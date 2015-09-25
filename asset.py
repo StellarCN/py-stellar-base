@@ -1,7 +1,7 @@
 # coding: utf-8
 
-from . import strkey, keypair
-from .stellarxdr import StellarXDR_pack as xdr
+from . import keypair
+from .stellarxdr import StellarXDR_pack as Xdr
 
 
 class Asset(object):
@@ -20,48 +20,34 @@ class Asset(object):
     def native():
         return Asset("XLM")
 
-    # @staticmethod
-    # def fromOperation(xdrAssetObject):
-    #     if xdrAssetObject.type == xdr.const.ASSET_TYPE_NATIVE:
-    #         return Asset.native()
-    #     if xdrAssetObject.type == xdr.const.ASSET_TYPE_CREDIT_ALPHANUM4:
-    #         anum = xdrAssetObject.alphaNum4  # nullClass in Xdr
-    #         issuer = strkey.encodeCheck("accountId", anum.issuer.ed25519)
-    #         code = anum.assetCode.rstrip('\0')
-    #         return Asset(code, issuer)
-    #     elif xdrAssetObject.type == xdr.const.ASSET_TYPE_CREDIT_ALPHANUM12:
-    #         anum = xdrAssetObject.alphaNum12
-    #         issuer = strkey.encodeCheck("accountId", anum.issuer.ed25519)
-    #         code = anum.assetCode.rstrip('\0')
-    #         return Asset(code, issuer)
-    #     else:
-    #         raise Exception("Invalid asset type:"+xdrAssetObject.type)
+    def is_native(self):
+        if self.issuer is None:
+            return True
+        else:
+            return False
 
-    def isNative(self):
-        return not self.issuer
-
-    def getCode(self):
+    def get_code(self):
         return self.code
 
-    def getIssuer(self):
+    def get_issuer(self):
         return self.issuer
 
     def equals(self, asset):
-        return self.code == asset.getCode() and self.issuer == asset.getIssuer()
+        return self.code == asset.get_code() and self.issuer == asset.get_issuer()
 
-    def toXdrObject(self) -> xdr.types.Asset:
-        if self.isNative():
-            xdrType = xdr.const.ASSET_TYPE_NATIVE
-            return xdr.types.Asset(type=xdrType)
+    def to_xdr_object(self) -> Xdr.types.Asset:
+        if self.is_native():
+            xdr_type = Xdr.const.ASSET_TYPE_NATIVE
+            return Xdr.types.Asset(type=xdr_type)
         else:
-            x = xdr.nullclass
+            x = Xdr.nullclass
             length = len(self.code)
-            padLength = 4 - length if length <= 4 else 12 - length
-            x.assetCode = self.code + '\x00' * padLength
-            x.issuer = keypair.KeyPair.fromAddress(self.issuer).accountId()
+            pad_length = 4 - length if length <= 4 else 12 - length
+            x.assetCode = self.code + '\x00' * pad_length
+            x.issuer = keypair.KeyPair.from_address(self.issuer).account_id()
         if length <= 4:
-            xdrType = xdr.const.ASSET_TYPE_CREDIT_ALPHANUM4
-            return xdr.types.Asset(type=xdrType, alphaNum4=x)
+            xdr_type = Xdr.const.ASSET_TYPE_CREDIT_ALPHANUM4
+            return Xdr.types.Asset(type=xdr_type, alphaNum4=x)
         else:
-            xdrType = xdr.const.ASSET_TYPE_CREDIT_ALPHANUM4
-            return xdr.types.Asset(type=xdrType, alphaNum12=x)
+            xdr_type = Xdr.const.ASSET_TYPE_CREDIT_ALPHANUM4
+            return Xdr.types.Asset(type=xdr_type, alphaNum12=x)

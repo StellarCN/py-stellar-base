@@ -1,6 +1,6 @@
 # coding:utf-8
+import hashlib
 
-import  hashlib
 
 def hash(data):
     return hashlib.sha256(data).digest()
