@@ -11,13 +11,13 @@ class TransactionEnvelope(object):
         self.tx = tx
         try:
             self.signatures = opts.get('signatures')
-        except:
+        except AttributeError:
             self.signatures = []
 
     def sign(self, *args):
         tx_hash = self.hash()
         for kp in args:
-            sig = kp.signDecorated(tx_hash)
+            sig = kp.sign_decorated(tx_hash)
             self.signatures.append(sig)
 
     def hash(self):
@@ -25,7 +25,10 @@ class TransactionEnvelope(object):
 
     def signature_base(self):
         network_id = Network.use_testnet_work().network_id()
-        tx_type = bytes([Xdr.const.ENVELOPE_TYPE_TX])  # int to bytes
+        tx_type = Xdr.STELLARXDRPacker()
+        tx_type.pack_EnvelopeType(Xdr.const.ENVELOPE_TYPE_TX)
+        tx_type = tx_type.get_buffer()
+
         tx = Xdr.STELLARXDRPacker()
         tx.pack_Transaction(self.tx.to_xdr_object())
         tx = tx.get_buffer()
