@@ -1,14 +1,13 @@
 # coding: utf-8
 
-from . import keypair
+from .utils import XdrLengthError, account_xdr_object
 from .stellarxdr import StellarXDR_pack as Xdr
 
 
 class Asset(object):
-
     def __init__(self, code, issuer=None):
         if len(code) > 12:
-            raise Exception("Asset code must be 12 characters at max.")
+            raise XdrLengthError("Asset code must be 12 characters at max.")
 
         if str(code).lower() != 'xlm' and issuer is None:
             raise Exception("Issuer cannot be null")
@@ -21,19 +20,10 @@ class Asset(object):
         return Asset("XLM")
 
     def is_native(self):
-        if self.issuer is None:
-            return True
-        else:
-            return False
+        return True if self.issuer is None else False
 
-    def get_code(self):
-        return self.code
-
-    def get_issuer(self):
-        return self.issuer
-
-    def equals(self, asset):
-        return self.code == asset.get_code() and self.issuer == asset.get_issuer()
+    # def equals(self, asset):
+    #     return self.code == asset.code and self.issuer == asset.issuer
 
     def to_xdr_object(self) -> Xdr.types.Asset:
         if self.is_native():
@@ -44,7 +34,7 @@ class Asset(object):
             length = len(self.code)
             pad_length = 4 - length if length <= 4 else 12 - length
             x.assetCode = self.code + '\x00' * pad_length
-            x.issuer = keypair.KeyPair.from_address(self.issuer).account_id()
+            x.issuer = account_xdr_object(self.issuer)
         if length <= 4:
             xdr_type = Xdr.const.ASSET_TYPE_CREDIT_ALPHANUM4
             return Xdr.types.Asset(type=xdr_type, alphaNum4=x)

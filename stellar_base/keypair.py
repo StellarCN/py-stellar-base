@@ -1,36 +1,41 @@
 # coding:utf-8
-from . import strkey
+from .utils import XdrLengthError, decode_check, encode_check
 from .stellarxdr import StellarXDR_pack as Xdr
-from pure25519 import ed25519_oop as ed25519
 import os
+# noinspection PyBroadException
+try:
+    # noinspection PyUnresolvedReferences
+    from pure25519 import ed25519_oop as ed25519
+except:
+    import ed25519
 
 
-class KeyPair(object):
+class Keypair(object):
     """ 创建随机地址与密钥
         从seed及secret构建KeyPair。
         验证地址及密钥是否正确
     """
     def __init__(self, verifying_key, signing_key=None):
+        assert type(verifying_key) is ed25519.VerifyingKey
         self.verifying_key = verifying_key
         self.signing_key = signing_key
-        
+
     @classmethod
     def random(cls):
         seed = os.urandom(32)
         return cls.from_raw_seed(seed)
-    
+
     @classmethod
     def from_seed(cls, seed):
-        raw_seed = strkey.decode_check("seed", seed)
+        raw_seed = decode_check("seed", seed)
         return cls.from_raw_seed(raw_seed)
-    
-    @classmethod   
+
+    @classmethod
     def from_raw_seed(cls, raw_seed):
         signing_key = ed25519.SigningKey(raw_seed)
         verifying_key = signing_key.get_verifying_key()
-
         return cls(verifying_key, signing_key)
-    
+
     # TODO 实现从原密钥到新密钥的转换
     @staticmethod
     def from_base58_seed(seed):
@@ -38,36 +43,35 @@ class KeyPair(object):
 
     @classmethod
     def from_address(cls, address):
-        public_key = strkey.decode_check("account_id", address)
+        public_key = decode_check("account", address)
         if len(public_key) != 32:
-            raise Exception('Invalid Stellar address')
+            raise XdrLengthError('Invalid Stellar address')
         verifying_key = ed25519.VerifyingKey(public_key)
         return cls(verifying_key)
 
-    # @property
-    def account_id(self):
+    def account_xdr_object(self):
         return Xdr.types.PublicKey(Xdr.const.KEY_TYPE_ED25519, self.verifying_key.to_bytes())
 
     def public_key(self):
-        return Xdr.types.PublicKey(Xdr.const.KEY_TYPE_ED25519, self.verifying_key.to_bytes())
+        return self.account_xdr_object()
 
     def raw_public_key(self):
-        return self.signing_key.sk_s
-
-    def address(self):
-        return strkey.encode_check('account_id', self.verifying_key.to_bytes())
-
-    def seed(self):
-        return strkey.encode_check('seed', self.signing_key.to_seed())
+        return self.verifying_key.to_bytes()
 
     def raw_seed(self):
         return self.signing_key.to_seed()
 
-    def raw_secret_key(self):
-        return self.signing_key
+    def address(self):
+        return encode_check('account', self.raw_public_key())
 
-    def can_sign(self):
-        return self.signing_key
+    def seed(self):
+        return encode_check('seed', self.raw_seed())
+
+    # def raw_secret_key(self):
+    #     return self.signing_key
+
+    # def can_sign(self):
+    #     return self.signing_key
 
     def sign(self, data):
         try:
@@ -84,4 +88,4 @@ class KeyPair(object):
         return Xdr.types.DecoratedSignature(hint, signature)
 
     def signature_hint(self):
-        return bytes(memoryview(self.public_key().ed25519)[-4:])
+        return bytes(self.public_key().ed25519[-4:])

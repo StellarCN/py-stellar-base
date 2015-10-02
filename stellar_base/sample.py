@@ -1,14 +1,13 @@
 # coding:utf-8
 import base64
-import sys
+import os, sys
 from stellar_base.stellarxdr import StellarXDR_pack as Xdr
 from stellar_base.operation import Operation
 from stellar_base.asset import Asset
 from stellar_base.transaction import Transaction
 from stellar_base.transaction_envelopo import TransactionEnvelope as Te
 from stellar_base.keypair import KeyPair
-sys.path.append('')  # the path
-
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 # base info
 seqNum = "34909494181888"

@@ -10,7 +10,7 @@ class TransactionEnvelope(object):
     def __init__(self, tx, opts=None):
         self.tx = tx
         try:
-            self.signatures = opts.get('signatures')
+            self.signatures = opts.get('signatures') or []
         except AttributeError:
             self.signatures = []
 
