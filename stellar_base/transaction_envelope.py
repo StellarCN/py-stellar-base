@@ -13,6 +13,7 @@ class TransactionEnvelope(object):
             self.signatures = opts.get('signatures') or []
         except AttributeError:
             self.signatures = []
+        self.network_id = Network(NETWORKS[opts.get('network_id', 'TESTNET')]).network_id()
 
     def sign(self, keypair):
         assert isinstance(keypair, Keypair)
@@ -25,10 +26,7 @@ class TransactionEnvelope(object):
         return xdr_hash(self.signature_base())
 
     def signature_base(self):
-        # TODO user can choose the network ,now default is the TestNet
-
-
-        network_id = Network(NETWORKS['TESTNET']).network_id()
+        network_id = self.network_id
         tx_type = Xdr.STELLARXDRPacker()
         tx_type.pack_EnvelopeType(Xdr.const.ENVELOPE_TYPE_TX)
         tx_type = tx_type.get_buffer()
