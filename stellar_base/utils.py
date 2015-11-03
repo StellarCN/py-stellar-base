@@ -16,6 +16,10 @@ from .stellarxdr import StellarXDR_pack as Xdr
 bytes_types = (bytes, bytearray)  # Types acceptable as binary data
 versionBytes = {'account': binascii.a2b_hex('30'), 'seed': binascii.a2b_hex('90')}
 
+def suppress_context(exc):
+    """ Python 2 compatible version of raise from None """
+    exc.__context__ = None
+    return exc
 
 def xdr_hash(data):
     return hashlib.sha256(data).digest()
@@ -40,8 +44,9 @@ def bytes_from_decode_data(s):
     try:
         return memoryview(s).tobytes()
     except TypeError:
-        raise TypeError("argument should be a bytes-like object or ASCII "
-                        "string, not %r" % s.__class__.__name__) from None
+        raise suppress_context(TypeError("argument should be a bytes-like "
+                                         "object or ASCII string, not %r" %
+                                         s.__class__.__name__))
 
 
 class XdrLengthError(Exception):

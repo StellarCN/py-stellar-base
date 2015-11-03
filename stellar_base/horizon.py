@@ -2,8 +2,16 @@
 
 import requests
 import json
-from sseclient import SSEClient
-from urllib.parse import urlencode
+try:
+    from sseclient import SSEClient
+except ImportError:
+    SSEClient = None
+try:
+    # Python 3
+    from urllib.parse import urlencode
+except ImportError:
+    # Python 2
+    from urllib import urlencode
 
 
 def query(url, params=None, sse=False):
@@ -11,6 +19,8 @@ def query(url, params=None, sse=False):
         p = requests.get(url, params, )
         return json.loads(p.text)
     else:
+        if SSEClient is None:
+            raise ValueError('SSE not supported, missing sseclient module')
         if params:
             url = url + '?' + urlencode(params)
         messages = SSEClient(url)
