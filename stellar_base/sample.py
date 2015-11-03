@@ -39,6 +39,5 @@ ex = x.get_buffer()
 ex = base64.b64encode(ex)
 
 url = "https://horizon-testnet.stellar.org/transactions"
-#url = "http://posttestserver.com/post.php"
 r = requests.post(url, data={'tx': ex.decode('ascii')})
 print(r.text)
