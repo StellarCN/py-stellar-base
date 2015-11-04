@@ -27,7 +27,7 @@ def query(url, params=None, sse=False):
         return messages
 
 
-class Horizon:
+class Horizon (object):
     def __init__(self, horizon=None):
         if horizon is None:
             self.horizon = 'https://horizon-testnet.stellar.org'
