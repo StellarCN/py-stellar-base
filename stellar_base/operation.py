@@ -21,9 +21,9 @@ class Operation(object):
         return Xdr.types.Operation(source_account, self.body)
 
 
-class CreateAccountOperation(Operation):
+class CreateAccount(Operation):
     def __init__(self, opts):
-        super().__init__(opts)
+        super(CreateAccount, self).__init__(opts)
         self.destination = opts.get('destination')
         self.starting_balance = opts.get('starting_balance')
 
@@ -33,12 +33,12 @@ class CreateAccountOperation(Operation):
         create_account_op = Xdr.types.CreateAccountOp(destination, self.starting_balance)
         self.body.type = Xdr.const.CREATE_ACCOUNT
         self.body.createAccountOp = create_account_op
-        return super().to_xdr_object()
+        return super(CreateAccount, self).to_xdr_object()
 
 
-class PaymentOperation(Operation):
+class Payment(Operation):
     def __init__(self, opts):
-        super().__init__(opts)
+        super(Payment, self).__init__(opts)
         self.destination = opts.get('destination')
         self.asset = opts.get('asset')
         self.amount = opts.get('amount')
@@ -50,12 +50,12 @@ class PaymentOperation(Operation):
         payment_op = Xdr.types.PaymentOp(destination, asset, self.amount)
         self.body.type = Xdr.const.PAYMENT
         self.body.paymentOp = payment_op
-        return super().to_xdr_object()
+        return super(Payment, self).to_xdr_object()
 
 
-class PathPaymentOperation(Operation):
+class PathPayment(Operation):
     def __init__(self, opts):
-        super().__init__(opts)
+        super(PathPayment, self).__init__(opts)
         self.destination = opts.get('destination')
         self.send_asset = opts.get('send_asset')
         self.send_max = opts.get('send_max')
@@ -72,12 +72,12 @@ class PathPaymentOperation(Operation):
                                                dest_asset, self.dest_amount, self.path)
         self.body.type = Xdr.const.PATH_PAYMENT
         self.body.pathPayment = path_payment
-        return super().to_xdr_object()
+        return super(PathPayment, self).to_xdr_object()
 
 
-class ChangeTrustOperation(Operation):
+class ChangeTrust(Operation):
     def __init__(self, opts):
-        super().__init__(opts)
+        super(ChangeTrust, self).__init__(opts)
         self.line = opts.get('asset')
         try:
             self.limit = int(opts.get('limit'))
@@ -89,13 +89,13 @@ class ChangeTrustOperation(Operation):
 
         change_trust_op = Xdr.types.ChangeTrustOp(line, self.limit)
         self.body.type = Xdr.const.CHANGE_TRUST
-        self.body.changeTrustOP = change_trust_op
-        return super().to_xdr_object()
+        self.body.changeTrustOp = change_trust_op
+        return super(ChangeTrust, self).to_xdr_object()
 
 
 class AllowTrust(Operation):
     def __init__(self, opts):
-        super().__init__(opts)
+        super(AllowTrust, self).__init__(opts)
         self.trustor = opts.get('trustor')
         self.asset_code = opts.get('asset_code')
         self.authorize = opts.get('authorize')
@@ -107,7 +107,7 @@ class AllowTrust(Operation):
         pad_length = 4 - length if length <= 4 else 12 - length
         asset_code = self.asset_code + '\x00' * pad_length
         asset = Xdr.nullclass()
-        if length == 4:
+        if len(asset_code) == 4:
             asset.type = Xdr.const.ASSET_TYPE_CREDIT_ALPHANUM4
             asset.assetCode4 = asset_code
         else:
@@ -116,13 +116,13 @@ class AllowTrust(Operation):
 
         allow_trust_op = Xdr.types.AllowTrustOp(trustor, asset, self.authorize)
         self.body.type = Xdr.const.ALLOW_TRUST
-        self.body.changeTrustOP = allow_trust_op
-        return super().to_xdr_object()
+        self.body.allowTrustOp = allow_trust_op
+        return super(AllowTrust, self).to_xdr_object()
 
 
-class SetOptionsOperation(Operation):
+class SetOptions(Operation):
     def __init__(self, opts):
-        super().__init__(opts)
+        super(SetOptions, self).__init__(opts)
         self.inflation_dest = opts.get('inflation_dest') or None
         self.clear_flags = opts.get('clear_flags') or None
         self.set_flags = opts.get('set_flags') or None
@@ -152,12 +152,12 @@ class SetOptionsOperation(Operation):
                                                 self.high_threshold, self.home_domain, singer)
         self.body.type = Xdr.const.SET_OPTIONS
         self.body.setOptionsOp = set_options_op
-        return super().to_xdr_object()
+        return super(SetOptions, self).to_xdr_object()
 
 
-class ManageOfferOperation(Operation):
+class ManageOffer(Operation):
     def __init__(self, opts):
-        super().__init__(opts)
+        super(ManageOffer, self).__init__(opts)
         self.selling = opts.get('selling')
         self.buying = opts.get('buying')
         self.amount = opts.get('amount')
@@ -174,12 +174,12 @@ class ManageOfferOperation(Operation):
         manage_offer_op = Xdr.types.ManageOfferOp(selling, buying, self.amount, price, self.offer_id)
         self.body.type = Xdr.const.MANAGE_OFFER
         self.body.changeTrustOP = manage_offer_op
-        return super().to_xdr_object()
+        return super(ManageOffer, self).to_xdr_object()
 
 
 class CreatePassiveOffer(Operation):
     def __init__(self, opts):
-        super().__init__(opts)
+        super(CreatePassiveOffer, self).__init__(opts)
         self.selling = opts.get('selling')
         self.buying = opts.get('buying')
         self.amount = opts.get('amount')
@@ -195,12 +195,12 @@ class CreatePassiveOffer(Operation):
         create_passive_offer_op = Xdr.types.CreatePassiveOfferOp(selling, buying, self.amount, price)
         self.body.type = Xdr.const.CREATE_PASSIVE_OFFER
         self.body.createPassiveOfferOp = create_passive_offer_op
-        return super().to_xdr_object()
+        return super(CreatePassiveOffer, self).to_xdr_object()
 
 
-class AccountMergeOperation(Operation):
+class AccountMerge(Operation):
     def __init__(self, opts):
-        super().__init__(opts)
+        super(AccountMerge, self).__init__(opts)
         self.destination = opts.get('destination')
 
     def to_xdr_object(self):
@@ -208,13 +208,13 @@ class AccountMergeOperation(Operation):
 
         self.body.type = Xdr.const.ACCOUNT_MERGE
         self.body.accountMerge = destination
-        return super().to_xdr_object()
+        return super(AccountMerge, self).to_xdr_object()
 
 
-class InflationOperation(Operation):
+class Inflation(Operation):
     def __init__(self, opts):
-        super().__init__(opts)
+        super(Inflation, self).__init__(opts)
 
     def to_xdr_object(self):
         self.body.type = Xdr.const.INFLATION
-        return super().to_xdr_object()
+        return super(Inflation, self).to_xdr_object()
