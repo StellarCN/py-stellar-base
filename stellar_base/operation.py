@@ -89,7 +89,7 @@ class ChangeTrust(Operation):
 
         change_trust_op = Xdr.types.ChangeTrustOp(line, self.limit)
         self.body.type = Xdr.const.CHANGE_TRUST
-        self.body.changeTrustOP = change_trust_op
+        self.body.changeTrustOp = change_trust_op
         return super(ChangeTrust, self).to_xdr_object()
 
 
@@ -107,7 +107,7 @@ class AllowTrust(Operation):
         pad_length = 4 - length if length <= 4 else 12 - length
         asset_code = self.asset_code + '\x00' * pad_length
         asset = Xdr.nullclass()
-        if length == 4:
+        if len(asset_code) == 4:
             asset.type = Xdr.const.ASSET_TYPE_CREDIT_ALPHANUM4
             asset.assetCode4 = asset_code
         else:
@@ -116,7 +116,7 @@ class AllowTrust(Operation):
 
         allow_trust_op = Xdr.types.AllowTrustOp(trustor, asset, self.authorize)
         self.body.type = Xdr.const.ALLOW_TRUST
-        self.body.changeTrustOP = allow_trust_op
+        self.body.allowTrustOp = allow_trust_op
         return super(AllowTrust, self).to_xdr_object()
 
 
