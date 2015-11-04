@@ -25,7 +25,7 @@ class Asset(object):
     # def equals(self, asset):
     #     return self.code == asset.code and self.issuer == asset.issuer
 
-    def to_xdr_object(self) -> Xdr.types.Asset:
+    def to_xdr_object(self):# -> Xdr.types.Asset:
         if self.is_native():
             xdr_type = Xdr.const.ASSET_TYPE_NATIVE
             return Xdr.types.Asset(type=xdr_type)
