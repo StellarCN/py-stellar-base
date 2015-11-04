@@ -10,13 +10,13 @@ from stellar_base.horizon import Horizon
 
 def create_account_op_build(destination,starting_balance):
     opts = {'destination':destination, 'starting_balance':starting_balance}
-    return CreateAccountOperation(opts)
+    return CreateAccount(opts)
 
 
 def pay_op_build(destination, amount, asset_type='XLM', asset_issuer=None, address=None):
     asset = Asset(code=asset_type, issuer=asset_issuer)
     opts = {'source': address, 'destination': destination, 'asset': asset, 'amount': amount}
-    return PaymentOperation(opts)
+    return Payment(opts)
 
 
 def tx_build(address, operation, seq=None, time_bounds=None, memo=None, fee=None):
