@@ -8,7 +8,8 @@ try:
     from pure25519 import ed25519_oop as ed25519
 except:
     import ed25519
-
+import hashlib
+import base58
 
 class Keypair(object):
     """ 创建随机地址与密钥
@@ -89,3 +90,10 @@ class Keypair(object):
 
     def signature_hint(self):
         return bytes(self.public_key().ed25519[-4:])
+
+    def to_old_address(self):
+        rv = hashlib.new('sha256', self.raw_public_key()).digest()
+        rv = hashlib.new('ripemd160', rv).digest()
+        rv = '\x00' + rv
+        rv += hashlib.new('sha256', hashlib.new('sha256', rv).digest()).digest()[0:4]
+        return base58.encode(rv)
