@@ -13,6 +13,12 @@ except:
     import ed25519
 from .stellarxdr import StellarXDR_pack as Xdr
 
+# Compatibility for Python 3.x that dont have unicode type
+try:
+    type(unicode)
+except NameError:
+    unicode = str
+
 bytes_types = (bytes, bytearray)  # Types acceptable as binary data
 versionBytes = {'account': binascii.a2b_hex('30'), 'seed': binascii.a2b_hex('90')}
 
