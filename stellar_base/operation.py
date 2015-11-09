@@ -127,29 +127,29 @@ class SetOptions(Operation):
         self.clear_flags = opts.get('clear_flags') or None
         self.set_flags = opts.get('set_flags') or None
         self.master_weight = opts.get('master_weight') or None
-        self.low_threshold = opts.get('lowThreshold') or None
-        self.med_threshold = opts.get('medThreshold') or None
+        self.low_threshold = opts.get('low_threshold') or None
+        self.med_threshold = opts.get('med_threshold') or None
         self.high_threshold = opts.get('high_threshold') or None
         self.home_domain = opts.get('home_domain') or None
         try:
-            self.singer_address = opts.get('signer').address
-            self.singer_weight = opts.get('signer').weight
+            self.signer_address = opts['signer_address']
+            self.signer_weight = opts['signer_weight']
         except KeyError:
-            self.singer_address = None
+            self.signer_address = None
 
     def to_xdr_object(self):
         if self.inflation_dest is not None:
             inflation_dest = account_xdr_object(self.inflation_dest)
         else:
             inflation_dest = None
-        if self.singer_address is not None:
-            singer = Xdr.types.Signer(account_xdr_object(self.singer_address), self.singer_weight)
+        if self.signer_address is not None:
+            signer = Xdr.types.Signer(account_xdr_object(self.signer_address), self.signer_weight)
         else:
-            singer = None
+            signer = None
 
         set_options_op = Xdr.types.SetOptionsOp(inflation_dest, self.clear_flags, self.set_flags,
                                                 self.master_weight, self.low_threshold, self.med_threshold,
-                                                self.high_threshold, self.home_domain, singer)
+                                                self.high_threshold, self.home_domain, signer)
         self.body.type = Xdr.const.SET_OPTIONS
         self.body.setOptionsOp = set_options_op
         return super(SetOptions, self).to_xdr_object()
