@@ -34,7 +34,7 @@ def account_xdr_object(account):
 def bytes_from_decode_data(s):
     """copy from base64._bytes_from_decode_data
     """
-    if isinstance(s, str):
+    if isinstance(s, (str, unicode)):
         try:
             return s.encode('ascii')
         except UnicodeEncodeError:

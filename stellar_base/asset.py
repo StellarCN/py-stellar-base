@@ -15,6 +15,15 @@ class Asset(object):
         self.code = code
         self.issuer = issuer
 
+    def to_dict(self):
+        rv = {'asset_code': self.code}
+        if not self.is_native():
+            rv['asset_issuer'] = self.issuer
+            rv['asset_type'] = len(self.code) > 4 and 'credit_alphanum12' or 'credit_alphanum4'
+        else:
+            rv['asset_type'] = 'native'
+        return rv
+
     @staticmethod
     def native():
         return Asset("XLM")
