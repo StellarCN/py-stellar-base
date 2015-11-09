@@ -7,24 +7,62 @@
 namespace stellar
 {
 
+enum ErrorCode
+{
+    ERR_MISC = 0, // Unspecific error
+    ERR_DATA = 1, // Malformed data
+    ERR_CONF = 2, // Misconfiguration error
+    ERR_AUTH = 3, // Authentication failure
+    ERR_LOAD = 4  // System overloaded
+};
+
 struct Error
 {
-    int code;
+    ErrorCode code;
     string msg<100>;
+};
+
+struct AuthCert
+{
+    Curve25519Public pubkey;
+    uint64 expiration;
+    Signature sig;
 };
 
 struct Hello
 {
     uint32 ledgerVersion;
     uint32 overlayVersion;
+    Hash networkID;
     string versionStr<100>;
     int listeningPort;
     NodeID peerID;
+    AuthCert cert;
+    uint256 nonce;
+};
+
+struct Auth
+{
+    // Empty message, just to confirm
+    // establishment of MAC keys.
+    int unused;
+};
+
+enum IPAddrType
+{
+    IPv4 = 0,
+    IPv6 = 1
 };
 
 struct PeerAddress
 {
-    opaque ip[4];
+    union switch (IPAddrType type)
+    {
+    case IPv4:
+        opaque ipv4[4];
+    case IPv6:
+        opaque ipv6[16];
+    } ip;
     uint32 port;
     uint32 numFailures;
 };
@@ -33,20 +71,21 @@ enum MessageType
 {
     ERROR_MSG = 0,
     HELLO = 1,
-    DONT_HAVE = 2,
+    AUTH = 2,
+    DONT_HAVE = 3,
 
-    GET_PEERS = 3, // gets a list of peers this guy knows about
-    PEERS = 4,
+    GET_PEERS = 4, // gets a list of peers this guy knows about
+    PEERS = 5,
 
-    GET_TX_SET = 5, // gets a particular txset by hash
-    TX_SET = 6,
+    GET_TX_SET = 6, // gets a particular txset by hash
+    TX_SET = 7,
 
-    TRANSACTION = 7, // pass on a tx you have heard about
+    TRANSACTION = 8, // pass on a tx you have heard about
 
     // SCP
-    GET_SCP_QUORUMSET = 8,
-    SCP_QUORUMSET = 9,
-    SCP_MESSAGE = 10
+    GET_SCP_QUORUMSET = 9,
+    SCP_QUORUMSET = 10,
+    SCP_MESSAGE = 11
 };
 
 struct DontHave
@@ -61,6 +100,8 @@ case ERROR_MSG:
     Error error;
 case HELLO:
     Hello hello;
+case AUTH:
+    Auth auth;
 case DONT_HAVE:
     DontHave dontHave;
 case GET_PEERS:
@@ -84,4 +125,12 @@ case SCP_QUORUMSET:
 case SCP_MESSAGE:
     SCPEnvelope envelope;
 };
+
+struct AuthenticatedMessage
+{
+   uint64 sequence;
+   StellarMessage message;
+   HmacSha256Mac mac;
+};
+
 }
