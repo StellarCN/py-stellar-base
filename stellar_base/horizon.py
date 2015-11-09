@@ -40,6 +40,9 @@ class Horizon (object):
         p = requests.post(url, params=params, )  # timeout=20
         return json.loads(p.text)
 
+    def query(self, url, params=None, sse=False):
+        return query(self.horizon+url, params, sse)
+
     def accounts(self, params=None, sse=False):
         url = self.horizon + '/accounts/'
         return query(url, params, sse)
