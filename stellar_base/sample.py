@@ -1,38 +1,65 @@
 # coding:utf-8
-import base64
-import os, sys
-from stellar_base.stellarxdr import StellarXDR_pack as Xdr
-from stellar_base.operation import PaymentOperation
+import sys
+sys.path.append('.')
+
+from stellar_base.operation import Payment
 from stellar_base.asset import Asset
 from stellar_base.transaction import Transaction
 from stellar_base.transaction_envelope import TransactionEnvelope as Te
 from stellar_base.keypair import Keypair
-sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+from stellar_base.memo import *
 
-# base info
-seqNum = "34909494181888"
-address = "GDVDKQFP665JAO7A2LSHNLQIUNYNAAIGJ6FYJVMG4DT3YJQQJSRBLQDG"
-secret = 'SCVLSUGYEAUC4MVWJORB63JBMY2CEX6ATTJ5MXTENGD3IELUQF4F6HUB'
-# input
-destination = 'GBS43BF24ENNS3KPACUZVKK2VYPOZVBQO2CISGZ777RYGOPYC2FT6S3K'
-asset = Asset.native()
-amount = 1000
+url = 'https://horizon-testnet.stellar.org'
 
-# process
-opts = {'source': address, 'destination': destination, 'asset': asset, 'amount': amount}
-operation = PaymentOperation(opts)
+# Only for sample 'requests' and 'simplejson' are required.
+import requests
+import simplejson as json
 
+def newAccount(creator=False):
+	kp = Keypair.random()
+	r = requests.get(url + '/friendbot?addr=' + kp.address().decode('ascii')) # Get 1000 lumens
+	assert 'hash' in json.loads(r.text)
+	return {
+		'address': kp.address().decode('ascii'),
+		'seed': kp.seed().decode('ascii')
+	}
 
-opts = {'seqNum': seqNum}
+def packer(envelope=False):
+	import base64
+	from stellar_base.stellarxdr import StellarXDR_pack as Xdr
+	x = Xdr.STELLARXDRPacker()
+	x.pack_TransactionEnvelope(envelope.to_xdr_object())
+	return base64.b64encode(x.get_buffer())
 
-tx = Transaction(address, opts)
-tx.add_operation(operation)
-envelope = Te(tx)
-signer = Keypair.from_seed(secret)
-envelope.sign(signer)
-exo = envelope.to_xdr_object()
-x = Xdr.STELLARXDRPacker()
-x.pack_TransactionEnvelope(exo)
-ex = x.get_buffer()
-ex = base64.b64encode(ex)
-print(ex)
+anna = newAccount()
+bob = newAccount()
+print('Anna: ', json.dumps(anna, sort_keys=True, indent=4 * ' '))
+print('Bob: ', json.dumps(bob, sort_keys=True, indent=4 * ' '))
+
+operation = Payment({
+	'source': anna['address'],
+	'destination': bob['address'],
+	'asset': Asset.native(),
+	'amount': 10*10**6,
+})
+tx = Transaction(
+	source=anna['address'],
+	opts={
+		'seqNum': json.loads(requests.get(url+'/accounts/'+anna['address']).text)['sequence'],
+		'timeBounds': [],
+		'memo': NoneMemo(),
+		'fee': 100,
+		'operations': [
+			operation,
+		],
+	},
+)
+envelope = Te(tx=tx, opts={"network_id": "TESTNET"})
+envelope.sign(Keypair.from_seed(anna['seed']))
+
+print('Tx: ', json.dumps(json.loads(requests.post(
+	url=url+'/transactions',
+	data={
+		'tx': packer(envelope).decode('ascii')
+	}
+).text), sort_keys=True, indent=4 * ' '))

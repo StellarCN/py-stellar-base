@@ -11,7 +11,7 @@ try:
     from pure25519 import ed25519_oop as ed25519
 except:
     import ed25519
-from .stellarxdr import StellarXDR_pack as Xdr
+from stellar_base.stellarxdr import StellarXDR_pack as Xdr
 
 # Compatibility for Python 3.x that dont have unicode type
 try:
