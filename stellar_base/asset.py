@@ -42,11 +42,11 @@ class Asset(object):
             x = Xdr.nullclass
             length = len(self.code)
             pad_length = 4 - length if length <= 4 else 12 - length
-            x.assetCode = self.code + '\x00' * pad_length
+            x.assetCode = bytearray(self.code,'ascii') + b'\x00' * pad_length
             x.issuer = account_xdr_object(self.issuer)
         if length <= 4:
             xdr_type = Xdr.const.ASSET_TYPE_CREDIT_ALPHANUM4
             return Xdr.types.Asset(type=xdr_type, alphaNum4=x)
         else:
-            xdr_type = Xdr.const.ASSET_TYPE_CREDIT_ALPHANUM4
+            xdr_type = Xdr.const.ASSET_TYPE_CREDIT_ALPHANUM12
             return Xdr.types.Asset(type=xdr_type, alphaNum12=x)

@@ -96,7 +96,7 @@ class Horizon (object):
         return query(url, params)
 
     def order_book_trades(self, params=None):
-        url = self.horizon + '/orderbook/trades/'
+        url = self.horizon + '/order_book/trades/'
         return query(url, params)
 
     def ledgers(self, params=None, sse=False):
@@ -131,7 +131,7 @@ class Horizon (object):
         url = self.horizon + '/operations/'
         return query(url, params, sse)
 
-    def operation(self, op_id,params=None):
+    def operation(self, op_id, params=None):
         url = self.horizon + '/operations/' + op_id
         return query(url, params)
 
