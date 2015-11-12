@@ -1,0 +1,10 @@
+language: python
+
+python:
+	- "2.7"
+	- "3.4"
+install:
+	- pip install ed25519 crc16 requests SSEClient
+
+script:
+	- python -m unittest tests
