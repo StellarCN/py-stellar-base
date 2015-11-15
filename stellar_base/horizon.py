@@ -16,7 +16,7 @@ except ImportError:
 
 def query(url, params=None, sse=False):
     if sse is False:
-        p = requests.get(url, params, )
+        p = requests.get(url, params=params)
         return json.loads(p.text)
     else:
         if SSEClient is None:
