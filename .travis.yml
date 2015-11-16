@@ -5,10 +5,12 @@ python:
   - 2.7
   - 3.4
   - 3.5
-  - pypy
+
 cache: pip
 # command to install dependencies
-install: "pip install -U pytest"
+install: 
+  - python setup.py install --user
+  - pip install -U pytest
 # # command to run tests
 script:
   - py.test .
