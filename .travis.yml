@@ -1,16 +1,21 @@
-sudo: false
 language: python
 python:
-  - 2.6
   - 2.7
   - 3.4
   - 3.5
-
-cache: pip
-# command to install dependencies
-install: 
-  - python setup.py install --user
-  - pip install -U pytest
-# # command to run tests
+install: python setup.py install
 script:
-  - py.test .
+  - ls
+  - python -m nose -v
+notifications:
+  email: false
+  irc:
+    channels: "irc.freenode.org#stellar-py"
+    template:
+      - "%{repository}@%{branch}: %{message} (%{build_url})"
+    on_success: change
+    on_failure: change
+branches:
+  only:
+    - master
+    - /^rc-.*$/
