@@ -3,7 +3,9 @@ python:
   - 2.7
   - 3.4
   - 3.5
-install: python setup.py install
+install:
+  - python setup.py install
+  - pip install coverage
 script:
   - ls
   - python -m nose -v

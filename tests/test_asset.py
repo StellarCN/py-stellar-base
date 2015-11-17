@@ -1,20 +1,29 @@
-from unittest import TestCase
+from nose.tools import raises
 from stellar_base.asset import Asset
 from stellar_base.stellarxdr import StellarXDR_pack as Xdr
 
-
-class TestAsset(TestCase):
+class TestAsset:
+    def __init__(self):
+        self.source = 'GDJVFDG5OCW5PYWHB64MGTHGFF57DRRJEDUEFDEL2SLNIOONHYJWHA3Z'
 
     def test_native(self):
-        self.assertEqual('XLM', Asset.native().code)
-        self.assertEqual(None,Asset.native().issuer)
+        assert 'XLM' == Asset.native().code
+        assert None == Asset.native().issuer
 
     def test_is_native(self):
         native = Asset('XLM')
-        cny = Asset('CNY','GDVDKQFP665JAO7A2LSHNLQIUNYNAAIGJ6FYJVMG4DT3YJQQJSRBLQDG')
-        self.assertTrue(native.is_native())
-        self.assertFalse(cny.is_native())
+        cny = Asset('CNY', self.source)
+        assert native.is_native()
+        assert not cny.is_native()
 
     def test_to_xdr_object(self):
-        cny = Asset('CNY','GDVDKQFP665JAO7A2LSHNLQIUNYNAAIGJ6FYJVMG4DT3YJQQJSRBLQDG')
-        self.assertIsInstance(cny.test_to_xdr_object(), Xdr.types.Asset)
+        cny = Asset('CNY', self.source)
+        assert isinstance(cny.to_xdr_object(), Xdr.types.Asset)
+
+    @raises(Exception)
+    def test_too_long(self):
+        Asset('123456789012TooLong', self.source)
+
+    @raises(Exception)
+    def test_no_issuer(self):
+        Asset('beer', None)
