@@ -130,13 +130,13 @@ class SetOptions(Operation):
     def __init__(self, opts):
         super(SetOptions, self).__init__(opts)
         self.inflation_dest = opts.get('inflation_dest') or None
-        self.clear_flags = opts.get('clear_flags') or []
-        self.set_flags = opts.get('set_flags') or []
-        self.master_weight = opts.get('master_weight') or []
-        self.low_threshold = opts.get('low_threshold') or []
-        self.med_threshold = opts.get('med_threshold') or []
-        self.high_threshold = opts.get('high_threshold') or []
-        self.home_domain = opts.get('home_domain') or []
+        self.clear_flags = opts.get('clear_flags') or None
+        self.set_flags = opts.get('set_flags') or None
+        self.master_weight = opts.get('master_weight') or None
+        self.low_threshold = opts.get('low_threshold') or None
+        self.med_threshold = opts.get('med_threshold') or None
+        self.high_threshold = opts.get('high_threshold') or None
+        self.home_domain = opts.get('home_domain') or None
         try:
             self.signer_address = opts['signer_address']
             self.signer_weight = opts['signer_weight']
@@ -144,10 +144,25 @@ class SetOptions(Operation):
             self.signer_address = None
 
     def to_xdr_object(self):
+        def assert_option_array(x):
+            if x is None:
+                return []
+            if not isinstance(x, list):
+                return [x]
+            return x
         if self.inflation_dest is not None:
             inflation_dest = [account_xdr_object(self.inflation_dest)]
         else:
             inflation_dest = []
+
+        self.clear_flags = assert_option_array(self.clear_flags)
+        self.set_flags = assert_option_array(self.set_flags)
+        self.master_weight = assert_option_array(self.master_weight)
+        self.low_threshold = assert_option_array(self.low_threshold)
+        self.med_threshold = assert_option_array(self.med_threshold)
+        self.high_threshold = assert_option_array(self.high_threshold)
+        self.home_domain = assert_option_array(self.home_domain)
+
         if self.signer_address is not None:
             signer = [Xdr.types.Signer(account_xdr_object(self.signer_address), self.signer_weight)]
         else:
