@@ -1,6 +1,6 @@
 # coding:utf-8
 from .stellarxdr import StellarXDR_pack as Xdr
-from .utils import account_xdr_object
+from .utils import account_xdr_object,best_rational_approximation as best_r
 import base64
 
 class Operation(object):
@@ -11,7 +11,7 @@ class Operation(object):
         assert type(opts) is dict
 
         self.source = opts.get('source')
-        self.body = Xdr.nullclass
+        self.body = Xdr.nullclass()
 
     def to_xdr_object(self):
         try:
@@ -66,7 +66,7 @@ class PathPayment(Operation):
         self.send_max = opts.get('send_max')
         self.dest_asset = opts.get('dest_asset')
         self.dest_amount = opts.get('dest_amount')
-        self.path = opts.get('path')
+        self.path = opts.get('path')  # a list of paths
 
     def to_xdr_object(self):
         destination = account_xdr_object(self.destination)
@@ -76,7 +76,7 @@ class PathPayment(Operation):
         path_payment = Xdr.types.PathPaymentOp(send_asset, self.send_max, destination,
                                                dest_asset, self.dest_amount, self.path)
         self.body.type = Xdr.const.PATH_PAYMENT
-        self.body.pathPayment = path_payment
+        self.body.pathPaymentOp = path_payment
         return super(PathPayment, self).to_xdr_object()
 
 
@@ -129,14 +129,14 @@ class AllowTrust(Operation):
 class SetOptions(Operation):
     def __init__(self, opts):
         super(SetOptions, self).__init__(opts)
-        self.inflation_dest = opts.get('inflation_dest') or None
-        self.clear_flags = opts.get('clear_flags') or None
-        self.set_flags = opts.get('set_flags') or None
-        self.master_weight = opts.get('master_weight') or None
-        self.low_threshold = opts.get('low_threshold') or None
-        self.med_threshold = opts.get('med_threshold') or None
-        self.high_threshold = opts.get('high_threshold') or None
-        self.home_domain = opts.get('home_domain') or None
+        self.inflation_dest = opts.get('inflation_dest')
+        self.clear_flags = opts.get('clear_flags')
+        self.set_flags = opts.get('set_flags')
+        self.master_weight = opts.get('master_weight')
+        self.low_threshold = opts.get('low_threshold')
+        self.med_threshold = opts.get('med_threshold')
+        self.high_threshold = opts.get('high_threshold')
+        self.home_domain = opts.get('home_domain')
         try:
             self.signer_address = opts['signer_address']
             self.signer_weight = opts['signer_weight']
@@ -179,22 +179,21 @@ class SetOptions(Operation):
 class ManageOffer(Operation):
     def __init__(self, opts):
         super(ManageOffer, self).__init__(opts)
-        self.selling = opts.get('selling')
-        self.buying = opts.get('buying')
+        self.selling = opts.get('selling')  # Asset
+        self.buying = opts.get('buying')    # Asset
         self.amount = opts.get('amount')
-        # TODO
-        # approx = best_r(opts.price)
-        self.price = dict(n=None, d=None)
-        self.offer_id = opts.get('offerId')
+        self.price = opts.get('price')
+        self.offer_id = opts.get('offerId', 0)
 
     def to_xdr_object(self):
         selling = self.selling.to_xdr_object()
         buying = self.buying.to_xdr_object()
-        price = Xdr.types.Price(n=self.price['n'], d=self.price['d'])
+        price = best_r(self.price)
+        price = Xdr.types.Price(price['n'], price['d'])
 
         manage_offer_op = Xdr.types.ManageOfferOp(selling, buying, self.amount, price, self.offer_id)
         self.body.type = Xdr.const.MANAGE_OFFER
-        self.body.changeTrustOP = manage_offer_op
+        self.body.manageOfferOp = manage_offer_op
         return super(ManageOffer, self).to_xdr_object()
 
 
@@ -204,14 +203,14 @@ class CreatePassiveOffer(Operation):
         self.selling = opts.get('selling')
         self.buying = opts.get('buying')
         self.amount = opts.get('amount')
-        # TODO
-        # approx = best_r(opts.price)
-        self.price = dict(n=None, d=None)
+        self.price = opts.get('price')
 
     def to_xdr_object(self):
         selling = self.selling.to_xdr_object()
         buying = self.buying.to_xdr_object()
-        price = Xdr.types.Price(self.price['n'], self.price['d'])
+
+        price = best_r(self.price)
+        price = Xdr.types.Price(price['n'], price['d'])
 
         create_passive_offer_op = Xdr.types.CreatePassiveOfferOp(selling, buying, self.amount, price)
         self.body.type = Xdr.const.CREATE_PASSIVE_OFFER

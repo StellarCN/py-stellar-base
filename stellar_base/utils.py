@@ -12,6 +12,7 @@ try:
 except:
     import ed25519
 from stellar_base.stellarxdr import StellarXDR_pack as Xdr
+from fractions import Fraction
 
 # Compatibility for Python 3.x that dont have unicode type
 try:
@@ -101,3 +102,8 @@ def calculate_checksum(payload):
     checksum = crc16.crc16xmodem(payload)
     checksum = struct.pack('H', checksum)
     return checksum
+
+
+def best_rational_approximation(x):
+    p = Fraction(x).limit_denominator(10**8)
+    return {'n':p.numerator,'d':p.denominator}
