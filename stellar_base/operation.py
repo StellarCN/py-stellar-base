@@ -145,11 +145,11 @@ class SetOptions(Operation):
 
     def to_xdr_object(self):
         if self.inflation_dest is not None:
-            inflation_dest = account_xdr_object(self.inflation_dest)
+            inflation_dest = [account_xdr_object(self.inflation_dest)]
         else:
             inflation_dest = []
         if self.signer_address is not None:
-            signer = Xdr.types.Signer(account_xdr_object(self.signer_address), self.signer_weight)
+            signer = [Xdr.types.Signer(account_xdr_object(self.signer_address), self.signer_weight)]
         else:
             signer = []
 
