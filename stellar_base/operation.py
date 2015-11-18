@@ -1,7 +1,7 @@
 # coding:utf-8
 from .stellarxdr import StellarXDR_pack as Xdr
 from .utils import account_xdr_object
-
+import base64
 
 class Operation(object):
     """follow the specific . the source can be none.
@@ -19,6 +19,11 @@ class Operation(object):
         except TypeError:
             source_account = []
         return Xdr.types.Operation(source_account, self.body)
+
+    def xdr(self):
+        op = Xdr.STELLARXDRPacker()
+        op.pack_Operation(self.to_xdr_object())
+        return base64.b64encode(op.get_buffer())
 
 
 class CreateAccount(Operation):
@@ -106,6 +111,7 @@ class AllowTrust(Operation):
         assert length <= 12
         pad_length = 4 - length if length <= 4 else 12 - length
         asset_code = self.asset_code + '\x00' * pad_length
+        asset_code = bytearray(asset_code, encoding='utf-8')
         asset = Xdr.nullclass()
         if len(asset_code) == 4:
             asset.type = Xdr.const.ASSET_TYPE_CREDIT_ALPHANUM4
@@ -124,13 +130,13 @@ class SetOptions(Operation):
     def __init__(self, opts):
         super(SetOptions, self).__init__(opts)
         self.inflation_dest = opts.get('inflation_dest') or None
-        self.clear_flags = opts.get('clear_flags') or None
-        self.set_flags = opts.get('set_flags') or None
-        self.master_weight = opts.get('master_weight') or None
-        self.low_threshold = opts.get('low_threshold') or None
-        self.med_threshold = opts.get('med_threshold') or None
-        self.high_threshold = opts.get('high_threshold') or None
-        self.home_domain = opts.get('home_domain') or None
+        self.clear_flags = opts.get('clear_flags') or []
+        self.set_flags = opts.get('set_flags') or []
+        self.master_weight = opts.get('master_weight') or []
+        self.low_threshold = opts.get('low_threshold') or []
+        self.med_threshold = opts.get('med_threshold') or []
+        self.high_threshold = opts.get('high_threshold') or []
+        self.home_domain = opts.get('home_domain') or []
         try:
             self.signer_address = opts['signer_address']
             self.signer_weight = opts['signer_weight']
@@ -141,11 +147,11 @@ class SetOptions(Operation):
         if self.inflation_dest is not None:
             inflation_dest = account_xdr_object(self.inflation_dest)
         else:
-            inflation_dest = None
+            inflation_dest = []
         if self.signer_address is not None:
             signer = Xdr.types.Signer(account_xdr_object(self.signer_address), self.signer_weight)
         else:
-            signer = None
+            signer = []
 
         set_options_op = Xdr.types.SetOptionsOp(inflation_dest, self.clear_flags, self.set_flags,
                                                 self.master_weight, self.low_threshold, self.med_threshold,
@@ -207,7 +213,7 @@ class AccountMerge(Operation):
         destination = account_xdr_object(self.destination)
 
         self.body.type = Xdr.const.ACCOUNT_MERGE
-        self.body.accountMerge = destination
+        self.body.destination = destination
         return super(AccountMerge, self).to_xdr_object()
 
 
