@@ -39,7 +39,7 @@ class Asset(object):
             xdr_type = Xdr.const.ASSET_TYPE_NATIVE
             return Xdr.types.Asset(type=xdr_type)
         else:
-            x = Xdr.nullclass
+            x = Xdr.nullclass()
             length = len(self.code)
             pad_length = 4 - length if length <= 4 else 12 - length
             x.assetCode = bytearray(self.code,'ascii') + b'\x00' * pad_length
