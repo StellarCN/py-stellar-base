@@ -1,9 +1,11 @@
 # coding: utf-8
+import base64
+
 from .network import Network, NETWORKS
 from .utils import xdr_hash
 from .stellarxdr import StellarXDR_pack as Xdr
 from .keypair import Keypair
-import base64
+from .transaction import Transaction
 
 
 class TransactionEnvelope(object):
@@ -34,7 +36,7 @@ class TransactionEnvelope(object):
         tx = Xdr.STELLARXDRPacker()
         tx.pack_Transaction(self.tx.to_xdr_object())
         tx = tx.get_buffer()
-        return network_id+tx_type+tx
+        return network_id + tx_type + tx
 
     def to_xdr_object(self):
         tx = self.tx.to_xdr_object()
@@ -43,6 +45,18 @@ class TransactionEnvelope(object):
     def xdr(self):
         te = Xdr.STELLARXDRPacker()
         te.pack_TransactionEnvelope(self.to_xdr_object())
-        # te = base64.encodebytes(te.get_buffer()) # with \n
         te = base64.b64encode(te.get_buffer())
+        return te
+
+    # can not get network id from XDR , default is 'TESTNET'
+    @classmethod
+    def from_xdr(cls, xdr):
+        xdr_decoded = base64.b64decode(xdr)
+        te = Xdr.STELLARXDRUnpacker(xdr_decoded)
+        te_xdr_object = te.unpack_TransactionEnvelope()
+        signatures = te_xdr_object.signatures
+        tx_xdr_object = te_xdr_object.tx
+        tx = Transaction.from_xdr_object(tx_xdr_object)
+        te = TransactionEnvelope(tx, {'signatures': signatures})
+        # te = TransactionEnvelope(tx, {'signatures': signatures, 'network_id': 'PUBLIC'})
         return te

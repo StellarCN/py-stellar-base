@@ -106,4 +106,8 @@ def calculate_checksum(payload):
 
 def best_rational_approximation(x):
     p = Fraction(x).limit_denominator(10**8)
-    return {'n':p.numerator,'d':p.denominator}
+    return {'n': p.numerator,'d': p.denominator}
+
+
+def division(n,d):
+    return float(Fraction(n,d))

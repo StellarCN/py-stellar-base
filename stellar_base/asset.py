@@ -1,6 +1,6 @@
 # coding: utf-8
 
-from .utils import XdrLengthError, account_xdr_object
+from .utils import XdrLengthError, account_xdr_object, encode_check
 from .stellarxdr import StellarXDR_pack as Xdr
 
 
@@ -34,7 +34,7 @@ class Asset(object):
     # def equals(self, asset):
     #     return self.code == asset.code and self.issuer == asset.issuer
 
-    def to_xdr_object(self):# -> Xdr.types.Asset:
+    def to_xdr_object(self):
         if self.is_native():
             xdr_type = Xdr.const.ASSET_TYPE_NATIVE
             return Xdr.types.Asset(type=xdr_type)
@@ -42,7 +42,7 @@ class Asset(object):
             x = Xdr.nullclass()
             length = len(self.code)
             pad_length = 4 - length if length <= 4 else 12 - length
-            x.assetCode = bytearray(self.code,'ascii') + b'\x00' * pad_length
+            x.assetCode = bytearray(self.code, 'ascii') + b'\x00' * pad_length
             x.issuer = account_xdr_object(self.issuer)
         if length <= 4:
             xdr_type = Xdr.const.ASSET_TYPE_CREDIT_ALPHANUM4
@@ -50,3 +50,15 @@ class Asset(object):
         else:
             xdr_type = Xdr.const.ASSET_TYPE_CREDIT_ALPHANUM12
             return Xdr.types.Asset(type=xdr_type, alphaNum12=x)
+
+    @classmethod
+    def from_xdr_object(cls, asset_xdr_object):
+        if asset_xdr_object.type == Xdr.const.ASSET_TYPE_NATIVE:
+            return Asset.native()
+        elif asset_xdr_object.type == Xdr.const.ASSET_TYPE_CREDIT_ALPHANUM4:
+            issuer = encode_check('account', asset_xdr_object.alphaNum4.issuer.ed25519)
+            code = asset_xdr_object.alphaNum4.assetCode.decode()
+        else:
+            issuer = encode_check('account', asset_xdr_object.alphaNum12.issuer.ed25519)
+            code = asset_xdr_object.alphaNum12.assetCode.decode()
+        return cls(code, issuer)
