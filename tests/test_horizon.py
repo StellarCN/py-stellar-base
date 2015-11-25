@@ -1,5 +1,5 @@
 import requests
-import simplejson as json
+import json
 from stellar_base.keypair import Keypair
 from stellar_base.memo import *
 from stellar_base.operation import *
