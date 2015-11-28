@@ -84,7 +84,7 @@ class Payment(Operation):
             source = encode_check('account', op_xdr_object.sourceAccount[0].ed25519)
 
         destination = encode_check('account', op_xdr_object.body.paymentOp.destination.ed25519)
-        asset = Asset.from_xdr_object(op_xdr_object.body.paymentOp.destination)
+        asset = Asset.from_xdr_object(op_xdr_object.body.paymentOp.asset)
         amount = op_xdr_object.body.paymentOp.amount
 
         return cls({

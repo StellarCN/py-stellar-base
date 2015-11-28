@@ -88,11 +88,11 @@ class Transaction(object):
             elif op.type == Xdr.const.INFLATION:
                 operations.append(Inflation.from_xdr_object(op))
 
-            return cls(
-                source, {
-                    'sequence': sequence,
-                    'timeBounds': time_bounds,
-                    'memo': memo,
-                    'fee': fee,
-                    'operations': operations
-                })
+        return cls(
+            source, {
+                'sequence': sequence,
+                'timeBounds': time_bounds,
+                'memo': memo,
+                'fee': fee,
+                'operations': operations
+            })
