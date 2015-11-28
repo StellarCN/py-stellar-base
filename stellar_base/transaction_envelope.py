@@ -21,7 +21,8 @@ class TransactionEnvelope(object):
         assert isinstance(keypair, Keypair)
         tx_hash = self.hash_meta()
         sig = keypair.sign_decorated(tx_hash)
-        self.signatures.append(sig)
+        if sig not in self.signatures:
+            self.signatures.append(sig)
         return self
 
     def hash_meta(self):

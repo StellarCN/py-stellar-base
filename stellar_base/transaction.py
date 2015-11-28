@@ -31,7 +31,8 @@ class Transaction(object):
         self.operations = opts.get('operations') or []
 
     def add_operation(self, operation):
-        self.operations.append(operation)
+        if operation not in self.operations:
+            self.operations.append(operation)
 
     def to_xdr_object(self):
         source_account = account_xdr_object(self.source)
