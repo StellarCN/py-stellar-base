@@ -1,12 +1,13 @@
 # coding: utf-8
-from .utils import XdrLengthError
 from .stellarxdr import StellarXDR_pack as Xdr
+from .utils import XdrLengthError
 
 # Compatibility for Python 3.x that don't have unicode type
 try:
     type(unicode)
 except NameError:
     unicode = str
+
 
 class NoneMemo(object):
     def __init__(self):
@@ -18,9 +19,9 @@ class NoneMemo(object):
 
 class TextMemo(object):
     def __init__(self, text):
-        if not isinstance(text,(str,unicode)):
+        if not isinstance(text, (str, unicode)):
             raise TypeError('Expects string type got a ' + type(text))
-        if bytes == str and not isinstance(text,unicode):  # Python 2 without unicode string
+        if bytes == str and not isinstance(text, unicode):  # Python 2 without unicode string
             self.text = text
         else:  # python 3 or python 2 with unicode string
             self.text = bytearray(text, encoding='utf-8')
@@ -33,11 +34,11 @@ class TextMemo(object):
 
 
 class IdMemo(object):
-    def __init__(self, mid):
-        self.mid = mid
+    def __init__(self, memo_id):
+        self.memo_id = memo_id
 
     def to_xdr_object(self):
-        return Xdr.types.Memo(type=Xdr.const.MEMO_ID, id=self.mid)
+        return Xdr.types.Memo(type=Xdr.const.MEMO_ID, id=self.memo_id)
 
 
 class HashMemo(object):
