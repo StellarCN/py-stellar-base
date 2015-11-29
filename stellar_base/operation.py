@@ -1,9 +1,9 @@
 # coding:utf-8
 import base64
 
+from .asset import Asset
 from .stellarxdr import StellarXDR_pack as Xdr
 from .utils import account_xdr_object, encode_check, best_rational_approximation as best_r, division
-from .asset import Asset
 
 
 class Operation(object):
@@ -15,6 +15,9 @@ class Operation(object):
 
         self.source = opts.get('source')
         self.body = Xdr.nullclass()
+
+    def __eq__(self, other):
+        return self.xdr() == other.xdr()
 
     def to_xdr_object(self):
         try:
@@ -220,7 +223,6 @@ class AllowTrust(Operation):
         asset_type = op_xdr_object.body.allowTrustOp.asset.type
         if asset_type == Xdr.const.ASSET_TYPE_CREDIT_ALPHANUM4:
             asset_code = op_xdr_object.body.allowTrustOp.asset.assetCode4.decode()
-            print(asset_code)
         elif asset_type == Xdr.const.ASSET_TYPE_CREDIT_ALPHANUM12:
             asset_code = op_xdr_object.body.allowTrustOp.asset.assetCode12.decode()
 
@@ -243,11 +245,13 @@ class SetOptions(Operation):
         self.med_threshold = opts.get('med_threshold')
         self.high_threshold = opts.get('high_threshold')
         self.home_domain = opts.get('home_domain')
-        try:
-            self.signer_address = opts['signer_address']
-            self.signer_weight = opts['signer_weight']
-        except KeyError:
-            self.signer_address = None
+        # try:
+        #     self.signer_address = opts['signer_address']
+        #     self.signer_weight = opts['signer_weight']
+        # except KeyError:
+        #     self.signer_address = None
+        self.signer_address = opts.get('signer_address')
+        self.signer_weight = opts.get('signer_weight')
 
     def to_xdr_object(self):
         def assert_option_array(x):
@@ -270,7 +274,7 @@ class SetOptions(Operation):
         self.high_threshold = assert_option_array(self.high_threshold)
         self.home_domain = assert_option_array(self.home_domain)
 
-        if self.signer_address is not None:
+        if self.signer_address is not None and self.signer_weight is not None:
             signer = [Xdr.types.Signer(account_xdr_object(self.signer_address), self.signer_weight)]
         else:
             signer = []
@@ -283,7 +287,7 @@ class SetOptions(Operation):
         return super(SetOptions, self).to_xdr_object()
 
     @classmethod
-    def from_xdr_object(cls,op_xdr_object):
+    def from_xdr_object(cls, op_xdr_object):
         if not op_xdr_object.sourceAccount:
             source = None
         else:
@@ -323,7 +327,6 @@ class SetOptions(Operation):
         })
 
 
-
 class ManageOffer(Operation):
     def __init__(self, opts):
         super(ManageOffer, self).__init__(opts)
@@ -345,7 +348,7 @@ class ManageOffer(Operation):
         return super(ManageOffer, self).to_xdr_object()
 
     @classmethod
-    def from_xdr_object(cls,op_xdr_object):
+    def from_xdr_object(cls, op_xdr_object):
         if not op_xdr_object.sourceAccount:
             source = None
         else:
@@ -391,7 +394,7 @@ class CreatePassiveOffer(Operation):
         return super(CreatePassiveOffer, self).to_xdr_object()
 
     @classmethod
-    def from_xdr_object(cls,op_xdr_object):
+    def from_xdr_object(cls, op_xdr_object):
         if not op_xdr_object.sourceAccount:
             source = None
         else:
@@ -408,12 +411,9 @@ class CreatePassiveOffer(Operation):
             'source': source,
             'selling': selling,
             'buying': buying,
-            'amount':amount,
-            'price':price
+            'amount': amount,
+            'price': price
         })
-
-
-
 
 
 class AccountMerge(Operation):
@@ -429,7 +429,7 @@ class AccountMerge(Operation):
         return super(AccountMerge, self).to_xdr_object()
 
     @classmethod
-    def from_xdr_object(cls,op_xdr_object):
+    def from_xdr_object(cls, op_xdr_object):
         if not op_xdr_object.sourceAccount:
             source = None
         else:
@@ -438,8 +438,8 @@ class AccountMerge(Operation):
         destination = encode_check('account', op_xdr_object.body.destination.ed25519)
 
         return cls({
-            'source':source,
-            'destination':destination
+            'source': source,
+            'destination': destination
         })
 
 
@@ -452,9 +452,9 @@ class Inflation(Operation):
         return super(Inflation, self).to_xdr_object()
 
     @classmethod
-    def from_xdr_object(cls,op_xdr_object):
+    def from_xdr_object(cls, op_xdr_object):
         if not op_xdr_object.sourceAccount:
             source = None
         else:
             source = encode_check('account', op_xdr_object.sourceAccount[0].ed25519)
-        return cls({'source':source})
+        return cls({'source': source})
