@@ -26,11 +26,20 @@ class TestBuilder(object):
         cold = Builder(self.cold.seed().decode())
 
         cold.append_create_account_op(hot_account, 200)
-        cold.append_trust_op(cold_account, 'BEER', 1000, address=hot_account)
+
+        cold.append_set_options_op(inflation_dest=cold_account, set_flags=1,
+                                   home_domain='256kw.com',master_weight=10,
+                                   low_threshold=5,)
+        cold.append_trust_op(cold_account, 'BEER', 1000, source=hot_account)
+        cold.append_allow_trust_op(hot_account,'BEER', True)
         # append twice for test
         cold.append_payment_op(hot_account, 50.123, 'BEER', cold_account)
         cold.append_payment_op(hot_account, 50.123, 'BEER', cold_account)
         cold.sign(self.hot.seed().decode())
+        cold.sign(self.hot.seed().decode())
+        cold.sign()
+        assert len(cold.te.signatures) == 2
+        assert len(cold.ops) == 5
 
         try:
             response = cold.submit()
