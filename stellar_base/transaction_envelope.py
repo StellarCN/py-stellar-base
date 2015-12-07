@@ -2,7 +2,7 @@
 import base64
 
 from .network import Network, NETWORKS
-from .utils import xdr_hash
+from .utils import xdr_hash, SignatureExistError
 from .stellarxdr import StellarXDR_pack as Xdr
 from .keypair import Keypair
 from .transaction import Transaction
@@ -24,9 +24,14 @@ class TransactionEnvelope(object):
         # if sig not in self.signatures:
         #     self.signatures.append(sig)
         sig_dict = [signature.__dict__ for signature in self.signatures]
-        if sig.__dict__ not in sig_dict:
+        if sig.__dict__ in sig_dict:
+            raise SignatureExistError('already signed')
+        else:
             self.signatures.append(sig)
-        return self
+        # if sig.__dict__ not in sig_dict:
+        #     self.signatures.append(sig)
+        # return self
+
 
     def hash_meta(self):
         return xdr_hash(self.signature_base())

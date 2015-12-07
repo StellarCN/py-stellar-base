@@ -8,6 +8,7 @@ from .network import NETWORKS, Network
 from .operation import *
 from .transaction import Transaction
 from .transaction_envelope import TransactionEnvelope as Te
+from .utils import SignatureExistError
 
 HORIZON_LIVE = "https://horizon.stellar.org"
 HORIZON_TEST = "https://horizon-testnet.stellar.org"
@@ -247,23 +248,33 @@ class Builder(object):
         self.memo = te.tx.memo
 
     def sign(self, secret=None):
+        key_pair = self.key_pair if not secret else Keypair.from_seed(secret)
+
         self.gen_te()
-        if secret:
-            self.te.sign(Keypair.from_seed(secret))
-        else:
-            self.te.sign(self.key_pair)
+
+        try:
+            self.te.sign(key_pair)
+        except SignatureExistError:
+            pass
+
+
+        # if secret:
+        #     self.te.sign(Keypair.from_seed(secret))
+        # else:
+        #     self.te.sign(self.key_pair)
 
     def submit(self):
         try:
-            ret = self.horizon.submit(self.gen_xdr())
-        except:
+            return self.horizon.submit(self.gen_xdr())
+        except Exception as e:
+            print(e)
             raise Exception('network problem')
 
-        if 'hash' in ret:
-            return ret['hash']
-        else:
-            print(ret)
-            raise Exception('sorry' + ret['status'] + ret['extras']['result_codes']['operations'][0])
+        # if 'hash' in ret:
+        #     return ret['hash']
+        # else:
+        #     print(ret)
+        #     raise Exception('sorry' + ret['status'] + ret['extras']['result_codes']['operations'][0])
 
     def get_sequence(self, address):
         try:

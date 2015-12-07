@@ -55,19 +55,33 @@ def bytes_from_decode_data(s):
                                          "object or ASCII string, not %r" %
                                          s.__class__.__name__))
 
+class BaseError(Exception):
+    def __init__(self,msg):
+        super(BaseError, self).__init__(msg)
 
-class XdrLengthError(Exception):
-    def __init__(self, msg):
-        super(XdrLengthError, self).__init__(msg)
 
+class XdrLengthError(BaseError):
+    pass
+
+
+class SignatureExistError(BaseError):
+    pass
+
+class DecodeError(BaseError):
+    pass
 
 def decode_check(version_byte_name, encoded):
     encoded = bytes_from_decode_data(encoded)
 
-    if encoded != base64.b32encode(base64.b32decode(encoded)):
-        raise Exception('invalid encoded bytes')
+    try:
+        decoded = base64.b32decode(encoded)
+    except binascii.Error:
+        raise DecodeError('Incorrect padding')
 
-    decoded = base64.b32decode(encoded)
+    if encoded != base64.b32encode(decoded):
+        raise DecodeError('invalid encoded bytes')
+
+
     version_byte = decoded[0:1]
     payload = decoded[0:-2]
     data = decoded[1:-2]
@@ -76,12 +90,12 @@ def decode_check(version_byte_name, encoded):
     # raise KeyError
     expected_version = versionBytes[version_byte_name]
     if version_byte != expected_version:
-        raise XdrLengthError(
+        raise DecodeError(
             'invalid version byte. expected ' + str(expected_version) + ', got ' + str(version_byte))
 
     expected_checksum = calculate_checksum(payload)
     if expected_checksum != checksum:
-        raise Exception('invalid checksum')
+        raise DecodeError('invalid checksum')
 
     return data
 
