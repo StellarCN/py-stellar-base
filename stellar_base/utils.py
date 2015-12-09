@@ -12,6 +12,7 @@ try:
 except:
     import ed25519
 from stellar_base.stellarxdr import StellarXDR_pack as Xdr
+from fractions import Fraction
 import numpy
 from decimal import *
 
