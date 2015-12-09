@@ -12,7 +12,8 @@ try:
 except:
     import ed25519
 from stellar_base.stellarxdr import StellarXDR_pack as Xdr
-from fractions import Fraction
+import numpy
+from decimal import *
 
 # Compatibility for Python 3.x that dont have unicode type
 try:
@@ -105,8 +106,31 @@ def calculate_checksum(payload):
 
 
 def best_rational_approximation(x):
-    p = Fraction(x).limit_denominator(10**8)
-    return {'n': p.numerator,'d': p.denominator}
+    x = Decimal(x)
+    INT32_MAX = Decimal(2147483647)
+    a = None
+    f = None
+    fractions = numpy.array([[Decimal(0), Decimal(1)],[Decimal(1), Decimal(0)]])
+    i = 2
+    while True:
+      if x > INT32_MAX:
+        break
+      a = x.to_integral_exact(rounding=ROUND_FLOOR)
+      f = x - a
+      h = a * fractions[i - 1][0] + fractions[i - 2][0]
+      k = a * fractions[i - 1][1] + fractions[i - 2][1]
+      if h > INT32_MAX or k > INT32_MAX:
+        break
+      fractions = numpy.vstack([fractions, [h, k]])
+      if f.is_zero():
+        break
+      x = 1 / f
+      i = i + 1
+    n = fractions[len(fractions)-1][0]
+    d = fractions[len(fractions)-1][1]
+    if n.is_zero() or d.is_zero():
+      raise Exception("Couldn't find approximation")
+    return {'n': int(n),'d': int(d)}
 
 
 def division(n,d):
