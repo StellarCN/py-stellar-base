@@ -1,5 +1,6 @@
 # coding:utf-8
 
+from nose.tools import raises
 from stellar_base.memo import *
 from stellar_base.operation import *
 from stellar_base.asset import Asset
@@ -13,7 +14,7 @@ class TestOp:
         self.dest = 'GCW24FUIFPC2767SOU4JI3JEAXIHYJFIJLH7GBZ2AVCBVP32SJAI53F5'
         self.seq = 1
         self.fee = 100
-        self.amount = 10 * 10 ** 6
+        self.amount = "1"
 
     def do(self, op):
         from stellar_base.transaction import Transaction
@@ -27,6 +28,28 @@ class TestOp:
         envelope_b64 = envelope.xdr()
         print(envelope_b64)
         return envelope_b64
+
+    def test_to_xdr_amount(self):
+        assert(Operation.to_xdr_amount("20") == 20*10**7)
+        assert(Operation.to_xdr_amount("0.1234567") == 1234567)
+
+    @raises(Exception)
+    def test_to_xdr_amount_inexact(self):
+        Operation.to_xdr_amount("0.12345678")
+
+    @raises(Exception)
+    def test_to_xdr_amount_not_number(self):
+        Operation.to_xdr_amount("test")
+
+    @raises(Exception)
+    def test_to_xdr_amount_not_string(self):
+        Operation.to_xdr_amount(0.1234)
+
+    def test_from_xdr_amount(self):
+        assert(Operation.from_xdr_amount(10**7) == "1")
+        assert(Operation.from_xdr_amount(20*10**7) == "20")
+        assert(Operation.from_xdr_amount(1234567) == "0.1234567")
+        assert(Operation.from_xdr_amount(112345678) == "11.2345678")
 
     def test_createAccount_min(self):
         result = b'AAAAANNSjN1wrdfixw+4w0zmKXvxxikg6EKMi9SW1DnNPhNjAAAAZAAAAAAAAAACAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAra4WiCvFr/vydTiUbSQF0HwkqErP8wc6BUQav3qSQI4AAAAAAJiWgAAAAAAAAAABzT4TYwAAAEBBR+eUTPqpyTBLiNMudfSl2AN+oZL9/yp0KE9SyYeIzM2Y7yQH+dGNlwz5PMaaCEGAD+82IZkAPSDyunElc+EP'
@@ -79,7 +102,7 @@ class TestOp:
         assert (result == self.do(op=ManageOffer({
             'selling': Asset('beer', self.source),
             'buying': Asset('beer', self.dest),
-            'amount': 100 * 10 ** 7,
+            'amount': "100",
             'price': 3.14159,
             'offer_id': 1,
         })))
@@ -89,7 +112,7 @@ class TestOp:
         assert (result == self.do(op=CreatePassiveOffer({
             'selling': Asset('beer', self.source),
             'buying': Asset('beer', self.dest),
-            'amount': 100 * 10 ** 7,
+            'amount': "100",
             'price': 3.14159,
         })))
 
@@ -231,7 +254,7 @@ class TestMultiOp:
         ]
         self.seq = 1
         self.fee = 100
-        self.amount = 20 * 10 ** 7
+        self.amount = "20"
 
     def make_envelope(self, *args, **kwargs):
         from stellar_base.transaction import Transaction
@@ -258,11 +281,11 @@ class TestMultiOp:
         assert (result == self.make_envelope(
             CreateAccount({
                 'destination': self.accounts[0]['address'],
-                'starting_balance': self.amount * 1,
+                'starting_balance': self.amount,
             }),
             CreateAccount({
                 'destination': self.accounts[1]['address'],
-                'starting_balance': self.amount * 2,
+                'starting_balance': "40",
             }),
             ))
 
@@ -272,12 +295,12 @@ class TestMultiOp:
             Payment({
                 'destination': self.accounts[0]['address'],
                 'asset': Asset.native(),
-                'amount': self.amount * 1,
+                'amount': self.amount,
             }),
             Payment({
                 'destination': self.accounts[1]['address'],
                 'asset': Asset.native(),
-                'amount': self.amount * 2,
+                'amount': "40",
             }),
             ))
 
@@ -304,14 +327,14 @@ class TestMultiOp:
             ManageOffer({
                 'selling': Asset('beer', self.accounts[0]['address']),
                 'buying': Asset('beer', self.accounts[1]['address']),
-                'amount': 100 * 10 ** 7,
+                'amount': "100",
                 'price': 3.14159,
                 'offer_id': 1,
             }),
             CreatePassiveOffer({
                 'selling': Asset('beer', self.accounts[1]['address']),
                 'buying': Asset('beer', self.accounts[2]['address']),
-                'amount': 100 * 10 ** 7,
+                'amount': "100",
                 'price': 3.14159,
             }),
             SetOptions({
@@ -337,7 +360,7 @@ class TestMultiOp:
             }),
             ChangeTrust({
                 'asset': Asset('EUR', self.address),
-                'amount': 10**9 * 10**7
+                'amount': "1000000000"
             }),
             AllowTrust({
                 'authorize': True,
@@ -347,6 +370,6 @@ class TestMultiOp:
             Payment({
                 'destination': self.accounts[0]['address'],
                 'asset': Asset('EUR', self.address),
-                'amount': 10**9 * 10**7
+                'amount': "1000000000"
             })
         ))
