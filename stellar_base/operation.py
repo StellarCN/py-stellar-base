@@ -32,7 +32,7 @@ class Operation(object):
 
     @staticmethod
     def to_xdr_amount(value):
-      if not isinstance(value, basestring):
+      if not isinstance(value, str):
         raise Exception("value must be a string")
       # throw exception if value * ONE has decimal places (it can't be represented as int64)
       return int((Decimal(value) * ONE).to_integral_exact(context=Context(traps=[Inexact])))
