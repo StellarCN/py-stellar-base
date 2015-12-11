@@ -41,7 +41,7 @@ class TestMethods:
         envelope_xdr = self.make_envelope(Payment({
                 'destination': self.address,
                 'asset': Asset.native(),
-                'amount': 1618
+                'amount': "0.0001618"
         }))
         response = horizon.submit( envelope_xdr )
         assert 'hash' in response
