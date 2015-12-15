@@ -45,7 +45,7 @@ operation = Payment({
 tx = Transaction(
 	source=anna['address'],
 	opts={
-		'seqNum': json.loads(requests.get(url+'/accounts/'+anna['address']).text)['sequence'],
+		'sequence': json.loads(requests.get(url+'/accounts/'+anna['address']).text)['sequence'],
 		'timeBounds': [],
 		'memo': NoneMemo(),
 		'fee': 100,
