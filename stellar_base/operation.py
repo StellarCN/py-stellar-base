@@ -4,6 +4,10 @@ import base64
 from .asset import Asset
 from .stellarxdr import StellarXDR_pack as Xdr
 from .utils import account_xdr_object, encode_check, best_rational_approximation as best_r, division
+from .asset import Asset
+from decimal import *
+
+ONE = Decimal(10 ** 7)
 
 
 class Operation(object):
@@ -31,6 +35,16 @@ class Operation(object):
         op.pack_Operation(self.to_xdr_object())
         return base64.b64encode(op.get_buffer())
 
+    @staticmethod
+    def to_xdr_amount(value):
+      if not isinstance(value, str):
+        raise Exception("value must be a string")
+      # throw exception if value * ONE has decimal places (it can't be represented as int64)
+      return int((Decimal(value) * ONE).to_integral_exact(context=Context(traps=[Inexact])))
+
+    @staticmethod
+    def from_xdr_amount(value):
+      return str(Decimal(value) / ONE)
 
 class CreateAccount(Operation):
     def __init__(self, opts):
@@ -41,7 +55,7 @@ class CreateAccount(Operation):
     def to_xdr_object(self):
         destination = account_xdr_object(self.destination)
 
-        create_account_op = Xdr.types.CreateAccountOp(destination, self.starting_balance)
+        create_account_op = Xdr.types.CreateAccountOp(destination, Operation.to_xdr_amount(self.starting_balance))
         self.body.type = Xdr.const.CREATE_ACCOUNT
         self.body.createAccountOp = create_account_op
         return super(CreateAccount, self).to_xdr_object()
@@ -54,7 +68,7 @@ class CreateAccount(Operation):
             source = encode_check('account', op_xdr_object.sourceAccount[0].ed25519)
 
         destination = encode_check('account', op_xdr_object.body.createAccountOp.destination.ed25519)
-        starting_balance = op_xdr_object.body.createAccountOp.startingBalance
+        starting_balance = Operation.from_xdr_amount(op_xdr_object.body.createAccountOp.startingBalance)
 
         return cls({
             'source': source,
@@ -74,7 +88,9 @@ class Payment(Operation):
         asset = self.asset.to_xdr_object()
         destination = account_xdr_object(self.destination)
 
-        payment_op = Xdr.types.PaymentOp(destination, asset, self.amount)
+        amount = Operation.to_xdr_amount(self.amount)
+
+        payment_op = Xdr.types.PaymentOp(destination, asset, amount)
         self.body.type = Xdr.const.PAYMENT
         self.body.paymentOp = payment_op
         return super(Payment, self).to_xdr_object()
@@ -87,8 +103,8 @@ class Payment(Operation):
             source = encode_check('account', op_xdr_object.sourceAccount[0].ed25519)
 
         destination = encode_check('account', op_xdr_object.body.paymentOp.destination.ed25519)
-        asset = Asset.from_xdr_object(op_xdr_object.body.paymentOp.asset)
-        amount = op_xdr_object.body.paymentOp.amount
+        asset = Asset.from_xdr_object(op_xdr_object.body.paymentOp.destination)
+        amount = Operation.from_xdr_amount(op_xdr_object.body.paymentOp.amount)
 
         return cls({
             'source': source,
@@ -113,8 +129,8 @@ class PathPayment(Operation):
         send_asset = self.send_asset.to_xdr_object()
         dest_asset = self.dest_asset.to_xdr_object()
 
-        path_payment = Xdr.types.PathPaymentOp(send_asset, self.send_max, destination,
-                                               dest_asset, self.dest_amount, self.path)
+        path_payment = Xdr.types.PathPaymentOp(send_asset, Operation.to_xdr_amount(self.send_max), destination,
+                                               dest_asset, Operation.to_xdr_amount(self.dest_amount), self.path)
         self.body.type = Xdr.const.PATH_PAYMENT
         self.body.pathPaymentOp = path_payment
         return super(PathPayment, self).to_xdr_object()
@@ -129,8 +145,8 @@ class PathPayment(Operation):
         destination = encode_check('account', op_xdr_object.body.pathPaymentOp.destination.ed25519)
         send_asset = Asset.from_xdr_object(op_xdr_object.body.pathPaymentOp.sendAsset)
         dest_asset = Asset.from_xdr_object(op_xdr_object.body.pathPaymentOp.destAsset)
-        send_max = op_xdr_object.body.pathPaymentOp.sendMax
-        dest_amount = op_xdr_object.body.pathPaymentOp.destAmount
+        send_max = Operation.from_xdr_amount(op_xdr_object.body.pathPaymentOp.sendMax)
+        dest_amount = Operation.from_xdr_amount(op_xdr_object.body.pathPaymentOp.destAmount)
 
         path = []
         if op_xdr_object.body.pathPaymentOp.path:
@@ -152,15 +168,16 @@ class ChangeTrust(Operation):
     def __init__(self, opts):
         super(ChangeTrust, self).__init__(opts)
         self.line = opts.get('asset')
-        try:
-            self.limit = int(opts.get('limit'))
-        except TypeError:
-            self.limit = 9223372036854775807
+        if opts.get('limit') != None:
+            self.limit = opts.get('limit')
+        else:
+            self.limit = "922337203685.4775807"
 
     def to_xdr_object(self):
         line = self.line.to_xdr_object()
+        limit = Operation.to_xdr_amount(self.limit)
 
-        change_trust_op = Xdr.types.ChangeTrustOp(line, self.limit)
+        change_trust_op = Xdr.types.ChangeTrustOp(line, limit)
         self.body.type = Xdr.const.CHANGE_TRUST
         self.body.changeTrustOp = change_trust_op
         return super(ChangeTrust, self).to_xdr_object()
@@ -174,7 +191,7 @@ class ChangeTrust(Operation):
 
         line = Asset.from_xdr_object(op_xdr_object.body.changeTrustOp.line)
         print(line)
-        limit = op_xdr_object.body.changeTrustOp.limit
+        limit = Operation.from_xdr_amount(op_xdr_object.body.changeTrustOp.limit)
 
         return cls({
             'source': source,
@@ -342,7 +359,9 @@ class ManageOffer(Operation):
         price = best_r(self.price)
         price = Xdr.types.Price(price['n'], price['d'])
 
-        manage_offer_op = Xdr.types.ManageOfferOp(selling, buying, self.amount, price, self.offer_id)
+        amount = Operation.to_xdr_amount(self.amount)
+
+        manage_offer_op = Xdr.types.ManageOfferOp(selling, buying, amount, price, self.offer_id)
         self.body.type = Xdr.const.MANAGE_OFFER
         self.body.manageOfferOp = manage_offer_op
         return super(ManageOffer, self).to_xdr_object()
@@ -356,7 +375,7 @@ class ManageOffer(Operation):
 
         selling = Asset.from_xdr_object(op_xdr_object.body.manageOfferOp.selling)
         buying = Asset.from_xdr_object(op_xdr_object.body.manageOfferOp.buying)
-        amount = op_xdr_object.body.manageOfferOp.amount
+        amount = Operation.from_xdr_amount(op_xdr_object.body.manageOfferOp.amount)
 
         n = op_xdr_object.body.manageOfferOp.price.n
         d = op_xdr_object.body.manageOfferOp.price.d
@@ -388,7 +407,9 @@ class CreatePassiveOffer(Operation):
         price = best_r(self.price)
         price = Xdr.types.Price(price['n'], price['d'])
 
-        create_passive_offer_op = Xdr.types.CreatePassiveOfferOp(selling, buying, self.amount, price)
+        amount = Operation.to_xdr_amount(self.amount)
+
+        create_passive_offer_op = Xdr.types.CreatePassiveOfferOp(selling, buying, amount, price)
         self.body.type = Xdr.const.CREATE_PASSIVE_OFFER
         self.body.createPassiveOfferOp = create_passive_offer_op
         return super(CreatePassiveOffer, self).to_xdr_object()
@@ -402,7 +423,7 @@ class CreatePassiveOffer(Operation):
 
         selling = Asset.from_xdr_object(op_xdr_object.body.createPassiveOfferOp.selling)
         buying = Asset.from_xdr_object(op_xdr_object.body.createPassiveOfferOp.buying)
-        amount = op_xdr_object.body.createPassiveOfferOp.amount
+        amount = Operation.from_xdr_amount(op_xdr_object.body.createPassiveOfferOp.amount)
 
         n = op_xdr_object.body.createPassiveOfferOp.price.n
         d = op_xdr_object.body.createPassiveOfferOp.price.d

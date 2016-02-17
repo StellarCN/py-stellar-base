@@ -40,12 +40,12 @@ operation = Payment({
 	'source': anna['address'],
 	'destination': bob['address'],
 	'asset': Asset.native(),
-	'amount': 10*10**6,
+	'amount': '1000', # needs to be a string?
 })
 tx = Transaction(
 	source=anna['address'],
 	opts={
-		'seqNum': json.loads(requests.get(url+'/accounts/'+anna['address']).text)['sequence'],
+		'sequence': json.loads(requests.get(url+'/accounts/'+anna['address']).text)['sequence'],
 		'timeBounds': [],
 		'memo': NoneMemo(),
 		'fee': 100,
