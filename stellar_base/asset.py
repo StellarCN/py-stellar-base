@@ -1,7 +1,8 @@
 # coding: utf-8
 
 from .utils import XdrLengthError, account_xdr_object, encode_check
-from .stellarxdr import StellarXDR_pack as Xdr
+from .stellarxdr import Xdr
+import base64
 
 
 class Asset(object):
@@ -50,6 +51,11 @@ class Asset(object):
         else:
             xdr_type = Xdr.const.ASSET_TYPE_CREDIT_ALPHANUM12
             return Xdr.types.Asset(type=xdr_type, alphaNum12=x)
+
+    def xdr(self):
+        asset = Xdr.StellarXDRPacker()
+        asset.pack_Asset(self.to_xdr_object())
+        return base64.b64encode(asset.get_buffer())
 
     @classmethod
     def from_xdr_object(cls, asset_xdr_object):
