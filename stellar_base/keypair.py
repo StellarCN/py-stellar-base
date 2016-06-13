@@ -1,7 +1,11 @@
 # coding:utf-8
-from .utils import XdrLengthError, decode_check, encode_check
-from .stellarxdr import StellarXDR_pack as Xdr
+import base64
 import os
+
+from .base58 import b58decode_check, b58encode_check
+from .stellarxdr import Xdr
+from .utils import XdrLengthError, decode_check, encode_check
+
 # noinspection PyBroadException
 try:
     # noinspection PyUnresolvedReferences
@@ -9,17 +13,25 @@ try:
 except:
     import ed25519
 import hashlib
-import base58
+
 
 class Keypair(object):
-    """ 创建随机地址与密钥
-        从seed及secret构建KeyPair。
-        验证地址及密钥是否正确
+    """ use for create stellar Keypair(StrKey) .
+        also support old style stellar keypair transforming
     """
+
     def __init__(self, verifying_key, signing_key=None):
         assert type(verifying_key) is ed25519.VerifyingKey
         self.verifying_key = verifying_key
         self.signing_key = signing_key
+
+    @classmethod
+    def deterministic(cls, master):
+        """ a deterministic keypair generator .
+            :type master: bytes-like object  for create keypair. e.g. u'中文'.encode('utf-8') 
+        """
+        seed = hashlib.sha256(master).digest()
+        return cls.from_raw_seed(seed)
 
     @classmethod
     def random(cls):
@@ -28,6 +40,10 @@ class Keypair(object):
 
     @classmethod
     def from_seed(cls, seed):
+        """
+        create Keypair class from a strkey seed.
+        :type seed: StrKey base32
+        """
         raw_seed = decode_check("seed", seed)
         return cls.from_raw_seed(raw_seed)
 
@@ -37,10 +53,10 @@ class Keypair(object):
         verifying_key = signing_key.get_verifying_key()
         return cls(verifying_key, signing_key)
 
-    # TODO 实现从原密钥到新密钥的转换
-    @staticmethod
-    def from_base58_seed(seed):
-        pass
+    @classmethod
+    def from_base58_seed(cls, base58_seed):
+        raw_seed = b58decode_check(base58_seed)[1:]
+        return cls.from_raw_seed(raw_seed)
 
     @classmethod
     def from_address(cls, address):
@@ -51,7 +67,13 @@ class Keypair(object):
         return cls(verifying_key)
 
     def account_xdr_object(self):
-        return Xdr.types.PublicKey(Xdr.const.KEY_TYPE_ED25519, self.verifying_key.to_bytes())
+        return Xdr.types.PublicKey(Xdr.const.KEY_TYPE_ED25519,
+                                   self.verifying_key.to_bytes())
+
+    def xdr(self):
+        kp = Xdr.StellarXDRPacker()
+        kp.pack_PublicKey(self.account_xdr_object())
+        return base64.b64encode(kp.get_buffer())
 
     def public_key(self):
         return self.account_xdr_object()
@@ -94,6 +116,10 @@ class Keypair(object):
     def to_old_address(self):
         rv = hashlib.new('sha256', self.raw_public_key()).digest()
         rv = hashlib.new('ripemd160', rv).digest()
-        rv = '\x00' + rv
-        rv += hashlib.new('sha256', hashlib.new('sha256', rv).digest()).digest()[0:4]
-        return base58.encode(rv)
+        rv = chr(0).encode() + rv
+        # v += hashlib.new('sha256', hashlib.new('sha256', rv).digest()).digest()[0:4]
+        return b58encode_check(rv)
+
+    def to_old_seed(self):
+        seed = chr(33).encode() + self.raw_seed()
+        return b58encode_check(seed)
