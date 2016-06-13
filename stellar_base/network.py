@@ -14,3 +14,11 @@ class Network(object):
 
     def network_id(self):
         return xdr_hash(self.passphrase.encode())
+
+    @staticmethod
+    def public_network():
+        return Network(NETWORKS['PUBLIC'])
+
+    @staticmethod
+    def test_network():
+        return Network(NETWORKS['TESTNET'])
