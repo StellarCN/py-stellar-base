@@ -15,13 +15,17 @@ HORIZON_TEST = "https://horizon-testnet.stellar.org"
 
 
 class Builder(object):
-    """
+    """ build transaction and submit to horizon.
 
     """
 
-    def __init__(self, secret, horizon=None, network=None, sequence=None):
-        self.key_pair = Keypair.from_seed(secret)
-        self.account = self.key_pair.address().decode()
+    def __init__(self, secret=None, horizon=None, network=None, sequence=None):
+        if secret:
+            self.key_pair = Keypair.from_seed(secret)
+            self.address = self.key_pair.address().decode()
+        else:
+            self.key_pair = None
+            self.address = None
 
         if network != 'PUBLIC':
             self.network = 'TESTNET'
@@ -35,8 +39,10 @@ class Builder(object):
             self.horizon = Horizon(HORIZON_TEST)
         if sequence:
             self.sequence = sequence
+        elif self.address:
+            self.sequence = self.get_sequence(self.address)
         else:
-            self.sequence = self.get_sequence(self.account)
+            self.sequence = None
 
         self.ops = []
         self.time_bounds = []
@@ -53,7 +59,7 @@ class Builder(object):
         opts = {
             'source': source,
             'destination': destination,
-            'starting_balance': int(starting_balance * 10 ** 7)
+            'starting_balance': str(starting_balance)
         }
         op = CreateAccount(opts)
         self.append_op(op)
@@ -61,7 +67,7 @@ class Builder(object):
     def append_trust_op(self, destination, code, limit=None, source=None):
         line = Asset(code, destination)
         if limit:
-            limit = int(limit * 10 ** 7)
+            limit = str(limit)
         opts = {
             'source': source,
             'asset': line,
@@ -77,31 +83,28 @@ class Builder(object):
             'source': source,
             'destination': destination,
             'asset': asset,
-            'amount': int(amount * 10 ** 7)
+            'amount': str(amount)
         }
         op = Payment(opts)
         self.append_op(op)
 
     def append_path_payment_op(self, destination, send_code, send_issuer, send_max,
                                dest_code, dest_issuer, dest_amount, path, source=None):
-        """
-
-        :param path: a list of asset tuple which contains code and issuer, [(code,issuer),(code,issuer)]
-        """
+        # path: a list of asset tuple which contains code and issuer, [(code,issuer),(code,issuer)]
         send_asset = Asset(send_code, send_issuer)
         dest_asset = Asset(dest_code, dest_issuer)
 
         assets = []
         for p in path:
-            assets.append(Asset(p[0],p[1]))
+            assets.append(Asset(p[0], p[1]))
 
         opts = {
             'source': source,
             'destination': destination,
             'send_asset': send_asset,
-            'send_max': int(send_max * 10 ** 7),
+            'send_max': str(send_max),
             'dest_asset': dest_asset,
-            'dest_amount': int(dest_amount * 10 ** 7),
+            'dest_amount': str(dest_amount),
             'path': assets
         }
         op = Payment(opts)
@@ -117,7 +120,7 @@ class Builder(object):
         op = AllowTrust(opts)
         self.append_op(op)
 
-    def append_set_options_op(self, inflation_dest=None,clear_flags=None, set_flags=None,
+    def append_set_options_op(self, inflation_dest=None, clear_flags=None, set_flags=None,
                               master_weight=None, low_threshold=None, med_threshold=None,
                               high_threshold=None, home_domain=None, signer_address=None,
                               signer_weight=None, source=None,
@@ -148,7 +151,7 @@ class Builder(object):
             'source': source,
             'selling': selling,
             'buying': buying,
-            'amount': amount,
+            'amount': str(amount),
             'price': price,
             'offer_id': offer_id,
 
@@ -166,7 +169,7 @@ class Builder(object):
             'source': source,
             'selling': selling,
             'buying': buying,
-            'amount': amount,
+            'amount': str(amount),
             'price': price,
         }
         op = CreatePassiveOffer(opts)
@@ -181,9 +184,17 @@ class Builder(object):
         op = AccountMerge(opts)
         self.append_op(op)
 
-    def append_inflation_op(self,source=None):
+    def append_inflation_op(self, source=None):
         opts = {'source': source}
         op = Inflation(opts)
+        self.append_op(op)
+
+    def append_manage_data_op(self, data_name, data_value):
+        opts = {
+            'data_name': data_name,
+            'data_value': data_value
+        }
+        op = ManageData(opts)
         self.append_op(op)
 
     def add_memo(self, memo):
@@ -209,10 +220,12 @@ class Builder(object):
         self.time_bounds.append(time_bounds)
 
     def gen_tx(self):
+        if not self.address:
+            raise Exception('Transaction does not have any source address ')
         if not self.sequence:
-            raise Exception('have no sequence,maybe not funded?')
+            raise Exception('have no sequence, maybe not funded?')
         tx = Transaction(
-            self.account,
+            self.address,
             opts={
                 'sequence': self.sequence,
                 'time_Bounds': self.time_bounds,
@@ -242,7 +255,7 @@ class Builder(object):
         self.te = te
         self.tx = te.tx  # with a different source or not .
         self.ops = te.tx.operations
-        self.account = te.tx.source
+        self.address = te.tx.source
         self.sequence = te.tx.sequence - 1
         self.time_bounds = te.tx.time_bounds
         self.memo = te.tx.memo
@@ -255,13 +268,7 @@ class Builder(object):
         try:
             self.te.sign(key_pair)
         except SignatureExistError:
-            pass
-
-
-        # if secret:
-        #     self.te.sign(Keypair.from_seed(secret))
-        # else:
-        #     self.te.sign(self.key_pair)
+            raise
 
     def submit(self):
         try:
@@ -270,16 +277,16 @@ class Builder(object):
             print(e)
             raise Exception('network problem')
 
-        # if 'hash' in ret:
-        #     return ret['hash']
-        # else:
-        #     print(ret)
-        #     raise Exception('sorry' + ret['status'] + ret['extras']['result_codes']['operations'][0])
+    def next_builder(self):
+        next_builder = Builder(horizon=self.horizon, network=self.network, sequence=self.sequence + 1)
+        next_builder.address = self.address
+        next_builder.key_pair = self.key_pair
+        return next_builder
 
     def get_sequence(self, address):
         try:
-            account = self.horizon.account(address)
+            address = self.horizon.account(address)
         except:
             raise Exception('network problem')
 
-        return account.get('sequence')
+        return address.get('sequence')
