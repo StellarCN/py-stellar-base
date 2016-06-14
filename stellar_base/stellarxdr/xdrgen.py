@@ -739,10 +739,10 @@ def id_unique(dict_id, name, lineno):
     """Returns True if dict_id not already used.  Otherwise, invokes error"""
     if dict_id in name_dict:
         global error_occurred
-        # error_occurred = True
+        error_occurred = True
         print("ERROR - {0:s} definition {1:s} at line {2:d} conflicts with {3:s}"
               .format(name, dict_id, lineno, name_dict[dict_id]))
-        # return False
+        return False
     else:
         return True
 
@@ -896,7 +896,7 @@ class Info(object):
                         (prefix, self.id)
                 if self.len is not None:
                     limit = "%sif len(data) > %s:\n" \
-                            "%s%sraise XDRError( 'array length too long')\n" % \
+                            "%s%sraise XDRError('array length too long')\n" % \
                             (prefix, self.fullname(self.len), prefix, varindent)
                     array = limit + array
         else:
@@ -923,7 +923,7 @@ class Info(object):
                          (prefix, newdata, self.id)
                 if self.len is not None:
                     limit = "%sif len(%s) > %s:\n" \
-                            "%s%sraise XDRError( 'array length too long')\n" % \
+                            "%s%sraise XDRError('array length too long')\n" % \
                             (prefix, newdata, self.fullname(self.len), prefix, indent)
                     array += limit
             newdata = 'data'
@@ -935,7 +935,7 @@ class Info(object):
         prefix, data, subheader, array = self._array_pack(prefix, data)
         varlist = ["const.%s" % l.id for l in self.body]
         check = "%sif self.check_enum and %s not in [%s]:\n" \
-                "%s%sraise XDRError( 'value=%%s not in enum %s' %% %s)\n" % \
+                "%s%sraise XDRError('value=%%s not in enum %s' %% %s)\n" % \
                 (prefix, data, ', '.join(varlist),
                  prefix, indent, self.id, data)
         pack = check + "%sself.pack_int(%s)\n" % (prefix, data)
@@ -945,7 +945,7 @@ class Info(object):
         prefix, data, subheader, array = self._array_unpack(prefix, data)
         varlist = ["const.%s" % l.id for l in self.body]
         check = "%sif self.check_enum and %s not in [%s]:\n" \
-                "%s%sraise XDRError( 'value=%%s not in enum %s' %% %s)\n" % \
+                "%s%sraise XDRError('value=%%s not in enum %s' %% %s)\n" % \
                 (prefix, data, ', '.join(varlist),
                  prefix, indent, self.id, data)
         unpack = "%s%s = self.unpack_int()\n" % (prefix, data)
@@ -985,7 +985,7 @@ class Info(object):
         if default != []:
             pack += default[0].packout(prefix + indent, data)
         else:
-            pack += "%s%sraise XDRError( 'bad switch=%%s' %% %s.%s)\n" % \
+            pack += "%s%sraise XDRError('bad switch=%%s' %% %s.%s)\n" % \
                     (prefix, indent, data, switch.id)
         return subheader + pack + array
 
@@ -1027,7 +1027,7 @@ class Info(object):
         ##                       (prefix, indent, data, data, default[0].id)
         ##             unpack += arm
         else:
-            unpack += "%s%sraise XDRError( 'bad switch=%%s' %% %s.%s)\n" % \
+            unpack += "%s%sraise XDRError('bad switch=%%s' %% %s.%s)\n" % \
                       (prefix, indent, data, switch.id)
 
         return subheader + unpack + array
@@ -1307,7 +1307,7 @@ class type_info(Info):
 
     def packout(self, prefix='', data='data'):
         check = "%sif %s.%s is None:\n" \
-                "%s%sraise TypeError( '%s.%s == None')\n" % \
+                "%s%sraise TypeError('%s.%s == None')\n" % \
                 (prefix, data, self.id, prefix, indent, data, self.id)
         if self.type == 'void':
             return prefix + 'pass\n'
@@ -1368,7 +1368,7 @@ class type_info(Info):
             limit = ''
         else:
             limit = "%sif len(%s) > %s and self.check_array:\n" \
-                    "%s%sraise XDRError( " \
+                    "%s%sraise XDRError(" \
                     "'array length too long for %s')\n" % \
                     (prefix, data, self.fullname(self.len), prefix, indent, data)
         if self.fixed:
@@ -1392,7 +1392,7 @@ class type_info(Info):
             limit = ''
         else:
             limit = "%sif len(%s) > %s and self.check_array:\n" \
-                    "%s%sraise XDRError( " \
+                    "%s%sraise XDRError(" \
                     "'array length too long for %s')\n" % \
                     (prefix, data, self.fullname(self.len), prefix, indent, data)
         if self.fixed:
@@ -1487,18 +1487,14 @@ def run(infile, filters=True, pass_attrs=True, debug=False):
 
     import ply.yacc as yacc
     parser = yacc.yacc(debug=0, write_tables=0)
-    global data
-    data = ''
     name_base = "StellarXDR"
 
     if os.path.isfile(infile):
-        f = open(infile)
-        data = f.read()
-        f.close()
+        with open(infile) as content:
+            data = content.read()
         print("Input file is", infile)
         # name_base = os.path.basename(infile[:infile.rfind(".")])
         name_base = os.path.splitext(os.path.basename(infile))[0]
-        #name_base = "StellarXDR"
         parser.parse(data)
 
     # stellar XDR dir/files
@@ -1509,7 +1505,7 @@ def run(infile, filters=True, pass_attrs=True, debug=False):
         file_list = [os.path.abspath(os.path.join(infile, x)) for x in os.listdir(infile)]
         while file_list:
             file_path = file_list.pop()
-            readfile(file_path, file_list, parser)
+            readfile(file_path, parser)
 
     global constants_file, types_file, packer_file
     # Create output file names (without .py)
@@ -1533,7 +1529,8 @@ def run(infile, filters=True, pass_attrs=True, debug=False):
     pack_fd = open(packer_file + ".py", "w", newline='\n')
     pack_fd.write(comment_string)
     pack_fd.write(pack_header % (constants_file, types_file))
-    pack_fd.write(pack_init % name_base.upper())
+    #pack_fd.write(pack_init % name_base.upper())
+    pack_fd.write(pack_init % name_base)
     pack_fd.write(packer_start)
 
     type_list = sorted(name_dict.values(), key=lambda name: name.sortno)
@@ -1553,7 +1550,8 @@ def run(infile, filters=True, pass_attrs=True, debug=False):
             # pack_fd.write("# **** %s %s %s****\n" % (value.id, value.lineno, value.sortno))
             pack_fd.write(output)
             pack_fd.write('\n')
-    pack_fd.write(unpack_init % name_base.upper())
+    #pack_fd.write(unpack_init % name_base.upper())
+    pack_fd.write(unpack_init % name_base)
     pack_fd.write(unpacker_start)
     for value in type_list:
         output = value.unpack_output()
@@ -1568,7 +1566,8 @@ def run(infile, filters=True, pass_attrs=True, debug=False):
     return
 
 
-def readfile(file_path, file_list, parser):
+def readfile(file_path, parser):
+    global file_list
     with open(file_path) as content:
         data = content.read()
     import re
@@ -1579,7 +1578,7 @@ def readfile(file_path, file_list, parser):
 
         if file_depend in file_list:
             file_list.remove(file_depend)
-            readfile(file_depend, file_list, parser)
+            readfile(file_depend, parser)
     parser.parse(data)
 
 
