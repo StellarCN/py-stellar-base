@@ -1,8 +1,8 @@
 # code : utf-8
 
 from .memo import *
-from .utils import decode_check
 from .operation import *
+from .utils import decode_check
 
 FEE = 100
 
@@ -87,6 +87,8 @@ class Transaction(object):
                 operations.append(AccountMerge.from_xdr_object(op))
             elif op.type == Xdr.const.INFLATION:
                 operations.append(Inflation.from_xdr_object(op))
+            elif op.type == Xdr.const.MANAGE_DATA:
+                operations.append(ManageData.from_xdr_object(op))
 
         return cls(
             source, {

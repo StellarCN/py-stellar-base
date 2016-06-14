@@ -1,8 +1,7 @@
 # coding:utf-8
 import base64
 
-from .asset import Asset
-from .stellarxdr import StellarXDR_pack as Xdr
+from .stellarxdr import Xdr
 from .utils import account_xdr_object, encode_check, best_rational_approximation as best_r, division
 from .asset import Asset
 from decimal import *
@@ -11,7 +10,8 @@ ONE = Decimal(10 ** 7)
 
 
 class Operation(object):
-    """follow the specific . the source can be none.
+    """what we can do in stellar network.
+        follow the specific . the source can be none.
     """
 
     def __init__(self, opts):
@@ -31,20 +31,22 @@ class Operation(object):
         return Xdr.types.Operation(source_account, self.body)
 
     def xdr(self):
-        op = Xdr.STELLARXDRPacker()
+        op = Xdr.StellarXDRPacker()
         op.pack_Operation(self.to_xdr_object())
         return base64.b64encode(op.get_buffer())
 
     @staticmethod
     def to_xdr_amount(value):
-      if not isinstance(value, str):
-        raise Exception("value must be a string")
-      # throw exception if value * ONE has decimal places (it can't be represented as int64)
-      return int((Decimal(value) * ONE).to_integral_exact(context=Context(traps=[Inexact])))
+        if not isinstance(value, str):
+            raise Exception("value must be a string")
+
+        # throw exception if value * ONE has decimal places (it can't be represented as int64)
+        return int((Decimal(value) * ONE).to_integral_exact(context=Context(traps=[Inexact])))
 
     @staticmethod
     def from_xdr_amount(value):
-      return str(Decimal(value) / ONE)
+        return str(Decimal(value) / ONE)
+
 
 class CreateAccount(Operation):
     def __init__(self, opts):
@@ -168,7 +170,7 @@ class ChangeTrust(Operation):
     def __init__(self, opts):
         super(ChangeTrust, self).__init__(opts)
         self.line = opts.get('asset')
-        if opts.get('limit') != None:
+        if opts.get('limit') is not None:
             self.limit = opts.get('limit')
         else:
             self.limit = "922337203685.4775807"
@@ -242,6 +244,8 @@ class AllowTrust(Operation):
             asset_code = op_xdr_object.body.allowTrustOp.asset.assetCode4.decode()
         elif asset_type == Xdr.const.ASSET_TYPE_CREDIT_ALPHANUM12:
             asset_code = op_xdr_object.body.allowTrustOp.asset.assetCode12.decode()
+        else:
+            raise Exception
 
         return cls({
             'source': source,
@@ -479,3 +483,35 @@ class Inflation(Operation):
         else:
             source = encode_check('account', op_xdr_object.sourceAccount[0].ed25519)
         return cls({'source': source})
+
+
+class ManageData(Operation):
+    def __init__(self, opts):
+        super(ManageData, self).__init__(opts)
+        self.data_name = opts.get('data_name')
+        self.data_value = opts.get('data_value')
+
+    def to_xdr_object(self):
+        data_name = bytearray(self.data_name, encoding='utf-8')
+
+        if self.data_value is not None:
+            data_value = [bytearray(self.data_value,'utf-8')]
+        else:
+            data_value = []
+        manage_data_op = Xdr.types.ManageDataOp(data_name, data_value)
+        self.body.type = Xdr.const.MANAGE_DATA
+        self.body.manageDataOp = manage_data_op
+        return super(ManageData, self).to_xdr_object()
+
+    @classmethod
+    def from_xdr_object(cls, op_xdr_object):
+        data_name = str(op_xdr_object.body.manageDataOp.dataName)
+
+        if op_xdr_object.body.manageDataOp.dataValue:
+            data_value = str(op_xdr_object.body.manageDataOp.dataValue[0])
+        else:
+            data_value = None
+        return cls({
+            'data_name': data_name,
+            'data_value': data_value
+        })
