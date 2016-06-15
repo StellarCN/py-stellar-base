@@ -1,11 +1,14 @@
+# coding: utf-8
+import codecs
+
 from setuptools import setup, find_packages
 
-with open('README.md') as file:
+with codecs.open('README.md', encoding='utf-8') as file:
     long_description = file.read()
 
 setup(
     name='stellar-base',
-    version='0.0.1',
+    version='0.1.0',
     description='stellar-base in python.',
     long_description=long_description,
     url='http://github.com/stellarCN/py-stellar-base/',
@@ -21,14 +24,13 @@ setup(
         'License :: OSI Approved :: Apache License',
         'Operating System :: OS Independent',
         'Programming Language :: Python',
-        # 'Programming Language :: Python :: 2',
-        # 'Programming Language :: Python :: 2.6',
-        # 'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.4',
+        'Programming Language :: Python :: 3.5',
         'Topic :: Software Development :: Libraries :: Python Modules',
     ],
     install_requires=[
-        'ed25519', 'crc16', 'requests', 'SSEClient', 'base58'
+        'ed25519', 'crc16', 'requests', 'SSEClient', 'numpy'
     ]
 )
