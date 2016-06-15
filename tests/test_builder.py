@@ -1,12 +1,11 @@
 # encoding: utf-8
-
-
 import json
 
 import requests
 
-from stellar_base.build import Builder, HORIZON_TEST
+from stellar_base.builder import Builder, HORIZON_TEST
 from stellar_base.keypair import Keypair
+from stellar_base.utils import SignatureExistError
 
 
 class TestBuilder(object):
@@ -35,8 +34,15 @@ class TestBuilder(object):
         # append twice for test
         cold.append_payment_op(hot_account, 50.123, 'BEER', cold_account)
         cold.append_payment_op(hot_account, 50.123, 'BEER', cold_account)
+
         cold.sign(self.hot.seed().decode())
-        cold.sign(self.hot.seed().decode())
+        try:  # sign twice
+            cold.sign(self.hot.seed().decode())
+        except SignatureExistError:
+            assert True 
+        except:
+            assert False
+
         cold.sign()
         assert len(cold.te.signatures) == 2
         assert len(cold.ops) == 5
@@ -65,7 +71,6 @@ class TestBuilder(object):
 
         try:
             response = hot.submit()
-            print(response)
         except:
             assert False
 
