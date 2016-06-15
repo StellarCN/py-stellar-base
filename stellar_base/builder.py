@@ -244,7 +244,10 @@ class Builder(object):
         return te
 
     def gen_xdr(self):
-        self.sign()
+        try:
+            self.sign()
+        except SignatureExistError:
+            pass
         return self.te.xdr()
 
     def import_from_xdr(self, xdr):
@@ -272,8 +275,8 @@ class Builder(object):
         try:
             return self.horizon.submit(self.gen_xdr())
         except Exception as e:
-            print(e)
-            raise Exception('network problem')
+            raise e
+            #raise Exception('network problem')
 
     def next_builder(self):
         next_builder = Builder(horizon=self.horizon, network=self.network, sequence=self.sequence + 1)
