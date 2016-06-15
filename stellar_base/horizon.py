@@ -15,6 +15,9 @@ except ImportError:
     # Python 2
     from urllib import urlencode
 
+HORIZON_LIVE = "https://horizon.stellar.org"
+HORIZON_TEST = "https://horizon-testnet.stellar.org"
+
 
 def query(url, params=None, sse=False):
     if sse is False:
@@ -36,7 +39,7 @@ def query(url, params=None, sse=False):
 class Horizon(object):
     def __init__(self, horizon=None):
         if horizon is None:
-            self.horizon = 'https://horizon-testnet.stellar.org'
+            self.horizon = HORIZON_TEST
         else:
             self.horizon = horizon
 
@@ -148,3 +151,11 @@ class Horizon(object):
     def payments(self, params=None, sse=False):
         url = self.horizon + '/payments/'
         return query(url, params, sse)
+
+
+def horizon_testnet():
+    return Horizon(HORIZON_TEST)
+
+
+def horizon_livenet():
+    return Horizon(HORIZON_LIVE)

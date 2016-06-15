@@ -21,16 +21,11 @@ class TransactionEnvelope(object):
         assert isinstance(keypair, Keypair)
         tx_hash = self.hash_meta()
         sig = keypair.sign_decorated(tx_hash)
-        # if sig not in self.signatures:
-        #     self.signatures.append(sig)
         sig_dict = [signature.__dict__ for signature in self.signatures]
         if sig.__dict__ in sig_dict:
             raise SignatureExistError('already signed')
         else:
             self.signatures.append(sig)
-            # if sig.__dict__ not in sig_dict:
-            #     self.signatures.append(sig)
-            # return self
 
     def hash_meta(self):
         return xdr_hash(self.signature_base())

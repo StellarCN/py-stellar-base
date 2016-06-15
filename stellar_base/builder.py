@@ -9,9 +9,7 @@ from .operation import *
 from .transaction import Transaction
 from .transaction_envelope import TransactionEnvelope as Te
 from .utils import SignatureExistError
-
-HORIZON_LIVE = "https://horizon.stellar.org"
-HORIZON_TEST = "https://horizon-testnet.stellar.org"
+from .horizon import HORIZON_LIVE, HORIZON_TEST
 
 
 class Builder(object):

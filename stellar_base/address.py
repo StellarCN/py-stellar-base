@@ -5,9 +5,7 @@ import requests
 from .horizon import Horizon
 from .keypair import Keypair
 from .utils import AccountNotExistError, NotValidParamError
-
-HORIZON_LIVE = "https://horizon.stellar.org"
-HORIZON_TEST = "https://horizon-testnet.stellar.org"
+from .horizon import HORIZON_LIVE, HORIZON_TEST
 
 
 class Address(object):
