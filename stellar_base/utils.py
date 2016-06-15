@@ -1,22 +1,24 @@
 # coding:utf-8
 
-import binascii
 import base64
-import crc16
-import struct
+import binascii
 import hashlib
+import struct
+
+import crc16
+
 # noinspection PyBroadException
 try:
     # noinspection PyUnresolvedReferences
     from pure25519 import ed25519_oop as ed25519
 except:
     import ed25519
-from stellar_base.stellarxdr import StellarXDR_pack as Xdr
+from .stellarxdr import Xdr
 from fractions import Fraction
 import numpy
 from decimal import *
 
-# Compatibility for Python 3.x that dont have unicode type
+# Compatibility for Python 3.x that don't have unicode type
 try:
     type(unicode)
 except NameError:
@@ -25,10 +27,12 @@ except NameError:
 bytes_types = (bytes, bytearray)  # Types acceptable as binary data
 versionBytes = {'account': binascii.a2b_hex('30'), 'seed': binascii.a2b_hex('90')}
 
+
 def suppress_context(exc):
     """ Python 2 compatible version of raise from None """
     exc.__context__ = None
     return exc
+
 
 def xdr_hash(data):
     return hashlib.sha256(data).digest()
@@ -58,18 +62,44 @@ def bytes_from_decode_data(s):
                                          s.__class__.__name__))
 
 
-class XdrLengthError(Exception):
+class BaseError(Exception):
     def __init__(self, msg):
-        super(XdrLengthError, self).__init__(msg)
+        super(BaseError, self).__init__(msg)
+
+
+class XdrLengthError(BaseError):
+    pass
+
+
+class SignatureExistError(BaseError):
+    pass
+
+
+class DecodeError(BaseError):
+    pass
+
+
+class AccountNotExistError(BaseError):
+    pass
+
+
+class NotValidParamError(BaseError):
+    pass
 
 
 def decode_check(version_byte_name, encoded):
     encoded = bytes_from_decode_data(encoded)
 
-    if encoded != base64.b32encode(base64.b32decode(encoded)):
-        raise Exception('invalid encoded bytes')
+    try:
+        decoded = base64.b32decode(encoded)
+    except binascii.Error:
+        raise DecodeError('Incorrect padding')
+    except:
+        raise
 
-    decoded = base64.b32decode(encoded)
+    if encoded != base64.b32encode(decoded):
+        raise DecodeError('invalid encoded bytes')
+
     version_byte = decoded[0:1]
     payload = decoded[0:-2]
     data = decoded[1:-2]
@@ -78,12 +108,12 @@ def decode_check(version_byte_name, encoded):
     # raise KeyError
     expected_version = versionBytes[version_byte_name]
     if version_byte != expected_version:
-        raise XdrLengthError(
-            'invalid version byte. expected ' + str(expected_version) + ', got ' + str(version_byte))
+        raise DecodeError(
+                'invalid version byte. expected ' + str(expected_version) + ', got ' + str(version_byte))
 
     expected_checksum = calculate_checksum(payload)
     if expected_checksum != checksum:
-        raise Exception('invalid checksum')
+        raise DecodeError('invalid checksum')
 
     return data
 
@@ -111,28 +141,28 @@ def best_rational_approximation(x):
     INT32_MAX = Decimal(2147483647)
     a = None
     f = None
-    fractions = numpy.array([[Decimal(0), Decimal(1)],[Decimal(1), Decimal(0)]])
+    fractions = numpy.array([[Decimal(0), Decimal(1)], [Decimal(1), Decimal(0)]])
     i = 2
     while True:
-      if x > INT32_MAX:
-        break
-      a = x.to_integral_exact(rounding=ROUND_FLOOR)
-      f = x - a
-      h = a * fractions[i - 1][0] + fractions[i - 2][0]
-      k = a * fractions[i - 1][1] + fractions[i - 2][1]
-      if h > INT32_MAX or k > INT32_MAX:
-        break
-      fractions = numpy.vstack([fractions, [h, k]])
-      if f.is_zero():
-        break
-      x = 1 / f
-      i = i + 1
-    n = fractions[len(fractions)-1][0]
-    d = fractions[len(fractions)-1][1]
+        if x > INT32_MAX:
+            break
+        a = x.to_integral_exact(rounding=ROUND_FLOOR)
+        f = x - a
+        h = a * fractions[i - 1][0] + fractions[i - 2][0]
+        k = a * fractions[i - 1][1] + fractions[i - 2][1]
+        if h > INT32_MAX or k > INT32_MAX:
+            break
+        fractions = numpy.vstack([fractions, [h, k]])
+        if f.is_zero():
+            break
+        x = 1 / f
+        i = i + 1
+    n = fractions[len(fractions) - 1][0]
+    d = fractions[len(fractions) - 1][1]
     if n.is_zero() or d.is_zero():
-      raise Exception("Couldn't find approximation")
-    return {'n': int(n),'d': int(d)}
+        raise Exception("Couldn't find approximation")
+    return {'n': int(n), 'd': int(d)}
 
 
-def division(n,d):
-    return float(Fraction(n,d))
+def division(n, d):
+    return float(Fraction(n, d))

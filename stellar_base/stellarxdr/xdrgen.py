@@ -1,4 +1,14 @@
 #!/usr/bin/env python
+from __future__ import print_function
+
+import os
+import sys
+import time
+
+import ply.lex as lex
+
+# xdrgen.py for stellar
+#
 # rpcgen.py - A Python RPC protocol compiler
 # 
 # Written by Fred Isaman <iisaman@citi.umich.edu>
@@ -160,9 +170,10 @@
    once within the scope of a union declaration.
 
 """
-
-# Being supplemented by RPC structures:
 """
+
+ Being supplemented by RPC structures:
+
       program-def:
          "program" identifier "{"
             version-def
@@ -208,18 +219,16 @@
         than one type-specifier in procedure argument lists; the usual
         practice is to wrap arguments into a structure.
 """
+
 # Spec above allows the following problems:
 # typedef void; 
 # typedef enum <enum_body> ID[5];  <---Not a problem
 # typedef enum <enum_body> ID<>;   <---Not a problem
 
-import sys
-import keyword
-import StringIO
-import time
-import os
-# Allow to be run stright from package
-if  __name__ == "__main__":
+
+# Allow to be run straight from package
+
+if __name__ == "__main__":
     if os.path.isfile(os.path.join(sys.path[0], 'lib', 'testmod.py')):
         sys.path.insert(1, os.path.join(sys.path[0], 'lib'))
 
@@ -229,13 +238,15 @@ if  __name__ == "__main__":
 #                                                                        #
 ##########################################################################
 
-import ply.lex as lex
 
 keywords = ("bool", "case", "const", "default", "double", "quadruple",
             "enum", "float", "hyper", "int", "opaque", "string", "struct",
             "switch", "typedef", "union", "unsigned", "void",
             # RPC specific
-            "program", "version")
+            "program", "version",
+            # stellar
+            "namespace"
+            )
 
 # Required by lex.  Each token also allows a function t_<token>.
 tokens = tuple([t.upper() for t in keywords]) + (
@@ -244,7 +255,7 @@ tokens = tuple([t.upper() for t in keywords]) + (
     "LPAREN", "RPAREN", "LBRACKET", "RBRACKET", "LBRACE", "RBRACE",
     # ; : < > * = ,
     "SEMI", "COLON", "LT", "GT", "STAR", "EQUALS", "COMMA"
-    )
+)
 
 # t_<name> functions are used by lex.  They are called with t.value==<match
 # of rule in comment>, and t.type==<name>.  They expect a return value
@@ -253,58 +264,73 @@ tokens = tuple([t.upper() for t in keywords]) + (
 # Tell lexer to ignore Whitespace
 t_ignore = " \t"
 
+
 def t_ID(t):
     r'[A-Za-z][A-Za-z0-9_]*'
     if t.value in keywords:
         t.type = t.value.upper()
     return t
 
+
 def t_CONST16(t):
     r'0x[0-9a-fA-F]+'
     return t
+
 
 def t_CONST8(t):
     r'0[0-7]+'
     return t
 
+
 def t_CONST10(t):
     r'-?(([1-9]\d*)|0)'
     return t
 
+
 # Tokens
-t_LPAREN           = r'\('
-t_RPAREN           = r'\)'
-t_LBRACKET         = r'\['
-t_RBRACKET         = r'\]'
-t_LBRACE           = r'\{'
-t_RBRACE           = r'\}'
-t_SEMI             = r';'
-t_COLON            = r':'
-t_LT               = r'<'
-t_GT               = r'>'
-t_STAR             = r'\*'
-t_EQUALS           = r'='
-t_COMMA            = r','
+t_LPAREN = r'\('
+t_RPAREN = r'\)'
+t_LBRACKET = r'\['
+t_RBRACKET = r'\]'
+t_LBRACE = r'\{'
+t_RBRACE = r'\}'
+t_SEMI = r';'
+t_COLON = r':'
+t_LT = r'<'
+t_GT = r'>'
+t_STAR = r'\*'
+t_EQUALS = r'='
+t_COMMA = r','
+
 
 def t_newline(t):
     r'\n+'
     t.lexer.lineno += t.value.count("\n")
+
 
 # Comments
 def t_comment(t):
     r'/\*(.|\n)*?\*/'
     t.lexer.lineno += t.value.count('\n')
 
+
 def t_linecomment(t):
     r'%.*\n'
     t.lexer.lineno += 1
 
+
+def t_stellar_linecomment(t):
+    r'//.*\n'
+    t.lexer.lineno += 1
+
+
 def t_error(t):
-    print "Illegal character %s at %d type %s" % (repr(t.value[0]), t.lexer.lineno, t.type)
+    print(u"Illegal character {0:s} at line {1:d} type {2:s}".format(repr(t.value[0]), t.lexer.lineno, t.type))
     t.lexer.skip(1)
-    
+
+
 # Build the lexer
-lex.lex(debug=0)
+lex.lex(debug=0, optimize=False)
 
 
 ##########################################################################
@@ -313,20 +339,28 @@ lex.lex(debug=0)
 #                                                                        #
 ##########################################################################
 
+
+def p_namespace(t):
+    """namespace : NAMESPACE ID LBRACE specification RBRACE"""
+
+
 def p_specification(t):
-    '''specification : definition_list'''
+    """specification : definition_list"""
+
 
 def p_definition_list(t):
-    '''definition_list : definition definition_list 
-                       | empty'''
+    """definition_list : definition definition_list
+                       | empty"""
+
 
 def p_definition(t):
-    '''definition : constant_def
+    """definition : constant_def
                   | type_def
-                  | program_def'''
+                  | program_def"""
+
 
 def p_constant_def(t):
-    '''constant_def : CONST ID EQUALS constant SEMI'''
+    """constant_def : CONST ID EQUALS constant SEMI"""
     global name_dict
     id = t[2]
     value = t[4]
@@ -334,23 +368,26 @@ def p_constant_def(t):
     if id_unique(id, 'constant', lineno):
         name_dict[id] = const_info(id, value, lineno)
 
+
 def p_constant(t):
-    '''constant : CONST10
+    """constant : CONST10
                 | CONST8
-                | CONST16'''
+                | CONST16"""
     if len(t[1]) > 9:
         t[0] = t[1] + 'L'
     else:
         t[0] = t[1]
 
+
 def p_value(t):
-    '''value : constant
-             | ID'''
+    """value : constant
+             | ID"""
     t[0] = t[1]
 
+
 def p_optional_value(t):
-    '''optional_value : value
-                      | empty'''
+    """optional_value : value
+                      | empty"""
     # return value or None.
     t[0] = t[1]
     # Note this must be unsigned
@@ -371,10 +408,11 @@ def p_optional_value(t):
     if msg:
         global error_occurred
         error_occurred = True
-        print "ERROR - %s near line %i" % (msg, t.lineno(1))
+        print(u"ERROR - {0:s} near line {1:d}".format(msg, t.lineno(1)))
+
 
 def p_type_def_1(t):
-    '''type_def : TYPEDEF declaration SEMI'''
+    """type_def : TYPEDEF declaration SEMI"""
     # declarations is a type_info
     d = t[2]
     lineno = t.lineno(1)
@@ -382,7 +420,7 @@ def p_type_def_1(t):
     if d.type == 'void':
         global error_occurred
         error_occurred = True
-        print "ERROR - can't use void in typedef at line %i" % lineno
+        print(u"ERROR - can't use void in typedef at line {0:d}".format(lineno))
         return
     d.lineno = lineno
     if id_unique(d.id, d.type, lineno):
@@ -396,8 +434,9 @@ def p_type_def_1(t):
             info = d
         name_dict[d.id] = info
 
+
 def p_type_def_2(t):
-    '''type_def : ENUM ID enum_body SEMI'''
+    """type_def : ENUM ID enum_body SEMI"""
     id = t[2]
     body = t[3]
     lineno = t.lineno(1)
@@ -405,35 +444,39 @@ def p_type_def_2(t):
     if id_unique(id, 'enum', lineno):
         name_dict[id] = enum_info(id, body, lineno, sortno)
 
+
 def p_type_def_3(t):
-    '''type_def : STRUCT ID struct_body SEMI'''
+    """type_def : STRUCT ID struct_body SEMI"""
     id = t[2]
     body = t[3]
     lineno = t.lineno(1)
     if id_unique(id, 'struct', lineno):
         name_dict[id] = struct_info(id, body, lineno)
 
+
 def p_type_def_4(t):
-    '''type_def : UNION ID union_body SEMI'''
+    """type_def : UNION ID union_body SEMI"""
     id = t[2]
     body = t[3]
     lineno = t.lineno(1)
     if id_unique(id, 'union', lineno):
         name_dict[id] = union_info(id, body, lineno)
 
+
 def p_declaration_1(t):
-    '''declaration : type_specifier ID'''
+    """declaration : type_specifier ID"""
     t[1].id = t[2]
     t[0] = t[1]
 
+
 def p_declaration_2(t):
-    '''declaration : type_specifier ID LBRACKET value RBRACKET
+    """declaration : type_specifier ID LBRACKET value RBRACKET
                    | type_specifier ID LT optional_value GT
                    | OPAQUE ID LBRACKET value RBRACKET
                    | OPAQUE ID LT optional_value GT
-                   | STRING ID LT optional_value GT'''
+                   | STRING ID LT optional_value GT"""
     if not isinstance(t[1], type_info):
-        t[1] =  type_info(t[1], t.lineno(1))
+        t[1] = type_info(t[1], t.lineno(1))
     t[1].id = t[2]
     t[1].array = True
     if t[3] == '[':
@@ -443,28 +486,32 @@ def p_declaration_2(t):
     t[1].len = t[4]
     t[0] = t[1]
 
+
 def p_declaration_3(t):
-    '''declaration : type_specifier STAR ID'''
+    """declaration : type_specifier STAR ID"""
     # encode this as the equivalent 'type_specifier ID LT 1 GT'
     if not isinstance(t[1], type_info):
-        t[1] =  type_info(t[1], t.lineno(1))
+        t[1] = type_info(t[1], t.lineno(1))
     t[1].id = t[3]
     t[1].array = True
     t[1].fixed = False
     t[1].len = '1'
     t[0] = t[1]
 
+
 def p_declaration_4(t):
-    '''declaration : VOID'''
+    """declaration : VOID"""
     t[0] = type_info(t[1], t.lineno(1))
 
+
 def p_type_specifier_1(t):
-    '''type_specifier : UNSIGNED INT
-                      | UNSIGNED HYPER'''
+    """type_specifier : UNSIGNED INT
+                      | UNSIGNED HYPER"""
     t[0] = type_info('u' + t[2], t.lineno(1))
 
+
 def p_type_specifier_2(t):
-    '''type_specifier : INT
+    """type_specifier : INT
                       | HYPER
                       | FLOAT
                       | DOUBLE
@@ -474,82 +521,97 @@ def p_type_specifier_2(t):
                       | UNSIGNED
                       | enum_type_spec
                       | struct_type_spec
-                      | union_type_spec'''
+                      | union_type_spec"""
     # FRED - Note UNSIGNED is not in spec
     if isinstance(t[1], type_info):
         t[0] = t[1]
     else:
         t[0] = type_info(t[1], t.lineno(1))
 
+
 def p_enum_type_spec(t):
-    '''enum_type_spec : ENUM enum_body'''
+    """enum_type_spec : ENUM enum_body"""
     t[0] = type_info("enum", t.lineno(1), body=t[2])
 
+
 def p_struct_type_spec(t):
-    '''struct_type_spec : STRUCT struct_body'''
+    """struct_type_spec : STRUCT struct_body"""
     t[0] = type_info("struct", t.lineno(1), body=t[2])
 
+
 def p_union_type_spec(t):
-    '''union_type_spec : UNION union_body'''
+    """union_type_spec : UNION union_body"""
     t[0] = type_info("union", t.lineno(1), body=t[2])
 
+
 def p_union_body(t):
-    '''union_body : SWITCH LPAREN declaration RPAREN LBRACE switch_body RBRACE'''
-    t[0] = [Case_Spec(['switch'], [t[3]])] + t[6]
+    """union_body : SWITCH LPAREN declaration RPAREN LBRACE switch_body RBRACE"""
+    t[0] = [CaseSpec(['switch'], [t[3]])] + t[6]
+
 
 def p_switch_body(t):
-    '''switch_body : case_spec_list default_declaration'''
+    """switch_body : case_spec_list default_declaration"""
     # default_declaration is a list of type_info
-    t[0] = t[1] + [Case_Spec(['default'], t[2])]
+    t[0] = t[1] + [CaseSpec(['default'], t[2])]
+
 
 def p_case_spec(t):
-    '''case_spec : case_statement_list declaration SEMI'''
+    """case_spec : case_statement_list declaration SEMI"""
     # Note a declaration is a type_info
     # case_* are both lists of strings (values)
-    t[0] = [Case_Spec(t[1], [t[2]])]
+    t[0] = [CaseSpec(t[1], [t[2]])]
+
 
 def p_nonempty_lists(t):
-    '''case_spec_list      : case_spec case_spec_list
+    """case_spec_list      : case_spec case_spec_list
                            | case_spec
        case_statement_list : case_statement case_statement_list
-                           | case_statement'''
+                           | case_statement"""
     if len(t) == 2:
         t[0] = t[1]
     else:
         t[0] = t[1] + t[2]
 
+
 def p_case_statement(t):
-    '''case_statement : CASE value COLON'''
+    """case_statement : CASE value COLON"""
     t[0] = [t[2]]
 
+
 def p_default_declaration_1(t):
-    '''default_declaration : empty'''
+    """default_declaration : empty"""
     t[0] = []
 
+
 def p_default_declaration_(t):
-    '''default_declaration : DEFAULT COLON declaration SEMI'''
+    """default_declaration : DEFAULT COLON declaration SEMI"""
     t[0] = [t[3]]
 
+
 def p_struct_body(t):
-    '''struct_body : LBRACE declaration_list RBRACE'''
+    """struct_body : LBRACE declaration_list RBRACE"""
     # Returns a list of type_info declarations
     t[0] = t[2]
 
+
 def p_declaration_list_1(t):
-    '''declaration_list : declaration SEMI''' 
+    """declaration_list : declaration SEMI"""
     t[0] = [t[1]]
 
+
 def p_declaration_list_2(t):
-    '''declaration_list : declaration SEMI declaration_list''' 
+    """declaration_list : declaration SEMI declaration_list"""
     t[0] = [t[1]] + t[3]
 
+
 def p_enum_body(t):
-    '''enum_body : LBRACE enum_constant_list RBRACE'''
+    """enum_body : LBRACE enum_constant_list RBRACE"""
     # Returns a list of const_info
-    t[0] = t[2] 
+    t[0] = t[2]
+
 
 def p_enum_constant(t):
-    '''enum_constant : ID EQUALS value'''
+    """enum_constant : ID EQUALS value"""
     global name_dict, error_occurred
     id = t[1]
     value = t[3]
@@ -560,43 +622,47 @@ def p_enum_constant(t):
             # We have a name instead of a constant, make sure it is defined
             if value not in name_dict:
                 error_occurred = True
-                print "ERROR - can't derefence %s at line %s" % (value, lineno)
+                print("ERROR - can't derefence {0:s} at line {1:s}".format(value, lineno))
             elif not isinstance(name_dict[value], const_info):
                 error_occurred = True
-                print "ERROR - reference to %s at line %s is not a constant" %\
-                      (value, lineno)
+                print("ERROR - reference to {0:s} at line {1:s} is not a constant".format(value, lineno))
             else:
                 info.positive = name_dict[value].positive
         t[0] = [info]
     else:
         t[0] = []
 
+
 def p_enum_constant_list_1(t):
-    '''enum_constant_list : enum_constant'''
+    """enum_constant_list : enum_constant"""
     t[0] = t[1]
 
+
 def p_enum_constant_list_2(t):
-    '''enum_constant_list : enum_constant COMMA enum_constant_list'''
+    """enum_constant_list : enum_constant COMMA enum_constant_list"""
     t[0] = t[1] + t[3]
 
+
 def p_empty(t):
-    'empty :'
+    """empty :"""
+
 
 def p_error(t):
     global error_occurred
     error_occurred = True
     if t:
-        print "Syntax error at '%s' (lineno %d)" % (t.value, t.lineno)
+        print("Syntax error at '{0:s}' (lineno {1:d})".format(t.value, t.lineno))
     else:
-        print "Syntax error: unexpectedly hit EOF"
+        print("Syntax error: unexpectedly hit EOF")
+
 
 #
 # RPC specific routines follow
 #
 
 def p_program_def(t):
-    '''program_def : PROGRAM ID LBRACE version_def version_def_list RBRACE EQUALS constant SEMI'''
-    print "Ignoring program %s = %s" % (t[2], t[8])
+    """program_def : PROGRAM ID LBRACE version_def version_def_list RBRACE EQUALS constant SEMI"""
+    print("Ignoring program {0:s} = {1:s}".format(t[2], t[8]))
     global name_dict
     id = t[2]
     value = t[8]
@@ -604,8 +670,9 @@ def p_program_def(t):
     if id_unique(id, 'program', lineno):
         name_dict[id] = const_info(id, value, lineno)
 
+
 def p_version_def(t):
-    '''version_def :  VERSION ID LBRACE procedure_def procedure_def_list RBRACE EQUALS constant SEMI'''
+    """version_def :  VERSION ID LBRACE procedure_def procedure_def_list RBRACE EQUALS constant SEMI"""
     global name_dict
     id = t[2]
     value = t[8]
@@ -613,35 +680,41 @@ def p_version_def(t):
     if id_unique(id, 'version', lineno):
         name_dict[id] = const_info(id, value, lineno)
 
+
 def p_version_def_list(t):
-    '''version_def_list : version_def version_def_list
-                        | empty'''
+    """version_def_list : version_def version_def_list
+                        | empty"""
+
 
 def p_procedure_def(t):
-    '''procedure_def : proc_return ID LPAREN proc_firstarg  type_specifier_list RPAREN EQUALS constant SEMI'''
+    """procedure_def : proc_return ID LPAREN proc_firstarg  type_specifier_list RPAREN EQUALS constant SEMI"""
     global name_dict
-    id = t[2]
+    tid = t[2]
     value = t[8]
     lineno = t.lineno(1)
-    if id_unique(id, 'procedure', lineno):
-        name_dict[id] = const_info(id, value, lineno)
+    if id_unique(tid, 'procedure', lineno):
+        name_dict[tid] = const_info(tid, value, lineno)
+
 
 def p_procedure_def_list(t):
-    '''procedure_def_list : procedure_def procedure_def_list
-                          | empty'''
+    """procedure_def_list : procedure_def procedure_def_list
+                          | empty"""
+
 
 def p_proc_return(t):
-    '''proc_return : type_specifier
-                   | VOID'''
+    """proc_return : type_specifier
+                   | VOID"""
+
 
 def p_proc_firstarg(t):
-    '''proc_firstarg : type_specifier
-                     | VOID'''
+    """proc_firstarg : type_specifier
+                     | VOID"""
+
 
 def p_type_specifier_list(t):
-    '''type_specifier_list : COMMA type_specifier type_specifier_list
-                           | empty'''
-    
+    """type_specifier_list : COMMA type_specifier type_specifier_list
+                           | empty"""
+
 
 ##########################################################################
 #                                                                        #
@@ -649,11 +722,12 @@ def p_type_specifier_list(t):
 #                                                                        #
 ##########################################################################
 
-error_occurred = False # Parsing of infile status
+error_occurred = False  # Parsing of infile status
 
-INDENT = 4 # Number of spaces for each indent level
+INDENT = 4  # Number of spaces for each indent level
 indent = ' ' * INDENT
 indent2 = indent * 2
+
 
 ##########################################################################
 #                                                                        #
@@ -661,24 +735,26 @@ indent2 = indent * 2
 #                                                                        #
 ##########################################################################
 
-def id_unique(id, name, lineno):
-    """Returns True if id not already used.  Otherwise, invokes error"""
-    if id in name_dict:
+def id_unique(dict_id, name, lineno):
+    """Returns True if dict_id not already used.  Otherwise, invokes error"""
+    if dict_id in name_dict:
         global error_occurred
         error_occurred = True
-        print "ERROR - %s definition %s at line %s conflicts with %s" % \
-              (name, id, lineno, name_dict[id])
+        print("ERROR - {0:s} definition {1:s} at line {2:d} conflicts with {3:s}"
+              .format(name, dict_id, lineno, name_dict[dict_id]))
         return False
     else:
         return True
 
-class Case_Spec(object):
+
+class CaseSpec(object):
     def __init__(self, cases, declarations):
         self.cases = cases
         self.declarations = declarations
 
     def __str__(self):
         return "cases %s: %s" % (self.cases, self.declarations)
+
 
 class Info(object):
     def __init__(self):
@@ -694,11 +770,11 @@ class Info(object):
     def __cmp__(self, other):
         """Sort on lineno, but send None to end"""
         # FRED - not used
-        if self.lineno == other.lineno == None:
+        if self.lineno is None and other.lineno is None:
             return 0
-        if self.lineno == None:
+        if self.lineno is None:
             return 1
-        if other.lineno == None:
+        if other.lineno is None:
             return -1
         if self.lineno < other.lineno:
             return -1
@@ -707,28 +783,28 @@ class Info(object):
         else:
             return 1
 
-    def __cmp__(self, other):
-        """Sort on lineno, but send None to end"""
-        if self.sortno < other.sortno:
-            return -1
-        elif self.sortno == other.sortno:
-            return 0
-        else:
-            return 1
+    # def __cmp__(self, other):
+    #     """Sort on lineno, but send None to end"""
+    #     if self.sortno < other.sortno:
+    #         return -1
+    #     elif self.sortno == other.sortno:
+    #         return 0
+    #     else:
+    #         return 1
 
     def const_output(self):
         return None
-    
+
     def type_output(self):
         return None
 
-    def pack_output(Self):
+    def pack_output(self):
         return None
 
     def _get_filter(self):
         if use_filters:
             filter1 = "%sif hasattr(self, 'filter_%s'):\n" % (indent2, self.id)
-            filter2 = "%sdata = getattr(self, 'filter_%s')(data)\n" % (indent*3, self.id)
+            filter2 = "%sdata = getattr(self, 'filter_%s')(data)\n" % (indent * 3, self.id)
             return filter1 + filter2
         else:
             return ''
@@ -760,7 +836,7 @@ class Info(object):
 
     def fullname(self, value):
         """Put 'const.' in front if needed"""
-        if value[0].isdigit() or value[0]=='-':
+        if value[0].isdigit() or value[0] == '-':
             return value
         else:
             return "const." + value
@@ -771,15 +847,15 @@ class Info(object):
                             for var in varlist])
         return "%sdef __init__(self%s):\n%s" % (prefix, initargs, initvars)
 
-##     def typerepr(self, varlist, prefix=indent):
-##         indent2 = prefix + indent
-##         reprbody = ''.join(["%sif self.%s is not None:\n" \
-##                             "%s%sout += ['%s=%%s' %% repr(self.%s)]\n" %
-##                             (indent2, var.id, indent2, indent, var.id, var.id)
-##                             for var in varlist])
-##         return "%sdef __repr__(self):\n%sout = []\n" \
-##                "%s%sreturn '%s(%%s)' %% ', '.join(out)\n" % \
-##                (prefix, indent2, reprbody, indent2, self.id)
+    #     def typerepr(self, varlist, prefix=indent):
+    #         indent2 = prefix + indent
+    #         reprbody = ''.join(["%sif self.%s is not None:\n" \
+    #                             "%s%sout += ['%s=%%s' %% repr(self.%s)]\n" %
+    #                             (indent2, var.id, indent2, indent, var.id, var.id)
+    #                             for var in varlist])
+    #         return "%sdef __repr__(self):\n%sout = []\n" \
+    #                "%s%sreturn '%s(%%s)' %% ', '.join(out)\n" % \
+    #                (prefix, indent2, reprbody, indent2, self.id)
 
     def typerepr(self, varlist, prefix=indent):
         def special(t):
@@ -790,6 +866,7 @@ class Info(object):
                         return "','.join([const.%s.get(x, x) for x in self.%s])" % (p.id, t.id)
                     return "const.%s.get(self.%s, self.%s)" % (p.id, t.id, t.id)
             return "repr(self.%s)" % t.id
+
         indent2 = prefix + indent
         reprbody = ''.join(["%sif self.%s is not None:\n" \
                             "%s%sout += ['%s=%%s' %% %s]\n" %
@@ -809,7 +886,7 @@ class Info(object):
             newdata = "%s.%s" % (data, self.id)
         if self.array:
             newdata = data
-            subheader = "%sdef pack_one_%s(self, data):\n" % (prefix, self.id) 
+            subheader = "%sdef pack_one_%s(self, data):\n" % (prefix, self.id)
             varindent = indent
             if self.fixed:
                 array = "%sself.pack_farray(%s, data, pack_one_%s)\n" % \
@@ -819,12 +896,12 @@ class Info(object):
                         (prefix, self.id)
                 if self.len is not None:
                     limit = "%sif len(data) > %s:\n" \
-                            "%s%sraise XDRError( 'array length too long')\n" %\
+                            "%s%sraise XDRError('array length too long')\n" % \
                             (prefix, self.fullname(self.len), prefix, varindent)
                     array = limit + array
         else:
             subheader = array = varindent = ''
-        return prefix+varindent, newdata, subheader, array
+        return prefix + varindent, newdata, subheader, array
 
     def _array_unpack(self, prefix, data='data'):
         info = globals()["%s_info" % self.type]
@@ -835,30 +912,30 @@ class Info(object):
             newdata = "%s.%s" % (data, self.id)
         if self.array:
             subheader = "%sdef unpack_one_%s(self, data):\n" % \
-                        (prefix, self.id) 
+                        (prefix, self.id)
             varindent = indent
             array = "%s%sreturn data\n" % (prefix, varindent)
             if self.fixed:
                 array += "%s%s = self.unpack_farray(%s, unpack_one_%s)\n" % \
-                        (prefix, newdata, self.fullname(self.len), self.id)
+                         (prefix, newdata, self.fullname(self.len), self.id)
             else:
                 array += "%s%s = self.unpack_array(unpack_one_%s)\n" % \
                          (prefix, newdata, self.id)
                 if self.len is not None:
                     limit = "%sif len(%s) > %s:\n" \
-                            "%s%sraise XDRError( 'array length too long')\n" %\
+                            "%s%sraise XDRError('array length too long')\n" % \
                             (prefix, newdata, self.fullname(self.len), prefix, indent)
                     array += limit
             newdata = 'data'
         else:
             subheader = array = varindent = ''
-        return prefix+varindent, newdata, subheader, array
-        
+        return prefix + varindent, newdata, subheader, array
+
     def packenum(self, prefix, data='data'):
         prefix, data, subheader, array = self._array_pack(prefix, data)
         varlist = ["const.%s" % l.id for l in self.body]
         check = "%sif self.check_enum and %s not in [%s]:\n" \
-                "%s%sraise XDRError( 'value=%%s not in enum %s' %% %s)\n" % \
+                "%s%sraise XDRError('value=%%s not in enum %s' %% %s)\n" % \
                 (prefix, data, ', '.join(varlist),
                  prefix, indent, self.id, data)
         pack = check + "%sself.pack_int(%s)\n" % (prefix, data)
@@ -868,7 +945,7 @@ class Info(object):
         prefix, data, subheader, array = self._array_unpack(prefix, data)
         varlist = ["const.%s" % l.id for l in self.body]
         check = "%sif self.check_enum and %s not in [%s]:\n" \
-                "%s%sraise XDRError( 'value=%%s not in enum %s' %% %s)\n" % \
+                "%s%sraise XDRError('value=%%s not in enum %s' %% %s)\n" % \
                 (prefix, data, ', '.join(varlist),
                  prefix, indent, self.id, data)
         unpack = "%s%s = self.unpack_int()\n" % (prefix, data)
@@ -876,7 +953,7 @@ class Info(object):
 
     def packstruct(self, prefix, data='data'):
         prefix, data, subheader, array = self._array_pack(prefix, data)
-        pack = ''.join( [l.packout(prefix, data) for l in self.body] )
+        pack = ''.join([l.packout(prefix, data) for l in self.body])
         return subheader + pack + array
 
     def unpackstruct(self, prefix, data='data'):
@@ -886,7 +963,7 @@ class Info(object):
         else:
             classname = 'nullclass'
         unpack = "%s%s = %s()\n" % (prefix, data, classname) + \
-                 ''.join( [l.unpackout(prefix, data) for l in self.body] )
+                 ''.join([l.unpackout(prefix, data) for l in self.body])
         return subheader + unpack + array
 
     def packunion(self, prefix, data='data'):
@@ -899,8 +976,8 @@ class Info(object):
                                  (data, switch.id, self.fullname(c))
                                  for c in l.cases])
             check = "%s%sif %s:\n" % (prefix, first, cases)
-            body = ''.join( [d.packout(prefix + indent, data) \
-                             for d in l.declarations] )
+            body = ''.join([d.packout(prefix + indent, data) \
+                            for d in l.declarations])
             pack += check + body
             first = 'el'
         default = self.body[-1].declarations
@@ -908,7 +985,7 @@ class Info(object):
         if default != []:
             pack += default[0].packout(prefix + indent, data)
         else:
-            pack += "%s%sraise XDRError( 'bad switch=%%s' %% %s.%s)\n" % \
+            pack += "%s%sraise XDRError('bad switch=%%s' %% %s.%s)\n" % \
                     (prefix, indent, data, switch.id)
         return subheader + pack + array
 
@@ -927,32 +1004,32 @@ class Info(object):
                                  (data, switch.id, self.fullname(c))
                                  for c in l.cases])
             check = "%s%sif %s:\n" % (prefix, first, cases)
-            body = ''.join( [d.unpackout(prefix + indent, data) \
-                             for d in l.declarations] )
-##             if l.declarations[0].id is None:
-##                  arm = "%s%s%s.switch = None\n" % \
-##                        (prefix, indent, data)
-##             else:
-##                 arm = "%s%s%s.switch = %s.%s\n" % \
-##                       (prefix, indent, data, data, l.declarations[0].id)
-            unpack += check + body# + arm
+            body = ''.join([d.unpackout(prefix + indent, data) \
+                            for d in l.declarations])
+            ##             if l.declarations[0].id is None:
+            ##                  arm = "%s%s%s.switch = None\n" % \
+            ##                        (prefix, indent, data)
+            ##             else:
+            ##                 arm = "%s%s%s.switch = %s.%s\n" % \
+            ##                       (prefix, indent, data, data, l.declarations[0].id)
+            unpack += check + body  # + arm
             first = 'el'
         default = self.body[-1].declarations
         unpack += "%selse:\n" % (prefix)
         if default != []:
-            unpack += ''.join( [d.unpackout(prefix + indent, data) \
-                                for d in default] )
-##             if default[0].id is None:
-##                  arm = "%s%s%s.switch = None\n" % \
-##                        (prefix, indent, data)
-##             else:
-##                 arm = "%s%s%s.switch = %s.%s\n" % \
-##                       (prefix, indent, data, data, default[0].id)
-##             unpack += arm
+            unpack += ''.join([d.unpackout(prefix + indent, data) \
+                               for d in default])
+        ##             if default[0].id is None:
+        ##                  arm = "%s%s%s.switch = None\n" % \
+        ##                        (prefix, indent, data)
+        ##             else:
+        ##                 arm = "%s%s%s.switch = %s.%s\n" % \
+        ##                       (prefix, indent, data, data, default[0].id)
+        ##             unpack += arm
         else:
-            unpack += "%s%sraise XDRError( 'bad switch=%%s' %% %s.%s)\n" % \
+            unpack += "%s%sraise XDRError('bad switch=%%s' %% %s.%s)\n" % \
                       (prefix, indent, data, switch.id)
-            
+
         return subheader + unpack + array
 
     def xdrbody(self, prefix=''):
@@ -977,10 +1054,12 @@ class Info(object):
                         ''.join(["%s\n" % d.xdrout(prefix + indent)
                                  for d in self.body[-1].declarations])
         return body
-            
+
+
 class const_info(Info):
     """The result of 'CONST ID EQUALS constant SEMI' or inside of enum as
     'ID EQUALS value' """
+
     def __init__(self, id, value, lineno=None, enum=False):
         self.id = id
         self.value = value
@@ -988,15 +1067,16 @@ class const_info(Info):
         self.lineno = self.sortno = lineno
         self.type = 'const'
         self.enum = enum
-        
+
     def __repr__(self):
         return "constant %s=%s at line %s" % (self.id, self.value, self.lineno)
 
     def xdrout(self, prefix=''):
         return "%s%s = %s" % (prefix, self.id, self.value)
-    
+
     def const_output(self):
         return "%s = %s\n" % (self.id, self.value)
+
 
 class enum_info(Info):
     """The result of 'TYPEDEF ENUM <enum_body> ID <array> SEMI' or
@@ -1004,9 +1084,10 @@ class enum_info(Info):
 
     Note that an enum which is not of above form will appear as a type_info
     """
+
     def __init__(self, id, body, lineno=None, sortno=None):
         self.id = id
-        self.body = body # list of const_info
+        self.body = body  # list of const_info
         self.lineno = lineno
         if sortno is None:
             self.sortno = self.lineno
@@ -1029,16 +1110,18 @@ class enum_info(Info):
         header = "%sdef unpack_%s(self):\n" % (indent, self.id)
         return header + self.unpackenum(indent2) + \
                self._get_unpack_footer()
-        
+
+
 class struct_info(Info):
     """The result of 'TYPEDEF STRUCT <struct_body> ID <array> SEMI' or
     'STRUCT ID <struct_body> SEMI'
 
     Note that a struct which is not of above form will appear as a type_info
     """
+
     def __init__(self, id, body, lineno=None, sortno=None):
         self.id = id
-        self.body = body # list of type_info declarations
+        self.body = body  # list of type_info declarations
         self.lineno = lineno
         if sortno is None:
             self.sortno = self.lineno
@@ -1079,15 +1162,16 @@ class struct_info(Info):
                    (indent, indent2, candidates[0].id)
         else:
             return ''
-        
+
     def pack_output(self):
         header = self._get_pack_header()
         return header + self.packstruct(indent2)
-        
+
     def unpack_output(self):
         header = "%sdef unpack_%s(self):\n" % (indent, self.id)
         return header + self.unpackstruct(indent2) + \
                self._get_unpack_footer()
+
 
 class union_info(Info):
     """The result of 'TYPEDEF UNION <union_body> ID <array> SEMI' or
@@ -1095,9 +1179,10 @@ class union_info(Info):
 
     Note that a union which is not of above form will appear as a type_info
     """
+
     def __init__(self, id, body, lineno=None, sortno=None):
         self.id = id
-        self.body = body # list of type_info declarations
+        self.body = body  # list of type_info declarations
         self.lineno = lineno
         if sortno is None:
             self.sortno = self.lineno
@@ -1108,7 +1193,7 @@ class union_info(Info):
         self.parent = True
 
     def union_getattr(self, prefix=indent):
-        return "%sdef __getattr__(self, attr):\n"\
+        return "%sdef __getattr__(self, attr):\n" \
                "%s%sreturn getattr(self.switch, attr)\n" % \
                (prefix, prefix, indent)
 
@@ -1139,10 +1224,10 @@ class union_info(Info):
     def type_output(self):
         comment = '%s# ' % indent
         xdrbody = self.xdrbody(comment)
-        switch = "%s" % self.body[0].declarations[0].xdrout(comment +' '*13)
+        switch = "%s" % self.body[0].declarations[0].xdrout(comment + ' ' * 13)
         xdrdef = "%sXDR definition:\n%sunion %s switch(%s) {\n%s%s};\n" % \
                  (comment, comment, self.id,
-                  switch[13+len(comment):].rstrip(';'), xdrbody, comment)
+                  switch[13 + len(comment):].rstrip(';'), xdrbody, comment)
         # FRED - need to detect doubles in varlist
         varlist = []
         for c in self.body:
@@ -1161,6 +1246,7 @@ class union_info(Info):
         header = "%sdef unpack_%s(self):\n" % (indent, self.id)
         return header + self.unpackunion(indent2) + \
                self._get_unpack_footer()
+
 
 class type_info(Info):
     def __init__(self, type, lineno=None, body=None):
@@ -1198,34 +1284,36 @@ class type_info(Info):
             x.len = self.len
             x.fixed = self.fixed
         return x
-        
+
     def xdrout(self, prefix=''):
         if self.type == 'void':
             return "%svoid;" % prefix
         elif self.type == 'enum':
             body = self.xdrbody(prefix)
             name = "%senum {\n%s%s}" % (prefix, body, prefix)
-            
+
         elif self.type == 'struct':
             body = self.xdrbody(prefix)
             name = "%sstruct {\n%s%s}" % (prefix, body, prefix)
+
         elif self.type == 'union':
             body = self.xdrbody(prefix)
-            switch = "%s" % self.body[0].declarations[0].xdrout(prefix +' '*13)
+            switch = "%s" % self.body[0].declarations[0].xdrout(prefix + ' ' * 13)
             name = "%sunion switch(%s) {\n%s%s}" % \
-                   (prefix, switch[13+len(prefix):].rstrip(';'), body, prefix)
+                   (prefix, switch[13 + len(prefix):].rstrip(';'), body, prefix)
         else:
             name = prefix + self.type
         return "%s %s%s;" % (name, self.id, self.brackets())
 
     def packout(self, prefix='', data='data'):
         check = "%sif %s.%s is None:\n" \
-                "%s%sraise TypeError( '%s.%s == None')\n" % \
+                "%s%sraise TypeError('%s.%s == None')\n" % \
                 (prefix, data, self.id, prefix, indent, data, self.id)
         if self.type == 'void':
             return prefix + 'pass\n'
         elif self.type == 'struct':
             return check + self.packstruct(prefix, data)
+
         elif self.type == 'union':
             return check + self.packunion(prefix, data)
         elif self.type == 'enum':
@@ -1240,6 +1328,7 @@ class type_info(Info):
             return prefix + 'pass\n'
         elif self.type == 'struct':
             return self.unpackstruct(prefix, data)
+
         elif self.type == 'union':
             return self.unpackunion(prefix, data)
         elif self.type == 'enum':
@@ -1260,7 +1349,7 @@ class type_info(Info):
                     return "%s = %s\n" % (self.id, self.type)
                 elif cast.type == "enum":
                     return "%s = const.%s\n" % (self.id, self.type)
-        
+
     def pack_output(self):
         if not self.array:
             return "%spack_%s = pack_%s\n" % (indent, self.id, self.type)
@@ -1279,7 +1368,7 @@ class type_info(Info):
             limit = ''
         else:
             limit = "%sif len(%s) > %s and self.check_array:\n" \
-                    "%s%sraise XDRError( " \
+                    "%s%sraise XDRError(" \
                     "'array length too long for %s')\n" % \
                     (prefix, data, self.fullname(self.len), prefix, indent, data)
         if self.fixed:
@@ -1297,13 +1386,13 @@ class type_info(Info):
         pack = "%sself.pack_%s%s(%s%s%s)\n" % \
                (prefix, fixchar, type, fixnum, data, packer)
         return limit + pack
-        
+
     def _unpack_array(self, prefix, data='data'):
         if self.fixed or self.len is None:
             limit = ''
         else:
             limit = "%sif len(%s) > %s and self.check_array:\n" \
-                    "%s%sraise XDRError( " \
+                    "%s%sraise XDRError(" \
                     "'array length too long for %s')\n" % \
                     (prefix, data, self.fullname(self.len), prefix, indent, data)
         if self.fixed:
@@ -1320,27 +1409,26 @@ class type_info(Info):
             packer = ["self.unpack_%s" % self.type]
 
         pack = "%s%s = self.unpack_%s%s(%s)\n" % \
-               (prefix, data, fixchar, type, ', '.join(fixnum+packer))
+               (prefix, data, fixchar, type, ', '.join(fixnum + packer))
         return pack + limit
-        
-     
-        
+
+
 ##########################################################################
 #                                                                        #
 #                          Main Loop                                     #
 #                                                                        #
 ##########################################################################
-name_dict = { } # list of global names seen, to avoid conflict
+name_dict = {}  # list of global names seen, to avoid conflict
 
 use_filters = True  # Option which causes hooks to be generated which
-                    # allows easy subclassing to, for example,
-                    # automatically exand opaque segments
-allow_attr_passthrough = True # Option which allows substructure attrs to
-                              # be referenced directly, in cases where there
-                              # is a unique substructure to search.
+# allows easy subclassing to, for example,
+# automatically exand opaque segments
+allow_attr_passthrough = True  # Option which allows substructure attrs to
+# be referenced directly, in cases where there
+# is a unique substructure to search.
 pack_header = """\
-import %s as const
-import %s as types
+from . import %s as const
+from . import %s as types
 import xdrlib
 from xdrlib import Error as XDRError
 
@@ -1367,18 +1455,18 @@ class %sUnpacker(xdrlib.Unpacker):
 
 """ % ("%s", indent, indent2, indent2, indent2)
 
-known_basics = {"int" : "pack_int",
-                #"enum" : "pack_enum", 
-                "uint" : "pack_uint",
-                "unsigned" : "pack_uint",
-                "hyper" : "pack_hyper",
-                "uhyper" : "pack_uhyper",
-                "float" : "pack_float",
-                "double" : "pack_double",
+known_basics = {"int": "pack_int",
+                # "enum" : "pack_enum",
+                "uint": "pack_uint",
+                "unsigned": "pack_uint",
+                "hyper": "pack_hyper",
+                "uhyper": "pack_uhyper",
+                "float": "pack_float",
+                "double": "pack_double",
                 # Note: xdrlib.py does not have a
-                # pack_quadruple currently. 
-                "quadruple" : "pack_double", 
-                "bool" : "pack_bool",
+                # pack_quadruple currently.
+                "quadruple": "pack_double",
+                "bool": "pack_bool",
                 "opaque": "pack_opaque",
                 "string": "pack_string"}
 packer_start = ''.join(["%spack_%s = xdrlib.Packer.%s\n" % (indent, k, v)
@@ -1387,85 +1475,119 @@ packer_start = ''.join(["%spack_%s = xdrlib.Packer.%s\n" % (indent, k, v)
 unpacker_start = ''.join(["%sunpack_%s = xdrlib.Unpacker.un%s\n" % (indent, k, v)
                           for k, v in known_basics.items()])
 
+
 def run(infile, filters=True, pass_attrs=True, debug=False):
     global use_filters, allow_attr_passthrough
     use_filters = filters
     allow_attr_passthrough = pass_attrs
-    print "Input file is", infile
-
-    # Create output file names (without .py)
-    global constants_file, types_file, packer_file
-    name_base = os.path.basename(infile[:infile.rfind(".")])
-    constants_file = name_base + "_const"
-    types_file = name_base + "_type"
-    packer_file = name_base + "_pack"
-    print "Will use output files %s.py, %s.py, and %s.py" % \
-          (constants_file, types_file, packer_file)
 
     # Parse the input data with yacc
     global name_dict
     name_dict = {}
-    f = open(infile)
-    data = f.read()
-    f.close()
+
     import ply.yacc as yacc
-    yacc.yacc()
-    yacc.parse(data, debug=debug)
+    parser = yacc.yacc(debug=0, write_tables=0)
+    name_base = "StellarXDR"
+
+    if os.path.isfile(infile):
+        with open(infile) as content:
+            data = content.read()
+        print("Input file is", infile)
+        # name_base = os.path.basename(infile[:infile.rfind(".")])
+        name_base = os.path.splitext(os.path.basename(infile))[0]
+        parser.parse(data)
+
+    # stellar XDR dir/files
+    elif os.path.isdir(infile):
+        print("Input dir is", infile)
+        #name_base = os.path.basename(os.path.abspath(infile))
+        global file_list
+        file_list = [os.path.abspath(os.path.join(infile, x)) for x in os.listdir(infile)]
+        while file_list:
+            file_path = file_list.pop()
+            readfile(file_path, parser)
+
+    global constants_file, types_file, packer_file
+    # Create output file names (without .py)
+    constants_file = name_base + "_const"
+    types_file = name_base + "_type"
+    packer_file = name_base + "_pack"
+    print("Will use output files {0:s}.py, {1:s}.py, and {2:s}.py"
+          .format(constants_file, types_file, packer_file))
 
     if error_occurred:
-        print
-        print "Error occurred, did not write output files"
+        print("Error occurred, did not write output files")
         return 1
 
-    comment_string = "# Generated by rpcgen.py from %s on %s\n" % \
-                     (infile, time.asctime())
-    const_fd = file(constants_file + ".py", "w")
+    comment_string = "# Generated by xdrgen.py from {0:s} on {1:s}\n" \
+        .format(infile, time.asctime())
+    const_fd = open(constants_file + ".py", "w", newline='\n')
     const_fd.write(comment_string)
-    type_fd = file(types_file + ".py", "w")
+    type_fd = open(types_file + ".py", "w", newline='\n')
     type_fd.write(comment_string)
-    type_fd.write("import %s as const\n" % constants_file)
-    pack_fd = file(packer_file + ".py", "w")
+    type_fd.write("from . import %s as const\n" % constants_file)
+    pack_fd = open(packer_file + ".py", "w", newline='\n')
     pack_fd.write(comment_string)
     pack_fd.write(pack_header % (constants_file, types_file))
-    pack_fd.write(pack_init % name_base.upper())
+    #pack_fd.write(pack_init % name_base.upper())
+    pack_fd.write(pack_init % name_base)
     pack_fd.write(packer_start)
 
-    type_list = name_dict.values()
-    type_list.sort()
+    type_list = sorted(name_dict.values(), key=lambda name: name.sortno)
+    # type_list.sort()
     for value in type_list:
-        #print value
+        # print value
         output = value.const_output()
         if output is not None:
-            #const_fd.write("# **** %s ****\n" % value.id)
+            # const_fd.write("# **** %s ****\n" % value.id)
             const_fd.write(output)
         output = value.type_output()
         if output is not None:
-            #type_fd.write("# **** %s ****\n" % value.id)
+            # type_fd.write("# **** %s ****\n" % value.id)
             type_fd.write(output)
         output = value.pack_output()
         if output is not None:
-            #pack_fd.write("# **** %s %s %s****\n" % (value.id, value.lineno, value.sortno))
+            # pack_fd.write("# **** %s %s %s****\n" % (value.id, value.lineno, value.sortno))
             pack_fd.write(output)
             pack_fd.write('\n')
-    pack_fd.write(unpack_init % name_base.upper())
+    #pack_fd.write(unpack_init % name_base.upper())
+    pack_fd.write(unpack_init % name_base)
     pack_fd.write(unpacker_start)
     for value in type_list:
         output = value.unpack_output()
         if output is not None:
             pack_fd.write(output)
             pack_fd.write('\n')
-            
+
     const_fd.close()
     type_fd.close()
     pack_fd.close()
+    print('Done')
     return
+
+
+def readfile(file_path, parser):
+    global file_list
+    with open(file_path) as content:
+        data = content.read()
+    import re
+    s = re.findall('%#.*\/(.*).h\".*\n', data)
+    if not s == []:
+        file = s[0] + '.x'
+        file_depend = os.path.join(os.path.dirname(file_path), file)
+
+        if file_depend in file_list:
+            file_list.remove(file_depend)
+            readfile(file_depend, parser)
+    parser.parse(data)
+
 
 #
 # Section: main
 #
 if __name__ == "__main__":
     if len(sys.argv) < 2:
-        print "Usage: %s <filename>" % sys.argv[0]
+        print("Usage: {0:s} <filename | directory>".format(sys.argv[0]))
         sys.exit(1)
 
     run(sys.argv[1])

@@ -1,15 +1,17 @@
 # coding:utf-8
 import base64
 
-from .stellarxdr import StellarXDR_pack as Xdr
+from .stellarxdr import Xdr
 from .utils import account_xdr_object, encode_check, best_rational_approximation as best_r, division
 from .asset import Asset
 from decimal import *
 
 ONE = Decimal(10 ** 7)
 
+
 class Operation(object):
-    """follow the specific . the source can be none.
+    """what we can do in stellar network.
+        follow the specific . the source can be none.
     """
 
     def __init__(self, opts):
@@ -17,6 +19,9 @@ class Operation(object):
 
         self.source = opts.get('source')
         self.body = Xdr.nullclass()
+
+    def __eq__(self, other):
+        return self.xdr() == other.xdr()
 
     def to_xdr_object(self):
         try:
@@ -26,20 +31,22 @@ class Operation(object):
         return Xdr.types.Operation(source_account, self.body)
 
     def xdr(self):
-        op = Xdr.STELLARXDRPacker()
+        op = Xdr.StellarXDRPacker()
         op.pack_Operation(self.to_xdr_object())
         return base64.b64encode(op.get_buffer())
 
     @staticmethod
     def to_xdr_amount(value):
-      if not isinstance(value, str):
-        raise Exception("value must be a string")
-      # throw exception if value * ONE has decimal places (it can't be represented as int64)
-      return int((Decimal(value) * ONE).to_integral_exact(context=Context(traps=[Inexact])))
+        if not isinstance(value, str):
+            raise Exception("value must be a string")
+
+        # throw exception if value * ONE has decimal places (it can't be represented as int64)
+        return int((Decimal(value) * ONE).to_integral_exact(context=Context(traps=[Inexact])))
 
     @staticmethod
     def from_xdr_amount(value):
-      return str(Decimal(value) / ONE)
+        return str(Decimal(value) / ONE)
+
 
 class CreateAccount(Operation):
     def __init__(self, opts):
@@ -163,7 +170,7 @@ class ChangeTrust(Operation):
     def __init__(self, opts):
         super(ChangeTrust, self).__init__(opts)
         self.line = opts.get('asset')
-        if opts.get('limit') != None:
+        if opts.get('limit') is not None:
             self.limit = opts.get('limit')
         else:
             self.limit = "922337203685.4775807"
@@ -235,9 +242,10 @@ class AllowTrust(Operation):
         asset_type = op_xdr_object.body.allowTrustOp.asset.type
         if asset_type == Xdr.const.ASSET_TYPE_CREDIT_ALPHANUM4:
             asset_code = op_xdr_object.body.allowTrustOp.asset.assetCode4.decode()
-            print(asset_code)
         elif asset_type == Xdr.const.ASSET_TYPE_CREDIT_ALPHANUM12:
             asset_code = op_xdr_object.body.allowTrustOp.asset.assetCode12.decode()
+        else:
+            raise Exception
 
         return cls({
             'source': source,
@@ -258,11 +266,13 @@ class SetOptions(Operation):
         self.med_threshold = opts.get('med_threshold')
         self.high_threshold = opts.get('high_threshold')
         self.home_domain = opts.get('home_domain')
-        try:
-            self.signer_address = opts['signer_address']
-            self.signer_weight = opts['signer_weight']
-        except KeyError:
-            self.signer_address = None
+        # try:
+        #     self.signer_address = opts['signer_address']
+        #     self.signer_weight = opts['signer_weight']
+        # except KeyError:
+        #     self.signer_address = None
+        self.signer_address = opts.get('signer_address')
+        self.signer_weight = opts.get('signer_weight')
 
     def to_xdr_object(self):
         def assert_option_array(x):
@@ -285,7 +295,7 @@ class SetOptions(Operation):
         self.high_threshold = assert_option_array(self.high_threshold)
         self.home_domain = assert_option_array(self.home_domain)
 
-        if self.signer_address is not None:
+        if self.signer_address is not None and self.signer_weight is not None:
             signer = [Xdr.types.Signer(account_xdr_object(self.signer_address), self.signer_weight)]
         else:
             signer = []
@@ -298,7 +308,7 @@ class SetOptions(Operation):
         return super(SetOptions, self).to_xdr_object()
 
     @classmethod
-    def from_xdr_object(cls,op_xdr_object):
+    def from_xdr_object(cls, op_xdr_object):
         if not op_xdr_object.sourceAccount:
             source = None
         else:
@@ -338,7 +348,6 @@ class SetOptions(Operation):
         })
 
 
-
 class ManageOffer(Operation):
     def __init__(self, opts):
         super(ManageOffer, self).__init__(opts)
@@ -362,7 +371,7 @@ class ManageOffer(Operation):
         return super(ManageOffer, self).to_xdr_object()
 
     @classmethod
-    def from_xdr_object(cls,op_xdr_object):
+    def from_xdr_object(cls, op_xdr_object):
         if not op_xdr_object.sourceAccount:
             source = None
         else:
@@ -410,7 +419,7 @@ class CreatePassiveOffer(Operation):
         return super(CreatePassiveOffer, self).to_xdr_object()
 
     @classmethod
-    def from_xdr_object(cls,op_xdr_object):
+    def from_xdr_object(cls, op_xdr_object):
         if not op_xdr_object.sourceAccount:
             source = None
         else:
@@ -427,12 +436,9 @@ class CreatePassiveOffer(Operation):
             'source': source,
             'selling': selling,
             'buying': buying,
-            'amount':amount,
-            'price':price
+            'amount': amount,
+            'price': price
         })
-
-
-
 
 
 class AccountMerge(Operation):
@@ -448,7 +454,7 @@ class AccountMerge(Operation):
         return super(AccountMerge, self).to_xdr_object()
 
     @classmethod
-    def from_xdr_object(cls,op_xdr_object):
+    def from_xdr_object(cls, op_xdr_object):
         if not op_xdr_object.sourceAccount:
             source = None
         else:
@@ -457,8 +463,8 @@ class AccountMerge(Operation):
         destination = encode_check('account', op_xdr_object.body.destination.ed25519)
 
         return cls({
-            'source':source,
-            'destination':destination
+            'source': source,
+            'destination': destination
         })
 
 
@@ -471,9 +477,41 @@ class Inflation(Operation):
         return super(Inflation, self).to_xdr_object()
 
     @classmethod
-    def from_xdr_object(cls,op_xdr_object):
+    def from_xdr_object(cls, op_xdr_object):
         if not op_xdr_object.sourceAccount:
             source = None
         else:
             source = encode_check('account', op_xdr_object.sourceAccount[0].ed25519)
-        return cls({'source':source})
+        return cls({'source': source})
+
+
+class ManageData(Operation):
+    def __init__(self, opts):
+        super(ManageData, self).__init__(opts)
+        self.data_name = opts.get('data_name')
+        self.data_value = opts.get('data_value')
+
+    def to_xdr_object(self):
+        data_name = bytearray(self.data_name, encoding='utf-8')
+
+        if self.data_value is not None:
+            data_value = [bytearray(self.data_value,'utf-8')]
+        else:
+            data_value = []
+        manage_data_op = Xdr.types.ManageDataOp(data_name, data_value)
+        self.body.type = Xdr.const.MANAGE_DATA
+        self.body.manageDataOp = manage_data_op
+        return super(ManageData, self).to_xdr_object()
+
+    @classmethod
+    def from_xdr_object(cls, op_xdr_object):
+        data_name = str(op_xdr_object.body.manageDataOp.dataName)
+
+        if op_xdr_object.body.manageDataOp.dataValue:
+            data_value = str(op_xdr_object.body.manageDataOp.dataValue[0])
+        else:
+            data_value = None
+        return cls({
+            'data_name': data_name,
+            'data_value': data_value
+        })

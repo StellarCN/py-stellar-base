@@ -1,6 +1,8 @@
 # coding: utf-8
+import base64
+
+from .stellarxdr import Xdr
 from .utils import XdrLengthError
-from .stellarxdr import StellarXDR_pack as Xdr
 
 # Compatibility for Python 3.x that don't have unicode type
 try:
@@ -8,7 +10,21 @@ try:
 except NameError:
     unicode = str
 
-class NoneMemo(object):
+
+class Memo(object):
+    # def __init__(self):
+    #     pass
+
+    def to_xdr_object(self):
+         pass
+
+    def xdr(self):
+        x = Xdr.StellarXDRPacker()
+        x.pack_Memo(self.to_xdr_object())
+        return base64.b64encode(x.get_buffer())
+
+
+class NoneMemo(Memo):
     def __init__(self):
         pass
 
@@ -16,11 +32,11 @@ class NoneMemo(object):
         return Xdr.types.Memo(type=Xdr.const.MEMO_NONE)
 
 
-class TextMemo(object):
+class TextMemo(Memo):
     def __init__(self, text):
-        if not isinstance(text,(str,unicode)):
+        if not isinstance(text, (str, unicode)):
             raise TypeError('Expects string type got a ' + type(text))
-        if bytes == str and not isinstance(text,unicode):  # Python 2 without unicode string
+        if bytes == str and not isinstance(text, unicode):  # Python 2 without unicode string
             self.text = text
         else:  # python 3 or python 2 with unicode string
             self.text = bytearray(text, encoding='utf-8')
@@ -32,15 +48,15 @@ class TextMemo(object):
         return Xdr.types.Memo(type=Xdr.const.MEMO_TEXT, text=self.text)
 
 
-class IdMemo(object):
-    def __init__(self, mid):
-        self.mid = mid
+class IdMemo(Memo):
+    def __init__(self, memo_id):
+        self.memo_id = int(memo_id)
 
     def to_xdr_object(self):
-        return Xdr.types.Memo(type=Xdr.const.MEMO_ID, id=self.mid)
+        return Xdr.types.Memo(type=Xdr.const.MEMO_ID, id=self.memo_id)
 
 
-class HashMemo(object):
+class HashMemo(Memo):
     def __init__(self, memo_hash):
         if len(memo_hash) != 32:
             raise XdrLengthError("Expects a 32 byte mhash value. Got {:d} bytes instead".format(len(memo_hash)))
@@ -50,7 +66,7 @@ class HashMemo(object):
         return Xdr.types.Memo(type=Xdr.const.MEMO_HASH, hash=self.memo_hash)
 
 
-class RetHashMemo(object):
+class RetHashMemo(Memo):
     def __init__(self, memo_return):
         if len(memo_return) != 32:
             raise XdrLengthError("Expects a 32 byte hash value. Got {:d} bytes instead".format(len(memo_return)))

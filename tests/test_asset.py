@@ -1,6 +1,7 @@
 from nose.tools import raises
 from stellar_base.asset import Asset
-from stellar_base.stellarxdr import StellarXDR_pack as Xdr
+from stellar_base.stellarxdr import Xdr
+
 
 class TestAsset:
     def __init__(self):
@@ -27,3 +28,8 @@ class TestAsset:
     @raises(Exception)
     def test_no_issuer(self):
         Asset('beer', None)
+
+    def test_xdr(self):
+        xdr = b'AAAAAUNOWQAAAAAA01KM3XCt1+LHD7jDTOYpe/HGKSDoQoyL1JbUOc0+E2M='
+        cny = Asset('CNY',self.source)
+        assert xdr == cny.xdr()

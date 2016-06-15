@@ -1,11 +1,11 @@
 # coding: utf-8
 import base64
 
-from .network import Network, NETWORKS
-from .utils import xdr_hash
-from .stellarxdr import StellarXDR_pack as Xdr
 from .keypair import Keypair
+from .network import Network, NETWORKS
+from .stellarxdr import Xdr
 from .transaction import Transaction
+from .utils import xdr_hash, SignatureExistError
 
 
 class TransactionEnvelope(object):
@@ -21,20 +21,22 @@ class TransactionEnvelope(object):
         assert isinstance(keypair, Keypair)
         tx_hash = self.hash_meta()
         sig = keypair.sign_decorated(tx_hash)
-        if sig not in self.signatures:
+        sig_dict = [signature.__dict__ for signature in self.signatures]
+        if sig.__dict__ in sig_dict:
+            raise SignatureExistError('already signed')
+        else:
             self.signatures.append(sig)
-        return self
 
     def hash_meta(self):
         return xdr_hash(self.signature_base())
 
     def signature_base(self):
         network_id = self.network_id
-        tx_type = Xdr.STELLARXDRPacker()
+        tx_type = Xdr.StellarXDRPacker()
         tx_type.pack_EnvelopeType(Xdr.const.ENVELOPE_TYPE_TX)
         tx_type = tx_type.get_buffer()
 
-        tx = Xdr.STELLARXDRPacker()
+        tx = Xdr.StellarXDRPacker()
         tx.pack_Transaction(self.tx.to_xdr_object())
         tx = tx.get_buffer()
         return network_id + tx_type + tx
@@ -44,7 +46,7 @@ class TransactionEnvelope(object):
         return Xdr.types.TransactionEnvelope(tx, self.signatures)
 
     def xdr(self):
-        te = Xdr.STELLARXDRPacker()
+        te = Xdr.StellarXDRPacker()
         te.pack_TransactionEnvelope(self.to_xdr_object())
         te = base64.b64encode(te.get_buffer())
         return te
@@ -53,7 +55,7 @@ class TransactionEnvelope(object):
     @classmethod
     def from_xdr(cls, xdr):
         xdr_decoded = base64.b64decode(xdr)
-        te = Xdr.STELLARXDRUnpacker(xdr_decoded)
+        te = Xdr.StellarXDRUnpacker(xdr_decoded)
         te_xdr_object = te.unpack_TransactionEnvelope()
         signatures = te_xdr_object.signatures
         tx_xdr_object = te_xdr_object.tx
