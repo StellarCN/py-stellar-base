@@ -1,6 +1,7 @@
 # encoding: utf-8
 
 # from stellar_base.asset import Asset
+from .horizon import HORIZON_LIVE, HORIZON_TEST
 from .horizon import Horizon
 from .keypair import Keypair
 from .memo import *
@@ -9,7 +10,6 @@ from .operation import *
 from .transaction import Transaction
 from .transaction_envelope import TransactionEnvelope as Te
 from .utils import SignatureExistError
-from .horizon import HORIZON_LIVE, HORIZON_TEST
 
 
 class Builder(object):
@@ -187,8 +187,9 @@ class Builder(object):
         op = Inflation(opts)
         self.append_op(op)
 
-    def append_manage_data_op(self, data_name, data_value):
+    def append_manage_data_op(self, data_name, data_value, source=None):
         opts = {
+            'source': source,
             'data_name': data_name,
             'data_value': data_value
         }
@@ -276,7 +277,7 @@ class Builder(object):
             return self.horizon.submit(self.gen_xdr())
         except Exception as e:
             raise e
-            #raise Exception('network problem')
+            # raise Exception('network problem')
 
     def next_builder(self):
         next_builder = Builder(horizon=self.horizon, network=self.network, sequence=self.sequence + 1)
