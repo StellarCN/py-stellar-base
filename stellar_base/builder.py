@@ -187,8 +187,9 @@ class Builder(object):
         op = Inflation(opts)
         self.append_op(op)
 
-    def append_manage_data_op(self, data_name, data_value):
+    def append_manage_data_op(self, data_name, data_value, source=None):
         opts = {
+            'source': source,
             'data_name': data_name,
             'data_value': data_value
         }
@@ -279,7 +280,8 @@ class Builder(object):
             #raise Exception('network problem')
 
     def next_builder(self):
-        next_builder = Builder(horizon=self.horizon, network=self.network, sequence=self.sequence + 1)
+        sequence = str(int(self.sequence) + 1)
+        next_builder = Builder(horizon=self.horizon, network=self.network, sequence=sequence)
         next_builder.address = self.address
         next_builder.key_pair = self.key_pair
         return next_builder

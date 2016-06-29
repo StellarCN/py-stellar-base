@@ -495,7 +495,7 @@ class ManageData(Operation):
         data_name = bytearray(self.data_name, encoding='utf-8')
 
         if self.data_value is not None:
-            data_value = [bytearray(self.data_value,'utf-8')]
+            data_value = [bytearray(self.data_value, 'utf-8')]
         else:
             data_value = []
         manage_data_op = Xdr.types.ManageDataOp(data_name, data_value)
@@ -505,13 +505,19 @@ class ManageData(Operation):
 
     @classmethod
     def from_xdr_object(cls, op_xdr_object):
-        data_name = str(op_xdr_object.body.manageDataOp.dataName)
+        if not op_xdr_object.sourceAccount:
+            source = None
+        else:
+            source = encode_check('account', op_xdr_object.sourceAccount[0].ed25519)
+
+        data_name = op_xdr_object.body.manageDataOp.dataName.decode()
 
         if op_xdr_object.body.manageDataOp.dataValue:
-            data_value = str(op_xdr_object.body.manageDataOp.dataValue[0])
+            data_value = op_xdr_object.body.manageDataOp.dataValue[0].decode()
         else:
             data_value = None
         return cls({
+            'source': source,
             'data_name': data_name,
             'data_value': data_value
         })
