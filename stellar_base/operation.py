@@ -1,10 +1,10 @@
 # coding:utf-8
 import base64
+from decimal import *
 
+from .asset import Asset
 from .stellarxdr import Xdr
 from .utils import account_xdr_object, encode_check, best_rational_approximation as best_r, division
-from .asset import Asset
-from decimal import *
 
 ONE = Decimal(10 ** 7)
 

@@ -1,6 +1,7 @@
 # encoding: utf-8
 
 # from stellar_base.asset import Asset
+from .horizon import HORIZON_LIVE, HORIZON_TEST
 from .horizon import Horizon
 from .keypair import Keypair
 from .memo import *
@@ -9,7 +10,6 @@ from .operation import *
 from .transaction import Transaction
 from .transaction_envelope import TransactionEnvelope as Te
 from .utils import SignatureExistError
-from .horizon import HORIZON_LIVE, HORIZON_TEST
 
 
 class Builder(object):
@@ -38,7 +38,7 @@ class Builder(object):
         if sequence:
             self.sequence = sequence
         elif self.address:
-            self.sequence = self.get_sequence(self.address)
+            self.sequence = self.get_sequence()
         else:
             self.sequence = None
 
