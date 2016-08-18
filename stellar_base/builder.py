@@ -132,7 +132,7 @@ class Builder(object):
             'low_threshold': low_threshold,
             'med_threshold': med_threshold,
             'high_threshold': high_threshold,
-            'home_domain': bytearray(home_domain, encoding='utf-8'),
+            'home_domain': bytearray(home_domain, encoding='utf-8') if home_domain else None,
             'signer_address': signer_address,
             'signer_weight': signer_weight
         }
@@ -286,9 +286,11 @@ class Builder(object):
         next_builder.key_pair = self.key_pair
         return next_builder
 
-    def get_sequence(self, address):
+    def get_sequence(self):
+        if not self.address:
+            raise Exception('no address provided')
         try:
-            address = self.horizon.account(address)
+            address = self.horizon.account(self.address)
         except:
             raise Exception('network problem')
 
