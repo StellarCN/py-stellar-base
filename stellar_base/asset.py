@@ -63,8 +63,8 @@ class Asset(object):
             return Asset.native()
         elif asset_xdr_object.type == Xdr.const.ASSET_TYPE_CREDIT_ALPHANUM4:
             issuer = encode_check('account', asset_xdr_object.alphaNum4.issuer.ed25519)
-            code = asset_xdr_object.alphaNum4.assetCode.decode()
+            code = asset_xdr_object.alphaNum4.assetCode.decode().rstrip('\x00')
         else:
             issuer = encode_check('account', asset_xdr_object.alphaNum12.issuer.ed25519)
-            code = asset_xdr_object.alphaNum12.assetCode.decode()
+            code = asset_xdr_object.alphaNum12.assetCode.decode().rstrip('\x00')
         return cls(code, issuer)
