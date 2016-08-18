@@ -105,7 +105,7 @@ class Payment(Operation):
             source = encode_check('account', op_xdr_object.sourceAccount[0].ed25519)
 
         destination = encode_check('account', op_xdr_object.body.paymentOp.destination.ed25519)
-        asset = Asset.from_xdr_object(op_xdr_object.body.paymentOp.destination)
+        asset = Asset.from_xdr_object(op_xdr_object.body.paymentOp.asset)
         amount = Operation.from_xdr_amount(op_xdr_object.body.paymentOp.amount)
 
         return cls({
@@ -327,8 +327,8 @@ class SetOptions(Operation):
         high_threshold = op_xdr_object.body.setOptionsOp.highThreshold
         home_domain = op_xdr_object.body.setOptionsOp.homeDomain
         if op_xdr_object.body.setOptionsOp.signer:
-            signer_address = op_xdr_object.body.setOptionsOp.signer.pubKey.ed25519
-            signer_weight = op_xdr_object.body.setOptionsOp.signer.weight
+            signer_address = encode_check('account', op_xdr_object.body.setOptionsOp.signer[0].pubKey.ed25519)
+            signer_weight = op_xdr_object.body.setOptionsOp.signer[0].weight
         else:
             signer_address = None
             signer_weight = None

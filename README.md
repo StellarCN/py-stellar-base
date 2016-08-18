@@ -36,22 +36,22 @@ let's start with my favourite keypair in TESTNET.
 
 ### base info
 ```python
-    from stellar_base.account import Account 
+    from stellar_base.address import Address
     publickey = 'GDVDKQFP665JAO7A2LSHNLQIUNYNAAIGJ6FYJVMG4DT3YJQQJSRBLQDG'
-    account = Account(account=publickey) 
-    # account = Account(account=publickey,network='public') for livenet.
-    account.get()
+    address = Address(address=publickey) 
+    # address = Address(address=publickey,network='public') for livenet.
+    address.get()
 ```
-now you can check account.`balance` ,`sequence` ,`flags` ,`signers`, `manage_data` etc.
+now you can check address.`balance` ,`sequence` ,`flags` ,`signers`, `manage_data` etc.
 
 ### check payments
-`account.payments()`will give you latest 10 payments.
+`address.payments()`will give you latest 10 payments.
 
 there are three params using for query : `limit`, `order` and `cursor`(paging_token). and the default value for them is 10, asc and 0  
 
-so need check payments after a specific cursor?try `account.payments(cursor='4225135422738433',limit=20,order=asc)`
+so need check payments after a specific cursor?try `address.payments(cursor='4225135422738433',limit=20,order='asc')`
 
-Horizon have SSE support for push data ,if you really want, use like this: `account.payment(sse=True,cursor='4225135422738433')`
+Horizon have SSE support for push data ,if you really want, use like this: `address.payment(sse=True,cursor='4225135422738433')`
 
 ###like check payments, you can check `transactions`,`effects`,`offers`,and `operations`.
 remember , offers have not SSE support.
@@ -66,7 +66,7 @@ remember , offers have not SSE support.
     # builder = Builder(secret=secret, network='public') for LIVENET.
     
 ### operations
-how about make a tips to bob?
+how about sending Bob a tip?
 
     bob_address = 'GABCDEFGHIJKLMNOPQRSTUVW'
     builder.append_payment_op(bob_address,'100','XLM')
@@ -79,16 +79,16 @@ or
 
     builder.add_text_memo('Have a nice day!')  # string length <= 28 bytes
     
-### sign & sumbit
+### sign & submit
     
     builder.sign()
-    builder.sumbit()
+    builder.submit()
 
 Done.
 
-### sign a muilt-sig transaction 
+### sign a multi-sig transaction 
 
-  you get a xdr string (or transaction envlope xdr)from a friend or partner ,which decribe a multi-sig transaction . 
+  you get a xdr string (or transaction envelope xdr)from a friend or partner ,which describe a multi-sig transaction . 
   They need you sign on it too. 
 
     builder = Builder(secret=secret) 

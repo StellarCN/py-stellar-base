@@ -38,7 +38,7 @@ class Builder(object):
         if sequence:
             self.sequence = sequence
         elif self.address:
-            self.sequence = self.get_sequence(self.address)
+            self.sequence = self.get_sequence()
         else:
             self.sequence = None
 
@@ -64,7 +64,7 @@ class Builder(object):
 
     def append_trust_op(self, destination, code, limit=None, source=None):
         line = Asset(code, destination)
-        if limit:
+        if limit is not None:
             limit = str(limit)
         opts = {
             'source': source,
@@ -132,7 +132,7 @@ class Builder(object):
             'low_threshold': low_threshold,
             'med_threshold': med_threshold,
             'high_threshold': high_threshold,
-            'home_domain': bytearray(home_domain, encoding='utf-8'),
+            'home_domain': bytearray(home_domain, encoding='utf-8') if home_domain else None,
             'signer_address': signer_address,
             'signer_weight': signer_weight
         }
@@ -281,14 +281,16 @@ class Builder(object):
 
     def next_builder(self):
         sequence = str(int(self.sequence) + 1)
-        next_builder = Builder(horizon=self.horizon, network=self.network, sequence=sequence)
+        next_builder = Builder(horizon=self.horizon.horizon, network=self.network, sequence=sequence)
         next_builder.address = self.address
         next_builder.key_pair = self.key_pair
         return next_builder
 
-    def get_sequence(self, address):
+    def get_sequence(self):
+        if not self.address:
+            raise Exception('no address provided')
         try:
-            address = self.horizon.account(address)
+            address = self.horizon.account(self.address)
         except:
             raise Exception('network problem')
 
