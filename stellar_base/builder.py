@@ -64,7 +64,7 @@ class Builder(object):
 
     def append_trust_op(self, destination, code, limit=None, source=None):
         line = Asset(code, destination)
-        if limit:
+        if limit is not None:
             limit = str(limit)
         opts = {
             'source': source,
@@ -277,11 +277,11 @@ class Builder(object):
             return self.horizon.submit(self.gen_xdr())
         except Exception as e:
             raise e
-            #raise Exception('network problem')
+            # raise Exception('network problem')
 
     def next_builder(self):
         sequence = str(int(self.sequence) + 1)
-        next_builder = Builder(horizon=self.horizon, network=self.network, sequence=sequence)
+        next_builder = Builder(horizon=self.horizon.horizon, network=self.network, sequence=sequence)
         next_builder.address = self.address
         next_builder.key_pair = self.key_pair
         return next_builder
