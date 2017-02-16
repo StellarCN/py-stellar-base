@@ -17,13 +17,19 @@ class Builder(object):
 
     """
 
-    def __init__(self, secret=None, horizon=None, network=None, sequence=None):
+    def __init__(self, secret=None, address=None, horizon=None, network=None, sequence=None):
         if secret:
             self.key_pair = Keypair.from_seed(secret)
             self.address = self.key_pair.address().decode()
         else:
             self.key_pair = None
             self.address = None
+
+        if address is None and secret is None:
+            raise Exception('No Stellar address afforded.')
+        if address is not None and secret is None:
+            self.address = address
+            self.key_pair = None
 
         if network != 'PUBLIC':
             self.network = 'TESTNET'
@@ -121,7 +127,7 @@ class Builder(object):
     def append_set_options_op(self, inflation_dest=None, clear_flags=None, set_flags=None,
                               master_weight=None, low_threshold=None, med_threshold=None,
                               high_threshold=None, home_domain=None, signer_address=None,
-                              signer_weight=None, source=None,
+                              signer_type=None,signer_weight=None, source=None,
                               ):
         opts = {
             'source': source,
@@ -134,10 +140,19 @@ class Builder(object):
             'high_threshold': high_threshold,
             'home_domain': bytearray(home_domain, encoding='utf-8') if home_domain else None,
             'signer_address': signer_address,
+            'signer_type': signer_type,
             'signer_weight': signer_weight
         }
         op = SetOptions(opts)
         self.append_op(op)
+
+    def append_hashx_signer(self,hashx, signer_weight,source=None):
+        self.append_set_options_op(signer_address=hashx,signer_type='hashX',signer_weight=signer_weight,source=source)
+
+    def append_pre_auth_tx_signer(self, pre_auth_tx, signer_weight, source=None):
+        self.append_set_options_op(signer_address=pre_auth_tx, signer_type='preAuthTx', 
+                                   signer_weight=signer_weight, source=source)
+
 
     def append_manage_offer_op(self, selling_code, selling_issuer,
                                buying_code, buying_issuer,
@@ -237,7 +252,8 @@ class Builder(object):
         return tx
 
     def gen_te(self):
-        self.gen_tx()
+        if self.tx is None:
+            self.gen_tx()
         te = Te(self.tx, opts={'network_id': self.network})
         if self.te:
             te.signatures = self.te.signatures
@@ -245,10 +261,8 @@ class Builder(object):
         return te
 
     def gen_xdr(self):
-        try:
-            self.sign()
-        except SignatureExistError:
-            pass
+        if self.tx is None:
+            self.gen_te()
         return self.te.xdr()
 
     def import_from_xdr(self, xdr):
@@ -269,6 +283,16 @@ class Builder(object):
 
         try:
             self.te.sign(key_pair)
+        except SignatureExistError:
+            raise
+
+    def sign_preimage(self, preimage):
+        ''' preimage must be a unicode string 
+        '''
+        if self.te is None :
+            self.gen_te()
+        try:
+            self.te.sign_hashX(preimage)
         except SignatureExistError:
             raise
 

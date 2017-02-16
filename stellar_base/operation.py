@@ -4,7 +4,7 @@ from decimal import *
 
 from .asset import Asset
 from .stellarxdr import Xdr
-from .utils import account_xdr_object, encode_check, best_rational_approximation as best_r, division
+from .utils import account_xdr_object, signer_key_xdr_object, encode_check, best_rational_approximation as best_r, division
 
 ONE = Decimal(10 ** 7)
 
@@ -266,13 +266,26 @@ class SetOptions(Operation):
         self.med_threshold = opts.get('med_threshold')
         self.high_threshold = opts.get('high_threshold')
         self.home_domain = opts.get('home_domain')
-        # try:
-        #     self.signer_address = opts['signer_address']
-        #     self.signer_weight = opts['signer_weight']
-        # except KeyError:
-        #     self.signer_address = None
+        
         self.signer_address = opts.get('signer_address')
+        self.signer_type = opts.get('signer_type')
         self.signer_weight = opts.get('signer_weight')
+
+        if self.signer_address is not None and self.signer_type is None:
+            try:
+                decode_check('account',self.signer_address)
+            except DecodeError:
+                raise Exception('must be a valid strkey if not give signer_type')
+            self.signer_type = 'ed25519PublicKey'
+            
+        if self.signer_type in ('hashX','preAuthTx') and \
+            (self.signer_address is None or len(self.signer_address) != 32):
+            raise Exception('hashX or preAuthTx Signer must be 32 bytes')
+        
+        if self.signer_type is not None and self.signer_type not in ('ed25519PublicKey','hashX','preAuthTx'):
+            raise Exception('invalid signer type.')
+
+
 
     def to_xdr_object(self):
         def assert_option_array(x):
@@ -295,8 +308,10 @@ class SetOptions(Operation):
         self.high_threshold = assert_option_array(self.high_threshold)
         self.home_domain = assert_option_array(self.home_domain)
 
-        if self.signer_address is not None and self.signer_weight is not None:
-            signer = [Xdr.types.Signer(account_xdr_object(self.signer_address), self.signer_weight)]
+        if self.signer_address is not None and \
+            self.signer_type is not None and \
+            self.signer_weight is not None:
+            signer = [Xdr.types.Signer(signer_key_xdr_object(self.signer_type,self.signer_address), self.signer_weight)]
         else:
             signer = []
 
@@ -326,11 +341,23 @@ class SetOptions(Operation):
         med_threshold = op_xdr_object.body.setOptionsOp.medThreshold
         high_threshold = op_xdr_object.body.setOptionsOp.highThreshold
         home_domain = op_xdr_object.body.setOptionsOp.homeDomain
+
         if op_xdr_object.body.setOptionsOp.signer:
-            signer_address = encode_check('account', op_xdr_object.body.setOptionsOp.signer[0].pubKey.ed25519)
+            key = op_xdr_object.body.setOptionOp.signer[0].key
+            if key.type == Xdr.const.SIGNER_KEY_TYPE_ED25519:
+                signer_address = encode_check('account', key.ed25519)
+                signer_type = 'ed25519PublicKey'
+            if key.type == Xdr.const.SIGNER_KEY_TYPE_PRE_AUTH_TX:
+                signer_address = key.preAuthTx
+                signer_type = 'preAuthTx'
+            if key.type == Xdr.const.SIGNER_KEY_TYPE_HASH_X:
+                signer_address = key.hashX
+                signer_type = 'hashX'
+
             signer_weight = op_xdr_object.body.setOptionsOp.signer[0].weight
         else:
             signer_address = None
+            signer_type = None
             signer_weight = None
 
         return cls({
@@ -344,6 +371,7 @@ class SetOptions(Operation):
             'high_threshold': high_threshold,
             'home_domain': home_domain,
             'signer_address': signer_address,
+            'Signer_type': signer_type,
             'signer_weight': signer_weight
         })
 

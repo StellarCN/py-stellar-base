@@ -25,7 +25,11 @@ except NameError:
     unicode = str
 
 bytes_types = (bytes, bytearray)  # Types acceptable as binary data
-versionBytes = {'account': binascii.a2b_hex('30'), 'seed': binascii.a2b_hex('90')}
+versionBytes = {'account': binascii.a2b_hex('30'), # G 48 6 << 3 
+                'seed': binascii.a2b_hex('90'), # S 144 18 << 3
+                'preAuthTx': binascii.a2b_hex('98'), # T 152 19 << 3
+                'sha256Hash': binascii.a2b_hex('b8') # X 184 23 << 3
+                }
 
 
 def suppress_context(exc):
@@ -42,6 +46,21 @@ def account_xdr_object(account):
     public_key = decode_check('account', account)
     axo = Xdr.types.PublicKey(Xdr.const.KEY_TYPE_ED25519, public_key)
     return axo
+
+def signer_key_xdr_object(signer_type, signer):
+    if signer_type == 'ed25519PublicKey':
+        return Xdr.types.SignerKey(Xdr.const.SIGNER_KEY_TYPE_ED25519, decode_check('account', signer))
+    if signer_type == 'hashX':
+        return Xdr.types.SignerKey(Xdr.const.SIGNER_KEY_TYPE_HASH_X, hashX=signer)
+    if signer_type == 'preAuthTX':
+        return Xdr.types.SignerKey(Xdr.const.SIGNER_KEY_TYPE_PRE_AUTH_TX, preAuthTx=signer)
+
+def hashX_sign_decorated(preimage):
+    preimage = preimage.encode('utf-8')
+    hash_preimage = hashlib.sha256(preimage).digest()
+    hint = hash_preimage[-4:]
+    return Xdr.types.DecoratedSignature(hint, preimage)
+
 
 
 def bytes_from_decode_data(s):
@@ -68,6 +87,10 @@ class BaseError(Exception):
 
 
 class XdrLengthError(BaseError):
+    pass
+
+
+class PreimageLengthError(BaseError):
     pass
 
 
