@@ -10,6 +10,7 @@ from .operation import *
 from .transaction import Transaction
 from .transaction_envelope import TransactionEnvelope as Te
 from .utils import SignatureExistError
+from .federation import *
 
 
 class Builder(object):
@@ -233,6 +234,18 @@ class Builder(object):
     def add_time_bounds(self, time_bounds):
         self.time_bounds.append(time_bounds)
 
+    def federation_payment(self, fed_address, amount, asset_type='XLM',
+                           asset_issuer=None, source=None):
+        fed_info = federation(fed_address, 'name')
+        if not fed_info:
+            raise FederationError('can not get valid federation response. ')
+        self.append_payment_op(fed_info['account_id'], amount, asset_type,
+                               asset_issuer, source)
+        memo_type = fed_info.get('memo_type')
+        if memo_type is not None and memo_type in ('text', 'id', 'hash'):
+            getattr(self, 'add_' + memo_type + '_memo')(fed_info['memo'])
+
+
     def gen_tx(self):
         if not self.address:
             raise Exception('Transaction does not have any source address ')
@@ -264,6 +277,13 @@ class Builder(object):
         if self.tx is None:
             self.gen_te()
         return self.te.xdr()
+
+    def gen_compliance_xdr(self):
+        sequence = self.sequence
+        self.sequence = '-1' # sequence number shoule be '0' here. so the pass one is '-1'
+        tx_xdr = self.gen_tx().xdr()
+        self.sequence = sequence
+        return tx_xdr
 
     def import_from_xdr(self, xdr):
         te = Te.from_xdr(xdr)
