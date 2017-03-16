@@ -32,7 +32,7 @@ def get_federation_service(domain):
     return st.get('FEDERATION_SERVER')
 
 def get_auth_server(domain):
-    st = get_stellar_toml(domai)
+    st = get_stellar_toml(domain)
     if not st:
         return None
     return st.get('AUTH_SERVER')
