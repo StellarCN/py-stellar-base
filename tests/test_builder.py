@@ -63,7 +63,6 @@ class TestBuilder(object):
         cold.append_trust_op(cold_account, 'BEER', 1000, hot_account)
         cold.append_payment_op(hot_account, 100, 'BEER', cold_account)
         cold.append_payment_op(cold_account, 2.222, 'BEER', cold_account, hot_account)
-
         xdr = cold.gen_xdr()
         hot = Builder(self.hot.seed().decode())
         hot.import_from_xdr(xdr)

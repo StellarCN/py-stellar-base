@@ -5,7 +5,7 @@ from .keypair import Keypair
 from .network import Network, NETWORKS
 from .stellarxdr import Xdr
 from .transaction import Transaction
-from .utils import xdr_hash, SignatureExistError
+from .utils import xdr_hash, SignatureExistError, PreimageLengthError, hashX_sign_decorated
 
 
 class TransactionEnvelope(object):
@@ -26,6 +26,17 @@ class TransactionEnvelope(object):
             raise SignatureExistError('already signed')
         else:
             self.signatures.append(sig)
+
+    def sign_hashX(self, preimage):
+        if len(preimage) > 64:
+            raise PreimageLengthError('preimage must <= 64 bytes')
+        sig = hashX_sign_decorated(preimage)
+        sig_dict = [signature.__dict__ for signature in self.signatures]
+        if sig.__dict__ in sig_dict:
+            raise SignatureExistError('already signed')
+        else:
+            self.signatures.append(sig)
+
 
     def hash_meta(self):
         return xdr_hash(self.signature_base())

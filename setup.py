@@ -31,6 +31,6 @@ setup(
         'Topic :: Software Development :: Libraries :: Python Modules',
     ],
     install_requires=[
-        'ed25519', 'crc16', 'requests', 'SSEClient', 'numpy'
+        'ed25519', 'crc16', 'requests', 'SSEClient', 'numpy', 'toml'
     ]
 )
