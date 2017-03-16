@@ -18,8 +18,11 @@ def federation(fed_address, fed_type='name'):
     if not fed_service:
         raise FederationError('not a valid federation server')
 
+    return get_federation_info(fed_address, fed_service, fed_type)
+
+def get_federation_info(fed_address, federation_service, fed_type='name'):
     params = {'q':fed_address, 'type':fed_type }
-    r = requests.get(fed_service,params=params)
+    r = requests.get(federation_service,params=params)
     if r.status_code == 200:
         return r.json()
     else:
