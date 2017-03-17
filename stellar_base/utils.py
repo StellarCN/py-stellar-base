@@ -189,3 +189,44 @@ def best_rational_approximation(x):
 
 def division(n, d):
     return float(Fraction(n, d))
+
+# mnemonic 
+from mnemonic import Mnemonic
+import os
+from pbkdf2 import PBKDF2
+import hmac
+PBKDF2_ROUNDS = 2048
+
+class StellarMnemonic(Mnemonic):
+    def __init__(self, language='english'):
+        self.radix = 2048
+        if language == 'chinese':
+            with open('%s/%s.txt' % (self._get_directory(), language), 'r') as f:
+                self.wordlist = [w.strip() for w in f.readlines()]
+        else:
+            with open('%s/%s.txt' % (Mnemonic._get_directory(), language), 'r') as f:
+                self.wordlist = [w.strip() for w in f.readlines()]
+
+        if len(self.wordlist) != self.radix:
+            raise ConfigurationError('Wordlist should contain %d words, but it contains %d words.' % (self.radix, len(self.wordlist)))
+
+    @classmethod
+    def _get_directory(cls):
+        return os.path.join(os.path.dirname(__file__), 'wordlist') 
+
+    @classmethod
+    def list_languages(cls):
+        lang =  [f.split('.')[0] for f in os.listdir(cls._get_directory()) if f.endswith('.txt')]
+        lang += [f.split('.')[0] for f in os.listdir(Mnemonic._get_directory()) if f.endswith('.txt')]
+        return lang
+
+    def to_seed(cls, mnemonic, passphrase=''):
+        if not cls.check(mnemonic):
+            raise MnemonicError('wrong mnemonic string')
+        mnemonic = cls.normalize_string(mnemonic)
+        passphrase = cls.normalize_string(passphrase)
+        return PBKDF2(mnemonic, u'mnemonic' + passphrase, iterations=PBKDF2_ROUNDS, macmodule=hmac, digestmodule=hashlib.sha512).read(32)
+
+
+class MnemonicError(Exception):
+    pass
