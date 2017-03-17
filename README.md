@@ -7,21 +7,27 @@
 
 # usage
 
-## Create a Stellar keypair?
+## Generate a Stellar keypair?
 ```python
     from stellar_base.keypair import Keypair
     kp = Keypair.random()
 ```    
-**or** 
+**or from mnemonic string** 
 ```python
-    from __future__ import unicode_literals
-    master = u'中文'.encode('utf-8')
-    kp = Keypair.deterministic(master)
+    m = '域 监 惜 国 期 碱 珍 继 造 监 剥 电'
+    kp = Keypair.deterministic(m,lang='chinese')
 ```    
 then we can get key/secret from random:
  
     publickey = kp.address().decode()
     secret = kp.seed().decode()
+
+### generator mnemonic string 
+```python
+    from stellar_base.utils import StellarMnemonic
+    sm = StellarMnemoic() # default language is 'english'
+    m = sm.generate()
+```
 
 
 let's start with my favourite keypair in TESTNET. 
