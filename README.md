@@ -51,7 +51,7 @@ there are three params using for query : `limit`, `order` and `cursor`(paging_to
 
 so need check payments after a specific cursor?try `address.payments(cursor='4225135422738433',limit=20,order='asc')`
 
-Horizon have SSE support for push data ,if you really want, use like this: `address.payment(sse=True,cursor='4225135422738433')`
+Horizon have SSE support for push data ,if you really want, use like this: `address.payments(sse=True,cursor='4225135422738433')`
 
 ###like check payments, you can check `transactions`,`effects`,`offers`,and `operations`.
 remember , offers have not SSE support.
