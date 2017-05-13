@@ -132,7 +132,7 @@ We can use three params to customize query : `limit`, `order` and `cursor`(pagin
 So if you need to check payments after a specific cursor, try:
 `address.payments(cursor='4225135422738433',limit=20,order='asc')`
 
-Horizon have SSE support for push data ,if you really want, use like this: `address.payment(sse=True,cursor='4225135422738433')`
+Horizon have SSE support for push data ,if you really want, use like this: `address.payments(sse=True,cursor='4225135422738433')`
 
 ### 3.3 Check others
 Just like payments, we can check `transactions`,`effects`,`offers`,and `operations` by:
