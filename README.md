@@ -1,11 +1,8 @@
 [![Build Status](https://travis-ci.org/StellarCN/py-stellar-base.svg)](https://travis-ci.org/StellarCN/py-stellar-base)
 
 # Installation
-    pip install stellar-base
-
-
+    pip install stellar-base
 # Quick Start
-
 ## 1. Create a Stellar keypair
 There are 2 methods for generating a keypair in py-stellar-base. 
 ### 1.1 Random generation
@@ -16,10 +13,11 @@ There are 2 methods for generating a keypair in py-stellar-base.
 ### 1.2 Deterministic generation
 Or we may generate from a particular unicode string:
 ```python
-    from __future__ import unicode_literals
-    master = u'中文_string_123'.encode('utf-8')
-    kp = Keypair.deterministic(master)
-```    
+    from stellar_base.utils import StellarMnemonic
+    sm = StellarMnemoic() # default language is 'english'
+    m = sm.generate() # or m = '域 监 惜 国 期 碱 珍 继 造 监 剥 电'
+    kp = Keypair.deterministic(m,lang='english')
+```
 Cautions: Please be very careful if you try to use the second method. Because anyone happends to come up with the same string with you would have the access to the generated account. And this coincidence is very likely to happend if you used
 a comman phrase/word/numbers. Therefore, random generation is recommanded.
 
