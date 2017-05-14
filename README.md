@@ -11,12 +11,13 @@ There are 2 methods for generating a keypair in py-stellar-base.
     kp = Keypair.random()
 ```    
 ### 1.2 Deterministic generation
-Or we may generate from a particular unicode string:
+Or we may generate from a unicode mnemonic string:
 ```python
     from stellar_base.utils import StellarMnemonic
-    sm = StellarMnemoic() # default language is 'english'
-    m = sm.generate() # or m = '域 监 惜 国 期 碱 珍 继 造 监 剥 电'
-    kp = Keypair.deterministic(m,lang='english')
+    sm = StellarMnemonic("chinese") # here we use chinese,but default language is 'english'
+    m = sm.generate() 
+    # or m = u'域 监 惜 国 期 碱 珍 继 造 监 剥 电' must add u'' before the string if using python2
+    kp = Keypair.deterministic(m,lang='chinese')
 ```
 Cautions: Please be very careful if you try to use the second method. Because anyone happends to come up with the same string with you would have the access to the generated account. And this coincidence is very likely to happend if you used
 a comman phrase/word/numbers. Therefore, random generation is recommanded.
