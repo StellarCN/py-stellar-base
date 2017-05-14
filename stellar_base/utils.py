@@ -1,11 +1,12 @@
 # coding:utf-8
-
+from __future__ import print_function
 import base64
 import binascii
 import hashlib
 import struct
 
 import crc16
+
 
 # noinspection PyBroadException
 try:
@@ -195,16 +196,18 @@ from mnemonic import Mnemonic
 import os
 from pbkdf2 import PBKDF2
 import hmac
+import io
 PBKDF2_ROUNDS = 2048
 
 class StellarMnemonic(Mnemonic):
     def __init__(self, language='english'):
         self.radix = 2048
         if language == 'chinese':
-            with open('%s/%s.txt' % (self._get_directory(), language), 'r') as f:
+            with io.open('%s/%s.txt' % (self._get_directory(), language), 'r',encoding="utf8") as f:
                 self.wordlist = [w.strip() for w in f.readlines()]
         else:
-            with open('%s/%s.txt' % (Mnemonic._get_directory(), language), 'r') as f:
+            with io.open('%s/%s.txt' % (Mnemonic._get_directory(), language),
+                    'r',encoding="utf8") as f:
                 self.wordlist = [w.strip() for w in f.readlines()]
 
         if len(self.wordlist) != self.radix:
@@ -226,6 +229,14 @@ class StellarMnemonic(Mnemonic):
         mnemonic = cls.normalize_string(mnemonic)
         passphrase = cls.normalize_string(passphrase)
         return PBKDF2(mnemonic, u'mnemonic' + passphrase, iterations=PBKDF2_ROUNDS, macmodule=hmac, digestmodule=hashlib.sha512).read(32)
+    
+    def generate(self, strength=128):
+        if strength not in [128, 160, 192, 224, 256]:
+            raise ValueError('Strength should be one of the following [128, 160, 192, 224, 256], but it is not (%d).' % strength)
+        ret = self.to_mnemonic(os.urandom(strength // 8))
+        print(ret)
+        return ret
+        
 
 
 class MnemonicError(Exception):
