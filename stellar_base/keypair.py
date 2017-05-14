@@ -4,7 +4,7 @@ import os
 
 from .base58 import b58decode_check, b58encode_check
 from .stellarxdr import Xdr
-from .utils import XdrLengthError, decode_check, encode_check
+from .utils import XdrLengthError, decode_check, encode_check, StellarMnemonic
 
 # noinspection PyBroadException
 try:
@@ -26,11 +26,12 @@ class Keypair(object):
         self.signing_key = signing_key
 
     @classmethod
-    def deterministic(cls, master):
+    def deterministic(cls, mnemonic, passphrase='', lang='english'):
         """ a deterministic keypair generator .
             :type master: bytes-like object  for create keypair. e.g. u'中文'.encode('utf-8') 
         """
-        seed = hashlib.sha256(master).digest()
+        sm = StellarMnemonic(lang)
+        seed = sm.to_seed(mnemonic, passphrase='')
         return cls.from_raw_seed(seed)
 
     @classmethod
