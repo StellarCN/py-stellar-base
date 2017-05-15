@@ -19,9 +19,6 @@ Or we may generate from a unicode mnemonic string:
     # or m = u'域 监 惜 国 期 碱 珍 继 造 监 剥 电' must add u'' before the string if using python2
     kp = Keypair.deterministic(m,lang='chinese')
 ```
-Cautions: Please be very careful if you try to use the second method. Because anyone happends to come up with the same string with you would have the access to the generated account. And this coincidence is very likely to happend if you used
-a comman phrase/word/numbers. Therefore, random generation is recommanded.
-
 After the keypair generation, we can get publickey/seed from it:
  ```python
     publickey = kp.address().decode()
@@ -200,7 +197,7 @@ Sometimes, we need to deal with multi-signature transaction. Especially when you
     amount = '100'
     
     Alice = Keypair.from_seed(alice_seed)
-    horizon = horizon_testnet()
+    horizon = horizon_testnet()# horizon = horizon_pubic() for LIVENET
     
     asset = Asset('CNY', CNY_ISSUER) 
     # create op 
@@ -232,7 +229,7 @@ Sometimes, we need to deal with multi-signature transaction. Especially when you
     
     
     # build envelope
-    envelope = Te(tx=tx, opts={"network_id": "TESTNET"})
+    envelope = Te(tx=tx, opts={"network_id": "TESTNET"}) # envelope = Te(tx=tx, opts={"network_id": "PUBLIC"}) for LIVENET
     # sign 
     envelope.sign(Alice)
     # submit
