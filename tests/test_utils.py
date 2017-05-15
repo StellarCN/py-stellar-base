@@ -1,3 +1,5 @@
+# coding: utf-8 
+
 from nose.tools import raises
 from stellar_base import utils
 from stellar_base.stellarxdr import StellarXDR_pack as Xdr
