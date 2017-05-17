@@ -157,7 +157,7 @@ How about sending Bob a payment?
 ```  
 Or if you want to pay him with CNY:
 ```python
-    CNY_ISSUER='ABC'
+    CNY_ISSUER='GDVDKQFP665JAO7A2LSHNLQIUNYNAAIGJ6FYJVMG4DT3YJQQJSRBLQDG'# Just an stellar address which issues asset CNY
     builder.append_payment_op(bob_address,'100','CNY',CNY_ISSUER)
 ```    
 Then maybe need to carry a message:
