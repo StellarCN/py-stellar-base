@@ -5,7 +5,8 @@ from .keypair import Keypair
 from .network import Network, NETWORKS
 from .stellarxdr import Xdr
 from .transaction import Transaction
-from .utils import xdr_hash, SignatureExistError, PreimageLengthError, hashX_sign_decorated
+from .utils import xdr_hash, SignatureExistError, PreimageLengthError, \
+                   hashX_sign_decorated
 
 
 class TransactionEnvelope(object):
@@ -15,7 +16,8 @@ class TransactionEnvelope(object):
             self.signatures = opts.get('signatures') or []
         except AttributeError:
             self.signatures = []
-        self.network_id = Network(NETWORKS[opts.get('network_id', 'TESTNET')]).network_id()
+        self.network_id = Network(NETWORKS[opts.get('network_id',
+            'TESTNET')]).network_id()
 
     def sign(self, keypair):
         assert isinstance(keypair, Keypair)
@@ -72,5 +74,6 @@ class TransactionEnvelope(object):
         tx_xdr_object = te_xdr_object.tx
         tx = Transaction.from_xdr_object(tx_xdr_object)
         te = TransactionEnvelope(tx, {'signatures': signatures})
-        # te = TransactionEnvelope(tx, {'signatures': signatures, 'network_id': 'PUBLIC'})
+        # te = TransactionEnvelope(tx, {'signatures': signatures,
+        #    'network_id': 'PUBLIC'})
         return te

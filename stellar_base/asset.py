@@ -23,7 +23,8 @@ class Asset(object):
         rv = {'asset_code': self.code}
         if not self.is_native():
             rv['asset_issuer'] = self.issuer
-            rv['asset_type'] = len(self.code) > 4 and 'credit_alphanum12' or 'credit_alphanum4'
+            rv['asset_type'] = len(self.code) > 4 and 'credit_alphanum12' \
+                               or 'credit_alphanum4'
         else:
             rv['asset_type'] = 'native'
         return rv
@@ -62,11 +63,14 @@ class Asset(object):
         if asset_xdr_object.type == Xdr.const.ASSET_TYPE_NATIVE:
             return Asset.native()
         elif asset_xdr_object.type == Xdr.const.ASSET_TYPE_CREDIT_ALPHANUM4:
-            issuer = encode_check('account', asset_xdr_object.alphaNum4.issuer.ed25519).decode()
+            issuer = encode_check('account',
+                asset_xdr_object.alphaNum4.issuer.ed25519).decode()
             code = asset_xdr_object.alphaNum4.assetCode.decode().rstrip('\x00')
         else:
-            issuer = encode_check('account', asset_xdr_object.alphaNum12.issuer.ed25519).decode()
-            code = asset_xdr_object.alphaNum12.assetCode.decode().rstrip('\x00')
+            issuer = encode_check('account',
+                asset_xdr_object.alphaNum12.issuer.ed25519).decode()
+            code = asset_xdr_object.alphaNum12.assetCode.decode().rstrip(
+                '\x00')
         return cls(code, issuer)
 
     @classmethod
