@@ -9,11 +9,12 @@ from .horizon import HORIZON_LIVE, HORIZON_TEST
 
 
 class Address(object):
-    """ check address info from stellar network using horizon rest api or SSE.
-
+    """
+    check address info from stellar network using horizon rest api or SSE.
     """
 
-    def __init__(self, address=None, secret=None, network='TESTNET', horizon=None):
+    def __init__(self, address=None, secret=None, network='TESTNET',
+        horizon=None):
         if address is None and secret is None:
             raise Exception('oops,need a stellar address or secret')
         if address is None and secret is not None:
@@ -61,7 +62,8 @@ class Address(object):
 
     def payments(self, sse=False, **kwargs):
         check_params(kwargs)
-        return self.horizon.account_payments(self.address, params=kwargs, sse=sse)
+        return self.horizon.account_payments(
+            self.address, params=kwargs, sse=sse)
 
     def offers(self, **kwargs):
         check_params(kwargs)
@@ -69,15 +71,18 @@ class Address(object):
 
     def transactions(self, sse=False, **kwargs):
         check_params(kwargs)
-        return self.horizon.account_transactions(self.address, params=kwargs, sse=sse)
+        return self.horizon.account_transactions(
+            self.address, params=kwargs, sse=sse)
 
     def operations(self, sse=False, **kwargs):
         check_params(kwargs)
-        return self.horizon.account_operations(self.address, params=kwargs, sse=sse)
+        return self.horizon.account_operations(
+            self.address, params=kwargs, sse=sse)
 
     def effects(self, sse=False, **kwargs):
         check_params(kwargs)
-        return self.horizon.account_effects(self.address, params=kwargs, sse=sse)
+        return self.horizon.account_effects(
+            self.address, params=kwargs, sse=sse)
 
 
 def check_params(data):

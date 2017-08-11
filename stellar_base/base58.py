@@ -1,9 +1,10 @@
 # coding:utf-8
-'''Base58 encoding
+"""
+Base58 encoding
 
 Implementations of Base58 and Base58Check endcodings that are compatible
 with the bitcoin network.
-'''
+"""
 
 # This module is based upon base58 snippets found scattered over many bitcoin
 # tools written in python. From what I gather the original source is from a
@@ -91,7 +92,7 @@ def b58decode_check(v):
 
 
 def main():
-    '''Base58 encode or decode FILE, or standard input, to standard output.'''
+    """Base58 encode or decode FILE, or standard input, to standard output."""
 
     import sys
     import argparse

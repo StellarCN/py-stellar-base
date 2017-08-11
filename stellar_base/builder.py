@@ -14,11 +14,12 @@ from .federation import *
 
 
 class Builder(object):
-    """ build transaction and submit to horizon.
-
+    """
+    build transaction and submit to horizon.
     """
 
-    def __init__(self, secret=None, address=None, horizon=None, network=None, sequence=None):
+    def __init__(self, secret=None, address=None, horizon=None, network=None,
+        sequence=None):
         if secret:
             self.key_pair = Keypair.from_seed(secret)
             self.address = self.key_pair.address().decode()
@@ -60,7 +61,8 @@ class Builder(object):
         if operation not in self.ops:
             self.ops.append(operation)
 
-    def append_create_account_op(self, destination, starting_balance, source=None):
+    def append_create_account_op(self, destination, starting_balance,
+        source=None):
         opts = {
             'source': source,
             'destination': destination,
@@ -93,9 +95,11 @@ class Builder(object):
         op = Payment(opts)
         self.append_op(op)
 
-    def append_path_payment_op(self, destination, send_code, send_issuer, send_max,
-                               dest_code, dest_issuer, dest_amount, path, source=None):
-        # path: a list of asset tuple which contains code and issuer, [(code,issuer),(code,issuer)]
+    def append_path_payment_op(self, destination, send_code, send_issuer,
+                               send_max, dest_code, dest_issuer, dest_amount,
+                               path, source=None):
+        # path: a list of asset tuple which contains code and issuer,
+        # [(code,issuer),(code,issuer)]
         send_asset = Asset(send_code, send_issuer)
         dest_asset = Asset(dest_code, dest_issuer)
 
@@ -115,7 +119,8 @@ class Builder(object):
         op = Payment(opts)
         self.append_op(op)
 
-    def append_allow_trust_op(self, trustor, asset_code, authorize, source=None):
+    def append_allow_trust_op(self, trustor, asset_code,
+                              authorize, source=None):
         opts = {
             'source': source,
             'trustor': trustor,
@@ -125,11 +130,13 @@ class Builder(object):
         op = AllowTrust(opts)
         self.append_op(op)
 
-    def append_set_options_op(self, inflation_dest=None, clear_flags=None, set_flags=None,
-                              master_weight=None, low_threshold=None, med_threshold=None,
-                              high_threshold=None, home_domain=None, signer_address=None,
-                              signer_type=None,signer_weight=None, source=None,
-                              ):
+    def append_set_options_op(self,
+                              inflation_dest=None, clear_flags=None,
+                              set_flags=None, master_weight=None,
+                              low_threshold=None, med_threshold=None,
+                              high_threshold=None, home_domain=None,
+                              signer_address=None, signer_type=None,
+                              signer_weight=None, source=None):
         opts = {
             'source': source,
             'inflation_dest': inflation_dest,
@@ -139,7 +146,8 @@ class Builder(object):
             'low_threshold': low_threshold,
             'med_threshold': med_threshold,
             'high_threshold': high_threshold,
-            'home_domain': bytearray(home_domain, encoding='utf-8') if home_domain else None,
+            'home_domain': bytearray(home_domain, encoding='utf-8') \
+                           if home_domain else None,
             'signer_address': signer_address,
             'signer_type': signer_type,
             'signer_weight': signer_weight
@@ -148,11 +156,13 @@ class Builder(object):
         self.append_op(op)
 
     def append_hashx_signer(self,hashx, signer_weight,source=None):
-        self.append_set_options_op(signer_address=hashx,signer_type='hashX',signer_weight=signer_weight,source=source)
+        self.append_set_options_op(signer_address=hashx, signer_type='hashX',
+            signer_weight=signer_weight, source=source)
 
-    def append_pre_auth_tx_signer(self, pre_auth_tx, signer_weight, source=None):
-        self.append_set_options_op(signer_address=pre_auth_tx, signer_type='preAuthTx', 
-                                   signer_weight=signer_weight, source=source)
+    def append_pre_auth_tx_signer(self, pre_auth_tx,
+                                  signer_weight, source=None):
+        self.append_set_options_op(signer_address=pre_auth_tx,
+            signer_type='preAuthTx', signer_weight=signer_weight,source=source)
 
 
     def append_manage_offer_op(self, selling_code, selling_issuer,
@@ -280,7 +290,8 @@ class Builder(object):
 
     def gen_compliance_xdr(self):
         sequence = self.sequence
-        self.sequence = '-1' # sequence number shoule be '0' here. so the pass one is '-1'
+        # sequence number shoule be '0' here. so the pass one is '-1'
+        self.sequence = '-1' 
         tx_xdr = self.gen_tx().xdr()
         self.sequence = sequence
         return tx_xdr
@@ -325,7 +336,8 @@ class Builder(object):
 
     def next_builder(self):
         sequence = str(int(self.sequence) + 1)
-        next_builder = Builder(horizon=self.horizon.horizon, network=self.network, sequence=sequence)
+        next_builder = Builder(horizon=self.horizon.horizon,
+            network=self.network, sequence=sequence)
         next_builder.address = self.address
         next_builder.key_pair = self.key_pair
         return next_builder

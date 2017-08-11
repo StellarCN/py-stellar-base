@@ -16,8 +16,9 @@ import hashlib
 
 
 class Keypair(object):
-    """ use for create stellar Keypair(StrKey) .
-        also support old style stellar keypair transforming
+    """
+    use for create stellar Keypair(StrKey).
+    also support old style stellar keypair transforming
     """
 
     def __init__(self, verifying_key, signing_key=None):
@@ -27,8 +28,10 @@ class Keypair(object):
 
     @classmethod
     def deterministic(cls, mnemonic, passphrase='', lang='english'):
-        """ a deterministic keypair generator .
-            :type master: bytes-like object  for create keypair. e.g. u'中文'.encode('utf-8') 
+        """
+        a deterministic keypair generator .
+        :type master: bytes-like object  for create keypair.
+        e.g. u'中文'.encode('utf-8') 
         """
         sm = StellarMnemonic(lang)
         seed = sm.to_seed(mnemonic, passphrase='')
@@ -118,7 +121,8 @@ class Keypair(object):
         rv = hashlib.new('sha256', self.raw_public_key()).digest()
         rv = hashlib.new('ripemd160', rv).digest()
         rv = chr(0).encode() + rv
-        # v += hashlib.new('sha256', hashlib.new('sha256', rv).digest()).digest()[0:4]
+        # v += hashlib.new('sha256',
+        #    hashlib.new('sha256', rv).digest()).digest()[0:4]
         return b58encode_check(rv)
 
     def to_old_seed(self):

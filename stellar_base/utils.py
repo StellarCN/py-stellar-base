@@ -50,11 +50,14 @@ def account_xdr_object(account):
 
 def signer_key_xdr_object(signer_type, signer):
     if signer_type == 'ed25519PublicKey':
-        return Xdr.types.SignerKey(Xdr.const.SIGNER_KEY_TYPE_ED25519, decode_check('account', signer))
+        return Xdr.types.SignerKey(Xdr.const.SIGNER_KEY_TYPE_ED25519,
+            decode_check('account', signer))
     if signer_type == 'hashX':
-        return Xdr.types.SignerKey(Xdr.const.SIGNER_KEY_TYPE_HASH_X, hashX=signer)
+        return Xdr.types.SignerKey(Xdr.const.SIGNER_KEY_TYPE_HASH_X,
+            hashX=signer)
     if signer_type == 'preAuthTX':
-        return Xdr.types.SignerKey(Xdr.const.SIGNER_KEY_TYPE_PRE_AUTH_TX, preAuthTx=signer)
+        return Xdr.types.SignerKey(Xdr.const.SIGNER_KEY_TYPE_PRE_AUTH_TX,
+            preAuthTx=signer)
 
 def hashX_sign_decorated(preimage):
     preimage = preimage.encode('utf-8')
@@ -71,7 +74,8 @@ def bytes_from_decode_data(s):
         try:
             return s.encode('ascii')
         except UnicodeEncodeError:
-            raise ValueError('string argument should contain only ASCII characters')
+            raise ValueError('string argument should contain ' \
+                             'only ASCII characters')
     if isinstance(s, bytes_types):
         return s
     try:
@@ -132,8 +136,9 @@ def decode_check(version_byte_name, encoded):
     # raise KeyError
     expected_version = versionBytes[version_byte_name]
     if version_byte != expected_version:
-        raise DecodeError(
-                'invalid version byte. expected ' + str(expected_version) + ', got ' + str(version_byte))
+        raise DecodeError('invalid version byte. expected ' \
+                          '' + str(expected_version) + ', got ' \
+                          '' + str(version_byte))
 
     expected_checksum = calculate_checksum(payload)
     if expected_checksum != checksum:
@@ -165,7 +170,8 @@ def best_rational_approximation(x):
     INT32_MAX = Decimal(2147483647)
     a = None
     f = None
-    fractions = numpy.array([[Decimal(0), Decimal(1)], [Decimal(1), Decimal(0)]])
+    fractions = numpy.array(
+        [[Decimal(0), Decimal(1)], [Decimal(1), Decimal(0)]])
     i = 2
     while True:
         if x > INT32_MAX:
@@ -203,15 +209,18 @@ class StellarMnemonic(Mnemonic):
     def __init__(self, language='english'):
         self.radix = 2048
         if language == 'chinese':
-            with io.open('%s/%s.txt' % (self._get_directory(), language), 'r',encoding="utf8") as f:
+            with io.open('%s/%s.txt' % (self._get_directory(), language),
+                'r', encoding="utf8") as f:
                 self.wordlist = [w.strip() for w in f.readlines()]
         else:
             with io.open('%s/%s.txt' % (Mnemonic._get_directory(), language),
-                    'r',encoding="utf8") as f:
+                'r', encoding="utf8") as f:
                 self.wordlist = [w.strip() for w in f.readlines()]
 
         if len(self.wordlist) != self.radix:
-            raise ConfigurationError('Wordlist should contain %d words, but it contains %d words.' % (self.radix, len(self.wordlist)))
+            raise ConfigurationError(
+                'Wordlist should contain %d words, but it contains %d words.' \
+                    % (self.radix, len(self.wordlist)))
 
     @classmethod
     def _get_directory(cls):
@@ -219,8 +228,10 @@ class StellarMnemonic(Mnemonic):
 
     @classmethod
     def list_languages(cls):
-        lang =  [f.split('.')[0] for f in os.listdir(cls._get_directory()) if f.endswith('.txt')]
-        lang += [f.split('.')[0] for f in os.listdir(Mnemonic._get_directory()) if f.endswith('.txt')]
+        lang = [f.split('.')[0] for f in os.listdir(cls._get_directory())
+                if f.endswith('.txt')]
+        lang += [f.split('.')[0] for f in os.listdir(Mnemonic._get_directory())
+                 if f.endswith('.txt')]
         return lang
 
     def to_seed(cls, mnemonic, passphrase=''):
@@ -228,16 +239,20 @@ class StellarMnemonic(Mnemonic):
             raise MnemonicError('wrong mnemonic string')
         mnemonic = cls.normalize_string(mnemonic)
         passphrase = cls.normalize_string(passphrase)
-        return PBKDF2(mnemonic, u'mnemonic' + passphrase, iterations=PBKDF2_ROUNDS, macmodule=hmac, digestmodule=hashlib.sha512).read(32)
+        return PBKDF2(mnemonic, u'mnemonic' + passphrase,
+            iterations=PBKDF2_ROUNDS, macmodule=hmac,
+                digestmodule=hashlib.sha512).read(32)
     
     def generate(self, strength=128):
         if strength not in [128, 160, 192, 224, 256]:
-            raise ValueError('Strength should be one of the following [128, 160, 192, 224, 256], but it is not (%d).' % strength)
+            raise ValueError('Strength should be one of the following ' \
+                             '[128, 160, 192, 224, 256], but it is not (%d).' \
+                             % strength)
         ret = self.to_mnemonic(os.urandom(strength // 8))
         print(ret)
         return ret
-        
 
 
 class MnemonicError(Exception):
     pass
+
