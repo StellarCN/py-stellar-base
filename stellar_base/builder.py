@@ -96,6 +96,7 @@ class Builder(object):
     def append_path_payment_op(self, destination, send_code, send_issuer, send_max,
                                dest_code, dest_issuer, dest_amount, path, source=None):
         # path: a list of asset tuple which contains code and issuer, [(code,issuer),(code,issuer)]
+        # for native asset you can delivery ('xlm','')        
         send_asset = Asset(send_code, send_issuer)
         dest_asset = Asset(dest_code, dest_issuer)
 
@@ -112,7 +113,7 @@ class Builder(object):
             'dest_amount': str(dest_amount),
             'path': assets
         }
-        op = Payment(opts)
+        op = PathPayment(opts)
         self.append_op(op)
 
     def append_allow_trust_op(self, trustor, asset_code, authorize, source=None):
