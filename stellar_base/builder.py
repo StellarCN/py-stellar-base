@@ -32,7 +32,7 @@ class Builder(object):
             self.address = address
             self.key_pair = None
 
-        if network.upper() != 'PUBLIC':
+        if network is None or network.upper() != 'PUBLIC':
             self.network = 'TESTNET'
         else:
             self.network = 'PUBLIC'
