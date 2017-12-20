@@ -189,7 +189,7 @@ Sometimes, we need to deal with multi-signature transactions. Especially when yo
     from stellar_base.transaction import Transaction
     from stellar_base.transaction_envelope import TransactionEnvelope as Te
     from stellar_base.memo import TextMemo
-    from stellar_base.horizon import horizon_testnet, horizon_pubic
+    from stellar_base.horizon import horizon_testnet, horizon_livenet
     
     alice_seed = 'SAZJ3EDATROKTNNN4WZBZPRC34AN5WR43VEHAFKT5D66UEZTKDNKUHOK'
     bob_address = 'GDLP3SP4WP72L4BAJWZUDZ6SAYE4NAWILT5WQDS7RWC4XCUNUQDRB2A4'
@@ -197,7 +197,7 @@ Sometimes, we need to deal with multi-signature transactions. Especially when yo
     amount = '100'
     
     Alice = Keypair.from_seed(alice_seed)
-    horizon = horizon_testnet()# horizon = horizon_pubic() for LIVENET
+    horizon = horizon_testnet() # horizon = horizon_livenet() for LIVENET
     
     asset = Asset('CNY', CNY_ISSUER) 
     # create op 
@@ -211,7 +211,10 @@ Sometimes, we need to deal with multi-signature transactions. Especially when yo
     msg = TextMemo('Buy yourself a beer !')
     
     # get sequence of Alice
-    sequence = horizon.account(Alice.address()).get('sequence') 
+    # Python 2
+    sequence = horizon.account(Alice.address()).get('sequence')
+    # Python 3
+    # sequence = horizon.account(Alice.address().decode('utf-8')).get('sequence')
     
     # construct Tx
     tx = Transaction(
