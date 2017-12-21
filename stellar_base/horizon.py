@@ -152,6 +152,10 @@ class Horizon(object):
         url = self.horizon + '/payments/'
         return query(url, params, sse)
 
+    def assets(self, params=None):
+        url = self.horizon + '/assets/'
+        return query(url, params)
+
 
 def horizon_testnet():
     return Horizon(HORIZON_TEST)
