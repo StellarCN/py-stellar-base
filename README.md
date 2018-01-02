@@ -32,8 +32,9 @@ The seed is your secret. For safety, please keep it local and never send it thro
 
 Whenever we forget/lose your public key, we can regenerate the key pair from the seed:
 ```python
+    seed_string = "correct horse battery staple ..." # your word sequence from when the seed was deterministically generated
     from stellar_base.keypair import Keypair
-    kp = Keypair.from_seed(seed)
+    kp = Keypair.from_seed(seed_string)
 ```   
 This is my favorite key pair in TESTNET, let's use them in the following steps.
 ```python
