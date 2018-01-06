@@ -14,28 +14,42 @@ There are 2 methods for generating a key pair in `py-stellar-base`.
 ```    
 
 ### 1.2 Deterministic generation
-Or we may generate from a Unicode mnemonic string:
+In this method the key pair is deterministically generated from a mnemonic string, also known as "seed phrase".
+First we generate a Unicode mnemonic string:
 ```python
     from stellar_base.utils import StellarMnemonic
     sm = StellarMnemonic("chinese") # here we use chinese, but default language is 'english'
     m = sm.generate() 
     # or m = u'域 监 惜 国 期 碱 珍 继 造 监 剥 电' (must add u'' before the string if using Python 2)
+```
+The call `sm.generate()` prints out the generated mnemonic string, which is a phrase made of random words separated by
+spaces. You should either write this phrase down or memorize it. Do not share your mnemonic string with anyone.
+
+Now we use the mnemonic string `m` to generate the key pair:
+```python
     kp = Keypair.deterministic(m, lang='chinese')
 ```
-After the key pair generation, we can get a public key/seed from it:
- ```python
+
+After the key pair generation, we can get a public key and a seed from it:
+```python
     publickey = kp.address().decode()
     seed = kp.seed().decode()
 ```    
 The public key is also your account address. If someone needs to send you a transaction, you should share with them this key.
 The seed is your secret. For safety, please keep it local and never send it through the Internet.
 
-Whenever we forget/lose your public key, we can regenerate the key pair from the seed:
+Whenever we forget/lose the public key, we can regenerate the key pair from the seed:
 ```python
-    seed_string = "correct horse battery staple ..." # your word sequence from when the seed was deterministically generated
     from stellar_base.keypair import Keypair
-    kp = Keypair.from_seed(seed_string)
-```   
+    kp = Keypair.from_seed(seed)
+```
+If we forget/lose both the public key and the seed, we can regenerate the key pair from the mnemonic string:
+```python
+    from stellar_base.keypair import Keypair
+    seed_phrase = '...' # the word sequence that you wrote down or memorized
+    kp = Keypair.deterministic(seed_phrase, lang='chinese')
+```
+
 This is my favorite key pair in TESTNET, let's use them in the following steps.
 ```python
     publickey = 'GDVDKQFP665JAO7A2LSHNLQIUNYNAAIGJ6FYJVMG4DT3YJQQJSRBLQDG'
