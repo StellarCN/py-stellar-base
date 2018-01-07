@@ -234,7 +234,7 @@ class StellarMnemonic(Mnemonic):
         if strength not in [128, 160, 192, 224, 256]:
             raise ValueError('Strength should be one of the following [128, 160, 192, 224, 256], but it is not (%d).' % strength)
         ret = self.to_mnemonic(os.urandom(strength // 8))
-        print(ret)
+        # print(ret)
         return ret
         
 
