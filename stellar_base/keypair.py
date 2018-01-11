@@ -31,7 +31,7 @@ class Keypair(object):
             :type master: bytes-like object  for create keypair. e.g. u'中文'.encode('utf-8') 
         """
         sm = StellarMnemonic(lang)
-        seed = sm.to_seed(mnemonic, passphrase='')
+        seed = sm.to_seed(mnemonic, passphrase=passphrase)
         return cls.from_raw_seed(seed)
 
     @classmethod
