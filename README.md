@@ -1,6 +1,8 @@
 [![Build Status](https://travis-ci.org/StellarCN/py-stellar-base.svg)](https://travis-ci.org/StellarCN/py-stellar-base)
 
 # Installation
+
+## Install
     `pip install stellar-base`
 # Quick Start
 
@@ -19,7 +21,7 @@ First we generate a Unicode mnemonic string:
 ```python
     from stellar_base.utils import StellarMnemonic
     sm = StellarMnemonic("chinese") # here we use chinese, but default language is 'english'
-    m = sm.generate() 
+    m = sm.generate()
     # or m = u'域 监 惜 国 期 碱 珍 继 造 监 剥 电' (must add u'' before the string if using Python 2)
 ```
 The call `sm.generate()` prints out the generated mnemonic string, which is a phrase made of random words separated by
@@ -29,7 +31,11 @@ Now we use the mnemonic string `m` to generate the key pair:
 ```python
     kp = Keypair.deterministic(m, lang='chinese')
 ```
-
+And we can use the mnemonic string `m` to generate multiple key pairs:
+```python
+    kp1 = Keypair.deterministic(m, lang='chinese', index=1)
+    kp2 = Keypair.deterministic(m, lang='chinese', index=2)
+```
 After the key pair generation, we can get a public key and a seed from it:
 ```python
     publickey = kp.address().decode()
@@ -57,7 +63,7 @@ This is my favorite key pair in TESTNET, let's use them in the following steps.
 ```   
 
 ## 2.Create Account
-After the key pair generation, you have already got the address, but it is not activated until someone transfers at least 20 lumen into it. 
+After the key pair generation, you have already got the address, but it is not activated until someone transfers at least 20 lumen into it.
 
 ### 2.1 Testnet
 If you want to play in the Stellar test network, you can ask our Friendbot to create an account for you as shown below:
@@ -78,14 +84,14 @@ However, if you want to create an account from another account of your own, you 
     from stellar_base.transaction_envelope import TransactionEnvelope as Te
     from stellar_base.memo import TextMemo
     from stellar_base.horizon import horizon_testnet, horizon_livenet
-    
+
     oldAccountSeed = "SCVLSUGYEAUC4MVWJORB63JBMY2CEX6ATTJ5MXTENGD3IELUQF4F6HUB"
     newAccountAddress = "XXX"
     amount = '25' # Any amount higher than 20
     kp = Keypair.from_seed(oldAccountSeed)
     horizon = horizon_livenet()
     asset = Asset("XLM")
-    # create op 
+    # create op
     op = CreateAccount({
         'destination': newAccountAddress,
         'starting_balance': amount
@@ -109,12 +115,12 @@ However, if you want to create an account from another account of your own, you 
     )
     # build envelope
     envelope = Te(tx=tx, opts={"network_id": "PUBLIC"})
-    # sign 
+    # sign
     envelope.sign(kp)
     # submit
     xdr = envelope.xdr()
     response = horizon.submit(xdr)
-    
+
 ```
 Then, you can check the status of this operation with the response.
 
@@ -187,12 +193,12 @@ At last, sign & submit
 ```
 Done.
 
-Sometimes, we need to deal with multi-signature transactions. Especially when you get a xdr string (or transaction envelope xdr) from a friend or partner, which describes a multi-sig transaction. They may need you to sign on it too. 
+Sometimes, we need to deal with multi-signature transactions. Especially when you get a xdr string (or transaction envelope xdr) from a friend or partner, which describes a multi-sig transaction. They may need you to sign on it too.
 ```python
     builder = Builder(secret=seed) # or builder = Builder(secret=secret, network='public') for LIVENET.
     builder.import_from_xdr(xdr_string) # the xdr_string come from your friend
     builder.sign()
-    builder.to_xdr() # generate new xdr string 
+    builder.to_xdr() # generate new xdr string
     # or builder.submit() # submit to Stellar network
 ```
 
@@ -205,17 +211,17 @@ Sometimes, we need to deal with multi-signature transactions. Especially when yo
     from stellar_base.transaction_envelope import TransactionEnvelope as Te
     from stellar_base.memo import TextMemo
     from stellar_base.horizon import horizon_testnet, horizon_livenet
-    
+
     alice_seed = 'SAZJ3EDATROKTNNN4WZBZPRC34AN5WR43VEHAFKT5D66UEZTKDNKUHOK'
     bob_address = 'GDLP3SP4WP72L4BAJWZUDZ6SAYE4NAWILT5WQDS7RWC4XCUNUQDRB2A4'
     CNY_ISSUER = 'GDVDKQFP665JAO7A2LSHNLQIUNYNAAIGJ6FYJVMG4DT3YJQQJSRBLQDG'
     amount = '100'
-    
+
     Alice = Keypair.from_seed(alice_seed)
     horizon = horizon_testnet() # horizon = horizon_livenet() for LIVENET
-    
-    asset = Asset('CNY', CNY_ISSUER) 
-    # create op 
+
+    asset = Asset('CNY', CNY_ISSUER)
+    # create op
     op = Payment({
         # 'source' : Alice.address().decode(),
         'destination': bob_address,
@@ -224,13 +230,13 @@ Sometimes, we need to deal with multi-signature transactions. Especially when yo
     })
     # create a memo
     msg = TextMemo('Buy yourself a beer !')
-    
+
     # get sequence of Alice
     # Python 2
     sequence = horizon.account(Alice.address()).get('sequence')
     # Python 3
     # sequence = horizon.account(Alice.address().decode('utf-8')).get('sequence')
-    
+
     # construct Tx
     tx = Transaction(
         source=Alice.address().decode(),
@@ -244,14 +250,13 @@ Sometimes, we need to deal with multi-signature transactions. Especially when yo
             ],
         },
     )
-    
-    
+
+
     # build envelope
     envelope = Te(tx=tx, opts={"network_id": "TESTNET"}) # envelope = Te(tx=tx, opts={"network_id": "PUBLIC"}) for LIVENET
-    # sign 
+    # sign
     envelope.sign(Alice)
     # submit
     xdr = envelope.xdr()
     response=horizon.submit(xdr)
 ```
-

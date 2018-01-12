@@ -26,12 +26,12 @@ class Keypair(object):
         self.signing_key = signing_key
 
     @classmethod
-    def deterministic(cls, mnemonic, passphrase='', lang='english'):
+    def deterministic(cls, mnemonic, passphrase='', lang='english', index=0):
         """ a deterministic keypair generator .
-            :type master: bytes-like object  for create keypair. e.g. u'中文'.encode('utf-8') 
+            :type master: bytes-like object  for create keypair. e.g. u'中文'.encode('utf-8')
         """
         sm = StellarMnemonic(lang)
-        seed = sm.to_seed(mnemonic, passphrase=passphrase)
+        seed = sm.to_seed(mnemonic, passphrase=passphrase, index=index)
         return cls.from_raw_seed(seed)
 
     @classmethod
