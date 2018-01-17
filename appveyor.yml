@@ -5,12 +5,12 @@ cache:
 install:
   - pip install nose mock
   - pip install .
-on_success:
+test_script:
   - python -m nose -v
-on_failure:
-  - ps: dir "env:"
 notifications:
   - provider: Email
     to:
       - '{{commitAuthorEmail}}'
     on_build_failure: true
+    on_build_success: false
+    on_build_status_changed: false
