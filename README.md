@@ -1,5 +1,7 @@
-[![Build Status](https://travis-ci.org/StellarCN/py-stellar-base.svg)](https://travis-ci.org/StellarCN/py-stellar-base) [![AppVeyor](https://img.shields.io/appveyor/ci/overcat/py-stellar-base-96yof.svg)](https://ci.appveyor.com/project/overcat/py-stellar-base-96yof) [![PyPI](https://img.shields.io/pypi/v/stellar-base.svg)](https://pypi.python.org/pypi/stellar-base)
+[![Build Status](https://travis-ci.org/StellarCN/py-stellar-base.svg)](https://travis-ci.org/StellarCN/py-stellar-base) [![PyPI](https://img.shields.io/pypi/v/stellar-base.svg)](https://pypi.python.org/pypi/stellar-base)
 # Installation
+
+## Install
     `pip install stellar-base`
 # Quick Start
 
@@ -28,7 +30,11 @@ Now we use the mnemonic string `m` to generate the key pair:
 ```python
 kp = Keypair.deterministic(m, lang='chinese')
 ```
-
+And we can use the mnemonic string `m` to generate multiple key pairs:
+```python
+    kp1 = Keypair.deterministic(m, lang='chinese', index=1)
+    kp2 = Keypair.deterministic(m, lang='chinese', index=2)
+```
 After the key pair generation, we can get a public key and a seed from it:
 ```python
 publickey = kp.address().decode()
@@ -56,7 +62,7 @@ seed = 'SCVLSUGYEAUC4MVWJORB63JBMY2CEX6ATTJ5MXTENGD3IELUQF4F6HUB'
 ```   
 
 ## 2.Create Account
-After the key pair generation, you have already got the address, but it is not activated until someone transfers at least 20 lumen into it. 
+After the key pair generation, you have already got the address, but it is not activated until someone transfers at least 20 lumen into it.
 
 ### 2.1 Testnet
 If you want to play in the Stellar test network, you can ask our Friendbot to create an account for you as shown below:
@@ -185,7 +191,7 @@ builder.submit()
 ```
 Done.
 
-Sometimes, we need to deal with multi-signature transactions. Especially when you get a xdr string (or transaction envelope xdr) from a friend or partner, which describes a multi-sig transaction. They may need you to sign on it too. 
+Sometimes, we need to deal with multi-signature transactions. Especially when you get a xdr string (or transaction envelope xdr) from a friend or partner, which describes a multi-sig transaction. They may need you to sign on it too.
 ```python
 builder = Builder(secret=seed) # or builder = Builder(secret=secret, network='public') for LIVENET.
 builder.import_from_xdr(xdr_string) # the xdr_string come from your friend
@@ -252,4 +258,3 @@ envelope.sign(Alice)
 xdr = envelope.xdr()
 response = horizon.submit(xdr)
 ```
-
