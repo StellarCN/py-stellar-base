@@ -35,7 +35,7 @@ class NoneMemo(Memo):
 class TextMemo(Memo):
     def __init__(self, text):
         if not isinstance(text, (str, unicode)):
-            raise TypeError('Expects string type got a ' + type(text))
+            raise TypeError('Expects string type got a ' + type(text).__name__)
         if bytes == str and not isinstance(text, unicode):  # Python 2 without unicode string
             self.text = text
         else:  # python 3 or python 2 with unicode string
