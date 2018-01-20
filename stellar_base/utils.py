@@ -157,7 +157,8 @@ def encode_check(version_byte_name, data):
 def calculate_checksum(payload):
     # This code calculates CRC16-XModem checksum of payload
     checksum = crc16.crc16xmodem(payload)
-    checksum = struct.pack('H', checksum)
+    # Ensure that the checksum is in LSB order.
+    checksum = struct.pack('<H', checksum)
     return checksum
 
 
