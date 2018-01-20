@@ -6,9 +6,16 @@
 Welcome to PyStellar's documentation!
 =====================================
 
+API Documentation
+-----------------
+Here you'll find detailed documentation on specific functions, classes, and
+methods.
+
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
+
+   api
 
 
 
