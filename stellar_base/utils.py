@@ -83,32 +83,32 @@ def bytes_from_decode_data(s):
                                          s.__class__.__name__))
 
 
-class BaseError(Exception):
+class StellarError(Exception):
     def __init__(self, msg):
-        super(BaseError, self).__init__(msg)
+        super(StellarError, self).__init__(msg)
 
 
-class XdrLengthError(BaseError):
+class XdrLengthError(StellarError):
     pass
 
 
-class PreimageLengthError(BaseError):
+class PreimageLengthError(StellarError):
     pass
 
 
-class SignatureExistError(BaseError):
+class SignatureExistError(StellarError):
     pass
 
 
-class DecodeError(BaseError):
+class DecodeError(StellarError):
     pass
 
 
-class AccountNotExistError(BaseError):
+class AccountNotExistError(StellarError):
     pass
 
 
-class NotValidParamError(BaseError):
+class NotValidParamError(StellarError):
     pass
 
 
@@ -119,8 +119,6 @@ def decode_check(version_byte_name, encoded):
         decoded = base64.b32decode(encoded)
     except binascii.Error:
         raise DecodeError('Incorrect padding')
-    except:
-        raise
 
     if encoded != base64.b32encode(decoded):
         raise DecodeError('invalid encoded bytes')

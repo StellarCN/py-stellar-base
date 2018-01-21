@@ -3,6 +3,12 @@
 API Documentation
 =================
 
+Asset
+-----
+
+.. automodule:: stellar_base.asset
+   :members:
+
 KeyPair
 -------
 
