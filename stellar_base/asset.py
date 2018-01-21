@@ -12,11 +12,16 @@ class Asset(object):
     """The :class:`Asset` object, which represents an asset its corresponding
     issuer on the Stellar network.
 
+    For more information about the formats used for asset codes and how issuers
+    work on Stellar's network, see `Stellar's guide on assets`_.
+
     :param str code: The asset code, in the formats specified in `Stellar's
-        guide on assets
-        <https://www.stellar.org/developers/guides/concepts/assets.html>`_.
+        guide on assets`_.
     :param str issuer: The strkey encoded issuer of the asset. Note if the
         currency is the native currency (XLM (Lumens)), no issuer is necessary.
+
+    .. _Stellar's guide on assets:
+        https://www.stellar.org/developers/guides/concepts/assets.html
 
     """
 

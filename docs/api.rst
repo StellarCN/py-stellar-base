@@ -3,14 +3,42 @@
 API Documentation
 =================
 
+.. module:: stellar_base
+
 Asset
 -----
 
-.. automodule:: stellar_base.asset
+.. autoclass:: stellar_base.asset.Asset
    :members:
 
-KeyPair
+Keypair
 -------
 
-.. automodule:: stellar_base.keypair
+.. autoclass:: stellar_base.keypair.Keypair
    :members:
+
+Memo
+----
+
+.. autoclass:: stellar_base.memo.Memo
+   :members:
+
+.. autoclass:: stellar_base.memo.NoneMemo
+   :members:
+   :inherited-members:
+
+.. autoclass:: stellar_base.memo.TextMemo
+   :members:
+   :inherited-members:
+
+.. autoclass:: stellar_base.memo.IdMemo
+   :members:
+   :inherited-members:
+
+.. autoclass:: stellar_base.memo.HashMemo
+   :members:
+   :inherited-members:
+
+.. autoclass:: stellar_base.memo.RetHashMemo
+   :members:
+   :inherited-members:
