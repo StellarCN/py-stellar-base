@@ -9,8 +9,8 @@ from .stellarxdr import Xdr
 
 
 class Asset(object):
-    """The :class:`Asset` object, which represents an asset its corresponding
-    issuer on the Stellar network.
+    """The :class:`Asset` object, which represents an asset and its
+    corresponding issuer on the Stellar network.
 
     For more information about the formats used for asset codes and how issuers
     work on Stellar's network, see `Stellar's guide on assets`_.

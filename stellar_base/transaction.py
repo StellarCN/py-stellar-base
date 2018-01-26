@@ -1,14 +1,40 @@
 # code : utf-8
 
 import base64
+# FIXME: Get rid of * imports, makes for poor readability.
 from .memo import *
 from .operation import *
 from .utils import decode_check
 
+# TODO: Consider making a part of the Transaction object?
 FEE = 100
 
 
 class Transaction(object):
+    """The :class:`Transaction` object, which represents a transaction
+    on Stellar's network.
+
+    A transaction contains a list of operations (see :class:`Operation`),
+    which are all executed in order as one ACID transaction, along with an
+    associated source account, fee, account sequence number, list of
+    signatures, both an optional memo and an optional timebound.
+
+    For more information on Transactions in Stellar, see `Stellar's guide
+    on transactions`_.
+
+    .. _Stellar's guide on transactions:
+        https://www.stellar.org/developers/guides/concepts/transactions.html
+
+    :param str source: A strkey encoded account ID (public key) of the source
+        account for the transaction.
+    :param dict opts: A dict that contains the primary components of the
+        transaction.
+
+    """
+    # TODO: Why is this passed in as a dictionary? Wouldn't it make more sense
+    # to use optional arguments? Several of the components in opts are also
+    # required. Especially because they're just being shoved into typed
+    # attributes anyways?
     def __init__(self, source, opts):
         """source should be a stellar address who will submit this Transaction,and should be a string .
             opts should be a dict ,will contain some  variables to build a transaction
