@@ -43,6 +43,13 @@ Memo
    :members:
    :inherited-members:
 
+Operation
+---------
+
+.. autoclass:: stellar_base.operation.Operation
+   :members:
+   :inherited-members:
+
 Transaction
 -----------
 
