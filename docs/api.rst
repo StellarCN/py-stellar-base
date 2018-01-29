@@ -42,3 +42,10 @@ Memo
 .. autoclass:: stellar_base.memo.RetHashMemo
    :members:
    :inherited-members:
+
+Transaction
+-----------
+
+.. autoclass:: stellar_base.transaction.Transaction
+   :members:
+   :inherited-members:
