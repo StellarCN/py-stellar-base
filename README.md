@@ -2,7 +2,7 @@
 # Installation
 
 ## Install
-    `pip install stellar-base`
+`pip install stellar-base`
 # Quick Start
 
 ## 1. Create a Stellar key pair
@@ -32,8 +32,8 @@ kp = Keypair.deterministic(m, lang='chinese')
 ```
 And we can use the mnemonic string `m` to generate multiple key pairs:
 ```python
-    kp1 = Keypair.deterministic(m, lang='chinese', index=1)
-    kp2 = Keypair.deterministic(m, lang='chinese', index=2)
+kp1 = Keypair.deterministic(m, lang='chinese', index=1)
+kp2 = Keypair.deterministic(m, lang='chinese', index=2)
 ```
 After the key pair generation, we can get a public key and a seed from it:
 ```python
@@ -159,7 +159,6 @@ address.effects()
 address.offers()
 address.operations()
 ```
-By the way, offers do not have SSE support.
 
 ## 4. Building transaction
 We can build a transaction with a wrapper or from scratch.
@@ -172,8 +171,8 @@ builder = Builder(secret=seed) # builder = Builder(secret=seed, network='public'
 ```
 How about sending Bob a payment?
 ```python
-    bob_address = 'XXX'
-    builder.append_payment_op(bob_address,'100','XLM')
+bob_address = 'XXX'
+builder.append_payment_op(bob_address,'100','XLM')
 ```
 Or if you want to pay him with CNY:
 ```python

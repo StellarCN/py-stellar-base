@@ -64,9 +64,9 @@ class Horizon(object):
         url = self.horizon + '/accounts/' + address + '/effects/'
         return query(url, params, sse)
 
-    def account_offers(self, address, params=None):
+    def account_offers(self, address, params=None, sse=False):
         url = self.horizon + '/accounts/' + address + '/offers/'
-        return query(url, params)
+        return query(url, params, sse)
 
     def account_operations(self, address, params=None, sse=False):
         url = self.horizon + '/accounts/' + address + '/operations/'

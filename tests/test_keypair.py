@@ -14,10 +14,12 @@ class TestKeypair(unittest.TestCase):
         self.assertEqual(address, address_expect)
 
         mnemonic = 'cable spray genius state float twenty onion head street palace net private method loan turn phrase state blanket interest dry amazing dress blast tube'
-        seed = Keypair.deterministic(mnemonic, passphrase='p4ssphr4se').seed().decode()
+        seed = Keypair.deterministic(
+            mnemonic, passphrase='p4ssphr4se').seed().decode()
         seed_expect = 'SAFWTGXVS7ELMNCXELFWCFZOPMHUZ5LXNBGUVRCY3FHLFPXK4QPXYP2X'
         self.assertEqual(seed, seed_expect)
-        address = Keypair.deterministic(mnemonic, passphrase='p4ssphr4se', index=9).address().decode()
+        address = Keypair.deterministic(
+            mnemonic, passphrase='p4ssphr4se', index=9).address().decode()
         address_expect = 'GBOSMFQYKWFDHJWCMCZSMGUMWCZOM4KFMXXS64INDHVCJ2A2JAABCYRR'
         self.assertEqual(address, address_expect)
 

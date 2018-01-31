@@ -10,7 +10,7 @@ from .utils import XdrLengthError, decode_check, encode_check, StellarMnemonic
 try:
     # noinspection PyUnresolvedReferences
     from pure25519 import ed25519_oop as ed25519
-except:
+except ImportError:
     import ed25519
 import hashlib
 

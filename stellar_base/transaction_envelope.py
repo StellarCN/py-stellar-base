@@ -15,7 +15,8 @@ class TransactionEnvelope(object):
             self.signatures = opts.get('signatures') or []
         except AttributeError:
             self.signatures = []
-        self.network_id = Network(NETWORKS[opts.get('network_id', 'TESTNET')]).network_id()
+        self.network_id = Network(
+            NETWORKS[opts.get('network_id', 'TESTNET')]).network_id()
 
     def sign(self, keypair):
         assert isinstance(keypair, Keypair)
@@ -36,7 +37,6 @@ class TransactionEnvelope(object):
             raise SignatureExistError('already signed')
         else:
             self.signatures.append(sig)
-
 
     def hash_meta(self):
         return xdr_hash(self.signature_base())
