@@ -3,23 +3,33 @@
 import requests
 import toml
 
+from .keypair import Keypair
+from .utils import DecodeError
 
-def federation(fed_address, fed_type='name'):
-    if '*' not in fed_address:
-        raise FederationError('not a valid federation address')
 
-    param, domain = fed_address.rsplit('*', 1)
-    if param == '' or domain == '':
-        raise FederationError('not a valid federation address')
+def federation(address_or_id, fed_type='name', domain=None):
+    if fed_type == 'name':
+        if '*' not in address_or_id:
+            raise FederationError('not a valid federation address')
+
+        param, domain = address_or_id.rsplit('*', 1)
+        if param == '' or domain == '':
+            raise FederationError('not a valid federation address')
+    elif fed_type == 'id':
+        try:
+            Keypair.from_address(address_or_id)
+        except DecodeError:
+            raise FederationError('not a valid account id')
+    else:
+        raise FederationError('not a valid fed_type')
 
     if '.' not in domain:
         raise FederationError('not a valid domain name')
-
     fed_service = get_federation_service(domain)
     if not fed_service:
         raise FederationError('not a valid federation server')
 
-    return get_federation_info(fed_address, fed_service, fed_type)
+    return get_federation_info(address_or_id, fed_service, fed_type)
 
 
 def get_federation_info(fed_address, federation_service, fed_type='name'):

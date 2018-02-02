@@ -21,6 +21,12 @@ def mocked_requests_get(*args, **kwargs):
                               "memo_type": "text", "memo": "AIHHklPLdS9w3CcTH0fMI1Fq8fuW", \
                               "stellar_address": "1CqDFDxR9Tv696j86PwtyxhA5p9ev1EviJ*naobtc.com"}', \
                             200)
+    if args[0] == 'https://www.fed-domain.com/federation' and \
+            kwargs['params'] == {'q': 'GBTCBCWLE6YVTR5Y5RRZC36Z37OH22G773HECWEIZTZJSN4WTG3CSOES', 'type': 'id'}:
+        return MockResponse('{"account_id": "GBTCBCWLE6YVTR5Y5RRZC36Z37OH22G773HECWEIZTZJSN4WTG3CSOES",  \
+                              "memo_type": "text", "memo": "AIHHklPLdS9w3CcTH0fMI1Fq8fuW", \
+                              "stellar_address": "1CqDFDxR9Tv696j86PwtyxhA5p9ev1EviJ*naobtc.com"}', \
+                            200)
     if args[0] == 'https://fed-domain.com/.well-known/stellar.toml':
         return MockResponse('FEDERATION_SERVER="https://www.fed-domain.com/federation"\n  \
                              [[CURRENCIES]]  \n   code="BTC"     \n\
@@ -52,10 +58,17 @@ class TestFederation(object):
 
     @mock.patch('stellar_base.federation.requests.get', side_effect=mocked_requests_get)
     @mock.patch('stellar_base.federation.get_federation_service')
-    def test_federation_normal_service(self, mock_service, mock_get):
+    def test_federation_normal_service_by_name(self, mock_service, mock_get):
         mock_service.return_value = 'https://www.fed-domain.com/federation'
         response = federation('fed*fed-domain.com')
         assert response.get('account_id') == 'GBTCBCWLE6YVTR5Y5RRZC36Z37OH22G773HECWEIZTZJSN4WTG3CSOES'
+
+    @mock.patch('stellar_base.federation.requests.get', side_effect=mocked_requests_get)
+    @mock.patch('stellar_base.federation.get_federation_service')
+    def test_federation_normal_service_by_id(self, mock_service, mock_get):
+        mock_service.return_value = 'https://www.fed-domain.com/federation'
+        response = federation('GBTCBCWLE6YVTR5Y5RRZC36Z37OH22G773HECWEIZTZJSN4WTG3CSOES', 'id', 'fed-domain.com')
+        assert response.get('stellar_address') == '1CqDFDxR9Tv696j86PwtyxhA5p9ev1EviJ*naobtc.com'
 
     @mock.patch('stellar_base.federation.requests.get', side_effect=mocked_requests_get)
     def test_get_toml(self, get_toml):
