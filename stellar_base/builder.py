@@ -1,4 +1,4 @@
-# encoding: utf-8
+# coding: utf-8
 
 # from stellar_base.asset import Asset
 from .horizon import HORIZON_LIVE, HORIZON_TEST
@@ -130,7 +130,7 @@ class Builder(object):
     def append_set_options_op(self, inflation_dest=None, clear_flags=None, set_flags=None,
                               master_weight=None, low_threshold=None, med_threshold=None,
                               high_threshold=None, home_domain=None, signer_address=None,
-                              signer_type=None,signer_weight=None, source=None,
+                              signer_type=None, signer_weight=None, source=None,
                               ):
         opts = {
             'source': source,
@@ -149,8 +149,9 @@ class Builder(object):
         op = SetOptions(opts)
         return self.append_op(op)
 
-    def append_hashx_signer(self,hashx, signer_weight,source=None):
-        return self.append_set_options_op(signer_address=hashx,signer_type='hashX',signer_weight=signer_weight,source=source)
+    def append_hashx_signer(self, hashx, signer_weight, source=None):
+        return self.append_set_options_op(signer_address=hashx, signer_type='hashX', signer_weight=signer_weight,
+                                          source=source)
 
     def append_pre_auth_tx_signer(self, pre_auth_tx, signer_weight, source=None):
         return self.append_set_options_op(signer_address=pre_auth_tx, signer_type='preAuthTx',
@@ -247,7 +248,6 @@ class Builder(object):
         if memo_type is not None and memo_type in ('text', 'id', 'hash'):
             getattr(self, 'add_' + memo_type + '_memo')(fed_info['memo'])
 
-
     def gen_tx(self):
         if not self.address:
             raise Exception('Transaction does not have any source address ')
@@ -282,7 +282,7 @@ class Builder(object):
 
     def gen_compliance_xdr(self):
         sequence = self.sequence
-        self.sequence = '-1' # sequence number shoule be '0' here. so the pass one is '-1'
+        self.sequence = '-1'  # sequence number shoule be '0' here. so the pass one is '-1'
         tx_xdr = self.gen_tx().xdr()
         self.sequence = sequence
         return tx_xdr
@@ -311,7 +311,7 @@ class Builder(object):
     def sign_preimage(self, preimage):
         ''' preimage must be a unicode string
         '''
-        if self.te is None :
+        if self.te is None:
             self.gen_te()
         try:
             self.te.sign_hashX(preimage)

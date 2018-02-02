@@ -4,8 +4,10 @@ from . import StellarXDR_type as types
 import xdrlib
 from xdrlib import Error as XDRError
 
+
 class nullclass(object):
     pass
+
 
 class StellarXDRPacker(xdrlib.Packer):
     def __init__(self, check_enum=True, check_array=True):
@@ -24,6 +26,7 @@ class StellarXDRPacker(xdrlib.Packer):
     pack_float = xdrlib.Packer.pack_float
     pack_uint = xdrlib.Packer.pack_uint
     pack_uhyper = xdrlib.Packer.pack_uhyper
+
     def pack_Hash(self, data):
         if hasattr(self, 'filter_Hash'):
             data = getattr(self, 'filter_Hash')(data)
@@ -59,7 +62,8 @@ class StellarXDRPacker(xdrlib.Packer):
     def pack_SignerKeyType(self, data):
         if hasattr(self, 'filter_SignerKeyType'):
             data = getattr(self, 'filter_SignerKeyType')(data)
-        if self.check_enum and data not in [const.SIGNER_KEY_TYPE_ED25519, const.SIGNER_KEY_TYPE_PRE_AUTH_TX, const.SIGNER_KEY_TYPE_HASH_X]:
+        if self.check_enum and data not in [const.SIGNER_KEY_TYPE_ED25519, const.SIGNER_KEY_TYPE_PRE_AUTH_TX,
+                                            const.SIGNER_KEY_TYPE_HASH_X]:
             raise XDRError('value=%s not in enum SignerKeyType' % data)
         self.pack_int(data)
 
@@ -172,7 +176,8 @@ class StellarXDRPacker(xdrlib.Packer):
     def pack_AssetType(self, data):
         if hasattr(self, 'filter_AssetType'):
             data = getattr(self, 'filter_AssetType')(data)
-        if self.check_enum and data not in [const.ASSET_TYPE_NATIVE, const.ASSET_TYPE_CREDIT_ALPHANUM4, const.ASSET_TYPE_CREDIT_ALPHANUM12]:
+        if self.check_enum and data not in [const.ASSET_TYPE_NATIVE, const.ASSET_TYPE_CREDIT_ALPHANUM4,
+                                            const.ASSET_TYPE_CREDIT_ALPHANUM12]:
             raise XDRError('value=%s not in enum AssetType' % data)
         self.pack_int(data)
 
@@ -218,7 +223,8 @@ class StellarXDRPacker(xdrlib.Packer):
     def pack_ThresholdIndexes(self, data):
         if hasattr(self, 'filter_ThresholdIndexes'):
             data = getattr(self, 'filter_ThresholdIndexes')(data)
-        if self.check_enum and data not in [const.THRESHOLD_MASTER_WEIGHT, const.THRESHOLD_LOW, const.THRESHOLD_MED, const.THRESHOLD_HIGH]:
+        if self.check_enum and data not in [const.THRESHOLD_MASTER_WEIGHT, const.THRESHOLD_LOW, const.THRESHOLD_MED,
+                                            const.THRESHOLD_HIGH]:
             raise XDRError('value=%s not in enum ThresholdIndexes' % data)
         self.pack_int(data)
 
@@ -242,7 +248,8 @@ class StellarXDRPacker(xdrlib.Packer):
     def pack_AccountFlags(self, data):
         if hasattr(self, 'filter_AccountFlags'):
             data = getattr(self, 'filter_AccountFlags')(data)
-        if self.check_enum and data not in [const.AUTH_REQUIRED_FLAG, const.AUTH_REVOCABLE_FLAG, const.AUTH_IMMUTABLE_FLAG]:
+        if self.check_enum and data not in [const.AUTH_REQUIRED_FLAG, const.AUTH_REVOCABLE_FLAG,
+                                            const.AUTH_IMMUTABLE_FLAG]:
             raise XDRError('value=%s not in enum AccountFlags' % data)
         self.pack_int(data)
 
@@ -447,7 +454,9 @@ class StellarXDRPacker(xdrlib.Packer):
     def pack_OperationType(self, data):
         if hasattr(self, 'filter_OperationType'):
             data = getattr(self, 'filter_OperationType')(data)
-        if self.check_enum and data not in [const.CREATE_ACCOUNT, const.PAYMENT, const.PATH_PAYMENT, const.MANAGE_OFFER, const.CREATE_PASSIVE_OFFER, const.SET_OPTIONS, const.CHANGE_TRUST, const.ALLOW_TRUST, const.ACCOUNT_MERGE, const.INFLATION, const.MANAGE_DATA]:
+        if self.check_enum and data not in [const.CREATE_ACCOUNT, const.PAYMENT, const.PATH_PAYMENT, const.MANAGE_OFFER,
+                                            const.CREATE_PASSIVE_OFFER, const.SET_OPTIONS, const.CHANGE_TRUST,
+                                            const.ALLOW_TRUST, const.ACCOUNT_MERGE, const.INFLATION, const.MANAGE_DATA]:
             raise XDRError('value=%s not in enum OperationType' % data)
         self.pack_int(data)
 
@@ -690,7 +699,8 @@ class StellarXDRPacker(xdrlib.Packer):
     def pack_MemoType(self, data):
         if hasattr(self, 'filter_MemoType'):
             data = getattr(self, 'filter_MemoType')(data)
-        if self.check_enum and data not in [const.MEMO_NONE, const.MEMO_TEXT, const.MEMO_ID, const.MEMO_HASH, const.MEMO_RETURN]:
+        if self.check_enum and data not in [const.MEMO_NONE, const.MEMO_TEXT, const.MEMO_ID, const.MEMO_HASH,
+                                            const.MEMO_RETURN]:
             raise XDRError('value=%s not in enum MemoType' % data)
         self.pack_int(data)
 
@@ -823,7 +833,9 @@ class StellarXDRPacker(xdrlib.Packer):
     def pack_CreateAccountResultCode(self, data):
         if hasattr(self, 'filter_CreateAccountResultCode'):
             data = getattr(self, 'filter_CreateAccountResultCode')(data)
-        if self.check_enum and data not in [const.CREATE_ACCOUNT_SUCCESS, const.CREATE_ACCOUNT_MALFORMED, const.CREATE_ACCOUNT_UNDERFUNDED, const.CREATE_ACCOUNT_LOW_RESERVE, const.CREATE_ACCOUNT_ALREADY_EXIST]:
+        if self.check_enum and data not in [const.CREATE_ACCOUNT_SUCCESS, const.CREATE_ACCOUNT_MALFORMED,
+                                            const.CREATE_ACCOUNT_UNDERFUNDED, const.CREATE_ACCOUNT_LOW_RESERVE,
+                                            const.CREATE_ACCOUNT_ALREADY_EXIST]:
             raise XDRError('value=%s not in enum CreateAccountResultCode' % data)
         self.pack_int(data)
 
@@ -841,7 +853,11 @@ class StellarXDRPacker(xdrlib.Packer):
     def pack_PaymentResultCode(self, data):
         if hasattr(self, 'filter_PaymentResultCode'):
             data = getattr(self, 'filter_PaymentResultCode')(data)
-        if self.check_enum and data not in [const.PAYMENT_SUCCESS, const.PAYMENT_MALFORMED, const.PAYMENT_UNDERFUNDED, const.PAYMENT_SRC_NO_TRUST, const.PAYMENT_SRC_NOT_AUTHORIZED, const.PAYMENT_NO_DESTINATION, const.PAYMENT_NO_TRUST, const.PAYMENT_NOT_AUTHORIZED, const.PAYMENT_LINE_FULL, const.PAYMENT_NO_ISSUER]:
+        if self.check_enum and data not in [const.PAYMENT_SUCCESS, const.PAYMENT_MALFORMED, const.PAYMENT_UNDERFUNDED,
+                                            const.PAYMENT_SRC_NO_TRUST, const.PAYMENT_SRC_NOT_AUTHORIZED,
+                                            const.PAYMENT_NO_DESTINATION, const.PAYMENT_NO_TRUST,
+                                            const.PAYMENT_NOT_AUTHORIZED, const.PAYMENT_LINE_FULL,
+                                            const.PAYMENT_NO_ISSUER]:
             raise XDRError('value=%s not in enum PaymentResultCode' % data)
         self.pack_int(data)
 
@@ -859,7 +875,13 @@ class StellarXDRPacker(xdrlib.Packer):
     def pack_PathPaymentResultCode(self, data):
         if hasattr(self, 'filter_PathPaymentResultCode'):
             data = getattr(self, 'filter_PathPaymentResultCode')(data)
-        if self.check_enum and data not in [const.PATH_PAYMENT_SUCCESS, const.PATH_PAYMENT_MALFORMED, const.PATH_PAYMENT_UNDERFUNDED, const.PATH_PAYMENT_SRC_NO_TRUST, const.PATH_PAYMENT_SRC_NOT_AUTHORIZED, const.PATH_PAYMENT_NO_DESTINATION, const.PATH_PAYMENT_NO_TRUST, const.PATH_PAYMENT_NOT_AUTHORIZED, const.PATH_PAYMENT_LINE_FULL, const.PATH_PAYMENT_NO_ISSUER, const.PATH_PAYMENT_TOO_FEW_OFFERS, const.PATH_PAYMENT_OFFER_CROSS_SELF, const.PATH_PAYMENT_OVER_SENDMAX]:
+        if self.check_enum and data not in [const.PATH_PAYMENT_SUCCESS, const.PATH_PAYMENT_MALFORMED,
+                                            const.PATH_PAYMENT_UNDERFUNDED, const.PATH_PAYMENT_SRC_NO_TRUST,
+                                            const.PATH_PAYMENT_SRC_NOT_AUTHORIZED, const.PATH_PAYMENT_NO_DESTINATION,
+                                            const.PATH_PAYMENT_NO_TRUST, const.PATH_PAYMENT_NOT_AUTHORIZED,
+                                            const.PATH_PAYMENT_LINE_FULL, const.PATH_PAYMENT_NO_ISSUER,
+                                            const.PATH_PAYMENT_TOO_FEW_OFFERS, const.PATH_PAYMENT_OFFER_CROSS_SELF,
+                                            const.PATH_PAYMENT_OVER_SENDMAX]:
             raise XDRError('value=%s not in enum PathPaymentResultCode' % data)
         self.pack_int(data)
 
@@ -901,14 +923,21 @@ class StellarXDRPacker(xdrlib.Packer):
     def pack_ManageOfferResultCode(self, data):
         if hasattr(self, 'filter_ManageOfferResultCode'):
             data = getattr(self, 'filter_ManageOfferResultCode')(data)
-        if self.check_enum and data not in [const.MANAGE_OFFER_SUCCESS, const.MANAGE_OFFER_MALFORMED, const.MANAGE_OFFER_SELL_NO_TRUST, const.MANAGE_OFFER_BUY_NO_TRUST, const.MANAGE_OFFER_SELL_NOT_AUTHORIZED, const.MANAGE_OFFER_BUY_NOT_AUTHORIZED, const.MANAGE_OFFER_LINE_FULL, const.MANAGE_OFFER_UNDERFUNDED, const.MANAGE_OFFER_CROSS_SELF, const.MANAGE_OFFER_SELL_NO_ISSUER, const.MANAGE_OFFER_BUY_NO_ISSUER, const.MANAGE_OFFER_NOT_FOUND, const.MANAGE_OFFER_LOW_RESERVE]:
+        if self.check_enum and data not in [const.MANAGE_OFFER_SUCCESS, const.MANAGE_OFFER_MALFORMED,
+                                            const.MANAGE_OFFER_SELL_NO_TRUST, const.MANAGE_OFFER_BUY_NO_TRUST,
+                                            const.MANAGE_OFFER_SELL_NOT_AUTHORIZED,
+                                            const.MANAGE_OFFER_BUY_NOT_AUTHORIZED, const.MANAGE_OFFER_LINE_FULL,
+                                            const.MANAGE_OFFER_UNDERFUNDED, const.MANAGE_OFFER_CROSS_SELF,
+                                            const.MANAGE_OFFER_SELL_NO_ISSUER, const.MANAGE_OFFER_BUY_NO_ISSUER,
+                                            const.MANAGE_OFFER_NOT_FOUND, const.MANAGE_OFFER_LOW_RESERVE]:
             raise XDRError('value=%s not in enum ManageOfferResultCode' % data)
         self.pack_int(data)
 
     def pack_ManageOfferEffect(self, data):
         if hasattr(self, 'filter_ManageOfferEffect'):
             data = getattr(self, 'filter_ManageOfferEffect')(data)
-        if self.check_enum and data not in [const.MANAGE_OFFER_CREATED, const.MANAGE_OFFER_UPDATED, const.MANAGE_OFFER_DELETED]:
+        if self.check_enum and data not in [const.MANAGE_OFFER_CREATED, const.MANAGE_OFFER_UPDATED,
+                                            const.MANAGE_OFFER_DELETED]:
             raise XDRError('value=%s not in enum ManageOfferEffect' % data)
         self.pack_int(data)
 
@@ -946,7 +975,11 @@ class StellarXDRPacker(xdrlib.Packer):
     def pack_SetOptionsResultCode(self, data):
         if hasattr(self, 'filter_SetOptionsResultCode'):
             data = getattr(self, 'filter_SetOptionsResultCode')(data)
-        if self.check_enum and data not in [const.SET_OPTIONS_SUCCESS, const.SET_OPTIONS_LOW_RESERVE, const.SET_OPTIONS_TOO_MANY_SIGNERS, const.SET_OPTIONS_BAD_FLAGS, const.SET_OPTIONS_INVALID_INFLATION, const.SET_OPTIONS_CANT_CHANGE, const.SET_OPTIONS_UNKNOWN_FLAG, const.SET_OPTIONS_THRESHOLD_OUT_OF_RANGE, const.SET_OPTIONS_BAD_SIGNER, const.SET_OPTIONS_INVALID_HOME_DOMAIN]:
+        if self.check_enum and data not in [const.SET_OPTIONS_SUCCESS, const.SET_OPTIONS_LOW_RESERVE,
+                                            const.SET_OPTIONS_TOO_MANY_SIGNERS, const.SET_OPTIONS_BAD_FLAGS,
+                                            const.SET_OPTIONS_INVALID_INFLATION, const.SET_OPTIONS_CANT_CHANGE,
+                                            const.SET_OPTIONS_UNKNOWN_FLAG, const.SET_OPTIONS_THRESHOLD_OUT_OF_RANGE,
+                                            const.SET_OPTIONS_BAD_SIGNER, const.SET_OPTIONS_INVALID_HOME_DOMAIN]:
             raise XDRError('value=%s not in enum SetOptionsResultCode' % data)
         self.pack_int(data)
 
@@ -964,7 +997,9 @@ class StellarXDRPacker(xdrlib.Packer):
     def pack_ChangeTrustResultCode(self, data):
         if hasattr(self, 'filter_ChangeTrustResultCode'):
             data = getattr(self, 'filter_ChangeTrustResultCode')(data)
-        if self.check_enum and data not in [const.CHANGE_TRUST_SUCCESS, const.CHANGE_TRUST_MALFORMED, const.CHANGE_TRUST_NO_ISSUER, const.CHANGE_TRUST_INVALID_LIMIT, const.CHANGE_TRUST_LOW_RESERVE, const.CHANGE_TRUST_SELF_NOT_ALLOWED]:
+        if self.check_enum and data not in [const.CHANGE_TRUST_SUCCESS, const.CHANGE_TRUST_MALFORMED,
+                                            const.CHANGE_TRUST_NO_ISSUER, const.CHANGE_TRUST_INVALID_LIMIT,
+                                            const.CHANGE_TRUST_LOW_RESERVE, const.CHANGE_TRUST_SELF_NOT_ALLOWED]:
             raise XDRError('value=%s not in enum ChangeTrustResultCode' % data)
         self.pack_int(data)
 
@@ -982,7 +1017,9 @@ class StellarXDRPacker(xdrlib.Packer):
     def pack_AllowTrustResultCode(self, data):
         if hasattr(self, 'filter_AllowTrustResultCode'):
             data = getattr(self, 'filter_AllowTrustResultCode')(data)
-        if self.check_enum and data not in [const.ALLOW_TRUST_SUCCESS, const.ALLOW_TRUST_MALFORMED, const.ALLOW_TRUST_NO_TRUST_LINE, const.ALLOW_TRUST_TRUST_NOT_REQUIRED, const.ALLOW_TRUST_CANT_REVOKE, const.ALLOW_TRUST_SELF_NOT_ALLOWED]:
+        if self.check_enum and data not in [const.ALLOW_TRUST_SUCCESS, const.ALLOW_TRUST_MALFORMED,
+                                            const.ALLOW_TRUST_NO_TRUST_LINE, const.ALLOW_TRUST_TRUST_NOT_REQUIRED,
+                                            const.ALLOW_TRUST_CANT_REVOKE, const.ALLOW_TRUST_SELF_NOT_ALLOWED]:
             raise XDRError('value=%s not in enum AllowTrustResultCode' % data)
         self.pack_int(data)
 
@@ -1000,7 +1037,9 @@ class StellarXDRPacker(xdrlib.Packer):
     def pack_AccountMergeResultCode(self, data):
         if hasattr(self, 'filter_AccountMergeResultCode'):
             data = getattr(self, 'filter_AccountMergeResultCode')(data)
-        if self.check_enum and data not in [const.ACCOUNT_MERGE_SUCCESS, const.ACCOUNT_MERGE_MALFORMED, const.ACCOUNT_MERGE_NO_ACCOUNT, const.ACCOUNT_MERGE_IMMUTABLE_SET, const.ACCOUNT_MERGE_HAS_SUB_ENTRIES]:
+        if self.check_enum and data not in [const.ACCOUNT_MERGE_SUCCESS, const.ACCOUNT_MERGE_MALFORMED,
+                                            const.ACCOUNT_MERGE_NO_ACCOUNT, const.ACCOUNT_MERGE_IMMUTABLE_SET,
+                                            const.ACCOUNT_MERGE_HAS_SUB_ENTRIES]:
             raise XDRError('value=%s not in enum AccountMergeResultCode' % data)
         self.pack_int(data)
 
@@ -1050,7 +1089,9 @@ class StellarXDRPacker(xdrlib.Packer):
     def pack_ManageDataResultCode(self, data):
         if hasattr(self, 'filter_ManageDataResultCode'):
             data = getattr(self, 'filter_ManageDataResultCode')(data)
-        if self.check_enum and data not in [const.MANAGE_DATA_SUCCESS, const.MANAGE_DATA_NOT_SUPPORTED_YET, const.MANAGE_DATA_NAME_NOT_FOUND, const.MANAGE_DATA_LOW_RESERVE, const.MANAGE_DATA_INVALID_NAME]:
+        if self.check_enum and data not in [const.MANAGE_DATA_SUCCESS, const.MANAGE_DATA_NOT_SUPPORTED_YET,
+                                            const.MANAGE_DATA_NAME_NOT_FOUND, const.MANAGE_DATA_LOW_RESERVE,
+                                            const.MANAGE_DATA_INVALID_NAME]:
             raise XDRError('value=%s not in enum ManageDataResultCode' % data)
         self.pack_int(data)
 
@@ -1136,7 +1177,10 @@ class StellarXDRPacker(xdrlib.Packer):
     def pack_TransactionResultCode(self, data):
         if hasattr(self, 'filter_TransactionResultCode'):
             data = getattr(self, 'filter_TransactionResultCode')(data)
-        if self.check_enum and data not in [const.txSUCCESS, const.txFAILED, const.txTOO_EARLY, const.txTOO_LATE, const.txMISSING_OPERATION, const.txBAD_SEQ, const.txBAD_AUTH, const.txINSUFFICIENT_BALANCE, const.txNO_ACCOUNT, const.txINSUFFICIENT_FEE, const.txBAD_AUTH_EXTRA, const.txINTERNAL_ERROR]:
+        if self.check_enum and data not in [const.txSUCCESS, const.txFAILED, const.txTOO_EARLY, const.txTOO_LATE,
+                                            const.txMISSING_OPERATION, const.txBAD_SEQ, const.txBAD_AUTH,
+                                            const.txINSUFFICIENT_BALANCE, const.txNO_ACCOUNT, const.txINSUFFICIENT_FEE,
+                                            const.txBAD_AUTH_EXTRA, const.txINTERNAL_ERROR]:
             raise XDRError('value=%s not in enum TransactionResultCode' % data)
         self.pack_int(data)
 
@@ -1256,7 +1300,8 @@ class StellarXDRPacker(xdrlib.Packer):
     def pack_LedgerUpgradeType(self, data):
         if hasattr(self, 'filter_LedgerUpgradeType'):
             data = getattr(self, 'filter_LedgerUpgradeType')(data)
-        if self.check_enum and data not in [const.LEDGER_UPGRADE_VERSION, const.LEDGER_UPGRADE_BASE_FEE, const.LEDGER_UPGRADE_MAX_TX_SET_SIZE]:
+        if self.check_enum and data not in [const.LEDGER_UPGRADE_VERSION, const.LEDGER_UPGRADE_BASE_FEE,
+                                            const.LEDGER_UPGRADE_MAX_TX_SET_SIZE]:
             raise XDRError('value=%s not in enum LedgerUpgradeType' % data)
         self.pack_int(data)
 
@@ -1467,7 +1512,8 @@ class StellarXDRPacker(xdrlib.Packer):
     def pack_LedgerEntryChangeType(self, data):
         if hasattr(self, 'filter_LedgerEntryChangeType'):
             data = getattr(self, 'filter_LedgerEntryChangeType')(data)
-        if self.check_enum and data not in [const.LEDGER_ENTRY_CREATED, const.LEDGER_ENTRY_UPDATED, const.LEDGER_ENTRY_REMOVED, const.LEDGER_ENTRY_STATE]:
+        if self.check_enum and data not in [const.LEDGER_ENTRY_CREATED, const.LEDGER_ENTRY_UPDATED,
+                                            const.LEDGER_ENTRY_REMOVED, const.LEDGER_ENTRY_STATE]:
             raise XDRError('value=%s not in enum LedgerEntryChangeType' % data)
         self.pack_int(data)
 
@@ -1539,7 +1585,8 @@ class StellarXDRPacker(xdrlib.Packer):
     def pack_SCPStatementType(self, data):
         if hasattr(self, 'filter_SCPStatementType'):
             data = getattr(self, 'filter_SCPStatementType')(data)
-        if self.check_enum and data not in [const.SCP_ST_PREPARE, const.SCP_ST_CONFIRM, const.SCP_ST_EXTERNALIZE, const.SCP_ST_NOMINATE]:
+        if self.check_enum and data not in [const.SCP_ST_PREPARE, const.SCP_ST_CONFIRM, const.SCP_ST_EXTERNALIZE,
+                                            const.SCP_ST_NOMINATE]:
             raise XDRError('value=%s not in enum SCPStatementType' % data)
         self.pack_int(data)
 
@@ -1658,7 +1705,8 @@ class StellarXDRPacker(xdrlib.Packer):
     def pack_ErrorCode(self, data):
         if hasattr(self, 'filter_ErrorCode'):
             data = getattr(self, 'filter_ErrorCode')(data)
-        if self.check_enum and data not in [const.ERR_MISC, const.ERR_DATA, const.ERR_CONF, const.ERR_AUTH, const.ERR_LOAD]:
+        if self.check_enum and data not in [const.ERR_MISC, const.ERR_DATA, const.ERR_CONF, const.ERR_AUTH,
+                                            const.ERR_LOAD]:
             raise XDRError('value=%s not in enum ErrorCode' % data)
         self.pack_int(data)
 
@@ -1762,7 +1810,9 @@ class StellarXDRPacker(xdrlib.Packer):
     def pack_MessageType(self, data):
         if hasattr(self, 'filter_MessageType'):
             data = getattr(self, 'filter_MessageType')(data)
-        if self.check_enum and data not in [const.ERROR_MSG, const.AUTH, const.DONT_HAVE, const.GET_PEERS, const.PEERS, const.GET_TX_SET, const.TX_SET, const.TRANSACTION, const.GET_SCP_QUORUMSET, const.SCP_QUORUMSET, const.SCP_MESSAGE, const.GET_SCP_STATE, const.HELLO]:
+        if self.check_enum and data not in [const.ERROR_MSG, const.AUTH, const.DONT_HAVE, const.GET_PEERS, const.PEERS,
+                                            const.GET_TX_SET, const.TX_SET, const.TRANSACTION, const.GET_SCP_QUORUMSET,
+                                            const.SCP_QUORUMSET, const.SCP_MESSAGE, const.GET_SCP_STATE, const.HELLO]:
             raise XDRError('value=%s not in enum MessageType' % data)
         self.pack_int(data)
 
@@ -1856,6 +1906,7 @@ class StellarXDRPacker(xdrlib.Packer):
         else:
             raise XDRError('bad switch=%s' % data.v)
 
+
 class StellarXDRUnpacker(xdrlib.Unpacker):
     def __init__(self, data, check_enum=True, check_array=True):
         xdrlib.Unpacker.__init__(self, data)
@@ -1873,6 +1924,7 @@ class StellarXDRUnpacker(xdrlib.Unpacker):
     unpack_float = xdrlib.Unpacker.unpack_float
     unpack_uint = xdrlib.Unpacker.unpack_uint
     unpack_uhyper = xdrlib.Unpacker.unpack_uhyper
+
     def unpack_Hash(self):
         data = self.unpack_fopaque(32)
         if hasattr(self, 'filter_Hash'):
@@ -1911,7 +1963,8 @@ class StellarXDRUnpacker(xdrlib.Unpacker):
 
     def unpack_SignerKeyType(self):
         data = self.unpack_int()
-        if self.check_enum and data not in [const.SIGNER_KEY_TYPE_ED25519, const.SIGNER_KEY_TYPE_PRE_AUTH_TX, const.SIGNER_KEY_TYPE_HASH_X]:
+        if self.check_enum and data not in [const.SIGNER_KEY_TYPE_ED25519, const.SIGNER_KEY_TYPE_PRE_AUTH_TX,
+                                            const.SIGNER_KEY_TYPE_HASH_X]:
             raise XDRError('value=%s not in enum SignerKeyType' % data)
         if hasattr(self, 'filter_SignerKeyType'):
             data = getattr(self, 'filter_SignerKeyType')(data)
@@ -2023,7 +2076,8 @@ class StellarXDRUnpacker(xdrlib.Unpacker):
 
     def unpack_AssetType(self):
         data = self.unpack_int()
-        if self.check_enum and data not in [const.ASSET_TYPE_NATIVE, const.ASSET_TYPE_CREDIT_ALPHANUM4, const.ASSET_TYPE_CREDIT_ALPHANUM12]:
+        if self.check_enum and data not in [const.ASSET_TYPE_NATIVE, const.ASSET_TYPE_CREDIT_ALPHANUM4,
+                                            const.ASSET_TYPE_CREDIT_ALPHANUM12]:
             raise XDRError('value=%s not in enum AssetType' % data)
         if hasattr(self, 'filter_AssetType'):
             data = getattr(self, 'filter_AssetType')(data)
@@ -2058,7 +2112,8 @@ class StellarXDRUnpacker(xdrlib.Unpacker):
 
     def unpack_ThresholdIndexes(self):
         data = self.unpack_int()
-        if self.check_enum and data not in [const.THRESHOLD_MASTER_WEIGHT, const.THRESHOLD_LOW, const.THRESHOLD_MED, const.THRESHOLD_HIGH]:
+        if self.check_enum and data not in [const.THRESHOLD_MASTER_WEIGHT, const.THRESHOLD_LOW, const.THRESHOLD_MED,
+                                            const.THRESHOLD_HIGH]:
             raise XDRError('value=%s not in enum ThresholdIndexes' % data)
         if hasattr(self, 'filter_ThresholdIndexes'):
             data = getattr(self, 'filter_ThresholdIndexes')(data)
@@ -2082,7 +2137,8 @@ class StellarXDRUnpacker(xdrlib.Unpacker):
 
     def unpack_AccountFlags(self):
         data = self.unpack_int()
-        if self.check_enum and data not in [const.AUTH_REQUIRED_FLAG, const.AUTH_REVOCABLE_FLAG, const.AUTH_IMMUTABLE_FLAG]:
+        if self.check_enum and data not in [const.AUTH_REQUIRED_FLAG, const.AUTH_REVOCABLE_FLAG,
+                                            const.AUTH_IMMUTABLE_FLAG]:
             raise XDRError('value=%s not in enum AccountFlags' % data)
         if hasattr(self, 'filter_AccountFlags'):
             data = getattr(self, 'filter_AccountFlags')(data)
@@ -2223,7 +2279,9 @@ class StellarXDRUnpacker(xdrlib.Unpacker):
 
     def unpack_OperationType(self):
         data = self.unpack_int()
-        if self.check_enum and data not in [const.CREATE_ACCOUNT, const.PAYMENT, const.PATH_PAYMENT, const.MANAGE_OFFER, const.CREATE_PASSIVE_OFFER, const.SET_OPTIONS, const.CHANGE_TRUST, const.ALLOW_TRUST, const.ACCOUNT_MERGE, const.INFLATION, const.MANAGE_DATA]:
+        if self.check_enum and data not in [const.CREATE_ACCOUNT, const.PAYMENT, const.PATH_PAYMENT, const.MANAGE_OFFER,
+                                            const.CREATE_PASSIVE_OFFER, const.SET_OPTIONS, const.CHANGE_TRUST,
+                                            const.ALLOW_TRUST, const.ACCOUNT_MERGE, const.INFLATION, const.MANAGE_DATA]:
             raise XDRError('value=%s not in enum OperationType' % data)
         if hasattr(self, 'filter_OperationType'):
             data = getattr(self, 'filter_OperationType')(data)
@@ -2385,7 +2443,8 @@ class StellarXDRUnpacker(xdrlib.Unpacker):
 
     def unpack_MemoType(self):
         data = self.unpack_int()
-        if self.check_enum and data not in [const.MEMO_NONE, const.MEMO_TEXT, const.MEMO_ID, const.MEMO_HASH, const.MEMO_RETURN]:
+        if self.check_enum and data not in [const.MEMO_NONE, const.MEMO_TEXT, const.MEMO_ID, const.MEMO_HASH,
+                                            const.MEMO_RETURN]:
             raise XDRError('value=%s not in enum MemoType' % data)
         if hasattr(self, 'filter_MemoType'):
             data = getattr(self, 'filter_MemoType')(data)
@@ -2479,7 +2538,9 @@ class StellarXDRUnpacker(xdrlib.Unpacker):
 
     def unpack_CreateAccountResultCode(self):
         data = self.unpack_int()
-        if self.check_enum and data not in [const.CREATE_ACCOUNT_SUCCESS, const.CREATE_ACCOUNT_MALFORMED, const.CREATE_ACCOUNT_UNDERFUNDED, const.CREATE_ACCOUNT_LOW_RESERVE, const.CREATE_ACCOUNT_ALREADY_EXIST]:
+        if self.check_enum and data not in [const.CREATE_ACCOUNT_SUCCESS, const.CREATE_ACCOUNT_MALFORMED,
+                                            const.CREATE_ACCOUNT_UNDERFUNDED, const.CREATE_ACCOUNT_LOW_RESERVE,
+                                            const.CREATE_ACCOUNT_ALREADY_EXIST]:
             raise XDRError('value=%s not in enum CreateAccountResultCode' % data)
         if hasattr(self, 'filter_CreateAccountResultCode'):
             data = getattr(self, 'filter_CreateAccountResultCode')(data)
@@ -2498,7 +2559,11 @@ class StellarXDRUnpacker(xdrlib.Unpacker):
 
     def unpack_PaymentResultCode(self):
         data = self.unpack_int()
-        if self.check_enum and data not in [const.PAYMENT_SUCCESS, const.PAYMENT_MALFORMED, const.PAYMENT_UNDERFUNDED, const.PAYMENT_SRC_NO_TRUST, const.PAYMENT_SRC_NOT_AUTHORIZED, const.PAYMENT_NO_DESTINATION, const.PAYMENT_NO_TRUST, const.PAYMENT_NOT_AUTHORIZED, const.PAYMENT_LINE_FULL, const.PAYMENT_NO_ISSUER]:
+        if self.check_enum and data not in [const.PAYMENT_SUCCESS, const.PAYMENT_MALFORMED, const.PAYMENT_UNDERFUNDED,
+                                            const.PAYMENT_SRC_NO_TRUST, const.PAYMENT_SRC_NOT_AUTHORIZED,
+                                            const.PAYMENT_NO_DESTINATION, const.PAYMENT_NO_TRUST,
+                                            const.PAYMENT_NOT_AUTHORIZED, const.PAYMENT_LINE_FULL,
+                                            const.PAYMENT_NO_ISSUER]:
             raise XDRError('value=%s not in enum PaymentResultCode' % data)
         if hasattr(self, 'filter_PaymentResultCode'):
             data = getattr(self, 'filter_PaymentResultCode')(data)
@@ -2517,7 +2582,13 @@ class StellarXDRUnpacker(xdrlib.Unpacker):
 
     def unpack_PathPaymentResultCode(self):
         data = self.unpack_int()
-        if self.check_enum and data not in [const.PATH_PAYMENT_SUCCESS, const.PATH_PAYMENT_MALFORMED, const.PATH_PAYMENT_UNDERFUNDED, const.PATH_PAYMENT_SRC_NO_TRUST, const.PATH_PAYMENT_SRC_NOT_AUTHORIZED, const.PATH_PAYMENT_NO_DESTINATION, const.PATH_PAYMENT_NO_TRUST, const.PATH_PAYMENT_NOT_AUTHORIZED, const.PATH_PAYMENT_LINE_FULL, const.PATH_PAYMENT_NO_ISSUER, const.PATH_PAYMENT_TOO_FEW_OFFERS, const.PATH_PAYMENT_OFFER_CROSS_SELF, const.PATH_PAYMENT_OVER_SENDMAX]:
+        if self.check_enum and data not in [const.PATH_PAYMENT_SUCCESS, const.PATH_PAYMENT_MALFORMED,
+                                            const.PATH_PAYMENT_UNDERFUNDED, const.PATH_PAYMENT_SRC_NO_TRUST,
+                                            const.PATH_PAYMENT_SRC_NOT_AUTHORIZED, const.PATH_PAYMENT_NO_DESTINATION,
+                                            const.PATH_PAYMENT_NO_TRUST, const.PATH_PAYMENT_NOT_AUTHORIZED,
+                                            const.PATH_PAYMENT_LINE_FULL, const.PATH_PAYMENT_NO_ISSUER,
+                                            const.PATH_PAYMENT_TOO_FEW_OFFERS, const.PATH_PAYMENT_OFFER_CROSS_SELF,
+                                            const.PATH_PAYMENT_OVER_SENDMAX]:
             raise XDRError('value=%s not in enum PathPaymentResultCode' % data)
         if hasattr(self, 'filter_PathPaymentResultCode'):
             data = getattr(self, 'filter_PathPaymentResultCode')(data)
@@ -2549,7 +2620,13 @@ class StellarXDRUnpacker(xdrlib.Unpacker):
 
     def unpack_ManageOfferResultCode(self):
         data = self.unpack_int()
-        if self.check_enum and data not in [const.MANAGE_OFFER_SUCCESS, const.MANAGE_OFFER_MALFORMED, const.MANAGE_OFFER_SELL_NO_TRUST, const.MANAGE_OFFER_BUY_NO_TRUST, const.MANAGE_OFFER_SELL_NOT_AUTHORIZED, const.MANAGE_OFFER_BUY_NOT_AUTHORIZED, const.MANAGE_OFFER_LINE_FULL, const.MANAGE_OFFER_UNDERFUNDED, const.MANAGE_OFFER_CROSS_SELF, const.MANAGE_OFFER_SELL_NO_ISSUER, const.MANAGE_OFFER_BUY_NO_ISSUER, const.MANAGE_OFFER_NOT_FOUND, const.MANAGE_OFFER_LOW_RESERVE]:
+        if self.check_enum and data not in [const.MANAGE_OFFER_SUCCESS, const.MANAGE_OFFER_MALFORMED,
+                                            const.MANAGE_OFFER_SELL_NO_TRUST, const.MANAGE_OFFER_BUY_NO_TRUST,
+                                            const.MANAGE_OFFER_SELL_NOT_AUTHORIZED,
+                                            const.MANAGE_OFFER_BUY_NOT_AUTHORIZED, const.MANAGE_OFFER_LINE_FULL,
+                                            const.MANAGE_OFFER_UNDERFUNDED, const.MANAGE_OFFER_CROSS_SELF,
+                                            const.MANAGE_OFFER_SELL_NO_ISSUER, const.MANAGE_OFFER_BUY_NO_ISSUER,
+                                            const.MANAGE_OFFER_NOT_FOUND, const.MANAGE_OFFER_LOW_RESERVE]:
             raise XDRError('value=%s not in enum ManageOfferResultCode' % data)
         if hasattr(self, 'filter_ManageOfferResultCode'):
             data = getattr(self, 'filter_ManageOfferResultCode')(data)
@@ -2557,7 +2634,8 @@ class StellarXDRUnpacker(xdrlib.Unpacker):
 
     def unpack_ManageOfferEffect(self):
         data = self.unpack_int()
-        if self.check_enum and data not in [const.MANAGE_OFFER_CREATED, const.MANAGE_OFFER_UPDATED, const.MANAGE_OFFER_DELETED]:
+        if self.check_enum and data not in [const.MANAGE_OFFER_CREATED, const.MANAGE_OFFER_UPDATED,
+                                            const.MANAGE_OFFER_DELETED]:
             raise XDRError('value=%s not in enum ManageOfferEffect' % data)
         if hasattr(self, 'filter_ManageOfferEffect'):
             data = getattr(self, 'filter_ManageOfferEffect')(data)
@@ -2589,7 +2667,11 @@ class StellarXDRUnpacker(xdrlib.Unpacker):
 
     def unpack_SetOptionsResultCode(self):
         data = self.unpack_int()
-        if self.check_enum and data not in [const.SET_OPTIONS_SUCCESS, const.SET_OPTIONS_LOW_RESERVE, const.SET_OPTIONS_TOO_MANY_SIGNERS, const.SET_OPTIONS_BAD_FLAGS, const.SET_OPTIONS_INVALID_INFLATION, const.SET_OPTIONS_CANT_CHANGE, const.SET_OPTIONS_UNKNOWN_FLAG, const.SET_OPTIONS_THRESHOLD_OUT_OF_RANGE, const.SET_OPTIONS_BAD_SIGNER, const.SET_OPTIONS_INVALID_HOME_DOMAIN]:
+        if self.check_enum and data not in [const.SET_OPTIONS_SUCCESS, const.SET_OPTIONS_LOW_RESERVE,
+                                            const.SET_OPTIONS_TOO_MANY_SIGNERS, const.SET_OPTIONS_BAD_FLAGS,
+                                            const.SET_OPTIONS_INVALID_INFLATION, const.SET_OPTIONS_CANT_CHANGE,
+                                            const.SET_OPTIONS_UNKNOWN_FLAG, const.SET_OPTIONS_THRESHOLD_OUT_OF_RANGE,
+                                            const.SET_OPTIONS_BAD_SIGNER, const.SET_OPTIONS_INVALID_HOME_DOMAIN]:
             raise XDRError('value=%s not in enum SetOptionsResultCode' % data)
         if hasattr(self, 'filter_SetOptionsResultCode'):
             data = getattr(self, 'filter_SetOptionsResultCode')(data)
@@ -2608,7 +2690,9 @@ class StellarXDRUnpacker(xdrlib.Unpacker):
 
     def unpack_ChangeTrustResultCode(self):
         data = self.unpack_int()
-        if self.check_enum and data not in [const.CHANGE_TRUST_SUCCESS, const.CHANGE_TRUST_MALFORMED, const.CHANGE_TRUST_NO_ISSUER, const.CHANGE_TRUST_INVALID_LIMIT, const.CHANGE_TRUST_LOW_RESERVE, const.CHANGE_TRUST_SELF_NOT_ALLOWED]:
+        if self.check_enum and data not in [const.CHANGE_TRUST_SUCCESS, const.CHANGE_TRUST_MALFORMED,
+                                            const.CHANGE_TRUST_NO_ISSUER, const.CHANGE_TRUST_INVALID_LIMIT,
+                                            const.CHANGE_TRUST_LOW_RESERVE, const.CHANGE_TRUST_SELF_NOT_ALLOWED]:
             raise XDRError('value=%s not in enum ChangeTrustResultCode' % data)
         if hasattr(self, 'filter_ChangeTrustResultCode'):
             data = getattr(self, 'filter_ChangeTrustResultCode')(data)
@@ -2627,7 +2711,9 @@ class StellarXDRUnpacker(xdrlib.Unpacker):
 
     def unpack_AllowTrustResultCode(self):
         data = self.unpack_int()
-        if self.check_enum and data not in [const.ALLOW_TRUST_SUCCESS, const.ALLOW_TRUST_MALFORMED, const.ALLOW_TRUST_NO_TRUST_LINE, const.ALLOW_TRUST_TRUST_NOT_REQUIRED, const.ALLOW_TRUST_CANT_REVOKE, const.ALLOW_TRUST_SELF_NOT_ALLOWED]:
+        if self.check_enum and data not in [const.ALLOW_TRUST_SUCCESS, const.ALLOW_TRUST_MALFORMED,
+                                            const.ALLOW_TRUST_NO_TRUST_LINE, const.ALLOW_TRUST_TRUST_NOT_REQUIRED,
+                                            const.ALLOW_TRUST_CANT_REVOKE, const.ALLOW_TRUST_SELF_NOT_ALLOWED]:
             raise XDRError('value=%s not in enum AllowTrustResultCode' % data)
         if hasattr(self, 'filter_AllowTrustResultCode'):
             data = getattr(self, 'filter_AllowTrustResultCode')(data)
@@ -2646,7 +2732,9 @@ class StellarXDRUnpacker(xdrlib.Unpacker):
 
     def unpack_AccountMergeResultCode(self):
         data = self.unpack_int()
-        if self.check_enum and data not in [const.ACCOUNT_MERGE_SUCCESS, const.ACCOUNT_MERGE_MALFORMED, const.ACCOUNT_MERGE_NO_ACCOUNT, const.ACCOUNT_MERGE_IMMUTABLE_SET, const.ACCOUNT_MERGE_HAS_SUB_ENTRIES]:
+        if self.check_enum and data not in [const.ACCOUNT_MERGE_SUCCESS, const.ACCOUNT_MERGE_MALFORMED,
+                                            const.ACCOUNT_MERGE_NO_ACCOUNT, const.ACCOUNT_MERGE_IMMUTABLE_SET,
+                                            const.ACCOUNT_MERGE_HAS_SUB_ENTRIES]:
             raise XDRError('value=%s not in enum AccountMergeResultCode' % data)
         if hasattr(self, 'filter_AccountMergeResultCode'):
             data = getattr(self, 'filter_AccountMergeResultCode')(data)
@@ -2692,7 +2780,9 @@ class StellarXDRUnpacker(xdrlib.Unpacker):
 
     def unpack_ManageDataResultCode(self):
         data = self.unpack_int()
-        if self.check_enum and data not in [const.MANAGE_DATA_SUCCESS, const.MANAGE_DATA_NOT_SUPPORTED_YET, const.MANAGE_DATA_NAME_NOT_FOUND, const.MANAGE_DATA_LOW_RESERVE, const.MANAGE_DATA_INVALID_NAME]:
+        if self.check_enum and data not in [const.MANAGE_DATA_SUCCESS, const.MANAGE_DATA_NOT_SUPPORTED_YET,
+                                            const.MANAGE_DATA_NAME_NOT_FOUND, const.MANAGE_DATA_LOW_RESERVE,
+                                            const.MANAGE_DATA_INVALID_NAME]:
             raise XDRError('value=%s not in enum ManageDataResultCode' % data)
         if hasattr(self, 'filter_ManageDataResultCode'):
             data = getattr(self, 'filter_ManageDataResultCode')(data)
@@ -2755,7 +2845,10 @@ class StellarXDRUnpacker(xdrlib.Unpacker):
 
     def unpack_TransactionResultCode(self):
         data = self.unpack_int()
-        if self.check_enum and data not in [const.txSUCCESS, const.txFAILED, const.txTOO_EARLY, const.txTOO_LATE, const.txMISSING_OPERATION, const.txBAD_SEQ, const.txBAD_AUTH, const.txINSUFFICIENT_BALANCE, const.txNO_ACCOUNT, const.txINSUFFICIENT_FEE, const.txBAD_AUTH_EXTRA, const.txINTERNAL_ERROR]:
+        if self.check_enum and data not in [const.txSUCCESS, const.txFAILED, const.txTOO_EARLY, const.txTOO_LATE,
+                                            const.txMISSING_OPERATION, const.txBAD_SEQ, const.txBAD_AUTH,
+                                            const.txINSUFFICIENT_BALANCE, const.txNO_ACCOUNT, const.txINSUFFICIENT_FEE,
+                                            const.txBAD_AUTH_EXTRA, const.txINTERNAL_ERROR]:
             raise XDRError('value=%s not in enum TransactionResultCode' % data)
         if hasattr(self, 'filter_TransactionResultCode'):
             data = getattr(self, 'filter_TransactionResultCode')(data)
@@ -2833,7 +2926,8 @@ class StellarXDRUnpacker(xdrlib.Unpacker):
 
     def unpack_LedgerUpgradeType(self):
         data = self.unpack_int()
-        if self.check_enum and data not in [const.LEDGER_UPGRADE_VERSION, const.LEDGER_UPGRADE_BASE_FEE, const.LEDGER_UPGRADE_MAX_TX_SET_SIZE]:
+        if self.check_enum and data not in [const.LEDGER_UPGRADE_VERSION, const.LEDGER_UPGRADE_BASE_FEE,
+                                            const.LEDGER_UPGRADE_MAX_TX_SET_SIZE]:
             raise XDRError('value=%s not in enum LedgerUpgradeType' % data)
         if hasattr(self, 'filter_LedgerUpgradeType'):
             data = getattr(self, 'filter_LedgerUpgradeType')(data)
@@ -2993,7 +3087,8 @@ class StellarXDRUnpacker(xdrlib.Unpacker):
 
     def unpack_LedgerEntryChangeType(self):
         data = self.unpack_int()
-        if self.check_enum and data not in [const.LEDGER_ENTRY_CREATED, const.LEDGER_ENTRY_UPDATED, const.LEDGER_ENTRY_REMOVED, const.LEDGER_ENTRY_STATE]:
+        if self.check_enum and data not in [const.LEDGER_ENTRY_CREATED, const.LEDGER_ENTRY_UPDATED,
+                                            const.LEDGER_ENTRY_REMOVED, const.LEDGER_ENTRY_STATE]:
             raise XDRError('value=%s not in enum LedgerEntryChangeType' % data)
         if hasattr(self, 'filter_LedgerEntryChangeType'):
             data = getattr(self, 'filter_LedgerEntryChangeType')(data)
@@ -3056,7 +3151,8 @@ class StellarXDRUnpacker(xdrlib.Unpacker):
 
     def unpack_SCPStatementType(self):
         data = self.unpack_int()
-        if self.check_enum and data not in [const.SCP_ST_PREPARE, const.SCP_ST_CONFIRM, const.SCP_ST_EXTERNALIZE, const.SCP_ST_NOMINATE]:
+        if self.check_enum and data not in [const.SCP_ST_PREPARE, const.SCP_ST_CONFIRM, const.SCP_ST_EXTERNALIZE,
+                                            const.SCP_ST_NOMINATE]:
             raise XDRError('value=%s not in enum SCPStatementType' % data)
         if hasattr(self, 'filter_SCPStatementType'):
             data = getattr(self, 'filter_SCPStatementType')(data)
@@ -3128,7 +3224,8 @@ class StellarXDRUnpacker(xdrlib.Unpacker):
 
     def unpack_ErrorCode(self):
         data = self.unpack_int()
-        if self.check_enum and data not in [const.ERR_MISC, const.ERR_DATA, const.ERR_CONF, const.ERR_AUTH, const.ERR_LOAD]:
+        if self.check_enum and data not in [const.ERR_MISC, const.ERR_DATA, const.ERR_CONF, const.ERR_AUTH,
+                                            const.ERR_LOAD]:
             raise XDRError('value=%s not in enum ErrorCode' % data)
         if hasattr(self, 'filter_ErrorCode'):
             data = getattr(self, 'filter_ErrorCode')(data)
@@ -3203,7 +3300,9 @@ class StellarXDRUnpacker(xdrlib.Unpacker):
 
     def unpack_MessageType(self):
         data = self.unpack_int()
-        if self.check_enum and data not in [const.ERROR_MSG, const.AUTH, const.DONT_HAVE, const.GET_PEERS, const.PEERS, const.GET_TX_SET, const.TX_SET, const.TRANSACTION, const.GET_SCP_QUORUMSET, const.SCP_QUORUMSET, const.SCP_MESSAGE, const.GET_SCP_STATE, const.HELLO]:
+        if self.check_enum and data not in [const.ERROR_MSG, const.AUTH, const.DONT_HAVE, const.GET_PEERS, const.PEERS,
+                                            const.GET_TX_SET, const.TX_SET, const.TRANSACTION, const.GET_SCP_QUORUMSET,
+                                            const.SCP_QUORUMSET, const.SCP_MESSAGE, const.GET_SCP_STATE, const.HELLO]:
             raise XDRError('value=%s not in enum MessageType' % data)
         if hasattr(self, 'filter_MessageType'):
             data = getattr(self, 'filter_MessageType')(data)
@@ -3265,4 +3364,3 @@ class StellarXDRUnpacker(xdrlib.Unpacker):
         if hasattr(self, 'filter_AuthenticatedMessage'):
             data = getattr(self, 'filter_AuthenticatedMessage')(data)
         return data
-

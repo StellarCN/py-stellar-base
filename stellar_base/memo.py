@@ -16,7 +16,7 @@ class Memo(object):
     #     pass
 
     def to_xdr_object(self):
-         pass
+        pass
 
     def xdr(self):
         x = Xdr.StellarXDRPacker()

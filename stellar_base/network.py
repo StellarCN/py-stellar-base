@@ -1,4 +1,4 @@
-# encoding:utf-8
+# coding: utf-8
 from .utils import xdr_hash
 
 NETWORKS = {'PUBLIC': 'Public Global Stellar Network ; September 2015',

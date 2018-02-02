@@ -1500,7 +1500,7 @@ def run(infile, filters=True, pass_attrs=True, debug=False):
     # stellar XDR dir/files
     elif os.path.isdir(infile):
         print("Input dir is", infile)
-        #name_base = os.path.basename(os.path.abspath(infile))
+        # name_base = os.path.basename(os.path.abspath(infile))
         global file_list
         file_list = [os.path.abspath(os.path.join(infile, x)) for x in os.listdir(infile)]
         while file_list:
@@ -1529,7 +1529,7 @@ def run(infile, filters=True, pass_attrs=True, debug=False):
     pack_fd = open(packer_file + ".py", "w", newline='\n')
     pack_fd.write(comment_string)
     pack_fd.write(pack_header % (constants_file, types_file))
-    #pack_fd.write(pack_init % name_base.upper())
+    # pack_fd.write(pack_init % name_base.upper())
     pack_fd.write(pack_init % name_base)
     pack_fd.write(packer_start)
 
@@ -1550,7 +1550,7 @@ def run(infile, filters=True, pass_attrs=True, debug=False):
             # pack_fd.write("# **** %s %s %s****\n" % (value.id, value.lineno, value.sortno))
             pack_fd.write(output)
             pack_fd.write('\n')
-    #pack_fd.write(unpack_init % name_base.upper())
+    # pack_fd.write(unpack_init % name_base.upper())
     pack_fd.write(unpack_init % name_base)
     pack_fd.write(unpacker_start)
     for value in type_list:

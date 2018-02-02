@@ -1,6 +1,5 @@
-# code : utf-8
+# coding: utf-8
 
-import base64
 from .memo import *
 from .operation import *
 from .utils import decode_check

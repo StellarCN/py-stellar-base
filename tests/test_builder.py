@@ -21,16 +21,16 @@ class TestBuilder(object):
         hot_account = self.hot.address().decode()
         fund(cold_account)
 
-        cold = Builder(self.cold.seed().decode())\
-          .append_create_account_op(hot_account, 200)\
-          .append_set_options_op(inflation_dest=cold_account, set_flags=1,
+        cold = Builder(self.cold.seed().decode()) \
+            .append_create_account_op(hot_account, 200) \
+            .append_set_options_op(inflation_dest=cold_account, set_flags=1,
                                    home_domain='256kw.com', master_weight=10,
-                                   low_threshold=5,)\
-          .append_trust_op(cold_account, 'BEER', 1000, source=hot_account)\
-          .append_allow_trust_op(hot_account, 'BEER', True)
+                                   low_threshold=5, ) \
+            .append_trust_op(cold_account, 'BEER', 1000, source=hot_account) \
+            .append_allow_trust_op(hot_account, 'BEER', True)
         # append twice for test
-        cold.append_payment_op(hot_account, 50.123, 'BEER', cold_account)\
-          .append_payment_op(hot_account, 50.123, 'BEER', cold_account)
+        cold.append_payment_op(hot_account, 50.123, 'BEER', cold_account) \
+            .append_payment_op(hot_account, 50.123, 'BEER', cold_account)
 
         cold.sign(self.hot.seed().decode())
         try:  # sign twice
@@ -57,11 +57,11 @@ class TestBuilder(object):
 
         fund(hot_account)
 
-        cold = Builder(self.cold.seed().decode())\
-          .append_trust_op(cold_account, 'BEER', 1000, hot_account)\
-          .append_payment_op(hot_account, 100, 'BEER', cold_account)\
-          .append_payment_op(cold_account, 2.222,
-                             'BEER', cold_account, hot_account)
+        cold = Builder(self.cold.seed().decode()) \
+            .append_trust_op(cold_account, 'BEER', 1000, hot_account) \
+            .append_payment_op(hot_account, 100, 'BEER', cold_account) \
+            .append_payment_op(cold_account, 2.222,
+                               'BEER', cold_account, hot_account)
         xdr = cold.gen_xdr()
         hot = Builder(self.hot.seed().decode())
         hot.import_from_xdr(xdr)

@@ -1,4 +1,4 @@
-# coding:utf-8
+# coding: utf-8
 from __future__ import print_function
 import base64
 import binascii
@@ -7,7 +7,6 @@ import struct
 import hmac
 
 import crc16
-
 
 # noinspection PyBroadException
 try:
@@ -27,10 +26,10 @@ except NameError:
     unicode = str
 
 bytes_types = (bytes, bytearray)  # Types acceptable as binary data
-versionBytes = {'account': binascii.a2b_hex('30'), # G 48 6 << 3
-                'seed': binascii.a2b_hex('90'), # S 144 18 << 3
-                'preAuthTx': binascii.a2b_hex('98'), # T 152 19 << 3
-                'sha256Hash': binascii.a2b_hex('b8') # X 184 23 << 3
+versionBytes = {'account': binascii.a2b_hex('30'),  # G 48 6 << 3
+                'seed': binascii.a2b_hex('90'),  # S 144 18 << 3
+                'preAuthTx': binascii.a2b_hex('98'),  # T 152 19 << 3
+                'sha256Hash': binascii.a2b_hex('b8')  # X 184 23 << 3
                 }
 
 
@@ -49,6 +48,7 @@ def account_xdr_object(account):
     axo = Xdr.types.PublicKey(Xdr.const.KEY_TYPE_ED25519, public_key)
     return axo
 
+
 def signer_key_xdr_object(signer_type, signer):
     if signer_type == 'ed25519PublicKey':
         return Xdr.types.SignerKey(Xdr.const.SIGNER_KEY_TYPE_ED25519, decode_check('account', signer))
@@ -57,12 +57,12 @@ def signer_key_xdr_object(signer_type, signer):
     if signer_type == 'preAuthTX':
         return Xdr.types.SignerKey(Xdr.const.SIGNER_KEY_TYPE_PRE_AUTH_TX, preAuthTx=signer)
 
+
 def hashX_sign_decorated(preimage):
     preimage = preimage.encode('utf-8')
     hash_preimage = hashlib.sha256(preimage).digest()
     hint = hash_preimage[-4:]
     return Xdr.types.DecoratedSignature(hint, preimage)
-
 
 
 def bytes_from_decode_data(s):
@@ -134,7 +134,7 @@ def decode_check(version_byte_name, encoded):
     expected_version = versionBytes[version_byte_name]
     if version_byte != expected_version:
         raise DecodeError(
-                'invalid version byte. expected ' + str(expected_version) + ', got ' + str(version_byte))
+            'invalid version byte. expected ' + str(expected_version) + ', got ' + str(version_byte))
 
     expected_checksum = calculate_checksum(payload)
     if expected_checksum != checksum:
@@ -192,13 +192,16 @@ def best_rational_approximation(x):
 def division(n, d):
     return float(Fraction(n, d))
 
+
 # mnemonic
 from mnemonic import Mnemonic
 import os
 from pbkdf2 import PBKDF2
 import hmac
 import io
+
 PBKDF2_ROUNDS = 2048
+
 
 class StellarMnemonic(Mnemonic):
     def __init__(self, language='english'):
@@ -207,15 +210,16 @@ class StellarMnemonic(Mnemonic):
         self.first_hardened_index = 0x80000000
         self.seed_modifier = b"ed25519 seed"
         if language == 'chinese':
-            with io.open('%s/%s.txt' % (self._get_directory(), language), 'r',encoding="utf8") as f:
+            with io.open('%s/%s.txt' % (self._get_directory(), language), 'r', encoding="utf8") as f:
                 self.wordlist = [w.strip() for w in f.readlines()]
         else:
             with io.open('%s/%s.txt' % (Mnemonic._get_directory(), language),
-                    'r',encoding="utf8") as f:
+                         'r', encoding="utf8") as f:
                 self.wordlist = [w.strip() for w in f.readlines()]
 
         if len(self.wordlist) != self.radix:
-            raise ConfigurationError('Wordlist should contain %d words, but it contains %d words.' % (self.radix, len(self.wordlist)))
+            raise ConfigurationError(
+                'Wordlist should contain %d words, but it contains %d words.' % (self.radix, len(self.wordlist)))
 
     @classmethod
     def _get_directory(cls):
@@ -223,7 +227,7 @@ class StellarMnemonic(Mnemonic):
 
     @classmethod
     def list_languages(cls):
-        lang =  [f.split('.')[0] for f in os.listdir(cls._get_directory()) if f.endswith('.txt')]
+        lang = [f.split('.')[0] for f in os.listdir(cls._get_directory()) if f.endswith('.txt')]
         lang += [f.split('.')[0] for f in os.listdir(Mnemonic._get_directory()) if f.endswith('.txt')]
         return lang
 
@@ -232,12 +236,14 @@ class StellarMnemonic(Mnemonic):
             raise MnemonicError('wrong mnemonic string')
         mnemonic = cls.normalize_string(mnemonic)
         passphrase = cls.normalize_string(passphrase)
-        seed = PBKDF2(mnemonic, u'mnemonic' + passphrase, iterations=PBKDF2_ROUNDS, macmodule=hmac, digestmodule=hashlib.sha512).read(64)
+        seed = PBKDF2(mnemonic, u'mnemonic' + passphrase, iterations=PBKDF2_ROUNDS, macmodule=hmac,
+                      digestmodule=hashlib.sha512).read(64)
         return cls.derive(seed, index)
 
     def generate(self, strength=128):
         if strength not in [128, 160, 192, 224, 256]:
-            raise ValueError('Strength should be one of the following [128, 160, 192, 224, 256], but it is not (%d).' % strength)
+            raise ValueError(
+                'Strength should be one of the following [128, 160, 192, 224, 256], but it is not (%d).' % strength)
         ret = self.to_mnemonic(os.urandom(strength // 8))
         # print(ret)
         return ret
