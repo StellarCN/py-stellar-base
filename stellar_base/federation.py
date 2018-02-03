@@ -7,7 +7,7 @@ from .keypair import Keypair
 from .utils import DecodeError
 
 
-def federation(address_or_id, fed_type='name', domain=None):
+def federation(address_or_id, fed_type='name', domain=None, allow_http=False):
     if fed_type == 'name':
         if '*' not in address_or_id:
             raise FederationError('not a valid federation address')
@@ -25,15 +25,15 @@ def federation(address_or_id, fed_type='name', domain=None):
 
     if '.' not in domain:
         raise FederationError('not a valid domain name')
-    fed_service = get_federation_service(domain)
+    fed_service = get_federation_service(domain, allow_http)
     if not fed_service:
         raise FederationError('not a valid federation server')
 
     return get_federation_info(address_or_id, fed_service, fed_type)
 
 
-def get_federation_info(fed_address, federation_service, fed_type='name'):
-    params = {'q': fed_address, 'type': fed_type}
+def get_federation_info(address_or_id, federation_service, fed_type='name'):
+    params = {'q': address_or_id, 'type': fed_type}
     r = requests.get(federation_service, params=params)
     if r.status_code == 200:
         return r.json()
@@ -41,23 +41,26 @@ def get_federation_info(fed_address, federation_service, fed_type='name'):
         return None
 
 
-def get_federation_service(domain):
-    st = get_stellar_toml(domain)
+def get_federation_service(domain, allow_http=False):
+    st = get_stellar_toml(domain, allow_http)
     if not st:
         return None
     return st.get('FEDERATION_SERVER')
 
 
-def get_auth_server(domain):
-    st = get_stellar_toml(domain)
+def get_auth_server(domain, allow_http=False):
+    st = get_stellar_toml(domain, allow_http)
     if not st:
         return None
     return st.get('AUTH_SERVER')
 
 
-def get_stellar_toml(domain):
+def get_stellar_toml(domain, allow_http=False):
     toml_link = '/.well-known/stellar.toml'
-    protocol = 'https://'
+    if allow_http:
+        protocol = 'http://'
+    else:
+        protocol = 'https://'
     url_list = ['', 'www.', 'stellar.']
     url_list = [protocol + url + domain + toml_link for url in url_list]
 

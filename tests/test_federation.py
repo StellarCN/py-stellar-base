@@ -32,7 +32,11 @@ def mocked_requests_get(*args, **kwargs):
                              [[CURRENCIES]]  \n   code="BTC"     \n\
                              issuer="GATEMHCCKCY67ZUCKTROYN24ZYT5GK4EQZ65JJLDHKHRUZI3EUEKMTCH"', \
                             200)
-
+    if args[0] == 'http://fed-domain.com/.well-known/stellar.toml':
+        return MockResponse('FEDERATION_SERVER="http://www.fed-domain.com/federation"\n  \
+                             [[CURRENCIES]]  \n   code="BTC"     \n\
+                             issuer="GATEMHCCKCY67ZUCKTROYN24ZYT5GK4EQZ65JJLDHKHRUZI3EUEKMTCH"', \
+                            200)
     return MockResponse({}, 404)
 
 
@@ -76,9 +80,19 @@ class TestFederation(object):
         assert response.get('FEDERATION_SERVER') == "https://www.fed-domain.com/federation"
 
     @mock.patch('stellar_base.federation.requests.get', side_effect=mocked_requests_get)
+    def test_get_toml_http(self, get_toml):
+        response = get_stellar_toml('fed-domain.com', allow_http=True)
+        assert response.get('FEDERATION_SERVER') == "http://www.fed-domain.com/federation"
+
+    @mock.patch('stellar_base.federation.requests.get', side_effect=mocked_requests_get)
     def test_get_fed_service(self, get_toml):
         response = get_federation_service('fed-domain.com')
         assert response == "https://www.fed-domain.com/federation"
+
+    @mock.patch('stellar_base.federation.requests.get', side_effect=mocked_requests_get)
+    def test_get_fed_service_http(self, get_toml):
+        response = get_federation_service('fed-domain.com', allow_http=True)
+        assert response == "http://www.fed-domain.com/federation"
 
     @mock.patch('stellar_base.federation.requests.get', side_effect=mocked_requests_get)
     def test_get_auth_server(self, get_toml):
