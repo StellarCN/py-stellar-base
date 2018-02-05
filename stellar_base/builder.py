@@ -257,7 +257,7 @@ class Builder(object):
             self.address,
             opts={
                 'sequence': self.sequence,
-                'time_Bounds': self.time_bounds,
+                'timeBounds': self.time_bounds,
                 'memo': self.memo,
                 'fee': self.fee if self.fee else 100 * len(self.ops),
                 'operations': self.ops,
