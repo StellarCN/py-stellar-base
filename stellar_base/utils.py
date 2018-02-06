@@ -54,7 +54,7 @@ def signer_key_xdr_object(signer_type, signer):
         return Xdr.types.SignerKey(Xdr.const.SIGNER_KEY_TYPE_ED25519, decode_check('account', signer))
     if signer_type == 'hashX':
         return Xdr.types.SignerKey(Xdr.const.SIGNER_KEY_TYPE_HASH_X, hashX=signer)
-    if signer_type == 'preAuthTX':
+    if signer_type == 'preAuthTx':
         return Xdr.types.SignerKey(Xdr.const.SIGNER_KEY_TYPE_PRE_AUTH_TX, preAuthTx=signer)
 
 
