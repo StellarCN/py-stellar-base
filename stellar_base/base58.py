@@ -1,4 +1,4 @@
-# coding:utf-8
+# coding: utf-8
 '''Base58 encoding
 
 Implementations of Base58 and Base58Check endcodings that are compatible

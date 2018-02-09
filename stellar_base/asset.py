@@ -40,9 +40,13 @@ class Asset(object):
 
         self.code = code
         self.issuer = issuer
+        self.type = self.guessAssetType()
 
     def __eq__(self, other):
         return self.xdr() == other.xdr()
+
+    def guessAssetType(self):
+        return len(self.code) > 4 and 'credit_alphanum12' or 'credit_alphanum4'
 
     def to_dict(self):
         """Generate a dict for this object's attributes.
@@ -53,9 +57,7 @@ class Asset(object):
         rv = {'asset_code': self.code}
         if not self.is_native():
             rv['asset_issuer'] = self.issuer
-            rv['asset_type'] = (
-                'credit_alphanum12' if len(self.code) > 4 else
-                'credit_alphanum4')
+            rv['asset_type'] = self.type
         else:
             rv['asset_type'] = 'native'
         return rv
@@ -140,6 +142,7 @@ class Asset(object):
 
         :return: A new :class:`Asset` object from its encoded XDR
             representation.
+
         """
         xdr_decoded = base64.b64decode(xdr)
         asset = Xdr.StellarXDRUnpacker(xdr_decoded)

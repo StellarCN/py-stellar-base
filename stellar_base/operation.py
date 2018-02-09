@@ -1,4 +1,5 @@
-# coding:utf-8
+# -*- coding: utf-8 -*-
+
 import base64
 from decimal import Context, Decimal, Inexact
 
@@ -199,7 +200,7 @@ class CreateAccount(Operation):
             'source': source,
             'destination': destination,
             'starting_balance': starting_balance,
-            })
+        })
 
 
 class Payment(Operation):
@@ -239,7 +240,7 @@ class Payment(Operation):
             'destination': destination,
             'asset': asset,
             'amount': amount,
-            })
+        })
 
 
 class PathPayment(Operation):
@@ -297,7 +298,7 @@ class PathPayment(Operation):
             'dest_asset': dest_asset,
             'dest_amount': dest_amount,
             'path': path
-            })
+        })
 
 
 class ChangeTrust(Operation):
@@ -334,7 +335,7 @@ class ChangeTrust(Operation):
             'source': source,
             'asset': line,
             'limit': limit
-            })
+        })
 
 
 class AllowTrust(Operation):
@@ -393,7 +394,7 @@ class AllowTrust(Operation):
             'trustor': trustor,
             'authorize': authorize,
             'asset_code': asset_code
-            })
+        })
 
 
 class SetOptions(Operation):
@@ -434,8 +435,8 @@ class SetOptions(Operation):
         signer_addr_has_valid_len = (
             self.signer_address is not None and len(self.signer_address) != 32)
 
-        if self.signer_type in ('hashX', 'preAuthTx') and not (
-                signer_addr_has_valid_len):
+        if (self.signer_type in ('hashX', 'preAuthTx')
+                and not signer_addr_has_valid_len):
             # FIXME: Throw better exception
             raise Exception('hashX or preAuthTx Signer must be 32 bytes')
 
@@ -535,7 +536,7 @@ class SetOptions(Operation):
             'signer_address': signer_address,
             'Signer_type': signer_type,
             'signer_weight': signer_weight
-            })
+        })
 
 
 class ManageOffer(Operation):
@@ -587,7 +588,7 @@ class ManageOffer(Operation):
             'amount': amount,
             'price': price,
             'offer_id': offer_id
-            })
+        })
 
 
 class CreatePassiveOffer(Operation):
@@ -637,7 +638,7 @@ class CreatePassiveOffer(Operation):
             'buying': buying,
             'amount': amount,
             'price': price
-            })
+        })
 
 
 class AccountMerge(Operation):
@@ -666,7 +667,7 @@ class AccountMerge(Operation):
         return cls({
             'source': source,
             'destination': destination
-            })
+        })
 
 
 class Inflation(Operation):
@@ -731,4 +732,4 @@ class ManageData(Operation):
             'source': source,
             'data_name': data_name,
             'data_value': data_value
-            })
+        })
