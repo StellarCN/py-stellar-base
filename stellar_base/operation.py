@@ -12,6 +12,13 @@ from .utils import XdrLengthError
 
 ONE = Decimal(10 ** 7)
 
+# TODO: We should really consider not taking a dictionary of opts here, and
+# instead should craft each operation's arguments to reasonable defaults and
+# expectations of required arguments. It makes documentation better, as well
+# as inspection of the method # definition. There's no reason that dictionary
+# unpacking can't be used to facilitate easy dict -> kwargs conversion on the
+# init statements.
+
 
 class Operation(object):
     """The :class:`Operation` object, which represents an operation on
@@ -168,7 +175,7 @@ class Operation(object):
 
 
 class CreateAccount(Operation):
-    """The class:`CreateAccount` object, which represents a Create Account
+    """The :class:`CreateAccount` object, which represents a Create Account
     operation on Stellar's network.
 
     This operation creates and funds a new account with the specified starting
@@ -176,9 +183,9 @@ class CreateAccount(Operation):
 
     Threshold: Medium
 
-    :param dict opts: A dict of options for creating this :class:`Operation`.
-        This class pulls a 'source', 'destination', and 'starting_balance' via
-        opts.
+    :param dict opts: A dict of options for creating this
+        :class:`CreateAccount`. This class pulls a 'source', 'destination', and
+        'starting_balance' via opts.
 
     """
     def __init__(self, opts):
@@ -225,6 +232,18 @@ class CreateAccount(Operation):
 
 
 class Payment(Operation):
+    """The :class:`Payment` object, which represents a Payment operation on
+    Stellar's network.
+
+    Sends an amount in a specific asset to a destination account.
+
+    Threshold: Medium
+
+    :param dict opts: A dict of options for creating this :class:`Payment`.
+        This class pulls a 'source', 'destination', 'asset', and 'amount' via
+        opts.
+
+    """
     def __init__(self, opts):
         super(Payment, self).__init__(opts)
         self.destination = opts.get('destination')
@@ -273,6 +292,20 @@ class Payment(Operation):
 
 
 class PathPayment(Operation):
+    """The :class:`PathPayment` object, which represents a PathPayment
+    operation on Stellar's network.
+
+    Sends an amount in a specific asset to a destination account through a path
+    of offers. This allows the asset sent (e.g., 450 XLM) to be different from
+    the asset received (e.g, 6 BTC).
+
+    Threshold: Medium
+
+    :param dict opts: A dict of options for creating this :class:`PathPayment`.
+        This class pulls a 'source', 'destination', 'send_asset', 'send_max',
+        'dest_asset', 'dest_amount', and 'path' via opts.
+
+    """
     def __init__(self, opts):
         super(PathPayment, self).__init__(opts)
         self.destination = opts.get('destination')
@@ -339,6 +372,20 @@ class PathPayment(Operation):
 
 
 class ChangeTrust(Operation):
+    """The :class:`ChangeTrust` object, which represents a ChangeTrust
+    operation on Stellar's network.
+
+    Creates, updates, or deletes a trustline. For more on trustlines, please
+    refer to the `assets documentation
+    <https://www.stellar.org/developers/guides/concepts/assets.html>_`.
+
+    Threshold: Medium
+
+    :param dict opts: A dict of options for creating this :class:`ChangeTrust`.
+        This class pulls a 'source', 'asset', and optionally a 'limit' via
+        opts.
+
+    """
     def __init__(self, opts):
         super(ChangeTrust, self).__init__(opts)
         self.line = opts.get('asset')
@@ -384,6 +431,24 @@ class ChangeTrust(Operation):
 
 
 class AllowTrust(Operation):
+    """The :class:`AllowTrust` object, which represents a AllowTrust operation
+    on Stellar's network.
+
+    Updates the authorized flag of an existing trustline. This can only be
+    called by the issuer of a trustline’s `asset
+    <https://www.stellar.org/developers/guides/concepts/assets.html>`_.
+
+    The issuer can only clear the authorized flag if the issuer has the
+    AUTH_REVOCABLE_FLAG set. Otherwise, the issuer can only set the authorized
+    flag.
+
+    Threshold: Low
+
+    :param dict opts: A dict of options for creating this :class:`AllowTrust`.
+        This class pulls a 'source', 'trustor', 'asset_code', and 'authorize'
+        via opts.
+
+    """
     def __init__(self, opts):
         super(AllowTrust, self).__init__(opts)
         self.trustor = opts.get('trustor')
@@ -451,6 +516,27 @@ class AllowTrust(Operation):
 
 
 class SetOptions(Operation):
+    """The :class:`SetOptions` object, which represents a SetOptions operation
+    on Stellar's network.
+
+    This operation sets the options for an account.
+
+    For more information on the signing options, please refer to the `multi-sig
+    doc <https://www.stellar.org/developers/guides/concepts/multi-sig.html>`_.
+
+    When updating signers or other thresholds, the threshold of this operation
+    is high.
+
+    Threshold: Medium or High
+
+    :param dict opts: A dict of options for creating this :class:`SetOptions`.
+        This class pulls several of the following depending on the option: a
+        'source', 'inflation_dest', 'clear_flags', 'set_flags',
+        'master_weight', 'low_threshold', 'med_threshold', 'high_threshold',
+        'home_domain', 'signer_address', 'signer_type', 'signer_weight' via
+        opts.
+
+    """
     def __init__(self, opts):
         super(SetOptions, self).__init__(opts)
         self.inflation_dest = opts.get('inflation_dest')
@@ -601,6 +687,25 @@ class SetOptions(Operation):
 
 
 class ManageOffer(Operation):
+    """The :class:`ManageOffer` object, which represents a ManageOffer
+    operation on Stellar's network.
+
+    Creates, updates, or deletes an offer.
+
+    If you want to create a new offer set Offer ID to 0.
+
+    If you want to update an existing offer set Offer ID to existing offer ID.
+
+    If you want to delete an existing offer set Offer ID to existing offer ID
+    and set Amount to 0.
+
+    Threshold: Medium
+
+    :param dict opts: A dict of options for creating this :class:`ManageOffer`.
+        This class pulls several of the following from opts: 'source',
+        'selling', 'buying', 'amount', 'price', 'offer_id'.
+
+    """
     def __init__(self, opts):
         super(ManageOffer, self).__init__(opts)
         self.selling = opts.get('selling')  # Asset
@@ -661,6 +766,32 @@ class ManageOffer(Operation):
 
 
 class CreatePassiveOffer(Operation):
+    """The :class:`CreatePassiveOffer` object, which represents a
+    CreatePassiveOffer operation on Stellar's network.
+
+    A passive offer is an offer that does not act on and take a reverse offer
+    of equal price. Instead, they only take offers of lesser price. For
+    example, if an offer exists to buy 5 BTC for 30 XLM, and you make a passive
+    offer to buy 30 XLM for 5 BTC, your passive offer does not take the first
+    offer.
+
+    Note that regular offers made later than your passive offer can act on and
+    take your passive offer, even if the regular offer is of the same price as
+    your passive offer.
+
+    Passive offers allow market makers to have zero spread. If you want to
+    trade EUR for USD at 1:1 price and USD for EUR also at 1:1, you can create
+    two passive offers so the two offers don’t immediately act on each other.
+
+    Once the passive offer is created, you can manage it like any other offer
+    using the manage offer operation - see :class:`ManageOffer` for more
+    details.
+
+    :param dict opts: A dict of options for creating this
+        :class:`CreatePassiveOffer`.  This class pulls several of the following
+        from opts: 'source', 'selling', 'buying', 'amount', 'price'.
+
+    """
     def __init__(self, opts):
         super(CreatePassiveOffer, self).__init__(opts)
         self.selling = opts.get('selling')
@@ -719,6 +850,19 @@ class CreatePassiveOffer(Operation):
 
 
 class AccountMerge(Operation):
+    """The :class:`AccountMerge` object, which represents a
+    AccountMerge operation on Stellar's network.
+
+    Transfers the native balance (the amount of XLM an account holds) to
+    another account and removes the source account from the ledger.
+
+    Threshold: High
+
+    :param dict opts: A dict of options for creating this
+        :class:`AccountMerge`.  This class pulls several of the following from
+        opts: 'source', 'destination'
+
+    """
     def __init__(self, opts):
         super(AccountMerge, self).__init__(opts)
         self.destination = opts.get('destination')
@@ -756,6 +900,18 @@ class AccountMerge(Operation):
 
 
 class Inflation(Operation):
+    """The :class:`Inflation` object, which represents a
+    Inflation operation on Stellar's network.
+
+    This operation runs inflation.
+
+    Threshold: Low
+
+    :param dict opts: A dict of options for creating this
+        :class:`Inflation`.  This class pulls several of the following from
+        opts: 'source'.
+
+    """
     def __init__(self, opts):
         super(Inflation, self).__init__(opts)
 
@@ -782,6 +938,24 @@ class Inflation(Operation):
 
 
 class ManageData(Operation):
+    """The :class:`ManageData` object, which represents a
+    ManageData operation on Stellar's network.
+
+    Allows you to set,modify or delete a Data Entry (name/value pair) that is
+    attached to a particular account. An account can have an arbitrary amount
+    of DataEntries attached to it. Each DataEntry increases the minimum balance
+    needed to be held by the account.
+
+    DataEntries can be used for application specific things. They are not used
+    by the core Stellar protocol.
+
+    Threshold: Medium
+
+    :param dict opts: A dict of options for creating this :class:`ManageData`.
+        This class pulls several of the following from opts: 'source',
+        'data_name', 'data_value'.
+
+    """
     def __init__(self, opts):
         super(ManageData, self).__init__(opts)
         self.data_name = opts.get('data_name')

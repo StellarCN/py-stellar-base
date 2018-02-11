@@ -56,3 +56,72 @@ Transaction
 .. autoclass:: stellar_base.transaction.Transaction
    :members:
    :inherited-members:
+
+List of Operations
+------------------
+
+Create Account
+^^^^^^^^^^^^^^
+
+.. autoclass:: stellar_base.operation.CreateAccount
+   :members:
+
+Payment
+^^^^^^^
+
+.. autoclass:: stellar_base.operation.Payment
+   :members:
+
+Path Payment
+^^^^^^^^^^^^
+
+.. autoclass:: stellar_base.operation.PathPayment
+   :members:
+
+Manage Offer
+^^^^^^^^^^^^
+
+.. autoclass:: stellar_base.operation.ManageOffer
+   :members:
+
+Create Passive Offer
+^^^^^^^^^^^^^^^^^^^^
+
+.. autoclass:: stellar_base.operation.CreatePassiveOffer
+   :members:
+
+Set Options
+^^^^^^^^^^^
+
+.. autoclass:: stellar_base.operation.SetOptions
+   :members:
+
+Change Trust
+^^^^^^^^^^^^
+
+.. autoclass:: stellar_base.operation.ChangeTrust
+   :members:
+
+Allow Trust
+^^^^^^^^^^^
+
+.. autoclass:: stellar_base.operation.AllowTrust
+   :members:
+
+Account Merge
+^^^^^^^^^^^^^
+
+.. autoclass:: stellar_base.operation.AccountMerge
+   :members:
+
+Inflation
+^^^^^^^^^
+
+.. autoclass:: stellar_base.operation.Inflation
+   :members:
+
+Manage Data
+^^^^^^^^^^^
+
+.. autoclass:: stellar_base.operation.ManageData
+   :members:
