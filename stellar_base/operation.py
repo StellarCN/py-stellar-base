@@ -168,12 +168,29 @@ class Operation(object):
 
 
 class CreateAccount(Operation):
+    """The class:`CreateAccount` object, which represents a Create Account
+    operation on Stellar's network.
+
+    This operation creates and funds a new account with the specified starting
+    balance.
+
+    Threshold: Medium
+
+    :param dict opts: A dict of options for creating this :class:`Operation`.
+        This class pulls a 'source', 'destination', and 'starting_balance' via
+        opts.
+
+    """
     def __init__(self, opts):
         super(CreateAccount, self).__init__(opts)
         self.destination = opts.get('destination')
         self.starting_balance = opts.get('starting_balance')
 
     def to_xdr_object(self):
+        """Creates an XDR Operation object that represents this
+        :class:`CreateAccount`.
+
+        """
         destination = account_xdr_object(self.destination)
 
         create_account_op = Xdr.types.CreateAccountOp(
@@ -184,6 +201,10 @@ class CreateAccount(Operation):
 
     @classmethod
     def from_xdr_object(cls, op_xdr_object):
+        """Creates a :class:`CreateAccount` object from an XDR Operation
+        object.
+
+        """
         if not op_xdr_object.sourceAccount:
             source = None
         else:
@@ -211,6 +232,10 @@ class Payment(Operation):
         self.amount = opts.get('amount')
 
     def to_xdr_object(self):
+        """Creates an XDR Operation object that represents this
+        :class:`Payment`.
+
+        """
         asset = self.asset.to_xdr_object()
         destination = account_xdr_object(self.destination)
 
@@ -223,6 +248,10 @@ class Payment(Operation):
 
     @classmethod
     def from_xdr_object(cls, op_xdr_object):
+        """Creates a :class:`Payment` object from an XDR Operation
+        object.
+
+        """
         if not op_xdr_object.sourceAccount:
             source = None
         else:
@@ -254,6 +283,10 @@ class PathPayment(Operation):
         self.path = opts.get('path')  # a list of paths/assets
 
     def to_xdr_object(self):
+        """Creates an XDR Operation object that represents this
+        :class:`PathPayment`.
+
+        """
         destination = account_xdr_object(self.destination)
         send_asset = self.send_asset.to_xdr_object()
         dest_asset = self.dest_asset.to_xdr_object()
@@ -267,6 +300,10 @@ class PathPayment(Operation):
 
     @classmethod
     def from_xdr_object(cls, op_xdr_object):
+        """Creates a :class:`PathPayment` object from an XDR Operation
+        object.
+
+        """
         if not op_xdr_object.sourceAccount:
             source = None
         else:
@@ -311,6 +348,10 @@ class ChangeTrust(Operation):
             self.limit = "922337203685.4775807"
 
     def to_xdr_object(self):
+        """Creates an XDR Operation object that represents this
+        :class:`ChangeTrust`.
+
+        """
         line = self.line.to_xdr_object()
         limit = Operation.to_xdr_amount(self.limit)
 
@@ -321,6 +362,10 @@ class ChangeTrust(Operation):
 
     @classmethod
     def from_xdr_object(cls, op_xdr_object):
+        """Creates a :class:`ChangeTrust` object from an XDR Operation
+        object.
+
+        """
         if not op_xdr_object.sourceAccount:
             source = None
         else:
@@ -346,6 +391,10 @@ class AllowTrust(Operation):
         self.authorize = opts.get('authorize')
 
     def to_xdr_object(self):
+        """Creates an XDR Operation object that represents this
+        :class:`AllowTrust`.
+
+        """
         trustor = account_xdr_object(self.trustor)
         length = len(self.asset_code)
         assert length <= 12
@@ -368,6 +417,10 @@ class AllowTrust(Operation):
 
     @classmethod
     def from_xdr_object(cls, op_xdr_object):
+        """Creates a :class:`AllowTrust` object from an XDR Operation
+        object.
+
+        """
         if not op_xdr_object.sourceAccount:
             source = None
         else:
@@ -441,6 +494,10 @@ class SetOptions(Operation):
             raise Exception('hashX or preAuthTx Signer must be 32 bytes')
 
     def to_xdr_object(self):
+        """Creates an XDR Operation object that represents this
+        :class:`SetOptions`.
+
+        """
         def assert_option_array(x):
             if x is None:
                 return []
@@ -484,6 +541,10 @@ class SetOptions(Operation):
 
     @classmethod
     def from_xdr_object(cls, op_xdr_object):
+        """Creates a :class:`SetOptions` object from an XDR Operation
+        object.
+
+        """
         if not op_xdr_object.sourceAccount:
             source = None
         else:
@@ -549,6 +610,10 @@ class ManageOffer(Operation):
         self.offer_id = opts.get('offer_id', 0)
 
     def to_xdr_object(self):
+        """Creates an XDR Operation object that represents this
+        :class:`ManageOffer`.
+
+        """
         selling = self.selling.to_xdr_object()
         buying = self.buying.to_xdr_object()
         price = best_r(self.price)
@@ -564,6 +629,10 @@ class ManageOffer(Operation):
 
     @classmethod
     def from_xdr_object(cls, op_xdr_object):
+        """Creates a :class:`ManageOffer` object from an XDR Operation
+        object.
+
+        """
         if not op_xdr_object.sourceAccount:
             source = None
         else:
@@ -600,6 +669,10 @@ class CreatePassiveOffer(Operation):
         self.price = opts.get('price')
 
     def to_xdr_object(self):
+        """Creates an XDR Operation object that represents this
+        :class:`CreatePassiveOffer`.
+
+        """
         selling = self.selling.to_xdr_object()
         buying = self.buying.to_xdr_object()
 
@@ -616,6 +689,10 @@ class CreatePassiveOffer(Operation):
 
     @classmethod
     def from_xdr_object(cls, op_xdr_object):
+        """Creates a :class:`CreatePassiveOffer` object from an XDR Operation
+        object.
+
+        """
         if not op_xdr_object.sourceAccount:
             source = None
         else:
@@ -647,6 +724,10 @@ class AccountMerge(Operation):
         self.destination = opts.get('destination')
 
     def to_xdr_object(self):
+        """Creates an XDR Operation object that represents this
+        :class:`AccountMerge`.
+
+        """
         destination = account_xdr_object(self.destination)
 
         self.body.type = Xdr.const.ACCOUNT_MERGE
@@ -655,6 +736,10 @@ class AccountMerge(Operation):
 
     @classmethod
     def from_xdr_object(cls, op_xdr_object):
+        """Creates a :class:`AccountMerge` object from an XDR Operation
+        object.
+
+        """
         if not op_xdr_object.sourceAccount:
             source = None
         else:
@@ -675,11 +760,19 @@ class Inflation(Operation):
         super(Inflation, self).__init__(opts)
 
     def to_xdr_object(self):
+        """Creates an XDR Operation object that represents this
+        :class:`Inflation`.
+
+        """
         self.body.type = Xdr.const.INFLATION
         return super(Inflation, self).to_xdr_object()
 
     @classmethod
     def from_xdr_object(cls, op_xdr_object):
+        """Creates a :class:`Inflation` object from an XDR Operation
+        object.
+
+        """
         if not op_xdr_object.sourceAccount:
             source = None
         else:
@@ -703,6 +796,10 @@ class ManageData(Operation):
                 "Data or value should be <= 64 bytes (ascii encoded).")
 
     def to_xdr_object(self):
+        """Creates an XDR Operation object that represents this
+        :class:`ManageData`.
+
+        """
         data_name = bytearray(self.data_name, encoding='utf-8')
 
         if self.data_value is not None:
@@ -716,6 +813,10 @@ class ManageData(Operation):
 
     @classmethod
     def from_xdr_object(cls, op_xdr_object):
+        """Creates a :class:`ManageData` object from an XDR Operation
+        object.
+
+        """
         if not op_xdr_object.sourceAccount:
             source = None
         else:
