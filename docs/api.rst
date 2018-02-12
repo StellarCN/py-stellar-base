@@ -5,17 +5,33 @@ API Documentation
 
 .. module:: stellar_base
 
+Address
+-------
+
+.. autoclass:: stellar_base.address.Address
+   :members:
+   :inherited-members:
+
 Asset
 -----
 
 .. autoclass:: stellar_base.asset.Asset
    :members:
+   :inherited-members:
+
+Horizon
+-------
+
+.. autoclass:: stellar_base.horizon.Horizon
+   :members:
+   :inherited-members:
 
 Keypair
 -------
 
 .. autoclass:: stellar_base.keypair.Keypair
    :members:
+   :inherited-members:
 
 Memo
 ----

@@ -90,8 +90,7 @@ class Transaction(object):
         transaction's list of operations, i.e. every operation in the
         transaction should be unique.
 
-        :param operation: The operation to add to this transaction.
-        :type operation: Operation
+        :param Operation operation: The operation to add to this transaction.
 
         """
         if operation not in self.operations:
