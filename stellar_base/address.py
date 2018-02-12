@@ -77,9 +77,9 @@ class Address(object):
         * Data
 
         :raises AccountNotExistError: If the account does not exist, shown by a
-        404 response from a Horizon server.
+            404 response from a Horizon server.
         :raises Exception: If any other problems come up, or if a network
-        connection happens.
+            connection happens.
 
         """
         try:

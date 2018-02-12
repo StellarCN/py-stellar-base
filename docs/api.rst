@@ -1,7 +1,11 @@
 .. _api:
 
+*****************
 API Documentation
-=================
+*****************
+
+Classes
+=======
 
 .. module:: stellar_base
 
@@ -140,4 +144,10 @@ Manage Data
 ^^^^^^^^^^^
 
 .. autoclass:: stellar_base.operation.ManageData
+   :members:
+
+Federation
+==========
+
+.. automodule:: stellar_base.federation
    :members:
