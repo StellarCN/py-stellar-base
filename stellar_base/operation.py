@@ -4,9 +4,8 @@ from decimal import *
 
 from .asset import Asset
 from .stellarxdr import Xdr
-from .utils import account_xdr_object, signer_key_xdr_object, encode_check, best_rational_approximation as best_r, \
-    division
-from .utils import XdrLengthError
+from .utils import account_xdr_object, signer_key_xdr_object, encode_check, best_rational_approximation as best_r, division, decode_check
+from .utils import XdrLengthError, DecodeError
 
 ONE = Decimal(10 ** 7)
 
