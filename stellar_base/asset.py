@@ -74,7 +74,7 @@ class Asset(object):
         return cls(code, issuer)
 
     @classmethod
-    def from_xdr(cls,xdr):
+    def from_xdr(cls, xdr):
         xdr_decoded = base64.b64decode(xdr)
         asset = Xdr.StellarXDRUnpacker(xdr_decoded)
         asset_xdr_object = asset.unpack_Asset()

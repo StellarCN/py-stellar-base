@@ -2,7 +2,7 @@
 # Installation
 
 ## Install
-    `pip install stellar-base`
+`pip install stellar-base`
 # Quick Start
 
 ## 1. Create a Stellar key pair
@@ -32,8 +32,8 @@ kp = Keypair.deterministic(m, lang='chinese')
 ```
 And we can use the mnemonic string `m` to generate multiple key pairs:
 ```python
-    kp1 = Keypair.deterministic(m, lang='chinese', index=1)
-    kp2 = Keypair.deterministic(m, lang='chinese', index=2)
+kp1 = Keypair.deterministic(m, lang='chinese', index=1)
+kp2 = Keypair.deterministic(m, lang='chinese', index=2)
 ```
 After the key pair generation, we can get a public key and a seed from it:
 ```python

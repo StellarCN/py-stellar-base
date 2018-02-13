@@ -30,8 +30,8 @@ class TestOp:
         return envelope_b64
 
     def test_to_xdr_amount(self):
-        assert(Operation.to_xdr_amount("20") == 20*10**7)
-        assert(Operation.to_xdr_amount("0.1234567") == 1234567)
+        assert (Operation.to_xdr_amount("20") == 20 * 10 ** 7)
+        assert (Operation.to_xdr_amount("0.1234567") == 1234567)
 
     @raises(Exception)
     def test_to_xdr_amount_inexact(self):
@@ -46,10 +46,10 @@ class TestOp:
         Operation.to_xdr_amount(0.1234)
 
     def test_from_xdr_amount(self):
-        assert(Operation.from_xdr_amount(10**7) == "1")
-        assert(Operation.from_xdr_amount(20*10**7) == "20")
-        assert(Operation.from_xdr_amount(1234567) == "0.1234567")
-        assert(Operation.from_xdr_amount(112345678) == "11.2345678")
+        assert (Operation.from_xdr_amount(10 ** 7) == "1")
+        assert (Operation.from_xdr_amount(20 * 10 ** 7) == "20")
+        assert (Operation.from_xdr_amount(1234567) == "0.1234567")
+        assert (Operation.from_xdr_amount(112345678) == "11.2345678")
 
     def test_createAccount_min(self):
         result = b'AAAAANNSjN1wrdfixw+4w0zmKXvxxikg6EKMi9SW1DnNPhNjAAAAZAAAAAAAAAACAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAra4WiCvFr/vydTiUbSQF0HwkqErP8wc6BUQav3qSQI4AAAAAAJiWgAAAAAAAAAABzT4TYwAAAEBBR+eUTPqpyTBLiNMudfSl2AN+oZL9/yp0KE9SyYeIzM2Y7yQH+dGNlwz5PMaaCEGAD+82IZkAPSDyunElc+EP'
@@ -241,6 +241,7 @@ class TestunXdr:
         result = b'AAAAANNSjN1wrdfixw+4w0zmKXvxxikg6EKMi9SW1DnNPhNjAAAAZAAAAAAAAAACAAAAAAAAAAAAAAABAAAAAAAAAAUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAc0+E2MAAABAymdhj3dFg+3TcCRILXdUu8ZhG3WOuBmX3YXcYJhYemjCDylQEk31vF8wxB/ntRg4/vmCYC2IwhBtw1mJZ8h+Bw=='
         assert (result == Te.from_xdr(result).xdr())
 
+
 class TestMultiOp:
     def __init__(self):
         self.address = 'GDJVFDG5OCW5PYWHB64MGTHGFF57DRRJEDUEFDEL2SLNIOONHYJWHA3Z'
@@ -273,12 +274,12 @@ class TestMultiOp:
         }
         for opt, value in kwargs.items():
             opts[opt] = value
-        tx = Transaction( source=self.address, opts=opts)
+        tx = Transaction(source=self.address, opts=opts)
         for count, op in enumerate(args):
-            tx.add_operation( operation=op )
-        envelope = Te( tx=tx, opts={"network_id": "TESTNET"} )
-        signer = Keypair.from_seed( seed=self.seed )
-        envelope.sign( keypair=signer )
+            tx.add_operation(operation=op)
+        envelope = Te(tx=tx, opts={"network_id": "TESTNET"})
+        signer = Keypair.from_seed(seed=self.seed)
+        envelope.sign(keypair=signer)
         envelope_b64 = envelope.xdr()
         print(envelope_b64)
         return envelope_b64
@@ -294,7 +295,7 @@ class TestMultiOp:
                 'destination': self.accounts[1]['address'],
                 'starting_balance': "40",
             }),
-            ))
+        ))
 
     def test_double_payment(self):
         result = b'AAAAANNSjN1wrdfixw+4w0zmKXvxxikg6EKMi9SW1DnNPhNjAAAAyAAAAAAAAAACAAAAAAAAAAAAAAACAAAAAAAAAAEAAAAAlMoegcSS0iHsTrJ5XNJH1ri4rO05uVmRHX6dbOj22fgAAAAAAAAAAAvrwgAAAAAAAAAAAQAAAABNqbPPMcFohrLf2BM4UPn/CB/t1jVq0x9DBET5ki/XaAAAAAAAAAAAF9eEAAAAAAAAAAABzT4TYwAAAEAhTZr3nE2w9LBziL54UuyuEgUa4MJaXfMnZpHpu9+TYgPaDE3M6DNe6Du8ZSSC89LCGfpS1Fs38JB0U5rikmMP'
@@ -309,7 +310,7 @@ class TestMultiOp:
                 'asset': Asset.native(),
                 'amount': "40",
             }),
-            ))
+        ))
 
     def test_mix_1(self):
         result = b'AAAAANNSjN1wrdfixw+4w0zmKXvxxikg6EKMi9SW1DnNPhNjAAADhAAAAAAAAAACAAAAAAAAAAAAAAAJAAAAAAAAAAAAAAAAlMoegcSS0iHsTrJ5XNJH1ri4rO05uVmRHX6dbOj22fgAAAAAC+vCAAAAAAAAAAABAAAAAE2ps88xwWiGst/YEzhQ+f8IH+3WNWrTH0MERPmSL9doAAAAAAAAAAAL68IAAAAAAAAAAAIAAAAAAAAAAAvrwgAAAAAAoEATyhnfBjtgSGL5Fr4oHlw/X4bIYnH44zIpor2MQbUAAAAAAAAAAAvrwgAAAAAAAAAAAAAAAAMAAAABYmVlcgAAAACUyh6BxJLSIexOsnlc0kfWuLis7Tm5WZEdfp1s6PbZ+AAAAAFiZWVyAAAAAE2ps88xwWiGst/YEzhQ+f8IH+3WNWrTH0MERPmSL9doAAAAADuaygAABMsvAAGGoAAAAAAAAAABAAAAAAAAAAQAAAABYmVlcgAAAABNqbPPMcFohrLf2BM4UPn/CB/t1jVq0x9DBET5ki/XaAAAAAFiZWVyAAAAAKBAE8oZ3wY7YEhi+Ra+KB5cP1+GyGJx+OMyKaK9jEG1AAAAADuaygAABMsvAAGGoAAAAAAAAAAFAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYAAAABYmVlcgAAAACUyh6BxJLSIexOsnlc0kfWuLis7Tm5WZEdfp1s6PbZ+H//////////AAAAAAAAAAcAAAAAlMoegcSS0iHsTrJ5XNJH1ri4rO05uVmRHX6dbOj22fgAAAABYmVlcgAAAAEAAAAAAAAACAAAAACUyh6BxJLSIexOsnlc0kfWuLis7Tm5WZEdfp1s6PbZ+AAAAAAAAAABzT4TYwAAAECnD5OPLjCC3vjtrsffS0fekR0rEgJZoDvJrOdp2G4LBKWLPsH4ZKVVGiOxPq2akIowWckiYXwZG45/mSLSbloN'

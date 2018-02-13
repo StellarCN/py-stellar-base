@@ -37,7 +37,6 @@ class TransactionEnvelope(object):
         else:
             self.signatures.append(sig)
 
-
     def hash_meta(self):
         return xdr_hash(self.signature_base())
 
