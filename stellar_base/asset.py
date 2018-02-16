@@ -15,13 +15,19 @@ class Asset(object):
 
         self.code = code
         self.issuer = issuer
-        self.type = self.guessAssetType()
+        self.type = self.guess_asset_type()
 
     def __eq__(self, other):
         return self.xdr() == other.xdr()
 
-    def guessAssetType(self):
-        return len(self.code) > 4 and 'credit_alphanum12' or 'credit_alphanum4'
+    def guess_asset_type(self):
+        if self.code.lower() == 'xlm' and self.issuer is None:
+            asset_type = 'native'
+        elif len(self.code) > 4:
+            asset_type = 'credit_alphanum12'
+        else:
+            asset_type = 'credit_alphanum4'
+        return asset_type
 
     def to_dict(self):
         rv = {'asset_code': self.code}
@@ -66,10 +72,12 @@ class Asset(object):
         if asset_xdr_object.type == Xdr.const.ASSET_TYPE_NATIVE:
             return Asset.native()
         elif asset_xdr_object.type == Xdr.const.ASSET_TYPE_CREDIT_ALPHANUM4:
-            issuer = encode_check('account', asset_xdr_object.alphaNum4.issuer.ed25519).decode()
+            issuer = encode_check(
+                'account', asset_xdr_object.alphaNum4.issuer.ed25519).decode()
             code = asset_xdr_object.alphaNum4.assetCode.decode().rstrip('\x00')
         else:
-            issuer = encode_check('account', asset_xdr_object.alphaNum12.issuer.ed25519).decode()
+            issuer = encode_check(
+                'account', asset_xdr_object.alphaNum12.issuer.ed25519).decode()
             code = asset_xdr_object.alphaNum12.assetCode.decode().rstrip('\x00')
         return cls(code, issuer)
 
