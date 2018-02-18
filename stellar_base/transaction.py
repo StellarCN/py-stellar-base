@@ -44,7 +44,7 @@ class Transaction(object):
         * opts.time_bounds - A list of two Unix timestamps representing the
           lower and upper bound of when a given transaction will be valid.
           NOTE: This should likely be an object containing a minTime and
-          maxTime attribute instead.
+          maxTime attribute instead, and the implementation may change.
         * opts.memo - The memo being sent with the transaction, being
           represented as one of the subclasses of the
           :class:`Memo <stellar_base.memo.Memo>` object.

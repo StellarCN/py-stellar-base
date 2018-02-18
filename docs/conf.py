@@ -99,7 +99,10 @@ html_theme = 'alabaster'
 # documentation.
 #
 html_theme_options = {
-    'show_related': True
+    'show_related': True,
+    'github_user': 'StellarCN',
+    'github_repo': 'py-stellar-base',
+    'github_banner': True,
 }
 
 # Add any paths that contain custom static files (such as style sheets) here,
@@ -113,9 +116,15 @@ html_static_path = ['_static']
 # This is required for the alabaster theme
 # refs: http://alabaster.readthedocs.io/en/latest/installation.html#sidebars
 html_sidebars = {
-    '**': [
+    'index': [
         'about.html',
         'navigation.html',
+        'relations.html',  # needs 'show_related': True theme option to display
+        'searchbox.html',
+    ],
+    '**': [
+        'about.html',
+        'localtoc.html',
         'relations.html',  # needs 'show_related': True theme option to display
         'searchbox.html',
     ]

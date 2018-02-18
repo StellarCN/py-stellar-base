@@ -807,6 +807,9 @@ class CreatePassiveOffer(Operation):
         selling = self.selling.to_xdr_object()
         buying = self.buying.to_xdr_object()
 
+        # FIXME: This assume that self.price is always an integer, however it
+        # could be a tuple/dict of a numerator and denominator. This should do
+        # type checking (similar to the JS library).
         price = best_r(self.price)
         price = Xdr.types.Price(price['n'], price['d'])
 

@@ -4,6 +4,7 @@
 API Documentation
 *****************
 
+
 Classes
 =======
 
@@ -20,6 +21,13 @@ Asset
 -----
 
 .. autoclass:: stellar_base.asset.Asset
+   :members:
+   :inherited-members:
+
+Builder
+-------
+
+.. autoclass:: stellar_base.builder.Builder
    :members:
    :inherited-members:
 
@@ -45,23 +53,18 @@ Memo
 
 .. autoclass:: stellar_base.memo.NoneMemo
    :members:
-   :inherited-members:
 
 .. autoclass:: stellar_base.memo.TextMemo
    :members:
-   :inherited-members:
 
 .. autoclass:: stellar_base.memo.IdMemo
    :members:
-   :inherited-members:
 
 .. autoclass:: stellar_base.memo.HashMemo
    :members:
-   :inherited-members:
 
 .. autoclass:: stellar_base.memo.RetHashMemo
    :members:
-   :inherited-members:
 
 Operation
 ---------
