@@ -86,6 +86,13 @@ Transaction
    :members:
    :inherited-members:
 
+TransactionEnvelope
+-------------------
+
+.. autoclass:: stellar_base.transaction_envelope.TransactionEnvelope
+   :members:
+   :inherited-members:
+
 List of Operations
 ------------------
 

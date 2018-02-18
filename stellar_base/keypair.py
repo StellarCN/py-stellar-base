@@ -211,6 +211,7 @@ class Keypair(object):
     def sign(self, data):
         """Sign a bytes-like object using the signing (private) key.
 
+        :param bytes data: The data to sign
         :return: The signed data
         :rtype: bytes
         """
@@ -236,11 +237,29 @@ class Keypair(object):
         return self.verifying_key.verify(signature, data)
 
     def sign_decorated(self, data):
+        """Sign a bytes-like object and return the decorated signature.
+
+        Sign a bytes-like object by signing the data using the signing
+        (private) key, and return a decorated signature, which includes the
+        last four bytes of the public key as a signature hint to go along with
+        the signature as an XDR DecoratedSignature object.
+
+        :param bytes data: A sequence of bytes to sign, typically a
+            transaction.
+
+        """
         signature = self.sign(data)
         hint = self.signature_hint()
         return Xdr.types.DecoratedSignature(hint, signature)
 
     def signature_hint(self):
+        """Get the signature hint derived from the public key in this
+        :class:`Keypair`.
+
+        Get the last four bytes of the public key to be used as a signature
+        hint when utilizing decorated signatures.
+
+        """
         return bytes(self.public_key().ed25519[-4:])
 
     def to_old_address(self):
