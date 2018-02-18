@@ -66,6 +66,12 @@ Memo
 .. autoclass:: stellar_base.memo.RetHashMemo
    :members:
 
+Network
+-------
+
+.. automodule:: stellar_base.network
+   :members:
+
 Operation
 ---------
 
