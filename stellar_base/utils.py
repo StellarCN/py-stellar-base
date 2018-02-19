@@ -97,6 +97,10 @@ class ConfigurationError(StellarError):
     pass
 
 
+class HorizonError(StellarError):
+    pass
+
+
 class XdrLengthError(StellarError):
     pass
 

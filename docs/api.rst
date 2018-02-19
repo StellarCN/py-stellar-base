@@ -31,13 +31,6 @@ Builder
    :members:
    :inherited-members:
 
-Horizon
--------
-
-.. autoclass:: stellar_base.horizon.Horizon
-   :members:
-   :inherited-members:
-
 Keypair
 -------
 
@@ -167,3 +160,14 @@ Federation
 
 .. automodule:: stellar_base.federation
    :members:
+
+Horizon
+=======
+
+.. autoclass:: stellar_base.horizon.Horizon
+   :members:
+   :inherited-members:
+
+.. autofunction:: stellar_base.horizon.horizon_testnet
+
+.. autofunction:: stellar_base.horizon.horizon_livenet
