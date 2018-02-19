@@ -14,7 +14,9 @@ class Address(object):
 
     An :class:`Address` is initialized via a public key string, or derived via
     a secret seed. The network on which the account exists is also specified,
-    as it is used to verify and set attributes via connecting to Horizon.
+    as it is used to verify and set attributes via connecting to Horizon. It
+    mostly exists as a helper class for Horizon operations on a given account
+    ID.
 
     :param str address: The address string that represents this
         :class:`Address`.

@@ -61,6 +61,8 @@ class Horizon(object):
             return messages
         else:
             try:
+                # FIXME: We should really consider raising the HTTPError when
+                # it happens and wrapping its JSON response in a HorizonError
                 resp = self.session.request(
                     verb, url, timeout=self.timeout, **kwargs)
                 return resp.json()
