@@ -29,7 +29,7 @@ methods.
 
 
 Indices
-=======
+-------
 
 * :ref:`genindex`
 * :ref:`modindex`
