@@ -8,7 +8,7 @@ with codecs.open('README.md', encoding='utf-8') as file:
 
 setup(
     name='stellar-base',
-    version='0.1.7',
+    version='0.1.8',
     description='stellar-base in python.',
     long_description=long_description,
     url='http://github.com/stellarCN/py-stellar-base/',

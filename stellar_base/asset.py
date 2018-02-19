@@ -40,13 +40,19 @@ class Asset(object):
 
         self.code = code
         self.issuer = issuer
-        self.type = self.guessAssetType()
+        self.type = self.guess_asset_type()
 
     def __eq__(self, other):
         return self.xdr() == other.xdr()
 
-    def guessAssetType(self):
-        return len(self.code) > 4 and 'credit_alphanum12' or 'credit_alphanum4'
+    def guess_asset_type(self):
+        if self.code.lower() == 'xlm' and self.issuer is None:
+            asset_type = 'native'
+        elif len(self.code) > 4:
+            asset_type = 'credit_alphanum12'
+        else:
+            asset_type = 'credit_alphanum4'
+        return asset_type
 
     def to_dict(self):
         """Generate a dict for this object's attributes.

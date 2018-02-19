@@ -10,6 +10,7 @@ class TestAsset:
     def test_native(self):
         assert 'XLM' == Asset.native().code
         assert None == Asset.native().issuer
+        assert 'native' == Asset.native().type
 
     def test_is_native(self):
         native = Asset('XLM')

@@ -7,8 +7,7 @@ from .asset import Asset
 from .stellarxdr import Xdr
 from .utils import (
     account_xdr_object, best_rational_approximation as best_r, decode_check,
-    division, encode_check, signer_key_xdr_object, DecodeError)
-from .utils import XdrLengthError
+    division, encode_check, signer_key_xdr_object, DecodeError, XdrLengthError)
 
 ONE = Decimal(10 ** 7)
 
