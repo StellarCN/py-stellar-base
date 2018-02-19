@@ -13,6 +13,7 @@ Here you'll find some basic examples on how to use the libary.
 .. toctree::
    :maxdepth: 2
 
+   install
    quickstart
 
 API Documentation
