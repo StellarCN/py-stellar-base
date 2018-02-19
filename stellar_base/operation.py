@@ -562,11 +562,11 @@ class SetOptions(Operation):
                     'Must be a valid strkey if not give signer_type')
             self.signer_type = 'ed25519PublicKey'
 
-        signer_is_valid_type = (
+        signer_is_invalid_type = (
             self.signer_type is not None and
-            self.signer_type in ('ed25519PublicKey', 'hashX', 'preAuthTx'))
+            self.signer_type not in ('ed25519PublicKey', 'hashX', 'preAuthTx'))
 
-        if not signer_is_valid_type:
+        if signer_is_invalid_type:
             # FIXME: Throw better exception
             raise Exception('invalid signer type.')
 

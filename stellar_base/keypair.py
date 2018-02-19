@@ -39,7 +39,7 @@ class Keypair(object):
         # FIXME: Throw more specific exceptions instead of assert statements.
         assert type(verifying_key) is ed25519.VerifyingKey
         self.verifying_key = verifying_key
-        if self.signing_key is not None:
+        if signing_key is not None:
             assert type(signing_key) is ed25519.SigningKey
             self.signing_key = signing_key
 

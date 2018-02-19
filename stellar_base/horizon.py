@@ -87,16 +87,16 @@ class Horizon(object):
         `POST /transactions
         <https://www.stellar.org/developers/horizon/reference/endpoints/transactions-create.html>`_
 
-        :param te: The transaction envelope to submit
-        :type te: :class:`TransactionEnvelope
-            <stellar_base.transaction_envelope.TransactionEnvelope>`
+        Uses form-encoded data to send over to Horizon.
+
+        :param bytes te: The transaction envelope to submit
         :return: The JSON response indicating the success/failure of the
             submitted transaction.
         :rtype: dict
 
         """
         payload = {'tx': te}
-        return self._post('/transactions', json=payload, **kwargs)
+        return self._post('/transactions', data=payload, **kwargs)
 
     def account(self, address, **kwargs):
         """Returns information and links relating to a single account.
