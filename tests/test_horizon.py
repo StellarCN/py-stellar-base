@@ -36,7 +36,6 @@ class TestMethods:
         signer = Keypair.from_seed(seed=self.seed)
         envelope.sign(keypair=signer)
         envelope_xdr = envelope.xdr()
-        print(envelope_xdr)
         return envelope_xdr
 
     def test_submit(self):

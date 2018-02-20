@@ -1,0 +1,23 @@
+[[source]]
+
+url = "https://pypi.python.org/simple"
+verify_ssl = true
+name = "pypi"
+
+
+[packages]
+
+sphinx = "~=1.6"
+"crc16" = "~=0.1.1"
+"ed25519" = "~=1.4"
+mnemonic = "~=0.18"
+numpy = "~=1.14"
+requests = "~=2.18"
+sseclient = "~=0.0.18"
+toml = "~=0.9.4"
+nose = "*"
+mock = "*"
+
+
+[dev-packages]
+

@@ -8,6 +8,8 @@ from stellar_base.keypair import Keypair
 from stellar_base.utils import SignatureExistError
 
 
+# TODO: These endpoints really need to be mocked out.
+
 class TestBuilder(object):
     def __init__(self):
 
