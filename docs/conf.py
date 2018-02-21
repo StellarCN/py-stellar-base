@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
-# PyStellar documentation build configuration file, created by
+# py-stellar-base documentation build configuration file, created by
 # sphinx-quickstart on Sat Jan 20 11:58:02 2018.
 #
 # This file is execfile()d with the current directory set to its
@@ -20,7 +20,7 @@
 import os
 import sys
 
-# Insert PyStellar's Path for Autodoc
+# Insert py-stellar-base's Path for Autodoc
 sys.path.insert(0, os.path.abspath('..'))
 
 
@@ -55,7 +55,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = 'PyStellar'
+project = 'py-stellar-base'
 copyright = '2018, Stellar Community'
 author = 'Stellar Community'
 
@@ -102,7 +102,7 @@ html_theme_options = {
     'show_related': True,
     'github_user': 'StellarCN',
     'github_repo': 'py-stellar-base',
-    'github_banner': True,
+    'github_banner': False,
 }
 
 # Add any paths that contain custom static files (such as style sheets) here,
@@ -134,7 +134,7 @@ html_sidebars = {
 # -- Options for HTMLHelp output ------------------------------------------
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'PyStellardoc'
+htmlhelp_basename = 'py-stellar-basedoc'
 
 
 # -- Options for LaTeX output ---------------------------------------------
@@ -161,7 +161,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'PyStellar.tex', 'PyStellar Documentation',
+    (master_doc, 'py-stellar-base.tex', 'py-stellar-base Documentation',
      'Stellar Community', 'manual'),
 ]
 
@@ -171,7 +171,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'pystellar', 'PyStellar Documentation',
+    (master_doc, 'pystellar', 'py-stellar-base Documentation',
      [author], 1)
 ]
 
@@ -182,7 +182,7 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'PyStellar', 'PyStellar Documentation',
-     author, 'PyStellar', 'One line description of project.',
+    (master_doc, 'py-stellar-base', 'py-stellar-base Documentation',
+     author, 'py-stellar-base', 'One line description of project.',
      'Miscellaneous'),
 ]

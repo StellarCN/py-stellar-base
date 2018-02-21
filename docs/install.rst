@@ -4,10 +4,10 @@
 Installation
 ************
 
-Via pipenv (or pip)
-===================
+Via pipenv or pip (Recommended)
+===============================
 
-To install PyStellar, use pipenv to install the module:
+To install py-stellar-base, use pipenv to install the module:
 
 .. code-block:: bash
 
@@ -21,9 +21,15 @@ and dependencies can be found over in the `Hitchhiker's Guide to Python
 Via Source Code
 ===============
 
-You can always clone `the repository
-<https://github.com/StellarCN/py-stellar-base>`_ directly, and install it
-locally:
+Please use the code on pypi whenever possible. The latest code may be unstable.
+
+You can install it from source code via pip:
+
+.. code-block:: bash
+
+    pip install git+git://github.com/StellarCN/py-stellar-base
+
+And you can always clone `the repository <https://github.com/StellarCN/py-stellar-base>`_ directly, and install it locally:
 
 .. code-block:: bash
 

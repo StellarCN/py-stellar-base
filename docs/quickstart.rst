@@ -165,7 +165,7 @@ account of your own, here's an example of how to do so:
 
    # This is the new account ID (the StrKey representation of your newly
    # created public key). This is the destination account.
-   new_account_addr = "XXX"
+   new_account_addr = "GXXX"
 
    amount = '1' # Your new account minimum balance (in XLM) to transfer over
    # create the CreateAccount operation
@@ -178,7 +178,10 @@ account of your own, here's an example of how to do so:
 
    # Get the current sequence of the source account by contacting Horizon. You
    # should also check the response for errors!
-   sequence = horizon.account(old_account_keypair.address()).get('sequence')
+   # Python 3
+   sequence = horizon.account(old_account_keypair.address().decode()).get('sequence')
+   # Python 2
+   # sequence = horizon.account(old_account_keypair.address()).get('sequence')
 
    # Create a transaction with our single create account operation, with the
    # default fee of 100 stroops as of this writing (0.00001 XLM)
@@ -308,7 +311,7 @@ way:
    builder = Builder(secret=seed)
    # builder = Builder(secret=seed, network='public') for LIVENET
 
-   bob_address = 'XXX'
+   bob_address = 'GXXX'
    builder.append_payment_op(bob_address, '100', 'XLM')
    builder.add_text_memo('For beers') # string length <= 28 bytes
    builder.sign()
@@ -340,7 +343,7 @@ this, you use :meth:`import_from_xdr
 .. code-block:: python
 
    # This is the transaction that you need to add your signature to
-   xdr_string = 'XXX'
+   xdr_string = 'GXXX'
    builder = Builder(secret=seed)
    builder.import_from_xdr(xdr_string)
    builder.sign()
@@ -396,11 +399,10 @@ In this example, Alice is sending Bob 100 CNY.
    memo = TextMemo('For beers yesterday!)
 
    # Get the current sequence of Alice
-   # Python 2
-   sequence = horizon.account(alice_kp.address()).get('sequence')
    # Python 3
-   # sequence = horizon.account(
-   #     alice_kp.address().decode('utf-8')).get('sequence')
+   sequence = horizon.account(alice_kp.address().decode('utf-8')).get('sequence')
+   # Python 2
+   # sequence = horizon.account(alice_kp.address()).get('sequence')
 
    # Construct a transaction
    tx = Transaction(
