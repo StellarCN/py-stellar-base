@@ -396,7 +396,7 @@ In this example, Alice is sending Bob 100 CNY.
        'amount': amount
    })
    # create a memo
-   memo = TextMemo('For beers yesterday!)
+   msg = TextMemo('For beers yesterday!')
 
    # Get the current sequence of Alice
    # Python 3
