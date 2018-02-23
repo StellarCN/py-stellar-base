@@ -747,9 +747,8 @@ class Builder(object):
         """
         sequence = str(int(self.sequence) + 1)
         next_builder = Builder(
-            horizon=self.horizon.horizon, network=self.network,
-            sequence=sequence, fee=self.fee)
-        next_builder.address = self.address
+            horizon=self.horizon.horizon, address=self.address,
+            network=self.network, sequence=sequence, fee=self.fee)
         next_builder.key_pair = self.key_pair
         return next_builder
 
