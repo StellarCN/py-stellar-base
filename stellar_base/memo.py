@@ -2,7 +2,7 @@
 import base64
 
 from .stellarxdr import Xdr
-from .utils import XdrLengthError
+from .exceptions import XdrLengthError
 
 # TODO: Consider using six throughout the library?
 # Compatibility for Python 3.x that don't have unicode type

@@ -3,8 +3,8 @@
 import base64
 import re
 
-from .utils import (
-    StellarError, XdrLengthError, account_xdr_object, encode_check)
+from .utils import account_xdr_object, encode_check
+
 from .stellarxdr import Xdr
 
 

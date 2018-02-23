@@ -4,7 +4,7 @@ import requests
 
 from .horizon import Horizon
 from .keypair import Keypair
-from .utils import AccountNotExistError, NotValidParamError
+from .exceptions import AccountNotExistError, NotValidParamError
 from .horizon import HORIZON_LIVE, HORIZON_TEST
 
 

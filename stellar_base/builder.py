@@ -9,7 +9,7 @@ from .network import NETWORKS, Network
 from . import operation
 from .transaction import Transaction
 from .transaction_envelope import TransactionEnvelope as Te
-from .utils import SignatureExistError
+from .exceptions import SignatureExistError
 from .federation import federation, FederationError
 
 

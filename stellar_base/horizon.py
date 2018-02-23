@@ -13,7 +13,7 @@ except ImportError:
     # Python 2
     from urllib import urlencode
 
-from .utils import HorizonError
+from .exceptions import HorizonError
 
 HORIZON_LIVE = "https://horizon.stellar.org"
 HORIZON_TEST = "https://horizon-testnet.stellar.org"

@@ -5,8 +5,8 @@ from .keypair import Keypair
 from .network import Network, NETWORKS
 from .stellarxdr import Xdr
 from .transaction import Transaction
-from .utils import (
-    hashX_sign_decorated, xdr_hash, SignatureExistError, PreimageLengthError)
+from .utils import hashX_sign_decorated, xdr_hash
+from .exceptions import SignatureExistError, PreimageLengthError
 
 
 class TransactionEnvelope(object):

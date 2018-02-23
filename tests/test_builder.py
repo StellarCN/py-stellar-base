@@ -5,7 +5,7 @@ import requests
 
 from stellar_base.builder import Builder, HORIZON_TEST
 from stellar_base.keypair import Keypair
-from stellar_base.utils import SignatureExistError
+from stellar_base.exceptions import SignatureExistError
 
 
 # TODO: These endpoints really need to be mocked out.

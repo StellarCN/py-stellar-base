@@ -5,8 +5,8 @@ import warnings
 
 from .base58 import b58decode_check, b58encode_check
 from .stellarxdr import Xdr
-from .utils import XdrLengthError, decode_check, encode_check, StellarMnemonic
-
+from .utils import decode_check, encode_check, StellarMnemonic
+from .exceptions import XdrLengthError
 # noinspection PyBroadException
 try:
     # noinspection PyUnresolvedReferences

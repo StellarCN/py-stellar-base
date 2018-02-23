@@ -17,6 +17,7 @@ import numpy as np
 from pbkdf2 import PBKDF2
 
 from .stellarxdr import Xdr
+from .exceptions import DecodeError, ConfigurationError, MnemonicError
 
 # Compatibility for Python 3.x that don't have unicode type
 try:
@@ -85,48 +86,6 @@ def bytes_from_decode_data(s):
         raise suppress_context(TypeError(
             'Argument should be a bytes-like object or ASCII string, not '
             '{!r}'.format(s.__class__.__name__)))
-
-
-# TODO: Move to an errors or exceptions module.
-class StellarError(Exception):
-    def __init__(self, msg):
-        super(StellarError, self).__init__(msg)
-
-
-class ConfigurationError(StellarError):
-    pass
-
-
-class HorizonError(StellarError):
-    pass
-
-
-class XdrLengthError(StellarError):
-    pass
-
-
-class PreimageLengthError(StellarError):
-    pass
-
-
-class SignatureExistError(StellarError):
-    pass
-
-
-class DecodeError(StellarError):
-    pass
-
-
-class AccountNotExistError(StellarError):
-    pass
-
-
-class NotValidParamError(StellarError):
-    pass
-
-
-class MnemonicError(StellarError):
-    pass
 
 
 def decode_check(version_byte_name, encoded):
