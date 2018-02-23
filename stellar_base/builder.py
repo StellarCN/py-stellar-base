@@ -32,11 +32,14 @@ class Builder(object):
     :param int sequence: The sequence number to use for submitting this
         transaction with (must be the *current* sequence number of the source
         account)
-
+    :param int fee: The network base fee is currently set to 
+        100 stroops (0.00001 lumens). Transaction fee is equal to base fee 
+        times number of operations in this transaction.
     """
+
     def __init__(
             self, secret=None, address=None, horizon=None, network=None,
-            sequence=None):
+            sequence=None, fee=100):
         if secret:
             self.key_pair = Keypair.from_seed(secret)
             self.address = self.key_pair.address().decode()
@@ -69,11 +72,10 @@ class Builder(object):
             self.sequence = self.get_sequence()
         else:
             self.sequence = None
-
         self.ops = []
         self.time_bounds = []
         self.memo = memo.NoneMemo()
-        self.fee = None
+        self.fee = fee
         self.tx = None
         self.te = None
 
@@ -601,7 +603,7 @@ class Builder(object):
                 'sequence': self.sequence,
                 'timeBounds': self.time_bounds,
                 'memo': self.memo,
-                'fee': self.fee if self.fee else 100 * len(self.ops),
+                'fee': self.fee * len(self.ops),
                 'operations': self.ops,
             },
         )
@@ -746,7 +748,7 @@ class Builder(object):
         sequence = str(int(self.sequence) + 1)
         next_builder = Builder(
             horizon=self.horizon.horizon, network=self.network,
-            sequence=sequence)
+            sequence=sequence, fee=self.fee)
         next_builder.address = self.address
         next_builder.key_pair = self.key_pair
         return next_builder
