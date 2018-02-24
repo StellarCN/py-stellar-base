@@ -32,8 +32,8 @@ class Builder(object):
     :param int sequence: The sequence number to use for submitting this
         transaction with (must be the *current* sequence number of the source
         account)
-    :param int fee: The network base fee is currently set to 
-        100 stroops (0.00001 lumens). Transaction fee is equal to base fee 
+    :param int fee: The network base fee is currently set to
+        100 stroops (0.00001 lumens). Transaction fee is equal to base fee
         times number of operations in this transaction.
     """
 
@@ -141,20 +141,20 @@ class Builder(object):
         op = operation.ChangeTrust(opts)
         return self.append_op(op)
 
-    def append_payment_op(self, destination, amount, asset_type='XLM',
+    def append_payment_op(self, destination, amount, asset_code='XLM',
                           asset_issuer=None, source=None):
         """Append a :class:`Payment <stellar_base.operation.Payment>` operation
         to the list of operations.
 
         :param str destination: Account address that receives the payment.
         :param int amount: The amount of the currency to send in the payment.
-        :param str asset_type: The asset code for the asset to send.
+        :param str asset_code: The asset code for the asset to send.
         :param str asset_issuer: The address of the issuer of the asset.
         :param str source: The source address of the payment.
         :return: This builder instance.
 
         """
-        asset = Asset(code=asset_type, issuer=asset_issuer)
+        asset = Asset(code=asset_code, issuer=asset_issuer)
         opts = {
             'source': source,
             'destination': destination,
@@ -554,7 +554,7 @@ class Builder(object):
         """
         return self.time_bounds.append(time_bounds)
 
-    def federation_payment(self, fed_address, amount, asset_type='XLM',
+    def federation_payment(self, fed_address, amount, asset_code='XLM',
                            asset_issuer=None, source=None):
         """Append a :class:`Payment <stellar_base.operation.Payment>` operation
         to the list of operations using federation on the destination address.
@@ -566,7 +566,7 @@ class Builder(object):
         :param str fed_address: A Stellar Address that needs to be translated
             into a valid account ID via federation.
         :param int amount: The amount of the currency to send in the payment.
-        :param str asset_type: The asset code for the asset to send.
+        :param str asset_code: The asset code for the asset to send.
         :param str asset_issuer: The address of the issuer of the asset.
         :param str source: The source address of the payment.
         :return: This builder instance.
@@ -578,7 +578,7 @@ class Builder(object):
                 'Cannot determine Stellar Address to Account ID translation '
                 'via Federation server')
         self.append_payment_op(
-            fed_info['account_id'], amount, asset_type, asset_issuer, source)
+            fed_info['account_id'], amount, asset_code, asset_issuer, source)
         memo_type = fed_info.get('memo_type')
         if memo_type is not None and memo_type in ('text', 'id', 'hash'):
             getattr(self, 'add_' + memo_type + '_memo')(fed_info['memo'])
