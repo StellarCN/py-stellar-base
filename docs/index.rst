@@ -26,6 +26,14 @@ methods.
 
    api
 
+Snippets
+--------
+Find examples here.
+
+.. toctree::
+   :maxdepth: 2
+
+   snippets
 
 
 Indices
