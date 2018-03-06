@@ -653,7 +653,7 @@ class SetOptions(Operation):
         home_domain = op_xdr_object.body.setOptionsOp.homeDomain
 
         if op_xdr_object.body.setOptionsOp.signer:
-            key = op_xdr_object.body.setOptionOp.signer[0].key
+            key = op_xdr_object.body.setOptionsOp.signer[0].key
             if key.type == Xdr.const.SIGNER_KEY_TYPE_ED25519:
                 signer_address = encode_check('account', key.ed25519).decode()
                 signer_type = 'ed25519PublicKey'
