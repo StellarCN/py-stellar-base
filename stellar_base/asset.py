@@ -4,13 +4,12 @@ from .utils import XdrLengthError, account_xdr_object, encode_check
 from .stellarxdr import Xdr
 import base64
 
-
 class Asset(object):
-    def __init__(self, code, issuer=None):
+    def __init__(self, code, issuer):
         if len(code) > 12:
             raise XdrLengthError("Asset code must be 12 characters at max.")
 
-        if str(code).lower() != 'xlm' and issuer is None:
+        if issuer is None:
             raise Exception("Issuer cannot be null")
 
         self.code = code
@@ -30,20 +29,18 @@ class Asset(object):
         return asset_type
 
     def to_dict(self):
-        rv = {'asset_code': self.code}
-        if not self.is_native():
-            rv['asset_issuer'] = self.issuer
-            rv['asset_type'] = self.type
-        else:
-            rv['asset_type'] = 'native'
+        rv = {'asset_code': self.code,
+              'asset_issuer': self.issuer,
+              'asset_type': self.type
+              }
         return rv
 
     @staticmethod
     def native():
-        return Asset("XLM")
+        return NativeAsset()
 
     def is_native(self):
-        return True if self.issuer is None else False
+        return self.type == 'native'
 
     def to_xdr_object(self):
         if self.is_native():
@@ -70,7 +67,7 @@ class Asset(object):
     @classmethod
     def from_xdr_object(cls, asset_xdr_object):
         if asset_xdr_object.type == Xdr.const.ASSET_TYPE_NATIVE:
-            return Asset.native()
+            return NativeAsset()
         elif asset_xdr_object.type == Xdr.const.ASSET_TYPE_CREDIT_ALPHANUM4:
             issuer = encode_check(
                 'account', asset_xdr_object.alphaNum4.issuer.ed25519).decode()
@@ -88,3 +85,11 @@ class Asset(object):
         asset_xdr_object = asset.unpack_Asset()
         asset = Asset.from_xdr_object(asset_xdr_object)
         return asset
+
+
+class NativeAsset(Asset):
+    def __init__(self):
+        self.type = 'native'
+        self.code = 'XLM'
+        self.issuer = None
+
