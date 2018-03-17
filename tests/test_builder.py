@@ -77,7 +77,7 @@ class TestBuilder(object):
 
 def fund(address):
     for attempt in range(3):
-        r = requests.get(HORIZON_TEST + '/friendbot?addr=' +
+        r = requests.get('https://friendbot.stellar.org/?addr=' +
                          address)  # Get 10000 lumens
         t = r.text
         try:

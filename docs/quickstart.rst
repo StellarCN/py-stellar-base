@@ -131,7 +131,7 @@ to create an account for you as shown below:
 
    import requests
    publickey = kp.address().decode()
-   url = 'https://horizon-testnet.stellar.org/friendbot'
+   url = 'https://friendbot.stellar.org'
    r = requests.get(url, params={'addr': publickey})
 
 Using The Stellar Live Network
