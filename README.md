@@ -166,11 +166,11 @@ address.get() # get the updated information
 ```
 Now you can check the address `balance`, `sequence`, `flags`, `signers`, `data` etc.
 ```python
-print("Balances: {}'.format(address.balances))
-print("Sequence Number: {}'.format(address.sequence))
-print("Flags: {}'.format(address.flags))
-print("Signers: {}'.format(address.signers))
-print("Data: {}'.format(address.data))
+print("Balances: {}".format(address.balances))
+print("Sequence Number: {}".format(address.sequence))
+print("Flags: {}".format(address.flags))
+print("Signers: {}".format(address.signers))
+print("Data: {}".format(address.data))
 ```
 
 #### 4.2 Check payments
