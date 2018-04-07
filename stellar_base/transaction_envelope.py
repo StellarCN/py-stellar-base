@@ -35,8 +35,14 @@ class TransactionEnvelope(object):
             self.signatures = opts.get('signatures') or []
         except AttributeError:
             self.signatures = []
-        self.network_id = Network(
-            NETWORKS[opts.get('network_id', 'TESTNET')]).network_id()
+        if 'network_id' in opts:
+            if opts['network_id'] in NETWORKS:
+                passphrase = NETWORKS[opts['network_id']]
+            else:
+                passphrase = opts['network_id']
+        else:
+            passphrase = NETWORKS['TESTNET']
+        self.network_id = Network(passphrase).network_id()
 
     def sign(self, keypair):
         """Sign this transaction envelope with a given keypair.
