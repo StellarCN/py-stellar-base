@@ -336,7 +336,7 @@ class Builder(object):
         function for :meth:`append_set_options_op`.
 
         :param str pre_auth_tx: The address of the new preAuthTx signer - obtained by calling `hash_meta` on the `TransactionEnvelope
-        <stellar_base.transaction_envelope.TransactionEnvelope>`
+        <stellar_base.transaction_envelope.TransactionEnvelope>`.
         :param int signer_weight: The weight of the new signer.
         :param str source: The source account that is adding a signer to its
             list of signers.
