@@ -46,10 +46,11 @@ class Address(object):
             self.network = 'TESTNET'
         else:
             self.network = 'PUBLIC'
-        # FIXME: This allows a horizon instance to be passed which is not the
-        # same as the network string - the class should verify this.
         if horizon:
-            self.horizon = Horizon(horizon)
+            if isinstance(horizon, Horizon):
+                self.horizon = horizon
+            else:
+                self.horizon = Horizon(horizon)
         elif network.upper() == 'PUBLIC':
             self.horizon = Horizon(HORIZON_LIVE)
         else:
