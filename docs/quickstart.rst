@@ -347,7 +347,7 @@ this, you use :meth:`import_from_xdr
    builder = Builder(secret=seed)
    builder.import_from_xdr(xdr_string)
    builder.sign()
-   xdr_string = builder.to_xdr()
+   xdr_string = builder.gen_xdr()
 
 From here you can pass along your XDR string to anyone else who needs to sign
 it, or you can submit it via `builder.submit()` if you're the last to sign.
