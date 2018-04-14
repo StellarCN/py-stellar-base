@@ -323,10 +323,11 @@ class PathPayment(Operation):
         destination = account_xdr_object(self.destination)
         send_asset = self.send_asset.to_xdr_object()
         dest_asset = self.dest_asset.to_xdr_object()
+        path = [asset.to_xdr_object() for asset in self.path]
 
         path_payment = Xdr.types.PathPaymentOp(
             send_asset, Operation.to_xdr_amount(self.send_max), destination,
-            dest_asset, Operation.to_xdr_amount(self.dest_amount), self.path)
+            dest_asset, Operation.to_xdr_amount(self.dest_amount), path)
         self.body.type = Xdr.const.PATH_PAYMENT
         self.body.pathPaymentOp = path_payment
         return super(PathPayment, self).to_xdr_object()
