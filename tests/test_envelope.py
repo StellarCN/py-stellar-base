@@ -240,6 +240,10 @@ class TestunXdr:
     def test_SetOptions_empty_unXdr(self):
         result = b'AAAAANNSjN1wrdfixw+4w0zmKXvxxikg6EKMi9SW1DnNPhNjAAAAZAAAAAAAAAACAAAAAAAAAAAAAAABAAAAAAAAAAUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAc0+E2MAAABAymdhj3dFg+3TcCRILXdUu8ZhG3WOuBmX3YXcYJhYemjCDylQEk31vF8wxB/ntRg4/vmCYC2IwhBtw1mJZ8h+Bw=='
         assert (result == Te.from_xdr(result).xdr())
+    
+    def test_with_textmemo_unXdr(self):
+        result = b'AAAAAOiDfcHkczCk4s7yZjQUk3Bw5I2XbnYE6chMMKI8YJtLAAAAZACBU1YAAAACAAAAAAAAAAEAAAAIdGV4dG1lbW8AAAABAAAAAAAAAAEAAAAAFpAPI0oLC9YB1XuGNOlQ66m2pW2S475yjvCc8hjY4fIAAAAAAAAAADuaygAAAAAAAAAAAjxgm0sAAABAip/qGePkWwafGT0Juy65rZ2jG1PAv5wDoiZSLmTj9DDcYNq/MpZg5cgOht+aqESP+dlFp6Lmz0sO2A5vo49ZD31MZysAAABANgJJyV+XRPZAieaHceV3JWfjyfhWJpqrEpfS0pkDzKbExGIKy9ntfrZS3a4kYE8IQeziRRYxc+tASf+Tgs+EAQ=='
+        assert (result == Te.from_xdr(result).xdr())
 
 
 class TestMultiOp:
