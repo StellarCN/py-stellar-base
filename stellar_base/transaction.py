@@ -132,7 +132,7 @@ class Transaction(object):
         memo_type = tx_xdr_object.memo.type
         memo_switch = tx_xdr_object.memo.switch
         if memo_type == Xdr.const.MEMO_TEXT:
-            memo = TextMemo(memo_switch)
+            memo = TextMemo(memo_switch.decode())
         elif memo_type == Xdr.const.MEMO_ID:
             memo = IdMemo(memo_switch)
         elif memo_type == Xdr.const.MEMO_HASH:
