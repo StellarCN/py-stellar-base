@@ -229,7 +229,7 @@ Sometimes, we need to deal with multi-signature transactions. Especially when yo
 builder = Builder(secret=seed) # or builder = Builder(secret=secret, network='public') for LIVENET.
 builder.import_from_xdr(xdr_string) # the xdr_string come from your friend
 builder.sign()
-builder.to_xdr() # generate new xdr string
+builder.gen_xdr() # generate new xdr string
 # or builder.submit() # submit to Stellar network
 ```
 
