@@ -1,83 +1,80 @@
 # coding: utf-8
+
 from stellar_base.memo import *
 from stellar_base.operation import *
+from stellar_base.transaction import Transaction
+from stellar_base.keypair import Keypair
+from stellar_base.transaction_envelope import TransactionEnvelope as Te
 
 
 class TestTx:
-    def __init__(self):
-        self.source = 'GDJVFDG5OCW5PYWHB64MGTHGFF57DRRJEDUEFDEL2SLNIOONHYJWHA3Z'
-        self.seed = 'SAHPFH5CXKRMFDXEIHO6QATHJCX6PREBLCSFKYXTTCDDV6FJ3FXX4POT'
-        self.dest = 'GCW24FUIFPC2767SOU4JI3JEAXIHYJFIJLH7GBZ2AVCBVP32SJAI53F5'
-        self.seq = 1
-        self.fee = 100
-        self.amount = 10 * 10 ** 6
+    source = 'GDJVFDG5OCW5PYWHB64MGTHGFF57DRRJEDUEFDEL2SLNIOONHYJWHA3Z'
+    seed = 'SAHPFH5CXKRMFDXEIHO6QATHJCX6PREBLCSFKYXTTCDDV6FJ3FXX4POT'
+    dest = 'GCW24FUIFPC2767SOU4JI3JEAXIHYJFIJLH7GBZ2AVCBVP32SJAI53F5'
 
-    def do(self, op):
-        from stellar_base.transaction import Transaction
-        from stellar_base.keypair import Keypair
-        from stellar_base.transaction_envelope import TransactionEnvelope as Te
-        tx = Transaction(source=self.source, opts=op)
-        tx.add_operation(operation=Inflation({}))
-        envelope = Te(tx=tx, opts={"network_id": "TESTNET"})
-        signer = Keypair.from_seed(seed=self.seed)
-        envelope.sign(keypair=signer)
+    def do(self, network, opts):
+        tx = Transaction(self.source, opts)
+        tx.add_operation(Inflation({}))
+        envelope = Te(tx, {"network_id": network})
+        signer = Keypair.from_seed(self.seed)
+        envelope.sign(signer)
         envelope_b64 = envelope.xdr()
         print(envelope_b64)
         return envelope_b64
 
-    def test_textMemo_ascii(self):
-        result = b'AAAAANNSjN1wrdfixw+4w0zmKXvxxikg6EKMi9SW1DnNPhNjAAAAZAAAAAAAAAACAAAAAAAAAAEAAAAHdGVzdGluZwAAAAABAAAAAAAAAAkAAAAAAAAAAc0+E2MAAABA0nGC1i7CxTIJYNZKgo067Tr6JTCZTIU5Jwa2kpNMR7ayPohKVTaO53kojTn0c+NftXaogRZvz4/9etdOhDhlDQ=='
-        assert (result == self.do(op={
-            'sequence': self.seq,
+    def test_textMemo_ascii(self, setup):
+        if setup.type == 'testnet':
+            result = b'AAAAANNSjN1wrdfixw+4w0zmKXvxxikg6EKMi9SW1DnNPhNjAAAAZAAAAAAAAAACAAAAAAAAAAEAAAAHdGVzdGluZwAAAAABAAAAAAAAAAkAAAAAAAAAAc0+E2MAAABA0nGC1i7CxTIJYNZKgo067Tr6JTCZTIU5Jwa2kpNMR7ayPohKVTaO53kojTn0c+NftXaogRZvz4/9etdOhDhlDQ=='
+        else:
+            result = b'AAAAANNSjN1wrdfixw+4w0zmKXvxxikg6EKMi9SW1DnNPhNjAAAAZAAAAAAAAAACAAAAAAAAAAEAAAAHdGVzdGluZwAAAAABAAAAAAAAAAkAAAAAAAAAAc0+E2MAAABAMQFOqFSB22TugUKMAyF+ReoaNe1eXUeuLgxbJ2fo/FqqSs13aszSTveEpOp+FXdYPWKnFREb6UO8lohSE5JaCQ=='
+        assert (result == self.do(setup.network, {
+            'sequence': 1,
             'memo': TextMemo('testing'),
         }))
 
-    def test_textMemo_unicode(self):
-        result = b'AAAAANNSjN1wrdfixw+4w0zmKXvxxikg6EKMi9SW1DnNPhNjAAAAZAAAAAAAAAACAAAAAAAAAAEAAAAMdMSTxaF0xKvFhsSjAAAAAQAAAAAAAAAJAAAAAAAAAAHNPhNjAAAAQLW0BjNvpw3FWZwrXHWmno436IrqDQLzPD7wWsVBdrp+VG244GTfSJfUYJwaOiiqEt93G7KTUIc/HLxO8saMeAo='
-        assert (result == self.do(op={
-            'sequence': self.seq,
+    def test_textMemo_unicode(self, setup):
+        if setup.type == 'testnet':
+            result = b'AAAAANNSjN1wrdfixw+4w0zmKXvxxikg6EKMi9SW1DnNPhNjAAAAZAAAAAAAAAACAAAAAAAAAAEAAAAMdMSTxaF0xKvFhsSjAAAAAQAAAAAAAAAJAAAAAAAAAAHNPhNjAAAAQLW0BjNvpw3FWZwrXHWmno436IrqDQLzPD7wWsVBdrp+VG244GTfSJfUYJwaOiiqEt93G7KTUIc/HLxO8saMeAo='
+        else:
+            result = b'AAAAANNSjN1wrdfixw+4w0zmKXvxxikg6EKMi9SW1DnNPhNjAAAAZAAAAAAAAAACAAAAAAAAAAEAAAAMdMSTxaF0xKvFhsSjAAAAAQAAAAAAAAAJAAAAAAAAAAHNPhNjAAAAQPbTvBNXbVRC2yLA8BFVBB1IvgIlNykIn9heLQC709Mtq1OBOj222zrF0y07Hbe90iWtjAU98bGBQVSpf8GRUQk='
+        assert (result == self.do(setup.network, {
+            'sequence': 1,
             'memo': TextMemo('tēštīņģ'),
         }))
 
 
 class TestMultiOp:
-    def __init__(self):
-        self.address = 'GDJVFDG5OCW5PYWHB64MGTHGFF57DRRJEDUEFDEL2SLNIOONHYJWHA3Z'
-        self.seed = 'SAHPFH5CXKRMFDXEIHO6QATHJCX6PREBLCSFKYXTTCDDV6FJ3FXX4POT'
-        self.accounts = [
-            {
-                'address': 'GCKMUHUBYSJNEIPMJ2ZHSXGSI7LLROFM5U43SWMRDV7J23HI63M7RW2D',
-                'seed': 'SDKGBZFUZZEP3QKAFNLEINQ2MPD5QZJ35ZV7YNS6XCQ4NEHI6ND3ZMWC',
-            },
-            {
-                'address': 'GBG2TM6PGHAWRBVS37MBGOCQ7H7QQH7N2Y2WVUY7IMCEJ6MSF7LWQNIP',
-                'seed': 'SAMM4N3BI447BUSTHPGO5NRHQY2J5QWECMPVHLXHZ3UKENU52UJ7MJLQ',
-            },
-            {
-                'address': 'GCQEAE6KDHPQMO3AJBRPSFV6FAPFYP27Q3EGE4PY4MZCTIV5RRA3KDBS',
-                'seed': 'SDWJCTX6T3NJ6HEPDWFPMP33M2UDBPFKUCN7BIRFQYKXQTLO7NGDEVZE',
-            },
-        ]
-        self.seq = 1
-        self.fee = 100
-        self.amount = "20"
+    address = 'GDJVFDG5OCW5PYWHB64MGTHGFF57DRRJEDUEFDEL2SLNIOONHYJWHA3Z'
+    seed = 'SAHPFH5CXKRMFDXEIHO6QATHJCX6PREBLCSFKYXTTCDDV6FJ3FXX4POT'
+    accounts = [
+        {
+            'address': 'GCKMUHUBYSJNEIPMJ2ZHSXGSI7LLROFM5U43SWMRDV7J23HI63M7RW2D',
+            'seed': 'SDKGBZFUZZEP3QKAFNLEINQ2MPD5QZJ35ZV7YNS6XCQ4NEHI6ND3ZMWC',
+        },
+        {
+            'address': 'GBG2TM6PGHAWRBVS37MBGOCQ7H7QQH7N2Y2WVUY7IMCEJ6MSF7LWQNIP',
+            'seed': 'SAMM4N3BI447BUSTHPGO5NRHQY2J5QWECMPVHLXHZ3UKENU52UJ7MJLQ',
+        },
+        {
+            'address': 'GCQEAE6KDHPQMO3AJBRPSFV6FAPFYP27Q3EGE4PY4MZCTIV5RRA3KDBS',
+            'seed': 'SDWJCTX6T3NJ6HEPDWFPMP33M2UDBPFKUCN7BIRFQYKXQTLO7NGDEVZE',
+        },
+    ]
+    amount = "20"
 
     def make_envelope(self, *args, **kwargs):
-        from stellar_base.transaction import Transaction
-        from stellar_base.keypair import Keypair
-        from stellar_base.transaction_envelope import TransactionEnvelope as Te
         opts = {
-            'sequence': self.seq,
-            'fee': self.fee * len(args)
+            'sequence': 1,
+            'fee': 100 * len(args)
         }
         for opt, value in kwargs.items():
             opts[opt] = value
-        tx = Transaction(source=self.address, opts=opts)
+        tx = Transaction(self.address, opts)
         for count, op in enumerate(args):
-            tx.add_operation(operation=op)
-        envelope = Te(tx=tx, opts={"network_id": "TESTNET"})
-        signer = Keypair.from_seed(seed=self.seed)
-        envelope.sign(keypair=signer)
+            tx.add_operation(op)
+        envelope = Te(tx, {"network_id": "TESTNET"})
+        signer = Keypair.from_seed(self.seed)
+        envelope.sign(signer)
         envelope_b64 = envelope.xdr()
         print(envelope_b64)
         return envelope_b64
