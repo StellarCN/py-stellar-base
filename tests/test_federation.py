@@ -1,7 +1,8 @@
 # coding:utf-8
 
-from nose.tools import raises
+import pytest
 import mock
+
 from stellar_base.federation import *
 
 
@@ -42,23 +43,19 @@ def mocked_requests_get(*args, **kwargs):
 
 class TestFederation(object):
 
-    @raises(FederationError)
-    def test_federation_false_address_1(self):
-        federation('false_address')
+    def test_federation_false_address(self):
+        with pytest.raises(FederationError, match='not a valid federation address'):
+            federation('false_address')
+        with pytest.raises(FederationError, match='not a valid federation address'):
+            federation('false_address*')
+        with pytest.raises(FederationError, match='not a valid domain name'):
+            federation('false*address')
 
-    @raises(FederationError)
-    def test_federation_false_address_2(self):
-        federation('false_address*')
-
-    @raises(FederationError)
-    def test_federation_false_address_3(self):
-        federation('false*address')
-
-    @raises(FederationError)
     @mock.patch('stellar_base.federation.get_federation_service')
     def test_federation_none_service(self, get_service):
         get_service.return_value = None
-        federation('fed*stellar.org')
+        with pytest.raises(FederationError, match='not a valid federation server'):
+            federation('fed*stellar.org')
 
     @mock.patch('stellar_base.federation.requests.get', side_effect=mocked_requests_get)
     @mock.patch('stellar_base.federation.get_federation_service')
@@ -97,4 +94,4 @@ class TestFederation(object):
     @mock.patch('stellar_base.federation.requests.get', side_effect=mocked_requests_get)
     def test_get_auth_server(self, get_toml):
         response = get_auth_server('fed-domain.com')
-        assert response == None
+        assert response is None

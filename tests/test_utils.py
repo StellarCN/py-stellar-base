@@ -1,14 +1,14 @@
 # coding: utf-8 
 
-from nose.tools import raises
+import pytest
+
 from stellar_base import utils
 from stellar_base.stellarxdr import StellarXDR_pack as Xdr
 
 
 class TestUtils():
-    def __init__(self):
-        self.account = 'GDVDKQFP665JAO7A2LSHNLQIUNYNAAIGJ6FYJVMG4DT3YJQQJSRBLQDG'
-        self.secret = 'SCVLSUGYEAUC4MVWJORB63JBMY2CEX6ATTJ5MXTENGD3IELUQF4F6HUB'
+    account = 'GDVDKQFP665JAO7A2LSHNLQIUNYNAAIGJ6FYJVMG4DT3YJQQJSRBLQDG'
+    secret = 'SCVLSUGYEAUC4MVWJORB63JBMY2CEX6ATTJ5MXTENGD3IELUQF4F6HUB'
 
     def test_account_xdr_object(self):
         assert isinstance(utils.account_xdr_object(self.account), Xdr.types.PublicKey)
@@ -45,19 +45,19 @@ class TestUtils():
         assert {'n': 3, 'd': 1000000000} == utils.best_rational_approximation("0.000000003")
         assert {'n': 2147483647, 'd': 1} == utils.best_rational_approximation("2147483647")
 
-    @raises(Exception)
     def test_best_rational_approximation_not_found_denominator(self):
-        utils.best_rational_approximation("0.0000000003")
+        with pytest.raises(Exception, match="Couldn't find approximation"):
+            utils.best_rational_approximation("0.0000000003")
 
-    @raises(Exception)
     def test_best_rational_approximation_not_found_numerator(self):
-        utils.best_rational_approximation("2147483648")
+        with pytest.raises(Exception, match="Couldn't find approximation"):
+            utils.best_rational_approximation("2147483648")
 
-    @raises(utils.MnemonicError)
     def test_mnemonic_check(self):
         sm = utils.StellarMnemonic()
         m = sm.generate()
-        sm.to_seed(m + '1')
+        with pytest.raises(utils.MnemonicError):
+            sm.to_seed(m + '1')
 
     def test_menonic(self):
         sm = utils.StellarMnemonic('chinese')
