@@ -80,7 +80,7 @@ seed = 'SCVLSUGYEAUC4MVWJORB63JBMY2CEX6ATTJ5MXTENGD3IELUQF4F6HUB'
 ```   
 
 ### 3.Create Account
-After the key pair generation, you have already got the address, but it is not activated until someone transfers at least 20 lumen into it.
+After the key pair generation, you have already got the address, but it is not activated until someone transfers at least 1 lumen into it.
 
 #### 3.1 Testnet
 If you want to play in the Stellar test network, you can ask our Friendbot to create an account for you as shown below:
