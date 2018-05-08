@@ -109,7 +109,7 @@ horizon = horizon_livenet()
 # new account in the create account operation. You'll need the seed in order
 # to sign off on the transaction. This is the source account.
 old_account_seed = "SCVLSUGYEAUC4MVWJORB63JBMY2CEX6ATTJ5MXTENGD3IELUQF4F6HUB"
-old_account_keypair = Keypair.from_seed(oldAccountSeed)
+old_account_keypair = Keypair.from_seed(old_account_seed)
 
 # This is the new account ID (the StrKey representation of your newly
 # created public key). This is the destination account.
@@ -122,14 +122,14 @@ op = CreateAccount({
     'starting_balance': amount
 })
 # create a memo
-memo = TextMemo('Transferring to my new account!')
+memo = TextMemo('Hello, Stellar!')
 
 # Get the current sequence of the source account by contacting Horizon. You
 # should also check the response for errors!
 # Python 3
 sequence = horizon.account(old_account_keypair.address().decode()).get('sequence')
 # Python 2
-# sequence = horizon.account(old_account_keypair.address().get('sequence')
+# sequence = horizon.account(old_account_keypair.address()).get('sequence')
 
 # Create a transaction with our single create account operation, with the
 # default fee of 100 stroops as of this writing (0.00001 XLM)
