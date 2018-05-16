@@ -1,14 +1,28 @@
 language: python
 python:
   - 2.7
-  - 3.4
   - 3.5
+  - 3.6
+
+services:
+  - docker
+
+cache:
+  - pip
+
+before_install:
+  - docker pull zulucrypto/stellar-integration-test-network
+  - make start
+
 install:
-  - python setup.py install
-  - pip install coverage
+  - make init
+
 script:
-  - ls
-  - python -m nose -v
+  - make test
+
+after_script:
+  - make stop
+
 notifications:
   email: false
   irc:
@@ -22,3 +36,4 @@ branches:
     - master
     - dev
     - /^rc-.*$/
+
