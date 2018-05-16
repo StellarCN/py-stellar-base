@@ -541,7 +541,7 @@ class Builder(object):
     def add_time_bounds(self, time_bounds):
         """Add a time bound to this transaction.
 
-        Add a the UNIX timestamp, determined by ledger time, of a lower and
+        Add a UNIX timestamp, determined by ledger time, of a lower and
         upper bound of when this transaction will be valid. If a transaction is
         submitted too early or too late, it will fail to make it into the
         transaction set. maxTime equal 0 means that it’s not set.
