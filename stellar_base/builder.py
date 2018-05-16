@@ -53,10 +53,12 @@ class Builder(object):
             self.address = address
             self.key_pair = None
 
-        if network and network.upper() in NETWORKS:
+        if network is None:
+            self.network = 'TESTNET'
+        elif network.upper() in NETWORKS:
             self.network = network.upper()
         else:
-            self.network = 'TESTNET'
+            self.network = network
 
         if horizon:
             self.horizon = Horizon(horizon)
@@ -675,7 +677,10 @@ class Builder(object):
 
         """
         te = Te.from_xdr(xdr)
-        te.network_id = Network(NETWORKS[self.network]).network_id()
+        if self.network.upper() in NETWORKS:
+            te.network_id = Network(NETWORKS[self.network]).network_id()
+        else:
+            te.network_id = Network(self.network).network_id()
         self.te = te
         self.tx = te.tx  # with a different source or not .
         self.ops = te.tx.operations
