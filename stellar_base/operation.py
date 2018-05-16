@@ -682,7 +682,7 @@ class SetOptions(Operation):
             'high_threshold': high_threshold,
             'home_domain': home_domain,
             'signer_address': signer_address,
-            'Signer_type': signer_type,
+            'signer_type': signer_type,
             'signer_weight': signer_weight
         })
 
