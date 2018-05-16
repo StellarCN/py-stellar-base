@@ -186,7 +186,7 @@ account of your own, here's an example of how to do so:
    # Create a transaction with our single create account operation, with the
    # default fee of 100 stroops as of this writing (0.00001 XLM)
    tx = Transaction(
-       source=kp.address().decode(),
+       source=old_account_keypair.address().decode(),
        opts={
            'sequence': sequence,
            'memo': memo,
