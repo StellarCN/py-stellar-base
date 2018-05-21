@@ -50,7 +50,7 @@ class Transaction(object):
           :class:`Memo <stellar_base.memo.Memo>` object.
           Defaults to :class:`NoneMemo <stellar_base.memo.NoneMemo>`.
         * opts.fee - The fee amount for the transaction, which should equal
-          BASE_FEE (currently 100 stroops) multiplied by the number of
+          FEE (currently 100 stroops) multiplied by the number of
           operations in the transaction. See `Stellar's latest documentation
           on fees
           <https://www.stellar.org/developers/guides/concepts/fees.html#transaction-fee>`_
