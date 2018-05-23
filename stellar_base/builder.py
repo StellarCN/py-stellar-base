@@ -546,7 +546,7 @@ class Builder(object):
         Add a UNIX timestamp, determined by ledger time, of a lower and
         upper bound of when this transaction will be valid. If a transaction is
         submitted too early or too late, it will fail to make it into the
-        transaction set. maxTime equal 0 means that it’s not set.
+        transaction set. maxTime equal 0 means that it's not set.
 
         :param list time_bounds: A list of two Unix timestamps representing the
             lower and upper bound of when a given transaction will be valid.

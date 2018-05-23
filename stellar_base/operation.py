@@ -436,7 +436,7 @@ class AllowTrust(Operation):
     on Stellar's network.
 
     Updates the authorized flag of an existing trustline. This can only be
-    called by the issuer of a trustline’s `asset
+    called by the issuer of a trustline's `asset
     <https://www.stellar.org/developers/guides/concepts/assets.html>`_.
 
     The issuer can only clear the authorized flag if the issuer has the
@@ -782,7 +782,7 @@ class CreatePassiveOffer(Operation):
 
     Passive offers allow market makers to have zero spread. If you want to
     trade EUR for USD at 1:1 price and USD for EUR also at 1:1, you can create
-    two passive offers so the two offers don’t immediately act on each other.
+    two passive offers so the two offers don't immediately act on each other.
 
     Once the passive offer is created, you can manage it like any other offer
     using the manage offer operation - see :class:`ManageOffer` for more
@@ -945,7 +945,7 @@ class ManageData(Operation):
     """The :class:`ManageData` object, which represents a
     ManageData operation on Stellar's network.
 
-    Allows you to set,modify or delete a Data Entry (name/value pair) that is
+    Allows you to set, modify or delete a Data Entry (name/value pair) that is
     attached to a particular account. An account can have an arbitrary amount
     of DataEntries attached to it. Each DataEntry increases the minimum balance
     needed to be held by the account.

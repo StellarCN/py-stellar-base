@@ -60,6 +60,8 @@ class Horizon(object):
             messages = SSEClient(url)
             return messages
         else:
+            kwargs.pop('sse', None)
+
             try:
                 # FIXME: We should really consider raising the HTTPError when
                 # it happens and wrapping its JSON response in a HorizonError
@@ -72,7 +74,7 @@ class Horizon(object):
 
     def _get(self, endpoint, **kwargs):
         # If sse has been passed in by an endpoint (meaning it supports sse)
-        # but it hasn't been explicitly been set by the request, default to the
+        # but it hasn't been explicitly been set by the request, default to
         # this instance's setting on SSE requests.
         if 'sse' in kwargs and kwargs['sse'] is None:
             kwargs['sse'] = self.sse
