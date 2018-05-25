@@ -967,7 +967,7 @@ class ManageData(Operation):
 
         valid_data_name_len = len(self.data_name) <= 64
         valid_data_val_len = (
-            self.data_value is not None and len(self.data_value) <= 64)
+            self.data_value is None or len(self.data_value) <= 64)
 
         if not valid_data_name_len or not valid_data_val_len:
             raise XdrLengthError(
