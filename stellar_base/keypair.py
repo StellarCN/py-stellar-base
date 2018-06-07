@@ -16,6 +16,14 @@ except ImportError:
 import hashlib
 
 
+def _check_is_key_correct_type(key, expected_type):
+    if not isinstance(key, expected_type):
+        raise TypeError(
+            "The given key_type={}) is not of type {}"
+            ".".format(type(key), expected_type)
+        )
+
+
 class Keypair(object):
     """The :class:`Keypair` object, which represents a signing and
     verifying key for use with the Stellar network.
@@ -36,11 +44,10 @@ class Keypair(object):
     """
 
     def __init__(self, verifying_key, signing_key=None):
-        # FIXME: Throw more specific exceptions instead of assert statements.
-        assert type(verifying_key) is ed25519.VerifyingKey
+        _check_is_key_correct_type(verifying_key, ed25519.VerifyingKey)
         self.verifying_key = verifying_key
         if signing_key is not None:
-            assert type(signing_key) is ed25519.SigningKey
+            _check_is_key_correct_type(signing_key, ed25519.SigningKey)
             self.signing_key = signing_key
 
     @classmethod
@@ -61,7 +68,7 @@ class Keypair(object):
             This allows for multiple Keypairs to be derived from the same
             mnemonic, such as::
 
-                >>> from stellar_base import Keypair
+                >>> from stellar_base.keypair import Keypair
                 >>> m = 'hello world'  # Don't use this mnemonic in practice.
                 >>> kp1 = Keypair.deterministic(m, lang='english', index=0)
                 >>> kp2 = Keypair.deterministic(m, lang='english', index=1)

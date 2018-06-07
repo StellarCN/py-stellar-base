@@ -1,3 +1,5 @@
+from unittest import TestCase
+from pytest import raises
 from stellar_base.keypair import Keypair
 
 
@@ -20,3 +22,21 @@ def test_sep0005():
     assert seed == b'SBUV3MRWKNS6AYKZ6E6MOUVF2OYMON3MIUASWL3JLY5E3ISDJFELYBRZ'
     address = Keypair.deterministic(mnemonic, index=8).address().decode()
     assert address == 'GABTYCZJMCP55SS6I46SR76IHETZDLG4L37MLZRZKQDGBLS5RMP65TSX'
+
+
+class KeypairTest(TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.mnemonic = (
+            'illness spike retreat truth genius clock brain pass '
+            'fit cave bargain toe'
+        )
+        cls.key_pair0 = Keypair.deterministic(cls.mnemonic)
+
+    def test_from_seed(self):
+        key_pair1 = Keypair.from_seed(self.key_pair0.seed())
+        assert self.key_pair0.address() == key_pair1.address()
+
+    def test_init_wrong_type_key_raise(self):
+        raises(TypeError, Keypair, self.mnemonic)
+
