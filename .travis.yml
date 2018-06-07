@@ -25,15 +25,4 @@ after_script:
 
 notifications:
   email: false
-  irc:
-    channels: "irc.freenode.org#stellar-py"
-    template:
-      - "%{repository}@%{branch}: %{message} (%{build_url})"
-    on_success: change
-    on_failure: change
-branches:
-  only:
-    - master
-    - dev
-    - /^rc-.*$/
 
