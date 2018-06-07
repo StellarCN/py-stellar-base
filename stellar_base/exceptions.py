@@ -38,3 +38,7 @@ class NotValidParamError(StellarError):
 class MnemonicError(StellarError):
     pass
 
+
+class MissingSigningKeyError(StellarError):
+    pass
+

@@ -6,7 +6,7 @@ import warnings
 from .base58 import b58decode_check, b58encode_check
 from .stellarxdr import Xdr
 from .utils import decode_check, encode_check, StellarMnemonic
-from .exceptions import XdrLengthError
+from .exceptions import XdrLengthError, MissingSigningKeyError
 # noinspection PyBroadException
 try:
     # noinspection PyUnresolvedReferences
@@ -16,12 +16,13 @@ except ImportError:
 import hashlib
 
 
-def _check_is_key_correct_type(key, expected_type):
-    if not isinstance(key, expected_type):
+def _get_key_of_expected_type(key, expected_type):
+    if key is not None and not isinstance(key, expected_type):
         raise TypeError(
             "The given key_type={}) is not of type {}"
             ".".format(type(key), expected_type)
         )
+    return key
 
 
 class Keypair(object):
@@ -44,11 +45,12 @@ class Keypair(object):
     """
 
     def __init__(self, verifying_key, signing_key=None):
-        _check_is_key_correct_type(verifying_key, ed25519.VerifyingKey)
-        self.verifying_key = verifying_key
-        if signing_key is not None:
-            _check_is_key_correct_type(signing_key, ed25519.SigningKey)
-            self.signing_key = signing_key
+        self.verifying_key = _get_key_of_expected_type(
+            verifying_key, ed25519.VerifyingKey
+        )
+        self.signing_key = _get_key_of_expected_type(
+            signing_key, ed25519.SigningKey
+        )
 
     @classmethod
     def deterministic(cls, mnemonic, passphrase='', lang='english', index=0):
@@ -222,11 +224,11 @@ class Keypair(object):
         :return: The signed data
         :rtype: bytes
         """
-        # FIXME: Refactor this method into more robust exception handling.
-        try:
-            return self.signing_key.sign(data)
-        except:
-            raise Exception("cannot sign: no secret key available")
+        if self.signing_key is None:
+            raise MissingSigningKeyError(
+                "Cannot sign without signing key."
+            )
+        return self.signing_key.sign(data)
 
     def verify(self, data, signature):
         """Verify the signature of a sequence of bytes.

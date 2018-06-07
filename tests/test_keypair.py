@@ -1,6 +1,8 @@
 from unittest import TestCase
 from pytest import raises
+
 from stellar_base.keypair import Keypair
+from stellar_base.exceptions import MissingSigningKeyError
 
 
 def test_sep0005():
@@ -34,8 +36,12 @@ class KeypairTest(TestCase):
         cls.key_pair0 = Keypair.deterministic(cls.mnemonic)
 
     def test_from_seed(self):
-        key_pair1 = Keypair.from_seed(self.key_pair0.seed())
-        assert self.key_pair0.address() == key_pair1.address()
+        key_pair = Keypair.from_seed(self.key_pair0.seed())
+        assert self.key_pair0.address() == key_pair.address()
+
+    def test_sign_missing_signing_key_raise(self):
+        key_pair = Keypair.from_address(self.key_pair0.address())
+        raises(MissingSigningKeyError, key_pair.sign, "")
 
     def test_init_wrong_type_key_raise(self):
         raises(TypeError, Keypair, self.mnemonic)
