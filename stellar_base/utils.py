@@ -181,11 +181,10 @@ class StellarMnemonic(Mnemonic):
         self.stellar_account_path_format = "m/44'/148'/%d'"
         self.first_hardened_index = 0x80000000
         self.seed_modifier = b"ed25519 seed"
-        if language == 'chinese':
-            lang_filename = '{}/{}.txt'.format(self._get_directory(), language)
-        else:
-            lang_filename = '{}/{}.txt'.format(
-                Mnemonic._get_directory(), language)
+        lang_dir = Mnemonic._get_directory() \
+            if language in Mnemonic.list_languages() \
+            else self._get_directory()
+        lang_filename = os.path.join(lang_dir, language + ".txt")
         with io.open(lang_filename, 'r', encoding="utf8") as f:
             self.wordlist = [w.strip() for w in f.readlines()]
 
@@ -208,22 +207,24 @@ class StellarMnemonic(Mnemonic):
             ]
         return lang
 
-    def to_seed(cls, mnemonic, passphrase='', index=0):
-        if not cls.check(mnemonic):
+    def to_seed(self, mnemonic, passphrase='', index=0):
+        if not self.check(mnemonic):
             raise MnemonicError('wrong mnemonic string')
-        mnemonic = cls.normalize_string(mnemonic)
-        passphrase = cls.normalize_string(passphrase)
+        mnemonic = self.normalize_string(mnemonic)
+        passphrase = self.normalize_string(passphrase)
         seed = PBKDF2(
             mnemonic, u'mnemonic' + passphrase, iterations=PBKDF2_ROUNDS,
             macmodule=hmac, digestmodule=hashlib.sha512).read(64)
-        return cls.derive(seed, index)
+        return self.derive(seed, index)
 
     def generate(self, strength=128):
-        if strength not in [128, 160, 192, 224, 256]:
+        accepted_strengths = {128, 160, 192, 224, 256}
+        if strength not in accepted_strengths:
             raise ValueError(
                 'Strength should be one of the following '
-                '{128, 160, 192, 224, 256}, but it was {} '
-                'instead.'.format(strength))
+                '{}, but it was {} instead'
+                '.'.format(accepted_strengths, strength)
+            )
         ret = self.to_mnemonic(os.urandom(strength // 8))
         # print(ret)
         return ret

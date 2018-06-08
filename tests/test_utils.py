@@ -1,12 +1,12 @@
 # coding: utf-8 
-
+from unittest import TestCase
 import pytest
 
 from stellar_base import utils
 from stellar_base.stellarxdr import StellarXDR_pack as Xdr
 
 
-class TestUtils():
+class TestUtils(TestCase):
     account = 'GDVDKQFP665JAO7A2LSHNLQIUNYNAAIGJ6FYJVMG4DT3YJQQJSRBLQDG'
     secret = 'SCVLSUGYEAUC4MVWJORB63JBMY2CEX6ATTJ5MXTENGD3IELUQF4F6HUB'
 
@@ -59,7 +59,7 @@ class TestUtils():
         with pytest.raises(utils.MnemonicError):
             sm.to_seed(m + '1')
 
-    def test_menonic(self):
+    def test_mnemonic_lang_chinese(self):
         sm = utils.StellarMnemonic('chinese')
         mnemonic = u'域 监 惜 国 期 碱 珍 继 造 监 剥 电'
         assert sm.check(mnemonic)

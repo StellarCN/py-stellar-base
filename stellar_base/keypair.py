@@ -6,7 +6,7 @@ import warnings
 from .base58 import b58decode_check, b58encode_check
 from .stellarxdr import Xdr
 from .utils import decode_check, encode_check, StellarMnemonic
-from .exceptions import XdrLengthError
+from .exceptions import XdrLengthError, MissingSigningKeyError
 # noinspection PyBroadException
 try:
     # noinspection PyUnresolvedReferences
@@ -14,6 +14,15 @@ try:
 except ImportError:
     import ed25519
 import hashlib
+
+
+def _get_key_of_expected_type(key, expected_type):
+    if key is not None and not isinstance(key, expected_type):
+        raise TypeError(
+            "The given key_type={}) is not of type {}"
+            ".".format(type(key), expected_type)
+        )
+    return key
 
 
 class Keypair(object):
@@ -36,12 +45,12 @@ class Keypair(object):
     """
 
     def __init__(self, verifying_key, signing_key=None):
-        # FIXME: Throw more specific exceptions instead of assert statements.
-        assert type(verifying_key) is ed25519.VerifyingKey
-        self.verifying_key = verifying_key
-        if signing_key is not None:
-            assert type(signing_key) is ed25519.SigningKey
-            self.signing_key = signing_key
+        self.verifying_key = _get_key_of_expected_type(
+            verifying_key, ed25519.VerifyingKey
+        )
+        self.signing_key = _get_key_of_expected_type(
+            signing_key, ed25519.SigningKey
+        )
 
     @classmethod
     def deterministic(cls, mnemonic, passphrase='', lang='english', index=0):
@@ -61,7 +70,7 @@ class Keypair(object):
             This allows for multiple Keypairs to be derived from the same
             mnemonic, such as::
 
-                >>> from stellar_base import Keypair
+                >>> from stellar_base.keypair import Keypair
                 >>> m = 'hello world'  # Don't use this mnemonic in practice.
                 >>> kp1 = Keypair.deterministic(m, lang='english', index=0)
                 >>> kp2 = Keypair.deterministic(m, lang='english', index=1)
@@ -215,11 +224,11 @@ class Keypair(object):
         :return: The signed data
         :rtype: bytes
         """
-        # FIXME: Refactor this method into more robust exception handling.
-        try:
-            return self.signing_key.sign(data)
-        except:
-            raise Exception("cannot sign: no secret key available")
+        if self.signing_key is None:
+            raise MissingSigningKeyError(
+                "Cannot sign without signing key."
+            )
+        return self.signing_key.sign(data)
 
     def verify(self, data, signature):
         """Verify the signature of a sequence of bytes.
