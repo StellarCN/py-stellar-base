@@ -241,13 +241,9 @@ class Keypair(object):
             the private key associated with this verifying key.
         :param bytes signature: A sequence of bytes that comprised the
             signature for the corresponding data.
-        :return: True if the verification passed, False otherwise.
         """
-        try:
-            self.verifying_key.verify(signature, data)
-            return True
-        except:
-            return False
+
+        return self.verifying_key.verify(signature, data)
 
     def sign_decorated(self, data):
         """Sign a bytes-like object and return the decorated signature.
