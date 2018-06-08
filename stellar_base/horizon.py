@@ -1,6 +1,8 @@
 # coding: utf-8
 
 import requests
+from requests import adapters as requests_adapaters
+from requests.packages.urllib3.util import retry as requests_retry
 
 try:
     from sseclient import SSEClient
@@ -20,7 +22,7 @@ HORIZON_TEST = "https://horizon-testnet.stellar.org"
 
 
 class Horizon(object):
-    def __init__(self, horizon=None, sse=False, timeout=20):
+    def __init__(self, horizon=None, sse=False, timeout=20, retry_attempts=3, retry_backoff=0.1):
         """The :class:`Horizon` object, which represents the interface for
         making requests to a Horizon server instance.
 
@@ -49,6 +51,17 @@ class Horizon(object):
             self.horizon = horizon
 
         self.session = requests.Session()
+        retry = requests_retry.Retry(
+            total=retry_attempts,
+            read=retry_attempts,
+            connect=retry_attempts,
+            backoff_factor=retry_backoff,
+            status_forcelist=[502, 503, 504],
+        )
+        adapter = requests_adapaters.HTTPAdapter(max_retries=retry)
+        self.session.mount('http://', adapter)
+        self.session.mount('https://', adapter)
+
         self.sse = sse
         self.timeout = timeout
 
@@ -63,11 +76,25 @@ class Horizon(object):
             kwargs.pop('sse', None)
 
             try:
-                # FIXME: We should really consider raising the HTTPError when
-                # it happens and wrapping its JSON response in a HorizonError
                 resp = self.session.request(
                     verb, url, timeout=self.timeout, **kwargs)
+                resp.raise_for_status()
                 return resp.json()
+            except requests.HTTPError as exc:
+                details = exc.response.json()
+                extra_error = ''
+                if 'extras' in details:
+                    if 'invalid_field' in details['extras']:
+                        extra_error = "Invalid field: {invalid_field}\n".format(**details['extras'])
+                    elif 'result_codes' in details['extras']:
+                        extra_error = "Transaction status: {transaction}\nOperation errors: {operations}\n".format(
+                            **details['extras']['result_codes'])
+                error_msg = (
+                    "Request to Horizon failed with status {status}: {title} - {detail}.\n"
+                    + extra_error +
+                    "More detail about this type of error can be found at: {type}"
+                ).format(**details)
+                raise HorizonError(error_msg)
             except requests.RequestException:
                 raise HorizonError(
                     'Could not successfully make a request to Horizon.')
