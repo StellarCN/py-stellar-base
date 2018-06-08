@@ -39,3 +39,9 @@ class TestAsset:
         xdr = self.cny.xdr()
         cny_x = Asset.from_xdr(xdr)
         assert self.cny == cny_x
+
+    def test_asset_to_dict(self):
+        native = Asset('XLM')
+        assert native.to_dict() == {'code': 'XLM', 'type': 'native'}
+        assert self.cny.to_dict() == {'code': 'CNY', 'issuer': self.source,
+                                      'type': 'credit_alphanum4'}
