@@ -1,0 +1,19 @@
+version: "2"
+
+plugins:
+  duplication:
+    enabled: true
+    config:
+      languages:
+      - python
+  pep8:
+    enabled: true
+
+exclude_paths:
+- "docs/"
+- "examples/"
+- "tests/
+- "stellar_base/stellarxdr"
+- "stellar_base/wordlist"
+- "stellar_base/xdr"
+- "!**.py"
