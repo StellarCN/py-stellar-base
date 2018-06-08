@@ -1,0 +1,23 @@
+version: "2"
+
+checks:
+  file-lines:
+    enabled: false
+
+plugins:
+  duplication:
+    enabled: true
+    config:
+      languages:
+        - python
+  pep8:
+    enabled: true
+
+exclude_patterns:
+  - "docs/"
+  - "tests/"
+  - "examples/"
+  - "stellar_base/xdr/"
+  - "stellar_base/wordlist/"
+  - "stellar_base/stellarxdr/"
+
