@@ -1,5 +1,5 @@
 [run]
-source = stellar_base
+source = stellar_base,tests
 
 [report]
 omit =

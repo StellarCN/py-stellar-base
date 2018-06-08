@@ -4,7 +4,6 @@ import base64
 import re
 
 from .utils import account_xdr_object, encode_check
-
 from .stellarxdr import Xdr
 
 

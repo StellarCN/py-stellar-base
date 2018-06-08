@@ -8,7 +8,16 @@ exec(open("stellar_base/version.py").read())
 with codecs.open('README.md', encoding='utf-8') as file:
     long_description = file.read()
 
-install_requires = ['ed25519', 'crc16', 'requests', 'SSEClient', 'numpy', 'toml', 'mnemonic']
+install_requires = [
+    'ed25519',
+    'crc16',
+    'requests',
+    'SSEClient',
+    'numpy',
+    'toml',
+    'mnemonic',
+    'six',
+]
 tests_require = ['pytest', 'mock', 'sphinx']
 
 setup(
