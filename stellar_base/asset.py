@@ -59,13 +59,12 @@ class Asset(object):
 
         :return: A dict representing an :class:`Asset`
         """
-        # TODO: Any reason these can't be just code, issuer, and type?
-        rv = {'asset_code': self.code}
+        rv = {'code': self.code}
         if not self.is_native():
-            rv['asset_issuer'] = self.issuer
-            rv['asset_type'] = self.type
+            rv['issuer'] = self.issuer
+            rv['type'] = self.type
         else:
-            rv['asset_type'] = 'native'
+            rv['type'] = 'native'
         return rv
 
     @staticmethod
