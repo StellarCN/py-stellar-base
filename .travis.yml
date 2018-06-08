@@ -23,6 +23,9 @@ script:
 after_script:
   - make stop
 
+after_success:
+  - make codecov
+
 notifications:
   email: false
 

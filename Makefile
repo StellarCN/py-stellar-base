@@ -6,6 +6,7 @@ default: ;
 init:
 	pip install .
 	pip install -e .
+	pip install pytest-cov
 .PHONY: init
 
 start:
@@ -18,12 +19,17 @@ stop:
 .PHONY: stop
 
 test:
-	python -m pytest -v -rs -s -x tests
+	python -m pytest -v -rs -s -x tests --cov
 .PHONY: test
 
 testnet:
-	python -m pytest -v -rs -s -x tests --testnet
+	python -m pytest -v -rs -s -x tests --testnet --cov
 .PHONY: testnet
+
+codecov:
+	pip install codecov
+	python -m codecov
+.PHONY: codecov
 
 wheel:
 	python setup.py bdist_wheel
