@@ -19,11 +19,11 @@ stop:
 .PHONY: stop
 
 test:
-	python -m pytest -v -rs -s -x tests --cov
+	python -m pytest -v -rs tests --cov
 .PHONY: test
 
 testnet:
-	python -m pytest -v -rs -s -x tests --testnet --cov
+	python -m pytest -v -rs tests --testnet --cov
 .PHONY: testnet
 
 codecov:

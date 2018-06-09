@@ -1,7 +1,4 @@
 # encoding: utf-8
-
-import pytest
-
 from stellar_base.keypair import Keypair
 from stellar_base.operation import *
 from stellar_base.horizon import Horizon

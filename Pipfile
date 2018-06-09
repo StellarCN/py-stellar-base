@@ -11,6 +11,7 @@ numpy = "~=1.14"
 requests = "~=2.18"
 sseclient = "~=0.0.19"
 toml = "~=0.9.4"
+six = "~=1.11.0"
 
 [dev-packages]
 pytest = "*"

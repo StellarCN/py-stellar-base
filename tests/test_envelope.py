@@ -1,8 +1,4 @@
 # coding:utf-8
-
-import pytest
-
-from stellar_base.memo import *
 from stellar_base.operation import *
 from stellar_base.asset import Asset
 from stellar_base.keypair import Keypair

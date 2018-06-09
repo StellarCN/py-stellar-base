@@ -1,18 +1,17 @@
 # coding: utf-8
+import sys
+import six
+import abc
 import base64
 
 from .stellarxdr import Xdr
 from .exceptions import XdrLengthError
 
-# TODO: Consider using six throughout the library?
-# Compatibility for Python 3.x that don't have unicode type
-try:
-    type(unicode)
-except NameError:
+if sys.version_info.major == 3:
     unicode = str
 
 
-# TODO: Consider making an abstract base class
+@six.add_metaclass(abc.ABCMeta)
 class Memo(object):
     """The :class:`Memo` object, which represents the base class for memos for
     use with Stellar transactions.
@@ -38,12 +37,9 @@ class Memo(object):
     information on the available types of memos.
 
     """
-    def __init__(self):
-        pass
-
+    @abc.abstractmethod
     def to_xdr_object(self):
         """Creates an XDR Memo object that represents this :class:`Memo`."""
-        pass
 
     def xdr(self):
         """Packs and base64 encodes this :class:`Memo` as an XDR string."""
@@ -54,8 +50,6 @@ class Memo(object):
 
 class NoneMemo(Memo):
     """The :class:`NoneMemo`, which represents no memo for a transaction."""
-    def __init__(self):
-        pass
 
     def to_xdr_object(self):
         """Creates an XDR Memo object for a transaction with no memo."""
@@ -71,7 +65,9 @@ class TextMemo(Memo):
     """
     def __init__(self, text):
         if not isinstance(text, (str, unicode)):
-            raise TypeError('Expects string type got a ' + type(text).__name__)
+            raise TypeError(
+                'Expects string type got a {}'.format(type(text))
+            )
         if bytes == str and not isinstance(text, unicode):
             # Python 2 without unicode string
             self.text = text

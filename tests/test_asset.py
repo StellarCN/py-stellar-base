@@ -1,18 +1,22 @@
 # coding: utf-8
-
+from unittest import TestCase
 import pytest
 
 from stellar_base.asset import Asset
 from stellar_base.stellarxdr import Xdr
 
 
-class TestAsset:
-    source = 'GDJVFDG5OCW5PYWHB64MGTHGFF57DRRJEDUEFDEL2SLNIOONHYJWHA3Z'
-    cny = Asset('CNY', source)
+class TestAsset(TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.source = (
+            'GDJVFDG5OCW5PYWHB64MGTHGFF57DRRJEDUEFDEL2SLNIOONHYJWHA3Z'
+        )
+        cls.cny = Asset('CNY', cls.source)
 
     def test_native(self):
         assert 'XLM' == Asset.native().code
-        assert None == Asset.native().issuer
+        assert Asset.native().issuer is None
         assert 'native' == Asset.native().type
 
     def test_is_native(self):
