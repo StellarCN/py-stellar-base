@@ -1,26 +1,36 @@
 # coding: utf-8
 
 import requests
+from requests.adapters import HTTPAdapter, DEFAULT_POOLSIZE
+from requests.exceptions import RequestException
+from requests.compat import urljoin
+from time import sleep
+from urllib3.util import Retry
+
+from .exceptions import HorizonError
+
+import logging
+
+logger = logging.getLogger(__name__)
 
 try:
     from sseclient import SSEClient
 except ImportError:
     SSEClient = None
-try:
-    # Python 3
-    from urllib.parse import urlencode
-except ImportError:
-    # Python 2
-    from urllib import urlencode
-
-from .exceptions import HorizonError
 
 HORIZON_LIVE = "https://horizon.stellar.org"
 HORIZON_TEST = "https://horizon-testnet.stellar.org"
+DEFAULT_REQUEST_TIMEOUT = 11  # two ledgers + 1 sec, let's retry faster and not wait 60 secs.
+DEFAULT_NUM_RETRIES = 5
+DEFAULT_BACKOFF_FACTOR = 0.5
+USER_AGENT = 'py-stellar-base'
 
 
 class Horizon(object):
-    def __init__(self, horizon=None, sse=False, timeout=20):
+    def __init__(self, horizon=None, pool_size=DEFAULT_POOLSIZE,
+                 num_retries=DEFAULT_NUM_RETRIES,
+                 request_timeout=DEFAULT_REQUEST_TIMEOUT,
+                 backoff_factor=DEFAULT_BACKOFF_FACTOR, user_agent=USER_AGENT):
         """The :class:`Horizon` object, which represents the interface for
         making requests to a Horizon server instance.
 
@@ -35,72 +45,126 @@ class Horizon(object):
         class.
 
         :param str horizon: The horizon base URL
-        :param bool sse: Default to using server side events for streaming
-            responses when available.
         :param int timeout: The timeout for all requests.
+        :param int pool_size persistent connection to Horizon and connection pool
+        :param int num_retries configurable request retry functionality
+        :param float backoff_factor a backoff factor to apply between attempts after the second try
+        :param str user_agent String representing the user-agent you want, such as "py-stellar-base"
 
         """
-        if sse and SSEClient is None:
-            raise ValueError('SSE not supported, missing sseclient module')
-
         if horizon is None:
-            self.horizon = HORIZON_TEST
+            self.horizon_uri = HORIZON_TEST
         else:
-            self.horizon = horizon
+            self.horizon_uri = horizon
 
-        self.session = requests.Session()
-        self.sse = sse
-        self.timeout = timeout
+        self.pool_size = pool_size
+        self.num_retries = num_retries
+        self.request_timeout = request_timeout
+        self.backoff_factor = backoff_factor
 
-    def _request(self, verb, endpoint, **kwargs):
-        url = '{base}{endpoint}'.format(base=self.horizon, endpoint=endpoint)
-        if kwargs.get('sse', False):
-            if 'params' in kwargs and kwargs['params']:
-                url = '{}?{}'.format(url, urlencode(kwargs['params']))
-            messages = SSEClient(url)
-            return messages
-        else:
-            kwargs.pop('sse', None)
+        # adding 504 to the list of statuses to retry
+        self.status_forcelist = list(Retry.RETRY_AFTER_STATUS_CODES).append(
+            504)
 
-            try:
-                # FIXME: We should really consider raising the HTTPError when
-                # it happens and wrapping its JSON response in a HorizonError
-                resp = self.session.request(
-                    verb, url, timeout=self.timeout, **kwargs)
-                return resp.json()
-            except requests.RequestException:
-                raise HorizonError(
-                    'Could not successfully make a request to Horizon.')
+        # configure standard session
 
-    def _get(self, endpoint, **kwargs):
-        # If sse has been passed in by an endpoint (meaning it supports sse)
-        # but it hasn't been explicitly been set by the request, default to
-        # this instance's setting on SSE requests.
-        if 'sse' in kwargs and kwargs['sse'] is None:
-            kwargs['sse'] = self.sse
-        return self._request('GET', endpoint, **kwargs)
+        # configure retry handler
+        retry = Retry(total=self.num_retries,
+                      backoff_factor=self.backoff_factor, redirect=0,
+                      status_forcelist=self.status_forcelist)
+        # init transport adapter
+        adapter = HTTPAdapter(pool_connections=self.pool_size,
+                              pool_maxsize=self.pool_size, max_retries=retry)
 
-    def _post(self, endpoint, **kwargs):
-        return self._request('POST', endpoint, **kwargs)
+        # init session
+        session = requests.Session()
 
-    def submit(self, te, **kwargs):
-        """Submit a transaction to Horizon.
+        # set default headers
+        session.headers.update({'User-Agent': user_agent})
+
+        session.mount('http://', adapter)
+        session.mount('https://', adapter)
+        self._session = session
+
+        # configure SSE session (differs from our standard session)
+
+        sse_retry = Retry(total=1000000, redirect=0,
+                          status_forcelist=self.status_forcelist)
+        sse_adapter = HTTPAdapter(pool_connections=self.pool_size,
+                                  pool_maxsize=self.pool_size,
+                                  max_retries=sse_retry)
+        sse_session = requests.Session()
+        sse_session.headers.update({'User-Agent': user_agent})
+        sse_session.mount('http://', sse_adapter)
+        sse_session.mount('https://', sse_adapter)
+        self._sse_session = sse_session
+
+    def submit(self, te):
+        """Submit the transaction using a pooled connection, and retry on failure.
 
         `POST /transactions
         <https://www.stellar.org/developers/horizon/reference/endpoints/transactions-create.html>`_
 
         Uses form-encoded data to send over to Horizon.
 
-        :param bytes te: The transaction envelope to submit
         :return: The JSON response indicating the success/failure of the
             submitted transaction.
         :rtype: dict
 
         """
-        payload = {'tx': te}
-        return self._post('/transactions', data=payload, **kwargs)
+        params = {'tx': te}
+        url = urljoin(self.horizon_uri, 'transactions/')
 
-    def account(self, address, **kwargs):
+        # POST is not included in Retry's method_whitelist for a good reason.
+        # our custom retry mechanism follows
+        reply = None
+        retry_count = self.num_retries
+        while True:
+            try:
+                reply = self._session.post(url, data=params,
+                                           timeout=self.request_timeout)
+                return check_horizon_reply(reply.json())
+            except (RequestException, ValueError) as e:
+                if reply:
+                    msg = 'horizon submit exception: {}, reply: [{}] {}'.format(
+                        str(e), reply.status_code, reply.text)
+                else:
+                    msg = 'horizon submit exception: {}'.format(str(e))
+                logging.warning(msg)
+
+                if reply and reply.status_code not in self.status_forcelist:
+                    raise Exception('invalid horizon reply: [{}] {}'.format(
+                        reply.status_code, reply.text))
+                # retry
+                if retry_count <= 0:
+                    raise
+                retry_count -= 1
+                logging.warning('submit retry attempt {}'.format(retry_count))
+                sleep(self.backoff_factor)
+
+    def query(self, rel_url, params=None, sse=False):
+        abs_url = urljoin(self.horizon_uri, rel_url)
+        reply = self._query(abs_url, params, sse)
+        return check_horizon_reply(reply) if not sse else reply
+
+    def _query(self, url, params=None, sse=False):
+        if not sse:
+            reply = self._session.get(url, params=params,
+                                      timeout=self.request_timeout)
+            try:
+                return reply.json()
+            except ValueError:
+                raise Exception(
+                    'invalid horizon reply: [{}] {}'.format(reply.status_code,
+                                                            reply.text))
+
+        # SSE connection
+        if SSEClient is None:
+            raise ValueError('SSE not supported, missing sseclient module')
+
+        return SSEClient(url, session=self._sse_session, params=params)
+
+    def account(self, address):
         """Returns information and links relating to a single account.
 
         `GET /accounts/{account}
@@ -111,11 +175,10 @@ class Horizon(object):
         :rtype: dict
 
         """
-
         endpoint = '/accounts/{account_id}'.format(account_id=address)
-        return self._get(endpoint, **kwargs)
+        return self.query(endpoint)
 
-    def account_data(self, account_id, data_key, **kwargs):
+    def account_data(self, account_id, data_key):
         """This endpoint represents a single data associated with a given
         account.
 
@@ -131,9 +194,9 @@ class Horizon(object):
         """
         endpoint = '/accounts/{account_id}/data/{data_key}'.format(
             account_id=account_id, data_key=data_key)
-        return self._get(endpoint, **kwargs)
+        return self.query(endpoint)
 
-    def account_effects(self, address, params=None, sse=None, **kwargs):
+    def account_effects(self, address, params=None, sse=False):
         """This endpoint represents all effects that changed a given account.
 
         `GET /accounts/{account}/effects{?cursor,limit,order}
@@ -148,9 +211,9 @@ class Horizon(object):
 
         """
         endpoint = '/accounts/{account_id}/effects'.format(account_id=address)
-        return self._get(endpoint, params=params, **kwargs)
+        return self.query(endpoint, params, sse)
 
-    def account_offers(self, address, params=None, **kwargs):
+    def account_offers(self, address, params=None):
         """This endpoint represents all the offers a particular account makes.
 
         `GET /accounts/{account}/offers{?cursor,limit,order}
@@ -164,9 +227,9 @@ class Horizon(object):
 
         """
         endpoint = '/accounts/{account_id}/offers'.format(account_id=address)
-        return self._get(endpoint, params=params, **kwargs)
+        return self.query(endpoint, params)
 
-    def account_operations(self, address, params=None, sse=None, **kwargs):
+    def account_operations(self, address, params=None, sse=False):
         """This endpoint represents all operations that were included in valid
         transactions that affected a particular account.
 
@@ -183,9 +246,9 @@ class Horizon(object):
         """
         endpoint = '/accounts/{account_id}/operations'.format(
             account_id=address)
-        return self._get(endpoint, params=params, sse=sse, **kwargs)
+        return self.query(endpoint, params, sse)
 
-    def account_transactions(self, address, params=None, sse=None, **kwargs):
+    def account_transactions(self, address, params=None, sse=False):
         """This endpoint represents all transactions that affected a given
         account.
 
@@ -201,9 +264,9 @@ class Horizon(object):
         """
         endpoint = '/accounts/{account_id}/transactions'.format(
             account_id=address)
-        return self._get(endpoint, params=params, sse=sse, **kwargs)
+        return self.query(endpoint, params, sse)
 
-    def account_payments(self, address, params=None, sse=None, **kwargs):
+    def account_payments(self, address, params=None, sse=False):
         """This endpoint responds with a collection of Payment operations where
         the given account was either the sender or receiver.
 
@@ -220,9 +283,9 @@ class Horizon(object):
         """
         endpoint = '/accounts/{account_id}/payments'.format(
             account_id=address)
-        return self._get(endpoint, params=params, sse=sse, **kwargs)
+        return self.query(endpoint, params, sse)
 
-    def assets(self, params=None, **kwargs):
+    def assets(self, params=None):
         """This endpoint represents all assets. It will give you all the assets
         in the system along with various statistics about each.
 
@@ -238,10 +301,10 @@ class Horizon(object):
         :rtype: dict
 
         """
-        endpoint = '/assets'
-        return self._get(endpoint, params=params, **kwargs)
+        endpoint = '/assets/'
+        return self.query(endpoint, params)
 
-    def transactions(self, params=None, sse=None, **kwargs):
+    def transactions(self, params=None, sse=False):
         """This endpoint represents all validated transactions.
 
         `GET /transactions{?cursor,limit,order}
@@ -254,10 +317,10 @@ class Horizon(object):
         :rtype: dict
 
         """
-        endpoint = '/transactions'
-        return self._get(endpoint, params=params, sse=sse, **kwargs)
+        endpoint = '/transactions/'
+        return self.query(endpoint, params, sse)
 
-    def transaction(self, tx_hash, **kwargs):
+    def transaction(self, tx_hash):
         """The transaction details endpoint provides information on a single
         transaction.
 
@@ -270,9 +333,9 @@ class Horizon(object):
 
         """
         endpoint = '/transactions/{tx_hash}'.format(tx_hash=tx_hash)
-        return self._get(endpoint, **kwargs)
+        return self.query(endpoint)
 
-    def transaction_operations(self, tx_hash, params=None, **kwargs):
+    def transaction_operations(self, tx_hash, params=None):
         """This endpoint represents all operations that are part of a given
         transaction.
 
@@ -288,9 +351,9 @@ class Horizon(object):
         """
         endpoint = '/transactions/{tx_hash}/operations'.format(
             tx_hash=tx_hash)
-        return self._get(endpoint, params=params, **kwargs)
+        return self.query(endpoint, params)
 
-    def transaction_effects(self, tx_hash, params=None, **kwargs):
+    def transaction_effects(self, tx_hash, params=None):
         """This endpoint represents all effects that occurred as a result of a
         given transaction.
 
@@ -306,9 +369,9 @@ class Horizon(object):
         """
         endpoint = '/transactions/{tx_hash}/effects'.format(
             tx_hash=tx_hash)
-        return self._get(endpoint, params=params, **kwargs)
+        return self.query(endpoint, params)
 
-    def transaction_payments(self, tx_hash, params=None, **kwargs):
+    def transaction_payments(self, tx_hash, params=None):
         """This endpoint represents all payment operations that are part of a
         given transaction.
 
@@ -324,9 +387,9 @@ class Horizon(object):
         """
         endpoint = '/transactions/{tx_hash}/payments'.format(
             tx_hash=tx_hash)
-        return self._get(endpoint, params=params, **kwargs)
+        return self.query(endpoint, params)
 
-    def order_book(self, params=None, **kwargs):
+    def order_book(self, params=None):
         """Return, for each orderbook, a summary of the orderbook and the bids
         and asks associated with that orderbook.
 
@@ -340,10 +403,10 @@ class Horizon(object):
         :rtype: dict
 
         """
-        endpoint = '/order_book'
-        return self._get(endpoint, params=params, **kwargs)
+        endpoint = '/order_book/'
+        return self.query(endpoint, params)
 
-    def ledgers(self, params=None, sse=None, **kwargs):
+    def ledgers(self, params=None, sse=False):
         """This endpoint represents all ledgers.
 
         `GET /ledgers{?cursor,limit,order}
@@ -355,10 +418,10 @@ class Horizon(object):
         :rtype: dict
 
         """
-        endpoint = '/ledgers'
-        return self._get(endpoint, params=params, sse=sse, **kwargs)
+        endpoint = '/ledgers/'
+        return self.query(endpoint, params, sse)
 
-    def ledger(self, ledger_id, **kwargs):
+    def ledger(self, ledger_id):
         """The ledger details endpoint provides information on a single ledger.
 
         `GET /ledgers/{sequence}
@@ -370,9 +433,9 @@ class Horizon(object):
 
         """
         endpoint = '/ledgers/{ledger_id}'.format(ledger_id=ledger_id)
-        return self._get(endpoint, **kwargs)
+        return self.query(endpoint)
 
-    def ledger_effects(self, ledger_id, params=None, **kwargs):
+    def ledger_effects(self, ledger_id, params=None):
         """This endpoint represents all effects that occurred in the given
         ledger.
 
@@ -387,9 +450,9 @@ class Horizon(object):
 
         """
         endpoint = '/ledgers/{ledger_id}/effects'.format(ledger_id=ledger_id)
-        return self._get(endpoint, params=params, **kwargs)
+        return self.query(endpoint, params)
 
-    def ledger_operations(self, ledger_id, params=None, **kwargs):
+    def ledger_operations(self, ledger_id, params=None):
         """This endpoint returns all operations that occurred in a given
         ledger.
 
@@ -405,9 +468,9 @@ class Horizon(object):
         """
         endpoint = '/ledgers/{ledger_id}/operations'.format(
             ledger_id=ledger_id)
-        return self._get(endpoint, params=params, **kwargs)
+        return self.query(endpoint, params)
 
-    def ledger_payments(self, ledger_id, params=None, **kwargs):
+    def ledger_payments(self, ledger_id, params=None):
         """This endpoint represents all payment operations that are part of a
         valid transactions in a given ledger.
 
@@ -422,9 +485,9 @@ class Horizon(object):
 
         """
         endpoint = '/ledgers/{ledger_id}/payments'.format(ledger_id=ledger_id)
-        return self._get(endpoint, params=params, **kwargs)
+        return self.query(endpoint, params)
 
-    def ledger_transactions(self, ledger_id, params=None, **kwargs):
+    def ledger_transactions(self, ledger_id, params=None, ):
         """This endpoint represents all transactions in a given ledger.
 
         `GET /ledgers/{id}/transactions{?cursor,limit,order}
@@ -439,9 +502,9 @@ class Horizon(object):
         """
         endpoint = '/ledgers/{ledger_id}/transactions'.format(
             ledger_id=ledger_id)
-        return self._get(endpoint, params=params, **kwargs)
+        return self.query(endpoint, params)
 
-    def effects(self, params=None, sse=None, **kwargs):
+    def effects(self, params=None, sse=False):
         """This endpoint represents all effects.
 
         `GET /effects{?cursor,limit,order}
@@ -454,10 +517,10 @@ class Horizon(object):
         :rtype: dict
 
         """
-        endpoint = '/effects'
-        return self._get(endpoint, params=params, sse=sse, **kwargs)
+        endpoint = '/effects/'
+        return self.query(endpoint, params, sse)
 
-    def operations(self, params=None, sse=None, **kwargs):
+    def operations(self, params=None, sse=False):
         """This endpoint represents all operations that are part of validated
         transactions.
 
@@ -471,10 +534,10 @@ class Horizon(object):
         :rtype: dict
 
         """
-        endpoint = '/operations'
-        return self._get(endpoint, params=params, sse=sse, **kwargs)
+        endpoint = '/operations/'
+        return self.query(endpoint, params, sse)
 
-    def operation(self, op_id, **kwargs):
+    def operation(self, op_id, params=None):
         """The operation details endpoint provides information on a single
         operation.
 
@@ -486,9 +549,9 @@ class Horizon(object):
         :rtype: dict
         """
         endpoint = '/operations/{op_id}'.format(op_id=op_id)
-        return self._get(endpoint, **kwargs)
+        return self.query(endpoint, params)
 
-    def operation_effects(self, op_id, params=None, **kwargs):
+    def operation_effects(self, op_id, params=None):
         """This endpoint represents all effects that occurred as a result of a
         given operation.
 
@@ -503,9 +566,9 @@ class Horizon(object):
 
         """
         endpoint = '/operations/{op_id}/effects'.format(op_id=op_id)
-        return self._get(endpoint, params=params, **kwargs)
+        return self.query(endpoint, params)
 
-    def payments(self, params=None, sse=None, **kwargs):
+    def payments(self, params=None, sse=False):
         """This endpoint represents all payment operations that are part of
         validated transactions.
 
@@ -519,10 +582,10 @@ class Horizon(object):
         :rtype: dict
 
         """
-        endpoint = '/payments'
-        return self._get(endpoint, params=params, sse=sse, **kwargs)
+        endpoint = '/payments/'
+        return self.query(endpoint, params, sse)
 
-    def paths(self, params=None, **kwargs):
+    def paths(self, params=None):
         """Load a list of assets available to the source account id and find
         any payment paths from those source assets to the desired
         destination asset.
@@ -542,9 +605,9 @@ class Horizon(object):
 
         """
         endpoint = '/paths'
-        return self._get(endpoint, params=params, **kwargs)
+        return self.query(endpoint, params)
 
-    def trades(self, params=None, **kwargs):
+    def trades(self, params=None):
         """Load a list of trades, optionally filtered by an orderbook.
 
         See the below docs for more information on required and optional
@@ -559,10 +622,10 @@ class Horizon(object):
         :rtype: dict
 
         """
-        endpoint = '/trades'
-        return self._get(endpoint, params=params, **kwargs)
+        endpoint = '/trades/'
+        return self.query(endpoint, params)
 
-    def trade_aggregations(self, params=None, **kwargs):
+    def trade_aggregations(self, params=None):
         """Load a list of aggregated historical trade data, optionally filtered
         by an orderbook.
 
@@ -576,8 +639,14 @@ class Horizon(object):
         :rtype: dict
 
         """
-        endpoint = '/trade_aggregations'
-        return self._get(endpoint, params=params, **kwargs)
+        endpoint = '/trade_aggregations/'
+        return self.query(endpoint, params)
+
+
+def check_horizon_reply(reply):
+    if 'status' not in reply:
+        return reply
+    raise HorizonError(reply)
 
 
 def horizon_testnet():
