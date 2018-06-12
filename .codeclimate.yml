@@ -2,7 +2,10 @@ version: "2"
 
 checks:
   file-lines:
-    enabled: false
+      enabled: false
+  argument-count:
+    config:
+      threshold: 5
 
 plugins:
   duplication:
@@ -10,7 +13,15 @@ plugins:
     config:
       languages:
         - python
+  fixme:
+    enabled: true
+  radon:
+    enabled: true
   pep8:
+    enabled: true
+  shellcheck:
+    enabled: true
+  sonar-python:
     enabled: true
 
 exclude_patterns:
