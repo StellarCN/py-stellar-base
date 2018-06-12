@@ -1,5 +1,5 @@
 # coding: utf-8
-
+import pytest
 from stellar_base.memo import *
 from stellar_base.operation import *
 from stellar_base.transaction import Transaction
@@ -11,6 +11,17 @@ class TestTx:
     source = 'GDJVFDG5OCW5PYWHB64MGTHGFF57DRRJEDUEFDEL2SLNIOONHYJWHA3Z'
     seed = 'SAHPFH5CXKRMFDXEIHO6QATHJCX6PREBLCSFKYXTTCDDV6FJ3FXX4POT'
     dest = 'GCW24FUIFPC2767SOU4JI3JEAXIHYJFIJLH7GBZ2AVCBVP32SJAI53F5'
+
+    def test_init_raise_redundant_argument(self):
+        pytest.raises(
+            ValueError, Transaction, self.source,
+            opts={"dummy": [], "sequence": 1}
+        )
+
+    def test_init_raise_account_code_wrong(self):
+        pytest.raises(
+            DecodeError, Transaction, self.source + "1", opts={"sequence": 1}
+        )
 
     def do(self, network, opts):
         tx = Transaction(self.source, opts)

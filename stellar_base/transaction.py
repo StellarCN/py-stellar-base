@@ -3,18 +3,13 @@
 import base64
 
 from .memo import HashMemo, IdMemo, NoneMemo, RetHashMemo, TextMemo
-from .operation import (
-    CreateAccount, ManageOffer, AccountMerge, AllowTrust, ChangeTrust,
-    CreatePassiveOffer, Inflation, ManageData, PathPayment, Payment,
-    SetOptions)
+from .operation import Operation
 from .stellarxdr import Xdr
 from .utils import account_xdr_object, decode_check, encode_check
 
-# TODO: Consider making a part of the Transaction object?
-FEE = 100
-
 
 class Transaction(object):
+
     """The :class:`Transaction` object, which represents a transaction
     on Stellar's network.
 
@@ -65,22 +60,25 @@ class Transaction(object):
     # JavaScript SDK)? Wouldn't it make more sense to use optional arguments?
     # Several of the components in opts are also required. Especially because
     # they're just being shoved into typed attributes anyways?
+
+    default_fee = 100
+
     def __init__(self, source, opts):
-        # TODO: Remove these assert statements and throw more appropriate
-        # exceptions.
-        assert source is not None
-        assert decode_check('account', source)
-        assert type(opts) is dict
-        assert opts.get('sequence') is not None
+        opts = dict(opts)
+        decode_check('account', source)
 
         self.source = source
-        self.sequence = int(opts.get('sequence')) + 1
+        self.sequence = int(opts.pop('sequence')) + 1
         # FIXME: Shouldn't timebounds be an object that contains minTime and
         # maxTime fields?
-        self.time_bounds = opts.get('timeBounds', [])
-        self.memo = opts.get('memo', NoneMemo())
-        self.fee = int(opts['fee']) if 'fee' in opts else FEE
-        self.operations = opts.get('operations', [])
+        self.time_bounds = opts.pop('timeBounds', [])
+        self.memo = opts.pop('memo', NoneMemo())
+        self.fee = int(opts.pop('fee', self.default_fee))
+        self.operations = opts.pop('operations', [])
+        if opts:
+            raise ValueError(
+                "Unknown arguments found in opts: {}".format(opts)
+            )
 
     def add_operation(self, operation):
         """Add an :class:`Operation <stellar_base.operation.Operation>` to
@@ -143,33 +141,9 @@ class Transaction(object):
             memo = NoneMemo()
 
         fee = tx_xdr_object.fee
-
-        operations = []
-        ops = tx_xdr_object.operations
-        for op in ops:
-            if op.type == Xdr.const.CREATE_ACCOUNT:
-                operations.append(CreateAccount.from_xdr_object(op))
-            elif op.type == Xdr.const.PAYMENT:
-                operations.append(Payment.from_xdr_object(op))
-            elif op.type == Xdr.const.PATH_PAYMENT:
-                operations.append(PathPayment.from_xdr_object(op))
-            elif op.type == Xdr.const.CHANGE_TRUST:
-                operations.append(ChangeTrust.from_xdr_object(op))
-            elif op.type == Xdr.const.ALLOW_TRUST:
-                operations.append(AllowTrust.from_xdr_object(op))
-            elif op.type == Xdr.const.SET_OPTIONS:
-                operations.append(SetOptions.from_xdr_object(op))
-            elif op.type == Xdr.const.MANAGE_OFFER:
-                operations.append(ManageOffer.from_xdr_object(op))
-            elif op.type == Xdr.const.CREATE_PASSIVE_OFFER:
-                operations.append(CreatePassiveOffer.from_xdr_object(op))
-            elif op.type == Xdr.const.ACCOUNT_MERGE:
-                operations.append(AccountMerge.from_xdr_object(op))
-            elif op.type == Xdr.const.INFLATION:
-                operations.append(Inflation.from_xdr_object(op))
-            elif op.type == Xdr.const.MANAGE_DATA:
-                operations.append(ManageData.from_xdr_object(op))
-
+        operations = list(map(
+            Operation.from_xdr_object, tx_xdr_object.operations
+        ))
         return cls(
             source, {
                 'sequence': sequence,

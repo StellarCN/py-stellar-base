@@ -48,9 +48,6 @@ class Operation(object):
     """
 
     def __init__(self, opts):
-        # FIXME: Use a better exception.
-        assert type(opts) is dict
-
         self.source = opts.get('source')
         self.body = Xdr.nullclass()
 
@@ -101,8 +98,8 @@ class Operation(object):
 
         """
         if not isinstance(value, str):
-            # FIXME: Raise better exception
-            raise Exception("value must be a string")
+            raise TypeError("value of type '{}' is not a string"
+                            ".".format(type(value)))
 
         # throw exception if value * ONE has decimal places (it can't be
         # represented as int64)
@@ -136,6 +133,20 @@ class Operation(object):
         return str(Decimal(value) / ONE)
 
     @classmethod
+    def type_code(cls):
+        pass
+
+    @classmethod
+    def from_xdr_object(cls, operation):
+        for sub_cls in cls.__subclasses__():
+            if sub_cls.type_code() == operation.type:
+                return sub_cls.from_xdr_object(operation)
+        raise NotImplementedError(
+            "Operation of type={} is not implemented"
+            ".".format(operation.type)
+        )
+
+    @classmethod
     def from_xdr(cls, xdr):
         """Create the appropriate :class:`Operation` subclass from the XDR
         structure.
@@ -150,28 +161,7 @@ class Operation(object):
         xdr_decode = base64.b64decode(xdr)
         op = Xdr.StellarXDRUnpacker(xdr_decode)
         op = op.unpack_Operation()
-        if op.type == Xdr.const.CREATE_ACCOUNT:
-            return CreateAccount.from_xdr_object(op)
-        elif op.type == Xdr.const.PAYMENT:
-            return Payment.from_xdr_object(op)
-        elif op.type == Xdr.const.PATH_PAYMENT:
-            return PathPayment.from_xdr_object(op)
-        elif op.type == Xdr.const.CHANGE_TRUST:
-            return ChangeTrust.from_xdr_object(op)
-        elif op.type == Xdr.const.ALLOW_TRUST:
-            return AllowTrust.from_xdr_object(op)
-        elif op.type == Xdr.const.SET_OPTIONS:
-            return SetOptions.from_xdr_object(op)
-        elif op.type == Xdr.const.MANAGE_OFFER:
-            return ManageOffer.from_xdr_object(op)
-        elif op.type == Xdr.const.CREATE_PASSIVE_OFFER:
-            return CreatePassiveOffer.from_xdr_object(op)
-        elif op.type == Xdr.const.ACCOUNT_MERGE:
-            return AccountMerge.from_xdr_object(op)
-        elif op.type == Xdr.const.INFLATION:
-            return Inflation.from_xdr_object(op)
-        elif op.type == Xdr.const.MANAGE_DATA:
-            return ManageData.from_xdr_object(op)
+        return cls.from_xdr_object(op)
 
 
 class CreateAccount(Operation):
@@ -188,6 +178,11 @@ class CreateAccount(Operation):
         'starting_balance' via opts.
 
     """
+
+    @classmethod
+    def type_code(cls):
+        return Xdr.const.CREATE_ACCOUNT
+
     def __init__(self, opts):
         super(CreateAccount, self).__init__(opts)
         self.destination = opts.get('destination')
@@ -244,6 +239,10 @@ class Payment(Operation):
         opts.
 
     """
+    @classmethod
+    def type_code(cls):
+        return Xdr.const.PAYMENT
+
     def __init__(self, opts):
         super(Payment, self).__init__(opts)
         self.destination = opts.get('destination')
@@ -306,6 +305,10 @@ class PathPayment(Operation):
         'dest_asset', 'dest_amount', and 'path' via opts.
 
     """
+    @classmethod
+    def type_code(cls):
+        return Xdr.const.PATH_PAYMENT
+
     def __init__(self, opts):
         super(PathPayment, self).__init__(opts)
         self.destination = opts.get('destination')
@@ -387,6 +390,10 @@ class ChangeTrust(Operation):
         opts.
 
     """
+    @classmethod
+    def type_code(cls):
+        return Xdr.const.CHANGE_TRUST
+
     def __init__(self, opts):
         super(ChangeTrust, self).__init__(opts)
         self.line = opts.get('asset')
@@ -450,6 +457,10 @@ class AllowTrust(Operation):
         via opts.
 
     """
+    @classmethod
+    def type_code(cls):
+        return Xdr.const.ALLOW_TRUST
+
     def __init__(self, opts):
         super(AllowTrust, self).__init__(opts)
         self.trustor = opts.get('trustor')
@@ -538,6 +549,10 @@ class SetOptions(Operation):
         opts.
 
     """
+    @classmethod
+    def type_code(cls):
+        return Xdr.const.SET_OPTIONS
+
     def __init__(self, opts):
         super(SetOptions, self).__init__(opts)
         self.inflation_dest = opts.get('inflation_dest')
@@ -707,6 +722,10 @@ class ManageOffer(Operation):
         'selling', 'buying', 'amount', 'price', 'offer_id'.
 
     """
+    @classmethod
+    def type_code(cls):
+        return Xdr.const.MANAGE_OFFER
+
     def __init__(self, opts):
         super(ManageOffer, self).__init__(opts)
         self.selling = opts.get('selling')  # Asset
@@ -793,6 +812,10 @@ class CreatePassiveOffer(Operation):
         from opts: 'source', 'selling', 'buying', 'amount', 'price'.
 
     """
+    @classmethod
+    def type_code(cls):
+        return Xdr.const.CREATE_PASSIVE_OFFER
+
     def __init__(self, opts):
         super(CreatePassiveOffer, self).__init__(opts)
         self.selling = opts.get('selling')
@@ -867,6 +890,10 @@ class AccountMerge(Operation):
         opts: 'source', 'destination'
 
     """
+    @classmethod
+    def type_code(cls):
+        return Xdr.const.ACCOUNT_MERGE
+
     def __init__(self, opts):
         super(AccountMerge, self).__init__(opts)
         self.destination = opts.get('destination')
@@ -916,6 +943,10 @@ class Inflation(Operation):
         opts: 'source'.
 
     """
+    @classmethod
+    def type_code(cls):
+        return Xdr.const.INFLATION
+
     def __init__(self, opts):
         super(Inflation, self).__init__(opts)
 
@@ -960,6 +991,10 @@ class ManageData(Operation):
         'data_name', 'data_value'.
 
     """
+    @classmethod
+    def type_code(cls):
+        return Xdr.const.MANAGE_DATA
+
     def __init__(self, opts):
         super(ManageData, self).__init__(opts)
         self.data_name = opts.get('data_name')

@@ -4,8 +4,10 @@ from . import StellarXDR_type as types
 import xdrlib
 from xdrlib import Error as XDRError
 
+
 class nullclass(object):
     pass
+
 
 class StellarXDRPacker(xdrlib.Packer):
     def __init__(self, check_enum=True, check_array=True):
