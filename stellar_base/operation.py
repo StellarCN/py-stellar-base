@@ -99,7 +99,7 @@ class Operation(object):
         """
         if not isinstance(value, str):
             raise TypeError("value of type '{}' is not a string"
-                            ".".format(type(value)))
+                            ".".format(type(value).__name__))
 
         # throw exception if value * ONE has decimal places (it can't be
         # represented as int64)

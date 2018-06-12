@@ -20,7 +20,7 @@ class TestTx:
 
     def test_init_raise_account_code_wrong(self):
         pytest.raises(
-            DecodeError, Transaction, self.source + "1", opts={"sequence": 1}
+            Exception, Transaction, self.source + "1", opts={"sequence": 1}
         )
 
     def do(self, network, opts):
