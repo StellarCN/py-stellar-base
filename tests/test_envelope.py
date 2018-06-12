@@ -1,4 +1,7 @@
 # coding:utf-8
+from os import path
+import pytest
+
 from stellar_base.operation import *
 from stellar_base.asset import Asset
 from stellar_base.keypair import Keypair
@@ -175,51 +178,19 @@ class TestOp:
         })))
 
 
-class TestunXdr:
-    def test_allowTrust_shortAsset_unXdr(self):
-        result = b'AAAAANNSjN1wrdfixw+4w0zmKXvxxikg6EKMi9SW1DnNPhNjAAAAZAAAAAAAAAACAAAAAAAAAAAAAAABAAAAAAAAAAcAAAAAra4WiCvFr/vydTiUbSQF0HwkqErP8wc6BUQav3qSQI4AAAACcG9ja2V0a25pdmVzAAAAAQAAAAAAAAABzT4TYwAAAEBK169VZqBQYUrs+ueQzx/UaANo+7HCdUcpflNvT4e5y7o+T7fxzJ845B3hVr8rrJ27Rz/VVslBWkXmxKoaa8sC'
-        assert (result == Te.from_xdr(result).xdr())
+def _load_xdr_and_un_xdr_cases():
+    filename = path.join(
+        path.dirname(__file__), "txt", "xdr_for_transaction_enveloppe.txt"
+    )
+    with open(filename, "r") as f:
+        for line in f.readlines():
+            s, data = line.strip().split(",")
+            yield s, str.encode(data)
 
-    def test_createAccount_unXdr(self):
-        result = b'AAAAANNSjN1wrdfixw+4w0zmKXvxxikg6EKMi9SW1DnNPhNjAAAAZAAAAAAAAAACAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAra4WiCvFr/vydTiUbSQF0HwkqErP8wc6BUQav3qSQI4AAAAAAJiWgAAAAAAAAAABzT4TYwAAAEBBR+eUTPqpyTBLiNMudfSl2AN+oZL9/yp0KE9SyYeIzM2Y7yQH+dGNlwz5PMaaCEGAD+82IZkAPSDyunElc+EP'
-        assert (result == Te.from_xdr(result).xdr())
 
-    def test_payment_short_unXdr(self):
-        result = b'AAAAANNSjN1wrdfixw+4w0zmKXvxxikg6EKMi9SW1DnNPhNjAAAAZAAAAAAAAAACAAAAAAAAAAAAAAABAAAAAQAAAADTUozdcK3X4scPuMNM5il78cYpIOhCjIvUltQ5zT4TYwAAAAEAAAAAra4WiCvFr/vydTiUbSQF0HwkqErP8wc6BUQav3qSQI4AAAAAAAAAAACYloAAAAAAAAAAAc0+E2MAAABAzEdbP2ISsB9pDqmIRPt6WEK0GkVOgAEljnelNQjNpDig6A60+jMtveQjdCocL13GwVbO1B8VBXgQdlAobs0fDg=='
-        assert (result == Te.from_xdr(result).xdr())
-
-    def test_pathPayment_min_unXdr(self):
-        result = b'AAAAANNSjN1wrdfixw+4w0zmKXvxxikg6EKMi9SW1DnNPhNjAAAAZAAAAAAAAAACAAAAAAAAAAAAAAABAAAAAQAAAADTUozdcK3X4scPuMNM5il78cYpIOhCjIvUltQ5zT4TYwAAAAIAAAAAAAAAAACYloAAAAAAra4WiCvFr/vydTiUbSQF0HwkqErP8wc6BUQav3qSQI4AAAAAAAAAAACYloAAAAAAAAAAAAAAAAHNPhNjAAAAQFwSz9wwBEWCv9cNnuIq+Jjq36mXBI22f6uj/FZ6LbyLljkckSLkF/AqXcaOoOgY9mZ0NrXsHbA5/chSThtgMgQ='  # TODO
-        assert (result == Te.from_xdr(result).xdr())
-
-    def test_changeTrust_min_unXdr(self):
-        result = b'AAAAANNSjN1wrdfixw+4w0zmKXvxxikg6EKMi9SW1DnNPhNjAAAAZAAAAAAAAAACAAAAAAAAAAAAAAABAAAAAAAAAAYAAAABYmVlcgAAAACtrhaIK8Wv+/J1OJRtJAXQfCSoSs/zBzoFRBq/epJAjn//////////AAAAAAAAAAHNPhNjAAAAQL0R9eOS0qesc+HHKQoHMjFUJWvzeQOy+u/7HBHNooo37AOaG85y9jyNoa1D4EduroZmK8vCfCF0V3rn5o9CpgA='
-        assert (result == Te.from_xdr(result).xdr())
-
-    def test_accountMerge_min_unXdr(self):
-        result = b'AAAAANNSjN1wrdfixw+4w0zmKXvxxikg6EKMi9SW1DnNPhNjAAAAZAAAAAAAAAACAAAAAAAAAAAAAAABAAAAAAAAAAgAAAAAra4WiCvFr/vydTiUbSQF0HwkqErP8wc6BUQav3qSQI4AAAAAAAAAAc0+E2MAAABADFSYbdlswOKfK4Y02Tz/j5j83c7f5YvLe+QxmXcHSd/W8ika63MsM6CDkDZhjRx4+Nt+mfCKpKbP7j0NPzNhCQ=='
-        assert (result == Te.from_xdr(result).xdr())
-
-    def test_inflation_unXdr(self):
-        result = b'AAAAANNSjN1wrdfixw+4w0zmKXvxxikg6EKMi9SW1DnNPhNjAAAAZAAAAAAAAAACAAAAAAAAAAAAAAABAAAAAAAAAAkAAAAAAAAAAc0+E2MAAABAL2tfdCYqdtfxvINWVZ0iwcROqxQieoBF9cay5AL2oj2oJDrp3F3sYlHQNJi1orkcMLqsxaGtr6DWdnc0vwIBDg=='
-        assert (result == Te.from_xdr(result).xdr())
-
-    def test_createPassiveOffer_min_unXdr(self):
-        result = b'AAAAANNSjN1wrdfixw+4w0zmKXvxxikg6EKMi9SW1DnNPhNjAAAAZAAAAAAAAAACAAAAAAAAAAAAAAABAAAAAAAAAAQAAAABYmVlcgAAAADTUozdcK3X4scPuMNM5il78cYpIOhCjIvUltQ5zT4TYwAAAAFiZWVyAAAAAK2uFogrxa/78nU4lG0kBdB8JKhKz/MHOgVEGr96kkCOAAAAADuaygAABMsvAAGGoAAAAAAAAAABzT4TYwAAAEAm4lQf6g7mpnw05syhOt3ub+OmSADhSfLwn/xg6bD+6qwqlpF/xflNYWKU1uQOy4P9e1+SWIGJdR+KWryykS0M'  # TODO
-        assert (result == Te.from_xdr(result).xdr())
-
-    def test_manageOffer_min_unXdr(self):
-        result = b'AAAAANNSjN1wrdfixw+4w0zmKXvxxikg6EKMi9SW1DnNPhNjAAAAZAAAAAAAAAACAAAAAAAAAAAAAAABAAAAAAAAAAMAAAABYmVlcgAAAADTUozdcK3X4scPuMNM5il78cYpIOhCjIvUltQ5zT4TYwAAAAFiZWVyAAAAAK2uFogrxa/78nU4lG0kBdB8JKhKz/MHOgVEGr96kkCOAAAAADuaygAABMsvAAGGoAAAAAAAAAABAAAAAAAAAAHNPhNjAAAAQBTg1srmkpv/pFqELvCsSurwRPYRUpH05j1sgDzOZdILCdVpxb3sEvMgim1DXE0VhGXqbgZaQV/Sp2VH5C5RKQI='  # TODO
-        print(result)
-        print(Te.from_xdr(result).xdr())
-
-    def test_SetOptions_empty_unXdr(self):
-        result = b'AAAAANNSjN1wrdfixw+4w0zmKXvxxikg6EKMi9SW1DnNPhNjAAAAZAAAAAAAAAACAAAAAAAAAAAAAAABAAAAAAAAAAUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAc0+E2MAAABAymdhj3dFg+3TcCRILXdUu8ZhG3WOuBmX3YXcYJhYemjCDylQEk31vF8wxB/ntRg4/vmCYC2IwhBtw1mJZ8h+Bw=='
-        assert (result == Te.from_xdr(result).xdr())
-    
-    def test_with_textmemo_unXdr(self):
-        result = b'AAAAAOiDfcHkczCk4s7yZjQUk3Bw5I2XbnYE6chMMKI8YJtLAAAAZACBU1YAAAACAAAAAAAAAAEAAAAIdGV4dG1lbW8AAAABAAAAAAAAAAEAAAAAFpAPI0oLC9YB1XuGNOlQ66m2pW2S475yjvCc8hjY4fIAAAAAAAAAADuaygAAAAAAAAAAAjxgm0sAAABAip/qGePkWwafGT0Juy65rZ2jG1PAv5wDoiZSLmTj9DDcYNq/MpZg5cgOht+aqESP+dlFp6Lmz0sO2A5vo49ZD31MZysAAABANgJJyV+XRPZAieaHceV3JWfjyfhWJpqrEpfS0pkDzKbExGIKy9ntfrZS3a4kYE8IQeziRRYxc+tASf+Tgs+EAQ=='
-        assert (result == Te.from_xdr(result).xdr())
+@pytest.mark.parametrize("name, xdr_data", _load_xdr_and_un_xdr_cases())
+def test_xdr_and_un_xdr(name, xdr_data):
+    assert xdr_data == Te.from_xdr(xdr_data).xdr()
 
 
 class TestMultiOp:
