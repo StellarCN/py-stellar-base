@@ -35,7 +35,6 @@ class TestXdrAmount:
 
 def _load_operations():
     source = 'GDJVFDG5OCW5PYWHB64MGTHGFF57DRRJEDUEFDEL2SLNIOONHYJWHA3Z'
-    seed = 'SAHPFH5CXKRMFDXEIHO6QATHJCX6PREBLCSFKYXTTCDDV6FJ3FXX4POT'
     dest = 'GCW24FUIFPC2767SOU4JI3JEAXIHYJFIJLH7GBZ2AVCBVP32SJAI53F5'
     amount = "1"
     return [
@@ -47,6 +46,19 @@ def _load_operations():
             'source': source, 'destination': dest,
             'asset': Asset.native(), 'amount': amount,
         })),
+        ("payment_short_asset", Payment({
+            'source': source, 'destination': dest,
+            'asset': Asset('USD4', source), 'amount': amount,
+        })),
+        ("payment_long_asset", Payment({
+            'source': source, 'destination': dest,
+            'asset': Asset('SNACKS789ABC', source), 'amount': amount,
+        })),
+        ("path_payment_min", PathPayment({
+            'source': source, 'destination': dest,
+            'send_asset': Asset.native(), 'dest_asset': Asset.native(),
+            'send_max': amount, 'dest_amount': amount, 'path': [],
+        })),
         ("allow_trust_short_asset", AllowTrust({
             'source': source, 'trustor': dest, 'asset_code': 'beer',
             'authorize': True,
@@ -54,6 +66,27 @@ def _load_operations():
         ("allow_trust_long_asset", AllowTrust({
             'source': source, 'trustor': dest,
             'asset_code': 'pocketknives', 'authorize': True,
+        })),
+        ("manage_offer_min", ManageOffer({
+            'selling': Asset('beer', source), 'buying': Asset('beer', dest),
+            'amount': "100", 'price': 3.14159, 'offer_id': 1,
+        })),
+        ("create_passive_offer_min", CreatePassiveOffer({
+            'selling': Asset('beer', source), 'buying': Asset('beer', dest),
+            'amount': "100", 'price': 3.14159,
+        })),
+        ("set_options_empty", SetOptions({})),
+        ("change_trust_min", ChangeTrust({
+            'source': source, 'asset': Asset('beer', dest), 'limit': '100'
+        })),
+        ("account_merge_min", AccountMerge({
+            'source': source, 'destination': dest,
+        })),
+        ("inflation", Inflation({'source': source})),
+        ("manage_data", ManageData({
+            'source': source,
+            'data_name': '1KFHE7w8BhaENAswwryaoccDb6qcT6DbYY',
+            'data_value': source,
         })),
     ]
 
@@ -71,149 +104,13 @@ def test_operation(name, operation):
 
 def test_from_xdr_object_raise():
     operation = mock.MagicMock(type=2561)
-    pytest.raises(
-        NotImplementedError, Operation.from_xdr_object, operation
-    )
+    pytest.raises(NotImplementedError, Operation.from_xdr_object, operation)
 
 
-class TestOp:
-    source = 'GDJVFDG5OCW5PYWHB64MGTHGFF57DRRJEDUEFDEL2SLNIOONHYJWHA3Z'
-    seed = 'SAHPFH5CXKRMFDXEIHO6QATHJCX6PREBLCSFKYXTTCDDV6FJ3FXX4POT'
-    dest = 'GCW24FUIFPC2767SOU4JI3JEAXIHYJFIJLH7GBZ2AVCBVP32SJAI53F5'
-    amount = "1"
-
-    def test_payment_short_asset(self):
-        op = Payment({
-            'source': self.source,
-            'destination': self.dest,
-            'asset': Asset('USD4', self.source),
-            'amount': self.amount,
-        })
-        op_x = Operation.from_xdr(op.xdr())
-        assert op == op_x
-        assert op_x.source == self.source
-        assert op_x.destination == self.dest
-        assert op_x.asset == Asset('USD4', self.source)
-        assert op_x.amount == self.amount
-
-    def test_payment_long_asset(self):
-        op = Payment({
-            'source': self.source,
-            'destination': self.dest,
-            'asset': Asset('SNACKS789ABC', self.source),
-            'amount': self.amount,
-        })
-        op_x = Operation.from_xdr(op.xdr())
-        assert op == op_x
-        assert op_x.source == self.source
-        assert op_x.destination == self.dest
-        assert op_x.asset == Asset('SNACKS789ABC', self.source)
-        assert op_x.amount == self.amount
-
-    def test_pathPayment_min(self):
-        op = PathPayment({
-            'source': self.source,
-            'destination': self.dest,
-            'send_asset': Asset.native(),
-            'dest_asset': Asset.native(),
-            'send_max': self.amount,
-            'dest_amount': self.amount,
-            'path': [],
-        })
-        op_x = Operation.from_xdr(op.xdr())
-        assert op == op_x
-        assert op_x.source == self.source
-        assert op_x.destination == self.dest
-        assert op_x.send_asset == Asset.native()
-        assert op_x.dest_asset == Asset.native()
-        assert op_x.send_max == self.amount
-        assert op_x.dest_amount == self.amount
-        assert op_x.path == []
-
-    def test_manageOffer_min(self):
-        op = ManageOffer({
-            'selling': Asset('beer', self.source),
-            'buying': Asset('beer', self.dest),
-            'amount': "100",
-            'price': 3.14159,
-            'offer_id': 1,
-        })
-        op_x = Operation.from_xdr(op.xdr())
-        assert op == op_x
-        assert op_x.source == None
-        assert op_x.selling == Asset('beer', self.source)
-        assert op_x.buying == Asset('beer', self.dest)
-        assert op_x.amount == "100"
-        assert op_x.price == 3.14159
-        assert op_x.offer_id == 1
-
-    def test_createPassiveOffer_min(self):
-        op = CreatePassiveOffer({
-            'selling': Asset('beer', self.source),
-            'buying': Asset('beer', self.dest),
-            'amount': "100",
-            'price': 3.14159,
-        })
-        op_x = Operation.from_xdr(op.xdr())
-        assert op == op_x
-        assert op_x.source == None
-        assert op_x.selling == Asset('beer', self.source)
-        assert op_x.buying == Asset('beer', self.dest)
-        assert op_x.amount == "100"
-        assert op_x.price == 3.14159
-
-    def test_SetOptions_empty(self):
-        op = SetOptions({})
-        assert op == Operation.from_xdr(op.xdr())
-
-    def test_changeTrust_min(self):
-        op = ChangeTrust({
-            'source': self.source,
-            'asset': Asset('beer', self.dest),
-            'limit': '100'
-        })
-        op_x = Operation.from_xdr(op.xdr())
-        assert op == op_x
-        assert op_x.source == self.source
-        assert op_x.line == Asset('beer', self.dest)
-        assert op_x.limit == '100'
-
-    def test_accountMerge_min(self):
-        op = AccountMerge({
-            'source': self.source,
-            'destination': self.dest,
-        })
-        op_x = Operation.from_xdr(op.xdr())
-        assert op == op_x
-        assert op_x.source == self.source
-        assert op_x.destination == self.dest
-
-    def test_inflation(self):
-        op = Inflation({
-            'source': self.source,
-        })
-        op_x = Operation.from_xdr(op.xdr())
-        assert op == op_x
-        assert op_x.source == self.source
-
-    def test_manage_data(self):
-        op = ManageData({
-            'source': self.source,
+def test_manage_data_too_long_raises():
+    msg = 'Data or value should be <= 64 bytes \(ascii encoded\).'
+    with pytest.raises(XdrLengthError, match=msg):
+        ManageData({
             'data_name': '1KFHE7w8BhaENAswwryaoccDb6qcT6DbYY',
-            'data_value': self.source,
+            'data_value': '1234567890' * 7
         })
-        op_x = Operation.from_xdr(op.xdr())
-        assert op == op_x
-        assert op_x.source == self.source
-        assert op_x.data_name == '1KFHE7w8BhaENAswwryaoccDb6qcT6DbYY'
-        assert op_x.data_value == self.source
-
-    def test_manage_data_too_long(self):
-        with pytest.raises(
-                XdrLengthError,
-                match='Data or value should be <= 64 bytes \(ascii encoded\).'
-        ):
-            ManageData({
-                'data_name': '1KFHE7w8BhaENAswwryaoccDb6qcT6DbYY',
-                'data_value': '1234567890' * 7
-            })
