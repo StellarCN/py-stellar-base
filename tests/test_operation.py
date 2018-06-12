@@ -33,43 +33,54 @@ class TestXdrAmount:
         assert (Operation.from_xdr_amount(112345678) == "11.2345678")
 
 
+def _load_operations():
+    source = 'GDJVFDG5OCW5PYWHB64MGTHGFF57DRRJEDUEFDEL2SLNIOONHYJWHA3Z'
+    seed = 'SAHPFH5CXKRMFDXEIHO6QATHJCX6PREBLCSFKYXTTCDDV6FJ3FXX4POT'
+    dest = 'GCW24FUIFPC2767SOU4JI3JEAXIHYJFIJLH7GBZ2AVCBVP32SJAI53F5'
+    amount = "1"
+    return [
+        ("create_account_min", CreateAccount({
+            'source': source, 'destination': dest,
+            'starting_balance': amount
+        })),
+        ("payment_min", Payment({
+            'source': source, 'destination': dest,
+            'asset': Asset.native(), 'amount': amount,
+        })),
+        ("allow_trust_short_asset", AllowTrust({
+            'source': source, 'trustor': dest, 'asset_code': 'beer',
+            'authorize': True,
+        })),
+        ("allow_trust_long_asset", AllowTrust({
+            'source': source, 'trustor': dest,
+            'asset_code': 'pocketknives', 'authorize': True,
+        })),
+    ]
+
+
+@pytest.mark.parametrize("name, operation", _load_operations())
+def test_operation(name, operation):
+    operation_restored = Operation.from_xdr(operation.xdr())
+    assert operation == operation_restored
+    original = dict(operation.__dict__)
+    original.pop("body")
+    restored = dict(operation_restored.__dict__)
+    restored.pop("body")
+    assert original == restored
+
+
+def test_from_xdr_object_raise():
+    operation = mock.MagicMock(type=2561)
+    pytest.raises(
+        NotImplementedError, Operation.from_xdr_object, operation
+    )
+
+
 class TestOp:
     source = 'GDJVFDG5OCW5PYWHB64MGTHGFF57DRRJEDUEFDEL2SLNIOONHYJWHA3Z'
     seed = 'SAHPFH5CXKRMFDXEIHO6QATHJCX6PREBLCSFKYXTTCDDV6FJ3FXX4POT'
     dest = 'GCW24FUIFPC2767SOU4JI3JEAXIHYJFIJLH7GBZ2AVCBVP32SJAI53F5'
     amount = "1"
-
-    def test_from_xdr_object_raise(self):
-        operation = mock.MagicMock(type=2561)
-        pytest.raises(
-            NotImplementedError, Operation.from_xdr_object, operation
-        )
-
-    def test_createAccount_min(self):
-        op = CreateAccount({
-            'source': self.source,
-            'destination': self.dest,
-            'starting_balance': self.amount
-        })
-        op_x = Operation.from_xdr(op.xdr())
-        assert op == op_x
-        assert op_x.source == self.source
-        assert op_x.destination == self.dest
-        assert op_x.starting_balance == self.amount
-
-    def test_payment_min(self):
-        op = Payment({
-            'source': self.source,
-            'destination': self.dest,
-            'asset': Asset.native(),
-            'amount': self.amount,
-        })
-        op_x = Operation.from_xdr(op.xdr())
-        assert op == op_x
-        assert op_x.source == self.source
-        assert op_x.destination == self.dest
-        assert op_x.asset == Asset.native()
-        assert op_x.amount == self.amount
 
     def test_payment_short_asset(self):
         op = Payment({
@@ -166,34 +177,6 @@ class TestOp:
         assert op_x.source == self.source
         assert op_x.line == Asset('beer', self.dest)
         assert op_x.limit == '100'
-
-    def test_allowTrust_shortAsset(self):
-        op = AllowTrust({
-            'source': self.source,
-            'trustor': self.dest,
-            'asset_code': 'beer',
-            'authorize': True,
-        })
-        op_x = Operation.from_xdr(op.xdr())
-        assert op == op_x
-        assert op_x.source == self.source
-        assert op_x.trustor == self.dest
-        assert op_x.asset_code == 'beer'
-        assert op_x.authorize == True
-
-    def test_allowTrust_longAsset(self):
-        op = AllowTrust({
-            'source': self.source,
-            'trustor': self.dest,
-            'asset_code': 'pocketknives',
-            'authorize': True,
-        })
-        op_x = Operation.from_xdr(op.xdr())
-        assert op == op_x
-        assert op_x.source == self.source
-        assert op_x.trustor == self.dest
-        assert op_x.asset_code == 'pocketknives'
-        assert op_x.authorize == True
 
     def test_accountMerge_min(self):
         op = AccountMerge({
