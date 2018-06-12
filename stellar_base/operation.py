@@ -390,6 +390,8 @@ class ChangeTrust(Operation):
         opts.
 
     """
+    default_limit = "922337203685.4775807"
+
     @classmethod
     def type_code(cls):
         return Xdr.const.CHANGE_TRUST
@@ -397,10 +399,7 @@ class ChangeTrust(Operation):
     def __init__(self, opts):
         super(ChangeTrust, self).__init__(opts)
         self.line = opts.get('asset')
-        if opts.get('limit') is not None:
-            self.limit = opts.get('limit')
-        else:
-            self.limit = "922337203685.4775807"
+        self.limit = opts.get('limit') or self.default_limit
 
     def to_xdr_object(self):
         """Creates an XDR Operation object that represents this
@@ -431,11 +430,7 @@ class ChangeTrust(Operation):
         limit = Operation.from_xdr_amount(
             op_xdr_object.body.changeTrustOp.limit)
 
-        return cls({
-            'source': source,
-            'asset': line,
-            'limit': limit
-        })
+        return cls({'source': source, 'asset': line, 'limit': limit})
 
 
 class AllowTrust(Operation):

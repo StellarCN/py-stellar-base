@@ -1,4 +1,6 @@
 # coding:utf-8
+import sys
+import decimal
 import mock
 import pytest
 
@@ -6,31 +8,27 @@ from stellar_base.operation import *
 from stellar_base.asset import Asset
 
 
-class TestXdrAmount:
-    def test_to_xdr_amount(self):
-        assert (Operation.to_xdr_amount("20") == 20 * 10 ** 7)
-        assert (Operation.to_xdr_amount("0.1234567") == 1234567)
+@pytest.mark.parametrize("s, error_type", [
+    ("0.12345678", decimal.Inexact),
+    ("test", decimal.InvalidOperation),
+    (0.1234, TypeError),
+])
+def test_to_xdr_amount_raise(s, error_type):
+    if sys.version_info.major == 2:
+        error_type = Exception
+    with pytest.raises(error_type):
+        Operation.to_xdr_amount(s)
 
-    def test_to_xdr_amount_inexact(self):
-        with pytest.raises(Exception):
-            Operation.to_xdr_amount("0.12345678")
 
-    def test_to_xdr_amount_not_number(self):
-        with pytest.raises(Exception):
-            # in python2.7 it will raise Exception('Invalid literal for Decimal')
-            # but in python3, it will raise decimal.InvalidOperation
-            Operation.to_xdr_amount("test")
-
-    def test_to_xdr_amount_not_string(self):
-        with pytest.raises(
-                TypeError, match="value of type 'float' is not a string"):
-            Operation.to_xdr_amount(0.1234)
-
-    def test_from_xdr_amount(self):
-        assert (Operation.from_xdr_amount(10 ** 7) == "1")
-        assert (Operation.from_xdr_amount(20 * 10 ** 7) == "20")
-        assert (Operation.from_xdr_amount(1234567) == "0.1234567")
-        assert (Operation.from_xdr_amount(112345678) == "11.2345678")
+@pytest.mark.parametrize("num, s", [
+    (10 ** 7, "1"),
+    (20 * 10 ** 7, "20"),
+    (1234567, "0.1234567"),
+    (112345678, "11.2345678"),
+])
+def test_from_and_to_xdr_amount(num, s):
+    assert s == Operation.from_xdr_amount(num)
+    assert num == Operation.to_xdr_amount(s)
 
 
 def _load_operations():
@@ -78,6 +76,9 @@ def _load_operations():
         ("set_options_empty", SetOptions({})),
         ("change_trust_min", ChangeTrust({
             'source': source, 'asset': Asset('beer', dest), 'limit': '100'
+        })),
+        ("change_trust_default_limit", ChangeTrust({
+            'source': source, 'asset': Asset('beer', dest)
         })),
         ("account_merge_min", AccountMerge({
             'source': source, 'destination': dest,
