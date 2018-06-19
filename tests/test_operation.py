@@ -1,5 +1,5 @@
 # coding:utf-8
-
+import mock
 import pytest
 
 from stellar_base.operation import *
@@ -22,7 +22,8 @@ class TestXdrAmount:
             Operation.to_xdr_amount("test")
 
     def test_to_xdr_amount_not_string(self):
-        with pytest.raises(Exception, match='value must be a string'):
+        with pytest.raises(
+                TypeError, match="value of type 'float' is not a string"):
             Operation.to_xdr_amount(0.1234)
 
     def test_from_xdr_amount(self):
@@ -37,6 +38,12 @@ class TestOp:
     seed = 'SAHPFH5CXKRMFDXEIHO6QATHJCX6PREBLCSFKYXTTCDDV6FJ3FXX4POT'
     dest = 'GCW24FUIFPC2767SOU4JI3JEAXIHYJFIJLH7GBZ2AVCBVP32SJAI53F5'
     amount = "1"
+
+    def test_from_xdr_object_raise(self):
+        operation = mock.MagicMock(type=2561)
+        pytest.raises(
+            NotImplementedError, Operation.from_xdr_object, operation
+        )
 
     def test_createAccount_min(self):
         op = CreateAccount({
@@ -218,8 +225,11 @@ class TestOp:
         assert op_x.data_name == '1KFHE7w8BhaENAswwryaoccDb6qcT6DbYY'
         assert op_x.data_value == self.source
 
-    def test_manage_data_toolong(self):
-        with pytest.raises(XdrLengthError, match='Data or value should be <= 64 bytes \(ascii encoded\).'):
+    def test_manage_data_too_long(self):
+        with pytest.raises(
+                XdrLengthError,
+                match='Data or value should be <= 64 bytes \(ascii encoded\).'
+        ):
             ManageData({
                 'data_name': '1KFHE7w8BhaENAswwryaoccDb6qcT6DbYY',
                 'data_value': '1234567890' * 7

@@ -15,7 +15,6 @@ plugins:
 
 exclude_patterns:
   - "docs/"
-  - "tests/"
   - "stellar_base/xdr/"
   - "stellar_base/wordlist/"
   - "stellar_base/stellarxdr/"

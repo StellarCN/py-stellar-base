@@ -1,6 +1,6 @@
 # coding: utf-8
 from __future__ import print_function
-
+import sys
 import base64
 import binascii
 from decimal import Decimal, ROUND_FLOOR
@@ -20,9 +20,7 @@ from .stellarxdr import Xdr
 from .exceptions import DecodeError, ConfigurationError, MnemonicError
 
 # Compatibility for Python 3.x that don't have unicode type
-try:
-    type(unicode)
-except NameError:
+if sys.version_info.major == 3:
     unicode = str
 
 bytes_types = (bytes, bytearray)  # Types acceptable as binary data
