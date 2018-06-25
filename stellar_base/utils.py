@@ -236,11 +236,26 @@ class StellarMnemonic(Mnemonic):
         path = self.stellar_account_path_format % index
         for x in path.split("/")[1:]:
             data = (
-                struct.pack('x')
-                + il
-                + struct.pack('>I', self.first_hardened_index + int(x[:-1])))
+                    struct.pack('x')
+                    + il
+                    + struct.pack('>I',
+                                  self.first_hardened_index + int(x[:-1])))
             i = hmac.new(ir, digestmod=hashlib.sha512)
             i.update(data)
             il = i.digest()[:32]
             ir = i.digest()[32:]
         return il
+
+
+def is_valid_address(address):
+    try:
+        return decode_check('account', address)
+    except Exception:
+        return False
+
+
+def is_valid_secret_key(key):
+    try:
+        return decode_check('seed', key)
+    except Exception:
+        return False

@@ -5,14 +5,17 @@ import warnings
 
 from .base58 import b58decode_check, b58encode_check
 from .stellarxdr import Xdr
-from .utils import decode_check, encode_check, StellarMnemonic
-from .exceptions import XdrLengthError, MissingSigningKeyError
+from .utils import encode_check, StellarMnemonic, \
+    is_valid_address, is_valid_secret_key
+from .exceptions import MissingSigningKeyError
+
 # noinspection PyBroadException
 try:
     # noinspection PyUnresolvedReferences
-    from pure25519 import ed25519_oop as ed25519
-except ImportError:
     import ed25519
+except ImportError:
+    from pure25519 import ed25519_oop as ed25519
+
 import hashlib
 
 
@@ -98,7 +101,10 @@ class Keypair(object):
         :return: A new :class:`Keypair` instance derived by the secret seed.
 
         """
-        raw_seed = decode_check("seed", seed)
+
+        raw_seed = is_valid_secret_key(seed)
+        if not raw_seed:
+            raise ValueError('Invalid Stellar secret key: {}'.format(seed))
         return cls.from_raw_seed(raw_seed)
 
     @classmethod
@@ -146,9 +152,9 @@ class Keypair(object):
         :return: A new :class:`Keypair` with only a verifying (public) key.
 
         """
-        public_key = decode_check("account", address)
-        if len(public_key) != 32:
-            raise XdrLengthError('Invalid Stellar address')
+        public_key = is_valid_address(address)
+        if not public_key:
+            raise ValueError('Invalid Stellar address: {}'.format(address))
         verifying_key = ed25519.VerifyingKey(public_key)
         return cls(verifying_key)
 

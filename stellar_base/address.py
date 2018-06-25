@@ -33,14 +33,13 @@ class Address(object):
     # TODO: Make network an enum
     def __init__(
             self, address=None, secret=None, network='TESTNET', horizon=None):
-        if address is None and secret is None:
-            # FIXME: Throw a better exception
-            raise Exception('oops,need a stellar address or secret')
-        if address is None and secret is not None:
+        if secret:
             self.address = Keypair.from_seed(secret).address().decode()
+        elif address:
+            self.address = Keypair.from_address(address).address().decode()
         else:
-            self.address = address
-        self.secret = secret
+            raise ValueError('oops, need a stellar address or secret')
+        # self.secret = secret
 
         if network.upper() != 'PUBLIC':
             self.network = 'TESTNET'
@@ -112,7 +111,7 @@ class Address(object):
         :param bool sse: Use the SSE client for connecting to Horizon.
 
         """
-        check_params(kwargs)
+        self.__check_params(kwargs)
         return self.horizon.account_payments(
             self.address, params=kwargs, sse=sse)
 
@@ -125,7 +124,7 @@ class Address(object):
         :param bool sse: Use the SSE client for connecting to Horizon.
 
         """
-        check_params(kwargs)
+        self.__check_params(kwargs)
         return self.horizon.account_offers(self.address, params=kwargs)
 
     def transactions(self, sse=False, **kwargs):
@@ -137,7 +136,7 @@ class Address(object):
         :param bool sse: Use the SSE client for connecting to Horizon.
 
         """
-        check_params(kwargs)
+        self.__check_params(kwargs)
         return self.horizon.account_transactions(
             self.address, params=kwargs, sse=sse)
 
@@ -150,7 +149,7 @@ class Address(object):
         :param bool sse: Use the SSE client for connecting to Horizon.
 
         """
-        check_params(kwargs)
+        self.__check_params(kwargs)
         return self.horizon.account_operations(
             self.address, params=kwargs, sse=sse)
 
@@ -163,21 +162,20 @@ class Address(object):
         :param bool sse: Use the SSE client for connecting to Horizon.
 
         """
-        check_params(kwargs)
+        self.__check_params(kwargs)
         return self.horizon.account_effects(
             self.address, params=kwargs, sse=sse)
 
+    # noinspection PyMethodMayBeStatic
+    def __check_params(self, data):
+        """Check for appropriate keywords for a Horizon request method.
 
-# TODO: Make this a private method of the Address class.
-def check_params(data):
-    """Check for appropriate keywords for a Horizon request method.
+        Check a dict of arguments to make sure that they only contain allowable
+        params for requests to Horizon, such as 'cursor', 'limit', and 'order'.
 
-    Check a dict of arguments to make sure that they only contain allowable
-    params for requests to Horizon, such as 'cursor', 'limit', and 'order'.
+        """
 
-    """
-
-    params_allowed = {'cursor', 'limit', 'order'}
-    params = set(data.keys())
-    if params - params_allowed:
-        raise NotValidParamError('not valid params')
+        params_allowed = {'cursor', 'limit', 'order'}
+        params = set(data.keys())
+        if params - params_allowed:
+            raise NotValidParamError('not valid params')

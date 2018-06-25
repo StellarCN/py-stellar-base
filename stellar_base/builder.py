@@ -50,7 +50,7 @@ class Builder(object):
         if address is None and secret is None:
             raise Exception('No Stellar address afforded.')
         if address is not None and secret is None:
-            self.address = address
+            self.address = Keypair.from_address(address).address().decode()
             self.key_pair = None
 
         if network is None:
