@@ -4,17 +4,23 @@ import pytest
 
 from stellar_base import utils
 from stellar_base.stellarxdr import StellarXDR_pack as Xdr
+from stellar_base.utils import is_valid_address
 
 
 class TestUtils(TestCase):
     account = 'GDVDKQFP665JAO7A2LSHNLQIUNYNAAIGJ6FYJVMG4DT3YJQQJSRBLQDG'
     secret = 'SCVLSUGYEAUC4MVWJORB63JBMY2CEX6ATTJ5MXTENGD3IELUQF4F6HUB'
+    bad_account = 'GDVDKQFP665JAO7A2LSHNLQIUNYNAAIGJ6FYJVMG4DT3YJQQJSXXXXXX'
 
     def test_account_xdr_object(self):
         assert isinstance(utils.account_xdr_object(self.account), Xdr.types.PublicKey)
 
     def test_decode_check(self):
         assert type(utils.decode_check('account', self.account)) is bytes
+
+    def test_is_valid_address(self):
+        assert type(is_valid_address(self.account)) is bytes
+        assert is_valid_address(self.bad_account) is False
 
     # def test_encode_check(self):
     # TODO

@@ -3,7 +3,7 @@
 import base64
 import re
 
-from .utils import account_xdr_object, encode_check
+from .utils import account_xdr_object, encode_check, is_valid_address
 from .stellarxdr import Xdr
 
 
@@ -32,10 +32,11 @@ class Asset(object):
                 "Asset code is invalid (alphanumeric, 12 "
                 "characters max).")
 
+        if issuer is not None and not is_valid_address(issuer):
+            raise ValueError('Invalid issuer account: {}'.format(issuer))
+
         if code.lower() != 'xlm' and issuer is None:
             raise ValueError("Issuer cannot be None")
-
-        # TODO: Check if issuer is a valid address (public key)
 
         self.code = code
         self.issuer = issuer

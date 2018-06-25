@@ -5,7 +5,7 @@ import warnings
 
 from .base58 import b58decode_check, b58encode_check
 from .stellarxdr import Xdr
-from .utils import decode_check, encode_check, StellarMnemonic
+from .utils import decode_check, encode_check, StellarMnemonic, is_valid_address
 from .exceptions import XdrLengthError, MissingSigningKeyError
 # noinspection PyBroadException
 try:
@@ -146,9 +146,9 @@ class Keypair(object):
         :return: A new :class:`Keypair` with only a verifying (public) key.
 
         """
-        public_key = decode_check("account", address)
-        if len(public_key) != 32:
-            raise XdrLengthError('Invalid Stellar address')
+        public_key = is_valid_address(address)
+        if not public_key:
+            raise ValueError('Invalid Stellar address: {}'.format(address))
         verifying_key = ed25519.VerifyingKey(public_key)
         return cls(verifying_key)
 

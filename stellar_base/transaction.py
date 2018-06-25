@@ -5,11 +5,11 @@ import base64
 from .memo import HashMemo, IdMemo, NoneMemo, RetHashMemo, TextMemo
 from .operation import Operation
 from .stellarxdr import Xdr
-from .utils import account_xdr_object, decode_check, encode_check
+from .utils import account_xdr_object, encode_check, \
+    is_valid_address
 
 
 class Transaction(object):
-
     """The :class:`Transaction` object, which represents a transaction
     on Stellar's network.
 
@@ -65,7 +65,8 @@ class Transaction(object):
 
     def __init__(self, source, opts):
         opts = dict(opts)
-        decode_check('account', source)
+        if not is_valid_address(source):
+            raise ValueError('invalid source address: {}'.format(source))
 
         self.source = source
         self.sequence = int(opts.pop('sequence')) + 1
