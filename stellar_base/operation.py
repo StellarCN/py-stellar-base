@@ -6,11 +6,12 @@ from decimal import Context, Decimal, Inexact
 from .asset import Asset
 from .stellarxdr import Xdr
 from .utils import (
-    account_xdr_object, best_rational_approximation as best_r, decode_check,
-    division, encode_check, signer_key_xdr_object)
+    account_xdr_object, best_rational_approximation as best_r,
+    division, encode_check, signer_key_xdr_object, is_valid_address)
 from .exceptions import DecodeError, XdrLengthError
 
 ONE = Decimal(10 ** 7)
+
 
 # TODO: We should really consider not taking a dictionary of opts here, and
 # instead should craft each operation's arguments to reasonable defaults and
@@ -239,6 +240,7 @@ class Payment(Operation):
         opts.
 
     """
+
     @classmethod
     def type_code(cls):
         return Xdr.const.PAYMENT
@@ -305,6 +307,7 @@ class PathPayment(Operation):
         'dest_asset', 'dest_amount', and 'path' via opts.
 
     """
+
     @classmethod
     def type_code(cls):
         return Xdr.const.PATH_PAYMENT
@@ -452,6 +455,7 @@ class AllowTrust(Operation):
         via opts.
 
     """
+
     @classmethod
     def type_code(cls):
         return Xdr.const.ALLOW_TRUST
@@ -544,6 +548,7 @@ class SetOptions(Operation):
         opts.
 
     """
+
     @classmethod
     def type_code(cls):
         return Xdr.const.SET_OPTIONS
@@ -567,23 +572,23 @@ class SetOptions(Operation):
         # (some of them depend on booleans already checked in earlier
         # statements)
         if self.signer_address is not None and self.signer_type is None:
-            try:
-                decode_check('account', self.signer_address)
-            except DecodeError:
-                raise Exception(
+            if not is_valid_address(self.signer_address):
+                raise ValueError(
                     'Must be a valid strkey if not give signer_type')
             self.signer_type = 'ed25519PublicKey'
 
         signer_is_invalid_type = (
-            self.signer_type is not None and
-            self.signer_type not in ('ed25519PublicKey', 'hashX', 'preAuthTx'))
+                self.signer_type is not None and
+                self.signer_type not in (
+                    'ed25519PublicKey', 'hashX', 'preAuthTx'))
 
         if signer_is_invalid_type:
             # FIXME: Throw better exception
             raise Exception('invalid signer type.')
 
         signer_addr_has_valid_len = (
-            self.signer_address is not None and len(self.signer_address) == 32)
+                self.signer_address is not None and len(
+            self.signer_address) == 32)
 
         if (self.signer_type in ('hashX', 'preAuthTx')
                 and not signer_addr_has_valid_len):
@@ -595,6 +600,7 @@ class SetOptions(Operation):
         :class:`SetOptions`.
 
         """
+
         def assert_option_array(x):
             if x is None:
                 return []
@@ -653,7 +659,8 @@ class SetOptions(Operation):
         else:
             inflation_dest = encode_check(
                 'account',
-                op_xdr_object.body.setOptionsOp.inflationDest[0].ed25519).decode()
+                op_xdr_object.body.setOptionsOp.inflationDest[
+                    0].ed25519).decode()
 
         clear_flags = op_xdr_object.body.setOptionsOp.clearFlags  # list
         set_flags = op_xdr_object.body.setOptionsOp.setFlags
@@ -717,6 +724,7 @@ class ManageOffer(Operation):
         'selling', 'buying', 'amount', 'price', 'offer_id'.
 
     """
+
     @classmethod
     def type_code(cls):
         return Xdr.const.MANAGE_OFFER
@@ -807,6 +815,7 @@ class CreatePassiveOffer(Operation):
         from opts: 'source', 'selling', 'buying', 'amount', 'price'.
 
     """
+
     @classmethod
     def type_code(cls):
         return Xdr.const.CREATE_PASSIVE_OFFER
@@ -885,6 +894,7 @@ class AccountMerge(Operation):
         opts: 'source', 'destination'
 
     """
+
     @classmethod
     def type_code(cls):
         return Xdr.const.ACCOUNT_MERGE
@@ -938,6 +948,7 @@ class Inflation(Operation):
         opts: 'source'.
 
     """
+
     @classmethod
     def type_code(cls):
         return Xdr.const.INFLATION
@@ -986,6 +997,7 @@ class ManageData(Operation):
         'data_name', 'data_value'.
 
     """
+
     @classmethod
     def type_code(cls):
         return Xdr.const.MANAGE_DATA
@@ -997,7 +1009,7 @@ class ManageData(Operation):
 
         valid_data_name_len = len(self.data_name) <= 64
         valid_data_val_len = (
-            self.data_value is None or len(self.data_value) <= 64)
+                self.data_value is None or len(self.data_value) <= 64)
 
         if not valid_data_name_len or not valid_data_val_len:
             raise XdrLengthError(
