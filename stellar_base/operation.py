@@ -108,6 +108,16 @@ class Operation(object):
             context=Context(traps=[Inexact])))
 
     @staticmethod
+    def to_xdr_price(price):
+        if isinstance(price, dict):
+            if not ('n' in price and 'd' in price):
+                raise ValueError(
+                    "You need pass `price` params as `digit` or `{'n': numerator, 'd': denominator}`")
+        else:
+            price = best_r(price)
+        return price
+
+    @staticmethod
     def from_xdr_amount(value):
         """Converts an amount from an XDR object into its appropriate integer
         representation.
@@ -744,7 +754,7 @@ class ManageOffer(Operation):
         """
         selling = self.selling.to_xdr_object()
         buying = self.buying.to_xdr_object()
-        price = best_r(self.price)
+        price = Operation.to_xdr_price(self.price)
         price = Xdr.types.Price(price['n'], price['d'])
 
         amount = Operation.to_xdr_amount(self.amount)
@@ -835,10 +845,7 @@ class CreatePassiveOffer(Operation):
         selling = self.selling.to_xdr_object()
         buying = self.buying.to_xdr_object()
 
-        # FIXME: This assume that self.price is always an integer, however it
-        # could be a tuple/dict of a numerator and denominator. This should do
-        # type checking (similar to the JS library).
-        price = best_r(self.price)
+        price = Operation.to_xdr_price(self.price)
         price = Xdr.types.Price(price['n'], price['d'])
 
         amount = Operation.to_xdr_amount(self.amount)

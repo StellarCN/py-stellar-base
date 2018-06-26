@@ -7,6 +7,9 @@ import pytest
 from stellar_base.operation import *
 from stellar_base.asset import Asset
 
+DEST = 'GCW24FUIFPC2767SOU4JI3JEAXIHYJFIJLH7GBZ2AVCBVP32SJAI53F5'
+SOURCE = 'GDJVFDG5OCW5PYWHB64MGTHGFF57DRRJEDUEFDEL2SLNIOONHYJWHA3Z'
+
 
 @pytest.mark.parametrize("s, error_type", [
     ("0.12345678", decimal.Inexact),
@@ -32,62 +35,65 @@ def test_from_and_to_xdr_amount(num, s):
 
 
 def _load_operations():
-    source = 'GDJVFDG5OCW5PYWHB64MGTHGFF57DRRJEDUEFDEL2SLNIOONHYJWHA3Z'
-    dest = 'GCW24FUIFPC2767SOU4JI3JEAXIHYJFIJLH7GBZ2AVCBVP32SJAI53F5'
     amount = "1"
     return [
         ("create_account_min", CreateAccount({
-            'source': source, 'destination': dest,
+            'source': SOURCE, 'destination': DEST,
             'starting_balance': amount
         })),
         ("payment_min", Payment({
-            'source': source, 'destination': dest,
+            'source': SOURCE, 'destination': DEST,
             'asset': Asset.native(), 'amount': amount,
         })),
         ("payment_short_asset", Payment({
-            'source': source, 'destination': dest,
-            'asset': Asset('USD4', source), 'amount': amount,
+            'source': SOURCE, 'destination': DEST,
+            'asset': Asset('USD4', SOURCE), 'amount': amount,
         })),
         ("payment_long_asset", Payment({
-            'source': source, 'destination': dest,
-            'asset': Asset('SNACKS789ABC', source), 'amount': amount,
+            'source': SOURCE, 'destination': DEST,
+            'asset': Asset('SNACKS789ABC', SOURCE), 'amount': amount,
         })),
         ("path_payment_min", PathPayment({
-            'source': source, 'destination': dest,
+            'source': SOURCE, 'destination': DEST,
             'send_asset': Asset.native(), 'dest_asset': Asset.native(),
             'send_max': amount, 'dest_amount': amount, 'path': [],
         })),
         ("allow_trust_short_asset", AllowTrust({
-            'source': source, 'trustor': dest, 'asset_code': 'beer',
+            'source': SOURCE, 'trustor': DEST, 'asset_code': 'beer',
             'authorize': True,
         })),
         ("allow_trust_long_asset", AllowTrust({
-            'source': source, 'trustor': dest,
+            'source': SOURCE, 'trustor': DEST,
             'asset_code': 'pocketknives', 'authorize': True,
         })),
         ("manage_offer_min", ManageOffer({
-            'selling': Asset('beer', source), 'buying': Asset('beer', dest),
+            'selling': Asset('beer', SOURCE), 'buying': Asset('beer', DEST),
             'amount': "100", 'price': 3.14159, 'offer_id': 1,
         })),
+        ("manage_offer_dict_price", ManageOffer({
+            'selling': Asset('beer', SOURCE), 'buying': Asset('beer', DEST),
+            'amount': "100", 'price': {'n': 314159, 'd': 100000},
+            'offer_id': 1,
+        })),
         ("create_passive_offer_min", CreatePassiveOffer({
-            'selling': Asset('beer', source), 'buying': Asset('beer', dest),
+            'selling': Asset('beer', SOURCE), 'buying': Asset('beer', DEST),
             'amount': "100", 'price': 3.14159,
         })),
         ("set_options_empty", SetOptions({})),
         ("change_trust_min", ChangeTrust({
-            'source': source, 'asset': Asset('beer', dest), 'limit': '100'
+            'source': SOURCE, 'asset': Asset('beer', DEST), 'limit': '100'
         })),
         ("change_trust_default_limit", ChangeTrust({
-            'source': source, 'asset': Asset('beer', dest)
+            'source': SOURCE, 'asset': Asset('beer', DEST)
         })),
         ("account_merge_min", AccountMerge({
-            'source': source, 'destination': dest,
+            'source': SOURCE, 'destination': DEST,
         })),
-        ("inflation", Inflation({'source': source})),
+        ("inflation", Inflation({'source': SOURCE})),
         ("manage_data", ManageData({
-            'source': source,
+            'source': SOURCE,
             'data_name': '1KFHE7w8BhaENAswwryaoccDb6qcT6DbYY',
-            'data_value': source,
+            'data_value': SOURCE,
         })),
     ]
 
@@ -100,6 +106,8 @@ def test_operation(name, operation):
     original.pop("body")
     restored = dict(operation_restored.__dict__)
     restored.pop("body")
+    if name == 'manage_offer_dict_price':
+        original['price'] = float(original['price']['n']) / float(original['price']['d'])
     assert original == restored
 
 
@@ -115,3 +123,13 @@ def test_manage_data_too_long_raises():
             'data_name': '1KFHE7w8BhaENAswwryaoccDb6qcT6DbYY',
             'data_value': '1234567890' * 7
         })
+
+
+def test_manage_offer_dict_price_raises():
+    msg = "You need pass `price` params as `digit` or `{'n': numerator, 'd': denominator}`"
+    with pytest.raises(ValueError, match=msg):
+        ManageOffer({
+            'selling': Asset('beer', SOURCE), 'buying': Asset('beer', DEST),
+            'amount': "100", 'price': {},
+            'offer_id': 1,
+        }).xdr()
