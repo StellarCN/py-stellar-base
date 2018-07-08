@@ -764,10 +764,6 @@ class Builder(object):
         """
         if not self.address:
             raise Exception('no address provided')
-        try:
-            address = self.horizon.account(self.address)
-        except:
-            # TODO: Throw a better exception, such as HTTPError
-            raise Exception('network problem')
 
+        address = self.horizon.account(self.address)
         return address.get('sequence')

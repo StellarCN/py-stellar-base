@@ -8,7 +8,7 @@ from .stellarxdr import Xdr
 from .utils import (
     account_xdr_object, best_rational_approximation as best_r,
     division, encode_check, signer_key_xdr_object, is_valid_address)
-from .exceptions import DecodeError, XdrLengthError
+from .exceptions import XdrLengthError
 
 ONE = Decimal(10 ** 7)
 
@@ -525,8 +525,10 @@ class AllowTrust(Operation):
             asset_code = (
                 op_xdr_object.body.allowTrustOp.asset.assetCode12.decode())
         else:
-            # FIXME: Raise a better exception
-            raise Exception
+            raise NotImplementedError(
+                "Operation of asset_type={} is not implemented"
+                ".".format(asset_type.type)
+            )
 
         return cls({
             'source': source,
@@ -578,9 +580,6 @@ class SetOptions(Operation):
         self.signer_type = opts.get('signer_type')
         self.signer_weight = opts.get('signer_weight')
 
-        # FIXME: Clean up boolean logic - make these conditions more linear
-        # (some of them depend on booleans already checked in earlier
-        # statements)
         if self.signer_address is not None and self.signer_type is None:
             if not is_valid_address(self.signer_address):
                 raise ValueError(
@@ -593,8 +592,9 @@ class SetOptions(Operation):
                     'ed25519PublicKey', 'hashX', 'preAuthTx'))
 
         if signer_is_invalid_type:
-            # FIXME: Throw better exception
-            raise Exception('invalid signer type.')
+            raise ValueError(
+                'Invalid signer type, sign_type should '
+                'be ed25519PublicKey, hashX or preAuthTx')
 
         signer_addr_has_valid_len = (
                 self.signer_address is not None and len(
@@ -602,8 +602,7 @@ class SetOptions(Operation):
 
         if (self.signer_type in ('hashX', 'preAuthTx')
                 and not signer_addr_has_valid_len):
-            # FIXME: Throw better exception
-            raise Exception('hashX or preAuthTx Signer must be 32 bytes')
+            raise ValueError('hashX or preAuthTx Signer must be 32 bytes')
 
     def to_xdr_object(self):
         """Creates an XDR Operation object that represents this

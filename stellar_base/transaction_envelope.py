@@ -139,7 +139,6 @@ class TransactionEnvelope(object):
         te = base64.b64encode(te.get_buffer())
         return te
 
-    # FIXME: can not get network id from XDR , default is 'TESTNET'
     @classmethod
     def from_xdr(cls, xdr):
         """Create a new :class:`TransactionEnvelope` from an XDR string.

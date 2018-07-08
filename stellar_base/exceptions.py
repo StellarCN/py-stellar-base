@@ -8,7 +8,9 @@ class ConfigurationError(StellarError):
 
 
 class HorizonError(StellarError):
-    pass
+    def __init__(self, msg):
+        super(HorizonError, self).__init__(msg)
+        self.message = msg
 
 
 class XdrLengthError(StellarError):
@@ -41,4 +43,3 @@ class MnemonicError(StellarError):
 
 class MissingSigningKeyError(StellarError):
     pass
-

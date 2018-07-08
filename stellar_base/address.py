@@ -4,7 +4,7 @@ import requests
 
 from .horizon import Horizon
 from .keypair import Keypair
-from .exceptions import AccountNotExistError, NotValidParamError
+from .exceptions import AccountNotExistError, NotValidParamError, HorizonError
 from .horizon import HORIZON_LIVE, HORIZON_TEST
 
 
@@ -94,13 +94,8 @@ class Address(object):
                 self.flags = acc.get('flags')
                 self.signers = acc.get('signers')
                 self.data = acc.get('data')
-            elif acc.get('status') == 404:
-                raise AccountNotExistError(acc.get('title'))
-            else:
-                # FIXME: Throw a more specific exception.
-                raise Exception(acc.get('detail'))
-        except requests.ConnectionError:
-            raise Exception('network problem')
+        except HorizonError as err:
+            raise AccountNotExistError(err.message['title'])
 
     def payments(self, sse=False, **kwargs):
         """Retrieve the payments JSON from this instance's Horizon server.
