@@ -13,14 +13,6 @@ from .exceptions import XdrLengthError
 ONE = Decimal(10 ** 7)
 
 
-# TODO: We should really consider not taking a dictionary of opts here, and
-# instead should craft each operation's arguments to reasonable defaults and
-# expectations of required arguments. It makes documentation better, as well
-# as inspection of the method # definition. There's no reason that dictionary
-# unpacking can't be used to facilitate easy dict -> kwargs conversion on the
-# init statements.
-
-
 class Operation(object):
     """The :class:`Operation` object, which represents an operation on
     Stellar's network.
@@ -48,8 +40,8 @@ class Operation(object):
 
     """
 
-    def __init__(self, opts):
-        self.source = opts.get('source')
+    def __init__(self, source=None):
+        self.source = source
         self.body = Xdr.nullclass()
 
     def __eq__(self, other):
@@ -194,10 +186,10 @@ class CreateAccount(Operation):
     def type_code(cls):
         return Xdr.const.CREATE_ACCOUNT
 
-    def __init__(self, opts):
-        super(CreateAccount, self).__init__(opts)
-        self.destination = opts.get('destination')
-        self.starting_balance = opts.get('starting_balance')
+    def __init__(self, destination, starting_balance, source=None):
+        super(CreateAccount, self).__init__(source)
+        self.destination = destination
+        self.starting_balance = starting_balance
 
     def to_xdr_object(self):
         """Creates an XDR Operation object that represents this
@@ -230,11 +222,11 @@ class CreateAccount(Operation):
         starting_balance = Operation.from_xdr_amount(
             op_xdr_object.body.createAccountOp.startingBalance)
 
-        return cls({
-            'source': source,
-            'destination': destination,
-            'starting_balance': starting_balance,
-        })
+        return cls(
+            source=source,
+            destination=destination,
+            starting_balance=starting_balance,
+        )
 
 
 class Payment(Operation):
@@ -255,11 +247,11 @@ class Payment(Operation):
     def type_code(cls):
         return Xdr.const.PAYMENT
 
-    def __init__(self, opts):
-        super(Payment, self).__init__(opts)
-        self.destination = opts.get('destination')
-        self.asset = opts.get('asset')
-        self.amount = opts.get('amount')
+    def __init__(self, destination, asset, amount, source=None):
+        super(Payment, self).__init__(source)
+        self.destination = destination
+        self.asset = asset
+        self.amount = amount
 
     def to_xdr_object(self):
         """Creates an XDR Operation object that represents this
@@ -294,12 +286,12 @@ class Payment(Operation):
         asset = Asset.from_xdr_object(op_xdr_object.body.paymentOp.asset)
         amount = Operation.from_xdr_amount(op_xdr_object.body.paymentOp.amount)
 
-        return cls({
-            'source': source,
-            'destination': destination,
-            'asset': asset,
-            'amount': amount,
-        })
+        return cls(
+            source=source,
+            destination=destination,
+            asset=asset,
+            amount=amount,
+        )
 
 
 class PathPayment(Operation):
@@ -322,14 +314,15 @@ class PathPayment(Operation):
     def type_code(cls):
         return Xdr.const.PATH_PAYMENT
 
-    def __init__(self, opts):
-        super(PathPayment, self).__init__(opts)
-        self.destination = opts.get('destination')
-        self.send_asset = opts.get('send_asset')
-        self.send_max = opts.get('send_max')
-        self.dest_asset = opts.get('dest_asset')
-        self.dest_amount = opts.get('dest_amount')
-        self.path = opts.get('path')  # a list of paths/assets
+    def __init__(self, destination, send_asset, send_max, dest_asset,
+                 dest_amount, path, source=None):
+        super(PathPayment, self).__init__(source)
+        self.destination = destination
+        self.send_asset = send_asset
+        self.send_max = send_max
+        self.dest_asset = dest_asset
+        self.dest_amount = dest_amount
+        self.path = path  # a list of paths/assets
 
     def to_xdr_object(self):
         """Creates an XDR Operation object that represents this
@@ -377,15 +370,15 @@ class PathPayment(Operation):
             for x in op_xdr_object.body.pathPaymentOp.path:
                 path.append(Asset.from_xdr_object(x))
 
-        return cls({
-            'source': source,
-            'destination': destination,
-            'send_asset': send_asset,
-            'send_max': send_max,
-            'dest_asset': dest_asset,
-            'dest_amount': dest_amount,
-            'path': path
-        })
+        return cls(
+            source=source,
+            destination=destination,
+            send_asset=send_asset,
+            send_max=send_max,
+            dest_asset=dest_asset,
+            dest_amount=dest_amount,
+            path=path
+        )
 
 
 class ChangeTrust(Operation):
@@ -409,10 +402,10 @@ class ChangeTrust(Operation):
     def type_code(cls):
         return Xdr.const.CHANGE_TRUST
 
-    def __init__(self, opts):
-        super(ChangeTrust, self).__init__(opts)
-        self.line = opts.get('asset')
-        self.limit = opts.get('limit') or self.default_limit
+    def __init__(self, asset, limit=None, source=None):
+        super(ChangeTrust, self).__init__(source)
+        self.line = asset
+        self.limit = limit or self.default_limit
 
     def to_xdr_object(self):
         """Creates an XDR Operation object that represents this
@@ -443,7 +436,7 @@ class ChangeTrust(Operation):
         limit = Operation.from_xdr_amount(
             op_xdr_object.body.changeTrustOp.limit)
 
-        return cls({'source': source, 'asset': line, 'limit': limit})
+        return cls(source=source, asset=line, limit=limit)
 
 
 class AllowTrust(Operation):
@@ -470,11 +463,11 @@ class AllowTrust(Operation):
     def type_code(cls):
         return Xdr.const.ALLOW_TRUST
 
-    def __init__(self, opts):
-        super(AllowTrust, self).__init__(opts)
-        self.trustor = opts.get('trustor')
-        self.asset_code = opts.get('asset_code')
-        self.authorize = opts.get('authorize')
+    def __init__(self, trustor, asset_code, authorize, source=None):
+        super(AllowTrust, self).__init__(source)
+        self.trustor = trustor
+        self.asset_code = asset_code
+        self.authorize = authorize
 
     def to_xdr_object(self):
         """Creates an XDR Operation object that represents this
@@ -530,12 +523,12 @@ class AllowTrust(Operation):
                 ".".format(asset_type.type)
             )
 
-        return cls({
-            'source': source,
-            'trustor': trustor,
-            'authorize': authorize,
-            'asset_code': asset_code
-        })
+        return cls(
+            source=source,
+            trustor=trustor,
+            authorize=authorize,
+            asset_code=asset_code
+        )
 
 
 class SetOptions(Operation):
@@ -565,20 +558,25 @@ class SetOptions(Operation):
     def type_code(cls):
         return Xdr.const.SET_OPTIONS
 
-    def __init__(self, opts):
-        super(SetOptions, self).__init__(opts)
-        self.inflation_dest = opts.get('inflation_dest')
-        self.clear_flags = opts.get('clear_flags')
-        self.set_flags = opts.get('set_flags')
-        self.master_weight = opts.get('master_weight')
-        self.low_threshold = opts.get('low_threshold')
-        self.med_threshold = opts.get('med_threshold')
-        self.high_threshold = opts.get('high_threshold')
-        self.home_domain = opts.get('home_domain')
+    def __init__(self, inflation_dest=None, clear_flags=None, set_flags=None,
+                 master_weight=None,
+                 low_threshold=None, med_threshold=None, high_threshold=None,
+                 home_domain=None,
+                 signer_address=None, signer_type=None, signer_weight=None,
+                 source=None):
+        super(SetOptions, self).__init__(source)
+        self.inflation_dest = inflation_dest
+        self.clear_flags = clear_flags
+        self.set_flags = set_flags
+        self.master_weight = master_weight
+        self.low_threshold = low_threshold
+        self.med_threshold = med_threshold
+        self.high_threshold = high_threshold
+        self.home_domain = home_domain
 
-        self.signer_address = opts.get('signer_address')
-        self.signer_type = opts.get('signer_type')
-        self.signer_weight = opts.get('signer_weight')
+        self.signer_address = signer_address
+        self.signer_type = signer_type
+        self.signer_weight = signer_weight
 
         if self.signer_address is not None and self.signer_type is None:
             if not is_valid_address(self.signer_address):
@@ -697,20 +695,20 @@ class SetOptions(Operation):
             signer_type = None
             signer_weight = None
 
-        return cls({
-            'source': source,
-            'inflation_dest': inflation_dest,
-            'clear_flags': clear_flags,
-            'set_flags': set_flags,
-            'master_weight': master_weight,
-            'low_threshold': low_threshold,
-            'med_threshold': med_threshold,
-            'high_threshold': high_threshold,
-            'home_domain': home_domain,
-            'signer_address': signer_address,
-            'signer_type': signer_type,
-            'signer_weight': signer_weight
-        })
+        return cls(
+            source=source,
+            inflation_dest=inflation_dest,
+            clear_flags=clear_flags,
+            set_flags=set_flags,
+            master_weight=master_weight,
+            low_threshold=low_threshold,
+            med_threshold=med_threshold,
+            high_threshold=high_threshold,
+            home_domain=home_domain,
+            signer_address=signer_address,
+            signer_type=signer_type,
+            signer_weight=signer_weight
+        )
 
 
 class ManageOffer(Operation):
@@ -738,13 +736,14 @@ class ManageOffer(Operation):
     def type_code(cls):
         return Xdr.const.MANAGE_OFFER
 
-    def __init__(self, opts):
-        super(ManageOffer, self).__init__(opts)
-        self.selling = opts.get('selling')  # Asset
-        self.buying = opts.get('buying')  # Asset
-        self.amount = opts.get('amount')
-        self.price = opts.get('price')
-        self.offer_id = opts.get('offer_id', 0)
+    def __init__(self, selling, buying, amount, price, offer_id=0,
+                 source=None):
+        super(ManageOffer, self).__init__(source)
+        self.selling = selling  # Asset
+        self.buying = buying  # Asset
+        self.amount = amount
+        self.price = price
+        self.offer_id = offer_id
 
     def to_xdr_object(self):
         """Creates an XDR Operation object that represents this
@@ -787,14 +786,14 @@ class ManageOffer(Operation):
         price = division(n, d)
         offer_id = op_xdr_object.body.manageOfferOp.offerID
 
-        return cls({
-            'source': source,
-            'selling': selling,
-            'buying': buying,
-            'amount': amount,
-            'price': price,
-            'offer_id': offer_id
-        })
+        return cls(
+            source=source,
+            selling=selling,
+            buying=buying,
+            amount=amount,
+            price=price,
+            offer_id=offer_id
+        )
 
 
 class CreatePassiveOffer(Operation):
@@ -829,12 +828,12 @@ class CreatePassiveOffer(Operation):
     def type_code(cls):
         return Xdr.const.CREATE_PASSIVE_OFFER
 
-    def __init__(self, opts):
-        super(CreatePassiveOffer, self).__init__(opts)
-        self.selling = opts.get('selling')
-        self.buying = opts.get('buying')
-        self.amount = opts.get('amount')
-        self.price = opts.get('price')
+    def __init__(self, selling, buying, amount, price, source=None):
+        super(CreatePassiveOffer, self).__init__(source)
+        self.selling = selling
+        self.buying = buying
+        self.amount = amount
+        self.price = price
 
     def to_xdr_object(self):
         """Creates an XDR Operation object that represents this
@@ -877,13 +876,13 @@ class CreatePassiveOffer(Operation):
         n = op_xdr_object.body.createPassiveOfferOp.price.n
         d = op_xdr_object.body.createPassiveOfferOp.price.d
         price = division(n, d)
-        return cls({
-            'source': source,
-            'selling': selling,
-            'buying': buying,
-            'amount': amount,
-            'price': price
-        })
+        return cls(
+            source=source,
+            selling=selling,
+            buying=buying,
+            amount=amount,
+            price=price
+        )
 
 
 class AccountMerge(Operation):
@@ -905,9 +904,9 @@ class AccountMerge(Operation):
     def type_code(cls):
         return Xdr.const.ACCOUNT_MERGE
 
-    def __init__(self, opts):
-        super(AccountMerge, self).__init__(opts)
-        self.destination = opts.get('destination')
+    def __init__(self, destination, source=None):
+        super(AccountMerge, self).__init__(source)
+        self.destination = destination
 
     def to_xdr_object(self):
         """Creates an XDR Operation object that represents this
@@ -935,10 +934,10 @@ class AccountMerge(Operation):
         destination = encode_check(
             'account', op_xdr_object.body.destination.ed25519).decode()
 
-        return cls({
-            'source': source,
-            'destination': destination
-        })
+        return cls(
+            source=source,
+            destination=destination
+        )
 
 
 class Inflation(Operation):
@@ -959,8 +958,8 @@ class Inflation(Operation):
     def type_code(cls):
         return Xdr.const.INFLATION
 
-    def __init__(self, opts):
-        super(Inflation, self).__init__(opts)
+    def __init__(self, source=None):
+        super(Inflation, self).__init__(source)
 
     def to_xdr_object(self):
         """Creates an XDR Operation object that represents this
@@ -981,7 +980,7 @@ class Inflation(Operation):
         else:
             source = encode_check(
                 'account', op_xdr_object.sourceAccount[0].ed25519).decode()
-        return cls({'source': source})
+        return cls(source=source)
 
 
 class ManageData(Operation):
@@ -1008,10 +1007,10 @@ class ManageData(Operation):
     def type_code(cls):
         return Xdr.const.MANAGE_DATA
 
-    def __init__(self, opts):
-        super(ManageData, self).__init__(opts)
-        self.data_name = opts.get('data_name')
-        self.data_value = opts.get('data_value')
+    def __init__(self, data_name, data_value, source=None):
+        super(ManageData, self).__init__(source)
+        self.data_name = data_name
+        self.data_value = data_value
 
         valid_data_name_len = len(self.data_name) <= 64
         valid_data_val_len = (
@@ -1055,8 +1054,8 @@ class ManageData(Operation):
             data_value = op_xdr_object.body.manageDataOp.dataValue[0].decode()
         else:
             data_value = None
-        return cls({
-            'source': source,
-            'data_name': data_name,
-            'data_value': data_value
-        })
+        return cls(
+            source=source,
+            data_name=data_name,
+            data_value=data_value
+        )

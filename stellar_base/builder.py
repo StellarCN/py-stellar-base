@@ -37,9 +37,13 @@ class Builder(object):
         times number of operations in this transaction.
     """
 
-    def __init__(
-            self, secret=None, address=None, horizon=None, network=None,
-            sequence=None, fee=100):
+    def __init__(self,
+                 secret=None,
+                 address=None,
+                 horizon=None,
+                 network=None,
+                 sequence=None,
+                 fee=100):
         if secret:
             self.key_pair = Keypair.from_seed(secret)
             self.address = self.key_pair.address().decode()
@@ -96,8 +100,10 @@ class Builder(object):
             self.ops.append(operation)
         return self
 
-    def append_create_account_op(
-            self, destination, starting_balance, source=None):
+    def append_create_account_op(self,
+                                 destination,
+                                 starting_balance,
+                                 source=None):
         """Append a :class:`CreateAccount
         <stellar_base.operation.CreateAccount>` operation to the list of
         operations.
@@ -110,12 +116,8 @@ class Builder(object):
         :return: This builder instance.
 
         """
-        opts = {
-            'source': source,
-            'destination': destination,
-            'starting_balance': str(starting_balance)
-        }
-        op = operation.CreateAccount(opts)
+        starting_balance = str(starting_balance)
+        op = operation.CreateAccount(destination, starting_balance, source)
         return self.append_op(op)
 
     def append_trust_op(self, destination, code, limit=None, source=None):
@@ -131,19 +133,18 @@ class Builder(object):
         :return: This builder instance.
 
         """
-        line = Asset(code, destination)
+        asset = Asset(code, destination)
         if limit is not None:
             limit = str(limit)
-        opts = {
-            'source': source,
-            'asset': line,
-            'limit': limit
-        }
-        op = operation.ChangeTrust(opts)
+        op = operation.ChangeTrust(asset, limit, source)
         return self.append_op(op)
 
-    def append_payment_op(self, destination, amount, asset_code='XLM',
-                          asset_issuer=None, source=None):
+    def append_payment_op(self,
+                          destination,
+                          amount,
+                          asset_code='XLM',
+                          asset_issuer=None,
+                          source=None):
         """Append a :class:`Payment <stellar_base.operation.Payment>` operation
         to the list of operations.
 
@@ -156,18 +157,20 @@ class Builder(object):
 
         """
         asset = Asset(code=asset_code, issuer=asset_issuer)
-        opts = {
-            'source': source,
-            'destination': destination,
-            'asset': asset,
-            'amount': str(amount)
-        }
-        op = operation.Payment(opts)
+        amount = str(amount)
+        op = operation.Payment(destination, asset, amount, source=None)
         return self.append_op(op)
 
-    def append_path_payment_op(
-            self, destination, send_code, send_issuer, send_max, dest_code,
-            dest_issuer, dest_amount, path, source=None):
+    def append_path_payment_op(self,
+                               destination,
+                               send_code,
+                               send_issuer,
+                               send_max,
+                               dest_code,
+                               dest_issuer,
+                               dest_amount,
+                               path,
+                               source=None):
         """Append a :class:`PathPayment <stellar_base.operation.PathPayment>`
         operation to the list of operations.
 
@@ -199,21 +202,18 @@ class Builder(object):
         assets = []
         for p in path:
             assets.append(Asset(p[0], p[1]))
+        send_max = str(send_max)
+        dest_amount = str(dest_amount)
 
-        opts = {
-            'source': source,
-            'destination': destination,
-            'send_asset': send_asset,
-            'send_max': str(send_max),
-            'dest_asset': dest_asset,
-            'dest_amount': str(dest_amount),
-            'path': assets
-        }
-        op = operation.PathPayment(opts)
+        op = operation.PathPayment(destination, send_asset, send_max,
+                                   dest_asset, dest_amount, path, source)
         return self.append_op(op)
 
-    def append_allow_trust_op(
-            self, trustor, asset_code, authorize, source=None):
+    def append_allow_trust_op(self,
+                              trustor,
+                              asset_code,
+                              authorize,
+                              source=None):
         """Append an :class:`AllowTrust <stellar_base.operation.AllowTrust>`
         operation to the list of operations.
 
@@ -228,20 +228,22 @@ class Builder(object):
         :return: This builder instance.
 
         """
-        opts = {
-            'source': source,
-            'trustor': trustor,
-            'asset_code': asset_code,
-            'authorize': authorize
-        }
-        op = operation.AllowTrust(opts)
+        op = operation.AllowTrust(trustor, asset_code, authorize, source)
         return self.append_op(op)
 
-    def append_set_options_op(
-            self, inflation_dest=None, clear_flags=None, set_flags=None,
-            master_weight=None, low_threshold=None, med_threshold=None,
-            high_threshold=None, home_domain=None, signer_address=None,
-            signer_type=None, signer_weight=None, source=None):
+    def append_set_options_op(self,
+                              inflation_dest=None,
+                              clear_flags=None,
+                              set_flags=None,
+                              master_weight=None,
+                              low_threshold=None,
+                              med_threshold=None,
+                              high_threshold=None,
+                              home_domain=None,
+                              signer_address=None,
+                              signer_type=None,
+                              signer_weight=None,
+                              source=None):
         """Append a :class:`SetOptions <stellar_base.operation.SetOptions>`
         operation to the list of operations.
 
@@ -291,23 +293,12 @@ class Builder(object):
         :return: This builder instance.
 
         """
-        opts = {
-            'source': source,
-            'inflation_dest': inflation_dest,
-            'clear_flags': clear_flags,
-            'set_flags': set_flags,
-            'master_weight': master_weight,
-            'low_threshold': low_threshold,
-            'med_threshold': med_threshold,
-            'high_threshold': high_threshold,
-            'home_domain': (
-                bytearray(home_domain, encoding='utf-8')
-                if home_domain else None),
-            'signer_address': signer_address,
-            'signer_type': signer_type,
-            'signer_weight': signer_weight
-        }
-        op = operation.SetOptions(opts)
+        home_domain = bytearray(
+            home_domain, encoding='utf-8') if home_domain else None
+        op = operation.SetOptions(inflation_dest, clear_flags, set_flags,
+                                  master_weight, low_threshold, med_threshold,
+                                  high_threshold, home_domain, signer_address,
+                                  signer_type, signer_weight, source)
         return self.append_op(op)
 
     def append_hashx_signer(self, hashx, signer_weight, source=None):
@@ -325,11 +316,15 @@ class Builder(object):
 
         """
         return self.append_set_options_op(
-            signer_address=hashx, signer_type='hashX',
-            signer_weight=signer_weight, source=source)
+            signer_address=hashx,
+            signer_type='hashX',
+            signer_weight=signer_weight,
+            source=source)
 
-    def append_pre_auth_tx_signer(
-            self, pre_auth_tx, signer_weight, source=None):
+    def append_pre_auth_tx_signer(self,
+                                  pre_auth_tx,
+                                  signer_weight,
+                                  source=None):
         """Add a PreAuthTx signer to an account.
 
         Add a PreAuthTx signer to an account via a :class:`SetOptions
@@ -344,12 +339,20 @@ class Builder(object):
 
         """
         return self.append_set_options_op(
-            signer_address=pre_auth_tx, signer_type='preAuthTx',
-            signer_weight=signer_weight, source=source)
+            signer_address=pre_auth_tx,
+            signer_type='preAuthTx',
+            signer_weight=signer_weight,
+            source=source)
 
-    def append_manage_offer_op(self, selling_code, selling_issuer,
-                               buying_code, buying_issuer,
-                               amount, price, offer_id=0, source=None):
+    def append_manage_offer_op(self,
+                               selling_code,
+                               selling_issuer,
+                               buying_code,
+                               buying_issuer,
+                               amount,
+                               price,
+                               offer_id=0,
+                               source=None):
         """Append a :class:`ManageOffer <stellar_base.operation.ManageOffer>`
         operation to the list of operations.
 
@@ -376,22 +379,20 @@ class Builder(object):
         """
         selling = Asset(selling_code, selling_issuer)
         buying = Asset(buying_code, buying_issuer)
+        amount = str(amount)
 
-        opts = {
-            'source': source,
-            'selling': selling,
-            'buying': buying,
-            'amount': str(amount),
-            'price': price,
-            'offer_id': offer_id,
-
-        }
-        op = operation.ManageOffer(opts)
+        op = operation.ManageOffer(selling, buying, amount, price, offer_id,
+                                   source)
         return self.append_op(op)
 
-    def append_create_passive_offer_op(self, selling_code, selling_issuer,
-                                       buying_code, buying_issuer,
-                                       amount, price, source=None):
+    def append_create_passive_offer_op(self,
+                                       selling_code,
+                                       selling_issuer,
+                                       buying_code,
+                                       buying_issuer,
+                                       amount,
+                                       price,
+                                       source=None):
         """Append a :class:`CreatePassiveOffer
         <stellar_base.operation.CreatePassiveOffer>` operation to the list of
         operations.
@@ -417,15 +418,10 @@ class Builder(object):
         """
         selling = Asset(selling_code, selling_issuer)
         buying = Asset(buying_code, buying_issuer)
+        amount = str(amount)
 
-        opts = {
-            'source': source,
-            'selling': selling,
-            'buying': buying,
-            'amount': str(amount),
-            'price': price,
-        }
-        op = operation.CreatePassiveOffer(opts)
+        op = operation.CreatePassiveOffer(selling, buying, amount, price,
+                                          source)
         return self.append_op(op)
 
     def append_account_merge_op(self, destination, source=None):
@@ -440,11 +436,7 @@ class Builder(object):
         :return: This builder instance.
 
         """
-        opts = {
-            'source': source,
-            'destination': destination
-        }
-        op = operation.AccountMerge(opts)
+        op = operation.AccountMerge(destination, source)
         return self.append_op(op)
 
     def append_inflation_op(self, source=None):
@@ -457,8 +449,7 @@ class Builder(object):
         :return: This builder instance.
 
         """
-        opts = {'source': source}
-        op = operation.Inflation(opts)
+        op = operation.Inflation(source)
         return self.append_op(op)
 
     def append_manage_data_op(self, data_name, data_value, source=None):
@@ -476,12 +467,7 @@ class Builder(object):
         :return: This builder instance.
 
         """
-        opts = {
-            'source': source,
-            'data_name': data_name,
-            'data_value': data_value
-        }
-        op = operation.ManageData(opts)
+        op = operation.ManageData(data_name, data_value, source)
         return self.append_op(op)
 
     def add_memo(self, memo):
@@ -555,8 +541,12 @@ class Builder(object):
         """
         return self.time_bounds.append(time_bounds)
 
-    def federation_payment(self, fed_address, amount, asset_code='XLM',
-                           asset_issuer=None, source=None):
+    def federation_payment(self,
+                           fed_address,
+                           amount,
+                           asset_code='XLM',
+                           asset_issuer=None,
+                           source=None):
         """Append a :class:`Payment <stellar_base.operation.Payment>` operation
         to the list of operations using federation on the destination address.
 
@@ -578,8 +568,8 @@ class Builder(object):
             raise FederationError(
                 'Cannot determine Stellar Address to Account ID translation '
                 'via Federation server')
-        self.append_payment_op(
-            fed_info['account_id'], amount, asset_code, asset_issuer, source)
+        self.append_payment_op(fed_info['account_id'], amount, asset_code,
+                               asset_issuer, source)
         memo_type = fed_info.get('memo_type')
         if memo_type is not None and memo_type in ('text', 'id', 'hash'):
             getattr(self, 'add_' + memo_type + '_memo')(fed_info['memo'])
@@ -751,8 +741,11 @@ class Builder(object):
         """
         sequence = str(int(self.sequence) + 1)
         next_builder = Builder(
-            horizon=self.horizon.horizon, address=self.address,
-            network=self.network, sequence=sequence, fee=self.fee)
+            horizon=self.horizon.horizon,
+            address=self.address,
+            network=self.network,
+            sequence=sequence,
+            fee=self.fee)
         next_builder.key_pair = self.key_pair
         return next_builder
 

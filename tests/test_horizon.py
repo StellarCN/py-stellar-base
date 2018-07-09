@@ -33,10 +33,9 @@ def test_submit(setup, helpers):
     horizon = Horizon(setup.horizon_endpoint_uri)
 
     envelope_xdr = make_envelope(setup.network, horizon, address, seed,
-                                 Payment({
-                                    'destination': address,
-                                    'asset': Asset.native(),
-                                    'amount': "0.0001618"
-                                 }))
+                                 Payment(
+                                     destination=address,
+                                     asset=Asset.native(),
+                                     amount="0.0001618"))
     response = horizon.submit(envelope_xdr)
     assert 'hash' in response

@@ -24,8 +24,8 @@ def test_to_xdr_amount_raise(s, error_type):
 
 
 @pytest.mark.parametrize("num, s", [
-    (10 ** 7, "1"),
-    (20 * 10 ** 7, "20"),
+    (10**7, "1"),
+    (20 * 10**7, "20"),
     (1234567, "0.1234567"),
     (112345678, "11.2345678"),
 ])
@@ -37,64 +37,96 @@ def test_from_and_to_xdr_amount(num, s):
 def _load_operations():
     amount = "1"
     return [
-        ("create_account_min", CreateAccount({
-            'source': SOURCE, 'destination': DEST,
-            'starting_balance': amount
-        })),
-        ("payment_min", Payment({
-            'source': SOURCE, 'destination': DEST,
-            'asset': Asset.native(), 'amount': amount,
-        })),
-        ("payment_short_asset", Payment({
-            'source': SOURCE, 'destination': DEST,
-            'asset': Asset('USD4', SOURCE), 'amount': amount,
-        })),
-        ("payment_long_asset", Payment({
-            'source': SOURCE, 'destination': DEST,
-            'asset': Asset('SNACKS789ABC', SOURCE), 'amount': amount,
-        })),
-        ("path_payment_min", PathPayment({
-            'source': SOURCE, 'destination': DEST,
-            'send_asset': Asset.native(), 'dest_asset': Asset.native(),
-            'send_max': amount, 'dest_amount': amount, 'path': [],
-        })),
-        ("allow_trust_short_asset", AllowTrust({
-            'source': SOURCE, 'trustor': DEST, 'asset_code': 'beer',
-            'authorize': True,
-        })),
-        ("allow_trust_long_asset", AllowTrust({
-            'source': SOURCE, 'trustor': DEST,
-            'asset_code': 'pocketknives', 'authorize': True,
-        })),
-        ("manage_offer_min", ManageOffer({
-            'selling': Asset('beer', SOURCE), 'buying': Asset('beer', DEST),
-            'amount': "100", 'price': 3.14159, 'offer_id': 1,
-        })),
-        ("manage_offer_dict_price", ManageOffer({
-            'selling': Asset('beer', SOURCE), 'buying': Asset('beer', DEST),
-            'amount': "100", 'price': {'n': 314159, 'd': 100000},
-            'offer_id': 1,
-        })),
-        ("create_passive_offer_min", CreatePassiveOffer({
-            'selling': Asset('beer', SOURCE), 'buying': Asset('beer', DEST),
-            'amount': "100", 'price': 3.14159,
-        })),
-        ("set_options_empty", SetOptions({})),
-        ("change_trust_min", ChangeTrust({
-            'source': SOURCE, 'asset': Asset('beer', DEST), 'limit': '100'
-        })),
-        ("change_trust_default_limit", ChangeTrust({
-            'source': SOURCE, 'asset': Asset('beer', DEST)
-        })),
-        ("account_merge_min", AccountMerge({
-            'source': SOURCE, 'destination': DEST,
-        })),
-        ("inflation", Inflation({'source': SOURCE})),
-        ("manage_data", ManageData({
-            'source': SOURCE,
-            'data_name': '1KFHE7w8BhaENAswwryaoccDb6qcT6DbYY',
-            'data_value': SOURCE,
-        })),
+        ("create_account_min",
+         CreateAccount(
+             source=SOURCE, destination=DEST, starting_balance=amount)),
+        ("payment_min",
+         Payment(
+             source=SOURCE,
+             destination=DEST,
+             asset=Asset.native(),
+             amount=amount,
+         )),
+        ("payment_short_asset",
+         Payment(
+             source=SOURCE,
+             destination=DEST,
+             asset=Asset('USD4', SOURCE),
+             amount=amount,
+         )),
+        ("payment_long_asset",
+         Payment(
+             source=SOURCE,
+             destination=DEST,
+             asset=Asset('SNACKS789ABC', SOURCE),
+             amount=amount,
+         )),
+        ("path_payment_min",
+         PathPayment(
+             source=SOURCE,
+             destination=DEST,
+             send_asset=Asset.native(),
+             dest_asset=Asset.native(),
+             send_max=amount,
+             dest_amount=amount,
+             path=[],
+         )),
+        ("allow_trust_short_asset",
+         AllowTrust(
+             source=SOURCE,
+             trustor=DEST,
+             asset_code='beer',
+             authorize=True,
+         )),
+        ("allow_trust_long_asset",
+         AllowTrust(
+             source=SOURCE,
+             trustor=DEST,
+             asset_code='pocketknives',
+             authorize=True,
+         )),
+        ("manage_offer_min",
+         ManageOffer(
+             selling=Asset('beer', SOURCE),
+             buying=Asset('beer', DEST),
+             amount="100",
+             price=3.14159,
+             offer_id=1,
+         )),
+        ("manage_offer_dict_price",
+         ManageOffer(
+             selling=Asset('beer', SOURCE),
+             buying=Asset('beer', DEST),
+             amount="100",
+             price={
+                 'n': 314159,
+                 'd': 100000
+             },
+             offer_id=1,
+         )),
+        ("create_passive_offer_min",
+         CreatePassiveOffer(
+             selling=Asset('beer', SOURCE),
+             buying=Asset('beer', DEST),
+             amount="100",
+             price=3.14159,
+         )),
+        ("set_options_empty", SetOptions()),
+        ("change_trust_min",
+         ChangeTrust(source=SOURCE, asset=Asset('beer', DEST), limit='100')),
+        ("change_trust_default_limit",
+         ChangeTrust(source=SOURCE, asset=Asset('beer', DEST))),
+        ("account_merge_min", AccountMerge(
+            source=SOURCE,
+            destination=DEST,
+        )),
+        ("inflation", Inflation(source=SOURCE)),
+        ("manage_data",
+         ManageData(
+             source=SOURCE,
+             data_name='1KFHE7w8BhaENAswwryaoccDb6qcT6DbYY',
+             data_value=SOURCE,
+         )),
     ]
 
 
@@ -107,7 +139,8 @@ def test_operation(name, operation):
     restored = dict(operation_restored.__dict__)
     restored.pop("body")
     if name == 'manage_offer_dict_price':
-        original['price'] = float(original['price']['n']) / float(original['price']['d'])
+        original['price'] = float(original['price']['n']) / float(
+            original['price']['d'])
     assert original == restored
 
 
@@ -119,17 +152,18 @@ def test_from_xdr_object_raise():
 def test_manage_data_too_long_raises():
     msg = 'Data or value should be <= 64 bytes \(ascii encoded\).'
     with pytest.raises(XdrLengthError, match=msg):
-        ManageData({
-            'data_name': '1KFHE7w8BhaENAswwryaoccDb6qcT6DbYY',
-            'data_value': '1234567890' * 7
-        })
+        ManageData(
+            data_name='1KFHE7w8BhaENAswwryaoccDb6qcT6DbYY',
+            data_value='1234567890' * 7)
 
 
 def test_manage_offer_dict_price_raises():
     msg = "You need pass `price` params as `digit` or `{'n': numerator, 'd': denominator}`"
     with pytest.raises(ValueError, match=msg):
-        ManageOffer({
-            'selling': Asset('beer', SOURCE), 'buying': Asset('beer', DEST),
-            'amount': "100", 'price': {},
-            'offer_id': 1,
-        }).xdr()
+        ManageOffer(
+            selling=Asset('beer', SOURCE),
+            buying=Asset('beer', DEST),
+            amount="100",
+            price={},
+            offer_id=1,
+        ).xdr()
