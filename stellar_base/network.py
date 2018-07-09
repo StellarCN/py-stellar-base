@@ -16,6 +16,7 @@ class Network(object):
     :param str passphrase: The passphrase for the network
 
     """
+
     def __init__(self, passphrase=None):
         if passphrase is None:
             self.passphrase = NETWORKS['TESTNET']

@@ -29,6 +29,7 @@ class TransactionEnvelope(object):
           transaction envelope is associated with.
 
     """
+
     def __init__(self, tx, opts=None):
         self.tx = tx
         try:

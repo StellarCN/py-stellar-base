@@ -78,8 +78,7 @@ class Transaction(object):
         self.operations = opts.pop('operations', [])
         if opts:
             raise ValueError(
-                "Unknown arguments found in opts: {}".format(opts)
-            )
+                "Unknown arguments found in opts: {}".format(opts))
 
     def add_operation(self, operation):
         """Add an :class:`Operation <stellar_base.operation.Operation>` to
@@ -105,9 +104,8 @@ class Transaction(object):
         operations = [o.to_xdr_object() for o in self.operations]
         ext = Xdr.nullclass()
         ext.v = 0
-        return Xdr.types.Transaction(
-            source_account, self.fee, self.sequence, self.time_bounds, memo,
-            operations, ext)
+        return Xdr.types.Transaction(source_account, self.fee, self.sequence,
+                                     self.time_bounds, memo, operations, ext)
 
     def xdr(self):
         """Packs and base64 encodes this :class:`Transaction` as an XDR
@@ -142,9 +140,8 @@ class Transaction(object):
             memo = NoneMemo()
 
         fee = tx_xdr_object.fee
-        operations = list(map(
-            Operation.from_xdr_object, tx_xdr_object.operations
-        ))
+        operations = list(
+            map(Operation.from_xdr_object, tx_xdr_object.operations))
         return cls(
             source, {
                 'sequence': sequence,

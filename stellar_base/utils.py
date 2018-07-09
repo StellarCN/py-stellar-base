@@ -50,8 +50,8 @@ def account_xdr_object(account):
 
 def signer_key_xdr_object(signer_type, signer):
     if signer_type == 'ed25519PublicKey':
-        return Xdr.types.SignerKey(
-            Xdr.const.SIGNER_KEY_TYPE_ED25519, decode_check('account', signer))
+        return Xdr.types.SignerKey(Xdr.const.SIGNER_KEY_TYPE_ED25519,
+                                   decode_check('account', signer))
     if signer_type == 'hashX':
         return Xdr.types.SignerKey(
             Xdr.const.SIGNER_KEY_TYPE_HASH_X, hashX=signer)
@@ -81,9 +81,10 @@ def bytes_from_decode_data(s):
     try:
         return memoryview(s).tobytes()
     except TypeError:
-        raise suppress_context(TypeError(
-            'Argument should be a bytes-like object or ASCII string, not '
-            '{!r}'.format(s.__class__.__name__)))
+        raise suppress_context(
+            TypeError(
+                'Argument should be a bytes-like object or ASCII string, not '
+                '{!r}'.format(s.__class__.__name__)))
 
 
 def decode_check(version_byte_name, encoded):
@@ -105,9 +106,8 @@ def decode_check(version_byte_name, encoded):
     # raise KeyError
     expected_version = versionBytes[version_byte_name]
     if version_byte != expected_version:
-        raise DecodeError(
-            'Invalid version byte. Expected {}, got {}'.format(
-                str(expected_version), str(version_byte)))
+        raise DecodeError('Invalid version byte. Expected {}, got {}'.format(
+            str(expected_version), str(version_byte)))
 
     expected_checksum = calculate_checksum(payload)
     if expected_checksum != checksum:
@@ -140,8 +140,7 @@ def best_rational_approximation(x):
     INT32_MAX = Decimal(2147483647)
     a = None
     f = None
-    fractions = np.array(
-        [[Decimal(0), Decimal(1)], [Decimal(1), Decimal(0)]])
+    fractions = np.array([[Decimal(0), Decimal(1)], [Decimal(1), Decimal(0)]])
     i = 2
     while True:
         if x > INT32_MAX:
@@ -211,18 +210,19 @@ class StellarMnemonic(Mnemonic):
         mnemonic = self.normalize_string(mnemonic)
         passphrase = self.normalize_string(passphrase)
         seed = PBKDF2(
-            mnemonic, u'mnemonic' + passphrase, iterations=PBKDF2_ROUNDS,
-            macmodule=hmac, digestmodule=hashlib.sha512).read(64)
+            mnemonic,
+            u'mnemonic' + passphrase,
+            iterations=PBKDF2_ROUNDS,
+            macmodule=hmac,
+            digestmodule=hashlib.sha512).read(64)
         return self.derive(seed, index)
 
     def generate(self, strength=128):
         accepted_strengths = {128, 160, 192, 224, 256}
         if strength not in accepted_strengths:
-            raise ValueError(
-                'Strength should be one of the following '
-                '{}, but it was {} instead'
-                '.'.format(accepted_strengths, strength)
-            )
+            raise ValueError('Strength should be one of the following '
+                             '{}, but it was {} instead'
+                             '.'.format(accepted_strengths, strength))
         ret = self.to_mnemonic(os.urandom(strength // 8))
         # print(ret)
         return ret
@@ -235,11 +235,8 @@ class StellarMnemonic(Mnemonic):
         ir = master_hmac.digest()[32:]
         path = self.stellar_account_path_format % index
         for x in path.split("/")[1:]:
-            data = (
-                    struct.pack('x')
-                    + il
-                    + struct.pack('>I',
-                                  self.first_hardened_index + int(x[:-1])))
+            data = (struct.pack('x') + il +
+                    struct.pack('>I', self.first_hardened_index + int(x[:-1])))
             i = hmac.new(ir, digestmod=hashlib.sha512)
             i.update(data)
             il = i.digest()[:32]

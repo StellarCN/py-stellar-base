@@ -31,8 +31,11 @@ class Address(object):
     """
 
     # TODO: Make network an enum
-    def __init__(
-            self, address=None, secret=None, network='TESTNET', horizon=None):
+    def __init__(self,
+                 address=None,
+                 secret=None,
+                 network='TESTNET',
+                 horizon=None):
         if secret:
             self.address = Keypair.from_seed(secret).address().decode()
         elif address:

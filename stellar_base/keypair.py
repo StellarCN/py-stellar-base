@@ -21,10 +21,8 @@ import hashlib
 
 def _get_key_of_expected_type(key, expected_type):
     if key is not None and not isinstance(key, expected_type):
-        raise TypeError(
-            "The given key_type={}) is not of type {}"
-            ".".format(type(key), expected_type)
-        )
+        raise TypeError("The given key_type={}) is not of type {}"
+                        ".".format(type(key), expected_type))
     return key
 
 
@@ -48,12 +46,10 @@ class Keypair(object):
     """
 
     def __init__(self, verifying_key, signing_key=None):
-        self.verifying_key = _get_key_of_expected_type(
-            verifying_key, ed25519.VerifyingKey
-        )
-        self.signing_key = _get_key_of_expected_type(
-            signing_key, ed25519.SigningKey
-        )
+        self.verifying_key = _get_key_of_expected_type(verifying_key,
+                                                       ed25519.VerifyingKey)
+        self.signing_key = _get_key_of_expected_type(signing_key,
+                                                     ed25519.SigningKey)
 
     @classmethod
     def deterministic(cls, mnemonic, passphrase='', lang='english', index=0):
@@ -231,9 +227,7 @@ class Keypair(object):
         :rtype: bytes
         """
         if self.signing_key is None:
-            raise MissingSigningKeyError(
-                "Cannot sign without signing key."
-            )
+            raise MissingSigningKeyError("Cannot sign without signing key.")
         return self.signing_key.sign(data)
 
     def verify(self, data, signature):

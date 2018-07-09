@@ -10,8 +10,7 @@ class TestAsset(TestCase):
     @classmethod
     def setUpClass(cls):
         cls.source = (
-            'GDJVFDG5OCW5PYWHB64MGTHGFF57DRRJEDUEFDEL2SLNIOONHYJWHA3Z'
-        )
+            'GDJVFDG5OCW5PYWHB64MGTHGFF57DRRJEDUEFDEL2SLNIOONHYJWHA3Z')
         cls.cny = Asset('CNY', cls.source)
 
     def test_native(self):
@@ -47,5 +46,8 @@ class TestAsset(TestCase):
     def test_asset_to_dict(self):
         native = Asset('XLM')
         assert native.to_dict() == {'code': 'XLM', 'type': 'native'}
-        assert self.cny.to_dict() == {'code': 'CNY', 'issuer': self.source,
-                                      'type': 'credit_alphanum4'}
+        assert self.cny.to_dict() == {
+            'code': 'CNY',
+            'issuer': self.source,
+            'type': 'credit_alphanum4'
+        }

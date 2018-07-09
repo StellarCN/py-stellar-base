@@ -5,12 +5,12 @@ from decimal import Context, Decimal, Inexact
 
 from .asset import Asset
 from .stellarxdr import Xdr
-from .utils import (
-    account_xdr_object, best_rational_approximation as best_r,
-    division, encode_check, signer_key_xdr_object, is_valid_address)
+from .utils import (account_xdr_object, best_rational_approximation as best_r,
+                    division, encode_check, signer_key_xdr_object,
+                    is_valid_address)
 from .exceptions import XdrLengthError
 
-ONE = Decimal(10 ** 7)
+ONE = Decimal(10**7)
 
 
 class Operation(object):
@@ -96,15 +96,16 @@ class Operation(object):
 
         # throw exception if value * ONE has decimal places (it can't be
         # represented as int64)
-        return int((Decimal(value) * ONE).to_integral_exact(
-            context=Context(traps=[Inexact])))
+        return int((Decimal(value) *
+                    ONE).to_integral_exact(context=Context(traps=[Inexact])))
 
     @staticmethod
     def to_xdr_price(price):
         if isinstance(price, dict):
             if not ('n' in price and 'd' in price):
                 raise ValueError(
-                    "You need pass `price` params as `digit` or `{'n': numerator, 'd': denominator}`")
+                    "You need pass `price` params as `digit` or `{'n': numerator, 'd': denominator}`"
+                )
         else:
             price = best_r(price)
         return price
@@ -144,10 +145,8 @@ class Operation(object):
         for sub_cls in cls.__subclasses__():
             if sub_cls.type_code() == operation.type:
                 return sub_cls.from_xdr_object(operation)
-        raise NotImplementedError(
-            "Operation of type={} is not implemented"
-            ".".format(operation.type)
-        )
+        raise NotImplementedError("Operation of type={} is not implemented"
+                                  ".".format(operation.type))
 
     @classmethod
     def from_xdr(cls, xdr):
@@ -314,8 +313,14 @@ class PathPayment(Operation):
     def type_code(cls):
         return Xdr.const.PATH_PAYMENT
 
-    def __init__(self, destination, send_asset, send_max, dest_asset,
-                 dest_amount, path, source=None):
+    def __init__(self,
+                 destination,
+                 send_asset,
+                 send_max,
+                 dest_asset,
+                 dest_amount,
+                 path,
+                 source=None):
         super(PathPayment, self).__init__(source)
         self.destination = destination
         self.send_asset = send_asset
@@ -334,9 +339,12 @@ class PathPayment(Operation):
         dest_asset = self.dest_asset.to_xdr_object()
         path = [asset.to_xdr_object() for asset in self.path]
 
-        path_payment = Xdr.types.PathPaymentOp(
-            send_asset, Operation.to_xdr_amount(self.send_max), destination,
-            dest_asset, Operation.to_xdr_amount(self.dest_amount), path)
+        path_payment = Xdr.types.PathPaymentOp(send_asset,
+                                               Operation.to_xdr_amount(
+                                                   self.send_max), destination,
+                                               dest_asset,
+                                               Operation.to_xdr_amount(
+                                                   self.dest_amount), path)
         self.body.type = Xdr.const.PATH_PAYMENT
         self.body.pathPaymentOp = path_payment
         return super(PathPayment, self).to_xdr_object()
@@ -377,8 +385,7 @@ class PathPayment(Operation):
             send_max=send_max,
             dest_asset=dest_asset,
             dest_amount=dest_amount,
-            path=path
-        )
+            path=path)
 
 
 class ChangeTrust(Operation):
@@ -520,15 +527,13 @@ class AllowTrust(Operation):
         else:
             raise NotImplementedError(
                 "Operation of asset_type={} is not implemented"
-                ".".format(asset_type.type)
-            )
+                ".".format(asset_type.type))
 
         return cls(
             source=source,
             trustor=trustor,
             authorize=authorize,
-            asset_code=asset_code
-        )
+            asset_code=asset_code)
 
 
 class SetOptions(Operation):
@@ -558,11 +563,18 @@ class SetOptions(Operation):
     def type_code(cls):
         return Xdr.const.SET_OPTIONS
 
-    def __init__(self, inflation_dest=None, clear_flags=None, set_flags=None,
+    def __init__(self,
+                 inflation_dest=None,
+                 clear_flags=None,
+                 set_flags=None,
                  master_weight=None,
-                 low_threshold=None, med_threshold=None, high_threshold=None,
+                 low_threshold=None,
+                 med_threshold=None,
+                 high_threshold=None,
                  home_domain=None,
-                 signer_address=None, signer_type=None, signer_weight=None,
+                 signer_address=None,
+                 signer_type=None,
+                 signer_weight=None,
                  source=None):
         super(SetOptions, self).__init__(source)
         self.inflation_dest = inflation_dest
@@ -585,18 +597,15 @@ class SetOptions(Operation):
             self.signer_type = 'ed25519PublicKey'
 
         signer_is_invalid_type = (
-                self.signer_type is not None and
-                self.signer_type not in (
-                    'ed25519PublicKey', 'hashX', 'preAuthTx'))
+            self.signer_type is not None and
+            self.signer_type not in ('ed25519PublicKey', 'hashX', 'preAuthTx'))
 
         if signer_is_invalid_type:
-            raise ValueError(
-                'Invalid signer type, sign_type should '
-                'be ed25519PublicKey, hashX or preAuthTx')
+            raise ValueError('Invalid signer type, sign_type should '
+                             'be ed25519PublicKey, hashX or preAuthTx')
 
-        signer_addr_has_valid_len = (
-                self.signer_address is not None and len(
-            self.signer_address) == 32)
+        signer_addr_has_valid_len = (self.signer_address is not None
+                                     and len(self.signer_address) == 32)
 
         if (self.signer_type in ('hashX', 'preAuthTx')
                 and not signer_addr_has_valid_len):
@@ -628,14 +637,14 @@ class SetOptions(Operation):
         self.high_threshold = assert_option_array(self.high_threshold)
         self.home_domain = assert_option_array(self.home_domain)
 
-        req_signer_fields = (
-            self.signer_address, self.signer_type, self.signer_weight)
+        req_signer_fields = (self.signer_address, self.signer_type,
+                             self.signer_weight)
 
         if all(signer_field is not None for signer_field in req_signer_fields):
             signer = [
                 Xdr.types.Signer(
-                    signer_key_xdr_object(
-                        self.signer_type, self.signer_address),
+                    signer_key_xdr_object(self.signer_type,
+                                          self.signer_address),
                     self.signer_weight)
             ]
         else:
@@ -665,8 +674,7 @@ class SetOptions(Operation):
             inflation_dest = None
         else:
             inflation_dest = encode_check(
-                'account',
-                op_xdr_object.body.setOptionsOp.inflationDest[
+                'account', op_xdr_object.body.setOptionsOp.inflationDest[
                     0].ed25519).decode()
 
         clear_flags = op_xdr_object.body.setOptionsOp.clearFlags  # list
@@ -707,8 +715,7 @@ class SetOptions(Operation):
             home_domain=home_domain,
             signer_address=signer_address,
             signer_type=signer_type,
-            signer_weight=signer_weight
-        )
+            signer_weight=signer_weight)
 
 
 class ManageOffer(Operation):
@@ -757,8 +764,8 @@ class ManageOffer(Operation):
 
         amount = Operation.to_xdr_amount(self.amount)
 
-        manage_offer_op = Xdr.types.ManageOfferOp(
-            selling, buying, amount, price, self.offer_id)
+        manage_offer_op = Xdr.types.ManageOfferOp(selling, buying, amount,
+                                                  price, self.offer_id)
         self.body.type = Xdr.const.MANAGE_OFFER
         self.body.manageOfferOp = manage_offer_op
         return super(ManageOffer, self).to_xdr_object()
@@ -792,8 +799,7 @@ class ManageOffer(Operation):
             buying=buying,
             amount=amount,
             price=price,
-            offer_id=offer_id
-        )
+            offer_id=offer_id)
 
 
 class CreatePassiveOffer(Operation):
@@ -881,8 +887,7 @@ class CreatePassiveOffer(Operation):
             selling=selling,
             buying=buying,
             amount=amount,
-            price=price
-        )
+            price=price)
 
 
 class AccountMerge(Operation):
@@ -934,10 +939,7 @@ class AccountMerge(Operation):
         destination = encode_check(
             'account', op_xdr_object.body.destination.ed25519).decode()
 
-        return cls(
-            source=source,
-            destination=destination
-        )
+        return cls(source=source, destination=destination)
 
 
 class Inflation(Operation):
@@ -1013,8 +1015,8 @@ class ManageData(Operation):
         self.data_value = data_value
 
         valid_data_name_len = len(self.data_name) <= 64
-        valid_data_val_len = (
-                self.data_value is None or len(self.data_value) <= 64)
+        valid_data_val_len = (self.data_value is None
+                              or len(self.data_value) <= 64)
 
         if not valid_data_name_len or not valid_data_val_len:
             raise XdrLengthError(
@@ -1054,8 +1056,4 @@ class ManageData(Operation):
             data_value = op_xdr_object.body.manageDataOp.dataValue[0].decode()
         else:
             data_value = None
-        return cls(
-            source=source,
-            data_name=data_name,
-            data_value=data_value
-        )
+        return cls(source=source, data_name=data_name, data_value=data_value)

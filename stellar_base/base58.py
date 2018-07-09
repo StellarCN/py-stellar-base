@@ -106,11 +106,10 @@ def main():
         type=argparse.FileType('r'),
         default='-')
     parser.add_argument(
-        '-d', '--decode',
-        action='store_true',
-        help='decode data')
+        '-d', '--decode', action='store_true', help='decode data')
     parser.add_argument(
-        '-c', '--check',
+        '-c',
+        '--check',
         action='store_true',
         help='append a checksum before encoding')
 

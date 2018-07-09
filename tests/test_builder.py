@@ -6,13 +6,14 @@ from stellar_base.builder import Builder
 from stellar_base.keypair import Keypair
 from stellar_base.exceptions import SignatureExistError
 
-
 # TODO: These endpoints really need to be mocked out.
+
 
 @pytest.fixture(scope='module')
 def test_data(setup, helpers):
     class Struct:
-        def __init__(self, **entries): self.__dict__.update(entries)
+        def __init__(self, **entries):
+            self.__dict__.update(entries)
 
     cold = Keypair.random()
     cold_secret = cold.seed()
@@ -68,7 +69,10 @@ def test_builder_xdr(setup, helpers, test_data):
 
     xdr = cold.gen_xdr()
 
-    hot = Builder(secret=hot_secret, horizon=setup.horizon_endpoint_uri, network=setup.network)
+    hot = Builder(
+        secret=hot_secret,
+        horizon=setup.horizon_endpoint_uri,
+        network=setup.network)
     hot.import_from_xdr(xdr)
     hot.sign()
 

@@ -28,9 +28,8 @@ class Asset(object):
 
     def __init__(self, code, issuer=None):
         if not self._ASSET_CODE_RE.match(code):
-            raise ValueError(
-                "Asset code is invalid (alphanumeric, 12 "
-                "characters max).")
+            raise ValueError("Asset code is invalid (alphanumeric, 12 "
+                             "characters max).")
 
         if issuer is not None and not is_valid_address(issuer):
             raise ValueError('Invalid issuer account: {}'.format(issuer))
@@ -133,7 +132,8 @@ class Asset(object):
             code = asset_xdr_object.alphaNum4.assetCode.decode().rstrip('\x00')
         else:
             issuer = encode_check(
-                'account', asset_xdr_object.alphaNum12.issuer.ed25519).decode()
+                'account',
+                asset_xdr_object.alphaNum12.issuer.ed25519).decode()
             code = (
                 asset_xdr_object.alphaNum12.assetCode.decode().rstrip('\x00'))
         return cls(code, issuer)

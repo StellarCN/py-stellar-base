@@ -27,10 +27,13 @@ USER_AGENT = 'py-stellar-base'
 
 
 class Horizon(object):
-    def __init__(self, horizon=None, pool_size=DEFAULT_POOLSIZE,
+    def __init__(self,
+                 horizon=None,
+                 pool_size=DEFAULT_POOLSIZE,
                  num_retries=DEFAULT_NUM_RETRIES,
                  request_timeout=DEFAULT_REQUEST_TIMEOUT,
-                 backoff_factor=DEFAULT_BACKOFF_FACTOR, user_agent=USER_AGENT):
+                 backoff_factor=DEFAULT_BACKOFF_FACTOR,
+                 user_agent=USER_AGENT):
         """The :class:`Horizon` object, which represents the interface for
         making requests to a Horizon server instance.
 
@@ -63,18 +66,22 @@ class Horizon(object):
         self.backoff_factor = backoff_factor
 
         # adding 504 to the list of statuses to retry
-        self.status_forcelist = list(Retry.RETRY_AFTER_STATUS_CODES).append(
-            504)
+        self.status_forcelist = list(
+            Retry.RETRY_AFTER_STATUS_CODES).append(504)
 
         # configure standard session
 
         # configure retry handler
-        retry = Retry(total=self.num_retries,
-                      backoff_factor=self.backoff_factor, redirect=0,
-                      status_forcelist=self.status_forcelist)
+        retry = Retry(
+            total=self.num_retries,
+            backoff_factor=self.backoff_factor,
+            redirect=0,
+            status_forcelist=self.status_forcelist)
         # init transport adapter
-        adapter = HTTPAdapter(pool_connections=self.pool_size,
-                              pool_maxsize=self.pool_size, max_retries=retry)
+        adapter = HTTPAdapter(
+            pool_connections=self.pool_size,
+            pool_maxsize=self.pool_size,
+            max_retries=retry)
 
         # init session
         session = requests.Session()
@@ -88,11 +95,12 @@ class Horizon(object):
 
         # configure SSE session (differs from our standard session)
 
-        sse_retry = Retry(total=1000000, redirect=0,
-                          status_forcelist=self.status_forcelist)
-        sse_adapter = HTTPAdapter(pool_connections=self.pool_size,
-                                  pool_maxsize=self.pool_size,
-                                  max_retries=sse_retry)
+        sse_retry = Retry(
+            total=1000000, redirect=0, status_forcelist=self.status_forcelist)
+        sse_adapter = HTTPAdapter(
+            pool_connections=self.pool_size,
+            pool_maxsize=self.pool_size,
+            max_retries=sse_retry)
         sse_session = requests.Session()
         sse_session.headers.update({'User-Agent': user_agent})
         sse_session.mount('http://', sse_adapter)
@@ -121,8 +129,8 @@ class Horizon(object):
         retry_count = self.num_retries
         while True:
             try:
-                reply = self._session.post(url, data=params,
-                                           timeout=self.request_timeout)
+                reply = self._session.post(
+                    url, data=params, timeout=self.request_timeout)
                 return check_horizon_reply(reply.json())
             except (RequestException, ValueError) as e:
                 if reply:
@@ -149,14 +157,13 @@ class Horizon(object):
 
     def _query(self, url, params=None, sse=False):
         if not sse:
-            reply = self._session.get(url, params=params,
-                                      timeout=self.request_timeout)
+            reply = self._session.get(
+                url, params=params, timeout=self.request_timeout)
             try:
                 return reply.json()
             except ValueError:
-                raise Exception(
-                    'invalid horizon reply: [{}] {}'.format(reply.status_code,
-                                                            reply.text))
+                raise Exception('invalid horizon reply: [{}] {}'.format(
+                    reply.status_code, reply.text))
 
         # SSE connection
         if SSEClient is None:
@@ -281,8 +288,7 @@ class Horizon(object):
         :rtype: dict
 
         """
-        endpoint = '/accounts/{account_id}/payments'.format(
-            account_id=address)
+        endpoint = '/accounts/{account_id}/payments'.format(account_id=address)
         return self.query(endpoint, params, sse)
 
     def assets(self, params=None):
@@ -349,8 +355,7 @@ class Horizon(object):
         :rtype: dict
 
         """
-        endpoint = '/transactions/{tx_hash}/operations'.format(
-            tx_hash=tx_hash)
+        endpoint = '/transactions/{tx_hash}/operations'.format(tx_hash=tx_hash)
         return self.query(endpoint, params)
 
     def transaction_effects(self, tx_hash, params=None):
@@ -367,8 +372,7 @@ class Horizon(object):
         :rtype: dict
 
         """
-        endpoint = '/transactions/{tx_hash}/effects'.format(
-            tx_hash=tx_hash)
+        endpoint = '/transactions/{tx_hash}/effects'.format(tx_hash=tx_hash)
         return self.query(endpoint, params)
 
     def transaction_payments(self, tx_hash, params=None):
@@ -385,8 +389,7 @@ class Horizon(object):
         :rtype: dict
 
         """
-        endpoint = '/transactions/{tx_hash}/payments'.format(
-            tx_hash=tx_hash)
+        endpoint = '/transactions/{tx_hash}/payments'.format(tx_hash=tx_hash)
         return self.query(endpoint, params)
 
     def order_book(self, params=None):
@@ -487,7 +490,11 @@ class Horizon(object):
         endpoint = '/ledgers/{ledger_id}/payments'.format(ledger_id=ledger_id)
         return self.query(endpoint, params)
 
-    def ledger_transactions(self, ledger_id, params=None, ):
+    def ledger_transactions(
+            self,
+            ledger_id,
+            params=None,
+    ):
         """This endpoint represents all transactions in a given ledger.
 
         `GET /ledgers/{id}/transactions{?cursor,limit,order}

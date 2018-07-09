@@ -37,6 +37,7 @@ class Memo(object):
     information on the available types of memos.
 
     """
+
     @abc.abstractmethod
     def to_xdr_object(self):
         """Creates an XDR Memo object that represents this :class:`Memo`."""
@@ -63,11 +64,10 @@ class TextMemo(Memo):
         28-bytes long.
 
     """
+
     def __init__(self, text):
         if not isinstance(text, (str, unicode)):
-            raise TypeError(
-                'Expects string type got a {}'.format(type(text))
-            )
+            raise TypeError('Expects string type got a {}'.format(type(text)))
         if bytes == str and not isinstance(text, unicode):
             # Python 2 without unicode string
             self.text = text
@@ -76,9 +76,8 @@ class TextMemo(Memo):
             self.text = bytearray(text, encoding='utf-8')
         length = len(self.text)
         if length > 28:
-            raise XdrLengthError(
-                "Text should be <= 28 bytes (ascii encoded). "
-                "Got {:s}".format(str(length)))
+            raise XdrLengthError("Text should be <= 28 bytes (ascii encoded). "
+                                 "Got {:s}".format(str(length)))
 
     def to_xdr_object(self):
         """Creates an XDR Memo object for a transaction with MEMO_TEXT."""
@@ -91,6 +90,7 @@ class IdMemo(Memo):
     :param int memo_id: A 64 bit unsigned integer.
 
     """
+
     def __init__(self, memo_id):
         self.memo_id = int(memo_id)
 
@@ -105,11 +105,12 @@ class HashMemo(Memo):
     :param bytes memo_hash: A 32 byte hash.
 
     """
+
     def __init__(self, memo_hash):
         if len(memo_hash) != 32:
-            raise XdrLengthError(
-                "Expects a 32 byte mhash value. "
-                "Got {:d} bytes instead".format(len(memo_hash)))
+            raise XdrLengthError("Expects a 32 byte mhash value. "
+                                 "Got {:d} bytes instead".format(
+                                     len(memo_hash)))
         self.memo_hash = memo_hash
 
     def to_xdr_object(self):
@@ -128,11 +129,12 @@ class RetHashMemo(Memo):
         hash of the transaction the sender is refunding.
 
     """
+
     def __init__(self, memo_return):
         if len(memo_return) != 32:
-            raise XdrLengthError(
-                "Expects a 32 byte hash value. "
-                "Got {:d} bytes instead".format(len(memo_return)))
+            raise XdrLengthError("Expects a 32 byte hash value. "
+                                 "Got {:d} bytes instead".format(
+                                     len(memo_return)))
         self.memo_return = memo_return
 
     def to_xdr_object(self):

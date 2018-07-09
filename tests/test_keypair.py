@@ -16,7 +16,8 @@ def test_sep0005():
     mnemonic = 'cable spray genius state float twenty onion head street palace net private method loan turn phrase state blanket interest dry amazing dress blast tube'
     seed = Keypair.deterministic(mnemonic, passphrase='p4ssphr4se').seed()
     assert seed == b'SAFWTGXVS7ELMNCXELFWCFZOPMHUZ5LXNBGUVRCY3FHLFPXK4QPXYP2X'
-    address = Keypair.deterministic(mnemonic, passphrase='p4ssphr4se', index=9).address().decode()
+    address = Keypair.deterministic(
+        mnemonic, passphrase='p4ssphr4se', index=9).address().decode()
     assert address == 'GBOSMFQYKWFDHJWCMCZSMGUMWCZOM4KFMXXS64INDHVCJ2A2JAABCYRR'
 
     mnemonic = 'abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about'
@@ -29,10 +30,8 @@ def test_sep0005():
 class KeypairTest(TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.mnemonic = (
-            'illness spike retreat truth genius clock brain pass '
-            'fit cave bargain toe'
-        )
+        cls.mnemonic = ('illness spike retreat truth genius clock brain pass '
+                        'fit cave bargain toe')
         cls.key_pair0 = Keypair.deterministic(cls.mnemonic)
 
     def test_from_seed(self):
@@ -45,4 +44,3 @@ class KeypairTest(TestCase):
 
     def test_init_wrong_type_key_raise(self):
         raises(TypeError, Keypair, self.mnemonic)
-

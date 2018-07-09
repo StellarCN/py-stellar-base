@@ -11,7 +11,6 @@ from stellar_base.stellarxdr import Xdr
 
 
 class TestMemo:
-
     def test_none_memo(self):
         memo = NoneMemo()
         self.__asset_memo('none', None, memo)
@@ -26,16 +25,17 @@ class TestMemo:
     def test_text_memo_toolong(self):
         memo_text = "Out, out, brief candle, life is but a walking shadow."
         length = len(memo_text)
-        with pytest.raises(XdrLengthError,
-                           match="Text should be <= 28 bytes \(ascii encoded\). "
-                                 "Got {}".format(str(length))):
+        with pytest.raises(
+                XdrLengthError,
+                match="Text should be <= 28 bytes \(ascii encoded\). "
+                "Got {}".format(str(length))):
             TextMemo(memo_text)
 
     def test_text_memo_wrong_value(self):
-        memo_text = ("stellar",)
-        with pytest.raises(TypeError,
-                           match='Expects string type got a {}'.format(
-                               type(memo_text))):
+        memo_text = ("stellar", )
+        with pytest.raises(
+                TypeError,
+                match='Expects string type got a {}'.format(type(memo_text))):
             TextMemo(memo_text)
 
     def test_id_memo(self):
@@ -68,18 +68,18 @@ class TestMemo:
         if memo_type == 'none':
             xdr_memo = Xdr.types.Memo(type=Xdr.const.MEMO_NONE)
         elif memo_type == 'text':
-            xdr_memo = Xdr.types.Memo(type=Xdr.const.MEMO_TEXT,
-                                      text=memo_value)
+            xdr_memo = Xdr.types.Memo(
+                type=Xdr.const.MEMO_TEXT, text=memo_value)
             assert xdr_memo.text == memo_xdr_object.text
         elif memo_type == 'id':
             xdr_memo = Xdr.types.Memo(type=Xdr.const.MEMO_ID, id=memo_value)
             assert memo_xdr_object.id == xdr_memo.id
         elif memo_type == 'hash':
-            xdr_memo = Xdr.types.Memo(type=Xdr.const.MEMO_HASH,
-                                      hash=memo_value)
+            xdr_memo = Xdr.types.Memo(
+                type=Xdr.const.MEMO_HASH, hash=memo_value)
             assert xdr_memo.hash == memo_xdr_object.hash
         elif memo_type == 'ret_hash':
-            xdr_memo = Xdr.types.Memo(type=Xdr.const.MEMO_RETURN,
-                                      retHash=memo_value)
+            xdr_memo = Xdr.types.Memo(
+                type=Xdr.const.MEMO_RETURN, retHash=memo_value)
             assert memo_xdr_object.retHash == xdr_memo.retHash
         assert memo_xdr_object.type == xdr_memo.type
