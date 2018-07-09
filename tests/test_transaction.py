@@ -14,22 +14,15 @@ class TestTx:
 
     def test_init_raise_redundant_argument(self):
         pytest.raises(
-            ValueError,
-            Transaction,
-            self.source,
-            opts={
-                "dummy": [],
-                "sequence": 1
-            })
+            TypeError, Transaction, self.source, dummy=[], sequence=1)
 
     def test_init_raise_account_code_wrong(self):
-        pytest.raises(
-            Exception, Transaction, self.source + "1", opts={"sequence": 1})
+        pytest.raises(Exception, Transaction, self.source + "1", sequence=1)
 
     def do(self, network, opts):
-        tx = Transaction(self.source, opts)
-        tx.add_operation(Inflation({}))
-        envelope = Te(tx, {"network_id": network})
+        tx = Transaction(self.source, **opts)
+        tx.add_operation(Inflation())
+        envelope = Te(tx, network_id=network)
         signer = Keypair.from_seed(self.seed)
         envelope.sign(signer)
         envelope_b64 = envelope.xdr()
@@ -83,10 +76,10 @@ class TestMultiOp:
         opts = {'sequence': 1, 'fee': 100 * len(args)}
         for opt, value in kwargs.items():
             opts[opt] = value
-        tx = Transaction(self.address, opts)
+        tx = Transaction(self.address, **opts)
         for count, op in enumerate(args):
             tx.add_operation(op)
-        envelope = Te(tx, {"network_id": "TESTNET"})
+        envelope = Te(tx, network_id="TESTNET")
         signer = Keypair.from_seed(self.seed)
         envelope.sign(signer)
         envelope_b64 = envelope.xdr()

@@ -16,13 +16,12 @@ class TestOp:
     amount = "1"
 
     def do(self, network, op):
-        tx = Transaction(self.source, {'sequence': 1})
+        tx = Transaction(self.source, sequence=1)
         tx.add_operation(op)
-        envelope = Te(tx, {"network_id": network})
+        envelope = Te(tx, network_id=network)
         signer = Keypair.from_seed(self.seed)
         envelope.sign(signer)
         envelope_b64 = envelope.xdr()
-        print(envelope_b64)
         return envelope_b64
 
     def test_createAccount_min(self, setup):
@@ -234,10 +233,10 @@ class TestMultiOp:
         opts = {'sequence': 1, 'fee': 100 * len(args)}
         for opt, value in kwargs.items():
             opts[opt] = value
-        tx = Transaction(self.address, opts)
+        tx = Transaction(self.address, **opts)
         for count, op in enumerate(args):
             tx.add_operation(op)
-        envelope = Te(tx, {"network_id": network})
+        envelope = Te(tx, network_id=network)
         signer = Keypair.from_seed(self.seed)
         envelope.sign(signer)
         envelope_b64 = envelope.xdr()

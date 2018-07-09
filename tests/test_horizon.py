@@ -13,10 +13,10 @@ def make_envelope(network, horizon, address, seed, *args, **kwargs):
     }
     for opt, value in kwargs.items():
         opts[opt] = value
-    tx = Transaction(address, opts)
+    tx = Transaction(address, **opts)
     for count, op in enumerate(args):
         tx.add_operation(op)
-    envelope = Te(tx, {"network_id": network})
+    envelope = Te(tx, network_id=network)
     signer = Keypair.from_seed(seed)
     envelope.sign(signer)
     envelope_xdr = envelope.xdr()

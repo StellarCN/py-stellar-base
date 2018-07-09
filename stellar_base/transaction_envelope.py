@@ -30,17 +30,14 @@ class TransactionEnvelope(object):
 
     """
 
-    def __init__(self, tx, opts=None):
+    def __init__(self, tx, signatures=None, network_id=None):
         self.tx = tx
-        try:
-            self.signatures = opts.get('signatures') or []
-        except AttributeError:
-            self.signatures = []
-        if 'network_id' in opts:
-            if opts['network_id'] in NETWORKS:
-                passphrase = NETWORKS[opts['network_id']]
+        self.signatures = signatures or []
+        if network_id:
+            if network_id in NETWORKS:
+                passphrase = NETWORKS[network_id]
             else:
-                passphrase = opts['network_id']
+                passphrase = network_id
         else:
             passphrase = NETWORKS['TESTNET']
         self.network_id = Network(passphrase).network_id()
@@ -154,7 +151,7 @@ class TransactionEnvelope(object):
         signatures = te_xdr_object.signatures
         tx_xdr_object = te_xdr_object.tx
         tx = Transaction.from_xdr_object(tx_xdr_object)
-        te = TransactionEnvelope(tx, {'signatures': signatures})
+        te = TransactionEnvelope(tx, signatures=signatures)
         # te = TransactionEnvelope(
         #     tx, {'signatures': signatures, 'network_id': 'PUBLIC'})
         return te

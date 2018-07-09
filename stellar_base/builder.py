@@ -589,15 +589,12 @@ class Builder(object):
         if not self.sequence:
             raise Exception('No sequence is present, maybe not funded?')
         tx = Transaction(
-            self.address,
-            opts={
-                'sequence': self.sequence,
-                'timeBounds': self.time_bounds,
-                'memo': self.memo,
-                'fee': self.fee * len(self.ops),
-                'operations': self.ops,
-            },
-        )
+            source=self.address,
+            sequence=self.sequence,
+            timeBounds=self.time_bounds,
+            memo=self.memo,
+            fee=self.fee * len(self.ops),
+            operations=self.ops)
         self.tx = tx
         return tx
 
@@ -613,7 +610,7 @@ class Builder(object):
         """
         if self.tx is None:
             self.gen_tx()
-        te = Te(self.tx, opts={'network_id': self.network})
+        te = Te(self.tx, network_id=self.network)
         if self.te:
             te.signatures = self.te.signatures
         self.te = te
