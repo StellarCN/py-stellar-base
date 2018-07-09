@@ -63,22 +63,19 @@ class Transaction(object):
 
     default_fee = 100
 
-    def __init__(self, source, opts):
-        opts = dict(opts)
+    def __init__(self, source, sequence, timeBounds=None, memo=None, fee=None,
+                 operations=None):
         if not is_valid_address(source):
             raise ValueError('invalid source address: {}'.format(source))
 
         self.source = source
-        self.sequence = int(opts.pop('sequence')) + 1
+        self.sequence = int(sequence) + 1
         # FIXME: Shouldn't timebounds be an object that contains minTime and
         # maxTime fields?
-        self.time_bounds = opts.pop('timeBounds', [])
-        self.memo = opts.pop('memo', NoneMemo())
-        self.fee = int(opts.pop('fee', self.default_fee))
-        self.operations = opts.pop('operations', [])
-        if opts:
-            raise ValueError(
-                "Unknown arguments found in opts: {}".format(opts))
+        self.time_bounds = timeBounds or []
+        self.memo = memo or NoneMemo()
+        self.fee = int(fee) if fee else self.default_fee
+        self.operations = operations or []
 
     def add_operation(self, operation):
         """Add an :class:`Operation <stellar_base.operation.Operation>` to
@@ -143,10 +140,10 @@ class Transaction(object):
         operations = list(
             map(Operation.from_xdr_object, tx_xdr_object.operations))
         return cls(
-            source, {
-                'sequence': sequence,
-                'timeBounds': time_bounds,
-                'memo': memo,
-                'fee': fee,
-                'operations': operations
-            })
+            source=source,
+            sequence=sequence,
+            timeBounds=time_bounds,
+            memo=memo,
+            fee=fee,
+            operations=operations
+        )
