@@ -30,7 +30,7 @@ There are two methods for generating a key pair in `py-stellar-base`.
 ```python
 from stellar_base.keypair import Keypair
 kp = Keypair.random()
-```    
+```
 
 #### 2.2 Deterministic generation
 In this method the key pair is deterministically generated from a mnemonic string, also known as "seed phrase".
@@ -57,7 +57,7 @@ After the key pair generation, we can get a public key and a seed from it:
 ```python
 publickey = kp.address().decode()
 seed = kp.seed().decode()
-```    
+```
 The public key is also your account address. If someone needs to send you a transaction, you should share with them this key.
 The seed is your secret. For safety, please keep it local and never send it through the Internet.
 
@@ -77,7 +77,7 @@ This is my favorite key pair in TESTNET, let's use them in the following steps.
 ```python
 publickey = 'GDVDKQFP665JAO7A2LSHNLQIUNYNAAIGJ6FYJVMG4DT3YJQQJSRBLQDG'
 seed = 'SCVLSUGYEAUC4MVWJORB63JBMY2CEX6ATTJ5MXTENGD3IELUQF4F6HUB'
-```   
+```
 
 ### 3.Create Account
 After the key pair generation, you have already got the address, but it is not activated until someone transfers at least 1 lumen into it.
@@ -117,10 +117,10 @@ new_account_addr = "GXXX"
 
 amount = '1' # Your new account minimum balance (in XLM) to transfer over
 # create the CreateAccount operation
-op = CreateAccount({
-    'destination': new_account_addr,
-    'starting_balance': amount
-})
+op = CreateAccount(
+    destination=new_account_addr,
+    starting_balance=amount
+)
 # create a memo
 memo = TextMemo('Hello, Stellar!')
 
@@ -135,16 +135,14 @@ sequence = horizon.account(old_account_keypair.address().decode()).get('sequence
 # default fee of 100 stroops as of this writing (0.00001 XLM)
 tx = Transaction(
     source=kp.address().decode(),
-    opts={
-        'sequence': sequence,
-        'memo': memo,
-        'operations': [
-            op,
-        ],
-    },
+    sequence=sequence,
+    memo=memo,
+    operations=[
+        op,
+    ],
 )
 # Build a transaction envelope, ready to be signed.
-envelope = Te(tx=tx, opts={"network_id": "PUBLIC"})
+envelope = Te(tx=tx, network_id="PUBLIC")
 
 # Sign the transaction envelope with the source keypair
 envelope.sign(old_account_keypair)
@@ -206,19 +204,19 @@ builder = Builder(secret=seed) # builder = Builder(secret=seed, network='public'
 How about sending Bob a payment?
 ```python
 bob_address = 'GXXX'
-builder.append_payment_op(bob_address, '100', 'XLM')
+builder.append_payment_op(bob_address, 100, 'XLM')
 ```
 Or if you want to pay him with CNY:
 ```python
 CNY_ISSUER = 'GDVDKQFP665JAO7A2LSHNLQIUNYNAAIGJ6FYJVMG4DT3YJQQJSRBLQDG'# Just a Stellar address which issues asset CNY
-builder.append_payment_op(bob_address, '100', 'CNY', CNY_ISSUER)
+builder.append_payment_op(bob_address, 100, 'CNY', CNY_ISSUER)
 ```
 And maybe you need to carry a message:
 ```python
 builder.add_text_memo('Buy yourself a beer!') # string length <= 28 bytes
-```    
+```
 At last, sign & submit
- ```python   
+ ```python
 builder.sign()
 builder.submit()
 ```
@@ -234,7 +232,7 @@ builder.gen_xdr() # generate new xdr string
 ```
 
 #### 5.2 Build from scratch
-```python   
+```python
 from stellar_base.keypair import Keypair
 from stellar_base.asset import Asset
 from stellar_base.operation import Payment
@@ -253,12 +251,12 @@ horizon = horizon_testnet() # horizon = horizon_livenet() for LIVENET
 
 asset = Asset('CNY', CNY_ISSUER)
 # create op
-op = Payment({
-    # 'source' : Alice.address().decode(),
-    'destination': bob_address,
-    'asset': asset,
-    'amount': amount
-})
+op = Payment(
+    # source=Alice.address().decode(),
+    destination=bob_address,
+    asset=asset,
+    amount=amount
+)
 # create a memo
 msg = TextMemo('Buy yourself a beer !')
 
@@ -270,21 +268,18 @@ sequence = horizon.account(Alice.address().decode('utf-8')).get('sequence')
 
 # construct Tx
 tx = Transaction(
-    source = Alice.address().decode(),
-    opts = {
-        'sequence': sequence,
-        # 'timeBounds': [],
-        'memo': msg,
-        # 'fee': 100,
-        'operations': [
-            op,
-        ],
-    },
+    source=Alice.address().decode(),
+    sequence=sequence,
+    # time_bounds = {'minTime': 1531000000, 'maxTime': 1531234600},
+    memo=msg,
+    fee=100,
+    operations=[
+        op,
+    ],
 )
 
-
 # build envelope
-envelope = Te(tx=tx, opts={"network_id": "TESTNET"}) # envelope = Te(tx=tx, opts={"network_id": "PUBLIC"}) for LIVENET
+envelope = Te(tx=tx, network_id="TESTNET") # envelope = Te(tx=tx, network_id="PUBLIC"}) for LIVENET
 # sign
 envelope.sign(Alice)
 # submit
