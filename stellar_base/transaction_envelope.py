@@ -21,11 +21,9 @@ class TransactionEnvelope(object):
 
     :param tx: The transaction that is encapsulated in this envelope.
     :type tx: :class:`Transaction <stellar_base.transaction.Transaction>`
-    :param dict opts: Additional options, such as:
-
-        - opts.signatures, which contains a list of signatures that have
+    :param list signatures: which contains a list of signatures that have
           already been created.
-        - opts.network_id, which contains the network ID for which network this
+    :param str network_id: which contains the network ID for which network this
           transaction envelope is associated with.
 
     """

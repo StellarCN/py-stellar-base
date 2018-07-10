@@ -30,31 +30,23 @@ class Transaction(object):
 
     :param str source: A strkey encoded account ID (public key) of the source
         account for the transaction.
-    :param dict opts: A dict that contains the primary components of the
-        transaction. The following keys are searched from the dict:
-
-        * opts.sequence - The current sequence number of the source account.
+    :param int sequence: The current sequence number of the source account.
           The sequence number is incremented by 1 automatically, as is
           necessary for a new transaction for a given source account.
-        * opts.time_bounds - A list of two Unix timestamps representing the
-          lower and upper bound of when a given transaction will be valid.
-          NOTE: This should likely be an object containing a minTime and
-          maxTime attribute instead, and the implementation may change.
-        * opts.memo - The memo being sent with the transaction, being
+    :param dict time_bounds: A dict that contains a minTime and maxTime attribute.
+    :param Memo memo: The memo being sent with the transaction, being
           represented as one of the subclasses of the
           :class:`Memo <stellar_base.memo.Memo>` object.
-          Defaults to :class:`NoneMemo <stellar_base.memo.NoneMemo>`.
-        * opts.fee - The fee amount for the transaction, which should equal
+    :param int fee: The fee amount for the transaction, which should equal
           FEE (currently 100 stroops) multiplied by the number of
           operations in the transaction. See `Stellar's latest documentation
           on fees
           <https://www.stellar.org/developers/guides/concepts/fees.html#transaction-fee>`_
           for more information.
-        * opts.operations: A list of :class:`Operation
+    :param list operations: A list of :class:`Operation
           <stellar_base.operation.Operation>` objects (typically its
           subclasses as defined in :mod:`stellar_base.operation` to be
           included in the transaction. By default this is an empty list.
-
     """
 
     default_fee = 100

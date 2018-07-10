@@ -35,8 +35,8 @@ class Operation(object):
     The :class:`Operation` class is typically not used, but rather one of its
     subclasses is typically included in transactions.
 
-    :param dict opts: A dict of options for creating this :class:`Operation`.
-        By default, this only pulls out the source account via opts.source.
+    :param str source: The source account for the payment. Defaults to the
+        transaction's source account.
 
     """
 
@@ -175,9 +175,12 @@ class CreateAccount(Operation):
 
     Threshold: Medium
 
-    :param dict opts: A dict of options for creating this
-        :class:`CreateAccount`. This class pulls a 'source', 'destination', and
-        'starting_balance' via opts.
+    :param str destination: Destination account ID to create an account for.
+    :param int_or_float starting_balance: Amount in XLM the account should be
+        funded for. Must be greater than the [reserve balance amount]
+        (https://www.stellar.org/developers/learn/concepts/fees.html).
+    :param str source: The source account for the payment. Defaults to the
+        transaction's source account.
 
     """
 
@@ -236,9 +239,11 @@ class Payment(Operation):
 
     Threshold: Medium
 
-    :param dict opts: A dict of options for creating this :class:`Payment`.
-        This class pulls a 'source', 'destination', 'asset', and 'amount' via
-        opts.
+    :param str destination: The destination account ID.
+    :param Asset asset: The asset to send.
+    :param int_or_float amount: The amount to send.
+    :param str source: The source account for the payment. Defaults to the
+        transaction's source account.
 
     """
 
@@ -303,10 +308,14 @@ class PathPayment(Operation):
 
     Threshold: Medium
 
-    :param dict opts: A dict of options for creating this :class:`PathPayment`.
-        This class pulls a 'source', 'destination', 'send_asset', 'send_max',
-        'dest_asset', 'dest_amount', and 'path' via opts.
-
+    :param str destination: The destination account to send to.
+    :param Asset send_asset: The asset to pay with.
+    :param int_or_float send_max: The maximum amount of send_asset to send.
+    :param Asset dest_asset: The asset the destination will receive.
+    :param int_or_float dest_amount: The amount the destination receives.
+    :param list path: A list of Asset objects to use as the path.
+    :param str source: The source account for the payment. Defaults to the
+        transaction's source account.
     """
 
     @classmethod
@@ -339,12 +348,9 @@ class PathPayment(Operation):
         dest_asset = self.dest_asset.to_xdr_object()
         path = [asset.to_xdr_object() for asset in self.path]
 
-        path_payment = Xdr.types.PathPaymentOp(send_asset,
-                                               Operation.to_xdr_amount(
-                                                   self.send_max), destination,
-                                               dest_asset,
-                                               Operation.to_xdr_amount(
-                                                   self.dest_amount), path)
+        path_payment = Xdr.types.PathPaymentOp(
+            send_asset, Operation.to_xdr_amount(self.send_max), destination,
+            dest_asset, Operation.to_xdr_amount(self.dest_amount), path)
         self.body.type = Xdr.const.PATH_PAYMENT
         self.body.pathPaymentOp = path_payment
         return super(PathPayment, self).to_xdr_object()
@@ -398,9 +404,10 @@ class ChangeTrust(Operation):
 
     Threshold: Medium
 
-    :param dict opts: A dict of options for creating this :class:`ChangeTrust`.
-        This class pulls a 'source', 'asset', and optionally a 'limit' via
-        opts.
+    :param Asset asset: The asset for the trust line.
+    :param int_or_float limit: The limit for the asset, defaults to max int64.
+        If the limit is set to "0" it deletes the trustline.
+    :param str source: The source account (defaults to transaction source).
 
     """
     default_limit = "922337203685.4775807"
@@ -460,9 +467,9 @@ class AllowTrust(Operation):
 
     Threshold: Low
 
-    :param dict opts: A dict of options for creating this :class:`AllowTrust`.
-        This class pulls a 'source', 'trustor', 'asset_code', and 'authorize'
-        via opts.
+    :param str trustor: The trusting account (the one being authorized)
+    :param str asset_code: The asset code being authorized.
+    :param str source: The source account (defaults to transaction source).
 
     """
 
@@ -550,12 +557,19 @@ class SetOptions(Operation):
 
     Threshold: Medium or High
 
-    :param dict opts: A dict of options for creating this :class:`SetOptions`.
-        This class pulls several of the following depending on the option: a
-        'source', 'inflation_dest', 'clear_flags', 'set_flags',
-        'master_weight', 'low_threshold', 'med_threshold', 'high_threshold',
-        'home_domain', 'signer_address', 'signer_type', 'signer_weight' via
-        opts.
+    :param str inflation_dest: Set this account ID as the account's inflation destination.
+    :param int clear_flags: Bitmap integer for which account flags to clear.
+    :param int set_flags: Bitmap integer for which account flags to set.
+    :param int master_weight: The master key weight.
+    :param int low_threshold: The sum weight for the low threshold.
+    :param int med_threshold: The sum weight for the medium threshold.
+    :param int high_threshold: The sum weight for the high threshold.
+    :param str home_domain: sets the home domain used for reverse federation lookup.
+    :param str_or_bytes signer_address: signer
+    :param str signer_type: The type of signer, it should be 'ed25519PublicKey',
+        'hashX' or 'preAuthTx'
+    :param int signer_weight: The weight of the new signer (0 to delete or 1-255)
+    :param str source: The source account (defaults to transaction source).
 
     """
 
@@ -674,8 +688,8 @@ class SetOptions(Operation):
             inflation_dest = None
         else:
             inflation_dest = encode_check(
-                'account', op_xdr_object.body.setOptionsOp.inflationDest[
-                    0].ed25519).decode()
+                'account', op_xdr_object.body.setOptionsOp.inflationDest[0]
+                .ed25519).decode()
 
         clear_flags = op_xdr_object.body.setOptionsOp.clearFlags  # list
         set_flags = op_xdr_object.body.setOptionsOp.setFlags
@@ -733,9 +747,15 @@ class ManageOffer(Operation):
 
     Threshold: Medium
 
-    :param dict opts: A dict of options for creating this :class:`ManageOffer`.
-        This class pulls several of the following from opts: 'source',
-        'selling', 'buying', 'amount', 'price', 'offer_id'.
+    :param Asset selling: What you're selling.
+    :param Asset buying: What you're buying.
+    :param int_or_float amount: The total amount you're selling. If 0,
+        deletes the offer.
+    :param int_or_price_or_dict price: Price of 1 unit of `selling` in
+        terms of `buying`.
+    :param int offer_id: If `0`, will create a new offer (default). Otherwise,
+        edits an existing offer.
+    :param str source: The source account (defaults to transaction source).
 
     """
 
@@ -824,9 +844,13 @@ class CreatePassiveOffer(Operation):
     using the manage offer operation - see :class:`ManageOffer` for more
     details.
 
-    :param dict opts: A dict of options for creating this
-        :class:`CreatePassiveOffer`.  This class pulls several of the following
-        from opts: 'source', 'selling', 'buying', 'amount', 'price'.
+    :param Asset selling: What you're selling.
+    :param Asset buying: What you're buying.
+    :param int_or_float amount: The total amount you're selling. If 0,
+        deletes the offer.
+    :param int_or_price_or_dict price: Price of 1 unit of `selling` in
+        terms of `buying`.
+    :param str source: The source account (defaults to transaction source).
 
     """
 
@@ -899,9 +923,8 @@ class AccountMerge(Operation):
 
     Threshold: High
 
-    :param dict opts: A dict of options for creating this
-        :class:`AccountMerge`.  This class pulls several of the following from
-        opts: 'source', 'destination'
+    :param str destination: Destination to merge the source account into.
+    :param str source: The source account (defaults to transaction source).
 
     """
 
@@ -950,9 +973,7 @@ class Inflation(Operation):
 
     Threshold: Low
 
-    :param dict opts: A dict of options for creating this
-        :class:`Inflation`.  This class pulls several of the following from
-        opts: 'source'.
+    :param str source: The source account (defaults to transaction source).
 
     """
 
@@ -999,9 +1020,9 @@ class ManageData(Operation):
 
     Threshold: Medium
 
-    :param dict opts: A dict of options for creating this :class:`ManageData`.
-        This class pulls several of the following from opts: 'source',
-        'data_name', 'data_value'.
+    :param str data_name: The name of the data entry.
+    :param str data_value: The value of the data entry.
+    :param str source: The optional source account.
 
     """
 
