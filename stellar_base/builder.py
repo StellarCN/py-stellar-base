@@ -13,7 +13,6 @@ from .exceptions import SignatureExistError
 from .federation import federation, FederationError
 
 
-# TODO: Rename to TransactionBuilder? Feels like it should be more explicit.
 class Builder(object):
     """The :class:`Builder` object, which uses the builder pattern to create
     a list of operations in a :class:`Transaction`, ultimately to be submitted
@@ -78,7 +77,7 @@ class Builder(object):
         else:
             self.sequence = None
         self.ops = []
-        self.time_bounds = []
+        self.time_bounds = None
         self.memo = memo.NoneMemo()
         self.fee = fee
         self.tx = None
@@ -539,7 +538,8 @@ class Builder(object):
         :return: This builder instance.
 
         """
-        return self.time_bounds.append(time_bounds)
+        self.time_bounds = time_bounds
+        return self
 
     def federation_payment(self,
                            fed_address,
@@ -591,7 +591,7 @@ class Builder(object):
         tx = Transaction(
             source=self.address,
             sequence=self.sequence,
-            timeBounds=self.time_bounds,
+            time_bounds=self.time_bounds,
             memo=self.memo,
             fee=self.fee * len(self.ops),
             operations=self.ops)
@@ -673,7 +673,14 @@ class Builder(object):
         self.ops = te.tx.operations
         self.address = te.tx.source
         self.sequence = te.tx.sequence - 1
-        self.time_bounds = te.tx.time_bounds
+        time_bounds_in_xdr = te.tx.time_bounds
+        if time_bounds_in_xdr:
+            self.time_bounds = {
+                'maxTime': time_bounds_in_xdr[0].maxTime,
+                'minTime': time_bounds_in_xdr[0].minTime
+            }
+        else:
+            self.time_bounds = None
         self.memo = te.tx.memo
 
     def sign(self, secret=None):

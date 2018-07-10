@@ -56,26 +56,33 @@ class Transaction(object):
           included in the transaction. By default this is an empty list.
 
     """
-    # TODO: Why is this passed in as a dictionary (outside of conforming to the
-    # JavaScript SDK)? Wouldn't it make more sense to use optional arguments?
-    # Several of the components in opts are also required. Especially because
-    # they're just being shoved into typed attributes anyways?
 
     default_fee = 100
 
-    def __init__(self, source, sequence, timeBounds=None, memo=None, fee=None,
+    def __init__(self,
+                 source,
+                 sequence,
+                 time_bounds=None,
+                 memo=None,
+                 fee=None,
                  operations=None):
         if not is_valid_address(source):
             raise ValueError('invalid source address: {}'.format(source))
 
         self.source = source
         self.sequence = int(sequence) + 1
-        # FIXME: Shouldn't timebounds be an object that contains minTime and
-        # maxTime fields?
-        self.time_bounds = timeBounds or []
         self.memo = memo or NoneMemo()
         self.fee = int(fee) if fee else self.default_fee
         self.operations = operations or []
+        # self.time_bounds = [time_bounds['minTime'],
+        #                     time_bounds['maxTime']] if time_bounds else []
+        if time_bounds is None:
+            self.time_bounds = []
+        else:
+            if not isinstance(time_bounds, dict):
+                raise ValueError("time_bounds should be a dict that contains "
+                                 "minTime and maxTime fields")
+            self.time_bounds = [time_bounds['minTime'], time_bounds['maxTime']]
 
     def add_operation(self, operation):
         """Add an :class:`Operation <stellar_base.operation.Operation>` to
@@ -121,7 +128,14 @@ class Transaction(object):
         """
         source = encode_check('account', tx_xdr_object.sourceAccount.ed25519)
         sequence = tx_xdr_object.seqNum - 1
-        time_bounds = tx_xdr_object.timeBounds  # TODO test
+        time_bounds_in_xdr = tx_xdr_object.timeBounds  # TODO test
+        if time_bounds_in_xdr:
+            time_bounds = {
+                'maxTime': time_bounds_in_xdr[0].maxTime,
+                'minTime': time_bounds_in_xdr[0].minTime
+            }
+        else:
+            time_bounds = None
 
         memo_type = tx_xdr_object.memo.type
         memo_switch = tx_xdr_object.memo.switch
@@ -142,8 +156,7 @@ class Transaction(object):
         return cls(
             source=source,
             sequence=sequence,
-            timeBounds=time_bounds,
+            time_bounds=time_bounds,
             memo=memo,
             fee=fee,
-            operations=operations
-        )
+            operations=operations)
