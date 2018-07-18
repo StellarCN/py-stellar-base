@@ -70,3 +70,7 @@ Create Offer
               buying_issuer, amount, price)
    builder.sign()
    builder.submit()
+
+More
+----
+Get more code snippets from `here <https://github.com/StellarCN/py-stellar-base/tree/v0.2/examples>`_.

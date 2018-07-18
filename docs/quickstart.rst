@@ -169,10 +169,10 @@ account of your own, here's an example of how to do so:
 
    amount = '1' # Your new account minimum balance (in XLM) to transfer over
    # create the CreateAccount operation
-   op = CreateAccount({
-       'destination': new_account_addr,
-       'starting_balance': amount
-   })
+   op = CreateAccount(
+       destination=new_account_addr,
+       starting_balance=amount
+   )
    # create a memo
    memo = TextMemo('Transferring to my new account!')
 
@@ -186,17 +186,15 @@ account of your own, here's an example of how to do so:
    # Create a transaction with our single create account operation, with the
    # default fee of 100 stroops as of this writing (0.00001 XLM)
    tx = Transaction(
-       source=old_account_keypair.address().decode(),
-       opts={
-           'sequence': sequence,
-           'memo': memo,
-           'operations': [
-               op,
-           ],
-       },
+       source=kp.address().decode(),
+       sequence=sequence,
+       memo=memo,
+       operations=[
+           op,
+       ],
    )
    # Build a transaction envelope, ready to be signed.
-   envelope = Te(tx=tx, opts={"network_id": "PUBLIC"})
+   envelope = Te(tx=tx, network_id="PUBLIC")
 
    # Sign the transaction envelope with the source keypair
    envelope.sign(old_account_keypair)
@@ -388,13 +386,13 @@ In this example, Alice is sending Bob 100 CNY.
    # create op
    amount = '100'
    asset = Asset('CNY', CNY_ISSUER)
-   op = Payment({
+   op = Payment(
        # Source is also inferred from the transaction source, so it's optional.
-       'source' : alice_kp.address().decode(),
-       'destination': bob_address,
-       'asset': asset,
-       'amount': amount
-   })
+       source=alice_kp.address().decode(),
+       destination=bob_address,
+       asset=asset,
+       amount=amount
+   )
    # create a memo
    msg = TextMemo('For beers yesterday!')
 
@@ -406,21 +404,20 @@ In this example, Alice is sending Bob 100 CNY.
 
    # Construct a transaction
    tx = Transaction(
-       source = alice_kp.address().decode(),
-       opts = {
-           'sequence': sequence,
-           'memo': msg,
-           # Can specify a fee or use the default by not specifying it
-           'fee': 100,
-           'operations': [
-               op,
-           ],
-       },
+       source=Alice.address().decode(),
+       sequence=sequence,
+       # time_bounds = {'minTime': 1531000000, 'maxTime': 1531234600},
+       memo=msg,
+       fee=100, # Can specify a fee or use the default by not specifying it
+       operations=[
+           op,
+       ],
    )
 
 
+
    # Build transaction envelope
-   envelope = Te(tx=tx, opts={"network_id": "TESTNET"}) # or 'PUBLIC'
+   envelope = Te(tx=tx, network_id="TESTNET") # or 'PUBLIC'
 
    # Sign the envelope
    envelope.sign(alice_kp)
