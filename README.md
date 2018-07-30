@@ -273,7 +273,7 @@ tx = Transaction(
     source = Alice.address().decode(),
     opts = {
         'sequence': sequence,
-        # 'timeBounds': [],
+        # 'timeBounds': [1532961160, 1532962160],
         'memo': msg,
         # 'fee': 100,
         'operations': [

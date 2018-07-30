@@ -2,6 +2,8 @@
 
 import base64
 
+from stellar_base.stellarxdr.StellarXDR_type import TimeBounds
+
 from .memo import HashMemo, IdMemo, NoneMemo, RetHashMemo, TextMemo
 from .operation import (
     CreateAccount, ManageOffer, AccountMerge, AllowTrust, ChangeTrust,
@@ -78,6 +80,10 @@ class Transaction(object):
         # FIXME: Shouldn't timebounds be an object that contains minTime and
         # maxTime fields?
         self.time_bounds = opts.get('timeBounds', [])
+        if self.time_bounds:
+            self.time_bounds = [
+                TimeBounds(minTime=self.time_bounds[0],
+                           maxTime=self.time_bounds[1])]
         self.memo = opts.get('memo', NoneMemo())
         self.fee = int(opts['fee']) if 'fee' in opts else FEE
         self.operations = opts.get('operations', [])
@@ -127,7 +133,9 @@ class Transaction(object):
         """
         source = encode_check('account', tx_xdr_object.sourceAccount.ed25519)
         sequence = tx_xdr_object.seqNum - 1
-        time_bounds = tx_xdr_object.timeBounds  # TODO test
+        time_bounds = tx_xdr_object.timeBounds
+        if time_bounds:
+            time_bounds = [time_bounds[0].minTime, time_bounds[0].maxTime]  # TODO test
 
         memo_type = tx_xdr_object.memo.type
         memo_switch = tx_xdr_object.memo.switch
