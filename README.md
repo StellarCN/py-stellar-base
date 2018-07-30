@@ -94,8 +94,7 @@ On the other hand, if you would like to create an account in the livenet, you sh
 However, if you want to create an account from another account of your own, you may run the following code:
 ```python
 from stellar_base.keypair import Keypair
-from stellar_base.asset import Asset
-from stellar_base.operation import CreateAccount, Payment
+from stellar_base.operation import CreateAccount
 from stellar_base.transaction import Transaction
 from stellar_base.transaction_envelope import TransactionEnvelope as Te
 from stellar_base.memo import TextMemo
@@ -134,7 +133,7 @@ sequence = horizon.account(old_account_keypair.address().decode()).get('sequence
 # Create a transaction with our single create account operation, with the
 # default fee of 100 stroops as of this writing (0.00001 XLM)
 tx = Transaction(
-    source=kp.address().decode(),
+    source=old_account_keypair.address().decode(),
     sequence=sequence,
     memo=memo,
     operations=[

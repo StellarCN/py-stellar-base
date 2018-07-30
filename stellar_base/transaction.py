@@ -5,6 +5,7 @@ import base64
 from .memo import HashMemo, IdMemo, NoneMemo, RetHashMemo, TextMemo
 from .operation import Operation
 from .stellarxdr import Xdr
+from .stellarxdr.StellarXDR_type import TimeBounds
 from .utils import account_xdr_object, encode_check, \
     is_valid_address
 
@@ -74,7 +75,8 @@ class Transaction(object):
             if not isinstance(time_bounds, dict):
                 raise ValueError("time_bounds should be a dict that contains "
                                  "minTime and maxTime fields")
-            self.time_bounds = [time_bounds['minTime'], time_bounds['maxTime']]
+            self.time_bounds = [TimeBounds(minTime=time_bounds['minTime'],
+                                           maxTime=time_bounds['maxTime'])]
 
     def add_operation(self, operation):
         """Add an :class:`Operation <stellar_base.operation.Operation>` to
