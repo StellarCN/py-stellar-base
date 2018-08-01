@@ -469,6 +469,21 @@ class Builder(object):
         op = operation.ManageData(data_name, data_value, source)
         return self.append_op(op)
 
+    def append_bump_sequence_op(self, bump_to, source=None):
+        """Append a :class:`BumpSequence <stellar_base.operation.BumpSequence>`
+        operation to the list of operations.
+
+        Only available in protocol version 10 and above
+
+        :param int bump_to: Sequence number to bump to.
+        :param str source: The source address that is running the inflation
+            operation.
+        :return: This builder instance.
+
+        """
+        op = operation.BumpSequence(bump_to, source)
+        return self.append_op(op)
+
     def add_memo(self, memo):
         """Set the memo for the transaction build by this :class:`Builder`.
 

@@ -39,9 +39,9 @@ def test_builder(setup, test_data):
     # append twice for test
     cold.append_payment_op(hot_account, 50.123, 'BEER', test_data.cold_account) \
         .append_payment_op(hot_account, 50.123, 'BEER', test_data.cold_account)
+    # TODO: append_bump_sequence_op test
     cold.sign()
     cold.sign(hot_secret)
-
     # try to sign twice
     with pytest.raises(SignatureExistError):
         cold.sign(hot_secret)
