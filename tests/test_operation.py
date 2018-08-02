@@ -127,6 +127,9 @@ def _load_operations():
              data_name='1KFHE7w8BhaENAswwryaoccDb6qcT6DbYY',
              data_value=SOURCE,
          )),
+        ("bump_sequence", BumpSequence(
+            bump_to=23333114514
+        ))
     ]
 
 

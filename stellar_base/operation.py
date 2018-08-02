@@ -1078,3 +1078,55 @@ class ManageData(Operation):
         else:
             data_value = None
         return cls(source=source, data_name=data_name, data_value=data_value)
+
+
+class BumpSequence(Operation):
+    """The :class:`BumpSequence` object, which represents a
+    BumpSequence operation on Stellar's network.
+
+    Only available in protocol version 10 and above
+
+    Bump sequence allows to bump forward the sequence number of the source account of the
+    operation, allowing to invalidate any transactions with a smaller sequence number.
+    If the specified bumpTo sequence number is greater than the source account’s sequence number,
+    the account’s sequence number is updated with that value, otherwise it’s not modified.
+
+    Threshold: Low
+
+    :param int bump_to: Sequence number to bump to.
+    :param str source: The optional source account.
+
+    """
+
+    @classmethod
+    def type_code(cls):
+        return Xdr.const.BUMP_SEQUENCE
+
+    def __init__(self, bump_to, source=None):
+        super(BumpSequence, self).__init__(source)
+        self.bump_to = bump_to
+
+    def to_xdr_object(self):
+        """Creates an XDR Operation object that represents this
+        :class:`BumpSequence`.
+
+        """
+        bump_sequence_op = Xdr.types.BumpSequenceOp(self.bump_to)
+        self.body.type = Xdr.const.BUMP_SEQUENCE
+        self.body.bumpSequenceOp = bump_sequence_op
+        return super(BumpSequence, self).to_xdr_object()
+
+    @classmethod
+    def from_xdr_object(cls, op_xdr_object):
+        """Creates a :class:`BumpSequence` object from an XDR Operation
+        object.
+
+        """
+        if not op_xdr_object.sourceAccount:
+            source = None
+        else:
+            source = encode_check(
+                'account', op_xdr_object.sourceAccount[0].ed25519).decode()
+
+        bump_to = op_xdr_object.body.bumpSequenceOp.bumpTo
+        return cls(source=source, bump_to=bump_to)
