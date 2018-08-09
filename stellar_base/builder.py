@@ -157,7 +157,7 @@ class Builder(object):
         """
         asset = Asset(code=asset_code, issuer=asset_issuer)
         amount = str(amount)
-        op = operation.Payment(destination, asset, amount, source=None)
+        op = operation.Payment(destination, asset, amount, source)
         return self.append_op(op)
 
     def append_path_payment_op(self,
