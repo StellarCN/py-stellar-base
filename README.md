@@ -251,11 +251,11 @@ horizon = horizon_testnet() # horizon = horizon_livenet() for LIVENET
 
 asset = Asset('CNY', CNY_ISSUER)
 # create op
-op = Payment(
-    # source=Alice.address().decode(),
-    destination=bob_address,
-    asset=asset,
-    amount=amount
+op = Payment({
+    # 'source': Alice.address().decode(),
+    'destination': bob_address,
+    'asset': asset,
+    'amount': amount}
 )
 # create a memo
 msg = TextMemo('Buy yourself a beer !')
@@ -266,23 +266,25 @@ sequence = horizon.account(Alice.address().decode('utf-8')).get('sequence')
 # Python 2
 # sequence = horizon.account(Alice.address()).get('sequence')
 
+source = Alice.address().decode()
 # construct Tx
 tx = Transaction(
-    source=Alice.address().decode(),
-    sequence=sequence,
-    # time_bounds = {'minTime': 1531000000, 'maxTime': 1531234600},
-    memo=msg,
-    fee=100,
-    operations=[
-        op,
-    ],
+    source,
+    {
+        'sequence': sequence,
+        # 'time_bounds': {'minTime': 1531000000, 'maxTime': 1531234600},
+        'memo': msg,
+        'fee': 100,
+        'operations': [op]
+    }
 )
 
 # build envelope
-envelope = Te(tx=tx, network_id="TESTNET") # envelope = Te(tx=tx, network_id="PUBLIC"}) for LIVENET
+envelope = Te(tx, {'network_id': "TESTNET"})  # envelope = Te(tx=tx, network_id="PUBLIC"}) for LIVENET
 # sign
 envelope.sign(Alice)
 # submit
 xdr = envelope.xdr()
 response = horizon.submit(xdr)
+print(response)
 ```
