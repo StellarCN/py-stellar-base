@@ -27,7 +27,7 @@ builder = Builder(
     issuing_secret, network='TESTNET').append_payment_op(
         destination=receiving_public,
         amount=1000,
-        asset_code=my_asset.code,
+        asset_type=my_asset.code,
         asset_issuer=my_asset.issuer)
 builder.sign()
 resp = builder.submit()
