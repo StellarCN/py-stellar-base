@@ -114,11 +114,11 @@ old_account_keypair = Keypair.from_seed(old_account_seed)
 # created public key). This is the destination account.
 new_account_addr = "GXXX"
 
-amount = '1' # Your new account minimum balance (in XLM) to transfer over
+amount = '1'  # Your new account minimum balance (in XLM) to transfer over
 # create the CreateAccount operation
-op = CreateAccount(
-    destination=new_account_addr,
-    starting_balance=amount
+op = CreateAccount({
+    'destination': new_account_addr,
+    'starting_balance': amount}
 )
 # create a memo
 memo = TextMemo('Hello, Stellar!')
@@ -126,22 +126,22 @@ memo = TextMemo('Hello, Stellar!')
 # Get the current sequence of the source account by contacting Horizon. You
 # should also check the response for errors!
 # Python 3
-sequence = horizon.account(old_account_keypair.address().decode()).get('sequence')
+sequence = horizon.account(
+    old_account_keypair.address().decode()).get('sequence')
 # Python 2
 # sequence = horizon.account(old_account_keypair.address()).get('sequence')
 
 # Create a transaction with our single create account operation, with the
 # default fee of 100 stroops as of this writing (0.00001 XLM)
+source = old_account_keypair.address().decode()
 tx = Transaction(
-    source=old_account_keypair.address().decode(),
-    sequence=sequence,
-    memo=memo,
-    operations=[
-        op,
-    ],
+    source,
+    {'sequence': sequence,
+     'memo': memo,
+     'operations': [op]}
 )
 # Build a transaction envelope, ready to be signed.
-envelope = Te(tx=tx, network_id="PUBLIC")
+envelope = Te(tx, {'network_id': "PUBLIC"})
 
 # Sign the transaction envelope with the source keypair
 envelope.sign(old_account_keypair)
@@ -149,6 +149,7 @@ envelope.sign(old_account_keypair)
 # Submit the transaction to Horizon
 te_xdr = envelope.xdr()
 response = horizon.submit(te_xdr)
+print(response)
 ```
 Then, you can check the status of this operation with the response.
 
