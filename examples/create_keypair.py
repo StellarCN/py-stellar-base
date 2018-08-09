@@ -1,4 +1,4 @@
-from stellar_base import Keypair
+from stellar_base.keypair import Keypair
 
 
 def create_keypair_determinist_english():
