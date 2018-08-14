@@ -42,3 +42,7 @@ pypi:
 clean:
 	find . -name \*.pyc -delete
 .PHONY: clean
+
+updatexdr:
+	cd stellar_base/stellarxdr && python updatexdr.py && python xdrgen.py ../xdr/
+.PHONY: updatexdr
