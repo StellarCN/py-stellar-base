@@ -27,7 +27,7 @@ You can install it from source code via pip:
 
 .. code-block:: bash
 
-    pip install git+git://github.com/StellarCN/py-stellar-base
+    pip install -U git+git://github.com/StellarCN/py-stellar-base
 
 And you can always clone `the repository <https://github.com/StellarCN/py-stellar-base>`_ directly, and install it locally:
 

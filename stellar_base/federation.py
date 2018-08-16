@@ -3,8 +3,8 @@
 import requests
 import toml
 
+from .exceptions import FederationError, DecodeError
 from .keypair import Keypair
-from .utils import DecodeError
 
 
 def federation(address_or_id, fed_type='name', domain=None, allow_http=False):
@@ -131,9 +131,3 @@ def get_stellar_toml(domain, allow_http=False):
 
     return None
 
-
-class FederationError(Exception):
-    """A :exc:`FederationError` that represents an issue stemming from
-    Stellar Federation.
-
-    """

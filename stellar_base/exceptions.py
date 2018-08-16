@@ -43,3 +43,10 @@ class MnemonicError(StellarError):
 
 class MissingSigningKeyError(StellarError):
     pass
+
+
+class FederationError(Exception):
+    """A :exc:`FederationError` that represents an issue stemming from
+    Stellar Federation.
+
+    """

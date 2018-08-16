@@ -148,7 +148,8 @@ class Builder(object):
         :param str destination: Account address that receives the payment.
         :param str amount: The amount of the currency to send in the payment.
         :param str asset_code: The asset code for the asset to send.
-        :param str asset_issuer: The address of the issuer of the asset.
+        :param asset_issuer: The address of the issuer of the asset.
+        :type asset_issuer: str, None
         :param str source: The source address of the payment.
         :return: This builder instance.
 
@@ -174,12 +175,14 @@ class Builder(object):
             payment.
         :param str send_code: The asset code for the source asset deducted from
             the source account.
-        :param str send_issuer: The address of the issuer of the source asset.
+        :param send_issuer: The address of the issuer of the source asset.
+        :type send_issuer: str, None
         :param str send_max: The maximum amount of send asset to deduct
             (excluding fees).
         :param str dest_code: The asset code for the final destination asset
             sent to the recipient.
-        :param str dest_issuer: Account address that receives the payment.
+        :param dest_issuer: Account address that receives the payment.
+        :type dest_issuer: str, None
         :param str dest_amount: The amount of destination asset the destination
             account receives.
         :param list path: A list of asset tuples, each tuple containing a
@@ -350,12 +353,14 @@ class Builder(object):
 
         :param str selling_code: The asset code for the asset the offer creator
             is selling.
-        :param str selling_issuer: The issuing address for the asset the offer
+        :param selling_issuer: The issuing address for the asset the offer
             creator is selling.
+        :type selling_issuer: str, None
         :param str buying_code: The asset code for the asset the offer creator
             is buying.
-        :param str buying_issuer: The issuing address for the asset the offer
+        :param buying_issuer: The issuing address for the asset the offer
             creator is selling.
+        :type buying_issuer: str, None
         :param str amount: Amount of the asset being sold. Set to 0 if you want
             to delete an existing offer.
         :param price: Price of 1 unit of selling in terms of buying. You can pass
@@ -388,12 +393,14 @@ class Builder(object):
 
         :param str selling_code: The asset code for the asset the offer creator
             is selling.
-        :param str selling_issuer: The issuing address for the asset the offer
+        :param selling_issuer: The issuing address for the asset the offer
             creator is selling.
+        :type selling_issuer: str, None
         :param str buying_code: The asset code for the asset the offer creator
             is buying.
-        :param str buying_issuer: The issuing address for the asset the offer
+        :param buying_issuer: The issuing address for the asset the offer
             creator is selling.
+        :type buying_issuer: str, None
         :param str amount: Amount of the asset being sold. Set to 0 if you want
             to delete an existing offer.
         :param price: Price of 1 unit of selling in terms of buying. You can pass
@@ -445,7 +452,7 @@ class Builder(object):
         :param str data_name: String up to 64 bytes long. If this is a new Name
             it will add the given name/value pair to the account. If this Name
             is already present then the associated value will be modified.
-        :param bytes data_value: If not present then the existing
+        :param str data_value: If not present then the existing
             Name will be deleted. If present then this value will be set in the
             DataEntry. Up to 64 bytes long.
         :param str source: The source account on which data is being managed.

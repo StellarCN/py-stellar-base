@@ -155,6 +155,12 @@ Manage Data
 .. autoclass:: stellar_base.operation.ManageData
    :members:
 
+Bump Sequence
+^^^^^^^^^^^^^
+
+.. autoclass:: stellar_base.operation.BumpSequence
+   :members:
+
 Federation
 ==========
 

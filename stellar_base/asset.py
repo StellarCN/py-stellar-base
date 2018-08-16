@@ -16,8 +16,9 @@ class Asset(object):
 
     :param str code: The asset code, in the formats specified in `Stellar's
         guide on assets`_.
-    :param str issuer: The strkey encoded issuer of the asset. Note if the
+    :param issuer: The strkey encoded issuer of the asset. Note if the
         currency is the native currency (XLM (Lumens)), no issuer is necessary.
+    :type issuer: str, None
 
     .. _Stellar's guide on assets:
         https://www.stellar.org/developers/guides/concepts/assets.html

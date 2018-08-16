@@ -26,14 +26,10 @@ methods.
 
    api
 
-Snippets
+Examples
 --------
-Find examples here.
+Find examples `here`_.
 
-.. toctree::
-   :maxdepth: 2
-
-   snippets
 
 
 Indices
@@ -41,3 +37,6 @@ Indices
 
 * :ref:`genindex`
 * :ref:`modindex`
+
+
+.. _here: https://github.com/StellarCN/py-stellar-base/tree/master/examples
