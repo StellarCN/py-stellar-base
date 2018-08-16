@@ -5,7 +5,7 @@ from setuptools import setup, find_packages
 
 exec(open("stellar_base/version.py").read())
 
-with codecs.open('README.md', encoding='utf-8') as file:
+with codecs.open('README.rst', encoding='utf-8') as file:
     long_description = file.read()
 
 install_requires = [
