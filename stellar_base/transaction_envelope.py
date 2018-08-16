@@ -139,8 +139,9 @@ class TransactionEnvelope(object):
     def from_xdr(cls, xdr):
         """Create a new :class:`TransactionEnvelope` from an XDR string.
 
-        :param bytes xdr: The XDR string that represents a transaction
+        :param xdr: The XDR string that represents a transaction
             envelope.
+        :type xdr: bytes, str
 
         """
         xdr_decoded = base64.b64decode(xdr)

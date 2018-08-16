@@ -31,10 +31,13 @@ class Transaction(object):
 
     :param str source: A strkey encoded account ID (public key) of the source
         account for the transaction.
-    :param int sequence: The current sequence number of the source account.
+    :param sequence: The current sequence number of the source account.
           The sequence number is incremented by 1 automatically, as is
           necessary for a new transaction for a given source account.
-    :param dict time_bounds: A dict that contains a minTime and maxTime attribute.
+    :type sequence: int, str
+    :param dict time_bounds: A dict that contains a minTime and maxTime attribute
+            (`{'minTime': 1534392138, 'maxTime': 1534392238}`) representing the
+            lower and upper bound of when a given transaction will be valid.
     :param Memo memo: The memo being sent with the transaction, being
           represented as one of the subclasses of the
           :class:`Memo <stellar_base.memo.Memo>` object.

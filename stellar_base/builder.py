@@ -1,6 +1,6 @@
 # coding: utf-8
 
-from stellar_base.asset import Asset
+from .asset import Asset
 from .horizon import HORIZON_LIVE, HORIZON_TEST
 from .horizon import Horizon
 from .keypair import Keypair
@@ -21,21 +21,22 @@ class Builder(object):
 
     :param str secret: The base32 secret seed for the source address.
     :param str address: The base32 source address.
-    :param horizon: The horizon instance to use for submitting the created
+    :param str horizon: The horizon instance to use for submitting the created
         transaction.
-    :type horizon: :class:`Horizon`
     :param str network: The network string that describes which version of
         Horizon to use, either the live net ('PUBLIC') or the test net
         ('TESTNET'). Defaults to TESTNET if an instance of Horizon has not been
         passed to the horizon param.
-    :param int sequence: The sequence number to use for submitting this
+    :param sequence: The sequence number to use for submitting this
         transaction with (must be the *current* sequence number of the source
         account)
+    :type sequence: int, str
     :param int fee: The network base fee is currently set to
         100 stroops (0.00001 lumens). Transaction fee is equal to base fee
         times number of operations in this transaction.
     """
 
+    # TODO: rename `horizon` to `horizon_uri` ?
     def __init__(self,
                  secret=None,
                  address=None,
@@ -71,7 +72,7 @@ class Builder(object):
             self.horizon = Horizon(HORIZON_TEST)
 
         if sequence:
-            self.sequence = sequence
+            self.sequence = int(sequence)
         elif self.address:
             self.sequence = self.get_sequence()
         else:
@@ -108,14 +109,13 @@ class Builder(object):
         operations.
 
         :param str destination: Account address that is created and funded.
-        :param int starting_balance: Amount of XLM to send to the newly created
+        :param str starting_balance: Amount of XLM to send to the newly created
             account. This XLM comes from the source account.
         :param str source: The source address to deduct funds from to fund the
             new account.
         :return: This builder instance.
 
         """
-        starting_balance = str(starting_balance)
         op = operation.CreateAccount(destination, starting_balance, source)
         return self.append_op(op)
 
@@ -133,8 +133,6 @@ class Builder(object):
 
         """
         asset = Asset(code, destination)
-        if limit is not None:
-            limit = str(limit)
         op = operation.ChangeTrust(asset, limit, source)
         return self.append_op(op)
 
@@ -148,7 +146,7 @@ class Builder(object):
         to the list of operations.
 
         :param str destination: Account address that receives the payment.
-        :param int amount: The amount of the currency to send in the payment.
+        :param str amount: The amount of the currency to send in the payment.
         :param str asset_code: The asset code for the asset to send.
         :param str asset_issuer: The address of the issuer of the asset.
         :param str source: The source address of the payment.
@@ -156,7 +154,6 @@ class Builder(object):
 
         """
         asset = Asset(code=asset_code, issuer=asset_issuer)
-        amount = str(amount)
         op = operation.Payment(destination, asset, amount, source)
         return self.append_op(op)
 
@@ -178,7 +175,7 @@ class Builder(object):
         :param str send_code: The asset code for the source asset deducted from
             the source account.
         :param str send_issuer: The address of the issuer of the source asset.
-        :param int send_max: The maximum amount of send asset to deduct
+        :param str send_max: The maximum amount of send asset to deduct
             (excluding fees).
         :param str dest_code: The asset code for the final destination asset
             sent to the recipient.
@@ -186,24 +183,21 @@ class Builder(object):
         :param str dest_amount: The amount of destination asset the destination
             account receives.
         :param list path: A list of asset tuples, each tuple containing a
-            (code, issuer_address) for each asset in the path. For the native
-            asset, an empty string is used for the issuer address.
+            (asset_code, asset_issuer) for each asset in the path. For the native
+            asset, `None` is used for the asset_issuer.
         :param str source: The source address of the path payment.
         :return: This builder instance.
 
         """
-        # path: a list of asset tuple which contains code and issuer,
-        # [(code,issuer),(code,issuer)] for native asset you can deliver
-        # ('xlm','')
+        # path: a list of asset tuple which contains asset_code and asset_issuer,
+        # [(asset_code, asset_issuer), (asset_code, asset_issuer)] for native asset you can deliver
+        # ('XLM', None)
         send_asset = Asset(send_code, send_issuer)
         dest_asset = Asset(dest_code, dest_issuer)
 
         assets = []
         for p in path:
             assets.append(Asset(p[0], p[1]))
-        send_max = str(send_max)
-        dest_amount = str(dest_amount)
-
         op = operation.PathPayment(destination, send_asset, send_max,
                                    dest_asset, dest_amount, path, source)
         return self.append_op(op)
@@ -292,8 +286,7 @@ class Builder(object):
         :return: This builder instance.
 
         """
-        home_domain = bytearray(
-            home_domain, encoding='utf-8') if home_domain else None
+
         op = operation.SetOptions(inflation_dest, clear_flags, set_flags,
                                   master_weight, low_threshold, med_threshold,
                                   high_threshold, home_domain, signer_address,
@@ -363,13 +356,12 @@ class Builder(object):
             is buying.
         :param str buying_issuer: The issuing address for the asset the offer
             creator is selling.
-        :param int amount: Amount of the asset being sold. Set to 0 if you want
+        :param str amount: Amount of the asset being sold. Set to 0 if you want
             to delete an existing offer.
-        :param float price: Decimal representation of the price of 1 unit of
-            selling in terms of buying. For example, if you wanted to sell 30
-            XLM and buy 5 BTC, the price would be (5 / 30). Note that this does
-            not take a tuple/dict with a numerator/denominator at this time.
-        :param str offer_id: The ID of the offer. 0 for new offer. Set to
+        :param price: Price of 1 unit of selling in terms of buying. You can pass
+            in a number as a string or a dict like `{n: numerator, d: denominator}`
+        :type price: str, dict
+        :param int offer_id: The ID of the offer. 0 for new offer. Set to
             existing offer ID to update or delete.
         :param str source: The source address that is managing an offer on
             Stellar's distributed exchange.
@@ -378,8 +370,6 @@ class Builder(object):
         """
         selling = Asset(selling_code, selling_issuer)
         buying = Asset(buying_code, buying_issuer)
-        amount = str(amount)
-
         op = operation.ManageOffer(selling, buying, amount, price, offer_id,
                                    source)
         return self.append_op(op)
@@ -404,12 +394,11 @@ class Builder(object):
             is buying.
         :param str buying_issuer: The issuing address for the asset the offer
             creator is selling.
-        :param int amount: Amount of the asset being sold. Set to 0 if you want
+        :param str amount: Amount of the asset being sold. Set to 0 if you want
             to delete an existing offer.
-        :param float price: Decimal representation of the price of 1 unit of
-            selling in terms of buying. For example, if you wanted to sell 30
-            XLM and buy 5 BTC, the price would be (5 / 30). Note that this does
-            not take a tuple/dict with a numerator/denominator at this time.
+        :param price: Price of 1 unit of selling in terms of buying. You can pass
+            in a number as a string or a dict like `{n: numerator, d: denominator}`
+        :type price: str, dict
         :param str source: The source address that is creating a passive offer
             on Stellar's distributed exchange.
         :return: This builder instance.
@@ -417,8 +406,6 @@ class Builder(object):
         """
         selling = Asset(selling_code, selling_issuer)
         buying = Asset(buying_code, buying_issuer)
-        amount = str(amount)
-
         op = operation.CreatePassiveOffer(selling, buying, amount, price,
                                           source)
         return self.append_op(op)
@@ -548,7 +535,8 @@ class Builder(object):
         submitted too early or too late, it will fail to make it into the
         transaction set. maxTime equal 0 means that it's not set.
 
-        :param list time_bounds: A list of two Unix timestamps representing the
+        :param dict time_bounds: A dict that contains a minTime and maxTime attribute
+            (`{'minTime': 1534392138, 'maxTime': 1534392238}`) representing the
             lower and upper bound of when a given transaction will be valid.
         :return: This builder instance.
 
@@ -561,7 +549,8 @@ class Builder(object):
                            amount,
                            asset_code='XLM',
                            asset_issuer=None,
-                           source=None):
+                           source=None,
+                           allow_http=False):
         """Append a :class:`Payment <stellar_base.operation.Payment>` operation
         to the list of operations using federation on the destination address.
 
@@ -571,14 +560,17 @@ class Builder(object):
 
         :param str fed_address: A Stellar Address that needs to be translated
             into a valid account ID via federation.
-        :param int amount: The amount of the currency to send in the payment.
+        :param str amount: The amount of the currency to send in the payment.
         :param str asset_code: The asset code for the asset to send.
         :param str asset_issuer: The address of the issuer of the asset.
         :param str source: The source address of the payment.
+        :param bool allow_http: When set to `True`, connections to insecure http protocol federation servers
+            will be allowed. Must be set to `False` in production. Default: `False`.
         :return: This builder instance.
 
         """
-        fed_info = federation(fed_address, 'name')
+        fed_info = federation(
+            address_or_id=fed_address, fed_type='name', allow_http=allow_http)
         if not fed_info:
             raise FederationError(
                 'Cannot determine Stellar Address to Account ID translation '
@@ -600,7 +592,7 @@ class Builder(object):
 
         """
         if not self.address:
-            raise Exception('Transaction does not have any source address ')
+            raise Exception('Transaction does not have any source address')
         if not self.sequence:
             raise Exception('No sequence is present, maybe not funded?')
         tx = Transaction(
@@ -658,9 +650,7 @@ class Builder(object):
 
         """
         sequence = self.sequence
-        # sequence number should be '0' here. so the pass one is '-1'
-        # TODO: Perhaps pass this state over instead?
-        self.sequence = '-1'
+        self.sequence = -1
         tx_xdr = self.gen_tx().xdr()
         self.sequence = sequence
         return tx_xdr
@@ -676,6 +666,7 @@ class Builder(object):
 
         :param xdr: The XDR object representing the transaction envelope to
             which this builder is setting its state to.
+        :type xdr: bytes, str
 
         """
         te = Te.from_xdr(xdr)
@@ -741,14 +732,9 @@ class Builder(object):
         submitting via the sign methods.
 
         :returns: A dict representing the JSON response from Horizon.
-        :raises: HTTPError
 
         """
-        try:
-            return self.horizon.submit(self.gen_xdr())
-        except Exception as e:
-            raise e
-            # raise Exception('network problem')
+        return self.horizon.submit(self.gen_xdr())
 
     def next_builder(self):
         """Create a new builder based off of this one with its sequence number
@@ -758,7 +744,7 @@ class Builder(object):
         :rtype: :class:`Builder`
 
         """
-        sequence = str(int(self.sequence) + 1)
+        sequence = self.sequence + 1
         next_builder = Builder(
             horizon=self.horizon.horizon,
             address=self.address,
@@ -775,7 +761,7 @@ class Builder(object):
         :rtype: int
         """
         if not self.address:
-            raise Exception('no address provided')
+            raise ValueError('No address provided')
 
         address = self.horizon.account(self.address)
-        return address.get('sequence')
+        return int(address.get('sequence'))

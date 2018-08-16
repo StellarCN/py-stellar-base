@@ -92,7 +92,7 @@ class Operation(object):
         """
         if not isinstance(value, str):
             raise TypeError("value of type '{}' is not a string"
-                            ".".format(type(value).__name__))
+                            ".".format(value))
 
         # throw exception if value * ONE has decimal places (it can't be
         # represented as int64)
@@ -176,7 +176,7 @@ class CreateAccount(Operation):
     Threshold: Medium
 
     :param str destination: Destination account ID to create an account for.
-    :param int_or_float starting_balance: Amount in XLM the account should be
+    :param str starting_balance: Amount in XLM the account should be
         funded for. Must be greater than the [reserve balance amount]
         (https://www.stellar.org/developers/learn/concepts/fees.html).
     :param str source: The source account for the payment. Defaults to the
@@ -241,7 +241,7 @@ class Payment(Operation):
 
     :param str destination: The destination account ID.
     :param Asset asset: The asset to send.
-    :param int_or_float amount: The amount to send.
+    :param str amount: The amount to send.
     :param str source: The source account for the payment. Defaults to the
         transaction's source account.
 
@@ -310,9 +310,9 @@ class PathPayment(Operation):
 
     :param str destination: The destination account to send to.
     :param Asset send_asset: The asset to pay with.
-    :param int_or_float send_max: The maximum amount of send_asset to send.
+    :param str send_max: The maximum amount of send_asset to send.
     :param Asset dest_asset: The asset the destination will receive.
-    :param int_or_float dest_amount: The amount the destination receives.
+    :param str dest_amount: The amount the destination receives.
     :param list path: A list of Asset objects to use as the path.
     :param str source: The source account for the payment. Defaults to the
         transaction's source account.
@@ -405,7 +405,7 @@ class ChangeTrust(Operation):
     Threshold: Medium
 
     :param Asset asset: The asset for the trust line.
-    :param int_or_float limit: The limit for the asset, defaults to max int64.
+    :param str limit: The limit for the asset, defaults to max int64.
         If the limit is set to "0" it deletes the trustline.
     :param str source: The source account (defaults to transaction source).
 
@@ -565,7 +565,8 @@ class SetOptions(Operation):
     :param int med_threshold: The sum weight for the medium threshold.
     :param int high_threshold: The sum weight for the high threshold.
     :param str home_domain: sets the home domain used for reverse federation lookup.
-    :param str_or_bytes signer_address: signer
+    :param signer_address: signer
+    :type signer_address: str, bytes
     :param str signer_type: The type of signer, it should be 'ed25519PublicKey',
         'hashX' or 'preAuthTx'
     :param int signer_weight: The weight of the new signer (0 to delete or 1-255)
@@ -598,8 +599,10 @@ class SetOptions(Operation):
         self.low_threshold = low_threshold
         self.med_threshold = med_threshold
         self.high_threshold = high_threshold
-        self.home_domain = home_domain
-
+        if isinstance(home_domain, str):
+            self.home_domain = bytearray(home_domain, encoding='utf-8')
+        else:
+            self.home_domain = home_domain
         self.signer_address = signer_address
         self.signer_type = signer_type
         self.signer_weight = signer_weight
@@ -749,10 +752,11 @@ class ManageOffer(Operation):
 
     :param Asset selling: What you're selling.
     :param Asset buying: What you're buying.
-    :param int_or_float amount: The total amount you're selling. If 0,
+    :param str amount: The total amount you're selling. If 0,
         deletes the offer.
-    :param int_or_price_or_dict price: Price of 1 unit of `selling` in
+    :param price: Price of 1 unit of `selling` in
         terms of `buying`.
+    :type price: str, dict
     :param int offer_id: If `0`, will create a new offer (default). Otherwise,
         edits an existing offer.
     :param str source: The source account (defaults to transaction source).
@@ -846,10 +850,11 @@ class CreatePassiveOffer(Operation):
 
     :param Asset selling: What you're selling.
     :param Asset buying: What you're buying.
-    :param int_or_float amount: The total amount you're selling. If 0,
+    :param str amount: The total amount you're selling. If 0,
         deletes the offer.
-    :param int_or_price_or_dict price: Price of 1 unit of `selling` in
+    :param price: Price of 1 unit of `selling` in
         terms of `buying`.
+    :type price: str, dict
     :param str source: The source account (defaults to transaction source).
 
     """

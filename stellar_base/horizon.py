@@ -21,7 +21,7 @@ except ImportError:
 HORIZON_LIVE = "https://horizon.stellar.org"
 HORIZON_TEST = "https://horizon-testnet.stellar.org"
 DEFAULT_REQUEST_TIMEOUT = 11  # two ledgers + 1 sec, let's retry faster and not wait 60 secs.
-DEFAULT_NUM_RETRIES = 5
+DEFAULT_NUM_RETRIES = 3
 DEFAULT_BACKOFF_FACTOR = 0.5
 USER_AGENT = 'py-stellar-base'
 
