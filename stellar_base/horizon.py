@@ -60,6 +60,7 @@ class Horizon(object):
             messages = SSEClient(url)
             return messages
         else:
+            kwargs.pop('sse', None)
             try:
                 # FIXME: We should really consider raising the HTTPError when
                 # it happens and wrapping its JSON response in a HorizonError
