@@ -216,7 +216,7 @@ class TestOp:
         assert op == op_x
         assert op_x.source == self.source
         assert op_x.data_name == '1KFHE7w8BhaENAswwryaoccDb6qcT6DbYY'
-        assert op_x.data_value == self.source
+        assert op_x.data_value == bytes(self.source, 'utf-8')
 
     @raises(XdrLengthError)
     def test_manage_data_toolong(self):
