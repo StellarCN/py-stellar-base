@@ -144,6 +144,9 @@ def test_operation(name, operation):
     if name == 'manage_offer_dict_price':
         original['price'] = float(original['price']['n']) / float(
             original['price']['d'])
+    if name == 'manage_data':  # return `bytes` now
+        if not isinstance(original['data_value'], bytes):
+            original['data_value'] = bytes(original['data_value'], 'utf-8')
     assert original == restored
 
 

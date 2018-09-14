@@ -1026,7 +1026,8 @@ class ManageData(Operation):
     Threshold: Medium
 
     :param str data_name: The name of the data entry.
-    :param str data_value: The value of the data entry.
+    :param data_value: The value of the data entry.
+    :type data_value: str, bytes, None
     :param str source: The optional source account.
 
     """
@@ -1056,7 +1057,10 @@ class ManageData(Operation):
         data_name = bytearray(self.data_name, encoding='utf-8')
 
         if self.data_value is not None:
-            data_value = [bytearray(self.data_value, 'utf-8')]
+            if isinstance(self.data_value, bytes):
+                data_value = [bytearray(self.data_value)]
+            else:
+                data_value = [bytearray(self.data_value, 'utf-8')]
         else:
             data_value = []
         manage_data_op = Xdr.types.ManageDataOp(data_name, data_value)
@@ -1079,7 +1083,7 @@ class ManageData(Operation):
         data_name = op_xdr_object.body.manageDataOp.dataName.decode()
 
         if op_xdr_object.body.manageDataOp.dataValue:
-            data_value = op_xdr_object.body.manageDataOp.dataValue[0].decode()
+            data_value = op_xdr_object.body.manageDataOp.dataValue[0]
         else:
             data_value = None
         return cls(source=source, data_name=data_name, data_value=data_value)
