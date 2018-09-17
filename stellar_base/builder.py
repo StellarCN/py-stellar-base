@@ -695,6 +695,7 @@ class Builder(object):
         else:
             self.time_bounds = None
         self.memo = te.tx.memo
+        return self
 
     def sign(self, secret=None):
         """Sign the generated :class:`TransactionEnvelope
