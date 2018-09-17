@@ -552,7 +552,8 @@ class Builder(object):
         :return: This builder instance.
 
         """
-        return self.time_bounds.append(time_bounds)
+        self.time_bounds = time_bounds
+        return self
 
     def federation_payment(self, fed_address, amount, asset_code='XLM',
                            asset_issuer=None, source=None):
@@ -682,8 +683,13 @@ class Builder(object):
         self.ops = te.tx.operations
         self.address = te.tx.source
         self.sequence = te.tx.sequence - 1
-        self.time_bounds = te.tx.time_bounds
+        time_bounds_in_xdr = te.tx.time_bounds
+        if time_bounds_in_xdr:
+            self.time_bounds = [time_bounds_in_xdr[0].minTime, time_bounds_in_xdr[0].maxTime]
+        else:
+            self.time_bounds = []
         self.memo = te.tx.memo
+        return self
 
     def sign(self, secret=None):
         """Sign the generated :class:`TransactionEnvelope

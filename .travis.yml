@@ -17,8 +17,3 @@ notifications:
       - "%{repository}@%{branch}: %{message} (%{build_url})"
     on_success: change
     on_failure: change
-branches:
-  only:
-    - master
-    - dev
-    - /^rc-.*$/
