@@ -202,7 +202,7 @@ class Builder(object):
         for p in path:
             assets.append(Asset(p[0], p[1]))
         op = operation.PathPayment(destination, send_asset, send_max,
-                                   dest_asset, dest_amount, path, source)
+                                   dest_asset, dest_amount, assets, source)
         return self.append_op(op)
 
     def append_allow_trust_op(self,
