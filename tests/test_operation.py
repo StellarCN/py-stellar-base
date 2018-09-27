@@ -1,4 +1,5 @@
 # coding:utf-8
+import sys
 
 from nose.tools import raises
 from stellar_base.memo import *
@@ -216,7 +217,10 @@ class TestOp:
         assert op == op_x
         assert op_x.source == self.source
         assert op_x.data_name == '1KFHE7w8BhaENAswwryaoccDb6qcT6DbYY'
-        assert op_x.data_value == self.source
+        if sys.version_info.major == 2:
+            assert op_x.data_value == bytes(self.source)
+        else:
+            assert op_x.data_value == bytes(self.source, 'utf-8')
 
     @raises(XdrLengthError)
     def test_manage_data_toolong(self):
