@@ -755,7 +755,7 @@ class Builder(object):
         """
         sequence = self.sequence + 1
         next_builder = Builder(
-            horizon=self.horizon.horizon,
+            horizon=self.horizon.horizon_uri,
             address=self.address,
             network=self.network,
             sequence=sequence,
