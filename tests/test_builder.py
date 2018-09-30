@@ -50,7 +50,7 @@ def test_builder(setup, test_data):
     assert len(cold.ops) == 5
 
     response = cold.submit()
-    assert response.get('hash')
+    assert response.get('hash') == cold.hash()
 
 
 def test_builder_xdr(setup, helpers, test_data):
@@ -80,4 +80,4 @@ def test_builder_xdr(setup, helpers, test_data):
     assert len(hot.ops) == 4
 
     response = hot.submit()
-    assert response.get('hash')
+    assert response.get('hash') == hot.hash()
