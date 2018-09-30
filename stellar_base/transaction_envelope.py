@@ -5,7 +5,7 @@ from .keypair import Keypair
 from .network import Network, NETWORKS
 from .stellarxdr import Xdr
 from .transaction import Transaction
-from .utils import hashX_sign_decorated, xdr_hash
+from .utils import hashX_sign_decorated, xdr_hash, convert_hex_to_bytes
 from .exceptions import SignatureExistError, PreimageLengthError
 
 
@@ -69,12 +69,14 @@ class TransactionEnvelope(object):
         <https://www.stellar.org/developers/guides/concepts/multi-sig.html>`_
         for more details on Hash(x) signatures.
 
-        :param str preimage: The "x" value to be hashed and used as a
+        :param preimage: 32 byte hash or hex encoded string, the "x" value to be hashed and used as a
             signature.
+        :type preimage: str, bytes
 
         """
         if len(preimage) > 64:
             raise PreimageLengthError('preimage must <= 64 bytes')
+        preimage = convert_hex_to_bytes(preimage)
         sig = hashX_sign_decorated(preimage)
         sig_dict = [signature.__dict__ for signature in self.signatures]
         if sig.__dict__ in sig_dict:
