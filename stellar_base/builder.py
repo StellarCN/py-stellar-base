@@ -1,4 +1,5 @@
 # coding: utf-8
+import binascii
 
 from .asset import Asset
 from .horizon import HORIZON_LIVE, HORIZON_TEST
@@ -667,6 +668,14 @@ class Builder(object):
         tx_xdr = self.gen_tx().xdr()
         self.sequence = sequence
         return tx_xdr
+
+    def hash(self):
+        """Return a hash for this transaction.
+
+        :return A hash for this transaction.
+        :rtype str
+        """
+        return binascii.hexlify(self.gen_te().hash_meta()).decode()
 
     def import_from_xdr(self, xdr):
         """Create a :class:`TransactionEnvelope
