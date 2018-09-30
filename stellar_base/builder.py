@@ -276,8 +276,9 @@ class Builder(object):
         :param str home_domain: Sets the home domain of an account. See
             Stellar's documentation on `Federation
             <https://www.stellar.org/developers/guides/concepts/federation.html>`_.
-        :param str signer_address: The address of the new signer to add to the
+        :param signer_address: The address of the new signer to add to the
             source account.
+        :type signer_address: str, bytes
         :param str signer_type: The type of signer to add to the account. Must
             be in ('ed25519PublicKey', 'hashX', 'preAuthTx'). See Stellar's
             documentation for `Multi-Sign
@@ -303,7 +304,8 @@ class Builder(object):
         <stellar_base.operation.SetOptions` operation. This is a helper
         function for :meth:`append_set_options_op`.
 
-        :param str hashx: The address of the new hashX signer.
+        :param hashx: The address of the new hashX signer.
+        :type hashx: str, bytes
         :param int signer_weight: The weight of the new signer.
         :param str source: The source account that is adding a signer to its
             list of signers.
@@ -326,7 +328,8 @@ class Builder(object):
         <stellar_base.operation.SetOptions` operation. This is a helper
         function for :meth:`append_set_options_op`.
 
-        :param str pre_auth_tx: The address of the new preAuthTx signer - obtained by calling `hash_meta` on the TransactionEnvelope.
+        :param pre_auth_tx: The address of the new preAuthTx signer - obtained by calling `hash_meta` on the TransactionEnvelope.
+        :type pre_auth_tx: str, bytes
         :param int signer_weight: The weight of the new signer.
         :param str source: The source account that is adding a signer to its
             list of signers.
@@ -516,7 +519,8 @@ class Builder(object):
         """Set the memo for the transaction to a new :class:`HashMemo
         <stellar_base.memo.HashMemo>`.
 
-        :param bytes memo_hash: A 32 byte hash to use as the memo.
+        :param memo_hash: A 32 byte hash or hex encoded string to use as the memo.
+        :type memo_hash: bytes, str
         :return: This builder instance.
 
         """
@@ -527,8 +531,9 @@ class Builder(object):
         """Set the memo for the transaction to a new :class:`RetHashMemo
         <stellar_base.memo.RetHashMemo>`.
 
-        :param bytes memo_return: A 32 byte hash intended to be interpreted as
+        :param bytes memo_return: A 32 byte hash or hex encoded string intended to be interpreted as
             the hash of the transaction the sender is refunding.
+        :type memo_return: bytes, str
         :return: This builder instance.
 
         """
@@ -720,8 +725,9 @@ class Builder(object):
     def sign_preimage(self, preimage):
         """Sign the generated transaction envelope using a Hash(x) signature.
 
-        :param str preimage: The value to be hashed and used as a signer on the
+        :param preimage: The value to be hashed and used as a signer on the
             transaction envelope.
+        :type preimage: str, bytes
 
         """
         if self.te is None:
