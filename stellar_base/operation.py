@@ -7,7 +7,7 @@ from .asset import Asset
 from .stellarxdr import Xdr
 from .utils import (account_xdr_object, best_rational_approximation as best_r,
                     division, encode_check, signer_key_xdr_object,
-                    is_valid_address)
+                    is_valid_address, convert_hex_to_bytes)
 from .exceptions import XdrLengthError
 
 ONE = Decimal(10**7)
@@ -614,19 +614,16 @@ class SetOptions(Operation):
             self.signer_type = 'ed25519PublicKey'
 
         signer_is_invalid_type = (
-            self.signer_type is not None and
-            self.signer_type not in ('ed25519PublicKey', 'hashX', 'preAuthTx'))
+                self.signer_type is not None and
+                self.signer_type not in ('ed25519PublicKey', 'hashX', 'preAuthTx'))
 
         if signer_is_invalid_type:
             raise ValueError('Invalid signer type, sign_type should '
                              'be ed25519PublicKey, hashX or preAuthTx')
 
-        signer_addr_has_valid_len = (self.signer_address is not None
-                                     and len(self.signer_address) == 32)
+        if self.signer_type in ('hashX', 'preAuthTx'):
+            self.signer_address = convert_hex_to_bytes(self.signer_address)
 
-        if (self.signer_type in ('hashX', 'preAuthTx')
-                and not signer_addr_has_valid_len):
-            raise ValueError('hashX or preAuthTx Signer must be 32 bytes')
 
     def to_xdr_object(self):
         """Creates an XDR Operation object that represents this

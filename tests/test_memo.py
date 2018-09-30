@@ -51,10 +51,10 @@ class TestMemo:
         self.__asset_memo('ret_hash', memo_hash, ret_hash_memo)
 
     def test_hash_memo_and_ret_hash_memo_toolong(self):
-        memo_hash = binascii.hexlify(os.urandom(32))
-        with pytest.raises(XdrLengthError):
+        memo_hash = binascii.hexlify(os.urandom(32)).decode() + ' '
+        with pytest.raises(ValueError):
             HashMemo(memo_hash)
-        with pytest.raises(XdrLengthError):
+        with pytest.raises(ValueError):
             RetHashMemo(memo_hash)
 
     def test_memo_xdr(self):

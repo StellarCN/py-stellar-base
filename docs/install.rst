@@ -33,6 +33,6 @@ And you can always clone `the repository <https://github.com/StellarCN/py-stella
 
 .. code-block:: bash
 
-    git clone git@github.com:StellarCN/py-stellar-base.git;
-    cd stellar_base;
+    git clone https://github.com/StellarCN/py-stellar-base.git
+    cd py-stellar-base
     pip install .

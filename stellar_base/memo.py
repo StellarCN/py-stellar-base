@@ -4,6 +4,7 @@ import six
 import abc
 import base64
 
+from stellar_base.utils import convert_hex_to_bytes
 from .stellarxdr import Xdr
 from .exceptions import XdrLengthError
 
@@ -102,16 +103,12 @@ class IdMemo(Memo):
 class HashMemo(Memo):
     """The :class:`HashMemo` which represents MEMO_HASH in a transaction.
 
-    :param bytes memo_hash: A 32 byte hash.
-
+    :param memo_hash: A 32 byte hash or hex encoded string.
+    :type memo_hash: bytes, str
     """
 
     def __init__(self, memo_hash):
-        if len(memo_hash) != 32:
-            raise XdrLengthError("Expects a 32 byte mhash value. "
-                                 "Got {:d} bytes instead".format(
-                                     len(memo_hash)))
-        self.memo_hash = memo_hash
+        self.memo_hash = convert_hex_to_bytes(memo_hash)
 
     def to_xdr_object(self):
         """Creates an XDR Memo object for a transaction with MEMO_HASH."""
@@ -125,17 +122,14 @@ class RetHashMemo(Memo):
     a 32 byte hash intended to be interpreted as the hash of the transaction
     the sender is refunding.
 
-    :param bytes memo_return: A 32 byte hash intended to be interpreted as the
+    :param memo_return: A 32 byte hash or hex encoded string intended to be interpreted as the
         hash of the transaction the sender is refunding.
+    :type memo_return: bytes, str
 
     """
 
     def __init__(self, memo_return):
-        if len(memo_return) != 32:
-            raise XdrLengthError("Expects a 32 byte hash value. "
-                                 "Got {:d} bytes instead".format(
-                                     len(memo_return)))
-        self.memo_return = memo_return
+        self.memo_return = convert_hex_to_bytes(memo_return)
 
     def to_xdr_object(self):
         """Creates an XDR Memo object for a transaction with MEMO_RETURN."""

@@ -61,7 +61,7 @@ def signer_key_xdr_object(signer_type, signer):
 
 
 def hashX_sign_decorated(preimage):
-    preimage = preimage.encode('utf-8')
+    # preimage -> bytes_here
     hash_preimage = hashlib.sha256(preimage).digest()
     hint = hash_preimage[-4:]
     return Xdr.types.DecoratedSignature(hint, preimage)
@@ -256,3 +256,16 @@ def is_valid_secret_key(key):
         return decode_check('seed', key)
     except Exception:
         return False
+
+
+def convert_hex_to_bytes(value):
+    # Not perfect but works on Python2 and Python3
+    if len is None:
+        raise ValueError("Value should be 32 byte hash or hex encoded string, but got None")
+    length = len(value)
+    if length == 32:
+        return value
+    elif length == 64:
+        return binascii.unhexlify(value)
+    else:
+        raise ValueError("Value should be 32 byte hash or hex encoded string, but got {}".format(value))
