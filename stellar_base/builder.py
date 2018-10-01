@@ -672,10 +672,18 @@ class Builder(object):
     def hash(self):
         """Return a hash for this transaction.
 
-        :return A hash for this transaction.
-        :rtype str
+        :return: A hash for this transaction.
+        :rtype: bytes
         """
-        return binascii.hexlify(self.gen_te().hash_meta()).decode()
+        return self.gen_te().hash_meta()
+
+    def hash_hex(self):
+        """Return a hex encoded hash for this transaction.
+
+        :return: A hex encoded hash for this transaction.
+        :rtype: str
+        """
+        return binascii.hexlify(self.hash()).decode()
 
     def import_from_xdr(self, xdr):
         """Create a :class:`TransactionEnvelope
