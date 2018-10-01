@@ -57,7 +57,7 @@ A Simple Example
 
     builder = Builder(secret=alice_secret)
     builder.add_text_memo("Hello, Stellar!").append_payment_op(
-        destination=bob_address, amount='12.25', asset_code='XLM')
+        destination=bob_address, amount='10', asset_code='XLM')
     builder.sign()
     response = builder.submit()
     print(response)
