@@ -24,10 +24,10 @@ class Address(object):
         address for this :class:`Address`.
     :param str network: The network to connect to for verifying and retrieving
         additional attributes from. Must be either 'PUBLIC' or 'TESTNET'.
-    :param Horizon horizon: The :class:`Horizon` instance to use for
+    :param horizon: The horizon url or horizon instance to use for
         connecting to for additional information for the account to which this
         address corresponds to.
-
+    :type horizon: str, :class:`Horizon <stellar_base.horizon.Horizon>`
     """
 
     # TODO: Make network an enum
