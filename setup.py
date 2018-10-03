@@ -12,7 +12,7 @@ install_requires = [
     'ed25519',
     'crc16',
     'requests',
-    'SSEClient',
+    'stellar-base-sseclient',
     'numpy',
     'toml',
     'mnemonic',

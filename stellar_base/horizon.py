@@ -169,7 +169,7 @@ class Horizon(object):
         if SSEClient is None:
             raise ValueError('SSE not supported, missing sseclient module')
 
-        return SSEClient(url, session=self._sse_session, params=params)
+        return SSEClient(url, retry=0, session=self._sse_session, connect_retry=-1, params=params)
 
     def account(self, address):
         """Returns information and links relating to a single account.
