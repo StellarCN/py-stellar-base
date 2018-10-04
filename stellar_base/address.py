@@ -65,6 +65,7 @@ class Address(object):
         self.flags = None
         self.signers = None
         self.data = None
+        self.inflation_destination = None
 
     def get(self):
         """Retrieve the account data that corresponds to this :class:`Address`.
@@ -97,6 +98,7 @@ class Address(object):
                 self.flags = acc.get('flags')
                 self.signers = acc.get('signers')
                 self.data = acc.get('data')
+                self.inflation_destination = acc.get('inflation_destination')
         except HorizonError as err:
             raise AccountNotExistError(err.message['title'])
 
