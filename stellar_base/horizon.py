@@ -28,7 +28,7 @@ USER_AGENT = 'py-stellar-base'
 
 class Horizon(object):
     def __init__(self,
-                 horizon=None,
+                 horizon_uri=None,
                  pool_size=DEFAULT_POOLSIZE,
                  num_retries=DEFAULT_NUM_RETRIES,
                  request_timeout=DEFAULT_REQUEST_TIMEOUT,
@@ -47,7 +47,7 @@ class Horizon(object):
         error or a valid response. Any other errors however are raised by this
         class.
 
-        :param str horizon: The horizon base URL
+        :param str horizon_uri: The horizon base URL
         :param int timeout: The timeout for all requests.
         :param int pool_size persistent connection to Horizon and connection pool
         :param int num_retries configurable request retry functionality
@@ -55,10 +55,10 @@ class Horizon(object):
         :param str user_agent String representing the user-agent you want, such as "py-stellar-base"
 
         """
-        if horizon is None:
+        if horizon_uri is None:
             self.horizon_uri = HORIZON_TEST
         else:
-            self.horizon_uri = horizon
+            self.horizon_uri = horizon_uri
 
         self.pool_size = pool_size
         self.num_retries = num_retries

@@ -22,7 +22,7 @@ class Builder(object):
 
     :param str secret: The base32 secret seed for the source address.
     :param str address: The base32 source address.
-    :param str horizon: The horizon instance to use for submitting the created
+    :param str horizon_uri: The horizon instance to use for submitting the created
         transaction.
     :param str network: The network string that describes which version of
         Horizon to use, either the live net ('PUBLIC') or the test net
@@ -37,11 +37,10 @@ class Builder(object):
         times number of operations in this transaction.
     """
 
-    # TODO: rename `horizon` to `horizon_uri` ?
     def __init__(self,
                  secret=None,
                  address=None,
-                 horizon=None,
+                 horizon_uri=None,
                  network=None,
                  sequence=None,
                  fee=100):
@@ -65,8 +64,8 @@ class Builder(object):
         else:
             self.network = network
 
-        if horizon:
-            self.horizon = Horizon(horizon)
+        if horizon_uri:
+            self.horizon = Horizon(horizon_uri)
         elif self.network == 'PUBLIC':
             self.horizon = Horizon(HORIZON_LIVE)
         else:
@@ -778,7 +777,7 @@ class Builder(object):
         """
         sequence = self.sequence + 1
         next_builder = Builder(
-            horizon=self.horizon.horizon_uri,
+            horizon_uri=self.horizon.horizon_uri,
             address=self.address,
             network=self.network,
             sequence=sequence,

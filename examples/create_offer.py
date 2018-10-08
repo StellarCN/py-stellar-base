@@ -12,7 +12,7 @@ buying_issuer = 'GCNY5OXYSY4FKHOPT2SPOQZAOEIGXB5LBYW3HVU3OWSTQITS65M5RCNY'
 price = '5.5'  # or price = {'n': 55, 'd': 10}
 amount = '12.5'
 
-builder = Builder(secret=alice_seed, horizon='https://horizon-testnet.stellar.org') \
+builder = Builder(secret=alice_seed, horizon_uri='https://horizon-testnet.stellar.org') \
              .append_manage_offer_op(selling_code, selling_issuer, buying_code, \
               buying_issuer, amount, price)
 

@@ -29,7 +29,7 @@ def test_builder(setup, test_data):
     hot_account = hot.address().decode()
     hot_secret = hot.seed()
 
-    cold = Builder(secret=test_data.cold_secret, horizon=setup.horizon_endpoint_uri, network=setup.network) \
+    cold = Builder(secret=test_data.cold_secret, horizon_uri=setup.horizon_endpoint_uri, network=setup.network) \
         .append_create_account_op(hot_account, '200') \
         .append_set_options_op(inflation_dest=test_data.cold_account, set_flags=1,
                                home_domain='256kw.com', master_weight=10,
@@ -60,7 +60,7 @@ def test_builder_xdr(setup, helpers, test_data):
 
     helpers.fund_account(setup, hot_account)
 
-    cold = Builder(secret=test_data.cold_secret, horizon=setup.horizon_endpoint_uri, network=setup.network) \
+    cold = Builder(secret=test_data.cold_secret, horizon_uri=setup.horizon_endpoint_uri, network=setup.network) \
         .append_trust_op(test_data.cold_account, 'BEER', '1000', hot_account) \
         .append_allow_trust_op(hot_account, 'BEER', True, test_data.cold_account) \
         .append_payment_op(hot_account, '100', 'BEER', test_data.cold_account, test_data.cold_account) \
@@ -71,7 +71,7 @@ def test_builder_xdr(setup, helpers, test_data):
 
     hot = Builder(
         secret=hot_secret,
-        horizon=setup.horizon_endpoint_uri,
+        horizon_uri=setup.horizon_endpoint_uri,
         network=setup.network)
     hot.import_from_xdr(xdr)
     hot.sign()

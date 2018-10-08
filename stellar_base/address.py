@@ -24,10 +24,9 @@ class Address(object):
         address for this :class:`Address`.
     :param str network: The network to connect to for verifying and retrieving
         additional attributes from. Must be either 'PUBLIC' or 'TESTNET'.
-    :param horizon: The horizon url or horizon instance to use for
+    :param str horizon_uri: The horizon url to use for
         connecting to for additional information for the account to which this
         address corresponds to.
-    :type horizon: str, :class:`Horizon <stellar_base.horizon.Horizon>`
     """
 
     # TODO: Make network an enum
@@ -35,7 +34,7 @@ class Address(object):
                  address=None,
                  secret=None,
                  network='TESTNET',
-                 horizon=None):
+                 horizon_uri=None):
         if secret:
             self.address = Keypair.from_seed(secret).address().decode()
         elif address:
@@ -48,11 +47,9 @@ class Address(object):
             self.network = 'TESTNET'
         else:
             self.network = 'PUBLIC'
-        if horizon:
-            if isinstance(horizon, Horizon):
-                self.horizon = horizon
-            else:
-                self.horizon = Horizon(horizon)
+
+        if horizon_uri:
+            self.horizon = Horizon(horizon_uri)
         elif network.upper() == 'PUBLIC':
             self.horizon = Horizon(HORIZON_LIVE)
         else:
@@ -66,6 +63,7 @@ class Address(object):
         self.signers = None
         self.data = None
         self.inflation_destination = None
+        self.subentry_count = None
 
     def get(self):
         """Retrieve the account data that corresponds to this :class:`Address`.
@@ -99,6 +97,7 @@ class Address(object):
                 self.signers = acc.get('signers')
                 self.data = acc.get('data')
                 self.inflation_destination = acc.get('inflation_destination')
+                self.subentry_count = acc.get('subentry_count')
         except HorizonError as err:
             raise AccountNotExistError(err.message['title'])
 

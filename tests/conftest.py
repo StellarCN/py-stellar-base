@@ -91,7 +91,7 @@ class Helpers:
         """A helper to establish a trustline"""
         builder = Builder(
             secret=secret_key,
-            horizon=setup.horizon_endpoint_uri,
+            horizon_uri=setup.horizon_endpoint_uri,
             network=setup.network)
         builder.append_trust_op(setup.test_asset.issuer, setup.test_asset.code)
         if memo_text:
@@ -111,7 +111,7 @@ class Helpers:
         """A helper to send asset"""
         builder = Builder(
             secret=secret_key,
-            horizon=setup.horizon_endpoint_uri,
+            horizon_uri=setup.horizon_endpoint_uri,
             network=setup.network)
         builder.append_payment_op(address, amount, setup.test_asset.code,
                                   setup.test_asset.issuer)
