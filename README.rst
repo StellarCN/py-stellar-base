@@ -41,7 +41,7 @@ Install from latest source code(*may be unstable*):
 
 .. code-block:: text
 
-    pip install -U git+git://github.com/StellarCN/py-stellar-base
+    pip install git+git://github.com/StellarCN/py-stellar-base
 
 
 A Simple Example
@@ -49,7 +49,7 @@ A Simple Example
 
 .. code-block:: python
 
-    # Alice pay 10 XLM to Bob
+    # Alice pay 10.25 XLM to Bob
     from stellar_base.builder import Builder
 
     alice_secret = 'SCB6JIZUC3RDHLRGFRTISOUYATKEE63EP7MCHNZNXQMQGZSLZ5CNRTKK'
@@ -57,7 +57,7 @@ A Simple Example
 
     builder = Builder(secret=alice_secret)
     builder.add_text_memo("Hello, Stellar!").append_payment_op(
-        destination=bob_address, amount='10', asset_code='XLM')
+        destination=bob_address, amount='10.25', asset_code='XLM')
     builder.sign()
     response = builder.submit()
     print(response)
