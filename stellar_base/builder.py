@@ -53,13 +53,13 @@ class Builder(object):
             self.address = address
             self.key_pair = None
 
-        # FIXME: You shouldn't be able to pass both a network and a horizon
-        # instance, as one overrides the other one with little transparency to
-        # the user of the class.
-        if network is None or network.upper() != 'PUBLIC':
+        if network is None:
             self.network = 'TESTNET'
+        elif network.upper() in NETWORKS:
+            self.network = network.upper()
         else:
-            self.network = 'PUBLIC'
+            self.network = network
+
         if horizon:
             self.horizon = Horizon(horizon)
         elif self.network == 'PUBLIC':
