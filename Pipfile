@@ -9,9 +9,9 @@ name = "pypi"
 mnemonic = "~=0.18"
 numpy = "~=1.14"
 requests = "~=2.18"
-sseclient = "~=0.0.19"
 toml = "~=0.9.4"
 six = "~=1.11.0"
+stellar-base-sseclient = "==0.0.21"
 
 [dev-packages]
 pytest = "*"
