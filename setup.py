@@ -1,7 +1,11 @@
 # coding: utf-8
 import codecs
+import os
 
 from setuptools import setup, find_packages
+
+# Auto build and deploy pypi package with Travis-CI
+package_name = os.environ.get('TRAVIS_STELLAR_BUILD_PACKAGE_NAME') or 'stellar-base'
 
 exec(open("stellar_base/version.py").read())
 
@@ -11,7 +15,7 @@ with codecs.open('README.rst', encoding='utf-8') as file:
 tests_require = ['pytest', 'mock', 'sphinx']
 
 setup(
-    name='stellar-base',
+    name=package_name,
     version=__version__,
     description='Code for managing Stellar.org blockchain transactions and accounts using stellar-base in python. Allows full functionality interfacing with the Horizon front end. Visit https://stellar.org for more information.',
     long_description=long_description,
