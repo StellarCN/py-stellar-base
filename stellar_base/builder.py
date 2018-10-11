@@ -1,5 +1,6 @@
 # coding: utf-8
 import binascii
+import warnings
 
 from .asset import Asset
 from .horizon import HORIZON_LIVE, HORIZON_TEST
@@ -120,19 +121,36 @@ class Builder(object):
         return self.append_op(op)
 
     def append_trust_op(self, destination, code, limit=None, source=None):
-        """Append a :class:`ChangeTrust <stellar_base.operation.ChangeTrust>`
+        """append_trust_op will be deprecated in the future, use append_change_trust_op instead.
+        Append a :class:`ChangeTrust <stellar_base.operation.ChangeTrust>`
         operation to the list of operations.
 
         :param str destination: The issuer address for the asset.
-        :param str code: The asset of the trustline. For example, if a user
-            extends a trustline of up to 200 USD to an anchor, the line is
-            USD:anchor.
+        :param str code: The asset code for the asset.
         :param str limit: The limit of the new trustline.
         :param str source: The source address to add the trustline to.
         :return: This builder instance.
 
         """
-        asset = Asset(code, destination)
+        warnings.warn(
+            "append_trust_op will be deprecated in the future, use append_change_trust_op instead.",
+            PendingDeprecationWarning
+        )
+
+        return self.append_change_trust_op(asset_code=code, asset_issuer=destination, limit=limit, source=source)
+
+    def append_change_trust_op(self, asset_code, asset_issuer, limit=None, source=None):
+        """Append a :class:`ChangeTrust <stellar_base.operation.ChangeTrust>`
+        operation to the list of operations.
+
+        :param str asset_issuer: The issuer address for the asset.
+        :param str asset_code: The asset code for the asset.
+        :param str limit: The limit of the new trustline.
+        :param str source: The source address to add the trustline to.
+        :return: This builder instance.
+
+        """
+        asset = Asset(asset_code, asset_issuer)
         op = operation.ChangeTrust(asset, limit, source)
         return self.append_op(op)
 
