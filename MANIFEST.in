@@ -1,3 +1,5 @@
 include stellar_base/wordlist/chinese.txt
-include README.md
+include README.rst
 include LICENSE
+include requirements.txt
+include requirements-windows.txt
