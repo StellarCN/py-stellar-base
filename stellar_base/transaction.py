@@ -2,7 +2,7 @@
 
 import base64
 
-from .memo import HashMemo, IdMemo, NoneMemo, RetHashMemo, TextMemo
+from .memo import xdr_to_memo, NoneMemo
 from .operation import Operation
 from .stellarxdr import Xdr
 from .stellarxdr.StellarXDR_type import TimeBounds
@@ -134,26 +134,15 @@ class Transaction(object):
         else:
             time_bounds = None
 
-        memo_type = tx_xdr_object.memo.type
-        memo_switch = tx_xdr_object.memo.switch
-        if memo_type == Xdr.const.MEMO_TEXT:
-            memo = TextMemo(memo_switch.decode())
-        elif memo_type == Xdr.const.MEMO_ID:
-            memo = IdMemo(memo_switch)
-        elif memo_type == Xdr.const.MEMO_HASH:
-            memo = HashMemo(memo_switch)
-        elif memo_type == Xdr.const.MEMO_RETURN:
-            memo = RetHashMemo(memo_switch)
-        else:
-            memo = NoneMemo()
+        memo = xdr_to_memo(tx_xdr_object)
 
-        fee = tx_xdr_object.fee
-        operations = list(
-            map(Operation.from_xdr_object, tx_xdr_object.operations))
+        operations = list(map(
+            Operation.from_xdr_object, tx_xdr_object.operations
+        ))
         return cls(
             source=source,
             sequence=sequence,
             time_bounds=time_bounds,
             memo=memo,
-            fee=fee,
+            fee=tx_xdr_object.fee,
             operations=operations)

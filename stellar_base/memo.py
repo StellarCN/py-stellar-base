@@ -43,6 +43,10 @@ class Memo(object):
     def to_xdr_object(self):
         """Creates an XDR Memo object that represents this :class:`Memo`."""
 
+    @classmethod
+    def from_xdr_object(cls, xdr_obj):
+        return cls(xdr_obj.memo.switch)
+
     def xdr(self):
         """Packs and base64 encodes this :class:`Memo` as an XDR string."""
         x = Xdr.StellarXDRPacker()
@@ -52,6 +56,10 @@ class Memo(object):
 
 class NoneMemo(Memo):
     """The :class:`NoneMemo`, which represents no memo for a transaction."""
+
+    @classmethod
+    def from_xdr_object(cls, xdr_obj):
+        return cls()
 
     def to_xdr_object(self):
         """Creates an XDR Memo object for a transaction with no memo."""
@@ -79,6 +87,10 @@ class TextMemo(Memo):
         if length > 28:
             raise XdrLengthError("Text should be <= 28 bytes (ascii encoded). "
                                  "Got {:s}".format(str(length)))
+
+    @classmethod
+    def from_xdr_object(cls, xdr_obj):
+        return cls(xdr_obj.memo.switch.decode())
 
     def to_xdr_object(self):
         """Creates an XDR Memo object for a transaction with MEMO_TEXT."""
@@ -135,3 +147,16 @@ class RetHashMemo(Memo):
         """Creates an XDR Memo object for a transaction with MEMO_RETURN."""
         return Xdr.types.Memo(
             type=Xdr.const.MEMO_RETURN, retHash=self.memo_return)
+
+
+_xdr_type_map = {
+    Xdr.const.MEMO_TEXT: TextMemo,
+    Xdr.const.MEMO_ID: IdMemo,
+    Xdr.const.MEMO_HASH: HashMemo,
+    Xdr.const.MEMO_RETURN: RetHashMemo
+}
+
+
+def xdr_to_memo(xdr_obj):
+    memo_cls = _xdr_type_map.get(xdr_obj.memo.type, NoneMemo)
+    return memo_cls.from_xdr_object(xdr_obj)
