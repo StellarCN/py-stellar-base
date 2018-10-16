@@ -134,7 +134,7 @@ class Transaction(object):
         else:
             time_bounds = None
 
-        memo = xdr_to_memo(tx_xdr_object)
+        memo = xdr_to_memo(tx_xdr_object.memo)
 
         operations = list(map(
             Operation.from_xdr_object, tx_xdr_object.operations

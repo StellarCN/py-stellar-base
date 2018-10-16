@@ -45,7 +45,7 @@ class Memo(object):
 
     @classmethod
     def from_xdr_object(cls, xdr_obj):
-        return cls(xdr_obj.memo.switch)
+        return cls(xdr_obj.switch)
 
     def xdr(self):
         """Packs and base64 encodes this :class:`Memo` as an XDR string."""
@@ -53,12 +53,15 @@ class Memo(object):
         x.pack_Memo(self.to_xdr_object())
         return base64.b64encode(x.get_buffer())
 
+    def __eq__(self, other):
+        return self.xdr() == other.xdr()
+
 
 class NoneMemo(Memo):
     """The :class:`NoneMemo`, which represents no memo for a transaction."""
 
     @classmethod
-    def from_xdr_object(cls, xdr_obj):
+    def from_xdr_object(cls, _xdr_obj):
         return cls()
 
     def to_xdr_object(self):
@@ -90,7 +93,7 @@ class TextMemo(Memo):
 
     @classmethod
     def from_xdr_object(cls, xdr_obj):
-        return cls(xdr_obj.memo.switch.decode())
+        return cls(xdr_obj.switch.decode())
 
     def to_xdr_object(self):
         """Creates an XDR Memo object for a transaction with MEMO_TEXT."""
@@ -158,5 +161,5 @@ _xdr_type_map = {
 
 
 def xdr_to_memo(xdr_obj):
-    memo_cls = _xdr_type_map.get(xdr_obj.memo.type, NoneMemo)
+    memo_cls = _xdr_type_map.get(xdr_obj.type, NoneMemo)
     return memo_cls.from_xdr_object(xdr_obj)

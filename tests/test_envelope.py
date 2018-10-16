@@ -191,6 +191,7 @@ class TestOp:
                 data_name='1KFHE7w8BhaENAswwryaoccDb6qcT6DbYY',
                 data_value=self.source,
             )))
+
     def test_bump_sequence(self, setup):
         if setup.type == 'testnet':
             result = b'AAAAANNSjN1wrdfixw+4w0zmKXvxxikg6EKMi9SW1DnNPhNjAAAAZAAAAAAAAAACAAAAAAAAAAAAAAABAAAAAAAAAAsAAAAFbsMSkgAAAAAAAAABzT4TYwAAAEDi5k05oazHoWRnj1g55Yhxf3rvJ+CwsuR7rB6BDg4oUuYjGAHV06IufC5pq2N+w/lOo/XegJasnpuXj9CQDZYC'
@@ -199,6 +200,7 @@ class TestOp:
         assert (result == self.do(
             setup.network,
             op=BumpSequence(bump_to=23333114514)))
+
 
 def _load_xdr_and_un_xdr_cases():
     filename = path.join(
