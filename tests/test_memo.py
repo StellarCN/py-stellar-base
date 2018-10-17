@@ -6,8 +6,21 @@ import binascii
 import pytest
 
 from stellar_base.exceptions import XdrLengthError
-from stellar_base.memo import NoneMemo, TextMemo, HashMemo, IdMemo, RetHashMemo
+from stellar_base.memo import (
+    NoneMemo, TextMemo, HashMemo, IdMemo, RetHashMemo, xdr_to_memo
+)
 from stellar_base.stellarxdr import Xdr
+
+
+@pytest.mark.parametrize("memo_obj", [
+    TextMemo("Hello, Stellar"),
+    NoneMemo(),
+    IdMemo(31415926535),
+])
+def test_xdr_to_memo(memo_obj):
+    xdr_obj = memo_obj.to_xdr_object()
+    restored_obj = xdr_to_memo(xdr_obj)
+    assert memo_obj == restored_obj
 
 
 class TestMemo:
