@@ -11,10 +11,15 @@ import io
 import os
 import struct
 
-import crc16
 from mnemonic import Mnemonic
 import numpy as np
 from pbkdf2 import PBKDF2
+
+try:
+    from crc16 import crc16xmodem
+except ImportError:
+    # see: https://github.com/StellarCN/py-stellar-base/issues/160
+    from .purecrc16 import crc16xmodem
 
 from .stellarxdr import Xdr
 from .exceptions import DecodeError, ConfigurationError, MnemonicError
@@ -129,7 +134,7 @@ def encode_check(version_byte_name, data):
 
 def calculate_checksum(payload):
     # This code calculates CRC16-XModem checksum of payload
-    checksum = crc16.crc16xmodem(payload)
+    checksum = crc16xmodem(payload)
     # Ensure that the checksum is in LSB order.
     checksum = struct.pack('<H', checksum)
     return checksum
