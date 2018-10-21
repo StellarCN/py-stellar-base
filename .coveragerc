@@ -6,6 +6,7 @@ omit =
     stellar_base/stellarxdr/*
     stellar_base/base58.py
     stellar_base/version.py
+    stellar_base/purecrc16.py
 
 exclude_lines =
     pragma: no cover

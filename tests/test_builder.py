@@ -34,7 +34,7 @@ def test_builder(setup, test_data):
         .append_set_options_op(inflation_dest=test_data.cold_account, set_flags=1,
                                home_domain='256kw.com', master_weight=10,
                                low_threshold=5, ) \
-        .append_trust_op(test_data.cold_account, 'BEER', '1000', hot_account) \
+        .append_change_trust_op('BEER', test_data.cold_account, '1000', hot_account) \
         .append_allow_trust_op(hot_account, 'BEER', True)
     # append twice for test
     cold.append_payment_op(hot_account, '50.123', 'BEER', test_data.cold_account) \
@@ -61,7 +61,7 @@ def test_builder_xdr(setup, helpers, test_data):
     helpers.fund_account(setup, hot_account)
 
     cold = Builder(secret=test_data.cold_secret, horizon_uri=setup.horizon_endpoint_uri, network=setup.network) \
-        .append_trust_op(test_data.cold_account, 'BEER', '1000', hot_account) \
+        .append_change_trust_op('BEER', test_data.cold_account, '1000', hot_account) \
         .append_allow_trust_op(hot_account, 'BEER', True, test_data.cold_account) \
         .append_payment_op(hot_account, '100', 'BEER', test_data.cold_account, test_data.cold_account) \
         .append_payment_op(test_data.cold_account, '2.222', 'BEER', test_data.cold_account, hot_account)
