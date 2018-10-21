@@ -25,10 +25,9 @@ class Builder(object):
     :param str address: The base32 source address.
     :param str horizon_uri: The horizon instance to use for submitting the created
         transaction.
-    :param str network: The network string that describes which version of
-        Horizon to use, either the live net ('PUBLIC') or the test net
-        ('TESTNET'). Defaults to TESTNET if an instance of Horizon has not been
-        passed to the horizon param.
+    :param str network: The network to connect to for verifying and retrieving
+        additional attributes from. 'PUBLIC' is an alias for 'Public Global Stellar Network ; September 2015',
+        'TESTNET' is an alias for 'Test SDF Network ; September 2015'. Defaults to TESTNET.
     :param sequence: The sequence number to use for submitting this
         transaction with (must be the *current* sequence number of the source
         account)
@@ -46,17 +45,17 @@ class Builder(object):
                  sequence=None,
                  fee=100):
         if secret:
-            self.key_pair = Keypair.from_seed(secret)
-            self.address = self.key_pair.address().decode()
+            self.keypair = Keypair.from_seed(secret)
+            self.address = self.keypair.address().decode()
         else:
-            self.key_pair = None
+            self.keypair = None
             self.address = None
 
         if address is None and secret is None:
             raise Exception('No Stellar address afforded.')
         if address is not None and secret is None:
             self.address = Keypair.from_address(address).address().decode()
-            self.key_pair = None
+            self.keypair = None
 
         if network is None:
             self.network = 'TESTNET'
@@ -213,6 +212,7 @@ class Builder(object):
         # path: a list of asset tuple which contains asset_code and asset_issuer,
         # [(asset_code, asset_issuer), (asset_code, asset_issuer)] for native asset you can deliver
         # ('XLM', None)
+
         send_asset = Asset(send_code, send_issuer)
         dest_asset = Asset(dest_code, dest_issuer)
 
@@ -747,12 +747,12 @@ class Builder(object):
             another key is being utilized to sign the transaction envelope.
 
         """
-        key_pair = self.key_pair if not secret else Keypair.from_seed(secret)
+        keypair = self.keypair if not secret else Keypair.from_seed(secret)
 
         self.gen_te()
 
         try:
-            self.te.sign(key_pair)
+            self.te.sign(keypair)
         except SignatureExistError:
             raise
 
@@ -800,7 +800,7 @@ class Builder(object):
             network=self.network,
             sequence=sequence,
             fee=self.fee)
-        next_builder.key_pair = self.key_pair
+        next_builder.keypair = self.keypair
         return next_builder
 
     def get_sequence(self):

@@ -32,15 +32,15 @@ class KeypairTest(TestCase):
     def setUpClass(cls):
         cls.mnemonic = ('illness spike retreat truth genius clock brain pass '
                         'fit cave bargain toe')
-        cls.key_pair0 = Keypair.deterministic(cls.mnemonic)
+        cls.keypair0 = Keypair.deterministic(cls.mnemonic)
 
     def test_from_seed(self):
-        key_pair = Keypair.from_seed(self.key_pair0.seed())
-        assert self.key_pair0.address() == key_pair.address()
+        keypair = Keypair.from_seed(self.keypair0.seed())
+        assert self.keypair0.address() == keypair.address()
 
     def test_sign_missing_signing_key_raise(self):
-        key_pair = Keypair.from_address(self.key_pair0.address())
-        raises(MissingSigningKeyError, key_pair.sign, "")
+        keypair = Keypair.from_address(self.keypair0.address())
+        raises(MissingSigningKeyError, keypair.sign, "")
 
     def test_init_wrong_type_key_raise(self):
         raises(TypeError, Keypair, self.mnemonic)

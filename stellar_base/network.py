@@ -13,7 +13,7 @@ class Network(object):
     This class represents such a stellar network such as the public livenet and
     the Stellar Development Foundation Test network.
 
-    :param str passphrase: The passphrase for the network
+    :param str passphrase: The passphrase for the network. (ex. 'Public Global Stellar Network ; September 2015')
 
     """
 

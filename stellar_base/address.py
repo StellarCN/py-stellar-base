@@ -1,7 +1,5 @@
 # coding: utf-8
 
-import requests
-
 from .horizon import Horizon
 from .keypair import Keypair
 from .exceptions import AccountNotExistError, NotValidParamError, HorizonError
@@ -23,7 +21,8 @@ class Address(object):
     :param str secret: The secret seed string that is used to derive the
         address for this :class:`Address`.
     :param str network: The network to connect to for verifying and retrieving
-        additional attributes from. Must be either 'PUBLIC' or 'TESTNET'.
+        additional attributes from. 'PUBLIC' is an alias for 'Public Global Stellar Network ; September 2015',
+        'TESTNET' is an alias for 'Test SDF Network ; September 2015'. Defaults to TESTNET.
     :param str horizon_uri: The horizon url to use for
         connecting to for additional information for the account to which this
         address corresponds to.
@@ -79,6 +78,8 @@ class Address(object):
         * Flags
         * Signers
         * Data
+        * Inflation Destination
+        * Subentry Count
 
         :raises AccountNotExistError: If the account does not exist, shown by a
             404 response from a Horizon server.
