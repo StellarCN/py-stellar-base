@@ -602,7 +602,7 @@ class Builder(object):
         """
         fed_info = federation(
             address_or_id=fed_address, fed_type='name', allow_http=allow_http)
-        if not fed_info:
+        if not fed_info or not fed_info.get('account_id'):
             raise FederationError(
                 'Cannot determine Stellar Address to Account ID translation '
                 'via Federation server')
