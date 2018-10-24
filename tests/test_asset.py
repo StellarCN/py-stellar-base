@@ -38,16 +38,6 @@ class TestAsset(TestCase):
         xdr = b'AAAAAUNOWQAAAAAA01KM3XCt1+LHD7jDTOYpe/HGKSDoQoyL1JbUOc0+E2M='
         assert xdr == self.cny.xdr()
 
-    def test_xdr_padding_will_be_removed(self):
-        xdr = self.cny.to_xdr_object()
-        former_xdr_cny = Asset.from_xdr_object(xdr)
-        assert former_xdr_cny.code == self.cny.code, 'Padding not removed.'
-
-        # check for greater than four as well ...
-        xdr = Asset('BIGGER').to_xdr_object()
-        former_xdr_bigger = Asset.from_xdr_object(xdr)
-        assert former_xdr_bigger.code == 'BIGGER', 'Padding not removed.'
-
     def test_unxdr(self):
         xdr = self.cny.xdr()
         cny_x = Asset.from_xdr(xdr)
