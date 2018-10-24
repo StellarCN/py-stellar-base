@@ -1,6 +1,5 @@
 # coding: utf-8
 import codecs
-import platform
 import os
 
 from setuptools import setup, find_packages
@@ -16,8 +15,6 @@ with codecs.open('README.rst', encoding='utf-8') as file:
 tests_require = ['pytest', 'mock', 'sphinx']
 
 requirements_file = 'requirements.txt'
-if platform.system() == 'Windows':
-    requirements_file = 'requirements-windows.txt'
 
 setup(
     name=package_name,
@@ -45,6 +42,7 @@ setup(
         'Programming Language :: Python :: 3.7',
         'Topic :: Software Development :: Libraries :: Python Modules',
     ],
+    python_requires='>=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*',
     install_requires=open(requirements_file).readlines(),
     tests_require=tests_require
 )

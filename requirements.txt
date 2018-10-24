@@ -1,5 +1,6 @@
-crc16==0.1.1
-ed25519==1.4
+crc16==0.1.1; sys_platform != "win32" and sys_platform != "cygwin"
+pure25519==0.0.1; sys_platform == "win32" or sys_platform == "cygwin"
+ed25519==1.4; sys_platform != "win32" and sys_platform != "cygwin"
 requests==2.19.1
 six==1.11.0
 stellar-base-sseclient==0.0.21

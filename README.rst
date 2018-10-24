@@ -1,20 +1,15 @@
 py-stellar-base
 ===============
 
-.. image:: https://img.shields.io/travis/StellarCN/py-stellar-base.svg?maxAge=1800
+.. image:: https://img.shields.io/travis/StellarCN/py-stellar-base.svg?style=flat-square&maxAge=1800
     :alt: Travis (.org)
     :target: https://travis-ci.org/StellarCN/py-stellar-base/
 
-.. image:: https://img.shields.io/readthedocs/stellar-base.svg?maxAge=1800
+.. image:: https://img.shields.io/readthedocs/stellar-base.svg?style=flat-square&maxAge=1800
     :alt: Read the Docs
     :target: https://stellar-base.readthedocs.io/en/latest/
 
-.. image:: https://img.shields.io/pypi/v/stellar-base.svg?maxAge=1800
-    :alt: PyPI
-    :target: https://pypi.python.org/pypi/stellar-base
-
-
-.. image:: https://img.shields.io/codecov/c/github/StellarCN/py-stellar-base.svg?maxAge=1800
+.. image:: https://img.shields.io/codecov/c/github/StellarCN/py-stellar-base.svg?style=flat-square&maxAge=1800
     :alt: Codecov
     :target: https://codecov.io/gh/StellarCN/py-stellar-base
 
@@ -31,7 +26,23 @@ It provides:
 Installing
 ----------
 
-Install from pypi:
+Install from pypi, there are two packages here, please choose one of them:
+
+* The package is built automatically by Travis-CI. |stellar-sdk-image|
+
+.. |stellar-sdk-image| image:: https://img.shields.io/pypi/v/stellar-sdk.svg?style=flat-square&maxAge=1800
+    :alt: PyPI
+    :target: https://pypi.python.org/pypi/stellar-sdk
+
+.. code-block:: text
+
+    pip install -U stellar-sdk
+
+* The package is maintained by antb123. |stellar-base-image|
+
+.. |stellar-base-image| image:: https://img.shields.io/pypi/v/stellar-base.svg?style=flat-square&maxAge=1800
+    :alt: PyPI
+    :target: https://pypi.python.org/pypi/stellar-base
 
 .. code-block:: text
 
@@ -72,7 +83,7 @@ Document
 Links
 -----
 * Examples: https://github.com/StellarCN/py-stellar-base/tree/master/examples
-* Releases: https://pypi.org/project/stellar-base/
+* Releases: https://pypi.org/project/stellar-sdk/
 * Code: https://github.com/StellarCN/py-stellar-base
 * Issue tracker: https://github.com/StellarCN/py-stellar-base/issues
 * License: `Apache License 2.0 <https://github.com/StellarCN/py-stellar-base/blob/master/LICENSE>`_
