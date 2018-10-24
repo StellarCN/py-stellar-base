@@ -87,20 +87,17 @@ class Address(object):
             connection happens.
 
         """
-        try:
-            acc = self.horizon.account(self.address)
-            if acc.get('sequence'):
-                self.sequence = acc.get('sequence')
-                self.balances = acc.get('balances')
-                self.paging_token = acc.get('paging_token')
-                self.thresholds = acc.get('thresholds')
-                self.flags = acc.get('flags')
-                self.signers = acc.get('signers')
-                self.data = acc.get('data')
-                self.inflation_destination = acc.get('inflation_destination')
-                self.subentry_count = acc.get('subentry_count')
-        except HorizonError as err:  # TODO: remove AccountNotExistError?
-            raise AccountNotExistError(err.message['title'])
+
+        acc = self.horizon.account(self.address)
+        self.sequence = acc.get('sequence')
+        self.balances = acc.get('balances')
+        self.paging_token = acc.get('paging_token')
+        self.thresholds = acc.get('thresholds')
+        self.flags = acc.get('flags')
+        self.signers = acc.get('signers')
+        self.data = acc.get('data')
+        self.inflation_destination = acc.get('inflation_destination')
+        self.subentry_count = acc.get('subentry_count')
 
     def payments(self, sse=False, **kwargs):
         """Retrieve the payments JSON from this instance's Horizon server.

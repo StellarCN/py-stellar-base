@@ -54,10 +54,6 @@ class DecodeError(StellarError):
     pass
 
 
-class AccountNotExistError(StellarError):
-    pass
-
-
 class NotValidParamError(StellarError):
     pass
 
