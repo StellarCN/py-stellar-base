@@ -1,18 +1,16 @@
 # coding: utf-8
 import codecs
-import os
 
 from setuptools import setup, find_packages
 
-# Auto build and deploy pypi package with Travis-CI
-package_name = os.environ.get('TRAVIS_STELLAR_BUILD_PACKAGE_NAME') or 'stellar-base'
+package_name = "stellar-base"
 
 exec(open("stellar_base/version.py").read())
 
 with codecs.open('README.rst', encoding='utf-8') as file:
     long_description = file.read()
 
-tests_require = ['pytest', 'mock', 'sphinx']
+tests_require = ['pytest', 'mock']
 
 requirements_file = 'requirements.txt'
 

@@ -28,11 +28,16 @@ after_success:
 
 notifications:
   email: false
+
+before_deploy:
+  - perl -i -pe's/"stellar-base"/"stellar-sdk"/g' setup.py
+
 deploy:
   provider: pypi
   user: overcat_build_bot
   password:
     secure: R8Ye0kMNjY92+WKWQnRIAU+fk2nYZwp0yseDW7xcDUCFdrNj8VSMyJdHIVYGum7sn8Ft+OBVCMA1ZZn7rRTw4+VFefvCLu7Gder8OKIJ2Cqa+BDGGh9LKC9002HYhcNYkXU2IYKOveQSGSMo0i4fyWX7SafSUTiFyPFJZP98qDICKomUWOKOf0S/Y8r3M1IZ2GZymAe5Khvbgw2qktu8moAvoN+6RvPZaMdZXsDPGVltkAp9VWpkbXGk4JbVYoFO5WGzQ/lUUzGgx65i0GqSBjB6hVC9oeFQgt5FTKxph6892Y4qIXPKbPrGTCSBla8Z8y6jYmKqPvv/WHKfDnSBLbqZXThDdVcbK+JP6Y67m5gh8nXmVmz8elJ052Xg/P6dDAk7wzWeeRop+qZllWBRpHfiUcy12VMSPTHIEpk4qiQ7lF2Pzvo3nVzEg5N4B4insdqoCoPNwFT8uE99rKtlU2DbLTlU0XFCw5Oe0FUJRQPMWdE8n+Ar0gF2NIau3w8EZs9AESAOJSQ/gesadkro+5ztbZW/lb35ieiot3L+5FdK32SixwDNPnIzBuMwRls7yblpncO9+zRH7SvAr3rBiGDYk3aQL7935Zg2vSzfogPGYqbGuB32yBqxdmhFkOi/kOQni22b+87l+ZFrPsElLkVy1PK9QwyIIQzk6LN/h7M=
+  skip_cleanup: true
   on:
     python: 3.5
     tags: true
