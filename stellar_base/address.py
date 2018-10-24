@@ -153,6 +153,19 @@ class Address(object):
         return self.horizon.account_operations(
             self.address, params=kwargs, sse=sse)
 
+    def trades(self, sse=False, **kwargs):
+        """Retrieve the trades JSON from this instance's Horizon server.
+
+        Retrieve the trades JSON response for the account associated with
+        this :class:`Address`.
+
+        :param bool sse: Use the SSE client for connecting to Horizon.
+        """
+        self.__check_params(kwargs)
+        return self.horizon.account_trades(
+            self.address, params=kwargs, sse=sse
+        )
+
     def effects(self, sse=False, **kwargs):
         """Retrieve the effects JSON from this instance's Horizon server.
 
