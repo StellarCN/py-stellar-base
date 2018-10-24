@@ -286,9 +286,25 @@ class Horizon(object):
         :param bool sse: Use server side events for streaming responses
         :return: The list of payments for an account in a JSON response.
         :rtype: dict
-
         """
         endpoint = '/accounts/{account_id}/payments'.format(account_id=address)
+        return self.query(endpoint, params, sse)
+
+    def account_trades(self, address, params=None, sse=False):
+        """This endpoint responds with a collection of Trades where
+        the given account was either the taker or the maker
+
+        `GET /accounts/{id}/trades{?cursor,limit,order}
+        <https://www.stellar.org/developers/horizon/reference/endpoints/trades-for-account.html>`_
+
+        :param str address: The account ID to list trades to/from
+        :param dict params: The query parameters to pass to this request, such
+            as cursor, order, and limit.
+        :param bool sse: Use server side events for streaming responses
+        :return: The list of payments for an account in a JSON response.
+        :rtype: dict
+        """
+        endpoint = '/accounts/{account_id}/trades'.format(account_id=address)
         return self.query(endpoint, params, sse)
 
     def assets(self, params=None):
