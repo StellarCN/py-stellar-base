@@ -2,7 +2,7 @@ from unittest import TestCase
 from pytest import raises
 
 from stellar_base.keypair import Keypair
-from stellar_base.exceptions import MissingSigningKeyError
+from stellar_base.exceptions import MissingSigningKeyError, NotValidParamError
 
 
 def test_sep0005():
@@ -43,4 +43,4 @@ class KeypairTest(TestCase):
         raises(MissingSigningKeyError, keypair.sign, "")
 
     def test_init_wrong_type_key_raise(self):
-        raises(TypeError, Keypair, self.mnemonic)
+        raises(NotValidParamError, Keypair, self.mnemonic)

@@ -1,13 +1,14 @@
 # coding: utf-8
-
 import requests
 from requests.adapters import HTTPAdapter, DEFAULT_POOLSIZE
 from requests.exceptions import RequestException
 from requests.compat import urljoin
 from time import sleep
-from urllib3.util import Retry
 
-from .exceptions import HorizonError
+from urllib3.exceptions import NewConnectionError
+from urllib3.util import Retry
+from .version import __version__
+from .exceptions import HorizonError, HorizonRequestError
 
 import logging
 
@@ -23,7 +24,7 @@ HORIZON_TEST = "https://horizon-testnet.stellar.org"
 DEFAULT_REQUEST_TIMEOUT = 11  # two ledgers + 1 sec, let's retry faster and not wait 60 secs.
 DEFAULT_NUM_RETRIES = 3
 DEFAULT_BACKOFF_FACTOR = 0.5
-USER_AGENT = 'py-stellar-base'
+USER_AGENT = 'py-stellar-base-{}'.format(__version__)
 
 
 class Horizon(object):
@@ -65,9 +66,8 @@ class Horizon(object):
         self.request_timeout = request_timeout
         self.backoff_factor = backoff_factor
 
-        # adding 504 to the list of statuses to retry
-        self.status_forcelist = list(
-            Retry.RETRY_AFTER_STATUS_CODES).append(504)
+        # adding 504 to the tuple of statuses to retry
+        self.status_forcelist = tuple(Retry.RETRY_AFTER_STATUS_CODES) + (504,)
 
         # configure standard session
 
@@ -132,22 +132,21 @@ class Horizon(object):
                 reply = self._session.post(
                     url, data=params, timeout=self.request_timeout)
                 return check_horizon_reply(reply.json())
-            except (RequestException, ValueError) as e:
-                if reply:
-                    msg = 'horizon submit exception: {}, reply: [{}] {}'.format(
+            except (RequestException, NewConnectionError, ValueError) as e:
+                if reply is not None:
+                    msg = 'Horizon submit exception: {}, reply: [{}] {}'.format(
                         str(e), reply.status_code, reply.text)
                 else:
-                    msg = 'horizon submit exception: {}'.format(str(e))
+                    msg = 'Horizon submit exception: {}'.format(str(e))
                 logging.warning(msg)
 
-                if reply and reply.status_code not in self.status_forcelist:
-                    raise Exception('invalid horizon reply: [{}] {}'.format(
-                        reply.status_code, reply.text))
-                # retry
-                if retry_count <= 0:
-                    raise
+                if (reply is not None and reply.status_code not in self.status_forcelist) or retry_count <= 0:
+                    if reply is None:
+                        raise HorizonRequestError(e)
+                    raise HorizonError('Invalid horizon reply: [{}] {}'.format(
+                        reply.status_code, reply.text), reply.status_code)
                 retry_count -= 1
-                logging.warning('submit retry attempt {}'.format(retry_count))
+                logging.warning('Submit retry attempt {}'.format(retry_count))
                 sleep(self.backoff_factor)
 
     def query(self, rel_url, params=None, sse=False):
@@ -156,18 +155,22 @@ class Horizon(object):
         return check_horizon_reply(reply) if not sse else reply
 
     def _query(self, url, params=None, sse=False):
+        reply = None
         if not sse:
-            reply = self._session.get(
-                url, params=params, timeout=self.request_timeout)
             try:
+                reply = self._session.get(
+                    url, params=params, timeout=self.request_timeout)
                 return reply.json()
-            except ValueError:
-                raise Exception('invalid horizon reply: [{}] {}'.format(
-                    reply.status_code, reply.text))
+            except (RequestException, NewConnectionError, ValueError) as e:
+                if reply is not None:
+                    raise HorizonError('Invalid horizon reply: [{}] {}'.format(
+                        reply.status_code, reply.text), reply.status_code)
+                else:
+                    raise HorizonRequestError(e)
 
         # SSE connection
         if SSEClient is None:
-            raise ValueError('SSE not supported, missing sseclient module')
+            raise ImportError('SSE not supported, missing `stellar-base-sseclient` module')
 
         return SSEClient(url, retry=0, session=self._sse_session, connect_retry=-1, params=params)
 
@@ -653,7 +656,7 @@ class Horizon(object):
 def check_horizon_reply(reply):
     if 'status' not in reply:
         return reply
-    raise HorizonError(reply)
+    raise HorizonError(reply, reply['status'])
 
 
 def horizon_testnet():

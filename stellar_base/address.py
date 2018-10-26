@@ -2,7 +2,7 @@
 
 from .horizon import Horizon
 from .keypair import Keypair
-from .exceptions import AccountNotExistError, NotValidParamError, HorizonError
+from .exceptions import NotValidParamError
 from .horizon import HORIZON_LIVE, HORIZON_TEST
 
 
@@ -99,7 +99,7 @@ class Address(object):
                 self.data = acc.get('data')
                 self.inflation_destination = acc.get('inflation_destination')
                 self.subentry_count = acc.get('subentry_count')
-        except HorizonError as err:
+        except HorizonError as err:  # TODO: remove AccountNotExistError?
             raise AccountNotExistError(err.message['title'])
 
     def payments(self, sse=False, **kwargs):

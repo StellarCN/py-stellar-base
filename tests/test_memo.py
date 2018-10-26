@@ -5,7 +5,7 @@ import binascii
 
 import pytest
 
-from stellar_base.exceptions import XdrLengthError
+from stellar_base.exceptions import NotValidParamError
 from stellar_base.memo import (
     NoneMemo, TextMemo, HashMemo, IdMemo, RetHashMemo, xdr_to_memo
 )
@@ -39,7 +39,7 @@ class TestMemo:
         memo_text = "Out, out, brief candle, life is but a walking shadow."
         length = len(memo_text)
         with pytest.raises(
-                XdrLengthError,
+                NotValidParamError,
                 match="Text should be <= 28 bytes \(ascii encoded\). "
                 "Got {}".format(str(length))):
             TextMemo(memo_text)
@@ -47,7 +47,7 @@ class TestMemo:
     def test_text_memo_wrong_value(self):
         memo_text = ("stellar", )
         with pytest.raises(
-                TypeError,
+                NotValidParamError,
                 match='Expects string type got a {}'.format(type(memo_text))):
             TextMemo(memo_text)
 
@@ -65,9 +65,9 @@ class TestMemo:
 
     def test_hash_memo_and_ret_hash_memo_toolong(self):
         memo_hash = binascii.hexlify(os.urandom(32)).decode() + ' '
-        with pytest.raises(ValueError):
+        with pytest.raises(NotValidParamError):
             HashMemo(memo_hash)
-        with pytest.raises(ValueError):
+        with pytest.raises(NotValidParamError):
             RetHashMemo(memo_hash)
 
     def test_memo_xdr(self):

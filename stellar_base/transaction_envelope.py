@@ -6,7 +6,7 @@ from .network import Network, NETWORKS
 from .stellarxdr import Xdr
 from .transaction import Transaction
 from .utils import hashX_sign_decorated, xdr_hash, convert_hex_to_bytes
-from .exceptions import SignatureExistError, PreimageLengthError
+from .exceptions import SignatureExistError
 
 
 class TransactionEnvelope(object):
@@ -58,7 +58,7 @@ class TransactionEnvelope(object):
         sig = keypair.sign_decorated(tx_hash)
         sig_dict = [signature.__dict__ for signature in self.signatures]
         if sig.__dict__ in sig_dict:
-            raise SignatureExistError('already signed')
+            raise SignatureExistError('The keypair has already signed')
         else:
             self.signatures.append(sig)
 
@@ -74,13 +74,13 @@ class TransactionEnvelope(object):
         :type preimage: str, bytes
 
         """
-        if len(preimage) > 64:
-            raise PreimageLengthError('preimage must <= 64 bytes')
+        # if len(preimage) > 64:
+        #     raise PreimageLengthError('preimage must <= 64 bytes')
         preimage = convert_hex_to_bytes(preimage)
         sig = hashX_sign_decorated(preimage)
         sig_dict = [signature.__dict__ for signature in self.signatures]
         if sig.__dict__ in sig_dict:
-            raise SignatureExistError('already signed')
+            raise SignatureExistError('The preimage has already signed.')
         else:
             self.signatures.append(sig)
 

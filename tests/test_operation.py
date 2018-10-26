@@ -14,7 +14,7 @@ SOURCE = 'GDJVFDG5OCW5PYWHB64MGTHGFF57DRRJEDUEFDEL2SLNIOONHYJWHA3Z'
 @pytest.mark.parametrize("s, error_type", [
     ("0.12345678", decimal.Inexact),
     ("test", decimal.InvalidOperation),
-    (0.1234, TypeError),
+    (0.1234, NotValidParamError),
 ])
 def test_to_xdr_amount_raise(s, error_type):
     if sys.version_info.major == 2:
@@ -156,16 +156,16 @@ def test_from_xdr_object_raise():
 
 
 def test_manage_data_too_long_raises():
-    msg = 'Data or value should be <= 64 bytes \(ascii encoded\).'
-    with pytest.raises(XdrLengthError, match=msg):
+    msg = 'Data and value should be <= 64 bytes \(ascii encoded\).'
+    with pytest.raises(NotValidParamError, match=msg):
         ManageData(
             data_name='1KFHE7w8BhaENAswwryaoccDb6qcT6DbYY',
             data_value='1234567890' * 7)
 
 
 def test_manage_offer_dict_price_raises():
-    msg = "You need pass `price` params as `digit` or `{'n': numerator, 'd': denominator}`"
-    with pytest.raises(ValueError, match=msg):
+    msg = "You need pass `price` params as `str` or `{'n': numerator, 'd': denominator}`"
+    with pytest.raises(NotValidParamError, match=msg):
         ManageOffer(
             selling=Asset('beer', SOURCE),
             buying=Asset('beer', DEST),

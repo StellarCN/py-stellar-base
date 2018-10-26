@@ -3,8 +3,8 @@
 import requests
 import toml
 
-from .exceptions import FederationError, DecodeError
-from .keypair import Keypair
+from stellar_base.utils import is_valid_address
+from .exceptions import FederationError, StellarAddressInvalidError
 
 
 def federation(address_or_id, fed_type='name', domain=None, allow_http=False):
@@ -27,24 +27,24 @@ def federation(address_or_id, fed_type='name', domain=None, allow_http=False):
     """
     if fed_type == 'name':
         if '*' not in address_or_id:
-            raise FederationError('not a valid federation address')
+            raise FederationError('Not a valid federation address.')
 
         param, domain = address_or_id.rsplit('*', 1)
         if param == '' or domain == '':
-            raise FederationError('not a valid federation address')
+            raise FederationError('Not a valid federation address.')
     elif fed_type == 'id':
         try:
-            Keypair.from_address(address_or_id)
-        except DecodeError:
-            raise FederationError('not a valid account id')
+            assert is_valid_address(address_or_id)
+        except StellarAddressInvalidError:
+            raise FederationError('{} is not a valid account id.'.format(address_or_id))
     else:
-        raise FederationError('not a valid fed_type')
+        raise FederationError('Not a valid fed_type.')
 
     if '.' not in domain:
-        raise FederationError('not a valid domain name')
+        raise FederationError('Not a valid domain name.')
     fed_service = get_federation_service(domain, allow_http)
     if not fed_service:
-        raise FederationError('not a valid federation server')
+        raise FederationError('Not a valid federation server.')
 
     return _get_federation_info(address_or_id, fed_service, fed_type)
 
@@ -130,4 +130,3 @@ def get_stellar_toml(domain, allow_http=False):
             return toml.loads(r.text)
 
     return None
-

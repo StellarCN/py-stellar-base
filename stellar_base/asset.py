@@ -3,6 +3,7 @@
 import base64
 import re
 
+from stellar_base.exceptions import AssetCodeInvalidError, StellarAddressInvalidError
 from .utils import account_xdr_object, encode_check, is_valid_address
 from .stellarxdr import Xdr
 
@@ -29,14 +30,17 @@ class Asset(object):
 
     def __init__(self, code, issuer=None):
         if not self._ASSET_CODE_RE.match(code):
-            raise ValueError("Asset code is invalid (alphanumeric, 12 "
-                             "characters max).")
+            raise AssetCodeInvalidError("Asset code is invalid (alphanumeric, 12 "
+                                        "characters max).")
 
-        if issuer is not None and not is_valid_address(issuer):
-            raise ValueError('Invalid issuer account: {}'.format(issuer))
+        if issuer is not None:
+            try:
+                assert is_valid_address(issuer)
+            except StellarAddressInvalidError:
+                raise StellarAddressInvalidError('Invalid issuer account: {}'.format(issuer))
 
         if code.lower() != 'xlm' and issuer is None:
-            raise ValueError("Issuer cannot be None")
+            raise StellarAddressInvalidError("Issuer cannot be `None` except native asset.")
 
         self.code = code
         self.issuer = issuer
