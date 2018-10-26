@@ -11,7 +11,7 @@ from .network import NETWORKS, Network
 from . import operation
 from .transaction import Transaction
 from .transaction_envelope import TransactionEnvelope as Te
-from .exceptions import SignatureExistError
+from .exceptions import NoStellarSecretOrAddressError, StellarAddressInvalidError, SequenceError
 from .federation import federation, FederationError
 
 
@@ -52,7 +52,7 @@ class Builder(object):
             self.address = None
 
         if address is None and secret is None:
-            raise Exception('No Stellar address afforded.')
+            raise NoStellarSecretOrAddressError('Stellar secret or address is required.')
         if address is not None and secret is None:
             self.address = Keypair.from_address(address).address().decode()
             self.keypair = None
@@ -605,7 +605,7 @@ class Builder(object):
         if not fed_info or not fed_info.get('account_id'):
             raise FederationError(
                 'Cannot determine Stellar Address to Account ID translation '
-                'via Federation server')
+                'via Federation server.')
         self.append_payment_op(fed_info['account_id'], amount, asset_code,
                                asset_issuer, source)
         memo_type = fed_info.get('memo_type')
@@ -623,9 +623,9 @@ class Builder(object):
 
         """
         if not self.address:
-            raise Exception('Transaction does not have any source address')
+            raise StellarAddressInvalidError('Transaction does not have any source address.')
         if not self.sequence:
-            raise Exception('No sequence is present, maybe not funded?')
+            raise SequenceError('No sequence is present, maybe not funded?')
         tx = Transaction(
             source=self.address,
             sequence=self.sequence,
@@ -748,13 +748,8 @@ class Builder(object):
 
         """
         keypair = self.keypair if not secret else Keypair.from_seed(secret)
-
         self.gen_te()
-
-        try:
-            self.te.sign(keypair)
-        except SignatureExistError:
-            raise
+        self.te.sign(keypair)
 
     def sign_preimage(self, preimage):
         """Sign the generated transaction envelope using a Hash(x) signature.
@@ -766,10 +761,7 @@ class Builder(object):
         """
         if self.te is None:
             self.gen_te()
-        try:
-            self.te.sign_hashX(preimage)
-        except SignatureExistError:
-            raise
+        self.te.sign_hashX(preimage)
 
     def submit(self):
         """Submit the generated XDR object of the built transaction envelope to
@@ -810,7 +802,7 @@ class Builder(object):
         :rtype: int
         """
         if not self.address:
-            raise ValueError('No address provided')
+            raise StellarAddressInvalidError('No address provided.')
 
         address = self.horizon.account(self.address)
         return int(address.get('sequence'))

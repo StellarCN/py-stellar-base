@@ -6,7 +6,7 @@ import base64
 
 from stellar_base.utils import convert_hex_to_bytes
 from .stellarxdr import Xdr
-from .exceptions import XdrLengthError
+from .exceptions import NotValidParamError
 
 if sys.version_info.major == 3:
     unicode = str
@@ -79,7 +79,7 @@ class TextMemo(Memo):
 
     def __init__(self, text):
         if not isinstance(text, (str, unicode)):
-            raise TypeError('Expects string type got a {}'.format(type(text)))
+            raise NotValidParamError('Expects string type got a {}'.format(type(text)))
         if bytes == str and not isinstance(text, unicode):
             # Python 2 without unicode string
             self.text = text
@@ -88,7 +88,7 @@ class TextMemo(Memo):
             self.text = bytearray(text, encoding='utf-8')
         length = len(self.text)
         if length > 28:
-            raise XdrLengthError("Text should be <= 28 bytes (ascii encoded). "
+            raise NotValidParamError("Text should be <= 28 bytes (ascii encoded). "
                                  "Got {:s}".format(str(length)))
 
     @classmethod

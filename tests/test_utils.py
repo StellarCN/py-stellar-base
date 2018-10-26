@@ -3,6 +3,7 @@ from unittest import TestCase
 import pytest
 
 from stellar_base import utils
+from stellar_base.exceptions import StellarAddressInvalidError, StellarSecretInvalidError
 from stellar_base.stellarxdr import StellarXDR_pack as Xdr
 from stellar_base.utils import is_valid_address, is_valid_secret_key
 
@@ -22,11 +23,13 @@ class TestUtils(TestCase):
 
     def test_is_valid_address(self):
         assert type(is_valid_address(self.account)) is bytes
-        assert is_valid_address(self.bad_account) is False
+        with pytest.raises(StellarAddressInvalidError, match='Invalid Stellar Address: {}'.format(self.bad_account)):
+            utils.is_valid_address(self.bad_account)
 
     def is_valid_secret_key(self):
         assert type(is_valid_secret_key(self.secret)) is bytes
-        assert is_valid_secret_key(self.bad_secret) is False
+        with pytest.raises(StellarSecretInvalidError, match='Invalid Stellar Secret: {}'.format(self.bad_secret)):
+            utils.is_valid_secret_key(self.bad_secret)
 
     # def test_encode_check(self):
     # TODO

@@ -2,6 +2,7 @@
 
 import base64
 
+from stellar_base.exceptions import NotValidParamError
 from .memo import xdr_to_memo, NoneMemo
 from .operation import Operation
 from .stellarxdr import Xdr
@@ -62,8 +63,7 @@ class Transaction(object):
                  memo=None,
                  fee=None,
                  operations=None):
-        if not is_valid_address(source):
-            raise ValueError('invalid source address: {}'.format(source))
+        assert is_valid_address(source)
 
         self.source = source
         self.sequence = int(sequence) + 1
@@ -76,8 +76,8 @@ class Transaction(object):
             self.time_bounds = []
         else:
             if not isinstance(time_bounds, dict):
-                raise ValueError("time_bounds should be a dict that contains "
-                                 "minTime and maxTime fields")
+                raise NotValidParamError("time_bounds should be a dict that contains "
+                                         "minTime and maxTime fields")
             self.time_bounds = [TimeBounds(minTime=time_bounds['minTime'],
                                            maxTime=time_bounds['maxTime'])]
 

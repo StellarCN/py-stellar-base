@@ -8,9 +8,9 @@ from .stellarxdr import Xdr
 from .utils import (account_xdr_object, best_rational_approximation as best_r,
                     division, encode_check, signer_key_xdr_object,
                     is_valid_address, convert_hex_to_bytes)
-from .exceptions import XdrLengthError
+from .exceptions import StellarAddressInvalidError, NotValidParamError
 
-ONE = Decimal(10**7)
+ONE = Decimal(10 ** 7)
 
 
 class Operation(object):
@@ -91,8 +91,7 @@ class Operation(object):
 
         """
         if not isinstance(value, str):
-            raise TypeError("value of type '{}' is not a string"
-                            ".".format(value))
+            raise NotValidParamError("Value of type '{}' is not a string".format(value))
 
         # throw exception if value * ONE has decimal places (it can't be
         # represented as int64)
@@ -103,8 +102,8 @@ class Operation(object):
     def to_xdr_price(price):
         if isinstance(price, dict):
             if not ('n' in price and 'd' in price):
-                raise ValueError(
-                    "You need pass `price` params as `digit` or `{'n': numerator, 'd': denominator}`"
+                raise NotValidParamError(
+                    "You need pass `price` params as `str` or `{'n': numerator, 'd': denominator}`"
                 )
         else:
             price = best_r(price)
@@ -608,9 +607,10 @@ class SetOptions(Operation):
         self.signer_weight = signer_weight
 
         if self.signer_address is not None and self.signer_type is None:
-            if not is_valid_address(self.signer_address):
-                raise ValueError(
-                    'Must be a valid strkey if not give signer_type')
+            try:
+                is_valid_address(self.signer_address)
+            except StellarAddressInvalidError:
+                raise StellarAddressInvalidError('Must be a valid stellar address if not give signer_type')
             self.signer_type = 'ed25519PublicKey'
 
         signer_is_invalid_type = (
@@ -618,12 +618,11 @@ class SetOptions(Operation):
                 self.signer_type not in ('ed25519PublicKey', 'hashX', 'preAuthTx'))
 
         if signer_is_invalid_type:
-            raise ValueError('Invalid signer type, sign_type should '
-                             'be ed25519PublicKey, hashX or preAuthTx')
+            raise NotValidParamError('Invalid signer type, sign_type should '
+                                     'be ed25519PublicKey, hashX or preAuthTx')
 
         if self.signer_type in ('hashX', 'preAuthTx'):
             self.signer_address = convert_hex_to_bytes(self.signer_address)
-
 
     def to_xdr_object(self):
         """Creates an XDR Operation object that represents this
@@ -689,7 +688,7 @@ class SetOptions(Operation):
         else:
             inflation_dest = encode_check(
                 'account', op_xdr_object.body.setOptionsOp.inflationDest[0]
-                .ed25519).decode()
+                    .ed25519).decode()
 
         clear_flags = op_xdr_object.body.setOptionsOp.clearFlags  # list
         set_flags = op_xdr_object.body.setOptionsOp.setFlags
@@ -1043,8 +1042,8 @@ class ManageData(Operation):
                               or len(self.data_value) <= 64)
 
         if not valid_data_name_len or not valid_data_val_len:
-            raise XdrLengthError(
-                "Data or value should be <= 64 bytes (ascii encoded).")
+            raise NotValidParamError(
+                "Data and value should be <= 64 bytes (ascii encoded).")
 
     def to_xdr_object(self):
         """Creates an XDR Operation object that represents this

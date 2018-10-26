@@ -2,7 +2,7 @@
 
 from .horizon import Horizon
 from .keypair import Keypair
-from .exceptions import AccountNotExistError, NotValidParamError, HorizonError
+from .exceptions import NotValidParamError
 from .horizon import HORIZON_LIVE, HORIZON_TEST
 
 
@@ -87,20 +87,17 @@ class Address(object):
             connection happens.
 
         """
-        try:
-            acc = self.horizon.account(self.address)
-            if acc.get('sequence'):
-                self.sequence = acc.get('sequence')
-                self.balances = acc.get('balances')
-                self.paging_token = acc.get('paging_token')
-                self.thresholds = acc.get('thresholds')
-                self.flags = acc.get('flags')
-                self.signers = acc.get('signers')
-                self.data = acc.get('data')
-                self.inflation_destination = acc.get('inflation_destination')
-                self.subentry_count = acc.get('subentry_count')
-        except HorizonError as err:
-            raise AccountNotExistError(err.message['title'])
+
+        acc = self.horizon.account(self.address)
+        self.sequence = acc.get('sequence')
+        self.balances = acc.get('balances')
+        self.paging_token = acc.get('paging_token')
+        self.thresholds = acc.get('thresholds')
+        self.flags = acc.get('flags')
+        self.signers = acc.get('signers')
+        self.data = acc.get('data')
+        self.inflation_destination = acc.get('inflation_destination')
+        self.subentry_count = acc.get('subentry_count')
 
     def payments(self, sse=False, **kwargs):
         """Retrieve the payments JSON from this instance's Horizon server.

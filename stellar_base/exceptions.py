@@ -3,21 +3,46 @@ class StellarError(Exception):
         super(StellarError, self).__init__(msg)
 
 
+class BadSignatureError(StellarError):
+    pass
+
+
+class AssetCodeInvalidError(StellarError):
+    pass
+
+
+class StellarAddressInvalidError(StellarError):
+    pass
+
+
+class StellarSecretInvalidError(StellarError):
+    pass
+
+
+class NoStellarSecretOrAddressError(StellarError):
+    pass
+
+
+class SequenceError(StellarError):
+    pass
+
+
 class ConfigurationError(StellarError):
     pass
 
 
-class HorizonError(StellarError):
-    def __init__(self, msg):
-        super(HorizonError, self).__init__(msg)
-        self.message = msg
-
-
-class XdrLengthError(StellarError):
+class NoApproximationError(StellarError):
     pass
 
 
-class PreimageLengthError(StellarError):
+class HorizonError(StellarError):
+    def __init__(self, msg, status_code):
+        super(HorizonError, self).__init__(msg)
+        self.message = msg
+        self.status_code = status_code
+
+
+class HorizonRequestError(StellarError):
     pass
 
 
@@ -26,10 +51,6 @@ class SignatureExistError(StellarError):
 
 
 class DecodeError(StellarError):
-    pass
-
-
-class AccountNotExistError(StellarError):
     pass
 
 
@@ -50,3 +71,10 @@ class FederationError(Exception):
     Stellar Federation.
 
     """
+
+# class XdrLengthError(StellarError):
+#     pass
+#
+#
+# class PreimageLengthError(StellarError):
+#     pass

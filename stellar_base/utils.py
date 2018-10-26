@@ -22,7 +22,8 @@ except ImportError:
     from .purecrc16 import crc16xmodem
 
 from .stellarxdr import Xdr
-from .exceptions import DecodeError, ConfigurationError, MnemonicError
+from .exceptions import DecodeError, ConfigurationError, MnemonicError, StellarAddressInvalidError, \
+    StellarSecretInvalidError, NotValidParamError, NoApproximationError
 
 # Compatibility for Python 3.x that don't have unicode type
 if sys.version_info.major == 3:
@@ -48,7 +49,7 @@ def xdr_hash(data):
 
 
 def account_xdr_object(account):
-    public_key = decode_check('account', account)
+    public_key = is_valid_address(account)
     axo = Xdr.types.PublicKey(Xdr.const.KEY_TYPE_ED25519, public_key)
     return axo
 
@@ -56,7 +57,7 @@ def account_xdr_object(account):
 def signer_key_xdr_object(signer_type, signer):
     if signer_type == 'ed25519PublicKey':
         return Xdr.types.SignerKey(Xdr.const.SIGNER_KEY_TYPE_ED25519,
-                                   decode_check('account', signer))
+                                   is_valid_address(signer))
     if signer_type == 'hashX':
         return Xdr.types.SignerKey(
             Xdr.const.SIGNER_KEY_TYPE_HASH_X, hashX=signer)
@@ -79,7 +80,7 @@ def bytes_from_decode_data(s):
         try:
             return s.encode('ascii')
         except UnicodeEncodeError:
-            raise ValueError(
+            raise NotValidParamError(
                 'String argument should contain only ASCII characters')
     if isinstance(s, bytes_types):
         return s
@@ -98,10 +99,10 @@ def decode_check(version_byte_name, encoded):
     try:
         decoded = base64.b32decode(encoded)
     except binascii.Error:
-        raise DecodeError('Incorrect padding')
+        raise DecodeError('Incorrect padding.')
 
     if encoded != base64.b32encode(decoded):
-        raise DecodeError('invalid encoded bytes')
+        raise DecodeError('Invalid encoded bytes.')
 
     version_byte = decoded[0:1]
     payload = decoded[0:-2]
@@ -116,14 +117,14 @@ def decode_check(version_byte_name, encoded):
 
     expected_checksum = calculate_checksum(payload)
     if expected_checksum != checksum:
-        raise DecodeError('invalid checksum')
+        raise DecodeError('Invalid checksum')
 
     return data
 
 
 def encode_check(version_byte_name, data):
     if data is None:
-        raise Exception("cannot encode null data")
+        raise NotValidParamError("cannot encode null data")
 
     # raise KerError
     version_byte = versionBytes[version_byte_name]
@@ -164,7 +165,7 @@ def best_rational_approximation(x):
     n = fractions[len(fractions) - 1][0]
     d = fractions[len(fractions) - 1][1]
     if n.is_zero() or d.is_zero():
-        raise Exception("Couldn't find approximation")
+        raise NoApproximationError("Couldn't find approximation.")
     return {'n': int(n), 'd': int(d)}
 
 
@@ -211,7 +212,7 @@ class StellarMnemonic(Mnemonic):
 
     def to_seed(self, mnemonic, passphrase='', index=0):
         if not self.check(mnemonic):
-            raise MnemonicError('wrong mnemonic string')
+            raise MnemonicError('Wrong mnemonic string.')
         mnemonic = self.normalize_string(mnemonic)
         passphrase = self.normalize_string(passphrase)
         seed = PBKDF2(
@@ -225,11 +226,10 @@ class StellarMnemonic(Mnemonic):
     def generate(self, strength=128):
         accepted_strengths = {128, 160, 192, 224, 256}
         if strength not in accepted_strengths:
-            raise ValueError('Strength should be one of the following '
-                             '{}, but it was {} instead'
-                             '.'.format(accepted_strengths, strength))
+            raise NotValidParamError('Strength should be one of the following '
+                                     '{}, but it was {} instead'
+                                     '.'.format(accepted_strengths, strength))
         ret = self.to_mnemonic(os.urandom(strength // 8))
-        # print(ret)
         return ret
 
     def derive(self, seed, index):
@@ -252,25 +252,25 @@ class StellarMnemonic(Mnemonic):
 def is_valid_address(address):
     try:
         return decode_check('account', address)
-    except Exception:
-        return False
+    except DecodeError:
+        raise StellarAddressInvalidError('Invalid Stellar Address: {}'.format(address))
 
 
-def is_valid_secret_key(key):
+def is_valid_secret_key(secret):
     try:
-        return decode_check('seed', key)
-    except Exception:
-        return False
+        return decode_check('seed', secret)
+    except DecodeError:
+        raise StellarSecretInvalidError('Invalid Stellar Secret: {}'.format(secret))
 
 
 def convert_hex_to_bytes(value):
     # Not perfect but works on Python2 and Python3
     if len is None:
-        raise ValueError("Value should be 32 byte hash or hex encoded string, but got None")
+        raise NotValidParamError("Value should be 32 byte hash or hex encoded string, but got `None`")
     length = len(value)
     if length == 32:
         return value
     elif length == 64:
         return binascii.unhexlify(value)
     else:
-        raise ValueError("Value should be 32 byte hash or hex encoded string, but got {}".format(value))
+        raise NotValidParamError("Value should be 32 byte hash or hex encoded string, but got {}".format(value))

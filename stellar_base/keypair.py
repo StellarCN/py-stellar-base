@@ -7,7 +7,7 @@ from .base58 import b58decode_check, b58encode_check
 from .stellarxdr import Xdr
 from .utils import encode_check, StellarMnemonic, \
     is_valid_address, is_valid_secret_key
-from .exceptions import MissingSigningKeyError
+from .exceptions import MissingSigningKeyError, BadSignatureError, NotValidParamError
 
 # noinspection PyBroadException
 try:
@@ -21,8 +21,7 @@ import hashlib
 
 def _get_key_of_expected_type(key, expected_type):
     if key is not None and not isinstance(key, expected_type):
-        raise TypeError("The given key_type={}) is not of type {}"
-                        ".".format(type(key), expected_type))
+        raise NotValidParamError("The given key_type={}) is not of type {}.".format(type(key), expected_type))
     return key
 
 
@@ -99,8 +98,6 @@ class Keypair(object):
         """
 
         raw_seed = is_valid_secret_key(seed)
-        if not raw_seed:
-            raise ValueError('Invalid Stellar secret key: {}'.format(seed))
         return cls.from_raw_seed(raw_seed)
 
     @classmethod
@@ -149,8 +146,6 @@ class Keypair(object):
 
         """
         public_key = is_valid_address(address)
-        if not public_key:
-            raise ValueError('Invalid Stellar address: {}'.format(address))
         verifying_key = ed25519.VerifyingKey(public_key)
         return cls(verifying_key)
 
@@ -204,7 +199,7 @@ class Keypair(object):
         process.
 
         :return: The public key encoded as a strkey.
-        :rtype: str
+        :rtype: bytes
         """
         return encode_check('account', self.raw_public_key())
 
@@ -215,7 +210,7 @@ class Keypair(object):
         process.
 
         :return: The secret seed encoded as a strkey.
-        :rtype: str
+        :rtype: bytes
         """
         return encode_check('seed', self.raw_seed())
 
@@ -227,7 +222,8 @@ class Keypair(object):
         :rtype: bytes
         """
         if self.signing_key is None:
-            raise MissingSigningKeyError("Cannot sign without signing key.")
+            raise MissingSigningKeyError("KeyPair does not contain secret key. "
+                                         "Use Keypair.from_seed method to create a new keypair with a secret key.")
         return self.signing_key.sign(data)
 
     def verify(self, data, signature):
@@ -242,8 +238,10 @@ class Keypair(object):
         :param bytes signature: A sequence of bytes that comprised the
             signature for the corresponding data.
         """
-
-        return self.verifying_key.verify(signature, data)
+        try:
+            return self.verifying_key.verify(signature, data)
+        except ed25519.BadSignatureError:
+            raise BadSignatureError("Signature verification failed.")
 
     def sign_decorated(self, data):
         """Sign a bytes-like object and return the decorated signature.

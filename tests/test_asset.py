@@ -31,7 +31,7 @@ class TestAsset(TestCase):
             Asset('123456789012TooLong', self.source)
 
     def test_no_issuer(self):
-        with pytest.raises(Exception, match='Issuer cannot be None'):
+        with pytest.raises(Exception, match='Issuer cannot be `None` except native asset.'):
             Asset('beer', None)
 
     def test_xdr(self):

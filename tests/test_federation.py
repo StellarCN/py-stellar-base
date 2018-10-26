@@ -44,19 +44,19 @@ def mocked_requests_get(*args, **kwargs):
 class TestFederation(object):
     def test_federation_false_address(self):
         with pytest.raises(
-                FederationError, match='not a valid federation address'):
+                FederationError, match='Not a valid federation address.'):
             federation('false_address')
         with pytest.raises(
-                FederationError, match='not a valid federation address'):
+                FederationError, match='Not a valid federation address.'):
             federation('false_address*')
-        with pytest.raises(FederationError, match='not a valid domain name'):
+        with pytest.raises(FederationError, match='Not a valid domain name.'):
             federation('false*address')
 
     @mock.patch('stellar_base.federation.get_federation_service')
     def test_federation_none_service(self, get_service):
         get_service.return_value = None
         with pytest.raises(
-                FederationError, match='not a valid federation server'):
+                FederationError, match='Not a valid federation server.'):
             federation('fed*stellar.org')
 
     @mock.patch(
