@@ -665,6 +665,35 @@ class Horizon(object):
         endpoint = '/trade_aggregations/'
         return self.query(endpoint, params)
 
+    def offer_trades(self, offer_id, params=None):
+        """This endpoint represents all trades for a given offer.
+
+        `GET /offers/{offer_id}/trades{?cursor,limit,order}
+        <https://www.stellar.org/developers/horizon/reference/endpoints/trades-for-offer.html>`_
+
+        :param int offer_id: The offer ID to get trades on.
+        :param dict params: The query parameters to pass to this request, such
+            as cursor, order, and limit.
+        :return: A list of effects on the given operation
+        :rtype: dict
+
+        """
+        endpoint = '/offers/{offer_id}/trades'.format(offer_id=offer_id)
+        return self.query(endpoint, params)
+
+    def metrics(self):
+        """The metrics endpoint returns a host of useful data points for monitoring the health
+        of the underlying Horizon process.
+
+        `GET /metrics
+        <https://www.stellar.org/developers/horizon/reference/endpoints/metrics.html>`_
+
+        :return: A host of useful data points for monitoring the health of the underlying Horizon process
+        :rtype: dict
+        """
+
+        endpoint = '/metrics'
+        return self.query(endpoint)
 
 def check_horizon_reply(reply):
     if 'status' not in reply:
