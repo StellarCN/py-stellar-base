@@ -2,7 +2,6 @@
 
 from .horizon import Horizon
 from .keypair import Keypair
-from .exceptions import NotValidParamError
 from .horizon import HORIZON_LIVE, HORIZON_TEST
 
 
@@ -99,93 +98,100 @@ class Address(object):
         self.inflation_destination = acc.get('inflation_destination')
         self.subentry_count = acc.get('subentry_count')
 
-    def payments(self, sse=False, **kwargs):
+    def payments(self, cursor=None, order='asc', limit=10, sse=False):
         """Retrieve the payments JSON from this instance's Horizon server.
 
         Retrieve the payments JSON response for the account associated with
         this :class:`Address`.
 
-        :param bool sse: Use the SSE client for connecting to Horizon.
+        :param cursor: A paging token, specifying where to start returning records from.
+            When streaming this can be set to "now" to stream object created since your request time.
+        :type cursor: int, str
+        :param str order: The order in which to return rows, "asc" or "desc".
+        :param int limit: Maximum number of records to return.
+        :param bool sse: Use server side events for streaming responses.
 
         """
-        self.__check_params(kwargs)
-        return self.horizon.account_payments(
-            self.address, params=kwargs, sse=sse)
+        return self.horizon.account_payments(address=self.address, cursor=cursor, order=order, limit=limit, sse=sse)
 
-    def offers(self, **kwargs):
+    def offers(self, cursor=None, order='asc', limit=10, sse=False):
         """Retrieve the offers JSON from this instance's Horizon server.
 
         Retrieve the offers JSON response for the account associated with
         this :class:`Address`.
 
-        :param bool sse: Use the SSE client for connecting to Horizon.
+        :param cursor: A paging token, specifying where to start returning records from.
+            When streaming this can be set to "now" to stream object created since your request time.
+        :type cursor: int, str
+        :param str order: The order in which to return rows, "asc" or "desc".
+        :param int limit: Maximum number of records to return.
+        :param bool sse: Use server side events for streaming responses.
 
         """
-        self.__check_params(kwargs)
-        return self.horizon.account_offers(self.address, params=kwargs)
+        return self.horizon.account_offers(self.address, cursor=cursor, order=order, limit=limit, sse=sse)
 
-    def transactions(self, sse=False, **kwargs):
+    def transactions(self,cursor=None, order='asc', limit=10, sse=False):
         """Retrieve the transactions JSON from this instance's Horizon server.
 
         Retrieve the transactions JSON response for the account associated with
         this :class:`Address`.
 
-        :param bool sse: Use the SSE client for connecting to Horizon.
-
+        :param cursor: A paging token, specifying where to start returning records from.
+            When streaming this can be set to "now" to stream object created since your request time.
+        :type cursor: int, str
+        :param str order: The order in which to return rows, "asc" or "desc".
+        :param int limit: Maximum number of records to return.
+        :param bool sse: Use server side events for streaming responses.
         """
-        self.__check_params(kwargs)
         return self.horizon.account_transactions(
-            self.address, params=kwargs, sse=sse)
+            self.address, cursor=cursor, order=order, limit=limit, sse=sse)
 
-    def operations(self, sse=False, **kwargs):
+    def operations(self, cursor=None, order='asc', limit=10, sse=False):
         """Retrieve the operations JSON from this instance's Horizon server.
 
         Retrieve the operations JSON response for the account associated with
         this :class:`Address`.
 
+        :param cursor: A paging token, specifying where to start returning records from.
+            When streaming this can be set to "now" to stream object created since your request time.
+        :type cursor: int, str
+        :param str order: The order in which to return rows, "asc" or "desc".
+        :param int limit: Maximum number of records to return.
         :param bool sse: Use the SSE client for connecting to Horizon.
 
         """
-        self.__check_params(kwargs)
         return self.horizon.account_operations(
-            self.address, params=kwargs, sse=sse)
+            self.address, cursor=cursor, order=order, limit=limit, sse=sse)
 
-    def trades(self, sse=False, **kwargs):
+    def trades(self, cursor=None, order='asc', limit=10, sse=False):
         """Retrieve the trades JSON from this instance's Horizon server.
 
         Retrieve the trades JSON response for the account associated with
         this :class:`Address`.
 
+        :param cursor: A paging token, specifying where to start returning records from.
+            When streaming this can be set to "now" to stream object created since your request time.
+        :type cursor: int, str
+        :param str order: The order in which to return rows, "asc" or "desc".
+        :param int limit: Maximum number of records to return.
         :param bool sse: Use the SSE client for connecting to Horizon.
         """
-        self.__check_params(kwargs)
         return self.horizon.account_trades(
-            self.address, params=kwargs, sse=sse
-        )
+            self.address, cursor=cursor, order=order, limit=limit, sse=sse)
 
-    def effects(self, sse=False, **kwargs):
+    def effects(self, cursor=None, order='asc', limit=10, sse=False):
         """Retrieve the effects JSON from this instance's Horizon server.
 
         Retrieve the effects JSON response for the account associated with
         this :class:`Address`.
 
+        :param cursor: A paging token, specifying where to start returning records from.
+            When streaming this can be set to "now" to stream object created since your request time.
+        :type cursor: int, str
+        :param str order: The order in which to return rows, "asc" or "desc".
+        :param int limit: Maximum number of records to return.
         :param bool sse: Use the SSE client for connecting to Horizon.
 
         """
-        self.__check_params(kwargs)
         return self.horizon.account_effects(
-            self.address, params=kwargs, sse=sse)
-
-    # noinspection PyMethodMayBeStatic
-    def __check_params(self, data):
-        """Check for appropriate keywords for a Horizon request method.
-
-        Check a dict of arguments to make sure that they only contain allowable
-        params for requests to Horizon, such as 'cursor', 'limit', and 'order'.
-
-        """
-
-        params_allowed = {'cursor', 'limit', 'order'}
-        params = set(data.keys())
-        if params - params_allowed:
-            raise NotValidParamError('not valid params')
+            self.address, cursor=cursor, order=order, limit=limit, sse=sse)
