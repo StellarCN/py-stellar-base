@@ -161,6 +161,113 @@ Bump Sequence
 .. autoclass:: stellar_base.operation.BumpSequence
    :members:
 
+List of Exceptions
+------------------
+
+StellarError
+^^^^^^^^^^^^
+
+.. autoclass:: stellar_base.exceptions.StellarError
+   :members:
+
+BadSignatureError
+^^^^^^^^^^^^^^^^^
+
+.. autoclass:: stellar_base.exceptions.BadSignatureError
+   :members:
+
+AssetCodeInvalidError
+^^^^^^^^^^^^^^^^^^^^^
+
+.. autoclass:: stellar_base.exceptions.AssetCodeInvalidError
+   :members:
+
+StellarAddressInvalidError
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. autoclass:: stellar_base.exceptions.StellarAddressInvalidError
+   :members:
+
+
+StellarSecretInvalidError
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. autoclass:: stellar_base.exceptions.StellarSecretInvalidError
+   :members:
+
+NoStellarSecretOrAddressError
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. autoclass:: stellar_base.exceptions.NoStellarSecretOrAddressError
+   :members:
+
+SequenceError
+^^^^^^^^^^^^^
+
+.. autoclass:: stellar_base.exceptions.SequenceError
+   :members:
+
+ConfigurationError
+^^^^^^^^^^^^^^^^^^
+
+.. autoclass:: stellar_base.exceptions.ConfigurationError
+   :members:
+
+NoApproximationError
+^^^^^^^^^^^^^^^^^^^^
+
+.. autoclass:: stellar_base.exceptions.NoApproximationError
+   :members:
+
+HorizonError
+^^^^^^^^^^^^
+
+.. autoclass:: stellar_base.exceptions.HorizonError
+   :members:
+
+HorizonRequestError
+^^^^^^^^^^^^^^^^^^^
+
+.. autoclass:: stellar_base.exceptions.HorizonRequestError
+   :members:
+
+
+SignatureExistError
+^^^^^^^^^^^^^^^^^^^
+
+.. autoclass:: stellar_base.exceptions.SignatureExistError
+   :members:
+
+DecodeError
+^^^^^^^^^^^
+
+.. autoclass:: stellar_base.exceptions.DecodeError
+   :members:
+
+NotValidParamError
+^^^^^^^^^^^^^^^^^^
+
+.. autoclass:: stellar_base.exceptions.NotValidParamError
+   :members:
+
+MnemonicError
+^^^^^^^^^^^^^
+
+.. autoclass:: stellar_base.exceptions.MnemonicError
+   :members:
+
+MissingSigningKeyError
+^^^^^^^^^^^^^^^^^^^^^^
+
+.. autoclass:: stellar_base.exceptions.MissingSigningKeyError
+   :members:
+
+FederationError
+^^^^^^^^^^^^^^^
+.. autoclass:: stellar_base.exceptions.FederationError
+   :members:
+
+
 Federation
 ==========
 

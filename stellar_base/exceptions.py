@@ -36,6 +36,10 @@ class NoApproximationError(StellarError):
 
 
 class HorizonError(StellarError):
+    """A :exc:`HorizonError` that represents an issue stemming from
+    Stellar Horizon.
+
+    """
     def __init__(self, msg, status_code):
         super(HorizonError, self).__init__(msg)
         self.message = msg
@@ -43,6 +47,10 @@ class HorizonError(StellarError):
 
 
 class HorizonRequestError(StellarError):
+    """A :exc:`HorizonRequestError` that represents we cannot connect
+    to Stellar Horizon.
+
+    """
     pass
 
 
@@ -71,10 +79,3 @@ class FederationError(Exception):
     Stellar Federation.
 
     """
-
-# class XdrLengthError(StellarError):
-#     pass
-#
-#
-# class PreimageLengthError(StellarError):
-#     pass

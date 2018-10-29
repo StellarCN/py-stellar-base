@@ -39,7 +39,6 @@ class Address(object):
             self.address = Keypair.from_address(address).address().decode()
         else:
             raise ValueError('oops, need a stellar address or secret')
-        # self.secret = secret
 
         if network.upper() != 'PUBLIC':
             self.network = 'TESTNET'
@@ -79,11 +78,6 @@ class Address(object):
         * Data
         * Inflation Destination
         * Subentry Count
-
-        :raises AccountNotExistError: If the account does not exist, shown by a
-            404 response from a Horizon server.
-        :raises Exception: If any other problems come up, or if a network
-            connection happens.
 
         """
 

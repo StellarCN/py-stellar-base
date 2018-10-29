@@ -50,11 +50,11 @@ class Horizon(object):
         class.
 
         :param str horizon_uri: The horizon base URL
-        :param int timeout: The timeout for all requests.
-        :param int pool_size persistent connection to Horizon and connection pool
-        :param int num_retries configurable request retry functionality
-        :param float backoff_factor a backoff factor to apply between attempts after the second try
-        :param str user_agent String representing the user-agent you want, such as "py-stellar-base"
+        :param int request_timeout: The timeout for all requests.
+        :param int pool_size: persistent connection to Horizon and connection pool
+        :param int num_retries: configurable request retry functionality
+        :param float backoff_factor: a backoff factor to apply between attempts after the second try
+        :param str user_agent: String representing the user-agent you want, such as "py-stellar-base"
 
         """
         if horizon_uri is None:

@@ -69,7 +69,7 @@ class Keypair(object):
             mnemonic, such as::
 
                 >>> from stellar_base.keypair import Keypair
-                >>> m = 'hello world'  # Don't use this mnemonic in practice.
+                >>> m = 'update hello cry airport drive chunk elite boat shaft sea describe number'  # Don't use this mnemonic in practice.
                 >>> kp1 = Keypair.deterministic(m, lang='english', index=0)
                 >>> kp2 = Keypair.deterministic(m, lang='english', index=1)
                 >>> kp3 = Keypair.deterministic(m, lang='english', index=2)
@@ -151,7 +151,6 @@ class Keypair(object):
 
     # TODO: Make some of the following functions properties?
 
-    # TODO: Make this function private, given its use in xdr(self).
     def account_xdr_object(self):
         """Create PublicKey XDR object via public key bytes.
 
@@ -164,7 +163,7 @@ class Keypair(object):
         """Generate base64 encoded XDR PublicKey object.
 
         Return a base64 encoded PublicKey XDR object, for sending over the wire
-        when interacting with stellard.
+        when interacting with stellar.
 
         :return: The base64 encoded PublicKey XDR structure.
         """
