@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import base64
+import decimal
 from decimal import Context, Decimal, Inexact
 
 from .asset import Asset
@@ -91,12 +92,17 @@ class Operation(object):
 
         """
         if not isinstance(value, str):
-            raise NotValidParamError("Value of type '{}' is not a string".format(value))
+            raise NotValidParamError("Value of type '{}' must be of type String, but got {}".format(value, type(value)))
 
         # throw exception if value * ONE has decimal places (it can't be
         # represented as int64)
-        return int((Decimal(value) *
-                    ONE).to_integral_exact(context=Context(traps=[Inexact])))
+        try:
+            amount = int((Decimal(value) * ONE).to_integral_exact(context=Context(traps=[Inexact])))
+        except decimal.Inexact:
+            raise NotValidParamError("Value of '{}' must have at most 7 digits after the decimal.".format(value))
+        except decimal.InvalidOperation:
+            raise NotValidParamError("Value of '{}' must represent a positive number.".format(value))
+        return amount
 
     @staticmethod
     def to_xdr_price(price):

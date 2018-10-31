@@ -1,19 +1,19 @@
 # coding:utf-8
 import sys
-import decimal
 import mock
 import pytest
 
 from stellar_base.operation import *
 from stellar_base.asset import Asset
+from stellar_base.exceptions import NotValidParamError
 
 DEST = 'GCW24FUIFPC2767SOU4JI3JEAXIHYJFIJLH7GBZ2AVCBVP32SJAI53F5'
 SOURCE = 'GDJVFDG5OCW5PYWHB64MGTHGFF57DRRJEDUEFDEL2SLNIOONHYJWHA3Z'
 
 
 @pytest.mark.parametrize("s, error_type", [
-    ("0.12345678", decimal.Inexact),
-    ("test", decimal.InvalidOperation),
+    ("0.12345678", NotValidParamError),
+    ("test", NotValidParamError),
     (0.1234, NotValidParamError),
 ])
 def test_to_xdr_amount_raise(s, error_type):
