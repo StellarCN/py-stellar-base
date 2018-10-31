@@ -29,9 +29,6 @@ after_success:
 notifications:
   email: false
 
-before_deploy:
-  - perl -i -pe's/"stellar-base"/"stellar-sdk"/g' setup.py
-
 deploy:
   provider: pypi
   user: overcat_build_bot

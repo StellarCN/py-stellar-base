@@ -3,7 +3,7 @@ import codecs
 
 from setuptools import setup, find_packages
 
-package_name = "stellar-base"
+package_name = "stellar-sdk"  # or stellar-base
 
 exec(open("stellar_base/version.py").read())
 
@@ -28,7 +28,7 @@ setup(
     include_package_data=True,
     packages=find_packages(),
     classifiers=[
-        'Development Status :: 4 - Beta',
+        'Development Status :: 5 - Production/Stable',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: Apache Software License',
         'Operating System :: OS Independent',

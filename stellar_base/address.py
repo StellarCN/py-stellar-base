@@ -124,7 +124,7 @@ class Address(object):
         """
         return self.horizon.account_offers(self.address, cursor=cursor, order=order, limit=limit, sse=sse)
 
-    def transactions(self,cursor=None, order='asc', limit=10, sse=False):
+    def transactions(self, cursor=None, order='asc', limit=10, sse=False):
         """Retrieve the transactions JSON from this instance's Horizon server.
 
         Retrieve the transactions JSON response for the account associated with
