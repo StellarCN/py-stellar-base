@@ -17,7 +17,7 @@ To install py-stellar-base, use pipenv to install the module, there are two pack
 
 .. code-block:: text
 
-    pip install -U stellar-sdk
+    pipenv install stellar-sdk
 
 * The package is maintained by antb123. |stellar-base-image|
 
@@ -27,7 +27,7 @@ To install py-stellar-base, use pipenv to install the module, there are two pack
 
 .. code-block:: text
 
-    pip install -U stellar-base
+    pipenv install stellar-base
 
 If you're not using `pipenv <https://docs.pipenv.org/>`_, you should.
 Otherwise, you can install it via plain old ``pip``. More on installing Python

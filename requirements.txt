@@ -4,6 +4,5 @@ ed25519==1.4; sys_platform != "win32" and sys_platform != "cygwin"
 requests==2.20.0
 six==1.11.0
 stellar-base-sseclient==0.0.21
-numpy==1.15.0
 toml==0.9.4
 mnemonic==0.18

@@ -12,7 +12,6 @@ import os
 import struct
 
 from mnemonic import Mnemonic
-import numpy as np
 from pbkdf2 import PBKDF2
 
 try:
@@ -146,7 +145,7 @@ def best_rational_approximation(x):
     INT32_MAX = Decimal(2147483647)
     a = None
     f = None
-    fractions = np.array([[Decimal(0), Decimal(1)], [Decimal(1), Decimal(0)]])
+    fractions = [[Decimal(0), Decimal(1)], [Decimal(1), Decimal(0)]]
     i = 2
     while True:
         if x > INT32_MAX:
@@ -157,7 +156,7 @@ def best_rational_approximation(x):
         k = a * fractions[i - 1][1] + fractions[i - 2][1]
         if h > INT32_MAX or k > INT32_MAX:
             break
-        fractions = np.vstack([fractions, [h, k]])
+        fractions.append([h, k])
         if f.is_zero():
             break
         x = 1 / f
