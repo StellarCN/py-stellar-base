@@ -515,7 +515,8 @@ class Builder(object):
         """Set the memo for the transaction to a new :class:`TextMemo
         <stellar_base.memo.TextMemo>`.
 
-        :param str memo_text: The text for the memo to add.
+        :param memo_text: The text for the memo to add.
+        :type memo_text: str, bytes
         :return: This builder instance.
 
         """

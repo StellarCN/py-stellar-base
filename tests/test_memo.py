@@ -48,7 +48,7 @@ class TestMemo:
         memo_text = ("stellar", )
         with pytest.raises(
                 NotValidParamError,
-                match='Expects string type got a {}'.format(type(memo_text))):
+                match='Expects string or bytes type got a {}'.format(type(memo_text))):
             TextMemo(memo_text)
 
     def test_id_memo(self):

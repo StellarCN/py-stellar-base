@@ -72,28 +72,27 @@ class NoneMemo(Memo):
 class TextMemo(Memo):
     """The :class:`TextMemo`, which represents MEMO_TEXT in a transaction.
 
-    :param str text: A string encoded using either ASCII or UTF-8, up to
+    :param text: A string encoded using either ASCII or UTF-8, up to
         28-bytes long.
+    :type text: str, bytes
 
     """
 
     def __init__(self, text):
-        if not isinstance(text, (str, unicode)):
-            raise NotValidParamError('Expects string type got a {}'.format(type(text)))
-        if bytes == str and not isinstance(text, unicode):
-            # Python 2 without unicode string
-            self.text = text
-        else:
-            # Python 3 or Python 2 with unicode string
+        if not isinstance(text, (str, unicode, bytes)):
+            raise NotValidParamError('Expects string or bytes type got a {}'.format(type(text)))
+        if (bytes == str and isinstance(text, unicode)) or (bytes != str and not isinstance(text, bytes)):
             self.text = bytearray(text, encoding='utf-8')
+        else:
+            self.text = text
         length = len(self.text)
         if length > 28:
             raise NotValidParamError("Text should be <= 28 bytes (ascii encoded). "
-                                 "Got {:s}".format(str(length)))
+                                     "Got {:s}".format(str(length)))
 
     @classmethod
     def from_xdr_object(cls, xdr_obj):
-        return cls(xdr_obj.switch.decode())
+        return cls(bytes(xdr_obj.switch))
 
     def to_xdr_object(self):
         """Creates an XDR Memo object for a transaction with MEMO_TEXT."""
