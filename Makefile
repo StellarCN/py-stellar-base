@@ -10,7 +10,7 @@ init:
 .PHONY: init
 
 start:
-	docker run --rm -d -p "8000:8000" --name stellar zulucrypto/stellar-integration-test-network
+	docker run --rm -d -p "8000:8000" -p "8004:8004" --name stellar zulucrypto/stellar-integration-test-network
 	sleep 10
 .PHONY: start
 

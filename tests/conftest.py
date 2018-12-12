@@ -7,9 +7,11 @@ from stellar_base.keypair import Keypair
 from stellar_base.builder import Builder
 
 import logging
+
 logging.basicConfig()
 
-#logging.getLogger().setLevel(logging.DEBUG)
+
+# logging.getLogger().setLevel(logging.DEBUG)
 
 
 def pytest_addoption(parser):
@@ -55,7 +57,8 @@ def setup(testnet):
         network='CUSTOM',
         issuer_keypair=issuer_keypair,
         test_asset=test_asset,
-        horizon_endpoint_uri='http://localhost:8000')
+        horizon_endpoint_uri='http://localhost:8000',
+        friend_bot_base_uri='http://localhost:8004')
 
 
 class Helpers:
@@ -66,8 +69,8 @@ class Helpers:
         for attempt in range(3):
             try:
                 if setup.type == 'local':
-                    r = requests.get(setup.horizon_endpoint_uri +
-                                     '/friendbot?addr=' + address)
+                    r = requests.get(setup.friend_bot_base_uri +
+                                     '?addr=' + address)
                 else:
                     r = requests.get(
                         'https://friendbot.stellar.org/?addr=' + address)
