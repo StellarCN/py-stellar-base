@@ -232,7 +232,7 @@ class StellarMnemonic(Mnemonic):
         return ret
 
     def derive(self, seed, index):
-        # bip-0032
+        # References https://github.com/satoshilabs/slips/blob/master/slip-0010.md
         master_hmac = hmac.new(self.seed_modifier, digestmod=hashlib.sha512)
         master_hmac.update(seed)
         il = master_hmac.digest()[:32]
