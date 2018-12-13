@@ -77,7 +77,8 @@ class Horizon(object):
             total=self.num_retries,
             backoff_factor=self.backoff_factor,
             redirect=0,
-            status_forcelist=self.status_forcelist)
+            status_forcelist=self.status_forcelist,
+            raise_on_status=False)
         # init transport adapter
         adapter = HTTPAdapter(
             pool_connections=self.pool_size,
@@ -851,7 +852,7 @@ class Horizon(object):
 def check_horizon_reply(reply):
     if 'status' not in reply:
         return reply
-    raise HorizonError(reply, reply['status'])
+    raise HorizonError('Invalid horizon reply: [{}] {}'.format(reply['status'], reply), reply['status'])
 
 
 def horizon_testnet():
