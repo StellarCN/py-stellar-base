@@ -1,5 +1,5 @@
 # coding: utf-8
-
+from stellar_base.exceptions import NotValidParamError
 from .horizon import Horizon
 from .keypair import Keypair
 from .horizon import HORIZON_LIVE, HORIZON_TEST
@@ -38,7 +38,7 @@ class Address(object):
         elif address:
             self.address = Keypair.from_address(address).address().decode()
         else:
-            raise ValueError('oops, need a stellar address or secret')
+            raise NotValidParamError('oops, need a stellar address or secret')
 
         if network.upper() != 'PUBLIC':
             self.network = 'TESTNET'
