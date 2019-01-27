@@ -9,7 +9,7 @@ from urllib3.exceptions import NewConnectionError
 from urllib3.util import Retry
 from .version import __version__
 from .asset import Asset
-from .exceptions import HorizonError, HorizonRequestError
+from .exceptions import HorizonError, HorizonRequestError, NotValidParamError
 
 import logging
 
@@ -774,8 +774,8 @@ class Horizon(object):
         return self.query(endpoint, params)
 
     def trade_aggregations(self, resolution, base_asset_code, counter_asset_code,
-                           base_asset_issuer=None, start_time=None, end_time=None,
-                           counter_asset_issuer=None, order='asc', limit=10):
+                           base_asset_issuer=None, counter_asset_issuer=None, start_time=None,
+                           end_time=None, order='asc', limit=10, offset=0):
         """Load a list of aggregated historical trade data, optionally filtered
         by an orderbook.
 
@@ -793,10 +793,20 @@ class Horizon(object):
         :param str counter_asset_issuer: Issuer of counter asset, if it is a native asset, let it be `None`.
         :param str order: The order in which to return rows, "asc" or "desc".
         :param int limit: Maximum number of records to return.
+        :param int offset: segments can be offset using this parameter.
+            Expressed in milliseconds. *Can only be used if the resolution is greater than 1 hour.
+            Value must be in whole hours, less than the provided resolution, and less than 24 hours.
         :return: A list of collected trade aggregations.
         :rtype: dict
 
         """
+        allowed_resolutions = (60000, 300000, 900000, 3600000, 86400000, 604800000)
+        if resolution not in allowed_resolutions:
+            raise NotValidParamError("resolution is invalid")
+
+        if offset > resolution or offset >= 24 * 3600000 or offset % 3600000 != 0:
+            raise NotValidParamError("offset is invalid")
+
         base_asset = Asset(base_asset_code, base_asset_issuer)
         counter_asset = Asset(counter_asset_code, counter_asset_issuer)
         asset_params = {
@@ -809,7 +819,7 @@ class Horizon(object):
         }
         endpoint = '/trade_aggregations'
         params = self.__query_params(start_time=start_time, end_time=end_time, resolution=resolution, order=order,
-                                     limit=limit, **asset_params)
+                                     limit=limit, offset=offset, **asset_params)
         return self.query(endpoint, params)
 
     def offer_trades(self, offer_id, cursor=None, order='asc', limit=10):
