@@ -25,7 +25,10 @@ HORIZON_TEST = "https://horizon-testnet.stellar.org"
 DEFAULT_REQUEST_TIMEOUT = 11  # two ledgers + 1 sec, let's retry faster and not wait 60 secs.
 DEFAULT_NUM_RETRIES = 3
 DEFAULT_BACKOFF_FACTOR = 0.5
-USER_AGENT = 'py-stellar-base-{}'.format(__version__)
+USER_AGENT = {
+    'X-Client-Name': 'py-stellar-base',
+    'X-Client-Version': __version__
+}
 
 
 class Horizon(object):
@@ -35,7 +38,7 @@ class Horizon(object):
                  num_retries=DEFAULT_NUM_RETRIES,
                  request_timeout=DEFAULT_REQUEST_TIMEOUT,
                  backoff_factor=DEFAULT_BACKOFF_FACTOR,
-                 user_agent=USER_AGENT):
+                 user_agent=None):
         """The :class:`Horizon` object, which represents the interface for
         making requests to a Horizon server instance.
 
@@ -54,9 +57,12 @@ class Horizon(object):
         :param int pool_size: persistent connection to Horizon and connection pool
         :param int num_retries: configurable request retry functionality
         :param float backoff_factor: a backoff factor to apply between attempts after the second try
-        :param str user_agent: String representing the user-agent you want, such as "py-stellar-base"
+        :param dict user_agent: representing the user-agent you want,
+            such as `{'X-Client-Name': 'py-stellar-base', 'X-Client-Version': __version__}`
 
         """
+        if user_agent is None:
+            self.user_agent = USER_AGENT
         if horizon_uri is None:
             self.horizon_uri = HORIZON_TEST
         else:
@@ -89,7 +95,7 @@ class Horizon(object):
         session = requests.Session()
 
         # set default headers
-        session.headers.update({'User-Agent': user_agent})
+        session.headers.update(self.user_agent)
 
         session.mount('http://', adapter)
         session.mount('https://', adapter)
@@ -104,7 +110,7 @@ class Horizon(object):
             pool_maxsize=self.pool_size,
             max_retries=sse_retry)
         sse_session = requests.Session()
-        sse_session.headers.update({'User-Agent': user_agent})
+        sse_session.headers.update(self.user_agent)
         sse_session.mount('http://', sse_adapter)
         sse_session.mount('https://', sse_adapter)
         self._sse_session = sse_session
@@ -173,6 +179,9 @@ class Horizon(object):
         # SSE connection
         if SSEClient is None:
             raise ImportError('SSE not supported, missing `stellar-base-sseclient` module')
+
+        # If SSE is enabled, Horizon will fetch the user-agent from the URL query params. Maybe it's not a good design.
+        params.update(self.user_agent)
 
         return SSEClient(url, retry=0, session=self._sse_session, connect_retry=-1, params=params)
 
