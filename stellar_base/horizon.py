@@ -258,7 +258,7 @@ class Horizon(object):
         params = self.__query_params(cursor=cursor, order=order, limit=limit)
         return self.query(endpoint, params, sse)
 
-    def account_operations(self, address, cursor=None, order='asc', limit=10, sse=False):
+    def account_operations(self, address, cursor=None, order='asc', limit=10, include_failed=False, sse=False):
         """This endpoint represents all operations that were included in valid
         transactions that affected a particular account.
 
@@ -272,16 +272,17 @@ class Horizon(object):
         :param str order: The order in which to return rows, "asc" or "desc".
         :param int limit: Maximum number of records to return.
         :param bool sse: Use server side events for streaming responses.
+        :param bool include_failed: Set to `True` to include operations of failed transactions in results.
         :return: The list of operations for an account in a JSON response.
         :rtype: dict
 
         """
         endpoint = '/accounts/{account_id}/operations'.format(
             account_id=address)
-        params = self.__query_params(cursor=cursor, order=order, limit=limit)
+        params = self.__query_params(cursor=cursor, order=order, limit=limit, include_failed=include_failed)
         return self.query(endpoint, params, sse)
 
-    def account_transactions(self, address, cursor=None, order='asc', limit=10, sse=False):
+    def account_transactions(self, address, cursor=None, order='asc', limit=10, include_failed=False, sse=False):
         """This endpoint represents all transactions that affected a given
         account.
 
@@ -294,6 +295,7 @@ class Horizon(object):
         :type cursor: int, str
         :param str order: The order in which to return rows, "asc" or "desc".
         :param int limit: Maximum number of records to return.
+        :param bool include_failed: Set to `True` include failed transactions in results.
         :param bool sse: Use server side events for streaming responses.
         :return: The list of transactions for an account in a JSON response.
         :rtype: dict
@@ -301,7 +303,7 @@ class Horizon(object):
         """
         endpoint = '/accounts/{account_id}/transactions'.format(
             account_id=address)
-        params = self.__query_params(cursor=cursor, order=order, limit=limit)
+        params = self.__query_params(cursor=cursor, order=order, limit=limit, include_failed=include_failed)
 
         return self.query(endpoint, params, sse)
 
@@ -373,7 +375,7 @@ class Horizon(object):
                                      limit=limit)
         return self.query(endpoint, params)
 
-    def transactions(self, cursor=None, order='asc', limit=10, sse=False):
+    def transactions(self, cursor=None, order='asc', limit=10, include_failed=False, sse=False):
         """This endpoint represents all validated transactions.
 
         `GET /transactions{?cursor,limit,order}
@@ -384,13 +386,14 @@ class Horizon(object):
         :type cursor: int, str
         :param str order: The order in which to return rows, "asc" or "desc".
         :param int limit: Maximum number of records to return.
+        :param bool include_failed: Set to `True` to include operations of failed transactions.
         :param bool sse: Use server side events for streaming responses.
         :return: The list of all transactions
         :rtype: dict
 
         """
         endpoint = '/transactions'
-        params = self.__query_params(cursor=cursor, order=order, limit=limit)
+        params = self.__query_params(cursor=cursor, order=order, limit=limit, include_failed=include_failed)
         return self.query(endpoint, params, sse)
 
     def transaction(self, tx_hash):
@@ -408,7 +411,7 @@ class Horizon(object):
         endpoint = '/transactions/{tx_hash}'.format(tx_hash=tx_hash)
         return self.query(endpoint)
 
-    def transaction_operations(self, tx_hash, cursor=None, order='asc', limit=10):
+    def transaction_operations(self, tx_hash, cursor=None, order='asc', include_failed=False, limit=10):
         """This endpoint represents all operations that are part of a given
         transaction.
 
@@ -419,12 +422,13 @@ class Horizon(object):
         :param int cursor: A paging token, specifying where to start returning records from.
         :param str order: The order in which to return rows, "asc" or "desc".
         :param int limit: Maximum number of records to return.
+        :param bool include_failed: Set to `True` to include operations of failed transactions in results.
         :return: A single transaction's operations.
         :rtype: dict
 
         """
         endpoint = '/transactions/{tx_hash}/operations'.format(tx_hash=tx_hash)
-        params = self.__query_params(cursor=cursor, order=order, limit=limit)
+        params = self.__query_params(cursor=cursor, order=order, limit=limit, include_failed=include_failed)
         return self.query(endpoint, params)
 
     def transaction_effects(self, tx_hash, cursor=None, order='asc', limit=10):
@@ -553,7 +557,7 @@ class Horizon(object):
         params = self.__query_params(cursor=cursor, order=order, limit=limit)
         return self.query(endpoint, params)
 
-    def ledger_operations(self, ledger_id, cursor=None, order='asc', limit=10):
+    def ledger_operations(self, ledger_id, cursor=None, order='asc', include_failed=False, limit=10):
         """This endpoint returns all operations that occurred in a given
         ledger.
 
@@ -564,13 +568,14 @@ class Horizon(object):
         :param int cursor: A paging token, specifying where to start returning records from.
         :param str order: The order in which to return rows, "asc" or "desc".
         :param int limit: Maximum number of records to return.
+        :param bool include_failed: Set to `True` to include operations of failed transactions in results.
         :return: The operations contained in a single ledger.
         :rtype: dict
 
         """
         endpoint = '/ledgers/{ledger_id}/operations'.format(
             ledger_id=ledger_id)
-        params = self.__query_params(cursor=cursor, order=order, limit=limit)
+        params = self.__query_params(cursor=cursor, order=order, limit=limit, include_failed=include_failed)
         return self.query(endpoint, params)
 
     def ledger_payments(self, ledger_id, cursor=None, order='asc', limit=10):
@@ -592,7 +597,7 @@ class Horizon(object):
         params = self.__query_params(cursor=cursor, order=order, limit=limit)
         return self.query(endpoint, params)
 
-    def ledger_transactions(self, ledger_id, cursor=None, order='asc', limit=10):
+    def ledger_transactions(self, ledger_id, cursor=None, order='asc', include_failed=False, limit=10):
         """This endpoint represents all transactions in a given ledger.
 
         `GET /ledgers/{id}/transactions{?cursor,limit,order}
@@ -602,13 +607,14 @@ class Horizon(object):
         :param int cursor: A paging token, specifying where to start returning records from.
         :param str order: The order in which to return rows, "asc" or "desc".
         :param int limit: Maximum number of records to return.
+        :param bool include_failed: Set to `True` to include failed transactions in results.
         :return: The transactions contained in a single ledger.
         :rtype: dict
 
         """
         endpoint = '/ledgers/{ledger_id}/transactions'.format(
             ledger_id=ledger_id)
-        params = self.__query_params(cursor=cursor, order=order, limit=limit)
+        params = self.__query_params(cursor=cursor, order=order, limit=limit, include_failed=include_failed)
         return self.query(endpoint, params)
 
     def effects(self, cursor=None, order='asc', limit=10, sse=False):
@@ -631,7 +637,7 @@ class Horizon(object):
         params = self.__query_params(cursor=cursor, order=order, limit=limit)
         return self.query(endpoint, params, sse)
 
-    def operations(self, cursor=None, order='asc', limit=10, sse=False):
+    def operations(self, cursor=None, order='asc', limit=10, include_failed=False, sse=False):
         """This endpoint represents all operations that are part of validated
         transactions.
 
@@ -643,13 +649,14 @@ class Horizon(object):
         :type cursor: int, str
         :param str order: The order in which to return rows, "asc" or "desc".
         :param int limit: Maximum number of records to return.
+        :param bool include_failed: Set to `True` to include operations of failed transactions in results.
         :param bool sse: Use server side events for streaming responses.
         :return: A list of all operations.
         :rtype: dict
 
         """
         endpoint = '/operations'
-        params = self.__query_params(cursor=cursor, order=order, limit=limit)
+        params = self.__query_params(cursor=cursor, order=order, limit=limit, include_failed=include_failed)
         return self.query(endpoint, params, sse)
 
     def operation(self, op_id):
@@ -864,7 +871,16 @@ class Horizon(object):
         return self.query(endpoint)
 
     def __query_params(self, **kwargs):
-        params = {k: v for k, v in kwargs.items() if v is not None}
+        params = {}
+        for k, v in kwargs.items():
+            if v is None:
+                pass
+            elif v is True:
+                params[k] = 'true'
+            elif v is False:
+                params[k] = 'false'
+            else:
+                params[k] = v
         return params
 
 
