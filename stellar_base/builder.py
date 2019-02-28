@@ -32,9 +32,8 @@ class Builder(object):
         transaction with (must be the *current* sequence number of the source
         account)
     :type sequence: int, str
-    :param int fee: The network base fee is currently set to
-        100 stroops (0.00001 lumens). Transaction fee is equal to base fee
-        times number of operations in this transaction.
+    :param int fee: Base fee in stroops. The network base fee is obtained by default from the latest ledger.
+        Transaction fee is equal to base fee times number of operations in this transaction.
     """
 
     def __init__(self,
@@ -43,7 +42,7 @@ class Builder(object):
                  horizon_uri=None,
                  network=None,
                  sequence=None,
-                 fee=100):
+                 fee=None):
         if secret:
             self.keypair = Keypair.from_seed(secret)
             self.address = self.keypair.address().decode()
@@ -77,10 +76,15 @@ class Builder(object):
             self.sequence = self.get_sequence()
         else:
             self.sequence = None
+
+        if fee is None:
+            self.fee = self.horizon.base_fee()
+        else:
+            self.fee = fee
+
         self.ops = []
         self.time_bounds = None
         self.memo = memo.NoneMemo()
-        self.fee = fee
         self.tx = None
         self.te = None
 
