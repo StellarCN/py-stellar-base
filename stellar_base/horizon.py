@@ -870,6 +870,20 @@ class Horizon(object):
         endpoint = '/metrics'
         return self.query(endpoint)
 
+    def fee_stats(self):
+        """This endpoint gives useful information about fee stats in the last 5 ledgers.
+        It can be used to predict a fee set on the transaction that will be submitted to the network.
+
+
+        `GET /fee_stats
+        <https://www.stellar.org/developers/horizon/reference/endpoints/fee-stats.html>`_
+
+        :return: Useful information about fee stats in the last 5 ledgers.
+        :rtype: dict
+        """
+        endpoint = '/fee_stats'
+        return self.query(endpoint)
+
     def __query_params(self, **kwargs):
         params = {}
         for k, v in kwargs.items():
