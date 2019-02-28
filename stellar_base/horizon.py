@@ -884,6 +884,19 @@ class Horizon(object):
         endpoint = '/fee_stats'
         return self.query(endpoint)
 
+    def base_fee(self):
+        """Fetch the base fee from the latest ledger.
+        In the future, we'll fetch the base fee from `/fee_stats`
+        :return: base free
+        :rtype: int
+        """
+        latest_ledger = self.ledgers(order='desc', limit=1)
+        try:
+            base_fee = latest_ledger['_embedded']['records'][0]['base_fee_in_stroops']
+        except (KeyError, IndexError):
+            base_fee = 100
+        return base_fee
+
     def __query_params(self, **kwargs):
         params = {}
         for k, v in kwargs.items():
