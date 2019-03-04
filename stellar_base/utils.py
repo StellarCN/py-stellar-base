@@ -264,7 +264,7 @@ def is_valid_secret_key(secret):
 
 def convert_hex_to_bytes(value):
     # Not perfect but works on Python2 and Python3
-    if len is None:
+    if value is None:
         raise NotValidParamError("Value should be 32 byte hash or hex encoded string, but got `None`")
     length = len(value)
     if length == 32:
