@@ -13,8 +13,8 @@ from .exceptions import MissingSigningKeyError, BadSignatureError, NotValidParam
 try:
     # noinspection PyUnresolvedReferences
     import ed25519
-except ImportError:
-    from pure25519 import ed25519_oop as ed25519
+except ImportError:  # pragma: no cover
+    from pure25519 import ed25519_oop as ed25519  # pragma: no cover
 
 import hashlib
 

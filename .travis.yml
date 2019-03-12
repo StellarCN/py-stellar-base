@@ -10,18 +10,11 @@ services:
 cache:
   - pip
 
-before_install:
-  - docker pull zulucrypto/stellar-integration-test-network
-  - make start
-
 install:
   - make init
 
 script:
-  - make test
-
-after_script:
-  - make stop
+  - make testnet
 
 after_success:
   - make codecov

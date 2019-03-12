@@ -1,8 +1,10 @@
 from unittest import TestCase
+
+import pytest
 from pytest import raises
 
 from stellar_base.keypair import Keypair
-from stellar_base.exceptions import MissingSigningKeyError, NotValidParamError
+from stellar_base.exceptions import MissingSigningKeyError, NotValidParamError, BadSignatureError
 
 
 class KeypairTest(TestCase):
@@ -11,6 +13,8 @@ class KeypairTest(TestCase):
         cls.mnemonic = ('illness spike retreat truth genius clock brain pass '
                         'fit cave bargain toe')
         cls.keypair0 = Keypair.deterministic(cls.mnemonic)
+        cls.sign_data = "hello".encode()
+        cls.signature = b"\xa3[\xd8Z\xa3\x8a\xb3h'\xdf0\x0e\xf3\xff\x19C\xdf\xc6\xfb\xfb\xe4\xd9\x8c\x9f\x99\xbdU\x11\xf6.\xb1`\x815\xe9\xcd\x81\x006\xe0&\xb3 \x98\xe4w\xe0\x15`\x92s\xd3;h\xc1\x10P&\xec\xbf=\x17\xc5\x07"
 
     def test_from_seed(self):
         keypair = Keypair.from_seed(self.keypair0.seed())
@@ -22,6 +26,26 @@ class KeypairTest(TestCase):
 
     def test_init_wrong_type_key_raise(self):
         raises(NotValidParamError, Keypair, self.mnemonic)
+
+    def test_xdr(self):
+        assert self.keypair0.xdr() == b'AAAAAONyaDCgtgy19SyETP/NTu1l66XBVeibJkEVYnJOceVE'
+
+    def test_sign(self):
+        assert self.keypair0.sign("hello".encode()) == self.signature
+
+    def test_verify(self):
+        assert self.keypair0.verify(self.sign_data, self.signature) is None
+
+    def test_bad_signature_raise(self):
+        with pytest.raises(BadSignatureError, match="Signature verification failed."):
+            self.keypair0.verify(self.sign_data + " ".encode(), self.signature)
+
+    def test_old_style_base58_keypair(self):
+        seed = 'sfjCwvnEU9HuTDtJB8f8sn4Z4fLMT7p3DiJQvCTHf1pJ1JYxeQP'
+        address = 'gHAXa8zgoJJ4cyJbrdt6LxuwJaU3oTqouv'
+        kp = Keypair.from_base58_seed(seed)
+        assert kp.to_old_address() == address
+        assert kp.to_old_seed() == seed
 
 
 class Sep0005Test(TestCase):

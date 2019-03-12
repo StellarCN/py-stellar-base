@@ -75,7 +75,7 @@ class Builder(object):
         elif self.address:
             self.sequence = self.get_sequence()
         else:
-            self.sequence = None
+            self.sequence = None  # Do we need this? Doesn't the address always exist?
 
         if fee is None:
             self.fee = self.horizon.base_fee()
@@ -123,7 +123,7 @@ class Builder(object):
         op = operation.CreateAccount(destination, starting_balance, source)
         return self.append_op(op)
 
-    def append_trust_op(self, destination, code, limit=None, source=None):
+    def append_trust_op(self, destination, code, limit=None, source=None):  # pragma: no cover
         """append_trust_op will be deprecated in the future, use append_change_trust_op instead.
         Append a :class:`ChangeTrust <stellar_base.operation.ChangeTrust>`
         operation to the list of operations.
@@ -138,9 +138,10 @@ class Builder(object):
         warnings.warn(
             "append_trust_op will be deprecated in the future, use append_change_trust_op instead.",
             PendingDeprecationWarning
-        )
+        )  # pragma: no cover
 
-        return self.append_change_trust_op(asset_code=code, asset_issuer=destination, limit=limit, source=source)
+        return self.append_change_trust_op(asset_code=code, asset_issuer=destination, limit=limit,
+                                           source=source)  # pragma: no cover
 
     def append_change_trust_op(self, asset_code, asset_issuer, limit=None, source=None):
         """Append a :class:`ChangeTrust <stellar_base.operation.ChangeTrust>`
@@ -563,7 +564,7 @@ class Builder(object):
         memo_return = memo.RetHashMemo(memo_return)
         return self.add_memo(memo_return)
 
-    def add_time_bounds(self, time_bounds):
+    def add_time_bounds(self, time_bounds):  # TODO: time_bounds -> min_time and max_time
         """Add a time bound to this transaction.
 
         Add a UNIX timestamp, determined by ledger time, of a lower and
@@ -615,7 +616,7 @@ class Builder(object):
                                asset_issuer, source)
         memo_type = fed_info.get('memo_type')
         if memo_type is not None and memo_type in ('text', 'id', 'hash'):
-            getattr(self, 'add_' + memo_type + '_memo')(fed_info['memo'])
+            getattr(self, 'add_' + memo_type.lower() + '_memo')(fed_info['memo'])
 
     def gen_tx(self):
         """Generate a :class:`Transaction
@@ -629,7 +630,7 @@ class Builder(object):
         """
         if not self.address:
             raise StellarAddressInvalidError('Transaction does not have any source address.')
-        if not self.sequence:
+        if self.sequence is None:
             raise SequenceError('No sequence is present, maybe not funded?')
         tx = Transaction(
             source=self.address,

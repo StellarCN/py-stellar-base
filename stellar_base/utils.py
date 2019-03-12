@@ -16,9 +16,9 @@ from pbkdf2 import PBKDF2
 
 try:
     from crc16 import crc16xmodem
-except ImportError:
+except ImportError:  # pragma: no cover
     # see: https://github.com/StellarCN/py-stellar-base/issues/160
-    from .purecrc16 import crc16xmodem
+    from .purecrc16 import crc16xmodem  # pragma: no cover
 
 from .stellarxdr import Xdr
 from .exceptions import DecodeError, ConfigurationError, MnemonicError, StellarAddressInvalidError, \
@@ -100,7 +100,7 @@ def decode_check(version_byte_name, encoded):
     except binascii.Error:
         raise DecodeError('Incorrect padding.')
 
-    if encoded != base64.b32encode(decoded):
+    if encoded != base64.b32encode(decoded):  # Is that even possible?
         raise DecodeError('Invalid encoded bytes.')
 
     version_byte = decoded[0:1]

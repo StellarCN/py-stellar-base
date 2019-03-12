@@ -143,7 +143,7 @@ class Operation(object):
 
     @classmethod
     def type_code(cls):
-        pass
+        pass  # pragma: no cover
 
     @classmethod
     def from_xdr_object(cls, operation):

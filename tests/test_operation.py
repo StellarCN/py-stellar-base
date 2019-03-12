@@ -1,4 +1,5 @@
 # coding:utf-8
+import os
 import sys
 import mock
 import pytest
@@ -24,8 +25,8 @@ def test_to_xdr_amount_raise(s, error_type):
 
 
 @pytest.mark.parametrize("num, s", [
-    (10**7, "1"),
-    (20 * 10**7, "20"),
+    (10 ** 7, "1"),
+    (20 * 10 ** 7, "20"),
     (1234567, "0.1234567"),
     (112345678, "11.2345678"),
 ])
@@ -71,6 +72,15 @@ def _load_operations():
              dest_amount=amount,
              path=[],
          )),
+        ("path_payment",
+         PathPayment(
+             destination=DEST,
+             send_asset=Asset.native(),
+             dest_asset=Asset.native(),
+             send_max=amount,
+             dest_amount=amount,
+             path=[Asset('MOE', DEST)],
+         )),
         ("allow_trust_short_asset",
          AllowTrust(
              source=SOURCE,
@@ -92,6 +102,7 @@ def _load_operations():
              amount="100",
              price=3.14159,
              offer_id=1,
+             source=SOURCE
          )),
         ("manage_offer_dict_price",
          ManageOffer(
@@ -110,8 +121,24 @@ def _load_operations():
              buying=Asset('beer', DEST),
              amount="100",
              price=3.14159,
+             source=SOURCE
+         )),
+        ("create_passive_dict_offer",
+         CreatePassiveOffer(
+             selling=Asset('beer', SOURCE),
+             buying=Asset('beer', DEST),
+             amount="100",
+             price={
+                 'n': 314159,
+                 'd': 100000
+             }
          )),
         ("set_options_empty", SetOptions()),
+        ("set_options_ed25519PublicKey", SetOptions(signer_type='ed25519PublicKey', signer_address=DEST, signer_weight=1)),
+        ("set_options_hashX", SetOptions(signer_type='hashX', signer_address=os.urandom(32), signer_weight=2)),
+        ("set_options_preAuthTx", SetOptions(signer_type='preAuthTx', signer_address=os.urandom(32), signer_weight=3)),
+        ("set_options_inflation_dest",
+         SetOptions(inflation_dest=DEST, source=SOURCE)),
         ("change_trust_min",
          ChangeTrust(source=SOURCE, asset=Asset('beer', DEST), limit='100')),
         ("change_trust_default_limit",
@@ -127,7 +154,16 @@ def _load_operations():
              data_name='1KFHE7w8BhaENAswwryaoccDb6qcT6DbYY',
              data_value=SOURCE,
          )),
+        ("manage_data_none",
+         ManageData(
+             data_name='1KFHE7w8BhaENAswwryaoccDb6qcT6DbYY',
+             data_value=None,
+         )),
         ("bump_sequence", BumpSequence(
+            source=SOURCE,
+            bump_to=23333114514
+        )),
+        ("bump_sequence_no_source", BumpSequence(
             bump_to=23333114514
         ))
     ]
@@ -141,7 +177,7 @@ def test_operation(name, operation):
     original.pop("body")
     restored = dict(operation_restored.__dict__)
     restored.pop("body")
-    if name == 'manage_offer_dict_price':
+    if name == 'manage_offer_dict_price' or name == 'create_passive_dict_offer':
         original['price'] = float(original['price']['n']) / float(
             original['price']['d'])
     if name == 'manage_data':  # return `bytes` now
@@ -173,3 +209,15 @@ def test_manage_offer_dict_price_raises():
             price={},
             offer_id=1,
         ).xdr()
+
+
+def test_set_options_signer_raises():
+    op = SetOptions(signer_address=SOURCE)
+    assert op == SetOptions(signer_address=SOURCE, signer_type='ed25519PublicKey')
+
+    with pytest.raises(StellarAddressInvalidError, match='Must be a valid stellar address if not give signer_type'):
+        SetOptions(signer_address=SOURCE + 'ERROR')
+
+    with pytest.raises(NotValidParamError,
+                       match='Invalid signer type, sign_type should be ed25519PublicKey, hashX or preAuthTx'):
+        SetOptions(signer_address=SOURCE, signer_type='bad_type')
