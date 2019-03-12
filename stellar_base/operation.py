@@ -55,7 +55,7 @@ class Operation(object):
         """
         try:
             source_account = [account_xdr_object(self.source)]
-        except TypeError:
+        except StellarAddressInvalidError:
             source_account = []
         return Xdr.types.Operation(source_account, self.body)
 
