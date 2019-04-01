@@ -11,6 +11,8 @@ requests = ">=2.20.0"
 toml = "~=0.9.4"
 six = "~=1.11.0"
 stellar-base-sseclient = "==0.0.21"
+aiohttp = "*"
+aiohttp-sse-client = "*"
 
 [dev-packages]
 pytest = "*"

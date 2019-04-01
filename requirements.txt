@@ -6,3 +6,5 @@ six==1.11.0
 stellar-base-sseclient==0.0.21
 toml==0.9.4
 mnemonic==0.18
+aiohttp==3.5.4
+aiohttp-sse-client==0.1.4
