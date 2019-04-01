@@ -1,6 +1,5 @@
 # coding: utf-8
 from __future__ import print_function
-import sys
 import base64
 import binascii
 from decimal import Decimal, ROUND_FLOOR
@@ -23,10 +22,6 @@ except ImportError:  # pragma: no cover
 from .stellarxdr import Xdr
 from .exceptions import DecodeError, ConfigurationError, MnemonicError, StellarAddressInvalidError, \
     StellarSecretInvalidError, NotValidParamError, NoApproximationError
-
-# Compatibility for Python 3.x that don't have unicode type
-if sys.version_info.major == 3:
-    unicode = str
 
 bytes_types = (bytes, bytearray)  # Types acceptable as binary data
 versionBytes = {
@@ -75,7 +70,7 @@ def hashX_sign_decorated(preimage):
 def bytes_from_decode_data(s):
     """copy from base64._bytes_from_decode_data
     """
-    if isinstance(s, (str, unicode)):
+    if isinstance(s, str):
         try:
             return s.encode('ascii')
         except UnicodeEncodeError:
@@ -143,8 +138,6 @@ def calculate_checksum(payload):
 def best_rational_approximation(x):
     x = Decimal(x)
     INT32_MAX = Decimal(2147483647)
-    a = None
-    f = None
     fractions = [[Decimal(0), Decimal(1)], [Decimal(1), Decimal(0)]]
     i = 2
     while True:
@@ -263,13 +256,10 @@ def is_valid_secret_key(secret):
 
 
 def convert_hex_to_bytes(value):
-    # Not perfect but works on Python2 and Python3
-    if value is None:
-        raise NotValidParamError("Value should be 32 byte hash or hex encoded string, but got `None`")
     length = len(value)
-    if length == 32:
+    if length == 32 and isinstance(value, bytes):
         return value
-    elif length == 64:
+    elif length == 64 and isinstance(value, str):
         return binascii.unhexlify(value)
     else:
         raise NotValidParamError("Value should be 32 byte hash or hex encoded string, but got {}".format(value))

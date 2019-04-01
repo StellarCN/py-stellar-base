@@ -132,6 +132,7 @@ class Asset(object):
         if asset_xdr_object.type == Xdr.const.ASSET_TYPE_NATIVE:
             return Asset.native()
         elif asset_xdr_object.type == Xdr.const.ASSET_TYPE_CREDIT_ALPHANUM4:
+            # TODO: clean up
             issuer = encode_check(
                 'account', asset_xdr_object.alphaNum4.issuer.ed25519).decode()
             code = asset_xdr_object.alphaNum4.assetCode.decode().rstrip('\x00')

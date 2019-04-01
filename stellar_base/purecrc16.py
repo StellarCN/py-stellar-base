@@ -46,9 +46,8 @@ def _crc16(data, crc, table):
     :param list table: Table for caclulating CRC (list of 256 integers)
     :return: calculated value of CRC
     """
-    bytes_to_int = lambda x: ord(x) if sys.version_info.major == 2 else x
     for byte in data:
-        crc = ((crc << 8) & 0xff00) ^ table[((crc >> 8) & 0xff) ^ bytes_to_int(byte)]
+        crc = ((crc << 8) & 0xff00) ^ table[((crc >> 8) & 0xff) ^ byte]
     return crc & 0xffff
 
 
