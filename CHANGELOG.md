@@ -1,6 +1,10 @@
 Release History
 ===============
 
+### Version 1.1.1
+Released on April 1, 2019
+  - Small bug fixes.
+
 ### Version 1.1.0
 Released on February 28, 2019
   - Add include_failed parameter to `Horizon.account_operations`, `Horizon.account_transactions`, `Horizon.transactions`,
