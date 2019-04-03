@@ -1,9 +1,10 @@
 from stellar_base.exceptions import NotValidParamError
 from stellar_base.async_support.horizon import Horizon, HORIZON_LIVE, HORIZON_TEST
 from stellar_base.keypair import Keypair
+from stellar_base.address import Address as BaseAddress
 
 
-class Address(object):
+class Address(BaseAddress):
     """The :class:`Address` object, which represents an address (public key) on
     Stellar's network.
 
@@ -31,34 +32,13 @@ class Address(object):
                  secret=None,
                  network='TESTNET',
                  horizon_uri=None):
-        if secret:
-            self.address = Keypair.from_seed(secret).address().decode()
-        elif address:
-            self.address = Keypair.from_address(address).address().decode()
-        else:
-            raise NotValidParamError('oops, need a stellar address or secret')
-
-        if network.upper() != 'PUBLIC':
-            self.network = 'TESTNET'
-        else:
-            self.network = 'PUBLIC'
-
+        super().__init__(address, secret, network, horizon_uri)
         if horizon_uri:
             self.horizon = Horizon(horizon_uri)
         elif network.upper() == 'PUBLIC':
             self.horizon = Horizon(HORIZON_LIVE)
         else:
             self.horizon = Horizon(HORIZON_TEST)
-
-        self.sequence = None
-        self.balances = None
-        self.paging_token = None
-        self.thresholds = None
-        self.flags = None
-        self.signers = None
-        self.data = None
-        self.inflation_destination = None
-        self.subentry_count = None
 
     async def get(self):
         """Retrieve the account data that corresponds to this :class:`Address`.

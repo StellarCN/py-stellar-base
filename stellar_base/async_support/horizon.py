@@ -912,7 +912,7 @@ class Horizon(object):
                 params[k] = v
         return params
 
-    async def close(self) -> None:
+    async def close(self):
         """Close the connection to horizon"""
         await self._session.__aexit__(None, None, None)
         if self._sse_session is not None:
