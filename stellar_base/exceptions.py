@@ -40,6 +40,7 @@ class HorizonError(StellarError):
     Stellar Horizon.
 
     """
+
     def __init__(self, msg, status_code):
         super(HorizonError, self).__init__(msg)
         self.message = msg
@@ -74,8 +75,12 @@ class MissingSigningKeyError(StellarError):
     pass
 
 
-class FederationError(Exception):
+class FederationError(StellarError):
     """A :exc:`FederationError` that represents an issue stemming from
     Stellar Federation.
 
     """
+
+
+class WebAuthenticationError(StellarError):
+    pass
