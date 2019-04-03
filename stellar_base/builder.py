@@ -48,7 +48,6 @@ class Builder(object):
             self.address = self.keypair.address().decode()
         else:
             self.keypair = None
-            self.address = None
 
         if address is None and secret is None:
             raise NoStellarSecretOrAddressError('Stellar secret or address is required.')
@@ -72,16 +71,10 @@ class Builder(object):
 
         if sequence:
             self.sequence = int(sequence)
-        elif self.address:
-            self.sequence = self.get_sequence()
         else:
             self.sequence = None  # Do we need this? Doesn't the address always exist?
 
-        if fee is None:
-            self.fee = self.horizon.base_fee()
-        else:
-            self.fee = fee
-
+        self.fee = fee
         self.ops = []
         self.time_bounds = None
         self.memo = memo.NoneMemo()
@@ -630,8 +623,14 @@ class Builder(object):
         """
         if not self.address:
             raise StellarAddressInvalidError('Transaction does not have any source address.')
+
+        if self.sequence is None:
+            self.sequence = self.get_sequence()
         if self.sequence is None:
             raise SequenceError('No sequence is present, maybe not funded?')
+        if self.fee is None:
+            self.fee = self.get_fee()
+
         tx = Transaction(
             source=self.address,
             sequence=self.sequence,
@@ -812,3 +811,6 @@ class Builder(object):
 
         address = self.horizon.account(self.address)
         return int(address.get('sequence'))
+
+    def get_fee(self):
+        return self.horizon.base_fee()
