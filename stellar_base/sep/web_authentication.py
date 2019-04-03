@@ -42,6 +42,7 @@ def get_jwt(domain, account, allow_http=False):
         try:
             server_keypair.verify(hash, signature.signature)
             valid = True
+            break
         except BadSignatureError:
             pass
 
