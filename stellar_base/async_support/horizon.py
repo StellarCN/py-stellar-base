@@ -1,4 +1,3 @@
-# coding: utf-8
 import json
 import asyncio
 from functools import wraps
@@ -8,9 +7,9 @@ import aiohttp
 
 from aiohttp_sse_client.client import EventSource as SSEClient
 
-from ..version import __version__
-from ..asset import Asset
-from ..exceptions import HorizonError, HorizonRequestError, NotValidParamError
+from stellar_base.version import __version__
+from stellar_base.asset import Asset
+from stellar_base.exceptions import HorizonError, HorizonRequestError, NotValidParamError
 
 import logging
 
@@ -141,19 +140,17 @@ class Horizon(object):
 
         return check_horizon_reply(reply)
 
-    async def query(self, rel_url, params=None, sse=False,
-                    sse_timeout=None):
+    async def query(self, rel_url, params=None, sse=False):
         """
         Send a query to horizon
         :param rel_url: The relative path
         :param params: Parameters to include in the query
         :param sse: Should SSE be used
-        :param sse_timeout: How long to wait for a new sse event
         :return: The response from horizon
         """
         abs_url = urljoin(self.horizon_uri, rel_url)
         try:
-            reply = await self._get(abs_url, params, sse, sse_timeout=sse_timeout)
+            reply = await self._get(abs_url, params, sse)
         except (aiohttp.ClientConnectionError, aiohttp.ContentTypeError) as e:
             raise HorizonRequestError(e)
 
@@ -166,7 +163,6 @@ class Horizon(object):
         :param url: The url to send a request to
         :param params: Parameters to include in the request
         :param sse: Should SSE be used
-        :param sse_timeout: How long to wait for a new sse event
         :return: The response from the http request
         """
         if not sse:

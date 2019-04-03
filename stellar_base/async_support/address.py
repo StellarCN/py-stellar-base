@@ -1,7 +1,6 @@
-from ..exceptions import NotValidParamError
-from .horizon import Horizon
-from ..keypair import Keypair
-from .horizon import HORIZON_LIVE, HORIZON_TEST
+from stellar_base.exceptions import NotValidParamError
+from stellar_base.async_support.horizon import Horizon, HORIZON_LIVE, HORIZON_TEST
+from stellar_base.keypair import Keypair
 
 
 class Address(object):
@@ -105,7 +104,8 @@ class Address(object):
         :param bool sse: Use server side events for streaming responses.
 
         """
-        return await self.horizon.account_payments(address=self.address, cursor=cursor, order=order, limit=limit, sse=sse)
+        return await self.horizon.account_payments(address=self.address, cursor=cursor, order=order, limit=limit,
+                                                   sse=sse)
 
     async def offers(self, cursor=None, order='asc', limit=10, sse=False):
         """Retrieve the offers JSON from this instance's Horizon server.
