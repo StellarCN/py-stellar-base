@@ -10,7 +10,7 @@ from aiohttp_sse_client.client import EventSource as SSEClient
 
 from ..version import __version__
 from ..asset import Asset
-from ..exceptions import HorizonError, HorizonRequestError
+from ..exceptions import HorizonError, HorizonRequestError, NotValidParamError
 
 import logging
 
@@ -160,7 +160,7 @@ class Horizon(object):
         return check_horizon_reply(reply) if not sse else reply
 
     @_retry
-    async def _get(self, url, params=None, sse=False, sse_timeout=None):
+    async def _get(self, url, params=None, sse=False):
         """
         Send a get request
         :param url: The url to send a request to
@@ -175,7 +175,8 @@ class Horizon(object):
 
         # If SSE is enabled, Horizon will fetch the user-agent from the URL query params. Maybe it's not a good design.
         params.update(USER_AGENT)
-        return self.sse_generator(url, sse_timeout)
+        await self._init_sse_session()
+        return SSEGenerator(url, self._sse_session)
 
     @_retry
     async def _post(self, url, params=None):
@@ -187,58 +188,6 @@ class Horizon(object):
         """
         async with self._session.post(url, params=params) as response:
             return await response.json(encoding='utf-8')
-
-    async def sse_generator(self, url, timeout):
-        """
-        SSE generator with timeout between events
-        :param url: URL to send SSE request to
-        :param timeout: The time to wait for a a new event
-        :return: AsyncGenerator[dict]
-        """
-
-        async def _sse_generator():
-            """
-            Generator for sse events
-            :rtype AsyncGenerator[dict]
-            """
-            last_id = 'now'  # Start monitoring from now.
-            retry = 0.1
-            while True:
-                try:
-                    """
-                    Create a new SSEClient:
-                    Using the last id as the cursor
-                    Headers are needed because of a bug that makes "params" override the default headers
-                    """
-                    async with SSEClient(url, session=self._sse_session,
-                                         params={'cursor': last_id},
-                                         headers=USER_AGENT) as client:
-                        """
-                        We want to throw a TimeoutError if we didnt get any event in the last x seconds.
-                        read_timeout in aiohttp is not implemented correctly https://github.com/aio-libs/aiohttp/issues/1954
-                        So we will create our own way to do that.
-                        Note that the timeout starts from the first event forward. There is no until we get the first event.
-                        """
-                        async for event in client:
-                            if event.last_event_id != '':
-                                # Events that dont have an id are not useful for us (hello/byebye events)
-                                # Save the last event id and retry time
-                                last_id = event.last_event_id
-                                retry = client._reconnection_time
-                                try:
-                                    yield json.loads(event.data)  # TODO: 3.5 support
-                                except json.JSONDecodeError:
-                                    # Content was not json-decodable
-                                    pass
-                except aiohttp.ClientPayloadError:
-                    # Retry if the connection dropped after we got the initial response
-                    logger.debug('Resetting SSE connection for {} after timeout'.format(url))
-                    await asyncio.sleep(retry.total_seconds())
-
-        await self._init_sse_session()
-        gen = _sse_generator()
-        while True:
-            yield await asyncio.wait_for(gen.__anext__(), timeout)  # TODO: 3.5 support
 
     async def account(self, address):
         """Returns information and links relating to a single account.
@@ -988,3 +937,53 @@ def horizon_testnet():
 def horizon_livenet():
     """Create a Horizon instance utilizing SDF's Live Network."""
     return Horizon(HORIZON_LIVE)
+
+
+class SSEGenerator:
+    def __init__(self, url, session, cursor):
+        """
+        Generator for sse events
+        :param str url: URL to send SSE request to
+        :param ClientSession session: client session
+        :param cursor: A paging token, specifying where to start returning records from.
+            this can be set to "now" to stream object created since your request time.
+        :type cursor: int, str
+        """
+        self.url = url
+        self.cursor = cursor
+        self.retry = 0.1
+        self.session = session
+
+    def __aiter__(self):
+        return self
+
+    async def __anext__(self):
+        while True:
+            try:
+                """
+                Create a new SSEClient:
+                Using the last id as the cursor
+                Headers are needed because of a bug that makes "params" override the default headers
+                """
+                async with SSEClient(url=self.url, session=self.session,
+                                     params={'cursor': self.cursor}, headers=USER_AGENT) as client:
+                    """¸
+                    We want to throw a TimeoutError if we didnt get any event in the last x seconds.
+                    read_timeout in aiohttp is not implemented correctly https://github.com/aio-libs/aiohttp/issues/1954
+                    So we will create our own way to do that.
+                    Note that the timeout starts from the first event forward. There is no until we get the first event.
+                    """
+                    async for event in client:
+                        if event.last_event_id != '':
+                            # Events that dont have an id are not useful for us (hello/byebye events)
+                            # Save the last event id and retry time
+                            self.last_id = event.last_event_id
+                            self.retry = client._reconnection_time
+                            try:
+                                return json.loads(event.data)
+                            except json.JSONDecodeError:
+                                # Content was not json-decodable
+                                pass
+            except aiohttp.ClientPayloadError:
+                # Retry if the connection dropped after we got the initial response
+                await asyncio.sleep(self.retry.total_seconds())
