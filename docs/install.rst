@@ -7,27 +7,11 @@ Installation
 Via pipenv or pip (Recommended)
 ===============================
 
-To install py-stellar-base, use pipenv to install the module, there are two packages here, please choose one of them:
-
-* The package is built automatically by Travis-CI. |stellar-sdk-image|
-
-.. |stellar-sdk-image| image:: https://img.shields.io/pypi/v/stellar-sdk.svg?style=flat-square&maxAge=1800
-    :alt: PyPI
-    :target: https://pypi.python.org/pypi/stellar-sdk
+To install py-stellar-base, use pipenv to install the module:
 
 .. code-block:: text
 
     pipenv install stellar-sdk
-
-* The package is maintained by antb123. |stellar-base-image|
-
-.. |stellar-base-image| image:: https://img.shields.io/pypi/v/stellar-base.svg?style=flat-square&maxAge=1800
-    :alt: PyPI
-    :target: https://pypi.python.org/pypi/stellar-base
-
-.. code-block:: text
-
-    pipenv install stellar-base
 
 If you're not using `pipenv <https://docs.pipenv.org/>`_, you should.
 Otherwise, you can install it via plain old ``pip``. More on installing Python

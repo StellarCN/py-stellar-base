@@ -1,6 +1,9 @@
 py-stellar-base
 ===============
 
+.. image:: https://img.shields.io/pypi/v/stellar-sdk.svg?style=flat-square&maxAge=1800
+    :alt: PyPI
+    :target: https://pypi.python.org/pypi/stellar-sdk
 .. image:: https://img.shields.io/travis/StellarCN/py-stellar-base.svg?style=flat-square&maxAge=1800
     :alt: Travis (.org)
     :target: https://travis-ci.org/StellarCN/py-stellar-base/
@@ -26,27 +29,12 @@ It provides:
 Installing
 ----------
 
-Install from pypi, there are two packages here, please choose one of them:
-
-* The package is built automatically by Travis-CI. |stellar-sdk-image|
-
-.. |stellar-sdk-image| image:: https://img.shields.io/pypi/v/stellar-sdk.svg?style=flat-square&maxAge=1800
-    :alt: PyPI
-    :target: https://pypi.python.org/pypi/stellar-sdk
+Install from pypi:
 
 .. code-block:: text
 
     pip install -U stellar-sdk
 
-* The package is maintained by antb123. |stellar-base-image|
-
-.. |stellar-base-image| image:: https://img.shields.io/pypi/v/stellar-base.svg?style=flat-square&maxAge=1800
-    :alt: PyPI
-    :target: https://pypi.python.org/pypi/stellar-base
-
-.. code-block:: text
-
-    pip install -U stellar-base
 
 Install from latest source code(*may be unstable*):
 
