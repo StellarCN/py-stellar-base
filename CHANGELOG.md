@@ -1,6 +1,10 @@
 Release History
 ===============
 
+### Version 1.1.2
+Released on April 17, 2019
+  - Upgraded some dependencies.
+
 ### Version 1.1.1
 Released on April 1, 2019
   - Small bug fixes.
