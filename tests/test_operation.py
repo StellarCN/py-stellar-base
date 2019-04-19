@@ -1,4 +1,5 @@
 # coding:utf-8
+import copy
 import os
 import sys
 import mock
@@ -134,7 +135,8 @@ def _load_operations():
              }
          )),
         ("set_options_empty", SetOptions()),
-        ("set_options_ed25519PublicKey", SetOptions(signer_type='ed25519PublicKey', signer_address=DEST, signer_weight=1)),
+        ("set_options_ed25519PublicKey",
+         SetOptions(signer_type='ed25519PublicKey', signer_address=DEST, signer_weight=1)),
         ("set_options_hashX", SetOptions(signer_type='hashX', signer_address=os.urandom(32), signer_weight=2)),
         ("set_options_preAuthTx", SetOptions(signer_type='preAuthTx', signer_address=os.urandom(32), signer_weight=3)),
         ("set_options_inflation_dest",
@@ -221,3 +223,11 @@ def test_set_options_signer_raises():
     with pytest.raises(NotValidParamError,
                        match='Invalid signer type, sign_type should be ed25519PublicKey, hashX or preAuthTx'):
         SetOptions(signer_address=SOURCE, signer_type='bad_type')
+
+
+def test_deepcopy():
+    payment = Payment(SOURCE, Asset('XLM'), '1')
+    payment_copy1 = copy.deepcopy(payment)
+    xdr = payment.xdr()
+    payment_copy2 = copy.deepcopy(payment)
+    assert payment_copy1.xdr() == payment_copy2.xdr() == xdr
