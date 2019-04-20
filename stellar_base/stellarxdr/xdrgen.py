@@ -1235,7 +1235,7 @@ class union_info(Info):
     def union_getattr(self, prefix=indent):
         # see: https://github.com/StellarCN/py-stellar-base/issues/192
         return "%sdef __getattr__(self, attr):\n" \
-               "%s%sif attr == '__setstate__':\n" \
+               "%s%sif attr is '__setstate__':\n" \
                "%s%s%sraise AttributeError\n" \
                "%s%sreturn getattr(self.switch, attr)\n" % \
                (prefix, prefix, indent, prefix, indent, indent, prefix, indent)
