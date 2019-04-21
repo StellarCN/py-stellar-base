@@ -1,6 +1,10 @@
 Release History
 ===============
 
+### Version 1.1.3
+Released on April 21, 2019
+  - Bugfix: RecursionError during deepcopy on operations object.
+
 ### Version 1.1.2
 Released on April 17, 2019
   - Upgraded some dependencies.
