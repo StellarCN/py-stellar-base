@@ -399,10 +399,94 @@ class Builder(object):
         :return: This builder instance.
 
         """
+        warnings.warn(
+            "append_manage_offer_op has been deprecated, use append_manage_sell_offer_op instead.",
+            DeprecationWarning
+        )  # pragma: no cover
         selling = Asset(selling_code, selling_issuer)
         buying = Asset(buying_code, buying_issuer)
         op = operation.ManageOffer(selling, buying, amount, price, offer_id,
                                    source)
+        return self.append_op(op)
+
+    def append_manage_buy_offer_op(self,
+                                   selling_code,
+                                   selling_issuer,
+                                   buying_code,
+                                   buying_issuer,
+                                   amount,
+                                   price,
+                                   offer_id=0,
+                                   source=None):
+        """Append a :class:`ManageBuyOfferOp <stellar_base.operation.ManageBuyOfferOp>`
+        operation to the list of operations.
+
+        :param str selling_code: The asset code for the asset the offer creator
+            is selling.
+        :param selling_issuer: The issuing address for the asset the offer
+            creator is selling.
+        :type selling_issuer: str, None
+        :param str buying_code: The asset code for the asset the offer creator
+            is buying.
+        :param buying_issuer: The issuing address for the asset the offer
+            creator is selling.
+        :type buying_issuer: str, None
+        :param str amount: Amount being bought. if set to. Set to 0 if you want
+            to delete an existing offer.
+        :param price: Price of thing being bought in terms of what you are selling. You can pass
+            in a number as a string or a dict like `{n: numerator, d: denominator}`
+        :type price: str, dict
+        :param int offer_id: The ID of the offer. 0 for new offer. Set to
+            existing offer ID to update or delete.
+        :param str source: The source address that is managing an offer on
+            Stellar's distributed exchange.
+        :return: This builder instance.
+
+        """
+        selling = Asset(selling_code, selling_issuer)
+        buying = Asset(buying_code, buying_issuer)
+        op = operation.ManageBuyOfferOp(selling, buying, amount, price, offer_id,
+                                        source)
+        return self.append_op(op)
+
+    def append_manage_sell_offer_op(self,
+                                    selling_code,
+                                    selling_issuer,
+                                    buying_code,
+                                    buying_issuer,
+                                    amount,
+                                    price,
+                                    offer_id=0,
+                                    source=None):
+        """Append a :class:`ManageSellOffer <stellar_base.operation.ManageSellOffer>`
+        operation to the list of operations.
+
+        :param str selling_code: The asset code for the asset the offer creator
+            is selling.
+        :param selling_issuer: The issuing address for the asset the offer
+            creator is selling.
+        :type selling_issuer: str, None
+        :param str buying_code: The asset code for the asset the offer creator
+            is buying.
+        :param buying_issuer: The issuing address for the asset the offer
+            creator is selling.
+        :type buying_issuer: str, None
+        :param str amount: Amount of the asset being sold. Set to 0 if you want
+            to delete an existing offer.
+        :param price: Price of 1 unit of selling in terms of buying. You can pass
+            in a number as a string or a dict like `{n: numerator, d: denominator}`
+        :type price: str, dict
+        :param int offer_id: The ID of the offer. 0 for new offer. Set to
+            existing offer ID to update or delete.
+        :param str source: The source address that is managing an offer on
+            Stellar's distributed exchange.
+        :return: This builder instance.
+
+        """
+        selling = Asset(selling_code, selling_issuer)
+        buying = Asset(buying_code, buying_issuer)
+        op = operation.ManageSellOffer(selling, buying, amount, price, offer_id,
+                                       source)
         return self.append_op(op)
 
     def append_create_passive_offer_op(self,
@@ -437,10 +521,53 @@ class Builder(object):
         :return: This builder instance.
 
         """
+        warnings.warn(
+            "append_create_passive_offer_op has been deprecated, use append_create_passive_sell_offer_op instead.",
+            DeprecationWarning
+        )  # pragma: no cover
         selling = Asset(selling_code, selling_issuer)
         buying = Asset(buying_code, buying_issuer)
         op = operation.CreatePassiveOffer(selling, buying, amount, price,
                                           source)
+        return self.append_op(op)
+
+    def append_create_passive_sell_offer_op(self,
+                                            selling_code,
+                                            selling_issuer,
+                                            buying_code,
+                                            buying_issuer,
+                                            amount,
+                                            price,
+                                            source=None):
+        """Append a :class:`CreatePassiveSellOffer
+        <stellar_base.operation.CreatePassiveSellOffer>` operation to the list of
+        operations.
+
+        :param str selling_code: The asset code for the asset the offer creator
+            is selling.
+        :param selling_issuer: The issuing address for the asset the offer
+            creator is selling.
+        :type selling_issuer: str, None
+        :param str buying_code: The asset code for the asset the offer creator
+            is buying.
+        :param buying_issuer: The issuing address for the asset the offer
+            creator is selling.
+        :type buying_issuer: str, None
+        :param str amount: Amount of the asset being sold. Set to 0 if you want
+            to delete an existing offer.
+        :param price: Price of 1 unit of selling in terms of buying. You can pass
+            in a number as a string or a dict like `{n: numerator, d: denominator}`
+        :type price: str, dict
+        :param str source: The source address that is creating a passive offer
+            on Stellar's distributed exchange.
+        :return: This builder instance.
+
+        """
+
+        selling = Asset(selling_code, selling_issuer)
+        buying = Asset(buying_code, buying_issuer)
+        op = operation.CreatePassiveSellOffer(selling, buying, amount, price,
+                                              source)
         return self.append_op(op)
 
     def append_account_merge_op(self, destination, source=None):

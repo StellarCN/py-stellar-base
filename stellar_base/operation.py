@@ -2,6 +2,7 @@
 
 import base64
 import decimal
+import warnings
 from decimal import Context, Decimal, Inexact
 
 from .asset import Asset
@@ -737,11 +738,100 @@ class SetOptions(Operation):
             signer_weight=signer_weight)
 
 
-class ManageOffer(Operation):
-    """The :class:`ManageOffer` object, which represents a ManageOffer
+class ManageBuyOffer(Operation):
+    """The :class:`ManageBuyOffer` object, which represents a ManageBuyOffer
     operation on Stellar's network.
 
-    Creates, updates, or deletes an offer.
+    Creates, updates, or deletes an buy offer.
+
+    If you want to create a new offer set Offer ID to 0.
+
+    If you want to update an existing offer set Offer ID to existing offer ID.
+
+    If you want to delete an existing offer set Offer ID to existing offer ID
+    and set Amount to 0.
+
+    Threshold: Medium
+
+    :param Asset selling: What you're selling.
+    :param Asset buying: What you're buying.
+    :param str amount: Amount being bought. if set to 0, delete the offer.
+    :param price: Price of thing being bought in terms of what you are selling.
+    :type price: str, dict
+    :param int offer_id: If `0`, will create a new offer (default). Otherwise,
+        edits an existing offer.
+    :param str source: The source account (defaults to transaction source).
+
+    """
+
+    @classmethod
+    def type_code(cls):
+        return Xdr.const.MANAGE_BUY_OFFER
+
+    def __init__(self, selling, buying, amount, price, offer_id=0,
+                 source=None):
+        super(ManageBuyOffer, self).__init__(source)
+        self.selling = selling  # Asset
+        self.buying = buying  # Asset
+        self.amount = amount
+        self.price = price
+        self.offer_id = offer_id
+
+    def to_xdr_object(self):
+        """Creates an XDR Operation object that represents this
+        :class:`ManageOffer`.
+
+        """
+        selling = self.selling.to_xdr_object()
+        buying = self.buying.to_xdr_object()
+        price = Operation.to_xdr_price(self.price)
+        price = Xdr.types.Price(price['n'], price['d'])
+
+        amount = Operation.to_xdr_amount(self.amount)
+
+        manage_buy_offer_op = Xdr.types.ManageBuyOfferOp(selling, buying, amount,
+                                                         price, self.offer_id)
+        self.body.type = Xdr.const.MANAGE_BUY_OFFER
+        self.body.manageBuyOfferOp = manage_buy_offer_op
+        return super(ManageBuyOffer, self).to_xdr_object()
+
+    @classmethod
+    def from_xdr_object(cls, op_xdr_object):
+        """Creates a :class:`ManageOffer` object from an XDR Operation
+        object.
+
+        """
+        if not op_xdr_object.sourceAccount:
+            source = None
+        else:
+            source = encode_check(
+                'account', op_xdr_object.sourceAccount[0].ed25519).decode()
+
+        selling = Asset.from_xdr_object(
+            op_xdr_object.body.manageBuyOfferOp.selling)
+        buying = Asset.from_xdr_object(op_xdr_object.body.manageBuyOfferOp.buying)
+        amount = Operation.from_xdr_amount(
+            op_xdr_object.body.manageBuyOfferOp.buyAmount)
+
+        n = op_xdr_object.body.manageBuyOfferOp.price.n
+        d = op_xdr_object.body.manageBuyOfferOp.price.d
+        price = division(n, d)
+        offer_id = op_xdr_object.body.manageBuyOfferOp.offerID
+
+        return cls(
+            source=source,
+            selling=selling,
+            buying=buying,
+            amount=amount,
+            price=price,
+            offer_id=offer_id)
+
+
+class ManageSellOffer(Operation):
+    """The :class:`ManageSellOffer` object, which represents a ManageSellOffer
+    operation on Stellar's network.
+
+    Creates, updates, or deletes an sell offer.
 
     If you want to create a new offer set Offer ID to 0.
 
@@ -767,11 +857,11 @@ class ManageOffer(Operation):
 
     @classmethod
     def type_code(cls):
-        return Xdr.const.MANAGE_OFFER
+        return Xdr.const.MANAGE_SELL_OFFER
 
     def __init__(self, selling, buying, amount, price, offer_id=0,
                  source=None):
-        super(ManageOffer, self).__init__(source)
+        super(ManageSellOffer, self).__init__(source)
         self.selling = selling  # Asset
         self.buying = buying  # Asset
         self.amount = amount
@@ -790,11 +880,11 @@ class ManageOffer(Operation):
 
         amount = Operation.to_xdr_amount(self.amount)
 
-        manage_offer_op = Xdr.types.ManageOfferOp(selling, buying, amount,
-                                                  price, self.offer_id)
-        self.body.type = Xdr.const.MANAGE_OFFER
-        self.body.manageOfferOp = manage_offer_op
-        return super(ManageOffer, self).to_xdr_object()
+        manage_sell_offer_op = Xdr.types.ManageSellOfferOp(selling, buying, amount,
+                                                           price, self.offer_id)
+        self.body.type = Xdr.const.MANAGE_SELL_OFFER
+        self.body.manageSellOfferOp = manage_sell_offer_op
+        return super(ManageSellOffer, self).to_xdr_object()
 
     @classmethod
     def from_xdr_object(cls, op_xdr_object):
@@ -809,15 +899,15 @@ class ManageOffer(Operation):
                 'account', op_xdr_object.sourceAccount[0].ed25519).decode()
 
         selling = Asset.from_xdr_object(
-            op_xdr_object.body.manageOfferOp.selling)
-        buying = Asset.from_xdr_object(op_xdr_object.body.manageOfferOp.buying)
+            op_xdr_object.body.manageSellOfferOp.selling)
+        buying = Asset.from_xdr_object(op_xdr_object.body.manageSellOfferOp.buying)
         amount = Operation.from_xdr_amount(
-            op_xdr_object.body.manageOfferOp.amount)
+            op_xdr_object.body.manageSellOfferOp.amount)
 
-        n = op_xdr_object.body.manageOfferOp.price.n
-        d = op_xdr_object.body.manageOfferOp.price.d
+        n = op_xdr_object.body.manageSellOfferOp.price.n
+        d = op_xdr_object.body.manageSellOfferOp.price.d
         price = division(n, d)
-        offer_id = op_xdr_object.body.manageOfferOp.offerID
+        offer_id = op_xdr_object.body.manageSellOfferOp.offerID
 
         return cls(
             source=source,
@@ -828,25 +918,25 @@ class ManageOffer(Operation):
             offer_id=offer_id)
 
 
-class CreatePassiveOffer(Operation):
-    """The :class:`CreatePassiveOffer` object, which represents a
-    CreatePassiveOffer operation on Stellar's network.
+class CreatePassiveSellOffer(Operation):
+    """The :class:`CreatePassiveSellOffer` object, which represents a
+    CreatePassiveSellOffer operation on Stellar's network.
 
-    A passive offer is an offer that does not act on and take a reverse offer
+    A passive sell offer is an offer that does not act on and take a reverse offer
     of equal price. Instead, they only take offers of lesser price. For
     example, if an offer exists to buy 5 BTC for 30 XLM, and you make a passive
-    offer to buy 30 XLM for 5 BTC, your passive offer does not take the first
+    sell offer to buy 30 XLM for 5 BTC, your passive sell offer does not take the first
     offer.
 
-    Note that regular offers made later than your passive offer can act on and
-    take your passive offer, even if the regular offer is of the same price as
-    your passive offer.
+    Note that regular offers made later than your passive sell offer can act on and
+    take your passive sell offer, even if the regular offer is of the same price as
+    your passive sell offer.
 
-    Passive offers allow market makers to have zero spread. If you want to
+    Passive sell offers allow market makers to have zero spread. If you want to
     trade EUR for USD at 1:1 price and USD for EUR also at 1:1, you can create
-    two passive offers so the two offers don't immediately act on each other.
+    two passive sell offers so the two offers don't immediately act on each other.
 
-    Once the passive offer is created, you can manage it like any other offer
+    Once the passive sell offer is created, you can manage it like any other offer
     using the manage offer operation - see :class:`ManageOffer` for more
     details.
 
@@ -863,10 +953,10 @@ class CreatePassiveOffer(Operation):
 
     @classmethod
     def type_code(cls):
-        return Xdr.const.CREATE_PASSIVE_OFFER
+        return Xdr.const.CREATE_PASSIVE_SELL_OFFER
 
     def __init__(self, selling, buying, amount, price, source=None):
-        super(CreatePassiveOffer, self).__init__(source)
+        super(CreatePassiveSellOffer, self).__init__(source)
         self.selling = selling
         self.buying = buying
         self.amount = amount
@@ -885,11 +975,11 @@ class CreatePassiveOffer(Operation):
 
         amount = Operation.to_xdr_amount(self.amount)
 
-        create_passive_offer_op = Xdr.types.CreatePassiveOfferOp(
+        create_passive_sell_offer_op = Xdr.types.CreatePassiveSellOfferOp(
             selling, buying, amount, price)
-        self.body.type = Xdr.const.CREATE_PASSIVE_OFFER
-        self.body.createPassiveOfferOp = create_passive_offer_op
-        return super(CreatePassiveOffer, self).to_xdr_object()
+        self.body.type = Xdr.const.CREATE_PASSIVE_SELL_OFFER
+        self.body.createPassiveSellOfferOp = create_passive_sell_offer_op
+        return super(CreatePassiveSellOffer, self).to_xdr_object()
 
     @classmethod
     def from_xdr_object(cls, op_xdr_object):
@@ -904,14 +994,14 @@ class CreatePassiveOffer(Operation):
                 'account', op_xdr_object.sourceAccount[0].ed25519).decode()
 
         selling = Asset.from_xdr_object(
-            op_xdr_object.body.createPassiveOfferOp.selling)
+            op_xdr_object.body.createPassiveSellOfferOp.selling)
         buying = Asset.from_xdr_object(
-            op_xdr_object.body.createPassiveOfferOp.buying)
+            op_xdr_object.body.createPassiveSellOfferOp.buying)
         amount = Operation.from_xdr_amount(
-            op_xdr_object.body.createPassiveOfferOp.amount)
+            op_xdr_object.body.createPassiveSellOfferOp.amount)
 
-        n = op_xdr_object.body.createPassiveOfferOp.price.n
-        d = op_xdr_object.body.createPassiveOfferOp.price.d
+        n = op_xdr_object.body.createPassiveSellOfferOp.price.n
+        d = op_xdr_object.body.createPassiveSellOfferOp.price.d
         price = division(n, d)
         return cls(
             source=source,
@@ -1141,3 +1231,19 @@ class BumpSequence(Operation):
 
         bump_to = op_xdr_object.body.bumpSequenceOp.bumpTo
         return cls(source=source, bump_to=bump_to)
+
+
+def ManageOffer(*args, **kwargs):
+    warnings.warn(
+        "ManageOffer has been deprecated, use ManageSellOffer instead.",
+        DeprecationWarning
+    )  # pragma: no cover
+    return ManageSellOffer(*args, **kwargs)
+
+
+def CreatePassiveOffer(*args, **kwargs):
+    warnings.warn(
+        "CreatePassiveOffer has been deprecated, use CreatePassiveSellOffer instead.",
+        DeprecationWarning
+    )  # pragma: no cover
+    return CreatePassiveSellOffer(*args, **kwargs)
