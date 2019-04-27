@@ -12,7 +12,14 @@ typedef opaque Thresholds[4];
 typedef string string32<32>;
 typedef string string64<64>;
 typedef int64 SequenceNumber;
+typedef uint64 TimePoint;
 typedef opaque DataValue<64>;
+
+// 1-4 alphanumeric characters right-padded with 0 bytes
+typedef opaque AssetCode4[4];
+
+// 5-12 alphanumeric characters right-padded with 0 bytes
+typedef opaque AssetCode12[12];
 
 enum AssetType
 {
@@ -29,14 +36,14 @@ case ASSET_TYPE_NATIVE: // Not credit
 case ASSET_TYPE_CREDIT_ALPHANUM4:
     struct
     {
-        opaque assetCode[4]; // 1 to 4 characters
+        AssetCode4 assetCode;
         AccountID issuer;
     } alphaNum4;
 
 case ASSET_TYPE_CREDIT_ALPHANUM12:
     struct
     {
-        opaque assetCode[12]; // 5 to 12 characters
+        AssetCode12 assetCode;
         AccountID issuer;
     } alphaNum12;
 
@@ -77,7 +84,7 @@ enum LedgerEntryType
 struct Signer
 {
     SignerKey key;
-    uint32 weight; // really only need 1byte
+    uint32 weight; // really only need 1 byte
 };
 
 enum AccountFlags
@@ -105,7 +112,6 @@ const MASK_ACCOUNT_FLAGS = 0x7;
     Other ledger entries created require an account.
 
 */
-
 struct AccountEntry
 {
     AccountID accountID;      // master public key for this account
@@ -210,7 +216,7 @@ const MASK_OFFERENTRY_FLAGS = 1;
 struct OfferEntry
 {
     AccountID sellerID;
-    uint64 offerID;
+    int64 offerID;
     Asset selling; // A
     Asset buying;  // B
     int64 amount;  // amount of A
@@ -283,6 +289,7 @@ enum EnvelopeType
 {
     ENVELOPE_TYPE_SCP = 1,
     ENVELOPE_TYPE_TX = 2,
-    ENVELOPE_TYPE_AUTH = 3
+    ENVELOPE_TYPE_AUTH = 3,
+    ENVELOPE_TYPE_SCPVALUE = 4
 };
 }
