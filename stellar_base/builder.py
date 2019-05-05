@@ -418,7 +418,7 @@ class Builder(object):
                                    price,
                                    offer_id=0,
                                    source=None):
-        """Append a :class:`ManageBuyOfferOp <stellar_base.operation.ManageBuyOfferOp>`
+        """Append a :class:`ManageBuyOffer <stellar_base.operation.ManageBuyOffer>`
         operation to the list of operations.
 
         :param str selling_code: The asset code for the asset the offer creator
@@ -445,7 +445,7 @@ class Builder(object):
         """
         selling = Asset(selling_code, selling_issuer)
         buying = Asset(buying_code, buying_issuer)
-        op = operation.ManageBuyOfferOp(selling, buying, amount, price, offer_id,
+        op = operation.ManageBuyOffer(selling, buying, amount, price, offer_id,
                                         source)
         return self.append_op(op)
 
