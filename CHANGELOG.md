@@ -1,6 +1,10 @@
 Release History
 ===============
 
+### Version 1.1.4
+Released on May 5, 2019
+  - `Horizon.order_book` supports stream.
+
 ### Version 1.1.3
 Released on April 21, 2019
   - Bugfix: RecursionError during deepcopy on operations object.
