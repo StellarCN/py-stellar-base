@@ -470,7 +470,7 @@ class Horizon(object):
         return self.query(endpoint, params)
 
     def order_book(self, selling_asset_code, buying_asset_code, selling_asset_issuer=None, buying_asset_issuer=None,
-                   limit=10):
+                   limit=10, sse=False):
         """Return, for each orderbook, a summary of the orderbook and the bids
         and asks associated with that orderbook.
 
@@ -486,6 +486,7 @@ class Horizon(object):
         :param str buying_asset_issuer: Account ID of the issuer of the Asset being bought,
             if it is a native asset, let it be `None`.
         :param int limit: Limit the number of items returned.
+        :param bool sse: Use server side events for streaming responses.
         :return: A list of orderbook summaries as a JSON object.
         :rtype: dict
 
@@ -502,7 +503,7 @@ class Horizon(object):
         }
         endpoint = '/order_book'
         params = self.__query_params(limit=limit, **asset_params)
-        return self.query(endpoint, params)
+        return self.query(endpoint, params, sse)
 
     def ledgers(self, cursor=None, order='asc', limit=10, sse=False):
         """This endpoint represents all ledgers.
