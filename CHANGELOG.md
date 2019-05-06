@@ -1,6 +1,15 @@
 Release History
 ===============
 
+### Version 1.2.0
+Released on May 6, 2019
+  - Adapt to Protocol v11. [ManageBuyOffer](https://github.com/StellarCN/py-stellar-base/blob/279aec10663a32662f8fe48c5d20a752f13f5946/stellar_base/operation.py#L741), 
+  [ManageSellOffer](https://github.com/StellarCN/py-stellar-base/blob/279aec10663a32662f8fe48c5d20a752f13f5946/stellar_base/operation.py#L830) 
+  and [CreatePassiveSellOffer](https://github.com/StellarCN/py-stellar-base/blob/279aec10663a32662f8fe48c5d20a752f13f5946/stellar_base/operation.py#L921) are supported.
+  - Breaking change: [ManageOffer](https://github.com/StellarCN/py-stellar-base/blob/279aec10663a32662f8fe48c5d20a752f13f5946/stellar_base/operation.py#L1236) 
+  and [CreatePassiveOffer](https://github.com/StellarCN/py-stellar-base/blob/279aec10663a32662f8fe48c5d20a752f13f5946/stellar_base/operation.py#L1244) are marked as deprecated, although you can still use them now, please update your code immediately.
+  - The [Builder](https://github.com/StellarCN/py-stellar-base/blob/279aec10663a32662f8fe48c5d20a752f13f5946/stellar_base/builder.py) was also affected by the above changes, added `append_manage_buy_offer_op`, `append_manage_sell_offer_op` and `append_create_passive_sell_offer_op`. `append_manage_offer_op` and `append_create_passive_offer_op` are deprecated.
+
 ### Version 1.1.4
 Released on May 5, 2019
   - `Horizon.order_book` supports stream.
