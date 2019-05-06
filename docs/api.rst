@@ -107,6 +107,24 @@ Path Payment
 .. autoclass:: stellar_base.operation.PathPayment
    :members:
 
+Manage Sell Offer
+^^^^^^^^^^^^^^^^^
+
+.. autoclass:: stellar_base.operation.ManageSellOffer
+   :members:
+
+Manage Buy Offer
+^^^^^^^^^^^^^^^^
+
+.. autoclass:: stellar_base.operation.ManageBuyOffer
+   :members:
+
+Create Passive Sell Offer
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. autoclass:: stellar_base.operation.CreatePassiveSellOffer
+   :members:
+
 Manage Offer
 ^^^^^^^^^^^^
 
