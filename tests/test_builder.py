@@ -70,9 +70,11 @@ class TestBuilder(object):
             append_pre_auth_tx_signer(
             pre_auth_tx=b"\x95\xe5\xbb\x95\x15\xd9\x9f\x82\x9d\xf9\x93\xc3'\x8e\xeb\xf1\nj!\xda\xa4\xa1\xe4\xf2<6cG}\x17\x97\xfe",
             signer_weight=1). \
-            append_manage_offer_op(selling_code='XLM', selling_issuer=None, buying_code='BEER',
+            append_manage_sell_offer_op(selling_code='XLM', selling_issuer=None, buying_code='BEER',
                                    buying_issuer=bob_account, amount='1', price='10', offer_id=0). \
-            append_create_passive_offer_op(selling_code='XLM', selling_issuer=None, buying_code='BEER',
+            append_manage_buy_offer_op(selling_code='XLM', selling_issuer=None, buying_code='BEER',
+                                        buying_issuer=bob_account, amount='1', price='10', offer_id=0). \
+            append_create_passive_sell_offer_op(selling_code='XLM', selling_issuer=None, buying_code='BEER',
                                            buying_issuer=bob_account, amount='1', price={'n': 10, 'd': 1}). \
             append_account_merge_op(destination=bob_account). \
             append_inflation_op(). \
@@ -80,9 +82,9 @@ class TestBuilder(object):
             append_bump_sequence_op(bump_to=938635037769749). \
             add_text_memo("hello, stellar"). \
             add_time_bounds({'minTime': 1534392138, 'maxTime': 1534392238})
-        assert builder.hash_hex() == '82910e59edebeeafc86294372572812a251066ad1f0784e1e38ca63d3b6bdf24'
+        assert builder.hash_hex() == 'f646a891ed9ecde6f98bf7fb1afcb52acbc73aabd08f9390c61fdfc8f426815f'
         builder.sign()
-        assert builder.gen_xdr().decode() == 'AAAAAP4sA2cn9oggk4cfzPLqZVfpSEhmindW2FQofl5b0SjDAAAFeAADVa8AAAABAAAAAQAAAABbdPdKAAAAAFt0964AAAABAAAADmhlbGxvLCBzdGVsbGFyAAAAAAAOAAAAAAAAAAAAAAAAc9qkfqsgyI5MELIC62rtUGCe6YQwteIOIjIeAolrCt4AAAAABfXhAAAAAAAAAAAGAAAAAUJFRVIAAAAAc9qkfqsgyI5MELIC62rtUGCe6YQwteIOIjIeAolrCt4AAAACVAvkAAAAAAAAAAABAAAAAHPapH6rIMiOTBCyAutq7VBgnumEMLXiDiIyHgKJawreAAAAAAAAAAA7msoAAAAAAAAAAAIAAAABQkVFUgAAAABz2qR+qyDIjkwQsgLrau1QYJ7phDC14g4iMh4CiWsK3gAAAAA7msoAAAAAAHPapH6rIMiOTBCyAutq7VBgnumEMLXiDiIyHgKJawreAAAAAAAAAAA7msoAAAAAAQAAAAJIRUxMTwAAAAAAAAAAAAAAc9qkfqsgyI5MELIC62rtUGCe6YQwteIOIjIeAolrCt4AAAAAAAAABwAAAABz2qR+qyDIjkwQsgLrau1QYJ7phDC14g4iMh4CiWsK3gAAAAFNT0UAAAAAAQAAAAAAAAAFAAAAAAAAAAAAAAABAAAABwAAAAAAAAAAAAAAAAAAAAAAAAABAAAAC3N0ZWxsYXIub3JnAAAAAAAAAAAAAAAABQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAALn1DBqOj5wSKARkChxiKBJVvapyTAVSCbrzQMJkx8nOAAAAAEAAAAAAAAABQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAGV5buVFdmfgp35k8MnjuvxCmoh2qSh5PI8NmNHfReX/gAAAAEAAAAAAAAAAwAAAAAAAAABQkVFUgAAAABz2qR+qyDIjkwQsgLrau1QYJ7phDC14g4iMh4CiWsK3gAAAAAAmJaAAAAACgAAAAEAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAFCRUVSAAAAAHPapH6rIMiOTBCyAutq7VBgnumEMLXiDiIyHgKJawreAAAAAACYloAAAAAKAAAAAQAAAAAAAAAIAAAAAHPapH6rIMiOTBCyAutq7VBgnumEMLXiDiIyHgKJawreAAAAAAAAAAkAAAAAAAAACgAAAAVoZWxsbwAAAAAAAAEAAAAFd29ybGQAAAAAAAAAAAAACwADVa8AAAAVAAAAAAAAAAFb0SjDAAAAQOeOIQNAwscAcVIdCHVou6xILLKBJTqxqmXiOxxtD4pYVsl0G2tLoDrMfcoWkSb7eyj3c68SIWNZRZEvWyusNwM='
+        assert builder.gen_xdr().decode() == 'AAAAAP4sA2cn9oggk4cfzPLqZVfpSEhmindW2FQofl5b0SjDAAAF3AADVa8AAAABAAAAAQAAAABbdPdKAAAAAFt0964AAAABAAAADmhlbGxvLCBzdGVsbGFyAAAAAAAPAAAAAAAAAAAAAAAAc9qkfqsgyI5MELIC62rtUGCe6YQwteIOIjIeAolrCt4AAAAABfXhAAAAAAAAAAAGAAAAAUJFRVIAAAAAc9qkfqsgyI5MELIC62rtUGCe6YQwteIOIjIeAolrCt4AAAACVAvkAAAAAAAAAAABAAAAAHPapH6rIMiOTBCyAutq7VBgnumEMLXiDiIyHgKJawreAAAAAAAAAAA7msoAAAAAAAAAAAIAAAABQkVFUgAAAABz2qR+qyDIjkwQsgLrau1QYJ7phDC14g4iMh4CiWsK3gAAAAA7msoAAAAAAHPapH6rIMiOTBCyAutq7VBgnumEMLXiDiIyHgKJawreAAAAAAAAAAA7msoAAAAAAQAAAAJIRUxMTwAAAAAAAAAAAAAAc9qkfqsgyI5MELIC62rtUGCe6YQwteIOIjIeAolrCt4AAAAAAAAABwAAAABz2qR+qyDIjkwQsgLrau1QYJ7phDC14g4iMh4CiWsK3gAAAAFNT0UAAAAAAQAAAAAAAAAFAAAAAAAAAAAAAAABAAAABwAAAAAAAAAAAAAAAAAAAAAAAAABAAAAC3N0ZWxsYXIub3JnAAAAAAAAAAAAAAAABQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAALn1DBqOj5wSKARkChxiKBJVvapyTAVSCbrzQMJkx8nOAAAAAEAAAAAAAAABQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAGV5buVFdmfgp35k8MnjuvxCmoh2qSh5PI8NmNHfReX/gAAAAEAAAAAAAAAAwAAAAAAAAABQkVFUgAAAABz2qR+qyDIjkwQsgLrau1QYJ7phDC14g4iMh4CiWsK3gAAAAAAmJaAAAAACgAAAAEAAAAAAAAAAAAAAAAAAAAMAAAAAAAAAAFCRUVSAAAAAHPapH6rIMiOTBCyAutq7VBgnumEMLXiDiIyHgKJawreAAAAAACYloAAAAAKAAAAAQAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAUJFRVIAAAAAc9qkfqsgyI5MELIC62rtUGCe6YQwteIOIjIeAolrCt4AAAAAAJiWgAAAAAoAAAABAAAAAAAAAAgAAAAAc9qkfqsgyI5MELIC62rtUGCe6YQwteIOIjIeAolrCt4AAAAAAAAACQAAAAAAAAAKAAAABWhlbGxvAAAAAAAAAQAAAAV3b3JsZAAAAAAAAAAAAAALAANVrwAAABUAAAAAAAAAAVvRKMMAAABAM1rhFzh2mbT283+lJsqeckCxnO9vC0m8ADTbyUbFXNJNAfSpI23W/kS69wgeq8qp/1knDpkn72b6e6Eac9coCw=='
 
     def test_no_stellar_secret_or_address_error_raise(self):
         with pytest.raises(NoStellarSecretOrAddressError):

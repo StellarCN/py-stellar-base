@@ -96,7 +96,25 @@ def _load_operations():
              asset_code='pocketknives',
              authorize=True,
          )),
-        ("manage_offer_min",
+        ("manage_sell_offer_min",
+         ManageSellOffer(
+             selling=Asset('beer', SOURCE),
+             buying=Asset('beer', DEST),
+             amount="100",
+             price=3.14159,
+             offer_id=1,
+             source=SOURCE
+         )),
+        ("manage_buy_offer_min",
+         ManageBuyOffer(
+             selling=Asset('beer', SOURCE),
+             buying=Asset('beer', DEST),
+             amount="100",
+             price=3.14159,
+             offer_id=1,
+             source=SOURCE
+         )),
+        ("manage_deprecated_offer_min",
          ManageOffer(
              selling=Asset('beer', SOURCE),
              buying=Asset('beer', DEST),
@@ -105,7 +123,29 @@ def _load_operations():
              offer_id=1,
              source=SOURCE
          )),
-        ("manage_offer_dict_price",
+        ("manage_sell_offer_dict_price",
+         ManageSellOffer(
+             selling=Asset('beer', SOURCE),
+             buying=Asset('beer', DEST),
+             amount="100",
+             price={
+                 'n': 314159,
+                 'd': 100000
+             },
+             offer_id=1,
+         )),
+        ("manage_buy_offer_dict_price",
+         ManageSellOffer(
+             selling=Asset('beer', SOURCE),
+             buying=Asset('beer', DEST),
+             amount="100",
+             price={
+                 'n': 314159,
+                 'd': 100000
+             },
+             offer_id=1,
+         )),
+        ("manage_deprecated_offer_dict_price",
          ManageOffer(
              selling=Asset('beer', SOURCE),
              buying=Asset('beer', DEST),
@@ -116,7 +156,15 @@ def _load_operations():
              },
              offer_id=1,
          )),
-        ("create_passive_offer_min",
+        ("create_passive_sell_offer_min",
+         CreatePassiveSellOffer(
+             selling=Asset('beer', SOURCE),
+             buying=Asset('beer', DEST),
+             amount="100",
+             price=3.14159,
+             source=SOURCE
+         )),
+        ("create_passive_deprecated_offer_min",
          CreatePassiveOffer(
              selling=Asset('beer', SOURCE),
              buying=Asset('beer', DEST),
@@ -124,7 +172,17 @@ def _load_operations():
              price=3.14159,
              source=SOURCE
          )),
-        ("create_passive_dict_offer",
+        ("create_passive_sell_offer_dict",
+         CreatePassiveSellOffer(
+             selling=Asset('beer', SOURCE),
+             buying=Asset('beer', DEST),
+             amount="100",
+             price={
+                 'n': 314159,
+                 'd': 100000
+             }
+         )),
+        ("create_passive_deprecated_offer_dict",
          CreatePassiveOffer(
              selling=Asset('beer', SOURCE),
              buying=Asset('beer', DEST),
@@ -179,7 +237,9 @@ def test_operation(name, operation):
     original.pop("body")
     restored = dict(operation_restored.__dict__)
     restored.pop("body")
-    if name == 'manage_offer_dict_price' or name == 'create_passive_dict_offer':
+    if name == 'manage_sell_offer_dict_price' or name == 'manage_buy_offer_dict_price' \
+            or name == 'create_passive_sell_offer_dict' or name == 'create_passive_deprecated_offer_dict' \
+            or name == 'manage_deprecated_offer_dict_price':
         original['price'] = float(original['price']['n']) / float(
             original['price']['d'])
     if name == 'manage_data':  # return `bytes` now
@@ -201,10 +261,10 @@ def test_manage_data_too_long_raises():
             data_value='1234567890' * 7)
 
 
-def test_manage_offer_dict_price_raises():
+def test_manage_sell_offer_dict_price_raises():
     msg = "You need pass `price` params as `str` or `{'n': numerator, 'd': denominator}`"
     with pytest.raises(NotValidParamError, match=msg):
-        ManageOffer(
+        ManageSellOffer(
             selling=Asset('beer', SOURCE),
             buying=Asset('beer', DEST),
             amount="100",
