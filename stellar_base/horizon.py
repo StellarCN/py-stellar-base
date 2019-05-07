@@ -1,4 +1,6 @@
 # coding: utf-8
+import json
+
 import requests
 from requests.adapters import HTTPAdapter, DEFAULT_POOLSIZE
 from requests.exceptions import RequestException
@@ -177,13 +179,9 @@ class Horizon(object):
                     raise HorizonRequestError(e)
 
         # SSE connection
-        if SSEClient is None:
-            raise ImportError('SSE not supported, missing `stellar-base-sseclient` module')
-
         # If SSE is enabled, Horizon will fetch the user-agent from the URL query params. Maybe it's not a good design.
         params.update(self.user_agent)
-
-        return SSEClient(url, retry=0, session=self._sse_session, connect_retry=-1, params=params)
+        return _SSEClient(url, retry=0, session=self._sse_session, connect_retry=-1, params=params)
 
     def account(self, address):
         """Returns information and links relating to a single account.
@@ -910,6 +908,24 @@ class Horizon(object):
             else:
                 params[k] = v
         return params
+
+
+class _SSEClient(object):
+    def __init__(self, url, last_id=None, retry=3000, session=None, chunk_size=1024, connect_retry=0, **kwargs):
+        if SSEClient is None:
+            raise ImportError('SSE not supported, missing `stellar-base-sseclient` module')
+
+        self.client = SSEClient(url, last_id, retry, session, chunk_size, connect_retry, **kwargs)
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        while True:
+            msg = next(self.client)
+            data = msg.data
+            if data != '"hello"' and data != '"byebye"':
+                return json.loads(data)
 
 
 def check_horizon_reply(reply):
