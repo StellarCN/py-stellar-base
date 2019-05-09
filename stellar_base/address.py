@@ -52,15 +52,19 @@ class Address(object):
         else:
             self.horizon = Horizon(HORIZON_TEST)
 
-        self.sequence = None
-        self.balances = None
+        self.id = None
         self.paging_token = None
+        self.account_id = None
+        self.sequence = None
+        self.subentry_count = None
+        self.inflation_destination = None
+        self.home_domain = None
+        self.last_modified_ledger = None
         self.thresholds = None
         self.flags = None
+        self.balances = None
         self.signers = None
         self.data = None
-        self.inflation_destination = None
-        self.subentry_count = None
 
     def get(self):
         """Retrieve the account data that corresponds to this :class:`Address`.
@@ -69,28 +73,36 @@ class Address(object):
         to this :class:`Address`. Attempt to retrieve the following attributes
         from Horizon:
 
-        * Sequence Number
-        * Balances
+        * ID
         * Paging Token
+        * Account ID
+        * Sequence Number
+        * Subentry Count
+        * Inflation Destination
+        * Home Domain
+        * Last Modified Ledger
         * Thresholds
         * Flags
+        * Balances
         * Signers
         * Data
-        * Inflation Destination
-        * Subentry Count
 
         """
 
         acc = self.horizon.account(self.address)
-        self.sequence = acc.get('sequence')
-        self.balances = acc.get('balances')
+        self.id = acc.get('id')
         self.paging_token = acc.get('paging_token')
+        self.account_id = acc.get('account_id')
+        self.sequence = acc.get('sequence')
+        self.subentry_count = acc.get('subentry_count')
+        self.inflation_destination = acc.get('inflation_destination')
+        self.home_domain = acc.get('home_domain')
+        self.last_modified_ledger = acc.get('last_modified_ledger')
         self.thresholds = acc.get('thresholds')
         self.flags = acc.get('flags')
+        self.balances = acc.get('balances')
         self.signers = acc.get('signers')
         self.data = acc.get('data')
-        self.inflation_destination = acc.get('inflation_destination')
-        self.subentry_count = acc.get('subentry_count')
 
     def payments(self, cursor=None, order='asc', limit=10, sse=False):
         """Retrieve the payments JSON from this instance's Horizon server.
