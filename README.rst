@@ -33,6 +33,7 @@ Install from pypi:
 
 .. code-block:: text
 
+    pip install -U stellar_base
     pip install -U stellar-sdk
 
 
