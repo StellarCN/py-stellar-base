@@ -425,7 +425,10 @@ class ChangeTrust(Operation):
     def __init__(self, asset, limit=None, source=None):
         super(ChangeTrust, self).__init__(source)
         self.line = asset
-        self.limit = limit or self.default_limit
+        if limit is None:
+            self.limit = self.default_limit
+        else:
+            self.limit = limit
 
     def to_xdr_object(self):
         """Creates an XDR Operation object that represents this
