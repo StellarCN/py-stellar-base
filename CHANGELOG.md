@@ -1,6 +1,10 @@
 Release History
 ===============
 
+### Version 1.2.1
+Released on June 9, 2019
+  - fix(Operation.ChangeTrust): An exception should be thrown when the limit is set to 0(int). ([#206](https://github.com/StellarCN/py-stellar-base/pull/206))
+
 ### Version 1.2.0
 Released on May 6, 2019
   - Adapt to Protocol v11. [ManageBuyOffer](https://github.com/StellarCN/py-stellar-base/blob/279aec10663a32662f8fe48c5d20a752f13f5946/stellar_base/operation.py#L741), 
