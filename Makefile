@@ -31,9 +31,9 @@ codecov:
 	python -m codecov
 .PHONY: codecov
 
-wheel:
-	python setup.py bdist_wheel
-.PHONY: wheel
+package:
+	python setup.py sdist bdist_wheel
+.PHONY: package
 
 pypi:
 	twine upload dist/*
