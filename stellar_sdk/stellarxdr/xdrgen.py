@@ -1242,6 +1242,14 @@ class union_info(Info):
                "%s%sreturn getattr(self.switch, attr)\n" % \
                (prefix, prefix, indent, prefix, indent, indent, prefix, indent)
 
+    def union_to_xdr(self, prefix=indent):
+        obj_id = self.id.lower()
+        return "%sdef to_xdr(self):\n" \
+               "%s%s%s = pack.StellarXDRPacker()\n" \
+               "%s%s%s.pack_%s(self)\n" \
+               "%s%sreturn base64.b64encode(%s.get_buffer())\n" % \
+               (prefix, prefix, indent, obj_id, prefix, indent, obj_id, self.id, prefix, indent, obj_id)
+
     def union_switch(self, prefix=indent):
         d = '{'
         for l in self.body[1:-1]:
@@ -1279,9 +1287,8 @@ class union_info(Info):
             varlist += [l for l in c.declarations if l.type != 'void']
         init = self.typeinit(varlist)
         repr = self.typerepr(varlist)
-        return "class %s:\n%s%s\n%s\n%s\n%s\n" % \
-               (self.id, xdrdef, init, self.union_switch(),
-                self.union_getattr(), repr)
+        return "class %s:\n%s%s\n%s\n%s\n%s\n%s\n" % \
+               (self.id, xdrdef, init, self.union_switch(), self.union_to_xdr(), self.union_getattr(), repr)
 
     def pack_output(self):
         header = self._get_pack_header()
@@ -1580,7 +1587,9 @@ def run(infile, filters=True, pass_attrs=True, debug=False):
     const_fd.write(comment_string)
     type_fd = open(types_file + ".py", "w", newline='\n')
     type_fd.write(comment_string)
+    type_fd.write("import base64\n\n")
     type_fd.write("from . import %s as const\n" % constants_file)
+    type_fd.write("from . import %s as pack\n" % packer_file)
     pack_fd = open(packer_file + ".py", "w", newline='\n')
     pack_fd.write(comment_string)
     pack_fd.write(pack_header % (constants_file, types_file))
