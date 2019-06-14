@@ -1,7 +1,7 @@
 import os
 
-import ed25519
 import pytest
+import nacl.signing as ed25519
 
 from stellar_sdk.exceptions import Ed25519SecretSeedInvalidError, Ed25519PublicKeyInvalidError, \
     MissingEd25519SecretSeedError, BadSignatureError
@@ -93,9 +93,9 @@ class TestKeypair:
     def test_get_key_of_expected_type(self):
         raw_seed = os.urandom(32)
         signing_key = ed25519.SigningKey(raw_seed)
-        verifying_key = signing_key.get_verifying_key()
+        verify_key = signing_key.verify_key
         assert _get_key_of_expected_type(signing_key, ed25519.SigningKey) == signing_key
-        assert _get_key_of_expected_type(verifying_key, ed25519.VerifyingKey) == verifying_key
+        assert _get_key_of_expected_type(verify_key, ed25519.VerifyKey) == verify_key
 
     def test_get_key_of_expected_type_raise(self):
         fake_data = "Hello, overcat!"

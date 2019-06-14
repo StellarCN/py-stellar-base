@@ -10,7 +10,7 @@ pytest-cov = "*"
 
 [packages]
 crc16 = "*"
-ed25519 = "*"
+pynacl = "*"
 
 [requires]
 python_version = "3.7"
