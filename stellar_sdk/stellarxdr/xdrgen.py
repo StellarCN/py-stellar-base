@@ -1180,8 +1180,18 @@ class struct_info(Info):
         init = self.typeinit(varlist)
         repr = self.typerepr(varlist)
         pass_attr = self.pass_through(varlist)
-        return "class %s:\n%s%s\n%s%s\n" % \
-               (self.id, xdrdef, init, pass_attr, repr)
+        to_xdr = self.type_to_xdr()
+        return "class %s:\n%s%s\n%s%s%s\n" % \
+               (self.id, xdrdef, init, pass_attr, to_xdr, repr)
+
+    def type_to_xdr(self, prefix=indent):
+        obj_id = self.id.lower()
+        return "%sdef to_xdr(self):\n" \
+               "%s%s%s = pack.StellarXDRPacker()\n" \
+               "%s%s%s.pack_%s(self)\n" \
+               "%s%sreturn base64.b64encode(%s.get_buffer())\n" % \
+               (prefix, prefix, indent, obj_id, prefix, indent, obj_id, self.id, prefix, indent, obj_id)
+
 
     def pass_through(self, varlist):
         def check(v):
