@@ -4,6 +4,7 @@ from stellar_sdk.asset import Asset
 from stellar_sdk.operation import Operation, CreateAccount
 from stellar_sdk.exceptions import Ed25519PublicKeyInvalidError
 from stellar_sdk.operation.account_merge import AccountMerge
+from stellar_sdk.operation.allow_trust import AllowTrust
 from stellar_sdk.operation.bump_sequence import BumpSequence
 from stellar_sdk.operation.change_trust import ChangeTrust
 from stellar_sdk.operation.inflation import Inflation
@@ -289,3 +290,33 @@ class TestPathPayment:
         assert op.send_max == '3.007'
         assert op.dest_amount == '3.1415'
         assert op.path == path
+
+
+class TestAllowTrust:
+    @pytest.mark.parametrize('authorize, xdr', [
+        (True,
+         b'AAAAAQAAAADX7fRsY6KTqIc8EIDyr8M9gxGPW6ODnZoZDgo6l1ymwwAAAAcAAAAAzU64DztfTtBLJ2I0nN998lhiyhFcS8rtZHyowijs/XsAAAABVVNEAAAAAAE='),
+        (False,
+         b'AAAAAQAAAADX7fRsY6KTqIc8EIDyr8M9gxGPW6ODnZoZDgo6l1ymwwAAAAcAAAAAzU64DztfTtBLJ2I0nN998lhiyhFcS8rtZHyowijs/XsAAAABVVNEAAAAAAA=')])
+    def test_to_xdr_obj(self, authorize, xdr):
+        source = 'GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV'
+        trustor = 'GDGU5OAPHNPU5UCLE5RDJHG7PXZFQYWKCFOEXSXNMR6KRQRI5T6XXCD7'
+        asset_code = 'USD'
+        op = AllowTrust(trustor, asset_code, authorize, source)
+        assert op.to_xdr_object().to_xdr() == xdr
+
+    @pytest.mark.parametrize('asset_code, authorize', [
+        ('USD', True),
+        ('USDT', False),
+        ('Banana', True),
+        ("STELLAROVERC", False)])
+    def test_from_xdr_obj(self, asset_code, authorize):
+        source = 'GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV'
+        trustor = 'GDGU5OAPHNPU5UCLE5RDJHG7PXZFQYWKCFOEXSXNMR6KRQRI5T6XXCD7'
+        origin_xdr_obj = AllowTrust(trustor, asset_code, authorize, source).to_xdr_object()
+        op = Operation.from_xdr_object(origin_xdr_obj)
+        assert isinstance(op, AllowTrust)
+        assert op.source == source
+        assert op.trustor == trustor
+        assert op.asset_code == asset_code
+        assert op.authorize == authorize

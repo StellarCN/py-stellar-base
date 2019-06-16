@@ -8,9 +8,7 @@ from .stellarxdr import Xdr
 
 class Asset:
     def __init__(self, code, issuer=None):
-        asset_code_re = re.compile(r'^[a-zA-Z0-9]{1,12}$')
-        if not asset_code_re.match(code):
-            raise AssetCodeInvalidError('Asset code is invalid (maximum alphanumeric, 12 characters at max).')
+        Asset.check_if_asset_code_is_valid(code)
 
         if code != 'XLM' and issuer is None:
             raise AssetIssuerInvalidError("The issuer cannot be `None` except for the native asset.")
@@ -21,6 +19,12 @@ class Asset:
         self.code = code
         self.issuer = issuer
         self._type = self.guess_asset_type()
+
+    @staticmethod
+    def check_if_asset_code_is_valid(code: str) -> None:
+        asset_code_re = re.compile(r'^[a-zA-Z0-9]{1,12}$')
+        if not asset_code_re.match(code):
+            raise AssetCodeInvalidError('Asset code is invalid (maximum alphanumeric, 12 characters at max).')
 
     @property
     def type(self):

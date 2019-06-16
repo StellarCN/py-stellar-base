@@ -29,7 +29,7 @@ class PathPayment(Operation):
         self.dest_amount = dest_amount
         self.path = path  # a list of paths/assets
 
-    def to_operation_body(self) -> Xdr.nullclass():
+    def to_operation_body(self) -> Xdr.nullclass:
         destination = Keypair.from_public_key(self.destination).xdr_account_id()
         send_asset = self.send_asset.to_xdr_object()
         dest_asset = self.dest_asset.to_xdr_object()
