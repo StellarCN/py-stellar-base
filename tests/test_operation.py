@@ -1,4 +1,6 @@
 import pytest
+from stellar_sdk.hashing import hash256
+
 from stellar_sdk.asset import Asset
 
 from stellar_sdk.operation import Operation, CreateAccount
@@ -11,6 +13,7 @@ from stellar_sdk.operation.inflation import Inflation
 from stellar_sdk.operation.manage_data import ManageData
 from stellar_sdk.operation.path_payment import PathPayment
 from stellar_sdk.operation.payment import Payment
+from stellar_sdk.operation.set_options import SetOptions
 
 
 class TestBaseOperation:
@@ -330,7 +333,9 @@ class TestManageData:
         ('remove_data', None,
          b'AAAAAQAAAADX7fRsY6KTqIc8EIDyr8M9gxGPW6ODnZoZDgo6l1ymwwAAAAoAAAALcmVtb3ZlX2RhdGEAAAAAAA=='),
         ('add_bytes_data', b'bytes_value',
-         b'AAAAAQAAAADX7fRsY6KTqIc8EIDyr8M9gxGPW6ODnZoZDgo6l1ymwwAAAAoAAAAOYWRkX2J5dGVzX2RhdGEAAAAAAAEAAAALYnl0ZXNfdmFsdWUA')
+         b'AAAAAQAAAADX7fRsY6KTqIc8EIDyr8M9gxGPW6ODnZoZDgo6l1ymwwAAAAoAAAAOYWRkX2J5dGVzX2RhdGEAAAAAAAEAAAALYnl0ZXNfdmFsdWUA'),
+        ('add_data_中文', '恒星',
+         b'AAAAAQAAAADX7fRsY6KTqIc8EIDyr8M9gxGPW6ODnZoZDgo6l1ymwwAAAAoAAAAPYWRkX2RhdGFf5Lit5paHAAAAAAEAAAAG5oGS5pifAAA=')
     ])
     def test_to_xdr_obj(self, name, value, xdr):
         source = 'GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV'
@@ -339,7 +344,7 @@ class TestManageData:
 
     @pytest.mark.parametrize('name, value', [
         ('name_too_long' + '-' * 64, 'value'),
-        ('value_too_long', 'value'  + 'a' * 64),
+        ('value_too_long', 'value' + 'a' * 64),
     ])
     def test_to_xdr_obj_with_invalid_value_raise(self, name, value):
         source = 'GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV'
@@ -349,7 +354,8 @@ class TestManageData:
     @pytest.mark.parametrize('name, value', [
         ('add_data', 'value'),
         ('remove_data', None),
-        ('add_bytes_data', b'bytes_value')
+        ('add_bytes_data', b'bytes_value'),
+        ('add_data_中文', '恒星')
     ])
     def test_from_xdr_obj(self, name, value):
         source = 'GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV'
@@ -361,4 +367,88 @@ class TestManageData:
         if isinstance(value, str):
             value = value.encode()
         assert op.value == value
+
+
+class TestSetOptions:
+    def test_auth_flags_set_correctly(self):
+        assert SetOptions.AuthFlag.AUTHORIZATION_REQUIRED == 1
+        assert SetOptions.AuthFlag.AUTHORIZATION_REVOCABLE == 2
+        assert SetOptions.AuthFlag.AUTHORIZATION_IMMUTABLE == 4
+
+    def test_signer_type_flags_set_correctly(self):
+        assert SetOptions.SignerType.ED25519_PUBLIC_KEY.value == 'ed25519_public_key'
+        assert SetOptions.SignerType.SHA256_HASH.value == 'sha256_hash'
+        assert SetOptions.SignerType.PRE_AUTH_TX.value == 'pre_auth_tx'
+
+    @pytest.mark.parametrize(
+        'inflation_dest, clear_flags, set_flags, master_weight, low_threshold, med_threshold, high_threshold, home_domain, signer_type, signer_key, signer_weight, source, xdr',
+        [
+            ('GDGU5OAPHNPU5UCLE5RDJHG7PXZFQYWKCFOEXSXNMR6KRQRI5T6XXCD7',
+             SetOptions.AuthFlag.AUTHORIZATION_REVOCABLE | SetOptions.AuthFlag.AUTHORIZATION_IMMUTABLE,
+             SetOptions.AuthFlag.AUTHORIZATION_REQUIRED, 0, 1, 2, 3, 'www.example.com',
+             SetOptions.SignerType.ED25519_PUBLIC_KEY, 'GDGU5OAPHNPU5UCLE5RDJHG7PXZFQYWKCFOEXSXNMR6KRQRI5T6XXCD7', 1,
+             None,
+             b'AAAAAAAAAAUAAAABAAAAAM1OuA87X07QSydiNJzfffJYYsoRXEvK7WR8qMIo7P17AAAAAQAAAAYAAAABAAAAAQAAAAEAAAAAAAAAAQAAAAEAAAABAAAAAgAAAAEAAAADAAAAAQAAAA93d3cuZXhhbXBsZS5jb20AAAAAAQAAAADNTrgPO19O0EsnYjSc333yWGLKEVxLyu1kfKjCKOz9ewAAAAE='),
+            ('GDGU5OAPHNPU5UCLE5RDJHG7PXZFQYWKCFOEXSXNMR6KRQRI5T6XXCD7',
+             SetOptions.AuthFlag.AUTHORIZATION_REQUIRED | SetOptions.AuthFlag.AUTHORIZATION_REVOCABLE,
+             SetOptions.AuthFlag.AUTHORIZATION_REVOCABLE, 3, 2, 4, 6, None,
+             SetOptions.SignerType.PRE_AUTH_TX, hash256(b"PRE_AUTH_TX"), 2,
+             'GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV',
+             b'AAAAAQAAAADX7fRsY6KTqIc8EIDyr8M9gxGPW6ODnZoZDgo6l1ymwwAAAAUAAAABAAAAAM1OuA87X07QSydiNJzfffJYYsoRXEvK7WR8qMIo7P17AAAAAQAAAAMAAAABAAAAAgAAAAEAAAADAAAAAQAAAAIAAAABAAAABAAAAAEAAAAGAAAAAAAAAAEAAAAB96nlNnQ/Aq5uCbYXnGJN/EXa76Y2RQP6S1wP8lOEL1UAAAAC'),
+            (None, None, None, 0, 255, 255, 255, 'overcat.me', SetOptions.SignerType.SHA256_HASH,
+             hash256(b"SHA256_HASH"), 0, None,
+             b'AAAAAAAAAAUAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAEAAAD/AAAAAQAAAP8AAAABAAAA/wAAAAEAAAAKb3ZlcmNhdC5tZQAAAAAAAQAAAALB1I1O+GEAV87X3eYN/uAYDIDzP5mY4SVTEQFFYFq6nwAAAAA='),
+            (None, None, None, None, None, None, None, None, None, None, None, None,
+             b'AAAAAAAAAAUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA='),
+
+        ])
+    def test_to_xdr(self, inflation_dest, clear_flags, set_flags, master_weight, low_threshold, med_threshold,
+                    high_threshold, home_domain, signer_type, signer_key, signer_weight, source, xdr):
+        op = SetOptions(inflation_dest,
+                        clear_flags,
+                        set_flags,
+                        master_weight,
+                        low_threshold,
+                        med_threshold,
+                        high_threshold,
+                        signer_type,
+                        signer_key,
+                        signer_weight,
+                        home_domain,
+                        source)
+        xdr_obj = op.to_xdr_object()
+        assert xdr_obj.to_xdr() == xdr
+        from_ins = Operation.from_xdr_object(xdr_obj)
+        assert isinstance(from_ins, SetOptions)
+        assert from_ins.source == source
+        assert from_ins.clear_flags == clear_flags
+        assert from_ins.set_flags == set_flags
+        assert from_ins.master_weight == master_weight
+        assert from_ins.low_threshold == low_threshold
+        assert from_ins.med_threshold == med_threshold
+        assert from_ins.high_threshold == high_threshold
+        assert from_ins.signer_type == signer_type
+        assert from_ins.signer_key == signer_key
+        assert from_ins.signer_weight == signer_weight
+        assert from_ins.home_domain == home_domain
+
+    @pytest.mark.parametrize('signer_type, signer_key, signer_weight', [
+        (SetOptions.SignerType.ED25519_PUBLIC_KEY, 'GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV', None),
+        (SetOptions.SignerType.ED25519_PUBLIC_KEY, None, 1),
+        (None, 'GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV', 1),
+
+    ])
+    def test_to_xdr_with_invalid_signer_arguments_raise(self, signer_type, signer_key, signer_weight):
+        with pytest.raises(ValueError, match="If you want to set up signer, you must provide signer_type, signer_key and signer_weight."):
+            SetOptions(signer_type=signer_type, signer_key=signer_key, signer_weight=signer_weight)
+
+    def test_to_xdr_with_invalid_signer_type_raise(self):
+        signer_type = 'BAD_TYPE'
+        signer_key = 'GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV'
+        signer_weight = 1
+
+        with pytest.raises(ValueError,
+                           match='Invalid signer type, sign_type should be SetOptions.SignerType.ED25519_PUBLIC_KEY, '
+                                 'SetOptions.SHA256_HASH.ED25519_PUBLIC_KEY or SetOptions.SignerType.PRE_AUTH_TX'):
+            SetOptions(signer_type=signer_type, signer_key=signer_key, signer_weight=signer_weight)
 
