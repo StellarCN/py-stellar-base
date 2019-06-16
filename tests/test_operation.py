@@ -8,6 +8,7 @@ from stellar_sdk.operation.allow_trust import AllowTrust
 from stellar_sdk.operation.bump_sequence import BumpSequence
 from stellar_sdk.operation.change_trust import ChangeTrust
 from stellar_sdk.operation.inflation import Inflation
+from stellar_sdk.operation.manage_data import ManageData
 from stellar_sdk.operation.path_payment import PathPayment
 from stellar_sdk.operation.payment import Payment
 
@@ -320,3 +321,44 @@ class TestAllowTrust:
         assert op.trustor == trustor
         assert op.asset_code == asset_code
         assert op.authorize == authorize
+
+
+class TestManageData:
+    @pytest.mark.parametrize('name, value, xdr', [
+        ('add_data', 'value',
+         b'AAAAAQAAAADX7fRsY6KTqIc8EIDyr8M9gxGPW6ODnZoZDgo6l1ymwwAAAAoAAAAIYWRkX2RhdGEAAAABAAAABXZhbHVlAAAA'),
+        ('remove_data', None,
+         b'AAAAAQAAAADX7fRsY6KTqIc8EIDyr8M9gxGPW6ODnZoZDgo6l1ymwwAAAAoAAAALcmVtb3ZlX2RhdGEAAAAAAA=='),
+        ('add_bytes_data', b'bytes_value',
+         b'AAAAAQAAAADX7fRsY6KTqIc8EIDyr8M9gxGPW6ODnZoZDgo6l1ymwwAAAAoAAAAOYWRkX2J5dGVzX2RhdGEAAAAAAAEAAAALYnl0ZXNfdmFsdWUA')
+    ])
+    def test_to_xdr_obj(self, name, value, xdr):
+        source = 'GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV'
+        op = ManageData(name, value, source)
+        assert op.to_xdr_object().to_xdr() == xdr
+
+    @pytest.mark.parametrize('name, value', [
+        ('name_too_long' + '-' * 64, 'value'),
+        ('value_too_long', 'value'  + 'a' * 64),
+    ])
+    def test_to_xdr_obj_with_invalid_value_raise(self, name, value):
+        source = 'GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV'
+        with pytest.raises(ValueError, match=r'Data and value should be <= 64 bytes \(ascii encoded\).'):
+            ManageData(name, value, source)
+
+    @pytest.mark.parametrize('name, value', [
+        ('add_data', 'value'),
+        ('remove_data', None),
+        ('add_bytes_data', b'bytes_value')
+    ])
+    def test_from_xdr_obj(self, name, value):
+        source = 'GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV'
+        origin_xdr_obj = ManageData(name, value, source).to_xdr_object()
+        op = Operation.from_xdr_object(origin_xdr_obj)
+        assert isinstance(op, ManageData)
+        assert op.source == source
+        assert op.name == name
+        if isinstance(value, str):
+            value = value.encode()
+        assert op.value == value
+

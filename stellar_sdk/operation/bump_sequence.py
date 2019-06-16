@@ -12,7 +12,7 @@ class BumpSequence(Operation):
         super().__init__(source)
         self.bump_to = bump_to
 
-    def to_operation_body(self):
+    def to_operation_body(self) -> Xdr.nullclass:
         bump_sequence_op = Xdr.types.BumpSequenceOp(self.bump_to)
         body = Xdr.nullclass()
         body.type = Xdr.const.BUMP_SEQUENCE

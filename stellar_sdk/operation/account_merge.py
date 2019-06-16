@@ -7,22 +7,22 @@ from ..stellarxdr import Xdr
 
 class AccountMerge(Operation):
     @classmethod
-    def type_code(cls):
+    def type_code(cls) -> int:
         return Xdr.const.ACCOUNT_MERGE
 
-    def __init__(self, destination, source=None):
+    def __init__(self, destination: str, source: str = None):
         super().__init__(source)
         self.destination = destination
 
-    def to_operation_body(self):
+    def to_operation_body(self) -> Xdr.nullclass:
         destination = Keypair.from_public_key(self.destination).xdr_account_id()
-        body = Xdr.nullclass
+        body = Xdr.nullclass()
         body.type = Xdr.const.ACCOUNT_MERGE
         body.destination = destination
         return body
 
     @classmethod
-    def from_xdr_object(cls, op_xdr_object):
+    def from_xdr_object(cls, op_xdr_object: Xdr.types.Operation) -> 'AccountMerge':
         source = Operation.get_source_from_xdr_obj(op_xdr_object)
         destination = StrKey.encode_ed25519_public_key(op_xdr_object.body.destination.ed25519)
         return cls(source=source, destination=destination)

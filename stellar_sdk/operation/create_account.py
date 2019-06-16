@@ -7,10 +7,10 @@ from ..keypair import Keypair
 
 class CreateAccount(Operation):
     @classmethod
-    def type_code(cls):
+    def type_code(cls) -> int:
         return Xdr.const.CREATE_ACCOUNT
 
-    def __init__(self, destination, starting_balance, source=None):
+    def __init__(self, destination: str, starting_balance: str, source: str = None) -> None:
         super().__init__(source)
         self.destination = destination
         self.starting_balance = starting_balance
@@ -27,7 +27,7 @@ class CreateAccount(Operation):
         return body
 
     @classmethod
-    def from_xdr_object(cls, op_xdr_object) -> 'CreateAccount':
+    def from_xdr_object(cls, op_xdr_object: Xdr.types.Operation) -> 'CreateAccount':
         source = Operation.get_source_from_xdr_obj(op_xdr_object)
 
         destination = StrKey.encode_ed25519_public_key(op_xdr_object.body.createAccountOp.destination.ed25519)
