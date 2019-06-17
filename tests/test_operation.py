@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 import pytest
 from stellar_sdk.hashing import hash256
 
@@ -9,11 +11,15 @@ from stellar_sdk.operation.account_merge import AccountMerge
 from stellar_sdk.operation.allow_trust import AllowTrust
 from stellar_sdk.operation.bump_sequence import BumpSequence
 from stellar_sdk.operation.change_trust import ChangeTrust
+from stellar_sdk.operation.create_passive_sell_offer import CreatePassiveSellOffer
 from stellar_sdk.operation.inflation import Inflation
+from stellar_sdk.operation.manage_buy_offer import ManageBuyOffer
 from stellar_sdk.operation.manage_data import ManageData
+from stellar_sdk.operation.manage_sell_offer import ManageSellOffer
 from stellar_sdk.operation.path_payment import PathPayment
 from stellar_sdk.operation.payment import Payment
 from stellar_sdk.operation.set_options import SetOptions
+from stellar_sdk.price import Price
 
 
 class TestBaseOperation:
@@ -418,19 +424,19 @@ class TestSetOptions:
                         source)
         xdr_obj = op.to_xdr_object()
         assert xdr_obj.to_xdr() == xdr
-        from_ins = Operation.from_xdr_object(xdr_obj)
-        assert isinstance(from_ins, SetOptions)
-        assert from_ins.source == source
-        assert from_ins.clear_flags == clear_flags
-        assert from_ins.set_flags == set_flags
-        assert from_ins.master_weight == master_weight
-        assert from_ins.low_threshold == low_threshold
-        assert from_ins.med_threshold == med_threshold
-        assert from_ins.high_threshold == high_threshold
-        assert from_ins.signer_type == signer_type
-        assert from_ins.signer_key == signer_key
-        assert from_ins.signer_weight == signer_weight
-        assert from_ins.home_domain == home_domain
+        from_instance = Operation.from_xdr_object(xdr_obj)
+        assert isinstance(from_instance, SetOptions)
+        assert from_instance.source == source
+        assert from_instance.clear_flags == clear_flags
+        assert from_instance.set_flags == set_flags
+        assert from_instance.master_weight == master_weight
+        assert from_instance.low_threshold == low_threshold
+        assert from_instance.med_threshold == med_threshold
+        assert from_instance.high_threshold == high_threshold
+        assert from_instance.signer_type == signer_type
+        assert from_instance.signer_key == signer_key
+        assert from_instance.signer_weight == signer_weight
+        assert from_instance.home_domain == home_domain
 
     @pytest.mark.parametrize('signer_type, signer_key, signer_weight', [
         (SetOptions.SignerType.ED25519_PUBLIC_KEY, 'GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV', None),
@@ -439,7 +445,8 @@ class TestSetOptions:
 
     ])
     def test_to_xdr_with_invalid_signer_arguments_raise(self, signer_type, signer_key, signer_weight):
-        with pytest.raises(ValueError, match="If you want to set up signer, you must provide signer_type, signer_key and signer_weight."):
+        with pytest.raises(ValueError,
+                           match="If you want to set up signer, you must provide signer_type, signer_key and signer_weight."):
             SetOptions(signer_type=signer_type, signer_key=signer_key, signer_weight=signer_weight)
 
     def test_to_xdr_with_invalid_signer_type_raise(self):
@@ -452,3 +459,92 @@ class TestSetOptions:
                                  'SetOptions.SHA256_HASH.ED25519_PUBLIC_KEY or SetOptions.SignerType.PRE_AUTH_TX'):
             SetOptions(signer_type=signer_type, signer_key=signer_key, signer_weight=signer_weight)
 
+
+class TestManageSellOffer:
+    @pytest.mark.parametrize('selling, buying, amount, price, offer_id, source, xdr', [
+        (Asset('USD', 'GDGU5OAPHNPU5UCLE5RDJHG7PXZFQYWKCFOEXSXNMR6KRQRI5T6XXCD7'),
+         Asset('XCN', 'GCNY5OXYSY4FKHOPT2SPOQZAOEIGXB5LBYW3HVU3OWSTQITS65M5RCNY'), '3.123456', '8.141592', 1,
+         'GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV',
+         b'AAAAAQAAAADX7fRsY6KTqIc8EIDyr8M9gxGPW6ODnZoZDgo6l1ymwwAAAAMAAAABVVNEAAAAAADNTrgPO19O0EsnYjSc333yWGLKEVxLyu1kfKjCKOz9ewAAAAFYQ04AAAAAAJuOuviWOFUdz56k90MgcRBrh6sOLbPWm3WlOCJy91nYAAAAAAHcmgAAD4djAAHoSAAAAAAAAAAB'),
+        (Asset('USD', 'GDGU5OAPHNPU5UCLE5RDJHG7PXZFQYWKCFOEXSXNMR6KRQRI5T6XXCD7'),
+         Asset('XCN', 'GCNY5OXYSY4FKHOPT2SPOQZAOEIGXB5LBYW3HVU3OWSTQITS65M5RCNY'), '8', '238.141592', 0, None,
+         b'AAAAAAAAAAMAAAABVVNEAAAAAADNTrgPO19O0EsnYjSc333yWGLKEVxLyu1kfKjCKOz9ewAAAAFYQ04AAAAAAJuOuviWOFUdz56k90MgcRBrh6sOLbPWm3WlOCJy91nYAAAAAATEtAABxjgTAAHoSAAAAAAAAAAA'),
+        (Asset('XLM'),
+         Asset('XCN', 'GCNY5OXYSY4FKHOPT2SPOQZAOEIGXB5LBYW3HVU3OWSTQITS65M5RCNY'), '3.123456', Price(11, 10), 1,
+         'GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV',
+         b'AAAAAQAAAADX7fRsY6KTqIc8EIDyr8M9gxGPW6ODnZoZDgo6l1ymwwAAAAMAAAAAAAAAAVhDTgAAAAAAm466+JY4VR3PnqT3QyBxEGuHqw4ts9abdaU4InL3WdgAAAAAAdyaAAAAAAsAAAAKAAAAAAAAAAE='),
+    ])
+    def test_to_xdr(self, selling, buying, amount, price, offer_id, source, xdr):
+        op = ManageSellOffer(selling, buying, amount, price, offer_id, source)
+        xdr_obj = op.to_xdr_object()
+        assert xdr_obj.to_xdr() == xdr
+        from_instance = Operation.from_xdr_object(xdr_obj)
+        assert isinstance(from_instance, ManageSellOffer)
+        assert from_instance.source == source
+        assert from_instance.buying == buying
+        assert from_instance.selling == selling
+        assert from_instance.amount == amount
+        if not isinstance(price, Price):
+            price = Price.from_raw_price(price)
+        assert from_instance.price == price
+        assert from_instance.offer_id == offer_id
+
+
+class TestManageBuyOffer:
+    @pytest.mark.parametrize('selling, buying, amount, price, offer_id, source, xdr', [
+        (Asset('USD', 'GDGU5OAPHNPU5UCLE5RDJHG7PXZFQYWKCFOEXSXNMR6KRQRI5T6XXCD7'),
+         Asset('XCN', 'GCNY5OXYSY4FKHOPT2SPOQZAOEIGXB5LBYW3HVU3OWSTQITS65M5RCNY'), '3.123456', '8.141592', 1,
+         'GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV',
+         b'AAAAAQAAAADX7fRsY6KTqIc8EIDyr8M9gxGPW6ODnZoZDgo6l1ymwwAAAAwAAAABVVNEAAAAAADNTrgPO19O0EsnYjSc333yWGLKEVxLyu1kfKjCKOz9ewAAAAFYQ04AAAAAAJuOuviWOFUdz56k90MgcRBrh6sOLbPWm3WlOCJy91nYAAAAAAHcmgAAD4djAAHoSAAAAAAAAAAB'),
+        (Asset('USD', 'GDGU5OAPHNPU5UCLE5RDJHG7PXZFQYWKCFOEXSXNMR6KRQRI5T6XXCD7'),
+         Asset('XCN', 'GCNY5OXYSY4FKHOPT2SPOQZAOEIGXB5LBYW3HVU3OWSTQITS65M5RCNY'), '8', '238.141592', 0, None,
+         b'AAAAAAAAAAwAAAABVVNEAAAAAADNTrgPO19O0EsnYjSc333yWGLKEVxLyu1kfKjCKOz9ewAAAAFYQ04AAAAAAJuOuviWOFUdz56k90MgcRBrh6sOLbPWm3WlOCJy91nYAAAAAATEtAABxjgTAAHoSAAAAAAAAAAA'),
+        (Asset('XLM'),
+         Asset('XCN', 'GCNY5OXYSY4FKHOPT2SPOQZAOEIGXB5LBYW3HVU3OWSTQITS65M5RCNY'), '3.123456', Price(11, 10), 1,
+         'GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV',
+         b'AAAAAQAAAADX7fRsY6KTqIc8EIDyr8M9gxGPW6ODnZoZDgo6l1ymwwAAAAwAAAAAAAAAAVhDTgAAAAAAm466+JY4VR3PnqT3QyBxEGuHqw4ts9abdaU4InL3WdgAAAAAAdyaAAAAAAsAAAAKAAAAAAAAAAE='),
+    ])
+    def test_to_xdr(self, selling, buying, amount, price, offer_id, source, xdr):
+        op = ManageBuyOffer(selling, buying, amount, price, offer_id, source)
+        xdr_obj = op.to_xdr_object()
+        assert xdr_obj.to_xdr() == xdr
+        from_instance = Operation.from_xdr_object(xdr_obj)
+        assert isinstance(from_instance, ManageBuyOffer)
+        assert from_instance.source == source
+        assert from_instance.buying == buying
+        assert from_instance.selling == selling
+        assert from_instance.amount == amount
+        if not isinstance(price, Price):
+            price = Price.from_raw_price(price)
+        assert from_instance.price == price
+        assert from_instance.offer_id == offer_id
+
+
+class TestCreatePassiveSellOffer:
+
+    @pytest.mark.parametrize('selling, buying, amount, price, source, xdr', [
+        (Asset('USD', 'GDGU5OAPHNPU5UCLE5RDJHG7PXZFQYWKCFOEXSXNMR6KRQRI5T6XXCD7'),
+         Asset('XCN', 'GCNY5OXYSY4FKHOPT2SPOQZAOEIGXB5LBYW3HVU3OWSTQITS65M5RCNY'), '11.2782700', '3.07',
+         'GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV',
+         b'AAAAAQAAAADX7fRsY6KTqIc8EIDyr8M9gxGPW6ODnZoZDgo6l1ymwwAAAAQAAAABVVNEAAAAAADNTrgPO19O0EsnYjSc333yWGLKEVxLyu1kfKjCKOz9ewAAAAFYQ04AAAAAAJuOuviWOFUdz56k90MgcRBrh6sOLbPWm3WlOCJy91nYAAAAAAa47WwAAAEzAAAAZA=='),
+        (Asset('USD', 'GDGU5OAPHNPU5UCLE5RDJHG7PXZFQYWKCFOEXSXNMR6KRQRI5T6XXCD7'),
+         Asset('XCN', 'GCNY5OXYSY4FKHOPT2SPOQZAOEIGXB5LBYW3HVU3OWSTQITS65M5RCNY'), '8.000', '238.141592', None,
+         b'AAAAAAAAAAQAAAABVVNEAAAAAADNTrgPO19O0EsnYjSc333yWGLKEVxLyu1kfKjCKOz9ewAAAAFYQ04AAAAAAJuOuviWOFUdz56k90MgcRBrh6sOLbPWm3WlOCJy91nYAAAAAATEtAABxjgTAAHoSA=='),
+        (Asset('XLM'),
+         Asset('XCN', 'GCNY5OXYSY4FKHOPT2SPOQZAOEIGXB5LBYW3HVU3OWSTQITS65M5RCNY'), '11.2782700', Price(453, 4354),
+         'GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV',
+         b'AAAAAQAAAADX7fRsY6KTqIc8EIDyr8M9gxGPW6ODnZoZDgo6l1ymwwAAAAQAAAAAAAAAAVhDTgAAAAAAm466+JY4VR3PnqT3QyBxEGuHqw4ts9abdaU4InL3WdgAAAAABrjtbAAAAcUAABEC'),
+    ])
+    def test_to_xdr(self, selling, buying, amount, price, source, xdr):
+        op = CreatePassiveSellOffer(selling, buying, amount, price, source)
+        xdr_obj = op.to_xdr_object()
+        assert xdr_obj.to_xdr() == xdr
+        from_instance = Operation.from_xdr_object(xdr_obj)
+        assert isinstance(from_instance, CreatePassiveSellOffer)
+        assert from_instance.source == source
+        assert from_instance.buying == buying
+        assert from_instance.selling == selling
+        assert Decimal(from_instance.amount) == Decimal(amount)
+        if not isinstance(price, Price):
+            price = Price.from_raw_price(price)
+        assert from_instance.price == price

@@ -14,6 +14,10 @@ class Operation(metaclass=ABCMeta):
     def __init__(self, source: str = None) -> None:
         self.source = source
 
+    @classmethod
+    def type_code(cls) -> int:
+        pass  # pragma: no cover
+
     @staticmethod
     def to_xdr_amount(value: str) -> int:
         if not isinstance(value, str):
@@ -35,7 +39,7 @@ class Operation(metaclass=ABCMeta):
         return str(Decimal(value) / Operation._ONE)
 
     @abstractmethod
-    def to_operation_body(self) -> Xdr.nullclass():
+    def to_operation_body(self) -> Xdr.nullclass:
         pass  # pragma: no cover
 
     def to_xdr_object(self) -> Xdr.types.Operation:
