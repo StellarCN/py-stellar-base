@@ -12,6 +12,8 @@ yapf = "*"
 [packages]
 crc16 = "*"
 pynacl = "*"
+requests = "*"
+schematics = "*"
 
 [requires]
 python_version = "3.7"
