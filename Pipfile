@@ -7,6 +7,7 @@ verify_ssl = true
 pytest = "*"
 ply = "*"
 pytest-cov = "*"
+yapf = "*"
 
 [packages]
 crc16 = "*"
