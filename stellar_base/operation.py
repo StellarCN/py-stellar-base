@@ -544,6 +544,7 @@ class AllowTrust(Operation):
             raise NotImplementedError(
                 "Operation of asset_type={} is not implemented"
                 ".".format(asset_type.type))
+        asset_code = asset_code.rstrip('\x00')
 
         return cls(
             source=source,
