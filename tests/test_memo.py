@@ -10,16 +10,16 @@ from stellar_sdk.memo import NoneMemo, Memo, TextMemo, IdMemo, HashMemo, ReturnH
 class TestMemo:
     def test_none_memo(self):
         memo = NoneMemo()
-        assert memo.to_xdr_object().to_xdr() == b'AAAAAA=='
+        assert memo.to_xdr_object().to_xdr() == 'AAAAAA=='
 
         base_memo = Memo.from_xdr_object(memo.to_xdr_object())
         assert isinstance(base_memo, NoneMemo)
-        assert base_memo.to_xdr_object().to_xdr() == b'AAAAAA=='
+        assert base_memo.to_xdr_object().to_xdr() == 'AAAAAA=='
 
     @pytest.mark.parametrize('text, xdr', [
-        ('Hello, Eno!', b'AAAAAQAAAAtIZWxsbywgRW5vIQA='),
-        ('星星之火。', b'AAAAAQAAAA/mmJ/mmJ/kuYvngavjgIIA'),
-        (b'Stellar', b'AAAAAQAAAAdTdGVsbGFyAA=='),
+        ('Hello, Eno!', 'AAAAAQAAAAtIZWxsbywgRW5vIQA='),
+        ('星星之火。', 'AAAAAQAAAA/mmJ/mmJ/kuYvngavjgIIA'),
+        (b'Stellar', 'AAAAAQAAAAdTdGVsbGFyAA=='),
     ])
     def test_text_memo(self, text, xdr):
         memo = TextMemo(text)
@@ -43,9 +43,9 @@ class TestMemo:
             TextMemo(invalid_value)
 
     @pytest.mark.parametrize('id, xdr', [
-        (0, b'AAAAAgAAAAAAAAAA'),
-        (123123123, b'AAAAAgAAAAAHVrWz'),
-        (2 ** 64 - 1, b'AAAAAv//////////'),
+        (0, 'AAAAAgAAAAAAAAAA'),
+        (123123123, 'AAAAAgAAAAAHVrWz'),
+        (2 ** 64 - 1, 'AAAAAv//////////'),
     ])
     def test_id_memo(self, id, xdr):
         memo = IdMemo(id)
@@ -65,9 +65,9 @@ class TestMemo:
             IdMemo(id)
 
     @pytest.mark.parametrize('hex, xdr', [
-        ('90d38f2d64949bb64f693ff231f9a3b3', b'AAAAA5DTjy1klJu2T2k/8jH5o7MAAAAAAAAAAAAAAAAAAAAA'),
+        ('90d38f2d64949bb64f693ff231f9a3b3', 'AAAAA5DTjy1klJu2T2k/8jH5o7MAAAAAAAAAAAAAAAAAAAAA'),
         ('573c10b148fc4bc7db97540ce49da22930f4bcd48a060dc7347be84ea9f52d9f',
-         b'AAAAA1c8ELFI/EvH25dUDOSdoikw9LzUigYNxzR76E6p9S2f'),
+         'AAAAA1c8ELFI/EvH25dUDOSdoikw9LzUigYNxzR76E6p9S2f'),
     ])
     def test_hash_memo(self, hex, xdr):
         hash = binascii.unhexlify(hex)
@@ -85,9 +85,9 @@ class TestMemo:
             HashMemo(os.urandom(length))
 
     @pytest.mark.parametrize('hex, xdr', [
-        ('90d38f2d64949bb64f693ff231f9a3b3', b'AAAABJDTjy1klJu2T2k/8jH5o7MAAAAAAAAAAAAAAAAAAAAA'),
+        ('90d38f2d64949bb64f693ff231f9a3b3', 'AAAABJDTjy1klJu2T2k/8jH5o7MAAAAAAAAAAAAAAAAAAAAA'),
         ('573c10b148fc4bc7db97540ce49da22930f4bcd48a060dc7347be84ea9f52d9f',
-         b'AAAABFc8ELFI/EvH25dUDOSdoikw9LzUigYNxzR76E6p9S2f'),
+         'AAAABFc8ELFI/EvH25dUDOSdoikw9LzUigYNxzR76E6p9S2f'),
     ])
     def test_return_hash_memo(self, hex, xdr):
         return_hash = binascii.unhexlify(hex)

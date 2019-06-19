@@ -1192,7 +1192,7 @@ class struct_info(Info):
         return "%sdef to_xdr(self):\n" \
                "%s%s%s = pack.StellarXDRPacker()\n" \
                "%s%s%s.pack_%s(self)\n" \
-               "%s%sreturn base64.b64encode(%s.get_buffer())\n" % \
+               "%s%sreturn base64.b64encode(%s.get_buffer()).decode()\n" % \
                (prefix, prefix, indent, obj_id, prefix, indent, obj_id, self.id, prefix, indent, obj_id)
 
     def type_from_xdr(self, prefix=indent):
@@ -1267,7 +1267,7 @@ class union_info(Info):
         return "%sdef to_xdr(self):\n" \
                "%s%s%s = pack.StellarXDRPacker()\n" \
                "%s%s%s.pack_%s(self)\n" \
-               "%s%sreturn base64.b64encode(%s.get_buffer())\n" % \
+               "%s%sreturn base64.b64encode(%s.get_buffer()).decode()\n" % \
                (prefix, prefix, indent, obj_id, prefix, indent, obj_id, self.id, prefix, indent, obj_id)
 
     def union_from_xdr(self, prefix=indent):

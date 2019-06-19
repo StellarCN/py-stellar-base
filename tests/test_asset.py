@@ -85,11 +85,11 @@ class TestAsset:
                == Asset('XCN', 'GCNY5OXYSY4FKHOPT2SPOQZAOEIGXB5LBYW3HVU3OWSTQITS65M5RCNY')
 
     @pytest.mark.parametrize('asset, xdr', [
-        pytest.param(Asset.native(), b'AAAAAA==', id='native'),
+        pytest.param(Asset.native(), 'AAAAAA==', id='native'),
         pytest.param(Asset('XCN', 'GCNY5OXYSY4FKHOPT2SPOQZAOEIGXB5LBYW3HVU3OWSTQITS65M5RCNY'),
-                     b'AAAAAVhDTgAAAAAAm466+JY4VR3PnqT3QyBxEGuHqw4ts9abdaU4InL3Wdg=', id='alphanum4'),
+                     'AAAAAVhDTgAAAAAAm466+JY4VR3PnqT3QyBxEGuHqw4ts9abdaU4InL3Wdg=', id='alphanum4'),
         pytest.param(Asset('CATCOIN', 'GDJVFDG5OCW5PYWHB64MGTHGFF57DRRJEDUEFDEL2SLNIOONHYJWHA3Z'),
-                     b'AAAAAkNBVENPSU4AAAAAAAAAAADTUozdcK3X4scPuMNM5il78cYpIOhCjIvUltQ5zT4TYw==', id='alphanum12'),
+                     'AAAAAkNBVENPSU4AAAAAAAAAAADTUozdcK3X4scPuMNM5il78cYpIOhCjIvUltQ5zT4TYw==', id='alphanum12'),
     ])
     def test_to_xdr_object(self, asset, xdr):
         assert asset.to_xdr_object().to_xdr() == xdr

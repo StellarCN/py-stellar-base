@@ -6,8 +6,8 @@ from stellar_sdk.time_bounds import TimeBounds
 class TestTimeBounds:
 
     @pytest.mark.parametrize('min_time, max_time, xdr', [
-        (1560844454, 1560846000, b'AAAAAF0ImKYAAAAAXQiesA=='),
-        (1560844454, 0, b'AAAAAF0ImKYAAAAAAAAAAA==')
+        (1560844454, 1560846000, 'AAAAAF0ImKYAAAAAXQiesA=='),
+        (1560844454, 0, 'AAAAAF0ImKYAAAAAAAAAAA==')
     ])
     def test_to_xdr(self, min_time, max_time, xdr):
         op_xdr_object = TimeBounds(min_time, max_time).to_xdr_object()

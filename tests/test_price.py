@@ -5,7 +5,7 @@ class TestPrice:
     def test_to_xdr(self):
         n, d = 1, 2
         price_obj = Price(n, d).to_xdr_object()
-        assert price_obj.to_xdr() == b'AAAAAQAAAAI='
+        assert price_obj.to_xdr() == 'AAAAAQAAAAI='
         from_instance = Price.from_xdr_object(price_obj)
         assert isinstance(from_instance, Price)
         assert from_instance.n == n
