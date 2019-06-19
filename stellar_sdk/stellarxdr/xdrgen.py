@@ -359,6 +359,7 @@ def t_error(t):
 # Build the lexer
 lex.lex(debug=0, optimize=False)
 
+
 ##########################################################################
 #                                                                        #
 #                          Yacc Parsing Info                             #
@@ -655,7 +656,7 @@ def p_enum_constant(t):
                 error_occurred = True
                 print(
                     "ERROR - reference to {0:s} at line {1:s} is not a constant".
-                    format(value, lineno))
+                        format(value, lineno))
             else:
                 info.positive = name_dict[value].positive
         t[0] = [info]
@@ -760,6 +761,7 @@ INDENT = 4  # Number of spaces for each indent level
 indent = ' ' * INDENT
 indent2 = indent * 2
 
+
 ##########################################################################
 #                                                                        #
 #                   Helper classes and functions                         #
@@ -774,7 +776,7 @@ def id_unique(dict_id, name, lineno):
         error_occurred = True
         print(
             "ERROR - {0:s} definition {1:s} at line {2:d} conflicts with {3:s}"
-            .format(name, dict_id, lineno, name_dict[dict_id]))
+                .format(name, dict_id, lineno, name_dict[dict_id]))
         return False
     else:
         return True
@@ -1181,8 +1183,9 @@ class struct_info(Info):
         repr = self.typerepr(varlist)
         pass_attr = self.pass_through(varlist)
         to_xdr = self.type_to_xdr()
-        return "class %s:\n%s%s\n%s%s%s\n" % \
-               (self.id, xdrdef, init, pass_attr, to_xdr, repr)
+        from_xdr = self.type_from_xdr()
+        return "class %s:\n%s%s\n%s%s\n%s\n%s\n" % \
+               (self.id, xdrdef, init, pass_attr, to_xdr, from_xdr, repr)
 
     def type_to_xdr(self, prefix=indent):
         obj_id = self.id.lower()
@@ -1192,6 +1195,13 @@ class struct_info(Info):
                "%s%sreturn base64.b64encode(%s.get_buffer())\n" % \
                (prefix, prefix, indent, obj_id, prefix, indent, obj_id, self.id, prefix, indent, obj_id)
 
+    def type_from_xdr(self, prefix=indent):
+        return "%s@staticmethod\n" \
+               "%sdef from_xdr(xdr):\n" \
+               "%s%sxdr_decoded = base64.b64decode(xdr)\n" \
+               "%s%sxdr_unpacked = pack.StellarXDRUnpacker(xdr_decoded)\n" \
+               "%s%sreturn xdr_unpacked.unpack_%s()\n" % \
+               (prefix, prefix, prefix, indent, prefix, indent, prefix, indent, self.id)
 
     def pass_through(self, varlist):
         def check(v):
@@ -1260,6 +1270,14 @@ class union_info(Info):
                "%s%sreturn base64.b64encode(%s.get_buffer())\n" % \
                (prefix, prefix, indent, obj_id, prefix, indent, obj_id, self.id, prefix, indent, obj_id)
 
+    def union_from_xdr(self, prefix=indent):
+        return "%s@staticmethod\n" \
+               "%sdef from_xdr(xdr):\n" \
+               "%s%sxdr_decoded = base64.b64decode(xdr)\n" \
+               "%s%sxdr_unpacked = pack.StellarXDRUnpacker(xdr_decoded)\n" \
+               "%s%sreturn xdr_unpacked.unpack_%s()\n" % \
+               (prefix, prefix, prefix, indent, prefix, indent, prefix, indent, self.id)
+
     def union_switch(self, prefix=indent):
         d = '{'
         for l in self.body[1:-1]:
@@ -1297,8 +1315,9 @@ class union_info(Info):
             varlist += [l for l in c.declarations if l.type != 'void']
         init = self.typeinit(varlist)
         repr = self.typerepr(varlist)
-        return "class %s:\n%s%s\n%s\n%s\n%s\n%s\n" % \
-               (self.id, xdrdef, init, self.union_switch(), self.union_to_xdr(), self.union_getattr(), repr)
+        return "class %s:\n%s%s\n%s\n%s\n%s\n%s\n%s\n" % \
+               (self.id, xdrdef, init, self.union_switch(), self.union_to_xdr(), self.union_from_xdr(),
+                self.union_getattr(), repr)
 
     def pack_output(self):
         header = self._get_pack_header()
