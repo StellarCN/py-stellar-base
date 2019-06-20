@@ -1,6 +1,10 @@
 Release History
 ===============
 
+### Version 1.2.2
+Released on June 20, 2019
+  - fix(Operation.AllowTrust): AllowTrust.from_xdr_object may generate incorrect asset code.
+
 ### Version 1.2.1
 Released on June 9, 2019
   - fix(Operation.ChangeTrust): An exception should be thrown when the limit is set to 0(int). ([#206](https://github.com/StellarCN/py-stellar-base/pull/206))
