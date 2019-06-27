@@ -11,7 +11,7 @@ address = Address(address=address, horizon_uri=horizon)
 
 
 def payment_handler(response):
-    print(response.data)
+    print(response)
 
 
 payments = address.payments(sse=True, cursor=cursor)
