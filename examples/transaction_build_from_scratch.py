@@ -1,3 +1,6 @@
+# If you are new to the SDK, I suggest you first read transaction_build_with_builder.py
+# in the same directory, which provides the same functionality in the simplest way as this example.
+
 from stellar_base.keypair import Keypair
 from stellar_base.asset import Asset
 from stellar_base.operation import Payment, SetOptions
