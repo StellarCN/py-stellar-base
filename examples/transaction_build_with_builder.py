@@ -4,7 +4,7 @@ alice_seed = 'SBUORYV26AZ3ULEEC5FQ4NKPVRO7MBAWTW26YKCDPPKFGMK7WAYNX4UN'
 bob_address = 'GBZF7GQJXXHD3OL3B5IOUICFDYIATZZ3F3XQ7SOQ5PXLVQMDSOI5ACEE'
 
 horizon_uri = 'https://horizon-testnet.stellar.org'  # testnet horizon
-# horizon_uri = 'https://horizon-testnet.stellar.org' # public horizon
+# horizon_uri = 'https://horizon.stellar.org' # public horizon
 network = 'TESTNET'  # for test network
 # network = 'PUBLIC' # for public network
 
