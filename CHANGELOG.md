@@ -1,6 +1,10 @@
 Release History
 ===============
 
+### Version 1.3.0
+Released on July 24, 2019
+  - Breaking change: fetching data through SSE returns **dict** instead of a **str**.
+
 ### Version 1.2.2
 Released on June 20, 2019
   - fix(Operation.AllowTrust): AllowTrust.from_xdr_object may generate incorrect asset code.
