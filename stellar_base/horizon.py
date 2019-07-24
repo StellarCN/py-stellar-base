@@ -181,7 +181,8 @@ class Horizon(object):
         # SSE connection
         # If SSE is enabled, Horizon will fetch the user-agent from the URL query params. Maybe it's not a good design.
         params.update(self.user_agent)
-        return _SSEClient(url, retry=0, session=self._sse_session, connect_retry=-1, params=params)
+        sse_client = _SSEClient(url, retry=0, session=self._sse_session, connect_retry=-1, params=params)
+        return sse_client
 
     def account(self, address):
         """Returns information and links relating to a single account.
@@ -926,6 +927,8 @@ class _SSEClient(object):
             data = msg.data
             if data != '"hello"' and data != '"byebye"':
                 return json.loads(data)
+
+    next = __next__  # Python 2
 
 
 def check_horizon_reply(reply):
