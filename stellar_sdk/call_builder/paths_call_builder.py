@@ -2,7 +2,7 @@ from ..asset import Asset
 from ..call_builder.base_call_builder import BaseCallBuilder
 
 
-class PathCallBuilder(BaseCallBuilder):
+class PathsCallBuilder(BaseCallBuilder):
     def __init__(self, horizon_url,
                  client,
                  source_account: str,

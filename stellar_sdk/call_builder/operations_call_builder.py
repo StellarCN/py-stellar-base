@@ -1,7 +1,7 @@
 from ..call_builder.base_call_builder import BaseCallBuilder
 
 
-class OperationCallBuilder(BaseCallBuilder):
+class OperationsCallBuilder(BaseCallBuilder):
     def __init__(self, horizon_url, client):
         super().__init__(horizon_url, client)
         self.endpoint = 'operations'

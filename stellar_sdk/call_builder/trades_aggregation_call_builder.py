@@ -4,7 +4,7 @@ from ..asset import Asset
 from ..call_builder.base_call_builder import BaseCallBuilder
 
 
-class TradeAggregationCallBuilder(BaseCallBuilder):
+class TradeAggregationsCallBuilder(BaseCallBuilder):
     def __init__(self,
                  horizon_url: str,
                  client,
