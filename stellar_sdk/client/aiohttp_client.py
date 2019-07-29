@@ -6,12 +6,14 @@ import aiohttp
 from aiohttp_sse_client.client import EventSource
 
 from .base_async_client import BaseAsyncClient
+from .response import Response
 from ..__version__ import __version__
 
 DEFAULT_REQUEST_TIMEOUT = 11  # two ledgers + 1 sec, let's retry faster and not wait 60 secs.
 DEFAULT_NUM_RETRIES = 3
 DEFAULT_BACKOFF_FACTOR = 0.5
-USER_AGENT = {
+USER_AGENT = 'py-stellar-sdk/%s/AiohttpClient' % __version__
+IDENTIFICATION_HEADERS = {
     'X-Client-Name': 'py-stellar-sdk',
     'X-Client-Version': __version__,
 }
@@ -24,7 +26,7 @@ class AiohttpClient(BaseAsyncClient):
                  num_retries: Optional[int] = DEFAULT_NUM_RETRIES,
                  request_timeout: Optional[Union[int, None]] = DEFAULT_REQUEST_TIMEOUT,
                  backoff_factor: Optional[float] = DEFAULT_BACKOFF_FACTOR,
-                 user_agent: Optional[dict] = None,
+                 user_agent: Optional[str] = None,
                  **kwargs) -> None:
         self.num_retries = num_retries
         self.backoff_factor = backoff_factor
@@ -40,8 +42,9 @@ class AiohttpClient(BaseAsyncClient):
             self.user_agent = user_agent
 
         headers = {
-            **self.user_agent,
+            **IDENTIFICATION_HEADERS,
             'Content-Type': 'application/x-www-form-urlencoded',
+            'User-Agent': self.user_agent
         }
         session = aiohttp.ClientSession(headers=headers,
                                         connector=connector,
@@ -51,13 +54,19 @@ class AiohttpClient(BaseAsyncClient):
         self._session = session
         self._sse_session = None
 
-    async def get(self, url: str, params=None) -> dict:
+    async def get(self, url: str, params=None) -> Response:
         async with self._session.get(url, params=params) as response:
-            return await response.json(encoding='utf-8')
+            return Response(status_code=response.status,
+                            text=await response.text(),
+                            headers=dict(response.headers),
+                            url=str(response.url))
 
-    async def post(self, url: str, params=None) -> dict:
+    async def post(self, url: str, params=None) -> Response:
         async with self._session.post(url, params=params) as response:
-            return await response.json(encoding='utf-8')
+            return Response(status_code=response.status,
+                            text=await response.text(),
+                            headers=dict(response.headers),
+                            url=str(response.url))
 
     async def _init_sse_session(self) -> None:
         """Init the sse session """
@@ -65,7 +74,7 @@ class AiohttpClient(BaseAsyncClient):
             self._sse_session = aiohttp.ClientSession()  # No timeout, no special connector
             # Other headers such as "Accept: text/event-stream" are added by thr SSEClient
 
-    async def stream(self, url: str, params: Optional[dict] = None) -> AsyncGenerator[dict]:
+    async def stream(self, url: str, params: Optional[dict] = None) -> AsyncGenerator:
         """
         SSE generator with timeout between events
         :param url: URL to send SSE request to
@@ -77,9 +86,10 @@ class AiohttpClient(BaseAsyncClient):
             """
             Generator for sse events
             """
+
             if params.get('cursor') is None:
                 params['cursor'] = 'now'  # Start monitoring from now.
-            params.update(**self.user_agent)
+            params.update(**IDENTIFICATION_HEADERS)
             retry = 0.1
             while True:
                 try:
@@ -101,7 +111,7 @@ class AiohttpClient(BaseAsyncClient):
                             if event.last_event_id != '':
                                 # Events that dont have an id are not useful for us (hello/byebye events)
                                 # Save the last event id and retry time
-                                last_id = event.last_event_id
+                                last_id = event.last_event_id  # TODO
                                 retry = client._reconnection_time.total_seconds()
                                 try:
                                     data = event.data
