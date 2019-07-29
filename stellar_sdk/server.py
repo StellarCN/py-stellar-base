@@ -1,3 +1,5 @@
+from stellar_sdk.account import Account
+from stellar_sdk.client.base_sync_client import BaseSyncClient
 from .asset import Asset
 from .call_builder.accounts_call_builder import AccountsCallBuilder
 from .call_builder.assets_call_builder import AssetsCallBuilder
@@ -11,14 +13,32 @@ from .call_builder.trades_aggregation_call_builder import TradeAggregationsCallB
 from .call_builder.trades_call_builder import TradesCallBuilder
 from .call_builder.transactions_call_builder import TransactionsCallBuilder
 from .client.aiohttp_client import AiohttpClient
+from .client.base_async_client import BaseAsyncClient
 
 
-class AsyncServer:
+class Server:
     def __init__(self, horizon_url="https://horizon.stellar.org", client=None):
         self.horizon_url = horizon_url
         self.client = AiohttpClient()
+        if isinstance(self.client, BaseAsyncClient):
+            self.load_account = self.__load_account_async
+        elif isinstance(self.client, BaseSyncClient):
+            self.load_account = self.__load_account_sync
+        else:
+            raise  # TODO
+
         if client:
             self.client = client
+
+    async def __load_account_async(self, account_id):
+        resp = await self.accounts().account_id(account_id=account_id).call()
+        sequence = resp.json()['sequence']
+        return Account(account_id=account_id, sequence=sequence)
+
+    def __load_account_sync(self, account_id):
+        resp = self.accounts().account_id(account_id=account_id).call()
+        sequence = resp.json()['sequence']
+        return Account(account_id=account_id, sequence=sequence)
 
     def accounts(self) -> AccountsCallBuilder:
         return AccountsCallBuilder(horizon_url=self.horizon_url, client=self.client)
@@ -77,3 +97,12 @@ class AsyncServer:
                                             end_time=end_time,
                                             resolution=resolution,
                                             offset=offset)
+
+    async def __aenter__(self) -> 'Server':
+        return self
+
+    async def __aexit__(self, exc_type, exc_val, exc_tb) -> None:
+        await self.close()
+
+    async def close(self) -> None:
+        await self.client.close()
