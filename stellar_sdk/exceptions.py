@@ -1,43 +1,47 @@
-class StellarError(Exception):
+class SdkError(Exception):
     def __init__(self, msg):
-        super(StellarError, self).__init__(msg)
+        super(SdkError, self).__init__(msg)
 
 
-class BadSignatureError(StellarError):
+class ValueError(ValueError, SdkError):
     pass
 
 
-class Ed25519PublicKeyInvalidError(StellarError):
+class BadSignatureError(SdkError):
     pass
 
 
-class Ed25519SecretSeedInvalidError(StellarError):
+class Ed25519PublicKeyInvalidError(SdkError):
     pass
 
 
-class DecodeError(StellarError):
+class Ed25519SecretSeedInvalidError(SdkError):
     pass
 
 
-class MissingEd25519SecretSeedError(StellarError):
+class DecodeError(SdkError):
     pass
 
 
-class MemoInvalidException(StellarError, ValueError):
+class MissingEd25519SecretSeedError(SdkError):
     pass
 
 
-class AssetCodeInvalidError(StellarError):
+class MemoInvalidException(ValueError):
     pass
 
 
-class AssetIssuerInvalidError(Ed25519PublicKeyInvalidError):
+class AssetCodeInvalidError(ValueError):
     pass
 
 
-class NoApproximationError(StellarError):
+class AssetIssuerInvalidError(ValueError):
     pass
 
 
-class SignatureExistError(StellarError):
+class NoApproximationError(SdkError):
+    pass
+
+
+class SignatureExistError(SdkError):
     pass
