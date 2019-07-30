@@ -4,9 +4,9 @@ import typing
 import nacl.signing as ed25519
 from nacl.exceptions import BadSignatureError as NaclBadSignatureError
 
+from .exceptions import BadSignatureError, MissingEd25519SecretSeedError
 from .stellarxdr import Xdr
 from .strkey import StrKey
-from .exceptions import BadSignatureError, MissingEd25519SecretSeedError
 
 
 def _get_key_of_expected_type(key: typing.Any, expected_type: typing.Any) -> typing.Any:
@@ -55,6 +55,7 @@ class Keypair:
     def raw_public_key(self) -> bytes:
         return bytes(self.verify_key)
 
+    # @property
     def public_key(self) -> str:
         return StrKey.encode_ed25519_public_key(self.raw_public_key())
 
@@ -90,3 +91,6 @@ class Keypair:
         signature = self.sign(data)
         hint = self.signature_hint()
         return Xdr.types.DecoratedSignature(hint, signature)
+
+    def __eq__(self, other: 'Keypair'):
+        return self.verify_key == other.verify_key and self.signing_key == other.signing_key

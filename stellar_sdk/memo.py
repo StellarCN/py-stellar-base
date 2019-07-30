@@ -21,7 +21,7 @@ class Memo(object, metaclass=abc.ABCMeta):
             Xdr.const.MEMO_NONE: NoneMemo
         }
 
-        # Maybe we should raise Key Error here
+        # TODO: Maybe we should raise Key Error here
         memo_cls = xdr_types.get(xdr_obj.type, NoneMemo)
         return memo_cls.from_xdr_object(xdr_obj)
 
