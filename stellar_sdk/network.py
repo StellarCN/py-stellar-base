@@ -12,10 +12,8 @@ class Network:
         return self.network_passphrase == other.network_passphrase
 
 
-_network_passphrases = {
-    'PUBLIC': 'Public Global Stellar Network ; September 2015',
-    'TESTNET': 'Test SDF Network ; September 2015'
-}
+PUBLIC_NETWORK_PASSPHRASE: str = 'Public Global Stellar Network ; September 2015'
+TESTNET_NETWORK_PASSPHRASE: str = 'Test SDF Network ; September 2015'
 
-PUBLIC = Network(_network_passphrases['PUBLIC'])  # type: Network
-TESTNET = Network(_network_passphrases['TESTNET'])  # type: Network
+PUBLIC: Network = Network(PUBLIC_NETWORK_PASSPHRASE)
+TESTNET: Network = Network(TESTNET_NETWORK_PASSPHRASE)
