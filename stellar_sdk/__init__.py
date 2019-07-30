@@ -8,6 +8,8 @@ from .keypair import Keypair
 from .memo import Memo, NoneMemo, TextMemo, IdMemo, HashMemo, ReturnHashMemo
 from .network import Network, PUBLIC, TESTNET
 from .price import Price
+from .server import Server
+from .transaction_builder import TransactionBuilder
 
 __all__ = ['__title__',
            '__description__',
@@ -17,6 +19,7 @@ __all__ = ['__title__',
            '__author_email__',
            '__license__',
            'Asset',
+           'AsyncServer'
            'Keypair',
            'Memo',
            'NoneMemo',
@@ -27,5 +30,6 @@ __all__ = ['__title__',
            'Network',
            'PUBLIC',
            'TESTNET',
+           'TransactionBuilder',
            'Price'
            ] + operation_all
