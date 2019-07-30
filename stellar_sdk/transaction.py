@@ -1,24 +1,27 @@
 import typing
 
-from .strkey import StrKey
-from .time_bounds import TimeBounds
+from .exceptions import ValueError
 from .keypair import Keypair
+from .memo import NoneMemo, Memo
 from .operation.operation import Operation
 from .stellarxdr import Xdr
-from .memo import NoneMemo, Memo
-from .utils import pack_xdr_array, unpack_xdr_array
+from .strkey import StrKey
+from .time_bounds import TimeBounds
 from .types import MemoUnion, OperationUnion
+from .utils import pack_xdr_array, unpack_xdr_array
 
 
 class Transaction:
     def __init__(
-            self,
-            source: Keypair,
-            sequence: int,
-            fee: int,
-            operations: typing.List[OperationUnion],
-            memo: typing.Union[MemoUnion] = None,
-            time_bounds: TimeBounds = None):
+        self,
+        source: Keypair,
+        sequence: int,
+        fee: int,
+        operations: typing.List[OperationUnion],
+        memo: typing.Union[MemoUnion] = None,
+        time_bounds: TimeBounds = None
+    ) -> None:
+
         if not operations:
             raise ValueError("At least one operation required.")
 
@@ -31,11 +34,6 @@ class Transaction:
         self.memo = memo
         self.fee = fee
         self.time_bounds = time_bounds
-        self.signatures = []
-
-    def add_operation(self, operation):
-        if operation not in self.operations:  # TODO: remove this?
-            self.operations.append(operation)
 
     def to_xdr_object(self):
         source_account = self.source.xdr_account_id()
