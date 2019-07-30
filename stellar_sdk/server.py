@@ -1,5 +1,6 @@
-from stellar_sdk.account import Account
-from stellar_sdk.client.base_sync_client import BaseSyncClient
+from urllib.parse import urljoin
+
+from .account import Account
 from .asset import Asset
 from .call_builder.accounts_call_builder import AccountsCallBuilder
 from .call_builder.assets_call_builder import AssetsCallBuilder
@@ -14,30 +15,47 @@ from .call_builder.trades_call_builder import TradesCallBuilder
 from .call_builder.transactions_call_builder import TransactionsCallBuilder
 from .client.aiohttp_client import AiohttpClient
 from .client.base_async_client import BaseAsyncClient
+from .client.base_sync_client import BaseSyncClient
+from .transaction_envelope import TransactionEnvelope
 
 
 class Server:
     def __init__(self, horizon_url="https://horizon.stellar.org", client=None):
         self.horizon_url = horizon_url
-        self.client = AiohttpClient()
+
+        self.client = client
+        if not client:
+            self.client = AiohttpClient()
+
         if isinstance(self.client, BaseAsyncClient):
-            self.load_account = self.__load_account_async
+            self.__async = True
         elif isinstance(self.client, BaseSyncClient):
-            self.load_account = self.__load_account_sync
+            self.__async = False
         else:
             raise  # TODO
 
-        if client:
-            self.client = client
+    async def submit_transaction(self, transaction_envelope: TransactionEnvelope):
+        xdr = transaction_envelope
+        if isinstance(transaction_envelope, TransactionEnvelope):
+            xdr = transaction_envelope.to_xdr()
 
-    async def __load_account_async(self, account_id):
+        params = {'tx': xdr}
+        url = urljoin(self.horizon_url, '/transactions')
+        return await self.client.post(url=url, params=params)
+
+    def load_account(self, account_id):
+        if self.__async:
+            return self.__load_account_async(account_id)
+        return self.__load_account_sync(account_id)
+
+    async def __load_account_async(self, account_id: str) -> Account:
         resp = await self.accounts().account_id(account_id=account_id).call()
-        sequence = resp.json()['sequence']
+        sequence = int(resp.json()['sequence'])
         return Account(account_id=account_id, sequence=sequence)
 
-    def __load_account_sync(self, account_id):
+    def __load_account_sync(self, account_id: str) -> Account:
         resp = self.accounts().account_id(account_id=account_id).call()
-        sequence = resp.json()['sequence']
+        sequence = int(resp.json()['sequence'])
         return Account(account_id=account_id, sequence=sequence)
 
     def accounts(self) -> AccountsCallBuilder:
