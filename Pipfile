@@ -13,7 +13,6 @@ yapf = "*"
 crc16 = "*"
 pynacl = "*"
 requests = "*"
-schematics = "*"
 aiohttp = "*"
 aiohttp-sse-client = "*"
 
