@@ -2,16 +2,15 @@ from urllib.parse import urljoin
 
 from ..client.base_async_client import BaseAsyncClient
 from ..client.base_sync_client import BaseSyncClient
+from ..client.response import Response
 
 
 class BaseCallBuilder:
     def __init__(self, horizon_url, client):
         if isinstance(client, BaseAsyncClient):
-            self.call = self.call_async
-            self.stream = self.stream_async
+            self.__async = True
         elif isinstance(client, BaseSyncClient):
-            self.call = self.call_sync
-            self.stream = self.stream_sync
+            self.__async = False
 
         self.client = client
         self.horizon_url = horizon_url
@@ -19,7 +18,13 @@ class BaseCallBuilder:
         self.params = {}
         self.endpoint = ''
 
-    async def call_async(self):
+    def call(self) -> Response:
+        if self.__async:
+            return self.__call_async()
+        else:
+            return self.__call_sync()
+
+    async def __call_async(self) -> Response:
         url = urljoin(self.horizon_url, self.endpoint)
         params = self.__query_params(**self.params)
         return await self.client.get(url, params)
@@ -30,8 +35,10 @@ class BaseCallBuilder:
         while True:
             yield await stream.__anext__()
 
-    def call_sync(self):
-        pass
+    def __call_sync(self) -> Response:
+        url = urljoin(self.horizon_url, self.endpoint)
+        params = self.__query_params(**self.params)
+        return self.client.get(url, params)
 
     def stream_sync(self):
         pass
