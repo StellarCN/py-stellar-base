@@ -3,7 +3,7 @@ from .strkey import StrKey
 
 class Account:
     def __init__(self, account_id: str, sequence: int) -> None:
-        StrKey.is_valid_ed25519_public_key(account_id)
+        StrKey.decode_ed25519_public_key(account_id)
 
         self.account_id = account_id
         self.sequence = sequence
