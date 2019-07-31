@@ -1,164 +1,107 @@
-# coding: utf-8
-import sys
-import six
 import abc
-import base64
+import typing
 
-from stellar_base.utils import convert_hex_to_bytes
+from stellar_sdk.exceptions import MemoInvalidException
 from .stellarxdr import Xdr
-from .exceptions import NotValidParamError
-
-if sys.version_info.major == 3:
-    unicode = str
 
 
-@six.add_metaclass(abc.ABCMeta)
-class Memo(object):
-    """The :class:`Memo` object, which represents the base class for memos for
-    use with Stellar transactions.
-
-    The memo for a transaction contains optional extra information about the
-    transaction taking place. It is the responsibility of the client to
-    interpret this value.
-
-    See the following implementations that serve a more practical use with the
-    library:
-
-    * :class:`NoneMemo` - No memo.
-    * :class:`TextMemo` - A string encoded using either ASCII or UTF-8, up to
-        28-bytes long.
-    * :class:`IdMemo` - A 64 bit unsigned integer.
-    * :class:`HashMemo` - A 32 byte hash.
-    * :class:`RetHashMemo` -  A 32 byte hash intended to be interpreted as the
-        hash of the transaction the sender is refunding.
-
-    See `Stellar's documentation on Transactions
-    <https://www.stellar.org/developers/guides/concepts/transactions.html>`_
-    for more information on how memos are used within transactions, as well as
-    information on the available types of memos.
-
-    """
-
+class Memo(object, metaclass=abc.ABCMeta):
     @abc.abstractmethod
     def to_xdr_object(self):
         """Creates an XDR Memo object that represents this :class:`Memo`."""
 
-    @classmethod
-    def from_xdr_object(cls, xdr_obj):
-        return cls(xdr_obj.switch)
+    @staticmethod
+    def from_xdr_object(xdr_obj: Xdr.types.Memo) -> typing.Union[
+        'NoneMemo', 'TextMemo', 'IdMemo', 'HashMemo', 'ReturnHashMemo']:
+        xdr_types = {
+            Xdr.const.MEMO_TEXT: TextMemo,
+            Xdr.const.MEMO_ID: IdMemo,
+            Xdr.const.MEMO_HASH: HashMemo,
+            Xdr.const.MEMO_RETURN: ReturnHashMemo,
+            Xdr.const.MEMO_NONE: NoneMemo
+        }
 
-    def xdr(self):
-        """Packs and base64 encodes this :class:`Memo` as an XDR string."""
-        x = Xdr.StellarXDRPacker()
-        x.pack_Memo(self.to_xdr_object())
-        return base64.b64encode(x.get_buffer())
+        # Maybe we should raise Key Error here
+        memo_cls = xdr_types.get(xdr_obj.type, NoneMemo)
+        return memo_cls.from_xdr_object(xdr_obj)
 
-    def __eq__(self, other):
-        return self.xdr() == other.xdr()
+    def __eq__(self, memo: typing.Union['NoneMemo', 'TextMemo', 'IdMemo', 'HashMemo', 'ReturnHashMemo']) -> bool:
+        return self.to_xdr_object().to_xdr() == memo.to_xdr_object().to_xdr()
 
 
 class NoneMemo(Memo):
-    """The :class:`NoneMemo`, which represents no memo for a transaction."""
-
     @classmethod
-    def from_xdr_object(cls, _xdr_obj):
+    def from_xdr_object(cls, _xdr_obj: Xdr.types.Memo) -> 'NoneMemo':
         return cls()
 
-    def to_xdr_object(self):
-        """Creates an XDR Memo object for a transaction with no memo."""
+    def to_xdr_object(self) -> Xdr.types.Memo:
         return Xdr.types.Memo(type=Xdr.const.MEMO_NONE)
 
 
 class TextMemo(Memo):
-    """The :class:`TextMemo`, which represents MEMO_TEXT in a transaction.
+    def __init__(self, text: typing.Union[str, bytes]) -> None:
+        if not isinstance(text, (str, bytes)):
+            raise MemoInvalidException('TextMemo expects string or bytes type got a {}'.format(type(text)))
 
-    :param text: A string encoded using either ASCII or UTF-8, up to
-        28-bytes long.
-    :type text: str, bytes
-
-    """
-
-    def __init__(self, text):
-        if not isinstance(text, (str, unicode, bytes)):
-            raise NotValidParamError('Expects string or bytes type got a {}'.format(type(text)))
-        if (bytes == str and isinstance(text, unicode)) or (bytes != str and not isinstance(text, bytes)):
+        self.text = text
+        if not isinstance(text, bytes):
             self.text = bytearray(text, encoding='utf-8')
-        else:
-            self.text = text
+
         length = len(self.text)
         if length > 28:
-            raise NotValidParamError("Text should be <= 28 bytes (ascii encoded). "
-                                     "Got {:s}".format(str(length)))
+            raise MemoInvalidException("Text should be <= 28 bytes (ascii encoded), got {:d} bytes.".format(length))
 
     @classmethod
-    def from_xdr_object(cls, xdr_obj):
+    def from_xdr_object(cls, xdr_obj: Xdr.types.Memo) -> 'TextMemo':
         return cls(bytes(xdr_obj.switch))
 
-    def to_xdr_object(self):
-        """Creates an XDR Memo object for a transaction with MEMO_TEXT."""
+    def to_xdr_object(self) -> Xdr.types.Memo:
         return Xdr.types.Memo(type=Xdr.const.MEMO_TEXT, text=self.text)
 
 
 class IdMemo(Memo):
-    """The :class:`IdMemo` which represents MEMO_ID in a transaction.
+    def __init__(self, memo_id: int) -> None:
+        if memo_id < 0 or memo_id > 2 ** 64 - 1:
+            raise MemoInvalidException(
+                "IdMemo is an unsigned 64-bit integer and the max valid value is 18446744073709551615.")
+        self.memo_id = memo_id
 
-    :param int memo_id: A 64 bit unsigned integer.
+    @classmethod
+    def from_xdr_object(cls, xdr_obj: Xdr.types.Memo) -> 'IdMemo':
+        return cls(xdr_obj.switch)
 
-    """
-
-    def __init__(self, memo_id):
-        self.memo_id = int(memo_id)
-
-    def to_xdr_object(self):
-        """Creates an XDR Memo object for a transaction with MEMO_ID."""
+    def to_xdr_object(self) -> Xdr.types.Memo:
         return Xdr.types.Memo(type=Xdr.const.MEMO_ID, id=self.memo_id)
 
 
 class HashMemo(Memo):
-    """The :class:`HashMemo` which represents MEMO_HASH in a transaction.
+    def __init__(self, memo_hash: bytes) -> None:
+        length = len(memo_hash)
+        if length > 32:
+            raise MemoInvalidException("HashMemo can contain 32 bytes at max, got {:d} bytes".format(length))
 
-    :param memo_hash: A 32 byte hash or hex encoded string.
-    :type memo_hash: bytes, str
-    """
+        self.memo_hash = memo_hash
 
-    def __init__(self, memo_hash):
-        self.memo_hash = convert_hex_to_bytes(memo_hash)
+    @classmethod
+    def from_xdr_object(cls, xdr_obj: Xdr.types.Memo) -> 'HashMemo':
+        return cls(xdr_obj.switch)
 
-    def to_xdr_object(self):
-        """Creates an XDR Memo object for a transaction with MEMO_HASH."""
+    def to_xdr_object(self) -> Xdr.types.Memo:
         return Xdr.types.Memo(type=Xdr.const.MEMO_HASH, hash=self.memo_hash)
 
 
-class RetHashMemo(Memo):
-    """The :class:`RetHashMemo` which represents MEMO_RETURN in a transaction.
+class ReturnHashMemo(Memo):
+    def __init__(self, memo_return: bytes) -> None:
+        length = len(memo_return)
+        if length > 32:
+            raise MemoInvalidException("ReturnHashMemo can contain 32 bytes at max, got {:d} bytes".format(length))
 
-    MEMO_RETURN is typically used with refunds/returns over the network - it is
-    a 32 byte hash intended to be interpreted as the hash of the transaction
-    the sender is refunding.
+        self.memo_return = memo_return
 
-    :param memo_return: A 32 byte hash or hex encoded string intended to be interpreted as the
-        hash of the transaction the sender is refunding.
-    :type memo_return: bytes, str
+    @classmethod
+    def from_xdr_object(cls, xdr_obj: Xdr.types.Memo) -> 'ReturnHashMemo':
+        return cls(xdr_obj.switch)
 
-    """
-
-    def __init__(self, memo_return):
-        self.memo_return = convert_hex_to_bytes(memo_return)
-
-    def to_xdr_object(self):
-        """Creates an XDR Memo object for a transaction with MEMO_RETURN."""
+    def to_xdr_object(self) -> Xdr.types.Memo:
         return Xdr.types.Memo(
             type=Xdr.const.MEMO_RETURN, retHash=self.memo_return)
-
-
-_xdr_type_map = {
-    Xdr.const.MEMO_TEXT: TextMemo,
-    Xdr.const.MEMO_ID: IdMemo,
-    Xdr.const.MEMO_HASH: HashMemo,
-    Xdr.const.MEMO_RETURN: RetHashMemo
-}
-
-
-def xdr_to_memo(xdr_obj):
-    memo_cls = _xdr_type_map.get(xdr_obj.type, NoneMemo)
-    return memo_cls.from_xdr_object(xdr_obj)

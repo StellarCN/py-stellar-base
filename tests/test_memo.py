@@ -1,98 +1,117 @@
-# coding: utf-8
-import sys
-import os
 import binascii
+import os
 
 import pytest
 
-from stellar_base.exceptions import NotValidParamError
-from stellar_base.memo import (
-    NoneMemo, TextMemo, HashMemo, IdMemo, RetHashMemo, xdr_to_memo
-)
-from stellar_base.stellarxdr import Xdr
-
-
-@pytest.mark.parametrize("memo_obj", [
-    TextMemo("Hello, Stellar"),
-    NoneMemo(),
-    IdMemo(31415926535),
-])
-def test_xdr_to_memo(memo_obj):
-    xdr_obj = memo_obj.to_xdr_object()
-    restored_obj = xdr_to_memo(xdr_obj)
-    assert memo_obj == restored_obj
+from stellar_sdk.exceptions import MemoInvalidException
+from stellar_sdk.memo import NoneMemo, Memo, TextMemo, IdMemo, HashMemo, ReturnHashMemo
 
 
 class TestMemo:
     def test_none_memo(self):
         memo = NoneMemo()
-        self.__asset_memo('none', None, memo)
+        assert memo.to_xdr_object().to_xdr() == b'AAAAAA=='
 
-    def test_text_memo(self):
-        memo_text = "Hello, world!"
-        memo = TextMemo(memo_text)
-        if sys.version_info.major >= 3:
-            memo_text = bytearray(memo_text, encoding='utf-8')
-        self.__asset_memo('text', memo_text, memo)
+        base_memo = Memo.from_xdr_object(memo.to_xdr_object())
+        assert isinstance(base_memo, NoneMemo)
+        assert base_memo.to_xdr_object().to_xdr() == b'AAAAAA=='
 
-    def test_text_memo_toolong(self):
-        memo_text = "Out, out, brief candle, life is but a walking shadow."
-        length = len(memo_text)
-        with pytest.raises(
-                NotValidParamError,
-                match="Text should be <= 28 bytes \(ascii encoded\). "
-                "Got {}".format(str(length))):
-            TextMemo(memo_text)
+    @pytest.mark.parametrize('text, xdr', [
+        ('Hello, Eno!', b'AAAAAQAAAAtIZWxsbywgRW5vIQA='),
+        ('星星之火。', b'AAAAAQAAAA/mmJ/mmJ/kuYvngavjgIIA'),
+        (b'Stellar', b'AAAAAQAAAAdTdGVsbGFyAA=='),
+    ])
+    def test_text_memo(self, text, xdr):
+        memo = TextMemo(text)
+        assert memo.to_xdr_object().to_xdr() == xdr
 
-    def test_text_memo_wrong_value(self):
-        memo_text = ("stellar", )
-        with pytest.raises(
-                NotValidParamError,
-                match='Expects string or bytes type got a {}'.format(type(memo_text))):
-            TextMemo(memo_text)
+        base_memo = Memo.from_xdr_object(memo.to_xdr_object())
+        assert isinstance(base_memo, TextMemo)
+        assert base_memo.to_xdr_object().to_xdr() == xdr
 
-    def test_id_memo(self):
-        memo_id = 31415926535
-        memo = IdMemo(memo_id)
-        self.__asset_memo('id', memo_id, memo)
+    def test_text_memo_invalid_type_raise(self):
+        invalid_value = 123
+        with pytest.raises(MemoInvalidException,
+                           match='TextMemo expects string or bytes type got a {}'.format(type(invalid_value))):
+            TextMemo(invalid_value)
 
-    def test_hash_memo_and_ret_hash_memo(self):
-        memo_hash = binascii.hexlify(os.urandom(16))
-        hash_memo = HashMemo(memo_hash)
-        ret_hash_memo = RetHashMemo(memo_hash)
-        self.__asset_memo('hash', memo_hash, hash_memo)
-        self.__asset_memo('ret_hash', memo_hash, ret_hash_memo)
+    def test_text_memo_too_long_raise(self):
+        invalid_value = 'a' * 29
+        with pytest.raises(MemoInvalidException,
+                           match=r'Text should be <= 28 bytes \(ascii encoded\), got {:d} bytes.'.format(
+                               len(invalid_value))):
+            TextMemo(invalid_value)
 
-    def test_hash_memo_and_ret_hash_memo_toolong(self):
-        memo_hash = binascii.hexlify(os.urandom(32)).decode() + ' '
-        with pytest.raises(NotValidParamError):
-            HashMemo(memo_hash)
-        with pytest.raises(NotValidParamError):
-            RetHashMemo(memo_hash)
+    @pytest.mark.parametrize('id, xdr', [
+        (0, b'AAAAAgAAAAAAAAAA'),
+        (123123123, b'AAAAAgAAAAAHVrWz'),
+        (2 ** 64 - 1, b'AAAAAv//////////'),
+    ])
+    def test_id_memo(self, id, xdr):
+        memo = IdMemo(id)
+        assert memo.to_xdr_object().to_xdr() == xdr
 
-    def test_memo_xdr(self):
-        xdr_string = b'AAAAAQAAAA1oZXksIHN0ZWxsYXIhAAAA'
-        xdr_memo = TextMemo('hey, stellar!').xdr()
-        assert xdr_string == xdr_memo
+        base_memo = Memo.from_xdr_object(memo.to_xdr_object())
+        assert isinstance(base_memo, IdMemo)
+        assert base_memo.to_xdr_object().to_xdr() == xdr
 
-    @staticmethod
-    def __asset_memo(memo_type, memo_value, memo):
-        memo_xdr_object = memo.to_xdr_object()
-        if memo_type == 'none':
-            xdr_memo = Xdr.types.Memo(type=Xdr.const.MEMO_NONE)
-        elif memo_type == 'text':
-            xdr_memo = Xdr.types.Memo(
-                type=Xdr.const.MEMO_TEXT, text=memo_value)
-            assert xdr_memo.text == memo_xdr_object.text
-        elif memo_type == 'id':
-            xdr_memo = Xdr.types.Memo(type=Xdr.const.MEMO_ID, id=memo_value)
-            assert memo_xdr_object.id == xdr_memo.id
-        elif memo_type == 'hash':
-            xdr_memo = Xdr.types.Memo(
-                type=Xdr.const.MEMO_HASH, hash=memo_value)
-            assert xdr_memo.hash == memo_xdr_object.hash
-        elif memo_type == 'ret_hash':
-            xdr_memo = Xdr.types.Memo(
-                type=Xdr.const.MEMO_RETURN, retHash=memo_value)
-            assert memo_xdr_object.retHash == xdr_memo.retHash
-        assert memo_xdr_object.type == xdr_memo.type
+    @pytest.mark.parametrize('id', [
+        -1,
+        2 ** 64
+    ])
+    def test_id_memo_invalid_raise(self, id):
+        with pytest.raises(MemoInvalidException,
+                           match="IdMemo is an unsigned 64-bit integer and the max valid value is 18446744073709551615."):
+            IdMemo(id)
+
+    @pytest.mark.parametrize('hex, xdr', [
+        ('90d38f2d64949bb64f693ff231f9a3b3', b'AAAAA5DTjy1klJu2T2k/8jH5o7MAAAAAAAAAAAAAAAAAAAAA'),
+        ('573c10b148fc4bc7db97540ce49da22930f4bcd48a060dc7347be84ea9f52d9f',
+         b'AAAAA1c8ELFI/EvH25dUDOSdoikw9LzUigYNxzR76E6p9S2f'),
+    ])
+    def test_hash_memo(self, hex, xdr):
+        hash = binascii.unhexlify(hex)
+        memo = HashMemo(hash)
+        assert memo.to_xdr_object().to_xdr() == xdr
+
+        base_memo = Memo.from_xdr_object(memo.to_xdr_object())
+        assert isinstance(base_memo, HashMemo)
+        assert base_memo.to_xdr_object().to_xdr() == xdr
+
+    def test_hash_memo_too_long_raise(self):
+        length = 33
+        with pytest.raises(MemoInvalidException,
+                           match="HashMemo can contain 32 bytes at max, got {:d} bytes".format(length)):
+            HashMemo(os.urandom(length))
+
+    @pytest.mark.parametrize('hex, xdr', [
+        ('90d38f2d64949bb64f693ff231f9a3b3', b'AAAABJDTjy1klJu2T2k/8jH5o7MAAAAAAAAAAAAAAAAAAAAA'),
+        ('573c10b148fc4bc7db97540ce49da22930f4bcd48a060dc7347be84ea9f52d9f',
+         b'AAAABFc8ELFI/EvH25dUDOSdoikw9LzUigYNxzR76E6p9S2f'),
+    ])
+    def test_return_hash_memo(self, hex, xdr):
+        return_hash = binascii.unhexlify(hex)
+        memo = ReturnHashMemo(return_hash)
+        assert memo.to_xdr_object().to_xdr() == xdr
+
+        base_memo = Memo.from_xdr_object(memo.to_xdr_object())
+        assert isinstance(base_memo, ReturnHashMemo)
+        assert base_memo.to_xdr_object().to_xdr() == xdr
+
+    def test_return_hash_memo_too_long_raise(self):
+        length = 33
+        with pytest.raises(MemoInvalidException,
+                           match="ReturnHashMemo can contain 32 bytes at max, got {:d} bytes".format(length)):
+            ReturnHashMemo(os.urandom(length))
+
+    @pytest.mark.parametrize('asset_a, asset_b, equal', [
+        (NoneMemo(), NoneMemo(), True),
+        (TextMemo("hello"), NoneMemo(), False),
+        (TextMemo("恒星"), TextMemo("恒星"), True),
+        (HashMemo(binascii.unhexlify('573c10b148fc4bc7db97540ce49da22930f4bcd48a060dc7347be84ea9f52d9f')),
+         ReturnHashMemo(binascii.unhexlify('573c10b148fc4bc7db97540ce49da22930f4bcd48a060dc7347be84ea9f52d9f')), False),
+        (HashMemo(binascii.unhexlify('573c10b148fc4bc7db97540ce49da22930f4bcd48a060dc7347be84ea9f52d9f')),
+         HashMemo(binascii.unhexlify('573c10b148fc4bc7db97540ce49da22930f4bcd48a060dc7347be84ea9f52d9f')), True)
+    ])
+    def test_equals(self, asset_a, asset_b, equal):
+        assert (asset_a == asset_b) is equal
