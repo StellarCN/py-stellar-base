@@ -33,3 +33,6 @@ class AssetCodeInvalidError(StellarError):
 
 class AssetIssuerInvalidError(Ed25519PublicKeyInvalidError):
     pass
+
+class NoApproximationError(StellarError):
+    pass
