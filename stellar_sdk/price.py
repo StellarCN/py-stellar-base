@@ -44,4 +44,6 @@ class Price:
         return cls(n, d)
 
     def __eq__(self, other: 'Price'):
+        if not isinstance(other, Price):
+            return False
         return self.n == other.n and self.d == other.d

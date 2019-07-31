@@ -25,7 +25,7 @@ class Memo(object, metaclass=abc.ABCMeta):
         hash of the transaction the sender is refunding.
 
     See `Stellar's documentation on Transactions
-    <https://www.stellar.org/developers/guides/concepts/transactions.html>`_
+    <https://www.stellar.org/developers/guides/concepts/transactions.html#memo>`_
     for more information on how memos are used within transactions, as well as
     information on the available types of memos.
 
