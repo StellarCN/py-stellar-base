@@ -1,42 +1,33 @@
 language: python
-python:
-  - 2.7
-  - 3.5
-  - 3.6
+matrix:
+  include:
+    - name: "Python 3.5 on Xenial Linux"
+      python: 3.5
+      dist: xenial
+    - name: "Python 3.6 on Xenial Linux"
+      python: 3.6
+      dist: xenial
+    - name: "Python 3.7 on Xenial Linux"
+      python: 3.7
+      dist: xenial
+    - name: "Python 3.7 on macOS"
+      os: osx
+      osx_image: xcode10.2
+      language: shell
+    - name: "Python 3.7 on Windows"
+      os: windows
+      language: shell
+      before_install: choco install python
+      env: PATH=/c/Python37:/c/Python37/Scripts:$PATH
 
 cache:
   - pip
 
 install:
-  - make init
+  - pip3 install -r requirements-test.txt
 
 script:
-  - make testnet
-
-after_success:
-  - make codecov
-
-before_deploy:
-  - make package
-
-deploy:
-  provider: releases
-  api_key:
-    secure: BRm8shev0Sm+lX5k/VApx+XR+vneKq+OTdz4CnTsspfHU7lKGCCFgCp0/XDBkbvpcAy1pjBscU8cEf8HVjzX8bo0D/D2ByblHorYeksWJv2OzO2MXsDWGG296XdRR6+kPEwZWRxSkM5UjooRb80w44ndI+OGhW5F3rb+WxHUCAdwzPyd0PVrK0oSUmQs4gx0mFS+y8iZtfNDRR4xDmsKEWeZLO9lLrVTl0m/50iV6XooUKXE4W/ttYI3CTKrjgijLlF41ABaUxrGt8FVWeBRF/fLPpywGKuSjJa9uiuHnr98zSO25wWWJTIcbsnLHcB/c1+OQdnKw1ypAJL5IaziXrwQKkIBjwCm6QaQtXge4WCrgG08OLH/0awwdB/663ab24bEMkV3985GypR1VrriZxxjuPLIGJ89UiCaYi42mMCDX4cPFUXnJUSIrf2ebkYwrBA2DYxgh+8VshcZubMNmB5QeSWGI4xUXJVsrkckGCzZVNd1LS2S4QHDO9QlYp7DXfBTwA5BrHAMdkorsC8z91Yoj8cY63EMtrcpnSOf+MFYr1TM8ux09a8ZKJsnTDGmu16uXSCIWv6fFFCRItxUicMTJtFcCVCStBCdjAteyXdU/mbiqv3b36SG7cNq03uQbo9I3M24eEGp7/d5HhEafH3ctX9Uky7nQ2L2RKc8rqI=
-  file: ./dist/stellar*
-  skip_cleanup: true
-  file_glob: true
-  prerelease: true
-  on:
-    repo: StellarCN/py-stellar-base
-    python: 3.5
-    tags: true
-
-after_deploy:
-  - echo "SHA1 Information"
-  - sha1sum dist/stellar*
-  - echo "MD5 Information"
-  - md5sum dist/stellar*
+  - pytest -v -rs tests --cov
 
 notifications:
   email: false
