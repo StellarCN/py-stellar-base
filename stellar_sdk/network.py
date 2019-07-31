@@ -17,5 +17,5 @@ _network_passphrases = {
     'TESTNET': 'Test SDF Network ; September 2015'
 }
 
-PUBLIC = Network(_network_passphrases['PUBLIC'])
-TESTNET = Network(_network_passphrases['TESTNET'])
+PUBLIC = Network(_network_passphrases['PUBLIC'])  # type: Network
+TESTNET = Network(_network_passphrases['TESTNET'])  # type: Network

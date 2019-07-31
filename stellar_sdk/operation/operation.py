@@ -62,3 +62,6 @@ class Operation(metaclass=ABCMeta):
         if xdr_object.sourceAccount:
             return StrKey.encode_ed25519_public_key(xdr_object.sourceAccount[0].ed25519)
         return None
+
+    def __eq__(self, other: 'Operation') -> bool:
+        return self.to_xdr_object().to_xdr() == self.to_xdr_object().to_xdr()

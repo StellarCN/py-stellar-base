@@ -5,6 +5,7 @@ from .operation import Operation
 from ..keypair import Keypair
 from ..strkey import StrKey
 from ..stellarxdr import Xdr
+from ..utils import pack_xdr_array, unpack_xdr_array
 
 
 class SetOptions(Operation):
@@ -50,12 +51,6 @@ class SetOptions(Operation):
                                                                                          signer_weight)
 
     def to_operation_body(self) -> Xdr.nullclass():
-        def pack_option_array(x):
-            if x is None:
-                return []
-            # if not isinstance(x, list):
-            #     return [x]
-            return [x]
 
         if self.inflation_dest is not None:
             inflation_dest = [Keypair.from_public_key(self.inflation_dest).xdr_account_id()]
@@ -64,14 +59,14 @@ class SetOptions(Operation):
 
         home_domain = []
         if self.home_domain:
-            home_domain = pack_option_array(bytes(self.home_domain, encoding='utf-8'))
+            home_domain = pack_xdr_array(bytes(self.home_domain, encoding='utf-8'))
 
-        clear_flags = pack_option_array(self.clear_flags)
-        set_flags = pack_option_array(self.set_flags)
-        master_weight = pack_option_array(self.master_weight)
-        low_threshold = pack_option_array(self.low_threshold)
-        med_threshold = pack_option_array(self.med_threshold)
-        high_threshold = pack_option_array(self.high_threshold)
+        clear_flags = pack_xdr_array(self.clear_flags)
+        set_flags = pack_xdr_array(self.set_flags)
+        master_weight = pack_xdr_array(self.master_weight)
+        low_threshold = pack_xdr_array(self.low_threshold)
+        med_threshold = pack_xdr_array(self.med_threshold)
+        high_threshold = pack_xdr_array(self.high_threshold)
 
         signer = []
         if self.signer_type:
@@ -89,10 +84,6 @@ class SetOptions(Operation):
 
     @classmethod
     def from_xdr_object(cls, op_xdr_object):
-        def unpack_option_array(x):
-            if not x:
-                return None
-            return x[0]
 
         source = Operation.get_source_from_xdr_obj(op_xdr_object)
 
@@ -100,13 +91,13 @@ class SetOptions(Operation):
         if op_xdr_object.body.setOptionsOp.inflationDest:
             inflation_dest = StrKey.encode_ed25519_public_key(op_xdr_object.body.setOptionsOp.inflationDest[0].ed25519)
 
-        clear_flags = unpack_option_array(op_xdr_object.body.setOptionsOp.clearFlags)  # list
-        set_flags = unpack_option_array(op_xdr_object.body.setOptionsOp.setFlags)
-        master_weight = unpack_option_array(op_xdr_object.body.setOptionsOp.masterWeight)
-        low_threshold = unpack_option_array(op_xdr_object.body.setOptionsOp.lowThreshold)
-        med_threshold = unpack_option_array(op_xdr_object.body.setOptionsOp.medThreshold)
-        high_threshold = unpack_option_array(op_xdr_object.body.setOptionsOp.highThreshold)
-        home_domain = unpack_option_array(op_xdr_object.body.setOptionsOp.homeDomain)
+        clear_flags = unpack_xdr_array(op_xdr_object.body.setOptionsOp.clearFlags)  # list
+        set_flags = unpack_xdr_array(op_xdr_object.body.setOptionsOp.setFlags)
+        master_weight = unpack_xdr_array(op_xdr_object.body.setOptionsOp.masterWeight)
+        low_threshold = unpack_xdr_array(op_xdr_object.body.setOptionsOp.lowThreshold)
+        med_threshold = unpack_xdr_array(op_xdr_object.body.setOptionsOp.medThreshold)
+        high_threshold = unpack_xdr_array(op_xdr_object.body.setOptionsOp.highThreshold)
+        home_domain = unpack_xdr_array(op_xdr_object.body.setOptionsOp.homeDomain)
 
         if home_domain:
             home_domain = home_domain.decode('utf-8')
