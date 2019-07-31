@@ -1,4 +1,4 @@
-from .hashing import hash256
+from .utils import sha256
 
 
 class Network:
@@ -6,7 +6,7 @@ class Network:
         self.network_passphrase = network_passphrase
 
     def network_id(self) -> bytes:
-        return hash256(self.network_passphrase.encode())
+        return sha256(self.network_passphrase.encode())
 
     def __eq__(self, other: 'Network') -> bool:
         return self.network_passphrase == other.network_passphrase

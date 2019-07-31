@@ -6,6 +6,7 @@ from decimal import Decimal, Context, Inexact
 from ..strkey import StrKey
 from ..keypair import Keypair
 from ..stellarxdr import Xdr
+from ..types import OperationUnion
 
 
 class Operation(metaclass=ABCMeta):
@@ -50,7 +51,7 @@ class Operation(metaclass=ABCMeta):
         return Xdr.types.Operation(source_account, self.to_operation_body())
 
     @classmethod
-    def from_xdr_object(cls, op_xdr_object: Xdr.types.Operation) -> typing.Type['Operation']:
+    def from_xdr_object(cls, op_xdr_object: Xdr.types.Operation) -> OperationUnion:
         for sub_cls in cls.__subclasses__():
             if sub_cls.type_code() == op_xdr_object.type:
                 return sub_cls.from_xdr_object(op_xdr_object)

@@ -1,7 +1,7 @@
 from decimal import Decimal
 
 import pytest
-from stellar_sdk.hashing import hash256
+from stellar_sdk.utils import sha256
 
 from stellar_sdk.asset import Asset
 
@@ -398,11 +398,11 @@ class TestSetOptions:
             ('GDGU5OAPHNPU5UCLE5RDJHG7PXZFQYWKCFOEXSXNMR6KRQRI5T6XXCD7',
              SetOptions.AuthFlag.AUTHORIZATION_REQUIRED | SetOptions.AuthFlag.AUTHORIZATION_REVOCABLE,
              SetOptions.AuthFlag.AUTHORIZATION_REVOCABLE, 3, 2, 4, 6, None,
-             SetOptions.SignerType.PRE_AUTH_TX, hash256(b"PRE_AUTH_TX"), 2,
+             SetOptions.SignerType.PRE_AUTH_TX, sha256(b"PRE_AUTH_TX"), 2,
              'GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV',
              b'AAAAAQAAAADX7fRsY6KTqIc8EIDyr8M9gxGPW6ODnZoZDgo6l1ymwwAAAAUAAAABAAAAAM1OuA87X07QSydiNJzfffJYYsoRXEvK7WR8qMIo7P17AAAAAQAAAAMAAAABAAAAAgAAAAEAAAADAAAAAQAAAAIAAAABAAAABAAAAAEAAAAGAAAAAAAAAAEAAAAB96nlNnQ/Aq5uCbYXnGJN/EXa76Y2RQP6S1wP8lOEL1UAAAAC'),
             (None, None, None, 0, 255, 255, 255, 'overcat.me', SetOptions.SignerType.SHA256_HASH,
-             hash256(b"SHA256_HASH"), 0, None,
+             sha256(b"SHA256_HASH"), 0, None,
              b'AAAAAAAAAAUAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAEAAAD/AAAAAQAAAP8AAAABAAAA/wAAAAEAAAAKb3ZlcmNhdC5tZQAAAAAAAQAAAALB1I1O+GEAV87X3eYN/uAYDIDzP5mY4SVTEQFFYFq6nwAAAAA='),
             (None, None, None, None, None, None, None, None, None, None, None, None,
              b'AAAAAAAAAAUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA='),

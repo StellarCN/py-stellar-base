@@ -1,6 +1,11 @@
+import hashlib
 from decimal import Decimal, ROUND_FLOOR
 
 from .exceptions import NoApproximationError
+
+
+def sha256(data: bytes) -> bytes:
+    return hashlib.sha256(data).digest()
 
 
 def best_rational_approximation(x):
