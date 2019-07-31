@@ -4,7 +4,7 @@ import struct
 
 from crc16 import crc16xmodem
 
-from stellar_sdk.exceptions import Ed25519SecretSeedInvalidError, Ed25519PublicKeyInvalidError
+from .exceptions import Ed25519SecretSeedInvalidError, Ed25519PublicKeyInvalidError
 
 _version_bytes = {
     'ed25519_public_key': binascii.a2b_hex('30'),  # G 48 6 << 3

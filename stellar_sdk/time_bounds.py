@@ -12,7 +12,7 @@ class TimeBounds:
 
     See `Stellar's documentation on Transactions
     <https://www.stellar.org/developers/guides/concepts/transactions.html#time-bounds>`_
-    for more information on how memos are used within transactions.
+    for more information on how TimeBounds are used within transactions.
 
 
     :param min_time: the UNIX timestamp (in seconds)

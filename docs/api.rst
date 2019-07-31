@@ -5,300 +5,68 @@ API Documentation
 *****************
 
 
-Classes
-=======
+.. module:: stellar_sdk
 
-.. module:: stellar_base
 
-Address
+Account
 -------
 
-.. autoclass:: stellar_base.address.Address
+.. autoclass:: stellar_sdk.account.Account
    :members:
    :inherited-members:
 
 Asset
 -----
 
-.. autoclass:: stellar_base.asset.Asset
-   :members:
-   :inherited-members:
-
-Builder
--------
-
-.. autoclass:: stellar_base.builder.Builder
+.. autoclass:: stellar_sdk.asset.Asset
    :members:
    :inherited-members:
 
 Keypair
 -------
 
-.. autoclass:: stellar_base.keypair.Keypair
+.. autoclass:: stellar_sdk.keypair.Keypair
    :members:
    :inherited-members:
 
 Memo
 ----
 
-.. autoclass:: stellar_base.memo.Memo
+.. autoclass:: stellar_sdk.memo.Memo
    :members:
 
-.. autoclass:: stellar_base.memo.NoneMemo
+.. autoclass:: stellar_sdk.memo.NoneMemo
    :members:
 
-.. autoclass:: stellar_base.memo.TextMemo
+.. autoclass:: stellar_sdk.memo.TextMemo
    :members:
 
-.. autoclass:: stellar_base.memo.IdMemo
+.. autoclass:: stellar_sdk.memo.IdMemo
    :members:
 
-.. autoclass:: stellar_base.memo.HashMemo
+.. autoclass:: stellar_sdk.memo.HashMemo
    :members:
 
-.. autoclass:: stellar_base.memo.RetHashMemo
+.. autoclass:: stellar_sdk.memo.ReturnHashMemo
    :members:
 
 Network
 -------
 
-.. automodule:: stellar_base.network
-   :members:
-
-Operation
----------
-
-.. autoclass:: stellar_base.operation.Operation
+.. autoclass:: stellar_sdk.network.Network
    :members:
    :inherited-members:
 
-Transaction
------------
+Price
+-----
 
-.. autoclass:: stellar_base.transaction.Transaction
+.. autoclass:: stellar_sdk.price.Price
    :members:
    :inherited-members:
 
-TransactionEnvelope
--------------------
+TimeBounds
+----------
 
-.. autoclass:: stellar_base.transaction_envelope.TransactionEnvelope
+.. autoclass:: stellar_sdk.time_bounds.TimeBounds
    :members:
    :inherited-members:
-
-List of Operations
-------------------
-
-Create Account
-^^^^^^^^^^^^^^
-
-.. autoclass:: stellar_base.operation.CreateAccount
-   :members:
-
-Payment
-^^^^^^^
-
-.. autoclass:: stellar_base.operation.Payment
-   :members:
-
-Path Payment
-^^^^^^^^^^^^
-
-.. autoclass:: stellar_base.operation.PathPayment
-   :members:
-
-Manage Sell Offer
-^^^^^^^^^^^^^^^^^
-
-.. autoclass:: stellar_base.operation.ManageSellOffer
-   :members:
-
-Manage Buy Offer
-^^^^^^^^^^^^^^^^
-
-.. autoclass:: stellar_base.operation.ManageBuyOffer
-   :members:
-
-Create Passive Sell Offer
-^^^^^^^^^^^^^^^^^^^^^^^^^
-
-.. autoclass:: stellar_base.operation.CreatePassiveSellOffer
-   :members:
-
-Manage Offer
-^^^^^^^^^^^^
-
-.. autoclass:: stellar_base.operation.ManageOffer
-   :members:
-
-Create Passive Offer
-^^^^^^^^^^^^^^^^^^^^
-
-.. autoclass:: stellar_base.operation.CreatePassiveOffer
-   :members:
-
-Set Options
-^^^^^^^^^^^
-
-.. autoclass:: stellar_base.operation.SetOptions
-   :members:
-
-Change Trust
-^^^^^^^^^^^^
-
-.. autoclass:: stellar_base.operation.ChangeTrust
-   :members:
-
-Allow Trust
-^^^^^^^^^^^
-
-.. autoclass:: stellar_base.operation.AllowTrust
-   :members:
-
-Account Merge
-^^^^^^^^^^^^^
-
-.. autoclass:: stellar_base.operation.AccountMerge
-   :members:
-
-Inflation
-^^^^^^^^^
-
-.. autoclass:: stellar_base.operation.Inflation
-   :members:
-
-Manage Data
-^^^^^^^^^^^
-
-.. autoclass:: stellar_base.operation.ManageData
-   :members:
-
-Bump Sequence
-^^^^^^^^^^^^^
-
-.. autoclass:: stellar_base.operation.BumpSequence
-   :members:
-
-List of Exceptions
-------------------
-
-StellarError
-^^^^^^^^^^^^
-
-.. autoclass:: stellar_base.exceptions.StellarError
-   :members:
-
-BadSignatureError
-^^^^^^^^^^^^^^^^^
-
-.. autoclass:: stellar_base.exceptions.BadSignatureError
-   :members:
-
-AssetCodeInvalidError
-^^^^^^^^^^^^^^^^^^^^^
-
-.. autoclass:: stellar_base.exceptions.AssetCodeInvalidError
-   :members:
-
-StellarAddressInvalidError
-^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-.. autoclass:: stellar_base.exceptions.StellarAddressInvalidError
-   :members:
-
-
-StellarSecretInvalidError
-^^^^^^^^^^^^^^^^^^^^^^^^^
-
-.. autoclass:: stellar_base.exceptions.StellarSecretInvalidError
-   :members:
-
-NoStellarSecretOrAddressError
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-.. autoclass:: stellar_base.exceptions.NoStellarSecretOrAddressError
-   :members:
-
-SequenceError
-^^^^^^^^^^^^^
-
-.. autoclass:: stellar_base.exceptions.SequenceError
-   :members:
-
-ConfigurationError
-^^^^^^^^^^^^^^^^^^
-
-.. autoclass:: stellar_base.exceptions.ConfigurationError
-   :members:
-
-NoApproximationError
-^^^^^^^^^^^^^^^^^^^^
-
-.. autoclass:: stellar_base.exceptions.NoApproximationError
-   :members:
-
-HorizonError
-^^^^^^^^^^^^
-
-.. autoclass:: stellar_base.exceptions.HorizonError
-   :members:
-
-HorizonRequestError
-^^^^^^^^^^^^^^^^^^^
-
-.. autoclass:: stellar_base.exceptions.HorizonRequestError
-   :members:
-
-
-SignatureExistError
-^^^^^^^^^^^^^^^^^^^
-
-.. autoclass:: stellar_base.exceptions.SignatureExistError
-   :members:
-
-DecodeError
-^^^^^^^^^^^
-
-.. autoclass:: stellar_base.exceptions.DecodeError
-   :members:
-
-NotValidParamError
-^^^^^^^^^^^^^^^^^^
-
-.. autoclass:: stellar_base.exceptions.NotValidParamError
-   :members:
-
-MnemonicError
-^^^^^^^^^^^^^
-
-.. autoclass:: stellar_base.exceptions.MnemonicError
-   :members:
-
-MissingSigningKeyError
-^^^^^^^^^^^^^^^^^^^^^^
-
-.. autoclass:: stellar_base.exceptions.MissingSigningKeyError
-   :members:
-
-FederationError
-^^^^^^^^^^^^^^^
-.. autoclass:: stellar_base.exceptions.FederationError
-   :members:
-
-
-Federation
-==========
-
-.. automodule:: stellar_base.federation
-   :members:
-
-Horizon
-=======
-
-.. autoclass:: stellar_base.horizon.Horizon
-   :members:
-   :inherited-members:
-
-.. autofunction:: stellar_base.horizon.horizon_testnet
-
-.. autofunction:: stellar_base.horizon.horizon_livenet
