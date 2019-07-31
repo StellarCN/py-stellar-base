@@ -1,5 +1,6 @@
-# coding: utf-8
 '''Base58 encoding
+
+Copy from: https://github.com/keis/base58
 
 Implementations of Base58 and Base58Check endcodings that are compatible
 with the bitcoin network.
@@ -10,75 +11,95 @@ with the bitcoin network.
 # forum post by Gavin Andresen, so direct your praise to him.
 # This module adds shiny packaging and support for python3.
 
-__version__ = '0.2.2'
-
 from hashlib import sha256
 
-# 58 character alphabet used
-alphabet = 'gsphnaf39wBUDNEGHJKLM4PQRST7VWXYZ2bcdeCr65jkm8oFqi1tuvAxyz'
+__version__ = '1.0.3'
 
-if bytes == str:  # python2
-    iseq = lambda s: map(ord, s)
-    bseq = lambda s: ''.join(map(chr, s))
-    buffer = lambda s: s
-else:  # python3
-    iseq = lambda s: s
-    bseq = bytes
-    buffer = lambda s: s.buffer
+# 58 character alphabet used
+alphabet = b'123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz'
+
+iseq, bseq, buffer = (
+    lambda s: s,
+    bytes,
+    lambda s: s.buffer,
+)
+
+
+def scrub_input(v):
+    if isinstance(v, str) and not isinstance(v, bytes):
+        v = v.encode('ascii')
+
+    return v
+
+
+def b58encode_int(i, default_one=True):
+    '''Encode an integer using Base58'''
+    if not i and default_one:
+        return alphabet[0:1]
+    string = b""
+    while i:
+        i, idx = divmod(i, 58)
+        string = alphabet[idx:idx + 1] + string
+    return string
 
 
 def b58encode(v):
-    """Encode a string using Base58"""
+    '''Encode a string using Base58'''
+    v = scrub_input(v)
 
-    origlen = len(v)
+    nPad = len(v)
     v = v.lstrip(b'\0')
-    newlen = len(v)
+    nPad -= len(v)
 
     p, acc = 1, 0
-    for c in iseq(v[::-1]):
+    for c in iseq(reversed(v)):
         acc += p * c
         p = p << 8
 
-    result = ''
-    while acc > 0:
-        acc, mod = divmod(acc, 58)
-        result += alphabet[mod]
+    result = b58encode_int(acc, default_one=False)
 
-    return (result + alphabet[0] * (origlen - newlen))[::-1]
+    return (alphabet[0:1] * nPad + result)
+
+
+def b58decode_int(v):
+    '''Decode a Base58 encoded string as an integer'''
+    v = v.rstrip()
+    v = scrub_input(v)
+
+    decimal = 0
+    for char in v:
+        decimal = decimal * 58 + alphabet.index(char)
+    return decimal
 
 
 def b58decode(v):
-    """Decode a Base58 encoded string"""
-
-    if not isinstance(v, str):
-        v = v.decode('ascii')
+    '''Decode a Base58 encoded string'''
+    v = v.rstrip()
+    v = scrub_input(v)
 
     origlen = len(v)
-    v = v.lstrip(alphabet[0])
+    v = v.lstrip(alphabet[0:1])
     newlen = len(v)
 
-    p, acc = 1, 0
-    for c in v[::-1]:
-        acc += p * alphabet.index(c)
-        p *= 58
+    acc = b58decode_int(v)
 
     result = []
     while acc > 0:
         acc, mod = divmod(acc, 256)
         result.append(mod)
 
-    return (bseq(result) + b'\0' * (origlen - newlen))[::-1]
+    return (b'\0' * (origlen - newlen) + bseq(reversed(result)))
 
 
 def b58encode_check(v):
-    """Encode a string using Base58 with a 4 character checksum"""
+    '''Encode a string using Base58 with a 4 character checksum'''
 
     digest = sha256(sha256(v).digest()).digest()
     return b58encode(v + digest[:4])
 
 
 def b58decode_check(v):
-    """Decode and verify the checksum of a Base58 encoded string"""
+    '''Decode and verify the checksum of a Base58 encoded string'''
 
     result = b58decode(v)
     result, check = result[:-4], result[-4:]
@@ -106,10 +127,11 @@ def main():
         type=argparse.FileType('r'),
         default='-')
     parser.add_argument(
-        '-d', '--decode', action='store_true', help='decode data')
+        '-d', '--decode',
+        action='store_true',
+        help='decode data')
     parser.add_argument(
-        '-c',
-        '--check',
+        '-c', '--check',
         action='store_true',
         help='append a checksum before encoding')
 
@@ -121,7 +143,7 @@ def main():
         (True, True): b58decode_check
     }[(args.decode, args.check)]
 
-    data = buffer(args.file).read().rstrip(b'\n')
+    data = buffer(args.file).read()
 
     try:
         result = fun(data)
