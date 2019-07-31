@@ -1,4 +1,2 @@
-include stellar_base/wordlist/chinese.txt
-include README.rst
-include LICENSE
-include requirements.txt
+include README.md LICENSE requirements.txt Pipfile Pipfile.lock
+recursive-include tests *.py

@@ -1,8 +1,2 @@
-crc16==0.1.1; sys_platform != "win32" and sys_platform != "cygwin"
-pure25519==0.0.1; sys_platform == "win32" or sys_platform == "cygwin"
-ed25519==1.4; sys_platform != "win32" and sys_platform != "cygwin"
-requests
-six
-stellar-base-sseclient==0.0.21
-toml==0.10.0
-mnemonic==0.18
+crc16==0.1.1
+ed25519==1.5

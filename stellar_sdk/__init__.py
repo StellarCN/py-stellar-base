@@ -1,6 +1,1 @@
-from .version import __version__
-
-from .keypair import Keypair
-from .builder import Builder
-from .address import Address
-from .horizon import Horizon
+from .__version__ import __title__, __description__, __url__, __version__, __author__, __author_email__, __license__

@@ -1,20 +1,16 @@
 [[source]]
-url = "https://pypi.org/simple/"
-verify_ssl = true
 name = "pypi"
-
-[packages]
-"crc16" = "~=0.1.1"
-"ed25519" = "~=1.4"
-mnemonic = "~=0.18"
-requests = "*"
-toml = "~=0.10.0"
-six = "*"
-stellar-base-sseclient = "==0.0.21"
+url = "https://pypi.org/simple"
+verify_ssl = true
 
 [dev-packages]
 pytest = "*"
-mock = "*"
-sphinx = "*"
-pytest-cov = "*"
 ply = "*"
+pytest-cov = "*"
+
+[packages]
+crc16 = "*"
+ed25519 = "*"
+
+[requires]
+python_version = "3.7"
