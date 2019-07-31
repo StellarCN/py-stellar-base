@@ -9,6 +9,8 @@ ply = "*"
 pytest-cov = "*"
 yapf = "*"
 sphinx = "*"
+sphinx-rtd-theme = "*"
+sphinx-autodoc-typehints = "*"
 
 [packages]
 crc16 = "*"
@@ -16,8 +18,6 @@ pynacl = "*"
 requests = "*"
 aiohttp = "*"
 aiohttp-sse-client = "*"
-sphinx-rtd-theme = "*"
-sphinx-autodoc-typehints = "*"
 
 [requires]
 python_version = "3.7"
