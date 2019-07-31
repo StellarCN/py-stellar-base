@@ -1,0 +1,6 @@
+-r requirements-test.txt
+sphinx
+sphinx-rtd-theme
+sphinx-autodoc-typehints
+black
+ply

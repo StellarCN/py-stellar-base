@@ -7,10 +7,10 @@ verify_ssl = true
 pytest = "*"
 ply = "*"
 pytest-cov = "*"
-yapf = "*"
 sphinx = "*"
 sphinx-rtd-theme = "*"
 sphinx-autodoc-typehints = "*"
+black = "*"
 
 [packages]
 crc16 = "*"
