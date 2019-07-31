@@ -1,293 +1,196 @@
-# coding:utf-8
-import copy
-import os
-import sys
-import mock
 import pytest
+from stellar_sdk.asset import Asset
 
-from stellar_base.operation import *
-from stellar_base.asset import Asset
-from stellar_base.exceptions import NotValidParamError
-
-DEST = 'GCW24FUIFPC2767SOU4JI3JEAXIHYJFIJLH7GBZ2AVCBVP32SJAI53F5'
-SOURCE = 'GDJVFDG5OCW5PYWHB64MGTHGFF57DRRJEDUEFDEL2SLNIOONHYJWHA3Z'
-
-
-@pytest.mark.parametrize("s, error_type", [
-    ("0.12345678", NotValidParamError),
-    ("test", NotValidParamError),
-    (0.1234, NotValidParamError),
-])
-def test_to_xdr_amount_raise(s, error_type):
-    if sys.version_info.major == 2:
-        error_type = Exception
-    with pytest.raises(error_type):
-        Operation.to_xdr_amount(s)
+from stellar_sdk.operation import Operation, CreateAccount
+from stellar_sdk.exceptions import Ed25519PublicKeyInvalidError
+from stellar_sdk.operation.account_merge import AccountMerge
+from stellar_sdk.operation.bump_sequence import BumpSequence
+from stellar_sdk.operation.change_trust import ChangeTrust
+from stellar_sdk.operation.inflation import Inflation
 
 
-@pytest.mark.parametrize("num, s", [
-    (10 ** 7, "1"),
-    (20 * 10 ** 7, "20"),
-    (1234567, "0.1234567"),
-    (112345678, "11.2345678"),
-])
-def test_from_and_to_xdr_amount(num, s):
-    assert s == Operation.from_xdr_amount(num)
-    assert num == Operation.to_xdr_amount(s)
+class TestBaseOperation:
+
+    @pytest.mark.parametrize('origin_amount, expect_value', [
+        ('10', 100000000),
+        ('0.10', 1000000),
+        ('0.1234567', 1234567),
+        ('922337203685.4775807', 9223372036854775807)
+    ])
+    def test_to_xdr_amount(self, origin_amount, expect_value):
+        assert Operation.to_xdr_amount(origin_amount) == expect_value
+
+    @pytest.mark.parametrize('origin_amount, exception, reason', [
+        (10, TypeError, "Value of type '{}' must be of type String, but got {}.".format(10, type(10))),
+        ('-0.1', ValueError,
+         "Value of '-0.1' must represent a positive number and the max valid value is 9223372036854775807."),
+        ('9223372036854775808', ValueError,
+         "Value of '9223372036854775808' must represent a positive number and the max valid value is 9223372036854775807."),
+        ('0.123456789', ValueError, "Value of '0.123456789' must have at most 7 digits after the decimal."),
+
+    ])
+    def test_to_xdr_amount_raise(self, origin_amount, exception, reason):
+        with pytest.raises(exception, match=reason):
+            assert Operation.to_xdr_amount(origin_amount)
+
+    @pytest.mark.parametrize('origin_amount, expect_value', [
+        (100000000, '10'),
+        (1000000, '0.1'),
+        (1234567, '0.1234567'),
+        (9223372036854775807, '922337203685.4775807')
+    ])
+    def test_from_xdr_amount(self, origin_amount, expect_value):
+        assert Operation.from_xdr_amount(origin_amount) == expect_value
+
+    def test_get_source_exist_from_xdr_obj(self):  # BAD TEST
+        source = 'GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV'
+        destination = 'GCEZWKCA5VLDNRLN3RPRJMRZOX3Z6G5CHCGSNFHEYVXM3XOJMDS674JZ'
+        starting_balance = '1000.00'
+        origin_op = CreateAccount(destination, starting_balance, source)
+        origin_xdr_obj = origin_op.to_xdr_object()
+
+        op = Operation.from_xdr_object(origin_xdr_obj)
+        assert op.source == source
+        assert op.starting_balance == '1000'
+        assert op.destination == destination
+
+    def test_get_source_no_exist_from_xdr_obj(self):  # BAD TEST
+        destination = 'GCEZWKCA5VLDNRLN3RPRJMRZOX3Z6G5CHCGSNFHEYVXM3XOJMDS674JZ'
+        starting_balance = '1000.00'
+        origin_op = CreateAccount(destination, starting_balance)
+        origin_xdr_obj = origin_op.to_xdr_object()
+
+        op = Operation.from_xdr_object(origin_xdr_obj)
+        assert op.source == None
+        assert op.starting_balance == '1000'
+        assert op.destination == destination
 
 
-def _load_operations():
-    amount = "1"
-    return [
-        ("create_account_min",
-         CreateAccount(
-             source=SOURCE, destination=DEST, starting_balance=amount)),
-        ("payment_min",
-         Payment(
-             source=SOURCE,
-             destination=DEST,
-             asset=Asset.native(),
-             amount=amount,
-         )),
-        ("payment_short_asset",
-         Payment(
-             source=SOURCE,
-             destination=DEST,
-             asset=Asset('USD4', SOURCE),
-             amount=amount,
-         )),
-        ("payment_long_asset",
-         Payment(
-             source=SOURCE,
-             destination=DEST,
-             asset=Asset('SNACKS789ABC', SOURCE),
-             amount=amount,
-         )),
-        ("path_payment_min",
-         PathPayment(
-             source=SOURCE,
-             destination=DEST,
-             send_asset=Asset.native(),
-             dest_asset=Asset.native(),
-             send_max=amount,
-             dest_amount=amount,
-             path=[],
-         )),
-        ("path_payment",
-         PathPayment(
-             destination=DEST,
-             send_asset=Asset.native(),
-             dest_asset=Asset.native(),
-             send_max=amount,
-             dest_amount=amount,
-             path=[Asset('MOE', DEST)],
-         )),
-        ("allow_trust_short_asset",
-         AllowTrust(
-             source=SOURCE,
-             trustor=DEST,
-             asset_code='beer',
-             authorize=True,
-         )),
-        ("allow_trust_long_asset",
-         AllowTrust(
-             source=SOURCE,
-             trustor=DEST,
-             asset_code='pocketknives',
-             authorize=True,
-         )),
-        ("manage_sell_offer_min",
-         ManageSellOffer(
-             selling=Asset('beer', SOURCE),
-             buying=Asset('beer', DEST),
-             amount="100",
-             price=3.14159,
-             offer_id=1,
-             source=SOURCE
-         )),
-        ("manage_buy_offer_min",
-         ManageBuyOffer(
-             selling=Asset('beer', SOURCE),
-             buying=Asset('beer', DEST),
-             amount="100",
-             price=3.14159,
-             offer_id=1,
-             source=SOURCE
-         )),
-        ("manage_deprecated_offer_min",
-         ManageOffer(
-             selling=Asset('beer', SOURCE),
-             buying=Asset('beer', DEST),
-             amount="100",
-             price=3.14159,
-             offer_id=1,
-             source=SOURCE
-         )),
-        ("manage_sell_offer_dict_price",
-         ManageSellOffer(
-             selling=Asset('beer', SOURCE),
-             buying=Asset('beer', DEST),
-             amount="100",
-             price={
-                 'n': 314159,
-                 'd': 100000
-             },
-             offer_id=1,
-         )),
-        ("manage_buy_offer_dict_price",
-         ManageSellOffer(
-             selling=Asset('beer', SOURCE),
-             buying=Asset('beer', DEST),
-             amount="100",
-             price={
-                 'n': 314159,
-                 'd': 100000
-             },
-             offer_id=1,
-         )),
-        ("manage_deprecated_offer_dict_price",
-         ManageOffer(
-             selling=Asset('beer', SOURCE),
-             buying=Asset('beer', DEST),
-             amount="100",
-             price={
-                 'n': 314159,
-                 'd': 100000
-             },
-             offer_id=1,
-         )),
-        ("create_passive_sell_offer_min",
-         CreatePassiveSellOffer(
-             selling=Asset('beer', SOURCE),
-             buying=Asset('beer', DEST),
-             amount="100",
-             price=3.14159,
-             source=SOURCE
-         )),
-        ("create_passive_deprecated_offer_min",
-         CreatePassiveOffer(
-             selling=Asset('beer', SOURCE),
-             buying=Asset('beer', DEST),
-             amount="100",
-             price=3.14159,
-             source=SOURCE
-         )),
-        ("create_passive_sell_offer_dict",
-         CreatePassiveSellOffer(
-             selling=Asset('beer', SOURCE),
-             buying=Asset('beer', DEST),
-             amount="100",
-             price={
-                 'n': 314159,
-                 'd': 100000
-             }
-         )),
-        ("create_passive_deprecated_offer_dict",
-         CreatePassiveOffer(
-             selling=Asset('beer', SOURCE),
-             buying=Asset('beer', DEST),
-             amount="100",
-             price={
-                 'n': 314159,
-                 'd': 100000
-             }
-         )),
-        ("set_options_empty", SetOptions()),
-        ("set_options_ed25519PublicKey",
-         SetOptions(signer_type='ed25519PublicKey', signer_address=DEST, signer_weight=1)),
-        ("set_options_hashX", SetOptions(signer_type='hashX', signer_address=os.urandom(32), signer_weight=2)),
-        ("set_options_preAuthTx", SetOptions(signer_type='preAuthTx', signer_address=os.urandom(32), signer_weight=3)),
-        ("set_options_inflation_dest",
-         SetOptions(inflation_dest=DEST, source=SOURCE)),
-        ("change_trust_min",
-         ChangeTrust(source=SOURCE, asset=Asset('beer', DEST), limit='100')),
-        ("change_trust_default_limit",
-         ChangeTrust(source=SOURCE, asset=Asset('beer', DEST))),
-        ("account_merge_min", AccountMerge(
-            source=SOURCE,
-            destination=DEST,
-        )),
-        ("inflation", Inflation(source=SOURCE)),
-        ("manage_data",
-         ManageData(
-             source=SOURCE,
-             data_name='1KFHE7w8BhaENAswwryaoccDb6qcT6DbYY',
-             data_value=SOURCE,
-         )),
-        ("manage_data_none",
-         ManageData(
-             data_name='1KFHE7w8BhaENAswwryaoccDb6qcT6DbYY',
-             data_value=None,
-         )),
-        ("bump_sequence", BumpSequence(
-            source=SOURCE,
-            bump_to=23333114514
-        )),
-        ("bump_sequence_no_source", BumpSequence(
-            bump_to=23333114514
-        ))
-    ]
+class TestCreateAccount:
+    def test_to_xdr_obj(self):
+        source = 'GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV'
+        destination = 'GCEZWKCA5VLDNRLN3RPRJMRZOX3Z6G5CHCGSNFHEYVXM3XOJMDS674JZ'
+        starting_balance = '1000.00'
+        op = CreateAccount(destination, starting_balance, source)
+        assert op.to_xdr_object().to_xdr() == b'AAAAAQAAAADX7fRsY6KTqIc8EIDyr8M9gxGPW6ODnZoZDgo6l1ymwwAAA' \
+                                              b'AAAAAAAiZsoQO1WNsVt3F8Usjl1958bojiNJpTkxW7N3clg5e8AAAACVAvkAA=='
+
+    def test_to_xdr_obj_without_source(self):
+        destination = 'GCEZWKCA5VLDNRLN3RPRJMRZOX3Z6G5CHCGSNFHEYVXM3XOJMDS674JZ'
+        starting_balance = '1000.00'
+        op = CreateAccount(destination, starting_balance)
+        assert op.to_xdr_object().to_xdr() == b'AAAAAAAAAAAAAAAAiZsoQO1WNsVt3F8Usjl' \
+                                              b'1958bojiNJpTkxW7N3clg5e8AAAACVAvkAA=='
+
+    def test_to_xdr_obj_with_invalid_destination_raise(self):
+        destination = 'GCEZWKCA5VLDNRLN3RPRJMRZOX3Z6G5CHCGSNFHEYVXM3XOJMINVALID'
+        starting_balance = '1000.00'
+        op = CreateAccount(destination, starting_balance)
+        with pytest.raises(Ed25519PublicKeyInvalidError, match='Invalid Ed25519 Public Key: {}'.format(destination)):
+            op.to_xdr_object().to_xdr()
+
+    def test_to_xdr_obj_with_invalid_source_raise(self):
+        source = 'GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLINVALID'
+        destination = 'GCEZWKCA5VLDNRLN3RPRJMRZOX3Z6G5CHCGSNFHEYVXM3XOJMDS674JZ'
+        starting_balance = '1000.00'
+        op = CreateAccount(destination, starting_balance, source)
+        with pytest.raises(Ed25519PublicKeyInvalidError, match='Invalid Ed25519 Public Key: {}'.format(source)):
+            op.to_xdr_object().to_xdr()
+
+    def test_to_xdr_obj_with_invalid_starting_balance_raise(self):
+        destination = 'GCEZWKCA5VLDNRLN3RPRJMRZOX3Z6G5CHCGSNFHEYVXM3XOJMDS674JZ'
+        starting_balance = '-1'
+        op = CreateAccount(destination, starting_balance)
+        with pytest.raises(ValueError, match="Value of '{}' must represent a positive number and "
+                                             "the max valid value is 9223372036854775807.".format(starting_balance)):
+            op.to_xdr_object()
+
+    def test_from_xdr_obj(self):
+        source = 'GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV'
+        destination = 'GCEZWKCA5VLDNRLN3RPRJMRZOX3Z6G5CHCGSNFHEYVXM3XOJMDS674JZ'
+        starting_balance = '1000.00'
+        origin_op = CreateAccount(destination, starting_balance, source)
+        origin_xdr_obj = origin_op.to_xdr_object()
+
+        op = Operation.from_xdr_object(origin_xdr_obj)
+        assert op.source == source
+        assert op.starting_balance == '1000'
+        assert op.destination == destination
 
 
-@pytest.mark.parametrize("name, operation", _load_operations())
-def test_operation(name, operation):
-    operation_restored = Operation.from_xdr(operation.xdr())
-    assert operation == operation_restored
-    original = dict(operation.__dict__)
-    original.pop("body")
-    restored = dict(operation_restored.__dict__)
-    restored.pop("body")
-    if name == 'manage_sell_offer_dict_price' or name == 'manage_buy_offer_dict_price' \
-            or name == 'create_passive_sell_offer_dict' or name == 'create_passive_deprecated_offer_dict' \
-            or name == 'manage_deprecated_offer_dict_price':
-        original['price'] = float(original['price']['n']) / float(
-            original['price']['d'])
-    if name == 'manage_data':  # return `bytes` now
-        if not isinstance(original['data_value'], bytes):
-            original['data_value'] = bytes(original['data_value'], 'utf-8')
-    assert original == restored
+class TestBumpSequence:
+    def test_to_xdr_obj(self):
+        bump_to = 114514
+        source = 'GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV'
+
+        op = BumpSequence(bump_to, source)
+        assert op.to_xdr_object().to_xdr() == b'AAAAAQAAAADX7fRsY6KTqIc8EIDyr8M9gxGPW6ODnZoZDgo6l1ymwwAAAAsAAAAAAAG/Ug=='
+
+    def test_from_xdr_obj(self):
+        bump_to = 123123123
+        source = 'GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV'
+        origin_xdr_obj = BumpSequence(bump_to, source).to_xdr_object()
+        op = Operation.from_xdr_object(origin_xdr_obj)
+        assert isinstance(op, BumpSequence)
+        assert op.source == source
+        assert op.bump_to == bump_to
 
 
-def test_from_xdr_object_raise():
-    operation = mock.MagicMock(type=2561)
-    pytest.raises(NotImplementedError, Operation.from_xdr_object, operation)
+class TestInflation:
+    def test_to_xdr_obj(self):
+        source = 'GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV'
+        op = Inflation(source)
+        assert op.to_xdr_object().to_xdr() == b'AAAAAQAAAADX7fRsY6KTqIc8EIDyr8M9gxGPW6ODnZoZDgo6l1ymwwAAAAk='
+
+    def test_from_xdr_obj(self):
+        source = 'GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV'
+        origin_xdr_obj = Inflation(source).to_xdr_object()
+        op = Operation.from_xdr_object(origin_xdr_obj)
+        assert isinstance(op, Inflation)
+        assert op.source == source
 
 
-def test_manage_data_too_long_raises():
-    msg = 'Data and value should be <= 64 bytes \(ascii encoded\).'
-    with pytest.raises(NotValidParamError, match=msg):
-        ManageData(
-            data_name='1KFHE7w8BhaENAswwryaoccDb6qcT6DbYY',
-            data_value='1234567890' * 7)
+class TestAccountMerge:
+    def test_to_xdr_obj(self):
+        source = 'GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV'
+        destination = 'GCEZWKCA5VLDNRLN3RPRJMRZOX3Z6G5CHCGSNFHEYVXM3XOJMDS674JZ'
+        op = AccountMerge(destination, source)
+        assert op.to_xdr_object().to_xdr() == b'AAAAAQAAAADX7fRsY6KTqIc8EIDyr8M9gxGPW6ODnZoZDgo6l1ymwwAAAAgAAAAAiZsoQO1WNsVt3F8Usjl1958bojiNJpTkxW7N3clg5e8='
+
+    def test_from_xdr_obj(self):
+        source = 'GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV'
+        destination = 'GCEZWKCA5VLDNRLN3RPRJMRZOX3Z6G5CHCGSNFHEYVXM3XOJMDS674JZ'
+        origin_xdr_obj = AccountMerge(destination, source).to_xdr_object()
+        op = Operation.from_xdr_object(origin_xdr_obj)
+        assert isinstance(op, AccountMerge)
+        assert op.source == source
+        assert op.destination == destination
 
 
-def test_manage_sell_offer_dict_price_raises():
-    msg = "You need pass `price` params as `str` or `{'n': numerator, 'd': denominator}`"
-    with pytest.raises(NotValidParamError, match=msg):
-        ManageSellOffer(
-            selling=Asset('beer', SOURCE),
-            buying=Asset('beer', DEST),
-            amount="100",
-            price={},
-            offer_id=1,
-        ).xdr()
+class TestChangeTrust:
+    @pytest.mark.parametrize('limit, xdr', [
+        ("922337203685.4775807",
+         b'AAAAAQAAAADX7fRsY6KTqIc8EIDyr8M9gxGPW6ODnZoZDgo6l1ymwwAAAAYAAAABVVNEAAAAAADNTrgPO19O0EsnYjSc333yWGLKEVxLyu1kfKjCKOz9e3//////////'),
+        ("0",
+         b'AAAAAQAAAADX7fRsY6KTqIc8EIDyr8M9gxGPW6ODnZoZDgo6l1ymwwAAAAYAAAABVVNEAAAAAADNTrgPO19O0EsnYjSc333yWGLKEVxLyu1kfKjCKOz9ewAAAAAAAAAA'),
+        ("50.1234567",
+         b'AAAAAQAAAADX7fRsY6KTqIc8EIDyr8M9gxGPW6ODnZoZDgo6l1ymwwAAAAYAAAABVVNEAAAAAADNTrgPO19O0EsnYjSc333yWGLKEVxLyu1kfKjCKOz9ewAAAAAd4DuH'),
+        (None,
+         b'AAAAAQAAAADX7fRsY6KTqIc8EIDyr8M9gxGPW6ODnZoZDgo6l1ymwwAAAAYAAAABVVNEAAAAAADNTrgPO19O0EsnYjSc333yWGLKEVxLyu1kfKjCKOz9e3//////////')
+    ])
+    def test_to_xdr_obj(self, limit, xdr):
+        asset = Asset('USD', 'GDGU5OAPHNPU5UCLE5RDJHG7PXZFQYWKCFOEXSXNMR6KRQRI5T6XXCD7')
+        source = 'GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV'
+        op = ChangeTrust(asset, limit, source)
+        assert op.to_xdr_object().to_xdr() == xdr
 
-
-def test_set_options_signer_raises():
-    op = SetOptions(signer_address=SOURCE)
-    assert op == SetOptions(signer_address=SOURCE, signer_type='ed25519PublicKey')
-
-    with pytest.raises(StellarAddressInvalidError, match='Must be a valid stellar address if not give signer_type'):
-        SetOptions(signer_address=SOURCE + 'ERROR')
-
-    with pytest.raises(NotValidParamError,
-                       match='Invalid signer type, sign_type should be ed25519PublicKey, hashX or preAuthTx'):
-        SetOptions(signer_address=SOURCE, signer_type='bad_type')
-
-
-def test_deepcopy():
-    payment = Payment(SOURCE, Asset('XLM'), '1')
-    payment_copy1 = copy.deepcopy(payment)
-    xdr = payment.xdr()
-    payment_copy2 = copy.deepcopy(payment)
-    assert payment_copy1.xdr() == payment_copy2.xdr() == xdr
+    def test_from_xdr_obj(self):
+        asset = Asset('USD', 'GDGU5OAPHNPU5UCLE5RDJHG7PXZFQYWKCFOEXSXNMR6KRQRI5T6XXCD7')
+        source = 'GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV'
+        limit = '123456.789'
+        origin_xdr_obj = ChangeTrust(asset, limit, source).to_xdr_object()
+        op = Operation.from_xdr_object(origin_xdr_obj)
+        assert isinstance(op, ChangeTrust)
+        assert op.source == source
+        assert op.limit == limit
+        assert op.asset == asset
