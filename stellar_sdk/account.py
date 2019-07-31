@@ -32,6 +32,8 @@ class Account:
         self.sequence += 1
 
     def __eq__(self, other: 'Account'):
+        if not isinstance(other, self.__class__):
+            return False
         return self.account_id == other.account_id and self.sequence == other.sequence
 
     def __str__(self):

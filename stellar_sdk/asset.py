@@ -132,4 +132,10 @@ class Asset:
         return cls(code, issuer)
 
     def __eq__(self, other: 'Asset'):
+        if not isinstance(other, Asset):
+            return False
         return self.code == other.code and self.issuer == other.issuer
+
+    def __str__(self):
+        return '<Asset [code={code}, issuer={issuer}]>'.format(code=self.code,
+                                                               issuer=self.issuer)
