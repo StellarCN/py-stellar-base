@@ -1,17 +1,17 @@
 [run]
-source = stellar_base
+source = stellar_sdk
 
 [report]
 omit =
-    stellar_base/stellarxdr/*
-    stellar_base/base58.py
-    stellar_base/version.py
-    stellar_base/purecrc16.py
+    stellar_sdk/stellarxdr/*
+    stellar_sdk/vendor/*
+    stellar_sdk/base58.py
 
 exclude_lines =
     pragma: no cover
 
     def __repr__
+    def __str__
     if self\.debug
 
     raise AssertionError

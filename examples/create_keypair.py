@@ -1,39 +1,22 @@
-from stellar_base.keypair import Keypair
-from stellar_base.utils import StellarMnemonic
+from stellar_sdk.keypair import Keypair
 
+# create a random keypair
+print("create a random keypair")
+kp = Keypair.random()
+print("Secret: {}".format(kp.secret()))
+print("Public Key: {}".format(kp.public_key()))
+print("")
 
-def generate_random_keypair():
-    print("Generate random keypair")
-    keypair = Keypair.random()
-    print("Public key / Account address:\n", keypair.address().decode())
-    print("Seed / Your secret to keep it on local:\n",
-          keypair.seed().decode())
+# create a keypair from secret
+print("create a keypair from secret")
+secret = "SBRR6ZPBHHTDXYSFRZR2QZCGDZURNE5ON4M4F3HQA42G3Z62SFCR7EEJ"
+kp = Keypair.from_secret(secret)
+print("Secret: {}".format(kp.secret()))
+print("Public Key: {}".format(kp.public_key()))
+print("")
 
-
-def create_keypair_determinist_english():
-    print("Create keypair determinist english")
-    mnemonic = ('illness spike retreat truth genius clock brain pass '
-                'fit cave bargain toe')
-    keypair = Keypair.deterministic(mnemonic)
-    print("Public key / Account address:\n", keypair.address().decode())
-    print("Seed / Your secret to keep it on local:\n",
-          keypair.seed().decode())
-
-
-def create_multiple_keypair():
-    print("Create multiple keypair")
-    sm = StellarMnemonic()
-    secret_phrase = sm.generate()
-    kp0 = Keypair.deterministic(secret_phrase, index=0)
-    kp1 = Keypair.deterministic(secret_phrase, index=1)
-    kp2 = Keypair.deterministic(secret_phrase, index=2)
-    for keypair in (kp0, kp1, kp2):
-        print("Public key / Account address:\n", keypair.address().decode())
-        print("Seed / Your secret to keep it on local:\n",
-              keypair.seed().decode())
-
-
-if __name__ == "__main__":
-    generate_random_keypair()
-    create_keypair_determinist_english()
-    create_multiple_keypair()
+# create a keypair from public key
+print("create a keypair from public key")
+public_key = "GDCZ6JDZMWYORTIHEO2E4ZXKBQ2TLXNRQJPJH5RCFN7Q7I24G4RGLXP6"
+kp = Keypair.from_public_key(public_key)
+print("Public Key: {}".format(kp.public_key()))
