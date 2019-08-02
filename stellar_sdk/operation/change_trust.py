@@ -5,11 +5,22 @@ from ..stellarxdr import Xdr
 
 
 class ChangeTrust(Operation):
-    _DEFAULT_LIMIT = "922337203685.4775807"
+    """The :class:`ChangeTrust` object, which represents a ChangeTrust
+    operation on Stellar's network.
 
-    @classmethod
-    def type_code(cls) -> int:
-        return Xdr.const.CHANGE_TRUST
+    Creates, updates, or deletes a trustline. For more on trustlines, please
+    refer to the `assets documentation
+    <https://www.stellar.org/developers/guides/concepts/assets.html>_`.
+
+    Threshold: Medium
+
+    :param asset: The asset for the trust line.
+    :param limit: The limit for the asset, defaults to max int64(922337203685.4775807).
+        If the limit is set to "0" it deletes the trustline.
+    :param source: The source account (defaults to transaction source).
+
+    """
+    _DEFAULT_LIMIT = "922337203685.4775807"
 
     def __init__(self, asset: Asset, limit: str = None, source: str = None) -> None:
         super().__init__(source)
@@ -19,7 +30,11 @@ class ChangeTrust(Operation):
         else:
             self.limit = limit
 
-    def to_operation_body(self) -> Xdr.nullclass:
+    @classmethod
+    def _type_code(cls) -> int:
+        return Xdr.const.CHANGE_TRUST
+
+    def _to_operation_body(self) -> Xdr.nullclass:
         line = self.asset.to_xdr_object()
         limit = Operation.to_xdr_amount(self.limit)
 
@@ -30,10 +45,14 @@ class ChangeTrust(Operation):
         return body
 
     @classmethod
-    def from_xdr_object(cls, op_xdr_object: Xdr.types.Operation) -> 'ChangeTrust':
-        source = Operation.get_source_from_xdr_obj(op_xdr_object)
+    def from_xdr_object(cls, operation_xdr_object: Xdr.types.Operation) -> 'ChangeTrust':
+        """Creates a :class:`ChangeTrust` object from an XDR Operation
+        object.
 
-        line = Asset.from_xdr_object(op_xdr_object.body.changeTrustOp.line)
-        limit = Operation.from_xdr_amount(op_xdr_object.body.changeTrustOp.limit)
+        """
+        source = Operation.get_source_from_xdr_obj(operation_xdr_object)
+
+        line = Asset.from_xdr_object(operation_xdr_object.body.changeTrustOp.line)
+        limit = Operation.from_xdr_amount(operation_xdr_object.body.changeTrustOp.limit)
 
         return cls(source=source, asset=line, limit=limit)

@@ -1,6 +1,8 @@
 from decimal import Decimal
 
 import pytest
+
+from stellar_sdk.signer import Signer
 from stellar_sdk.utils import sha256
 
 from stellar_sdk.asset import Asset
@@ -369,47 +371,41 @@ class TestManageData:
         op = Operation.from_xdr_object(origin_xdr_obj)
         assert isinstance(op, ManageData)
         assert op.source == source
-        assert op.name == name
+        assert op.data_name == name
         if isinstance(value, str):
             value = value.encode()
-        assert op.value == value
+        assert op.data_value == value
 
 
 class TestSetOptions:
-    def test_auth_flags_set_correctly(self):
-        assert SetOptions.AuthFlag.AUTHORIZATION_REQUIRED == 1
-        assert SetOptions.AuthFlag.AUTHORIZATION_REVOCABLE == 2
-        assert SetOptions.AuthFlag.AUTHORIZATION_IMMUTABLE == 4
-
-    def test_signer_type_flags_set_correctly(self):
-        assert SetOptions.SignerType.ED25519_PUBLIC_KEY.value == 'ed25519_public_key'
-        assert SetOptions.SignerType.SHA256_HASH.value == 'sha256_hash'
-        assert SetOptions.SignerType.PRE_AUTH_TX.value == 'pre_auth_tx'
+    AUTHORIZATION_REQUIRED = 1
+    AUTHORIZATION_REVOCABLE = 2
+    AUTHORIZATION_IMMUTABLE = 4
 
     @pytest.mark.parametrize(
-        'inflation_dest, clear_flags, set_flags, master_weight, low_threshold, med_threshold, high_threshold, home_domain, signer_type, signer_key, signer_weight, source, xdr',
+        'inflation_dest, clear_flags, set_flags, master_weight, low_threshold, med_threshold, high_threshold, home_domain, signer, source, xdr',
         [
             ('GDGU5OAPHNPU5UCLE5RDJHG7PXZFQYWKCFOEXSXNMR6KRQRI5T6XXCD7',
-             SetOptions.AuthFlag.AUTHORIZATION_REVOCABLE | SetOptions.AuthFlag.AUTHORIZATION_IMMUTABLE,
-             SetOptions.AuthFlag.AUTHORIZATION_REQUIRED, 0, 1, 2, 3, 'www.example.com',
-             SetOptions.SignerType.ED25519_PUBLIC_KEY, 'GDGU5OAPHNPU5UCLE5RDJHG7PXZFQYWKCFOEXSXNMR6KRQRI5T6XXCD7', 1,
+             AUTHORIZATION_REVOCABLE | AUTHORIZATION_IMMUTABLE,
+             AUTHORIZATION_REQUIRED, 0, 1, 2, 3, 'www.example.com',
+             Signer.ed25519_public_key("GDGU5OAPHNPU5UCLE5RDJHG7PXZFQYWKCFOEXSXNMR6KRQRI5T6XXCD7", 1),
              None,
              'AAAAAAAAAAUAAAABAAAAAM1OuA87X07QSydiNJzfffJYYsoRXEvK7WR8qMIo7P17AAAAAQAAAAYAAAABAAAAAQAAAAEAAAAAAAAAAQAAAAEAAAABAAAAAgAAAAEAAAADAAAAAQAAAA93d3cuZXhhbXBsZS5jb20AAAAAAQAAAADNTrgPO19O0EsnYjSc333yWGLKEVxLyu1kfKjCKOz9ewAAAAE='),
             ('GDGU5OAPHNPU5UCLE5RDJHG7PXZFQYWKCFOEXSXNMR6KRQRI5T6XXCD7',
-             SetOptions.AuthFlag.AUTHORIZATION_REQUIRED | SetOptions.AuthFlag.AUTHORIZATION_REVOCABLE,
-             SetOptions.AuthFlag.AUTHORIZATION_REVOCABLE, 3, 2, 4, 6, None,
-             SetOptions.SignerType.PRE_AUTH_TX, sha256(b"PRE_AUTH_TX"), 2,
+             AUTHORIZATION_REQUIRED | AUTHORIZATION_REVOCABLE,
+             AUTHORIZATION_REVOCABLE, 3, 2, 4, 6, None,
+             Signer.pre_auth_tx(sha256(b"PRE_AUTH_TX"), 2),
              'GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV',
              'AAAAAQAAAADX7fRsY6KTqIc8EIDyr8M9gxGPW6ODnZoZDgo6l1ymwwAAAAUAAAABAAAAAM1OuA87X07QSydiNJzfffJYYsoRXEvK7WR8qMIo7P17AAAAAQAAAAMAAAABAAAAAgAAAAEAAAADAAAAAQAAAAIAAAABAAAABAAAAAEAAAAGAAAAAAAAAAEAAAAB96nlNnQ/Aq5uCbYXnGJN/EXa76Y2RQP6S1wP8lOEL1UAAAAC'),
-            (None, None, None, 0, 255, 255, 255, 'overcat.me', SetOptions.SignerType.SHA256_HASH,
-             sha256(b"SHA256_HASH"), 0, None,
+            (None, None, None, 0, 255, 255, 255, 'overcat.me', Signer.sha256_hash(sha256(b"SHA256_HASH"), 0),
+              None,
              'AAAAAAAAAAUAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAEAAAD/AAAAAQAAAP8AAAABAAAA/wAAAAEAAAAKb3ZlcmNhdC5tZQAAAAAAAQAAAALB1I1O+GEAV87X3eYN/uAYDIDzP5mY4SVTEQFFYFq6nwAAAAA='),
-            (None, None, None, None, None, None, None, None, None, None, None, None,
+            (None, None, None, None, None, None, None, None, None, None,
              'AAAAAAAAAAUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA='),
 
         ])
     def test_to_xdr(self, inflation_dest, clear_flags, set_flags, master_weight, low_threshold, med_threshold,
-                    high_threshold, home_domain, signer_type, signer_key, signer_weight, source, xdr):
+                    high_threshold, home_domain, signer, source, xdr):
         op = SetOptions(inflation_dest,
                         clear_flags,
                         set_flags,
@@ -417,9 +413,7 @@ class TestSetOptions:
                         low_threshold,
                         med_threshold,
                         high_threshold,
-                        signer_type,
-                        signer_key,
-                        signer_weight,
+                        signer,
                         home_domain,
                         source)
         xdr_obj = op.to_xdr_object()
@@ -433,32 +427,8 @@ class TestSetOptions:
         assert from_instance.low_threshold == low_threshold
         assert from_instance.med_threshold == med_threshold
         assert from_instance.high_threshold == high_threshold
-        assert from_instance.signer_type == signer_type
-        assert from_instance.signer_key == signer_key
-        assert from_instance.signer_weight == signer_weight
+        assert from_instance.signer == signer
         assert from_instance.home_domain == home_domain
-
-    @pytest.mark.parametrize('signer_type, signer_key, signer_weight', [
-        (SetOptions.SignerType.ED25519_PUBLIC_KEY, 'GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV', None),
-        (SetOptions.SignerType.ED25519_PUBLIC_KEY, None, 1),
-        (None, 'GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV', 1),
-
-    ])
-    def test_to_xdr_with_invalid_signer_arguments_raise(self, signer_type, signer_key, signer_weight):
-        with pytest.raises(ValueError,
-                           match="If you want to set up signer, you must provide signer_type, signer_key and signer_weight."):
-            SetOptions(signer_type=signer_type, signer_key=signer_key, signer_weight=signer_weight)
-
-    def test_to_xdr_with_invalid_signer_type_raise(self):
-        signer_type = 'BAD_TYPE'
-        signer_key = 'GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV'
-        signer_weight = 1
-
-        with pytest.raises(ValueError,
-                           match='Invalid signer type, sign_type should be SetOptions.SignerType.ED25519_PUBLIC_KEY, '
-                                 'SetOptions.SHA256_HASH.ED25519_PUBLIC_KEY or SetOptions.SignerType.PRE_AUTH_TX'):
-            SetOptions(signer_type=signer_type, signer_key=signer_key, signer_weight=signer_weight)
-
 
 class TestManageSellOffer:
     @pytest.mark.parametrize('selling, buying, amount, price, offer_id, source, xdr', [

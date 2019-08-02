@@ -1,21 +1,37 @@
 from .operation import Operation
-
-from ..strkey import StrKey
-from ..stellarxdr import Xdr
 from ..keypair import Keypair
+from ..stellarxdr import Xdr
+from ..strkey import StrKey
 
 
 class CreateAccount(Operation):
-    @classmethod
-    def type_code(cls) -> int:
-        return Xdr.const.CREATE_ACCOUNT
+    """The :class:`CreateAccount` object, which represents a Create Account
+    operation on Stellar's network.
+
+    This operation creates and funds a new account with the specified starting
+    balance.
+
+    Threshold: Medium
+
+    :param destination: Destination account ID to create an account for.
+    :param starting_balance: Amount in XLM the account should be
+        funded for. Must be greater than the [reserve balance amount]
+        (https://www.stellar.org/developers/learn/concepts/fees.html).
+    :param source: The source account for the payment. Defaults to the
+        transaction's source account.
+
+    """
 
     def __init__(self, destination: str, starting_balance: str, source: str = None) -> None:
         super().__init__(source)
         self.destination = destination
         self.starting_balance = starting_balance
 
-    def to_operation_body(self):
+    @classmethod
+    def _type_code(cls) -> int:
+        return Xdr.const.CREATE_ACCOUNT
+
+    def _to_operation_body(self):
         destination = Keypair.from_public_key(self.destination).xdr_account_id()
 
         create_account_op = Xdr.types.CreateAccountOp(
@@ -27,10 +43,13 @@ class CreateAccount(Operation):
         return body
 
     @classmethod
-    def from_xdr_object(cls, op_xdr_object: Xdr.types.Operation) -> 'CreateAccount':
-        source = Operation.get_source_from_xdr_obj(op_xdr_object)
+    def from_xdr_object(cls, operation_xdr_object: Xdr.types.Operation) -> 'CreateAccount':
+        """Creates a :class:`CreateAccount` object from an XDR Operation object.
 
-        destination = StrKey.encode_ed25519_public_key(op_xdr_object.body.createAccountOp.destination.ed25519)
-        starting_balance = Operation.from_xdr_amount(op_xdr_object.body.createAccountOp.startingBalance)
+        """
+        source = Operation.get_source_from_xdr_obj(operation_xdr_object)
+
+        destination = StrKey.encode_ed25519_public_key(operation_xdr_object.body.createAccountOp.destination.ed25519)
+        starting_balance = Operation.from_xdr_amount(operation_xdr_object.body.createAccountOp.startingBalance)
 
         return cls(source=source, destination=destination, starting_balance=starting_balance)

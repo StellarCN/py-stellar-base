@@ -1,20 +1,32 @@
 from .operation import Operation
-
 from ..keypair import Keypair
-from ..strkey import StrKey
 from ..stellarxdr import Xdr
+from ..strkey import StrKey
 
 
 class AccountMerge(Operation):
-    @classmethod
-    def type_code(cls) -> int:
-        return Xdr.const.ACCOUNT_MERGE
+    """The :class:`AccountMerge` object, which represents a
+    AccountMerge operation on Stellar's network.
+
+    Transfers the native balance (the amount of XLM an account holds) to
+    another account and removes the source account from the ledger.
+
+    Threshold: High
+
+    :param destination: Destination to merge the source account into.
+    :param source: The source account (defaults to transaction source).
+
+    """
 
     def __init__(self, destination: str, source: str = None):
         super().__init__(source)
         self.destination = destination
 
-    def to_operation_body(self) -> Xdr.nullclass:
+    @classmethod
+    def _type_code(cls) -> int:
+        return Xdr.const.ACCOUNT_MERGE
+
+    def _to_operation_body(self) -> Xdr.nullclass:
         destination = Keypair.from_public_key(self.destination).xdr_account_id()
         body = Xdr.nullclass()
         body.type = Xdr.const.ACCOUNT_MERGE
@@ -22,7 +34,11 @@ class AccountMerge(Operation):
         return body
 
     @classmethod
-    def from_xdr_object(cls, op_xdr_object: Xdr.types.Operation) -> 'AccountMerge':
-        source = Operation.get_source_from_xdr_obj(op_xdr_object)
-        destination = StrKey.encode_ed25519_public_key(op_xdr_object.body.destination.ed25519)
+    def from_xdr_object(cls, operation_xdr_object: Xdr.types.Operation) -> 'AccountMerge':
+        """Creates a :class:`AccountMerge` object from an XDR Operation
+        object.
+
+        """
+        source = Operation.get_source_from_xdr_obj(operation_xdr_object)
+        destination = StrKey.encode_ed25519_public_key(operation_xdr_object.body.destination.ed25519)
         return cls(source=source, destination=destination)

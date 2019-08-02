@@ -4,19 +4,34 @@ from ..stellarxdr import Xdr
 
 
 class Inflation(Operation):
-    @classmethod
-    def type_code(cls) -> int:
-        return Xdr.const.INFLATION
+    """The :class:`Inflation` object, which represents a
+    Inflation operation on Stellar's network.
+
+    This operation runs inflation.
+
+    Threshold: Low
+
+    :param str source: The source account (defaults to transaction source).
+
+    """
 
     def __init__(self, source: str = None) -> None:
         super().__init__(source)
 
-    def to_operation_body(self) -> Xdr.nullclass:
+    @classmethod
+    def _type_code(cls) -> int:
+        return Xdr.const.INFLATION
+
+    def _to_operation_body(self) -> Xdr.nullclass:
         body = Xdr.nullclass()
         body.type = Xdr.const.INFLATION
         return body
 
     @classmethod
-    def from_xdr_object(cls, op_xdr_object: Xdr.types.Operation) -> 'Inflation':
-        source = Operation.get_source_from_xdr_obj(op_xdr_object)
+    def from_xdr_object(cls, operation_xdr_object: Xdr.types.Operation) -> 'Inflation':
+        """Creates a :class:`Inflation` object from an XDR Operation
+        object.
+
+        """
+        source = Operation.get_source_from_xdr_obj(operation_xdr_object)
         return cls(source)

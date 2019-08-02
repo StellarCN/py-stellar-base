@@ -1,23 +1,41 @@
 from .operation import Operation
-
 from ..asset import Asset
 from ..keypair import Keypair
-from ..strkey import StrKey
 from ..stellarxdr import Xdr
+from ..strkey import StrKey
 
 
 class AllowTrust(Operation):
-    @classmethod
-    def type_code(cls) -> int:
-        return Xdr.const.ALLOW_TRUST
+    """The :class:`AllowTrust` object, which represents a AllowTrust operation
+    on Stellar's network.
 
+    Updates the authorized flag of an existing trustline. This can only be
+    called by the issuer of a trustline's `asset
+    <https://www.stellar.org/developers/guides/concepts/assets.html>`_.
+
+    The issuer can only clear the authorized flag if the issuer has the
+    AUTH_REVOCABLE_FLAG set. Otherwise, the issuer can only set the authorized
+    flag.
+
+    Threshold: Low
+
+    :param trustor: The trusting account (the one being authorized).
+    :param asset_code: The asset code being authorized.
+    :param authorize: `True` to authorize the line, `False` to deauthorize.
+    :param source: The source account (defaults to transaction source).
+
+    """
     def __init__(self, trustor: str, asset_code: str, authorize: bool, source: str = None) -> None:
         super().__init__(source)
         self.trustor = trustor
         self.asset_code = asset_code
         self.authorize = authorize
 
-    def to_operation_body(self) -> Xdr.nullclass:
+    @classmethod
+    def _type_code(cls) -> int:
+        return Xdr.const.ALLOW_TRUST
+
+    def _to_operation_body(self) -> Xdr.nullclass:
         Asset.check_if_asset_code_is_valid(self.asset_code)
         trustor = Keypair.from_public_key(self.trustor).xdr_account_id()
         length = len(self.asset_code)
@@ -41,18 +59,22 @@ class AllowTrust(Operation):
         return body
 
     @classmethod
-    def from_xdr_object(cls, op_xdr_object: Xdr.types.Operation) -> 'AllowTrust':
-        source = Operation.get_source_from_xdr_obj(op_xdr_object)
-        trustor = StrKey.encode_ed25519_public_key(op_xdr_object.body.allowTrustOp.trustor.ed25519)
-        authorize = op_xdr_object.body.allowTrustOp.authorize
+    def from_xdr_object(cls, operation_xdr_object: Xdr.types.Operation) -> 'AllowTrust':
+        """Creates a :class:`AllowTrust` object from an XDR Operation
+        object.
 
-        asset_type = op_xdr_object.body.allowTrustOp.asset.type
+        """
+        source = Operation.get_source_from_xdr_obj(operation_xdr_object)
+        trustor = StrKey.encode_ed25519_public_key(operation_xdr_object.body.allowTrustOp.trustor.ed25519)
+        authorize = operation_xdr_object.body.allowTrustOp.authorize
+
+        asset_type = operation_xdr_object.body.allowTrustOp.asset.type
         if asset_type == Xdr.const.ASSET_TYPE_CREDIT_ALPHANUM4:
             asset_code = (
-                op_xdr_object.body.allowTrustOp.asset.assetCode4.decode())
+                operation_xdr_object.body.allowTrustOp.asset.assetCode4.decode())
         elif asset_type == Xdr.const.ASSET_TYPE_CREDIT_ALPHANUM12:
             asset_code = (
-                op_xdr_object.body.allowTrustOp.asset.assetCode12.decode())
+                operation_xdr_object.body.allowTrustOp.asset.assetCode12.decode())
         else:
             raise NotImplementedError(
                 "Operation of asset_type={} is not implemented"
