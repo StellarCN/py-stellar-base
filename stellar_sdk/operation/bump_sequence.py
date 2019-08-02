@@ -23,10 +23,10 @@ class BumpSequence(Operation):
         self.bump_to = bump_to
 
     @classmethod
-    def __type_code(cls) -> int:
+    def _type_code(cls) -> int:
         return Xdr.const.BUMP_SEQUENCE
 
-    def __to_operation_body(self) -> Xdr.nullclass:
+    def _to_operation_body(self) -> Xdr.nullclass:
         bump_sequence_op = Xdr.types.BumpSequenceOp(self.bump_to)
         body = Xdr.nullclass()
         body.type = Xdr.const.BUMP_SEQUENCE

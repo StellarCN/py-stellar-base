@@ -49,10 +49,10 @@ class CreatePassiveSellOffer(Operation):
             self.price = Price.from_raw_price(price)
 
     @classmethod
-    def __type_code(cls) -> int:
+    def _type_code(cls) -> int:
         return Xdr.const.CREATE_PASSIVE_SELL_OFFER
 
-    def __to_operation_body(self) -> Xdr.nullclass:
+    def _to_operation_body(self) -> Xdr.nullclass:
         selling = self.selling.to_xdr_object()
         buying = self.buying.to_xdr_object()
         price = self.price.to_xdr_object()

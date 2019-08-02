@@ -32,10 +32,10 @@ class AllowTrust(Operation):
         self.authorize = authorize
 
     @classmethod
-    def __type_code(cls) -> int:
+    def _type_code(cls) -> int:
         return Xdr.const.ALLOW_TRUST
 
-    def __to_operation_body(self) -> Xdr.nullclass:
+    def _to_operation_body(self) -> Xdr.nullclass:
         Asset.check_if_asset_code_is_valid(self.asset_code)
         trustor = Keypair.from_public_key(self.trustor).xdr_account_id()
         length = len(self.asset_code)

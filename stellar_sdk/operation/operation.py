@@ -41,7 +41,7 @@ class Operation(metaclass=ABCMeta):
         self.source = source
 
     @classmethod
-    def __type_code(cls) -> int:
+    def _type_code(cls) -> int:
         pass  # pragma: no cover
 
     @staticmethod
@@ -109,7 +109,7 @@ class Operation(metaclass=ABCMeta):
         return str(Decimal(value) / Operation._ONE)
 
     @abstractmethod
-    def __to_operation_body(self) -> Xdr.nullclass:
+    def _to_operation_body(self) -> Xdr.nullclass:
         pass  # pragma: no cover
 
     def to_xdr_object(self) -> Xdr.types.Operation:
@@ -121,7 +121,7 @@ class Operation(metaclass=ABCMeta):
         if self.source is not None:
             source_account = [Keypair.from_public_key(self.source).xdr_account_id()]
 
-        return Xdr.types.Operation(source_account, self.__to_operation_body())
+        return Xdr.types.Operation(source_account, self._to_operation_body())
 
     @classmethod
     def from_xdr_object(cls, operation_xdr_object: Xdr.types.Operation) -> 'Operation':
@@ -132,7 +132,7 @@ class Operation(metaclass=ABCMeta):
             subclass) instance from.
         """
         for sub_cls in cls.__subclasses__():
-            if sub_cls.type_code() == operation_xdr_object.type:
+            if sub_cls._type_code() == operation_xdr_object.type:
                 return sub_cls.from_xdr_object(operation_xdr_object)
         raise NotImplementedError("Operation of type={} is not implemented"
                                   ".".format(operation_xdr_object.type))

@@ -31,10 +31,10 @@ class ChangeTrust(Operation):
             self.limit = limit
 
     @classmethod
-    def __type_code(cls) -> int:
+    def _type_code(cls) -> int:
         return Xdr.const.CHANGE_TRUST
 
-    def __to_operation_body(self) -> Xdr.nullclass:
+    def _to_operation_body(self) -> Xdr.nullclass:
         line = self.asset.to_xdr_object()
         limit = Operation.to_xdr_amount(self.limit)
 

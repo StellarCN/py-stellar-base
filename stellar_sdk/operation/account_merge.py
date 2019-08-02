@@ -23,10 +23,10 @@ class AccountMerge(Operation):
         self.destination = destination
 
     @classmethod
-    def __type_code(cls) -> int:
+    def _type_code(cls) -> int:
         return Xdr.const.ACCOUNT_MERGE
 
-    def __to_operation_body(self) -> Xdr.nullclass:
+    def _to_operation_body(self) -> Xdr.nullclass:
         destination = Keypair.from_public_key(self.destination).xdr_account_id()
         body = Xdr.nullclass()
         body.type = Xdr.const.ACCOUNT_MERGE

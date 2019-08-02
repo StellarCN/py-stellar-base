@@ -73,10 +73,10 @@ class SetOptions(Operation):
         self.signer = signer
 
     @classmethod
-    def __type_code(cls) -> int:
+    def _type_code(cls) -> int:
         return Xdr.const.SET_OPTIONS
 
-    def __to_operation_body(self) -> Xdr.nullclass():
+    def _to_operation_body(self) -> Xdr.nullclass():
         if self.inflation_dest is not None:
             inflation_dest = [Keypair.from_public_key(self.inflation_dest).xdr_account_id()]
         else:
@@ -133,7 +133,7 @@ class SetOptions(Operation):
         signer = None
         signer_xdr_object = operation_xdr_object.body.setOptionsOp.signer
         if signer_xdr_object:
-            signer = Signer.from_xdr_object(signer_xdr_object)
+            signer = Signer.from_xdr_object(signer_xdr_object[0])
 
         return cls(
             inflation_dest=inflation_dest,

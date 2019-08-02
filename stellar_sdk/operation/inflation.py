@@ -19,10 +19,10 @@ class Inflation(Operation):
         super().__init__(source)
 
     @classmethod
-    def __type_code(cls) -> int:
+    def _type_code(cls) -> int:
         return Xdr.const.INFLATION
 
-    def __to_operation_body(self) -> Xdr.nullclass:
+    def _to_operation_body(self) -> Xdr.nullclass:
         body = Xdr.nullclass()
         body.type = Xdr.const.INFLATION
         return body

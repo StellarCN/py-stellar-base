@@ -28,10 +28,10 @@ class Payment(Operation):
         self.amount = amount
 
     @classmethod
-    def __type_code(cls) -> int:
+    def _type_code(cls) -> int:
         return Xdr.const.PAYMENT
 
-    def __to_operation_body(self) -> Xdr.nullclass:
+    def _to_operation_body(self) -> Xdr.nullclass:
         asset = self.asset.to_xdr_object()
         destination = Keypair.from_public_key(self.destination).xdr_account_id()
 

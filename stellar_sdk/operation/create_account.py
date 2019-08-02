@@ -28,10 +28,10 @@ class CreateAccount(Operation):
         self.starting_balance = starting_balance
 
     @classmethod
-    def __type_code(cls) -> int:
+    def _type_code(cls) -> int:
         return Xdr.const.CREATE_ACCOUNT
 
-    def __to_operation_body(self):
+    def _to_operation_body(self):
         destination = Keypair.from_public_key(self.destination).xdr_account_id()
 
         create_account_op = Xdr.types.CreateAccountOp(
