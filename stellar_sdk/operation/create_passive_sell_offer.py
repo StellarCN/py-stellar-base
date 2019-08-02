@@ -1,16 +1,42 @@
 import typing
 
 from .operation import Operation
-
 from ..asset import Asset
 from ..price import Price
 from ..stellarxdr import Xdr
 
 
 class CreatePassiveSellOffer(Operation):
-    @classmethod
-    def type_code(cls) -> int:
-        return Xdr.const.CREATE_PASSIVE_SELL_OFFER
+    """The :class:`CreatePassiveSellOffer` object, which represents a
+    CreatePassiveSellOffer operation on Stellar's network.
+
+    A passive sell offer is an offer that does not act on and take a reverse offer
+    of equal price. Instead, they only take offers of lesser price. For
+    example, if an offer exists to buy 5 BTC for 30 XLM, and you make a passive
+    sell offer to buy 30 XLM for 5 BTC, your passive sell offer does not take the first
+    offer.
+
+    Note that regular offers made later than your passive sell offer can act on and
+    take your passive sell offer, even if the regular offer is of the same price as
+    your passive sell offer.
+
+    Passive sell offers allow market makers to have zero spread. If you want to
+    trade EUR for USD at 1:1 price and USD for EUR also at 1:1, you can create
+    two passive sell offers so the two offers don't immediately act on each other.
+
+    Once the passive sell offer is created, you can manage it like any other offer
+    using the manage offer operation - see :class:`ManageOffer` for more
+    details.
+
+    :param selling: What you're selling.
+    :param buying: What you're buying.
+    :param amount: The total amount you're selling. If 0,
+        deletes the offer.
+    :param price: Price of 1 unit of `selling` in
+        terms of `buying`.
+    :param source: The source account (defaults to transaction source).
+
+    """
 
     def __init__(self, selling: Asset, buying: Asset, amount: str, price: typing.Union[Price, str],
                  source: str = None) -> None:
@@ -22,7 +48,11 @@ class CreatePassiveSellOffer(Operation):
         if not isinstance(price, Price):
             self.price = Price.from_raw_price(price)
 
-    def to_operation_body(self) -> Xdr.nullclass:
+    @classmethod
+    def __type_code(cls) -> int:
+        return Xdr.const.CREATE_PASSIVE_SELL_OFFER
+
+    def __to_operation_body(self) -> Xdr.nullclass:
         selling = self.selling.to_xdr_object()
         buying = self.buying.to_xdr_object()
         price = self.price.to_xdr_object()
@@ -36,13 +66,15 @@ class CreatePassiveSellOffer(Operation):
         return body
 
     @classmethod
-    def from_xdr_object(cls, op_xdr_object: Xdr.types.Operation) -> 'CreatePassiveSellOffer':
-        source = Operation.get_source_from_xdr_obj(op_xdr_object)
+    def from_xdr_object(cls, operation_xdr_object: Xdr.types.Operation) -> 'CreatePassiveSellOffer':
+        """Creates a :class:`CreatePassiveSellOffer` object from an XDR Operation object.
 
-        selling = Asset.from_xdr_object(op_xdr_object.body.createPassiveSellOfferOp.selling)
-        buying = Asset.from_xdr_object(op_xdr_object.body.createPassiveSellOfferOp.buying)
-        amount = Operation.from_xdr_amount(op_xdr_object.body.createPassiveSellOfferOp.amount)
-        price = Price.from_xdr_object(op_xdr_object.body.createPassiveSellOfferOp.price)
+        """
+        source = Operation.get_source_from_xdr_obj(operation_xdr_object)
+        selling = Asset.from_xdr_object(operation_xdr_object.body.createPassiveSellOfferOp.selling)
+        buying = Asset.from_xdr_object(operation_xdr_object.body.createPassiveSellOfferOp.buying)
+        amount = Operation.from_xdr_amount(operation_xdr_object.body.createPassiveSellOfferOp.amount)
+        price = Price.from_xdr_object(operation_xdr_object.body.createPassiveSellOfferOp.price)
 
         return cls(
             source=source,

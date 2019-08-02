@@ -1,35 +1,54 @@
 import typing
 
 from .operation import Operation
-
 from ..stellarxdr import Xdr
 
 
 class ManageData(Operation):
-    @classmethod
-    def type_code(cls) -> int:
-        return Xdr.const.MANAGE_DATA
+    """The :class:`ManageData` object, which represents a
+    ManageData operation on Stellar's network.
 
-    def __init__(self, name: str, value: typing.Union[str, bytes, None], source=None) -> None:  # TODO: bytes only?
+    Allows you to set, modify or delete a Data Entry (name/value pair) that is
+    attached to a particular account. An account can have an arbitrary amount
+    of DataEntries attached to it. Each DataEntry increases the minimum balance
+    needed to be held by the account.
+
+    DataEntries can be used for application specific things. They are not used
+    by the core Stellar protocol.
+
+    Threshold: Medium
+
+    :param data_name: The name of the data entry.
+    :param data_value: The value of the data entry.
+    :param source: The optional source account.
+
+    """
+
+    def __init__(self, data_name: str, data_value: typing.Union[str, bytes, None],
+                 source=None) -> None:  # TODO: bytes only?
         super().__init__(source)
-        self.name = name
-        self.value = value
+        self.data_name = data_name
+        self.data_value = data_value
 
-        valid_data_name_len = len(self.name) <= 64
-        valid_data_val_len = (self.value is None
-                              or len(self.value) <= 64)
+        valid_data_name_len = len(self.data_name) <= 64
+        valid_data_val_len = (self.data_value is None
+                              or len(self.data_value) <= 64)
 
         if not valid_data_name_len or not valid_data_val_len:
             raise ValueError("Data and value should be <= 64 bytes (ascii encoded).")
 
-    def to_operation_body(self) -> Xdr.nullclass:
-        data_name = bytes(self.name, encoding='utf-8')
+    @classmethod
+    def __type_code(cls) -> int:
+        return Xdr.const.MANAGE_DATA
 
-        if self.value is not None:
-            if isinstance(self.value, bytes):
-                data_value = [self.value]
+    def __to_operation_body(self) -> Xdr.nullclass:
+        data_name = bytes(self.data_name, encoding='utf-8')
+
+        if self.data_value is not None:
+            if isinstance(self.data_value, bytes):
+                data_value = [self.data_value]
             else:
-                data_value = [bytes(self.value, 'utf-8')]
+                data_value = [bytes(self.data_value, 'utf-8')]
         else:
             data_value = []
         manage_data_op = Xdr.types.ManageDataOp(data_name, data_value)
@@ -40,12 +59,16 @@ class ManageData(Operation):
         return body
 
     @classmethod
-    def from_xdr_object(cls, op_xdr_object: Xdr.types.Operation) -> 'ManageData':
-        source = Operation.get_source_from_xdr_obj(op_xdr_object)
-        data_name = op_xdr_object.body.manageDataOp.dataName.decode()
+    def from_xdr_object(cls, operation_xdr_object: Xdr.types.Operation) -> 'ManageData':
+        """Creates a :class:`ManageData` object from an XDR Operation
+        object.
 
-        if op_xdr_object.body.manageDataOp.dataValue:
-            data_value = op_xdr_object.body.manageDataOp.dataValue[0]
+        """
+        source = Operation.get_source_from_xdr_obj(operation_xdr_object)
+        data_name = operation_xdr_object.body.manageDataOp.dataName.decode()
+
+        if operation_xdr_object.body.manageDataOp.dataValue:
+            data_value = operation_xdr_object.body.manageDataOp.dataValue[0]
         else:
             data_value = None
-        return cls(source=source, name=data_name, value=data_value)
+        return cls(data_name=data_name, data_value=data_value, source=source)

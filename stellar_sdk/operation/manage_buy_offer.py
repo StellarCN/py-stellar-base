@@ -1,16 +1,35 @@
 import typing
 
 from .operation import Operation
-
 from ..asset import Asset
 from ..price import Price
 from ..stellarxdr import Xdr
 
 
 class ManageBuyOffer(Operation):
-    @classmethod
-    def type_code(cls) -> int:
-        return Xdr.const.MANAGE_BUY_OFFER
+    """The :class:`ManageBuyOffer` object, which represents a ManageBuyOffer
+    operation on Stellar's network.
+
+    Creates, updates, or deletes an buy offer.
+
+    If you want to create a new offer set Offer ID to 0.
+
+    If you want to update an existing offer set Offer ID to existing offer ID.
+
+    If you want to delete an existing offer set Offer ID to existing offer ID
+    and set Amount to 0.
+
+    Threshold: Medium
+
+    :param selling: What you're selling.
+    :param buying: What you're buying.
+    :param amount: Amount being bought. if set to 0, delete the offer.
+    :param price: Price of thing being bought in terms of what you are selling.
+    :param offer_id: If `0`, will create a new offer (default). Otherwise,
+        edits an existing offer.
+    :param source: The source account (defaults to transaction source).
+
+    """
 
     def __init__(self, selling: Asset, buying: Asset, amount: str, price: typing.Union[Price, str], offer_id: int = 0,
                  source: str = None) -> None:
@@ -23,7 +42,11 @@ class ManageBuyOffer(Operation):
             self.price = Price.from_raw_price(price)
         self.offer_id = offer_id
 
-    def to_operation_body(self) -> Xdr.nullclass:
+    @classmethod
+    def __type_code(cls) -> int:
+        return Xdr.const.MANAGE_BUY_OFFER
+
+    def __to_operation_body(self) -> Xdr.nullclass:
         selling = self.selling.to_xdr_object()
         buying = self.buying.to_xdr_object()
         price = self.price.to_xdr_object()
@@ -38,16 +61,19 @@ class ManageBuyOffer(Operation):
         return body
 
     @classmethod
-    def from_xdr_object(cls, op_xdr_object: Xdr.types.Operation) -> 'ManageBuyOffer':
-        source = Operation.get_source_from_xdr_obj(op_xdr_object)
+    def from_xdr_object(cls, operation_xdr_object: Xdr.types.Operation) -> 'ManageBuyOffer':
+        """Creates a :class:`ManageBuyOffer` object from an XDR Operation object.
+
+        """
+        source = Operation.get_source_from_xdr_obj(operation_xdr_object)
 
         selling = Asset.from_xdr_object(
-            op_xdr_object.body.manageBuyOfferOp.selling)
-        buying = Asset.from_xdr_object(op_xdr_object.body.manageBuyOfferOp.buying)
+            operation_xdr_object.body.manageBuyOfferOp.selling)
+        buying = Asset.from_xdr_object(operation_xdr_object.body.manageBuyOfferOp.buying)
         amount = Operation.from_xdr_amount(
-            op_xdr_object.body.manageBuyOfferOp.buyAmount)
-        price = Price.from_xdr_object(op_xdr_object.body.manageBuyOfferOp.price)
-        offer_id = op_xdr_object.body.manageBuyOfferOp.offerID
+            operation_xdr_object.body.manageBuyOfferOp.buyAmount)
+        price = Price.from_xdr_object(operation_xdr_object.body.manageBuyOfferOp.price)
+        offer_id = operation_xdr_object.body.manageBuyOfferOp.offerID
 
         return cls(
             source=source,
