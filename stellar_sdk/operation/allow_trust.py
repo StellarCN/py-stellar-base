@@ -25,7 +25,10 @@ class AllowTrust(Operation):
     :param source: The source account (defaults to transaction source).
 
     """
-    def __init__(self, trustor: str, asset_code: str, authorize: bool, source: str = None) -> None:
+
+    def __init__(
+        self, trustor: str, asset_code: str, authorize: bool, source: str = None
+    ) -> None:
         super().__init__(source)
         self.trustor = trustor
         self.asset_code = asset_code
@@ -43,7 +46,7 @@ class AllowTrust(Operation):
         pad_length = 4 - length if length <= 4 else 12 - length
         # asset_code = self.asset_code + '\x00' * pad_length
         # asset_code = bytearray(asset_code, encoding='utf-8')
-        asset_code = bytearray(self.asset_code, 'ascii') + b'\x00' * pad_length
+        asset_code = bytearray(self.asset_code, "ascii") + b"\x00" * pad_length
         asset = Xdr.nullclass()
         if len(asset_code) == 4:
             asset.type = Xdr.const.ASSET_TYPE_CREDIT_ALPHANUM4
@@ -59,30 +62,33 @@ class AllowTrust(Operation):
         return body
 
     @classmethod
-    def from_xdr_object(cls, operation_xdr_object: Xdr.types.Operation) -> 'AllowTrust':
+    def from_xdr_object(cls, operation_xdr_object: Xdr.types.Operation) -> "AllowTrust":
         """Creates a :class:`AllowTrust` object from an XDR Operation
         object.
 
         """
         source = Operation.get_source_from_xdr_obj(operation_xdr_object)
-        trustor = StrKey.encode_ed25519_public_key(operation_xdr_object.body.allowTrustOp.trustor.ed25519)
+        trustor = StrKey.encode_ed25519_public_key(
+            operation_xdr_object.body.allowTrustOp.trustor.ed25519
+        )
         authorize = operation_xdr_object.body.allowTrustOp.authorize
 
         asset_type = operation_xdr_object.body.allowTrustOp.asset.type
         if asset_type == Xdr.const.ASSET_TYPE_CREDIT_ALPHANUM4:
             asset_code = (
-                operation_xdr_object.body.allowTrustOp.asset.assetCode4.decode())
+                operation_xdr_object.body.allowTrustOp.asset.assetCode4.decode()
+            )
         elif asset_type == Xdr.const.ASSET_TYPE_CREDIT_ALPHANUM12:
             asset_code = (
-                operation_xdr_object.body.allowTrustOp.asset.assetCode12.decode())
+                operation_xdr_object.body.allowTrustOp.asset.assetCode12.decode()
+            )
         else:
             raise NotImplementedError(
                 "Operation of asset_type={} is not implemented"
-                ".".format(asset_type.type))
+                ".".format(asset_type.type)
+            )
 
-        asset_code = asset_code.rstrip('\x00')
+        asset_code = asset_code.rstrip("\x00")
         return cls(
-            source=source,
-            trustor=trustor,
-            authorize=authorize,
-            asset_code=asset_code)
+            source=source, trustor=trustor, authorize=authorize, asset_code=asset_code
+        )

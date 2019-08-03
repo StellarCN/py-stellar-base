@@ -22,7 +22,9 @@ class CreateAccount(Operation):
 
     """
 
-    def __init__(self, destination: str, starting_balance: str, source: str = None) -> None:
+    def __init__(
+        self, destination: str, starting_balance: str, source: str = None
+    ) -> None:
         super().__init__(source)
         self.destination = destination
         self.starting_balance = starting_balance
@@ -35,7 +37,8 @@ class CreateAccount(Operation):
         destination = Keypair.from_public_key(self.destination).xdr_account_id()
 
         create_account_op = Xdr.types.CreateAccountOp(
-            destination, Operation.to_xdr_amount(self.starting_balance))
+            destination, Operation.to_xdr_amount(self.starting_balance)
+        )
 
         body = Xdr.nullclass()
         body.type = Xdr.const.CREATE_ACCOUNT
@@ -43,13 +46,21 @@ class CreateAccount(Operation):
         return body
 
     @classmethod
-    def from_xdr_object(cls, operation_xdr_object: Xdr.types.Operation) -> 'CreateAccount':
+    def from_xdr_object(
+        cls, operation_xdr_object: Xdr.types.Operation
+    ) -> "CreateAccount":
         """Creates a :class:`CreateAccount` object from an XDR Operation object.
 
         """
         source = Operation.get_source_from_xdr_obj(operation_xdr_object)
 
-        destination = StrKey.encode_ed25519_public_key(operation_xdr_object.body.createAccountOp.destination.ed25519)
-        starting_balance = Operation.from_xdr_amount(operation_xdr_object.body.createAccountOp.startingBalance)
+        destination = StrKey.encode_ed25519_public_key(
+            operation_xdr_object.body.createAccountOp.destination.ed25519
+        )
+        starting_balance = Operation.from_xdr_amount(
+            operation_xdr_object.body.createAccountOp.startingBalance
+        )
 
-        return cls(source=source, destination=destination, starting_balance=starting_balance)
+        return cls(
+            source=source, destination=destination, starting_balance=starting_balance
+        )

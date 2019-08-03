@@ -69,16 +69,30 @@ class Operation(metaclass=ABCMeta):
 
         """
         if not isinstance(value, str):
-            raise TypeError("Value of type '{}' must be of type String, but got {}.".format(value, type(value)))
+            raise TypeError(
+                "Value of type '{}' must be of type String, but got {}.".format(
+                    value, type(value)
+                )
+            )
         # throw exception if value * ONE has decimal places (it can't be represented as int64)
         try:
-            amount = int((Decimal(value) * Operation._ONE).to_integral_exact(context=Context(traps=[Inexact])))
+            amount = int(
+                (Decimal(value) * Operation._ONE).to_integral_exact(
+                    context=Context(traps=[Inexact])
+                )
+            )
         except decimal.Inexact:
-            raise ValueError("Value of '{}' must have at most 7 digits after the decimal.".format(value))
+            raise ValueError(
+                "Value of '{}' must have at most 7 digits after the decimal.".format(
+                    value
+                )
+            )
 
         if amount < 0 or amount > 9223372036854775807:
-            raise ValueError("Value of '{}' must represent a positive number "
-                             "and the max valid value is 9223372036854775807.".format(value))
+            raise ValueError(
+                "Value of '{}' must represent a positive number "
+                "and the max valid value is 9223372036854775807.".format(value)
+            )
 
         return amount
 
@@ -124,7 +138,7 @@ class Operation(metaclass=ABCMeta):
         return Xdr.types.Operation(source_account, self._to_operation_body())
 
     @classmethod
-    def from_xdr_object(cls, operation_xdr_object: Xdr.types.Operation) -> 'Operation':
+    def from_xdr_object(cls, operation_xdr_object: Xdr.types.Operation) -> "Operation":
         """Create the appropriate :class:`Operation` subclass from the XDR
         object.
 
@@ -134,11 +148,15 @@ class Operation(metaclass=ABCMeta):
         for sub_cls in cls.__subclasses__():
             if sub_cls._type_code() == operation_xdr_object.type:
                 return sub_cls.from_xdr_object(operation_xdr_object)
-        raise NotImplementedError("Operation of type={} is not implemented"
-                                  ".".format(operation_xdr_object.type))
+        raise NotImplementedError(
+            "Operation of type={} is not implemented"
+            ".".format(operation_xdr_object.type)
+        )
 
     @staticmethod
-    def get_source_from_xdr_obj(xdr_object: Xdr.types.Operation) -> typing.Optional[str]:
+    def get_source_from_xdr_obj(
+        xdr_object: Xdr.types.Operation
+    ) -> typing.Optional[str]:
         """Get the source account from account the operation xdr object.
 
         :param xdr_object: the operation xdr object.
@@ -148,7 +166,7 @@ class Operation(metaclass=ABCMeta):
             return StrKey.encode_ed25519_public_key(xdr_object.sourceAccount[0].ed25519)
         return None
 
-    def __eq__(self, other: 'Operation'):
+    def __eq__(self, other: "Operation"):
         if not isinstance(other, Operation):
             return False
         return self.to_xdr_object().to_xdr() == other.to_xdr_object().to_xdr()

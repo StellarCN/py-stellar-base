@@ -28,7 +28,7 @@ class Inflation(Operation):
         return body
 
     @classmethod
-    def from_xdr_object(cls, operation_xdr_object: Xdr.types.Operation) -> 'Inflation':
+    def from_xdr_object(cls, operation_xdr_object: Xdr.types.Operation) -> "Inflation":
         """Creates a :class:`Inflation` object from an XDR Operation
         object.
 

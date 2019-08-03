@@ -20,12 +20,15 @@ class ChangeTrust(Operation):
     :param source: The source account (defaults to transaction source).
 
     """
+
     _DEFAULT_LIMIT = "922337203685.4775807"
 
     def __init__(self, asset: Asset, limit: str = None, source: str = None) -> None:
         super().__init__(source)
         self.asset = asset
-        if limit is None:  # We don't need this if the user can send the value with correct type.
+        if (
+            limit is None
+        ):  # We don't need this if the user can send the value with correct type.
             self.limit = self._DEFAULT_LIMIT
         else:
             self.limit = limit
@@ -45,7 +48,9 @@ class ChangeTrust(Operation):
         return body
 
     @classmethod
-    def from_xdr_object(cls, operation_xdr_object: Xdr.types.Operation) -> 'ChangeTrust':
+    def from_xdr_object(
+        cls, operation_xdr_object: Xdr.types.Operation
+    ) -> "ChangeTrust":
         """Creates a :class:`ChangeTrust` object from an XDR Operation
         object.
 
