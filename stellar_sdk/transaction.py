@@ -7,19 +7,18 @@ from .operation.operation import Operation
 from .stellarxdr import Xdr
 from .strkey import StrKey
 from .time_bounds import TimeBounds
-from .types import MemoUnion, OperationUnion
 from .utils import pack_xdr_array, unpack_xdr_array
 
 
 class Transaction:
     def __init__(
-        self,
-        source: Keypair,
-        sequence: int,
-        fee: int,
-        operations: typing.List[OperationUnion],
-        memo: typing.Union[MemoUnion] = None,
-        time_bounds: TimeBounds = None
+            self,
+            source: Keypair,
+            sequence: int,
+            fee: int,
+            operations: typing.List[Operation],
+            memo: typing.Union[Memo] = None,
+            time_bounds: TimeBounds = None
     ) -> None:
 
         if not operations:

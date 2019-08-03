@@ -151,4 +151,4 @@ class Operation(metaclass=ABCMeta):
     def __eq__(self, other: 'Operation'):
         if not isinstance(other, Operation):
             return False
-        return self.to_xdr_object().to_xdr() == self.to_xdr_object().to_xdr()
+        return self.to_xdr_object().to_xdr() == other.to_xdr_object().to_xdr()

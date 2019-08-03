@@ -43,6 +43,7 @@ class ManageData(Operation):
 
     def _to_operation_body(self) -> Xdr.nullclass:
         data_name = bytes(self.data_name, encoding='utf-8')
+        print(type(self.data_value))
 
         if self.data_value is not None:
             if isinstance(self.data_value, bytes):
