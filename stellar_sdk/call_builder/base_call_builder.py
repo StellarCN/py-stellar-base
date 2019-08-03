@@ -16,7 +16,7 @@ class BaseCallBuilder:
         self.horizon_url = horizon_url
         self.filter = []
         self.params = {}
-        self.endpoint = ''
+        self.endpoint = ""
 
     def call(self) -> Response:
         if self.__async:
@@ -44,26 +44,26 @@ class BaseCallBuilder:
         pass
 
     def cursor(self, cursor):
-        self.params['cursor'] = cursor
+        self.params["cursor"] = cursor
         return self
 
     def limit(self, limit):
-        self.params['limit'] = limit
+        self.params["limit"] = limit
         return self
 
     def order(self, order):
-        self.params['order'] = order
+        self.params["order"] = order
         return self
-
+    
     def __query_params(self, **kwargs):
         params = {}
         for k, v in kwargs.items():
             if v is None:
                 pass
             elif v is True:
-                params[k] = 'true'
+                params[k] = "true"
             elif v is False:
-                params[k] = 'false'
+                params[k] = "false"
             else:
                 params[k] = v
         return params
