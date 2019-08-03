@@ -24,15 +24,15 @@ class ManageData(Operation):
 
     """
 
-    def __init__(self, data_name: str, data_value: typing.Union[str, bytes, None],
-                 source=None) -> None:  # TODO: bytes only?
+    def __init__(
+        self, data_name: str, data_value: typing.Union[str, bytes, None], source=None
+    ) -> None:  # TODO: bytes only?
         super().__init__(source)
         self.data_name = data_name
         self.data_value = data_value
 
         valid_data_name_len = len(self.data_name) <= 64
-        valid_data_val_len = (self.data_value is None
-                              or len(self.data_value) <= 64)
+        valid_data_val_len = self.data_value is None or len(self.data_value) <= 64
 
         if not valid_data_name_len or not valid_data_val_len:
             raise ValueError("Data and value should be <= 64 bytes (ascii encoded).")
@@ -42,13 +42,13 @@ class ManageData(Operation):
         return Xdr.const.MANAGE_DATA
 
     def _to_operation_body(self) -> Xdr.nullclass:
-        data_name = bytes(self.data_name, encoding='utf-8')
+        data_name = bytes(self.data_name, encoding="utf-8")
 
         if self.data_value is not None:
             if isinstance(self.data_value, bytes):
                 data_value = [self.data_value]
             else:
-                data_value = [bytes(self.data_value, 'utf-8')]
+                data_value = [bytes(self.data_value, "utf-8")]
         else:
             data_value = []
         manage_data_op = Xdr.types.ManageDataOp(data_name, data_value)
@@ -59,7 +59,7 @@ class ManageData(Operation):
         return body
 
     @classmethod
-    def from_xdr_object(cls, operation_xdr_object: Xdr.types.Operation) -> 'ManageData':
+    def from_xdr_object(cls, operation_xdr_object: Xdr.types.Operation) -> "ManageData":
         """Creates a :class:`ManageData` object from an XDR Operation
         object.
 

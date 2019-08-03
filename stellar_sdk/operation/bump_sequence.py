@@ -18,6 +18,7 @@ class BumpSequence(Operation):
     :param source: The optional source account.
 
     """
+
     def __init__(self, bump_to: int, source: str = None) -> None:
         super().__init__(source)
         self.bump_to = bump_to
@@ -34,7 +35,9 @@ class BumpSequence(Operation):
         return body
 
     @classmethod
-    def from_xdr_object(cls, operation_xdr_object: Xdr.types.Operation) -> 'BumpSequence':
+    def from_xdr_object(
+        cls, operation_xdr_object: Xdr.types.Operation
+    ) -> "BumpSequence":
         """Creates a :class:`BumpSequence` object from an XDR Operation
         object.
 

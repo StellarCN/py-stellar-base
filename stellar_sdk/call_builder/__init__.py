@@ -11,15 +11,17 @@ from .trades_aggregation_call_builder import TradeAggregationsCallBuilder
 from .trades_call_builder import TradesCallBuilder
 from .transactions_call_builder import TransactionsCallBuilder
 
-__all__ = ['AccountsCallBuilder',
-           'AssetsCallBuilder',
-           'BaseCallBuilder',
-           'EffectsCallBuilder',
-           'LedgersCallBuilder',
-           'OperationsCallBuilder',
-           'OrderbookCallBuilder',
-           'PathsCallBuilder',
-           'PaymentsCallBuilder',
-           'TradeAggregationsCallBuilder',
-           'TradesCallBuilder',
-           'TransactionsCallBuilder']
+__all__ = [
+    "AccountsCallBuilder",
+    "AssetsCallBuilder",
+    "BaseCallBuilder",
+    "EffectsCallBuilder",
+    "LedgersCallBuilder",
+    "OperationsCallBuilder",
+    "OrderbookCallBuilder",
+    "PathsCallBuilder",
+    "PaymentsCallBuilder",
+    "TradeAggregationsCallBuilder",
+    "TradesCallBuilder",
+    "TransactionsCallBuilder",
+]

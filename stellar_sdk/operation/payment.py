@@ -21,7 +21,9 @@ class Payment(Operation):
 
     """
 
-    def __init__(self, destination: str, asset: Asset, amount: str, source: str = None) -> None:
+    def __init__(
+        self, destination: str, asset: Asset, amount: str, source: str = None
+    ) -> None:
         super().__init__(source)
         self.destination = destination
         self.asset = asset
@@ -44,20 +46,17 @@ class Payment(Operation):
         return body
 
     @classmethod
-    def from_xdr_object(cls, operation_xdr_object: Xdr.types.Operation) -> 'Payment':
+    def from_xdr_object(cls, operation_xdr_object: Xdr.types.Operation) -> "Payment":
         """Creates a :class:`Payment` object from an XDR Operation
         object.
 
         """
         source = Operation.get_source_from_xdr_obj(operation_xdr_object)
 
-        destination = StrKey.encode_ed25519_public_key(operation_xdr_object.body.paymentOp.destination.ed25519)
+        destination = StrKey.encode_ed25519_public_key(
+            operation_xdr_object.body.paymentOp.destination.ed25519
+        )
         asset = Asset.from_xdr_object(operation_xdr_object.body.paymentOp.asset)
         amount = Operation.from_xdr_amount(operation_xdr_object.body.paymentOp.amount)
 
-        return cls(
-            source=source,
-            destination=destination,
-            asset=asset,
-            amount=amount,
-        )
+        return cls(source=source, destination=destination, asset=asset, amount=amount)

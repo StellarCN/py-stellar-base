@@ -29,7 +29,7 @@ class Signer:
     @classmethod
     def pre_auth_tx(cls, pre_auth_tx_hash: bytes, weight: int) -> 'Signer':
         """Create Pre AUTH TX Signer from the sha256 hash of a transaction,
-        click `here <https://www.stellar.org/developers/guides/concepts/multi-sig.html#pre-authorized-transaction>`_ for more information.
+        click `here <https://www.stellar.org/developers/guides/concepts/multi-sig.html#pre-authorized-transaction>`__ for more information.
 
         :param pre_auth_tx_hash: The sha256 hash of a transaction.
         :param weight: The weight of the signer (0 to delete or 1-255)
@@ -43,7 +43,7 @@ class Signer:
     @classmethod
     def sha256_hash(cls, sha256_hash: bytes, weight: int) -> 'Signer':
         """Create SHA256 HASH Signer from a sha256 hash of a preimage,
-        click `here <https://www.stellar.org/developers/guides/concepts/multi-sig.html#hashx>`_ for more information.
+        click `here <https://www.stellar.org/developers/guides/concepts/multi-sig.html#hashx>`__ for more information.
 
         :param sha256_hash: a sha256 hash of a preimage
         :param weight: The weight of the signer (0 to delete or 1-255)

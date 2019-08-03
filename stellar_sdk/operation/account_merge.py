@@ -34,11 +34,15 @@ class AccountMerge(Operation):
         return body
 
     @classmethod
-    def from_xdr_object(cls, operation_xdr_object: Xdr.types.Operation) -> 'AccountMerge':
+    def from_xdr_object(
+        cls, operation_xdr_object: Xdr.types.Operation
+    ) -> "AccountMerge":
         """Creates a :class:`AccountMerge` object from an XDR Operation
         object.
 
         """
         source = Operation.get_source_from_xdr_obj(operation_xdr_object)
-        destination = StrKey.encode_ed25519_public_key(operation_xdr_object.body.destination.ed25519)
+        destination = StrKey.encode_ed25519_public_key(
+            operation_xdr_object.body.destination.ed25519
+        )
         return cls(source=source, destination=destination)

@@ -1,4 +1,5 @@
 from abc import ABCMeta, abstractmethod
+
 from .response import Response
 
 
@@ -8,9 +9,9 @@ class BaseSyncClient(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def post(self, url, params) -> Response:
+    def post(self, url, data) -> Response:
         pass
 
     @abstractmethod
-    def stream(self, url):
+    def stream(self, url, params):
         pass

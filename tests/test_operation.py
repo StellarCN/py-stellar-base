@@ -2,13 +2,9 @@ from decimal import Decimal
 
 import pytest
 
-from stellar_sdk.signer import Signer
-from stellar_sdk.utils import sha256
-
 from stellar_sdk.asset import Asset
-
-from stellar_sdk.operation import Operation, CreateAccount
 from stellar_sdk.exceptions import Ed25519PublicKeyInvalidError
+from stellar_sdk.operation import Operation, CreateAccount
 from stellar_sdk.operation.account_merge import AccountMerge
 from stellar_sdk.operation.allow_trust import AllowTrust
 from stellar_sdk.operation.bump_sequence import BumpSequence
@@ -22,6 +18,8 @@ from stellar_sdk.operation.path_payment import PathPayment
 from stellar_sdk.operation.payment import Payment
 from stellar_sdk.operation.set_options import SetOptions
 from stellar_sdk.price import Price
+from stellar_sdk.signer import Signer
+from stellar_sdk.utils import sha256
 
 
 class TestBaseOperation:
@@ -79,6 +77,13 @@ class TestBaseOperation:
         assert op.source == None
         assert op.starting_balance == '1000'
         assert op.destination == destination
+
+    def test_equal(self):
+        op1 = ManageData("a", "b")
+        op2 = ManageData("a", "b")
+        op3 = ManageData("A", "B")
+
+        assert op1 == op2 != op3
 
 
 class TestCreateAccount:
@@ -340,7 +345,7 @@ class TestManageData:
          'AAAAAQAAAADX7fRsY6KTqIc8EIDyr8M9gxGPW6ODnZoZDgo6l1ymwwAAAAoAAAAIYWRkX2RhdGEAAAABAAAABXZhbHVlAAAA'),
         ('remove_data', None,
          'AAAAAQAAAADX7fRsY6KTqIc8EIDyr8M9gxGPW6ODnZoZDgo6l1ymwwAAAAoAAAALcmVtb3ZlX2RhdGEAAAAAAA=='),
-        ('add_bytes_data', 'bytes_value',
+        ('add_bytes_data', b'bytes_value',
          'AAAAAQAAAADX7fRsY6KTqIc8EIDyr8M9gxGPW6ODnZoZDgo6l1ymwwAAAAoAAAAOYWRkX2J5dGVzX2RhdGEAAAAAAAEAAAALYnl0ZXNfdmFsdWUA'),
         ('add_data_中文', '恒星',
          'AAAAAQAAAADX7fRsY6KTqIc8EIDyr8M9gxGPW6ODnZoZDgo6l1ymwwAAAAoAAAAPYWRkX2RhdGFf5Lit5paHAAAAAAEAAAAG5oGS5pifAAA=')
@@ -398,7 +403,7 @@ class TestSetOptions:
              'GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV',
              'AAAAAQAAAADX7fRsY6KTqIc8EIDyr8M9gxGPW6ODnZoZDgo6l1ymwwAAAAUAAAABAAAAAM1OuA87X07QSydiNJzfffJYYsoRXEvK7WR8qMIo7P17AAAAAQAAAAMAAAABAAAAAgAAAAEAAAADAAAAAQAAAAIAAAABAAAABAAAAAEAAAAGAAAAAAAAAAEAAAAB96nlNnQ/Aq5uCbYXnGJN/EXa76Y2RQP6S1wP8lOEL1UAAAAC'),
             (None, None, None, 0, 255, 255, 255, 'overcat.me', Signer.sha256_hash(sha256(b"SHA256_HASH"), 0),
-              None,
+             None,
              'AAAAAAAAAAUAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAEAAAD/AAAAAQAAAP8AAAABAAAA/wAAAAEAAAAKb3ZlcmNhdC5tZQAAAAAAAQAAAALB1I1O+GEAV87X3eYN/uAYDIDzP5mY4SVTEQFFYFq6nwAAAAA='),
             (None, None, None, None, None, None, None, None, None, None,
              'AAAAAAAAAAUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA='),
@@ -429,6 +434,7 @@ class TestSetOptions:
         assert from_instance.high_threshold == high_threshold
         assert from_instance.signer == signer
         assert from_instance.home_domain == home_domain
+
 
 class TestManageSellOffer:
     @pytest.mark.parametrize('selling, buying, amount, price, offer_id, source, xdr', [

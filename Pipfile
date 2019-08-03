@@ -10,7 +10,7 @@ pytest-cov = "*"
 sphinx = "*"
 sphinx-rtd-theme = "*"
 sphinx-autodoc-typehints = "*"
-black = "*"
+pytest-timeout = "*"
 
 [packages]
 crc16 = "*"
@@ -18,6 +18,10 @@ pynacl = "*"
 requests = "*"
 aiohttp = "*"
 aiohttp-sse-client = "*"
+stellar-base-sseclient = "*"
 
 [requires]
 python_version = "3.7"
+
+[pipenv]
+allow_prereleases = true
