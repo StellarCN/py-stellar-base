@@ -1,6 +1,10 @@
 Release History
 ===============
 
+### Version 1.3.1
+Released on August 4, 2019
+* Add `Builder.challenge_tx` method for building [SEP-10](https://github.com/stellar/stellar-protocol/blob/master/ecosystem/sep-0010.md) challenge transaction.
+
 ### Version 1.3.0
 Released on July 24, 2019
   - Breaking change: fetching data through SSE returns **dict** instead of a **str**.
