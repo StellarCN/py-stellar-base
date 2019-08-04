@@ -10,17 +10,13 @@ class BaseAsyncClient(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    async def post(self, url, params) -> Response:
+    async def post(self, url, data) -> Response:
         pass
 
     @abstractmethod
     async def stream(self, url, params) -> AsyncGenerator:
         pass
 
-    # @abstractmethod
-    # async def __aenter__(self):
-    #     pass
-    #
-    # @abstractmethod
-    # async def __aexit__(self, exc_type, exc_val, exc_tb):
-    #     pass
+    @abstractmethod
+    async def close(self) -> None:
+        pass
