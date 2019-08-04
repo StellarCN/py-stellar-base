@@ -1,18 +1,20 @@
 # coding: utf-8
 import binascii
+import os
+import time
 import warnings
 
+from . import memo
+from . import operation
 from .asset import Asset
+from .exceptions import NoStellarSecretOrAddressError, StellarAddressInvalidError, SequenceError
+from .federation import federation, FederationError
 from .horizon import HORIZON_LIVE, HORIZON_TEST
 from .horizon import Horizon
 from .keypair import Keypair
-from . import memo
 from .network import NETWORKS, Network
-from . import operation
 from .transaction import Transaction
 from .transaction_envelope import TransactionEnvelope as Te
-from .exceptions import NoStellarSecretOrAddressError, StellarAddressInvalidError, SequenceError
-from .federation import federation, FederationError
 
 
 class Builder(object):
@@ -446,7 +448,7 @@ class Builder(object):
         selling = Asset(selling_code, selling_issuer)
         buying = Asset(buying_code, buying_issuer)
         op = operation.ManageBuyOffer(selling, buying, amount, price, offer_id,
-                                        source)
+                                      source)
         return self.append_op(op)
 
     def append_manage_sell_offer_op(self,
@@ -939,3 +941,26 @@ class Builder(object):
 
         address = self.horizon.account(self.address)
         return int(address.get('sequence'))
+
+    @classmethod
+    def challenge_tx(cls, server_secret, client_account_id, archor_name, network='TESTNET', timeout=300):
+        """Returns a valid `SEP0010 <https://github.com/stellar/stellar-protocol/blob/master/ecosystem/sep-0010.md>`_
+            challenge transaction which you can use for Stellar Web Authentication.
+
+        :param server_secret: secret key for server's signing account.
+        :param client_account_id: The stellar account that the wallet wishes to authenticate with the server.
+        :param archor_name: Anchor's name to be used in the manage_data key.
+        :param str network: The network to connect to for verifying and retrieving
+            additional attributes from. 'PUBLIC' is an alias for 'Public Global Stellar Network ; September 2015',
+            'TESTNET' is an alias for 'Test SDF Network ; September 2015'. Defaults to TESTNET.
+        :param int timeout: Challenge duration in seconds (default to 5 minutes).
+        :return: a valid SEP0010 challenge transaction which you can use for Stellar Web Authentication.
+        :rtype: :class:`Builder`
+        """
+        now = int(time.time())
+        transaction = cls(secret=server_secret, network=network, sequence=-1)
+        transaction.add_time_bounds({'minTime': now, 'maxTime': now + timeout})
+        nonce = os.urandom(64)
+        transaction.append_manage_data_op(data_name='{} auth'.format(archor_name), data_value=nonce,
+                                          source=client_account_id)
+        return transaction

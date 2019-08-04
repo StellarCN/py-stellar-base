@@ -4,10 +4,10 @@ import os
 import warnings
 
 from .base58 import b58decode_check, b58encode_check
+from .exceptions import MissingSigningKeyError, BadSignatureError, NotValidParamError
 from .stellarxdr import Xdr
 from .utils import encode_check, StellarMnemonic, \
     is_valid_address, is_valid_secret_key
-from .exceptions import MissingSigningKeyError, BadSignatureError, NotValidParamError
 
 # noinspection PyBroadException
 try:
@@ -279,3 +279,9 @@ class Keypair(object):
     def to_old_seed(self):
         seed = chr(33).encode() + self.raw_seed()
         return b58encode_check(seed)
+
+    def __eq__(self, other):
+        if not isinstance(other, Keypair):
+            return False
+
+        return self.signing_key == other.signing_key and self.verifying_key == other.verifying_key

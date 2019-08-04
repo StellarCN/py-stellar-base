@@ -1,13 +1,15 @@
 # encoding: utf-8
+import time
 
-import pytest
 import mock
+import pytest
 
 from stellar_base import memo
 from stellar_base.builder import Builder
+from stellar_base.exceptions import NoStellarSecretOrAddressError, FederationError
 from stellar_base.horizon import horizon_testnet, horizon_livenet, Horizon
 from stellar_base.keypair import Keypair
-from stellar_base.exceptions import NoStellarSecretOrAddressError, FederationError
+from stellar_base.operation import ManageData
 
 
 @pytest.fixture(scope='module')
@@ -71,11 +73,11 @@ class TestBuilder(object):
             pre_auth_tx=b"\x95\xe5\xbb\x95\x15\xd9\x9f\x82\x9d\xf9\x93\xc3'\x8e\xeb\xf1\nj!\xda\xa4\xa1\xe4\xf2<6cG}\x17\x97\xfe",
             signer_weight=1). \
             append_manage_sell_offer_op(selling_code='XLM', selling_issuer=None, buying_code='BEER',
-                                   buying_issuer=bob_account, amount='1', price='10', offer_id=0). \
-            append_manage_buy_offer_op(selling_code='XLM', selling_issuer=None, buying_code='BEER',
                                         buying_issuer=bob_account, amount='1', price='10', offer_id=0). \
+            append_manage_buy_offer_op(selling_code='XLM', selling_issuer=None, buying_code='BEER',
+                                       buying_issuer=bob_account, amount='1', price='10', offer_id=0). \
             append_create_passive_sell_offer_op(selling_code='XLM', selling_issuer=None, buying_code='BEER',
-                                           buying_issuer=bob_account, amount='1', price={'n': 10, 'd': 1}). \
+                                                buying_issuer=bob_account, amount='1', price={'n': 10, 'd': 1}). \
             append_account_merge_op(destination=bob_account). \
             append_inflation_op(). \
             append_manage_data_op(data_name='hello', data_value='world'). \
@@ -199,3 +201,28 @@ class TestBuilder(object):
                           horizon_uri=setup.horizon_endpoint_uri)
         assert builder.network == 'PUBLIC'
         assert builder.horizon.horizon_uri == Horizon(horizon_uri=setup.horizon_endpoint_uri).horizon_uri
+
+    def test_challenge_tx(self):
+        server_kp = Keypair.random()
+        client_account_id = "GBDIT5GUJ7R5BXO3GJHFXJ6AZ5UQK6MNOIDMPQUSMXLIHTUNR2Q5CFNF"
+        timeout = 600
+        network = 'TESTNET'
+        archor_name = "SDF"
+
+        tx = Builder.challenge_tx(server_secret=server_kp.seed().decode(),
+                                  client_account_id=client_account_id,
+                                  archor_name=archor_name,
+                                  network=network,
+                                  timeout=timeout)
+        assert len(tx.ops) == 1
+        op = tx.ops[0]
+        assert isinstance(op, ManageData)
+        assert op.data_name == "SDF auth"
+        assert len(op.data_value) == 64
+        assert op.source == client_account_id
+
+        now = int(time.time())
+        assert now - 3 < tx.time_bounds['minTime'] < now + 3
+        assert tx.time_bounds['maxTime'] - tx.time_bounds['minTime'] == timeout
+        assert tx.keypair == server_kp
+        assert tx.sequence == -1
