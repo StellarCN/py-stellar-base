@@ -24,7 +24,7 @@ install:
   - pip3 install -r requirements-test.txt
 
 script:
-  - pytest -v -rs tests --cov
+  - pytest -v -rs tests --runslow --cov
 
 notifications:
   email: false

@@ -1,6 +1,9 @@
 import os
+import sys
 
 from setuptools import setup, find_packages
+
+assert sys.version_info >= (3, 6, 0), "stellar-sdk v2 requires Python 3.6+"
 
 here = os.path.abspath(os.path.dirname(__file__))
 requirements_file = 'requirements.txt'
@@ -27,7 +30,7 @@ setup(
     include_package_data=True,
     install_requires=open(requirements_file).readlines(),
     packages=find_packages(),
-    python_requires=">=3.5.4",
+    python_requires=">=3.6.0",
     classifiers=[
         "Development Status :: 1 - Planning",
         "Intended Audience :: Developers",
@@ -35,7 +38,6 @@ setup(
         "Operating System :: OS Independent",
         "License :: OSI Approved :: Apache Software License",
         "Programming Language :: Python",
-        "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3 :: Only",
