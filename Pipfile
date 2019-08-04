@@ -11,6 +11,7 @@ sphinx = "*"
 sphinx-rtd-theme = "*"
 sphinx-autodoc-typehints = "*"
 pytest-timeout = "*"
+pytest-asyncio = "*"
 
 [packages]
 crc16 = "*"

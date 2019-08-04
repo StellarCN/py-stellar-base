@@ -1,6 +1,6 @@
 import asyncio
 import json
-from typing import Optional, Union, AsyncGenerator
+from typing import Optional, Union, AsyncGenerator, Any
 
 import aiohttp
 from aiohttp_sse_client.client import EventSource
@@ -43,13 +43,13 @@ class AiohttpClient(BaseAsyncClient):
         if user_agent:
             self.user_agent = user_agent
 
-        headers = {
+        self.headers = {
             **IDENTIFICATION_HEADERS,
             "Content-Type": "application/x-www-form-urlencoded",
             "User-Agent": self.user_agent,
         }
         session = aiohttp.ClientSession(
-            headers=headers,
+            headers=self.headers.copy(),
             connector=connector,
             timeout=aiohttp.ClientTimeout(total=request_timeout),
             **kwargs
@@ -67,8 +67,8 @@ class AiohttpClient(BaseAsyncClient):
                 url=str(response.url),
             )
 
-    async def post(self, url: str, params=None) -> Response:
-        async with self._session.post(url, params=params) as response:
+    async def post(self, url: str, data=None) -> Response:
+        async with self._session.post(url, data=data) as response:
             return Response(
                 status_code=response.status,
                 text=await response.text(),
@@ -79,12 +79,13 @@ class AiohttpClient(BaseAsyncClient):
     async def _init_sse_session(self) -> None:
         """Init the sse session """
         if self._sse_session is None:
-            self._sse_session = (
-                aiohttp.ClientSession()
-            )  # No timeout, no special connector
+            # No timeout, no special connector
             # Other headers such as "Accept: text/event-stream" are added by thr SSEClient
+            self._sse_session = aiohttp.ClientSession()
 
-    async def stream(self, url: str, params: Optional[dict] = None) -> AsyncGenerator:
+    async def stream(
+        self, url: str, params: Optional[dict] = None
+    ) -> AsyncGenerator[dict, Any]:
         """
         SSE generator with timeout between events
         :param url: URL to send SSE request to
@@ -92,14 +93,16 @@ class AiohttpClient(BaseAsyncClient):
         :return: response dict
         """
 
-        async def _sse_generator() -> AsyncGenerator[dict]:
+        async def _sse_generator() -> AsyncGenerator[dict, Any]:
             """
             Generator for sse events
             """
+            query_params = {**params} if params else dict()
 
-            if params.get("cursor") is None:
-                params["cursor"] = "now"  # Start monitoring from now.
-            params.update(**IDENTIFICATION_HEADERS)
+            if query_params.get("cursor") is None:
+                query_params["cursor"] = "now"  # Start monitoring from now.
+
+            query_params.update(**IDENTIFICATION_HEADERS)
             retry = 0.1
             while True:
                 try:
@@ -109,7 +112,10 @@ class AiohttpClient(BaseAsyncClient):
                     Headers are needed because of a bug that makes "params" override the default headers
                     """
                     async with EventSource(
-                        url, session=self._sse_session, params=params
+                        url,
+                        session=self._sse_session,
+                        params=query_params,
+                        headers=self.headers.copy(),
                     ) as client:
                         """
                         We want to throw a TimeoutError if we didnt get any event in the last x seconds.
@@ -121,8 +127,6 @@ class AiohttpClient(BaseAsyncClient):
                         async for event in client:
                             if event.last_event_id != "":
                                 # Events that dont have an id are not useful for us (hello/byebye events)
-                                # Save the last event id and retry time
-                                last_id = event.last_event_id  # TODO
                                 retry = client._reconnection_time.total_seconds()
                                 try:
                                     data = event.data
@@ -130,7 +134,7 @@ class AiohttpClient(BaseAsyncClient):
                                         yield json.loads(data)
                                 except json.JSONDecodeError:
                                     # Content was not json-decodable
-                                    pass
+                                    pass  # pragma: no cover
                 except aiohttp.ClientPayloadError:
                     # Retry if the connection dropped after we got the initial response
                     await asyncio.sleep(retry)
