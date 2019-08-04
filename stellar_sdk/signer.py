@@ -9,25 +9,27 @@ class Signer:
     :param weight:
     """
 
-    def __init__(self, signer_key: Xdr.types.SignerKey, weight) -> 'None':
+    def __init__(self, signer_key: Xdr.types.SignerKey, weight) -> "None":
         self.signer_key = signer_key
         self.weight = weight
 
     @classmethod
-    def ed25519_public_key(cls, account_id: str, weight: int) -> 'Signer':
+    def ed25519_public_key(cls, account_id: str, weight: int) -> "Signer":
         """Create ED25519 PUBLIC KEY Signer from account id.
 
         :param account_id: account id
         :param weight: The weight of the signer (0 to delete or 1-255)
         :return: ED25519 PUBLIC KEY Signer
         """
-        signer_key = Xdr.types.SignerKey(Xdr.const.SIGNER_KEY_TYPE_ED25519,
-                                         ed25519=StrKey.decode_ed25519_public_key(account_id))
+        signer_key = Xdr.types.SignerKey(
+            Xdr.const.SIGNER_KEY_TYPE_ED25519,
+            ed25519=StrKey.decode_ed25519_public_key(account_id),
+        )
 
         return cls(signer_key, weight)
 
     @classmethod
-    def pre_auth_tx(cls, pre_auth_tx_hash: bytes, weight: int) -> 'Signer':
+    def pre_auth_tx(cls, pre_auth_tx_hash: bytes, weight: int) -> "Signer":
         """Create Pre AUTH TX Signer from the sha256 hash of a transaction,
         click `here <https://www.stellar.org/developers/guides/concepts/multi-sig.html#pre-authorized-transaction>`__ for more information.
 
@@ -36,12 +38,13 @@ class Signer:
         :return: Pre AUTH TX Signer
         """
         signer_key = Xdr.types.SignerKey(
-            Xdr.const.SIGNER_KEY_TYPE_PRE_AUTH_TX, preAuthTx=pre_auth_tx_hash)
+            Xdr.const.SIGNER_KEY_TYPE_PRE_AUTH_TX, preAuthTx=pre_auth_tx_hash
+        )
 
         return cls(signer_key, weight)
 
     @classmethod
-    def sha256_hash(cls, sha256_hash: bytes, weight: int) -> 'Signer':
+    def sha256_hash(cls, sha256_hash: bytes, weight: int) -> "Signer":
         """Create SHA256 HASH Signer from a sha256 hash of a preimage,
         click `here <https://www.stellar.org/developers/guides/concepts/multi-sig.html#hashx>`__ for more information.
 
@@ -50,7 +53,8 @@ class Signer:
         :return: SHA256 HASH Signer
         """
         signer_key = Xdr.types.SignerKey(
-            Xdr.const.SIGNER_KEY_TYPE_HASH_X, hashX=sha256_hash)
+            Xdr.const.SIGNER_KEY_TYPE_HASH_X, hashX=sha256_hash
+        )
         return cls(signer_key, weight)
 
     def to_xdr_object(self):
@@ -61,7 +65,7 @@ class Signer:
         return Xdr.types.Signer(self.signer_key, self.weight)
 
     @classmethod
-    def from_xdr_object(cls, signer_xdr_object: Xdr.types.Signer) -> 'Signer':
+    def from_xdr_object(cls, signer_xdr_object: Xdr.types.Signer) -> "Signer":
         """Create a :class:`Signer` from an XDR TimeBounds object.
 
         :param signer_xdr_object: The XDR Signer object.
@@ -76,6 +80,5 @@ class Signer:
         if signer_xdr_object.type == Xdr.const.SIGNER_KEY_TYPE_HASH_X:
             return cls.sha256_hash(signer_xdr_object.hashX, weight)
 
-    def __eq__(self, other: 'Signer'):
+    def __eq__(self, other: "Signer"):
         return self.to_xdr_object().to_xdr() == other.to_xdr_object().to_xdr()
-

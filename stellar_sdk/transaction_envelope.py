@@ -24,8 +24,12 @@ class TransactionEnvelope:
     :param str network: which network this transaction envelope is associated with.
     """
 
-    def __init__(self, transaction: Transaction, network: Network,
-                 signatures: typing.List[Xdr.types.DecoratedSignature] = None) -> None:
+    def __init__(
+        self,
+        transaction: Transaction,
+        network: Network,
+        signatures: typing.List[Xdr.types.DecoratedSignature] = None,
+    ) -> None:
         self.transaction = transaction
         self.network_id = network.network_id()
         self.signatures = signatures or []
@@ -58,7 +62,7 @@ class TransactionEnvelope:
         sig = signer.sign_decorated(tx_hash)
         sig_dict = [signature.__dict__ for signature in self.signatures]
         if sig.__dict__ in sig_dict:
-            raise SignatureExistError('The keypair has already signed.')
+            raise SignatureExistError("The keypair has already signed.")
         else:
             self.signatures.append(sig)
 
@@ -100,7 +104,7 @@ class TransactionEnvelope:
         sig = Xdr.types.DecoratedSignature(hint, preimage)
         sig_dict = [signature.__dict__ for signature in self.signatures]
         if sig.__dict__ in sig_dict:
-            raise SignatureExistError('The preimage has already signed.')
+            raise SignatureExistError("The preimage has already signed.")
         else:
             self.signatures.append(sig)
 
@@ -122,7 +126,9 @@ class TransactionEnvelope:
         return self.to_xdr_object().to_xdr()
 
     @classmethod
-    def from_xdr_object(cls, te_xdr_object: Xdr.types.TransactionEnvelope, network: Network) -> 'TransactionEnvelope':
+    def from_xdr_object(
+        cls, te_xdr_object: Xdr.types.TransactionEnvelope, network: Network
+    ) -> "TransactionEnvelope":
         """Create a new :class:`TransactionEnvelope` from an XDR object.
 
         :param te_xdr_object: The XDR object that represents a transaction envelope.
@@ -137,7 +143,7 @@ class TransactionEnvelope:
         return te
 
     @classmethod
-    def from_xdr(cls, xdr: str, network: Network) -> 'TransactionEnvelope':
+    def from_xdr(cls, xdr: str, network: Network) -> "TransactionEnvelope":
         """Create a new :class:`TransactionEnvelope` from an XDR string.
 
         :param xdr: The XDR string that represents a transaction

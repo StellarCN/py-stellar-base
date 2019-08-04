@@ -11,24 +11,26 @@ from .strkey import StrKey
 
 def _get_key_of_expected_type(key: typing.Any, expected_type: typing.Any) -> typing.Any:
     if key is not None and not isinstance(key, expected_type):
-        raise TypeError("The given key_type={} is not of type {}.".format(type(key), expected_type))
+        raise TypeError(
+            "The given key_type={} is not of type {}.".format(type(key), expected_type)
+        )
     return key
 
 
 class Keypair:
-    def __init__(self, verify_key: ed25519.VerifyKey, signing_key: ed25519.SigningKey = None) -> None:
-        self.verify_key = _get_key_of_expected_type(verify_key,
-                                                    ed25519.VerifyKey)
-        self.signing_key = _get_key_of_expected_type(signing_key,
-                                                     ed25519.SigningKey)
+    def __init__(
+        self, verify_key: ed25519.VerifyKey, signing_key: ed25519.SigningKey = None
+    ) -> None:
+        self.verify_key = _get_key_of_expected_type(verify_key, ed25519.VerifyKey)
+        self.signing_key = _get_key_of_expected_type(signing_key, ed25519.SigningKey)
 
     @classmethod
-    def from_secret(cls, secret: str) -> 'Keypair':
+    def from_secret(cls, secret: str) -> "Keypair":
         raw_secret = StrKey.decode_ed25519_secret_seed(secret)
         return cls.from_raw_ed25519_seed(raw_secret)
 
     @classmethod
-    def from_raw_ed25519_seed(cls, raw_seed: bytes) -> 'Keypair':
+    def from_raw_ed25519_seed(cls, raw_seed: bytes) -> "Keypair":
         signing_key = ed25519.SigningKey(raw_seed)
         verify_key = signing_key.verify_key
         return cls(verify_key, signing_key)
@@ -36,13 +38,13 @@ class Keypair:
     # TODO: master
 
     @classmethod
-    def from_public_key(cls, public_key: str) -> 'Keypair':
+    def from_public_key(cls, public_key: str) -> "Keypair":
         public_key = StrKey.decode_ed25519_public_key(public_key)
         verifying_key = ed25519.VerifyKey(public_key)
         return cls(verifying_key)
 
     @classmethod
-    def random(cls) -> 'Keypair':
+    def random(cls) -> "Keypair":
         seed = os.urandom(32)
         return cls.from_raw_ed25519_seed(seed)
 
@@ -64,8 +66,10 @@ class Keypair:
 
     def secret(self) -> str:
         if not self.signing_key:
-            raise MissingEd25519SecretSeedError("The keypair does not contain secret seed. Use Keypair.from_secret or "
-                                                "Keypair.random to create a new keypair with a secret seed.")
+            raise MissingEd25519SecretSeedError(
+                "The keypair does not contain secret seed. Use Keypair.from_secret or "
+                "Keypair.random to create a new keypair with a secret seed."
+            )
 
         return StrKey.encode_ed25519_secret_seed(self.raw_secret_key())
 
@@ -77,8 +81,10 @@ class Keypair:
 
     def sign(self, data: bytes) -> bytes:
         if not self.can_sign():
-            raise MissingEd25519SecretSeedError("The keypair does not contain secret seed. Use Keypair.from_secret or "
-                                                "Keypair.random to create a new keypair with a secret seed.")
+            raise MissingEd25519SecretSeedError(
+                "The keypair does not contain secret seed. Use Keypair.from_secret or "
+                "Keypair.random to create a new keypair with a secret seed."
+            )
         return self.signing_key.sign(data).signature
 
     def verify(self, data: bytes, signature: bytes) -> None:
@@ -92,5 +98,8 @@ class Keypair:
         hint = self.signature_hint()
         return Xdr.types.DecoratedSignature(hint, signature)
 
-    def __eq__(self, other: 'Keypair'):
-        return self.verify_key == other.verify_key and self.signing_key == other.signing_key
+    def __eq__(self, other: "Keypair"):
+        return (
+            self.verify_key == other.verify_key
+            and self.signing_key == other.signing_key
+        )

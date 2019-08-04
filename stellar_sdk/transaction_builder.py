@@ -12,10 +12,12 @@ from .transaction_envelope import TransactionEnvelope
 
 
 class TransactionBuilder:
-    def __init__(self,
-                 source_account: Account,
-                 network_passphrase: str = TESTNET_NETWORK_PASSPHRASE,
-                 base_fee: int = 100):
+    def __init__(
+        self,
+        source_account: Account,
+        network_passphrase: str = TESTNET_NETWORK_PASSPHRASE,
+        base_fee: int = 100,
+    ):
         self.source_account = source_account
         self.base_fee = base_fee
         self.network = Network(network_passphrase)
@@ -26,13 +28,17 @@ class TransactionBuilder:
     def build(self) -> TransactionEnvelope:
         source = Keypair.from_public_key(self.source_account.account_id)
         sequence = self.source_account.sequence + 1
-        transaction = Transaction(source=source,
-                                  sequence=sequence,
-                                  fee=self.base_fee * len(self.operations),
-                                  operations=self.operations,
-                                  memo=self.memo,
-                                  time_bounds=self.time_bounds)
-        transaction_envelope = TransactionEnvelope(transaction=transaction, network=self.network)
+        transaction = Transaction(
+            source=source,
+            sequence=sequence,
+            fee=self.base_fee * len(self.operations),
+            operations=self.operations,
+            memo=self.memo,
+            time_bounds=self.time_bounds,
+        )
+        transaction_envelope = TransactionEnvelope(
+            transaction=transaction, network=self.network
+        )
         self.source_account.increment_sequence_number()
         return transaction_envelope
 
@@ -52,7 +58,7 @@ class TransactionBuilder:
         """
         return TransactionEnvelope.from_xdr(xdr=xdr, network=Network(network_id))
 
-    def add_time_bounds(self, min_time, max_time) -> 'TransactionBuilder':
+    def add_time_bounds(self, min_time, max_time) -> "TransactionBuilder":
         """Add a time bound to this transaction.
 
         Add a UNIX timestamp, determined by ledger time, of a lower and
@@ -69,9 +75,11 @@ class TransactionBuilder:
         self.time_bounds = TimeBounds(min_time, max_time)
         return self
 
-    def set_timeout(self, timeout: int) -> 'TransactionBuilder':
+    def set_timeout(self, timeout: int) -> "TransactionBuilder":
         if self.time_bounds:
-            raise ValueError("TimeBounds has been already set - setting timeout would overwrite it.")
+            raise ValueError(
+                "TimeBounds has been already set - setting timeout would overwrite it."
+            )
         timeout_timestamp = int(time.time()) + timeout
         self.time_bounds = TimeBounds(min_time=0, max_time=timeout_timestamp)
         return self
@@ -135,15 +143,14 @@ class TransactionBuilder:
         memo_return = ReturnHashMemo(memo_return_hash)
         return self.add_memo(memo_return)
 
-    def append_operation(self, operation) -> 'TransactionBuilder':
+    def append_operation(self, operation) -> "TransactionBuilder":
         # TODO: LOG HERE
         self.operations.append(operation)
         return self
 
-    def append_create_account_op(self,
-                                 destination: str,
-                                 starting_balance: str,
-                                 source: str = None) -> 'TransactionBuilder':
+    def append_create_account_op(
+        self, destination: str, starting_balance: str, source: str = None
+    ) -> "TransactionBuilder":
         """Append a :class:`CreateAccount
         <stellar_sdk.operation.CreateAccount>` operation to the list of
         operations.
@@ -174,12 +181,9 @@ class TransactionBuilder:
         op = ChangeTrust(asset, limit, source)
         return self.append_operation(op)
 
-    def append_payment_op(self,
-                          destination,
-                          amount,
-                          asset_code='XLM',
-                          asset_issuer=None,
-                          source=None):
+    def append_payment_op(
+        self, destination, amount, asset_code="XLM", asset_issuer=None, source=None
+    ):
         """Append a :class:`Payment <stellar_sdk.operation.Payment>` operation
         to the list of operations.
 
@@ -196,16 +200,18 @@ class TransactionBuilder:
         op = Payment(destination, asset, amount, source)
         return self.append_operation(op)
 
-    def append_path_payment_op(self,
-                               destination,
-                               send_code,
-                               send_issuer,
-                               send_max,
-                               dest_code,
-                               dest_issuer,
-                               dest_amount,
-                               path,
-                               source=None):
+    def append_path_payment_op(
+        self,
+        destination,
+        send_code,
+        send_issuer,
+        send_max,
+        dest_code,
+        dest_issuer,
+        dest_amount,
+        path,
+        source=None,
+    ):
         """Append a :class:`PathPayment <stellar_sdk.operation.PathPayment>`
         operation to the list of operations.
 
@@ -240,15 +246,12 @@ class TransactionBuilder:
         assets = []
         for p in path:
             assets.append(Asset(p[0], p[1]))
-        op = PathPayment(destination, send_asset, send_max,
-                         dest_asset, dest_amount, assets, source)
+        op = PathPayment(
+            destination, send_asset, send_max, dest_asset, dest_amount, assets, source
+        )
         return self.append_operation(op)
 
-    def append_allow_trust_op(self,
-                              trustor,
-                              asset_code,
-                              authorize,
-                              source=None):
+    def append_allow_trust_op(self, trustor, asset_code, authorize, source=None):
         """Append an :class:`AllowTrust <stellar_sdk.operation.AllowTrust>`
         operation to the list of operations.
 
@@ -266,19 +269,21 @@ class TransactionBuilder:
         op = AllowTrust(trustor, asset_code, authorize, source)
         return self.append_operation(op)
 
-    def append_set_options_op(self,
-                              inflation_dest=None,
-                              clear_flags=None,
-                              set_flags=None,
-                              master_weight=None,
-                              low_threshold=None,
-                              med_threshold=None,
-                              high_threshold=None,
-                              home_domain=None,
-                              signer_address=None,
-                              signer_type=None,
-                              signer_weight=None,
-                              source=None):
+    def append_set_options_op(
+        self,
+        inflation_dest=None,
+        clear_flags=None,
+        set_flags=None,
+        master_weight=None,
+        low_threshold=None,
+        med_threshold=None,
+        high_threshold=None,
+        home_domain=None,
+        signer_address=None,
+        signer_type=None,
+        signer_weight=None,
+        source=None,
+    ):
         """Append a :class:`SetOptions <stellar_sdk.operation.SetOptions>`
         operation to the list of operations.
 
@@ -330,10 +335,20 @@ class TransactionBuilder:
 
         """
 
-        op = SetOptions(inflation_dest, clear_flags, set_flags,
-                        master_weight, low_threshold, med_threshold,
-                        high_threshold, home_domain, signer_address,
-                        signer_type, signer_weight, source)
+        op = SetOptions(
+            inflation_dest,
+            clear_flags,
+            set_flags,
+            master_weight,
+            low_threshold,
+            med_threshold,
+            high_threshold,
+            home_domain,
+            signer_address,
+            signer_type,
+            signer_weight,
+            source,
+        )
         return self.append_operation(op)
 
     def append_hashx_signer(self, hashx, signer_weight, source=None):
@@ -353,14 +368,12 @@ class TransactionBuilder:
         """
         return self.append_set_options_op(
             signer_address=hashx,
-            signer_type='hashX',
+            signer_type="hashX",
             signer_weight=signer_weight,
-            source=source)
+            source=source,
+        )
 
-    def append_pre_auth_tx_signer(self,
-                                  pre_auth_tx,
-                                  signer_weight,
-                                  source=None):
+    def append_pre_auth_tx_signer(self, pre_auth_tx, signer_weight, source=None):
         """Add a PreAuthTx signer to an account.
 
         Add a PreAuthTx signer to an account via a :class:`SetOptions
@@ -377,19 +390,22 @@ class TransactionBuilder:
         """
         return self.append_set_options_op(
             signer_address=pre_auth_tx,
-            signer_type='preAuthTx',
+            signer_type="preAuthTx",
             signer_weight=signer_weight,
-            source=source)
+            source=source,
+        )
 
-    def append_manage_buy_offer_op(self,
-                                   selling_code,
-                                   selling_issuer,
-                                   buying_code,
-                                   buying_issuer,
-                                   amount,
-                                   price,
-                                   offer_id=0,
-                                   source=None):
+    def append_manage_buy_offer_op(
+        self,
+        selling_code,
+        selling_issuer,
+        buying_code,
+        buying_issuer,
+        amount,
+        price,
+        offer_id=0,
+        source=None,
+    ):
         """Append a :class:`ManageBuyOffer <stellar_sdk.operation.ManageBuyOffer>`
         operation to the list of operations.
 
@@ -417,19 +433,20 @@ class TransactionBuilder:
         """
         selling = Asset(selling_code, selling_issuer)
         buying = Asset(buying_code, buying_issuer)
-        op = ManageBuyOffer(selling, buying, amount, price, offer_id,
-                            source)
+        op = ManageBuyOffer(selling, buying, amount, price, offer_id, source)
         return self.append_operation(op)
 
-    def append_manage_sell_offer_op(self,
-                                    selling_code,
-                                    selling_issuer,
-                                    buying_code,
-                                    buying_issuer,
-                                    amount,
-                                    price,
-                                    offer_id=0,
-                                    source=None):
+    def append_manage_sell_offer_op(
+        self,
+        selling_code,
+        selling_issuer,
+        buying_code,
+        buying_issuer,
+        amount,
+        price,
+        offer_id=0,
+        source=None,
+    ):
         """Append a :class:`ManageSellOffer <stellar_sdk.operation.ManageSellOffer>`
         operation to the list of operations.
 
@@ -457,18 +474,19 @@ class TransactionBuilder:
         """
         selling = Asset(selling_code, selling_issuer)
         buying = Asset(buying_code, buying_issuer)
-        op = ManageSellOffer(selling, buying, amount, price, offer_id,
-                             source)
+        op = ManageSellOffer(selling, buying, amount, price, offer_id, source)
         return self.append_operation(op)
 
-    def append_create_passive_sell_offer_op(self,
-                                            selling_code,
-                                            selling_issuer,
-                                            buying_code,
-                                            buying_issuer,
-                                            amount,
-                                            price,
-                                            source=None):
+    def append_create_passive_sell_offer_op(
+        self,
+        selling_code,
+        selling_issuer,
+        buying_code,
+        buying_issuer,
+        amount,
+        price,
+        source=None,
+    ):
         """Append a :class:`CreatePassiveSellOffer
         <stellar_sdk.operation.CreatePassiveSellOffer>` operation to the list of
         operations.
@@ -496,8 +514,7 @@ class TransactionBuilder:
 
         selling = Asset(selling_code, selling_issuer)
         buying = Asset(buying_code, buying_issuer)
-        op = CreatePassiveSellOffer(selling, buying, amount, price,
-                                    source)
+        op = CreatePassiveSellOffer(selling, buying, amount, price, source)
         return self.append_operation(op)
 
     def append_account_merge_op(self, destination, source=None):

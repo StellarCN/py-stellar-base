@@ -11,10 +11,7 @@ def sha256(data: bytes) -> bytes:
 def best_rational_approximation(x):
     x = Decimal(x)
     int32_max = Decimal(2147483647)
-    fractions = [
-        [Decimal(0), Decimal(1)],
-        [Decimal(1), Decimal(0)]
-    ]
+    fractions = [[Decimal(0), Decimal(1)], [Decimal(1), Decimal(0)]]
     i = 2
     while True:
         if x > int32_max:
@@ -34,7 +31,7 @@ def best_rational_approximation(x):
     d = fractions[len(fractions) - 1][1]
     if n.is_zero() or d.is_zero():
         raise NoApproximationError("Couldn't find approximation.")
-    return {'n': int(n), 'd': int(d)}
+    return {"n": int(n), "d": int(d)}
 
 
 def pack_xdr_array(x):
