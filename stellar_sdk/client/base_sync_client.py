@@ -15,3 +15,7 @@ class BaseSyncClient(metaclass=ABCMeta):
     @abstractmethod
     def stream(self, url, params):
         pass
+
+    @abstractmethod
+    def close(self):
+        pass

@@ -164,3 +164,9 @@ TimeBounds
 .. autoclass:: stellar_sdk.time_bounds.TimeBounds
    :members:
    :inherited-members:
+
+TransactionBuilder
+^^^^^^^^^^^^^^^^^^
+
+.. autoclass:: stellar_sdk.transaction_builder.TransactionBuilder
+   :members:

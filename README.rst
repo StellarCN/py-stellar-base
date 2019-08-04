@@ -1,5 +1,5 @@
-py-stellar-base
-===============
+[In Development] py-stellar-sdk
+===============================
 
 .. image:: https://img.shields.io/pypi/v/stellar-sdk.svg?style=flat-square&maxAge=1800
     :alt: PyPI
@@ -8,9 +8,9 @@ py-stellar-base
     :alt: Travis (.org)
     :target: https://travis-ci.org/StellarCN/py-stellar-base/
 
-.. image:: https://img.shields.io/readthedocs/stellar-base.svg?style=flat-square&maxAge=1800
+.. image:: https://img.shields.io/readthedocs/stellar-sdk.svg?style=flat-square&maxAge=1800
     :alt: Read the Docs
-    :target: https://stellar-base.readthedocs.io/en/latest/
+    :target: https://stellar-sdk.readthedocs.io/en/latest/
 
 .. image:: https://img.shields.io/codecov/c/github/StellarCN/py-stellar-base.svg?style=flat-square&maxAge=1800
     :alt: Codecov
@@ -49,23 +49,12 @@ A Simple Example
 .. code-block:: python
 
     # Alice pay 10.25 XLM to Bob
-    from stellar_base.builder import Builder
-
-    alice_secret = 'SCB6JIZUC3RDHLRGFRTISOUYATKEE63EP7MCHNZNXQMQGZSLZ5CNRTKK'
-    bob_address = 'GA7YNBW5CBTJZ3ZZOWX3ZNBKD6OE7A7IHUQVWMY62W2ZBG2SGZVOOPVH'
-
-    builder = Builder(secret=alice_secret)
-    builder.add_text_memo("Hello, Stellar!").append_payment_op(
-        destination=bob_address, amount='10.25', asset_code='XLM')
-    builder.sign()
-    response = builder.submit()
-    print(response)
-
+    # TODO: WIP
 
 Document
 --------
-* Quick Start: https://stellar-base.readthedocs.io/en/latest/quickstart.html
-* API: https://stellar-base.readthedocs.io/en/latest/api.html
+* Quick Start: https://stellar-sdk.readthedocs.io/en/latest/quickstart.html
+* API: https://stellar-sdk.readthedocs.io/en/latest/api.html
 
 
 Links

@@ -3,32 +3,24 @@
 .DEFAULT_GOAL: default
 default: ;
 
-init:
+install:
 	pip install .
-	pip install -e .
-	pip install pytest-cov
-.PHONY: init
+.PHONY: install
 
-start:
-	docker run --rm -d -p "8000:8000" -p "8004:8004" --name stellar zulucrypto/stellar-integration-test-network
-	sleep 10
-.PHONY: start
-
-stop:
-	docker stop stellar
-.PHONY: stop
+install-test:
+	pip install -r requirements-test.txt
+.PHONY: install-test
 
 test:
-	python -m pytest -v -rs tests --cov
+	pytest -v -s -rs tests --cov --cov-report=html
 .PHONY: test
 
-testnet:
-	python -m pytest -v -rs tests --testnet --cov
-.PHONY: testnet
+fulltest:
+	pytest -v -s -rs tests --runslow --cov --cov-report=html
+.PHONY: fulltest
 
 codecov:
-	pip install codecov
-	python -m codecov
+	codecov
 .PHONY: codecov
 
 package:

@@ -34,15 +34,20 @@ class TimeBounds:
         return Xdr.types.TimeBounds(minTime=self.min_time, maxTime=self.max_time)
 
     @classmethod
-    def from_xdr_object(cls, time_bounds_xdr_object: Xdr.types.TimeBounds) -> 'TimeBounds':
+    def from_xdr_object(
+        cls, time_bounds_xdr_object: Xdr.types.TimeBounds
+    ) -> "TimeBounds":
         """Create a :class:`TimeBounds` from an XDR TimeBounds object.
 
         :param time_bounds_xdr_object: The XDR TimeBounds object.
         :return: A new :class:`TimeBounds` object from the given XDR TimeBounds object.
         """
-        return cls(min_time=time_bounds_xdr_object.minTime, max_time=time_bounds_xdr_object.maxTime)
+        return cls(
+            min_time=time_bounds_xdr_object.minTime,
+            max_time=time_bounds_xdr_object.maxTime,
+        )
 
-    def __eq__(self, other: 'TimeBounds'):
+    def __eq__(self, other: "TimeBounds"):
         if not isinstance(other, TimeBounds):
             return False
         return self.min_time == other.min_time and self.max_time == other.max_time

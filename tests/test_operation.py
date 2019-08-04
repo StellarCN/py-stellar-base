@@ -23,132 +23,173 @@ from stellar_sdk.utils import sha256
 
 
 class TestBaseOperation:
-
-    @pytest.mark.parametrize('origin_amount, expect_value', [
-        ('10', 100000000),
-        ('0.10', 1000000),
-        ('0.1234567', 1234567),
-        ('922337203685.4775807', 9223372036854775807)
-    ])
+    @pytest.mark.parametrize(
+        "origin_amount, expect_value",
+        [
+            ("10", 100000000),
+            ("0.10", 1000000),
+            ("0.1234567", 1234567),
+            ("922337203685.4775807", 9223372036854775807),
+        ],
+    )
     def test_to_xdr_amount(self, origin_amount, expect_value):
         assert Operation.to_xdr_amount(origin_amount) == expect_value
 
-    @pytest.mark.parametrize('origin_amount, exception, reason', [
-        (10, TypeError, "Value of type '{}' must be of type String, but got {}.".format(10, type(10))),
-        ('-0.1', ValueError,
-         "Value of '-0.1' must represent a positive number and the max valid value is 9223372036854775807."),
-        ('9223372036854775808', ValueError,
-         "Value of '9223372036854775808' must represent a positive number and the max valid value is 9223372036854775807."),
-        ('0.123456789', ValueError, "Value of '0.123456789' must have at most 7 digits after the decimal."),
-
-    ])
+    @pytest.mark.parametrize(
+        "origin_amount, exception, reason",
+        [
+            (
+                10,
+                TypeError,
+                "Value of type '{}' must be of type String, but got {}.".format(
+                    10, type(10)
+                ),
+            ),
+            (
+                "-0.1",
+                ValueError,
+                "Value of '-0.1' must represent a positive number and the max valid value is 9223372036854775807.",
+            ),
+            (
+                "9223372036854775808",
+                ValueError,
+                "Value of '9223372036854775808' must represent a positive number and the max valid value is 9223372036854775807.",
+            ),
+            (
+                "0.123456789",
+                ValueError,
+                "Value of '0.123456789' must have at most 7 digits after the decimal.",
+            ),
+        ],
+    )
     def test_to_xdr_amount_raise(self, origin_amount, exception, reason):
         with pytest.raises(exception, match=reason):
             assert Operation.to_xdr_amount(origin_amount)
 
-    @pytest.mark.parametrize('origin_amount, expect_value', [
-        (100000000, '10'),
-        (1000000, '0.1'),
-        (1234567, '0.1234567'),
-        (9223372036854775807, '922337203685.4775807')
-    ])
+    @pytest.mark.parametrize(
+        "origin_amount, expect_value",
+        [
+            (100000000, "10"),
+            (1000000, "0.1"),
+            (1234567, "0.1234567"),
+            (9223372036854775807, "922337203685.4775807"),
+        ],
+    )
     def test_from_xdr_amount(self, origin_amount, expect_value):
         assert Operation.from_xdr_amount(origin_amount) == expect_value
 
     def test_get_source_exist_from_xdr_obj(self):  # BAD TEST
-        source = 'GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV'
-        destination = 'GCEZWKCA5VLDNRLN3RPRJMRZOX3Z6G5CHCGSNFHEYVXM3XOJMDS674JZ'
-        starting_balance = '1000.00'
+        source = "GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV"
+        destination = "GCEZWKCA5VLDNRLN3RPRJMRZOX3Z6G5CHCGSNFHEYVXM3XOJMDS674JZ"
+        starting_balance = "1000.00"
         origin_op = CreateAccount(destination, starting_balance, source)
         origin_xdr_obj = origin_op.to_xdr_object()
 
         op = Operation.from_xdr_object(origin_xdr_obj)
         assert op.source == source
-        assert op.starting_balance == '1000'
+        assert op.starting_balance == "1000"
         assert op.destination == destination
 
     def test_get_source_no_exist_from_xdr_obj(self):  # BAD TEST
-        destination = 'GCEZWKCA5VLDNRLN3RPRJMRZOX3Z6G5CHCGSNFHEYVXM3XOJMDS674JZ'
-        starting_balance = '1000.00'
+        destination = "GCEZWKCA5VLDNRLN3RPRJMRZOX3Z6G5CHCGSNFHEYVXM3XOJMDS674JZ"
+        starting_balance = "1000.00"
         origin_op = CreateAccount(destination, starting_balance)
         origin_xdr_obj = origin_op.to_xdr_object()
 
         op = Operation.from_xdr_object(origin_xdr_obj)
         assert op.source == None
-        assert op.starting_balance == '1000'
+        assert op.starting_balance == "1000"
         assert op.destination == destination
 
     def test_equal(self):
         op1 = ManageData("a", "b")
         op2 = ManageData("a", "b")
         op3 = ManageData("A", "B")
+        op4 = "BAD TYEE"
 
-        assert op1 == op2 != op3
+        assert op1 == op2 != op3 != op4
 
 
 class TestCreateAccount:
     def test_to_xdr_obj(self):
-        source = 'GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV'
-        destination = 'GCEZWKCA5VLDNRLN3RPRJMRZOX3Z6G5CHCGSNFHEYVXM3XOJMDS674JZ'
-        starting_balance = '1000.00'
+        source = "GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV"
+        destination = "GCEZWKCA5VLDNRLN3RPRJMRZOX3Z6G5CHCGSNFHEYVXM3XOJMDS674JZ"
+        starting_balance = "1000.00"
         op = CreateAccount(destination, starting_balance, source)
-        assert op.to_xdr_object().to_xdr() == 'AAAAAQAAAADX7fRsY6KTqIc8EIDyr8M9gxGPW6ODnZoZDgo6l1ymwwAAA' \
-                                              'AAAAAAAiZsoQO1WNsVt3F8Usjl1958bojiNJpTkxW7N3clg5e8AAAACVAvkAA=='
+        assert (
+            op.to_xdr_object().to_xdr()
+            == "AAAAAQAAAADX7fRsY6KTqIc8EIDyr8M9gxGPW6ODnZoZDgo6l1ymwwAAA"
+            "AAAAAAAiZsoQO1WNsVt3F8Usjl1958bojiNJpTkxW7N3clg5e8AAAACVAvkAA=="
+        )
 
     def test_to_xdr_obj_without_source(self):
-        destination = 'GCEZWKCA5VLDNRLN3RPRJMRZOX3Z6G5CHCGSNFHEYVXM3XOJMDS674JZ'
-        starting_balance = '1000.00'
+        destination = "GCEZWKCA5VLDNRLN3RPRJMRZOX3Z6G5CHCGSNFHEYVXM3XOJMDS674JZ"
+        starting_balance = "1000.00"
         op = CreateAccount(destination, starting_balance)
-        assert op.to_xdr_object().to_xdr() == 'AAAAAAAAAAAAAAAAiZsoQO1WNsVt3F8Usjl' \
-                                              '1958bojiNJpTkxW7N3clg5e8AAAACVAvkAA=='
+        assert (
+            op.to_xdr_object().to_xdr() == "AAAAAAAAAAAAAAAAiZsoQO1WNsVt3F8Usjl"
+            "1958bojiNJpTkxW7N3clg5e8AAAACVAvkAA=="
+        )
 
     def test_to_xdr_obj_with_invalid_destination_raise(self):
-        destination = 'GCEZWKCA5VLDNRLN3RPRJMRZOX3Z6G5CHCGSNFHEYVXM3XOJMINVALID'
-        starting_balance = '1000.00'
+        destination = "GCEZWKCA5VLDNRLN3RPRJMRZOX3Z6G5CHCGSNFHEYVXM3XOJMINVALID"
+        starting_balance = "1000.00"
         op = CreateAccount(destination, starting_balance)
-        with pytest.raises(Ed25519PublicKeyInvalidError, match='Invalid Ed25519 Public Key: {}'.format(destination)):
+        with pytest.raises(
+            Ed25519PublicKeyInvalidError,
+            match="Invalid Ed25519 Public Key: {}".format(destination),
+        ):
             op.to_xdr_object().to_xdr()
 
     def test_to_xdr_obj_with_invalid_source_raise(self):
-        source = 'GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLINVALID'
-        destination = 'GCEZWKCA5VLDNRLN3RPRJMRZOX3Z6G5CHCGSNFHEYVXM3XOJMDS674JZ'
-        starting_balance = '1000.00'
+        source = "GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLINVALID"
+        destination = "GCEZWKCA5VLDNRLN3RPRJMRZOX3Z6G5CHCGSNFHEYVXM3XOJMDS674JZ"
+        starting_balance = "1000.00"
         op = CreateAccount(destination, starting_balance, source)
-        with pytest.raises(Ed25519PublicKeyInvalidError, match='Invalid Ed25519 Public Key: {}'.format(source)):
+        with pytest.raises(
+            Ed25519PublicKeyInvalidError,
+            match="Invalid Ed25519 Public Key: {}".format(source),
+        ):
             op.to_xdr_object().to_xdr()
 
     def test_to_xdr_obj_with_invalid_starting_balance_raise(self):
-        destination = 'GCEZWKCA5VLDNRLN3RPRJMRZOX3Z6G5CHCGSNFHEYVXM3XOJMDS674JZ'
-        starting_balance = '-1'
+        destination = "GCEZWKCA5VLDNRLN3RPRJMRZOX3Z6G5CHCGSNFHEYVXM3XOJMDS674JZ"
+        starting_balance = "-1"
         op = CreateAccount(destination, starting_balance)
-        with pytest.raises(ValueError, match="Value of '{}' must represent a positive number and "
-                                             "the max valid value is 9223372036854775807.".format(starting_balance)):
+        with pytest.raises(
+            ValueError,
+            match="Value of '{}' must represent a positive number and "
+            "the max valid value is 9223372036854775807.".format(starting_balance),
+        ):
             op.to_xdr_object()
 
     def test_from_xdr_obj(self):
-        source = 'GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV'
-        destination = 'GCEZWKCA5VLDNRLN3RPRJMRZOX3Z6G5CHCGSNFHEYVXM3XOJMDS674JZ'
-        starting_balance = '1000.00'
+        source = "GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV"
+        destination = "GCEZWKCA5VLDNRLN3RPRJMRZOX3Z6G5CHCGSNFHEYVXM3XOJMDS674JZ"
+        starting_balance = "1000.00"
         origin_op = CreateAccount(destination, starting_balance, source)
         origin_xdr_obj = origin_op.to_xdr_object()
 
         op = Operation.from_xdr_object(origin_xdr_obj)
         assert op.source == source
-        assert op.starting_balance == '1000'
+        assert op.starting_balance == "1000"
         assert op.destination == destination
 
 
 class TestBumpSequence:
     def test_to_xdr_obj(self):
         bump_to = 114514
-        source = 'GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV'
+        source = "GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV"
 
         op = BumpSequence(bump_to, source)
-        assert op.to_xdr_object().to_xdr() == 'AAAAAQAAAADX7fRsY6KTqIc8EIDyr8M9gxGPW6ODnZoZDgo6l1ymwwAAAAsAAAAAAAG/Ug=='
+        assert (
+            op.to_xdr_object().to_xdr()
+            == "AAAAAQAAAADX7fRsY6KTqIc8EIDyr8M9gxGPW6ODnZoZDgo6l1ymwwAAAAsAAAAAAAG/Ug=="
+        )
 
     def test_from_xdr_obj(self):
         bump_to = 123123123
-        source = 'GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV'
+        source = "GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV"
         origin_xdr_obj = BumpSequence(bump_to, source).to_xdr_object()
         op = Operation.from_xdr_object(origin_xdr_obj)
         assert isinstance(op, BumpSequence)
@@ -158,12 +199,15 @@ class TestBumpSequence:
 
 class TestInflation:
     def test_to_xdr_obj(self):
-        source = 'GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV'
+        source = "GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV"
         op = Inflation(source)
-        assert op.to_xdr_object().to_xdr() == 'AAAAAQAAAADX7fRsY6KTqIc8EIDyr8M9gxGPW6ODnZoZDgo6l1ymwwAAAAk='
+        assert (
+            op.to_xdr_object().to_xdr()
+            == "AAAAAQAAAADX7fRsY6KTqIc8EIDyr8M9gxGPW6ODnZoZDgo6l1ymwwAAAAk="
+        )
 
     def test_from_xdr_obj(self):
-        source = 'GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV'
+        source = "GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV"
         origin_xdr_obj = Inflation(source).to_xdr_object()
         op = Operation.from_xdr_object(origin_xdr_obj)
         assert isinstance(op, Inflation)
@@ -172,14 +216,17 @@ class TestInflation:
 
 class TestAccountMerge:
     def test_to_xdr_obj(self):
-        source = 'GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV'
-        destination = 'GCEZWKCA5VLDNRLN3RPRJMRZOX3Z6G5CHCGSNFHEYVXM3XOJMDS674JZ'
+        source = "GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV"
+        destination = "GCEZWKCA5VLDNRLN3RPRJMRZOX3Z6G5CHCGSNFHEYVXM3XOJMDS674JZ"
         op = AccountMerge(destination, source)
-        assert op.to_xdr_object().to_xdr() == 'AAAAAQAAAADX7fRsY6KTqIc8EIDyr8M9gxGPW6ODnZoZDgo6l1ymwwAAAAgAAAAAiZsoQO1WNsVt3F8Usjl1958bojiNJpTkxW7N3clg5e8='
+        assert (
+            op.to_xdr_object().to_xdr()
+            == "AAAAAQAAAADX7fRsY6KTqIc8EIDyr8M9gxGPW6ODnZoZDgo6l1ymwwAAAAgAAAAAiZsoQO1WNsVt3F8Usjl1958bojiNJpTkxW7N3clg5e8="
+        )
 
     def test_from_xdr_obj(self):
-        source = 'GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV'
-        destination = 'GCEZWKCA5VLDNRLN3RPRJMRZOX3Z6G5CHCGSNFHEYVXM3XOJMDS674JZ'
+        source = "GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV"
+        destination = "GCEZWKCA5VLDNRLN3RPRJMRZOX3Z6G5CHCGSNFHEYVXM3XOJMDS674JZ"
         origin_xdr_obj = AccountMerge(destination, source).to_xdr_object()
         op = Operation.from_xdr_object(origin_xdr_obj)
         assert isinstance(op, AccountMerge)
@@ -188,26 +235,37 @@ class TestAccountMerge:
 
 
 class TestChangeTrust:
-    @pytest.mark.parametrize('limit, xdr', [
-        ("922337203685.4775807",
-         'AAAAAQAAAADX7fRsY6KTqIc8EIDyr8M9gxGPW6ODnZoZDgo6l1ymwwAAAAYAAAABVVNEAAAAAADNTrgPO19O0EsnYjSc333yWGLKEVxLyu1kfKjCKOz9e3//////////'),
-        ("0",
-         'AAAAAQAAAADX7fRsY6KTqIc8EIDyr8M9gxGPW6ODnZoZDgo6l1ymwwAAAAYAAAABVVNEAAAAAADNTrgPO19O0EsnYjSc333yWGLKEVxLyu1kfKjCKOz9ewAAAAAAAAAA'),
-        ("50.1234567",
-         'AAAAAQAAAADX7fRsY6KTqIc8EIDyr8M9gxGPW6ODnZoZDgo6l1ymwwAAAAYAAAABVVNEAAAAAADNTrgPO19O0EsnYjSc333yWGLKEVxLyu1kfKjCKOz9ewAAAAAd4DuH'),
-        (None,
-         'AAAAAQAAAADX7fRsY6KTqIc8EIDyr8M9gxGPW6ODnZoZDgo6l1ymwwAAAAYAAAABVVNEAAAAAADNTrgPO19O0EsnYjSc333yWGLKEVxLyu1kfKjCKOz9e3//////////')
-    ])
+    @pytest.mark.parametrize(
+        "limit, xdr",
+        [
+            (
+                "922337203685.4775807",
+                "AAAAAQAAAADX7fRsY6KTqIc8EIDyr8M9gxGPW6ODnZoZDgo6l1ymwwAAAAYAAAABVVNEAAAAAADNTrgPO19O0EsnYjSc333yWGLKEVxLyu1kfKjCKOz9e3//////////",
+            ),
+            (
+                "0",
+                "AAAAAQAAAADX7fRsY6KTqIc8EIDyr8M9gxGPW6ODnZoZDgo6l1ymwwAAAAYAAAABVVNEAAAAAADNTrgPO19O0EsnYjSc333yWGLKEVxLyu1kfKjCKOz9ewAAAAAAAAAA",
+            ),
+            (
+                "50.1234567",
+                "AAAAAQAAAADX7fRsY6KTqIc8EIDyr8M9gxGPW6ODnZoZDgo6l1ymwwAAAAYAAAABVVNEAAAAAADNTrgPO19O0EsnYjSc333yWGLKEVxLyu1kfKjCKOz9ewAAAAAd4DuH",
+            ),
+            (
+                None,
+                "AAAAAQAAAADX7fRsY6KTqIc8EIDyr8M9gxGPW6ODnZoZDgo6l1ymwwAAAAYAAAABVVNEAAAAAADNTrgPO19O0EsnYjSc333yWGLKEVxLyu1kfKjCKOz9e3//////////",
+            ),
+        ],
+    )
     def test_to_xdr_obj(self, limit, xdr):
-        asset = Asset('USD', 'GDGU5OAPHNPU5UCLE5RDJHG7PXZFQYWKCFOEXSXNMR6KRQRI5T6XXCD7')
-        source = 'GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV'
+        asset = Asset("USD", "GDGU5OAPHNPU5UCLE5RDJHG7PXZFQYWKCFOEXSXNMR6KRQRI5T6XXCD7")
+        source = "GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV"
         op = ChangeTrust(asset, limit, source)
         assert op.to_xdr_object().to_xdr() == xdr
 
     def test_from_xdr_obj(self):
-        asset = Asset('USD', 'GDGU5OAPHNPU5UCLE5RDJHG7PXZFQYWKCFOEXSXNMR6KRQRI5T6XXCD7')
-        source = 'GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV'
-        limit = '123456.789'
+        asset = Asset("USD", "GDGU5OAPHNPU5UCLE5RDJHG7PXZFQYWKCFOEXSXNMR6KRQRI5T6XXCD7")
+        source = "GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV"
+        limit = "123456.789"
         origin_xdr_obj = ChangeTrust(asset, limit, source).to_xdr_object()
         op = Operation.from_xdr_object(origin_xdr_obj)
         assert isinstance(op, ChangeTrust)
@@ -218,68 +276,90 @@ class TestChangeTrust:
 
 class TestPayment:
     def test_to_xdr_obj(self):
-        source = 'GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV'
-        destination = 'GCEZWKCA5VLDNRLN3RPRJMRZOX3Z6G5CHCGSNFHEYVXM3XOJMDS674JZ'
-        amount = '1000.0000000'
-        asset = Asset('USD', 'GDGU5OAPHNPU5UCLE5RDJHG7PXZFQYWKCFOEXSXNMR6KRQRI5T6XXCD7')
+        source = "GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV"
+        destination = "GCEZWKCA5VLDNRLN3RPRJMRZOX3Z6G5CHCGSNFHEYVXM3XOJMDS674JZ"
+        amount = "1000.0000000"
+        asset = Asset("USD", "GDGU5OAPHNPU5UCLE5RDJHG7PXZFQYWKCFOEXSXNMR6KRQRI5T6XXCD7")
         op = Payment(destination, asset, amount, source)
-        assert op.to_xdr_object().to_xdr() == 'AAAAAQAAAADX7fRsY6KTqIc8EIDyr8M9gxGPW6ODnZoZDgo6l1ymwwAAAAEAAAAAiZsoQO1WNsVt3F8Usjl1958bojiNJpTkxW7N3clg5e8AAAABVVNEAAAAAADNTrgPO19O0EsnYjSc333yWGLKEVxLyu1kfKjCKOz9ewAAAAJUC+QA'
+        assert (
+            op.to_xdr_object().to_xdr()
+            == "AAAAAQAAAADX7fRsY6KTqIc8EIDyr8M9gxGPW6ODnZoZDgo6l1ymwwAAAAEAAAAAiZsoQO1WNsVt3F8Usjl1958bojiNJpTkxW7N3clg5e8AAAABVVNEAAAAAADNTrgPO19O0EsnYjSc333yWGLKEVxLyu1kfKjCKOz9ewAAAAJUC+QA"
+        )
 
     def test_to_xdr_obj_with_invalid_destination_raise(self):
-        source = 'GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV'
-        destination = 'GCEZW'
-        amount = '1000.0000000'
-        asset = Asset('USD', 'GDGU5OAPHNPU5UCLE5RDJHG7PXZFQYWKCFOEXSXNMR6KRQRI5T6XXCD7')
+        source = "GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV"
+        destination = "GCEZW"
+        amount = "1000.0000000"
+        asset = Asset("USD", "GDGU5OAPHNPU5UCLE5RDJHG7PXZFQYWKCFOEXSXNMR6KRQRI5T6XXCD7")
         op = Payment(destination, asset, amount, source)
         with pytest.raises(Ed25519PublicKeyInvalidError):
             op.to_xdr_object()
 
     def test_to_xdr_obj_with_invalid_amount_raise(self):
-        source = 'GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV'
-        destination = 'GCEZWKCA5VLDNRLN3RPRJMRZOX3Z6G5CHCGSNFHEYVXM3XOJMDS674JZ'
+        source = "GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV"
+        destination = "GCEZWKCA5VLDNRLN3RPRJMRZOX3Z6G5CHCGSNFHEYVXM3XOJMDS674JZ"
         amount = 1
-        asset = Asset('USD', 'GDGU5OAPHNPU5UCLE5RDJHG7PXZFQYWKCFOEXSXNMR6KRQRI5T6XXCD7')
+        asset = Asset("USD", "GDGU5OAPHNPU5UCLE5RDJHG7PXZFQYWKCFOEXSXNMR6KRQRI5T6XXCD7")
         op = Payment(destination, asset, amount, source)
         with pytest.raises(TypeError):
             op.to_xdr_object()
 
     def test_from_xdr_obj(self):
-        source = 'GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV'
-        destination = 'GCEZWKCA5VLDNRLN3RPRJMRZOX3Z6G5CHCGSNFHEYVXM3XOJMDS674JZ'
-        amount = '1000.0000000'
-        asset = Asset('USD', 'GDGU5OAPHNPU5UCLE5RDJHG7PXZFQYWKCFOEXSXNMR6KRQRI5T6XXCD7')
+        source = "GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV"
+        destination = "GCEZWKCA5VLDNRLN3RPRJMRZOX3Z6G5CHCGSNFHEYVXM3XOJMDS674JZ"
+        amount = "1000.0000000"
+        asset = Asset("USD", "GDGU5OAPHNPU5UCLE5RDJHG7PXZFQYWKCFOEXSXNMR6KRQRI5T6XXCD7")
         origin_xdr_obj = Payment(destination, asset, amount, source).to_xdr_object()
         op = Operation.from_xdr_object(origin_xdr_obj)
         assert isinstance(op, Payment)
         assert op.source == source
         assert op.destination == destination
-        assert op.amount == '1000'
+        assert op.amount == "1000"
         assert op.asset == asset
 
 
 class TestPathPayment:
     def test_to_xdr_obj(self):
-        source = 'GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV'
-        destination = 'GCEZWKCA5VLDNRLN3RPRJMRZOX3Z6G5CHCGSNFHEYVXM3XOJMDS674JZ'
-        send_asset = Asset('USD', 'GDGU5OAPHNPU5UCLE5RDJHG7PXZFQYWKCFOEXSXNMR6KRQRI5T6XXCD7')
-        dest_asset = Asset('USD', 'GDGU5OAPHNPU5UCLE5RDJHG7PXZFQYWKCFOEXSXNMR6KRQRI5T6XXCD7')
-        send_max = '3.0070000'
-        dest_amount = '3.1415000'
-        path = [Asset('USD', 'GBBM6BKZPEHWYO3E3YKREDPQXMS4VK35YLNU7NFBRI26RAN7GI5POFBB'),
-                Asset('EUR', 'GDTNXRLOJD2YEBPKK7KCMR7J33AAG5VZXHAJTHIG736D6LVEFLLLKPDL')]
-        op = PathPayment(destination, send_asset, send_max, dest_asset, dest_amount, path, source)
-        assert op.to_xdr_object().to_xdr() == 'AAAAAQAAAADX7fRsY6KTqIc8EIDyr8M9gxGPW6ODnZoZDgo6l1ymwwAAAAIAAAABVVNEAAAAAADNTrgPO19O0EsnYjSc333yWGLKEVxLyu1kfKjCKOz9ewAAAAABytTwAAAAAImbKEDtVjbFbdxfFLI5dfefG6I4jSaU5MVuzd3JYOXvAAAAAVVTRAAAAAAAzU64DztfTtBLJ2I0nN998lhiyhFcS8rtZHyowijs/XsAAAAAAd9a2AAAAAIAAAABVVNEAAAAAABCzwVZeQ9sO2TeFRIN8Lslyqt9wttPtKGKNeiBvzI69wAAAAFFVVIAAAAAAObbxW5I9YIF6lfUJkfp3sADdrm5wJmdBv78Py6kKta1'
+        source = "GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV"
+        destination = "GCEZWKCA5VLDNRLN3RPRJMRZOX3Z6G5CHCGSNFHEYVXM3XOJMDS674JZ"
+        send_asset = Asset(
+            "USD", "GDGU5OAPHNPU5UCLE5RDJHG7PXZFQYWKCFOEXSXNMR6KRQRI5T6XXCD7"
+        )
+        dest_asset = Asset(
+            "USD", "GDGU5OAPHNPU5UCLE5RDJHG7PXZFQYWKCFOEXSXNMR6KRQRI5T6XXCD7"
+        )
+        send_max = "3.0070000"
+        dest_amount = "3.1415000"
+        path = [
+            Asset("USD", "GBBM6BKZPEHWYO3E3YKREDPQXMS4VK35YLNU7NFBRI26RAN7GI5POFBB"),
+            Asset("EUR", "GDTNXRLOJD2YEBPKK7KCMR7J33AAG5VZXHAJTHIG736D6LVEFLLLKPDL"),
+        ]
+        op = PathPayment(
+            destination, send_asset, send_max, dest_asset, dest_amount, path, source
+        )
+        assert (
+            op.to_xdr_object().to_xdr()
+            == "AAAAAQAAAADX7fRsY6KTqIc8EIDyr8M9gxGPW6ODnZoZDgo6l1ymwwAAAAIAAAABVVNEAAAAAADNTrgPO19O0EsnYjSc333yWGLKEVxLyu1kfKjCKOz9ewAAAAABytTwAAAAAImbKEDtVjbFbdxfFLI5dfefG6I4jSaU5MVuzd3JYOXvAAAAAVVTRAAAAAAAzU64DztfTtBLJ2I0nN998lhiyhFcS8rtZHyowijs/XsAAAAAAd9a2AAAAAIAAAABVVNEAAAAAABCzwVZeQ9sO2TeFRIN8Lslyqt9wttPtKGKNeiBvzI69wAAAAFFVVIAAAAAAObbxW5I9YIF6lfUJkfp3sADdrm5wJmdBv78Py6kKta1"
+        )
 
     def test_to_xdr_obj_with_invalid_destination_raise(self):
-        source = 'GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV'
-        destination = 'GCEZW'
-        send_asset = Asset('USD', 'GDGU5OAPHNPU5UCLE5RDJHG7PXZFQYWKCFOEXSXNMR6KRQRI5T6XXCD7')
-        dest_asset = Asset('USD', 'GDGU5OAPHNPU5UCLE5RDJHG7PXZFQYWKCFOEXSXNMR6KRQRI5T6XXCD7')
-        send_max = '3.0070000'
-        dest_amount = '3.1415000'
-        path = [Asset('USD', 'GBBM6BKZPEHWYO3E3YKREDPQXMS4VK35YLNU7NFBRI26RAN7GI5POFBB'),
-                Asset('EUR', 'GDTNXRLOJD2YEBPKK7KCMR7J33AAG5VZXHAJTHIG736D6LVEFLLLKPDL')]
-        op = PathPayment(destination, send_asset, send_max, dest_asset, dest_amount, path, source)
+        source = "GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV"
+        destination = "GCEZW"
+        send_asset = Asset(
+            "USD", "GDGU5OAPHNPU5UCLE5RDJHG7PXZFQYWKCFOEXSXNMR6KRQRI5T6XXCD7"
+        )
+        dest_asset = Asset(
+            "USD", "GDGU5OAPHNPU5UCLE5RDJHG7PXZFQYWKCFOEXSXNMR6KRQRI5T6XXCD7"
+        )
+        send_max = "3.0070000"
+        dest_amount = "3.1415000"
+        path = [
+            Asset("USD", "GBBM6BKZPEHWYO3E3YKREDPQXMS4VK35YLNU7NFBRI26RAN7GI5POFBB"),
+            Asset("EUR", "GDTNXRLOJD2YEBPKK7KCMR7J33AAG5VZXHAJTHIG736D6LVEFLLLKPDL"),
+        ]
+        op = PathPayment(
+            destination, send_asset, send_max, dest_asset, dest_amount, path, source
+        )
         with pytest.raises(Ed25519PublicKeyInvalidError):
             op.to_xdr_object()
 
@@ -288,49 +368,65 @@ class TestPathPayment:
     #     pass
 
     def test_from_xdr_obj(self):
-        source = 'GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV'
-        destination = 'GCEZWKCA5VLDNRLN3RPRJMRZOX3Z6G5CHCGSNFHEYVXM3XOJMDS674JZ'
-        send_asset = Asset('USD', 'GDGU5OAPHNPU5UCLE5RDJHG7PXZFQYWKCFOEXSXNMR6KRQRI5T6XXCD7')
-        dest_asset = Asset('USD', 'GDGU5OAPHNPU5UCLE5RDJHG7PXZFQYWKCFOEXSXNMR6KRQRI5T6XXCD7')
-        send_max = '3.0070000'
-        dest_amount = '3.1415000'
-        path = [Asset('USD', 'GBBM6BKZPEHWYO3E3YKREDPQXMS4VK35YLNU7NFBRI26RAN7GI5POFBB'),
-                Asset('EUR', 'GDTNXRLOJD2YEBPKK7KCMR7J33AAG5VZXHAJTHIG736D6LVEFLLLKPDL')]
-        origin_xdr_obj = PathPayment(destination, send_asset, send_max, dest_asset, dest_amount, path,
-                                     source).to_xdr_object()
+        source = "GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV"
+        destination = "GCEZWKCA5VLDNRLN3RPRJMRZOX3Z6G5CHCGSNFHEYVXM3XOJMDS674JZ"
+        send_asset = Asset(
+            "USD", "GDGU5OAPHNPU5UCLE5RDJHG7PXZFQYWKCFOEXSXNMR6KRQRI5T6XXCD7"
+        )
+        dest_asset = Asset(
+            "USD", "GDGU5OAPHNPU5UCLE5RDJHG7PXZFQYWKCFOEXSXNMR6KRQRI5T6XXCD7"
+        )
+        send_max = "3.0070000"
+        dest_amount = "3.1415000"
+        path = [
+            Asset("USD", "GBBM6BKZPEHWYO3E3YKREDPQXMS4VK35YLNU7NFBRI26RAN7GI5POFBB"),
+            Asset("EUR", "GDTNXRLOJD2YEBPKK7KCMR7J33AAG5VZXHAJTHIG736D6LVEFLLLKPDL"),
+        ]
+        origin_xdr_obj = PathPayment(
+            destination, send_asset, send_max, dest_asset, dest_amount, path, source
+        ).to_xdr_object()
         op = Operation.from_xdr_object(origin_xdr_obj)
         assert isinstance(op, PathPayment)
         assert op.source == source
         assert op.destination == destination
         assert op.send_asset == send_asset
         assert op.dest_asset == dest_asset
-        assert op.send_max == '3.007'
-        assert op.dest_amount == '3.1415'
+        assert op.send_max == "3.007"
+        assert op.dest_amount == "3.1415"
         assert op.path == path
 
 
 class TestAllowTrust:
-    @pytest.mark.parametrize('authorize, xdr', [
-        (True,
-         'AAAAAQAAAADX7fRsY6KTqIc8EIDyr8M9gxGPW6ODnZoZDgo6l1ymwwAAAAcAAAAAzU64DztfTtBLJ2I0nN998lhiyhFcS8rtZHyowijs/XsAAAABVVNEAAAAAAE='),
-        (False,
-         'AAAAAQAAAADX7fRsY6KTqIc8EIDyr8M9gxGPW6ODnZoZDgo6l1ymwwAAAAcAAAAAzU64DztfTtBLJ2I0nN998lhiyhFcS8rtZHyowijs/XsAAAABVVNEAAAAAAA=')])
+    @pytest.mark.parametrize(
+        "authorize, xdr",
+        [
+            (
+                True,
+                "AAAAAQAAAADX7fRsY6KTqIc8EIDyr8M9gxGPW6ODnZoZDgo6l1ymwwAAAAcAAAAAzU64DztfTtBLJ2I0nN998lhiyhFcS8rtZHyowijs/XsAAAABVVNEAAAAAAE=",
+            ),
+            (
+                False,
+                "AAAAAQAAAADX7fRsY6KTqIc8EIDyr8M9gxGPW6ODnZoZDgo6l1ymwwAAAAcAAAAAzU64DztfTtBLJ2I0nN998lhiyhFcS8rtZHyowijs/XsAAAABVVNEAAAAAAA=",
+            ),
+        ],
+    )
     def test_to_xdr_obj(self, authorize, xdr):
-        source = 'GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV'
-        trustor = 'GDGU5OAPHNPU5UCLE5RDJHG7PXZFQYWKCFOEXSXNMR6KRQRI5T6XXCD7'
-        asset_code = 'USD'
+        source = "GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV"
+        trustor = "GDGU5OAPHNPU5UCLE5RDJHG7PXZFQYWKCFOEXSXNMR6KRQRI5T6XXCD7"
+        asset_code = "USD"
         op = AllowTrust(trustor, asset_code, authorize, source)
         assert op.to_xdr_object().to_xdr() == xdr
 
-    @pytest.mark.parametrize('asset_code, authorize', [
-        ('USD', True),
-        ('USDT', False),
-        ('Banana', True),
-        ("STELLAROVERC", False)])
+    @pytest.mark.parametrize(
+        "asset_code, authorize",
+        [("USD", True), ("USDT", False), ("Banana", True), ("STELLAROVERC", False)],
+    )
     def test_from_xdr_obj(self, asset_code, authorize):
-        source = 'GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV'
-        trustor = 'GDGU5OAPHNPU5UCLE5RDJHG7PXZFQYWKCFOEXSXNMR6KRQRI5T6XXCD7'
-        origin_xdr_obj = AllowTrust(trustor, asset_code, authorize, source).to_xdr_object()
+        source = "GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV"
+        trustor = "GDGU5OAPHNPU5UCLE5RDJHG7PXZFQYWKCFOEXSXNMR6KRQRI5T6XXCD7"
+        origin_xdr_obj = AllowTrust(
+            trustor, asset_code, authorize, source
+        ).to_xdr_object()
         op = Operation.from_xdr_object(origin_xdr_obj)
         assert isinstance(op, AllowTrust)
         assert op.source == source
@@ -340,38 +436,58 @@ class TestAllowTrust:
 
 
 class TestManageData:
-    @pytest.mark.parametrize('name, value, xdr', [
-        ('add_data', 'value',
-         'AAAAAQAAAADX7fRsY6KTqIc8EIDyr8M9gxGPW6ODnZoZDgo6l1ymwwAAAAoAAAAIYWRkX2RhdGEAAAABAAAABXZhbHVlAAAA'),
-        ('remove_data', None,
-         'AAAAAQAAAADX7fRsY6KTqIc8EIDyr8M9gxGPW6ODnZoZDgo6l1ymwwAAAAoAAAALcmVtb3ZlX2RhdGEAAAAAAA=='),
-        ('add_bytes_data', b'bytes_value',
-         'AAAAAQAAAADX7fRsY6KTqIc8EIDyr8M9gxGPW6ODnZoZDgo6l1ymwwAAAAoAAAAOYWRkX2J5dGVzX2RhdGEAAAAAAAEAAAALYnl0ZXNfdmFsdWUA'),
-        ('add_data_中文', '恒星',
-         'AAAAAQAAAADX7fRsY6KTqIc8EIDyr8M9gxGPW6ODnZoZDgo6l1ymwwAAAAoAAAAPYWRkX2RhdGFf5Lit5paHAAAAAAEAAAAG5oGS5pifAAA=')
-    ])
+    @pytest.mark.parametrize(
+        "name, value, xdr",
+        [
+            (
+                "add_data",
+                "value",
+                "AAAAAQAAAADX7fRsY6KTqIc8EIDyr8M9gxGPW6ODnZoZDgo6l1ymwwAAAAoAAAAIYWRkX2RhdGEAAAABAAAABXZhbHVlAAAA",
+            ),
+            (
+                "remove_data",
+                None,
+                "AAAAAQAAAADX7fRsY6KTqIc8EIDyr8M9gxGPW6ODnZoZDgo6l1ymwwAAAAoAAAALcmVtb3ZlX2RhdGEAAAAAAA==",
+            ),
+            (
+                "add_bytes_data",
+                b"bytes_value",
+                "AAAAAQAAAADX7fRsY6KTqIc8EIDyr8M9gxGPW6ODnZoZDgo6l1ymwwAAAAoAAAAOYWRkX2J5dGVzX2RhdGEAAAAAAAEAAAALYnl0ZXNfdmFsdWUA",
+            ),
+            (
+                "add_data_中文",
+                "恒星",
+                "AAAAAQAAAADX7fRsY6KTqIc8EIDyr8M9gxGPW6ODnZoZDgo6l1ymwwAAAAoAAAAPYWRkX2RhdGFf5Lit5paHAAAAAAEAAAAG5oGS5pifAAA=",
+            ),
+        ],
+    )
     def test_to_xdr_obj(self, name, value, xdr):
-        source = 'GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV'
+        source = "GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV"
         op = ManageData(name, value, source)
         assert op.to_xdr_object().to_xdr() == xdr
 
-    @pytest.mark.parametrize('name, value', [
-        ('name_too_long' + '-' * 64, 'value'),
-        ('value_too_long', 'value' + 'a' * 64),
-    ])
+    @pytest.mark.parametrize(
+        "name, value",
+        [("name_too_long" + "-" * 64, "value"), ("value_too_long", "value" + "a" * 64)],
+    )
     def test_to_xdr_obj_with_invalid_value_raise(self, name, value):
-        source = 'GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV'
-        with pytest.raises(ValueError, match=r'Data and value should be <= 64 bytes \(ascii encoded\).'):
+        source = "GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV"
+        with pytest.raises(
+            ValueError, match=r"Data and value should be <= 64 bytes \(ascii encoded\)."
+        ):
             ManageData(name, value, source)
 
-    @pytest.mark.parametrize('name, value', [
-        ('add_data', 'value'),
-        ('remove_data', None),
-        ('add_bytes_data', 'bytes_value'),
-        ('add_data_中文', '恒星')
-    ])
+    @pytest.mark.parametrize(
+        "name, value",
+        [
+            ("add_data", "value"),
+            ("remove_data", None),
+            ("add_bytes_data", "bytes_value"),
+            ("add_data_中文", "恒星"),
+        ],
+    )
     def test_from_xdr_obj(self, name, value):
-        source = 'GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV'
+        source = "GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV"
         origin_xdr_obj = ManageData(name, value, source).to_xdr_object()
         op = Operation.from_xdr_object(origin_xdr_obj)
         assert isinstance(op, ManageData)
@@ -388,39 +504,90 @@ class TestSetOptions:
     AUTHORIZATION_IMMUTABLE = 4
 
     @pytest.mark.parametrize(
-        'inflation_dest, clear_flags, set_flags, master_weight, low_threshold, med_threshold, high_threshold, home_domain, signer, source, xdr',
+        "inflation_dest, clear_flags, set_flags, master_weight, low_threshold, med_threshold, high_threshold, home_domain, signer, source, xdr",
         [
-            ('GDGU5OAPHNPU5UCLE5RDJHG7PXZFQYWKCFOEXSXNMR6KRQRI5T6XXCD7',
-             AUTHORIZATION_REVOCABLE | AUTHORIZATION_IMMUTABLE,
-             AUTHORIZATION_REQUIRED, 0, 1, 2, 3, 'www.example.com',
-             Signer.ed25519_public_key("GDGU5OAPHNPU5UCLE5RDJHG7PXZFQYWKCFOEXSXNMR6KRQRI5T6XXCD7", 1),
-             None,
-             'AAAAAAAAAAUAAAABAAAAAM1OuA87X07QSydiNJzfffJYYsoRXEvK7WR8qMIo7P17AAAAAQAAAAYAAAABAAAAAQAAAAEAAAAAAAAAAQAAAAEAAAABAAAAAgAAAAEAAAADAAAAAQAAAA93d3cuZXhhbXBsZS5jb20AAAAAAQAAAADNTrgPO19O0EsnYjSc333yWGLKEVxLyu1kfKjCKOz9ewAAAAE='),
-            ('GDGU5OAPHNPU5UCLE5RDJHG7PXZFQYWKCFOEXSXNMR6KRQRI5T6XXCD7',
-             AUTHORIZATION_REQUIRED | AUTHORIZATION_REVOCABLE,
-             AUTHORIZATION_REVOCABLE, 3, 2, 4, 6, None,
-             Signer.pre_auth_tx(sha256(b"PRE_AUTH_TX"), 2),
-             'GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV',
-             'AAAAAQAAAADX7fRsY6KTqIc8EIDyr8M9gxGPW6ODnZoZDgo6l1ymwwAAAAUAAAABAAAAAM1OuA87X07QSydiNJzfffJYYsoRXEvK7WR8qMIo7P17AAAAAQAAAAMAAAABAAAAAgAAAAEAAAADAAAAAQAAAAIAAAABAAAABAAAAAEAAAAGAAAAAAAAAAEAAAAB96nlNnQ/Aq5uCbYXnGJN/EXa76Y2RQP6S1wP8lOEL1UAAAAC'),
-            (None, None, None, 0, 255, 255, 255, 'overcat.me', Signer.sha256_hash(sha256(b"SHA256_HASH"), 0),
-             None,
-             'AAAAAAAAAAUAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAEAAAD/AAAAAQAAAP8AAAABAAAA/wAAAAEAAAAKb3ZlcmNhdC5tZQAAAAAAAQAAAALB1I1O+GEAV87X3eYN/uAYDIDzP5mY4SVTEQFFYFq6nwAAAAA='),
-            (None, None, None, None, None, None, None, None, None, None,
-             'AAAAAAAAAAUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA='),
-
-        ])
-    def test_to_xdr(self, inflation_dest, clear_flags, set_flags, master_weight, low_threshold, med_threshold,
-                    high_threshold, home_domain, signer, source, xdr):
-        op = SetOptions(inflation_dest,
-                        clear_flags,
-                        set_flags,
-                        master_weight,
-                        low_threshold,
-                        med_threshold,
-                        high_threshold,
-                        signer,
-                        home_domain,
-                        source)
+            (
+                "GDGU5OAPHNPU5UCLE5RDJHG7PXZFQYWKCFOEXSXNMR6KRQRI5T6XXCD7",
+                AUTHORIZATION_REVOCABLE | AUTHORIZATION_IMMUTABLE,
+                AUTHORIZATION_REQUIRED,
+                0,
+                1,
+                2,
+                3,
+                "www.example.com",
+                Signer.ed25519_public_key(
+                    "GDGU5OAPHNPU5UCLE5RDJHG7PXZFQYWKCFOEXSXNMR6KRQRI5T6XXCD7", 1
+                ),
+                None,
+                "AAAAAAAAAAUAAAABAAAAAM1OuA87X07QSydiNJzfffJYYsoRXEvK7WR8qMIo7P17AAAAAQAAAAYAAAABAAAAAQAAAAEAAAAAAAAAAQAAAAEAAAABAAAAAgAAAAEAAAADAAAAAQAAAA93d3cuZXhhbXBsZS5jb20AAAAAAQAAAADNTrgPO19O0EsnYjSc333yWGLKEVxLyu1kfKjCKOz9ewAAAAE=",
+            ),
+            (
+                "GDGU5OAPHNPU5UCLE5RDJHG7PXZFQYWKCFOEXSXNMR6KRQRI5T6XXCD7",
+                AUTHORIZATION_REQUIRED | AUTHORIZATION_REVOCABLE,
+                AUTHORIZATION_REVOCABLE,
+                3,
+                2,
+                4,
+                6,
+                None,
+                Signer.pre_auth_tx(sha256(b"PRE_AUTH_TX"), 2),
+                "GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV",
+                "AAAAAQAAAADX7fRsY6KTqIc8EIDyr8M9gxGPW6ODnZoZDgo6l1ymwwAAAAUAAAABAAAAAM1OuA87X07QSydiNJzfffJYYsoRXEvK7WR8qMIo7P17AAAAAQAAAAMAAAABAAAAAgAAAAEAAAADAAAAAQAAAAIAAAABAAAABAAAAAEAAAAGAAAAAAAAAAEAAAAB96nlNnQ/Aq5uCbYXnGJN/EXa76Y2RQP6S1wP8lOEL1UAAAAC",
+            ),
+            (
+                None,
+                None,
+                None,
+                0,
+                255,
+                255,
+                255,
+                "overcat.me",
+                Signer.sha256_hash(sha256(b"SHA256_HASH"), 0),
+                None,
+                "AAAAAAAAAAUAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAEAAAD/AAAAAQAAAP8AAAABAAAA/wAAAAEAAAAKb3ZlcmNhdC5tZQAAAAAAAQAAAALB1I1O+GEAV87X3eYN/uAYDIDzP5mY4SVTEQFFYFq6nwAAAAA=",
+            ),
+            (
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                "AAAAAAAAAAUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=",
+            ),
+        ],
+    )
+    def test_to_xdr(
+        self,
+        inflation_dest,
+        clear_flags,
+        set_flags,
+        master_weight,
+        low_threshold,
+        med_threshold,
+        high_threshold,
+        home_domain,
+        signer,
+        source,
+        xdr,
+    ):
+        op = SetOptions(
+            inflation_dest,
+            clear_flags,
+            set_flags,
+            master_weight,
+            low_threshold,
+            med_threshold,
+            high_threshold,
+            signer,
+            home_domain,
+            source,
+        )
         xdr_obj = op.to_xdr_object()
         assert xdr_obj.to_xdr() == xdr
         from_instance = Operation.from_xdr_object(xdr_obj)
@@ -437,19 +604,48 @@ class TestSetOptions:
 
 
 class TestManageSellOffer:
-    @pytest.mark.parametrize('selling, buying, amount, price, offer_id, source, xdr', [
-        (Asset('USD', 'GDGU5OAPHNPU5UCLE5RDJHG7PXZFQYWKCFOEXSXNMR6KRQRI5T6XXCD7'),
-         Asset('XCN', 'GCNY5OXYSY4FKHOPT2SPOQZAOEIGXB5LBYW3HVU3OWSTQITS65M5RCNY'), '3.123456', '8.141592', 1,
-         'GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV',
-         'AAAAAQAAAADX7fRsY6KTqIc8EIDyr8M9gxGPW6ODnZoZDgo6l1ymwwAAAAMAAAABVVNEAAAAAADNTrgPO19O0EsnYjSc333yWGLKEVxLyu1kfKjCKOz9ewAAAAFYQ04AAAAAAJuOuviWOFUdz56k90MgcRBrh6sOLbPWm3WlOCJy91nYAAAAAAHcmgAAD4djAAHoSAAAAAAAAAAB'),
-        (Asset('USD', 'GDGU5OAPHNPU5UCLE5RDJHG7PXZFQYWKCFOEXSXNMR6KRQRI5T6XXCD7'),
-         Asset('XCN', 'GCNY5OXYSY4FKHOPT2SPOQZAOEIGXB5LBYW3HVU3OWSTQITS65M5RCNY'), '8', '238.141592', 0, None,
-         'AAAAAAAAAAMAAAABVVNEAAAAAADNTrgPO19O0EsnYjSc333yWGLKEVxLyu1kfKjCKOz9ewAAAAFYQ04AAAAAAJuOuviWOFUdz56k90MgcRBrh6sOLbPWm3WlOCJy91nYAAAAAATEtAABxjgTAAHoSAAAAAAAAAAA'),
-        (Asset('XLM'),
-         Asset('XCN', 'GCNY5OXYSY4FKHOPT2SPOQZAOEIGXB5LBYW3HVU3OWSTQITS65M5RCNY'), '3.123456', Price(11, 10), 1,
-         'GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV',
-         'AAAAAQAAAADX7fRsY6KTqIc8EIDyr8M9gxGPW6ODnZoZDgo6l1ymwwAAAAMAAAAAAAAAAVhDTgAAAAAAm466+JY4VR3PnqT3QyBxEGuHqw4ts9abdaU4InL3WdgAAAAAAdyaAAAAAAsAAAAKAAAAAAAAAAE='),
-    ])
+    @pytest.mark.parametrize(
+        "selling, buying, amount, price, offer_id, source, xdr",
+        [
+            (
+                Asset(
+                    "USD", "GDGU5OAPHNPU5UCLE5RDJHG7PXZFQYWKCFOEXSXNMR6KRQRI5T6XXCD7"
+                ),
+                Asset(
+                    "XCN", "GCNY5OXYSY4FKHOPT2SPOQZAOEIGXB5LBYW3HVU3OWSTQITS65M5RCNY"
+                ),
+                "3.123456",
+                "8.141592",
+                1,
+                "GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV",
+                "AAAAAQAAAADX7fRsY6KTqIc8EIDyr8M9gxGPW6ODnZoZDgo6l1ymwwAAAAMAAAABVVNEAAAAAADNTrgPO19O0EsnYjSc333yWGLKEVxLyu1kfKjCKOz9ewAAAAFYQ04AAAAAAJuOuviWOFUdz56k90MgcRBrh6sOLbPWm3WlOCJy91nYAAAAAAHcmgAAD4djAAHoSAAAAAAAAAAB",
+            ),
+            (
+                Asset(
+                    "USD", "GDGU5OAPHNPU5UCLE5RDJHG7PXZFQYWKCFOEXSXNMR6KRQRI5T6XXCD7"
+                ),
+                Asset(
+                    "XCN", "GCNY5OXYSY4FKHOPT2SPOQZAOEIGXB5LBYW3HVU3OWSTQITS65M5RCNY"
+                ),
+                "8",
+                "238.141592",
+                0,
+                None,
+                "AAAAAAAAAAMAAAABVVNEAAAAAADNTrgPO19O0EsnYjSc333yWGLKEVxLyu1kfKjCKOz9ewAAAAFYQ04AAAAAAJuOuviWOFUdz56k90MgcRBrh6sOLbPWm3WlOCJy91nYAAAAAATEtAABxjgTAAHoSAAAAAAAAAAA",
+            ),
+            (
+                Asset("XLM"),
+                Asset(
+                    "XCN", "GCNY5OXYSY4FKHOPT2SPOQZAOEIGXB5LBYW3HVU3OWSTQITS65M5RCNY"
+                ),
+                "3.123456",
+                Price(11, 10),
+                1,
+                "GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV",
+                "AAAAAQAAAADX7fRsY6KTqIc8EIDyr8M9gxGPW6ODnZoZDgo6l1ymwwAAAAMAAAAAAAAAAVhDTgAAAAAAm466+JY4VR3PnqT3QyBxEGuHqw4ts9abdaU4InL3WdgAAAAAAdyaAAAAAAsAAAAKAAAAAAAAAAE=",
+            ),
+        ],
+    )
     def test_to_xdr(self, selling, buying, amount, price, offer_id, source, xdr):
         op = ManageSellOffer(selling, buying, amount, price, offer_id, source)
         xdr_obj = op.to_xdr_object()
@@ -467,19 +663,48 @@ class TestManageSellOffer:
 
 
 class TestManageBuyOffer:
-    @pytest.mark.parametrize('selling, buying, amount, price, offer_id, source, xdr', [
-        (Asset('USD', 'GDGU5OAPHNPU5UCLE5RDJHG7PXZFQYWKCFOEXSXNMR6KRQRI5T6XXCD7'),
-         Asset('XCN', 'GCNY5OXYSY4FKHOPT2SPOQZAOEIGXB5LBYW3HVU3OWSTQITS65M5RCNY'), '3.123456', '8.141592', 1,
-         'GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV',
-         'AAAAAQAAAADX7fRsY6KTqIc8EIDyr8M9gxGPW6ODnZoZDgo6l1ymwwAAAAwAAAABVVNEAAAAAADNTrgPO19O0EsnYjSc333yWGLKEVxLyu1kfKjCKOz9ewAAAAFYQ04AAAAAAJuOuviWOFUdz56k90MgcRBrh6sOLbPWm3WlOCJy91nYAAAAAAHcmgAAD4djAAHoSAAAAAAAAAAB'),
-        (Asset('USD', 'GDGU5OAPHNPU5UCLE5RDJHG7PXZFQYWKCFOEXSXNMR6KRQRI5T6XXCD7'),
-         Asset('XCN', 'GCNY5OXYSY4FKHOPT2SPOQZAOEIGXB5LBYW3HVU3OWSTQITS65M5RCNY'), '8', '238.141592', 0, None,
-         'AAAAAAAAAAwAAAABVVNEAAAAAADNTrgPO19O0EsnYjSc333yWGLKEVxLyu1kfKjCKOz9ewAAAAFYQ04AAAAAAJuOuviWOFUdz56k90MgcRBrh6sOLbPWm3WlOCJy91nYAAAAAATEtAABxjgTAAHoSAAAAAAAAAAA'),
-        (Asset('XLM'),
-         Asset('XCN', 'GCNY5OXYSY4FKHOPT2SPOQZAOEIGXB5LBYW3HVU3OWSTQITS65M5RCNY'), '3.123456', Price(11, 10), 1,
-         'GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV',
-         'AAAAAQAAAADX7fRsY6KTqIc8EIDyr8M9gxGPW6ODnZoZDgo6l1ymwwAAAAwAAAAAAAAAAVhDTgAAAAAAm466+JY4VR3PnqT3QyBxEGuHqw4ts9abdaU4InL3WdgAAAAAAdyaAAAAAAsAAAAKAAAAAAAAAAE='),
-    ])
+    @pytest.mark.parametrize(
+        "selling, buying, amount, price, offer_id, source, xdr",
+        [
+            (
+                Asset(
+                    "USD", "GDGU5OAPHNPU5UCLE5RDJHG7PXZFQYWKCFOEXSXNMR6KRQRI5T6XXCD7"
+                ),
+                Asset(
+                    "XCN", "GCNY5OXYSY4FKHOPT2SPOQZAOEIGXB5LBYW3HVU3OWSTQITS65M5RCNY"
+                ),
+                "3.123456",
+                "8.141592",
+                1,
+                "GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV",
+                "AAAAAQAAAADX7fRsY6KTqIc8EIDyr8M9gxGPW6ODnZoZDgo6l1ymwwAAAAwAAAABVVNEAAAAAADNTrgPO19O0EsnYjSc333yWGLKEVxLyu1kfKjCKOz9ewAAAAFYQ04AAAAAAJuOuviWOFUdz56k90MgcRBrh6sOLbPWm3WlOCJy91nYAAAAAAHcmgAAD4djAAHoSAAAAAAAAAAB",
+            ),
+            (
+                Asset(
+                    "USD", "GDGU5OAPHNPU5UCLE5RDJHG7PXZFQYWKCFOEXSXNMR6KRQRI5T6XXCD7"
+                ),
+                Asset(
+                    "XCN", "GCNY5OXYSY4FKHOPT2SPOQZAOEIGXB5LBYW3HVU3OWSTQITS65M5RCNY"
+                ),
+                "8",
+                "238.141592",
+                0,
+                None,
+                "AAAAAAAAAAwAAAABVVNEAAAAAADNTrgPO19O0EsnYjSc333yWGLKEVxLyu1kfKjCKOz9ewAAAAFYQ04AAAAAAJuOuviWOFUdz56k90MgcRBrh6sOLbPWm3WlOCJy91nYAAAAAATEtAABxjgTAAHoSAAAAAAAAAAA",
+            ),
+            (
+                Asset("XLM"),
+                Asset(
+                    "XCN", "GCNY5OXYSY4FKHOPT2SPOQZAOEIGXB5LBYW3HVU3OWSTQITS65M5RCNY"
+                ),
+                "3.123456",
+                Price(11, 10),
+                1,
+                "GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV",
+                "AAAAAQAAAADX7fRsY6KTqIc8EIDyr8M9gxGPW6ODnZoZDgo6l1ymwwAAAAwAAAAAAAAAAVhDTgAAAAAAm466+JY4VR3PnqT3QyBxEGuHqw4ts9abdaU4InL3WdgAAAAAAdyaAAAAAAsAAAAKAAAAAAAAAAE=",
+            ),
+        ],
+    )
     def test_to_xdr(self, selling, buying, amount, price, offer_id, source, xdr):
         op = ManageBuyOffer(selling, buying, amount, price, offer_id, source)
         xdr_obj = op.to_xdr_object()
@@ -497,20 +722,45 @@ class TestManageBuyOffer:
 
 
 class TestCreatePassiveSellOffer:
-
-    @pytest.mark.parametrize('selling, buying, amount, price, source, xdr', [
-        (Asset('USD', 'GDGU5OAPHNPU5UCLE5RDJHG7PXZFQYWKCFOEXSXNMR6KRQRI5T6XXCD7'),
-         Asset('XCN', 'GCNY5OXYSY4FKHOPT2SPOQZAOEIGXB5LBYW3HVU3OWSTQITS65M5RCNY'), '11.2782700', '3.07',
-         'GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV',
-         'AAAAAQAAAADX7fRsY6KTqIc8EIDyr8M9gxGPW6ODnZoZDgo6l1ymwwAAAAQAAAABVVNEAAAAAADNTrgPO19O0EsnYjSc333yWGLKEVxLyu1kfKjCKOz9ewAAAAFYQ04AAAAAAJuOuviWOFUdz56k90MgcRBrh6sOLbPWm3WlOCJy91nYAAAAAAa47WwAAAEzAAAAZA=='),
-        (Asset('USD', 'GDGU5OAPHNPU5UCLE5RDJHG7PXZFQYWKCFOEXSXNMR6KRQRI5T6XXCD7'),
-         Asset('XCN', 'GCNY5OXYSY4FKHOPT2SPOQZAOEIGXB5LBYW3HVU3OWSTQITS65M5RCNY'), '8.000', '238.141592', None,
-         'AAAAAAAAAAQAAAABVVNEAAAAAADNTrgPO19O0EsnYjSc333yWGLKEVxLyu1kfKjCKOz9ewAAAAFYQ04AAAAAAJuOuviWOFUdz56k90MgcRBrh6sOLbPWm3WlOCJy91nYAAAAAATEtAABxjgTAAHoSA=='),
-        (Asset('XLM'),
-         Asset('XCN', 'GCNY5OXYSY4FKHOPT2SPOQZAOEIGXB5LBYW3HVU3OWSTQITS65M5RCNY'), '11.2782700', Price(453, 4354),
-         'GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV',
-         'AAAAAQAAAADX7fRsY6KTqIc8EIDyr8M9gxGPW6ODnZoZDgo6l1ymwwAAAAQAAAAAAAAAAVhDTgAAAAAAm466+JY4VR3PnqT3QyBxEGuHqw4ts9abdaU4InL3WdgAAAAABrjtbAAAAcUAABEC'),
-    ])
+    @pytest.mark.parametrize(
+        "selling, buying, amount, price, source, xdr",
+        [
+            (
+                Asset(
+                    "USD", "GDGU5OAPHNPU5UCLE5RDJHG7PXZFQYWKCFOEXSXNMR6KRQRI5T6XXCD7"
+                ),
+                Asset(
+                    "XCN", "GCNY5OXYSY4FKHOPT2SPOQZAOEIGXB5LBYW3HVU3OWSTQITS65M5RCNY"
+                ),
+                "11.2782700",
+                "3.07",
+                "GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV",
+                "AAAAAQAAAADX7fRsY6KTqIc8EIDyr8M9gxGPW6ODnZoZDgo6l1ymwwAAAAQAAAABVVNEAAAAAADNTrgPO19O0EsnYjSc333yWGLKEVxLyu1kfKjCKOz9ewAAAAFYQ04AAAAAAJuOuviWOFUdz56k90MgcRBrh6sOLbPWm3WlOCJy91nYAAAAAAa47WwAAAEzAAAAZA==",
+            ),
+            (
+                Asset(
+                    "USD", "GDGU5OAPHNPU5UCLE5RDJHG7PXZFQYWKCFOEXSXNMR6KRQRI5T6XXCD7"
+                ),
+                Asset(
+                    "XCN", "GCNY5OXYSY4FKHOPT2SPOQZAOEIGXB5LBYW3HVU3OWSTQITS65M5RCNY"
+                ),
+                "8.000",
+                "238.141592",
+                None,
+                "AAAAAAAAAAQAAAABVVNEAAAAAADNTrgPO19O0EsnYjSc333yWGLKEVxLyu1kfKjCKOz9ewAAAAFYQ04AAAAAAJuOuviWOFUdz56k90MgcRBrh6sOLbPWm3WlOCJy91nYAAAAAATEtAABxjgTAAHoSA==",
+            ),
+            (
+                Asset("XLM"),
+                Asset(
+                    "XCN", "GCNY5OXYSY4FKHOPT2SPOQZAOEIGXB5LBYW3HVU3OWSTQITS65M5RCNY"
+                ),
+                "11.2782700",
+                Price(453, 4354),
+                "GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV",
+                "AAAAAQAAAADX7fRsY6KTqIc8EIDyr8M9gxGPW6ODnZoZDgo6l1ymwwAAAAQAAAAAAAAAAVhDTgAAAAAAm466+JY4VR3PnqT3QyBxEGuHqw4ts9abdaU4InL3WdgAAAAABrjtbAAAAcUAABEC",
+            ),
+        ],
+    )
     def test_to_xdr(self, selling, buying, amount, price, source, xdr):
         op = CreatePassiveSellOffer(selling, buying, amount, price, source)
         xdr_obj = op.to_xdr_object()

@@ -22,16 +22,16 @@ class Network:
         """
         return sha256(self.network_passphrase.encode())
 
-    def __eq__(self, other: 'Network') -> bool:
+    def __eq__(self, other: "Network") -> bool:
         if not isinstance(other, Network):
             return False
         return self.network_passphrase == other.network_passphrase
 
 
-PUBLIC_NETWORK_PASSPHRASE: str = 'Public Global Stellar Network ; September 2015'
+PUBLIC_NETWORK_PASSPHRASE: str = "Public Global Stellar Network ; September 2015"
 """Get the Public network passphrase."""
 
-TESTNET_NETWORK_PASSPHRASE: str = 'Test SDF Network ; September 2015'
+TESTNET_NETWORK_PASSPHRASE: str = "Test SDF Network ; September 2015"
 """Get the Test network passphrase."""
 
 PUBLIC: Network = Network(PUBLIC_NETWORK_PASSPHRASE)
