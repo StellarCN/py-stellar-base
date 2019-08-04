@@ -37,7 +37,6 @@ extensions = [
     'sphinx.ext.coverage',
     'sphinx.ext.intersphinx',
     'sphinx.ext.viewcode',
-    'sphinx.ext.autodoc',
     'sphinx_autodoc_typehints'
 ]
 
@@ -129,7 +128,7 @@ html_sidebars = {
 # -- Options for HTMLHelp output ------------------------------------------
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'py-stellar-sdkdoc'
+htmlhelp_basename = 'py-stellar-sdk-doc'
 
 # -- Options for LaTeX output ---------------------------------------------
 

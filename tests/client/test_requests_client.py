@@ -30,6 +30,7 @@ class TestRequestsClient:
         assert json["headers"]["Content-Type"] == "application/x-www-form-urlencoded"
         assert json["form"] == data
 
+    @pytest.mark.slow
     @pytest.mark.timeout(30)
     def test_stream(self):
         client = RequestsClient()
