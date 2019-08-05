@@ -26,7 +26,7 @@ class TradesCallBuilder(BaseCallBuilder):
         return self
 
     def for_offer(self, offer_id: Union[int, str]) -> "TradesCallBuilder":
-        self._add_query_param("offer_id", offer_id)
+        self.endpoint = "offers/{offer_id}/trades".format(offer_id=offer_id)
         return self
 
     def for_account(self, account_id: str) -> "TradesCallBuilder":

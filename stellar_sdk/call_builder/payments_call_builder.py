@@ -25,3 +25,7 @@ class PaymentsCallBuilder(BaseCallBuilder):
             transaction_hash=transaction_hash
         )
         return self
+
+    def include_failed(self, include_failed: bool) -> "PaymentsCallBuilder":
+        self._add_query_param("include_failed", include_failed)
+        return self

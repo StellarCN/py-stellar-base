@@ -5,6 +5,7 @@ from ..asset import Asset
 from ..call_builder.base_call_builder import BaseCallBuilder
 from ..client.base_async_client import BaseAsyncClient
 from ..client.base_sync_client import BaseSyncClient
+from ..exceptions import ValueError
 
 
 class TradeAggregationsCallBuilder(BaseCallBuilder):
@@ -14,18 +15,19 @@ class TradeAggregationsCallBuilder(BaseCallBuilder):
         client: Union[BaseAsyncClient, BaseSyncClient],
         base: Asset,
         counter: Asset,
+        resolution: int,
         start_time: int = None,
         end_time: int = None,
-        resolution: int = None,
         offset: int = None,
     ) -> None:
         super().__init__(horizon_url, client)
-        self.url = urljoin(horizon_url, "trade_aggregations")
-        if not self.__is_valid_offset(offset, resolution):
-            raise ValueError("Invalid offset: ", offset)
+        self.endpoint = "trade_aggregations"
 
         if not self.__is_valid_resolution(resolution):
-            raise ValueError("Invalid resolution: ", resolution)
+            raise ValueError("Invalid resolution: {}".format(resolution))
+
+        if offset and not self.__is_valid_offset(offset, resolution):
+            raise ValueError("Invalid offset: {}".format(offset))
 
         params = {
             "base_asset_type": base.type,

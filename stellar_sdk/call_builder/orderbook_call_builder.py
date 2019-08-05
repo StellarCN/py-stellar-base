@@ -15,6 +15,7 @@ class OrderbookCallBuilder(BaseCallBuilder):
         buying: Asset,
     ) -> None:
         super().__init__(horizon_url, client)
+        self.endpoint = "order_book"
         params = {
             "selling_asset_type": selling.type,
             "selling_asset_code": None if selling.is_native() else selling.code,

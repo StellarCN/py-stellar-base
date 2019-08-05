@@ -64,5 +64,5 @@ class BaseCallBuilder:
             self.params[key] = value
 
     def _add_query_params(self, params: dict):
-        for k, v in params:
+        for k, v in params.items():
             self._add_query_param(k, v)
