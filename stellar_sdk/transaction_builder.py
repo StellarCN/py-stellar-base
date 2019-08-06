@@ -1,5 +1,5 @@
 import time
-from typing import List, Union
+from typing import List, Union, Optional
 
 from .account import Account
 from .asset import Asset
@@ -221,7 +221,7 @@ class TransactionBuilder:
         destination: str,
         amount: str,
         asset_code: str = "XLM",
-        asset_issuer: str = None,
+        asset_issuer: Optional[str] = None,
         source: str = None,
     ) -> "TransactionBuilder":
         """Append a :class:`Payment <stellar_sdk.operation.Payment>` operation
@@ -243,10 +243,10 @@ class TransactionBuilder:
         self,
         destination: str,
         send_code: str,
-        send_issuer: str,
+        send_issuer: Optional[str],
         send_max: str,
         dest_code: str,
-        dest_issuer: str,
+        dest_issuer: Optional[str],
         dest_amount: str,
         path: List[Asset],
         source=None,
@@ -430,9 +430,9 @@ class TransactionBuilder:
     def append_manage_buy_offer_op(
         self,
         selling_code: str,
-        selling_issuer: str,
+        selling_issuer: Optional[str],
         buying_code: str,
-        buying_issuer: str,
+        buying_issuer: Optional[str],
         amount: str,
         price: Union[str, Price],
         offer_id: int = 0,
@@ -474,9 +474,9 @@ class TransactionBuilder:
     def append_manage_sell_offer_op(
         self,
         selling_code: str,
-        selling_issuer: str,
+        selling_issuer: Optional[str],
         buying_code: str,
-        buying_issuer: str,
+        buying_issuer: Optional[str],
         amount: str,
         price: Union[str, Price],
         offer_id: int = 0,
@@ -518,9 +518,9 @@ class TransactionBuilder:
     def append_create_passive_sell_offer_op(
         self,
         selling_code: str,
-        selling_issuer: str,
+        selling_issuer: Optional[str],
         buying_code: str,
-        buying_issuer: str,
+        buying_issuer: Optional[str],
         amount: str,
         price: Union[str, Price],
         source: str = None,
@@ -613,5 +613,4 @@ class TransactionBuilder:
 
         """
         op = BumpSequence(bump_to, source)
-        self.append_operation(op)
-        return self
+        return self.append_operation(op)
