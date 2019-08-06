@@ -26,22 +26,29 @@ class BaseCallBuilder:
         else:
             return self.__call_sync()
 
-    async def __call_async(self) -> Response:
-        url = urljoin(self.horizon_url, self.endpoint)
-        return await self.client.get(url, self.params)
-
-    async def stream_async(self):
-        url = urljoin(self.horizon_url, self.endpoint)
-        stream = self.client.stream(url)
-        while True:
-            yield await stream.__anext__()
-
     def __call_sync(self) -> Response:
         url = urljoin(self.horizon_url, self.endpoint)
         return self.client.get(url, self.params)
 
-    def stream_sync(self):
-        pass
+    async def __call_async(self) -> Response:
+        url = urljoin(self.horizon_url, self.endpoint)
+        return await self.client.get(url, self.params)
+
+    def stream(self):
+        if self.__async:
+            return self.__stream_async()
+        else:
+            return self.__stream_sync()
+
+    async def __stream_async(self):
+        url = urljoin(self.horizon_url, self.endpoint)
+        stream = self.client.stream(url, self.params)
+        while True:
+            yield await stream.__anext__()
+
+    def __stream_sync(self):
+        url = urljoin(self.horizon_url, self.endpoint)
+        return self.client.stream(url, self.params)
 
     def cursor(self, cursor):
         self._add_query_param("cursor", cursor)
@@ -51,7 +58,10 @@ class BaseCallBuilder:
         self._add_query_param("limit", limit)
         return self
 
-    def order(self, order):
+    def order(self, desc=True):
+        order = "asc"
+        if desc:
+            order = "desc"
         self._add_query_param("order", order)
         return self
 

@@ -17,7 +17,14 @@ class Response:
         return json.loads(self.text)
 
     def __eq__(self, other: "Response"):
-        return self.status_code == other.status_code and self.text == other.text
+        if not isinstance(other, self.__class__):
+            return False
+        return (
+            self.status_code == other.status_code
+            and self.text == other.text
+            and self.headers == other.headers
+            and self.url == other.url
+        )
 
     def __str__(self):
         return "<Response [%s]>" % self.status_code

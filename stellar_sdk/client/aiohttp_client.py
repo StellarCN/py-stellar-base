@@ -134,7 +134,7 @@ class AiohttpClient(BaseAsyncClient):
                                         yield json.loads(data)
                                 except json.JSONDecodeError:
                                     # Content was not json-decodable
-                                    pass  # pragma: no cover
+                                    pass
                 except aiohttp.ClientPayloadError:
                     # Retry if the connection dropped after we got the initial response
                     await asyncio.sleep(retry)

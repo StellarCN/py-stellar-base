@@ -42,7 +42,7 @@ class Operation(metaclass=ABCMeta):
 
     @classmethod
     def _type_code(cls) -> int:
-        pass  # pragma: no cover
+        pass
 
     @staticmethod
     def to_xdr_amount(value: str) -> int:
@@ -124,7 +124,7 @@ class Operation(metaclass=ABCMeta):
 
     @abstractmethod
     def _to_operation_body(self) -> Xdr.nullclass:
-        pass  # pragma: no cover
+        pass
 
     def to_xdr_object(self) -> Xdr.types.Operation:
         """Creates an XDR Operation object that represents this
