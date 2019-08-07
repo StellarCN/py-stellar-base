@@ -26,7 +26,5 @@ plugins:
 
 exclude_patterns:
   - "docs/"
-  - "stellar_base/xdr/"
-  - "stellar_base/wordlist/"
-  - "stellar_base/stellarxdr/"
+  - "stellar_sdk/xdr/"
 

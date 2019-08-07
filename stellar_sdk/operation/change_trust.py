@@ -1,7 +1,7 @@
 from .operation import Operation
 
 from ..asset import Asset
-from ..stellarxdr import Xdr
+from ..xdr import Xdr
 
 
 class ChangeTrust(Operation):

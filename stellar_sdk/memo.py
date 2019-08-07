@@ -2,7 +2,7 @@ import abc
 import typing
 
 from .exceptions import MemoInvalidException
-from .stellarxdr import Xdr
+from .xdr import Xdr
 
 
 class Memo(object, metaclass=abc.ABCMeta):

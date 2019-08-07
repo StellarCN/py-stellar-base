@@ -5,7 +5,7 @@ import nacl.signing as ed25519
 from nacl.exceptions import BadSignatureError as NaclBadSignatureError
 
 from .exceptions import BadSignatureError, MissingEd25519SecretSeedError
-from .stellarxdr import Xdr
+from .xdr import Xdr
 from .strkey import StrKey
 
 

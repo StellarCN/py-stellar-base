@@ -1,7 +1,7 @@
 from .operation import Operation
 from ..keypair import Keypair
 from ..signer import Signer
-from ..stellarxdr import Xdr
+from ..xdr import Xdr
 from ..strkey import StrKey
 from ..utils import pack_xdr_array, unpack_xdr_array
 
