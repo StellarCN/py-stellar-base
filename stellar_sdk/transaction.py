@@ -4,7 +4,7 @@ from .exceptions import ValueError
 from .keypair import Keypair
 from .memo import NoneMemo, Memo
 from .operation.operation import Operation
-from .stellarxdr import Xdr
+from .xdr import Xdr
 from .strkey import StrKey
 from .time_bounds import TimeBounds
 from .utils import pack_xdr_array, unpack_xdr_array

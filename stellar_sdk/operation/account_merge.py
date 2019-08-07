@@ -1,6 +1,6 @@
 from .operation import Operation
 from ..keypair import Keypair
-from ..stellarxdr import Xdr
+from ..xdr import Xdr
 from ..strkey import StrKey
 
 

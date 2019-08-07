@@ -1,4 +1,4 @@
-from .stellarxdr import Xdr
+from .xdr import Xdr
 from .strkey import StrKey
 
 

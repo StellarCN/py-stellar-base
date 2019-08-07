@@ -3,7 +3,7 @@ import typing
 from .exceptions import SignatureExistError
 from .keypair import Keypair
 from .network import Network
-from .stellarxdr import Xdr
+from .xdr import Xdr
 from .transaction import Transaction
 from .utils import sha256
 

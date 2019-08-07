@@ -3,7 +3,7 @@ import typing
 from .operation import Operation
 from ..asset import Asset
 from ..price import Price
-from ..stellarxdr import Xdr
+from ..xdr import Xdr
 
 
 class CreatePassiveSellOffer(Operation):

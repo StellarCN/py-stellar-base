@@ -1,6 +1,6 @@
 import pytest
 
-from stellar_sdk import stellarxdr
+from stellar_sdk.xdr import Xdr
 from stellar_sdk.asset import Asset
 from stellar_sdk.exceptions import AssetIssuerInvalidError, AssetCodeInvalidError
 from stellar_sdk.keypair import Keypair
@@ -104,8 +104,8 @@ class TestAsset:
         assert asset.to_xdr_object().to_xdr() == xdr
 
     def test_from_xdr_object_native(self):
-        xdr_type = stellarxdr.Xdr.const.ASSET_TYPE_NATIVE
-        xdr = stellarxdr.Xdr.types.Asset(type=xdr_type)
+        xdr_type = Xdr.const.ASSET_TYPE_NATIVE
+        xdr = Xdr.types.Asset(type=xdr_type)
 
         asset = Asset.from_xdr_object(xdr)
         assert asset.is_native()
@@ -115,11 +115,11 @@ class TestAsset:
         issuer = "GCNY5OXYSY4FKHOPT2SPOQZAOEIGXB5LBYW3HVU3OWSTQITS65M5RCNY"
         type = "credit_alphanum4"
 
-        x = stellarxdr.Xdr.nullclass()
+        x = Xdr.nullclass()
         x.assetCode = bytearray(code, "ascii") + b"\x00"
         x.issuer = Keypair.from_public_key(issuer).xdr_account_id()
-        xdr_type = stellarxdr.Xdr.const.ASSET_TYPE_CREDIT_ALPHANUM4
-        xdr = stellarxdr.Xdr.types.Asset(type=xdr_type, alphaNum4=x)
+        xdr_type = Xdr.const.ASSET_TYPE_CREDIT_ALPHANUM4
+        xdr = Xdr.types.Asset(type=xdr_type, alphaNum4=x)
 
         asset = Asset.from_xdr_object(xdr)
         assert asset.code == code
@@ -131,11 +131,11 @@ class TestAsset:
         issuer = "GCNY5OXYSY4FKHOPT2SPOQZAOEIGXB5LBYW3HVU3OWSTQITS65M5RCNY"
         type = "credit_alphanum12"
 
-        x = stellarxdr.Xdr.nullclass()
+        x = Xdr.nullclass()
         x.assetCode = bytearray(code, "ascii") + b"\x00" * 6
         x.issuer = Keypair.from_public_key(issuer).xdr_account_id()
-        xdr_type = stellarxdr.Xdr.const.ASSET_TYPE_CREDIT_ALPHANUM12
-        xdr = stellarxdr.Xdr.types.Asset(type=xdr_type, alphaNum12=x)
+        xdr_type = Xdr.const.ASSET_TYPE_CREDIT_ALPHANUM12
+        xdr = Xdr.types.Asset(type=xdr_type, alphaNum12=x)
 
         asset = Asset.from_xdr_object(xdr)
         assert asset.code == code

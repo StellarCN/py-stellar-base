@@ -4,7 +4,7 @@ from abc import ABCMeta, abstractmethod
 from decimal import Decimal, Context, Inexact
 
 from ..keypair import Keypair
-from ..stellarxdr import Xdr
+from ..xdr import Xdr
 from ..strkey import StrKey
 
 
