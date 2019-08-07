@@ -22,6 +22,87 @@ Asset
    :members:
    :inherited-members:
 
+Call Builder
+^^^^^^^^^^^^
+
+BaseCallBuilder
+-------------------
+.. autoclass:: stellar_sdk.call_builder.BaseCallBuilder
+   :members:
+   :inherited-members:
+
+AccountsCallBuilder
+-------------------
+.. autoclass:: stellar_sdk.call_builder.AccountsCallBuilder
+   :members:
+   :inherited-members:
+
+AssetsCallBuilder
+-----------------
+.. autoclass:: stellar_sdk.call_builder.AssetsCallBuilder
+   :members:
+   :inherited-members:
+
+EffectsCallBuilder
+------------------
+.. autoclass:: stellar_sdk.call_builder.EffectsCallBuilder
+   :members:
+   :inherited-members:
+
+LedgersCallBuilder
+------------------
+.. autoclass:: stellar_sdk.call_builder.LedgersCallBuilder
+   :members:
+   :inherited-members:
+
+OffersCallBuilder
+---------------------
+.. autoclass:: stellar_sdk.call_builder.OffersCallBuilder
+   :members:
+   :inherited-members:
+
+OperationsCallBuilder
+---------------------
+.. autoclass:: stellar_sdk.call_builder.OperationsCallBuilder
+   :members:
+   :inherited-members:
+
+OrderbookCallBuilder
+--------------------
+.. autoclass:: stellar_sdk.call_builder.OrderbookCallBuilder
+   :members:
+   :inherited-members:
+
+PathsCallBuilder
+----------------
+.. autoclass:: stellar_sdk.call_builder.PathsCallBuilder
+   :members:
+   :inherited-members:
+
+PaymentsCallBuilder
+-------------------
+.. autoclass:: stellar_sdk.call_builder.PaymentsCallBuilder
+   :members:
+   :inherited-members:
+
+TradeAggregationsCallBuilder
+----------------------------
+.. autoclass:: stellar_sdk.call_builder.TradeAggregationsCallBuilder
+   :members:
+   :inherited-members:
+
+TradesCallBuilder
+-----------------
+.. autoclass:: stellar_sdk.call_builder.TradesCallBuilder
+   :members:
+   :inherited-members:
+
+TransactionsCallBuilder
+-----------------------
+.. autoclass:: stellar_sdk.call_builder.TransactionsCallBuilder
+   :members:
+   :inherited-members:
+
 Keypair
 ^^^^^^^
 
@@ -151,8 +232,15 @@ Price
    :members:
    :inherited-members:
 
+Server
+^^^^^^
+
+.. autoclass:: stellar_sdk.server.Server
+   :members:
+   :inherited-members:
+
 Signer
-^^^^^^^^^^
+^^^^^^
 
 .. autoclass:: stellar_sdk.signer.Signer
    :members:

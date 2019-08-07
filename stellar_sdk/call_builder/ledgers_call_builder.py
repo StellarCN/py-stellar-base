@@ -6,6 +6,15 @@ from ..client.base_sync_client import BaseSyncClient
 
 
 class LedgersCallBuilder(BaseCallBuilder):
+    """ Creates a new :class:`LedgersCallBuilder` pointed to server defined by horizon_url.
+    Do not create this object directly, use :func:`stellar_sdk.server.Server.ledgers`.
+
+    See `All Ledgers <https://www.stellar.org/developers/horizon/reference/endpoints/ledgers-all.html>`_
+
+    :param horizon_url: Horizon server URL.
+    :param client: The client instance used to send request.
+    """
+
     def __init__(
         self, horizon_url: str, client: Union[BaseAsyncClient, BaseSyncClient]
     ) -> None:
@@ -13,5 +22,12 @@ class LedgersCallBuilder(BaseCallBuilder):
         self.endpoint = "ledgers"
 
     def ledger(self, sequence: Union[int, str]) -> "LedgersCallBuilder":
+        """Provides information on a single ledger.
+
+        See `Ledger Details <https://www.stellar.org/developers/horizon/reference/endpoints/ledgers-single.html>`_
+
+        :param sequence: Ledger sequence
+        :return: current LedgerCallBuilder instance
+        """
         self.endpoint = "ledgers/{sequence}".format(sequence=sequence)
         return self

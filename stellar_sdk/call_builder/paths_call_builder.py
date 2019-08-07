@@ -7,6 +7,23 @@ from ..client.base_sync_client import BaseSyncClient
 
 
 class PathsCallBuilder(BaseCallBuilder):
+    """ Creates a new :class:`PathsCallBuilder` pointed to server defined by horizon_url.
+    Do not create this object directly, use :func:`stellar_sdk.server.Server.paths`.
+
+    The Stellar Network allows payments to be made across assets through path payments. A path payment specifies a
+    series of assets to route a payment through, from source asset (the asset debited from the payer) to destination
+    asset (the asset credited to the payee).
+
+    See `Find Payment Paths <https://www.stellar.org/developers/horizon/reference/endpoints/path-finding.html>`_
+    
+    :param horizon_url: Horizon server URL.
+    :param client: The client instance used to send request.
+    :param source_account: The sender's account ID. Any returned path must use a source that the sender can hold.
+    :param destination_account: The destination account ID that any returned path should use.
+    :param destination_asset: The destination asset.
+    :param destination_amount: The amount, denominated in the destination asset, that any returned path should be able to satisfy.
+    """
+
     def __init__(
         self,
         horizon_url: str,
