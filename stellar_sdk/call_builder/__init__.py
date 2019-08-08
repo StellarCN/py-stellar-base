@@ -27,3 +27,4 @@ __all__ = [
     "TradesCallBuilder",
     "TransactionsCallBuilder",
 ]
+# TODO: fee stats builder

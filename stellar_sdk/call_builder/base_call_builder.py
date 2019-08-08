@@ -117,3 +117,13 @@ class BaseCallBuilder:
     def _add_query_params(self, params: dict):
         for k, v in params.items():
             self._add_query_param(k, v)
+
+    def __eq__(self, other: "BaseCallBuilder"):
+        if not isinstance(other, self.__class__):
+            return False
+        return (
+            self.client == other.client
+            and self.params == other.params
+            and self.endpoint == other.endpoint
+            and self.horizon_url == other.horizon_url
+        )
