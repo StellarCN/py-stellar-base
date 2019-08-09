@@ -6,6 +6,7 @@ from .asset import Asset
 from .call_builder.accounts_call_builder import AccountsCallBuilder
 from .call_builder.assets_call_builder import AssetsCallBuilder
 from .call_builder.effects_call_builder import EffectsCallBuilder
+from .call_builder.fee_stats_call_builder import FeeStatsCallBuilder
 from .call_builder.ledgers_call_builder import LedgersCallBuilder
 from .call_builder.offers_call_builder import OffersCallBuilder
 from .call_builder.operations_call_builder import OperationsCallBuilder
@@ -71,6 +72,9 @@ class Server:
 
     def effects(self) -> EffectsCallBuilder:
         return EffectsCallBuilder(horizon_url=self.horizon_url, client=self.client)
+
+    def fee_stats(self) -> FeeStatsCallBuilder:
+        return FeeStatsCallBuilder(horizon_url=self.horizon_url, client=self.client)
 
     def ledgers(self) -> LedgersCallBuilder:
         return LedgersCallBuilder(horizon_url=self.horizon_url, client=self.client)

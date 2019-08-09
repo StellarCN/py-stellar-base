@@ -1,5 +1,6 @@
 import pytest
 
+from stellar_sdk.call_builder import FeeStatsCallBuilder
 from stellar_sdk.exceptions import ValueError
 from stellar_sdk import Asset, TransactionBuilder
 from stellar_sdk.client.aiohttp_client import AiohttpClient
@@ -49,6 +50,7 @@ class TestServer:
             assert server.accounts() == AccountsCallBuilder(horizon_url, client)
             assert server.assets() == AssetsCallBuilder(horizon_url, client)
             assert server.effects() == EffectsCallBuilder(horizon_url, client)
+            assert server.fee_stats() == FeeStatsCallBuilder(horizon_url, client)
             assert server.ledgers() == LedgersCallBuilder(horizon_url, client)
             assert server.offers(
                 "GDV6FVHPY4JH7EEBSJYPQQYZA3OC6TKTM2TAXRHWT4EEL7BJ2BTDQT5D"
