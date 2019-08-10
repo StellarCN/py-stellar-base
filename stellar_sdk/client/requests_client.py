@@ -2,11 +2,13 @@ import json
 from typing import Generator
 
 import requests
-from requests import Session
+from requests import Session, RequestException
 from requests.adapters import HTTPAdapter, DEFAULT_POOLSIZE
 from sseclient import SSEClient
+from urllib3.exceptions import NewConnectionError
 from urllib3.util import Retry
 
+from stellar_sdk.exceptions import ConnectionError
 from ..__version__ import __version__
 from ..client.base_sync_client import BaseSyncClient
 from ..client.response import Response
@@ -90,7 +92,10 @@ class RequestsClient(BaseSyncClient):
             self._stream_session = sse_session
 
     def get(self, url, params=None) -> Response:
-        resp = self._session.get(url, params=params, timeout=self.request_timeout)
+        try:
+            resp = self._session.get(url, params=params, timeout=self.request_timeout)
+        except (RequestException, NewConnectionError) as err:
+            raise ConnectionError(err)
         return Response(
             status_code=resp.status_code,
             text=resp.text,
@@ -99,7 +104,10 @@ class RequestsClient(BaseSyncClient):
         )
 
     def post(self, url, data=None) -> Response:
-        resp = self._session.post(url, data=data, timeout=self.request_timeout)
+        try:
+            resp = self._session.post(url, data=data, timeout=self.request_timeout)
+        except (RequestException, NewConnectionError) as err:
+            raise ConnectionError(err)
         return Response(
             status_code=resp.status_code,
             text=resp.text,

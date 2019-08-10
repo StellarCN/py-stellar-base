@@ -43,6 +43,7 @@ class Transaction:
           represented as one of the subclasses of the
           :class:`Memo <stellar_sdk.memo.Memo>` object.
     """
+
     def __init__(
         self,
         source: Keypair,
@@ -84,7 +85,7 @@ class Transaction:
         )
 
     @classmethod
-    def from_xdr_object(cls, tx_xdr_object) -> 'Transaction':
+    def from_xdr_object(cls, tx_xdr_object) -> "Transaction":
         """Create a new :class:`Transaction` from an XDR object.
 
         :param tx_xdr_object: The XDR object that represents a transaction.

@@ -66,3 +66,76 @@ class SignatureExistError(ValueError):
     """A keypair can only sign a transaction once.
 
     """
+
+
+class BaseRequestError(SdkError):
+    """Base class for requests errors.
+    """
+
+
+class ConnectionError(BaseRequestError):
+    """Base class for client connection errors.
+
+    """
+
+
+class BaseHorizonError(BaseRequestError):
+    """Base class for horizon request errors.
+
+    """
+
+    def __init__(self, response):
+        super().__init__(response)
+        message = response.json()
+        self.type = message.get("type")
+        self.title = message.get("title")
+        self.status = message.get("status")
+        self.detail = message.get("detail")
+        self.extras = message.get("extras")
+
+    def __str__(self):
+        return """\n\ttype: {type}
+        title: {title}
+        status: {status}
+        detail: {detail}
+        extras: {extras}
+        """.format(
+            type=self.type,
+            title=self.title,
+            status=self.status,
+            detail=self.detail,
+            extras=self.extras,
+        )
+
+
+class NotFoundError(BaseHorizonError):
+    """This exception is thrown when the requested resource does not exist.
+
+    """
+
+    def __init__(self, response):
+        super().__init__(response)
+
+
+class BadRequestError(BaseHorizonError):
+    """The request from the client has an error.
+
+    """
+
+    def __init__(self, response):
+        super().__init__(response)
+
+
+class BadResponseError(BaseHorizonError):
+    """The response from the server has an error.
+
+    """
+
+    def __init__(self, response):
+        super().__init__(response)
+
+
+class UnknownRequestError(BaseHorizonError):
+    """Unknown request exception, please create an issue feedback for this issue.
+
+    """

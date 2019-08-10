@@ -184,6 +184,42 @@ SignatureExistError
 .. autoclass:: stellar_sdk.exceptions.SignatureExistError
    :members:
 
+BaseRequestError
+----------------
+
+.. autoclass:: stellar_sdk.exceptions.BaseRequestError
+   :members:
+
+ConnectionError
+---------------
+
+.. autoclass:: stellar_sdk.exceptions.ConnectionError
+   :members:
+
+BaseHorizonError
+----------------
+
+.. autoclass:: stellar_sdk.exceptions.BaseHorizonError
+   :members:
+
+NotFoundError
+-------------
+
+.. autoclass:: stellar_sdk.exceptions.NotFoundError
+   :members:
+
+BadRequestError
+---------------
+
+.. autoclass:: stellar_sdk.exceptions.BadRequestError
+   :members:
+
+BadResponseError
+----------------
+
+.. autoclass:: stellar_sdk.exceptions.BadResponseError
+   :members:
+
 Keypair
 ^^^^^^^
 

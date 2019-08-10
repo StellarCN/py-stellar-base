@@ -59,22 +59,28 @@ class AiohttpClient(BaseAsyncClient):
         self._sse_session = None
 
     async def get(self, url: str, params=None) -> Response:
-        async with self._session.get(url, params=params) as response:
-            return Response(
-                status_code=response.status,
-                text=await response.text(),
-                headers=dict(response.headers),
-                url=str(response.url),
-            )
+        try:
+            async with self._session.get(url, params=params) as response:
+                return Response(
+                    status_code=response.status,
+                    text=await response.text(),
+                    headers=dict(response.headers),
+                    url=str(response.url),
+                )
+        except aiohttp.ClientConnectionError as e:  # TODO: need more research
+            raise ConnectionError(e)
 
     async def post(self, url: str, data=None) -> Response:
-        async with self._session.post(url, data=data) as response:
-            return Response(
-                status_code=response.status,
-                text=await response.text(),
-                headers=dict(response.headers),
-                url=str(response.url),
-            )
+        try:
+            async with self._session.post(url, data=data) as response:
+                return Response(
+                    status_code=response.status,
+                    text=await response.text(),
+                    headers=dict(response.headers),
+                    url=str(response.url),
+                )
+        except aiohttp.ClientConnectionError as e:
+            raise ConnectionError(e)
 
     async def _init_sse_session(self) -> None:
         """Init the sse session """
