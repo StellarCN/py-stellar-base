@@ -1,10 +1,18 @@
 import base64
 import binascii
 import struct
+from typing import Union
 
 from crc16 import crc16xmodem
 
-from .exceptions import Ed25519SecretSeedInvalidError, Ed25519PublicKeyInvalidError
+from .exceptions import (
+    Ed25519SecretSeedInvalidError,
+    Ed25519PublicKeyInvalidError,
+    ValueError,
+    TypeError,
+)
+
+__all__ = ["StrKey"]
 
 _version_bytes = {
     "ed25519_public_key": binascii.a2b_hex("30"),  # G 48 6 << 3
@@ -15,12 +23,31 @@ _version_bytes = {
 
 
 class StrKey:
+    """StrKey is a helper class that allows encoding and decoding strkey.
+
+    """
+
     @staticmethod
     def encode_ed25519_public_key(data: bytes) -> str:
+        """Encodes data to strkey ed25519 public key.
+
+        :param data: data to encode
+        :return: strkey ed25519 public key
+        :raises:
+            :exc:`ValueError <stellar_sdk.exceptions.ValueError>`
+            :exc:`TypeError <stellar_sdk.exceptions.TypeError>`
+        """
         return encode_check("ed25519_public_key", data)
 
     @staticmethod
     def decode_ed25519_public_key(data: str) -> bytes:
+        """Decodes strkey ed25519 public key to raw data.
+
+        :param data: strkey ed25519 public key
+        :return: raw bytes
+        :raises:
+            :exc:`Ed25519PublicKeyInvalidError <stellar_sdk.exceptions.Ed25519PublicKeyInvalidError>`
+        """
         try:
             return decode_check("ed25519_public_key", data)
         except Exception:
@@ -29,15 +56,35 @@ class StrKey:
             )
 
     @staticmethod
-    def is_valid_ed25519_public_key(public_key: str):
+    def is_valid_ed25519_public_key(public_key: str) -> bool:
+        """Returns True if the given Stellar public key is a valid ed25519 public key.
+
+        :param public_key: strkey ed25519 public key to check
+        :return: `True` if the given Stellar public key is a valid ed25519 public key.
+        """
         return is_valid("ed25519_public_key", public_key)
 
     @staticmethod
     def encode_ed25519_secret_seed(data: bytes) -> str:
+        """Encodes data to strkey ed25519 seed.
+
+        :param data: data to encode
+        :return: strkey ed25519 seed
+        :raises:
+            :exc:`ValueError <stellar_sdk.exceptions.ValueError>`
+            :exc:`TypeError <stellar_sdk.exceptions.TypeError>`
+        """
         return encode_check("ed25519_secret_seed", data)
 
     @staticmethod
     def decode_ed25519_secret_seed(data: str) -> bytes:
+        """Decodes strkey ed25519 seed to raw data.
+
+        :param data: strkey ed25519 seed
+        :return: raw bytes
+        :raises:
+            :exc:`Ed25519SecretSeedInvalidError <stellar_sdk.exceptions.Ed25519SecretSeedInvalidError>`
+        """
         try:
             return decode_check("ed25519_secret_seed", data)
         except Exception:
@@ -47,22 +94,62 @@ class StrKey:
 
     @staticmethod
     def is_valid_ed25519_secret_seed(seed: str):
+        """Returns True if the given Stellar secret key is a valid ed25519 secret seed.
+
+        :param seed: strkey ed25519 secret seed
+        :return: `True` if the given Stellar secret key is a valid ed25519 secret seed.
+        :raises:
+            :exc:`ValueError <stellar_sdk.exceptions.ValueError>`
+            :exc:`TypeError <stellar_sdk.exceptions.TypeError>`
+        """
         return is_valid("ed25519_secret_seed", seed)
 
     @staticmethod
     def encode_pre_auth_tx(data: bytes) -> str:
+        """Encodes data to strkey preAuthTx.
+
+        :param data: data to encode
+        :return: strkey preAuthTx
+        :raises:
+            :exc:`ValueError <stellar_sdk.exceptions.ValueError>`
+            :exc:`TypeError <stellar_sdk.exceptions.TypeError>`
+        """
         return encode_check("pre_auth_tx", data)
 
     @staticmethod
     def decode_pre_auth_tx(data: str) -> bytes:
+        """Decodes strkey PreAuthTx to raw data.
+
+        :param data: strkey preAuthTx
+        :return: raw bytes
+        :raises:
+            :exc:`ValueError <stellar_sdk.exceptions.ValueError>`
+            :exc:`TypeError <stellar_sdk.exceptions.TypeError>`
+        """
         return decode_check("pre_auth_tx", data)
 
     @staticmethod
     def encode_sha256_hash(data: bytes) -> str:
+        """Encodes data to strkey sha256 hash.
+
+        :param data: data to encode
+        :return: strkey sha256 hash
+        :raises:
+            :exc:`ValueError <stellar_sdk.exceptions.ValueError>`
+            :exc:`TypeError <stellar_sdk.exceptions.TypeError>`
+        """
         return encode_check("sha256_hash", data)
 
     @staticmethod
     def decode_sha256_hash(data: str) -> bytes:
+        """Decodes strkey sha256 hash to raw data.
+
+        :param data: strkey sha256 hash
+        :return: raw bytes
+        :raises:
+            :exc:`ValueError <stellar_sdk.exceptions.ValueError>`
+            :exc:`TypeError <stellar_sdk.exceptions.TypeError>`
+        """
         return decode_check("sha256_hash", data)
 
 
@@ -72,28 +159,27 @@ def decode_check(version_byte_name: str, encoded: str) -> bytes:
     try:
         decoded = base64.b32decode(encoded)
     except binascii.Error:
-        raise Exception("Incorrect padding.")
+        raise ValueError("Incorrect padding.")
 
     if encoded != base64.b32encode(decoded):  # Is that even possible?
-        raise Exception("Invalid encoded bytes.")
+        raise ValueError("Invalid encoded bytes.")
 
     version_byte = decoded[0:1]
     payload = decoded[0:-2]
     data = decoded[1:-2]
     checksum = decoded[-2:]
 
-    try:
-        expected_version = _version_bytes[version_byte_name]
-    except KeyError:
-        raise KeyError(
+    expected_version = _version_bytes.get(version_byte_name)
+    if expected_version is None:
+        raise TypeError(
             '{} is not a valid version byte name. expected one of "ed25519_public_key", '
             '"ed25519_secret_seed", "pre_auth_tx", "sha256_hash"'.format(
                 version_byte_name
             )
-        )  # TODO
+        )
 
     if version_byte != expected_version:
-        raise Exception(
+        raise TypeError(
             "Invalid version byte. Expected {}, got {}".format(
                 str(expected_version), str(version_byte)
             )
@@ -101,25 +187,23 @@ def decode_check(version_byte_name: str, encoded: str) -> bytes:
 
     expected_checksum = _calculate_checksum(payload)
     if expected_checksum != checksum:
-        raise Exception("Invalid checksum")
+        raise ValueError("Invalid checksum")
 
     return data
 
 
 def encode_check(version_byte_name: str, data: bytes) -> str:
     if data is None:
-        raise TypeError("cannot encode null data")
+        raise ValueError("cannot encode null data")
 
-    try:
-        version_byte = _version_bytes[version_byte_name]
-    except KeyError:
-        raise KeyError(
+    version_byte = _version_bytes.get(version_byte_name)
+    if version_byte is None:
+        raise TypeError(
             '{} is not a valid version byte name. expected one of "ed25519_public_key", '
             '"ed25519_secret_seed", "pre_auth_tx", "sha256_hash"'.format(
                 version_byte_name
             )
-        )  # TODO
-
+        )
     payload = version_byte + data
     crc = _calculate_checksum(payload)
     return base64.b32encode(payload + crc).decode("utf-8")
@@ -132,12 +216,12 @@ def is_valid(version_byte_name: str, encoded: str) -> bool:
         decoded = decode_check(version_byte_name, encoded)
         # if len(decoded) != 32:
         #     return False
-    except Exception as e:  # TODO: log
+    except (ValueError, TypeError):
         return False
     return True
 
 
-def _bytes_from_decode_data(s):
+def _bytes_from_decode_data(s: Union[str, bytes, bytearray]) -> bytes:
     """copy from base64._bytes_from_decode_data
     """
     bytes_types = (bytes, bytearray)  # Types acceptable as binary data

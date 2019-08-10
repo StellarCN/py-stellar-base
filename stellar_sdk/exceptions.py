@@ -1,9 +1,16 @@
+import binascii
+
+
 class SdkError(Exception):
     def __init__(self, msg):
         super(SdkError, self).__init__(msg)
 
 
 class ValueError(ValueError, SdkError):
+    pass
+
+
+class TypeError(TypeError, SdkError):
     pass
 
 
