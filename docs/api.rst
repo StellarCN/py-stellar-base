@@ -334,6 +334,18 @@ TimeBounds
    :members:
    :inherited-members:
 
+Transaction
+^^^^^^^^^^^
+
+.. autoclass:: stellar_sdk.transaction.Transaction
+   :members:
+
+TransactionEnvelope
+^^^^^^^^^^^^^^^^^^^
+
+.. autoclass:: stellar_sdk.transaction_envelope.TransactionEnvelope
+   :members:
+
 TransactionBuilder
 ^^^^^^^^^^^^^^^^^^
 
