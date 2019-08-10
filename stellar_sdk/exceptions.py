@@ -1,54 +1,68 @@
-import binascii
-
-
 class SdkError(Exception):
-    def __init__(self, msg):
-        super(SdkError, self).__init__(msg)
+    """Base exception for all stellar sdk related errors
+    """
 
 
 class ValueError(ValueError, SdkError):
-    pass
+    """exception for all values related errors
+
+    """
 
 
 class TypeError(TypeError, SdkError):
-    pass
+    """exception for all type related errors
+
+    """
 
 
-class BadSignatureError(SdkError):
-    pass
+class BadSignatureError(ValueError):
+    """Raised when the signature was forged or otherwise corrupt.
+    """
 
 
-class Ed25519PublicKeyInvalidError(SdkError):
-    pass
+class Ed25519PublicKeyInvalidError(ValueError):
+    """Ed25519 public key is incorrect.
+
+    """
 
 
-class Ed25519SecretSeedInvalidError(SdkError):
-    pass
+class Ed25519SecretSeedInvalidError(ValueError):
+    """Ed25519 secret seed is incorrect.
+
+    """
 
 
-class DecodeError(SdkError):
-    pass
+class MissingEd25519SecretSeedError(ValueError):
+    """Missing Ed25519 secret seed in the keypair
 
-
-class MissingEd25519SecretSeedError(SdkError):
-    pass
+    """
 
 
 class MemoInvalidException(ValueError):
-    pass
+    """Memo is incorrect.
+
+    """
 
 
 class AssetCodeInvalidError(ValueError):
-    pass
+    """Asset Code is incorrect.
+
+    """
 
 
 class AssetIssuerInvalidError(ValueError):
-    pass
+    """Asset issuer is incorrect.
+
+    """
 
 
 class NoApproximationError(SdkError):
-    pass
+    """Approximation cannot be found
+
+    """
 
 
-class SignatureExistError(SdkError):
-    pass
+class SignatureExistError(ValueError):
+    """A keypair can only sign a transaction once.
+
+    """
