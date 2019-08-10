@@ -166,7 +166,7 @@ class Operation(metaclass=ABCMeta):
             return StrKey.encode_ed25519_public_key(xdr_object.sourceAccount[0].ed25519)
         return None
 
-    def __eq__(self, other: "Operation"):
-        if not isinstance(other, Operation):
-            return False
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, self.__class__):
+            return NotImplemented
         return self.to_xdr_object().to_xdr() == other.to_xdr_object().to_xdr()

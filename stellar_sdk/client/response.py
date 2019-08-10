@@ -16,9 +16,9 @@ class Response:
     def json(self) -> dict:
         return json.loads(self.text)
 
-    def __eq__(self, other: "Response"):
+    def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
-            return False
+            return NotImplemented
         return (
             self.status_code == other.status_code
             and self.text == other.text

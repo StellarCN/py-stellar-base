@@ -51,8 +51,10 @@ class Memo(object, metaclass=abc.ABCMeta):
         memo_cls = xdr_types.get(xdr_obj.type, NoneMemo)
         return memo_cls.from_xdr_object(xdr_obj)
 
-    def __eq__(self, memo: "Memo"):
-        return self.to_xdr_object().to_xdr() == memo.to_xdr_object().to_xdr()
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, self.__class__):
+            return NotImplemented
+        return self.to_xdr_object().to_xdr() == other.to_xdr_object().to_xdr()
 
 
 class NoneMemo(Memo):

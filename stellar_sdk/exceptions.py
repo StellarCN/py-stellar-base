@@ -1,15 +1,20 @@
+from .client.response import Response
+
+BuildInValueError = ValueError
+BuildInTypeError = TypeError
+
 class SdkError(Exception):
     """Base exception for all stellar sdk related errors
     """
 
 
-class ValueError(ValueError, SdkError):
+class ValueError(BuildInValueError, SdkError):
     """exception for all values related errors
 
     """
 
 
-class TypeError(TypeError, SdkError):
+class TypeError(BuildInTypeError, SdkError):
     """exception for all type related errors
 
     """
@@ -82,9 +87,10 @@ class ConnectionError(BaseRequestError):
 class BaseHorizonError(BaseRequestError):
     """Base class for horizon request errors.
 
+    :param response: client response
     """
 
-    def __init__(self, response):
+    def __init__(self, response: Response) -> None:
         super().__init__(response)
         message = response.json()
         self.type = message.get("type")

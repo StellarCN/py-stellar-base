@@ -80,5 +80,7 @@ class Signer:
         if signer_xdr_object.type == Xdr.const.SIGNER_KEY_TYPE_HASH_X:
             return cls.sha256_hash(signer_xdr_object.hashX, weight)
 
-    def __eq__(self, other: "Signer"):
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, self.__class__):
+            return NotImplemented
         return self.to_xdr_object().to_xdr() == other.to_xdr_object().to_xdr()

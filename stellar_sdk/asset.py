@@ -139,9 +139,9 @@ class Asset:
             code = asset_xdr_object.alphaNum12.assetCode.decode().rstrip("\x00")
         return cls(code, issuer)
 
-    def __eq__(self, other: "Asset"):
-        if not isinstance(other, Asset):
-            return False
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, self.__class__):
+            return NotImplemented
         return self.code == other.code and self.issuer == other.issuer
 
     def __str__(self):

@@ -141,9 +141,9 @@ class BaseCallBuilder:
         else:
             raise UnknownRequestError(response)
 
-    def __eq__(self, other: "BaseCallBuilder"):
+    def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
-            return False
+            return NotImplemented
         return (
             self.client == other.client
             and self.params == other.params

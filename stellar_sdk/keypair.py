@@ -175,9 +175,9 @@ class Keypair:
         hint = self.signature_hint()
         return Xdr.types.DecoratedSignature(hint, signature)
 
-    def __eq__(self, other: "Keypair"):
+    def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
-            return False
+            return NotImplemented
         return (
             self.verify_key == other.verify_key
             and self.signing_key == other.signing_key

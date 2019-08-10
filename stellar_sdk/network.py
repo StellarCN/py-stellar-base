@@ -22,9 +22,9 @@ class Network:
         """
         return sha256(self.network_passphrase.encode())
 
-    def __eq__(self, other: "Network") -> bool:
-        if not isinstance(other, Network):
-            return False
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, self.__class__):
+            return NotImplemented
         return self.network_passphrase == other.network_passphrase
 
 
