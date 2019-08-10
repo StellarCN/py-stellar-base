@@ -1,6 +1,12 @@
-from typing import Union, Coroutine, Any, AsyncGenerator
+from typing import Union, Coroutine, Any
 from urllib.parse import urljoin
 
+from ..exceptions import (
+    NotFoundError,
+    BadResponseError,
+    BadRequestError,
+    UnknownRequestError,
+)
 from ..client.base_async_client import BaseAsyncClient
 from ..client.base_sync_client import BaseSyncClient
 from ..client.response import Response
@@ -41,11 +47,15 @@ class BaseCallBuilder:
 
     def __call_sync(self) -> Response:
         url = urljoin(self.horizon_url, self.endpoint)
-        return self.client.get(url, self.params)
+        resp = self.client.get(url, self.params)
+        self._raise_request_exception(resp)
+        return resp
 
     async def __call_async(self) -> Response:
         url = urljoin(self.horizon_url, self.endpoint)
-        return await self.client.get(url, self.params)
+        resp = await self.client.get(url, self.params)
+        self._raise_request_exception(resp)
+        return resp
 
     def stream(self):
         """Creates an EventSource that listens for incoming messages from the server.
@@ -117,3 +127,26 @@ class BaseCallBuilder:
     def _add_query_params(self, params: dict):
         for k, v in params.items():
             self._add_query_param(k, v)
+
+    def _raise_request_exception(self, response):
+        status_code = response.status_code
+        if status_code == 200:
+            pass
+        elif status_code == 400:
+            raise BadRequestError(response)
+        elif status_code == 404:
+            raise NotFoundError(response)
+        elif 500 <= status_code < 600:
+            raise BadResponseError(response)
+        else:
+            raise UnknownRequestError(response)
+
+    def __eq__(self, other: "BaseCallBuilder"):
+        if not isinstance(other, self.__class__):
+            return False
+        return (
+            self.client == other.client
+            and self.params == other.params
+            and self.endpoint == other.endpoint
+            and self.horizon_url == other.horizon_url
+        )

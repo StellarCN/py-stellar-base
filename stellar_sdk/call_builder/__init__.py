@@ -2,6 +2,7 @@ from .accounts_call_builder import AccountsCallBuilder
 from .assets_call_builder import AssetsCallBuilder
 from .base_call_builder import BaseCallBuilder
 from .effects_call_builder import EffectsCallBuilder
+from .fee_stats_call_builder import FeeStatsCallBuilder
 from .ledgers_call_builder import LedgersCallBuilder
 from .offers_call_builder import OffersCallBuilder
 from .operations_call_builder import OperationsCallBuilder
@@ -17,6 +18,7 @@ __all__ = [
     "AssetsCallBuilder",
     "BaseCallBuilder",
     "EffectsCallBuilder",
+    "FeeStatsCallBuilder",
     "LedgersCallBuilder",
     "OffersCallBuilder",
     "OperationsCallBuilder",

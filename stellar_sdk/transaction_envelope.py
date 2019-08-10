@@ -54,10 +54,8 @@ class TransactionEnvelope:
 
         :param signer: The keypair to use for signing this transaction
             envelope.
-        :raises: :exc:`SignatureExistError
-            <stellar_sdk.exception.SignatureExistError>`
+        :raise: :exc:`SignatureExistError <stellar_sdk.exception.SignatureExistError>`
         """
-        # TODO: raise
         tx_hash = self.hash()
         sig = signer.sign_decorated(tx_hash)
         sig_dict = [signature.__dict__ for signature in self.signatures]

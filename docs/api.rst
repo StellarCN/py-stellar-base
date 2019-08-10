@@ -49,6 +49,12 @@ EffectsCallBuilder
    :members:
    :inherited-members:
 
+FeeStatsCallBuilder
+-------------------
+.. autoclass:: stellar_sdk.call_builder.FeeStatsCallBuilder
+   :members:
+   :inherited-members:
+
 LedgersCallBuilder
 ------------------
 .. autoclass:: stellar_sdk.call_builder.LedgersCallBuilder
@@ -102,6 +108,117 @@ TransactionsCallBuilder
 .. autoclass:: stellar_sdk.call_builder.TransactionsCallBuilder
    :members:
    :inherited-members:
+
+Exceptions
+^^^^^^^^^^
+
+SdkError
+--------
+
+.. autoclass:: stellar_sdk.exceptions.SdkError
+   :members:
+
+ValueError
+----------
+
+.. autoclass:: stellar_sdk.exceptions.ValueError
+   :members:
+
+TypeError
+---------
+
+.. autoclass:: stellar_sdk.exceptions.TypeError
+   :members:
+
+BadSignatureError
+-----------------
+
+.. autoclass:: stellar_sdk.exceptions.BadSignatureError
+   :members:
+
+Ed25519PublicKeyInvalidError
+----------------------------
+
+.. autoclass:: stellar_sdk.exceptions.Ed25519PublicKeyInvalidError
+   :members:
+
+Ed25519SecretSeedInvalidError
+-----------------------------
+
+.. autoclass:: stellar_sdk.exceptions.Ed25519SecretSeedInvalidError
+   :members:
+
+MissingEd25519SecretSeedError
+-----------------------------
+
+.. autoclass:: stellar_sdk.exceptions.MissingEd25519SecretSeedError
+   :members:
+
+MemoInvalidException
+--------------------
+
+.. autoclass:: stellar_sdk.exceptions.MemoInvalidException
+   :members:
+
+AssetCodeInvalidError
+---------------------
+
+.. autoclass:: stellar_sdk.exceptions.AssetCodeInvalidError
+   :members:
+
+AssetIssuerInvalidError
+-----------------------
+
+.. autoclass:: stellar_sdk.exceptions.AssetIssuerInvalidError
+   :members:
+
+NoApproximationError
+--------------------
+
+.. autoclass:: stellar_sdk.exceptions.NoApproximationError
+   :members:
+
+SignatureExistError
+-------------------
+
+.. autoclass:: stellar_sdk.exceptions.SignatureExistError
+   :members:
+
+BaseRequestError
+----------------
+
+.. autoclass:: stellar_sdk.exceptions.BaseRequestError
+   :members:
+
+ConnectionError
+---------------
+
+.. autoclass:: stellar_sdk.exceptions.ConnectionError
+   :members:
+
+BaseHorizonError
+----------------
+
+.. autoclass:: stellar_sdk.exceptions.BaseHorizonError
+   :members:
+
+NotFoundError
+-------------
+
+.. autoclass:: stellar_sdk.exceptions.NotFoundError
+   :members:
+
+BadRequestError
+---------------
+
+.. autoclass:: stellar_sdk.exceptions.BadRequestError
+   :members:
+
+BadResponseError
+----------------
+
+.. autoclass:: stellar_sdk.exceptions.BadResponseError
+   :members:
 
 Keypair
 ^^^^^^^
@@ -252,6 +369,18 @@ TimeBounds
 .. autoclass:: stellar_sdk.time_bounds.TimeBounds
    :members:
    :inherited-members:
+
+Transaction
+^^^^^^^^^^^
+
+.. autoclass:: stellar_sdk.transaction.Transaction
+   :members:
+
+TransactionEnvelope
+^^^^^^^^^^^^^^^^^^^
+
+.. autoclass:: stellar_sdk.transaction_envelope.TransactionEnvelope
+   :members:
 
 TransactionBuilder
 ^^^^^^^^^^^^^^^^^^

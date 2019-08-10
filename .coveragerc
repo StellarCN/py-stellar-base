@@ -1,11 +1,13 @@
 [run]
-source = stellar_sdk
+source =
+    stellar_sdk/
+    tests/
 
 [report]
 omit =
-    stellar_sdk/stellarxdr/*
+    stellar_sdk/xdr/*
     stellar_sdk/vendor/*
-    stellar_sdk/base58.py
+    tests/conftest.py
 
 exclude_lines =
     pragma: no cover

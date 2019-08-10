@@ -2,6 +2,7 @@ import os
 
 import pytest
 import nacl.signing as ed25519
+from stellar_sdk.exceptions import ValueError
 
 from stellar_sdk.exceptions import (
     Ed25519SecretSeedInvalidError,
@@ -142,7 +143,7 @@ class TestKeypair:
         fake_data = "Hello, overcat!"
         fake_expected = ed25519.SigningKey
         with pytest.raises(
-            TypeError,
+            ValueError,
             match="The given key_type={} is not of type {}.".format(
                 type(fake_data), fake_expected
             ),

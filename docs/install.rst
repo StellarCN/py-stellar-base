@@ -7,7 +7,7 @@ Installation
 Via pipenv or pip (Recommended)
 ===============================
 
-To install py-stellar-base, use pipenv to install the module:
+To install py-stellar-sdk, use pipenv to install the module:
 
 .. code-block:: text
 

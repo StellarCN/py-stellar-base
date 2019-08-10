@@ -4,20 +4,26 @@ import typing
 import nacl.signing as ed25519
 from nacl.exceptions import BadSignatureError as NaclBadSignatureError
 
-from .exceptions import BadSignatureError, MissingEd25519SecretSeedError
-from .xdr import Xdr
+from .exceptions import BadSignatureError, MissingEd25519SecretSeedError, ValueError
 from .strkey import StrKey
-
-
-def _get_key_of_expected_type(key: typing.Any, expected_type: typing.Any) -> typing.Any:
-    if key is not None and not isinstance(key, expected_type):
-        raise TypeError(
-            "The given key_type={} is not of type {}.".format(type(key), expected_type)
-        )
-    return key
+from .xdr import Xdr
 
 
 class Keypair:
+    """The :class:`Keypair` object, which represents a signing and
+    verifying key for use with the Stellar network.
+
+    Instead of instantiating the class directly, we recommend using one of
+    several class methods:
+
+    * :meth:`Keypair.random`
+    * :meth:`Keypair.from_secret`
+    * :meth:`Keypair.from_public_key`
+
+    :param verify_key: The verifying (public) Ed25519 key in the keypair.
+    :param signing_key: The signing (private) Ed25519 key in the keypair.
+    """
+
     def __init__(
         self, verify_key: ed25519.VerifyKey, signing_key: ed25519.SigningKey = None
     ) -> None:
@@ -25,46 +31,58 @@ class Keypair:
         self.signing_key = _get_key_of_expected_type(signing_key, ed25519.SigningKey)
 
     @classmethod
+    def random(cls) -> "Keypair":
+        """Generate a :class:`Keypair` object from a randomly generated seed.
+
+        :return: A new :class:`Keypair` instance derived by the randomly seed.
+        """
+        seed = os.urandom(32)
+        return cls.from_raw_ed25519_seed(seed)
+
+    @classmethod
     def from_secret(cls, secret: str) -> "Keypair":
+        """Generate a :class:`Keypair` object from a secret seed.
+
+        :param secret: strkey ed25519 seed, for example: `SB2LHKBL24ITV2Y346BU46XPEL45BDAFOOJLZ6SESCJZ6V5JMP7D6G5X`
+        :return: A new :class:`Keypair` instance derived by the secret.
+        :raise: :exc:`Ed25519SecretSeedInvalidError <stellar_sdk.exceptions.Ed25519SecretSeedInvalidError>`
+            The secret seed used to generate the :class:`Keypair` is incorrect
+        """
         raw_secret = StrKey.decode_ed25519_secret_seed(secret)
         return cls.from_raw_ed25519_seed(raw_secret)
 
     @classmethod
-    def from_raw_ed25519_seed(cls, raw_seed: bytes) -> "Keypair":
-        signing_key = ed25519.SigningKey(raw_seed)
-        verify_key = signing_key.verify_key
-        return cls(verify_key, signing_key)
-
-    # TODO: master
-
-    @classmethod
     def from_public_key(cls, public_key: str) -> "Keypair":
+        """Generate a :class:`Keypair` object from a public key.
+
+        :param public_key: strkey ed25519 public key,
+            for example: `GATPGGOIE6VWADVKD3ER3IFO2IH6DTOA5G535ITB3TT66FZFSIZEAU2B`
+        :return: A new :class:`Keypair` instance derived by the public key.
+        :raise: :exc:`Ed25519PublicKeyInvalidError <stellar_sdk.exceptions.Ed25519PublicKeyInvalidError>`
+            The public key used to generate the :class:`Keypair` is incorrect
+        """
         public_key = StrKey.decode_ed25519_public_key(public_key)
         verifying_key = ed25519.VerifyKey(public_key)
         return cls(verifying_key)
 
     @classmethod
-    def random(cls) -> "Keypair":
-        seed = os.urandom(32)
-        return cls.from_raw_ed25519_seed(seed)
+    def from_raw_ed25519_seed(cls, raw_seed: bytes) -> "Keypair":
+        """Generate a :class:`Keypair` object from ed25519 secret key seed raw bytes.
 
-    def xdr_public_key(self) -> Xdr.types.PublicKey:
-        return Xdr.types.PublicKey(Xdr.const.KEY_TYPE_ED25519, bytes(self.verify_key))
-
-    def xdr_account_id(self) -> Xdr.types.PublicKey:
-        return self.xdr_public_key()
-
-    def raw_public_key(self) -> bytes:
-        return bytes(self.verify_key)
-
-    # @property
-    def public_key(self) -> str:
-        return StrKey.encode_ed25519_public_key(self.raw_public_key())
-
-    def signature_hint(self) -> bytes:
-        return bytes(self.xdr_account_id().ed25519[-4:])
+        :param raw_seed: ed25519 secret key seed raw bytes
+        :return: A new :class:`Keypair` instance derived by the ed25519 secret key seed raw bytes
+        """
+        signing_key = ed25519.SigningKey(raw_seed)
+        verify_key = signing_key.verify_key
+        return cls(verify_key, signing_key)
 
     def secret(self) -> str:
+        """Returns secret key associated with this :class:`Keypair` instance
+
+        :return: secret key
+        :raise: :exc:`MissingEd25519SecretSeedError <stellar_sdk.exceptions.MissingEd25519SecretSeedError>`
+            The :class:`Keypair` does not contain secret seed
+        """
         if not self.signing_key:
             raise MissingEd25519SecretSeedError(
                 "The keypair does not contain secret seed. Use Keypair.from_secret or "
@@ -73,13 +91,60 @@ class Keypair:
 
         return StrKey.encode_ed25519_secret_seed(self.raw_secret_key())
 
+    # @property
+    def public_key(self) -> str:
+        """Returns public key associated with this :class:`Keypair` instance
+
+        :return: public key
+        """
+        return StrKey.encode_ed25519_public_key(self.raw_public_key())
+
+    def xdr_public_key(self) -> Xdr.types.PublicKey:
+        """
+
+        :return:
+        """
+        return Xdr.types.PublicKey(Xdr.const.KEY_TYPE_ED25519, bytes(self.verify_key))
+
+    def xdr_account_id(self) -> Xdr.types.PublicKey:
+        return self.xdr_public_key()
+
+    def raw_public_key(self) -> bytes:
+        """Returns raw public key.
+
+        :return: raw public key
+        """
+        return bytes(self.verify_key)
+
+    def signature_hint(self) -> bytes:
+        """Returns signature hint associated with this :class:`Keypair` instance
+
+        :return: signature hint
+        """
+        return bytes(self.xdr_account_id().ed25519[-4:])
+
     def raw_secret_key(self) -> bytes:
+        """Returns raw secret key.
+
+        :return: raw secret key
+        """
         return bytes(self.signing_key)
 
     def can_sign(self) -> bool:
+        """Returns `True` if this :class:`Keypair` object contains secret key and can sign.
+
+        :return: `True` if this :class:`Keypair` object contains secret key and can sign
+        """
         return self.signing_key is not None
 
     def sign(self, data: bytes) -> bytes:
+        """Sign the provided data with the keypair's private key.
+
+        :param data: The data to sign.
+        :return: signed bytes
+        :raise: :exc:`MissingEd25519SecretSeedError <stellar_sdk.exceptions.MissingEd25519SecretSeedError>`
+            The :class:`Keypair` does not contain secret seed.
+        """
         if not self.can_sign():
             raise MissingEd25519SecretSeedError(
                 "The keypair does not contain secret seed. Use Keypair.from_secret or "
@@ -88,18 +153,40 @@ class Keypair:
         return self.signing_key.sign(data).signature
 
     def verify(self, data: bytes, signature: bytes) -> None:
+        """Verify the provided data and signature match this keypair's public key.
+
+        :param data: The data that was signed.
+        :param signature: The signature.
+        :raise: :exc:`BadSignatureError <stellar_sdk.exceptions.BadSignatureError>`
+            The verification failed and the signature was incorrect.
+        """
         try:
             return self.verify_key.verify(data, signature)
         except NaclBadSignatureError:
             raise BadSignatureError("Signature verification failed.")
 
-    def sign_decorated(self, data) -> Xdr.types.DecoratedSignature:  # TODO
+    def sign_decorated(self, data) -> Xdr.types.DecoratedSignature:
+        """Sign the provided data with the keypair's private key and returns DecoratedSignature.
+
+        :param data: signed bytes
+        :return: sign decorated
+        """
         signature = self.sign(data)
         hint = self.signature_hint()
         return Xdr.types.DecoratedSignature(hint, signature)
 
     def __eq__(self, other: "Keypair"):
+        if not isinstance(other, self.__class__):
+            return False
         return (
             self.verify_key == other.verify_key
             and self.signing_key == other.signing_key
         )
+
+
+def _get_key_of_expected_type(key: typing.Any, expected_type: typing.Any) -> typing.Any:
+    if key is not None and not isinstance(key, expected_type):
+        raise ValueError(
+            "The given key_type={} is not of type {}.".format(type(key), expected_type)
+        )
+    return key
