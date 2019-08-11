@@ -40,12 +40,17 @@ setup(
         "sdex",
         "trading",
     ],
+    project_urls={
+        "Documentation": "https://stellar-sdk.readthedocs.org",
+        "Code": "https://github.com/StellarCN/py-stellar-base",
+        "Issue tracker": "https://github.com/StellarCN/py-stellar-base/issues",
+    },
     include_package_data=True,
     install_requires=open(requirements_file).readlines(),
     packages=find_packages(exclude=["tests", "tests.*"]),
     python_requires=">=3.6.0",
     classifiers=[
-        "Development Status :: 1 - Planning",
+        "Development Status :: 3 - Alpha",
         "Intended Audience :: Developers",
         "Natural Language :: English",
         "Operating System :: OS Independent",

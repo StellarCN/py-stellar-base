@@ -1,9 +1,6 @@
-[In Development] py-stellar-sdk
+py-stellar-sdk
 ===============================
 
-.. image:: https://img.shields.io/pypi/v/stellar-sdk.svg?style=flat-square&maxAge=1800
-    :alt: PyPI
-    :target: https://pypi.python.org/pypi/stellar-sdk
 .. image:: https://img.shields.io/travis/StellarCN/py-stellar-base.svg?style=flat-square&maxAge=1800
     :alt: Travis (.org)
     :target: https://travis-ci.org/StellarCN/py-stellar-base/
@@ -16,10 +13,22 @@
     :alt: Codecov
     :target: https://codecov.io/gh/StellarCN/py-stellar-base
 
+.. image:: https://img.shields.io/pypi/v/stellar-sdk.svg?style=flat-square&maxAge=1800
+    :alt: PyPI
+    :target: https://pypi.python.org/pypi/stellar-sdk
+
+.. image:: https://img.shields.io/badge/python-3.6%20%7C%203.7-blue?style=flat-square
+    :alt: Python - Version
+    :target: https://pypi.python.org/pypi/stellar-sdk
+
+.. image:: https://img.shields.io/badge/implementation-cpython%20%7C%20pypy-blue?style=flat-square
+    :alt: PyPI - Implementation
+    :target: https://pypi.python.org/pypi/stellar-sdk
 
 
 py-stellar-sdk is a Python library for communicating with
-a `Stellar Horizon server`_. It is used for building Stellar apps on Python.
+a `Stellar Horizon server`_. It is used for building Stellar apps on Python. It supports Python 3.6+ as
+well as PyPy 3.6+.
 
 It provides:
 
@@ -29,18 +38,12 @@ It provides:
 Installing
 ----------
 
-Install from pypi:
+Install and update using `pipenv`_ or `pip`_:
 
 .. code-block:: text
 
     pip install -U stellar-sdk
 
-
-Install from latest source code(*may be unstable*):
-
-.. code-block:: text
-
-    pip install git+git://github.com/StellarCN/py-stellar-base
 
 
 A Simple Example
@@ -49,16 +52,24 @@ A Simple Example
 .. code-block:: python
 
     # Alice pay 10.25 XLM to Bob
-    # TODO: WIP
+    from stellar_sdk import Server, Keypair, TransactionBuilder
 
-Document
---------
-* Quick Start: https://stellar-sdk.readthedocs.io/en/latest/quickstart.html
-* API: https://stellar-sdk.readthedocs.io/en/latest/api.html
+    alice_keypair = Keypair.from_secret("SBFZCHU5645DOKRWYBXVOXY2ELGJKFRX6VGGPRYUWHQ7PMXXJNDZFMKD")
+    bob_address = "GA7YNBW5CBTJZ3ZZOWX3ZNBKD6OE7A7IHUQVWMY62W2ZBG2SGZVOOPVH"
 
+    server = Server()
+    alice_account = server.load_account(alice_keypair.public_key())
+    transaction = TransactionBuilder(alice_account)\
+        .add_text_memo("Hello, Stellar!")\
+        .append_payment_op(bob_address, "10.25", "XLM")\
+        .build()
+    transaction.sign(alice_keypair)
+    response = server.submit_transaction(transaction)
+    print(response)
 
 Links
 -----
+* Document: https://stellar-sdk.readthedocs.io
 * Code: https://github.com/StellarCN/py-stellar-base
 * Docker: https://hub.docker.com/r/overcat/py-stellar-base
 * Examples: https://github.com/StellarCN/py-stellar-base/tree/master/examples
@@ -66,6 +77,8 @@ Links
 * License: `Apache License 2.0 <https://github.com/StellarCN/py-stellar-base/blob/master/LICENSE>`_
 * Releases: https://pypi.org/project/stellar-sdk/
 
-Thank you to all the people who have already contributed to py-stellar-base!
+Thank you to all the people who have already contributed to py-stellar-sdk!
 
 .. _Stellar Horizon server: https://github.com/stellar/go/tree/master/services/horizon
+.. _pip: https://pip.pypa.io/en/stable/quickstart/
+.. _pipenv: https://github.com/pypa/pipenv
