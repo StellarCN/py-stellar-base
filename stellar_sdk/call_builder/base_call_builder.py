@@ -1,4 +1,13 @@
-from typing import Union, Coroutine, Any
+from typing import (
+    Union,
+    Coroutine,
+    Any,
+    Dict,
+    Awaitable,
+    Mapping,
+    Generator,
+    AsyncGenerator,
+)
 from urllib.parse import urljoin
 
 from ..exceptions import (
@@ -24,15 +33,15 @@ class BaseCallBuilder:
     def __init__(
         self, horizon_url: str, client: Union[BaseAsyncClient, BaseSyncClient]
     ) -> None:
+
+        self.__async: bool = False
         if isinstance(client, BaseAsyncClient):
             self.__async = True
-        elif isinstance(client, BaseSyncClient):
-            self.__async = False
 
-        self.client = client
-        self.horizon_url = horizon_url
-        self.params = {}
-        self.endpoint = ""
+        self.client: Union[BaseAsyncClient, BaseSyncClient] = client
+        self.horizon_url: str = horizon_url
+        self.params: Dict[str, str] = {}
+        self.endpoint: str = ""
 
     def call(self) -> Union[Response, Coroutine[Any, Any, Response]]:
         """Triggers a HTTP request using this builder's current configuration.
@@ -57,7 +66,11 @@ class BaseCallBuilder:
         self._raise_request_exception(resp)
         return resp
 
-    def stream(self):
+    def stream(
+        self
+    ) -> Union[
+        AsyncGenerator[Dict[str, Any], None], Generator[Dict[str, Any], None, None]
+    ]:
         """Creates an EventSource that listens for incoming messages from the server.
 
         See `Horizon Response Format <https://www.stellar.org/developers/horizon/reference/responses.html>`_
@@ -72,17 +85,17 @@ class BaseCallBuilder:
         else:
             return self.__stream_sync()
 
-    async def __stream_async(self):
+    async def __stream_async(self) -> AsyncGenerator[Dict[str, Any], None]:
         url = urljoin(self.horizon_url, self.endpoint)
         stream = self.client.stream(url, self.params)
         while True:
             yield await stream.__anext__()
 
-    def __stream_sync(self):
+    def __stream_sync(self) -> Generator[Dict[str, Any], None, None]:
         url = urljoin(self.horizon_url, self.endpoint)
         return self.client.stream(url, self.params)
 
-    def cursor(self, cursor):
+    def cursor(self, cursor: Union) -> "BaseCallBuilder":
         """Sets `cursor` parameter for the current call. Returns the CallBuilder object on which this method has been called.
 
         See `Paging <https://www.stellar.org/developers/horizon/reference/paging.html>`_
@@ -93,7 +106,7 @@ class BaseCallBuilder:
         self._add_query_param("cursor", cursor)
         return self
 
-    def limit(self, limit):
+    def limit(self, limit: int) -> "BaseCallBuilder":
         """Sets `limit` parameter for the current call. Returns the CallBuilder object on which this method has been called.
 
         See `Paging <https://www.stellar.org/developers/horizon/reference/paging.html>`_
@@ -104,7 +117,7 @@ class BaseCallBuilder:
         self._add_query_param("limit", limit)
         return self
 
-    def order(self, desc=True):
+    def order(self, desc: bool = True) -> "BaseCallBuilder":
         """Sets `order` parameter for the current call. Returns the CallBuilder object on which this method has been called.
 
         :param desc: Sort direction, `True` to get desc sort direction, the default setting is `True`.
@@ -116,15 +129,17 @@ class BaseCallBuilder:
         self._add_query_param("order", order)
         return self
 
-    def _add_query_param(self, key, value):
+    def _add_query_param(self, key: str, value: Union[str, float, int, bool, None]):
         if value is None:
             pass
         elif value is True:
             self.params[key] = "true"
         else:
-            self.params[key] = value
+            self.params[key] = str(value)
 
-    def _add_query_params(self, params: dict):
+    def _add_query_params(
+        self, params: Mapping[str, Union[str, float, int, bool, None]]
+    ) -> None:
         for k, v in params.items():
             self._add_query_param(k, v)
 

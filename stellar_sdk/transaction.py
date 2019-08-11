@@ -1,4 +1,4 @@
-import typing
+from typing import List, Union
 
 from .exceptions import ValueError
 from .keypair import Keypair
@@ -49,8 +49,8 @@ class Transaction:
         source: Keypair,
         sequence: int,
         fee: int,
-        operations: typing.List[Operation],
-        memo: typing.Union[Memo] = None,
+        operations: List[Operation],
+        memo: Union[Memo] = None,
         time_bounds: TimeBounds = None,
     ) -> None:
 
@@ -75,7 +75,7 @@ class Transaction:
         source_account = self.source.xdr_account_id()
         memo = self.memo.to_xdr_object()
         operations = [operation.to_xdr_object() for operation in self.operations]
-        time_bounds = []
+        time_bounds: List[TimeBounds] = []
         if self.time_bounds:
             time_bounds = pack_xdr_array(self.time_bounds.to_xdr_object())
         ext = Xdr.nullclass()

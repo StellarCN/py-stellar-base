@@ -10,6 +10,7 @@
 __title__ = "stellar-sdk"
 __description__ = "The Python Stellar SDK library provides APIs to build transactions and connect to Horizon."
 __url__ = "https://github.com/overcat/py-stellar-sdk"
+__issues__ = "{}/issues".format(__url__)
 __version__ = "2.0.0-planning"
 __author__ = "Eno, overcat"
 __author_email__ = "appweb.cn@gmail.com, 4catcode@gmail.com"

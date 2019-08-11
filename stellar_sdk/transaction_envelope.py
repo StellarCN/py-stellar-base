@@ -1,4 +1,4 @@
-import typing
+from typing import List
 
 from .exceptions import SignatureExistError
 from .keypair import Keypair
@@ -28,11 +28,11 @@ class TransactionEnvelope:
         self,
         transaction: Transaction,
         network: Network,
-        signatures: typing.List[Xdr.types.DecoratedSignature] = None,
+        signatures: List[Xdr.types.DecoratedSignature] = None,
     ) -> None:
-        self.transaction = transaction
-        self.network_id = network.network_id()
-        self.signatures = signatures or []
+        self.transaction: Transaction = transaction
+        self.network_id: bytes = network.network_id()
+        self.signatures: List[Xdr.types.DecoratedSignature] = signatures or []
 
     def hash(self) -> bytes:
         """Get the XDR Hash of the signature base.
@@ -80,12 +80,12 @@ class TransactionEnvelope:
         network_id = self.network_id
         tx_type = Xdr.StellarXDRPacker()
         tx_type.pack_EnvelopeType(Xdr.const.ENVELOPE_TYPE_TX)
-        tx_type = tx_type.get_buffer()
+        tx_type_buffer = tx_type.get_buffer()
 
         tx = Xdr.StellarXDRPacker()
         tx.pack_Transaction(self.transaction.to_xdr_object())
-        tx = tx.get_buffer()
-        return network_id + tx_type + tx
+        tx_buffer = tx.get_buffer()
+        return network_id + tx_type_buffer + tx_buffer
 
     def sign_hashx(self, preimage: bytes) -> None:
         """Sign this transaction envelope with a Hash(x) signature.

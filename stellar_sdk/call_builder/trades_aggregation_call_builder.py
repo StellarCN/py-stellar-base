@@ -81,3 +81,4 @@ class TradeAggregationsCallBuilder(BaseCallBuilder):
         allowed_resolutions = (60000, 300000, 900000, 3600000, 86400000, 604800000)
         if resolution in allowed_resolutions:
             return True
+        return False

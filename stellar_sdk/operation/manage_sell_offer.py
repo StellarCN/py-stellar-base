@@ -1,4 +1,4 @@
-import typing
+from typing import Union
 
 from .operation import Operation
 from ..asset import Asset
@@ -36,7 +36,7 @@ class ManageSellOffer(Operation):
         selling: Asset,
         buying: Asset,
         amount: str,
-        price: typing.Union[Price, str],
+        price: Union[Price, str],
         offer_id: int = 0,
         source: str = None,
     ) -> None:
@@ -45,8 +45,6 @@ class ManageSellOffer(Operation):
         self.buying = buying
         self.amount = amount
         self.price = price
-        if not isinstance(price, Price):
-            self.price = Price.from_raw_price(price)
         self.offer_id = offer_id
 
     @classmethod
@@ -56,7 +54,13 @@ class ManageSellOffer(Operation):
     def _to_operation_body(self) -> Xdr.nullclass:
         selling = self.selling.to_xdr_object()
         buying = self.buying.to_xdr_object()
-        price = self.price.to_xdr_object()
+
+        if isinstance(self.price, Price):
+            price_fraction = self.price
+        else:
+            price_fraction = Price.from_raw_price(self.price)
+
+        price = price_fraction.to_xdr_object()
 
         amount = Operation.to_xdr_amount(self.amount)
 

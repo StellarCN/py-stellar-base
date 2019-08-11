@@ -43,12 +43,12 @@ class TransactionBuilder:
         network_passphrase: str = TESTNET_NETWORK_PASSPHRASE,
         base_fee: int = 100,
     ):
-        self.source_account = source_account
-        self.base_fee = base_fee
-        self.network = Network(network_passphrase)
-        self.operations = []
-        self.time_bounds = None
-        self.memo = NoneMemo()
+        self.source_account: Account = source_account
+        self.base_fee: int = base_fee
+        self.network: Network = Network(network_passphrase)
+        self.operations: List[Operation] = []
+        self.time_bounds: Optional[TimeBounds] = None
+        self.memo: Memo = NoneMemo()
 
     def build(self) -> TransactionEnvelope:
         """This will build the transaction envelope.
@@ -134,10 +134,10 @@ class TransactionBuilder:
         :return: This builder instance.
 
         """
-        memo_text = TextMemo(memo_text)
-        return self.add_memo(memo_text)
+        memo = TextMemo(memo_text)
+        return self.add_memo(memo)
 
-    def add_id_memo(self, memo_id) -> "TransactionBuilder":
+    def add_id_memo(self, memo_id: int) -> "TransactionBuilder":
         """Set the memo for the transaction to a new :class:`IdMemo
         <stellar_sdk.memo.IdMemo>`.
 
@@ -145,10 +145,10 @@ class TransactionBuilder:
         :return: This builder instance.
 
         """
-        memo_id = IdMemo(memo_id)
-        return self.add_memo(memo_id)
+        memo = IdMemo(memo_id)
+        return self.add_memo(memo)
 
-    def add_hash_memo(self, memo_hash) -> "TransactionBuilder":
+    def add_hash_memo(self, memo_hash: bytes) -> "TransactionBuilder":
         """Set the memo for the transaction to a new :class:`HashMemo
         <stellar_sdk.memo.HashMemo>`.
 
@@ -156,8 +156,8 @@ class TransactionBuilder:
         :return: This builder instance.
 
         """
-        memo_hash = HashMemo(memo_hash)
-        return self.add_memo(memo_hash)
+        memo = HashMemo(memo_hash)
+        return self.add_memo(memo)
 
     def add_return_hash_memo(self, memo_return: bytes) -> "TransactionBuilder":
         """Set the memo for the transaction to a new :class:`RetHashMemo
@@ -168,8 +168,8 @@ class TransactionBuilder:
         :return: This builder instance.
 
         """
-        memo_return = ReturnHashMemo(memo_return)
-        return self.add_memo(memo_return)
+        memo = ReturnHashMemo(memo_return)
+        return self.add_memo(memo)
 
     def append_operation(self, operation: Operation) -> "TransactionBuilder":
         """Add an operation to the builder instance

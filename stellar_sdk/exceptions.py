@@ -3,6 +3,7 @@ from .client.response import Response
 BuildInValueError = ValueError
 BuildInTypeError = TypeError
 
+
 class SdkError(Exception):
     """Base exception for all stellar sdk related errors
     """

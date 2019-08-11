@@ -1,5 +1,5 @@
 import re
-from typing import Optional
+from typing import Optional, Dict
 
 from .exceptions import AssetCodeInvalidError, AssetIssuerInvalidError
 from .keypair import Keypair
@@ -34,9 +34,9 @@ class Asset:
         if issuer is not None and not StrKey.is_valid_ed25519_public_key(issuer):
             raise AssetIssuerInvalidError("The issuer should be a correct public key.")
 
-        self.code = code
-        self.issuer = issuer
-        self._type = self.guess_asset_type()
+        self.code: str = code
+        self.issuer: Optional[str] = issuer
+        self._type: str = self.guess_asset_type()
 
     @staticmethod
     def check_if_asset_code_is_valid(code: str) -> None:
@@ -76,7 +76,7 @@ class Asset:
 
         :return: A dict representing an :class:`Asset`
         """
-        rv = {"type": self.type}
+        rv: Dict[str, str] = {"type": self.type}
         if not self.is_native():
             rv["code"] = self.code
             rv["issuer"] = self.issuer

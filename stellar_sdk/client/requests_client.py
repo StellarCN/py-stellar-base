@@ -1,5 +1,5 @@
 import json
-from typing import Generator
+from typing import Generator, Union, Dict, Any
 
 import requests
 from requests import Session, RequestException
@@ -63,8 +63,7 @@ class RequestsClient(BaseSyncClient):
         headers = {**IDENTIFICATION_HEADERS, "User-Agent": USER_AGENT}
 
         # init session
-        self._session = session
-        if self._session is None:
+        if session is None:
             session = requests.Session()
 
             # set default headers
@@ -72,11 +71,12 @@ class RequestsClient(BaseSyncClient):
 
             session.mount("http://", adapter)
             session.mount("https://", adapter)
-            self._session = session
+        self._session: Session = session
 
-        self._stream_session = stream_session
-        if self._stream_session is None:
+        if stream_session is None:
             # configure SSE session (differs from our standard session)
+            stream_session = requests.Session()
+
             sse_retry = Retry(
                 total=1000000, redirect=0, status_forcelist=self.status_forcelist
             )
@@ -85,13 +85,13 @@ class RequestsClient(BaseSyncClient):
                 pool_maxsize=self.pool_size,
                 max_retries=sse_retry,
             )
-            sse_session = requests.Session()
-            sse_session.headers.update(headers)
-            sse_session.mount("http://", sse_adapter)
-            sse_session.mount("https://", sse_adapter)
-            self._stream_session = sse_session
 
-    def get(self, url, params=None) -> Response:
+            stream_session.headers.update(headers)
+            stream_session.mount("http://", sse_adapter)
+            stream_session.mount("https://", sse_adapter)
+        self._stream_session: Session = stream_session
+
+    def get(self, url: str, params: Dict[str, str] = None) -> Response:
         try:
             resp = self._session.get(url, params=params, timeout=self.request_timeout)
         except (RequestException, NewConnectionError) as err:
@@ -103,7 +103,7 @@ class RequestsClient(BaseSyncClient):
             url=resp.url,
         )
 
-    def post(self, url, data=None) -> Response:
+    def post(self, url: str, data: Dict[str, str] = None) -> Response:
         try:
             resp = self._session.post(url, data=data, timeout=self.request_timeout)
         except (RequestException, NewConnectionError) as err:
@@ -115,13 +115,18 @@ class RequestsClient(BaseSyncClient):
             url=resp.url,
         )
 
-    def stream(self, url, params=None) -> Generator[dict, None, None]:
+    def stream(
+        self, url: str, params: Dict[str, str] = None
+    ) -> Generator[Dict[str, Any], None, None]:
+        query_params: Dict[str, Union[int, float, str]] = {**IDENTIFICATION_HEADERS}
         if params:
-            params = {**params, **IDENTIFICATION_HEADERS}
-        else:
-            params = IDENTIFICATION_HEADERS  # pragma: no cover
+            query_params = {**params, **query_params}
         stream_client = _SSEClient(
-            url, retry=0, session=self._stream_session, connect_retry=-1, params=params
+            url,
+            retry=0,
+            session=self._stream_session,
+            connect_retry=-1,
+            params=query_params,
         )
         for message in stream_client:
             yield message

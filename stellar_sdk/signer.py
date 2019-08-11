@@ -1,5 +1,7 @@
-from .xdr import Xdr
+from .__version__ import __issues__
+from .exceptions import ValueError
 from .strkey import StrKey
+from .xdr import Xdr
 
 
 class Signer:
@@ -57,7 +59,7 @@ class Signer:
         )
         return cls(signer_key, weight)
 
-    def to_xdr_object(self):
+    def to_xdr_object(self) -> Xdr.types.Signer:
         """Returns the xdr object for this Signer object.
 
         :return: XDR Signer object
@@ -75,10 +77,15 @@ class Signer:
         if signer_xdr_object.type == Xdr.const.SIGNER_KEY_TYPE_ED25519:
             account_id = StrKey.encode_ed25519_public_key(signer_xdr_object.ed25519)
             return cls.ed25519_public_key(account_id, weight)
-        if signer_xdr_object.type == Xdr.const.SIGNER_KEY_TYPE_PRE_AUTH_TX:
+        elif signer_xdr_object.type == Xdr.const.SIGNER_KEY_TYPE_PRE_AUTH_TX:
             return cls.pre_auth_tx(signer_xdr_object.preAuthTx, weight)
-        if signer_xdr_object.type == Xdr.const.SIGNER_KEY_TYPE_HASH_X:
+        elif signer_xdr_object.type == Xdr.const.SIGNER_KEY_TYPE_HASH_X:
             return cls.sha256_hash(signer_xdr_object.hashX, weight)
+        else:
+            raise ValueError(
+                "This is an unknown signer type, "
+                "please consider creating an issuer at {}.".format(__issues__)
+            )
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):

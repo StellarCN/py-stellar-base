@@ -1,7 +1,7 @@
 import decimal
-import typing
 from abc import ABCMeta, abstractmethod
 from decimal import Decimal, Context, Inexact
+from typing import Optional, List
 
 from ..keypair import Keypair
 from ..xdr import Xdr
@@ -131,7 +131,7 @@ class Operation(metaclass=ABCMeta):
         :class:`Operation`.
 
         """
-        source_account = []
+        source_account: List[Xdr.types.PublicKey] = []
         if self.source is not None:
             source_account = [Keypair.from_public_key(self.source).xdr_account_id()]
 
@@ -154,9 +154,7 @@ class Operation(metaclass=ABCMeta):
         )
 
     @staticmethod
-    def get_source_from_xdr_obj(
-        xdr_object: Xdr.types.Operation
-    ) -> typing.Optional[str]:
+    def get_source_from_xdr_obj(xdr_object: Xdr.types.Operation) -> Optional[str]:
         """Get the source account from account the operation xdr object.
 
         :param xdr_object: the operation xdr object.
