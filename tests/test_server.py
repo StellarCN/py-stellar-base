@@ -42,6 +42,20 @@ class TestServer:
             assert account.account_id == account_id
             assert isinstance(account.sequence, int)
 
+    def test_fetch_base_fee_sync(self):
+        horizon_url = "https://horizon.stellar.org"
+        with Server(horizon_url) as server:
+            base_fee = server.fetch_base_fee()
+            assert base_fee == 100
+
+    @pytest.mark.asyncio
+    async def test_fetch_base_fee_async(self):
+        horizon_url = "https://horizon.stellar.org"
+        client = AiohttpClient()
+        async with Server(horizon_url, client) as server:
+            base_fee = await server.fetch_base_fee()
+            assert isinstance(base_fee, int)
+
     def test_endpoint(self):
         horizon_url = "https://horizon.stellar.org"
         client = RequestsClient()

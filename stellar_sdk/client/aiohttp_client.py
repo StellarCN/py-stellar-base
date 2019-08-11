@@ -1,6 +1,6 @@
 import asyncio
 import json
-from typing import Optional, Union, AsyncGenerator, Any, Dict
+from typing import Optional, AsyncGenerator, Any, Dict
 
 import aiohttp
 from aiohttp_sse_client.client import EventSource
@@ -23,16 +23,23 @@ __all__ = ["AiohttpClient"]
 
 
 class AiohttpClient(BaseAsyncClient):
+    """The :class:`AiohttpClient` object is a asynchronous http client,
+    which represents the interface for making requests to a server instance.
+
+    :param pool_size: persistent connection to Horizon and connection pool
+    :param request_timeout: the timeout for all requests
+    :param backoff_factor: a backoff factor to apply between attempts after the second try
+    :param user_agent: the server can use it to identify you
+    """
+
     def __init__(
         self,
         pool_size: Optional[int] = None,
-        num_retries: Optional[int] = DEFAULT_NUM_RETRIES,
         request_timeout: float = DEFAULT_REQUEST_TIMEOUT,
         backoff_factor: Optional[float] = DEFAULT_BACKOFF_FACTOR,
         user_agent: Optional[str] = None,
         **kwargs
     ) -> None:
-        self.num_retries = num_retries
         self.backoff_factor = backoff_factor
 
         # init session
@@ -61,6 +68,13 @@ class AiohttpClient(BaseAsyncClient):
         self._sse_session = None
 
     async def get(self, url: str, params: Dict[str, str] = None) -> Response:
+        """Perform HTTP GET request.
+
+        :param url: the request url
+        :param params: the requested params
+        :return: the response from server
+        :raise: :exc:`ConnectionError <stellar_sdk.exceptions.ConnectionError>`
+        """
         try:
             async with self._session.get(url, params=params) as response:
                 return Response(
@@ -73,6 +87,13 @@ class AiohttpClient(BaseAsyncClient):
             raise ConnectionError(e)
 
     async def post(self, url: str, data: Dict[str, str] = None) -> Response:
+        """Perform HTTP POST request.
+
+        :param url: the request url
+        :param data: the data send to server
+        :return: the response from server
+        :raise: :exc:`ConnectionError <stellar_sdk.exceptions.ConnectionError>`
+        """
         try:
             async with self._session.post(url, data=data) as response:
                 return Response(
@@ -94,11 +115,16 @@ class AiohttpClient(BaseAsyncClient):
     async def stream(
         self, url: str, params: Dict[str, str] = None
     ) -> AsyncGenerator[Dict[str, Any], None]:
-        """
-        SSE generator with timeout between events
-        :param url: URL to send SSE request to
-        :param params: params
-        :return: response dict
+        """Creates an EventSource that listens for incoming messages from the server.
+
+        See `Horizon Response Format <https://www.stellar.org/developers/horizon/reference/responses.html>`_
+
+        See `MDN EventSource <https://developer.mozilla.org/en-US/docs/Web/API/EventSource>`_
+
+        :param url: the request url
+        :param params: the request params
+        :return: a dict Generator for server response
+        :raise: :exc:`ConnectionError <stellar_sdk.exceptions.ConnectionError>`
         """
 
         async def _sse_generator() -> AsyncGenerator[dict, Any]:
@@ -160,6 +186,10 @@ class AiohttpClient(BaseAsyncClient):
         await self.close()
 
     async def close(self) -> None:
+        """Close underlying connector.
+
+        Release all acquired resources.
+        """
         await self._session.__aexit__(None, None, None)
         if self._sse_session is not None:
             await self._sse_session.__aexit__(None, None, None)

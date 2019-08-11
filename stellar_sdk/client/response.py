@@ -7,6 +7,10 @@ class Response:
     """The :class:`Response <Response>` object, which contains a
     server's response to an HTTP request.
 
+    :param status_code: response status code
+    :param text: response content
+    :param headers: response headers
+    :param url: request url
     """
 
     def __init__(self, status_code: int, text: str, headers: dict, url: str) -> None:
@@ -16,6 +20,10 @@ class Response:
         self.url = url
 
     def json(self) -> dict:
+        """convert the content to dict
+
+        :return: the content from server
+        """
         return json.loads(self.text)
 
     def __eq__(self, other: object) -> bool:

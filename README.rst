@@ -9,9 +9,13 @@ py-stellar-sdk
     :alt: Read the Docs
     :target: https://stellar-sdk.readthedocs.io/en/latest/
 
-.. image:: https://img.shields.io/codecov/c/github/StellarCN/py-stellar-base.svg?style=flat-square&maxAge=1800
+.. image:: https://img.shields.io/codecov/c/github/StellarCN/py-stellar-base/v2?style=flat-square&maxAge=1800
     :alt: Codecov
     :target: https://codecov.io/gh/StellarCN/py-stellar-base
+
+.. image:: https://img.shields.io/codeclimate/maintainability/overcat/py-stellar-sdk?style=flat-square&maxAge=1800
+    :alt: Code Climate maintainability
+    :target: https://codeclimate.com/github/overcat/py-stellar-sdk/maintainability
 
 .. image:: https://img.shields.io/pypi/v/stellar-sdk.svg?style=flat-square&maxAge=1800
     :alt: PyPI

@@ -109,6 +109,41 @@ TransactionsCallBuilder
    :members:
    :inherited-members:
 
+Client
+^^^^^^
+
+BaseAsyncClient
+---------------
+
+.. autoclass:: stellar_sdk.client.base_async_client.BaseAsyncClient
+   :members:
+
+BaseAsyncClient
+---------------
+
+.. autoclass:: stellar_sdk.client.base_sync_client.BaseSyncClient
+   :members:
+
+AiohttpClient
+--------------
+
+.. autoclass:: stellar_sdk.client.aiohttp_client.AiohttpClient
+   :members:
+
+SimpleRequestsClient
+--------------------
+
+.. autoclass:: stellar_sdk.client.simple_requests_client.SimpleRequestsClient
+   :members:
+
+Response
+--------
+
+.. autoclass:: stellar_sdk.client.response.Response
+   :members:
+
+
+
 Exceptions
 ^^^^^^^^^^
 
