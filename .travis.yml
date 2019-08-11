@@ -4,6 +4,9 @@ matrix:
     - name: "Python 3.6 on Xenial Linux"
       python: 3.6
       dist: xenial
+    - name: "PyPy 3.6 on Xenial Linux"
+      python: "pypy3.6-7.1.1"
+      dist: xenial
     - name: "Python 3.7 on Xenial Linux"
       python: 3.7
       dist: xenial
@@ -26,6 +29,10 @@ install:
 script:
   - pytest -v -rs tests --runslow --cov
 
+after_success:
+  - codecov
+
 notifications:
-  on_success: change
-  on_failure: always
+  email:
+    on_success: change
+    on_failure: always
