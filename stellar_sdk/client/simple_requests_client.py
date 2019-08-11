@@ -1,4 +1,4 @@
-from typing import NoReturn, Union, Dict
+from typing import Union, Dict
 
 import requests
 from requests import RequestException
@@ -41,7 +41,9 @@ class SimpleRequestsClient(BaseSyncClient):
             url=resp.url,
         )
 
-    def stream(self, url: str, params: Dict[str, str] = None) -> NoReturn:
+    def stream(
+        self, url: str, params: Dict[str, str] = None
+    ) -> None:  # Here should return NoReturn, but it has not been implemented in PyPy.
         raise NotImplementedError  # pragma: no cover
 
     def close(self):

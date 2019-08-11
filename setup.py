@@ -6,10 +6,12 @@ from setuptools import setup, find_packages
 assert sys.version_info >= (3, 6, 0), "stellar-sdk v2 requires Python 3.6+"
 
 here = os.path.abspath(os.path.dirname(__file__))
-requirements_file = 'requirements.txt'
+requirements_file = "requirements.txt"
 
 about = {}
-with open(os.path.join(here, "stellar_sdk", "__version__.py"), mode="r", encoding="utf-8") as f:
+with open(
+    os.path.join(here, "stellar_sdk", "__version__.py"), mode="r", encoding="utf-8"
+) as f:
     exec(f.read(), about)
 
 with open("README.rst", mode="r", encoding="utf-8") as f:
@@ -24,11 +26,23 @@ setup(
     author_email=about["__author_email__"],
     url=about["__url__"],
     license=about["__license__"],
-    keywords=["stellar-sdk", "stellar.org", "lumens", "xlm", "blockchain", "distributed exchange", "cryptocurrency",
-              "dex", "stellar-core", "horizon", "sdex", "trading"],
+    keywords=[
+        "stellar-sdk",
+        "stellar.org",
+        "lumens",
+        "xlm",
+        "blockchain",
+        "distributed exchange",
+        "cryptocurrency",
+        "dex",
+        "stellar-core",
+        "horizon",
+        "sdex",
+        "trading",
+    ],
     include_package_data=True,
     install_requires=open(requirements_file).readlines(),
-    packages=find_packages(),
+    packages=find_packages(exclude=["tests", "tests.*"]),
     python_requires=">=3.6.0",
     classifiers=[
         "Development Status :: 1 - Planning",
@@ -41,6 +55,7 @@ setup(
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3 :: Only",
         "Programming Language :: Python :: Implementation :: CPython",
+        "Programming Language :: Python :: Implementation :: PyPy",
         "Topic :: Software Development :: Libraries :: Python Modules",
     ],
 )
