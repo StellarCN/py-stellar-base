@@ -15,6 +15,8 @@ HEADERS = {
     "User-Agent": USER_AGENT,
 }
 
+__all__ = ["SimpleRequestsClient"]
+
 
 class SimpleRequestsClient(BaseSyncClient):
     def get(self, url: str, params: Dict[str, str] = None) -> Response:

@@ -126,8 +126,7 @@ class TestServer:
         client = RequestsClient()
         with Server(horizon_url, client) as server:
             resp = server.submit_transaction(xdr)
-            assert resp.status_code == 200
-            assert resp.json()["envelope_xdr"] == xdr
+            assert resp["envelope_xdr"] == xdr
 
     @pytest.mark.asyncio
     async def test_submit_transaction_with_te(self):
@@ -137,5 +136,4 @@ class TestServer:
         client = AiohttpClient()
         async with Server(horizon_url, client) as server:
             resp = await server.submit_transaction(te)
-            assert resp.status_code == 200
-            assert resp.json()["envelope_xdr"] == xdr
+            assert resp["envelope_xdr"] == xdr

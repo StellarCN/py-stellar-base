@@ -6,6 +6,8 @@ from .keypair import Keypair
 from .xdr import Xdr
 from .strkey import StrKey
 
+__all__ = ["Asset"]
+
 
 class Asset:
     """The :class:`Asset` object, which represents an asset and its

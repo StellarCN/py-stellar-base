@@ -1,5 +1,7 @@
 from .xdr import Xdr
 
+__all__ = ["TimeBounds"]
+
 
 class TimeBounds:
     """TimeBounds represents the time interval that a transaction is valid.

@@ -19,6 +19,8 @@ IDENTIFICATION_HEADERS = {
     "X-Client-Version": __version__,
 }
 
+__all__ = ["AiohttpClient"]
+
 
 class AiohttpClient(BaseAsyncClient):
     def __init__(

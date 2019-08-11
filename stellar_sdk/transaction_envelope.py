@@ -7,6 +7,8 @@ from .xdr import Xdr
 from .transaction import Transaction
 from .utils import sha256
 
+__all__ = ["TransactionEnvelope"]
+
 
 class TransactionEnvelope:
     """The :class:`TransactionEnvelope` object, which represents a transaction

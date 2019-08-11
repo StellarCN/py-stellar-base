@@ -8,6 +8,8 @@ from .exceptions import BadSignatureError, MissingEd25519SecretSeedError, ValueE
 from .strkey import StrKey
 from .xdr import Xdr
 
+__all__ = ["Keypair"]
+
 
 class Keypair:
     """The :class:`Keypair` object, which represents a signing and

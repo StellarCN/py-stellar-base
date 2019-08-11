@@ -63,12 +63,12 @@ class Server:
             return self.__submit_async(url, data)
         return self.__submit_sync(url, data)
 
-    def __submit_sync(self, url, data):
+    def __submit_sync(self, url: str, data: Dict[str, str]) -> Dict[str, Any]:
         resp = self._client.post(url=url, data=data)
         raise_request_exception(resp)
         return resp.json()
 
-    async def __submit_async(self, url, data):
+    async def __submit_async(self, url: str, data: Dict[str, str]) -> Dict[str, Any]:
         resp = await self._client.post(url=url, data=data)
         raise_request_exception(resp)
         return resp.json()

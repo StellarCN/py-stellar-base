@@ -23,6 +23,8 @@ IDENTIFICATION_HEADERS = {
     "X-Client-Version": __version__,
 }
 
+__all__ = ["RequestsClient"]
+
 
 class RequestsClient(BaseSyncClient):
     def __init__(

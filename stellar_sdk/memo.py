@@ -4,6 +4,8 @@ from typing import Union
 from .exceptions import MemoInvalidException
 from .xdr import Xdr
 
+__all__ = ["Memo", "NoneMemo", "TextMemo", "IdMemo", "HashMemo", "ReturnHashMemo"]
+
 
 class Memo(object, metaclass=abc.ABCMeta):
     """The :class:`Memo` object, which represents the base class for memos for

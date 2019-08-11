@@ -3,6 +3,8 @@ from .exceptions import ValueError
 from .strkey import StrKey
 from .xdr import Xdr
 
+__all__ = ["Signer"]
+
 
 class Signer:
     """The :class:`Signer` object, which represents an account signer on Stellar's network.

@@ -1,6 +1,8 @@
 from .xdr import Xdr
 from .utils import best_rational_approximation
 
+__all__ = ["Price"]
+
 
 class Price:
     """Create a new price. Price in Stellar is represented as a fraction.

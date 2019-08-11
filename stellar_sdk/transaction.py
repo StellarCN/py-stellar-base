@@ -9,6 +9,8 @@ from .strkey import StrKey
 from .time_bounds import TimeBounds
 from .utils import pack_xdr_array, unpack_xdr_array
 
+__all__ = ["Transaction"]
+
 
 class Transaction:
     """The :class:`Transaction` object, which represents a transaction

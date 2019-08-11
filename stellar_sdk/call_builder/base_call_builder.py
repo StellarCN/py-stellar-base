@@ -1,12 +1,4 @@
-from typing import (
-    Union,
-    Coroutine,
-    Any,
-    Dict,
-    Mapping,
-    Generator,
-    AsyncGenerator,
-)
+from typing import Union, Coroutine, Any, Dict, Mapping, Generator, AsyncGenerator
 from urllib.parse import urljoin
 
 from ..client.base_async_client import BaseAsyncClient
@@ -25,7 +17,7 @@ class BaseCallBuilder:
     """
 
     def __init__(
-            self, horizon_url: str, client: Union[BaseAsyncClient, BaseSyncClient]
+        self, horizon_url: str, client: Union[BaseAsyncClient, BaseSyncClient]
     ) -> None:
 
         self.__async: bool = False
@@ -61,7 +53,7 @@ class BaseCallBuilder:
         return resp.json()
 
     def stream(
-            self
+        self
     ) -> Union[
         AsyncGenerator[Dict[str, Any], None], Generator[Dict[str, Any], None, None]
     ]:
@@ -132,7 +124,7 @@ class BaseCallBuilder:
             self.params[key] = str(value)
 
     def _add_query_params(
-            self, params: Mapping[str, Union[str, float, int, bool, None]]
+        self, params: Mapping[str, Union[str, float, int, bool, None]]
     ) -> None:
         for k, v in params.items():
             self._add_query_param(k, v)
@@ -141,8 +133,8 @@ class BaseCallBuilder:
         if not isinstance(other, self.__class__):
             return NotImplemented
         return (
-                self.client == other.client
-                and self.params == other.params
-                and self.endpoint == other.endpoint
-                and self.horizon_url == other.horizon_url
+            self.client == other.client
+            and self.params == other.params
+            and self.endpoint == other.endpoint
+            and self.horizon_url == other.horizon_url
         )

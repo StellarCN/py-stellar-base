@@ -6,13 +6,15 @@ from .asset import Asset
 from .exceptions import ValueError
 from .keypair import Keypair
 from .memo import *
-from .network import Network, TESTNET_NETWORK_PASSPHRASE
+from .network import Network
 from .operation import *
 from .price import Price
 from .signer import Signer
 from .time_bounds import TimeBounds
 from .transaction import Transaction
 from .transaction_envelope import TransactionEnvelope
+
+__all__ = ["TransactionBuilder"]
 
 
 class TransactionBuilder:
@@ -40,7 +42,7 @@ class TransactionBuilder:
     def __init__(
         self,
         source_account: Account,
-        network_passphrase: str = TESTNET_NETWORK_PASSPHRASE,
+        network_passphrase: str = Network.TESTNET_NETWORK_PASSPHRASE,
         base_fee: int = 100,
     ):
         self.source_account: Account = source_account
