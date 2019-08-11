@@ -20,7 +20,7 @@ class TestTradeAggregationsCallBuilder:
             "base_asset_code": base.code,
             "base_asset_issuer": base.issuer,
             "counter_asset_type": counter.type,
-            "resolution": resolution,
+            "resolution": str(resolution),
         }
 
     def test_invalid_resolution_raise(self):

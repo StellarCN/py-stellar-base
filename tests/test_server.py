@@ -115,8 +115,8 @@ class TestServer:
         with pytest.raises(
             ValueError,
             match="This `client` class should be an instance "
-            "of `stellar_sdk.client.base_async_client import BaseAsyncClient` "
-            "or `stellar_sdk.client.base_sync_client import BaseSyncClient`.",
+            "of `stellar_sdk.client.base_async_client.BaseAsyncClient` "
+            "or `stellar_sdk.client.base_sync_client.BaseSyncClient`.",
         ):
             Server(horizon_url, client)
 
