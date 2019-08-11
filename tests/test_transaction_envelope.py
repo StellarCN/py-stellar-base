@@ -4,7 +4,7 @@ from stellar_sdk.asset import Asset
 from stellar_sdk.exceptions import SignatureExistError
 from stellar_sdk.keypair import Keypair
 from stellar_sdk.memo import IdMemo
-from stellar_sdk.network import PUBLIC
+from stellar_sdk.network import Network
 from stellar_sdk.operation import Payment, ManageData
 from stellar_sdk.time_bounds import TimeBounds
 from stellar_sdk.transaction import Transaction
@@ -26,7 +26,7 @@ class TestTransactionEnvelope:
         time_bounds = TimeBounds(12345, 56789)
         ops = [Payment(destination, asset, amount), ManageData("hello", "world")]
         tx = Transaction(source, sequence, fee, ops, memo, time_bounds)
-        network = PUBLIC
+        network = Network.public_network()
         te = TransactionEnvelope(tx, network)
         te.sign(source)
         hashx = bytes.fromhex(
@@ -52,7 +52,7 @@ class TestTransactionEnvelope:
         time_bounds = TimeBounds(12345, 56789)
         ops = [Payment(destination, asset, amount), ManageData("hello", "world")]
         tx = Transaction(source, sequence, fee, ops, memo, time_bounds)
-        network = PUBLIC
+        network = Network.public_network()
         te = TransactionEnvelope(tx, network)
         te.sign(source)
         hashx = bytes.fromhex(

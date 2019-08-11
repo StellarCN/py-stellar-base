@@ -19,7 +19,7 @@ from stellar_sdk.call_builder.transactions_call_builder import TransactionsCallB
 from stellar_sdk.client.aiohttp_client import AiohttpClient
 from stellar_sdk.client.requests_client import RequestsClient
 from stellar_sdk.exceptions import ValueError
-from stellar_sdk.network import PUBLIC_NETWORK_PASSPHRASE
+from stellar_sdk.network import Network
 from stellar_sdk.server import Server
 
 
@@ -131,7 +131,7 @@ class TestServer:
     @pytest.mark.asyncio
     async def test_submit_transaction_with_te(self):
         xdr = "AAAAAHI7fpgo+b7tgpiFyYWimjV7L7IOYLwmQS7k7F8SronXAAAAZAE+QT4AAAAJAAAAAQAAAAAAAAAAAAAAAF1MG8cAAAAAAAAAAQAAAAAAAAAAAAAAAOvi1O/HEn+QgZJw+EMZBtwvTVNmpgvE9p8IRfwp0GY4AAAAAAExLQAAAAAAAAAAARKuidcAAABAJVc1ASGp35hUquGNbzzSqWPoTG0zgc89zc4p+19QkgbPqsdyEfHs7+ng9VJA49YneEXRa6Fv7pfKpEigb3VTCg=="
-        te = TransactionBuilder.from_xdr(xdr, PUBLIC_NETWORK_PASSPHRASE)
+        te = TransactionBuilder.from_xdr(xdr, Network.PUBLIC_NETWORK_PASSPHRASE)
         horizon_url = "https://horizon.stellar.org"
         client = AiohttpClient()
         async with Server(horizon_url, client) as server:

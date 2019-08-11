@@ -13,7 +13,7 @@ from stellar_sdk import (
     ReturnHashMemo,
 )
 from stellar_sdk.account import Account
-from stellar_sdk.network import TESTNET_NETWORK_PASSPHRASE
+from stellar_sdk.network import Network
 from stellar_sdk.signer import Signer
 from stellar_sdk.time_bounds import TimeBounds
 
@@ -21,7 +21,9 @@ from stellar_sdk.time_bounds import TimeBounds
 class TestTransactionBuilder:
     def test_to_xdr(self):
         source = Account("GDF5O4OWEMVBY5FLDHWA5RZTYSV2U276XGKZZ6VSHDDR3THSQ6OQS7UM", 1)
-        builder = TransactionBuilder(source, TESTNET_NETWORK_PASSPHRASE, base_fee=150)
+        builder = TransactionBuilder(
+            source, Network.TESTNET_NETWORK_PASSPHRASE, base_fee=150
+        )
         builder.add_text_memo("Stellar Python SDK")
         builder.add_time_bounds(1565590000, 1565600000)
         te = (
@@ -136,14 +138,16 @@ class TestTransactionBuilder:
         print(te.to_xdr())
         assert te.to_xdr() == xdr_signed
 
-        restore_te = TransactionBuilder.from_xdr(xdr_signed, TESTNET_NETWORK_PASSPHRASE)
+        restore_te = TransactionBuilder.from_xdr(
+            xdr_signed, Network.TESTNET_NETWORK_PASSPHRASE
+        )
         assert restore_te.to_xdr() == xdr_signed
 
     def test_set_timeout(self):
         source = Account("GDF5O4OWEMVBY5FLDHWA5RZTYSV2U276XGKZZ6VSHDDR3THSQ6OQS7UM", 1)
         timeout = 1000
         builder = TransactionBuilder(
-            source, TESTNET_NETWORK_PASSPHRASE, base_fee=150
+            source, Network.TESTNET_NETWORK_PASSPHRASE, base_fee=150
         ).set_timeout(1000)
         now = int(time.time())
         assert isinstance(builder.time_bounds, TimeBounds)
@@ -159,22 +163,22 @@ class TestTransactionBuilder:
             match="TimeBounds has been already set - setting timeout would overwrite it.",
         ):
             TransactionBuilder(
-                source, TESTNET_NETWORK_PASSPHRASE, base_fee=150
+                source, Network.TESTNET_NETWORK_PASSPHRASE, base_fee=150
             ).add_time_bounds(0, now + timeout).set_timeout(1000)
 
     def test_add_memo(self):
         source = Account("GDF5O4OWEMVBY5FLDHWA5RZTYSV2U276XGKZZ6VSHDDR3THSQ6OQS7UM", 1)
         builder = TransactionBuilder(
-            source, TESTNET_NETWORK_PASSPHRASE, base_fee=150
+            source, Network.TESTNET_NETWORK_PASSPHRASE, base_fee=150
         ).add_id_memo(100)
         assert builder.memo == IdMemo(100)
 
         memo_hash = os.urandom(32)
         builder = TransactionBuilder(
-            source, TESTNET_NETWORK_PASSPHRASE, base_fee=150
+            source, Network.TESTNET_NETWORK_PASSPHRASE, base_fee=150
         ).add_hash_memo(memo_hash)
         assert builder.memo == HashMemo(memo_hash)
         builder = TransactionBuilder(
-            source, TESTNET_NETWORK_PASSPHRASE, base_fee=150
+            source, Network.TESTNET_NETWORK_PASSPHRASE, base_fee=150
         ).add_return_hash_memo(memo_hash)
         assert builder.memo == ReturnHashMemo(memo_hash)
