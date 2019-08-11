@@ -1,3 +1,5 @@
+from typing import List
+
 from .operation import Operation
 from ..keypair import Keypair
 from ..signer import Signer
@@ -78,7 +80,7 @@ class SetOptions(Operation):
     def _type_code(cls) -> int:
         return Xdr.const.SET_OPTIONS
 
-    def _to_operation_body(self) -> Xdr.nullclass():
+    def _to_operation_body(self) -> Xdr.nullclass:
         if self.inflation_dest is not None:
             inflation_dest = [
                 Keypair.from_public_key(self.inflation_dest).xdr_account_id()
@@ -86,7 +88,7 @@ class SetOptions(Operation):
         else:
             inflation_dest = []
 
-        home_domain = []
+        home_domain: List[bytes] = []
         if self.home_domain:
             home_domain = pack_xdr_array(bytes(self.home_domain, encoding="utf-8"))
 
@@ -97,7 +99,7 @@ class SetOptions(Operation):
         med_threshold = pack_xdr_array(self.med_threshold)
         high_threshold = pack_xdr_array(self.high_threshold)
 
-        signer = []
+        signer: List[Xdr.types.Signer] = []
         if self.signer:
             signer = [self.signer.to_xdr_object()]
 

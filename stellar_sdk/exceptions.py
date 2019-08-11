@@ -1,15 +1,42 @@
+from .client.response import Response
+
+BuildInValueError = ValueError
+BuildInTypeError = TypeError
+
+__all__ = [
+    "SdkError",
+    "ValueError",
+    "TypeError",
+    "BadSignatureError",
+    "Ed25519PublicKeyInvalidError",
+    "Ed25519SecretSeedInvalidError",
+    "MissingEd25519SecretSeedError",
+    "MemoInvalidException",
+    "AssetCodeInvalidError",
+    "AssetIssuerInvalidError",
+    "NoApproximationError",
+    "SignatureExistError",
+    "BaseRequestError",
+    "ConnectionError",
+    "NotFoundError",
+    "BadRequestError",
+    "BadResponseError",
+    "UnknownRequestError",
+]
+
+
 class SdkError(Exception):
     """Base exception for all stellar sdk related errors
     """
 
 
-class ValueError(ValueError, SdkError):
+class ValueError(BuildInValueError, SdkError):
     """exception for all values related errors
 
     """
 
 
-class TypeError(TypeError, SdkError):
+class TypeError(BuildInTypeError, SdkError):
     """exception for all type related errors
 
     """
@@ -82,9 +109,10 @@ class ConnectionError(BaseRequestError):
 class BaseHorizonError(BaseRequestError):
     """Base class for horizon request errors.
 
+    :param response: client response
     """
 
-    def __init__(self, response):
+    def __init__(self, response: Response) -> None:
         super().__init__(response)
         message = response.json()
         self.type = message.get("type")
@@ -139,3 +167,17 @@ class UnknownRequestError(BaseHorizonError):
     """Unknown request exception, please create an issue feedback for this issue.
 
     """
+
+
+def raise_request_exception(response: Response) -> None:
+    status_code = response.status_code
+    if status_code == 200:
+        pass
+    elif status_code == 400:
+        raise BadRequestError(response)
+    elif status_code == 404:
+        raise NotFoundError(response)
+    elif 500 <= status_code < 600:
+        raise BadResponseError(response)
+    else:
+        raise UnknownRequestError(response)

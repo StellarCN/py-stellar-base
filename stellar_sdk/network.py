@@ -1,5 +1,7 @@
 from .utils import sha256
 
+__all__ = ["Network"]
+
 
 class Network:
     """The :class:`Network` object, which represents a Stellar network.
@@ -10,6 +12,12 @@ class Network:
         (ex. 'Public Global Stellar Network ; September 2015')
 
     """
+
+    PUBLIC_NETWORK_PASSPHRASE: str = "Public Global Stellar Network ; September 2015"
+    """Get the Public network passphrase."""
+
+    TESTNET_NETWORK_PASSPHRASE: str = "Test SDF Network ; September 2015"
+    """Get the Test network passphrase."""
 
     def __init__(self, network_passphrase: str) -> None:
         self.network_passphrase = network_passphrase
@@ -22,20 +30,23 @@ class Network:
         """
         return sha256(self.network_passphrase.encode())
 
-    def __eq__(self, other: "Network") -> bool:
-        if not isinstance(other, Network):
-            return False
+    @classmethod
+    def public_network(cls) -> "Network":
+        """Get the :class:`Network` object representing the PUBLIC Network.
+
+        :return: PUBLIC Network
+        """
+        return cls(cls.PUBLIC_NETWORK_PASSPHRASE)
+
+    @classmethod
+    def testnet_network(cls) -> "Network":
+        """Get the :class:`Network` object representing the TESTNET Network.
+
+        :return: TESTNET Network
+        """
+        return cls(cls.TESTNET_NETWORK_PASSPHRASE)
+
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, self.__class__):
+            return NotImplemented
         return self.network_passphrase == other.network_passphrase
-
-
-PUBLIC_NETWORK_PASSPHRASE: str = "Public Global Stellar Network ; September 2015"
-"""Get the Public network passphrase."""
-
-TESTNET_NETWORK_PASSPHRASE: str = "Test SDF Network ; September 2015"
-"""Get the Test network passphrase."""
-
-PUBLIC: Network = Network(PUBLIC_NETWORK_PASSPHRASE)
-"""Get the :class:`Network` representing the PUBLIC Network."""
-
-TESTNET: Network = Network(TESTNET_NETWORK_PASSPHRASE)
-"""Get the :class:`Network` representing the Test Network."""

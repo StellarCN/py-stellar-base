@@ -1,4 +1,4 @@
-from typing import Union, Coroutine, Any
+from typing import Union, Coroutine, Any, Dict
 from urllib.parse import urljoin
 
 from .account import Account
@@ -21,7 +21,7 @@ from .client.base_sync_client import BaseSyncClient
 from .client.requests_client import RequestsClient
 from .client.response import Response
 from .transaction_envelope import TransactionEnvelope
-from .exceptions import ValueError
+from .exceptions import ValueError, raise_request_exception
 
 __all__ = ["Server"]
 
@@ -32,65 +32,77 @@ class Server:
         horizon_url: str = "https://horizon-testnet.stellar.org/",
         client: Union[BaseAsyncClient, BaseSyncClient] = None,
     ) -> None:
-        self.horizon_url = horizon_url
+        self.horizon_url: str = horizon_url
 
-        self.client = client
         if not client:
             # TODO: warning here
-            self.client = RequestsClient()
+            client = RequestsClient()
+        self._client: Union[BaseAsyncClient, BaseSyncClient] = client
 
-        if isinstance(self.client, BaseAsyncClient):
+        if isinstance(self._client, BaseAsyncClient):
             self.__async: bool = True
-        elif isinstance(self.client, BaseSyncClient):
-            self.__async: bool = False
+        elif isinstance(self._client, BaseSyncClient):
+            self.__async = False
         else:
             raise ValueError(
                 "This `client` class should be an instance "
-                "of `stellar_sdk.client.base_async_client import BaseAsyncClient` "
-                "or `stellar_sdk.client.base_sync_client import BaseSyncClient`."
+                "of `stellar_sdk.client.base_async_client.BaseAsyncClient` "
+                "or `stellar_sdk.client.base_sync_client.BaseSyncClient`."
             )
 
     def submit_transaction(
         self, transaction_envelope: Union[TransactionEnvelope, str]
-    ) -> Union[Response, Coroutine[Any, Any, Response]]:
+    ) -> Union[Dict[str, Any], Coroutine[Any, Any, Dict[str, Any]]]:
         xdr = transaction_envelope
         if isinstance(transaction_envelope, TransactionEnvelope):
             xdr = transaction_envelope.to_xdr()
 
         data = {"tx": xdr}
         url = urljoin(self.horizon_url, "/transactions")
-        return self.client.post(url=url, data=data)
+        if self.__async:
+            return self.__submit_async(url, data)
+        return self.__submit_sync(url, data)
+
+    def __submit_sync(self, url: str, data: Dict[str, str]) -> Dict[str, Any]:
+        resp = self._client.post(url=url, data=data)
+        raise_request_exception(resp)
+        return resp.json()
+
+    async def __submit_async(self, url: str, data: Dict[str, str]) -> Dict[str, Any]:
+        resp = await self._client.post(url=url, data=data)
+        raise_request_exception(resp)
+        return resp.json()
 
     def accounts(self) -> AccountsCallBuilder:
         """
         :return: New :class:`AccountsCallBuilder` object configured by a current Horizon server configuration.
         """
-        return AccountsCallBuilder(horizon_url=self.horizon_url, client=self.client)
+        return AccountsCallBuilder(horizon_url=self.horizon_url, client=self._client)
 
     def assets(self) -> AssetsCallBuilder:
-        return AssetsCallBuilder(horizon_url=self.horizon_url, client=self.client)
+        return AssetsCallBuilder(horizon_url=self.horizon_url, client=self._client)
 
     def effects(self) -> EffectsCallBuilder:
-        return EffectsCallBuilder(horizon_url=self.horizon_url, client=self.client)
+        return EffectsCallBuilder(horizon_url=self.horizon_url, client=self._client)
 
     def fee_stats(self) -> FeeStatsCallBuilder:
-        return FeeStatsCallBuilder(horizon_url=self.horizon_url, client=self.client)
+        return FeeStatsCallBuilder(horizon_url=self.horizon_url, client=self._client)
 
     def ledgers(self) -> LedgersCallBuilder:
-        return LedgersCallBuilder(horizon_url=self.horizon_url, client=self.client)
+        return LedgersCallBuilder(horizon_url=self.horizon_url, client=self._client)
 
     def offers(self, account_id: str) -> OffersCallBuilder:
         return OffersCallBuilder(
-            horizon_url=self.horizon_url, client=self.client, account_id=account_id
+            horizon_url=self.horizon_url, client=self._client, account_id=account_id
         )
 
     def operations(self) -> OperationsCallBuilder:
-        return OperationsCallBuilder(horizon_url=self.horizon_url, client=self.client)
+        return OperationsCallBuilder(horizon_url=self.horizon_url, client=self._client)
 
     def orderbook(self, selling: Asset, buying: Asset) -> OrderbookCallBuilder:
         return OrderbookCallBuilder(
             horizon_url=self.horizon_url,
-            client=self.client,
+            client=self._client,
             buying=buying,
             selling=selling,
         )
@@ -104,7 +116,7 @@ class Server:
     ) -> PathsCallBuilder:
         return PathsCallBuilder(
             horizon_url=self.horizon_url,
-            client=self.client,
+            client=self._client,
             source_account=source_account,
             destination_account=destination_account,
             destination_asset=destination_asset,
@@ -112,7 +124,7 @@ class Server:
         )
 
     def payments(self) -> PaymentsCallBuilder:
-        return PaymentsCallBuilder(horizon_url=self.horizon_url, client=self.client)
+        return PaymentsCallBuilder(horizon_url=self.horizon_url, client=self._client)
 
     def trade_aggregations(
         self,
@@ -125,7 +137,7 @@ class Server:
     ) -> TradeAggregationsCallBuilder:
         return TradeAggregationsCallBuilder(
             horizon_url=self.horizon_url,
-            client=self.client,
+            client=self._client,
             base=base,
             counter=counter,
             start_time=start_time,
@@ -135,10 +147,12 @@ class Server:
         )
 
     def trades(self) -> TradesCallBuilder:
-        return TradesCallBuilder(horizon_url=self.horizon_url, client=self.client)
+        return TradesCallBuilder(horizon_url=self.horizon_url, client=self._client)
 
     def transactions(self) -> TransactionsCallBuilder:
-        return TransactionsCallBuilder(horizon_url=self.horizon_url, client=self.client)
+        return TransactionsCallBuilder(
+            horizon_url=self.horizon_url, client=self._client
+        )
 
     def load_account(
         self, account_id: str
@@ -149,12 +163,12 @@ class Server:
 
     async def __load_account_async(self, account_id: str) -> Account:
         resp = await self.accounts().account_id(account_id=account_id).call()
-        sequence = int(resp.json()["sequence"])
+        sequence = int(resp["sequence"])
         return Account(account_id=account_id, sequence=sequence)
 
     def __load_account_sync(self, account_id: str) -> Account:
         resp = self.accounts().account_id(account_id=account_id).call()
-        sequence = int(resp.json()["sequence"])
+        sequence = int(resp["sequence"])
         return Account(account_id=account_id, sequence=sequence)
 
     def close(self):
@@ -164,10 +178,10 @@ class Server:
             return self.__close_sync()
 
     async def __close_async(self) -> None:
-        await self.client.close()
+        await self._client.close()
 
     def __close_sync(self) -> None:
-        self.client.close()
+        self._client.close()
 
     async def __aenter__(self) -> "Server":
         return self

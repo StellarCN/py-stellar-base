@@ -1,8 +1,10 @@
 import abc
-import typing
+from typing import Union
 
 from .exceptions import MemoInvalidException
 from .xdr import Xdr
+
+__all__ = ["Memo", "NoneMemo", "TextMemo", "IdMemo", "HashMemo", "ReturnHashMemo"]
 
 
 class Memo(object, metaclass=abc.ABCMeta):
@@ -32,7 +34,7 @@ class Memo(object, metaclass=abc.ABCMeta):
     """
 
     @abc.abstractmethod
-    def to_xdr_object(self):
+    def to_xdr_object(self) -> Xdr.types.Memo:
         """Creates an XDR Memo object that represents this :class:`Memo`."""
 
     @staticmethod
@@ -51,8 +53,10 @@ class Memo(object, metaclass=abc.ABCMeta):
         memo_cls = xdr_types.get(xdr_obj.type, NoneMemo)
         return memo_cls.from_xdr_object(xdr_obj)
 
-    def __eq__(self, memo: "Memo"):
-        return self.to_xdr_object().to_xdr() == memo.to_xdr_object().to_xdr()
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, self.__class__):
+            return NotImplemented
+        return self.to_xdr_object().to_xdr() == other.to_xdr_object().to_xdr()
 
 
 class NoneMemo(Memo):
@@ -78,7 +82,7 @@ class TextMemo(Memo):
 
     """
 
-    def __init__(self, text: typing.Union[str, bytes]) -> None:
+    def __init__(self, text: Union[str, bytes]) -> None:
         if not isinstance(text, (str, bytes)):
             raise MemoInvalidException(
                 "TextMemo expects string or bytes type got a {}".format(type(text))

@@ -1,6 +1,6 @@
 import asyncio
 import json
-from typing import Optional, Union, AsyncGenerator, Any
+from typing import Optional, Union, AsyncGenerator, Any, Dict
 
 import aiohttp
 from aiohttp_sse_client.client import EventSource
@@ -19,13 +19,15 @@ IDENTIFICATION_HEADERS = {
     "X-Client-Version": __version__,
 }
 
+__all__ = ["AiohttpClient"]
+
 
 class AiohttpClient(BaseAsyncClient):
     def __init__(
         self,
         pool_size: Optional[int] = None,
         num_retries: Optional[int] = DEFAULT_NUM_RETRIES,
-        request_timeout: Optional[Union[int, None]] = DEFAULT_REQUEST_TIMEOUT,
+        request_timeout: float = DEFAULT_REQUEST_TIMEOUT,
         backoff_factor: Optional[float] = DEFAULT_BACKOFF_FACTOR,
         user_agent: Optional[str] = None,
         **kwargs
@@ -58,7 +60,7 @@ class AiohttpClient(BaseAsyncClient):
         self._session = session
         self._sse_session = None
 
-    async def get(self, url: str, params=None) -> Response:
+    async def get(self, url: str, params: Dict[str, str] = None) -> Response:
         try:
             async with self._session.get(url, params=params) as response:
                 return Response(
@@ -70,7 +72,7 @@ class AiohttpClient(BaseAsyncClient):
         except aiohttp.ClientConnectionError as e:  # TODO: need more research
             raise ConnectionError(e)
 
-    async def post(self, url: str, data=None) -> Response:
+    async def post(self, url: str, data: Dict[str, str] = None) -> Response:
         try:
             async with self._session.post(url, data=data) as response:
                 return Response(
@@ -90,8 +92,8 @@ class AiohttpClient(BaseAsyncClient):
             self._sse_session = aiohttp.ClientSession()
 
     async def stream(
-        self, url: str, params: Optional[dict] = None
-    ) -> AsyncGenerator[dict, Any]:
+        self, url: str, params: Dict[str, str] = None
+    ) -> AsyncGenerator[Dict[str, Any], None]:
         """
         SSE generator with timeout between events
         :param url: URL to send SSE request to
@@ -148,7 +150,8 @@ class AiohttpClient(BaseAsyncClient):
         await self._init_sse_session()
         gen = _sse_generator()
         while True:
-            yield await gen.__anext__()
+            data = await gen.__anext__()
+            yield data
 
     async def __aenter__(self) -> "AiohttpClient":
         return self

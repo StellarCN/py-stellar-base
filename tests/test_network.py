@@ -1,4 +1,4 @@
-from stellar_sdk.network import Network, PUBLIC, TESTNET
+from stellar_sdk.network import Network
 
 
 class TestNetwork:
@@ -15,20 +15,20 @@ class TestNetwork:
         )
 
     def test_public(self):
-        assert PUBLIC.network_passphrase == self.public_passphrase
+        assert Network.public_network().network_passphrase == self.public_passphrase
         assert (
-            PUBLIC.network_id().hex()
+            Network.public_network().network_id().hex()
             == "7ac33997544e3175d266bd022439b22cdb16508c01163f26e5cb2a3e1045a979"
         )
 
     def test_testnet(self):
-        assert TESTNET.network_passphrase == self.testnet_passphrase
+        assert Network.testnet_network().network_passphrase == self.testnet_passphrase
         assert (
-            TESTNET.network_id().hex()
+            Network.testnet_network().network_id().hex()
             == "cee0302d59844d32bdca915c8203dd44b33fbb7edc19051ea37abedf28ecd472"
         )
 
     def test_equals(self):
-        assert Network(self.public_passphrase) == PUBLIC
-        assert Network(self.testnet_passphrase) == TESTNET
+        assert Network(self.public_passphrase) == Network.public_network()
+        assert Network(self.testnet_passphrase) == Network.testnet_network()
         assert Network(self.public_passphrase) != Network(self.testnet_passphrase)

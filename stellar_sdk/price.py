@@ -1,6 +1,8 @@
 from .xdr import Xdr
 from .utils import best_rational_approximation
 
+__all__ = ["Price"]
+
 
 class Price:
     """Create a new price. Price in Stellar is represented as a fraction.
@@ -43,7 +45,7 @@ class Price:
         d = price_xdr_object.d
         return cls(n, d)
 
-    def __eq__(self, other: "Price"):
-        if not isinstance(other, Price):
-            return False
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, self.__class__):
+            return NotImplemented
         return self.n == other.n and self.d == other.d

@@ -1,5 +1,7 @@
 from .strkey import StrKey
 
+__all__ = ["Account"]
+
 
 class Account:
     """The :class:`Account` object, which represents represents a single
@@ -31,9 +33,9 @@ class Account:
         """
         self.sequence += 1
 
-    def __eq__(self, other: "Account"):
+    def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
-            return False
+            return NotImplemented
         return self.account_id == other.account_id and self.sequence == other.sequence
 
     def __str__(self):

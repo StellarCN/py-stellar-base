@@ -1,6 +1,8 @@
-from typing import NoReturn
+from typing import Union, Dict
 
 import requests
+from requests import RequestException
+from urllib3.exceptions import NewConnectionError
 
 from .base_sync_client import BaseSyncClient
 from ..__version__ import __version__
@@ -13,10 +15,15 @@ HEADERS = {
     "User-Agent": USER_AGENT,
 }
 
+__all__ = ["SimpleRequestsClient"]
+
 
 class SimpleRequestsClient(BaseSyncClient):
-    def get(self, url: str, params: dict) -> Response:
-        resp = requests.get(url=url, params=params, headers=HEADERS)
+    def get(self, url: str, params: Dict[str, str] = None) -> Response:
+        try:
+            resp = requests.get(url=url, params=params, headers=HEADERS)
+        except (RequestException, NewConnectionError) as err:
+            raise ConnectionError(err)
         return Response(
             status_code=resp.status_code,
             text=resp.text,
@@ -24,8 +31,11 @@ class SimpleRequestsClient(BaseSyncClient):
             url=resp.url,
         )
 
-    def post(self, url: str, data: dict) -> Response:
-        resp = requests.post(url=url, data=data, headers=HEADERS)
+    def post(self, url: str, data: Dict[str, str]) -> Response:
+        try:
+            resp = requests.post(url=url, data=data, headers=HEADERS)
+        except (RequestException, NewConnectionError) as err:
+            raise ConnectionError(err)
         return Response(
             status_code=resp.status_code,
             text=resp.text,
@@ -33,7 +43,9 @@ class SimpleRequestsClient(BaseSyncClient):
             url=resp.url,
         )
 
-    def stream(self, url: str, params: dict) -> NoReturn:
+    def stream(
+        self, url: str, params: Dict[str, str] = None
+    ) -> None:  # Here should return NoReturn, but it has not been implemented in PyPy.
         raise NotImplementedError  # pragma: no cover
 
     def close(self):

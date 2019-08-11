@@ -1,6 +1,7 @@
-import typing
+from typing import Union
 
 from .operation import Operation
+from ..exceptions import ValueError
 from ..xdr import Xdr
 
 
@@ -25,7 +26,7 @@ class ManageData(Operation):
     """
 
     def __init__(
-        self, data_name: str, data_value: typing.Union[str, bytes, None], source=None
+        self, data_name: str, data_value: Union[str, bytes, None], source=None
     ) -> None:  # TODO: bytes only?
         super().__init__(source)
         self.data_name = data_name

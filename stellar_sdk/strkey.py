@@ -154,20 +154,20 @@ class StrKey:
 
 
 def decode_check(version_byte_name: str, encoded: str) -> bytes:
-    encoded = _bytes_from_decode_data(encoded)
+    encoded_data = _bytes_from_decode_data(encoded)
 
     try:
-        decoded = base64.b32decode(encoded)
+        decoded_data = base64.b32decode(encoded_data)
     except binascii.Error:
         raise ValueError("Incorrect padding.")
 
-    if encoded != base64.b32encode(decoded):  # Is that even possible?
+    if encoded_data != base64.b32encode(decoded_data):  # Is that even possible?
         raise ValueError("Invalid encoded bytes.")
 
-    version_byte = decoded[0:1]
-    payload = decoded[0:-2]
-    data = decoded[1:-2]
-    checksum = decoded[-2:]
+    version_byte = decoded_data[0:1]
+    payload = decoded_data[0:-2]
+    data = decoded_data[1:-2]
+    checksum = decoded_data[-2:]
 
     expected_version = _version_bytes.get(version_byte_name)
     if expected_version is None:

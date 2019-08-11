@@ -1,4 +1,4 @@
-import typing
+from typing import List
 
 from .operation import Operation
 from ..asset import Asset
@@ -34,7 +34,7 @@ class PathPayment(Operation):
         send_max: str,
         dest_asset: Asset,
         dest_amount: str,
-        path: typing.List[Asset],
+        path: List[Asset],
         source: str = None,
     ) -> None:
         super().__init__(source)

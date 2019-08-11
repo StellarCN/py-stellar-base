@@ -1,5 +1,5 @@
 import os
-import typing
+from typing import Any
 
 import nacl.signing as ed25519
 from nacl.exceptions import BadSignatureError as NaclBadSignatureError
@@ -7,6 +7,8 @@ from nacl.exceptions import BadSignatureError as NaclBadSignatureError
 from .exceptions import BadSignatureError, MissingEd25519SecretSeedError, ValueError
 from .strkey import StrKey
 from .xdr import Xdr
+
+__all__ = ["Keypair"]
 
 
 class Keypair:
@@ -61,8 +63,8 @@ class Keypair:
         :raise: :exc:`Ed25519PublicKeyInvalidError <stellar_sdk.exceptions.Ed25519PublicKeyInvalidError>`
             The public key used to generate the :class:`Keypair` is incorrect
         """
-        public_key = StrKey.decode_ed25519_public_key(public_key)
-        verifying_key = ed25519.VerifyKey(public_key)
+        key = StrKey.decode_ed25519_public_key(public_key)
+        verifying_key = ed25519.VerifyKey(key)
         return cls(verifying_key)
 
     @classmethod
@@ -175,16 +177,16 @@ class Keypair:
         hint = self.signature_hint()
         return Xdr.types.DecoratedSignature(hint, signature)
 
-    def __eq__(self, other: "Keypair"):
+    def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
-            return False
+            return NotImplemented
         return (
             self.verify_key == other.verify_key
             and self.signing_key == other.signing_key
         )
 
 
-def _get_key_of_expected_type(key: typing.Any, expected_type: typing.Any) -> typing.Any:
+def _get_key_of_expected_type(key: Any, expected_type: Any) -> Any:
     if key is not None and not isinstance(key, expected_type):
         raise ValueError(
             "The given key_type={} is not of type {}.".format(type(key), expected_type)
