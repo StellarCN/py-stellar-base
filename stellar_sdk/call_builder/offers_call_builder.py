@@ -1,8 +1,8 @@
 from typing import Union
 
-from stellar_sdk.call_builder import BaseCallBuilder
-from stellar_sdk.client.base_async_client import BaseAsyncClient
-from stellar_sdk.client.base_sync_client import BaseSyncClient
+from ..call_builder import BaseCallBuilder
+from ..client.base_async_client import BaseAsyncClient
+from ..client.base_sync_client import BaseSyncClient
 
 
 class OffersCallBuilder(BaseCallBuilder):

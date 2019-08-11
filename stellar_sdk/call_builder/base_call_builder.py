@@ -34,6 +34,12 @@ class BaseCallBuilder:
 
         :return: If it is called synchronous, the response will be returned. If
             it is called asynchronously, it will return Coroutine.
+        :raises:
+            :exc:`ConnectionError <stellar_sdk.exceptions.ConnectionError>`
+            :exc:`NotFoundError <stellar_sdk.exceptions.NotFoundError>`
+            :exc:`BadRequestError <stellar_sdk.exceptions.BadRequestError>`
+            :exc:`BadResponseError <stellar_sdk.exceptions.BadResponseError>`
+            :exc:`UnknownRequestError <stellar_sdk.exceptions.UnknownRequestError>`
         """
         if self.__async:
             return self.__call_async()
