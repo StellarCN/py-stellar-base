@@ -1,4 +1,4 @@
-from typing import Union, Coroutine, Any
+from typing import Union, Coroutine, Any, Dict
 from urllib.parse import urljoin
 
 from .account import Account
@@ -21,7 +21,7 @@ from .client.base_sync_client import BaseSyncClient
 from .client.requests_client import RequestsClient
 from .client.response import Response
 from .transaction_envelope import TransactionEnvelope
-from .exceptions import ValueError
+from .exceptions import ValueError, raise_request_exception
 
 __all__ = ["Server"]
 
@@ -52,14 +52,26 @@ class Server:
 
     def submit_transaction(
         self, transaction_envelope: Union[TransactionEnvelope, str]
-    ) -> Union[Response, Coroutine[Any, Any, Response]]:
+    ) -> Union[Dict[str, Any], Coroutine[Any, Any, Dict[str, Any]]]:
         xdr = transaction_envelope
         if isinstance(transaction_envelope, TransactionEnvelope):
             xdr = transaction_envelope.to_xdr()
 
         data = {"tx": xdr}
         url = urljoin(self.horizon_url, "/transactions")
-        return self._client.post(url=url, data=data)
+        if self.__async:
+            return self.__submit_async(url, data)
+        return self.__submit_sync(url, data)
+
+    def __submit_sync(self, url, data):
+        resp = self._client.post(url=url, data=data)
+        raise_request_exception(resp)
+        return resp.json()
+
+    async def __submit_async(self, url, data):
+        resp = await self._client.post(url=url, data=data)
+        raise_request_exception(resp)
+        return resp.json()
 
     def accounts(self) -> AccountsCallBuilder:
         """
@@ -151,12 +163,12 @@ class Server:
 
     async def __load_account_async(self, account_id: str) -> Account:
         resp = await self.accounts().account_id(account_id=account_id).call()
-        sequence = int(resp.json()["sequence"])
+        sequence = int(resp["sequence"])
         return Account(account_id=account_id, sequence=sequence)
 
     def __load_account_sync(self, account_id: str) -> Account:
         resp = self.accounts().account_id(account_id=account_id).call()
-        sequence = int(resp.json()["sequence"])
+        sequence = int(resp["sequence"])
         return Account(account_id=account_id, sequence=sequence)
 
     def close(self):

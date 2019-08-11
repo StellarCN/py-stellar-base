@@ -20,9 +20,8 @@ class TestBaseCallBuilder:
             .call()
         )
 
-        json = resp.json()
-        assert json["args"] == {"cursor": "89777", "limit": "25", "order": "asc"}
-        assert json["headers"] == {
+        assert resp["args"] == {"cursor": "89777", "limit": "25", "order": "asc"}
+        assert resp["headers"] == {
             "Accept": "*/*",
             "Accept-Encoding": "gzip, deflate",
             "Content-Type": "application/x-www-form-urlencoded",
@@ -31,7 +30,7 @@ class TestBaseCallBuilder:
             "X-Client-Name": "py-stellar-sdk",
             "X-Client-Version": __version__,
         }
-        assert json["url"] == "https://httpbin.org/get?cursor=89777&order=asc&limit=25"
+        assert resp["url"] == "https://httpbin.org/get?cursor=89777&order=asc&limit=25"
 
     def test_get_data_sync(self):
         url = "https://httpbin.org/get"
@@ -39,9 +38,8 @@ class TestBaseCallBuilder:
         resp = (
             BaseCallBuilder(url, client).limit(10).cursor(10086).order(desc=True).call()
         )
-        json = resp.json()
-        assert json["args"] == {"cursor": "10086", "limit": "10", "order": "desc"}
-        assert json["headers"] == {
+        assert resp["args"] == {"cursor": "10086", "limit": "10", "order": "desc"}
+        assert resp["headers"] == {
             "Accept": "*/*",
             "Accept-Encoding": "gzip, deflate",
             "Host": "httpbin.org",
@@ -49,7 +47,7 @@ class TestBaseCallBuilder:
             "X-Client-Name": "py-stellar-sdk",
             "X-Client-Version": __version__,
         }
-        assert json["url"] == "https://httpbin.org/get?limit=10&cursor=10086&order=desc"
+        assert resp["url"] == "https://httpbin.org/get?limit=10&cursor=10086&order=desc"
 
     @pytest.mark.slow
     @pytest.mark.asyncio
