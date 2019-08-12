@@ -53,23 +53,71 @@ Install and update using `pipenv`_ or `pip`_:
 A Simple Example
 ----------------
 
+* Building transaction with synchronous server
+
 .. code-block:: python
 
     # Alice pay 10.25 XLM to Bob
-    from stellar_sdk import Server, Keypair, TransactionBuilder
+    from stellar_sdk import Server, Keypair, TransactionBuilder, Network
 
     alice_keypair = Keypair.from_secret("SBFZCHU5645DOKRWYBXVOXY2ELGJKFRX6VGGPRYUWHQ7PMXXJNDZFMKD")
     bob_address = "GA7YNBW5CBTJZ3ZZOWX3ZNBKD6OE7A7IHUQVWMY62W2ZBG2SGZVOOPVH"
 
-    server = Server()
+    server = Server("https://horizon-testnet.stellar.org")
     alice_account = server.load_account(alice_keypair.public_key())
-    transaction = TransactionBuilder(alice_account)\
-        .add_text_memo("Hello, Stellar!")\
-        .append_payment_op(bob_address, "10.25", "XLM")\
+    base_fee = server.fetch_base_fee()
+    transaction = (
+        TransactionBuilder(
+            source_account=alice_account,
+            network_passphrase=Network.TESTNET_NETWORK_PASSPHRASE,
+            base_fee=base_fee,
+        )
+        .add_text_memo("Hello, Stellar!")
+        .append_payment_op(bob_address, "10.25", "XLM")
         .build()
+    )
     transaction.sign(alice_keypair)
     response = server.submit_transaction(transaction)
     print(response)
+
+* Building transaction with asynchronous server
+
+.. code-block:: python
+
+    # Alice pay 10.25 XLM to Bob
+    import asyncio
+
+    from stellar_sdk import Server, Keypair, TransactionBuilder, Network
+    from stellar_sdk.client.aiohttp_client import AiohttpClient
+
+    alice_keypair = Keypair.from_secret("SBFZCHU5645DOKRWYBXVOXY2ELGJKFRX6VGGPRYUWHQ7PMXXJNDZFMKD")
+    bob_address = "GA7YNBW5CBTJZ3ZZOWX3ZNBKD6OE7A7IHUQVWMY62W2ZBG2SGZVOOPVH"
+
+
+    async def payment():
+        async with Server(
+            horizon_url="https://horizon-testnet.stellar.org", client=AiohttpClient()
+        ) as server:
+            alice_account = await server.load_account(alice_keypair.public_key())
+            base_fee = await server.fetch_base_fee()
+            transaction = (
+                TransactionBuilder(
+                    source_account=alice_account,
+                    network_passphrase=Network.TESTNET_NETWORK_PASSPHRASE,
+                    base_fee=base_fee,
+                )
+                .add_text_memo("Hello, Stellar!")
+                .append_payment_op(bob_address, "10.25", "XLM")
+                .build()
+            )
+
+            transaction.sign(alice_keypair)
+            response = await server.submit_transaction(transaction)
+         print(response)
+
+
+    if __name__ == "__main__":
+        asyncio.run(payment())
 
 Links
 -----
