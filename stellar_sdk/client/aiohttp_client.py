@@ -76,13 +76,13 @@ class AiohttpClient(BaseAsyncClient):
         :raise: :exc:`ConnectionError <stellar_sdk.exceptions.ConnectionError>`
         """
         try:
-            async with self._session.get(url, params=params) as response:
-                return Response(
-                    status_code=response.status,
-                    text=await response.text(),
-                    headers=dict(response.headers),
-                    url=str(response.url),
-                )
+            response = await self._session.get(url, params=params)
+            return Response(
+                status_code=response.status,
+                text=await response.text(),
+                headers=dict(response.headers),
+                url=str(response.url),
+            )
         except aiohttp.ClientConnectionError as e:  # TODO: need more research
             raise ConnectionError(e)
 
@@ -95,13 +95,13 @@ class AiohttpClient(BaseAsyncClient):
         :raise: :exc:`ConnectionError <stellar_sdk.exceptions.ConnectionError>`
         """
         try:
-            async with self._session.post(url, data=data) as response:
-                return Response(
-                    status_code=response.status,
-                    text=await response.text(),
-                    headers=dict(response.headers),
-                    url=str(response.url),
-                )
+            response = await self._session.post(url, data=data)
+            return Response(
+                status_code=response.status,
+                text=await response.text(),
+                headers=dict(response.headers),
+                url=str(response.url),
+            )
         except aiohttp.ClientConnectionError as e:
             raise ConnectionError(e)
 

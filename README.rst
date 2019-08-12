@@ -113,7 +113,7 @@ A Simple Example
 
             transaction.sign(alice_keypair)
             response = await server.submit_transaction(transaction)
-         print(response)
+            print(response)
 
 
     if __name__ == "__main__":
