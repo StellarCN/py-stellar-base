@@ -4,7 +4,7 @@
 Installation
 ************
 
-Via pipenv or pip (Recommended)
+Via pipenv or pip
 ===============================
 
 To install py-stellar-sdk, use pipenv to install the module:
@@ -14,7 +14,7 @@ To install py-stellar-sdk, use pipenv to install the module:
     pipenv install stellar-sdk
 
 If you're not using `pipenv <https://docs.pipenv.org/>`_, you should.
-Otherwise, you can install it via plain old ``pip``. More on installing Python
+Otherwise, you can install it via plain old `pip <https://pip.pypa.io/en/stable/quickstart/>`_. More on installing Python
 and dependencies can be found over in the `Hitchhiker's Guide to Python
 <http://docs.python-guide.org/en/latest/starting/installation/>`_.
 
