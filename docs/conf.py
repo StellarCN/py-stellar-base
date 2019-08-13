@@ -56,8 +56,8 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'py-stellar-sdk'
-copyright = '2019, Stellar Community'
-author = 'Stellar Community'
+copyright = '2019, StellarCN and Individual Contributors'
+author = 'StellarCN and Individual Contributors'
 
 import stellar_sdk
 # The version info for the project you're documenting, acts as replacement for
@@ -99,6 +99,8 @@ html_theme = 'sphinx_rtd_theme'
 # documentation.
 #
 html_theme_options = {
+    'collapse_navigation': False,
+    'style_external_links': False
 }
 
 # Add any paths that contain custom static files (such as style sheets) here,

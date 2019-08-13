@@ -39,13 +39,13 @@ class RequestsClient(BaseSyncClient):
     """
 
     def __init__(
-            self,
-            pool_size: int = DEFAULT_POOLSIZE,
-            num_retries: int = DEFAULT_NUM_RETRIES,
-            request_timeout: int = DEFAULT_REQUEST_TIMEOUT,
-            backoff_factor: float = DEFAULT_BACKOFF_FACTOR,
-            session: Session = None,
-            stream_session: Session = None,
+        self,
+        pool_size: int = DEFAULT_POOLSIZE,
+        num_retries: int = DEFAULT_NUM_RETRIES,
+        request_timeout: int = DEFAULT_REQUEST_TIMEOUT,
+        backoff_factor: float = DEFAULT_BACKOFF_FACTOR,
+        session: Session = None,
+        stream_session: Session = None,
     ):
         self.pool_size = pool_size
         self.num_retries = num_retries
@@ -143,7 +143,7 @@ class RequestsClient(BaseSyncClient):
         )
 
     def stream(
-            self, url: str, params: Dict[str, str] = None
+        self, url: str, params: Dict[str, str] = None
     ) -> Generator[Dict[str, Any], None, None]:
         """Creates an EventSource that listens for incoming messages from the server.
 
@@ -186,14 +186,14 @@ class RequestsClient(BaseSyncClient):
 
 class _SSEClient:
     def __init__(
-            self,
-            url: str,
-            last_id: Union[str, int] = None,
-            retry: int = 3000,
-            session: Session = None,
-            chunk_size: int = 1024,
-            connect_retry: int = 0,
-            **kwargs
+        self,
+        url: str,
+        last_id: Union[str, int] = None,
+        retry: int = 3000,
+        session: Session = None,
+        chunk_size: int = 1024,
+        connect_retry: int = 0,
+        **kwargs
     ):
         if SSEClient is None:
             raise ImportError(

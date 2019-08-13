@@ -23,7 +23,8 @@ from .time_bounds import TimeBounds
 from .transaction import Transaction
 from .transaction_builder import TransactionBuilder
 from .transaction_envelope import TransactionEnvelope
-
+from .client.requests_client import RequestsClient
+from .client.aiohttp_client import AiohttpClient
 
 __all__ = [
     "__title__",
@@ -47,6 +48,9 @@ __all__ = [
     "Server",
     "Signer",
     "TimeBounds",
-    "Transaction" "TransactionBuilder",
+    "Transaction",
+    "TransactionBuilder",
     "TransactionEnvelope",
+    "RequestsClient",
+    "AiohttpClient"
 ] + operation_all

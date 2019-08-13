@@ -31,7 +31,7 @@ py-stellar-sdk
 
 
 py-stellar-sdk is a Python library for communicating with
-a `Stellar Horizon server`_. It is used for building Stellar apps on Python. It supports Python 3.6+ as
+a `Stellar Horizon server`_. It is used for building Stellar apps on Python. It supports **Python 3.6+** as
 well as PyPy 3.6+.
 
 It provides:
@@ -113,7 +113,7 @@ A Simple Example
 
             transaction.sign(alice_keypair)
             response = await server.submit_transaction(transaction)
-         print(response)
+            print(response)
 
 
     if __name__ == "__main__":
