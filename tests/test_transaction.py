@@ -1,6 +1,7 @@
 import pytest
 
-from stellar_sdk import Keypair, IdMemo, Payment, ManageData, Asset, NoneMemo
+from stellar_sdk import Keypair, IdMemo,  Asset, NoneMemo
+from stellar_sdk.operation import Payment, ManageData
 from stellar_sdk.exceptions import ValueError
 from stellar_sdk.time_bounds import TimeBounds
 from stellar_sdk.transaction import Transaction
