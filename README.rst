@@ -16,7 +16,7 @@ py-stellar-base
     :alt: Codecov
     :target: https://codecov.io/gh/StellarCN/py-stellar-base
 
-
+We just **released** the `first alpha <https://github.com/StellarCN/py-stellar-base/tree/v2>`_ of v2, **the v1 version will continue to be maintained**, feedback is welcome :-)
 
 py-stellar-sdk is a Python library for communicating with
 a `Stellar Horizon server`_. It is used for building Stellar apps on Python.
