@@ -8,7 +8,7 @@
 py-stellar-sdk
 ===============================
 
-.. image:: https://img.shields.io/travis/StellarCN/py-stellar-base.svg?style=flat-square&maxAge=1800
+.. image:: https://img.shields.io/travis/StellarCN/py-stellar-base/v2?style=flat-square&maxAge=1800
     :alt: Travis (.org)
     :target: https://travis-ci.org/StellarCN/py-stellar-base/
 
@@ -36,6 +36,7 @@ py-stellar-sdk
     :alt: PyPI - Implementation
     :target: https://pypi.python.org/pypi/stellar-sdk
 
+**This is a alpha release, please do not use it in production environment, feedback is welcome :-)**
 
 py-stellar-sdk is a Python library for communicating with
 a `Stellar Horizon server`_. It is used for building Stellar apps on Python. It supports **Python 3.6+** as

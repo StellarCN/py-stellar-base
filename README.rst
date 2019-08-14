@@ -1,7 +1,7 @@
 py-stellar-sdk
 ==============
 
-.. image:: https://img.shields.io/travis/StellarCN/py-stellar-base.svg?style=flat-square&maxAge=1800
+.. image:: https://img.shields.io/travis/StellarCN/py-stellar-base/v2?style=flat-square&maxAge=1800
     :alt: Travis (.org)
     :target: https://travis-ci.org/StellarCN/py-stellar-base/
 
@@ -13,7 +13,7 @@ py-stellar-sdk
     :alt: Codecov
     :target: https://codecov.io/gh/StellarCN/py-stellar-base
 
-.. image:: https://img.shields.io/codeclimate/maintainability/overcat/py-stellar-sdk?style=flat-square&maxAge=1800
+.. image:: https://img.shields.io/codeclimate/maintainability/overcat/py-stellar-sdk/v2?style=flat-square&maxAge=1800
     :alt: Code Climate maintainability
     :target: https://codeclimate.com/github/overcat/py-stellar-sdk/maintainability
 
