@@ -63,6 +63,7 @@ KeyPairs, etc.).
    assets
    building_transactions
    payment
+   asynchronous
    multi_signature_account
 
 
