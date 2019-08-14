@@ -1,2 +1,2 @@
-include README.md LICENSE requirements.txt Pipfile Pipfile.lock
-recursive-include tests *.py
+include LICENSE
+include README.rst
