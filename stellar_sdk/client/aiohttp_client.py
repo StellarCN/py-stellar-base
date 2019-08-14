@@ -83,7 +83,7 @@ class AiohttpClient(BaseAsyncClient):
                 headers=dict(response.headers),
                 url=str(response.url),
             )
-        except aiohttp.ClientConnectionError as e:  # TODO: need more research
+        except aiohttp.ClientError as e:  # TODO: need more research
             raise ConnectionError(e)
 
     async def post(self, url: str, data: Dict[str, str] = None) -> Response:
