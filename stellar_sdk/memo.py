@@ -72,6 +72,9 @@ class NoneMemo(Memo):
         """Creates an XDR Memo object that represents this :class:`NoneMemo`."""
         return Xdr.types.Memo(type=Xdr.const.MEMO_NONE)
 
+    def __str__(self):
+        return "<NoneMemo>"
+
 
 class TextMemo(Memo):
     """The :class:`TextMemo`, which represents MEMO_TEXT in a transaction.
@@ -88,11 +91,11 @@ class TextMemo(Memo):
                 "TextMemo expects string or bytes type got a {}".format(type(text))
             )
 
-        self.text = text
+        self.memo_text = text
         if not isinstance(text, bytes):
-            self.text = bytearray(text, encoding="utf-8")
+            self.memo_text = bytearray(text, encoding="utf-8")
 
-        length = len(self.text)
+        length = len(self.memo_text)
         if length > 28:
             raise MemoInvalidException(
                 "Text should be <= 28 bytes (ascii encoded), got {:d} bytes.".format(
@@ -108,7 +111,10 @@ class TextMemo(Memo):
 
     def to_xdr_object(self) -> Xdr.types.Memo:
         """Creates an XDR Memo object that represents this :class:`TextMemo`."""
-        return Xdr.types.Memo(type=Xdr.const.MEMO_TEXT, text=self.text)
+        return Xdr.types.Memo(type=Xdr.const.MEMO_TEXT, text=self.memo_text)
+
+    def __str__(self):
+        return "<TextMemo [memo={memo}]>".format(memo=self.memo_text)
 
 
 class IdMemo(Memo):
@@ -135,6 +141,9 @@ class IdMemo(Memo):
         """Creates an XDR Memo object that represents this :class:`IdMemo`."""
         return Xdr.types.Memo(type=Xdr.const.MEMO_ID, id=self.memo_id)
 
+    def __str__(self):
+        return "<IdMemo [memo={memo}]>".format(memo=self.memo_id)
+
 
 class HashMemo(Memo):
     """The :class:`HashMemo` which represents MEMO_HASH in a transaction.
@@ -160,6 +169,9 @@ class HashMemo(Memo):
     def to_xdr_object(self) -> Xdr.types.Memo:
         """Creates an XDR Memo object that represents this :class:`HashMemo`."""
         return Xdr.types.Memo(type=Xdr.const.MEMO_HASH, hash=self.memo_hash)
+
+    def __str__(self):
+        return "<HashMemo [memo={memo}]>".format(memo=self.memo_hash)
 
 
 class ReturnHashMemo(Memo):
@@ -192,3 +204,6 @@ class ReturnHashMemo(Memo):
     def to_xdr_object(self) -> Xdr.types.Memo:
         """Creates an XDR Memo object that represents this :class:`ReturnHashMemo`."""
         return Xdr.types.Memo(type=Xdr.const.MEMO_RETURN, retHash=self.memo_return)
+
+    def __str__(self):
+        return "<ReturnHashMemo [memo={memo}]>".format(memo=self.memo_return)

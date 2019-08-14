@@ -50,3 +50,8 @@ class Network:
         if not isinstance(other, self.__class__):
             return NotImplemented
         return self.network_passphrase == other.network_passphrase
+
+    def __str__(self):
+        return "<Network [network_passphrase={network_passphrase}]>".format(
+            network_passphrase=self.network_passphrase
+        )

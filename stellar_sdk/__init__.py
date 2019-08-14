@@ -52,5 +52,5 @@ __all__ = [
     "TransactionBuilder",
     "TransactionEnvelope",
     "RequestsClient",
-    "AiohttpClient"
+    "AiohttpClient",
 ] + operation_all

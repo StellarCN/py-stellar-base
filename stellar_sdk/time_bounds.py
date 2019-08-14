@@ -53,3 +53,8 @@ class TimeBounds:
         if not isinstance(other, self.__class__):
             return NotImplemented
         return self.min_time == other.min_time and self.max_time == other.max_time
+
+    def __str__(self):
+        return "<TimeBounds [min_time={min_time}, max_time={max_time}]>".format(
+            min_time=self.min_time, max_time=self.max_time
+        )

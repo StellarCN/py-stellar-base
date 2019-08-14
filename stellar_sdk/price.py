@@ -49,3 +49,6 @@ class Price:
         if not isinstance(other, self.__class__):
             return NotImplemented
         return self.n == other.n and self.d == other.d
+
+    def __str__(self):
+        return "<Price [n={n}, d={d}]>".format(n=self.n, d=self.d)
