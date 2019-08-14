@@ -2,11 +2,13 @@ from .client.response import Response
 
 BuildInValueError = ValueError
 BuildInTypeError = TypeError
+BuildInAttributeError = AttributeError
 
 __all__ = [
     "SdkError",
     "ValueError",
     "TypeError",
+    "AttributeError",
     "BadSignatureError",
     "Ed25519PublicKeyInvalidError",
     "Ed25519SecretSeedInvalidError",
@@ -40,6 +42,10 @@ class TypeError(BuildInTypeError, SdkError):
     """exception for all type related errors
 
     """
+
+
+class AttributeError(BuildInAttributeError, SdkError):
+    """ Attribute not found. """
 
 
 class BadSignatureError(ValueError):

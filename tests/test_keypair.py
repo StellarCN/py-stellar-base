@@ -2,7 +2,7 @@ import os
 
 import pytest
 import nacl.signing as ed25519
-from stellar_sdk.exceptions import ValueError
+from stellar_sdk.exceptions import ValueError, AttributeError
 
 from stellar_sdk.exceptions import (
     Ed25519SecretSeedInvalidError,
@@ -17,8 +17,8 @@ from stellar_sdk.strkey import StrKey
 class TestKeypair:
     def test_create_random(self):
         kp = Keypair.random()
-        public_key = kp.public_key()
-        secret = kp.secret()
+        public_key = kp.public_key
+        secret = kp.secret
         assert StrKey.is_valid_ed25519_public_key(public_key)
         assert StrKey.is_valid_ed25519_secret_seed(secret)
 
@@ -27,10 +27,9 @@ class TestKeypair:
         kp = Keypair.from_secret(secret)
         assert isinstance(kp, Keypair)
         assert (
-            kp.public_key()
-            == "GDFQVQCYYB7GKCGSCUSIQYXTPLV5YJ3XWDMWGQMDNM4EAXAL7LITIBQ7"
+            kp.public_key == "GDFQVQCYYB7GKCGSCUSIQYXTPLV5YJ3XWDMWGQMDNM4EAXAL7LITIBQ7"
         )
-        assert kp.secret() == secret
+        assert kp.secret == secret
 
     @pytest.mark.parametrize(
         "invalid_secret",
@@ -54,8 +53,7 @@ class TestKeypair:
         kp = Keypair.from_public_key(public_key)
         assert isinstance(kp, Keypair)
         assert (
-            kp.public_key()
-            == "GAXDYNIBA5E4DXR5TJN522RRYESFQ5UNUXHIPTFGVLLD5O5K552DF5ZH"
+            kp.public_key == "GAXDYNIBA5E4DXR5TJN522RRYESFQ5UNUXHIPTFGVLLD5O5K552DF5ZH"
         )
         assert (
             kp.raw_public_key().hex()
@@ -155,4 +153,19 @@ class TestKeypair:
             "GAXDYNIBA5E4DXR5TJN522RRYESFQ5UNUXHIPTFGVLLD5O5K552DF5ZH"
         )
         with pytest.raises(MissingEd25519SecretSeedError):
-            kp.secret()
+            secret = kp.secret
+
+    def test_set_keypair_raise(self):
+        secret = "SD7X7LEHBNMUIKQGKPARG5TDJNBHKC346OUARHGZL5ITC6IJPXHILY36"
+        kp = Keypair.from_secret(secret)
+        with pytest.raises(
+            AttributeError,
+            match="Please use `Keypair.from_secret` to generate a new Keypair object.",
+        ):
+            kp.secret = "SAMWF63FZ5ZNHY75SNYNAFMWTL5FPBMIV7DLB3UDAVLL7DKPI5ZFS2S6"
+
+        with pytest.raises(
+            AttributeError,
+            match="Please use `Keypair.from_public_key` to generate a new Keypair object.",
+        ):
+            kp.public_key = "GAXDYNIBA5E4DXR5TJN522RRYESFQ5UNUXHIPTFGVLLD5O5K552DF5ZH"

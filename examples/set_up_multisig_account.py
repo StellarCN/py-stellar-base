@@ -2,10 +2,10 @@ from stellar_sdk import Server, TransactionBuilder, Signer, Network, Keypair
 
 server = Server(horizon_url="https://horizon-testnet.stellar.org")
 root_keypair = Keypair.from_secret("SA6XHAH4GNLRWWWF6TEVEWNS44CBNFAJWHWOPZCVZOUXSQA7BOYN7XHC")
-root_account = server.load_account(account_id=root_keypair.public_key())
+root_account = server.load_account(account_id=root_keypair.public_key)
 secondary_keypair = Keypair.from_secret("SAMZUAAPLRUH62HH3XE7NVD6ZSMTWPWGM6DS4X47HLVRHEBKP4U2H5E7")
 
-secondary_signer = Signer.ed25519_public_key(account_id=secondary_keypair.public_key(), weight=1)
+secondary_signer = Signer.ed25519_public_key(account_id=secondary_keypair.public_key, weight=1)
 transaction = TransactionBuilder(
     source_account=root_account,
     network_passphrase=Network.TESTNET_NETWORK_PASSPHRASE,

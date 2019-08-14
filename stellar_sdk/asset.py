@@ -1,7 +1,7 @@
 import re
 from typing import Optional, Dict
 
-from .exceptions import AssetCodeInvalidError, AssetIssuerInvalidError
+from .exceptions import AssetCodeInvalidError, AssetIssuerInvalidError, AttributeError
 from .keypair import Keypair
 from .xdr import Xdr
 from .strkey import StrKey

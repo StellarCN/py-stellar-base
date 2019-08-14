@@ -19,7 +19,7 @@ creating new keypair is by passing the account's secret seed:
    from stellar_sdk import Keypair
 
    keypair = Keypair.from_secret("SBK2VIYYSVG76E7VC3QHYARNFLY2EAQXDHRC7BMXBBGIFG74ARPRMNQM")
-   public_key = keypair.public_key()  # GDHMW6QZOL73SHKG2JA3YHXFDHM46SS5ZRWEYF5BCYHX2C5TVO6KZBYL
+   public_key = keypair.public_key  # GDHMW6QZOL73SHKG2JA3YHXFDHM46SS5ZRWEYF5BCYHX2C5TVO6KZBYL
    can_sign = keypair.can_sign()  # True
 
 
@@ -41,5 +41,5 @@ You can also create a randomly generated keypair:
    from stellar_sdk import Keypair
 
    keypair = Keypair.random()
-   print("Public Key: " + keypair.public_key())
-   print("Secret Seed: " + keypair.secret())
+   print("Public Key: " + keypair.public_key)
+   print("Secret Seed: " + keypair.secret)

@@ -4,7 +4,12 @@ from typing import Any
 import nacl.signing as ed25519
 from nacl.exceptions import BadSignatureError as NaclBadSignatureError
 
-from .exceptions import BadSignatureError, MissingEd25519SecretSeedError, ValueError
+from .exceptions import (
+    BadSignatureError,
+    MissingEd25519SecretSeedError,
+    ValueError,
+    AttributeError,
+)
 from .strkey import StrKey
 from .xdr import Xdr
 
@@ -78,6 +83,7 @@ class Keypair:
         verify_key = signing_key.verify_key
         return cls(verify_key, signing_key)
 
+    @property
     def secret(self) -> str:
         """Returns secret key associated with this :class:`Keypair` instance
 
@@ -93,13 +99,25 @@ class Keypair:
 
         return StrKey.encode_ed25519_secret_seed(self.raw_secret_key())
 
-    # @property
+    @secret.setter
+    def secret(self, secret: str) -> None:
+        raise AttributeError(
+            "Please use `Keypair.from_secret` to generate a new Keypair object."
+        )
+
+    @property
     def public_key(self) -> str:
         """Returns public key associated with this :class:`Keypair` instance
 
         :return: public key
         """
         return StrKey.encode_ed25519_public_key(self.raw_public_key())
+
+    @public_key.setter
+    def public_key(self, public_key: str) -> None:
+        raise AttributeError(
+            "Please use `Keypair.from_public_key` to generate a new Keypair object."
+        )
 
     def xdr_public_key(self) -> Xdr.types.PublicKey:
         """

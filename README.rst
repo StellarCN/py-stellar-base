@@ -64,7 +64,7 @@ A Simple Example
     bob_address = "GA7YNBW5CBTJZ3ZZOWX3ZNBKD6OE7A7IHUQVWMY62W2ZBG2SGZVOOPVH"
 
     server = Server("https://horizon-testnet.stellar.org")
-    alice_account = server.load_account(alice_keypair.public_key())
+    alice_account = server.load_account(alice_keypair.public_key)
     base_fee = server.fetch_base_fee()
     transaction = (
         TransactionBuilder(
@@ -98,7 +98,7 @@ A Simple Example
         async with Server(
             horizon_url="https://horizon-testnet.stellar.org", client=AiohttpClient()
         ) as server:
-            alice_account = await server.load_account(alice_keypair.public_key())
+            alice_account = await server.load_account(alice_keypair.public_key)
             base_fee = await server.fetch_base_fee()
             transaction = (
                 TransactionBuilder(
