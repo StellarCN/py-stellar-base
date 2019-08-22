@@ -179,10 +179,10 @@ def raise_request_exception(response: Response) -> None:
     status_code = response.status_code
     if status_code == 200:
         pass
-    elif status_code == 400:
-        raise BadRequestError(response)
     elif status_code == 404:
         raise NotFoundError(response)
+    elif 400 <= status_code < 500:
+        raise BadRequestError(response)
     elif 500 <= status_code < 600:
         raise BadResponseError(response)
     else:
