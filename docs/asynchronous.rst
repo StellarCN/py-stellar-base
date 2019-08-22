@@ -23,3 +23,9 @@ the same example of using the synchronization method can be found `here <payment
 .. literalinclude:: ../examples/payment_async.py
    :language: python
    :linenos:
+
+The following example helps you listen to multiple endpoints asynchronously.
+
+.. literalinclude:: ../examples/stream_requests_async.py
+   :language: python
+   :linenos:
