@@ -126,6 +126,8 @@ class BaseCallBuilder:
             pass
         elif value is True:
             self.params[key] = "true"
+        elif value is False:
+            self.params[key] = "false"
         else:
             self.params[key] = str(value)
 

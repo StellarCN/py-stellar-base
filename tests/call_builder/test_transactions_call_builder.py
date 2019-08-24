@@ -45,3 +45,15 @@ class TestTransactionsCallBuilder:
             account_id=account_id
         )
         assert builder.params == {"include_failed": "true"}
+
+    def test_not_include_failed(self):
+        account_id = "GATEMHCCKCY67ZUCKTROYN24ZYT5GK4EQZ65JJLDHKHRUZI3EUEKMTCH"
+        builder = (
+            TransactionsCallBuilder(horizon_url, client)
+            .for_account(account_id)
+            .include_failed(False)
+        )
+        assert builder.endpoint == "accounts/{account_id}/transactions".format(
+            account_id=account_id
+        )
+        assert builder.params == {"include_failed": "false"}
