@@ -1,5 +1,6 @@
 import asyncio
 import json
+import logging
 from typing import Optional, AsyncGenerator, Any, Dict
 
 import aiohttp
@@ -8,6 +9,8 @@ from aiohttp_sse_client.client import EventSource
 from .base_async_client import BaseAsyncClient
 from .response import Response
 from ..__version__ import __version__
+
+logger = logging.getLogger(__name__)
 
 # two ledgers + 1 sec, let's retry faster and not wait 60 secs.
 DEFAULT_REQUEST_TIMEOUT = 11
@@ -41,6 +44,7 @@ class AiohttpClient(BaseAsyncClient):
         **kwargs
     ) -> None:
         self.backoff_factor = backoff_factor
+        self.request_timeout = request_timeout
 
         # init session
         if pool_size is None:
@@ -105,79 +109,63 @@ class AiohttpClient(BaseAsyncClient):
         except aiohttp.ClientConnectionError as e:
             raise ConnectionError(e)
 
-    async def _init_sse_session(self) -> None:
+    async def stream(
+        self, url: str, params: Dict[str, str] = None
+    ) -> AsyncGenerator[Dict[str, Any], None]:
         """Init the sse session """
         if self._sse_session is None:
             # No timeout, no special connector
             # Other headers such as "Accept: text/event-stream" are added by thr SSEClient
             self._sse_session = aiohttp.ClientSession()
 
-    async def stream(
-        self, url: str, params: Dict[str, str] = None
-    ) -> AsyncGenerator[Dict[str, Any], None]:
-        """Creates an EventSource that listens for incoming messages from the server.
+        query_params = {**params} if params else dict()
 
-        See `Horizon Response Format <https://www.stellar.org/developers/horizon/reference/responses.html>`_
+        if query_params.get("cursor") is None:
+            query_params["cursor"] = "now"  # Start monitoring from now.
 
-        See `MDN EventSource <https://developer.mozilla.org/en-US/docs/Web/API/EventSource>`_
+        query_params.update(**IDENTIFICATION_HEADERS)
+        retry = 0.1
 
-        :param url: the request url
-        :param params: the request params
-        :return: a dict Generator for server response
-        :raise: :exc:`ConnectionError <stellar_sdk.exceptions.ConnectionError>`
-        """
-
-        async def _sse_generator() -> AsyncGenerator[dict, Any]:
-            """
-            Generator for sse events
-            """
-            query_params = {**params} if params else dict()
-
-            if query_params.get("cursor") is None:
-                query_params["cursor"] = "now"  # Start monitoring from now.
-
-            query_params.update(**IDENTIFICATION_HEADERS)
-            retry = 0.1
-            while True:
-                try:
-                    """
-                    Create a new SSEClient:
-                    Using the last id as the cursor
-                    Headers are needed because of a bug that makes "params" override the default headers
-                    """
-                    async with EventSource(
-                        url,
-                        session=self._sse_session,
-                        params=query_params,
-                        headers=self.headers.copy(),
-                    ) as client:
-                        """
-                        We want to throw a TimeoutError if we didnt get any event in the last x seconds.
-                        read_timeout in aiohttp is not implemented correctly https://github.com/aio-libs/aiohttp/issues/1954
-                        So we will create our own way to do that.
-
-                        Note that the timeout starts from the first event forward. There is no until we get the first event.
-                        """
-                        async for event in client:
-                            if event.last_event_id != "":
-                                # Events that dont have an id are not useful for us (hello/byebye events)
-                                retry = client._reconnection_time.total_seconds()
-                                try:
-                                    data = event.data
-                                    if data != '"hello"' and data != '"byebye"':
-                                        yield json.loads(data)
-                                except json.JSONDecodeError:
-                                    # Content was not json-decodable
-                                    pass
-                except aiohttp.ClientPayloadError:
-                    # Retry if the connection dropped after we got the initial response
-                    await asyncio.sleep(retry)
-
-        await self._init_sse_session()
-        gen = _sse_generator()
         while True:
-            data = await gen.__anext__()
-            yield data
+            try:
+                """
+                Create a new SSEClient:
+                Using the last id as the cursor
+                Headers are needed because of a bug that makes "params" override the default headers
+                """
+                async with EventSource(
+                    url,
+                    session=self._sse_session,
+                    params=query_params,
+                    headers=self.headers.copy(),
+                ) as client:
+                    """
+                    We want to throw a TimeoutError if we didnt get any event in the last x seconds.
+                    read_timeout in aiohttp is not implemented correctly https://github.com/aio-libs/aiohttp/issues/1954
+                    So we will create our own way to do that.
+
+                    Note that the timeout starts from the first event forward. There is no until we get the first event.
+                    """
+                    async for event in client:
+                        if event.last_event_id != "":
+                            query_params["cursor"] = event.last_event_id
+                            # Events that dont have an id are not useful for us (hello/byebye events)
+                            retry = client._reconnection_time.total_seconds()
+                            try:
+                                data = event.data
+                                if data != '"hello"' and data != '"byebye"':
+                                    yield json.loads(data)
+                            except json.JSONDecodeError:
+                                # Content was not json-decodable
+                                pass
+            except aiohttp.ClientConnectionError:
+                # Retry if the connection dropped after we got the initial response
+                logger.warning(
+                    "We have encountered an error and we will try to reconnect, cursor = {}".format(
+                        query_params["cursor"]
+                    )
+                )
+                await asyncio.sleep(retry)
 
     async def __aenter__(self) -> "AiohttpClient":
         return self
