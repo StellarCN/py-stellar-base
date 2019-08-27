@@ -16,6 +16,8 @@ class Account:
     :param account_id: Account ID of the
         account (ex. `GB3KJPLFUYN5VL6R3GU3EGCGVCKFDSD7BEDX42HWG5BWFKB3KQGJJRMA`)
     :param sequence: sequence current sequence number of the account
+    :raises:
+        :exc:`Ed25519PublicKeyInvalidError: <stellar_sdk.exceptions.Ed25519PublicKeyInvalidError:>`
 
     .. _Accounts:
         https://stellar.org/developers/learn/concepts/accounts.html

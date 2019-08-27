@@ -20,6 +20,9 @@ class Asset:
         guide on assets`_.
     :param issuer: The account ID of the issuer. Note if the
         currency is the native currency (XLM (Lumens)), no issuer is necessary.
+    :raises:
+        :exc:`AssetCodeInvalidError: <stellar_sdk.exceptions.AssetCodeInvalidError:>`
+        :exc:`AssetIssuerInvalidError: <stellar_sdk.exceptions.AssetIssuerInvalidError:>`
 
     .. _Stellar's guide on assets:
         https://www.stellar.org/developers/guides/concepts/assets.html

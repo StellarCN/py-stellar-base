@@ -82,6 +82,8 @@ class TextMemo(Memo):
     :param text: A string encoded using either ASCII or UTF-8, up to
         28-bytes long.
     :type text: str, bytes
+    :raises:
+        :exc:`MemoInvalidException: <stellar_sdk.exceptions.MemoInvalidException:>`
 
     """
 
@@ -121,6 +123,8 @@ class IdMemo(Memo):
     """The :class:`IdMemo` which represents MEMO_ID in a transaction.
 
     :param int memo_id: A 64 bit unsigned integer.
+    :raises:
+        :exc:`MemoInvalidException: <stellar_sdk.exceptions.MemoInvalidException:>`
 
     """
 
@@ -149,6 +153,8 @@ class HashMemo(Memo):
     """The :class:`HashMemo` which represents MEMO_HASH in a transaction.
 
     :param memo_hash: A 32 byte hash.
+    :raises:
+        :exc:`MemoInvalidException: <stellar_sdk.exceptions.MemoInvalidException:>`
     """
 
     def __init__(self, memo_hash: bytes) -> None:
@@ -183,6 +189,8 @@ class ReturnHashMemo(Memo):
 
     :param memo_return: A 32 byte hash intended to be interpreted as the
         hash of the transaction the sender is refunding.
+    :raises:
+        :exc:`MemoInvalidException: <stellar_sdk.exceptions.MemoInvalidException:>`
     """
 
     def __init__(self, memo_return: bytes) -> None:
