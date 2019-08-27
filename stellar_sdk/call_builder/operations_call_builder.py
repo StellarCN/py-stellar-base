@@ -78,3 +78,12 @@ class OperationsCallBuilder(BaseCallBuilder):
         """
         self._add_query_param("include_failed", include_failed)
         return self
+
+    def join(self, join: str) -> "OperationsCallBuilder":
+        """join represents `join` param in queries, currently only supports `transactions`
+
+        :param join: join represents `join` param in queries, currently only supports `transactions`
+        :return: current OperationsCallBuilder instance
+        """
+        self._add_query_param("join", join)
+        return self
