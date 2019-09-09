@@ -13,14 +13,15 @@ from .call_builder.operations_call_builder import OperationsCallBuilder
 from .call_builder.orderbook_call_builder import OrderbookCallBuilder
 from .call_builder.paths_call_builder import PathsCallBuilder
 from .call_builder.payments_call_builder import PaymentsCallBuilder
+from .call_builder.root_call_builder import RootCallBuilder
 from .call_builder.trades_aggregation_call_builder import TradeAggregationsCallBuilder
 from .call_builder.trades_call_builder import TradesCallBuilder
 from .call_builder.transactions_call_builder import TransactionsCallBuilder
 from .client.base_async_client import BaseAsyncClient
 from .client.base_sync_client import BaseSyncClient
 from .client.requests_client import RequestsClient
-from .transaction_envelope import TransactionEnvelope
 from .exceptions import ValueError, raise_request_exception
+from .transaction_envelope import TransactionEnvelope
 
 __all__ = ["Server"]
 
@@ -96,6 +97,13 @@ class Server:
         resp = await self._client.post(url=url, data=data)
         raise_request_exception(resp)
         return resp.json()
+
+    def root(self) -> RootCallBuilder:
+        """
+        :return: New :class:`stellar_sdk.call_builder.RootCallBuilder` object configured
+            by a current Horizon server configuration.
+        """
+        return RootCallBuilder(horizon_url=self.horizon_url, client=self._client)
 
     def accounts(self) -> AccountsCallBuilder:
         """

@@ -91,6 +91,12 @@ PaymentsCallBuilder
    :members:
    :inherited-members:
 
+RootCallBuilder
+-------------------
+.. autoclass:: stellar_sdk.call_builder.RootCallBuilder
+   :members:
+   :inherited-members:
+
 TradeAggregationsCallBuilder
 ----------------------------
 .. autoclass:: stellar_sdk.call_builder.TradeAggregationsCallBuilder
@@ -118,7 +124,7 @@ BaseAsyncClient
 .. autoclass:: stellar_sdk.client.base_async_client.BaseAsyncClient
    :members:
 
-BaseAsyncClient
+BaseSyncClient
 ---------------
 
 .. autoclass:: stellar_sdk.client.base_sync_client.BaseSyncClient
@@ -128,6 +134,12 @@ AiohttpClient
 --------------
 
 .. autoclass:: stellar_sdk.client.aiohttp_client.AiohttpClient
+   :members:
+
+RequestsClient
+--------------
+
+.. autoclass:: stellar_sdk.client.requests_client.RequestsClient
    :members:
 
 SimpleRequestsClient

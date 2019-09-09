@@ -11,6 +11,7 @@ from stellar_sdk.call_builder.operations_call_builder import OperationsCallBuild
 from stellar_sdk.call_builder.orderbook_call_builder import OrderbookCallBuilder
 from stellar_sdk.call_builder.paths_call_builder import PathsCallBuilder
 from stellar_sdk.call_builder.payments_call_builder import PaymentsCallBuilder
+from stellar_sdk.call_builder.root_call_builder import RootCallBuilder
 from stellar_sdk.call_builder.trades_aggregation_call_builder import (
     TradeAggregationsCallBuilder,
 )
@@ -100,6 +101,7 @@ class TestServer:
                 destination_amount,
             )
             assert server.payments() == PaymentsCallBuilder(horizon_url, client)
+            assert server.root() == RootCallBuilder(horizon_url, client)
             base = Asset.native()
             counter = Asset(
                 "MOE", "GDV6FVHPY4JH7EEBSJYPQQYZA3OC6TKTM2TAXRHWT4EEL7BJ2BTDQT5D"
