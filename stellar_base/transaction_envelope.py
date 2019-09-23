@@ -50,7 +50,7 @@ class TransactionEnvelope(object):
             envelope.
         :type keypair: :class:`Keypair <stellar_base.keypair.Keypair>`
         :raises: :exc:`SignatureExistError
-            <stellar_base.utils.SignatureExistError>`
+            <stellar_base.exceptions.SignatureExistError>`
 
         """
         assert isinstance(keypair, Keypair)

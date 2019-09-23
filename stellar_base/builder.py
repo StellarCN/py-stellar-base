@@ -7,12 +7,14 @@ import warnings
 from . import memo
 from . import operation
 from .asset import Asset
-from .exceptions import NoStellarSecretOrAddressError, StellarAddressInvalidError, SequenceError
+from .exceptions import NoStellarSecretOrAddressError, StellarAddressInvalidError, SequenceError, \
+    InvalidSep10ChallengeError, BadSignatureError
 from .federation import federation, FederationError
 from .horizon import HORIZON_LIVE, HORIZON_TEST
 from .horizon import Horizon
 from .keypair import Keypair
 from .network import NETWORKS, Network
+from .operation import ManageData
 from .transaction import Transaction
 from .transaction_envelope import TransactionEnvelope as Te
 
@@ -72,12 +74,10 @@ class Builder(object):
         else:
             self.horizon = Horizon(HORIZON_TEST)
 
-        if sequence:
+        if sequence is not None:
             self.sequence = int(sequence)
         elif self.address:
             self.sequence = self.get_sequence()
-        else:
-            self.sequence = None  # Do we need this? Doesn't the address always exist?
 
         if fee is None:
             self.fee = self.horizon.base_fee()
@@ -947,9 +947,9 @@ class Builder(object):
         """Returns a valid `SEP0010 <https://github.com/stellar/stellar-protocol/blob/master/ecosystem/sep-0010.md>`_
             challenge transaction which you can use for Stellar Web Authentication.
 
-        :param server_secret: secret key for server's signing account.
-        :param client_account_id: The stellar account that the wallet wishes to authenticate with the server.
-        :param archor_name: Anchor's name to be used in the manage_data key.
+        :param str server_secret: secret key for server's signing account.
+        :param str client_account_id: The stellar account that the wallet wishes to authenticate with the server.
+        :param str archor_name: Anchor's name to be used in the manage_data key.
         :param str network: The network to connect to for verifying and retrieving
             additional attributes from. 'PUBLIC' is an alias for 'Public Global Stellar Network ; September 2015',
             'TESTNET' is an alias for 'Test SDF Network ; September 2015'. Defaults to TESTNET.
@@ -958,9 +958,95 @@ class Builder(object):
         :rtype: :class:`Builder`
         """
         now = int(time.time())
-        transaction = cls(secret=server_secret, network=network, sequence=-1)
+        transaction = cls(secret=server_secret, network=network, sequence=-1, fee=100)
         transaction.add_time_bounds({'minTime': now, 'maxTime': now + timeout})
         nonce = os.urandom(64)
         transaction.append_manage_data_op(data_name='{} auth'.format(archor_name), data_value=nonce,
                                           source=client_account_id)
         return transaction
+
+    @staticmethod
+    def verify_challenge_tx(challenge_tx, server_account_id, network='TESTNET'):
+        """Verifies if a transaction is a valid
+        `SEP0010 <https://github.com/stellar/stellar-protocol/blob/master/ecosystem/sep-0010.md>`_
+        challenge transaction.
+
+        This function performs the following checks:
+            1. verify that transaction sequenceNumber is equal to zero;
+            2. verify that transaction source account is equal to the server's signing key;
+            3. verify that transaction has time bounds set, and that current time is between the minimum and maximum bounds;
+            4. verify that transaction contains a single Manage Data operation and it's source account is not null;
+            5. verify that transaction envelope has a correct signature by server's signing key;
+            6. verify that transaction envelope has a correct signature by the operation's source account;
+
+        :param str challenge_tx: SEP0010 transaction challenge transaction in base64.
+        :param str server_account_id: public key for server's account.
+        :param str network: The network to connect to for verifying and retrieving
+            additional attributes from. 'PUBLIC' is an alias for 'Public Global Stellar Network ; September 2015',
+            'TESTNET' is an alias for 'Test SDF Network ; September 2015'. Defaults to TESTNET.
+        :raises: :exc:`SEP10VerificationError <stellar_base.exceptions.SEP10VerificationError>`
+        """
+        try:
+            transaction_envelope = Te.from_xdr(challenge_tx)
+        except Exception:
+            raise InvalidSep10ChallengeError("Importing XDR failed, please check if XDR is correct.")
+
+        if network is None:
+            network = NETWORKS['TESTNET']
+        if network.upper() in NETWORKS:
+            network = NETWORKS[network.upper()]
+        network = Network(network)
+
+        transaction_envelope.network_id = network.network_id()
+        transaction = transaction_envelope.tx
+        if transaction.sequence != 0:
+            raise InvalidSep10ChallengeError("The transaction sequence number should be zero.")
+
+        if transaction.source.decode() != server_account_id:
+            raise InvalidSep10ChallengeError("Transaction source account is not equal to server's account.")
+
+        if not transaction.time_bounds:
+            raise InvalidSep10ChallengeError("Transaction requires timebounds.")
+
+        max_time = transaction.time_bounds[0].maxTime
+        min_time = transaction.time_bounds[0].minTime
+
+        if max_time == 0:
+            raise InvalidSep10ChallengeError("Transaction requires non-infinite timebounds.")
+
+        current_time = time.time()
+        if current_time < min_time or current_time > max_time:
+            raise InvalidSep10ChallengeError("Transaction is not within range of the specified timebounds.")
+
+        if len(transaction.operations) != 1:
+            raise InvalidSep10ChallengeError("Transaction requires a single ManageData operation.")
+
+        manage_data_op = transaction.operations[0]
+        if manage_data_op.type_code != ManageData.type_code:
+            raise InvalidSep10ChallengeError("Operation type should be ManageData.")
+
+        if not manage_data_op.source:
+            raise InvalidSep10ChallengeError("Operation should have a source account.")
+
+        if len(manage_data_op.data_value) != 64:
+            raise InvalidSep10ChallengeError("Operation value should be a 64 bytes base64 random string.")
+
+        if not transaction_envelope.signatures:
+            raise InvalidSep10ChallengeError("Transaction has no signatures.")
+
+        if not _verify_te_signed_by(transaction_envelope, server_account_id):
+            raise InvalidSep10ChallengeError("transaction not signed by server: {}.".format(server_account_id))
+
+        if not _verify_te_signed_by(transaction_envelope, manage_data_op.source):
+            raise InvalidSep10ChallengeError("transaction not signed by client: {}.".format(manage_data_op.source))
+
+
+def _verify_te_signed_by(transaction_envelope, account_id):
+    kp = Keypair.from_address(account_id)
+    for decorated_signature in transaction_envelope.signatures:
+        try:
+            kp.verify(transaction_envelope.hash_meta(), decorated_signature.signature)
+            return True
+        except BadSignatureError:
+            pass
+    return False

@@ -1,4 +1,5 @@
 # encoding: utf-8
+import os
 import time
 
 import mock
@@ -6,7 +7,7 @@ import pytest
 
 from stellar_base import memo
 from stellar_base.builder import Builder
-from stellar_base.exceptions import NoStellarSecretOrAddressError, FederationError
+from stellar_base.exceptions import InvalidSep10ChallengeError, NoStellarSecretOrAddressError, FederationError
 from stellar_base.horizon import horizon_testnet, horizon_livenet, Horizon
 from stellar_base.keypair import Keypair
 from stellar_base.operation import ManageData
@@ -226,3 +227,285 @@ class TestBuilder(object):
         assert tx.time_bounds['maxTime'] - tx.time_bounds['minTime'] == timeout
         assert tx.keypair == server_kp
         assert tx.sequence == -1
+
+    def test_verify_challenge_tx(self):
+        server_kp = Keypair.random()
+        client_kp = Keypair.random()
+        timeout = 600
+        network = 'Public Global Stellar Network ; September 2015'
+        archor_name = "SDF"
+
+        challenge = Builder.challenge_tx(server_secret=server_kp.seed().decode(),
+                                         client_account_id=client_kp.address().decode(),
+                                         archor_name=archor_name,
+                                         network=network,
+                                         timeout=timeout)
+        challenge.sign()
+        challenge_tx_server_signed = challenge.gen_xdr()
+
+        transaction = Builder(client_kp.seed().decode(), network='Public Global Stellar Network ; September 2015',
+                              sequence=0, fee=100)
+        transaction.import_from_xdr(challenge_tx_server_signed)
+        transaction.sign()
+        challenge_tx = transaction.gen_xdr()
+        Builder.verify_challenge_tx(challenge_tx, server_kp.address().decode(),
+                                    'Public Global Stellar Network ; September 2015')
+
+    def test_verify_challenge_tx_sequence_not_zero(self):
+        server_kp = Keypair.random()
+        client_kp = Keypair.random()
+
+        challenge = Builder(server_kp.seed().decode(), sequence=10086, fee=100)
+        challenge.sign()
+        challenge_tx_server_signed = challenge.gen_xdr()
+
+        transaction = Builder(client_kp.seed().decode(), network='Public Global Stellar Network ; September 2015',
+                              sequence=0, fee=100)
+        transaction.import_from_xdr(challenge_tx_server_signed)
+        transaction.sign()
+        challenge_tx = transaction.gen_xdr()
+        with pytest.raises(InvalidSep10ChallengeError, match="The transaction sequence number should be zero."):
+            Builder.verify_challenge_tx(challenge_tx, server_kp.address().decode(),
+                                        'Public Global Stellar Network ; September 2015')
+
+    def test_verify_challenge_tx_source_is_different_to_server_account_id(self):
+        server_kp = Keypair.random()
+        client_kp = Keypair.random()
+        network = 'TESTNET'
+
+        challenge = Builder(server_kp.seed().decode(), network=network, sequence=-1, fee=100)
+        challenge.sign()
+        challenge_tx_server_signed = challenge.gen_xdr()
+
+        transaction = Builder(client_kp.seed().decode(), network='TESTNET',
+                              sequence=0, fee=100)
+        transaction.import_from_xdr(challenge_tx_server_signed)
+        transaction.sign()
+        challenge_tx = transaction.gen_xdr()
+        with pytest.raises(InvalidSep10ChallengeError,
+                           match="Transaction source account is not equal to server's account."):
+            Builder.verify_challenge_tx(challenge_tx, Keypair.random().address().decode(),
+                                        'TESTNET')
+
+    def test_verify_challenge_tx_donot_contain_any_operation(self):
+        server_kp = Keypair.random()
+        client_kp = Keypair.random()
+        timeout = 600
+        network = 'TESTNET'
+
+        challenge = Builder(server_kp.seed().decode(), network=network, sequence=-1, fee=100)
+        now = int(time.time())
+        challenge.add_time_bounds({'minTime': now, 'maxTime': now + timeout})
+        challenge.sign()
+        challenge_tx_server_signed = challenge.gen_xdr()
+
+        transaction = Builder(client_kp.seed().decode(), network='TESTNET',
+                              sequence=0, fee=100)
+
+        transaction.import_from_xdr(challenge_tx_server_signed)
+        transaction.sign()
+        challenge_tx = transaction.gen_xdr()
+        with pytest.raises(InvalidSep10ChallengeError, match="Transaction requires a single ManageData operation."):
+            Builder.verify_challenge_tx(challenge_tx, server_kp.address().decode(),
+                                        'TESTNET')
+
+    def test_verify_challenge_tx_donot_contain_managedata_operation(self):
+        server_kp = Keypair.random()
+        client_kp = Keypair.random()
+        timeout = 600
+        network = 'TESTNET'
+
+        challenge = Builder(server_kp.seed().decode(), network=network, sequence=-1, fee=100)
+        now = int(time.time())
+        challenge.add_time_bounds({'minTime': now, 'maxTime': now + timeout})
+        challenge.append_bump_sequence_op(12, source=client_kp.address().decode())
+        challenge.sign()
+        challenge_tx_server_signed = challenge.gen_xdr()
+
+        transaction = Builder(client_kp.seed().decode(), network='TESTNET',
+                              sequence=0, fee=100)
+
+        transaction.import_from_xdr(challenge_tx_server_signed)
+        transaction.sign()
+        challenge_tx = transaction.gen_xdr()
+        with pytest.raises(InvalidSep10ChallengeError, match="Operation type should be ManageData."):
+            Builder.verify_challenge_tx(challenge_tx, server_kp.address().decode(),
+                                        'TESTNET')
+
+    def test_verify_challenge_tx_operation_does_not_contain_the_source_account(self):
+        server_kp = Keypair.random()
+        client_kp = Keypair.random()
+        timeout = 600
+        network = 'TESTNET'
+        archor_name = 'sdf'
+
+        challenge = Builder(server_kp.seed().decode(), network=network, sequence=-1, fee=100)
+        now = int(time.time())
+        challenge.add_time_bounds({'minTime': now, 'maxTime': now + timeout})
+        nonce = os.urandom(64)
+        challenge.append_manage_data_op(data_name='{} auth'.format(archor_name), data_value=nonce)
+        challenge.sign()
+        challenge_tx_server_signed = challenge.gen_xdr()
+
+        transaction = Builder(client_kp.seed().decode(), network='TESTNET',
+                              sequence=0, fee=100)
+
+        transaction.import_from_xdr(challenge_tx_server_signed)
+        transaction.sign()
+        challenge_tx = transaction.gen_xdr()
+        with pytest.raises(InvalidSep10ChallengeError, match="Operation should have a source account."):
+            Builder.verify_challenge_tx(challenge_tx, server_kp.address().decode(),
+                                        'TESTNET')
+
+    def test_verify_challenge_tx_operation_value_is_not_a_64_bytes_base64_string(self):
+        server_kp = Keypair.random()
+        client_kp = Keypair.random()
+        timeout = 600
+        network = 'TESTNET'
+        archor_name = 'sdf'
+
+        challenge = Builder(server_kp.seed().decode(), network=network, sequence=-1, fee=100)
+        now = int(time.time())
+        challenge.add_time_bounds({'minTime': now, 'maxTime': now + timeout})
+        nonce = os.urandom(32)
+        challenge.append_manage_data_op(data_name='{} auth'.format(archor_name), data_value=nonce,
+                                        source=client_kp.address().decode())
+        challenge.sign()
+        challenge_tx_server_signed = challenge.gen_xdr()
+
+        transaction = Builder(client_kp.seed().decode(), network='TESTNET',
+                              sequence=0, fee=100)
+
+        transaction.import_from_xdr(challenge_tx_server_signed)
+        transaction.sign()
+        challenge_tx = transaction.gen_xdr()
+        with pytest.raises(InvalidSep10ChallengeError,
+                           match="Operation value should be a 64 bytes base64 random string."):
+            Builder.verify_challenge_tx(challenge_tx, server_kp.address().decode(),
+                                        'TESTNET')
+
+    def test_verify_challenge_tx_transaction_is_not_signed_by_the_server(self):
+        server_kp = Keypair.random()
+        client_kp = Keypair.random()
+        timeout = 600
+        network = 'TESTNET'
+        archor_name = 'sdf'
+
+        challenge = Builder(server_kp.seed().decode(), network=network, sequence=-1, fee=100)
+        now = int(time.time())
+        challenge.add_time_bounds({'minTime': now, 'maxTime': now + timeout})
+        nonce = os.urandom(64)
+        challenge.append_manage_data_op(data_name='{} auth'.format(archor_name), data_value=nonce,
+                                        source=client_kp.address().decode())
+        challenge_tx_server_signed = challenge.gen_xdr()
+
+        transaction = Builder(client_kp.seed().decode(), network='TESTNET',
+                              sequence=0, fee=100)
+
+        transaction.import_from_xdr(challenge_tx_server_signed)
+        transaction.sign()
+        challenge_tx = transaction.gen_xdr()
+        with pytest.raises(InvalidSep10ChallengeError,
+                           match="transaction not signed by server: {}".format(server_kp.address().decode())):
+            Builder.verify_challenge_tx(challenge_tx, server_kp.address().decode(),
+                                        'TESTNET')
+
+    def test_verify_challenge_tx_transaction_is_not_signed_by_the_client(self):
+        server_kp = Keypair.random()
+        client_kp = Keypair.random()
+        timeout = 600
+        network = 'TESTNET'
+        archor_name = 'sdf'
+
+        challenge = Builder(server_kp.seed().decode(), network=network, sequence=-1, fee=100)
+        now = int(time.time())
+        challenge.add_time_bounds({'minTime': now, 'maxTime': now + timeout})
+        nonce = os.urandom(64)
+        challenge.append_manage_data_op(data_name='{} auth'.format(archor_name), data_value=nonce,
+                                        source=client_kp.address().decode())
+        challenge.sign()
+        challenge_tx_server_signed = challenge.gen_xdr()
+
+        transaction = Builder(client_kp.seed().decode(), network='TESTNET',
+                              sequence=0, fee=100)
+        transaction.import_from_xdr(challenge_tx_server_signed)
+        challenge_tx = transaction.gen_xdr()
+        with pytest.raises(InvalidSep10ChallengeError,
+                           match="transaction not signed by client: {}".format(client_kp.address().decode())):
+            Builder.verify_challenge_tx(challenge_tx, server_kp.address().decode(),
+                                        'TESTNET')
+
+    def test_verify_challenge_tx_dont_contains_timebound(self):
+        server_kp = Keypair.random()
+        client_kp = Keypair.random()
+        network = 'TESTNET'
+        archor_name = 'sdf'
+
+        challenge = Builder(server_kp.seed().decode(), network=network, sequence=-1, fee=100)
+        nonce = os.urandom(64)
+        challenge.append_manage_data_op(data_name='{} auth'.format(archor_name), data_value=nonce,
+                                        source=client_kp.address().decode())
+        challenge.sign()
+        challenge_tx_server_signed = challenge.gen_xdr()
+
+        transaction = Builder(client_kp.seed().decode(), network='TESTNET',
+                              sequence=0, fee=100)
+        transaction.import_from_xdr(challenge_tx_server_signed)
+        transaction.sign()
+        challenge_tx = transaction.gen_xdr()
+        with pytest.raises(InvalidSep10ChallengeError,
+                           match="Transaction requires timebounds."):
+            Builder.verify_challenge_tx(challenge_tx, server_kp.address().decode(),
+                                        'TESTNET')
+
+    def test_verify_challenge_tx_contains_infinite_timebounds(self):
+        server_kp = Keypair.random()
+        client_kp = Keypair.random()
+        timeout = 600
+        network = 'TESTNET'
+        archor_name = 'sdf'
+
+        challenge = Builder(server_kp.seed().decode(), network=network, sequence=-1, fee=100)
+        now = int(time.time())
+        challenge.add_time_bounds({'minTime': now, 'maxTime': 0})
+        nonce = os.urandom(64)
+        challenge.append_manage_data_op(data_name='{} auth'.format(archor_name), data_value=nonce,
+                                        source=client_kp.address().decode())
+        challenge.sign()
+        challenge_tx_server_signed = challenge.gen_xdr()
+
+        transaction = Builder(client_kp.seed().decode(), network='TESTNET',
+                              sequence=0, fee=100)
+        transaction.import_from_xdr(challenge_tx_server_signed)
+        transaction.sign()
+        challenge_tx = transaction.gen_xdr()
+        with pytest.raises(InvalidSep10ChallengeError,
+                           match="Transaction requires non-infinite timebounds."):
+            Builder.verify_challenge_tx(challenge_tx, server_kp.address().decode(),
+                                        'TESTNET')
+
+    def test_verify_challenge_tx_not_within_range_of_the_specified_timebounds(self):
+        server_kp = Keypair.random()
+        client_kp = Keypair.random()
+        timeout = 600
+        network = 'TESTNET'
+        archor_name = 'sdf'
+
+        challenge = Builder(server_kp.seed().decode(), network=network, sequence=-1, fee=100)
+        now = int(time.time())
+        challenge.add_time_bounds({'minTime': now - 100, 'maxTime': now - 20})
+        nonce = os.urandom(64)
+        challenge.append_manage_data_op(data_name='{} auth'.format(archor_name), data_value=nonce,
+                                        source=client_kp.address().decode())
+        challenge.sign()
+        challenge_tx_server_signed = challenge.gen_xdr()
+
+        transaction = Builder(client_kp.seed().decode(), network='TESTNET',
+                              sequence=0, fee=100)
+        transaction.import_from_xdr(challenge_tx_server_signed)
+        transaction.sign()
+        challenge_tx = transaction.gen_xdr()
+        with pytest.raises(InvalidSep10ChallengeError,
+                           match="Transaction is not within range of the specified timebounds."):
+            Builder.verify_challenge_tx(challenge_tx, server_kp.address().decode(),
+                                        'TESTNET')
