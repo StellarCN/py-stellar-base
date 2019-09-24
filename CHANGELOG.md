@@ -1,6 +1,11 @@
 Release History
 ===============
 
+### Version 1.3.2
+Released on September 24, 2019
+* Add `Builder.verify_challenge_tx` method for verifying [SEP-10](https://github.com/stellar/stellar-protocol/blob/master/ecosystem/sep-0010.md) challenge transaction.
+
+
 ### Version 1.3.1
 Released on August 4, 2019
 * Add `Builder.challenge_tx` method for building [SEP-10](https://github.com/stellar/stellar-protocol/blob/master/ecosystem/sep-0010.md) challenge transaction.
