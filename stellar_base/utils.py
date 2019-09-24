@@ -1,15 +1,16 @@
 # coding: utf-8
 from __future__ import print_function
-import sys
+
 import base64
 import binascii
-from decimal import Decimal, ROUND_FLOOR
-from fractions import Fraction
 import hashlib
 import hmac
 import io
 import os
 import struct
+import sys
+from decimal import Decimal, ROUND_FLOOR
+from fractions import Fraction
 
 from mnemonic import Mnemonic
 from pbkdf2 import PBKDF2
@@ -22,7 +23,7 @@ except ImportError:  # pragma: no cover
 
 from .stellarxdr import Xdr
 from .exceptions import DecodeError, ConfigurationError, MnemonicError, StellarAddressInvalidError, \
-    StellarSecretInvalidError, NotValidParamError, NoApproximationError
+    StellarSecretInvalidError, NotValidParamError, NoApproximationError, BadSignatureError
 
 # Compatibility for Python 3.x that don't have unicode type
 if sys.version_info.major == 3:

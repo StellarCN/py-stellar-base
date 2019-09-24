@@ -40,6 +40,7 @@ class HorizonError(StellarError):
     Stellar Horizon.
 
     """
+
     def __init__(self, msg, status_code):
         super(HorizonError, self).__init__(msg)
         self.message = msg
@@ -79,3 +80,7 @@ class FederationError(Exception):
     Stellar Federation.
 
     """
+
+
+class InvalidSep10ChallengeError(StellarError):
+    pass
