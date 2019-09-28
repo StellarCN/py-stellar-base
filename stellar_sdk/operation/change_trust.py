@@ -1,3 +1,6 @@
+from decimal import Decimal
+from typing import Union
+
 from .operation import Operation
 
 from ..asset import Asset
@@ -24,7 +27,9 @@ class ChangeTrust(Operation):
 
     _DEFAULT_LIMIT = "922337203685.4775807"
 
-    def __init__(self, asset: Asset, limit: str = None, source: str = None) -> None:
+    def __init__(
+        self, asset: Asset, limit: Union[str, Decimal] = None, source: str = None
+    ) -> None:
         super().__init__(source)
         self.asset = asset
         if (

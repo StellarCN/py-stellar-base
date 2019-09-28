@@ -1,4 +1,6 @@
-from typing import List
+import warnings
+from decimal import Decimal
+from typing import List, Union
 
 from .operation import Operation
 from ..asset import Asset
@@ -32,9 +34,9 @@ class PathPayment(Operation):
         self,
         destination: str,
         send_asset: Asset,
-        send_max: str,
+        send_max: Union[str, Decimal],
         dest_asset: Asset,
-        dest_amount: str,
+        dest_amount: Union[str, Decimal],
         path: List[Asset],
         source: str = None,
     ) -> None:

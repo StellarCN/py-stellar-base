@@ -1,4 +1,6 @@
 import time
+import warnings
+from decimal import Decimal
 from typing import List, Union, Optional
 
 from .account import Account
@@ -184,7 +186,10 @@ class TransactionBuilder:
         return self
 
     def append_create_account_op(
-        self, destination: str, starting_balance: str, source: str = None
+        self,
+        destination: str,
+        starting_balance: Union[str, Decimal],
+        source: str = None,
     ) -> "TransactionBuilder":
         """Append a :class:`CreateAccount
         <stellar_sdk.operation.CreateAccount>` operation to the list of
@@ -202,7 +207,11 @@ class TransactionBuilder:
         return self.append_operation(op)
 
     def append_change_trust_op(
-        self, asset_code: str, asset_issuer: str, limit: str = None, source: str = None
+        self,
+        asset_code: str,
+        asset_issuer: str,
+        limit: Union[str, Decimal] = None,
+        source: str = None,
     ) -> "TransactionBuilder":
         """Append a :class:`ChangeTrust <stellar_sdk.operation.ChangeTrust>`
         operation to the list of operations.
@@ -221,7 +230,7 @@ class TransactionBuilder:
     def append_payment_op(
         self,
         destination: str,
-        amount: str,
+        amount: Union[str, Decimal],
         asset_code: str = "XLM",
         asset_issuer: Optional[str] = None,
         source: str = None,
@@ -246,10 +255,10 @@ class TransactionBuilder:
         destination: str,
         send_code: str,
         send_issuer: Optional[str],
-        send_max: str,
+        send_max: Union[str, Decimal],
         dest_code: str,
         dest_issuer: Optional[str],
-        dest_amount: str,
+        dest_amount: Union[str, Decimal],
         path: List[Asset],
         source=None,
     ) -> "TransactionBuilder":
@@ -435,8 +444,8 @@ class TransactionBuilder:
         selling_issuer: Optional[str],
         buying_code: str,
         buying_issuer: Optional[str],
-        amount: str,
-        price: Union[str, Price],
+        amount: Union[str, Decimal],
+        price: Union[str, Decimal, Price],
         offer_id: int = 0,
         source: str = None,
     ) -> "TransactionBuilder":
@@ -479,8 +488,8 @@ class TransactionBuilder:
         selling_issuer: Optional[str],
         buying_code: str,
         buying_issuer: Optional[str],
-        amount: str,
-        price: Union[str, Price],
+        amount: Union[str, Decimal],
+        price: Union[str, Price, Decimal],
         offer_id: int = 0,
         source: str = None,
     ) -> "TransactionBuilder":
@@ -523,8 +532,8 @@ class TransactionBuilder:
         selling_issuer: Optional[str],
         buying_code: str,
         buying_issuer: Optional[str],
-        amount: str,
-        price: Union[str, Price],
+        amount: Union[str, Decimal],
+        price: Union[str, Price, Decimal],
         source: str = None,
     ) -> "TransactionBuilder":
         """Append a :class:`CreatePassiveSellOffer
