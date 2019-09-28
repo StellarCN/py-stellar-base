@@ -1,9 +1,11 @@
+from decimal import Decimal
 from typing import Union
 
 from .operation import Operation
 from ..asset import Asset
 from ..price import Price
 from ..xdr import Xdr
+from .utils import check_price, check_amount
 
 
 class ManageSellOffer(Operation):
@@ -35,12 +37,14 @@ class ManageSellOffer(Operation):
         self,
         selling: Asset,
         buying: Asset,
-        amount: str,
-        price: Union[Price, str],
+        amount: Union[str, Decimal],
+        price: Union[Price, str, Decimal],
         offer_id: int = 0,
         source: str = None,
     ) -> None:
         super().__init__(source)
+        check_price(price)
+        check_amount(amount)
         self.selling = selling
         self.buying = buying
         self.amount = amount

@@ -3,6 +3,7 @@ from ..asset import Asset
 from ..keypair import Keypair
 from ..xdr import Xdr
 from ..strkey import StrKey
+from .utils import check_ed25519_public_key, check_amount
 
 
 class Payment(Operation):
@@ -25,6 +26,8 @@ class Payment(Operation):
         self, destination: str, asset: Asset, amount: str, source: str = None
     ) -> None:
         super().__init__(source)
+        check_ed25519_public_key(destination)
+        check_amount(amount)
         self.destination = destination
         self.asset = asset
         self.amount = amount

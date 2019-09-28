@@ -2,6 +2,7 @@ from .operation import Operation
 
 from ..asset import Asset
 from ..xdr import Xdr
+from .utils import check_amount
 
 
 class ChangeTrust(Operation):
@@ -31,6 +32,7 @@ class ChangeTrust(Operation):
         ):  # We don't need this if the user can send the value with correct type.
             self.limit = self._DEFAULT_LIMIT
         else:
+            check_amount(limit)
             self.limit = limit
 
     @classmethod

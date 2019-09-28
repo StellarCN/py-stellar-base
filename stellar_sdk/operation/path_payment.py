@@ -5,6 +5,7 @@ from ..asset import Asset
 from ..keypair import Keypair
 from ..xdr import Xdr
 from ..strkey import StrKey
+from .utils import check_ed25519_public_key, check_amount
 
 
 class PathPayment(Operation):
@@ -38,6 +39,9 @@ class PathPayment(Operation):
         source: str = None,
     ) -> None:
         super().__init__(source)
+        check_ed25519_public_key(destination)
+        check_amount(send_max)
+        check_amount(dest_amount)
         self.destination = destination
         self.send_asset = send_asset
         self.send_max = send_max

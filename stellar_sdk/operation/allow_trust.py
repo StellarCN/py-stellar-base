@@ -3,6 +3,7 @@ from ..asset import Asset
 from ..keypair import Keypair
 from ..xdr import Xdr
 from ..strkey import StrKey
+from .utils import check_ed25519_public_key, check_asset_code
 
 
 class AllowTrust(Operation):
@@ -30,6 +31,8 @@ class AllowTrust(Operation):
         self, trustor: str, asset_code: str, authorize: bool, source: str = None
     ) -> None:
         super().__init__(source)
+        check_ed25519_public_key(trustor)
+        check_asset_code(asset_code)
         self.trustor = trustor
         self.asset_code = asset_code
         self.authorize = authorize

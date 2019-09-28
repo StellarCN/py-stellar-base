@@ -1,11 +1,13 @@
 import decimal
 from abc import ABCMeta, abstractmethod
 from decimal import Decimal, Context, Inexact
-from typing import Optional, List
+from typing import Optional, List, Union
 
+from .utils import check_source
 from ..keypair import Keypair
-from ..xdr import Xdr
 from ..strkey import StrKey
+from ..xdr import Xdr
+from ..exceptions import ValueError, TypeError
 
 
 class Operation(metaclass=ABCMeta):
@@ -38,6 +40,7 @@ class Operation(metaclass=ABCMeta):
     _ONE = Decimal(10 ** 7)
 
     def __init__(self, source: str = None) -> None:
+        check_source(source)
         self.source = source
 
     @classmethod
@@ -45,7 +48,7 @@ class Operation(metaclass=ABCMeta):
         pass
 
     @staticmethod
-    def to_xdr_amount(value: str) -> int:
+    def to_xdr_amount(value: Union[str, Decimal]) -> int:
         """Converts an amount to the appropriate value to send over the network
         as a part of an XDR object.
 
@@ -68,10 +71,10 @@ class Operation(metaclass=ABCMeta):
             serialization.
 
         """
-        if not isinstance(value, str):
+        if not (isinstance(value, str) or isinstance(value, Decimal)):
             raise TypeError(
-                "Value of type '{}' must be of type String, but got {}.".format(
-                    value, type(value)
+                "Value of type '{}' must be of type {} or {}, but got {}.".format(
+                    value, str, Decimal, type(value)
                 )
             )
         # throw exception if value * ONE has decimal places (it can't be represented as int64)
@@ -91,7 +94,7 @@ class Operation(metaclass=ABCMeta):
         if amount < 0 or amount > 9223372036854775807:
             raise ValueError(
                 "Value of '{}' must represent a positive number "
-                "and the max valid value is 9223372036854775807.".format(value)
+                "and the max valid value is 922337203685.4775807.".format(value)
             )
 
         return amount

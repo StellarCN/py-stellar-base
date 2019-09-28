@@ -6,6 +6,7 @@ from ..signer import Signer
 from ..xdr import Xdr
 from ..strkey import StrKey
 from ..utils import pack_xdr_array, unpack_xdr_array
+from .utils import check_ed25519_public_key
 
 
 class SetOptions(Operation):
@@ -66,6 +67,9 @@ class SetOptions(Operation):
         source: str = None,
     ) -> None:
         super().__init__(source)
+        if inflation_dest is not None:
+            check_ed25519_public_key(inflation_dest)
+
         self.inflation_dest = inflation_dest
         self.clear_flags = clear_flags
         self.set_flags = set_flags

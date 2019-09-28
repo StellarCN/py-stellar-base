@@ -2,6 +2,7 @@ from .operation import Operation
 from ..keypair import Keypair
 from ..xdr import Xdr
 from ..strkey import StrKey
+from .utils import check_ed25519_public_key, check_amount
 
 
 class CreateAccount(Operation):
@@ -26,6 +27,8 @@ class CreateAccount(Operation):
         self, destination: str, starting_balance: str, source: str = None
     ) -> None:
         super().__init__(source)
+        check_ed25519_public_key(destination)
+        check_amount(starting_balance)
         self.destination = destination
         self.starting_balance = starting_balance
 

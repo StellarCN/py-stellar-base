@@ -2,8 +2,8 @@ from decimal import Decimal
 
 import pytest
 
-from stellar_sdk.asset import Asset
-from stellar_sdk.exceptions import Ed25519PublicKeyInvalidError
+from stellar_sdk import Price, Asset
+from stellar_sdk.exceptions import Ed25519PublicKeyInvalidError, AssetCodeInvalidError
 from stellar_sdk.operation import Operation, CreateAccount
 from stellar_sdk.operation.account_merge import AccountMerge
 from stellar_sdk.operation.allow_trust import AllowTrust
@@ -17,7 +17,13 @@ from stellar_sdk.operation.manage_sell_offer import ManageSellOffer
 from stellar_sdk.operation.path_payment import PathPayment
 from stellar_sdk.operation.payment import Payment
 from stellar_sdk.operation.set_options import SetOptions
-from stellar_sdk.price import Price
+from stellar_sdk.operation.utils import (
+    check_price,
+    check_amount,
+    check_source,
+    check_asset_code,
+    check_ed25519_public_key,
+)
 from stellar_sdk.signer import Signer
 from stellar_sdk.utils import sha256
 
@@ -41,19 +47,19 @@ class TestBaseOperation:
             (
                 10,
                 TypeError,
-                "Value of type '{}' must be of type String, but got {}.".format(
-                    10, type(10)
+                "Value of type '{}' must be of type {} or {}, but got {}.".format(
+                    10, str, Decimal, type(10)
                 ),
             ),
             (
                 "-0.1",
                 ValueError,
-                "Value of '-0.1' must represent a positive number and the max valid value is 9223372036854775807.",
+                "Value of '-0.1' must represent a positive number and the max valid value is 922337203685.4775807.",
             ),
             (
-                "9223372036854775808",
+                "922337203685.4775808",
                 ValueError,
-                "Value of '9223372036854775808' must represent a positive number and the max valid value is 9223372036854775807.",
+                "Value of '922337203685.4775808' must represent a positive number and the max valid value is 922337203685.4775807.",
             ),
             (
                 "0.123456789",
@@ -64,7 +70,7 @@ class TestBaseOperation:
     )
     def test_to_xdr_amount_raise(self, origin_amount, exception, reason):
         with pytest.raises(exception, match=reason):
-            assert Operation.to_xdr_amount(origin_amount)
+            Operation.to_xdr_amount(origin_amount)
 
     @pytest.mark.parametrize(
         "origin_amount, expect_value",
@@ -134,34 +140,31 @@ class TestCreateAccount:
     def test_to_xdr_obj_with_invalid_destination_raise(self):
         destination = "GCEZWKCA5VLDNRLN3RPRJMRZOX3Z6G5CHCGSNFHEYVXM3XOJMINVALID"
         starting_balance = "1000.00"
-        op = CreateAccount(destination, starting_balance)
         with pytest.raises(
             Ed25519PublicKeyInvalidError,
             match="Invalid Ed25519 Public Key: {}".format(destination),
         ):
-            op.to_xdr_object().to_xdr()
+            CreateAccount(destination, starting_balance)
 
     def test_to_xdr_obj_with_invalid_source_raise(self):
         source = "GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLINVALID"
         destination = "GCEZWKCA5VLDNRLN3RPRJMRZOX3Z6G5CHCGSNFHEYVXM3XOJMDS674JZ"
         starting_balance = "1000.00"
-        op = CreateAccount(destination, starting_balance, source)
         with pytest.raises(
             Ed25519PublicKeyInvalidError,
             match="Invalid Ed25519 Public Key: {}".format(source),
         ):
-            op.to_xdr_object().to_xdr()
+            CreateAccount(destination, starting_balance, source)
 
     def test_to_xdr_obj_with_invalid_starting_balance_raise(self):
         destination = "GCEZWKCA5VLDNRLN3RPRJMRZOX3Z6G5CHCGSNFHEYVXM3XOJMDS674JZ"
         starting_balance = "-1"
-        op = CreateAccount(destination, starting_balance)
         with pytest.raises(
             ValueError,
             match="Value of '{}' must represent a positive number and "
-            "the max valid value is 9223372036854775807.".format(starting_balance),
+            "the max valid value is 922337203685.4775807.".format(starting_balance),
         ):
-            op.to_xdr_object()
+            CreateAccount(destination, starting_balance)
 
     def test_from_xdr_obj(self):
         source = "GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV"
@@ -291,18 +294,16 @@ class TestPayment:
         destination = "GCEZW"
         amount = "1000.0000000"
         asset = Asset("USD", "GDGU5OAPHNPU5UCLE5RDJHG7PXZFQYWKCFOEXSXNMR6KRQRI5T6XXCD7")
-        op = Payment(destination, asset, amount, source)
         with pytest.raises(Ed25519PublicKeyInvalidError):
-            op.to_xdr_object()
+            Payment(destination, asset, amount, source)
 
     def test_to_xdr_obj_with_invalid_amount_raise(self):
         source = "GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV"
         destination = "GCEZWKCA5VLDNRLN3RPRJMRZOX3Z6G5CHCGSNFHEYVXM3XOJMDS674JZ"
         amount = 1
         asset = Asset("USD", "GDGU5OAPHNPU5UCLE5RDJHG7PXZFQYWKCFOEXSXNMR6KRQRI5T6XXCD7")
-        op = Payment(destination, asset, amount, source)
         with pytest.raises(TypeError):
-            op.to_xdr_object()
+            Payment(destination, asset, amount, source)
 
     def test_from_xdr_obj(self):
         source = "GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV"
@@ -357,11 +358,10 @@ class TestPathPayment:
             Asset("USD", "GBBM6BKZPEHWYO3E3YKREDPQXMS4VK35YLNU7NFBRI26RAN7GI5POFBB"),
             Asset("EUR", "GDTNXRLOJD2YEBPKK7KCMR7J33AAG5VZXHAJTHIG736D6LVEFLLLKPDL"),
         ]
-        op = PathPayment(
-            destination, send_asset, send_max, dest_asset, dest_amount, path, source
-        )
         with pytest.raises(Ed25519PublicKeyInvalidError):
-            op.to_xdr_object()
+            PathPayment(
+                destination, send_asset, send_max, dest_asset, dest_amount, path, source
+            )
 
     # TODO
     # def test_to_xdr_obj_with_invalid_amount_raise(self):
@@ -774,3 +774,157 @@ class TestCreatePassiveSellOffer:
         if not isinstance(price, Price):
             price = Price.from_raw_price(price)
         assert from_instance.price == price
+
+
+class TestOperationUtils:
+    def test_check_source(self):
+        check_source(None)
+        check_source("GCNY5OXYSY4FKHOPT2SPOQZAOEIGXB5LBYW3HVU3OWSTQITS65M5RCNY")
+
+    @pytest.mark.parametrize(
+        "source",
+        ["GCNY5OXYSY4FKHOPT2SPOQZAOEIGXB5LBYW3HVU3OWSTQITS65M5RBAD", "", " ", 123],
+    )
+    def test_check_source_raise(self, source):
+        with pytest.raises(
+            ValueError, match="Invalid Ed25519 Public Key: {}".format(source)
+        ):
+            check_source(source)
+
+    def test_check_ed25519_public_key(self):
+        check_ed25519_public_key(
+            "GCNY5OXYSY4FKHOPT2SPOQZAOEIGXB5LBYW3HVU3OWSTQITS65M5RCNY"
+        )
+
+    @pytest.mark.parametrize(
+        "source",
+        ["GCNY5OXYSY4FKHOPT2SPOQZAOEIGXB5LBYW3HVU3OWSTQITS65M5RBAD", "", " ", 123],
+    )
+    def test_check_ed25519_public_key_raise(self, source):
+        with pytest.raises(
+            ValueError, match="Invalid Ed25519 Public Key: {}".format(source)
+        ):
+            check_ed25519_public_key(source)
+
+    @pytest.mark.parametrize(
+        "amount",
+        [
+            "0",
+            "0.0000000",
+            "922337203685.4775807",
+            "123466",
+            Decimal(12),
+            Decimal("0.0000000"),
+            Decimal("922337203685.4775807"),
+            Decimal("123466"),
+        ],
+    )
+    def test_check_amount(self, amount):
+        check_amount(amount)
+
+    @pytest.mark.parametrize("amount", [234, Price(12, 34)])
+    def test_check_amount_type_raise(self, amount):
+        with pytest.raises(
+            TypeError, match="amount should be type of {} or {}.".format(str, Decimal)
+        ):
+            check_amount(amount)
+
+    @pytest.mark.parametrize(
+        "amount",
+        [
+            "-0.1",
+            "922337203685.4775808",
+            Decimal("-0.1"),
+            Decimal("922337203685.4775808"),
+        ],
+    )
+    def test_check_amount_exceed_raise(self, amount):
+        with pytest.raises(
+            ValueError,
+            match="Value of '{}' must represent a positive "
+            "number and the max valid value is 922337203685.4775807.".format(amount),
+        ):
+            check_amount(amount)
+
+    @pytest.mark.parametrize(
+        "amount",
+        [
+            "0.00000000",
+            "922337203685.47758001",
+            Decimal("0.00000000"),
+            Decimal("922337203685.47758001"),
+        ],
+    )
+    def test_check_amount_bad_precision_raise(self, amount):
+        with pytest.raises(
+            ValueError,
+            match="must have at most 7 digits after the decimal.".format(amount),
+        ):
+            check_amount(amount)
+
+    @pytest.mark.parametrize(
+        "price",
+        [
+            "0",
+            "0.0000000",
+            "922337203685.4775807",
+            "123466",
+            Decimal(12),
+            Decimal("0.0000000"),
+            Decimal("922337203685.4775807"),
+            Decimal("123466"),
+            Price(1, 2),
+        ],
+    )
+    def test_check_price(self, price):
+        check_price(price)
+
+    @pytest.mark.parametrize("price", [234, True])
+    def test_check_price_type_raise(self, price):
+        with pytest.raises(
+            TypeError,
+            match="amount should be type of {}, {} or {}.".format(str, Decimal, Price),
+        ):
+            check_price(price)
+
+    @pytest.mark.parametrize(
+        "price",
+        [
+            "-0.1",
+            "922337203685.4775808",
+            Decimal("-0.1"),
+            Decimal("922337203685.4775808"),
+        ],
+    )
+    def test_check_price_exceed_raise(self, price):
+        with pytest.raises(
+            ValueError,
+            match="Value of '{}' must represent a positive "
+            "number and the max valid value is 922337203685.4775807.".format(price),
+        ):
+            check_price(price)
+
+    @pytest.mark.parametrize(
+        "price",
+        [
+            "0.00000000",
+            "922337203685.47758001",
+            Decimal("0.00000000"),
+            Decimal("922337203685.47758001"),
+        ],
+    )
+    def test_check_price_bad_precision_raise(self, price):
+        with pytest.raises(
+            ValueError,
+            match="must have at most 7 digits after the decimal.".format(price),
+        ):
+            check_price(price)
+
+    @pytest.mark.parametrize("asset_code", ["XLM", "Bananana", "Bananananana"])
+    def test_check_asset_code(self, asset_code):
+        check_asset_code(asset_code)
+
+    @pytest.mark.parametrize("asset_code", ["", "Banananananan", "XLM-XCN"])
+    def test_check_asset_code_raise(self, asset_code):
+        with pytest.raises(AssetCodeInvalidError, match="Asset code is invalid"):
+            check_asset_code(asset_code)

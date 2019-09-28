@@ -14,6 +14,6 @@ class RootCallBuilder(BaseCallBuilder):
     """
 
     def __init__(
-            self, horizon_url: str, client: Union[BaseAsyncClient, BaseSyncClient]
+        self, horizon_url: str, client: Union[BaseAsyncClient, BaseSyncClient]
     ) -> None:
         super().__init__(horizon_url, client)
