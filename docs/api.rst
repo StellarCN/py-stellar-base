@@ -381,6 +381,16 @@ PathPayment
 .. autoclass:: stellar_sdk.operation.PathPayment
    :members: to_xdr_object, from_xdr_object
 
+PathPaymentStrictReceive
+------------------------
+.. autoclass:: stellar_sdk.operation.PathPaymentStrictReceive
+   :members: to_xdr_object, from_xdr_object
+
+PathPaymentStrictSend
+---------------------
+.. autoclass:: stellar_sdk.operation.PathPaymentStrictSend
+   :members: to_xdr_object, from_xdr_object
+
 Payment
 -------
 .. autoclass:: stellar_sdk.operation.Payment
