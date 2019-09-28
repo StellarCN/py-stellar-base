@@ -1,4 +1,3 @@
-import warnings
 from decimal import Decimal
 from typing import List, Union
 
@@ -10,21 +9,21 @@ from ..strkey import StrKey
 from .utils import check_ed25519_public_key, check_amount
 
 
-class PathPayment(Operation):
-    """The :class:`PathPayment` object, which represents a PathPayment
+class PathPaymentStrictSend(Operation):
+    """The :class:`PathPaymentStrictSend` object, which represents a PathPaymentStrictSend
     operation on Stellar's network.
 
     Sends an amount in a specific asset to a destination account through a path
-    of offers. This allows the asset sent (e.g., 450 XLM) to be different from
+    of offers. This allows the asset sent (e.g, 450 XLM) to be different from
     the asset received (e.g, 6 BTC).
 
     Threshold: Medium
 
     :param destination: The destination account to send to.
     :param send_asset: The asset to pay with.
-    :param send_max: The maximum amount of send_asset to send.
+    :param send_amount: Amount of send_asset to send.
     :param dest_asset: The asset the destination will receive.
-    :param dest_amount: The amount the destination receives.
+    :param dest_min: The minimum amount of dest_asset to be received.
     :param path: A list of Asset objects to use as the path.
     :param source: The source account for the payment. Defaults to the
         transaction's source account.
@@ -34,32 +33,26 @@ class PathPayment(Operation):
         self,
         destination: str,
         send_asset: Asset,
-        send_max: Union[str, Decimal],
+        send_amount: Union[str, Decimal],
         dest_asset: Asset,
-        dest_amount: Union[str, Decimal],
+        dest_min: Union[str, Decimal],
         path: List[Asset],
         source: str = None,
     ) -> None:
-        warnings.warn(
-            "Will be removed in version v2.0.0-alpha6, "
-            "use stellar_sdk.operation.PathPaymentStrictReceive",
-            DeprecationWarning,
-        )
-
         super().__init__(source)
         check_ed25519_public_key(destination)
-        check_amount(send_max)
-        check_amount(dest_amount)
+        check_amount(send_amount)
+        check_amount(dest_min)
         self.destination = destination
         self.send_asset = send_asset
-        self.send_max = send_max
+        self.send_amount = send_amount
         self.dest_asset = dest_asset
-        self.dest_amount = dest_amount
+        self.dest_min = dest_min
         self.path = path  # a list of paths/assets
 
     @classmethod
     def _type_code(cls) -> int:
-        return -1
+        return Xdr.const.PATH_PAYMENT_STRICT_SEND
 
     def _to_operation_body(self) -> Xdr.nullclass:
         destination = Keypair.from_public_key(self.destination).xdr_account_id()
@@ -67,56 +60,56 @@ class PathPayment(Operation):
         dest_asset = self.dest_asset.to_xdr_object()
         path = [asset.to_xdr_object() for asset in self.path]
 
-        path_payment_strict_receive_op = Xdr.types.PathPaymentStrictReceiveOp(
+        path_payment_strice_send_op = Xdr.types.PathPaymentStrictSendOp(
             send_asset,
-            Operation.to_xdr_amount(self.send_max),
+            Operation.to_xdr_amount(self.send_amount),
             destination,
             dest_asset,
-            Operation.to_xdr_amount(self.dest_amount),
+            Operation.to_xdr_amount(self.dest_min),
             path,
         )
         body = Xdr.nullclass()
-        body.type = Xdr.const.PATH_PAYMENT_STRICT_RECEIVE
-        body.pathPaymentStrictReceiveOp = path_payment_strict_receive_op
+        body.type = Xdr.const.PATH_PAYMENT_STRICT_SEND
+        body.pathPaymentStrictSendOp = path_payment_strice_send_op
         return body
 
     @classmethod
     def from_xdr_object(
         cls, operation_xdr_object: Xdr.types.Operation
-    ) -> "PathPayment":
-        """Creates a :class:`PathPayment` object from an XDR Operation
+    ) -> "PathPaymentStrictSend":
+        """Creates a :class:`PathPaymentStrictSend` object from an XDR Operation
         object.
 
         """
         source = Operation.get_source_from_xdr_obj(operation_xdr_object)
         destination = StrKey.encode_ed25519_public_key(
-            operation_xdr_object.body.pathPaymentStrictReceiveOp.destination.ed25519
+            operation_xdr_object.body.pathPaymentStrictSendOp.destination.ed25519
         )
 
         send_asset = Asset.from_xdr_object(
-            operation_xdr_object.body.pathPaymentStrictReceiveOp.sendAsset
+            operation_xdr_object.body.pathPaymentStrictSendOp.sendAsset
         )
         dest_asset = Asset.from_xdr_object(
-            operation_xdr_object.body.pathPaymentStrictReceiveOp.destAsset
+            operation_xdr_object.body.pathPaymentStrictSendOp.destAsset
         )
-        send_max = Operation.from_xdr_amount(
-            operation_xdr_object.body.pathPaymentStrictReceiveOp.sendMax
+        send_amount = Operation.from_xdr_amount(
+            operation_xdr_object.body.pathPaymentStrictSendOp.sendAmount
         )
-        dest_amount = Operation.from_xdr_amount(
-            operation_xdr_object.body.pathPaymentStrictReceiveOp.destAmount
+        dest_min = Operation.from_xdr_amount(
+            operation_xdr_object.body.pathPaymentStrictSendOp.destMin
         )
 
         path = []
-        if operation_xdr_object.body.pathPaymentStrictReceiveOp.path:
-            for x in operation_xdr_object.body.pathPaymentStrictReceiveOp.path:
+        if operation_xdr_object.body.pathPaymentStrictSendOp.path:
+            for x in operation_xdr_object.body.pathPaymentStrictSendOp.path:
                 path.append(Asset.from_xdr_object(x))
 
         return cls(
             source=source,
             destination=destination,
             send_asset=send_asset,
-            send_max=send_max,
+            send_amount=send_amount,
             dest_asset=dest_asset,
-            dest_amount=dest_amount,
+            dest_min=dest_min,
             path=path,
         )

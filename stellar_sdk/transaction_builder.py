@@ -283,6 +283,12 @@ class TransactionBuilder:
 
         """
 
+        warnings.warn(
+            "Will be removed in version v2.0.0-alpha6, "
+            "use stellar_sdk.transaction_builder.append_path_payment_strict_receive_op",
+            DeprecationWarning,
+        )
+
         send_asset = Asset(send_code, send_issuer)
         dest_asset = Asset(dest_code, dest_issuer)
 
@@ -295,6 +301,104 @@ class TransactionBuilder:
             send_max=send_max,
             dest_asset=dest_asset,
             dest_amount=dest_amount,
+            path=assets,
+            source=source,
+        )
+        return self.append_operation(op)
+
+    def append_path_payment_strict_receive_op(
+        self,
+        destination: str,
+        send_code: str,
+        send_issuer: Optional[str],
+        send_max: Union[str, Decimal],
+        dest_code: str,
+        dest_issuer: Optional[str],
+        dest_amount: Union[str, Decimal],
+        path: List[Asset],
+        source=None,
+    ) -> "TransactionBuilder":
+        """Append a :class:`PathPaymentStrictReceive <stellar_sdk.operation.PathPaymentStrictReceive>`
+        operation to the list of operations.
+
+        :param destination: The destination address (Account ID) for the
+            payment.
+        :param send_code: The asset code for the source asset deducted from
+            the source account.
+        :param send_issuer: The address of the issuer of the source asset.
+        :param send_max: The maximum amount of send asset to deduct
+            (excluding fees).
+        :param dest_code: The asset code for the final destination asset
+            sent to the recipient.
+        :param dest_issuer: Account address that receives the payment.
+        :param dest_amount: The amount of destination asset the destination
+            account receives.
+        :param path: A list of Asset objects to use as the path.
+        :param source: The source address of the path payment.
+        :return: This builder instance.
+
+        """
+
+        send_asset = Asset(send_code, send_issuer)
+        dest_asset = Asset(dest_code, dest_issuer)
+
+        assets = []
+        for asset in path:
+            assets.append(asset)
+        op = PathPaymentStrictReceive(
+            destination=destination,
+            send_asset=send_asset,
+            send_max=send_max,
+            dest_asset=dest_asset,
+            dest_amount=dest_amount,
+            path=assets,
+            source=source,
+        )
+        return self.append_operation(op)
+
+    def append_path_payment_strict_send_op(
+        self,
+        destination: str,
+        send_code: str,
+        send_issuer: Optional[str],
+        send_amount: Union[str, Decimal],
+        dest_code: str,
+        dest_issuer: Optional[str],
+        dest_min: Union[str, Decimal],
+        path: List[Asset],
+        source=None,
+    ) -> "TransactionBuilder":
+        """Append a :class:`PathPaymentStrictSend <stellar_sdk.operation.PathPaymentStrictSend>`
+        operation to the list of operations.
+
+        :param destination: The destination address (Account ID) for the
+            payment.
+        :param send_code: The asset code for the source asset deducted from
+            the source account.
+        :param send_issuer: The address of the issuer of the source asset.
+        :param send_amount: Amount of send_asset to send.
+        :param dest_code: The asset code for the final destination asset
+            sent to the recipient.
+        :param dest_issuer: Account address that receives the payment.
+        :param dest_min: The minimum amount of dest_asset to be received.
+        :param path: A list of Asset objects to use as the path.
+        :param source: The source address of the path payment.
+        :return: This builder instance.
+
+        """
+
+        send_asset = Asset(send_code, send_issuer)
+        dest_asset = Asset(dest_code, dest_issuer)
+
+        assets = []
+        for asset in path:
+            assets.append(asset)
+        op = PathPaymentStrictSend(
+            destination=destination,
+            send_asset=send_asset,
+            send_amount=send_amount,
+            dest_asset=dest_asset,
+            dest_min=dest_min,
             path=assets,
             source=source,
         )

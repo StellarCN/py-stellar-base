@@ -1,4 +1,3 @@
-import warnings
 from decimal import Decimal
 from typing import List, Union
 
@@ -10,13 +9,13 @@ from ..strkey import StrKey
 from .utils import check_ed25519_public_key, check_amount
 
 
-class PathPayment(Operation):
-    """The :class:`PathPayment` object, which represents a PathPayment
+class PathPaymentStrictReceive(Operation):
+    """The :class:`PathPaymentStrictReceive` object, which represents a PathPaymentStrictReceive
     operation on Stellar's network.
 
     Sends an amount in a specific asset to a destination account through a path
-    of offers. This allows the asset sent (e.g., 450 XLM) to be different from
-    the asset received (e.g, 6 BTC).
+    of offers. This allows the asset sent (e.g. 450 XLM) to be different from
+    the asset received (e.g. 6 BTC).
 
     Threshold: Medium
 
@@ -40,12 +39,6 @@ class PathPayment(Operation):
         path: List[Asset],
         source: str = None,
     ) -> None:
-        warnings.warn(
-            "Will be removed in version v2.0.0-alpha6, "
-            "use stellar_sdk.operation.PathPaymentStrictReceive",
-            DeprecationWarning,
-        )
-
         super().__init__(source)
         check_ed25519_public_key(destination)
         check_amount(send_max)
@@ -59,7 +52,7 @@ class PathPayment(Operation):
 
     @classmethod
     def _type_code(cls) -> int:
-        return -1
+        return Xdr.const.PATH_PAYMENT_STRICT_RECEIVE
 
     def _to_operation_body(self) -> Xdr.nullclass:
         destination = Keypair.from_public_key(self.destination).xdr_account_id()
@@ -83,8 +76,8 @@ class PathPayment(Operation):
     @classmethod
     def from_xdr_object(
         cls, operation_xdr_object: Xdr.types.Operation
-    ) -> "PathPayment":
-        """Creates a :class:`PathPayment` object from an XDR Operation
+    ) -> "PathPaymentStrictReceive":
+        """Creates a :class:`PathPaymentStrictReceive` object from an XDR Operation
         object.
 
         """
