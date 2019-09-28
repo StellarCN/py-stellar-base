@@ -24,6 +24,7 @@ __all__ = [
     "BadRequestError",
     "BadResponseError",
     "UnknownRequestError",
+    "NotPageableError",
 ]
 
 
@@ -172,6 +173,11 @@ class BadResponseError(BaseHorizonError):
 class UnknownRequestError(BaseHorizonError):
     """Unknown request exception, please create an issue feedback for this issue.
 
+    """
+
+
+class NotPageableError(BaseRequestError):
+    """There is no previous or next page
     """
 
 

@@ -1,10 +1,18 @@
-from typing import Union, Coroutine, Any, Dict, Mapping, Generator, AsyncGenerator
+from typing import (
+    Union,
+    Coroutine,
+    Any,
+    Dict,
+    Mapping,
+    Generator,
+    AsyncGenerator,
+    Optional,
+)
 from urllib.parse import urljoin
 
 from ..client.base_async_client import BaseAsyncClient
 from ..client.base_sync_client import BaseSyncClient
-from ..client.response import Response
-from ..exceptions import raise_request_exception
+from ..exceptions import raise_request_exception, NotPageableError
 
 
 class BaseCallBuilder:
@@ -28,6 +36,8 @@ class BaseCallBuilder:
         self.horizon_url: str = horizon_url
         self.params: Dict[str, str] = {}
         self.endpoint: str = ""
+        self.prev_href: Optional[str] = None
+        self.next_href: Optional[str] = None
 
     def call(self) -> Union[Dict[str, Any], Coroutine[Any, Any, Dict[str, Any]]]:
         """Triggers a HTTP request using this builder's current configuration.
@@ -41,22 +51,28 @@ class BaseCallBuilder:
             :exc:`BadResponseError <stellar_sdk.exceptions.BadResponseError>`
             :exc:`UnknownRequestError <stellar_sdk.exceptions.UnknownRequestError>`
         """
+        url = urljoin(self.horizon_url, self.endpoint)
+        return self.__call(url, self.params)
+
+    def __call(self, url: str, params: dict = None):
         if self.__async:
-            return self.__call_async()
+            return self.__call_async(url, params)
         else:
-            return self.__call_sync()
+            return self.__call_sync(url, params)
 
-    def __call_sync(self) -> Dict[str, Any]:
-        url = urljoin(self.horizon_url, self.endpoint)
-        resp = self.client.get(url, self.params)
-        raise_request_exception(resp)
-        return resp.json()
+    def __call_sync(self, url: str, params: dict = None) -> Dict[str, Any]:
+        raw_resp = self.client.get(url, params)
+        raise_request_exception(raw_resp)
+        resp = raw_resp.json()
+        self._check_pageable(resp)
+        return resp
 
-    async def __call_async(self) -> Dict[str, Any]:
-        url = urljoin(self.horizon_url, self.endpoint)
-        resp = await self.client.get(url, self.params)
-        raise_request_exception(resp)
-        return resp.json()
+    async def __call_async(self, url: str, params: dict = None) -> Dict[str, Any]:
+        raw_resp = await self.client.get(url, params)
+        raise_request_exception(raw_resp)
+        resp = raw_resp.json()
+        self._check_pageable(resp)
+        return resp
 
     def stream(
         self
@@ -121,6 +137,16 @@ class BaseCallBuilder:
         self._add_query_param("order", order)
         return self
 
+    def next(self):
+        if self.next_href is None:
+            raise NotPageableError("The next page does not exist.")
+        return self.__call(self.next_href, None)
+
+    def prev(self):
+        if self.next_href is None:
+            raise NotPageableError("The prev page does not exist.")
+        return self.__call(self.prev_href, None)
+
     def _add_query_param(self, key: str, value: Union[str, float, int, bool, None]):
         if value is None:
             pass
@@ -130,6 +156,17 @@ class BaseCallBuilder:
             self.params[key] = "false"
         else:
             self.params[key] = str(value)
+
+    def _check_pageable(self, response: dict) -> None:
+        links = response.get("_links")
+        if not links:
+            return
+        prev_page = links.get("prev")
+        next_page = links.get("next")
+        if prev_page:
+            self.prev_href = prev_page.get("href")
+        if next_page:
+            self.next_href = next_page.get("href")
 
     def _add_query_params(
         self, params: Mapping[str, Union[str, float, int, bool, None]]

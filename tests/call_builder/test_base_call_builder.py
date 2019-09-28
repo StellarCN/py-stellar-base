@@ -4,7 +4,7 @@ from stellar_sdk.__version__ import __version__
 from stellar_sdk.call_builder import BaseCallBuilder
 from stellar_sdk.client.aiohttp_client import AiohttpClient
 from stellar_sdk.client.requests_client import RequestsClient
-from stellar_sdk.exceptions import BadRequestError, NotFoundError
+from stellar_sdk.exceptions import BadRequestError, NotFoundError, NotPageableError
 
 
 class TestBaseCallBuilder:
@@ -145,3 +145,96 @@ class TestBaseCallBuilder:
             "or no data in our database could be found with the parameters provided."
         )
         assert exception.extras is None
+
+    @pytest.mark.asyncio
+    async def test_get_data_async(self):
+        url = "https://httpbin.org/get"
+        client = AiohttpClient()
+        resp = (
+            await BaseCallBuilder(url, client)
+            .cursor(89777)
+            .order(desc=False)
+            .limit(25)
+            .call()
+        )
+
+        assert resp["args"] == {"cursor": "89777", "limit": "25", "order": "asc"}
+        assert resp["headers"] == {
+            "Accept": "*/*",
+            "Accept-Encoding": "gzip, deflate",
+            "Content-Type": "application/x-www-form-urlencoded",
+            "Host": "httpbin.org",
+            "User-Agent": "py-stellar-sdk/{}/AiohttpClient".format(__version__),
+            "X-Client-Name": "py-stellar-sdk",
+            "X-Client-Version": __version__,
+        }
+        assert resp["url"] == "https://httpbin.org/get?cursor=89777&order=asc&limit=25"
+
+    def test_get_data_no_link(self):
+        url = "https://httpbin.org/get"
+        client = RequestsClient()
+        call_builder = (
+            BaseCallBuilder(url, client).limit(10).cursor(10086).order(desc=True)
+        )
+        call_builder.call()
+        assert call_builder.next_href is None
+        assert call_builder.prev_href is None
+
+    def test_get_data_not_pageable_raise(self):
+        url = "https://httpbin.org/get"
+        client = RequestsClient()
+        call_builder = (
+            BaseCallBuilder(url, client).limit(10).cursor(10086).order(desc=True)
+        )
+        call_builder.call()
+        with pytest.raises(NotPageableError, match="The next page does not exist."):
+            call_builder.next()
+
+        with pytest.raises(NotPageableError, match="The prev page does not exist."):
+            call_builder.prev()
+
+    def test_get_data_page(self):
+        url = "https://horizon.stellar.org/transactions"
+        client = RequestsClient()
+        call_builder = (
+            BaseCallBuilder(url, client)
+            .cursor(81058917781504)
+            .limit(10)
+            .order(desc=True)
+        )
+        first_resp = call_builder.call()
+        assert first_resp["_links"] == {
+            "self": {
+                "href": "https://horizon.stellar.org/transactions?cursor=81058917781504&limit=10&order=desc"
+            },
+            "next": {
+                "href": "https://horizon.stellar.org/transactions?cursor=12884905984&limit=10&order=desc"
+            },
+            "prev": {
+                "href": "https://horizon.stellar.org/transactions?cursor=80607946215424&limit=10&order=asc"
+            },
+        }
+        next_resp = call_builder.next()
+        assert next_resp["_links"] == {
+            "self": {
+                "href": "https://horizon.stellar.org/transactions?cursor=12884905984&limit=10&order=desc"
+            },
+            "next": {
+                "href": "https://horizon.stellar.org/transactions?cursor=12884905984&limit=10&order=desc"
+            },
+            "prev": {
+                "href": "https://horizon.stellar.org/transactions?cursor=12884905984&limit=10&order=asc"
+            },
+        }
+        prev_page = call_builder.prev()
+        assert prev_page["_links"] == {
+            "self": {
+                "href": "https://horizon.stellar.org/transactions?cursor=12884905984&limit=10&order=asc"
+            },
+            "next": {
+                "href": "https://horizon.stellar.org/transactions?cursor=81827716927488&limit=10&order=asc"
+            },
+            "prev": {
+                "href": "https://horizon.stellar.org/transactions?cursor=33676838572032&limit=10&order=desc"
+            },
+        }
