@@ -69,8 +69,7 @@ class Keypair:
             The public key used to generate the :class:`Keypair` is incorrect
         """
         key = StrKey.decode_ed25519_public_key(public_key)
-        verifying_key = ed25519.VerifyKey(key)
-        return cls(verifying_key)
+        return cls.from_raw_ed25519_public_key(key)
 
     @classmethod
     def from_raw_ed25519_seed(cls, raw_seed: bytes) -> "Keypair":
@@ -82,6 +81,16 @@ class Keypair:
         signing_key = ed25519.SigningKey(raw_seed)
         verify_key = signing_key.verify_key
         return cls(verify_key, signing_key)
+
+    @classmethod
+    def from_raw_ed25519_public_key(cls, raw_public_key: bytes) -> "Keypair":
+        """Generate a :class:`Keypair` object from ed25519 public key raw bytes.
+
+        :param raw_public_key: ed25519 public key raw bytes
+        :return: A new :class:`Keypair` instance derived by the ed25519 public key raw bytes
+        """
+        verify_key = ed25519.VerifyKey(raw_public_key)
+        return cls(verify_key)
 
     @property
     def secret(self) -> str:
