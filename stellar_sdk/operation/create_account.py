@@ -1,3 +1,6 @@
+from decimal import Decimal
+from typing import Union
+
 from .operation import Operation
 from ..keypair import Keypair
 from ..xdr import Xdr
@@ -24,7 +27,10 @@ class CreateAccount(Operation):
     """
 
     def __init__(
-        self, destination: str, starting_balance: str, source: str = None
+        self,
+        destination: str,
+        starting_balance: Union[str, Decimal],
+        source: str = None,
     ) -> None:
         super().__init__(source)
         check_ed25519_public_key(destination)

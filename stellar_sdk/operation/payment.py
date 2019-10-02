@@ -1,3 +1,6 @@
+from decimal import Decimal
+from typing import Union
+
 from .operation import Operation
 from ..asset import Asset
 from ..keypair import Keypair
@@ -23,7 +26,11 @@ class Payment(Operation):
     """
 
     def __init__(
-        self, destination: str, asset: Asset, amount: str, source: str = None
+        self,
+        destination: str,
+        asset: Asset,
+        amount: Union[str, Decimal],
+        source: str = None,
     ) -> None:
         super().__init__(source)
         check_ed25519_public_key(destination)
