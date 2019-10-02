@@ -222,7 +222,7 @@ class Builder(object):
         warnings.warn(
             "append_path_payment_op will be deprecated in the future, "
             "use append_path_payment_strict_receive_op instead.",
-            PendingDeprecationWarning
+            DeprecationWarning
         )  # pragma: no cover
         return self.append_path_payment_strict_receive_op(destination, send_code, send_issuer, send_max, dest_code,
                                                           dest_issuer, dest_amount, path, source)
