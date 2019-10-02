@@ -6,11 +6,11 @@ import warnings
 from decimal import Context, Decimal, Inexact
 
 from .asset import Asset
+from .exceptions import StellarAddressInvalidError, NotValidParamError
 from .stellarxdr import Xdr
 from .utils import (account_xdr_object, best_rational_approximation as best_r,
                     division, encode_check, signer_key_xdr_object,
                     is_valid_address, convert_hex_to_bytes)
-from .exceptions import StellarAddressInvalidError, NotValidParamError
 
 ONE = Decimal(10 ** 7)
 
@@ -304,8 +304,8 @@ class Payment(Operation):
         )
 
 
-class PathPayment(Operation):
-    """The :class:`PathPayment` object, which represents a PathPayment
+class PathPaymentStrictReceive(Operation):
+    """The :class:`PathPaymentStrictReceive` object, which represents a PathPaymentStrictReceive
     operation on Stellar's network.
 
     Sends an amount in a specific asset to a destination account through a path
@@ -326,7 +326,7 @@ class PathPayment(Operation):
 
     @classmethod
     def type_code(cls):
-        return Xdr.const.PATH_PAYMENT
+        return Xdr.const.PATH_PAYMENT_STRICT_RECEIVE
 
     def __init__(self,
                  destination,
@@ -336,7 +336,7 @@ class PathPayment(Operation):
                  dest_amount,
                  path,
                  source=None):
-        super(PathPayment, self).__init__(source)
+        super(PathPaymentStrictReceive, self).__init__(source)
         self.destination = destination
         self.send_asset = send_asset
         self.send_max = send_max
@@ -346,7 +346,7 @@ class PathPayment(Operation):
 
     def to_xdr_object(self):
         """Creates an XDR Operation object that represents this
-        :class:`PathPayment`.
+        :class:`PathPaymentStrictReceive`.
 
         """
         destination = account_xdr_object(self.destination)
@@ -354,16 +354,16 @@ class PathPayment(Operation):
         dest_asset = self.dest_asset.to_xdr_object()
         path = [asset.to_xdr_object() for asset in self.path]
 
-        path_payment = Xdr.types.PathPaymentOp(
+        path_payment_strict_receive_op = Xdr.types.PathPaymentStrictReceiveOp(
             send_asset, Operation.to_xdr_amount(self.send_max), destination,
             dest_asset, Operation.to_xdr_amount(self.dest_amount), path)
-        self.body.type = Xdr.const.PATH_PAYMENT
-        self.body.pathPaymentOp = path_payment
-        return super(PathPayment, self).to_xdr_object()
+        self.body.type = Xdr.const.PATH_PAYMENT_STRICT_RECEIVE
+        self.body.pathPaymentStrictReceiveOp = path_payment_strict_receive_op
+        return super(PathPaymentStrictReceive, self).to_xdr_object()
 
     @classmethod
     def from_xdr_object(cls, op_xdr_object):
-        """Creates a :class:`PathPayment` object from an XDR Operation
+        """Creates a :class:`PathPaymentStrictReceive` object from an XDR Operation
         object.
 
         """
@@ -375,19 +375,19 @@ class PathPayment(Operation):
 
         destination = encode_check(
             'account',
-            op_xdr_object.body.pathPaymentOp.destination.ed25519).decode()
+            op_xdr_object.body.pathPaymentStrictReceiveOp.destination.ed25519).decode()
         send_asset = Asset.from_xdr_object(
-            op_xdr_object.body.pathPaymentOp.sendAsset)
+            op_xdr_object.body.pathPaymentStrictReceiveOp.sendAsset)
         dest_asset = Asset.from_xdr_object(
-            op_xdr_object.body.pathPaymentOp.destAsset)
+            op_xdr_object.body.pathPaymentStrictReceiveOp.destAsset)
         send_max = Operation.from_xdr_amount(
-            op_xdr_object.body.pathPaymentOp.sendMax)
+            op_xdr_object.body.pathPaymentStrictReceiveOp.sendMax)
         dest_amount = Operation.from_xdr_amount(
-            op_xdr_object.body.pathPaymentOp.destAmount)
+            op_xdr_object.body.pathPaymentStrictReceiveOp.destAmount)
 
         path = []
-        if op_xdr_object.body.pathPaymentOp.path:
-            for x in op_xdr_object.body.pathPaymentOp.path:
+        if op_xdr_object.body.pathPaymentStrictReceiveOp.path:
+            for x in op_xdr_object.body.pathPaymentStrictReceiveOp.path:
                 path.append(Asset.from_xdr_object(x))
 
         return cls(
@@ -397,6 +397,102 @@ class PathPayment(Operation):
             send_max=send_max,
             dest_asset=dest_asset,
             dest_amount=dest_amount,
+            path=path)
+
+
+class PathPaymentStrictSend(Operation):
+    """The :class:`PathPaymentStrictSend` object, which represents a PathPaymentStrictSend
+    operation on Stellar's network.
+
+    Sends an amount in a specific asset to a destination account through a path
+    of offers. This allows the asset sent (e.g., 450 XLM) to be different from
+    the asset received (e.g, 6 BTC).
+
+    Threshold: Medium
+
+    :param str destination: The destination account to send to.
+    :param Asset send_asset: The asset to pay with.
+    :param str send_amount: Amount of send_asset to send.
+    :param Asset dest_asset: The asset the destination will receive.
+    :param str dest_min: The minimum amount of dest_asset to be received.
+    :param list path: A list of Asset objects to use as the path.
+    :param str source: The source account for the payment. Defaults to the
+        transaction's source account.
+    """
+
+    @classmethod
+    def type_code(cls):
+        return Xdr.const.PATH_PAYMENT_STRICT_SEND
+
+    def __init__(self,
+                 destination,
+                 send_asset,
+                 send_amount,
+                 dest_asset,
+                 dest_min,
+                 path,
+                 source=None):
+        super(PathPaymentStrictSend, self).__init__(source)
+        self.destination = destination
+        self.send_asset = send_asset
+        self.send_amount = send_amount
+        self.dest_asset = dest_asset
+        self.dest_min = dest_min
+        self.path = path  # a list of paths/assets
+
+    def to_xdr_object(self):
+        """Creates an XDR Operation object that represents this
+        :class:`PathPaymentStrictSend`.
+
+        """
+        destination = account_xdr_object(self.destination)
+        send_asset = self.send_asset.to_xdr_object()
+        dest_asset = self.dest_asset.to_xdr_object()
+        path = [asset.to_xdr_object() for asset in self.path]
+
+        path_payment_strict_send_op = Xdr.types.PathPaymentStrictSendOp(
+            send_asset, Operation.to_xdr_amount(self.send_amount), destination,
+            dest_asset, Operation.to_xdr_amount(self.dest_min), path)
+        self.body.type = Xdr.const.PATH_PAYMENT_STRICT_SEND
+        self.body.pathPaymentStrictSendOp = path_payment_strict_send_op
+        return super(PathPaymentStrictSend, self).to_xdr_object()
+
+    @classmethod
+    def from_xdr_object(cls, op_xdr_object):
+        """Creates a :class:`PathPaymentStrictSend` object from an XDR Operation
+        object.
+
+        """
+        if not op_xdr_object.sourceAccount:
+            source = None
+        else:
+            source = encode_check(
+                'account', op_xdr_object.sourceAccount[0].ed25519).decode()
+
+        destination = encode_check(
+            'account',
+            op_xdr_object.body.pathPaymentStrictSendOp.destination.ed25519).decode()
+        send_asset = Asset.from_xdr_object(
+            op_xdr_object.body.pathPaymentStrictSendOp.sendAsset)
+        dest_asset = Asset.from_xdr_object(
+            op_xdr_object.body.pathPaymentStrictSendOp.destAsset)
+        send_amount = Operation.from_xdr_amount(
+            op_xdr_object.body.pathPaymentStrictSendOp.sendAmount)
+        dest_min = Operation.from_xdr_amount(
+            op_xdr_object.body.pathPaymentStrictSendOp.destMin)
+
+        path = []
+        if op_xdr_object.body.pathPaymentStrictSendOp.path:
+            for x in op_xdr_object.body.pathPaymentStrictSendOp.path:
+                path.append(Asset.from_xdr_object(x))
+
+        return cls(
+            source=source,
+            destination=destination,
+            send_asset=send_asset,
+            send_amount=send_amount,
+            dest_asset=dest_asset,
+            dest_min=dest_min,
             path=path)
 
 
@@ -1251,3 +1347,11 @@ def CreatePassiveOffer(*args, **kwargs):
         DeprecationWarning
     )  # pragma: no cover
     return CreatePassiveSellOffer(*args, **kwargs)
+
+
+def PathPayment(*args, **kwargs):
+    warnings.warn(
+        "PathPayment has been deprecated, use PathPaymentStrictReceive instead.",
+        DeprecationWarning
+    )  # pragma: no cover
+    return PathPaymentStrictReceive(*args, **kwargs)

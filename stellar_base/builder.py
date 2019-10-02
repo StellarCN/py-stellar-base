@@ -192,7 +192,52 @@ class Builder(object):
                                dest_amount,
                                path,
                                source=None):
-        """Append a :class:`PathPayment <stellar_base.operation.PathPayment>`
+        """Append a :class:`PathPaymentStrictReceive <stellar_base.operation.PathPaymentStrictReceive>`
+        operation to the list of operations.
+
+        :param str destination: The destination address (Account ID) for the
+            payment.
+        :param str send_code: The asset code for the source asset deducted from
+            the source account.
+        :param send_issuer: The address of the issuer of the source asset.
+        :type send_issuer: str, None
+        :param str send_max: The maximum amount of send asset to deduct
+            (excluding fees).
+        :param str dest_code: The asset code for the final destination asset
+            sent to the recipient.
+        :param dest_issuer: Account address that receives the payment.
+        :type dest_issuer: str, None
+        :param str dest_amount: The amount of destination asset the destination
+            account receives.
+        :param list path: A list of asset tuples, each tuple containing a
+            (asset_code, asset_issuer) for each asset in the path. For the native
+            asset, `None` is used for the asset_issuer.
+        :param str source: The source address of the path payment.
+        :return: This builder instance.
+
+        """
+        # path: a list of asset tuple which contains asset_code and asset_issuer,
+        # [(asset_code, asset_issuer), (asset_code, asset_issuer)] for native asset you can deliver
+        # ('XLM', None)
+        warnings.warn(
+            "append_path_payment_op will be deprecated in the future, "
+            "use append_path_payment_strict_receive_op instead.",
+            DeprecationWarning
+        )  # pragma: no cover
+        return self.append_path_payment_strict_receive_op(destination, send_code, send_issuer, send_max, dest_code,
+                                                          dest_issuer, dest_amount, path, source)
+
+    def append_path_payment_strict_receive_op(self,
+                                              destination,
+                                              send_code,
+                                              send_issuer,
+                                              send_max,
+                                              dest_code,
+                                              dest_issuer,
+                                              dest_amount,
+                                              path,
+                                              source=None):
+        """Append a :class:`PathPaymentStrictReceive <stellar_base.operation.PathPaymentStrictReceive>`
         operation to the list of operations.
 
         :param str destination: The destination address (Account ID) for the
@@ -226,8 +271,56 @@ class Builder(object):
         assets = []
         for p in path:
             assets.append(Asset(p[0], p[1]))
-        op = operation.PathPayment(destination, send_asset, send_max,
-                                   dest_asset, dest_amount, assets, source)
+        op = operation.PathPaymentStrictReceive(destination, send_asset, send_max,
+                                                dest_asset, dest_amount, assets, source)
+        return self.append_op(op)
+
+    def append_path_payment_strict_send_op(self,
+                                           destination,
+                                           send_code,
+                                           send_issuer,
+                                           send_amount,
+                                           dest_code,
+                                           dest_issuer,
+                                           dest_min,
+                                           path,
+                                           source=None):
+        """Append a :class:`PathPaymentStrictSend <stellar_base.operation.PathPaymentStrictSend>`
+        operation to the list of operations.
+
+        :param str destination: The destination address (Account ID) for the
+            payment.
+        :param str send_code: The asset code for the source asset deducted from
+            the source account.
+        :param send_issuer: The address of the issuer of the source asset.
+        :type send_issuer: str, None
+        :param str send_amount: Amount of send_asset to send
+            (excluding fees).
+        :param str dest_code: The asset code for the final destination asset
+            sent to the recipient.
+        :param dest_issuer: Account address that receives the payment.
+        :type dest_issuer: str, None
+        :param str dest_min: The minimum amount of destination asset the destination
+            account receives.
+        :param list path: A list of asset tuples, each tuple containing a
+            (asset_code, asset_issuer) for each asset in the path. For the native
+            asset, `None` is used for the asset_issuer.
+        :param str source: The source address of the path payment.
+        :return: This builder instance.
+
+        """
+        # path: a list of asset tuple which contains asset_code and asset_issuer,
+        # [(asset_code, asset_issuer), (asset_code, asset_issuer)] for native asset you can deliver
+        # ('XLM', None)
+
+        send_asset = Asset(send_code, send_issuer)
+        dest_asset = Asset(dest_code, dest_issuer)
+
+        assets = []
+        for p in path:
+            assets.append(Asset(p[0], p[1]))
+        op = operation.PathPaymentStrictSend(destination, send_asset, send_amount,
+                                             dest_asset, dest_min, assets, source)
         return self.append_op(op)
 
     def append_allow_trust_op(self,
