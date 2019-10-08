@@ -3,6 +3,7 @@ import warnings
 from decimal import Decimal
 from typing import List, Union, Optional
 
+from .utils import hex_to_bytes
 from .account import Account
 from .asset import Asset
 from .exceptions import ValueError
@@ -130,7 +131,7 @@ class TransactionBuilder:
         self.memo = memo
         return self
 
-    def add_text_memo(self, memo_text: str) -> "TransactionBuilder":
+    def add_text_memo(self, memo_text: Union[str, bytes]) -> "TransactionBuilder":
         """Set the memo for the transaction to a new :class:`TextMemo
         <stellar_sdk.memo.TextMemo>`.
 
@@ -152,7 +153,7 @@ class TransactionBuilder:
         memo = IdMemo(memo_id)
         return self.add_memo(memo)
 
-    def add_hash_memo(self, memo_hash: bytes) -> "TransactionBuilder":
+    def add_hash_memo(self, memo_hash: Union[bytes, str]) -> "TransactionBuilder":
         """Set the memo for the transaction to a new :class:`HashMemo
         <stellar_sdk.memo.HashMemo>`.
 
@@ -160,10 +161,12 @@ class TransactionBuilder:
         :return: This builder instance.
 
         """
-        memo = HashMemo(memo_hash)
+        memo = HashMemo(hex_to_bytes(memo_hash))
         return self.add_memo(memo)
 
-    def add_return_hash_memo(self, memo_return: bytes) -> "TransactionBuilder":
+    def add_return_hash_memo(
+        self, memo_return: Union[bytes, str]
+    ) -> "TransactionBuilder":
         """Set the memo for the transaction to a new :class:`RetHashMemo
         <stellar_sdk.memo.ReturnHashMemo>`.
 
@@ -172,7 +175,7 @@ class TransactionBuilder:
         :return: This builder instance.
 
         """
-        memo = ReturnHashMemo(memo_return)
+        memo = ReturnHashMemo(hex_to_bytes(memo_return))
         return self.add_memo(memo)
 
     def append_operation(self, operation: Operation) -> "TransactionBuilder":
@@ -428,14 +431,14 @@ class TransactionBuilder:
         self,
         inflation_dest: str = None,
         clear_flags: int = None,
-        set_flags=None,
-        master_weight=None,
-        low_threshold=None,
-        med_threshold=None,
-        high_threshold=None,
-        home_domain=None,
-        signer=None,
-        source=None,
+        set_flags: int = None,
+        master_weight: int = None,
+        low_threshold: int = None,
+        med_threshold: int = None,
+        high_threshold: int = None,
+        home_domain: str = None,
+        signer: Signer = None,
+        source: str = None,
     ) -> "TransactionBuilder":
         """Append a :class:`SetOptions <stellar_sdk.operation.SetOptions>`
         operation to the list of operations.
@@ -504,7 +507,7 @@ class TransactionBuilder:
         return self.append_set_options_op(signer=signer, source=source)
 
     def append_hashx_signer(
-        self, sha256_hash: bytes, weight: int, source=None
+        self, sha256_hash: [bytes, str], weight: int, source=None
     ) -> "TransactionBuilder":
         """Add a sha256 hash(HashX) signer to an account.
 
@@ -512,14 +515,17 @@ class TransactionBuilder:
         <stellar_sdk.operation.SetOptions` operation. This is a helper
         function for :meth:`append_set_options_op`.
 
-        :param sha256_hash: The address of the new sha256 hash(hashX) signer.
+        :param sha256_hash: The address of the new sha256 hash(hashX) signer,
+            a 32 byte hash or hex encoded string.
         :param weight: The weight of the new signer.
         :param source: The source account that is adding a signer to its
             list of signers.
         :return: This builder instance.
 
         """
-        signer = Signer.sha256_hash(sha256_hash=sha256_hash, weight=weight)
+        signer = Signer.sha256_hash(
+            sha256_hash=hex_to_bytes(sha256_hash), weight=weight
+        )
         return self.append_set_options_op(signer=signer, source=source)
 
     def append_pre_auth_tx_signer(
@@ -532,14 +538,17 @@ class TransactionBuilder:
         function for :meth:`append_set_options_op`.
 
         :param pre_auth_tx_hash: The address of the new preAuthTx signer - obtained by calling ``hash`` on
-            the :class:`TransactionEnvelope <stellar_sdk.transaction_envelope.TransactionEnvelope>`.
+            the :class:`TransactionEnvelope <stellar_sdk.transaction_envelope.TransactionEnvelope>`,
+            a 32 byte hash or hex encoded string.
         :param weight: The weight of the new signer.
         :param source: The source account that is adding a signer to its
             list of signers.
         :return: This builder instance.
 
         """
-        signer = Signer.pre_auth_tx(pre_auth_tx_hash=pre_auth_tx_hash, weight=weight)
+        signer = Signer.pre_auth_tx(
+            pre_auth_tx_hash=hex_to_bytes(pre_auth_tx_hash), weight=weight
+        )
         return self.append_set_options_op(signer=signer, source=source)
 
     def append_manage_buy_offer_op(

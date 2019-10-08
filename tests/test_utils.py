@@ -1,7 +1,7 @@
 import pytest
 
-from stellar_sdk.exceptions import NoApproximationError
-from stellar_sdk.utils import best_rational_approximation
+from stellar_sdk.exceptions import NoApproximationError, TypeError
+from stellar_sdk.utils import best_rational_approximation, hex_to_bytes
 
 
 class TestUtils:
@@ -36,3 +36,24 @@ class TestUtils:
     def test_best_rational_approximation_raise(self, v):
         with pytest.raises(NoApproximationError, match="Couldn't find approximation."):
             best_rational_approximation(v)
+
+    @pytest.mark.parametrize(
+        "input_value, except_return",
+        [
+            (b"hello", b"hello"),
+            (
+                "bbf50b0fb8e4b0ad8b005eb39d96e068776f43f16a5858a2dafaa3e8045887dd",
+                b"\xbb\xf5\x0b\x0f\xb8\xe4\xb0\xad\x8b\x00^\xb3\x9d\x96\xe0hwoC\xf1jXX\xa2\xda\xfa\xa3\xe8\x04X\x87\xdd",
+            ),
+        ],
+    )
+    def test_hex_to_bytes(self, input_value, except_return):
+        assert hex_to_bytes(input_value) == except_return
+
+    @pytest.mark.parametrize("input_value", [12, None])
+    def test_hex_to_bytes_type_raise(self, input_value):
+        with pytest.raises(
+            TypeError,
+            match="`hex_string` should be a 32 byte hash or hex encoded string.",
+        ):
+            hex_to_bytes(input_value)

@@ -1,7 +1,7 @@
 import hashlib
 from decimal import Decimal, ROUND_FLOOR
 
-from .exceptions import NoApproximationError
+from .exceptions import NoApproximationError, TypeError
 
 
 def sha256(data: bytes) -> bytes:
@@ -46,3 +46,11 @@ def unpack_xdr_array(x):
     if not x:
         return None
     return x[0]
+
+
+def hex_to_bytes(hex_string):
+    if isinstance(hex_string, bytes):
+        return hex_string
+    if isinstance(hex_string, str):
+        return bytes.fromhex(hex_string)
+    raise TypeError("`hex_string` should be a 32 byte hash or hex encoded string.")
