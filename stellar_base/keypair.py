@@ -119,6 +119,18 @@ class Keypair(object):
         return cls(verifying_key, signing_key)
 
     @classmethod
+    def from_raw_address(cls, raw_address):
+        """Generate a :class:`Keypair` object via a sequence of bytes.
+
+        :param bytes raw_address: A bytes object used as the address for generating
+            the keypair.
+        :return: A new :class:`Keypair` derived by the raw public key.
+
+        """
+        verifying_key = ed25519.VerifyingKey(raw_address)
+        return cls(verifying_key)
+
+    @classmethod
     def from_base58_seed(cls, base58_seed):
         """Generate a :class:`Keypair` object via Base58 encoded seed.
 
@@ -146,8 +158,7 @@ class Keypair(object):
 
         """
         public_key = is_valid_address(address)
-        verifying_key = ed25519.VerifyingKey(public_key)
-        return cls(verifying_key)
+        return cls.from_raw_address(public_key)
 
     # TODO: Make some of the following functions properties?
 
