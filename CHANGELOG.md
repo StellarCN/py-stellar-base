@@ -1,14 +1,20 @@
 Release History
 ===============
 
+### Version 1.4.0
+Released on October 8, 2019
+  - Adapt to Protocol v12. [PathPaymentStrictReceive](https://github.com/StellarCN/py-stellar-base/blob/e2663afdcc/stellar_base/operation.py#L307), 
+  [PathPaymentStrictSend](https://github.com/StellarCN/py-stellar-base/blob/e2663afdcc/stellar_base/operation.py#L403) are supported.
+  - Breaking change: [PathPayment](https://github.com/StellarCN/py-stellar-base/blob/e2663afdcc/stellar_base/operation.py#L1352) are marked as deprecated, although you can still use them now, please update your code immediately.
+  - The [Builder](https://github.com/StellarCN/py-stellar-base/blob/e2663afdcc/stellar_base/builder.py) was also affected by the above changes, added `append_path_payment_strict_receive_op` and `append_path_payment_strict_send_op`. `append_path_payment_op` are deprecated.
+
 ### Version 1.3.2
 Released on September 24, 2019
-* Add `Builder.verify_challenge_tx` method for verifying [SEP-10](https://github.com/stellar/stellar-protocol/blob/master/ecosystem/sep-0010.md) challenge transaction.
-
+  - Add `Builder.verify_challenge_tx` method for verifying [SEP-10](https://github.com/stellar/stellar-protocol/blob/master/ecosystem/sep-0010.md) challenge transaction.
 
 ### Version 1.3.1
 Released on August 4, 2019
-* Add `Builder.challenge_tx` method for building [SEP-10](https://github.com/stellar/stellar-protocol/blob/master/ecosystem/sep-0010.md) challenge transaction.
+  - Add `Builder.challenge_tx` method for building [SEP-10](https://github.com/stellar/stellar-protocol/blob/master/ecosystem/sep-0010.md) challenge transaction.
 
 ### Version 1.3.0
 Released on July 24, 2019
