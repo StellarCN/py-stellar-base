@@ -2,6 +2,7 @@ from typing import Union
 
 from .operation import Operation
 from ..exceptions import ValueError
+from ..utils import pack_xdr_array, unpack_xdr_array
 from ..xdr import Xdr
 
 
@@ -47,11 +48,11 @@ class ManageData(Operation):
 
         if self.data_value is not None:
             if isinstance(self.data_value, bytes):
-                data_value = [self.data_value]
+                data_value = pack_xdr_array(self.data_value)
             else:
-                data_value = [bytes(self.data_value, "utf-8")]
+                data_value = pack_xdr_array(bytes(self.data_value, "utf-8"))
         else:
-            data_value = []
+            data_value = pack_xdr_array(self.data_value)
         manage_data_op = Xdr.types.ManageDataOp(data_name, data_value)
 
         body = Xdr.nullclass()
@@ -68,8 +69,5 @@ class ManageData(Operation):
         source = Operation.get_source_from_xdr_obj(operation_xdr_object)
         data_name = operation_xdr_object.body.manageDataOp.dataName.decode()
 
-        if operation_xdr_object.body.manageDataOp.dataValue:
-            data_value = operation_xdr_object.body.manageDataOp.dataValue[0]
-        else:
-            data_value = None
+        data_value = unpack_xdr_array(operation_xdr_object.body.manageDataOp.dataValue)
         return cls(data_name=data_name, data_value=data_value, source=source)
