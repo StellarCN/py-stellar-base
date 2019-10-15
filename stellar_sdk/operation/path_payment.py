@@ -26,11 +26,21 @@ class PathPayment(PathPaymentStrictReceive):
         transaction's source account.
     """
 
-    def __init__(self, destination: str, send_asset: Asset, send_max: Union[str, Decimal], dest_asset: Asset,
-                 dest_amount: Union[str, Decimal], path: List[Asset], source: str = None) -> None:
+    def __init__(
+        self,
+        destination: str,
+        send_asset: Asset,
+        send_max: Union[str, Decimal],
+        dest_asset: Asset,
+        dest_amount: Union[str, Decimal],
+        path: List[Asset],
+        source: str = None,
+    ) -> None:
         warnings.warn(
             "Will be removed in version v2.0.0-alpha6, "
             "use stellar_sdk.operation.PathPaymentStrictReceive",
             DeprecationWarning,
         )
-        super().__init__(destination, send_asset, send_max, dest_asset, dest_amount, path, source)
+        super().__init__(
+            destination, send_asset, send_max, dest_asset, dest_amount, path, source
+        )
