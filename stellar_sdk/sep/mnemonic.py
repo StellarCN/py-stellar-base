@@ -55,7 +55,7 @@ class StellarMnemonic(Mnemonic):
     def generate(self, strength: int = 128) -> str:
         if strength not in (128, 160, 192, 224, 256):
             raise ValueError(
-                "Strength should be one of the following [128, 160, 192, 224, 256], but it is not (%d)."
+                "Strength should be one of the following (128, 160, 192, 224, 256), but it is not (%d)."
                 % strength
             )
         return self.to_mnemonic(os.urandom(strength // 8))
