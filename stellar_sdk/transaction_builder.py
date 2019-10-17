@@ -287,7 +287,7 @@ class TransactionBuilder:
         """
 
         warnings.warn(
-            "Will be removed in version v2.0.0-alpha6, "
+            "Will be removed in version v2.1.0, "
             "use stellar_sdk.transaction_builder.append_path_payment_strict_receive_op",
             DeprecationWarning,
         )
