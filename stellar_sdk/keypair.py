@@ -8,7 +8,7 @@ from .sep.mnemonic import Language, StellarMnemonic
 from .exceptions import (
     BadSignatureError,
     MissingEd25519SecretSeedError,
-    ValueError,
+    TypeError,
     AttributeError,
 )
 from .strkey import StrKey
@@ -255,7 +255,7 @@ class Keypair:
 
 def _get_key_of_expected_type(key: Any, expected_type: Any) -> Any:
     if key is not None and not isinstance(key, expected_type):
-        raise ValueError(
+        raise TypeError(
             "The given key_type={} is not of type {}.".format(type(key), expected_type)
         )
     return key
