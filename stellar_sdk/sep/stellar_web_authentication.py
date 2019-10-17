@@ -23,16 +23,16 @@ def build_challenge_transaction(
     archor_name: str,
     network_passphrase: str,
     timeout: int = 300,
-):
+) -> str:
     """Returns a valid `SEP0010 <https://github.com/stellar/stellar-protocol/blob/master/ecosystem/sep-0010.md>`_
     challenge transaction which you can use for Stellar Web Authentication.
 
-    :param str server_secret: secret key for server's signing account.
-    :param str client_account_id: The stellar account that the wallet wishes to authenticate with the server.
-    :param str archor_name: Anchor's name to be used in the manage_data key.
-    :param str network_passphrase: The network to connect to for verifying and retrieving
+    :param server_secret: secret key for server's signing account.
+    :param client_account_id: The stellar account that the wallet wishes to authenticate with the server.
+    :param archor_name: Anchor's name to be used in the manage_data key.
+    :param network_passphrase: The network to connect to for verifying and retrieving
         additional attributes from. (ex. 'Public Global Stellar Network ; September 2015')
-    :param int timeout: Challenge duration in seconds (default to 5 minutes).
+    :param timeout: Challenge duration in seconds (default to 5 minutes).
     :return: A base64 encoded string of the raw TransactionEnvelope xdr struct for the transaction.
     """
     now = int(time.time())
@@ -52,8 +52,8 @@ def build_challenge_transaction(
 
 
 def verify_challenge_transaction(
-    challenge_transaction, server_account_id, network_passphrase
-):
+    challenge_transaction: str, server_account_id: str, network_passphrase: str
+) -> None:
     """Verifies if a transaction is a valid
     `SEP0010 <https://github.com/stellar/stellar-protocol/blob/master/ecosystem/sep-0010.md>`_
     challenge transaction, if the validation fails, an exception will be thrown.
@@ -67,11 +67,11 @@ def verify_challenge_transaction(
         5. verify that transaction envelope has a correct signature by server's signing key;
         6. verify that transaction envelope has a correct signature by the operation's source account;
 
-    :param str challenge_transaction: SEP0010 transaction challenge transaction in base64.
-    :param str server_account_id: public key for server's account.
-    :param str network_passphrase: The network to connect to for verifying and retrieving
+    :param challenge_transaction: SEP0010 transaction challenge transaction in base64.
+    :param server_account_id: public key for server's account.
+    :param network_passphrase: The network to connect to for verifying and retrieving
         additional attributes from. (ex. 'Public Global Stellar Network ; September 2015')
-    :raises: :exc:`SEP10VerificationError <stellar_sdk.sep.exceptions.SEP10VerificationError>`
+    :raises: :exc:`InvalidSep10ChallengeError <stellar_sdk.sep.exceptions.InvalidSep10ChallengeError>`
     """
     network = Network(network_passphrase)
     try:
