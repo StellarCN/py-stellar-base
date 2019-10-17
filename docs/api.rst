@@ -446,3 +446,23 @@ TransactionBuilder
 
 .. autoclass:: stellar_sdk.transaction_builder.TransactionBuilder
    :members:
+
+Stellar Ecosystem Proposals
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+SEP 0005: Key Derivation Methods for Stellar Accounts
+-----------------------------------------------------
+.. autoclass:: stellar_sdk.sep.mnemonic.StellarMnemonic
+   :members:
+.. autoclass:: stellar_sdk.sep.mnemonic.Language
+   :members:
+   :undoc-members:
+
+SEP 0010: Stellar Web Authentication
+------------------------------------
+.. autofunction:: stellar_sdk.sep.stellar_web_authentication.build_challenge_transaction
+.. autofunction:: stellar_sdk.sep.stellar_web_authentication.verify_challenge_transaction
+
+Exceptions
+----------
+.. autoclass:: stellar_sdk.sep.exceptions.InvalidSep10ChallengeError

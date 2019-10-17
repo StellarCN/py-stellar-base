@@ -18,6 +18,8 @@ from ..exceptions import ValueError
 
 @unique
 class Language(Enum):
+    """The type of language supported by the mnemonic."""
+
     JAPANESE = "japanese"
     FRENCH = "french"
     ENGLISH = "english"
@@ -29,6 +31,8 @@ class Language(Enum):
 
 
 class StellarMnemonic(Mnemonic):
+    """Please use :meth:`Keypair.generate_mnemonic_phrase` and :meth:`Keypair.from_mnemonic_phrase`"""
+
     STELLAR_ACCOUNT_PATH_FORMAT = "m/44'/148'/%d'"
     FIRST_HARDENED_INDEX = 0x80000000
     SEED_MODIFIER = b"ed25519 seed"

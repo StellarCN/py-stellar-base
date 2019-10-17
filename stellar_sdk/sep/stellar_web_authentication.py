@@ -25,7 +25,7 @@ def build_challenge_transaction(
     timeout: int = 300,
 ):
     """Returns a valid `SEP0010 <https://github.com/stellar/stellar-protocol/blob/master/ecosystem/sep-0010.md>`_
-        challenge transaction which you can use for Stellar Web Authentication.
+    challenge transaction which you can use for Stellar Web Authentication.
 
     :param str server_secret: secret key for server's signing account.
     :param str client_account_id: The stellar account that the wallet wishes to authenticate with the server.
@@ -56,9 +56,10 @@ def verify_challenge_transaction(
 ):
     """Verifies if a transaction is a valid
     `SEP0010 <https://github.com/stellar/stellar-protocol/blob/master/ecosystem/sep-0010.md>`_
-    challenge transaction.
+    challenge transaction, if the validation fails, an exception will be thrown.
 
     This function performs the following checks:
+
         1. verify that transaction sequenceNumber is equal to zero;
         2. verify that transaction source account is equal to the server's signing key;
         3. verify that transaction has time bounds set, and that current time is between the minimum and maximum bounds;
