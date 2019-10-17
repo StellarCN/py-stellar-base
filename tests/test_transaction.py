@@ -51,14 +51,14 @@ class TestTransaction:
         tx = Transaction(source, sequence, fee, ops)
         assert tx.memo == NoneMemo()
 
-    def test_no_operation_raise(self):
-        with pytest.raises(ValueError, match="At least one operation required."):
-            source = Keypair.from_public_key(
-                "GCEZWKCA5VLDNRLN3RPRJMRZOX3Z6G5CHCGSNFHEYVXM3XOJMDS674JZ"
-            )
-            sequence = 1
-            memo = IdMemo(100)
-            fee = 200
-            time_bounds = TimeBounds(12345, 56789)
-            ops = []
-            Transaction(source, sequence, fee, ops, memo, time_bounds).to_xdr_object()
+    # def test_no_operation_raise(self):
+    #     with pytest.raises(ValueError, match="At least one operation required."):
+    #         source = Keypair.from_public_key(
+    #             "GCEZWKCA5VLDNRLN3RPRJMRZOX3Z6G5CHCGSNFHEYVXM3XOJMDS674JZ"
+    #         )
+    #         sequence = 1
+    #         memo = IdMemo(100)
+    #         fee = 200
+    #         time_bounds = TimeBounds(12345, 56789)
+    #         ops = []
+    #         Transaction(source, sequence, fee, ops, memo, time_bounds).to_xdr_object()

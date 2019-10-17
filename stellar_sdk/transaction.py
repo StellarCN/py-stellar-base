@@ -56,8 +56,8 @@ class Transaction:
         time_bounds: TimeBounds = None,
     ) -> None:
 
-        if not operations:
-            raise ValueError("At least one operation required.")
+        # if not operations:
+        #     raise ValueError("At least one operation required.")
 
         if not memo:
             memo = NoneMemo()
