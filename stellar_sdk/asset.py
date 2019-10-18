@@ -28,7 +28,7 @@ class Asset:
         https://www.stellar.org/developers/guides/concepts/assets.html
     """
 
-    def __init__(self, code: str, issuer: Optional[str] = None):
+    def __init__(self, code: str, issuer: Optional[str] = None) -> None:
         Asset.check_if_asset_code_is_valid(code)
 
         if code != "XLM" and issuer is None:
@@ -60,7 +60,7 @@ class Asset:
         return self._type
 
     @type.setter
-    def type(self, v):
+    def type(self, v) -> None:
         raise AttributeError("Asset type is immutable.")
 
     def guess_asset_type(self) -> str:
