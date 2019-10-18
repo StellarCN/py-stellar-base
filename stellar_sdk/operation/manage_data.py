@@ -40,7 +40,7 @@ class ManageData(Operation):
             raise ValueError("Data and value should be <= 64 bytes (ascii encoded).")
 
     @classmethod
-    def _type_code(cls) -> int:
+    def type_code(cls) -> int:
         return Xdr.const.MANAGE_DATA
 
     def _to_operation_body(self) -> Xdr.nullclass:

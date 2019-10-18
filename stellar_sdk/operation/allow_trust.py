@@ -38,7 +38,7 @@ class AllowTrust(Operation):
         self.authorize = authorize
 
     @classmethod
-    def _type_code(cls) -> int:
+    def type_code(cls) -> int:
         return Xdr.const.ALLOW_TRUST
 
     def _to_operation_body(self) -> Xdr.nullclass:

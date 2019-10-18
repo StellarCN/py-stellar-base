@@ -25,7 +25,7 @@ class AccountMerge(Operation):
         self.destination = destination
 
     @classmethod
-    def _type_code(cls) -> int:
+    def type_code(cls) -> int:
         return Xdr.const.ACCOUNT_MERGE
 
     def _to_operation_body(self) -> Xdr.nullclass:

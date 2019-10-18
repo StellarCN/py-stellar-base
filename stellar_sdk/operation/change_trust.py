@@ -41,7 +41,7 @@ class ChangeTrust(Operation):
             self.limit = limit
 
     @classmethod
-    def _type_code(cls) -> int:
+    def type_code(cls) -> int:
         return Xdr.const.CHANGE_TRUST
 
     def _to_operation_body(self) -> Xdr.nullclass:

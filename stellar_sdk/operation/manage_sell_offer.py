@@ -52,7 +52,7 @@ class ManageSellOffer(Operation):
         self.offer_id = offer_id
 
     @classmethod
-    def _type_code(cls) -> int:
+    def type_code(cls) -> int:
         return Xdr.const.MANAGE_SELL_OFFER
 
     def _to_operation_body(self) -> Xdr.nullclass:

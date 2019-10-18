@@ -44,7 +44,7 @@ class Operation(metaclass=ABCMeta):
         self.source = source
 
     @classmethod
-    def _type_code(cls) -> int:
+    def type_code(cls) -> int:
         pass
 
     @staticmethod
@@ -149,7 +149,7 @@ class Operation(metaclass=ABCMeta):
             subclass) instance from.
         """
         for sub_cls in cls.__subclasses__():
-            if sub_cls._type_code() == operation_xdr_object.type:
+            if sub_cls.type_code() == operation_xdr_object.type:
                 return sub_cls.from_xdr_object(operation_xdr_object)
         raise NotImplementedError(
             "Operation of type={} is not implemented"

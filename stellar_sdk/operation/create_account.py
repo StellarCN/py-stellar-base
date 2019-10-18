@@ -39,7 +39,7 @@ class CreateAccount(Operation):
         self.starting_balance = starting_balance
 
     @classmethod
-    def _type_code(cls) -> int:
+    def type_code(cls) -> int:
         return Xdr.const.CREATE_ACCOUNT
 
     def _to_operation_body(self):

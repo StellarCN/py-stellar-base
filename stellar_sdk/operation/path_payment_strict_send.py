@@ -51,7 +51,7 @@ class PathPaymentStrictSend(Operation):
         self.path = path  # a list of paths/assets
 
     @classmethod
-    def _type_code(cls) -> int:
+    def type_code(cls) -> int:
         return Xdr.const.PATH_PAYMENT_STRICT_SEND
 
     def _to_operation_body(self) -> Xdr.nullclass:
