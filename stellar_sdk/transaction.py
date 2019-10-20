@@ -1,6 +1,5 @@
 from typing import List, Union
 
-from .exceptions import ValueError
 from .keypair import Keypair
 from .memo import NoneMemo, Memo
 from .operation.operation import Operation
