@@ -19,6 +19,7 @@ __all__ = [
     "NoApproximationError",
     "SignatureExistError",
     "BaseRequestError",
+    "BaseHorizonError",
     "ConnectionError",
     "NotFoundError",
     "BadRequestError",
@@ -121,26 +122,16 @@ class BaseHorizonError(BaseRequestError):
 
     def __init__(self, response: Response) -> None:
         super().__init__(response)
-        message = response.json()
-        self.type = message.get("type")
-        self.title = message.get("title")
-        self.status = message.get("status")
-        self.detail = message.get("detail")
-        self.extras = message.get("extras")
+        self.message = response.json()
+        self.type = self.message.get("type")
+        self.title = self.message.get("title")
+        self.status = self.message.get("status")
+        self.detail = self.message.get("detail")
+        self.extras = self.message.get("extras")
+        self.result_xdr = self.message.get("result_xdr")
 
     def __str__(self):
-        return """\n\ttype: {type}
-        title: {title}
-        status: {status}
-        detail: {detail}
-        extras: {extras}
-        """.format(
-            type=self.type,
-            title=self.title,
-            status=self.status,
-            detail=self.detail,
-            extras=self.extras,
-        )
+        return str(self.message)
 
 
 class NotFoundError(BaseHorizonError):
