@@ -20,7 +20,7 @@ __all__ = ["build_challenge_transaction", "verify_challenge_transaction"]
 def build_challenge_transaction(
     server_secret: str,
     client_account_id: str,
-    archor_name: str,
+    anchor_name: str,
     network_passphrase: str,
     timeout: int = 300,
 ) -> str:
@@ -29,7 +29,7 @@ def build_challenge_transaction(
 
     :param server_secret: secret key for server's signing account.
     :param client_account_id: The stellar account that the wallet wishes to authenticate with the server.
-    :param archor_name: Anchor's name to be used in the manage_data key.
+    :param anchor_name: Anchor's name to be used in the manage_data key.
     :param network_passphrase: The network to connect to for verifying and retrieving
         additional attributes from. (ex. 'Public Global Stellar Network ; September 2015')
     :param timeout: Challenge duration in seconds (default to 5 minutes).
@@ -42,7 +42,7 @@ def build_challenge_transaction(
     transaction_builder.add_time_bounds(min_time=now, max_time=now + timeout)
     nonce = os.urandom(64)
     transaction_builder.append_manage_data_op(
-        data_name="{} auth".format(archor_name),
+        data_name="{} auth".format(anchor_name),
         data_value=nonce,
         source=client_account_id,
     )

@@ -19,12 +19,12 @@ class TestStellarWebAuthentication:
         client_account_id = "GBDIT5GUJ7R5BXO3GJHFXJ6AZ5UQK6MNOIDMPQUSMXLIHTUNR2Q5CFNF"
         timeout = 600
         network_passphrase = Network.TESTNET_NETWORK_PASSPHRASE
-        archor_name = "SDF"
+        anchor_name = "SDF"
 
         challenge = build_challenge_transaction(
             server_secret=server_kp.secret,
             client_account_id=client_account_id,
-            archor_name=archor_name,
+            anchor_name=anchor_name,
             network_passphrase=network_passphrase,
             timeout=timeout,
         )
@@ -53,12 +53,12 @@ class TestStellarWebAuthentication:
         client_kp = Keypair.random()
         timeout = 600
         network_passphrase = Network.PUBLIC_NETWORK_PASSPHRASE
-        archor_name = "SDF"
+        anchor_name = "SDF"
 
         challenge = build_challenge_transaction(
             server_secret=server_kp.secret,
             client_account_id=client_kp.public_key,
-            archor_name=archor_name,
+            anchor_name=anchor_name,
             network_passphrase=network_passphrase,
             timeout=timeout,
         )
@@ -76,14 +76,14 @@ class TestStellarWebAuthentication:
         server_kp = Keypair.random()
         client_kp = Keypair.random()
         network_passphrase = Network.PUBLIC_NETWORK_PASSPHRASE
-        archor_name = "SDF"
+        anchor_name = "SDF"
         now = int(time.time())
         nonce = os.urandom(64)
         server_account = Account(server_kp.public_key, 10086)
         challenge_te = (
             TransactionBuilder(server_account, network_passphrase, 100)
             .append_manage_data_op(
-                data_name="{} auth".format(archor_name),
+                data_name="{} auth".format(anchor_name),
                 data_value=nonce,
                 source=client_kp.public_key,
             )
@@ -107,10 +107,10 @@ class TestStellarWebAuthentication:
         server_kp = Keypair.random()
         client_kp = Keypair.random()
         network_passphrase = Network.TESTNET_NETWORK_PASSPHRASE
-        archor_name = "SDF"
+        anchor_name = "SDF"
 
         challenge = build_challenge_transaction(
-            server_kp.secret, client_kp.public_key, archor_name, network_passphrase
+            server_kp.secret, client_kp.public_key, anchor_name, network_passphrase
         )
 
         transaction = TransactionEnvelope.from_xdr(
@@ -179,14 +179,14 @@ class TestStellarWebAuthentication:
         server_kp = Keypair.random()
         client_kp = Keypair.random()
         network_passphrase = Network.PUBLIC_NETWORK_PASSPHRASE
-        archor_name = "SDF"
+        anchor_name = "SDF"
         now = int(time.time())
         nonce = os.urandom(64)
         server_account = Account(server_kp.public_key, -1)
         challenge_te = (
             TransactionBuilder(server_account, network_passphrase, 100)
             .append_manage_data_op(
-                data_name="{} auth".format(archor_name), data_value=nonce
+                data_name="{} auth".format(anchor_name), data_value=nonce
             )
             .add_time_bounds(now, now + 300)
             .build()
@@ -207,14 +207,14 @@ class TestStellarWebAuthentication:
         server_kp = Keypair.random()
         client_kp = Keypair.random()
         network_passphrase = Network.PUBLIC_NETWORK_PASSPHRASE
-        archor_name = "SDF"
+        anchor_name = "SDF"
         now = int(time.time())
         nonce = os.urandom(32)
         server_account = Account(server_kp.public_key, -1)
         challenge_te = (
             TransactionBuilder(server_account, network_passphrase, 100)
             .append_manage_data_op(
-                data_name="{} auth".format(archor_name),
+                data_name="{} auth".format(anchor_name),
                 data_value=nonce,
                 source=client_kp.public_key,
             )
@@ -238,7 +238,7 @@ class TestStellarWebAuthentication:
         server_kp = Keypair.random()
         client_kp = Keypair.random()
         network_passphrase = Network.PUBLIC_NETWORK_PASSPHRASE
-        archor_name = "SDF"
+        anchor_name = "SDF"
         timeout = 300
 
         now = int(time.time())
@@ -250,7 +250,7 @@ class TestStellarWebAuthentication:
         transaction_builder.add_time_bounds(min_time=now, max_time=now + timeout)
         nonce = os.urandom(64)
         transaction_builder.append_manage_data_op(
-            data_name="{} auth".format(archor_name),
+            data_name="{} auth".format(anchor_name),
             data_value=nonce,
             source=client_kp.public_key,
         )
@@ -274,12 +274,12 @@ class TestStellarWebAuthentication:
         client_account_id = "GBDIT5GUJ7R5BXO3GJHFXJ6AZ5UQK6MNOIDMPQUSMXLIHTUNR2Q5CFNF"
         timeout = 600
         network_passphrase = Network.TESTNET_NETWORK_PASSPHRASE
-        archor_name = "SDF"
+        anchor_name = "SDF"
 
         challenge = build_challenge_transaction(
             server_secret=server_kp.secret,
             client_account_id=client_account_id,
-            archor_name=archor_name,
+            anchor_name=anchor_name,
             network_passphrase=network_passphrase,
             timeout=timeout,
         )
@@ -296,13 +296,13 @@ class TestStellarWebAuthentication:
         server_kp = Keypair.random()
         client_kp = Keypair.random()
         network_passphrase = Network.PUBLIC_NETWORK_PASSPHRASE
-        archor_name = "SDF"
+        anchor_name = "SDF"
         nonce = os.urandom(64)
         server_account = Account(server_kp.public_key, -1)
         challenge_te = (
             TransactionBuilder(server_account, network_passphrase, 100)
             .append_manage_data_op(
-                data_name="{} auth".format(archor_name),
+                data_name="{} auth".format(anchor_name),
                 data_value=nonce,
                 source=client_kp.public_key,
             )
@@ -324,14 +324,14 @@ class TestStellarWebAuthentication:
         server_kp = Keypair.random()
         client_kp = Keypair.random()
         network_passphrase = Network.PUBLIC_NETWORK_PASSPHRASE
-        archor_name = "SDF"
+        anchor_name = "SDF"
         now = int(time.time())
         nonce = os.urandom(64)
         server_account = Account(server_kp.public_key, -1)
         challenge_te = (
             TransactionBuilder(server_account, network_passphrase, 100)
             .append_manage_data_op(
-                data_name="{} auth".format(archor_name),
+                data_name="{} auth".format(anchor_name),
                 data_value=nonce,
                 source=client_kp.public_key,
             )
@@ -355,14 +355,14 @@ class TestStellarWebAuthentication:
         server_kp = Keypair.random()
         client_kp = Keypair.random()
         network_passphrase = Network.PUBLIC_NETWORK_PASSPHRASE
-        archor_name = "SDF"
+        anchor_name = "SDF"
         now = int(time.time())
         nonce = os.urandom(64)
         server_account = Account(server_kp.public_key, -1)
         challenge_te = (
             TransactionBuilder(server_account, network_passphrase, 100)
             .append_manage_data_op(
-                data_name="{} auth".format(archor_name),
+                data_name="{} auth".format(anchor_name),
                 data_value=nonce,
                 source=client_kp.public_key,
             )
