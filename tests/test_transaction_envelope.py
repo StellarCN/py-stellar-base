@@ -1,3 +1,4 @@
+import binascii
 import pytest
 
 from stellar_sdk.asset import Asset
@@ -28,6 +29,7 @@ class TestTransactionEnvelope:
         tx = Transaction(source, sequence, fee, ops, memo, time_bounds)
         network = Network.public_network()
         te = TransactionEnvelope(tx, network)
+        assert binascii.hexlify(te.hash()).decode() == te.hash_hex()
         te.sign(source)
         hashx = bytes.fromhex(
             "94e8223a518ac16a8cb110ab1952ef14da2c10b264645c38c8b3d82bd2b20000"
@@ -54,7 +56,9 @@ class TestTransactionEnvelope:
         tx = Transaction(source, sequence, fee, ops, memo, time_bounds)
         network = Network.public_network()
         te = TransactionEnvelope(tx, network)
-        te.sign(source)
+        assert binascii.hexlify(te.hash()).decode() == te.hash_hex()
+        # te.sign(source)
+        te.sign("SCCS5ZBI7WVIJ4SW36WGOQQIWJYCL3VOAULSXX3FB57USIO25EDOYQHH")
         hashx = bytes.fromhex(
             "94e8223a518ac16a8cb110ab1952ef14da2c10b264645c38c8b3d82bd2b20000"
         )

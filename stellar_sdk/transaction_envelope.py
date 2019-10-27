@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Union
 
 from .exceptions import SignatureExistError
 from .keypair import Keypair
@@ -48,16 +48,25 @@ class TransactionEnvelope:
         """
         return sha256(self.signature_base())
 
-    def sign(self, signer: Keypair) -> None:
+    def hash_hex(self) -> str:
+        """Return a hex encoded hash for this transaction envelope.
+
+        :return: A hex encoded hash for this transaction envelope.
+        """
+        return self.hash().hex()
+
+    def sign(self, signer: Union[Keypair, str]) -> None:
         """Sign this transaction envelope with a given keypair.
 
         Note that the signature must not already be in this instance's list of
         signatures.
 
-        :param signer: The keypair to use for signing this transaction
+        :param signer: The keypair or secret to use for signing this transaction
             envelope.
         :raise: :exc:`SignatureExistError <stellar_sdk.exception.SignatureExistError>`
         """
+        if isinstance(signer, str):
+            signer = Keypair.from_secret(signer)
         tx_hash = self.hash()
         sig = signer.sign_decorated(tx_hash)
         sig_dict = [signature.__dict__ for signature in self.signatures]
