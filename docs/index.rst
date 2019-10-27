@@ -37,8 +37,9 @@ py-stellar-sdk
     :target: https://pypi.python.org/pypi/stellar-sdk
 
 .. warning::
-    This is a alpha release, please do not use it in production
-    environment, feedback is welcome :-)
+    This is a beta release, please help us find bugs in the SDK
+    so we can release a stable version as soon as possible :-)
+
 
 
 py-stellar-sdk is a Python library for communicating with
@@ -87,7 +88,7 @@ Links
 * Document: https://stellar-sdk.readthedocs.io
 * Code: https://github.com/StellarCN/py-stellar-base/tree/v2
 * Docker: https://hub.docker.com/r/overcat/py-stellar-base
-* Examples: https://github.com/StellarCN/py-stellar-base/tree/master/examples
+* Examples: https://github.com/StellarCN/py-stellar-base/blob/v2/examples
 * Issue tracker: https://github.com/StellarCN/py-stellar-base/issues
 * License: `Apache License 2.0 <https://github.com/StellarCN/py-stellar-base/blob/master/LICENSE>`_
 * Releases: https://pypi.org/project/stellar-sdk/
