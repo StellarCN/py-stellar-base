@@ -191,7 +191,7 @@ class Keypair:
             The verification failed and the signature was incorrect.
         """
         try:
-            return self.verify_key.verify(data, signature)
+            self.verify_key.verify(data, signature)
         except NaclBadSignatureError:
             raise BadSignatureError("Signature verification failed.")
 
