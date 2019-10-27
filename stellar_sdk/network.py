@@ -48,7 +48,7 @@ class Network:
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
-            return NotImplemented
+            return NotImplemented  # pragma: no cover
         return self.network_passphrase == other.network_passphrase
 
     def __str__(self):

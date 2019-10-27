@@ -112,7 +112,6 @@ class TransactionBuilder:
         return self
 
     def set_timeout(self, timeout: int) -> "TransactionBuilder":
-
         if self.time_bounds:
             raise ValueError(
                 "TimeBounds has been already set - setting timeout would overwrite it."

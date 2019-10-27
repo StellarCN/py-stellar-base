@@ -47,7 +47,7 @@ class Price:
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
-            return NotImplemented
+            return NotImplemented  # pragma: no cover
         return self.n == other.n and self.d == other.d
 
     def __str__(self):

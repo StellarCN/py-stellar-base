@@ -19,7 +19,7 @@ from stellar_sdk.call_builder.trades_call_builder import TradesCallBuilder
 from stellar_sdk.call_builder.transactions_call_builder import TransactionsCallBuilder
 from stellar_sdk.client.aiohttp_client import AiohttpClient
 from stellar_sdk.client.requests_client import RequestsClient
-from stellar_sdk.exceptions import ValueError
+from stellar_sdk.exceptions import TypeError
 from stellar_sdk.network import Network
 from stellar_sdk.server import Server
 
@@ -129,7 +129,7 @@ class TestServer:
         horizon_url = "https://h.fchain.io"
         client = "BAD TYPE"
         with pytest.raises(
-            ValueError,
+            TypeError,
             match="This `client` class should be an instance "
             "of `stellar_sdk.client.base_async_client.BaseAsyncClient` "
             "or `stellar_sdk.client.base_sync_client.BaseSyncClient`.",

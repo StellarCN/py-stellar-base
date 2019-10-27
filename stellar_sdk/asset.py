@@ -146,10 +146,10 @@ class Asset:
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
-            return NotImplemented
+            return NotImplemented  # pragma: no cover
         return self.code == other.code and self.issuer == other.issuer
 
     def __str__(self):
-        return "<Asset [code={code}, issuer={issuer}]>".format(
-            code=self.code, issuer=self.issuer
+        return "<Asset [code={code}, issuer={issuer}, type={type}]>".format(
+            code=self.code, issuer=self.issuer, type=self.type
         )

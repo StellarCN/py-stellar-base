@@ -91,5 +91,5 @@ class Signer:
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
-            return NotImplemented
+            return NotImplemented  # pragma: no cover
         return self.to_xdr_object().to_xdr() == other.to_xdr_object().to_xdr()

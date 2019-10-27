@@ -37,7 +37,7 @@ class Account:
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
-            return NotImplemented
+            return NotImplemented  # pragma: no cover
         return self.account_id == other.account_id and self.sequence == other.sequence
 
     def __str__(self):

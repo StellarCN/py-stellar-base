@@ -176,7 +176,7 @@ class BaseCallBuilder:
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
-            return NotImplemented
+            return NotImplemented  # pragma: no cover
         return (
             self.client == other.client
             and self.params == other.params

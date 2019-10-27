@@ -20,7 +20,7 @@ from .call_builder.transactions_call_builder import TransactionsCallBuilder
 from .client.base_async_client import BaseAsyncClient
 from .client.base_sync_client import BaseSyncClient
 from .client.requests_client import RequestsClient
-from .exceptions import ValueError, raise_request_exception
+from .exceptions import TypeError, raise_request_exception
 from .transaction_envelope import TransactionEnvelope
 
 __all__ = ["Server"]
@@ -59,7 +59,7 @@ class Server:
         elif isinstance(self._client, BaseSyncClient):
             self.__async = False
         else:
-            raise ValueError(
+            raise TypeError(
                 "This `client` class should be an instance "
                 "of `stellar_sdk.client.base_async_client.BaseAsyncClient` "
                 "or `stellar_sdk.client.base_sync_client.BaseSyncClient`."
@@ -302,7 +302,7 @@ class Server:
             )
         return base_fee
 
-    def close(self) -> None:
+    def close(self) -> Union[None, Coroutine[Any, Any, None]]:
         """Close underlying connector.
 
         Release all acquired resources.

@@ -5,6 +5,10 @@ import pytest
 
 from stellar_sdk import (
     TransactionBuilder,
+    Account,
+    Network,
+    Signer,
+    TimeBounds,
     Asset,
     Price,
     Keypair,
@@ -12,15 +16,14 @@ from stellar_sdk import (
     HashMemo,
     ReturnHashMemo,
 )
-from stellar_sdk.account import Account
-from stellar_sdk.network import Network
-from stellar_sdk.signer import Signer
-from stellar_sdk.time_bounds import TimeBounds
 
 
 class TestTransactionBuilder:
     def test_to_xdr(self):
-        source = Account("GDF5O4OWEMVBY5FLDHWA5RZTYSV2U276XGKZZ6VSHDDR3THSQ6OQS7UM", 1)
+        sequence = 1
+        source = Account(
+            "GDF5O4OWEMVBY5FLDHWA5RZTYSV2U276XGKZZ6VSHDDR3THSQ6OQS7UM", sequence
+        )
         builder = TransactionBuilder(
             source, Network.TESTNET_NETWORK_PASSPHRASE, base_fee=150
         )
@@ -173,13 +176,13 @@ class TestTransactionBuilder:
             "SCCS5ZBI7WVIJ4SW36WGOQQIWJYCL3VOAULSXX3FB57USIO25EDOYQHH"
         )
         te.sign(signer)
-        print(te.to_xdr())
         assert te.to_xdr() == xdr_signed
 
         restore_te = TransactionBuilder.from_xdr(
             xdr_signed, Network.TESTNET_NETWORK_PASSPHRASE
         )
         assert restore_te.to_xdr() == xdr_signed
+        assert source.sequence == sequence + 1
 
     def test_set_timeout(self):
         source = Account("GDF5O4OWEMVBY5FLDHWA5RZTYSV2U276XGKZZ6VSHDDR3THSQ6OQS7UM", 1)
