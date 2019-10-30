@@ -12,7 +12,7 @@ In this example, the destination account must exist.
 We use synchronous methods to submit transactions here, if you want,
 you can also use asynchronous methods.
 
-.. literalinclude:: ../examples/payment.py
+.. literalinclude:: ../../examples/payment.py
    :language: python
    :linenos:
 
@@ -31,6 +31,6 @@ The `path payment <https://www.stellar.org/developers/learn/concepts/list-of-ope
 cause the destination address to get 5.5 GBP. It will cost the sender no more than 1000 XLM.
 In this example there will be 3 exchanges, XLM->USD, USD->EUR, EUR->GBP.
 
-.. literalinclude:: ../examples/path_payment.py
+.. literalinclude:: ../../examples/path_payment.py
    :language: python
    :linenos:

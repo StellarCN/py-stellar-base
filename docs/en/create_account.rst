@@ -7,7 +7,7 @@ Create Account
 
 Now, in order to create an account, you need to run a :py:class:`CreateAccount
 <stellar_sdk.operation.CreateAccount>` operation with your new account ID.
-Due to `Stellar's account minimums
+Due to `Stellar's minimum account balance
 <https://www.stellar.org/developers/guides/concepts/fees.html#minimum-account-balance>`_,
 you'll need to transfer the minimum account balance from another account with
 the create account operation. As of this writing, minimum balance is **1 XLM (2
@@ -19,7 +19,7 @@ If you want to play in the Stellar test network, you can ask our `Friendbot
 <https://www.stellar.org/developers/guides/get-started/create-account.html>`_
 to create an account for you as shown below:
 
-.. literalinclude:: ../examples/create_account_friendbot.py
+.. literalinclude:: ../../examples/create_account_friendbot.py
    :language: python
    :linenos:
 
@@ -32,6 +32,6 @@ account for you. However, if you want to create an account from another
 account of your own, here's an example of how to do so:
 
 
-.. literalinclude:: ../examples/create_account.py
+.. literalinclude:: ../../examples/create_account.py
    :language: python
    :linenos:

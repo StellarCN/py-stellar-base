@@ -5,8 +5,8 @@
 
 .. .. include:: ../README.rst
 
-py-stellar-sdk
-===============================
+Stellar Python SDK
+==================
 
 .. image:: https://img.shields.io/travis/StellarCN/py-stellar-base/v2?style=flat-square&maxAge=1800
     :alt: Travis (.org)
@@ -95,7 +95,7 @@ Links
 
 Thanks
 ------
-This document is based on `JavaScript Stellar SDK`_ documentation.
+This document is based on `Stellar JavaScript SDK`_ documentation.
 Thank you to all the people who have already contributed to Stellar ecosystem!
 
 
@@ -107,4 +107,4 @@ Thank you to all the people who have already contributed to Stellar ecosystem!
 .. _Stellar Horizon server: https://github.com/stellar/go/tree/master/services/horizon
 .. _pip: https://pip.pypa.io/en/stable/quickstart/
 .. _pipenv: https://github.com/pypa/pipenv
-.. _JavaScript Stellar SDK: https://www.stellar.org/developers/js-stellar-sdk/reference/
+.. _Stellar JavaScript SDK: https://www.stellar.org/developers/js-stellar-sdk/reference/

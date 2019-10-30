@@ -22,6 +22,6 @@ In this example, we will:
 * Set our account's masterkey weight and threshold levels
 * Create a multi signature transaction that sends a payment
 
-.. literalinclude:: ../examples/set_up_multisig_account.py
+.. literalinclude:: ../../examples/set_up_multisig_account.py
    :language: python
    :linenos:

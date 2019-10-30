@@ -14,7 +14,7 @@ py-stellar-sdk uses the `Builder pattern <https://en.wikipedia.org/wiki/Builder_
 to Horizon. Starting with a :py:class:`Server <stellar_sdk.server.Server>` object, you can chain methods together to generate a query.
 (See the `Horizon reference <https://www.stellar.org/developers/reference/>`_ documentation for what methods are possible.)
 
-.. literalinclude:: ../examples/query_horizon.py
+.. literalinclude:: ../../examples/query_horizon.py
    :language: python
    :linenos:
 
@@ -35,6 +35,6 @@ specified with :py:meth:`cursor() <stellar_sdk.call_builder.BaseCallBuilder.curs
 
 For example, to log instances of transactions from a particular account:
 
-.. literalinclude:: ../examples/stream_requests.py
+.. literalinclude:: ../../examples/stream_requests.py
    :language: python
    :linenos:

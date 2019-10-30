@@ -42,7 +42,7 @@ the returned transaction will contain
 the sequence number of the source account. This transaction is unsigned.
 You must sign it before it will be accepted by the Stellar network.
 
-.. literalinclude:: ../examples/transaction_builder.py
+.. literalinclude:: ../../examples/transaction_builder.py
    :language: python
    :linenos:
 
@@ -75,7 +75,7 @@ There are 5 types of memos:
 * :py:class:`stellar_sdk.memo.HashMemo` - 32-byte hash - ex. hash of an item in a content server,
 * :py:class:`stellar_sdk.memo.ReturnHashMemo` - 32-byte hash used for returning payments - contains hash of the transaction being rejected.
 
-.. literalinclude:: ../examples/transaction_builder_with_memo.py
+.. literalinclude:: ../../examples/transaction_builder_with_memo.py
    :language: python
    :linenos:
 
