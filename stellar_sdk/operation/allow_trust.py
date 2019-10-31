@@ -33,9 +33,9 @@ class AllowTrust(Operation):
         super().__init__(source)
         check_ed25519_public_key(trustor)
         check_asset_code(asset_code)
-        self.trustor = trustor
-        self.asset_code = asset_code
-        self.authorize = authorize
+        self.trustor: str = trustor
+        self.asset_code: str = asset_code
+        self.authorize: bool = authorize
 
     @classmethod
     def type_code(cls) -> int:

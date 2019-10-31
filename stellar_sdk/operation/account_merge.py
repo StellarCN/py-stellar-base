@@ -22,7 +22,7 @@ class AccountMerge(Operation):
     def __init__(self, destination: str, source: str = None) -> None:
         super().__init__(source)
         check_ed25519_public_key(destination)
-        self.destination = destination
+        self.destination: str = destination
 
     @classmethod
     def type_code(cls) -> int:

@@ -19,4 +19,4 @@ class FeeStatsCallBuilder(BaseCallBuilder):
         self, horizon_url: str, client: Union[BaseAsyncClient, BaseSyncClient]
     ) -> None:
         super().__init__(horizon_url, client)
-        self.endpoint = "fee_stats"
+        self.endpoint: str = "fee_stats"

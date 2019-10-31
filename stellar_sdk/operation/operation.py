@@ -41,7 +41,7 @@ class Operation(metaclass=ABCMeta):
 
     def __init__(self, source: str = None) -> None:
         check_source(source)
-        self.source = source
+        self.source: Optional[str] = source
 
     @classmethod
     def type_code(cls) -> int:

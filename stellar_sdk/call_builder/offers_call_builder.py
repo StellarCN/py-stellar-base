@@ -23,4 +23,6 @@ class OffersCallBuilder(BaseCallBuilder):
         account_id: str,
     ) -> None:
         super().__init__(horizon_url, client)
-        self.endpoint = "accounts/{account_id}/offers".format(account_id=account_id)
+        self.endpoint: str = "accounts/{account_id}/offers".format(
+            account_id=account_id
+        )

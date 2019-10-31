@@ -20,7 +20,7 @@ class TradesCallBuilder(BaseCallBuilder):
         self, horizon_url: str, client: Union[BaseAsyncClient, BaseSyncClient]
     ) -> None:
         super().__init__(horizon_url, client)
-        self.endpoint = "trades"
+        self.endpoint: str = "trades"
 
     def for_asset_pair(self, base: Asset, counter: Asset) -> "TradesCallBuilder":
         """Filter trades for a specific asset pair (orderbook)

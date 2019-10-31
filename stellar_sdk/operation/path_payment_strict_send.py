@@ -43,12 +43,12 @@ class PathPaymentStrictSend(Operation):
         check_ed25519_public_key(destination)
         check_amount(send_amount)
         check_amount(dest_min)
-        self.destination = destination
-        self.send_asset = send_asset
-        self.send_amount = send_amount
-        self.dest_asset = dest_asset
-        self.dest_min = dest_min
-        self.path = path  # a list of paths/assets
+        self.destination: str = destination
+        self.send_asset: Asset = send_asset
+        self.send_amount: Union[str, Decimal] = send_amount
+        self.dest_asset: Asset = dest_asset
+        self.dest_min: Union[str, Decimal] = dest_min
+        self.path: List[Asset] = path  # a list of paths/assets
 
     @classmethod
     def type_code(cls) -> int:

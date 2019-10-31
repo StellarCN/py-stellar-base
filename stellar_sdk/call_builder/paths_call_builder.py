@@ -34,7 +34,7 @@ class PathsCallBuilder(BaseCallBuilder):
         destination_amount: str,
     ) -> None:
         super().__init__(horizon_url, client)
-        self.endpoint = "paths"
+        self.endpoint: str = "paths"
         params = {
             "destination_account": destination_account,
             "source_account": source_account,

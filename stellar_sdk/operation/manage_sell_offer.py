@@ -45,11 +45,11 @@ class ManageSellOffer(Operation):
         super().__init__(source)
         check_price(price)
         check_amount(amount)
-        self.selling = selling
-        self.buying = buying
-        self.amount = amount
-        self.price = price
-        self.offer_id = offer_id
+        self.selling: Asset = selling
+        self.buying: Asset = buying
+        self.amount: Union[str, Decimal] = amount
+        self.price: Union[Price, str, Decimal] = price
+        self.offer_id: int = offer_id
 
     @classmethod
     def type_code(cls) -> int:

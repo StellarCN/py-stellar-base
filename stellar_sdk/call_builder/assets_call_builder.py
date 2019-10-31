@@ -19,7 +19,7 @@ class AssetsCallBuilder(BaseCallBuilder):
         self, horizon_url: str, client: Union[BaseAsyncClient, BaseSyncClient]
     ) -> None:
         super().__init__(horizon_url, client)
-        self.endpoint = "assets"
+        self.endpoint: str = "assets"
 
     def for_code(self, asset_code: str) -> "AssetsCallBuilder":
         """ This endpoint filters all assets by the asset code.

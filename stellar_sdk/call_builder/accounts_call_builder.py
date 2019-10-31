@@ -17,7 +17,7 @@ class AccountsCallBuilder(BaseCallBuilder):
         self, horizon_url, client: Union[BaseAsyncClient, BaseSyncClient]
     ) -> None:
         super().__init__(horizon_url, client)
-        self.endpoint = "accounts"
+        self.endpoint: str = "accounts"
 
     def account_id(self, account_id: str) -> "AccountsCallBuilder":
         """Returns information and links relating to a single account.

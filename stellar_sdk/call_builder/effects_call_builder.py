@@ -19,7 +19,7 @@ class EffectsCallBuilder(BaseCallBuilder):
         self, horizon_url: str, client: Union[BaseAsyncClient, BaseSyncClient]
     ) -> None:
         super().__init__(horizon_url, client)
-        self.endpoint = "effects"
+        self.endpoint: str = "effects"
 
     def for_account(self, account_id: str) -> "EffectsCallBuilder":
         """This endpoint represents all effects that changed a given account. It will return relevant
@@ -42,7 +42,7 @@ class EffectsCallBuilder(BaseCallBuilder):
         :param sequence: ledger sequence
         :return: this EffectCallBuilder instance
         """
-        self.endpoint = "ledgers/{sequence}/effects".format(sequence=sequence)
+        self.endpoint: str = "ledgers/{sequence}/effects".format(sequence=sequence)
         return self
 
     def for_transaction(self, transaction_hash: str) -> "EffectsCallBuilder":
@@ -53,7 +53,7 @@ class EffectsCallBuilder(BaseCallBuilder):
         :param transaction_hash: transaction hash
         :return: this EffectCallBuilder instance
         """
-        self.endpoint = "transactions/{transaction_hash}/effects".format(
+        self.endpoint: str = "transactions/{transaction_hash}/effects".format(
             transaction_hash=transaction_hash
         )
         return self
@@ -66,7 +66,7 @@ class EffectsCallBuilder(BaseCallBuilder):
         :param operation_id: operation ID
         :return: this EffectCallBuilder instance
         """
-        self.endpoint = "operations/{operation_id}/effects".format(
+        self.endpoint: str = "operations/{operation_id}/effects".format(
             operation_id=operation_id
         )
         return self

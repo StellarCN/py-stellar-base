@@ -30,8 +30,8 @@ class ManageData(Operation):
         self, data_name: str, data_value: Union[str, bytes, None], source=None
     ) -> None:  # TODO: bytes only?
         super().__init__(source)
-        self.data_name = data_name
-        self.data_value = data_value
+        self.data_name: str = data_name
+        self.data_value: Union[str, bytes, None] = data_value
 
         valid_data_name_len = len(self.data_name) <= 64
         valid_data_val_len = self.data_value is None or len(self.data_value) <= 64

@@ -41,7 +41,7 @@ class TradeAggregationsCallBuilder(BaseCallBuilder):
         offset: int = None,
     ) -> None:
         super().__init__(horizon_url, client)
-        self.endpoint = "trade_aggregations"
+        self.endpoint: str = "trade_aggregations"
 
         if not self.__is_valid_resolution(resolution):
             raise ValueError("Invalid resolution: {}".format(resolution))

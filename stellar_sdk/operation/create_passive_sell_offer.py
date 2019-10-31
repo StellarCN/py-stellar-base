@@ -51,10 +51,10 @@ class CreatePassiveSellOffer(Operation):
         super().__init__(source)
         check_amount(amount)
         check_price(price)
-        self.selling = selling
-        self.buying = buying
-        self.amount = amount
-        self.price = price
+        self.selling: Asset = selling
+        self.buying: Asset = buying
+        self.amount: Union[str, Decimal] = amount
+        self.price: Union[Price, str, Decimal] = price
 
     @classmethod
     def type_code(cls) -> int:

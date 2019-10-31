@@ -43,8 +43,8 @@ class AiohttpClient(BaseAsyncClient):
         user_agent: Optional[str] = None,
         **kwargs
     ) -> None:
-        self.backoff_factor = backoff_factor
-        self.request_timeout = request_timeout
+        self.backoff_factor: Optional[float] = backoff_factor
+        self.request_timeout: float = request_timeout
 
         # init session
         if pool_size is None:
@@ -52,11 +52,11 @@ class AiohttpClient(BaseAsyncClient):
         else:
             connector = aiohttp.TCPConnector(limit=pool_size)
 
-        self.user_agent = USER_AGENT
+        self.user_agent: dict = USER_AGENT
         if user_agent:
             self.user_agent = user_agent
 
-        self.headers = {
+        self.headers: dict = {
             **IDENTIFICATION_HEADERS,
             "Content-Type": "application/x-www-form-urlencoded",
             "User-Agent": self.user_agent,
@@ -68,8 +68,8 @@ class AiohttpClient(BaseAsyncClient):
             **kwargs
         )
 
-        self._session = session
-        self._sse_session = None
+        self._session: aiohttp.ClientSession = session
+        self._sse_session: Optional[aiohttp.ClientSession] = None
 
     async def get(self, url: str, params: Dict[str, str] = None) -> Response:
         """Perform HTTP GET request.

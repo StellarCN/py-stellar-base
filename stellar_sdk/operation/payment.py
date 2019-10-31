@@ -35,9 +35,9 @@ class Payment(Operation):
         super().__init__(source)
         check_ed25519_public_key(destination)
         check_amount(amount)
-        self.destination = destination
-        self.asset = asset
-        self.amount = amount
+        self.destination: str = destination
+        self.asset: Asset = asset
+        self.amount: Union[str, Decimal] = amount
 
     @classmethod
     def type_code(cls) -> int:

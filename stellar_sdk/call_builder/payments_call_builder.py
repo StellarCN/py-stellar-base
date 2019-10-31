@@ -19,7 +19,7 @@ class PaymentsCallBuilder(BaseCallBuilder):
         self, horizon_url: str, client: Union[BaseAsyncClient, BaseSyncClient]
     ) -> None:
         super().__init__(horizon_url, client)
-        self.endpoint = "payments"
+        self.endpoint: str = "payments"
 
     def for_account(self, account_id: str) -> "PaymentsCallBuilder":
         """This endpoint responds with a collection of Payment operations where the given account
@@ -41,7 +41,7 @@ class PaymentsCallBuilder(BaseCallBuilder):
         :param sequence: Ledger sequence
         :return: current PaymentsCallBuilder instance
         """
-        self.endpoint = "ledgers/{sequence}/payments".format(sequence=sequence)
+        self.endpoint: str = "ledgers/{sequence}/payments".format(sequence=sequence)
         return self
 
     def for_transaction(self, transaction_hash: str) -> "PaymentsCallBuilder":
@@ -52,7 +52,7 @@ class PaymentsCallBuilder(BaseCallBuilder):
         :param transaction_hash: Transaction hash
         :return: current PaymentsCallBuilder instance
         """
-        self.endpoint = "transactions/{transaction_hash}/payments".format(
+        self.endpoint: str = "transactions/{transaction_hash}/payments".format(
             transaction_hash=transaction_hash
         )
         return self

@@ -35,8 +35,8 @@ class CreateAccount(Operation):
         super().__init__(source)
         check_ed25519_public_key(destination)
         check_amount(starting_balance)
-        self.destination = destination
-        self.starting_balance = starting_balance
+        self.destination: str = destination
+        self.starting_balance: Union[str, Decimal] = starting_balance
 
     @classmethod
     def type_code(cls) -> int:

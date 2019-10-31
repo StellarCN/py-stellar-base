@@ -19,7 +19,7 @@ class OperationsCallBuilder(BaseCallBuilder):
         self, horizon_url, client: Union[BaseAsyncClient, BaseSyncClient]
     ) -> None:
         super().__init__(horizon_url, client)
-        self.endpoint = "operations"
+        self.endpoint: str = "operations"
 
     def operation(self, operation_id: Union[int, str]) -> "OperationsCallBuilder":
         """The operation details endpoint provides information on a single operation. The operation ID provided
@@ -42,7 +42,9 @@ class OperationsCallBuilder(BaseCallBuilder):
         :param account_id: Account ID
         :return: this OperationCallBuilder instance
         """
-        self.endpoint = "accounts/{account_id}/operations".format(account_id=account_id)
+        self.endpoint: str = "accounts/{account_id}/operations".format(
+            account_id=account_id
+        )
         return self
 
     def for_ledger(self, sequence: Union[int, str]) -> "OperationsCallBuilder":
@@ -53,7 +55,7 @@ class OperationsCallBuilder(BaseCallBuilder):
         :param sequence: Sequence ID
         :return: this OperationCallBuilder instance
         """
-        self.endpoint = "ledgers/{sequence}/operations".format(sequence=sequence)
+        self.endpoint: str = "ledgers/{sequence}/operations".format(sequence=sequence)
         return self
 
     def for_transaction(self, transaction_hash: str) -> "OperationsCallBuilder":
@@ -64,7 +66,7 @@ class OperationsCallBuilder(BaseCallBuilder):
         :param transaction_hash:
         :return: this OperationCallBuilder instance
         """
-        self.endpoint = "transactions/{transaction_hash}/operations".format(
+        self.endpoint: str = "transactions/{transaction_hash}/operations".format(
             transaction_hash=transaction_hash
         )
         return self

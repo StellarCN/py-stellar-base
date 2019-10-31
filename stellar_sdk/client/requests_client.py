@@ -1,5 +1,5 @@
 import json
-from typing import Generator, Union, Dict, Any
+from typing import Generator, Union, Dict, Any, Tuple
 
 import requests
 from requests import Session, RequestException
@@ -47,13 +47,15 @@ class RequestsClient(BaseSyncClient):
         session: Session = None,
         stream_session: Session = None,
     ):
-        self.pool_size = pool_size
-        self.num_retries = num_retries
-        self.request_timeout = request_timeout
-        self.backoff_factor = backoff_factor
+        self.pool_size: int = pool_size
+        self.num_retries: int = num_retries
+        self.request_timeout: int = request_timeout
+        self.backoff_factor: float = backoff_factor
 
         # adding 504 to the tuple of statuses to retry
-        self.status_forcelist = tuple(Retry.RETRY_AFTER_STATUS_CODES) + (504,)
+        self.status_forcelist: Tuple[int] = tuple(Retry.RETRY_AFTER_STATUS_CODES) + (
+            504,
+        )
 
         # configure standard session
 

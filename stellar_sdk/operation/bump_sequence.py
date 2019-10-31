@@ -21,7 +21,7 @@ class BumpSequence(Operation):
 
     def __init__(self, bump_to: int, source: str = None) -> None:
         super().__init__(source)
-        self.bump_to = bump_to
+        self.bump_to: int = bump_to
 
     @classmethod
     def type_code(cls) -> int:

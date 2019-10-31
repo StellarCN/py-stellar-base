@@ -43,12 +43,12 @@ class PathPaymentStrictReceive(Operation):
         check_ed25519_public_key(destination)
         check_amount(send_max)
         check_amount(dest_amount)
-        self.destination = destination
-        self.send_asset = send_asset
-        self.send_max = send_max
-        self.dest_asset = dest_asset
-        self.dest_amount = dest_amount
-        self.path = path  # a list of paths/assets
+        self.destination: str = destination
+        self.send_asset: Asset = send_asset
+        self.send_max: Union[str, Decimal] = send_max
+        self.dest_asset: Asset = dest_asset
+        self.dest_amount: Union[str, Decimal] = dest_amount
+        self.path: List[Asset] = path  # a list of paths/assets
 
     @classmethod
     def type_code(cls) -> int:

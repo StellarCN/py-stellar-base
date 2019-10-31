@@ -31,11 +31,11 @@ class ChangeTrust(Operation):
         self, asset: Asset, limit: Union[str, Decimal] = None, source: str = None
     ) -> None:
         super().__init__(source)
-        self.asset = asset
+        self.asset: Asset = asset
         if (
             limit is None
         ):  # We don't need this if the user can send the value with correct type.
-            self.limit = self._DEFAULT_LIMIT
+            self.limit: Union[str, Decimal] = self._DEFAULT_LIMIT
         else:
             check_amount(limit)
             self.limit = limit

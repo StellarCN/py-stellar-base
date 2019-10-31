@@ -14,10 +14,10 @@ class Response:
     """
 
     def __init__(self, status_code: int, text: str, headers: dict, url: str) -> None:
-        self.status_code = status_code
-        self.text = text
-        self.headers = headers
-        self.url = url
+        self.status_code: int = status_code
+        self.text: str = text
+        self.headers: dict = headers
+        self.url: str = url
 
     def json(self) -> dict:
         """convert the content to dict

@@ -19,7 +19,7 @@ class LedgersCallBuilder(BaseCallBuilder):
         self, horizon_url: str, client: Union[BaseAsyncClient, BaseSyncClient]
     ) -> None:
         super().__init__(horizon_url, client)
-        self.endpoint = "ledgers"
+        self.endpoint: str = "ledgers"
 
     def ledger(self, sequence: Union[int, str]) -> "LedgersCallBuilder":
         """Provides information on a single ledger.

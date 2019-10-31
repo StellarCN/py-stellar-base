@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 
 from .operation import Operation
 from ..keypair import Keypair
@@ -70,15 +70,15 @@ class SetOptions(Operation):
         if inflation_dest is not None:
             check_ed25519_public_key(inflation_dest)
 
-        self.inflation_dest = inflation_dest
-        self.clear_flags = clear_flags
-        self.set_flags = set_flags
-        self.master_weight = master_weight
-        self.low_threshold = low_threshold
-        self.med_threshold = med_threshold
-        self.high_threshold = high_threshold
-        self.home_domain = home_domain
-        self.signer = signer
+        self.inflation_dest: str = inflation_dest
+        self.clear_flags: int = clear_flags
+        self.set_flags: int = set_flags
+        self.master_weight: int = master_weight
+        self.low_threshold: int = low_threshold
+        self.med_threshold: int = med_threshold
+        self.high_threshold: int = high_threshold
+        self.home_domain: str = home_domain
+        self.signer: Optional[Signer] = signer
 
     @classmethod
     def type_code(cls) -> int:

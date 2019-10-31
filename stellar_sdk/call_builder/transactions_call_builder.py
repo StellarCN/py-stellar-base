@@ -19,7 +19,7 @@ class TransactionsCallBuilder(BaseCallBuilder):
         self, horizon_url: str, client: Union[BaseAsyncClient, BaseSyncClient]
     ) -> None:
         super().__init__(horizon_url, client)
-        self.endpoint = "transactions"
+        self.endpoint: str = "transactions"
 
     def transaction(self, transaction_hash: str) -> "TransactionsCallBuilder":
         """The transaction details endpoint provides information on a single transaction.
