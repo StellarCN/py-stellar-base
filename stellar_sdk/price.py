@@ -12,8 +12,8 @@ class Price:
     """
 
     def __init__(self, n: int, d: int) -> None:
-        self.n = n
-        self.d = d
+        self.n: int = n
+        self.d: int = d
 
     @classmethod
     def from_raw_price(cls, price: str) -> "Price":

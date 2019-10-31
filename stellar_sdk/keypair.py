@@ -35,8 +35,12 @@ class Keypair:
     def __init__(
         self, verify_key: ed25519.VerifyKey, signing_key: ed25519.SigningKey = None
     ) -> None:
-        self.verify_key = _get_key_of_expected_type(verify_key, ed25519.VerifyKey)
-        self.signing_key = _get_key_of_expected_type(signing_key, ed25519.SigningKey)
+        self.verify_key: ed25519.VerifyKey = _get_key_of_expected_type(
+            verify_key, ed25519.VerifyKey
+        )
+        self.signing_key: ed25519.SigningKey = _get_key_of_expected_type(
+            signing_key, ed25519.SigningKey
+        )
 
     @classmethod
     def random(cls) -> "Keypair":

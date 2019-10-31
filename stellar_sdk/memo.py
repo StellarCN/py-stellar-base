@@ -1,6 +1,7 @@
 import abc
 from typing import Union
 
+from .utils import hex_to_bytes
 from .exceptions import MemoInvalidException
 from .xdr import Xdr
 
@@ -93,9 +94,9 @@ class TextMemo(Memo):
                 "TextMemo expects string or bytes type got a {}".format(type(text))
             )
 
-        self.memo_text = text
+        self.memo_text: bytes = text
         if not isinstance(text, bytes):
-            self.memo_text = bytearray(text, encoding="utf-8")
+            self.memo_text = bytes(text, encoding="utf-8")
 
         length = len(self.memo_text)
         if length > 28:
@@ -133,7 +134,7 @@ class IdMemo(Memo):
             raise MemoInvalidException(
                 "IdMemo is an unsigned 64-bit integer and the max valid value is 18446744073709551615."
             )
-        self.memo_id = memo_id
+        self.memo_id: int = memo_id
 
     @classmethod
     def from_xdr_object(cls, xdr_obj: Xdr.types.Memo) -> "IdMemo":
@@ -152,19 +153,20 @@ class IdMemo(Memo):
 class HashMemo(Memo):
     """The :class:`HashMemo` which represents MEMO_HASH in a transaction.
 
-    :param memo_hash: A 32 byte hash.
+    :param memo_hash: A 32 byte hash hex encoded string.
     :raises:
         :exc:`MemoInvalidException: <stellar_sdk.exceptions.MemoInvalidException:>`
     """
 
-    def __init__(self, memo_hash: bytes) -> None:
+    def __init__(self, memo_hash: Union[bytes, str]) -> None:
+        memo_hash = hex_to_bytes(memo_hash)
         length = len(memo_hash)
         if length > 32:
             raise MemoInvalidException(
                 "HashMemo can contain 32 bytes at max, got {:d} bytes".format(length)
             )
 
-        self.memo_hash = memo_hash
+        self.memo_hash: bytes = memo_hash
 
     @classmethod
     def from_xdr_object(cls, xdr_obj: Xdr.types.Memo) -> "HashMemo":
@@ -187,13 +189,14 @@ class ReturnHashMemo(Memo):
     a 32 byte hash intended to be interpreted as the hash of the transaction
     the sender is refunding.
 
-    :param memo_return: A 32 byte hash intended to be interpreted as the
+    :param memo_return: A 32 byte hash or hex encoded string intended to be interpreted as the
         hash of the transaction the sender is refunding.
     :raises:
         :exc:`MemoInvalidException: <stellar_sdk.exceptions.MemoInvalidException:>`
     """
 
     def __init__(self, memo_return: bytes) -> None:
+        memo_return = hex_to_bytes(memo_return)
         length = len(memo_return)
         if length > 32:
             raise MemoInvalidException(
@@ -202,7 +205,7 @@ class ReturnHashMemo(Memo):
                 )
             )
 
-        self.memo_return = memo_return
+        self.memo_return: bytes = memo_return
 
     @classmethod
     def from_xdr_object(cls, xdr_obj: Xdr.types.Memo) -> "ReturnHashMemo":

@@ -14,8 +14,8 @@ class Signer:
     """
 
     def __init__(self, signer_key: Xdr.types.SignerKey, weight) -> "None":
-        self.signer_key = signer_key
-        self.weight = weight
+        self.signer_key: Xdr.types.SignerKey = signer_key
+        self.weight: int = weight
 
     @classmethod
     def ed25519_public_key(cls, account_id: str, weight: int) -> "Signer":

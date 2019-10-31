@@ -51,22 +51,22 @@ class Transaction:
         sequence: int,
         fee: int,
         operations: List[Operation],
-        memo: Union[Memo] = None,
+        memo: Memo = None,
         time_bounds: TimeBounds = None,
     ) -> None:
 
         # if not operations:
         #     raise ValueError("At least one operation required.")
 
-        if not memo:
+        if memo is None:
             memo = NoneMemo()
 
-        self.source = source
-        self.sequence = sequence
-        self.operations = operations
-        self.memo = memo
-        self.fee = fee
-        self.time_bounds = time_bounds
+        self.source: Keypair = source
+        self.sequence: int = sequence
+        self.operations: List[Operation] = operations
+        self.memo: Memo = memo
+        self.fee: int = fee
+        self.time_bounds: TimeBounds = time_bounds
 
     def to_xdr_object(self) -> Xdr.types.Transaction:
         """Get an XDR object representation of this :class:`Transaction`.

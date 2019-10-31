@@ -26,8 +26,8 @@ class TimeBounds:
         if 0 < max_time <= min_time:
             raise ValueError("max_time must be >= min_time.")
 
-        self.min_time = min_time
-        self.max_time = max_time
+        self.min_time: int = min_time
+        self.max_time: int = max_time
 
     def to_xdr_object(self) -> Xdr.types.TimeBounds:
         """Returns the xdr object for this TimeBounds object.

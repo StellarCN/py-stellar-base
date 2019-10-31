@@ -26,8 +26,8 @@ class Account:
     def __init__(self, account_id: str, sequence: int) -> None:
         StrKey.decode_ed25519_public_key(account_id)
 
-        self.account_id = account_id
-        self.sequence = sequence
+        self.account_id: str = account_id
+        self.sequence: int = sequence
 
     def increment_sequence_number(self) -> None:
         """

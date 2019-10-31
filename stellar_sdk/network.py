@@ -20,7 +20,7 @@ class Network:
     """Get the Test network passphrase."""
 
     def __init__(self, network_passphrase: str) -> None:
-        self.network_passphrase = network_passphrase
+        self.network_passphrase: str = network_passphrase
 
     def network_id(self) -> bytes:
         """Get the network ID of the network, which is an XDR hash of the
