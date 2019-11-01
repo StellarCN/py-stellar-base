@@ -57,8 +57,8 @@ class Keypair:
 
         :param secret: strkey ed25519 seed, for example: `SB2LHKBL24ITV2Y346BU46XPEL45BDAFOOJLZ6SESCJZ6V5JMP7D6G5X`
         :return: A new :class:`Keypair` instance derived by the secret.
-        :raise: :exc:`Ed25519SecretSeedInvalidError <stellar_sdk.exceptions.Ed25519SecretSeedInvalidError>`
-            The secret seed used to generate the :class:`Keypair` is incorrect
+        :raise: :exc:`Ed25519SecretSeedInvalidError <stellar_sdk.exceptions.Ed25519SecretSeedInvalidError>`:
+            if ``secret`` is not a valid ed25519 secret seed.
         """
         raw_secret = StrKey.decode_ed25519_secret_seed(secret)
         return cls.from_raw_ed25519_seed(raw_secret)
@@ -70,8 +70,8 @@ class Keypair:
         :param public_key: strkey ed25519 public key,
             for example: `GATPGGOIE6VWADVKD3ER3IFO2IH6DTOA5G535ITB3TT66FZFSIZEAU2B`
         :return: A new :class:`Keypair` instance derived by the public key.
-        :raise: :exc:`Ed25519PublicKeyInvalidError <stellar_sdk.exceptions.Ed25519PublicKeyInvalidError>`
-            The public key used to generate the :class:`Keypair` is incorrect
+        :raise: :exc:`Ed25519PublicKeyInvalidError <stellar_sdk.exceptions.Ed25519PublicKeyInvalidError>`:
+            if ``public_key`` is not a valid ed25519 public key.
         """
         key = StrKey.decode_ed25519_public_key(public_key)
         return cls.from_raw_ed25519_public_key(key)
@@ -176,8 +176,8 @@ class Keypair:
 
         :param data: The data to sign.
         :return: signed bytes
-        :raise: :exc:`MissingEd25519SecretSeedError <stellar_sdk.exceptions.MissingEd25519SecretSeedError>`
-            The :class:`Keypair` does not contain secret seed.
+        :raise: :exc:`MissingEd25519SecretSeedError <stellar_sdk.exceptions.MissingEd25519SecretSeedError>`:
+            if :class:`Keypair` does not contain secret seed.
         """
         if not self.can_sign():
             raise MissingEd25519SecretSeedError(
@@ -191,8 +191,8 @@ class Keypair:
 
         :param data: The data that was signed.
         :param signature: The signature.
-        :raise: :exc:`BadSignatureError <stellar_sdk.exceptions.BadSignatureError>`
-            The verification failed and the signature was incorrect.
+        :raise: :exc:`BadSignatureError <stellar_sdk.exceptions.BadSignatureError>`:
+            if the verification failed and the signature was incorrect.
         """
         try:
             self.verify_key.verify(data, signature)

@@ -47,7 +47,7 @@ class Transaction:
 
     def __init__(
         self,
-        source: Keypair,
+        source: Union[Keypair, str],
         sequence: int,
         fee: int,
         operations: List[Operation],
@@ -60,6 +60,8 @@ class Transaction:
 
         if memo is None:
             memo = NoneMemo()
+        if isinstance(source, str):
+            source = Keypair.from_public_key(source)
 
         self.source: Keypair = source
         self.sequence: int = sequence

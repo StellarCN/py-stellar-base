@@ -45,11 +45,14 @@ class BaseCallBuilder:
         :return: If it is called synchronous, the response will be returned. If
             it is called asynchronously, it will return Coroutine.
         :raises:
-            :exc:`ConnectionError <stellar_sdk.exceptions.ConnectionError>`
-            :exc:`NotFoundError <stellar_sdk.exceptions.NotFoundError>`
-            :exc:`BadRequestError <stellar_sdk.exceptions.BadRequestError>`
-            :exc:`BadResponseError <stellar_sdk.exceptions.BadResponseError>`
-            :exc:`UnknownRequestError <stellar_sdk.exceptions.UnknownRequestError>`
+            | :exc:`ConnectionError <stellar_sdk.exceptions.ConnectionError>`: if you have not successfully
+                connected to the server.
+            | :exc:`NotFoundError <stellar_sdk.exceptions.NotFoundError>`: if status_code == 404
+            | :exc:`BadRequestError <stellar_sdk.exceptions.BadRequestError>`: if 400 <= status_code < 500
+                and status_code != 404
+            | :exc:`BadResponseError <stellar_sdk.exceptions.BadResponseError>`: if 500 <= status_code < 600
+            | :exc:`UnknownRequestError <stellar_sdk.exceptions.UnknownRequestError>`: if an unknown error occurs,
+                please submit an issue
         """
         url = urljoin(self.horizon_url, self.endpoint)
         return self.__call(url, self.params)
@@ -85,8 +88,8 @@ class BaseCallBuilder:
 
         See `MDN EventSource <https://developer.mozilla.org/en-US/docs/Web/API/EventSource>`_
 
-        :return: If it is called synchronous, it will return `Generator`, If
-            it is called asynchronously, it will return `AsyncGenerator`.
+        :return: If it is called synchronous, it will return ``Generator``, If
+            it is called asynchronously, it will return ``AsyncGenerator``.
         """
         if self.__async:
             return self.__stream_async()
@@ -104,7 +107,7 @@ class BaseCallBuilder:
         return self.client.stream(url, self.params)
 
     def cursor(self, cursor: Union) -> "BaseCallBuilder":
-        """Sets `cursor` parameter for the current call. Returns the CallBuilder object on which this method has been called.
+        """Sets ``cursor`` parameter for the current call. Returns the CallBuilder object on which this method has been called.
 
         See `Paging <https://www.stellar.org/developers/horizon/reference/paging.html>`_
 
@@ -115,7 +118,7 @@ class BaseCallBuilder:
         return self
 
     def limit(self, limit: int) -> "BaseCallBuilder":
-        """Sets `limit` parameter for the current call. Returns the CallBuilder object on which this method has been called.
+        """Sets ``limit`` parameter for the current call. Returns the CallBuilder object on which this method has been called.
 
         See `Paging <https://www.stellar.org/developers/horizon/reference/paging.html>`_
 
@@ -126,9 +129,9 @@ class BaseCallBuilder:
         return self
 
     def order(self, desc: bool = True) -> "BaseCallBuilder":
-        """Sets `order` parameter for the current call. Returns the CallBuilder object on which this method has been called.
+        """Sets ``order`` parameter for the current call. Returns the CallBuilder object on which this method has been called.
 
-        :param desc: Sort direction, `True` to get desc sort direction, the default setting is `True`.
+        :param desc: Sort direction, ``True`` to get desc sort direction, the default setting is ``True``.
         :return: current CallBuilder instance
         """
         order = "asc"

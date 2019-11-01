@@ -71,7 +71,8 @@ def verify_challenge_transaction(
     :param server_account_id: public key for server's account.
     :param network_passphrase: The network to connect to for verifying and retrieving
         additional attributes from. (ex. 'Public Global Stellar Network ; September 2015')
-    :raises: :exc:`InvalidSep10ChallengeError <stellar_sdk.sep.exceptions.InvalidSep10ChallengeError>`
+    :raises: :exc:`InvalidSep10ChallengeError <stellar_sdk.sep.exceptions.InvalidSep10ChallengeError>` - if the
+        validation fails, the exception will be thrown.
     """
     network = Network(network_passphrase)
     try:

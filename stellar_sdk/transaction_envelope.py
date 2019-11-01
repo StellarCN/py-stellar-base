@@ -63,7 +63,8 @@ class TransactionEnvelope:
 
         :param signer: The keypair or secret to use for signing this transaction
             envelope.
-        :raise: :exc:`SignatureExistError <stellar_sdk.exception.SignatureExistError>`
+        :raise: :exc:`SignatureExistError <stellar_sdk.exception.SignatureExistError>`:
+            if this signature already exists.
         """
         if isinstance(signer, str):
             signer = Keypair.from_secret(signer)

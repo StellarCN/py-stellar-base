@@ -136,6 +136,7 @@ class BaseHorizonError(BaseRequestError):
 
 class NotFoundError(BaseHorizonError):
     """This exception is thrown when the requested resource does not exist.
+    status_code == 400
 
     """
 
@@ -145,6 +146,7 @@ class NotFoundError(BaseHorizonError):
 
 class BadRequestError(BaseHorizonError):
     """The request from the client has an error.
+    400 <= status_code < 500 and status_code != 404
 
     """
 
@@ -154,6 +156,8 @@ class BadRequestError(BaseHorizonError):
 
 class BadResponseError(BaseHorizonError):
     """The response from the server has an error.
+    500 <= status_code < 600
+
 
     """
 

@@ -39,8 +39,7 @@ class Server:
 
     :param horizon_url: Horizon Server URL (ex. `https://horizon-testnet.stellar.org`)
     :param client: Http Client used to send the request
-    :raises:
-        :exc:`ValueError: <stellar_sdk.exceptions.ValueError:>`
+    :raises: :exc:`TypeError <stellar_sdk.exceptions.TypeError>`: if the ``client`` does not meet the standard.
     """
 
     def __init__(

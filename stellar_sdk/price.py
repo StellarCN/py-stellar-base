@@ -21,6 +21,8 @@ class Price:
 
         :param price: the str price. (ex. `'0.125'`)
         :return: A new :class:`Price` object from the given str price.
+        :raises: :exc:`NoApproximationError <stellar_sdk.exceptions.NoApproximationError>`:
+            if the approximation could not not be found.
         """
         best_r = best_rational_approximation(price)
         n = best_r["n"]

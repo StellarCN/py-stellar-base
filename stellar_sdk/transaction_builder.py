@@ -112,6 +112,13 @@ class TransactionBuilder:
         return self
 
     def set_timeout(self, timeout: int) -> "TransactionBuilder":
+        """Set timeout for the transaction, actually set a TimeBounds.
+
+        :param timeout: timeout in second.
+        :return: This builder instance.
+        :raises:
+            :exc:`ValueError <stellar_sdk.exceptions.ValueError>`: if time_bound is already set.
+        """
         if self.time_bounds:
             raise ValueError(
                 "TimeBounds has been already set - setting timeout would overwrite it."
@@ -136,7 +143,8 @@ class TransactionBuilder:
 
         :param memo_text: The text for the memo to add.
         :return: This builder instance.
-
+        :raises: :exc:`MemoInvalidException <stellar_sdk.exceptions.MemoInvalidException>`:
+            if ``memo_text`` is not a valid text memo.
         """
         memo = TextMemo(memo_text)
         return self.add_memo(memo)
@@ -147,6 +155,9 @@ class TransactionBuilder:
 
         :param memo_id: A 64 bit unsigned integer to set as the memo.
         :return: This builder instance.
+        :raises:
+            :exc:`MemoInvalidException <stellar_sdk.exceptions.MemoInvalidException>`:
+            if ``memo_id`` is not a valid id memo.
 
         """
         memo = IdMemo(memo_id)
@@ -158,7 +169,9 @@ class TransactionBuilder:
 
         :param memo_hash: A 32 byte hash or hex encoded string to use as the memo.
         :return: This builder instance.
-
+        :raises:
+            :exc:`MemoInvalidException <stellar_sdk.exceptions.MemoInvalidException>`:
+            if ``memo_hash`` is not a valid hash memo.
         """
         memo = HashMemo(hex_to_bytes(memo_hash))
         return self.add_memo(memo)
@@ -172,7 +185,9 @@ class TransactionBuilder:
         :param memo_return: A 32 byte hash or hex encoded string intended to be interpreted as
             the hash of the transaction the sender is refunding.
         :return: This builder instance.
-
+        :raises:
+            :exc:`MemoInvalidException <stellar_sdk.exceptions.MemoInvalidException>`:
+            if ``memo_return`` is not a valid return hash memo.
         """
         memo = ReturnHashMemo(hex_to_bytes(memo_return))
         return self.add_memo(memo)

@@ -20,6 +20,7 @@ class TimeBounds:
 
     :param min_time: the UNIX timestamp (in seconds)
     :param max_time: the UNIX timestamp (in seconds)
+    :raises: :exc:`ValueError <stellar_sdk.exceptions.ValueError>`: if ``max_time`` less than ``min_time``.
     """
 
     def __init__(self, min_time: int, max_time: int) -> None:

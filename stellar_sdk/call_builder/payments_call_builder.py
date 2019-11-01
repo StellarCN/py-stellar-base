@@ -61,7 +61,7 @@ class PaymentsCallBuilder(BaseCallBuilder):
         """Adds a parameter defining whether to include failed transactions. By default only
         payments of successful transactions are returned.
 
-        :param include_failed: Set to `True` to include payments of failed transactions.
+        :param include_failed: Set to ``True`` to include payments of failed transactions.
         :return: current PaymentsCallBuilder instance
         """
         self._add_query_param("include_failed", include_failed)

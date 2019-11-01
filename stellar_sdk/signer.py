@@ -24,6 +24,9 @@ class Signer:
         :param account_id: account id
         :param weight: The weight of the signer (0 to delete or 1-255)
         :return: ED25519 PUBLIC KEY Signer
+        :raises:
+            :exc:`Ed25519PublicKeyInvalidError <stellar_sdk.exceptions.Ed25519PublicKeyInvalidError>`: if ``account_id``
+            is not a valid ed25519 public key.
         """
         signer_key = Xdr.types.SignerKey(
             Xdr.const.SIGNER_KEY_TYPE_ED25519,

@@ -101,23 +101,7 @@ class Operation(metaclass=ABCMeta):
 
     @staticmethod
     def from_xdr_amount(value: int) -> str:
-        """Converts an amount from an XDR object into its appropriate integer
-        representation.
-
-        Each asset amount is encoded as a signed 64-bit integer in the XDR
-        structures. An asset amount unit (that which is seen by end users) is
-        scaled down by a factor of ten million (10,000,000) to arrive at the
-        native 64-bit integer representation. For example, the integer amount
-        value 25,123,456 equals 2.5123456 units of the asset. This scaling
-        allows for seven decimal places of precision in human-friendly amount
-        units.
-
-        This static method correctly divides the value by the scaling factor in
-        order to get the proper units of the asset.
-
-        See `Stellar's documentation on Asset Precision
-        <https://www.stellar.org/developers/guides/concepts/assets.html#amount-precision-and-representation>`_
-        for more information.
+        """Converts an str amount from an XDR amount object
 
         :param value: The amount to convert to a string from an XDR int64
             amount.
