@@ -1,3 +1,5 @@
+from typing import Optional
+
 from .client.response import Response
 
 BuildInValueError = ValueError
@@ -122,16 +124,17 @@ class BaseHorizonError(BaseRequestError):
 
     def __init__(self, response: Response) -> None:
         super().__init__(response)
-        self.message = response.json()
-        self.type = self.message.get("type")
-        self.title = self.message.get("title")
-        self.status = self.message.get("status")
-        self.detail = self.message.get("detail")
-        self.extras = self.message.get("extras")
-        self.result_xdr = self.message.get("result_xdr")
+        message = response.json()
+        self.message: str = response.text
+        self.type: Optional[str] = message.get("type")
+        self.title: Optional[str] = message.get("title")
+        self.status: Optional[int] = message.get("status")
+        self.detail: Optional[str] = message.get("detail")
+        self.extras: Optional[dict] = message.get("extras")
+        self.result_xdr: Optional[str] = message.get("result_xdr")
 
     def __str__(self):
-        return str(self.message)
+        return self.message
 
 
 class NotFoundError(BaseHorizonError):
