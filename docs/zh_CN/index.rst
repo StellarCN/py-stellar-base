@@ -20,9 +20,9 @@ Stellar Python SDK
     :alt: Codecov
     :target: https://codecov.io/gh/StellarCN/py-stellar-base
 
-.. image:: https://img.shields.io/codeclimate/maintainability/overcat/py-stellar-sdk?style=flat-square&maxAge=1800
+.. image:: https://img.shields.io/codeclimate/maintainability/StellarCN/py-stellar-base?style=flat-square&maxAge=1800
     :alt: Code Climate maintainability
-    :target: https://codeclimate.com/github/overcat/py-stellar-sdk/maintainability
+    :target: https://codeclimate.com/github/StellarCN/py-stellar-base/maintainability
 
 .. image:: https://img.shields.io/pypi/v/stellar-sdk.svg?style=flat-square&maxAge=1800
     :alt: PyPI
@@ -35,6 +35,9 @@ Stellar Python SDK
 .. image:: https://img.shields.io/badge/implementation-cpython%20%7C%20pypy-blue?style=flat-square
     :alt: PyPI - Implementation
     :target: https://pypi.python.org/pypi/stellar-sdk
+
+.. note::
+    此页面呈现的是 V2 版本，如果你想使用 V1 版本请点击 `这里 <https://github.com/StellarCN/py-stellar-base/tree/v1>`_。
 
 .. warning::
     此 SDK 当前仍是 Beta 版本，请帮助我们找个其中的 Bug :-)
