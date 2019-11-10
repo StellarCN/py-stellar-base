@@ -5,7 +5,7 @@ from .keypair import Keypair
 from .network import Network
 from .xdr import Xdr
 from .transaction import Transaction
-from .utils import sha256
+from .utils import sha256, hex_to_bytes
 
 __all__ = ["TransactionEnvelope"]
 
@@ -106,10 +106,10 @@ class TransactionEnvelope:
         <https://www.stellar.org/developers/guides/concepts/multi-sig.html>`_
         for more details on Hash(x) signatures.
 
-        :param preimage: 32 byte hash, the "x" value to be hashed and used as a
+        :param preimage: 32 byte hash or hex encoded string , the "x" value to be hashed and used as a
             signature.
         """
-        hash_preimage = sha256(preimage)
+        hash_preimage = sha256(hex_to_bytes(preimage))
         hint = hash_preimage[-4:]
         sig = Xdr.types.DecoratedSignature(hint, preimage)
         sig_dict = [signature.__dict__ for signature in self.signatures]
