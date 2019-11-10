@@ -11,7 +11,6 @@ from ..transaction_builder import TransactionBuilder
 from ..operation.manage_data import ManageData
 from .exceptions import InvalidSep10ChallengeError
 from ..transaction_envelope import TransactionEnvelope
-from ..network import Network
 from ..account import Account
 
 __all__ = ["build_challenge_transaction", "verify_challenge_transaction"]
@@ -74,10 +73,9 @@ def verify_challenge_transaction(
     :raises: :exc:`InvalidSep10ChallengeError <stellar_sdk.sep.exceptions.InvalidSep10ChallengeError>` - if the
         validation fails, the exception will be thrown.
     """
-    network = Network(network_passphrase)
     try:
         transaction_envelope = TransactionEnvelope.from_xdr(
-            challenge_transaction, network=network
+            challenge_transaction, network_passphrase=network_passphrase
         )
     except Exception:
         raise InvalidSep10ChallengeError(

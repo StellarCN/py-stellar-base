@@ -1,6 +1,7 @@
 import pytest
 
-from stellar_sdk import Asset, TransactionBuilder
+from stellar_sdk.transaction_envelope import TransactionEnvelope
+from stellar_sdk.asset import Asset
 from stellar_sdk.call_builder import FeeStatsCallBuilder
 from stellar_sdk.call_builder.accounts_call_builder import AccountsCallBuilder
 from stellar_sdk.call_builder.assets_call_builder import AssetsCallBuilder
@@ -147,7 +148,7 @@ class TestServer:
     @pytest.mark.asyncio
     async def test_submit_transaction_with_te(self):
         xdr = "AAAAAHI7fpgo+b7tgpiFyYWimjV7L7IOYLwmQS7k7F8SronXAAAAZAE+QT4AAAAJAAAAAQAAAAAAAAAAAAAAAF1MG8cAAAAAAAAAAQAAAAAAAAAAAAAAAOvi1O/HEn+QgZJw+EMZBtwvTVNmpgvE9p8IRfwp0GY4AAAAAAExLQAAAAAAAAAAARKuidcAAABAJVc1ASGp35hUquGNbzzSqWPoTG0zgc89zc4p+19QkgbPqsdyEfHs7+ng9VJA49YneEXRa6Fv7pfKpEigb3VTCg=="
-        te = TransactionBuilder.from_xdr(xdr, Network.PUBLIC_NETWORK_PASSPHRASE)
+        te = TransactionEnvelope.from_xdr(xdr, Network.PUBLIC_NETWORK_PASSPHRASE)
         horizon_url = "https://horizon.stellar.org"
         client = AiohttpClient()
         async with Server(horizon_url, client) as server:

@@ -27,8 +27,7 @@ class TestTransactionEnvelope:
         time_bounds = TimeBounds(12345, 56789)
         ops = [Payment(destination, asset, amount), ManageData("hello", "world")]
         tx = Transaction(source, sequence, fee, ops, memo, time_bounds)
-        network = Network.public_network()
-        te = TransactionEnvelope(tx, network)
+        te = TransactionEnvelope(tx, Network.PUBLIC_NETWORK_PASSPHRASE)
         assert binascii.hexlify(te.hash()).decode() == te.hash_hex()
         te.sign(source)
         hashx = bytes.fromhex(
@@ -37,7 +36,9 @@ class TestTransactionEnvelope:
         te.sign_hashx(hashx)
         te_xdr = "AAAAAMvXcdYjKhx0qxnsDsczxKuqa/65lZz6sjjHHczyh50JAAAAyAAAAAAAAAABAAAAAQAAAAAAADA5AAAAAAAA3dUAAAACAAAAAAAAAGQAAAACAAAAAAAAAAEAAAAA0pjFgVcRZZHpMgnpXHpb/xIbLh0/YYto0PzI7+Xl5HAAAAAAAAAAAlQL5AAAAAAAAAAACgAAAAVoZWxsbwAAAAAAAAEAAAAFd29ybGQAAAAAAAAAAAAAAvKHnQkAAABAM4dg0J1LEFBmbDESJ5d+60WCuZC8lnA80g45qyEgz2oRBSNw1mOfZETnL/BgrebkG/K03oI2Wqcs9lvDKrDGDE0sOBsAAAAglOgiOlGKwWqMsRCrGVLvFNosELJkZFw4yLPYK9KyAAA="
         assert te.to_xdr() == te_xdr
-        restore_te = TransactionEnvelope.from_xdr(te_xdr, network)
+        restore_te = TransactionEnvelope.from_xdr(
+            te_xdr, Network.PUBLIC_NETWORK_PASSPHRASE
+        )
         assert restore_te.to_xdr() == te_xdr
 
     def test_already_signed_raise(self):
@@ -54,8 +55,7 @@ class TestTransactionEnvelope:
         time_bounds = TimeBounds(12345, 56789)
         ops = [Payment(destination, asset, amount), ManageData("hello", "world")]
         tx = Transaction(source, sequence, fee, ops, memo, time_bounds)
-        network = Network.public_network()
-        te = TransactionEnvelope(tx, network)
+        te = TransactionEnvelope(tx, Network.PUBLIC_NETWORK_PASSPHRASE)
         assert binascii.hexlify(te.hash()).decode() == te.hash_hex()
         # te.sign(source)
         te.sign("SCCS5ZBI7WVIJ4SW36WGOQQIWJYCL3VOAULSXX3FB57USIO25EDOYQHH")

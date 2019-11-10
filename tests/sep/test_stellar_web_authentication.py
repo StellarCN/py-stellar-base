@@ -30,7 +30,7 @@ class TestStellarWebAuthentication:
         )
 
         transaction = TransactionEnvelope.from_xdr(
-            challenge, network=Network(network_passphrase)
+            challenge, network_passphrase
         ).transaction
         assert len(transaction.operations) == 1
         op = transaction.operations[0]
@@ -63,9 +63,7 @@ class TestStellarWebAuthentication:
             timeout=timeout,
         )
 
-        transaction = TransactionEnvelope.from_xdr(
-            challenge, Network(network_passphrase)
-        )
+        transaction = TransactionEnvelope.from_xdr(challenge, network_passphrase)
         transaction.sign(client_kp)
         challenge_tx = transaction.to_xdr()
         verify_challenge_transaction(
@@ -113,9 +111,7 @@ class TestStellarWebAuthentication:
             server_kp.secret, client_kp.public_key, anchor_name, network_passphrase
         )
 
-        transaction = TransactionEnvelope.from_xdr(
-            challenge, Network(network_passphrase)
-        )
+        transaction = TransactionEnvelope.from_xdr(challenge, network_passphrase)
         transaction.sign(client_kp)
 
         challenge_tx = transaction.to_xdr()
@@ -256,9 +252,7 @@ class TestStellarWebAuthentication:
         )
         challenge = transaction_builder.build().to_xdr()
 
-        transaction = TransactionEnvelope.from_xdr(
-            challenge, Network(network_passphrase)
-        )
+        transaction = TransactionEnvelope.from_xdr(challenge, network_passphrase)
         transaction.sign(client_kp)
         challenge_tx = transaction.to_xdr()
         with pytest.raises(

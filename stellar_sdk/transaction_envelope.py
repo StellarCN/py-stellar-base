@@ -23,17 +23,17 @@ class TransactionEnvelope:
     :param transaction: The transaction that is encapsulated in this envelope.
     :param list signatures: which contains a list of signatures that have
           already been created.
-    :param str network: which network this transaction envelope is associated with.
+    :param network_passphrase: The network to connect to for verifying and retrieving additional attributes from.
     """
 
     def __init__(
         self,
         transaction: Transaction,
-        network: Network,
+        network_passphrase: str,
         signatures: List[Xdr.types.DecoratedSignature] = None,
     ) -> None:
         self.transaction: Transaction = transaction
-        self.network_id: bytes = network.network_id()
+        self.network_id: bytes = Network(network_passphrase).network_id()
         self.signatures: List[Xdr.types.DecoratedSignature] = signatures or []
 
     def hash(self) -> bytes:
@@ -137,23 +137,24 @@ class TransactionEnvelope:
 
     @classmethod
     def from_xdr_object(
-        cls, te_xdr_object: Xdr.types.TransactionEnvelope, network: Network
+        cls, te_xdr_object: Xdr.types.TransactionEnvelope, network_passphrase: str
     ) -> "TransactionEnvelope":
         """Create a new :class:`TransactionEnvelope` from an XDR object.
 
         :param te_xdr_object: The XDR object that represents a transaction envelope.
-        :param network: which network this transaction envelope is associated with.
-
+        :param network_passphrase: The network to connect to for verifying and retrieving additional attributes from.
         :return: A new :class:`TransactionEnvelope` object from the given XDR TransactionEnvelope object.
         """
         signatures = te_xdr_object.signatures
         tx_xdr_object = te_xdr_object.tx
         tx = Transaction.from_xdr_object(tx_xdr_object)
-        te = TransactionEnvelope(tx, network=network, signatures=signatures)
+        te = TransactionEnvelope(
+            tx, network_passphrase=network_passphrase, signatures=signatures
+        )
         return te
 
     @classmethod
-    def from_xdr(cls, xdr: str, network: Network) -> "TransactionEnvelope":
+    def from_xdr(cls, xdr: str, network_passphrase: str) -> "TransactionEnvelope":
         """Create a new :class:`TransactionEnvelope` from an XDR string.
 
         :param xdr: The XDR string that represents a transaction
@@ -163,4 +164,4 @@ class TransactionEnvelope:
         :return: A new :class:`TransactionEnvelope` object from the given XDR TransactionEnvelope base64 string object.
         """
         xdr_object = Xdr.types.TransactionEnvelope.from_xdr(xdr)
-        return cls.from_xdr_object(xdr_object, network)
+        return cls.from_xdr_object(xdr_object, network_passphrase)

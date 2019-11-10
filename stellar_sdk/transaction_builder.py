@@ -36,7 +36,7 @@ class TransactionBuilder:
 
     :param source_account: The source account for this transaction.
     :param network_passphrase: The network to connect to for verifying and retrieving additional attributes from.
-        Defaults to **TESTNET**.
+        Defaults to **Test SDF Network ; September 2015**.
     :param base_fee: Base fee in stroops. The network base fee is obtained by default from the latest ledger.
         Transaction fee is equal to base fee times number of operations in this transaction.
     """
@@ -50,7 +50,7 @@ class TransactionBuilder:
     ):
         self.source_account: Account = source_account
         self.base_fee: int = base_fee
-        self.network: Network = Network(network_passphrase)
+        self.network_passphrase: str = network_passphrase
         self.operations: List[Operation] = []
         self.time_bounds: Optional[TimeBounds] = None
         self.memo: Memo = NoneMemo()
@@ -72,28 +72,45 @@ class TransactionBuilder:
             time_bounds=self.time_bounds,
         )
         transaction_envelope = TransactionEnvelope(
-            transaction=transaction, network=self.network
+            transaction=transaction, network_passphrase=self.network_passphrase
         )
         self.source_account.increment_sequence_number()
         return transaction_envelope
 
-    @classmethod
-    def from_xdr(cls, xdr: str, network_passphrase: str) -> TransactionEnvelope:
-        """Create a :class:`TransactionEnvelope
+    @staticmethod
+    def from_xdr(xdr: str, network_passphrase: str) -> "TransactionBuilder":
+        """Create a :class:`TransactionBuilder
         <stellar_sdk.transaction_envelope.TransactionEnvelope>` via an XDR
         object.
 
         In addition, sets the fields of this builder (the transaction envelope,
         transaction, operations, source, etc.) to all of the fields in the
-        provided XDR transaction envelope.
+        provided XDR transaction envelope, but the signature will not be added to it.
 
         :param xdr: The XDR object representing the transaction envelope to
             which this builder is setting its state to.
-        :param network_passphrase: which network this transaction envelope is associated with.
+        :param network_passphrase: The network to connect to for verifying and retrieving additional attributes from.
         """
-        return TransactionEnvelope.from_xdr(
-            xdr=xdr, network=Network(network_passphrase=network_passphrase)
+        transaction_envelope = TransactionEnvelope.from_xdr(
+            xdr=xdr, network_passphrase=network_passphrase
         )
+
+        source_account = Account(
+            transaction_envelope.transaction.source.public_key,
+            transaction_envelope.transaction.sequence - 1,
+        )
+        transaction_builder = TransactionBuilder(
+            source_account=source_account,
+            network_passphrase=network_passphrase,
+            base_fee=int(
+                transaction_envelope.transaction.fee
+                / len(transaction_envelope.transaction.operations)
+            ),
+        )
+        transaction_builder.time_bounds = transaction_envelope.transaction.time_bounds
+        transaction_builder.operations = transaction_envelope.transaction.operations
+        transaction_builder.memo = transaction_envelope.transaction.memo
+        return transaction_builder
 
     def add_time_bounds(self, min_time: int, max_time: int) -> "TransactionBuilder":
         """Add a time bound to this transaction.

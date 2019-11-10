@@ -180,8 +180,8 @@ class TestTransactionBuilder:
 
         restore_te = TransactionBuilder.from_xdr(
             xdr_signed, Network.TESTNET_NETWORK_PASSPHRASE
-        )
-        assert restore_te.to_xdr() == xdr_signed
+        ).build()
+        assert restore_te.to_xdr() == xdr
         assert source.sequence == sequence + 1
 
     def test_set_timeout(self):
