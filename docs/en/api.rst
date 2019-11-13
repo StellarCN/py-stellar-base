@@ -97,6 +97,18 @@ RootCallBuilder
    :members:
    :inherited-members:
 
+StrictReceivePathsCallBuilder
+------------------------------
+.. autoclass:: stellar_sdk.call_builder.StrictReceivePathsCallBuilder
+   :members:
+   :inherited-members:
+
+StrictSendPathsCallBuilder
+------------------------------
+.. autoclass:: stellar_sdk.call_builder.StrictSendPathsCallBuilder
+   :members:
+   :inherited-members:
+
 TradeAggregationsCallBuilder
 ----------------------------
 .. autoclass:: stellar_sdk.call_builder.TradeAggregationsCallBuilder

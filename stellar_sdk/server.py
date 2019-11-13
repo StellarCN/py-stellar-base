@@ -1,4 +1,5 @@
-from typing import Union, Coroutine, Any, Dict
+import warnings
+from typing import Union, Coroutine, Any, Dict, List
 from urllib.parse import urljoin
 
 from .account import Account
@@ -14,6 +15,10 @@ from .call_builder.orderbook_call_builder import OrderbookCallBuilder
 from .call_builder.paths_call_builder import PathsCallBuilder
 from .call_builder.payments_call_builder import PaymentsCallBuilder
 from .call_builder.root_call_builder import RootCallBuilder
+from .call_builder.strict_receive_paths_call_builder import (
+    StrictReceivePathsCallBuilder,
+)
+from .call_builder.strict_send_paths_call_builder import StrictSendPathsCallBuilder
 from .call_builder.trades_aggregation_call_builder import TradeAggregationsCallBuilder
 from .call_builder.trades_call_builder import TradesCallBuilder
 from .call_builder.transactions_call_builder import TransactionsCallBuilder
@@ -178,6 +183,13 @@ class Server:
         :return: New :class:`stellar_sdk.call_builder.PathsCallBuilder` object configured by
             a current Horizon server configuration.
         """
+
+        warnings.warn(
+            "Will be removed in version v2.1.0, "
+            "use stellar_sdk.server.strict_receive_paths",
+            DeprecationWarning,
+        )
+
         return PathsCallBuilder(
             horizon_url=self.horizon_url,
             client=self._client,
@@ -185,6 +197,48 @@ class Server:
             destination_account=destination_account,
             destination_asset=destination_asset,
             destination_amount=destination_amount,
+        )
+
+    def strict_receive_paths(
+        self,
+        source: Union[str, List[Asset]],
+        destination_asset: Asset,
+        destination_amount: str,
+    ):
+        """
+        :param source: The sender's account ID or a list of Assets. Any returned path must use a source that the sender can hold.
+        :param destination_asset: The destination asset.
+        :param destination_amount: The amount, denominated in the destination asset, that any returned path should be able to satisfy.
+        :return: New :class:`stellar_sdk.call_builder.StrictReceivePathsCallBuilder` object configured by
+            a current Horizon server configuration.
+        """
+        return StrictReceivePathsCallBuilder(
+            horizon_url=self.horizon_url,
+            client=self._client,
+            source=source,
+            destination_asset=destination_asset,
+            destination_amount=destination_amount,
+        )
+
+    def strict_send_paths(
+        self,
+        source_asset: Asset,
+        source_amount: str,
+        destination: Union[str, List[Asset]],
+    ):
+        """
+        :param source_asset: The asset to be sent.
+        :param source_amount: The amount, denominated in the source asset, that any returned path should be able to satisfy.
+        :param destination: The destination account or the destination assets.
+        :return: New :class:`stellar_sdk.call_builder.StrictReceivePathsCallBuilder` object configured by
+            a current Horizon server configuration.
+        """
+        return StrictSendPathsCallBuilder(
+            horizon_url=self.horizon_url,
+            client=self._client,
+            source_asset=source_asset,
+            source_amount=source_amount,
+            destination=destination,
         )
 
     def payments(self) -> PaymentsCallBuilder:

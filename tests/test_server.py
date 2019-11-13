@@ -13,6 +13,12 @@ from stellar_sdk.call_builder.orderbook_call_builder import OrderbookCallBuilder
 from stellar_sdk.call_builder.paths_call_builder import PathsCallBuilder
 from stellar_sdk.call_builder.payments_call_builder import PaymentsCallBuilder
 from stellar_sdk.call_builder.root_call_builder import RootCallBuilder
+from stellar_sdk.call_builder.strict_receive_paths_call_builder import (
+    StrictReceivePathsCallBuilder,
+)
+from stellar_sdk.call_builder.strict_send_paths_call_builder import (
+    StrictSendPathsCallBuilder,
+)
 from stellar_sdk.call_builder.trades_aggregation_call_builder import (
     TradeAggregationsCallBuilder,
 )
@@ -100,6 +106,27 @@ class TestServer:
                 destination_account,
                 destination_asset,
                 destination_amount,
+            )
+            source = "GAYSHLG75RPSMXWJ5KX7O7STE6RSZTD6NE4CTWAXFZYYVYIFRUVJIBJH"
+            destination_asset = Asset(
+                "EUR", "GDSBCQO34HWPGUGQSP3QBFEXVTSR2PW46UIGTHVWGWJGQKH3AFNHXHXN"
+            )
+            destination_amount = "20.0"
+            assert server.strict_receive_paths(
+                source, destination_asset, destination_amount
+            ) == StrictReceivePathsCallBuilder(
+                horizon_url, client, source, destination_asset, destination_amount
+            )
+
+            source_asset = Asset(
+                "EUR", "GDSBCQO34HWPGUGQSP3QBFEXVTSR2PW46UIGTHVWGWJGQKH3AFNHXHXN"
+            )
+            source_amount = "10.25"
+            destination = "GARSFJNXJIHO6ULUBK3DBYKVSIZE7SC72S5DYBCHU7DKL22UXKVD7MXP"
+            assert server.strict_send_paths(
+                source_asset, source_amount, destination
+            ) == StrictSendPathsCallBuilder(
+                horizon_url, client, source_asset, source_amount, destination
             )
             assert server.payments() == PaymentsCallBuilder(horizon_url, client)
             assert server.root() == RootCallBuilder(horizon_url, client)

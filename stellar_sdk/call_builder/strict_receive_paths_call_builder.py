@@ -1,5 +1,4 @@
-import warnings
-from typing import Union
+from typing import Union, List
 
 from ..asset import Asset
 from ..call_builder.base_call_builder import BaseCallBuilder
@@ -7,20 +6,32 @@ from ..client.base_async_client import BaseAsyncClient
 from ..client.base_sync_client import BaseSyncClient
 
 
-class PathsCallBuilder(BaseCallBuilder):
-    """ Creates a new :class:`PathsCallBuilder` pointed to server defined by horizon_url.
+class StrictReceivePathsCallBuilder(BaseCallBuilder):
+    """Creates a new :class:`StrictReceivePathsCallBuilder` pointed to server defined by horizon_url.
     Do not create this object directly, use :func:`stellar_sdk.server.Server.paths`.
 
     The Stellar Network allows payments to be made across assets through path payments. A path payment specifies a
     series of assets to route a payment through, from source asset (the asset debited from the payer) to destination
     asset (the asset credited to the payee).
 
+    A path search is specified using:
+
+    - The source address or source assets.
+    - The asset and amount that the destination account should receive.
+
+    As part of the search, horizon will load a list of assets available to the
+    source address and will find any payment paths from those source assets to
+    the desired destination asset. The search's amount parameter will be used to
+    determine if there a given path can satisfy a payment of the desired amount.
+
+    If a list of assets is passed as the source, horizon will find any payment
+    paths from those source assets to the desired destination asset.
+
     See `Find Payment Paths <https://www.stellar.org/developers/horizon/reference/endpoints/path-finding.html>`_
-    
+
     :param horizon_url: Horizon server URL.
     :param client: The client instance used to send request.
-    :param source_account: The sender's account ID. Any returned path must use a source that the sender can hold.
-    :param destination_account: The destination account ID that any returned path should use.
+    :param source: The sender's account ID or a list of Assets. Any returned path must use a source that the sender can hold.
     :param destination_asset: The destination asset.
     :param destination_amount: The amount, denominated in the destination asset, that any returned path should be able to satisfy.
     """
@@ -29,23 +40,13 @@ class PathsCallBuilder(BaseCallBuilder):
         self,
         horizon_url: str,
         client: Union[BaseAsyncClient, BaseSyncClient],
-        source_account: str,
-        destination_account: str,
+        source: Union[str, List[Asset]],
         destination_asset: Asset,
         destination_amount: str,
     ) -> None:
-
-        warnings.warn(
-            "Will be removed in version v2.1.0, "
-            "use stellar_sdk.call_builder.StrictReceivePathsCallBuilder",
-            DeprecationWarning,
-        )
-
         super().__init__(horizon_url, client)
-        self.endpoint: str = "paths"
+        self.endpoint: str = "paths/strict-receive"
         params = {
-            "destination_account": destination_account,
-            "source_account": source_account,
             "destination_amount": destination_amount,
             "destination_asset_type": destination_asset.type,
             "destination_asset_code": None
@@ -53,4 +54,15 @@ class PathsCallBuilder(BaseCallBuilder):
             else destination_asset.code,
             "destination_asset_issuer": destination_asset.issuer,
         }
+        if isinstance(source, str):
+            params["source_account"] = source
+        else:
+            source_assets = []
+            for asset in source:
+                if asset.is_native():
+                    source_assets.append(asset.type)
+                else:
+                    source_assets.append("{}:{}".format(asset.code, asset.issuer))
+            params["source_assets"] = ",".join(source_assets)
+
         self._add_query_params(params)
