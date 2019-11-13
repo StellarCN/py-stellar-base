@@ -131,7 +131,7 @@ class BaseHorizonError(BaseRequestError):
         self.status: Optional[int] = message.get("status")
         self.detail: Optional[str] = message.get("detail")
         self.extras: Optional[dict] = message.get("extras")
-        self.result_xdr: Optional[str] = message.get("result_xdr")
+        self.result_xdr: Optional[str] = message.get("extras", {}).get("result_xdr")
 
     def __str__(self):
         return self.message
