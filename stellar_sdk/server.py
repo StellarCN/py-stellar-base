@@ -146,6 +146,7 @@ class Server:
 
     def offers(self, account_id: str) -> OffersCallBuilder:
         """
+        :param account_id: Account ID.
         :return: New :class:`stellar_sdk.call_builder.OffersCallBuilder` object configured by
             a current Horizon server configuration.
         """
@@ -162,6 +163,8 @@ class Server:
 
     def orderbook(self, selling: Asset, buying: Asset) -> OrderbookCallBuilder:
         """
+        :param selling: Asset being sold
+        :param buying: Asset being bought
         :return: New :class:`stellar_sdk.call_builder.OrderbookCallBuilder` object configured by
             a current Horizon server configuration.
         """
@@ -180,6 +183,10 @@ class Server:
         destination_amount: str,
     ) -> PathsCallBuilder:
         """
+        :param source_account: The sender's account ID. Any returned path must use a source that the sender can hold.
+        :param destination_account: The destination account ID that any returned path should use.
+        :param destination_asset: The destination asset.
+        :param destination_amount: The amount, denominated in the destination asset, that any returned path should be able to satisfy.
         :return: New :class:`stellar_sdk.call_builder.PathsCallBuilder` object configured by
             a current Horizon server configuration.
         """
@@ -258,6 +265,16 @@ class Server:
         offset: int = None,
     ) -> TradeAggregationsCallBuilder:
         """
+        :param base: base asset
+        :param counter: counter asset
+        :param resolution: segment duration as millis since epoch. *Supported values
+            are 1 minute (60000), 5 minutes (300000), 15 minutes (900000),
+            1 hour (3600000), 1 day (86400000) and 1 week (604800000).*
+        :param start_time: lower time boundary represented as millis since epoch
+        :param end_time: upper time boundary represented as millis since epoch
+        :param offset: segments can be offset using this parameter.
+            Expressed in milliseconds. *Can only be used if the resolution is greater than 1 hour.
+            Value must be in whole hours, less than the provided resolution, and less than 24 hours.*
         :return: New :class:`stellar_sdk.call_builder.TradeAggregationsCallBuilder` object configured by
             a current Horizon server configuration.
         """
