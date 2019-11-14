@@ -13,6 +13,8 @@ from .root_call_builder import RootCallBuilder
 from .trades_aggregation_call_builder import TradeAggregationsCallBuilder
 from .trades_call_builder import TradesCallBuilder
 from .transactions_call_builder import TransactionsCallBuilder
+from .strict_receive_paths_call_builder import StrictReceivePathsCallBuilder
+from .strict_send_paths_call_builder import StrictSendPathsCallBuilder
 
 __all__ = [
     "AccountsCallBuilder",
@@ -27,6 +29,8 @@ __all__ = [
     "PathsCallBuilder",
     "PaymentsCallBuilder",
     "RootCallBuilder",
+    "StrictReceivePathsCallBuilder",
+    "StrictSendPathsCallBuilder",
     "TradeAggregationsCallBuilder",
     "TradesCallBuilder",
     "TransactionsCallBuilder",
