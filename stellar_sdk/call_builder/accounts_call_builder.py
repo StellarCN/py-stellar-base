@@ -30,3 +30,14 @@ class AccountsCallBuilder(BaseCallBuilder):
         """
         self.endpoint = "accounts/{account_id}".format(account_id=account_id)
         return self
+
+    def signer(self, signer: str) -> "AccountsCallBuilder":
+        """Get all the accounts that contain the signer.
+
+        See `Account Details <https://www.stellar.org/developers/horizon/reference/endpoints/accounts-single.html>`_
+
+        :param signer: signer's account id, for example: `GDGQVOKHW4VEJRU2TETD6DBRKEO5ERCNF353LW5WBFW3JJWQ2BRQ6KDD`
+        :return:
+        """
+        self._add_query_param("signer", signer)
+        return self

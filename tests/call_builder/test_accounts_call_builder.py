@@ -14,3 +14,9 @@ class TestAccountsCallBuilder:
 
         assert builder.endpoint == "accounts/{}".format(account_id)
         assert builder.params == {}
+
+    def test_signer(self):
+        signer = "GA7YNBW5CBTJZ3ZZOWX3ZNBKD6OE7A7IHUQVWMY62W2ZBG2SGZVOOPVH"
+        builder = AccountsCallBuilder(horizon_url, client).signer(signer)
+        assert builder.endpoint == "accounts"
+        assert builder.params == {"signer": signer}
