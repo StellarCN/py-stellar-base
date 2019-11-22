@@ -1,5 +1,6 @@
 from typing import Union, List
 
+from ..utils import convert_assets_to_horizon_param
 from ..asset import Asset
 from ..call_builder.base_call_builder import BaseCallBuilder
 from ..client.base_async_client import BaseAsyncClient
@@ -57,12 +58,6 @@ class StrictReceivePathsCallBuilder(BaseCallBuilder):
         if isinstance(source, str):
             params["source_account"] = source
         else:
-            source_assets = []
-            for asset in source:
-                if asset.is_native():
-                    source_assets.append(asset.type)
-                else:
-                    source_assets.append("{}:{}".format(asset.code, asset.issuer))
-            params["source_assets"] = ",".join(source_assets)
+            params["source_assets"] = convert_assets_to_horizon_param(source)
 
         self._add_query_params(params)

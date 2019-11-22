@@ -1,5 +1,6 @@
 from typing import Union, List
 
+from ..utils import convert_assets_to_horizon_param
 from ..asset import Asset
 from ..call_builder.base_call_builder import BaseCallBuilder
 from ..client.base_async_client import BaseAsyncClient
@@ -58,11 +59,5 @@ class StrictSendPathsCallBuilder(BaseCallBuilder):
         if isinstance(destination, str):
             params["destination_account"] = destination
         else:
-            destination_assets = []
-            for asset in destination:
-                if asset.is_native():
-                    destination_assets.append(asset.type)
-                else:
-                    destination_assets.append("{}:{}".format(asset.code, asset.issuer))
-            params["destination_assets"] = ",".join(destination_assets)
+            params["destination_assets"] = convert_assets_to_horizon_param(destination)
         self._add_query_params(params)

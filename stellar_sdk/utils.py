@@ -1,6 +1,9 @@
 import hashlib
 from decimal import Decimal, ROUND_FLOOR
 
+from typing import List
+
+from .asset import Asset
 from .exceptions import NoApproximationError, TypeError
 
 
@@ -54,3 +57,13 @@ def hex_to_bytes(hex_string):
     if isinstance(hex_string, str):
         return bytes.fromhex(hex_string)
     raise TypeError("`hex_string` should be a 32 byte hash or hex encoded string.")
+
+
+def convert_assets_to_horizon_param(assets: List[Asset]) -> str:
+    assets_string = []
+    for asset in assets:
+        if asset.is_native():
+            assets_string.append(asset.type)
+        else:
+            assets_string.append("{}:{}".format(asset.code, asset.issuer))
+    return ",".join(assets_string)
