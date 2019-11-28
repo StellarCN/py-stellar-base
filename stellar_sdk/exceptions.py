@@ -1,3 +1,4 @@
+from json import JSONDecodeError
 from typing import Optional
 
 from .client.response import Response
@@ -124,11 +125,17 @@ class BaseHorizonError(BaseRequestError):
 
     def __init__(self, response: Response) -> None:
         super().__init__(response)
-        message = response.json()
+
         self.message: str = response.text
+        self.status: int = response.status_code
+
+        message = {}
+        try:
+            message = response.json()
+        except JSONDecodeError:
+            pass
         self.type: Optional[str] = message.get("type")
         self.title: Optional[str] = message.get("title")
-        self.status: Optional[int] = message.get("status")
         self.detail: Optional[str] = message.get("detail")
         self.extras: Optional[dict] = message.get("extras")
         self.result_xdr: Optional[str] = message.get("extras", {}).get("result_xdr")
