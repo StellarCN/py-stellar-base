@@ -37,12 +37,8 @@ Stellar Python SDK
     :target: https://pypi.python.org/pypi/stellar-sdk
 
 .. note::
-    This branch is about v2, which is currently in beta. Click `here <https://github.com/StellarCN/py-stellar-base/tree/v1>`_ for the v1 branch.
+    This branch is about v2, click `here <https://github.com/StellarCN/py-stellar-base/tree/v1>`_ for the v1 branch.
     Thank you for your patience as we transition!
-
-.. warning::
-    This is a beta release, please help us find bugs in the SDK
-    so we can release a stable version as soon as possible :-)
 
 py-stellar-sdk is a Python library for communicating with
 a `Stellar Horizon server`_. It is used for building Stellar apps on Python. It supports **Python 3.6+** as

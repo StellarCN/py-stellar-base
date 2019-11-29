@@ -39,11 +39,6 @@ Stellar Python SDK
 .. note::
     此页面呈现的是 V2 版本，如果你想使用 V1 版本请点击 `这里 <https://github.com/StellarCN/py-stellar-base/tree/v1>`_。
 
-.. warning::
-    此 SDK 当前仍是 Beta 版本，请帮助我们找个其中的 Bug :-)
-
-
-
 py-stellar-sdk 是用于开发 Stellar 应用程序的 Python 库。它目前支持 Python 3.6+ 和 PyPy3.6+。
 
 它提供了：
