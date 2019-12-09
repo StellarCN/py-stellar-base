@@ -461,6 +461,9 @@ TransactionBuilder
 
 Stellar Ecosystem Proposals
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+SEP 0001: stellar.toml
+----------------------
+.. autofunction:: stellar_sdk.sep.stellar_toml.fetch_stellar_toml
 
 SEP 0005: Key Derivation Methods for Stellar Accounts
 -----------------------------------------------------
@@ -477,4 +480,5 @@ SEP 0010: Stellar Web Authentication
 
 Exceptions
 ----------
+.. autoclass:: stellar_sdk.sep.exceptions.StellarTomlNotFoundError
 .. autoclass:: stellar_sdk.sep.exceptions.InvalidSep10ChallengeError

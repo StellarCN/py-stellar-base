@@ -37,7 +37,7 @@ Stellar Python SDK
     :target: https://pypi.python.org/pypi/stellar-sdk
 
 .. note::
-    This branch is about v2, click `here <https://github.com/StellarCN/py-stellar-base/tree/v1>`_ for the v1 branch.
+    This branch is about v2, click `here <https://github.com/StellarCN/py-stellar-base/tree/v1>`__ for the v1 branch.
     Thank you for your patience as we transition!
 
 py-stellar-sdk is a Python library for communicating with
