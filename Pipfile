@@ -21,6 +21,7 @@ aiohttp = "*"
 aiohttp-sse-client = "*"
 stellar-base-sseclient = "*"
 mnemonic = "*"
+toml = "*"
 
 [requires]
 python_version = "3.7"
