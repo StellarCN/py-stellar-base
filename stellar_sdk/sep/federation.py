@@ -1,3 +1,12 @@
+"""
+SEP: 0002
+Title: Federation protocol
+Author: stellar.org
+Status: Final
+Created: 2017-10-30
+Updated: 2019-10-10
+Version 1.1.0
+"""
 from typing import Optional, Union, Coroutine, Any
 
 from ..exceptions import ValueError

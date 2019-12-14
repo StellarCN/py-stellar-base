@@ -1,3 +1,12 @@
+"""
+SEP: 0001
+Title: stellar.toml
+Author: stellar.org
+Status: Active
+Created: 2017-10-30
+Updated: 2019-06-12
+Version: 2.1.0
+"""
 from typing import Union, Dict, Any, Coroutine
 
 import toml
@@ -19,14 +28,6 @@ def fetch_stellar_toml(
     Retrieve the stellar.toml file for information about interacting with
     Stellar's federation protocol for a given Stellar Anchor (specified by a
     domain).
-
-    SEP: 0001
-    Title: stellar.toml
-    Author: stellar.org
-    Status: Active
-    Created: 2017-10-30
-    Updated: 2019-06-12
-    Version: 2.1.0
 
     :param domain: The domain the .toml file is hosted at.
     :param use_http: Specifies whether the request should go over plain HTTP vs HTTPS.
