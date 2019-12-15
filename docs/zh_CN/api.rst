@@ -465,6 +465,13 @@ SEP 0001: stellar.toml
 ----------------------
 .. autofunction:: stellar_sdk.sep.stellar_toml.fetch_stellar_toml
 
+SEP 0002: Federation protocol
+----------------------
+.. autofunction:: stellar_sdk.sep.federation.resolve_stellar_address
+.. autofunction:: stellar_sdk.sep.federation.resolve_account_id
+.. autoclass:: stellar_sdk.sep.federation.FederationRecord
+   :members:
+
 SEP 0005: Key Derivation Methods for Stellar Accounts
 -----------------------------------------------------
 .. autoclass:: stellar_sdk.sep.mnemonic.StellarMnemonic
