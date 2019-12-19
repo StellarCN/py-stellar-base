@@ -161,10 +161,11 @@ class Server:
         """
         return OperationsCallBuilder(horizon_url=self.horizon_url, client=self._client)
 
-    def orderbook(self, selling: Asset, buying: Asset) -> OrderbookCallBuilder:
+    def orderbook(self, selling: Asset, buying: Asset, limit: int) -> OrderbookCallBuilder:
         """
         :param selling: Asset being sold
         :param buying: Asset being bought
+        :limit: Limit the number of items returned (default 20)
         :return: New :class:`stellar_sdk.call_builder.OrderbookCallBuilder` object configured by
             a current Horizon server configuration.
         """
@@ -173,6 +174,7 @@ class Server:
             client=self._client,
             buying=buying,
             selling=selling,
+            limit=limit,
         )
 
     def paths(
