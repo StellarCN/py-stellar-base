@@ -16,6 +16,7 @@ class OrderbookCallBuilder(BaseCallBuilder):
     :param client: The client instance used to send request.
     :param selling: Asset being sold
     :param buying: Asset being bought
+    :param limit: Limit the number of items returned (default 20)
     """
 
     def __init__(
@@ -24,6 +25,7 @@ class OrderbookCallBuilder(BaseCallBuilder):
         client: Union[BaseAsyncClient, BaseSyncClient],
         selling: Asset,
         buying: Asset,
+        limit: int,
     ) -> None:
         super().__init__(horizon_url, client)
         self.endpoint: str = "order_book"
@@ -34,5 +36,6 @@ class OrderbookCallBuilder(BaseCallBuilder):
             "buying_asset_type": buying.type,
             "buying_asset_code": None if buying.is_native() else buying.code,
             "buying_asset_issuer": buying.issuer,
+            "limit": limit,
         }
         self._add_query_params(params)
