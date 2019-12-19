@@ -161,7 +161,7 @@ class Server:
         """
         return OperationsCallBuilder(horizon_url=self.horizon_url, client=self._client)
 
-    def orderbook(self, selling: Asset, buying: Asset, limit: int) -> OrderbookCallBuilder:
+    def orderbook(self, selling: Asset, buying: Asset, limit=20) -> OrderbookCallBuilder:
         """
         :param selling: Asset being sold
         :param buying: Asset being bought
