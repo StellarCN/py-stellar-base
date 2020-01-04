@@ -1,6 +1,13 @@
 Release History
 ===============
 
+### Version 2.1.0
+Released on January 04, 2020
+
+* feat: add support for SEP-0001 (stellar.toml).
+* feat: add support for SEP-0002 (Federation protocol).
+* perf: Adjust the client's default timeout.
+
 ### Version 2.0.0
 Released on November 29, 2019
 
