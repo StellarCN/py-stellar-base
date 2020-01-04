@@ -13,8 +13,8 @@ from ..client.base_sync_client import BaseSyncClient
 from ..client.response import Response
 from ..exceptions import ConnectionError
 
-# two ledgers + 1 sec, let's retry faster and not wait 60 secs.
-DEFAULT_REQUEST_TIMEOUT = 11
+# four ledgers sec, let's retry faster and not wait 60 secs.
+DEFAULT_REQUEST_TIMEOUT = 20
 DEFAULT_NUM_RETRIES = 3
 DEFAULT_BACKOFF_FACTOR = 0.5
 USER_AGENT = "py-stellar-sdk/%s/RequestsClient" % __version__

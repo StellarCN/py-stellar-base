@@ -12,8 +12,8 @@ from ..__version__ import __version__
 
 logger = logging.getLogger(__name__)
 
-# two ledgers + 1 sec, let's retry faster and not wait 60 secs.
-DEFAULT_REQUEST_TIMEOUT = 11
+# four ledgers sec, let's retry faster and not wait 60 secs.
+DEFAULT_REQUEST_TIMEOUT = 20
 DEFAULT_NUM_RETRIES = 3
 DEFAULT_BACKOFF_FACTOR = 0.5
 USER_AGENT = "py-stellar-sdk/%s/AiohttpClient" % __version__
