@@ -6,6 +6,7 @@ from .account import Account
 from .asset import Asset
 from .call_builder.accounts_call_builder import AccountsCallBuilder
 from .call_builder.assets_call_builder import AssetsCallBuilder
+from .call_builder.data_call_builder import DataCallBuilder
 from .call_builder.effects_call_builder import EffectsCallBuilder
 from .call_builder.fee_stats_call_builder import FeeStatsCallBuilder
 from .call_builder.ledgers_call_builder import LedgersCallBuilder
@@ -122,6 +123,18 @@ class Server:
             a current Horizon server configuration.
         """
         return AssetsCallBuilder(horizon_url=self.horizon_url, client=self._client)
+
+    def data(self, account_id: str, data_name: str):
+        """
+        :return: New :class:`stellar_sdk.call_builder.DataCallBuilder` object configured by
+            a current Horizon server configuration.
+        """
+        return DataCallBuilder(
+            horizon_url=self.horizon_url,
+            client=self._client,
+            account_id=account_id,
+            data_name=data_name,
+        )
 
     def effects(self) -> EffectsCallBuilder:
         """

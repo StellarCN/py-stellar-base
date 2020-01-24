@@ -51,7 +51,9 @@ class TestFederation:
             FederationServerNotFoundError,
             match="Unable to find federation server at sdk-test.overcat.me.",
         ):
-            await resolve_stellar_address("hello*sdk-test.overcat.me", client=AiohttpClient())
+            await resolve_stellar_address(
+                "hello*sdk-test.overcat.me", client=AiohttpClient()
+            )
 
     def test_resolve_by_stellar_address_with_federation_url_sync(self):
         record = resolve_stellar_address(
@@ -104,7 +106,9 @@ class TestFederation:
             FederationServerNotFoundError,
             match="Unable to find federation server at sdk-test.overcat.me.",
         ):
-            await resolve_account_id(self.ACCOUNT_ID, domain="sdk-test.overcat.me", client=AiohttpClient())
+            await resolve_account_id(
+                self.ACCOUNT_ID, domain="sdk-test.overcat.me", client=AiohttpClient()
+            )
 
     def test_not_found_record_at_federation(self):
         with pytest.raises(BadFederationResponseError) as err:
