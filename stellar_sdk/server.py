@@ -157,15 +157,12 @@ class Server:
         """
         return LedgersCallBuilder(horizon_url=self.horizon_url, client=self._client)
 
-    def offers(self, account_id: str) -> OffersCallBuilder:
+    def offers(self) -> OffersCallBuilder:
         """
-        :param account_id: Account ID.
         :return: New :class:`stellar_sdk.call_builder.OffersCallBuilder` object configured by
             a current Horizon server configuration.
         """
-        return OffersCallBuilder(
-            horizon_url=self.horizon_url, client=self._client, account_id=account_id
-        )
+        return OffersCallBuilder(horizon_url=self.horizon_url, client=self._client)
 
     def operations(self) -> OperationsCallBuilder:
         """
