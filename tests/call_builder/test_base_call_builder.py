@@ -139,26 +139,6 @@ class TestBaseCallBuilder:
         )
         assert exception.extras is None
 
-    @pytest.mark.asyncio
-    async def test_get_data_async(self):
-        url = "https://httpbin.org/get"
-        client = AiohttpClient()
-        resp = (
-            await BaseCallBuilder(url, client)
-            .cursor(89777)
-            .order(desc=False)
-            .limit(25)
-            .call()
-        )
-
-        assert resp["args"] == {"cursor": "89777", "limit": "25", "order": "asc"}
-        assert resp["headers"][
-            "User-Agent"
-        ] == "py-stellar-sdk/{}/AiohttpClient".format(__version__)
-        assert resp["headers"]["X-Client-Name"] == "py-stellar-sdk"
-        assert resp["headers"]["X-Client-Version"] == __version__
-        assert resp["url"] == "https://httpbin.org/get?cursor=89777&order=asc&limit=25"
-
     def test_get_data_no_link(self):
         url = "https://httpbin.org/get"
         client = RequestsClient()
