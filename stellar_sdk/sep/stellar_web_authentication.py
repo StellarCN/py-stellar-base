@@ -73,11 +73,24 @@ def verify_challenge_transaction(
         4. verify that transaction contains a single Manage Data operation and it's source account is not null;
         5. verify that transaction envelope has a correct signature by server's signing key;
 
-    If `client_account_signers` is not passed:
+    If `client_account_signers` and `threshold` are not passed:
         6. verify that transaction envelope has a correct signature by the operation's source account;
     else:
         6. verify that transaction envelope's signers are signers for the client's account;
         7. verify that the envelope's signers' cumulative weight meets or exceeds `threshold`;
+
+    For multi-signature accounts, pass both `client_account_signers` and `threshold`. These variables can be
+    retrieved by making a call to Horizon:
+    ::
+
+        from stellar_sdk.server import Server
+        from stellar_sdk.sep.stellar_web_authentication import read_challenge_xdr
+
+        transaction, source_account = read_challenge_xdr(<envelope XDR>)
+        server = Server(horizon_url=<horizon url>)
+        account_json = server.accounts().account_id(source_account).call()
+        client_account_signers = account_json["signers"]
+        threshold = account_json["thresholds"][<"low_threshold", "med_threshold", or "high_threshold">]
 
     :param challenge_transaction: SEP0010 transaction challenge transaction in base64.
     :param server_account_id: public key for server's account.
