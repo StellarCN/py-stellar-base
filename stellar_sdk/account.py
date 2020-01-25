@@ -1,3 +1,6 @@
+from typing import Optional, List
+
+from .sep.ed25519_public_key_signer import Ed25519PublicKeySigner
 from .strkey import StrKey
 
 __all__ = ["Account"]
@@ -30,11 +33,24 @@ class Account:
         self.account_id: str = account_id
         self.sequence: int = sequence
 
+        # You should not use it directly, it will be removed in 3.0.
+        self._signers: Optional[dict] = None
+
     def increment_sequence_number(self) -> None:
         """
         Increments sequence number in this object by one.
         """
         self.sequence += 1
+
+    def load_ed25519_public_key_signers(self) -> List[Ed25519PublicKeySigner]:
+        """
+        Load SEP-0010 Signers, may change in 3.0.
+        """
+        sep0010_signers = []
+        for signer in self._signers:
+            if signer['type'] == 'ed25519_public_key':
+                sep0010_signers.append(Ed25519PublicKeySigner(signer['key'], signer['weight']))
+        return sep0010_signers
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):

@@ -2,15 +2,21 @@ import os
 import time
 
 import pytest
-from stellar_sdk.sep.exceptions import InvalidSep10ChallengeError
-from stellar_sdk.operation import ManageData
+
 from stellar_sdk import Keypair, Network, Account
+from stellar_sdk.operation import ManageData
+from stellar_sdk.sep.ed25519_public_key_signer import Ed25519PublicKeySigner
+from stellar_sdk.sep.exceptions import InvalidSep10ChallengeError
 from stellar_sdk.sep.stellar_web_authentication import (
     build_challenge_transaction,
     verify_challenge_transaction,
+    _verify_transaction_signatures,
+    verify_challenge_transaction_signers,
+    verify_challenge_transaction_signer,
+    verify_challenge_transaction_threshold,
 )
-from stellar_sdk.transaction_envelope import TransactionEnvelope
 from stellar_sdk.transaction_builder import TransactionBuilder
+from stellar_sdk.transaction_envelope import TransactionEnvelope
 
 
 class TestStellarWebAuthentication:
@@ -257,7 +263,7 @@ class TestStellarWebAuthentication:
         challenge_tx = transaction.to_xdr()
         with pytest.raises(
             InvalidSep10ChallengeError,
-            match="transaction not signed by server: {}".format(server_kp.public_key),
+            match="Transaction not signed by server: {}".format(server_kp.public_key),
         ):
             verify_challenge_transaction(
                 challenge_tx, server_kp.public_key, network_passphrase
@@ -280,7 +286,7 @@ class TestStellarWebAuthentication:
 
         with pytest.raises(
             InvalidSep10ChallengeError,
-            match="transaction not signed by client: {}".format(client_account_id),
+            match="Transaction not signed by client: {}".format(client_account_id),
         ):
             verify_challenge_transaction(
                 challenge, server_kp.public_key, network_passphrase
@@ -374,4 +380,281 @@ class TestStellarWebAuthentication:
         ):
             verify_challenge_transaction(
                 challenge_tx_signed, server_kp.public_key, network_passphrase
+            )
+
+    def test_verify_transaction_signatures(self):
+        server_kp = Keypair.random()
+        client_kp_a = Keypair.random()
+        client_kp_b = Keypair.random()
+        client_kp_c = Keypair.random()
+        timeout = 600
+        network_passphrase = Network.PUBLIC_NETWORK_PASSPHRASE
+        anchor_name = "SDF"
+
+        challenge = build_challenge_transaction(
+            server_secret=server_kp.secret,
+            client_account_id=client_kp_a.public_key,
+            anchor_name=anchor_name,
+            network_passphrase=network_passphrase,
+            timeout=timeout,
+        )
+
+        transaction = TransactionEnvelope.from_xdr(challenge, network_passphrase)
+        transaction.sign(client_kp_a)
+        transaction.sign(client_kp_b)
+        transaction.sign(client_kp_c)
+        signers = [
+            Ed25519PublicKeySigner(client_kp_a.public_key, 1),
+            Ed25519PublicKeySigner(client_kp_a.public_key, 2),
+            Ed25519PublicKeySigner(client_kp_a.public_key, 3),
+            Ed25519PublicKeySigner(Keypair.random().public_key, 4),
+        ]
+        signers_found = _verify_transaction_signatures(transaction, signers)
+        assert signers_found == [
+            Ed25519PublicKeySigner(client_kp_a.public_key, 1),
+            Ed25519PublicKeySigner(client_kp_a.public_key, 2),
+            Ed25519PublicKeySigner(client_kp_a.public_key, 3),
+        ]
+
+    def test_verify_transaction_signatures_raise_no_signature(self):
+        server_kp = Keypair.random()
+        client_kp = Keypair.random()
+        network_passphrase = Network.PUBLIC_NETWORK_PASSPHRASE
+        anchor_name = "SDF"
+        now = int(time.time())
+        nonce = os.urandom(64)
+        server_account = Account(server_kp.public_key, -1)
+        challenge_te = (
+            TransactionBuilder(server_account, network_passphrase, 100)
+            .append_manage_data_op(
+                data_name="{} auth".format(anchor_name),
+                data_value=nonce,
+                source=client_kp.public_key,
+            )
+            .add_time_bounds(now, now + 300)
+            .build()
+        )
+
+        signers = []
+        with pytest.raises(
+            InvalidSep10ChallengeError, match="Transaction has no signatures."
+        ):
+            _verify_transaction_signatures(challenge_te, signers)
+
+    def test_verify_challenge_transaction_signers(self):
+        server_kp = Keypair.random()
+        client_kp_a = Keypair.random()
+        client_kp_b = Keypair.random()
+        client_kp_c = Keypair.random()
+        timeout = 600
+        network_passphrase = Network.PUBLIC_NETWORK_PASSPHRASE
+        anchor_name = "SDF"
+
+        challenge = build_challenge_transaction(
+            server_secret=server_kp.secret,
+            client_account_id=client_kp_a.public_key,
+            anchor_name=anchor_name,
+            network_passphrase=network_passphrase,
+            timeout=timeout,
+        )
+
+        transaction = TransactionEnvelope.from_xdr(challenge, network_passphrase)
+        transaction.sign(client_kp_a)
+        transaction.sign(client_kp_b)
+        transaction.sign(client_kp_c)
+
+        challenge_tx = transaction.to_xdr()
+        signers = [
+            Ed25519PublicKeySigner(client_kp_a.public_key, 1),
+            Ed25519PublicKeySigner(client_kp_a.public_key, 3),
+            Ed25519PublicKeySigner(client_kp_a.public_key, 4),
+            Ed25519PublicKeySigner(Keypair.random().public_key, 255),
+        ]
+        signers_found = verify_challenge_transaction_signers(
+            challenge_tx, server_kp.public_key, network_passphrase, signers
+        )
+        assert signers_found == [
+            Ed25519PublicKeySigner(client_kp_a.public_key, 1),
+            Ed25519PublicKeySigner(client_kp_a.public_key, 3),
+            Ed25519PublicKeySigner(client_kp_a.public_key, 4),
+        ]
+
+    def test_verify_challenge_transaction_signers_raise_no_signers(self):
+        server_kp = Keypair.random()
+        client_kp_a = Keypair.random()
+        client_kp_b = Keypair.random()
+        client_kp_c = Keypair.random()
+        timeout = 600
+        network_passphrase = Network.PUBLIC_NETWORK_PASSPHRASE
+        anchor_name = "SDF"
+
+        challenge = build_challenge_transaction(
+            server_secret=server_kp.secret,
+            client_account_id=client_kp_a.public_key,
+            anchor_name=anchor_name,
+            network_passphrase=network_passphrase,
+            timeout=timeout,
+        )
+
+        transaction = TransactionEnvelope.from_xdr(challenge, network_passphrase)
+        transaction.sign(client_kp_a)
+        transaction.sign(client_kp_b)
+        transaction.sign(client_kp_c)
+
+        challenge_tx = transaction.to_xdr()
+        signers = []
+
+        with pytest.raises(InvalidSep10ChallengeError, match="No signers provided."):
+            verify_challenge_transaction_signers(
+                challenge_tx, server_kp.public_key, network_passphrase, signers
+            )
+
+    def test_verify_challenge_transaction_signers_raise_unrecognized_signatures(self):
+        server_kp = Keypair.random()
+        client_kp_a = Keypair.random()
+        client_kp_b = Keypair.random()
+        client_kp_c = Keypair.random()
+        client_kp_unrecognized = Keypair.random()
+
+        timeout = 600
+        network_passphrase = Network.PUBLIC_NETWORK_PASSPHRASE
+        anchor_name = "SDF"
+
+        challenge = build_challenge_transaction(
+            server_secret=server_kp.secret,
+            client_account_id=client_kp_a.public_key,
+            anchor_name=anchor_name,
+            network_passphrase=network_passphrase,
+            timeout=timeout,
+        )
+
+        transaction = TransactionEnvelope.from_xdr(challenge, network_passphrase)
+        transaction.sign(client_kp_a)
+        transaction.sign(client_kp_b)
+        transaction.sign(client_kp_c)
+        transaction.sign(client_kp_unrecognized)
+
+        challenge_tx = transaction.to_xdr()
+        signers = [
+            Ed25519PublicKeySigner(client_kp_a.public_key, 1),
+            Ed25519PublicKeySigner(client_kp_a.public_key, 3),
+            Ed25519PublicKeySigner(client_kp_a.public_key, 4),
+            Ed25519PublicKeySigner(Keypair.random().public_key, 255),
+        ]
+        with pytest.raises(
+            InvalidSep10ChallengeError, match="Transaction has unrecognized signatures."
+        ):
+            verify_challenge_transaction_signers(
+                challenge_tx, server_kp.public_key, network_passphrase, signers
+            )
+
+    def test_verify_challenge_transaction_signer(self):
+        server_kp = Keypair.random()
+        client_kp = Keypair.random()
+        timeout = 600
+        network_passphrase = Network.PUBLIC_NETWORK_PASSPHRASE
+        anchor_name = "SDF"
+
+        challenge = build_challenge_transaction(
+            server_secret=server_kp.secret,
+            client_account_id=client_kp.public_key,
+            anchor_name=anchor_name,
+            network_passphrase=network_passphrase,
+            timeout=timeout,
+        )
+
+        transaction = TransactionEnvelope.from_xdr(challenge, network_passphrase)
+        transaction.sign(client_kp)
+
+        challenge_tx = transaction.to_xdr()
+        signer = Ed25519PublicKeySigner(client_kp.public_key, 1)
+
+        signers_found = verify_challenge_transaction_signer(
+            challenge_tx, server_kp.public_key, network_passphrase, signer
+        )
+        assert signers_found == [Ed25519PublicKeySigner(client_kp.public_key, 1)]
+
+    def test_verify_challenge_transaction_threshold(self):
+        server_kp = Keypair.random()
+        client_kp_a = Keypair.random()
+        client_kp_b = Keypair.random()
+        client_kp_c = Keypair.random()
+        timeout = 600
+        network_passphrase = Network.PUBLIC_NETWORK_PASSPHRASE
+        anchor_name = "SDF"
+
+        challenge = build_challenge_transaction(
+            server_secret=server_kp.secret,
+            client_account_id=client_kp_a.public_key,
+            anchor_name=anchor_name,
+            network_passphrase=network_passphrase,
+            timeout=timeout,
+        )
+
+        transaction = TransactionEnvelope.from_xdr(challenge, network_passphrase)
+        transaction.sign(client_kp_a)
+        transaction.sign(client_kp_b)
+        transaction.sign(client_kp_c)
+
+        challenge_tx = transaction.to_xdr()
+        signers = [
+            Ed25519PublicKeySigner(client_kp_a.public_key, 1),
+            Ed25519PublicKeySigner(client_kp_a.public_key, 3),
+            Ed25519PublicKeySigner(client_kp_a.public_key, 4),
+            Ed25519PublicKeySigner(Keypair.random().public_key, 255),
+        ]
+        med_threshold = 7
+        signers_found = verify_challenge_transaction_threshold(
+            challenge_tx,
+            server_kp.public_key,
+            network_passphrase,
+            med_threshold,
+            signers,
+        )
+        assert signers_found == [
+            Ed25519PublicKeySigner(client_kp_a.public_key, 1),
+            Ed25519PublicKeySigner(client_kp_a.public_key, 3),
+            Ed25519PublicKeySigner(client_kp_a.public_key, 4),
+        ]
+
+    def test_verify_challenge_transaction_threshold_raise_not_meet_threshold(self):
+        server_kp = Keypair.random()
+        client_kp_a = Keypair.random()
+        client_kp_b = Keypair.random()
+        client_kp_c = Keypair.random()
+        timeout = 600
+        network_passphrase = Network.PUBLIC_NETWORK_PASSPHRASE
+        anchor_name = "SDF"
+
+        challenge = build_challenge_transaction(
+            server_secret=server_kp.secret,
+            client_account_id=client_kp_a.public_key,
+            anchor_name=anchor_name,
+            network_passphrase=network_passphrase,
+            timeout=timeout,
+        )
+
+        transaction = TransactionEnvelope.from_xdr(challenge, network_passphrase)
+        transaction.sign(client_kp_a)
+        transaction.sign(client_kp_b)
+        transaction.sign(client_kp_c)
+
+        challenge_tx = transaction.to_xdr()
+        signers = [
+            Ed25519PublicKeySigner(client_kp_a.public_key, 1),
+            Ed25519PublicKeySigner(client_kp_a.public_key, 3),
+            Ed25519PublicKeySigner(client_kp_a.public_key, 4),
+            Ed25519PublicKeySigner(Keypair.random().public_key, 255),
+        ]
+        med_threshold = 10
+        with pytest.raises(
+            InvalidSep10ChallengeError,
+            match="signers with weight 8 do not meet threshold 10.",
+        ):
+            verify_challenge_transaction_threshold(
+                challenge_tx,
+                server_kp.public_key,
+                network_passphrase,
+                med_threshold,
+                signers,
             )

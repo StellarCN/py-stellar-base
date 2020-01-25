@@ -327,12 +327,16 @@ class Server:
     async def __load_account_async(self, account_id: str) -> Account:
         resp = await self.accounts().account_id(account_id=account_id).call()
         sequence = int(resp["sequence"])
-        return Account(account_id=account_id, sequence=sequence)
+        account = Account(account_id=account_id, sequence=sequence)
+        account._signers = resp['signers']
+        return account
 
     def __load_account_sync(self, account_id: str) -> Account:
         resp = self.accounts().account_id(account_id=account_id).call()
         sequence = int(resp["sequence"])
-        return Account(account_id=account_id, sequence=sequence)
+        account = Account(account_id=account_id, sequence=sequence)
+        account._signers = resp['signers']
+        return account
 
     def fetch_base_fee(self) -> Union[int, Coroutine[Any, Any, int]]:
         """Fetch the base fee. Since this hits the server, if the server call fails,
