@@ -27,7 +27,7 @@ __all__ = [
     "verify_challenge_transaction_signed_by_client",
     "verify_challenge_transaction_threshold",
     "read_challenge_transaction",
-    "verify_challenge_transaction"
+    "verify_challenge_transaction",
 ]
 
 
@@ -269,10 +269,7 @@ def verify_challenge_transaction_threshold(
         challenge_transaction, server_account_id, network_passphrase, signers
     )
 
-    weight = 0
-    for signer in signers_found:
-        weight += signer.weight
-
+    weight = sum(signer.weight for signer in signers_found)
     if weight < threshold:
         raise InvalidSep10ChallengeError(
             "signers with weight %d do not meet threshold %d." % (weight, threshold)
@@ -340,9 +337,12 @@ def _verify_te_signed_by(
     transaction_envelope: TransactionEnvelope, account_id: str
 ) -> bool:
     kp = Keypair.from_public_key(account_id)
+    tx_hash = transaction_envelope.hash()
     for decorated_signature in transaction_envelope.signatures:
+        if decorated_signature.hint != kp.signature_hint():
+            continue
         try:
-            kp.verify(transaction_envelope.hash(), decorated_signature.signature)
+            kp.verify(tx_hash, decorated_signature.signature)
             return True
         except BadSignatureError:
             pass
