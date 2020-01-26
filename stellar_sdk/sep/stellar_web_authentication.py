@@ -27,6 +27,7 @@ __all__ = [
     "verify_challenge_transaction_signed_by_client",
     "verify_challenge_transaction_threshold",
     "read_challenge_transaction",
+    "verify_challenge_transaction"
 ]
 
 
@@ -284,7 +285,7 @@ def verify_challenge_transaction(
     challenge_transaction: str, server_account_id: str, network_passphrase: str
 ) -> None:
     """Verifies if a transaction is a valid
-    `SEP0010 <https://github.com/stellar/stellar-protocol/blob/master/ecosystem/sep-0010.md>`_
+    `SEP0010 v1.2 <https://github.com/stellar/stellar-protocol/blob/master/ecosystem/sep-0010.md>`_
     challenge transaction, if the validation fails, an exception will be thrown.
 
     This function performs the following checks:
