@@ -33,8 +33,9 @@ class Account:
         self.account_id: str = account_id
         self.sequence: int = sequence
 
-        # You should not use it directly, it will be removed in 3.0.
-        self._signers: Optional[dict] = None
+        # The following properties will change in 3.0
+        self.signers: Optional[dict] = None
+        self.thresholds: Optional[Thresholds] = None
 
     def increment_sequence_number(self) -> None:
         """
@@ -44,13 +45,15 @@ class Account:
 
     def load_ed25519_public_key_signers(self) -> List[Ed25519PublicKeySigner]:
         """
-        Load SEP-0010 Signers, may change in 3.0.
+        Load ed25519 public key signers, may change in 3.0.
         """
-        sep0010_signers = []
-        for signer in self._signers:
-            if signer['type'] == 'ed25519_public_key':
-                sep0010_signers.append(Ed25519PublicKeySigner(signer['key'], signer['weight']))
-        return sep0010_signers
+        ed25519_public_key_signers = []
+        for signer in self.signers:
+            if signer["type"] == "ed25519_public_key":
+                ed25519_public_key_signers.append(
+                    Ed25519PublicKeySigner(signer["key"], signer["weight"])
+                )
+        return ed25519_public_key_signers
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
@@ -60,4 +63,27 @@ class Account:
     def __str__(self):
         return "<Account [account_id={account_id}, sequence={sequence}]>".format(
             account_id=self.account_id, sequence=self.sequence
+        )
+
+
+class Thresholds:
+    def __init__(self, low_threshold, med_threshold, high_threshold):
+        self.low_threshold = low_threshold
+        self.med_threshold = med_threshold
+        self.high_threshold = high_threshold
+
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, self.__class__):
+            return NotImplemented  # pragma: no cover
+        return (
+            self.low_threshold == other.low_threshold
+            and self.med_threshold == other.med_threshold
+            and self.high_threshold == other.high_threshold
+        )
+
+    def __str__(self):
+        return "<Thresholds [low_threshold={low_threshold}, med_threshold={med_threshold}, high_threshold={high_threshold}]>".format(
+            low_threshold=self.low_threshold,
+            med_threshold=self.med_threshold,
+            high_threshold=self.high_threshold,
         )

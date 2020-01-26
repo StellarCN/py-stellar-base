@@ -41,7 +41,7 @@ class TestAccount:
         account_id = "GA7YNBW5CBTJZ3ZZOWX3ZNBKD6OE7A7IHUQVWMY62W2ZBG2SGZVOOPVH"
         sequence = 123123
         account = Account(account_id=account_id, sequence=sequence)
-        account._signers = signers
+        account.signers = signers
         assert account.load_ed25519_public_key_signers() == [
             Ed25519PublicKeySigner(
                 "GCV5YZ7R6IAKQCIGDP6TS6GHUXSNWVLP2CNRCUSIPQFRX67LGQRXTCL6", 1

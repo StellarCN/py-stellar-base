@@ -1,6 +1,6 @@
 import pytest
 
-from stellar_sdk.transaction_envelope import TransactionEnvelope
+from stellar_sdk.account import Thresholds
 from stellar_sdk.asset import Asset
 from stellar_sdk.call_builder import FeeStatsCallBuilder
 from stellar_sdk.call_builder.accounts_call_builder import AccountsCallBuilder
@@ -29,6 +29,7 @@ from stellar_sdk.client.requests_client import RequestsClient
 from stellar_sdk.exceptions import TypeError
 from stellar_sdk.network import Network
 from stellar_sdk.server import Server
+from stellar_sdk.transaction_envelope import TransactionEnvelope
 
 
 class TestServer:
@@ -39,6 +40,7 @@ class TestServer:
             account = server.load_account(account_id)
             assert account.account_id == account_id
             assert isinstance(account.sequence, int)
+            assert account.thresholds == Thresholds(1, 2, 3)
 
     @pytest.mark.asyncio
     async def test_load_acount_async(self):
@@ -49,6 +51,7 @@ class TestServer:
             account = await server.load_account(account_id)
             assert account.account_id == account_id
             assert isinstance(account.sequence, int)
+            assert account.thresholds == Thresholds(1, 2, 3)
 
     def test_fetch_base_fee_sync(self):
         horizon_url = "https://horizon.stellar.org"
