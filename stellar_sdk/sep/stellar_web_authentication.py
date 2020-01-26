@@ -175,7 +175,7 @@ def verify_challenge_transaction(
         )
 
 
-def read_challenge_xdr(challenge_xdr: str, network_phrase: str) -> Tuple[Transaction, str]:
+def read_challenge_xdr(challenge_xdr: str, network_phrase: str) -> Tuple[TransactionEnvelope, str]:
     """
     Returns the `challenge_xdr` transaction and source account
 
@@ -191,7 +191,7 @@ def read_challenge_xdr(challenge_xdr: str, network_phrase: str) -> Tuple[Transac
         raise ValueError("Operation type must be ManageData")
     elif not transaction.operations[0].source:
         raise ValueError("Operation must have a source account")
-    return transaction, transaction.operations[0].source
+    return tx_envelope, transaction.operations[0].source
 
 
 def __verify_te_multisig(
