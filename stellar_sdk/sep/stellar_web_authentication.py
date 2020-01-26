@@ -24,7 +24,7 @@ from ..transaction_envelope import TransactionEnvelope
 __all__ = [
     "build_challenge_transaction",
     "verify_challenge_transaction_signers",
-    "verify_challenge_transaction_signer",
+    "verify_challenge_transaction_signed_by_client",
     "verify_challenge_transaction_threshold",
     "read_challenge_transaction",
 ]
@@ -154,6 +154,7 @@ def read_challenge_transaction(
             "The transaction sequence number should be zero."
         )
 
+    # TODO: I don't think this is a good idea.
     return transaction_envelope, client_account_id
 
 
@@ -207,27 +208,34 @@ def verify_challenge_transaction_signers(
     return signers_found
 
 
-def verify_challenge_transaction_signer(
+def verify_challenge_transaction_signed_by_client(
     challenge_transaction: str,
     server_account_id: str,
     network_passphrase: str,
-    signer: Ed25519PublicKeySigner,
-):
-    """An alias for :func:`stellar_sdk.sep.stellar_web_authentication.verify_challenge_transaction_signers`.
+    client_account_id: str,
+) -> None:
+    """An alias for :func:`stellar_sdk.sep.stellar_web_authentication.verify_challenge_transaction_signers`, but
+    return nothing.
 
     :param challenge_transaction: SEP0010 transaction challenge transaction in base64.
     :param server_account_id: public key for server's account.
     :param network_passphrase: The network to connect to for verifying and retrieving
         additional attributes from. (ex. 'Public Global Stellar Network ; September 2015')
-    :param signer: The signer of client account.
+    :param client_account_id: The account id of client account.
 
     :raises: :exc:`InvalidSep10ChallengeError <stellar_sdk.sep.exceptions.InvalidSep10ChallengeError>`:
         - The transaction is invalid according to :func:`stellar_sdk.sep.stellar_web_authentication.read_challenge_transaction`.
         - One or more signatures in the transaction are not identifiable as the server account or one of the signers provided in the arguments.
     """
-    return verify_challenge_transaction_signers(
-        challenge_transaction, server_account_id, network_passphrase, [signer]
+
+    signers_found = verify_challenge_transaction_signers(
+        challenge_transaction,
+        server_account_id,
+        network_passphrase,
+        [Ed25519PublicKeySigner(client_account_id, None)],
     )
+    if not signers_found:
+        raise InvalidSep10ChallengeError("Client master key not signed.")
 
 
 def verify_challenge_transaction_threshold(

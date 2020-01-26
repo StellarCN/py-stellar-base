@@ -12,8 +12,8 @@ from stellar_sdk.sep.stellar_web_authentication import (
     verify_challenge_transaction,
     _verify_transaction_signatures,
     verify_challenge_transaction_signers,
-    verify_challenge_transaction_signer,
     verify_challenge_transaction_threshold,
+    verify_challenge_transaction_signed_by_client,
 )
 from stellar_sdk.transaction_builder import TransactionBuilder
 from stellar_sdk.transaction_envelope import TransactionEnvelope
@@ -548,7 +548,7 @@ class TestStellarWebAuthentication:
                 challenge_tx, server_kp.public_key, network_passphrase, signers
             )
 
-    def test_verify_challenge_transaction_signer(self):
+    def test_verify_challenge_transaction_signed_by_client(self):
         server_kp = Keypair.random()
         client_kp = Keypair.random()
         timeout = 600
@@ -567,12 +567,38 @@ class TestStellarWebAuthentication:
         transaction.sign(client_kp)
 
         challenge_tx = transaction.to_xdr()
-        signer = Ed25519PublicKeySigner(client_kp.public_key, 1)
 
-        signers_found = verify_challenge_transaction_signer(
-            challenge_tx, server_kp.public_key, network_passphrase, signer
+        verify_challenge_transaction_signed_by_client(
+            challenge_tx, server_kp.public_key, network_passphrase, client_kp.public_key
         )
-        assert signers_found == [Ed25519PublicKeySigner(client_kp.public_key, 1)]
+
+    def test_verify_challenge_transaction_signed_by_client_raise_not_signed(self):
+        server_kp = Keypair.random()
+        client_kp = Keypair.random()
+        timeout = 600
+        network_passphrase = Network.PUBLIC_NETWORK_PASSPHRASE
+        anchor_name = "SDF"
+
+        challenge = build_challenge_transaction(
+            server_secret=server_kp.secret,
+            client_account_id=client_kp.public_key,
+            anchor_name=anchor_name,
+            network_passphrase=network_passphrase,
+            timeout=timeout,
+        )
+
+        transaction = TransactionEnvelope.from_xdr(challenge, network_passphrase)
+        challenge_tx = transaction.to_xdr()
+
+        with pytest.raises(
+            InvalidSep10ChallengeError, match="Client master key not signed."
+        ):
+            verify_challenge_transaction_signed_by_client(
+                challenge_tx,
+                server_kp.public_key,
+                network_passphrase,
+                client_kp.public_key,
+            )
 
     def test_verify_challenge_transaction_threshold(self):
         server_kp = Keypair.random()
