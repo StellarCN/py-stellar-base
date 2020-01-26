@@ -210,33 +210,22 @@ def verify_challenge_transaction_signers(
 
 
 def verify_challenge_transaction_signed_by_client(
-    challenge_transaction: str,
-    server_account_id: str,
-    network_passphrase: str,
-    client_account_id: str,
+    challenge_transaction: str, server_account_id: str, network_passphrase: str
 ) -> None:
-    """An alias for :func:`stellar_sdk.sep.stellar_web_authentication.verify_challenge_transaction_signers`, but
-    return nothing.
+    """An alias for :func:`stellar_sdk.sep.stellar_web_authentication.verify_challenge_transaction`.
 
     :param challenge_transaction: SEP0010 transaction challenge transaction in base64.
     :param server_account_id: public key for server's account.
     :param network_passphrase: The network to connect to for verifying and retrieving
         additional attributes from. (ex. 'Public Global Stellar Network ; September 2015')
-    :param client_account_id: The account id of client account.
 
-    :raises: :exc:`InvalidSep10ChallengeError <stellar_sdk.sep.exceptions.InvalidSep10ChallengeError>`:
-        - The transaction is invalid according to :func:`stellar_sdk.sep.stellar_web_authentication.read_challenge_transaction`.
-        - One or more signatures in the transaction are not identifiable as the server account or one of the signers provided in the arguments.
+    :raises: :exc:`InvalidSep10ChallengeError <stellar_sdk.sep.exceptions.InvalidSep10ChallengeError>` - if the
+        validation fails, the exception will be thrown.
     """
 
-    signers_found = verify_challenge_transaction_signers(
-        challenge_transaction,
-        server_account_id,
-        network_passphrase,
-        [Ed25519PublicKeySigner(client_account_id, None)],
+    return verify_challenge_transaction(
+        challenge_transaction, server_account_id, network_passphrase
     )
-    if not signers_found:
-        raise InvalidSep10ChallengeError("Client master key not signed.")
 
 
 def verify_challenge_transaction_threshold(

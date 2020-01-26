@@ -569,7 +569,7 @@ class TestStellarWebAuthentication:
         challenge_tx = transaction.to_xdr()
 
         verify_challenge_transaction_signed_by_client(
-            challenge_tx, server_kp.public_key, network_passphrase, client_kp.public_key
+            challenge_tx, server_kp.public_key, network_passphrase
         )
 
     def test_verify_challenge_transaction_signed_by_client_raise_not_signed(self):
@@ -591,13 +591,11 @@ class TestStellarWebAuthentication:
         challenge_tx = transaction.to_xdr()
 
         with pytest.raises(
-            InvalidSep10ChallengeError, match="Client master key not signed."
+            InvalidSep10ChallengeError,
+            match="Transaction not signed by client: {}.".format(client_kp.public_key),
         ):
             verify_challenge_transaction_signed_by_client(
-                challenge_tx,
-                server_kp.public_key,
-                network_passphrase,
-                client_kp.public_key,
+                challenge_tx, server_kp.public_key, network_passphrase
             )
 
     def test_verify_challenge_transaction_threshold(self):

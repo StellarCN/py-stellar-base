@@ -15,8 +15,8 @@ network_passphrase = Network.TESTNET_NETWORK_PASSPHRASE
 
 
 def setup_multisig():
-    client_account1 = server.load_account(client_master_keypair.public_key)
-    te = TransactionBuilder(client_account1, network_passphrase) \
+    client_master_account = server.load_account(client_master_keypair.public_key)
+    te = TransactionBuilder(client_master_account, network_passphrase) \
         .append_ed25519_public_key_signer(client_signer_keypair1.public_key, 40) \
         .append_ed25519_public_key_signer(client_signer_keypair2.public_key, 60) \
         .append_set_options_op(master_weight=0, low_threshold=1, med_threshold=10, high_threshold=100) \
@@ -55,7 +55,6 @@ def example_verify_challenge_tx_threshold():
         signers = horizon_client_account.load_ed25519_public_key_signers()
         # chooses the threshold to require: low, med or high
         threshold = horizon_client_account.thresholds.med_threshold
-        signers_found = None
         try:
             signers_found = verify_challenge_transaction_threshold(signed_challenge_tx, server_keypair.public_key,
                                                                    network_passphrase, threshold, signers)
@@ -71,7 +70,7 @@ def example_verify_challenge_tx_threshold():
         # verifies that master key has signed challenge transaction
         try:
             verify_challenge_transaction_signed_by_client(signed_challenge_tx, server_keypair.public_key,
-                                                          network_passphrase, client_master_keypair.public_key)
+                                                          network_passphrase)
             print("Client Master Key Verified.")
         except InvalidSep10ChallengeError as e:
             print("You should handle possible exceptions:")
