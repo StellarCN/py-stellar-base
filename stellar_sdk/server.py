@@ -2,7 +2,7 @@ import warnings
 from typing import Union, Coroutine, Any, Dict, List
 from urllib.parse import urljoin
 
-from .account import Account
+from .account import Account, Thresholds
 from .asset import Asset
 from .call_builder.accounts_call_builder import AccountsCallBuilder
 from .call_builder.assets_call_builder import AssetsCallBuilder
@@ -327,12 +327,28 @@ class Server:
     async def __load_account_async(self, account_id: str) -> Account:
         resp = await self.accounts().account_id(account_id=account_id).call()
         sequence = int(resp["sequence"])
-        return Account(account_id=account_id, sequence=sequence)
+        thresholds = Thresholds(
+            resp["thresholds"]["low_threshold"],
+            resp["thresholds"]["med_threshold"],
+            resp["thresholds"]["high_threshold"],
+        )
+        account = Account(account_id=account_id, sequence=sequence)
+        account.signers = resp["signers"]
+        account.thresholds = thresholds
+        return account
 
     def __load_account_sync(self, account_id: str) -> Account:
         resp = self.accounts().account_id(account_id=account_id).call()
         sequence = int(resp["sequence"])
-        return Account(account_id=account_id, sequence=sequence)
+        thresholds = Thresholds(
+            resp["thresholds"]["low_threshold"],
+            resp["thresholds"]["med_threshold"],
+            resp["thresholds"]["high_threshold"],
+        )
+        account = Account(account_id=account_id, sequence=sequence)
+        account.signers = resp["signers"]
+        account.thresholds = thresholds
+        return account
 
     def fetch_base_fee(self) -> Union[int, Coroutine[Any, Any, int]]:
         """Fetch the base fee. Since this hits the server, if the server call fails,
