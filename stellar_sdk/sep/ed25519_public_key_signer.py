@@ -1,5 +1,5 @@
 class Ed25519PublicKeySigner:
-    def __init__(self, account_id: str, weight: int) -> None:
+    def __init__(self, account_id: str, weight: int = 0) -> None:
         """The :class:`Signer` object, which represents represents the signer for the client account.
 
         :param account_id: Account ID (ex. GBYNR2QJXLBCBTRN44MRORCMI4YO7FZPFBCNOKTOBCAAFC7KC3LNPRYS)

@@ -509,6 +509,44 @@ class TestStellarWebAuthentication:
                 challenge_tx, server_kp.public_key, network_passphrase, signers
             )
 
+    def test_verify_challenge_transaction_signers_raise_no_server_signature(self):
+        server_kp = Keypair.random()
+        client_kp_a = Keypair.random()
+        client_kp_b = Keypair.random()
+        client_kp_c = Keypair.random()
+        timeout = 600
+        network_passphrase = Network.PUBLIC_NETWORK_PASSPHRASE
+        anchor_name = "SDF"
+
+        challenge = build_challenge_transaction(
+            server_secret=server_kp.secret,
+            client_account_id=client_kp_a.public_key,
+            anchor_name=anchor_name,
+            network_passphrase=network_passphrase,
+            timeout=timeout,
+        )
+
+        transaction = TransactionEnvelope.from_xdr(challenge, network_passphrase)
+        transaction.signatures = []
+        transaction.sign(client_kp_a)
+        transaction.sign(client_kp_b)
+        transaction.sign(client_kp_c)
+
+        challenge_tx = transaction.to_xdr()
+        signers = [
+            Ed25519PublicKeySigner(client_kp_a.public_key, 1),
+            Ed25519PublicKeySigner(client_kp_a.public_key, 3),
+            Ed25519PublicKeySigner(client_kp_a.public_key, 4),
+            Ed25519PublicKeySigner(Keypair.random().public_key, 255),
+        ]
+        with pytest.raises(
+            InvalidSep10ChallengeError,
+            match="Transaction not signed by server: {}.".format(server_kp.public_key),
+        ):
+            verify_challenge_transaction_signers(
+                challenge_tx, server_kp.public_key, network_passphrase, signers
+            )
+
     def test_verify_challenge_transaction_signers_raise_unrecognized_signatures(self):
         server_kp = Keypair.random()
         client_kp_a = Keypair.random()

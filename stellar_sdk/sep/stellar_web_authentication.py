@@ -191,19 +191,44 @@ def verify_challenge_transaction_signers(
     )
     server_keypair = Keypair.from_public_key(server_account_id)
 
-    # Remove the server signer from the signers list if it is present. It's
-    # important when verifying signers of a challenge transaction that we only
-    # verify and return client signers. If an account has the server as a
-    # signer the server should not play a part in the authentication of the
-    # client.
+    # Deduplicate the client signers and ensure the server is not included
+    # anywhere we check or output the list of signers.
     client_signers = []
     for signer in signers:
+        # Ignore the server signer if it is in the signers list. It's
+        # important when verifying signers of a challenge transaction that we
+        # only verify and return client signers. If an account has the server
+        # as a signer the server should not play a part in the authentication
+        # of the client.
         if signer == server_keypair.public_key:
             continue
         client_signers.append(signer)
 
-    signers_found = _verify_transaction_signatures(te, client_signers)
-    if len(signers_found) != len(te.signatures) - 1:
+    # Verify all the transaction's signers (server and client) in one
+    # hit. We do this in one hit here even though the server signature was
+    # checked in the read_challenge_transaction to ensure that every signature and signer
+    # are consumed only once on the transaction.
+    all_signers = client_signers + [Ed25519PublicKeySigner(server_keypair.public_key)]
+    all_signers_found = _verify_transaction_signatures(te, all_signers)
+
+    signers_found = []
+    server_signer_found = False
+    for signer in all_signers_found:
+        if signer.account_id == server_keypair.public_key:
+            server_signer_found = True
+            continue
+        if signer in signers_found:
+            continue
+        signers_found.append(signer)
+
+    # Confirm we matched a signature to the server signer.
+    if not server_signer_found:
+        raise InvalidSep10ChallengeError(
+            "Transaction not signed by server: {}.".format(server_keypair.public_key)
+        )
+
+    # Confirm all signatures were consumed by a signer.
+    if len(all_signers_found) != len(te.signatures):
         raise InvalidSep10ChallengeError("Transaction has unrecognized signatures.")
 
     return signers_found
