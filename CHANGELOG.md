@@ -1,6 +1,17 @@
 Release History
 ===============
 
+### Version 2.2.0
+
+Unreleased
+
+Horizon v1.0.0 Compatibility.
+
+* **[Breaking Change]** Add support for `/offers` end-point with query parameters, this will affect the existing API, please refer to the documentation. (See [SDK API Documentation](https://stellar-sdk.readthedocs.io/en/2.2.0-beta1/api.html#offerscallbuilder) and [Stellar documentation for offers](https://www.stellar.org/developers/horizon/reference/endpoints/offers.html))
+* Regenerate the XDR definitions to include [MetaV2](https://github.com/jonjove/stellar-core/blob/b299b3a458a15f592352c67d4da69baa6e8fbb6a/src/xdr/Stellar-ledger.x#L309) support (also see [#1902](https://github.com/stellar/go/issues/1902)).
+
+There are also some updates that have been released in previous versions, see this [issue](https://github.com/StellarCN/py-stellar-base/issues/257) for details.
+
 ### Version 2.1.1
 Released on January 31, 2020
 
