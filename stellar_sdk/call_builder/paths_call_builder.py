@@ -36,7 +36,7 @@ class PathsCallBuilder(BaseCallBuilder):
     ) -> None:
 
         warnings.warn(
-            "Will be removed in version v2.1.0, "
+            "Will be removed in version v2.3.0, "
             "use stellar_sdk.call_builder.StrictReceivePathsCallBuilder",
             DeprecationWarning,
         )

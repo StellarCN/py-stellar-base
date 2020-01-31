@@ -2,9 +2,9 @@ Release History
 ===============
 
 ### Version 2.1.1
-Unreleased
+Released on January 31, 2020
 
-* feat: update challenge tx helpers for SEP-0010 v1.3.0
+* feat: update challenge tx helpers for SEP-0010 v1.3.0.
 
 ### Version 2.1.0
 Released on January 04, 2020
