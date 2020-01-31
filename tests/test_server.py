@@ -5,6 +5,7 @@ from stellar_sdk.asset import Asset
 from stellar_sdk.call_builder import FeeStatsCallBuilder
 from stellar_sdk.call_builder.accounts_call_builder import AccountsCallBuilder
 from stellar_sdk.call_builder.assets_call_builder import AssetsCallBuilder
+from stellar_sdk.call_builder.data_call_builder import DataCallBuilder
 from stellar_sdk.call_builder.effects_call_builder import EffectsCallBuilder
 from stellar_sdk.call_builder.ledgers_call_builder import LedgersCallBuilder
 from stellar_sdk.call_builder.offers_call_builder import OffersCallBuilder
@@ -73,16 +74,18 @@ class TestServer:
         with Server(horizon_url, client) as server:
             assert server.accounts() == AccountsCallBuilder(horizon_url, client)
             assert server.assets() == AssetsCallBuilder(horizon_url, client)
-            assert server.effects() == EffectsCallBuilder(horizon_url, client)
-            assert server.fee_stats() == FeeStatsCallBuilder(horizon_url, client)
-            assert server.ledgers() == LedgersCallBuilder(horizon_url, client)
-            assert server.offers(
-                "GDV6FVHPY4JH7EEBSJYPQQYZA3OC6TKTM2TAXRHWT4EEL7BJ2BTDQT5D"
-            ) == OffersCallBuilder(
+            assert server.data(
+                "GDV6FVHPY4JH7EEBSJYPQQYZA3OC6TKTM2TAXRHWT4EEL7BJ2BTDQT5D", "hello"
+            ) == DataCallBuilder(
                 horizon_url,
                 client,
                 "GDV6FVHPY4JH7EEBSJYPQQYZA3OC6TKTM2TAXRHWT4EEL7BJ2BTDQT5D",
+                "hello",
             )
+            assert server.effects() == EffectsCallBuilder(horizon_url, client)
+            assert server.fee_stats() == FeeStatsCallBuilder(horizon_url, client)
+            assert server.ledgers() == LedgersCallBuilder(horizon_url, client)
+            assert server.offers() == OffersCallBuilder(horizon_url, client)
             assert server.operations() == OperationsCallBuilder(horizon_url, client)
             buying = Asset.native()
             selling = Asset(
