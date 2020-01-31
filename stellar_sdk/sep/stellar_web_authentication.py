@@ -68,7 +68,7 @@ def build_challenge_transaction(
 def read_challenge_transaction(
     challenge_transaction: str, server_account_id: str, network_passphrase: str
 ) -> Tuple[TransactionEnvelope, str]:
-    """Reads a SEP 10 challenge transaction and returns the decoded transaction envelope and client account ID contained within..
+    """Reads a SEP 10 challenge transaction and returns the decoded transaction envelope and client account ID contained within.
 
     It also verifies that transaction is signed by the server.
 
