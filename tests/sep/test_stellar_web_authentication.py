@@ -1,3 +1,4 @@
+import base64
 import os
 import time
 
@@ -42,7 +43,8 @@ class TestStellarWebAuthentication:
         op = transaction.operations[0]
         assert isinstance(op, ManageData)
         assert op.data_name == "SDF auth"
-        assert len(op.data_value) == 64
+        assert len(op.data_value) == 48
+        assert len(base64.b64encode(op.data_value)) == 64
         assert op.source == client_account_id
 
         now = int(time.time())
@@ -82,7 +84,7 @@ class TestStellarWebAuthentication:
         network_passphrase = Network.PUBLIC_NETWORK_PASSPHRASE
         anchor_name = "SDF"
         now = int(time.time())
-        nonce = os.urandom(64)
+        nonce = os.urandom(48)
         server_account = Account(server_kp.public_key, 10086)
         challenge_te = (
             TransactionBuilder(server_account, network_passphrase, 100)
@@ -91,7 +93,7 @@ class TestStellarWebAuthentication:
                 data_value=nonce,
                 source=client_kp.public_key,
             )
-            .add_time_bounds(now, now + 300)
+            .add_time_bounds(now, now + 900)
             .build()
         )
 
@@ -137,7 +139,7 @@ class TestStellarWebAuthentication:
         server_account = Account(server_kp.public_key, -1)
         challenge_te = (
             TransactionBuilder(server_account, network_passphrase, 100)
-            .add_time_bounds(now, now + 300)
+            .add_time_bounds(now, now + 900)
             .build()
         )
 
@@ -162,7 +164,7 @@ class TestStellarWebAuthentication:
         challenge_te = (
             TransactionBuilder(server_account, network_passphrase, 100)
             .append_set_options_op()
-            .add_time_bounds(now, now + 300)
+            .add_time_bounds(now, now + 900)
             .build()
         )
 
@@ -183,14 +185,14 @@ class TestStellarWebAuthentication:
         network_passphrase = Network.PUBLIC_NETWORK_PASSPHRASE
         anchor_name = "SDF"
         now = int(time.time())
-        nonce = os.urandom(64)
+        nonce = os.urandom(48)
         server_account = Account(server_kp.public_key, -1)
         challenge_te = (
             TransactionBuilder(server_account, network_passphrase, 100)
             .append_manage_data_op(
                 data_name="{} auth".format(anchor_name), data_value=nonce
             )
-            .add_time_bounds(now, now + 300)
+            .add_time_bounds(now, now + 900)
             .build()
         )
 
@@ -220,7 +222,7 @@ class TestStellarWebAuthentication:
                 data_value=nonce,
                 source=client_kp.public_key,
             )
-            .add_time_bounds(now, now + 300)
+            .add_time_bounds(now, now + 900)
             .build()
         )
 
@@ -230,7 +232,7 @@ class TestStellarWebAuthentication:
 
         with pytest.raises(
             InvalidSep10ChallengeError,
-            match="Operation value should be a 64 bytes base64 random string.",
+            match="Operation value encoded as base64 should be 64 bytes long.",
         ):
             verify_challenge_transaction(
                 challenge_tx_signed, server_kp.public_key, network_passphrase
@@ -241,7 +243,7 @@ class TestStellarWebAuthentication:
         client_kp = Keypair.random()
         network_passphrase = Network.PUBLIC_NETWORK_PASSPHRASE
         anchor_name = "SDF"
-        timeout = 300
+        timeout = 900
 
         now = int(time.time())
         server_keypair = Keypair.from_secret(server_kp.secret)
@@ -250,7 +252,7 @@ class TestStellarWebAuthentication:
             server_account, network_passphrase, 100
         )
         transaction_builder.add_time_bounds(min_time=now, max_time=now + timeout)
-        nonce = os.urandom(64)
+        nonce = os.urandom(48)
         transaction_builder.append_manage_data_op(
             data_name="{} auth".format(anchor_name),
             data_value=nonce,
@@ -297,7 +299,7 @@ class TestStellarWebAuthentication:
         client_kp = Keypair.random()
         network_passphrase = Network.PUBLIC_NETWORK_PASSPHRASE
         anchor_name = "SDF"
-        nonce = os.urandom(64)
+        nonce = os.urandom(48)
         server_account = Account(server_kp.public_key, -1)
         challenge_te = (
             TransactionBuilder(server_account, network_passphrase, 100)
@@ -326,7 +328,7 @@ class TestStellarWebAuthentication:
         network_passphrase = Network.PUBLIC_NETWORK_PASSPHRASE
         anchor_name = "SDF"
         now = int(time.time())
-        nonce = os.urandom(64)
+        nonce = os.urandom(48)
         server_account = Account(server_kp.public_key, -1)
         challenge_te = (
             TransactionBuilder(server_account, network_passphrase, 100)
@@ -357,7 +359,7 @@ class TestStellarWebAuthentication:
         network_passphrase = Network.PUBLIC_NETWORK_PASSPHRASE
         anchor_name = "SDF"
         now = int(time.time())
-        nonce = os.urandom(64)
+        nonce = os.urandom(48)
         server_account = Account(server_kp.public_key, -1)
         challenge_te = (
             TransactionBuilder(server_account, network_passphrase, 100)
@@ -405,15 +407,15 @@ class TestStellarWebAuthentication:
         transaction.sign(client_kp_c)
         signers = [
             Ed25519PublicKeySigner(client_kp_a.public_key, 1),
-            Ed25519PublicKeySigner(client_kp_a.public_key, 2),
-            Ed25519PublicKeySigner(client_kp_a.public_key, 3),
+            Ed25519PublicKeySigner(client_kp_b.public_key, 2),
+            Ed25519PublicKeySigner(client_kp_c.public_key, 3),
             Ed25519PublicKeySigner(Keypair.random().public_key, 4),
         ]
         signers_found = _verify_transaction_signatures(transaction, signers)
         assert signers_found == [
             Ed25519PublicKeySigner(client_kp_a.public_key, 1),
-            Ed25519PublicKeySigner(client_kp_a.public_key, 2),
-            Ed25519PublicKeySigner(client_kp_a.public_key, 3),
+            Ed25519PublicKeySigner(client_kp_b.public_key, 2),
+            Ed25519PublicKeySigner(client_kp_c.public_key, 3),
         ]
 
     def test_verify_transaction_signatures_raise_no_signature(self):
@@ -422,7 +424,7 @@ class TestStellarWebAuthentication:
         network_passphrase = Network.PUBLIC_NETWORK_PASSPHRASE
         anchor_name = "SDF"
         now = int(time.time())
-        nonce = os.urandom(64)
+        nonce = os.urandom(48)
         server_account = Account(server_kp.public_key, -1)
         challenge_te = (
             TransactionBuilder(server_account, network_passphrase, 100)
@@ -431,7 +433,7 @@ class TestStellarWebAuthentication:
                 data_value=nonce,
                 source=client_kp.public_key,
             )
-            .add_time_bounds(now, now + 300)
+            .add_time_bounds(now, now + 900)
             .build()
         )
 
@@ -466,8 +468,8 @@ class TestStellarWebAuthentication:
         challenge_tx = transaction.to_xdr()
         signers = [
             Ed25519PublicKeySigner(client_kp_a.public_key, 1),
-            Ed25519PublicKeySigner(client_kp_a.public_key, 3),
-            Ed25519PublicKeySigner(client_kp_a.public_key, 4),
+            Ed25519PublicKeySigner(client_kp_b.public_key, 3),
+            Ed25519PublicKeySigner(client_kp_c.public_key, 4),
             Ed25519PublicKeySigner(Keypair.random().public_key, 255),
         ]
         signers_found = verify_challenge_transaction_signers(
@@ -475,8 +477,8 @@ class TestStellarWebAuthentication:
         )
         assert signers_found == [
             Ed25519PublicKeySigner(client_kp_a.public_key, 1),
-            Ed25519PublicKeySigner(client_kp_a.public_key, 3),
-            Ed25519PublicKeySigner(client_kp_a.public_key, 4),
+            Ed25519PublicKeySigner(client_kp_b.public_key, 3),
+            Ed25519PublicKeySigner(client_kp_c.public_key, 4),
         ]
 
     def test_verify_challenge_transaction_signers_raise_no_signers(self):
@@ -535,8 +537,8 @@ class TestStellarWebAuthentication:
         challenge_tx = transaction.to_xdr()
         signers = [
             Ed25519PublicKeySigner(client_kp_a.public_key, 1),
-            Ed25519PublicKeySigner(client_kp_a.public_key, 3),
-            Ed25519PublicKeySigner(client_kp_a.public_key, 4),
+            Ed25519PublicKeySigner(client_kp_b.public_key, 3),
+            Ed25519PublicKeySigner(client_kp_c.public_key, 4),
             Ed25519PublicKeySigner(Keypair.random().public_key, 255),
         ]
         with pytest.raises(
@@ -575,8 +577,8 @@ class TestStellarWebAuthentication:
         challenge_tx = transaction.to_xdr()
         signers = [
             Ed25519PublicKeySigner(client_kp_a.public_key, 1),
-            Ed25519PublicKeySigner(client_kp_a.public_key, 3),
-            Ed25519PublicKeySigner(client_kp_a.public_key, 4),
+            Ed25519PublicKeySigner(client_kp_b.public_key, 3),
+            Ed25519PublicKeySigner(client_kp_c.public_key, 4),
             Ed25519PublicKeySigner(Keypair.random().public_key, 255),
         ]
         with pytest.raises(
@@ -661,8 +663,8 @@ class TestStellarWebAuthentication:
         challenge_tx = transaction.to_xdr()
         signers = [
             Ed25519PublicKeySigner(client_kp_a.public_key, 1),
-            Ed25519PublicKeySigner(client_kp_a.public_key, 3),
-            Ed25519PublicKeySigner(client_kp_a.public_key, 4),
+            Ed25519PublicKeySigner(client_kp_b.public_key, 3),
+            Ed25519PublicKeySigner(client_kp_c.public_key, 4),
             Ed25519PublicKeySigner(Keypair.random().public_key, 255),
         ]
         med_threshold = 7
@@ -675,8 +677,8 @@ class TestStellarWebAuthentication:
         )
         assert signers_found == [
             Ed25519PublicKeySigner(client_kp_a.public_key, 1),
-            Ed25519PublicKeySigner(client_kp_a.public_key, 3),
-            Ed25519PublicKeySigner(client_kp_a.public_key, 4),
+            Ed25519PublicKeySigner(client_kp_b.public_key, 3),
+            Ed25519PublicKeySigner(client_kp_c.public_key, 4),
         ]
 
     def test_verify_challenge_transaction_threshold_raise_not_meet_threshold(self):
@@ -704,8 +706,8 @@ class TestStellarWebAuthentication:
         challenge_tx = transaction.to_xdr()
         signers = [
             Ed25519PublicKeySigner(client_kp_a.public_key, 1),
-            Ed25519PublicKeySigner(client_kp_a.public_key, 3),
-            Ed25519PublicKeySigner(client_kp_a.public_key, 4),
+            Ed25519PublicKeySigner(client_kp_b.public_key, 3),
+            Ed25519PublicKeySigner(client_kp_c.public_key, 4),
             Ed25519PublicKeySigner(Keypair.random().public_key, 255),
         ]
         med_threshold = 10
