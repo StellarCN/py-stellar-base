@@ -14,7 +14,7 @@ from stellar_sdk.sep.stellar_web_authentication import (
     _verify_transaction_signatures,
     verify_challenge_transaction_signers,
     verify_challenge_transaction_threshold,
-    verify_challenge_transaction_signed_by_client,
+    verify_challenge_transaction_signed_by_client_master_key,
 )
 from stellar_sdk.transaction_builder import TransactionBuilder
 from stellar_sdk.transaction_envelope import TransactionEnvelope
@@ -468,7 +468,7 @@ class TestStellarWebAuthentication:
         challenge_tx = transaction.to_xdr()
         signers = [
             Ed25519PublicKeySigner(client_kp_a.public_key, 1),
-            Ed25519PublicKeySigner(client_kp_b.public_key, 3),
+            Ed25519PublicKeySigner(client_kp_b.public_key, 2),
             Ed25519PublicKeySigner(client_kp_c.public_key, 4),
             Ed25519PublicKeySigner(Keypair.random().public_key, 255),
         ]
@@ -477,7 +477,7 @@ class TestStellarWebAuthentication:
         )
         assert signers_found == [
             Ed25519PublicKeySigner(client_kp_a.public_key, 1),
-            Ed25519PublicKeySigner(client_kp_b.public_key, 3),
+            Ed25519PublicKeySigner(client_kp_b.public_key, 2),
             Ed25519PublicKeySigner(client_kp_c.public_key, 4),
         ]
 
@@ -511,6 +511,43 @@ class TestStellarWebAuthentication:
                 challenge_tx, server_kp.public_key, network_passphrase, signers
             )
 
+    def test_verify_challenge_transaction_signers_raise_no_client_signer_found(self):
+        server_kp = Keypair.random()
+        client_kp_a = Keypair.random()
+        client_kp_b = Keypair.random()
+        client_kp_c = Keypair.random()
+        timeout = 600
+        network_passphrase = Network.PUBLIC_NETWORK_PASSPHRASE
+        anchor_name = "SDF"
+
+        challenge = build_challenge_transaction(
+            server_secret=server_kp.secret,
+            client_account_id=client_kp_a.public_key,
+            anchor_name=anchor_name,
+            network_passphrase=network_passphrase,
+            timeout=timeout,
+        )
+
+        transaction = TransactionEnvelope.from_xdr(challenge, network_passphrase)
+        transaction.sign(client_kp_a)
+        transaction.sign(client_kp_b)
+        transaction.sign(client_kp_c)
+
+        challenge_tx = transaction.to_xdr()
+        signers = [
+            Ed25519PublicKeySigner(Keypair.random().public_key, 1),
+            Ed25519PublicKeySigner(Keypair.random().public_key, 2),
+            Ed25519PublicKeySigner(Keypair.random().public_key, 4),
+        ]
+
+        with pytest.raises(
+            InvalidSep10ChallengeError,
+            match="Transaction not signed by any client signer.",
+        ):
+            verify_challenge_transaction_signers(
+                challenge_tx, server_kp.public_key, network_passphrase, signers
+            )
+
     def test_verify_challenge_transaction_signers_raise_no_server_signature(self):
         server_kp = Keypair.random()
         client_kp_a = Keypair.random()
@@ -537,7 +574,7 @@ class TestStellarWebAuthentication:
         challenge_tx = transaction.to_xdr()
         signers = [
             Ed25519PublicKeySigner(client_kp_a.public_key, 1),
-            Ed25519PublicKeySigner(client_kp_b.public_key, 3),
+            Ed25519PublicKeySigner(client_kp_b.public_key, 2),
             Ed25519PublicKeySigner(client_kp_c.public_key, 4),
             Ed25519PublicKeySigner(Keypair.random().public_key, 255),
         ]
@@ -577,7 +614,7 @@ class TestStellarWebAuthentication:
         challenge_tx = transaction.to_xdr()
         signers = [
             Ed25519PublicKeySigner(client_kp_a.public_key, 1),
-            Ed25519PublicKeySigner(client_kp_b.public_key, 3),
+            Ed25519PublicKeySigner(client_kp_b.public_key, 2),
             Ed25519PublicKeySigner(client_kp_c.public_key, 4),
             Ed25519PublicKeySigner(Keypair.random().public_key, 255),
         ]
@@ -608,7 +645,7 @@ class TestStellarWebAuthentication:
 
         challenge_tx = transaction.to_xdr()
 
-        verify_challenge_transaction_signed_by_client(
+        verify_challenge_transaction_signed_by_client_master_key(
             challenge_tx, server_kp.public_key, network_passphrase
         )
 
@@ -634,7 +671,7 @@ class TestStellarWebAuthentication:
             InvalidSep10ChallengeError,
             match="Transaction not signed by client: {}.".format(client_kp.public_key),
         ):
-            verify_challenge_transaction_signed_by_client(
+            verify_challenge_transaction_signed_by_client_master_key(
                 challenge_tx, server_kp.public_key, network_passphrase
             )
 
@@ -663,7 +700,7 @@ class TestStellarWebAuthentication:
         challenge_tx = transaction.to_xdr()
         signers = [
             Ed25519PublicKeySigner(client_kp_a.public_key, 1),
-            Ed25519PublicKeySigner(client_kp_b.public_key, 3),
+            Ed25519PublicKeySigner(client_kp_b.public_key, 2),
             Ed25519PublicKeySigner(client_kp_c.public_key, 4),
             Ed25519PublicKeySigner(Keypair.random().public_key, 255),
         ]
@@ -677,7 +714,7 @@ class TestStellarWebAuthentication:
         )
         assert signers_found == [
             Ed25519PublicKeySigner(client_kp_a.public_key, 1),
-            Ed25519PublicKeySigner(client_kp_b.public_key, 3),
+            Ed25519PublicKeySigner(client_kp_b.public_key, 2),
             Ed25519PublicKeySigner(client_kp_c.public_key, 4),
         ]
 
@@ -706,14 +743,14 @@ class TestStellarWebAuthentication:
         challenge_tx = transaction.to_xdr()
         signers = [
             Ed25519PublicKeySigner(client_kp_a.public_key, 1),
-            Ed25519PublicKeySigner(client_kp_b.public_key, 3),
+            Ed25519PublicKeySigner(client_kp_b.public_key, 2),
             Ed25519PublicKeySigner(client_kp_c.public_key, 4),
             Ed25519PublicKeySigner(Keypair.random().public_key, 255),
         ]
         med_threshold = 10
         with pytest.raises(
             InvalidSep10ChallengeError,
-            match="signers with weight 8 do not meet threshold 10.",
+            match="signers with weight 7 do not meet threshold 10.",
         ):
             verify_challenge_transaction_threshold(
                 challenge_tx,
