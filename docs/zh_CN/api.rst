@@ -485,7 +485,7 @@ SEP 0010: Stellar Web Authentication
 .. autofunction:: stellar_sdk.sep.stellar_web_authentication.build_challenge_transaction
 .. autofunction:: stellar_sdk.sep.stellar_web_authentication.read_challenge_transaction
 .. autofunction:: stellar_sdk.sep.stellar_web_authentication.verify_challenge_transaction_threshold
-.. autofunction:: stellar_sdk.sep.stellar_web_authentication.verify_challenge_transaction_signed_by_client
+.. autofunction:: stellar_sdk.sep.stellar_web_authentication.verify_challenge_transaction_signed_by_client_master_key
 .. autofunction:: stellar_sdk.sep.stellar_web_authentication.verify_challenge_transaction_signers
 .. autofunction:: stellar_sdk.sep.stellar_web_authentication.verify_challenge_transaction
 
