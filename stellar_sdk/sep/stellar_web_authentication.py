@@ -404,8 +404,6 @@ def _verify_te_signed_by_account_id(
     )
     if not signers_found:
         return False
-    if signers_found[0].account_id != account_id:
-        return False
     return True
 
 
