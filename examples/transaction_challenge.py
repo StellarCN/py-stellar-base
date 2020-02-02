@@ -2,7 +2,7 @@ from stellar_sdk import Server, TransactionBuilder, Keypair, Network
 from stellar_sdk.exceptions import NotFoundError
 from stellar_sdk.sep.exceptions import InvalidSep10ChallengeError
 from stellar_sdk.sep.stellar_web_authentication import build_challenge_transaction, read_challenge_transaction, \
-    verify_challenge_transaction_threshold, verify_challenge_transaction_signed_by_client
+    verify_challenge_transaction_threshold, verify_challenge_transaction_signed_by_client_master_key
 
 server_keypair = Keypair.from_secret("SBGCNEOQGECW5R4A55C26ZFS736IONKCHY5PPPSFZVXSJSU63MWNM4K6")
 client_master_keypair = Keypair.from_secret("SDWZHXKWSHTQ2YGPT6YQQSOJWJX5JX2IEU7KOLGQ2XEJEECIQHUU3RMR")
@@ -69,8 +69,8 @@ def example_verify_challenge_tx_threshold():
     else:
         # verifies that master key has signed challenge transaction
         try:
-            verify_challenge_transaction_signed_by_client(signed_challenge_tx, server_keypair.public_key,
-                                                          network_passphrase)
+            verify_challenge_transaction_signed_by_client_master_key(signed_challenge_tx, server_keypair.public_key,
+                                                                     network_passphrase)
             print("Client Master Key Verified.")
         except InvalidSep10ChallengeError as e:
             print("You should handle possible exceptions:")

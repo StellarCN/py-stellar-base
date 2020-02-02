@@ -7,9 +7,10 @@ Created: 2018-07-31
 Updated: 2019-12-04
 Version 1.3.0
 """
-
+import base64
 import os
 import time
+import warnings
 from typing import List, Tuple
 
 from .ed25519_public_key_signer import Ed25519PublicKeySigner
@@ -24,7 +25,7 @@ from ..transaction_envelope import TransactionEnvelope
 __all__ = [
     "build_challenge_transaction",
     "verify_challenge_transaction_signers",
-    "verify_challenge_transaction_signed_by_client",
+    "verify_challenge_transaction_signed_by_client_master_key",
     "verify_challenge_transaction_threshold",
     "read_challenge_transaction",
     "verify_challenge_transaction",
@@ -36,7 +37,7 @@ def build_challenge_transaction(
     client_account_id: str,
     anchor_name: str,
     network_passphrase: str,
-    timeout: int = 300,
+    timeout: int = 900,
 ) -> str:
     """Returns a valid `SEP0010 <https://github.com/stellar/stellar-protocol/blob/master/ecosystem/sep-0010.md>`_
     challenge transaction which you can use for Stellar Web Authentication.
@@ -46,7 +47,7 @@ def build_challenge_transaction(
     :param anchor_name: Anchor's name to be used in the manage_data key.
     :param network_passphrase: The network to connect to for verifying and retrieving
         additional attributes from. (ex. 'Public Global Stellar Network ; September 2015')
-    :param timeout: Challenge duration in seconds (default to 5 minutes).
+    :param timeout: Challenge duration in seconds (default to 15 minutes).
     :return: A base64 encoded string of the raw TransactionEnvelope xdr struct for the transaction.
     """
     now = int(time.time())
@@ -54,7 +55,7 @@ def build_challenge_transaction(
     server_account = Account(account_id=server_keypair.public_key, sequence=-1)
     transaction_builder = TransactionBuilder(server_account, network_passphrase, 100)
     transaction_builder.add_time_bounds(min_time=now, max_time=now + timeout)
-    nonce = os.urandom(64)
+    nonce = os.urandom(48)
     transaction_builder.append_manage_data_op(
         data_name="{} auth".format(anchor_name),
         data_value=nonce,
@@ -103,6 +104,12 @@ def read_challenge_transaction(
             "Transaction source account is not equal to server's account."
         )
 
+    # verify that transaction sequenceNumber is equal to zero
+    if transaction.sequence != 0:
+        raise InvalidSep10ChallengeError(
+            "The transaction sequence number should be zero."
+        )
+
     # verify that transaction has time bounds set, and that current time is between the minimum and maximum bounds
     if not transaction.time_bounds:
         raise InvalidSep10ChallengeError("Transaction requires timebounds.")
@@ -135,24 +142,21 @@ def read_challenge_transaction(
     if not client_account_id:
         raise InvalidSep10ChallengeError("Operation should have a source account.")
 
-    if len(manage_data_op.data_value) != 64:
+    nonce_base64 = base64.b64encode(manage_data_op.data_value)
+    if len(nonce_base64) != 64:
         raise InvalidSep10ChallengeError(
-            "Operation value should be a 64 bytes base64 random string."
+            "Operation value encoded as base64 should be 64 bytes long."
         )
 
-    if not transaction_envelope.signatures:
-        raise InvalidSep10ChallengeError("Transaction has no signatures.")
+    if len(manage_data_op.data_value) != 48:
+        raise InvalidSep10ChallengeError(
+            "Operation value before encoding as base64 should be 48 bytes long."
+        )
 
     # verify that transaction envelope has a correct signature by server's signing key
-    if not _verify_te_signed_by(transaction_envelope, server_account_id):
+    if not _verify_te_signed_by_account_id(transaction_envelope, server_account_id):
         raise InvalidSep10ChallengeError(
             "Transaction not signed by server: {}.".format(server_account_id)
-        )
-
-    # verify that transaction sequenceNumber is equal to zero
-    if transaction.sequence != 0:
-        raise InvalidSep10ChallengeError(
-            "The transaction sequence number should be zero."
         )
 
     # TODO: I don't think this is a good idea.
@@ -191,7 +195,7 @@ def verify_challenge_transaction_signers(
     )
     server_keypair = Keypair.from_public_key(server_account_id)
 
-    # Deduplicate the client signers and ensure the server is not included
+    # Ensure the server is not included
     # anywhere we check or output the list of signers.
     client_signers = []
     for signer in signers:
@@ -217,7 +221,8 @@ def verify_challenge_transaction_signers(
         if signer.account_id == server_keypair.public_key:
             server_signer_found = True
             continue
-        if signer in signers_found:
+        # Deduplicate the client signers
+        if _signer_in_signers(signer, signers_found):
             continue
         signers_found.append(signer)
 
@@ -227,6 +232,10 @@ def verify_challenge_transaction_signers(
             "Transaction not signed by server: {}.".format(server_keypair.public_key)
         )
 
+    # Confirm we matched signatures to the client signers.
+    if not signers_found:
+        raise InvalidSep10ChallengeError("Transaction not signed by any client signer.")
+
     # Confirm all signatures were consumed by a signer.
     if len(all_signers_found) != len(te.signatures):
         raise InvalidSep10ChallengeError("Transaction has unrecognized signatures.")
@@ -235,6 +244,30 @@ def verify_challenge_transaction_signers(
 
 
 def verify_challenge_transaction_signed_by_client(
+    challenge_transaction: str, server_account_id: str, network_passphrase: str
+) -> None:
+    """An alias for :func:`stellar_sdk.sep.stellar_web_authentication.verify_challenge_transaction`.
+
+    :param challenge_transaction: SEP0010 transaction challenge transaction in base64.
+    :param server_account_id: public key for server's account.
+    :param network_passphrase: The network to connect to for verifying and retrieving
+        additional attributes from. (ex. 'Public Global Stellar Network ; September 2015')
+
+    :raises: :exc:`InvalidSep10ChallengeError <stellar_sdk.sep.exceptions.InvalidSep10ChallengeError>` - if the
+        validation fails, the exception will be thrown.
+    """
+    warnings.warn(
+        "Will be removed in version v2.3.0, "
+        "use stellar_sdk.sep.test_stellar_web_authentication.verify_challenge_transaction_signed_by_client_master_key",
+        DeprecationWarning,
+    )  # pragma: no cover
+
+    return verify_challenge_transaction_signed_by_client_master_key(
+        challenge_transaction, server_account_id, network_passphrase
+    )  # pragma: no cover
+
+
+def verify_challenge_transaction_signed_by_client_master_key(
     challenge_transaction: str, server_account_id: str, network_passphrase: str
 ) -> None:
     """An alias for :func:`stellar_sdk.sep.stellar_web_authentication.verify_challenge_transaction`.
@@ -320,7 +353,7 @@ def verify_challenge_transaction(
         challenge_transaction, server_account_id, network_passphrase
     )
 
-    if not _verify_te_signed_by(transaction_envelope, client_account_id):
+    if not _verify_te_signed_by_account_id(transaction_envelope, client_account_id):
         raise InvalidSep10ChallengeError(
             "Transaction not signed by client: {}.".format(client_account_id)
         )
@@ -340,24 +373,44 @@ def _verify_transaction_signatures(
     if not signatures:
         raise InvalidSep10ChallengeError("Transaction has no signatures.")
 
-    signers_found = []
+    tx_hash = transaction_envelope.hash()
+
+    signers_found = []  # prevent a signature from being reused
+    signature_used = set()
     for signer in signers:
-        if _verify_te_signed_by(transaction_envelope, signer.account_id):
-            signers_found.append(signer)
+        kp = Keypair.from_public_key(signer.account_id)
+        for index, decorated_signature in enumerate(transaction_envelope.signatures):
+            # Special thanks to Leigh McCulloch for his help
+            # See https://github.com/StellarCN/py-stellar-base/issues/252#issuecomment-580882560
+            if index in signature_used:
+                continue
+            if decorated_signature.hint != kp.signature_hint():
+                continue
+            try:
+                kp.verify(tx_hash, decorated_signature.signature)
+                signature_used.add(index)
+                signers_found.append(signer)
+                break
+            except BadSignatureError:
+                pass
     return signers_found
 
 
-def _verify_te_signed_by(
+def _verify_te_signed_by_account_id(
     transaction_envelope: TransactionEnvelope, account_id: str
 ) -> bool:
-    kp = Keypair.from_public_key(account_id)
-    tx_hash = transaction_envelope.hash()
-    for decorated_signature in transaction_envelope.signatures:
-        if decorated_signature.hint != kp.signature_hint():
-            continue
-        try:
-            kp.verify(tx_hash, decorated_signature.signature)
+    signers_found = _verify_transaction_signatures(
+        transaction_envelope, [Ed25519PublicKeySigner(account_id)]
+    )
+    if not signers_found:
+        return False
+    return True
+
+
+def _signer_in_signers(
+    signer: Ed25519PublicKeySigner, signers: List[Ed25519PublicKeySigner]
+) -> bool:
+    for s in signers:
+        if s.account_id == signer.account_id:
             return True
-        except BadSignatureError:
-            pass
     return False
