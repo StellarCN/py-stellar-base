@@ -1,6 +1,11 @@
 Release History
 ===============
 
+### Version 2.1.3
+Released on February 03, 2020
+
+* fix: fix bug in SEP-0010 implementation.
+
 ### Version 2.1.2
 Released on February 02, 2020
 
