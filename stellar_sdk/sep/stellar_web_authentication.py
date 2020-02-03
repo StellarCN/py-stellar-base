@@ -56,9 +56,10 @@ def build_challenge_transaction(
     transaction_builder = TransactionBuilder(server_account, network_passphrase, 100)
     transaction_builder.add_time_bounds(min_time=now, max_time=now + timeout)
     nonce = os.urandom(48)
+    nonce_encoded = base64.b64encode(nonce)
     transaction_builder.append_manage_data_op(
         data_name="{} auth".format(anchor_name),
-        data_value=nonce,
+        data_value=nonce_encoded,
         source=client_account_id,
     )
     transaction = transaction_builder.build()
@@ -142,13 +143,13 @@ def read_challenge_transaction(
     if not client_account_id:
         raise InvalidSep10ChallengeError("Operation should have a source account.")
 
-    nonce_base64 = base64.b64encode(manage_data_op.data_value)
-    if len(nonce_base64) != 64:
+    if len(manage_data_op.data_value) != 64:
         raise InvalidSep10ChallengeError(
             "Operation value encoded as base64 should be 64 bytes long."
         )
 
-    if len(manage_data_op.data_value) != 48:
+    nonce = base64.b64decode(manage_data_op.data_value)
+    if len(nonce) != 48:
         raise InvalidSep10ChallengeError(
             "Operation value before encoding as base64 should be 48 bytes long."
         )

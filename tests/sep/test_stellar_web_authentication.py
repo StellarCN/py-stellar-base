@@ -43,8 +43,8 @@ class TestStellarWebAuthentication:
         op = transaction.operations[0]
         assert isinstance(op, ManageData)
         assert op.data_name == "SDF auth"
-        assert len(op.data_value) == 48
-        assert len(base64.b64encode(op.data_value)) == 64
+        assert len(op.data_value) == 64
+        assert len(base64.b64decode(op.data_value)) == 48
         assert op.source == client_account_id
 
         now = int(time.time())
@@ -85,12 +85,13 @@ class TestStellarWebAuthentication:
         anchor_name = "SDF"
         now = int(time.time())
         nonce = os.urandom(48)
+        nonce_encoded = base64.b64encode(nonce)
         server_account = Account(server_kp.public_key, 10086)
         challenge_te = (
             TransactionBuilder(server_account, network_passphrase, 100)
             .append_manage_data_op(
                 data_name="{} auth".format(anchor_name),
-                data_value=nonce,
+                data_value=nonce_encoded,
                 source=client_kp.public_key,
             )
             .add_time_bounds(now, now + 900)
@@ -186,11 +187,12 @@ class TestStellarWebAuthentication:
         anchor_name = "SDF"
         now = int(time.time())
         nonce = os.urandom(48)
+        nonce_encoded = base64.b64encode(nonce)
         server_account = Account(server_kp.public_key, -1)
         challenge_te = (
             TransactionBuilder(server_account, network_passphrase, 100)
             .append_manage_data_op(
-                data_name="{} auth".format(anchor_name), data_value=nonce
+                data_name="{} auth".format(anchor_name), data_value=nonce_encoded
             )
             .add_time_bounds(now, now + 900)
             .build()
@@ -214,12 +216,13 @@ class TestStellarWebAuthentication:
         anchor_name = "SDF"
         now = int(time.time())
         nonce = os.urandom(32)
+        nonce_encoded = base64.b64encode(nonce)
         server_account = Account(server_kp.public_key, -1)
         challenge_te = (
             TransactionBuilder(server_account, network_passphrase, 100)
             .append_manage_data_op(
                 data_name="{} auth".format(anchor_name),
-                data_value=nonce,
+                data_value=nonce_encoded,
                 source=client_kp.public_key,
             )
             .add_time_bounds(now, now + 900)
@@ -253,9 +256,10 @@ class TestStellarWebAuthentication:
         )
         transaction_builder.add_time_bounds(min_time=now, max_time=now + timeout)
         nonce = os.urandom(48)
+        nonce_encoded = base64.b64encode(nonce)
         transaction_builder.append_manage_data_op(
             data_name="{} auth".format(anchor_name),
-            data_value=nonce,
+            data_value=nonce_encoded,
             source=client_kp.public_key,
         )
         challenge = transaction_builder.build().to_xdr()
@@ -300,12 +304,13 @@ class TestStellarWebAuthentication:
         network_passphrase = Network.PUBLIC_NETWORK_PASSPHRASE
         anchor_name = "SDF"
         nonce = os.urandom(48)
+        nonce_encoded = base64.b64encode(nonce)
         server_account = Account(server_kp.public_key, -1)
         challenge_te = (
             TransactionBuilder(server_account, network_passphrase, 100)
             .append_manage_data_op(
                 data_name="{} auth".format(anchor_name),
-                data_value=nonce,
+                data_value=nonce_encoded,
                 source=client_kp.public_key,
             )
             .build()
@@ -329,12 +334,13 @@ class TestStellarWebAuthentication:
         anchor_name = "SDF"
         now = int(time.time())
         nonce = os.urandom(48)
+        nonce_encoded = base64.b64encode(nonce)
         server_account = Account(server_kp.public_key, -1)
         challenge_te = (
             TransactionBuilder(server_account, network_passphrase, 100)
             .append_manage_data_op(
                 data_name="{} auth".format(anchor_name),
-                data_value=nonce,
+                data_value=nonce_encoded,
                 source=client_kp.public_key,
             )
             .add_time_bounds(now, 0)
@@ -360,12 +366,13 @@ class TestStellarWebAuthentication:
         anchor_name = "SDF"
         now = int(time.time())
         nonce = os.urandom(48)
+        nonce_encoded = base64.b64encode(nonce)
         server_account = Account(server_kp.public_key, -1)
         challenge_te = (
             TransactionBuilder(server_account, network_passphrase, 100)
             .append_manage_data_op(
                 data_name="{} auth".format(anchor_name),
-                data_value=nonce,
+                data_value=nonce_encoded,
                 source=client_kp.public_key,
             )
             .add_time_bounds(now - 100, now - 50)
@@ -425,12 +432,13 @@ class TestStellarWebAuthentication:
         anchor_name = "SDF"
         now = int(time.time())
         nonce = os.urandom(48)
+        nonce_encoded = base64.b64encode(nonce)
         server_account = Account(server_kp.public_key, -1)
         challenge_te = (
             TransactionBuilder(server_account, network_passphrase, 100)
             .append_manage_data_op(
                 data_name="{} auth".format(anchor_name),
-                data_value=nonce,
+                data_value=nonce_encoded,
                 source=client_kp.public_key,
             )
             .add_time_bounds(now, now + 900)
