@@ -10,19 +10,10 @@ class TestOffersCallBuilder:
         assert builder.endpoint == "offers"
         assert builder.params == {}
 
-    def test_for_account(self):
-        account_id = "GATEMHCCKCY67ZUCKTROYN24ZYT5GK4EQZ65JJLDHKHRUZI3EUEKMTCH"
-        builder = OffersCallBuilder(horizon_url, client)
-        builder.for_account(account_id)
-        assert builder.endpoint == "accounts/{account_id}/offers".format(
-            account_id=account_id
-        )
-        assert builder.params == {}
-
     def test_for_offer(self):
         offer_id = "1000"
         builder = OffersCallBuilder(horizon_url, client)
-        builder.for_offer(offer_id)
+        builder.offer(offer_id)
         assert builder.endpoint == "offers/{offer_id}".format(offer_id=offer_id)
         assert builder.params == {}
 
@@ -32,7 +23,8 @@ class TestOffersCallBuilder:
         )
         buying = Asset.native()
         builder = OffersCallBuilder(horizon_url, client)
-        builder.for_asset(selling, buying)
+        builder.for_selling_asset(selling)
+        builder.for_buying_asset(buying)
         assert builder.endpoint == "offers"
         assert builder.params == {
             "selling_asset_type": selling.type,
@@ -49,7 +41,8 @@ class TestOffersCallBuilder:
         buying = Asset.native()
         builder = OffersCallBuilder(horizon_url, client)
         builder.for_seller(seller)
-        builder.for_asset(selling, buying)
+        builder.for_selling_asset(selling)
+        builder.for_buying_asset(buying)
         assert builder.endpoint == "offers"
         assert builder.params == {
             "seller": seller,
