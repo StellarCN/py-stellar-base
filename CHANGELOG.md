@@ -1,8 +1,8 @@
 Release History
 ===============
-### Version 2.2.0
 
-Unreleased
+### Version 2.2.0
+Released on February 07, 2020
 
 Horizon v1.0.0 Compatibility.
 
@@ -52,14 +52,14 @@ Horizon v1.0.0 Compatibility.
 
 - Regenerate the XDR definitions to include [MetaV2](https://github.com/jonjove/stellar-core/blob/b299b3a458a15f592352c67d4da69baa6e8fbb6a/src/xdr/Stellar-ledger.x#L309) support (also see [#1902](https://github.com/stellar/go/issues/1902)).
 
-### Fixed
+#### Fixed
 
 - Fixed some documentation errors.
 
 #### Breaking
 
 - Change function signature for `server.offers`. 
-  The signature for the function `server.offers()` was changed to bring suppport for other filters.
+  The signature for the function `server.offers()` was changed to bring support for other filters.
 
   Before, if you wanted to list all the offers for a given account, you'd do:
 
@@ -75,10 +75,8 @@ Horizon v1.0.0 Compatibility.
 
 * `server.accounts().signer` and `server.accounts().asset` are marked as deprecated, use `server.accounts().for_signer` and `server.accounts().for_asset` instead.
 
-There are also some changes related to the horizon's response, currently SDK has not added parse support to it, 
-so please refer to this [issue](https://github.com/StellarCN/py-stellar-base/issues/257) or 
-release notes of Stellar horizon 1.0.0. In addition, support for parsing the 
-horizon's responses will be added in the next major update.
+There are also some changes related to the horizon's response, currently, SDK has not added parse support to it, 
+so please refer to this [issue](https://github.com/StellarCN/py-stellar-base/issues/257) or release notes of Stellar horizon 1.0.0. In addition, support for parsing the horizon's responses will be added in the next major update.
 
 ### Version 2.1.3
 Released on February 03, 2020

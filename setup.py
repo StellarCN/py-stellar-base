@@ -50,7 +50,7 @@ setup(
     packages=find_packages(exclude=["tests", "tests.*"]),
     python_requires=">=3.6.0",
     classifiers=[
-        "Development Status :: 4 - Beta",
+        "Development Status :: 5 - Production/Stable",
         "Intended Audience :: Developers",
         "Natural Language :: English",
         "Operating System :: OS Independent",
