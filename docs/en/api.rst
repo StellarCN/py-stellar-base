@@ -43,6 +43,12 @@ AssetsCallBuilder
    :members:
    :inherited-members:
 
+DataCallBuilder
+---------------
+.. autoclass:: stellar_sdk.call_builder.DataCallBuilder
+   :members:
+   :inherited-members:
+
 EffectsCallBuilder
 ------------------
 .. autoclass:: stellar_sdk.call_builder.EffectsCallBuilder
