@@ -17,12 +17,6 @@ matrix:
       os: osx
       osx_image: xcode10.2
       language: shell
-    - name: "Python 3.7 on Windows"
-      os: windows
-      language: shell
-      python: 3.7
-      before_install: choco install python --version=3.7.4
-      env: PATH=/c/Python37:/c/Python37/Scripts:$PATH
 
 cache:
   - pip
