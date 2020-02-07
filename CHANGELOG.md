@@ -7,10 +7,79 @@ Unreleased
 
 Horizon v1.0.0 Compatibility.
 
-* **[Breaking Change]** Add support for `/offers` end-point with query parameters, this will affect the existing API, please refer to the documentation. (See [SDK API Documentation](https://stellar-sdk.readthedocs.io/en/2.2.0-beta1/api.html#offerscallbuilder) and [Stellar documentation for offers](https://www.stellar.org/developers/horizon/reference/endpoints/offers.html))
-* Regenerate the XDR definitions to include [MetaV2](https://github.com/jonjove/stellar-core/blob/b299b3a458a15f592352c67d4da69baa6e8fbb6a/src/xdr/Stellar-ledger.x#L309) support (also see [#1902](https://github.com/stellar/go/issues/1902)).
+#### Added
 
-There are also some updates that have been released in previous versions, see this [issue](https://github.com/StellarCN/py-stellar-base/issues/257) for details.
+- Add support for top-level offers endpoint with `seller`, `selling`, and `buying` filter.
+  Horizon 1.0 includes a new `/offers` end-point, which allows you to list all offers, supporting filtering by `seller`, `selling`, or `buying` asset.
+
+  You can fetch data from this endpoint by doing `server.offers()` and use any of the following filters:
+
+  - `seller`: `server.offers().for_seller(account_id)`
+  - `buying`: `server.offers().for_buying(asset)`
+  - `selling`: `server.offers().for_selling(asset)`
+  - `offer detail` : `server.offers().offer(offer_id)`
+
+  This introduced a breaking change since it modified the signature for the function `server.offers()`.
+
+  Before, if you wanted to list all the offers for a given account, you'd do:
+
+  ```
+  server.offers(account_id)
+  ```
+
+  Starting on this version you'll need to do:
+
+  ```
+  server.offers().for_seller(account_id)
+  ```
+
+  You can do now things that were not possible before, like finding
+  all offers for an account filtering by the selling or buying asset
+
+  ```
+  server.offers().for_seller(account_id).for_buying(buying_asset).for_selling(selling_asset)
+  ```
+
+- Add support for filtering accounts by `signer` or `asset`, this has been released in a previous patch version.
+  Horizon 1.0 includes a new `/accounts` end-point, which allows you to list all accounts who have another account as a signer or hold a given asset.
+
+  You can fetch data from this endpoint by doing `server.accounts()` and use any of the following filters:
+
+  - `acount detail`: `server.accounts().account_id(account_id)`, returns a single account.
+  - `for signer`: `server.accounts().for_signer(account_id)`, returns accounts where `account_id` is a signer.
+  - `for asset`: `server.accounts().for_asset(asset)`, returns accounts which hold the `asset`.
+
+#### Changed
+
+- Regenerate the XDR definitions to include [MetaV2](https://github.com/jonjove/stellar-core/blob/b299b3a458a15f592352c67d4da69baa6e8fbb6a/src/xdr/Stellar-ledger.x#L309) support (also see [#1902](https://github.com/stellar/go/issues/1902)).
+
+### Fixed
+
+- Fixed some documentation errors.
+
+#### Breaking
+
+- Change function signature for `server.offers`. 
+  The signature for the function `server.offers()` was changed to bring suppport for other filters.
+
+  Before, if you wanted to list all the offers for a given account, you'd do:
+
+  ```
+  server.offers(account_id)
+  ```
+
+  Starting on this version you'll need to do:
+
+  ```
+  server.offers().for_seller(account_id)
+  ```
+
+* `server.accounts().signer` and `server.accounts().asset` are marked as deprecated, use `server.accounts().for_signer` and `server.accounts().for_asset` instead.
+
+There are also some changes related to the horizon's response, currently SDK has not added parse support to it, 
+so please refer to this [issue](https://github.com/StellarCN/py-stellar-base/issues/257) or 
+release notes of Stellar horizon 1.0.0. In addition, support for parsing the 
+horizon's responses will be added in the next major update.
 
 ### Version 2.1.1
 Released on January 31, 2020

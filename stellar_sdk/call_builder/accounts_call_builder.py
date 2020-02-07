@@ -1,4 +1,5 @@
-from typing import Union, List
+import warnings
+from typing import Union
 
 from ..asset import Asset
 from ..call_builder.base_call_builder import BaseCallBuilder
@@ -41,6 +42,20 @@ class AccountsCallBuilder(BaseCallBuilder):
         :param signer: signer's account id, for example: `GDGQVOKHW4VEJRU2TETD6DBRKEO5ERCNF353LW5WBFW3JJWQ2BRQ6KDD`
         :return: current AccountCallBuilder instance
         """
+        warnings.warn(
+            "Will be removed in future, use AccountsCallBuilder.for_signer",
+            DeprecationWarning,
+        )
+        return self.for_signer(signer)
+
+    def for_signer(self, signer: str) -> "AccountsCallBuilder":
+        """Filtering accounts who have a given signer. The result is a list of accounts.
+
+        See `Account Details <https://www.stellar.org/developers/horizon/reference/endpoints/accounts-single.html>`_
+
+        :param signer: signer's account id, for example: `GDGQVOKHW4VEJRU2TETD6DBRKEO5ERCNF353LW5WBFW3JJWQ2BRQ6KDD`
+        :return: current AccountCallBuilder instance
+        """
         self._add_query_param("signer", signer)
         return self
 
@@ -49,7 +64,21 @@ class AccountsCallBuilder(BaseCallBuilder):
 
         See `Account Details <https://www.stellar.org/developers/horizon/reference/endpoints/accounts-single.html>`_
 
-        :param assets: a list of one or more Assets
+        :param asset: an issued asset
+        :return: current AccountCallBuilder instance
+        """
+        warnings.warn(
+            "Will be removed in future, use AccountsCallBuilder.for_asset",
+            DeprecationWarning,
+        )
+        return self.for_asset(asset)
+
+    def for_asset(self, asset: Asset) -> "AccountsCallBuilder":
+        """Filtering accounts who have a trustline to an asset. The result is a list of accounts.
+
+        See `Account Details <https://www.stellar.org/developers/horizon/reference/endpoints/accounts-single.html>`_
+
+        :param asset: an issued asset
         :return: current AccountCallBuilder instance
         """
         assets_param = convert_assets_to_horizon_param([asset])

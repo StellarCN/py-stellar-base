@@ -1,3 +1,4 @@
+import warnings
 from typing import Union
 
 from ..asset import Asset
@@ -23,6 +24,21 @@ class OffersCallBuilder(BaseCallBuilder):
         super().__init__(horizon_url, client)
         self.endpoint: str = "offers"
 
+    def account(self, account_id):
+        """Returns all offers where the given account is the seller.
+
+        See `Offers for Account <https://www.stellar.org/developers/horizon/reference/endpoints/offers-for-account.html>`_
+
+        :param account_id: Account ID
+        :return: this OffersCallBuilder instance
+        """
+        warnings.warn(
+            "Will be removed in future, use OffersCallBuilder.for_seller",
+            DeprecationWarning,
+        )
+        self.endpoint = "accounts/{account_id}/offers".format(account_id=account_id)
+        return self
+
     def for_seller(self, seller: str):
         """Returns all offers where the given account is the seller.
 
@@ -33,11 +49,13 @@ class OffersCallBuilder(BaseCallBuilder):
         See `Offers <https://www.stellar.org/developers/horizon/reference/endpoints/offers.html>`_
 
         :param seller: Account ID of the offer creator
+        :return: this OffersCallBuilder instance
         """
         self.endpoint: str = "offers"
         self._add_query_param("seller", seller)
+        return self
 
-    def for_buying_asset(self, buying: Asset):
+    def for_buying(self, buying: Asset):
         """Returns all offers buying an asset.
 
         People on the Stellar network can make offers to buy or sell assets.
@@ -47,6 +65,7 @@ class OffersCallBuilder(BaseCallBuilder):
         See `Offers <https://www.stellar.org/developers/horizon/reference/endpoints/offers.html>`_
 
         :param buying: The asset being bought.
+        :return: this OffersCallBuilder instance
         """
         params = {
             "buying_asset_type": buying.type,
@@ -54,8 +73,9 @@ class OffersCallBuilder(BaseCallBuilder):
             "buying_asset_issuer": buying.issuer,
         }
         self._add_query_params(params)
+        return self
 
-    def for_selling_asset(self, selling: Asset):
+    def for_selling(self, selling: Asset):
         """Returns all offers selling an asset.
 
         People on the Stellar network can make offers to buy or sell assets.
@@ -65,6 +85,7 @@ class OffersCallBuilder(BaseCallBuilder):
         See `Offers <https://www.stellar.org/developers/horizon/reference/endpoints/offers.html>`_
 
         :param selling: The asset being sold.
+        :return: this OffersCallBuilder instance
         """
         params = {
             "selling_asset_type": selling.type,
@@ -72,12 +93,15 @@ class OffersCallBuilder(BaseCallBuilder):
             "selling_asset_issuer": selling.issuer,
         }
         self._add_query_params(params)
+        return self
 
-    def offer(self, offer_id: str):
+    def offer(self, offer_id: Union[str, int]):
         """Returns information and links relating to a single offer.
 
         See `Offer Details <https://www.stellar.org/developers/horizon/reference/endpoints/offer-details.html>`_
 
         :param offer_id: Offer ID.
+        :return: this OffersCallBuilder instance
         """
         self.endpoint = "offers/{offer}".format(offer=offer_id)
+        return self

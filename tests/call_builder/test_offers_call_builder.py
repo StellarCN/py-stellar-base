@@ -23,8 +23,8 @@ class TestOffersCallBuilder:
         )
         buying = Asset.native()
         builder = OffersCallBuilder(horizon_url, client)
-        builder.for_selling_asset(selling)
-        builder.for_buying_asset(buying)
+        builder.for_selling(selling)
+        builder.for_buying(buying)
         assert builder.endpoint == "offers"
         assert builder.params == {
             "selling_asset_type": selling.type,
@@ -41,8 +41,8 @@ class TestOffersCallBuilder:
         buying = Asset.native()
         builder = OffersCallBuilder(horizon_url, client)
         builder.for_seller(seller)
-        builder.for_selling_asset(selling)
-        builder.for_buying_asset(buying)
+        builder.for_selling(selling)
+        builder.for_buying(buying)
         assert builder.endpoint == "offers"
         assert builder.params == {
             "seller": seller,
