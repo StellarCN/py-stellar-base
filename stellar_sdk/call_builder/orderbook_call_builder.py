@@ -7,8 +7,8 @@ from ..client.base_sync_client import BaseSyncClient
 
 
 class OrderbookCallBuilder(BaseCallBuilder):
-    """ Creates a new :class:`AccountsCallBuilder` pointed to server defined by horizon_url.
-    Do not create this object directly, use :func:`stellar_sdk.server.Server.accounts`.
+    """ Creates a new :class:`OrderbookCallBuilder` pointed to server defined by horizon_url.
+    Do not create this object directly, use :func:`stellar_sdk.server.Server.orderbook`.
 
     See `Orderbook Details <https://www.stellar.org/developers/horizon/reference/endpoints/orderbook-details.html>`_
 
