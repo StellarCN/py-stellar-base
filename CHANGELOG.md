@@ -78,6 +78,11 @@ Horizon v1.0.0 Compatibility.
 There are also some changes related to the horizon's response, currently, SDK has not added parse support to it, 
 so please refer to this [issue](https://github.com/StellarCN/py-stellar-base/issues/257) or release notes of Stellar horizon 1.0.0. In addition, support for parsing the horizon's responses will be added in the next major update.
 
+### Version 2.1.4
+Released on February 12, 2020
+
+* fix: orderbook async streams (#265)
+
 ### Version 2.1.3
 Released on February 03, 2020
 
