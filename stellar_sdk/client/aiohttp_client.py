@@ -147,22 +147,22 @@ class AiohttpClient(BaseAsyncClient):
                     Note that the timeout starts from the first event forward. There is no until we get the first event.
                     """
                     async for event in client:
-                        if event.last_event_id != "":
+                        if event.last_event_id:
                             query_params["cursor"] = event.last_event_id
                             # Events that dont have an id are not useful for us (hello/byebye events)
-                            retry = client._reconnection_time.total_seconds()
-                            try:
-                                data = event.data
-                                if data != '"hello"' and data != '"byebye"':
-                                    yield json.loads(data)
-                            except json.JSONDecodeError:
-                                # Content was not json-decodable
-                                pass
+                        retry = client._reconnection_time.total_seconds()
+                        try:
+                            data = event.data
+                            if data != '"hello"' and data != '"byebye"':
+                                yield json.loads(data)
+                        except json.JSONDecodeError:
+                            # Content was not json-decodable
+                            pass
             except aiohttp.ClientConnectionError:
                 # Retry if the connection dropped after we got the initial response
                 logger.warning(
                     "We have encountered an error and we will try to reconnect, cursor = {}".format(
-                        query_params["cursor"]
+                        query_params.get("cursor")
                     )
                 )
                 await asyncio.sleep(retry)
