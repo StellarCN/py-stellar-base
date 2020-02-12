@@ -1,6 +1,11 @@
 Release History
 ===============
 
+### Version 2.1.4
+Released on February 12, 2020
+
+* fix: orderbook async streams (#265)
+
 ### Version 2.1.3
 Released on February 03, 2020
 
