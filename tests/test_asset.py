@@ -1,9 +1,9 @@
 import pytest
 
-from stellar_sdk.xdr import Xdr
 from stellar_sdk.asset import Asset
 from stellar_sdk.exceptions import AssetIssuerInvalidError, AssetCodeInvalidError
 from stellar_sdk.keypair import Keypair
+from stellar_sdk.xdr import xdr as stellarxdr
 
 
 class TestAsset:
@@ -101,11 +101,11 @@ class TestAsset:
         ],
     )
     def test_to_xdr_object(self, asset, xdr):
-        assert asset.to_xdr_object().to_xdr() == xdr
+        assert asset.to_xdr() == xdr
 
     def test_from_xdr_object_native(self):
-        xdr_type = Xdr.const.ASSET_TYPE_NATIVE
-        xdr = Xdr.types.Asset(type=xdr_type)
+        xdr_type = stellarxdr.AssetType.ASSET_TYPE_NATIVE
+        xdr = stellarxdr.Asset(type=xdr_type)
 
         asset = Asset.from_xdr_object(xdr)
         assert asset.is_native()
@@ -115,29 +115,31 @@ class TestAsset:
         issuer = "GCNY5OXYSY4FKHOPT2SPOQZAOEIGXB5LBYW3HVU3OWSTQITS65M5RCNY"
         type = "credit_alphanum4"
 
-        x = Xdr.nullclass()
-        x.assetCode = bytearray(code, "ascii") + b"\x00"
-        x.issuer = Keypair.from_public_key(issuer).xdr_account_id()
-        xdr_type = Xdr.const.ASSET_TYPE_CREDIT_ALPHANUM4
-        xdr = Xdr.types.Asset(type=xdr_type, alphaNum4=x)
+        asset_code = stellarxdr.AssetCode4(bytearray(code, "ascii") + b"\x00")
+        issuer_xdr = Keypair.from_public_key(issuer).xdr_account_id()
+        alpha_num4 = stellarxdr.AssetAlphaNum4(asset_code, issuer_xdr)
+        xdr_type = stellarxdr.AssetType.ASSET_TYPE_CREDIT_ALPHANUM4
+        xdr = stellarxdr.Asset(type=xdr_type, alpha_num4=alpha_num4)
 
         asset = Asset.from_xdr_object(xdr)
         assert asset.code == code
         assert asset.issuer == issuer
         assert asset.type == type
+        assert Asset(code, issuer) == Asset.from_xdr(Asset(code, issuer).to_xdr())
 
     def test_from_xdr_object_alphanum12(self):
         code = "Banana"
         issuer = "GCNY5OXYSY4FKHOPT2SPOQZAOEIGXB5LBYW3HVU3OWSTQITS65M5RCNY"
         type = "credit_alphanum12"
 
-        x = Xdr.nullclass()
-        x.assetCode = bytearray(code, "ascii") + b"\x00" * 6
-        x.issuer = Keypair.from_public_key(issuer).xdr_account_id()
-        xdr_type = Xdr.const.ASSET_TYPE_CREDIT_ALPHANUM12
-        xdr = Xdr.types.Asset(type=xdr_type, alphaNum12=x)
+        asset_code = stellarxdr.AssetCode12(bytearray(code, "ascii") + b"\x00" * 6)
+        issuer_xdr = Keypair.from_public_key(issuer).xdr_account_id()
+        alpha_num12 = stellarxdr.AssetAlphaNum12(asset_code, issuer_xdr)
+        xdr_type = stellarxdr.AssetType.ASSET_TYPE_CREDIT_ALPHANUM12
+        xdr = stellarxdr.Asset(type=xdr_type, alpha_num12=alpha_num12)
 
         asset = Asset.from_xdr_object(xdr)
         assert asset.code == code
         assert asset.issuer == issuer
         assert asset.type == type
+        assert Asset(code, issuer) == Asset.from_xdr(Asset(code, issuer).to_xdr())

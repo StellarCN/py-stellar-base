@@ -93,7 +93,7 @@ class TestBaseOperation:
         origin_op = CreateAccount(destination, starting_balance, source)
         origin_xdr_obj = origin_op.to_xdr_object()
 
-        op = Operation.from_xdr_object(origin_xdr_obj)
+        op: CreateAccount = Operation.from_xdr_object(origin_xdr_obj)
         assert op.source == source
         assert op.starting_balance == "1000"
         assert op.destination == destination
@@ -102,9 +102,9 @@ class TestBaseOperation:
         destination = "GCEZWKCA5VLDNRLN3RPRJMRZOX3Z6G5CHCGSNFHEYVXM3XOJMDS674JZ"
         starting_balance = "1000.00"
         origin_op = CreateAccount(destination, starting_balance)
-        origin_xdr_obj = origin_op.to_xdr_object()
+        origin_op_obj = origin_op.to_xdr_object()
 
-        op = Operation.from_xdr_object(origin_xdr_obj)
+        op = Operation.from_xdr_object(origin_op_obj)
         assert op.source == None
         assert op.starting_balance == "1000"
         assert op.destination == destination
@@ -124,20 +124,15 @@ class TestCreateAccount:
         destination = "GCEZWKCA5VLDNRLN3RPRJMRZOX3Z6G5CHCGSNFHEYVXM3XOJMDS674JZ"
         starting_balance = "1000.00"
         op = CreateAccount(destination, starting_balance, source)
-        assert (
-            op.to_xdr_object().to_xdr()
-            == "AAAAAQAAAADX7fRsY6KTqIc8EIDyr8M9gxGPW6ODnZoZDgo6l1ymwwAAA"
-            "AAAAAAAiZsoQO1WNsVt3F8Usjl1958bojiNJpTkxW7N3clg5e8AAAACVAvkAA=="
-        )
+        xdr = "AAAAAQAAAADX7fRsY6KTqIc8EIDyr8M9gxGPW6ODnZoZDgo6l1ymwwAAAAAAAAAAiZsoQO1WNsVt3F8Usjl1958bojiNJpTkxW7N3clg5e8AAAACVAvkAA=="
+        assert op.to_xdr() == xdr
 
     def test_to_xdr_obj_without_source(self):
         destination = "GCEZWKCA5VLDNRLN3RPRJMRZOX3Z6G5CHCGSNFHEYVXM3XOJMDS674JZ"
         starting_balance = "1000.00"
+        xdr = "AAAAAAAAAAAAAAAAiZsoQO1WNsVt3F8Usjl1958bojiNJpTkxW7N3clg5e8AAAACVAvkAA=="
         op = CreateAccount(destination, starting_balance)
-        assert (
-            op.to_xdr_object().to_xdr() == "AAAAAAAAAAAAAAAAiZsoQO1WNsVt3F8Usjl"
-            "1958bojiNJpTkxW7N3clg5e8AAAACVAvkAA=="
-        )
+        assert op.to_xdr() == xdr
 
     def test_to_xdr_obj_with_invalid_destination_raise(self):
         destination = "GCEZWKCA5VLDNRLN3RPRJMRZOX3Z6G5CHCGSNFHEYVXM3XOJMINVALID"
@@ -173,9 +168,10 @@ class TestCreateAccount:
         destination = "GCEZWKCA5VLDNRLN3RPRJMRZOX3Z6G5CHCGSNFHEYVXM3XOJMDS674JZ"
         starting_balance = "1000.00"
         origin_op = CreateAccount(destination, starting_balance, source)
-        origin_xdr_obj = origin_op.to_xdr_object()
+        origin_op_obj = origin_op.to_xdr_object()
 
-        op = Operation.from_xdr_object(origin_xdr_obj)
+        assert origin_op == Operation.from_xdr(origin_op.to_xdr())
+        op = Operation.from_xdr_object(origin_op_obj)
         assert op.source == source
         assert op.starting_balance == "1000"
         assert op.destination == destination
@@ -188,15 +184,17 @@ class TestBumpSequence:
 
         op = BumpSequence(bump_to, source)
         assert (
-            op.to_xdr_object().to_xdr()
+            op.to_xdr()
             == "AAAAAQAAAADX7fRsY6KTqIc8EIDyr8M9gxGPW6ODnZoZDgo6l1ymwwAAAAsAAAAAAAG/Ug=="
         )
 
     def test_from_xdr_obj(self):
         bump_to = 123123123
         source = "GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV"
-        origin_xdr_obj = BumpSequence(bump_to, source).to_xdr_object()
-        op = Operation.from_xdr_object(origin_xdr_obj)
+        origin_op = BumpSequence(bump_to, source)
+        origin_op_obj = origin_op.to_xdr_object()
+        op = Operation.from_xdr_object(origin_op_obj)
+        assert origin_op == Operation.from_xdr(origin_op.to_xdr())
         assert isinstance(op, BumpSequence)
         assert op.source == source
         assert op.bump_to == bump_to
@@ -207,14 +205,16 @@ class TestInflation:
         source = "GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV"
         op = Inflation(source)
         assert (
-            op.to_xdr_object().to_xdr()
+            op.to_xdr()
             == "AAAAAQAAAADX7fRsY6KTqIc8EIDyr8M9gxGPW6ODnZoZDgo6l1ymwwAAAAk="
         )
 
     def test_from_xdr_obj(self):
         source = "GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV"
-        origin_xdr_obj = Inflation(source).to_xdr_object()
-        op = Operation.from_xdr_object(origin_xdr_obj)
+        origin_op = Inflation(source)
+        origin_op_obj = origin_op.to_xdr_object()
+        assert Operation.from_xdr(origin_op.to_xdr()) == origin_op
+        op = Operation.from_xdr_object(origin_op_obj)
         assert isinstance(op, Inflation)
         assert op.source == source
 
@@ -225,15 +225,17 @@ class TestAccountMerge:
         destination = "GCEZWKCA5VLDNRLN3RPRJMRZOX3Z6G5CHCGSNFHEYVXM3XOJMDS674JZ"
         op = AccountMerge(destination, source)
         assert (
-            op.to_xdr_object().to_xdr()
+            op.to_xdr()
             == "AAAAAQAAAADX7fRsY6KTqIc8EIDyr8M9gxGPW6ODnZoZDgo6l1ymwwAAAAgAAAAAiZsoQO1WNsVt3F8Usjl1958bojiNJpTkxW7N3clg5e8="
         )
 
     def test_from_xdr_obj(self):
         source = "GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV"
         destination = "GCEZWKCA5VLDNRLN3RPRJMRZOX3Z6G5CHCGSNFHEYVXM3XOJMDS674JZ"
-        origin_xdr_obj = AccountMerge(destination, source).to_xdr_object()
-        op = Operation.from_xdr_object(origin_xdr_obj)
+        origin_op = AccountMerge(destination, source)
+        origin_op_obj = origin_op.to_xdr_object()
+        assert Operation.from_xdr(origin_op.to_xdr()) == origin_op
+        op = Operation.from_xdr_object(origin_op_obj)
         assert isinstance(op, AccountMerge)
         assert op.source == source
         assert op.destination == destination
@@ -265,14 +267,16 @@ class TestChangeTrust:
         asset = Asset("USD", "GDGU5OAPHNPU5UCLE5RDJHG7PXZFQYWKCFOEXSXNMR6KRQRI5T6XXCD7")
         source = "GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV"
         op = ChangeTrust(asset, limit, source)
-        assert op.to_xdr_object().to_xdr() == xdr
+        assert op.to_xdr() == xdr
 
     def test_from_xdr_obj(self):
         asset = Asset("USD", "GDGU5OAPHNPU5UCLE5RDJHG7PXZFQYWKCFOEXSXNMR6KRQRI5T6XXCD7")
         source = "GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV"
         limit = "123456.789"
-        origin_xdr_obj = ChangeTrust(asset, limit, source).to_xdr_object()
-        op = Operation.from_xdr_object(origin_xdr_obj)
+        origin_op = ChangeTrust(asset, limit, source)
+        origin_op_obj = origin_op.to_xdr_object()
+        assert Operation.from_xdr(origin_op.to_xdr()) == origin_op
+        op = Operation.from_xdr_object(origin_op_obj)
         assert isinstance(op, ChangeTrust)
         assert op.source == source
         assert op.limit == limit
@@ -287,7 +291,7 @@ class TestPayment:
         asset = Asset("USD", "GDGU5OAPHNPU5UCLE5RDJHG7PXZFQYWKCFOEXSXNMR6KRQRI5T6XXCD7")
         op = Payment(destination, asset, amount, source)
         assert (
-            op.to_xdr_object().to_xdr()
+            op.to_xdr()
             == "AAAAAQAAAADX7fRsY6KTqIc8EIDyr8M9gxGPW6ODnZoZDgo6l1ymwwAAAAEAAAAAiZsoQO1WNsVt3F8Usjl1958bojiNJpTkxW7N3clg5e8AAAABVVNEAAAAAADNTrgPO19O0EsnYjSc333yWGLKEVxLyu1kfKjCKOz9ewAAAAJUC+QA"
         )
 
@@ -312,8 +316,10 @@ class TestPayment:
         destination = "GCEZWKCA5VLDNRLN3RPRJMRZOX3Z6G5CHCGSNFHEYVXM3XOJMDS674JZ"
         amount = "1000.0000000"
         asset = Asset("USD", "GDGU5OAPHNPU5UCLE5RDJHG7PXZFQYWKCFOEXSXNMR6KRQRI5T6XXCD7")
-        origin_xdr_obj = Payment(destination, asset, amount, source).to_xdr_object()
-        op = Operation.from_xdr_object(origin_xdr_obj)
+        origin_op = Payment(destination, asset, amount, source)
+        origin_op_obj = origin_op.to_xdr_object()
+        assert Operation.from_xdr(origin_op.to_xdr()) == origin_op
+        op = Operation.from_xdr_object(origin_op_obj)
         assert isinstance(op, Payment)
         assert op.source == source
         assert op.destination == destination
@@ -341,7 +347,7 @@ class TestPathPayment:
             destination, send_asset, send_max, dest_asset, dest_amount, path, source
         )
         assert (
-            op.to_xdr_object().to_xdr()
+            op.to_xdr()
             == "AAAAAQAAAADX7fRsY6KTqIc8EIDyr8M9gxGPW6ODnZoZDgo6l1ymwwAAAAIAAAABVVNEAAAAAADNTrgPO19O0EsnYjSc333yWGLKEVxLyu1kfKjCKOz9ewAAAAABytTwAAAAAImbKEDtVjbFbdxfFLI5dfefG6I4jSaU5MVuzd3JYOXvAAAAAVVTRAAAAAAAzU64DztfTtBLJ2I0nN998lhiyhFcS8rtZHyowijs/XsAAAAAAd9a2AAAAAIAAAABVVNEAAAAAABCzwVZeQ9sO2TeFRIN8Lslyqt9wttPtKGKNeiBvzI69wAAAAFFVVIAAAAAAObbxW5I9YIF6lfUJkfp3sADdrm5wJmdBv78Py6kKta1"
         )
 
@@ -384,10 +390,12 @@ class TestPathPayment:
             Asset("USD", "GBBM6BKZPEHWYO3E3YKREDPQXMS4VK35YLNU7NFBRI26RAN7GI5POFBB"),
             Asset("EUR", "GDTNXRLOJD2YEBPKK7KCMR7J33AAG5VZXHAJTHIG736D6LVEFLLLKPDL"),
         ]
-        origin_xdr_obj = PathPayment(
+        origin_op = PathPayment(
             destination, send_asset, send_max, dest_asset, dest_amount, path, source
-        ).to_xdr_object()
-        op = Operation.from_xdr_object(origin_xdr_obj)
+        )
+        origin_op_obj = origin_op.to_xdr_object()
+        assert Operation.from_xdr(origin_op.to_xdr()) == origin_op
+        op = Operation.from_xdr_object(origin_op_obj)
         assert isinstance(op, PathPaymentStrictReceive)
         assert op.source == source
         assert op.destination == destination
@@ -418,7 +426,7 @@ class TestPathPaymentStrictReceive:
             destination, send_asset, send_max, dest_asset, dest_amount, path, source
         )
         assert (
-            op.to_xdr_object().to_xdr()
+            op.to_xdr()
             == "AAAAAQAAAADX7fRsY6KTqIc8EIDyr8M9gxGPW6ODnZoZDgo6l1ymwwAAAAIAAAABVVNEAAAAAADNTrgPO19O0EsnYjSc333yWGLKEVxLyu1kfKjCKOz9ewAAAAABytTwAAAAAImbKEDtVjbFbdxfFLI5dfefG6I4jSaU5MVuzd3JYOXvAAAAAVVTRAAAAAAAzU64DztfTtBLJ2I0nN998lhiyhFcS8rtZHyowijs/XsAAAAAAd9a2AAAAAIAAAABVVNEAAAAAABCzwVZeQ9sO2TeFRIN8Lslyqt9wttPtKGKNeiBvzI69wAAAAFFVVIAAAAAAObbxW5I9YIF6lfUJkfp3sADdrm5wJmdBv78Py6kKta1"
         )
 
@@ -457,10 +465,12 @@ class TestPathPaymentStrictReceive:
             Asset("USD", "GBBM6BKZPEHWYO3E3YKREDPQXMS4VK35YLNU7NFBRI26RAN7GI5POFBB"),
             Asset("EUR", "GDTNXRLOJD2YEBPKK7KCMR7J33AAG5VZXHAJTHIG736D6LVEFLLLKPDL"),
         ]
-        origin_xdr_obj = PathPaymentStrictReceive(
+        origin_op = PathPaymentStrictReceive(
             destination, send_asset, send_max, dest_asset, dest_amount, path, source
-        ).to_xdr_object()
-        op = Operation.from_xdr_object(origin_xdr_obj)
+        )
+        origin_op_obj = origin_op.to_xdr_object()
+        assert Operation.from_xdr(origin_op.to_xdr()) == origin_op
+        op = Operation.from_xdr_object(origin_op_obj)
         assert isinstance(op, PathPaymentStrictReceive)
         assert op.source == source
         assert op.destination == destination
@@ -491,7 +501,7 @@ class TestPathPaymentStrictSend:
             destination, send_asset, send_amount, dest_asset, dest_min, path, source
         )
         assert (
-            op.to_xdr_object().to_xdr()
+            op.to_xdr()
             == "AAAAAQAAAADX7fRsY6KTqIc8EIDyr8M9gxGPW6ODnZoZDgo6l1ymwwAAAA0AAAABVVNEAAAAAADNTrgPO19O0EsnYjSc333yWGLKEVxLyu1kfKjCKOz9ewAAAAAB31rYAAAAAImbKEDtVjbFbdxfFLI5dfefG6I4jSaU5MVuzd3JYOXvAAAAAVVTRAAAAAAAzU64DztfTtBLJ2I0nN998lhiyhFcS8rtZHyowijs/XsAAAAAAcrU8AAAAAIAAAABVVNEAAAAAABCzwVZeQ9sO2TeFRIN8Lslyqt9wttPtKGKNeiBvzI69wAAAAFFVVIAAAAAAObbxW5I9YIF6lfUJkfp3sADdrm5wJmdBv78Py6kKta1"
         )
 
@@ -530,10 +540,12 @@ class TestPathPaymentStrictSend:
             Asset("USD", "GBBM6BKZPEHWYO3E3YKREDPQXMS4VK35YLNU7NFBRI26RAN7GI5POFBB"),
             Asset("EUR", "GDTNXRLOJD2YEBPKK7KCMR7J33AAG5VZXHAJTHIG736D6LVEFLLLKPDL"),
         ]
-        origin_xdr_obj = PathPaymentStrictSend(
+        origin_op = PathPaymentStrictSend(
             destination, send_asset, send_amount, dest_asset, dest_min, path, source
-        ).to_xdr_object()
-        op = Operation.from_xdr_object(origin_xdr_obj)
+        )
+        origin_op_obj = origin_op.to_xdr_object()
+        assert Operation.from_xdr(origin_op.to_xdr()) == origin_op
+        op = Operation.from_xdr_object(origin_op_obj)
         assert isinstance(op, PathPaymentStrictSend)
         assert op.source == source
         assert op.destination == destination
@@ -563,7 +575,7 @@ class TestAllowTrust:
         trustor = "GDGU5OAPHNPU5UCLE5RDJHG7PXZFQYWKCFOEXSXNMR6KRQRI5T6XXCD7"
         asset_code = "USD"
         op = AllowTrust(trustor, asset_code, authorize, source)
-        assert op.to_xdr_object().to_xdr() == xdr
+        assert op.to_xdr() == xdr
 
     @pytest.mark.parametrize(
         "asset_code, authorize",
@@ -572,10 +584,10 @@ class TestAllowTrust:
     def test_from_xdr_obj(self, asset_code, authorize):
         source = "GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV"
         trustor = "GDGU5OAPHNPU5UCLE5RDJHG7PXZFQYWKCFOEXSXNMR6KRQRI5T6XXCD7"
-        origin_xdr_obj = AllowTrust(
-            trustor, asset_code, authorize, source
-        ).to_xdr_object()
-        op = Operation.from_xdr_object(origin_xdr_obj)
+        origin_op = AllowTrust(trustor, asset_code, authorize, source)
+        origin_op_obj = origin_op.to_xdr_object()
+        assert Operation.from_xdr(origin_op.to_xdr()) == origin_op
+        op = Operation.from_xdr_object(origin_op_obj)
         assert isinstance(op, AllowTrust)
         assert op.source == source
         assert op.trustor == trustor
@@ -588,14 +600,14 @@ class TestManageData:
         "name, value, xdr",
         [
             (
-                "add_data",
-                "value",
-                "AAAAAQAAAADX7fRsY6KTqIc8EIDyr8M9gxGPW6ODnZoZDgo6l1ymwwAAAAoAAAAIYWRkX2RhdGEAAAABAAAABXZhbHVlAAAA",
-            ),
-            (
                 "remove_data",
                 None,
                 "AAAAAQAAAADX7fRsY6KTqIc8EIDyr8M9gxGPW6ODnZoZDgo6l1ymwwAAAAoAAAALcmVtb3ZlX2RhdGEAAAAAAA==",
+            ),
+            (
+                "add_data",
+                "value",
+                "AAAAAQAAAADX7fRsY6KTqIc8EIDyr8M9gxGPW6ODnZoZDgo6l1ymwwAAAAoAAAAIYWRkX2RhdGEAAAABAAAABXZhbHVlAAAA",
             ),
             (
                 "add_bytes_data",
@@ -612,7 +624,7 @@ class TestManageData:
     def test_to_xdr_obj(self, name, value, xdr):
         source = "GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV"
         op = ManageData(name, value, source)
-        assert op.to_xdr_object().to_xdr() == xdr
+        assert op.to_xdr() == xdr
 
     @pytest.mark.parametrize(
         "name, value",
@@ -636,8 +648,10 @@ class TestManageData:
     )
     def test_from_xdr_obj(self, name, value):
         source = "GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV"
-        origin_xdr_obj = ManageData(name, value, source).to_xdr_object()
-        op = Operation.from_xdr_object(origin_xdr_obj)
+        origin_op = ManageData(name, value, source)
+        origin_op_obj = origin_op.to_xdr_object()
+        assert Operation.from_xdr(origin_op.to_xdr()) == origin_op
+        op = Operation.from_xdr_object(origin_op_obj)
         assert isinstance(op, ManageData)
         assert op.source == source
         assert op.data_name == name
@@ -737,7 +751,8 @@ class TestSetOptions:
             source,
         )
         xdr_obj = op.to_xdr_object()
-        assert xdr_obj.to_xdr() == xdr
+        assert op.to_xdr() == xdr
+        assert Operation.from_xdr(xdr) == op
         from_instance = Operation.from_xdr_object(xdr_obj)
         assert isinstance(from_instance, SetOptions)
         assert from_instance.source == source
@@ -797,7 +812,8 @@ class TestManageSellOffer:
     def test_to_xdr(self, selling, buying, amount, price, offer_id, source, xdr):
         op = ManageSellOffer(selling, buying, amount, price, offer_id, source)
         xdr_obj = op.to_xdr_object()
-        assert xdr_obj.to_xdr() == xdr
+        assert op.to_xdr() == xdr
+        assert Operation.from_xdr(xdr) == op
         from_instance = Operation.from_xdr_object(xdr_obj)
         assert isinstance(from_instance, ManageSellOffer)
         assert from_instance.source == source
@@ -856,7 +872,8 @@ class TestManageBuyOffer:
     def test_to_xdr(self, selling, buying, amount, price, offer_id, source, xdr):
         op = ManageBuyOffer(selling, buying, amount, price, offer_id, source)
         xdr_obj = op.to_xdr_object()
-        assert xdr_obj.to_xdr() == xdr
+        assert op.to_xdr() == xdr
+        assert Operation.from_xdr(xdr) == op
         from_instance = Operation.from_xdr_object(xdr_obj)
         assert isinstance(from_instance, ManageBuyOffer)
         assert from_instance.source == source
@@ -912,7 +929,8 @@ class TestCreatePassiveSellOffer:
     def test_to_xdr(self, selling, buying, amount, price, source, xdr):
         op = CreatePassiveSellOffer(selling, buying, amount, price, source)
         xdr_obj = op.to_xdr_object()
-        assert xdr_obj.to_xdr() == xdr
+        assert op.to_xdr() == xdr
+        assert Operation.from_xdr(xdr) == op
         from_instance = Operation.from_xdr_object(xdr_obj)
         assert isinstance(from_instance, CreatePassiveSellOffer)
         assert from_instance.source == source

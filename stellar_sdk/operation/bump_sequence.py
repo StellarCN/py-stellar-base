@@ -1,6 +1,6 @@
 from .operation import Operation
 
-from ..xdr import Xdr
+from ..xdr import xdr
 
 
 class BumpSequence(Operation):
@@ -24,25 +24,25 @@ class BumpSequence(Operation):
         self.bump_to: int = bump_to
 
     @classmethod
-    def type_code(cls) -> int:
-        return Xdr.const.BUMP_SEQUENCE
+    def type_code(cls) -> xdr.OperationType:
+        return xdr.OperationType.BUMP_SEQUENCE
 
-    def _to_operation_body(self) -> Xdr.nullclass:
-        bump_sequence_op = Xdr.types.BumpSequenceOp(self.bump_to)
-        body = Xdr.nullclass()
-        body.type = Xdr.const.BUMP_SEQUENCE
-        body.bumpSequenceOp = bump_sequence_op
+    def _to_operation_body(self) -> xdr.OperationBody:
+        sequence = xdr.SequenceNumber(xdr.Int64(self.bump_to))
+        bump_sequence_op = xdr.BumpSequenceOp(sequence)
+        body = xdr.OperationBody(
+            type=self.type_code(), bump_sequence_op=bump_sequence_op
+        )
         return body
 
     @classmethod
-    def from_xdr_object(
-        cls, operation_xdr_object: Xdr.types.Operation
-    ) -> "BumpSequence":
+    def from_xdr_object(cls, operation_xdr_object: xdr.Operation) -> "BumpSequence":
         """Creates a :class:`BumpSequence` object from an XDR Operation
         object.
 
         """
         source = Operation.get_source_from_xdr_obj(operation_xdr_object)
-
-        bump_to = operation_xdr_object.body.bumpSequenceOp.bumpTo
+        bump_to = (
+            operation_xdr_object.body.bump_sequence_op.bump_to.sequence_number.int64
+        )
         return cls(source=source, bump_to=bump_to)

@@ -2,11 +2,11 @@ from decimal import Decimal
 from typing import List, Union
 
 from .operation import Operation
+from .utils import check_ed25519_public_key, check_amount
 from ..asset import Asset
 from ..keypair import Keypair
-from ..xdr import Xdr
 from ..strkey import StrKey
-from .utils import check_ed25519_public_key, check_amount
+from ..xdr import xdr
 
 
 class PathPaymentStrictSend(Operation):
@@ -48,34 +48,35 @@ class PathPaymentStrictSend(Operation):
         self.send_amount: Union[str, Decimal] = send_amount
         self.dest_asset: Asset = dest_asset
         self.dest_min: Union[str, Decimal] = dest_min
-        self.path: List[Asset] = path  # a list of paths/assets
+        self.path: List[Asset] = path
 
     @classmethod
-    def type_code(cls) -> int:
-        return Xdr.const.PATH_PAYMENT_STRICT_SEND
+    def type_code(cls) -> xdr.OperationType:
+        return xdr.OperationType.PATH_PAYMENT_STRICT_SEND
 
-    def _to_operation_body(self) -> Xdr.nullclass:
+    def _to_operation_body(self) -> xdr.OperationBody:
         destination = Keypair.from_public_key(self.destination).xdr_account_id()
         send_asset = self.send_asset.to_xdr_object()
         dest_asset = self.dest_asset.to_xdr_object()
         path = [asset.to_xdr_object() for asset in self.path]
 
-        path_payment_strice_send_op = Xdr.types.PathPaymentStrictSendOp(
+        path_payment_strict_send_op = xdr.PathPaymentStrictSendOp(
             send_asset,
-            Operation.to_xdr_amount(self.send_amount),
+            xdr.Int64(Operation.to_xdr_amount(self.send_amount)),
             destination,
             dest_asset,
-            Operation.to_xdr_amount(self.dest_min),
+            xdr.Int64(Operation.to_xdr_amount(self.dest_min)),
             path,
         )
-        body = Xdr.nullclass()
-        body.type = Xdr.const.PATH_PAYMENT_STRICT_SEND
-        body.pathPaymentStrictSendOp = path_payment_strice_send_op
+        body = xdr.OperationBody(
+            type=self.type_code(),
+            path_payment_strict_send_op=path_payment_strict_send_op,
+        )
         return body
 
     @classmethod
     def from_xdr_object(
-        cls, operation_xdr_object: Xdr.types.Operation
+        cls, operation_xdr_object: xdr.Operation
     ) -> "PathPaymentStrictSend":
         """Creates a :class:`PathPaymentStrictSend` object from an XDR Operation
         object.
@@ -83,25 +84,26 @@ class PathPaymentStrictSend(Operation):
         """
         source = Operation.get_source_from_xdr_obj(operation_xdr_object)
         destination = StrKey.encode_ed25519_public_key(
-            operation_xdr_object.body.pathPaymentStrictSendOp.destination.ed25519
+            operation_xdr_object.body.path_payment_strict_send_op.destination.account_id.ed25519.uint256
         )
 
         send_asset = Asset.from_xdr_object(
-            operation_xdr_object.body.pathPaymentStrictSendOp.sendAsset
+            operation_xdr_object.body.path_payment_strict_send_op.send_asset
         )
         dest_asset = Asset.from_xdr_object(
-            operation_xdr_object.body.pathPaymentStrictSendOp.destAsset
+            operation_xdr_object.body.path_payment_strict_send_op.dest_asset
         )
         send_amount = Operation.from_xdr_amount(
-            operation_xdr_object.body.pathPaymentStrictSendOp.sendAmount
+            operation_xdr_object.body.path_payment_strict_send_op.send_amount.int64
         )
         dest_min = Operation.from_xdr_amount(
-            operation_xdr_object.body.pathPaymentStrictSendOp.destMin
+            operation_xdr_object.body.path_payment_strict_send_op.dest_min.int64
         )
 
         path = []
-        if operation_xdr_object.body.pathPaymentStrictSendOp.path:
-            for x in operation_xdr_object.body.pathPaymentStrictSendOp.path:
+        # In fact, we don't need to check it.
+        if operation_xdr_object.body.path_payment_strict_send_op.path:
+            for x in operation_xdr_object.body.path_payment_strict_send_op.path:
                 path.append(Asset.from_xdr_object(x))
 
         return cls(

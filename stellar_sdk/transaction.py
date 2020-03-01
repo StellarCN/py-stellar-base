@@ -1,12 +1,13 @@
+import base64
 from typing import List, Union
+from xdrlib import Unpacker, Packer
 
 from .keypair import Keypair
 from .memo import NoneMemo, Memo
 from .operation.operation import Operation
-from .xdr import Xdr
 from .strkey import StrKey
 from .time_bounds import TimeBounds
-from .utils import pack_xdr_array, unpack_xdr_array
+from .xdr import xdr as stellarxdr
 
 __all__ = ["Transaction"]
 
@@ -70,7 +71,7 @@ class Transaction:
         self.fee: int = fee
         self.time_bounds: TimeBounds = time_bounds
 
-    def to_xdr_object(self) -> Xdr.types.Transaction:
+    def to_xdr_object(self) -> stellarxdr.Transaction:
         """Get an XDR object representation of this :class:`Transaction`.
 
         :return: XDR Transaction object
@@ -78,17 +79,22 @@ class Transaction:
         source_account = self.source.xdr_account_id()
         memo = self.memo.to_xdr_object()
         operations = [operation.to_xdr_object() for operation in self.operations]
-        time_bounds: List[TimeBounds] = []
-        if self.time_bounds:
-            time_bounds = pack_xdr_array(self.time_bounds.to_xdr_object())
-        ext = Xdr.nullclass()
-        ext.v = 0
-        return Xdr.types.Transaction(
-            source_account, self.fee, self.sequence, time_bounds, memo, operations, ext
+        time_bounds = (
+            self.time_bounds.to_xdr_object() if self.time_bounds is not None else None
+        )
+        ext = stellarxdr.TransactionExt(0)
+        return stellarxdr.Transaction(
+            source_account,
+            stellarxdr.Uint32(self.fee),
+            stellarxdr.SequenceNumber(stellarxdr.Int64(self.sequence)),
+            time_bounds,
+            memo,
+            operations,
+            ext,
         )
 
     @classmethod
-    def from_xdr_object(cls, tx_xdr_object) -> "Transaction":
+    def from_xdr_object(cls, tx_xdr_object: stellarxdr.Transaction) -> "Transaction":
         """Create a new :class:`Transaction` from an XDR object.
 
         :param tx_xdr_object: The XDR object that represents a transaction.
@@ -96,17 +102,18 @@ class Transaction:
         :return: A new :class:`Transaction` object from the given XDR Transaction object.
         """
         source = Keypair.from_public_key(
-            StrKey.encode_ed25519_public_key(tx_xdr_object.sourceAccount.ed25519)
-        )
-        sequence = tx_xdr_object.seqNum
-        fee = tx_xdr_object.fee
-        time_bounds_in_xdr = tx_xdr_object.timeBounds
-        time_bounds = None
-        if time_bounds_in_xdr:
-            time_bounds = TimeBounds.from_xdr_object(
-                unpack_xdr_array(time_bounds_in_xdr)
+            StrKey.encode_ed25519_public_key(
+                tx_xdr_object.source_account.account_id.ed25519.uint256
             )
-
+        )
+        sequence = tx_xdr_object.seq_num.sequence_number.int64
+        fee = tx_xdr_object.fee.uint32
+        time_bounds_xdr = tx_xdr_object.time_bounds
+        time_bounds = (
+            None
+            if time_bounds_xdr is None
+            else TimeBounds.from_xdr_object(time_bounds_xdr)
+        )
         memo = Memo.from_xdr_object(tx_xdr_object.memo)
         operations = list(map(Operation.from_xdr_object, tx_xdr_object.operations))
         return cls(
@@ -116,4 +123,52 @@ class Transaction:
             memo=memo,
             fee=fee,
             operations=operations,
+        )
+
+    def to_xdr(self) -> str:
+        """Get the base64 encoded XDR string representing this
+        :class:`Transaction`.
+
+        :return: XDR :class:`Transaction` base64 string object
+        """
+        packer = Packer()
+        self.to_xdr_object().pack(packer)
+        return base64.b64encode(packer.get_buffer()).decode()
+
+    @classmethod
+    def from_xdr(cls, xdr: str) -> "Transaction":
+        """Create a new :class:`Transaction` from an XDR string.
+
+        :param xdr: The XDR string that represents a :class:`Transaction`.
+
+        :return: A new :class:`Transaction` object from the given XDR Transaction base64 string object.
+        """
+        data = base64.b64decode(xdr.encode())
+        unpacker = Unpacker(data)
+        xdr_obj = stellarxdr.Transaction.unpack(unpacker)
+        return cls.from_xdr_object(xdr_obj)
+
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, self.__class__):
+            return NotImplemented  # pragma: no cover
+        return (
+            self.source == other.source
+            and self.sequence == other.sequence
+            and self.fee == other.fee
+            and self.operations == other.operations
+            and self.memo == other.memo
+            and self.time_bounds == other.time_bounds
+        )
+
+    def __str__(self):
+        return (
+            "<Transaction [source={source}, sequence={sequence}, fee={fee}, "
+            "operations={operations}, memo={memo}, time_bounds={time_bounds}]>".format(
+                source=self.source,
+                sequence=self.sequence,
+                fee=self.fee,
+                operations=self.operations,
+                memo=self.memo,
+                time_bounds=self.time_bounds,
+            )
         )

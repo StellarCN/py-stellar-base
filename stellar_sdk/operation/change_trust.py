@@ -2,10 +2,9 @@ from decimal import Decimal
 from typing import Union
 
 from .operation import Operation
-
-from ..asset import Asset
-from ..xdr import Xdr
 from .utils import check_amount
+from ..asset import Asset
+from ..xdr import xdr
 
 
 class ChangeTrust(Operation):
@@ -41,30 +40,27 @@ class ChangeTrust(Operation):
             self.limit = limit
 
     @classmethod
-    def type_code(cls) -> int:
-        return Xdr.const.CHANGE_TRUST
+    def type_code(cls) -> xdr.OperationType:
+        return xdr.OperationType.CHANGE_TRUST
 
-    def _to_operation_body(self) -> Xdr.nullclass:
+    def _to_operation_body(self) -> xdr.OperationBody:
         line = self.asset.to_xdr_object()
-        limit = Operation.to_xdr_amount(self.limit)
+        limit = xdr.Int64(Operation.to_xdr_amount(self.limit))
 
-        change_trust_op = Xdr.types.ChangeTrustOp(line, limit)
-        body = Xdr.nullclass()
-        body.type = Xdr.const.CHANGE_TRUST
-        body.changeTrustOp = change_trust_op
+        change_trust_op = xdr.ChangeTrustOp(line, limit)
+        body = xdr.OperationBody(type=self.type_code(), change_trust_op=change_trust_op)
         return body
 
     @classmethod
-    def from_xdr_object(
-        cls, operation_xdr_object: Xdr.types.Operation
-    ) -> "ChangeTrust":
+    def from_xdr_object(cls, operation_xdr_object: xdr.Operation) -> "ChangeTrust":
         """Creates a :class:`ChangeTrust` object from an XDR Operation
         object.
 
         """
         source = Operation.get_source_from_xdr_obj(operation_xdr_object)
-
-        line = Asset.from_xdr_object(operation_xdr_object.body.changeTrustOp.line)
-        limit = Operation.from_xdr_amount(operation_xdr_object.body.changeTrustOp.limit)
+        line = Asset.from_xdr_object(operation_xdr_object.body.change_trust_op.line)
+        limit = Operation.from_xdr_amount(
+            operation_xdr_object.body.change_trust_op.limit.int64
+        )
 
         return cls(source=source, asset=line, limit=limit)

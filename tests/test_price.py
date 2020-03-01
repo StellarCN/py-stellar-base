@@ -4,9 +4,10 @@ from stellar_sdk.price import Price
 class TestPrice:
     def test_to_xdr(self):
         n, d = 1, 2
-        price_obj = Price(n, d).to_xdr_object()
-        assert price_obj.to_xdr() == "AAAAAQAAAAI="
-        from_instance = Price.from_xdr_object(price_obj)
+        price = Price(n, d)
+        assert price.to_xdr() == "AAAAAQAAAAI="
+        assert Price.from_xdr("AAAAAQAAAAI=") == price
+        from_instance = Price.from_xdr_object(price.to_xdr_object())
         assert isinstance(from_instance, Price)
         assert from_instance.n == n
         assert from_instance.d == d

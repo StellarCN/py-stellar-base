@@ -2,10 +2,10 @@ from decimal import Decimal
 from typing import Union
 
 from .operation import Operation
+from .utils import check_price, check_amount
 from ..asset import Asset
 from ..price import Price
-from ..xdr import Xdr
-from .utils import check_price, check_amount
+from ..xdr import xdr
 
 
 class ManageSellOffer(Operation):
@@ -52,10 +52,10 @@ class ManageSellOffer(Operation):
         self.offer_id: int = offer_id
 
     @classmethod
-    def type_code(cls) -> int:
-        return Xdr.const.MANAGE_SELL_OFFER
+    def type_code(cls) -> xdr.OperationType:
+        return xdr.OperationType.MANAGE_SELL_OFFER
 
-    def _to_operation_body(self) -> Xdr.nullclass:
+    def _to_operation_body(self) -> xdr.OperationBody:
         selling = self.selling.to_xdr_object()
         buying = self.buying.to_xdr_object()
 
@@ -65,37 +65,35 @@ class ManageSellOffer(Operation):
             price_fraction = Price.from_raw_price(self.price)
 
         price = price_fraction.to_xdr_object()
-
-        amount = Operation.to_xdr_amount(self.amount)
-
-        manage_sell_offer_op = Xdr.types.ManageSellOfferOp(
-            selling, buying, amount, price, self.offer_id
+        amount = xdr.Int64(Operation.to_xdr_amount(self.amount))
+        manage_sell_offer_op = xdr.ManageSellOfferOp(
+            selling, buying, amount, price, xdr.Int64(self.offer_id)
         )
-        body = Xdr.nullclass()
-        body.type = Xdr.const.MANAGE_SELL_OFFER
-        body.manageSellOfferOp = manage_sell_offer_op
+        body = xdr.OperationBody(
+            type=self.type_code(), manage_sell_offer_op=manage_sell_offer_op
+        )
         return body
 
     @classmethod
-    def from_xdr_object(
-        cls, operation_xdr_object: Xdr.types.Operation
-    ) -> "ManageSellOffer":
+    def from_xdr_object(cls, operation_xdr_object: xdr.Operation) -> "ManageSellOffer":
         """Creates a :class:`ManageSellOffer` object from an XDR Operation object.
 
         """
         source = Operation.get_source_from_xdr_obj(operation_xdr_object)
 
         selling = Asset.from_xdr_object(
-            operation_xdr_object.body.manageSellOfferOp.selling
+            operation_xdr_object.body.manage_sell_offer_op.selling
         )
         buying = Asset.from_xdr_object(
-            operation_xdr_object.body.manageSellOfferOp.buying
+            operation_xdr_object.body.manage_sell_offer_op.buying
         )
         amount = Operation.from_xdr_amount(
-            operation_xdr_object.body.manageSellOfferOp.amount
+            operation_xdr_object.body.manage_sell_offer_op.amount.int64
         )
-        price = Price.from_xdr_object(operation_xdr_object.body.manageSellOfferOp.price)
-        offer_id = operation_xdr_object.body.manageSellOfferOp.offerID
+        price = Price.from_xdr_object(
+            operation_xdr_object.body.manage_sell_offer_op.price
+        )
+        offer_id = operation_xdr_object.body.manage_sell_offer_op.offer_id.int64
 
         return cls(
             source=source,

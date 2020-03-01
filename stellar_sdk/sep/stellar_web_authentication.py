@@ -385,10 +385,10 @@ def _verify_transaction_signatures(
             # See https://github.com/StellarCN/py-stellar-base/issues/252#issuecomment-580882560
             if index in signature_used:
                 continue
-            if decorated_signature.hint != kp.signature_hint():
+            if decorated_signature.hint.signature_hint != kp.signature_hint():
                 continue
             try:
-                kp.verify(tx_hash, decorated_signature.signature)
+                kp.verify(tx_hash, decorated_signature.signature.signature)
                 signature_used.add(index)
                 signers_found.append(signer)
                 break

@@ -1,9 +1,11 @@
 import abc
+import base64
 from typing import Union
+from xdrlib import Packer, Unpacker
 
-from .utils import hex_to_bytes
 from .exceptions import MemoInvalidException
-from .xdr import Xdr
+from .utils import hex_to_bytes
+from .xdr import xdr as stellarxdr
 
 __all__ = ["Memo", "NoneMemo", "TextMemo", "IdMemo", "HashMemo", "ReturnHashMemo"]
 
@@ -33,43 +35,65 @@ class Memo(object, metaclass=abc.ABCMeta):
     """
 
     @abc.abstractmethod
-    def to_xdr_object(self) -> Xdr.types.Memo:
+    def to_xdr_object(self) -> stellarxdr.Memo:
         """Creates an XDR Memo object that represents this :class:`Memo`."""
 
     @staticmethod
-    def from_xdr_object(xdr_obj: Xdr.types.Memo) -> "Memo":
+    def from_xdr_object(xdr_obj: stellarxdr.Memo) -> "Memo":
         """Returns an Memo object from XDR memo object."""
 
         xdr_types = {
-            Xdr.const.MEMO_TEXT: TextMemo,
-            Xdr.const.MEMO_ID: IdMemo,
-            Xdr.const.MEMO_HASH: HashMemo,
-            Xdr.const.MEMO_RETURN: ReturnHashMemo,
-            Xdr.const.MEMO_NONE: NoneMemo,
+            stellarxdr.MemoType.MEMO_TEXT: TextMemo,
+            stellarxdr.MemoType.MEMO_ID: IdMemo,
+            stellarxdr.MemoType.MEMO_HASH: HashMemo,
+            stellarxdr.MemoType.MEMO_RETURN: ReturnHashMemo,
+            stellarxdr.MemoType.MEMO_NONE: NoneMemo,
         }
 
         # TODO: Maybe we should raise Key Error here
         memo_cls = xdr_types.get(xdr_obj.type, NoneMemo)
         return memo_cls.from_xdr_object(xdr_obj)
 
+    def to_xdr(self) -> str:
+        """Get the base64 encoded XDR string representing this Memo.
+
+        :return: XDR Memo base64 string object
+        """
+        packer = Packer()
+        self.to_xdr_object().pack(packer)
+        return base64.b64encode(packer.get_buffer()).decode()
+
+    @classmethod
+    def from_xdr(cls, xdr: str) -> "Memo":
+        """Create a new Memo from an XDR string.
+
+        :param xdr: The XDR string that represents a Memo.
+
+        :return: A new Memo object from the given XDR Memo base64 string object.
+        """
+        data = base64.b64decode(xdr.encode())
+        unpacker = Unpacker(data)
+        xdr_obj = stellarxdr.Memo.unpack(unpacker)
+        return cls.from_xdr_object(xdr_obj)
+
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
             return NotImplemented  # pragma: no cover
-        return self.to_xdr_object().to_xdr() == other.to_xdr_object().to_xdr()
+        return self.to_xdr_object() == other.to_xdr_object()
 
 
 class NoneMemo(Memo):
     """The :class:`NoneMemo`, which represents no memo for a transaction."""
 
     @classmethod
-    def from_xdr_object(cls, xdr_obj: Xdr.types.Memo) -> "NoneMemo":
+    def from_xdr_object(cls, xdr_obj: stellarxdr.Memo) -> "NoneMemo":
         """Returns an :class:`NoneMemo` object from XDR memo object."""
 
         return cls()
 
-    def to_xdr_object(self) -> Xdr.types.Memo:
+    def to_xdr_object(self) -> stellarxdr.Memo:
         """Creates an XDR Memo object that represents this :class:`NoneMemo`."""
-        return Xdr.types.Memo(type=Xdr.const.MEMO_NONE)
+        return stellarxdr.Memo(stellarxdr.MemoType.MEMO_NONE)
 
     def __str__(self):
         return "<NoneMemo>"
@@ -105,14 +129,13 @@ class TextMemo(Memo):
             )
 
     @classmethod
-    def from_xdr_object(cls, xdr_obj: Xdr.types.Memo) -> "TextMemo":
+    def from_xdr_object(cls, xdr_obj: stellarxdr.Memo) -> "TextMemo":
         """Returns an :class:`TextMemo` object from XDR memo object."""
+        return cls(bytes(xdr_obj.text))
 
-        return cls(bytes(xdr_obj.switch))
-
-    def to_xdr_object(self) -> Xdr.types.Memo:
+    def to_xdr_object(self) -> stellarxdr.Memo:
         """Creates an XDR Memo object that represents this :class:`TextMemo`."""
-        return Xdr.types.Memo(type=Xdr.const.MEMO_TEXT, text=self.memo_text)
+        return stellarxdr.Memo(type=stellarxdr.MemoType.MEMO_TEXT, text=self.memo_text)
 
     def __str__(self):
         return "<TextMemo [memo={memo}]>".format(memo=self.memo_text)
@@ -136,14 +159,15 @@ class IdMemo(Memo):
         self.memo_id: int = memo_id
 
     @classmethod
-    def from_xdr_object(cls, xdr_obj: Xdr.types.Memo) -> "IdMemo":
+    def from_xdr_object(cls, xdr_obj: stellarxdr.Memo) -> "IdMemo":
         """Returns an :class:`IdMemo` object from XDR memo object."""
 
-        return cls(xdr_obj.switch)
+        return cls(xdr_obj.id.uint64)
 
-    def to_xdr_object(self) -> Xdr.types.Memo:
+    def to_xdr_object(self) -> stellarxdr.Memo:
         """Creates an XDR Memo object that represents this :class:`IdMemo`."""
-        return Xdr.types.Memo(type=Xdr.const.MEMO_ID, id=self.memo_id)
+        xdr_id = stellarxdr.Uint64(self.memo_id)
+        return stellarxdr.Memo(type=stellarxdr.MemoType.MEMO_ID, id=xdr_id)
 
     def __str__(self):
         return "<IdMemo [memo={memo}]>".format(memo=self.memo_id)
@@ -160,22 +184,24 @@ class HashMemo(Memo):
     def __init__(self, memo_hash: Union[bytes, str]) -> None:
         memo_hash = hex_to_bytes(memo_hash)
         length = len(memo_hash)
+        # TODO: fix
         if length > 32:
             raise MemoInvalidException(
-                "HashMemo can contain 32 bytes at max, got {:d} bytes".format(length)
+                "HashMemo can contain 32 bytes, got {:d} bytes".format(length)
             )
 
         self.memo_hash: bytes = memo_hash
 
     @classmethod
-    def from_xdr_object(cls, xdr_obj: Xdr.types.Memo) -> "HashMemo":
+    def from_xdr_object(cls, xdr_obj: stellarxdr.Memo) -> "HashMemo":
         """Returns an :class:`HashMemo` object from XDR memo object."""
 
-        return cls(xdr_obj.switch)
+        return cls(xdr_obj.hash.hash)
 
-    def to_xdr_object(self) -> Xdr.types.Memo:
+    def to_xdr_object(self) -> stellarxdr.Memo:
         """Creates an XDR Memo object that represents this :class:`HashMemo`."""
-        return Xdr.types.Memo(type=Xdr.const.MEMO_HASH, hash=self.memo_hash)
+        xdr_hash = stellarxdr.Hash(self.memo_hash)
+        return stellarxdr.Memo(type=stellarxdr.MemoType.MEMO_HASH, hash=xdr_hash)
 
     def __str__(self):
         return "<HashMemo [memo={memo}]>".format(memo=self.memo_hash)
@@ -197,23 +223,25 @@ class ReturnHashMemo(Memo):
     def __init__(self, memo_return: bytes) -> None:
         memo_return = hex_to_bytes(memo_return)
         length = len(memo_return)
+        # TODO: fix
         if length > 32:
             raise MemoInvalidException(
-                "ReturnHashMemo can contain 32 bytes at max, got {:d} bytes".format(
-                    length
-                )
+                "ReturnHashMemo can contain 32 bytes, got {:d} bytes".format(length)
             )
 
         self.memo_return: bytes = memo_return
 
     @classmethod
-    def from_xdr_object(cls, xdr_obj: Xdr.types.Memo) -> "ReturnHashMemo":
+    def from_xdr_object(cls, xdr_obj: stellarxdr.Memo) -> "ReturnHashMemo":
         """Returns an :class:`ReturnHashMemo` object from XDR memo object."""
-        return cls(xdr_obj.switch)
+        return cls(xdr_obj.ret_hash.hash)
 
-    def to_xdr_object(self) -> Xdr.types.Memo:
+    def to_xdr_object(self) -> stellarxdr.Memo:
         """Creates an XDR Memo object that represents this :class:`ReturnHashMemo`."""
-        return Xdr.types.Memo(type=Xdr.const.MEMO_RETURN, retHash=self.memo_return)
+        xdr_ret_hash = stellarxdr.Hash(self.memo_return)
+        return stellarxdr.Memo(
+            type=stellarxdr.MemoType.MEMO_RETURN, ret_hash=xdr_ret_hash
+        )
 
     def __str__(self):
         return "<ReturnHashMemo [memo={memo}]>".format(memo=self.memo_return)
