@@ -1,11 +1,14 @@
-from typing import Union
+from typing import Union, TypeVar, List
 
 from ..call_builder.base_call_builder import BaseCallBuilder
 from ..client.base_async_client import BaseAsyncClient
 from ..client.base_sync_client import BaseSyncClient
+from ..response.asset_response import AssetResponse
+
+T = TypeVar("T")
 
 
-class AssetsCallBuilder(BaseCallBuilder):
+class AssetsCallBuilder(BaseCallBuilder[T]):
     """ Creates a new :class:`AssetsCallBuilder` pointed to server defined by horizon_url.
     Do not create this object directly, use :func:`stellar_sdk.server.Server.assets`.
 
@@ -21,7 +24,7 @@ class AssetsCallBuilder(BaseCallBuilder):
         super().__init__(horizon_url, client)
         self.endpoint: str = "assets"
 
-    def for_code(self, asset_code: str) -> "AssetsCallBuilder":
+    def for_code(self, asset_code: str) -> "AssetsCallBuilder[T]":
         """ This endpoint filters all assets by the asset code.
 
         :param asset_code: asset code, for example: `USD`
@@ -30,7 +33,7 @@ class AssetsCallBuilder(BaseCallBuilder):
         self._add_query_param("asset_code", asset_code)
         return self
 
-    def for_issuer(self, asset_issuer: str) -> "AssetsCallBuilder":
+    def for_issuer(self, asset_issuer: str) -> "AssetsCallBuilder[T]":
         """ This endpoint filters all assets by the asset issuer.
 
         :param asset_issuer: asset issuer,
@@ -39,3 +42,8 @@ class AssetsCallBuilder(BaseCallBuilder):
         """
         self._add_query_param("asset_issuer", asset_issuer)
         return self
+
+    def _parse_response(
+        self, raw_data: dict
+    ) -> Union[List[AssetResponse], AssetResponse]:
+        return self._base_parse_response(raw_data, AssetResponse)

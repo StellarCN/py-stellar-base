@@ -1,0 +1,29 @@
+{
+  "_links": {
+    "self": {
+      "href": "https://horizon.stellar.org/operations/120220803244650499"
+    },
+    "transaction": {
+      "href": "https://horizon.stellar.org/transactions/ddaaac565ad23b300e8221cc6a9b081a5acfa86c630d632ce1d5d9b8835098c0"
+    },
+    "effects": {
+      "href": "https://horizon.stellar.org/operations/120220803244650499/effects"
+    },
+    "succeeds": {
+      "href": "https://horizon.stellar.org/effects?order=desc&cursor=120220803244650499"
+    },
+    "precedes": {
+      "href": "https://horizon.stellar.org/effects?order=asc&cursor=120220803244650499"
+    }
+  },
+  "id": "120220803244650499",
+  "paging_token": "120220803244650499",
+  "transaction_successful": true,
+  "source_account": "GB4CUDE7YBVI3VRC76RR4JPXI5KX62ANJWARFR47D5QTX46CSDKWRAKB",
+  "type": "manage_data",
+  "type_i": 10,
+  "created_at": "2020-01-30T06:24:48Z",
+  "transaction_hash": "ddaaac565ad23b300e8221cc6a9b081a5acfa86c630d632ce1d5d9b8835098c0",
+  "name": "productId",
+  "value": "ZjAwMQ=="
+}

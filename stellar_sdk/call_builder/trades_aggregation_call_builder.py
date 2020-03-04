@@ -1,13 +1,16 @@
-from typing import Union
+from typing import Union, TypeVar, List
 
 from ..asset import Asset
 from ..call_builder.base_call_builder import BaseCallBuilder
 from ..client.base_async_client import BaseAsyncClient
 from ..client.base_sync_client import BaseSyncClient
 from ..exceptions import ValueError
+from ..response.trades_aggregation_response import TradesAggregationResponse
+
+T = TypeVar("T")
 
 
-class TradeAggregationsCallBuilder(BaseCallBuilder):
+class TradeAggregationsCallBuilder(BaseCallBuilder[T]):
     """ Creates a new :class:`TradeAggregationsCallBuilder` pointed to server defined by horizon_url.
     Do not create this object directly, use :func:`stellar_sdk.server.Server.trade_aggregations`.
 
@@ -82,3 +85,8 @@ class TradeAggregationsCallBuilder(BaseCallBuilder):
         if resolution in allowed_resolutions:
             return True
         return False
+
+    def _parse_response(
+        self, raw_data: dict
+    ) -> Union[List[TradesAggregationResponse], TradesAggregationResponse]:
+        return self._base_parse_response(raw_data, TradesAggregationResponse)

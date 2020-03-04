@@ -1,0 +1,22 @@
+{
+  "_links": {
+    "operation": {
+      "href": "https://horizon.stellar.org/operations/120186117088796673"
+    },
+    "succeeds": {
+      "href": "https://horizon.stellar.org/effects?order=desc&cursor=120186117088796673-1"
+    },
+    "precedes": {
+      "href": "https://horizon.stellar.org/effects?order=asc&cursor=120186117088796673-1"
+    }
+  },
+  "id": "0120186117088796673-0000000001",
+  "paging_token": "120186117088796673-1",
+  "account": "GBA5QMXH3Y7M6AW2RKFFJA2V4HQTPVLXFUUJ56LTIX46ODOWYMEW5UCK",
+  "type": "trustline_deauthorized",
+  "type_i": 24,
+  "created_at": "2020-01-29T17:24:54Z",
+  "trustor": "GDSNFA47YWDNMAJWVAJ6HMAJUQAUWYAYCTJG6YD4HUEI5YLPRPSEL5UB",
+  "asset_type": "credit_alphanum4",
+  "asset_code": "TNS"
+}

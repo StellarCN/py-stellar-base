@@ -1,0 +1,23 @@
+{
+  "_links": {
+    "operation": {
+      "href": "https://horizon.stellar.org/operations/120227301530128386"
+    },
+    "succeeds": {
+      "href": "https://horizon.stellar.org/effects?order=desc&cursor=120227301530128386-1"
+    },
+    "precedes": {
+      "href": "https://horizon.stellar.org/effects?order=asc&cursor=120227301530128386-1"
+    }
+  },
+  "id": "0120227301530128386-0000000001",
+  "paging_token": "120227301530128386-1",
+  "account": "GBUJPCX6T64EDMSCFSL2DQOBKSIEAZ6UJJECC5XAEM75BZCPSBKLG2GB",
+  "type": "trustline_created",
+  "type_i": 20,
+  "created_at": "2020-01-30T08:50:58Z",
+  "asset_type": "credit_alphanum4",
+  "asset_code": "TXT",
+  "asset_issuer": "GAKRDXBHA2TTOYJZQIAQ7ZDS555P24RAYRUUZWU3KHSLIOZMVV4IITXT",
+  "limit": "922337203685.4775807"
+}

@@ -1,0 +1,43 @@
+{
+  "_links": {
+    "self": {
+      "href": "https://horizon-testnet.stellar.org/operations/865307061129217"
+    },
+    "transaction": {
+      "href": "https://horizon-testnet.stellar.org/transactions/f06a96490eb3c3145d18ab53811abb9b375b18a54ff35c750c8fdc3627a5b492"
+    },
+    "effects": {
+      "href": "https://horizon-testnet.stellar.org/operations/865307061129217/effects"
+    },
+    "succeeds": {
+      "href": "https://horizon-testnet.stellar.org/effects?order=desc&cursor=865307061129217"
+    },
+    "precedes": {
+      "href": "https://horizon-testnet.stellar.org/effects?order=asc&cursor=865307061129217"
+    }
+  },
+  "id": "865307061129217",
+  "paging_token": "865307061129217",
+  "transaction_successful": true,
+  "source_account": "GCLGST7A3HH5PDKDSOHJI5YAY5SE7TW3DW4BFBCCQUXUE25INW4YBDAB",
+  "type": "set_options",
+  "type_i": 5,
+  "created_at": "2020-02-11T02:26:50Z",
+  "transaction_hash": "f06a96490eb3c3145d18ab53811abb9b375b18a54ff35c750c8fdc3627a5b492",
+  "home_domain": "example.com",
+  "inflation_dest": "GDBNNRTZLFZBYOSI2L7X7E3AG7QZBZV5NLJBJOP4RRHP7SDF2BAPNEMM",
+  "master_key_weight": 254,
+  "signer_key": "GDBNNRTZLFZBYOSI2L7X7E3AG7QZBZV5NLJBJOP4RRHP7SDF2BAPNEMM",
+  "signer_weight": 1,
+  "set_flags": [
+    1,
+    2
+  ],
+  "set_flags_s": [
+    "auth_required",
+    "auth_revocable"
+  ],
+  "low_threshold": 10,
+  "med_threshold": 20,
+  "high_threshold": 30
+}

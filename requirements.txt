@@ -6,3 +6,4 @@ requests>=2.22.0
 stellar-base-sseclient==0.0.21
 mnemonic==0.19
 toml~=0.10.0
+pydantic~=1.3.0

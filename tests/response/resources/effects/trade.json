@@ -1,0 +1,29 @@
+{
+  "_links": {
+    "operation": {
+      "href": "https://horizon.stellar.org/operations/118943084833710081"
+    },
+    "succeeds": {
+      "href": "https://horizon.stellar.org/effects?order=desc&cursor=118943084833710081-1"
+    },
+    "precedes": {
+      "href": "https://horizon.stellar.org/effects?order=asc&cursor=118943084833710081-1"
+    }
+  },
+  "id": "0118943084833710081-0000000001",
+  "paging_token": "118943084833710081-1",
+  "account": "GD6CGMOMQ5GHCX2REOYIITW6FJFWFKPDSUUJZR7M3CVX3DBKXMY2US5W",
+  "type": "trade",
+  "type_i": 33,
+  "created_at": "2020-01-10T22:50:05Z",
+  "seller": "GBOCILSLD4A4LUJ5O5NKHEZCMVIGID3Z7LIFXANJ44RFYMVPCRPBV43A",
+  "offer_id": 146452500,
+  "sold_amount": "0.0003949",
+  "sold_asset_type": "credit_alphanum4",
+  "sold_asset_code": "CALL",
+  "sold_asset_issuer": "GCZBJ6KTNNGYFJUHM7JLIVPXCKF4244KGIULAFITYXE2NCSP2CW3CALL",
+  "bought_amount": "0.0000050",
+  "bought_asset_type": "credit_alphanum4",
+  "bought_asset_code": "XCN",
+  "bought_asset_issuer": "GCNY5OXYSY4FKHOPT2SPOQZAOEIGXB5LBYW3HVU3OWSTQITS65M5RCNY"
+}

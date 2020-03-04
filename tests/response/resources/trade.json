@@ -1,0 +1,37 @@
+{
+  "_links": {
+    "self": {
+      "href": ""
+    },
+    "base": {
+      "href": "https://horizon.stellar.org/accounts/GDSRB5ZZRR5MKOIIFAK6UVYI5KKDU4VDJWN4DDRWIFVQVGJOJYQENF4B"
+    },
+    "counter": {
+      "href": "https://horizon.stellar.org/accounts/GCDG3E3H7YRRVQSPQWKRZM63OQCNKDT6U5JXWCJVOQQPXYJL567FB65H"
+    },
+    "operation": {
+      "href": "https://horizon.stellar.org/operations/121004016300744706"
+    }
+  },
+  "id": "121004016300744706-0",
+  "paging_token": "121004016300744706-0",
+  "ledger_close_time": "2020-02-11T09:54:44Z",
+  "offer_id": "156267632",
+  "base_offer_id": "4732690034728132610",
+  "base_account": "GDSRB5ZZRR5MKOIIFAK6UVYI5KKDU4VDJWN4DDRWIFVQVGJOJYQENF4B",
+  "base_amount": "0.0001763",
+  "base_asset_type": "credit_alphanum4",
+  "base_asset_code": "BTC",
+  "base_asset_issuer": "GATEMHCCKCY67ZUCKTROYN24ZYT5GK4EQZ65JJLDHKHRUZI3EUEKMTCH",
+  "counter_offer_id": "156267632",
+  "counter_account": "GCDG3E3H7YRRVQSPQWKRZM63OQCNKDT6U5JXWCJVOQQPXYJL567FB65H",
+  "counter_amount": "0.0077985",
+  "counter_asset_type": "credit_alphanum4",
+  "counter_asset_code": "ETH",
+  "counter_asset_issuer": "GBETHKBL5TCUTQ3JPDIYOZ5RDARTMHMEKIO2QZQ7IOZ4YC5XV3C2IKYU",
+  "base_is_seller": false,
+  "price": {
+    "n": 1000000,
+    "d": 22607
+  }
+}

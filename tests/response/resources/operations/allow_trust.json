@@ -1,0 +1,33 @@
+{
+  "_links": {
+    "self": {
+      "href": "https://horizon.stellar.org/operations/120226657285066756"
+    },
+    "transaction": {
+      "href": "https://horizon.stellar.org/transactions/de25f161c134195b80d2afb802d69d58ab2fec3a59444668d0825741156debc9"
+    },
+    "effects": {
+      "href": "https://horizon.stellar.org/operations/120226657285066756/effects"
+    },
+    "succeeds": {
+      "href": "https://horizon.stellar.org/effects?order=desc&cursor=120226657285066756"
+    },
+    "precedes": {
+      "href": "https://horizon.stellar.org/effects?order=asc&cursor=120226657285066756"
+    }
+  },
+  "id": "120226657285066756",
+  "paging_token": "120226657285066756",
+  "transaction_successful": true,
+  "source_account": "GDHBV2RXOTM5I7WMMNWJ4HUENYPPZSUHXXPQUAVNCHBLFY6G5URLABZ2",
+  "type": "allow_trust",
+  "type_i": 7,
+  "created_at": "2020-01-30T08:36:40Z",
+  "transaction_hash": "de25f161c134195b80d2afb802d69d58ab2fec3a59444668d0825741156debc9",
+  "asset_type": "credit_alphanum12",
+  "asset_code": "AlphaRocks",
+  "asset_issuer": "GDHBV2RXOTM5I7WMMNWJ4HUENYPPZSUHXXPQUAVNCHBLFY6G5URLABZ2",
+  "trustee": "GDHBV2RXOTM5I7WMMNWJ4HUENYPPZSUHXXPQUAVNCHBLFY6G5URLABZ2",
+  "trustor": "GADHDRC3QEQFKYR2CA7XGLBZNR6WWY6DPZA76MKCC2QMOIF35Y2CGKVT",
+  "authorize": true
+}

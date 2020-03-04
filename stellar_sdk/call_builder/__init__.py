@@ -11,11 +11,11 @@ from .orderbook_call_builder import OrderbookCallBuilder
 from .paths_call_builder import PathsCallBuilder
 from .payments_call_builder import PaymentsCallBuilder
 from .root_call_builder import RootCallBuilder
+from .strict_receive_paths_call_builder import StrictReceivePathsCallBuilder
+from .strict_send_paths_call_builder import StrictSendPathsCallBuilder
 from .trades_aggregation_call_builder import TradeAggregationsCallBuilder
 from .trades_call_builder import TradesCallBuilder
 from .transactions_call_builder import TransactionsCallBuilder
-from .strict_receive_paths_call_builder import StrictReceivePathsCallBuilder
-from .strict_send_paths_call_builder import StrictSendPathsCallBuilder
 
 __all__ = [
     "AccountsCallBuilder",

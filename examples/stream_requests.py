@@ -9,5 +9,5 @@ def tx_handler(tx_response):
     print(tx_response)
 
 
-for tx in server.transactions().for_account(account_id).cursor(last_cursor).stream():
+for tx in server.transactions().for_account(account_id).cursor(last_cursor)._stream():
     tx_handler(tx)

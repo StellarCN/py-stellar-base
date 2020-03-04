@@ -1,0 +1,19 @@
+{
+  "_links": {
+    "operation": {
+      "href": "https://horizon.stellar.org/operations/120208794516164609"
+    },
+    "succeeds": {
+      "href": "https://horizon.stellar.org/effects?order=desc&cursor=120208794516164609-1"
+    },
+    "precedes": {
+      "href": "https://horizon.stellar.org/effects?order=asc&cursor=120208794516164609-1"
+    }
+  },
+  "id": "0120208794516164609-0000000001",
+  "paging_token": "120208794516164609-1",
+  "account": "GD6KGYZZG2IM7TPVIB4I7UAKGFUAUQRO3SQUBIHBA2J6WE5KKWQ66FMF",
+  "type": "account_inflation_destination_updated",
+  "type_i": 7,
+  "created_at": "2020-01-30T01:52:40Z"
+}

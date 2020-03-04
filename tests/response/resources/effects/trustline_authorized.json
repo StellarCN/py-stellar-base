@@ -1,0 +1,22 @@
+{
+  "_links": {
+    "operation": {
+      "href": "https://horizon.stellar.org/operations/120226657285066756"
+    },
+    "succeeds": {
+      "href": "https://horizon.stellar.org/effects?order=desc&cursor=120226657285066756-1"
+    },
+    "precedes": {
+      "href": "https://horizon.stellar.org/effects?order=asc&cursor=120226657285066756-1"
+    }
+  },
+  "id": "0120226657285066756-0000000001",
+  "paging_token": "120226657285066756-1",
+  "account": "GDHBV2RXOTM5I7WMMNWJ4HUENYPPZSUHXXPQUAVNCHBLFY6G5URLABZ2",
+  "type": "trustline_authorized",
+  "type_i": 23,
+  "created_at": "2020-01-30T08:36:40Z",
+  "trustor": "GADHDRC3QEQFKYR2CA7XGLBZNR6WWY6DPZA76MKCC2QMOIF35Y2CGKVT",
+  "asset_type": "credit_alphanum12",
+  "asset_code": "AlphaRocks"
+}

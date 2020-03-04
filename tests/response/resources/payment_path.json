@@ -1,0 +1,25 @@
+{
+  "source_asset_type": "native",
+  "source_amount": "20.0182307",
+  "destination_asset_type": "credit_alphanum4",
+  "destination_asset_code": "XCN",
+  "destination_asset_issuer": "GCNY5OXYSY4FKHOPT2SPOQZAOEIGXB5LBYW3HVU3OWSTQITS65M5RCNY",
+  "destination_amount": "10.0000000",
+  "path": [
+    {
+      "asset_type": "credit_alphanum4",
+      "asset_code": "USD",
+      "asset_issuer": "GDUKMGUGDZQK6YHYA5Z6AY2G4XDSZPSZ3SW5UN3ARVMO6QSRDWP5YLEX"
+    },
+    {
+      "asset_type": "credit_alphanum4",
+      "asset_code": "EURT",
+      "asset_issuer": "GAP5LETOV6YIE62YAM56STDANPRDO7ZFDBGSNHJQIYGGKSMOZAHOOS2S"
+    },
+    {
+      "asset_type": "credit_alphanum4",
+      "asset_code": "NGNT",
+      "asset_issuer": "GAWODAROMJ33V5YDFY3NPYTHVYQG7MJXVJ2ND3AOGIHYRWINES6ACCPD"
+    }
+  ]
+}

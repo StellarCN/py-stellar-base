@@ -1,0 +1,29 @@
+{
+  "_links": {
+    "self": {
+      "href": "https://horizon-testnet.stellar.org/offers/829"
+    },
+    "offer_maker": {
+      "href": "https://horizon-testnet.stellar.org/accounts/GCMMI2VMWPOEHUCQDCRZ7XNVW74JUOXGQ2BBGMEOV657BMPSTYHDS7X7"
+    }
+  },
+  "id": "829",
+  "paging_token": "829",
+  "seller": "GCMMI2VMWPOEHUCQDCRZ7XNVW74JUOXGQ2BBGMEOV657BMPSTYHDS7X7",
+  "selling": {
+    "asset_type": "native"
+  },
+  "buying": {
+    "asset_type": "credit_alphanum4",
+    "asset_code": "ZIK",
+    "asset_issuer": "GBEMRIXDVPJZKHK7USJFZIU2Z4OGZQS5ZEI6LNROS3VLTXMBZ2SLB5MO"
+  },
+  "amount": "21.3274808",
+  "price_r": {
+    "n": 520000,
+    "d": 89
+  },
+  "price": "5842.6966292",
+  "last_modified_ledger": 155009,
+  "last_modified_time": "2020-02-08T04:09:11Z"
+}

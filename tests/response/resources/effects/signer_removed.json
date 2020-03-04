@@ -1,0 +1,22 @@
+{
+  "_links": {
+    "operation": {
+      "href": "https://horizon.stellar.org/operations/120227254285578242"
+    },
+    "succeeds": {
+      "href": "https://horizon.stellar.org/effects?order=desc&cursor=120227254285578242-3"
+    },
+    "precedes": {
+      "href": "https://horizon.stellar.org/effects?order=asc&cursor=120227254285578242-3"
+    }
+  },
+  "id": "0120227254285578242-0000000003",
+  "paging_token": "120227254285578242-3",
+  "account": "GB6DNEWWSSPQAX7SR5MCWUTRVQPJBAERJTUQAZOVXXJDU2E6PIMKGMO2",
+  "type": "signer_removed",
+  "type_i": 11,
+  "created_at": "2020-01-30T08:49:52Z",
+  "weight": 0,
+  "public_key": "GA2T6GR7VXXXBETTERSAFETHANSORRYXXXPROTECTEDBYLOBSTRVAULT",
+  "key": ""
+}

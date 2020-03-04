@@ -18,7 +18,7 @@ class TestBaseCallBuilder:
             .order(desc=False)
             .limit(25)
             .call()
-        )
+        ).raw_data
 
         assert resp["args"] == {"cursor": "89777", "limit": "25", "order": "asc"}
         assert resp["headers"][
@@ -33,7 +33,7 @@ class TestBaseCallBuilder:
         client = RequestsClient()
         resp = (
             BaseCallBuilder(url, client).limit(10).cursor(10086).order(desc=True).call()
-        )
+        ).raw_data
         assert resp["args"] == {"cursor": "10086", "limit": "10", "order": "desc"}
         assert resp["headers"][
             "User-Agent"
@@ -42,13 +42,18 @@ class TestBaseCallBuilder:
         assert resp["headers"]["X-Client-Version"] == __version__
         assert resp["url"] == "https://httpbin.org/get?limit=10&cursor=10086&order=desc"
 
+    def _parse(self, raw_data):
+        return raw_data
+
     @pytest.mark.slow
     @pytest.mark.asyncio
     @pytest.mark.timeout(30)
     async def test_get_stream_data_async(self):
         url = "https://horizon.stellar.org/ledgers"
         client = AiohttpClient()
-        resp = BaseCallBuilder(url, client).cursor("now").stream()
+        builder = BaseCallBuilder(url, client)
+        builder._parse_response = self._parse
+        resp = builder.cursor("now")._stream()
         messages = []
         async for msg in resp:
             assert isinstance(msg, dict)
@@ -61,7 +66,9 @@ class TestBaseCallBuilder:
     def test_stream_data_sync(self):
         url = "https://horizon.stellar.org/ledgers"
         client = RequestsClient()
-        resp = BaseCallBuilder(url, client).cursor("now").stream()
+        builder = BaseCallBuilder(url, client)
+        builder._parse_response = self._parse
+        resp = builder.cursor("now")._stream()
         messages = []
         for msg in resp:
             assert isinstance(msg, dict)
@@ -171,7 +178,7 @@ class TestBaseCallBuilder:
             .limit(10)
             .order(desc=True)
         )
-        first_resp = call_builder.call()
+        first_resp = call_builder.call().raw_data
         assert first_resp["_links"] == {
             "self": {
                 "href": "https://horizon.stellar.org/transactions?cursor=81058917781504&limit=10&order=desc"
@@ -183,7 +190,7 @@ class TestBaseCallBuilder:
                 "href": "https://horizon.stellar.org/transactions?cursor=80607946215424&limit=10&order=asc"
             },
         }
-        next_resp = call_builder.next()
+        next_resp = call_builder.next().raw_data
         assert next_resp["_links"] == {
             "self": {
                 "href": "https://horizon.stellar.org/transactions?cursor=12884905984&limit=10&order=desc"
@@ -195,7 +202,7 @@ class TestBaseCallBuilder:
                 "href": "https://horizon.stellar.org/transactions?cursor=12884905984&limit=10&order=asc"
             },
         }
-        prev_page = call_builder.prev()
+        prev_page = call_builder.prev().raw_data
         assert prev_page["_links"] == {
             "self": {
                 "href": "https://horizon.stellar.org/transactions?cursor=12884905984&limit=10&order=asc"

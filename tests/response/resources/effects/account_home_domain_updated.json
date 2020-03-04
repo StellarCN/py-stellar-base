@@ -1,0 +1,20 @@
+{
+  "_links": {
+    "operation": {
+      "href": "https://horizon.stellar.org/operations/120227323005083650"
+    },
+    "succeeds": {
+      "href": "https://horizon.stellar.org/effects?order=desc&cursor=120227323005083650-1"
+    },
+    "precedes": {
+      "href": "https://horizon.stellar.org/effects?order=asc&cursor=120227323005083650-1"
+    }
+  },
+  "id": "0120227323005083650-0000000001",
+  "paging_token": "120227323005083650-1",
+  "account": "GD33AD7P7JP4UNDPDXN2PD2WP7UZJBDN5D4TKK3SG4WLPPL3BVRFL2OO",
+  "type": "account_home_domain_updated",
+  "type_i": 5,
+  "created_at": "2020-01-30T08:51:25Z",
+  "home_domain": "cryptomarine.eu"
+}
