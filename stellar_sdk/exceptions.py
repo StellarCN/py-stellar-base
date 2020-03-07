@@ -186,6 +186,11 @@ class NotPageableError(BaseRequestError):
     """
 
 
+class ParseResponseError(SdkError):
+    """This error occurs when parsing the response fails, please try upgrading the SDK
+    """
+
+
 def raise_request_exception(response: Response) -> None:
     status_code = response.status_code
     if status_code == 200:

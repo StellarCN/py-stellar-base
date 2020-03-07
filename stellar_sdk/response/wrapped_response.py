@@ -1,7 +1,10 @@
 import json
-
 from typing import Generic, TypeVar, Callable
 
+from pydantic import ValidationError
+
+from ..exceptions import ParseResponseError
+from ..__version__ import __issues__
 T = TypeVar("T")
 
 
@@ -12,7 +15,11 @@ class WrappedResponse(Generic[T]):
 
     @property
     def parsed(self) -> T:
-        return self._parse_func(self.raw_data)
+        try:
+            return self._parse_func(self.raw_data)
+        except ValidationError as e:
+            raise ParseResponseError("Parsing the response failed. This may be due to a change in the Horizon field. "
+                                     "Please try upgrading the SDK or submit a issue: {}.".format(__issues__)) from e
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
