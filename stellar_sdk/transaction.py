@@ -1,6 +1,4 @@
-import base64
 from typing import List, Union
-from xdrlib import Unpacker, Packer
 
 from .keypair import Keypair
 from .memo import NoneMemo, Memo
@@ -131,9 +129,7 @@ class Transaction:
 
         :return: XDR :class:`Transaction` base64 string object
         """
-        packer = Packer()
-        self.to_xdr_object().pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return self.to_xdr_object().to_xdr()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "Transaction":
@@ -143,9 +139,7 @@ class Transaction:
 
         :return: A new :class:`Transaction` object from the given XDR Transaction base64 string object.
         """
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        xdr_obj = stellarxdr.Transaction.unpack(unpacker)
+        xdr_obj = stellarxdr.Transaction.from_xdr(xdr)
         return cls.from_xdr_object(xdr_obj)
 
     def __eq__(self, other: object) -> bool:

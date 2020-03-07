@@ -1,9 +1,7 @@
-import base64
 import decimal
 from abc import ABCMeta, abstractmethod
 from decimal import Decimal, Context, Inexact
 from typing import Optional, Union
-from xdrlib import Packer, Unpacker
 
 from .utils import check_source
 from ..exceptions import ValueError, TypeError
@@ -149,9 +147,7 @@ class Operation(metaclass=ABCMeta):
 
         :return: XDR Operation base64 string object
         """
-        packer = Packer()
-        self.to_xdr_object().pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return self.to_xdr_object().to_xdr()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "Operation":
@@ -161,9 +157,7 @@ class Operation(metaclass=ABCMeta):
 
         :return: A new Operation object from the given XDR Operation base64 string object.
         """
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        xdr_obj = stellarxdr.Operation.unpack(unpacker)
+        xdr_obj = stellarxdr.Operation.from_xdr(xdr)
         return cls.from_xdr_object(xdr_obj)
 
     @staticmethod

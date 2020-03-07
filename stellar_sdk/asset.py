@@ -1,7 +1,5 @@
-import base64
 import re
 from typing import Optional, Dict
-from xdrlib import Unpacker, Packer
 
 from .exceptions import AssetCodeInvalidError, AssetIssuerInvalidError, AttributeError
 from .keypair import Keypair
@@ -159,9 +157,7 @@ class Asset:
 
         :return: XDR :class:`Asset` base64 string object
         """
-        packer = Packer()
-        self.to_xdr_object().pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return self.to_xdr_object().to_xdr()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "Asset":
@@ -171,9 +167,7 @@ class Asset:
 
         :return: A new :class:`Asset` object from the given XDR Asset base64 string object.
         """
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        xdr_obj = stellarxdr.Asset.unpack(unpacker)
+        xdr_obj = stellarxdr.Asset.from_xdr(xdr)
         return cls.from_xdr_object(xdr_obj)
 
     def __eq__(self, other: object) -> bool:

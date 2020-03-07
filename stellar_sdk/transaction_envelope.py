@@ -133,9 +133,7 @@ class TransactionEnvelope:
 
         :return: XDR :class:`TransactionEnvelope` base64 string object
         """
-        packer = Packer()
-        self.to_xdr_object().pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return self.to_xdr_object().to_xdr()
 
     @classmethod
     def from_xdr_object(

@@ -1,11 +1,9 @@
-from enum import Enum
 from typing import Union
 from xdrlib import Packer, Unpacker
-from ..__version__ import __issues__
+
 from ..exceptions import ValueError
 
 __all__ = [
-    "BaseEnum",
     "Integer",
     "UnsignedInteger",
     "Hyper",
@@ -14,22 +12,6 @@ __all__ = [
     "String",
     "Opaque",
 ]
-
-
-class BaseEnum(Enum):
-    def pack(self, packer) -> None:
-        Integer(self.value).pack(packer)
-
-    @classmethod
-    def unpack(cls, unpacker) -> "BaseEnum":
-        integer = Integer.unpack(unpacker)
-        return cls(integer)
-
-    @classmethod
-    def _missing_(cls, value):
-        raise ValueError(
-            f"{value} is not a valid {cls.__name__}, please upgrade the SDK or submit an issue here: {__issues__}."
-        )
 
 
 class Integer:

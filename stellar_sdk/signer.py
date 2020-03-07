@@ -1,8 +1,3 @@
-import base64
-from xdrlib import Packer, Unpacker
-
-from .__version__ import __issues__
-from .exceptions import ValueError
 from .strkey import StrKey
 from .xdr import xdr as stellarxdr
 
@@ -108,9 +103,7 @@ class Signer:
 
         :return: XDR :class:`Signer` base64 string object
         """
-        packer = Packer()
-        self.to_xdr_object().pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return self.to_xdr_object().to_xdr()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "Signer":
@@ -120,9 +113,7 @@ class Signer:
 
         :return: A new :class:`Signer` object from the given XDR Signer base64 string object.
         """
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        xdr_obj = stellarxdr.Signer.unpack(unpacker)
+        xdr_obj = stellarxdr.Signer.from_xdr(xdr)
         return cls.from_xdr_object(xdr_obj)
 
     def __eq__(self, other: object) -> bool:

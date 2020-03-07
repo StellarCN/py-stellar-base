@@ -1,6 +1,3 @@
-import base64
-from xdrlib import Packer, Unpacker
-
 from .exceptions import ValueError
 from .xdr import xdr as stellarxdr
 
@@ -63,9 +60,7 @@ class TimeBounds:
 
         :return: XDR :class:`TimeBounds` base64 string object
         """
-        packer = Packer()
-        self.to_xdr_object().pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return self.to_xdr_object().to_xdr()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "TimeBounds":
@@ -75,9 +70,7 @@ class TimeBounds:
 
         :return: A new :class:`TimeBounds` object from the given XDR TimeBounds base64 string object.
         """
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        xdr_obj = stellarxdr.TimeBounds.unpack(unpacker)
+        xdr_obj = stellarxdr.TimeBounds.from_xdr(xdr)
         return cls.from_xdr_object(xdr_obj)
 
     def __eq__(self, other: object) -> bool:

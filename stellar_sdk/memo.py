@@ -1,7 +1,5 @@
 import abc
-import base64
 from typing import Union
-from xdrlib import Packer, Unpacker
 
 from .exceptions import MemoInvalidException
 from .utils import hex_to_bytes
@@ -59,9 +57,7 @@ class Memo(object, metaclass=abc.ABCMeta):
 
         :return: XDR Memo base64 string object
         """
-        packer = Packer()
-        self.to_xdr_object().pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return self.to_xdr_object().to_xdr()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "Memo":
@@ -71,9 +67,7 @@ class Memo(object, metaclass=abc.ABCMeta):
 
         :return: A new Memo object from the given XDR Memo base64 string object.
         """
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        xdr_obj = stellarxdr.Memo.unpack(unpacker)
+        xdr_obj = stellarxdr.Memo.from_xdr(xdr)
         return cls.from_xdr_object(xdr_obj)
 
     def __eq__(self, other: object) -> bool:
