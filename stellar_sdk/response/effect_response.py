@@ -1,7 +1,7 @@
 from datetime import datetime
+from typing import Optional, Union, Type
 
 from pydantic import BaseModel, Field
-from typing import Optional, Union, Type
 
 from .common import Link
 
