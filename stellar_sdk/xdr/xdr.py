@@ -1,4 +1,4 @@
-# Automatically generated on 2020-03-07T18:25:29+08:00
+# Automatically generated on 2020-03-07T19:37:18+08:00
 # DO NOT EDIT or your changes may be overwritten
 import base64
 from enum import IntEnum
@@ -6,15 +6,18 @@ from typing import List, Optional
 from xdrlib import Packer, Unpacker
 
 from .base import *
+from ..__version__ import __issues__
 from ..exceptions import ValueError
 
 
-# === xdr source ============================================================
-#
-#   typedef opaque Value<>;
-#
-# ===========================================================================
 class Value:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    typedef opaque Value<>;
+    ----------------------------------------------------------------
+    """
+
     def __init__(self, value: bytes) -> None:
         self.value = value
 
@@ -22,7 +25,7 @@ class Value:
         Opaque(self.value, 4294967295, False).pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'Value':
+    def unpack(cls, unpacker: Unpacker) -> "Value":
         value = Opaque.unpack(unpacker, 4294967295, False)
         return cls(value)
 
@@ -32,7 +35,7 @@ class Value:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'Value':
+    def from_xdr(cls, xdr) -> "Value":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -46,21 +49,19 @@ class Value:
         return f"<Value [value={self.value}]>"
 
 
-# === xdr source ============================================================
-#
-#   struct SCPBallot
-#   {
-#       uint32 counter; // n
-#       Value value;    // x
-#   };
-#
-# ===========================================================================
 class SCPBallot:
-    def __init__(
-            self,
-            counter: 'Uint32',
-            value: 'Value',
-    ) -> None:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    struct SCPBallot
+    {
+        uint32 counter; // n
+        Value value;    // x
+    };
+    ----------------------------------------------------------------
+    """
+
+    def __init__(self, counter: "Uint32", value: "Value") -> None:
         self.counter = counter
         self.value = value
 
@@ -69,13 +70,10 @@ class SCPBallot:
         self.value.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'SCPBallot':
+    def unpack(cls, unpacker: Unpacker) -> "SCPBallot":
         counter = Uint32.unpack(unpacker)
         value = Value.unpack(unpacker)
-        return cls(
-            counter=counter,
-            value=value,
-        )
+        return cls(counter=counter, value=value)
 
     def to_xdr(self) -> str:
         packer = Packer()
@@ -83,7 +81,7 @@ class SCPBallot:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'SCPBallot':
+    def from_xdr(cls, xdr) -> "SCPBallot":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -94,25 +92,24 @@ class SCPBallot:
         return self.counter == other.counter and self.value == other.value
 
     def __str__(self):
-        out = [
-            f'counter={self.counter}',
-            f'value={self.value}',
-        ]
+        out = [f"counter={self.counter}", f"value={self.value}"]
         return f"<SCPBallot {[', '.join(out)]}>"
 
 
-# === xdr source ============================================================
-#
-#   enum SCPStatementType
-#   {
-#       SCP_ST_PREPARE = 0,
-#       SCP_ST_CONFIRM = 1,
-#       SCP_ST_EXTERNALIZE = 2,
-#       SCP_ST_NOMINATE = 3
-#   };
-#
-# ===========================================================================
 class SCPStatementType(IntEnum):
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    enum SCPStatementType
+    {
+        SCP_ST_PREPARE = 0,
+        SCP_ST_CONFIRM = 1,
+        SCP_ST_EXTERNALIZE = 2,
+        SCP_ST_NOMINATE = 3
+    };
+    ----------------------------------------------------------------
+    """
+
     SCP_ST_PREPARE = 0
     SCP_ST_CONFIRM = 1
     SCP_ST_EXTERNALIZE = 2
@@ -122,7 +119,7 @@ class SCPStatementType(IntEnum):
         packer.pack_int(self.value)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'SCPStatementType':
+    def unpack(cls, unpacker: Unpacker) -> "SCPStatementType":
         value = unpacker.unpack_int()
         return cls(value)
 
@@ -132,7 +129,7 @@ class SCPStatementType(IntEnum):
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'SCPStatementType':
+    def from_xdr(cls, xdr) -> "SCPStatementType":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -144,22 +141,21 @@ class SCPStatementType(IntEnum):
         )
 
 
-# === xdr source ============================================================
-#
-#   struct SCPNomination
-#   {
-#       Hash quorumSetHash; // D
-#       Value votes<>;      // X
-#       Value accepted<>;   // Y
-#   };
-#
-# ===========================================================================
 class SCPNomination:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    struct SCPNomination
+    {
+        Hash quorumSetHash; // D
+        Value votes<>;      // X
+        Value accepted<>;   // Y
+    };
+    ----------------------------------------------------------------
+    """
+
     def __init__(
-            self,
-            quorum_set_hash: 'Hash',
-            votes: List['Value'],
-            accepted: List['Value'],
+        self, quorum_set_hash: "Hash", votes: List["Value"], accepted: List["Value"]
     ) -> None:
         self.quorum_set_hash = quorum_set_hash
         self.votes = votes
@@ -175,7 +171,7 @@ class SCPNomination:
             element.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'SCPNomination':
+    def unpack(cls, unpacker: Unpacker) -> "SCPNomination":
         quorum_set_hash = Hash.unpack(unpacker)
         length = unpacker.unpack_uint()
         votes = []
@@ -185,11 +181,7 @@ class SCPNomination:
         accepted = []
         for _ in range(length):
             accepted.append(Value.unpack(unpacker))
-        return cls(
-            quorum_set_hash=quorum_set_hash,
-            votes=votes,
-            accepted=accepted,
-        )
+        return cls(quorum_set_hash=quorum_set_hash, votes=votes, accepted=accepted)
 
     def to_xdr(self) -> str:
         packer = Packer()
@@ -197,7 +189,7 @@ class SCPNomination:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'SCPNomination':
+    def from_xdr(cls, xdr) -> "SCPNomination":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -205,39 +197,45 @@ class SCPNomination:
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented
-        return self.quorum_set_hash == other.quorum_set_hash and self.votes == other.votes and self.accepted == other.accepted
+        return (
+            self.quorum_set_hash == other.quorum_set_hash
+            and self.votes == other.votes
+            and self.accepted == other.accepted
+        )
 
     def __str__(self):
         out = [
-            f'quorum_set_hash={self.quorum_set_hash}',
-            f'votes={self.votes}',
-            f'accepted={self.accepted}',
+            f"quorum_set_hash={self.quorum_set_hash}",
+            f"votes={self.votes}",
+            f"accepted={self.accepted}",
         ]
         return f"<SCPNomination {[', '.join(out)]}>"
 
 
-# === xdr source ============================================================
-#
-#   struct
-#           {
-#               Hash quorumSetHash;       // D
-#               SCPBallot ballot;         // b
-#               SCPBallot* prepared;      // p
-#               SCPBallot* preparedPrime; // p'
-#               uint32 nC;                // c.n
-#               uint32 nH;                // h.n
-#           }
-#
-# ===========================================================================
 class SCPStatementPrepare:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    struct
+            {
+                Hash quorumSetHash;       // D
+                SCPBallot ballot;         // b
+                SCPBallot* prepared;      // p
+                SCPBallot* preparedPrime; // p'
+                uint32 nC;                // c.n
+                uint32 nH;                // h.n
+            }
+    ----------------------------------------------------------------
+    """
+
     def __init__(
-            self,
-            quorum_set_hash: 'Hash',
-            ballot: 'SCPBallot',
-            prepared: Optional['SCPBallot'],
-            prepared_prime: Optional['SCPBallot'],
-            n_c: 'Uint32',
-            n_h: 'Uint32',
+        self,
+        quorum_set_hash: "Hash",
+        ballot: "SCPBallot",
+        prepared: Optional["SCPBallot"],
+        prepared_prime: Optional["SCPBallot"],
+        n_c: "Uint32",
+        n_h: "Uint32",
     ) -> None:
         self.quorum_set_hash = quorum_set_hash
         self.ballot = ballot
@@ -263,7 +261,7 @@ class SCPStatementPrepare:
         self.n_h.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'SCPStatementPrepare':
+    def unpack(cls, unpacker: Unpacker) -> "SCPStatementPrepare":
         quorum_set_hash = Hash.unpack(unpacker)
         ballot = SCPBallot.unpack(unpacker)
         prepared = SCPBallot.unpack(unpacker) if unpacker.unpack_uint() else None
@@ -285,7 +283,7 @@ class SCPStatementPrepare:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'SCPStatementPrepare':
+    def from_xdr(cls, xdr) -> "SCPStatementPrepare":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -293,40 +291,49 @@ class SCPStatementPrepare:
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented
-        return self.quorum_set_hash == other.quorum_set_hash and self.ballot == other.ballot and self.prepared == other.prepared and self.prepared_prime == other.prepared_prime and self.n_c == other.n_c and self.n_h == other.n_h
+        return (
+            self.quorum_set_hash == other.quorum_set_hash
+            and self.ballot == other.ballot
+            and self.prepared == other.prepared
+            and self.prepared_prime == other.prepared_prime
+            and self.n_c == other.n_c
+            and self.n_h == other.n_h
+        )
 
     def __str__(self):
         out = [
-            f'quorum_set_hash={self.quorum_set_hash}',
-            f'ballot={self.ballot}',
-            f'prepared={self.prepared}',
-            f'prepared_prime={self.prepared_prime}',
-            f'n_c={self.n_c}',
-            f'n_h={self.n_h}',
+            f"quorum_set_hash={self.quorum_set_hash}",
+            f"ballot={self.ballot}",
+            f"prepared={self.prepared}",
+            f"prepared_prime={self.prepared_prime}",
+            f"n_c={self.n_c}",
+            f"n_h={self.n_h}",
         ]
         return f"<SCPStatementPrepare {[', '.join(out)]}>"
 
 
-# === xdr source ============================================================
-#
-#   struct
-#           {
-#               SCPBallot ballot;   // b
-#               uint32 nPrepared;   // p.n
-#               uint32 nCommit;     // c.n
-#               uint32 nH;          // h.n
-#               Hash quorumSetHash; // D
-#           }
-#
-# ===========================================================================
 class SCPStatementConfirm:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    struct
+            {
+                SCPBallot ballot;   // b
+                uint32 nPrepared;   // p.n
+                uint32 nCommit;     // c.n
+                uint32 nH;          // h.n
+                Hash quorumSetHash; // D
+            }
+    ----------------------------------------------------------------
+    """
+
     def __init__(
-            self,
-            ballot: 'SCPBallot',
-            n_prepared: 'Uint32',
-            n_commit: 'Uint32',
-            n_h: 'Uint32',
-            quorum_set_hash: 'Hash',
+        self,
+        ballot: "SCPBallot",
+        n_prepared: "Uint32",
+        n_commit: "Uint32",
+        n_h: "Uint32",
+        quorum_set_hash: "Hash",
     ) -> None:
         self.ballot = ballot
         self.n_prepared = n_prepared
@@ -342,7 +349,7 @@ class SCPStatementConfirm:
         self.quorum_set_hash.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'SCPStatementConfirm':
+    def unpack(cls, unpacker: Unpacker) -> "SCPStatementConfirm":
         ballot = SCPBallot.unpack(unpacker)
         n_prepared = Uint32.unpack(unpacker)
         n_commit = Uint32.unpack(unpacker)
@@ -362,7 +369,7 @@ class SCPStatementConfirm:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'SCPStatementConfirm':
+    def from_xdr(cls, xdr) -> "SCPStatementConfirm":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -370,35 +377,40 @@ class SCPStatementConfirm:
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented
-        return self.ballot == other.ballot and self.n_prepared == other.n_prepared and self.n_commit == other.n_commit and self.n_h == other.n_h and self.quorum_set_hash == other.quorum_set_hash
+        return (
+            self.ballot == other.ballot
+            and self.n_prepared == other.n_prepared
+            and self.n_commit == other.n_commit
+            and self.n_h == other.n_h
+            and self.quorum_set_hash == other.quorum_set_hash
+        )
 
     def __str__(self):
         out = [
-            f'ballot={self.ballot}',
-            f'n_prepared={self.n_prepared}',
-            f'n_commit={self.n_commit}',
-            f'n_h={self.n_h}',
-            f'quorum_set_hash={self.quorum_set_hash}',
+            f"ballot={self.ballot}",
+            f"n_prepared={self.n_prepared}",
+            f"n_commit={self.n_commit}",
+            f"n_h={self.n_h}",
+            f"quorum_set_hash={self.quorum_set_hash}",
         ]
         return f"<SCPStatementConfirm {[', '.join(out)]}>"
 
 
-# === xdr source ============================================================
-#
-#   struct
-#           {
-#               SCPBallot commit;         // c
-#               uint32 nH;                // h.n
-#               Hash commitQuorumSetHash; // D used before EXTERNALIZE
-#           }
-#
-# ===========================================================================
 class SCPStatementExternalize:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    struct
+            {
+                SCPBallot commit;         // c
+                uint32 nH;                // h.n
+                Hash commitQuorumSetHash; // D used before EXTERNALIZE
+            }
+    ----------------------------------------------------------------
+    """
+
     def __init__(
-            self,
-            commit: 'SCPBallot',
-            n_h: 'Uint32',
-            commit_quorum_set_hash: 'Hash',
+        self, commit: "SCPBallot", n_h: "Uint32", commit_quorum_set_hash: "Hash"
     ) -> None:
         self.commit = commit
         self.n_h = n_h
@@ -410,14 +422,12 @@ class SCPStatementExternalize:
         self.commit_quorum_set_hash.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'SCPStatementExternalize':
+    def unpack(cls, unpacker: Unpacker) -> "SCPStatementExternalize":
         commit = SCPBallot.unpack(unpacker)
         n_h = Uint32.unpack(unpacker)
         commit_quorum_set_hash = Hash.unpack(unpacker)
         return cls(
-            commit=commit,
-            n_h=n_h,
-            commit_quorum_set_hash=commit_quorum_set_hash,
+            commit=commit, n_h=n_h, commit_quorum_set_hash=commit_quorum_set_hash
         )
 
     def to_xdr(self) -> str:
@@ -426,7 +436,7 @@ class SCPStatementExternalize:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'SCPStatementExternalize':
+    def from_xdr(cls, xdr) -> "SCPStatementExternalize":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -434,66 +444,72 @@ class SCPStatementExternalize:
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented
-        return self.commit == other.commit and self.n_h == other.n_h and self.commit_quorum_set_hash == other.commit_quorum_set_hash
+        return (
+            self.commit == other.commit
+            and self.n_h == other.n_h
+            and self.commit_quorum_set_hash == other.commit_quorum_set_hash
+        )
 
     def __str__(self):
         out = [
-            f'commit={self.commit}',
-            f'n_h={self.n_h}',
-            f'commit_quorum_set_hash={self.commit_quorum_set_hash}',
+            f"commit={self.commit}",
+            f"n_h={self.n_h}",
+            f"commit_quorum_set_hash={self.commit_quorum_set_hash}",
         ]
         return f"<SCPStatementExternalize {[', '.join(out)]}>"
 
 
-# === xdr source ============================================================
-#
-#   union switch (SCPStatementType type)
-#       {
-#       case SCP_ST_PREPARE:
-#           struct
-#           {
-#               Hash quorumSetHash;       // D
-#               SCPBallot ballot;         // b
-#               SCPBallot* prepared;      // p
-#               SCPBallot* preparedPrime; // p'
-#               uint32 nC;                // c.n
-#               uint32 nH;                // h.n
-#           } prepare;
-#       case SCP_ST_CONFIRM:
-#           struct
-#           {
-#               SCPBallot ballot;   // b
-#               uint32 nPrepared;   // p.n
-#               uint32 nCommit;     // c.n
-#               uint32 nH;          // h.n
-#               Hash quorumSetHash; // D
-#           } confirm;
-#       case SCP_ST_EXTERNALIZE:
-#           struct
-#           {
-#               SCPBallot commit;         // c
-#               uint32 nH;                // h.n
-#               Hash commitQuorumSetHash; // D used before EXTERNALIZE
-#           } externalize;
-#       case SCP_ST_NOMINATE:
-#           SCPNomination nominate;
-#       }
-#
-# ===========================================================================
 class SCPStatementPledges:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    union switch (SCPStatementType type)
+        {
+        case SCP_ST_PREPARE:
+            struct
+            {
+                Hash quorumSetHash;       // D
+                SCPBallot ballot;         // b
+                SCPBallot* prepared;      // p
+                SCPBallot* preparedPrime; // p'
+                uint32 nC;                // c.n
+                uint32 nH;                // h.n
+            } prepare;
+        case SCP_ST_CONFIRM:
+            struct
+            {
+                SCPBallot ballot;   // b
+                uint32 nPrepared;   // p.n
+                uint32 nCommit;     // c.n
+                uint32 nH;          // h.n
+                Hash quorumSetHash; // D
+            } confirm;
+        case SCP_ST_EXTERNALIZE:
+            struct
+            {
+                SCPBallot commit;         // c
+                uint32 nH;                // h.n
+                Hash commitQuorumSetHash; // D used before EXTERNALIZE
+            } externalize;
+        case SCP_ST_NOMINATE:
+            SCPNomination nominate;
+        }
+    ----------------------------------------------------------------
+    """
+
     def __init__(
-            self,
-            type: 'SCPStatementType',
-            prepare: 'SCPStatementPrepare' = None,
-            confirm: 'SCPStatementConfirm' = None,
-            externalize: 'SCPStatementExternalize' = None,
-            nominate: 'SCPNomination' = None,
+        self,
+        type: "SCPStatementType",
+        prepare: "SCPStatementPrepare" = None,
+        confirm: "SCPStatementConfirm" = None,
+        externalize: "SCPStatementExternalize" = None,
+        nominate: "SCPNomination" = None,
     ) -> None:
         self.type = type
-        self.prepare: 'SCPStatementPrepare' = prepare
-        self.confirm: 'SCPStatementConfirm' = confirm
-        self.externalize: 'SCPStatementExternalize' = externalize
-        self.nominate: 'SCPNomination' = nominate
+        self.prepare: "SCPStatementPrepare" = prepare
+        self.confirm: "SCPStatementConfirm" = confirm
+        self.externalize: "SCPStatementExternalize" = externalize
+        self.nominate: "SCPNomination" = nominate
 
     def pack(self, packer: Packer) -> None:
         self.type.pack(packer)
@@ -511,7 +527,7 @@ class SCPStatementPledges:
             return
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'SCPStatementPledges':
+    def unpack(cls, unpacker: Unpacker) -> "SCPStatementPledges":
         type = SCPStatementType.unpack(unpacker)
         if type == SCPStatementType.SCP_ST_PREPARE:
             prepare = SCPStatementPrepare.unpack(unpacker)
@@ -532,7 +548,7 @@ class SCPStatementPledges:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'SCPStatementPledges':
+    def from_xdr(cls, xdr) -> "SCPStatementPledges":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -540,66 +556,73 @@ class SCPStatementPledges:
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented
-        return self.type == other.type and self.prepare == other.prepare and self.confirm == other.confirm and self.externalize == other.externalize and self.nominate == other.nominate
+        return (
+            self.type == other.type
+            and self.prepare == other.prepare
+            and self.confirm == other.confirm
+            and self.externalize == other.externalize
+            and self.nominate == other.nominate
+        )
 
     def __str__(self):
         out = []
-        out.append(f'type={self.type}')
-        out.append(f'prepare={self.prepare}') if self.prepare is not None else None
-        out.append(f'confirm={self.confirm}') if self.confirm is not None else None
-        out.append(f'externalize={self.externalize}') if self.externalize is not None else None
-        out.append(f'nominate={self.nominate}') if self.nominate is not None else None
+        out.append(f"type={self.type}")
+        out.append(f"prepare={self.prepare}") if self.prepare is not None else None
+        out.append(f"confirm={self.confirm}") if self.confirm is not None else None
+        out.append(
+            f"externalize={self.externalize}"
+        ) if self.externalize is not None else None
+        out.append(f"nominate={self.nominate}") if self.nominate is not None else None
         return f"<SCPStatementPledges {[', '.join(out)]}>"
 
 
-# === xdr source ============================================================
-#
-#   struct SCPStatement
-#   {
-#       NodeID nodeID;    // v
-#       uint64 slotIndex; // i
-#
-#       union switch (SCPStatementType type)
-#       {
-#       case SCP_ST_PREPARE:
-#           struct
-#           {
-#               Hash quorumSetHash;       // D
-#               SCPBallot ballot;         // b
-#               SCPBallot* prepared;      // p
-#               SCPBallot* preparedPrime; // p'
-#               uint32 nC;                // c.n
-#               uint32 nH;                // h.n
-#           } prepare;
-#       case SCP_ST_CONFIRM:
-#           struct
-#           {
-#               SCPBallot ballot;   // b
-#               uint32 nPrepared;   // p.n
-#               uint32 nCommit;     // c.n
-#               uint32 nH;          // h.n
-#               Hash quorumSetHash; // D
-#           } confirm;
-#       case SCP_ST_EXTERNALIZE:
-#           struct
-#           {
-#               SCPBallot commit;         // c
-#               uint32 nH;                // h.n
-#               Hash commitQuorumSetHash; // D used before EXTERNALIZE
-#           } externalize;
-#       case SCP_ST_NOMINATE:
-#           SCPNomination nominate;
-#       }
-#       pledges;
-#   };
-#
-# ===========================================================================
 class SCPStatement:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    struct SCPStatement
+    {
+        NodeID nodeID;    // v
+        uint64 slotIndex; // i
+
+        union switch (SCPStatementType type)
+        {
+        case SCP_ST_PREPARE:
+            struct
+            {
+                Hash quorumSetHash;       // D
+                SCPBallot ballot;         // b
+                SCPBallot* prepared;      // p
+                SCPBallot* preparedPrime; // p'
+                uint32 nC;                // c.n
+                uint32 nH;                // h.n
+            } prepare;
+        case SCP_ST_CONFIRM:
+            struct
+            {
+                SCPBallot ballot;   // b
+                uint32 nPrepared;   // p.n
+                uint32 nCommit;     // c.n
+                uint32 nH;          // h.n
+                Hash quorumSetHash; // D
+            } confirm;
+        case SCP_ST_EXTERNALIZE:
+            struct
+            {
+                SCPBallot commit;         // c
+                uint32 nH;                // h.n
+                Hash commitQuorumSetHash; // D used before EXTERNALIZE
+            } externalize;
+        case SCP_ST_NOMINATE:
+            SCPNomination nominate;
+        }
+        pledges;
+    };
+    ----------------------------------------------------------------
+    """
+
     def __init__(
-            self,
-            node_id: 'NodeID',
-            slot_index: 'Uint64',
-            pledges: 'SCPStatementPledges',
+        self, node_id: "NodeID", slot_index: "Uint64", pledges: "SCPStatementPledges"
     ) -> None:
         self.node_id = node_id
         self.slot_index = slot_index
@@ -611,15 +634,11 @@ class SCPStatement:
         self.pledges.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'SCPStatement':
+    def unpack(cls, unpacker: Unpacker) -> "SCPStatement":
         node_id = NodeID.unpack(unpacker)
         slot_index = Uint64.unpack(unpacker)
         pledges = SCPStatementPledges.unpack(unpacker)
-        return cls(
-            node_id=node_id,
-            slot_index=slot_index,
-            pledges=pledges,
-        )
+        return cls(node_id=node_id, slot_index=slot_index, pledges=pledges)
 
     def to_xdr(self) -> str:
         packer = Packer()
@@ -627,7 +646,7 @@ class SCPStatement:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'SCPStatement':
+    def from_xdr(cls, xdr) -> "SCPStatement":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -635,32 +654,34 @@ class SCPStatement:
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented
-        return self.node_id == other.node_id and self.slot_index == other.slot_index and self.pledges == other.pledges
+        return (
+            self.node_id == other.node_id
+            and self.slot_index == other.slot_index
+            and self.pledges == other.pledges
+        )
 
     def __str__(self):
         out = [
-            f'node_id={self.node_id}',
-            f'slot_index={self.slot_index}',
-            f'pledges={self.pledges}',
+            f"node_id={self.node_id}",
+            f"slot_index={self.slot_index}",
+            f"pledges={self.pledges}",
         ]
         return f"<SCPStatement {[', '.join(out)]}>"
 
 
-# === xdr source ============================================================
-#
-#   struct SCPEnvelope
-#   {
-#       SCPStatement statement;
-#       Signature signature;
-#   };
-#
-# ===========================================================================
 class SCPEnvelope:
-    def __init__(
-            self,
-            statement: 'SCPStatement',
-            signature: 'Signature',
-    ) -> None:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    struct SCPEnvelope
+    {
+        SCPStatement statement;
+        Signature signature;
+    };
+    ----------------------------------------------------------------
+    """
+
+    def __init__(self, statement: "SCPStatement", signature: "Signature") -> None:
         self.statement = statement
         self.signature = signature
 
@@ -669,13 +690,10 @@ class SCPEnvelope:
         self.signature.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'SCPEnvelope':
+    def unpack(cls, unpacker: Unpacker) -> "SCPEnvelope":
         statement = SCPStatement.unpack(unpacker)
         signature = Signature.unpack(unpacker)
-        return cls(
-            statement=statement,
-            signature=signature,
-        )
+        return cls(statement=statement, signature=signature)
 
     def to_xdr(self) -> str:
         packer = Packer()
@@ -683,7 +701,7 @@ class SCPEnvelope:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'SCPEnvelope':
+    def from_xdr(cls, xdr) -> "SCPEnvelope":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -694,29 +712,28 @@ class SCPEnvelope:
         return self.statement == other.statement and self.signature == other.signature
 
     def __str__(self):
-        out = [
-            f'statement={self.statement}',
-            f'signature={self.signature}',
-        ]
+        out = [f"statement={self.statement}", f"signature={self.signature}"]
         return f"<SCPEnvelope {[', '.join(out)]}>"
 
 
-# === xdr source ============================================================
-#
-#   struct SCPQuorumSet
-#   {
-#       uint32 threshold;
-#       PublicKey validators<>;
-#       SCPQuorumSet innerSets<>;
-#   };
-#
-# ===========================================================================
 class SCPQuorumSet:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    struct SCPQuorumSet
+    {
+        uint32 threshold;
+        PublicKey validators<>;
+        SCPQuorumSet innerSets<>;
+    };
+    ----------------------------------------------------------------
+    """
+
     def __init__(
-            self,
-            threshold: 'Uint32',
-            validators: List['PublicKey'],
-            inner_sets: List['SCPQuorumSet'],
+        self,
+        threshold: "Uint32",
+        validators: List["PublicKey"],
+        inner_sets: List["SCPQuorumSet"],
     ) -> None:
         self.threshold = threshold
         self.validators = validators
@@ -732,7 +749,7 @@ class SCPQuorumSet:
             element.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'SCPQuorumSet':
+    def unpack(cls, unpacker: Unpacker) -> "SCPQuorumSet":
         threshold = Uint32.unpack(unpacker)
         length = unpacker.unpack_uint()
         validators = []
@@ -742,11 +759,7 @@ class SCPQuorumSet:
         inner_sets = []
         for _ in range(length):
             inner_sets.append(SCPQuorumSet.unpack(unpacker))
-        return cls(
-            threshold=threshold,
-            validators=validators,
-            inner_sets=inner_sets,
-        )
+        return cls(threshold=threshold, validators=validators, inner_sets=inner_sets)
 
     def to_xdr(self) -> str:
         packer = Packer()
@@ -754,7 +767,7 @@ class SCPQuorumSet:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'SCPQuorumSet':
+    def from_xdr(cls, xdr) -> "SCPQuorumSet":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -762,23 +775,29 @@ class SCPQuorumSet:
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented
-        return self.threshold == other.threshold and self.validators == other.validators and self.inner_sets == other.inner_sets
+        return (
+            self.threshold == other.threshold
+            and self.validators == other.validators
+            and self.inner_sets == other.inner_sets
+        )
 
     def __str__(self):
         out = [
-            f'threshold={self.threshold}',
-            f'validators={self.validators}',
-            f'inner_sets={self.inner_sets}',
+            f"threshold={self.threshold}",
+            f"validators={self.validators}",
+            f"inner_sets={self.inner_sets}",
         ]
         return f"<SCPQuorumSet {[', '.join(out)]}>"
 
 
-# === xdr source ============================================================
-#
-#   typedef opaque UpgradeType<128>;
-#
-# ===========================================================================
 class UpgradeType:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    typedef opaque UpgradeType<128>;
+    ----------------------------------------------------------------
+    """
+
     def __init__(self, upgrade_type: bytes) -> None:
         self.upgrade_type = upgrade_type
 
@@ -786,7 +805,7 @@ class UpgradeType:
         Opaque(self.upgrade_type, 128, False).pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'UpgradeType':
+    def unpack(cls, unpacker: Unpacker) -> "UpgradeType":
         upgrade_type = Opaque.unpack(unpacker, 128, False)
         return cls(upgrade_type)
 
@@ -796,7 +815,7 @@ class UpgradeType:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'UpgradeType':
+    def from_xdr(cls, xdr) -> "UpgradeType":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -810,16 +829,18 @@ class UpgradeType:
         return f"<UpgradeType [upgrade_type={self.upgrade_type}]>"
 
 
-# === xdr source ============================================================
-#
-#   enum StellarValueType
-#   {
-#       STELLAR_VALUE_BASIC = 0,
-#       STELLAR_VALUE_SIGNED = 1
-#   };
-#
-# ===========================================================================
 class StellarValueType(IntEnum):
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    enum StellarValueType
+    {
+        STELLAR_VALUE_BASIC = 0,
+        STELLAR_VALUE_SIGNED = 1
+    };
+    ----------------------------------------------------------------
+    """
+
     STELLAR_VALUE_BASIC = 0
     STELLAR_VALUE_SIGNED = 1
 
@@ -827,7 +848,7 @@ class StellarValueType(IntEnum):
         packer.pack_int(self.value)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'StellarValueType':
+    def unpack(cls, unpacker: Unpacker) -> "StellarValueType":
         value = unpacker.unpack_int()
         return cls(value)
 
@@ -837,7 +858,7 @@ class StellarValueType(IntEnum):
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'StellarValueType':
+    def from_xdr(cls, xdr) -> "StellarValueType":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -849,21 +870,19 @@ class StellarValueType(IntEnum):
         )
 
 
-# === xdr source ============================================================
-#
-#   struct LedgerCloseValueSignature
-#   {
-#       NodeID nodeID;       // which node introduced the value
-#       Signature signature; // nodeID's signature
-#   };
-#
-# ===========================================================================
 class LedgerCloseValueSignature:
-    def __init__(
-            self,
-            node_id: 'NodeID',
-            signature: 'Signature',
-    ) -> None:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    struct LedgerCloseValueSignature
+    {
+        NodeID nodeID;       // which node introduced the value
+        Signature signature; // nodeID's signature
+    };
+    ----------------------------------------------------------------
+    """
+
+    def __init__(self, node_id: "NodeID", signature: "Signature") -> None:
         self.node_id = node_id
         self.signature = signature
 
@@ -872,13 +891,10 @@ class LedgerCloseValueSignature:
         self.signature.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'LedgerCloseValueSignature':
+    def unpack(cls, unpacker: Unpacker) -> "LedgerCloseValueSignature":
         node_id = NodeID.unpack(unpacker)
         signature = Signature.unpack(unpacker)
-        return cls(
-            node_id=node_id,
-            signature=signature,
-        )
+        return cls(node_id=node_id, signature=signature)
 
     def to_xdr(self) -> str:
         packer = Packer()
@@ -886,7 +902,7 @@ class LedgerCloseValueSignature:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'LedgerCloseValueSignature':
+    def from_xdr(cls, xdr) -> "LedgerCloseValueSignature":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -897,32 +913,31 @@ class LedgerCloseValueSignature:
         return self.node_id == other.node_id and self.signature == other.signature
 
     def __str__(self):
-        out = [
-            f'node_id={self.node_id}',
-            f'signature={self.signature}',
-        ]
+        out = [f"node_id={self.node_id}", f"signature={self.signature}"]
         return f"<LedgerCloseValueSignature {[', '.join(out)]}>"
 
 
-# === xdr source ============================================================
-#
-#   union switch (StellarValueType v)
-#       {
-#       case STELLAR_VALUE_BASIC:
-#           void;
-#       case STELLAR_VALUE_SIGNED:
-#           LedgerCloseValueSignature lcValueSignature;
-#       }
-#
-# ===========================================================================
 class StellarValueExt:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    union switch (StellarValueType v)
+        {
+        case STELLAR_VALUE_BASIC:
+            void;
+        case STELLAR_VALUE_SIGNED:
+            LedgerCloseValueSignature lcValueSignature;
+        }
+    ----------------------------------------------------------------
+    """
+
     def __init__(
-            self,
-            v: 'StellarValueType',
-            lc_value_signature: 'LedgerCloseValueSignature' = None,
+        self,
+        v: "StellarValueType",
+        lc_value_signature: "LedgerCloseValueSignature" = None,
     ) -> None:
         self.v = v
-        self.lc_value_signature: 'LedgerCloseValueSignature' = lc_value_signature
+        self.lc_value_signature: "LedgerCloseValueSignature" = lc_value_signature
 
     def pack(self, packer: Packer) -> None:
         self.v.pack(packer)
@@ -933,7 +948,7 @@ class StellarValueExt:
             return
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'StellarValueExt':
+    def unpack(cls, unpacker: Unpacker) -> "StellarValueExt":
         v = StellarValueType.unpack(unpacker)
         if v == StellarValueType.STELLAR_VALUE_BASIC:
             return cls(v)
@@ -947,7 +962,7 @@ class StellarValueExt:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'StellarValueExt':
+    def from_xdr(cls, xdr) -> "StellarValueExt":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -959,44 +974,48 @@ class StellarValueExt:
 
     def __str__(self):
         out = []
-        out.append(f'v={self.v}')
-        out.append(f'lc_value_signature={self.lc_value_signature}') if self.lc_value_signature is not None else None
+        out.append(f"v={self.v}")
+        out.append(
+            f"lc_value_signature={self.lc_value_signature}"
+        ) if self.lc_value_signature is not None else None
         return f"<StellarValueExt {[', '.join(out)]}>"
 
 
-# === xdr source ============================================================
-#
-#   struct StellarValue
-#   {
-#       Hash txSetHash;      // transaction set to apply to previous ledger
-#       TimePoint closeTime; // network close time
-#
-#       // upgrades to apply to the previous ledger (usually empty)
-#       // this is a vector of encoded 'LedgerUpgrade' so that nodes can drop
-#       // unknown steps during consensus if needed.
-#       // see notes below on 'LedgerUpgrade' for more detail
-#       // max size is dictated by number of upgrade types (+ room for future)
-#       UpgradeType upgrades<6>;
-#
-#       // reserved for future use
-#       union switch (StellarValueType v)
-#       {
-#       case STELLAR_VALUE_BASIC:
-#           void;
-#       case STELLAR_VALUE_SIGNED:
-#           LedgerCloseValueSignature lcValueSignature;
-#       }
-#       ext;
-#   };
-#
-# ===========================================================================
 class StellarValue:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    struct StellarValue
+    {
+        Hash txSetHash;      // transaction set to apply to previous ledger
+        TimePoint closeTime; // network close time
+
+        // upgrades to apply to the previous ledger (usually empty)
+        // this is a vector of encoded 'LedgerUpgrade' so that nodes can drop
+        // unknown steps during consensus if needed.
+        // see notes below on 'LedgerUpgrade' for more detail
+        // max size is dictated by number of upgrade types (+ room for future)
+        UpgradeType upgrades<6>;
+
+        // reserved for future use
+        union switch (StellarValueType v)
+        {
+        case STELLAR_VALUE_BASIC:
+            void;
+        case STELLAR_VALUE_SIGNED:
+            LedgerCloseValueSignature lcValueSignature;
+        }
+        ext;
+    };
+    ----------------------------------------------------------------
+    """
+
     def __init__(
-            self,
-            tx_set_hash: 'Hash',
-            close_time: 'TimePoint',
-            upgrades: List['UpgradeType'],
-            ext: 'StellarValueExt',
+        self,
+        tx_set_hash: "Hash",
+        close_time: "TimePoint",
+        upgrades: List["UpgradeType"],
+        ext: "StellarValueExt",
     ) -> None:
         self.tx_set_hash = tx_set_hash
         self.close_time = close_time
@@ -1012,7 +1031,7 @@ class StellarValue:
         self.ext.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'StellarValue':
+    def unpack(cls, unpacker: Unpacker) -> "StellarValue":
         tx_set_hash = Hash.unpack(unpacker)
         close_time = TimePoint.unpack(unpacker)
         length = unpacker.unpack_uint()
@@ -1021,10 +1040,7 @@ class StellarValue:
             upgrades.append(UpgradeType.unpack(unpacker))
         ext = StellarValueExt.unpack(unpacker)
         return cls(
-            tx_set_hash=tx_set_hash,
-            close_time=close_time,
-            upgrades=upgrades,
-            ext=ext,
+            tx_set_hash=tx_set_hash, close_time=close_time, upgrades=upgrades, ext=ext
         )
 
     def to_xdr(self) -> str:
@@ -1033,7 +1049,7 @@ class StellarValue:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'StellarValue':
+    def from_xdr(cls, xdr) -> "StellarValue":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -1041,32 +1057,36 @@ class StellarValue:
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented
-        return self.tx_set_hash == other.tx_set_hash and self.close_time == other.close_time and self.upgrades == other.upgrades and self.ext == other.ext
+        return (
+            self.tx_set_hash == other.tx_set_hash
+            and self.close_time == other.close_time
+            and self.upgrades == other.upgrades
+            and self.ext == other.ext
+        )
 
     def __str__(self):
         out = [
-            f'tx_set_hash={self.tx_set_hash}',
-            f'close_time={self.close_time}',
-            f'upgrades={self.upgrades}',
-            f'ext={self.ext}',
+            f"tx_set_hash={self.tx_set_hash}",
+            f"close_time={self.close_time}",
+            f"upgrades={self.upgrades}",
+            f"ext={self.ext}",
         ]
         return f"<StellarValue {[', '.join(out)]}>"
 
 
-# === xdr source ============================================================
-#
-#   union switch (int v)
-#       {
-#       case 0:
-#           void;
-#       }
-#
-# ===========================================================================
 class LedgerHeaderExt:
-    def __init__(
-            self,
-            v: int,
-    ) -> None:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    union switch (int v)
+        {
+        case 0:
+            void;
+        }
+    ----------------------------------------------------------------
+    """
+
+    def __init__(self, v: int) -> None:
         self.v = v
 
     def pack(self, packer: Packer) -> None:
@@ -1075,7 +1095,7 @@ class LedgerHeaderExt:
             return
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'LedgerHeaderExt':
+    def unpack(cls, unpacker: Unpacker) -> "LedgerHeaderExt":
         v = Integer.unpack(unpacker)
         if v == 0:
             return cls(v)
@@ -1086,7 +1106,7 @@ class LedgerHeaderExt:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'LedgerHeaderExt':
+    def from_xdr(cls, xdr) -> "LedgerHeaderExt":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -1098,69 +1118,71 @@ class LedgerHeaderExt:
 
     def __str__(self):
         out = []
-        out.append(f'v={self.v}')
+        out.append(f"v={self.v}")
         return f"<LedgerHeaderExt {[', '.join(out)]}>"
 
 
-# === xdr source ============================================================
-#
-#   struct LedgerHeader
-#   {
-#       uint32 ledgerVersion;    // the protocol version of the ledger
-#       Hash previousLedgerHash; // hash of the previous ledger header
-#       StellarValue scpValue;   // what consensus agreed to
-#       Hash txSetResultHash;    // the TransactionResultSet that led to this ledger
-#       Hash bucketListHash;     // hash of the ledger state
-#
-#       uint32 ledgerSeq; // sequence number of this ledger
-#
-#       int64 totalCoins; // total number of stroops in existence.
-#                         // 10,000,000 stroops in 1 XLM
-#
-#       int64 feePool;       // fees burned since last inflation run
-#       uint32 inflationSeq; // inflation sequence number
-#
-#       uint64 idPool; // last used global ID, used for generating objects
-#
-#       uint32 baseFee;     // base fee per operation in stroops
-#       uint32 baseReserve; // account base reserve in stroops
-#
-#       uint32 maxTxSetSize; // maximum size a transaction set can be
-#
-#       Hash skipList[4]; // hashes of ledgers in the past. allows you to jump back
-#                         // in time without walking the chain back ledger by ledger
-#                         // each slot contains the oldest ledger that is mod of
-#                         // either 50  5000  50000 or 500000 depending on index
-#                         // skipList[0] mod(50), skipList[1] mod(5000), etc
-#
-#       // reserved for future use
-#       union switch (int v)
-#       {
-#       case 0:
-#           void;
-#       }
-#       ext;
-#   };
-#
-# ===========================================================================
 class LedgerHeader:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    struct LedgerHeader
+    {
+        uint32 ledgerVersion;    // the protocol version of the ledger
+        Hash previousLedgerHash; // hash of the previous ledger header
+        StellarValue scpValue;   // what consensus agreed to
+        Hash txSetResultHash;    // the TransactionResultSet that led to this ledger
+        Hash bucketListHash;     // hash of the ledger state
+
+        uint32 ledgerSeq; // sequence number of this ledger
+
+        int64 totalCoins; // total number of stroops in existence.
+                          // 10,000,000 stroops in 1 XLM
+
+        int64 feePool;       // fees burned since last inflation run
+        uint32 inflationSeq; // inflation sequence number
+
+        uint64 idPool; // last used global ID, used for generating objects
+
+        uint32 baseFee;     // base fee per operation in stroops
+        uint32 baseReserve; // account base reserve in stroops
+
+        uint32 maxTxSetSize; // maximum size a transaction set can be
+
+        Hash skipList[4]; // hashes of ledgers in the past. allows you to jump back
+                          // in time without walking the chain back ledger by ledger
+                          // each slot contains the oldest ledger that is mod of
+                          // either 50  5000  50000 or 500000 depending on index
+                          // skipList[0] mod(50), skipList[1] mod(5000), etc
+
+        // reserved for future use
+        union switch (int v)
+        {
+        case 0:
+            void;
+        }
+        ext;
+    };
+    ----------------------------------------------------------------
+    """
+
     def __init__(
-            self,
-            ledger_version: 'Uint32',
-            previous_ledger_hash: 'Hash',
-            scp_value: 'StellarValue',
-            tx_set_result_hash: 'Hash',
-            bucket_list_hash: 'Hash',
-            ledger_seq: 'Uint32',
-            total_coins: 'Int64',
-            fee_pool: 'Int64',
-            inflation_seq: 'Uint32',
-            id_pool: 'Uint64',
-            base_fee: 'Uint32',
-            base_reserve: 'Uint32',
-            max_tx_set_size: 'Uint32',
-            skip_list: List['Hash'],
-            ext: 'LedgerHeaderExt',
+        self,
+        ledger_version: "Uint32",
+        previous_ledger_hash: "Hash",
+        scp_value: "StellarValue",
+        tx_set_result_hash: "Hash",
+        bucket_list_hash: "Hash",
+        ledger_seq: "Uint32",
+        total_coins: "Int64",
+        fee_pool: "Int64",
+        inflation_seq: "Uint32",
+        id_pool: "Uint64",
+        base_fee: "Uint32",
+        base_reserve: "Uint32",
+        max_tx_set_size: "Uint32",
+        skip_list: List["Hash"],
+        ext: "LedgerHeaderExt",
     ) -> None:
         self.ledger_version = ledger_version
         self.previous_ledger_hash = previous_ledger_hash
@@ -1198,7 +1220,7 @@ class LedgerHeader:
         self.ext.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'LedgerHeader':
+    def unpack(cls, unpacker: Unpacker) -> "LedgerHeader":
         ledger_version = Uint32.unpack(unpacker)
         previous_ledger_hash = Hash.unpack(unpacker)
         scp_value = StellarValue.unpack(unpacker)
@@ -1241,7 +1263,7 @@ class LedgerHeader:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'LedgerHeader':
+    def from_xdr(cls, xdr) -> "LedgerHeader":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -1249,41 +1271,59 @@ class LedgerHeader:
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented
-        return self.ledger_version == other.ledger_version and self.previous_ledger_hash == other.previous_ledger_hash and self.scp_value == other.scp_value and self.tx_set_result_hash == other.tx_set_result_hash and self.bucket_list_hash == other.bucket_list_hash and self.ledger_seq == other.ledger_seq and self.total_coins == other.total_coins and self.fee_pool == other.fee_pool and self.inflation_seq == other.inflation_seq and self.id_pool == other.id_pool and self.base_fee == other.base_fee and self.base_reserve == other.base_reserve and self.max_tx_set_size == other.max_tx_set_size and self.skip_list == other.skip_list and self.ext == other.ext
+        return (
+            self.ledger_version == other.ledger_version
+            and self.previous_ledger_hash == other.previous_ledger_hash
+            and self.scp_value == other.scp_value
+            and self.tx_set_result_hash == other.tx_set_result_hash
+            and self.bucket_list_hash == other.bucket_list_hash
+            and self.ledger_seq == other.ledger_seq
+            and self.total_coins == other.total_coins
+            and self.fee_pool == other.fee_pool
+            and self.inflation_seq == other.inflation_seq
+            and self.id_pool == other.id_pool
+            and self.base_fee == other.base_fee
+            and self.base_reserve == other.base_reserve
+            and self.max_tx_set_size == other.max_tx_set_size
+            and self.skip_list == other.skip_list
+            and self.ext == other.ext
+        )
 
     def __str__(self):
         out = [
-            f'ledger_version={self.ledger_version}',
-            f'previous_ledger_hash={self.previous_ledger_hash}',
-            f'scp_value={self.scp_value}',
-            f'tx_set_result_hash={self.tx_set_result_hash}',
-            f'bucket_list_hash={self.bucket_list_hash}',
-            f'ledger_seq={self.ledger_seq}',
-            f'total_coins={self.total_coins}',
-            f'fee_pool={self.fee_pool}',
-            f'inflation_seq={self.inflation_seq}',
-            f'id_pool={self.id_pool}',
-            f'base_fee={self.base_fee}',
-            f'base_reserve={self.base_reserve}',
-            f'max_tx_set_size={self.max_tx_set_size}',
-            f'skip_list={self.skip_list}',
-            f'ext={self.ext}',
+            f"ledger_version={self.ledger_version}",
+            f"previous_ledger_hash={self.previous_ledger_hash}",
+            f"scp_value={self.scp_value}",
+            f"tx_set_result_hash={self.tx_set_result_hash}",
+            f"bucket_list_hash={self.bucket_list_hash}",
+            f"ledger_seq={self.ledger_seq}",
+            f"total_coins={self.total_coins}",
+            f"fee_pool={self.fee_pool}",
+            f"inflation_seq={self.inflation_seq}",
+            f"id_pool={self.id_pool}",
+            f"base_fee={self.base_fee}",
+            f"base_reserve={self.base_reserve}",
+            f"max_tx_set_size={self.max_tx_set_size}",
+            f"skip_list={self.skip_list}",
+            f"ext={self.ext}",
         ]
         return f"<LedgerHeader {[', '.join(out)]}>"
 
 
-# === xdr source ============================================================
-#
-#   enum LedgerUpgradeType
-#   {
-#       LEDGER_UPGRADE_VERSION = 1,
-#       LEDGER_UPGRADE_BASE_FEE = 2,
-#       LEDGER_UPGRADE_MAX_TX_SET_SIZE = 3,
-#       LEDGER_UPGRADE_BASE_RESERVE = 4
-#   };
-#
-# ===========================================================================
 class LedgerUpgradeType(IntEnum):
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    enum LedgerUpgradeType
+    {
+        LEDGER_UPGRADE_VERSION = 1,
+        LEDGER_UPGRADE_BASE_FEE = 2,
+        LEDGER_UPGRADE_MAX_TX_SET_SIZE = 3,
+        LEDGER_UPGRADE_BASE_RESERVE = 4
+    };
+    ----------------------------------------------------------------
+    """
+
     LEDGER_UPGRADE_VERSION = 1
     LEDGER_UPGRADE_BASE_FEE = 2
     LEDGER_UPGRADE_MAX_TX_SET_SIZE = 3
@@ -1293,7 +1333,7 @@ class LedgerUpgradeType(IntEnum):
         packer.pack_int(self.value)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'LedgerUpgradeType':
+    def unpack(cls, unpacker: Unpacker) -> "LedgerUpgradeType":
         value = unpacker.unpack_int()
         return cls(value)
 
@@ -1303,7 +1343,7 @@ class LedgerUpgradeType(IntEnum):
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'LedgerUpgradeType':
+    def from_xdr(cls, xdr) -> "LedgerUpgradeType":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -1315,35 +1355,37 @@ class LedgerUpgradeType(IntEnum):
         )
 
 
-# === xdr source ============================================================
-#
-#   union LedgerUpgrade switch (LedgerUpgradeType type)
-#   {
-#   case LEDGER_UPGRADE_VERSION:
-#       uint32 newLedgerVersion; // update ledgerVersion
-#   case LEDGER_UPGRADE_BASE_FEE:
-#       uint32 newBaseFee; // update baseFee
-#   case LEDGER_UPGRADE_MAX_TX_SET_SIZE:
-#       uint32 newMaxTxSetSize; // update maxTxSetSize
-#   case LEDGER_UPGRADE_BASE_RESERVE:
-#       uint32 newBaseReserve; // update baseReserve
-#   };
-#
-# ===========================================================================
 class LedgerUpgrade:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    union LedgerUpgrade switch (LedgerUpgradeType type)
+    {
+    case LEDGER_UPGRADE_VERSION:
+        uint32 newLedgerVersion; // update ledgerVersion
+    case LEDGER_UPGRADE_BASE_FEE:
+        uint32 newBaseFee; // update baseFee
+    case LEDGER_UPGRADE_MAX_TX_SET_SIZE:
+        uint32 newMaxTxSetSize; // update maxTxSetSize
+    case LEDGER_UPGRADE_BASE_RESERVE:
+        uint32 newBaseReserve; // update baseReserve
+    };
+    ----------------------------------------------------------------
+    """
+
     def __init__(
-            self,
-            type: 'LedgerUpgradeType',
-            new_ledger_version: 'Uint32' = None,
-            new_base_fee: 'Uint32' = None,
-            new_max_tx_set_size: 'Uint32' = None,
-            new_base_reserve: 'Uint32' = None,
+        self,
+        type: "LedgerUpgradeType",
+        new_ledger_version: "Uint32" = None,
+        new_base_fee: "Uint32" = None,
+        new_max_tx_set_size: "Uint32" = None,
+        new_base_reserve: "Uint32" = None,
     ) -> None:
         self.type = type
-        self.new_ledger_version: 'Uint32' = new_ledger_version
-        self.new_base_fee: 'Uint32' = new_base_fee
-        self.new_max_tx_set_size: 'Uint32' = new_max_tx_set_size
-        self.new_base_reserve: 'Uint32' = new_base_reserve
+        self.new_ledger_version: "Uint32" = new_ledger_version
+        self.new_base_fee: "Uint32" = new_base_fee
+        self.new_max_tx_set_size: "Uint32" = new_max_tx_set_size
+        self.new_base_reserve: "Uint32" = new_base_reserve
 
     def pack(self, packer: Packer) -> None:
         self.type.pack(packer)
@@ -1361,7 +1403,7 @@ class LedgerUpgrade:
             return
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'LedgerUpgrade':
+    def unpack(cls, unpacker: Unpacker) -> "LedgerUpgrade":
         type = LedgerUpgradeType.unpack(unpacker)
         if type == LedgerUpgradeType.LEDGER_UPGRADE_VERSION:
             new_ledger_version = Uint32.unpack(unpacker)
@@ -1382,7 +1424,7 @@ class LedgerUpgrade:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'LedgerUpgrade':
+    def from_xdr(cls, xdr) -> "LedgerUpgrade":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -1390,42 +1432,53 @@ class LedgerUpgrade:
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented
-        return self.type == other.type and self.new_ledger_version == other.new_ledger_version and self.new_base_fee == other.new_base_fee and self.new_max_tx_set_size == other.new_max_tx_set_size and self.new_base_reserve == other.new_base_reserve
+        return (
+            self.type == other.type
+            and self.new_ledger_version == other.new_ledger_version
+            and self.new_base_fee == other.new_base_fee
+            and self.new_max_tx_set_size == other.new_max_tx_set_size
+            and self.new_base_reserve == other.new_base_reserve
+        )
 
     def __str__(self):
         out = []
-        out.append(f'type={self.type}')
-        out.append(f'new_ledger_version={self.new_ledger_version}') if self.new_ledger_version is not None else None
-        out.append(f'new_base_fee={self.new_base_fee}') if self.new_base_fee is not None else None
-        out.append(f'new_max_tx_set_size={self.new_max_tx_set_size}') if self.new_max_tx_set_size is not None else None
-        out.append(f'new_base_reserve={self.new_base_reserve}') if self.new_base_reserve is not None else None
+        out.append(f"type={self.type}")
+        out.append(
+            f"new_ledger_version={self.new_ledger_version}"
+        ) if self.new_ledger_version is not None else None
+        out.append(
+            f"new_base_fee={self.new_base_fee}"
+        ) if self.new_base_fee is not None else None
+        out.append(
+            f"new_max_tx_set_size={self.new_max_tx_set_size}"
+        ) if self.new_max_tx_set_size is not None else None
+        out.append(
+            f"new_base_reserve={self.new_base_reserve}"
+        ) if self.new_base_reserve is not None else None
         return f"<LedgerUpgrade {[', '.join(out)]}>"
 
 
-# === xdr source ============================================================
-#
-#   struct
-#       {
-#           AccountID accountID;
-#       }
-#
-# ===========================================================================
 class LedgerKeyAccount:
-    def __init__(
-            self,
-            account_id: 'AccountID',
-    ) -> None:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    struct
+        {
+            AccountID accountID;
+        }
+    ----------------------------------------------------------------
+    """
+
+    def __init__(self, account_id: "AccountID") -> None:
         self.account_id = account_id
 
     def pack(self, packer: Packer) -> None:
         self.account_id.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'LedgerKeyAccount':
+    def unpack(cls, unpacker: Unpacker) -> "LedgerKeyAccount":
         account_id = AccountID.unpack(unpacker)
-        return cls(
-            account_id=account_id,
-        )
+        return cls(account_id=account_id)
 
     def to_xdr(self) -> str:
         packer = Packer()
@@ -1433,7 +1486,7 @@ class LedgerKeyAccount:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'LedgerKeyAccount':
+    def from_xdr(cls, xdr) -> "LedgerKeyAccount":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -1444,27 +1497,23 @@ class LedgerKeyAccount:
         return self.account_id == other.account_id
 
     def __str__(self):
-        out = [
-            f'account_id={self.account_id}',
-        ]
+        out = [f"account_id={self.account_id}"]
         return f"<LedgerKeyAccount {[', '.join(out)]}>"
 
 
-# === xdr source ============================================================
-#
-#   struct
-#       {
-#           AccountID accountID;
-#           Asset asset;
-#       }
-#
-# ===========================================================================
 class LedgerKeyTrustLine:
-    def __init__(
-            self,
-            account_id: 'AccountID',
-            asset: 'Asset',
-    ) -> None:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    struct
+        {
+            AccountID accountID;
+            Asset asset;
+        }
+    ----------------------------------------------------------------
+    """
+
+    def __init__(self, account_id: "AccountID", asset: "Asset") -> None:
         self.account_id = account_id
         self.asset = asset
 
@@ -1473,13 +1522,10 @@ class LedgerKeyTrustLine:
         self.asset.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'LedgerKeyTrustLine':
+    def unpack(cls, unpacker: Unpacker) -> "LedgerKeyTrustLine":
         account_id = AccountID.unpack(unpacker)
         asset = Asset.unpack(unpacker)
-        return cls(
-            account_id=account_id,
-            asset=asset,
-        )
+        return cls(account_id=account_id, asset=asset)
 
     def to_xdr(self) -> str:
         packer = Packer()
@@ -1487,7 +1533,7 @@ class LedgerKeyTrustLine:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'LedgerKeyTrustLine':
+    def from_xdr(cls, xdr) -> "LedgerKeyTrustLine":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -1498,28 +1544,23 @@ class LedgerKeyTrustLine:
         return self.account_id == other.account_id and self.asset == other.asset
 
     def __str__(self):
-        out = [
-            f'account_id={self.account_id}',
-            f'asset={self.asset}',
-        ]
+        out = [f"account_id={self.account_id}", f"asset={self.asset}"]
         return f"<LedgerKeyTrustLine {[', '.join(out)]}>"
 
 
-# === xdr source ============================================================
-#
-#   struct
-#       {
-#           AccountID sellerID;
-#           int64 offerID;
-#       }
-#
-# ===========================================================================
 class LedgerKeyOffer:
-    def __init__(
-            self,
-            seller_id: 'AccountID',
-            offer_id: 'Int64',
-    ) -> None:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    struct
+        {
+            AccountID sellerID;
+            int64 offerID;
+        }
+    ----------------------------------------------------------------
+    """
+
+    def __init__(self, seller_id: "AccountID", offer_id: "Int64") -> None:
         self.seller_id = seller_id
         self.offer_id = offer_id
 
@@ -1528,13 +1569,10 @@ class LedgerKeyOffer:
         self.offer_id.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'LedgerKeyOffer':
+    def unpack(cls, unpacker: Unpacker) -> "LedgerKeyOffer":
         seller_id = AccountID.unpack(unpacker)
         offer_id = Int64.unpack(unpacker)
-        return cls(
-            seller_id=seller_id,
-            offer_id=offer_id,
-        )
+        return cls(seller_id=seller_id, offer_id=offer_id)
 
     def to_xdr(self) -> str:
         packer = Packer()
@@ -1542,7 +1580,7 @@ class LedgerKeyOffer:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'LedgerKeyOffer':
+    def from_xdr(cls, xdr) -> "LedgerKeyOffer":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -1553,28 +1591,23 @@ class LedgerKeyOffer:
         return self.seller_id == other.seller_id and self.offer_id == other.offer_id
 
     def __str__(self):
-        out = [
-            f'seller_id={self.seller_id}',
-            f'offer_id={self.offer_id}',
-        ]
+        out = [f"seller_id={self.seller_id}", f"offer_id={self.offer_id}"]
         return f"<LedgerKeyOffer {[', '.join(out)]}>"
 
 
-# === xdr source ============================================================
-#
-#   struct
-#       {
-#           AccountID accountID;
-#           string64 dataName;
-#       }
-#
-# ===========================================================================
 class LedgerKeyData:
-    def __init__(
-            self,
-            account_id: 'AccountID',
-            data_name: 'String64',
-    ) -> None:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    struct
+        {
+            AccountID accountID;
+            string64 dataName;
+        }
+    ----------------------------------------------------------------
+    """
+
+    def __init__(self, account_id: "AccountID", data_name: "String64") -> None:
         self.account_id = account_id
         self.data_name = data_name
 
@@ -1583,13 +1616,10 @@ class LedgerKeyData:
         self.data_name.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'LedgerKeyData':
+    def unpack(cls, unpacker: Unpacker) -> "LedgerKeyData":
         account_id = AccountID.unpack(unpacker)
         data_name = String64.unpack(unpacker)
-        return cls(
-            account_id=account_id,
-            data_name=data_name,
-        )
+        return cls(account_id=account_id, data_name=data_name)
 
     def to_xdr(self) -> str:
         packer = Packer()
@@ -1597,7 +1627,7 @@ class LedgerKeyData:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'LedgerKeyData':
+    def from_xdr(cls, xdr) -> "LedgerKeyData":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -1608,60 +1638,59 @@ class LedgerKeyData:
         return self.account_id == other.account_id and self.data_name == other.data_name
 
     def __str__(self):
-        out = [
-            f'account_id={self.account_id}',
-            f'data_name={self.data_name}',
-        ]
+        out = [f"account_id={self.account_id}", f"data_name={self.data_name}"]
         return f"<LedgerKeyData {[', '.join(out)]}>"
 
 
-# === xdr source ============================================================
-#
-#   union LedgerKey switch (LedgerEntryType type)
-#   {
-#   case ACCOUNT:
-#       struct
-#       {
-#           AccountID accountID;
-#       } account;
-#
-#   case TRUSTLINE:
-#       struct
-#       {
-#           AccountID accountID;
-#           Asset asset;
-#       } trustLine;
-#
-#   case OFFER:
-#       struct
-#       {
-#           AccountID sellerID;
-#           int64 offerID;
-#       } offer;
-#
-#   case DATA:
-#       struct
-#       {
-#           AccountID accountID;
-#           string64 dataName;
-#       } data;
-#   };
-#
-# ===========================================================================
 class LedgerKey:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    union LedgerKey switch (LedgerEntryType type)
+    {
+    case ACCOUNT:
+        struct
+        {
+            AccountID accountID;
+        } account;
+
+    case TRUSTLINE:
+        struct
+        {
+            AccountID accountID;
+            Asset asset;
+        } trustLine;
+
+    case OFFER:
+        struct
+        {
+            AccountID sellerID;
+            int64 offerID;
+        } offer;
+
+    case DATA:
+        struct
+        {
+            AccountID accountID;
+            string64 dataName;
+        } data;
+    };
+    ----------------------------------------------------------------
+    """
+
     def __init__(
-            self,
-            type: 'LedgerEntryType',
-            account: 'LedgerKeyAccount' = None,
-            trust_line: 'LedgerKeyTrustLine' = None,
-            offer: 'LedgerKeyOffer' = None,
-            data: 'LedgerKeyData' = None,
+        self,
+        type: "LedgerEntryType",
+        account: "LedgerKeyAccount" = None,
+        trust_line: "LedgerKeyTrustLine" = None,
+        offer: "LedgerKeyOffer" = None,
+        data: "LedgerKeyData" = None,
     ) -> None:
         self.type = type
-        self.account: 'LedgerKeyAccount' = account
-        self.trust_line: 'LedgerKeyTrustLine' = trust_line
-        self.offer: 'LedgerKeyOffer' = offer
-        self.data: 'LedgerKeyData' = data
+        self.account: "LedgerKeyAccount" = account
+        self.trust_line: "LedgerKeyTrustLine" = trust_line
+        self.offer: "LedgerKeyOffer" = offer
+        self.data: "LedgerKeyData" = data
 
     def pack(self, packer: Packer) -> None:
         self.type.pack(packer)
@@ -1679,7 +1708,7 @@ class LedgerKey:
             return
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'LedgerKey':
+    def unpack(cls, unpacker: Unpacker) -> "LedgerKey":
         type = LedgerEntryType.unpack(unpacker)
         if type == LedgerEntryType.ACCOUNT:
             account = LedgerKeyAccount.unpack(unpacker)
@@ -1700,7 +1729,7 @@ class LedgerKey:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'LedgerKey':
+    def from_xdr(cls, xdr) -> "LedgerKey":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -1708,32 +1737,42 @@ class LedgerKey:
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented
-        return self.type == other.type and self.account == other.account and self.trust_line == other.trust_line and self.offer == other.offer and self.data == other.data
+        return (
+            self.type == other.type
+            and self.account == other.account
+            and self.trust_line == other.trust_line
+            and self.offer == other.offer
+            and self.data == other.data
+        )
 
     def __str__(self):
         out = []
-        out.append(f'type={self.type}')
-        out.append(f'account={self.account}') if self.account is not None else None
-        out.append(f'trust_line={self.trust_line}') if self.trust_line is not None else None
-        out.append(f'offer={self.offer}') if self.offer is not None else None
-        out.append(f'data={self.data}') if self.data is not None else None
+        out.append(f"type={self.type}")
+        out.append(f"account={self.account}") if self.account is not None else None
+        out.append(
+            f"trust_line={self.trust_line}"
+        ) if self.trust_line is not None else None
+        out.append(f"offer={self.offer}") if self.offer is not None else None
+        out.append(f"data={self.data}") if self.data is not None else None
         return f"<LedgerKey {[', '.join(out)]}>"
 
 
-# === xdr source ============================================================
-#
-#   enum BucketEntryType
-#   {
-#       METAENTRY =
-#           -1, // At-and-after protocol 11: bucket metadata, should come first.
-#       LIVEENTRY = 0, // Before protocol 11: created-or-updated;
-#                      // At-and-after protocol 11: only updated.
-#       DEADENTRY = 1,
-#       INITENTRY = 2 // At-and-after protocol 11: only created.
-#   };
-#
-# ===========================================================================
 class BucketEntryType(IntEnum):
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    enum BucketEntryType
+    {
+        METAENTRY =
+            -1, // At-and-after protocol 11: bucket metadata, should come first.
+        LIVEENTRY = 0, // Before protocol 11: created-or-updated;
+                       // At-and-after protocol 11: only updated.
+        DEADENTRY = 1,
+        INITENTRY = 2 // At-and-after protocol 11: only created.
+    };
+    ----------------------------------------------------------------
+    """
+
     METAENTRY = -1
     LIVEENTRY = 0
     DEADENTRY = 1
@@ -1743,7 +1782,7 @@ class BucketEntryType(IntEnum):
         packer.pack_int(self.value)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'BucketEntryType':
+    def unpack(cls, unpacker: Unpacker) -> "BucketEntryType":
         value = unpacker.unpack_int()
         return cls(value)
 
@@ -1753,7 +1792,7 @@ class BucketEntryType(IntEnum):
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'BucketEntryType':
+    def from_xdr(cls, xdr) -> "BucketEntryType":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -1765,20 +1804,19 @@ class BucketEntryType(IntEnum):
         )
 
 
-# === xdr source ============================================================
-#
-#   union switch (int v)
-#       {
-#       case 0:
-#           void;
-#       }
-#
-# ===========================================================================
 class BucketMetadataExt:
-    def __init__(
-            self,
-            v: int,
-    ) -> None:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    union switch (int v)
+        {
+        case 0:
+            void;
+        }
+    ----------------------------------------------------------------
+    """
+
+    def __init__(self, v: int) -> None:
         self.v = v
 
     def pack(self, packer: Packer) -> None:
@@ -1787,7 +1825,7 @@ class BucketMetadataExt:
             return
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'BucketMetadataExt':
+    def unpack(cls, unpacker: Unpacker) -> "BucketMetadataExt":
         v = Integer.unpack(unpacker)
         if v == 0:
             return cls(v)
@@ -1798,7 +1836,7 @@ class BucketMetadataExt:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'BucketMetadataExt':
+    def from_xdr(cls, xdr) -> "BucketMetadataExt":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -1810,33 +1848,31 @@ class BucketMetadataExt:
 
     def __str__(self):
         out = []
-        out.append(f'v={self.v}')
+        out.append(f"v={self.v}")
         return f"<BucketMetadataExt {[', '.join(out)]}>"
 
 
-# === xdr source ============================================================
-#
-#   struct BucketMetadata
-#   {
-#       // Indicates the protocol version used to create / merge this bucket.
-#       uint32 ledgerVersion;
-#
-#       // reserved for future use
-#       union switch (int v)
-#       {
-#       case 0:
-#           void;
-#       }
-#       ext;
-#   };
-#
-# ===========================================================================
 class BucketMetadata:
-    def __init__(
-            self,
-            ledger_version: 'Uint32',
-            ext: 'BucketMetadataExt',
-    ) -> None:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    struct BucketMetadata
+    {
+        // Indicates the protocol version used to create / merge this bucket.
+        uint32 ledgerVersion;
+
+        // reserved for future use
+        union switch (int v)
+        {
+        case 0:
+            void;
+        }
+        ext;
+    };
+    ----------------------------------------------------------------
+    """
+
+    def __init__(self, ledger_version: "Uint32", ext: "BucketMetadataExt") -> None:
         self.ledger_version = ledger_version
         self.ext = ext
 
@@ -1845,13 +1881,10 @@ class BucketMetadata:
         self.ext.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'BucketMetadata':
+    def unpack(cls, unpacker: Unpacker) -> "BucketMetadata":
         ledger_version = Uint32.unpack(unpacker)
         ext = BucketMetadataExt.unpack(unpacker)
-        return cls(
-            ledger_version=ledger_version,
-            ext=ext,
-        )
+        return cls(ledger_version=ledger_version, ext=ext)
 
     def to_xdr(self) -> str:
         packer = Packer()
@@ -1859,7 +1892,7 @@ class BucketMetadata:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'BucketMetadata':
+    def from_xdr(cls, xdr) -> "BucketMetadata":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -1870,40 +1903,39 @@ class BucketMetadata:
         return self.ledger_version == other.ledger_version and self.ext == other.ext
 
     def __str__(self):
-        out = [
-            f'ledger_version={self.ledger_version}',
-            f'ext={self.ext}',
-        ]
+        out = [f"ledger_version={self.ledger_version}", f"ext={self.ext}"]
         return f"<BucketMetadata {[', '.join(out)]}>"
 
 
-# === xdr source ============================================================
-#
-#   union BucketEntry switch (BucketEntryType type)
-#   {
-#   case LIVEENTRY:
-#   case INITENTRY:
-#       LedgerEntry liveEntry;
-#
-#   case DEADENTRY:
-#       LedgerKey deadEntry;
-#   case METAENTRY:
-#       BucketMetadata metaEntry;
-#   };
-#
-# ===========================================================================
 class BucketEntry:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    union BucketEntry switch (BucketEntryType type)
+    {
+    case LIVEENTRY:
+    case INITENTRY:
+        LedgerEntry liveEntry;
+
+    case DEADENTRY:
+        LedgerKey deadEntry;
+    case METAENTRY:
+        BucketMetadata metaEntry;
+    };
+    ----------------------------------------------------------------
+    """
+
     def __init__(
-            self,
-            type: 'BucketEntryType',
-            live_entry: 'LedgerEntry' = None,
-            dead_entry: 'LedgerKey' = None,
-            meta_entry: 'BucketMetadata' = None,
+        self,
+        type: "BucketEntryType",
+        live_entry: "LedgerEntry" = None,
+        dead_entry: "LedgerKey" = None,
+        meta_entry: "BucketMetadata" = None,
     ) -> None:
         self.type = type
-        self.live_entry: 'LedgerEntry' = live_entry
-        self.dead_entry: 'LedgerKey' = dead_entry
-        self.meta_entry: 'BucketMetadata' = meta_entry
+        self.live_entry: "LedgerEntry" = live_entry
+        self.dead_entry: "LedgerKey" = dead_entry
+        self.meta_entry: "BucketMetadata" = meta_entry
 
     def pack(self, packer: Packer) -> None:
         self.type.pack(packer)
@@ -1919,7 +1951,7 @@ class BucketEntry:
             return
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'BucketEntry':
+    def unpack(cls, unpacker: Unpacker) -> "BucketEntry":
         type = BucketEntryType.unpack(unpacker)
         if type == BucketEntryType.LIVEENTRY:
             if type == BucketEntryType.INITENTRY:
@@ -1938,7 +1970,7 @@ class BucketEntry:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'BucketEntry':
+    def from_xdr(cls, xdr) -> "BucketEntry":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -1946,31 +1978,42 @@ class BucketEntry:
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented
-        return self.type == other.type and self.live_entry == other.live_entry and self.dead_entry == other.dead_entry and self.meta_entry == other.meta_entry
+        return (
+            self.type == other.type
+            and self.live_entry == other.live_entry
+            and self.dead_entry == other.dead_entry
+            and self.meta_entry == other.meta_entry
+        )
 
     def __str__(self):
         out = []
-        out.append(f'type={self.type}')
-        out.append(f'live_entry={self.live_entry}') if self.live_entry is not None else None
-        out.append(f'dead_entry={self.dead_entry}') if self.dead_entry is not None else None
-        out.append(f'meta_entry={self.meta_entry}') if self.meta_entry is not None else None
+        out.append(f"type={self.type}")
+        out.append(
+            f"live_entry={self.live_entry}"
+        ) if self.live_entry is not None else None
+        out.append(
+            f"dead_entry={self.dead_entry}"
+        ) if self.dead_entry is not None else None
+        out.append(
+            f"meta_entry={self.meta_entry}"
+        ) if self.meta_entry is not None else None
         return f"<BucketEntry {[', '.join(out)]}>"
 
 
-# === xdr source ============================================================
-#
-#   struct TransactionSet
-#   {
-#       Hash previousLedgerHash;
-#       TransactionEnvelope txs<>;
-#   };
-#
-# ===========================================================================
 class TransactionSet:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    struct TransactionSet
+    {
+        Hash previousLedgerHash;
+        TransactionEnvelope txs<>;
+    };
+    ----------------------------------------------------------------
+    """
+
     def __init__(
-            self,
-            previous_ledger_hash: 'Hash',
-            txs: List['TransactionEnvelope'],
+        self, previous_ledger_hash: "Hash", txs: List["TransactionEnvelope"]
     ) -> None:
         self.previous_ledger_hash = previous_ledger_hash
         self.txs = txs
@@ -1982,16 +2025,13 @@ class TransactionSet:
             element.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'TransactionSet':
+    def unpack(cls, unpacker: Unpacker) -> "TransactionSet":
         previous_ledger_hash = Hash.unpack(unpacker)
         length = unpacker.unpack_uint()
         txs = []
         for _ in range(length):
             txs.append(TransactionEnvelope.unpack(unpacker))
-        return cls(
-            previous_ledger_hash=previous_ledger_hash,
-            txs=txs,
-        )
+        return cls(previous_ledger_hash=previous_ledger_hash, txs=txs)
 
     def to_xdr(self) -> str:
         packer = Packer()
@@ -1999,7 +2039,7 @@ class TransactionSet:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'TransactionSet':
+    def from_xdr(cls, xdr) -> "TransactionSet":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -2007,31 +2047,29 @@ class TransactionSet:
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented
-        return self.previous_ledger_hash == other.previous_ledger_hash and self.txs == other.txs
+        return (
+            self.previous_ledger_hash == other.previous_ledger_hash
+            and self.txs == other.txs
+        )
 
     def __str__(self):
-        out = [
-            f'previous_ledger_hash={self.previous_ledger_hash}',
-            f'txs={self.txs}',
-        ]
+        out = [f"previous_ledger_hash={self.previous_ledger_hash}", f"txs={self.txs}"]
         return f"<TransactionSet {[', '.join(out)]}>"
 
 
-# === xdr source ============================================================
-#
-#   struct TransactionResultPair
-#   {
-#       Hash transactionHash;
-#       TransactionResult result; // result for the transaction
-#   };
-#
-# ===========================================================================
 class TransactionResultPair:
-    def __init__(
-            self,
-            transaction_hash: 'Hash',
-            result: 'TransactionResult',
-    ) -> None:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    struct TransactionResultPair
+    {
+        Hash transactionHash;
+        TransactionResult result; // result for the transaction
+    };
+    ----------------------------------------------------------------
+    """
+
+    def __init__(self, transaction_hash: "Hash", result: "TransactionResult") -> None:
         self.transaction_hash = transaction_hash
         self.result = result
 
@@ -2040,13 +2078,10 @@ class TransactionResultPair:
         self.result.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'TransactionResultPair':
+    def unpack(cls, unpacker: Unpacker) -> "TransactionResultPair":
         transaction_hash = Hash.unpack(unpacker)
         result = TransactionResult.unpack(unpacker)
-        return cls(
-            transaction_hash=transaction_hash,
-            result=result,
-        )
+        return cls(transaction_hash=transaction_hash, result=result)
 
     def to_xdr(self) -> str:
         packer = Packer()
@@ -2054,7 +2089,7 @@ class TransactionResultPair:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'TransactionResultPair':
+    def from_xdr(cls, xdr) -> "TransactionResultPair":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -2062,29 +2097,28 @@ class TransactionResultPair:
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented
-        return self.transaction_hash == other.transaction_hash and self.result == other.result
+        return (
+            self.transaction_hash == other.transaction_hash
+            and self.result == other.result
+        )
 
     def __str__(self):
-        out = [
-            f'transaction_hash={self.transaction_hash}',
-            f'result={self.result}',
-        ]
+        out = [f"transaction_hash={self.transaction_hash}", f"result={self.result}"]
         return f"<TransactionResultPair {[', '.join(out)]}>"
 
 
-# === xdr source ============================================================
-#
-#   struct TransactionResultSet
-#   {
-#       TransactionResultPair results<>;
-#   };
-#
-# ===========================================================================
 class TransactionResultSet:
-    def __init__(
-            self,
-            results: List['TransactionResultPair'],
-    ) -> None:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    struct TransactionResultSet
+    {
+        TransactionResultPair results<>;
+    };
+    ----------------------------------------------------------------
+    """
+
+    def __init__(self, results: List["TransactionResultPair"]) -> None:
         self.results = results
 
     def pack(self, packer: Packer) -> None:
@@ -2093,14 +2127,12 @@ class TransactionResultSet:
             element.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'TransactionResultSet':
+    def unpack(cls, unpacker: Unpacker) -> "TransactionResultSet":
         length = unpacker.unpack_uint()
         results = []
         for _ in range(length):
             results.append(TransactionResultPair.unpack(unpacker))
-        return cls(
-            results=results,
-        )
+        return cls(results=results)
 
     def to_xdr(self) -> str:
         packer = Packer()
@@ -2108,7 +2140,7 @@ class TransactionResultSet:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'TransactionResultSet':
+    def from_xdr(cls, xdr) -> "TransactionResultSet":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -2119,26 +2151,23 @@ class TransactionResultSet:
         return self.results == other.results
 
     def __str__(self):
-        out = [
-            f'results={self.results}',
-        ]
+        out = [f"results={self.results}"]
         return f"<TransactionResultSet {[', '.join(out)]}>"
 
 
-# === xdr source ============================================================
-#
-#   union switch (int v)
-#       {
-#       case 0:
-#           void;
-#       }
-#
-# ===========================================================================
 class TransactionHistoryEntryExt:
-    def __init__(
-            self,
-            v: int,
-    ) -> None:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    union switch (int v)
+        {
+        case 0:
+            void;
+        }
+    ----------------------------------------------------------------
+    """
+
+    def __init__(self, v: int) -> None:
         self.v = v
 
     def pack(self, packer: Packer) -> None:
@@ -2147,7 +2176,7 @@ class TransactionHistoryEntryExt:
             return
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'TransactionHistoryEntryExt':
+    def unpack(cls, unpacker: Unpacker) -> "TransactionHistoryEntryExt":
         v = Integer.unpack(unpacker)
         if v == 0:
             return cls(v)
@@ -2158,7 +2187,7 @@ class TransactionHistoryEntryExt:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'TransactionHistoryEntryExt':
+    def from_xdr(cls, xdr) -> "TransactionHistoryEntryExt":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -2170,33 +2199,35 @@ class TransactionHistoryEntryExt:
 
     def __str__(self):
         out = []
-        out.append(f'v={self.v}')
+        out.append(f"v={self.v}")
         return f"<TransactionHistoryEntryExt {[', '.join(out)]}>"
 
 
-# === xdr source ============================================================
-#
-#   struct TransactionHistoryEntry
-#   {
-#       uint32 ledgerSeq;
-#       TransactionSet txSet;
-#
-#       // reserved for future use
-#       union switch (int v)
-#       {
-#       case 0:
-#           void;
-#       }
-#       ext;
-#   };
-#
-# ===========================================================================
 class TransactionHistoryEntry:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    struct TransactionHistoryEntry
+    {
+        uint32 ledgerSeq;
+        TransactionSet txSet;
+
+        // reserved for future use
+        union switch (int v)
+        {
+        case 0:
+            void;
+        }
+        ext;
+    };
+    ----------------------------------------------------------------
+    """
+
     def __init__(
-            self,
-            ledger_seq: 'Uint32',
-            tx_set: 'TransactionSet',
-            ext: 'TransactionHistoryEntryExt',
+        self,
+        ledger_seq: "Uint32",
+        tx_set: "TransactionSet",
+        ext: "TransactionHistoryEntryExt",
     ) -> None:
         self.ledger_seq = ledger_seq
         self.tx_set = tx_set
@@ -2208,15 +2239,11 @@ class TransactionHistoryEntry:
         self.ext.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'TransactionHistoryEntry':
+    def unpack(cls, unpacker: Unpacker) -> "TransactionHistoryEntry":
         ledger_seq = Uint32.unpack(unpacker)
         tx_set = TransactionSet.unpack(unpacker)
         ext = TransactionHistoryEntryExt.unpack(unpacker)
-        return cls(
-            ledger_seq=ledger_seq,
-            tx_set=tx_set,
-            ext=ext,
-        )
+        return cls(ledger_seq=ledger_seq, tx_set=tx_set, ext=ext)
 
     def to_xdr(self) -> str:
         packer = Packer()
@@ -2224,7 +2251,7 @@ class TransactionHistoryEntry:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'TransactionHistoryEntry':
+    def from_xdr(cls, xdr) -> "TransactionHistoryEntry":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -2232,31 +2259,34 @@ class TransactionHistoryEntry:
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented
-        return self.ledger_seq == other.ledger_seq and self.tx_set == other.tx_set and self.ext == other.ext
+        return (
+            self.ledger_seq == other.ledger_seq
+            and self.tx_set == other.tx_set
+            and self.ext == other.ext
+        )
 
     def __str__(self):
         out = [
-            f'ledger_seq={self.ledger_seq}',
-            f'tx_set={self.tx_set}',
-            f'ext={self.ext}',
+            f"ledger_seq={self.ledger_seq}",
+            f"tx_set={self.tx_set}",
+            f"ext={self.ext}",
         ]
         return f"<TransactionHistoryEntry {[', '.join(out)]}>"
 
 
-# === xdr source ============================================================
-#
-#   union switch (int v)
-#       {
-#       case 0:
-#           void;
-#       }
-#
-# ===========================================================================
 class TransactionHistoryResultEntryExt:
-    def __init__(
-            self,
-            v: int,
-    ) -> None:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    union switch (int v)
+        {
+        case 0:
+            void;
+        }
+    ----------------------------------------------------------------
+    """
+
+    def __init__(self, v: int) -> None:
         self.v = v
 
     def pack(self, packer: Packer) -> None:
@@ -2265,7 +2295,7 @@ class TransactionHistoryResultEntryExt:
             return
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'TransactionHistoryResultEntryExt':
+    def unpack(cls, unpacker: Unpacker) -> "TransactionHistoryResultEntryExt":
         v = Integer.unpack(unpacker)
         if v == 0:
             return cls(v)
@@ -2276,7 +2306,7 @@ class TransactionHistoryResultEntryExt:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'TransactionHistoryResultEntryExt':
+    def from_xdr(cls, xdr) -> "TransactionHistoryResultEntryExt":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -2288,33 +2318,35 @@ class TransactionHistoryResultEntryExt:
 
     def __str__(self):
         out = []
-        out.append(f'v={self.v}')
+        out.append(f"v={self.v}")
         return f"<TransactionHistoryResultEntryExt {[', '.join(out)]}>"
 
 
-# === xdr source ============================================================
-#
-#   struct TransactionHistoryResultEntry
-#   {
-#       uint32 ledgerSeq;
-#       TransactionResultSet txResultSet;
-#
-#       // reserved for future use
-#       union switch (int v)
-#       {
-#       case 0:
-#           void;
-#       }
-#       ext;
-#   };
-#
-# ===========================================================================
 class TransactionHistoryResultEntry:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    struct TransactionHistoryResultEntry
+    {
+        uint32 ledgerSeq;
+        TransactionResultSet txResultSet;
+
+        // reserved for future use
+        union switch (int v)
+        {
+        case 0:
+            void;
+        }
+        ext;
+    };
+    ----------------------------------------------------------------
+    """
+
     def __init__(
-            self,
-            ledger_seq: 'Uint32',
-            tx_result_set: 'TransactionResultSet',
-            ext: 'TransactionHistoryResultEntryExt',
+        self,
+        ledger_seq: "Uint32",
+        tx_result_set: "TransactionResultSet",
+        ext: "TransactionHistoryResultEntryExt",
     ) -> None:
         self.ledger_seq = ledger_seq
         self.tx_result_set = tx_result_set
@@ -2326,15 +2358,11 @@ class TransactionHistoryResultEntry:
         self.ext.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'TransactionHistoryResultEntry':
+    def unpack(cls, unpacker: Unpacker) -> "TransactionHistoryResultEntry":
         ledger_seq = Uint32.unpack(unpacker)
         tx_result_set = TransactionResultSet.unpack(unpacker)
         ext = TransactionHistoryResultEntryExt.unpack(unpacker)
-        return cls(
-            ledger_seq=ledger_seq,
-            tx_result_set=tx_result_set,
-            ext=ext,
-        )
+        return cls(ledger_seq=ledger_seq, tx_result_set=tx_result_set, ext=ext)
 
     def to_xdr(self) -> str:
         packer = Packer()
@@ -2342,7 +2370,7 @@ class TransactionHistoryResultEntry:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'TransactionHistoryResultEntry':
+    def from_xdr(cls, xdr) -> "TransactionHistoryResultEntry":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -2350,31 +2378,34 @@ class TransactionHistoryResultEntry:
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented
-        return self.ledger_seq == other.ledger_seq and self.tx_result_set == other.tx_result_set and self.ext == other.ext
+        return (
+            self.ledger_seq == other.ledger_seq
+            and self.tx_result_set == other.tx_result_set
+            and self.ext == other.ext
+        )
 
     def __str__(self):
         out = [
-            f'ledger_seq={self.ledger_seq}',
-            f'tx_result_set={self.tx_result_set}',
-            f'ext={self.ext}',
+            f"ledger_seq={self.ledger_seq}",
+            f"tx_result_set={self.tx_result_set}",
+            f"ext={self.ext}",
         ]
         return f"<TransactionHistoryResultEntry {[', '.join(out)]}>"
 
 
-# === xdr source ============================================================
-#
-#   union switch (int v)
-#       {
-#       case 0:
-#           void;
-#       }
-#
-# ===========================================================================
 class LedgerHeaderHistoryEntryExt:
-    def __init__(
-            self,
-            v: int,
-    ) -> None:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    union switch (int v)
+        {
+        case 0:
+            void;
+        }
+    ----------------------------------------------------------------
+    """
+
+    def __init__(self, v: int) -> None:
         self.v = v
 
     def pack(self, packer: Packer) -> None:
@@ -2383,7 +2414,7 @@ class LedgerHeaderHistoryEntryExt:
             return
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'LedgerHeaderHistoryEntryExt':
+    def unpack(cls, unpacker: Unpacker) -> "LedgerHeaderHistoryEntryExt":
         v = Integer.unpack(unpacker)
         if v == 0:
             return cls(v)
@@ -2394,7 +2425,7 @@ class LedgerHeaderHistoryEntryExt:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'LedgerHeaderHistoryEntryExt':
+    def from_xdr(cls, xdr) -> "LedgerHeaderHistoryEntryExt":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -2406,33 +2437,32 @@ class LedgerHeaderHistoryEntryExt:
 
     def __str__(self):
         out = []
-        out.append(f'v={self.v}')
+        out.append(f"v={self.v}")
         return f"<LedgerHeaderHistoryEntryExt {[', '.join(out)]}>"
 
 
-# === xdr source ============================================================
-#
-#   struct LedgerHeaderHistoryEntry
-#   {
-#       Hash hash;
-#       LedgerHeader header;
-#
-#       // reserved for future use
-#       union switch (int v)
-#       {
-#       case 0:
-#           void;
-#       }
-#       ext;
-#   };
-#
-# ===========================================================================
 class LedgerHeaderHistoryEntry:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    struct LedgerHeaderHistoryEntry
+    {
+        Hash hash;
+        LedgerHeader header;
+
+        // reserved for future use
+        union switch (int v)
+        {
+        case 0:
+            void;
+        }
+        ext;
+    };
+    ----------------------------------------------------------------
+    """
+
     def __init__(
-            self,
-            hash: 'Hash',
-            header: 'LedgerHeader',
-            ext: 'LedgerHeaderHistoryEntryExt',
+        self, hash: "Hash", header: "LedgerHeader", ext: "LedgerHeaderHistoryEntryExt"
     ) -> None:
         self.hash = hash
         self.header = header
@@ -2444,15 +2474,11 @@ class LedgerHeaderHistoryEntry:
         self.ext.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'LedgerHeaderHistoryEntry':
+    def unpack(cls, unpacker: Unpacker) -> "LedgerHeaderHistoryEntry":
         hash = Hash.unpack(unpacker)
         header = LedgerHeader.unpack(unpacker)
         ext = LedgerHeaderHistoryEntryExt.unpack(unpacker)
-        return cls(
-            hash=hash,
-            header=header,
-            ext=ext,
-        )
+        return cls(hash=hash, header=header, ext=ext)
 
     def to_xdr(self) -> str:
         packer = Packer()
@@ -2460,7 +2486,7 @@ class LedgerHeaderHistoryEntry:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'LedgerHeaderHistoryEntry':
+    def from_xdr(cls, xdr) -> "LedgerHeaderHistoryEntry":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -2468,32 +2494,30 @@ class LedgerHeaderHistoryEntry:
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented
-        return self.hash == other.hash and self.header == other.header and self.ext == other.ext
+        return (
+            self.hash == other.hash
+            and self.header == other.header
+            and self.ext == other.ext
+        )
 
     def __str__(self):
-        out = [
-            f'hash={self.hash}',
-            f'header={self.header}',
-            f'ext={self.ext}',
-        ]
+        out = [f"hash={self.hash}", f"header={self.header}", f"ext={self.ext}"]
         return f"<LedgerHeaderHistoryEntry {[', '.join(out)]}>"
 
 
-# === xdr source ============================================================
-#
-#   struct LedgerSCPMessages
-#   {
-#       uint32 ledgerSeq;
-#       SCPEnvelope messages<>;
-#   };
-#
-# ===========================================================================
 class LedgerSCPMessages:
-    def __init__(
-            self,
-            ledger_seq: 'Uint32',
-            messages: List['SCPEnvelope'],
-    ) -> None:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    struct LedgerSCPMessages
+    {
+        uint32 ledgerSeq;
+        SCPEnvelope messages<>;
+    };
+    ----------------------------------------------------------------
+    """
+
+    def __init__(self, ledger_seq: "Uint32", messages: List["SCPEnvelope"]) -> None:
         self.ledger_seq = ledger_seq
         self.messages = messages
 
@@ -2504,16 +2528,13 @@ class LedgerSCPMessages:
             element.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'LedgerSCPMessages':
+    def unpack(cls, unpacker: Unpacker) -> "LedgerSCPMessages":
         ledger_seq = Uint32.unpack(unpacker)
         length = unpacker.unpack_uint()
         messages = []
         for _ in range(length):
             messages.append(SCPEnvelope.unpack(unpacker))
-        return cls(
-            ledger_seq=ledger_seq,
-            messages=messages,
-        )
+        return cls(ledger_seq=ledger_seq, messages=messages)
 
     def to_xdr(self) -> str:
         packer = Packer()
@@ -2521,7 +2542,7 @@ class LedgerSCPMessages:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'LedgerSCPMessages':
+    def from_xdr(cls, xdr) -> "LedgerSCPMessages":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -2532,27 +2553,24 @@ class LedgerSCPMessages:
         return self.ledger_seq == other.ledger_seq and self.messages == other.messages
 
     def __str__(self):
-        out = [
-            f'ledger_seq={self.ledger_seq}',
-            f'messages={self.messages}',
-        ]
+        out = [f"ledger_seq={self.ledger_seq}", f"messages={self.messages}"]
         return f"<LedgerSCPMessages {[', '.join(out)]}>"
 
 
-# === xdr source ============================================================
-#
-#   struct SCPHistoryEntryV0
-#   {
-#       SCPQuorumSet quorumSets<>; // additional quorum sets used by ledgerMessages
-#       LedgerSCPMessages ledgerMessages;
-#   };
-#
-# ===========================================================================
 class SCPHistoryEntryV0:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    struct SCPHistoryEntryV0
+    {
+        SCPQuorumSet quorumSets<>; // additional quorum sets used by ledgerMessages
+        LedgerSCPMessages ledgerMessages;
+    };
+    ----------------------------------------------------------------
+    """
+
     def __init__(
-            self,
-            quorum_sets: List['SCPQuorumSet'],
-            ledger_messages: 'LedgerSCPMessages',
+        self, quorum_sets: List["SCPQuorumSet"], ledger_messages: "LedgerSCPMessages"
     ) -> None:
         self.quorum_sets = quorum_sets
         self.ledger_messages = ledger_messages
@@ -2564,16 +2582,13 @@ class SCPHistoryEntryV0:
         self.ledger_messages.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'SCPHistoryEntryV0':
+    def unpack(cls, unpacker: Unpacker) -> "SCPHistoryEntryV0":
         length = unpacker.unpack_uint()
         quorum_sets = []
         for _ in range(length):
             quorum_sets.append(SCPQuorumSet.unpack(unpacker))
         ledger_messages = LedgerSCPMessages.unpack(unpacker)
-        return cls(
-            quorum_sets=quorum_sets,
-            ledger_messages=ledger_messages,
-        )
+        return cls(quorum_sets=quorum_sets, ledger_messages=ledger_messages)
 
     def to_xdr(self) -> str:
         packer = Packer()
@@ -2581,7 +2596,7 @@ class SCPHistoryEntryV0:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'SCPHistoryEntryV0':
+    def from_xdr(cls, xdr) -> "SCPHistoryEntryV0":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -2589,33 +2604,34 @@ class SCPHistoryEntryV0:
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented
-        return self.quorum_sets == other.quorum_sets and self.ledger_messages == other.ledger_messages
+        return (
+            self.quorum_sets == other.quorum_sets
+            and self.ledger_messages == other.ledger_messages
+        )
 
     def __str__(self):
         out = [
-            f'quorum_sets={self.quorum_sets}',
-            f'ledger_messages={self.ledger_messages}',
+            f"quorum_sets={self.quorum_sets}",
+            f"ledger_messages={self.ledger_messages}",
         ]
         return f"<SCPHistoryEntryV0 {[', '.join(out)]}>"
 
 
-# === xdr source ============================================================
-#
-#   union SCPHistoryEntry switch (int v)
-#   {
-#   case 0:
-#       SCPHistoryEntryV0 v0;
-#   };
-#
-# ===========================================================================
 class SCPHistoryEntry:
-    def __init__(
-            self,
-            v: int,
-            v0: 'SCPHistoryEntryV0' = None,
-    ) -> None:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    union SCPHistoryEntry switch (int v)
+    {
+    case 0:
+        SCPHistoryEntryV0 v0;
+    };
+    ----------------------------------------------------------------
+    """
+
+    def __init__(self, v: int, v0: "SCPHistoryEntryV0" = None) -> None:
         self.v = v
-        self.v0: 'SCPHistoryEntryV0' = v0
+        self.v0: "SCPHistoryEntryV0" = v0
 
     def pack(self, packer: Packer) -> None:
         Integer(self.v).pack(packer)
@@ -2624,7 +2640,7 @@ class SCPHistoryEntry:
             return
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'SCPHistoryEntry':
+    def unpack(cls, unpacker: Unpacker) -> "SCPHistoryEntry":
         v = Integer.unpack(unpacker)
         if v == 0:
             v0 = SCPHistoryEntryV0.unpack(unpacker)
@@ -2636,7 +2652,7 @@ class SCPHistoryEntry:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'SCPHistoryEntry':
+    def from_xdr(cls, xdr) -> "SCPHistoryEntry":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -2648,23 +2664,25 @@ class SCPHistoryEntry:
 
     def __str__(self):
         out = []
-        out.append(f'v={self.v}')
-        out.append(f'v0={self.v0}') if self.v0 is not None else None
+        out.append(f"v={self.v}")
+        out.append(f"v0={self.v0}") if self.v0 is not None else None
         return f"<SCPHistoryEntry {[', '.join(out)]}>"
 
 
-# === xdr source ============================================================
-#
-#   enum LedgerEntryChangeType
-#   {
-#       LEDGER_ENTRY_CREATED = 0, // entry was added to the ledger
-#       LEDGER_ENTRY_UPDATED = 1, // entry was modified in the ledger
-#       LEDGER_ENTRY_REMOVED = 2, // entry was removed from the ledger
-#       LEDGER_ENTRY_STATE = 3    // value of the entry
-#   };
-#
-# ===========================================================================
 class LedgerEntryChangeType(IntEnum):
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    enum LedgerEntryChangeType
+    {
+        LEDGER_ENTRY_CREATED = 0, // entry was added to the ledger
+        LEDGER_ENTRY_UPDATED = 1, // entry was modified in the ledger
+        LEDGER_ENTRY_REMOVED = 2, // entry was removed from the ledger
+        LEDGER_ENTRY_STATE = 3    // value of the entry
+    };
+    ----------------------------------------------------------------
+    """
+
     LEDGER_ENTRY_CREATED = 0
     LEDGER_ENTRY_UPDATED = 1
     LEDGER_ENTRY_REMOVED = 2
@@ -2674,7 +2692,7 @@ class LedgerEntryChangeType(IntEnum):
         packer.pack_int(self.value)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'LedgerEntryChangeType':
+    def unpack(cls, unpacker: Unpacker) -> "LedgerEntryChangeType":
         value = unpacker.unpack_int()
         return cls(value)
 
@@ -2684,7 +2702,7 @@ class LedgerEntryChangeType(IntEnum):
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'LedgerEntryChangeType':
+    def from_xdr(cls, xdr) -> "LedgerEntryChangeType":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -2696,35 +2714,37 @@ class LedgerEntryChangeType(IntEnum):
         )
 
 
-# === xdr source ============================================================
-#
-#   union LedgerEntryChange switch (LedgerEntryChangeType type)
-#   {
-#   case LEDGER_ENTRY_CREATED:
-#       LedgerEntry created;
-#   case LEDGER_ENTRY_UPDATED:
-#       LedgerEntry updated;
-#   case LEDGER_ENTRY_REMOVED:
-#       LedgerKey removed;
-#   case LEDGER_ENTRY_STATE:
-#       LedgerEntry state;
-#   };
-#
-# ===========================================================================
 class LedgerEntryChange:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    union LedgerEntryChange switch (LedgerEntryChangeType type)
+    {
+    case LEDGER_ENTRY_CREATED:
+        LedgerEntry created;
+    case LEDGER_ENTRY_UPDATED:
+        LedgerEntry updated;
+    case LEDGER_ENTRY_REMOVED:
+        LedgerKey removed;
+    case LEDGER_ENTRY_STATE:
+        LedgerEntry state;
+    };
+    ----------------------------------------------------------------
+    """
+
     def __init__(
-            self,
-            type: 'LedgerEntryChangeType',
-            created: 'LedgerEntry' = None,
-            updated: 'LedgerEntry' = None,
-            removed: 'LedgerKey' = None,
-            state: 'LedgerEntry' = None,
+        self,
+        type: "LedgerEntryChangeType",
+        created: "LedgerEntry" = None,
+        updated: "LedgerEntry" = None,
+        removed: "LedgerKey" = None,
+        state: "LedgerEntry" = None,
     ) -> None:
         self.type = type
-        self.created: 'LedgerEntry' = created
-        self.updated: 'LedgerEntry' = updated
-        self.removed: 'LedgerKey' = removed
-        self.state: 'LedgerEntry' = state
+        self.created: "LedgerEntry" = created
+        self.updated: "LedgerEntry" = updated
+        self.removed: "LedgerKey" = removed
+        self.state: "LedgerEntry" = state
 
     def pack(self, packer: Packer) -> None:
         self.type.pack(packer)
@@ -2742,7 +2762,7 @@ class LedgerEntryChange:
             return
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'LedgerEntryChange':
+    def unpack(cls, unpacker: Unpacker) -> "LedgerEntryChange":
         type = LedgerEntryChangeType.unpack(unpacker)
         if type == LedgerEntryChangeType.LEDGER_ENTRY_CREATED:
             created = LedgerEntry.unpack(unpacker)
@@ -2763,7 +2783,7 @@ class LedgerEntryChange:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'LedgerEntryChange':
+    def from_xdr(cls, xdr) -> "LedgerEntryChange":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -2771,28 +2791,37 @@ class LedgerEntryChange:
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented
-        return self.type == other.type and self.created == other.created and self.updated == other.updated and self.removed == other.removed and self.state == other.state
+        return (
+            self.type == other.type
+            and self.created == other.created
+            and self.updated == other.updated
+            and self.removed == other.removed
+            and self.state == other.state
+        )
 
     def __str__(self):
         out = []
-        out.append(f'type={self.type}')
-        out.append(f'created={self.created}') if self.created is not None else None
-        out.append(f'updated={self.updated}') if self.updated is not None else None
-        out.append(f'removed={self.removed}') if self.removed is not None else None
-        out.append(f'state={self.state}') if self.state is not None else None
+        out.append(f"type={self.type}")
+        out.append(f"created={self.created}") if self.created is not None else None
+        out.append(f"updated={self.updated}") if self.updated is not None else None
+        out.append(f"removed={self.removed}") if self.removed is not None else None
+        out.append(f"state={self.state}") if self.state is not None else None
         return f"<LedgerEntryChange {[', '.join(out)]}>"
 
 
-# === xdr source ============================================================
-#
-#   typedef LedgerEntryChange LedgerEntryChanges<>;
-#
-# ===========================================================================
 class LedgerEntryChanges:
-    def __init__(self, ledger_entry_changes: List['LedgerEntryChange']) -> None:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    typedef LedgerEntryChange LedgerEntryChanges<>;
+    ----------------------------------------------------------------
+    """
+
+    def __init__(self, ledger_entry_changes: List["LedgerEntryChange"]) -> None:
         if len(ledger_entry_changes) > 4294967295:
             raise ValueError(
-                f"The maximum length of `ledger_entry_changes` should be 4294967295, but got {len(ledger_entry_changes)}.")
+                f"The maximum length of `ledger_entry_changes` should be 4294967295, but got {len(ledger_entry_changes)}."
+            )
 
         self.ledger_entry_changes = ledger_entry_changes
 
@@ -2802,7 +2831,7 @@ class LedgerEntryChanges:
             element.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'LedgerEntryChanges':
+    def unpack(cls, unpacker: Unpacker) -> "LedgerEntryChanges":
         length = unpacker.unpack_uint()
         ledger_entry_changes = []
         for _ in range(length):
@@ -2816,7 +2845,7 @@ class LedgerEntryChanges:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'LedgerEntryChanges':
+    def from_xdr(cls, xdr) -> "LedgerEntryChanges":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -2827,33 +2856,32 @@ class LedgerEntryChanges:
         return self.ledger_entry_changes == other.ledger_entry_changes
 
     def __str__(self):
-        return f"<LedgerEntryChanges [ledger_entry_changes={self.ledger_entry_changes}]>"
+        return (
+            f"<LedgerEntryChanges [ledger_entry_changes={self.ledger_entry_changes}]>"
+        )
 
 
-# === xdr source ============================================================
-#
-#   struct OperationMeta
-#   {
-#       LedgerEntryChanges changes;
-#   };
-#
-# ===========================================================================
 class OperationMeta:
-    def __init__(
-            self,
-            changes: 'LedgerEntryChanges',
-    ) -> None:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    struct OperationMeta
+    {
+        LedgerEntryChanges changes;
+    };
+    ----------------------------------------------------------------
+    """
+
+    def __init__(self, changes: "LedgerEntryChanges") -> None:
         self.changes = changes
 
     def pack(self, packer: Packer) -> None:
         self.changes.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'OperationMeta':
+    def unpack(cls, unpacker: Unpacker) -> "OperationMeta":
         changes = LedgerEntryChanges.unpack(unpacker)
-        return cls(
-            changes=changes,
-        )
+        return cls(changes=changes)
 
     def to_xdr(self) -> str:
         packer = Packer()
@@ -2861,7 +2889,7 @@ class OperationMeta:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'OperationMeta':
+    def from_xdr(cls, xdr) -> "OperationMeta":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -2872,26 +2900,24 @@ class OperationMeta:
         return self.changes == other.changes
 
     def __str__(self):
-        out = [
-            f'changes={self.changes}',
-        ]
+        out = [f"changes={self.changes}"]
         return f"<OperationMeta {[', '.join(out)]}>"
 
 
-# === xdr source ============================================================
-#
-#   struct TransactionMetaV1
-#   {
-#       LedgerEntryChanges txChanges; // tx level changes if any
-#       OperationMeta operations<>;   // meta for each operation
-#   };
-#
-# ===========================================================================
 class TransactionMetaV1:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    struct TransactionMetaV1
+    {
+        LedgerEntryChanges txChanges; // tx level changes if any
+        OperationMeta operations<>;   // meta for each operation
+    };
+    ----------------------------------------------------------------
+    """
+
     def __init__(
-            self,
-            tx_changes: 'LedgerEntryChanges',
-            operations: List['OperationMeta'],
+        self, tx_changes: "LedgerEntryChanges", operations: List["OperationMeta"]
     ) -> None:
         self.tx_changes = tx_changes
         self.operations = operations
@@ -2903,16 +2929,13 @@ class TransactionMetaV1:
             element.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'TransactionMetaV1':
+    def unpack(cls, unpacker: Unpacker) -> "TransactionMetaV1":
         tx_changes = LedgerEntryChanges.unpack(unpacker)
         length = unpacker.unpack_uint()
         operations = []
         for _ in range(length):
             operations.append(OperationMeta.unpack(unpacker))
-        return cls(
-            tx_changes=tx_changes,
-            operations=operations,
-        )
+        return cls(tx_changes=tx_changes, operations=operations)
 
     def to_xdr(self) -> str:
         packer = Packer()
@@ -2920,7 +2943,7 @@ class TransactionMetaV1:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'TransactionMetaV1':
+    def from_xdr(cls, xdr) -> "TransactionMetaV1":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -2928,34 +2951,35 @@ class TransactionMetaV1:
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented
-        return self.tx_changes == other.tx_changes and self.operations == other.operations
+        return (
+            self.tx_changes == other.tx_changes and self.operations == other.operations
+        )
 
     def __str__(self):
-        out = [
-            f'tx_changes={self.tx_changes}',
-            f'operations={self.operations}',
-        ]
+        out = [f"tx_changes={self.tx_changes}", f"operations={self.operations}"]
         return f"<TransactionMetaV1 {[', '.join(out)]}>"
 
 
-# === xdr source ============================================================
-#
-#   struct TransactionMetaV2
-#   {
-#       LedgerEntryChanges txChangesBefore; // tx level changes before operations
-#                                           // are applied if any
-#       OperationMeta operations<>;         // meta for each operation
-#       LedgerEntryChanges txChangesAfter;  // tx level changes after operations are
-#                                           // applied if any
-#   };
-#
-# ===========================================================================
 class TransactionMetaV2:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    struct TransactionMetaV2
+    {
+        LedgerEntryChanges txChangesBefore; // tx level changes before operations
+                                            // are applied if any
+        OperationMeta operations<>;         // meta for each operation
+        LedgerEntryChanges txChangesAfter;  // tx level changes after operations are
+                                            // applied if any
+    };
+    ----------------------------------------------------------------
+    """
+
     def __init__(
-            self,
-            tx_changes_before: 'LedgerEntryChanges',
-            operations: List['OperationMeta'],
-            tx_changes_after: 'LedgerEntryChanges',
+        self,
+        tx_changes_before: "LedgerEntryChanges",
+        operations: List["OperationMeta"],
+        tx_changes_after: "LedgerEntryChanges",
     ) -> None:
         self.tx_changes_before = tx_changes_before
         self.operations = operations
@@ -2969,7 +2993,7 @@ class TransactionMetaV2:
         self.tx_changes_after.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'TransactionMetaV2':
+    def unpack(cls, unpacker: Unpacker) -> "TransactionMetaV2":
         tx_changes_before = LedgerEntryChanges.unpack(unpacker)
         length = unpacker.unpack_uint()
         operations = []
@@ -2988,7 +3012,7 @@ class TransactionMetaV2:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'TransactionMetaV2':
+    def from_xdr(cls, xdr) -> "TransactionMetaV2":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -2996,42 +3020,48 @@ class TransactionMetaV2:
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented
-        return self.tx_changes_before == other.tx_changes_before and self.operations == other.operations and self.tx_changes_after == other.tx_changes_after
+        return (
+            self.tx_changes_before == other.tx_changes_before
+            and self.operations == other.operations
+            and self.tx_changes_after == other.tx_changes_after
+        )
 
     def __str__(self):
         out = [
-            f'tx_changes_before={self.tx_changes_before}',
-            f'operations={self.operations}',
-            f'tx_changes_after={self.tx_changes_after}',
+            f"tx_changes_before={self.tx_changes_before}",
+            f"operations={self.operations}",
+            f"tx_changes_after={self.tx_changes_after}",
         ]
         return f"<TransactionMetaV2 {[', '.join(out)]}>"
 
 
-# === xdr source ============================================================
-#
-#   union TransactionMeta switch (int v)
-#   {
-#   case 0:
-#       OperationMeta operations<>;
-#   case 1:
-#       TransactionMetaV1 v1;
-#   case 2:
-#       TransactionMetaV2 v2;
-#   };
-#
-# ===========================================================================
 class TransactionMeta:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    union TransactionMeta switch (int v)
+    {
+    case 0:
+        OperationMeta operations<>;
+    case 1:
+        TransactionMetaV1 v1;
+    case 2:
+        TransactionMetaV2 v2;
+    };
+    ----------------------------------------------------------------
+    """
+
     def __init__(
-            self,
-            v: int,
-            operations: List['OperationMeta'] = None,
-            v1: 'TransactionMetaV1' = None,
-            v2: 'TransactionMetaV2' = None,
+        self,
+        v: int,
+        operations: List["OperationMeta"] = None,
+        v1: "TransactionMetaV1" = None,
+        v2: "TransactionMetaV2" = None,
     ) -> None:
         self.v = v
-        self.operations: List['OperationMeta'] = operations
-        self.v1: 'TransactionMetaV1' = v1
-        self.v2: 'TransactionMetaV2' = v2
+        self.operations: List["OperationMeta"] = operations
+        self.v1: "TransactionMetaV1" = v1
+        self.v2: "TransactionMetaV2" = v2
 
     def pack(self, packer: Packer) -> None:
         Integer(self.v).pack(packer)
@@ -3048,7 +3078,7 @@ class TransactionMeta:
             return
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'TransactionMeta':
+    def unpack(cls, unpacker: Unpacker) -> "TransactionMeta":
         v = Integer.unpack(unpacker)
         if v == 0:
             length = unpacker.unpack_uint()
@@ -3069,7 +3099,7 @@ class TransactionMeta:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'TransactionMeta':
+    def from_xdr(cls, xdr) -> "TransactionMeta":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -3077,33 +3107,42 @@ class TransactionMeta:
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented
-        return self.v == other.v and self.operations == other.operations and self.v1 == other.v1 and self.v2 == other.v2
+        return (
+            self.v == other.v
+            and self.operations == other.operations
+            and self.v1 == other.v1
+            and self.v2 == other.v2
+        )
 
     def __str__(self):
         out = []
-        out.append(f'v={self.v}')
-        out.append(f'operations={self.operations}') if self.operations is not None else None
-        out.append(f'v1={self.v1}') if self.v1 is not None else None
-        out.append(f'v2={self.v2}') if self.v2 is not None else None
+        out.append(f"v={self.v}")
+        out.append(
+            f"operations={self.operations}"
+        ) if self.operations is not None else None
+        out.append(f"v1={self.v1}") if self.v1 is not None else None
+        out.append(f"v2={self.v2}") if self.v2 is not None else None
         return f"<TransactionMeta {[', '.join(out)]}>"
 
 
-# === xdr source ============================================================
-#
-#   struct TransactionResultMeta
-#   {
-#       TransactionResultPair result;
-#       LedgerEntryChanges feeProcessing;
-#       TransactionMeta txApplyProcessing;
-#   };
-#
-# ===========================================================================
 class TransactionResultMeta:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    struct TransactionResultMeta
+    {
+        TransactionResultPair result;
+        LedgerEntryChanges feeProcessing;
+        TransactionMeta txApplyProcessing;
+    };
+    ----------------------------------------------------------------
+    """
+
     def __init__(
-            self,
-            result: 'TransactionResultPair',
-            fee_processing: 'LedgerEntryChanges',
-            tx_apply_processing: 'TransactionMeta',
+        self,
+        result: "TransactionResultPair",
+        fee_processing: "LedgerEntryChanges",
+        tx_apply_processing: "TransactionMeta",
     ) -> None:
         self.result = result
         self.fee_processing = fee_processing
@@ -3115,7 +3154,7 @@ class TransactionResultMeta:
         self.tx_apply_processing.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'TransactionResultMeta':
+    def unpack(cls, unpacker: Unpacker) -> "TransactionResultMeta":
         result = TransactionResultPair.unpack(unpacker)
         fee_processing = LedgerEntryChanges.unpack(unpacker)
         tx_apply_processing = TransactionMeta.unpack(unpacker)
@@ -3131,7 +3170,7 @@ class TransactionResultMeta:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'TransactionResultMeta':
+    def from_xdr(cls, xdr) -> "TransactionResultMeta":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -3139,32 +3178,34 @@ class TransactionResultMeta:
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented
-        return self.result == other.result and self.fee_processing == other.fee_processing and self.tx_apply_processing == other.tx_apply_processing
+        return (
+            self.result == other.result
+            and self.fee_processing == other.fee_processing
+            and self.tx_apply_processing == other.tx_apply_processing
+        )
 
     def __str__(self):
         out = [
-            f'result={self.result}',
-            f'fee_processing={self.fee_processing}',
-            f'tx_apply_processing={self.tx_apply_processing}',
+            f"result={self.result}",
+            f"fee_processing={self.fee_processing}",
+            f"tx_apply_processing={self.tx_apply_processing}",
         ]
         return f"<TransactionResultMeta {[', '.join(out)]}>"
 
 
-# === xdr source ============================================================
-#
-#   struct UpgradeEntryMeta
-#   {
-#       LedgerUpgrade upgrade;
-#       LedgerEntryChanges changes;
-#   };
-#
-# ===========================================================================
 class UpgradeEntryMeta:
-    def __init__(
-            self,
-            upgrade: 'LedgerUpgrade',
-            changes: 'LedgerEntryChanges',
-    ) -> None:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    struct UpgradeEntryMeta
+    {
+        LedgerUpgrade upgrade;
+        LedgerEntryChanges changes;
+    };
+    ----------------------------------------------------------------
+    """
+
+    def __init__(self, upgrade: "LedgerUpgrade", changes: "LedgerEntryChanges") -> None:
         self.upgrade = upgrade
         self.changes = changes
 
@@ -3173,13 +3214,10 @@ class UpgradeEntryMeta:
         self.changes.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'UpgradeEntryMeta':
+    def unpack(cls, unpacker: Unpacker) -> "UpgradeEntryMeta":
         upgrade = LedgerUpgrade.unpack(unpacker)
         changes = LedgerEntryChanges.unpack(unpacker)
-        return cls(
-            upgrade=upgrade,
-            changes=changes,
-        )
+        return cls(upgrade=upgrade, changes=changes)
 
     def to_xdr(self) -> str:
         packer = Packer()
@@ -3187,7 +3225,7 @@ class UpgradeEntryMeta:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'UpgradeEntryMeta':
+    def from_xdr(cls, xdr) -> "UpgradeEntryMeta":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -3198,42 +3236,41 @@ class UpgradeEntryMeta:
         return self.upgrade == other.upgrade and self.changes == other.changes
 
     def __str__(self):
-        out = [
-            f'upgrade={self.upgrade}',
-            f'changes={self.changes}',
-        ]
+        out = [f"upgrade={self.upgrade}", f"changes={self.changes}"]
         return f"<UpgradeEntryMeta {[', '.join(out)]}>"
 
 
-# === xdr source ============================================================
-#
-#   struct LedgerCloseMetaV0
-#   {
-#       LedgerHeaderHistoryEntry ledgerHeader;
-#       // NB: txSet is sorted in "Hash order"
-#       TransactionSet txSet;
-#
-#       // NB: transactions are sorted in apply order here
-#       // fees for all transactions are processed first
-#       // followed by applying transactions
-#       TransactionResultMeta txProcessing<>;
-#
-#       // upgrades are applied last
-#       UpgradeEntryMeta upgradesProcessing<>;
-#
-#       // other misc information attached to the ledger close
-#       SCPHistoryEntry scpInfo<>;
-#   };
-#
-# ===========================================================================
 class LedgerCloseMetaV0:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    struct LedgerCloseMetaV0
+    {
+        LedgerHeaderHistoryEntry ledgerHeader;
+        // NB: txSet is sorted in "Hash order"
+        TransactionSet txSet;
+
+        // NB: transactions are sorted in apply order here
+        // fees for all transactions are processed first
+        // followed by applying transactions
+        TransactionResultMeta txProcessing<>;
+
+        // upgrades are applied last
+        UpgradeEntryMeta upgradesProcessing<>;
+
+        // other misc information attached to the ledger close
+        SCPHistoryEntry scpInfo<>;
+    };
+    ----------------------------------------------------------------
+    """
+
     def __init__(
-            self,
-            ledger_header: 'LedgerHeaderHistoryEntry',
-            tx_set: 'TransactionSet',
-            tx_processing: List['TransactionResultMeta'],
-            upgrades_processing: List['UpgradeEntryMeta'],
-            scp_info: List['SCPHistoryEntry'],
+        self,
+        ledger_header: "LedgerHeaderHistoryEntry",
+        tx_set: "TransactionSet",
+        tx_processing: List["TransactionResultMeta"],
+        upgrades_processing: List["UpgradeEntryMeta"],
+        scp_info: List["SCPHistoryEntry"],
     ) -> None:
         self.ledger_header = ledger_header
         self.tx_set = tx_set
@@ -3255,7 +3292,7 @@ class LedgerCloseMetaV0:
             element.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'LedgerCloseMetaV0':
+    def unpack(cls, unpacker: Unpacker) -> "LedgerCloseMetaV0":
         ledger_header = LedgerHeaderHistoryEntry.unpack(unpacker)
         tx_set = TransactionSet.unpack(unpacker)
         length = unpacker.unpack_uint()
@@ -3284,7 +3321,7 @@ class LedgerCloseMetaV0:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'LedgerCloseMetaV0':
+    def from_xdr(cls, xdr) -> "LedgerCloseMetaV0":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -3292,36 +3329,40 @@ class LedgerCloseMetaV0:
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented
-        return self.ledger_header == other.ledger_header and self.tx_set == other.tx_set and self.tx_processing == other.tx_processing and self.upgrades_processing == other.upgrades_processing and self.scp_info == other.scp_info
+        return (
+            self.ledger_header == other.ledger_header
+            and self.tx_set == other.tx_set
+            and self.tx_processing == other.tx_processing
+            and self.upgrades_processing == other.upgrades_processing
+            and self.scp_info == other.scp_info
+        )
 
     def __str__(self):
         out = [
-            f'ledger_header={self.ledger_header}',
-            f'tx_set={self.tx_set}',
-            f'tx_processing={self.tx_processing}',
-            f'upgrades_processing={self.upgrades_processing}',
-            f'scp_info={self.scp_info}',
+            f"ledger_header={self.ledger_header}",
+            f"tx_set={self.tx_set}",
+            f"tx_processing={self.tx_processing}",
+            f"upgrades_processing={self.upgrades_processing}",
+            f"scp_info={self.scp_info}",
         ]
         return f"<LedgerCloseMetaV0 {[', '.join(out)]}>"
 
 
-# === xdr source ============================================================
-#
-#   union LedgerCloseMeta switch (int v)
-#   {
-#   case 0:
-#        LedgerCloseMetaV0 v0;
-#   };
-#
-# ===========================================================================
 class LedgerCloseMeta:
-    def __init__(
-            self,
-            v: int,
-            v0: 'LedgerCloseMetaV0' = None,
-    ) -> None:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    union LedgerCloseMeta switch (int v)
+    {
+    case 0:
+         LedgerCloseMetaV0 v0;
+    };
+    ----------------------------------------------------------------
+    """
+
+    def __init__(self, v: int, v0: "LedgerCloseMetaV0" = None) -> None:
         self.v = v
-        self.v0: 'LedgerCloseMetaV0' = v0
+        self.v0: "LedgerCloseMetaV0" = v0
 
     def pack(self, packer: Packer) -> None:
         Integer(self.v).pack(packer)
@@ -3330,7 +3371,7 @@ class LedgerCloseMeta:
             return
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'LedgerCloseMeta':
+    def unpack(cls, unpacker: Unpacker) -> "LedgerCloseMeta":
         v = Integer.unpack(unpacker)
         if v == 0:
             v0 = LedgerCloseMetaV0.unpack(unpacker)
@@ -3342,7 +3383,7 @@ class LedgerCloseMeta:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'LedgerCloseMeta':
+    def from_xdr(cls, xdr) -> "LedgerCloseMeta":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -3354,26 +3395,24 @@ class LedgerCloseMeta:
 
     def __str__(self):
         out = []
-        out.append(f'v={self.v}')
-        out.append(f'v0={self.v0}') if self.v0 is not None else None
+        out.append(f"v={self.v}")
+        out.append(f"v0={self.v0}") if self.v0 is not None else None
         return f"<LedgerCloseMeta {[', '.join(out)]}>"
 
 
-# === xdr source ============================================================
-#
-#   struct DecoratedSignature
-#   {
-#       SignatureHint hint;  // last 4 bytes of the public key, used as a hint
-#       Signature signature; // actual signature
-#   };
-#
-# ===========================================================================
 class DecoratedSignature:
-    def __init__(
-            self,
-            hint: 'SignatureHint',
-            signature: 'Signature',
-    ) -> None:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    struct DecoratedSignature
+    {
+        SignatureHint hint;  // last 4 bytes of the public key, used as a hint
+        Signature signature; // actual signature
+    };
+    ----------------------------------------------------------------
+    """
+
+    def __init__(self, hint: "SignatureHint", signature: "Signature") -> None:
         self.hint = hint
         self.signature = signature
 
@@ -3382,13 +3421,10 @@ class DecoratedSignature:
         self.signature.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'DecoratedSignature':
+    def unpack(cls, unpacker: Unpacker) -> "DecoratedSignature":
         hint = SignatureHint.unpack(unpacker)
         signature = Signature.unpack(unpacker)
-        return cls(
-            hint=hint,
-            signature=signature,
-        )
+        return cls(hint=hint, signature=signature)
 
     def to_xdr(self) -> str:
         packer = Packer()
@@ -3396,7 +3432,7 @@ class DecoratedSignature:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'DecoratedSignature':
+    def from_xdr(cls, xdr) -> "DecoratedSignature":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -3407,35 +3443,34 @@ class DecoratedSignature:
         return self.hint == other.hint and self.signature == other.signature
 
     def __str__(self):
-        out = [
-            f'hint={self.hint}',
-            f'signature={self.signature}',
-        ]
+        out = [f"hint={self.hint}", f"signature={self.signature}"]
         return f"<DecoratedSignature {[', '.join(out)]}>"
 
 
-# === xdr source ============================================================
-#
-#   enum OperationType
-#   {
-#       CREATE_ACCOUNT = 0,
-#       PAYMENT = 1,
-#       PATH_PAYMENT_STRICT_RECEIVE = 2,
-#       MANAGE_SELL_OFFER = 3,
-#       CREATE_PASSIVE_SELL_OFFER = 4,
-#       SET_OPTIONS = 5,
-#       CHANGE_TRUST = 6,
-#       ALLOW_TRUST = 7,
-#       ACCOUNT_MERGE = 8,
-#       INFLATION = 9,
-#       MANAGE_DATA = 10,
-#       BUMP_SEQUENCE = 11,
-#       MANAGE_BUY_OFFER = 12,
-#       PATH_PAYMENT_STRICT_SEND = 13
-#   };
-#
-# ===========================================================================
 class OperationType(IntEnum):
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    enum OperationType
+    {
+        CREATE_ACCOUNT = 0,
+        PAYMENT = 1,
+        PATH_PAYMENT_STRICT_RECEIVE = 2,
+        MANAGE_SELL_OFFER = 3,
+        CREATE_PASSIVE_SELL_OFFER = 4,
+        SET_OPTIONS = 5,
+        CHANGE_TRUST = 6,
+        ALLOW_TRUST = 7,
+        ACCOUNT_MERGE = 8,
+        INFLATION = 9,
+        MANAGE_DATA = 10,
+        BUMP_SEQUENCE = 11,
+        MANAGE_BUY_OFFER = 12,
+        PATH_PAYMENT_STRICT_SEND = 13
+    };
+    ----------------------------------------------------------------
+    """
+
     CREATE_ACCOUNT = 0
     PAYMENT = 1
     PATH_PAYMENT_STRICT_RECEIVE = 2
@@ -3455,7 +3490,7 @@ class OperationType(IntEnum):
         packer.pack_int(self.value)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'OperationType':
+    def unpack(cls, unpacker: Unpacker) -> "OperationType":
         value = unpacker.unpack_int()
         return cls(value)
 
@@ -3465,7 +3500,7 @@ class OperationType(IntEnum):
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'OperationType':
+    def from_xdr(cls, xdr) -> "OperationType":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -3477,21 +3512,19 @@ class OperationType(IntEnum):
         )
 
 
-# === xdr source ============================================================
-#
-#   struct CreateAccountOp
-#   {
-#       AccountID destination; // account to create
-#       int64 startingBalance; // amount they end up with
-#   };
-#
-# ===========================================================================
 class CreateAccountOp:
-    def __init__(
-            self,
-            destination: 'AccountID',
-            starting_balance: 'Int64',
-    ) -> None:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    struct CreateAccountOp
+    {
+        AccountID destination; // account to create
+        int64 startingBalance; // amount they end up with
+    };
+    ----------------------------------------------------------------
+    """
+
+    def __init__(self, destination: "AccountID", starting_balance: "Int64") -> None:
         self.destination = destination
         self.starting_balance = starting_balance
 
@@ -3500,13 +3533,10 @@ class CreateAccountOp:
         self.starting_balance.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'CreateAccountOp':
+    def unpack(cls, unpacker: Unpacker) -> "CreateAccountOp":
         destination = AccountID.unpack(unpacker)
         starting_balance = Int64.unpack(unpacker)
-        return cls(
-            destination=destination,
-            starting_balance=starting_balance,
-        )
+        return cls(destination=destination, starting_balance=starting_balance)
 
     def to_xdr(self) -> str:
         packer = Packer()
@@ -3514,7 +3544,7 @@ class CreateAccountOp:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'CreateAccountOp':
+    def from_xdr(cls, xdr) -> "CreateAccountOp":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -3522,32 +3552,34 @@ class CreateAccountOp:
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented
-        return self.destination == other.destination and self.starting_balance == other.starting_balance
+        return (
+            self.destination == other.destination
+            and self.starting_balance == other.starting_balance
+        )
 
     def __str__(self):
         out = [
-            f'destination={self.destination}',
-            f'starting_balance={self.starting_balance}',
+            f"destination={self.destination}",
+            f"starting_balance={self.starting_balance}",
         ]
         return f"<CreateAccountOp {[', '.join(out)]}>"
 
 
-# === xdr source ============================================================
-#
-#   struct PaymentOp
-#   {
-#       AccountID destination; // recipient of the payment
-#       Asset asset;           // what they end up with
-#       int64 amount;          // amount they end up with
-#   };
-#
-# ===========================================================================
 class PaymentOp:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    struct PaymentOp
+    {
+        AccountID destination; // recipient of the payment
+        Asset asset;           // what they end up with
+        int64 amount;          // amount they end up with
+    };
+    ----------------------------------------------------------------
+    """
+
     def __init__(
-            self,
-            destination: 'AccountID',
-            asset: 'Asset',
-            amount: 'Int64',
+        self, destination: "AccountID", asset: "Asset", amount: "Int64"
     ) -> None:
         self.destination = destination
         self.asset = asset
@@ -3559,15 +3591,11 @@ class PaymentOp:
         self.amount.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'PaymentOp':
+    def unpack(cls, unpacker: Unpacker) -> "PaymentOp":
         destination = AccountID.unpack(unpacker)
         asset = Asset.unpack(unpacker)
         amount = Int64.unpack(unpacker)
-        return cls(
-            destination=destination,
-            asset=asset,
-            amount=amount,
-        )
+        return cls(destination=destination, asset=asset, amount=amount)
 
     def to_xdr(self) -> str:
         packer = Packer()
@@ -3575,7 +3603,7 @@ class PaymentOp:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'PaymentOp':
+    def from_xdr(cls, xdr) -> "PaymentOp":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -3583,43 +3611,49 @@ class PaymentOp:
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented
-        return self.destination == other.destination and self.asset == other.asset and self.amount == other.amount
+        return (
+            self.destination == other.destination
+            and self.asset == other.asset
+            and self.amount == other.amount
+        )
 
     def __str__(self):
         out = [
-            f'destination={self.destination}',
-            f'asset={self.asset}',
-            f'amount={self.amount}',
+            f"destination={self.destination}",
+            f"asset={self.asset}",
+            f"amount={self.amount}",
         ]
         return f"<PaymentOp {[', '.join(out)]}>"
 
 
-# === xdr source ============================================================
-#
-#   struct PathPaymentStrictReceiveOp
-#   {
-#       Asset sendAsset; // asset we pay with
-#       int64 sendMax;   // the maximum amount of sendAsset to
-#                        // send (excluding fees).
-#                        // The operation will fail if can't be met
-#
-#       AccountID destination; // recipient of the payment
-#       Asset destAsset;       // what they end up with
-#       int64 destAmount;      // amount they end up with
-#
-#       Asset path<5>; // additional hops it must go through to get there
-#   };
-#
-# ===========================================================================
 class PathPaymentStrictReceiveOp:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    struct PathPaymentStrictReceiveOp
+    {
+        Asset sendAsset; // asset we pay with
+        int64 sendMax;   // the maximum amount of sendAsset to
+                         // send (excluding fees).
+                         // The operation will fail if can't be met
+
+        AccountID destination; // recipient of the payment
+        Asset destAsset;       // what they end up with
+        int64 destAmount;      // amount they end up with
+
+        Asset path<5>; // additional hops it must go through to get there
+    };
+    ----------------------------------------------------------------
+    """
+
     def __init__(
-            self,
-            send_asset: 'Asset',
-            send_max: 'Int64',
-            destination: 'AccountID',
-            dest_asset: 'Asset',
-            dest_amount: 'Int64',
-            path: List['Asset'],
+        self,
+        send_asset: "Asset",
+        send_max: "Int64",
+        destination: "AccountID",
+        dest_asset: "Asset",
+        dest_amount: "Int64",
+        path: List["Asset"],
     ) -> None:
         self.send_asset = send_asset
         self.send_max = send_max
@@ -3639,7 +3673,7 @@ class PathPaymentStrictReceiveOp:
             element.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'PathPaymentStrictReceiveOp':
+    def unpack(cls, unpacker: Unpacker) -> "PathPaymentStrictReceiveOp":
         send_asset = Asset.unpack(unpacker)
         send_max = Int64.unpack(unpacker)
         destination = AccountID.unpack(unpacker)
@@ -3664,7 +3698,7 @@ class PathPaymentStrictReceiveOp:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'PathPaymentStrictReceiveOp':
+    def from_xdr(cls, xdr) -> "PathPaymentStrictReceiveOp":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -3672,46 +3706,55 @@ class PathPaymentStrictReceiveOp:
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented
-        return self.send_asset == other.send_asset and self.send_max == other.send_max and self.destination == other.destination and self.dest_asset == other.dest_asset and self.dest_amount == other.dest_amount and self.path == other.path
+        return (
+            self.send_asset == other.send_asset
+            and self.send_max == other.send_max
+            and self.destination == other.destination
+            and self.dest_asset == other.dest_asset
+            and self.dest_amount == other.dest_amount
+            and self.path == other.path
+        )
 
     def __str__(self):
         out = [
-            f'send_asset={self.send_asset}',
-            f'send_max={self.send_max}',
-            f'destination={self.destination}',
-            f'dest_asset={self.dest_asset}',
-            f'dest_amount={self.dest_amount}',
-            f'path={self.path}',
+            f"send_asset={self.send_asset}",
+            f"send_max={self.send_max}",
+            f"destination={self.destination}",
+            f"dest_asset={self.dest_asset}",
+            f"dest_amount={self.dest_amount}",
+            f"path={self.path}",
         ]
         return f"<PathPaymentStrictReceiveOp {[', '.join(out)]}>"
 
 
-# === xdr source ============================================================
-#
-#   struct PathPaymentStrictSendOp
-#   {
-#       Asset sendAsset;  // asset we pay with
-#       int64 sendAmount; // amount of sendAsset to send (excluding fees)
-#
-#       AccountID destination; // recipient of the payment
-#       Asset destAsset;       // what they end up with
-#       int64 destMin;         // the minimum amount of dest asset to
-#                              // be received
-#                              // The operation will fail if it can't be met
-#
-#       Asset path<5>; // additional hops it must go through to get there
-#   };
-#
-# ===========================================================================
 class PathPaymentStrictSendOp:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    struct PathPaymentStrictSendOp
+    {
+        Asset sendAsset;  // asset we pay with
+        int64 sendAmount; // amount of sendAsset to send (excluding fees)
+
+        AccountID destination; // recipient of the payment
+        Asset destAsset;       // what they end up with
+        int64 destMin;         // the minimum amount of dest asset to
+                               // be received
+                               // The operation will fail if it can't be met
+
+        Asset path<5>; // additional hops it must go through to get there
+    };
+    ----------------------------------------------------------------
+    """
+
     def __init__(
-            self,
-            send_asset: 'Asset',
-            send_amount: 'Int64',
-            destination: 'AccountID',
-            dest_asset: 'Asset',
-            dest_min: 'Int64',
-            path: List['Asset'],
+        self,
+        send_asset: "Asset",
+        send_amount: "Int64",
+        destination: "AccountID",
+        dest_asset: "Asset",
+        dest_min: "Int64",
+        path: List["Asset"],
     ) -> None:
         self.send_asset = send_asset
         self.send_amount = send_amount
@@ -3731,7 +3774,7 @@ class PathPaymentStrictSendOp:
             element.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'PathPaymentStrictSendOp':
+    def unpack(cls, unpacker: Unpacker) -> "PathPaymentStrictSendOp":
         send_asset = Asset.unpack(unpacker)
         send_amount = Int64.unpack(unpacker)
         destination = AccountID.unpack(unpacker)
@@ -3756,7 +3799,7 @@ class PathPaymentStrictSendOp:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'PathPaymentStrictSendOp':
+    def from_xdr(cls, xdr) -> "PathPaymentStrictSendOp":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -3764,42 +3807,51 @@ class PathPaymentStrictSendOp:
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented
-        return self.send_asset == other.send_asset and self.send_amount == other.send_amount and self.destination == other.destination and self.dest_asset == other.dest_asset and self.dest_min == other.dest_min and self.path == other.path
+        return (
+            self.send_asset == other.send_asset
+            and self.send_amount == other.send_amount
+            and self.destination == other.destination
+            and self.dest_asset == other.dest_asset
+            and self.dest_min == other.dest_min
+            and self.path == other.path
+        )
 
     def __str__(self):
         out = [
-            f'send_asset={self.send_asset}',
-            f'send_amount={self.send_amount}',
-            f'destination={self.destination}',
-            f'dest_asset={self.dest_asset}',
-            f'dest_min={self.dest_min}',
-            f'path={self.path}',
+            f"send_asset={self.send_asset}",
+            f"send_amount={self.send_amount}",
+            f"destination={self.destination}",
+            f"dest_asset={self.dest_asset}",
+            f"dest_min={self.dest_min}",
+            f"path={self.path}",
         ]
         return f"<PathPaymentStrictSendOp {[', '.join(out)]}>"
 
 
-# === xdr source ============================================================
-#
-#   struct ManageSellOfferOp
-#   {
-#       Asset selling;
-#       Asset buying;
-#       int64 amount; // amount being sold. if set to 0, delete the offer
-#       Price price;  // price of thing being sold in terms of what you are buying
-#
-#       // 0=create a new offer, otherwise edit an existing offer
-#       int64 offerID;
-#   };
-#
-# ===========================================================================
 class ManageSellOfferOp:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    struct ManageSellOfferOp
+    {
+        Asset selling;
+        Asset buying;
+        int64 amount; // amount being sold. if set to 0, delete the offer
+        Price price;  // price of thing being sold in terms of what you are buying
+
+        // 0=create a new offer, otherwise edit an existing offer
+        int64 offerID;
+    };
+    ----------------------------------------------------------------
+    """
+
     def __init__(
-            self,
-            selling: 'Asset',
-            buying: 'Asset',
-            amount: 'Int64',
-            price: 'Price',
-            offer_id: 'Int64',
+        self,
+        selling: "Asset",
+        buying: "Asset",
+        amount: "Int64",
+        price: "Price",
+        offer_id: "Int64",
     ) -> None:
         self.selling = selling
         self.buying = buying
@@ -3815,7 +3867,7 @@ class ManageSellOfferOp:
         self.offer_id.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'ManageSellOfferOp':
+    def unpack(cls, unpacker: Unpacker) -> "ManageSellOfferOp":
         selling = Asset.unpack(unpacker)
         buying = Asset.unpack(unpacker)
         amount = Int64.unpack(unpacker)
@@ -3835,7 +3887,7 @@ class ManageSellOfferOp:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'ManageSellOfferOp':
+    def from_xdr(cls, xdr) -> "ManageSellOfferOp":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -3843,42 +3895,50 @@ class ManageSellOfferOp:
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented
-        return self.selling == other.selling and self.buying == other.buying and self.amount == other.amount and self.price == other.price and self.offer_id == other.offer_id
+        return (
+            self.selling == other.selling
+            and self.buying == other.buying
+            and self.amount == other.amount
+            and self.price == other.price
+            and self.offer_id == other.offer_id
+        )
 
     def __str__(self):
         out = [
-            f'selling={self.selling}',
-            f'buying={self.buying}',
-            f'amount={self.amount}',
-            f'price={self.price}',
-            f'offer_id={self.offer_id}',
+            f"selling={self.selling}",
+            f"buying={self.buying}",
+            f"amount={self.amount}",
+            f"price={self.price}",
+            f"offer_id={self.offer_id}",
         ]
         return f"<ManageSellOfferOp {[', '.join(out)]}>"
 
 
-# === xdr source ============================================================
-#
-#   struct ManageBuyOfferOp
-#   {
-#       Asset selling;
-#       Asset buying;
-#       int64 buyAmount; // amount being bought. if set to 0, delete the offer
-#       Price price;     // price of thing being bought in terms of what you are
-#                        // selling
-#
-#       // 0=create a new offer, otherwise edit an existing offer
-#       int64 offerID;
-#   };
-#
-# ===========================================================================
 class ManageBuyOfferOp:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    struct ManageBuyOfferOp
+    {
+        Asset selling;
+        Asset buying;
+        int64 buyAmount; // amount being bought. if set to 0, delete the offer
+        Price price;     // price of thing being bought in terms of what you are
+                         // selling
+
+        // 0=create a new offer, otherwise edit an existing offer
+        int64 offerID;
+    };
+    ----------------------------------------------------------------
+    """
+
     def __init__(
-            self,
-            selling: 'Asset',
-            buying: 'Asset',
-            buy_amount: 'Int64',
-            price: 'Price',
-            offer_id: 'Int64',
+        self,
+        selling: "Asset",
+        buying: "Asset",
+        buy_amount: "Int64",
+        price: "Price",
+        offer_id: "Int64",
     ) -> None:
         self.selling = selling
         self.buying = buying
@@ -3894,7 +3954,7 @@ class ManageBuyOfferOp:
         self.offer_id.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'ManageBuyOfferOp':
+    def unpack(cls, unpacker: Unpacker) -> "ManageBuyOfferOp":
         selling = Asset.unpack(unpacker)
         buying = Asset.unpack(unpacker)
         buy_amount = Int64.unpack(unpacker)
@@ -3914,7 +3974,7 @@ class ManageBuyOfferOp:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'ManageBuyOfferOp':
+    def from_xdr(cls, xdr) -> "ManageBuyOfferOp":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -3922,37 +3982,41 @@ class ManageBuyOfferOp:
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented
-        return self.selling == other.selling and self.buying == other.buying and self.buy_amount == other.buy_amount and self.price == other.price and self.offer_id == other.offer_id
+        return (
+            self.selling == other.selling
+            and self.buying == other.buying
+            and self.buy_amount == other.buy_amount
+            and self.price == other.price
+            and self.offer_id == other.offer_id
+        )
 
     def __str__(self):
         out = [
-            f'selling={self.selling}',
-            f'buying={self.buying}',
-            f'buy_amount={self.buy_amount}',
-            f'price={self.price}',
-            f'offer_id={self.offer_id}',
+            f"selling={self.selling}",
+            f"buying={self.buying}",
+            f"buy_amount={self.buy_amount}",
+            f"price={self.price}",
+            f"offer_id={self.offer_id}",
         ]
         return f"<ManageBuyOfferOp {[', '.join(out)]}>"
 
 
-# === xdr source ============================================================
-#
-#   struct CreatePassiveSellOfferOp
-#   {
-#       Asset selling; // A
-#       Asset buying;  // B
-#       int64 amount;  // amount taker gets. if set to 0, delete the offer
-#       Price price;   // cost of A in terms of B
-#   };
-#
-# ===========================================================================
 class CreatePassiveSellOfferOp:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    struct CreatePassiveSellOfferOp
+    {
+        Asset selling; // A
+        Asset buying;  // B
+        int64 amount;  // amount taker gets. if set to 0, delete the offer
+        Price price;   // cost of A in terms of B
+    };
+    ----------------------------------------------------------------
+    """
+
     def __init__(
-            self,
-            selling: 'Asset',
-            buying: 'Asset',
-            amount: 'Int64',
-            price: 'Price',
+        self, selling: "Asset", buying: "Asset", amount: "Int64", price: "Price"
     ) -> None:
         self.selling = selling
         self.buying = buying
@@ -3966,17 +4030,12 @@ class CreatePassiveSellOfferOp:
         self.price.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'CreatePassiveSellOfferOp':
+    def unpack(cls, unpacker: Unpacker) -> "CreatePassiveSellOfferOp":
         selling = Asset.unpack(unpacker)
         buying = Asset.unpack(unpacker)
         amount = Int64.unpack(unpacker)
         price = Price.unpack(unpacker)
-        return cls(
-            selling=selling,
-            buying=buying,
-            amount=amount,
-            price=price,
-        )
+        return cls(selling=selling, buying=buying, amount=amount, price=price)
 
     def to_xdr(self) -> str:
         packer = Packer()
@@ -3984,7 +4043,7 @@ class CreatePassiveSellOfferOp:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'CreatePassiveSellOfferOp':
+    def from_xdr(cls, xdr) -> "CreatePassiveSellOfferOp":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -3992,53 +4051,60 @@ class CreatePassiveSellOfferOp:
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented
-        return self.selling == other.selling and self.buying == other.buying and self.amount == other.amount and self.price == other.price
+        return (
+            self.selling == other.selling
+            and self.buying == other.buying
+            and self.amount == other.amount
+            and self.price == other.price
+        )
 
     def __str__(self):
         out = [
-            f'selling={self.selling}',
-            f'buying={self.buying}',
-            f'amount={self.amount}',
-            f'price={self.price}',
+            f"selling={self.selling}",
+            f"buying={self.buying}",
+            f"amount={self.amount}",
+            f"price={self.price}",
         ]
         return f"<CreatePassiveSellOfferOp {[', '.join(out)]}>"
 
 
-# === xdr source ============================================================
-#
-#   struct SetOptionsOp
-#   {
-#       AccountID* inflationDest; // sets the inflation destination
-#
-#       uint32* clearFlags; // which flags to clear
-#       uint32* setFlags;   // which flags to set
-#
-#       // account threshold manipulation
-#       uint32* masterWeight; // weight of the master account
-#       uint32* lowThreshold;
-#       uint32* medThreshold;
-#       uint32* highThreshold;
-#
-#       string32* homeDomain; // sets the home domain
-#
-#       // Add, update or remove a signer for the account
-#       // signer is deleted if the weight is 0
-#       Signer* signer;
-#   };
-#
-# ===========================================================================
 class SetOptionsOp:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    struct SetOptionsOp
+    {
+        AccountID* inflationDest; // sets the inflation destination
+
+        uint32* clearFlags; // which flags to clear
+        uint32* setFlags;   // which flags to set
+
+        // account threshold manipulation
+        uint32* masterWeight; // weight of the master account
+        uint32* lowThreshold;
+        uint32* medThreshold;
+        uint32* highThreshold;
+
+        string32* homeDomain; // sets the home domain
+
+        // Add, update or remove a signer for the account
+        // signer is deleted if the weight is 0
+        Signer* signer;
+    };
+    ----------------------------------------------------------------
+    """
+
     def __init__(
-            self,
-            inflation_dest: Optional['AccountID'],
-            clear_flags: Optional['Uint32'],
-            set_flags: Optional['Uint32'],
-            master_weight: Optional['Uint32'],
-            low_threshold: Optional['Uint32'],
-            med_threshold: Optional['Uint32'],
-            high_threshold: Optional['Uint32'],
-            home_domain: Optional['String32'],
-            signer: Optional['Signer'],
+        self,
+        inflation_dest: Optional["AccountID"],
+        clear_flags: Optional["Uint32"],
+        set_flags: Optional["Uint32"],
+        master_weight: Optional["Uint32"],
+        low_threshold: Optional["Uint32"],
+        med_threshold: Optional["Uint32"],
+        high_threshold: Optional["Uint32"],
+        home_domain: Optional["String32"],
+        signer: Optional["Signer"],
     ) -> None:
         self.inflation_dest = inflation_dest
         self.clear_flags = clear_flags
@@ -4098,7 +4164,7 @@ class SetOptionsOp:
             self.signer.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'SetOptionsOp':
+    def unpack(cls, unpacker: Unpacker) -> "SetOptionsOp":
         inflation_dest = AccountID.unpack(unpacker) if unpacker.unpack_uint() else None
         clear_flags = Uint32.unpack(unpacker) if unpacker.unpack_uint() else None
         set_flags = Uint32.unpack(unpacker) if unpacker.unpack_uint() else None
@@ -4126,7 +4192,7 @@ class SetOptionsOp:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'SetOptionsOp':
+    def from_xdr(cls, xdr) -> "SetOptionsOp":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -4134,40 +4200,48 @@ class SetOptionsOp:
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented
-        return self.inflation_dest == other.inflation_dest and self.clear_flags == other.clear_flags and self.set_flags == other.set_flags and self.master_weight == other.master_weight and self.low_threshold == other.low_threshold and self.med_threshold == other.med_threshold and self.high_threshold == other.high_threshold and self.home_domain == other.home_domain and self.signer == other.signer
+        return (
+            self.inflation_dest == other.inflation_dest
+            and self.clear_flags == other.clear_flags
+            and self.set_flags == other.set_flags
+            and self.master_weight == other.master_weight
+            and self.low_threshold == other.low_threshold
+            and self.med_threshold == other.med_threshold
+            and self.high_threshold == other.high_threshold
+            and self.home_domain == other.home_domain
+            and self.signer == other.signer
+        )
 
     def __str__(self):
         out = [
-            f'inflation_dest={self.inflation_dest}',
-            f'clear_flags={self.clear_flags}',
-            f'set_flags={self.set_flags}',
-            f'master_weight={self.master_weight}',
-            f'low_threshold={self.low_threshold}',
-            f'med_threshold={self.med_threshold}',
-            f'high_threshold={self.high_threshold}',
-            f'home_domain={self.home_domain}',
-            f'signer={self.signer}',
+            f"inflation_dest={self.inflation_dest}",
+            f"clear_flags={self.clear_flags}",
+            f"set_flags={self.set_flags}",
+            f"master_weight={self.master_weight}",
+            f"low_threshold={self.low_threshold}",
+            f"med_threshold={self.med_threshold}",
+            f"high_threshold={self.high_threshold}",
+            f"home_domain={self.home_domain}",
+            f"signer={self.signer}",
         ]
         return f"<SetOptionsOp {[', '.join(out)]}>"
 
 
-# === xdr source ============================================================
-#
-#   struct ChangeTrustOp
-#   {
-#       Asset line;
-#
-#       // if limit is set to 0, deletes the trust line
-#       int64 limit;
-#   };
-#
-# ===========================================================================
 class ChangeTrustOp:
-    def __init__(
-            self,
-            line: 'Asset',
-            limit: 'Int64',
-    ) -> None:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    struct ChangeTrustOp
+    {
+        Asset line;
+
+        // if limit is set to 0, deletes the trust line
+        int64 limit;
+    };
+    ----------------------------------------------------------------
+    """
+
+    def __init__(self, line: "Asset", limit: "Int64") -> None:
         self.line = line
         self.limit = limit
 
@@ -4176,13 +4250,10 @@ class ChangeTrustOp:
         self.limit.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'ChangeTrustOp':
+    def unpack(cls, unpacker: Unpacker) -> "ChangeTrustOp":
         line = Asset.unpack(unpacker)
         limit = Int64.unpack(unpacker)
-        return cls(
-            line=line,
-            limit=limit,
-        )
+        return cls(line=line, limit=limit)
 
     def to_xdr(self) -> str:
         packer = Packer()
@@ -4190,7 +4261,7 @@ class ChangeTrustOp:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'ChangeTrustOp':
+    def from_xdr(cls, xdr) -> "ChangeTrustOp":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -4201,38 +4272,37 @@ class ChangeTrustOp:
         return self.line == other.line and self.limit == other.limit
 
     def __str__(self):
-        out = [
-            f'line={self.line}',
-            f'limit={self.limit}',
-        ]
+        out = [f"line={self.line}", f"limit={self.limit}"]
         return f"<ChangeTrustOp {[', '.join(out)]}>"
 
 
-# === xdr source ============================================================
-#
-#   union switch (AssetType type)
-#       {
-#       // ASSET_TYPE_NATIVE is not allowed
-#       case ASSET_TYPE_CREDIT_ALPHANUM4:
-#           AssetCode4 assetCode4;
-#
-#       case ASSET_TYPE_CREDIT_ALPHANUM12:
-#           AssetCode12 assetCode12;
-#
-#           // add other asset types here in the future
-#       }
-#
-# ===========================================================================
 class AllowTrustOpAsset:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    union switch (AssetType type)
+        {
+        // ASSET_TYPE_NATIVE is not allowed
+        case ASSET_TYPE_CREDIT_ALPHANUM4:
+            AssetCode4 assetCode4;
+
+        case ASSET_TYPE_CREDIT_ALPHANUM12:
+            AssetCode12 assetCode12;
+
+            // add other asset types here in the future
+        }
+    ----------------------------------------------------------------
+    """
+
     def __init__(
-            self,
-            type: 'AssetType',
-            asset_code4: 'AssetCode4' = None,
-            asset_code12: 'AssetCode12' = None,
+        self,
+        type: "AssetType",
+        asset_code4: "AssetCode4" = None,
+        asset_code12: "AssetCode12" = None,
     ) -> None:
         self.type = type
-        self.asset_code4: 'AssetCode4' = asset_code4
-        self.asset_code12: 'AssetCode12' = asset_code12
+        self.asset_code4: "AssetCode4" = asset_code4
+        self.asset_code12: "AssetCode12" = asset_code12
 
     def pack(self, packer: Packer) -> None:
         self.type.pack(packer)
@@ -4244,7 +4314,7 @@ class AllowTrustOpAsset:
             return
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'AllowTrustOpAsset':
+    def unpack(cls, unpacker: Unpacker) -> "AllowTrustOpAsset":
         type = AssetType.unpack(unpacker)
         if type == AssetType.ASSET_TYPE_CREDIT_ALPHANUM4:
             asset_code4 = AssetCode4.unpack(unpacker)
@@ -4259,7 +4329,7 @@ class AllowTrustOpAsset:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'AllowTrustOpAsset':
+    def from_xdr(cls, xdr) -> "AllowTrustOpAsset":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -4267,44 +4337,51 @@ class AllowTrustOpAsset:
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented
-        return self.type == other.type and self.asset_code4 == other.asset_code4 and self.asset_code12 == other.asset_code12
+        return (
+            self.type == other.type
+            and self.asset_code4 == other.asset_code4
+            and self.asset_code12 == other.asset_code12
+        )
 
     def __str__(self):
         out = []
-        out.append(f'type={self.type}')
-        out.append(f'asset_code4={self.asset_code4}') if self.asset_code4 is not None else None
-        out.append(f'asset_code12={self.asset_code12}') if self.asset_code12 is not None else None
+        out.append(f"type={self.type}")
+        out.append(
+            f"asset_code4={self.asset_code4}"
+        ) if self.asset_code4 is not None else None
+        out.append(
+            f"asset_code12={self.asset_code12}"
+        ) if self.asset_code12 is not None else None
         return f"<AllowTrustOpAsset {[', '.join(out)]}>"
 
 
-# === xdr source ============================================================
-#
-#   struct AllowTrustOp
-#   {
-#       AccountID trustor;
-#       union switch (AssetType type)
-#       {
-#       // ASSET_TYPE_NATIVE is not allowed
-#       case ASSET_TYPE_CREDIT_ALPHANUM4:
-#           AssetCode4 assetCode4;
-#
-#       case ASSET_TYPE_CREDIT_ALPHANUM12:
-#           AssetCode12 assetCode12;
-#
-#           // add other asset types here in the future
-#       }
-#       asset;
-#
-#       bool authorize;
-#   };
-#
-# ===========================================================================
 class AllowTrustOp:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    struct AllowTrustOp
+    {
+        AccountID trustor;
+        union switch (AssetType type)
+        {
+        // ASSET_TYPE_NATIVE is not allowed
+        case ASSET_TYPE_CREDIT_ALPHANUM4:
+            AssetCode4 assetCode4;
+
+        case ASSET_TYPE_CREDIT_ALPHANUM12:
+            AssetCode12 assetCode12;
+
+            // add other asset types here in the future
+        }
+        asset;
+
+        bool authorize;
+    };
+    ----------------------------------------------------------------
+    """
+
     def __init__(
-            self,
-            trustor: 'AccountID',
-            asset: 'AllowTrustOpAsset',
-            authorize: bool,
+        self, trustor: "AccountID", asset: "AllowTrustOpAsset", authorize: bool
     ) -> None:
         self.trustor = trustor
         self.asset = asset
@@ -4316,15 +4393,11 @@ class AllowTrustOp:
         Boolean(self.authorize).pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'AllowTrustOp':
+    def unpack(cls, unpacker: Unpacker) -> "AllowTrustOp":
         trustor = AccountID.unpack(unpacker)
         asset = AllowTrustOpAsset.unpack(unpacker)
         authorize = Boolean.unpack(unpacker)
-        return cls(
-            trustor=trustor,
-            asset=asset,
-            authorize=authorize,
-        )
+        return cls(trustor=trustor, asset=asset, authorize=authorize)
 
     def to_xdr(self) -> str:
         packer = Packer()
@@ -4332,7 +4405,7 @@ class AllowTrustOp:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'AllowTrustOp':
+    def from_xdr(cls, xdr) -> "AllowTrustOp":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -4340,31 +4413,35 @@ class AllowTrustOp:
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented
-        return self.trustor == other.trustor and self.asset == other.asset and self.authorize == other.authorize
+        return (
+            self.trustor == other.trustor
+            and self.asset == other.asset
+            and self.authorize == other.authorize
+        )
 
     def __str__(self):
         out = [
-            f'trustor={self.trustor}',
-            f'asset={self.asset}',
-            f'authorize={self.authorize}',
+            f"trustor={self.trustor}",
+            f"asset={self.asset}",
+            f"authorize={self.authorize}",
         ]
         return f"<AllowTrustOp {[', '.join(out)]}>"
 
 
-# === xdr source ============================================================
-#
-#   struct ManageDataOp
-#   {
-#       string64 dataName;
-#       DataValue* dataValue; // set to null to clear
-#   };
-#
-# ===========================================================================
 class ManageDataOp:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    struct ManageDataOp
+    {
+        string64 dataName;
+        DataValue* dataValue; // set to null to clear
+    };
+    ----------------------------------------------------------------
+    """
+
     def __init__(
-            self,
-            data_name: 'String64',
-            data_value: Optional['DataValue'],
+        self, data_name: "String64", data_value: Optional["DataValue"]
     ) -> None:
         self.data_name = data_name
         self.data_value = data_value
@@ -4378,13 +4455,10 @@ class ManageDataOp:
             self.data_value.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'ManageDataOp':
+    def unpack(cls, unpacker: Unpacker) -> "ManageDataOp":
         data_name = String64.unpack(unpacker)
         data_value = DataValue.unpack(unpacker) if unpacker.unpack_uint() else None
-        return cls(
-            data_name=data_name,
-            data_value=data_value,
-        )
+        return cls(data_name=data_name, data_value=data_value)
 
     def to_xdr(self) -> str:
         packer = Packer()
@@ -4392,7 +4466,7 @@ class ManageDataOp:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'ManageDataOp':
+    def from_xdr(cls, xdr) -> "ManageDataOp":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -4403,37 +4477,31 @@ class ManageDataOp:
         return self.data_name == other.data_name and self.data_value == other.data_value
 
     def __str__(self):
-        out = [
-            f'data_name={self.data_name}',
-            f'data_value={self.data_value}',
-        ]
+        out = [f"data_name={self.data_name}", f"data_value={self.data_value}"]
         return f"<ManageDataOp {[', '.join(out)]}>"
 
 
-# === xdr source ============================================================
-#
-#   struct BumpSequenceOp
-#   {
-#       SequenceNumber bumpTo;
-#   };
-#
-# ===========================================================================
 class BumpSequenceOp:
-    def __init__(
-            self,
-            bump_to: 'SequenceNumber',
-    ) -> None:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    struct BumpSequenceOp
+    {
+        SequenceNumber bumpTo;
+    };
+    ----------------------------------------------------------------
+    """
+
+    def __init__(self, bump_to: "SequenceNumber") -> None:
         self.bump_to = bump_to
 
     def pack(self, packer: Packer) -> None:
         self.bump_to.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'BumpSequenceOp':
+    def unpack(cls, unpacker: Unpacker) -> "BumpSequenceOp":
         bump_to = SequenceNumber.unpack(unpacker)
-        return cls(
-            bump_to=bump_to,
-        )
+        return cls(bump_to=bump_to)
 
     def to_xdr(self) -> str:
         packer = Packer()
@@ -4441,7 +4509,7 @@ class BumpSequenceOp:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'BumpSequenceOp':
+    def from_xdr(cls, xdr) -> "BumpSequenceOp":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -4452,79 +4520,79 @@ class BumpSequenceOp:
         return self.bump_to == other.bump_to
 
     def __str__(self):
-        out = [
-            f'bump_to={self.bump_to}',
-        ]
+        out = [f"bump_to={self.bump_to}"]
         return f"<BumpSequenceOp {[', '.join(out)]}>"
 
 
-# === xdr source ============================================================
-#
-#   union switch (OperationType type)
-#       {
-#       case CREATE_ACCOUNT:
-#           CreateAccountOp createAccountOp;
-#       case PAYMENT:
-#           PaymentOp paymentOp;
-#       case PATH_PAYMENT_STRICT_RECEIVE:
-#           PathPaymentStrictReceiveOp pathPaymentStrictReceiveOp;
-#       case MANAGE_SELL_OFFER:
-#           ManageSellOfferOp manageSellOfferOp;
-#       case CREATE_PASSIVE_SELL_OFFER:
-#           CreatePassiveSellOfferOp createPassiveSellOfferOp;
-#       case SET_OPTIONS:
-#           SetOptionsOp setOptionsOp;
-#       case CHANGE_TRUST:
-#           ChangeTrustOp changeTrustOp;
-#       case ALLOW_TRUST:
-#           AllowTrustOp allowTrustOp;
-#       case ACCOUNT_MERGE:
-#           AccountID destination;
-#       case INFLATION:
-#           void;
-#       case MANAGE_DATA:
-#           ManageDataOp manageDataOp;
-#       case BUMP_SEQUENCE:
-#           BumpSequenceOp bumpSequenceOp;
-#       case MANAGE_BUY_OFFER:
-#           ManageBuyOfferOp manageBuyOfferOp;
-#       case PATH_PAYMENT_STRICT_SEND:
-#           PathPaymentStrictSendOp pathPaymentStrictSendOp;
-#       }
-#
-# ===========================================================================
 class OperationBody:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    union switch (OperationType type)
+        {
+        case CREATE_ACCOUNT:
+            CreateAccountOp createAccountOp;
+        case PAYMENT:
+            PaymentOp paymentOp;
+        case PATH_PAYMENT_STRICT_RECEIVE:
+            PathPaymentStrictReceiveOp pathPaymentStrictReceiveOp;
+        case MANAGE_SELL_OFFER:
+            ManageSellOfferOp manageSellOfferOp;
+        case CREATE_PASSIVE_SELL_OFFER:
+            CreatePassiveSellOfferOp createPassiveSellOfferOp;
+        case SET_OPTIONS:
+            SetOptionsOp setOptionsOp;
+        case CHANGE_TRUST:
+            ChangeTrustOp changeTrustOp;
+        case ALLOW_TRUST:
+            AllowTrustOp allowTrustOp;
+        case ACCOUNT_MERGE:
+            AccountID destination;
+        case INFLATION:
+            void;
+        case MANAGE_DATA:
+            ManageDataOp manageDataOp;
+        case BUMP_SEQUENCE:
+            BumpSequenceOp bumpSequenceOp;
+        case MANAGE_BUY_OFFER:
+            ManageBuyOfferOp manageBuyOfferOp;
+        case PATH_PAYMENT_STRICT_SEND:
+            PathPaymentStrictSendOp pathPaymentStrictSendOp;
+        }
+    ----------------------------------------------------------------
+    """
+
     def __init__(
-            self,
-            type: 'OperationType',
-            create_account_op: 'CreateAccountOp' = None,
-            payment_op: 'PaymentOp' = None,
-            path_payment_strict_receive_op: 'PathPaymentStrictReceiveOp' = None,
-            manage_sell_offer_op: 'ManageSellOfferOp' = None,
-            create_passive_sell_offer_op: 'CreatePassiveSellOfferOp' = None,
-            set_options_op: 'SetOptionsOp' = None,
-            change_trust_op: 'ChangeTrustOp' = None,
-            allow_trust_op: 'AllowTrustOp' = None,
-            destination: 'AccountID' = None,
-            manage_data_op: 'ManageDataOp' = None,
-            bump_sequence_op: 'BumpSequenceOp' = None,
-            manage_buy_offer_op: 'ManageBuyOfferOp' = None,
-            path_payment_strict_send_op: 'PathPaymentStrictSendOp' = None,
+        self,
+        type: "OperationType",
+        create_account_op: "CreateAccountOp" = None,
+        payment_op: "PaymentOp" = None,
+        path_payment_strict_receive_op: "PathPaymentStrictReceiveOp" = None,
+        manage_sell_offer_op: "ManageSellOfferOp" = None,
+        create_passive_sell_offer_op: "CreatePassiveSellOfferOp" = None,
+        set_options_op: "SetOptionsOp" = None,
+        change_trust_op: "ChangeTrustOp" = None,
+        allow_trust_op: "AllowTrustOp" = None,
+        destination: "AccountID" = None,
+        manage_data_op: "ManageDataOp" = None,
+        bump_sequence_op: "BumpSequenceOp" = None,
+        manage_buy_offer_op: "ManageBuyOfferOp" = None,
+        path_payment_strict_send_op: "PathPaymentStrictSendOp" = None,
     ) -> None:
         self.type = type
-        self.create_account_op: 'CreateAccountOp' = create_account_op
-        self.payment_op: 'PaymentOp' = payment_op
-        self.path_payment_strict_receive_op: 'PathPaymentStrictReceiveOp' = path_payment_strict_receive_op
-        self.manage_sell_offer_op: 'ManageSellOfferOp' = manage_sell_offer_op
-        self.create_passive_sell_offer_op: 'CreatePassiveSellOfferOp' = create_passive_sell_offer_op
-        self.set_options_op: 'SetOptionsOp' = set_options_op
-        self.change_trust_op: 'ChangeTrustOp' = change_trust_op
-        self.allow_trust_op: 'AllowTrustOp' = allow_trust_op
-        self.destination: 'AccountID' = destination
-        self.manage_data_op: 'ManageDataOp' = manage_data_op
-        self.bump_sequence_op: 'BumpSequenceOp' = bump_sequence_op
-        self.manage_buy_offer_op: 'ManageBuyOfferOp' = manage_buy_offer_op
-        self.path_payment_strict_send_op: 'PathPaymentStrictSendOp' = path_payment_strict_send_op
+        self.create_account_op: "CreateAccountOp" = create_account_op
+        self.payment_op: "PaymentOp" = payment_op
+        self.path_payment_strict_receive_op: "PathPaymentStrictReceiveOp" = path_payment_strict_receive_op
+        self.manage_sell_offer_op: "ManageSellOfferOp" = manage_sell_offer_op
+        self.create_passive_sell_offer_op: "CreatePassiveSellOfferOp" = create_passive_sell_offer_op
+        self.set_options_op: "SetOptionsOp" = set_options_op
+        self.change_trust_op: "ChangeTrustOp" = change_trust_op
+        self.allow_trust_op: "AllowTrustOp" = allow_trust_op
+        self.destination: "AccountID" = destination
+        self.manage_data_op: "ManageDataOp" = manage_data_op
+        self.bump_sequence_op: "BumpSequenceOp" = bump_sequence_op
+        self.manage_buy_offer_op: "ManageBuyOfferOp" = manage_buy_offer_op
+        self.path_payment_strict_send_op: "PathPaymentStrictSendOp" = path_payment_strict_send_op
 
     def pack(self, packer: Packer) -> None:
         self.type.pack(packer)
@@ -4571,7 +4639,7 @@ class OperationBody:
             return
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'OperationBody':
+    def unpack(cls, unpacker: Unpacker) -> "OperationBody":
         type = OperationType.unpack(unpacker)
         if type == OperationType.CREATE_ACCOUNT:
             create_account_op = CreateAccountOp.unpack(unpacker)
@@ -4581,7 +4649,9 @@ class OperationBody:
             return cls(type, payment_op=payment_op)
         if type == OperationType.PATH_PAYMENT_STRICT_RECEIVE:
             path_payment_strict_receive_op = PathPaymentStrictReceiveOp.unpack(unpacker)
-            return cls(type, path_payment_strict_receive_op=path_payment_strict_receive_op)
+            return cls(
+                type, path_payment_strict_receive_op=path_payment_strict_receive_op
+            )
         if type == OperationType.MANAGE_SELL_OFFER:
             manage_sell_offer_op = ManageSellOfferOp.unpack(unpacker)
             return cls(type, manage_sell_offer_op=manage_sell_offer_op)
@@ -4621,7 +4691,7 @@ class OperationBody:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'OperationBody':
+    def from_xdr(cls, xdr) -> "OperationBody":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -4629,80 +4699,118 @@ class OperationBody:
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented
-        return self.type == other.type and self.create_account_op == other.create_account_op and self.payment_op == other.payment_op and self.path_payment_strict_receive_op == other.path_payment_strict_receive_op and self.manage_sell_offer_op == other.manage_sell_offer_op and self.create_passive_sell_offer_op == other.create_passive_sell_offer_op and self.set_options_op == other.set_options_op and self.change_trust_op == other.change_trust_op and self.allow_trust_op == other.allow_trust_op and self.destination == other.destination and self.manage_data_op == other.manage_data_op and self.bump_sequence_op == other.bump_sequence_op and self.manage_buy_offer_op == other.manage_buy_offer_op and self.path_payment_strict_send_op == other.path_payment_strict_send_op
+        return (
+            self.type == other.type
+            and self.create_account_op == other.create_account_op
+            and self.payment_op == other.payment_op
+            and self.path_payment_strict_receive_op
+            == other.path_payment_strict_receive_op
+            and self.manage_sell_offer_op == other.manage_sell_offer_op
+            and self.create_passive_sell_offer_op == other.create_passive_sell_offer_op
+            and self.set_options_op == other.set_options_op
+            and self.change_trust_op == other.change_trust_op
+            and self.allow_trust_op == other.allow_trust_op
+            and self.destination == other.destination
+            and self.manage_data_op == other.manage_data_op
+            and self.bump_sequence_op == other.bump_sequence_op
+            and self.manage_buy_offer_op == other.manage_buy_offer_op
+            and self.path_payment_strict_send_op == other.path_payment_strict_send_op
+        )
 
     def __str__(self):
         out = []
-        out.append(f'type={self.type}')
-        out.append(f'create_account_op={self.create_account_op}') if self.create_account_op is not None else None
-        out.append(f'payment_op={self.payment_op}') if self.payment_op is not None else None
+        out.append(f"type={self.type}")
         out.append(
-            f'path_payment_strict_receive_op={self.path_payment_strict_receive_op}') if self.path_payment_strict_receive_op is not None else None
+            f"create_account_op={self.create_account_op}"
+        ) if self.create_account_op is not None else None
         out.append(
-            f'manage_sell_offer_op={self.manage_sell_offer_op}') if self.manage_sell_offer_op is not None else None
+            f"payment_op={self.payment_op}"
+        ) if self.payment_op is not None else None
         out.append(
-            f'create_passive_sell_offer_op={self.create_passive_sell_offer_op}') if self.create_passive_sell_offer_op is not None else None
-        out.append(f'set_options_op={self.set_options_op}') if self.set_options_op is not None else None
-        out.append(f'change_trust_op={self.change_trust_op}') if self.change_trust_op is not None else None
-        out.append(f'allow_trust_op={self.allow_trust_op}') if self.allow_trust_op is not None else None
-        out.append(f'destination={self.destination}') if self.destination is not None else None
-        out.append(f'manage_data_op={self.manage_data_op}') if self.manage_data_op is not None else None
-        out.append(f'bump_sequence_op={self.bump_sequence_op}') if self.bump_sequence_op is not None else None
-        out.append(f'manage_buy_offer_op={self.manage_buy_offer_op}') if self.manage_buy_offer_op is not None else None
+            f"path_payment_strict_receive_op={self.path_payment_strict_receive_op}"
+        ) if self.path_payment_strict_receive_op is not None else None
         out.append(
-            f'path_payment_strict_send_op={self.path_payment_strict_send_op}') if self.path_payment_strict_send_op is not None else None
+            f"manage_sell_offer_op={self.manage_sell_offer_op}"
+        ) if self.manage_sell_offer_op is not None else None
+        out.append(
+            f"create_passive_sell_offer_op={self.create_passive_sell_offer_op}"
+        ) if self.create_passive_sell_offer_op is not None else None
+        out.append(
+            f"set_options_op={self.set_options_op}"
+        ) if self.set_options_op is not None else None
+        out.append(
+            f"change_trust_op={self.change_trust_op}"
+        ) if self.change_trust_op is not None else None
+        out.append(
+            f"allow_trust_op={self.allow_trust_op}"
+        ) if self.allow_trust_op is not None else None
+        out.append(
+            f"destination={self.destination}"
+        ) if self.destination is not None else None
+        out.append(
+            f"manage_data_op={self.manage_data_op}"
+        ) if self.manage_data_op is not None else None
+        out.append(
+            f"bump_sequence_op={self.bump_sequence_op}"
+        ) if self.bump_sequence_op is not None else None
+        out.append(
+            f"manage_buy_offer_op={self.manage_buy_offer_op}"
+        ) if self.manage_buy_offer_op is not None else None
+        out.append(
+            f"path_payment_strict_send_op={self.path_payment_strict_send_op}"
+        ) if self.path_payment_strict_send_op is not None else None
         return f"<OperationBody {[', '.join(out)]}>"
 
 
-# === xdr source ============================================================
-#
-#   struct Operation
-#   {
-#       // sourceAccount is the account used to run the operation
-#       // if not set, the runtime defaults to "sourceAccount" specified at
-#       // the transaction level
-#       AccountID* sourceAccount;
-#
-#       union switch (OperationType type)
-#       {
-#       case CREATE_ACCOUNT:
-#           CreateAccountOp createAccountOp;
-#       case PAYMENT:
-#           PaymentOp paymentOp;
-#       case PATH_PAYMENT_STRICT_RECEIVE:
-#           PathPaymentStrictReceiveOp pathPaymentStrictReceiveOp;
-#       case MANAGE_SELL_OFFER:
-#           ManageSellOfferOp manageSellOfferOp;
-#       case CREATE_PASSIVE_SELL_OFFER:
-#           CreatePassiveSellOfferOp createPassiveSellOfferOp;
-#       case SET_OPTIONS:
-#           SetOptionsOp setOptionsOp;
-#       case CHANGE_TRUST:
-#           ChangeTrustOp changeTrustOp;
-#       case ALLOW_TRUST:
-#           AllowTrustOp allowTrustOp;
-#       case ACCOUNT_MERGE:
-#           AccountID destination;
-#       case INFLATION:
-#           void;
-#       case MANAGE_DATA:
-#           ManageDataOp manageDataOp;
-#       case BUMP_SEQUENCE:
-#           BumpSequenceOp bumpSequenceOp;
-#       case MANAGE_BUY_OFFER:
-#           ManageBuyOfferOp manageBuyOfferOp;
-#       case PATH_PAYMENT_STRICT_SEND:
-#           PathPaymentStrictSendOp pathPaymentStrictSendOp;
-#       }
-#       body;
-#   };
-#
-# ===========================================================================
 class Operation:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    struct Operation
+    {
+        // sourceAccount is the account used to run the operation
+        // if not set, the runtime defaults to "sourceAccount" specified at
+        // the transaction level
+        AccountID* sourceAccount;
+
+        union switch (OperationType type)
+        {
+        case CREATE_ACCOUNT:
+            CreateAccountOp createAccountOp;
+        case PAYMENT:
+            PaymentOp paymentOp;
+        case PATH_PAYMENT_STRICT_RECEIVE:
+            PathPaymentStrictReceiveOp pathPaymentStrictReceiveOp;
+        case MANAGE_SELL_OFFER:
+            ManageSellOfferOp manageSellOfferOp;
+        case CREATE_PASSIVE_SELL_OFFER:
+            CreatePassiveSellOfferOp createPassiveSellOfferOp;
+        case SET_OPTIONS:
+            SetOptionsOp setOptionsOp;
+        case CHANGE_TRUST:
+            ChangeTrustOp changeTrustOp;
+        case ALLOW_TRUST:
+            AllowTrustOp allowTrustOp;
+        case ACCOUNT_MERGE:
+            AccountID destination;
+        case INFLATION:
+            void;
+        case MANAGE_DATA:
+            ManageDataOp manageDataOp;
+        case BUMP_SEQUENCE:
+            BumpSequenceOp bumpSequenceOp;
+        case MANAGE_BUY_OFFER:
+            ManageBuyOfferOp manageBuyOfferOp;
+        case PATH_PAYMENT_STRICT_SEND:
+            PathPaymentStrictSendOp pathPaymentStrictSendOp;
+        }
+        body;
+    };
+    ----------------------------------------------------------------
+    """
+
     def __init__(
-            self,
-            source_account: Optional['AccountID'],
-            body: 'OperationBody',
+        self, source_account: Optional["AccountID"], body: "OperationBody"
     ) -> None:
         self.source_account = source_account
         self.body = body
@@ -4716,13 +4824,10 @@ class Operation:
         self.body.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'Operation':
+    def unpack(cls, unpacker: Unpacker) -> "Operation":
         source_account = AccountID.unpack(unpacker) if unpacker.unpack_uint() else None
         body = OperationBody.unpack(unpacker)
-        return cls(
-            source_account=source_account,
-            body=body,
-        )
+        return cls(source_account=source_account, body=body)
 
     def to_xdr(self) -> str:
         packer = Packer()
@@ -4730,7 +4835,7 @@ class Operation:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'Operation':
+    def from_xdr(cls, xdr) -> "Operation":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -4741,26 +4846,25 @@ class Operation:
         return self.source_account == other.source_account and self.body == other.body
 
     def __str__(self):
-        out = [
-            f'source_account={self.source_account}',
-            f'body={self.body}',
-        ]
+        out = [f"source_account={self.source_account}", f"body={self.body}"]
         return f"<Operation {[', '.join(out)]}>"
 
 
-# === xdr source ============================================================
-#
-#   enum MemoType
-#   {
-#       MEMO_NONE = 0,
-#       MEMO_TEXT = 1,
-#       MEMO_ID = 2,
-#       MEMO_HASH = 3,
-#       MEMO_RETURN = 4
-#   };
-#
-# ===========================================================================
 class MemoType(IntEnum):
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    enum MemoType
+    {
+        MEMO_NONE = 0,
+        MEMO_TEXT = 1,
+        MEMO_ID = 2,
+        MEMO_HASH = 3,
+        MEMO_RETURN = 4
+    };
+    ----------------------------------------------------------------
+    """
+
     MEMO_NONE = 0
     MEMO_TEXT = 1
     MEMO_ID = 2
@@ -4771,7 +4875,7 @@ class MemoType(IntEnum):
         packer.pack_int(self.value)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'MemoType':
+    def unpack(cls, unpacker: Unpacker) -> "MemoType":
         value = unpacker.unpack_int()
         return cls(value)
 
@@ -4781,7 +4885,7 @@ class MemoType(IntEnum):
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'MemoType':
+    def from_xdr(cls, xdr) -> "MemoType":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -4793,37 +4897,39 @@ class MemoType(IntEnum):
         )
 
 
-# === xdr source ============================================================
-#
-#   union Memo switch (MemoType type)
-#   {
-#   case MEMO_NONE:
-#       void;
-#   case MEMO_TEXT:
-#       string text<28>;
-#   case MEMO_ID:
-#       uint64 id;
-#   case MEMO_HASH:
-#       Hash hash; // the hash of what to pull from the content server
-#   case MEMO_RETURN:
-#       Hash retHash; // the hash of the tx you are rejecting
-#   };
-#
-# ===========================================================================
 class Memo:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    union Memo switch (MemoType type)
+    {
+    case MEMO_NONE:
+        void;
+    case MEMO_TEXT:
+        string text<28>;
+    case MEMO_ID:
+        uint64 id;
+    case MEMO_HASH:
+        Hash hash; // the hash of what to pull from the content server
+    case MEMO_RETURN:
+        Hash retHash; // the hash of the tx you are rejecting
+    };
+    ----------------------------------------------------------------
+    """
+
     def __init__(
-            self,
-            type: 'MemoType',
-            text: bytes = None,
-            id: 'Uint64' = None,
-            hash: 'Hash' = None,
-            ret_hash: 'Hash' = None,
+        self,
+        type: "MemoType",
+        text: bytes = None,
+        id: "Uint64" = None,
+        hash: "Hash" = None,
+        ret_hash: "Hash" = None,
     ) -> None:
         self.type = type
         self.text: bytes = text
-        self.id: 'Uint64' = id
-        self.hash: 'Hash' = hash
-        self.ret_hash: 'Hash' = ret_hash
+        self.id: "Uint64" = id
+        self.hash: "Hash" = hash
+        self.ret_hash: "Hash" = ret_hash
 
     def pack(self, packer: Packer) -> None:
         self.type.pack(packer)
@@ -4843,7 +4949,7 @@ class Memo:
             return
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'Memo':
+    def unpack(cls, unpacker: Unpacker) -> "Memo":
         type = MemoType.unpack(unpacker)
         if type == MemoType.MEMO_NONE:
             return cls(type)
@@ -4866,7 +4972,7 @@ class Memo:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'Memo':
+    def from_xdr(cls, xdr) -> "Memo":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -4874,33 +4980,37 @@ class Memo:
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented
-        return self.type == other.type and self.text == other.text and self.id == other.id and self.hash == other.hash and self.ret_hash == other.ret_hash
+        return (
+            self.type == other.type
+            and self.text == other.text
+            and self.id == other.id
+            and self.hash == other.hash
+            and self.ret_hash == other.ret_hash
+        )
 
     def __str__(self):
         out = []
-        out.append(f'type={self.type}')
-        out.append(f'text={self.text}') if self.text is not None else None
-        out.append(f'id={self.id}') if self.id is not None else None
-        out.append(f'hash={self.hash}') if self.hash is not None else None
-        out.append(f'ret_hash={self.ret_hash}') if self.ret_hash is not None else None
+        out.append(f"type={self.type}")
+        out.append(f"text={self.text}") if self.text is not None else None
+        out.append(f"id={self.id}") if self.id is not None else None
+        out.append(f"hash={self.hash}") if self.hash is not None else None
+        out.append(f"ret_hash={self.ret_hash}") if self.ret_hash is not None else None
         return f"<Memo {[', '.join(out)]}>"
 
 
-# === xdr source ============================================================
-#
-#   struct TimeBounds
-#   {
-#       TimePoint minTime;
-#       TimePoint maxTime; // 0 here means no maxTime
-#   };
-#
-# ===========================================================================
 class TimeBounds:
-    def __init__(
-            self,
-            min_time: 'TimePoint',
-            max_time: 'TimePoint',
-    ) -> None:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    struct TimeBounds
+    {
+        TimePoint minTime;
+        TimePoint maxTime; // 0 here means no maxTime
+    };
+    ----------------------------------------------------------------
+    """
+
+    def __init__(self, min_time: "TimePoint", max_time: "TimePoint") -> None:
         self.min_time = min_time
         self.max_time = max_time
 
@@ -4909,13 +5019,10 @@ class TimeBounds:
         self.max_time.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'TimeBounds':
+    def unpack(cls, unpacker: Unpacker) -> "TimeBounds":
         min_time = TimePoint.unpack(unpacker)
         max_time = TimePoint.unpack(unpacker)
-        return cls(
-            min_time=min_time,
-            max_time=max_time,
-        )
+        return cls(min_time=min_time, max_time=max_time)
 
     def to_xdr(self) -> str:
         packer = Packer()
@@ -4923,7 +5030,7 @@ class TimeBounds:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'TimeBounds':
+    def from_xdr(cls, xdr) -> "TimeBounds":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -4934,35 +5041,32 @@ class TimeBounds:
         return self.min_time == other.min_time and self.max_time == other.max_time
 
     def __str__(self):
-        out = [
-            f'min_time={self.min_time}',
-            f'max_time={self.max_time}',
-        ]
+        out = [f"min_time={self.min_time}", f"max_time={self.max_time}"]
         return f"<TimeBounds {[', '.join(out)]}>"
 
 
-# === xdr source ============================================================
-#
-#   const MAX_OPS_PER_TX = 100;
-#
-# ===========================================================================
+"""
+XDR Source Code
+----------------------------------------------------------------
+const MAX_OPS_PER_TX = 100;
+----------------------------------------------------------------
+"""
 MAX_OPS_PER_TX: int = 100
 
 
-# === xdr source ============================================================
-#
-#   union switch (int v)
-#       {
-#       case 0:
-#           void;
-#       }
-#
-# ===========================================================================
 class TransactionExt:
-    def __init__(
-            self,
-            v: int,
-    ) -> None:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    union switch (int v)
+        {
+        case 0:
+            void;
+        }
+    ----------------------------------------------------------------
+    """
+
+    def __init__(self, v: int) -> None:
         self.v = v
 
     def pack(self, packer: Packer) -> None:
@@ -4971,7 +5075,7 @@ class TransactionExt:
             return
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'TransactionExt':
+    def unpack(cls, unpacker: Unpacker) -> "TransactionExt":
         v = Integer.unpack(unpacker)
         if v == 0:
             return cls(v)
@@ -4982,7 +5086,7 @@ class TransactionExt:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'TransactionExt':
+    def from_xdr(cls, xdr) -> "TransactionExt":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -4994,50 +5098,52 @@ class TransactionExt:
 
     def __str__(self):
         out = []
-        out.append(f'v={self.v}')
+        out.append(f"v={self.v}")
         return f"<TransactionExt {[', '.join(out)]}>"
 
 
-# === xdr source ============================================================
-#
-#   struct Transaction
-#   {
-#       // account used to run the transaction
-#       AccountID sourceAccount;
-#
-#       // the fee the sourceAccount will pay
-#       uint32 fee;
-#
-#       // sequence number to consume in the account
-#       SequenceNumber seqNum;
-#
-#       // validity range (inclusive) for the last ledger close time
-#       TimeBounds* timeBounds;
-#
-#       Memo memo;
-#
-#       Operation operations<MAX_OPS_PER_TX>;
-#
-#       // reserved for future use
-#       union switch (int v)
-#       {
-#       case 0:
-#           void;
-#       }
-#       ext;
-#   };
-#
-# ===========================================================================
 class Transaction:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    struct Transaction
+    {
+        // account used to run the transaction
+        AccountID sourceAccount;
+
+        // the fee the sourceAccount will pay
+        uint32 fee;
+
+        // sequence number to consume in the account
+        SequenceNumber seqNum;
+
+        // validity range (inclusive) for the last ledger close time
+        TimeBounds* timeBounds;
+
+        Memo memo;
+
+        Operation operations<MAX_OPS_PER_TX>;
+
+        // reserved for future use
+        union switch (int v)
+        {
+        case 0:
+            void;
+        }
+        ext;
+    };
+    ----------------------------------------------------------------
+    """
+
     def __init__(
-            self,
-            source_account: 'AccountID',
-            fee: 'Uint32',
-            seq_num: 'SequenceNumber',
-            time_bounds: Optional['TimeBounds'],
-            memo: 'Memo',
-            operations: List['Operation'],
-            ext: 'TransactionExt',
+        self,
+        source_account: "AccountID",
+        fee: "Uint32",
+        seq_num: "SequenceNumber",
+        time_bounds: Optional["TimeBounds"],
+        memo: "Memo",
+        operations: List["Operation"],
+        ext: "TransactionExt",
     ) -> None:
         self.source_account = source_account
         self.fee = fee
@@ -5063,7 +5169,7 @@ class Transaction:
         self.ext.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'Transaction':
+    def unpack(cls, unpacker: Unpacker) -> "Transaction":
         source_account = AccountID.unpack(unpacker)
         fee = Uint32.unpack(unpacker)
         seq_num = SequenceNumber.unpack(unpacker)
@@ -5090,7 +5196,7 @@ class Transaction:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'Transaction':
+    def from_xdr(cls, xdr) -> "Transaction":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -5098,39 +5204,45 @@ class Transaction:
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented
-        return self.source_account == other.source_account and self.fee == other.fee and self.seq_num == other.seq_num and self.time_bounds == other.time_bounds and self.memo == other.memo and self.operations == other.operations and self.ext == other.ext
+        return (
+            self.source_account == other.source_account
+            and self.fee == other.fee
+            and self.seq_num == other.seq_num
+            and self.time_bounds == other.time_bounds
+            and self.memo == other.memo
+            and self.operations == other.operations
+            and self.ext == other.ext
+        )
 
     def __str__(self):
         out = [
-            f'source_account={self.source_account}',
-            f'fee={self.fee}',
-            f'seq_num={self.seq_num}',
-            f'time_bounds={self.time_bounds}',
-            f'memo={self.memo}',
-            f'operations={self.operations}',
-            f'ext={self.ext}',
+            f"source_account={self.source_account}",
+            f"fee={self.fee}",
+            f"seq_num={self.seq_num}",
+            f"time_bounds={self.time_bounds}",
+            f"memo={self.memo}",
+            f"operations={self.operations}",
+            f"ext={self.ext}",
         ]
         return f"<Transaction {[', '.join(out)]}>"
 
 
-# === xdr source ============================================================
-#
-#   union switch (EnvelopeType type)
-#       {
-#       case ENVELOPE_TYPE_TX:
-#           Transaction tx;
-#           /* All other values of type are invalid */
-#       }
-#
-# ===========================================================================
 class TransactionSignaturePayloadTaggedTransaction:
-    def __init__(
-            self,
-            type: 'EnvelopeType',
-            tx: 'Transaction' = None,
-    ) -> None:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    union switch (EnvelopeType type)
+        {
+        case ENVELOPE_TYPE_TX:
+            Transaction tx;
+            /* All other values of type are invalid */
+        }
+    ----------------------------------------------------------------
+    """
+
+    def __init__(self, type: "EnvelopeType", tx: "Transaction" = None) -> None:
         self.type = type
-        self.tx: 'Transaction' = tx
+        self.tx: "Transaction" = tx
 
     def pack(self, packer: Packer) -> None:
         self.type.pack(packer)
@@ -5139,7 +5251,9 @@ class TransactionSignaturePayloadTaggedTransaction:
             return
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'TransactionSignaturePayloadTaggedTransaction':
+    def unpack(
+        cls, unpacker: Unpacker
+    ) -> "TransactionSignaturePayloadTaggedTransaction":
         type = EnvelopeType.unpack(unpacker)
         if type == EnvelopeType.ENVELOPE_TYPE_TX:
             tx = Transaction.unpack(unpacker)
@@ -5151,7 +5265,7 @@ class TransactionSignaturePayloadTaggedTransaction:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'TransactionSignaturePayloadTaggedTransaction':
+    def from_xdr(cls, xdr) -> "TransactionSignaturePayloadTaggedTransaction":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -5163,31 +5277,33 @@ class TransactionSignaturePayloadTaggedTransaction:
 
     def __str__(self):
         out = []
-        out.append(f'type={self.type}')
-        out.append(f'tx={self.tx}') if self.tx is not None else None
+        out.append(f"type={self.type}")
+        out.append(f"tx={self.tx}") if self.tx is not None else None
         return f"<TransactionSignaturePayloadTaggedTransaction {[', '.join(out)]}>"
 
 
-# === xdr source ============================================================
-#
-#   struct TransactionSignaturePayload
-#   {
-#       Hash networkId;
-#       union switch (EnvelopeType type)
-#       {
-#       case ENVELOPE_TYPE_TX:
-#           Transaction tx;
-#           /* All other values of type are invalid */
-#       }
-#       taggedTransaction;
-#   };
-#
-# ===========================================================================
 class TransactionSignaturePayload:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    struct TransactionSignaturePayload
+    {
+        Hash networkId;
+        union switch (EnvelopeType type)
+        {
+        case ENVELOPE_TYPE_TX:
+            Transaction tx;
+            /* All other values of type are invalid */
+        }
+        taggedTransaction;
+    };
+    ----------------------------------------------------------------
+    """
+
     def __init__(
-            self,
-            network_id: 'Hash',
-            tagged_transaction: 'TransactionSignaturePayloadTaggedTransaction',
+        self,
+        network_id: "Hash",
+        tagged_transaction: "TransactionSignaturePayloadTaggedTransaction",
     ) -> None:
         self.network_id = network_id
         self.tagged_transaction = tagged_transaction
@@ -5197,13 +5313,12 @@ class TransactionSignaturePayload:
         self.tagged_transaction.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'TransactionSignaturePayload':
+    def unpack(cls, unpacker: Unpacker) -> "TransactionSignaturePayload":
         network_id = Hash.unpack(unpacker)
-        tagged_transaction = TransactionSignaturePayloadTaggedTransaction.unpack(unpacker)
-        return cls(
-            network_id=network_id,
-            tagged_transaction=tagged_transaction,
+        tagged_transaction = TransactionSignaturePayloadTaggedTransaction.unpack(
+            unpacker
         )
+        return cls(network_id=network_id, tagged_transaction=tagged_transaction)
 
     def to_xdr(self) -> str:
         packer = Packer()
@@ -5211,7 +5326,7 @@ class TransactionSignaturePayload:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'TransactionSignaturePayload':
+    def from_xdr(cls, xdr) -> "TransactionSignaturePayload":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -5219,32 +5334,35 @@ class TransactionSignaturePayload:
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented
-        return self.network_id == other.network_id and self.tagged_transaction == other.tagged_transaction
+        return (
+            self.network_id == other.network_id
+            and self.tagged_transaction == other.tagged_transaction
+        )
 
     def __str__(self):
         out = [
-            f'network_id={self.network_id}',
-            f'tagged_transaction={self.tagged_transaction}',
+            f"network_id={self.network_id}",
+            f"tagged_transaction={self.tagged_transaction}",
         ]
         return f"<TransactionSignaturePayload {[', '.join(out)]}>"
 
 
-# === xdr source ============================================================
-#
-#   struct TransactionEnvelope
-#   {
-#       Transaction tx;
-#       /* Each decorated signature is a signature over the SHA256 hash of
-#        * a TransactionSignaturePayload */
-#       DecoratedSignature signatures<20>;
-#   };
-#
-# ===========================================================================
 class TransactionEnvelope:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    struct TransactionEnvelope
+    {
+        Transaction tx;
+        /* Each decorated signature is a signature over the SHA256 hash of
+         * a TransactionSignaturePayload */
+        DecoratedSignature signatures<20>;
+    };
+    ----------------------------------------------------------------
+    """
+
     def __init__(
-            self,
-            tx: 'Transaction',
-            signatures: List['DecoratedSignature'],
+        self, tx: "Transaction", signatures: List["DecoratedSignature"]
     ) -> None:
         self.tx = tx
         self.signatures = signatures
@@ -5256,16 +5374,13 @@ class TransactionEnvelope:
             element.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'TransactionEnvelope':
+    def unpack(cls, unpacker: Unpacker) -> "TransactionEnvelope":
         tx = Transaction.unpack(unpacker)
         length = unpacker.unpack_uint()
         signatures = []
         for _ in range(length):
             signatures.append(DecoratedSignature.unpack(unpacker))
-        return cls(
-            tx=tx,
-            signatures=signatures,
-        )
+        return cls(tx=tx, signatures=signatures)
 
     def to_xdr(self) -> str:
         packer = Packer()
@@ -5273,7 +5388,7 @@ class TransactionEnvelope:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'TransactionEnvelope':
+    def from_xdr(cls, xdr) -> "TransactionEnvelope":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -5284,40 +5399,39 @@ class TransactionEnvelope:
         return self.tx == other.tx and self.signatures == other.signatures
 
     def __str__(self):
-        out = [
-            f'tx={self.tx}',
-            f'signatures={self.signatures}',
-        ]
+        out = [f"tx={self.tx}", f"signatures={self.signatures}"]
         return f"<TransactionEnvelope {[', '.join(out)]}>"
 
 
-# === xdr source ============================================================
-#
-#   struct ClaimOfferAtom
-#   {
-#       // emitted to identify the offer
-#       AccountID sellerID; // Account that owns the offer
-#       int64 offerID;
-#
-#       // amount and asset taken from the owner
-#       Asset assetSold;
-#       int64 amountSold;
-#
-#       // amount and asset sent to the owner
-#       Asset assetBought;
-#       int64 amountBought;
-#   };
-#
-# ===========================================================================
 class ClaimOfferAtom:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    struct ClaimOfferAtom
+    {
+        // emitted to identify the offer
+        AccountID sellerID; // Account that owns the offer
+        int64 offerID;
+
+        // amount and asset taken from the owner
+        Asset assetSold;
+        int64 amountSold;
+
+        // amount and asset sent to the owner
+        Asset assetBought;
+        int64 amountBought;
+    };
+    ----------------------------------------------------------------
+    """
+
     def __init__(
-            self,
-            seller_id: 'AccountID',
-            offer_id: 'Int64',
-            asset_sold: 'Asset',
-            amount_sold: 'Int64',
-            asset_bought: 'Asset',
-            amount_bought: 'Int64',
+        self,
+        seller_id: "AccountID",
+        offer_id: "Int64",
+        asset_sold: "Asset",
+        amount_sold: "Int64",
+        asset_bought: "Asset",
+        amount_bought: "Int64",
     ) -> None:
         self.seller_id = seller_id
         self.offer_id = offer_id
@@ -5335,7 +5449,7 @@ class ClaimOfferAtom:
         self.amount_bought.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'ClaimOfferAtom':
+    def unpack(cls, unpacker: Unpacker) -> "ClaimOfferAtom":
         seller_id = AccountID.unpack(unpacker)
         offer_id = Int64.unpack(unpacker)
         asset_sold = Asset.unpack(unpacker)
@@ -5357,7 +5471,7 @@ class ClaimOfferAtom:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'ClaimOfferAtom':
+    def from_xdr(cls, xdr) -> "ClaimOfferAtom":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -5365,37 +5479,46 @@ class ClaimOfferAtom:
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented
-        return self.seller_id == other.seller_id and self.offer_id == other.offer_id and self.asset_sold == other.asset_sold and self.amount_sold == other.amount_sold and self.asset_bought == other.asset_bought and self.amount_bought == other.amount_bought
+        return (
+            self.seller_id == other.seller_id
+            and self.offer_id == other.offer_id
+            and self.asset_sold == other.asset_sold
+            and self.amount_sold == other.amount_sold
+            and self.asset_bought == other.asset_bought
+            and self.amount_bought == other.amount_bought
+        )
 
     def __str__(self):
         out = [
-            f'seller_id={self.seller_id}',
-            f'offer_id={self.offer_id}',
-            f'asset_sold={self.asset_sold}',
-            f'amount_sold={self.amount_sold}',
-            f'asset_bought={self.asset_bought}',
-            f'amount_bought={self.amount_bought}',
+            f"seller_id={self.seller_id}",
+            f"offer_id={self.offer_id}",
+            f"asset_sold={self.asset_sold}",
+            f"amount_sold={self.amount_sold}",
+            f"asset_bought={self.asset_bought}",
+            f"amount_bought={self.amount_bought}",
         ]
         return f"<ClaimOfferAtom {[', '.join(out)]}>"
 
 
-# === xdr source ============================================================
-#
-#   enum CreateAccountResultCode
-#   {
-#       // codes considered as "success" for the operation
-#       CREATE_ACCOUNT_SUCCESS = 0, // account was created
-#
-#       // codes considered as "failure" for the operation
-#       CREATE_ACCOUNT_MALFORMED = -1,   // invalid destination
-#       CREATE_ACCOUNT_UNDERFUNDED = -2, // not enough funds in source account
-#       CREATE_ACCOUNT_LOW_RESERVE =
-#           -3, // would create an account below the min reserve
-#       CREATE_ACCOUNT_ALREADY_EXIST = -4 // account already exists
-#   };
-#
-# ===========================================================================
 class CreateAccountResultCode(IntEnum):
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    enum CreateAccountResultCode
+    {
+        // codes considered as "success" for the operation
+        CREATE_ACCOUNT_SUCCESS = 0, // account was created
+
+        // codes considered as "failure" for the operation
+        CREATE_ACCOUNT_MALFORMED = -1,   // invalid destination
+        CREATE_ACCOUNT_UNDERFUNDED = -2, // not enough funds in source account
+        CREATE_ACCOUNT_LOW_RESERVE =
+            -3, // would create an account below the min reserve
+        CREATE_ACCOUNT_ALREADY_EXIST = -4 // account already exists
+    };
+    ----------------------------------------------------------------
+    """
+
     CREATE_ACCOUNT_SUCCESS = 0
     CREATE_ACCOUNT_MALFORMED = -1
     CREATE_ACCOUNT_UNDERFUNDED = -2
@@ -5406,7 +5529,7 @@ class CreateAccountResultCode(IntEnum):
         packer.pack_int(self.value)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'CreateAccountResultCode':
+    def unpack(cls, unpacker: Unpacker) -> "CreateAccountResultCode":
         value = unpacker.unpack_int()
         return cls(value)
 
@@ -5416,7 +5539,7 @@ class CreateAccountResultCode(IntEnum):
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'CreateAccountResultCode':
+    def from_xdr(cls, xdr) -> "CreateAccountResultCode":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -5428,22 +5551,21 @@ class CreateAccountResultCode(IntEnum):
         )
 
 
-# === xdr source ============================================================
-#
-#   union CreateAccountResult switch (CreateAccountResultCode code)
-#   {
-#   case CREATE_ACCOUNT_SUCCESS:
-#       void;
-#   default:
-#       void;
-#   };
-#
-# ===========================================================================
 class CreateAccountResult:
-    def __init__(
-            self,
-            code: 'CreateAccountResultCode',
-    ) -> None:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    union CreateAccountResult switch (CreateAccountResultCode code)
+    {
+    case CREATE_ACCOUNT_SUCCESS:
+        void;
+    default:
+        void;
+    };
+    ----------------------------------------------------------------
+    """
+
+    def __init__(self, code: "CreateAccountResultCode") -> None:
         self.code = code
 
     def pack(self, packer: Packer) -> None:
@@ -5452,7 +5574,7 @@ class CreateAccountResult:
             return
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'CreateAccountResult':
+    def unpack(cls, unpacker: Unpacker) -> "CreateAccountResult":
         code = CreateAccountResultCode.unpack(unpacker)
         if code == CreateAccountResultCode.CREATE_ACCOUNT_SUCCESS:
             return cls(code)
@@ -5463,7 +5585,7 @@ class CreateAccountResult:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'CreateAccountResult':
+    def from_xdr(cls, xdr) -> "CreateAccountResult":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -5475,31 +5597,33 @@ class CreateAccountResult:
 
     def __str__(self):
         out = []
-        out.append(f'code={self.code}')
+        out.append(f"code={self.code}")
         return f"<CreateAccountResult {[', '.join(out)]}>"
 
 
-# === xdr source ============================================================
-#
-#   enum PaymentResultCode
-#   {
-#       // codes considered as "success" for the operation
-#       PAYMENT_SUCCESS = 0, // payment successfuly completed
-#
-#       // codes considered as "failure" for the operation
-#       PAYMENT_MALFORMED = -1,          // bad input
-#       PAYMENT_UNDERFUNDED = -2,        // not enough funds in source account
-#       PAYMENT_SRC_NO_TRUST = -3,       // no trust line on source account
-#       PAYMENT_SRC_NOT_AUTHORIZED = -4, // source not authorized to transfer
-#       PAYMENT_NO_DESTINATION = -5,     // destination account does not exist
-#       PAYMENT_NO_TRUST = -6,       // destination missing a trust line for asset
-#       PAYMENT_NOT_AUTHORIZED = -7, // destination not authorized to hold asset
-#       PAYMENT_LINE_FULL = -8,      // destination would go above their limit
-#       PAYMENT_NO_ISSUER = -9       // missing issuer on asset
-#   };
-#
-# ===========================================================================
 class PaymentResultCode(IntEnum):
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    enum PaymentResultCode
+    {
+        // codes considered as "success" for the operation
+        PAYMENT_SUCCESS = 0, // payment successfuly completed
+
+        // codes considered as "failure" for the operation
+        PAYMENT_MALFORMED = -1,          // bad input
+        PAYMENT_UNDERFUNDED = -2,        // not enough funds in source account
+        PAYMENT_SRC_NO_TRUST = -3,       // no trust line on source account
+        PAYMENT_SRC_NOT_AUTHORIZED = -4, // source not authorized to transfer
+        PAYMENT_NO_DESTINATION = -5,     // destination account does not exist
+        PAYMENT_NO_TRUST = -6,       // destination missing a trust line for asset
+        PAYMENT_NOT_AUTHORIZED = -7, // destination not authorized to hold asset
+        PAYMENT_LINE_FULL = -8,      // destination would go above their limit
+        PAYMENT_NO_ISSUER = -9       // missing issuer on asset
+    };
+    ----------------------------------------------------------------
+    """
+
     PAYMENT_SUCCESS = 0
     PAYMENT_MALFORMED = -1
     PAYMENT_UNDERFUNDED = -2
@@ -5515,7 +5639,7 @@ class PaymentResultCode(IntEnum):
         packer.pack_int(self.value)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'PaymentResultCode':
+    def unpack(cls, unpacker: Unpacker) -> "PaymentResultCode":
         value = unpacker.unpack_int()
         return cls(value)
 
@@ -5525,7 +5649,7 @@ class PaymentResultCode(IntEnum):
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'PaymentResultCode':
+    def from_xdr(cls, xdr) -> "PaymentResultCode":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -5537,22 +5661,21 @@ class PaymentResultCode(IntEnum):
         )
 
 
-# === xdr source ============================================================
-#
-#   union PaymentResult switch (PaymentResultCode code)
-#   {
-#   case PAYMENT_SUCCESS:
-#       void;
-#   default:
-#       void;
-#   };
-#
-# ===========================================================================
 class PaymentResult:
-    def __init__(
-            self,
-            code: 'PaymentResultCode',
-    ) -> None:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    union PaymentResult switch (PaymentResultCode code)
+    {
+    case PAYMENT_SUCCESS:
+        void;
+    default:
+        void;
+    };
+    ----------------------------------------------------------------
+    """
+
+    def __init__(self, code: "PaymentResultCode") -> None:
         self.code = code
 
     def pack(self, packer: Packer) -> None:
@@ -5561,7 +5684,7 @@ class PaymentResult:
             return
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'PaymentResult':
+    def unpack(cls, unpacker: Unpacker) -> "PaymentResult":
         code = PaymentResultCode.unpack(unpacker)
         if code == PaymentResultCode.PAYMENT_SUCCESS:
             return cls(code)
@@ -5572,7 +5695,7 @@ class PaymentResult:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'PaymentResult':
+    def from_xdr(cls, xdr) -> "PaymentResult":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -5584,34 +5707,36 @@ class PaymentResult:
 
     def __str__(self):
         out = []
-        out.append(f'code={self.code}')
+        out.append(f"code={self.code}")
         return f"<PaymentResult {[', '.join(out)]}>"
 
 
-# === xdr source ============================================================
-#
-#   enum PathPaymentStrictReceiveResultCode
-#   {
-#       // codes considered as "success" for the operation
-#       PATH_PAYMENT_STRICT_RECEIVE_SUCCESS = 0, // success
-#
-#       // codes considered as "failure" for the operation
-#       PATH_PAYMENT_STRICT_RECEIVE_MALFORMED = -1,          // bad input
-#       PATH_PAYMENT_STRICT_RECEIVE_UNDERFUNDED = -2,        // not enough funds in source account
-#       PATH_PAYMENT_STRICT_RECEIVE_SRC_NO_TRUST = -3,       // no trust line on source account
-#       PATH_PAYMENT_STRICT_RECEIVE_SRC_NOT_AUTHORIZED = -4, // source not authorized to transfer
-#       PATH_PAYMENT_STRICT_RECEIVE_NO_DESTINATION = -5,     // destination account does not exist
-#       PATH_PAYMENT_STRICT_RECEIVE_NO_TRUST = -6,           // dest missing a trust line for asset
-#       PATH_PAYMENT_STRICT_RECEIVE_NOT_AUTHORIZED = -7,     // dest not authorized to hold asset
-#       PATH_PAYMENT_STRICT_RECEIVE_LINE_FULL = -8,          // dest would go above their limit
-#       PATH_PAYMENT_STRICT_RECEIVE_NO_ISSUER = -9,          // missing issuer on one asset
-#       PATH_PAYMENT_STRICT_RECEIVE_TOO_FEW_OFFERS = -10,    // not enough offers to satisfy path
-#       PATH_PAYMENT_STRICT_RECEIVE_OFFER_CROSS_SELF = -11,  // would cross one of its own offers
-#       PATH_PAYMENT_STRICT_RECEIVE_OVER_SENDMAX = -12       // could not satisfy sendmax
-#   };
-#
-# ===========================================================================
 class PathPaymentStrictReceiveResultCode(IntEnum):
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    enum PathPaymentStrictReceiveResultCode
+    {
+        // codes considered as "success" for the operation
+        PATH_PAYMENT_STRICT_RECEIVE_SUCCESS = 0, // success
+
+        // codes considered as "failure" for the operation
+        PATH_PAYMENT_STRICT_RECEIVE_MALFORMED = -1,          // bad input
+        PATH_PAYMENT_STRICT_RECEIVE_UNDERFUNDED = -2,        // not enough funds in source account
+        PATH_PAYMENT_STRICT_RECEIVE_SRC_NO_TRUST = -3,       // no trust line on source account
+        PATH_PAYMENT_STRICT_RECEIVE_SRC_NOT_AUTHORIZED = -4, // source not authorized to transfer
+        PATH_PAYMENT_STRICT_RECEIVE_NO_DESTINATION = -5,     // destination account does not exist
+        PATH_PAYMENT_STRICT_RECEIVE_NO_TRUST = -6,           // dest missing a trust line for asset
+        PATH_PAYMENT_STRICT_RECEIVE_NOT_AUTHORIZED = -7,     // dest not authorized to hold asset
+        PATH_PAYMENT_STRICT_RECEIVE_LINE_FULL = -8,          // dest would go above their limit
+        PATH_PAYMENT_STRICT_RECEIVE_NO_ISSUER = -9,          // missing issuer on one asset
+        PATH_PAYMENT_STRICT_RECEIVE_TOO_FEW_OFFERS = -10,    // not enough offers to satisfy path
+        PATH_PAYMENT_STRICT_RECEIVE_OFFER_CROSS_SELF = -11,  // would cross one of its own offers
+        PATH_PAYMENT_STRICT_RECEIVE_OVER_SENDMAX = -12       // could not satisfy sendmax
+    };
+    ----------------------------------------------------------------
+    """
+
     PATH_PAYMENT_STRICT_RECEIVE_SUCCESS = 0
     PATH_PAYMENT_STRICT_RECEIVE_MALFORMED = -1
     PATH_PAYMENT_STRICT_RECEIVE_UNDERFUNDED = -2
@@ -5630,7 +5755,7 @@ class PathPaymentStrictReceiveResultCode(IntEnum):
         packer.pack_int(self.value)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'PathPaymentStrictReceiveResultCode':
+    def unpack(cls, unpacker: Unpacker) -> "PathPaymentStrictReceiveResultCode":
         value = unpacker.unpack_int()
         return cls(value)
 
@@ -5640,7 +5765,7 @@ class PathPaymentStrictReceiveResultCode(IntEnum):
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'PathPaymentStrictReceiveResultCode':
+    def from_xdr(cls, xdr) -> "PathPaymentStrictReceiveResultCode":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -5652,22 +5777,21 @@ class PathPaymentStrictReceiveResultCode(IntEnum):
         )
 
 
-# === xdr source ============================================================
-#
-#   struct SimplePaymentResult
-#   {
-#       AccountID destination;
-#       Asset asset;
-#       int64 amount;
-#   };
-#
-# ===========================================================================
 class SimplePaymentResult:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    struct SimplePaymentResult
+    {
+        AccountID destination;
+        Asset asset;
+        int64 amount;
+    };
+    ----------------------------------------------------------------
+    """
+
     def __init__(
-            self,
-            destination: 'AccountID',
-            asset: 'Asset',
-            amount: 'Int64',
+        self, destination: "AccountID", asset: "Asset", amount: "Int64"
     ) -> None:
         self.destination = destination
         self.asset = asset
@@ -5679,15 +5803,11 @@ class SimplePaymentResult:
         self.amount.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'SimplePaymentResult':
+    def unpack(cls, unpacker: Unpacker) -> "SimplePaymentResult":
         destination = AccountID.unpack(unpacker)
         asset = Asset.unpack(unpacker)
         amount = Int64.unpack(unpacker)
-        return cls(
-            destination=destination,
-            asset=asset,
-            amount=amount,
-        )
+        return cls(destination=destination, asset=asset, amount=amount)
 
     def to_xdr(self) -> str:
         packer = Packer()
@@ -5695,7 +5815,7 @@ class SimplePaymentResult:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'SimplePaymentResult':
+    def from_xdr(cls, xdr) -> "SimplePaymentResult":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -5703,31 +5823,35 @@ class SimplePaymentResult:
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented
-        return self.destination == other.destination and self.asset == other.asset and self.amount == other.amount
+        return (
+            self.destination == other.destination
+            and self.asset == other.asset
+            and self.amount == other.amount
+        )
 
     def __str__(self):
         out = [
-            f'destination={self.destination}',
-            f'asset={self.asset}',
-            f'amount={self.amount}',
+            f"destination={self.destination}",
+            f"asset={self.asset}",
+            f"amount={self.amount}",
         ]
         return f"<SimplePaymentResult {[', '.join(out)]}>"
 
 
-# === xdr source ============================================================
-#
-#   struct
-#       {
-#           ClaimOfferAtom offers<>;
-#           SimplePaymentResult last;
-#       }
-#
-# ===========================================================================
 class PathPaymentStrictReceiveResultSuccess:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    struct
+        {
+            ClaimOfferAtom offers<>;
+            SimplePaymentResult last;
+        }
+    ----------------------------------------------------------------
+    """
+
     def __init__(
-            self,
-            offers: List['ClaimOfferAtom'],
-            last: 'SimplePaymentResult',
+        self, offers: List["ClaimOfferAtom"], last: "SimplePaymentResult"
     ) -> None:
         self.offers = offers
         self.last = last
@@ -5739,16 +5863,13 @@ class PathPaymentStrictReceiveResultSuccess:
         self.last.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'PathPaymentStrictReceiveResultSuccess':
+    def unpack(cls, unpacker: Unpacker) -> "PathPaymentStrictReceiveResultSuccess":
         length = unpacker.unpack_uint()
         offers = []
         for _ in range(length):
             offers.append(ClaimOfferAtom.unpack(unpacker))
         last = SimplePaymentResult.unpack(unpacker)
-        return cls(
-            offers=offers,
-            last=last,
-        )
+        return cls(offers=offers, last=last)
 
     def to_xdr(self) -> str:
         packer = Packer()
@@ -5756,7 +5877,7 @@ class PathPaymentStrictReceiveResultSuccess:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'PathPaymentStrictReceiveResultSuccess':
+    def from_xdr(cls, xdr) -> "PathPaymentStrictReceiveResultSuccess":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -5767,57 +5888,68 @@ class PathPaymentStrictReceiveResultSuccess:
         return self.offers == other.offers and self.last == other.last
 
     def __str__(self):
-        out = [
-            f'offers={self.offers}',
-            f'last={self.last}',
-        ]
+        out = [f"offers={self.offers}", f"last={self.last}"]
         return f"<PathPaymentStrictReceiveResultSuccess {[', '.join(out)]}>"
 
 
-# === xdr source ============================================================
-#
-#   union PathPaymentStrictReceiveResult switch (PathPaymentStrictReceiveResultCode code)
-#   {
-#   case PATH_PAYMENT_STRICT_RECEIVE_SUCCESS:
-#       struct
-#       {
-#           ClaimOfferAtom offers<>;
-#           SimplePaymentResult last;
-#       } success;
-#   case PATH_PAYMENT_STRICT_RECEIVE_NO_ISSUER:
-#       Asset noIssuer; // the asset that caused the error
-#   default:
-#       void;
-#   };
-#
-# ===========================================================================
 class PathPaymentStrictReceiveResult:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    union PathPaymentStrictReceiveResult switch (PathPaymentStrictReceiveResultCode code)
+    {
+    case PATH_PAYMENT_STRICT_RECEIVE_SUCCESS:
+        struct
+        {
+            ClaimOfferAtom offers<>;
+            SimplePaymentResult last;
+        } success;
+    case PATH_PAYMENT_STRICT_RECEIVE_NO_ISSUER:
+        Asset noIssuer; // the asset that caused the error
+    default:
+        void;
+    };
+    ----------------------------------------------------------------
+    """
+
     def __init__(
-            self,
-            code: 'PathPaymentStrictReceiveResultCode',
-            success: 'PathPaymentStrictReceiveResultSuccess' = None,
-            no_issuer: 'Asset' = None,
+        self,
+        code: "PathPaymentStrictReceiveResultCode",
+        success: "PathPaymentStrictReceiveResultSuccess" = None,
+        no_issuer: "Asset" = None,
     ) -> None:
         self.code = code
-        self.success: 'PathPaymentStrictReceiveResultSuccess' = success
-        self.no_issuer: 'Asset' = no_issuer
+        self.success: "PathPaymentStrictReceiveResultSuccess" = success
+        self.no_issuer: "Asset" = no_issuer
 
     def pack(self, packer: Packer) -> None:
         self.code.pack(packer)
-        if self.code == PathPaymentStrictReceiveResultCode.PATH_PAYMENT_STRICT_RECEIVE_SUCCESS:
+        if (
+            self.code
+            == PathPaymentStrictReceiveResultCode.PATH_PAYMENT_STRICT_RECEIVE_SUCCESS
+        ):
             self.success.pack(packer)
             return
-        if self.code == PathPaymentStrictReceiveResultCode.PATH_PAYMENT_STRICT_RECEIVE_NO_ISSUER:
+        if (
+            self.code
+            == PathPaymentStrictReceiveResultCode.PATH_PAYMENT_STRICT_RECEIVE_NO_ISSUER
+        ):
             self.no_issuer.pack(packer)
             return
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'PathPaymentStrictReceiveResult':
+    def unpack(cls, unpacker: Unpacker) -> "PathPaymentStrictReceiveResult":
         code = PathPaymentStrictReceiveResultCode.unpack(unpacker)
-        if code == PathPaymentStrictReceiveResultCode.PATH_PAYMENT_STRICT_RECEIVE_SUCCESS:
+        if (
+            code
+            == PathPaymentStrictReceiveResultCode.PATH_PAYMENT_STRICT_RECEIVE_SUCCESS
+        ):
             success = PathPaymentStrictReceiveResultSuccess.unpack(unpacker)
             return cls(code, success=success)
-        if code == PathPaymentStrictReceiveResultCode.PATH_PAYMENT_STRICT_RECEIVE_NO_ISSUER:
+        if (
+            code
+            == PathPaymentStrictReceiveResultCode.PATH_PAYMENT_STRICT_RECEIVE_NO_ISSUER
+        ):
             no_issuer = Asset.unpack(unpacker)
             return cls(code, no_issuer=no_issuer)
 
@@ -5827,7 +5959,7 @@ class PathPaymentStrictReceiveResult:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'PathPaymentStrictReceiveResult':
+    def from_xdr(cls, xdr) -> "PathPaymentStrictReceiveResult":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -5835,40 +5967,48 @@ class PathPaymentStrictReceiveResult:
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented
-        return self.code == other.code and self.success == other.success and self.no_issuer == other.no_issuer
+        return (
+            self.code == other.code
+            and self.success == other.success
+            and self.no_issuer == other.no_issuer
+        )
 
     def __str__(self):
         out = []
-        out.append(f'code={self.code}')
-        out.append(f'success={self.success}') if self.success is not None else None
-        out.append(f'no_issuer={self.no_issuer}') if self.no_issuer is not None else None
+        out.append(f"code={self.code}")
+        out.append(f"success={self.success}") if self.success is not None else None
+        out.append(
+            f"no_issuer={self.no_issuer}"
+        ) if self.no_issuer is not None else None
         return f"<PathPaymentStrictReceiveResult {[', '.join(out)]}>"
 
 
-# === xdr source ============================================================
-#
-#   enum PathPaymentStrictSendResultCode
-#   {
-#       // codes considered as "success" for the operation
-#       PATH_PAYMENT_STRICT_SEND_SUCCESS = 0, // success
-#
-#       // codes considered as "failure" for the operation
-#       PATH_PAYMENT_STRICT_SEND_MALFORMED = -1,          // bad input
-#       PATH_PAYMENT_STRICT_SEND_UNDERFUNDED = -2,        // not enough funds in source account
-#       PATH_PAYMENT_STRICT_SEND_SRC_NO_TRUST = -3,       // no trust line on source account
-#       PATH_PAYMENT_STRICT_SEND_SRC_NOT_AUTHORIZED = -4, // source not authorized to transfer
-#       PATH_PAYMENT_STRICT_SEND_NO_DESTINATION = -5,     // destination account does not exist
-#       PATH_PAYMENT_STRICT_SEND_NO_TRUST = -6,           // dest missing a trust line for asset
-#       PATH_PAYMENT_STRICT_SEND_NOT_AUTHORIZED = -7,     // dest not authorized to hold asset
-#       PATH_PAYMENT_STRICT_SEND_LINE_FULL = -8,          // dest would go above their limit
-#       PATH_PAYMENT_STRICT_SEND_NO_ISSUER = -9,          // missing issuer on one asset
-#       PATH_PAYMENT_STRICT_SEND_TOO_FEW_OFFERS = -10,    // not enough offers to satisfy path
-#       PATH_PAYMENT_STRICT_SEND_OFFER_CROSS_SELF = -11,  // would cross one of its own offers
-#       PATH_PAYMENT_STRICT_SEND_UNDER_DESTMIN = -12      // could not satisfy destMin
-#   };
-#
-# ===========================================================================
 class PathPaymentStrictSendResultCode(IntEnum):
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    enum PathPaymentStrictSendResultCode
+    {
+        // codes considered as "success" for the operation
+        PATH_PAYMENT_STRICT_SEND_SUCCESS = 0, // success
+
+        // codes considered as "failure" for the operation
+        PATH_PAYMENT_STRICT_SEND_MALFORMED = -1,          // bad input
+        PATH_PAYMENT_STRICT_SEND_UNDERFUNDED = -2,        // not enough funds in source account
+        PATH_PAYMENT_STRICT_SEND_SRC_NO_TRUST = -3,       // no trust line on source account
+        PATH_PAYMENT_STRICT_SEND_SRC_NOT_AUTHORIZED = -4, // source not authorized to transfer
+        PATH_PAYMENT_STRICT_SEND_NO_DESTINATION = -5,     // destination account does not exist
+        PATH_PAYMENT_STRICT_SEND_NO_TRUST = -6,           // dest missing a trust line for asset
+        PATH_PAYMENT_STRICT_SEND_NOT_AUTHORIZED = -7,     // dest not authorized to hold asset
+        PATH_PAYMENT_STRICT_SEND_LINE_FULL = -8,          // dest would go above their limit
+        PATH_PAYMENT_STRICT_SEND_NO_ISSUER = -9,          // missing issuer on one asset
+        PATH_PAYMENT_STRICT_SEND_TOO_FEW_OFFERS = -10,    // not enough offers to satisfy path
+        PATH_PAYMENT_STRICT_SEND_OFFER_CROSS_SELF = -11,  // would cross one of its own offers
+        PATH_PAYMENT_STRICT_SEND_UNDER_DESTMIN = -12      // could not satisfy destMin
+    };
+    ----------------------------------------------------------------
+    """
+
     PATH_PAYMENT_STRICT_SEND_SUCCESS = 0
     PATH_PAYMENT_STRICT_SEND_MALFORMED = -1
     PATH_PAYMENT_STRICT_SEND_UNDERFUNDED = -2
@@ -5887,7 +6027,7 @@ class PathPaymentStrictSendResultCode(IntEnum):
         packer.pack_int(self.value)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'PathPaymentStrictSendResultCode':
+    def unpack(cls, unpacker: Unpacker) -> "PathPaymentStrictSendResultCode":
         value = unpacker.unpack_int()
         return cls(value)
 
@@ -5897,7 +6037,7 @@ class PathPaymentStrictSendResultCode(IntEnum):
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'PathPaymentStrictSendResultCode':
+    def from_xdr(cls, xdr) -> "PathPaymentStrictSendResultCode":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -5909,20 +6049,20 @@ class PathPaymentStrictSendResultCode(IntEnum):
         )
 
 
-# === xdr source ============================================================
-#
-#   struct
-#       {
-#           ClaimOfferAtom offers<>;
-#           SimplePaymentResult last;
-#       }
-#
-# ===========================================================================
 class PathPaymentStrictSendResultSuccess:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    struct
+        {
+            ClaimOfferAtom offers<>;
+            SimplePaymentResult last;
+        }
+    ----------------------------------------------------------------
+    """
+
     def __init__(
-            self,
-            offers: List['ClaimOfferAtom'],
-            last: 'SimplePaymentResult',
+        self, offers: List["ClaimOfferAtom"], last: "SimplePaymentResult"
     ) -> None:
         self.offers = offers
         self.last = last
@@ -5934,16 +6074,13 @@ class PathPaymentStrictSendResultSuccess:
         self.last.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'PathPaymentStrictSendResultSuccess':
+    def unpack(cls, unpacker: Unpacker) -> "PathPaymentStrictSendResultSuccess":
         length = unpacker.unpack_uint()
         offers = []
         for _ in range(length):
             offers.append(ClaimOfferAtom.unpack(unpacker))
         last = SimplePaymentResult.unpack(unpacker)
-        return cls(
-            offers=offers,
-            last=last,
-        )
+        return cls(offers=offers, last=last)
 
     def to_xdr(self) -> str:
         packer = Packer()
@@ -5951,7 +6088,7 @@ class PathPaymentStrictSendResultSuccess:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'PathPaymentStrictSendResultSuccess':
+    def from_xdr(cls, xdr) -> "PathPaymentStrictSendResultSuccess":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -5962,52 +6099,57 @@ class PathPaymentStrictSendResultSuccess:
         return self.offers == other.offers and self.last == other.last
 
     def __str__(self):
-        out = [
-            f'offers={self.offers}',
-            f'last={self.last}',
-        ]
+        out = [f"offers={self.offers}", f"last={self.last}"]
         return f"<PathPaymentStrictSendResultSuccess {[', '.join(out)]}>"
 
 
-# === xdr source ============================================================
-#
-#   union PathPaymentStrictSendResult switch (PathPaymentStrictSendResultCode code)
-#   {
-#   case PATH_PAYMENT_STRICT_SEND_SUCCESS:
-#       struct
-#       {
-#           ClaimOfferAtom offers<>;
-#           SimplePaymentResult last;
-#       } success;
-#   case PATH_PAYMENT_STRICT_SEND_NO_ISSUER:
-#       Asset noIssuer; // the asset that caused the error
-#   default:
-#       void;
-#   };
-#
-# ===========================================================================
 class PathPaymentStrictSendResult:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    union PathPaymentStrictSendResult switch (PathPaymentStrictSendResultCode code)
+    {
+    case PATH_PAYMENT_STRICT_SEND_SUCCESS:
+        struct
+        {
+            ClaimOfferAtom offers<>;
+            SimplePaymentResult last;
+        } success;
+    case PATH_PAYMENT_STRICT_SEND_NO_ISSUER:
+        Asset noIssuer; // the asset that caused the error
+    default:
+        void;
+    };
+    ----------------------------------------------------------------
+    """
+
     def __init__(
-            self,
-            code: 'PathPaymentStrictSendResultCode',
-            success: 'PathPaymentStrictSendResultSuccess' = None,
-            no_issuer: 'Asset' = None,
+        self,
+        code: "PathPaymentStrictSendResultCode",
+        success: "PathPaymentStrictSendResultSuccess" = None,
+        no_issuer: "Asset" = None,
     ) -> None:
         self.code = code
-        self.success: 'PathPaymentStrictSendResultSuccess' = success
-        self.no_issuer: 'Asset' = no_issuer
+        self.success: "PathPaymentStrictSendResultSuccess" = success
+        self.no_issuer: "Asset" = no_issuer
 
     def pack(self, packer: Packer) -> None:
         self.code.pack(packer)
-        if self.code == PathPaymentStrictSendResultCode.PATH_PAYMENT_STRICT_SEND_SUCCESS:
+        if (
+            self.code
+            == PathPaymentStrictSendResultCode.PATH_PAYMENT_STRICT_SEND_SUCCESS
+        ):
             self.success.pack(packer)
             return
-        if self.code == PathPaymentStrictSendResultCode.PATH_PAYMENT_STRICT_SEND_NO_ISSUER:
+        if (
+            self.code
+            == PathPaymentStrictSendResultCode.PATH_PAYMENT_STRICT_SEND_NO_ISSUER
+        ):
             self.no_issuer.pack(packer)
             return
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'PathPaymentStrictSendResult':
+    def unpack(cls, unpacker: Unpacker) -> "PathPaymentStrictSendResult":
         code = PathPaymentStrictSendResultCode.unpack(unpacker)
         if code == PathPaymentStrictSendResultCode.PATH_PAYMENT_STRICT_SEND_SUCCESS:
             success = PathPaymentStrictSendResultSuccess.unpack(unpacker)
@@ -6022,7 +6164,7 @@ class PathPaymentStrictSendResult:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'PathPaymentStrictSendResult':
+    def from_xdr(cls, xdr) -> "PathPaymentStrictSendResult":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -6030,43 +6172,51 @@ class PathPaymentStrictSendResult:
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented
-        return self.code == other.code and self.success == other.success and self.no_issuer == other.no_issuer
+        return (
+            self.code == other.code
+            and self.success == other.success
+            and self.no_issuer == other.no_issuer
+        )
 
     def __str__(self):
         out = []
-        out.append(f'code={self.code}')
-        out.append(f'success={self.success}') if self.success is not None else None
-        out.append(f'no_issuer={self.no_issuer}') if self.no_issuer is not None else None
+        out.append(f"code={self.code}")
+        out.append(f"success={self.success}") if self.success is not None else None
+        out.append(
+            f"no_issuer={self.no_issuer}"
+        ) if self.no_issuer is not None else None
         return f"<PathPaymentStrictSendResult {[', '.join(out)]}>"
 
 
-# === xdr source ============================================================
-#
-#   enum ManageSellOfferResultCode
-#   {
-#       // codes considered as "success" for the operation
-#       MANAGE_SELL_OFFER_SUCCESS = 0,
-#
-#       // codes considered as "failure" for the operation
-#       MANAGE_SELL_OFFER_MALFORMED = -1,     // generated offer would be invalid
-#       MANAGE_SELL_OFFER_SELL_NO_TRUST = -2, // no trust line for what we're selling
-#       MANAGE_SELL_OFFER_BUY_NO_TRUST = -3,  // no trust line for what we're buying
-#       MANAGE_SELL_OFFER_SELL_NOT_AUTHORIZED = -4, // not authorized to sell
-#       MANAGE_SELL_OFFER_BUY_NOT_AUTHORIZED = -5,  // not authorized to buy
-#       MANAGE_SELL_OFFER_LINE_FULL = -6,      // can't receive more of what it's buying
-#       MANAGE_SELL_OFFER_UNDERFUNDED = -7,    // doesn't hold what it's trying to sell
-#       MANAGE_SELL_OFFER_CROSS_SELF = -8,     // would cross an offer from the same user
-#       MANAGE_SELL_OFFER_SELL_NO_ISSUER = -9, // no issuer for what we're selling
-#       MANAGE_SELL_OFFER_BUY_NO_ISSUER = -10, // no issuer for what we're buying
-#
-#       // update errors
-#       MANAGE_SELL_OFFER_NOT_FOUND = -11, // offerID does not match an existing offer
-#
-#       MANAGE_SELL_OFFER_LOW_RESERVE = -12 // not enough funds to create a new Offer
-#   };
-#
-# ===========================================================================
 class ManageSellOfferResultCode(IntEnum):
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    enum ManageSellOfferResultCode
+    {
+        // codes considered as "success" for the operation
+        MANAGE_SELL_OFFER_SUCCESS = 0,
+
+        // codes considered as "failure" for the operation
+        MANAGE_SELL_OFFER_MALFORMED = -1,     // generated offer would be invalid
+        MANAGE_SELL_OFFER_SELL_NO_TRUST = -2, // no trust line for what we're selling
+        MANAGE_SELL_OFFER_BUY_NO_TRUST = -3,  // no trust line for what we're buying
+        MANAGE_SELL_OFFER_SELL_NOT_AUTHORIZED = -4, // not authorized to sell
+        MANAGE_SELL_OFFER_BUY_NOT_AUTHORIZED = -5,  // not authorized to buy
+        MANAGE_SELL_OFFER_LINE_FULL = -6,      // can't receive more of what it's buying
+        MANAGE_SELL_OFFER_UNDERFUNDED = -7,    // doesn't hold what it's trying to sell
+        MANAGE_SELL_OFFER_CROSS_SELF = -8,     // would cross an offer from the same user
+        MANAGE_SELL_OFFER_SELL_NO_ISSUER = -9, // no issuer for what we're selling
+        MANAGE_SELL_OFFER_BUY_NO_ISSUER = -10, // no issuer for what we're buying
+
+        // update errors
+        MANAGE_SELL_OFFER_NOT_FOUND = -11, // offerID does not match an existing offer
+
+        MANAGE_SELL_OFFER_LOW_RESERVE = -12 // not enough funds to create a new Offer
+    };
+    ----------------------------------------------------------------
+    """
+
     MANAGE_SELL_OFFER_SUCCESS = 0
     MANAGE_SELL_OFFER_MALFORMED = -1
     MANAGE_SELL_OFFER_SELL_NO_TRUST = -2
@@ -6085,7 +6235,7 @@ class ManageSellOfferResultCode(IntEnum):
         packer.pack_int(self.value)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'ManageSellOfferResultCode':
+    def unpack(cls, unpacker: Unpacker) -> "ManageSellOfferResultCode":
         value = unpacker.unpack_int()
         return cls(value)
 
@@ -6095,7 +6245,7 @@ class ManageSellOfferResultCode(IntEnum):
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'ManageSellOfferResultCode':
+    def from_xdr(cls, xdr) -> "ManageSellOfferResultCode":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -6107,17 +6257,19 @@ class ManageSellOfferResultCode(IntEnum):
         )
 
 
-# === xdr source ============================================================
-#
-#   enum ManageOfferEffect
-#   {
-#       MANAGE_OFFER_CREATED = 0,
-#       MANAGE_OFFER_UPDATED = 1,
-#       MANAGE_OFFER_DELETED = 2
-#   };
-#
-# ===========================================================================
 class ManageOfferEffect(IntEnum):
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    enum ManageOfferEffect
+    {
+        MANAGE_OFFER_CREATED = 0,
+        MANAGE_OFFER_UPDATED = 1,
+        MANAGE_OFFER_DELETED = 2
+    };
+    ----------------------------------------------------------------
+    """
+
     MANAGE_OFFER_CREATED = 0
     MANAGE_OFFER_UPDATED = 1
     MANAGE_OFFER_DELETED = 2
@@ -6126,7 +6278,7 @@ class ManageOfferEffect(IntEnum):
         packer.pack_int(self.value)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'ManageOfferEffect':
+    def unpack(cls, unpacker: Unpacker) -> "ManageOfferEffect":
         value = unpacker.unpack_int()
         return cls(value)
 
@@ -6136,7 +6288,7 @@ class ManageOfferEffect(IntEnum):
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'ManageOfferEffect':
+    def from_xdr(cls, xdr) -> "ManageOfferEffect":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -6148,26 +6300,24 @@ class ManageOfferEffect(IntEnum):
         )
 
 
-# === xdr source ============================================================
-#
-#   union switch (ManageOfferEffect effect)
-#       {
-#       case MANAGE_OFFER_CREATED:
-#       case MANAGE_OFFER_UPDATED:
-#           OfferEntry offer;
-#       default:
-#           void;
-#       }
-#
-# ===========================================================================
 class ManageOfferSuccessResultOffer:
-    def __init__(
-            self,
-            effect: 'ManageOfferEffect',
-            offer: 'OfferEntry' = None,
-    ) -> None:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    union switch (ManageOfferEffect effect)
+        {
+        case MANAGE_OFFER_CREATED:
+        case MANAGE_OFFER_UPDATED:
+            OfferEntry offer;
+        default:
+            void;
+        }
+    ----------------------------------------------------------------
+    """
+
+    def __init__(self, effect: "ManageOfferEffect", offer: "OfferEntry" = None) -> None:
         self.effect = effect
-        self.offer: 'OfferEntry' = offer
+        self.offer: "OfferEntry" = offer
 
     def pack(self, packer: Packer) -> None:
         self.effect.pack(packer)
@@ -6177,7 +6327,7 @@ class ManageOfferSuccessResultOffer:
                 return
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'ManageOfferSuccessResultOffer':
+    def unpack(cls, unpacker: Unpacker) -> "ManageOfferSuccessResultOffer":
         effect = ManageOfferEffect.unpack(unpacker)
         if effect == ManageOfferEffect.MANAGE_OFFER_CREATED:
             if effect == ManageOfferEffect.MANAGE_OFFER_UPDATED:
@@ -6190,7 +6340,7 @@ class ManageOfferSuccessResultOffer:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'ManageOfferSuccessResultOffer':
+    def from_xdr(cls, xdr) -> "ManageOfferSuccessResultOffer":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -6202,35 +6352,37 @@ class ManageOfferSuccessResultOffer:
 
     def __str__(self):
         out = []
-        out.append(f'effect={self.effect}')
-        out.append(f'offer={self.offer}') if self.offer is not None else None
+        out.append(f"effect={self.effect}")
+        out.append(f"offer={self.offer}") if self.offer is not None else None
         return f"<ManageOfferSuccessResultOffer {[', '.join(out)]}>"
 
 
-# === xdr source ============================================================
-#
-#   struct ManageOfferSuccessResult
-#   {
-#       // offers that got claimed while creating this offer
-#       ClaimOfferAtom offersClaimed<>;
-#
-#       union switch (ManageOfferEffect effect)
-#       {
-#       case MANAGE_OFFER_CREATED:
-#       case MANAGE_OFFER_UPDATED:
-#           OfferEntry offer;
-#       default:
-#           void;
-#       }
-#       offer;
-#   };
-#
-# ===========================================================================
 class ManageOfferSuccessResult:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    struct ManageOfferSuccessResult
+    {
+        // offers that got claimed while creating this offer
+        ClaimOfferAtom offersClaimed<>;
+
+        union switch (ManageOfferEffect effect)
+        {
+        case MANAGE_OFFER_CREATED:
+        case MANAGE_OFFER_UPDATED:
+            OfferEntry offer;
+        default:
+            void;
+        }
+        offer;
+    };
+    ----------------------------------------------------------------
+    """
+
     def __init__(
-            self,
-            offers_claimed: List['ClaimOfferAtom'],
-            offer: 'ManageOfferSuccessResultOffer',
+        self,
+        offers_claimed: List["ClaimOfferAtom"],
+        offer: "ManageOfferSuccessResultOffer",
     ) -> None:
         self.offers_claimed = offers_claimed
         self.offer = offer
@@ -6242,16 +6394,13 @@ class ManageOfferSuccessResult:
         self.offer.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'ManageOfferSuccessResult':
+    def unpack(cls, unpacker: Unpacker) -> "ManageOfferSuccessResult":
         length = unpacker.unpack_uint()
         offers_claimed = []
         for _ in range(length):
             offers_claimed.append(ClaimOfferAtom.unpack(unpacker))
         offer = ManageOfferSuccessResultOffer.unpack(unpacker)
-        return cls(
-            offers_claimed=offers_claimed,
-            offer=offer,
-        )
+        return cls(offers_claimed=offers_claimed, offer=offer)
 
     def to_xdr(self) -> str:
         packer = Packer()
@@ -6259,7 +6408,7 @@ class ManageOfferSuccessResult:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'ManageOfferSuccessResult':
+    def from_xdr(cls, xdr) -> "ManageOfferSuccessResult":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -6270,32 +6419,31 @@ class ManageOfferSuccessResult:
         return self.offers_claimed == other.offers_claimed and self.offer == other.offer
 
     def __str__(self):
-        out = [
-            f'offers_claimed={self.offers_claimed}',
-            f'offer={self.offer}',
-        ]
+        out = [f"offers_claimed={self.offers_claimed}", f"offer={self.offer}"]
         return f"<ManageOfferSuccessResult {[', '.join(out)]}>"
 
 
-# === xdr source ============================================================
-#
-#   union ManageSellOfferResult switch (ManageSellOfferResultCode code)
-#   {
-#   case MANAGE_SELL_OFFER_SUCCESS:
-#       ManageOfferSuccessResult success;
-#   default:
-#       void;
-#   };
-#
-# ===========================================================================
 class ManageSellOfferResult:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    union ManageSellOfferResult switch (ManageSellOfferResultCode code)
+    {
+    case MANAGE_SELL_OFFER_SUCCESS:
+        ManageOfferSuccessResult success;
+    default:
+        void;
+    };
+    ----------------------------------------------------------------
+    """
+
     def __init__(
-            self,
-            code: 'ManageSellOfferResultCode',
-            success: 'ManageOfferSuccessResult' = None,
+        self,
+        code: "ManageSellOfferResultCode",
+        success: "ManageOfferSuccessResult" = None,
     ) -> None:
         self.code = code
-        self.success: 'ManageOfferSuccessResult' = success
+        self.success: "ManageOfferSuccessResult" = success
 
     def pack(self, packer: Packer) -> None:
         self.code.pack(packer)
@@ -6304,7 +6452,7 @@ class ManageSellOfferResult:
             return
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'ManageSellOfferResult':
+    def unpack(cls, unpacker: Unpacker) -> "ManageSellOfferResult":
         code = ManageSellOfferResultCode.unpack(unpacker)
         if code == ManageSellOfferResultCode.MANAGE_SELL_OFFER_SUCCESS:
             success = ManageOfferSuccessResult.unpack(unpacker)
@@ -6316,7 +6464,7 @@ class ManageSellOfferResult:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'ManageSellOfferResult':
+    def from_xdr(cls, xdr) -> "ManageSellOfferResult":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -6328,38 +6476,40 @@ class ManageSellOfferResult:
 
     def __str__(self):
         out = []
-        out.append(f'code={self.code}')
-        out.append(f'success={self.success}') if self.success is not None else None
+        out.append(f"code={self.code}")
+        out.append(f"success={self.success}") if self.success is not None else None
         return f"<ManageSellOfferResult {[', '.join(out)]}>"
 
 
-# === xdr source ============================================================
-#
-#   enum ManageBuyOfferResultCode
-#   {
-#       // codes considered as "success" for the operation
-#       MANAGE_BUY_OFFER_SUCCESS = 0,
-#
-#       // codes considered as "failure" for the operation
-#       MANAGE_BUY_OFFER_MALFORMED = -1,     // generated offer would be invalid
-#       MANAGE_BUY_OFFER_SELL_NO_TRUST = -2, // no trust line for what we're selling
-#       MANAGE_BUY_OFFER_BUY_NO_TRUST = -3,  // no trust line for what we're buying
-#       MANAGE_BUY_OFFER_SELL_NOT_AUTHORIZED = -4, // not authorized to sell
-#       MANAGE_BUY_OFFER_BUY_NOT_AUTHORIZED = -5,  // not authorized to buy
-#       MANAGE_BUY_OFFER_LINE_FULL = -6,      // can't receive more of what it's buying
-#       MANAGE_BUY_OFFER_UNDERFUNDED = -7,    // doesn't hold what it's trying to sell
-#       MANAGE_BUY_OFFER_CROSS_SELF = -8,     // would cross an offer from the same user
-#       MANAGE_BUY_OFFER_SELL_NO_ISSUER = -9, // no issuer for what we're selling
-#       MANAGE_BUY_OFFER_BUY_NO_ISSUER = -10, // no issuer for what we're buying
-#
-#       // update errors
-#       MANAGE_BUY_OFFER_NOT_FOUND = -11, // offerID does not match an existing offer
-#
-#       MANAGE_BUY_OFFER_LOW_RESERVE = -12 // not enough funds to create a new Offer
-#   };
-#
-# ===========================================================================
 class ManageBuyOfferResultCode(IntEnum):
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    enum ManageBuyOfferResultCode
+    {
+        // codes considered as "success" for the operation
+        MANAGE_BUY_OFFER_SUCCESS = 0,
+
+        // codes considered as "failure" for the operation
+        MANAGE_BUY_OFFER_MALFORMED = -1,     // generated offer would be invalid
+        MANAGE_BUY_OFFER_SELL_NO_TRUST = -2, // no trust line for what we're selling
+        MANAGE_BUY_OFFER_BUY_NO_TRUST = -3,  // no trust line for what we're buying
+        MANAGE_BUY_OFFER_SELL_NOT_AUTHORIZED = -4, // not authorized to sell
+        MANAGE_BUY_OFFER_BUY_NOT_AUTHORIZED = -5,  // not authorized to buy
+        MANAGE_BUY_OFFER_LINE_FULL = -6,      // can't receive more of what it's buying
+        MANAGE_BUY_OFFER_UNDERFUNDED = -7,    // doesn't hold what it's trying to sell
+        MANAGE_BUY_OFFER_CROSS_SELF = -8,     // would cross an offer from the same user
+        MANAGE_BUY_OFFER_SELL_NO_ISSUER = -9, // no issuer for what we're selling
+        MANAGE_BUY_OFFER_BUY_NO_ISSUER = -10, // no issuer for what we're buying
+
+        // update errors
+        MANAGE_BUY_OFFER_NOT_FOUND = -11, // offerID does not match an existing offer
+
+        MANAGE_BUY_OFFER_LOW_RESERVE = -12 // not enough funds to create a new Offer
+    };
+    ----------------------------------------------------------------
+    """
+
     MANAGE_BUY_OFFER_SUCCESS = 0
     MANAGE_BUY_OFFER_MALFORMED = -1
     MANAGE_BUY_OFFER_SELL_NO_TRUST = -2
@@ -6378,7 +6528,7 @@ class ManageBuyOfferResultCode(IntEnum):
         packer.pack_int(self.value)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'ManageBuyOfferResultCode':
+    def unpack(cls, unpacker: Unpacker) -> "ManageBuyOfferResultCode":
         value = unpacker.unpack_int()
         return cls(value)
 
@@ -6388,7 +6538,7 @@ class ManageBuyOfferResultCode(IntEnum):
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'ManageBuyOfferResultCode':
+    def from_xdr(cls, xdr) -> "ManageBuyOfferResultCode":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -6400,25 +6550,27 @@ class ManageBuyOfferResultCode(IntEnum):
         )
 
 
-# === xdr source ============================================================
-#
-#   union ManageBuyOfferResult switch (ManageBuyOfferResultCode code)
-#   {
-#   case MANAGE_BUY_OFFER_SUCCESS:
-#       ManageOfferSuccessResult success;
-#   default:
-#       void;
-#   };
-#
-# ===========================================================================
 class ManageBuyOfferResult:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    union ManageBuyOfferResult switch (ManageBuyOfferResultCode code)
+    {
+    case MANAGE_BUY_OFFER_SUCCESS:
+        ManageOfferSuccessResult success;
+    default:
+        void;
+    };
+    ----------------------------------------------------------------
+    """
+
     def __init__(
-            self,
-            code: 'ManageBuyOfferResultCode',
-            success: 'ManageOfferSuccessResult' = None,
+        self,
+        code: "ManageBuyOfferResultCode",
+        success: "ManageOfferSuccessResult" = None,
     ) -> None:
         self.code = code
-        self.success: 'ManageOfferSuccessResult' = success
+        self.success: "ManageOfferSuccessResult" = success
 
     def pack(self, packer: Packer) -> None:
         self.code.pack(packer)
@@ -6427,7 +6579,7 @@ class ManageBuyOfferResult:
             return
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'ManageBuyOfferResult':
+    def unpack(cls, unpacker: Unpacker) -> "ManageBuyOfferResult":
         code = ManageBuyOfferResultCode.unpack(unpacker)
         if code == ManageBuyOfferResultCode.MANAGE_BUY_OFFER_SUCCESS:
             success = ManageOfferSuccessResult.unpack(unpacker)
@@ -6439,7 +6591,7 @@ class ManageBuyOfferResult:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'ManageBuyOfferResult':
+    def from_xdr(cls, xdr) -> "ManageBuyOfferResult":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -6451,31 +6603,33 @@ class ManageBuyOfferResult:
 
     def __str__(self):
         out = []
-        out.append(f'code={self.code}')
-        out.append(f'success={self.success}') if self.success is not None else None
+        out.append(f"code={self.code}")
+        out.append(f"success={self.success}") if self.success is not None else None
         return f"<ManageBuyOfferResult {[', '.join(out)]}>"
 
 
-# === xdr source ============================================================
-#
-#   enum SetOptionsResultCode
-#   {
-#       // codes considered as "success" for the operation
-#       SET_OPTIONS_SUCCESS = 0,
-#       // codes considered as "failure" for the operation
-#       SET_OPTIONS_LOW_RESERVE = -1,      // not enough funds to add a signer
-#       SET_OPTIONS_TOO_MANY_SIGNERS = -2, // max number of signers already reached
-#       SET_OPTIONS_BAD_FLAGS = -3,        // invalid combination of clear/set flags
-#       SET_OPTIONS_INVALID_INFLATION = -4,      // inflation account does not exist
-#       SET_OPTIONS_CANT_CHANGE = -5,            // can no longer change this option
-#       SET_OPTIONS_UNKNOWN_FLAG = -6,           // can't set an unknown flag
-#       SET_OPTIONS_THRESHOLD_OUT_OF_RANGE = -7, // bad value for weight/threshold
-#       SET_OPTIONS_BAD_SIGNER = -8,             // signer cannot be masterkey
-#       SET_OPTIONS_INVALID_HOME_DOMAIN = -9     // malformed home domain
-#   };
-#
-# ===========================================================================
 class SetOptionsResultCode(IntEnum):
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    enum SetOptionsResultCode
+    {
+        // codes considered as "success" for the operation
+        SET_OPTIONS_SUCCESS = 0,
+        // codes considered as "failure" for the operation
+        SET_OPTIONS_LOW_RESERVE = -1,      // not enough funds to add a signer
+        SET_OPTIONS_TOO_MANY_SIGNERS = -2, // max number of signers already reached
+        SET_OPTIONS_BAD_FLAGS = -3,        // invalid combination of clear/set flags
+        SET_OPTIONS_INVALID_INFLATION = -4,      // inflation account does not exist
+        SET_OPTIONS_CANT_CHANGE = -5,            // can no longer change this option
+        SET_OPTIONS_UNKNOWN_FLAG = -6,           // can't set an unknown flag
+        SET_OPTIONS_THRESHOLD_OUT_OF_RANGE = -7, // bad value for weight/threshold
+        SET_OPTIONS_BAD_SIGNER = -8,             // signer cannot be masterkey
+        SET_OPTIONS_INVALID_HOME_DOMAIN = -9     // malformed home domain
+    };
+    ----------------------------------------------------------------
+    """
+
     SET_OPTIONS_SUCCESS = 0
     SET_OPTIONS_LOW_RESERVE = -1
     SET_OPTIONS_TOO_MANY_SIGNERS = -2
@@ -6491,7 +6645,7 @@ class SetOptionsResultCode(IntEnum):
         packer.pack_int(self.value)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'SetOptionsResultCode':
+    def unpack(cls, unpacker: Unpacker) -> "SetOptionsResultCode":
         value = unpacker.unpack_int()
         return cls(value)
 
@@ -6501,7 +6655,7 @@ class SetOptionsResultCode(IntEnum):
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'SetOptionsResultCode':
+    def from_xdr(cls, xdr) -> "SetOptionsResultCode":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -6513,22 +6667,21 @@ class SetOptionsResultCode(IntEnum):
         )
 
 
-# === xdr source ============================================================
-#
-#   union SetOptionsResult switch (SetOptionsResultCode code)
-#   {
-#   case SET_OPTIONS_SUCCESS:
-#       void;
-#   default:
-#       void;
-#   };
-#
-# ===========================================================================
 class SetOptionsResult:
-    def __init__(
-            self,
-            code: 'SetOptionsResultCode',
-    ) -> None:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    union SetOptionsResult switch (SetOptionsResultCode code)
+    {
+    case SET_OPTIONS_SUCCESS:
+        void;
+    default:
+        void;
+    };
+    ----------------------------------------------------------------
+    """
+
+    def __init__(self, code: "SetOptionsResultCode") -> None:
         self.code = code
 
     def pack(self, packer: Packer) -> None:
@@ -6537,7 +6690,7 @@ class SetOptionsResult:
             return
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'SetOptionsResult':
+    def unpack(cls, unpacker: Unpacker) -> "SetOptionsResult":
         code = SetOptionsResultCode.unpack(unpacker)
         if code == SetOptionsResultCode.SET_OPTIONS_SUCCESS:
             return cls(code)
@@ -6548,7 +6701,7 @@ class SetOptionsResult:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'SetOptionsResult':
+    def from_xdr(cls, xdr) -> "SetOptionsResult":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -6560,28 +6713,30 @@ class SetOptionsResult:
 
     def __str__(self):
         out = []
-        out.append(f'code={self.code}')
+        out.append(f"code={self.code}")
         return f"<SetOptionsResult {[', '.join(out)]}>"
 
 
-# === xdr source ============================================================
-#
-#   enum ChangeTrustResultCode
-#   {
-#       // codes considered as "success" for the operation
-#       CHANGE_TRUST_SUCCESS = 0,
-#       // codes considered as "failure" for the operation
-#       CHANGE_TRUST_MALFORMED = -1,     // bad input
-#       CHANGE_TRUST_NO_ISSUER = -2,     // could not find issuer
-#       CHANGE_TRUST_INVALID_LIMIT = -3, // cannot drop limit below balance
-#                                        // cannot create with a limit of 0
-#       CHANGE_TRUST_LOW_RESERVE =
-#           -4, // not enough funds to create a new trust line,
-#       CHANGE_TRUST_SELF_NOT_ALLOWED = -5  // trusting self is not allowed
-#   };
-#
-# ===========================================================================
 class ChangeTrustResultCode(IntEnum):
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    enum ChangeTrustResultCode
+    {
+        // codes considered as "success" for the operation
+        CHANGE_TRUST_SUCCESS = 0,
+        // codes considered as "failure" for the operation
+        CHANGE_TRUST_MALFORMED = -1,     // bad input
+        CHANGE_TRUST_NO_ISSUER = -2,     // could not find issuer
+        CHANGE_TRUST_INVALID_LIMIT = -3, // cannot drop limit below balance
+                                         // cannot create with a limit of 0
+        CHANGE_TRUST_LOW_RESERVE =
+            -4, // not enough funds to create a new trust line,
+        CHANGE_TRUST_SELF_NOT_ALLOWED = -5  // trusting self is not allowed
+    };
+    ----------------------------------------------------------------
+    """
+
     CHANGE_TRUST_SUCCESS = 0
     CHANGE_TRUST_MALFORMED = -1
     CHANGE_TRUST_NO_ISSUER = -2
@@ -6593,7 +6748,7 @@ class ChangeTrustResultCode(IntEnum):
         packer.pack_int(self.value)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'ChangeTrustResultCode':
+    def unpack(cls, unpacker: Unpacker) -> "ChangeTrustResultCode":
         value = unpacker.unpack_int()
         return cls(value)
 
@@ -6603,7 +6758,7 @@ class ChangeTrustResultCode(IntEnum):
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'ChangeTrustResultCode':
+    def from_xdr(cls, xdr) -> "ChangeTrustResultCode":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -6615,22 +6770,21 @@ class ChangeTrustResultCode(IntEnum):
         )
 
 
-# === xdr source ============================================================
-#
-#   union ChangeTrustResult switch (ChangeTrustResultCode code)
-#   {
-#   case CHANGE_TRUST_SUCCESS:
-#       void;
-#   default:
-#       void;
-#   };
-#
-# ===========================================================================
 class ChangeTrustResult:
-    def __init__(
-            self,
-            code: 'ChangeTrustResultCode',
-    ) -> None:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    union ChangeTrustResult switch (ChangeTrustResultCode code)
+    {
+    case CHANGE_TRUST_SUCCESS:
+        void;
+    default:
+        void;
+    };
+    ----------------------------------------------------------------
+    """
+
+    def __init__(self, code: "ChangeTrustResultCode") -> None:
         self.code = code
 
     def pack(self, packer: Packer) -> None:
@@ -6639,7 +6793,7 @@ class ChangeTrustResult:
             return
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'ChangeTrustResult':
+    def unpack(cls, unpacker: Unpacker) -> "ChangeTrustResult":
         code = ChangeTrustResultCode.unpack(unpacker)
         if code == ChangeTrustResultCode.CHANGE_TRUST_SUCCESS:
             return cls(code)
@@ -6650,7 +6804,7 @@ class ChangeTrustResult:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'ChangeTrustResult':
+    def from_xdr(cls, xdr) -> "ChangeTrustResult":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -6662,27 +6816,29 @@ class ChangeTrustResult:
 
     def __str__(self):
         out = []
-        out.append(f'code={self.code}')
+        out.append(f"code={self.code}")
         return f"<ChangeTrustResult {[', '.join(out)]}>"
 
 
-# === xdr source ============================================================
-#
-#   enum AllowTrustResultCode
-#   {
-#       // codes considered as "success" for the operation
-#       ALLOW_TRUST_SUCCESS = 0,
-#       // codes considered as "failure" for the operation
-#       ALLOW_TRUST_MALFORMED = -1,     // asset is not ASSET_TYPE_ALPHANUM
-#       ALLOW_TRUST_NO_TRUST_LINE = -2, // trustor does not have a trustline
-#                                       // source account does not require trust
-#       ALLOW_TRUST_TRUST_NOT_REQUIRED = -3,
-#       ALLOW_TRUST_CANT_REVOKE = -4,     // source account can't revoke trust,
-#       ALLOW_TRUST_SELF_NOT_ALLOWED = -5 // trusting self is not allowed
-#   };
-#
-# ===========================================================================
 class AllowTrustResultCode(IntEnum):
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    enum AllowTrustResultCode
+    {
+        // codes considered as "success" for the operation
+        ALLOW_TRUST_SUCCESS = 0,
+        // codes considered as "failure" for the operation
+        ALLOW_TRUST_MALFORMED = -1,     // asset is not ASSET_TYPE_ALPHANUM
+        ALLOW_TRUST_NO_TRUST_LINE = -2, // trustor does not have a trustline
+                                        // source account does not require trust
+        ALLOW_TRUST_TRUST_NOT_REQUIRED = -3,
+        ALLOW_TRUST_CANT_REVOKE = -4,     // source account can't revoke trust,
+        ALLOW_TRUST_SELF_NOT_ALLOWED = -5 // trusting self is not allowed
+    };
+    ----------------------------------------------------------------
+    """
+
     ALLOW_TRUST_SUCCESS = 0
     ALLOW_TRUST_MALFORMED = -1
     ALLOW_TRUST_NO_TRUST_LINE = -2
@@ -6694,7 +6850,7 @@ class AllowTrustResultCode(IntEnum):
         packer.pack_int(self.value)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'AllowTrustResultCode':
+    def unpack(cls, unpacker: Unpacker) -> "AllowTrustResultCode":
         value = unpacker.unpack_int()
         return cls(value)
 
@@ -6704,7 +6860,7 @@ class AllowTrustResultCode(IntEnum):
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'AllowTrustResultCode':
+    def from_xdr(cls, xdr) -> "AllowTrustResultCode":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -6716,22 +6872,21 @@ class AllowTrustResultCode(IntEnum):
         )
 
 
-# === xdr source ============================================================
-#
-#   union AllowTrustResult switch (AllowTrustResultCode code)
-#   {
-#   case ALLOW_TRUST_SUCCESS:
-#       void;
-#   default:
-#       void;
-#   };
-#
-# ===========================================================================
 class AllowTrustResult:
-    def __init__(
-            self,
-            code: 'AllowTrustResultCode',
-    ) -> None:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    union AllowTrustResult switch (AllowTrustResultCode code)
+    {
+    case ALLOW_TRUST_SUCCESS:
+        void;
+    default:
+        void;
+    };
+    ----------------------------------------------------------------
+    """
+
+    def __init__(self, code: "AllowTrustResultCode") -> None:
         self.code = code
 
     def pack(self, packer: Packer) -> None:
@@ -6740,7 +6895,7 @@ class AllowTrustResult:
             return
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'AllowTrustResult':
+    def unpack(cls, unpacker: Unpacker) -> "AllowTrustResult":
         code = AllowTrustResultCode.unpack(unpacker)
         if code == AllowTrustResultCode.ALLOW_TRUST_SUCCESS:
             return cls(code)
@@ -6751,7 +6906,7 @@ class AllowTrustResult:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'AllowTrustResult':
+    def from_xdr(cls, xdr) -> "AllowTrustResult":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -6763,28 +6918,30 @@ class AllowTrustResult:
 
     def __str__(self):
         out = []
-        out.append(f'code={self.code}')
+        out.append(f"code={self.code}")
         return f"<AllowTrustResult {[', '.join(out)]}>"
 
 
-# === xdr source ============================================================
-#
-#   enum AccountMergeResultCode
-#   {
-#       // codes considered as "success" for the operation
-#       ACCOUNT_MERGE_SUCCESS = 0,
-#       // codes considered as "failure" for the operation
-#       ACCOUNT_MERGE_MALFORMED = -1,       // can't merge onto itself
-#       ACCOUNT_MERGE_NO_ACCOUNT = -2,      // destination does not exist
-#       ACCOUNT_MERGE_IMMUTABLE_SET = -3,   // source account has AUTH_IMMUTABLE set
-#       ACCOUNT_MERGE_HAS_SUB_ENTRIES = -4, // account has trust lines/offers
-#       ACCOUNT_MERGE_SEQNUM_TOO_FAR = -5,  // sequence number is over max allowed
-#       ACCOUNT_MERGE_DEST_FULL = -6        // can't add source balance to
-#                                           // destination balance
-#   };
-#
-# ===========================================================================
 class AccountMergeResultCode(IntEnum):
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    enum AccountMergeResultCode
+    {
+        // codes considered as "success" for the operation
+        ACCOUNT_MERGE_SUCCESS = 0,
+        // codes considered as "failure" for the operation
+        ACCOUNT_MERGE_MALFORMED = -1,       // can't merge onto itself
+        ACCOUNT_MERGE_NO_ACCOUNT = -2,      // destination does not exist
+        ACCOUNT_MERGE_IMMUTABLE_SET = -3,   // source account has AUTH_IMMUTABLE set
+        ACCOUNT_MERGE_HAS_SUB_ENTRIES = -4, // account has trust lines/offers
+        ACCOUNT_MERGE_SEQNUM_TOO_FAR = -5,  // sequence number is over max allowed
+        ACCOUNT_MERGE_DEST_FULL = -6        // can't add source balance to
+                                            // destination balance
+    };
+    ----------------------------------------------------------------
+    """
+
     ACCOUNT_MERGE_SUCCESS = 0
     ACCOUNT_MERGE_MALFORMED = -1
     ACCOUNT_MERGE_NO_ACCOUNT = -2
@@ -6797,7 +6954,7 @@ class AccountMergeResultCode(IntEnum):
         packer.pack_int(self.value)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'AccountMergeResultCode':
+    def unpack(cls, unpacker: Unpacker) -> "AccountMergeResultCode":
         value = unpacker.unpack_int()
         return cls(value)
 
@@ -6807,7 +6964,7 @@ class AccountMergeResultCode(IntEnum):
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'AccountMergeResultCode':
+    def from_xdr(cls, xdr) -> "AccountMergeResultCode":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -6819,25 +6976,25 @@ class AccountMergeResultCode(IntEnum):
         )
 
 
-# === xdr source ============================================================
-#
-#   union AccountMergeResult switch (AccountMergeResultCode code)
-#   {
-#   case ACCOUNT_MERGE_SUCCESS:
-#       int64 sourceAccountBalance; // how much got transfered from source account
-#   default:
-#       void;
-#   };
-#
-# ===========================================================================
 class AccountMergeResult:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    union AccountMergeResult switch (AccountMergeResultCode code)
+    {
+    case ACCOUNT_MERGE_SUCCESS:
+        int64 sourceAccountBalance; // how much got transfered from source account
+    default:
+        void;
+    };
+    ----------------------------------------------------------------
+    """
+
     def __init__(
-            self,
-            code: 'AccountMergeResultCode',
-            source_account_balance: 'Int64' = None,
+        self, code: "AccountMergeResultCode", source_account_balance: "Int64" = None
     ) -> None:
         self.code = code
-        self.source_account_balance: 'Int64' = source_account_balance
+        self.source_account_balance: "Int64" = source_account_balance
 
     def pack(self, packer: Packer) -> None:
         self.code.pack(packer)
@@ -6846,7 +7003,7 @@ class AccountMergeResult:
             return
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'AccountMergeResult':
+    def unpack(cls, unpacker: Unpacker) -> "AccountMergeResult":
         code = AccountMergeResultCode.unpack(unpacker)
         if code == AccountMergeResultCode.ACCOUNT_MERGE_SUCCESS:
             source_account_balance = Int64.unpack(unpacker)
@@ -6858,7 +7015,7 @@ class AccountMergeResult:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'AccountMergeResult':
+    def from_xdr(cls, xdr) -> "AccountMergeResult":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -6866,28 +7023,34 @@ class AccountMergeResult:
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented
-        return self.code == other.code and self.source_account_balance == other.source_account_balance
+        return (
+            self.code == other.code
+            and self.source_account_balance == other.source_account_balance
+        )
 
     def __str__(self):
         out = []
-        out.append(f'code={self.code}')
+        out.append(f"code={self.code}")
         out.append(
-            f'source_account_balance={self.source_account_balance}') if self.source_account_balance is not None else None
+            f"source_account_balance={self.source_account_balance}"
+        ) if self.source_account_balance is not None else None
         return f"<AccountMergeResult {[', '.join(out)]}>"
 
 
-# === xdr source ============================================================
-#
-#   enum InflationResultCode
-#   {
-#       // codes considered as "success" for the operation
-#       INFLATION_SUCCESS = 0,
-#       // codes considered as "failure" for the operation
-#       INFLATION_NOT_TIME = -1
-#   };
-#
-# ===========================================================================
 class InflationResultCode(IntEnum):
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    enum InflationResultCode
+    {
+        // codes considered as "success" for the operation
+        INFLATION_SUCCESS = 0,
+        // codes considered as "failure" for the operation
+        INFLATION_NOT_TIME = -1
+    };
+    ----------------------------------------------------------------
+    """
+
     INFLATION_SUCCESS = 0
     INFLATION_NOT_TIME = -1
 
@@ -6895,7 +7058,7 @@ class InflationResultCode(IntEnum):
         packer.pack_int(self.value)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'InflationResultCode':
+    def unpack(cls, unpacker: Unpacker) -> "InflationResultCode":
         value = unpacker.unpack_int()
         return cls(value)
 
@@ -6905,7 +7068,7 @@ class InflationResultCode(IntEnum):
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'InflationResultCode':
+    def from_xdr(cls, xdr) -> "InflationResultCode":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -6917,21 +7080,19 @@ class InflationResultCode(IntEnum):
         )
 
 
-# === xdr source ============================================================
-#
-#   struct InflationPayout // or use PaymentResultAtom to limit types?
-#   {
-#       AccountID destination;
-#       int64 amount;
-#   };
-#
-# ===========================================================================
 class InflationPayout:
-    def __init__(
-            self,
-            destination: 'AccountID',
-            amount: 'Int64',
-    ) -> None:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    struct InflationPayout // or use PaymentResultAtom to limit types?
+    {
+        AccountID destination;
+        int64 amount;
+    };
+    ----------------------------------------------------------------
+    """
+
+    def __init__(self, destination: "AccountID", amount: "Int64") -> None:
         self.destination = destination
         self.amount = amount
 
@@ -6940,13 +7101,10 @@ class InflationPayout:
         self.amount.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'InflationPayout':
+    def unpack(cls, unpacker: Unpacker) -> "InflationPayout":
         destination = AccountID.unpack(unpacker)
         amount = Int64.unpack(unpacker)
-        return cls(
-            destination=destination,
-            amount=amount,
-        )
+        return cls(destination=destination, amount=amount)
 
     def to_xdr(self) -> str:
         packer = Packer()
@@ -6954,7 +7112,7 @@ class InflationPayout:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'InflationPayout':
+    def from_xdr(cls, xdr) -> "InflationPayout":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -6965,32 +7123,29 @@ class InflationPayout:
         return self.destination == other.destination and self.amount == other.amount
 
     def __str__(self):
-        out = [
-            f'destination={self.destination}',
-            f'amount={self.amount}',
-        ]
+        out = [f"destination={self.destination}", f"amount={self.amount}"]
         return f"<InflationPayout {[', '.join(out)]}>"
 
 
-# === xdr source ============================================================
-#
-#   union InflationResult switch (InflationResultCode code)
-#   {
-#   case INFLATION_SUCCESS:
-#       InflationPayout payouts<>;
-#   default:
-#       void;
-#   };
-#
-# ===========================================================================
 class InflationResult:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    union InflationResult switch (InflationResultCode code)
+    {
+    case INFLATION_SUCCESS:
+        InflationPayout payouts<>;
+    default:
+        void;
+    };
+    ----------------------------------------------------------------
+    """
+
     def __init__(
-            self,
-            code: 'InflationResultCode',
-            payouts: List['InflationPayout'] = None,
+        self, code: "InflationResultCode", payouts: List["InflationPayout"] = None
     ) -> None:
         self.code = code
-        self.payouts: List['InflationPayout'] = payouts
+        self.payouts: List["InflationPayout"] = payouts
 
     def pack(self, packer: Packer) -> None:
         self.code.pack(packer)
@@ -7001,7 +7156,7 @@ class InflationResult:
             return
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'InflationResult':
+    def unpack(cls, unpacker: Unpacker) -> "InflationResult":
         code = InflationResultCode.unpack(unpacker)
         if code == InflationResultCode.INFLATION_SUCCESS:
             length = unpacker.unpack_uint()
@@ -7016,7 +7171,7 @@ class InflationResult:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'InflationResult':
+    def from_xdr(cls, xdr) -> "InflationResult":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -7028,28 +7183,30 @@ class InflationResult:
 
     def __str__(self):
         out = []
-        out.append(f'code={self.code}')
-        out.append(f'payouts={self.payouts}') if self.payouts is not None else None
+        out.append(f"code={self.code}")
+        out.append(f"payouts={self.payouts}") if self.payouts is not None else None
         return f"<InflationResult {[', '.join(out)]}>"
 
 
-# === xdr source ============================================================
-#
-#   enum ManageDataResultCode
-#   {
-#       // codes considered as "success" for the operation
-#       MANAGE_DATA_SUCCESS = 0,
-#       // codes considered as "failure" for the operation
-#       MANAGE_DATA_NOT_SUPPORTED_YET =
-#           -1, // The network hasn't moved to this protocol change yet
-#       MANAGE_DATA_NAME_NOT_FOUND =
-#           -2, // Trying to remove a Data Entry that isn't there
-#       MANAGE_DATA_LOW_RESERVE = -3, // not enough funds to create a new Data Entry
-#       MANAGE_DATA_INVALID_NAME = -4 // Name not a valid string
-#   };
-#
-# ===========================================================================
 class ManageDataResultCode(IntEnum):
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    enum ManageDataResultCode
+    {
+        // codes considered as "success" for the operation
+        MANAGE_DATA_SUCCESS = 0,
+        // codes considered as "failure" for the operation
+        MANAGE_DATA_NOT_SUPPORTED_YET =
+            -1, // The network hasn't moved to this protocol change yet
+        MANAGE_DATA_NAME_NOT_FOUND =
+            -2, // Trying to remove a Data Entry that isn't there
+        MANAGE_DATA_LOW_RESERVE = -3, // not enough funds to create a new Data Entry
+        MANAGE_DATA_INVALID_NAME = -4 // Name not a valid string
+    };
+    ----------------------------------------------------------------
+    """
+
     MANAGE_DATA_SUCCESS = 0
     MANAGE_DATA_NOT_SUPPORTED_YET = -1
     MANAGE_DATA_NAME_NOT_FOUND = -2
@@ -7060,7 +7217,7 @@ class ManageDataResultCode(IntEnum):
         packer.pack_int(self.value)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'ManageDataResultCode':
+    def unpack(cls, unpacker: Unpacker) -> "ManageDataResultCode":
         value = unpacker.unpack_int()
         return cls(value)
 
@@ -7070,7 +7227,7 @@ class ManageDataResultCode(IntEnum):
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'ManageDataResultCode':
+    def from_xdr(cls, xdr) -> "ManageDataResultCode":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -7082,22 +7239,21 @@ class ManageDataResultCode(IntEnum):
         )
 
 
-# === xdr source ============================================================
-#
-#   union ManageDataResult switch (ManageDataResultCode code)
-#   {
-#   case MANAGE_DATA_SUCCESS:
-#       void;
-#   default:
-#       void;
-#   };
-#
-# ===========================================================================
 class ManageDataResult:
-    def __init__(
-            self,
-            code: 'ManageDataResultCode',
-    ) -> None:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    union ManageDataResult switch (ManageDataResultCode code)
+    {
+    case MANAGE_DATA_SUCCESS:
+        void;
+    default:
+        void;
+    };
+    ----------------------------------------------------------------
+    """
+
+    def __init__(self, code: "ManageDataResultCode") -> None:
         self.code = code
 
     def pack(self, packer: Packer) -> None:
@@ -7106,7 +7262,7 @@ class ManageDataResult:
             return
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'ManageDataResult':
+    def unpack(cls, unpacker: Unpacker) -> "ManageDataResult":
         code = ManageDataResultCode.unpack(unpacker)
         if code == ManageDataResultCode.MANAGE_DATA_SUCCESS:
             return cls(code)
@@ -7117,7 +7273,7 @@ class ManageDataResult:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'ManageDataResult':
+    def from_xdr(cls, xdr) -> "ManageDataResult":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -7129,22 +7285,24 @@ class ManageDataResult:
 
     def __str__(self):
         out = []
-        out.append(f'code={self.code}')
+        out.append(f"code={self.code}")
         return f"<ManageDataResult {[', '.join(out)]}>"
 
 
-# === xdr source ============================================================
-#
-#   enum BumpSequenceResultCode
-#   {
-#       // codes considered as "success" for the operation
-#       BUMP_SEQUENCE_SUCCESS = 0,
-#       // codes considered as "failure" for the operation
-#       BUMP_SEQUENCE_BAD_SEQ = -1 // `bumpTo` is not within bounds
-#   };
-#
-# ===========================================================================
 class BumpSequenceResultCode(IntEnum):
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    enum BumpSequenceResultCode
+    {
+        // codes considered as "success" for the operation
+        BUMP_SEQUENCE_SUCCESS = 0,
+        // codes considered as "failure" for the operation
+        BUMP_SEQUENCE_BAD_SEQ = -1 // `bumpTo` is not within bounds
+    };
+    ----------------------------------------------------------------
+    """
+
     BUMP_SEQUENCE_SUCCESS = 0
     BUMP_SEQUENCE_BAD_SEQ = -1
 
@@ -7152,7 +7310,7 @@ class BumpSequenceResultCode(IntEnum):
         packer.pack_int(self.value)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'BumpSequenceResultCode':
+    def unpack(cls, unpacker: Unpacker) -> "BumpSequenceResultCode":
         value = unpacker.unpack_int()
         return cls(value)
 
@@ -7162,7 +7320,7 @@ class BumpSequenceResultCode(IntEnum):
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'BumpSequenceResultCode':
+    def from_xdr(cls, xdr) -> "BumpSequenceResultCode":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -7174,22 +7332,21 @@ class BumpSequenceResultCode(IntEnum):
         )
 
 
-# === xdr source ============================================================
-#
-#   union BumpSequenceResult switch (BumpSequenceResultCode code)
-#   {
-#   case BUMP_SEQUENCE_SUCCESS:
-#       void;
-#   default:
-#       void;
-#   };
-#
-# ===========================================================================
 class BumpSequenceResult:
-    def __init__(
-            self,
-            code: 'BumpSequenceResultCode',
-    ) -> None:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    union BumpSequenceResult switch (BumpSequenceResultCode code)
+    {
+    case BUMP_SEQUENCE_SUCCESS:
+        void;
+    default:
+        void;
+    };
+    ----------------------------------------------------------------
+    """
+
+    def __init__(self, code: "BumpSequenceResultCode") -> None:
         self.code = code
 
     def pack(self, packer: Packer) -> None:
@@ -7198,7 +7355,7 @@ class BumpSequenceResult:
             return
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'BumpSequenceResult':
+    def unpack(cls, unpacker: Unpacker) -> "BumpSequenceResult":
         code = BumpSequenceResultCode.unpack(unpacker)
         if code == BumpSequenceResultCode.BUMP_SEQUENCE_SUCCESS:
             return cls(code)
@@ -7209,7 +7366,7 @@ class BumpSequenceResult:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'BumpSequenceResult':
+    def from_xdr(cls, xdr) -> "BumpSequenceResult":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -7221,25 +7378,27 @@ class BumpSequenceResult:
 
     def __str__(self):
         out = []
-        out.append(f'code={self.code}')
+        out.append(f"code={self.code}")
         return f"<BumpSequenceResult {[', '.join(out)]}>"
 
 
-# === xdr source ============================================================
-#
-#   enum OperationResultCode
-#   {
-#       opINNER = 0, // inner object result is valid
-#
-#       opBAD_AUTH = -1,     // too few valid signatures / wrong network
-#       opNO_ACCOUNT = -2,   // source account was not found
-#       opNOT_SUPPORTED = -3, // operation not supported at this time
-#       opTOO_MANY_SUBENTRIES = -4, // max number of subentries already reached
-#       opEXCEEDED_WORK_LIMIT = -5  // operation did too much work
-#   };
-#
-# ===========================================================================
 class OperationResultCode(IntEnum):
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    enum OperationResultCode
+    {
+        opINNER = 0, // inner object result is valid
+
+        opBAD_AUTH = -1,     // too few valid signatures / wrong network
+        opNO_ACCOUNT = -2,   // source account was not found
+        opNOT_SUPPORTED = -3, // operation not supported at this time
+        opTOO_MANY_SUBENTRIES = -4, // max number of subentries already reached
+        opEXCEEDED_WORK_LIMIT = -5  // operation did too much work
+    };
+    ----------------------------------------------------------------
+    """
+
     opINNER = 0
     opBAD_AUTH = -1
     opNO_ACCOUNT = -2
@@ -7251,7 +7410,7 @@ class OperationResultCode(IntEnum):
         packer.pack_int(self.value)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'OperationResultCode':
+    def unpack(cls, unpacker: Unpacker) -> "OperationResultCode":
         value = unpacker.unpack_int()
         return cls(value)
 
@@ -7261,7 +7420,7 @@ class OperationResultCode(IntEnum):
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'OperationResultCode':
+    def from_xdr(cls, xdr) -> "OperationResultCode":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -7273,75 +7432,77 @@ class OperationResultCode(IntEnum):
         )
 
 
-# === xdr source ============================================================
-#
-#   union switch (OperationType type)
-#       {
-#       case CREATE_ACCOUNT:
-#           CreateAccountResult createAccountResult;
-#       case PAYMENT:
-#           PaymentResult paymentResult;
-#       case PATH_PAYMENT_STRICT_RECEIVE:
-#           PathPaymentStrictReceiveResult pathPaymentStrictReceiveResult;
-#       case MANAGE_SELL_OFFER:
-#           ManageSellOfferResult manageSellOfferResult;
-#       case CREATE_PASSIVE_SELL_OFFER:
-#           ManageSellOfferResult createPassiveSellOfferResult;
-#       case SET_OPTIONS:
-#           SetOptionsResult setOptionsResult;
-#       case CHANGE_TRUST:
-#           ChangeTrustResult changeTrustResult;
-#       case ALLOW_TRUST:
-#           AllowTrustResult allowTrustResult;
-#       case ACCOUNT_MERGE:
-#           AccountMergeResult accountMergeResult;
-#       case INFLATION:
-#           InflationResult inflationResult;
-#       case MANAGE_DATA:
-#           ManageDataResult manageDataResult;
-#       case BUMP_SEQUENCE:
-#           BumpSequenceResult bumpSeqResult;
-#       case MANAGE_BUY_OFFER:
-#   	ManageBuyOfferResult manageBuyOfferResult;
-#       case PATH_PAYMENT_STRICT_SEND:
-#           PathPaymentStrictSendResult pathPaymentStrictSendResult;
-#       }
-#
-# ===========================================================================
 class OperationResultTr:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    union switch (OperationType type)
+        {
+        case CREATE_ACCOUNT:
+            CreateAccountResult createAccountResult;
+        case PAYMENT:
+            PaymentResult paymentResult;
+        case PATH_PAYMENT_STRICT_RECEIVE:
+            PathPaymentStrictReceiveResult pathPaymentStrictReceiveResult;
+        case MANAGE_SELL_OFFER:
+            ManageSellOfferResult manageSellOfferResult;
+        case CREATE_PASSIVE_SELL_OFFER:
+            ManageSellOfferResult createPassiveSellOfferResult;
+        case SET_OPTIONS:
+            SetOptionsResult setOptionsResult;
+        case CHANGE_TRUST:
+            ChangeTrustResult changeTrustResult;
+        case ALLOW_TRUST:
+            AllowTrustResult allowTrustResult;
+        case ACCOUNT_MERGE:
+            AccountMergeResult accountMergeResult;
+        case INFLATION:
+            InflationResult inflationResult;
+        case MANAGE_DATA:
+            ManageDataResult manageDataResult;
+        case BUMP_SEQUENCE:
+            BumpSequenceResult bumpSeqResult;
+        case MANAGE_BUY_OFFER:
+    	ManageBuyOfferResult manageBuyOfferResult;
+        case PATH_PAYMENT_STRICT_SEND:
+            PathPaymentStrictSendResult pathPaymentStrictSendResult;
+        }
+    ----------------------------------------------------------------
+    """
+
     def __init__(
-            self,
-            type: 'OperationType',
-            create_account_result: 'CreateAccountResult' = None,
-            payment_result: 'PaymentResult' = None,
-            path_payment_strict_receive_result: 'PathPaymentStrictReceiveResult' = None,
-            manage_sell_offer_result: 'ManageSellOfferResult' = None,
-            create_passive_sell_offer_result: 'ManageSellOfferResult' = None,
-            set_options_result: 'SetOptionsResult' = None,
-            change_trust_result: 'ChangeTrustResult' = None,
-            allow_trust_result: 'AllowTrustResult' = None,
-            account_merge_result: 'AccountMergeResult' = None,
-            inflation_result: 'InflationResult' = None,
-            manage_data_result: 'ManageDataResult' = None,
-            bump_seq_result: 'BumpSequenceResult' = None,
-            manage_buy_offer_result: 'ManageBuyOfferResult' = None,
-            path_payment_strict_send_result: 'PathPaymentStrictSendResult' = None,
+        self,
+        type: "OperationType",
+        create_account_result: "CreateAccountResult" = None,
+        payment_result: "PaymentResult" = None,
+        path_payment_strict_receive_result: "PathPaymentStrictReceiveResult" = None,
+        manage_sell_offer_result: "ManageSellOfferResult" = None,
+        create_passive_sell_offer_result: "ManageSellOfferResult" = None,
+        set_options_result: "SetOptionsResult" = None,
+        change_trust_result: "ChangeTrustResult" = None,
+        allow_trust_result: "AllowTrustResult" = None,
+        account_merge_result: "AccountMergeResult" = None,
+        inflation_result: "InflationResult" = None,
+        manage_data_result: "ManageDataResult" = None,
+        bump_seq_result: "BumpSequenceResult" = None,
+        manage_buy_offer_result: "ManageBuyOfferResult" = None,
+        path_payment_strict_send_result: "PathPaymentStrictSendResult" = None,
     ) -> None:
         self.type = type
-        self.create_account_result: 'CreateAccountResult' = create_account_result
-        self.payment_result: 'PaymentResult' = payment_result
-        self.path_payment_strict_receive_result: 'PathPaymentStrictReceiveResult' = path_payment_strict_receive_result
-        self.manage_sell_offer_result: 'ManageSellOfferResult' = manage_sell_offer_result
-        self.create_passive_sell_offer_result: 'ManageSellOfferResult' = create_passive_sell_offer_result
-        self.set_options_result: 'SetOptionsResult' = set_options_result
-        self.change_trust_result: 'ChangeTrustResult' = change_trust_result
-        self.allow_trust_result: 'AllowTrustResult' = allow_trust_result
-        self.account_merge_result: 'AccountMergeResult' = account_merge_result
-        self.inflation_result: 'InflationResult' = inflation_result
-        self.manage_data_result: 'ManageDataResult' = manage_data_result
-        self.bump_seq_result: 'BumpSequenceResult' = bump_seq_result
-        self.manage_buy_offer_result: 'ManageBuyOfferResult' = manage_buy_offer_result
-        self.path_payment_strict_send_result: 'PathPaymentStrictSendResult' = path_payment_strict_send_result
+        self.create_account_result: "CreateAccountResult" = create_account_result
+        self.payment_result: "PaymentResult" = payment_result
+        self.path_payment_strict_receive_result: "PathPaymentStrictReceiveResult" = path_payment_strict_receive_result
+        self.manage_sell_offer_result: "ManageSellOfferResult" = manage_sell_offer_result
+        self.create_passive_sell_offer_result: "ManageSellOfferResult" = create_passive_sell_offer_result
+        self.set_options_result: "SetOptionsResult" = set_options_result
+        self.change_trust_result: "ChangeTrustResult" = change_trust_result
+        self.allow_trust_result: "AllowTrustResult" = allow_trust_result
+        self.account_merge_result: "AccountMergeResult" = account_merge_result
+        self.inflation_result: "InflationResult" = inflation_result
+        self.manage_data_result: "ManageDataResult" = manage_data_result
+        self.bump_seq_result: "BumpSequenceResult" = bump_seq_result
+        self.manage_buy_offer_result: "ManageBuyOfferResult" = manage_buy_offer_result
+        self.path_payment_strict_send_result: "PathPaymentStrictSendResult" = path_payment_strict_send_result
 
     def pack(self, packer: Packer) -> None:
         self.type.pack(packer)
@@ -7389,7 +7550,7 @@ class OperationResultTr:
             return
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'OperationResultTr':
+    def unpack(cls, unpacker: Unpacker) -> "OperationResultTr":
         type = OperationType.unpack(unpacker)
         if type == OperationType.CREATE_ACCOUNT:
             create_account_result = CreateAccountResult.unpack(unpacker)
@@ -7398,14 +7559,21 @@ class OperationResultTr:
             payment_result = PaymentResult.unpack(unpacker)
             return cls(type, payment_result=payment_result)
         if type == OperationType.PATH_PAYMENT_STRICT_RECEIVE:
-            path_payment_strict_receive_result = PathPaymentStrictReceiveResult.unpack(unpacker)
-            return cls(type, path_payment_strict_receive_result=path_payment_strict_receive_result)
+            path_payment_strict_receive_result = PathPaymentStrictReceiveResult.unpack(
+                unpacker
+            )
+            return cls(
+                type,
+                path_payment_strict_receive_result=path_payment_strict_receive_result,
+            )
         if type == OperationType.MANAGE_SELL_OFFER:
             manage_sell_offer_result = ManageSellOfferResult.unpack(unpacker)
             return cls(type, manage_sell_offer_result=manage_sell_offer_result)
         if type == OperationType.CREATE_PASSIVE_SELL_OFFER:
             create_passive_sell_offer_result = ManageSellOfferResult.unpack(unpacker)
-            return cls(type, create_passive_sell_offer_result=create_passive_sell_offer_result)
+            return cls(
+                type, create_passive_sell_offer_result=create_passive_sell_offer_result
+            )
         if type == OperationType.SET_OPTIONS:
             set_options_result = SetOptionsResult.unpack(unpacker)
             return cls(type, set_options_result=set_options_result)
@@ -7431,8 +7599,12 @@ class OperationResultTr:
             manage_buy_offer_result = ManageBuyOfferResult.unpack(unpacker)
             return cls(type, manage_buy_offer_result=manage_buy_offer_result)
         if type == OperationType.PATH_PAYMENT_STRICT_SEND:
-            path_payment_strict_send_result = PathPaymentStrictSendResult.unpack(unpacker)
-            return cls(type, path_payment_strict_send_result=path_payment_strict_send_result)
+            path_payment_strict_send_result = PathPaymentStrictSendResult.unpack(
+                unpacker
+            )
+            return cls(
+                type, path_payment_strict_send_result=path_payment_strict_send_result
+            )
 
     def to_xdr(self) -> str:
         packer = Packer()
@@ -7440,7 +7612,7 @@ class OperationResultTr:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'OperationResultTr':
+    def from_xdr(cls, xdr) -> "OperationResultTr":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -7448,85 +7620,125 @@ class OperationResultTr:
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented
-        return self.type == other.type and self.create_account_result == other.create_account_result and self.payment_result == other.payment_result and self.path_payment_strict_receive_result == other.path_payment_strict_receive_result and self.manage_sell_offer_result == other.manage_sell_offer_result and self.create_passive_sell_offer_result == other.create_passive_sell_offer_result and self.set_options_result == other.set_options_result and self.change_trust_result == other.change_trust_result and self.allow_trust_result == other.allow_trust_result and self.account_merge_result == other.account_merge_result and self.inflation_result == other.inflation_result and self.manage_data_result == other.manage_data_result and self.bump_seq_result == other.bump_seq_result and self.manage_buy_offer_result == other.manage_buy_offer_result and self.path_payment_strict_send_result == other.path_payment_strict_send_result
+        return (
+            self.type == other.type
+            and self.create_account_result == other.create_account_result
+            and self.payment_result == other.payment_result
+            and self.path_payment_strict_receive_result
+            == other.path_payment_strict_receive_result
+            and self.manage_sell_offer_result == other.manage_sell_offer_result
+            and self.create_passive_sell_offer_result
+            == other.create_passive_sell_offer_result
+            and self.set_options_result == other.set_options_result
+            and self.change_trust_result == other.change_trust_result
+            and self.allow_trust_result == other.allow_trust_result
+            and self.account_merge_result == other.account_merge_result
+            and self.inflation_result == other.inflation_result
+            and self.manage_data_result == other.manage_data_result
+            and self.bump_seq_result == other.bump_seq_result
+            and self.manage_buy_offer_result == other.manage_buy_offer_result
+            and self.path_payment_strict_send_result
+            == other.path_payment_strict_send_result
+        )
 
     def __str__(self):
         out = []
-        out.append(f'type={self.type}')
+        out.append(f"type={self.type}")
         out.append(
-            f'create_account_result={self.create_account_result}') if self.create_account_result is not None else None
-        out.append(f'payment_result={self.payment_result}') if self.payment_result is not None else None
+            f"create_account_result={self.create_account_result}"
+        ) if self.create_account_result is not None else None
         out.append(
-            f'path_payment_strict_receive_result={self.path_payment_strict_receive_result}') if self.path_payment_strict_receive_result is not None else None
+            f"payment_result={self.payment_result}"
+        ) if self.payment_result is not None else None
         out.append(
-            f'manage_sell_offer_result={self.manage_sell_offer_result}') if self.manage_sell_offer_result is not None else None
+            f"path_payment_strict_receive_result={self.path_payment_strict_receive_result}"
+        ) if self.path_payment_strict_receive_result is not None else None
         out.append(
-            f'create_passive_sell_offer_result={self.create_passive_sell_offer_result}') if self.create_passive_sell_offer_result is not None else None
-        out.append(f'set_options_result={self.set_options_result}') if self.set_options_result is not None else None
-        out.append(f'change_trust_result={self.change_trust_result}') if self.change_trust_result is not None else None
-        out.append(f'allow_trust_result={self.allow_trust_result}') if self.allow_trust_result is not None else None
+            f"manage_sell_offer_result={self.manage_sell_offer_result}"
+        ) if self.manage_sell_offer_result is not None else None
         out.append(
-            f'account_merge_result={self.account_merge_result}') if self.account_merge_result is not None else None
-        out.append(f'inflation_result={self.inflation_result}') if self.inflation_result is not None else None
-        out.append(f'manage_data_result={self.manage_data_result}') if self.manage_data_result is not None else None
-        out.append(f'bump_seq_result={self.bump_seq_result}') if self.bump_seq_result is not None else None
+            f"create_passive_sell_offer_result={self.create_passive_sell_offer_result}"
+        ) if self.create_passive_sell_offer_result is not None else None
         out.append(
-            f'manage_buy_offer_result={self.manage_buy_offer_result}') if self.manage_buy_offer_result is not None else None
+            f"set_options_result={self.set_options_result}"
+        ) if self.set_options_result is not None else None
         out.append(
-            f'path_payment_strict_send_result={self.path_payment_strict_send_result}') if self.path_payment_strict_send_result is not None else None
+            f"change_trust_result={self.change_trust_result}"
+        ) if self.change_trust_result is not None else None
+        out.append(
+            f"allow_trust_result={self.allow_trust_result}"
+        ) if self.allow_trust_result is not None else None
+        out.append(
+            f"account_merge_result={self.account_merge_result}"
+        ) if self.account_merge_result is not None else None
+        out.append(
+            f"inflation_result={self.inflation_result}"
+        ) if self.inflation_result is not None else None
+        out.append(
+            f"manage_data_result={self.manage_data_result}"
+        ) if self.manage_data_result is not None else None
+        out.append(
+            f"bump_seq_result={self.bump_seq_result}"
+        ) if self.bump_seq_result is not None else None
+        out.append(
+            f"manage_buy_offer_result={self.manage_buy_offer_result}"
+        ) if self.manage_buy_offer_result is not None else None
+        out.append(
+            f"path_payment_strict_send_result={self.path_payment_strict_send_result}"
+        ) if self.path_payment_strict_send_result is not None else None
         return f"<OperationResultTr {[', '.join(out)]}>"
 
 
-# === xdr source ============================================================
-#
-#   union OperationResult switch (OperationResultCode code)
-#   {
-#   case opINNER:
-#       union switch (OperationType type)
-#       {
-#       case CREATE_ACCOUNT:
-#           CreateAccountResult createAccountResult;
-#       case PAYMENT:
-#           PaymentResult paymentResult;
-#       case PATH_PAYMENT_STRICT_RECEIVE:
-#           PathPaymentStrictReceiveResult pathPaymentStrictReceiveResult;
-#       case MANAGE_SELL_OFFER:
-#           ManageSellOfferResult manageSellOfferResult;
-#       case CREATE_PASSIVE_SELL_OFFER:
-#           ManageSellOfferResult createPassiveSellOfferResult;
-#       case SET_OPTIONS:
-#           SetOptionsResult setOptionsResult;
-#       case CHANGE_TRUST:
-#           ChangeTrustResult changeTrustResult;
-#       case ALLOW_TRUST:
-#           AllowTrustResult allowTrustResult;
-#       case ACCOUNT_MERGE:
-#           AccountMergeResult accountMergeResult;
-#       case INFLATION:
-#           InflationResult inflationResult;
-#       case MANAGE_DATA:
-#           ManageDataResult manageDataResult;
-#       case BUMP_SEQUENCE:
-#           BumpSequenceResult bumpSeqResult;
-#       case MANAGE_BUY_OFFER:
-#   	ManageBuyOfferResult manageBuyOfferResult;
-#       case PATH_PAYMENT_STRICT_SEND:
-#           PathPaymentStrictSendResult pathPaymentStrictSendResult;
-#       }
-#       tr;
-#   default:
-#       void;
-#   };
-#
-# ===========================================================================
 class OperationResult:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    union OperationResult switch (OperationResultCode code)
+    {
+    case opINNER:
+        union switch (OperationType type)
+        {
+        case CREATE_ACCOUNT:
+            CreateAccountResult createAccountResult;
+        case PAYMENT:
+            PaymentResult paymentResult;
+        case PATH_PAYMENT_STRICT_RECEIVE:
+            PathPaymentStrictReceiveResult pathPaymentStrictReceiveResult;
+        case MANAGE_SELL_OFFER:
+            ManageSellOfferResult manageSellOfferResult;
+        case CREATE_PASSIVE_SELL_OFFER:
+            ManageSellOfferResult createPassiveSellOfferResult;
+        case SET_OPTIONS:
+            SetOptionsResult setOptionsResult;
+        case CHANGE_TRUST:
+            ChangeTrustResult changeTrustResult;
+        case ALLOW_TRUST:
+            AllowTrustResult allowTrustResult;
+        case ACCOUNT_MERGE:
+            AccountMergeResult accountMergeResult;
+        case INFLATION:
+            InflationResult inflationResult;
+        case MANAGE_DATA:
+            ManageDataResult manageDataResult;
+        case BUMP_SEQUENCE:
+            BumpSequenceResult bumpSeqResult;
+        case MANAGE_BUY_OFFER:
+    	ManageBuyOfferResult manageBuyOfferResult;
+        case PATH_PAYMENT_STRICT_SEND:
+            PathPaymentStrictSendResult pathPaymentStrictSendResult;
+        }
+        tr;
+    default:
+        void;
+    };
+    ----------------------------------------------------------------
+    """
+
     def __init__(
-            self,
-            code: 'OperationResultCode',
-            tr: 'OperationResultTr' = None,
+        self, code: "OperationResultCode", tr: "OperationResultTr" = None
     ) -> None:
         self.code = code
-        self.tr: 'OperationResultTr' = tr
+        self.tr: "OperationResultTr" = tr
 
     def pack(self, packer: Packer) -> None:
         self.code.pack(packer)
@@ -7535,7 +7747,7 @@ class OperationResult:
             return
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'OperationResult':
+    def unpack(cls, unpacker: Unpacker) -> "OperationResult":
         code = OperationResultCode.unpack(unpacker)
         if code == OperationResultCode.opINNER:
             tr = OperationResultTr.unpack(unpacker)
@@ -7547,7 +7759,7 @@ class OperationResult:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'OperationResult':
+    def from_xdr(cls, xdr) -> "OperationResult":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -7559,34 +7771,36 @@ class OperationResult:
 
     def __str__(self):
         out = []
-        out.append(f'code={self.code}')
-        out.append(f'tr={self.tr}') if self.tr is not None else None
+        out.append(f"code={self.code}")
+        out.append(f"tr={self.tr}") if self.tr is not None else None
         return f"<OperationResult {[', '.join(out)]}>"
 
 
-# === xdr source ============================================================
-#
-#   enum TransactionResultCode
-#   {
-#       txSUCCESS = 0, // all operations succeeded
-#
-#       txFAILED = -1, // one of the operations failed (none were applied)
-#
-#       txTOO_EARLY = -2,         // ledger closeTime before minTime
-#       txTOO_LATE = -3,          // ledger closeTime after maxTime
-#       txMISSING_OPERATION = -4, // no operation was specified
-#       txBAD_SEQ = -5,           // sequence number does not match source account
-#
-#       txBAD_AUTH = -6,             // too few valid signatures / wrong network
-#       txINSUFFICIENT_BALANCE = -7, // fee would bring account below reserve
-#       txNO_ACCOUNT = -8,           // source account not found
-#       txINSUFFICIENT_FEE = -9,     // fee is too small
-#       txBAD_AUTH_EXTRA = -10,      // unused signatures attached to transaction
-#       txINTERNAL_ERROR = -11       // an unknown error occured
-#   };
-#
-# ===========================================================================
 class TransactionResultCode(IntEnum):
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    enum TransactionResultCode
+    {
+        txSUCCESS = 0, // all operations succeeded
+
+        txFAILED = -1, // one of the operations failed (none were applied)
+
+        txTOO_EARLY = -2,         // ledger closeTime before minTime
+        txTOO_LATE = -3,          // ledger closeTime after maxTime
+        txMISSING_OPERATION = -4, // no operation was specified
+        txBAD_SEQ = -5,           // sequence number does not match source account
+
+        txBAD_AUTH = -6,             // too few valid signatures / wrong network
+        txINSUFFICIENT_BALANCE = -7, // fee would bring account below reserve
+        txNO_ACCOUNT = -8,           // source account not found
+        txINSUFFICIENT_FEE = -9,     // fee is too small
+        txBAD_AUTH_EXTRA = -10,      // unused signatures attached to transaction
+        txINTERNAL_ERROR = -11       // an unknown error occured
+    };
+    ----------------------------------------------------------------
+    """
+
     txSUCCESS = 0
     txFAILED = -1
     txTOO_EARLY = -2
@@ -7604,7 +7818,7 @@ class TransactionResultCode(IntEnum):
         packer.pack_int(self.value)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'TransactionResultCode':
+    def unpack(cls, unpacker: Unpacker) -> "TransactionResultCode":
         value = unpacker.unpack_int()
         return cls(value)
 
@@ -7614,7 +7828,7 @@ class TransactionResultCode(IntEnum):
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'TransactionResultCode':
+    def from_xdr(cls, xdr) -> "TransactionResultCode":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -7626,26 +7840,26 @@ class TransactionResultCode(IntEnum):
         )
 
 
-# === xdr source ============================================================
-#
-#   union switch (TransactionResultCode code)
-#       {
-#       case txSUCCESS:
-#       case txFAILED:
-#           OperationResult results<>;
-#       default:
-#           void;
-#       }
-#
-# ===========================================================================
 class TransactionResultResult:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    union switch (TransactionResultCode code)
+        {
+        case txSUCCESS:
+        case txFAILED:
+            OperationResult results<>;
+        default:
+            void;
+        }
+    ----------------------------------------------------------------
+    """
+
     def __init__(
-            self,
-            code: 'TransactionResultCode',
-            results: List['OperationResult'] = None,
+        self, code: "TransactionResultCode", results: List["OperationResult"] = None
     ) -> None:
         self.code = code
-        self.results: List['OperationResult'] = results
+        self.results: List["OperationResult"] = results
 
     def pack(self, packer: Packer) -> None:
         self.code.pack(packer)
@@ -7657,7 +7871,7 @@ class TransactionResultResult:
             return
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'TransactionResultResult':
+    def unpack(cls, unpacker: Unpacker) -> "TransactionResultResult":
         code = TransactionResultCode.unpack(unpacker)
         if code == TransactionResultCode.txSUCCESS:
             if code == TransactionResultCode.txFAILED:
@@ -7673,7 +7887,7 @@ class TransactionResultResult:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'TransactionResultResult':
+    def from_xdr(cls, xdr) -> "TransactionResultResult":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -7685,25 +7899,24 @@ class TransactionResultResult:
 
     def __str__(self):
         out = []
-        out.append(f'code={self.code}')
-        out.append(f'results={self.results}') if self.results is not None else None
+        out.append(f"code={self.code}")
+        out.append(f"results={self.results}") if self.results is not None else None
         return f"<TransactionResultResult {[', '.join(out)]}>"
 
 
-# === xdr source ============================================================
-#
-#   union switch (int v)
-#       {
-#       case 0:
-#           void;
-#       }
-#
-# ===========================================================================
 class TransactionResultExt:
-    def __init__(
-            self,
-            v: int,
-    ) -> None:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    union switch (int v)
+        {
+        case 0:
+            void;
+        }
+    ----------------------------------------------------------------
+    """
+
+    def __init__(self, v: int) -> None:
         self.v = v
 
     def pack(self, packer: Packer) -> None:
@@ -7712,7 +7925,7 @@ class TransactionResultExt:
             return
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'TransactionResultExt':
+    def unpack(cls, unpacker: Unpacker) -> "TransactionResultExt":
         v = Integer.unpack(unpacker)
         if v == 0:
             return cls(v)
@@ -7723,7 +7936,7 @@ class TransactionResultExt:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'TransactionResultExt':
+    def from_xdr(cls, xdr) -> "TransactionResultExt":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -7735,42 +7948,44 @@ class TransactionResultExt:
 
     def __str__(self):
         out = []
-        out.append(f'v={self.v}')
+        out.append(f"v={self.v}")
         return f"<TransactionResultExt {[', '.join(out)]}>"
 
 
-# === xdr source ============================================================
-#
-#   struct TransactionResult
-#   {
-#       int64 feeCharged; // actual fee charged for the transaction
-#
-#       union switch (TransactionResultCode code)
-#       {
-#       case txSUCCESS:
-#       case txFAILED:
-#           OperationResult results<>;
-#       default:
-#           void;
-#       }
-#       result;
-#
-#       // reserved for future use
-#       union switch (int v)
-#       {
-#       case 0:
-#           void;
-#       }
-#       ext;
-#   };
-#
-# ===========================================================================
 class TransactionResult:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    struct TransactionResult
+    {
+        int64 feeCharged; // actual fee charged for the transaction
+
+        union switch (TransactionResultCode code)
+        {
+        case txSUCCESS:
+        case txFAILED:
+            OperationResult results<>;
+        default:
+            void;
+        }
+        result;
+
+        // reserved for future use
+        union switch (int v)
+        {
+        case 0:
+            void;
+        }
+        ext;
+    };
+    ----------------------------------------------------------------
+    """
+
     def __init__(
-            self,
-            fee_charged: 'Int64',
-            result: 'TransactionResultResult',
-            ext: 'TransactionResultExt',
+        self,
+        fee_charged: "Int64",
+        result: "TransactionResultResult",
+        ext: "TransactionResultExt",
     ) -> None:
         self.fee_charged = fee_charged
         self.result = result
@@ -7782,15 +7997,11 @@ class TransactionResult:
         self.ext.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'TransactionResult':
+    def unpack(cls, unpacker: Unpacker) -> "TransactionResult":
         fee_charged = Int64.unpack(unpacker)
         result = TransactionResultResult.unpack(unpacker)
         ext = TransactionResultExt.unpack(unpacker)
-        return cls(
-            fee_charged=fee_charged,
-            result=result,
-            ext=ext,
-        )
+        return cls(fee_charged=fee_charged, result=result, ext=ext)
 
     def to_xdr(self) -> str:
         packer = Packer()
@@ -7798,7 +8009,7 @@ class TransactionResult:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'TransactionResult':
+    def from_xdr(cls, xdr) -> "TransactionResult":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -7806,31 +8017,37 @@ class TransactionResult:
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented
-        return self.fee_charged == other.fee_charged and self.result == other.result and self.ext == other.ext
+        return (
+            self.fee_charged == other.fee_charged
+            and self.result == other.result
+            and self.ext == other.ext
+        )
 
     def __str__(self):
         out = [
-            f'fee_charged={self.fee_charged}',
-            f'result={self.result}',
-            f'ext={self.ext}',
+            f"fee_charged={self.fee_charged}",
+            f"result={self.result}",
+            f"ext={self.ext}",
         ]
         return f"<TransactionResult {[', '.join(out)]}>"
 
 
-# === xdr source ============================================================
-#
-#   typedef PublicKey AccountID;
-#
-# ===========================================================================
 class AccountID:
-    def __init__(self, account_id: 'PublicKey') -> None:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    typedef PublicKey AccountID;
+    ----------------------------------------------------------------
+    """
+
+    def __init__(self, account_id: "PublicKey") -> None:
         self.account_id = account_id
 
     def pack(self, packer: Packer) -> None:
         self.account_id.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'AccountID':
+    def unpack(cls, unpacker: Unpacker) -> "AccountID":
         account_id = PublicKey.unpack(unpacker)
         return cls(account_id)
 
@@ -7840,7 +8057,7 @@ class AccountID:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'AccountID':
+    def from_xdr(cls, xdr) -> "AccountID":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -7854,12 +8071,14 @@ class AccountID:
         return f"<AccountID [account_id={self.account_id}]>"
 
 
-# === xdr source ============================================================
-#
-#   typedef opaque Thresholds[4];
-#
-# ===========================================================================
 class Thresholds:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    typedef opaque Thresholds[4];
+    ----------------------------------------------------------------
+    """
+
     def __init__(self, thresholds: bytes) -> None:
         self.thresholds = thresholds
 
@@ -7867,7 +8086,7 @@ class Thresholds:
         Opaque(self.thresholds, 4, True).pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'Thresholds':
+    def unpack(cls, unpacker: Unpacker) -> "Thresholds":
         thresholds = Opaque.unpack(unpacker, 4, True)
         return cls(thresholds)
 
@@ -7877,7 +8096,7 @@ class Thresholds:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'Thresholds':
+    def from_xdr(cls, xdr) -> "Thresholds":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -7891,12 +8110,14 @@ class Thresholds:
         return f"<Thresholds [thresholds={self.thresholds}]>"
 
 
-# === xdr source ============================================================
-#
-#   typedef string string32<32>;
-#
-# ===========================================================================
 class String32:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    typedef string string32<32>;
+    ----------------------------------------------------------------
+    """
+
     def __init__(self, string32: bytes) -> None:
         self.string32 = string32
 
@@ -7904,7 +8125,7 @@ class String32:
         String(self.string32, 32).pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'String32':
+    def unpack(cls, unpacker: Unpacker) -> "String32":
         string32 = String.unpack(unpacker)
         return cls(string32)
 
@@ -7914,7 +8135,7 @@ class String32:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'String32':
+    def from_xdr(cls, xdr) -> "String32":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -7928,12 +8149,14 @@ class String32:
         return f"<String32 [string32={self.string32}]>"
 
 
-# === xdr source ============================================================
-#
-#   typedef string string64<64>;
-#
-# ===========================================================================
 class String64:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    typedef string string64<64>;
+    ----------------------------------------------------------------
+    """
+
     def __init__(self, string64: bytes) -> None:
         self.string64 = string64
 
@@ -7941,7 +8164,7 @@ class String64:
         String(self.string64, 64).pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'String64':
+    def unpack(cls, unpacker: Unpacker) -> "String64":
         string64 = String.unpack(unpacker)
         return cls(string64)
 
@@ -7951,7 +8174,7 @@ class String64:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'String64':
+    def from_xdr(cls, xdr) -> "String64":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -7965,20 +8188,22 @@ class String64:
         return f"<String64 [string64={self.string64}]>"
 
 
-# === xdr source ============================================================
-#
-#   typedef int64 SequenceNumber;
-#
-# ===========================================================================
 class SequenceNumber:
-    def __init__(self, sequence_number: 'Int64') -> None:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    typedef int64 SequenceNumber;
+    ----------------------------------------------------------------
+    """
+
+    def __init__(self, sequence_number: "Int64") -> None:
         self.sequence_number = sequence_number
 
     def pack(self, packer: Packer) -> None:
         self.sequence_number.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'SequenceNumber':
+    def unpack(cls, unpacker: Unpacker) -> "SequenceNumber":
         sequence_number = Int64.unpack(unpacker)
         return cls(sequence_number)
 
@@ -7988,7 +8213,7 @@ class SequenceNumber:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'SequenceNumber':
+    def from_xdr(cls, xdr) -> "SequenceNumber":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -8002,20 +8227,22 @@ class SequenceNumber:
         return f"<SequenceNumber [sequence_number={self.sequence_number}]>"
 
 
-# === xdr source ============================================================
-#
-#   typedef uint64 TimePoint;
-#
-# ===========================================================================
 class TimePoint:
-    def __init__(self, time_point: 'Uint64') -> None:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    typedef uint64 TimePoint;
+    ----------------------------------------------------------------
+    """
+
+    def __init__(self, time_point: "Uint64") -> None:
         self.time_point = time_point
 
     def pack(self, packer: Packer) -> None:
         self.time_point.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'TimePoint':
+    def unpack(cls, unpacker: Unpacker) -> "TimePoint":
         time_point = Uint64.unpack(unpacker)
         return cls(time_point)
 
@@ -8025,7 +8252,7 @@ class TimePoint:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'TimePoint':
+    def from_xdr(cls, xdr) -> "TimePoint":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -8039,12 +8266,14 @@ class TimePoint:
         return f"<TimePoint [time_point={self.time_point}]>"
 
 
-# === xdr source ============================================================
-#
-#   typedef opaque DataValue<64>;
-#
-# ===========================================================================
 class DataValue:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    typedef opaque DataValue<64>;
+    ----------------------------------------------------------------
+    """
+
     def __init__(self, data_value: bytes) -> None:
         self.data_value = data_value
 
@@ -8052,7 +8281,7 @@ class DataValue:
         Opaque(self.data_value, 64, False).pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'DataValue':
+    def unpack(cls, unpacker: Unpacker) -> "DataValue":
         data_value = Opaque.unpack(unpacker, 64, False)
         return cls(data_value)
 
@@ -8062,7 +8291,7 @@ class DataValue:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'DataValue':
+    def from_xdr(cls, xdr) -> "DataValue":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -8076,12 +8305,14 @@ class DataValue:
         return f"<DataValue [data_value={self.data_value}]>"
 
 
-# === xdr source ============================================================
-#
-#   typedef opaque AssetCode4[4];
-#
-# ===========================================================================
 class AssetCode4:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    typedef opaque AssetCode4[4];
+    ----------------------------------------------------------------
+    """
+
     def __init__(self, asset_code4: bytes) -> None:
         self.asset_code4 = asset_code4
 
@@ -8089,7 +8320,7 @@ class AssetCode4:
         Opaque(self.asset_code4, 4, True).pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'AssetCode4':
+    def unpack(cls, unpacker: Unpacker) -> "AssetCode4":
         asset_code4 = Opaque.unpack(unpacker, 4, True)
         return cls(asset_code4)
 
@@ -8099,7 +8330,7 @@ class AssetCode4:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'AssetCode4':
+    def from_xdr(cls, xdr) -> "AssetCode4":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -8113,12 +8344,14 @@ class AssetCode4:
         return f"<AssetCode4 [asset_code4={self.asset_code4}]>"
 
 
-# === xdr source ============================================================
-#
-#   typedef opaque AssetCode12[12];
-#
-# ===========================================================================
 class AssetCode12:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    typedef opaque AssetCode12[12];
+    ----------------------------------------------------------------
+    """
+
     def __init__(self, asset_code12: bytes) -> None:
         self.asset_code12 = asset_code12
 
@@ -8126,7 +8359,7 @@ class AssetCode12:
         Opaque(self.asset_code12, 12, True).pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'AssetCode12':
+    def unpack(cls, unpacker: Unpacker) -> "AssetCode12":
         asset_code12 = Opaque.unpack(unpacker, 12, True)
         return cls(asset_code12)
 
@@ -8136,7 +8369,7 @@ class AssetCode12:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'AssetCode12':
+    def from_xdr(cls, xdr) -> "AssetCode12":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -8150,17 +8383,19 @@ class AssetCode12:
         return f"<AssetCode12 [asset_code12={self.asset_code12}]>"
 
 
-# === xdr source ============================================================
-#
-#   enum AssetType
-#   {
-#       ASSET_TYPE_NATIVE = 0,
-#       ASSET_TYPE_CREDIT_ALPHANUM4 = 1,
-#       ASSET_TYPE_CREDIT_ALPHANUM12 = 2
-#   };
-#
-# ===========================================================================
 class AssetType(IntEnum):
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    enum AssetType
+    {
+        ASSET_TYPE_NATIVE = 0,
+        ASSET_TYPE_CREDIT_ALPHANUM4 = 1,
+        ASSET_TYPE_CREDIT_ALPHANUM12 = 2
+    };
+    ----------------------------------------------------------------
+    """
+
     ASSET_TYPE_NATIVE = 0
     ASSET_TYPE_CREDIT_ALPHANUM4 = 1
     ASSET_TYPE_CREDIT_ALPHANUM12 = 2
@@ -8169,7 +8404,7 @@ class AssetType(IntEnum):
         packer.pack_int(self.value)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'AssetType':
+    def unpack(cls, unpacker: Unpacker) -> "AssetType":
         value = unpacker.unpack_int()
         return cls(value)
 
@@ -8179,7 +8414,7 @@ class AssetType(IntEnum):
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'AssetType':
+    def from_xdr(cls, xdr) -> "AssetType":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -8191,21 +8426,19 @@ class AssetType(IntEnum):
         )
 
 
-# === xdr source ============================================================
-#
-#   struct
-#       {
-#           AssetCode4 assetCode;
-#           AccountID issuer;
-#       }
-#
-# ===========================================================================
 class AssetAlphaNum4:
-    def __init__(
-            self,
-            asset_code: 'AssetCode4',
-            issuer: 'AccountID',
-    ) -> None:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    struct
+        {
+            AssetCode4 assetCode;
+            AccountID issuer;
+        }
+    ----------------------------------------------------------------
+    """
+
+    def __init__(self, asset_code: "AssetCode4", issuer: "AccountID") -> None:
         self.asset_code = asset_code
         self.issuer = issuer
 
@@ -8214,13 +8447,10 @@ class AssetAlphaNum4:
         self.issuer.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'AssetAlphaNum4':
+    def unpack(cls, unpacker: Unpacker) -> "AssetAlphaNum4":
         asset_code = AssetCode4.unpack(unpacker)
         issuer = AccountID.unpack(unpacker)
-        return cls(
-            asset_code=asset_code,
-            issuer=issuer,
-        )
+        return cls(asset_code=asset_code, issuer=issuer)
 
     def to_xdr(self) -> str:
         packer = Packer()
@@ -8228,7 +8458,7 @@ class AssetAlphaNum4:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'AssetAlphaNum4':
+    def from_xdr(cls, xdr) -> "AssetAlphaNum4":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -8239,28 +8469,23 @@ class AssetAlphaNum4:
         return self.asset_code == other.asset_code and self.issuer == other.issuer
 
     def __str__(self):
-        out = [
-            f'asset_code={self.asset_code}',
-            f'issuer={self.issuer}',
-        ]
+        out = [f"asset_code={self.asset_code}", f"issuer={self.issuer}"]
         return f"<AssetAlphaNum4 {[', '.join(out)]}>"
 
 
-# === xdr source ============================================================
-#
-#   struct
-#       {
-#           AssetCode12 assetCode;
-#           AccountID issuer;
-#       }
-#
-# ===========================================================================
 class AssetAlphaNum12:
-    def __init__(
-            self,
-            asset_code: 'AssetCode12',
-            issuer: 'AccountID',
-    ) -> None:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    struct
+        {
+            AssetCode12 assetCode;
+            AccountID issuer;
+        }
+    ----------------------------------------------------------------
+    """
+
+    def __init__(self, asset_code: "AssetCode12", issuer: "AccountID") -> None:
         self.asset_code = asset_code
         self.issuer = issuer
 
@@ -8269,13 +8494,10 @@ class AssetAlphaNum12:
         self.issuer.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'AssetAlphaNum12':
+    def unpack(cls, unpacker: Unpacker) -> "AssetAlphaNum12":
         asset_code = AssetCode12.unpack(unpacker)
         issuer = AccountID.unpack(unpacker)
-        return cls(
-            asset_code=asset_code,
-            issuer=issuer,
-        )
+        return cls(asset_code=asset_code, issuer=issuer)
 
     def to_xdr(self) -> str:
         packer = Packer()
@@ -8283,7 +8505,7 @@ class AssetAlphaNum12:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'AssetAlphaNum12':
+    def from_xdr(cls, xdr) -> "AssetAlphaNum12":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -8294,48 +8516,47 @@ class AssetAlphaNum12:
         return self.asset_code == other.asset_code and self.issuer == other.issuer
 
     def __str__(self):
-        out = [
-            f'asset_code={self.asset_code}',
-            f'issuer={self.issuer}',
-        ]
+        out = [f"asset_code={self.asset_code}", f"issuer={self.issuer}"]
         return f"<AssetAlphaNum12 {[', '.join(out)]}>"
 
 
-# === xdr source ============================================================
-#
-#   union Asset switch (AssetType type)
-#   {
-#   case ASSET_TYPE_NATIVE: // Not credit
-#       void;
-#
-#   case ASSET_TYPE_CREDIT_ALPHANUM4:
-#       struct
-#       {
-#           AssetCode4 assetCode;
-#           AccountID issuer;
-#       } alphaNum4;
-#
-#   case ASSET_TYPE_CREDIT_ALPHANUM12:
-#       struct
-#       {
-#           AssetCode12 assetCode;
-#           AccountID issuer;
-#       } alphaNum12;
-#
-#       // add other asset types here in the future
-#   };
-#
-# ===========================================================================
 class Asset:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    union Asset switch (AssetType type)
+    {
+    case ASSET_TYPE_NATIVE: // Not credit
+        void;
+
+    case ASSET_TYPE_CREDIT_ALPHANUM4:
+        struct
+        {
+            AssetCode4 assetCode;
+            AccountID issuer;
+        } alphaNum4;
+
+    case ASSET_TYPE_CREDIT_ALPHANUM12:
+        struct
+        {
+            AssetCode12 assetCode;
+            AccountID issuer;
+        } alphaNum12;
+
+        // add other asset types here in the future
+    };
+    ----------------------------------------------------------------
+    """
+
     def __init__(
-            self,
-            type: 'AssetType',
-            alpha_num4: 'AssetAlphaNum4' = None,
-            alpha_num12: 'AssetAlphaNum12' = None,
+        self,
+        type: "AssetType",
+        alpha_num4: "AssetAlphaNum4" = None,
+        alpha_num12: "AssetAlphaNum12" = None,
     ) -> None:
         self.type = type
-        self.alpha_num4: 'AssetAlphaNum4' = alpha_num4
-        self.alpha_num12: 'AssetAlphaNum12' = alpha_num12
+        self.alpha_num4: "AssetAlphaNum4" = alpha_num4
+        self.alpha_num12: "AssetAlphaNum12" = alpha_num12
 
     def pack(self, packer: Packer) -> None:
         self.type.pack(packer)
@@ -8349,7 +8570,7 @@ class Asset:
             return
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'Asset':
+    def unpack(cls, unpacker: Unpacker) -> "Asset":
         type = AssetType.unpack(unpacker)
         if type == AssetType.ASSET_TYPE_NATIVE:
             return cls(type)
@@ -8366,7 +8587,7 @@ class Asset:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'Asset':
+    def from_xdr(cls, xdr) -> "Asset":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -8374,31 +8595,37 @@ class Asset:
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented
-        return self.type == other.type and self.alpha_num4 == other.alpha_num4 and self.alpha_num12 == other.alpha_num12
+        return (
+            self.type == other.type
+            and self.alpha_num4 == other.alpha_num4
+            and self.alpha_num12 == other.alpha_num12
+        )
 
     def __str__(self):
         out = []
-        out.append(f'type={self.type}')
-        out.append(f'alpha_num4={self.alpha_num4}') if self.alpha_num4 is not None else None
-        out.append(f'alpha_num12={self.alpha_num12}') if self.alpha_num12 is not None else None
+        out.append(f"type={self.type}")
+        out.append(
+            f"alpha_num4={self.alpha_num4}"
+        ) if self.alpha_num4 is not None else None
+        out.append(
+            f"alpha_num12={self.alpha_num12}"
+        ) if self.alpha_num12 is not None else None
         return f"<Asset {[', '.join(out)]}>"
 
 
-# === xdr source ============================================================
-#
-#   struct Price
-#   {
-#       int32 n; // numerator
-#       int32 d; // denominator
-#   };
-#
-# ===========================================================================
 class Price:
-    def __init__(
-            self,
-            n: 'Int32',
-            d: 'Int32',
-    ) -> None:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    struct Price
+    {
+        int32 n; // numerator
+        int32 d; // denominator
+    };
+    ----------------------------------------------------------------
+    """
+
+    def __init__(self, n: "Int32", d: "Int32") -> None:
         self.n = n
         self.d = d
 
@@ -8407,13 +8634,10 @@ class Price:
         self.d.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'Price':
+    def unpack(cls, unpacker: Unpacker) -> "Price":
         n = Int32.unpack(unpacker)
         d = Int32.unpack(unpacker)
-        return cls(
-            n=n,
-            d=d,
-        )
+        return cls(n=n, d=d)
 
     def to_xdr(self) -> str:
         packer = Packer()
@@ -8421,7 +8645,7 @@ class Price:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'Price':
+    def from_xdr(cls, xdr) -> "Price":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -8432,28 +8656,23 @@ class Price:
         return self.n == other.n and self.d == other.d
 
     def __str__(self):
-        out = [
-            f'n={self.n}',
-            f'd={self.d}',
-        ]
+        out = [f"n={self.n}", f"d={self.d}"]
         return f"<Price {[', '.join(out)]}>"
 
 
-# === xdr source ============================================================
-#
-#   struct Liabilities
-#   {
-#       int64 buying;
-#       int64 selling;
-#   };
-#
-# ===========================================================================
 class Liabilities:
-    def __init__(
-            self,
-            buying: 'Int64',
-            selling: 'Int64',
-    ) -> None:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    struct Liabilities
+    {
+        int64 buying;
+        int64 selling;
+    };
+    ----------------------------------------------------------------
+    """
+
+    def __init__(self, buying: "Int64", selling: "Int64") -> None:
         self.buying = buying
         self.selling = selling
 
@@ -8462,13 +8681,10 @@ class Liabilities:
         self.selling.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'Liabilities':
+    def unpack(cls, unpacker: Unpacker) -> "Liabilities":
         buying = Int64.unpack(unpacker)
         selling = Int64.unpack(unpacker)
-        return cls(
-            buying=buying,
-            selling=selling,
-        )
+        return cls(buying=buying, selling=selling)
 
     def to_xdr(self) -> str:
         packer = Packer()
@@ -8476,7 +8692,7 @@ class Liabilities:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'Liabilities':
+    def from_xdr(cls, xdr) -> "Liabilities":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -8487,25 +8703,24 @@ class Liabilities:
         return self.buying == other.buying and self.selling == other.selling
 
     def __str__(self):
-        out = [
-            f'buying={self.buying}',
-            f'selling={self.selling}',
-        ]
+        out = [f"buying={self.buying}", f"selling={self.selling}"]
         return f"<Liabilities {[', '.join(out)]}>"
 
 
-# === xdr source ============================================================
-#
-#   enum ThresholdIndexes
-#   {
-#       THRESHOLD_MASTER_WEIGHT = 0,
-#       THRESHOLD_LOW = 1,
-#       THRESHOLD_MED = 2,
-#       THRESHOLD_HIGH = 3
-#   };
-#
-# ===========================================================================
 class ThresholdIndexes(IntEnum):
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    enum ThresholdIndexes
+    {
+        THRESHOLD_MASTER_WEIGHT = 0,
+        THRESHOLD_LOW = 1,
+        THRESHOLD_MED = 2,
+        THRESHOLD_HIGH = 3
+    };
+    ----------------------------------------------------------------
+    """
+
     THRESHOLD_MASTER_WEIGHT = 0
     THRESHOLD_LOW = 1
     THRESHOLD_MED = 2
@@ -8515,7 +8730,7 @@ class ThresholdIndexes(IntEnum):
         packer.pack_int(self.value)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'ThresholdIndexes':
+    def unpack(cls, unpacker: Unpacker) -> "ThresholdIndexes":
         value = unpacker.unpack_int()
         return cls(value)
 
@@ -8525,7 +8740,7 @@ class ThresholdIndexes(IntEnum):
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'ThresholdIndexes':
+    def from_xdr(cls, xdr) -> "ThresholdIndexes":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -8537,18 +8752,20 @@ class ThresholdIndexes(IntEnum):
         )
 
 
-# === xdr source ============================================================
-#
-#   enum LedgerEntryType
-#   {
-#       ACCOUNT = 0,
-#       TRUSTLINE = 1,
-#       OFFER = 2,
-#       DATA = 3
-#   };
-#
-# ===========================================================================
 class LedgerEntryType(IntEnum):
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    enum LedgerEntryType
+    {
+        ACCOUNT = 0,
+        TRUSTLINE = 1,
+        OFFER = 2,
+        DATA = 3
+    };
+    ----------------------------------------------------------------
+    """
+
     ACCOUNT = 0
     TRUSTLINE = 1
     OFFER = 2
@@ -8558,7 +8775,7 @@ class LedgerEntryType(IntEnum):
         packer.pack_int(self.value)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'LedgerEntryType':
+    def unpack(cls, unpacker: Unpacker) -> "LedgerEntryType":
         value = unpacker.unpack_int()
         return cls(value)
 
@@ -8568,7 +8785,7 @@ class LedgerEntryType(IntEnum):
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'LedgerEntryType':
+    def from_xdr(cls, xdr) -> "LedgerEntryType":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -8580,21 +8797,19 @@ class LedgerEntryType(IntEnum):
         )
 
 
-# === xdr source ============================================================
-#
-#   struct Signer
-#   {
-#       SignerKey key;
-#       uint32 weight; // really only need 1 byte
-#   };
-#
-# ===========================================================================
 class Signer:
-    def __init__(
-            self,
-            key: 'SignerKey',
-            weight: 'Uint32',
-    ) -> None:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    struct Signer
+    {
+        SignerKey key;
+        uint32 weight; // really only need 1 byte
+    };
+    ----------------------------------------------------------------
+    """
+
+    def __init__(self, key: "SignerKey", weight: "Uint32") -> None:
         self.key = key
         self.weight = weight
 
@@ -8603,13 +8818,10 @@ class Signer:
         self.weight.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'Signer':
+    def unpack(cls, unpacker: Unpacker) -> "Signer":
         key = SignerKey.unpack(unpacker)
         weight = Uint32.unpack(unpacker)
-        return cls(
-            key=key,
-            weight=weight,
-        )
+        return cls(key=key, weight=weight)
 
     def to_xdr(self) -> str:
         packer = Packer()
@@ -8617,7 +8829,7 @@ class Signer:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'Signer':
+    def from_xdr(cls, xdr) -> "Signer":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -8628,31 +8840,30 @@ class Signer:
         return self.key == other.key and self.weight == other.weight
 
     def __str__(self):
-        out = [
-            f'key={self.key}',
-            f'weight={self.weight}',
-        ]
+        out = [f"key={self.key}", f"weight={self.weight}"]
         return f"<Signer {[', '.join(out)]}>"
 
 
-# === xdr source ============================================================
-#
-#   enum AccountFlags
-#   { // masks for each flag
-#
-#       // Flags set on issuer accounts
-#       // TrustLines are created with authorized set to "false" requiring
-#       // the issuer to set it for each TrustLine
-#       AUTH_REQUIRED_FLAG = 0x1,
-#       // If set, the authorized flag in TrustLines can be cleared
-#       // otherwise, authorization cannot be revoked
-#       AUTH_REVOCABLE_FLAG = 0x2,
-#       // Once set, causes all AUTH_* flags to be read-only
-#       AUTH_IMMUTABLE_FLAG = 0x4
-#   };
-#
-# ===========================================================================
 class AccountFlags(IntEnum):
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    enum AccountFlags
+    { // masks for each flag
+
+        // Flags set on issuer accounts
+        // TrustLines are created with authorized set to "false" requiring
+        // the issuer to set it for each TrustLine
+        AUTH_REQUIRED_FLAG = 0x1,
+        // If set, the authorized flag in TrustLines can be cleared
+        // otherwise, authorization cannot be revoked
+        AUTH_REVOCABLE_FLAG = 0x2,
+        // Once set, causes all AUTH_* flags to be read-only
+        AUTH_IMMUTABLE_FLAG = 0x4
+    };
+    ----------------------------------------------------------------
+    """
+
     AUTH_REQUIRED_FLAG = 1
     AUTH_REVOCABLE_FLAG = 2
     AUTH_IMMUTABLE_FLAG = 4
@@ -8661,7 +8872,7 @@ class AccountFlags(IntEnum):
         packer.pack_int(self.value)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'AccountFlags':
+    def unpack(cls, unpacker: Unpacker) -> "AccountFlags":
         value = unpacker.unpack_int()
         return cls(value)
 
@@ -8671,7 +8882,7 @@ class AccountFlags(IntEnum):
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'AccountFlags':
+    def from_xdr(cls, xdr) -> "AccountFlags":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -8683,28 +8894,28 @@ class AccountFlags(IntEnum):
         )
 
 
-# === xdr source ============================================================
-#
-#   const MASK_ACCOUNT_FLAGS = 0x7;
-#
-# ===========================================================================
+"""
+XDR Source Code
+----------------------------------------------------------------
+const MASK_ACCOUNT_FLAGS = 0x7;
+----------------------------------------------------------------
+"""
 MASK_ACCOUNT_FLAGS: int = 0x7
 
 
-# === xdr source ============================================================
-#
-#   union switch (int v)
-#               {
-#               case 0:
-#                   void;
-#               }
-#
-# ===========================================================================
 class AccountEntryV1Ext:
-    def __init__(
-            self,
-            v: int,
-    ) -> None:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    union switch (int v)
+                {
+                case 0:
+                    void;
+                }
+    ----------------------------------------------------------------
+    """
+
+    def __init__(self, v: int) -> None:
         self.v = v
 
     def pack(self, packer: Packer) -> None:
@@ -8713,7 +8924,7 @@ class AccountEntryV1Ext:
             return
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'AccountEntryV1Ext':
+    def unpack(cls, unpacker: Unpacker) -> "AccountEntryV1Ext":
         v = Integer.unpack(unpacker)
         if v == 0:
             return cls(v)
@@ -8724,7 +8935,7 @@ class AccountEntryV1Ext:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'AccountEntryV1Ext':
+    def from_xdr(cls, xdr) -> "AccountEntryV1Ext":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -8736,31 +8947,29 @@ class AccountEntryV1Ext:
 
     def __str__(self):
         out = []
-        out.append(f'v={self.v}')
+        out.append(f"v={self.v}")
         return f"<AccountEntryV1Ext {[', '.join(out)]}>"
 
 
-# === xdr source ============================================================
-#
-#   struct
-#           {
-#               Liabilities liabilities;
-#
-#               union switch (int v)
-#               {
-#               case 0:
-#                   void;
-#               }
-#               ext;
-#           }
-#
-# ===========================================================================
 class AccountEntryV1:
-    def __init__(
-            self,
-            liabilities: 'Liabilities',
-            ext: 'AccountEntryV1Ext',
-    ) -> None:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    struct
+            {
+                Liabilities liabilities;
+
+                union switch (int v)
+                {
+                case 0:
+                    void;
+                }
+                ext;
+            }
+    ----------------------------------------------------------------
+    """
+
+    def __init__(self, liabilities: "Liabilities", ext: "AccountEntryV1Ext") -> None:
         self.liabilities = liabilities
         self.ext = ext
 
@@ -8769,13 +8978,10 @@ class AccountEntryV1:
         self.ext.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'AccountEntryV1':
+    def unpack(cls, unpacker: Unpacker) -> "AccountEntryV1":
         liabilities = Liabilities.unpack(unpacker)
         ext = AccountEntryV1Ext.unpack(unpacker)
-        return cls(
-            liabilities=liabilities,
-            ext=ext,
-        )
+        return cls(liabilities=liabilities, ext=ext)
 
     def to_xdr(self) -> str:
         packer = Packer()
@@ -8783,7 +8989,7 @@ class AccountEntryV1:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'AccountEntryV1':
+    def from_xdr(cls, xdr) -> "AccountEntryV1":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -8794,42 +9000,37 @@ class AccountEntryV1:
         return self.liabilities == other.liabilities and self.ext == other.ext
 
     def __str__(self):
-        out = [
-            f'liabilities={self.liabilities}',
-            f'ext={self.ext}',
-        ]
+        out = [f"liabilities={self.liabilities}", f"ext={self.ext}"]
         return f"<AccountEntryV1 {[', '.join(out)]}>"
 
 
-# === xdr source ============================================================
-#
-#   union switch (int v)
-#       {
-#       case 0:
-#           void;
-#       case 1:
-#           struct
-#           {
-#               Liabilities liabilities;
-#
-#               union switch (int v)
-#               {
-#               case 0:
-#                   void;
-#               }
-#               ext;
-#           } v1;
-#       }
-#
-# ===========================================================================
 class AccountEntryExt:
-    def __init__(
-            self,
-            v: int,
-            v1: 'AccountEntryV1' = None,
-    ) -> None:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    union switch (int v)
+        {
+        case 0:
+            void;
+        case 1:
+            struct
+            {
+                Liabilities liabilities;
+
+                union switch (int v)
+                {
+                case 0:
+                    void;
+                }
+                ext;
+            } v1;
+        }
+    ----------------------------------------------------------------
+    """
+
+    def __init__(self, v: int, v1: "AccountEntryV1" = None) -> None:
         self.v = v
-        self.v1: 'AccountEntryV1' = v1
+        self.v1: "AccountEntryV1" = v1
 
     def pack(self, packer: Packer) -> None:
         Integer(self.v).pack(packer)
@@ -8840,7 +9041,7 @@ class AccountEntryExt:
             return
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'AccountEntryExt':
+    def unpack(cls, unpacker: Unpacker) -> "AccountEntryExt":
         v = Integer.unpack(unpacker)
         if v == 0:
             return cls(v)
@@ -8854,7 +9055,7 @@ class AccountEntryExt:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'AccountEntryExt':
+    def from_xdr(cls, xdr) -> "AccountEntryExt":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -8866,66 +9067,68 @@ class AccountEntryExt:
 
     def __str__(self):
         out = []
-        out.append(f'v={self.v}')
-        out.append(f'v1={self.v1}') if self.v1 is not None else None
+        out.append(f"v={self.v}")
+        out.append(f"v1={self.v1}") if self.v1 is not None else None
         return f"<AccountEntryExt {[', '.join(out)]}>"
 
 
-# === xdr source ============================================================
-#
-#   struct AccountEntry
-#   {
-#       AccountID accountID;      // master public key for this account
-#       int64 balance;            // in stroops
-#       SequenceNumber seqNum;    // last sequence number used for this account
-#       uint32 numSubEntries;     // number of sub-entries this account has
-#                                 // drives the reserve
-#       AccountID* inflationDest; // Account to vote for during inflation
-#       uint32 flags;             // see AccountFlags
-#
-#       string32 homeDomain; // can be used for reverse federation and memo lookup
-#
-#       // fields used for signatures
-#       // thresholds stores unsigned bytes: [weight of master|low|medium|high]
-#       Thresholds thresholds;
-#
-#       Signer signers<20>; // possible signers for this account
-#
-#       // reserved for future use
-#       union switch (int v)
-#       {
-#       case 0:
-#           void;
-#       case 1:
-#           struct
-#           {
-#               Liabilities liabilities;
-#
-#               union switch (int v)
-#               {
-#               case 0:
-#                   void;
-#               }
-#               ext;
-#           } v1;
-#       }
-#       ext;
-#   };
-#
-# ===========================================================================
 class AccountEntry:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    struct AccountEntry
+    {
+        AccountID accountID;      // master public key for this account
+        int64 balance;            // in stroops
+        SequenceNumber seqNum;    // last sequence number used for this account
+        uint32 numSubEntries;     // number of sub-entries this account has
+                                  // drives the reserve
+        AccountID* inflationDest; // Account to vote for during inflation
+        uint32 flags;             // see AccountFlags
+
+        string32 homeDomain; // can be used for reverse federation and memo lookup
+
+        // fields used for signatures
+        // thresholds stores unsigned bytes: [weight of master|low|medium|high]
+        Thresholds thresholds;
+
+        Signer signers<20>; // possible signers for this account
+
+        // reserved for future use
+        union switch (int v)
+        {
+        case 0:
+            void;
+        case 1:
+            struct
+            {
+                Liabilities liabilities;
+
+                union switch (int v)
+                {
+                case 0:
+                    void;
+                }
+                ext;
+            } v1;
+        }
+        ext;
+    };
+    ----------------------------------------------------------------
+    """
+
     def __init__(
-            self,
-            account_id: 'AccountID',
-            balance: 'Int64',
-            seq_num: 'SequenceNumber',
-            num_sub_entries: 'Uint32',
-            inflation_dest: Optional['AccountID'],
-            flags: 'Uint32',
-            home_domain: 'String32',
-            thresholds: 'Thresholds',
-            signers: List['Signer'],
-            ext: 'AccountEntryExt',
+        self,
+        account_id: "AccountID",
+        balance: "Int64",
+        seq_num: "SequenceNumber",
+        num_sub_entries: "Uint32",
+        inflation_dest: Optional["AccountID"],
+        flags: "Uint32",
+        home_domain: "String32",
+        thresholds: "Thresholds",
+        signers: List["Signer"],
+        ext: "AccountEntryExt",
     ) -> None:
         self.account_id = account_id
         self.balance = balance
@@ -8957,7 +9160,7 @@ class AccountEntry:
         self.ext.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'AccountEntry':
+    def unpack(cls, unpacker: Unpacker) -> "AccountEntry":
         account_id = AccountID.unpack(unpacker)
         balance = Int64.unpack(unpacker)
         seq_num = SequenceNumber.unpack(unpacker)
@@ -8990,7 +9193,7 @@ class AccountEntry:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'AccountEntry':
+    def from_xdr(cls, xdr) -> "AccountEntry":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -8998,41 +9201,54 @@ class AccountEntry:
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented
-        return self.account_id == other.account_id and self.balance == other.balance and self.seq_num == other.seq_num and self.num_sub_entries == other.num_sub_entries and self.inflation_dest == other.inflation_dest and self.flags == other.flags and self.home_domain == other.home_domain and self.thresholds == other.thresholds and self.signers == other.signers and self.ext == other.ext
+        return (
+            self.account_id == other.account_id
+            and self.balance == other.balance
+            and self.seq_num == other.seq_num
+            and self.num_sub_entries == other.num_sub_entries
+            and self.inflation_dest == other.inflation_dest
+            and self.flags == other.flags
+            and self.home_domain == other.home_domain
+            and self.thresholds == other.thresholds
+            and self.signers == other.signers
+            and self.ext == other.ext
+        )
 
     def __str__(self):
         out = [
-            f'account_id={self.account_id}',
-            f'balance={self.balance}',
-            f'seq_num={self.seq_num}',
-            f'num_sub_entries={self.num_sub_entries}',
-            f'inflation_dest={self.inflation_dest}',
-            f'flags={self.flags}',
-            f'home_domain={self.home_domain}',
-            f'thresholds={self.thresholds}',
-            f'signers={self.signers}',
-            f'ext={self.ext}',
+            f"account_id={self.account_id}",
+            f"balance={self.balance}",
+            f"seq_num={self.seq_num}",
+            f"num_sub_entries={self.num_sub_entries}",
+            f"inflation_dest={self.inflation_dest}",
+            f"flags={self.flags}",
+            f"home_domain={self.home_domain}",
+            f"thresholds={self.thresholds}",
+            f"signers={self.signers}",
+            f"ext={self.ext}",
         ]
         return f"<AccountEntry {[', '.join(out)]}>"
 
 
-# === xdr source ============================================================
-#
-#   enum TrustLineFlags
-#   {
-#       // issuer has authorized account to perform transactions with its credit
-#       AUTHORIZED_FLAG = 1
-#   };
-#
-# ===========================================================================
 class TrustLineFlags(IntEnum):
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    enum TrustLineFlags
+    {
+        // issuer has authorized account to perform transactions with its credit
+        AUTHORIZED_FLAG = 1
+    };
+    ----------------------------------------------------------------
+    """
+
     AUTHORIZED_FLAG = 1
 
     def pack(self, packer: Packer) -> None:
         packer.pack_int(self.value)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'TrustLineFlags':
+    def unpack(cls, unpacker: Unpacker) -> "TrustLineFlags":
         value = unpacker.unpack_int()
         return cls(value)
 
@@ -9042,7 +9258,7 @@ class TrustLineFlags(IntEnum):
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'TrustLineFlags':
+    def from_xdr(cls, xdr) -> "TrustLineFlags":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -9054,28 +9270,28 @@ class TrustLineFlags(IntEnum):
         )
 
 
-# === xdr source ============================================================
-#
-#   const MASK_TRUSTLINE_FLAGS = 1;
-#
-# ===========================================================================
+"""
+XDR Source Code
+----------------------------------------------------------------
+const MASK_TRUSTLINE_FLAGS = 1;
+----------------------------------------------------------------
+"""
 MASK_TRUSTLINE_FLAGS: int = 1
 
 
-# === xdr source ============================================================
-#
-#   union switch (int v)
-#               {
-#               case 0:
-#                   void;
-#               }
-#
-# ===========================================================================
 class TrustLineEntryV1Ext:
-    def __init__(
-            self,
-            v: int,
-    ) -> None:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    union switch (int v)
+                {
+                case 0:
+                    void;
+                }
+    ----------------------------------------------------------------
+    """
+
+    def __init__(self, v: int) -> None:
         self.v = v
 
     def pack(self, packer: Packer) -> None:
@@ -9084,7 +9300,7 @@ class TrustLineEntryV1Ext:
             return
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'TrustLineEntryV1Ext':
+    def unpack(cls, unpacker: Unpacker) -> "TrustLineEntryV1Ext":
         v = Integer.unpack(unpacker)
         if v == 0:
             return cls(v)
@@ -9095,7 +9311,7 @@ class TrustLineEntryV1Ext:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'TrustLineEntryV1Ext':
+    def from_xdr(cls, xdr) -> "TrustLineEntryV1Ext":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -9107,31 +9323,29 @@ class TrustLineEntryV1Ext:
 
     def __str__(self):
         out = []
-        out.append(f'v={self.v}')
+        out.append(f"v={self.v}")
         return f"<TrustLineEntryV1Ext {[', '.join(out)]}>"
 
 
-# === xdr source ============================================================
-#
-#   struct
-#           {
-#               Liabilities liabilities;
-#
-#               union switch (int v)
-#               {
-#               case 0:
-#                   void;
-#               }
-#               ext;
-#           }
-#
-# ===========================================================================
 class TrustLineEntryV1:
-    def __init__(
-            self,
-            liabilities: 'Liabilities',
-            ext: 'TrustLineEntryV1Ext',
-    ) -> None:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    struct
+            {
+                Liabilities liabilities;
+
+                union switch (int v)
+                {
+                case 0:
+                    void;
+                }
+                ext;
+            }
+    ----------------------------------------------------------------
+    """
+
+    def __init__(self, liabilities: "Liabilities", ext: "TrustLineEntryV1Ext") -> None:
         self.liabilities = liabilities
         self.ext = ext
 
@@ -9140,13 +9354,10 @@ class TrustLineEntryV1:
         self.ext.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'TrustLineEntryV1':
+    def unpack(cls, unpacker: Unpacker) -> "TrustLineEntryV1":
         liabilities = Liabilities.unpack(unpacker)
         ext = TrustLineEntryV1Ext.unpack(unpacker)
-        return cls(
-            liabilities=liabilities,
-            ext=ext,
-        )
+        return cls(liabilities=liabilities, ext=ext)
 
     def to_xdr(self) -> str:
         packer = Packer()
@@ -9154,7 +9365,7 @@ class TrustLineEntryV1:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'TrustLineEntryV1':
+    def from_xdr(cls, xdr) -> "TrustLineEntryV1":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -9165,42 +9376,37 @@ class TrustLineEntryV1:
         return self.liabilities == other.liabilities and self.ext == other.ext
 
     def __str__(self):
-        out = [
-            f'liabilities={self.liabilities}',
-            f'ext={self.ext}',
-        ]
+        out = [f"liabilities={self.liabilities}", f"ext={self.ext}"]
         return f"<TrustLineEntryV1 {[', '.join(out)]}>"
 
 
-# === xdr source ============================================================
-#
-#   union switch (int v)
-#       {
-#       case 0:
-#           void;
-#       case 1:
-#           struct
-#           {
-#               Liabilities liabilities;
-#
-#               union switch (int v)
-#               {
-#               case 0:
-#                   void;
-#               }
-#               ext;
-#           } v1;
-#       }
-#
-# ===========================================================================
 class TrustLineEntryExt:
-    def __init__(
-            self,
-            v: int,
-            v1: 'TrustLineEntryV1' = None,
-    ) -> None:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    union switch (int v)
+        {
+        case 0:
+            void;
+        case 1:
+            struct
+            {
+                Liabilities liabilities;
+
+                union switch (int v)
+                {
+                case 0:
+                    void;
+                }
+                ext;
+            } v1;
+        }
+    ----------------------------------------------------------------
+    """
+
+    def __init__(self, v: int, v1: "TrustLineEntryV1" = None) -> None:
         self.v = v
-        self.v1: 'TrustLineEntryV1' = v1
+        self.v1: "TrustLineEntryV1" = v1
 
     def pack(self, packer: Packer) -> None:
         Integer(self.v).pack(packer)
@@ -9211,7 +9417,7 @@ class TrustLineEntryExt:
             return
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'TrustLineEntryExt':
+    def unpack(cls, unpacker: Unpacker) -> "TrustLineEntryExt":
         v = Integer.unpack(unpacker)
         if v == 0:
             return cls(v)
@@ -9225,7 +9431,7 @@ class TrustLineEntryExt:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'TrustLineEntryExt':
+    def from_xdr(cls, xdr) -> "TrustLineEntryExt":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -9237,54 +9443,56 @@ class TrustLineEntryExt:
 
     def __str__(self):
         out = []
-        out.append(f'v={self.v}')
-        out.append(f'v1={self.v1}') if self.v1 is not None else None
+        out.append(f"v={self.v}")
+        out.append(f"v1={self.v1}") if self.v1 is not None else None
         return f"<TrustLineEntryExt {[', '.join(out)]}>"
 
 
-# === xdr source ============================================================
-#
-#   struct TrustLineEntry
-#   {
-#       AccountID accountID; // account this trustline belongs to
-#       Asset asset;         // type of asset (with issuer)
-#       int64 balance;       // how much of this asset the user has.
-#                            // Asset defines the unit for this;
-#
-#       int64 limit;  // balance cannot be above this
-#       uint32 flags; // see TrustLineFlags
-#
-#       // reserved for future use
-#       union switch (int v)
-#       {
-#       case 0:
-#           void;
-#       case 1:
-#           struct
-#           {
-#               Liabilities liabilities;
-#
-#               union switch (int v)
-#               {
-#               case 0:
-#                   void;
-#               }
-#               ext;
-#           } v1;
-#       }
-#       ext;
-#   };
-#
-# ===========================================================================
 class TrustLineEntry:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    struct TrustLineEntry
+    {
+        AccountID accountID; // account this trustline belongs to
+        Asset asset;         // type of asset (with issuer)
+        int64 balance;       // how much of this asset the user has.
+                             // Asset defines the unit for this;
+
+        int64 limit;  // balance cannot be above this
+        uint32 flags; // see TrustLineFlags
+
+        // reserved for future use
+        union switch (int v)
+        {
+        case 0:
+            void;
+        case 1:
+            struct
+            {
+                Liabilities liabilities;
+
+                union switch (int v)
+                {
+                case 0:
+                    void;
+                }
+                ext;
+            } v1;
+        }
+        ext;
+    };
+    ----------------------------------------------------------------
+    """
+
     def __init__(
-            self,
-            account_id: 'AccountID',
-            asset: 'Asset',
-            balance: 'Int64',
-            limit: 'Int64',
-            flags: 'Uint32',
-            ext: 'TrustLineEntryExt',
+        self,
+        account_id: "AccountID",
+        asset: "Asset",
+        balance: "Int64",
+        limit: "Int64",
+        flags: "Uint32",
+        ext: "TrustLineEntryExt",
     ) -> None:
         self.account_id = account_id
         self.asset = asset
@@ -9302,7 +9510,7 @@ class TrustLineEntry:
         self.ext.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'TrustLineEntry':
+    def unpack(cls, unpacker: Unpacker) -> "TrustLineEntry":
         account_id = AccountID.unpack(unpacker)
         asset = Asset.unpack(unpacker)
         balance = Int64.unpack(unpacker)
@@ -9324,7 +9532,7 @@ class TrustLineEntry:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'TrustLineEntry':
+    def from_xdr(cls, xdr) -> "TrustLineEntry":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -9332,37 +9540,46 @@ class TrustLineEntry:
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented
-        return self.account_id == other.account_id and self.asset == other.asset and self.balance == other.balance and self.limit == other.limit and self.flags == other.flags and self.ext == other.ext
+        return (
+            self.account_id == other.account_id
+            and self.asset == other.asset
+            and self.balance == other.balance
+            and self.limit == other.limit
+            and self.flags == other.flags
+            and self.ext == other.ext
+        )
 
     def __str__(self):
         out = [
-            f'account_id={self.account_id}',
-            f'asset={self.asset}',
-            f'balance={self.balance}',
-            f'limit={self.limit}',
-            f'flags={self.flags}',
-            f'ext={self.ext}',
+            f"account_id={self.account_id}",
+            f"asset={self.asset}",
+            f"balance={self.balance}",
+            f"limit={self.limit}",
+            f"flags={self.flags}",
+            f"ext={self.ext}",
         ]
         return f"<TrustLineEntry {[', '.join(out)]}>"
 
 
-# === xdr source ============================================================
-#
-#   enum OfferEntryFlags
-#   {
-#       // issuer has authorized account to perform transactions with its credit
-#       PASSIVE_FLAG = 1
-#   };
-#
-# ===========================================================================
 class OfferEntryFlags(IntEnum):
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    enum OfferEntryFlags
+    {
+        // issuer has authorized account to perform transactions with its credit
+        PASSIVE_FLAG = 1
+    };
+    ----------------------------------------------------------------
+    """
+
     PASSIVE_FLAG = 1
 
     def pack(self, packer: Packer) -> None:
         packer.pack_int(self.value)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'OfferEntryFlags':
+    def unpack(cls, unpacker: Unpacker) -> "OfferEntryFlags":
         value = unpacker.unpack_int()
         return cls(value)
 
@@ -9372,7 +9589,7 @@ class OfferEntryFlags(IntEnum):
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'OfferEntryFlags':
+    def from_xdr(cls, xdr) -> "OfferEntryFlags":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -9384,28 +9601,28 @@ class OfferEntryFlags(IntEnum):
         )
 
 
-# === xdr source ============================================================
-#
-#   const MASK_OFFERENTRY_FLAGS = 1;
-#
-# ===========================================================================
+"""
+XDR Source Code
+----------------------------------------------------------------
+const MASK_OFFERENTRY_FLAGS = 1;
+----------------------------------------------------------------
+"""
 MASK_OFFERENTRY_FLAGS: int = 1
 
 
-# === xdr source ============================================================
-#
-#   union switch (int v)
-#       {
-#       case 0:
-#           void;
-#       }
-#
-# ===========================================================================
 class OfferEntryExt:
-    def __init__(
-            self,
-            v: int,
-    ) -> None:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    union switch (int v)
+        {
+        case 0:
+            void;
+        }
+    ----------------------------------------------------------------
+    """
+
+    def __init__(self, v: int) -> None:
         self.v = v
 
     def pack(self, packer: Packer) -> None:
@@ -9414,7 +9631,7 @@ class OfferEntryExt:
             return
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'OfferEntryExt':
+    def unpack(cls, unpacker: Unpacker) -> "OfferEntryExt":
         v = Integer.unpack(unpacker)
         if v == 0:
             return cls(v)
@@ -9425,7 +9642,7 @@ class OfferEntryExt:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'OfferEntryExt':
+    def from_xdr(cls, xdr) -> "OfferEntryExt":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -9437,49 +9654,51 @@ class OfferEntryExt:
 
     def __str__(self):
         out = []
-        out.append(f'v={self.v}')
+        out.append(f"v={self.v}")
         return f"<OfferEntryExt {[', '.join(out)]}>"
 
 
-# === xdr source ============================================================
-#
-#   struct OfferEntry
-#   {
-#       AccountID sellerID;
-#       int64 offerID;
-#       Asset selling; // A
-#       Asset buying;  // B
-#       int64 amount;  // amount of A
-#
-#       /* price for this offer:
-#           price of A in terms of B
-#           price=AmountB/AmountA=priceNumerator/priceDenominator
-#           price is after fees
-#       */
-#       Price price;
-#       uint32 flags; // see OfferEntryFlags
-#
-#       // reserved for future use
-#       union switch (int v)
-#       {
-#       case 0:
-#           void;
-#       }
-#       ext;
-#   };
-#
-# ===========================================================================
 class OfferEntry:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    struct OfferEntry
+    {
+        AccountID sellerID;
+        int64 offerID;
+        Asset selling; // A
+        Asset buying;  // B
+        int64 amount;  // amount of A
+
+        /* price for this offer:
+            price of A in terms of B
+            price=AmountB/AmountA=priceNumerator/priceDenominator
+            price is after fees
+        */
+        Price price;
+        uint32 flags; // see OfferEntryFlags
+
+        // reserved for future use
+        union switch (int v)
+        {
+        case 0:
+            void;
+        }
+        ext;
+    };
+    ----------------------------------------------------------------
+    """
+
     def __init__(
-            self,
-            seller_id: 'AccountID',
-            offer_id: 'Int64',
-            selling: 'Asset',
-            buying: 'Asset',
-            amount: 'Int64',
-            price: 'Price',
-            flags: 'Uint32',
-            ext: 'OfferEntryExt',
+        self,
+        seller_id: "AccountID",
+        offer_id: "Int64",
+        selling: "Asset",
+        buying: "Asset",
+        amount: "Int64",
+        price: "Price",
+        flags: "Uint32",
+        ext: "OfferEntryExt",
     ) -> None:
         self.seller_id = seller_id
         self.offer_id = offer_id
@@ -9501,7 +9720,7 @@ class OfferEntry:
         self.ext.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'OfferEntry':
+    def unpack(cls, unpacker: Unpacker) -> "OfferEntry":
         seller_id = AccountID.unpack(unpacker)
         offer_id = Int64.unpack(unpacker)
         selling = Asset.unpack(unpacker)
@@ -9527,7 +9746,7 @@ class OfferEntry:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'OfferEntry':
+    def from_xdr(cls, xdr) -> "OfferEntry":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -9535,36 +9754,44 @@ class OfferEntry:
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented
-        return self.seller_id == other.seller_id and self.offer_id == other.offer_id and self.selling == other.selling and self.buying == other.buying and self.amount == other.amount and self.price == other.price and self.flags == other.flags and self.ext == other.ext
+        return (
+            self.seller_id == other.seller_id
+            and self.offer_id == other.offer_id
+            and self.selling == other.selling
+            and self.buying == other.buying
+            and self.amount == other.amount
+            and self.price == other.price
+            and self.flags == other.flags
+            and self.ext == other.ext
+        )
 
     def __str__(self):
         out = [
-            f'seller_id={self.seller_id}',
-            f'offer_id={self.offer_id}',
-            f'selling={self.selling}',
-            f'buying={self.buying}',
-            f'amount={self.amount}',
-            f'price={self.price}',
-            f'flags={self.flags}',
-            f'ext={self.ext}',
+            f"seller_id={self.seller_id}",
+            f"offer_id={self.offer_id}",
+            f"selling={self.selling}",
+            f"buying={self.buying}",
+            f"amount={self.amount}",
+            f"price={self.price}",
+            f"flags={self.flags}",
+            f"ext={self.ext}",
         ]
         return f"<OfferEntry {[', '.join(out)]}>"
 
 
-# === xdr source ============================================================
-#
-#   union switch (int v)
-#       {
-#       case 0:
-#           void;
-#       }
-#
-# ===========================================================================
 class DataEntryExt:
-    def __init__(
-            self,
-            v: int,
-    ) -> None:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    union switch (int v)
+        {
+        case 0:
+            void;
+        }
+    ----------------------------------------------------------------
+    """
+
+    def __init__(self, v: int) -> None:
         self.v = v
 
     def pack(self, packer: Packer) -> None:
@@ -9573,7 +9800,7 @@ class DataEntryExt:
             return
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'DataEntryExt':
+    def unpack(cls, unpacker: Unpacker) -> "DataEntryExt":
         v = Integer.unpack(unpacker)
         if v == 0:
             return cls(v)
@@ -9584,7 +9811,7 @@ class DataEntryExt:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'DataEntryExt':
+    def from_xdr(cls, xdr) -> "DataEntryExt":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -9596,35 +9823,37 @@ class DataEntryExt:
 
     def __str__(self):
         out = []
-        out.append(f'v={self.v}')
+        out.append(f"v={self.v}")
         return f"<DataEntryExt {[', '.join(out)]}>"
 
 
-# === xdr source ============================================================
-#
-#   struct DataEntry
-#   {
-#       AccountID accountID; // account this data belongs to
-#       string64 dataName;
-#       DataValue dataValue;
-#
-#       // reserved for future use
-#       union switch (int v)
-#       {
-#       case 0:
-#           void;
-#       }
-#       ext;
-#   };
-#
-# ===========================================================================
 class DataEntry:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    struct DataEntry
+    {
+        AccountID accountID; // account this data belongs to
+        string64 dataName;
+        DataValue dataValue;
+
+        // reserved for future use
+        union switch (int v)
+        {
+        case 0:
+            void;
+        }
+        ext;
+    };
+    ----------------------------------------------------------------
+    """
+
     def __init__(
-            self,
-            account_id: 'AccountID',
-            data_name: 'String64',
-            data_value: 'DataValue',
-            ext: 'DataEntryExt',
+        self,
+        account_id: "AccountID",
+        data_name: "String64",
+        data_value: "DataValue",
+        ext: "DataEntryExt",
     ) -> None:
         self.account_id = account_id
         self.data_name = data_name
@@ -9638,16 +9867,13 @@ class DataEntry:
         self.ext.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'DataEntry':
+    def unpack(cls, unpacker: Unpacker) -> "DataEntry":
         account_id = AccountID.unpack(unpacker)
         data_name = String64.unpack(unpacker)
         data_value = DataValue.unpack(unpacker)
         ext = DataEntryExt.unpack(unpacker)
         return cls(
-            account_id=account_id,
-            data_name=data_name,
-            data_value=data_value,
-            ext=ext,
+            account_id=account_id, data_name=data_name, data_value=data_value, ext=ext
         )
 
     def to_xdr(self) -> str:
@@ -9656,7 +9882,7 @@ class DataEntry:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'DataEntry':
+    def from_xdr(cls, xdr) -> "DataEntry":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -9664,47 +9890,54 @@ class DataEntry:
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented
-        return self.account_id == other.account_id and self.data_name == other.data_name and self.data_value == other.data_value and self.ext == other.ext
+        return (
+            self.account_id == other.account_id
+            and self.data_name == other.data_name
+            and self.data_value == other.data_value
+            and self.ext == other.ext
+        )
 
     def __str__(self):
         out = [
-            f'account_id={self.account_id}',
-            f'data_name={self.data_name}',
-            f'data_value={self.data_value}',
-            f'ext={self.ext}',
+            f"account_id={self.account_id}",
+            f"data_name={self.data_name}",
+            f"data_value={self.data_value}",
+            f"ext={self.ext}",
         ]
         return f"<DataEntry {[', '.join(out)]}>"
 
 
-# === xdr source ============================================================
-#
-#   union switch (LedgerEntryType type)
-#       {
-#       case ACCOUNT:
-#           AccountEntry account;
-#       case TRUSTLINE:
-#           TrustLineEntry trustLine;
-#       case OFFER:
-#           OfferEntry offer;
-#       case DATA:
-#           DataEntry data;
-#       }
-#
-# ===========================================================================
 class LedgerEntryData:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    union switch (LedgerEntryType type)
+        {
+        case ACCOUNT:
+            AccountEntry account;
+        case TRUSTLINE:
+            TrustLineEntry trustLine;
+        case OFFER:
+            OfferEntry offer;
+        case DATA:
+            DataEntry data;
+        }
+    ----------------------------------------------------------------
+    """
+
     def __init__(
-            self,
-            type: 'LedgerEntryType',
-            account: 'AccountEntry' = None,
-            trust_line: 'TrustLineEntry' = None,
-            offer: 'OfferEntry' = None,
-            data: 'DataEntry' = None,
+        self,
+        type: "LedgerEntryType",
+        account: "AccountEntry" = None,
+        trust_line: "TrustLineEntry" = None,
+        offer: "OfferEntry" = None,
+        data: "DataEntry" = None,
     ) -> None:
         self.type = type
-        self.account: 'AccountEntry' = account
-        self.trust_line: 'TrustLineEntry' = trust_line
-        self.offer: 'OfferEntry' = offer
-        self.data: 'DataEntry' = data
+        self.account: "AccountEntry" = account
+        self.trust_line: "TrustLineEntry" = trust_line
+        self.offer: "OfferEntry" = offer
+        self.data: "DataEntry" = data
 
     def pack(self, packer: Packer) -> None:
         self.type.pack(packer)
@@ -9722,7 +9955,7 @@ class LedgerEntryData:
             return
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'LedgerEntryData':
+    def unpack(cls, unpacker: Unpacker) -> "LedgerEntryData":
         type = LedgerEntryType.unpack(unpacker)
         if type == LedgerEntryType.ACCOUNT:
             account = AccountEntry.unpack(unpacker)
@@ -9743,7 +9976,7 @@ class LedgerEntryData:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'LedgerEntryData':
+    def from_xdr(cls, xdr) -> "LedgerEntryData":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -9751,32 +9984,39 @@ class LedgerEntryData:
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented
-        return self.type == other.type and self.account == other.account and self.trust_line == other.trust_line and self.offer == other.offer and self.data == other.data
+        return (
+            self.type == other.type
+            and self.account == other.account
+            and self.trust_line == other.trust_line
+            and self.offer == other.offer
+            and self.data == other.data
+        )
 
     def __str__(self):
         out = []
-        out.append(f'type={self.type}')
-        out.append(f'account={self.account}') if self.account is not None else None
-        out.append(f'trust_line={self.trust_line}') if self.trust_line is not None else None
-        out.append(f'offer={self.offer}') if self.offer is not None else None
-        out.append(f'data={self.data}') if self.data is not None else None
+        out.append(f"type={self.type}")
+        out.append(f"account={self.account}") if self.account is not None else None
+        out.append(
+            f"trust_line={self.trust_line}"
+        ) if self.trust_line is not None else None
+        out.append(f"offer={self.offer}") if self.offer is not None else None
+        out.append(f"data={self.data}") if self.data is not None else None
         return f"<LedgerEntryData {[', '.join(out)]}>"
 
 
-# === xdr source ============================================================
-#
-#   union switch (int v)
-#       {
-#       case 0:
-#           void;
-#       }
-#
-# ===========================================================================
 class LedgerEntryExt:
-    def __init__(
-            self,
-            v: int,
-    ) -> None:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    union switch (int v)
+        {
+        case 0:
+            void;
+        }
+    ----------------------------------------------------------------
+    """
+
+    def __init__(self, v: int) -> None:
         self.v = v
 
     def pack(self, packer: Packer) -> None:
@@ -9785,7 +10025,7 @@ class LedgerEntryExt:
             return
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'LedgerEntryExt':
+    def unpack(cls, unpacker: Unpacker) -> "LedgerEntryExt":
         v = Integer.unpack(unpacker)
         if v == 0:
             return cls(v)
@@ -9796,7 +10036,7 @@ class LedgerEntryExt:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'LedgerEntryExt':
+    def from_xdr(cls, xdr) -> "LedgerEntryExt":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -9808,45 +10048,47 @@ class LedgerEntryExt:
 
     def __str__(self):
         out = []
-        out.append(f'v={self.v}')
+        out.append(f"v={self.v}")
         return f"<LedgerEntryExt {[', '.join(out)]}>"
 
 
-# === xdr source ============================================================
-#
-#   struct LedgerEntry
-#   {
-#       uint32 lastModifiedLedgerSeq; // ledger the LedgerEntry was last changed
-#
-#       union switch (LedgerEntryType type)
-#       {
-#       case ACCOUNT:
-#           AccountEntry account;
-#       case TRUSTLINE:
-#           TrustLineEntry trustLine;
-#       case OFFER:
-#           OfferEntry offer;
-#       case DATA:
-#           DataEntry data;
-#       }
-#       data;
-#
-#       // reserved for future use
-#       union switch (int v)
-#       {
-#       case 0:
-#           void;
-#       }
-#       ext;
-#   };
-#
-# ===========================================================================
 class LedgerEntry:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    struct LedgerEntry
+    {
+        uint32 lastModifiedLedgerSeq; // ledger the LedgerEntry was last changed
+
+        union switch (LedgerEntryType type)
+        {
+        case ACCOUNT:
+            AccountEntry account;
+        case TRUSTLINE:
+            TrustLineEntry trustLine;
+        case OFFER:
+            OfferEntry offer;
+        case DATA:
+            DataEntry data;
+        }
+        data;
+
+        // reserved for future use
+        union switch (int v)
+        {
+        case 0:
+            void;
+        }
+        ext;
+    };
+    ----------------------------------------------------------------
+    """
+
     def __init__(
-            self,
-            last_modified_ledger_seq: 'Uint32',
-            data: 'LedgerEntryData',
-            ext: 'LedgerEntryExt',
+        self,
+        last_modified_ledger_seq: "Uint32",
+        data: "LedgerEntryData",
+        ext: "LedgerEntryExt",
     ) -> None:
         self.last_modified_ledger_seq = last_modified_ledger_seq
         self.data = data
@@ -9858,14 +10100,12 @@ class LedgerEntry:
         self.ext.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'LedgerEntry':
+    def unpack(cls, unpacker: Unpacker) -> "LedgerEntry":
         last_modified_ledger_seq = Uint32.unpack(unpacker)
         data = LedgerEntryData.unpack(unpacker)
         ext = LedgerEntryExt.unpack(unpacker)
         return cls(
-            last_modified_ledger_seq=last_modified_ledger_seq,
-            data=data,
-            ext=ext,
+            last_modified_ledger_seq=last_modified_ledger_seq, data=data, ext=ext
         )
 
     def to_xdr(self) -> str:
@@ -9874,7 +10114,7 @@ class LedgerEntry:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'LedgerEntry':
+    def from_xdr(cls, xdr) -> "LedgerEntry":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -9882,29 +10122,35 @@ class LedgerEntry:
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented
-        return self.last_modified_ledger_seq == other.last_modified_ledger_seq and self.data == other.data and self.ext == other.ext
+        return (
+            self.last_modified_ledger_seq == other.last_modified_ledger_seq
+            and self.data == other.data
+            and self.ext == other.ext
+        )
 
     def __str__(self):
         out = [
-            f'last_modified_ledger_seq={self.last_modified_ledger_seq}',
-            f'data={self.data}',
-            f'ext={self.ext}',
+            f"last_modified_ledger_seq={self.last_modified_ledger_seq}",
+            f"data={self.data}",
+            f"ext={self.ext}",
         ]
         return f"<LedgerEntry {[', '.join(out)]}>"
 
 
-# === xdr source ============================================================
-#
-#   enum EnvelopeType
-#   {
-#       ENVELOPE_TYPE_SCP = 1,
-#       ENVELOPE_TYPE_TX = 2,
-#       ENVELOPE_TYPE_AUTH = 3,
-#       ENVELOPE_TYPE_SCPVALUE = 4
-#   };
-#
-# ===========================================================================
 class EnvelopeType(IntEnum):
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    enum EnvelopeType
+    {
+        ENVELOPE_TYPE_SCP = 1,
+        ENVELOPE_TYPE_TX = 2,
+        ENVELOPE_TYPE_AUTH = 3,
+        ENVELOPE_TYPE_SCPVALUE = 4
+    };
+    ----------------------------------------------------------------
+    """
+
     ENVELOPE_TYPE_SCP = 1
     ENVELOPE_TYPE_TX = 2
     ENVELOPE_TYPE_AUTH = 3
@@ -9914,7 +10160,7 @@ class EnvelopeType(IntEnum):
         packer.pack_int(self.value)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'EnvelopeType':
+    def unpack(cls, unpacker: Unpacker) -> "EnvelopeType":
         value = unpacker.unpack_int()
         return cls(value)
 
@@ -9924,7 +10170,7 @@ class EnvelopeType(IntEnum):
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'EnvelopeType':
+    def from_xdr(cls, xdr) -> "EnvelopeType":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -9936,19 +10182,21 @@ class EnvelopeType(IntEnum):
         )
 
 
-# === xdr source ============================================================
-#
-#   enum ErrorCode
-#   {
-#       ERR_MISC = 0, // Unspecific error
-#       ERR_DATA = 1, // Malformed data
-#       ERR_CONF = 2, // Misconfiguration error
-#       ERR_AUTH = 3, // Authentication failure
-#       ERR_LOAD = 4  // System overloaded
-#   };
-#
-# ===========================================================================
 class ErrorCode(IntEnum):
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    enum ErrorCode
+    {
+        ERR_MISC = 0, // Unspecific error
+        ERR_DATA = 1, // Malformed data
+        ERR_CONF = 2, // Misconfiguration error
+        ERR_AUTH = 3, // Authentication failure
+        ERR_LOAD = 4  // System overloaded
+    };
+    ----------------------------------------------------------------
+    """
+
     ERR_MISC = 0
     ERR_DATA = 1
     ERR_CONF = 2
@@ -9959,7 +10207,7 @@ class ErrorCode(IntEnum):
         packer.pack_int(self.value)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'ErrorCode':
+    def unpack(cls, unpacker: Unpacker) -> "ErrorCode":
         value = unpacker.unpack_int()
         return cls(value)
 
@@ -9969,7 +10217,7 @@ class ErrorCode(IntEnum):
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'ErrorCode':
+    def from_xdr(cls, xdr) -> "ErrorCode":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -9981,21 +10229,19 @@ class ErrorCode(IntEnum):
         )
 
 
-# === xdr source ============================================================
-#
-#   struct Error
-#   {
-#       ErrorCode code;
-#       string msg<100>;
-#   };
-#
-# ===========================================================================
 class Error:
-    def __init__(
-            self,
-            code: 'ErrorCode',
-            msg: bytes,
-    ) -> None:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    struct Error
+    {
+        ErrorCode code;
+        string msg<100>;
+    };
+    ----------------------------------------------------------------
+    """
+
+    def __init__(self, code: "ErrorCode", msg: bytes) -> None:
         self.code = code
         self.msg = msg
 
@@ -10004,13 +10250,10 @@ class Error:
         String(self.msg, 100).pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'Error':
+    def unpack(cls, unpacker: Unpacker) -> "Error":
         code = ErrorCode.unpack(unpacker)
         msg = String.unpack(unpacker)
-        return cls(
-            code=code,
-            msg=msg,
-        )
+        return cls(code=code, msg=msg)
 
     def to_xdr(self) -> str:
         packer = Packer()
@@ -10018,7 +10261,7 @@ class Error:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'Error':
+    def from_xdr(cls, xdr) -> "Error":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -10029,29 +10272,25 @@ class Error:
         return self.code == other.code and self.msg == other.msg
 
     def __str__(self):
-        out = [
-            f'code={self.code}',
-            f'msg={self.msg}',
-        ]
+        out = [f"code={self.code}", f"msg={self.msg}"]
         return f"<Error {[', '.join(out)]}>"
 
 
-# === xdr source ============================================================
-#
-#   struct AuthCert
-#   {
-#       Curve25519Public pubkey;
-#       uint64 expiration;
-#       Signature sig;
-#   };
-#
-# ===========================================================================
 class AuthCert:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    struct AuthCert
+    {
+        Curve25519Public pubkey;
+        uint64 expiration;
+        Signature sig;
+    };
+    ----------------------------------------------------------------
+    """
+
     def __init__(
-            self,
-            pubkey: 'Curve25519Public',
-            expiration: 'Uint64',
-            sig: 'Signature',
+        self, pubkey: "Curve25519Public", expiration: "Uint64", sig: "Signature"
     ) -> None:
         self.pubkey = pubkey
         self.expiration = expiration
@@ -10063,15 +10302,11 @@ class AuthCert:
         self.sig.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'AuthCert':
+    def unpack(cls, unpacker: Unpacker) -> "AuthCert":
         pubkey = Curve25519Public.unpack(unpacker)
         expiration = Uint64.unpack(unpacker)
         sig = Signature.unpack(unpacker)
-        return cls(
-            pubkey=pubkey,
-            expiration=expiration,
-            sig=sig,
-        )
+        return cls(pubkey=pubkey, expiration=expiration, sig=sig)
 
     def to_xdr(self) -> str:
         packer = Packer()
@@ -10079,7 +10314,7 @@ class AuthCert:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'AuthCert':
+    def from_xdr(cls, xdr) -> "AuthCert":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -10087,45 +10322,51 @@ class AuthCert:
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented
-        return self.pubkey == other.pubkey and self.expiration == other.expiration and self.sig == other.sig
+        return (
+            self.pubkey == other.pubkey
+            and self.expiration == other.expiration
+            and self.sig == other.sig
+        )
 
     def __str__(self):
         out = [
-            f'pubkey={self.pubkey}',
-            f'expiration={self.expiration}',
-            f'sig={self.sig}',
+            f"pubkey={self.pubkey}",
+            f"expiration={self.expiration}",
+            f"sig={self.sig}",
         ]
         return f"<AuthCert {[', '.join(out)]}>"
 
 
-# === xdr source ============================================================
-#
-#   struct Hello
-#   {
-#       uint32 ledgerVersion;
-#       uint32 overlayVersion;
-#       uint32 overlayMinVersion;
-#       Hash networkID;
-#       string versionStr<100>;
-#       int listeningPort;
-#       NodeID peerID;
-#       AuthCert cert;
-#       uint256 nonce;
-#   };
-#
-# ===========================================================================
 class Hello:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    struct Hello
+    {
+        uint32 ledgerVersion;
+        uint32 overlayVersion;
+        uint32 overlayMinVersion;
+        Hash networkID;
+        string versionStr<100>;
+        int listeningPort;
+        NodeID peerID;
+        AuthCert cert;
+        uint256 nonce;
+    };
+    ----------------------------------------------------------------
+    """
+
     def __init__(
-            self,
-            ledger_version: 'Uint32',
-            overlay_version: 'Uint32',
-            overlay_min_version: 'Uint32',
-            network_id: 'Hash',
-            version_str: bytes,
-            listening_port: int,
-            peer_id: 'NodeID',
-            cert: 'AuthCert',
-            nonce: 'Uint256',
+        self,
+        ledger_version: "Uint32",
+        overlay_version: "Uint32",
+        overlay_min_version: "Uint32",
+        network_id: "Hash",
+        version_str: bytes,
+        listening_port: int,
+        peer_id: "NodeID",
+        cert: "AuthCert",
+        nonce: "Uint256",
     ) -> None:
         self.ledger_version = ledger_version
         self.overlay_version = overlay_version
@@ -10149,7 +10390,7 @@ class Hello:
         self.nonce.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'Hello':
+    def unpack(cls, unpacker: Unpacker) -> "Hello":
         ledger_version = Uint32.unpack(unpacker)
         overlay_version = Uint32.unpack(unpacker)
         overlay_min_version = Uint32.unpack(unpacker)
@@ -10177,7 +10418,7 @@ class Hello:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'Hello':
+    def from_xdr(cls, xdr) -> "Hello":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -10185,49 +10426,56 @@ class Hello:
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented
-        return self.ledger_version == other.ledger_version and self.overlay_version == other.overlay_version and self.overlay_min_version == other.overlay_min_version and self.network_id == other.network_id and self.version_str == other.version_str and self.listening_port == other.listening_port and self.peer_id == other.peer_id and self.cert == other.cert and self.nonce == other.nonce
+        return (
+            self.ledger_version == other.ledger_version
+            and self.overlay_version == other.overlay_version
+            and self.overlay_min_version == other.overlay_min_version
+            and self.network_id == other.network_id
+            and self.version_str == other.version_str
+            and self.listening_port == other.listening_port
+            and self.peer_id == other.peer_id
+            and self.cert == other.cert
+            and self.nonce == other.nonce
+        )
 
     def __str__(self):
         out = [
-            f'ledger_version={self.ledger_version}',
-            f'overlay_version={self.overlay_version}',
-            f'overlay_min_version={self.overlay_min_version}',
-            f'network_id={self.network_id}',
-            f'version_str={self.version_str}',
-            f'listening_port={self.listening_port}',
-            f'peer_id={self.peer_id}',
-            f'cert={self.cert}',
-            f'nonce={self.nonce}',
+            f"ledger_version={self.ledger_version}",
+            f"overlay_version={self.overlay_version}",
+            f"overlay_min_version={self.overlay_min_version}",
+            f"network_id={self.network_id}",
+            f"version_str={self.version_str}",
+            f"listening_port={self.listening_port}",
+            f"peer_id={self.peer_id}",
+            f"cert={self.cert}",
+            f"nonce={self.nonce}",
         ]
         return f"<Hello {[', '.join(out)]}>"
 
 
-# === xdr source ============================================================
-#
-#   struct Auth
-#   {
-#       // Empty message, just to confirm
-#       // establishment of MAC keys.
-#       int unused;
-#   };
-#
-# ===========================================================================
 class Auth:
-    def __init__(
-            self,
-            unused: int,
-    ) -> None:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    struct Auth
+    {
+        // Empty message, just to confirm
+        // establishment of MAC keys.
+        int unused;
+    };
+    ----------------------------------------------------------------
+    """
+
+    def __init__(self, unused: int) -> None:
         self.unused = unused
 
     def pack(self, packer: Packer) -> None:
         Integer(self.unused).pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'Auth':
+    def unpack(cls, unpacker: Unpacker) -> "Auth":
         unused = Integer.unpack(unpacker)
-        return cls(
-            unused=unused,
-        )
+        return cls(unused=unused)
 
     def to_xdr(self) -> str:
         packer = Packer()
@@ -10235,7 +10483,7 @@ class Auth:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'Auth':
+    def from_xdr(cls, xdr) -> "Auth":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -10246,22 +10494,22 @@ class Auth:
         return self.unused == other.unused
 
     def __str__(self):
-        out = [
-            f'unused={self.unused}',
-        ]
+        out = [f"unused={self.unused}"]
         return f"<Auth {[', '.join(out)]}>"
 
 
-# === xdr source ============================================================
-#
-#   enum IPAddrType
-#   {
-#       IPv4 = 0,
-#       IPv6 = 1
-#   };
-#
-# ===========================================================================
 class IPAddrType(IntEnum):
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    enum IPAddrType
+    {
+        IPv4 = 0,
+        IPv6 = 1
+    };
+    ----------------------------------------------------------------
+    """
+
     IPv4 = 0
     IPv6 = 1
 
@@ -10269,7 +10517,7 @@ class IPAddrType(IntEnum):
         packer.pack_int(self.value)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'IPAddrType':
+    def unpack(cls, unpacker: Unpacker) -> "IPAddrType":
         value = unpacker.unpack_int()
         return cls(value)
 
@@ -10279,7 +10527,7 @@ class IPAddrType(IntEnum):
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'IPAddrType':
+    def from_xdr(cls, xdr) -> "IPAddrType":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -10291,23 +10539,22 @@ class IPAddrType(IntEnum):
         )
 
 
-# === xdr source ============================================================
-#
-#   union switch (IPAddrType type)
-#       {
-#       case IPv4:
-#           opaque ipv4[4];
-#       case IPv6:
-#           opaque ipv6[16];
-#       }
-#
-# ===========================================================================
 class PeerAddressIp:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    union switch (IPAddrType type)
+        {
+        case IPv4:
+            opaque ipv4[4];
+        case IPv6:
+            opaque ipv6[16];
+        }
+    ----------------------------------------------------------------
+    """
+
     def __init__(
-            self,
-            type: 'IPAddrType',
-            ipv4: bytes = None,
-            ipv6: bytes = None,
+        self, type: "IPAddrType", ipv4: bytes = None, ipv6: bytes = None
     ) -> None:
         self.type = type
         self.ipv4: bytes = ipv4
@@ -10323,7 +10570,7 @@ class PeerAddressIp:
             return
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'PeerAddressIp':
+    def unpack(cls, unpacker: Unpacker) -> "PeerAddressIp":
         type = IPAddrType.unpack(unpacker)
         if type == IPAddrType.IPv4:
             ipv4 = Opaque.unpack(unpacker, 4, True)
@@ -10338,7 +10585,7 @@ class PeerAddressIp:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'PeerAddressIp':
+    def from_xdr(cls, xdr) -> "PeerAddressIp":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -10346,39 +10593,42 @@ class PeerAddressIp:
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented
-        return self.type == other.type and self.ipv4 == other.ipv4 and self.ipv6 == other.ipv6
+        return (
+            self.type == other.type
+            and self.ipv4 == other.ipv4
+            and self.ipv6 == other.ipv6
+        )
 
     def __str__(self):
         out = []
-        out.append(f'type={self.type}')
-        out.append(f'ipv4={self.ipv4}') if self.ipv4 is not None else None
-        out.append(f'ipv6={self.ipv6}') if self.ipv6 is not None else None
+        out.append(f"type={self.type}")
+        out.append(f"ipv4={self.ipv4}") if self.ipv4 is not None else None
+        out.append(f"ipv6={self.ipv6}") if self.ipv6 is not None else None
         return f"<PeerAddressIp {[', '.join(out)]}>"
 
 
-# === xdr source ============================================================
-#
-#   struct PeerAddress
-#   {
-#       union switch (IPAddrType type)
-#       {
-#       case IPv4:
-#           opaque ipv4[4];
-#       case IPv6:
-#           opaque ipv6[16];
-#       }
-#       ip;
-#       uint32 port;
-#       uint32 numFailures;
-#   };
-#
-# ===========================================================================
 class PeerAddress:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    struct PeerAddress
+    {
+        union switch (IPAddrType type)
+        {
+        case IPv4:
+            opaque ipv4[4];
+        case IPv6:
+            opaque ipv6[16];
+        }
+        ip;
+        uint32 port;
+        uint32 numFailures;
+    };
+    ----------------------------------------------------------------
+    """
+
     def __init__(
-            self,
-            ip: 'PeerAddressIp',
-            port: 'Uint32',
-            num_failures: 'Uint32',
+        self, ip: "PeerAddressIp", port: "Uint32", num_failures: "Uint32"
     ) -> None:
         self.ip = ip
         self.port = port
@@ -10390,15 +10640,11 @@ class PeerAddress:
         self.num_failures.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'PeerAddress':
+    def unpack(cls, unpacker: Unpacker) -> "PeerAddress":
         ip = PeerAddressIp.unpack(unpacker)
         port = Uint32.unpack(unpacker)
         num_failures = Uint32.unpack(unpacker)
-        return cls(
-            ip=ip,
-            port=port,
-            num_failures=num_failures,
-        )
+        return cls(ip=ip, port=port, num_failures=num_failures)
 
     def to_xdr(self) -> str:
         packer = Packer()
@@ -10406,7 +10652,7 @@ class PeerAddress:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'PeerAddress':
+    def from_xdr(cls, xdr) -> "PeerAddress":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -10414,48 +10660,54 @@ class PeerAddress:
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented
-        return self.ip == other.ip and self.port == other.port and self.num_failures == other.num_failures
+        return (
+            self.ip == other.ip
+            and self.port == other.port
+            and self.num_failures == other.num_failures
+        )
 
     def __str__(self):
         out = [
-            f'ip={self.ip}',
-            f'port={self.port}',
-            f'num_failures={self.num_failures}',
+            f"ip={self.ip}",
+            f"port={self.port}",
+            f"num_failures={self.num_failures}",
         ]
         return f"<PeerAddress {[', '.join(out)]}>"
 
 
-# === xdr source ============================================================
-#
-#   enum MessageType
-#   {
-#       ERROR_MSG = 0,
-#       AUTH = 2,
-#       DONT_HAVE = 3,
-#
-#       GET_PEERS = 4, // gets a list of peers this guy knows about
-#       PEERS = 5,
-#
-#       GET_TX_SET = 6, // gets a particular txset by hash
-#       TX_SET = 7,
-#
-#       TRANSACTION = 8, // pass on a tx you have heard about
-#
-#       // SCP
-#       GET_SCP_QUORUMSET = 9,
-#       SCP_QUORUMSET = 10,
-#       SCP_MESSAGE = 11,
-#       GET_SCP_STATE = 12,
-#
-#       // new messages
-#       HELLO = 13,
-#
-#       SURVEY_REQUEST = 14,
-#       SURVEY_RESPONSE = 15
-#   };
-#
-# ===========================================================================
 class MessageType(IntEnum):
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    enum MessageType
+    {
+        ERROR_MSG = 0,
+        AUTH = 2,
+        DONT_HAVE = 3,
+
+        GET_PEERS = 4, // gets a list of peers this guy knows about
+        PEERS = 5,
+
+        GET_TX_SET = 6, // gets a particular txset by hash
+        TX_SET = 7,
+
+        TRANSACTION = 8, // pass on a tx you have heard about
+
+        // SCP
+        GET_SCP_QUORUMSET = 9,
+        SCP_QUORUMSET = 10,
+        SCP_MESSAGE = 11,
+        GET_SCP_STATE = 12,
+
+        // new messages
+        HELLO = 13,
+
+        SURVEY_REQUEST = 14,
+        SURVEY_RESPONSE = 15
+    };
+    ----------------------------------------------------------------
+    """
+
     ERROR_MSG = 0
     AUTH = 2
     DONT_HAVE = 3
@@ -10476,7 +10728,7 @@ class MessageType(IntEnum):
         packer.pack_int(self.value)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'MessageType':
+    def unpack(cls, unpacker: Unpacker) -> "MessageType":
         value = unpacker.unpack_int()
         return cls(value)
 
@@ -10486,7 +10738,7 @@ class MessageType(IntEnum):
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'MessageType':
+    def from_xdr(cls, xdr) -> "MessageType":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -10498,21 +10750,19 @@ class MessageType(IntEnum):
         )
 
 
-# === xdr source ============================================================
-#
-#   struct DontHave
-#   {
-#       MessageType type;
-#       uint256 reqHash;
-#   };
-#
-# ===========================================================================
 class DontHave:
-    def __init__(
-            self,
-            type: 'MessageType',
-            req_hash: 'Uint256',
-    ) -> None:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    struct DontHave
+    {
+        MessageType type;
+        uint256 reqHash;
+    };
+    ----------------------------------------------------------------
+    """
+
+    def __init__(self, type: "MessageType", req_hash: "Uint256") -> None:
         self.type = type
         self.req_hash = req_hash
 
@@ -10521,13 +10771,10 @@ class DontHave:
         self.req_hash.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'DontHave':
+    def unpack(cls, unpacker: Unpacker) -> "DontHave":
         type = MessageType.unpack(unpacker)
         req_hash = Uint256.unpack(unpacker)
-        return cls(
-            type=type,
-            req_hash=req_hash,
-        )
+        return cls(type=type, req_hash=req_hash)
 
     def to_xdr(self) -> str:
         packer = Packer()
@@ -10535,7 +10782,7 @@ class DontHave:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'DontHave':
+    def from_xdr(cls, xdr) -> "DontHave":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -10546,29 +10793,28 @@ class DontHave:
         return self.type == other.type and self.req_hash == other.req_hash
 
     def __str__(self):
-        out = [
-            f'type={self.type}',
-            f'req_hash={self.req_hash}',
-        ]
+        out = [f"type={self.type}", f"req_hash={self.req_hash}"]
         return f"<DontHave {[', '.join(out)]}>"
 
 
-# === xdr source ============================================================
-#
-#   enum SurveyMessageCommandType
-#   {
-#       SURVEY_TOPOLOGY = 0
-#   };
-#
-# ===========================================================================
 class SurveyMessageCommandType(IntEnum):
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    enum SurveyMessageCommandType
+    {
+        SURVEY_TOPOLOGY = 0
+    };
+    ----------------------------------------------------------------
+    """
+
     SURVEY_TOPOLOGY = 0
 
     def pack(self, packer: Packer) -> None:
         packer.pack_int(self.value)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'SurveyMessageCommandType':
+    def unpack(cls, unpacker: Unpacker) -> "SurveyMessageCommandType":
         value = unpacker.unpack_int()
         return cls(value)
 
@@ -10578,7 +10824,7 @@ class SurveyMessageCommandType(IntEnum):
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'SurveyMessageCommandType':
+    def from_xdr(cls, xdr) -> "SurveyMessageCommandType":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -10590,26 +10836,28 @@ class SurveyMessageCommandType(IntEnum):
         )
 
 
-# === xdr source ============================================================
-#
-#   struct SurveyRequestMessage
-#   {
-#       NodeID surveyorPeerID;
-#       NodeID surveyedPeerID;
-#       uint32 ledgerNum;
-#       Curve25519Public encryptionKey;
-#       SurveyMessageCommandType commandType;
-#   };
-#
-# ===========================================================================
 class SurveyRequestMessage:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    struct SurveyRequestMessage
+    {
+        NodeID surveyorPeerID;
+        NodeID surveyedPeerID;
+        uint32 ledgerNum;
+        Curve25519Public encryptionKey;
+        SurveyMessageCommandType commandType;
+    };
+    ----------------------------------------------------------------
+    """
+
     def __init__(
-            self,
-            surveyor_peer_id: 'NodeID',
-            surveyed_peer_id: 'NodeID',
-            ledger_num: 'Uint32',
-            encryption_key: 'Curve25519Public',
-            command_type: 'SurveyMessageCommandType',
+        self,
+        surveyor_peer_id: "NodeID",
+        surveyed_peer_id: "NodeID",
+        ledger_num: "Uint32",
+        encryption_key: "Curve25519Public",
+        command_type: "SurveyMessageCommandType",
     ) -> None:
         self.surveyor_peer_id = surveyor_peer_id
         self.surveyed_peer_id = surveyed_peer_id
@@ -10625,7 +10873,7 @@ class SurveyRequestMessage:
         self.command_type.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'SurveyRequestMessage':
+    def unpack(cls, unpacker: Unpacker) -> "SurveyRequestMessage":
         surveyor_peer_id = NodeID.unpack(unpacker)
         surveyed_peer_id = NodeID.unpack(unpacker)
         ledger_num = Uint32.unpack(unpacker)
@@ -10645,7 +10893,7 @@ class SurveyRequestMessage:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'SurveyRequestMessage':
+    def from_xdr(cls, xdr) -> "SurveyRequestMessage":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -10653,33 +10901,39 @@ class SurveyRequestMessage:
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented
-        return self.surveyor_peer_id == other.surveyor_peer_id and self.surveyed_peer_id == other.surveyed_peer_id and self.ledger_num == other.ledger_num and self.encryption_key == other.encryption_key and self.command_type == other.command_type
+        return (
+            self.surveyor_peer_id == other.surveyor_peer_id
+            and self.surveyed_peer_id == other.surveyed_peer_id
+            and self.ledger_num == other.ledger_num
+            and self.encryption_key == other.encryption_key
+            and self.command_type == other.command_type
+        )
 
     def __str__(self):
         out = [
-            f'surveyor_peer_id={self.surveyor_peer_id}',
-            f'surveyed_peer_id={self.surveyed_peer_id}',
-            f'ledger_num={self.ledger_num}',
-            f'encryption_key={self.encryption_key}',
-            f'command_type={self.command_type}',
+            f"surveyor_peer_id={self.surveyor_peer_id}",
+            f"surveyed_peer_id={self.surveyed_peer_id}",
+            f"ledger_num={self.ledger_num}",
+            f"encryption_key={self.encryption_key}",
+            f"command_type={self.command_type}",
         ]
         return f"<SurveyRequestMessage {[', '.join(out)]}>"
 
 
-# === xdr source ============================================================
-#
-#   struct SignedSurveyRequestMessage
-#   {
-#       Signature requestSignature;
-#       SurveyRequestMessage request;
-#   };
-#
-# ===========================================================================
 class SignedSurveyRequestMessage:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    struct SignedSurveyRequestMessage
+    {
+        Signature requestSignature;
+        SurveyRequestMessage request;
+    };
+    ----------------------------------------------------------------
+    """
+
     def __init__(
-            self,
-            request_signature: 'Signature',
-            request: 'SurveyRequestMessage',
+        self, request_signature: "Signature", request: "SurveyRequestMessage"
     ) -> None:
         self.request_signature = request_signature
         self.request = request
@@ -10689,13 +10943,10 @@ class SignedSurveyRequestMessage:
         self.request.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'SignedSurveyRequestMessage':
+    def unpack(cls, unpacker: Unpacker) -> "SignedSurveyRequestMessage":
         request_signature = Signature.unpack(unpacker)
         request = SurveyRequestMessage.unpack(unpacker)
-        return cls(
-            request_signature=request_signature,
-            request=request,
-        )
+        return cls(request_signature=request_signature, request=request)
 
     def to_xdr(self) -> str:
         packer = Packer()
@@ -10703,7 +10954,7 @@ class SignedSurveyRequestMessage:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'SignedSurveyRequestMessage':
+    def from_xdr(cls, xdr) -> "SignedSurveyRequestMessage":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -10711,22 +10962,24 @@ class SignedSurveyRequestMessage:
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented
-        return self.request_signature == other.request_signature and self.request == other.request
+        return (
+            self.request_signature == other.request_signature
+            and self.request == other.request
+        )
 
     def __str__(self):
-        out = [
-            f'request_signature={self.request_signature}',
-            f'request={self.request}',
-        ]
+        out = [f"request_signature={self.request_signature}", f"request={self.request}"]
         return f"<SignedSurveyRequestMessage {[', '.join(out)]}>"
 
 
-# === xdr source ============================================================
-#
-#   typedef opaque EncryptedBody<64000>;
-#
-# ===========================================================================
 class EncryptedBody:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    typedef opaque EncryptedBody<64000>;
+    ----------------------------------------------------------------
+    """
+
     def __init__(self, encrypted_body: bytes) -> None:
         self.encrypted_body = encrypted_body
 
@@ -10734,7 +10987,7 @@ class EncryptedBody:
         Opaque(self.encrypted_body, 64000, False).pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'EncryptedBody':
+    def unpack(cls, unpacker: Unpacker) -> "EncryptedBody":
         encrypted_body = Opaque.unpack(unpacker, 64000, False)
         return cls(encrypted_body)
 
@@ -10744,7 +10997,7 @@ class EncryptedBody:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'EncryptedBody':
+    def from_xdr(cls, xdr) -> "EncryptedBody":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -10758,26 +11011,28 @@ class EncryptedBody:
         return f"<EncryptedBody [encrypted_body={self.encrypted_body}]>"
 
 
-# === xdr source ============================================================
-#
-#   struct SurveyResponseMessage
-#   {
-#       NodeID surveyorPeerID;
-#       NodeID surveyedPeerID;
-#       uint32 ledgerNum;
-#       SurveyMessageCommandType commandType;
-#       EncryptedBody encryptedBody;
-#   };
-#
-# ===========================================================================
 class SurveyResponseMessage:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    struct SurveyResponseMessage
+    {
+        NodeID surveyorPeerID;
+        NodeID surveyedPeerID;
+        uint32 ledgerNum;
+        SurveyMessageCommandType commandType;
+        EncryptedBody encryptedBody;
+    };
+    ----------------------------------------------------------------
+    """
+
     def __init__(
-            self,
-            surveyor_peer_id: 'NodeID',
-            surveyed_peer_id: 'NodeID',
-            ledger_num: 'Uint32',
-            command_type: 'SurveyMessageCommandType',
-            encrypted_body: 'EncryptedBody',
+        self,
+        surveyor_peer_id: "NodeID",
+        surveyed_peer_id: "NodeID",
+        ledger_num: "Uint32",
+        command_type: "SurveyMessageCommandType",
+        encrypted_body: "EncryptedBody",
     ) -> None:
         self.surveyor_peer_id = surveyor_peer_id
         self.surveyed_peer_id = surveyed_peer_id
@@ -10793,7 +11048,7 @@ class SurveyResponseMessage:
         self.encrypted_body.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'SurveyResponseMessage':
+    def unpack(cls, unpacker: Unpacker) -> "SurveyResponseMessage":
         surveyor_peer_id = NodeID.unpack(unpacker)
         surveyed_peer_id = NodeID.unpack(unpacker)
         ledger_num = Uint32.unpack(unpacker)
@@ -10813,7 +11068,7 @@ class SurveyResponseMessage:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'SurveyResponseMessage':
+    def from_xdr(cls, xdr) -> "SurveyResponseMessage":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -10821,33 +11076,39 @@ class SurveyResponseMessage:
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented
-        return self.surveyor_peer_id == other.surveyor_peer_id and self.surveyed_peer_id == other.surveyed_peer_id and self.ledger_num == other.ledger_num and self.command_type == other.command_type and self.encrypted_body == other.encrypted_body
+        return (
+            self.surveyor_peer_id == other.surveyor_peer_id
+            and self.surveyed_peer_id == other.surveyed_peer_id
+            and self.ledger_num == other.ledger_num
+            and self.command_type == other.command_type
+            and self.encrypted_body == other.encrypted_body
+        )
 
     def __str__(self):
         out = [
-            f'surveyor_peer_id={self.surveyor_peer_id}',
-            f'surveyed_peer_id={self.surveyed_peer_id}',
-            f'ledger_num={self.ledger_num}',
-            f'command_type={self.command_type}',
-            f'encrypted_body={self.encrypted_body}',
+            f"surveyor_peer_id={self.surveyor_peer_id}",
+            f"surveyed_peer_id={self.surveyed_peer_id}",
+            f"ledger_num={self.ledger_num}",
+            f"command_type={self.command_type}",
+            f"encrypted_body={self.encrypted_body}",
         ]
         return f"<SurveyResponseMessage {[', '.join(out)]}>"
 
 
-# === xdr source ============================================================
-#
-#   struct SignedSurveyResponseMessage
-#   {
-#       Signature responseSignature;
-#       SurveyResponseMessage response;
-#   };
-#
-# ===========================================================================
 class SignedSurveyResponseMessage:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    struct SignedSurveyResponseMessage
+    {
+        Signature responseSignature;
+        SurveyResponseMessage response;
+    };
+    ----------------------------------------------------------------
+    """
+
     def __init__(
-            self,
-            response_signature: 'Signature',
-            response: 'SurveyResponseMessage',
+        self, response_signature: "Signature", response: "SurveyResponseMessage"
     ) -> None:
         self.response_signature = response_signature
         self.response = response
@@ -10857,13 +11118,10 @@ class SignedSurveyResponseMessage:
         self.response.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'SignedSurveyResponseMessage':
+    def unpack(cls, unpacker: Unpacker) -> "SignedSurveyResponseMessage":
         response_signature = Signature.unpack(unpacker)
         response = SurveyResponseMessage.unpack(unpacker)
-        return cls(
-            response_signature=response_signature,
-            response=response,
-        )
+        return cls(response_signature=response_signature, response=response)
 
     def to_xdr(self) -> str:
         packer = Packer()
@@ -10871,7 +11129,7 @@ class SignedSurveyResponseMessage:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'SignedSurveyResponseMessage':
+    def from_xdr(cls, xdr) -> "SignedSurveyResponseMessage":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -10879,58 +11137,63 @@ class SignedSurveyResponseMessage:
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented
-        return self.response_signature == other.response_signature and self.response == other.response
+        return (
+            self.response_signature == other.response_signature
+            and self.response == other.response
+        )
 
     def __str__(self):
         out = [
-            f'response_signature={self.response_signature}',
-            f'response={self.response}',
+            f"response_signature={self.response_signature}",
+            f"response={self.response}",
         ]
         return f"<SignedSurveyResponseMessage {[', '.join(out)]}>"
 
 
-# === xdr source ============================================================
-#
-#   struct PeerStats
-#   {
-#       NodeID id;
-#       string versionStr<100>;
-#       uint64 messagesRead;
-#       uint64 messagesWritten;
-#       uint64 bytesRead;
-#       uint64 bytesWritten;
-#       uint64 secondsConnected;
-#
-#       uint64 uniqueFloodBytesRecv;
-#       uint64 duplicateFloodBytesRecv;
-#       uint64 uniqueFetchBytesRecv;
-#       uint64 duplicateFetchBytesRecv;
-#
-#       uint64 uniqueFloodMessageRecv;
-#       uint64 duplicateFloodMessageRecv;
-#       uint64 uniqueFetchMessageRecv;
-#       uint64 duplicateFetchMessageRecv;
-#   };
-#
-# ===========================================================================
 class PeerStats:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    struct PeerStats
+    {
+        NodeID id;
+        string versionStr<100>;
+        uint64 messagesRead;
+        uint64 messagesWritten;
+        uint64 bytesRead;
+        uint64 bytesWritten;
+        uint64 secondsConnected;
+
+        uint64 uniqueFloodBytesRecv;
+        uint64 duplicateFloodBytesRecv;
+        uint64 uniqueFetchBytesRecv;
+        uint64 duplicateFetchBytesRecv;
+
+        uint64 uniqueFloodMessageRecv;
+        uint64 duplicateFloodMessageRecv;
+        uint64 uniqueFetchMessageRecv;
+        uint64 duplicateFetchMessageRecv;
+    };
+    ----------------------------------------------------------------
+    """
+
     def __init__(
-            self,
-            id: 'NodeID',
-            version_str: bytes,
-            messages_read: 'Uint64',
-            messages_written: 'Uint64',
-            bytes_read: 'Uint64',
-            bytes_written: 'Uint64',
-            seconds_connected: 'Uint64',
-            unique_flood_bytes_recv: 'Uint64',
-            duplicate_flood_bytes_recv: 'Uint64',
-            unique_fetch_bytes_recv: 'Uint64',
-            duplicate_fetch_bytes_recv: 'Uint64',
-            unique_flood_message_recv: 'Uint64',
-            duplicate_flood_message_recv: 'Uint64',
-            unique_fetch_message_recv: 'Uint64',
-            duplicate_fetch_message_recv: 'Uint64',
+        self,
+        id: "NodeID",
+        version_str: bytes,
+        messages_read: "Uint64",
+        messages_written: "Uint64",
+        bytes_read: "Uint64",
+        bytes_written: "Uint64",
+        seconds_connected: "Uint64",
+        unique_flood_bytes_recv: "Uint64",
+        duplicate_flood_bytes_recv: "Uint64",
+        unique_fetch_bytes_recv: "Uint64",
+        duplicate_fetch_bytes_recv: "Uint64",
+        unique_flood_message_recv: "Uint64",
+        duplicate_flood_message_recv: "Uint64",
+        unique_fetch_message_recv: "Uint64",
+        duplicate_fetch_message_recv: "Uint64",
     ) -> None:
         self.id = id
         self.version_str = version_str
@@ -10966,7 +11229,7 @@ class PeerStats:
         self.duplicate_fetch_message_recv.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'PeerStats':
+    def unpack(cls, unpacker: Unpacker) -> "PeerStats":
         id = NodeID.unpack(unpacker)
         version_str = String.unpack(unpacker)
         messages_read = Uint64.unpack(unpacker)
@@ -11006,7 +11269,7 @@ class PeerStats:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'PeerStats':
+    def from_xdr(cls, xdr) -> "PeerStats":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -11014,38 +11277,58 @@ class PeerStats:
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented
-        return self.id == other.id and self.version_str == other.version_str and self.messages_read == other.messages_read and self.messages_written == other.messages_written and self.bytes_read == other.bytes_read and self.bytes_written == other.bytes_written and self.seconds_connected == other.seconds_connected and self.unique_flood_bytes_recv == other.unique_flood_bytes_recv and self.duplicate_flood_bytes_recv == other.duplicate_flood_bytes_recv and self.unique_fetch_bytes_recv == other.unique_fetch_bytes_recv and self.duplicate_fetch_bytes_recv == other.duplicate_fetch_bytes_recv and self.unique_flood_message_recv == other.unique_flood_message_recv and self.duplicate_flood_message_recv == other.duplicate_flood_message_recv and self.unique_fetch_message_recv == other.unique_fetch_message_recv and self.duplicate_fetch_message_recv == other.duplicate_fetch_message_recv
+        return (
+            self.id == other.id
+            and self.version_str == other.version_str
+            and self.messages_read == other.messages_read
+            and self.messages_written == other.messages_written
+            and self.bytes_read == other.bytes_read
+            and self.bytes_written == other.bytes_written
+            and self.seconds_connected == other.seconds_connected
+            and self.unique_flood_bytes_recv == other.unique_flood_bytes_recv
+            and self.duplicate_flood_bytes_recv == other.duplicate_flood_bytes_recv
+            and self.unique_fetch_bytes_recv == other.unique_fetch_bytes_recv
+            and self.duplicate_fetch_bytes_recv == other.duplicate_fetch_bytes_recv
+            and self.unique_flood_message_recv == other.unique_flood_message_recv
+            and self.duplicate_flood_message_recv == other.duplicate_flood_message_recv
+            and self.unique_fetch_message_recv == other.unique_fetch_message_recv
+            and self.duplicate_fetch_message_recv == other.duplicate_fetch_message_recv
+        )
 
     def __str__(self):
         out = [
-            f'id={self.id}',
-            f'version_str={self.version_str}',
-            f'messages_read={self.messages_read}',
-            f'messages_written={self.messages_written}',
-            f'bytes_read={self.bytes_read}',
-            f'bytes_written={self.bytes_written}',
-            f'seconds_connected={self.seconds_connected}',
-            f'unique_flood_bytes_recv={self.unique_flood_bytes_recv}',
-            f'duplicate_flood_bytes_recv={self.duplicate_flood_bytes_recv}',
-            f'unique_fetch_bytes_recv={self.unique_fetch_bytes_recv}',
-            f'duplicate_fetch_bytes_recv={self.duplicate_fetch_bytes_recv}',
-            f'unique_flood_message_recv={self.unique_flood_message_recv}',
-            f'duplicate_flood_message_recv={self.duplicate_flood_message_recv}',
-            f'unique_fetch_message_recv={self.unique_fetch_message_recv}',
-            f'duplicate_fetch_message_recv={self.duplicate_fetch_message_recv}',
+            f"id={self.id}",
+            f"version_str={self.version_str}",
+            f"messages_read={self.messages_read}",
+            f"messages_written={self.messages_written}",
+            f"bytes_read={self.bytes_read}",
+            f"bytes_written={self.bytes_written}",
+            f"seconds_connected={self.seconds_connected}",
+            f"unique_flood_bytes_recv={self.unique_flood_bytes_recv}",
+            f"duplicate_flood_bytes_recv={self.duplicate_flood_bytes_recv}",
+            f"unique_fetch_bytes_recv={self.unique_fetch_bytes_recv}",
+            f"duplicate_fetch_bytes_recv={self.duplicate_fetch_bytes_recv}",
+            f"unique_flood_message_recv={self.unique_flood_message_recv}",
+            f"duplicate_flood_message_recv={self.duplicate_flood_message_recv}",
+            f"unique_fetch_message_recv={self.unique_fetch_message_recv}",
+            f"duplicate_fetch_message_recv={self.duplicate_fetch_message_recv}",
         ]
         return f"<PeerStats {[', '.join(out)]}>"
 
 
-# === xdr source ============================================================
-#
-#   typedef PeerStats PeerStatList<25>;
-#
-# ===========================================================================
 class PeerStatList:
-    def __init__(self, peer_stat_list: List['PeerStats']) -> None:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    typedef PeerStats PeerStatList<25>;
+    ----------------------------------------------------------------
+    """
+
+    def __init__(self, peer_stat_list: List["PeerStats"]) -> None:
         if len(peer_stat_list) > 25:
-            raise ValueError(f"The maximum length of `peer_stat_list` should be 25, but got {len(peer_stat_list)}.")
+            raise ValueError(
+                f"The maximum length of `peer_stat_list` should be 25, but got {len(peer_stat_list)}."
+            )
 
         self.peer_stat_list = peer_stat_list
 
@@ -11055,7 +11338,7 @@ class PeerStatList:
             element.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'PeerStatList':
+    def unpack(cls, unpacker: Unpacker) -> "PeerStatList":
         length = unpacker.unpack_uint()
         peer_stat_list = []
         for _ in range(length):
@@ -11069,7 +11352,7 @@ class PeerStatList:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'PeerStatList':
+    def from_xdr(cls, xdr) -> "PeerStatList":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -11083,25 +11366,27 @@ class PeerStatList:
         return f"<PeerStatList [peer_stat_list={self.peer_stat_list}]>"
 
 
-# === xdr source ============================================================
-#
-#   struct TopologyResponseBody
-#   {
-#       PeerStatList inboundPeers;
-#       PeerStatList outboundPeers;
-#
-#       uint32 totalInboundPeerCount;
-#       uint32 totalOutboundPeerCount;
-#   };
-#
-# ===========================================================================
 class TopologyResponseBody:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    struct TopologyResponseBody
+    {
+        PeerStatList inboundPeers;
+        PeerStatList outboundPeers;
+
+        uint32 totalInboundPeerCount;
+        uint32 totalOutboundPeerCount;
+    };
+    ----------------------------------------------------------------
+    """
+
     def __init__(
-            self,
-            inbound_peers: 'PeerStatList',
-            outbound_peers: 'PeerStatList',
-            total_inbound_peer_count: 'Uint32',
-            total_outbound_peer_count: 'Uint32',
+        self,
+        inbound_peers: "PeerStatList",
+        outbound_peers: "PeerStatList",
+        total_inbound_peer_count: "Uint32",
+        total_outbound_peer_count: "Uint32",
     ) -> None:
         self.inbound_peers = inbound_peers
         self.outbound_peers = outbound_peers
@@ -11115,7 +11400,7 @@ class TopologyResponseBody:
         self.total_outbound_peer_count.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'TopologyResponseBody':
+    def unpack(cls, unpacker: Unpacker) -> "TopologyResponseBody":
         inbound_peers = PeerStatList.unpack(unpacker)
         outbound_peers = PeerStatList.unpack(unpacker)
         total_inbound_peer_count = Uint32.unpack(unpacker)
@@ -11133,7 +11418,7 @@ class TopologyResponseBody:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'TopologyResponseBody':
+    def from_xdr(cls, xdr) -> "TopologyResponseBody":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -11141,35 +11426,42 @@ class TopologyResponseBody:
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented
-        return self.inbound_peers == other.inbound_peers and self.outbound_peers == other.outbound_peers and self.total_inbound_peer_count == other.total_inbound_peer_count and self.total_outbound_peer_count == other.total_outbound_peer_count
+        return (
+            self.inbound_peers == other.inbound_peers
+            and self.outbound_peers == other.outbound_peers
+            and self.total_inbound_peer_count == other.total_inbound_peer_count
+            and self.total_outbound_peer_count == other.total_outbound_peer_count
+        )
 
     def __str__(self):
         out = [
-            f'inbound_peers={self.inbound_peers}',
-            f'outbound_peers={self.outbound_peers}',
-            f'total_inbound_peer_count={self.total_inbound_peer_count}',
-            f'total_outbound_peer_count={self.total_outbound_peer_count}',
+            f"inbound_peers={self.inbound_peers}",
+            f"outbound_peers={self.outbound_peers}",
+            f"total_inbound_peer_count={self.total_inbound_peer_count}",
+            f"total_outbound_peer_count={self.total_outbound_peer_count}",
         ]
         return f"<TopologyResponseBody {[', '.join(out)]}>"
 
 
-# === xdr source ============================================================
-#
-#   union SurveyResponseBody switch (SurveyMessageCommandType type)
-#   {
-#       case SURVEY_TOPOLOGY:
-#           TopologyResponseBody topologyResponseBody;
-#   };
-#
-# ===========================================================================
 class SurveyResponseBody:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    union SurveyResponseBody switch (SurveyMessageCommandType type)
+    {
+        case SURVEY_TOPOLOGY:
+            TopologyResponseBody topologyResponseBody;
+    };
+    ----------------------------------------------------------------
+    """
+
     def __init__(
-            self,
-            type: 'SurveyMessageCommandType',
-            topology_response_body: 'TopologyResponseBody' = None,
+        self,
+        type: "SurveyMessageCommandType",
+        topology_response_body: "TopologyResponseBody" = None,
     ) -> None:
         self.type = type
-        self.topology_response_body: 'TopologyResponseBody' = topology_response_body
+        self.topology_response_body: "TopologyResponseBody" = topology_response_body
 
     def pack(self, packer: Packer) -> None:
         self.type.pack(packer)
@@ -11178,7 +11470,7 @@ class SurveyResponseBody:
             return
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'SurveyResponseBody':
+    def unpack(cls, unpacker: Unpacker) -> "SurveyResponseBody":
         type = SurveyMessageCommandType.unpack(unpacker)
         if type == SurveyMessageCommandType.SURVEY_TOPOLOGY:
             topology_response_body = TopologyResponseBody.unpack(unpacker)
@@ -11190,7 +11482,7 @@ class SurveyResponseBody:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'SurveyResponseBody':
+    def from_xdr(cls, xdr) -> "SurveyResponseBody":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -11198,93 +11490,99 @@ class SurveyResponseBody:
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented
-        return self.type == other.type and self.topology_response_body == other.topology_response_body
+        return (
+            self.type == other.type
+            and self.topology_response_body == other.topology_response_body
+        )
 
     def __str__(self):
         out = []
-        out.append(f'type={self.type}')
+        out.append(f"type={self.type}")
         out.append(
-            f'topology_response_body={self.topology_response_body}') if self.topology_response_body is not None else None
+            f"topology_response_body={self.topology_response_body}"
+        ) if self.topology_response_body is not None else None
         return f"<SurveyResponseBody {[', '.join(out)]}>"
 
 
-# === xdr source ============================================================
-#
-#   union StellarMessage switch (MessageType type)
-#   {
-#   case ERROR_MSG:
-#       Error error;
-#   case HELLO:
-#       Hello hello;
-#   case AUTH:
-#       Auth auth;
-#   case DONT_HAVE:
-#       DontHave dontHave;
-#   case GET_PEERS:
-#       void;
-#   case PEERS:
-#       PeerAddress peers<100>;
-#
-#   case GET_TX_SET:
-#       uint256 txSetHash;
-#   case TX_SET:
-#       TransactionSet txSet;
-#
-#   case TRANSACTION:
-#       TransactionEnvelope transaction;
-#
-#   case SURVEY_REQUEST:
-#       SignedSurveyRequestMessage signedSurveyRequestMessage;
-#
-#   case SURVEY_RESPONSE:
-#       SignedSurveyResponseMessage signedSurveyResponseMessage;
-#
-#   // SCP
-#   case GET_SCP_QUORUMSET:
-#       uint256 qSetHash;
-#   case SCP_QUORUMSET:
-#       SCPQuorumSet qSet;
-#   case SCP_MESSAGE:
-#       SCPEnvelope envelope;
-#   case GET_SCP_STATE:
-#       uint32 getSCPLedgerSeq; // ledger seq requested ; if 0, requests the latest
-#   };
-#
-# ===========================================================================
 class StellarMessage:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    union StellarMessage switch (MessageType type)
+    {
+    case ERROR_MSG:
+        Error error;
+    case HELLO:
+        Hello hello;
+    case AUTH:
+        Auth auth;
+    case DONT_HAVE:
+        DontHave dontHave;
+    case GET_PEERS:
+        void;
+    case PEERS:
+        PeerAddress peers<100>;
+
+    case GET_TX_SET:
+        uint256 txSetHash;
+    case TX_SET:
+        TransactionSet txSet;
+
+    case TRANSACTION:
+        TransactionEnvelope transaction;
+
+    case SURVEY_REQUEST:
+        SignedSurveyRequestMessage signedSurveyRequestMessage;
+
+    case SURVEY_RESPONSE:
+        SignedSurveyResponseMessage signedSurveyResponseMessage;
+
+    // SCP
+    case GET_SCP_QUORUMSET:
+        uint256 qSetHash;
+    case SCP_QUORUMSET:
+        SCPQuorumSet qSet;
+    case SCP_MESSAGE:
+        SCPEnvelope envelope;
+    case GET_SCP_STATE:
+        uint32 getSCPLedgerSeq; // ledger seq requested ; if 0, requests the latest
+    };
+    ----------------------------------------------------------------
+    """
+
     def __init__(
-            self,
-            type: 'MessageType',
-            error: 'Error' = None,
-            hello: 'Hello' = None,
-            auth: 'Auth' = None,
-            dont_have: 'DontHave' = None,
-            peers: List['PeerAddress'] = None,
-            tx_set_hash: 'Uint256' = None,
-            tx_set: 'TransactionSet' = None,
-            transaction: 'TransactionEnvelope' = None,
-            signed_survey_request_message: 'SignedSurveyRequestMessage' = None,
-            signed_survey_response_message: 'SignedSurveyResponseMessage' = None,
-            q_set_hash: 'Uint256' = None,
-            q_set: 'SCPQuorumSet' = None,
-            envelope: 'SCPEnvelope' = None,
-            get_scp_ledger_seq: 'Uint32' = None,
+        self,
+        type: "MessageType",
+        error: "Error" = None,
+        hello: "Hello" = None,
+        auth: "Auth" = None,
+        dont_have: "DontHave" = None,
+        peers: List["PeerAddress"] = None,
+        tx_set_hash: "Uint256" = None,
+        tx_set: "TransactionSet" = None,
+        transaction: "TransactionEnvelope" = None,
+        signed_survey_request_message: "SignedSurveyRequestMessage" = None,
+        signed_survey_response_message: "SignedSurveyResponseMessage" = None,
+        q_set_hash: "Uint256" = None,
+        q_set: "SCPQuorumSet" = None,
+        envelope: "SCPEnvelope" = None,
+        get_scp_ledger_seq: "Uint32" = None,
     ) -> None:
         self.type = type
-        self.error: 'Error' = error
-        self.hello: 'Hello' = hello
-        self.auth: 'Auth' = auth
-        self.dont_have: 'DontHave' = dont_have
-        self.peers: List['PeerAddress'] = peers
-        self.tx_set_hash: 'Uint256' = tx_set_hash
-        self.tx_set: 'TransactionSet' = tx_set
-        self.transaction: 'TransactionEnvelope' = transaction
-        self.signed_survey_request_message: 'SignedSurveyRequestMessage' = signed_survey_request_message
-        self.signed_survey_response_message: 'SignedSurveyResponseMessage' = signed_survey_response_message
-        self.q_set_hash: 'Uint256' = q_set_hash
-        self.q_set: 'SCPQuorumSet' = q_set
-        self.envelope: 'SCPEnvelope' = envelope
-        self.get_scp_ledger_seq: 'Uint32' = get_scp_ledger_seq
+        self.error: "Error" = error
+        self.hello: "Hello" = hello
+        self.auth: "Auth" = auth
+        self.dont_have: "DontHave" = dont_have
+        self.peers: List["PeerAddress"] = peers
+        self.tx_set_hash: "Uint256" = tx_set_hash
+        self.tx_set: "TransactionSet" = tx_set
+        self.transaction: "TransactionEnvelope" = transaction
+        self.signed_survey_request_message: "SignedSurveyRequestMessage" = signed_survey_request_message
+        self.signed_survey_response_message: "SignedSurveyResponseMessage" = signed_survey_response_message
+        self.q_set_hash: "Uint256" = q_set_hash
+        self.q_set: "SCPQuorumSet" = q_set
+        self.envelope: "SCPEnvelope" = envelope
+        self.get_scp_ledger_seq: "Uint32" = get_scp_ledger_seq
 
     def pack(self, packer: Packer) -> None:
         self.type.pack(packer)
@@ -11336,7 +11634,7 @@ class StellarMessage:
             return
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'StellarMessage':
+    def unpack(cls, unpacker: Unpacker) -> "StellarMessage":
         type = MessageType.unpack(unpacker)
         if type == MessageType.ERROR_MSG:
             error = Error.unpack(unpacker)
@@ -11369,10 +11667,16 @@ class StellarMessage:
             return cls(type, transaction=transaction)
         if type == MessageType.SURVEY_REQUEST:
             signed_survey_request_message = SignedSurveyRequestMessage.unpack(unpacker)
-            return cls(type, signed_survey_request_message=signed_survey_request_message)
+            return cls(
+                type, signed_survey_request_message=signed_survey_request_message
+            )
         if type == MessageType.SURVEY_RESPONSE:
-            signed_survey_response_message = SignedSurveyResponseMessage.unpack(unpacker)
-            return cls(type, signed_survey_response_message=signed_survey_response_message)
+            signed_survey_response_message = SignedSurveyResponseMessage.unpack(
+                unpacker
+            )
+            return cls(
+                type, signed_survey_response_message=signed_survey_response_message
+            )
         if type == MessageType.GET_SCP_QUORUMSET:
             q_set_hash = Uint256.unpack(unpacker)
             return cls(type, q_set_hash=q_set_hash)
@@ -11392,7 +11696,7 @@ class StellarMessage:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'StellarMessage':
+    def from_xdr(cls, xdr) -> "StellarMessage":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -11400,46 +11704,75 @@ class StellarMessage:
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented
-        return self.type == other.type and self.error == other.error and self.hello == other.hello and self.auth == other.auth and self.dont_have == other.dont_have and self.peers == other.peers and self.tx_set_hash == other.tx_set_hash and self.tx_set == other.tx_set and self.transaction == other.transaction and self.signed_survey_request_message == other.signed_survey_request_message and self.signed_survey_response_message == other.signed_survey_response_message and self.q_set_hash == other.q_set_hash and self.q_set == other.q_set and self.envelope == other.envelope and self.get_scp_ledger_seq == other.get_scp_ledger_seq
+        return (
+            self.type == other.type
+            and self.error == other.error
+            and self.hello == other.hello
+            and self.auth == other.auth
+            and self.dont_have == other.dont_have
+            and self.peers == other.peers
+            and self.tx_set_hash == other.tx_set_hash
+            and self.tx_set == other.tx_set
+            and self.transaction == other.transaction
+            and self.signed_survey_request_message
+            == other.signed_survey_request_message
+            and self.signed_survey_response_message
+            == other.signed_survey_response_message
+            and self.q_set_hash == other.q_set_hash
+            and self.q_set == other.q_set
+            and self.envelope == other.envelope
+            and self.get_scp_ledger_seq == other.get_scp_ledger_seq
+        )
 
     def __str__(self):
         out = []
-        out.append(f'type={self.type}')
-        out.append(f'error={self.error}') if self.error is not None else None
-        out.append(f'hello={self.hello}') if self.hello is not None else None
-        out.append(f'auth={self.auth}') if self.auth is not None else None
-        out.append(f'dont_have={self.dont_have}') if self.dont_have is not None else None
-        out.append(f'peers={self.peers}') if self.peers is not None else None
-        out.append(f'tx_set_hash={self.tx_set_hash}') if self.tx_set_hash is not None else None
-        out.append(f'tx_set={self.tx_set}') if self.tx_set is not None else None
-        out.append(f'transaction={self.transaction}') if self.transaction is not None else None
+        out.append(f"type={self.type}")
+        out.append(f"error={self.error}") if self.error is not None else None
+        out.append(f"hello={self.hello}") if self.hello is not None else None
+        out.append(f"auth={self.auth}") if self.auth is not None else None
         out.append(
-            f'signed_survey_request_message={self.signed_survey_request_message}') if self.signed_survey_request_message is not None else None
+            f"dont_have={self.dont_have}"
+        ) if self.dont_have is not None else None
+        out.append(f"peers={self.peers}") if self.peers is not None else None
         out.append(
-            f'signed_survey_response_message={self.signed_survey_response_message}') if self.signed_survey_response_message is not None else None
-        out.append(f'q_set_hash={self.q_set_hash}') if self.q_set_hash is not None else None
-        out.append(f'q_set={self.q_set}') if self.q_set is not None else None
-        out.append(f'envelope={self.envelope}') if self.envelope is not None else None
-        out.append(f'get_scp_ledger_seq={self.get_scp_ledger_seq}') if self.get_scp_ledger_seq is not None else None
+            f"tx_set_hash={self.tx_set_hash}"
+        ) if self.tx_set_hash is not None else None
+        out.append(f"tx_set={self.tx_set}") if self.tx_set is not None else None
+        out.append(
+            f"transaction={self.transaction}"
+        ) if self.transaction is not None else None
+        out.append(
+            f"signed_survey_request_message={self.signed_survey_request_message}"
+        ) if self.signed_survey_request_message is not None else None
+        out.append(
+            f"signed_survey_response_message={self.signed_survey_response_message}"
+        ) if self.signed_survey_response_message is not None else None
+        out.append(
+            f"q_set_hash={self.q_set_hash}"
+        ) if self.q_set_hash is not None else None
+        out.append(f"q_set={self.q_set}") if self.q_set is not None else None
+        out.append(f"envelope={self.envelope}") if self.envelope is not None else None
+        out.append(
+            f"get_scp_ledger_seq={self.get_scp_ledger_seq}"
+        ) if self.get_scp_ledger_seq is not None else None
         return f"<StellarMessage {[', '.join(out)]}>"
 
 
-# === xdr source ============================================================
-#
-#   struct
-#   {
-#      uint64 sequence;
-#      StellarMessage message;
-#      HmacSha256Mac mac;
-#       }
-#
-# ===========================================================================
 class AuthenticatedMessageV0:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    struct
+    {
+       uint64 sequence;
+       StellarMessage message;
+       HmacSha256Mac mac;
+        }
+    ----------------------------------------------------------------
+    """
+
     def __init__(
-            self,
-            sequence: 'Uint64',
-            message: 'StellarMessage',
-            mac: 'HmacSha256Mac',
+        self, sequence: "Uint64", message: "StellarMessage", mac: "HmacSha256Mac"
     ) -> None:
         self.sequence = sequence
         self.message = message
@@ -11451,15 +11784,11 @@ class AuthenticatedMessageV0:
         self.mac.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'AuthenticatedMessageV0':
+    def unpack(cls, unpacker: Unpacker) -> "AuthenticatedMessageV0":
         sequence = Uint64.unpack(unpacker)
         message = StellarMessage.unpack(unpacker)
         mac = HmacSha256Mac.unpack(unpacker)
-        return cls(
-            sequence=sequence,
-            message=message,
-            mac=mac,
-        )
+        return cls(sequence=sequence, message=message, mac=mac)
 
     def to_xdr(self) -> str:
         packer = Packer()
@@ -11467,7 +11796,7 @@ class AuthenticatedMessageV0:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'AuthenticatedMessageV0':
+    def from_xdr(cls, xdr) -> "AuthenticatedMessageV0":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -11475,39 +11804,41 @@ class AuthenticatedMessageV0:
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented
-        return self.sequence == other.sequence and self.message == other.message and self.mac == other.mac
+        return (
+            self.sequence == other.sequence
+            and self.message == other.message
+            and self.mac == other.mac
+        )
 
     def __str__(self):
         out = [
-            f'sequence={self.sequence}',
-            f'message={self.message}',
-            f'mac={self.mac}',
+            f"sequence={self.sequence}",
+            f"message={self.message}",
+            f"mac={self.mac}",
         ]
         return f"<AuthenticatedMessageV0 {[', '.join(out)]}>"
 
 
-# === xdr source ============================================================
-#
-#   union AuthenticatedMessage switch (uint32 v)
-#   {
-#   case 0:
-#       struct
-#   {
-#      uint64 sequence;
-#      StellarMessage message;
-#      HmacSha256Mac mac;
-#       } v0;
-#   };
-#
-# ===========================================================================
 class AuthenticatedMessage:
-    def __init__(
-            self,
-            v: 'Uint32',
-            v0: 'AuthenticatedMessageV0' = None,
-    ) -> None:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    union AuthenticatedMessage switch (uint32 v)
+    {
+    case 0:
+        struct
+    {
+       uint64 sequence;
+       StellarMessage message;
+       HmacSha256Mac mac;
+        } v0;
+    };
+    ----------------------------------------------------------------
+    """
+
+    def __init__(self, v: "Uint32", v0: "AuthenticatedMessageV0" = None) -> None:
         self.v = v
-        self.v0: 'AuthenticatedMessageV0' = v0
+        self.v0: "AuthenticatedMessageV0" = v0
 
     def pack(self, packer: Packer) -> None:
         self.v.pack(packer)
@@ -11516,7 +11847,7 @@ class AuthenticatedMessage:
             return
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'AuthenticatedMessage':
+    def unpack(cls, unpacker: Unpacker) -> "AuthenticatedMessage":
         v = Uint32.unpack(unpacker)
         if v == 0:
             v0 = AuthenticatedMessageV0.unpack(unpacker)
@@ -11528,7 +11859,7 @@ class AuthenticatedMessage:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'AuthenticatedMessage':
+    def from_xdr(cls, xdr) -> "AuthenticatedMessage":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -11540,17 +11871,19 @@ class AuthenticatedMessage:
 
     def __str__(self):
         out = []
-        out.append(f'v={self.v}')
-        out.append(f'v0={self.v0}') if self.v0 is not None else None
+        out.append(f"v={self.v}")
+        out.append(f"v0={self.v0}") if self.v0 is not None else None
         return f"<AuthenticatedMessage {[', '.join(out)]}>"
 
 
-# === xdr source ============================================================
-#
-#   typedef opaque Hash[32];
-#
-# ===========================================================================
 class Hash:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    typedef opaque Hash[32];
+    ----------------------------------------------------------------
+    """
+
     def __init__(self, hash: bytes) -> None:
         self.hash = hash
 
@@ -11558,7 +11891,7 @@ class Hash:
         Opaque(self.hash, 32, True).pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'Hash':
+    def unpack(cls, unpacker: Unpacker) -> "Hash":
         hash = Opaque.unpack(unpacker, 32, True)
         return cls(hash)
 
@@ -11568,7 +11901,7 @@ class Hash:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'Hash':
+    def from_xdr(cls, xdr) -> "Hash":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -11582,12 +11915,14 @@ class Hash:
         return f"<Hash [hash={self.hash}]>"
 
 
-# === xdr source ============================================================
-#
-#   typedef opaque uint256[32];
-#
-# ===========================================================================
 class Uint256:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    typedef opaque uint256[32];
+    ----------------------------------------------------------------
+    """
+
     def __init__(self, uint256: bytes) -> None:
         self.uint256 = uint256
 
@@ -11595,7 +11930,7 @@ class Uint256:
         Opaque(self.uint256, 32, True).pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'Uint256':
+    def unpack(cls, unpacker: Unpacker) -> "Uint256":
         uint256 = Opaque.unpack(unpacker, 32, True)
         return cls(uint256)
 
@@ -11605,7 +11940,7 @@ class Uint256:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'Uint256':
+    def from_xdr(cls, xdr) -> "Uint256":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -11619,12 +11954,14 @@ class Uint256:
         return f"<Uint256 [uint256={self.uint256}]>"
 
 
-# === xdr source ============================================================
-#
-#   typedef unsigned int uint32;
-#
-# ===========================================================================
 class Uint32:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    typedef unsigned int uint32;
+    ----------------------------------------------------------------
+    """
+
     def __init__(self, uint32: int) -> None:
         self.uint32 = uint32
 
@@ -11632,7 +11969,7 @@ class Uint32:
         UnsignedInteger(self.uint32).pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'Uint32':
+    def unpack(cls, unpacker: Unpacker) -> "Uint32":
         uint32 = UnsignedInteger.unpack(unpacker)
         return cls(uint32)
 
@@ -11642,7 +11979,7 @@ class Uint32:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'Uint32':
+    def from_xdr(cls, xdr) -> "Uint32":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -11656,12 +11993,14 @@ class Uint32:
         return f"<Uint32 [uint32={self.uint32}]>"
 
 
-# === xdr source ============================================================
-#
-#   typedef int int32;
-#
-# ===========================================================================
 class Int32:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    typedef int int32;
+    ----------------------------------------------------------------
+    """
+
     def __init__(self, int32: int) -> None:
         self.int32 = int32
 
@@ -11669,7 +12008,7 @@ class Int32:
         Integer(self.int32).pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'Int32':
+    def unpack(cls, unpacker: Unpacker) -> "Int32":
         int32 = Integer.unpack(unpacker)
         return cls(int32)
 
@@ -11679,7 +12018,7 @@ class Int32:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'Int32':
+    def from_xdr(cls, xdr) -> "Int32":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -11693,12 +12032,14 @@ class Int32:
         return f"<Int32 [int32={self.int32}]>"
 
 
-# === xdr source ============================================================
-#
-#   typedef unsigned hyper uint64;
-#
-# ===========================================================================
 class Uint64:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    typedef unsigned hyper uint64;
+    ----------------------------------------------------------------
+    """
+
     def __init__(self, uint64: int) -> None:
         self.uint64 = uint64
 
@@ -11706,7 +12047,7 @@ class Uint64:
         UnsignedHyper(self.uint64).pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'Uint64':
+    def unpack(cls, unpacker: Unpacker) -> "Uint64":
         uint64 = UnsignedHyper.unpack(unpacker)
         return cls(uint64)
 
@@ -11716,7 +12057,7 @@ class Uint64:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'Uint64':
+    def from_xdr(cls, xdr) -> "Uint64":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -11730,12 +12071,14 @@ class Uint64:
         return f"<Uint64 [uint64={self.uint64}]>"
 
 
-# === xdr source ============================================================
-#
-#   typedef hyper int64;
-#
-# ===========================================================================
 class Int64:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    typedef hyper int64;
+    ----------------------------------------------------------------
+    """
+
     def __init__(self, int64: int) -> None:
         self.int64 = int64
 
@@ -11743,7 +12086,7 @@ class Int64:
         Hyper(self.int64).pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'Int64':
+    def unpack(cls, unpacker: Unpacker) -> "Int64":
         int64 = Hyper.unpack(unpacker)
         return cls(int64)
 
@@ -11753,7 +12096,7 @@ class Int64:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'Int64':
+    def from_xdr(cls, xdr) -> "Int64":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -11767,17 +12110,19 @@ class Int64:
         return f"<Int64 [int64={self.int64}]>"
 
 
-# === xdr source ============================================================
-#
-#   enum CryptoKeyType
-#   {
-#       KEY_TYPE_ED25519 = 0,
-#       KEY_TYPE_PRE_AUTH_TX = 1,
-#       KEY_TYPE_HASH_X = 2
-#   };
-#
-# ===========================================================================
 class CryptoKeyType(IntEnum):
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    enum CryptoKeyType
+    {
+        KEY_TYPE_ED25519 = 0,
+        KEY_TYPE_PRE_AUTH_TX = 1,
+        KEY_TYPE_HASH_X = 2
+    };
+    ----------------------------------------------------------------
+    """
+
     KEY_TYPE_ED25519 = 0
     KEY_TYPE_PRE_AUTH_TX = 1
     KEY_TYPE_HASH_X = 2
@@ -11786,7 +12131,7 @@ class CryptoKeyType(IntEnum):
         packer.pack_int(self.value)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'CryptoKeyType':
+    def unpack(cls, unpacker: Unpacker) -> "CryptoKeyType":
         value = unpacker.unpack_int()
         return cls(value)
 
@@ -11796,7 +12141,7 @@ class CryptoKeyType(IntEnum):
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'CryptoKeyType':
+    def from_xdr(cls, xdr) -> "CryptoKeyType":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -11808,22 +12153,24 @@ class CryptoKeyType(IntEnum):
         )
 
 
-# === xdr source ============================================================
-#
-#   enum PublicKeyType
-#   {
-#       PUBLIC_KEY_TYPE_ED25519 = KEY_TYPE_ED25519
-#   };
-#
-# ===========================================================================
 class PublicKeyType(IntEnum):
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    enum PublicKeyType
+    {
+        PUBLIC_KEY_TYPE_ED25519 = KEY_TYPE_ED25519
+    };
+    ----------------------------------------------------------------
+    """
+
     PUBLIC_KEY_TYPE_ED25519 = 0
 
     def pack(self, packer: Packer) -> None:
         packer.pack_int(self.value)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'PublicKeyType':
+    def unpack(cls, unpacker: Unpacker) -> "PublicKeyType":
         value = unpacker.unpack_int()
         return cls(value)
 
@@ -11833,7 +12180,7 @@ class PublicKeyType(IntEnum):
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'PublicKeyType':
+    def from_xdr(cls, xdr) -> "PublicKeyType":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -11845,17 +12192,19 @@ class PublicKeyType(IntEnum):
         )
 
 
-# === xdr source ============================================================
-#
-#   enum SignerKeyType
-#   {
-#       SIGNER_KEY_TYPE_ED25519 = KEY_TYPE_ED25519,
-#       SIGNER_KEY_TYPE_PRE_AUTH_TX = KEY_TYPE_PRE_AUTH_TX,
-#       SIGNER_KEY_TYPE_HASH_X = KEY_TYPE_HASH_X
-#   };
-#
-# ===========================================================================
 class SignerKeyType(IntEnum):
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    enum SignerKeyType
+    {
+        SIGNER_KEY_TYPE_ED25519 = KEY_TYPE_ED25519,
+        SIGNER_KEY_TYPE_PRE_AUTH_TX = KEY_TYPE_PRE_AUTH_TX,
+        SIGNER_KEY_TYPE_HASH_X = KEY_TYPE_HASH_X
+    };
+    ----------------------------------------------------------------
+    """
+
     SIGNER_KEY_TYPE_ED25519 = 0
     SIGNER_KEY_TYPE_PRE_AUTH_TX = 1
     SIGNER_KEY_TYPE_HASH_X = 2
@@ -11864,7 +12213,7 @@ class SignerKeyType(IntEnum):
         packer.pack_int(self.value)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'SignerKeyType':
+    def unpack(cls, unpacker: Unpacker) -> "SignerKeyType":
         value = unpacker.unpack_int()
         return cls(value)
 
@@ -11874,7 +12223,7 @@ class SignerKeyType(IntEnum):
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'SignerKeyType':
+    def from_xdr(cls, xdr) -> "SignerKeyType":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -11886,23 +12235,21 @@ class SignerKeyType(IntEnum):
         )
 
 
-# === xdr source ============================================================
-#
-#   union PublicKey switch (PublicKeyType type)
-#   {
-#   case PUBLIC_KEY_TYPE_ED25519:
-#       uint256 ed25519;
-#   };
-#
-# ===========================================================================
 class PublicKey:
-    def __init__(
-            self,
-            type: 'PublicKeyType',
-            ed25519: 'Uint256' = None,
-    ) -> None:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    union PublicKey switch (PublicKeyType type)
+    {
+    case PUBLIC_KEY_TYPE_ED25519:
+        uint256 ed25519;
+    };
+    ----------------------------------------------------------------
+    """
+
+    def __init__(self, type: "PublicKeyType", ed25519: "Uint256" = None) -> None:
         self.type = type
-        self.ed25519: 'Uint256' = ed25519
+        self.ed25519: "Uint256" = ed25519
 
     def pack(self, packer: Packer) -> None:
         self.type.pack(packer)
@@ -11911,7 +12258,7 @@ class PublicKey:
             return
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'PublicKey':
+    def unpack(cls, unpacker: Unpacker) -> "PublicKey":
         type = PublicKeyType.unpack(unpacker)
         if type == PublicKeyType.PUBLIC_KEY_TYPE_ED25519:
             ed25519 = Uint256.unpack(unpacker)
@@ -11923,7 +12270,7 @@ class PublicKey:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'PublicKey':
+    def from_xdr(cls, xdr) -> "PublicKey":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -11935,38 +12282,40 @@ class PublicKey:
 
     def __str__(self):
         out = []
-        out.append(f'type={self.type}')
-        out.append(f'ed25519={self.ed25519}') if self.ed25519 is not None else None
+        out.append(f"type={self.type}")
+        out.append(f"ed25519={self.ed25519}") if self.ed25519 is not None else None
         return f"<PublicKey {[', '.join(out)]}>"
 
 
-# === xdr source ============================================================
-#
-#   union SignerKey switch (SignerKeyType type)
-#   {
-#   case SIGNER_KEY_TYPE_ED25519:
-#       uint256 ed25519;
-#   case SIGNER_KEY_TYPE_PRE_AUTH_TX:
-#       /* SHA-256 Hash of TransactionSignaturePayload structure */
-#       uint256 preAuthTx;
-#   case SIGNER_KEY_TYPE_HASH_X:
-#       /* Hash of random 256 bit preimage X */
-#       uint256 hashX;
-#   };
-#
-# ===========================================================================
 class SignerKey:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    union SignerKey switch (SignerKeyType type)
+    {
+    case SIGNER_KEY_TYPE_ED25519:
+        uint256 ed25519;
+    case SIGNER_KEY_TYPE_PRE_AUTH_TX:
+        /* SHA-256 Hash of TransactionSignaturePayload structure */
+        uint256 preAuthTx;
+    case SIGNER_KEY_TYPE_HASH_X:
+        /* Hash of random 256 bit preimage X */
+        uint256 hashX;
+    };
+    ----------------------------------------------------------------
+    """
+
     def __init__(
-            self,
-            type: 'SignerKeyType',
-            ed25519: 'Uint256' = None,
-            pre_auth_tx: 'Uint256' = None,
-            hash_x: 'Uint256' = None,
+        self,
+        type: "SignerKeyType",
+        ed25519: "Uint256" = None,
+        pre_auth_tx: "Uint256" = None,
+        hash_x: "Uint256" = None,
     ) -> None:
         self.type = type
-        self.ed25519: 'Uint256' = ed25519
-        self.pre_auth_tx: 'Uint256' = pre_auth_tx
-        self.hash_x: 'Uint256' = hash_x
+        self.ed25519: "Uint256" = ed25519
+        self.pre_auth_tx: "Uint256" = pre_auth_tx
+        self.hash_x: "Uint256" = hash_x
 
     def pack(self, packer: Packer) -> None:
         self.type.pack(packer)
@@ -11981,7 +12330,7 @@ class SignerKey:
             return
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'SignerKey':
+    def unpack(cls, unpacker: Unpacker) -> "SignerKey":
         type = SignerKeyType.unpack(unpacker)
         if type == SignerKeyType.SIGNER_KEY_TYPE_ED25519:
             ed25519 = Uint256.unpack(unpacker)
@@ -11999,7 +12348,7 @@ class SignerKey:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'SignerKey':
+    def from_xdr(cls, xdr) -> "SignerKey":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -12007,23 +12356,32 @@ class SignerKey:
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented
-        return self.type == other.type and self.ed25519 == other.ed25519 and self.pre_auth_tx == other.pre_auth_tx and self.hash_x == other.hash_x
+        return (
+            self.type == other.type
+            and self.ed25519 == other.ed25519
+            and self.pre_auth_tx == other.pre_auth_tx
+            and self.hash_x == other.hash_x
+        )
 
     def __str__(self):
         out = []
-        out.append(f'type={self.type}')
-        out.append(f'ed25519={self.ed25519}') if self.ed25519 is not None else None
-        out.append(f'pre_auth_tx={self.pre_auth_tx}') if self.pre_auth_tx is not None else None
-        out.append(f'hash_x={self.hash_x}') if self.hash_x is not None else None
+        out.append(f"type={self.type}")
+        out.append(f"ed25519={self.ed25519}") if self.ed25519 is not None else None
+        out.append(
+            f"pre_auth_tx={self.pre_auth_tx}"
+        ) if self.pre_auth_tx is not None else None
+        out.append(f"hash_x={self.hash_x}") if self.hash_x is not None else None
         return f"<SignerKey {[', '.join(out)]}>"
 
 
-# === xdr source ============================================================
-#
-#   typedef opaque Signature<64>;
-#
-# ===========================================================================
 class Signature:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    typedef opaque Signature<64>;
+    ----------------------------------------------------------------
+    """
+
     def __init__(self, signature: bytes) -> None:
         self.signature = signature
 
@@ -12031,7 +12389,7 @@ class Signature:
         Opaque(self.signature, 64, False).pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'Signature':
+    def unpack(cls, unpacker: Unpacker) -> "Signature":
         signature = Opaque.unpack(unpacker, 64, False)
         return cls(signature)
 
@@ -12041,7 +12399,7 @@ class Signature:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'Signature':
+    def from_xdr(cls, xdr) -> "Signature":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -12055,12 +12413,14 @@ class Signature:
         return f"<Signature [signature={self.signature}]>"
 
 
-# === xdr source ============================================================
-#
-#   typedef opaque SignatureHint[4];
-#
-# ===========================================================================
 class SignatureHint:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    typedef opaque SignatureHint[4];
+    ----------------------------------------------------------------
+    """
+
     def __init__(self, signature_hint: bytes) -> None:
         self.signature_hint = signature_hint
 
@@ -12068,7 +12428,7 @@ class SignatureHint:
         Opaque(self.signature_hint, 4, True).pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'SignatureHint':
+    def unpack(cls, unpacker: Unpacker) -> "SignatureHint":
         signature_hint = Opaque.unpack(unpacker, 4, True)
         return cls(signature_hint)
 
@@ -12078,7 +12438,7 @@ class SignatureHint:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'SignatureHint':
+    def from_xdr(cls, xdr) -> "SignatureHint":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -12092,20 +12452,22 @@ class SignatureHint:
         return f"<SignatureHint [signature_hint={self.signature_hint}]>"
 
 
-# === xdr source ============================================================
-#
-#   typedef PublicKey NodeID;
-#
-# ===========================================================================
 class NodeID:
-    def __init__(self, node_id: 'PublicKey') -> None:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    typedef PublicKey NodeID;
+    ----------------------------------------------------------------
+    """
+
+    def __init__(self, node_id: "PublicKey") -> None:
         self.node_id = node_id
 
     def pack(self, packer: Packer) -> None:
         self.node_id.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'NodeID':
+    def unpack(cls, unpacker: Unpacker) -> "NodeID":
         node_id = PublicKey.unpack(unpacker)
         return cls(node_id)
 
@@ -12115,7 +12477,7 @@ class NodeID:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'NodeID':
+    def from_xdr(cls, xdr) -> "NodeID":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -12129,30 +12491,27 @@ class NodeID:
         return f"<NodeID [node_id={self.node_id}]>"
 
 
-# === xdr source ============================================================
-#
-#   struct Curve25519Secret
-#   {
-#           opaque key[32];
-#   };
-#
-# ===========================================================================
 class Curve25519Secret:
-    def __init__(
-            self,
-            key: bytes,
-    ) -> None:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    struct Curve25519Secret
+    {
+            opaque key[32];
+    };
+    ----------------------------------------------------------------
+    """
+
+    def __init__(self, key: bytes) -> None:
         self.key = key
 
     def pack(self, packer: Packer) -> None:
         Opaque(self.key, 32, True).pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'Curve25519Secret':
+    def unpack(cls, unpacker: Unpacker) -> "Curve25519Secret":
         key = Opaque.unpack(unpacker, 32, True)
-        return cls(
-            key=key,
-        )
+        return cls(key=key)
 
     def to_xdr(self) -> str:
         packer = Packer()
@@ -12160,7 +12519,7 @@ class Curve25519Secret:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'Curve25519Secret':
+    def from_xdr(cls, xdr) -> "Curve25519Secret":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -12171,36 +12530,31 @@ class Curve25519Secret:
         return self.key == other.key
 
     def __str__(self):
-        out = [
-            f'key={self.key}',
-        ]
+        out = [f"key={self.key}"]
         return f"<Curve25519Secret {[', '.join(out)]}>"
 
 
-# === xdr source ============================================================
-#
-#   struct Curve25519Public
-#   {
-#           opaque key[32];
-#   };
-#
-# ===========================================================================
 class Curve25519Public:
-    def __init__(
-            self,
-            key: bytes,
-    ) -> None:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    struct Curve25519Public
+    {
+            opaque key[32];
+    };
+    ----------------------------------------------------------------
+    """
+
+    def __init__(self, key: bytes) -> None:
         self.key = key
 
     def pack(self, packer: Packer) -> None:
         Opaque(self.key, 32, True).pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'Curve25519Public':
+    def unpack(cls, unpacker: Unpacker) -> "Curve25519Public":
         key = Opaque.unpack(unpacker, 32, True)
-        return cls(
-            key=key,
-        )
+        return cls(key=key)
 
     def to_xdr(self) -> str:
         packer = Packer()
@@ -12208,7 +12562,7 @@ class Curve25519Public:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'Curve25519Public':
+    def from_xdr(cls, xdr) -> "Curve25519Public":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -12219,36 +12573,31 @@ class Curve25519Public:
         return self.key == other.key
 
     def __str__(self):
-        out = [
-            f'key={self.key}',
-        ]
+        out = [f"key={self.key}"]
         return f"<Curve25519Public {[', '.join(out)]}>"
 
 
-# === xdr source ============================================================
-#
-#   struct HmacSha256Key
-#   {
-#           opaque key[32];
-#   };
-#
-# ===========================================================================
 class HmacSha256Key:
-    def __init__(
-            self,
-            key: bytes,
-    ) -> None:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    struct HmacSha256Key
+    {
+            opaque key[32];
+    };
+    ----------------------------------------------------------------
+    """
+
+    def __init__(self, key: bytes) -> None:
         self.key = key
 
     def pack(self, packer: Packer) -> None:
         Opaque(self.key, 32, True).pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'HmacSha256Key':
+    def unpack(cls, unpacker: Unpacker) -> "HmacSha256Key":
         key = Opaque.unpack(unpacker, 32, True)
-        return cls(
-            key=key,
-        )
+        return cls(key=key)
 
     def to_xdr(self) -> str:
         packer = Packer()
@@ -12256,7 +12605,7 @@ class HmacSha256Key:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'HmacSha256Key':
+    def from_xdr(cls, xdr) -> "HmacSha256Key":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -12267,36 +12616,31 @@ class HmacSha256Key:
         return self.key == other.key
 
     def __str__(self):
-        out = [
-            f'key={self.key}',
-        ]
+        out = [f"key={self.key}"]
         return f"<HmacSha256Key {[', '.join(out)]}>"
 
 
-# === xdr source ============================================================
-#
-#   struct HmacSha256Mac
-#   {
-#           opaque mac[32];
-#   };
-#
-# ===========================================================================
 class HmacSha256Mac:
-    def __init__(
-            self,
-            mac: bytes,
-    ) -> None:
+    """
+    XDR Source Code
+    ----------------------------------------------------------------
+    struct HmacSha256Mac
+    {
+            opaque mac[32];
+    };
+    ----------------------------------------------------------------
+    """
+
+    def __init__(self, mac: bytes) -> None:
         self.mac = mac
 
     def pack(self, packer: Packer) -> None:
         Opaque(self.mac, 32, True).pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> 'HmacSha256Mac':
+    def unpack(cls, unpacker: Unpacker) -> "HmacSha256Mac":
         mac = Opaque.unpack(unpacker, 32, True)
-        return cls(
-            mac=mac,
-        )
+        return cls(mac=mac)
 
     def to_xdr(self) -> str:
         packer = Packer()
@@ -12304,7 +12648,7 @@ class HmacSha256Mac:
         return base64.b64encode(packer.get_buffer()).decode()
 
     @classmethod
-    def from_xdr(cls, xdr) -> 'HmacSha256Mac':
+    def from_xdr(cls, xdr) -> "HmacSha256Mac":
         data = base64.b64decode(xdr.encode())
         unpacker = Unpacker(data)
         return cls.unpack(unpacker)
@@ -12315,7 +12659,5 @@ class HmacSha256Mac:
         return self.mac == other.mac
 
     def __str__(self):
-        out = [
-            f'mac={self.mac}',
-        ]
+        out = [f"mac={self.mac}"]
         return f"<HmacSha256Mac {[', '.join(out)]}>"
