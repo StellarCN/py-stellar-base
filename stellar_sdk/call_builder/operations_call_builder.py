@@ -111,11 +111,11 @@ class OperationsCallBuilder(BaseCallBuilder[T]):
             )
         return OPERATION_TYPE_I_RESPONSE[operation_type]
 
-    def _parsed_response(
+    def _parse_response(
         self, raw_data: dict
     ) -> Union[List[OPERATION_RESPONSE_TYPE_UNION], OPERATION_RESPONSE_TYPE_UNION]:
         return self._base_parse_response(
-            raw_data, self._get_corresponding_response_type(raw_data)
+            raw_data, model_selector=self._get_corresponding_response_type
         )
 
     def stream(

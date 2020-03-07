@@ -11,7 +11,6 @@ from stellar_sdk.call_builder.ledgers_call_builder import LedgersCallBuilder
 from stellar_sdk.call_builder.offers_call_builder import OffersCallBuilder
 from stellar_sdk.call_builder.operations_call_builder import OperationsCallBuilder
 from stellar_sdk.call_builder.orderbook_call_builder import OrderbookCallBuilder
-from stellar_sdk.call_builder.paths_call_builder import PathsCallBuilder
 from stellar_sdk.call_builder.payments_call_builder import PaymentsCallBuilder
 from stellar_sdk.call_builder.root_call_builder import RootCallBuilder
 from stellar_sdk.call_builder.strict_receive_paths_call_builder import (
@@ -93,25 +92,6 @@ class TestServer:
             )
             assert server.orderbook(buying, selling) == OrderbookCallBuilder(
                 horizon_url, client, buying, selling
-            )
-            source_account = "GABUVMDURJFF477AEDAXOG5TL7JBHGDAKJQLH5K6FB5QONMLEV52C6IO"
-            destination_account = (
-                "GDV6FVHPY4JH7EEBSJYPQQYZA3OC6TKTM2TAXRHWT4EEL7BJ2BTDQT5D"
-            )
-            destination_asset = Asset.native()
-            destination_amount = "100.0"
-            assert server.paths(
-                source_account,
-                destination_account,
-                destination_asset,
-                destination_amount,
-            ) == PathsCallBuilder(
-                horizon_url,
-                client,
-                source_account,
-                destination_account,
-                destination_asset,
-                destination_amount,
             )
             source = "GAYSHLG75RPSMXWJ5KX7O7STE6RSZTD6NE4CTWAXFZYYVYIFRUVJIBJH"
             destination_asset = Asset(

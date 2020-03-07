@@ -44,6 +44,7 @@ class TestOperationModel:
         raw = load_file("operations/manage_buy_offer.json")
         parsed = ManageBuyOfferResponse.parse_obj(raw)
         raw["created_at"] = parse_time(raw["created_at"])
+        raw["offer_id"] = int(raw["offer_id"])
         assert raw == parsed.dict(exclude_unset=True, by_alias=True)
 
     def test_manage_data(self):
@@ -56,6 +57,7 @@ class TestOperationModel:
         raw = load_file("operations/manage_offer.json")
         parsed = ManageSellOfferResponse.parse_obj(raw)
         raw["created_at"] = parse_time(raw["created_at"])
+        raw["offer_id"] = int(raw["offer_id"])
         assert raw == parsed.dict(exclude_unset=True, by_alias=True)
 
     def test_path_payment(self):

@@ -94,7 +94,7 @@ class EffectsCallBuilder(BaseCallBuilder[T]):
         self, raw_data: dict
     ) -> Union[List[EFFECT_RESPONSE_TYPE_UNION], EFFECT_RESPONSE_TYPE_UNION]:
         return self._base_parse_response(
-            raw_data, self._get_corresponding_response_type(raw_data)
+            raw_data, model_selector=self._get_corresponding_response_type
         )
 
     def stream(

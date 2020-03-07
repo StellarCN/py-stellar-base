@@ -113,7 +113,7 @@ class OffersCallBuilder(BaseCallBuilder[T]):
     def _parse_response(
         self, raw_data: dict
     ) -> Union[List[OfferResponse], OfferResponse]:
-        return self._base_parse_response(raw_data, AccountResponse)
+        return self._base_parse_response(raw_data, OfferResponse)
 
     def stream(
         self

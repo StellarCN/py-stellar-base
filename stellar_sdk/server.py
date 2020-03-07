@@ -13,7 +13,6 @@ from .call_builder.ledgers_call_builder import LedgersCallBuilder
 from .call_builder.offers_call_builder import OffersCallBuilder
 from .call_builder.operations_call_builder import OperationsCallBuilder
 from .call_builder.orderbook_call_builder import OrderbookCallBuilder
-from .call_builder.paths_call_builder import PathsCallBuilder
 from .call_builder.payments_call_builder import PaymentsCallBuilder
 from .call_builder.root_call_builder import RootCallBuilder
 from .call_builder.strict_receive_paths_call_builder import (
@@ -198,7 +197,7 @@ class Server:
 
     def orderbook(
         self, selling: Asset, buying: Asset
-    ) -> OrderbookCallBuilder[List[OrderbookResponse]]:
+    ) -> OrderbookCallBuilder[OrderbookResponse]:
         """
         :param selling: Asset being sold
         :param buying: Asset being bought
@@ -210,37 +209,6 @@ class Server:
             client=self._client,
             buying=buying,
             selling=selling,
-        )
-
-    def paths(
-        self,
-        source_account: str,
-        destination_account: str,
-        destination_asset: Asset,
-        destination_amount: str,
-    ) -> PathsCallBuilder[List[PaymentPathResponse]]:
-        """
-        :param source_account: The sender's account ID. Any returned path must use a source that the sender can hold.
-        :param destination_account: The destination account ID that any returned path should use.
-        :param destination_asset: The destination asset.
-        :param destination_amount: The amount, denominated in the destination asset, that any returned path should be able to satisfy.
-        :return: New :class:`stellar_sdk.call_builder.PathsCallBuilder` object configured by
-            a current Horizon server configuration.
-        """
-
-        warnings.warn(
-            "Will be removed in version v2.3.0, "
-            "use stellar_sdk.server.strict_receive_paths",
-            DeprecationWarning,
-        )
-
-        return PathsCallBuilder(
-            horizon_url=self.horizon_url,
-            client=self._client,
-            source_account=source_account,
-            destination_account=destination_account,
-            destination_asset=destination_asset,
-            destination_amount=destination_amount,
         )
 
     def strict_receive_paths(

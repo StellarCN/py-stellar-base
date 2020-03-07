@@ -11,7 +11,6 @@ class Links(BaseModel):
     account_transactions: Link
     assets: Link
     friendbot: Optional[Link]
-    metrics: Link
     offer: Optional[Link]
     offers: Optional[Link]
     order_book: Link

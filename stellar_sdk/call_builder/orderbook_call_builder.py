@@ -41,9 +41,7 @@ class OrderbookCallBuilder(BaseCallBuilder[T]):
         }
         self._add_query_params(params)
 
-    def _parse_response(
-        self, raw_data: dict
-    ) -> Union[List[OrderbookResponse], OrderbookResponse]:
+    def _parse_response(self, raw_data: dict) -> Union[OrderbookResponse]:
         return self._base_parse_response(raw_data, OrderbookResponse)
 
     def stream(

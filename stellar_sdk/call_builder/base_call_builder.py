@@ -10,6 +10,7 @@ from typing import (
     TypeVar,
     Generic,
     Type,
+    Callable,
 )
 from urllib.parse import urljoin
 
@@ -96,13 +97,28 @@ class BaseCallBuilder(Generic[T]):
             "please submit an issue: %s" % __issues__
         )
 
-    def _base_parse_response(self, raw_data, model: Type[BaseModel]):
+    def _base_parse_response(
+        self,
+        raw_data,
+        model: Type[BaseModel] = None,
+        model_selector: Callable[[dict], Type[BaseModel]] = None,
+    ):
         if self._check_pageable(raw_data):
-            parsed = [
-                model.parse_obj(record) for record in raw_data["_embedded"]["records"]
-            ]
+            if model_selector is not None:
+                parsed = [
+                    model_selector(record).parse_obj(record)
+                    for record in raw_data["_embedded"]["records"]
+                ]
+            else:
+                parsed = [
+                    model.parse_obj(record)
+                    for record in raw_data["_embedded"]["records"]
+                ]
         else:
-            parsed = model.parse_obj(raw_data)
+            if model_selector is not None:
+                parsed = model_selector(raw_data).parse_obj(raw_data)
+            else:
+                parsed = model.parse_obj(raw_data)
         return parsed
 
     def _stream(
