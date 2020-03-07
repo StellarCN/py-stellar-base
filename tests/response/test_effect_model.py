@@ -97,6 +97,7 @@ class TestEffectModel:
         raw = load_file("effects/trade.json")
         parsed = TradeResponse.parse_obj(raw)
         raw["created_at"] = parse_time(raw["created_at"])
+        raw["offer_id"] = int(raw["offer_id"])
         assert raw == parsed.dict(exclude_unset=True, by_alias=True)
 
     def test_trustline_authorized(self):
