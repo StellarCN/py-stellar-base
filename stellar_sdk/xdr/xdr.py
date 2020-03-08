@@ -1,4 +1,4 @@
-# Automatically generated on 2020-03-08T16:16:19+08:00
+# Automatically generated on 2020-03-08T16:53:04+08:00
 # DO NOT EDIT or your changes may be overwritten
 import base64
 from enum import IntEnum
@@ -157,6 +157,14 @@ class SCPNomination:
     def __init__(
         self, quorum_set_hash: "Hash", votes: List["Value"], accepted: List["Value"]
     ) -> None:
+        if len(votes) > 4294967295:
+            raise ValueError(
+                f"The maximum length of `votes` should be 4294967295, but got {len(votes)}."
+            )
+        if len(accepted) > 4294967295:
+            raise ValueError(
+                f"The maximum length of `accepted` should be 4294967295, but got {len(accepted)}."
+            )
         self.quorum_set_hash = quorum_set_hash
         self.votes = votes
         self.accepted = accepted
@@ -735,6 +743,14 @@ class SCPQuorumSet:
         validators: List["PublicKey"],
         inner_sets: List["SCPQuorumSet"],
     ) -> None:
+        if len(validators) > 4294967295:
+            raise ValueError(
+                f"The maximum length of `validators` should be 4294967295, but got {len(validators)}."
+            )
+        if len(inner_sets) > 4294967295:
+            raise ValueError(
+                f"The maximum length of `inner_sets` should be 4294967295, but got {len(inner_sets)}."
+            )
         self.threshold = threshold
         self.validators = validators
         self.inner_sets = inner_sets
@@ -1017,6 +1033,10 @@ class StellarValue:
         upgrades: List["UpgradeType"],
         ext: "StellarValueExt",
     ) -> None:
+        if len(upgrades) > 6:
+            raise ValueError(
+                f"The maximum length of `upgrades` should be 6, but got {len(upgrades)}."
+            )
         self.tx_set_hash = tx_set_hash
         self.close_time = close_time
         self.upgrades = upgrades
@@ -1184,6 +1204,10 @@ class LedgerHeader:
         skip_list: List["Hash"],
         ext: "LedgerHeaderExt",
     ) -> None:
+        if len(skip_list) != 4:
+            raise ValueError(
+                f"The length of `skip_list` should be 4, but got {len(skip_list)}."
+            )
         self.ledger_version = ledger_version
         self.previous_ledger_hash = previous_ledger_hash
         self.scp_value = scp_value
@@ -2019,6 +2043,10 @@ class TransactionSet:
     def __init__(
         self, previous_ledger_hash: "Hash", txs: List["TransactionEnvelope"]
     ) -> None:
+        if len(txs) > 4294967295:
+            raise ValueError(
+                f"The maximum length of `txs` should be 4294967295, but got {len(txs)}."
+            )
         self.previous_ledger_hash = previous_ledger_hash
         self.txs = txs
 
@@ -2123,6 +2151,10 @@ class TransactionResultSet:
     """
 
     def __init__(self, results: List["TransactionResultPair"]) -> None:
+        if len(results) > 4294967295:
+            raise ValueError(
+                f"The maximum length of `results` should be 4294967295, but got {len(results)}."
+            )
         self.results = results
 
     def pack(self, packer: Packer) -> None:
@@ -2522,6 +2554,10 @@ class LedgerSCPMessages:
     """
 
     def __init__(self, ledger_seq: "Uint32", messages: List["SCPEnvelope"]) -> None:
+        if len(messages) > 4294967295:
+            raise ValueError(
+                f"The maximum length of `messages` should be 4294967295, but got {len(messages)}."
+            )
         self.ledger_seq = ledger_seq
         self.messages = messages
 
@@ -2576,6 +2612,10 @@ class SCPHistoryEntryV0:
     def __init__(
         self, quorum_sets: List["SCPQuorumSet"], ledger_messages: "LedgerSCPMessages"
     ) -> None:
+        if len(quorum_sets) > 4294967295:
+            raise ValueError(
+                f"The maximum length of `quorum_sets` should be 4294967295, but got {len(quorum_sets)}."
+            )
         self.quorum_sets = quorum_sets
         self.ledger_messages = ledger_messages
 
@@ -2923,6 +2963,10 @@ class TransactionMetaV1:
     def __init__(
         self, tx_changes: "LedgerEntryChanges", operations: List["OperationMeta"]
     ) -> None:
+        if len(operations) > 4294967295:
+            raise ValueError(
+                f"The maximum length of `operations` should be 4294967295, but got {len(operations)}."
+            )
         self.tx_changes = tx_changes
         self.operations = operations
 
@@ -2985,6 +3029,10 @@ class TransactionMetaV2:
         operations: List["OperationMeta"],
         tx_changes_after: "LedgerEntryChanges",
     ) -> None:
+        if len(operations) > 4294967295:
+            raise ValueError(
+                f"The maximum length of `operations` should be 4294967295, but got {len(operations)}."
+            )
         self.tx_changes_before = tx_changes_before
         self.operations = operations
         self.tx_changes_after = tx_changes_after
@@ -3062,6 +3110,10 @@ class TransactionMeta:
         v1: "TransactionMetaV1" = None,
         v2: "TransactionMetaV2" = None,
     ) -> None:
+        if operations is not None and len(operations) > 4294967295:
+            raise ValueError(
+                f"The maximum length of `operations` should be 4294967295, but got {len(operations)}."
+            )
         self.v = v
         self.operations: List["OperationMeta"] = operations
         self.v1: "TransactionMetaV1" = v1
@@ -3276,6 +3328,18 @@ class LedgerCloseMetaV0:
         upgrades_processing: List["UpgradeEntryMeta"],
         scp_info: List["SCPHistoryEntry"],
     ) -> None:
+        if len(tx_processing) > 4294967295:
+            raise ValueError(
+                f"The maximum length of `tx_processing` should be 4294967295, but got {len(tx_processing)}."
+            )
+        if len(upgrades_processing) > 4294967295:
+            raise ValueError(
+                f"The maximum length of `upgrades_processing` should be 4294967295, but got {len(upgrades_processing)}."
+            )
+        if len(scp_info) > 4294967295:
+            raise ValueError(
+                f"The maximum length of `scp_info` should be 4294967295, but got {len(scp_info)}."
+            )
         self.ledger_header = ledger_header
         self.tx_set = tx_set
         self.tx_processing = tx_processing
@@ -3659,6 +3723,10 @@ class PathPaymentStrictReceiveOp:
         dest_amount: "Int64",
         path: List["Asset"],
     ) -> None:
+        if len(path) > 5:
+            raise ValueError(
+                f"The maximum length of `path` should be 5, but got {len(path)}."
+            )
         self.send_asset = send_asset
         self.send_max = send_max
         self.destination = destination
@@ -3760,6 +3828,10 @@ class PathPaymentStrictSendOp:
         dest_min: "Int64",
         path: List["Asset"],
     ) -> None:
+        if len(path) > 5:
+            raise ValueError(
+                f"The maximum length of `path` should be 5, but got {len(path)}."
+            )
         self.send_asset = send_asset
         self.send_amount = send_amount
         self.destination = destination
@@ -5149,6 +5221,10 @@ class Transaction:
         operations: List["Operation"],
         ext: "TransactionExt",
     ) -> None:
+        if len(operations) > MAX_OPS_PER_TX:
+            raise ValueError(
+                f"The maximum length of `operations` should be MAX_OPS_PER_TX, but got {len(operations)}."
+            )
         self.source_account = source_account
         self.fee = fee
         self.seq_num = seq_num
@@ -5368,6 +5444,10 @@ class TransactionEnvelope:
     def __init__(
         self, tx: "Transaction", signatures: List["DecoratedSignature"]
     ) -> None:
+        if len(signatures) > 20:
+            raise ValueError(
+                f"The maximum length of `signatures` should be 20, but got {len(signatures)}."
+            )
         self.tx = tx
         self.signatures = signatures
 
@@ -5857,6 +5937,10 @@ class PathPaymentStrictReceiveResultSuccess:
     def __init__(
         self, offers: List["ClaimOfferAtom"], last: "SimplePaymentResult"
     ) -> None:
+        if len(offers) > 4294967295:
+            raise ValueError(
+                f"The maximum length of `offers` should be 4294967295, but got {len(offers)}."
+            )
         self.offers = offers
         self.last = last
 
@@ -6068,6 +6152,10 @@ class PathPaymentStrictSendResultSuccess:
     def __init__(
         self, offers: List["ClaimOfferAtom"], last: "SimplePaymentResult"
     ) -> None:
+        if len(offers) > 4294967295:
+            raise ValueError(
+                f"The maximum length of `offers` should be 4294967295, but got {len(offers)}."
+            )
         self.offers = offers
         self.last = last
 
@@ -6392,6 +6480,10 @@ class ManageOfferSuccessResult:
         offers_claimed: List["ClaimOfferAtom"],
         offer: "ManageOfferSuccessResultOffer",
     ) -> None:
+        if len(offers_claimed) > 4294967295:
+            raise ValueError(
+                f"The maximum length of `offers_claimed` should be 4294967295, but got {len(offers_claimed)}."
+            )
         self.offers_claimed = offers_claimed
         self.offer = offer
 
@@ -7152,6 +7244,10 @@ class InflationResult:
     def __init__(
         self, code: "InflationResultCode", payouts: List["InflationPayout"] = None
     ) -> None:
+        if payouts is not None and len(payouts) > 4294967295:
+            raise ValueError(
+                f"The maximum length of `payouts` should be 4294967295, but got {len(payouts)}."
+            )
         self.code = code
         self.payouts: List["InflationPayout"] = payouts
 
@@ -7866,6 +7962,14 @@ class TransactionResultResult:
     def __init__(
         self, code: "TransactionResultCode", results: List["OperationResult"] = None
     ) -> None:
+        if results is not None and len(results) > 4294967295:
+            raise ValueError(
+                f"The maximum length of `results` should be 4294967295, but got {len(results)}."
+            )
+        if results is not None and len(results) > 4294967295:
+            raise ValueError(
+                f"The maximum length of `results` should be 4294967295, but got {len(results)}."
+            )
         self.code = code
         self.results: List["OperationResult"] = results
 
@@ -9147,6 +9251,10 @@ class AccountEntry:
         signers: List["Signer"],
         ext: "AccountEntryExt",
     ) -> None:
+        if len(signers) > 20:
+            raise ValueError(
+                f"The maximum length of `signers` should be 20, but got {len(signers)}."
+            )
         self.account_id = account_id
         self.balance = balance
         self.seq_num = seq_num
@@ -11585,6 +11693,10 @@ class StellarMessage:
         envelope: "SCPEnvelope" = None,
         get_scp_ledger_seq: "Uint32" = None,
     ) -> None:
+        if peers is not None and len(peers) > 100:
+            raise ValueError(
+                f"The maximum length of `peers` should be 100, but got {len(peers)}."
+            )
         self.type = type
         self.error: "Error" = error
         self.hello: "Hello" = hello
