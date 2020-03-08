@@ -13,8 +13,7 @@ class WrappedResponse(Generic[T]):
         self.raw_data: dict = raw_data
         self._parse_func = parse_func
 
-    @property
-    def parsed(self) -> T:
+    def parse(self) -> T:
         try:
             return self._parse_func(self.raw_data)
         except ValidationError as e:

@@ -157,7 +157,7 @@ class TestServer:
         with Server(horizon_url, client) as server:
             resp = server.submit_transaction(xdr)
             assert resp.raw_data["envelope_xdr"] == xdr
-            assert resp.parsed.dict(exclude_unset=True, by_alias=True) == resp.raw_data
+            assert resp.parse().dict(exclude_unset=True, by_alias=True) == resp.raw_data
 
     @pytest.mark.asyncio
     async def test_submit_transaction_with_te(self):
@@ -168,4 +168,4 @@ class TestServer:
         async with Server(horizon_url, client) as server:
             resp = await server.submit_transaction(te)
             assert resp.raw_data["envelope_xdr"] == xdr
-            assert resp.parsed.dict(exclude_unset=True, by_alias=True) == resp.raw_data
+            assert resp.parse().dict(exclude_unset=True, by_alias=True) == resp.raw_data
