@@ -3,17 +3,30 @@ from typing import Generic, TypeVar, Callable
 
 from pydantic import ValidationError
 
-from ..exceptions import ParseResponseError
 from ..__version__ import __issues__
+from ..exceptions import ParseResponseError
+
 T = TypeVar("T")
 
 
 class WrappedResponse(Generic[T]):
+    """Used to wrap the data returned by Horizon.
+
+    :param raw_data: Raw data returned by horizon.
+    :param parse_func: The function for parsing raw data.
+    """
+
     def __init__(self, raw_data: dict, parse_func: Callable[[dict], T]) -> None:
         self.raw_data: dict = raw_data
         self._parse_func = parse_func
 
     def parse(self) -> T:
+        """Attempt to return the parsed data.
+
+        :return: parsed data.
+        :raises: :exc:`ParseResponseError <stellar_sdk.exceptions.ParseResponseError>`: This error occurs when parsing the
+            response fails.
+        """
         try:
             return self._parse_func(self.raw_data)
         except ValidationError as e:
