@@ -1,4 +1,4 @@
-# Automatically generated on 2020-03-07T19:37:18+08:00
+# Automatically generated on 2020-03-08T16:16:19+08:00
 # DO NOT EDIT or your changes may be overwritten
 import base64
 from enum import IntEnum
@@ -1940,9 +1940,11 @@ class BucketEntry:
     def pack(self, packer: Packer) -> None:
         self.type.pack(packer)
         if self.type == BucketEntryType.LIVEENTRY:
-            if self.type == BucketEntryType.INITENTRY:
-                self.live_entry.pack(packer)
-                return
+            self.live_entry.pack(packer)
+            return
+        if self.type == BucketEntryType.INITENTRY:
+            self.live_entry.pack(packer)
+            return
         if self.type == BucketEntryType.DEADENTRY:
             self.dead_entry.pack(packer)
             return
@@ -1954,9 +1956,11 @@ class BucketEntry:
     def unpack(cls, unpacker: Unpacker) -> "BucketEntry":
         type = BucketEntryType.unpack(unpacker)
         if type == BucketEntryType.LIVEENTRY:
-            if type == BucketEntryType.INITENTRY:
-                live_entry = LedgerEntry.unpack(unpacker)
-                return cls(type, live_entry=live_entry)
+            live_entry = LedgerEntry.unpack(unpacker)
+            return cls(type, live_entry=live_entry)
+        if type == BucketEntryType.INITENTRY:
+            live_entry = LedgerEntry.unpack(unpacker)
+            return cls(type, live_entry=live_entry)
         if type == BucketEntryType.DEADENTRY:
             dead_entry = LedgerKey.unpack(unpacker)
             return cls(type, dead_entry=dead_entry)
@@ -3067,8 +3071,8 @@ class TransactionMeta:
         Integer(self.v).pack(packer)
         if self.v == 0:
             packer.pack_uint(len(self.operations))
-        for element in self.operations:
-            element.pack(packer)
+            for element in self.operations:
+                element.pack(packer)
             return
         if self.v == 1:
             self.v1.pack(packer)
@@ -6322,17 +6326,21 @@ class ManageOfferSuccessResultOffer:
     def pack(self, packer: Packer) -> None:
         self.effect.pack(packer)
         if self.effect == ManageOfferEffect.MANAGE_OFFER_CREATED:
-            if self.effect == ManageOfferEffect.MANAGE_OFFER_UPDATED:
-                self.offer.pack(packer)
-                return
+            self.offer.pack(packer)
+            return
+        if self.effect == ManageOfferEffect.MANAGE_OFFER_UPDATED:
+            self.offer.pack(packer)
+            return
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "ManageOfferSuccessResultOffer":
         effect = ManageOfferEffect.unpack(unpacker)
         if effect == ManageOfferEffect.MANAGE_OFFER_CREATED:
-            if effect == ManageOfferEffect.MANAGE_OFFER_UPDATED:
-                offer = OfferEntry.unpack(unpacker)
-                return cls(effect, offer=offer)
+            offer = OfferEntry.unpack(unpacker)
+            return cls(effect, offer=offer)
+        if effect == ManageOfferEffect.MANAGE_OFFER_UPDATED:
+            offer = OfferEntry.unpack(unpacker)
+            return cls(effect, offer=offer)
 
     def to_xdr(self) -> str:
         packer = Packer()
@@ -7151,8 +7159,8 @@ class InflationResult:
         self.code.pack(packer)
         if self.code == InflationResultCode.INFLATION_SUCCESS:
             packer.pack_uint(len(self.payouts))
-        for element in self.payouts:
-            element.pack(packer)
+            for element in self.payouts:
+                element.pack(packer)
             return
 
     @classmethod
@@ -7864,22 +7872,31 @@ class TransactionResultResult:
     def pack(self, packer: Packer) -> None:
         self.code.pack(packer)
         if self.code == TransactionResultCode.txSUCCESS:
-            if self.code == TransactionResultCode.txFAILED:
-                packer.pack_uint(len(self.results))
-        for element in self.results:
-            element.pack(packer)
+            packer.pack_uint(len(self.results))
+            for element in self.results:
+                element.pack(packer)
+            return
+        if self.code == TransactionResultCode.txFAILED:
+            packer.pack_uint(len(self.results))
+            for element in self.results:
+                element.pack(packer)
             return
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "TransactionResultResult":
         code = TransactionResultCode.unpack(unpacker)
         if code == TransactionResultCode.txSUCCESS:
-            if code == TransactionResultCode.txFAILED:
-                length = unpacker.unpack_uint()
-                results = []
-                for _ in range(length):
-                    results.append(OperationResult.unpack(unpacker))
-                return cls(code, results=results)
+            length = unpacker.unpack_uint()
+            results = []
+            for _ in range(length):
+                results.append(OperationResult.unpack(unpacker))
+            return cls(code, results=results)
+        if code == TransactionResultCode.txFAILED:
+            length = unpacker.unpack_uint()
+            results = []
+            for _ in range(length):
+                results.append(OperationResult.unpack(unpacker))
+            return cls(code, results=results)
 
     def to_xdr(self) -> str:
         packer = Packer()
@@ -11602,8 +11619,8 @@ class StellarMessage:
             return
         if self.type == MessageType.PEERS:
             packer.pack_uint(len(self.peers))
-        for element in self.peers:
-            element.pack(packer)
+            for element in self.peers:
+                element.pack(packer)
             return
         if self.type == MessageType.GET_TX_SET:
             self.tx_set_hash.pack(packer)
