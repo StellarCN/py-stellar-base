@@ -29,6 +29,7 @@ __all__ = [
     "BadResponseError",
     "UnknownRequestError",
     "NotPageableError",
+    "ParseResponseError"
 ]
 
 
