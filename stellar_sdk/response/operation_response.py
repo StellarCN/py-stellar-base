@@ -8,20 +8,20 @@ from .transaction_response import TransactionResponse
 from ..xdr.xdr import OperationType
 
 __all__ = [
-    "CreateAccountResponse",
-    "PaymentResponse",
-    "PathPaymentStrictReceiveResponse",
-    "ManageSellOfferResponse",
-    "CreatePassiveSellOfferResponse",
-    "SetOptionsResponse",
-    "ChangeTrustResponse",
-    "AllowTrustResponse",
-    "AccountMergeResponse",
-    "InflationResponse",
-    "ManageDataResponse",
-    "BumpSequenceResponse",
-    "ManageBuyOfferResponse",
-    "PathPaymentStrictSendResponse",
+    "CreateAccountOperationResponse",
+    "PaymentOperationResponse",
+    "PathPaymentStrictReceiveOperationResponse",
+    "ManageSellOfferOperationResponse",
+    "CreatePassiveSellOfferOperationResponse",
+    "SetOptionsOperationResponse",
+    "ChangeTrustOperationResponse",
+    "AllowTrustOperationResponse",
+    "AccountMergeOperationResponse",
+    "InflationOperationResponse",
+    "ManageDataOperationResponse",
+    "BumpSequenceOperationResponse",
+    "ManageBuyOfferOperationResponse",
+    "PathPaymentStrictSendOperationResponse",
 ]
 
 
@@ -46,14 +46,14 @@ class BaseOperationResponse(BaseModel):
     links: Links = Field(None, alias="_links")
 
 
-class BumpSequenceResponse(BaseOperationResponse):
+class BumpSequenceOperationResponse(BaseOperationResponse):
     """The resource representing a single operation whose type is BumpSequence.
     """
 
     bump_to: int  # str in Go impl
 
 
-class CreateAccountResponse(BaseOperationResponse):
+class CreateAccountOperationResponse(BaseOperationResponse):
     """The resource representing a single operation whose type is CreateAccount.
     """
 
@@ -62,7 +62,7 @@ class CreateAccountResponse(BaseOperationResponse):
     account: str
 
 
-class PaymentResponse(BaseOperationResponse):
+class PaymentOperationResponse(BaseOperationResponse):
     """The resource representing a single operation whose type is Payment.
     """
 
@@ -79,7 +79,7 @@ class PaymentResponse(BaseOperationResponse):
     amount: str
 
 
-class PathPaymentStrictReceiveResponse(BaseOperationResponse):
+class PathPaymentStrictReceiveOperationResponse(BaseOperationResponse):
     """The resource representing a single operation whose type is PathPaymentStrictReceive.
     """
 
@@ -102,7 +102,7 @@ class PathPaymentStrictReceiveResponse(BaseOperationResponse):
     source_asset_issuer: Optional[str]
 
 
-class PathPaymentStrictSendResponse(BaseOperationResponse):
+class PathPaymentStrictSendOperationResponse(BaseOperationResponse):
     """The resource representing a single operation whose type is PathPaymentStrictSend.
     """
 
@@ -125,7 +125,7 @@ class PathPaymentStrictSendResponse(BaseOperationResponse):
     source_asset_issuer: Optional[str]
 
 
-class ManageDataResponse(BaseOperationResponse):
+class ManageDataOperationResponse(BaseOperationResponse):
     """The resource representing a single operation whose type is ManageData.
     """
 
@@ -145,26 +145,26 @@ class BaseOfferOperationResponse(BaseOperationResponse):
     selling_asset_issuer: Optional[str]
 
 
-class CreatePassiveSellOfferResponse(BaseOfferOperationResponse):
+class CreatePassiveSellOfferOperationResponse(BaseOfferOperationResponse):
     """The resource representing a single operation whose type is CreatePassiveSellOffer.
     """
 
 
-class ManageSellOfferResponse(BaseOfferOperationResponse):
+class ManageSellOfferOperationResponse(BaseOfferOperationResponse):
     """The resource representing a single operation whose type is CreatePassiveSellOffer.
     """
 
     offer_id: int  # str in Go Impl
 
 
-class ManageBuyOfferResponse(BaseOfferOperationResponse):
+class ManageBuyOfferOperationResponse(BaseOfferOperationResponse):
     """The resource representing a single operation whose type is ManageBuyOffer.
     """
 
     offer_id: int  # str in Go Impl
 
 
-class SetOptionsResponse(BaseOperationResponse):
+class SetOptionsOperationResponse(BaseOperationResponse):
     """The resource representing a single operation whose type is SetOptions.
     """
 
@@ -182,7 +182,7 @@ class SetOptionsResponse(BaseOperationResponse):
     high_threshold: Optional[int]
 
 
-class ChangeTrustResponse(BaseOperationResponse):
+class ChangeTrustOperationResponse(BaseOperationResponse):
     """The resource representing a single operation whose type is ChangeTrust.
     """
 
@@ -194,7 +194,7 @@ class ChangeTrustResponse(BaseOperationResponse):
     trustor: str
 
 
-class AllowTrustResponse(BaseOperationResponse):
+class AllowTrustOperationResponse(BaseOperationResponse):
     """The resource representing a single operation whose type is AllowTrust.
     """
 
@@ -206,7 +206,7 @@ class AllowTrustResponse(BaseOperationResponse):
     authorize: bool
 
 
-class AccountMergeResponse(BaseOperationResponse):
+class AccountMergeOperationResponse(BaseOperationResponse):
     """The resource representing a single operation whose type is AccountMerge.
     """
 
@@ -214,66 +214,66 @@ class AccountMergeResponse(BaseOperationResponse):
     into: str
 
 
-class InflationResponse(BaseOperationResponse):
+class InflationOperationResponse(BaseOperationResponse):
     """The resource representing a single operation whose type is Inflation.
     """
 
 
 OPERATION_RESPONSE_TYPE_UNION = Union[
-    CreateAccountResponse,
-    PaymentResponse,
-    PathPaymentStrictReceiveResponse,
-    ManageSellOfferResponse,
-    CreatePassiveSellOfferResponse,
-    SetOptionsResponse,
-    ChangeTrustResponse,
-    AllowTrustResponse,
-    AccountMergeResponse,
-    InflationResponse,
-    ManageDataResponse,
-    BumpSequenceResponse,
-    ManageBuyOfferResponse,
-    PathPaymentStrictSendResponse,
+    CreateAccountOperationResponse,
+    PaymentOperationResponse,
+    PathPaymentStrictReceiveOperationResponse,
+    ManageSellOfferOperationResponse,
+    CreatePassiveSellOfferOperationResponse,
+    SetOptionsOperationResponse,
+    ChangeTrustOperationResponse,
+    AllowTrustOperationResponse,
+    AccountMergeOperationResponse,
+    InflationOperationResponse,
+    ManageDataOperationResponse,
+    BumpSequenceOperationResponse,
+    ManageBuyOfferOperationResponse,
+    PathPaymentStrictSendOperationResponse,
 ]
 
 PAYMENT_RESPONSE_TYPE_UNION = Union[
-    CreateAccountResponse,
-    PaymentResponse,
-    AccountMergeResponse,
-    PathPaymentStrictReceiveResponse,
-    PathPaymentStrictSendResponse,
+    CreateAccountOperationResponse,
+    PaymentOperationResponse,
+    AccountMergeOperationResponse,
+    PathPaymentStrictReceiveOperationResponse,
+    PathPaymentStrictSendOperationResponse,
 ]
 
 OPERATION_TYPE_I_RESPONSE = {
-    OperationType.CREATE_ACCOUNT.value: CreateAccountResponse,
-    OperationType.PAYMENT.value: PaymentResponse,
-    OperationType.PATH_PAYMENT_STRICT_RECEIVE.value: PathPaymentStrictReceiveResponse,
-    OperationType.MANAGE_SELL_OFFER.value: ManageSellOfferResponse,
-    OperationType.CREATE_PASSIVE_SELL_OFFER.value: CreatePassiveSellOfferResponse,
-    OperationType.SET_OPTIONS.value: SetOptionsResponse,
-    OperationType.CHANGE_TRUST.value: ChangeTrustResponse,
-    OperationType.ALLOW_TRUST.value: AllowTrustResponse,
-    OperationType.ACCOUNT_MERGE.value: AccountMergeResponse,
-    OperationType.INFLATION.value: InflationResponse,
-    OperationType.MANAGE_DATA.value: ManageDataResponse,
-    OperationType.BUMP_SEQUENCE.value: BumpSequenceResponse,
-    OperationType.MANAGE_BUY_OFFER.value: ManageBuyOfferResponse,
-    OperationType.PATH_PAYMENT_STRICT_SEND.value: PathPaymentStrictSendResponse,
+    OperationType.CREATE_ACCOUNT.value: CreateAccountOperationResponse,
+    OperationType.PAYMENT.value: PaymentOperationResponse,
+    OperationType.PATH_PAYMENT_STRICT_RECEIVE.value: PathPaymentStrictReceiveOperationResponse,
+    OperationType.MANAGE_SELL_OFFER.value: ManageSellOfferOperationResponse,
+    OperationType.CREATE_PASSIVE_SELL_OFFER.value: CreatePassiveSellOfferOperationResponse,
+    OperationType.SET_OPTIONS.value: SetOptionsOperationResponse,
+    OperationType.CHANGE_TRUST.value: ChangeTrustOperationResponse,
+    OperationType.ALLOW_TRUST.value: AllowTrustOperationResponse,
+    OperationType.ACCOUNT_MERGE.value: AccountMergeOperationResponse,
+    OperationType.INFLATION.value: InflationOperationResponse,
+    OperationType.MANAGE_DATA.value: ManageDataOperationResponse,
+    OperationType.BUMP_SEQUENCE.value: BumpSequenceOperationResponse,
+    OperationType.MANAGE_BUY_OFFER.value: ManageBuyOfferOperationResponse,
+    OperationType.PATH_PAYMENT_STRICT_SEND.value: PathPaymentStrictSendOperationResponse,
 }
 
 OPERATION_TYPE_I_RESPONSE_TYPE = {
-    OperationType.CREATE_ACCOUNT.value: Type[CreateAccountResponse],
-    OperationType.PAYMENT.value: Type[PaymentResponse],
-    OperationType.PATH_PAYMENT_STRICT_RECEIVE.value: Type[PathPaymentStrictReceiveResponse],
-    OperationType.MANAGE_SELL_OFFER.value: Type[ManageSellOfferResponse],
-    OperationType.CREATE_PASSIVE_SELL_OFFER.value: Type[CreatePassiveSellOfferResponse],
-    OperationType.SET_OPTIONS.value: Type[SetOptionsResponse],
-    OperationType.CHANGE_TRUST.value: Type[ChangeTrustResponse],
-    OperationType.ALLOW_TRUST.value: Type[AllowTrustResponse],
-    OperationType.ACCOUNT_MERGE.value: Type[AccountMergeResponse],
-    OperationType.INFLATION.value: Type[InflationResponse],
-    OperationType.MANAGE_DATA.value: Type[ManageDataResponse],
-    OperationType.BUMP_SEQUENCE.value: Type[BumpSequenceResponse],
-    OperationType.MANAGE_BUY_OFFER.value: Type[ManageBuyOfferResponse],
-    OperationType.PATH_PAYMENT_STRICT_SEND.value: Type[PathPaymentStrictSendResponse],
+    OperationType.CREATE_ACCOUNT.value: Type[CreateAccountOperationResponse],
+    OperationType.PAYMENT.value: Type[PaymentOperationResponse],
+    OperationType.PATH_PAYMENT_STRICT_RECEIVE.value: Type[PathPaymentStrictReceiveOperationResponse],
+    OperationType.MANAGE_SELL_OFFER.value: Type[ManageSellOfferOperationResponse],
+    OperationType.CREATE_PASSIVE_SELL_OFFER.value: Type[CreatePassiveSellOfferOperationResponse],
+    OperationType.SET_OPTIONS.value: Type[SetOptionsOperationResponse],
+    OperationType.CHANGE_TRUST.value: Type[ChangeTrustOperationResponse],
+    OperationType.ALLOW_TRUST.value: Type[AllowTrustOperationResponse],
+    OperationType.ACCOUNT_MERGE.value: Type[AccountMergeOperationResponse],
+    OperationType.INFLATION.value: Type[InflationOperationResponse],
+    OperationType.MANAGE_DATA.value: Type[ManageDataOperationResponse],
+    OperationType.BUMP_SEQUENCE.value: Type[BumpSequenceOperationResponse],
+    OperationType.MANAGE_BUY_OFFER.value: Type[ManageBuyOfferOperationResponse],
+    OperationType.PATH_PAYMENT_STRICT_SEND.value: Type[PathPaymentStrictSendOperationResponse],
 }

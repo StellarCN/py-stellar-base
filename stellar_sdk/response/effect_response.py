@@ -22,64 +22,64 @@ class BaseEffectResponse(BaseModel):
     links: Links = Field(None, alias="_links")
 
 
-class AccountCreatedResponse(BaseEffectResponse):
+class AccountCreatedEffectResponse(BaseEffectResponse):
     starting_balance: str
 
 
-class AccountRemovedResponse(BaseEffectResponse):
+class AccountRemovedEffectResponse(BaseEffectResponse):
     pass
 
 
-class AccountCreditedResponse(BaseEffectResponse):
+class AccountCreditedEffectResponse(BaseEffectResponse):
     asset_type: str
     asset_code: Optional[str]
     asset_issuer: Optional[str]
     amount: str
 
 
-class AccountDebitedResponse(BaseEffectResponse):
+class AccountDebitedEffectResponse(BaseEffectResponse):
     asset_type: str
     asset_code: Optional[str]
     asset_issuer: Optional[str]
     amount: str
 
 
-class AccountThresholdsUpdatedResponse(BaseEffectResponse):
+class AccountThresholdsUpdatedEffectResponse(BaseEffectResponse):
     low_threshold: int
     med_threshold: int
     high_threshold: int
 
 
-class AccountHomeDomainUpdatedResponse(BaseEffectResponse):
+class AccountHomeDomainUpdatedEffectResponse(BaseEffectResponse):
     home_domain: str
 
 
-class AccountFlagsUpdatedResponse(BaseEffectResponse):
+class AccountFlagsUpdatedEffectResponse(BaseEffectResponse):
     auth_required_flag: Optional[bool]
     auth_revokable_flag: Optional[bool]
 
 
-class AccountInflationDestinationUpdatedResponse(BaseEffectResponse):
+class AccountInflationDestinationUpdatedEffectResponse(BaseEffectResponse):
     pass
 
 
-class SequenceBumpedResponse(BaseEffectResponse):
+class SequenceBumpedEffectResponse(BaseEffectResponse):
     new_seq: int
 
 
-class SignerCreatedResponse(BaseEffectResponse):
+class SignerCreatedEffectResponse(BaseEffectResponse):
     weight: int
     public_key: str
     key: str
 
 
-class SignerRemovedResponse(BaseEffectResponse):
+class SignerRemovedEffectResponse(BaseEffectResponse):
     weight: int
     public_key: str
     key: str
 
 
-class SignerUpdatedResponse(BaseEffectResponse):
+class SignerUpdatedEffectResponse(BaseEffectResponse):
     weight: int
     public_key: str
     key: str
@@ -87,40 +87,40 @@ class SignerUpdatedResponse(BaseEffectResponse):
 
 # TODO: In my opinion asset_code should not be optional in trustline,
 # but it is optional in the source code of Horizon.
-class TrustlineCreatedResponse(BaseEffectResponse):
+class TrustlineCreatedEffectResponse(BaseEffectResponse):
     asset_type: str
     asset_code: str
     asset_issuer: str
     limit: str
 
 
-class TrustlineRemovedResponse(BaseEffectResponse):
+class TrustlineRemovedEffectResponse(BaseEffectResponse):
     asset_type: str
     asset_code: str
     asset_issuer: str
     limit: str
 
 
-class TrustlineUpdatedResponse(BaseEffectResponse):
+class TrustlineUpdatedEffectResponse(BaseEffectResponse):
     asset_type: str
     asset_code: str
     asset_issuer: str
     limit: str
 
 
-class TrustlineAuthorizedResponse(BaseEffectResponse):
+class TrustlineAuthorizedEffectResponse(BaseEffectResponse):
     trustor: str
     asset_type: str
     asset_code: str
 
 
-class TrustlineDeauthorizedResponse(BaseEffectResponse):
+class TrustlineDeauthorizedEffectResponse(BaseEffectResponse):
     trustor: str
     asset_type: str
     asset_code: str
 
 
-class TradeResponse(BaseEffectResponse):
+class TradeEffectResponse(BaseEffectResponse):
     seller: str
     sold_amount: str
     sold_asset_type: str
@@ -133,107 +133,107 @@ class TradeResponse(BaseEffectResponse):
     offer_id: int  # str in Go impl
 
 
-class OfferCreatedResponse(BaseEffectResponse):
+class OfferCreatedEffectResponse(BaseEffectResponse):
     pass
 
 
-class OfferRemovedResponse(BaseEffectResponse):
+class OfferRemovedEffectResponse(BaseEffectResponse):
     pass
 
 
-class OfferUpdatedResponse(BaseEffectResponse):
+class OfferUpdatedEffectResponse(BaseEffectResponse):
     pass
 
 
-class DataCreatedResponse(BaseEffectResponse):
+class DataCreatedEffectResponse(BaseEffectResponse):
     pass
 
 
-class DataRemovedResponse(BaseEffectResponse):
+class DataRemovedEffectResponse(BaseEffectResponse):
     pass
 
 
-class DataUpdatedResponse(BaseEffectResponse):
+class DataUpdatedEffectResponse(BaseEffectResponse):
     pass
 
 
 EFFECT_TYPE_I_RESPONSE = {
-    0: AccountCreatedResponse,
-    1: AccountRemovedResponse,
-    2: AccountCreditedResponse,
-    3: AccountDebitedResponse,
-    4: AccountThresholdsUpdatedResponse,
-    5: AccountHomeDomainUpdatedResponse,
-    6: AccountFlagsUpdatedResponse,
-    7: AccountInflationDestinationUpdatedResponse,
-    10: SignerCreatedResponse,
-    11: SignerRemovedResponse,
-    12: SignerUpdatedResponse,
-    20: TrustlineCreatedResponse,
-    21: TrustlineRemovedResponse,
-    22: TrustlineUpdatedResponse,
-    23: TrustlineAuthorizedResponse,
-    24: TrustlineDeauthorizedResponse,
-    30: OfferCreatedResponse,
-    31: OfferRemovedResponse,
-    32: OfferUpdatedResponse,
-    33: TradeResponse,
-    40: DataCreatedResponse,
-    41: DataRemovedResponse,
-    42: DataRemovedResponse,
-    43: SequenceBumpedResponse,
+    0: AccountCreatedEffectResponse,
+    1: AccountRemovedEffectResponse,
+    2: AccountCreditedEffectResponse,
+    3: AccountDebitedEffectResponse,
+    4: AccountThresholdsUpdatedEffectResponse,
+    5: AccountHomeDomainUpdatedEffectResponse,
+    6: AccountFlagsUpdatedEffectResponse,
+    7: AccountInflationDestinationUpdatedEffectResponse,
+    10: SignerCreatedEffectResponse,
+    11: SignerRemovedEffectResponse,
+    12: SignerUpdatedEffectResponse,
+    20: TrustlineCreatedEffectResponse,
+    21: TrustlineRemovedEffectResponse,
+    22: TrustlineUpdatedEffectResponse,
+    23: TrustlineAuthorizedEffectResponse,
+    24: TrustlineDeauthorizedEffectResponse,
+    30: OfferCreatedEffectResponse,
+    31: OfferRemovedEffectResponse,
+    32: OfferUpdatedEffectResponse,
+    33: TradeEffectResponse,
+    40: DataCreatedEffectResponse,
+    41: DataRemovedEffectResponse,
+    42: DataRemovedEffectResponse,
+    43: SequenceBumpedEffectResponse,
 }
 
 EFFECT_RESPONSE_TYPE_UNION = Union[
-    AccountCreatedResponse,
-    AccountRemovedResponse,
-    AccountCreditedResponse,
-    AccountDebitedResponse,
-    AccountThresholdsUpdatedResponse,
-    AccountHomeDomainUpdatedResponse,
-    AccountFlagsUpdatedResponse,
-    AccountInflationDestinationUpdatedResponse,
-    SignerCreatedResponse,
-    SignerRemovedResponse,
-    SignerUpdatedResponse,
-    TrustlineCreatedResponse,
-    TrustlineRemovedResponse,
-    TrustlineUpdatedResponse,
-    TrustlineAuthorizedResponse,
-    TrustlineDeauthorizedResponse,
-    OfferCreatedResponse,
-    OfferRemovedResponse,
-    OfferUpdatedResponse,
-    TradeResponse,
-    DataCreatedResponse,
-    DataRemovedResponse,
-    DataRemovedResponse,
-    SequenceBumpedResponse,
+    AccountCreatedEffectResponse,
+    AccountRemovedEffectResponse,
+    AccountCreditedEffectResponse,
+    AccountDebitedEffectResponse,
+    AccountThresholdsUpdatedEffectResponse,
+    AccountHomeDomainUpdatedEffectResponse,
+    AccountFlagsUpdatedEffectResponse,
+    AccountInflationDestinationUpdatedEffectResponse,
+    SignerCreatedEffectResponse,
+    SignerRemovedEffectResponse,
+    SignerUpdatedEffectResponse,
+    TrustlineCreatedEffectResponse,
+    TrustlineRemovedEffectResponse,
+    TrustlineUpdatedEffectResponse,
+    TrustlineAuthorizedEffectResponse,
+    TrustlineDeauthorizedEffectResponse,
+    OfferCreatedEffectResponse,
+    OfferRemovedEffectResponse,
+    OfferUpdatedEffectResponse,
+    TradeEffectResponse,
+    DataCreatedEffectResponse,
+    DataRemovedEffectResponse,
+    DataRemovedEffectResponse,
+    SequenceBumpedEffectResponse,
 ]
 
 EFFECT_RESPONSE_TYPE_UNION_TYPE = Union[
-    Type[AccountCreatedResponse],
-    Type[AccountRemovedResponse],
-    Type[AccountCreditedResponse],
-    Type[AccountDebitedResponse],
-    Type[AccountThresholdsUpdatedResponse],
-    Type[AccountHomeDomainUpdatedResponse],
-    Type[AccountFlagsUpdatedResponse],
-    Type[AccountInflationDestinationUpdatedResponse],
-    Type[SignerCreatedResponse],
-    Type[SignerRemovedResponse],
-    Type[SignerUpdatedResponse],
-    Type[TrustlineCreatedResponse],
-    Type[TrustlineRemovedResponse],
-    Type[TrustlineUpdatedResponse],
-    Type[TrustlineAuthorizedResponse],
-    Type[TrustlineDeauthorizedResponse],
-    Type[OfferCreatedResponse],
-    Type[OfferRemovedResponse],
-    Type[OfferUpdatedResponse],
-    Type[TradeResponse],
-    Type[DataCreatedResponse],
-    Type[DataRemovedResponse],
-    Type[DataRemovedResponse],
-    Type[SequenceBumpedResponse],
+    Type[AccountCreatedEffectResponse],
+    Type[AccountRemovedEffectResponse],
+    Type[AccountCreditedEffectResponse],
+    Type[AccountDebitedEffectResponse],
+    Type[AccountThresholdsUpdatedEffectResponse],
+    Type[AccountHomeDomainUpdatedEffectResponse],
+    Type[AccountFlagsUpdatedEffectResponse],
+    Type[AccountInflationDestinationUpdatedEffectResponse],
+    Type[SignerCreatedEffectResponse],
+    Type[SignerRemovedEffectResponse],
+    Type[SignerUpdatedEffectResponse],
+    Type[TrustlineCreatedEffectResponse],
+    Type[TrustlineRemovedEffectResponse],
+    Type[TrustlineUpdatedEffectResponse],
+    Type[TrustlineAuthorizedEffectResponse],
+    Type[TrustlineDeauthorizedEffectResponse],
+    Type[OfferCreatedEffectResponse],
+    Type[OfferRemovedEffectResponse],
+    Type[OfferUpdatedEffectResponse],
+    Type[TradeEffectResponse],
+    Type[DataCreatedEffectResponse],
+    Type[DataRemovedEffectResponse],
+    Type[DataRemovedEffectResponse],
+    Type[SequenceBumpedEffectResponse],
 ]
