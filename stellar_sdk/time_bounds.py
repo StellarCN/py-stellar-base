@@ -24,8 +24,13 @@ class TimeBounds:
     """
 
     def __init__(self, min_time: int, max_time: int) -> None:
-        # TODO: fix later if 0 < max_time < min_time:
-        if 0 < max_time <= min_time:
+        if min_time < 0:
+            raise ValueError("min_time cannot be negative.")
+
+        if max_time < 0:
+            raise ValueError("max_time cannot be negative.")
+
+        if 0 < max_time < min_time:
             raise ValueError("max_time must be >= min_time.")
 
         self.min_time: int = min_time

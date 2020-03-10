@@ -1,6 +1,12 @@
 Release History
 ===============
 
+### Version 2.2.2
+Released on March 08, 2020
+
+* fix: parameters checking rule in TimeBounds. ([561f3e7](https://github.com/StellarCN/py-stellar-base/commit/561f3e7a3c407783eb8ecbed4134978fd88497f4))
+* fix: HashMemo and ReturnHashMemo should be fixed in length (32 bytes). ([22cd179](https://github.com/StellarCN/py-stellar-base/commit/22cd1794ea7c35b059549588893c410b6fd297d8))
+
 ### Version 2.2.1
 Released on February 12, 2020
 

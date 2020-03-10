@@ -79,21 +79,10 @@ class TestMemo:
         ):
             IdMemo(id)
 
-    @pytest.mark.parametrize(
-        "hex, xdr",
-        # TODO: add test case
-        [
-            # (
-            #     "90d38f2d64949bb64f693ff231f9a3b3",
-            #     "AAAAA5DTjy1klJu2T2k/8jH5o7MAAAAAAAAAAAAAAAAAAAAA",
-            # ),
-            (
-                "573c10b148fc4bc7db97540ce49da22930f4bcd48a060dc7347be84ea9f52d9f",
-                "AAAAA1c8ELFI/EvH25dUDOSdoikw9LzUigYNxzR76E6p9S2f",
-            )
-        ],
-    )
-    def test_hash_memo(self, hex, xdr):
+
+    def test_hash_memo(self):
+        hex = "573c10b148fc4bc7db97540ce49da22930f4bcd48a060dc7347be84ea9f52d9f"
+        xdr = "AAAAA1c8ELFI/EvH25dUDOSdoikw9LzUigYNxzR76E6p9S2f"
         hash = binascii.unhexlify(hex)
         memo = HashMemo(hash)
         assert memo.to_xdr() == xdr
@@ -107,25 +96,21 @@ class TestMemo:
         length = 33
         with pytest.raises(
             MemoInvalidException,
-            match="HashMemo can contain 32 bytes, got {:d} bytes".format(length),
+            match="The length of HashMemo should be 32 bytes, got {:d} bytes.".format(length),
         ):
             HashMemo(os.urandom(length))
 
-    @pytest.mark.parametrize(
-        "hex, xdr",
-        # TODO: add test case
-        [
-            # (
-            #     "90d38f2d64949bb64f693ff231f9a3b3",
-            #     "AAAABJDTjy1klJu2T2k/8jH5o7MAAAAAAAAAAAAAAAAAAAAA",
-            # ),
-            (
-                "573c10b148fc4bc7db97540ce49da22930f4bcd48a060dc7347be84ea9f52d9f",
-                "AAAABFc8ELFI/EvH25dUDOSdoikw9LzUigYNxzR76E6p9S2f",
-            )
-        ],
-    )
-    def test_return_hash_memo(self, hex, xdr):
+    def test_hash_memo_too_short_raise(self):
+        length = 16
+        with pytest.raises(
+            MemoInvalidException,
+            match="The length of HashMemo should be 32 bytes, got {:d} bytes.".format(length),
+        ):
+            HashMemo(os.urandom(length))
+
+    def test_return_hash_memo(self):
+        hex = "573c10b148fc4bc7db97540ce49da22930f4bcd48a060dc7347be84ea9f52d9f"
+        xdr = "AAAABFc8ELFI/EvH25dUDOSdoikw9LzUigYNxzR76E6p9S2f"
         return_hash = binascii.unhexlify(hex)
         memo = ReturnHashMemo(return_hash)
         assert memo.to_xdr() == xdr
@@ -136,10 +121,22 @@ class TestMemo:
         assert base_memo.to_xdr() == xdr
 
     def test_return_hash_memo_too_long_raise(self):
-        length = 33
+        length = 48
         with pytest.raises(
             MemoInvalidException,
-            match="ReturnHashMemo can contain 32 bytes, got {:d} bytes".format(length),
+            match="The length of ReturnHashMemo should be 32 bytes, got {:d} bytes.".format(
+                length
+            ),
+        ):
+            ReturnHashMemo(os.urandom(length))
+
+    def test_return_hash_memo_too_short_raise(self):
+        length = 16
+        with pytest.raises(
+            MemoInvalidException,
+            match="The length of ReturnHashMemo should be 32 bytes, got {:d} bytes.".format(
+                length
+            ),
         ):
             ReturnHashMemo(os.urandom(length))
 
