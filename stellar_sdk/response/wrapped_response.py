@@ -30,8 +30,10 @@ class WrappedResponse(Generic[T]):
         try:
             return self._parse_func(self.raw_data)
         except ValidationError as e:
-            raise ParseResponseError("Parsing the response failed. This may be due to a change in the Horizon field. "
-                                     "Please try upgrading the SDK or submit a issue: {}.".format(__issues__)) from e
+            raise ParseResponseError(
+                "Parsing the response failed. This may be due to a change in the Horizon field. "
+                "Please try upgrading the SDK or submit a issue: {}.".format(__issues__)
+            ) from e
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):

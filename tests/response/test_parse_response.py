@@ -192,8 +192,8 @@ class TestParseResponse:
                 counter=Asset.native(),
                 resolution=300000,
             )
-                .order(desc=True)
-                .call()
+            .order(desc=True)
+            .call()
         )
         raw_resp = resp.raw_data
         parsed_resp = resp.parse()
@@ -217,10 +217,10 @@ class TestParseResponse:
     def test_transaction(self):
         resp = (
             self.server.transactions()
-                .transaction(
+            .transaction(
                 "b154e45e592a546226f6c58a4d28e03bb37266b7fa6bd3f6fab1d3bf69f088dd"
             )
-                .call()
+            .call()
         )
         raw_resp = resp.raw_data
         parsed_resp = resp.parse()
@@ -255,7 +255,9 @@ class TestParseResponse:
 
     def test_parse_failed_raise(self):
         resp = self.server.root().call()
-        resp.raw_data['current_protocol_version'] = 'raise'
-        with pytest.raises(ParseResponseError,
-                           match="Parsing the response failed. This may be due to a change in the Horizon field."):
+        resp.raw_data["current_protocol_version"] = "raise"
+        with pytest.raises(
+            ParseResponseError,
+            match="Parsing the response failed. This may be due to a change in the Horizon field.",
+        ):
             parsed_resp = resp.parse()

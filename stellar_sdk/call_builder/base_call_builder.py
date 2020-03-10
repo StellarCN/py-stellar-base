@@ -23,6 +23,7 @@ from ..exceptions import raise_request_exception, NotPageableError
 from ..response.wrapped_response import WrappedResponse
 
 T = TypeVar("T")
+S = TypeVar('S', bound='BaseCallBuilder')
 
 
 class BaseCallBuilder(Generic[T]):
@@ -152,7 +153,7 @@ class BaseCallBuilder(Generic[T]):
         while True:
             yield self._parse_response(stream.__next__())
 
-    def cursor(self, cursor: Union) -> "BaseCallBuilder[T]":
+    def cursor(self, cursor: Union) -> S[T]:
         """Sets ``cursor`` parameter for the current call. Returns the CallBuilder object on which this method has been called.
 
         See `Paging <https://www.stellar.org/developers/horizon/reference/paging.html>`_
@@ -163,7 +164,7 @@ class BaseCallBuilder(Generic[T]):
         self._add_query_param("cursor", cursor)
         return self
 
-    def limit(self, limit: int) -> "BaseCallBuilder[T]":
+    def limit(self, limit: int) -> S[T]:
         """Sets ``limit`` parameter for the current call. Returns the CallBuilder object on which this method has been called.
 
         See `Paging <https://www.stellar.org/developers/horizon/reference/paging.html>`_
@@ -174,7 +175,7 @@ class BaseCallBuilder(Generic[T]):
         self._add_query_param("limit", limit)
         return self
 
-    def order(self, desc: bool = True) -> "BaseCallBuilder[T]":
+    def order(self, desc: bool = True) -> S[T]:
         """Sets ``order`` parameter for the current call. Returns the CallBuilder object on which this method has been called.
 
         :param desc: Sort direction, ``True`` to get desc sort direction, the default setting is ``True``.
