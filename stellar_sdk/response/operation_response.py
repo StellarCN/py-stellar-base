@@ -5,22 +5,7 @@ from pydantic import BaseModel, Field
 
 from .common import Asset, Link, Price
 from .transaction_response import TransactionResponse
-from ..xdr.StellarXDR_const import (
-    CREATE_ACCOUNT,
-    PAYMENT,
-    PATH_PAYMENT_STRICT_RECEIVE,
-    MANAGE_SELL_OFFER,
-    CREATE_PASSIVE_SELL_OFFER,
-    SET_OPTIONS,
-    CHANGE_TRUST,
-    ALLOW_TRUST,
-    ACCOUNT_MERGE,
-    INFLATION,
-    MANAGE_DATA,
-    BUMP_SEQUENCE,
-    MANAGE_BUY_OFFER,
-    PATH_PAYMENT_STRICT_SEND,
-)
+from ..xdr.xdr import OperationType
 
 __all__ = [
     "CreateAccountResponse",
@@ -260,35 +245,35 @@ PAYMENT_RESPONSE_TYPE_UNION = Union[
 ]
 
 OPERATION_TYPE_I_RESPONSE = {
-    CREATE_ACCOUNT: CreateAccountResponse,
-    PAYMENT: PaymentResponse,
-    PATH_PAYMENT_STRICT_RECEIVE: PathPaymentStrictReceiveResponse,
-    MANAGE_SELL_OFFER: ManageSellOfferResponse,
-    CREATE_PASSIVE_SELL_OFFER: CreatePassiveSellOfferResponse,
-    SET_OPTIONS: SetOptionsResponse,
-    CHANGE_TRUST: ChangeTrustResponse,
-    ALLOW_TRUST: AllowTrustResponse,
-    ACCOUNT_MERGE: AccountMergeResponse,
-    INFLATION: InflationResponse,
-    MANAGE_DATA: ManageDataResponse,
-    BUMP_SEQUENCE: BumpSequenceResponse,
-    MANAGE_BUY_OFFER: ManageBuyOfferResponse,
-    PATH_PAYMENT_STRICT_SEND: PathPaymentStrictSendResponse,
+    OperationType.CREATE_ACCOUNT.value: CreateAccountResponse,
+    OperationType.PAYMENT.value: PaymentResponse,
+    OperationType.PATH_PAYMENT_STRICT_RECEIVE.value: PathPaymentStrictReceiveResponse,
+    OperationType.MANAGE_SELL_OFFER.value: ManageSellOfferResponse,
+    OperationType.CREATE_PASSIVE_SELL_OFFER.value: CreatePassiveSellOfferResponse,
+    OperationType.SET_OPTIONS.value: SetOptionsResponse,
+    OperationType.CHANGE_TRUST.value: ChangeTrustResponse,
+    OperationType.ALLOW_TRUST.value: AllowTrustResponse,
+    OperationType.ACCOUNT_MERGE.value: AccountMergeResponse,
+    OperationType.INFLATION.value: InflationResponse,
+    OperationType.MANAGE_DATA.value: ManageDataResponse,
+    OperationType.BUMP_SEQUENCE.value: BumpSequenceResponse,
+    OperationType.MANAGE_BUY_OFFER.value: ManageBuyOfferResponse,
+    OperationType.PATH_PAYMENT_STRICT_SEND.value: PathPaymentStrictSendResponse,
 }
 
 OPERATION_TYPE_I_RESPONSE_TYPE = {
-    CREATE_ACCOUNT: Type[CreateAccountResponse],
-    PAYMENT: Type[PaymentResponse],
-    PATH_PAYMENT_STRICT_RECEIVE: Type[PathPaymentStrictReceiveResponse],
-    MANAGE_SELL_OFFER: Type[ManageSellOfferResponse],
-    CREATE_PASSIVE_SELL_OFFER: Type[CreatePassiveSellOfferResponse],
-    SET_OPTIONS: Type[SetOptionsResponse],
-    CHANGE_TRUST: Type[ChangeTrustResponse],
-    ALLOW_TRUST: Type[AllowTrustResponse],
-    ACCOUNT_MERGE: Type[AccountMergeResponse],
-    INFLATION: Type[InflationResponse],
-    MANAGE_DATA: Type[ManageDataResponse],
-    BUMP_SEQUENCE: Type[BumpSequenceResponse],
-    MANAGE_BUY_OFFER: Type[ManageBuyOfferResponse],
-    PATH_PAYMENT_STRICT_SEND: Type[PathPaymentStrictSendResponse],
+    OperationType.CREATE_ACCOUNT.value: Type[CreateAccountResponse],
+    OperationType.PAYMENT.value: Type[PaymentResponse],
+    OperationType.PATH_PAYMENT_STRICT_RECEIVE.value: Type[PathPaymentStrictReceiveResponse],
+    OperationType.MANAGE_SELL_OFFER.value: Type[ManageSellOfferResponse],
+    OperationType.CREATE_PASSIVE_SELL_OFFER.value: Type[CreatePassiveSellOfferResponse],
+    OperationType.SET_OPTIONS.value: Type[SetOptionsResponse],
+    OperationType.CHANGE_TRUST.value: Type[ChangeTrustResponse],
+    OperationType.ALLOW_TRUST.value: Type[AllowTrustResponse],
+    OperationType.ACCOUNT_MERGE.value: Type[AccountMergeResponse],
+    OperationType.INFLATION.value: Type[InflationResponse],
+    OperationType.MANAGE_DATA.value: Type[ManageDataResponse],
+    OperationType.BUMP_SEQUENCE.value: Type[BumpSequenceResponse],
+    OperationType.MANAGE_BUY_OFFER.value: Type[ManageBuyOfferResponse],
+    OperationType.PATH_PAYMENT_STRICT_SEND.value: Type[PathPaymentStrictSendResponse],
 }
