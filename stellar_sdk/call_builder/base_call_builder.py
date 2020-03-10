@@ -153,7 +153,7 @@ class BaseCallBuilder(Generic[T]):
         while True:
             yield self._parse_response(stream.__next__())
 
-    def cursor(self, cursor: Union) -> S[T]:
+    def cursor(self, cursor: Union) -> S:
         """Sets ``cursor`` parameter for the current call. Returns the CallBuilder object on which this method has been called.
 
         See `Paging <https://www.stellar.org/developers/horizon/reference/paging.html>`_
@@ -164,7 +164,7 @@ class BaseCallBuilder(Generic[T]):
         self._add_query_param("cursor", cursor)
         return self
 
-    def limit(self, limit: int) -> S[T]:
+    def limit(self, limit: int) -> S:
         """Sets ``limit`` parameter for the current call. Returns the CallBuilder object on which this method has been called.
 
         See `Paging <https://www.stellar.org/developers/horizon/reference/paging.html>`_
@@ -175,7 +175,7 @@ class BaseCallBuilder(Generic[T]):
         self._add_query_param("limit", limit)
         return self
 
-    def order(self, desc: bool = True) -> S[T]:
+    def order(self, desc: bool = True) -> S:
         """Sets ``order`` parameter for the current call. Returns the CallBuilder object on which this method has been called.
 
         :param desc: Sort direction, ``True`` to get desc sort direction, the default setting is ``True``.
@@ -187,17 +187,17 @@ class BaseCallBuilder(Generic[T]):
         self._add_query_param("order", order)
         return self
 
-    def next(self):
+    def next(self) -> Union[WrappedResponse[T], Coroutine[Any, Any, WrappedResponse[T]]]:
         if self.next_href is None:
             raise NotPageableError("The next page does not exist.")
         return self._call(self.next_href, None)
 
-    def prev(self):
+    def prev(self) -> Union[WrappedResponse[T], Coroutine[Any, Any, WrappedResponse[T]]]:
         if self.next_href is None:
             raise NotPageableError("The prev page does not exist.")
         return self._call(self.prev_href, None)
 
-    def _add_query_param(self, key: str, value: Union[str, float, int, bool, None]):
+    def _add_query_param(self, key: str, value: Union[str, float, int, bool, None]) -> None:
         if value is None:
             pass
         elif value is True:
