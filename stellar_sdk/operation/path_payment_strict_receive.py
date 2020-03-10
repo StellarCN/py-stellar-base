@@ -2,11 +2,11 @@ from decimal import Decimal
 from typing import List, Union
 
 from .operation import Operation
+from .utils import check_ed25519_public_key, check_amount
 from ..asset import Asset
 from ..keypair import Keypair
-from ..xdr import Xdr
 from ..strkey import StrKey
-from .utils import check_ed25519_public_key, check_amount
+from ..xdr import xdr
 
 
 class PathPaymentStrictReceive(Operation):
@@ -48,34 +48,35 @@ class PathPaymentStrictReceive(Operation):
         self.send_max: Union[str, Decimal] = send_max
         self.dest_asset: Asset = dest_asset
         self.dest_amount: Union[str, Decimal] = dest_amount
-        self.path: List[Asset] = path  # a list of paths/assets
+        self.path: List[Asset] = path
 
     @classmethod
-    def type_code(cls) -> int:
-        return Xdr.const.PATH_PAYMENT_STRICT_RECEIVE
+    def type_code(cls) -> xdr.OperationType:
+        return xdr.OperationType.PATH_PAYMENT_STRICT_RECEIVE
 
-    def _to_operation_body(self) -> Xdr.nullclass:
+    def _to_operation_body(self) -> xdr.OperationBody:
         destination = Keypair.from_public_key(self.destination).xdr_account_id()
         send_asset = self.send_asset.to_xdr_object()
         dest_asset = self.dest_asset.to_xdr_object()
         path = [asset.to_xdr_object() for asset in self.path]
 
-        path_payment_strict_receive_op = Xdr.types.PathPaymentStrictReceiveOp(
+        path_payment_strict_receive_op = xdr.PathPaymentStrictReceiveOp(
             send_asset,
-            Operation.to_xdr_amount(self.send_max),
+            xdr.Int64(Operation.to_xdr_amount(self.send_max)),
             destination,
             dest_asset,
-            Operation.to_xdr_amount(self.dest_amount),
+            xdr.Int64(Operation.to_xdr_amount(self.dest_amount)),
             path,
         )
-        body = Xdr.nullclass()
-        body.type = Xdr.const.PATH_PAYMENT_STRICT_RECEIVE
-        body.pathPaymentStrictReceiveOp = path_payment_strict_receive_op
+        body = xdr.OperationBody(
+            type=self.type_code(),
+            path_payment_strict_receive_op=path_payment_strict_receive_op,
+        )
         return body
 
     @classmethod
     def from_xdr_object(
-        cls, operation_xdr_object: Xdr.types.Operation
+        cls, operation_xdr_object: xdr.Operation
     ) -> "PathPaymentStrictReceive":
         """Creates a :class:`PathPaymentStrictReceive` object from an XDR Operation
         object.
@@ -83,25 +84,26 @@ class PathPaymentStrictReceive(Operation):
         """
         source = Operation.get_source_from_xdr_obj(operation_xdr_object)
         destination = StrKey.encode_ed25519_public_key(
-            operation_xdr_object.body.pathPaymentStrictReceiveOp.destination.ed25519
+            operation_xdr_object.body.path_payment_strict_receive_op.destination.account_id.ed25519.uint256
         )
 
         send_asset = Asset.from_xdr_object(
-            operation_xdr_object.body.pathPaymentStrictReceiveOp.sendAsset
+            operation_xdr_object.body.path_payment_strict_receive_op.send_asset
         )
         dest_asset = Asset.from_xdr_object(
-            operation_xdr_object.body.pathPaymentStrictReceiveOp.destAsset
+            operation_xdr_object.body.path_payment_strict_receive_op.dest_asset
         )
         send_max = Operation.from_xdr_amount(
-            operation_xdr_object.body.pathPaymentStrictReceiveOp.sendMax
+            operation_xdr_object.body.path_payment_strict_receive_op.send_max.int64
         )
         dest_amount = Operation.from_xdr_amount(
-            operation_xdr_object.body.pathPaymentStrictReceiveOp.destAmount
+            operation_xdr_object.body.path_payment_strict_receive_op.dest_amount.int64
         )
 
         path = []
-        if operation_xdr_object.body.pathPaymentStrictReceiveOp.path:
-            for x in operation_xdr_object.body.pathPaymentStrictReceiveOp.path:
+        # In fact, we don't need to check it.
+        if operation_xdr_object.body.path_payment_strict_receive_op.path:
+            for x in operation_xdr_object.body.path_payment_strict_receive_op.path:
                 path.append(Asset.from_xdr_object(x))
 
         return cls(

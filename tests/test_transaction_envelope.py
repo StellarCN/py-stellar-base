@@ -71,3 +71,24 @@ class TestTransactionEnvelope:
             SignatureExistError, match="The preimage has already signed."
         ):
             te.sign_hashx(hashx)
+
+    def test_equal(self):
+        source = Keypair.from_secret(
+            "SCCS5ZBI7WVIJ4SW36WGOQQIWJYCL3VOAULSXX3FB57USIO25EDOYQHH"
+        )
+        destination = "GDJJRRMBK4IWLEPJGIE6SXD2LP7REGZODU7WDC3I2D6MR37F4XSHBKX2"
+        amount = "1000.0"
+        sequence = 1
+        memo = IdMemo(100)
+        fee = 200
+        asset = Asset.native()
+        time_bounds = TimeBounds(12345, 56789)
+        ops = [Payment(destination, asset, amount), ManageData("hello", "world")]
+        tx1 = Transaction(source, sequence, fee, ops, memo, time_bounds)
+        tx2 = Transaction(source, sequence, fee, ops, memo, time_bounds)
+        te1 = TransactionEnvelope(tx1, Network.PUBLIC_NETWORK_PASSPHRASE)
+        te2 = TransactionEnvelope(tx2, Network.PUBLIC_NETWORK_PASSPHRASE)
+        te3 = TransactionEnvelope(tx2, Network.TESTNET_NETWORK_PASSPHRASE)
+        assert te1 == te2
+        assert te1 != te3
+        assert te1 != "BAD TYPE"

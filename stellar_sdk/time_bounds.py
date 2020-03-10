@@ -1,5 +1,5 @@
-from .xdr import Xdr
 from .exceptions import ValueError
+from .xdr import xdr as stellarxdr
 
 __all__ = ["TimeBounds"]
 
@@ -36,16 +36,18 @@ class TimeBounds:
         self.min_time: int = min_time
         self.max_time: int = max_time
 
-    def to_xdr_object(self) -> Xdr.types.TimeBounds:
+    def to_xdr_object(self) -> stellarxdr.TimeBounds:
         """Returns the xdr object for this TimeBounds object.
 
         :return: XDR TimeBounds object
         """
-        return Xdr.types.TimeBounds(minTime=self.min_time, maxTime=self.max_time)
+        min_time = stellarxdr.TimePoint(stellarxdr.Uint64(self.min_time))
+        max_time = stellarxdr.TimePoint(stellarxdr.Uint64(self.max_time))
+        return stellarxdr.TimeBounds(min_time, max_time)
 
     @classmethod
     def from_xdr_object(
-        cls, time_bounds_xdr_object: Xdr.types.TimeBounds
+        cls, time_bounds_xdr_object: stellarxdr.TimeBounds
     ) -> "TimeBounds":
         """Create a :class:`TimeBounds` from an XDR TimeBounds object.
 
@@ -53,9 +55,28 @@ class TimeBounds:
         :return: A new :class:`TimeBounds` object from the given XDR TimeBounds object.
         """
         return cls(
-            min_time=time_bounds_xdr_object.minTime,
-            max_time=time_bounds_xdr_object.maxTime,
+            min_time=time_bounds_xdr_object.min_time.time_point.uint64,
+            max_time=time_bounds_xdr_object.max_time.time_point.uint64,
         )
+
+    def to_xdr(self) -> str:
+        """Get the base64 encoded XDR string representing this
+        :class:`TimeBounds`.
+
+        :return: XDR :class:`TimeBounds` base64 string object
+        """
+        return self.to_xdr_object().to_xdr()
+
+    @classmethod
+    def from_xdr(cls, xdr: str) -> "TimeBounds":
+        """Create a new :class:`TimeBounds` from an XDR string.
+
+        :param xdr: The XDR string that represents a :class:`TimeBounds`.
+
+        :return: A new :class:`TimeBounds` object from the given XDR TimeBounds base64 string object.
+        """
+        xdr_obj = stellarxdr.TimeBounds.from_xdr(xdr)
+        return cls.from_xdr_object(xdr_obj)
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):

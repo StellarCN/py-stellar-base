@@ -36,5 +36,5 @@ clean:
 .PHONY: clean
 
 updatexdr:
-	cd stellar_sdk/xdr && python updatexdr.py && python xdrgen.py ../../.xdr/
+	python .xdr/updatexdr.py
 .PHONY: updatexdr

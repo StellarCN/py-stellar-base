@@ -3,8 +3,8 @@ from typing import Optional, Dict
 
 from .exceptions import AssetCodeInvalidError, AssetIssuerInvalidError, AttributeError
 from .keypair import Keypair
-from .xdr import Xdr
 from .strkey import StrKey
+from .xdr import xdr as stellarxdr
 
 __all__ = ["Asset"]
 
@@ -102,47 +102,73 @@ class Asset:
         """
         return self.issuer is None
 
-    def to_xdr_object(self) -> Xdr.types.Asset:
+    def to_xdr_object(self) -> stellarxdr.Asset:
         """Returns the xdr object for this asset.
 
         :return: XDR Asset object
         """
         if self.is_native():
-            xdr_type = Xdr.const.ASSET_TYPE_NATIVE
-            return Xdr.types.Asset(type=xdr_type)
+            asset_type = stellarxdr.AssetType.ASSET_TYPE_NATIVE
+            return stellarxdr.Asset(type=asset_type)
         else:
-            x = Xdr.nullclass()
             length = len(self.code)
             pad_length = 4 - length if length <= 4 else 12 - length
-            x.assetCode = bytearray(self.code, "ascii") + b"\x00" * pad_length
-            x.issuer = Keypair.from_public_key(self.issuer).xdr_account_id()
+            asset_code = bytearray(self.code, "ascii") + b"\x00" * pad_length
+            issuer = Keypair.from_public_key(self.issuer).xdr_account_id()
         if length <= 4:
-            xdr_type = Xdr.const.ASSET_TYPE_CREDIT_ALPHANUM4
-            return Xdr.types.Asset(type=xdr_type, alphaNum4=x)
+            xdr_type = stellarxdr.AssetType.ASSET_TYPE_CREDIT_ALPHANUM4
+            asset_code4 = stellarxdr.AssetCode4(asset_code)
+            alpha_num4 = stellarxdr.AssetAlphaNum4(asset_code4, issuer)
+            return stellarxdr.Asset(type=xdr_type, alpha_num4=alpha_num4)
         else:
-            xdr_type = Xdr.const.ASSET_TYPE_CREDIT_ALPHANUM12
-            return Xdr.types.Asset(type=xdr_type, alphaNum12=x)
+            xdr_type = stellarxdr.AssetType.ASSET_TYPE_CREDIT_ALPHANUM12
+            asset_code12 = stellarxdr.AssetCode12(asset_code)
+            alpha_num12 = stellarxdr.AssetAlphaNum12(asset_code12, issuer)
+            return stellarxdr.Asset(type=xdr_type, alpha_num12=alpha_num12)
 
     @classmethod
-    def from_xdr_object(cls, asset_xdr_object: Xdr.types.Asset) -> "Asset":
+    def from_xdr_object(cls, asset_xdr_object: stellarxdr.Asset) -> "Asset":
         """Create a :class:`Asset` from an XDR Asset object.
 
         :param asset_xdr_object: The XDR Asset object.
         :return: A new :class:`Asset` object from the given XDR Asset object.
         """
-        if asset_xdr_object.type == Xdr.const.ASSET_TYPE_NATIVE:
+        if asset_xdr_object.type == stellarxdr.AssetType.ASSET_TYPE_NATIVE:
             return Asset.native()
-        elif asset_xdr_object.type == Xdr.const.ASSET_TYPE_CREDIT_ALPHANUM4:
+        elif asset_xdr_object.type == stellarxdr.AssetType.ASSET_TYPE_CREDIT_ALPHANUM4:
             issuer = StrKey.encode_ed25519_public_key(
-                asset_xdr_object.alphaNum4.issuer.ed25519
+                asset_xdr_object.alpha_num4.issuer.account_id.ed25519.uint256
             )
-            code = asset_xdr_object.alphaNum4.assetCode.decode().rstrip("\x00")
+            code = asset_xdr_object.alpha_num4.asset_code.asset_code4.decode().rstrip(
+                "\x00"
+            )
         else:
             issuer = StrKey.encode_ed25519_public_key(
-                asset_xdr_object.alphaNum12.issuer.ed25519
+                asset_xdr_object.alpha_num12.issuer.account_id.ed25519.uint256
             )
-            code = asset_xdr_object.alphaNum12.assetCode.decode().rstrip("\x00")
+            code = asset_xdr_object.alpha_num12.asset_code.asset_code12.decode().rstrip(
+                "\x00"
+            )
         return cls(code, issuer)
+
+    def to_xdr(self) -> str:
+        """Get the base64 encoded XDR string representing this
+        :class:`Asset`.
+
+        :return: XDR :class:`Asset` base64 string object
+        """
+        return self.to_xdr_object().to_xdr()
+
+    @classmethod
+    def from_xdr(cls, xdr: str) -> "Asset":
+        """Create a new :class:`Asset` from an XDR string.
+
+        :param xdr: The XDR string that represents an :class:`Asset`.
+
+        :return: A new :class:`Asset` object from the given XDR Asset base64 string object.
+        """
+        xdr_obj = stellarxdr.Asset.from_xdr(xdr)
+        return cls.from_xdr_object(xdr_obj)
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):

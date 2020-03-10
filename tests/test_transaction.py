@@ -21,15 +21,13 @@ class TestTransaction:
         time_bounds = TimeBounds(12345, 56789)
         ops = [Payment(destination, asset, amount), ManageData("hello", "world")]
 
-        tx_object = Transaction(
-            source, sequence, fee, ops, memo, time_bounds
-        ).to_xdr_object()
-        assert (
-            tx_object.to_xdr()
-            == "AAAAAImbKEDtVjbFbdxfFLI5dfefG6I4jSaU5MVuzd3JYOXvAAAAyAAAAAAAAAABAAAAAQAAAAAAADA5AAAAAAAA3dUAAAACAAAAAAAAAGQAAAACAAAAAAAAAAEAAAAA0pjFgVcRZZHpMgnpXHpb/xIbLh0/YYto0PzI7+Xl5HAAAAAAAAAAAlQL5AAAAAAAAAAACgAAAAVoZWxsbwAAAAAAAAEAAAAFd29ybGQAAAAAAAAA"
-        )
+        tx = Transaction(source, sequence, fee, ops, memo, time_bounds)
+        xdr = "AAAAAImbKEDtVjbFbdxfFLI5dfefG6I4jSaU5MVuzd3JYOXvAAAAyAAAAAAAAAABAAAAAQAAAAAAADA5AAAAAAAA3dUAAAACAAAAAAAAAGQAAAACAAAAAAAAAAEAAAAA0pjFgVcRZZHpMgnpXHpb/xIbLh0/YYto0PzI7+Xl5HAAAAAAAAAAAlQL5AAAAAAAAAAACgAAAAVoZWxsbwAAAAAAAAEAAAAFd29ybGQAAAAAAAAA"
 
-        restore_transaction = Transaction.from_xdr_object(tx_object)
+        assert xdr == tx.to_xdr()
+        assert Transaction.from_xdr(xdr) == tx
+
+        restore_transaction = Transaction.from_xdr_object(tx.to_xdr_object())
         assert isinstance(restore_transaction, Transaction)
         assert restore_transaction.source == source
         assert restore_transaction.fee == fee
@@ -48,15 +46,13 @@ class TestTransaction:
         time_bounds = TimeBounds(12345, 56789)
         ops = [Payment(destination, asset, amount), ManageData("hello", "world")]
 
-        tx_object = Transaction(
-            source, sequence, fee, ops, memo, time_bounds
-        ).to_xdr_object()
-        assert (
-            tx_object.to_xdr()
-            == "AAAAAImbKEDtVjbFbdxfFLI5dfefG6I4jSaU5MVuzd3JYOXvAAAAyAAAAAAAAAABAAAAAQAAAAAAADA5AAAAAAAA3dUAAAACAAAAAAAAAGQAAAACAAAAAAAAAAEAAAAA0pjFgVcRZZHpMgnpXHpb/xIbLh0/YYto0PzI7+Xl5HAAAAAAAAAAAlQL5AAAAAAAAAAACgAAAAVoZWxsbwAAAAAAAAEAAAAFd29ybGQAAAAAAAAA"
-        )
+        tx = Transaction(source, sequence, fee, ops, memo, time_bounds)
+        xdr = "AAAAAImbKEDtVjbFbdxfFLI5dfefG6I4jSaU5MVuzd3JYOXvAAAAyAAAAAAAAAABAAAAAQAAAAAAADA5AAAAAAAA3dUAAAACAAAAAAAAAGQAAAACAAAAAAAAAAEAAAAA0pjFgVcRZZHpMgnpXHpb/xIbLh0/YYto0PzI7+Xl5HAAAAAAAAAAAlQL5AAAAAAAAAAACgAAAAVoZWxsbwAAAAAAAAEAAAAFd29ybGQAAAAAAAAA"
 
-        restore_transaction = Transaction.from_xdr_object(tx_object)
+        assert tx.to_xdr() == xdr
+        assert Transaction.from_xdr(xdr) == tx
+
+        restore_transaction = Transaction.from_xdr_object(tx.to_xdr_object())
         assert isinstance(restore_transaction, Transaction)
         assert restore_transaction.source == Keypair.from_public_key(source)
         assert restore_transaction.fee == fee
