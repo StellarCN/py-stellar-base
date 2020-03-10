@@ -1,11 +1,13 @@
+import base64
 from typing import List, Union
+from xdrlib import Packer, Unpacker
 
 from .exceptions import SignatureExistError
 from .keypair import Keypair
 from .network import Network
-from .xdr import Xdr
 from .transaction import Transaction
 from .utils import sha256, hex_to_bytes
+from .xdr import xdr as stellarxdr
 
 __all__ = ["TransactionEnvelope"]
 
@@ -30,11 +32,12 @@ class TransactionEnvelope:
         self,
         transaction: Transaction,
         network_passphrase: str,
-        signatures: List[Xdr.types.DecoratedSignature] = None,
+        signatures: List[stellarxdr.DecoratedSignature] = None,
     ) -> None:
         self.transaction: Transaction = transaction
+        # TODO: network_passphrase
         self.network_id: bytes = Network(network_passphrase).network_id()
-        self.signatures: List[Xdr.types.DecoratedSignature] = signatures or []
+        self.signatures: List[stellarxdr.DecoratedSignature] = signatures or []
 
     def hash(self) -> bytes:
         """Get the XDR Hash of the signature base.
@@ -90,14 +93,10 @@ class TransactionEnvelope:
 
         """
         network_id = self.network_id
-        tx_type = Xdr.StellarXDRPacker()
-        tx_type.pack_EnvelopeType(Xdr.const.ENVELOPE_TYPE_TX)
-        tx_type_buffer = tx_type.get_buffer()
-
-        tx = Xdr.StellarXDRPacker()
-        tx.pack_Transaction(self.transaction.to_xdr_object())
-        tx_buffer = tx.get_buffer()
-        return network_id + tx_type_buffer + tx_buffer
+        packer = Packer()
+        stellarxdr.EnvelopeType.ENVELOPE_TYPE_TX.pack(packer)
+        self.transaction.to_xdr_object().pack(packer)
+        return network_id + packer.get_buffer()
 
     def sign_hashx(self, preimage: bytes) -> None:
         """Sign this transaction envelope with a Hash(x) signature.
@@ -110,34 +109,35 @@ class TransactionEnvelope:
             signature.
         """
         hash_preimage = sha256(hex_to_bytes(preimage))
-        hint = hash_preimage[-4:]
-        sig = Xdr.types.DecoratedSignature(hint, preimage)
+        hint = stellarxdr.SignatureHint(hash_preimage[-4:])
+        sig = stellarxdr.DecoratedSignature(hint, stellarxdr.Signature(preimage))
+        # TODO: improve
         sig_dict = [signature.__dict__ for signature in self.signatures]
         if sig.__dict__ in sig_dict:
             raise SignatureExistError("The preimage has already signed.")
         else:
             self.signatures.append(sig)
 
-    def to_xdr_object(self) -> Xdr.types.TransactionEnvelope:
+    def to_xdr_object(self) -> stellarxdr.TransactionEnvelope:
         """Get an XDR object representation of this :class:`TransactionEnvelope`.
 
         :return: XDR TransactionEnvelope object
         """
         tx = self.transaction.to_xdr_object()
-        transaction_envelope = Xdr.types.TransactionEnvelope(tx, self.signatures)
+        transaction_envelope = stellarxdr.TransactionEnvelope(tx, self.signatures)
         return transaction_envelope
 
     def to_xdr(self) -> str:
         """Get the base64 encoded XDR string representing this
         :class:`TransactionEnvelope`.
 
-        :return: XDR TransactionEnvelope base64 string object
+        :return: XDR :class:`TransactionEnvelope` base64 string object
         """
         return self.to_xdr_object().to_xdr()
 
     @classmethod
     def from_xdr_object(
-        cls, te_xdr_object: Xdr.types.TransactionEnvelope, network_passphrase: str
+        cls, te_xdr_object: stellarxdr.TransactionEnvelope, network_passphrase: str
     ) -> "TransactionEnvelope":
         """Create a new :class:`TransactionEnvelope` from an XDR object.
 
@@ -159,9 +159,30 @@ class TransactionEnvelope:
 
         :param xdr: The XDR string that represents a transaction
             envelope.
-        :param network: which network this transaction envelope is associated with.
+        :param network_passphrase: The network to connect to for verifying and retrieving additional attributes from.
 
         :return: A new :class:`TransactionEnvelope` object from the given XDR TransactionEnvelope base64 string object.
         """
-        xdr_object = Xdr.types.TransactionEnvelope.from_xdr(xdr)
-        return cls.from_xdr_object(xdr_object, network_passphrase)
+        data = base64.b64decode(xdr.encode())
+        unpacker = Unpacker(data)
+        xdr_obj = stellarxdr.TransactionEnvelope.unpack(unpacker)
+        return cls.from_xdr_object(xdr_obj, network_passphrase)
+
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, self.__class__):
+            return NotImplemented  # pragma: no cover
+        return (
+            self.transaction == other.transaction
+            and self.network_id == other.network_id
+            and self.signatures == other.signatures
+        )
+
+    def __str__(self):
+        return (
+            "<TransactionEnvelope [transaction={transaction}, network_id={network_id} "
+            "signatures={signatures}]>".format(
+                transaction=self.transaction,
+                network_id=self.network_id,
+                signatures=self.signatures,
+            )
+        )

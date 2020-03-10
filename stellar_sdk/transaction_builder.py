@@ -3,7 +3,6 @@ import warnings
 from decimal import Decimal
 from typing import List, Union, Optional
 
-from .utils import hex_to_bytes
 from .account import Account
 from .asset import Asset
 from .exceptions import ValueError
@@ -16,6 +15,7 @@ from .signer import Signer
 from .time_bounds import TimeBounds
 from .transaction import Transaction
 from .transaction_envelope import TransactionEnvelope
+from .utils import hex_to_bytes
 
 __all__ = ["TransactionBuilder"]
 
@@ -769,3 +769,29 @@ class TransactionBuilder:
         """
         op = BumpSequence(bump_to, source)
         return self.append_operation(op)
+
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, self.__class__):
+            return NotImplemented  # pragma: no cover
+        return (
+            self.source_account == other.source_account
+            and self.network_passphrase == other.network_passphrase
+            and self.base_fee == other.base_fee
+            and self.operations == other.operations
+            and self.memo == other.memo
+            and self.time_bounds == other.time_bounds
+        )
+
+    def __str__(self):
+        return (
+            "<TransactionBuilder [source_account={source_account}, "
+            "network_passphrase={network_passphrase}, base_fee={base_fee}, "
+            "operations={operations}, memo={memo}, time_bounds={time_bounds}]>".format(
+                source_account=self.source_account,
+                network_passphrase=self.network_passphrase,
+                base_fee=self.base_fee,
+                operations=self.operations,
+                memo=self.memo,
+                time_bounds=self.time_bounds,
+            )
+        )

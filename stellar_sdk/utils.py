@@ -1,6 +1,5 @@
 import hashlib
 from decimal import Decimal, ROUND_FLOOR
-
 from typing import List
 
 from .asset import Asset
@@ -35,20 +34,6 @@ def best_rational_approximation(x):
     if n.is_zero() or d.is_zero():
         raise NoApproximationError("Couldn't find approximation.")
     return {"n": int(n), "d": int(d)}
-
-
-def pack_xdr_array(x):
-    if x is None:
-        return []
-    # if not isinstance(x, list):
-    #     return [x]
-    return [x]
-
-
-def unpack_xdr_array(x):
-    if not x:
-        return None
-    return x[0]
 
 
 def hex_to_bytes(hex_string):

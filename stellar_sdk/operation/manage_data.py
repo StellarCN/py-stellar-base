@@ -2,8 +2,7 @@ from typing import Union
 
 from .operation import Operation
 from ..exceptions import ValueError
-from ..utils import pack_xdr_array, unpack_xdr_array
-from ..xdr import Xdr
+from ..xdr import xdr
 
 
 class ManageData(Operation):
@@ -40,34 +39,35 @@ class ManageData(Operation):
             raise ValueError("Data and value should be <= 64 bytes (ascii encoded).")
 
     @classmethod
-    def type_code(cls) -> int:
-        return Xdr.const.MANAGE_DATA
+    def type_code(cls) -> xdr.OperationType:
+        return xdr.OperationType.MANAGE_DATA
 
-    def _to_operation_body(self) -> Xdr.nullclass:
-        data_name = bytes(self.data_name, encoding="utf-8")
+    def _to_operation_body(self) -> xdr.OperationBody:
+        data_name = xdr.String64(bytes(self.data_name, encoding="utf-8"))
 
-        if self.data_value is not None:
-            if isinstance(self.data_value, bytes):
-                data_value = pack_xdr_array(self.data_value)
-            else:
-                data_value = pack_xdr_array(bytes(self.data_value, "utf-8"))
+        if self.data_value is None:
+            data_value = None
         else:
-            data_value = pack_xdr_array(self.data_value)
-        manage_data_op = Xdr.types.ManageDataOp(data_name, data_value)
+            if isinstance(self.data_value, bytes):
+                data_value = self.data_value
+            else:
+                data_value = bytes(self.data_value, "utf-8")
+            data_value = xdr.DataValue(data_value)
 
-        body = Xdr.nullclass()
-        body.type = Xdr.const.MANAGE_DATA
-        body.manageDataOp = manage_data_op
+        manage_data_op = xdr.ManageDataOp(data_name, data_value)
+
+        body = xdr.OperationBody(type=self.type_code(), manage_data_op=manage_data_op)
         return body
 
     @classmethod
-    def from_xdr_object(cls, operation_xdr_object: Xdr.types.Operation) -> "ManageData":
+    def from_xdr_object(cls, operation_xdr_object: xdr.Operation) -> "ManageData":
         """Creates a :class:`ManageData` object from an XDR Operation
         object.
 
         """
         source = Operation.get_source_from_xdr_obj(operation_xdr_object)
-        data_name = operation_xdr_object.body.manageDataOp.dataName.decode()
-
-        data_value = unpack_xdr_array(operation_xdr_object.body.manageDataOp.dataValue)
+        # TODO: should we decode it?
+        data_name = operation_xdr_object.body.manage_data_op.data_name.string64.decode()
+        data_value_xdr = operation_xdr_object.body.manage_data_op.data_value
+        data_value = None if data_value_xdr is None else data_value_xdr.data_value
         return cls(data_name=data_name, data_value=data_value, source=source)

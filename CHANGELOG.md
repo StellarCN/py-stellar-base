@@ -1,6 +1,17 @@
 Release History
 ===============
 
+### Version 2.2.2
+Released on March 08, 2020
+
+* fix: parameters checking rule in TimeBounds. ([561f3e7](https://github.com/StellarCN/py-stellar-base/commit/561f3e7a3c407783eb8ecbed4134978fd88497f4))
+* fix: HashMemo and ReturnHashMemo should be fixed in length (32 bytes). ([22cd179](https://github.com/StellarCN/py-stellar-base/commit/22cd1794ea7c35b059549588893c410b6fd297d8))
+
+### Version 2.2.1
+Released on February 12, 2020
+
+* fix: orderbook async streams (#265)
+
 ### Version 2.2.0
 Released on February 07, 2020
 
@@ -77,6 +88,11 @@ Horizon v1.0.0 Compatibility.
 
 There are also some changes related to the horizon's response, currently, SDK has not added parse support to it, 
 so please refer to this [issue](https://github.com/StellarCN/py-stellar-base/issues/257) or release notes of Stellar horizon 1.0.0. In addition, support for parsing the horizon's responses will be added in the next major update.
+
+### Version 2.1.4
+Released on February 12, 2020
+
+* fix: orderbook async streams (#265)
 
 ### Version 2.1.3
 Released on February 03, 2020

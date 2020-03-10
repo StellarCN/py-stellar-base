@@ -1,1 +1,1 @@
-from . import StellarXDR_pack as Xdr
+from .xdr import *

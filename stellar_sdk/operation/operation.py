@@ -1,13 +1,13 @@
 import decimal
 from abc import ABCMeta, abstractmethod
 from decimal import Decimal, Context, Inexact
-from typing import Optional, List, Union
+from typing import Optional, Union
 
 from .utils import check_source
+from ..exceptions import ValueError, TypeError
 from ..keypair import Keypair
 from ..strkey import StrKey
-from ..xdr import Xdr
-from ..exceptions import ValueError, TypeError
+from ..xdr import xdr as stellarxdr
 
 
 class Operation(metaclass=ABCMeta):
@@ -44,7 +44,7 @@ class Operation(metaclass=ABCMeta):
         self.source: Optional[str] = source
 
     @classmethod
-    def type_code(cls) -> int:
+    def type_code(cls) -> stellarxdr.OperationType:
         pass
 
     @staticmethod
@@ -110,22 +110,23 @@ class Operation(metaclass=ABCMeta):
         return str(Decimal(value) / Operation._ONE)
 
     @abstractmethod
-    def _to_operation_body(self) -> Xdr.nullclass:
+    def _to_operation_body(self) -> stellarxdr.OperationBody:
         pass
 
-    def to_xdr_object(self) -> Xdr.types.Operation:
+    def to_xdr_object(self) -> stellarxdr.Operation:
         """Creates an XDR Operation object that represents this
         :class:`Operation`.
 
         """
-        source_account: List[Xdr.types.PublicKey] = []
-        if self.source is not None:
-            source_account = [Keypair.from_public_key(self.source).xdr_account_id()]
-
-        return Xdr.types.Operation(source_account, self._to_operation_body())
+        source_account = (
+            Keypair.from_public_key(self.source).xdr_account_id()
+            if self.source is not None
+            else None
+        )
+        return stellarxdr.Operation(source_account, self._to_operation_body())
 
     @classmethod
-    def from_xdr_object(cls, operation_xdr_object: Xdr.types.Operation) -> "Operation":
+    def from_xdr_object(cls, operation_xdr_object: stellarxdr.Operation) -> "Operation":
         """Create the appropriate :class:`Operation` subclass from the XDR
         object.
 
@@ -133,25 +134,46 @@ class Operation(metaclass=ABCMeta):
             subclass) instance from.
         """
         for sub_cls in cls.__subclasses__():
-            if sub_cls.type_code() == operation_xdr_object.type:
+            if sub_cls.type_code() == operation_xdr_object.body.type:
                 return sub_cls.from_xdr_object(operation_xdr_object)
         raise NotImplementedError(
             "Operation of type={} is not implemented"
-            ".".format(operation_xdr_object.type)
+            ".".format(operation_xdr_object.body.type)
         )
 
+    def to_xdr(self) -> str:
+        """Get the base64 encoded XDR string representing this
+        Operation.
+
+        :return: XDR Operation base64 string object
+        """
+        return self.to_xdr_object().to_xdr()
+
+    @classmethod
+    def from_xdr(cls, xdr: str) -> "Operation":
+        """Create a new Operation from an XDR string.
+
+        :param xdr: The XDR string that represents a Operation.
+
+        :return: A new Operation object from the given XDR Operation base64 string object.
+        """
+        xdr_obj = stellarxdr.Operation.from_xdr(xdr)
+        return cls.from_xdr_object(xdr_obj)
+
     @staticmethod
-    def get_source_from_xdr_obj(xdr_object: Xdr.types.Operation) -> Optional[str]:
+    def get_source_from_xdr_obj(xdr_object: stellarxdr.Operation) -> Optional[str]:
         """Get the source account from account the operation xdr object.
 
         :param xdr_object: the operation xdr object.
         :return: The source account from account the operation xdr object.
         """
-        if xdr_object.sourceAccount:
-            return StrKey.encode_ed25519_public_key(xdr_object.sourceAccount[0].ed25519)
+        if xdr_object.source_account:
+            return StrKey.encode_ed25519_public_key(
+                xdr_object.source_account.account_id.ed25519.uint256
+            )
         return None
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
             return NotImplemented  # pragma: no cover
-        return self.to_xdr_object().to_xdr() == other.to_xdr_object().to_xdr()
+        return self.to_xdr_object() == other.to_xdr_object()

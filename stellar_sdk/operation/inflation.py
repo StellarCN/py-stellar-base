@@ -1,6 +1,6 @@
 from .operation import Operation
 
-from ..xdr import Xdr
+from ..xdr import xdr
 
 
 class Inflation(Operation):
@@ -19,16 +19,15 @@ class Inflation(Operation):
         super().__init__(source)
 
     @classmethod
-    def type_code(cls) -> int:
-        return Xdr.const.INFLATION
+    def type_code(cls) -> xdr.OperationType:
+        return xdr.OperationType.INFLATION
 
-    def _to_operation_body(self) -> Xdr.nullclass:
-        body = Xdr.nullclass()
-        body.type = Xdr.const.INFLATION
+    def _to_operation_body(self) -> xdr.OperationBody:
+        body = xdr.OperationBody(type=self.type_code())
         return body
 
     @classmethod
-    def from_xdr_object(cls, operation_xdr_object: Xdr.types.Operation) -> "Inflation":
+    def from_xdr_object(cls, operation_xdr_object: xdr.Operation) -> "Inflation":
         """Creates a :class:`Inflation` object from an XDR Operation
         object.
 

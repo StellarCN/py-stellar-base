@@ -4,15 +4,15 @@ from typing import Any, Union
 import nacl.signing as ed25519
 from nacl.exceptions import BadSignatureError as NaclBadSignatureError
 
-from .sep.mnemonic import Language, StellarMnemonic
 from .exceptions import (
     BadSignatureError,
     MissingEd25519SecretSeedError,
     TypeError,
     AttributeError,
 )
+from .sep.mnemonic import Language, StellarMnemonic
 from .strkey import StrKey
-from .xdr import Xdr
+from .xdr import xdr as stellarxdr
 
 __all__ = ["Keypair"]
 
@@ -133,15 +133,18 @@ class Keypair:
             "Please use `Keypair.from_public_key` to generate a new Keypair object."
         )
 
-    def xdr_public_key(self) -> Xdr.types.PublicKey:
+    def xdr_public_key(self) -> stellarxdr.PublicKey:
         """
 
         :return: xdr public key
         """
-        return Xdr.types.PublicKey(Xdr.const.KEY_TYPE_ED25519, bytes(self.verify_key))
+        return stellarxdr.PublicKey(
+            stellarxdr.PublicKeyType.PUBLIC_KEY_TYPE_ED25519,
+            stellarxdr.Uint256(bytes(self.verify_key)),
+        )
 
-    def xdr_account_id(self) -> Xdr.types.PublicKey:
-        return self.xdr_public_key()
+    def xdr_account_id(self) -> stellarxdr.AccountID:
+        return stellarxdr.AccountID(self.xdr_public_key())
 
     def raw_public_key(self) -> bytes:
         """Returns raw public key.
@@ -155,7 +158,7 @@ class Keypair:
 
         :return: signature hint
         """
-        return bytes(self.xdr_account_id().ed25519[-4:])
+        return bytes(self.xdr_account_id().account_id.ed25519.uint256[-4:])
 
     def raw_secret_key(self) -> bytes:
         """Returns raw secret key.
@@ -236,15 +239,15 @@ class Keypair:
         raw_ed25519_seed = StellarMnemonic.to_seed(mnemonic_phrase, passphrase, index)
         return cls.from_raw_ed25519_seed(raw_ed25519_seed)
 
-    def sign_decorated(self, data) -> Xdr.types.DecoratedSignature:
+    def sign_decorated(self, data) -> stellarxdr.DecoratedSignature:
         """Sign the provided data with the keypair's private key and returns DecoratedSignature.
 
         :param data: signed bytes
         :return: sign decorated
         """
-        signature = self.sign(data)
-        hint = self.signature_hint()
-        return Xdr.types.DecoratedSignature(hint, signature)
+        hint = stellarxdr.SignatureHint(self.signature_hint())
+        signature = stellarxdr.Signature(self.sign(data))
+        return stellarxdr.DecoratedSignature(hint, signature)
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
