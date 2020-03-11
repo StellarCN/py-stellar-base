@@ -3,7 +3,6 @@ import pytest
 from stellar_sdk import Asset
 from stellar_sdk.exceptions import ParseResponseError
 from stellar_sdk.server import Server
-from . import parse_time
 
 
 class TestParseResponse:
@@ -46,9 +45,6 @@ class TestParseResponse:
         raw_resp = resp.raw_data
         parsed_resp = resp.parse()
         for i in range(len(parsed_resp)):
-            raw_resp["_embedded"]["records"][i]["created_at"] = parse_time(
-                raw_resp["_embedded"]["records"][i]["created_at"]
-            )
             assert raw_resp["_embedded"]["records"][i] == parsed_resp[i].dict(
                 exclude_unset=True, by_alias=True
             )
@@ -70,7 +66,6 @@ class TestParseResponse:
         resp = self.server.ledgers().ledger(28566227).call()
         raw_resp = resp.raw_data
         parsed_resp = resp.parse()
-        raw_resp["closed_at"] = parse_time(raw_resp["closed_at"])
         assert raw_resp == parsed_resp.dict(exclude_unset=True, by_alias=True)
 
     def test_ledgers(self):
@@ -78,9 +73,6 @@ class TestParseResponse:
         raw_resp = resp.raw_data
         parsed_resp = resp.parse()
         for i in range(len(parsed_resp)):
-            raw_resp["_embedded"]["records"][i]["closed_at"] = parse_time(
-                raw_resp["_embedded"]["records"][i]["closed_at"]
-            )
             assert raw_resp["_embedded"]["records"][i] == parsed_resp[i].dict(
                 exclude_unset=True, by_alias=True
             )
@@ -90,9 +82,6 @@ class TestParseResponse:
         raw_resp = resp.raw_data
         parsed_resp = resp.parse()
         for i in range(len(parsed_resp)):
-            raw_resp["_embedded"]["records"][i]["last_modified_time"] = parse_time(
-                raw_resp["_embedded"]["records"][i]["last_modified_time"]
-            )
             raw_resp["_embedded"]["records"][i]["id"] = int(
                 raw_resp["_embedded"]["records"][i]["id"]
             )
@@ -104,7 +93,6 @@ class TestParseResponse:
         resp = self.server.operations().operation(122691075160104961).call()
         raw_resp = resp.raw_data
         parsed_resp = resp.parse()
-        raw_resp["created_at"] = parse_time(raw_resp["created_at"])
         if raw_resp.__contains__("bump_to"):
             raw_resp["bump_to"] = int(raw_resp["bump_to"])
         assert raw_resp == parsed_resp.dict(exclude_unset=True, by_alias=True)
@@ -114,9 +102,6 @@ class TestParseResponse:
         raw_resp = resp.raw_data
         parsed_resp = resp.parse()
         for i in range(len(parsed_resp)):
-            raw_resp["_embedded"]["records"][i]["created_at"] = parse_time(
-                raw_resp["_embedded"]["records"][i]["created_at"]
-            )
             if raw_resp["_embedded"]["records"][i].__contains__("bump_to"):
                 raw_resp["_embedded"]["records"][i]["bump_to"] = int(
                     raw_resp["_embedded"]["records"][i]["bump_to"]
@@ -144,9 +129,6 @@ class TestParseResponse:
         raw_resp = resp.raw_data
         parsed_resp = resp.parse()
         for i in range(len(parsed_resp)):
-            raw_resp["_embedded"]["records"][i]["created_at"] = parse_time(
-                raw_resp["_embedded"]["records"][i]["created_at"]
-            )
             assert raw_resp["_embedded"]["records"][i] == parsed_resp[i].dict(
                 exclude_unset=True, by_alias=True
             )
@@ -207,9 +189,6 @@ class TestParseResponse:
         raw_resp = resp.raw_data
         parsed_resp = resp.parse()
         for i in range(len(parsed_resp)):
-            raw_resp["_embedded"]["records"][i]["ledger_close_time"] = parse_time(
-                raw_resp["_embedded"]["records"][i]["ledger_close_time"]
-            )
             assert raw_resp["_embedded"]["records"][i] == parsed_resp[i].dict(
                 exclude_unset=True, by_alias=True
             )
@@ -224,32 +203,17 @@ class TestParseResponse:
         )
         raw_resp = resp.raw_data
         parsed_resp = resp.parse()
-        raw_resp["created_at"] = parse_time(raw_resp["created_at"])
-        raw_resp["valid_before"] = parse_time(raw_resp["valid_before"])
-        raw_resp["valid_after"] = parse_time(raw_resp["valid_after"])
         raw_resp["source_account_sequence"] = int(raw_resp["source_account_sequence"])
         assert raw_resp == parsed_resp.dict(exclude_unset=True, by_alias=True)
 
-    # fixme 2020, 3, 10, 13, 28, 8 122899814865731584
     def test_transactions(self):
         resp = self.server.transactions().order(desc=True).call()
         raw_resp = resp.raw_data
         parsed_resp = resp.parse()
         for i in range(len(parsed_resp)):
-            raw_resp["_embedded"]["records"][i]["created_at"] = parse_time(
-                raw_resp["_embedded"]["records"][i]["created_at"]
-            )
             raw_resp["_embedded"]["records"][i]["source_account_sequence"] = int(
                 raw_resp["_embedded"]["records"][i]["source_account_sequence"]
             )
-            if raw_resp["_embedded"]["records"][i].__contains__("valid_before"):
-                raw_resp["_embedded"]["records"][i]["valid_before"] = parse_time(
-                    raw_resp["_embedded"]["records"][i]["valid_before"]
-                )
-            if raw_resp["_embedded"]["records"][i].__contains__("valid_after"):
-                raw_resp["_embedded"]["records"][i]["valid_after"] = parse_time(
-                    raw_resp["_embedded"]["records"][i]["valid_after"]
-                )
             assert raw_resp["_embedded"]["records"][i] == parsed_resp[i].dict(
                 exclude_unset=True, by_alias=True
             )

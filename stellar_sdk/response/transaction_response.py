@@ -1,4 +1,3 @@
-from datetime import datetime
 from typing import Optional, List
 
 from pydantic import BaseModel, Field
@@ -25,7 +24,7 @@ class TransactionResponse(BaseModel):
     successful: bool
     hash: str
     ledger: int
-    created_at: datetime
+    created_at: str
     source_account: str
     source_account_sequence: int  # str in Go impl
     fee_charged: int
@@ -38,6 +37,6 @@ class TransactionResponse(BaseModel):
     memo_type: str
     memo: Optional[str]
     signatures: List[str]
-    valid_after: Optional[datetime]
-    valid_before: Optional[datetime]
+    valid_after: Optional[str]
+    valid_before: Optional[str]
     links: Links = Field(None, alias="_links")

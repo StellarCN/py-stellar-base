@@ -1,4 +1,3 @@
-from datetime import datetime
 from typing import Optional
 
 from pydantic import BaseModel, Field
@@ -23,7 +22,7 @@ class LedgerResponse(BaseModel):
     successful_transaction_count: int
     failed_transaction_count: int
     operation_count: int
-    closed_at: datetime
+    closed_at: str
     total_coins: str
     fee_pool: str
     base_fee_in_stroops: int

@@ -1,4 +1,3 @@
-from datetime import datetime
 from typing import Optional, List, Union, Type
 
 from pydantic import BaseModel, Field
@@ -40,7 +39,7 @@ class BaseOperationResponse(BaseModel):
     source_account: str
     type: str
     type_i: int
-    created_at: datetime
+    created_at: str
     transaction_hash: str
     transaction: Optional[TransactionResponse]
     links: Links = Field(None, alias="_links")
@@ -73,7 +72,7 @@ class PaymentOperationResponse(BaseOperationResponse):
         None,
         alias="from",
         description="This variable should be called `from`, "
-        "but `from` is a keyword in Python, so we named it `from_`.",
+                    "but `from` is a keyword in Python, so we named it `from_`.",
     )
     to: str
     amount: str
@@ -90,7 +89,7 @@ class PathPaymentStrictReceiveOperationResponse(BaseOperationResponse):
         None,
         alias="from",
         description="This variable should be called `from`, "
-        "but `from` is a keyword in Python, so we named it` from_`.",
+                    "but `from` is a keyword in Python, so we named it` from_`.",
     )
     to: str
     amount: str
@@ -113,7 +112,7 @@ class PathPaymentStrictSendOperationResponse(BaseOperationResponse):
         None,
         alias="from",
         description="This variable should be called `from`, "
-        "but `from` is a keyword in Python, so we named it` from_`.",
+                    "but `from` is a keyword in Python, so we named it` from_`.",
     )
     to: str
     amount: str

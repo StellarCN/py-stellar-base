@@ -1,4 +1,3 @@
-from datetime import datetime
 from typing import Optional
 
 from pydantic import BaseModel, Field
@@ -32,5 +31,5 @@ class OfferResponse(BaseModel):
     price_r: Price
     price: str
     last_modified_ledger: int
-    last_modified_time: datetime
+    last_modified_time: str
     links: Links = Field(None, alias="_links")

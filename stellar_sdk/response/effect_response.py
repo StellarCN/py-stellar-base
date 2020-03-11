@@ -1,4 +1,3 @@
-from datetime import datetime
 from typing import Optional, Union, Type
 
 from pydantic import BaseModel, Field
@@ -18,7 +17,9 @@ class BaseEffectResponse(BaseModel):
     account: str
     type: str
     type_i: int
-    created_at: datetime
+    # The maximum year in Python is 9999
+    # https://horizon.stellar.org/transactions/8761d590f853174b42c7d8e5e1a274a6dfd786091d1776eaf61965920346e9b8
+    created_at: str
     links: Links = Field(None, alias="_links")
 
 

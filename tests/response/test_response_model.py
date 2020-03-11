@@ -12,7 +12,7 @@ from stellar_sdk.response.trades_aggregation_response import TradesAggregationRe
 from stellar_sdk.response.transaction_response import TransactionResponse
 from stellar_sdk.response.submit_response import TransactionSuccessResponse
 
-from . import load_file, parse_time
+from . import load_file
 
 
 class TestResponseModel:
@@ -46,14 +46,12 @@ class TestResponseModel:
     def test_ledger(self):
         raw = load_file("ledger.json")
         parsed = LedgerResponse.parse_obj(raw)
-        raw["closed_at"] = parse_time(raw["closed_at"])
         assert raw == parsed.dict(exclude_unset=True, by_alias=True)
 
     def test_offer(self):
         raw = load_file("offer.json")
         parsed = OfferResponse.parse_obj(raw)
         raw["id"] = int(raw["id"])
-        raw["last_modified_time"] = parse_time(raw["last_modified_time"])
         assert raw == parsed.dict(exclude_unset=True, by_alias=True)
 
     def test_orderbook(self):
@@ -74,7 +72,6 @@ class TestResponseModel:
     def test_trade(self):
         raw = load_file("trade.json")
         parsed = TradeResponse.parse_obj(raw)
-        raw["ledger_close_time"] = parse_time(raw["ledger_close_time"])
         assert raw == parsed.dict(exclude_unset=True, by_alias=True)
 
     def test_trades_aggregation(self):
@@ -85,9 +82,6 @@ class TestResponseModel:
     def test_transaction(self):
         raw = load_file("transaction.json")
         parsed = TransactionResponse.parse_obj(raw)
-        raw["created_at"] = parse_time(raw["created_at"])
-        raw["valid_before"] = parse_time(raw["valid_before"])
-        raw["valid_after"] = parse_time(raw["valid_after"])
         raw["source_account_sequence"] = int(raw["source_account_sequence"])
         assert raw == parsed.dict(exclude_unset=True, by_alias=True)
 

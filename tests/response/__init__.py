@@ -10,6 +10,6 @@ def load_file(filename: str) -> dict:
         return json.loads(f.read())
 
 
-def parse_time(time: str):
-    dt = datetime.datetime.strptime(time, "%Y-%m-%dT%H:%M:%SZ")
-    return dt.replace(tzinfo=datetime.timezone.utc)
+# def parse_time(time: str):
+#     dt = datetime.datetime.strptime(time, "%Y-%m-%dT%H:%M:%SZ")
+#     return dt.replace(tzinfo=datetime.timezone.utc)

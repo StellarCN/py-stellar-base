@@ -1,4 +1,3 @@
-from datetime import datetime
 from typing import Optional
 
 from pydantic import BaseModel, Field
@@ -19,7 +18,7 @@ class TradeResponse(BaseModel):
 
     id: str
     paging_token: str
-    ledger_close_time: datetime
+    ledger_close_time: str
     offer_id: str
     base_offer_id: str
     base_account: str
