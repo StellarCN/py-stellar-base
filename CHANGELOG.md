@@ -1,6 +1,11 @@
 Release History
 ===============
 
+### Version 2.2.3
+Released on March 12, 2020
+
+* feat: add `stellar_sdk.operation.set_options.Flag`, we can express flag more conveniently. ([fdb1f7d](https://github.com/StellarCN/py-stellar-base/commit/fdb1f7da42c2c6307fa91b010addc9535c77b7d5))
+
 ### Version 2.2.2
 Released on March 08, 2020
 
