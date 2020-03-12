@@ -419,6 +419,9 @@ SetOptions
 .. autoclass:: stellar_sdk.operation.SetOptions
    :members: to_xdr_object, from_xdr_object
 
+.. autoclass:: stellar_sdk.operation.set_options.Flag
+   :members:
+
 Price
 ^^^^^
 
@@ -472,7 +475,7 @@ SEP 0001: stellar.toml
 .. autofunction:: stellar_sdk.sep.stellar_toml.fetch_stellar_toml
 
 SEP 0002: Federation protocol
-----------------------
+-----------------------------
 .. autofunction:: stellar_sdk.sep.federation.resolve_stellar_address
 .. autofunction:: stellar_sdk.sep.federation.resolve_account_id
 .. autoclass:: stellar_sdk.sep.federation.FederationRecord
