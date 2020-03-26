@@ -1,6 +1,6 @@
 import warnings
 from typing import Union, Coroutine, Any, Dict, List
-from urllib.parse import urljoin
+
 
 from .account import Account, Thresholds
 from .asset import Asset
@@ -28,6 +28,7 @@ from .client.base_sync_client import BaseSyncClient
 from .client.requests_client import RequestsClient
 from .exceptions import TypeError, raise_request_exception
 from .transaction_envelope import TransactionEnvelope
+from .utils import urljoin_with_params
 
 __all__ = ["Server"]
 
@@ -84,7 +85,7 @@ class Server:
             xdr = transaction_envelope.to_xdr()
 
         data = {"tx": xdr}
-        url = urljoin(self.horizon_url, "/transactions")
+        url = urljoin_with_params(self.horizon_url, "transactions")
         if self.__async:
             return self.__submit_transaction_async(url, data)
         return self.__submit_transaction_sync(url, data)

@@ -1,7 +1,11 @@
 import pytest
 
 from stellar_sdk.exceptions import NoApproximationError, TypeError
-from stellar_sdk.utils import best_rational_approximation, hex_to_bytes
+from stellar_sdk.utils import (
+    best_rational_approximation,
+    hex_to_bytes,
+    urljoin_with_params,
+)
 
 
 class TestUtils:
@@ -57,3 +61,66 @@ class TestUtils:
             match="`hex_string` should be a 32 byte hash or hex encoded string.",
         ):
             hex_to_bytes(input_value)
+
+    @pytest.mark.parametrize(
+        "base, url, output",
+        [
+            (
+                "https://horizon.stellar.org/",
+                "transaction",
+                "https://horizon.stellar.org/transaction",
+            ),
+            (
+                "https://horizon.stellar.org/hello",
+                "transaction",
+                "https://horizon.stellar.org/hello/transaction",
+            ),
+            (
+                "https://horizon.stellar.org/?auth=password",
+                "transaction",
+                "https://horizon.stellar.org/transaction?auth=password",
+            ),
+            (
+                "https://horizon.stellar.org/hello?auth=password",
+                "transaction",
+                "https://horizon.stellar.org/hello/transaction?auth=password",
+            ),
+            (
+                "https://horizon.stellar.org?auth=password&name=overcat",
+                "transaction",
+                "https://horizon.stellar.org/transaction?auth=password&name=overcat",
+            ),
+            (
+                "https://horizon.stellar.org/hello?auth=password&name=overcat",
+                "transaction",
+                "https://horizon.stellar.org/hello/transaction?auth=password&name=overcat",
+            ),
+            (
+                "https://horizon.stellar.org/hello/world?auth=password&name=overcat",
+                "transaction",
+                "https://horizon.stellar.org/hello/world/transaction?auth=password&name=overcat",
+            ),
+            (
+                "https://horizon.stellar.org/hello/world?auth=password&name=overcat",
+                "",
+                "https://horizon.stellar.org/hello/world?auth=password&name=overcat",
+            ),
+            (
+                "https://horizon.stellar.org/hello/world?auth=password&name=overcat",
+                None,
+                "https://horizon.stellar.org/hello/world?auth=password&name=overcat",
+            ),
+            (
+                "https://horizon.stellar.org/hello/world/?auth=password&name=overcat",
+                "",
+                "https://horizon.stellar.org/hello/world/?auth=password&name=overcat",
+            ),
+            (
+                "https://horizon.stellar.org/hello/world/?auth=password&name=overcat",
+                None,
+                "https://horizon.stellar.org/hello/world/?auth=password&name=overcat",
+            ),
+        ],
+    )
+    def test_test_urljoin_with_params(self, base, url, output):
+        assert output == urljoin_with_params(base, url)
