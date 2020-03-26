@@ -4,7 +4,7 @@ from stellar_sdk.exceptions import NoApproximationError, TypeError
 from stellar_sdk.utils import (
     best_rational_approximation,
     hex_to_bytes,
-    urljoin_with_params,
+    urljoin_with_query,
 )
 
 
@@ -63,7 +63,7 @@ class TestUtils:
             hex_to_bytes(input_value)
 
     @pytest.mark.parametrize(
-        "base, url, output",
+        "base, path, output",
         [
             (
                 "https://horizon.stellar.org/",
@@ -122,5 +122,5 @@ class TestUtils:
             ),
         ],
     )
-    def test_test_urljoin_with_params(self, base, url, output):
-        assert output == urljoin_with_params(base, url)
+    def test_urljoin_with_query(self, base, path, output):
+        assert output == urljoin_with_query(base, path)

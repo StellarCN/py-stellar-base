@@ -70,7 +70,7 @@ def convert_assets_to_horizon_param(assets: List[Asset]) -> str:
     return ",".join(assets_string)
 
 
-def urljoin_with_params(base: str, path: str) -> str:
+def urljoin_with_query(base: str, path: str) -> str:
     split_url = urlsplit(base)
     query = split_url.query
     real_path = split_url.path
