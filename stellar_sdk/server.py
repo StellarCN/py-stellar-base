@@ -1,7 +1,6 @@
 import warnings
 from typing import Union, Coroutine, Any, Dict, List
 
-
 from .account import Account, Thresholds
 from .asset import Asset
 from .call_builder.accounts_call_builder import AccountsCallBuilder
@@ -26,9 +25,13 @@ from .call_builder.transactions_call_builder import TransactionsCallBuilder
 from .client.base_async_client import BaseAsyncClient
 from .client.base_sync_client import BaseSyncClient
 from .client.requests_client import RequestsClient
-from .exceptions import TypeError, raise_request_exception
+from .exceptions import TypeError, NotFoundError, raise_request_exception
+from .memo import NoneMemo
+from .sep.exceptions import AccountRequiresMemoError
+from .transaction import Transaction
 from .transaction_envelope import TransactionEnvelope
 from .utils import urljoin_with_query
+from .xdr import Xdr
 
 __all__ = ["Server"]
 
@@ -72,37 +75,73 @@ class Server:
             )
 
     def submit_transaction(
-        self, transaction_envelope: Union[TransactionEnvelope, str]
+        self,
+        transaction_envelope: Union[TransactionEnvelope, str],
+        skip_memo_required_check: bool = False,
     ) -> Union[Dict[str, Any], Coroutine[Any, Any, Dict[str, Any]]]:
         """Submits a transaction to the network.
 
         :param transaction_envelope: :class:`stellar_sdk.transaction_envelope.TransactionEnvelope` object
             or base64 encoded xdr
         :return: the response from horizon
+        :raises:
+            :exc:`ConnectionError <stellar_sdk.exceptions.ConnectionError>`
+            :exc:`NotFoundError <stellar_sdk.exceptions.NotFoundError>`
+            :exc:`BadRequestError <stellar_sdk.exceptions.BadRequestError>`
+            :exc:`BadResponseError <stellar_sdk.exceptions.BadResponseError>`
+            :exc:`UnknownRequestError <stellar_sdk.exceptions.UnknownRequestError>`
+            :exc:`AccountRequiresMemoError <stellar_sdk.sep.exceptions.AccountRequiresMemoError>`
         """
-        xdr = transaction_envelope
-        if isinstance(transaction_envelope, TransactionEnvelope):
-            xdr = transaction_envelope.to_xdr()
-
-        data = {"tx": xdr}
-        url = urljoin_with_query(self.horizon_url, "transactions")
         if self.__async:
-            return self.__submit_transaction_async(url, data)
-        return self.__submit_transaction_sync(url, data)
+            return self.__submit_transaction_async(
+                transaction_envelope, skip_memo_required_check
+            )
+        return self.__submit_transaction_sync(
+            transaction_envelope, skip_memo_required_check
+        )
 
     def __submit_transaction_sync(
-        self, url: str, data: Dict[str, str]
+        self,
+        transaction_envelope: Union[TransactionEnvelope, str],
+        skip_memo_required_check: bool,
     ) -> Dict[str, Any]:
+        url = urljoin_with_query(self.horizon_url, "transactions")
+        xdr, tx = self.__get_xdr_and_transaction_from_transaction_envelope(
+            transaction_envelope
+        )
+        if not skip_memo_required_check:
+            self.__check_memo_required_sync(tx)
+        data = {"tx": xdr}
         resp = self._client.post(url=url, data=data)
         raise_request_exception(resp)
         return resp.json()
 
     async def __submit_transaction_async(
-        self, url: str, data: Dict[str, str]
+        self,
+        transaction_envelope: Union[TransactionEnvelope, str],
+        skip_memo_required_check: bool,
     ) -> Dict[str, Any]:
+        url = urljoin_with_query(self.horizon_url, "transactions")
+        xdr, tx = self.__get_xdr_and_transaction_from_transaction_envelope(
+            transaction_envelope
+        )
+        if not skip_memo_required_check:
+            await self.__check_memo_required_async(tx)
+        data = {"tx": xdr}
         resp = await self._client.post(url=url, data=data)
         raise_request_exception(resp)
         return resp.json()
+
+    def __get_xdr_and_transaction_from_transaction_envelope(
+        self, transaction_envelope: Union[TransactionEnvelope, str]
+    ):
+        if isinstance(transaction_envelope, TransactionEnvelope):
+            xdr = transaction_envelope.to_xdr()
+            tx = transaction_envelope.transaction
+        else:
+            xdr = transaction_envelope
+            tx = Transaction.from_xdr(xdr)
+        return xdr, tx
 
     def root(self) -> RootCallBuilder:
         """
@@ -360,6 +399,61 @@ class Server:
         account.signers = resp["signers"]
         account.thresholds = thresholds
         return account
+
+    def __check_memo_required_sync(self, transaction: Transaction) -> None:
+        if not (transaction.memo is None or isinstance(transaction.memo, NoneMemo)):
+            return
+        for index, destination in self.__get_check_memo_required_destinations(
+            transaction
+        ):
+            try:
+                account_resp = self.accounts().account_id(destination).call()
+            except NotFoundError:
+                continue
+            self.__check_destination_memo(account_resp, index, destination)
+
+    async def __check_memo_required_async(self, transaction: Transaction) -> None:
+        if not (transaction.memo is None or isinstance(transaction.memo, NoneMemo)):
+            return
+        for index, destination in self.__get_check_memo_required_destinations(
+            transaction
+        ):
+            try:
+                account_resp = await self.accounts().account_id(destination).call()
+            except NotFoundError:
+                continue
+            self.__check_destination_memo(account_resp, index, destination)
+
+    def __check_destination_memo(
+        self, account_resp: dict, index: int, destination: str
+    ) -> None:
+        memo_required_config_key = "config.memo_required"
+        memo_required_config_value = "MQ=="
+        data = account_resp["data"]
+        if data.get(memo_required_config_key) == memo_required_config_value:
+            raise AccountRequiresMemoError(
+                "Destination account requires a memo in the transaction.",
+                destination,
+                index,
+            )
+
+    def __get_check_memo_required_destinations(self, transaction: Transaction):
+        destinations = set()
+        memo_required_operation_code = (
+            Xdr.const.PAYMENT,
+            Xdr.const.ACCOUNT_MERGE,
+            Xdr.const.PATH_PAYMENT_STRICT_RECEIVE,
+            Xdr.const.PATH_PAYMENT_STRICT_SEND,
+        )
+        for index, operation in enumerate(transaction.operations):
+            if operation.type_code() in memo_required_operation_code:
+                destination = operation.destination
+            else:
+                continue
+            if destination in destinations:
+                continue
+            destinations.add(destination)
+            yield index, destination
 
     def fetch_base_fee(self) -> Union[int, Coroutine[Any, Any, int]]:
         """Fetch the base fee. Since this hits the server, if the server call fails,
