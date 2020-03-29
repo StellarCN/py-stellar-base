@@ -4,3 +4,4 @@ pytest
 pytest-cov
 pytest-timeout
 pytest-asyncio
+pytest-httpserver
