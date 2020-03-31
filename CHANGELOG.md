@@ -1,6 +1,33 @@
 Release History
 ===============
 
+### Version 2.3.0
+Released on March 31, 2020
+
+#### Added
+- Add SEP0029 (memo required) support. ([#291](https://github.com/StellarCN/py-stellar-base/pull/291))
+  Extends `Server.submit_transaction` to always run a memo required check before 
+  sending the transaction. If any of the destinations require a memo and the 
+  transaction doesn't include one, then an `AccountRequiresMemoError` will be thrown.
+  
+  This may degrade performance, but you can skip this check by passing `skip_memo_required_check=True` to `Server.submit_transaction`:
+
+  ```
+  server.submit_transaction(tx, skip_memo_required_check=True)
+  ```
+  The check runs for each operation of type:
+    - `Payment`
+    - `PathPaymentStrictReceive`
+    - `PathPaymentStrictSend`
+    - `AccountMerge`
+  
+  If the transaction includes a memo, then memo required checking is skipped.
+  
+  See [SEP-0029](https://github.com/stellar/stellar-protocol/blob/master/ecosystem/sep-0029.md) for more information about memo required check.
+
+#### Changed
+- Optimize the processing of horizon parameters. ([#289](https://github.com/StellarCN/py-stellar-base/pull/289))
+
 ### Version 2.2.3
 Released on March 12, 2020
 
