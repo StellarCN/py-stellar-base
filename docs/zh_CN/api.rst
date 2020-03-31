@@ -501,4 +501,8 @@ SEP 0010: Stellar Web Authentication
 Exceptions
 ----------
 .. autoclass:: stellar_sdk.sep.exceptions.StellarTomlNotFoundError
+.. autoclass:: stellar_sdk.sep.exceptions.InvalidFederationAddress
+.. autoclass:: stellar_sdk.sep.exceptions.FederationServerNotFoundError
+.. autoclass:: stellar_sdk.sep.exceptions.BadFederationResponseError
 .. autoclass:: stellar_sdk.sep.exceptions.InvalidSep10ChallengeError
+.. autoclass:: stellar_sdk.sep.exceptions.AccountRequiresMemoError
