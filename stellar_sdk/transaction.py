@@ -117,3 +117,14 @@ class Transaction:
             fee=fee,
             operations=operations,
         )
+
+    @classmethod
+    def from_xdr(cls, xdr: str) -> "Transaction":
+        """Create a new :class:`Transaction` from an XDR string.
+
+        :param xdr: The XDR string that represents a transaction.
+
+        :return: A new :class:`TransactionEnvelope` object from the given XDR TransactionEnvelope base64 string object.
+        """
+        xdr_object = Xdr.types.Transaction.from_xdr(xdr)
+        return cls.from_xdr_object(xdr_object)
