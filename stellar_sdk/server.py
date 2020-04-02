@@ -1,5 +1,4 @@
-import warnings
-from typing import Union, Coroutine, Any, Dict, List
+from typing import Union, Coroutine, Any, List
 
 from .account import Account, Thresholds
 from .asset import Asset
@@ -21,6 +20,11 @@ from .call_builder.strict_send_paths_call_builder import StrictSendPathsCallBuil
 from .call_builder.trades_aggregation_call_builder import TradeAggregationsCallBuilder
 from .call_builder.trades_call_builder import TradesCallBuilder
 from .call_builder.transactions_call_builder import TransactionsCallBuilder
+from .client.base_async_client import BaseAsyncClient
+from .client.base_sync_client import BaseSyncClient
+from .client.requests_client import RequestsClient
+from .exceptions import TypeError, NotFoundError, raise_request_exception
+from .memo import NoneMemo
 from .response.account_response import AccountResponse
 from .response.asset_response import AssetResponse
 from .response.data_response import DataResponse
@@ -34,21 +38,16 @@ from .response.operation_response import (
 )
 from .response.orderbook_response import OrderbookResponse
 from .response.payment_path_response import PaymentPathResponse
-from .response.root_response import RootResponse
 from .response.submit_response import TransactionSuccessResponse
 from .response.trade_response import TradeResponse
 from .response.trades_aggregation_response import TradesAggregationResponse
 from .response.transaction_response import TransactionResponse
 from .response.wrapped_response import WrappedResponse
-from .client.base_async_client import BaseAsyncClient
-from .client.base_sync_client import BaseSyncClient
-from .client.requests_client import RequestsClient
-from .exceptions import TypeError, NotFoundError, raise_request_exception
-from .memo import NoneMemo
 from .sep.exceptions import AccountRequiresMemoError
 from .transaction import Transaction
 from .transaction_envelope import TransactionEnvelope
 from .utils import urljoin_with_query
+from .xdr.xdr import OperationType
 
 __all__ = ["Server"]
 
@@ -92,8 +91,9 @@ class Server:
             )
 
     def submit_transaction(
-        self, transaction_envelope: Union[TransactionEnvelope, str],
-        skip_memo_required_check: bool = False
+        self,
+        transaction_envelope: Union[TransactionEnvelope, str],
+        skip_memo_required_check: bool = False,
     ) -> Union[
         WrappedResponse[TransactionSuccessResponse],
         Coroutine[Any, Any, WrappedResponse[TransactionSuccessResponse]],
@@ -139,7 +139,7 @@ class Server:
         self,
         transaction_envelope: Union[TransactionEnvelope, str],
         skip_memo_required_check: bool,
-    ) -> Coroutine[Any, Any, WrappedResponse[TransactionSuccessResponse]:
+    ) -> WrappedResponse[TransactionSuccessResponse]:
         url = urljoin_with_query(self.horizon_url, "transactions")
         xdr, tx = self.__get_xdr_and_transaction_from_transaction_envelope(
             transaction_envelope
@@ -369,27 +369,27 @@ class Server:
 
     async def __load_account_async(self, account_id: str) -> Account:
         resp = await self.accounts().account_id(account_id=account_id).call()
-        sequence = int(resp["sequence"])
+        sequence = int(resp.raw_data["sequence"])
         thresholds = Thresholds(
-            resp["thresholds"]["low_threshold"],
-            resp["thresholds"]["med_threshold"],
-            resp["thresholds"]["high_threshold"],
+            resp.raw_data["thresholds"]["low_threshold"],
+            resp.raw_data["thresholds"]["med_threshold"],
+            resp.raw_data["thresholds"]["high_threshold"],
         )
         account = Account(account_id=account_id, sequence=sequence)
-        account.signers = resp["signers"]
+        account.signers = resp.raw_data["signers"]
         account.thresholds = thresholds
         return account
 
     def __load_account_sync(self, account_id: str) -> Account:
         resp = self.accounts().account_id(account_id=account_id).call()
-        sequence = int(resp["sequence"])
+        sequence = int(resp.raw_data["sequence"])
         thresholds = Thresholds(
-            resp["thresholds"]["low_threshold"],
-            resp["thresholds"]["med_threshold"],
-            resp["thresholds"]["high_threshold"],
+            resp.raw_data["thresholds"]["low_threshold"],
+            resp.raw_data["thresholds"]["med_threshold"],
+            resp.raw_data["thresholds"]["high_threshold"],
         )
         account = Account(account_id=account_id, sequence=sequence)
-        account.signers = resp["signers"]
+        account.signers = resp.raw_data["signers"]
         account.thresholds = thresholds
         return account
 
@@ -403,7 +403,7 @@ class Server:
                 account_resp = self.accounts().account_id(destination).call()
             except NotFoundError:
                 continue
-            self.__check_destination_memo(account_resp, index, destination)
+            self.__check_destination_memo(account_resp.raw_data, index, destination)
 
     async def __check_memo_required_async(self, transaction: Transaction) -> None:
         if not (transaction.memo is None or isinstance(transaction.memo, NoneMemo)):
@@ -415,7 +415,7 @@ class Server:
                 account_resp = await self.accounts().account_id(destination).call()
             except NotFoundError:
                 continue
-            self.__check_destination_memo(account_resp, index, destination)
+            self.__check_destination_memo(account_resp.raw_data, index, destination)
 
     def __check_destination_memo(
         self, account_resp: dict, index: int, destination: str
@@ -433,10 +433,10 @@ class Server:
     def __get_check_memo_required_destinations(self, transaction: Transaction):
         destinations = set()
         memo_required_operation_code = (
-            Xdr.const.PAYMENT,
-            Xdr.const.ACCOUNT_MERGE,
-            Xdr.const.PATH_PAYMENT_STRICT_RECEIVE,
-            Xdr.const.PATH_PAYMENT_STRICT_SEND,
+            OperationType.PAYMENT.value,
+            OperationType.ACCOUNT_MERGE.value,
+            OperationType.PATH_PAYMENT_STRICT_RECEIVE.value,
+            OperationType.PATH_PAYMENT_STRICT_SEND.value,
         )
         for index, operation in enumerate(transaction.operations):
             if operation.type_code() in memo_required_operation_code:
@@ -474,15 +474,15 @@ class Server:
         base_fee = self.__handle_base_fee(latest_ledger)
         return base_fee
 
-    def __handle_base_fee(self, latest_ledger: dict) -> int:
+    def __handle_base_fee(self, latest_ledger: WrappedResponse[LedgerResponse]) -> int:
         base_fee = 100
         if (
-            latest_ledger["_embedded"]
-            and latest_ledger["_embedded"]["records"]
-            and latest_ledger["_embedded"]["records"][0]
+            latest_ledger.raw_data["_embedded"]
+            and latest_ledger.raw_data["_embedded"]["records"]
+            and latest_ledger.raw_data["_embedded"]["records"][0]
         ):
             base_fee = int(
-                latest_ledger["_embedded"]["records"][0]["base_fee_in_stroops"]
+                latest_ledger.raw_data["_embedded"]["records"][0]["base_fee_in_stroops"]
             )
         return base_fee
 

@@ -221,19 +221,19 @@ class TestBaseCallBuilder:
         resp = (
             BaseCallBuilder(url, client).limit(10).cursor(10086).order(desc=True).call()
         )
-        assert resp["args"] == {
+        assert resp.raw_data["args"] == {
             "auth": "myPassw0wd",
             "cursor": "10086",
             "limit": "10",
             "order": "desc",
             "version": "1.2",
         }
-        assert resp["headers"][
+        assert resp.raw_data["headers"][
             "User-Agent"
         ] == "py-stellar-sdk/{}/RequestsClient".format(__version__)
-        assert resp["headers"]["X-Client-Name"] == "py-stellar-sdk"
-        assert resp["headers"]["X-Client-Version"] == __version__
+        assert resp.raw_data["headers"]["X-Client-Name"] == "py-stellar-sdk"
+        assert resp.raw_data["headers"]["X-Client-Version"] == __version__
         assert (
-            resp["url"]
+            resp.raw_data["url"]
             == "https://httpbin.org/get?version=1.2&auth=myPassw0wd&limit=10&cursor=10086&order=desc"
         )
