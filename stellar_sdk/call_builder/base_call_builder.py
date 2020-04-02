@@ -7,15 +7,26 @@ from typing import (
     Generator,
     AsyncGenerator,
     Optional,
+    TypeVar,
+    Generic,
+    Type,
+    Callable,
 )
 from urllib.parse import urljoin
 
+from pydantic import BaseModel
+
+from ..__version__ import __issues__
 from ..client.base_async_client import BaseAsyncClient
 from ..client.base_sync_client import BaseSyncClient
 from ..exceptions import raise_request_exception, NotPageableError
+from ..response.wrapped_response import WrappedResponse
+
+T = TypeVar("T")
+S = TypeVar('S', bound='BaseCallBuilder')
 
 
-class BaseCallBuilder:
+class BaseCallBuilder(Generic[T]):
     """Creates a new :class:`BaseCallBuilder` pointed to server defined by horizon_url.
 
     This is an **abstract** class. Do not create this object directly, use :class:`stellar_sdk.server.Server` class.
@@ -39,7 +50,9 @@ class BaseCallBuilder:
         self.prev_href: Optional[str] = None
         self.next_href: Optional[str] = None
 
-    def call(self) -> Union[Dict[str, Any], Coroutine[Any, Any, Dict[str, Any]]]:
+    def call(
+        self
+    ) -> Union[WrappedResponse[T], Coroutine[Any, Any, WrappedResponse[T]]]:
         """Triggers a HTTP request using this builder's current configuration.
 
         :return: If it is called synchronous, the response will be returned. If
@@ -55,32 +68,64 @@ class BaseCallBuilder:
                 please submit an issue
         """
         url = urljoin(self.horizon_url, self.endpoint)
-        return self.__call(url, self.params)
+        return self._call(url, self.params)
 
-    def __call(self, url: str, params: dict = None):
+    def _call(
+        self, url: str, params: dict = None
+    ) -> Union[WrappedResponse[T], Coroutine[Any, Any, WrappedResponse[T]]]:
         if self.__async:
-            return self.__call_async(url, params)
+            return self._call_async(url, params)
         else:
-            return self.__call_sync(url, params)
+            return self._call_sync(url, params)
 
-    def __call_sync(self, url: str, params: dict = None) -> Dict[str, Any]:
+    def _call_sync(self, url: str, params: dict = None) -> WrappedResponse[T]:
         raw_resp = self.client.get(url, params)
         raise_request_exception(raw_resp)
         resp = raw_resp.json()
-        self._check_pageable(resp)
-        return resp
+        self._set_page_link(resp)
+        return WrappedResponse(resp, self._parse_response)
 
-    async def __call_async(self, url: str, params: dict = None) -> Dict[str, Any]:
+    async def _call_async(self, url: str, params: dict = None) -> WrappedResponse[T]:
         raw_resp = await self.client.get(url, params)
         raise_request_exception(raw_resp)
         resp = raw_resp.json()
-        self._check_pageable(resp)
-        return resp
+        self._set_page_link(resp)
+        return WrappedResponse(resp, self._parse_response)
 
-    def stream(
+    def _parse_response(self, raw_data):
+        raise NotImplementedError(
+            "This endpoint has not implemented this feature, "
+            "please submit an issue: %s" % __issues__
+        )
+
+    def _base_parse_response(
+        self,
+        raw_data,
+        model: Type[BaseModel] = None,
+        model_selector: Callable[[dict], Type[BaseModel]] = None,
+    ):
+        if self._check_pageable(raw_data):
+            if model_selector is not None:
+                parsed = [
+                    model_selector(record).parse_obj(record)
+                    for record in raw_data["_embedded"]["records"]
+                ]
+            else:
+                parsed = [
+                    model.parse_obj(record)
+                    for record in raw_data["_embedded"]["records"]
+                ]
+        else:
+            if model_selector is not None:
+                parsed = model_selector(raw_data).parse_obj(raw_data)
+            else:
+                parsed = model.parse_obj(raw_data)
+        return parsed
+
+    def _stream(
         self
     ) -> Union[
-        AsyncGenerator[Dict[str, Any], None], Generator[Dict[str, Any], None, None]
+        AsyncGenerator[WrappedResponse, None], Generator[WrappedResponse, None, None]
     ]:
         """Creates an EventSource that listens for incoming messages from the server.
 
@@ -92,21 +137,23 @@ class BaseCallBuilder:
             it is called asynchronously, it will return ``AsyncGenerator``.
         """
         if self.__async:
-            return self.__stream_async()
+            return self._stream_async()
         else:
-            return self.__stream_sync()
+            return self._stream_sync()
 
-    async def __stream_async(self) -> AsyncGenerator[Dict[str, Any], None]:
+    async def _stream_async(self) -> AsyncGenerator[WrappedResponse, None]:
         url = urljoin(self.horizon_url, self.endpoint)
         stream = self.client.stream(url, self.params)
         while True:
-            yield await stream.__anext__()
+            yield self._parse_response(await stream.__anext__())
 
-    def __stream_sync(self) -> Generator[Dict[str, Any], None, None]:
+    def _stream_sync(self) -> Generator[WrappedResponse, None, None]:
         url = urljoin(self.horizon_url, self.endpoint)
-        return self.client.stream(url, self.params)
+        stream = self.client.stream(url, self.params)
+        while True:
+            yield self._parse_response(stream.__next__())
 
-    def cursor(self, cursor: Union) -> "BaseCallBuilder":
+    def cursor(self, cursor: Union) -> S:
         """Sets ``cursor`` parameter for the current call. Returns the CallBuilder object on which this method has been called.
 
         See `Paging <https://www.stellar.org/developers/horizon/reference/paging.html>`_
@@ -117,7 +164,7 @@ class BaseCallBuilder:
         self._add_query_param("cursor", cursor)
         return self
 
-    def limit(self, limit: int) -> "BaseCallBuilder":
+    def limit(self, limit: int) -> S:
         """Sets ``limit`` parameter for the current call. Returns the CallBuilder object on which this method has been called.
 
         See `Paging <https://www.stellar.org/developers/horizon/reference/paging.html>`_
@@ -128,7 +175,7 @@ class BaseCallBuilder:
         self._add_query_param("limit", limit)
         return self
 
-    def order(self, desc: bool = True) -> "BaseCallBuilder":
+    def order(self, desc: bool = True) -> S:
         """Sets ``order`` parameter for the current call. Returns the CallBuilder object on which this method has been called.
 
         :param desc: Sort direction, ``True`` to get desc sort direction, the default setting is ``True``.
@@ -140,17 +187,17 @@ class BaseCallBuilder:
         self._add_query_param("order", order)
         return self
 
-    def next(self):
+    def next(self) -> Union[WrappedResponse[T], Coroutine[Any, Any, WrappedResponse[T]]]:
         if self.next_href is None:
             raise NotPageableError("The next page does not exist.")
-        return self.__call(self.next_href, None)
+        return self._call(self.next_href, None)
 
-    def prev(self):
+    def prev(self) -> Union[WrappedResponse[T], Coroutine[Any, Any, WrappedResponse[T]]]:
         if self.next_href is None:
             raise NotPageableError("The prev page does not exist.")
-        return self.__call(self.prev_href, None)
+        return self._call(self.prev_href, None)
 
-    def _add_query_param(self, key: str, value: Union[str, float, int, bool, None]):
+    def _add_query_param(self, key: str, value: Union[str, float, int, bool, None]) -> None:
         if value is None:
             pass
         elif value is True:
@@ -160,7 +207,7 @@ class BaseCallBuilder:
         else:
             self.params[key] = str(value)
 
-    def _check_pageable(self, response: dict) -> None:
+    def _set_page_link(self, response: dict) -> None:
         links = response.get("_links")
         if not links:
             return
@@ -170,6 +217,11 @@ class BaseCallBuilder:
             self.prev_href = prev_page.get("href")
         if next_page:
             self.next_href = next_page.get("href")
+
+    def _check_pageable(self, raw_data: dict) -> bool:
+        if "_embedded" in raw_data.keys() and "records" in raw_data["_embedded"].keys():
+            return True
+        return False
 
     def _add_query_params(
         self, params: Mapping[str, Union[str, float, int, bool, None]]

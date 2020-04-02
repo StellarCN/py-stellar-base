@@ -79,7 +79,6 @@ class TestMemo:
         ):
             IdMemo(id)
 
-
     def test_hash_memo(self):
         hex = "573c10b148fc4bc7db97540ce49da22930f4bcd48a060dc7347be84ea9f52d9f"
         xdr = "AAAAA1c8ELFI/EvH25dUDOSdoikw9LzUigYNxzR76E6p9S2f"
@@ -96,7 +95,9 @@ class TestMemo:
         length = 33
         with pytest.raises(
             MemoInvalidException,
-            match="The length of HashMemo should be 32 bytes, got {:d} bytes.".format(length),
+            match="The length of HashMemo should be 32 bytes, got {:d} bytes.".format(
+                length
+            ),
         ):
             HashMemo(os.urandom(length))
 
@@ -104,7 +105,9 @@ class TestMemo:
         length = 16
         with pytest.raises(
             MemoInvalidException,
-            match="The length of HashMemo should be 32 bytes, got {:d} bytes.".format(length),
+            match="The length of HashMemo should be 32 bytes, got {:d} bytes.".format(
+                length
+            ),
         ):
             HashMemo(os.urandom(length))
 

@@ -1,0 +1,22 @@
+{
+  "_links": {
+    "operation": {
+      "href": "https://horizon.stellar.org/operations/120227275760422913"
+    },
+    "succeeds": {
+      "href": "https://horizon.stellar.org/effects?order=desc&cursor=120227275760422913-1"
+    },
+    "precedes": {
+      "href": "https://horizon.stellar.org/effects?order=asc&cursor=120227275760422913-1"
+    }
+  },
+  "id": "0120227275760422913-0000000001",
+  "paging_token": "120227275760422913-1",
+  "account": "GB6DNEWWSSPQAX7SR5MCWUTRVQPJBAERJTUQAZOVXXJDU2E6PIMKGMO2",
+  "type": "account_thresholds_updated",
+  "type_i": 4,
+  "created_at": "2020-01-30T08:50:24Z",
+  "low_threshold": 20,
+  "med_threshold": 20,
+  "high_threshold": 20
+}

@@ -1,0 +1,23 @@
+{
+  "_links": {
+    "operation": {
+      "href": "https://horizon.stellar.org/operations/120166386009047042"
+    },
+    "succeeds": {
+      "href": "https://horizon.stellar.org/effects?order=desc&cursor=120166386009047042-1"
+    },
+    "precedes": {
+      "href": "https://horizon.stellar.org/effects?order=asc&cursor=120166386009047042-1"
+    }
+  },
+  "id": "0120166386009047042-0000000001",
+  "paging_token": "120166386009047042-1",
+  "account": "GCHAAFV7NHSFOVBKBR4HU2I52ZBTYFUNPOLHQTEITOY66AV3J4FR56JJ",
+  "type": "trustline_removed",
+  "type_i": 21,
+  "created_at": "2020-01-29T09:54:02Z",
+  "asset_type": "credit_alphanum4",
+  "asset_code": "HOT",
+  "asset_issuer": "GB6DMQ5IZUPRRMNTPU4H5FX32DRYCZ447REBEQ32YGVPPGZI5MX4AHOT",
+  "limit": "0.0000000"
+}

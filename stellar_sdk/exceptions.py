@@ -29,6 +29,7 @@ __all__ = [
     "BadResponseError",
     "UnknownRequestError",
     "NotPageableError",
+    "ParseResponseError",
 ]
 
 
@@ -183,6 +184,11 @@ class UnknownRequestError(BaseHorizonError):
 
 class NotPageableError(BaseRequestError):
     """There is no previous or next page
+    """
+
+
+class ParseResponseError(SdkError):
+    """This error occurs when parsing the response fails, please try upgrading the SDK
     """
 
 

@@ -1,12 +1,16 @@
-from typing import Union
+from typing import Union, TypeVar, List, AsyncGenerator, Generator
 
 from ..asset import Asset
 from ..call_builder.base_call_builder import BaseCallBuilder
 from ..client.base_async_client import BaseAsyncClient
 from ..client.base_sync_client import BaseSyncClient
+from ..response.orderbook_response import OrderbookResponse
+from ..response.wrapped_response import WrappedResponse
+
+T = TypeVar("T")
 
 
-class OrderbookCallBuilder(BaseCallBuilder):
+class OrderbookCallBuilder(BaseCallBuilder[T]):
     """ Creates a new :class:`OrderbookCallBuilder` pointed to server defined by horizon_url.
     Do not create this object directly, use :func:`stellar_sdk.server.Server.orderbook`.
 
@@ -36,3 +40,14 @@ class OrderbookCallBuilder(BaseCallBuilder):
             "buying_asset_issuer": buying.issuer,
         }
         self._add_query_params(params)
+
+    def _parse_response(self, raw_data: dict) -> Union[OrderbookResponse]:
+        return self._base_parse_response(raw_data, OrderbookResponse)
+
+    def stream(
+        self
+    ) -> Union[
+        AsyncGenerator[WrappedResponse[OrderbookResponse], None],
+        Generator[WrappedResponse[OrderbookResponse], None, None],
+    ]:
+        return self._stream()

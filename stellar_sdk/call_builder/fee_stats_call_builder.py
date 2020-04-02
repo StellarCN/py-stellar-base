@@ -1,11 +1,14 @@
-from typing import Union
+from typing import Union, TypeVar
 
 from ..call_builder.base_call_builder import BaseCallBuilder
 from ..client.base_async_client import BaseAsyncClient
 from ..client.base_sync_client import BaseSyncClient
+from ..response.fee_stats_response import FeeStatsResponse
+
+T = TypeVar("T")
 
 
-class FeeStatsCallBuilder(BaseCallBuilder):
+class FeeStatsCallBuilder(BaseCallBuilder[T]):
     """ Creates a new :class:`FeeStatsCallBuilder` pointed to server defined by horizon_url.
     Do not create this object directly, use :func:`stellar_sdk.server.Server.fee_stats`.
 
@@ -20,3 +23,6 @@ class FeeStatsCallBuilder(BaseCallBuilder):
     ) -> None:
         super().__init__(horizon_url, client)
         self.endpoint: str = "fee_stats"
+
+    def _parse_response(self, raw_data: dict) -> FeeStatsResponse:
+        return self._base_parse_response(raw_data, FeeStatsResponse)

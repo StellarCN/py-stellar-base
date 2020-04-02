@@ -1,0 +1,60 @@
+{
+  "_links": {
+    "account": {
+      "href": "https://horizon.stellar.org/accounts/{account_id}",
+      "templated": true
+    },
+    "accounts": {
+      "href": "https://horizon.stellar.org/accounts{?signer,asset,cursor,limit,order}",
+      "templated": true
+    },
+    "account_transactions": {
+      "href": "https://horizon.stellar.org/accounts/{account_id}/transactions{?cursor,limit,order}",
+      "templated": true
+    },
+    "assets": {
+      "href": "https://horizon.stellar.org/assets{?asset_code,asset_issuer,cursor,limit,order}",
+      "templated": true
+    },
+    "offer": {
+      "href": "https://horizon.stellar.org/offers/{offer_id}",
+      "templated": true
+    },
+    "offers": {
+      "href": "https://horizon.stellar.org/offers{?selling,buying,seller,cursor,limit,order}",
+      "templated": true
+    },
+    "order_book": {
+      "href": "https://horizon.stellar.org/order_book{?selling_asset_type,selling_asset_code,selling_asset_issuer,buying_asset_type,buying_asset_code,buying_asset_issuer,limit}",
+      "templated": true
+    },
+    "self": {
+      "href": "https://horizon.stellar.org/"
+    },
+    "strict_receive_paths": {
+      "href": "https://horizon.stellar.org/paths/strict-receive{?source_assets,source_account,destination_account,destination_asset_type,destination_asset_issuer,destination_asset_code,destination_amount}",
+      "templated": true
+    },
+    "strict_send_paths": {
+      "href": "https://horizon.stellar.org/paths/strict-send{?destination_account,destination_assets,source_asset_type,source_asset_issuer,source_asset_code,source_amount}",
+      "templated": true
+    },
+    "transaction": {
+      "href": "https://horizon.stellar.org/transactions/{hash}",
+      "templated": true
+    },
+    "transactions": {
+      "href": "https://horizon.stellar.org/transactions{?cursor,limit,order}",
+      "templated": true
+    }
+  },
+  "horizon_version": "1.0.0-948d8d1221abd4f15cac2d3a9eb44b31633cd3b9",
+  "core_version": "stellar-core 12.4.0 (c0136139802ac1a1ac8899424e7888fa9366414e)",
+  "ingest_latest_ledger": 28566433,
+  "history_latest_ledger": 28566433,
+  "history_elder_ledger": 1,
+  "core_latest_ledger": 28566433,
+  "network_passphrase": "Public Global Stellar Network ; September 2015",
+  "current_protocol_version": 12,
+  "core_supported_protocol_version": 12
+}

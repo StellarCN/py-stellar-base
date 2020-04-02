@@ -1,14 +1,17 @@
 import warnings
-from typing import Union
+from typing import Union, TypeVar, List
 
 from ..asset import Asset
 from ..call_builder.base_call_builder import BaseCallBuilder
 from ..client.base_async_client import BaseAsyncClient
 from ..client.base_sync_client import BaseSyncClient
+from ..response.account_response import AccountResponse
 from ..utils import convert_assets_to_horizon_param
 
+T = TypeVar("T")
 
-class AccountsCallBuilder(BaseCallBuilder):
+
+class AccountsCallBuilder(BaseCallBuilder[T]):
     """ Creates a new :class:`AccountsCallBuilder` pointed to server defined by horizon_url.
     Do not create this object directly, use :func:`stellar_sdk.server.Server.accounts`.
 
@@ -22,7 +25,7 @@ class AccountsCallBuilder(BaseCallBuilder):
         super().__init__(horizon_url, client)
         self.endpoint: str = "accounts"
 
-    def account_id(self, account_id: str) -> "AccountsCallBuilder":
+    def account_id(self, account_id: str) -> "AccountsCallBuilder[AccountResponse]":
         """Returns information and links relating to a single account.
         The balances section in the returned JSON will also list all the trust lines this account has set up.
 
@@ -34,7 +37,7 @@ class AccountsCallBuilder(BaseCallBuilder):
         self.endpoint = "accounts/{account_id}".format(account_id=account_id)
         return self
 
-    def signer(self, signer: str) -> "AccountsCallBuilder":
+    def signer(self, signer: str) -> "AccountsCallBuilder[T]":
         """Filtering accounts who have a given signer. The result is a list of accounts.
 
         See `Account Details <https://www.stellar.org/developers/horizon/reference/endpoints/accounts-single.html>`_
@@ -48,7 +51,7 @@ class AccountsCallBuilder(BaseCallBuilder):
         )
         return self.for_signer(signer)
 
-    def for_signer(self, signer: str) -> "AccountsCallBuilder":
+    def for_signer(self, signer: str) -> "AccountsCallBuilder[T]":
         """Filtering accounts who have a given signer. The result is a list of accounts.
 
         See `Account Details <https://www.stellar.org/developers/horizon/reference/endpoints/accounts-single.html>`_
@@ -59,7 +62,7 @@ class AccountsCallBuilder(BaseCallBuilder):
         self._add_query_param("signer", signer)
         return self
 
-    def asset(self, asset: Asset) -> "AccountsCallBuilder":
+    def asset(self, asset: Asset) -> "AccountsCallBuilder[T]":
         """Filtering accounts who have a trustline to an asset. The result is a list of accounts.
 
         See `Account Details <https://www.stellar.org/developers/horizon/reference/endpoints/accounts-single.html>`_
@@ -73,7 +76,7 @@ class AccountsCallBuilder(BaseCallBuilder):
         )
         return self.for_asset(asset)
 
-    def for_asset(self, asset: Asset) -> "AccountsCallBuilder":
+    def for_asset(self, asset: Asset) -> "AccountsCallBuilder[T]":
         """Filtering accounts who have a trustline to an asset. The result is a list of accounts.
 
         See `Account Details <https://www.stellar.org/developers/horizon/reference/endpoints/accounts-single.html>`_
@@ -84,3 +87,8 @@ class AccountsCallBuilder(BaseCallBuilder):
         assets_param = convert_assets_to_horizon_param([asset])
         self._add_query_param("asset", assets_param)
         return self
+
+    def _parse_response(
+        self, raw_data: dict
+    ) -> Union[List[AccountResponse], AccountResponse]:
+        return self._base_parse_response(raw_data, AccountResponse)

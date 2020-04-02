@@ -1,0 +1,28 @@
+{
+  "_links": {
+    "self": {
+      "href": "https://horizon.stellar.org/operations/119110124701929473"
+    },
+    "transaction": {
+      "href": "https://horizon.stellar.org/transactions/eaab57a82595474137b1c3eb1d1db0e5d11655f0e5c5510f0585226ae3f4f0a4"
+    },
+    "effects": {
+      "href": "https://horizon.stellar.org/operations/119110124701929473/effects"
+    },
+    "succeeds": {
+      "href": "https://horizon.stellar.org/effects?order=desc&cursor=119110124701929473"
+    },
+    "precedes": {
+      "href": "https://horizon.stellar.org/effects?order=asc&cursor=119110124701929473"
+    }
+  },
+  "id": "119110124701929473",
+  "paging_token": "119110124701929473",
+  "transaction_successful": true,
+  "source_account": "GDYU74IOOVG4YXO4MZNAROQ35GD5TNWCENELYC4HTGHTOLJLYSBRR4EZ",
+  "type": "bump_sequence",
+  "type_i": 11,
+  "created_at": "2020-01-13T10:09:45Z",
+  "transaction_hash": "eaab57a82595474137b1c3eb1d1db0e5d11655f0e5c5510f0585226ae3f4f0a4",
+  "bump_to": "116589962446506985"
+}

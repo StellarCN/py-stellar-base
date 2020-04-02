@@ -1,0 +1,33 @@
+{
+  "_links": {
+    "self": {
+      "href": "https://horizon.stellar.org/operations/120227323005083649"
+    },
+    "transaction": {
+      "href": "https://horizon.stellar.org/transactions/5cc4e9f3bcfd71212e763a9a8897c9593e9689badda261287ea2f48b668955ae"
+    },
+    "effects": {
+      "href": "https://horizon.stellar.org/operations/120227323005083649/effects"
+    },
+    "succeeds": {
+      "href": "https://horizon.stellar.org/effects?order=desc&cursor=120227323005083649"
+    },
+    "precedes": {
+      "href": "https://horizon.stellar.org/effects?order=asc&cursor=120227323005083649"
+    }
+  },
+  "id": "120227323005083649",
+  "paging_token": "120227323005083649",
+  "transaction_successful": true,
+  "source_account": "GD33AD7P7JP4UNDPDXN2PD2WP7UZJBDN5D4TKK3SG4WLPPL3BVRFL2OO",
+  "type": "change_trust",
+  "type_i": 6,
+  "created_at": "2020-01-30T08:51:25Z",
+  "transaction_hash": "5cc4e9f3bcfd71212e763a9a8897c9593e9689badda261287ea2f48b668955ae",
+  "asset_type": "credit_alphanum12",
+  "asset_code": "XMATK",
+  "asset_issuer": "GAB66NHLWO2X4CEO6V6KOO3MCHGX6ZTU6PIG32PEFR4L3R7U4PWFIAS7",
+  "limit": "100000000.0000000",
+  "trustee": "GAB66NHLWO2X4CEO6V6KOO3MCHGX6ZTU6PIG32PEFR4L3R7U4PWFIAS7",
+  "trustor": "GD33AD7P7JP4UNDPDXN2PD2WP7UZJBDN5D4TKK3SG4WLPPL3BVRFL2OO"
+}

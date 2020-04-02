@@ -1,13 +1,17 @@
 import warnings
-from typing import Union
+from typing import Union, TypeVar, List, AsyncGenerator, Generator
 
 from ..asset import Asset
 from ..call_builder import BaseCallBuilder
 from ..client.base_async_client import BaseAsyncClient
 from ..client.base_sync_client import BaseSyncClient
+from ..response.offer_response import OfferResponse
+from ..response.wrapped_response import WrappedResponse
+
+T = TypeVar("T")
 
 
-class OffersCallBuilder(BaseCallBuilder):
+class OffersCallBuilder(BaseCallBuilder[T]):
     """ Creates a new :class:`OffersCallBuilder` pointed to server defined by horizon_url.
     Do not create this object directly, use :func:`stellar_sdk.server.Server.offers`.
 
@@ -24,7 +28,7 @@ class OffersCallBuilder(BaseCallBuilder):
         super().__init__(horizon_url, client)
         self.endpoint: str = "offers"
 
-    def account(self, account_id):
+    def account(self, account_id) -> "OffersCallBuilder[T]":
         """Returns all offers where the given account is the seller.
 
         See `Offers for Account <https://www.stellar.org/developers/horizon/reference/endpoints/offers-for-account.html>`_
@@ -39,7 +43,7 @@ class OffersCallBuilder(BaseCallBuilder):
         self.endpoint = "accounts/{account_id}/offers".format(account_id=account_id)
         return self
 
-    def for_seller(self, seller: str):
+    def for_seller(self, seller: str) -> "OffersCallBuilder[T]":
         """Returns all offers where the given account is the seller.
 
         People on the Stellar network can make offers to buy or sell assets.
@@ -55,7 +59,7 @@ class OffersCallBuilder(BaseCallBuilder):
         self._add_query_param("seller", seller)
         return self
 
-    def for_buying(self, buying: Asset):
+    def for_buying(self, buying: Asset) -> "OffersCallBuilder[T]":
         """Returns all offers buying an asset.
 
         People on the Stellar network can make offers to buy or sell assets.
@@ -75,7 +79,7 @@ class OffersCallBuilder(BaseCallBuilder):
         self._add_query_params(params)
         return self
 
-    def for_selling(self, selling: Asset):
+    def for_selling(self, selling: Asset) -> "OffersCallBuilder[T]":
         """Returns all offers selling an asset.
 
         People on the Stellar network can make offers to buy or sell assets.
@@ -95,7 +99,7 @@ class OffersCallBuilder(BaseCallBuilder):
         self._add_query_params(params)
         return self
 
-    def offer(self, offer_id: Union[str, int]):
+    def offer(self, offer_id: Union[str, int]) -> "OffersCallBuilder[OfferResponse]":
         """Returns information and links relating to a single offer.
 
         See `Offer Details <https://www.stellar.org/developers/horizon/reference/endpoints/offer-details.html>`_
@@ -105,3 +109,16 @@ class OffersCallBuilder(BaseCallBuilder):
         """
         self.endpoint = "offers/{offer}".format(offer=offer_id)
         return self
+
+    def _parse_response(
+        self, raw_data: dict
+    ) -> Union[List[OfferResponse], OfferResponse]:
+        return self._base_parse_response(raw_data, OfferResponse)
+
+    def stream(
+        self
+    ) -> Union[
+        AsyncGenerator[WrappedResponse[OfferResponse], None],
+        Generator[WrappedResponse[OfferResponse], None, None],
+    ]:
+        return self._stream()

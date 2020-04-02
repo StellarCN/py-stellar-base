@@ -1,0 +1,23 @@
+{
+  "_links": {
+    "operation": {
+      "href": "https://horizon.stellar.org/operations/118954097129975809"
+    },
+    "succeeds": {
+      "href": "https://horizon.stellar.org/effects?order=desc&cursor=118954097129975809-2"
+    },
+    "precedes": {
+      "href": "https://horizon.stellar.org/effects?order=asc&cursor=118954097129975809-2"
+    }
+  },
+  "id": "0118954097129975809-0000000002",
+  "paging_token": "118954097129975809-2",
+  "account": "GDQWI6FKB72DPOJE4CGYCFQZKRPQQIOYXRMZ5KEVGXMG6UUTGJMBCASH",
+  "type": "account_debited",
+  "type_i": 3,
+  "created_at": "2020-01-11T02:43:58Z",
+  "asset_type": "credit_alphanum4",
+  "asset_code": "NODL",
+  "asset_issuer": "GB2Y3AWXVROM2BHFQKQPTWKIOI3TZEBBD3LTKTVQTKEPXGOBE742NODL",
+  "amount": "0.0000006"
+}

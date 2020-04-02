@@ -1,0 +1,20 @@
+{
+  "_links": {
+    "operation": {
+      "href": "https://horizon.stellar.org/operations/118763228783194113"
+    },
+    "succeeds": {
+      "href": "https://horizon.stellar.org/effects?order=desc&cursor=118763228783194113-2"
+    },
+    "precedes": {
+      "href": "https://horizon.stellar.org/effects?order=asc&cursor=118763228783194113-2"
+    }
+  },
+  "id": "0118763228783194113-0000000002",
+  "paging_token": "118763228783194113-2",
+  "account": "GBPQ4WWIXSZMSJ52372XVLMWEXXCNP66GR5TMFWRYJMTARSW2W3W4HNA",
+  "type": "account_flags_updated",
+  "type_i": 6,
+  "created_at": "2020-01-08T06:37:15Z",
+  "auth_required_flag": true
+}

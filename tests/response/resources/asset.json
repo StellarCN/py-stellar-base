@@ -1,0 +1,18 @@
+{
+  "_links": {
+    "toml": {
+      "href": "https://fchain.io/.well-known/stellar.toml"
+    }
+  },
+  "asset_type": "credit_alphanum4",
+  "asset_code": "XCN",
+  "asset_issuer": "GCNY5OXYSY4FKHOPT2SPOQZAOEIGXB5LBYW3HVU3OWSTQITS65M5RCNY",
+  "paging_token": "XCN_GCNY5OXYSY4FKHOPT2SPOQZAOEIGXB5LBYW3HVU3OWSTQITS65M5RCNY_credit_alphanum4",
+  "amount": "29982872.8993832",
+  "num_accounts": 10399,
+  "flags": {
+    "auth_required": false,
+    "auth_revocable": false,
+    "auth_immutable": false
+  }
+}

@@ -13,7 +13,6 @@ from .call_builder.ledgers_call_builder import LedgersCallBuilder
 from .call_builder.offers_call_builder import OffersCallBuilder
 from .call_builder.operations_call_builder import OperationsCallBuilder
 from .call_builder.orderbook_call_builder import OrderbookCallBuilder
-from .call_builder.paths_call_builder import PathsCallBuilder
 from .call_builder.payments_call_builder import PaymentsCallBuilder
 from .call_builder.root_call_builder import RootCallBuilder
 from .call_builder.strict_receive_paths_call_builder import (
@@ -23,6 +22,25 @@ from .call_builder.strict_send_paths_call_builder import StrictSendPathsCallBuil
 from .call_builder.trades_aggregation_call_builder import TradeAggregationsCallBuilder
 from .call_builder.trades_call_builder import TradesCallBuilder
 from .call_builder.transactions_call_builder import TransactionsCallBuilder
+from .response.account_response import AccountResponse
+from .response.asset_response import AssetResponse
+from .response.data_response import DataResponse
+from .response.effect_response import EFFECT_RESPONSE_TYPE_UNION
+from .response.fee_stats_response import FeeStatsResponse
+from .response.ledger_response import LedgerResponse
+from .response.offer_response import OfferResponse
+from .response.operation_response import (
+    OPERATION_RESPONSE_TYPE_UNION,
+    PAYMENT_RESPONSE_TYPE_UNION,
+)
+from .response.orderbook_response import OrderbookResponse
+from .response.payment_path_response import PaymentPathResponse
+from .response.root_response import RootResponse
+from .response.submit_response import TransactionSuccessResponse
+from .response.trade_response import TradeResponse
+from .response.trades_aggregation_response import TradesAggregationResponse
+from .response.transaction_response import TransactionResponse
+from .response.wrapped_response import WrappedResponse
 from .client.base_async_client import BaseAsyncClient
 from .client.base_sync_client import BaseSyncClient
 from .client.requests_client import RequestsClient
@@ -72,7 +90,10 @@ class Server:
 
     def submit_transaction(
         self, transaction_envelope: Union[TransactionEnvelope, str]
-    ) -> Union[Dict[str, Any], Coroutine[Any, Any, Dict[str, Any]]]:
+    ) -> Union[
+        WrappedResponse[TransactionSuccessResponse],
+        Coroutine[Any, Any, WrappedResponse[TransactionSuccessResponse]],
+    ]:
         """Submits a transaction to the network.
 
         :param transaction_envelope: :class:`stellar_sdk.transaction_envelope.TransactionEnvelope` object
@@ -91,40 +112,43 @@ class Server:
 
     def __submit_transaction_sync(
         self, url: str, data: Dict[str, str]
-    ) -> Dict[str, Any]:
+    ) -> WrappedResponse[TransactionSuccessResponse]:
         resp = self._client.post(url=url, data=data)
         raise_request_exception(resp)
-        return resp.json()
+        return WrappedResponse(resp.json(), self._parse_success_transaction)
 
     async def __submit_transaction_async(
         self, url: str, data: Dict[str, str]
-    ) -> Dict[str, Any]:
+    ) -> WrappedResponse[TransactionSuccessResponse]:
         resp = await self._client.post(url=url, data=data)
         raise_request_exception(resp)
-        return resp.json()
+        return WrappedResponse(resp.json(), self._parse_success_transaction)
 
-    def root(self) -> RootCallBuilder:
+    def _parse_success_transaction(self, raw_data: dict) -> TransactionSuccessResponse:
+        return TransactionSuccessResponse.parse_obj(raw_data)
+
+    def root(self) -> RootCallBuilder[RootResponse]:
         """
         :return: New :class:`stellar_sdk.call_builder.RootCallBuilder` object configured
             by a current Horizon server configuration.
         """
         return RootCallBuilder(horizon_url=self.horizon_url, client=self._client)
 
-    def accounts(self) -> AccountsCallBuilder:
+    def accounts(self) -> AccountsCallBuilder[List[AccountResponse]]:
         """
         :return: New :class:`stellar_sdk.call_builder.AccountsCallBuilder` object configured
             by a current Horizon server configuration.
         """
         return AccountsCallBuilder(horizon_url=self.horizon_url, client=self._client)
 
-    def assets(self) -> AssetsCallBuilder:
+    def assets(self) -> AssetsCallBuilder[List[AssetResponse]]:
         """
         :return: New :class:`stellar_sdk.call_builder.AssetsCallBuilder` object configured by
             a current Horizon server configuration.
         """
         return AssetsCallBuilder(horizon_url=self.horizon_url, client=self._client)
 
-    def data(self, account_id: str, data_name: str):
+    def data(self, account_id: str, data_name: str) -> DataCallBuilder[DataResponse]:
         """
         :return: New :class:`stellar_sdk.call_builder.DataCallBuilder` object configured by
             a current Horizon server configuration.
@@ -136,42 +160,44 @@ class Server:
             data_name=data_name,
         )
 
-    def effects(self) -> EffectsCallBuilder:
+    def effects(self) -> EffectsCallBuilder[List[EFFECT_RESPONSE_TYPE_UNION]]:
         """
         :return: New :class:`stellar_sdk.call_builder.EffectsCallBuilder` object configured by
             a current Horizon server configuration.
         """
         return EffectsCallBuilder(horizon_url=self.horizon_url, client=self._client)
 
-    def fee_stats(self) -> FeeStatsCallBuilder:
+    def fee_stats(self) -> FeeStatsCallBuilder[FeeStatsResponse]:
         """
         :return: New :class:`stellar_sdk.call_builder.FeeStatsCallBuilder` object configured by
             a current Horizon server configuration.
         """
         return FeeStatsCallBuilder(horizon_url=self.horizon_url, client=self._client)
 
-    def ledgers(self) -> LedgersCallBuilder:
+    def ledgers(self) -> LedgersCallBuilder[List[LedgerResponse]]:
         """
         :return: New :class:`stellar_sdk.call_builder.LedgersCallBuilder` object configured by
             a current Horizon server configuration.
         """
         return LedgersCallBuilder(horizon_url=self.horizon_url, client=self._client)
 
-    def offers(self) -> OffersCallBuilder:
+    def offers(self) -> OffersCallBuilder[List[OfferResponse]]:
         """
         :return: New :class:`stellar_sdk.call_builder.OffersCallBuilder` object configured by
             a current Horizon server configuration.
         """
         return OffersCallBuilder(horizon_url=self.horizon_url, client=self._client)
 
-    def operations(self) -> OperationsCallBuilder:
+    def operations(self) -> OperationsCallBuilder[List[OPERATION_RESPONSE_TYPE_UNION]]:
         """
         :return: New :class:`stellar_sdk.call_builder.OperationsCallBuilder` object configured by
             a current Horizon server configuration.
         """
         return OperationsCallBuilder(horizon_url=self.horizon_url, client=self._client)
 
-    def orderbook(self, selling: Asset, buying: Asset) -> OrderbookCallBuilder:
+    def orderbook(
+        self, selling: Asset, buying: Asset
+    ) -> OrderbookCallBuilder[OrderbookResponse]:
         """
         :param selling: Asset being sold
         :param buying: Asset being bought
@@ -185,43 +211,12 @@ class Server:
             selling=selling,
         )
 
-    def paths(
-        self,
-        source_account: str,
-        destination_account: str,
-        destination_asset: Asset,
-        destination_amount: str,
-    ) -> PathsCallBuilder:
-        """
-        :param source_account: The sender's account ID. Any returned path must use a source that the sender can hold.
-        :param destination_account: The destination account ID that any returned path should use.
-        :param destination_asset: The destination asset.
-        :param destination_amount: The amount, denominated in the destination asset, that any returned path should be able to satisfy.
-        :return: New :class:`stellar_sdk.call_builder.PathsCallBuilder` object configured by
-            a current Horizon server configuration.
-        """
-
-        warnings.warn(
-            "Will be removed in version v2.3.0, "
-            "use stellar_sdk.server.strict_receive_paths",
-            DeprecationWarning,
-        )
-
-        return PathsCallBuilder(
-            horizon_url=self.horizon_url,
-            client=self._client,
-            source_account=source_account,
-            destination_account=destination_account,
-            destination_asset=destination_asset,
-            destination_amount=destination_amount,
-        )
-
     def strict_receive_paths(
         self,
         source: Union[str, List[Asset]],
         destination_asset: Asset,
         destination_amount: str,
-    ):
+    ) -> StrictReceivePathsCallBuilder[List[PaymentPathResponse]]:
         """
         :param source: The sender's account ID or a list of Assets. Any returned path must use a source that the sender can hold.
         :param destination_asset: The destination asset.
@@ -242,7 +237,7 @@ class Server:
         source_asset: Asset,
         source_amount: str,
         destination: Union[str, List[Asset]],
-    ):
+    ) -> StrictSendPathsCallBuilder[List[PaymentPathResponse]]:
         """
         :param source_asset: The asset to be sent.
         :param source_amount: The amount, denominated in the source asset, that any returned path should be able to satisfy.
@@ -258,7 +253,7 @@ class Server:
             destination=destination,
         )
 
-    def payments(self) -> PaymentsCallBuilder:
+    def payments(self) -> PaymentsCallBuilder[List[PAYMENT_RESPONSE_TYPE_UNION]]:
         """
         :return: New :class:`stellar_sdk.call_builder.PaymentsCallBuilder` object configured by
             a current Horizon server configuration.
@@ -273,7 +268,7 @@ class Server:
         start_time: int = None,
         end_time: int = None,
         offset: int = None,
-    ) -> TradeAggregationsCallBuilder:
+    ) -> TradeAggregationsCallBuilder[List[TradesAggregationResponse]]:
         """
         :param base: base asset
         :param counter: counter asset
@@ -299,14 +294,14 @@ class Server:
             offset=offset,
         )
 
-    def trades(self) -> TradesCallBuilder:
+    def trades(self) -> TradesCallBuilder[List[TradeResponse]]:
         """
         :return: New :class:`stellar_sdk.call_builder.TradesCallBuilder` object configured by
             a current Horizon server configuration.
         """
         return TradesCallBuilder(horizon_url=self.horizon_url, client=self._client)
 
-    def transactions(self) -> TransactionsCallBuilder:
+    def transactions(self) -> TransactionsCallBuilder[List[TransactionResponse]]:
         """
         :return: New :class:`stellar_sdk.call_builder.TransactionsCallBuilder` object configured by
             a current Horizon server configuration.
@@ -331,11 +326,11 @@ class Server:
             :exc:`UnknownRequestError <stellar_sdk.exceptions.UnknownRequestError>`
         """
         if self.__async:
-            return self.__load_account_async(account_id)
-        return self.__load_account_sync(account_id)
+            return self._load_account_async(account_id)
+        return self._load_account_sync(account_id)
 
-    async def __load_account_async(self, account_id: str) -> Account:
-        resp = await self.accounts().account_id(account_id=account_id).call()
+    async def _load_account_async(self, account_id: str) -> Account:
+        resp = (await self.accounts().account_id(account_id=account_id).call()).raw_data
         sequence = int(resp["sequence"])
         thresholds = Thresholds(
             resp["thresholds"]["low_threshold"],
@@ -347,8 +342,8 @@ class Server:
         account.thresholds = thresholds
         return account
 
-    def __load_account_sync(self, account_id: str) -> Account:
-        resp = self.accounts().account_id(account_id=account_id).call()
+    def _load_account_sync(self, account_id: str) -> Account:
+        resp = self.accounts().account_id(account_id=account_id).call().raw_data
         sequence = int(resp["sequence"])
         thresholds = Thresholds(
             resp["thresholds"]["low_threshold"],
@@ -373,20 +368,20 @@ class Server:
             :exc:`UnknownRequestError <stellar_sdk.exceptions.UnknownRequestError>`
         """
         if self.__async:
-            return self.__fetch_base_fee_async()
-        return self.__fetch_base_fee_sync()
+            return self._fetch_base_fee_async()
+        return self._fetch_base_fee_sync()
 
-    def __fetch_base_fee_sync(self) -> int:
+    def _fetch_base_fee_sync(self) -> int:
         latest_ledger = self.ledgers().order(desc=True).limit(1).call()
-        base_fee = self.__handle_base_fee(latest_ledger)
+        base_fee = self._handle_base_fee(latest_ledger.raw_data)
         return base_fee
 
-    async def __fetch_base_fee_async(self) -> int:
+    async def _fetch_base_fee_async(self) -> int:
         latest_ledger = await self.ledgers().order(desc=True).limit(1).call()
-        base_fee = self.__handle_base_fee(latest_ledger)
+        base_fee = self._handle_base_fee(latest_ledger.raw_data)
         return base_fee
 
-    def __handle_base_fee(self, latest_ledger: dict) -> int:
+    def _handle_base_fee(self, latest_ledger: dict) -> int:
         base_fee = 100
         if (
             latest_ledger["_embedded"]
@@ -404,14 +399,14 @@ class Server:
         Release all acquired resources.
         """
         if self.__async:
-            return self.__close_async()
+            return self._close_async()
         else:
-            return self.__close_sync()
+            return self._close_sync()
 
-    async def __close_async(self) -> None:
+    async def _close_async(self) -> None:
         await self._client.close()
 
-    def __close_sync(self) -> None:
+    def _close_sync(self) -> None:
         self._client.close()
 
     async def __aenter__(self) -> "Server":
