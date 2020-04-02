@@ -18,7 +18,7 @@ from stellar_sdk.operation.path_payment import PathPayment
 from stellar_sdk.operation.path_payment_strict_receive import PathPaymentStrictReceive
 from stellar_sdk.operation.path_payment_strict_send import PathPaymentStrictSend
 from stellar_sdk.operation.payment import Payment
-from stellar_sdk.operation.set_options import SetOptions
+from stellar_sdk.operation.set_options import SetOptions, Flag
 from stellar_sdk.operation.utils import (
     check_price,
     check_amount,
@@ -672,6 +672,21 @@ class TestSetOptions:
                 "GDGU5OAPHNPU5UCLE5RDJHG7PXZFQYWKCFOEXSXNMR6KRQRI5T6XXCD7",
                 AUTHORIZATION_REVOCABLE | AUTHORIZATION_IMMUTABLE,
                 AUTHORIZATION_REQUIRED,
+                0,
+                1,
+                2,
+                3,
+                "www.example.com",
+                Signer.ed25519_public_key(
+                    "GDGU5OAPHNPU5UCLE5RDJHG7PXZFQYWKCFOEXSXNMR6KRQRI5T6XXCD7", 1
+                ),
+                None,
+                "AAAAAAAAAAUAAAABAAAAAM1OuA87X07QSydiNJzfffJYYsoRXEvK7WR8qMIo7P17AAAAAQAAAAYAAAABAAAAAQAAAAEAAAAAAAAAAQAAAAEAAAABAAAAAgAAAAEAAAADAAAAAQAAAA93d3cuZXhhbXBsZS5jb20AAAAAAQAAAADNTrgPO19O0EsnYjSc333yWGLKEVxLyu1kfKjCKOz9ewAAAAE=",
+            ),
+            (
+                "GDGU5OAPHNPU5UCLE5RDJHG7PXZFQYWKCFOEXSXNMR6KRQRI5T6XXCD7",
+                Flag.AUTHORIZATION_REVOCABLE | Flag.AUTHORIZATION_IMMUTABLE,
+                Flag.AUTHORIZATION_REQUIRED,
                 0,
                 1,
                 2,

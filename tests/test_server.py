@@ -155,7 +155,7 @@ class TestServer:
         horizon_url = "https://horizon.stellar.org"
         client = RequestsClient()
         with Server(horizon_url, client) as server:
-            resp = server.submit_transaction(xdr)
+            resp = server.submit_transaction(xdr, True)
             assert resp.raw_data["envelope_xdr"] == xdr
             assert resp.parse().dict(exclude_unset=True, by_alias=True) == resp.raw_data
 
@@ -166,6 +166,6 @@ class TestServer:
         horizon_url = "https://horizon.stellar.org"
         client = AiohttpClient()
         async with Server(horizon_url, client) as server:
-            resp = await server.submit_transaction(te)
+            resp = await server.submit_transaction(te, True)
             assert resp.raw_data["envelope_xdr"] == xdr
             assert resp.parse().dict(exclude_unset=True, by_alias=True) == resp.raw_data

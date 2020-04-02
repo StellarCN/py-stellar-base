@@ -214,3 +214,26 @@ class TestBaseCallBuilder:
                 "href": "https://horizon.stellar.org/transactions?cursor=33676838572032&limit=10&order=desc"
             },
         }
+
+    def test_horizon_url_params(self):
+        url = "https://httpbin.org/get?version=1.2&auth=myPassw0wd"
+        client = RequestsClient()
+        resp = (
+            BaseCallBuilder(url, client).limit(10).cursor(10086).order(desc=True).call()
+        )
+        assert resp["args"] == {
+            "auth": "myPassw0wd",
+            "cursor": "10086",
+            "limit": "10",
+            "order": "desc",
+            "version": "1.2",
+        }
+        assert resp["headers"][
+            "User-Agent"
+        ] == "py-stellar-sdk/{}/RequestsClient".format(__version__)
+        assert resp["headers"]["X-Client-Name"] == "py-stellar-sdk"
+        assert resp["headers"]["X-Client-Version"] == __version__
+        assert (
+            resp["url"]
+            == "https://httpbin.org/get?version=1.2&auth=myPassw0wd&limit=10&cursor=10086&order=desc"
+        )

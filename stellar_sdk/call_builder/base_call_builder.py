@@ -12,7 +12,6 @@ from typing import (
     Type,
     Callable,
 )
-from urllib.parse import urljoin
 
 from pydantic import BaseModel
 
@@ -21,6 +20,7 @@ from ..client.base_async_client import BaseAsyncClient
 from ..client.base_sync_client import BaseSyncClient
 from ..exceptions import raise_request_exception, NotPageableError
 from ..response.wrapped_response import WrappedResponse
+from ..utils import urljoin_with_query
 
 T = TypeVar("T")
 S = TypeVar('S', bound='BaseCallBuilder')
@@ -67,7 +67,7 @@ class BaseCallBuilder(Generic[T]):
             | :exc:`UnknownRequestError <stellar_sdk.exceptions.UnknownRequestError>`: if an unknown error occurs,
                 please submit an issue
         """
-        url = urljoin(self.horizon_url, self.endpoint)
+        url = urljoin_with_query(self.horizon_url, self.endpoint)
         return self._call(url, self.params)
 
     def _call(
@@ -142,13 +142,13 @@ class BaseCallBuilder(Generic[T]):
             return self._stream_sync()
 
     async def _stream_async(self) -> AsyncGenerator[WrappedResponse, None]:
-        url = urljoin(self.horizon_url, self.endpoint)
+        url = urljoin_with_query(self.horizon_url, self.endpoint)
         stream = self.client.stream(url, self.params)
         while True:
             yield self._parse_response(await stream.__anext__())
 
     def _stream_sync(self) -> Generator[WrappedResponse, None, None]:
-        url = urljoin(self.horizon_url, self.endpoint)
+        url = urljoin_with_query(self.horizon_url, self.endpoint)
         stream = self.client.stream(url, self.params)
         while True:
             yield self._parse_response(stream.__next__())

@@ -1,4 +1,6 @@
 from typing import Optional
+from enum import IntFlag
+from typing import List, Optional, Union
 
 from .operation import Operation
 from .utils import check_ed25519_public_key
@@ -7,6 +9,18 @@ from ..signer import Signer
 from ..strkey import StrKey
 from ..xdr import xdr
 
+__all__ = ["Flag", "SetOptions"]
+
+
+class Flag(IntFlag):
+    """Indicates which flags to set. For details about the flags,
+    please refer to the `accounts doc <https://www.stellar.org/developers/guides/concepts/accounts.html>`_.
+    The bit mask integer adds onto the existing flags of the account.
+    """
+
+    AUTHORIZATION_REQUIRED = 1
+    AUTHORIZATION_REVOCABLE = 2
+    AUTHORIZATION_IMMUTABLE = 4
 
 class SetOptions(Operation):
     """The :class:`SetOptions` object, which represents a SetOptions operation
@@ -26,14 +40,16 @@ class SetOptions(Operation):
     :param clear_flags: Indicates which flags to clear. For details about the flags,
         please refer to the `accounts doc <https://www.stellar.org/developers/guides/concepts/accounts.html>`_.
         The `bit mask <https://en.wikipedia.org/wiki/Bit_field>`_ integer subtracts from the existing flags of the account.
-        This allows for setting specific bits without knowledge of existing flags.
+        This allows for setting specific bits without knowledge of existing flags, you can also use
+        :class:`stellar_sdk.operation.set_options.Flag`
         - AUTHORIZATION_REQUIRED = 1
         - AUTHORIZATION_REVOCABLE = 2
         - AUTHORIZATION_IMMUTABLE = 4
     :param set_flags: Indicates which flags to set. For details about the flags,
         please refer to the `accounts doc <https://www.stellar.org/developers/guides/concepts/accounts.html>`_.
         The bit mask integer adds onto the existing flags of the account.
-        This allows for setting specific bits without knowledge of existing flags.
+        This allows for setting specific bits without knowledge of existing flags, you can also use
+        :class:`stellar_sdk.operation.set_options.Flag`
         - AUTHORIZATION_REQUIRED = 1
         - AUTHORIZATION_REVOCABLE = 2
         - AUTHORIZATION_IMMUTABLE = 4
@@ -55,8 +71,8 @@ class SetOptions(Operation):
     def __init__(
         self,
         inflation_dest: str = None,
-        clear_flags: int = None,
-        set_flags: int = None,
+        clear_flags: Union[int, Flag] = None,
+        set_flags: Union[int, Flag] = None,
         master_weight: int = None,
         low_threshold: int = None,
         med_threshold: int = None,
@@ -68,6 +84,12 @@ class SetOptions(Operation):
         super().__init__(source)
         if inflation_dest is not None:
             check_ed25519_public_key(inflation_dest)
+
+        if isinstance(set_flags, Flag):
+            set_flags = set_flags.value
+
+        if isinstance(clear_flags, Flag):
+            clear_flags = clear_flags.value
 
         self.inflation_dest: str = inflation_dest
         self.clear_flags: int = clear_flags
