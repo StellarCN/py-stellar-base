@@ -72,7 +72,7 @@ class PaymentOperationResponse(BaseOperationResponse):
         None,
         alias="from",
         description="This variable should be called `from`, "
-                    "but `from` is a keyword in Python, so we named it `from_`.",
+        "but `from` is a keyword in Python, so we named it `from_`.",
     )
     to: str
     amount: str
@@ -89,7 +89,7 @@ class PathPaymentStrictReceiveOperationResponse(BaseOperationResponse):
         None,
         alias="from",
         description="This variable should be called `from`, "
-                    "but `from` is a keyword in Python, so we named it` from_`.",
+        "but `from` is a keyword in Python, so we named it` from_`.",
     )
     to: str
     amount: str
@@ -112,7 +112,7 @@ class PathPaymentStrictSendOperationResponse(BaseOperationResponse):
         None,
         alias="from",
         description="This variable should be called `from`, "
-                    "but `from` is a keyword in Python, so we named it` from_`.",
+        "but `from` is a keyword in Python, so we named it` from_`.",
     )
     to: str
     amount: str
@@ -263,9 +263,13 @@ OPERATION_TYPE_I_RESPONSE = {
 OPERATION_TYPE_I_RESPONSE_TYPE = {
     OperationType.CREATE_ACCOUNT.value: Type[CreateAccountOperationResponse],
     OperationType.PAYMENT.value: Type[PaymentOperationResponse],
-    OperationType.PATH_PAYMENT_STRICT_RECEIVE.value: Type[PathPaymentStrictReceiveOperationResponse],
+    OperationType.PATH_PAYMENT_STRICT_RECEIVE.value: Type[
+        PathPaymentStrictReceiveOperationResponse
+    ],
     OperationType.MANAGE_SELL_OFFER.value: Type[ManageSellOfferOperationResponse],
-    OperationType.CREATE_PASSIVE_SELL_OFFER.value: Type[CreatePassiveSellOfferOperationResponse],
+    OperationType.CREATE_PASSIVE_SELL_OFFER.value: Type[
+        CreatePassiveSellOfferOperationResponse
+    ],
     OperationType.SET_OPTIONS.value: Type[SetOptionsOperationResponse],
     OperationType.CHANGE_TRUST.value: Type[ChangeTrustOperationResponse],
     OperationType.ALLOW_TRUST.value: Type[AllowTrustOperationResponse],
@@ -274,5 +278,7 @@ OPERATION_TYPE_I_RESPONSE_TYPE = {
     OperationType.MANAGE_DATA.value: Type[ManageDataOperationResponse],
     OperationType.BUMP_SEQUENCE.value: Type[BumpSequenceOperationResponse],
     OperationType.MANAGE_BUY_OFFER.value: Type[ManageBuyOfferOperationResponse],
-    OperationType.PATH_PAYMENT_STRICT_SEND.value: Type[PathPaymentStrictSendOperationResponse],
+    OperationType.PATH_PAYMENT_STRICT_SEND.value: Type[
+        PathPaymentStrictSendOperationResponse
+    ],
 }

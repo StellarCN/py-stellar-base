@@ -23,7 +23,7 @@ from ..response.wrapped_response import WrappedResponse
 from ..utils import urljoin_with_query
 
 T = TypeVar("T")
-S = TypeVar('S', bound='BaseCallBuilder')
+S = TypeVar("S", bound="BaseCallBuilder")
 
 
 class BaseCallBuilder(Generic[T]):
@@ -187,17 +187,23 @@ class BaseCallBuilder(Generic[T]):
         self._add_query_param("order", order)
         return self
 
-    def next(self) -> Union[WrappedResponse[T], Coroutine[Any, Any, WrappedResponse[T]]]:
+    def next(
+        self
+    ) -> Union[WrappedResponse[T], Coroutine[Any, Any, WrappedResponse[T]]]:
         if self.next_href is None:
             raise NotPageableError("The next page does not exist.")
         return self._call(self.next_href, None)
 
-    def prev(self) -> Union[WrappedResponse[T], Coroutine[Any, Any, WrappedResponse[T]]]:
+    def prev(
+        self
+    ) -> Union[WrappedResponse[T], Coroutine[Any, Any, WrappedResponse[T]]]:
         if self.next_href is None:
             raise NotPageableError("The prev page does not exist.")
         return self._call(self.prev_href, None)
 
-    def _add_query_param(self, key: str, value: Union[str, float, int, bool, None]) -> None:
+    def _add_query_param(
+        self, key: str, value: Union[str, float, int, bool, None]
+    ) -> None:
         if value is None:
             pass
         elif value is True:

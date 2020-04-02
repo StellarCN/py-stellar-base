@@ -22,6 +22,7 @@ class Flag(IntFlag):
     AUTHORIZATION_REVOCABLE = 2
     AUTHORIZATION_IMMUTABLE = 4
 
+
 class SetOptions(Operation):
     """The :class:`SetOptions` object, which represents a SetOptions operation
     on Stellar's network.
