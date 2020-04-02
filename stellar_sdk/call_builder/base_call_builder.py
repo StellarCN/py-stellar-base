@@ -153,7 +153,7 @@ class BaseCallBuilder(Generic[T]):
         while True:
             yield self._parse_response(stream.__next__())
 
-    def cursor(self, cursor: Union) -> S:
+    def cursor(self: S, cursor: Union[str, int]) -> S:
         """Sets ``cursor`` parameter for the current call. Returns the CallBuilder object on which this method has been called.
 
         See `Paging <https://www.stellar.org/developers/horizon/reference/paging.html>`_
@@ -164,7 +164,7 @@ class BaseCallBuilder(Generic[T]):
         self._add_query_param("cursor", cursor)
         return self
 
-    def limit(self, limit: int) -> S:
+    def limit(self: S, limit: int) -> S:
         """Sets ``limit`` parameter for the current call. Returns the CallBuilder object on which this method has been called.
 
         See `Paging <https://www.stellar.org/developers/horizon/reference/paging.html>`_
@@ -175,7 +175,7 @@ class BaseCallBuilder(Generic[T]):
         self._add_query_param("limit", limit)
         return self
 
-    def order(self, desc: bool = True) -> S:
+    def order(self: S, desc: bool = True) -> S:
         """Sets ``order`` parameter for the current call. Returns the CallBuilder object on which this method has been called.
 
         :param desc: Sort direction, ``True`` to get desc sort direction, the default setting is ``True``.
