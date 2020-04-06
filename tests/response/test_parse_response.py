@@ -45,6 +45,10 @@ class TestParseResponse:
         raw_resp = resp.raw_data
         parsed_resp = resp.parse()
         for i in range(len(parsed_resp)):
+            if raw_resp["_embedded"]["records"][i].__contains__("offer_id"):
+                raw_resp["_embedded"]["records"][i]["offer_id"] = int(
+                    raw_resp["_embedded"]["records"][i]["offer_id"]
+                )
             assert raw_resp["_embedded"]["records"][i] == parsed_resp[i].dict(
                 exclude_unset=True, by_alias=True
             )
