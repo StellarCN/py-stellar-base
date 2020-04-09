@@ -83,14 +83,18 @@ class BaseCallBuilder(Generic[T]):
         raise_request_exception(raw_resp)
         resp = raw_resp.json()
         self._set_page_link(resp)
-        return WrappedResponse(resp, self._parse_response)
+        return WrappedResponse(
+            parse_func=self._parse_response, raw_response=raw_resp, builder=self
+        )
 
     async def _call_async(self, url: str, params: dict = None) -> WrappedResponse[T]:
         raw_resp = await self.client.get(url, params)
         raise_request_exception(raw_resp)
         resp = raw_resp.json()
         self._set_page_link(resp)
-        return WrappedResponse(resp, self._parse_response)
+        return WrappedResponse(
+            parse_func=self._parse_response, raw_response=raw_resp, builder=self
+        )
 
     def _parse_response(self, raw_data):
         raise NotImplementedError(
@@ -145,13 +149,21 @@ class BaseCallBuilder(Generic[T]):
         url = urljoin_with_query(self.horizon_url, self.endpoint)
         stream = self.client.stream(url, self.params)
         while True:
-            yield self._parse_response(await stream.__anext__())
+            yield WrappedResponse(
+                parse_func=self._parse_response,
+                raw_data=(await stream.__anext__()),
+                builder=self,
+            )
 
     def _stream_sync(self) -> Generator[WrappedResponse, None, None]:
         url = urljoin_with_query(self.horizon_url, self.endpoint)
         stream = self.client.stream(url, self.params)
         while True:
-            yield self._parse_response(stream.__next__())
+            yield WrappedResponse(
+                parse_func=self._parse_response,
+                raw_data=stream.__next__(),
+                builder=self,
+            )
 
     def cursor(self: S, cursor: Union[str, int]) -> S:
         """Sets ``cursor`` parameter for the current call. Returns the CallBuilder object on which this method has been called.

@@ -5,7 +5,7 @@ from stellar_sdk.call_builder import BaseCallBuilder
 from stellar_sdk.client.aiohttp_client import AiohttpClient
 from stellar_sdk.client.requests_client import RequestsClient
 from stellar_sdk.exceptions import BadRequestError, NotFoundError, NotPageableError
-
+from stellar_sdk.response.wrapped_response import WrappedResponse
 
 class TestBaseCallBuilder:
     @pytest.mark.asyncio
@@ -56,7 +56,7 @@ class TestBaseCallBuilder:
         resp = builder.cursor("now")._stream()
         messages = []
         async for msg in resp:
-            assert isinstance(msg, dict)
+            assert isinstance(msg, WrappedResponse)
             messages.append(msg)
             if len(messages) == 2:
                 break
@@ -71,7 +71,7 @@ class TestBaseCallBuilder:
         resp = builder.cursor("now")._stream()
         messages = []
         for msg in resp:
-            assert isinstance(msg, dict)
+            assert isinstance(msg, WrappedResponse)
             messages.append(msg)
             if len(messages) == 2:
                 break

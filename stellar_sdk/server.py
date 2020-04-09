@@ -133,7 +133,7 @@ class Server:
         data = {"tx": xdr}
         resp = self._client.post(url=url, data=data)
         raise_request_exception(resp)
-        return WrappedResponse(resp.json(), self._parse_success_transaction)
+        return WrappedResponse(parse_func=self._parse_success_transaction, raw_response=resp)
 
     async def __submit_transaction_async(
         self,
@@ -149,7 +149,7 @@ class Server:
         data = {"tx": xdr}
         resp = await self._client.post(url=url, data=data)
         raise_request_exception(resp)
-        return WrappedResponse(resp.json(), self._parse_success_transaction)
+        return WrappedResponse(parse_func=self._parse_success_transaction, raw_response=resp)
 
     def __get_xdr_and_transaction_from_transaction_envelope(
         self, transaction_envelope: Union[TransactionEnvelope, str]
