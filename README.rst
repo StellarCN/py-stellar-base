@@ -1,7 +1,7 @@
 Stellar Python SDK
 ==================
 
-.. image:: https://img.shields.io/github/workflow/status/StellarCN/py-stellar-base/GitHub%20Action/dev?style=flat-square&maxAge=1800
+.. image:: https://img.shields.io/github/workflow/status/StellarCN/py-stellar-base/GitHub%20Action/master?style=flat-square&maxAge=1800
     :alt: GitHub Action
     :target: https://github.com/StellarCN/py-stellar-base/actions
 
@@ -59,7 +59,7 @@ Install and update using `pipenv`_ or `pip`_:
 
 .. code-block:: text
 
-    pip install stellar-sdk==2.3.0
+    pip install stellar-sdk==2.3.1
 
 
 A Simple Example

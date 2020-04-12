@@ -242,7 +242,7 @@ class Server:
         """
 
         warnings.warn(
-            "Will be removed in version v2.3.0, "
+            "Will be removed in version v3.0.0, "
             "use stellar_sdk.server.strict_receive_paths",
             DeprecationWarning,
         )

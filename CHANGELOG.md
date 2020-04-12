@@ -1,6 +1,11 @@
 Release History
 ===============
 
+### Version 2.3.1
+Released on April 12, 2020
+
+- Update dependencies.
+
 ### Version 2.3.0
 Released on March 31, 2020
 

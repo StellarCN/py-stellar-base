@@ -258,7 +258,7 @@ def verify_challenge_transaction_signed_by_client(
         validation fails, the exception will be thrown.
     """
     warnings.warn(
-        "Will be removed in version v2.3.0, "
+        "Will be removed in version v3.0.0, "
         "use stellar_sdk.sep.test_stellar_web_authentication.verify_challenge_transaction_signed_by_client_master_key",
         DeprecationWarning,
     )  # pragma: no cover
