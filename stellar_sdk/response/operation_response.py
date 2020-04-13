@@ -203,6 +203,7 @@ class AllowTrustOperationResponse(BaseOperationResponse):
     trustee: str
     trustor: str
     authorize: bool
+    authorize_to_maintain_liabilities: bool
 
 
 class AccountMergeOperationResponse(BaseOperationResponse):

@@ -45,7 +45,7 @@ class OrderbookCallBuilder(BaseCallBuilder[T]):
         return self._base_parse_response(raw_data, OrderbookResponse)
 
     def stream(
-        self
+        self,
     ) -> Union[
         AsyncGenerator[WrappedResponse[OrderbookResponse], None],
         Generator[WrappedResponse[OrderbookResponse], None, None],

@@ -157,6 +157,9 @@ class TestServer:
         with Server(horizon_url, client) as server:
             resp = server.submit_transaction(xdr, True)
             assert resp.raw_data["envelope_xdr"] == xdr
+            resp.raw_data["source_account_sequence"] = int(
+                resp.raw_data["source_account_sequence"]
+            )
             assert (
                 resp.parse_data().dict(exclude_unset=True, by_alias=True)
                 == resp.raw_data
@@ -171,6 +174,9 @@ class TestServer:
         async with Server(horizon_url, client) as server:
             resp = await server.submit_transaction(te, True)
             assert resp.raw_data["envelope_xdr"] == xdr
+            resp.raw_data["source_account_sequence"] = int(
+                resp.raw_data["source_account_sequence"]
+            )
             assert (
                 resp.parse_data().dict(exclude_unset=True, by_alias=True)
                 == resp.raw_data

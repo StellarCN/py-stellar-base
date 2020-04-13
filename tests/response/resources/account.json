@@ -70,6 +70,7 @@
       "is_authorized": true,
       "asset_type": "credit_alphanum12",
       "asset_code": "Python",
+      "is_authorized_to_maintain_liabilities": true,
       "asset_issuer": "GDBNNRTZLFZBYOSI2L7X7E3AG7QZBZV5NLJBJOP4RRHP7SDF2BAPNEMM"
     },
     {

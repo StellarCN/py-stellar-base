@@ -7,6 +7,7 @@ from stellar_sdk.client.requests_client import RequestsClient
 from stellar_sdk.exceptions import BadRequestError, NotFoundError, NotPageableError
 from stellar_sdk.response.wrapped_response import WrappedResponse
 
+
 class TestBaseCallBuilder:
     @pytest.mark.asyncio
     async def test_get_data_async(self):

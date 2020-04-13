@@ -32,6 +32,7 @@ class Balance(BaseModel):
     selling_liabilities: str
     last_modified_ledger: Optional[int]
     is_authorized: Optional[bool]
+    is_authorized_to_maintain_liabilities: Optional[bool]
 
 
 class Signer(BaseModel):

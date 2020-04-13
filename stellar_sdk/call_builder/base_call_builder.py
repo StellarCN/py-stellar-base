@@ -51,7 +51,7 @@ class BaseCallBuilder(Generic[T]):
         self.next_href: Optional[str] = None
 
     def call(
-        self
+        self,
     ) -> Union[WrappedResponse[T], Coroutine[Any, Any, WrappedResponse[T]]]:
         """Triggers a HTTP request using this builder's current configuration.
 
@@ -127,7 +127,7 @@ class BaseCallBuilder(Generic[T]):
         return parsed
 
     def _stream(
-        self
+        self,
     ) -> Union[
         AsyncGenerator[WrappedResponse, None], Generator[WrappedResponse, None, None]
     ]:
@@ -200,14 +200,14 @@ class BaseCallBuilder(Generic[T]):
         return self
 
     def next(
-        self
+        self,
     ) -> Union[WrappedResponse[T], Coroutine[Any, Any, WrappedResponse[T]]]:
         if self.next_href is None:
             raise NotPageableError("The next page does not exist.")
         return self._call(self.next_href, None)
 
     def prev(
-        self
+        self,
     ) -> Union[WrappedResponse[T], Coroutine[Any, Any, WrappedResponse[T]]]:
         if self.next_href is None:
             raise NotPageableError("The prev page does not exist.")

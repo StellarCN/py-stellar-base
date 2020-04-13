@@ -82,7 +82,7 @@ class TransactionsCallBuilder(BaseCallBuilder[T]):
         return self._base_parse_response(raw_data, TransactionResponse)
 
     def stream(
-        self
+        self,
     ) -> Union[
         AsyncGenerator[WrappedResponse[TransactionResponse], None],
         Generator[WrappedResponse[TransactionResponse], None, None],

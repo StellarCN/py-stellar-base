@@ -98,7 +98,7 @@ class EffectsCallBuilder(BaseCallBuilder[T]):
         )
 
     def stream(
-        self
+        self,
     ) -> Union[
         AsyncGenerator[WrappedResponse[EFFECT_RESPONSE_TYPE_UNION], None],
         Generator[WrappedResponse[EFFECT_RESPONSE_TYPE_UNION], None, None],

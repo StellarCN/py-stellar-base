@@ -13,6 +13,9 @@ class Links(BaseModel):
     effects: Link
     precedes: Link
     succeeds: Link
+    transaction: Optional[
+        Link
+    ]  # TODO: Temporarily include here, will be removed in the future.
 
 
 class TransactionResponse(BaseModel):
@@ -27,6 +30,7 @@ class TransactionResponse(BaseModel):
     created_at: str
     source_account: str
     source_account_sequence: int  # str in Go impl
+    fee_account: str
     fee_charged: int
     max_fee: int
     operation_count: int
@@ -40,3 +44,5 @@ class TransactionResponse(BaseModel):
     valid_after: Optional[str]
     valid_before: Optional[str]
     links: Links = Field(None, alias="_links")
+    # TODO: fee_bump_transaction
+    # TODO: inner_transaction

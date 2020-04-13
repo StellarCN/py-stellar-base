@@ -119,7 +119,7 @@ class OperationsCallBuilder(BaseCallBuilder[T]):
         )
 
     def stream(
-        self
+        self,
     ) -> Union[
         AsyncGenerator[WrappedResponse[OPERATION_RESPONSE_TYPE_UNION], None],
         Generator[WrappedResponse[OPERATION_RESPONSE_TYPE_UNION], None, None],

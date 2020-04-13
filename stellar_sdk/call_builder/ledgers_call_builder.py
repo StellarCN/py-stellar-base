@@ -43,7 +43,7 @@ class LedgersCallBuilder(BaseCallBuilder[T]):
         return self._base_parse_response(raw_data, LedgerResponse)
 
     def stream(
-        self
+        self,
     ) -> Union[
         AsyncGenerator[WrappedResponse[LedgerResponse], None],
         Generator[WrappedResponse[LedgerResponse], None, None],

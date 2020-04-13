@@ -94,7 +94,7 @@ class PaymentsCallBuilder(BaseCallBuilder[T]):
         )
 
     def stream(
-        self
+        self,
     ) -> Union[
         AsyncGenerator[WrappedResponse[PAYMENT_RESPONSE_TYPE_UNION], None],
         Generator[WrappedResponse[PAYMENT_RESPONSE_TYPE_UNION], None, None],

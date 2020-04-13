@@ -38,7 +38,6 @@ from .response.operation_response import (
 )
 from .response.orderbook_response import OrderbookResponse
 from .response.payment_path_response import PaymentPathResponse
-from .response.submit_response import TransactionSuccessResponse
 from .response.trade_response import TradeResponse
 from .response.trades_aggregation_response import TradesAggregationResponse
 from .response.transaction_response import TransactionResponse
@@ -95,8 +94,8 @@ class Server:
         transaction_envelope: Union[TransactionEnvelope, str],
         skip_memo_required_check: bool = False,
     ) -> Union[
-        WrappedResponse[TransactionSuccessResponse],
-        Coroutine[Any, Any, WrappedResponse[TransactionSuccessResponse]],
+        WrappedResponse[TransactionResponse],
+        Coroutine[Any, Any, WrappedResponse[TransactionResponse]],
     ]:
         """Submits a transaction to the network.
 
@@ -123,7 +122,7 @@ class Server:
         self,
         transaction_envelope: Union[TransactionEnvelope, str],
         skip_memo_required_check: bool,
-    ) -> WrappedResponse[TransactionSuccessResponse]:
+    ) -> WrappedResponse[TransactionResponse]:
         url = urljoin_with_query(self.horizon_url, "transactions")
         xdr, tx = self.__get_xdr_and_transaction_from_transaction_envelope(
             transaction_envelope
@@ -133,13 +132,15 @@ class Server:
         data = {"tx": xdr}
         resp = self._client.post(url=url, data=data)
         raise_request_exception(resp)
-        return WrappedResponse(parse_func=self._parse_success_transaction, raw_response=resp)
+        return WrappedResponse(
+            parse_func=self._parse_success_transaction, raw_response=resp
+        )
 
     async def __submit_transaction_async(
         self,
         transaction_envelope: Union[TransactionEnvelope, str],
         skip_memo_required_check: bool,
-    ) -> WrappedResponse[TransactionSuccessResponse]:
+    ) -> WrappedResponse[TransactionResponse]:
         url = urljoin_with_query(self.horizon_url, "transactions")
         xdr, tx = self.__get_xdr_and_transaction_from_transaction_envelope(
             transaction_envelope
@@ -149,7 +150,9 @@ class Server:
         data = {"tx": xdr}
         resp = await self._client.post(url=url, data=data)
         raise_request_exception(resp)
-        return WrappedResponse(parse_func=self._parse_success_transaction, raw_response=resp)
+        return WrappedResponse(
+            parse_func=self._parse_success_transaction, raw_response=resp
+        )
 
     def __get_xdr_and_transaction_from_transaction_envelope(
         self, transaction_envelope: Union[TransactionEnvelope, str]
@@ -162,8 +165,8 @@ class Server:
             tx = Transaction.from_xdr(xdr)
         return xdr, tx
 
-    def _parse_success_transaction(self, raw_data: dict) -> TransactionSuccessResponse:
-        return TransactionSuccessResponse.parse_obj(raw_data)
+    def _parse_success_transaction(self, raw_data: dict) -> TransactionResponse:
+        return TransactionResponse.parse_obj(raw_data)
 
     def root(self) -> RootCallBuilder:
         """

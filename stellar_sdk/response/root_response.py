@@ -10,13 +10,22 @@ class Links(BaseModel):
     accounts: Optional[Link]
     account_transactions: Link
     assets: Link
+    effects: Link
+    fee_stats: Link
     friendbot: Optional[Link]
+    ledger: Link
+    ledgers: Link
     offer: Optional[Link]
     offers: Optional[Link]
+    operation: Link
+    operations: Link
     order_book: Link
+    payments: Link
     self: Link
     strict_receive_paths: Link
     strict_send_paths: Link
+    trade_aggregations: Link
+    trades: Link
     transaction: Link
     transactions: Link
 

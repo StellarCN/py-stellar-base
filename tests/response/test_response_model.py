@@ -10,7 +10,6 @@ from stellar_sdk.response.root_response import RootResponse
 from stellar_sdk.response.trade_response import TradeResponse
 from stellar_sdk.response.trades_aggregation_response import TradesAggregationResponse
 from stellar_sdk.response.transaction_response import TransactionResponse
-from stellar_sdk.response.submit_response import TransactionSuccessResponse
 
 from . import load_file
 
@@ -83,9 +82,4 @@ class TestResponseModel:
         raw = load_file("transaction.json")
         parsed = TransactionResponse.parse_obj(raw)
         raw["source_account_sequence"] = int(raw["source_account_sequence"])
-        assert raw == parsed.dict(exclude_unset=True, by_alias=True)
-
-    def test_submit_transaction_success(self):
-        raw = load_file("transaction_success.json")
-        parsed = TransactionSuccessResponse.parse_obj(raw)
         assert raw == parsed.dict(exclude_unset=True, by_alias=True)

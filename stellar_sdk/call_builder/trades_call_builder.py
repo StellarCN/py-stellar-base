@@ -72,7 +72,7 @@ class TradesCallBuilder(BaseCallBuilder[T]):
         return self._base_parse_response(raw_data, TradeResponse)
 
     def stream(
-        self
+        self,
     ) -> Union[
         AsyncGenerator[WrappedResponse[TradeResponse], None],
         Generator[WrappedResponse[TradeResponse], None, None],

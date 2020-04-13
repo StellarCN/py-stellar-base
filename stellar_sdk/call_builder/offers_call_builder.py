@@ -116,7 +116,7 @@ class OffersCallBuilder(BaseCallBuilder[T]):
         return self._base_parse_response(raw_data, OfferResponse)
 
     def stream(
-        self
+        self,
     ) -> Union[
         AsyncGenerator[WrappedResponse[OfferResponse], None],
         Generator[WrappedResponse[OfferResponse], None, None],

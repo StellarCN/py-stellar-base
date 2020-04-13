@@ -238,3 +238,5 @@ EFFECT_RESPONSE_TYPE_UNION_TYPE = Union[
     Type[DataRemovedEffectResponse],
     Type[SequenceBumpedEffectResponse],
 ]
+
+# TODO: Protocol 13 / add trustline_authorized_to_maintain_liabilities
