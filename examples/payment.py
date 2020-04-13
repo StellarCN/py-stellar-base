@@ -37,13 +37,13 @@ transaction = (
         network_passphrase=Network.TESTNET_NETWORK_PASSPHRASE,
         base_fee=base_fee,
     )
-        .add_text_memo("Hello, Stellar!")  # Add a memo
-        # Add a payment operation to the transaction
-        # Send 350.1234567 XLM to receiver
-        # Specify 350.1234567 lumens. Lumens are divisible to seven digits past the decimal.
-        .append_payment_op(receiver_public_key, "350.1234567", "XLM")
-        .set_timeout(30)  # Make this transaction valid for the next 30 seconds only
-        .build()
+    .add_text_memo("Hello, Stellar!")  # Add a memo
+    # Add a payment operation to the transaction
+    # Send 350.1234567 XLM to receiver
+    # Specify 350.1234567 lumens. Lumens are divisible to seven digits past the decimal.
+    .append_payment_op(receiver_public_key, "350.1234567", "XLM")
+    .set_timeout(30)  # Make this transaction valid for the next 30 seconds only
+    .build()
 )
 
 # Sign this transaction with the secret key
@@ -58,4 +58,6 @@ print(transaction.to_xdr())
 # Submit the transaction to the Horizon server.
 # The Horizon server will then submit the transaction into the network for us.
 response = server.submit_transaction(transaction)
-print(response)
+# You can use raw data or parsed data to get a better development experience.
+# print(response.raw_data)
+print(response.parse_data())

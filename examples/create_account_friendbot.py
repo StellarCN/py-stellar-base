@@ -7,6 +7,6 @@ keypair = Keypair.random()
 print("Public Key: " + keypair.public_key)
 print("Secret Seed: " + keypair.secret)
 
-url = 'https://friendbot.stellar.org'
-response = requests.get(url, params={'addr': keypair.public_key})
+url = "https://friendbot.stellar.org"
+response = requests.get(url, params={"addr": keypair.public_key})
 print(response)

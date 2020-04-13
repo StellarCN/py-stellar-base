@@ -7,7 +7,11 @@ transactions = server.transactions().for_ledger(1400).call()
 print(transactions)
 
 # get a list of transactions submitted by a particular account
-transactions = server.transactions() \
-    .for_account(account_id="GASOCNHNNLYFNMDJYQ3XFMI7BYHIOCFW3GJEOWRPEGK2TDPGTG2E5EDW") \
+transactions = (
+    server.transactions()
+    .for_account(account_id="GASOCNHNNLYFNMDJYQ3XFMI7BYHIOCFW3GJEOWRPEGK2TDPGTG2E5EDW")
     .call()
-print(transactions)
+)
+# You can use raw data or parsed data to get a better development experience.
+# print(transactions.raw_data)
+print(transactions.parse_data())
