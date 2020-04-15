@@ -140,7 +140,7 @@ class Server:
             tx = transaction_envelope.transaction
         else:
             xdr = transaction_envelope
-            tx = Transaction.from_xdr(xdr)
+            tx = TransactionEnvelope.from_xdr(xdr, "").transaction
         return xdr, tx
 
     def root(self) -> RootCallBuilder:

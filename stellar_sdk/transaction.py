@@ -43,16 +43,20 @@ class Transaction:
     :param memo: The memo being sent with the transaction, being
           represented as one of the subclasses of the
           :class:`Memo <stellar_sdk.memo.Memo>` object.
+    :param v1: Temporary feature flag to allow alpha testing of Stellar Protocol 13 transactions.
+        We will remove this once all transactions are supposed to be v1.
+        See `CAP-0015 <https://github.com/stellar/stellar-protocol/blob/master/core/cap-0015.md>`_ for more information.
     """
 
     def __init__(
-        self,
-        source: Union[Keypair, str],
-        sequence: int,
-        fee: int,
-        operations: List[Operation],
-        memo: Memo = None,
-        time_bounds: TimeBounds = None,
+            self,
+            source: Union[Keypair, str],
+            sequence: int,
+            fee: int,
+            operations: List[Operation],
+            memo: Memo = None,
+            time_bounds: TimeBounds = None,
+            v1: bool = False
     ) -> None:
 
         # if not operations:
@@ -69,13 +73,13 @@ class Transaction:
         self.memo: Memo = memo
         self.fee: int = fee
         self.time_bounds: TimeBounds = time_bounds
+        self.v1: bool = v1
 
-    def to_xdr_object(self) -> Xdr.types.Transaction:
+    def to_xdr_object(self) -> Union[Xdr.types.Transaction, Xdr.types.TransactionV0]:
         """Get an XDR object representation of this :class:`Transaction`.
 
         :return: XDR Transaction object
         """
-        source_account = self.source.xdr_account_id()
         memo = self.memo.to_xdr_object()
         operations = [operation.to_xdr_object() for operation in self.operations]
         time_bounds: List[TimeBounds] = []
@@ -83,21 +87,32 @@ class Transaction:
             time_bounds = pack_xdr_array(self.time_bounds.to_xdr_object())
         ext = Xdr.nullclass()
         ext.v = 0
-        return Xdr.types.Transaction(
-            source_account, self.fee, self.sequence, time_bounds, memo, operations, ext
-        )
+        if self.v1:
+            return Xdr.types.Transaction(self.source.xdr_account_id(), self.fee, self.sequence, time_bounds, memo, operations, ext)
+        return Xdr.types.TransactionV0(self.source.xdr_account_id().ed25519, self.fee, self.sequence, time_bounds, memo, operations,
+                                       ext)
 
     @classmethod
-    def from_xdr_object(cls, tx_xdr_object) -> "Transaction":
+    def from_xdr_object(cls, tx_xdr_object: Union[Xdr.types.Transaction, Xdr.types.TransactionV0],
+                        v1: bool = False) -> "Transaction":
         """Create a new :class:`Transaction` from an XDR object.
 
         :param tx_xdr_object: The XDR object that represents a transaction.
+        :param v1: Temporary feature flag to allow alpha testing of Stellar Protocol 13 transactions.
+            We will remove this once all transactions are supposed to be v1.
+            See `CAP-0015 <https://github.com/stellar/stellar-protocol/blob/master/core/cap-0015.md>`_
+            for more information.
 
         :return: A new :class:`Transaction` object from the given XDR Transaction object.
         """
-        source = Keypair.from_public_key(
-            StrKey.encode_ed25519_public_key(tx_xdr_object.sourceAccount.ed25519)
-        )
+        if v1:
+            source = Keypair.from_public_key(
+                StrKey.encode_ed25519_public_key(tx_xdr_object.sourceAccount.ed25519)
+            )
+        else:
+            source = Keypair.from_public_key(
+                StrKey.encode_ed25519_public_key(tx_xdr_object.sourceAccountEd25519)
+            )
         sequence = tx_xdr_object.seqNum
         fee = tx_xdr_object.fee
         time_bounds_in_xdr = tx_xdr_object.timeBounds
@@ -119,12 +134,19 @@ class Transaction:
         )
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "Transaction":
+    def from_xdr(cls, xdr: str, v1: bool = False) -> "Transaction":
         """Create a new :class:`Transaction` from an XDR string.
 
         :param xdr: The XDR string that represents a transaction.
+        :param v1: Temporary feature flag to allow alpha testing of Stellar Protocol 13 transactions.
+            We will remove this once all transactions are supposed to be v1.
+            See `CAP-0015 <https://github.com/stellar/stellar-protocol/blob/master/core/cap-0015.md>`_
+            for more information.
 
         :return: A new :class:`TransactionEnvelope` object from the given XDR TransactionEnvelope base64 string object.
         """
-        xdr_object = Xdr.types.Transaction.from_xdr(xdr)
-        return cls.from_xdr_object(xdr_object)
+        if v1:
+            xdr_object = Xdr.types.Transaction.from_xdr(xdr)
+        else:
+            xdr_object = Xdr.types.TransactionV0.from_xdr(xdr)
+        return cls.from_xdr_object(xdr_object, v1)

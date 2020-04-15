@@ -1,8 +1,5 @@
-import pytest
-
 from stellar_sdk import Keypair, IdMemo, Asset, NoneMemo
 from stellar_sdk.operation import Payment, ManageData
-from stellar_sdk.exceptions import ValueError
 from stellar_sdk.time_bounds import TimeBounds
 from stellar_sdk.transaction import Transaction
 
@@ -22,14 +19,14 @@ class TestTransaction:
         ops = [Payment(destination, asset, amount), ManageData("hello", "world")]
 
         tx_object = Transaction(
-            source, sequence, fee, ops, memo, time_bounds
+            source, sequence, fee, ops, memo, time_bounds, True
         ).to_xdr_object()
         assert (
             tx_object.to_xdr()
             == "AAAAAImbKEDtVjbFbdxfFLI5dfefG6I4jSaU5MVuzd3JYOXvAAAAyAAAAAAAAAABAAAAAQAAAAAAADA5AAAAAAAA3dUAAAACAAAAAAAAAGQAAAACAAAAAAAAAAEAAAAA0pjFgVcRZZHpMgnpXHpb/xIbLh0/YYto0PzI7+Xl5HAAAAAAAAAAAlQL5AAAAAAAAAAACgAAAAVoZWxsbwAAAAAAAAEAAAAFd29ybGQAAAAAAAAA"
         )
 
-        restore_transaction = Transaction.from_xdr_object(tx_object)
+        restore_transaction = Transaction.from_xdr_object(tx_object, v1=True)
         assert isinstance(restore_transaction, Transaction)
         assert restore_transaction.source == source
         assert restore_transaction.fee == fee
@@ -49,14 +46,14 @@ class TestTransaction:
         ops = [Payment(destination, asset, amount), ManageData("hello", "world")]
 
         tx_object = Transaction(
-            source, sequence, fee, ops, memo, time_bounds
+            source, sequence, fee, ops, memo, time_bounds, True
         ).to_xdr_object()
         assert (
             tx_object.to_xdr()
             == "AAAAAImbKEDtVjbFbdxfFLI5dfefG6I4jSaU5MVuzd3JYOXvAAAAyAAAAAAAAAABAAAAAQAAAAAAADA5AAAAAAAA3dUAAAACAAAAAAAAAGQAAAACAAAAAAAAAAEAAAAA0pjFgVcRZZHpMgnpXHpb/xIbLh0/YYto0PzI7+Xl5HAAAAAAAAAAAlQL5AAAAAAAAAAACgAAAAVoZWxsbwAAAAAAAAEAAAAFd29ybGQAAAAAAAAA"
         )
 
-        restore_transaction = Transaction.from_xdr_object(tx_object)
+        restore_transaction = Transaction.from_xdr_object(tx_object, True)
         assert isinstance(restore_transaction, Transaction)
         assert restore_transaction.source == Keypair.from_public_key(source)
         assert restore_transaction.fee == fee
