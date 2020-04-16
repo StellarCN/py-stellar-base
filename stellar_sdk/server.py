@@ -125,6 +125,7 @@ class Server:
         xdr, tx = self.__get_xdr_and_transaction_from_transaction_envelope(
             transaction_envelope
         )
+        # TODO
         if not skip_memo_required_check:
             await self.__check_memo_required_async(tx)
         data = {"tx": xdr}

@@ -49,14 +49,14 @@ class Transaction:
     """
 
     def __init__(
-            self,
-            source: Union[Keypair, str],
-            sequence: int,
-            fee: int,
-            operations: List[Operation],
-            memo: Memo = None,
-            time_bounds: TimeBounds = None,
-            v1: bool = False
+        self,
+        source: Union[Keypair, str],
+        sequence: int,
+        fee: int,
+        operations: List[Operation],
+        memo: Memo = None,
+        time_bounds: TimeBounds = None,
+        v1: bool = False,
     ) -> None:
 
         # if not operations:
@@ -88,13 +88,31 @@ class Transaction:
         ext = Xdr.nullclass()
         ext.v = 0
         if self.v1:
-            return Xdr.types.Transaction(self.source.xdr_account_id(), self.fee, self.sequence, time_bounds, memo, operations, ext)
-        return Xdr.types.TransactionV0(self.source.xdr_account_id().ed25519, self.fee, self.sequence, time_bounds, memo, operations,
-                                       ext)
+            return Xdr.types.Transaction(
+                self.source.xdr_account_id(),
+                self.fee,
+                self.sequence,
+                time_bounds,
+                memo,
+                operations,
+                ext,
+            )
+        return Xdr.types.TransactionV0(
+            self.source.xdr_account_id().ed25519,
+            self.fee,
+            self.sequence,
+            time_bounds,
+            memo,
+            operations,
+            ext,
+        )
 
     @classmethod
-    def from_xdr_object(cls, tx_xdr_object: Union[Xdr.types.Transaction, Xdr.types.TransactionV0],
-                        v1: bool = False) -> "Transaction":
+    def from_xdr_object(
+        cls,
+        tx_xdr_object: Union[Xdr.types.Transaction, Xdr.types.TransactionV0],
+        v1: bool = False,
+    ) -> "Transaction":
         """Create a new :class:`Transaction` from an XDR object.
 
         :param tx_xdr_object: The XDR object that represents a transaction.
@@ -131,6 +149,7 @@ class Transaction:
             memo=memo,
             fee=fee,
             operations=operations,
+            v1=v1,
         )
 
     @classmethod
