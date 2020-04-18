@@ -89,6 +89,7 @@ class TransactionEnvelope(BaseTransactionEnvelope):
 
         :param te_xdr_object: The XDR object that represents a transaction envelope.
         :param network_passphrase: The network to connect to for verifying and retrieving additional attributes from.
+
         :return: A new :class:`TransactionEnvelope` object from the given XDR TransactionEnvelope object.
         """
         te_type = te_xdr_object.type

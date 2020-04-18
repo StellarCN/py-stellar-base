@@ -78,7 +78,7 @@ class BaseCallBuilder:
         return resp
 
     def stream(
-        self
+        self,
     ) -> Union[
         AsyncGenerator[Dict[str, Any], None], Generator[Dict[str, Any], None, None]
     ]:

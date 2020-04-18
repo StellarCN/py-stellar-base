@@ -27,6 +27,7 @@ from .transaction_builder import TransactionBuilder
 from .transaction_envelope import TransactionEnvelope
 from .client.requests_client import RequestsClient
 from .client.aiohttp_client import AiohttpClient
+from .helpers import *
 
 __all__ = [
     "__title__",
@@ -57,4 +58,4 @@ __all__ = [
     "TransactionEnvelope",
     "RequestsClient",
     "AiohttpClient",
-] + operation_all
+] + operation_all + helpers.__all__

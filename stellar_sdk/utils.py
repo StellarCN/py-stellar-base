@@ -2,7 +2,7 @@ import hashlib
 import os
 from decimal import Decimal, ROUND_FLOOR
 from typing import List
-from urllib.parse import urlsplit, urljoin, urlunsplit
+from urllib.parse import urlsplit, urlunsplit
 
 from .asset import Asset
 from .exceptions import NoApproximationError, TypeError

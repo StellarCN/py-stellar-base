@@ -97,7 +97,7 @@ class BaseTransactionEnvelope(Generic[T]):
             self.signatures.append(sig)
 
     def to_xdr_object(self) -> Xdr.types.TransactionEnvelope:
-        """Get an XDR object representation of this :class:`TransactionEnvelope`.
+        """Get an XDR object representation of this :class:`BaseTransactionEnvelope`.
 
         :return: XDR TransactionEnvelope object
         """
@@ -105,7 +105,7 @@ class BaseTransactionEnvelope(Generic[T]):
 
     def to_xdr(self) -> str:
         """Get the base64 encoded XDR string representing this
-        :class:`TransactionEnvelope`.
+        :class:`BaseTransactionEnvelope`.
 
         :return: XDR TransactionEnvelope base64 string object
         """
@@ -115,7 +115,7 @@ class BaseTransactionEnvelope(Generic[T]):
     def from_xdr_object(
         cls, te_xdr_object: Xdr.types.TransactionEnvelope, network_passphrase: str
     ) -> T:
-        """Create a new :class:`TransactionEnvelope` from an XDR object.
+        """Create a new :class:`BaseTransactionEnvelope` from an XDR object.
 
         :param te_xdr_object: The XDR object that represents a transaction envelope.
         :param network_passphrase: The network to connect to for verifying and retrieving additional attributes from.
@@ -125,13 +125,13 @@ class BaseTransactionEnvelope(Generic[T]):
 
     @classmethod
     def from_xdr(cls, xdr: str, network_passphrase: str) -> T:
-        """Create a new :class:`TransactionEnvelope` from an XDR string.
+        """Create a new :class:`BaseTransactionEnvelope` from an XDR string.
 
         :param xdr: The XDR string that represents a transaction
             envelope.
         :param network_passphrase: which network this transaction envelope is associated with.
 
-        :return: A new :class:`TransactionEnvelope` object from the given XDR TransactionEnvelope base64 string object.
+        :return: A new :class:`BaseTransactionEnvelope` object from the given XDR TransactionEnvelope base64 string object.
         """
         xdr_object = Xdr.types.TransactionEnvelope.from_xdr(xdr)
         return cls.from_xdr_object(xdr_object, network_passphrase)

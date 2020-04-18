@@ -4,6 +4,8 @@ from .base_transaction_envelope import BaseTransactionEnvelope
 from .fee_bump_transaction import FeeBumpTransaction
 from .xdr import Xdr
 
+__all__ = ["FeeBumpTransactionEnvelope"]
+
 
 class FeeBumpTransactionEnvelope(BaseTransactionEnvelope["FeeBumpTransactionEnvelope"]):
     """The :class:`FeeBumpTransactionEnvelope` object, which represents a transaction
@@ -27,7 +29,6 @@ class FeeBumpTransactionEnvelope(BaseTransactionEnvelope["FeeBumpTransactionEnve
         network_passphrase: str,
         signatures: List[Xdr.types.DecoratedSignature] = None,
     ) -> None:
-        # TODO: check
         super().__init__(transaction, network_passphrase, signatures)
         self.transaction = transaction
 

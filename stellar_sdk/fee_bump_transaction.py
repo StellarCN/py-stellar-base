@@ -19,7 +19,6 @@ class FeeBumpTransaction:
         base_fee: int,
         inner_transaction_envelope: TransactionEnvelope,
     ) -> None:
-
         if not (
             isinstance(inner_transaction_envelope.transaction, Transaction)
             and inner_transaction_envelope.transaction.v1
@@ -65,6 +64,7 @@ class FeeBumpTransaction:
         """Create a new :class:`FeeBumpTransaction` from an XDR object.
 
         :param tx_xdr_object: The XDR object that represents a transaction.
+        :param network_passphrase: The network to connect to for verifying and retrieving additional attributes from.
 
         :return: A new :class:`FeeBumpTransaction` object from the given XDR Transaction object.
         """
@@ -89,6 +89,7 @@ class FeeBumpTransaction:
         """Create a new :class:`Transaction` from an XDR string.
 
         :param xdr: The XDR string that represents a transaction.
+        :param network_passphrase: The network to connect to for verifying and retrieving additional attributes from.
 
         :return: A new :class:`TransactionEnvelope` object from the given XDR TransactionEnvelope base64 string object.
         """
