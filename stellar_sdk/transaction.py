@@ -89,7 +89,7 @@ class Transaction:
         ext.v = 0
         if self.v1:
             return Xdr.types.Transaction(
-                self.source.xdr_account_id(),
+                self.source.xdr_muxed_account(),
                 self.fee,
                 self.sequence,
                 time_bounds,
