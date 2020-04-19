@@ -45,7 +45,7 @@ class Payment(Operation):
 
     def _to_operation_body(self) -> Xdr.nullclass:
         asset = self.asset.to_xdr_object()
-        destination = Keypair.from_public_key(self.destination).xdr_account_id()
+        destination = Keypair.from_public_key(self.destination).xdr_muxed_account()
 
         amount = Operation.to_xdr_amount(self.amount)
 

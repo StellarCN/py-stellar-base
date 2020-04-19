@@ -55,7 +55,7 @@ class PathPaymentStrictReceive(Operation):
         return Xdr.const.PATH_PAYMENT_STRICT_RECEIVE
 
     def _to_operation_body(self) -> Xdr.nullclass:
-        destination = Keypair.from_public_key(self.destination).xdr_account_id()
+        destination = Keypair.from_public_key(self.destination).xdr_muxed_account()
         send_asset = self.send_asset.to_xdr_object()
         dest_asset = self.dest_asset.to_xdr_object()
         path = [asset.to_xdr_object() for asset in self.path]

@@ -118,9 +118,9 @@ class Operation(metaclass=ABCMeta):
         :class:`Operation`.
 
         """
-        source_account: List[Xdr.types.PublicKey] = []
+        source_account: List[Xdr.types.MuxedAccount] = []
         if self.source is not None:
-            source_account = [Keypair.from_public_key(self.source).xdr_account_id()]
+            source_account = [Keypair.from_public_key(self.source).xdr_muxed_account()]
 
         return Xdr.types.Operation(source_account, self._to_operation_body())
 

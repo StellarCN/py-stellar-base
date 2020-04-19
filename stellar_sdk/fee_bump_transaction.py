@@ -60,7 +60,7 @@ class FeeBumpTransaction:
 
         :return: XDR Transaction object
         """
-        fee_source = self.fee_source.xdr_account_id()
+        fee_source = self.fee_source.xdr_muxed_account()
         fee = self.base_fee * (len(self._inner_transaction.operations) + 1)
         ext = Xdr.nullclass()
         ext.v = 0

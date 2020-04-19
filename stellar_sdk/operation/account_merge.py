@@ -29,7 +29,7 @@ class AccountMerge(Operation):
         return Xdr.const.ACCOUNT_MERGE
 
     def _to_operation_body(self) -> Xdr.nullclass:
-        destination = Keypair.from_public_key(self.destination).xdr_account_id()
+        destination = Keypair.from_public_key(self.destination).xdr_muxed_account()
         body = Xdr.nullclass()
         body.type = Xdr.const.ACCOUNT_MERGE
         body.destination = destination
