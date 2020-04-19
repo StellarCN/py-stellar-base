@@ -1,9 +1,9 @@
 Stellar Python SDK
 ==================
 
-.. image:: https://img.shields.io/travis/StellarCN/py-stellar-base/v2?style=flat-square&maxAge=1800
-    :alt: Travis (.org)
-    :target: https://travis-ci.org/StellarCN/py-stellar-base/
+.. image:: https://img.shields.io/github/workflow/status/StellarCN/py-stellar-base/GitHub%20Action/dev?style=flat-square&maxAge=1800
+    :alt: GitHub Action
+    :target: https://github.com/StellarCN/py-stellar-base/actions
 
 .. image:: https://img.shields.io/readthedocs/stellar-sdk.svg?style=flat-square&maxAge=1800
     :alt: Read the Docs

@@ -1,6 +1,7 @@
 import warnings
-from typing import Union, Coroutine, Any, Dict, List
+from typing import Union, Coroutine, Any, Dict, List, Tuple
 
+from stellar_sdk.base_transaction_envelope import BaseTransactionEnvelope
 from .account import Account, Thresholds
 from .asset import Asset
 from .call_builder.accounts_call_builder import AccountsCallBuilder
@@ -26,10 +27,13 @@ from .client.base_async_client import BaseAsyncClient
 from .client.base_sync_client import BaseSyncClient
 from .client.requests_client import RequestsClient
 from .exceptions import TypeError, NotFoundError, raise_request_exception
+from .fee_bump_transaction import FeeBumpTransaction
+from .fee_bump_transaction_envelope import FeeBumpTransactionEnvelope
 from .memo import NoneMemo
 from .sep.exceptions import AccountRequiresMemoError
 from .transaction import Transaction
 from .transaction_envelope import TransactionEnvelope
+from .helpers import parse_transaction_envelope_from_xdr
 from .utils import urljoin_with_query
 from .xdr import Xdr
 
@@ -133,14 +137,19 @@ class Server:
         return resp.json()
 
     def __get_xdr_and_transaction_from_transaction_envelope(
-        self, transaction_envelope: Union[TransactionEnvelope, str]
-    ):
-        if isinstance(transaction_envelope, TransactionEnvelope):
+        self,
+        transaction_envelope: Union[
+            TransactionEnvelope, FeeBumpTransactionEnvelope, str
+        ],
+    ) -> Tuple[str, Union[Transaction, FeeBumpTransaction]]:
+        if isinstance(transaction_envelope, BaseTransactionEnvelope):
             xdr = transaction_envelope.to_xdr()
             tx = transaction_envelope.transaction
         else:
             xdr = transaction_envelope
-            tx = Transaction.from_xdr(xdr)
+            tx = parse_transaction_envelope_from_xdr(
+                transaction_envelope, ""
+            ).transaction
         return xdr, tx
 
     def root(self) -> RootCallBuilder:
@@ -401,6 +410,8 @@ class Server:
         return account
 
     def __check_memo_required_sync(self, transaction: Transaction) -> None:
+        if not isinstance(transaction, Transaction):
+            return
         if not (transaction.memo is None or isinstance(transaction.memo, NoneMemo)):
             return
         for index, destination in self.__get_check_memo_required_destinations(
@@ -412,7 +423,11 @@ class Server:
                 continue
             self.__check_destination_memo(account_resp, index, destination)
 
-    async def __check_memo_required_async(self, transaction: Transaction) -> None:
+    async def __check_memo_required_async(
+        self, transaction: Union[Transaction, FeeBumpTransaction]
+    ) -> None:
+        if not isinstance(transaction, Transaction):
+            return
         if not (transaction.memo is None or isinstance(transaction.memo, NoneMemo)):
             return
         for index, destination in self.__get_check_memo_required_destinations(
