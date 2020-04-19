@@ -45,6 +45,7 @@ class TestFeeBumpTransaction:
         restore_te = FeeBumpTransactionEnvelope.from_xdr(
             xdr, Network.TESTNET_NETWORK_PASSPHRASE
         )
+        assert restore_te.to_xdr() == TransactionBuilder.from_xdr(xdr, Network.TESTNET_NETWORK_PASSPHRASE).to_xdr()
         assert isinstance(restore_te, FeeBumpTransactionEnvelope)
         restore_tx = restore_te.transaction
         assert isinstance(restore_tx, FeeBumpTransaction)

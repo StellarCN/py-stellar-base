@@ -91,7 +91,7 @@ class FeeBumpTransaction:
         inner_transaction_operation_length = len(
             inner_transaction_envelope.transaction.operations
         )
-        base_fee = tx_xdr_object.fee / (inner_transaction_operation_length + 1)
+        base_fee = int(tx_xdr_object.fee / (inner_transaction_operation_length + 1))
         return cls(
             fee_source=source,
             base_fee=base_fee,

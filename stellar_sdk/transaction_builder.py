@@ -18,6 +18,7 @@ from .time_bounds import TimeBounds
 from .transaction import Transaction
 from .transaction_envelope import TransactionEnvelope
 from .utils import hex_to_bytes
+from .xdr import Xdr
 
 __all__ = ["TransactionBuilder"]
 
@@ -115,20 +116,31 @@ class TransactionBuilder:
         return transaction_envelope
 
     @staticmethod
-    def from_xdr(xdr: str, network_passphrase: str) -> "TransactionBuilder":
+    def from_xdr(xdr: str, network_passphrase: str) -> Union["TransactionBuilder", FeeBumpTransactionEnvelope]:
         """Create a :class:`TransactionBuilder
-        <stellar_sdk.transaction_envelope.TransactionBuilder>` via an XDR
-        object.
+        <stellar_sdk.transaction_envelope.TransactionBuilder>` or
+        :py:class:`FeeBumpTransactionEnvelope <stellar_sdk.fee_bump_transaction_envelope.FeeBumpTransactionEnvelope>`
+        via an XDR object.
 
-        In addition, sets the fields of this builder (the transaction envelope,
+        In addition, if xdr is not of
+        :py:class:`TransactionEnvelope <stellar_sdk.transaction_envelope.TransactionEnvelope>`,
+        it sets the fields of this builder (the transaction envelope,
         transaction, operations, source, etc.) to all of the fields in the
         provided XDR transaction envelope, but the signature will not be added to it.
 
         :param xdr: The XDR object representing the transaction envelope to
             which this builder is setting its state to.
         :param network_passphrase: The network to connect to for verifying and retrieving additional attributes from.
-        :return: a :class:`TransactionBuilder <stellar_sdk.transaction_envelope.TransactionBuilder>` via the XDR object.
+        :return: a :class:`TransactionBuilder <stellar_sdk.transaction_envelope.TransactionBuilder>` or
+            :py:class:`FeeBumpTransactionEnvelope <stellar_sdk.fee_bump_transaction_envelope.FeeBumpTransactionEnvelope>`
+            via the XDR object.
         """
+        xdr_object = Xdr.types.TransactionEnvelope.from_xdr(xdr)
+        te_type = xdr_object.type
+        if te_type == Xdr.const.ENVELOPE_TYPE_TX_FEE_BUMP:
+            return FeeBumpTransactionEnvelope.from_xdr_object(
+                xdr_object, network_passphrase
+            )
         transaction_envelope = TransactionEnvelope.from_xdr(
             xdr=xdr, network_passphrase=network_passphrase
         )
