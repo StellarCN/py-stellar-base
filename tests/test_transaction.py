@@ -48,12 +48,11 @@ class TestTransaction:
         tx_object = Transaction(
             source, sequence, fee, ops, memo, time_bounds, True
         ).to_xdr_object()
-        assert (
-            tx_object.to_xdr()
-            == "AAAAAImbKEDtVjbFbdxfFLI5dfefG6I4jSaU5MVuzd3JYOXvAAAAyAAAAAAAAAABAAAAAQAAAAAAADA5AAAAAAAA3dUAAAACAAAAAAAAAGQAAAACAAAAAAAAAAEAAAAA0pjFgVcRZZHpMgnpXHpb/xIbLh0/YYto0PzI7+Xl5HAAAAAAAAAAAlQL5AAAAAAAAAAACgAAAAVoZWxsbwAAAAAAAAEAAAAFd29ybGQAAAAAAAAA"
-        )
+        xdr = "AAAAAImbKEDtVjbFbdxfFLI5dfefG6I4jSaU5MVuzd3JYOXvAAAAyAAAAAAAAAABAAAAAQAAAAAAADA5AAAAAAAA3dUAAAACAAAAAAAAAGQAAAACAAAAAAAAAAEAAAAA0pjFgVcRZZHpMgnpXHpb/xIbLh0/YYto0PzI7+Xl5HAAAAAAAAAAAlQL5AAAAAAAAAAACgAAAAVoZWxsbwAAAAAAAAEAAAAFd29ybGQAAAAAAAAA"
 
-        restore_transaction = Transaction.from_xdr_object(tx_object, True)
+        assert tx_object.to_xdr() == xdr
+
+        restore_transaction = Transaction.from_xdr(xdr, True)
         assert isinstance(restore_transaction, Transaction)
         assert restore_transaction.source == Keypair.from_public_key(source)
         assert restore_transaction.fee == fee
@@ -119,7 +118,7 @@ class TestTransaction:
         #     == "AAAAAImbKEDtVjbFbdxfFLI5dfefG6I4jSaU5MVuzd3JYOXvAAAAyAAAAAAAAAABAAAAAQAAAAAAADA5AAAAAAAA3dUAAAACAAAAAAAAAGQAAAACAAAAAAAAAAEAAAAA0pjFgVcRZZHpMgnpXHpb/xIbLh0/YYto0PzI7+Xl5HAAAAAAAAAAAlQL5AAAAAAAAAAACgAAAAVoZWxsbwAAAAAAAAEAAAAFd29ybGQAAAAAAAAA"
         # )
 
-        restore_transaction = Transaction.from_xdr_object(tx_object, False)
+        restore_transaction = Transaction.from_xdr(tx_object.to_xdr(), False)
         assert isinstance(restore_transaction, Transaction)
         assert restore_transaction.source == Keypair.from_public_key(source)
         assert restore_transaction.fee == fee

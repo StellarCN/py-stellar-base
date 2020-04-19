@@ -29,7 +29,7 @@ class TransactionEnvelope(BaseTransactionEnvelope):
         network_passphrase: str,
         signatures: List[Xdr.types.DecoratedSignature] = None,
     ) -> None:
-        super().__init__(transaction, network_passphrase, signatures)
+        super().__init__(network_passphrase, signatures)
         self.transaction = transaction
 
     def signature_base(self) -> bytes:
@@ -73,14 +73,6 @@ class TransactionEnvelope(BaseTransactionEnvelope):
             tx_envelope = Xdr.types.TransactionV0Envelope(tx, self.signatures)
             return Xdr.types.TransactionEnvelope(type=te_type, v0=tx_envelope)
 
-    def to_xdr(self) -> str:
-        """Get the base64 encoded XDR string representing this
-        :class:`TransactionEnvelope`.
-
-        :return: XDR TransactionEnvelope base64 string object
-        """
-        return self.to_xdr_object().to_xdr()
-
     @classmethod
     def from_xdr_object(
         cls, te_xdr_object: Xdr.types.TransactionEnvelope, network_passphrase: str
@@ -100,7 +92,6 @@ class TransactionEnvelope(BaseTransactionEnvelope):
             tx = Transaction.from_xdr_object(te_xdr_object.v1, v1=True)
             signatures = te_xdr_object.v1.signatures
         else:
-            # TODO: more detail information
             raise ValueError("Invalid EnvelopeType: %d.", te_xdr_object.type)
         te = cls(tx, network_passphrase=network_passphrase, signatures=signatures)
         return te

@@ -37,8 +37,12 @@ class FeeBumpTransaction:
         inner_base_fee_rate = self._inner_transaction.fee / inner_operations_length
         if self.base_fee < inner_base_fee_rate or self.base_fee < BASE_FEE:
             raise ValueError(
-                "Invalid `base_fee`, it should be at least %d stroops.",
-                inner_operations_length,
+                "Invalid `base_fee`, it should be at least %d stroops."
+                % (
+                    self._inner_transaction.fee
+                    if self._inner_transaction.fee > BASE_FEE
+                    else BASE_FEE
+                )
             )
 
     def to_xdr_object(self) -> Xdr.types.FeeBumpTransaction:

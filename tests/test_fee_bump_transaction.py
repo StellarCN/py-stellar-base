@@ -1,3 +1,5 @@
+import pytest
+
 from stellar_sdk import (
     TransactionBuilder,
     Account,
@@ -6,6 +8,7 @@ from stellar_sdk import (
     FeeBumpTransactionEnvelope,
     FeeBumpTransaction,
 )
+from stellar_sdk.exceptions import ValueError
 
 
 class TestFeeBumpTransaction:
@@ -48,3 +51,94 @@ class TestFeeBumpTransaction:
         assert restore_tx.fee_source.public_key == fee_source.public_key
         assert restore_tx.base_fee == base_fee
         assert restore_tx.inner_transaction_envelope.to_xdr() == inner_tx.to_xdr()
+
+    def test_tx_not_v1(self):
+        inner_keypair = Keypair.from_secret(
+            "SBKTIFHJSS3JJWEZO2W74DZSA45WZU56LOL3AY7GAW63BXPEJQFYV53E"
+        )
+        inner_source = Account(inner_keypair.public_key, 7)
+        destination = "GDQERENWDDSQZS7R7WKHZI3BSOYMV3FSWR7TFUYFTKQ447PIX6NREOJM"
+        amount = "2000.0000000"
+        inner_tx = (
+            TransactionBuilder(
+                inner_source, Network.TESTNET_NETWORK_PASSPHRASE, 200, v1=False
+            )
+            .append_payment_op(destination=destination, amount=amount, asset_code="XLM")
+            .add_time_bounds(0, 0)
+            .build()
+        )
+        inner_tx.sign(inner_keypair)
+        fee_source = Keypair.from_secret(
+            "SB7ZMPZB3YMMK5CUWENXVLZWBK4KYX4YU5JBXQNZSK2DP2Q7V3LVTO5V"
+        )
+        base_fee = 200
+        with pytest.raises(
+            ValueError,
+            match="Invalid `inner_transaction`, it should be TransactionV1.",
+        ):
+            TransactionBuilder.build_fee_bump_transaction(
+                fee_source.public_key,
+                base_fee,
+                inner_tx,
+                Network.TESTNET_NETWORK_PASSPHRASE,
+            )
+
+    def test_tx_fee_less_than_inner_tx_fee(self):
+        inner_keypair = Keypair.from_secret(
+            "SBKTIFHJSS3JJWEZO2W74DZSA45WZU56LOL3AY7GAW63BXPEJQFYV53E"
+        )
+        inner_source = Account(inner_keypair.public_key, 7)
+        destination = "GDQERENWDDSQZS7R7WKHZI3BSOYMV3FSWR7TFUYFTKQ447PIX6NREOJM"
+        amount = "2000.0000000"
+        inner_tx = (
+            TransactionBuilder(
+                inner_source, Network.TESTNET_NETWORK_PASSPHRASE, 200, v1=True
+            )
+            .append_payment_op(destination=destination, amount=amount, asset_code="XLM")
+            .add_time_bounds(0, 0)
+            .build()
+        )
+        inner_tx.sign(inner_keypair)
+        fee_source = Keypair.from_secret(
+            "SB7ZMPZB3YMMK5CUWENXVLZWBK4KYX4YU5JBXQNZSK2DP2Q7V3LVTO5V"
+        )
+        base_fee = 150
+        with pytest.raises(
+            ValueError, match="Invalid `base_fee`, it should be at least 200 stroops.",
+        ):
+            TransactionBuilder.build_fee_bump_transaction(
+                fee_source.public_key,
+                base_fee,
+                inner_tx,
+                Network.TESTNET_NETWORK_PASSPHRASE,
+            )
+
+    def test_tx_fee_less_than_base_fee(self):
+        inner_keypair = Keypair.from_secret(
+            "SBKTIFHJSS3JJWEZO2W74DZSA45WZU56LOL3AY7GAW63BXPEJQFYV53E"
+        )
+        inner_source = Account(inner_keypair.public_key, 7)
+        destination = "GDQERENWDDSQZS7R7WKHZI3BSOYMV3FSWR7TFUYFTKQ447PIX6NREOJM"
+        amount = "2000.0000000"
+        inner_tx = (
+            TransactionBuilder(
+                inner_source, Network.TESTNET_NETWORK_PASSPHRASE, 50, v1=True
+            )
+            .append_payment_op(destination=destination, amount=amount, asset_code="XLM")
+            .add_time_bounds(0, 0)
+            .build()
+        )
+        inner_tx.sign(inner_keypair)
+        fee_source = Keypair.from_secret(
+            "SB7ZMPZB3YMMK5CUWENXVLZWBK4KYX4YU5JBXQNZSK2DP2Q7V3LVTO5V"
+        )
+        base_fee = 60
+        with pytest.raises(
+            ValueError, match="Invalid `base_fee`, it should be at least 100 stroops.",
+        ):
+            TransactionBuilder.build_fee_bump_transaction(
+                fee_source.public_key,
+                base_fee,
+                inner_tx,
+                Network.TESTNET_NETWORK_PASSPHRASE,
+            )

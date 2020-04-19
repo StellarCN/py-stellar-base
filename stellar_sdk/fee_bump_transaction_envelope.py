@@ -29,7 +29,7 @@ class FeeBumpTransactionEnvelope(BaseTransactionEnvelope["FeeBumpTransactionEnve
         network_passphrase: str,
         signatures: List[Xdr.types.DecoratedSignature] = None,
     ) -> None:
-        super().__init__(transaction, network_passphrase, signatures)
+        super().__init__(network_passphrase, signatures)
         self.transaction = transaction
 
     def signature_base(self) -> bytes:
@@ -64,14 +64,6 @@ class FeeBumpTransactionEnvelope(BaseTransactionEnvelope["FeeBumpTransactionEnve
         te_type = Xdr.const.ENVELOPE_TYPE_TX_FEE_BUMP
         tx_envelope = Xdr.types.FeeBumpTransactionEnvelope(tx, self.signatures)
         return Xdr.types.TransactionEnvelope(type=te_type, feeBump=tx_envelope)
-
-    def to_xdr(self) -> str:
-        """Get the base64 encoded XDR string representing this
-        :class:`TransactionEnvelope`.
-
-        :return: XDR TransactionEnvelope base64 string object
-        """
-        return self.to_xdr_object().to_xdr()
 
     @classmethod
     def from_xdr_object(

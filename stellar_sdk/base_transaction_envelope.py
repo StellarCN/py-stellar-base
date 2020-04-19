@@ -13,11 +13,9 @@ T = TypeVar("T")
 class BaseTransactionEnvelope(Generic[T]):
     def __init__(
         self,
-        transaction,
         network_passphrase: str,
         signatures: List[Xdr.types.DecoratedSignature] = None,
     ) -> None:
-        self.transaction = transaction
         self.network_id: bytes = Network(network_passphrase).network_id()
         self.signatures: List[Xdr.types.DecoratedSignature] = signatures or []
 
