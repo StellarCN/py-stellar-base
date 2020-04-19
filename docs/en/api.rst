@@ -461,12 +461,31 @@ TransactionEnvelope
 
 .. autoclass:: stellar_sdk.transaction_envelope.TransactionEnvelope
    :members:
+   :inherited-members:
+
+FeeBumpTransaction
+^^^^^^^^^^^^^^^^^^
+
+.. autoclass:: stellar_sdk.fee_bump_transaction.FeeBumpTransaction
+   :members:
+   :inherited-members:
+
+FeeBumpTransactionEnvelope
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. autoclass:: stellar_sdk.fee_bump_transaction_envelope.FeeBumpTransactionEnvelope
+   :members:
+   :inherited-members:
 
 TransactionBuilder
 ^^^^^^^^^^^^^^^^^^
 
 .. autoclass:: stellar_sdk.transaction_builder.TransactionBuilder
    :members:
+
+Helpers
+^^^^^^^
+.. autofunction:: stellar_sdk.helpers.parse_transaction_envelope_from_xdr
 
 Stellar Ecosystem Proposals
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^

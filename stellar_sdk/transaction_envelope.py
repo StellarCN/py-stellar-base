@@ -7,7 +7,7 @@ from .xdr import Xdr
 __all__ = ["TransactionEnvelope"]
 
 
-class TransactionEnvelope(BaseTransactionEnvelope):
+class TransactionEnvelope(BaseTransactionEnvelope["TransactionEnvelope"]):
     """The :class:`TransactionEnvelope` object, which represents a transaction
     envelope ready to sign and submit to send over the network.
 

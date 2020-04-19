@@ -92,6 +92,18 @@ class TransactionBuilder:
         inner_transaction_envelope: TransactionEnvelope,
         network_passphrase: str = Network.TESTNET_NETWORK_PASSPHRASE,
     ):
+        """Create a
+        :py:class:`FeeBumpTransactionEnvelope <stellar_sdk.fee_bump_transaction_envelope.FeeBumpTransactionEnvelope>`
+        object.
+
+        See `CAP-0015 <https://github.com/stellar/stellar-protocol/blob/master/core/cap-0015.md>`_ for more information.
+
+        :param fee_source: The account paying for the transaction.
+        :param base_fee: The max fee willing to pay per operation in inner transaction (**in stroops**).
+        :param inner_transaction_envelope: The TransactionEnvelope to be bumped by the fee bump transaction.
+        :param network_passphrase: The network to connect to for verifying and retrieving additional attributes from.
+        :return: a :class:`TransactionBuilder <stellar_sdk.transaction_envelope.TransactionBuilder>` via the XDR object.
+        """
         fee_bump_transaction = FeeBumpTransaction(
             fee_source=fee_source,
             base_fee=base_fee,
@@ -105,7 +117,7 @@ class TransactionBuilder:
     @staticmethod
     def from_xdr(xdr: str, network_passphrase: str) -> "TransactionBuilder":
         """Create a :class:`TransactionBuilder
-        <stellar_sdk.transaction_envelope.TransactionEnvelope>` via an XDR
+        <stellar_sdk.transaction_envelope.TransactionBuilder>` via an XDR
         object.
 
         In addition, sets the fields of this builder (the transaction envelope,
@@ -115,6 +127,7 @@ class TransactionBuilder:
         :param xdr: The XDR object representing the transaction envelope to
             which this builder is setting its state to.
         :param network_passphrase: The network to connect to for verifying and retrieving additional attributes from.
+        :return: a :class:`TransactionBuilder <stellar_sdk.transaction_envelope.TransactionBuilder>` via the XDR object.
         """
         transaction_envelope = TransactionEnvelope.from_xdr(
             xdr=xdr, network_passphrase=network_passphrase

@@ -12,7 +12,7 @@ __all__ = ["Transaction"]
 
 
 class Transaction:
-    """The :class:`Transaction` object, which represents a transaction
+    """The :class:`Transaction` object, which represents a transaction(Transaction or TransactionV0)
     on Stellar's network.
 
     A transaction contains a list of operations, which are all executed
@@ -162,7 +162,7 @@ class Transaction:
             See `CAP-0015 <https://github.com/stellar/stellar-protocol/blob/master/core/cap-0015.md>`_
             for more information.
 
-        :return: A new :class:`TransactionEnvelope` object from the given XDR TransactionEnvelope base64 string object.
+        :return: A new :class:`Transaction` object from the given XDR Transaction base64 string object.
         """
         if v1:
             xdr_object = Xdr.types.Transaction.from_xdr(xdr)

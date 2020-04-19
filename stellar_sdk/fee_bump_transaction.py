@@ -13,6 +13,16 @@ __all__ = ["FeeBumpTransaction"]
 
 
 class FeeBumpTransaction:
+    """The :class:`FeeBumpTransaction` object, which represents a fee bump transaction
+    on Stellar's network.
+
+    See `CAP-0015 <https://github.com/stellar/stellar-protocol/blob/master/core/cap-0015.md>`_ for more information.
+
+    :param fee_source: The account paying for the transaction.
+    :param base_fee: The max fee willing to pay per operation in inner transaction (**in stroops**).
+    :param inner_transaction_envelope: The TransactionEnvelope to be bumped by the fee bump transaction.
+    """
+
     def __init__(
         self,
         fee_source: Union[Keypair, str],
@@ -67,7 +77,7 @@ class FeeBumpTransaction:
     ) -> "FeeBumpTransaction":
         """Create a new :class:`FeeBumpTransaction` from an XDR object.
 
-        :param tx_xdr_object: The XDR object that represents a transaction.
+        :param tx_xdr_object: The XDR object that represents a fee bump transaction.
         :param network_passphrase: The network to connect to for verifying and retrieving additional attributes from.
 
         :return: A new :class:`FeeBumpTransaction` object from the given XDR Transaction object.
@@ -90,12 +100,12 @@ class FeeBumpTransaction:
 
     @classmethod
     def from_xdr(cls, xdr: str, network_passphrase: str) -> "FeeBumpTransaction":
-        """Create a new :class:`Transaction` from an XDR string.
+        """Create a new :class:`FeeBumpTransaction` from an XDR string.
 
         :param xdr: The XDR string that represents a transaction.
         :param network_passphrase: The network to connect to for verifying and retrieving additional attributes from.
 
-        :return: A new :class:`TransactionEnvelope` object from the given XDR TransactionEnvelope base64 string object.
+        :return: A new :class:`FeeBumpTransaction` object from the given XDR FeeBumpTransaction base64 string object.
         """
         xdr_object = Xdr.types.FeeBumpTransaction.from_xdr(xdr)
         return cls.from_xdr_object(xdr_object, network_passphrase)
