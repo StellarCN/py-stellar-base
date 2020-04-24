@@ -159,7 +159,7 @@ class StrKey:
         return decode_check("sha256_hash", data)
 
     @staticmethod
-    def encode_muxed_account(data: bytes) -> str:
+    def encode_muxed_account(data: Xdr.types.MuxedAccount) -> str:
         """Encodes data to strkey muxed account.
 
         :param data: data to encode
@@ -168,17 +168,16 @@ class StrKey:
             :exc:`ValueError <stellar_sdk.exceptions.ValueError>`
             :exc:`TypeError <stellar_sdk.exceptions.TypeError>`
         """
-        muxed = Xdr.types.MuxedAccount.from_xdr(data.decode())
-        if muxed.type == Xdr.const.KEY_TYPE_ED25519:
-            return StrKey.encode_ed25519_public_key(muxed.ed25519)
+        if data.type == Xdr.const.KEY_TYPE_ED25519:
+            return StrKey.encode_ed25519_public_key(data.ed25519)
         packer = Xdr.StellarXDRPacker()
-        packer.pack_int64(muxed.med25519.id)
-        packer.pack_uint256(muxed.med25519.ed25519)
+        packer.pack_int64(data.med25519.id)
+        packer.pack_uint256(data.med25519.ed25519)
         data = packer.get_buffer()
         return encode_check("muxed_account", data)
 
     @staticmethod
-    def decode_muxed_account(data: str) -> bytes:
+    def decode_muxed_account(data: str) -> Xdr.types.MuxedAccount:
         """Decodes strkey muxed account to raw data.
 
         :param data: strkey muxed account
@@ -205,7 +204,7 @@ class StrKey:
             )
         else:
             raise ValueError("Invalid encoded string.")
-        return muxed.to_xdr().encode()
+        return muxed
 
 
 def decode_check(version_byte_name: str, encoded: str) -> bytes:

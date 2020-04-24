@@ -21,7 +21,7 @@ class AccountMerge(Operation):
 
     def __init__(self, destination: str, source: str = None) -> None:
         super().__init__(source)
-        check_ed25519_public_key(destination)
+        # check_ed25519_public_key(destination)
         self.destination: str = destination
 
     @classmethod
@@ -29,7 +29,7 @@ class AccountMerge(Operation):
         return Xdr.const.ACCOUNT_MERGE
 
     def _to_operation_body(self) -> Xdr.nullclass:
-        destination = Keypair.from_public_key(self.destination).xdr_muxed_account()
+        destination = StrKey.decode_muxed_account(self.destination)
         body = Xdr.nullclass()
         body.type = Xdr.const.ACCOUNT_MERGE
         body.destination = destination
@@ -44,7 +44,6 @@ class AccountMerge(Operation):
 
         """
         source = Operation.get_source_from_xdr_obj(operation_xdr_object)
-        destination = StrKey.encode_ed25519_public_key(
-            operation_xdr_object.body.destination.ed25519
-        )
+        destination = StrKey.encode_muxed_account(operation_xdr_object.body.destination)
+
         return cls(source=source, destination=destination)

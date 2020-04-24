@@ -35,10 +35,8 @@ class TestStrKey:
         account_id_muxed = (
             "MAAAAAAAAAAAJURAAB2X52XFQP6FBXLGT6LWOOWMEXWHEWBDVRZ7V5WH34Y22MPFBHUHY"
         )
-        decoded = StrKey.decode_muxed_account(account_id_muxed)
-        assert (
-            decoded == b"AAABAAAAAAAAAATSIAB1furlg/xQ3Wafl2c6zCXsclgjrHP69sffMa0x5Qk="
-        )
+        decoded = StrKey.decode_muxed_account(account_id_muxed).to_xdr()
+        assert decoded == "AAABAAAAAAAAAATSIAB1furlg/xQ3Wafl2c6zCXsclgjrHP69sffMa0x5Qk="
 
     def test_decode_muxed_account_ed25519(self):
         account_id = "GAQAA5L65LSYH7CQ3VTJ7F3HHLGCL3DSLAR2Y47263D56MNNGHSQSTVY"
@@ -46,13 +44,11 @@ class TestStrKey:
         # account_id_muxed = "MAAAAAAAAAAAJURAAB2X52XFQP6FBXLGT6LWOOWMEXWHEWBDVRZ7V5WH34Y22MPFBHUHY"
         decoded = StrKey.decode_muxed_account(account_id)
         assert (
-            decoded
+            decoded.to_xdr()
             == Xdr.types.MuxedAccount(
                 type=Xdr.const.KEY_TYPE_ED25519,
                 ed25519=StrKey.decode_ed25519_public_key(account_id),
-            )
-            .to_xdr()
-            .encode()
+            ).to_xdr()
         )
 
     def test_encode_muxed_account_ed25519(self):
@@ -62,8 +58,6 @@ class TestStrKey:
                 type=Xdr.const.KEY_TYPE_ED25519,
                 ed25519=StrKey.decode_ed25519_public_key(account_id),
             )
-            .to_xdr()
-            .encode()
         )
         encoded = StrKey.encode_muxed_account(data)
         assert encoded == StrKey.encode_ed25519_public_key(
@@ -71,7 +65,7 @@ class TestStrKey:
         )
 
     def test_encode_muxed_account_med25519(self):
-        data = b"AAABAAAAAAAAAATSIAB1furlg/xQ3Wafl2c6zCXsclgjrHP69sffMa0x5Qk="
+        data = Xdr.types.MuxedAccount.from_xdr("AAABAAAAAAAAAATSIAB1furlg/xQ3Wafl2c6zCXsclgjrHP69sffMa0x5Qk=")
         expected = (
             "MAAAAAAAAAAAJURAAB2X52XFQP6FBXLGT6LWOOWMEXWHEWBDVRZ7V5WH34Y22MPFBHUHY"
         )

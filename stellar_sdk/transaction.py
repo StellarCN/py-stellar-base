@@ -64,10 +64,10 @@ class Transaction:
 
         if memo is None:
             memo = NoneMemo()
-        if isinstance(source, str):
-            source = Keypair.from_public_key(source)
+        if isinstance(source, Keypair):
+            source = source.public_key
 
-        self.source: Keypair = source
+        self.source: str = source
         self.sequence: int = sequence
         self.operations: List[Operation] = operations
         self.memo: Memo = memo
@@ -88,23 +88,13 @@ class Transaction:
         ext = Xdr.nullclass()
         ext.v = 0
         if self.v1:
+            source_xdr = StrKey.decode_muxed_account(self.source)
             return Xdr.types.Transaction(
-                self.source.xdr_muxed_account(),
-                self.fee,
-                self.sequence,
-                time_bounds,
-                memo,
-                operations,
-                ext,
+                source_xdr, self.fee, self.sequence, time_bounds, memo, operations, ext,
             )
+        source_xdr = Keypair.from_public_key(self.source).xdr_account_id().ed25519
         return Xdr.types.TransactionV0(
-            self.source.xdr_account_id().ed25519,
-            self.fee,
-            self.sequence,
-            time_bounds,
-            memo,
-            operations,
-            ext,
+            source_xdr, self.fee, self.sequence, time_bounds, memo, operations, ext,
         )
 
     @classmethod
@@ -124,12 +114,10 @@ class Transaction:
         :return: A new :class:`Transaction` object from the given XDR Transaction object.
         """
         if v1:
-            source = Keypair.from_public_key(
-                StrKey.encode_ed25519_public_key(tx_xdr_object.sourceAccount.ed25519)
-            )
+            source = StrKey.encode_muxed_account(tx_xdr_object.sourceAccount)
         else:
-            source = Keypair.from_public_key(
-                StrKey.encode_ed25519_public_key(tx_xdr_object.sourceAccountEd25519)
+            source = StrKey.encode_ed25519_public_key(
+                tx_xdr_object.sourceAccountEd25519
             )
         sequence = tx_xdr_object.seqNum
         fee = tx_xdr_object.fee
