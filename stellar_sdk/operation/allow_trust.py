@@ -1,3 +1,5 @@
+from typing import Union
+
 from .operation import Operation
 from ..asset import Asset
 from ..keypair import Keypair
@@ -28,14 +30,25 @@ class AllowTrust(Operation):
     """
 
     def __init__(
-        self, trustor: str, asset_code: str, authorize: bool, source: str = None
+        self,
+        trustor: str,
+        asset_code: str,
+        authorize: Union[bool, int],
+        source: str = None,
     ) -> None:
         super().__init__(source)
         check_ed25519_public_key(trustor)
         check_asset_code(asset_code)
         self.trustor: str = trustor
         self.asset_code: str = asset_code
-        self.authorize: bool = authorize
+
+        if isinstance(authorize, bool):
+            if authorize is True:
+                self.authorize: int = 1
+            else:
+                self.authorize: int = 0
+        else:
+            self.authorize: int = authorize
 
     @classmethod
     def type_code(cls) -> int:
