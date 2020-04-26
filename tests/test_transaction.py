@@ -28,7 +28,7 @@ class TestTransaction:
 
         restore_transaction = Transaction.from_xdr_object(tx_object, v1=True)
         assert isinstance(restore_transaction, Transaction)
-        assert restore_transaction.source == source
+        assert restore_transaction.source == source.public_key
         assert restore_transaction.fee == fee
         assert restore_transaction.memo == memo
         assert restore_transaction.time_bounds == time_bounds
@@ -54,11 +54,33 @@ class TestTransaction:
 
         restore_transaction = Transaction.from_xdr(xdr, True)
         assert isinstance(restore_transaction, Transaction)
-        assert restore_transaction.source == Keypair.from_public_key(source)
+        assert restore_transaction.source == Keypair.from_public_key(source).public_key
         assert restore_transaction.fee == fee
         assert restore_transaction.memo == memo
         assert restore_transaction.time_bounds == time_bounds
         assert restore_transaction.sequence == sequence
+
+    # def test_to_xdr_str_muxed_account_source_v1(self):
+    #     source = "MAAAAAAAAAAAJURAAB2X52XFQP6FBXLGT6LWOOWMEXWHEWBDVRZ7V5WH34Y22MPFBHUHY"
+    #     destination = "GDJJRRMBK4IWLEPJGIE6SXD2LP7REGZODU7WDC3I2D6MR37F4XSHBKX2"
+    #     amount = "1000.0"
+    #     sequence = 1
+    #     memo = IdMemo(100)
+    #     fee = 200
+    #     asset = Asset.native()
+    #     time_bounds = TimeBounds(12345, 56789)
+    #     ops = [Payment(destination, asset, amount), ManageData("hello", "world")]
+    #
+    #     tx_object = Transaction(
+    #         source, sequence, fee, ops, memo, time_bounds, True
+    #     ).to_xdr_object()
+    #     restore_transaction = Transaction.from_xdr(tx_object.to_xdr(), True)
+    #     assert isinstance(restore_transaction, Transaction)
+    #     assert restore_transaction.source == Keypair.from_public_key(source)
+    #     assert restore_transaction.fee == fee
+    #     assert restore_transaction.memo == memo
+    #     assert restore_transaction.time_bounds == time_bounds
+    #     assert restore_transaction.sequence == sequence
 
     def test_none_memo_v1(self):
         source = Keypair.from_public_key(
@@ -93,7 +115,7 @@ class TestTransaction:
 
         restore_transaction = Transaction.from_xdr_object(tx_object, False)
         assert isinstance(restore_transaction, Transaction)
-        assert restore_transaction.source == source
+        assert restore_transaction.source == source.public_key
         assert restore_transaction.fee == fee
         assert restore_transaction.memo == memo
         assert restore_transaction.time_bounds == time_bounds
@@ -120,7 +142,7 @@ class TestTransaction:
 
         restore_transaction = Transaction.from_xdr(tx_object.to_xdr(), False)
         assert isinstance(restore_transaction, Transaction)
-        assert restore_transaction.source == Keypair.from_public_key(source)
+        assert restore_transaction.source == Keypair.from_public_key(source).public_key
         assert restore_transaction.fee == fee
         assert restore_transaction.memo == memo
         assert restore_transaction.time_bounds == time_bounds

@@ -6,6 +6,8 @@ from urllib.parse import urlsplit, urlunsplit
 
 from .asset import Asset
 from .exceptions import NoApproximationError, TypeError
+from .strkey import decode_check, StrKey
+from .xdr import Xdr
 
 
 def sha256(data: bytes) -> bytes:
@@ -80,3 +82,14 @@ def urljoin_with_query(base: str, path: str) -> str:
         (split_url.scheme, split_url.netloc, real_path, query, split_url.fragment)
     )
     return url
+
+
+def parse_ed25519_account_id(data: str) -> str:
+    if data.startswith("G"):
+        return data
+    if data.startswith("M"):
+        xdr = decode_check("muxed_account", data)
+        unpacker = Xdr.StellarXDRUnpacker(xdr)
+        _ = unpacker.unpack_int64()
+        ed25519 = unpacker.unpack_uint256()
+        return StrKey.encode_ed25519_public_key(ed25519)

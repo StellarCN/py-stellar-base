@@ -8,6 +8,7 @@ from crc16 import crc16xmodem
 from .exceptions import (
     Ed25519SecretSeedInvalidError,
     Ed25519PublicKeyInvalidError,
+    MuxedEd25519AccountInvalidError,
     ValueError,
     TypeError,
 )
@@ -194,7 +195,12 @@ class StrKey:
             )
         elif data_length == 69:
             # let's optimize it in v3.
-            xdr = decode_check("muxed_account", data)
+            try:
+                xdr = decode_check("muxed_account", data)
+            except Exception:
+                raise MuxedEd25519AccountInvalidError(
+                    "Invalid Muxed Account: {}".format(data)
+                )
             unpacker = Xdr.StellarXDRUnpacker(xdr)
             med25519 = Xdr.nullclass()
             med25519.id = unpacker.unpack_int64()
@@ -203,7 +209,7 @@ class StrKey:
                 type=Xdr.const.KEY_TYPE_MUXED_ED25519, med25519=med25519
             )
         else:
-            raise ValueError("Invalid encoded string.")
+            raise ValueError("Invalid encoded string, this is not a valid account.")
         return muxed
 
 

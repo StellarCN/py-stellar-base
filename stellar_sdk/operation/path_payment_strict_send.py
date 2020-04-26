@@ -6,7 +6,7 @@ from ..asset import Asset
 from ..keypair import Keypair
 from ..xdr import Xdr
 from ..strkey import StrKey
-from .utils import check_ed25519_public_key, check_amount
+from .utils import check_muxed_ed25519_account, check_amount
 
 
 class PathPaymentStrictSend(Operation):
@@ -40,7 +40,7 @@ class PathPaymentStrictSend(Operation):
         source: str = None,
     ) -> None:
         super().__init__(source)
-        check_ed25519_public_key(destination)
+        check_muxed_ed25519_account(destination)
         check_amount(send_amount)
         check_amount(dest_min)
         self.destination: str = destination

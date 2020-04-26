@@ -21,10 +21,12 @@ class TestTimeBounds:
         assert from_instance.min_time == min_time
 
     @pytest.mark.parametrize(
-        "min_time, max_time, message", [
+        "min_time, max_time, message",
+        [
             (-1, 1560844454, "min_time cannot be negative."),
             (1560844454, -1, "max_time cannot be negative."),
-            (1560844455, 156084454, "max_time must be >= min_time.")]
+            (1560844455, 156084454, "max_time must be >= min_time."),
+        ],
     )
     def test_to_xdr_with_invalid_time_raise(self, min_time, max_time, message):
         with pytest.raises(ValueError, match=message):

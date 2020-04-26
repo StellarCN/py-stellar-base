@@ -40,7 +40,7 @@ class Operation(metaclass=ABCMeta):
     _ONE = Decimal(10 ** 7)
 
     def __init__(self, source: str = None) -> None:
-        # check_source(source)
+        check_source(source)
         self.source: Optional[str] = source
 
     @classmethod

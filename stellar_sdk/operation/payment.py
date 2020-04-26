@@ -3,10 +3,9 @@ from typing import Union
 
 from .operation import Operation
 from ..asset import Asset
-from ..keypair import Keypair
 from ..xdr import Xdr
 from ..strkey import StrKey
-from .utils import check_ed25519_public_key, check_amount
+from .utils import check_amount, check_muxed_ed25519_account
 
 
 class Payment(Operation):
@@ -33,7 +32,7 @@ class Payment(Operation):
         source: str = None,
     ) -> None:
         super().__init__(source)
-        # check_ed25519_public_key(destination)
+        check_muxed_ed25519_account(destination)
         check_amount(amount)
         self.destination: str = destination
         self.asset: Asset = asset

@@ -34,7 +34,7 @@ from .sep.exceptions import AccountRequiresMemoError
 from .transaction import Transaction
 from .transaction_envelope import TransactionEnvelope
 from .helpers import parse_transaction_envelope_from_xdr
-from .utils import urljoin_with_query
+from .utils import urljoin_with_query, parse_ed25519_account_id
 from .xdr import Xdr
 
 __all__ = ["Server"]
@@ -384,7 +384,8 @@ class Server:
         return self.__load_account_sync(account_id)
 
     async def __load_account_async(self, account_id: str) -> Account:
-        resp = await self.accounts().account_id(account_id=account_id).call()
+        ed25519_account_id = parse_ed25519_account_id(account_id)
+        resp = await self.accounts().account_id(account_id=ed25519_account_id).call()
         sequence = int(resp["sequence"])
         thresholds = Thresholds(
             resp["thresholds"]["low_threshold"],
@@ -397,7 +398,8 @@ class Server:
         return account
 
     def __load_account_sync(self, account_id: str) -> Account:
-        resp = self.accounts().account_id(account_id=account_id).call()
+        ed25519_account_id = parse_ed25519_account_id(account_id)
+        resp = self.accounts().account_id(account_id=ed25519_account_id).call()
         sequence = int(resp["sequence"])
         thresholds = Thresholds(
             resp["thresholds"]["low_threshold"],

@@ -1,6 +1,5 @@
 from .operation import Operation
-from .utils import check_ed25519_public_key, check_source
-from ..keypair import Keypair
+from .utils import check_muxed_ed25519_account
 from ..strkey import StrKey
 from ..xdr import Xdr
 
@@ -21,7 +20,7 @@ class AccountMerge(Operation):
 
     def __init__(self, destination: str, source: str = None) -> None:
         super().__init__(source)
-        # check_ed25519_public_key(destination)
+        check_muxed_ed25519_account(destination)
         self.destination: str = destination
 
     @classmethod
