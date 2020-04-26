@@ -251,7 +251,9 @@ class TestAccountMerge:
 
     def test_from_xdr_obj_muxed_account(self):
         source = "GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV"
-        destination = "MAAAAAAAAAAAJURAAB2X52XFQP6FBXLGT6LWOOWMEXWHEWBDVRZ7V5WH34Y22MPFBHUHY"
+        destination = (
+            "MAAAAAAAAAAAJURAAB2X52XFQP6FBXLGT6LWOOWMEXWHEWBDVRZ7V5WH34Y22MPFBHUHY"
+        )
         origin_xdr_obj = AccountMerge(destination, source).to_xdr_object()
         op = Operation.from_xdr_object(origin_xdr_obj)
         assert isinstance(op, AccountMerge)
@@ -492,7 +494,9 @@ class TestPathPaymentStrictReceive:
 
     def test_from_xdr_obj_muxed_account(self):
         source = "GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV"
-        destination = "MAAAAAAAAAAAJURAAB2X52XFQP6FBXLGT6LWOOWMEXWHEWBDVRZ7V5WH34Y22MPFBHUHY"
+        destination = (
+            "MAAAAAAAAAAAJURAAB2X52XFQP6FBXLGT6LWOOWMEXWHEWBDVRZ7V5WH34Y22MPFBHUHY"
+        )
         send_asset = Asset(
             "USD", "GDGU5OAPHNPU5UCLE5RDJHG7PXZFQYWKCFOEXSXNMR6KRQRI5T6XXCD7"
         )
@@ -593,7 +597,9 @@ class TestPathPaymentStrictSend:
 
     def test_from_xdr_obj_muxed_account(self):
         source = "GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV"
-        destination = "MAAAAAAAAAAAJURAAB2X52XFQP6FBXLGT6LWOOWMEXWHEWBDVRZ7V5WH34Y22MPFBHUHY"
+        destination = (
+            "MAAAAAAAAAAAJURAAB2X52XFQP6FBXLGT6LWOOWMEXWHEWBDVRZ7V5WH34Y22MPFBHUHY"
+        )
         send_asset = Asset(
             "USD", "GDGU5OAPHNPU5UCLE5RDJHG7PXZFQYWKCFOEXSXNMR6KRQRI5T6XXCD7"
         )
@@ -1022,13 +1028,19 @@ class TestOperationUtils:
 
     @pytest.mark.parametrize(
         "source,msg",
-        [("GCNY5OXYSY4FKHOPT2SPOQZAOEIGXB5LBYW3HVU3OWSTQITS65M5RBAD", "Invalid Ed25519 Public Key: "),
-         ("MAAAAAAAAAAAJURAAB2X52XFQP6FBXLGT6LWOOWMEXWHEWBDVRZ7V5WH34Y22MPFBHBAD", "Invalid Muxed Account: ")]
+        [
+            (
+                "GCNY5OXYSY4FKHOPT2SPOQZAOEIGXB5LBYW3HVU3OWSTQITS65M5RBAD",
+                "Invalid Ed25519 Public Key: ",
+            ),
+            (
+                "MAAAAAAAAAAAJURAAB2X52XFQP6FBXLGT6LWOOWMEXWHEWBDVRZ7V5WH34Y22MPFBHBAD",
+                "Invalid Muxed Account: ",
+            ),
+        ],
     )
     def test_check_source_raise(self, source, msg):
-        with pytest.raises(
-            ValueError, match=msg + source
-        ):
+        with pytest.raises(ValueError, match=msg + source):
             check_source(source)
 
     def test_check_ed25519_public_key(self):

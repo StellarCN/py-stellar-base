@@ -20,8 +20,10 @@ def check_source(source: Optional[str]) -> None:
 def check_ed25519_public_key(public_key: str) -> None:
     Keypair.from_public_key(public_key)
 
+
 def check_muxed_ed25519_account(muxed_account: str) -> None:
     StrKey.decode_muxed_account(muxed_account)
+
 
 def check_asset_code(asset_code: str) -> None:
     Asset.check_if_asset_code_is_valid(asset_code)

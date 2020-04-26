@@ -63,6 +63,7 @@ class Ed25519PublicKeyInvalidError(ValueError):
 
     """
 
+
 class MuxedEd25519AccountInvalidError(ValueError):
     """Muxed Ed25519 public key is incorrect.
 
