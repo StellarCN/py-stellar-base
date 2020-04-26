@@ -1,6 +1,47 @@
 Release History
 ===============
 
+### Version 2.4.0-alpha1
+
+Released on April 26, 2020
+
+**This update include breaking changes**.
+
+This version brings protocol 13 support with backwards compatibility support for protocol 12.
+
+### Added
+
+- Add `TransactionBuilder.build_fee_bump_transaction` which makes it easy to create `FeeBumpTransaction`, we have written an example, please click [here](https://github.com/StellarCN/py-stellar-base/blob/91fbd2ad61/examples/build_fee_bump_transaction.py) to view it ([#298](https://github.com/StellarCN/py-stellar-base/pull/298)).
+- Adds a feature flag which allow consumers of this library to create V1 (Protocol 13) transactions using the `TransactionBuilder` ([#298](https://github.com/StellarCN/py-stellar-base/pull/298)).
+- Add support for [CAP-0027](https://github.com/stellar/stellar-protocol/blob/master/core/cap-0027.md): First-class multiplexed accounts ([#300](https://github.com/StellarCN/py-stellar-base/pull/300)).
+- Add `Keypair.xdr_muxed_account` which creates a new `MuxedAccount`([#300](https://github.com/StellarCN/py-stellar-base/pull/300)).
+- Add `FeeBumpTransaction` and `FeeBumpTransactionEnvelope` which makes it easy to work with fee bump transactions ([#298](https://github.com/StellarCN/py-stellar-base/pull/298)).
+- Add `stellar_sdk.helpers.parse_transaction_envelope_from_xdr` which makes it easy to parse `TransactionEnvelope` and `FeeBumpTransactionEnvelope`([#298](https://github.com/StellarCN/py-stellar-base/pull/298)).
+
+### Update
+
+- Update XDR definitions with protocol 13.
+- Extend `TransactionEnvelope` to work with `TransactionEnvelope`and `FeeBumpTransactionEnvelope` ([#298](https://github.com/StellarCN/py-stellar-base/pull/298)).
+- Add backward compatibility support for [CAP-0018](https://github.com/stellar/stellar-protocol/blob/f01c9354aaab1e8ca97a25cf888829749cadf36a/core/cap-0018.md) ([#307](https://github.com/StellarCN/py-stellar-base/pull/307)).
+
+### Breaking changes
+
+- The type of `Transaction.source` changes from `Keypair` to `str`.
+
+- In this version, some changes have occurred in the XDR files. If you depend on them, please click [here](https://github.com/StellarCN/py-stellar-base/compare/686cf05be3c76426b6386eb31658615aa708b293...30311f51ff0f27f000cf5bc61c5c98ac734eb8f7) to view the changes.
+
+- The following XDR fields, which were previously an `AccountID` are now a `MuxedAccount` ([#300](https://github.com/StellarCN/py-stellar-base/pull/300)):
+
+  - `PaymentOp.destination`
+  - `PathPaymentStrictReceiveOp.destination`
+  - `PathPaymentStrictSendOp.destination`
+  - `OperationOp.source`
+  - `Operation.destination` (for `ACCOUNT_MERGE`)
+  - `Transaction.source`
+  - `FeeBumpTransaction.feeSource`
+
+  You can get the string representation by calling `StrKey.encode_muxed_account` which will return a `G..` or `M..` account.
+  
 ### Version 2.3.1
 Released on April 12, 2020
 
