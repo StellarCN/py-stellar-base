@@ -25,10 +25,6 @@ _version_bytes = {
 }
 
 
-# https://github.com/stellar/js-stellar-base/pull/330/files
-# https://github.com/stellar/js-stellar-base/pull/327/files
-
-
 class StrKey:
     """StrKey is a helper class that allows encoding and decoding strkey.
 
