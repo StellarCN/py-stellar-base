@@ -35,10 +35,10 @@ class FeeBumpTransaction:
         ):
             raise ValueError("Invalid `inner_transaction`, it should be TransactionV1.")
 
+        self.fee_source = fee_source
         if isinstance(fee_source, Keypair):
-            self.fee_source = fee_source
-        else:
-            self.fee_source = Keypair.from_public_key(fee_source)
+            self.fee_source = fee_source.public_key
+
         self.base_fee = base_fee
         self.inner_transaction_envelope = inner_transaction_envelope
         self._inner_transaction = inner_transaction_envelope.transaction
@@ -60,7 +60,7 @@ class FeeBumpTransaction:
 
         :return: XDR Transaction object
         """
-        fee_source = self.fee_source.xdr_muxed_account()
+        fee_source = StrKey.decode_muxed_account(self.fee_source)
         fee = self.base_fee * (len(self._inner_transaction.operations) + 1)
         ext = Xdr.nullclass()
         ext.v = 0
@@ -82,9 +82,7 @@ class FeeBumpTransaction:
 
         :return: A new :class:`FeeBumpTransaction` object from the given XDR Transaction object.
         """
-        source = Keypair.from_public_key(
-            StrKey.encode_ed25519_public_key(tx_xdr_object.feeSource.ed25519)
-        )
+        source = StrKey.encode_muxed_account(tx_xdr_object.feeSource)
         inner_transaction_envelope = TransactionEnvelope.from_xdr_object(
             tx_xdr_object.innerTx, network_passphrase
         )

@@ -8,9 +8,11 @@ from crc16 import crc16xmodem
 from .exceptions import (
     Ed25519SecretSeedInvalidError,
     Ed25519PublicKeyInvalidError,
+    MuxedEd25519AccountInvalidError,
     ValueError,
     TypeError,
 )
+from .xdr import Xdr
 
 __all__ = ["StrKey"]
 
@@ -19,6 +21,7 @@ _version_bytes = {
     "ed25519_secret_seed": binascii.a2b_hex("90"),  # S 144 18 << 3
     "pre_auth_tx": binascii.a2b_hex("98"),  # T 152 19 << 3
     "sha256_hash": binascii.a2b_hex("b8"),  # X 184 23 << 3
+    "muxed_account": binascii.a2b_hex("60"),  # M 96 12 << 3
 }
 
 
@@ -152,9 +155,63 @@ class StrKey:
         """
         return decode_check("sha256_hash", data)
 
+    @staticmethod
+    def encode_muxed_account(data: Xdr.types.MuxedAccount) -> str:
+        """Encodes data to strkey muxed account.
+
+        :param data: data to encode
+        :return: strkey muxed account
+        :raises:
+            :exc:`ValueError <stellar_sdk.exceptions.ValueError>`
+            :exc:`TypeError <stellar_sdk.exceptions.TypeError>`
+        """
+        if data.type == Xdr.const.KEY_TYPE_ED25519:
+            return StrKey.encode_ed25519_public_key(data.ed25519)
+        packer = Xdr.StellarXDRPacker()
+        packer.pack_int64(data.med25519.id)
+        packer.pack_uint256(data.med25519.ed25519)
+        data = packer.get_buffer()
+        return encode_check("muxed_account", data)
+
+    @staticmethod
+    def decode_muxed_account(data: str) -> Xdr.types.MuxedAccount:
+        """Decodes strkey muxed account to raw data.
+
+        :param data: strkey muxed account
+        :return: raw bytes
+        :raises:
+            :exc:`ValueError <stellar_sdk.exceptions.ValueError>`
+            :exc:`TypeError <stellar_sdk.exceptions.TypeError>`
+        """
+        data_length = len(data)
+        if data_length == 56:
+            muxed = Xdr.types.MuxedAccount(
+                type=Xdr.const.KEY_TYPE_ED25519,
+                ed25519=StrKey.decode_ed25519_public_key(data),
+            )
+        elif data_length == 69:
+            # let's optimize it in v3.
+            try:
+                xdr = decode_check("muxed_account", data)
+            except Exception:
+                raise MuxedEd25519AccountInvalidError(
+                    "Invalid Muxed Account: {}".format(data)
+                )
+            unpacker = Xdr.StellarXDRUnpacker(xdr)
+            med25519 = Xdr.nullclass()
+            med25519.id = unpacker.unpack_int64()
+            med25519.ed25519 = unpacker.unpack_uint256()
+            muxed = Xdr.types.MuxedAccount(
+                type=Xdr.const.KEY_TYPE_MUXED_ED25519, med25519=med25519
+            )
+        else:
+            raise ValueError("Invalid encoded string, this is not a valid account.")
+        return muxed
+
 
 def decode_check(version_byte_name: str, encoded: str) -> bytes:
     encoded_data = _bytes_from_decode_data(encoded)
+    encoded_data = encoded_data + b"=" * ((4 - len(encoded_data) % 4) % 4)
 
     try:
         decoded_data = base64.b32decode(encoded_data)
@@ -173,7 +230,7 @@ def decode_check(version_byte_name: str, encoded: str) -> bytes:
     if expected_version is None:
         raise TypeError(
             '{} is not a valid version byte name. expected one of "ed25519_public_key", '
-            '"ed25519_secret_seed", "pre_auth_tx", "sha256_hash"'.format(
+            '"ed25519_secret_seed", "pre_auth_tx", "sha256_hash", "muxed_account"'.format(
                 version_byte_name
             )
         )
@@ -200,13 +257,13 @@ def encode_check(version_byte_name: str, data: bytes) -> str:
     if version_byte is None:
         raise TypeError(
             '{} is not a valid version byte name. expected one of "ed25519_public_key", '
-            '"ed25519_secret_seed", "pre_auth_tx", "sha256_hash"'.format(
+            '"ed25519_secret_seed", "pre_auth_tx", "sha256_hash", "muxed_account"'.format(
                 version_byte_name
             )
         )
     payload = version_byte + data
     crc = _calculate_checksum(payload)
-    return base64.b32encode(payload + crc).decode("utf-8")
+    return base64.b32encode(payload + crc).decode("utf-8").rstrip("=")
 
 
 def is_valid(version_byte_name: str, encoded: str) -> bool:

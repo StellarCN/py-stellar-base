@@ -3,10 +3,9 @@ from typing import Union
 
 from .operation import Operation
 from ..asset import Asset
-from ..keypair import Keypair
 from ..xdr import Xdr
 from ..strkey import StrKey
-from .utils import check_ed25519_public_key, check_amount
+from .utils import check_amount, check_muxed_ed25519_account
 
 
 class Payment(Operation):
@@ -33,7 +32,7 @@ class Payment(Operation):
         source: str = None,
     ) -> None:
         super().__init__(source)
-        check_ed25519_public_key(destination)
+        check_muxed_ed25519_account(destination)
         check_amount(amount)
         self.destination: str = destination
         self.asset: Asset = asset
@@ -45,10 +44,8 @@ class Payment(Operation):
 
     def _to_operation_body(self) -> Xdr.nullclass:
         asset = self.asset.to_xdr_object()
-        destination = Keypair.from_public_key(self.destination).xdr_muxed_account()
-
+        destination = StrKey.decode_muxed_account(self.destination)
         amount = Operation.to_xdr_amount(self.amount)
-
         payment_op = Xdr.types.PaymentOp(destination, asset, amount)
         body = Xdr.nullclass()
         body.type = Xdr.const.PAYMENT
@@ -63,8 +60,8 @@ class Payment(Operation):
         """
         source = Operation.get_source_from_xdr_obj(operation_xdr_object)
 
-        destination = StrKey.encode_ed25519_public_key(
-            operation_xdr_object.body.paymentOp.destination.ed25519
+        destination = StrKey.encode_muxed_account(
+            operation_xdr_object.body.paymentOp.destination
         )
         asset = Asset.from_xdr_object(operation_xdr_object.body.paymentOp.asset)
         amount = Operation.from_xdr_amount(operation_xdr_object.body.paymentOp.amount)

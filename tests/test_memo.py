@@ -91,7 +91,9 @@ class TestMemo:
         length = 33
         with pytest.raises(
             MemoInvalidException,
-            match="The length of HashMemo should be 32 bytes, got {:d} bytes.".format(length),
+            match="The length of HashMemo should be 32 bytes, got {:d} bytes.".format(
+                length
+            ),
         ):
             HashMemo(os.urandom(length))
 
@@ -99,7 +101,9 @@ class TestMemo:
         length = 16
         with pytest.raises(
             MemoInvalidException,
-            match="The length of HashMemo should be 32 bytes, got {:d} bytes.".format(length),
+            match="The length of HashMemo should be 32 bytes, got {:d} bytes.".format(
+                length
+            ),
         ):
             HashMemo(os.urandom(length))
 

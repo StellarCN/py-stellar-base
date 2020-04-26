@@ -69,7 +69,7 @@ class TransactionBuilder:
 
         :return: The transaction envelope.
         """
-        source = Keypair.from_public_key(self.source_account.account_id)
+        source = self.source_account.account_id
         sequence = self.source_account.sequence + 1
         transaction = Transaction(
             source=source,
@@ -116,7 +116,9 @@ class TransactionBuilder:
         return transaction_envelope
 
     @staticmethod
-    def from_xdr(xdr: str, network_passphrase: str) -> Union["TransactionBuilder", FeeBumpTransactionEnvelope]:
+    def from_xdr(
+        xdr: str, network_passphrase: str
+    ) -> Union["TransactionBuilder", FeeBumpTransactionEnvelope]:
         """Create a :class:`TransactionBuilder
         <stellar_sdk.transaction_envelope.TransactionBuilder>` or
         :py:class:`FeeBumpTransactionEnvelope <stellar_sdk.fee_bump_transaction_envelope.FeeBumpTransactionEnvelope>`
@@ -146,7 +148,7 @@ class TransactionBuilder:
         )
 
         source_account = Account(
-            transaction_envelope.transaction.source.public_key,
+            transaction_envelope.transaction.source,
             transaction_envelope.transaction.sequence - 1,
         )
         transaction_builder = TransactionBuilder(

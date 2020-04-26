@@ -143,7 +143,9 @@ class Keypair:
         return self.xdr_public_key()
 
     def xdr_muxed_account(self) -> Xdr.types.MuxedAccount:
-        return Xdr.types.MuxedAccount(Xdr.const.KEY_TYPE_ED25519, bytes(self.verify_key))
+        return Xdr.types.MuxedAccount(
+            Xdr.const.KEY_TYPE_ED25519, bytes(self.verify_key)
+        )
 
     def raw_public_key(self) -> bytes:
         """Returns raw public key.
