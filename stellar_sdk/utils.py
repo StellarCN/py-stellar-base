@@ -2,10 +2,16 @@ import hashlib
 import os
 from decimal import Decimal, ROUND_FLOOR
 from typing import List
-from urllib.parse import urlsplit, urljoin, urlunsplit
+from urllib.parse import urlsplit, urlunsplit
 
 from .asset import Asset
 from .exceptions import NoApproximationError, TypeError
+from .strkey import decode_check, StrKey
+from .xdr import Xdr
+
+MUXED_ACCOUNT_STARTING_LETTER: str = "M"
+ED25519_PUBLIC_KEY_STARTING_LETTER: str = "G"
+
 
 
 def sha256(data: bytes) -> bytes:
@@ -80,3 +86,14 @@ def urljoin_with_query(base: str, path: str) -> str:
         (split_url.scheme, split_url.netloc, real_path, query, split_url.fragment)
     )
     return url
+
+
+def parse_ed25519_account_id(data: str) -> str:
+    if data.startswith(ED25519_PUBLIC_KEY_STARTING_LETTER):
+        return data
+    if data.startswith(MUXED_ACCOUNT_STARTING_LETTER):
+        xdr = decode_check("muxed_account", data)
+        unpacker = Xdr.StellarXDRUnpacker(xdr)
+        _ = unpacker.unpack_int64()
+        ed25519 = unpacker.unpack_uint256()
+        return StrKey.encode_ed25519_public_key(ed25519)

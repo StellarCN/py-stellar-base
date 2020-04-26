@@ -3,10 +3,11 @@ import warnings
 from decimal import Decimal
 from typing import List, Union, Optional
 
-from .utils import hex_to_bytes
 from .account import Account
 from .asset import Asset
 from .exceptions import ValueError
+from .fee_bump_transaction import FeeBumpTransaction
+from .fee_bump_transaction_envelope import FeeBumpTransactionEnvelope
 from .keypair import Keypair
 from .memo import *
 from .network import Network
@@ -16,6 +17,8 @@ from .signer import Signer
 from .time_bounds import TimeBounds
 from .transaction import Transaction
 from .transaction_envelope import TransactionEnvelope
+from .utils import hex_to_bytes
+from .xdr import Xdr
 
 __all__ = ["TransactionBuilder"]
 
@@ -39,6 +42,9 @@ class TransactionBuilder:
         Defaults to **Test SDF Network ; September 2015**.
     :param base_fee: Base fee in stroops. The network base fee is obtained by default from the latest ledger.
         Transaction fee is equal to base fee times number of operations in this transaction.
+    :param v1: Temporary feature flag to allow alpha testing of Stellar Protocol 13 transactions.
+        We will remove this once all transactions are supposed to be v1.
+        See `CAP-0015 <https://github.com/stellar/stellar-protocol/blob/master/core/cap-0015.md>`_ for more information.
     """
 
     # TODO: add an example
@@ -47,6 +53,7 @@ class TransactionBuilder:
         source_account: Account,
         network_passphrase: str = Network.TESTNET_NETWORK_PASSPHRASE,
         base_fee: int = 100,
+        v1: bool = False,
     ):
         self.source_account: Account = source_account
         self.base_fee: int = base_fee
@@ -54,6 +61,7 @@ class TransactionBuilder:
         self.operations: List[Operation] = []
         self.time_bounds: Optional[TimeBounds] = None
         self.memo: Memo = NoneMemo()
+        self.v1: bool = v1
 
     def build(self) -> TransactionEnvelope:
         """This will build the transaction envelope.
@@ -61,7 +69,7 @@ class TransactionBuilder:
 
         :return: The transaction envelope.
         """
-        source = Keypair.from_public_key(self.source_account.account_id)
+        source = self.source_account.account_id
         sequence = self.source_account.sequence + 1
         transaction = Transaction(
             source=source,
@@ -70,6 +78,7 @@ class TransactionBuilder:
             operations=self.operations,
             memo=self.memo,
             time_bounds=self.time_bounds,
+            v1=self.v1,
         )
         transaction_envelope = TransactionEnvelope(
             transaction=transaction, network_passphrase=self.network_passphrase
@@ -78,25 +87,68 @@ class TransactionBuilder:
         return transaction_envelope
 
     @staticmethod
-    def from_xdr(xdr: str, network_passphrase: str) -> "TransactionBuilder":
-        """Create a :class:`TransactionBuilder
-        <stellar_sdk.transaction_envelope.TransactionEnvelope>` via an XDR
+    def build_fee_bump_transaction(
+        fee_source: [Keypair, str],
+        base_fee: int,
+        inner_transaction_envelope: TransactionEnvelope,
+        network_passphrase: str = Network.TESTNET_NETWORK_PASSPHRASE,
+    ):
+        """Create a
+        :py:class:`FeeBumpTransactionEnvelope <stellar_sdk.fee_bump_transaction_envelope.FeeBumpTransactionEnvelope>`
         object.
 
-        In addition, sets the fields of this builder (the transaction envelope,
+        See `CAP-0015 <https://github.com/stellar/stellar-protocol/blob/master/core/cap-0015.md>`_ for more information.
+
+        :param fee_source: The account paying for the transaction.
+        :param base_fee: The max fee willing to pay per operation in inner transaction (**in stroops**).
+        :param inner_transaction_envelope: The TransactionEnvelope to be bumped by the fee bump transaction.
+        :param network_passphrase: The network to connect to for verifying and retrieving additional attributes from.
+        :return: a :class:`TransactionBuilder <stellar_sdk.transaction_envelope.TransactionBuilder>` via the XDR object.
+        """
+        fee_bump_transaction = FeeBumpTransaction(
+            fee_source=fee_source,
+            base_fee=base_fee,
+            inner_transaction_envelope=inner_transaction_envelope,
+        )
+        transaction_envelope = FeeBumpTransactionEnvelope(
+            transaction=fee_bump_transaction, network_passphrase=network_passphrase,
+        )
+        return transaction_envelope
+
+    @staticmethod
+    def from_xdr(
+        xdr: str, network_passphrase: str
+    ) -> Union["TransactionBuilder", FeeBumpTransactionEnvelope]:
+        """Create a :class:`TransactionBuilder
+        <stellar_sdk.transaction_envelope.TransactionBuilder>` or
+        :py:class:`FeeBumpTransactionEnvelope <stellar_sdk.fee_bump_transaction_envelope.FeeBumpTransactionEnvelope>`
+        via an XDR object.
+
+        In addition, if xdr is not of
+        :py:class:`TransactionEnvelope <stellar_sdk.transaction_envelope.TransactionEnvelope>`,
+        it sets the fields of this builder (the transaction envelope,
         transaction, operations, source, etc.) to all of the fields in the
         provided XDR transaction envelope, but the signature will not be added to it.
 
         :param xdr: The XDR object representing the transaction envelope to
             which this builder is setting its state to.
         :param network_passphrase: The network to connect to for verifying and retrieving additional attributes from.
+        :return: a :class:`TransactionBuilder <stellar_sdk.transaction_envelope.TransactionBuilder>` or
+            :py:class:`FeeBumpTransactionEnvelope <stellar_sdk.fee_bump_transaction_envelope.FeeBumpTransactionEnvelope>`
+            via the XDR object.
         """
+        xdr_object = Xdr.types.TransactionEnvelope.from_xdr(xdr)
+        te_type = xdr_object.type
+        if te_type == Xdr.const.ENVELOPE_TYPE_TX_FEE_BUMP:
+            return FeeBumpTransactionEnvelope.from_xdr_object(
+                xdr_object, network_passphrase
+            )
         transaction_envelope = TransactionEnvelope.from_xdr(
             xdr=xdr, network_passphrase=network_passphrase
         )
 
         source_account = Account(
-            transaction_envelope.transaction.source.public_key,
+            transaction_envelope.transaction.source,
             transaction_envelope.transaction.sequence - 1,
         )
         transaction_builder = TransactionBuilder(

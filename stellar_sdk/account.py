@@ -18,6 +18,7 @@ class Account:
 
     :param account_id: Account ID of the
         account (ex. `GB3KJPLFUYN5VL6R3GU3EGCGVCKFDSD7BEDX42HWG5BWFKB3KQGJJRMA`)
+        or muxed account (ex. `MAAAAAAAAAAAJURAAB2X52XFQP6FBXLGT6LWOOWMEXWHEWBDVRZ7V5WH34Y22MPFBHUHY`)
     :param sequence: sequence current sequence number of the account
     :raises:
         :exc:`Ed25519PublicKeyInvalidError <stellar_sdk.exceptions.Ed25519PublicKeyInvalidError>`: if ``account_id``
@@ -28,7 +29,7 @@ class Account:
     """
 
     def __init__(self, account_id: str, sequence: int) -> None:
-        StrKey.decode_ed25519_public_key(account_id)
+        StrKey.decode_muxed_account(account_id)
 
         self.account_id: str = account_id
         self.sequence: int = sequence

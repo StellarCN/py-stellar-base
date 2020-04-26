@@ -5,6 +5,7 @@ from stellar_sdk.utils import (
     best_rational_approximation,
     hex_to_bytes,
     urljoin_with_query,
+    parse_ed25519_account_id,
 )
 
 
@@ -124,3 +125,19 @@ class TestUtils:
     )
     def test_urljoin_with_query(self, base, path, output):
         assert output == urljoin_with_query(base, path)
+
+    @pytest.mark.parametrize(
+        "input, output",
+        [
+            (
+                "GCBS5PNHHDSRQY2X64ARM36TBQ6K34LNVPZQWWYZH4MZNF2Z6KKASHUC",
+                "GCBS5PNHHDSRQY2X64ARM36TBQ6K34LNVPZQWWYZH4MZNF2Z6KKASHUC",
+            ),
+            (
+                "MAAAAAAAAAAAAAMDF262OOHFDBRVP5YBCZX5GDB4VXYW3K7TBNNRSPYZS2LVT4UUBHQGS",
+                "GCBS5PNHHDSRQY2X64ARM36TBQ6K34LNVPZQWWYZH4MZNF2Z6KKASHUC",
+            ),
+        ],
+    )
+    def test_parse_ed25519_account_id(self, input, output):
+        assert parse_ed25519_account_id(input) == output

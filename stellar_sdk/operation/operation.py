@@ -118,9 +118,9 @@ class Operation(metaclass=ABCMeta):
         :class:`Operation`.
 
         """
-        source_account: List[Xdr.types.PublicKey] = []
+        source_account: List[Xdr.types.MuxedAccount] = []
         if self.source is not None:
-            source_account = [Keypair.from_public_key(self.source).xdr_account_id()]
+            source_account = [StrKey.decode_muxed_account(self.source)]
 
         return Xdr.types.Operation(source_account, self._to_operation_body())
 
@@ -148,7 +148,7 @@ class Operation(metaclass=ABCMeta):
         :return: The source account from account the operation xdr object.
         """
         if xdr_object.sourceAccount:
-            return StrKey.encode_ed25519_public_key(xdr_object.sourceAccount[0].ed25519)
+            return StrKey.encode_muxed_account(xdr_object.sourceAccount[0])
         return None
 
     def __eq__(self, other: object) -> bool:

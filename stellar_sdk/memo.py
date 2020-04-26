@@ -162,7 +162,9 @@ class HashMemo(Memo):
         length = len(memo_hash)
         if length != 32:
             raise MemoInvalidException(
-                "The length of HashMemo should be 32 bytes, got {:d} bytes.".format(length)
+                "The length of HashMemo should be 32 bytes, got {:d} bytes.".format(
+                    length
+                )
             )
 
         self.memo_hash: bytes = memo_hash

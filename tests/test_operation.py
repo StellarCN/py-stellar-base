@@ -109,12 +109,23 @@ class TestBaseOperation:
         assert op.starting_balance == "1000"
         assert op.destination == destination
 
+    def test_get_muxed_account_source_exist_from_xdr_obj(self):  # BAD TEST
+        source = "MAAAAAAAAAAAJURAAB2X52XFQP6FBXLGT6LWOOWMEXWHEWBDVRZ7V5WH34Y22MPFBHUHY"
+        destination = "GCEZWKCA5VLDNRLN3RPRJMRZOX3Z6G5CHCGSNFHEYVXM3XOJMDS674JZ"
+        starting_balance = "1000.00"
+        origin_op = CreateAccount(destination, starting_balance, source)
+        origin_xdr_obj = origin_op.to_xdr_object()
+
+        op = Operation.from_xdr_object(origin_xdr_obj)
+        assert op.source == source
+        assert op.starting_balance == "1000"
+        assert op.destination == destination
+
     def test_equal(self):
         op1 = ManageData("a", "b")
         op2 = ManageData("a", "b")
         op3 = ManageData("A", "B")
         op4 = "BAD TYEE"
-
         assert op1 == op2 != op3 != op4
 
 
@@ -238,6 +249,17 @@ class TestAccountMerge:
         assert op.source == source
         assert op.destination == destination
 
+    def test_from_xdr_obj_muxed_account(self):
+        source = "GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV"
+        destination = (
+            "MAAAAAAAAAAAJURAAB2X52XFQP6FBXLGT6LWOOWMEXWHEWBDVRZ7V5WH34Y22MPFBHUHY"
+        )
+        origin_xdr_obj = AccountMerge(destination, source).to_xdr_object()
+        op = Operation.from_xdr_object(origin_xdr_obj)
+        assert isinstance(op, AccountMerge)
+        assert op.source == source
+        assert op.destination == destination
+
 
 class TestChangeTrust:
     @pytest.mark.parametrize(
@@ -296,7 +318,7 @@ class TestPayment:
         destination = "GCEZW"
         amount = "1000.0000000"
         asset = Asset("USD", "GDGU5OAPHNPU5UCLE5RDJHG7PXZFQYWKCFOEXSXNMR6KRQRI5T6XXCD7")
-        with pytest.raises(Ed25519PublicKeyInvalidError):
+        with pytest.raises(ValueError):
             Payment(destination, asset, amount, source)
 
     def test_to_xdr_obj_with_invalid_amount_raise(self):
@@ -360,7 +382,7 @@ class TestPathPayment:
             Asset("USD", "GBBM6BKZPEHWYO3E3YKREDPQXMS4VK35YLNU7NFBRI26RAN7GI5POFBB"),
             Asset("EUR", "GDTNXRLOJD2YEBPKK7KCMR7J33AAG5VZXHAJTHIG736D6LVEFLLLKPDL"),
         ]
-        with pytest.raises(Ed25519PublicKeyInvalidError):
+        with pytest.raises(ValueError):
             PathPayment(
                 destination, send_asset, send_max, dest_asset, dest_amount, path, source
             )
@@ -437,7 +459,7 @@ class TestPathPaymentStrictReceive:
             Asset("USD", "GBBM6BKZPEHWYO3E3YKREDPQXMS4VK35YLNU7NFBRI26RAN7GI5POFBB"),
             Asset("EUR", "GDTNXRLOJD2YEBPKK7KCMR7J33AAG5VZXHAJTHIG736D6LVEFLLLKPDL"),
         ]
-        with pytest.raises(Ed25519PublicKeyInvalidError):
+        with pytest.raises(ValueError):
             PathPaymentStrictReceive(
                 destination, send_asset, send_max, dest_asset, dest_amount, path, source
             )
@@ -445,6 +467,36 @@ class TestPathPaymentStrictReceive:
     def test_from_xdr_obj(self):
         source = "GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV"
         destination = "GCEZWKCA5VLDNRLN3RPRJMRZOX3Z6G5CHCGSNFHEYVXM3XOJMDS674JZ"
+        send_asset = Asset(
+            "USD", "GDGU5OAPHNPU5UCLE5RDJHG7PXZFQYWKCFOEXSXNMR6KRQRI5T6XXCD7"
+        )
+        dest_asset = Asset(
+            "USD", "GDGU5OAPHNPU5UCLE5RDJHG7PXZFQYWKCFOEXSXNMR6KRQRI5T6XXCD7"
+        )
+        send_max = "3.0070000"
+        dest_amount = "3.1415000"
+        path = [
+            Asset("USD", "GBBM6BKZPEHWYO3E3YKREDPQXMS4VK35YLNU7NFBRI26RAN7GI5POFBB"),
+            Asset("EUR", "GDTNXRLOJD2YEBPKK7KCMR7J33AAG5VZXHAJTHIG736D6LVEFLLLKPDL"),
+        ]
+        origin_xdr_obj = PathPaymentStrictReceive(
+            destination, send_asset, send_max, dest_asset, dest_amount, path, source
+        ).to_xdr_object()
+        op = Operation.from_xdr_object(origin_xdr_obj)
+        assert isinstance(op, PathPaymentStrictReceive)
+        assert op.source == source
+        assert op.destination == destination
+        assert op.send_asset == send_asset
+        assert op.dest_asset == dest_asset
+        assert op.send_max == "3.007"
+        assert op.dest_amount == "3.1415"
+        assert op.path == path
+
+    def test_from_xdr_obj_muxed_account(self):
+        source = "GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV"
+        destination = (
+            "MAAAAAAAAAAAJURAAB2X52XFQP6FBXLGT6LWOOWMEXWHEWBDVRZ7V5WH34Y22MPFBHUHY"
+        )
         send_asset = Asset(
             "USD", "GDGU5OAPHNPU5UCLE5RDJHG7PXZFQYWKCFOEXSXNMR6KRQRI5T6XXCD7"
         )
@@ -510,7 +562,7 @@ class TestPathPaymentStrictSend:
             Asset("USD", "GBBM6BKZPEHWYO3E3YKREDPQXMS4VK35YLNU7NFBRI26RAN7GI5POFBB"),
             Asset("EUR", "GDTNXRLOJD2YEBPKK7KCMR7J33AAG5VZXHAJTHIG736D6LVEFLLLKPDL"),
         ]
-        with pytest.raises(Ed25519PublicKeyInvalidError):
+        with pytest.raises(ValueError):
             PathPaymentStrictSend(
                 destination, send_asset, send_amount, dest_asset, dest_min, path, source
             )
@@ -518,6 +570,36 @@ class TestPathPaymentStrictSend:
     def test_from_xdr_obj(self):
         source = "GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV"
         destination = "GCEZWKCA5VLDNRLN3RPRJMRZOX3Z6G5CHCGSNFHEYVXM3XOJMDS674JZ"
+        send_asset = Asset(
+            "USD", "GDGU5OAPHNPU5UCLE5RDJHG7PXZFQYWKCFOEXSXNMR6KRQRI5T6XXCD7"
+        )
+        dest_asset = Asset(
+            "USD", "GDGU5OAPHNPU5UCLE5RDJHG7PXZFQYWKCFOEXSXNMR6KRQRI5T6XXCD7"
+        )
+        send_amount = "3.1415000"
+        dest_min = "3.0070000"
+        path = [
+            Asset("USD", "GBBM6BKZPEHWYO3E3YKREDPQXMS4VK35YLNU7NFBRI26RAN7GI5POFBB"),
+            Asset("EUR", "GDTNXRLOJD2YEBPKK7KCMR7J33AAG5VZXHAJTHIG736D6LVEFLLLKPDL"),
+        ]
+        origin_xdr_obj = PathPaymentStrictSend(
+            destination, send_asset, send_amount, dest_asset, dest_min, path, source
+        ).to_xdr_object()
+        op = Operation.from_xdr_object(origin_xdr_obj)
+        assert isinstance(op, PathPaymentStrictSend)
+        assert op.source == source
+        assert op.destination == destination
+        assert op.send_asset == send_asset
+        assert op.dest_asset == dest_asset
+        assert op.send_amount == "3.1415"
+        assert op.dest_min == "3.007"
+        assert op.path == path
+
+    def test_from_xdr_obj_muxed_account(self):
+        source = "GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV"
+        destination = (
+            "MAAAAAAAAAAAJURAAB2X52XFQP6FBXLGT6LWOOWMEXWHEWBDVRZ7V5WH34Y22MPFBHUHY"
+        )
         send_asset = Asset(
             "USD", "GDGU5OAPHNPU5UCLE5RDJHG7PXZFQYWKCFOEXSXNMR6KRQRI5T6XXCD7"
         )
@@ -556,6 +638,18 @@ class TestAllowTrust:
                 False,
                 "AAAAAQAAAADX7fRsY6KTqIc8EIDyr8M9gxGPW6ODnZoZDgo6l1ymwwAAAAcAAAAAzU64DztfTtBLJ2I0nN998lhiyhFcS8rtZHyowijs/XsAAAABVVNEAAAAAAA=",
             ),
+            (
+                1,
+                "AAAAAQAAAADX7fRsY6KTqIc8EIDyr8M9gxGPW6ODnZoZDgo6l1ymwwAAAAcAAAAAzU64DztfTtBLJ2I0nN998lhiyhFcS8rtZHyowijs/XsAAAABVVNEAAAAAAE=",
+            ),
+            (
+                0,
+                "AAAAAQAAAADX7fRsY6KTqIc8EIDyr8M9gxGPW6ODnZoZDgo6l1ymwwAAAAcAAAAAzU64DztfTtBLJ2I0nN998lhiyhFcS8rtZHyowijs/XsAAAABVVNEAAAAAAA=",
+            ),
+            (
+                2,
+                "AAAAAQAAAADX7fRsY6KTqIc8EIDyr8M9gxGPW6ODnZoZDgo6l1ymwwAAAAcAAAAAzU64DztfTtBLJ2I0nN998lhiyhFcS8rtZHyowijs/XsAAAABVVNEAAAAAAI=",
+            ),
         ],
     )
     def test_to_xdr_obj(self, authorize, xdr):
@@ -567,7 +661,7 @@ class TestAllowTrust:
 
     @pytest.mark.parametrize(
         "asset_code, authorize",
-        [("USD", True), ("USDT", False), ("Banana", True), ("STELLAROVERC", False)],
+        [("USD", 1), ("USDT", 0), ("Banana", 1), ("STELLAROVERC", 0)],
     )
     def test_from_xdr_obj(self, asset_code, authorize):
         source = "GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV"
@@ -945,13 +1039,20 @@ class TestOperationUtils:
         check_source("GCNY5OXYSY4FKHOPT2SPOQZAOEIGXB5LBYW3HVU3OWSTQITS65M5RCNY")
 
     @pytest.mark.parametrize(
-        "source",
-        ["GCNY5OXYSY4FKHOPT2SPOQZAOEIGXB5LBYW3HVU3OWSTQITS65M5RBAD", "", " ", 123],
+        "source,msg",
+        [
+            (
+                "GCNY5OXYSY4FKHOPT2SPOQZAOEIGXB5LBYW3HVU3OWSTQITS65M5RBAD",
+                "Invalid Ed25519 Public Key: ",
+            ),
+            (
+                "MAAAAAAAAAAAJURAAB2X52XFQP6FBXLGT6LWOOWMEXWHEWBDVRZ7V5WH34Y22MPFBHBAD",
+                "Invalid Muxed Account: ",
+            ),
+        ],
     )
-    def test_check_source_raise(self, source):
-        with pytest.raises(
-            ValueError, match="Invalid Ed25519 Public Key: {}".format(source)
-        ):
+    def test_check_source_raise(self, source, msg):
+        with pytest.raises(ValueError, match=msg + source):
             check_source(source)
 
     def test_check_ed25519_public_key(self):
