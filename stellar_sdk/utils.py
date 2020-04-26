@@ -9,6 +9,9 @@ from .exceptions import NoApproximationError, TypeError
 from .strkey import decode_check, StrKey
 from .xdr import Xdr
 
+MUXED_ACCOUNT_STARTING_LETTER: str = "M"
+ED25519_PUBLIC_KEY_STARTING_LETTER: str = "G"
+
 
 def sha256(data: bytes) -> bytes:
     return hashlib.sha256(data).digest()
@@ -85,9 +88,9 @@ def urljoin_with_query(base: str, path: str) -> str:
 
 
 def parse_ed25519_account_id(data: str) -> str:
-    if data.startswith("G"):
+    if data.startswith(ED25519_PUBLIC_KEY_STARTING_LETTER):
         return data
-    if data.startswith("M"):
+    if data.startswith(MUXED_ACCOUNT_STARTING_LETTER):
         xdr = decode_check("muxed_account", data)
         unpacker = Xdr.StellarXDRUnpacker(xdr)
         _ = unpacker.unpack_int64()
