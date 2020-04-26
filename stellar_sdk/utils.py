@@ -13,6 +13,7 @@ MUXED_ACCOUNT_STARTING_LETTER: str = "M"
 ED25519_PUBLIC_KEY_STARTING_LETTER: str = "G"
 
 
+
 def sha256(data: bytes) -> bytes:
     return hashlib.sha256(data).digest()
 
