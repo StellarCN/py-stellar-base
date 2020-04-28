@@ -879,7 +879,7 @@ class TestAccountMemoRequirements:
         server.submit_transaction(transaction)
 
     @pytest.mark.asyncio
-    async def test_check_memo_required_with_memo_async(self, httpserver):
+    async def test_check_memo_required_with_memo_muxed_account_async(self, httpserver):
         self.__inject_mock_server(httpserver)
         horizon_url = httpserver.url_for("/")
         keypair = Keypair.from_secret(
