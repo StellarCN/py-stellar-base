@@ -1,5 +1,5 @@
 import warnings
-from typing import Union, Coroutine, Any, Dict, List, Tuple
+from typing import Union, Coroutine, Any, Dict, List, Tuple, Generator
 
 from stellar_sdk.base_transaction_envelope import BaseTransactionEnvelope
 from .account import Account, Thresholds
@@ -34,7 +34,11 @@ from .sep.exceptions import AccountRequiresMemoError
 from .transaction import Transaction
 from .transaction_envelope import TransactionEnvelope
 from .helpers import parse_transaction_envelope_from_xdr
-from .utils import urljoin_with_query, parse_ed25519_account_id
+from .utils import (
+    urljoin_with_query,
+    parse_ed25519_account_id,
+    MUXED_ACCOUNT_STARTING_LETTER,
+)
 from .xdr import Xdr
 
 __all__ = ["Server"]
@@ -412,13 +416,15 @@ class Server:
         return account
 
     def __check_memo_required_sync(self, transaction: Transaction) -> None:
-        if not isinstance(transaction, Transaction):
-            return
+        if isinstance(transaction, FeeBumpTransaction):
+            transaction = transaction.inner_transaction_envelope.transaction
         if not (transaction.memo is None or isinstance(transaction.memo, NoneMemo)):
             return
         for index, destination in self.__get_check_memo_required_destinations(
             transaction
         ):
+            if destination.startswith(MUXED_ACCOUNT_STARTING_LETTER):
+                continue
             try:
                 account_resp = self.accounts().account_id(destination).call()
             except NotFoundError:
@@ -428,13 +434,15 @@ class Server:
     async def __check_memo_required_async(
         self, transaction: Union[Transaction, FeeBumpTransaction]
     ) -> None:
-        if not isinstance(transaction, Transaction):
-            return
+        if isinstance(transaction, FeeBumpTransaction):
+            transaction = transaction.inner_transaction_envelope.transaction
         if not (transaction.memo is None or isinstance(transaction.memo, NoneMemo)):
             return
         for index, destination in self.__get_check_memo_required_destinations(
             transaction
         ):
+            if destination.startswith(MUXED_ACCOUNT_STARTING_LETTER):
+                continue
             try:
                 account_resp = await self.accounts().account_id(destination).call()
             except NotFoundError:
@@ -454,7 +462,9 @@ class Server:
                 index,
             )
 
-    def __get_check_memo_required_destinations(self, transaction: Transaction):
+    def __get_check_memo_required_destinations(
+        self, transaction: Transaction
+    ) -> Generator[Tuple[int, str], Any, Any]:
         destinations = set()
         memo_required_operation_code = (
             Xdr.const.PAYMENT,
@@ -464,7 +474,7 @@ class Server:
         )
         for index, operation in enumerate(transaction.operations):
             if operation.type_code() in memo_required_operation_code:
-                destination = operation.destination
+                destination: str = operation.destination
             else:
                 continue
             if destination in destinations:
