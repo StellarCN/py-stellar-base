@@ -1,6 +1,13 @@
 import pytest
 
-from stellar_sdk import Account, TransactionBuilder, Keypair, Server, AiohttpClient
+from stellar_sdk import (
+    Account,
+    TransactionBuilder,
+    Keypair,
+    Server,
+    AiohttpClient,
+    Network,
+)
 from stellar_sdk.exceptions import BadRequestError
 from stellar_sdk.sep.exceptions import AccountRequiresMemoError
 
@@ -26,6 +33,9 @@ class TestAccountMemoRequirements:
     )
     DESTINATION_ACCOUNT_FETCH_ERROR = (
         "GB7WNQUTDLD6YJ4MR3KQN3Y6ZIDIGTA7GRKNH47HOGMP2ETFGRSLD6OG"
+    )
+    ACCOUNT_ID_MUXED = (
+        "MAAAAAAAAAAAJURAAB2X52XFQP6FBXLGT6LWOOWMEXWHEWBDVRZ7V5WH34Y22MPFBHUHY"
     )
 
     def test_check_memo_required_with_memo_sync(self, httpserver):
@@ -423,7 +433,6 @@ class TestAccountMemoRequirements:
         )
         account = Account(keypair.public_key, 1)
         async with Server(horizon_url, AiohttpClient()) as server:
-
             transaction = (
                 TransactionBuilder(account)
                 .append_payment_op(
@@ -465,7 +474,6 @@ class TestAccountMemoRequirements:
         )
         account = Account(keypair.public_key, 1)
         async with Server(horizon_url, AiohttpClient()) as server:
-
             transaction = (
                 TransactionBuilder(account)
                 .append_payment_op(
@@ -506,7 +514,6 @@ class TestAccountMemoRequirements:
         )
         account = Account(keypair.public_key, 1)
         async with Server(horizon_url, AiohttpClient()) as server:
-
             transaction = (
                 TransactionBuilder(account)
                 .append_payment_op(
@@ -555,7 +562,6 @@ class TestAccountMemoRequirements:
         )
         account = Account(keypair.public_key, 1)
         async with Server(horizon_url, AiohttpClient()) as server:
-
             transaction = (
                 TransactionBuilder(account)
                 .append_payment_op(
@@ -650,7 +656,6 @@ class TestAccountMemoRequirements:
         )
         account = Account(keypair.public_key, 1)
         async with Server(horizon_url, AiohttpClient()) as server:
-
             transaction = (
                 TransactionBuilder(account)
                 .append_payment_op(
@@ -834,6 +839,178 @@ class TestAccountMemoRequirements:
             with pytest.raises(BadRequestError) as err:
                 await server.submit_transaction(transaction)
             assert err.value.status == 400
+
+    def test_check_memo_required_with_memo_muxed_account_sync(self, httpserver):
+        self.__inject_mock_server(httpserver)
+        horizon_url = httpserver.url_for("/")
+        server = Server(horizon_url)
+        keypair = Keypair.from_secret(
+            "SDQXFKA32UVQHUTLYJ42N56ZUEM5PNVVI4XE7EA5QFMLA2DHDCQX3GPY"
+        )
+        account = Account(keypair.public_key, 1)
+        transaction = (
+            TransactionBuilder(account)
+            .append_payment_op(self.DESTINATION_ACCOUNT_MEMO_REQUIRED_A, "10", "XLM")
+            .append_path_payment_strict_receive_op(
+                self.DESTINATION_ACCOUNT_MEMO_REQUIRED_B,
+                "XLM",
+                None,
+                "10",
+                "BTC",
+                "GA7GYB3QGLTZNHNGXN3BMANS6TC7KJT3TCGTR763J4JOU4QHKL37RVV2",
+                "1",
+                [],
+            )
+            .append_path_payment_strict_send_op(
+                self.DESTINATION_ACCOUNT_MEMO_REQUIRED_C,
+                "XLM",
+                None,
+                "10",
+                "BTC",
+                "GA7GYB3QGLTZNHNGXN3BMANS6TC7KJT3TCGTR763J4JOU4QHKL37RVV2",
+                "1",
+                [],
+            )
+            .append_account_merge_op(self.DESTINATION_ACCOUNT_MEMO_REQUIRED_D)
+            .add_text_memo("hello, world")
+            .build()
+        )
+        transaction.sign(keypair)
+        server.submit_transaction(transaction)
+
+    @pytest.mark.asyncio
+    async def test_check_memo_required_with_memo_async(self, httpserver):
+        self.__inject_mock_server(httpserver)
+        horizon_url = httpserver.url_for("/")
+        keypair = Keypair.from_secret(
+            "SDQXFKA32UVQHUTLYJ42N56ZUEM5PNVVI4XE7EA5QFMLA2DHDCQX3GPY"
+        )
+        account = Account(keypair.public_key, 1)
+        async with Server(horizon_url, AiohttpClient()) as server:
+            transaction = (
+                TransactionBuilder(account)
+                .append_payment_op(
+                    self.DESTINATION_ACCOUNT_MEMO_REQUIRED_A, "10", "XLM"
+                )
+                .append_path_payment_strict_receive_op(
+                    self.DESTINATION_ACCOUNT_MEMO_REQUIRED_B,
+                    "XLM",
+                    None,
+                    "10",
+                    "BTC",
+                    "GA7GYB3QGLTZNHNGXN3BMANS6TC7KJT3TCGTR763J4JOU4QHKL37RVV2",
+                    "1",
+                    [],
+                )
+                .append_path_payment_strict_send_op(
+                    self.DESTINATION_ACCOUNT_MEMO_REQUIRED_C,
+                    "XLM",
+                    None,
+                    "10",
+                    "BTC",
+                    "GA7GYB3QGLTZNHNGXN3BMANS6TC7KJT3TCGTR763J4JOU4QHKL37RVV2",
+                    "1",
+                    [],
+                )
+                .append_account_merge_op(self.DESTINATION_ACCOUNT_MEMO_REQUIRED_D)
+                .add_text_memo("hello, world")
+                .build()
+            )
+            transaction.sign(keypair)
+            await server.submit_transaction(transaction)
+
+    def test_check_memo_required_with_fee_bump_transaction_sync(self, httpserver):
+        self.__inject_mock_server(httpserver)
+        horizon_url = httpserver.url_for("/")
+        server = Server(horizon_url)
+        keypair = Keypair.from_secret(
+            "SDQXFKA32UVQHUTLYJ42N56ZUEM5PNVVI4XE7EA5QFMLA2DHDCQX3GPY"
+        )
+        account = Account(keypair.public_key, 1)
+        transaction = (
+            TransactionBuilder(account, v1=True)
+            .append_payment_op(self.DESTINATION_ACCOUNT_MEMO_REQUIRED_A, "10", "XLM")
+            .append_path_payment_strict_receive_op(
+                self.ACCOUNT_ID_MUXED,
+                "XLM",
+                None,
+                "10",
+                "BTC",
+                "GA7GYB3QGLTZNHNGXN3BMANS6TC7KJT3TCGTR763J4JOU4QHKL37RVV2",
+                "1",
+                [],
+            )
+            .append_path_payment_strict_send_op(
+                self.DESTINATION_ACCOUNT_MEMO_REQUIRED_C,
+                "XLM",
+                None,
+                "10",
+                "BTC",
+                "GA7GYB3QGLTZNHNGXN3BMANS6TC7KJT3TCGTR763J4JOU4QHKL37RVV2",
+                "1",
+                [],
+            )
+            .append_account_merge_op(self.DESTINATION_ACCOUNT_MEMO_REQUIRED_D)
+            .add_text_memo("hello, world")
+            .build()
+        )
+        transaction.sign(keypair)
+        fee_bump_tx = TransactionBuilder.build_fee_bump_transaction(
+            fee_source=Keypair.random().public_key,
+            base_fee=200,
+            inner_transaction_envelope=transaction,
+            network_passphrase=Network.TESTNET_NETWORK_PASSPHRASE,
+        )
+        server.submit_transaction(fee_bump_tx)
+
+    @pytest.mark.asyncio
+    async def test_check_memo_required_with_fee_bump_transaction_async(
+        self, httpserver
+    ):
+        self.__inject_mock_server(httpserver)
+        horizon_url = httpserver.url_for("/")
+        keypair = Keypair.from_secret(
+            "SDQXFKA32UVQHUTLYJ42N56ZUEM5PNVVI4XE7EA5QFMLA2DHDCQX3GPY"
+        )
+        account = Account(keypair.public_key, 1)
+        async with Server(horizon_url, AiohttpClient()) as server:
+            transaction = (
+                TransactionBuilder(account, v1=True)
+                .append_payment_op(
+                    self.DESTINATION_ACCOUNT_MEMO_REQUIRED_A, "10", "XLM"
+                )
+                .append_path_payment_strict_receive_op(
+                    self.ACCOUNT_ID_MUXED,
+                    "XLM",
+                    None,
+                    "10",
+                    "BTC",
+                    "GA7GYB3QGLTZNHNGXN3BMANS6TC7KJT3TCGTR763J4JOU4QHKL37RVV2",
+                    "1",
+                    [],
+                )
+                .append_path_payment_strict_send_op(
+                    self.DESTINATION_ACCOUNT_MEMO_REQUIRED_C,
+                    "XLM",
+                    None,
+                    "10",
+                    "BTC",
+                    "GA7GYB3QGLTZNHNGXN3BMANS6TC7KJT3TCGTR763J4JOU4QHKL37RVV2",
+                    "1",
+                    [],
+                )
+                .append_account_merge_op(self.DESTINATION_ACCOUNT_MEMO_REQUIRED_D)
+                .add_text_memo("hello, world")
+                .build()
+            )
+            transaction.sign(keypair)
+            fee_bump_tx = TransactionBuilder.build_fee_bump_transaction(
+                fee_source=Keypair.random().public_key,
+                base_fee=200,
+                inner_transaction_envelope=transaction,
+                network_passphrase=Network.TESTNET_NETWORK_PASSPHRASE,
+            )
+            await server.submit_transaction(fee_bump_tx)
 
     def __inject_mock_server(self, httpserver):
         memo_required_response = {"data": {"config.memo_required": "MQ=="}}
