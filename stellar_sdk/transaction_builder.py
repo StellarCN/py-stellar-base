@@ -491,7 +491,11 @@ class TransactionBuilder:
         return self.append_operation(op)
 
     def append_allow_trust_op(
-        self, trustor: str, asset_code: str, authorize: bool, source: str = None
+        self,
+        trustor: str,
+        asset_code: str,
+        authorize: Union[TrustLineEntryFlag, bool],
+        source: str = None,
     ) -> "TransactionBuilder":
         """Append an :class:`AllowTrust <stellar_sdk.operation.AllowTrust>`
         operation to the list of operations.
@@ -500,8 +504,8 @@ class TransactionBuilder:
         :param asset_code:  The asset of the trustline the source account
             is authorizing. For example, if an anchor wants to allow another
             account to hold its USD credit, the type is USD:anchor.
-        :param authorize: Flag indicating whether the trustline is
-            authorized.
+        :param authorize: `True` to authorize the line, `False` to deauthorize，if you need further control,
+            you can also use :class:`stellar_sdk.operation.allow_trust.TrustLineEntryFlag`.
         :param source: The source address that is establishing the trust in
             the allow trust operation.
         :return: This builder instance.

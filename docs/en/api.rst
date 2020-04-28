@@ -354,6 +354,9 @@ AllowTrust
 .. autoclass:: stellar_sdk.operation.AllowTrust
    :members: to_xdr_object, from_xdr_object
 
+.. autoclass:: stellar_sdk.operation.allow_trust.TrustLineEntryFlag
+   :members:
+
 BumpSequence
 ------------
 .. autoclass:: stellar_sdk.operation.BumpSequence

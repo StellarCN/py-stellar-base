@@ -6,7 +6,7 @@ from stellar_sdk import Price, Asset
 from stellar_sdk.exceptions import Ed25519PublicKeyInvalidError, AssetCodeInvalidError
 from stellar_sdk.operation import Operation, CreateAccount
 from stellar_sdk.operation.account_merge import AccountMerge
-from stellar_sdk.operation.allow_trust import AllowTrust
+from stellar_sdk.operation.allow_trust import AllowTrust, TrustLineEntryFlag
 from stellar_sdk.operation.bump_sequence import BumpSequence
 from stellar_sdk.operation.change_trust import ChangeTrust
 from stellar_sdk.operation.create_passive_sell_offer import CreatePassiveSellOffer
@@ -639,15 +639,15 @@ class TestAllowTrust:
                 "AAAAAQAAAADX7fRsY6KTqIc8EIDyr8M9gxGPW6ODnZoZDgo6l1ymwwAAAAcAAAAAzU64DztfTtBLJ2I0nN998lhiyhFcS8rtZHyowijs/XsAAAABVVNEAAAAAAA=",
             ),
             (
-                1,
+                TrustLineEntryFlag.AUTHORIZED_FLAG,
                 "AAAAAQAAAADX7fRsY6KTqIc8EIDyr8M9gxGPW6ODnZoZDgo6l1ymwwAAAAcAAAAAzU64DztfTtBLJ2I0nN998lhiyhFcS8rtZHyowijs/XsAAAABVVNEAAAAAAE=",
             ),
             (
-                0,
+                TrustLineEntryFlag.UNAUTHORIZED_FLAG,
                 "AAAAAQAAAADX7fRsY6KTqIc8EIDyr8M9gxGPW6ODnZoZDgo6l1ymwwAAAAcAAAAAzU64DztfTtBLJ2I0nN998lhiyhFcS8rtZHyowijs/XsAAAABVVNEAAAAAAA=",
             ),
             (
-                2,
+                TrustLineEntryFlag.AUTHORIZED_TO_MAINTAIN_LIABILITIES_FLAG,
                 "AAAAAQAAAADX7fRsY6KTqIc8EIDyr8M9gxGPW6ODnZoZDgo6l1ymwwAAAAcAAAAAzU64DztfTtBLJ2I0nN998lhiyhFcS8rtZHyowijs/XsAAAABVVNEAAAAAAI=",
             ),
         ],
@@ -661,7 +661,12 @@ class TestAllowTrust:
 
     @pytest.mark.parametrize(
         "asset_code, authorize",
-        [("USD", 1), ("USDT", 0), ("Banana", 1), ("STELLAROVERC", 0)],
+        [
+            ("USD", TrustLineEntryFlag.AUTHORIZED_FLAG),
+            ("USDT", TrustLineEntryFlag.UNAUTHORIZED_FLAG),
+            ("Banana", TrustLineEntryFlag.AUTHORIZED_FLAG),
+            ("STELLAROVERC", TrustLineEntryFlag.UNAUTHORIZED_FLAG),
+        ],
     )
     def test_from_xdr_obj(self, asset_code, authorize):
         source = "GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV"
