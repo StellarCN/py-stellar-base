@@ -146,7 +146,7 @@ class BaseCallBuilder:
         return self.__call(self.next_href, None)
 
     def prev(self):
-        if self.next_href is None:
+        if self.prev_href is None:
             raise NotPageableError("The prev page does not exist.")
         return self.__call(self.prev_href, None)
 
