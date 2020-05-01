@@ -2,11 +2,10 @@ from decimal import Decimal
 from typing import List, Union
 
 from .operation import Operation
+from .utils import check_amount, parse_mux_account_from_account
 from ..asset import Asset
-from ..keypair import Keypair
+from ..muxed_account import MuxedAccount
 from ..xdr import Xdr
-from ..strkey import StrKey
-from .utils import check_muxed_ed25519_account, check_amount
 
 
 class PathPaymentStrictSend(Operation):
@@ -37,13 +36,12 @@ class PathPaymentStrictSend(Operation):
         dest_asset: Asset,
         dest_min: Union[str, Decimal],
         path: List[Asset],
-        source: str = None,
+        source: Union[MuxedAccount, str] = None,
     ) -> None:
         super().__init__(source)
-        check_muxed_ed25519_account(destination)
         check_amount(send_amount)
         check_amount(dest_min)
-        self.destination: str = destination
+        self.destination: MuxedAccount = parse_mux_account_from_account(destination)
         self.send_asset: Asset = send_asset
         self.send_amount: Union[str, Decimal] = send_amount
         self.dest_asset: Asset = dest_asset
@@ -55,7 +53,7 @@ class PathPaymentStrictSend(Operation):
         return Xdr.const.PATH_PAYMENT_STRICT_SEND
 
     def _to_operation_body(self) -> Xdr.nullclass:
-        destination = StrKey.decode_muxed_account(self.destination)
+        destination = self.destination.to_xdr_object()
         send_asset = self.send_asset.to_xdr_object()
         dest_asset = self.dest_asset.to_xdr_object()
         path = [asset.to_xdr_object() for asset in self.path]
@@ -82,7 +80,7 @@ class PathPaymentStrictSend(Operation):
 
         """
         source = Operation.get_source_from_xdr_obj(operation_xdr_object)
-        destination = StrKey.encode_muxed_account(
+        destination = MuxedAccount.from_xdr_object(
             operation_xdr_object.body.pathPaymentStrictSendOp.destination
         )
         send_asset = Asset.from_xdr_object(

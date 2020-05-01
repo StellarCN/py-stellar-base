@@ -29,14 +29,14 @@ from .client.requests_client import RequestsClient
 from .exceptions import TypeError, NotFoundError, raise_request_exception
 from .fee_bump_transaction import FeeBumpTransaction
 from .fee_bump_transaction_envelope import FeeBumpTransactionEnvelope
+from .helpers import parse_transaction_envelope_from_xdr
 from .memo import NoneMemo
+from .muxed_account import MuxedAccount
 from .sep.exceptions import AccountRequiresMemoError
 from .transaction import Transaction
 from .transaction_envelope import TransactionEnvelope
-from .helpers import parse_transaction_envelope_from_xdr
 from .utils import (
     urljoin_with_query,
-    parse_ed25519_account_id,
     MUXED_ACCOUNT_STARTING_LETTER,
 )
 from .xdr import Xdr
@@ -388,7 +388,7 @@ class Server:
         return self.__load_account_sync(account_id)
 
     async def __load_account_async(self, account_id: str) -> Account:
-        ed25519_account_id = parse_ed25519_account_id(account_id)
+        ed25519_account_id = MuxedAccount.from_account(account_id).account_id
         resp = await self.accounts().account_id(account_id=ed25519_account_id).call()
         sequence = int(resp["sequence"])
         thresholds = Thresholds(
@@ -402,7 +402,7 @@ class Server:
         return account
 
     def __load_account_sync(self, account_id: str) -> Account:
-        ed25519_account_id = parse_ed25519_account_id(account_id)
+        ed25519_account_id = MuxedAccount.from_account(account_id).account_id
         resp = self.accounts().account_id(account_id=ed25519_account_id).call()
         sequence = int(resp["sequence"])
         thresholds = Thresholds(
@@ -474,7 +474,7 @@ class Server:
         )
         for index, operation in enumerate(transaction.operations):
             if operation.type_code() in memo_required_operation_code:
-                destination: str = operation.destination
+                destination: str = operation.destination.account_id
             else:
                 continue
             if destination in destinations:

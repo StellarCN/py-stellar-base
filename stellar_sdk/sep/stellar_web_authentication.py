@@ -120,7 +120,7 @@ def read_challenge_transaction(
     transaction = transaction_envelope.transaction
 
     # verify that transaction source account is equal to the server's signing key
-    if transaction.source != server_account_id:
+    if transaction.source.account_id != server_account_id:
         raise InvalidSep10ChallengeError(
             "Transaction source account is not equal to server's account."
         )
@@ -159,8 +159,8 @@ def read_challenge_transaction(
     if not isinstance(manage_data_op, ManageData):
         raise InvalidSep10ChallengeError("Operation type should be ManageData.")
 
-    client_account_id = manage_data_op.source
-    if not client_account_id:
+    client_account = manage_data_op.source
+    if not client_account:
         raise InvalidSep10ChallengeError("Operation should have a source account.")
 
     if len(manage_data_op.data_value) != 64:
@@ -181,7 +181,7 @@ def read_challenge_transaction(
         )
 
     # TODO: I don't think this is a good idea.
-    return transaction_envelope, client_account_id
+    return transaction_envelope, client_account.account_id
 
 
 def verify_challenge_transaction_signers(

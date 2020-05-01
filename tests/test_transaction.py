@@ -1,4 +1,4 @@
-from stellar_sdk import Keypair, IdMemo, Asset, NoneMemo
+from stellar_sdk import Keypair, IdMemo, Asset, NoneMemo, MuxedAccount
 from stellar_sdk.operation import Payment, ManageData
 from stellar_sdk.time_bounds import TimeBounds
 from stellar_sdk.transaction import Transaction
@@ -28,7 +28,9 @@ class TestTransaction:
 
         restore_transaction = Transaction.from_xdr_object(tx_object, v1=True)
         assert isinstance(restore_transaction, Transaction)
-        assert restore_transaction.source == source.public_key
+        assert restore_transaction.source == MuxedAccount.from_account(
+            source.public_key
+        )
         assert restore_transaction.fee == fee
         assert restore_transaction.memo == memo
         assert restore_transaction.time_bounds == time_bounds
@@ -54,7 +56,7 @@ class TestTransaction:
 
         restore_transaction = Transaction.from_xdr(xdr, True)
         assert isinstance(restore_transaction, Transaction)
-        assert restore_transaction.source == Keypair.from_public_key(source).public_key
+        assert restore_transaction.source == MuxedAccount.from_account(source)
         assert restore_transaction.fee == fee
         assert restore_transaction.memo == memo
         assert restore_transaction.time_bounds == time_bounds
@@ -115,7 +117,9 @@ class TestTransaction:
 
         restore_transaction = Transaction.from_xdr_object(tx_object, False)
         assert isinstance(restore_transaction, Transaction)
-        assert restore_transaction.source == source.public_key
+        assert restore_transaction.source == MuxedAccount.from_account(
+            source.public_key
+        )
         assert restore_transaction.fee == fee
         assert restore_transaction.memo == memo
         assert restore_transaction.time_bounds == time_bounds
@@ -142,7 +146,7 @@ class TestTransaction:
 
         restore_transaction = Transaction.from_xdr(tx_object.to_xdr(), False)
         assert isinstance(restore_transaction, Transaction)
-        assert restore_transaction.source == Keypair.from_public_key(source).public_key
+        assert restore_transaction.source == MuxedAccount.from_account(source)
         assert restore_transaction.fee == fee
         assert restore_transaction.memo == memo
         assert restore_transaction.time_bounds == time_bounds

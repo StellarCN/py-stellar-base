@@ -7,6 +7,7 @@ from stellar_sdk import (
     Keypair,
     FeeBumpTransactionEnvelope,
     FeeBumpTransaction,
+    MuxedAccount,
 )
 from stellar_sdk.exceptions import ValueError
 
@@ -54,7 +55,7 @@ class TestFeeBumpTransaction:
         assert isinstance(restore_te, FeeBumpTransactionEnvelope)
         restore_tx = restore_te.transaction
         assert isinstance(restore_tx, FeeBumpTransaction)
-        assert restore_tx.fee_source == fee_source.public_key
+        assert restore_tx.fee_source == MuxedAccount.from_account(fee_source.public_key)
         assert restore_tx.base_fee == base_fee
         assert restore_tx.inner_transaction_envelope.to_xdr() == inner_tx.to_xdr()
 
@@ -101,7 +102,7 @@ class TestFeeBumpTransaction:
         assert isinstance(restore_te, FeeBumpTransactionEnvelope)
         restore_tx = restore_te.transaction
         assert isinstance(restore_tx, FeeBumpTransaction)
-        assert restore_tx.fee_source == fee_source.public_key
+        assert restore_tx.fee_source == MuxedAccount.from_account(fee_source.public_key)
         assert restore_tx.base_fee == base_fee
         assert restore_tx.inner_transaction_envelope.to_xdr() == inner_tx.to_xdr()
 
@@ -147,9 +148,8 @@ class TestFeeBumpTransaction:
         assert isinstance(restore_te, FeeBumpTransactionEnvelope)
         restore_tx = restore_te.transaction
         assert isinstance(restore_tx, FeeBumpTransaction)
-        assert (
-            restore_tx.fee_source
-            == "MAAAAAAAAAAAH2HAJCI3MGHFBTF7D7MUPSRWDE5QZLWLFND7GLJQLGVBZZ66RP43CKRMY"
+        assert restore_tx.fee_source == MuxedAccount.from_account(
+            "MAAAAAAAAAAAH2HAJCI3MGHFBTF7D7MUPSRWDE5QZLWLFND7GLJQLGVBZZ66RP43CKRMY"
         )
         assert restore_tx.base_fee == base_fee
         assert restore_tx.inner_transaction_envelope.to_xdr() == inner_tx.to_xdr()

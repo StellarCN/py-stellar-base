@@ -1,8 +1,10 @@
 from .exceptions import ValueError, MuxedEd25519AccountInvalidError
 from .strkey import StrKey, encode_check, decode_check
+from .utils import check_ed25519_public_key
 from .xdr import Xdr
 
 __all__ = ["MuxedAccount"]
+
 
 class MuxedAccount:
     """The :class:`MuxedAccount` object, which represents a multiplexed account on Stellar's network.
@@ -15,6 +17,7 @@ class MuxedAccount:
     """
 
     def __init__(self, account_id: str, account_id_id: int = None) -> None:
+        check_ed25519_public_key(account_id)
         self.account_id = account_id
         self.account_id_id = account_id_id
 

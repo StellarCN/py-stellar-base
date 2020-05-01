@@ -10,6 +10,7 @@ from .fee_bump_transaction import FeeBumpTransaction
 from .fee_bump_transaction_envelope import FeeBumpTransactionEnvelope
 from .keypair import Keypair
 from .memo import *
+from .muxed_account import MuxedAccount
 from .network import Network
 from .operation import *
 from .price import Price
@@ -781,7 +782,9 @@ class TransactionBuilder:
         op = AccountMerge(destination, source)
         return self.append_operation(op)
 
-    def append_inflation_op(self, source: str = None) -> "TransactionBuilder":
+    def append_inflation_op(
+        self, source: Union[MuxedAccount, str] = None
+    ) -> "TransactionBuilder":
         """Append a :class:`Inflation
         <stellar_sdk.operation.Inflation>` operation to the list of
         operations.

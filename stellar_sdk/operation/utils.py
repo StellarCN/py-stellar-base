@@ -1,10 +1,11 @@
 from decimal import Decimal
 from typing import Optional, Union
 
-from ..keypair import Keypair
-from ..price import Price
 from ..asset import Asset
 from ..exceptions import ValueError, TypeError
+from ..keypair import Keypair
+from ..muxed_account import MuxedAccount
+from ..price import Price
 from ..strkey import StrKey
 
 _LOWER_LIMIT = "0"
@@ -54,3 +55,9 @@ def check_amount(amount: Union[str, Decimal]) -> None:
             "Value of '{}' must represent a positive number "
             "and the max valid value is {}.".format(amount, _UPPER_LIMIT)
         )
+
+
+def parse_mux_account_from_account(account: Union[str, MuxedAccount]) -> MuxedAccount:
+    if isinstance(account, str):
+        return MuxedAccount.from_account(account)
+    return account
