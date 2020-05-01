@@ -20,7 +20,7 @@ def parse_transaction_envelope_from_xdr(
     :param xdr: Transaction envelope XDR
     :param network_passphrase: The network to connect to for verifying and retrieving
         additional attributes from. (ex. 'Public Global Stellar Network ; September 2015')
-    :raises: :exc:`Value <stellar_sdk.exceptions.ValueError>` - XDR is neither :py:class:`TransactionEnvelope <stellar_sdk.transaction_envelope.TransactionEnvelope>`
+    :raises: :exc:`ValueError <stellar_sdk.exceptions.ValueError>` - XDR is neither :py:class:`TransactionEnvelope <stellar_sdk.transaction_envelope.TransactionEnvelope>`
         nor :py:class:`FeeBumpTransactionEnvelope <stellar_sdk.fee_bump_transaction_envelope.FeeBumpTransactionEnvelope>`
     """
     xdr_object = Xdr.types.TransactionEnvelope.from_xdr(xdr)
