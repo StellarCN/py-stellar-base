@@ -30,7 +30,7 @@ class PathPaymentStrictReceive(Operation):
 
     def __init__(
         self,
-        destination: str,
+        destination: Union[MuxedAccount, str],
         send_asset: Asset,
         send_max: Union[str, Decimal],
         dest_asset: Asset,

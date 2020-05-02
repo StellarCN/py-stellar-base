@@ -26,7 +26,7 @@ class Payment(Operation):
 
     def __init__(
         self,
-        destination: str,
+        destination: Union[MuxedAccount, str],
         asset: Asset,
         amount: Union[str, Decimal],
         source: Union[MuxedAccount, str] = None,
