@@ -2,10 +2,10 @@ from decimal import Decimal
 from typing import List, Union
 
 from .operation import Operation
+from .utils import check_amount, parse_mux_account_from_account
 from ..asset import Asset
+from ..muxed_account import MuxedAccount
 from ..xdr import Xdr
-from ..strkey import StrKey
-from .utils import check_muxed_ed25519_account, check_amount
 
 
 class PathPaymentStrictReceive(Operation):
@@ -30,19 +30,18 @@ class PathPaymentStrictReceive(Operation):
 
     def __init__(
         self,
-        destination: str,
+        destination: Union[MuxedAccount, str],
         send_asset: Asset,
         send_max: Union[str, Decimal],
         dest_asset: Asset,
         dest_amount: Union[str, Decimal],
         path: List[Asset],
-        source: str = None,
+        source: Union[MuxedAccount, str] = None,
     ) -> None:
         super().__init__(source)
-        check_muxed_ed25519_account(destination)
         check_amount(send_max)
         check_amount(dest_amount)
-        self.destination: str = destination
+        self.destination: MuxedAccount = parse_mux_account_from_account(destination)
         self.send_asset: Asset = send_asset
         self.send_max: Union[str, Decimal] = send_max
         self.dest_asset: Asset = dest_asset
@@ -54,7 +53,7 @@ class PathPaymentStrictReceive(Operation):
         return Xdr.const.PATH_PAYMENT_STRICT_RECEIVE
 
     def _to_operation_body(self) -> Xdr.nullclass:
-        destination = StrKey.decode_muxed_account(self.destination)
+        destination = self.destination.to_xdr_object()
         send_asset = self.send_asset.to_xdr_object()
         dest_asset = self.dest_asset.to_xdr_object()
         path = [asset.to_xdr_object() for asset in self.path]
@@ -81,7 +80,7 @@ class PathPaymentStrictReceive(Operation):
 
         """
         source = Operation.get_source_from_xdr_obj(operation_xdr_object)
-        destination = StrKey.encode_muxed_account(
+        destination = MuxedAccount.from_xdr_object(
             operation_xdr_object.body.pathPaymentStrictReceiveOp.destination
         )
         send_asset = Asset.from_xdr_object(

@@ -13,7 +13,6 @@ MUXED_ACCOUNT_STARTING_LETTER: str = "M"
 ED25519_PUBLIC_KEY_STARTING_LETTER: str = "G"
 
 
-
 def sha256(data: bytes) -> bytes:
     return hashlib.sha256(data).digest()
 
@@ -97,3 +96,7 @@ def parse_ed25519_account_id(data: str) -> str:
         _ = unpacker.unpack_int64()
         ed25519 = unpacker.unpack_uint256()
         return StrKey.encode_ed25519_public_key(ed25519)
+
+
+def check_ed25519_public_key(public_key: str) -> None:
+    StrKey.decode_ed25519_public_key(public_key)

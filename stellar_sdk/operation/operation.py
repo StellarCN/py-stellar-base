@@ -3,11 +3,10 @@ from abc import ABCMeta, abstractmethod
 from decimal import Decimal, Context, Inexact
 from typing import Optional, List, Union
 
-from .utils import check_source
-from ..keypair import Keypair
-from ..strkey import StrKey
-from ..xdr import Xdr
+from .utils import parse_mux_account_from_account
 from ..exceptions import ValueError, TypeError
+from ..muxed_account import MuxedAccount
+from ..xdr import Xdr
 
 
 class Operation(metaclass=ABCMeta):
@@ -39,9 +38,11 @@ class Operation(metaclass=ABCMeta):
 
     _ONE = Decimal(10 ** 7)
 
-    def __init__(self, source: str = None) -> None:
-        check_source(source)
-        self.source: Optional[str] = source
+    def __init__(self, source: Union[MuxedAccount, str] = None) -> None:
+        if source is None:
+            self.source = None
+        else:
+            self.source: Optional[MuxedAccount] = parse_mux_account_from_account(source)
 
     @classmethod
     def type_code(cls) -> int:
@@ -120,7 +121,7 @@ class Operation(metaclass=ABCMeta):
         """
         source_account: List[Xdr.types.MuxedAccount] = []
         if self.source is not None:
-            source_account = [StrKey.decode_muxed_account(self.source)]
+            source_account = [self.source.to_xdr_object()]
 
         return Xdr.types.Operation(source_account, self._to_operation_body())
 
@@ -141,14 +142,16 @@ class Operation(metaclass=ABCMeta):
         )
 
     @staticmethod
-    def get_source_from_xdr_obj(xdr_object: Xdr.types.Operation) -> Optional[str]:
+    def get_source_from_xdr_obj(
+        xdr_object: Xdr.types.Operation,
+    ) -> Optional[MuxedAccount]:
         """Get the source account from account the operation xdr object.
 
         :param xdr_object: the operation xdr object.
         :return: The source account from account the operation xdr object.
         """
         if xdr_object.sourceAccount:
-            return StrKey.encode_muxed_account(xdr_object.sourceAccount[0])
+            return MuxedAccount.from_xdr_object(xdr_object.sourceAccount[0])
         return None
 
     def __eq__(self, other: object) -> bool:

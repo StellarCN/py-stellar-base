@@ -5,6 +5,7 @@ from .operation import Operation
 from .utils import check_ed25519_public_key, check_asset_code
 from ..asset import Asset
 from ..keypair import Keypair
+from ..muxed_account import MuxedAccount
 from ..strkey import StrKey
 from ..xdr import Xdr
 
@@ -52,7 +53,7 @@ class AllowTrust(Operation):
         trustor: str,
         asset_code: str,
         authorize: Union[TrustLineEntryFlag, bool],
-        source: str = None,
+        source: Union[MuxedAccount, str] = None,
     ) -> None:
         super().__init__(source)
         check_ed25519_public_key(trustor)

@@ -2,6 +2,7 @@ from typing import Union
 
 from .operation import Operation
 from ..exceptions import ValueError
+from ..muxed_account import MuxedAccount
 from ..utils import pack_xdr_array, unpack_xdr_array
 from ..xdr import Xdr
 
@@ -27,7 +28,10 @@ class ManageData(Operation):
     """
 
     def __init__(
-        self, data_name: str, data_value: Union[str, bytes, None], source=None
+        self,
+        data_name: str,
+        data_value: Union[str, bytes, None],
+        source: Union[MuxedAccount, str] = None,
     ) -> None:  # TODO: bytes only?
         super().__init__(source)
         self.data_name: str = data_name
