@@ -29,11 +29,11 @@ Stellar Python SDK
     :alt: PyPI - Implementation
     :target: https://pypi.python.org/pypi/stellar-sdk
 
-.. image:: https://img.shields.io/badge/Stellar%20Protocol-12-blue?style=flat-square
+.. image:: https://img.shields.io/badge/Stellar%20Protocol-13-blue?style=flat-square
     :alt: Stellar Protocol
     :target: https://www.stellar.org/developers/guides/concepts/scp.html
 
-.. image:: https://img.shields.io/badge/Horizon%20Version-1.0.1-blue?style=flat-square
+.. image:: https://img.shields.io/badge/Horizon%20Version-1.2.0-blue?style=flat-square
     :alt: Horizon Version
     :target: https://github.com/stellar/go/releases/tag/horizon-v1.0.1
 
