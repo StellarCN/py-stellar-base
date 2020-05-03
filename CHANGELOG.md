@@ -1,6 +1,30 @@
 Release History
 ===============
 
+### Version 2.4.0-alpha2
+
+Released on May 03, 2020
+
+### Added
+
+- Add `stellar_sdk.MuxedAccount` which makes it easy to use muxed account. ([#311](https://github.com/StellarCN/py-stellar-base/pull/311)).
+
+### Breaking changes
+
+- The following fields, which were previously an `str` are now a `stellar_sdk.MuxedAccount` ([#311](https://github.com/StellarCN/py-stellar-base/pull/311)):
+
+  - `stellar_sdk.Account.account_id`
+  - `stellar_sdk.Transaction.source`
+  - `stellar_sdk.FeeBumpTransaction.fee_source`
+  - `stellar_sdk.operation.Operation.source`
+  - `stellar_sdk.operation.AccountMerge.destination`
+  - `stellar_sdk.operation.AllowTrust.destination`
+  - `stellar_sdk.operation.PathPaymentStrictReceive.destination`
+  - `stellar_sdk.operation.PathPaymentStrictSend.destination`
+  - `stellar_sdk.operation.PathPayment.destination`
+  - `stellar_sdk.operation.Payment.destination`
+
+
 ### Version 2.3.2
 Released on May 01, 2020
 
