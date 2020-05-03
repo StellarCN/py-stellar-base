@@ -6,10 +6,6 @@ from typing import Optional, Union
 from .utils import parse_mux_account_from_account
 from ..exceptions import ValueError, TypeError
 from ..muxed_account import MuxedAccount
-from .utils import check_source
-from ..exceptions import ValueError, TypeError
-from ..keypair import Keypair
-from ..strkey import StrKey
 from ..xdr import xdr as stellarxdr
 
 
@@ -125,9 +121,7 @@ class Operation(metaclass=ABCMeta):
         """
         # TODO muxaccount
         source_account = (
-            Keypair.from_public_key(self.source).xdr_account_id()
-            if self.source is not None
-            else None
+            self.source.to_xdr_object() if self.source is not None else None
         )
         return stellarxdr.Operation(source_account, self._to_operation_body())
 
@@ -167,14 +161,16 @@ class Operation(metaclass=ABCMeta):
         return cls.from_xdr_object(xdr_obj)
 
     @staticmethod
-    def get_source_from_xdr_obj(xdr_object: stellarxdr.Operation) -> Optional[MuxedAccount]:
+    def get_source_from_xdr_obj(
+        xdr_object: stellarxdr.Operation,
+    ) -> Optional[MuxedAccount]:
         """Get the source account from account the operation xdr object.
 
         :param xdr_object: the operation xdr object.
         :return: The source account from account the operation xdr object.
         """
-        if xdr_object.sourceAccount:
-            return MuxedAccount.from_xdr_object(xdr_object.sourceAccount[0])
+        if xdr_object.source_account:
+            return MuxedAccount.from_xdr_object(xdr_object.source_account)
         return None
 
     def __eq__(self, other: object) -> bool:

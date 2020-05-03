@@ -3,7 +3,7 @@ from typing import Union
 from .exceptions import ValueError
 from .fee_bump_transaction_envelope import FeeBumpTransactionEnvelope
 from .transaction_envelope import TransactionEnvelope
-from .xdr import Xdr
+from .xdr import xdr as stellarxdr
 
 
 __all__ = ["parse_transaction_envelope_from_xdr"]
@@ -23,15 +23,15 @@ def parse_transaction_envelope_from_xdr(
     :raises: :exc:`ValueError <stellar_sdk.exceptions.ValueError>` - XDR is neither :py:class:`TransactionEnvelope <stellar_sdk.transaction_envelope.TransactionEnvelope>`
         nor :py:class:`FeeBumpTransactionEnvelope <stellar_sdk.fee_bump_transaction_envelope.FeeBumpTransactionEnvelope>`
     """
-    xdr_object = Xdr.types.TransactionEnvelope.from_xdr(xdr)
+    xdr_object = stellarxdr.TransactionEnvelope.from_xdr(xdr)
     te_type = xdr_object.type
-    if te_type == Xdr.const.ENVELOPE_TYPE_TX_FEE_BUMP:
+    if te_type == stellarxdr.EnvelopeType.ENVELOPE_TYPE_TX_FEE_BUMP:
         return FeeBumpTransactionEnvelope.from_xdr_object(
             xdr_object, network_passphrase
         )
     elif (
-        te_type == Xdr.const.ENVELOPE_TYPE_TX
-        or te_type == Xdr.const.ENVELOPE_TYPE_TX_V0
+        te_type == stellarxdr.EnvelopeType.ENVELOPE_TYPE_TX
+        or te_type == stellarxdr.EnvelopeType.ENVELOPE_TYPE_TX_V0
     ):
         return TransactionEnvelope.from_xdr_object(xdr_object, network_passphrase)
     else:

@@ -3,7 +3,7 @@ import pytest
 from stellar_sdk.exceptions import ValueError
 from stellar_sdk.muxed_account import MuxedAccount
 from stellar_sdk.strkey import StrKey
-from stellar_sdk.xdr import Xdr
+from stellar_sdk import xdr as stellarxdr
 
 
 class TestMuxedAccount:
@@ -13,11 +13,12 @@ class TestMuxedAccount:
         account_id_muxed = (
             "MAAAAAAAAAAAJURAAB2X52XFQP6FBXLGT6LWOOWMEXWHEWBDVRZ7V5WH34Y22MPFBHUHY"
         )
-        med25519 = Xdr.nullclass()
-        med25519.id = account_id_id
-        med25519.ed25519 = StrKey.decode_ed25519_public_key(account_id)
-        muxed_account_xdr = Xdr.types.MuxedAccount(
-            type=Xdr.const.KEY_TYPE_MUXED_ED25519, med25519=med25519
+        med25519 = stellarxdr.MuxedAccountMed25519(
+            id=stellarxdr.Uint64(account_id_id),
+            ed25519=stellarxdr.Uint256(StrKey.decode_ed25519_public_key(account_id)),
+        )
+        muxed_account_xdr = stellarxdr.MuxedAccount(
+            type=stellarxdr.CryptoKeyType.KEY_TYPE_MUXED_ED25519, med25519=med25519
         )
         muxed_account = MuxedAccount(account_id, account_id_id)
         assert muxed_account.account_id_muxed == account_id_muxed
@@ -27,9 +28,9 @@ class TestMuxedAccount:
     def test_init_without_account_id_id(self):
         account_id = "GAQAA5L65LSYH7CQ3VTJ7F3HHLGCL3DSLAR2Y47263D56MNNGHSQSTVY"
         account_id_id = None
-        muxed_account_xdr = Xdr.types.MuxedAccount(
-            type=Xdr.const.KEY_TYPE_ED25519,
-            ed25519=StrKey.decode_ed25519_public_key(account_id),
+        muxed_account_xdr = stellarxdr.MuxedAccount(
+            type=stellarxdr.CryptoKeyType.KEY_TYPE_ED25519,
+            ed25519=stellarxdr.Uint256(StrKey.decode_ed25519_public_key(account_id)),
         )
         muxed_account = MuxedAccount(account_id, account_id_id)
         with pytest.raises(ValueError, match="`account_id_id` can not be None."):
@@ -69,5 +70,7 @@ class TestMuxedAccount:
 
     def test_from_account_invalid_account_raise(self):
         invalid_account = "A" * 100
-        with pytest.raises(ValueError, match="This is not a valid account."):
+        with pytest.raises(
+            ValueError, match="Invalid encoded string, this is not a valid account."
+        ):
             MuxedAccount.from_account(invalid_account)

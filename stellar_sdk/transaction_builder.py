@@ -19,6 +19,7 @@ from .time_bounds import TimeBounds
 from .transaction import Transaction
 from .transaction_envelope import TransactionEnvelope
 from .utils import hex_to_bytes
+from .xdr import xdr as stellarxdr
 
 __all__ = ["TransactionBuilder"]
 
@@ -137,9 +138,9 @@ class TransactionBuilder:
             :py:class:`FeeBumpTransactionEnvelope <stellar_sdk.fee_bump_transaction_envelope.FeeBumpTransactionEnvelope>`
             via the XDR object.
         """
-        xdr_object = Xdr.types.TransactionEnvelope.from_xdr(xdr)
+        xdr_object = stellarxdr.TransactionEnvelope.from_xdr(xdr)
         te_type = xdr_object.type
-        if te_type == Xdr.const.ENVELOPE_TYPE_TX_FEE_BUMP:
+        if te_type == stellarxdr.EnvelopeType.ENVELOPE_TYPE_TX_FEE_BUMP:
             return FeeBumpTransactionEnvelope.from_xdr_object(
                 xdr_object, network_passphrase
             )

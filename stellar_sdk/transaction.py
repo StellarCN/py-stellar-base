@@ -77,7 +77,7 @@ class Transaction:
         self.time_bounds: TimeBounds = time_bounds
         self.v1: bool = v1
 
-    def to_xdr_object(self) -> stellarxdr.Transaction:
+    def to_xdr_object(self) -> Union[stellarxdr.Transaction, stellarxdr.TransactionV0]:
         """Get an XDR object representation of this :class:`Transaction`.
 
         :return: XDR Transaction object
@@ -87,28 +87,28 @@ class Transaction:
         time_bounds = (
             self.time_bounds.to_xdr_object() if self.time_bounds is not None else None
         )
-        ext = stellarxdr.TransactionExt(0)
+        fee = stellarxdr.Uint32(self.fee)
+        sequence = stellarxdr.SequenceNumber(stellarxdr.Int64(self.sequence))
         if self.v1:
+            source_xdr = self.source.to_xdr_object()
+            ext = stellarxdr.TransactionExt(0)
             return stellarxdr.Transaction(
-                source_account,
-                stellarxdr.Uint32(self.fee),
-                stellarxdr.SequenceNumber(stellarxdr.Int64(self.sequence)),
-                time_bounds,
-                memo,
-                operations,
-                ext,
+                source_xdr, fee, sequence, time_bounds, memo, operations, ext,
             )
         source_xdr = (
-            Keypair.from_public_key(self.source.account_id).xdr_account_id().ed25519
+            Keypair.from_public_key(self.source.account_id)
+            .xdr_account_id()
+            .account_id.ed25519
         )
-        return Xdr.types.TransactionV0(
-            source_xdr, self.fee, self.sequence, time_bounds, memo, operations, ext,
+        ext = stellarxdr.TransactionV0Ext(0)
+        return stellarxdr.TransactionV0(
+            source_xdr, fee, sequence, time_bounds, memo, operations, ext,
         )
 
     @classmethod
     def from_xdr_object(
         cls,
-        tx_xdr_object: Union[Xdr.types.Transaction, Xdr.types.TransactionV0],
+        tx_xdr_object: Union[stellarxdr.Transaction, stellarxdr.TransactionV0],
         v1: bool = False,
     ) -> "Transaction":
         """Create a new :class:`Transaction` from an XDR object.
@@ -122,17 +122,11 @@ class Transaction:
         :return: A new :class:`Transaction` object from the given XDR Transaction object.
         """
         if v1:
-            source = MuxedAccount.from_xdr_object(tx_xdr_object.sourceAccount)
+            source = MuxedAccount.from_xdr_object(tx_xdr_object.source_account)
         else:
             source = StrKey.encode_ed25519_public_key(
-                tx_xdr_object.sourceAccountEd25519
+                tx_xdr_object.source_account_ed25519.uint256
             )
-        # TODO
-        source = Keypair.from_public_key(
-            StrKey.encode_ed25519_public_key(
-                tx_xdr_object.source_account.account_id.ed25519.uint256
-            )
-        )
         sequence = tx_xdr_object.seq_num.sequence_number.int64
         fee = tx_xdr_object.fee.uint32
         time_bounds_xdr = tx_xdr_object.time_bounds
@@ -174,12 +168,10 @@ class Transaction:
         :return: A new :class:`Transaction` object from the given XDR Transaction base64 string object.
         """
         if v1:
-            xdr_object = Xdr.types.Transaction.from_xdr(xdr)
+            xdr_object = stellarxdr.Transaction.from_xdr(xdr)
         else:
-            xdr_object = Xdr.types.TransactionV0.from_xdr(xdr)
+            xdr_object = stellarxdr.TransactionV0.from_xdr(xdr)
         return cls.from_xdr_object(xdr_object, v1)
-        xdr_obj = stellarxdr.Transaction.from_xdr(xdr)
-        return cls.from_xdr_object(xdr_obj)
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):

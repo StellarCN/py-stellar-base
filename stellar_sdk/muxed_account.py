@@ -1,7 +1,9 @@
-from .exceptions import ValueError, MuxedEd25519AccountInvalidError
-from .strkey import StrKey, encode_check, decode_check
+from xdrlib import Packer
+
+from .exceptions import ValueError
+from .strkey import StrKey, encode_check
 from .utils import check_ed25519_public_key
-from .xdr import Xdr
+from .xdr import xdr as stellarxdr
 
 __all__ = ["MuxedAccount"]
 
@@ -29,9 +31,14 @@ class MuxedAccount:
         """
         if self.account_id_id is None:
             raise ValueError("`account_id_id` can not be None.")
-        packer = Xdr.StellarXDRPacker()
-        packer.pack_int64(self.account_id_id)
-        packer.pack_uint256(StrKey.decode_ed25519_public_key(self.account_id))
+        muxed_account = stellarxdr.MuxedAccountMed25519(
+            id=stellarxdr.Uint64(self.account_id_id),
+            ed25519=stellarxdr.Uint256(
+                StrKey.decode_ed25519_public_key(self.account_id)
+            ),
+        )
+        packer = Packer()
+        muxed_account.pack(packer)
         data = packer.get_buffer()
         return encode_check("muxed_account", data)
 
@@ -49,27 +56,18 @@ class MuxedAccount:
             for example: `GDGQVOKHW4VEJRU2TETD6DBRKEO5ERCNF353LW5WBFW3JJWQ2BRQ6KDD` or
             `MAAAAAAAAAAAJURAAB2X52XFQP6FBXLGT6LWOOWMEXWHEWBDVRZ7V5WH34Y22MPFBHUHY`
         """
-        # There is a little confusion here, we used the new XDR generator in v3,
-        # let us optimize it in v3.
-        data_length = len(account)
-        if data_length == 56:
-            return cls(account_id=account, account_id_id=None)
-        elif data_length == 69:
-            try:
-                xdr = decode_check("muxed_account", account)
-            except Exception:
-                raise MuxedEd25519AccountInvalidError(
-                    "Invalid Muxed Account: {}".format(account)
-                )
-            unpacker = Xdr.StellarXDRUnpacker(xdr)
-            account_id_id = unpacker.unpack_int64()
-            ed25519 = unpacker.unpack_uint256()
-            account_id = StrKey.encode_ed25519_public_key(ed25519)
+        muxed = StrKey.decode_muxed_account(account)
+        if muxed.type == stellarxdr.CryptoKeyType.KEY_TYPE_ED25519:
+            account_id = StrKey.encode_ed25519_public_key(muxed.ed25519.uint256)
+            return cls(account_id=account_id, account_id_id=None)
+        if muxed.type == stellarxdr.CryptoKeyType.KEY_TYPE_MUXED_ED25519:
+            account_id = StrKey.encode_ed25519_public_key(
+                muxed.med25519.ed25519.uint256
+            )
+            account_id_id = muxed.med25519.id.uint64
             return cls(account_id=account_id, account_id_id=account_id_id)
-        else:
-            raise ValueError("This is not a valid account.")
 
-    def to_xdr_object(self) -> Xdr.types.MuxedAccount:
+    def to_xdr_object(self) -> stellarxdr.MuxedAccount:
         """Returns the xdr object for this MuxedAccount object.
 
         :return: XDR MuxedAccount object
@@ -80,23 +78,15 @@ class MuxedAccount:
 
     @classmethod
     def from_xdr_object(
-        cls, muxed_account_xdr_object: Xdr.types.MuxedAccount
+        cls, muxed_account_xdr_object: stellarxdr.MuxedAccount
     ) -> "MuxedAccount":
         """Create a :class:`MuxedAccount` from an XDR Asset object.
 
         :param muxed_account_xdr_object: The MuxedAccount Price object.
         :return: A new :class:`MuxedAccount` object from the given XDR MuxedAccount object.
         """
-        if muxed_account_xdr_object.type == Xdr.const.KEY_TYPE_ED25519:
-            account_id = StrKey.encode_ed25519_public_key(
-                muxed_account_xdr_object.ed25519
-            )
-            return cls(account_id=account_id, account_id_id=None)
-        account_id_id = muxed_account_xdr_object.med25519.id
-        account_id = StrKey.encode_ed25519_public_key(
-            muxed_account_xdr_object.med25519.ed25519
-        )
-        return cls(account_id=account_id, account_id_id=account_id_id)
+        account = StrKey.encode_muxed_account(muxed_account_xdr_object)
+        return cls.from_account(account)
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):

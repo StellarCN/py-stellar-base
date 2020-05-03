@@ -79,6 +79,7 @@ class AllowTrust(Operation):
         length = len(self.asset_code)
         pad_length = 4 - length if length <= 4 else 12 - length
         asset_code = bytearray(self.asset_code, "ascii") + b"\x00" * pad_length
+        authorize = xdr.Uint32(self.authorize.value)
         if len(asset_code) == 4:
             asset_type = xdr.AssetType.ASSET_TYPE_CREDIT_ALPHANUM4
             asset_code4 = xdr.AssetCode4(asset_code)
@@ -87,7 +88,7 @@ class AllowTrust(Operation):
             asset_type = xdr.AssetType.ASSET_TYPE_CREDIT_ALPHANUM12
             asset_code12 = xdr.AssetCode12(asset_code)
             asset = xdr.AllowTrustOpAsset(type=asset_type, asset_code12=asset_code12)
-        allow_trust_op = xdr.AllowTrustOp(trustor, asset, self.authorize)
+        allow_trust_op = xdr.AllowTrustOp(trustor, asset, authorize)
         body = xdr.OperationBody(type=self.type_code(), allow_trust_op=allow_trust_op)
         return body
 
@@ -101,7 +102,7 @@ class AllowTrust(Operation):
         trustor = StrKey.encode_ed25519_public_key(
             operation_xdr_object.body.allow_trust_op.trustor.account_id.ed25519.uint256
         )
-        authorize = operation_xdr_object.body.allow_trust_op.authorize
+        authorize = operation_xdr_object.body.allow_trust_op.authorize.uint32
         authorize = TrustLineEntryFlag(authorize)
         asset_type = operation_xdr_object.body.allow_trust_op.asset.type
         if asset_type == xdr.AssetType.ASSET_TYPE_CREDIT_ALPHANUM4:

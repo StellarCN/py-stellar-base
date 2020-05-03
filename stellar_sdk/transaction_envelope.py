@@ -1,14 +1,9 @@
-from typing import List
 import base64
-from typing import List, Union
+from typing import List
 from xdrlib import Packer, Unpacker
 
-from .exceptions import SignatureExistError
-from .keypair import Keypair
-from .network import Network
 from .base_transaction_envelope import BaseTransactionEnvelope
 from .transaction import Transaction
-from .utils import sha256, hex_to_bytes
 from .xdr import xdr as stellarxdr
 
 __all__ = ["TransactionEnvelope"]
@@ -53,17 +48,14 @@ class TransactionEnvelope(BaseTransactionEnvelope["TransactionEnvelope"]):
 
         """
         network_id = self.network_id
-        tx_type = Xdr.StellarXDRPacker()
-        tx_packer = Xdr.StellarXDRPacker()
         tx = self.transaction
         if isinstance(self.transaction, Transaction) and not self.transaction.v1:
             tx = Transaction.from_xdr_object(self.transaction.to_xdr_object(), v1=False)
             tx.v1 = True
-        tx_type.pack_EnvelopeType(Xdr.const.ENVELOPE_TYPE_TX)
-        tx_packer.pack_Transaction(tx.to_xdr_object())
-        tx_type_buffer = tx_type.get_buffer()
-        tx_buffer = tx_packer.get_buffer()
-        return network_id + tx_type_buffer + tx_buffer
+        packer = Packer()
+        stellarxdr.EnvelopeType.ENVELOPE_TYPE_TX.pack(packer)
+        tx.to_xdr_object().pack(packer)
+        return network_id + packer.get_buffer()
 
     def to_xdr_object(self) -> stellarxdr.TransactionEnvelope:
         """Get an XDR object representation of this :class:`TransactionEnvelope`.
@@ -72,13 +64,13 @@ class TransactionEnvelope(BaseTransactionEnvelope["TransactionEnvelope"]):
         """
         tx = self.transaction.to_xdr_object()
         if self.transaction.v1:
-            te_type = Xdr.const.ENVELOPE_TYPE_TX
-            tx_envelope = Xdr.types.TransactionV1Envelope(tx, self.signatures)
-            return Xdr.types.TransactionEnvelope(type=te_type, v1=tx_envelope)
+            te_type = stellarxdr.EnvelopeType.ENVELOPE_TYPE_TX
+            tx_envelope = stellarxdr.TransactionV1Envelope(tx, self.signatures)
+            return stellarxdr.TransactionEnvelope(type=te_type, v1=tx_envelope)
         else:
-            te_type = Xdr.const.ENVELOPE_TYPE_TX_V0
-            tx_envelope = Xdr.types.TransactionV0Envelope(tx, self.signatures)
-            return Xdr.types.TransactionEnvelope(type=te_type, v0=tx_envelope)
+            te_type = stellarxdr.EnvelopeType.ENVELOPE_TYPE_TX_V0
+            tx_envelope = stellarxdr.TransactionV0Envelope(tx, self.signatures)
+            return stellarxdr.TransactionEnvelope(type=te_type, v0=tx_envelope)
 
     def to_xdr(self) -> str:
         """Get the base64 encoded XDR string representing this
@@ -100,11 +92,11 @@ class TransactionEnvelope(BaseTransactionEnvelope["TransactionEnvelope"]):
         :return: A new :class:`TransactionEnvelope` object from the given XDR TransactionEnvelope object.
         """
         te_type = te_xdr_object.type
-        if te_type == Xdr.const.ENVELOPE_TYPE_TX_V0:
-            tx = Transaction.from_xdr_object(te_xdr_object.v0, v1=False)
+        if te_type == stellarxdr.EnvelopeType.ENVELOPE_TYPE_TX_V0:
+            tx = Transaction.from_xdr_object(te_xdr_object.v0.tx, v1=False)
             signatures = te_xdr_object.v0.signatures
-        elif te_type == Xdr.const.ENVELOPE_TYPE_TX:
-            tx = Transaction.from_xdr_object(te_xdr_object.v1, v1=True)
+        elif te_type == stellarxdr.EnvelopeType.ENVELOPE_TYPE_TX:
+            tx = Transaction.from_xdr_object(te_xdr_object.v1.tx, v1=True)
             signatures = te_xdr_object.v1.signatures
         else:
             raise ValueError("Invalid EnvelopeType: %d.", te_xdr_object.type)

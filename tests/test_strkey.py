@@ -1,7 +1,7 @@
 import pytest
 
 from stellar_sdk.strkey import StrKey
-from stellar_sdk.xdr import Xdr
+from stellar_sdk import xdr as stellarxdr
 
 
 class TestStrKey:
@@ -45,17 +45,19 @@ class TestStrKey:
         decoded = StrKey.decode_muxed_account(account_id)
         assert (
             decoded.to_xdr()
-            == Xdr.types.MuxedAccount(
-                type=Xdr.const.KEY_TYPE_ED25519,
-                ed25519=StrKey.decode_ed25519_public_key(account_id),
+            == stellarxdr.MuxedAccount(
+                type=stellarxdr.CryptoKeyType.KEY_TYPE_ED25519,
+                ed25519=stellarxdr.Uint256(
+                    StrKey.decode_ed25519_public_key(account_id)
+                ),
             ).to_xdr()
         )
 
     def test_encode_muxed_account_ed25519(self):
         account_id = "GAQAA5L65LSYH7CQ3VTJ7F3HHLGCL3DSLAR2Y47263D56MNNGHSQSTVY"
-        data = Xdr.types.MuxedAccount(
-            type=Xdr.const.KEY_TYPE_ED25519,
-            ed25519=StrKey.decode_ed25519_public_key(account_id),
+        data = stellarxdr.MuxedAccount(
+            type=stellarxdr.CryptoKeyType.KEY_TYPE_ED25519,
+            ed25519=stellarxdr.Uint256(StrKey.decode_ed25519_public_key(account_id)),
         )
         encoded = StrKey.encode_muxed_account(data)
         assert encoded == StrKey.encode_ed25519_public_key(
@@ -63,7 +65,7 @@ class TestStrKey:
         )
 
     def test_encode_muxed_account_med25519(self):
-        data = Xdr.types.MuxedAccount.from_xdr(
+        data = stellarxdr.MuxedAccount.from_xdr(
             "AAABAAAAAAAAAATSIAB1furlg/xQ3Wafl2c6zCXsclgjrHP69sffMa0x5Qk="
         )
         expected = (

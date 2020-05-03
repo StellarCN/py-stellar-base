@@ -5,9 +5,6 @@ from .operation import Operation
 from .utils import check_amount
 from ..asset import Asset
 from ..muxed_account import MuxedAccount
-from ..xdr import Xdr
-from .utils import check_amount
-from ..asset import Asset
 from ..xdr import xdr
 
 
@@ -53,7 +50,6 @@ class ChangeTrust(Operation):
     def _to_operation_body(self) -> xdr.OperationBody:
         line = self.asset.to_xdr_object()
         limit = xdr.Int64(Operation.to_xdr_amount(self.limit))
-
         change_trust_op = xdr.ChangeTrustOp(line, limit)
         body = xdr.OperationBody(type=self.type_code(), change_trust_op=change_trust_op)
         return body

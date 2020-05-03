@@ -5,7 +5,7 @@ from .exceptions import SignatureExistError
 from .keypair import Keypair
 from .network import Network
 from .utils import hex_to_bytes, sha256
-from .xdr import Xdr
+from .xdr import xdr as stellarxdr
 
 T = TypeVar("T")
 
@@ -14,10 +14,10 @@ class BaseTransactionEnvelope(Generic[T]):
     def __init__(
         self,
         network_passphrase: str,
-        signatures: List[Xdr.types.DecoratedSignature] = None,
+        signatures: List[stellarxdr.DecoratedSignature] = None,
     ) -> None:
         self.network_id: bytes = Network(network_passphrase).network_id()
-        self.signatures: List[Xdr.types.DecoratedSignature] = signatures or []
+        self.signatures: List[stellarxdr.DecoratedSignature] = signatures or []
 
     def hash(self) -> bytes:
         """Get the XDR Hash of the signature base.
@@ -86,15 +86,15 @@ class BaseTransactionEnvelope(Generic[T]):
             signature.
         """
         hash_preimage = sha256(hex_to_bytes(preimage))
-        hint = hash_preimage[-4:]
-        sig = Xdr.types.DecoratedSignature(hint, preimage)
+        hint = stellarxdr.SignatureHint(hash_preimage[-4:])
+        sig = stellarxdr.DecoratedSignature(hint, stellarxdr.Signature(preimage))
         sig_dict = [signature.__dict__ for signature in self.signatures]
         if sig.__dict__ in sig_dict:
             raise SignatureExistError("The preimage has already signed.")
         else:
             self.signatures.append(sig)
 
-    def to_xdr_object(self) -> Xdr.types.TransactionEnvelope:
+    def to_xdr_object(self) -> stellarxdr.TransactionEnvelope:
         """Get an XDR object representation of this :class:`BaseTransactionEnvelope`.
 
         :return: XDR TransactionEnvelope object
@@ -111,7 +111,7 @@ class BaseTransactionEnvelope(Generic[T]):
 
     @classmethod
     def from_xdr_object(
-        cls, te_xdr_object: Xdr.types.TransactionEnvelope, network_passphrase: str
+        cls, te_xdr_object: stellarxdr.TransactionEnvelope, network_passphrase: str
     ) -> T:
         """Create a new :class:`BaseTransactionEnvelope` from an XDR object.
 
@@ -131,5 +131,20 @@ class BaseTransactionEnvelope(Generic[T]):
 
         :return: A new :class:`BaseTransactionEnvelope` object from the given XDR TransactionEnvelope base64 string object.
         """
-        xdr_object = Xdr.types.TransactionEnvelope.from_xdr(xdr)
+        xdr_object = stellarxdr.TransactionEnvelope.from_xdr(xdr)
         return cls.from_xdr_object(xdr_object, network_passphrase)
+
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, self.__class__):
+            return NotImplemented  # pragma: no cover
+        return (
+            self.network_id == other.network_id and self.signatures == other.signatures
+        )
+
+    def __str__(self):
+        return (
+            "<BaseTransactionEnvelope [network_id={network_id} "
+            "signatures={signatures}]>".format(
+                network_id=self.network_id, signatures=self.signatures,
+            )
+        )

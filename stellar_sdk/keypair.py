@@ -145,9 +145,10 @@ class Keypair:
     def xdr_account_id(self) -> stellarxdr.AccountID:
         return stellarxdr.AccountID(self.xdr_public_key())
 
-    def xdr_muxed_account(self) -> Xdr.types.MuxedAccount:
-        return Xdr.types.MuxedAccount(
-            Xdr.const.KEY_TYPE_ED25519, bytes(self.verify_key)
+    def xdr_muxed_account(self) -> stellarxdr.MuxedAccount:
+        return stellarxdr.MuxedAccount(
+            type=stellarxdr.CryptoKeyType.KEY_TYPE_ED25519,
+            ed25519=stellarxdr.Uint256(bytes(self.verify_key)),
         )
 
     def raw_public_key(self) -> bytes:

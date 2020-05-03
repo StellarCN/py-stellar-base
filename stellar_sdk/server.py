@@ -50,11 +50,7 @@ from .muxed_account import MuxedAccount
 from .sep.exceptions import AccountRequiresMemoError
 from .transaction import Transaction
 from .transaction_envelope import TransactionEnvelope
-from .utils import (
-    urljoin_with_query,
-    MUXED_ACCOUNT_STARTING_LETTER,
-)
-from .xdr import Xdr
+from .utils import MUXED_ACCOUNT_STARTING_LETTER
 from .utils import urljoin_with_query
 from .xdr.xdr import OperationType
 

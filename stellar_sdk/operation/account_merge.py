@@ -3,10 +3,6 @@ from typing import Union
 from .operation import Operation
 from .utils import parse_mux_account_from_account
 from ..muxed_account import MuxedAccount
-from ..xdr import Xdr
-from .utils import check_ed25519_public_key
-from ..keypair import Keypair
-from ..strkey import StrKey
 from ..xdr import xdr
 
 
@@ -37,7 +33,7 @@ class AccountMerge(Operation):
         return xdr.OperationType.ACCOUNT_MERGE
 
     def _to_operation_body(self) -> xdr.OperationBody:
-        destination = Keypair.from_public_key(self.destination).xdr_account_id()
+        destination = self.destination.to_xdr_object()
         body = xdr.OperationBody(type=self.type_code(), destination=destination)
         return body
 

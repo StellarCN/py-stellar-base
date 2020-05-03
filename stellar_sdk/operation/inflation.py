@@ -1,9 +1,8 @@
 from typing import Union
 
 from .operation import Operation
-
-from ..xdr import xdr
 from ..muxed_account import MuxedAccount
+from ..xdr import xdr
 
 
 class Inflation(Operation):

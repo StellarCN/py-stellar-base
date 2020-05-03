@@ -7,7 +7,6 @@ from ..asset import Asset
 from ..muxed_account import MuxedAccount
 from ..price import Price
 from ..xdr import xdr
-from ..xdr import Xdr
 
 
 class ManageBuyOffer(Operation):

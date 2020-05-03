@@ -21,7 +21,7 @@ from ..keypair import Keypair
 from ..operation.manage_data import ManageData
 from ..transaction_builder import TransactionBuilder
 from ..transaction_envelope import TransactionEnvelope
-from ..xdr import Xdr
+from ..xdr import xdr as stellarxdr
 
 __all__ = [
     "build_challenge_transaction",
@@ -102,8 +102,8 @@ def read_challenge_transaction(
             "Invalid server_account_id, multiplexed account are not supported."
         )
 
-    xdr_object = Xdr.types.TransactionEnvelope.from_xdr(challenge_transaction)
-    if xdr_object.type == Xdr.const.ENVELOPE_TYPE_TX_FEE_BUMP:
+    xdr_object = stellarxdr.TransactionEnvelope.from_xdr(challenge_transaction)
+    if xdr_object.type == stellarxdr.EnvelopeType.ENVELOPE_TYPE_TX_FEE_BUMP:
         raise ValueError(
             "Invalid challenge, expected a TransactionEnvelope but received a FeeBumpTransactionEnvelope."
         )

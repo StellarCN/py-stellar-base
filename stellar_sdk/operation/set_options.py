@@ -1,6 +1,5 @@
-from typing import Optional
 from enum import IntFlag
-from typing import List, Optional, Union
+from typing import Optional, Union
 
 from .operation import Operation
 from .utils import check_ed25519_public_key
