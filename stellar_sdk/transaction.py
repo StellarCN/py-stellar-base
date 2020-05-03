@@ -2,6 +2,7 @@ from typing import List, Union
 
 from .keypair import Keypair
 from .memo import NoneMemo, Memo
+from .muxed_account import MuxedAccount
 from .operation.operation import Operation
 from .strkey import StrKey
 from .time_bounds import TimeBounds
@@ -11,7 +12,7 @@ __all__ = ["Transaction"]
 
 
 class Transaction:
-    """The :class:`Transaction` object, which represents a transaction
+    """The :class:`Transaction` object, which represents a transaction(Transaction or TransactionV0)
     on Stellar's network.
 
     A transaction contains a list of operations, which are all executed
@@ -42,16 +43,20 @@ class Transaction:
     :param memo: The memo being sent with the transaction, being
           represented as one of the subclasses of the
           :class:`Memo <stellar_sdk.memo.Memo>` object.
+    :param v1: Temporary feature flag to allow alpha testing of Stellar Protocol 13 transactions.
+        We will remove this once all transactions are supposed to be v1.
+        See `CAP-0015 <https://github.com/stellar/stellar-protocol/blob/master/core/cap-0015.md>`_ for more information.
     """
 
     def __init__(
         self,
-        source: Union[Keypair, str],
+        source: Union[Keypair, MuxedAccount, str],
         sequence: int,
         fee: int,
         operations: List[Operation],
         memo: Memo = None,
         time_bounds: TimeBounds = None,
+        v1: bool = False,
     ) -> None:
 
         # if not operations:
@@ -59,46 +64,70 @@ class Transaction:
 
         if memo is None:
             memo = NoneMemo()
+        if isinstance(source, Keypair):
+            source = MuxedAccount(account_id=source.public_key, account_id_id=None)
         if isinstance(source, str):
-            source = Keypair.from_public_key(source)
+            source = MuxedAccount.from_account(source)
 
-        self.source: Keypair = source
+        self.source: [MuxedAccount, str] = source
         self.sequence: int = sequence
         self.operations: List[Operation] = operations
         self.memo: Memo = memo
         self.fee: int = fee
         self.time_bounds: TimeBounds = time_bounds
+        self.v1: bool = v1
 
     def to_xdr_object(self) -> stellarxdr.Transaction:
         """Get an XDR object representation of this :class:`Transaction`.
 
         :return: XDR Transaction object
         """
-        source_account = self.source.xdr_account_id()
         memo = self.memo.to_xdr_object()
         operations = [operation.to_xdr_object() for operation in self.operations]
         time_bounds = (
             self.time_bounds.to_xdr_object() if self.time_bounds is not None else None
         )
         ext = stellarxdr.TransactionExt(0)
-        return stellarxdr.Transaction(
-            source_account,
-            stellarxdr.Uint32(self.fee),
-            stellarxdr.SequenceNumber(stellarxdr.Int64(self.sequence)),
-            time_bounds,
-            memo,
-            operations,
-            ext,
+        if self.v1:
+            return stellarxdr.Transaction(
+                source_account,
+                stellarxdr.Uint32(self.fee),
+                stellarxdr.SequenceNumber(stellarxdr.Int64(self.sequence)),
+                time_bounds,
+                memo,
+                operations,
+                ext,
+            )
+        source_xdr = (
+            Keypair.from_public_key(self.source.account_id).xdr_account_id().ed25519
+        )
+        return Xdr.types.TransactionV0(
+            source_xdr, self.fee, self.sequence, time_bounds, memo, operations, ext,
         )
 
     @classmethod
-    def from_xdr_object(cls, tx_xdr_object: stellarxdr.Transaction) -> "Transaction":
+    def from_xdr_object(
+        cls,
+        tx_xdr_object: Union[Xdr.types.Transaction, Xdr.types.TransactionV0],
+        v1: bool = False,
+    ) -> "Transaction":
         """Create a new :class:`Transaction` from an XDR object.
 
         :param tx_xdr_object: The XDR object that represents a transaction.
+        :param v1: Temporary feature flag to allow alpha testing of Stellar Protocol 13 transactions.
+            We will remove this once all transactions are supposed to be v1.
+            See `CAP-0015 <https://github.com/stellar/stellar-protocol/blob/master/core/cap-0015.md>`_
+            for more information.
 
         :return: A new :class:`Transaction` object from the given XDR Transaction object.
         """
+        if v1:
+            source = MuxedAccount.from_xdr_object(tx_xdr_object.sourceAccount)
+        else:
+            source = StrKey.encode_ed25519_public_key(
+                tx_xdr_object.sourceAccountEd25519
+            )
+        # TODO
         source = Keypair.from_public_key(
             StrKey.encode_ed25519_public_key(
                 tx_xdr_object.source_account.account_id.ed25519.uint256
@@ -121,6 +150,7 @@ class Transaction:
             memo=memo,
             fee=fee,
             operations=operations,
+            v1=v1,
         )
 
     def to_xdr(self) -> str:
@@ -132,13 +162,22 @@ class Transaction:
         return self.to_xdr_object().to_xdr()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "Transaction":
+    def from_xdr(cls, xdr: str, v1: bool = False) -> "Transaction":
         """Create a new :class:`Transaction` from an XDR string.
 
         :param xdr: The XDR string that represents a :class:`Transaction`.
+        :param v1: Temporary feature flag to allow alpha testing of Stellar Protocol 13 transactions.
+            We will remove this once all transactions are supposed to be v1.
+            See `CAP-0015 <https://github.com/stellar/stellar-protocol/blob/master/core/cap-0015.md>`_
+            for more information.
 
         :return: A new :class:`Transaction` object from the given XDR Transaction base64 string object.
         """
+        if v1:
+            xdr_object = Xdr.types.Transaction.from_xdr(xdr)
+        else:
+            xdr_object = Xdr.types.TransactionV0.from_xdr(xdr)
+        return cls.from_xdr_object(xdr_object, v1)
         xdr_obj = stellarxdr.Transaction.from_xdr(xdr)
         return cls.from_xdr_object(xdr_obj)
 

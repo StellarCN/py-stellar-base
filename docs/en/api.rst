@@ -326,6 +326,12 @@ ReturnHashMemo
 .. autoclass:: stellar_sdk.memo.ReturnHashMemo
    :members:
 
+MuxedAccount
+^^^^^^^^^^^^
+
+.. autoclass:: stellar_sdk.muxed_account.MuxedAccount
+   :members:
+
 Network
 ^^^^^^^
 
@@ -353,6 +359,9 @@ AllowTrust
 ----------
 .. autoclass:: stellar_sdk.operation.AllowTrust
    :members: to_xdr_object, from_xdr_object
+
+.. autoclass:: stellar_sdk.operation.allow_trust.TrustLineEntryFlag
+   :members:
 
 BumpSequence
 ------------
@@ -461,12 +470,31 @@ TransactionEnvelope
 
 .. autoclass:: stellar_sdk.transaction_envelope.TransactionEnvelope
    :members:
+   :inherited-members:
+
+FeeBumpTransaction
+^^^^^^^^^^^^^^^^^^
+
+.. autoclass:: stellar_sdk.fee_bump_transaction.FeeBumpTransaction
+   :members:
+   :inherited-members:
+
+FeeBumpTransactionEnvelope
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. autoclass:: stellar_sdk.fee_bump_transaction_envelope.FeeBumpTransactionEnvelope
+   :members:
+   :inherited-members:
 
 TransactionBuilder
 ^^^^^^^^^^^^^^^^^^
 
 .. autoclass:: stellar_sdk.transaction_builder.TransactionBuilder
    :members:
+
+Helpers
+^^^^^^^
+.. autofunction:: stellar_sdk.helpers.parse_transaction_envelope_from_xdr
 
 Stellar Ecosystem Proposals
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^

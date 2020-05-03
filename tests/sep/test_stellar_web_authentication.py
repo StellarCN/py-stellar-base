@@ -4,7 +4,8 @@ import time
 
 import pytest
 
-from stellar_sdk import Keypair, Network, Account
+from stellar_sdk import Keypair, Network, Account, MuxedAccount
+from stellar_sdk.exceptions import ValueError
 from stellar_sdk.operation import ManageData
 from stellar_sdk.sep.ed25519_public_key_signer import Ed25519PublicKeySigner
 from stellar_sdk.sep.exceptions import InvalidSep10ChallengeError
@@ -15,6 +16,7 @@ from stellar_sdk.sep.stellar_web_authentication import (
     verify_challenge_transaction_signers,
     verify_challenge_transaction_threshold,
     verify_challenge_transaction_signed_by_client_master_key,
+    read_challenge_transaction,
 )
 from stellar_sdk.transaction_builder import TransactionBuilder
 from stellar_sdk.transaction_envelope import TransactionEnvelope
@@ -45,7 +47,7 @@ class TestStellarWebAuthentication:
         assert op.data_name == "SDF auth"
         assert len(op.data_value) == 64
         assert len(base64.b64decode(op.data_value)) == 48
-        assert op.source == client_account_id
+        assert op.source == MuxedAccount(client_account_id)
 
         now = int(time.time())
         assert now - 3 < transaction.time_bounds.min_time < now + 3
@@ -53,8 +55,28 @@ class TestStellarWebAuthentication:
             transaction.time_bounds.max_time - transaction.time_bounds.min_time
             == timeout
         )
-        assert transaction.source.public_key == server_kp.public_key
+        assert transaction.source == MuxedAccount.from_account(server_kp.public_key)
         assert transaction.sequence == 0
+
+    def test_challenge_transaction_mux_client_account_id_raise(self):
+        server_kp = Keypair.random()
+        client_account_id = (
+            "MAAAAAAAAAAAJURAAB2X52XFQP6FBXLGT6LWOOWMEXWHEWBDVRZ7V5WH34Y22MPFBHUHY"
+        )
+        timeout = 600
+        network_passphrase = Network.TESTNET_NETWORK_PASSPHRASE
+        anchor_name = "SDF"
+        with pytest.raises(
+            ValueError,
+            match="Invalid client_account_id, multiplexed account are not supported.",
+        ):
+            build_challenge_transaction(
+                server_secret=server_kp.secret,
+                client_account_id=client_account_id,
+                anchor_name=anchor_name,
+                network_passphrase=network_passphrase,
+                timeout=timeout,
+            )
 
     def test_verify_challenge_transaction(self):
         server_kp = Keypair.random()
@@ -766,4 +788,64 @@ class TestStellarWebAuthentication:
                 network_passphrase,
                 med_threshold,
                 signers,
+            )
+
+    def test_read_challenge_transaction_mux_server_id_raise(self):
+        server_kp = Keypair.random()
+        client_account_id = "GBDIT5GUJ7R5BXO3GJHFXJ6AZ5UQK6MNOIDMPQUSMXLIHTUNR2Q5CFNF"
+        timeout = 600
+        network_passphrase = Network.TESTNET_NETWORK_PASSPHRASE
+        anchor_name = "SDF"
+
+        challenge = build_challenge_transaction(
+            server_secret=server_kp.secret,
+            client_account_id=client_account_id,
+            anchor_name=anchor_name,
+            network_passphrase=network_passphrase,
+            timeout=timeout,
+        )
+        with pytest.raises(
+            ValueError,
+            match="Invalid server_account_id, multiplexed account are not supported.",
+        ):
+            read_challenge_transaction(
+                challenge,
+                "MAAAAAAAAAAAJURAAB2X52XFQP6FBXLGT6LWOOWMEXWHEWBDVRZ7V5WH34Y22MPFBHUHY",
+                network_passphrase,
+            )
+
+    def test_read_challenge_transaction_fee_bump_transaction_raise(self):
+        inner_keypair = Keypair.from_secret(
+            "SBKTIFHJSS3JJWEZO2W74DZSA45WZU56LOL3AY7GAW63BXPEJQFYV53E"
+        )
+        inner_source = Account(inner_keypair.public_key, 7)
+        destination = "GDQERENWDDSQZS7R7WKHZI3BSOYMV3FSWR7TFUYFTKQ447PIX6NREOJM"
+        amount = "2000.0000000"
+        inner_tx = (
+            TransactionBuilder(
+                inner_source, Network.TESTNET_NETWORK_PASSPHRASE, 200, v1=True
+            )
+            .append_payment_op(destination=destination, amount=amount, asset_code="XLM")
+            .add_time_bounds(0, 0)
+            .build()
+        )
+        inner_tx.sign(inner_keypair)
+        fee_source = Keypair.from_secret(
+            "SB7ZMPZB3YMMK5CUWENXVLZWBK4KYX4YU5JBXQNZSK2DP2Q7V3LVTO5V"
+        )
+        base_fee = 200
+        fee_bump_tx = TransactionBuilder.build_fee_bump_transaction(
+            fee_source.public_key,
+            base_fee,
+            inner_tx,
+            Network.TESTNET_NETWORK_PASSPHRASE,
+        )
+        fee_bump_tx.sign(fee_source)
+        challenge = fee_bump_tx.to_xdr()
+        with pytest.raises(
+            ValueError,
+            match="Invalid challenge, expected a TransactionEnvelope but received a FeeBumpTransactionEnvelope.",
+        ):
+            read_challenge_transaction(
+                challenge, inner_keypair.public_key, Network.TESTNET_NETWORK_PASSPHRASE
             )

@@ -1,9 +1,9 @@
 Stellar Python SDK
 ==================
 
-.. image:: https://img.shields.io/travis/StellarCN/py-stellar-base/v2?style=flat-square&maxAge=1800
-    :alt: Travis (.org)
-    :target: https://travis-ci.org/StellarCN/py-stellar-base/
+.. image:: https://img.shields.io/github/workflow/status/StellarCN/py-stellar-base/GitHub%20Action/master?style=flat-square&maxAge=1800
+    :alt: GitHub Action
+    :target: https://github.com/StellarCN/py-stellar-base/actions
 
 .. image:: https://img.shields.io/readthedocs/stellar-sdk.svg?style=flat-square&maxAge=1800
     :alt: Read the Docs
@@ -29,11 +29,11 @@ Stellar Python SDK
     :alt: PyPI - Implementation
     :target: https://pypi.python.org/pypi/stellar-sdk
 
-.. image:: https://img.shields.io/badge/Stellar%20Protocol-12-blue?style=flat-square
+.. image:: https://img.shields.io/badge/Stellar%20Protocol-13-blue?style=flat-square
     :alt: Stellar Protocol
     :target: https://www.stellar.org/developers/guides/concepts/scp.html
 
-.. image:: https://img.shields.io/badge/Horizon%20Version-1.0.1-blue?style=flat-square
+.. image:: https://img.shields.io/badge/Horizon%20Version-1.2.0-blue?style=flat-square
     :alt: Horizon Version
     :target: https://github.com/stellar/go/releases/tag/horizon-v1.0.1
 
@@ -59,7 +59,7 @@ Install and update using `pipenv`_ or `pip`_:
 
 .. code-block:: text
 
-    pip install stellar-sdk==2.2.2
+    pip install stellar-sdk==2.3.2
 
 
 A Simple Example

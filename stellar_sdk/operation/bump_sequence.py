@@ -1,5 +1,7 @@
-from .operation import Operation
+from typing import Union
 
+from .operation import Operation
+from ..muxed_account import MuxedAccount
 from ..xdr import xdr
 
 
@@ -19,7 +21,7 @@ class BumpSequence(Operation):
 
     """
 
-    def __init__(self, bump_to: int, source: str = None) -> None:
+    def __init__(self, bump_to: int, source: Union[MuxedAccount, str] = None) -> None:
         super().__init__(source)
         self.bump_to: int = bump_to
 

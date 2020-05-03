@@ -5,6 +5,7 @@ from typing import List, Optional, Union
 from .operation import Operation
 from .utils import check_ed25519_public_key
 from ..keypair import Keypair
+from ..muxed_account import MuxedAccount
 from ..signer import Signer
 from ..strkey import StrKey
 from ..xdr import xdr
@@ -80,7 +81,7 @@ class SetOptions(Operation):
         high_threshold: int = None,
         signer: Signer = None,
         home_domain: str = None,
-        source: str = None,
+        source: Union[MuxedAccount, str] = None,
     ) -> None:
         super().__init__(source)
         if inflation_dest is not None:

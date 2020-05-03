@@ -16,11 +16,12 @@ from typing import List, Tuple
 from .ed25519_public_key_signer import Ed25519PublicKeySigner
 from .exceptions import InvalidSep10ChallengeError
 from ..account import Account
-from ..exceptions import BadSignatureError
+from ..exceptions import BadSignatureError, ValueError
 from ..keypair import Keypair
 from ..operation.manage_data import ManageData
 from ..transaction_builder import TransactionBuilder
 from ..transaction_envelope import TransactionEnvelope
+from ..xdr import Xdr
 
 __all__ = [
     "build_challenge_transaction",
@@ -30,6 +31,8 @@ __all__ = [
     "read_challenge_transaction",
     "verify_challenge_transaction",
 ]
+
+MUXED_ACCOUNT_STARTING_LETTER: str = "M"
 
 
 def build_challenge_transaction(
@@ -50,6 +53,11 @@ def build_challenge_transaction(
     :param timeout: Challenge duration in seconds (default to 15 minutes).
     :return: A base64 encoded string of the raw TransactionEnvelope xdr struct for the transaction.
     """
+    if client_account_id.startswith(MUXED_ACCOUNT_STARTING_LETTER):
+        raise ValueError(
+            "Invalid client_account_id, multiplexed account are not supported."
+        )
+
     now = int(time.time())
     server_keypair = Keypair.from_secret(server_secret)
     server_account = Account(account_id=server_keypair.public_key, sequence=-1)
@@ -89,6 +97,17 @@ def read_challenge_transaction(
     """
 
     # decode the received input as a base64-urlencoded XDR representation of Stellar transaction envelope
+    if server_account_id.startswith("M"):
+        raise ValueError(
+            "Invalid server_account_id, multiplexed account are not supported."
+        )
+
+    xdr_object = Xdr.types.TransactionEnvelope.from_xdr(challenge_transaction)
+    if xdr_object.type == Xdr.const.ENVELOPE_TYPE_TX_FEE_BUMP:
+        raise ValueError(
+            "Invalid challenge, expected a TransactionEnvelope but received a FeeBumpTransactionEnvelope."
+        )
+
     try:
         transaction_envelope = TransactionEnvelope.from_xdr(
             challenge_transaction, network_passphrase=network_passphrase
@@ -97,10 +116,11 @@ def read_challenge_transaction(
         raise InvalidSep10ChallengeError(
             "Importing XDR failed, please check if XDR is correct."
         )
+
     transaction = transaction_envelope.transaction
 
     # verify that transaction source account is equal to the server's signing key
-    if transaction.source.public_key != server_account_id:
+    if transaction.source.account_id != server_account_id:
         raise InvalidSep10ChallengeError(
             "Transaction source account is not equal to server's account."
         )
@@ -139,8 +159,8 @@ def read_challenge_transaction(
     if not isinstance(manage_data_op, ManageData):
         raise InvalidSep10ChallengeError("Operation type should be ManageData.")
 
-    client_account_id = manage_data_op.source
-    if not client_account_id:
+    client_account = manage_data_op.source
+    if not client_account:
         raise InvalidSep10ChallengeError("Operation should have a source account.")
 
     if len(manage_data_op.data_value) != 64:
@@ -161,7 +181,7 @@ def read_challenge_transaction(
         )
 
     # TODO: I don't think this is a good idea.
-    return transaction_envelope, client_account_id
+    return transaction_envelope, client_account.account_id
 
 
 def verify_challenge_transaction_signers(
@@ -258,7 +278,7 @@ def verify_challenge_transaction_signed_by_client(
         validation fails, the exception will be thrown.
     """
     warnings.warn(
-        "Will be removed in version v2.3.0, "
+        "Will be removed in version v3.0.0, "
         "use stellar_sdk.sep.test_stellar_web_authentication.verify_challenge_transaction_signed_by_client_master_key",
         DeprecationWarning,
     )  # pragma: no cover

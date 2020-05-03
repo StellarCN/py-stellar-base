@@ -4,7 +4,9 @@ from typing import Union
 from .operation import Operation
 from .utils import check_amount, check_price
 from ..asset import Asset
+from ..muxed_account import MuxedAccount
 from ..price import Price
+from ..xdr import Xdr
 from ..xdr import xdr
 
 
@@ -46,7 +48,7 @@ class CreatePassiveSellOffer(Operation):
         buying: Asset,
         amount: Union[str, Decimal],
         price: Union[Price, str, Decimal],
-        source: str = None,
+        source: Union[MuxedAccount, str] = None,
     ) -> None:
         super().__init__(source)
         check_amount(amount)
@@ -57,8 +59,8 @@ class CreatePassiveSellOffer(Operation):
         self.price: Union[Price, str, Decimal] = price
 
     @classmethod
-    def type_code(cls) -> xdr.OperationType:
-        return xdr.OperationType.CREATE_PASSIVE_SELL_OFFER
+    def type_code(cls) -> int:
+        return Xdr.const.CREATE_PASSIVE_SELL_OFFER
 
     def _to_operation_body(self) -> xdr.OperationBody:
         selling = self.selling.to_xdr_object()

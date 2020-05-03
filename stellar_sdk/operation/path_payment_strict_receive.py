@@ -3,10 +3,12 @@ from typing import List, Union
 
 from .operation import Operation
 from .utils import check_ed25519_public_key, check_amount
+from .utils import check_amount, parse_mux_account_from_account
 from ..asset import Asset
 from ..keypair import Keypair
 from ..strkey import StrKey
 from ..xdr import xdr
+from ..muxed_account import MuxedAccount
 
 
 class PathPaymentStrictReceive(Operation):
@@ -31,19 +33,18 @@ class PathPaymentStrictReceive(Operation):
 
     def __init__(
         self,
-        destination: str,
+        destination: Union[MuxedAccount, str],
         send_asset: Asset,
         send_max: Union[str, Decimal],
         dest_asset: Asset,
         dest_amount: Union[str, Decimal],
         path: List[Asset],
-        source: str = None,
+        source: Union[MuxedAccount, str] = None,
     ) -> None:
         super().__init__(source)
-        check_ed25519_public_key(destination)
         check_amount(send_max)
         check_amount(dest_amount)
-        self.destination: str = destination
+        self.destination: MuxedAccount = parse_mux_account_from_account(destination)
         self.send_asset: Asset = send_asset
         self.send_max: Union[str, Decimal] = send_max
         self.dest_asset: Asset = dest_asset
@@ -83,10 +84,11 @@ class PathPaymentStrictReceive(Operation):
 
         """
         source = Operation.get_source_from_xdr_obj(operation_xdr_object)
+        # destination = MuxedAccount.from_xdr_object(
+        #     operation_xdr_object.body.pathPaymentStrictReceiveOp.destination
         destination = StrKey.encode_ed25519_public_key(
             operation_xdr_object.body.path_payment_strict_receive_op.destination.account_id.ed25519.uint256
         )
-
         send_asset = Asset.from_xdr_object(
             operation_xdr_object.body.path_payment_strict_receive_op.send_asset
         )

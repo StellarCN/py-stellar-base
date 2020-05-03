@@ -209,7 +209,7 @@ class BaseCallBuilder(Generic[T]):
     def prev(
         self,
     ) -> Union[WrappedResponse[T], Coroutine[Any, Any, WrappedResponse[T]]]:
-        if self.next_href is None:
+        if self.prev_href is None:
             raise NotPageableError("The prev page does not exist.")
         return self._call(self.prev_href, None)
 

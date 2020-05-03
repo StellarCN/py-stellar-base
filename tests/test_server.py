@@ -1,5 +1,6 @@
 import pytest
 
+from stellar_sdk import MuxedAccount
 from stellar_sdk.account import Thresholds
 from stellar_sdk.asset import Asset
 from stellar_sdk.call_builder import FeeStatsCallBuilder
@@ -38,7 +39,7 @@ class TestServer:
         horizon_url = "https://horizon.stellar.org"
         with Server(horizon_url) as server:
             account = server.load_account(account_id)
-            assert account.account_id == account_id
+            assert account.account_id == MuxedAccount.from_account(account_id)
             assert isinstance(account.sequence, int)
             assert account.thresholds == Thresholds(1, 2, 3)
 
@@ -49,7 +50,7 @@ class TestServer:
         client = AiohttpClient()
         async with Server(horizon_url, client) as server:
             account = await server.load_account(account_id)
-            assert account.account_id == account_id
+            assert account.account_id == MuxedAccount.from_account(account_id)
             assert isinstance(account.sequence, int)
             assert account.thresholds == Thresholds(1, 2, 3)
 

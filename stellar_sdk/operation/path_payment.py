@@ -4,6 +4,7 @@ from typing import List, Union
 
 from .path_payment_strict_receive import PathPaymentStrictReceive
 from ..asset import Asset
+from ..muxed_account import MuxedAccount
 
 
 class PathPayment(PathPaymentStrictReceive):
@@ -28,16 +29,16 @@ class PathPayment(PathPaymentStrictReceive):
 
     def __init__(
         self,
-        destination: str,
+        destination: Union[MuxedAccount, str],
         send_asset: Asset,
         send_max: Union[str, Decimal],
         dest_asset: Asset,
         dest_amount: Union[str, Decimal],
         path: List[Asset],
-        source: str = None,
+        source: Union[MuxedAccount, str] = None,
     ) -> None:
         warnings.warn(
-            "Will be removed in version v2.3.0, "
+            "Will be removed in version v3.0.0, "
             "use stellar_sdk.operation.PathPaymentStrictReceive",
             DeprecationWarning,
         )

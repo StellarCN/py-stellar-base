@@ -2,8 +2,10 @@ from decimal import Decimal
 from typing import Union
 
 from .operation import Operation
+from .utils import check_amount, parse_mux_account_from_account
 from .utils import check_ed25519_public_key, check_amount
 from ..asset import Asset
+from ..muxed_account import MuxedAccount
 from ..keypair import Keypair
 from ..strkey import StrKey
 from ..xdr import xdr
@@ -17,25 +19,24 @@ class Payment(Operation):
 
     Threshold: Medium
 
-    :param str destination: The destination account ID.
-    :param Asset asset: The asset to send.
-    :param str amount: The amount to send.
-    :param str source: The source account for the payment. Defaults to the
+    :param destination: The destination account ID.
+    :param asset: The asset to send.
+    :param amount: The amount to send.
+    :param source: The source account for the payment. Defaults to the
         transaction's source account.
 
     """
 
     def __init__(
         self,
-        destination: str,
+        destination: Union[MuxedAccount, str],
         asset: Asset,
         amount: Union[str, Decimal],
-        source: str = None,
+        source: Union[MuxedAccount, str] = None,
     ) -> None:
         super().__init__(source)
-        check_ed25519_public_key(destination)
         check_amount(amount)
-        self.destination: str = destination
+        self.destination: MuxedAccount = parse_mux_account_from_account(destination)
         self.asset: Asset = asset
         self.amount: Union[str, Decimal] = amount
 

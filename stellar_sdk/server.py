@@ -1,5 +1,6 @@
-from typing import Union, Coroutine, Any, List
+from typing import Union, Coroutine, Any, Dict, List, Tuple, Generator
 
+from stellar_sdk.base_transaction_envelope import BaseTransactionEnvelope
 from .account import Account, Thresholds
 from .asset import Asset
 from .call_builder.accounts_call_builder import AccountsCallBuilder
@@ -24,6 +25,9 @@ from .client.base_async_client import BaseAsyncClient
 from .client.base_sync_client import BaseSyncClient
 from .client.requests_client import RequestsClient
 from .exceptions import TypeError, NotFoundError, raise_request_exception
+from .fee_bump_transaction import FeeBumpTransaction
+from .fee_bump_transaction_envelope import FeeBumpTransactionEnvelope
+from .helpers import parse_transaction_envelope_from_xdr
 from .memo import NoneMemo
 from .response.account_response import AccountResponse
 from .response.asset_response import AssetResponse
@@ -42,9 +46,15 @@ from .response.trade_response import TradeResponse
 from .response.trades_aggregation_response import TradesAggregationResponse
 from .response.transaction_response import TransactionResponse
 from .response.wrapped_response import WrappedResponse
+from .muxed_account import MuxedAccount
 from .sep.exceptions import AccountRequiresMemoError
 from .transaction import Transaction
 from .transaction_envelope import TransactionEnvelope
+from .utils import (
+    urljoin_with_query,
+    MUXED_ACCOUNT_STARTING_LETTER,
+)
+from .xdr import Xdr
 from .utils import urljoin_with_query
 from .xdr.xdr import OperationType
 
@@ -155,14 +165,19 @@ class Server:
         )
 
     def __get_xdr_and_transaction_from_transaction_envelope(
-        self, transaction_envelope: Union[TransactionEnvelope, str]
-    ):
-        if isinstance(transaction_envelope, TransactionEnvelope):
+        self,
+        transaction_envelope: Union[
+            TransactionEnvelope, FeeBumpTransactionEnvelope, str
+        ],
+    ) -> Tuple[str, Union[Transaction, FeeBumpTransaction]]:
+        if isinstance(transaction_envelope, BaseTransactionEnvelope):
             xdr = transaction_envelope.to_xdr()
             tx = transaction_envelope.transaction
         else:
             xdr = transaction_envelope
-            tx = Transaction.from_xdr(xdr)
+            tx = parse_transaction_envelope_from_xdr(
+                transaction_envelope, ""
+            ).transaction
         return xdr, tx
 
     def _parse_success_transaction(self, raw_data: dict) -> TransactionResponse:
@@ -371,7 +386,8 @@ class Server:
         return self.__load_account_sync(account_id)
 
     async def __load_account_async(self, account_id: str) -> Account:
-        resp = await self.accounts().account_id(account_id=account_id).call()
+        ed25519_account_id = MuxedAccount.from_account(account_id).account_id
+        resp = await self.accounts().account_id(account_id=ed25519_account_id).call()
         sequence = int(resp.raw_data["sequence"])
         thresholds = Thresholds(
             resp.raw_data["thresholds"]["low_threshold"],
@@ -384,7 +400,8 @@ class Server:
         return account
 
     def __load_account_sync(self, account_id: str) -> Account:
-        resp = self.accounts().account_id(account_id=account_id).call()
+        ed25519_account_id = MuxedAccount.from_account(account_id).account_id
+        resp = self.accounts().account_id(account_id=ed25519_account_id).call()
         sequence = int(resp.raw_data["sequence"])
         thresholds = Thresholds(
             resp.raw_data["thresholds"]["low_threshold"],
@@ -397,23 +414,33 @@ class Server:
         return account
 
     def __check_memo_required_sync(self, transaction: Transaction) -> None:
+        if isinstance(transaction, FeeBumpTransaction):
+            transaction = transaction.inner_transaction_envelope.transaction
         if not (transaction.memo is None or isinstance(transaction.memo, NoneMemo)):
             return
         for index, destination in self.__get_check_memo_required_destinations(
             transaction
         ):
+            if destination.startswith(MUXED_ACCOUNT_STARTING_LETTER):
+                continue
             try:
                 account_resp = self.accounts().account_id(destination).call()
             except NotFoundError:
                 continue
             self.__check_destination_memo(account_resp.raw_data, index, destination)
 
-    async def __check_memo_required_async(self, transaction: Transaction) -> None:
+    async def __check_memo_required_async(
+        self, transaction: Union[Transaction, FeeBumpTransaction]
+    ) -> None:
+        if isinstance(transaction, FeeBumpTransaction):
+            transaction = transaction.inner_transaction_envelope.transaction
         if not (transaction.memo is None or isinstance(transaction.memo, NoneMemo)):
             return
         for index, destination in self.__get_check_memo_required_destinations(
             transaction
         ):
+            if destination.startswith(MUXED_ACCOUNT_STARTING_LETTER):
+                continue
             try:
                 account_resp = await self.accounts().account_id(destination).call()
             except NotFoundError:
@@ -433,7 +460,9 @@ class Server:
                 index,
             )
 
-    def __get_check_memo_required_destinations(self, transaction: Transaction):
+    def __get_check_memo_required_destinations(
+        self, transaction: Transaction
+    ) -> Generator[Tuple[int, str], Any, Any]:
         destinations = set()
         memo_required_operation_code = (
             OperationType.PAYMENT.value,
@@ -443,7 +472,7 @@ class Server:
         )
         for index, operation in enumerate(transaction.operations):
             if operation.type_code() in memo_required_operation_code:
-                destination = operation.destination
+                destination: str = operation.destination.account_id
             else:
                 continue
             if destination in destinations:
