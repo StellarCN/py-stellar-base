@@ -2,6 +2,7 @@ from typing import List, Union
 
 from .keypair import Keypair
 from .memo import NoneMemo, Memo
+from .muxed_account import MuxedAccount
 from .operation.operation import Operation
 from .xdr import Xdr
 from .strkey import StrKey
@@ -50,7 +51,7 @@ class Transaction:
 
     def __init__(
         self,
-        source: Union[Keypair, str],
+        source: Union[Keypair, MuxedAccount, str],
         sequence: int,
         fee: int,
         operations: List[Operation],
@@ -65,9 +66,11 @@ class Transaction:
         if memo is None:
             memo = NoneMemo()
         if isinstance(source, Keypair):
-            source = source.public_key
+            source = MuxedAccount(account_id=source.public_key, account_id_id=None)
+        if isinstance(source, str):
+            source = MuxedAccount.from_account(source)
 
-        self.source: str = source
+        self.source: [MuxedAccount, str] = source
         self.sequence: int = sequence
         self.operations: List[Operation] = operations
         self.memo: Memo = memo
@@ -88,11 +91,13 @@ class Transaction:
         ext = Xdr.nullclass()
         ext.v = 0
         if self.v1:
-            source_xdr = StrKey.decode_muxed_account(self.source)
+            source_xdr = self.source.to_xdr_object()
             return Xdr.types.Transaction(
                 source_xdr, self.fee, self.sequence, time_bounds, memo, operations, ext,
             )
-        source_xdr = Keypair.from_public_key(self.source).xdr_account_id().ed25519
+        source_xdr = (
+            Keypair.from_public_key(self.source.account_id).xdr_account_id().ed25519
+        )
         return Xdr.types.TransactionV0(
             source_xdr, self.fee, self.sequence, time_bounds, memo, operations, ext,
         )
@@ -114,7 +119,7 @@ class Transaction:
         :return: A new :class:`Transaction` object from the given XDR Transaction object.
         """
         if v1:
-            source = StrKey.encode_muxed_account(tx_xdr_object.sourceAccount)
+            source = MuxedAccount.from_xdr_object(tx_xdr_object.sourceAccount)
         else:
             source = StrKey.encode_ed25519_public_key(
                 tx_xdr_object.sourceAccountEd25519

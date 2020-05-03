@@ -2,10 +2,10 @@ from decimal import Decimal
 from typing import Union
 
 from .operation import Operation
-
-from ..asset import Asset
-from ..xdr import Xdr
 from .utils import check_amount
+from ..asset import Asset
+from ..muxed_account import MuxedAccount
+from ..xdr import Xdr
 
 
 class ChangeTrust(Operation):
@@ -28,7 +28,10 @@ class ChangeTrust(Operation):
     _DEFAULT_LIMIT = "922337203685.4775807"
 
     def __init__(
-        self, asset: Asset, limit: Union[str, Decimal] = None, source: str = None
+        self,
+        asset: Asset,
+        limit: Union[str, Decimal] = None,
+        source: Union[MuxedAccount, str] = None,
     ) -> None:
         super().__init__(source)
         self.asset: Asset = asset

@@ -1,6 +1,12 @@
 Release History
 ===============
 
+### Version 2.3.2
+Released on May 01, 2020
+
+- fix: typo in fetching previous page.([#312](https://github.com/StellarCN/py-stellar-base/issues/312))
+
+
 ### Version 2.4.0-alpha1
 
 Released on April 26, 2020
@@ -41,7 +47,7 @@ This version brings protocol 13 support with backwards compatibility support for
   - `FeeBumpTransaction.feeSource`
 
   You can get the string representation by calling `StrKey.encode_muxed_account` which will return a `G..` or `M..` account.
-  
+
 ### Version 2.3.1
 Released on April 12, 2020
 

@@ -1,5 +1,6 @@
-from typing import Optional, List
+from typing import Optional, List, Union
 
+from .muxed_account import MuxedAccount
 from .sep.ed25519_public_key_signer import Ed25519PublicKeySigner
 from .strkey import StrKey
 
@@ -16,7 +17,7 @@ class Account:
     See `Accounts`_ For more information about the formats used for asset codes and how issuers
     work on Stellar's network,
 
-    :param account_id: Account ID of the
+    :param account_id: MuxedAccount or Account ID of the
         account (ex. `GB3KJPLFUYN5VL6R3GU3EGCGVCKFDSD7BEDX42HWG5BWFKB3KQGJJRMA`)
         or muxed account (ex. `MAAAAAAAAAAAJURAAB2X52XFQP6FBXLGT6LWOOWMEXWHEWBDVRZ7V5WH34Y22MPFBHUHY`)
     :param sequence: sequence current sequence number of the account
@@ -28,10 +29,10 @@ class Account:
         https://stellar.org/developers/learn/concepts/accounts.html
     """
 
-    def __init__(self, account_id: str, sequence: int) -> None:
-        StrKey.decode_muxed_account(account_id)
-
-        self.account_id: str = account_id
+    def __init__(self, account_id: Union[str, MuxedAccount], sequence: int) -> None:
+        if isinstance(account_id, str):
+            account_id = MuxedAccount.from_account(account_id)
+        self.account_id: MuxedAccount = account_id
         self.sequence: int = sequence
 
         # The following properties will change in 3.0

@@ -1,11 +1,29 @@
+from enum import IntFlag
 from typing import Union
 
 from .operation import Operation
+from .utils import check_ed25519_public_key, check_asset_code
 from ..asset import Asset
 from ..keypair import Keypair
-from ..xdr import Xdr
+from ..muxed_account import MuxedAccount
 from ..strkey import StrKey
-from .utils import check_ed25519_public_key, check_asset_code
+from ..xdr import Xdr
+
+
+class TrustLineEntryFlag(IntFlag):
+    """Indicates which flags to set. For details about the flags,
+    please refer to the `CAP-0018 <https://github.com/stellar/stellar-protocol/blob/master/core/cap-0018.md>`_.
+
+    - UNAUTHORIZED_FLAG: The account can not hold a balance but cannot receive payments, send payments, maintain offers, or manage offers
+
+    - AUTHORIZED_FLAG: The account can hold a balance but cannot receive payments, send payments, maintain offers, or manage offers
+
+    - AUTHORIZED_TO_MAINTAIN_LIABILITIES_FLAG: The account can hold a balance, receive payments, send payments, maintain offers, and manage offers
+    """
+
+    UNAUTHORIZED_FLAG = 0
+    AUTHORIZED_FLAG = 1
+    AUTHORIZED_TO_MAINTAIN_LIABILITIES_FLAG = 2
 
 
 class AllowTrust(Operation):
@@ -24,7 +42,8 @@ class AllowTrust(Operation):
 
     :param trustor: The trusting account (the one being authorized).
     :param asset_code: The asset code being authorized.
-    :param authorize: `True` to authorize the line, `False` to deauthorize.
+    :param authorize: `True` to authorize the line, `False` to deauthorize，if you need further control,
+        you can also use :class:`stellar_sdk.operation.allow_trust.TrustLineEntryFlag`.
     :param source: The source account (defaults to transaction source).
 
     """
@@ -33,8 +52,8 @@ class AllowTrust(Operation):
         self,
         trustor: str,
         asset_code: str,
-        authorize: Union[bool, int],
-        source: str = None,
+        authorize: Union[TrustLineEntryFlag, bool],
+        source: Union[MuxedAccount, str] = None,
     ) -> None:
         super().__init__(source)
         check_ed25519_public_key(trustor)
@@ -44,11 +63,11 @@ class AllowTrust(Operation):
 
         if isinstance(authorize, bool):
             if authorize is True:
-                self.authorize: int = 1
+                self.authorize: TrustLineEntryFlag = TrustLineEntryFlag.AUTHORIZED_FLAG
             else:
-                self.authorize: int = 0
+                self.authorize: TrustLineEntryFlag = TrustLineEntryFlag.UNAUTHORIZED_FLAG
         else:
-            self.authorize: int = authorize
+            self.authorize: TrustLineEntryFlag = authorize
 
     @classmethod
     def type_code(cls) -> int:
@@ -71,7 +90,7 @@ class AllowTrust(Operation):
             asset.type = Xdr.const.ASSET_TYPE_CREDIT_ALPHANUM12
             asset.assetCode12 = asset_code
 
-        allow_trust_op = Xdr.types.AllowTrustOp(trustor, asset, self.authorize)
+        allow_trust_op = Xdr.types.AllowTrustOp(trustor, asset, self.authorize.value)
         body = Xdr.nullclass()
         body.type = Xdr.const.ALLOW_TRUST
         body.allowTrustOp = allow_trust_op
@@ -88,6 +107,7 @@ class AllowTrust(Operation):
             operation_xdr_object.body.allowTrustOp.trustor.ed25519
         )
         authorize = operation_xdr_object.body.allowTrustOp.authorize
+        authorize = TrustLineEntryFlag(authorize)
 
         asset_type = operation_xdr_object.body.allowTrustOp.asset.type
         if asset_type == Xdr.const.ASSET_TYPE_CREDIT_ALPHANUM4:

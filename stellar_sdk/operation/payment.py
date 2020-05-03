@@ -2,10 +2,10 @@ from decimal import Decimal
 from typing import Union
 
 from .operation import Operation
+from .utils import check_amount, parse_mux_account_from_account
 from ..asset import Asset
+from ..muxed_account import MuxedAccount
 from ..xdr import Xdr
-from ..strkey import StrKey
-from .utils import check_amount, check_muxed_ed25519_account
 
 
 class Payment(Operation):
@@ -16,25 +16,24 @@ class Payment(Operation):
 
     Threshold: Medium
 
-    :param str destination: The destination account ID.
-    :param Asset asset: The asset to send.
-    :param str amount: The amount to send.
-    :param str source: The source account for the payment. Defaults to the
+    :param destination: The destination account ID.
+    :param asset: The asset to send.
+    :param amount: The amount to send.
+    :param source: The source account for the payment. Defaults to the
         transaction's source account.
 
     """
 
     def __init__(
         self,
-        destination: str,
+        destination: Union[MuxedAccount, str],
         asset: Asset,
         amount: Union[str, Decimal],
-        source: str = None,
+        source: Union[MuxedAccount, str] = None,
     ) -> None:
         super().__init__(source)
-        check_muxed_ed25519_account(destination)
         check_amount(amount)
-        self.destination: str = destination
+        self.destination: MuxedAccount = parse_mux_account_from_account(destination)
         self.asset: Asset = asset
         self.amount: Union[str, Decimal] = amount
 
@@ -44,7 +43,7 @@ class Payment(Operation):
 
     def _to_operation_body(self) -> Xdr.nullclass:
         asset = self.asset.to_xdr_object()
-        destination = StrKey.decode_muxed_account(self.destination)
+        destination = self.destination.to_xdr_object()
         amount = Operation.to_xdr_amount(self.amount)
         payment_op = Xdr.types.PaymentOp(destination, asset, amount)
         body = Xdr.nullclass()
@@ -60,7 +59,7 @@ class Payment(Operation):
         """
         source = Operation.get_source_from_xdr_obj(operation_xdr_object)
 
-        destination = StrKey.encode_muxed_account(
+        destination = MuxedAccount.from_xdr_object(
             operation_xdr_object.body.paymentOp.destination
         )
         asset = Asset.from_xdr_object(operation_xdr_object.body.paymentOp.asset)

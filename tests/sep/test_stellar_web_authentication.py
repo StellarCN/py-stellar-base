@@ -4,7 +4,7 @@ import time
 
 import pytest
 
-from stellar_sdk import Keypair, Network, Account
+from stellar_sdk import Keypair, Network, Account, MuxedAccount
 from stellar_sdk.exceptions import ValueError
 from stellar_sdk.operation import ManageData
 from stellar_sdk.sep.ed25519_public_key_signer import Ed25519PublicKeySigner
@@ -47,7 +47,7 @@ class TestStellarWebAuthentication:
         assert op.data_name == "SDF auth"
         assert len(op.data_value) == 64
         assert len(base64.b64decode(op.data_value)) == 48
-        assert op.source == client_account_id
+        assert op.source == MuxedAccount(client_account_id)
 
         now = int(time.time())
         assert now - 3 < transaction.time_bounds.min_time < now + 3
@@ -55,7 +55,7 @@ class TestStellarWebAuthentication:
             transaction.time_bounds.max_time - transaction.time_bounds.min_time
             == timeout
         )
-        assert transaction.source == server_kp.public_key
+        assert transaction.source == MuxedAccount.from_account(server_kp.public_key)
         assert transaction.sequence == 0
 
     def test_challenge_transaction_mux_client_account_id_raise(self):

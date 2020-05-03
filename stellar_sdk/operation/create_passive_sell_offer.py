@@ -2,10 +2,11 @@ from decimal import Decimal
 from typing import Union
 
 from .operation import Operation
+from .utils import check_amount, check_price
 from ..asset import Asset
+from ..muxed_account import MuxedAccount
 from ..price import Price
 from ..xdr import Xdr
-from .utils import check_amount, check_price
 
 
 class CreatePassiveSellOffer(Operation):
@@ -46,7 +47,7 @@ class CreatePassiveSellOffer(Operation):
         buying: Asset,
         amount: Union[str, Decimal],
         price: Union[Price, str, Decimal],
-        source: str = None,
+        source: Union[MuxedAccount, str] = None,
     ) -> None:
         super().__init__(source)
         check_amount(amount)
