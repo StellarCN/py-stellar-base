@@ -326,6 +326,12 @@ ReturnHashMemo
 .. autoclass:: stellar_sdk.memo.ReturnHashMemo
    :members:
 
+MuxedAccount
+^^^^^^^^^^^^
+
+.. autoclass:: stellar_sdk.muxed_account.MuxedAccount
+   :members:
+
 Network
 ^^^^^^^
 
