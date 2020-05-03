@@ -89,7 +89,7 @@ class TransactionBuilder:
 
     @staticmethod
     def build_fee_bump_transaction(
-        fee_source: [Keypair, str],
+        fee_source: [MuxedAccount, Keypair, str],
         base_fee: int,
         inner_transaction_envelope: TransactionEnvelope,
         network_passphrase: str = Network.TESTNET_NETWORK_PASSPHRASE,
