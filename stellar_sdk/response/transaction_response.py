@@ -13,9 +13,23 @@ class Links(BaseModel):
     effects: Link
     precedes: Link
     succeeds: Link
-    transaction: Optional[
-        Link
-    ]  # TODO: Temporarily include here, will be removed in the future.
+    transaction: Optional[Link]  # TODO: Temporarily include here, will be removed in the future.
+
+
+class FeeBumpTransaction(BaseModel):
+    """contains information about a fee bump transaction
+    """
+    hash: str
+    signatures: List[str]
+
+
+class InnerTransaction(BaseModel):
+    """contains information about the inner transaction contained
+    within a fee bump transaction
+    """
+    hash: str
+    signatures: List[str]
+    max_fee: int
 
 
 class TransactionResponse(BaseModel):
@@ -40,9 +54,10 @@ class TransactionResponse(BaseModel):
     fee_meta_xdr: str
     memo_type: str
     memo: Optional[str]
+    memo_bytes: Optional[str]
     signatures: List[str]
     valid_after: Optional[str]
     valid_before: Optional[str]
+    fee_bump_transaction: Optional[FeeBumpTransaction]
+    inner_transaction: Optional[InnerTransaction]
     links: Links = Field(None, alias="_links")
-    # TODO: fee_bump_transaction
-    # TODO: inner_transaction
