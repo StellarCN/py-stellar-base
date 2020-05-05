@@ -97,7 +97,7 @@ def read_challenge_transaction(
     """
 
     # decode the received input as a base64-urlencoded XDR representation of Stellar transaction envelope
-    if server_account_id.startswith("M"):
+    if server_account_id.startswith(MUXED_ACCOUNT_STARTING_LETTER):
         raise ValueError(
             "Invalid server_account_id, multiplexed account are not supported."
         )
