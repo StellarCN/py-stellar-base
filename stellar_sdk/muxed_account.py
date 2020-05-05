@@ -24,13 +24,11 @@ class MuxedAccount:
         self.account_id_id: Optional[int] = account_id_id
 
     @property
-    def account_id_muxed(self) -> str:
-        """Get the multiplex address starting with `M`.
-
-        :raises: :exc:`ValueError <stellar_sdk.exceptions.ValueError>` - account_id_id is None.
+    def account_id_muxed(self) -> Optional[str]:
+        """Get the multiplex address starting with `M`, return `None` if `account_id_id` is `None`
         """
         if self.account_id_id is None:
-            raise ValueError("`account_id_id` can not be None.")
+            return None
         packer = Xdr.StellarXDRPacker()
         packer.pack_int64(self.account_id_id)
         packer.pack_uint256(StrKey.decode_ed25519_public_key(self.account_id))
