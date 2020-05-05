@@ -1,3 +1,5 @@
+from typing import Optional
+
 from .exceptions import ValueError, MuxedEd25519AccountInvalidError
 from .strkey import StrKey, encode_check, decode_check
 from .utils import check_ed25519_public_key
@@ -18,11 +20,11 @@ class MuxedAccount:
 
     def __init__(self, account_id: str, account_id_id: int = None) -> None:
         check_ed25519_public_key(account_id)
-        self.account_id = account_id
-        self.account_id_id = account_id_id
+        self.account_id: str = account_id
+        self.account_id_id: Optional[int] = account_id_id
 
     @property
-    def account_id_muxed(self):
+    def account_id_muxed(self) -> str:
         """Get the multiplex address starting with `M`.
 
         :raises: :exc:`ValueError <stellar_sdk.exceptions.ValueError>` - account_id_id is None.
