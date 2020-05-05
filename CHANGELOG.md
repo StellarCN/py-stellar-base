@@ -1,6 +1,153 @@
 Release History
 ===============
 
+### Version 2.4.0
+
+Released on May 05, 2020
+
+**This update include breaking changes**.
+
+This version brings protocol 13 support with backwards compatibility support for protocol 12.
+
+### Added
+
+- Add `stellar_sdk.MuxedAccount` which makes it easy to use muxed account. ([#311](https://github.com/StellarCN/py-stellar-base/pull/311)).
+- Add `TransactionBuilder.build_fee_bump_transaction` which makes it easy to create `FeeBumpTransaction`, we have written an example, please click [here](https://github.com/StellarCN/py-stellar-base/blob/91fbd2ad61/examples/build_fee_bump_transaction.py) to view it ([#298](https://github.com/StellarCN/py-stellar-base/pull/298)).
+- Adds a feature flag which allow consumers of this library to create V1 (Protocol 13) transactions using the `TransactionBuilder` ([#298](https://github.com/StellarCN/py-stellar-base/pull/298)).
+- Add support for [CAP-0027](https://github.com/stellar/stellar-protocol/blob/master/core/cap-0027.md): First-class multiplexed accounts ([#300](https://github.com/StellarCN/py-stellar-base/pull/300)).
+- Add `Keypair.xdr_muxed_account` which creates a new `MuxedAccount`([#300](https://github.com/StellarCN/py-stellar-base/pull/300)).
+- Add `FeeBumpTransaction` and `FeeBumpTransactionEnvelope` which makes it easy to work with fee bump transactions ([#298](https://github.com/StellarCN/py-stellar-base/pull/298)).
+- Add `stellar_sdk.helpers.parse_transaction_envelope_from_xdr` which makes it easy to parse `TransactionEnvelope` and `FeeBumpTransactionEnvelope`([#298](https://github.com/StellarCN/py-stellar-base/pull/298)).
+
+### Update
+
+- Update XDR definitions with protocol 13.
+- Extend `TransactionEnvelope` to work with `TransactionEnvelope`and `FeeBumpTransactionEnvelope` ([#298](https://github.com/StellarCN/py-stellar-base/pull/298)).
+- Add backward compatibility support for [CAP-0018](https://github.com/stellar/stellar-protocol/blob/f01c9354aaab1e8ca97a25cf888829749cadf36a/core/cap-0018.md) ([#307](https://github.com/StellarCN/py-stellar-base/pull/307)).
+
+### Breaking changes
+
+- The following fields, which were previously an `str` are now a `stellar_sdk.MuxedAccount` ([#311](https://github.com/StellarCN/py-stellar-base/pull/311)):
+
+  - `stellar_sdk.Account.account_id`
+  - `stellar_sdk.Transaction.source`
+  - `stellar_sdk.FeeBumpTransaction.fee_source`
+  - `stellar_sdk.operation.Operation.source`
+  - `stellar_sdk.operation.AccountMerge.destination`
+  - `stellar_sdk.operation.AllowTrust.destination`
+  - `stellar_sdk.operation.PathPaymentStrictReceive.destination`
+  - `stellar_sdk.operation.PathPaymentStrictSend.destination`
+  - `stellar_sdk.operation.PathPayment.destination`
+  - `stellar_sdk.operation.Payment.destination`
+
+- In this version, some changes have occurred in the XDR files. If you depend on them, please click [here](https://github.com/StellarCN/py-stellar-base/compare/686cf05be3c76426b6386eb31658615aa708b293...30311f51ff0f27f000cf5bc61c5c98ac734eb8f7) to view the changes.
+
+### Example
+
+Some examples let you quickly learn about these changes.
+
+1. MuxedAccount
+
+   ```python
+   from stellar_sdk import MuxedAccount
+   
+   account_id = "GAQAA5L65LSYH7CQ3VTJ7F3HHLGCL3DSLAR2Y47263D56MNNGHSQSTVY"
+   account_id_id = 1234
+   account_id_muxed = "MAAAAAAAAAAAJURAAB2X52XFQP6FBXLGT6LWOOWMEXWHEWBDVRZ7V5WH34Y22MPFBHUHY"
+   
+   # generate account_id_muxed
+   muxed = MuxedAccount(account_id=account_id, account_id_id=account_id_id)  # account_id_id is optional.
+   print(f"account_id_muxed: {muxed.account_id_muxed}")
+   
+   # parse account_id_muxed
+   muxed = MuxedAccount.from_account(account_id_muxed)
+   print(f"account_id: {muxed.account_id}\naccount_id_id: {muxed.account_id_id}")
+   
+   # without `account_id_id`
+   muxed = MuxedAccount.from_account(account_id)
+   print(f"account_id_muxed: {muxed.account_id_muxed}")  # None
+   ```
+
+2. Pay to muxed account
+
+   ```python
+   import pprint
+   
+   from stellar_sdk import Keypair, Server, MuxedAccount, TransactionBuilder, Network
+   
+   horizon_url = "http://horizon-testnet.stellar.org/"
+   network_passphrase = Network.TESTNET_NETWORK_PASSPHRASE
+   
+   alice_secret = "SC5O7VZUXDJ6JBDSZ74DSERXL7W3Y5LTOAMRF7RQRL3TAGAPS7LUVG3L"
+   bob_account = MuxedAccount(
+       account_id="GBVKI23OQZCANDUZ2SI7XU7W6ICYKYT74JBXDD2CYRDAFZHZNRPASSQK",
+       account_id_id=12387,
+   )
+   print(f"account_id_muxed: {bob_account.account_id_muxed}")
+   
+   alice_keypair = Keypair.from_secret(alice_secret)
+   
+   server = Server(horizon_url=horizon_url)
+   alice_account = server.load_account(alice_keypair.public_key)
+   transaction = TransactionBuilder(
+       source_account=alice_account,
+       network_passphrase=network_passphrase,
+       base_fee=100,
+       v1=True,  # If you want to build Protocol 13 transactions, you need to set `v1` to `True`
+   ) \
+       .append_payment_op(destination=bob_account, amount="100", asset_code="XLM") \
+       .build()
+   
+   transaction.sign(alice_keypair)
+   resp = server.submit_transaction(transaction)
+   pprint.pprint(resp) 
+   ```
+
+3. Build fee bump transaction
+
+   ```python
+   import pprint
+   
+   from stellar_sdk import Keypair, Server, TransactionBuilder, Network
+   from stellar_sdk.exceptions import BadRequestError
+   
+   horizon_url = "http://horizon-testnet.stellar.org/"
+   network_passphrase = Network.TESTNET_NETWORK_PASSPHRASE
+   
+   fee_source_keypair = Keypair.from_secret("SASZKBDB6PFHXN6LRH4NQNTRGLGDTI3PSUVIKMZMLTYYBB7NDVMA6DSL")
+   inner_source_keypair = Keypair.from_secret("SC5O7VZUXDJ6JBDSZ74DSERXL7W3Y5LTOAMRF7RQRL3TAGAPS7LUVG3L")
+   destination_address = "GBVKI23OQZCANDUZ2SI7XU7W6ICYKYT74JBXDD2CYRDAFZHZNRPASSQK"
+   
+   server = Server(horizon_url=horizon_url)
+   inner_account = server.load_account(inner_source_keypair)
+   
+   inner_tx = TransactionBuilder(
+       source_account=inner_account,
+       network_passphrase=network_passphrase,
+       base_fee=50,
+       v1=True) \
+       .append_payment_op(destination=destination_address, amount="100", asset_code="XLM") \
+       .build()
+   
+   inner_tx.sign(inner_source_keypair)
+   
+   try:
+       # This transaction will fail.
+       tx_insufficient_fee_resp = server.submit_transaction(inner_tx)
+   except BadRequestError as e:
+       print(e)
+   
+   fee_bump_tx = TransactionBuilder.build_fee_bump_transaction(
+       fee_source=fee_source_keypair,
+       base_fee=200,
+       inner_transaction_envelope=inner_tx, network_passphrase=network_passphrase
+   )
+   fee_bump_tx.sign(fee_source_keypair)
+   response = server.submit_transaction(fee_bump_tx)
+   pprint.pprint(response)
+   ```
+
+
 ### Version 2.4.0-alpha2
 
 Released on May 03, 2020
