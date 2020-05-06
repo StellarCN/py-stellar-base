@@ -1,6 +1,6 @@
+from typing import Optional
 from xdrlib import Packer
 
-from .exceptions import ValueError
 from .strkey import StrKey, encode_check
 from .utils import check_ed25519_public_key
 from .xdr import xdr as stellarxdr
