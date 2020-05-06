@@ -99,6 +99,11 @@ class TestEffectModel:
         parsed = TrustlineDeauthorizedEffectResponse.parse_obj(raw)
         assert raw == parsed.dict(exclude_unset=True, by_alias=True)
 
+    def test_trustline_authorized_to_maintain_liabilities(self):
+        raw = load_file("effects/trustline_authorized_to_maintain_liabilities.json")
+        parsed = TrustlineAuthorizedToMaintainLiabilitiesEffectResponse.parse_obj(raw)
+        assert raw == parsed.dict(exclude_unset=True, by_alias=True)
+
     def test_trustline_removed(self):
         raw = load_file("effects/trustline_removed.json")
         parsed = TrustlineRemovedEffectResponse.parse_obj(raw)

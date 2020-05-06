@@ -120,6 +120,10 @@ class TrustlineDeauthorizedEffectResponse(BaseEffectResponse):
     asset_type: str
     asset_code: str
 
+class TrustlineAuthorizedToMaintainLiabilitiesEffectResponse(BaseEffectResponse):
+    trustor: str
+    asset_type: str
+    asset_code: str
 
 class TradeEffectResponse(BaseEffectResponse):
     seller: str
@@ -175,6 +179,7 @@ EFFECT_TYPE_I_RESPONSE = {
     22: TrustlineUpdatedEffectResponse,
     23: TrustlineAuthorizedEffectResponse,
     24: TrustlineDeauthorizedEffectResponse,
+    25: TrustlineAuthorizedToMaintainLiabilitiesEffectResponse,
     30: OfferCreatedEffectResponse,
     31: OfferRemovedEffectResponse,
     32: OfferUpdatedEffectResponse,
