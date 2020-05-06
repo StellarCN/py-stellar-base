@@ -20,17 +20,15 @@ class MuxedAccount:
 
     def __init__(self, account_id: str, account_id_id: int = None) -> None:
         check_ed25519_public_key(account_id)
-        self.account_id = account_id
-        self.account_id_id = account_id_id
+        self.account_id: str = account_id
+        self.account_id_id: Optional[int] = account_id_id
 
     @property
-    def account_id_muxed(self):
-        """Get the multiplex address starting with `M`.
-
-        :raises: :exc:`ValueError <stellar_sdk.exceptions.ValueError>` - account_id_id is None.
+    def account_id_muxed(self) -> Optional[str]:
+        """Get the multiplex address starting with `M`, return `None` if `account_id_id` is `None`
         """
         if self.account_id_id is None:
-            raise ValueError("`account_id_id` can not be None.")
+            return None
         muxed_account = stellarxdr.MuxedAccountMed25519(
             id=stellarxdr.Uint64(self.account_id_id),
             ed25519=stellarxdr.Uint256(

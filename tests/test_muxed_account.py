@@ -33,8 +33,7 @@ class TestMuxedAccount:
             ed25519=stellarxdr.Uint256(StrKey.decode_ed25519_public_key(account_id)),
         )
         muxed_account = MuxedAccount(account_id, account_id_id)
-        with pytest.raises(ValueError, match="`account_id_id` can not be None."):
-            _ = muxed_account.account_id_muxed
+        assert muxed_account.account_id_muxed is None
         assert muxed_account.to_xdr_object().to_xdr() == muxed_account_xdr.to_xdr()
         assert MuxedAccount.from_xdr_object(muxed_account_xdr) == muxed_account
 
