@@ -1,4 +1,4 @@
-# Automatically generated on 2020-05-03T12:46:54+08:00
+# Automatically generated on 2020-05-09T09:52:54+08:00
 # DO NOT EDIT or your changes may be overwritten
 import base64
 from enum import IntEnum
@@ -29,16 +29,24 @@ class Value:
         value = Opaque.unpack(unpacker, 4294967295, False)
         return cls(value)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "Value":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "Value":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -75,16 +83,24 @@ class SCPBallot:
         value = Value.unpack(unpacker)
         return cls(counter=counter, value=value)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "SCPBallot":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "SCPBallot":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -92,7 +108,10 @@ class SCPBallot:
         return self.counter == other.counter and self.value == other.value
 
     def __str__(self):
-        out = [f"counter={self.counter}", f"value={self.value}"]
+        out = [
+            f"counter={self.counter}",
+            f"value={self.value}",
+        ]
         return f"<SCPBallot {[', '.join(out)]}>"
 
 
@@ -123,16 +142,24 @@ class SCPStatementType(IntEnum):
         value = unpacker.unpack_int()
         return cls(value)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "SCPStatementType":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "SCPStatementType":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     @classmethod
     def _missing_(cls, value):
@@ -155,7 +182,7 @@ class SCPNomination:
     """
 
     def __init__(
-        self, quorum_set_hash: "Hash", votes: List["Value"], accepted: List["Value"]
+        self, quorum_set_hash: "Hash", votes: List["Value"], accepted: List["Value"],
     ) -> None:
         self.quorum_set_hash = quorum_set_hash
         self.votes = votes
@@ -183,16 +210,24 @@ class SCPNomination:
             accepted.append(Value.unpack(unpacker))
         return cls(quorum_set_hash=quorum_set_hash, votes=votes, accepted=accepted)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "SCPNomination":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "SCPNomination":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -277,16 +312,24 @@ class SCPStatementPrepare:
             n_h=n_h,
         )
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "SCPStatementPrepare":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "SCPStatementPrepare":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -363,16 +406,24 @@ class SCPStatementConfirm:
             quorum_set_hash=quorum_set_hash,
         )
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "SCPStatementConfirm":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "SCPStatementConfirm":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -410,7 +461,7 @@ class SCPStatementExternalize:
     """
 
     def __init__(
-        self, commit: "SCPBallot", n_h: "Uint32", commit_quorum_set_hash: "Hash"
+        self, commit: "SCPBallot", n_h: "Uint32", commit_quorum_set_hash: "Hash",
     ) -> None:
         self.commit = commit
         self.n_h = n_h
@@ -430,16 +481,24 @@ class SCPStatementExternalize:
             commit=commit, n_h=n_h, commit_quorum_set_hash=commit_quorum_set_hash,
         )
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "SCPStatementExternalize":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "SCPStatementExternalize":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -542,16 +601,24 @@ class SCPStatementPledges:
             nominate = SCPNomination.unpack(unpacker)
             return cls(type, nominate=nominate)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "SCPStatementPledges":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "SCPStatementPledges":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -622,7 +689,7 @@ class SCPStatement:
     """
 
     def __init__(
-        self, node_id: "NodeID", slot_index: "Uint64", pledges: "SCPStatementPledges"
+        self, node_id: "NodeID", slot_index: "Uint64", pledges: "SCPStatementPledges",
     ) -> None:
         self.node_id = node_id
         self.slot_index = slot_index
@@ -640,16 +707,24 @@ class SCPStatement:
         pledges = SCPStatementPledges.unpack(unpacker)
         return cls(node_id=node_id, slot_index=slot_index, pledges=pledges)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "SCPStatement":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "SCPStatement":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -695,16 +770,24 @@ class SCPEnvelope:
         signature = Signature.unpack(unpacker)
         return cls(statement=statement, signature=signature)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "SCPEnvelope":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "SCPEnvelope":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -712,7 +795,10 @@ class SCPEnvelope:
         return self.statement == other.statement and self.signature == other.signature
 
     def __str__(self):
-        out = [f"statement={self.statement}", f"signature={self.signature}"]
+        out = [
+            f"statement={self.statement}",
+            f"signature={self.signature}",
+        ]
         return f"<SCPEnvelope {[', '.join(out)]}>"
 
 
@@ -761,16 +847,24 @@ class SCPQuorumSet:
             inner_sets.append(SCPQuorumSet.unpack(unpacker))
         return cls(threshold=threshold, validators=validators, inner_sets=inner_sets)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "SCPQuorumSet":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "SCPQuorumSet":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -809,16 +903,24 @@ class UpgradeType:
         upgrade_type = Opaque.unpack(unpacker, 128, False)
         return cls(upgrade_type)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "UpgradeType":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "UpgradeType":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -852,16 +954,24 @@ class StellarValueType(IntEnum):
         value = unpacker.unpack_int()
         return cls(value)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "StellarValueType":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "StellarValueType":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     @classmethod
     def _missing_(cls, value):
@@ -896,16 +1006,24 @@ class LedgerCloseValueSignature:
         signature = Signature.unpack(unpacker)
         return cls(node_id=node_id, signature=signature)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "LedgerCloseValueSignature":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "LedgerCloseValueSignature":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -913,7 +1031,10 @@ class LedgerCloseValueSignature:
         return self.node_id == other.node_id and self.signature == other.signature
 
     def __str__(self):
-        out = [f"node_id={self.node_id}", f"signature={self.signature}"]
+        out = [
+            f"node_id={self.node_id}",
+            f"signature={self.signature}",
+        ]
         return f"<LedgerCloseValueSignature {[', '.join(out)]}>"
 
 
@@ -956,16 +1077,24 @@ class StellarValueExt:
             lc_value_signature = LedgerCloseValueSignature.unpack(unpacker)
             return cls(v, lc_value_signature=lc_value_signature)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "StellarValueExt":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "StellarValueExt":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -1043,16 +1172,24 @@ class StellarValue:
             tx_set_hash=tx_set_hash, close_time=close_time, upgrades=upgrades, ext=ext,
         )
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "StellarValue":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "StellarValue":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -1100,16 +1237,24 @@ class LedgerHeaderExt:
         if v == 0:
             return cls(v)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "LedgerHeaderExt":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "LedgerHeaderExt":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -1257,16 +1402,24 @@ class LedgerHeader:
             ext=ext,
         )
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "LedgerHeader":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "LedgerHeader":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -1337,16 +1490,24 @@ class LedgerUpgradeType(IntEnum):
         value = unpacker.unpack_int()
         return cls(value)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "LedgerUpgradeType":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "LedgerUpgradeType":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     @classmethod
     def _missing_(cls, value):
@@ -1418,16 +1579,24 @@ class LedgerUpgrade:
             new_base_reserve = Uint32.unpack(unpacker)
             return cls(type, new_base_reserve=new_base_reserve)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "LedgerUpgrade":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "LedgerUpgrade":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -1480,16 +1649,24 @@ class LedgerKeyAccount:
         account_id = AccountID.unpack(unpacker)
         return cls(account_id=account_id)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "LedgerKeyAccount":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "LedgerKeyAccount":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -1497,7 +1674,9 @@ class LedgerKeyAccount:
         return self.account_id == other.account_id
 
     def __str__(self):
-        out = [f"account_id={self.account_id}"]
+        out = [
+            f"account_id={self.account_id}",
+        ]
         return f"<LedgerKeyAccount {[', '.join(out)]}>"
 
 
@@ -1527,16 +1706,24 @@ class LedgerKeyTrustLine:
         asset = Asset.unpack(unpacker)
         return cls(account_id=account_id, asset=asset)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "LedgerKeyTrustLine":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "LedgerKeyTrustLine":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -1544,7 +1731,10 @@ class LedgerKeyTrustLine:
         return self.account_id == other.account_id and self.asset == other.asset
 
     def __str__(self):
-        out = [f"account_id={self.account_id}", f"asset={self.asset}"]
+        out = [
+            f"account_id={self.account_id}",
+            f"asset={self.asset}",
+        ]
         return f"<LedgerKeyTrustLine {[', '.join(out)]}>"
 
 
@@ -1574,16 +1764,24 @@ class LedgerKeyOffer:
         offer_id = Int64.unpack(unpacker)
         return cls(seller_id=seller_id, offer_id=offer_id)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "LedgerKeyOffer":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "LedgerKeyOffer":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -1591,7 +1789,10 @@ class LedgerKeyOffer:
         return self.seller_id == other.seller_id and self.offer_id == other.offer_id
 
     def __str__(self):
-        out = [f"seller_id={self.seller_id}", f"offer_id={self.offer_id}"]
+        out = [
+            f"seller_id={self.seller_id}",
+            f"offer_id={self.offer_id}",
+        ]
         return f"<LedgerKeyOffer {[', '.join(out)]}>"
 
 
@@ -1621,16 +1822,24 @@ class LedgerKeyData:
         data_name = String64.unpack(unpacker)
         return cls(account_id=account_id, data_name=data_name)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "LedgerKeyData":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "LedgerKeyData":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -1638,7 +1847,10 @@ class LedgerKeyData:
         return self.account_id == other.account_id and self.data_name == other.data_name
 
     def __str__(self):
-        out = [f"account_id={self.account_id}", f"data_name={self.data_name}"]
+        out = [
+            f"account_id={self.account_id}",
+            f"data_name={self.data_name}",
+        ]
         return f"<LedgerKeyData {[', '.join(out)]}>"
 
 
@@ -1723,16 +1935,24 @@ class LedgerKey:
             data = LedgerKeyData.unpack(unpacker)
             return cls(type, data=data)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "LedgerKey":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "LedgerKey":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -1786,16 +2006,24 @@ class BucketEntryType(IntEnum):
         value = unpacker.unpack_int()
         return cls(value)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "BucketEntryType":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "BucketEntryType":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     @classmethod
     def _missing_(cls, value):
@@ -1830,16 +2058,24 @@ class BucketMetadataExt:
         if v == 0:
             return cls(v)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "BucketMetadataExt":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "BucketMetadataExt":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -1886,16 +2122,24 @@ class BucketMetadata:
         ext = BucketMetadataExt.unpack(unpacker)
         return cls(ledger_version=ledger_version, ext=ext)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "BucketMetadata":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "BucketMetadata":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -1903,7 +2147,10 @@ class BucketMetadata:
         return self.ledger_version == other.ledger_version and self.ext == other.ext
 
     def __str__(self):
-        out = [f"ledger_version={self.ledger_version}", f"ext={self.ext}"]
+        out = [
+            f"ledger_version={self.ledger_version}",
+            f"ext={self.ext}",
+        ]
         return f"<BucketMetadata {[', '.join(out)]}>"
 
 
@@ -1964,16 +2211,24 @@ class BucketEntry:
             meta_entry = BucketMetadata.unpack(unpacker)
             return cls(type, meta_entry=meta_entry)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "BucketEntry":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "BucketEntry":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -2013,7 +2268,7 @@ class TransactionSet:
     """
 
     def __init__(
-        self, previous_ledger_hash: "Hash", txs: List["TransactionEnvelope"]
+        self, previous_ledger_hash: "Hash", txs: List["TransactionEnvelope"],
     ) -> None:
         self.previous_ledger_hash = previous_ledger_hash
         self.txs = txs
@@ -2033,16 +2288,24 @@ class TransactionSet:
             txs.append(TransactionEnvelope.unpack(unpacker))
         return cls(previous_ledger_hash=previous_ledger_hash, txs=txs)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "TransactionSet":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "TransactionSet":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -2053,7 +2316,10 @@ class TransactionSet:
         )
 
     def __str__(self):
-        out = [f"previous_ledger_hash={self.previous_ledger_hash}", f"txs={self.txs}"]
+        out = [
+            f"previous_ledger_hash={self.previous_ledger_hash}",
+            f"txs={self.txs}",
+        ]
         return f"<TransactionSet {[', '.join(out)]}>"
 
 
@@ -2083,16 +2349,24 @@ class TransactionResultPair:
         result = TransactionResult.unpack(unpacker)
         return cls(transaction_hash=transaction_hash, result=result)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "TransactionResultPair":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "TransactionResultPair":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -2103,7 +2377,10 @@ class TransactionResultPair:
         )
 
     def __str__(self):
-        out = [f"transaction_hash={self.transaction_hash}", f"result={self.result}"]
+        out = [
+            f"transaction_hash={self.transaction_hash}",
+            f"result={self.result}",
+        ]
         return f"<TransactionResultPair {[', '.join(out)]}>"
 
 
@@ -2134,16 +2411,24 @@ class TransactionResultSet:
             results.append(TransactionResultPair.unpack(unpacker))
         return cls(results=results)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "TransactionResultSet":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "TransactionResultSet":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -2151,7 +2436,9 @@ class TransactionResultSet:
         return self.results == other.results
 
     def __str__(self):
-        out = [f"results={self.results}"]
+        out = [
+            f"results={self.results}",
+        ]
         return f"<TransactionResultSet {[', '.join(out)]}>"
 
 
@@ -2181,16 +2468,24 @@ class TransactionHistoryEntryExt:
         if v == 0:
             return cls(v)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "TransactionHistoryEntryExt":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "TransactionHistoryEntryExt":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -2245,16 +2540,24 @@ class TransactionHistoryEntry:
         ext = TransactionHistoryEntryExt.unpack(unpacker)
         return cls(ledger_seq=ledger_seq, tx_set=tx_set, ext=ext)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "TransactionHistoryEntry":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "TransactionHistoryEntry":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -2300,16 +2603,24 @@ class TransactionHistoryResultEntryExt:
         if v == 0:
             return cls(v)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "TransactionHistoryResultEntryExt":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "TransactionHistoryResultEntryExt":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -2364,16 +2675,24 @@ class TransactionHistoryResultEntry:
         ext = TransactionHistoryResultEntryExt.unpack(unpacker)
         return cls(ledger_seq=ledger_seq, tx_result_set=tx_result_set, ext=ext)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "TransactionHistoryResultEntry":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "TransactionHistoryResultEntry":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -2419,16 +2738,24 @@ class LedgerHeaderHistoryEntryExt:
         if v == 0:
             return cls(v)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "LedgerHeaderHistoryEntryExt":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "LedgerHeaderHistoryEntryExt":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -2462,7 +2789,7 @@ class LedgerHeaderHistoryEntry:
     """
 
     def __init__(
-        self, hash: "Hash", header: "LedgerHeader", ext: "LedgerHeaderHistoryEntryExt"
+        self, hash: "Hash", header: "LedgerHeader", ext: "LedgerHeaderHistoryEntryExt",
     ) -> None:
         self.hash = hash
         self.header = header
@@ -2480,16 +2807,24 @@ class LedgerHeaderHistoryEntry:
         ext = LedgerHeaderHistoryEntryExt.unpack(unpacker)
         return cls(hash=hash, header=header, ext=ext)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "LedgerHeaderHistoryEntry":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "LedgerHeaderHistoryEntry":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -2501,7 +2836,11 @@ class LedgerHeaderHistoryEntry:
         )
 
     def __str__(self):
-        out = [f"hash={self.hash}", f"header={self.header}", f"ext={self.ext}"]
+        out = [
+            f"hash={self.hash}",
+            f"header={self.header}",
+            f"ext={self.ext}",
+        ]
         return f"<LedgerHeaderHistoryEntry {[', '.join(out)]}>"
 
 
@@ -2536,16 +2875,24 @@ class LedgerSCPMessages:
             messages.append(SCPEnvelope.unpack(unpacker))
         return cls(ledger_seq=ledger_seq, messages=messages)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "LedgerSCPMessages":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "LedgerSCPMessages":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -2553,7 +2900,10 @@ class LedgerSCPMessages:
         return self.ledger_seq == other.ledger_seq and self.messages == other.messages
 
     def __str__(self):
-        out = [f"ledger_seq={self.ledger_seq}", f"messages={self.messages}"]
+        out = [
+            f"ledger_seq={self.ledger_seq}",
+            f"messages={self.messages}",
+        ]
         return f"<LedgerSCPMessages {[', '.join(out)]}>"
 
 
@@ -2570,7 +2920,7 @@ class SCPHistoryEntryV0:
     """
 
     def __init__(
-        self, quorum_sets: List["SCPQuorumSet"], ledger_messages: "LedgerSCPMessages"
+        self, quorum_sets: List["SCPQuorumSet"], ledger_messages: "LedgerSCPMessages",
     ) -> None:
         self.quorum_sets = quorum_sets
         self.ledger_messages = ledger_messages
@@ -2590,16 +2940,24 @@ class SCPHistoryEntryV0:
         ledger_messages = LedgerSCPMessages.unpack(unpacker)
         return cls(quorum_sets=quorum_sets, ledger_messages=ledger_messages)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "SCPHistoryEntryV0":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "SCPHistoryEntryV0":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -2646,16 +3004,24 @@ class SCPHistoryEntry:
             v0 = SCPHistoryEntryV0.unpack(unpacker)
             return cls(v, v0=v0)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "SCPHistoryEntry":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "SCPHistoryEntry":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -2696,16 +3062,24 @@ class LedgerEntryChangeType(IntEnum):
         value = unpacker.unpack_int()
         return cls(value)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "LedgerEntryChangeType":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "LedgerEntryChangeType":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     @classmethod
     def _missing_(cls, value):
@@ -2777,16 +3151,24 @@ class LedgerEntryChange:
             state = LedgerEntry.unpack(unpacker)
             return cls(type, state=state)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "LedgerEntryChange":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "LedgerEntryChange":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -2839,16 +3221,24 @@ class LedgerEntryChanges:
 
         return cls(ledger_entry_changes)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "LedgerEntryChanges":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "LedgerEntryChanges":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -2883,16 +3273,24 @@ class OperationMeta:
         changes = LedgerEntryChanges.unpack(unpacker)
         return cls(changes=changes)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "OperationMeta":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "OperationMeta":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -2900,7 +3298,9 @@ class OperationMeta:
         return self.changes == other.changes
 
     def __str__(self):
-        out = [f"changes={self.changes}"]
+        out = [
+            f"changes={self.changes}",
+        ]
         return f"<OperationMeta {[', '.join(out)]}>"
 
 
@@ -2917,7 +3317,7 @@ class TransactionMetaV1:
     """
 
     def __init__(
-        self, tx_changes: "LedgerEntryChanges", operations: List["OperationMeta"]
+        self, tx_changes: "LedgerEntryChanges", operations: List["OperationMeta"],
     ) -> None:
         self.tx_changes = tx_changes
         self.operations = operations
@@ -2937,16 +3337,24 @@ class TransactionMetaV1:
             operations.append(OperationMeta.unpack(unpacker))
         return cls(tx_changes=tx_changes, operations=operations)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "TransactionMetaV1":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "TransactionMetaV1":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -2956,7 +3364,10 @@ class TransactionMetaV1:
         )
 
     def __str__(self):
-        out = [f"tx_changes={self.tx_changes}", f"operations={self.operations}"]
+        out = [
+            f"tx_changes={self.tx_changes}",
+            f"operations={self.operations}",
+        ]
         return f"<TransactionMetaV1 {[', '.join(out)]}>"
 
 
@@ -3006,16 +3417,24 @@ class TransactionMetaV2:
             tx_changes_after=tx_changes_after,
         )
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "TransactionMetaV2":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "TransactionMetaV2":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -3093,16 +3512,24 @@ class TransactionMeta:
             v2 = TransactionMetaV2.unpack(unpacker)
             return cls(v, v2=v2)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "TransactionMeta":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "TransactionMeta":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -3164,16 +3591,24 @@ class TransactionResultMeta:
             tx_apply_processing=tx_apply_processing,
         )
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "TransactionResultMeta":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "TransactionResultMeta":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -3205,7 +3640,9 @@ class UpgradeEntryMeta:
     ----------------------------------------------------------------
     """
 
-    def __init__(self, upgrade: "LedgerUpgrade", changes: "LedgerEntryChanges") -> None:
+    def __init__(
+        self, upgrade: "LedgerUpgrade", changes: "LedgerEntryChanges",
+    ) -> None:
         self.upgrade = upgrade
         self.changes = changes
 
@@ -3219,16 +3656,24 @@ class UpgradeEntryMeta:
         changes = LedgerEntryChanges.unpack(unpacker)
         return cls(upgrade=upgrade, changes=changes)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "UpgradeEntryMeta":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "UpgradeEntryMeta":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -3236,7 +3681,10 @@ class UpgradeEntryMeta:
         return self.upgrade == other.upgrade and self.changes == other.changes
 
     def __str__(self):
-        out = [f"upgrade={self.upgrade}", f"changes={self.changes}"]
+        out = [
+            f"upgrade={self.upgrade}",
+            f"changes={self.changes}",
+        ]
         return f"<UpgradeEntryMeta {[', '.join(out)]}>"
 
 
@@ -3315,16 +3763,24 @@ class LedgerCloseMetaV0:
             scp_info=scp_info,
         )
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "LedgerCloseMetaV0":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "LedgerCloseMetaV0":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -3377,16 +3833,24 @@ class LedgerCloseMeta:
             v0 = LedgerCloseMetaV0.unpack(unpacker)
             return cls(v, v0=v0)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "LedgerCloseMeta":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "LedgerCloseMeta":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -3426,16 +3890,24 @@ class MuxedAccountMed25519:
         ed25519 = Uint256.unpack(unpacker)
         return cls(id=id, ed25519=ed25519)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "MuxedAccountMed25519":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "MuxedAccountMed25519":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -3443,7 +3915,10 @@ class MuxedAccountMed25519:
         return self.id == other.id and self.ed25519 == other.ed25519
 
     def __str__(self):
-        out = [f"id={self.id}", f"ed25519={self.ed25519}"]
+        out = [
+            f"id={self.id}",
+            f"ed25519={self.ed25519}",
+        ]
         return f"<MuxedAccountMed25519 {[', '.join(out)]}>"
 
 
@@ -3494,16 +3969,24 @@ class MuxedAccount:
             med25519 = MuxedAccountMed25519.unpack(unpacker)
             return cls(type, med25519=med25519)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "MuxedAccount":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "MuxedAccount":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -3548,16 +4031,24 @@ class DecoratedSignature:
         signature = Signature.unpack(unpacker)
         return cls(hint=hint, signature=signature)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "DecoratedSignature":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "DecoratedSignature":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -3565,7 +4056,10 @@ class DecoratedSignature:
         return self.hint == other.hint and self.signature == other.signature
 
     def __str__(self):
-        out = [f"hint={self.hint}", f"signature={self.signature}"]
+        out = [
+            f"hint={self.hint}",
+            f"signature={self.signature}",
+        ]
         return f"<DecoratedSignature {[', '.join(out)]}>"
 
 
@@ -3616,16 +4110,24 @@ class OperationType(IntEnum):
         value = unpacker.unpack_int()
         return cls(value)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "OperationType":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "OperationType":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     @classmethod
     def _missing_(cls, value):
@@ -3660,16 +4162,24 @@ class CreateAccountOp:
         starting_balance = Int64.unpack(unpacker)
         return cls(destination=destination, starting_balance=starting_balance)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "CreateAccountOp":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "CreateAccountOp":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -3701,7 +4211,7 @@ class PaymentOp:
     """
 
     def __init__(
-        self, destination: "MuxedAccount", asset: "Asset", amount: "Int64"
+        self, destination: "MuxedAccount", asset: "Asset", amount: "Int64",
     ) -> None:
         self.destination = destination
         self.asset = asset
@@ -3719,16 +4229,24 @@ class PaymentOp:
         amount = Int64.unpack(unpacker)
         return cls(destination=destination, asset=asset, amount=amount)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "PaymentOp":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "PaymentOp":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -3814,16 +4332,24 @@ class PathPaymentStrictReceiveOp:
             path=path,
         )
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "PathPaymentStrictReceiveOp":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "PathPaymentStrictReceiveOp":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -3915,16 +4441,24 @@ class PathPaymentStrictSendOp:
             path=path,
         )
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "PathPaymentStrictSendOp":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "PathPaymentStrictSendOp":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -4003,16 +4537,24 @@ class ManageSellOfferOp:
             offer_id=offer_id,
         )
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "ManageSellOfferOp":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "ManageSellOfferOp":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -4090,16 +4632,24 @@ class ManageBuyOfferOp:
             offer_id=offer_id,
         )
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "ManageBuyOfferOp":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "ManageBuyOfferOp":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -4138,7 +4688,7 @@ class CreatePassiveSellOfferOp:
     """
 
     def __init__(
-        self, selling: "Asset", buying: "Asset", amount: "Int64", price: "Price"
+        self, selling: "Asset", buying: "Asset", amount: "Int64", price: "Price",
     ) -> None:
         self.selling = selling
         self.buying = buying
@@ -4159,16 +4709,24 @@ class CreatePassiveSellOfferOp:
         price = Price.unpack(unpacker)
         return cls(selling=selling, buying=buying, amount=amount, price=price)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "CreatePassiveSellOfferOp":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "CreatePassiveSellOfferOp":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -4308,16 +4866,24 @@ class SetOptionsOp:
             signer=signer,
         )
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "SetOptionsOp":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "SetOptionsOp":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -4377,16 +4943,24 @@ class ChangeTrustOp:
         limit = Int64.unpack(unpacker)
         return cls(line=line, limit=limit)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "ChangeTrustOp":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "ChangeTrustOp":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -4394,7 +4968,10 @@ class ChangeTrustOp:
         return self.line == other.line and self.limit == other.limit
 
     def __str__(self):
-        out = [f"line={self.line}", f"limit={self.limit}"]
+        out = [
+            f"line={self.line}",
+            f"limit={self.limit}",
+        ]
         return f"<ChangeTrustOp {[', '.join(out)]}>"
 
 
@@ -4445,16 +5022,24 @@ class AllowTrustOpAsset:
             asset_code12 = AssetCode12.unpack(unpacker)
             return cls(type, asset_code12=asset_code12)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "AllowTrustOpAsset":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "AllowTrustOpAsset":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -4504,7 +5089,7 @@ class AllowTrustOp:
     """
 
     def __init__(
-        self, trustor: "AccountID", asset: "AllowTrustOpAsset", authorize: "Uint32"
+        self, trustor: "AccountID", asset: "AllowTrustOpAsset", authorize: "Uint32",
     ) -> None:
         self.trustor = trustor
         self.asset = asset
@@ -4522,16 +5107,24 @@ class AllowTrustOp:
         authorize = Uint32.unpack(unpacker)
         return cls(trustor=trustor, asset=asset, authorize=authorize)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "AllowTrustOp":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "AllowTrustOp":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -4564,7 +5157,7 @@ class ManageDataOp:
     """
 
     def __init__(
-        self, data_name: "String64", data_value: Optional["DataValue"]
+        self, data_name: "String64", data_value: Optional["DataValue"],
     ) -> None:
         self.data_name = data_name
         self.data_value = data_value
@@ -4583,16 +5176,24 @@ class ManageDataOp:
         data_value = DataValue.unpack(unpacker) if unpacker.unpack_uint() else None
         return cls(data_name=data_name, data_value=data_value)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "ManageDataOp":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "ManageDataOp":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -4600,7 +5201,10 @@ class ManageDataOp:
         return self.data_name == other.data_name and self.data_value == other.data_value
 
     def __str__(self):
-        out = [f"data_name={self.data_name}", f"data_value={self.data_value}"]
+        out = [
+            f"data_name={self.data_name}",
+            f"data_value={self.data_value}",
+        ]
         return f"<ManageDataOp {[', '.join(out)]}>"
 
 
@@ -4626,16 +5230,24 @@ class BumpSequenceOp:
         bump_to = SequenceNumber.unpack(unpacker)
         return cls(bump_to=bump_to)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "BumpSequenceOp":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "BumpSequenceOp":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -4643,7 +5255,9 @@ class BumpSequenceOp:
         return self.bump_to == other.bump_to
 
     def __str__(self):
-        out = [f"bump_to={self.bump_to}"]
+        out = [
+            f"bump_to={self.bump_to}",
+        ]
         return f"<BumpSequenceOp {[', '.join(out)]}>"
 
 
@@ -4808,16 +5422,24 @@ class OperationBody:
             path_payment_strict_send_op = PathPaymentStrictSendOp.unpack(unpacker)
             return cls(type, path_payment_strict_send_op=path_payment_strict_send_op)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "OperationBody":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "OperationBody":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -4933,7 +5555,7 @@ class Operation:
     """
 
     def __init__(
-        self, source_account: Optional["MuxedAccount"], body: "OperationBody"
+        self, source_account: Optional["MuxedAccount"], body: "OperationBody",
     ) -> None:
         self.source_account = source_account
         self.body = body
@@ -4954,16 +5576,24 @@ class Operation:
         body = OperationBody.unpack(unpacker)
         return cls(source_account=source_account, body=body)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "Operation":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "Operation":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -4971,7 +5601,10 @@ class Operation:
         return self.source_account == other.source_account and self.body == other.body
 
     def __str__(self):
-        out = [f"source_account={self.source_account}", f"body={self.body}"]
+        out = [
+            f"source_account={self.source_account}",
+            f"body={self.body}",
+        ]
         return f"<Operation {[', '.join(out)]}>"
 
 
@@ -5004,16 +5637,24 @@ class MemoType(IntEnum):
         value = unpacker.unpack_int()
         return cls(value)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "MemoType":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "MemoType":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     @classmethod
     def _missing_(cls, value):
@@ -5091,16 +5732,24 @@ class Memo:
             ret_hash = Hash.unpack(unpacker)
             return cls(type, ret_hash=ret_hash)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "Memo":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "Memo":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -5149,16 +5798,24 @@ class TimeBounds:
         max_time = TimePoint.unpack(unpacker)
         return cls(min_time=min_time, max_time=max_time)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "TimeBounds":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "TimeBounds":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -5166,7 +5823,10 @@ class TimeBounds:
         return self.min_time == other.min_time and self.max_time == other.max_time
 
     def __str__(self):
-        out = [f"min_time={self.min_time}", f"max_time={self.max_time}"]
+        out = [
+            f"min_time={self.min_time}",
+            f"max_time={self.max_time}",
+        ]
         return f"<TimeBounds {[', '.join(out)]}>"
 
 
@@ -5205,16 +5865,24 @@ class TransactionV0Ext:
         if v == 0:
             return cls(v)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "TransactionV0Ext":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "TransactionV0Ext":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -5304,16 +5972,24 @@ class TransactionV0:
             ext=ext,
         )
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "TransactionV0":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "TransactionV0":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -5356,7 +6032,7 @@ class TransactionV0Envelope:
     """
 
     def __init__(
-        self, tx: "TransactionV0", signatures: List["DecoratedSignature"]
+        self, tx: "TransactionV0", signatures: List["DecoratedSignature"],
     ) -> None:
         self.tx = tx
         self.signatures = signatures
@@ -5376,16 +6052,24 @@ class TransactionV0Envelope:
             signatures.append(DecoratedSignature.unpack(unpacker))
         return cls(tx=tx, signatures=signatures)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "TransactionV0Envelope":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "TransactionV0Envelope":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -5393,7 +6077,10 @@ class TransactionV0Envelope:
         return self.tx == other.tx and self.signatures == other.signatures
 
     def __str__(self):
-        out = [f"tx={self.tx}", f"signatures={self.signatures}"]
+        out = [
+            f"tx={self.tx}",
+            f"signatures={self.signatures}",
+        ]
         return f"<TransactionV0Envelope {[', '.join(out)]}>"
 
 
@@ -5423,16 +6110,24 @@ class TransactionExt:
         if v == 0:
             return cls(v)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "TransactionExt":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "TransactionExt":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -5533,16 +6228,24 @@ class Transaction:
             ext=ext,
         )
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "Transaction":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "Transaction":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -5585,7 +6288,7 @@ class TransactionV1Envelope:
     """
 
     def __init__(
-        self, tx: "Transaction", signatures: List["DecoratedSignature"]
+        self, tx: "Transaction", signatures: List["DecoratedSignature"],
     ) -> None:
         self.tx = tx
         self.signatures = signatures
@@ -5605,16 +6308,24 @@ class TransactionV1Envelope:
             signatures.append(DecoratedSignature.unpack(unpacker))
         return cls(tx=tx, signatures=signatures)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "TransactionV1Envelope":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "TransactionV1Envelope":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -5622,7 +6333,10 @@ class TransactionV1Envelope:
         return self.tx == other.tx and self.signatures == other.signatures
 
     def __str__(self):
-        out = [f"tx={self.tx}", f"signatures={self.signatures}"]
+        out = [
+            f"tx={self.tx}",
+            f"signatures={self.signatures}",
+        ]
         return f"<TransactionV1Envelope {[', '.join(out)]}>"
 
 
@@ -5639,7 +6353,7 @@ class FeeBumpTransactionInnerTx:
     """
 
     def __init__(
-        self, type: "EnvelopeType", v1: "TransactionV1Envelope" = None
+        self, type: "EnvelopeType", v1: "TransactionV1Envelope" = None,
     ) -> None:
         self.type = type
         self.v1: "TransactionV1Envelope" = v1
@@ -5657,16 +6371,24 @@ class FeeBumpTransactionInnerTx:
             v1 = TransactionV1Envelope.unpack(unpacker)
             return cls(type, v1=v1)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "FeeBumpTransactionInnerTx":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "FeeBumpTransactionInnerTx":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -5706,16 +6428,24 @@ class FeeBumpTransactionExt:
         if v == 0:
             return cls(v)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "FeeBumpTransactionExt":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "FeeBumpTransactionExt":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -5778,16 +6508,24 @@ class FeeBumpTransaction:
         ext = FeeBumpTransactionExt.unpack(unpacker)
         return cls(fee_source=fee_source, fee=fee, inner_tx=inner_tx, ext=ext)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "FeeBumpTransaction":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "FeeBumpTransaction":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -5824,7 +6562,7 @@ class FeeBumpTransactionEnvelope:
     """
 
     def __init__(
-        self, tx: "FeeBumpTransaction", signatures: List["DecoratedSignature"]
+        self, tx: "FeeBumpTransaction", signatures: List["DecoratedSignature"],
     ) -> None:
         self.tx = tx
         self.signatures = signatures
@@ -5844,16 +6582,24 @@ class FeeBumpTransactionEnvelope:
             signatures.append(DecoratedSignature.unpack(unpacker))
         return cls(tx=tx, signatures=signatures)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "FeeBumpTransactionEnvelope":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "FeeBumpTransactionEnvelope":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -5861,7 +6607,10 @@ class FeeBumpTransactionEnvelope:
         return self.tx == other.tx and self.signatures == other.signatures
 
     def __str__(self):
-        out = [f"tx={self.tx}", f"signatures={self.signatures}"]
+        out = [
+            f"tx={self.tx}",
+            f"signatures={self.signatures}",
+        ]
         return f"<FeeBumpTransactionEnvelope {[', '.join(out)]}>"
 
 
@@ -5918,16 +6667,24 @@ class TransactionEnvelope:
             fee_bump = FeeBumpTransactionEnvelope.unpack(unpacker)
             return cls(type, fee_bump=fee_bump)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "TransactionEnvelope":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "TransactionEnvelope":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -5994,16 +6751,24 @@ class TransactionSignaturePayloadTaggedTransaction:
             fee_bump = FeeBumpTransaction.unpack(unpacker)
             return cls(type, fee_bump=fee_bump)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "TransactionSignaturePayloadTaggedTransaction":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "TransactionSignaturePayloadTaggedTransaction":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -6062,16 +6827,24 @@ class TransactionSignaturePayload:
         )
         return cls(network_id=network_id, tagged_transaction=tagged_transaction)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "TransactionSignaturePayload":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "TransactionSignaturePayload":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -6151,16 +6924,24 @@ class ClaimOfferAtom:
             amount_bought=amount_bought,
         )
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "ClaimOfferAtom":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "ClaimOfferAtom":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -6219,16 +7000,24 @@ class CreateAccountResultCode(IntEnum):
         value = unpacker.unpack_int()
         return cls(value)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "CreateAccountResultCode":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "CreateAccountResultCode":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     @classmethod
     def _missing_(cls, value):
@@ -6265,16 +7054,24 @@ class CreateAccountResult:
         if code == CreateAccountResultCode.CREATE_ACCOUNT_SUCCESS:
             return cls(code)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "CreateAccountResult":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "CreateAccountResult":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -6329,16 +7126,24 @@ class PaymentResultCode(IntEnum):
         value = unpacker.unpack_int()
         return cls(value)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "PaymentResultCode":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "PaymentResultCode":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     @classmethod
     def _missing_(cls, value):
@@ -6375,16 +7180,24 @@ class PaymentResult:
         if code == PaymentResultCode.PAYMENT_SUCCESS:
             return cls(code)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "PaymentResult":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "PaymentResult":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -6454,16 +7267,24 @@ class PathPaymentStrictReceiveResultCode(IntEnum):
         value = unpacker.unpack_int()
         return cls(value)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "PathPaymentStrictReceiveResultCode":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "PathPaymentStrictReceiveResultCode":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     @classmethod
     def _missing_(cls, value):
@@ -6486,7 +7307,7 @@ class SimplePaymentResult:
     """
 
     def __init__(
-        self, destination: "AccountID", asset: "Asset", amount: "Int64"
+        self, destination: "AccountID", asset: "Asset", amount: "Int64",
     ) -> None:
         self.destination = destination
         self.asset = asset
@@ -6504,16 +7325,24 @@ class SimplePaymentResult:
         amount = Int64.unpack(unpacker)
         return cls(destination=destination, asset=asset, amount=amount)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "SimplePaymentResult":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "SimplePaymentResult":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -6546,7 +7375,7 @@ class PathPaymentStrictReceiveResultSuccess:
     """
 
     def __init__(
-        self, offers: List["ClaimOfferAtom"], last: "SimplePaymentResult"
+        self, offers: List["ClaimOfferAtom"], last: "SimplePaymentResult",
     ) -> None:
         self.offers = offers
         self.last = last
@@ -6566,16 +7395,24 @@ class PathPaymentStrictReceiveResultSuccess:
         last = SimplePaymentResult.unpack(unpacker)
         return cls(offers=offers, last=last)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "PathPaymentStrictReceiveResultSuccess":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "PathPaymentStrictReceiveResultSuccess":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -6583,7 +7420,10 @@ class PathPaymentStrictReceiveResultSuccess:
         return self.offers == other.offers and self.last == other.last
 
     def __str__(self):
-        out = [f"offers={self.offers}", f"last={self.last}"]
+        out = [
+            f"offers={self.offers}",
+            f"last={self.last}",
+        ]
         return f"<PathPaymentStrictReceiveResultSuccess {[', '.join(out)]}>"
 
 
@@ -6648,16 +7488,24 @@ class PathPaymentStrictReceiveResult:
             no_issuer = Asset.unpack(unpacker)
             return cls(code, no_issuer=no_issuer)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "PathPaymentStrictReceiveResult":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "PathPaymentStrictReceiveResult":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -6734,16 +7582,24 @@ class PathPaymentStrictSendResultCode(IntEnum):
         value = unpacker.unpack_int()
         return cls(value)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "PathPaymentStrictSendResultCode":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "PathPaymentStrictSendResultCode":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     @classmethod
     def _missing_(cls, value):
@@ -6765,7 +7621,7 @@ class PathPaymentStrictSendResultSuccess:
     """
 
     def __init__(
-        self, offers: List["ClaimOfferAtom"], last: "SimplePaymentResult"
+        self, offers: List["ClaimOfferAtom"], last: "SimplePaymentResult",
     ) -> None:
         self.offers = offers
         self.last = last
@@ -6785,16 +7641,24 @@ class PathPaymentStrictSendResultSuccess:
         last = SimplePaymentResult.unpack(unpacker)
         return cls(offers=offers, last=last)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "PathPaymentStrictSendResultSuccess":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "PathPaymentStrictSendResultSuccess":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -6802,7 +7666,10 @@ class PathPaymentStrictSendResultSuccess:
         return self.offers == other.offers and self.last == other.last
 
     def __str__(self):
-        out = [f"offers={self.offers}", f"last={self.last}"]
+        out = [
+            f"offers={self.offers}",
+            f"last={self.last}",
+        ]
         return f"<PathPaymentStrictSendResultSuccess {[', '.join(out)]}>"
 
 
@@ -6861,16 +7728,24 @@ class PathPaymentStrictSendResult:
             no_issuer = Asset.unpack(unpacker)
             return cls(code, no_issuer=no_issuer)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "PathPaymentStrictSendResult":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "PathPaymentStrictSendResult":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -6946,16 +7821,24 @@ class ManageSellOfferResultCode(IntEnum):
         value = unpacker.unpack_int()
         return cls(value)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "ManageSellOfferResultCode":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "ManageSellOfferResultCode":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     @classmethod
     def _missing_(cls, value):
@@ -6989,16 +7872,24 @@ class ManageOfferEffect(IntEnum):
         value = unpacker.unpack_int()
         return cls(value)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "ManageOfferEffect":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "ManageOfferEffect":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     @classmethod
     def _missing_(cls, value):
@@ -7022,7 +7913,9 @@ class ManageOfferSuccessResultOffer:
     ----------------------------------------------------------------
     """
 
-    def __init__(self, effect: "ManageOfferEffect", offer: "OfferEntry" = None) -> None:
+    def __init__(
+        self, effect: "ManageOfferEffect", offer: "OfferEntry" = None,
+    ) -> None:
         self.effect = effect
         self.offer: "OfferEntry" = offer
 
@@ -7041,16 +7934,24 @@ class ManageOfferSuccessResultOffer:
                 offer = OfferEntry.unpack(unpacker)
                 return cls(effect, offer=offer)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "ManageOfferSuccessResultOffer":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "ManageOfferSuccessResultOffer":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -7109,16 +8010,24 @@ class ManageOfferSuccessResult:
         offer = ManageOfferSuccessResultOffer.unpack(unpacker)
         return cls(offers_claimed=offers_claimed, offer=offer)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "ManageOfferSuccessResult":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "ManageOfferSuccessResult":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -7126,7 +8035,10 @@ class ManageOfferSuccessResult:
         return self.offers_claimed == other.offers_claimed and self.offer == other.offer
 
     def __str__(self):
-        out = [f"offers_claimed={self.offers_claimed}", f"offer={self.offer}"]
+        out = [
+            f"offers_claimed={self.offers_claimed}",
+            f"offer={self.offer}",
+        ]
         return f"<ManageOfferSuccessResult {[', '.join(out)]}>"
 
 
@@ -7165,16 +8077,24 @@ class ManageSellOfferResult:
             success = ManageOfferSuccessResult.unpack(unpacker)
             return cls(code, success=success)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "ManageSellOfferResult":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "ManageSellOfferResult":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -7240,16 +8160,24 @@ class ManageBuyOfferResultCode(IntEnum):
         value = unpacker.unpack_int()
         return cls(value)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "ManageBuyOfferResultCode":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "ManageBuyOfferResultCode":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     @classmethod
     def _missing_(cls, value):
@@ -7293,16 +8221,24 @@ class ManageBuyOfferResult:
             success = ManageOfferSuccessResult.unpack(unpacker)
             return cls(code, success=success)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "ManageBuyOfferResult":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "ManageBuyOfferResult":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -7357,16 +8293,24 @@ class SetOptionsResultCode(IntEnum):
         value = unpacker.unpack_int()
         return cls(value)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "SetOptionsResultCode":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "SetOptionsResultCode":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     @classmethod
     def _missing_(cls, value):
@@ -7403,16 +8347,24 @@ class SetOptionsResult:
         if code == SetOptionsResultCode.SET_OPTIONS_SUCCESS:
             return cls(code)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "SetOptionsResult":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "SetOptionsResult":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -7460,16 +8412,24 @@ class ChangeTrustResultCode(IntEnum):
         value = unpacker.unpack_int()
         return cls(value)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "ChangeTrustResultCode":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "ChangeTrustResultCode":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     @classmethod
     def _missing_(cls, value):
@@ -7506,16 +8466,24 @@ class ChangeTrustResult:
         if code == ChangeTrustResultCode.CHANGE_TRUST_SUCCESS:
             return cls(code)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "ChangeTrustResult":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "ChangeTrustResult":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -7562,16 +8530,24 @@ class AllowTrustResultCode(IntEnum):
         value = unpacker.unpack_int()
         return cls(value)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "AllowTrustResultCode":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "AllowTrustResultCode":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     @classmethod
     def _missing_(cls, value):
@@ -7608,16 +8584,24 @@ class AllowTrustResult:
         if code == AllowTrustResultCode.ALLOW_TRUST_SUCCESS:
             return cls(code)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "AllowTrustResult":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "AllowTrustResult":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -7666,16 +8650,24 @@ class AccountMergeResultCode(IntEnum):
         value = unpacker.unpack_int()
         return cls(value)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "AccountMergeResultCode":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "AccountMergeResultCode":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     @classmethod
     def _missing_(cls, value):
@@ -7699,7 +8691,7 @@ class AccountMergeResult:
     """
 
     def __init__(
-        self, code: "AccountMergeResultCode", source_account_balance: "Int64" = None
+        self, code: "AccountMergeResultCode", source_account_balance: "Int64" = None,
     ) -> None:
         self.code = code
         self.source_account_balance: "Int64" = source_account_balance
@@ -7717,16 +8709,24 @@ class AccountMergeResult:
             source_account_balance = Int64.unpack(unpacker)
             return cls(code, source_account_balance=source_account_balance)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "AccountMergeResult":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "AccountMergeResult":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -7770,16 +8770,24 @@ class InflationResultCode(IntEnum):
         value = unpacker.unpack_int()
         return cls(value)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "InflationResultCode":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "InflationResultCode":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     @classmethod
     def _missing_(cls, value):
@@ -7814,16 +8822,24 @@ class InflationPayout:
         amount = Int64.unpack(unpacker)
         return cls(destination=destination, amount=amount)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "InflationPayout":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "InflationPayout":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -7831,7 +8847,10 @@ class InflationPayout:
         return self.destination == other.destination and self.amount == other.amount
 
     def __str__(self):
-        out = [f"destination={self.destination}", f"amount={self.amount}"]
+        out = [
+            f"destination={self.destination}",
+            f"amount={self.amount}",
+        ]
         return f"<InflationPayout {[', '.join(out)]}>"
 
 
@@ -7850,7 +8869,7 @@ class InflationResult:
     """
 
     def __init__(
-        self, code: "InflationResultCode", payouts: List["InflationPayout"] = None
+        self, code: "InflationResultCode", payouts: List["InflationPayout"] = None,
     ) -> None:
         self.code = code
         self.payouts: List["InflationPayout"] = payouts
@@ -7873,16 +8892,24 @@ class InflationResult:
                 payouts.append(InflationPayout.unpack(unpacker))
             return cls(code, payouts=payouts)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "InflationResult":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "InflationResult":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -7929,16 +8956,24 @@ class ManageDataResultCode(IntEnum):
         value = unpacker.unpack_int()
         return cls(value)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "ManageDataResultCode":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "ManageDataResultCode":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     @classmethod
     def _missing_(cls, value):
@@ -7975,16 +9010,24 @@ class ManageDataResult:
         if code == ManageDataResultCode.MANAGE_DATA_SUCCESS:
             return cls(code)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "ManageDataResult":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "ManageDataResult":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -8022,16 +9065,24 @@ class BumpSequenceResultCode(IntEnum):
         value = unpacker.unpack_int()
         return cls(value)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "BumpSequenceResultCode":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "BumpSequenceResultCode":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     @classmethod
     def _missing_(cls, value):
@@ -8068,16 +9119,24 @@ class BumpSequenceResult:
         if code == BumpSequenceResultCode.BUMP_SEQUENCE_SUCCESS:
             return cls(code)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "BumpSequenceResult":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "BumpSequenceResult":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -8122,16 +9181,24 @@ class OperationResultCode(IntEnum):
         value = unpacker.unpack_int()
         return cls(value)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "OperationResultCode":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "OperationResultCode":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     @classmethod
     def _missing_(cls, value):
@@ -8314,16 +9381,24 @@ class OperationResultTr:
                 type, path_payment_strict_send_result=path_payment_strict_send_result
             )
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "OperationResultTr":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "OperationResultTr":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -8443,7 +9518,7 @@ class OperationResult:
     """
 
     def __init__(
-        self, code: "OperationResultCode", tr: "OperationResultTr" = None
+        self, code: "OperationResultCode", tr: "OperationResultTr" = None,
     ) -> None:
         self.code = code
         self.tr: "OperationResultTr" = tr
@@ -8461,16 +9536,24 @@ class OperationResult:
             tr = OperationResultTr.unpack(unpacker)
             return cls(code, tr=tr)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "OperationResult":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "OperationResult":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -8537,16 +9620,24 @@ class TransactionResultCode(IntEnum):
         value = unpacker.unpack_int()
         return cls(value)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "TransactionResultCode":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "TransactionResultCode":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     @classmethod
     def _missing_(cls, value):
@@ -8583,7 +9674,7 @@ class InnerTransactionResultResult:
     """
 
     def __init__(
-        self, code: "TransactionResultCode", results: List["OperationResult"] = None
+        self, code: "TransactionResultCode", results: List["OperationResult"] = None,
     ) -> None:
         self.code = code
         self.results: List["OperationResult"] = results
@@ -8640,16 +9731,24 @@ class InnerTransactionResultResult:
         ):
             return cls(code)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "InnerTransactionResultResult":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "InnerTransactionResultResult":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -8689,16 +9788,24 @@ class InnerTransactionResultExt:
         if v == 0:
             return cls(v)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "InnerTransactionResultExt":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "InnerTransactionResultExt":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -8775,16 +9882,24 @@ class InnerTransactionResult:
         ext = InnerTransactionResultExt.unpack(unpacker)
         return cls(fee_charged=fee_charged, result=result, ext=ext)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "InnerTransactionResult":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "InnerTransactionResult":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -8817,7 +9932,7 @@ class InnerTransactionResultPair:
     """
 
     def __init__(
-        self, transaction_hash: "Hash", result: "InnerTransactionResult"
+        self, transaction_hash: "Hash", result: "InnerTransactionResult",
     ) -> None:
         self.transaction_hash = transaction_hash
         self.result = result
@@ -8832,16 +9947,24 @@ class InnerTransactionResultPair:
         result = InnerTransactionResult.unpack(unpacker)
         return cls(transaction_hash=transaction_hash, result=result)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "InnerTransactionResultPair":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "InnerTransactionResultPair":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -8852,7 +9975,10 @@ class InnerTransactionResultPair:
         )
 
     def __str__(self):
-        out = [f"transaction_hash={self.transaction_hash}", f"result={self.result}"]
+        out = [
+            f"transaction_hash={self.transaction_hash}",
+            f"result={self.result}",
+        ]
         return f"<InnerTransactionResultPair {[', '.join(out)]}>"
 
 
@@ -8920,16 +10046,24 @@ class TransactionResultResult:
                 results.append(OperationResult.unpack(unpacker))
             return cls(code, results=results)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "TransactionResultResult":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "TransactionResultResult":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -8976,16 +10110,24 @@ class TransactionResultExt:
         if v == 0:
             return cls(v)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "TransactionResultExt":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "TransactionResultExt":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -9052,16 +10194,24 @@ class TransactionResult:
         ext = TransactionResultExt.unpack(unpacker)
         return cls(fee_charged=fee_charged, result=result, ext=ext)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "TransactionResult":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "TransactionResult":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -9100,16 +10250,24 @@ class AccountID:
         account_id = PublicKey.unpack(unpacker)
         return cls(account_id)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "AccountID":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "AccountID":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -9139,16 +10297,24 @@ class Thresholds:
         thresholds = Opaque.unpack(unpacker, 4, True)
         return cls(thresholds)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "Thresholds":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "Thresholds":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -9178,16 +10344,24 @@ class String32:
         string32 = String.unpack(unpacker)
         return cls(string32)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "String32":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "String32":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -9217,16 +10391,24 @@ class String64:
         string64 = String.unpack(unpacker)
         return cls(string64)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "String64":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "String64":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -9256,16 +10438,24 @@ class SequenceNumber:
         sequence_number = Int64.unpack(unpacker)
         return cls(sequence_number)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "SequenceNumber":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "SequenceNumber":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -9295,16 +10485,24 @@ class TimePoint:
         time_point = Uint64.unpack(unpacker)
         return cls(time_point)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "TimePoint":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "TimePoint":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -9334,16 +10532,24 @@ class DataValue:
         data_value = Opaque.unpack(unpacker, 64, False)
         return cls(data_value)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "DataValue":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "DataValue":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -9373,16 +10579,24 @@ class AssetCode4:
         asset_code4 = Opaque.unpack(unpacker, 4, True)
         return cls(asset_code4)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "AssetCode4":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "AssetCode4":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -9412,16 +10626,24 @@ class AssetCode12:
         asset_code12 = Opaque.unpack(unpacker, 12, True)
         return cls(asset_code12)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "AssetCode12":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "AssetCode12":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -9457,16 +10679,24 @@ class AssetType(IntEnum):
         value = unpacker.unpack_int()
         return cls(value)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "AssetType":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "AssetType":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     @classmethod
     def _missing_(cls, value):
@@ -9501,16 +10731,24 @@ class AssetAlphaNum4:
         issuer = AccountID.unpack(unpacker)
         return cls(asset_code=asset_code, issuer=issuer)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "AssetAlphaNum4":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "AssetAlphaNum4":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -9518,7 +10756,10 @@ class AssetAlphaNum4:
         return self.asset_code == other.asset_code and self.issuer == other.issuer
 
     def __str__(self):
-        out = [f"asset_code={self.asset_code}", f"issuer={self.issuer}"]
+        out = [
+            f"asset_code={self.asset_code}",
+            f"issuer={self.issuer}",
+        ]
         return f"<AssetAlphaNum4 {[', '.join(out)]}>"
 
 
@@ -9548,16 +10789,24 @@ class AssetAlphaNum12:
         issuer = AccountID.unpack(unpacker)
         return cls(asset_code=asset_code, issuer=issuer)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "AssetAlphaNum12":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "AssetAlphaNum12":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -9565,7 +10814,10 @@ class AssetAlphaNum12:
         return self.asset_code == other.asset_code and self.issuer == other.issuer
 
     def __str__(self):
-        out = [f"asset_code={self.asset_code}", f"issuer={self.issuer}"]
+        out = [
+            f"asset_code={self.asset_code}",
+            f"issuer={self.issuer}",
+        ]
         return f"<AssetAlphaNum12 {[', '.join(out)]}>"
 
 
@@ -9630,16 +10882,24 @@ class Asset:
             alpha_num12 = AssetAlphaNum12.unpack(unpacker)
             return cls(type, alpha_num12=alpha_num12)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "Asset":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "Asset":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -9688,16 +10948,24 @@ class Price:
         d = Int32.unpack(unpacker)
         return cls(n=n, d=d)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "Price":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "Price":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -9705,7 +10973,10 @@ class Price:
         return self.n == other.n and self.d == other.d
 
     def __str__(self):
-        out = [f"n={self.n}", f"d={self.d}"]
+        out = [
+            f"n={self.n}",
+            f"d={self.d}",
+        ]
         return f"<Price {[', '.join(out)]}>"
 
 
@@ -9735,16 +11006,24 @@ class Liabilities:
         selling = Int64.unpack(unpacker)
         return cls(buying=buying, selling=selling)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "Liabilities":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "Liabilities":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -9752,7 +11031,10 @@ class Liabilities:
         return self.buying == other.buying and self.selling == other.selling
 
     def __str__(self):
-        out = [f"buying={self.buying}", f"selling={self.selling}"]
+        out = [
+            f"buying={self.buying}",
+            f"selling={self.selling}",
+        ]
         return f"<Liabilities {[', '.join(out)]}>"
 
 
@@ -9783,16 +11065,24 @@ class ThresholdIndexes(IntEnum):
         value = unpacker.unpack_int()
         return cls(value)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "ThresholdIndexes":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "ThresholdIndexes":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     @classmethod
     def _missing_(cls, value):
@@ -9828,16 +11118,24 @@ class LedgerEntryType(IntEnum):
         value = unpacker.unpack_int()
         return cls(value)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "LedgerEntryType":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "LedgerEntryType":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     @classmethod
     def _missing_(cls, value):
@@ -9872,16 +11170,24 @@ class Signer:
         weight = Uint32.unpack(unpacker)
         return cls(key=key, weight=weight)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "Signer":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "Signer":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -9889,7 +11195,10 @@ class Signer:
         return self.key == other.key and self.weight == other.weight
 
     def __str__(self):
-        out = [f"key={self.key}", f"weight={self.weight}"]
+        out = [
+            f"key={self.key}",
+            f"weight={self.weight}",
+        ]
         return f"<Signer {[', '.join(out)]}>"
 
 
@@ -9925,16 +11234,24 @@ class AccountFlags(IntEnum):
         value = unpacker.unpack_int()
         return cls(value)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "AccountFlags":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "AccountFlags":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     @classmethod
     def _missing_(cls, value):
@@ -9978,16 +11295,24 @@ class AccountEntryV1Ext:
         if v == 0:
             return cls(v)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "AccountEntryV1Ext":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "AccountEntryV1Ext":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -10032,16 +11357,24 @@ class AccountEntryV1:
         ext = AccountEntryV1Ext.unpack(unpacker)
         return cls(liabilities=liabilities, ext=ext)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "AccountEntryV1":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "AccountEntryV1":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -10049,7 +11382,10 @@ class AccountEntryV1:
         return self.liabilities == other.liabilities and self.ext == other.ext
 
     def __str__(self):
-        out = [f"liabilities={self.liabilities}", f"ext={self.ext}"]
+        out = [
+            f"liabilities={self.liabilities}",
+            f"ext={self.ext}",
+        ]
         return f"<AccountEntryV1 {[', '.join(out)]}>"
 
 
@@ -10098,16 +11434,24 @@ class AccountEntryExt:
             v1 = AccountEntryV1.unpack(unpacker)
             return cls(v, v1=v1)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "AccountEntryExt":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "AccountEntryExt":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -10236,16 +11580,24 @@ class AccountEntry:
             ext=ext,
         )
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "AccountEntry":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "AccountEntry":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -10305,16 +11657,24 @@ class TrustLineFlags(IntEnum):
         value = unpacker.unpack_int()
         return cls(value)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "TrustLineFlags":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "TrustLineFlags":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     @classmethod
     def _missing_(cls, value):
@@ -10366,16 +11726,24 @@ class TrustLineEntryV1Ext:
         if v == 0:
             return cls(v)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "TrustLineEntryV1Ext":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "TrustLineEntryV1Ext":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -10420,16 +11788,24 @@ class TrustLineEntryV1:
         ext = TrustLineEntryV1Ext.unpack(unpacker)
         return cls(liabilities=liabilities, ext=ext)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "TrustLineEntryV1":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "TrustLineEntryV1":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -10437,7 +11813,10 @@ class TrustLineEntryV1:
         return self.liabilities == other.liabilities and self.ext == other.ext
 
     def __str__(self):
-        out = [f"liabilities={self.liabilities}", f"ext={self.ext}"]
+        out = [
+            f"liabilities={self.liabilities}",
+            f"ext={self.ext}",
+        ]
         return f"<TrustLineEntryV1 {[', '.join(out)]}>"
 
 
@@ -10486,16 +11865,24 @@ class TrustLineEntryExt:
             v1 = TrustLineEntryV1.unpack(unpacker)
             return cls(v, v1=v1)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "TrustLineEntryExt":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "TrustLineEntryExt":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -10587,16 +11974,24 @@ class TrustLineEntry:
             ext=ext,
         )
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "TrustLineEntry":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "TrustLineEntry":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -10644,16 +12039,24 @@ class OfferEntryFlags(IntEnum):
         value = unpacker.unpack_int()
         return cls(value)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "OfferEntryFlags":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "OfferEntryFlags":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     @classmethod
     def _missing_(cls, value):
@@ -10697,16 +12100,24 @@ class OfferEntryExt:
         if v == 0:
             return cls(v)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "OfferEntryExt":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "OfferEntryExt":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -10801,16 +12212,24 @@ class OfferEntry:
             ext=ext,
         )
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "OfferEntry":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "OfferEntry":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -10866,16 +12285,24 @@ class DataEntryExt:
         if v == 0:
             return cls(v)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "DataEntryExt":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "DataEntryExt":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -10937,16 +12364,24 @@ class DataEntry:
             account_id=account_id, data_name=data_name, data_value=data_value, ext=ext,
         )
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "DataEntry":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "DataEntry":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -11031,16 +12466,24 @@ class LedgerEntryData:
             data = DataEntry.unpack(unpacker)
             return cls(type, data=data)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "LedgerEntryData":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "LedgerEntryData":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -11091,16 +12534,24 @@ class LedgerEntryExt:
         if v == 0:
             return cls(v)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "LedgerEntryExt":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "LedgerEntryExt":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -11169,16 +12620,24 @@ class LedgerEntry:
             last_modified_ledger_seq=last_modified_ledger_seq, data=data, ext=ext,
         )
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "LedgerEntry":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "LedgerEntry":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -11229,16 +12688,24 @@ class EnvelopeType(IntEnum):
         value = unpacker.unpack_int()
         return cls(value)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "EnvelopeType":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "EnvelopeType":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     @classmethod
     def _missing_(cls, value):
@@ -11276,16 +12743,24 @@ class ErrorCode(IntEnum):
         value = unpacker.unpack_int()
         return cls(value)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "ErrorCode":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "ErrorCode":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     @classmethod
     def _missing_(cls, value):
@@ -11320,16 +12795,24 @@ class Error:
         msg = String.unpack(unpacker)
         return cls(code=code, msg=msg)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "Error":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "Error":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -11337,7 +12820,10 @@ class Error:
         return self.code == other.code and self.msg == other.msg
 
     def __str__(self):
-        out = [f"code={self.code}", f"msg={self.msg}"]
+        out = [
+            f"code={self.code}",
+            f"msg={self.msg}",
+        ]
         return f"<Error {[', '.join(out)]}>"
 
 
@@ -11355,7 +12841,7 @@ class AuthCert:
     """
 
     def __init__(
-        self, pubkey: "Curve25519Public", expiration: "Uint64", sig: "Signature"
+        self, pubkey: "Curve25519Public", expiration: "Uint64", sig: "Signature",
     ) -> None:
         self.pubkey = pubkey
         self.expiration = expiration
@@ -11373,16 +12859,24 @@ class AuthCert:
         sig = Signature.unpack(unpacker)
         return cls(pubkey=pubkey, expiration=expiration, sig=sig)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "AuthCert":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "AuthCert":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -11477,16 +12971,24 @@ class Hello:
             nonce=nonce,
         )
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "Hello":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "Hello":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -11542,16 +13044,24 @@ class Auth:
         unused = Integer.unpack(unpacker)
         return cls(unused=unused)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "Auth":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "Auth":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -11559,7 +13069,9 @@ class Auth:
         return self.unused == other.unused
 
     def __str__(self):
-        out = [f"unused={self.unused}"]
+        out = [
+            f"unused={self.unused}",
+        ]
         return f"<Auth {[', '.join(out)]}>"
 
 
@@ -11586,16 +13098,24 @@ class IPAddrType(IntEnum):
         value = unpacker.unpack_int()
         return cls(value)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "IPAddrType":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "IPAddrType":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     @classmethod
     def _missing_(cls, value):
@@ -11619,7 +13139,7 @@ class PeerAddressIp:
     """
 
     def __init__(
-        self, type: "IPAddrType", ipv4: bytes = None, ipv6: bytes = None
+        self, type: "IPAddrType", ipv4: bytes = None, ipv6: bytes = None,
     ) -> None:
         self.type = type
         self.ipv4: bytes = ipv4
@@ -11644,16 +13164,24 @@ class PeerAddressIp:
             ipv6 = Opaque.unpack(unpacker, 16, True)
             return cls(type, ipv6=ipv6)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "PeerAddressIp":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "PeerAddressIp":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -11693,7 +13221,7 @@ class PeerAddress:
     """
 
     def __init__(
-        self, ip: "PeerAddressIp", port: "Uint32", num_failures: "Uint32"
+        self, ip: "PeerAddressIp", port: "Uint32", num_failures: "Uint32",
     ) -> None:
         self.ip = ip
         self.port = port
@@ -11711,16 +13239,24 @@ class PeerAddress:
         num_failures = Uint32.unpack(unpacker)
         return cls(ip=ip, port=port, num_failures=num_failures)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "PeerAddress":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "PeerAddress":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -11797,16 +13333,24 @@ class MessageType(IntEnum):
         value = unpacker.unpack_int()
         return cls(value)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "MessageType":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "MessageType":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     @classmethod
     def _missing_(cls, value):
@@ -11841,16 +13385,24 @@ class DontHave:
         req_hash = Uint256.unpack(unpacker)
         return cls(type=type, req_hash=req_hash)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "DontHave":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "DontHave":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -11858,7 +13410,10 @@ class DontHave:
         return self.type == other.type and self.req_hash == other.req_hash
 
     def __str__(self):
-        out = [f"type={self.type}", f"req_hash={self.req_hash}"]
+        out = [
+            f"type={self.type}",
+            f"req_hash={self.req_hash}",
+        ]
         return f"<DontHave {[', '.join(out)]}>"
 
 
@@ -11883,16 +13438,24 @@ class SurveyMessageCommandType(IntEnum):
         value = unpacker.unpack_int()
         return cls(value)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "SurveyMessageCommandType":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "SurveyMessageCommandType":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     @classmethod
     def _missing_(cls, value):
@@ -11952,16 +13515,24 @@ class SurveyRequestMessage:
             command_type=command_type,
         )
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "SurveyRequestMessage":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "SurveyRequestMessage":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -11998,7 +13569,7 @@ class SignedSurveyRequestMessage:
     """
 
     def __init__(
-        self, request_signature: "Signature", request: "SurveyRequestMessage"
+        self, request_signature: "Signature", request: "SurveyRequestMessage",
     ) -> None:
         self.request_signature = request_signature
         self.request = request
@@ -12013,16 +13584,24 @@ class SignedSurveyRequestMessage:
         request = SurveyRequestMessage.unpack(unpacker)
         return cls(request_signature=request_signature, request=request)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "SignedSurveyRequestMessage":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "SignedSurveyRequestMessage":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -12033,7 +13612,10 @@ class SignedSurveyRequestMessage:
         )
 
     def __str__(self):
-        out = [f"request_signature={self.request_signature}", f"request={self.request}"]
+        out = [
+            f"request_signature={self.request_signature}",
+            f"request={self.request}",
+        ]
         return f"<SignedSurveyRequestMessage {[', '.join(out)]}>"
 
 
@@ -12056,16 +13638,24 @@ class EncryptedBody:
         encrypted_body = Opaque.unpack(unpacker, 64000, False)
         return cls(encrypted_body)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "EncryptedBody":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "EncryptedBody":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -12127,16 +13717,24 @@ class SurveyResponseMessage:
             encrypted_body=encrypted_body,
         )
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "SurveyResponseMessage":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "SurveyResponseMessage":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -12173,7 +13771,7 @@ class SignedSurveyResponseMessage:
     """
 
     def __init__(
-        self, response_signature: "Signature", response: "SurveyResponseMessage"
+        self, response_signature: "Signature", response: "SurveyResponseMessage",
     ) -> None:
         self.response_signature = response_signature
         self.response = response
@@ -12188,16 +13786,24 @@ class SignedSurveyResponseMessage:
         response = SurveyResponseMessage.unpack(unpacker)
         return cls(response_signature=response_signature, response=response)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "SignedSurveyResponseMessage":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "SignedSurveyResponseMessage":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -12328,16 +13934,24 @@ class PeerStats:
             duplicate_fetch_message_recv=duplicate_fetch_message_recv,
         )
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "PeerStats":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "PeerStats":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -12411,16 +14025,24 @@ class PeerStatList:
 
         return cls(peer_stat_list)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "PeerStatList":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "PeerStatList":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -12477,16 +14099,24 @@ class TopologyResponseBody:
             total_outbound_peer_count=total_outbound_peer_count,
         )
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "TopologyResponseBody":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "TopologyResponseBody":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -12541,16 +14171,24 @@ class SurveyResponseBody:
             topology_response_body = TopologyResponseBody.unpack(unpacker)
             return cls(type, topology_response_body=topology_response_body)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "SurveyResponseBody":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "SurveyResponseBody":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -12755,16 +14393,24 @@ class StellarMessage:
             get_scp_ledger_seq = Uint32.unpack(unpacker)
             return cls(type, get_scp_ledger_seq=get_scp_ledger_seq)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "StellarMessage":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "StellarMessage":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -12837,7 +14483,7 @@ class AuthenticatedMessageV0:
     """
 
     def __init__(
-        self, sequence: "Uint64", message: "StellarMessage", mac: "HmacSha256Mac"
+        self, sequence: "Uint64", message: "StellarMessage", mac: "HmacSha256Mac",
     ) -> None:
         self.sequence = sequence
         self.message = message
@@ -12855,16 +14501,24 @@ class AuthenticatedMessageV0:
         mac = HmacSha256Mac.unpack(unpacker)
         return cls(sequence=sequence, message=message, mac=mac)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "AuthenticatedMessageV0":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "AuthenticatedMessageV0":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -12918,16 +14572,24 @@ class AuthenticatedMessage:
             v0 = AuthenticatedMessageV0.unpack(unpacker)
             return cls(v, v0=v0)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "AuthenticatedMessage":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "AuthenticatedMessage":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -12960,16 +14622,24 @@ class Hash:
         hash = Opaque.unpack(unpacker, 32, True)
         return cls(hash)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "Hash":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "Hash":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -12999,16 +14669,24 @@ class Uint256:
         uint256 = Opaque.unpack(unpacker, 32, True)
         return cls(uint256)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "Uint256":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "Uint256":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -13038,16 +14716,24 @@ class Uint32:
         uint32 = UnsignedInteger.unpack(unpacker)
         return cls(uint32)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "Uint32":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "Uint32":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -13077,16 +14763,24 @@ class Int32:
         int32 = Integer.unpack(unpacker)
         return cls(int32)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "Int32":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "Int32":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -13116,16 +14810,24 @@ class Uint64:
         uint64 = UnsignedHyper.unpack(unpacker)
         return cls(uint64)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "Uint64":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "Uint64":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -13155,16 +14857,24 @@ class Int64:
         int64 = Hyper.unpack(unpacker)
         return cls(int64)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "Int64":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "Int64":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -13204,16 +14914,24 @@ class CryptoKeyType(IntEnum):
         value = unpacker.unpack_int()
         return cls(value)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "CryptoKeyType":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "CryptoKeyType":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     @classmethod
     def _missing_(cls, value):
@@ -13243,16 +14961,24 @@ class PublicKeyType(IntEnum):
         value = unpacker.unpack_int()
         return cls(value)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "PublicKeyType":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "PublicKeyType":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     @classmethod
     def _missing_(cls, value):
@@ -13286,16 +15012,24 @@ class SignerKeyType(IntEnum):
         value = unpacker.unpack_int()
         return cls(value)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "SignerKeyType":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "SignerKeyType":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     @classmethod
     def _missing_(cls, value):
@@ -13333,16 +15067,24 @@ class PublicKey:
             ed25519 = Uint256.unpack(unpacker)
             return cls(type, ed25519=ed25519)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "PublicKey":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "PublicKey":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -13411,16 +15153,24 @@ class SignerKey:
             hash_x = Uint256.unpack(unpacker)
             return cls(type, hash_x=hash_x)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "SignerKey":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "SignerKey":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -13462,16 +15212,24 @@ class Signature:
         signature = Opaque.unpack(unpacker, 64, False)
         return cls(signature)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "Signature":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "Signature":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -13501,16 +15259,24 @@ class SignatureHint:
         signature_hint = Opaque.unpack(unpacker, 4, True)
         return cls(signature_hint)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "SignatureHint":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "SignatureHint":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -13540,16 +15306,24 @@ class NodeID:
         node_id = PublicKey.unpack(unpacker)
         return cls(node_id)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "NodeID":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "NodeID":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -13582,16 +15356,24 @@ class Curve25519Secret:
         key = Opaque.unpack(unpacker, 32, True)
         return cls(key=key)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "Curve25519Secret":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "Curve25519Secret":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -13599,7 +15381,9 @@ class Curve25519Secret:
         return self.key == other.key
 
     def __str__(self):
-        out = [f"key={self.key}"]
+        out = [
+            f"key={self.key}",
+        ]
         return f"<Curve25519Secret {[', '.join(out)]}>"
 
 
@@ -13625,16 +15409,24 @@ class Curve25519Public:
         key = Opaque.unpack(unpacker, 32, True)
         return cls(key=key)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "Curve25519Public":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "Curve25519Public":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -13642,7 +15434,9 @@ class Curve25519Public:
         return self.key == other.key
 
     def __str__(self):
-        out = [f"key={self.key}"]
+        out = [
+            f"key={self.key}",
+        ]
         return f"<Curve25519Public {[', '.join(out)]}>"
 
 
@@ -13668,16 +15462,24 @@ class HmacSha256Key:
         key = Opaque.unpack(unpacker, 32, True)
         return cls(key=key)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "HmacSha256Key":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "HmacSha256Key":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -13685,7 +15487,9 @@ class HmacSha256Key:
         return self.key == other.key
 
     def __str__(self):
-        out = [f"key={self.key}"]
+        out = [
+            f"key={self.key}",
+        ]
         return f"<HmacSha256Key {[', '.join(out)]}>"
 
 
@@ -13711,16 +15515,24 @@ class HmacSha256Mac:
         mac = Opaque.unpack(unpacker, 32, True)
         return cls(mac=mac)
 
-    def to_xdr(self) -> str:
+    def to_raw_xdr(self) -> bytes:
         packer = Packer()
         self.pack(packer)
-        return base64.b64encode(packer.get_buffer()).decode()
+        return packer.get_buffer()
+
+    @classmethod
+    def from_raw_xdr(cls, xdr: bytes) -> "HmacSha256Mac":
+        unpacker = Unpacker(xdr)
+        return cls.unpack(unpacker)
+
+    def to_xdr(self) -> str:
+        raw_xdr = self.to_raw_xdr()
+        return base64.b64encode(raw_xdr).decode()
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "HmacSha256Mac":
-        data = base64.b64decode(xdr.encode())
-        unpacker = Unpacker(data)
-        return cls.unpack(unpacker)
+        xdr = base64.b64decode(xdr.encode())
+        return cls.from_raw_xdr(xdr)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -13728,5 +15540,7 @@ class HmacSha256Mac:
         return self.mac == other.mac
 
     def __str__(self):
-        out = [f"mac={self.mac}"]
+        out = [
+            f"mac={self.mac}",
+        ]
         return f"<HmacSha256Mac {[', '.join(out)]}>"
