@@ -28,6 +28,7 @@ class PathPaymentStrictSend(Operation):
     :param source: The source account for the payment. Defaults to the
         transaction's source account.
     """
+    TYPE_CODE = xdr.OperationType.PATH_PAYMENT_STRICT_SEND
 
     def __init__(
         self,
@@ -49,10 +50,6 @@ class PathPaymentStrictSend(Operation):
         self.dest_min: Union[str, Decimal] = dest_min
         self.path: List[Asset] = path
 
-    @classmethod
-    def type_code(cls) -> xdr.OperationType:
-        return xdr.OperationType.PATH_PAYMENT_STRICT_SEND
-
     def _to_operation_body(self) -> xdr.OperationBody:
         destination = self.destination.to_xdr_object()
         send_asset = self.send_asset.to_xdr_object()
@@ -68,7 +65,7 @@ class PathPaymentStrictSend(Operation):
             path,
         )
         body = xdr.OperationBody(
-            type=self.type_code(),
+            type=self.TYPE_CODE,
             path_payment_strict_send_op=path_payment_strict_send_op,
         )
         return body

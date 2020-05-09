@@ -24,6 +24,7 @@ class Payment(Operation):
         transaction's source account.
 
     """
+    TYPE_CODE = xdr.OperationType.PAYMENT
 
     def __init__(
         self,
@@ -38,16 +39,12 @@ class Payment(Operation):
         self.asset: Asset = asset
         self.amount: Union[str, Decimal] = amount
 
-    @classmethod
-    def type_code(cls) -> xdr.OperationType:
-        return xdr.OperationType.PAYMENT
-
     def _to_operation_body(self) -> xdr.OperationBody:
         asset = self.asset.to_xdr_object()
         destination = self.destination.to_xdr_object()
         amount = xdr.Int64(Operation.to_xdr_amount(self.amount))
         payment_op = xdr.PaymentOp(destination, asset, amount)
-        body = xdr.OperationBody(type=self.type_code(), payment_op=payment_op)
+        body = xdr.OperationBody(type=self.TYPE_CODE, payment_op=payment_op)
         return body
 
     @classmethod

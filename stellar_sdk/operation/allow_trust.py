@@ -47,6 +47,7 @@ class AllowTrust(Operation):
     :param source: The source account (defaults to transaction source).
 
     """
+    TYPE_CODE = xdr.OperationType.ALLOW_TRUST
 
     def __init__(
         self,
@@ -69,10 +70,6 @@ class AllowTrust(Operation):
         else:
             self.authorize: TrustLineEntryFlag = authorize
 
-    @classmethod
-    def type_code(cls) -> xdr.OperationType:
-        return xdr.OperationType.ALLOW_TRUST
-
     def _to_operation_body(self) -> xdr.OperationBody:
         Asset.check_if_asset_code_is_valid(self.asset_code)
         trustor = Keypair.from_public_key(self.trustor).xdr_account_id()
@@ -89,7 +86,7 @@ class AllowTrust(Operation):
             asset_code12 = xdr.AssetCode12(asset_code)
             asset = xdr.AllowTrustOpAsset(type=asset_type, asset_code12=asset_code12)
         allow_trust_op = xdr.AllowTrustOp(trustor, asset, authorize)
-        body = xdr.OperationBody(type=self.type_code(), allow_trust_op=allow_trust_op)
+        body = xdr.OperationBody(type=self.TYPE_CODE, allow_trust_op=allow_trust_op)
         return body
 
     @classmethod

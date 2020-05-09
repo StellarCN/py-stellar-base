@@ -26,6 +26,7 @@ class CreateAccount(Operation):
         transaction's source account.
 
     """
+    TYPE_CODE = xdr.OperationType.CREATE_ACCOUNT
 
     def __init__(
         self,
@@ -39,16 +40,12 @@ class CreateAccount(Operation):
         self.destination: str = destination
         self.starting_balance: Union[str, Decimal] = starting_balance
 
-    @classmethod
-    def type_code(cls) -> xdr.OperationType:
-        return xdr.OperationType.CREATE_ACCOUNT
-
     def _to_operation_body(self):
         destination = Keypair.from_public_key(self.destination).xdr_account_id()
         starting_balance = xdr.Int64(Operation.to_xdr_amount(self.starting_balance))
         create_account_op = xdr.CreateAccountOp(destination, starting_balance)
         body = xdr.OperationBody(
-            type=self.type_code(), create_account_op=create_account_op
+            type=self.TYPE_CODE, create_account_op=create_account_op
         )
         return body
 

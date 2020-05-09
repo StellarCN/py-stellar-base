@@ -27,6 +27,8 @@ class ChangeTrust(Operation):
 
     _DEFAULT_LIMIT = "922337203685.4775807"
 
+    TYPE_CODE = xdr.OperationType.CHANGE_TRUST
+
     def __init__(
         self,
         asset: Asset,
@@ -43,15 +45,11 @@ class ChangeTrust(Operation):
             check_amount(limit)
             self.limit = limit
 
-    @classmethod
-    def type_code(cls) -> xdr.OperationType:
-        return xdr.OperationType.CHANGE_TRUST
-
     def _to_operation_body(self) -> xdr.OperationBody:
         line = self.asset.to_xdr_object()
         limit = xdr.Int64(Operation.to_xdr_amount(self.limit))
         change_trust_op = xdr.ChangeTrustOp(line, limit)
-        body = xdr.OperationBody(type=self.type_code(), change_trust_op=change_trust_op)
+        body = xdr.OperationBody(type=self.TYPE_CODE, change_trust_op=change_trust_op)
         return body
 
     @classmethod

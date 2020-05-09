@@ -20,20 +20,17 @@ class BumpSequence(Operation):
     :param source: The optional source account.
 
     """
+    TYPE_CODE = xdr.OperationType.BUMP_SEQUENCE
 
     def __init__(self, bump_to: int, source: Union[MuxedAccount, str] = None) -> None:
         super().__init__(source)
         self.bump_to: int = bump_to
 
-    @classmethod
-    def type_code(cls) -> xdr.OperationType:
-        return xdr.OperationType.BUMP_SEQUENCE
-
     def _to_operation_body(self) -> xdr.OperationBody:
         sequence = xdr.SequenceNumber(xdr.Int64(self.bump_to))
         bump_sequence_op = xdr.BumpSequenceOp(sequence)
         body = xdr.OperationBody(
-            type=self.type_code(), bump_sequence_op=bump_sequence_op
+            type=self.TYPE_CODE, bump_sequence_op=bump_sequence_op
         )
         return body
 

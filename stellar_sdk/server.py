@@ -472,7 +472,7 @@ class Server:
             OperationType.PATH_PAYMENT_STRICT_SEND.value,
         )
         for index, operation in enumerate(transaction.operations):
-            if operation.type_code() in memo_required_operation_code:
+            if operation.TYPE_CODE in memo_required_operation_code:
                 destination: str = operation.destination.account_id
             else:
                 continue

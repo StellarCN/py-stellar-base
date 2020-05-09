@@ -40,6 +40,7 @@ class CreatePassiveSellOffer(Operation):
     :param source: The source account (defaults to transaction source).
 
     """
+    TYPE_CODE = xdr.OperationType.CREATE_PASSIVE_SELL_OFFER
 
     def __init__(
         self,
@@ -57,10 +58,6 @@ class CreatePassiveSellOffer(Operation):
         self.amount: Union[str, Decimal] = amount
         self.price: Union[Price, str, Decimal] = price
 
-    @classmethod
-    def type_code(cls) -> xdr.OperationType:
-        return xdr.OperationType.CREATE_PASSIVE_SELL_OFFER
-
     def _to_operation_body(self) -> xdr.OperationBody:
         selling = self.selling.to_xdr_object()
         buying = self.buying.to_xdr_object()
@@ -76,7 +73,7 @@ class CreatePassiveSellOffer(Operation):
             selling, buying, amount, price
         )
         body = xdr.OperationBody(
-            type=self.type_code(),
+            type=self.TYPE_CODE,
             create_passive_sell_offer_op=create_passive_sell_offer_op,
         )
         return body

@@ -19,6 +19,7 @@ class AccountMerge(Operation):
     :param source: The source account (defaults to transaction source).
 
     """
+    TYPE_CODE = xdr.OperationType.ACCOUNT_MERGE
 
     def __init__(
         self,
@@ -28,13 +29,9 @@ class AccountMerge(Operation):
         super().__init__(source)
         self.destination: MuxedAccount = parse_mux_account_from_account(destination)
 
-    @classmethod
-    def type_code(cls) -> xdr.OperationType:
-        return xdr.OperationType.ACCOUNT_MERGE
-
     def _to_operation_body(self) -> xdr.OperationBody:
         destination = self.destination.to_xdr_object()
-        body = xdr.OperationBody(type=self.type_code(), destination=destination)
+        body = xdr.OperationBody(type=self.TYPE_CODE, destination=destination)
         return body
 
     @classmethod

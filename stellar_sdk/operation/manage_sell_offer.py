@@ -33,6 +33,7 @@ class ManageSellOffer(Operation):
     :param source: The source account (defaults to transaction source).
 
     """
+    TYPE_CODE = xdr.OperationType.MANAGE_SELL_OFFER
 
     def __init__(
         self,
@@ -52,10 +53,6 @@ class ManageSellOffer(Operation):
         self.price: Union[Price, str, Decimal] = price
         self.offer_id: int = offer_id
 
-    @classmethod
-    def type_code(cls) -> xdr.OperationType:
-        return xdr.OperationType.MANAGE_SELL_OFFER
-
     def _to_operation_body(self) -> xdr.OperationBody:
         selling = self.selling.to_xdr_object()
         buying = self.buying.to_xdr_object()
@@ -71,7 +68,7 @@ class ManageSellOffer(Operation):
             selling, buying, amount, price, xdr.Int64(self.offer_id)
         )
         body = xdr.OperationBody(
-            type=self.type_code(), manage_sell_offer_op=manage_sell_offer_op
+            type=self.TYPE_CODE, manage_sell_offer_op=manage_sell_offer_op
         )
         return body
 

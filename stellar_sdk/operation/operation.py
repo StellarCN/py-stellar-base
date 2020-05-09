@@ -44,10 +44,6 @@ class Operation(metaclass=ABCMeta):
         else:
             self.source: Optional[MuxedAccount] = parse_mux_account_from_account(source)
 
-    @classmethod
-    def type_code(cls) -> stellarxdr.OperationType:
-        pass
-
     @staticmethod
     def to_xdr_amount(value: Union[str, Decimal]) -> int:
         """Converts an amount to the appropriate value to send over the network
@@ -134,7 +130,7 @@ class Operation(metaclass=ABCMeta):
             subclass) instance from.
         """
         for sub_cls in cls.__subclasses__():
-            if sub_cls.type_code() == operation_xdr_object.body.type:
+            if sub_cls.TYPE_CODE == operation_xdr_object.body.type:
                 return sub_cls.from_xdr_object(operation_xdr_object)
         raise NotImplementedError(
             "Operation of type={} is not implemented"

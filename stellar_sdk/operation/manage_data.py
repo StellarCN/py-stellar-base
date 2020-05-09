@@ -25,6 +25,7 @@ class ManageData(Operation):
     :param source: The optional source account.
 
     """
+    TYPE_CODE = xdr.OperationType.MANAGE_DATA
 
     def __init__(
         self,
@@ -42,10 +43,6 @@ class ManageData(Operation):
         if not valid_data_name_len or not valid_data_val_len:
             raise ValueError("Data and value should be <= 64 bytes (ascii encoded).")
 
-    @classmethod
-    def type_code(cls) -> xdr.OperationType:
-        return xdr.OperationType.MANAGE_DATA
-
     def _to_operation_body(self) -> xdr.OperationBody:
         data_name = xdr.String64(bytes(self.data_name, encoding="utf-8"))
 
@@ -60,7 +57,7 @@ class ManageData(Operation):
 
         manage_data_op = xdr.ManageDataOp(data_name, data_value)
 
-        body = xdr.OperationBody(type=self.type_code(), manage_data_op=manage_data_op)
+        body = xdr.OperationBody(type=self.TYPE_CODE, manage_data_op=manage_data_op)
         return body
 
     @classmethod
