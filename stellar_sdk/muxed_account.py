@@ -1,6 +1,6 @@
 from typing import Optional
 
-from .strkey import StrKey, encode_check
+from .strkey import StrKey, encode_check, VersionByte
 from .utils import check_ed25519_public_key
 from .xdr import xdr as stellarxdr
 
@@ -35,7 +35,7 @@ class MuxedAccount:
             ),
         )
         muxed_account_raw_xdr = muxed_account.to_raw_xdr()
-        return encode_check("muxed_account", muxed_account_raw_xdr)
+        return encode_check(VersionByte.MUXED_ACCOUNT, muxed_account_raw_xdr)
 
     @account_id_muxed.setter
     def account_id_muxed(self, value):
