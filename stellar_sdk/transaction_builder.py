@@ -795,18 +795,20 @@ class TransactionBuilder:
             and self.operations == other.operations
             and self.memo == other.memo
             and self.time_bounds == other.time_bounds
+            and self.v1 == self.v1
         )
 
     def __str__(self):
         return (
             "<TransactionBuilder [source_account={source_account}, "
             "network_passphrase={network_passphrase}, base_fee={base_fee}, "
-            "operations={operations}, memo={memo}, time_bounds={time_bounds}]>".format(
+            "operations={operations}, memo={memo}, time_bounds={time_bounds}, v1={v1}]>".format(
                 source_account=self.source_account,
                 network_passphrase=self.network_passphrase,
                 base_fee=self.base_fee,
                 operations=self.operations,
                 memo=self.memo,
                 time_bounds=self.time_bounds,
+                v1=self.v1
             )
         )

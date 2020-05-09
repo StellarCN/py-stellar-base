@@ -16,8 +16,10 @@ class BaseTransactionEnvelope(Generic[T]):
         network_passphrase: str,
         signatures: List[stellarxdr.DecoratedSignature] = None,
     ) -> None:
-        self.network_id: bytes = Network(network_passphrase).network_id()
+        self.network_passphrase: str = network_passphrase
         self.signatures: List[stellarxdr.DecoratedSignature] = signatures or []
+        self._network_id: bytes = Network(network_passphrase).network_id()
+
 
     def hash(self) -> bytes:
         """Get the XDR Hash of the signature base.
@@ -138,13 +140,14 @@ class BaseTransactionEnvelope(Generic[T]):
         if not isinstance(other, self.__class__):
             return NotImplemented  # pragma: no cover
         return (
-            self.network_id == other.network_id and self.signatures == other.signatures
+                self.network_passphrase == other.network_passphrase
+                and self.signatures == other.signatures
         )
 
     def __str__(self):
         return (
-            "<BaseTransactionEnvelope [network_id={network_id} "
+            "<BaseTransactionEnvelope [network_passphrase={network_passphrase} "
             "signatures={signatures}]>".format(
-                network_id=self.network_id, signatures=self.signatures,
+                network_passphrase=self.network_passphrase, signatures=self.signatures,
             )
         )

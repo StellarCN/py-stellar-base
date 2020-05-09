@@ -46,7 +46,7 @@ class FeeBumpTransactionEnvelope(BaseTransactionEnvelope["FeeBumpTransactionEnve
         :return: The signature base of this transaction envelope.
 
         """
-        network_id = self.network_id
+        network_id = self._network_id
         packer = Packer()
         stellarxdr.EnvelopeType.ENVELOPE_TYPE_TX_FEE_BUMP.pack(packer)
         self.transaction.to_xdr_object().pack(packer)
@@ -82,3 +82,22 @@ class FeeBumpTransactionEnvelope(BaseTransactionEnvelope["FeeBumpTransactionEnve
         signatures = te_xdr_object.fee_bump.signatures
         te = cls(tx, network_passphrase=network_passphrase, signatures=signatures)
         return te
+
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, self.__class__):
+            return NotImplemented  # pragma: no cover
+        return (
+            self.transaction == other.transaction
+            and self.network_passphrase == other.network_passphrase
+            and self.signatures == other.signatures
+        )
+
+    def __str__(self):
+        return (
+            "<FeeBumpTransactionEnvelope [transaction={transaction}, network_passphrase={network_passphrase}, "
+            "signatures={signatures}]>".format(
+                transaction=self.transaction,
+                network_passphrase=self.network_passphrase,
+                signatures=self.signatures
+            )
+        )

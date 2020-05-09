@@ -47,7 +47,7 @@ class TransactionEnvelope(BaseTransactionEnvelope["TransactionEnvelope"]):
         :return: The signature base of this transaction envelope.
 
         """
-        network_id = self.network_id
+        network_id = self._network_id
         tx = self.transaction
         if isinstance(self.transaction, Transaction) and not self.transaction.v1:
             tx = Transaction.from_xdr_object(self.transaction.to_xdr_object(), v1=False)
@@ -122,17 +122,17 @@ class TransactionEnvelope(BaseTransactionEnvelope["TransactionEnvelope"]):
         if not isinstance(other, self.__class__):
             return NotImplemented  # pragma: no cover
         return (
-            self.transaction == other.transaction
-            and self.network_id == other.network_id
-            and self.signatures == other.signatures
+                self.transaction == other.transaction
+                and self.network_passphrase == other.network_passphrase
+                and self.signatures == other.signatures
         )
 
     def __str__(self):
         return (
-            "<TransactionEnvelope [transaction={transaction}, network_id={network_id} "
+            "<TransactionEnvelope [transaction={transaction}, network_passphrase={network_passphrase}, "
             "signatures={signatures}]>".format(
                 transaction=self.transaction,
-                network_id=self.network_id,
+                network_passphrase=self.network_passphrase,
                 signatures=self.signatures,
             )
         )

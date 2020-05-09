@@ -26,13 +26,14 @@ _version_bytes = {
     "sha256_hash": binascii.a2b_hex("b8"),
     "muxed_account": binascii.a2b_hex("60"),
 }
+
+
 class VersionBytes(Enum):
     ED25519_PUBLIC_KEY: bytes = binascii.a2b_hex("30")  # G 48 6 << 3
     ED25519_SECRET_SEED: bytes = binascii.a2b_hex("90")  # S 144 18 << 3
     PRE_AUTH_TX: bytes = binascii.a2b_hex("98")  # T 152 19 << 3
     SHA256_HASH: bytes = binascii.a2b_hex("b8")  # X 184 23 << 3
     MUXED_Account: bytes = binascii.a2b_hex("60")  # M 96 12 << 3
-
 
 
 class StrKey:

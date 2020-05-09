@@ -167,7 +167,7 @@ class Server:
             TransactionEnvelope, FeeBumpTransactionEnvelope, str
         ],
     ) -> Tuple[str, Union[Transaction, FeeBumpTransaction]]:
-        if isinstance(transaction_envelope, BaseTransactionEnvelope):
+        if isinstance(transaction_envelope, TransactionEnvelope) or isinstance(transaction_envelope, TransactionEnvelope):
             xdr = transaction_envelope.to_xdr()
             tx = transaction_envelope.transaction
         else:
