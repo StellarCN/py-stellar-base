@@ -1,6 +1,7 @@
 import base64
 import binascii
 import struct
+from enum import Enum
 from typing import Union
 from xdrlib import Packer
 
@@ -19,12 +20,19 @@ __all__ = ["StrKey"]
 
 # TODO: enum
 _version_bytes = {
-    "ed25519_public_key": binascii.a2b_hex("30"),  # G 48 6 << 3
-    "ed25519_secret_seed": binascii.a2b_hex("90"),  # S 144 18 << 3
-    "pre_auth_tx": binascii.a2b_hex("98"),  # T 152 19 << 3
-    "sha256_hash": binascii.a2b_hex("b8"),  # X 184 23 << 3
-    "muxed_account": binascii.a2b_hex("60"),  # M 96 12 << 3
+    "ed25519_public_key": binascii.a2b_hex("30"),
+    "ed25519_secret_seed": binascii.a2b_hex("90"),
+    "pre_auth_tx": binascii.a2b_hex("98"),
+    "sha256_hash": binascii.a2b_hex("b8"),
+    "muxed_account": binascii.a2b_hex("60"),
 }
+class VersionBytes(Enum):
+    ED25519_PUBLIC_KEY: bytes = binascii.a2b_hex("30")  # G 48 6 << 3
+    ED25519_SECRET_SEED: bytes = binascii.a2b_hex("90")  # S 144 18 << 3
+    PRE_AUTH_TX: bytes = binascii.a2b_hex("98")  # T 152 19 << 3
+    SHA256_HASH: bytes = binascii.a2b_hex("b8")  # X 184 23 << 3
+    MUXED_Account: bytes = binascii.a2b_hex("60")  # M 96 12 << 3
+
 
 
 class StrKey:

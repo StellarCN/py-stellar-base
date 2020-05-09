@@ -9,10 +9,10 @@ from ..signer import Signer
 from ..strkey import StrKey
 from ..xdr import xdr
 
-__all__ = ["Flag", "SetOptions"]
+__all__ = ["AuthorizationFlag", "SetOptions"]
 
 
-class Flag(IntFlag):
+class AuthorizationFlag(IntFlag):
     """Indicates which flags to set. For details about the flags,
     please refer to the `accounts doc <https://www.stellar.org/developers/guides/concepts/accounts.html>`_.
     The bit mask integer adds onto the existing flags of the account.
@@ -72,8 +72,8 @@ class SetOptions(Operation):
     def __init__(
         self,
         inflation_dest: str = None,
-        clear_flags: Union[int, Flag] = None,
-        set_flags: Union[int, Flag] = None,
+        clear_flags: Union[int, AuthorizationFlag] = None,
+        set_flags: Union[int, AuthorizationFlag] = None,
         master_weight: int = None,
         low_threshold: int = None,
         med_threshold: int = None,
@@ -86,10 +86,10 @@ class SetOptions(Operation):
         if inflation_dest is not None:
             check_ed25519_public_key(inflation_dest)
 
-        if isinstance(set_flags, Flag):
+        if isinstance(set_flags, AuthorizationFlag):
             set_flags = set_flags.value
 
-        if isinstance(clear_flags, Flag):
+        if isinstance(clear_flags, AuthorizationFlag):
             clear_flags = clear_flags.value
 
         self.inflation_dest: str = inflation_dest

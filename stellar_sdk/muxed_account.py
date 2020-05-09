@@ -1,5 +1,4 @@
 from typing import Optional
-from xdrlib import Packer
 
 from .strkey import StrKey, encode_check
 from .utils import check_ed25519_public_key

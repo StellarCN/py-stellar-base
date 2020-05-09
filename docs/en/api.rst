@@ -428,7 +428,7 @@ SetOptions
 .. autoclass:: stellar_sdk.operation.SetOptions
    :members: to_xdr_object, from_xdr_object
 
-.. autoclass:: stellar_sdk.operation.set_options.Flag
+.. autoclass:: stellar_sdk.operation.set_options.AuthorizationFlag
    :members:
 
 Price

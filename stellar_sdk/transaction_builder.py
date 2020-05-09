@@ -518,8 +518,8 @@ class TransactionBuilder:
     def append_set_options_op(
         self,
         inflation_dest: str = None,
-        clear_flags: Union[int, Flag] = None,
-        set_flags: Union[int, Flag] = None,
+        clear_flags: Union[int, AuthorizationFlag] = None,
+        set_flags: Union[int, AuthorizationFlag] = None,
         master_weight: int = None,
         low_threshold: int = None,
         med_threshold: int = None,
