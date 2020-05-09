@@ -35,10 +35,8 @@ class MuxedAccount:
                 StrKey.decode_ed25519_public_key(self.account_id)
             ),
         )
-        packer = Packer()
-        muxed_account.pack(packer)
-        data = packer.get_buffer()
-        return encode_check("muxed_account", data)
+        muxed_account_raw_xdr = muxed_account.to_raw_xdr()
+        return encode_check("muxed_account", muxed_account_raw_xdr)
 
     @account_id_muxed.setter
     def account_id_muxed(self, value):
