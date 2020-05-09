@@ -3,8 +3,8 @@ from typing import Generic, TypeVar, Callable
 
 from pydantic import ValidationError
 
-from ..call_builder import base_call_builder
 from ..__version__ import __issues__
+from ..call_builder import base_call_builder
 from ..client.response import Response
 from ..exceptions import ParseResponseError, NotPageableError
 from ..response.rate_limit_info import RateLimitInfo

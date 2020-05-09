@@ -1,4 +1,4 @@
-from typing import Union, TypeVar, List, AsyncGenerator, Generator
+from typing import Union, TypeVar, AsyncGenerator, Generator
 
 from ..asset import Asset
 from ..call_builder.base_call_builder import BaseCallBuilder

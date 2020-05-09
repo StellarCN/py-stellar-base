@@ -1,4 +1,4 @@
-from typing import Union, Dict
+from typing import Dict
 
 import requests
 from requests import RequestException

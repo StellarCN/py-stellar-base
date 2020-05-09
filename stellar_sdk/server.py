@@ -1,6 +1,5 @@
-from typing import Union, Coroutine, Any, Dict, List, Tuple, Generator
+from typing import Union, Coroutine, Any, List, Tuple, Generator
 
-from stellar_sdk.base_transaction_envelope import BaseTransactionEnvelope
 from .account import Account, Thresholds
 from .asset import Asset
 from .call_builder.accounts_call_builder import AccountsCallBuilder
@@ -30,6 +29,7 @@ from .fee_bump_transaction_envelope import FeeBumpTransactionEnvelope
 from .helpers import parse_transaction_envelope_from_xdr
 from .keypair import Keypair
 from .memo import NoneMemo
+from .muxed_account import MuxedAccount
 from .response.account_response import AccountResponse
 from .response.asset_response import AssetResponse
 from .response.data_response import DataResponse
@@ -47,7 +47,6 @@ from .response.trade_response import TradeResponse
 from .response.trades_aggregation_response import TradesAggregationResponse
 from .response.transaction_response import TransactionResponse
 from .response.wrapped_response import WrappedResponse
-from .muxed_account import MuxedAccount
 from .sep.exceptions import AccountRequiresMemoError
 from .transaction import Transaction
 from .transaction_envelope import TransactionEnvelope

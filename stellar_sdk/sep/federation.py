@@ -9,7 +9,6 @@ Version 1.1.0
 """
 from typing import Optional, Union, Coroutine, Any
 
-from ..exceptions import ValueError
 from .exceptions import (
     InvalidFederationAddress,
     FederationServerNotFoundError,
@@ -20,6 +19,7 @@ from ..client.base_async_client import BaseAsyncClient
 from ..client.base_sync_client import BaseSyncClient
 from ..client.requests_client import RequestsClient
 from ..client.response import Response
+from ..exceptions import ValueError
 
 SEPARATOR = "*"
 FEDERATION_SERVER_KEY = "FEDERATION_SERVER"
