@@ -85,7 +85,7 @@ class Server:
 
     def submit_transaction(
         self,
-        transaction_envelope: Union[TransactionEnvelope, str],
+        transaction_envelope: Union[TransactionEnvelope, FeeBumpTransactionEnvelope, str],
         skip_memo_required_check: bool = False,
     ) -> Union[Dict[str, Any], Coroutine[Any, Any, Dict[str, Any]]]:
         """Submits a transaction to the network.
@@ -111,7 +111,7 @@ class Server:
 
     def __submit_transaction_sync(
         self,
-        transaction_envelope: Union[TransactionEnvelope, str],
+        transaction_envelope: Union[TransactionEnvelope, FeeBumpTransactionEnvelope, str],
         skip_memo_required_check: bool,
     ) -> Dict[str, Any]:
         url = urljoin_with_query(self.horizon_url, "transactions")
@@ -127,7 +127,7 @@ class Server:
 
     async def __submit_transaction_async(
         self,
-        transaction_envelope: Union[TransactionEnvelope, str],
+        transaction_envelope: Union[TransactionEnvelope, FeeBumpTransactionEnvelope, str],
         skip_memo_required_check: bool,
     ) -> Dict[str, Any]:
         url = urljoin_with_query(self.horizon_url, "transactions")
