@@ -1,6 +1,14 @@
 Release History
 ===============
 
+### Version 2.4.1
+
+Released on May 10, 2020
+
+- fix type hint for `stellar_sdk.Server.submit_transaction()`.
+- fix broken links in examples.
+
+
 ### Version 2.4.0
 
 Released on May 05, 2020
