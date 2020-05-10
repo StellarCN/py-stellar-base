@@ -24,6 +24,7 @@ class Payment(Operation):
         transaction's source account.
 
     """
+
     TYPE_CODE = xdr.OperationType.PAYMENT
 
     def __init__(

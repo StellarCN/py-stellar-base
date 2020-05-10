@@ -122,9 +122,9 @@ class TransactionEnvelope(BaseTransactionEnvelope["TransactionEnvelope"]):
         if not isinstance(other, self.__class__):
             return NotImplemented  # pragma: no cover
         return (
-                self.transaction == other.transaction
-                and self.network_passphrase == other.network_passphrase
-                and self.signatures == other.signatures
+            self.transaction == other.transaction
+            and self.network_passphrase == other.network_passphrase
+            and self.signatures == other.signatures
         )
 
     def __str__(self):

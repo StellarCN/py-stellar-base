@@ -16,6 +16,7 @@ class Inflation(Operation):
     :param str source: The source account (defaults to transaction source).
 
     """
+
     TYPE_CODE = xdr.OperationType.INFLATION
 
     def __init__(self, source: Union[MuxedAccount, str] = None) -> None:

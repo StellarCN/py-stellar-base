@@ -98,6 +98,6 @@ class FeeBumpTransactionEnvelope(BaseTransactionEnvelope["FeeBumpTransactionEnve
             "signatures={signatures}]>".format(
                 transaction=self.transaction,
                 network_passphrase=self.network_passphrase,
-                signatures=self.signatures
+                signatures=self.signatures,
             )
         )

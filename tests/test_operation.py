@@ -844,7 +844,8 @@ class TestSetOptions:
             ),
             (
                 "GDGU5OAPHNPU5UCLE5RDJHG7PXZFQYWKCFOEXSXNMR6KRQRI5T6XXCD7",
-                AuthorizationFlag.AUTHORIZATION_REVOCABLE | AuthorizationFlag.AUTHORIZATION_IMMUTABLE,
+                AuthorizationFlag.AUTHORIZATION_REVOCABLE
+                | AuthorizationFlag.AUTHORIZATION_IMMUTABLE,
                 AuthorizationFlag.AUTHORIZATION_REQUIRED,
                 0,
                 1,

@@ -120,10 +120,12 @@ class TrustlineDeauthorizedEffectResponse(BaseEffectResponse):
     asset_type: str
     asset_code: str
 
+
 class TrustlineAuthorizedToMaintainLiabilitiesEffectResponse(BaseEffectResponse):
     trustor: str
     asset_type: str
     asset_code: str
+
 
 class TradeEffectResponse(BaseEffectResponse):
     seller: str

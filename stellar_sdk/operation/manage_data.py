@@ -25,6 +25,7 @@ class ManageData(Operation):
     :param source: The optional source account.
 
     """
+
     TYPE_CODE = xdr.OperationType.MANAGE_DATA
 
     def __init__(

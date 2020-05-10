@@ -132,6 +132,6 @@ class FeeBumpTransaction:
             "inner_transaction_envelope={inner_transaction_envelope}]>".format(
                 fee_source=self.fee_source,
                 base_fee=self.base_fee,
-                inner_transaction_envelope=self.inner_transaction_envelope
+                inner_transaction_envelope=self.inner_transaction_envelope,
             )
         )

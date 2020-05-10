@@ -33,6 +33,7 @@ class ManageBuyOffer(Operation):
     :param source: The source account (defaults to transaction source).
 
     """
+
     TYPE_CODE = xdr.OperationType.MANAGE_BUY_OFFER
 
     def __init__(

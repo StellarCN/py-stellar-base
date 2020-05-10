@@ -31,5 +31,5 @@ __all__ = [
     "Payment",
     "SetOptions",
     "TrustLineEntryFlag",
-    "AuthorizationFlag"
+    "AuthorizationFlag",
 ]

@@ -28,6 +28,7 @@ class PathPaymentStrictSend(Operation):
     :param source: The source account for the payment. Defaults to the
         transaction's source account.
     """
+
     TYPE_CODE = xdr.OperationType.PATH_PAYMENT_STRICT_SEND
 
     def __init__(

@@ -47,6 +47,7 @@ class AllowTrust(Operation):
     :param source: The source account (defaults to transaction source).
 
     """
+
     TYPE_CODE = xdr.OperationType.ALLOW_TRUST
 
     def __init__(

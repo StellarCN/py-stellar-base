@@ -40,6 +40,7 @@ class CreatePassiveSellOffer(Operation):
     :param source: The source account (defaults to transaction source).
 
     """
+
     TYPE_CODE = xdr.OperationType.CREATE_PASSIVE_SELL_OFFER
 
     def __init__(

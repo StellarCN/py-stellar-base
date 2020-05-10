@@ -68,6 +68,7 @@ class SetOptions(Operation):
     :param source: The source account (defaults to transaction source).
 
     """
+
     TYPE_CODE = xdr.OperationType.SET_OPTIONS
 
     def __init__(

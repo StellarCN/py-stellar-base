@@ -26,6 +26,7 @@ class CreateAccount(Operation):
         transaction's source account.
 
     """
+
     TYPE_CODE = xdr.OperationType.CREATE_ACCOUNT
 
     def __init__(

@@ -809,6 +809,6 @@ class TransactionBuilder:
                 operations=self.operations,
                 memo=self.memo,
                 time_bounds=self.time_bounds,
-                v1=self.v1
+                v1=self.v1,
             )
         )

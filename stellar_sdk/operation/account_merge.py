@@ -19,6 +19,7 @@ class AccountMerge(Operation):
     :param source: The source account (defaults to transaction source).
 
     """
+
     TYPE_CODE = xdr.OperationType.ACCOUNT_MERGE
 
     def __init__(
