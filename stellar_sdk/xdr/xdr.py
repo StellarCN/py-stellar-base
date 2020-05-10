@@ -1,4 +1,4 @@
-# Automatically generated on 2020-05-09T09:52:54+08:00
+# Automatically generated on 2020-05-10T11:20:32+08:00
 # DO NOT EDIT or your changes may be overwritten
 import base64
 from enum import IntEnum
@@ -19,7 +19,7 @@ class Value:
     """
 
     def __init__(self, value: bytes) -> None:
-        self.value = value
+        self.value: bytes = value
 
     def pack(self, packer: Packer) -> None:
         Opaque(self.value, 4294967295, False).pack(packer)
@@ -70,8 +70,8 @@ class SCPBallot:
     """
 
     def __init__(self, counter: "Uint32", value: "Value") -> None:
-        self.counter = counter
-        self.value = value
+        self.counter: "Uint32" = counter
+        self.value: "Value" = value
 
     def pack(self, packer: Packer) -> None:
         self.counter.pack(packer)
@@ -81,7 +81,7 @@ class SCPBallot:
     def unpack(cls, unpacker: Unpacker) -> "SCPBallot":
         counter = Uint32.unpack(unpacker)
         value = Value.unpack(unpacker)
-        return cls(counter=counter, value=value)
+        return cls(counter=counter, value=value,)
 
     def to_raw_xdr(self) -> bytes:
         packer = Packer()
@@ -182,11 +182,11 @@ class SCPNomination:
     """
 
     def __init__(
-        self, quorum_set_hash: "Hash", votes: List["Value"], accepted: List["Value"],
+        self, quorum_set_hash: "Hash", votes: List["Value"], accepted: List["Value"]
     ) -> None:
-        self.quorum_set_hash = quorum_set_hash
-        self.votes = votes
-        self.accepted = accepted
+        self.quorum_set_hash: "Hash" = quorum_set_hash
+        self.votes: List["Value"] = votes
+        self.accepted: List["Value"] = accepted
 
     def pack(self, packer: Packer) -> None:
         self.quorum_set_hash.pack(packer)
@@ -208,7 +208,7 @@ class SCPNomination:
         accepted = []
         for _ in range(length):
             accepted.append(Value.unpack(unpacker))
-        return cls(quorum_set_hash=quorum_set_hash, votes=votes, accepted=accepted)
+        return cls(quorum_set_hash=quorum_set_hash, votes=votes, accepted=accepted,)
 
     def to_raw_xdr(self) -> bytes:
         packer = Packer()
@@ -272,12 +272,12 @@ class SCPStatementPrepare:
         n_c: "Uint32",
         n_h: "Uint32",
     ) -> None:
-        self.quorum_set_hash = quorum_set_hash
-        self.ballot = ballot
-        self.prepared = prepared
-        self.prepared_prime = prepared_prime
-        self.n_c = n_c
-        self.n_h = n_h
+        self.quorum_set_hash: "Hash" = quorum_set_hash
+        self.ballot: "SCPBallot" = ballot
+        self.prepared: Optional["SCPBallot"] = prepared
+        self.prepared_prime: Optional["SCPBallot"] = prepared_prime
+        self.n_c: "Uint32" = n_c
+        self.n_h: "Uint32" = n_h
 
     def pack(self, packer: Packer) -> None:
         self.quorum_set_hash.pack(packer)
@@ -378,11 +378,11 @@ class SCPStatementConfirm:
         n_h: "Uint32",
         quorum_set_hash: "Hash",
     ) -> None:
-        self.ballot = ballot
-        self.n_prepared = n_prepared
-        self.n_commit = n_commit
-        self.n_h = n_h
-        self.quorum_set_hash = quorum_set_hash
+        self.ballot: "SCPBallot" = ballot
+        self.n_prepared: "Uint32" = n_prepared
+        self.n_commit: "Uint32" = n_commit
+        self.n_h: "Uint32" = n_h
+        self.quorum_set_hash: "Hash" = quorum_set_hash
 
     def pack(self, packer: Packer) -> None:
         self.ballot.pack(packer)
@@ -461,11 +461,11 @@ class SCPStatementExternalize:
     """
 
     def __init__(
-        self, commit: "SCPBallot", n_h: "Uint32", commit_quorum_set_hash: "Hash",
+        self, commit: "SCPBallot", n_h: "Uint32", commit_quorum_set_hash: "Hash"
     ) -> None:
-        self.commit = commit
-        self.n_h = n_h
-        self.commit_quorum_set_hash = commit_quorum_set_hash
+        self.commit: "SCPBallot" = commit
+        self.n_h: "Uint32" = n_h
+        self.commit_quorum_set_hash: "Hash" = commit_quorum_set_hash
 
     def pack(self, packer: Packer) -> None:
         self.commit.pack(packer)
@@ -564,7 +564,7 @@ class SCPStatementPledges:
         externalize: "SCPStatementExternalize" = None,
         nominate: "SCPNomination" = None,
     ) -> None:
-        self.type = type
+        self.type: "SCPStatementType" = type
         self.prepare: "SCPStatementPrepare" = prepare
         self.confirm: "SCPStatementConfirm" = confirm
         self.externalize: "SCPStatementExternalize" = externalize
@@ -689,11 +689,11 @@ class SCPStatement:
     """
 
     def __init__(
-        self, node_id: "NodeID", slot_index: "Uint64", pledges: "SCPStatementPledges",
+        self, node_id: "NodeID", slot_index: "Uint64", pledges: "SCPStatementPledges"
     ) -> None:
-        self.node_id = node_id
-        self.slot_index = slot_index
-        self.pledges = pledges
+        self.node_id: "NodeID" = node_id
+        self.slot_index: "Uint64" = slot_index
+        self.pledges: "SCPStatementPledges" = pledges
 
     def pack(self, packer: Packer) -> None:
         self.node_id.pack(packer)
@@ -705,7 +705,7 @@ class SCPStatement:
         node_id = NodeID.unpack(unpacker)
         slot_index = Uint64.unpack(unpacker)
         pledges = SCPStatementPledges.unpack(unpacker)
-        return cls(node_id=node_id, slot_index=slot_index, pledges=pledges)
+        return cls(node_id=node_id, slot_index=slot_index, pledges=pledges,)
 
     def to_raw_xdr(self) -> bytes:
         packer = Packer()
@@ -757,8 +757,8 @@ class SCPEnvelope:
     """
 
     def __init__(self, statement: "SCPStatement", signature: "Signature") -> None:
-        self.statement = statement
-        self.signature = signature
+        self.statement: "SCPStatement" = statement
+        self.signature: "Signature" = signature
 
     def pack(self, packer: Packer) -> None:
         self.statement.pack(packer)
@@ -768,7 +768,7 @@ class SCPEnvelope:
     def unpack(cls, unpacker: Unpacker) -> "SCPEnvelope":
         statement = SCPStatement.unpack(unpacker)
         signature = Signature.unpack(unpacker)
-        return cls(statement=statement, signature=signature)
+        return cls(statement=statement, signature=signature,)
 
     def to_raw_xdr(self) -> bytes:
         packer = Packer()
@@ -821,9 +821,9 @@ class SCPQuorumSet:
         validators: List["PublicKey"],
         inner_sets: List["SCPQuorumSet"],
     ) -> None:
-        self.threshold = threshold
-        self.validators = validators
-        self.inner_sets = inner_sets
+        self.threshold: "Uint32" = threshold
+        self.validators: List["PublicKey"] = validators
+        self.inner_sets: List["SCPQuorumSet"] = inner_sets
 
     def pack(self, packer: Packer) -> None:
         self.threshold.pack(packer)
@@ -845,7 +845,7 @@ class SCPQuorumSet:
         inner_sets = []
         for _ in range(length):
             inner_sets.append(SCPQuorumSet.unpack(unpacker))
-        return cls(threshold=threshold, validators=validators, inner_sets=inner_sets)
+        return cls(threshold=threshold, validators=validators, inner_sets=inner_sets,)
 
     def to_raw_xdr(self) -> bytes:
         packer = Packer()
@@ -893,7 +893,7 @@ class UpgradeType:
     """
 
     def __init__(self, upgrade_type: bytes) -> None:
-        self.upgrade_type = upgrade_type
+        self.upgrade_type: bytes = upgrade_type
 
     def pack(self, packer: Packer) -> None:
         Opaque(self.upgrade_type, 128, False).pack(packer)
@@ -993,8 +993,8 @@ class LedgerCloseValueSignature:
     """
 
     def __init__(self, node_id: "NodeID", signature: "Signature") -> None:
-        self.node_id = node_id
-        self.signature = signature
+        self.node_id: "NodeID" = node_id
+        self.signature: "Signature" = signature
 
     def pack(self, packer: Packer) -> None:
         self.node_id.pack(packer)
@@ -1004,7 +1004,7 @@ class LedgerCloseValueSignature:
     def unpack(cls, unpacker: Unpacker) -> "LedgerCloseValueSignature":
         node_id = NodeID.unpack(unpacker)
         signature = Signature.unpack(unpacker)
-        return cls(node_id=node_id, signature=signature)
+        return cls(node_id=node_id, signature=signature,)
 
     def to_raw_xdr(self) -> bytes:
         packer = Packer()
@@ -1057,7 +1057,7 @@ class StellarValueExt:
         v: "StellarValueType",
         lc_value_signature: "LedgerCloseValueSignature" = None,
     ) -> None:
-        self.v = v
+        self.v: "StellarValueType" = v
         self.lc_value_signature: "LedgerCloseValueSignature" = lc_value_signature
 
     def pack(self, packer: Packer) -> None:
@@ -1146,10 +1146,10 @@ class StellarValue:
         upgrades: List["UpgradeType"],
         ext: "StellarValueExt",
     ) -> None:
-        self.tx_set_hash = tx_set_hash
-        self.close_time = close_time
-        self.upgrades = upgrades
-        self.ext = ext
+        self.tx_set_hash: "Hash" = tx_set_hash
+        self.close_time: "TimePoint" = close_time
+        self.upgrades: List["UpgradeType"] = upgrades
+        self.ext: "StellarValueExt" = ext
 
     def pack(self, packer: Packer) -> None:
         self.tx_set_hash.pack(packer)
@@ -1224,7 +1224,7 @@ class LedgerHeaderExt:
     """
 
     def __init__(self, v: int) -> None:
-        self.v = v
+        self.v: int = v
 
     def pack(self, packer: Packer) -> None:
         Integer(self.v).pack(packer)
@@ -1329,21 +1329,21 @@ class LedgerHeader:
         skip_list: List["Hash"],
         ext: "LedgerHeaderExt",
     ) -> None:
-        self.ledger_version = ledger_version
-        self.previous_ledger_hash = previous_ledger_hash
-        self.scp_value = scp_value
-        self.tx_set_result_hash = tx_set_result_hash
-        self.bucket_list_hash = bucket_list_hash
-        self.ledger_seq = ledger_seq
-        self.total_coins = total_coins
-        self.fee_pool = fee_pool
-        self.inflation_seq = inflation_seq
-        self.id_pool = id_pool
-        self.base_fee = base_fee
-        self.base_reserve = base_reserve
-        self.max_tx_set_size = max_tx_set_size
-        self.skip_list = skip_list
-        self.ext = ext
+        self.ledger_version: "Uint32" = ledger_version
+        self.previous_ledger_hash: "Hash" = previous_ledger_hash
+        self.scp_value: "StellarValue" = scp_value
+        self.tx_set_result_hash: "Hash" = tx_set_result_hash
+        self.bucket_list_hash: "Hash" = bucket_list_hash
+        self.ledger_seq: "Uint32" = ledger_seq
+        self.total_coins: "Int64" = total_coins
+        self.fee_pool: "Int64" = fee_pool
+        self.inflation_seq: "Uint32" = inflation_seq
+        self.id_pool: "Uint64" = id_pool
+        self.base_fee: "Uint32" = base_fee
+        self.base_reserve: "Uint32" = base_reserve
+        self.max_tx_set_size: "Uint32" = max_tx_set_size
+        self.skip_list: List["Hash"] = skip_list
+        self.ext: "LedgerHeaderExt" = ext
 
     def pack(self, packer: Packer) -> None:
         self.ledger_version.pack(packer)
@@ -1542,7 +1542,7 @@ class LedgerUpgrade:
         new_max_tx_set_size: "Uint32" = None,
         new_base_reserve: "Uint32" = None,
     ) -> None:
-        self.type = type
+        self.type: "LedgerUpgradeType" = type
         self.new_ledger_version: "Uint32" = new_ledger_version
         self.new_base_fee: "Uint32" = new_base_fee
         self.new_max_tx_set_size: "Uint32" = new_max_tx_set_size
@@ -1639,7 +1639,7 @@ class LedgerKeyAccount:
     """
 
     def __init__(self, account_id: "AccountID") -> None:
-        self.account_id = account_id
+        self.account_id: "AccountID" = account_id
 
     def pack(self, packer: Packer) -> None:
         self.account_id.pack(packer)
@@ -1647,7 +1647,7 @@ class LedgerKeyAccount:
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "LedgerKeyAccount":
         account_id = AccountID.unpack(unpacker)
-        return cls(account_id=account_id)
+        return cls(account_id=account_id,)
 
     def to_raw_xdr(self) -> bytes:
         packer = Packer()
@@ -1693,8 +1693,8 @@ class LedgerKeyTrustLine:
     """
 
     def __init__(self, account_id: "AccountID", asset: "Asset") -> None:
-        self.account_id = account_id
-        self.asset = asset
+        self.account_id: "AccountID" = account_id
+        self.asset: "Asset" = asset
 
     def pack(self, packer: Packer) -> None:
         self.account_id.pack(packer)
@@ -1704,7 +1704,7 @@ class LedgerKeyTrustLine:
     def unpack(cls, unpacker: Unpacker) -> "LedgerKeyTrustLine":
         account_id = AccountID.unpack(unpacker)
         asset = Asset.unpack(unpacker)
-        return cls(account_id=account_id, asset=asset)
+        return cls(account_id=account_id, asset=asset,)
 
     def to_raw_xdr(self) -> bytes:
         packer = Packer()
@@ -1751,8 +1751,8 @@ class LedgerKeyOffer:
     """
 
     def __init__(self, seller_id: "AccountID", offer_id: "Int64") -> None:
-        self.seller_id = seller_id
-        self.offer_id = offer_id
+        self.seller_id: "AccountID" = seller_id
+        self.offer_id: "Int64" = offer_id
 
     def pack(self, packer: Packer) -> None:
         self.seller_id.pack(packer)
@@ -1762,7 +1762,7 @@ class LedgerKeyOffer:
     def unpack(cls, unpacker: Unpacker) -> "LedgerKeyOffer":
         seller_id = AccountID.unpack(unpacker)
         offer_id = Int64.unpack(unpacker)
-        return cls(seller_id=seller_id, offer_id=offer_id)
+        return cls(seller_id=seller_id, offer_id=offer_id,)
 
     def to_raw_xdr(self) -> bytes:
         packer = Packer()
@@ -1809,8 +1809,8 @@ class LedgerKeyData:
     """
 
     def __init__(self, account_id: "AccountID", data_name: "String64") -> None:
-        self.account_id = account_id
-        self.data_name = data_name
+        self.account_id: "AccountID" = account_id
+        self.data_name: "String64" = data_name
 
     def pack(self, packer: Packer) -> None:
         self.account_id.pack(packer)
@@ -1820,7 +1820,7 @@ class LedgerKeyData:
     def unpack(cls, unpacker: Unpacker) -> "LedgerKeyData":
         account_id = AccountID.unpack(unpacker)
         data_name = String64.unpack(unpacker)
-        return cls(account_id=account_id, data_name=data_name)
+        return cls(account_id=account_id, data_name=data_name,)
 
     def to_raw_xdr(self) -> bytes:
         packer = Packer()
@@ -1898,7 +1898,7 @@ class LedgerKey:
         offer: "LedgerKeyOffer" = None,
         data: "LedgerKeyData" = None,
     ) -> None:
-        self.type = type
+        self.type: "LedgerEntryType" = type
         self.account: "LedgerKeyAccount" = account
         self.trust_line: "LedgerKeyTrustLine" = trust_line
         self.offer: "LedgerKeyOffer" = offer
@@ -2045,7 +2045,7 @@ class BucketMetadataExt:
     """
 
     def __init__(self, v: int) -> None:
-        self.v = v
+        self.v: int = v
 
     def pack(self, packer: Packer) -> None:
         Integer(self.v).pack(packer)
@@ -2109,8 +2109,8 @@ class BucketMetadata:
     """
 
     def __init__(self, ledger_version: "Uint32", ext: "BucketMetadataExt") -> None:
-        self.ledger_version = ledger_version
-        self.ext = ext
+        self.ledger_version: "Uint32" = ledger_version
+        self.ext: "BucketMetadataExt" = ext
 
     def pack(self, packer: Packer) -> None:
         self.ledger_version.pack(packer)
@@ -2120,7 +2120,7 @@ class BucketMetadata:
     def unpack(cls, unpacker: Unpacker) -> "BucketMetadata":
         ledger_version = Uint32.unpack(unpacker)
         ext = BucketMetadataExt.unpack(unpacker)
-        return cls(ledger_version=ledger_version, ext=ext)
+        return cls(ledger_version=ledger_version, ext=ext,)
 
     def to_raw_xdr(self) -> bytes:
         packer = Packer()
@@ -2179,7 +2179,7 @@ class BucketEntry:
         dead_entry: "LedgerKey" = None,
         meta_entry: "BucketMetadata" = None,
     ) -> None:
-        self.type = type
+        self.type: "BucketEntryType" = type
         self.live_entry: "LedgerEntry" = live_entry
         self.dead_entry: "LedgerKey" = dead_entry
         self.meta_entry: "BucketMetadata" = meta_entry
@@ -2268,10 +2268,10 @@ class TransactionSet:
     """
 
     def __init__(
-        self, previous_ledger_hash: "Hash", txs: List["TransactionEnvelope"],
+        self, previous_ledger_hash: "Hash", txs: List["TransactionEnvelope"]
     ) -> None:
-        self.previous_ledger_hash = previous_ledger_hash
-        self.txs = txs
+        self.previous_ledger_hash: "Hash" = previous_ledger_hash
+        self.txs: List["TransactionEnvelope"] = txs
 
     def pack(self, packer: Packer) -> None:
         self.previous_ledger_hash.pack(packer)
@@ -2286,7 +2286,7 @@ class TransactionSet:
         txs = []
         for _ in range(length):
             txs.append(TransactionEnvelope.unpack(unpacker))
-        return cls(previous_ledger_hash=previous_ledger_hash, txs=txs)
+        return cls(previous_ledger_hash=previous_ledger_hash, txs=txs,)
 
     def to_raw_xdr(self) -> bytes:
         packer = Packer()
@@ -2336,8 +2336,8 @@ class TransactionResultPair:
     """
 
     def __init__(self, transaction_hash: "Hash", result: "TransactionResult") -> None:
-        self.transaction_hash = transaction_hash
-        self.result = result
+        self.transaction_hash: "Hash" = transaction_hash
+        self.result: "TransactionResult" = result
 
     def pack(self, packer: Packer) -> None:
         self.transaction_hash.pack(packer)
@@ -2347,7 +2347,7 @@ class TransactionResultPair:
     def unpack(cls, unpacker: Unpacker) -> "TransactionResultPair":
         transaction_hash = Hash.unpack(unpacker)
         result = TransactionResult.unpack(unpacker)
-        return cls(transaction_hash=transaction_hash, result=result)
+        return cls(transaction_hash=transaction_hash, result=result,)
 
     def to_raw_xdr(self) -> bytes:
         packer = Packer()
@@ -2396,7 +2396,7 @@ class TransactionResultSet:
     """
 
     def __init__(self, results: List["TransactionResultPair"]) -> None:
-        self.results = results
+        self.results: List["TransactionResultPair"] = results
 
     def pack(self, packer: Packer) -> None:
         packer.pack_uint(len(self.results))
@@ -2409,7 +2409,7 @@ class TransactionResultSet:
         results = []
         for _ in range(length):
             results.append(TransactionResultPair.unpack(unpacker))
-        return cls(results=results)
+        return cls(results=results,)
 
     def to_raw_xdr(self) -> bytes:
         packer = Packer()
@@ -2455,7 +2455,7 @@ class TransactionHistoryEntryExt:
     """
 
     def __init__(self, v: int) -> None:
-        self.v = v
+        self.v: int = v
 
     def pack(self, packer: Packer) -> None:
         Integer(self.v).pack(packer)
@@ -2524,9 +2524,9 @@ class TransactionHistoryEntry:
         tx_set: "TransactionSet",
         ext: "TransactionHistoryEntryExt",
     ) -> None:
-        self.ledger_seq = ledger_seq
-        self.tx_set = tx_set
-        self.ext = ext
+        self.ledger_seq: "Uint32" = ledger_seq
+        self.tx_set: "TransactionSet" = tx_set
+        self.ext: "TransactionHistoryEntryExt" = ext
 
     def pack(self, packer: Packer) -> None:
         self.ledger_seq.pack(packer)
@@ -2538,7 +2538,7 @@ class TransactionHistoryEntry:
         ledger_seq = Uint32.unpack(unpacker)
         tx_set = TransactionSet.unpack(unpacker)
         ext = TransactionHistoryEntryExt.unpack(unpacker)
-        return cls(ledger_seq=ledger_seq, tx_set=tx_set, ext=ext)
+        return cls(ledger_seq=ledger_seq, tx_set=tx_set, ext=ext,)
 
     def to_raw_xdr(self) -> bytes:
         packer = Packer()
@@ -2590,7 +2590,7 @@ class TransactionHistoryResultEntryExt:
     """
 
     def __init__(self, v: int) -> None:
-        self.v = v
+        self.v: int = v
 
     def pack(self, packer: Packer) -> None:
         Integer(self.v).pack(packer)
@@ -2659,9 +2659,9 @@ class TransactionHistoryResultEntry:
         tx_result_set: "TransactionResultSet",
         ext: "TransactionHistoryResultEntryExt",
     ) -> None:
-        self.ledger_seq = ledger_seq
-        self.tx_result_set = tx_result_set
-        self.ext = ext
+        self.ledger_seq: "Uint32" = ledger_seq
+        self.tx_result_set: "TransactionResultSet" = tx_result_set
+        self.ext: "TransactionHistoryResultEntryExt" = ext
 
     def pack(self, packer: Packer) -> None:
         self.ledger_seq.pack(packer)
@@ -2673,7 +2673,7 @@ class TransactionHistoryResultEntry:
         ledger_seq = Uint32.unpack(unpacker)
         tx_result_set = TransactionResultSet.unpack(unpacker)
         ext = TransactionHistoryResultEntryExt.unpack(unpacker)
-        return cls(ledger_seq=ledger_seq, tx_result_set=tx_result_set, ext=ext)
+        return cls(ledger_seq=ledger_seq, tx_result_set=tx_result_set, ext=ext,)
 
     def to_raw_xdr(self) -> bytes:
         packer = Packer()
@@ -2725,7 +2725,7 @@ class LedgerHeaderHistoryEntryExt:
     """
 
     def __init__(self, v: int) -> None:
-        self.v = v
+        self.v: int = v
 
     def pack(self, packer: Packer) -> None:
         Integer(self.v).pack(packer)
@@ -2789,11 +2789,11 @@ class LedgerHeaderHistoryEntry:
     """
 
     def __init__(
-        self, hash: "Hash", header: "LedgerHeader", ext: "LedgerHeaderHistoryEntryExt",
+        self, hash: "Hash", header: "LedgerHeader", ext: "LedgerHeaderHistoryEntryExt"
     ) -> None:
-        self.hash = hash
-        self.header = header
-        self.ext = ext
+        self.hash: "Hash" = hash
+        self.header: "LedgerHeader" = header
+        self.ext: "LedgerHeaderHistoryEntryExt" = ext
 
     def pack(self, packer: Packer) -> None:
         self.hash.pack(packer)
@@ -2805,7 +2805,7 @@ class LedgerHeaderHistoryEntry:
         hash = Hash.unpack(unpacker)
         header = LedgerHeader.unpack(unpacker)
         ext = LedgerHeaderHistoryEntryExt.unpack(unpacker)
-        return cls(hash=hash, header=header, ext=ext)
+        return cls(hash=hash, header=header, ext=ext,)
 
     def to_raw_xdr(self) -> bytes:
         packer = Packer()
@@ -2857,8 +2857,8 @@ class LedgerSCPMessages:
     """
 
     def __init__(self, ledger_seq: "Uint32", messages: List["SCPEnvelope"]) -> None:
-        self.ledger_seq = ledger_seq
-        self.messages = messages
+        self.ledger_seq: "Uint32" = ledger_seq
+        self.messages: List["SCPEnvelope"] = messages
 
     def pack(self, packer: Packer) -> None:
         self.ledger_seq.pack(packer)
@@ -2873,7 +2873,7 @@ class LedgerSCPMessages:
         messages = []
         for _ in range(length):
             messages.append(SCPEnvelope.unpack(unpacker))
-        return cls(ledger_seq=ledger_seq, messages=messages)
+        return cls(ledger_seq=ledger_seq, messages=messages,)
 
     def to_raw_xdr(self) -> bytes:
         packer = Packer()
@@ -2920,10 +2920,10 @@ class SCPHistoryEntryV0:
     """
 
     def __init__(
-        self, quorum_sets: List["SCPQuorumSet"], ledger_messages: "LedgerSCPMessages",
+        self, quorum_sets: List["SCPQuorumSet"], ledger_messages: "LedgerSCPMessages"
     ) -> None:
-        self.quorum_sets = quorum_sets
-        self.ledger_messages = ledger_messages
+        self.quorum_sets: List["SCPQuorumSet"] = quorum_sets
+        self.ledger_messages: "LedgerSCPMessages" = ledger_messages
 
     def pack(self, packer: Packer) -> None:
         packer.pack_uint(len(self.quorum_sets))
@@ -2938,7 +2938,7 @@ class SCPHistoryEntryV0:
         for _ in range(length):
             quorum_sets.append(SCPQuorumSet.unpack(unpacker))
         ledger_messages = LedgerSCPMessages.unpack(unpacker)
-        return cls(quorum_sets=quorum_sets, ledger_messages=ledger_messages)
+        return cls(quorum_sets=quorum_sets, ledger_messages=ledger_messages,)
 
     def to_raw_xdr(self) -> bytes:
         packer = Packer()
@@ -2988,7 +2988,7 @@ class SCPHistoryEntry:
     """
 
     def __init__(self, v: int, v0: "SCPHistoryEntryV0" = None) -> None:
-        self.v = v
+        self.v: int = v
         self.v0: "SCPHistoryEntryV0" = v0
 
     def pack(self, packer: Packer) -> None:
@@ -3114,7 +3114,7 @@ class LedgerEntryChange:
         removed: "LedgerKey" = None,
         state: "LedgerEntry" = None,
     ) -> None:
-        self.type = type
+        self.type: "LedgerEntryChangeType" = type
         self.created: "LedgerEntry" = created
         self.updated: "LedgerEntry" = updated
         self.removed: "LedgerKey" = removed
@@ -3205,7 +3205,7 @@ class LedgerEntryChanges:
                 f"The maximum length of `ledger_entry_changes` should be 4294967295, but got {len(ledger_entry_changes)}."
             )
 
-        self.ledger_entry_changes = ledger_entry_changes
+        self.ledger_entry_changes: List["LedgerEntryChange"] = ledger_entry_changes
 
     def pack(self, packer: Packer) -> None:
         packer.pack_uint(len(self.ledger_entry_changes))
@@ -3263,7 +3263,7 @@ class OperationMeta:
     """
 
     def __init__(self, changes: "LedgerEntryChanges") -> None:
-        self.changes = changes
+        self.changes: "LedgerEntryChanges" = changes
 
     def pack(self, packer: Packer) -> None:
         self.changes.pack(packer)
@@ -3271,7 +3271,7 @@ class OperationMeta:
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "OperationMeta":
         changes = LedgerEntryChanges.unpack(unpacker)
-        return cls(changes=changes)
+        return cls(changes=changes,)
 
     def to_raw_xdr(self) -> bytes:
         packer = Packer()
@@ -3317,10 +3317,10 @@ class TransactionMetaV1:
     """
 
     def __init__(
-        self, tx_changes: "LedgerEntryChanges", operations: List["OperationMeta"],
+        self, tx_changes: "LedgerEntryChanges", operations: List["OperationMeta"]
     ) -> None:
-        self.tx_changes = tx_changes
-        self.operations = operations
+        self.tx_changes: "LedgerEntryChanges" = tx_changes
+        self.operations: List["OperationMeta"] = operations
 
     def pack(self, packer: Packer) -> None:
         self.tx_changes.pack(packer)
@@ -3335,7 +3335,7 @@ class TransactionMetaV1:
         operations = []
         for _ in range(length):
             operations.append(OperationMeta.unpack(unpacker))
-        return cls(tx_changes=tx_changes, operations=operations)
+        return cls(tx_changes=tx_changes, operations=operations,)
 
     def to_raw_xdr(self) -> bytes:
         packer = Packer()
@@ -3392,9 +3392,9 @@ class TransactionMetaV2:
         operations: List["OperationMeta"],
         tx_changes_after: "LedgerEntryChanges",
     ) -> None:
-        self.tx_changes_before = tx_changes_before
-        self.operations = operations
-        self.tx_changes_after = tx_changes_after
+        self.tx_changes_before: "LedgerEntryChanges" = tx_changes_before
+        self.operations: List["OperationMeta"] = operations
+        self.tx_changes_after: "LedgerEntryChanges" = tx_changes_after
 
     def pack(self, packer: Packer) -> None:
         self.tx_changes_before.pack(packer)
@@ -3477,7 +3477,7 @@ class TransactionMeta:
         v1: "TransactionMetaV1" = None,
         v2: "TransactionMetaV2" = None,
     ) -> None:
-        self.v = v
+        self.v: int = v
         self.operations: List["OperationMeta"] = operations
         self.v1: "TransactionMetaV1" = v1
         self.v2: "TransactionMetaV2" = v2
@@ -3571,9 +3571,9 @@ class TransactionResultMeta:
         fee_processing: "LedgerEntryChanges",
         tx_apply_processing: "TransactionMeta",
     ) -> None:
-        self.result = result
-        self.fee_processing = fee_processing
-        self.tx_apply_processing = tx_apply_processing
+        self.result: "TransactionResultPair" = result
+        self.fee_processing: "LedgerEntryChanges" = fee_processing
+        self.tx_apply_processing: "TransactionMeta" = tx_apply_processing
 
     def pack(self, packer: Packer) -> None:
         self.result.pack(packer)
@@ -3640,11 +3640,9 @@ class UpgradeEntryMeta:
     ----------------------------------------------------------------
     """
 
-    def __init__(
-        self, upgrade: "LedgerUpgrade", changes: "LedgerEntryChanges",
-    ) -> None:
-        self.upgrade = upgrade
-        self.changes = changes
+    def __init__(self, upgrade: "LedgerUpgrade", changes: "LedgerEntryChanges") -> None:
+        self.upgrade: "LedgerUpgrade" = upgrade
+        self.changes: "LedgerEntryChanges" = changes
 
     def pack(self, packer: Packer) -> None:
         self.upgrade.pack(packer)
@@ -3654,7 +3652,7 @@ class UpgradeEntryMeta:
     def unpack(cls, unpacker: Unpacker) -> "UpgradeEntryMeta":
         upgrade = LedgerUpgrade.unpack(unpacker)
         changes = LedgerEntryChanges.unpack(unpacker)
-        return cls(upgrade=upgrade, changes=changes)
+        return cls(upgrade=upgrade, changes=changes,)
 
     def to_raw_xdr(self) -> bytes:
         packer = Packer()
@@ -3720,11 +3718,11 @@ class LedgerCloseMetaV0:
         upgrades_processing: List["UpgradeEntryMeta"],
         scp_info: List["SCPHistoryEntry"],
     ) -> None:
-        self.ledger_header = ledger_header
-        self.tx_set = tx_set
-        self.tx_processing = tx_processing
-        self.upgrades_processing = upgrades_processing
-        self.scp_info = scp_info
+        self.ledger_header: "LedgerHeaderHistoryEntry" = ledger_header
+        self.tx_set: "TransactionSet" = tx_set
+        self.tx_processing: List["TransactionResultMeta"] = tx_processing
+        self.upgrades_processing: List["UpgradeEntryMeta"] = upgrades_processing
+        self.scp_info: List["SCPHistoryEntry"] = scp_info
 
     def pack(self, packer: Packer) -> None:
         self.ledger_header.pack(packer)
@@ -3817,7 +3815,7 @@ class LedgerCloseMeta:
     """
 
     def __init__(self, v: int, v0: "LedgerCloseMetaV0" = None) -> None:
-        self.v = v
+        self.v: int = v
         self.v0: "LedgerCloseMetaV0" = v0
 
     def pack(self, packer: Packer) -> None:
@@ -3877,8 +3875,8 @@ class MuxedAccountMed25519:
     """
 
     def __init__(self, id: "Uint64", ed25519: "Uint256") -> None:
-        self.id = id
-        self.ed25519 = ed25519
+        self.id: "Uint64" = id
+        self.ed25519: "Uint256" = ed25519
 
     def pack(self, packer: Packer) -> None:
         self.id.pack(packer)
@@ -3888,7 +3886,7 @@ class MuxedAccountMed25519:
     def unpack(cls, unpacker: Unpacker) -> "MuxedAccountMed25519":
         id = Uint64.unpack(unpacker)
         ed25519 = Uint256.unpack(unpacker)
-        return cls(id=id, ed25519=ed25519)
+        return cls(id=id, ed25519=ed25519,)
 
     def to_raw_xdr(self) -> bytes:
         packer = Packer()
@@ -3946,7 +3944,7 @@ class MuxedAccount:
         ed25519: "Uint256" = None,
         med25519: "MuxedAccountMed25519" = None,
     ) -> None:
-        self.type = type
+        self.type: "CryptoKeyType" = type
         self.ed25519: "Uint256" = ed25519
         self.med25519: "MuxedAccountMed25519" = med25519
 
@@ -4018,8 +4016,8 @@ class DecoratedSignature:
     """
 
     def __init__(self, hint: "SignatureHint", signature: "Signature") -> None:
-        self.hint = hint
-        self.signature = signature
+        self.hint: "SignatureHint" = hint
+        self.signature: "Signature" = signature
 
     def pack(self, packer: Packer) -> None:
         self.hint.pack(packer)
@@ -4029,7 +4027,7 @@ class DecoratedSignature:
     def unpack(cls, unpacker: Unpacker) -> "DecoratedSignature":
         hint = SignatureHint.unpack(unpacker)
         signature = Signature.unpack(unpacker)
-        return cls(hint=hint, signature=signature)
+        return cls(hint=hint, signature=signature,)
 
     def to_raw_xdr(self) -> bytes:
         packer = Packer()
@@ -4149,8 +4147,8 @@ class CreateAccountOp:
     """
 
     def __init__(self, destination: "AccountID", starting_balance: "Int64") -> None:
-        self.destination = destination
-        self.starting_balance = starting_balance
+        self.destination: "AccountID" = destination
+        self.starting_balance: "Int64" = starting_balance
 
     def pack(self, packer: Packer) -> None:
         self.destination.pack(packer)
@@ -4160,7 +4158,7 @@ class CreateAccountOp:
     def unpack(cls, unpacker: Unpacker) -> "CreateAccountOp":
         destination = AccountID.unpack(unpacker)
         starting_balance = Int64.unpack(unpacker)
-        return cls(destination=destination, starting_balance=starting_balance)
+        return cls(destination=destination, starting_balance=starting_balance,)
 
     def to_raw_xdr(self) -> bytes:
         packer = Packer()
@@ -4211,11 +4209,11 @@ class PaymentOp:
     """
 
     def __init__(
-        self, destination: "MuxedAccount", asset: "Asset", amount: "Int64",
+        self, destination: "MuxedAccount", asset: "Asset", amount: "Int64"
     ) -> None:
-        self.destination = destination
-        self.asset = asset
-        self.amount = amount
+        self.destination: "MuxedAccount" = destination
+        self.asset: "Asset" = asset
+        self.amount: "Int64" = amount
 
     def pack(self, packer: Packer) -> None:
         self.destination.pack(packer)
@@ -4227,7 +4225,7 @@ class PaymentOp:
         destination = MuxedAccount.unpack(unpacker)
         asset = Asset.unpack(unpacker)
         amount = Int64.unpack(unpacker)
-        return cls(destination=destination, asset=asset, amount=amount)
+        return cls(destination=destination, asset=asset, amount=amount,)
 
     def to_raw_xdr(self) -> bytes:
         packer = Packer()
@@ -4295,12 +4293,12 @@ class PathPaymentStrictReceiveOp:
         dest_amount: "Int64",
         path: List["Asset"],
     ) -> None:
-        self.send_asset = send_asset
-        self.send_max = send_max
-        self.destination = destination
-        self.dest_asset = dest_asset
-        self.dest_amount = dest_amount
-        self.path = path
+        self.send_asset: "Asset" = send_asset
+        self.send_max: "Int64" = send_max
+        self.destination: "MuxedAccount" = destination
+        self.dest_asset: "Asset" = dest_asset
+        self.dest_amount: "Int64" = dest_amount
+        self.path: List["Asset"] = path
 
     def pack(self, packer: Packer) -> None:
         self.send_asset.pack(packer)
@@ -4404,12 +4402,12 @@ class PathPaymentStrictSendOp:
         dest_min: "Int64",
         path: List["Asset"],
     ) -> None:
-        self.send_asset = send_asset
-        self.send_amount = send_amount
-        self.destination = destination
-        self.dest_asset = dest_asset
-        self.dest_min = dest_min
-        self.path = path
+        self.send_asset: "Asset" = send_asset
+        self.send_amount: "Int64" = send_amount
+        self.destination: "MuxedAccount" = destination
+        self.dest_asset: "Asset" = dest_asset
+        self.dest_min: "Int64" = dest_min
+        self.path: List["Asset"] = path
 
     def pack(self, packer: Packer) -> None:
         self.send_asset.pack(packer)
@@ -4509,11 +4507,11 @@ class ManageSellOfferOp:
         price: "Price",
         offer_id: "Int64",
     ) -> None:
-        self.selling = selling
-        self.buying = buying
-        self.amount = amount
-        self.price = price
-        self.offer_id = offer_id
+        self.selling: "Asset" = selling
+        self.buying: "Asset" = buying
+        self.amount: "Int64" = amount
+        self.price: "Price" = price
+        self.offer_id: "Int64" = offer_id
 
     def pack(self, packer: Packer) -> None:
         self.selling.pack(packer)
@@ -4604,11 +4602,11 @@ class ManageBuyOfferOp:
         price: "Price",
         offer_id: "Int64",
     ) -> None:
-        self.selling = selling
-        self.buying = buying
-        self.buy_amount = buy_amount
-        self.price = price
-        self.offer_id = offer_id
+        self.selling: "Asset" = selling
+        self.buying: "Asset" = buying
+        self.buy_amount: "Int64" = buy_amount
+        self.price: "Price" = price
+        self.offer_id: "Int64" = offer_id
 
     def pack(self, packer: Packer) -> None:
         self.selling.pack(packer)
@@ -4688,12 +4686,12 @@ class CreatePassiveSellOfferOp:
     """
 
     def __init__(
-        self, selling: "Asset", buying: "Asset", amount: "Int64", price: "Price",
+        self, selling: "Asset", buying: "Asset", amount: "Int64", price: "Price"
     ) -> None:
-        self.selling = selling
-        self.buying = buying
-        self.amount = amount
-        self.price = price
+        self.selling: "Asset" = selling
+        self.buying: "Asset" = buying
+        self.amount: "Int64" = amount
+        self.price: "Price" = price
 
     def pack(self, packer: Packer) -> None:
         self.selling.pack(packer)
@@ -4707,7 +4705,7 @@ class CreatePassiveSellOfferOp:
         buying = Asset.unpack(unpacker)
         amount = Int64.unpack(unpacker)
         price = Price.unpack(unpacker)
-        return cls(selling=selling, buying=buying, amount=amount, price=price)
+        return cls(selling=selling, buying=buying, amount=amount, price=price,)
 
     def to_raw_xdr(self) -> bytes:
         packer = Packer()
@@ -4786,15 +4784,15 @@ class SetOptionsOp:
         home_domain: Optional["String32"],
         signer: Optional["Signer"],
     ) -> None:
-        self.inflation_dest = inflation_dest
-        self.clear_flags = clear_flags
-        self.set_flags = set_flags
-        self.master_weight = master_weight
-        self.low_threshold = low_threshold
-        self.med_threshold = med_threshold
-        self.high_threshold = high_threshold
-        self.home_domain = home_domain
-        self.signer = signer
+        self.inflation_dest: Optional["AccountID"] = inflation_dest
+        self.clear_flags: Optional["Uint32"] = clear_flags
+        self.set_flags: Optional["Uint32"] = set_flags
+        self.master_weight: Optional["Uint32"] = master_weight
+        self.low_threshold: Optional["Uint32"] = low_threshold
+        self.med_threshold: Optional["Uint32"] = med_threshold
+        self.high_threshold: Optional["Uint32"] = high_threshold
+        self.home_domain: Optional["String32"] = home_domain
+        self.signer: Optional["Signer"] = signer
 
     def pack(self, packer: Packer) -> None:
         if self.inflation_dest is None:
@@ -4930,8 +4928,8 @@ class ChangeTrustOp:
     """
 
     def __init__(self, line: "Asset", limit: "Int64") -> None:
-        self.line = line
-        self.limit = limit
+        self.line: "Asset" = line
+        self.limit: "Int64" = limit
 
     def pack(self, packer: Packer) -> None:
         self.line.pack(packer)
@@ -4941,7 +4939,7 @@ class ChangeTrustOp:
     def unpack(cls, unpacker: Unpacker) -> "ChangeTrustOp":
         line = Asset.unpack(unpacker)
         limit = Int64.unpack(unpacker)
-        return cls(line=line, limit=limit)
+        return cls(line=line, limit=limit,)
 
     def to_raw_xdr(self) -> bytes:
         packer = Packer()
@@ -4999,7 +4997,7 @@ class AllowTrustOpAsset:
         asset_code4: "AssetCode4" = None,
         asset_code12: "AssetCode12" = None,
     ) -> None:
-        self.type = type
+        self.type: "AssetType" = type
         self.asset_code4: "AssetCode4" = asset_code4
         self.asset_code12: "AssetCode12" = asset_code12
 
@@ -5089,11 +5087,11 @@ class AllowTrustOp:
     """
 
     def __init__(
-        self, trustor: "AccountID", asset: "AllowTrustOpAsset", authorize: "Uint32",
+        self, trustor: "AccountID", asset: "AllowTrustOpAsset", authorize: "Uint32"
     ) -> None:
-        self.trustor = trustor
-        self.asset = asset
-        self.authorize = authorize
+        self.trustor: "AccountID" = trustor
+        self.asset: "AllowTrustOpAsset" = asset
+        self.authorize: "Uint32" = authorize
 
     def pack(self, packer: Packer) -> None:
         self.trustor.pack(packer)
@@ -5105,7 +5103,7 @@ class AllowTrustOp:
         trustor = AccountID.unpack(unpacker)
         asset = AllowTrustOpAsset.unpack(unpacker)
         authorize = Uint32.unpack(unpacker)
-        return cls(trustor=trustor, asset=asset, authorize=authorize)
+        return cls(trustor=trustor, asset=asset, authorize=authorize,)
 
     def to_raw_xdr(self) -> bytes:
         packer = Packer()
@@ -5157,10 +5155,10 @@ class ManageDataOp:
     """
 
     def __init__(
-        self, data_name: "String64", data_value: Optional["DataValue"],
+        self, data_name: "String64", data_value: Optional["DataValue"]
     ) -> None:
-        self.data_name = data_name
-        self.data_value = data_value
+        self.data_name: "String64" = data_name
+        self.data_value: Optional["DataValue"] = data_value
 
     def pack(self, packer: Packer) -> None:
         self.data_name.pack(packer)
@@ -5174,7 +5172,7 @@ class ManageDataOp:
     def unpack(cls, unpacker: Unpacker) -> "ManageDataOp":
         data_name = String64.unpack(unpacker)
         data_value = DataValue.unpack(unpacker) if unpacker.unpack_uint() else None
-        return cls(data_name=data_name, data_value=data_value)
+        return cls(data_name=data_name, data_value=data_value,)
 
     def to_raw_xdr(self) -> bytes:
         packer = Packer()
@@ -5220,7 +5218,7 @@ class BumpSequenceOp:
     """
 
     def __init__(self, bump_to: "SequenceNumber") -> None:
-        self.bump_to = bump_to
+        self.bump_to: "SequenceNumber" = bump_to
 
     def pack(self, packer: Packer) -> None:
         self.bump_to.pack(packer)
@@ -5228,7 +5226,7 @@ class BumpSequenceOp:
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "BumpSequenceOp":
         bump_to = SequenceNumber.unpack(unpacker)
-        return cls(bump_to=bump_to)
+        return cls(bump_to=bump_to,)
 
     def to_raw_xdr(self) -> bytes:
         packer = Packer()
@@ -5316,7 +5314,7 @@ class OperationBody:
         manage_buy_offer_op: "ManageBuyOfferOp" = None,
         path_payment_strict_send_op: "PathPaymentStrictSendOp" = None,
     ) -> None:
-        self.type = type
+        self.type: "OperationType" = type
         self.create_account_op: "CreateAccountOp" = create_account_op
         self.payment_op: "PaymentOp" = payment_op
         self.path_payment_strict_receive_op: "PathPaymentStrictReceiveOp" = path_payment_strict_receive_op
@@ -5555,10 +5553,10 @@ class Operation:
     """
 
     def __init__(
-        self, source_account: Optional["MuxedAccount"], body: "OperationBody",
+        self, source_account: Optional["MuxedAccount"], body: "OperationBody"
     ) -> None:
-        self.source_account = source_account
-        self.body = body
+        self.source_account: Optional["MuxedAccount"] = source_account
+        self.body: "OperationBody" = body
 
     def pack(self, packer: Packer) -> None:
         if self.source_account is None:
@@ -5574,7 +5572,7 @@ class Operation:
             MuxedAccount.unpack(unpacker) if unpacker.unpack_uint() else None
         )
         body = OperationBody.unpack(unpacker)
-        return cls(source_account=source_account, body=body)
+        return cls(source_account=source_account, body=body,)
 
     def to_raw_xdr(self) -> bytes:
         packer = Packer()
@@ -5691,7 +5689,7 @@ class Memo:
         hash: "Hash" = None,
         ret_hash: "Hash" = None,
     ) -> None:
-        self.type = type
+        self.type: "MemoType" = type
         self.text: bytes = text
         self.id: "Uint64" = id
         self.hash: "Hash" = hash
@@ -5785,8 +5783,8 @@ class TimeBounds:
     """
 
     def __init__(self, min_time: "TimePoint", max_time: "TimePoint") -> None:
-        self.min_time = min_time
-        self.max_time = max_time
+        self.min_time: "TimePoint" = min_time
+        self.max_time: "TimePoint" = max_time
 
     def pack(self, packer: Packer) -> None:
         self.min_time.pack(packer)
@@ -5796,7 +5794,7 @@ class TimeBounds:
     def unpack(cls, unpacker: Unpacker) -> "TimeBounds":
         min_time = TimePoint.unpack(unpacker)
         max_time = TimePoint.unpack(unpacker)
-        return cls(min_time=min_time, max_time=max_time)
+        return cls(min_time=min_time, max_time=max_time,)
 
     def to_raw_xdr(self) -> bytes:
         packer = Packer()
@@ -5852,7 +5850,7 @@ class TransactionV0Ext:
     """
 
     def __init__(self, v: int) -> None:
-        self.v = v
+        self.v: int = v
 
     def pack(self, packer: Packer) -> None:
         Integer(self.v).pack(packer)
@@ -5927,13 +5925,13 @@ class TransactionV0:
         operations: List["Operation"],
         ext: "TransactionV0Ext",
     ) -> None:
-        self.source_account_ed25519 = source_account_ed25519
-        self.fee = fee
-        self.seq_num = seq_num
-        self.time_bounds = time_bounds
-        self.memo = memo
-        self.operations = operations
-        self.ext = ext
+        self.source_account_ed25519: "Uint256" = source_account_ed25519
+        self.fee: "Uint32" = fee
+        self.seq_num: "SequenceNumber" = seq_num
+        self.time_bounds: Optional["TimeBounds"] = time_bounds
+        self.memo: "Memo" = memo
+        self.operations: List["Operation"] = operations
+        self.ext: "TransactionV0Ext" = ext
 
     def pack(self, packer: Packer) -> None:
         self.source_account_ed25519.pack(packer)
@@ -6032,10 +6030,10 @@ class TransactionV0Envelope:
     """
 
     def __init__(
-        self, tx: "TransactionV0", signatures: List["DecoratedSignature"],
+        self, tx: "TransactionV0", signatures: List["DecoratedSignature"]
     ) -> None:
-        self.tx = tx
-        self.signatures = signatures
+        self.tx: "TransactionV0" = tx
+        self.signatures: List["DecoratedSignature"] = signatures
 
     def pack(self, packer: Packer) -> None:
         self.tx.pack(packer)
@@ -6050,7 +6048,7 @@ class TransactionV0Envelope:
         signatures = []
         for _ in range(length):
             signatures.append(DecoratedSignature.unpack(unpacker))
-        return cls(tx=tx, signatures=signatures)
+        return cls(tx=tx, signatures=signatures,)
 
     def to_raw_xdr(self) -> bytes:
         packer = Packer()
@@ -6097,7 +6095,7 @@ class TransactionExt:
     """
 
     def __init__(self, v: int) -> None:
-        self.v = v
+        self.v: int = v
 
     def pack(self, packer: Packer) -> None:
         Integer(self.v).pack(packer)
@@ -6183,13 +6181,13 @@ class Transaction:
         operations: List["Operation"],
         ext: "TransactionExt",
     ) -> None:
-        self.source_account = source_account
-        self.fee = fee
-        self.seq_num = seq_num
-        self.time_bounds = time_bounds
-        self.memo = memo
-        self.operations = operations
-        self.ext = ext
+        self.source_account: "MuxedAccount" = source_account
+        self.fee: "Uint32" = fee
+        self.seq_num: "SequenceNumber" = seq_num
+        self.time_bounds: Optional["TimeBounds"] = time_bounds
+        self.memo: "Memo" = memo
+        self.operations: List["Operation"] = operations
+        self.ext: "TransactionExt" = ext
 
     def pack(self, packer: Packer) -> None:
         self.source_account.pack(packer)
@@ -6288,10 +6286,10 @@ class TransactionV1Envelope:
     """
 
     def __init__(
-        self, tx: "Transaction", signatures: List["DecoratedSignature"],
+        self, tx: "Transaction", signatures: List["DecoratedSignature"]
     ) -> None:
-        self.tx = tx
-        self.signatures = signatures
+        self.tx: "Transaction" = tx
+        self.signatures: List["DecoratedSignature"] = signatures
 
     def pack(self, packer: Packer) -> None:
         self.tx.pack(packer)
@@ -6306,7 +6304,7 @@ class TransactionV1Envelope:
         signatures = []
         for _ in range(length):
             signatures.append(DecoratedSignature.unpack(unpacker))
-        return cls(tx=tx, signatures=signatures)
+        return cls(tx=tx, signatures=signatures,)
 
     def to_raw_xdr(self) -> bytes:
         packer = Packer()
@@ -6353,9 +6351,9 @@ class FeeBumpTransactionInnerTx:
     """
 
     def __init__(
-        self, type: "EnvelopeType", v1: "TransactionV1Envelope" = None,
+        self, type: "EnvelopeType", v1: "TransactionV1Envelope" = None
     ) -> None:
-        self.type = type
+        self.type: "EnvelopeType" = type
         self.v1: "TransactionV1Envelope" = v1
 
     def pack(self, packer: Packer) -> None:
@@ -6415,7 +6413,7 @@ class FeeBumpTransactionExt:
     """
 
     def __init__(self, v: int) -> None:
-        self.v = v
+        self.v: int = v
 
     def pack(self, packer: Packer) -> None:
         Integer(self.v).pack(packer)
@@ -6489,10 +6487,10 @@ class FeeBumpTransaction:
         inner_tx: "FeeBumpTransactionInnerTx",
         ext: "FeeBumpTransactionExt",
     ) -> None:
-        self.fee_source = fee_source
-        self.fee = fee
-        self.inner_tx = inner_tx
-        self.ext = ext
+        self.fee_source: "MuxedAccount" = fee_source
+        self.fee: "Int64" = fee
+        self.inner_tx: "FeeBumpTransactionInnerTx" = inner_tx
+        self.ext: "FeeBumpTransactionExt" = ext
 
     def pack(self, packer: Packer) -> None:
         self.fee_source.pack(packer)
@@ -6506,7 +6504,7 @@ class FeeBumpTransaction:
         fee = Int64.unpack(unpacker)
         inner_tx = FeeBumpTransactionInnerTx.unpack(unpacker)
         ext = FeeBumpTransactionExt.unpack(unpacker)
-        return cls(fee_source=fee_source, fee=fee, inner_tx=inner_tx, ext=ext)
+        return cls(fee_source=fee_source, fee=fee, inner_tx=inner_tx, ext=ext,)
 
     def to_raw_xdr(self) -> bytes:
         packer = Packer()
@@ -6562,10 +6560,10 @@ class FeeBumpTransactionEnvelope:
     """
 
     def __init__(
-        self, tx: "FeeBumpTransaction", signatures: List["DecoratedSignature"],
+        self, tx: "FeeBumpTransaction", signatures: List["DecoratedSignature"]
     ) -> None:
-        self.tx = tx
-        self.signatures = signatures
+        self.tx: "FeeBumpTransaction" = tx
+        self.signatures: List["DecoratedSignature"] = signatures
 
     def pack(self, packer: Packer) -> None:
         self.tx.pack(packer)
@@ -6580,7 +6578,7 @@ class FeeBumpTransactionEnvelope:
         signatures = []
         for _ in range(length):
             signatures.append(DecoratedSignature.unpack(unpacker))
-        return cls(tx=tx, signatures=signatures)
+        return cls(tx=tx, signatures=signatures,)
 
     def to_raw_xdr(self) -> bytes:
         packer = Packer()
@@ -6637,7 +6635,7 @@ class TransactionEnvelope:
         v1: "TransactionV1Envelope" = None,
         fee_bump: "FeeBumpTransactionEnvelope" = None,
     ) -> None:
-        self.type = type
+        self.type: "EnvelopeType" = type
         self.v0: "TransactionV0Envelope" = v0
         self.v1: "TransactionV1Envelope" = v1
         self.fee_bump: "FeeBumpTransactionEnvelope" = fee_bump
@@ -6726,7 +6724,7 @@ class TransactionSignaturePayloadTaggedTransaction:
         tx: "Transaction" = None,
         fee_bump: "FeeBumpTransaction" = None,
     ) -> None:
-        self.type = type
+        self.type: "EnvelopeType" = type
         self.tx: "Transaction" = tx
         self.fee_bump: "FeeBumpTransaction" = fee_bump
 
@@ -6812,8 +6810,8 @@ class TransactionSignaturePayload:
         network_id: "Hash",
         tagged_transaction: "TransactionSignaturePayloadTaggedTransaction",
     ) -> None:
-        self.network_id = network_id
-        self.tagged_transaction = tagged_transaction
+        self.network_id: "Hash" = network_id
+        self.tagged_transaction: "TransactionSignaturePayloadTaggedTransaction" = tagged_transaction
 
     def pack(self, packer: Packer) -> None:
         self.network_id.pack(packer)
@@ -6825,7 +6823,7 @@ class TransactionSignaturePayload:
         tagged_transaction = TransactionSignaturePayloadTaggedTransaction.unpack(
             unpacker
         )
-        return cls(network_id=network_id, tagged_transaction=tagged_transaction)
+        return cls(network_id=network_id, tagged_transaction=tagged_transaction,)
 
     def to_raw_xdr(self) -> bytes:
         packer = Packer()
@@ -6892,12 +6890,12 @@ class ClaimOfferAtom:
         asset_bought: "Asset",
         amount_bought: "Int64",
     ) -> None:
-        self.seller_id = seller_id
-        self.offer_id = offer_id
-        self.asset_sold = asset_sold
-        self.amount_sold = amount_sold
-        self.asset_bought = asset_bought
-        self.amount_bought = amount_bought
+        self.seller_id: "AccountID" = seller_id
+        self.offer_id: "Int64" = offer_id
+        self.asset_sold: "Asset" = asset_sold
+        self.amount_sold: "Int64" = amount_sold
+        self.asset_bought: "Asset" = asset_bought
+        self.amount_bought: "Int64" = amount_bought
 
     def pack(self, packer: Packer) -> None:
         self.seller_id.pack(packer)
@@ -7041,7 +7039,7 @@ class CreateAccountResult:
     """
 
     def __init__(self, code: "CreateAccountResultCode") -> None:
-        self.code = code
+        self.code: "CreateAccountResultCode" = code
 
     def pack(self, packer: Packer) -> None:
         self.code.pack(packer)
@@ -7167,7 +7165,7 @@ class PaymentResult:
     """
 
     def __init__(self, code: "PaymentResultCode") -> None:
-        self.code = code
+        self.code: "PaymentResultCode" = code
 
     def pack(self, packer: Packer) -> None:
         self.code.pack(packer)
@@ -7307,11 +7305,11 @@ class SimplePaymentResult:
     """
 
     def __init__(
-        self, destination: "AccountID", asset: "Asset", amount: "Int64",
+        self, destination: "AccountID", asset: "Asset", amount: "Int64"
     ) -> None:
-        self.destination = destination
-        self.asset = asset
-        self.amount = amount
+        self.destination: "AccountID" = destination
+        self.asset: "Asset" = asset
+        self.amount: "Int64" = amount
 
     def pack(self, packer: Packer) -> None:
         self.destination.pack(packer)
@@ -7323,7 +7321,7 @@ class SimplePaymentResult:
         destination = AccountID.unpack(unpacker)
         asset = Asset.unpack(unpacker)
         amount = Int64.unpack(unpacker)
-        return cls(destination=destination, asset=asset, amount=amount)
+        return cls(destination=destination, asset=asset, amount=amount,)
 
     def to_raw_xdr(self) -> bytes:
         packer = Packer()
@@ -7375,10 +7373,10 @@ class PathPaymentStrictReceiveResultSuccess:
     """
 
     def __init__(
-        self, offers: List["ClaimOfferAtom"], last: "SimplePaymentResult",
+        self, offers: List["ClaimOfferAtom"], last: "SimplePaymentResult"
     ) -> None:
-        self.offers = offers
-        self.last = last
+        self.offers: List["ClaimOfferAtom"] = offers
+        self.last: "SimplePaymentResult" = last
 
     def pack(self, packer: Packer) -> None:
         packer.pack_uint(len(self.offers))
@@ -7393,7 +7391,7 @@ class PathPaymentStrictReceiveResultSuccess:
         for _ in range(length):
             offers.append(ClaimOfferAtom.unpack(unpacker))
         last = SimplePaymentResult.unpack(unpacker)
-        return cls(offers=offers, last=last)
+        return cls(offers=offers, last=last,)
 
     def to_raw_xdr(self) -> bytes:
         packer = Packer()
@@ -7453,7 +7451,7 @@ class PathPaymentStrictReceiveResult:
         success: "PathPaymentStrictReceiveResultSuccess" = None,
         no_issuer: "Asset" = None,
     ) -> None:
-        self.code = code
+        self.code: "PathPaymentStrictReceiveResultCode" = code
         self.success: "PathPaymentStrictReceiveResultSuccess" = success
         self.no_issuer: "Asset" = no_issuer
 
@@ -7621,10 +7619,10 @@ class PathPaymentStrictSendResultSuccess:
     """
 
     def __init__(
-        self, offers: List["ClaimOfferAtom"], last: "SimplePaymentResult",
+        self, offers: List["ClaimOfferAtom"], last: "SimplePaymentResult"
     ) -> None:
-        self.offers = offers
-        self.last = last
+        self.offers: List["ClaimOfferAtom"] = offers
+        self.last: "SimplePaymentResult" = last
 
     def pack(self, packer: Packer) -> None:
         packer.pack_uint(len(self.offers))
@@ -7639,7 +7637,7 @@ class PathPaymentStrictSendResultSuccess:
         for _ in range(length):
             offers.append(ClaimOfferAtom.unpack(unpacker))
         last = SimplePaymentResult.unpack(unpacker)
-        return cls(offers=offers, last=last)
+        return cls(offers=offers, last=last,)
 
     def to_raw_xdr(self) -> bytes:
         packer = Packer()
@@ -7699,7 +7697,7 @@ class PathPaymentStrictSendResult:
         success: "PathPaymentStrictSendResultSuccess" = None,
         no_issuer: "Asset" = None,
     ) -> None:
-        self.code = code
+        self.code: "PathPaymentStrictSendResultCode" = code
         self.success: "PathPaymentStrictSendResultSuccess" = success
         self.no_issuer: "Asset" = no_issuer
 
@@ -7913,10 +7911,8 @@ class ManageOfferSuccessResultOffer:
     ----------------------------------------------------------------
     """
 
-    def __init__(
-        self, effect: "ManageOfferEffect", offer: "OfferEntry" = None,
-    ) -> None:
-        self.effect = effect
+    def __init__(self, effect: "ManageOfferEffect", offer: "OfferEntry" = None) -> None:
+        self.effect: "ManageOfferEffect" = effect
         self.offer: "OfferEntry" = offer
 
     def pack(self, packer: Packer) -> None:
@@ -7992,8 +7988,8 @@ class ManageOfferSuccessResult:
         offers_claimed: List["ClaimOfferAtom"],
         offer: "ManageOfferSuccessResultOffer",
     ) -> None:
-        self.offers_claimed = offers_claimed
-        self.offer = offer
+        self.offers_claimed: List["ClaimOfferAtom"] = offers_claimed
+        self.offer: "ManageOfferSuccessResultOffer" = offer
 
     def pack(self, packer: Packer) -> None:
         packer.pack_uint(len(self.offers_claimed))
@@ -8008,7 +8004,7 @@ class ManageOfferSuccessResult:
         for _ in range(length):
             offers_claimed.append(ClaimOfferAtom.unpack(unpacker))
         offer = ManageOfferSuccessResultOffer.unpack(unpacker)
-        return cls(offers_claimed=offers_claimed, offer=offer)
+        return cls(offers_claimed=offers_claimed, offer=offer,)
 
     def to_raw_xdr(self) -> bytes:
         packer = Packer()
@@ -8061,7 +8057,7 @@ class ManageSellOfferResult:
         code: "ManageSellOfferResultCode",
         success: "ManageOfferSuccessResult" = None,
     ) -> None:
-        self.code = code
+        self.code: "ManageSellOfferResultCode" = code
         self.success: "ManageOfferSuccessResult" = success
 
     def pack(self, packer: Packer) -> None:
@@ -8205,7 +8201,7 @@ class ManageBuyOfferResult:
         code: "ManageBuyOfferResultCode",
         success: "ManageOfferSuccessResult" = None,
     ) -> None:
-        self.code = code
+        self.code: "ManageBuyOfferResultCode" = code
         self.success: "ManageOfferSuccessResult" = success
 
     def pack(self, packer: Packer) -> None:
@@ -8334,7 +8330,7 @@ class SetOptionsResult:
     """
 
     def __init__(self, code: "SetOptionsResultCode") -> None:
-        self.code = code
+        self.code: "SetOptionsResultCode" = code
 
     def pack(self, packer: Packer) -> None:
         self.code.pack(packer)
@@ -8453,7 +8449,7 @@ class ChangeTrustResult:
     """
 
     def __init__(self, code: "ChangeTrustResultCode") -> None:
-        self.code = code
+        self.code: "ChangeTrustResultCode" = code
 
     def pack(self, packer: Packer) -> None:
         self.code.pack(packer)
@@ -8571,7 +8567,7 @@ class AllowTrustResult:
     """
 
     def __init__(self, code: "AllowTrustResultCode") -> None:
-        self.code = code
+        self.code: "AllowTrustResultCode" = code
 
     def pack(self, packer: Packer) -> None:
         self.code.pack(packer)
@@ -8691,9 +8687,9 @@ class AccountMergeResult:
     """
 
     def __init__(
-        self, code: "AccountMergeResultCode", source_account_balance: "Int64" = None,
+        self, code: "AccountMergeResultCode", source_account_balance: "Int64" = None
     ) -> None:
-        self.code = code
+        self.code: "AccountMergeResultCode" = code
         self.source_account_balance: "Int64" = source_account_balance
 
     def pack(self, packer: Packer) -> None:
@@ -8809,8 +8805,8 @@ class InflationPayout:
     """
 
     def __init__(self, destination: "AccountID", amount: "Int64") -> None:
-        self.destination = destination
-        self.amount = amount
+        self.destination: "AccountID" = destination
+        self.amount: "Int64" = amount
 
     def pack(self, packer: Packer) -> None:
         self.destination.pack(packer)
@@ -8820,7 +8816,7 @@ class InflationPayout:
     def unpack(cls, unpacker: Unpacker) -> "InflationPayout":
         destination = AccountID.unpack(unpacker)
         amount = Int64.unpack(unpacker)
-        return cls(destination=destination, amount=amount)
+        return cls(destination=destination, amount=amount,)
 
     def to_raw_xdr(self) -> bytes:
         packer = Packer()
@@ -8869,9 +8865,9 @@ class InflationResult:
     """
 
     def __init__(
-        self, code: "InflationResultCode", payouts: List["InflationPayout"] = None,
+        self, code: "InflationResultCode", payouts: List["InflationPayout"] = None
     ) -> None:
-        self.code = code
+        self.code: "InflationResultCode" = code
         self.payouts: List["InflationPayout"] = payouts
 
     def pack(self, packer: Packer) -> None:
@@ -8997,7 +8993,7 @@ class ManageDataResult:
     """
 
     def __init__(self, code: "ManageDataResultCode") -> None:
-        self.code = code
+        self.code: "ManageDataResultCode" = code
 
     def pack(self, packer: Packer) -> None:
         self.code.pack(packer)
@@ -9106,7 +9102,7 @@ class BumpSequenceResult:
     """
 
     def __init__(self, code: "BumpSequenceResultCode") -> None:
-        self.code = code
+        self.code: "BumpSequenceResultCode" = code
 
     def pack(self, packer: Packer) -> None:
         self.code.pack(packer)
@@ -9263,7 +9259,7 @@ class OperationResultTr:
         manage_buy_offer_result: "ManageBuyOfferResult" = None,
         path_payment_strict_send_result: "PathPaymentStrictSendResult" = None,
     ) -> None:
-        self.type = type
+        self.type: "OperationType" = type
         self.create_account_result: "CreateAccountResult" = create_account_result
         self.payment_result: "PaymentResult" = payment_result
         self.path_payment_strict_receive_result: "PathPaymentStrictReceiveResult" = path_payment_strict_receive_result
@@ -9518,9 +9514,9 @@ class OperationResult:
     """
 
     def __init__(
-        self, code: "OperationResultCode", tr: "OperationResultTr" = None,
+        self, code: "OperationResultCode", tr: "OperationResultTr" = None
     ) -> None:
-        self.code = code
+        self.code: "OperationResultCode" = code
         self.tr: "OperationResultTr" = tr
 
     def pack(self, packer: Packer) -> None:
@@ -9674,9 +9670,9 @@ class InnerTransactionResultResult:
     """
 
     def __init__(
-        self, code: "TransactionResultCode", results: List["OperationResult"] = None,
+        self, code: "TransactionResultCode", results: List["OperationResult"] = None
     ) -> None:
-        self.code = code
+        self.code: "TransactionResultCode" = code
         self.results: List["OperationResult"] = results
 
     def pack(self, packer: Packer) -> None:
@@ -9775,7 +9771,7 @@ class InnerTransactionResultExt:
     """
 
     def __init__(self, v: int) -> None:
-        self.v = v
+        self.v: int = v
 
     def pack(self, packer: Packer) -> None:
         Integer(self.v).pack(packer)
@@ -9866,9 +9862,9 @@ class InnerTransactionResult:
         result: "InnerTransactionResultResult",
         ext: "InnerTransactionResultExt",
     ) -> None:
-        self.fee_charged = fee_charged
-        self.result = result
-        self.ext = ext
+        self.fee_charged: "Int64" = fee_charged
+        self.result: "InnerTransactionResultResult" = result
+        self.ext: "InnerTransactionResultExt" = ext
 
     def pack(self, packer: Packer) -> None:
         self.fee_charged.pack(packer)
@@ -9880,7 +9876,7 @@ class InnerTransactionResult:
         fee_charged = Int64.unpack(unpacker)
         result = InnerTransactionResultResult.unpack(unpacker)
         ext = InnerTransactionResultExt.unpack(unpacker)
-        return cls(fee_charged=fee_charged, result=result, ext=ext)
+        return cls(fee_charged=fee_charged, result=result, ext=ext,)
 
     def to_raw_xdr(self) -> bytes:
         packer = Packer()
@@ -9932,10 +9928,10 @@ class InnerTransactionResultPair:
     """
 
     def __init__(
-        self, transaction_hash: "Hash", result: "InnerTransactionResult",
+        self, transaction_hash: "Hash", result: "InnerTransactionResult"
     ) -> None:
-        self.transaction_hash = transaction_hash
-        self.result = result
+        self.transaction_hash: "Hash" = transaction_hash
+        self.result: "InnerTransactionResult" = result
 
     def pack(self, packer: Packer) -> None:
         self.transaction_hash.pack(packer)
@@ -9945,7 +9941,7 @@ class InnerTransactionResultPair:
     def unpack(cls, unpacker: Unpacker) -> "InnerTransactionResultPair":
         transaction_hash = Hash.unpack(unpacker)
         result = InnerTransactionResult.unpack(unpacker)
-        return cls(transaction_hash=transaction_hash, result=result)
+        return cls(transaction_hash=transaction_hash, result=result,)
 
     def to_raw_xdr(self) -> bytes:
         packer = Packer()
@@ -10006,7 +10002,7 @@ class TransactionResultResult:
         inner_result_pair: "InnerTransactionResultPair" = None,
         results: List["OperationResult"] = None,
     ) -> None:
-        self.code = code
+        self.code: "TransactionResultCode" = code
         self.inner_result_pair: "InnerTransactionResultPair" = inner_result_pair
         self.results: List["OperationResult"] = results
 
@@ -10097,7 +10093,7 @@ class TransactionResultExt:
     """
 
     def __init__(self, v: int) -> None:
-        self.v = v
+        self.v: int = v
 
     def pack(self, packer: Packer) -> None:
         Integer(self.v).pack(packer)
@@ -10178,9 +10174,9 @@ class TransactionResult:
         result: "TransactionResultResult",
         ext: "TransactionResultExt",
     ) -> None:
-        self.fee_charged = fee_charged
-        self.result = result
-        self.ext = ext
+        self.fee_charged: "Int64" = fee_charged
+        self.result: "TransactionResultResult" = result
+        self.ext: "TransactionResultExt" = ext
 
     def pack(self, packer: Packer) -> None:
         self.fee_charged.pack(packer)
@@ -10192,7 +10188,7 @@ class TransactionResult:
         fee_charged = Int64.unpack(unpacker)
         result = TransactionResultResult.unpack(unpacker)
         ext = TransactionResultExt.unpack(unpacker)
-        return cls(fee_charged=fee_charged, result=result, ext=ext)
+        return cls(fee_charged=fee_charged, result=result, ext=ext,)
 
     def to_raw_xdr(self) -> bytes:
         packer = Packer()
@@ -10240,7 +10236,7 @@ class AccountID:
     """
 
     def __init__(self, account_id: "PublicKey") -> None:
-        self.account_id = account_id
+        self.account_id: "PublicKey" = account_id
 
     def pack(self, packer: Packer) -> None:
         self.account_id.pack(packer)
@@ -10287,7 +10283,7 @@ class Thresholds:
     """
 
     def __init__(self, thresholds: bytes) -> None:
-        self.thresholds = thresholds
+        self.thresholds: bytes = thresholds
 
     def pack(self, packer: Packer) -> None:
         Opaque(self.thresholds, 4, True).pack(packer)
@@ -10334,7 +10330,7 @@ class String32:
     """
 
     def __init__(self, string32: bytes) -> None:
-        self.string32 = string32
+        self.string32: bytes = string32
 
     def pack(self, packer: Packer) -> None:
         String(self.string32, 32).pack(packer)
@@ -10381,7 +10377,7 @@ class String64:
     """
 
     def __init__(self, string64: bytes) -> None:
-        self.string64 = string64
+        self.string64: bytes = string64
 
     def pack(self, packer: Packer) -> None:
         String(self.string64, 64).pack(packer)
@@ -10428,7 +10424,7 @@ class SequenceNumber:
     """
 
     def __init__(self, sequence_number: "Int64") -> None:
-        self.sequence_number = sequence_number
+        self.sequence_number: "Int64" = sequence_number
 
     def pack(self, packer: Packer) -> None:
         self.sequence_number.pack(packer)
@@ -10475,7 +10471,7 @@ class TimePoint:
     """
 
     def __init__(self, time_point: "Uint64") -> None:
-        self.time_point = time_point
+        self.time_point: "Uint64" = time_point
 
     def pack(self, packer: Packer) -> None:
         self.time_point.pack(packer)
@@ -10522,7 +10518,7 @@ class DataValue:
     """
 
     def __init__(self, data_value: bytes) -> None:
-        self.data_value = data_value
+        self.data_value: bytes = data_value
 
     def pack(self, packer: Packer) -> None:
         Opaque(self.data_value, 64, False).pack(packer)
@@ -10569,7 +10565,7 @@ class AssetCode4:
     """
 
     def __init__(self, asset_code4: bytes) -> None:
-        self.asset_code4 = asset_code4
+        self.asset_code4: bytes = asset_code4
 
     def pack(self, packer: Packer) -> None:
         Opaque(self.asset_code4, 4, True).pack(packer)
@@ -10616,7 +10612,7 @@ class AssetCode12:
     """
 
     def __init__(self, asset_code12: bytes) -> None:
-        self.asset_code12 = asset_code12
+        self.asset_code12: bytes = asset_code12
 
     def pack(self, packer: Packer) -> None:
         Opaque(self.asset_code12, 12, True).pack(packer)
@@ -10718,8 +10714,8 @@ class AssetAlphaNum4:
     """
 
     def __init__(self, asset_code: "AssetCode4", issuer: "AccountID") -> None:
-        self.asset_code = asset_code
-        self.issuer = issuer
+        self.asset_code: "AssetCode4" = asset_code
+        self.issuer: "AccountID" = issuer
 
     def pack(self, packer: Packer) -> None:
         self.asset_code.pack(packer)
@@ -10729,7 +10725,7 @@ class AssetAlphaNum4:
     def unpack(cls, unpacker: Unpacker) -> "AssetAlphaNum4":
         asset_code = AssetCode4.unpack(unpacker)
         issuer = AccountID.unpack(unpacker)
-        return cls(asset_code=asset_code, issuer=issuer)
+        return cls(asset_code=asset_code, issuer=issuer,)
 
     def to_raw_xdr(self) -> bytes:
         packer = Packer()
@@ -10776,8 +10772,8 @@ class AssetAlphaNum12:
     """
 
     def __init__(self, asset_code: "AssetCode12", issuer: "AccountID") -> None:
-        self.asset_code = asset_code
-        self.issuer = issuer
+        self.asset_code: "AssetCode12" = asset_code
+        self.issuer: "AccountID" = issuer
 
     def pack(self, packer: Packer) -> None:
         self.asset_code.pack(packer)
@@ -10787,7 +10783,7 @@ class AssetAlphaNum12:
     def unpack(cls, unpacker: Unpacker) -> "AssetAlphaNum12":
         asset_code = AssetCode12.unpack(unpacker)
         issuer = AccountID.unpack(unpacker)
-        return cls(asset_code=asset_code, issuer=issuer)
+        return cls(asset_code=asset_code, issuer=issuer,)
 
     def to_raw_xdr(self) -> bytes:
         packer = Packer()
@@ -10855,7 +10851,7 @@ class Asset:
         alpha_num4: "AssetAlphaNum4" = None,
         alpha_num12: "AssetAlphaNum12" = None,
     ) -> None:
-        self.type = type
+        self.type: "AssetType" = type
         self.alpha_num4: "AssetAlphaNum4" = alpha_num4
         self.alpha_num12: "AssetAlphaNum12" = alpha_num12
 
@@ -10935,8 +10931,8 @@ class Price:
     """
 
     def __init__(self, n: "Int32", d: "Int32") -> None:
-        self.n = n
-        self.d = d
+        self.n: "Int32" = n
+        self.d: "Int32" = d
 
     def pack(self, packer: Packer) -> None:
         self.n.pack(packer)
@@ -10946,7 +10942,7 @@ class Price:
     def unpack(cls, unpacker: Unpacker) -> "Price":
         n = Int32.unpack(unpacker)
         d = Int32.unpack(unpacker)
-        return cls(n=n, d=d)
+        return cls(n=n, d=d,)
 
     def to_raw_xdr(self) -> bytes:
         packer = Packer()
@@ -10993,8 +10989,8 @@ class Liabilities:
     """
 
     def __init__(self, buying: "Int64", selling: "Int64") -> None:
-        self.buying = buying
-        self.selling = selling
+        self.buying: "Int64" = buying
+        self.selling: "Int64" = selling
 
     def pack(self, packer: Packer) -> None:
         self.buying.pack(packer)
@@ -11004,7 +11000,7 @@ class Liabilities:
     def unpack(cls, unpacker: Unpacker) -> "Liabilities":
         buying = Int64.unpack(unpacker)
         selling = Int64.unpack(unpacker)
-        return cls(buying=buying, selling=selling)
+        return cls(buying=buying, selling=selling,)
 
     def to_raw_xdr(self) -> bytes:
         packer = Packer()
@@ -11157,8 +11153,8 @@ class Signer:
     """
 
     def __init__(self, key: "SignerKey", weight: "Uint32") -> None:
-        self.key = key
-        self.weight = weight
+        self.key: "SignerKey" = key
+        self.weight: "Uint32" = weight
 
     def pack(self, packer: Packer) -> None:
         self.key.pack(packer)
@@ -11168,7 +11164,7 @@ class Signer:
     def unpack(cls, unpacker: Unpacker) -> "Signer":
         key = SignerKey.unpack(unpacker)
         weight = Uint32.unpack(unpacker)
-        return cls(key=key, weight=weight)
+        return cls(key=key, weight=weight,)
 
     def to_raw_xdr(self) -> bytes:
         packer = Packer()
@@ -11282,7 +11278,7 @@ class AccountEntryV1Ext:
     """
 
     def __init__(self, v: int) -> None:
-        self.v = v
+        self.v: int = v
 
     def pack(self, packer: Packer) -> None:
         Integer(self.v).pack(packer)
@@ -11344,8 +11340,8 @@ class AccountEntryV1:
     """
 
     def __init__(self, liabilities: "Liabilities", ext: "AccountEntryV1Ext") -> None:
-        self.liabilities = liabilities
-        self.ext = ext
+        self.liabilities: "Liabilities" = liabilities
+        self.ext: "AccountEntryV1Ext" = ext
 
     def pack(self, packer: Packer) -> None:
         self.liabilities.pack(packer)
@@ -11355,7 +11351,7 @@ class AccountEntryV1:
     def unpack(cls, unpacker: Unpacker) -> "AccountEntryV1":
         liabilities = Liabilities.unpack(unpacker)
         ext = AccountEntryV1Ext.unpack(unpacker)
-        return cls(liabilities=liabilities, ext=ext)
+        return cls(liabilities=liabilities, ext=ext,)
 
     def to_raw_xdr(self) -> bytes:
         packer = Packer()
@@ -11414,7 +11410,7 @@ class AccountEntryExt:
     """
 
     def __init__(self, v: int, v1: "AccountEntryV1" = None) -> None:
-        self.v = v
+        self.v: int = v
         self.v1: "AccountEntryV1" = v1
 
     def pack(self, packer: Packer) -> None:
@@ -11523,16 +11519,16 @@ class AccountEntry:
         signers: List["Signer"],
         ext: "AccountEntryExt",
     ) -> None:
-        self.account_id = account_id
-        self.balance = balance
-        self.seq_num = seq_num
-        self.num_sub_entries = num_sub_entries
-        self.inflation_dest = inflation_dest
-        self.flags = flags
-        self.home_domain = home_domain
-        self.thresholds = thresholds
-        self.signers = signers
-        self.ext = ext
+        self.account_id: "AccountID" = account_id
+        self.balance: "Int64" = balance
+        self.seq_num: "SequenceNumber" = seq_num
+        self.num_sub_entries: "Uint32" = num_sub_entries
+        self.inflation_dest: Optional["AccountID"] = inflation_dest
+        self.flags: "Uint32" = flags
+        self.home_domain: "String32" = home_domain
+        self.thresholds: "Thresholds" = thresholds
+        self.signers: List["Signer"] = signers
+        self.ext: "AccountEntryExt" = ext
 
     def pack(self, packer: Packer) -> None:
         self.account_id.pack(packer)
@@ -11713,7 +11709,7 @@ class TrustLineEntryV1Ext:
     """
 
     def __init__(self, v: int) -> None:
-        self.v = v
+        self.v: int = v
 
     def pack(self, packer: Packer) -> None:
         Integer(self.v).pack(packer)
@@ -11775,8 +11771,8 @@ class TrustLineEntryV1:
     """
 
     def __init__(self, liabilities: "Liabilities", ext: "TrustLineEntryV1Ext") -> None:
-        self.liabilities = liabilities
-        self.ext = ext
+        self.liabilities: "Liabilities" = liabilities
+        self.ext: "TrustLineEntryV1Ext" = ext
 
     def pack(self, packer: Packer) -> None:
         self.liabilities.pack(packer)
@@ -11786,7 +11782,7 @@ class TrustLineEntryV1:
     def unpack(cls, unpacker: Unpacker) -> "TrustLineEntryV1":
         liabilities = Liabilities.unpack(unpacker)
         ext = TrustLineEntryV1Ext.unpack(unpacker)
-        return cls(liabilities=liabilities, ext=ext)
+        return cls(liabilities=liabilities, ext=ext,)
 
     def to_raw_xdr(self) -> bytes:
         packer = Packer()
@@ -11845,7 +11841,7 @@ class TrustLineEntryExt:
     """
 
     def __init__(self, v: int, v1: "TrustLineEntryV1" = None) -> None:
-        self.v = v
+        self.v: int = v
         self.v1: "TrustLineEntryV1" = v1
 
     def pack(self, packer: Packer) -> None:
@@ -11942,12 +11938,12 @@ class TrustLineEntry:
         flags: "Uint32",
         ext: "TrustLineEntryExt",
     ) -> None:
-        self.account_id = account_id
-        self.asset = asset
-        self.balance = balance
-        self.limit = limit
-        self.flags = flags
-        self.ext = ext
+        self.account_id: "AccountID" = account_id
+        self.asset: "Asset" = asset
+        self.balance: "Int64" = balance
+        self.limit: "Int64" = limit
+        self.flags: "Uint32" = flags
+        self.ext: "TrustLineEntryExt" = ext
 
     def pack(self, packer: Packer) -> None:
         self.account_id.pack(packer)
@@ -12087,7 +12083,7 @@ class OfferEntryExt:
     """
 
     def __init__(self, v: int) -> None:
-        self.v = v
+        self.v: int = v
 
     def pack(self, packer: Packer) -> None:
         Integer(self.v).pack(packer)
@@ -12172,14 +12168,14 @@ class OfferEntry:
         flags: "Uint32",
         ext: "OfferEntryExt",
     ) -> None:
-        self.seller_id = seller_id
-        self.offer_id = offer_id
-        self.selling = selling
-        self.buying = buying
-        self.amount = amount
-        self.price = price
-        self.flags = flags
-        self.ext = ext
+        self.seller_id: "AccountID" = seller_id
+        self.offer_id: "Int64" = offer_id
+        self.selling: "Asset" = selling
+        self.buying: "Asset" = buying
+        self.amount: "Int64" = amount
+        self.price: "Price" = price
+        self.flags: "Uint32" = flags
+        self.ext: "OfferEntryExt" = ext
 
     def pack(self, packer: Packer) -> None:
         self.seller_id.pack(packer)
@@ -12272,7 +12268,7 @@ class DataEntryExt:
     """
 
     def __init__(self, v: int) -> None:
-        self.v = v
+        self.v: int = v
 
     def pack(self, packer: Packer) -> None:
         Integer(self.v).pack(packer)
@@ -12343,10 +12339,10 @@ class DataEntry:
         data_value: "DataValue",
         ext: "DataEntryExt",
     ) -> None:
-        self.account_id = account_id
-        self.data_name = data_name
-        self.data_value = data_value
-        self.ext = ext
+        self.account_id: "AccountID" = account_id
+        self.data_name: "String64" = data_name
+        self.data_value: "DataValue" = data_value
+        self.ext: "DataEntryExt" = ext
 
     def pack(self, packer: Packer) -> None:
         self.account_id.pack(packer)
@@ -12429,7 +12425,7 @@ class LedgerEntryData:
         offer: "OfferEntry" = None,
         data: "DataEntry" = None,
     ) -> None:
-        self.type = type
+        self.type: "LedgerEntryType" = type
         self.account: "AccountEntry" = account
         self.trust_line: "TrustLineEntry" = trust_line
         self.offer: "OfferEntry" = offer
@@ -12521,7 +12517,7 @@ class LedgerEntryExt:
     """
 
     def __init__(self, v: int) -> None:
-        self.v = v
+        self.v: int = v
 
     def pack(self, packer: Packer) -> None:
         Integer(self.v).pack(packer)
@@ -12602,9 +12598,9 @@ class LedgerEntry:
         data: "LedgerEntryData",
         ext: "LedgerEntryExt",
     ) -> None:
-        self.last_modified_ledger_seq = last_modified_ledger_seq
-        self.data = data
-        self.ext = ext
+        self.last_modified_ledger_seq: "Uint32" = last_modified_ledger_seq
+        self.data: "LedgerEntryData" = data
+        self.ext: "LedgerEntryExt" = ext
 
     def pack(self, packer: Packer) -> None:
         self.last_modified_ledger_seq.pack(packer)
@@ -12782,8 +12778,8 @@ class Error:
     """
 
     def __init__(self, code: "ErrorCode", msg: bytes) -> None:
-        self.code = code
-        self.msg = msg
+        self.code: "ErrorCode" = code
+        self.msg: bytes = msg
 
     def pack(self, packer: Packer) -> None:
         self.code.pack(packer)
@@ -12793,7 +12789,7 @@ class Error:
     def unpack(cls, unpacker: Unpacker) -> "Error":
         code = ErrorCode.unpack(unpacker)
         msg = String.unpack(unpacker)
-        return cls(code=code, msg=msg)
+        return cls(code=code, msg=msg,)
 
     def to_raw_xdr(self) -> bytes:
         packer = Packer()
@@ -12841,11 +12837,11 @@ class AuthCert:
     """
 
     def __init__(
-        self, pubkey: "Curve25519Public", expiration: "Uint64", sig: "Signature",
+        self, pubkey: "Curve25519Public", expiration: "Uint64", sig: "Signature"
     ) -> None:
-        self.pubkey = pubkey
-        self.expiration = expiration
-        self.sig = sig
+        self.pubkey: "Curve25519Public" = pubkey
+        self.expiration: "Uint64" = expiration
+        self.sig: "Signature" = sig
 
     def pack(self, packer: Packer) -> None:
         self.pubkey.pack(packer)
@@ -12857,7 +12853,7 @@ class AuthCert:
         pubkey = Curve25519Public.unpack(unpacker)
         expiration = Uint64.unpack(unpacker)
         sig = Signature.unpack(unpacker)
-        return cls(pubkey=pubkey, expiration=expiration, sig=sig)
+        return cls(pubkey=pubkey, expiration=expiration, sig=sig,)
 
     def to_raw_xdr(self) -> bytes:
         packer = Packer()
@@ -12927,15 +12923,15 @@ class Hello:
         cert: "AuthCert",
         nonce: "Uint256",
     ) -> None:
-        self.ledger_version = ledger_version
-        self.overlay_version = overlay_version
-        self.overlay_min_version = overlay_min_version
-        self.network_id = network_id
-        self.version_str = version_str
-        self.listening_port = listening_port
-        self.peer_id = peer_id
-        self.cert = cert
-        self.nonce = nonce
+        self.ledger_version: "Uint32" = ledger_version
+        self.overlay_version: "Uint32" = overlay_version
+        self.overlay_min_version: "Uint32" = overlay_min_version
+        self.network_id: "Hash" = network_id
+        self.version_str: bytes = version_str
+        self.listening_port: int = listening_port
+        self.peer_id: "NodeID" = peer_id
+        self.cert: "AuthCert" = cert
+        self.nonce: "Uint256" = nonce
 
     def pack(self, packer: Packer) -> None:
         self.ledger_version.pack(packer)
@@ -13034,7 +13030,7 @@ class Auth:
     """
 
     def __init__(self, unused: int) -> None:
-        self.unused = unused
+        self.unused: int = unused
 
     def pack(self, packer: Packer) -> None:
         Integer(self.unused).pack(packer)
@@ -13042,7 +13038,7 @@ class Auth:
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "Auth":
         unused = Integer.unpack(unpacker)
-        return cls(unused=unused)
+        return cls(unused=unused,)
 
     def to_raw_xdr(self) -> bytes:
         packer = Packer()
@@ -13139,9 +13135,9 @@ class PeerAddressIp:
     """
 
     def __init__(
-        self, type: "IPAddrType", ipv4: bytes = None, ipv6: bytes = None,
+        self, type: "IPAddrType", ipv4: bytes = None, ipv6: bytes = None
     ) -> None:
-        self.type = type
+        self.type: "IPAddrType" = type
         self.ipv4: bytes = ipv4
         self.ipv6: bytes = ipv6
 
@@ -13221,11 +13217,11 @@ class PeerAddress:
     """
 
     def __init__(
-        self, ip: "PeerAddressIp", port: "Uint32", num_failures: "Uint32",
+        self, ip: "PeerAddressIp", port: "Uint32", num_failures: "Uint32"
     ) -> None:
-        self.ip = ip
-        self.port = port
-        self.num_failures = num_failures
+        self.ip: "PeerAddressIp" = ip
+        self.port: "Uint32" = port
+        self.num_failures: "Uint32" = num_failures
 
     def pack(self, packer: Packer) -> None:
         self.ip.pack(packer)
@@ -13237,7 +13233,7 @@ class PeerAddress:
         ip = PeerAddressIp.unpack(unpacker)
         port = Uint32.unpack(unpacker)
         num_failures = Uint32.unpack(unpacker)
-        return cls(ip=ip, port=port, num_failures=num_failures)
+        return cls(ip=ip, port=port, num_failures=num_failures,)
 
     def to_raw_xdr(self) -> bytes:
         packer = Packer()
@@ -13372,8 +13368,8 @@ class DontHave:
     """
 
     def __init__(self, type: "MessageType", req_hash: "Uint256") -> None:
-        self.type = type
-        self.req_hash = req_hash
+        self.type: "MessageType" = type
+        self.req_hash: "Uint256" = req_hash
 
     def pack(self, packer: Packer) -> None:
         self.type.pack(packer)
@@ -13383,7 +13379,7 @@ class DontHave:
     def unpack(cls, unpacker: Unpacker) -> "DontHave":
         type = MessageType.unpack(unpacker)
         req_hash = Uint256.unpack(unpacker)
-        return cls(type=type, req_hash=req_hash)
+        return cls(type=type, req_hash=req_hash,)
 
     def to_raw_xdr(self) -> bytes:
         packer = Packer()
@@ -13487,11 +13483,11 @@ class SurveyRequestMessage:
         encryption_key: "Curve25519Public",
         command_type: "SurveyMessageCommandType",
     ) -> None:
-        self.surveyor_peer_id = surveyor_peer_id
-        self.surveyed_peer_id = surveyed_peer_id
-        self.ledger_num = ledger_num
-        self.encryption_key = encryption_key
-        self.command_type = command_type
+        self.surveyor_peer_id: "NodeID" = surveyor_peer_id
+        self.surveyed_peer_id: "NodeID" = surveyed_peer_id
+        self.ledger_num: "Uint32" = ledger_num
+        self.encryption_key: "Curve25519Public" = encryption_key
+        self.command_type: "SurveyMessageCommandType" = command_type
 
     def pack(self, packer: Packer) -> None:
         self.surveyor_peer_id.pack(packer)
@@ -13569,10 +13565,10 @@ class SignedSurveyRequestMessage:
     """
 
     def __init__(
-        self, request_signature: "Signature", request: "SurveyRequestMessage",
+        self, request_signature: "Signature", request: "SurveyRequestMessage"
     ) -> None:
-        self.request_signature = request_signature
-        self.request = request
+        self.request_signature: "Signature" = request_signature
+        self.request: "SurveyRequestMessage" = request
 
     def pack(self, packer: Packer) -> None:
         self.request_signature.pack(packer)
@@ -13582,7 +13578,7 @@ class SignedSurveyRequestMessage:
     def unpack(cls, unpacker: Unpacker) -> "SignedSurveyRequestMessage":
         request_signature = Signature.unpack(unpacker)
         request = SurveyRequestMessage.unpack(unpacker)
-        return cls(request_signature=request_signature, request=request)
+        return cls(request_signature=request_signature, request=request,)
 
     def to_raw_xdr(self) -> bytes:
         packer = Packer()
@@ -13628,7 +13624,7 @@ class EncryptedBody:
     """
 
     def __init__(self, encrypted_body: bytes) -> None:
-        self.encrypted_body = encrypted_body
+        self.encrypted_body: bytes = encrypted_body
 
     def pack(self, packer: Packer) -> None:
         Opaque(self.encrypted_body, 64000, False).pack(packer)
@@ -13689,11 +13685,11 @@ class SurveyResponseMessage:
         command_type: "SurveyMessageCommandType",
         encrypted_body: "EncryptedBody",
     ) -> None:
-        self.surveyor_peer_id = surveyor_peer_id
-        self.surveyed_peer_id = surveyed_peer_id
-        self.ledger_num = ledger_num
-        self.command_type = command_type
-        self.encrypted_body = encrypted_body
+        self.surveyor_peer_id: "NodeID" = surveyor_peer_id
+        self.surveyed_peer_id: "NodeID" = surveyed_peer_id
+        self.ledger_num: "Uint32" = ledger_num
+        self.command_type: "SurveyMessageCommandType" = command_type
+        self.encrypted_body: "EncryptedBody" = encrypted_body
 
     def pack(self, packer: Packer) -> None:
         self.surveyor_peer_id.pack(packer)
@@ -13771,10 +13767,10 @@ class SignedSurveyResponseMessage:
     """
 
     def __init__(
-        self, response_signature: "Signature", response: "SurveyResponseMessage",
+        self, response_signature: "Signature", response: "SurveyResponseMessage"
     ) -> None:
-        self.response_signature = response_signature
-        self.response = response
+        self.response_signature: "Signature" = response_signature
+        self.response: "SurveyResponseMessage" = response
 
     def pack(self, packer: Packer) -> None:
         self.response_signature.pack(packer)
@@ -13784,7 +13780,7 @@ class SignedSurveyResponseMessage:
     def unpack(cls, unpacker: Unpacker) -> "SignedSurveyResponseMessage":
         response_signature = Signature.unpack(unpacker)
         response = SurveyResponseMessage.unpack(unpacker)
-        return cls(response_signature=response_signature, response=response)
+        return cls(response_signature=response_signature, response=response,)
 
     def to_raw_xdr(self) -> bytes:
         packer = Packer()
@@ -13866,21 +13862,21 @@ class PeerStats:
         unique_fetch_message_recv: "Uint64",
         duplicate_fetch_message_recv: "Uint64",
     ) -> None:
-        self.id = id
-        self.version_str = version_str
-        self.messages_read = messages_read
-        self.messages_written = messages_written
-        self.bytes_read = bytes_read
-        self.bytes_written = bytes_written
-        self.seconds_connected = seconds_connected
-        self.unique_flood_bytes_recv = unique_flood_bytes_recv
-        self.duplicate_flood_bytes_recv = duplicate_flood_bytes_recv
-        self.unique_fetch_bytes_recv = unique_fetch_bytes_recv
-        self.duplicate_fetch_bytes_recv = duplicate_fetch_bytes_recv
-        self.unique_flood_message_recv = unique_flood_message_recv
-        self.duplicate_flood_message_recv = duplicate_flood_message_recv
-        self.unique_fetch_message_recv = unique_fetch_message_recv
-        self.duplicate_fetch_message_recv = duplicate_fetch_message_recv
+        self.id: "NodeID" = id
+        self.version_str: bytes = version_str
+        self.messages_read: "Uint64" = messages_read
+        self.messages_written: "Uint64" = messages_written
+        self.bytes_read: "Uint64" = bytes_read
+        self.bytes_written: "Uint64" = bytes_written
+        self.seconds_connected: "Uint64" = seconds_connected
+        self.unique_flood_bytes_recv: "Uint64" = unique_flood_bytes_recv
+        self.duplicate_flood_bytes_recv: "Uint64" = duplicate_flood_bytes_recv
+        self.unique_fetch_bytes_recv: "Uint64" = unique_fetch_bytes_recv
+        self.duplicate_fetch_bytes_recv: "Uint64" = duplicate_fetch_bytes_recv
+        self.unique_flood_message_recv: "Uint64" = unique_flood_message_recv
+        self.duplicate_flood_message_recv: "Uint64" = duplicate_flood_message_recv
+        self.unique_fetch_message_recv: "Uint64" = unique_fetch_message_recv
+        self.duplicate_fetch_message_recv: "Uint64" = duplicate_fetch_message_recv
 
     def pack(self, packer: Packer) -> None:
         self.id.pack(packer)
@@ -14009,7 +14005,7 @@ class PeerStatList:
                 f"The maximum length of `peer_stat_list` should be 25, but got {len(peer_stat_list)}."
             )
 
-        self.peer_stat_list = peer_stat_list
+        self.peer_stat_list: List["PeerStats"] = peer_stat_list
 
     def pack(self, packer: Packer) -> None:
         packer.pack_uint(len(self.peer_stat_list))
@@ -14075,10 +14071,10 @@ class TopologyResponseBody:
         total_inbound_peer_count: "Uint32",
         total_outbound_peer_count: "Uint32",
     ) -> None:
-        self.inbound_peers = inbound_peers
-        self.outbound_peers = outbound_peers
-        self.total_inbound_peer_count = total_inbound_peer_count
-        self.total_outbound_peer_count = total_outbound_peer_count
+        self.inbound_peers: "PeerStatList" = inbound_peers
+        self.outbound_peers: "PeerStatList" = outbound_peers
+        self.total_inbound_peer_count: "Uint32" = total_inbound_peer_count
+        self.total_outbound_peer_count: "Uint32" = total_outbound_peer_count
 
     def pack(self, packer: Packer) -> None:
         self.inbound_peers.pack(packer)
@@ -14155,7 +14151,7 @@ class SurveyResponseBody:
         type: "SurveyMessageCommandType",
         topology_response_body: "TopologyResponseBody" = None,
     ) -> None:
-        self.type = type
+        self.type: "SurveyMessageCommandType" = type
         self.topology_response_body: "TopologyResponseBody" = topology_response_body
 
     def pack(self, packer: Packer) -> None:
@@ -14271,7 +14267,7 @@ class StellarMessage:
         envelope: "SCPEnvelope" = None,
         get_scp_ledger_seq: "Uint32" = None,
     ) -> None:
-        self.type = type
+        self.type: "MessageType" = type
         self.error: "Error" = error
         self.hello: "Hello" = hello
         self.auth: "Auth" = auth
@@ -14483,11 +14479,11 @@ class AuthenticatedMessageV0:
     """
 
     def __init__(
-        self, sequence: "Uint64", message: "StellarMessage", mac: "HmacSha256Mac",
+        self, sequence: "Uint64", message: "StellarMessage", mac: "HmacSha256Mac"
     ) -> None:
-        self.sequence = sequence
-        self.message = message
-        self.mac = mac
+        self.sequence: "Uint64" = sequence
+        self.message: "StellarMessage" = message
+        self.mac: "HmacSha256Mac" = mac
 
     def pack(self, packer: Packer) -> None:
         self.sequence.pack(packer)
@@ -14499,7 +14495,7 @@ class AuthenticatedMessageV0:
         sequence = Uint64.unpack(unpacker)
         message = StellarMessage.unpack(unpacker)
         mac = HmacSha256Mac.unpack(unpacker)
-        return cls(sequence=sequence, message=message, mac=mac)
+        return cls(sequence=sequence, message=message, mac=mac,)
 
     def to_raw_xdr(self) -> bytes:
         packer = Packer()
@@ -14556,7 +14552,7 @@ class AuthenticatedMessage:
     """
 
     def __init__(self, v: "Uint32", v0: "AuthenticatedMessageV0" = None) -> None:
-        self.v = v
+        self.v: "Uint32" = v
         self.v0: "AuthenticatedMessageV0" = v0
 
     def pack(self, packer: Packer) -> None:
@@ -14612,7 +14608,7 @@ class Hash:
     """
 
     def __init__(self, hash: bytes) -> None:
-        self.hash = hash
+        self.hash: bytes = hash
 
     def pack(self, packer: Packer) -> None:
         Opaque(self.hash, 32, True).pack(packer)
@@ -14659,7 +14655,7 @@ class Uint256:
     """
 
     def __init__(self, uint256: bytes) -> None:
-        self.uint256 = uint256
+        self.uint256: bytes = uint256
 
     def pack(self, packer: Packer) -> None:
         Opaque(self.uint256, 32, True).pack(packer)
@@ -14706,7 +14702,7 @@ class Uint32:
     """
 
     def __init__(self, uint32: int) -> None:
-        self.uint32 = uint32
+        self.uint32: int = uint32
 
     def pack(self, packer: Packer) -> None:
         UnsignedInteger(self.uint32).pack(packer)
@@ -14753,7 +14749,7 @@ class Int32:
     """
 
     def __init__(self, int32: int) -> None:
-        self.int32 = int32
+        self.int32: int = int32
 
     def pack(self, packer: Packer) -> None:
         Integer(self.int32).pack(packer)
@@ -14800,7 +14796,7 @@ class Uint64:
     """
 
     def __init__(self, uint64: int) -> None:
-        self.uint64 = uint64
+        self.uint64: int = uint64
 
     def pack(self, packer: Packer) -> None:
         UnsignedHyper(self.uint64).pack(packer)
@@ -14847,7 +14843,7 @@ class Int64:
     """
 
     def __init__(self, int64: int) -> None:
-        self.int64 = int64
+        self.int64: int = int64
 
     def pack(self, packer: Packer) -> None:
         Hyper(self.int64).pack(packer)
@@ -15051,7 +15047,7 @@ class PublicKey:
     """
 
     def __init__(self, type: "PublicKeyType", ed25519: "Uint256" = None) -> None:
-        self.type = type
+        self.type: "PublicKeyType" = type
         self.ed25519: "Uint256" = ed25519
 
     def pack(self, packer: Packer) -> None:
@@ -15123,7 +15119,7 @@ class SignerKey:
         pre_auth_tx: "Uint256" = None,
         hash_x: "Uint256" = None,
     ) -> None:
-        self.type = type
+        self.type: "SignerKeyType" = type
         self.ed25519: "Uint256" = ed25519
         self.pre_auth_tx: "Uint256" = pre_auth_tx
         self.hash_x: "Uint256" = hash_x
@@ -15202,7 +15198,7 @@ class Signature:
     """
 
     def __init__(self, signature: bytes) -> None:
-        self.signature = signature
+        self.signature: bytes = signature
 
     def pack(self, packer: Packer) -> None:
         Opaque(self.signature, 64, False).pack(packer)
@@ -15249,7 +15245,7 @@ class SignatureHint:
     """
 
     def __init__(self, signature_hint: bytes) -> None:
-        self.signature_hint = signature_hint
+        self.signature_hint: bytes = signature_hint
 
     def pack(self, packer: Packer) -> None:
         Opaque(self.signature_hint, 4, True).pack(packer)
@@ -15296,7 +15292,7 @@ class NodeID:
     """
 
     def __init__(self, node_id: "PublicKey") -> None:
-        self.node_id = node_id
+        self.node_id: "PublicKey" = node_id
 
     def pack(self, packer: Packer) -> None:
         self.node_id.pack(packer)
@@ -15346,7 +15342,7 @@ class Curve25519Secret:
     """
 
     def __init__(self, key: bytes) -> None:
-        self.key = key
+        self.key: bytes = key
 
     def pack(self, packer: Packer) -> None:
         Opaque(self.key, 32, True).pack(packer)
@@ -15354,7 +15350,7 @@ class Curve25519Secret:
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "Curve25519Secret":
         key = Opaque.unpack(unpacker, 32, True)
-        return cls(key=key)
+        return cls(key=key,)
 
     def to_raw_xdr(self) -> bytes:
         packer = Packer()
@@ -15399,7 +15395,7 @@ class Curve25519Public:
     """
 
     def __init__(self, key: bytes) -> None:
-        self.key = key
+        self.key: bytes = key
 
     def pack(self, packer: Packer) -> None:
         Opaque(self.key, 32, True).pack(packer)
@@ -15407,7 +15403,7 @@ class Curve25519Public:
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "Curve25519Public":
         key = Opaque.unpack(unpacker, 32, True)
-        return cls(key=key)
+        return cls(key=key,)
 
     def to_raw_xdr(self) -> bytes:
         packer = Packer()
@@ -15452,7 +15448,7 @@ class HmacSha256Key:
     """
 
     def __init__(self, key: bytes) -> None:
-        self.key = key
+        self.key: bytes = key
 
     def pack(self, packer: Packer) -> None:
         Opaque(self.key, 32, True).pack(packer)
@@ -15460,7 +15456,7 @@ class HmacSha256Key:
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "HmacSha256Key":
         key = Opaque.unpack(unpacker, 32, True)
-        return cls(key=key)
+        return cls(key=key,)
 
     def to_raw_xdr(self) -> bytes:
         packer = Packer()
@@ -15505,7 +15501,7 @@ class HmacSha256Mac:
     """
 
     def __init__(self, mac: bytes) -> None:
-        self.mac = mac
+        self.mac: bytes = mac
 
     def pack(self, packer: Packer) -> None:
         Opaque(self.mac, 32, True).pack(packer)
@@ -15513,7 +15509,7 @@ class HmacSha256Mac:
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "HmacSha256Mac":
         mac = Opaque.unpack(unpacker, 32, True)
-        return cls(mac=mac)
+        return cls(mac=mac,)
 
     def to_raw_xdr(self) -> bytes:
         packer = Packer()
