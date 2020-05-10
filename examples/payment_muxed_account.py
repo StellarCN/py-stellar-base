@@ -2,7 +2,7 @@ import pprint
 
 from stellar_sdk import Keypair, Server, MuxedAccount, TransactionBuilder, Network
 
-horizon_url = "http://horizon-testnet.stellar.org/"
+horizon_url = "https://horizon-testnet.stellar.org/"
 network_passphrase = Network.TESTNET_NETWORK_PASSPHRASE
 
 alice_secret = "SC5O7VZUXDJ6JBDSZ74DSERXL7W3Y5LTOAMRF7RQRL3TAGAPS7LUVG3L"

@@ -3,7 +3,7 @@ import pprint
 from stellar_sdk import Keypair, Server, TransactionBuilder, Network
 from stellar_sdk.exceptions import BadRequestError
 
-horizon_url = "http://horizon-testnet.stellar.org/"
+horizon_url = "https://horizon-testnet.stellar.org/"
 network_passphrase = Network.TESTNET_NETWORK_PASSPHRASE
 
 fee_source_keypair = Keypair.from_secret("SASZKBDB6PFHXN6LRH4NQNTRGLGDTI3PSUVIKMZMLTYYBB7NDVMA6DSL")
