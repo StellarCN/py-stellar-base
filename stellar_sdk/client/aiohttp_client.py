@@ -9,6 +9,7 @@ from aiohttp_sse_client.client import EventSource
 from .base_async_client import BaseAsyncClient
 from .response import Response
 from ..__version__ import __version__
+from ..exceptions import StreamClientError
 
 logger = logging.getLogger(__name__)
 
@@ -41,7 +42,7 @@ class AiohttpClient(BaseAsyncClient):
         request_timeout: float = DEFAULT_REQUEST_TIMEOUT,
         backoff_factor: Optional[float] = DEFAULT_BACKOFF_FACTOR,
         user_agent: Optional[str] = None,
-        **kwargs
+        **kwargs,
     ) -> None:
         self.backoff_factor: Optional[float] = backoff_factor
         self.request_timeout: float = request_timeout
@@ -65,7 +66,7 @@ class AiohttpClient(BaseAsyncClient):
             headers=self.headers.copy(),
             connector=connector,
             timeout=aiohttp.ClientTimeout(total=request_timeout),
-            **kwargs
+            **kwargs,
         )
 
         self._session: aiohttp.ClientSession = session
@@ -116,7 +117,8 @@ class AiohttpClient(BaseAsyncClient):
         if self._sse_session is None:
             # No timeout, no special connector
             # Other headers such as "Accept: text/event-stream" are added by thr SSEClient
-            self._sse_session = aiohttp.ClientSession()
+            timeout = aiohttp.ClientTimeout(total=10)
+            self._sse_session = aiohttp.ClientSession(timeout=timeout)
 
         query_params = {**params} if params else dict()
 
@@ -151,6 +153,7 @@ class AiohttpClient(BaseAsyncClient):
                             query_params["cursor"] = event.last_event_id
                             # Events that dont have an id are not useful for us (hello/byebye events)
                         retry = client._reconnection_time.total_seconds()
+                        print(f"retry: {retry}")
                         try:
                             data = event.data
                             if data != '"hello"' and data != '"byebye"':
@@ -158,10 +161,13 @@ class AiohttpClient(BaseAsyncClient):
                         except json.JSONDecodeError:
                             # Content was not json-decodable
                             pass
-            except aiohttp.ClientConnectionError:
-                # Retry if the connection dropped after we got the initial response
+            except aiohttp.ClientError as e:
+                raise StreamClientError(
+                    query_params["cursor"], "Failed to get stream message."
+                ) from e
+            except asyncio.exceptions.TimeoutError:
                 logger.warning(
-                    "We have encountered an error and we will try to reconnect, cursor = {}".format(
+                    "We have encountered an timeout error and we will try to reconnect, cursor = {}".format(
                         query_params.get("cursor")
                     )
                 )

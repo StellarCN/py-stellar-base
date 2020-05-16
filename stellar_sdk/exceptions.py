@@ -192,6 +192,18 @@ class NotPageableError(BaseRequestError):
     """
 
 
+class StreamClientError(BaseRequestError):
+    """Failed to obtain stream resource.
+
+    :param current_cursor: The cursor of the last message obtained can be used for reconnect.
+    :param message: error message
+    """
+
+    def __init__(self, current_cursor: str, message: str) -> None:
+        super().__init__(message)
+        self.current_cursor = current_cursor
+
+
 def raise_request_exception(response: Response) -> None:
     status_code = response.status_code
     if status_code == 200:
