@@ -1,6 +1,40 @@
 Release History
 ===============
 
+### Version 2.4.2-alpha1
+
+Released on May 17, 2020
+
+- refactor: separating client GET and POST timeout values. (#315)
+
+- refactor: optimize the use of `stellar_sdk.client.AiohttpClient`, it may throw an `stellar_sdk.exceptions.` exception now, you should catch it. (#317)
+
+  ```python
+  import asyncio
+  import logging
+  
+  from stellar_sdk import AiohttpClient, Server
+  from stellar_sdk.exceptions import StreamClientError
+  
+  horizon_url = "https://horizon.stellar.org"
+  
+  async def listen_transaction():
+      async with Server(horizon_url, AiohttpClient()) as server:
+          cursor = "now"
+          while True:
+              try:
+                  async for transaction in server.transactions().cursor(cursor).stream():
+                      print(f"Transaction: {transaction}")
+              except StreamClientError as e:
+                  logging.error(f'An StreamClientError was encountered while reading the SSE message, which was caused by {e.__cause__}.')
+                  cursor = e.current_cursor
+  
+  
+  if __name__ == '__main__':
+      asyncio.run(listen_transaction())
+  ```
+
+
 ### Version 2.4.1
 
 Released on May 10, 2020
