@@ -2,7 +2,6 @@ import asyncio
 import json
 import logging
 from typing import Optional, AsyncGenerator, Any, Dict
-
 import aiohttp
 from aiohttp_sse_client.client import EventSource
 
@@ -76,7 +75,7 @@ class AiohttpClient(BaseAsyncClient):
         """Perform HTTP GET request.
 
         :param url: the request url
-        :param params: the requested params
+        :param params: the request params
         :return: the response from server
         :raise: :exc:`ConnectionError <stellar_sdk.exceptions.ConnectionError>`
         """
@@ -113,7 +112,15 @@ class AiohttpClient(BaseAsyncClient):
     async def stream(
         self, url: str, params: Dict[str, str] = None
     ) -> AsyncGenerator[Dict[str, Any], None]:
-        """Init the sse session """
+        """Perform Stream request.
+
+        :param url: the request url
+        :param params: the request params
+        :return: the stream response from server
+        :raise: :exc:`StreamClientError <stellar_sdk.exceptions.StreamClientError>` - Failed to fetch stream resource.
+        """
+
+        # Init the sse session
         if self._sse_session is None:
             # No timeout, no special connector
             # Other headers such as "Accept: text/event-stream" are added by thr SSEClient
@@ -153,7 +160,6 @@ class AiohttpClient(BaseAsyncClient):
                             query_params["cursor"] = event.last_event_id
                             # Events that dont have an id are not useful for us (hello/byebye events)
                         retry = client._reconnection_time.total_seconds()
-                        print(f"retry: {retry}")
                         try:
                             data = event.data
                             if data != '"hello"' and data != '"byebye"':

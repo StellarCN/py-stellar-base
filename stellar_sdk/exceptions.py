@@ -29,6 +29,7 @@ __all__ = [
     "BadResponseError",
     "UnknownRequestError",
     "NotPageableError",
+    "StreamClientError"
 ]
 
 
@@ -193,7 +194,7 @@ class NotPageableError(BaseRequestError):
 
 
 class StreamClientError(BaseRequestError):
-    """Failed to obtain stream resource.
+    """Failed to fetch stream resource.
 
     :param current_cursor: The cursor of the last message obtained can be used for reconnect.
     :param message: error message
