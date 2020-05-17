@@ -122,7 +122,7 @@ class AiohttpClient(BaseAsyncClient):
 
         # Init the sse session
         if self._sse_session is None:
-            # No timeout, no special connector
+            # No special connector
             # Other headers such as "Accept: text/event-stream" are added by thr SSEClient
             timeout = aiohttp.ClientTimeout(total=60 * 5)
             self._sse_session = aiohttp.ClientSession(timeout=timeout)
