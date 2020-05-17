@@ -29,6 +29,7 @@ __all__ = [
     "BadResponseError",
     "UnknownRequestError",
     "NotPageableError",
+    "StreamClientError"
 ]
 
 
@@ -190,6 +191,18 @@ class UnknownRequestError(BaseHorizonError):
 class NotPageableError(BaseRequestError):
     """There is no previous or next page
     """
+
+
+class StreamClientError(BaseRequestError):
+    """Failed to fetch stream resource.
+
+    :param current_cursor: The cursor of the last message obtained can be used for reconnect.
+    :param message: error message
+    """
+
+    def __init__(self, current_cursor: str, message: str) -> None:
+        super().__init__(message)
+        self.current_cursor = current_cursor
 
 
 def raise_request_exception(response: Response) -> None:

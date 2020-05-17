@@ -2,18 +2,17 @@ import asyncio
 import json
 import logging
 from typing import Optional, AsyncGenerator, Any, Dict
-
 import aiohttp
 from aiohttp_sse_client.client import EventSource
 
+from . import defines
 from .base_async_client import BaseAsyncClient
 from .response import Response
 from ..__version__ import __version__
+from ..exceptions import StreamClientError
 
 logger = logging.getLogger(__name__)
 
-# four ledgers sec, let's retry faster and not wait 60 secs.
-DEFAULT_REQUEST_TIMEOUT = 20
 DEFAULT_NUM_RETRIES = 3
 DEFAULT_BACKOFF_FACTOR = 0.5
 USER_AGENT = "py-stellar-sdk/%s/AiohttpClient" % __version__
@@ -30,7 +29,8 @@ class AiohttpClient(BaseAsyncClient):
     which represents the interface for making requests to a server instance.
 
     :param pool_size: persistent connection to Horizon and connection pool
-    :param request_timeout: the timeout for all requests
+    :param request_timeout: the timeout for all GET requests
+    :param post_timeout: the timeout for all POST requests
     :param backoff_factor: a backoff factor to apply between attempts after the second try
     :param user_agent: the server can use it to identify you
     """
@@ -38,13 +38,15 @@ class AiohttpClient(BaseAsyncClient):
     def __init__(
         self,
         pool_size: Optional[int] = None,
-        request_timeout: float = DEFAULT_REQUEST_TIMEOUT,
+        request_timeout: float = defines.DEFAULT_GET_TIMEOUT_SECONDS,
+        post_timeout: float = defines.DEFAULT_POST_TIMEOUT_SECONDS,
         backoff_factor: Optional[float] = DEFAULT_BACKOFF_FACTOR,
         user_agent: Optional[str] = None,
-        **kwargs
+        **kwargs,
     ) -> None:
         self.backoff_factor: Optional[float] = backoff_factor
         self.request_timeout: float = request_timeout
+        self.post_timeout: float = post_timeout
 
         # init session
         if pool_size is None:
@@ -65,7 +67,7 @@ class AiohttpClient(BaseAsyncClient):
             headers=self.headers.copy(),
             connector=connector,
             timeout=aiohttp.ClientTimeout(total=request_timeout),
-            **kwargs
+            **kwargs,
         )
 
         self._session: aiohttp.ClientSession = session
@@ -75,7 +77,7 @@ class AiohttpClient(BaseAsyncClient):
         """Perform HTTP GET request.
 
         :param url: the request url
-        :param params: the requested params
+        :param params: the request params
         :return: the response from server
         :raise: :exc:`ConnectionError <stellar_sdk.exceptions.ConnectionError>`
         """
@@ -99,7 +101,7 @@ class AiohttpClient(BaseAsyncClient):
         :raise: :exc:`ConnectionError <stellar_sdk.exceptions.ConnectionError>`
         """
         try:
-            response = await self._session.post(url, data=data)
+            response = await self._session.post(url, data=data, timeout=aiohttp.ClientTimeout(total=self.post_timeout))
             return Response(
                 status_code=response.status,
                 text=await response.text(),
@@ -112,11 +114,20 @@ class AiohttpClient(BaseAsyncClient):
     async def stream(
         self, url: str, params: Dict[str, str] = None
     ) -> AsyncGenerator[Dict[str, Any], None]:
-        """Init the sse session """
+        """Perform Stream request.
+
+        :param url: the request url
+        :param params: the request params
+        :return: the stream response from server
+        :raise: :exc:`StreamClientError <stellar_sdk.exceptions.StreamClientError>` - Failed to fetch stream resource.
+        """
+
+        # Init the sse session
         if self._sse_session is None:
-            # No timeout, no special connector
+            # No special connector
             # Other headers such as "Accept: text/event-stream" are added by thr SSEClient
-            self._sse_session = aiohttp.ClientSession()
+            timeout = aiohttp.ClientTimeout(total=60 * 5)
+            self._sse_session = aiohttp.ClientSession(timeout=timeout)
 
         query_params = {**params} if params else dict()
 
@@ -158,10 +169,13 @@ class AiohttpClient(BaseAsyncClient):
                         except json.JSONDecodeError:
                             # Content was not json-decodable
                             pass
-            except aiohttp.ClientConnectionError:
-                # Retry if the connection dropped after we got the initial response
+            except aiohttp.ClientError as e:
+                raise StreamClientError(
+                    query_params["cursor"], "Failed to get stream message."
+                ) from e
+            except asyncio.exceptions.TimeoutError:
                 logger.warning(
-                    "We have encountered an error and we will try to reconnect, cursor = {}".format(
+                    "We have encountered an timeout error and we will try to reconnect, cursor = {}".format(
                         query_params.get("cursor")
                     )
                 )
