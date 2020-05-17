@@ -90,6 +90,8 @@ class BaseCallBuilder:
 
         :return: If it is called synchronous, it will return ``Generator``, If
             it is called asynchronously, it will return ``AsyncGenerator``.
+
+        :raise: :exc:`StreamClientError <stellar_sdk.exceptions.StreamClientError>` - Failed to fetch stream resource.
         """
         if self.__async:
             return self.__stream_async()

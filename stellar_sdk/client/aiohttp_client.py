@@ -2,7 +2,6 @@ import asyncio
 import json
 import logging
 from typing import Optional, AsyncGenerator, Any, Dict
-
 import aiohttp
 from aiohttp_sse_client.client import EventSource
 
@@ -10,6 +9,7 @@ from . import defines
 from .base_async_client import BaseAsyncClient
 from .response import Response
 from ..__version__ import __version__
+from ..exceptions import StreamClientError
 
 logger = logging.getLogger(__name__)
 
@@ -42,7 +42,7 @@ class AiohttpClient(BaseAsyncClient):
         post_timeout: float = defines.DEFAULT_POST_TIMEOUT_SECONDS,
         backoff_factor: Optional[float] = DEFAULT_BACKOFF_FACTOR,
         user_agent: Optional[str] = None,
-        **kwargs
+        **kwargs,
     ) -> None:
         self.backoff_factor: Optional[float] = backoff_factor
         self.request_timeout: float = request_timeout
@@ -67,7 +67,7 @@ class AiohttpClient(BaseAsyncClient):
             headers=self.headers.copy(),
             connector=connector,
             timeout=aiohttp.ClientTimeout(total=request_timeout),
-            **kwargs
+            **kwargs,
         )
 
         self._session: aiohttp.ClientSession = session
@@ -77,7 +77,7 @@ class AiohttpClient(BaseAsyncClient):
         """Perform HTTP GET request.
 
         :param url: the request url
-        :param params: the requested params
+        :param params: the request params
         :return: the response from server
         :raise: :exc:`ConnectionError <stellar_sdk.exceptions.ConnectionError>`
         """
@@ -114,11 +114,20 @@ class AiohttpClient(BaseAsyncClient):
     async def stream(
         self, url: str, params: Dict[str, str] = None
     ) -> AsyncGenerator[Dict[str, Any], None]:
-        """Init the sse session """
+        """Perform Stream request.
+
+        :param url: the request url
+        :param params: the request params
+        :return: the stream response from server
+        :raise: :exc:`StreamClientError <stellar_sdk.exceptions.StreamClientError>` - Failed to fetch stream resource.
+        """
+
+        # Init the sse session
         if self._sse_session is None:
-            # No timeout, no special connector
+            # No special connector
             # Other headers such as "Accept: text/event-stream" are added by thr SSEClient
-            self._sse_session = aiohttp.ClientSession()
+            timeout = aiohttp.ClientTimeout(total=60 * 5)
+            self._sse_session = aiohttp.ClientSession(timeout=timeout)
 
         query_params = {**params} if params else dict()
 
@@ -160,10 +169,13 @@ class AiohttpClient(BaseAsyncClient):
                         except json.JSONDecodeError:
                             # Content was not json-decodable
                             pass
-            except aiohttp.ClientConnectionError:
-                # Retry if the connection dropped after we got the initial response
+            except aiohttp.ClientError as e:
+                raise StreamClientError(
+                    query_params["cursor"], "Failed to get stream message."
+                ) from e
+            except asyncio.exceptions.TimeoutError:
                 logger.warning(
-                    "We have encountered an error and we will try to reconnect, cursor = {}".format(
+                    "We have encountered an timeout error and we will try to reconnect, cursor = {}".format(
                         query_params.get("cursor")
                     )
                 )
