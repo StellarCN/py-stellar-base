@@ -1,6 +1,13 @@
 Release History
 ===============
 
+### Version 2.4.2-alpha2
+
+Released on May 18, 2020
+
+- fix: monkey patch `aiohttp.streams.StreamReader.readline` to solve the problem that `aiohttp_sse_client` cannot read long stream messages.
+
+
 ### Version 2.4.2-alpha1
 
 Released on May 17, 2020
