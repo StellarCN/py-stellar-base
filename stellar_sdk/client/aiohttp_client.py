@@ -3,8 +3,8 @@ import json
 import logging
 from typing import Optional, AsyncGenerator, Any, Dict
 import aiohttp
-from aiohttp_sse_client.client import EventSource
 
+from aiohttp_sse_client.client import EventSource
 from . import defines
 from .base_async_client import BaseAsyncClient
 from .response import Response
@@ -22,6 +22,42 @@ IDENTIFICATION_HEADERS = {
 }
 
 __all__ = ["AiohttpClient"]
+
+
+# Temporary solution to solve the problem that
+# `aiohttp_sse_client` cannot read long stream messages.
+# Let's rewrite a stream lib later.
+async def __readline(self) -> bytes:
+    if self._exception is not None:
+        raise self._exception
+
+    line = []
+    line_size = 0
+    not_enough = True
+
+    while not_enough:
+        while self._buffer and not_enough:
+            offset = self._buffer_offset
+            ichar = self._buffer[0].find(b'\n', offset) + 1
+            # Read from current offset to found b'\n' or to the end.
+            data = self._read_nowait_chunk(ichar - offset if ichar else -1)
+            line.append(data)
+            line_size += len(data)
+            if ichar:
+                not_enough = False
+            #
+            # if line_size > self._high_water:
+            #     raise ValueError('Line is too long')
+        if self._eof:
+            break
+
+        if not_enough:
+            await self._wait('readline')
+
+    return b''.join(line)
+
+
+aiohttp.streams.StreamReader.readline = __readline
 
 
 class AiohttpClient(BaseAsyncClient):
