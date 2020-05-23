@@ -27,10 +27,7 @@ class ManageData(Operation):
     """
 
     def __init__(
-        self,
-        data_name: str,
-        data_value: Union[str, bytes, None],
-        source: str = None,
+        self, data_name: str, data_value: Union[str, bytes, None], source: str = None,
     ) -> None:  # TODO: bytes only?
         super().__init__(source)
         self.data_name: str = data_name

@@ -163,9 +163,7 @@ class TestCreateAccount:
         origin_xdr_obj = origin_op.to_xdr_object()
 
         op = Operation.from_xdr_object(origin_xdr_obj)
-        assert (
-            op.source == source
-        )
+        assert op.source == source
         assert op.starting_balance == "1000"
         assert op.destination == destination
 
@@ -187,9 +185,7 @@ class TestBumpSequence:
         origin_xdr_obj = BumpSequence(bump_to, source).to_xdr_object()
         op = Operation.from_xdr_object(origin_xdr_obj)
         assert isinstance(op, BumpSequence)
-        assert (
-            op.source == source
-        )
+        assert op.source == source
         assert op.bump_to == bump_to
 
 
@@ -207,9 +203,7 @@ class TestInflation:
         origin_xdr_obj = Inflation(source).to_xdr_object()
         op = Operation.from_xdr_object(origin_xdr_obj)
         assert isinstance(op, Inflation)
-        assert (
-            op.source == source
-        )
+        assert op.source == source
 
 
 class TestAccountMerge:
@@ -228,11 +222,8 @@ class TestAccountMerge:
         origin_xdr_obj = AccountMerge(destination, source).to_xdr_object()
         op = Operation.from_xdr_object(origin_xdr_obj)
         assert isinstance(op, AccountMerge)
-        assert (
-            op.source == source
-        )
+        assert op.source == source
         assert op.destination == destination
-
 
 
 class TestChangeTrust:
@@ -270,9 +261,7 @@ class TestChangeTrust:
         origin_xdr_obj = ChangeTrust(asset, limit, source).to_xdr_object()
         op = Operation.from_xdr_object(origin_xdr_obj)
         assert isinstance(op, ChangeTrust)
-        assert (
-            op.source == source
-        )
+        assert op.source == source
         assert op.limit == limit
         assert op.asset == asset
 
@@ -313,13 +302,10 @@ class TestPayment:
         origin_xdr_obj = Payment(destination, asset, amount, source).to_xdr_object()
         op = Operation.from_xdr_object(origin_xdr_obj)
         assert isinstance(op, Payment)
-        assert (
-            op.source == source
-        )
+        assert op.source == source
         assert op.destination == destination
         assert op.amount == "1000"
         assert op.asset == asset
-
 
 
 class TestPathPayment:
@@ -390,9 +376,7 @@ class TestPathPayment:
         ).to_xdr_object()
         op = Operation.from_xdr_object(origin_xdr_obj)
         assert isinstance(op, PathPaymentStrictReceive)
-        assert (
-            op.source == source
-        )
+        assert op.source == source
         assert op.destination == destination
         assert op.send_asset == send_asset
         assert op.dest_asset == dest_asset
@@ -465,9 +449,7 @@ class TestPathPaymentStrictReceive:
         ).to_xdr_object()
         op = Operation.from_xdr_object(origin_xdr_obj)
         assert isinstance(op, PathPaymentStrictReceive)
-        assert (
-            op.source == source
-        )
+        assert op.source == source
         assert op.destination == destination
         assert op.send_asset == send_asset
         assert op.dest_asset == dest_asset
@@ -540,9 +522,7 @@ class TestPathPaymentStrictSend:
         ).to_xdr_object()
         op = Operation.from_xdr_object(origin_xdr_obj)
         assert isinstance(op, PathPaymentStrictSend)
-        assert (
-            op.source == source
-        )
+        assert op.source == source
         assert op.destination == destination
         assert op.send_asset == send_asset
         assert op.dest_asset == dest_asset
@@ -601,9 +581,7 @@ class TestAllowTrust:
         ).to_xdr_object()
         op = Operation.from_xdr_object(origin_xdr_obj)
         assert isinstance(op, AllowTrust)
-        assert (
-            op.source == source
-        )
+        assert op.source == source
         assert op.trustor == trustor
         assert op.asset_code == asset_code
         assert op.authorize == authorize
@@ -665,9 +643,7 @@ class TestManageData:
         origin_xdr_obj = ManageData(name, value, source).to_xdr_object()
         op = Operation.from_xdr_object(origin_xdr_obj)
         assert isinstance(op, ManageData)
-        assert (
-            op.source == source
-        )
+        assert op.source == source
         assert op.data_name == name
         if isinstance(value, str):
             value = value.encode()
@@ -783,9 +759,7 @@ class TestSetOptions:
         assert xdr_obj.to_xdr() == xdr
         from_instance = Operation.from_xdr_object(xdr_obj)
         assert isinstance(from_instance, SetOptions)
-        assert (
-            from_instance.source == source
-        )
+        assert from_instance.source == source
         assert from_instance.clear_flags == clear_flags
         assert from_instance.set_flags == set_flags
         assert from_instance.master_weight == master_weight
@@ -845,9 +819,7 @@ class TestManageSellOffer:
         assert xdr_obj.to_xdr() == xdr
         from_instance = Operation.from_xdr_object(xdr_obj)
         assert isinstance(from_instance, ManageSellOffer)
-        assert (
-            from_instance.source == source
-        )
+        assert from_instance.source == source
         assert from_instance.buying == buying
         assert from_instance.selling == selling
         assert from_instance.amount == amount
@@ -906,9 +878,7 @@ class TestManageBuyOffer:
         assert xdr_obj.to_xdr() == xdr
         from_instance = Operation.from_xdr_object(xdr_obj)
         assert isinstance(from_instance, ManageBuyOffer)
-        assert (
-            from_instance.source == source
-        )
+        assert from_instance.source == source
         assert from_instance.buying == buying
         assert from_instance.selling == selling
         assert from_instance.amount == amount
@@ -964,9 +934,7 @@ class TestCreatePassiveSellOffer:
         assert xdr_obj.to_xdr() == xdr
         from_instance = Operation.from_xdr_object(xdr_obj)
         assert isinstance(from_instance, CreatePassiveSellOffer)
-        assert (
-            from_instance.source == source
-        )
+        assert from_instance.source == source
         assert from_instance.buying == buying
         assert from_instance.selling == selling
         assert Decimal(from_instance.amount) == Decimal(amount)

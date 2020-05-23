@@ -596,10 +596,7 @@ class TransactionBuilder:
         return self.append_set_options_op(signer=signer, source=source)
 
     def append_hashx_signer(
-        self,
-        sha256_hash: [bytes, str],
-        weight: int,
-        source: str = None,
+        self, sha256_hash: [bytes, str], weight: int, source: str = None,
     ) -> "TransactionBuilder":
         """Add a sha256 hash(HashX) signer to an account.
 
@@ -621,10 +618,7 @@ class TransactionBuilder:
         return self.append_set_options_op(signer=signer, source=source)
 
     def append_pre_auth_tx_signer(
-        self,
-        pre_auth_tx_hash: bytes,
-        weight: int,
-        source: str = None,
+        self, pre_auth_tx_hash: bytes, weight: int, source: str = None,
     ) -> "TransactionBuilder":
         """Add a PreAuthTx signer to an account.
 
@@ -771,9 +765,7 @@ class TransactionBuilder:
         return self.append_operation(op)
 
     def append_account_merge_op(
-        self,
-        destination: str,
-        source: str = None,
+        self, destination: str, source: str = None,
     ) -> "TransactionBuilder":
         """Append a :class:`AccountMerge
         <stellar_sdk.operation.AccountMerge>` operation to the list of
@@ -789,9 +781,7 @@ class TransactionBuilder:
         op = AccountMerge(destination, source)
         return self.append_operation(op)
 
-    def append_inflation_op(
-        self, source: str = None
-    ) -> "TransactionBuilder":
+    def append_inflation_op(self, source: str = None) -> "TransactionBuilder":
         """Append a :class:`Inflation
         <stellar_sdk.operation.Inflation>` operation to the list of
         operations.
@@ -805,10 +795,7 @@ class TransactionBuilder:
         return self.append_operation(op)
 
     def append_manage_data_op(
-        self,
-        data_name: str,
-        data_value: Union[str, bytes, None],
-        source: str = None,
+        self, data_name: str, data_value: Union[str, bytes, None], source: str = None,
     ) -> "TransactionBuilder":
         """Append a :class:`ManageData <stellar_sdk.operation.ManageData>`
         operation to the list of operations.

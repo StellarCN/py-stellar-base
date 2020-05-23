@@ -43,7 +43,6 @@ class TestServer:
             assert isinstance(account.sequence, int)
             assert account.thresholds == Thresholds(1, 2, 3)
 
-
     @pytest.mark.asyncio
     async def test_load_acount_async(self):
         account_id = "GDV6FVHPY4JH7EEBSJYPQQYZA3OC6TKTM2TAXRHWT4EEL7BJ2BTDQT5D"
@@ -54,7 +53,6 @@ class TestServer:
             assert account.account_id == account_id
             assert isinstance(account.sequence, int)
             assert account.thresholds == Thresholds(1, 2, 3)
-
 
     def test_fetch_base_fee_sync(self):
         horizon_url = "https://horizon.stellar.org"

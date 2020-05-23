@@ -19,11 +19,7 @@ class AccountMerge(Operation):
 
     """
 
-    def __init__(
-        self,
-        destination: str,
-        source: str = None,
-    ) -> None:
+    def __init__(self, destination: str, source: str = None,) -> None:
         super().__init__(source)
         check_ed25519_public_key(destination)
         self.destination: str = destination

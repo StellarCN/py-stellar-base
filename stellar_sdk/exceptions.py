@@ -29,7 +29,7 @@ __all__ = [
     "BadResponseError",
     "UnknownRequestError",
     "NotPageableError",
-    "StreamClientError"
+    "StreamClientError",
 ]
 
 

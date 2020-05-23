@@ -82,9 +82,7 @@ class FeeBumpTransaction:
 
         :return: A new :class:`FeeBumpTransaction` object from the given XDR Transaction object.
         """
-        source = StrKey.encode_ed25519_public_key(
-            tx_xdr_object.feeSource.ed25519
-        )
+        source = StrKey.encode_ed25519_public_key(tx_xdr_object.feeSource.ed25519)
         inner_transaction_envelope = TransactionEnvelope.from_xdr_object(
             tx_xdr_object.innerTx, network_passphrase
         )

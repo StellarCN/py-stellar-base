@@ -27,10 +27,7 @@ class ChangeTrust(Operation):
     _DEFAULT_LIMIT = "922337203685.4775807"
 
     def __init__(
-        self,
-        asset: Asset,
-        limit: Union[str, Decimal] = None,
-        source: str = None,
+        self, asset: Asset, limit: Union[str, Decimal] = None, source: str = None,
     ) -> None:
         super().__init__(source)
         self.asset: Asset = asset

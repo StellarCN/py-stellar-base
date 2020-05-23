@@ -6,8 +6,7 @@ from urllib.parse import urlsplit, urlunsplit
 
 from .asset import Asset
 from .exceptions import NoApproximationError, TypeError
-from .strkey import decode_check, StrKey
-from .xdr import Xdr
+from .strkey import StrKey
 
 MUXED_ACCOUNT_STARTING_LETTER: str = "M"
 ED25519_PUBLIC_KEY_STARTING_LETTER: str = "G"
@@ -85,7 +84,6 @@ def urljoin_with_query(base: str, path: str) -> str:
         (split_url.scheme, split_url.netloc, real_path, query, split_url.fragment)
     )
     return url
-
 
 
 def check_ed25519_public_key(public_key: str) -> None:

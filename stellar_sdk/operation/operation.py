@@ -142,9 +142,7 @@ class Operation(metaclass=ABCMeta):
         )
 
     @staticmethod
-    def get_source_from_xdr_obj(
-        xdr_object: Xdr.types.Operation,
-    ) -> Optional[str]:
+    def get_source_from_xdr_obj(xdr_object: Xdr.types.Operation,) -> Optional[str]:
         """Get the source account from account the operation xdr object.
 
         :param xdr_object: the operation xdr object.

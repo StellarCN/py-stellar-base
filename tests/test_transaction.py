@@ -28,9 +28,7 @@ class TestTransaction:
 
         restore_transaction = Transaction.from_xdr_object(tx_object, v1=True)
         assert isinstance(restore_transaction, Transaction)
-        assert restore_transaction.source == Keypair.from_public_key(
-            source.public_key
-        )
+        assert restore_transaction.source == Keypair.from_public_key(source.public_key)
         assert restore_transaction.fee == fee
         assert restore_transaction.memo == memo
         assert restore_transaction.time_bounds == time_bounds
