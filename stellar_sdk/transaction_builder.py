@@ -148,7 +148,7 @@ class TransactionBuilder:
         )
 
         source_account = Account(
-            transaction_envelope.transaction.source,
+            transaction_envelope.transaction.source.public_key,
             transaction_envelope.transaction.sequence - 1,
         )
         transaction_builder = TransactionBuilder(
