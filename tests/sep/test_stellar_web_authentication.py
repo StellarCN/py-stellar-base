@@ -55,7 +55,7 @@ class TestStellarWebAuthentication:
             transaction.time_bounds.max_time - transaction.time_bounds.min_time
             == timeout
         )
-        assert transaction.source == server_kp.public_key
+        assert transaction.source.public_key == server_kp.public_key
         assert transaction.sequence == 0
 
     def test_verify_challenge_transaction(self):

@@ -87,16 +87,6 @@ def urljoin_with_query(base: str, path: str) -> str:
     return url
 
 
-def parse_ed25519_account_id(data: str) -> str:
-    if data.startswith(ED25519_PUBLIC_KEY_STARTING_LETTER):
-        return data
-    if data.startswith(MUXED_ACCOUNT_STARTING_LETTER):
-        xdr = decode_check("muxed_account", data)
-        unpacker = Xdr.StellarXDRUnpacker(xdr)
-        _ = unpacker.unpack_int64()
-        ed25519 = unpacker.unpack_uint256()
-        return StrKey.encode_ed25519_public_key(ed25519)
-
 
 def check_ed25519_public_key(public_key: str) -> None:
     StrKey.decode_ed25519_public_key(public_key)
