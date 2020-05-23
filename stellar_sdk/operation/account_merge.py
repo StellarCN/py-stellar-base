@@ -44,7 +44,7 @@ class AccountMerge(Operation):
         """
         source = Operation.get_source_from_xdr_obj(operation_xdr_object)
         destination = parse_ed25519_account_id_from_muxed_account_xdr_object(
-            operation_xdr_object.body.destination.ed25519
+            operation_xdr_object.body.destination
         )
 
         return cls(source=source, destination=destination)
