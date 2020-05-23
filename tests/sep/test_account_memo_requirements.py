@@ -34,9 +34,6 @@ class TestAccountMemoRequirements:
     DESTINATION_ACCOUNT_FETCH_ERROR = (
         "GB7WNQUTDLD6YJ4MR3KQN3Y6ZIDIGTA7GRKNH47HOGMP2ETFGRSLD6OG"
     )
-    ACCOUNT_ID_MUXED = (
-        "MAAAAAAAAAAAJURAAB2X52XFQP6FBXLGT6LWOOWMEXWHEWBDVRZ7V5WH34Y22MPFBHUHY"
-    )
 
     def test_check_memo_required_with_memo_sync(self, httpserver):
         self.__inject_mock_server(httpserver)
@@ -930,16 +927,6 @@ class TestAccountMemoRequirements:
         transaction = (
             TransactionBuilder(account, v1=True)
             .append_payment_op(self.DESTINATION_ACCOUNT_MEMO_REQUIRED_A, "10", "XLM")
-            .append_path_payment_strict_receive_op(
-                self.ACCOUNT_ID_MUXED,
-                "XLM",
-                None,
-                "10",
-                "BTC",
-                "GA7GYB3QGLTZNHNGXN3BMANS6TC7KJT3TCGTR763J4JOU4QHKL37RVV2",
-                "1",
-                [],
-            )
             .append_path_payment_strict_send_op(
                 self.DESTINATION_ACCOUNT_MEMO_REQUIRED_C,
                 "XLM",
@@ -978,16 +965,6 @@ class TestAccountMemoRequirements:
                 TransactionBuilder(account, v1=True)
                 .append_payment_op(
                     self.DESTINATION_ACCOUNT_MEMO_REQUIRED_A, "10", "XLM"
-                )
-                .append_path_payment_strict_receive_op(
-                    self.ACCOUNT_ID_MUXED,
-                    "XLM",
-                    None,
-                    "10",
-                    "BTC",
-                    "GA7GYB3QGLTZNHNGXN3BMANS6TC7KJT3TCGTR763J4JOU4QHKL37RVV2",
-                    "1",
-                    [],
                 )
                 .append_path_payment_strict_send_op(
                     self.DESTINATION_ACCOUNT_MEMO_REQUIRED_C,

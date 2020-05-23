@@ -120,7 +120,7 @@ def read_challenge_transaction(
     transaction = transaction_envelope.transaction
 
     # verify that transaction source account is equal to the server's signing key
-    if transaction.source.account_id != server_account_id:
+    if transaction.source.public_key != server_account_id:
         raise InvalidSep10ChallengeError(
             "Transaction source account is not equal to server's account."
         )
@@ -181,7 +181,7 @@ def read_challenge_transaction(
         )
 
     # TODO: I don't think this is a good idea.
-    return transaction_envelope, client_account.account_id
+    return transaction_envelope, client_account
 
 
 def verify_challenge_transaction_signers(

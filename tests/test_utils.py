@@ -1,12 +1,14 @@
 import pytest
 
 from stellar_sdk.exceptions import NoApproximationError, TypeError
+from stellar_sdk.strkey import StrKey
 from stellar_sdk.utils import (
     best_rational_approximation,
     hex_to_bytes,
     urljoin_with_query,
-    parse_ed25519_account_id,
+    parse_ed25519_account_id_from_muxed_account_xdr_object,
 )
+from stellar_sdk.xdr import Xdr
 
 
 class TestUtils:
@@ -126,18 +128,24 @@ class TestUtils:
     def test_urljoin_with_query(self, base, path, output):
         assert output == urljoin_with_query(base, path)
 
-    @pytest.mark.parametrize(
-        "input, output",
-        [
-            (
-                "GCBS5PNHHDSRQY2X64ARM36TBQ6K34LNVPZQWWYZH4MZNF2Z6KKASHUC",
-                "GCBS5PNHHDSRQY2X64ARM36TBQ6K34LNVPZQWWYZH4MZNF2Z6KKASHUC",
-            ),
-            (
-                "MAAAAAAAAAAAAAMDF262OOHFDBRVP5YBCZX5GDB4VXYW3K7TBNNRSPYZS2LVT4UUBHQGS",
-                "GCBS5PNHHDSRQY2X64ARM36TBQ6K34LNVPZQWWYZH4MZNF2Z6KKASHUC",
-            ),
-        ],
-    )
-    def test_parse_ed25519_account_id(self, input, output):
-        assert parse_ed25519_account_id(input) == output
+    def test_parse_ed25519_account_id_from_muxed_account_xdr_object_ed25519(self):
+        account_id = "GAQAA5L65LSYH7CQ3VTJ7F3HHLGCL3DSLAR2Y47263D56MNNGHSQSTVY"
+        muxed = Xdr.types.MuxedAccount(
+            type=Xdr.const.KEY_TYPE_ED25519,
+            ed25519=StrKey.decode_ed25519_public_key(account_id),
+        )
+        assert (
+            parse_ed25519_account_id_from_muxed_account_xdr_object(muxed) == account_id
+        )
+
+    def test_parse_ed25519_account_id_from_muxed_account_xdr_object_muxed_account(self):
+        account_id = "GAQAA5L65LSYH7CQ3VTJ7F3HHLGCL3DSLAR2Y47263D56MNNGHSQSTVY"
+        med25519 = Xdr.nullclass()
+        med25519.ed25519 = StrKey.decode_ed25519_public_key(account_id)
+        med25519.id = 1234
+        muxed = Xdr.types.MuxedAccount(
+            type=Xdr.const.KEY_TYPE_MUXED_ED25519, med25519=med25519
+        )
+        assert (
+            parse_ed25519_account_id_from_muxed_account_xdr_object(muxed) == account_id
+        )

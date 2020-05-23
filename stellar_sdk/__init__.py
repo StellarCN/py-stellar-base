@@ -17,7 +17,6 @@ from .fee_bump_transaction import FeeBumpTransaction
 from .fee_bump_transaction_envelope import FeeBumpTransactionEnvelope
 from .keypair import Keypair
 from .memo import Memo, NoneMemo, TextMemo, IdMemo, HashMemo, ReturnHashMemo
-from .muxed_account import MuxedAccount
 from .network import Network
 from .price import Price
 from .server import Server
@@ -50,7 +49,6 @@ __all__ = (
         "IdMemo",
         "HashMemo",
         "ReturnHashMemo",
-        "MuxedAccount",
         "Network",
         "Price",
         "Server",

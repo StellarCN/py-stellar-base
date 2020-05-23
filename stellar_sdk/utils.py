@@ -6,7 +6,7 @@ from urllib.parse import urlsplit, urlunsplit
 
 from .asset import Asset
 from .exceptions import NoApproximationError, TypeError
-from .strkey import decode_check, StrKey
+from .strkey import StrKey
 from .xdr import Xdr
 
 MUXED_ACCOUNT_STARTING_LETTER: str = "M"
@@ -87,16 +87,9 @@ def urljoin_with_query(base: str, path: str) -> str:
     return url
 
 
-def parse_ed25519_account_id(data: str) -> str:
-    if data.startswith(ED25519_PUBLIC_KEY_STARTING_LETTER):
-        return data
-    if data.startswith(MUXED_ACCOUNT_STARTING_LETTER):
-        xdr = decode_check("muxed_account", data)
-        unpacker = Xdr.StellarXDRUnpacker(xdr)
-        _ = unpacker.unpack_int64()
-        ed25519 = unpacker.unpack_uint256()
-        return StrKey.encode_ed25519_public_key(ed25519)
-
-
-def check_ed25519_public_key(public_key: str) -> None:
-    StrKey.decode_ed25519_public_key(public_key)
+def parse_ed25519_account_id_from_muxed_account_xdr_object(
+    data: Xdr.types.MuxedAccount,
+) -> str:
+    if data.ed25519 is not None:
+        return StrKey.encode_ed25519_public_key(data.ed25519)
+    return StrKey.encode_ed25519_public_key(data.med25519.ed25519)

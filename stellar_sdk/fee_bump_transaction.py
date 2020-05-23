@@ -2,11 +2,10 @@ from typing import Union
 
 from .exceptions import ValueError
 from .keypair import Keypair
-from .strkey import StrKey
 from .transaction import Transaction
 from .transaction_envelope import TransactionEnvelope
+from .utils import parse_ed25519_account_id_from_muxed_account_xdr_object
 from .xdr import Xdr
-from .muxed_account import MuxedAccount
 
 BASE_FEE = 100
 
@@ -26,7 +25,7 @@ class FeeBumpTransaction:
 
     def __init__(
         self,
-        fee_source: Union[Keypair, MuxedAccount, str],
+        fee_source: Union[Keypair, str],
         base_fee: int,
         inner_transaction_envelope: TransactionEnvelope,
     ) -> None:
@@ -37,11 +36,9 @@ class FeeBumpTransaction:
             raise ValueError("Invalid `inner_transaction`, it should be TransactionV1.")
 
         if isinstance(fee_source, str):
-            fee_source = MuxedAccount.from_account(fee_source)
-        if isinstance(fee_source, Keypair):
-            fee_source = MuxedAccount.from_account(fee_source.public_key)
+            fee_source = Keypair.from_public_key(fee_source)
 
-        self.fee_source: MuxedAccount = fee_source
+        self.fee_source: Keypair = fee_source
         self.base_fee = base_fee
         self.inner_transaction_envelope = inner_transaction_envelope
         self._inner_transaction = inner_transaction_envelope.transaction
@@ -63,7 +60,7 @@ class FeeBumpTransaction:
 
         :return: XDR Transaction object
         """
-        fee_source = self.fee_source.to_xdr_object()
+        fee_source = self.fee_source.xdr_muxed_account()
         fee = self.base_fee * (len(self._inner_transaction.operations) + 1)
         ext = Xdr.nullclass()
         ext.v = 0
@@ -85,7 +82,9 @@ class FeeBumpTransaction:
 
         :return: A new :class:`FeeBumpTransaction` object from the given XDR Transaction object.
         """
-        source = MuxedAccount.from_xdr_object(tx_xdr_object.feeSource)
+        source = parse_ed25519_account_id_from_muxed_account_xdr_object(
+            tx_xdr_object.feeSource
+        )
         inner_transaction_envelope = TransactionEnvelope.from_xdr_object(
             tx_xdr_object.innerTx, network_passphrase
         )

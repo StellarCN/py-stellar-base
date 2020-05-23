@@ -2,12 +2,15 @@ from typing import List, Union
 
 from .keypair import Keypair
 from .memo import NoneMemo, Memo
-from .muxed_account import MuxedAccount
 from .operation.operation import Operation
-from .xdr import Xdr
 from .strkey import StrKey
 from .time_bounds import TimeBounds
-from .utils import pack_xdr_array, unpack_xdr_array
+from .utils import (
+    pack_xdr_array,
+    unpack_xdr_array,
+    parse_ed25519_account_id_from_muxed_account_xdr_object,
+)
+from .xdr import Xdr
 
 __all__ = ["Transaction"]
 
@@ -51,7 +54,7 @@ class Transaction:
 
     def __init__(
         self,
-        source: Union[Keypair, MuxedAccount, str],
+        source: Union[Keypair, str],
         sequence: int,
         fee: int,
         operations: List[Operation],
@@ -65,12 +68,10 @@ class Transaction:
 
         if memo is None:
             memo = NoneMemo()
-        if isinstance(source, Keypair):
-            source = MuxedAccount(account_id=source.public_key, account_id_id=None)
         if isinstance(source, str):
-            source = MuxedAccount.from_account(source)
+            source = Keypair.from_public_key(source)
 
-        self.source: [MuxedAccount, str] = source
+        self.source: Keypair = source
         self.sequence: int = sequence
         self.operations: List[Operation] = operations
         self.memo: Memo = memo
@@ -91,13 +92,11 @@ class Transaction:
         ext = Xdr.nullclass()
         ext.v = 0
         if self.v1:
-            source_xdr = self.source.to_xdr_object()
+            source_xdr = self.source.xdr_muxed_account()
             return Xdr.types.Transaction(
                 source_xdr, self.fee, self.sequence, time_bounds, memo, operations, ext,
             )
-        source_xdr = (
-            Keypair.from_public_key(self.source.account_id).xdr_account_id().ed25519
-        )
+        source_xdr = self.source.xdr_public_key().ed25519
         return Xdr.types.TransactionV0(
             source_xdr, self.fee, self.sequence, time_bounds, memo, operations, ext,
         )
@@ -119,7 +118,9 @@ class Transaction:
         :return: A new :class:`Transaction` object from the given XDR Transaction object.
         """
         if v1:
-            source = MuxedAccount.from_xdr_object(tx_xdr_object.sourceAccount)
+            source = parse_ed25519_account_id_from_muxed_account_xdr_object(
+                tx_xdr_object.sourceAccount
+            )
         else:
             source = StrKey.encode_ed25519_public_key(
                 tx_xdr_object.sourceAccountEd25519
