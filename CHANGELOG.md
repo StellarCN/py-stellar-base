@@ -1,6 +1,37 @@
 Release History
 ===============
 
+### Version 2.5.0-alpha1
+
+Released on May 23, 2020
+
+**This update include breaking changes**
+
+In [2.4.0](https://github.com/StellarCN/py-stellar-base/releases/tag/2.4.0), we added support for Stellar Protocol 13, it also includes support for M-strkeys ([SEP-0023](https://github.com/stellar/stellar-protocol/blob/master/ecosystem/sep-0023.md)), but now we are going to remove support for [SEP-0023](https://github.com/stellar/stellar-protocol/blob/master/ecosystem/sep-0023.md), because it is still a draft and may not be promoted to final, adding support for it means that users may end up storing M-strkeys, which can create a lot of problems if [SEP-0023](https://github.com/stellar/stellar-protocol/blob/master/ecosystem/sep-0023.md) ends up not being implemented. If you want to know more details, please click [here](https://github.com/StellarCN/py-stellar-base/issues/304#issuecomment-632876302).
+
+### Update
+
+- Revert support for [SEP-0023](https://github.com/stellar/stellar-protocol/blob/master/ecosystem/sep-0023.md). ([#319](https://github.com/StellarCN/py-stellar-base/pull/319))
+
+### Breaking changes
+
+- `stellar_sdk.muxed_account.MuxedAccount` has been removed. ([#319](https://github.com/StellarCN/py-stellar-base/pull/319))
+
+- we will no longer accept the M-strkeys address, when resolving the XDR, if it contains a muxed account, only the G-strkeys will be resolved, and the id will be discarded.
+
+- The following fields, which were previously(in 2.4.x) a `stellar_sdk.muxed_account.MuxedAccount` are now a `str` ([#319](https://github.com/StellarCN/py-stellar-base/pull/319))
+  - `stellar_sdk.Account.account_id`
+  - `stellar_sdk.operation.Operation.source`
+  - `stellar_sdk.operation.AccountMerge.destination`
+  - `stellar_sdk.operation.PathPaymentStrictReceive.destination`
+  - `stellar_sdk.operation.PathPaymentStrictSend.destination`
+  - `stellar_sdk.operation.PathPayment.destination`
+  - `stellar_sdk.operation.Payment.destination`
+
+- The following fields, which were previously(in 2.4.x) a `stellar_sdk.muxed_account.MuxedAccount` are now a `stellar_sdk.Keypair` ([#319](https://github.com/StellarCN/py-stellar-base/pull/319))
+  - `stellar_sdk.Transaction.source`
+  - `stellar_sdk.FeeBumpTransaction.fee_source`
+  
 ### Version 2.4.2
 
 Released on May 23, 2020
@@ -116,7 +147,6 @@ This version brings protocol 13 support with backwards compatibility support for
   - `stellar_sdk.FeeBumpTransaction.fee_source`
   - `stellar_sdk.operation.Operation.source`
   - `stellar_sdk.operation.AccountMerge.destination`
-  - `stellar_sdk.operation.AllowTrust.destination`
   - `stellar_sdk.operation.PathPaymentStrictReceive.destination`
   - `stellar_sdk.operation.PathPaymentStrictSend.destination`
   - `stellar_sdk.operation.PathPayment.destination`
