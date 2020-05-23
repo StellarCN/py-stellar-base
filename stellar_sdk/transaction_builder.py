@@ -10,7 +10,6 @@ from .fee_bump_transaction import FeeBumpTransaction
 from .fee_bump_transaction_envelope import FeeBumpTransactionEnvelope
 from .keypair import Keypair
 from .memo import *
-from .muxed_account import MuxedAccount
 from .network import Network
 from .operation import *
 from .price import Price
@@ -89,7 +88,7 @@ class TransactionBuilder:
 
     @staticmethod
     def build_fee_bump_transaction(
-        fee_source: Union[MuxedAccount, Keypair, str],
+        fee_source: Union[Keypair, str],
         base_fee: int,
         inner_transaction_envelope: TransactionEnvelope,
         network_passphrase: str = Network.TESTNET_NETWORK_PASSPHRASE,
@@ -149,7 +148,7 @@ class TransactionBuilder:
         )
 
         source_account = Account(
-            transaction_envelope.transaction.source,
+            transaction_envelope.transaction.source.public_key,
             transaction_envelope.transaction.sequence - 1,
         )
         transaction_builder = TransactionBuilder(
@@ -276,7 +275,7 @@ class TransactionBuilder:
         self,
         destination: str,
         starting_balance: Union[str, Decimal],
-        source: Union[MuxedAccount, str] = None,
+        source: str = None,
     ) -> "TransactionBuilder":
         """Append a :class:`CreateAccount
         <stellar_sdk.operation.CreateAccount>` operation to the list of
@@ -298,7 +297,7 @@ class TransactionBuilder:
         asset_code: str,
         asset_issuer: str,
         limit: Union[str, Decimal] = None,
-        source: Union[MuxedAccount, str] = None,
+        source: str = None,
     ) -> "TransactionBuilder":
         """Append a :class:`ChangeTrust <stellar_sdk.operation.ChangeTrust>`
         operation to the list of operations.
@@ -316,11 +315,11 @@ class TransactionBuilder:
 
     def append_payment_op(
         self,
-        destination: Union[MuxedAccount, str],
+        destination: str,
         amount: Union[str, Decimal],
         asset_code: str = "XLM",
         asset_issuer: Optional[str] = None,
-        source: Union[MuxedAccount, str] = None,
+        source: str = None,
     ) -> "TransactionBuilder":
         """Append a :class:`Payment <stellar_sdk.operation.Payment>` operation
         to the list of operations.
@@ -339,7 +338,7 @@ class TransactionBuilder:
 
     def append_path_payment_op(
         self,
-        destination: Union[MuxedAccount, str],
+        destination: str,
         send_code: str,
         send_issuer: Optional[str],
         send_max: Union[str, Decimal],
@@ -347,7 +346,7 @@ class TransactionBuilder:
         dest_issuer: Optional[str],
         dest_amount: Union[str, Decimal],
         path: List[Asset],
-        source: Union[MuxedAccount, str] = None,
+        source: str = None,
     ) -> "TransactionBuilder":
         """Append a :class:`PathPayment <stellar_sdk.operation.PathPayment>`
         operation to the list of operations.
@@ -395,7 +394,7 @@ class TransactionBuilder:
 
     def append_path_payment_strict_receive_op(
         self,
-        destination: Union[MuxedAccount, str],
+        destination: str,
         send_code: str,
         send_issuer: Optional[str],
         send_max: Union[str, Decimal],
@@ -403,7 +402,7 @@ class TransactionBuilder:
         dest_issuer: Optional[str],
         dest_amount: Union[str, Decimal],
         path: List[Asset],
-        source: Union[MuxedAccount, str] = None,
+        source: str = None,
     ) -> "TransactionBuilder":
         """Append a :class:`PathPaymentStrictReceive <stellar_sdk.operation.PathPaymentStrictReceive>`
         operation to the list of operations.
@@ -445,7 +444,7 @@ class TransactionBuilder:
 
     def append_path_payment_strict_send_op(
         self,
-        destination: Union[MuxedAccount, str],
+        destination: str,
         send_code: str,
         send_issuer: Optional[str],
         send_amount: Union[str, Decimal],
@@ -453,7 +452,7 @@ class TransactionBuilder:
         dest_issuer: Optional[str],
         dest_min: Union[str, Decimal],
         path: List[Asset],
-        source: Union[MuxedAccount, str] = None,
+        source: str = None,
     ) -> "TransactionBuilder":
         """Append a :class:`PathPaymentStrictSend <stellar_sdk.operation.PathPaymentStrictSend>`
         operation to the list of operations.
@@ -496,7 +495,7 @@ class TransactionBuilder:
         trustor: str,
         asset_code: str,
         authorize: Union[TrustLineEntryFlag, bool],
-        source: Union[MuxedAccount, str] = None,
+        source: str = None,
     ) -> "TransactionBuilder":
         """Append an :class:`AllowTrust <stellar_sdk.operation.AllowTrust>`
         operation to the list of operations.
@@ -526,7 +525,7 @@ class TransactionBuilder:
         high_threshold: int = None,
         home_domain: str = None,
         signer: Signer = None,
-        source: Union[MuxedAccount, str] = None,
+        source: str = None,
     ) -> "TransactionBuilder":
         """Append a :class:`SetOptions <stellar_sdk.operation.SetOptions>`
         operation to the list of operations.
@@ -578,7 +577,7 @@ class TransactionBuilder:
         return self.append_operation(op)
 
     def append_ed25519_public_key_signer(
-        self, account_id: str, weight: int, source: Union[MuxedAccount, str] = None
+        self, account_id: str, weight: int, source: str = None
     ) -> "TransactionBuilder":
         """Add a ed25519 public key signer to an account.
 
@@ -597,10 +596,7 @@ class TransactionBuilder:
         return self.append_set_options_op(signer=signer, source=source)
 
     def append_hashx_signer(
-        self,
-        sha256_hash: [bytes, str],
-        weight: int,
-        source: Union[MuxedAccount, str] = None,
+        self, sha256_hash: [bytes, str], weight: int, source: str = None,
     ) -> "TransactionBuilder":
         """Add a sha256 hash(HashX) signer to an account.
 
@@ -622,10 +618,7 @@ class TransactionBuilder:
         return self.append_set_options_op(signer=signer, source=source)
 
     def append_pre_auth_tx_signer(
-        self,
-        pre_auth_tx_hash: bytes,
-        weight: int,
-        source: Union[MuxedAccount, str] = None,
+        self, pre_auth_tx_hash: bytes, weight: int, source: str = None,
     ) -> "TransactionBuilder":
         """Add a PreAuthTx signer to an account.
 
@@ -656,7 +649,7 @@ class TransactionBuilder:
         amount: Union[str, Decimal],
         price: Union[str, Decimal, Price],
         offer_id: int = 0,
-        source: Union[MuxedAccount, str] = None,
+        source: str = None,
     ) -> "TransactionBuilder":
         """Append a :class:`ManageBuyOffer <stellar_sdk.operation.ManageBuyOffer>`
         operation to the list of operations.
@@ -700,7 +693,7 @@ class TransactionBuilder:
         amount: Union[str, Decimal],
         price: Union[str, Price, Decimal],
         offer_id: int = 0,
-        source: Union[MuxedAccount, str] = None,
+        source: str = None,
     ) -> "TransactionBuilder":
         """Append a :class:`ManageSellOffer <stellar_sdk.operation.ManageSellOffer>`
         operation to the list of operations.
@@ -743,7 +736,7 @@ class TransactionBuilder:
         buying_issuer: Optional[str],
         amount: Union[str, Decimal],
         price: Union[str, Price, Decimal],
-        source: Union[MuxedAccount, str] = None,
+        source: str = None,
     ) -> "TransactionBuilder":
         """Append a :class:`CreatePassiveSellOffer
         <stellar_sdk.operation.CreatePassiveSellOffer>` operation to the list of
@@ -772,9 +765,7 @@ class TransactionBuilder:
         return self.append_operation(op)
 
     def append_account_merge_op(
-        self,
-        destination: Union[MuxedAccount, str],
-        source: Union[MuxedAccount, str] = None,
+        self, destination: str, source: str = None,
     ) -> "TransactionBuilder":
         """Append a :class:`AccountMerge
         <stellar_sdk.operation.AccountMerge>` operation to the list of
@@ -790,9 +781,7 @@ class TransactionBuilder:
         op = AccountMerge(destination, source)
         return self.append_operation(op)
 
-    def append_inflation_op(
-        self, source: Union[MuxedAccount, str] = None
-    ) -> "TransactionBuilder":
+    def append_inflation_op(self, source: str = None) -> "TransactionBuilder":
         """Append a :class:`Inflation
         <stellar_sdk.operation.Inflation>` operation to the list of
         operations.
@@ -806,10 +795,7 @@ class TransactionBuilder:
         return self.append_operation(op)
 
     def append_manage_data_op(
-        self,
-        data_name: str,
-        data_value: Union[str, bytes, None],
-        source: Union[MuxedAccount, str] = None,
+        self, data_name: str, data_value: Union[str, bytes, None], source: str = None,
     ) -> "TransactionBuilder":
         """Append a :class:`ManageData <stellar_sdk.operation.ManageData>`
         operation to the list of operations.
@@ -829,7 +815,7 @@ class TransactionBuilder:
         return self.append_operation(op)
 
     def append_bump_sequence_op(
-        self, bump_to: int, source: Union[MuxedAccount, str] = None
+        self, bump_to: int, source: str = None
     ) -> "TransactionBuilder":
         """Append a :class:`BumpSequence <stellar_sdk.operation.BumpSequence>`
         operation to the list of operations.

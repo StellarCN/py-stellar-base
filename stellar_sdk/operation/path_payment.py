@@ -4,7 +4,6 @@ from typing import List, Union
 
 from .path_payment_strict_receive import PathPaymentStrictReceive
 from ..asset import Asset
-from ..muxed_account import MuxedAccount
 
 
 class PathPayment(PathPaymentStrictReceive):
@@ -29,13 +28,13 @@ class PathPayment(PathPaymentStrictReceive):
 
     def __init__(
         self,
-        destination: Union[MuxedAccount, str],
+        destination: str,
         send_asset: Asset,
         send_max: Union[str, Decimal],
         dest_asset: Asset,
         dest_amount: Union[str, Decimal],
         path: List[Asset],
-        source: Union[MuxedAccount, str] = None,
+        source: str = None,
     ) -> None:
         warnings.warn(
             "Will be removed in version v3.0.0, "

@@ -1,6 +1,5 @@
 import pytest
 
-from stellar_sdk import MuxedAccount
 from stellar_sdk.account import Account
 from stellar_sdk.exceptions import Ed25519PublicKeyInvalidError
 from stellar_sdk.sep.ed25519_public_key_signer import Ed25519PublicKeySigner
@@ -12,7 +11,7 @@ class TestAccount:
         sequence = 123123
         account = Account(account_id=account_id, sequence=sequence)
         assert account.sequence == sequence
-        assert account.account_id == MuxedAccount(account_id)
+        assert account.account_id == account_id
         other_account = Account(account_id=account_id, sequence=sequence)
         assert account == other_account
 

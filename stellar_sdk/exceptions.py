@@ -29,7 +29,7 @@ __all__ = [
     "BadResponseError",
     "UnknownRequestError",
     "NotPageableError",
-    "StreamClientError"
+    "StreamClientError",
 ]
 
 
@@ -61,12 +61,6 @@ class BadSignatureError(ValueError):
 
 class Ed25519PublicKeyInvalidError(ValueError):
     """Ed25519 public key is incorrect.
-
-    """
-
-
-class MuxedEd25519AccountInvalidError(ValueError):
-    """Muxed Ed25519 public key is incorrect.
 
     """
 

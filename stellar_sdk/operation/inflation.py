@@ -1,7 +1,4 @@
-from typing import Union
-
 from .operation import Operation
-from ..muxed_account import MuxedAccount
 from ..xdr import Xdr
 
 
@@ -17,7 +14,7 @@ class Inflation(Operation):
 
     """
 
-    def __init__(self, source: Union[MuxedAccount, str] = None) -> None:
+    def __init__(self, source: str = None) -> None:
         super().__init__(source)
 
     @classmethod
