@@ -1,20 +1,13 @@
 Release History
 ===============
 
-### Version 2.4.2-alpha2
+### Version 2.4.2
 
-Released on May 18, 2020
+Released on May 23, 2020
 
-- fix: monkey patch `aiohttp.streams.StreamReader.readline` to solve the problem that `aiohttp_sse_client` cannot read long stream messages.
+- refactor: separating client GET and POST timeout values. ([#315](https://github.com/StellarCN/py-stellar-base/pull/315))
 
-
-### Version 2.4.2-alpha1
-
-Released on May 17, 2020
-
-- refactor: separating client GET and POST timeout values. (#315)
-
-- refactor: optimize the use of `stellar_sdk.client.AiohttpClient`, it may throw an `stellar_sdk.exceptions.` exception now, you should catch it. (#317)
+- refactor: optimize the use of `stellar_sdk.client.AiohttpClient`, it may throw a `stellar_sdk.exceptions.StreamClientError` exception now, and you should catch it. ([#317](https://github.com/StellarCN/py-stellar-base/pull/317))
 
   ```python
   import asyncio
@@ -33,7 +26,47 @@ Released on May 17, 2020
                   async for transaction in server.transactions().cursor(cursor).stream():
                       print(f"Transaction: {transaction}")
               except StreamClientError as e:
-                  logging.error(f'An StreamClientError was encountered while reading the SSE message, which was caused by {e.__cause__}.')
+                  logging.error(f'A StreamClientError was encountered while reading the SSE message, which was caused by {e.current_cursor}.')
+                  cursor = e.current_cursor
+  
+  
+  if __name__ == '__main__':
+      asyncio.run(listen_transaction())
+  ```
+  
+### Version 2.4.2-alpha2
+
+Released on May 18, 2020
+
+- fix: monkey patch `aiohttp.streams.StreamReader.readline` to solve the problem that `aiohttp_sse_client` cannot read long stream messages.
+
+
+### Version 2.4.2-alpha1
+
+Released on May 17, 2020
+
+- refactor: separating client GET and POST timeout values. (#315)
+
+- refactor: optimize the use of `stellar_sdk.client.AiohttpClient`, it may throw a `stellar_sdk.exceptions.StreamClientError` exception now, and you should catch it. (#317)
+
+  ```python
+  import asyncio
+  import logging
+  
+  from stellar_sdk import AiohttpClient, Server
+  from stellar_sdk.exceptions import StreamClientError
+  
+  horizon_url = "https://horizon.stellar.org"
+  
+  async def listen_transaction():
+      async with Server(horizon_url, AiohttpClient()) as server:
+          cursor = "now"
+          while True:
+              try:
+                  async for transaction in server.transactions().cursor(cursor).stream():
+                      print(f"Transaction: {transaction}")
+              except StreamClientError as e:
+                  logging.error(f'A StreamClientError was encountered while reading the SSE message, which was caused by {e.current_cursor}.')
                   cursor = e.current_cursor
   
   
