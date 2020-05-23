@@ -4,7 +4,6 @@ from typing import Union
 from .operation import Operation
 from .utils import check_price, check_amount
 from ..asset import Asset
-from ..muxed_account import MuxedAccount
 from ..price import Price
 from ..xdr import Xdr
 
@@ -41,7 +40,7 @@ class ManageBuyOffer(Operation):
         amount: Union[str, Decimal],
         price: Union[Price, str, Decimal],
         offer_id: int = 0,
-        source: Union[MuxedAccount, str] = None,
+        source: str = None,
     ) -> None:
         super().__init__(source)
         check_amount(amount)

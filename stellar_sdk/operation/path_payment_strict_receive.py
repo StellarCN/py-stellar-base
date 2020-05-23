@@ -2,9 +2,10 @@ from decimal import Decimal
 from typing import List, Union
 
 from .operation import Operation
-from .utils import check_amount, parse_mux_account_from_account
+from .utils import check_amount, check_ed25519_public_key
 from ..asset import Asset
-from ..muxed_account import MuxedAccount
+from ..keypair import Keypair
+from ..strkey import StrKey
 from ..xdr import Xdr
 
 
@@ -30,18 +31,19 @@ class PathPaymentStrictReceive(Operation):
 
     def __init__(
         self,
-        destination: Union[MuxedAccount, str],
+        destination: str,
         send_asset: Asset,
         send_max: Union[str, Decimal],
         dest_asset: Asset,
         dest_amount: Union[str, Decimal],
         path: List[Asset],
-        source: Union[MuxedAccount, str] = None,
+        source: str = None,
     ) -> None:
         super().__init__(source)
         check_amount(send_max)
         check_amount(dest_amount)
-        self.destination: MuxedAccount = parse_mux_account_from_account(destination)
+        check_ed25519_public_key(destination)
+        self.destination: str = destination
         self.send_asset: Asset = send_asset
         self.send_max: Union[str, Decimal] = send_max
         self.dest_asset: Asset = dest_asset
@@ -53,7 +55,7 @@ class PathPaymentStrictReceive(Operation):
         return Xdr.const.PATH_PAYMENT_STRICT_RECEIVE
 
     def _to_operation_body(self) -> Xdr.nullclass:
-        destination = self.destination.to_xdr_object()
+        destination = Keypair.from_public_key(self.destination).xdr_muxed_account()
         send_asset = self.send_asset.to_xdr_object()
         dest_asset = self.dest_asset.to_xdr_object()
         path = [asset.to_xdr_object() for asset in self.path]
@@ -80,8 +82,8 @@ class PathPaymentStrictReceive(Operation):
 
         """
         source = Operation.get_source_from_xdr_obj(operation_xdr_object)
-        destination = MuxedAccount.from_xdr_object(
-            operation_xdr_object.body.pathPaymentStrictReceiveOp.destination
+        destination = StrKey.encode_ed25519_public_key(
+            operation_xdr_object.body.pathPaymentStrictReceiveOp.destination.ed25519
         )
         send_asset = Asset.from_xdr_object(
             operation_xdr_object.body.pathPaymentStrictReceiveOp.sendAsset

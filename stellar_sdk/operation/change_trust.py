@@ -4,7 +4,6 @@ from typing import Union
 from .operation import Operation
 from .utils import check_amount
 from ..asset import Asset
-from ..muxed_account import MuxedAccount
 from ..xdr import Xdr
 
 
@@ -31,7 +30,7 @@ class ChangeTrust(Operation):
         self,
         asset: Asset,
         limit: Union[str, Decimal] = None,
-        source: Union[MuxedAccount, str] = None,
+        source: str = None,
     ) -> None:
         super().__init__(source)
         self.asset: Asset = asset

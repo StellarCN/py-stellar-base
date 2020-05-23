@@ -1,8 +1,7 @@
-from typing import Union
-
 from .operation import Operation
-from .utils import parse_mux_account_from_account
-from ..muxed_account import MuxedAccount
+from .utils import check_ed25519_public_key
+from ..keypair import Keypair
+from ..strkey import StrKey
 from ..xdr import Xdr
 
 
@@ -22,11 +21,12 @@ class AccountMerge(Operation):
 
     def __init__(
         self,
-        destination: Union[MuxedAccount, str],
-        source: Union[MuxedAccount, str] = None,
+        destination: str,
+        source: str = None,
     ) -> None:
         super().__init__(source)
-        self.destination: MuxedAccount = parse_mux_account_from_account(destination)
+        check_ed25519_public_key(destination)
+        self.destination: str = destination
 
     @classmethod
     def type_code(cls) -> int:
@@ -35,7 +35,7 @@ class AccountMerge(Operation):
     def _to_operation_body(self) -> Xdr.nullclass:
         body = Xdr.nullclass()
         body.type = Xdr.const.ACCOUNT_MERGE
-        body.destination = self.destination.to_xdr_object()
+        body.destination = Keypair.from_public_key(self.destination).xdr_muxed_account()
         return body
 
     @classmethod
@@ -47,7 +47,7 @@ class AccountMerge(Operation):
 
         """
         source = Operation.get_source_from_xdr_obj(operation_xdr_object)
-        destination = MuxedAccount.from_xdr_object(
-            operation_xdr_object.body.destination
+        destination = StrKey.encode_ed25519_public_key(
+            operation_xdr_object.body.destination.ed25519
         )
         return cls(source=source, destination=destination)
