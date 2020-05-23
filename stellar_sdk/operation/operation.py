@@ -6,7 +6,7 @@ from typing import Optional, List, Union
 from .utils import check_source
 from ..keypair import Keypair
 from ..exceptions import ValueError, TypeError
-from ..strkey import StrKey
+from ..utils import parse_ed25519_account_id_from_muxed_account_xdr_object
 from ..xdr import Xdr
 
 
@@ -149,7 +149,9 @@ class Operation(metaclass=ABCMeta):
         :return: The source account from account the operation xdr object.
         """
         if xdr_object.sourceAccount:
-            return StrKey.encode_ed25519_public_key(xdr_object.sourceAccount[0].ed25519)
+            return parse_ed25519_account_id_from_muxed_account_xdr_object(
+                xdr_object.sourceAccount[0]
+            )
         return None
 
     def __eq__(self, other: object) -> bool:

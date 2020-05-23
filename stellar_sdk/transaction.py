@@ -5,7 +5,11 @@ from .memo import NoneMemo, Memo
 from .operation.operation import Operation
 from .strkey import StrKey
 from .time_bounds import TimeBounds
-from .utils import pack_xdr_array, unpack_xdr_array
+from .utils import (
+    pack_xdr_array,
+    unpack_xdr_array,
+    parse_ed25519_account_id_from_muxed_account_xdr_object,
+)
 from .xdr import Xdr
 
 __all__ = ["Transaction"]
@@ -114,8 +118,8 @@ class Transaction:
         :return: A new :class:`Transaction` object from the given XDR Transaction object.
         """
         if v1:
-            source = StrKey.encode_ed25519_public_key(
-                tx_xdr_object.sourceAccount.ed25519
+            source = parse_ed25519_account_id_from_muxed_account_xdr_object(
+                tx_xdr_object.sourceAccount
             )
         else:
             source = StrKey.encode_ed25519_public_key(

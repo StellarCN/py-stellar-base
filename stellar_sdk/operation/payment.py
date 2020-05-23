@@ -5,7 +5,7 @@ from .operation import Operation
 from .utils import check_amount, check_ed25519_public_key
 from ..keypair import Keypair
 from ..asset import Asset
-from ..strkey import StrKey
+from ..utils import parse_ed25519_account_id_from_muxed_account_xdr_object
 from ..xdr import Xdr
 
 
@@ -61,8 +61,8 @@ class Payment(Operation):
         """
         source = Operation.get_source_from_xdr_obj(operation_xdr_object)
 
-        destination = StrKey.encode_ed25519_public_key(
-            operation_xdr_object.body.paymentOp.destination.ed25519
+        destination = parse_ed25519_account_id_from_muxed_account_xdr_object(
+            operation_xdr_object.body.paymentOp.destination
         )
         asset = Asset.from_xdr_object(operation_xdr_object.body.paymentOp.asset)
         amount = Operation.from_xdr_amount(operation_xdr_object.body.paymentOp.amount)

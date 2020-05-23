@@ -5,7 +5,7 @@ from .operation import Operation
 from .utils import check_amount, check_ed25519_public_key
 from ..asset import Asset
 from ..keypair import Keypair
-from ..strkey import StrKey
+from ..utils import parse_ed25519_account_id_from_muxed_account_xdr_object
 from ..xdr import Xdr
 
 
@@ -82,9 +82,10 @@ class PathPaymentStrictReceive(Operation):
 
         """
         source = Operation.get_source_from_xdr_obj(operation_xdr_object)
-        destination = StrKey.encode_ed25519_public_key(
-            operation_xdr_object.body.pathPaymentStrictReceiveOp.destination.ed25519
+        destination = parse_ed25519_account_id_from_muxed_account_xdr_object(
+            operation_xdr_object.body.pathPaymentStrictReceiveOp.destination
         )
+
         send_asset = Asset.from_xdr_object(
             operation_xdr_object.body.pathPaymentStrictReceiveOp.sendAsset
         )

@@ -1,7 +1,7 @@
 from .operation import Operation
 from .utils import check_ed25519_public_key
 from ..keypair import Keypair
-from ..strkey import StrKey
+from ..utils import parse_ed25519_account_id_from_muxed_account_xdr_object
 from ..xdr import Xdr
 
 
@@ -43,7 +43,8 @@ class AccountMerge(Operation):
 
         """
         source = Operation.get_source_from_xdr_obj(operation_xdr_object)
-        destination = StrKey.encode_ed25519_public_key(
+        destination = parse_ed25519_account_id_from_muxed_account_xdr_object(
             operation_xdr_object.body.destination.ed25519
         )
+
         return cls(source=source, destination=destination)

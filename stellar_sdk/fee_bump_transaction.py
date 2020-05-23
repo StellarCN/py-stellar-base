@@ -2,9 +2,9 @@ from typing import Union
 
 from .exceptions import ValueError
 from .keypair import Keypair
-from .strkey import StrKey
 from .transaction import Transaction
 from .transaction_envelope import TransactionEnvelope
+from .utils import parse_ed25519_account_id_from_muxed_account_xdr_object
 from .xdr import Xdr
 
 BASE_FEE = 100
@@ -82,7 +82,9 @@ class FeeBumpTransaction:
 
         :return: A new :class:`FeeBumpTransaction` object from the given XDR Transaction object.
         """
-        source = StrKey.encode_ed25519_public_key(tx_xdr_object.feeSource.ed25519)
+        source = parse_ed25519_account_id_from_muxed_account_xdr_object(
+            tx_xdr_object.feeSource
+        )
         inner_transaction_envelope = TransactionEnvelope.from_xdr_object(
             tx_xdr_object.innerTx, network_passphrase
         )
