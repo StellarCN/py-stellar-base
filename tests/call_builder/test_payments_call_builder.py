@@ -58,3 +58,16 @@ class TestPaymentsCallBuilder:
             account_id=account_id
         )
         assert builder.params == {"include_failed": "false"}
+
+    def test_join(self):
+        account_id = "GATEMHCCKCY67ZUCKTROYN24ZYT5GK4EQZ65JJLDHKHRUZI3EUEKMTCH"
+        builder = (
+            PaymentsCallBuilder(horizon_url, client)
+            .for_account(account_id)
+            .include_failed(False)
+            .join("transactions")
+        )
+        assert builder.endpoint == "accounts/{account_id}/payments".format(
+            account_id=account_id
+        )
+        assert builder.params == {"include_failed": "false", "join": "transactions"}
