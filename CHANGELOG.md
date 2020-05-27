@@ -1,5 +1,25 @@
 Release History
-===============
+==============
+
+### Version 2.5.1
+
+Released on May 27, 2020
+
+#### Added
+
+- add `stellar_sdk.call_builder.PaymentsCallBuilder.join` ([#323](https://github.com/StellarCN/py-stellar-base/pull/323))
+
+  ```python
+  from stellar_sdk import Server
+  
+  horizon_url = "https://horizon.stellar.org/"
+  account_id = "GAHK7EEG2WWHVKDNT4CEQFZGKF2LGDSW2IVM4S5DP42RBW3K6BTODB4A"
+  server = Server(horizon_url)
+  # Set `join` to `transactions` to include the transactions which created each of the payments in the response.
+  resp = server.payments().for_account(account_id).include_failed(False).join("transactions").call()
+  print(resp)
+  ```
+
 
 ### Version 2.5.0
 
@@ -9,11 +29,11 @@ Released on May 25, 2020
 
 In [2.4.0](https://github.com/StellarCN/py-stellar-base/releases/tag/2.4.0), we added support for Stellar Protocol 13, it also includes support for M-strkeys ([SEP-0023](https://github.com/stellar/stellar-protocol/blob/master/ecosystem/sep-0023.md)), but now we are going to remove support for [SEP-0023](https://github.com/stellar/stellar-protocol/blob/master/ecosystem/sep-0023.md), because it is still a draft and may not be promoted to final, adding support for it means that users may end up storing M-strkeys, which can create a lot of problems if [SEP-0023](https://github.com/stellar/stellar-protocol/blob/master/ecosystem/sep-0023.md) ends up not being implemented. If you want to know more details, please click [here](https://github.com/StellarCN/py-stellar-base/issues/304#issuecomment-632876302).
 
-### Update
+#### Update
 
 - Revert support for [SEP-0023](https://github.com/stellar/stellar-protocol/blob/master/ecosystem/sep-0023.md). ([#319](https://github.com/StellarCN/py-stellar-base/pull/319))
 
-### Breaking changes
+#### Breaking changes
 
 - `stellar_sdk.muxed_account.MuxedAccount` has been removed. ([#319](https://github.com/StellarCN/py-stellar-base/pull/319))
 
@@ -40,11 +60,11 @@ Released on May 23, 2020
 
 In [2.4.0](https://github.com/StellarCN/py-stellar-base/releases/tag/2.4.0), we added support for Stellar Protocol 13, it also includes support for M-strkeys ([SEP-0023](https://github.com/stellar/stellar-protocol/blob/master/ecosystem/sep-0023.md)), but now we are going to remove support for [SEP-0023](https://github.com/stellar/stellar-protocol/blob/master/ecosystem/sep-0023.md), because it is still a draft and may not be promoted to final, adding support for it means that users may end up storing M-strkeys, which can create a lot of problems if [SEP-0023](https://github.com/stellar/stellar-protocol/blob/master/ecosystem/sep-0023.md) ends up not being implemented. If you want to know more details, please click [here](https://github.com/StellarCN/py-stellar-base/issues/304#issuecomment-632876302).
 
-### Update
+#### Update
 
 - Revert support for [SEP-0023](https://github.com/stellar/stellar-protocol/blob/master/ecosystem/sep-0023.md). ([#319](https://github.com/StellarCN/py-stellar-base/pull/319))
 
-### Breaking changes
+#### Breaking changes
 
 - `stellar_sdk.muxed_account.MuxedAccount` has been removed. ([#319](https://github.com/StellarCN/py-stellar-base/pull/319))
 
@@ -153,7 +173,7 @@ Released on May 05, 2020
 
 This version brings protocol 13 support with backwards compatibility support for protocol 12.
 
-### Added
+#### Added
 
 - Add `stellar_sdk.MuxedAccount` which makes it easy to use muxed account. ([#311](https://github.com/StellarCN/py-stellar-base/pull/311)).
 - Add `TransactionBuilder.build_fee_bump_transaction` which makes it easy to create `FeeBumpTransaction`, we have written an example, please click [here](https://github.com/StellarCN/py-stellar-base/blob/91fbd2ad61/examples/build_fee_bump_transaction.py) to view it ([#298](https://github.com/StellarCN/py-stellar-base/pull/298)).
@@ -163,13 +183,13 @@ This version brings protocol 13 support with backwards compatibility support for
 - Add `FeeBumpTransaction` and `FeeBumpTransactionEnvelope` which makes it easy to work with fee bump transactions ([#298](https://github.com/StellarCN/py-stellar-base/pull/298)).
 - Add `stellar_sdk.helpers.parse_transaction_envelope_from_xdr` which makes it easy to parse `TransactionEnvelope` and `FeeBumpTransactionEnvelope`([#298](https://github.com/StellarCN/py-stellar-base/pull/298)).
 
-### Update
+#### Update
 
 - Update XDR definitions with protocol 13.
 - Extend `TransactionEnvelope` to work with `TransactionEnvelope`and `FeeBumpTransactionEnvelope` ([#298](https://github.com/StellarCN/py-stellar-base/pull/298)).
 - Add backward compatibility support for [CAP-0018](https://github.com/stellar/stellar-protocol/blob/f01c9354aaab1e8ca97a25cf888829749cadf36a/core/cap-0018.md) ([#307](https://github.com/StellarCN/py-stellar-base/pull/307)).
 
-### Breaking changes
+#### Breaking changes
 
 - The following fields, which were previously an `str` are now a `stellar_sdk.MuxedAccount` ([#311](https://github.com/StellarCN/py-stellar-base/pull/311)):
 
@@ -185,7 +205,7 @@ This version brings protocol 13 support with backwards compatibility support for
 
 - In this version, some changes have occurred in the XDR files. If you depend on them, please click [here](https://github.com/StellarCN/py-stellar-base/compare/686cf05be3c76426b6386eb31658615aa708b293...30311f51ff0f27f000cf5bc61c5c98ac734eb8f7) to view the changes.
 
-### Example
+#### Example
 
 Some examples let you quickly learn about these changes.
 
@@ -295,11 +315,11 @@ Some examples let you quickly learn about these changes.
 
 Released on May 03, 2020
 
-### Added
+#### Added
 
 - Add `stellar_sdk.MuxedAccount` which makes it easy to use muxed account. ([#311](https://github.com/StellarCN/py-stellar-base/pull/311)).
 
-### Breaking changes
+#### Breaking changes
 
 - The following fields, which were previously an `str` are now a `stellar_sdk.MuxedAccount` ([#311](https://github.com/StellarCN/py-stellar-base/pull/311)):
 
@@ -329,7 +349,7 @@ Released on April 26, 2020
 
 This version brings protocol 13 support with backwards compatibility support for protocol 12.
 
-### Added
+#### Added
 
 - Add `TransactionBuilder.build_fee_bump_transaction` which makes it easy to create `FeeBumpTransaction`, we have written an example, please click [here](https://github.com/StellarCN/py-stellar-base/blob/91fbd2ad61/examples/build_fee_bump_transaction.py) to view it ([#298](https://github.com/StellarCN/py-stellar-base/pull/298)).
 - Adds a feature flag which allow consumers of this library to create V1 (Protocol 13) transactions using the `TransactionBuilder` ([#298](https://github.com/StellarCN/py-stellar-base/pull/298)).
@@ -338,13 +358,13 @@ This version brings protocol 13 support with backwards compatibility support for
 - Add `FeeBumpTransaction` and `FeeBumpTransactionEnvelope` which makes it easy to work with fee bump transactions ([#298](https://github.com/StellarCN/py-stellar-base/pull/298)).
 - Add `stellar_sdk.helpers.parse_transaction_envelope_from_xdr` which makes it easy to parse `TransactionEnvelope` and `FeeBumpTransactionEnvelope`([#298](https://github.com/StellarCN/py-stellar-base/pull/298)).
 
-### Update
+#### Update
 
 - Update XDR definitions with protocol 13.
 - Extend `TransactionEnvelope` to work with `TransactionEnvelope`and `FeeBumpTransactionEnvelope` ([#298](https://github.com/StellarCN/py-stellar-base/pull/298)).
 - Add backward compatibility support for [CAP-0018](https://github.com/stellar/stellar-protocol/blob/f01c9354aaab1e8ca97a25cf888829749cadf36a/core/cap-0018.md) ([#307](https://github.com/StellarCN/py-stellar-base/pull/307)).
 
-### Breaking changes
+#### Breaking changes
 
 - The type of `Transaction.source` changes from `Keypair` to `str`.
 
