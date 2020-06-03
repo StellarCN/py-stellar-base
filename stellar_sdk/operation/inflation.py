@@ -33,4 +33,6 @@ class Inflation(Operation):
 
         """
         source = Operation.get_source_from_xdr_obj(operation_xdr_object)
-        return cls(source)
+        op = cls(source)
+        op._source_muxed = Operation.get_source_muxed_from_xdr_obj(operation_xdr_object)
+        return op

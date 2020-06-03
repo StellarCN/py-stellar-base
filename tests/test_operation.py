@@ -2,7 +2,7 @@ from decimal import Decimal
 
 import pytest
 
-from stellar_sdk import Price, Asset
+from stellar_sdk import Price, Asset, Keypair
 from stellar_sdk.exceptions import Ed25519PublicKeyInvalidError, AssetCodeInvalidError
 from stellar_sdk.operation import Operation, CreateAccount
 from stellar_sdk.operation.account_merge import AccountMerge
@@ -93,7 +93,8 @@ class TestBaseOperation:
         origin_xdr_obj = origin_op.to_xdr_object()
 
         op = Operation.from_xdr_object(origin_xdr_obj)
-        assert op.source == None
+        assert op.source is None
+        assert op._source_muxed is None
         assert op.starting_balance == "1000"
         assert op.destination == destination
 
@@ -103,6 +104,25 @@ class TestBaseOperation:
         op3 = ManageData("A", "B")
         op4 = "BAD TYEE"
         assert op1 == op2 != op3 != op4
+
+    def test_get_source_muxed_from_xdr_obj(self):  # BAD TEST
+        destination = "GCEZWKCA5VLDNRLN3RPRJMRZOX3Z6G5CHCGSNFHEYVXM3XOJMDS674JZ"
+        source = "GBBM6BKZPEHWYO3E3YKREDPQXMS4VK35YLNU7NFBRI26RAN7GI5POFBB"
+        source2 = "GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV"
+        starting_balance = "1000.00"
+        origin_op = CreateAccount(destination, starting_balance, source)
+        origin_xdr_obj = origin_op.to_xdr_object()
+
+        op = Operation.from_xdr_object(origin_xdr_obj)
+        assert op.to_xdr_object().to_xdr() == origin_xdr_obj.to_xdr()
+        assert op.source == source
+        assert (
+            op._source_muxed.to_xdr()
+            == Keypair.from_public_key(source).xdr_muxed_account().to_xdr()
+        )
+        op.source = source2
+        assert op.source == source2
+        assert op._source_muxed is None
 
 
 class TestCreateAccount:
@@ -225,6 +245,21 @@ class TestAccountMerge:
         assert op.source == source
         assert op.destination == destination
 
+    def test_from_xdr_muxed(self):
+        source = "GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV"
+        destination = "GCEZWKCA5VLDNRLN3RPRJMRZOX3Z6G5CHCGSNFHEYVXM3XOJMDS674JZ"
+        destination2 = "GBL3NR5XNBNFAYVQMZ7R6RMUKLMGRUHNIYDYMEUPANQV6OROQXSDZYHV"
+        origin_xdr_obj = AccountMerge(destination, source).to_xdr_object()
+        restore_op = AccountMerge.from_xdr_object(origin_xdr_obj)
+        assert restore_op.to_xdr_object().to_xdr() == origin_xdr_obj.to_xdr()
+        assert (
+            restore_op._destination_muxed.to_xdr()
+            == Keypair.from_public_key(destination).xdr_muxed_account().to_xdr()
+        )
+        restore_op.destination = destination2
+        assert restore_op._destination_muxed is None
+        assert restore_op.destination == destination2
+
 
 class TestChangeTrust:
     @pytest.mark.parametrize(
@@ -306,6 +341,23 @@ class TestPayment:
         assert op.destination == destination
         assert op.amount == "1000"
         assert op.asset == asset
+
+    def test_from_xdr_muxed(self):
+        source = "GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV"
+        destination = "GCEZWKCA5VLDNRLN3RPRJMRZOX3Z6G5CHCGSNFHEYVXM3XOJMDS674JZ"
+        destination2 = "GBL3NR5XNBNFAYVQMZ7R6RMUKLMGRUHNIYDYMEUPANQV6OROQXSDZYHV"
+        amount = "1000.0000000"
+        asset = Asset("USD", "GDGU5OAPHNPU5UCLE5RDJHG7PXZFQYWKCFOEXSXNMR6KRQRI5T6XXCD7")
+        origin_xdr_obj = Payment(destination, asset, amount, source).to_xdr_object()
+        restore_op = Payment.from_xdr_object(origin_xdr_obj)
+        assert restore_op.to_xdr_object().to_xdr() == origin_xdr_obj.to_xdr()
+        assert (
+            restore_op._destination_muxed.to_xdr()
+            == Keypair.from_public_key(destination).xdr_muxed_account().to_xdr()
+        )
+        restore_op.destination = destination2
+        assert restore_op._destination_muxed is None
+        assert restore_op.destination == destination2
 
 
 class TestPathPayment:
@@ -457,6 +509,35 @@ class TestPathPaymentStrictReceive:
         assert op.dest_amount == "3.1415"
         assert op.path == path
 
+    def test_from_xdr_muxed(self):
+        source = "GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV"
+        destination = "GCEZWKCA5VLDNRLN3RPRJMRZOX3Z6G5CHCGSNFHEYVXM3XOJMDS674JZ"
+        destination2 = "GBL3NR5XNBNFAYVQMZ7R6RMUKLMGRUHNIYDYMEUPANQV6OROQXSDZYHV"
+        send_asset = Asset(
+            "USD", "GDGU5OAPHNPU5UCLE5RDJHG7PXZFQYWKCFOEXSXNMR6KRQRI5T6XXCD7"
+        )
+        dest_asset = Asset(
+            "USD", "GDGU5OAPHNPU5UCLE5RDJHG7PXZFQYWKCFOEXSXNMR6KRQRI5T6XXCD7"
+        )
+        send_max = "3.0070000"
+        dest_amount = "3.1415000"
+        path = [
+            Asset("USD", "GBBM6BKZPEHWYO3E3YKREDPQXMS4VK35YLNU7NFBRI26RAN7GI5POFBB"),
+            Asset("EUR", "GDTNXRLOJD2YEBPKK7KCMR7J33AAG5VZXHAJTHIG736D6LVEFLLLKPDL"),
+        ]
+        origin_xdr_obj = PathPaymentStrictReceive(
+            destination, send_asset, send_max, dest_asset, dest_amount, path, source
+        ).to_xdr_object()
+        restore_op = PathPaymentStrictReceive.from_xdr_object(origin_xdr_obj)
+        assert restore_op.to_xdr_object().to_xdr() == origin_xdr_obj.to_xdr()
+        assert (
+            restore_op._destination_muxed.to_xdr()
+            == Keypair.from_public_key(destination).xdr_muxed_account().to_xdr()
+        )
+        restore_op.destination = destination2
+        assert restore_op._destination_muxed is None
+        assert restore_op.destination == destination2
+
 
 class TestPathPaymentStrictSend:
     def test_to_xdr_obj(self):
@@ -529,6 +610,35 @@ class TestPathPaymentStrictSend:
         assert op.send_amount == "3.1415"
         assert op.dest_min == "3.007"
         assert op.path == path
+
+    def test_from_xdr_muxed(self):
+        source = "GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV"
+        destination = "GCEZWKCA5VLDNRLN3RPRJMRZOX3Z6G5CHCGSNFHEYVXM3XOJMDS674JZ"
+        destination2 = "GBL3NR5XNBNFAYVQMZ7R6RMUKLMGRUHNIYDYMEUPANQV6OROQXSDZYHV"
+        send_asset = Asset(
+            "USD", "GDGU5OAPHNPU5UCLE5RDJHG7PXZFQYWKCFOEXSXNMR6KRQRI5T6XXCD7"
+        )
+        dest_asset = Asset(
+            "USD", "GDGU5OAPHNPU5UCLE5RDJHG7PXZFQYWKCFOEXSXNMR6KRQRI5T6XXCD7"
+        )
+        send_amount = "3.1415000"
+        dest_min = "3.0070000"
+        path = [
+            Asset("USD", "GBBM6BKZPEHWYO3E3YKREDPQXMS4VK35YLNU7NFBRI26RAN7GI5POFBB"),
+            Asset("EUR", "GDTNXRLOJD2YEBPKK7KCMR7J33AAG5VZXHAJTHIG736D6LVEFLLLKPDL"),
+        ]
+        origin_xdr_obj = PathPaymentStrictSend(
+            destination, send_asset, send_amount, dest_asset, dest_min, path, source
+        ).to_xdr_object()
+        restore_op = PathPaymentStrictSend.from_xdr_object(origin_xdr_obj)
+        assert restore_op.to_xdr_object().to_xdr() == origin_xdr_obj.to_xdr()
+        assert (
+            restore_op._destination_muxed.to_xdr()
+            == Keypair.from_public_key(destination).xdr_muxed_account().to_xdr()
+        )
+        restore_op.destination = destination2
+        assert restore_op._destination_muxed is None
+        assert restore_op.destination == destination2
 
 
 class TestAllowTrust:

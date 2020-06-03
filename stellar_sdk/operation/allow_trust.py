@@ -124,6 +124,8 @@ class AllowTrust(Operation):
             )
 
         asset_code = asset_code.rstrip("\x00")
-        return cls(
+        op = cls(
             source=source, trustor=trustor, authorize=authorize, asset_code=asset_code
         )
+        op._source_muxed = Operation.get_source_muxed_from_xdr_obj(operation_xdr_object)
+        return op

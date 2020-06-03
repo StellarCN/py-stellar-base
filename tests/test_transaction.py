@@ -60,6 +60,32 @@ class TestTransaction:
         assert restore_transaction.time_bounds == time_bounds
         assert restore_transaction.sequence == sequence
 
+    def test_to_xdr_str_source_muxed_v1(self):
+        source = "GCEZWKCA5VLDNRLN3RPRJMRZOX3Z6G5CHCGSNFHEYVXM3XOJMDS674JZ"
+        source2 = "GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV"
+        destination = "GDJJRRMBK4IWLEPJGIE6SXD2LP7REGZODU7WDC3I2D6MR37F4XSHBKX2"
+        amount = "1000.0"
+        sequence = 1
+        memo = IdMemo(100)
+        fee = 200
+        asset = Asset.native()
+        time_bounds = TimeBounds(12345, 56789)
+        ops = [Payment(destination, asset, amount), ManageData("hello", "world")]
+
+        tx_object = Transaction(
+            source, sequence, fee, ops, memo, time_bounds, True
+        ).to_xdr_object()
+        restore_tx = Transaction.from_xdr_object(tx_object, v1=True)
+        assert restore_tx.to_xdr_object().to_xdr() == tx_object.to_xdr()
+        assert restore_tx.source == Keypair.from_public_key(source)
+        assert (
+            restore_tx._source_muxed.to_xdr()
+            == Keypair.from_public_key(source).xdr_muxed_account().to_xdr()
+        )
+        restore_tx.source = source2
+        assert restore_tx.source == Keypair.from_public_key(source2)
+        assert restore_tx._source_muxed is None
+
     def test_none_memo_v1(self):
         source = Keypair.from_public_key(
             "GCEZWKCA5VLDNRLN3RPRJMRZOX3Z6G5CHCGSNFHEYVXM3XOJMDS674JZ"

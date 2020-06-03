@@ -1,4 +1,4 @@
-from typing import Union
+from typing import Union, Optional
 
 from .exceptions import ValueError
 from .keypair import Keypair
@@ -38,7 +38,8 @@ class FeeBumpTransaction:
         if isinstance(fee_source, str):
             fee_source = Keypair.from_public_key(fee_source)
 
-        self.fee_source: Keypair = fee_source
+        self._fee_source: Keypair = fee_source
+        self._fee_source_muxed: Optional[Xdr.types.MuxedAccount] = None
         self.base_fee = base_fee
         self.inner_transaction_envelope = inner_transaction_envelope
         self._inner_transaction = inner_transaction_envelope.transaction
@@ -55,12 +56,27 @@ class FeeBumpTransaction:
                 )
             )
 
+    @property
+    def fee_source(self) -> Keypair:
+        return self._fee_source
+
+    @fee_source.setter
+    def fee_source(self, value: Union[Keypair, str]):
+        if isinstance(value, str):
+            value = Keypair.from_public_key(value)
+
+        self._fee_source: Keypair = value
+        self._fee_source_muxed: Optional[Xdr.types.MuxedAccount] = None
+
     def to_xdr_object(self) -> Xdr.types.FeeBumpTransaction:
         """Get an XDR object representation of this :class:`FeeBumpTransaction`.
 
         :return: XDR Transaction object
         """
-        fee_source = self.fee_source.xdr_muxed_account()
+        if self._fee_source_muxed is not None:
+            fee_source = self._fee_source_muxed
+        else:
+            fee_source = self._fee_source.xdr_muxed_account()
         fee = self.base_fee * (len(self._inner_transaction.operations) + 1)
         ext = Xdr.nullclass()
         ext.v = 0
@@ -92,11 +108,13 @@ class FeeBumpTransaction:
             inner_transaction_envelope.transaction.operations
         )
         base_fee = int(tx_xdr_object.fee / (inner_transaction_operation_length + 1))
-        return cls(
+        tx = cls(
             fee_source=source,
             base_fee=base_fee,
             inner_transaction_envelope=inner_transaction_envelope,
         )
+        tx._fee_source_muxed = tx_xdr_object.feeSource
+        return tx
 
     @classmethod
     def from_xdr(cls, xdr: str, network_passphrase: str) -> "FeeBumpTransaction":
