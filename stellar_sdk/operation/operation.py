@@ -133,7 +133,7 @@ class Operation(metaclass=ABCMeta):
         if self._source_muxed is not None:
             source_account = [self._source_muxed]
         elif self.source is not None:
-            source_account = [Keypair.from_public_key(self.source).xdr_muxed_account()]
+            source_account = [Keypair.from_public_key(self._source).xdr_muxed_account()]
         return Xdr.types.Operation(source_account, self._to_operation_body())
 
     @classmethod
