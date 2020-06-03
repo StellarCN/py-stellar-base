@@ -187,7 +187,7 @@ class SetOptions(Operation):
         if signer_xdr_object:
             signer = Signer.from_xdr_object(signer_xdr_object[0])
 
-        return cls(
+        op = cls(
             inflation_dest=inflation_dest,
             clear_flags=clear_flags,
             set_flags=set_flags,
@@ -199,3 +199,5 @@ class SetOptions(Operation):
             signer=signer,
             source=source,
         )
+        op._source_muxed = Operation.get_source_muxed_from_xdr_obj(operation_xdr_object)
+        return op

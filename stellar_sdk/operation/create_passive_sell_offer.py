@@ -102,6 +102,8 @@ class CreatePassiveSellOffer(Operation):
             operation_xdr_object.body.createPassiveSellOfferOp.price
         )
 
-        return cls(
+        op = cls(
             source=source, selling=selling, buying=buying, amount=amount, price=price
         )
+        op._source_muxed = Operation.get_source_muxed_from_xdr_obj(operation_xdr_object)
+        return op

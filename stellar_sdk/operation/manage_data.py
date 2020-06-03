@@ -70,4 +70,6 @@ class ManageData(Operation):
         data_name = operation_xdr_object.body.manageDataOp.dataName.decode()
 
         data_value = unpack_xdr_array(operation_xdr_object.body.manageDataOp.dataValue)
-        return cls(data_name=data_name, data_value=data_value, source=source)
+        op = cls(data_name=data_name, data_value=data_value, source=source)
+        op._source_muxed = Operation.get_source_muxed_from_xdr_obj(operation_xdr_object)
+        return op

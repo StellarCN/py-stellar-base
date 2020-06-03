@@ -70,6 +70,8 @@ class CreateAccount(Operation):
             operation_xdr_object.body.createAccountOp.startingBalance
         )
 
-        return cls(
+        op = cls(
             source=source, destination=destination, starting_balance=starting_balance
         )
+        op._source_muxed = Operation.get_source_muxed_from_xdr_obj(operation_xdr_object)
+        return op
