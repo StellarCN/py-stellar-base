@@ -1,6 +1,15 @@
 Release History
 ==============
 
+### Version 2.5.2
+
+Released on Jun 03, 2020
+
+#### Update
+- Optimized the way to read xdr. In 2.5.x, we will discard the id in muxed account, 
+    in this update, we will keep the id, but it is invisible to users. 
+    We recommend that all users using 2.5.x upgrade to this version. ([#326](https://github.com/StellarCN/py-stellar-base/pull/326))
+  
 ### Version 2.5.1
 
 Released on May 27, 2020
@@ -19,7 +28,6 @@ Released on May 27, 2020
   resp = server.payments().for_account(account_id).include_failed(False).join("transactions").call()
   print(resp)
   ```
-
 
 ### Version 2.5.0
 
