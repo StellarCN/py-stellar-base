@@ -104,7 +104,7 @@ class TestFeeBumpTransaction:
             restore_te.transaction._fee_source_muxed.to_xdr()
             == fee_source.xdr_muxed_account().to_xdr()
         )
-        restore_te.transaction.fee_source = fee_source2
+        restore_te.transaction.fee_source = fee_source2.public_key
         assert restore_te.transaction.fee_source.public_key == fee_source2.public_key
         assert restore_te.transaction._fee_source_muxed is None
 
