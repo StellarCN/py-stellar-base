@@ -1,3 +1,5 @@
+from typing import Optional
+
 from .operation import Operation
 from .utils import check_ed25519_public_key
 from ..keypair import Keypair
@@ -22,7 +24,18 @@ class AccountMerge(Operation):
     def __init__(self, destination: str, source: str = None,) -> None:
         super().__init__(source)
         check_ed25519_public_key(destination)
-        self.destination: str = destination
+        self._destination: str = destination
+        self._destination_muxed: Optional[Xdr.types.MuxedAccount] = None
+
+    @property
+    def destination(self) -> str:
+        return self._destination
+
+    @destination.setter
+    def destination(self, value: str):
+        check_ed25519_public_key(value)
+        self._destination_muxed = None
+        self._destination = value
 
     @classmethod
     def type_code(cls) -> int:
@@ -31,7 +44,7 @@ class AccountMerge(Operation):
     def _to_operation_body(self) -> Xdr.nullclass:
         body = Xdr.nullclass()
         body.type = Xdr.const.ACCOUNT_MERGE
-        body.destination = Keypair.from_public_key(self.destination).xdr_muxed_account()
+        body.destination = Keypair.from_public_key(self._destination).xdr_muxed_account() if self._destination_muxed is None else self._destination_muxed
         return body
 
     @classmethod
@@ -46,5 +59,7 @@ class AccountMerge(Operation):
         destination = parse_ed25519_account_id_from_muxed_account_xdr_object(
             operation_xdr_object.body.destination
         )
-
-        return cls(source=source, destination=destination)
+        op = cls(source=source, destination=destination)
+        op._destination_muxed = operation_xdr_object.body.destination
+        op._source_muxed = Operation.get_source_muxed_from_xdr_obj(operation_xdr_object)
+        return op

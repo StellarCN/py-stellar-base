@@ -1,4 +1,4 @@
-from typing import List, Union
+from typing import List, Union, Optional
 
 from .keypair import Keypair
 from .memo import NoneMemo, Memo
@@ -71,13 +71,26 @@ class Transaction:
         if isinstance(source, str):
             source = Keypair.from_public_key(source)
 
-        self.source: Keypair = source
+        self._source: Keypair = source
+        self._source_muxed: Optional[Xdr.types.MuxedAccount] = None
         self.sequence: int = sequence
         self.operations: List[Operation] = operations
         self.memo: Memo = memo
         self.fee: int = fee
         self.time_bounds: TimeBounds = time_bounds
         self.v1: bool = v1
+
+    @property
+    def source(self) -> Keypair:
+        return self._source
+
+    @source.setter
+    def source(self, value: Union[Keypair, str]):
+        if isinstance(value, str):
+            value = Keypair.from_public_key(value)
+
+        self._source: Keypair = value
+        self._source_muxed: Optional[Xdr.types.MuxedAccount] = None
 
     def to_xdr_object(self) -> Union[Xdr.types.Transaction, Xdr.types.TransactionV0]:
         """Get an XDR object representation of this :class:`Transaction`.
@@ -92,7 +105,7 @@ class Transaction:
         ext = Xdr.nullclass()
         ext.v = 0
         if self.v1:
-            source_xdr = self.source.xdr_muxed_account()
+            source_xdr = self.source.xdr_muxed_account() if self._source_muxed is None else self._source_muxed
             return Xdr.types.Transaction(
                 source_xdr, self.fee, self.sequence, time_bounds, memo, operations, ext,
             )
@@ -136,7 +149,7 @@ class Transaction:
 
         memo = Memo.from_xdr_object(tx_xdr_object.memo)
         operations = list(map(Operation.from_xdr_object, tx_xdr_object.operations))
-        return cls(
+        tx = cls(
             source=source,
             sequence=sequence,
             time_bounds=time_bounds,
@@ -145,6 +158,9 @@ class Transaction:
             operations=operations,
             v1=v1,
         )
+        if v1:
+            tx._source_muxed = tx_xdr_object.sourceAccount
+        return tx
 
     @classmethod
     def from_xdr(cls, xdr: str, v1: bool = False) -> "Transaction":
