@@ -97,7 +97,7 @@ class ManageSellOffer(Operation):
         price = Price.from_xdr_object(operation_xdr_object.body.manageSellOfferOp.price)
         offer_id = operation_xdr_object.body.manageSellOfferOp.offerID
 
-        return cls(
+        op = cls(
             source=source,
             selling=selling,
             buying=buying,
@@ -105,3 +105,5 @@ class ManageSellOffer(Operation):
             price=price,
             offer_id=offer_id,
         )
+        op._source_muxed = Operation.get_source_muxed_from_xdr_obj(operation_xdr_object)
+        return op

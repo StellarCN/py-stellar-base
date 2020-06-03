@@ -66,4 +66,6 @@ class ChangeTrust(Operation):
         line = Asset.from_xdr_object(operation_xdr_object.body.changeTrustOp.line)
         limit = Operation.from_xdr_amount(operation_xdr_object.body.changeTrustOp.limit)
 
-        return cls(source=source, asset=line, limit=limit)
+        op = cls(source=source, asset=line, limit=limit)
+        op._source_muxed = Operation.get_source_muxed_from_xdr_obj(operation_xdr_object)
+        return op
