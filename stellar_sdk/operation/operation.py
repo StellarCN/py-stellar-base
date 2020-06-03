@@ -166,7 +166,9 @@ class Operation(metaclass=ABCMeta):
         return None
 
     @staticmethod
-    def get_source_muxed_from_xdr_obj(xdr_object: Xdr.types.Operation,) -> Optional[Xdr.types.MuxedAccount]:
+    def get_source_muxed_from_xdr_obj(
+        xdr_object: Xdr.types.Operation,
+    ) -> Optional[Xdr.types.MuxedAccount]:
         """Get the source account from account the operation xdr object.
 
         :param xdr_object: the operation xdr object.

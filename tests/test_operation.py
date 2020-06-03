@@ -93,8 +93,8 @@ class TestBaseOperation:
         origin_xdr_obj = origin_op.to_xdr_object()
 
         op = Operation.from_xdr_object(origin_xdr_obj)
-        assert op.source == None
-        assert op._source_muxed == None
+        assert op.source is None
+        assert op._source_muxed is None
         assert op.starting_balance == "1000"
         assert op.destination == destination
 
@@ -114,14 +114,15 @@ class TestBaseOperation:
         origin_xdr_obj = origin_op.to_xdr_object()
 
         op = Operation.from_xdr_object(origin_xdr_obj)
+        assert op.to_xdr_object().to_xdr() == origin_xdr_obj.to_xdr()
         assert op.source == source
         assert (
             op._source_muxed.to_xdr()
             == Keypair.from_public_key(source).xdr_muxed_account().to_xdr()
         )
-        # op.source = source2
-        # assert op.source == source2
-        # assert op._source_muxed is None
+        op.source = source2
+        assert op.source == source2
+        assert op._source_muxed is None
 
 
 class TestCreateAccount:
@@ -250,6 +251,7 @@ class TestAccountMerge:
         destination2 = "GBL3NR5XNBNFAYVQMZ7R6RMUKLMGRUHNIYDYMEUPANQV6OROQXSDZYHV"
         origin_xdr_obj = AccountMerge(destination, source).to_xdr_object()
         restore_op = AccountMerge.from_xdr_object(origin_xdr_obj)
+        assert restore_op.to_xdr_object().to_xdr() == origin_xdr_obj.to_xdr()
         assert (
             restore_op._destination_muxed.to_xdr()
             == Keypair.from_public_key(destination).xdr_muxed_account().to_xdr()
@@ -348,6 +350,7 @@ class TestPayment:
         asset = Asset("USD", "GDGU5OAPHNPU5UCLE5RDJHG7PXZFQYWKCFOEXSXNMR6KRQRI5T6XXCD7")
         origin_xdr_obj = Payment(destination, asset, amount, source).to_xdr_object()
         restore_op = Payment.from_xdr_object(origin_xdr_obj)
+        assert restore_op.to_xdr_object().to_xdr() == origin_xdr_obj.to_xdr()
         assert (
             restore_op._destination_muxed.to_xdr()
             == Keypair.from_public_key(destination).xdr_muxed_account().to_xdr()
@@ -526,6 +529,7 @@ class TestPathPaymentStrictReceive:
             destination, send_asset, send_max, dest_asset, dest_amount, path, source
         ).to_xdr_object()
         restore_op = PathPaymentStrictReceive.from_xdr_object(origin_xdr_obj)
+        assert restore_op.to_xdr_object().to_xdr() == origin_xdr_obj.to_xdr()
         assert (
             restore_op._destination_muxed.to_xdr()
             == Keypair.from_public_key(destination).xdr_muxed_account().to_xdr()
@@ -627,6 +631,7 @@ class TestPathPaymentStrictSend:
             destination, send_asset, send_amount, dest_asset, dest_min, path, source
         ).to_xdr_object()
         restore_op = PathPaymentStrictSend.from_xdr_object(origin_xdr_obj)
+        assert restore_op.to_xdr_object().to_xdr() == origin_xdr_obj.to_xdr()
         assert (
             restore_op._destination_muxed.to_xdr()
             == Keypair.from_public_key(destination).xdr_muxed_account().to_xdr()

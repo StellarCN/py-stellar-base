@@ -42,13 +42,13 @@ class AccountMerge(Operation):
         return Xdr.const.ACCOUNT_MERGE
 
     def _to_operation_body(self) -> Xdr.nullclass:
+        if self._destination_muxed is not None:
+            destination = self._destination_muxed
+        else:
+            destination = Keypair.from_public_key(self._destination).xdr_muxed_account()
         body = Xdr.nullclass()
         body.type = Xdr.const.ACCOUNT_MERGE
-        body.destination = (
-            Keypair.from_public_key(self._destination).xdr_muxed_account()
-            if self._destination_muxed is None
-            else self._destination_muxed
-        )
+        body.destination = destination
         return body
 
     @classmethod

@@ -105,7 +105,10 @@ class Transaction:
         ext = Xdr.nullclass()
         ext.v = 0
         if self.v1:
-            source_xdr = self.source.xdr_muxed_account() if self._source_muxed is None else self._source_muxed
+            if self._source_muxed is not None:
+                source_xdr = self._source_muxed
+            else:
+                source_xdr = self.source.xdr_muxed_account()
             return Xdr.types.Transaction(
                 source_xdr, self.fee, self.sequence, time_bounds, memo, operations, ext,
             )

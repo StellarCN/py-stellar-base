@@ -66,7 +66,10 @@ class PathPaymentStrictSend(Operation):
         return Xdr.const.PATH_PAYMENT_STRICT_SEND
 
     def _to_operation_body(self) -> Xdr.nullclass:
-        destination = Keypair.from_public_key(self.destination).xdr_muxed_account() if self._destination_muxed is None else self._destination_muxed
+        if self._destination_muxed is not None:
+            destination = self._destination_muxed
+        else:
+            destination = Keypair.from_public_key(self._destination).xdr_muxed_account()
         send_asset = self.send_asset.to_xdr_object()
         dest_asset = self.dest_asset.to_xdr_object()
         path = [asset.to_xdr_object() for asset in self.path]
@@ -124,6 +127,8 @@ class PathPaymentStrictSend(Operation):
             dest_min=dest_min,
             path=path,
         )
-        op._destination_muxed = operation_xdr_object.body.pathPaymentStrictSendOp.destination
+        op._destination_muxed = (
+            operation_xdr_object.body.pathPaymentStrictSendOp.destination
+        )
         op._source_muxed = Operation.get_source_muxed_from_xdr_obj(operation_xdr_object)
         return op

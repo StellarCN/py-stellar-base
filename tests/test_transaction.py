@@ -76,6 +76,7 @@ class TestTransaction:
             source, sequence, fee, ops, memo, time_bounds, True
         ).to_xdr_object()
         restore_tx = Transaction.from_xdr_object(tx_object, v1=True)
+        assert restore_tx.to_xdr_object().to_xdr() == tx_object.to_xdr()
         assert restore_tx.source == Keypair.from_public_key(source)
         assert (
             restore_tx._source_muxed.to_xdr()
