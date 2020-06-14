@@ -4,7 +4,7 @@ from stellar_sdk.client.simple_requests_client import SimpleRequestsClient, USER
 class TestSimpleRequestsClient:
     def test_get(self):
         client = SimpleRequestsClient()
-        url = "http://httpbin.org/get"
+        url = "https://httpbin.org/get"
         params = {"hello": "world", "stellar": "sdk"}
         resp = client.get(url, params=params)
         assert resp.status_code == 200
@@ -14,7 +14,7 @@ class TestSimpleRequestsClient:
 
     def test_post(self):
         client = SimpleRequestsClient()
-        url = "http://httpbin.org/post"
+        url = "https://httpbin.org/post"
         data = {
             "tx": "AAAAABa3N0+hJk17vP/AnYK5xV4o/PhOnEfgi36HlYo4g+3nAAAAZQFDfjoAAaTSAAAAAA"
             "AAAAEAAAAJX3VwZGF0ZWRfAAAAAAAAAQAAAAEAAAAAFrc3T6EmTXu8/8CdgrnFXij8+E6cR+"
