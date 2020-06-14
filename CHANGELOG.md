@@ -1,6 +1,14 @@
 Release History
 ==============
 
+### Version 2.5.3
+
+Released on Jun 14, 2020
+
+#### Fixed
+- Set the value of the `v1` property correctly when calling TransactionBuilder.from_xdr. ([#333](https://github.com/StellarCN/py-stellar-base/pull/333))
+
+
 ### Version 2.5.2
 
 Released on Jun 03, 2020
