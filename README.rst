@@ -33,9 +33,9 @@ Stellar Python SDK
     :alt: Stellar Protocol
     :target: https://www.stellar.org/developers/guides/concepts/scp.html
 
-.. image:: https://img.shields.io/badge/Horizon%20Version-1.2.0-blue?style=flat-square
+.. image:: https://img.shields.io/badge/Horizon%20Version-1.3.0-blue?style=flat-square
     :alt: Horizon Version
-    :target: https://github.com/stellar/go/releases/tag/horizon-v1.0.1
+    :target: https://github.com/stellar/go/releases/tag/horizon-v1.3.0
 
 py-stellar-sdk is a Python library for communicating with
 a `Stellar Horizon server`_. It is used for building Stellar apps on Python. It supports **Python 3.6+** as
@@ -53,13 +53,11 @@ py-stellar-sdk's documentation can be found at https://stellar-sdk.readthedocs.i
 Installing
 ----------
 
-This branch is about v2, click `here <https://github.com/StellarCN/py-stellar-base/tree/v1>`_ for the v1 branch. Thank you for your patience as we transition!
-
 Install and update using `pipenv`_ or `pip`_:
 
 .. code-block:: text
 
-    pip install stellar-sdk==2.3.2
+    pip install stellar-sdk==2.5.2
 
 
 A Simple Example
