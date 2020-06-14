@@ -16,6 +16,7 @@ class BaseTransactionEnvelope(Generic[T]):
         network_passphrase: str,
         signatures: List[Xdr.types.DecoratedSignature] = None,
     ) -> None:
+        self.network_passphrase: str = network_passphrase
         self.network_id: bytes = Network(network_passphrase).network_id()
         self.signatures: List[Xdr.types.DecoratedSignature] = signatures or []
 
