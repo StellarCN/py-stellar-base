@@ -92,7 +92,7 @@ class TransactionBuilder:
         base_fee: int,
         inner_transaction_envelope: TransactionEnvelope,
         network_passphrase: str = Network.TESTNET_NETWORK_PASSPHRASE,
-    ):
+    ) -> "FeeBumpTransactionEnvelope":
         """Create a
         :py:class:`FeeBumpTransactionEnvelope <stellar_sdk.fee_bump_transaction_envelope.FeeBumpTransactionEnvelope>`
         object.
@@ -158,6 +158,7 @@ class TransactionBuilder:
                 transaction_envelope.transaction.fee
                 / len(transaction_envelope.transaction.operations)
             ),
+            v1=transaction_envelope.transaction.v1,
         )
         transaction_builder.time_bounds = transaction_envelope.transaction.time_bounds
         transaction_builder.operations = transaction_envelope.transaction.operations
