@@ -1,3 +1,4 @@
+import copy
 from typing import List
 
 from .base_transaction_envelope import BaseTransactionEnvelope
@@ -72,6 +73,14 @@ class TransactionEnvelope(BaseTransactionEnvelope["TransactionEnvelope"]):
             te_type = Xdr.const.ENVELOPE_TYPE_TX_V0
             tx_envelope = Xdr.types.TransactionV0Envelope(tx, self.signatures)
             return Xdr.types.TransactionEnvelope(type=te_type, v0=tx_envelope)
+
+    def to_transaction_envelope_v1(self) -> "TransactionEnvelope":
+        """Create a new :class:`TransactionEnvelope`, if the internal tx is not v1, we will convert it to v1.
+
+        """
+        tx = copy.deepcopy(self.transaction)
+        tx.v1 = True
+        return TransactionEnvelope(tx, self.network_passphrase, self.signatures)
 
     @classmethod
     def from_xdr_object(
