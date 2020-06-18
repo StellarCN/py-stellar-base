@@ -42,8 +42,8 @@ class TransactionBuilder:
         Defaults to **Test SDF Network ; September 2015**.
     :param base_fee: Base fee in stroops. The network base fee is obtained by default from the latest ledger.
         Transaction fee is equal to base fee times number of operations in this transaction.
-    :param v1: Temporary feature flag to allow alpha testing of Stellar Protocol 13 transactions.
-        We will remove this once all transactions are supposed to be v1.
+    :param v1: When this value is set to True, V1 transactions will be generated,
+        otherwise V0 transactions will be generated.
         See `CAP-0015 <https://github.com/stellar/stellar-protocol/blob/master/core/cap-0015.md>`_ for more information.
     """
 
@@ -53,7 +53,7 @@ class TransactionBuilder:
         source_account: Account,
         network_passphrase: str = Network.TESTNET_NETWORK_PASSPHRASE,
         base_fee: int = 100,
-        v1: bool = False,
+        v1: bool = True,
     ):
         self.source_account: Account = source_account
         self.base_fee: int = base_fee
