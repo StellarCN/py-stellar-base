@@ -8,7 +8,7 @@ class TestAiohttpClient:
     async def test_get(self):
         user_agent = "Hello/Stellar/overcat"
         client = AiohttpClient(pool_size=10, user_agent=user_agent)
-        url = "http://httpbin.org/get"
+        url = "https://httpbin.org/get"
         params = {"hello": "world", "stellar": "sdk"}
         resp = await client.get(url, params=params)
         assert resp.status_code == 200
@@ -20,7 +20,7 @@ class TestAiohttpClient:
     @pytest.mark.asyncio
     async def test_post(self):
         client = AiohttpClient()
-        url = "http://httpbin.org/post"
+        url = "https://httpbin.org/post"
         data = {
             "tx": "AAAAABa3N0+hJk17vP/AnYK5xV4o/PhOnEfgi36HlYo4g+3nAAAAZQFDfjoAAaTSAAAAAA"
             "AAAAEAAAAJX3VwZGF0ZWRfAAAAAAAAAQAAAAEAAAAAFrc3T6EmTXu8/8CdgrnFXij8+E6cR+"
@@ -52,7 +52,7 @@ class TestAiohttpClient:
     @pytest.mark.asyncio
     async def test_with(self):
         async with AiohttpClient() as client:
-            url = "http://httpbin.org/get"
+            url = "https://httpbin.org/get"
             params = {"hello": "world", "stellar": "sdk"}
             resp = await client.get(url, params=params)
             assert resp.status_code == 200

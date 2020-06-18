@@ -6,7 +6,7 @@ from stellar_sdk.client.requests_client import RequestsClient, USER_AGENT
 class TestRequestsClient:
     def test_get(self):
         client = RequestsClient()
-        url = "http://httpbin.org/get"
+        url = "https://httpbin.org/get"
         params = {"hello": "world", "stellar": "sdk"}
         resp = client.get(url, params=params)
         assert resp.status_code == 200
@@ -16,7 +16,7 @@ class TestRequestsClient:
 
     def test_post(self):
         client = RequestsClient()
-        url = "http://httpbin.org/post"
+        url = "https://httpbin.org/post"
         data = {
             "tx": "AAAAABa3N0+hJk17vP/AnYK5xV4o/PhOnEfgi36HlYo4g+3nAAAAZQFDfjoAAaTSAAAAAA"
             "AAAAEAAAAJX3VwZGF0ZWRfAAAAAAAAAQAAAAEAAAAAFrc3T6EmTXu8/8CdgrnFXij8+E6cR+"
@@ -45,7 +45,7 @@ class TestRequestsClient:
 
     def test_with(self):
         with RequestsClient() as client:
-            url = "http://httpbin.org/get"
+            url = "https://httpbin.org/get"
             params = {"hello": "world", "stellar": "sdk"}
             resp = client.get(url, params=params)
             assert resp.status_code == 200

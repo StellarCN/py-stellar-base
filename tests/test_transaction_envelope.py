@@ -26,7 +26,7 @@ class TestTransactionEnvelope:
         asset = Asset.native()
         time_bounds = TimeBounds(12345, 56789)
         ops = [Payment(destination, asset, amount), ManageData("hello", "world")]
-        tx = Transaction(source, sequence, fee, ops, memo, time_bounds)
+        tx = Transaction(source, sequence, fee, ops, memo, time_bounds, False)
         te = TransactionEnvelope(tx, Network.PUBLIC_NETWORK_PASSPHRASE)
         assert binascii.hexlify(te.hash()).decode() == te.hash_hex()
         te.sign(source)
