@@ -25,7 +25,7 @@ class TestTransactionBuilder:
             "GDF5O4OWEMVBY5FLDHWA5RZTYSV2U276XGKZZ6VSHDDR3THSQ6OQS7UM", sequence
         )
         builder = TransactionBuilder(
-            source, Network.TESTNET_NETWORK_PASSPHRASE, base_fee=150
+            source, Network.TESTNET_NETWORK_PASSPHRASE, base_fee=150, v1=False
         )
         builder.add_text_memo("Stellar Python SDK")
         builder.add_time_bounds(1565590000, 1565600000)
