@@ -1,6 +1,22 @@
 Release History
 ==============
 
+### Version 2.6.0
+
+Released on Jun 18, 2020
+
+**This update include breaking changes**
+
+#### Update
+- Generate V1 transactions by default. ([#337](https://github.com/StellarCN/py-stellar-base/pull/337))
+- Allow V0 transactions to be fee bumped. ([#331](https://github.com/StellarCN/py-stellar-base/pull/331))
+
+#### Breaking changes
+- The default values of the following parameters have changed, 
+  they used to default to False, but now they default to True.
+    - the `v1` parameter in stellar_sdk.transaction_builder.TransactionBuilder
+    - the `v1` parameter in stellar_sdk.transaction.Transaction
+
 ### Version 2.5.3
 
 Released on Jun 14, 2020
