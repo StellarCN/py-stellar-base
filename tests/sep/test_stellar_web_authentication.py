@@ -294,7 +294,7 @@ class TestStellarWebAuthentication:
 
         with pytest.raises(
             InvalidSep10ChallengeError,
-            match="Transaction not signed by client: {}".format(client_account_id),
+            match="Transaction not signed by any client signer.",
         ):
             verify_challenge_transaction(
                 challenge, server_kp.public_key, network_passphrase
@@ -679,7 +679,7 @@ class TestStellarWebAuthentication:
 
         with pytest.raises(
             InvalidSep10ChallengeError,
-            match="Transaction not signed by client: {}.".format(client_kp.public_key),
+            match="Transaction not signed by any client signer.",
         ):
             verify_challenge_transaction_signed_by_client_master_key(
                 challenge_tx, server_kp.public_key, network_passphrase
@@ -804,4 +804,35 @@ class TestStellarWebAuthentication:
         ):
             read_challenge_transaction(
                 challenge, inner_keypair.public_key, Network.TESTNET_NETWORK_PASSPHRASE
+            )
+
+    def test_verify_challenge_transaction_signed_by_client_master_key_raise_unrecognized_signatures(
+        self,
+    ):
+        server_kp = Keypair.random()
+        client_kp_a = Keypair.random()
+        client_kp_unrecognized = Keypair.random()
+
+        timeout = 600
+        network_passphrase = Network.PUBLIC_NETWORK_PASSPHRASE
+        anchor_name = "SDF"
+
+        challenge = build_challenge_transaction(
+            server_secret=server_kp.secret,
+            client_account_id=client_kp_a.public_key,
+            anchor_name=anchor_name,
+            network_passphrase=network_passphrase,
+            timeout=timeout,
+        )
+
+        transaction = TransactionEnvelope.from_xdr(challenge, network_passphrase)
+        transaction.sign(client_kp_a)
+        transaction.sign(client_kp_unrecognized)
+
+        challenge_tx = transaction.to_xdr()
+        with pytest.raises(
+            InvalidSep10ChallengeError, match="Transaction has unrecognized signatures."
+        ):
+            verify_challenge_transaction_signed_by_client_master_key(
+                challenge_tx, server_kp.public_key, network_passphrase
             )
