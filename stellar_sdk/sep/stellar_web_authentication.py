@@ -370,14 +370,13 @@ def verify_challenge_transaction(
         validation fails, the exception will be thrown.
     """
 
-    transaction_envelope, client_account_id = read_challenge_transaction(
+    _, client_account_id = read_challenge_transaction(
         challenge_transaction, server_account_id, network_passphrase
     )
-
-    if not _verify_te_signed_by_account_id(transaction_envelope, client_account_id):
-        raise InvalidSep10ChallengeError(
-            "Transaction not signed by client: {}.".format(client_account_id)
-        )
+    signers = [Ed25519PublicKeySigner(client_account_id, 255)]
+    verify_challenge_transaction_signers(
+        challenge_transaction, server_account_id, network_passphrase, signers
+    )
 
 
 def _verify_transaction_signatures(
