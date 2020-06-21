@@ -1,6 +1,29 @@
 Release History
 ==============
 
+### Version 2.6.1
+
+Released on Jun 21, 2020
+
+**This update has breaking changes compared to 2.5.3.**
+
+For [some reason](https://github.com/StellarCN/py-stellar-base/issues/338), we yanked [2.6.0](https://pypi.org/project/stellar-sdk/2.6.0/) on PyPi, 
+but actually 2.6.0 can be used normally. 
+
+This update log will contain the updated content of 2.6.0.
+
+#### Update
+- Optimize SEP-10, when you call `stellar_sdk.sep.stellar_web_authentication.verify_challenge_transaction_signed_by_client_master_key`, 
+  an exception will be thrown if the transaction contains extra signatures. ([#338](https://github.com/StellarCN/py-stellar-base/pull/338)) (2.6.1)
+- Generate V1 transactions by default. ([#337](https://github.com/StellarCN/py-stellar-base/pull/337)) (2.6.0)
+- Allow V0 transactions to be fee bumped. ([#331](https://github.com/StellarCN/py-stellar-base/pull/331)) (2.6.0)
+
+#### Breaking changes
+- The default values of the following parameters have changed, 
+  they used to default to False, but now they default to True. (2.6.0)
+    - the `v1` parameter in stellar_sdk.transaction_builder.TransactionBuilder
+    - the `v1` parameter in stellar_sdk.transaction.Transaction
+    
 ### Version 2.6.0
 
 Released on Jun 18, 2020
