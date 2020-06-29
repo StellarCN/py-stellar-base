@@ -13,11 +13,11 @@ class TrustLineEntryFlag(IntFlag):
     """Indicates which flags to set. For details about the flags,
     please refer to the `CAP-0018 <https://github.com/stellar/stellar-protocol/blob/master/core/cap-0018.md>`_.
 
-    - UNAUTHORIZED_FLAG: The account can not hold a balance but cannot receive payments, send payments, maintain offers, or manage offers
+    - UNAUTHORIZED_FLAG: The account can hold a balance but cannot receive payments, send payments, maintain offers or manage offers
 
-    - AUTHORIZED_FLAG: The account can hold a balance but cannot receive payments, send payments, maintain offers, or manage offers
+    - AUTHORIZED_FLAG: The account can hold a balance, receive payments, send payments, maintain offers or manage offers
 
-    - AUTHORIZED_TO_MAINTAIN_LIABILITIES_FLAG: The account can hold a balance, receive payments, send payments, maintain offers, and manage offers
+    - AUTHORIZED_TO_MAINTAIN_LIABILITIES_FLAG: The account can hold a balance and maintain offers but cannot receive payments, send payments or manage offers
     """
 
     UNAUTHORIZED_FLAG = 0
