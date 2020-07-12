@@ -8,13 +8,12 @@ from sseclient import SSEClient
 from urllib3.exceptions import NewConnectionError
 from urllib3.util import Retry
 
+from . import defines
 from ..__version__ import __version__
 from ..client.base_sync_client import BaseSyncClient
 from ..client.response import Response
 from ..exceptions import ConnectionError
 
-# two ledgers + 1 sec, let's retry faster and not wait 60 secs.
-DEFAULT_REQUEST_TIMEOUT = 11
 DEFAULT_NUM_RETRIES = 3
 DEFAULT_BACKOFF_FACTOR = 0.5
 USER_AGENT = "py-stellar-sdk/%s/RequestsClient" % __version__
@@ -32,7 +31,8 @@ class RequestsClient(BaseSyncClient):
 
     :param pool_size: persistent connection to Horizon and connection pool
     :param num_retries: configurable request retry functionality
-    :param request_timeout: the timeout for all requests
+    :param request_timeout: the timeout for all GET requests
+    :param post_timeout: the timeout for all POST requests
     :param backoff_factor: a backoff factor to apply between attempts after the second try
     :param session: the request session
     :param stream_session: the stream request session
@@ -42,7 +42,8 @@ class RequestsClient(BaseSyncClient):
         self,
         pool_size: int = DEFAULT_POOLSIZE,
         num_retries: int = DEFAULT_NUM_RETRIES,
-        request_timeout: int = DEFAULT_REQUEST_TIMEOUT,
+        request_timeout: int = defines.DEFAULT_GET_TIMEOUT_SECONDS,
+        post_timeout: float = defines.DEFAULT_POST_TIMEOUT_SECONDS,
         backoff_factor: float = DEFAULT_BACKOFF_FACTOR,
         session: Session = None,
         stream_session: Session = None,
@@ -50,6 +51,7 @@ class RequestsClient(BaseSyncClient):
         self.pool_size: int = pool_size
         self.num_retries: int = num_retries
         self.request_timeout: int = request_timeout
+        self.post_timeout: float = post_timeout
         self.backoff_factor: float = backoff_factor
 
         # adding 504 to the tuple of statuses to retry
@@ -134,7 +136,7 @@ class RequestsClient(BaseSyncClient):
         :raise: :exc:`ConnectionError <stellar_sdk.exceptions.ConnectionError>`
         """
         try:
-            resp = self._session.post(url, data=data, timeout=self.request_timeout)
+            resp = self._session.post(url, data=data, timeout=self.post_timeout)
         except (RequestException, NewConnectionError) as err:
             raise ConnectionError(err)
         return Response(

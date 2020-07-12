@@ -1,10 +1,16 @@
 import hashlib
+import os
 from decimal import Decimal, ROUND_FLOOR
-
 from typing import List
+from urllib.parse import urlsplit, urlunsplit
 
 from .asset import Asset
 from .exceptions import NoApproximationError, TypeError
+from .strkey import StrKey
+from .xdr import Xdr
+
+MUXED_ACCOUNT_STARTING_LETTER: str = "M"
+ED25519_PUBLIC_KEY_STARTING_LETTER: str = "G"
 
 
 def sha256(data: bytes) -> bytes:
@@ -67,3 +73,23 @@ def convert_assets_to_horizon_param(assets: List[Asset]) -> str:
         else:
             assets_string.append("{}:{}".format(asset.code, asset.issuer))
     return ",".join(assets_string)
+
+
+def urljoin_with_query(base: str, path: str) -> str:
+    split_url = urlsplit(base)
+    query = split_url.query
+    real_path = split_url.path
+    if path:
+        real_path = os.path.join(split_url.path, path)
+    url = urlunsplit(
+        (split_url.scheme, split_url.netloc, real_path, query, split_url.fragment)
+    )
+    return url
+
+
+def parse_ed25519_account_id_from_muxed_account_xdr_object(
+    data: Xdr.types.MuxedAccount,
+) -> str:
+    if data.ed25519 is not None:
+        return StrKey.encode_ed25519_public_key(data.ed25519)
+    return StrKey.encode_ed25519_public_key(data.med25519.ed25519)

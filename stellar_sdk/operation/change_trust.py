@@ -2,10 +2,9 @@ from decimal import Decimal
 from typing import Union
 
 from .operation import Operation
-
+from .utils import check_amount
 from ..asset import Asset
 from ..xdr import Xdr
-from .utils import check_amount
 
 
 class ChangeTrust(Operation):
@@ -28,7 +27,7 @@ class ChangeTrust(Operation):
     _DEFAULT_LIMIT = "922337203685.4775807"
 
     def __init__(
-        self, asset: Asset, limit: Union[str, Decimal] = None, source: str = None
+        self, asset: Asset, limit: Union[str, Decimal] = None, source: str = None,
     ) -> None:
         super().__init__(source)
         self.asset: Asset = asset
@@ -67,4 +66,6 @@ class ChangeTrust(Operation):
         line = Asset.from_xdr_object(operation_xdr_object.body.changeTrustOp.line)
         limit = Operation.from_xdr_amount(operation_xdr_object.body.changeTrustOp.limit)
 
-        return cls(source=source, asset=line, limit=limit)
+        op = cls(source=source, asset=line, limit=limit)
+        op._source_muxed = Operation.get_source_muxed_from_xdr_obj(operation_xdr_object)
+        return op

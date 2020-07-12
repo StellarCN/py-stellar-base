@@ -9,7 +9,7 @@ from ..client.base_sync_client import BaseSyncClient
 
 class StrictSendPathsCallBuilder(BaseCallBuilder):
     """Creates a new :class:`StrictSendPathsCallBuilder` pointed to server defined by horizon_url.
-    Do not create this object directly, use :func:`stellar_sdk.server.Server.paths`.
+    Do not create this object directly, use :func:`stellar_sdk.server.Server.strict_send_paths`.
 
     The Stellar Network allows payments to be made across assets through path
     payments. A strict send path payment specifies a series of assets to route a

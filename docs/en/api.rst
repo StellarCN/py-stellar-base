@@ -43,6 +43,12 @@ AssetsCallBuilder
    :members:
    :inherited-members:
 
+DataCallBuilder
+---------------
+.. autoclass:: stellar_sdk.call_builder.DataCallBuilder
+   :members:
+   :inherited-members:
+
 EffectsCallBuilder
 ------------------
 .. autoclass:: stellar_sdk.call_builder.EffectsCallBuilder
@@ -348,6 +354,9 @@ AllowTrust
 .. autoclass:: stellar_sdk.operation.AllowTrust
    :members: to_xdr_object, from_xdr_object
 
+.. autoclass:: stellar_sdk.operation.allow_trust.TrustLineEntryFlag
+   :members:
+
 BumpSequence
 ------------
 .. autoclass:: stellar_sdk.operation.BumpSequence
@@ -413,6 +422,9 @@ SetOptions
 .. autoclass:: stellar_sdk.operation.SetOptions
    :members: to_xdr_object, from_xdr_object
 
+.. autoclass:: stellar_sdk.operation.set_options.Flag
+   :members:
+
 Price
 ^^^^^
 
@@ -452,6 +464,21 @@ TransactionEnvelope
 
 .. autoclass:: stellar_sdk.transaction_envelope.TransactionEnvelope
    :members:
+   :inherited-members:
+
+FeeBumpTransaction
+^^^^^^^^^^^^^^^^^^
+
+.. autoclass:: stellar_sdk.fee_bump_transaction.FeeBumpTransaction
+   :members:
+   :inherited-members:
+
+FeeBumpTransactionEnvelope
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. autoclass:: stellar_sdk.fee_bump_transaction_envelope.FeeBumpTransactionEnvelope
+   :members:
+   :inherited-members:
 
 TransactionBuilder
 ^^^^^^^^^^^^^^^^^^
@@ -459,11 +486,22 @@ TransactionBuilder
 .. autoclass:: stellar_sdk.transaction_builder.TransactionBuilder
    :members:
 
+Helpers
+^^^^^^^
+.. autofunction:: stellar_sdk.helpers.parse_transaction_envelope_from_xdr
+
 Stellar Ecosystem Proposals
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 SEP 0001: stellar.toml
 ----------------------
 .. autofunction:: stellar_sdk.sep.stellar_toml.fetch_stellar_toml
+
+SEP 0002: Federation protocol
+-----------------------------
+.. autofunction:: stellar_sdk.sep.federation.resolve_stellar_address
+.. autofunction:: stellar_sdk.sep.federation.resolve_account_id
+.. autoclass:: stellar_sdk.sep.federation.FederationRecord
+   :members:
 
 SEP 0005: Key Derivation Methods for Stellar Accounts
 -----------------------------------------------------
@@ -476,6 +514,10 @@ SEP 0005: Key Derivation Methods for Stellar Accounts
 SEP 0010: Stellar Web Authentication
 ------------------------------------
 .. autofunction:: stellar_sdk.sep.stellar_web_authentication.build_challenge_transaction
+.. autofunction:: stellar_sdk.sep.stellar_web_authentication.read_challenge_transaction
+.. autofunction:: stellar_sdk.sep.stellar_web_authentication.verify_challenge_transaction_threshold
+.. autofunction:: stellar_sdk.sep.stellar_web_authentication.verify_challenge_transaction_signed_by_client_master_key
+.. autofunction:: stellar_sdk.sep.stellar_web_authentication.verify_challenge_transaction_signers
 .. autofunction:: stellar_sdk.sep.stellar_web_authentication.verify_challenge_transaction
 
 SEP 0011: Txrep: human-readable low-level representation of Stellar transactions
@@ -485,4 +527,8 @@ SEP 0011: Txrep: human-readable low-level representation of Stellar transactions
 Exceptions
 ----------
 .. autoclass:: stellar_sdk.sep.exceptions.StellarTomlNotFoundError
+.. autoclass:: stellar_sdk.sep.exceptions.InvalidFederationAddress
+.. autoclass:: stellar_sdk.sep.exceptions.FederationServerNotFoundError
+.. autoclass:: stellar_sdk.sep.exceptions.BadFederationResponseError
 .. autoclass:: stellar_sdk.sep.exceptions.InvalidSep10ChallengeError
+.. autoclass:: stellar_sdk.sep.exceptions.AccountRequiresMemoError

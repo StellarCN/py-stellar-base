@@ -2,10 +2,10 @@ from decimal import Decimal
 from typing import Union
 
 from .operation import Operation
+from .utils import check_amount, check_price
 from ..asset import Asset
 from ..price import Price
 from ..xdr import Xdr
-from .utils import check_amount, check_price
 
 
 class CreatePassiveSellOffer(Operation):
@@ -102,6 +102,8 @@ class CreatePassiveSellOffer(Operation):
             operation_xdr_object.body.createPassiveSellOfferOp.price
         )
 
-        return cls(
+        op = cls(
             source=source, selling=selling, buying=buying, amount=amount, price=price
         )
+        op._source_muxed = Operation.get_source_muxed_from_xdr_obj(operation_xdr_object)
+        return op

@@ -155,6 +155,7 @@ class StrKey:
 
 def decode_check(version_byte_name: str, encoded: str) -> bytes:
     encoded_data = _bytes_from_decode_data(encoded)
+    encoded_data = encoded_data + b"=" * ((4 - len(encoded_data) % 4) % 4)
 
     try:
         decoded_data = base64.b32decode(encoded_data)
@@ -206,7 +207,7 @@ def encode_check(version_byte_name: str, data: bytes) -> str:
         )
     payload = version_byte + data
     crc = _calculate_checksum(payload)
-    return base64.b32encode(payload + crc).decode("utf-8")
+    return base64.b32encode(payload + crc).decode("utf-8").rstrip("=")
 
 
 def is_valid(version_byte_name: str, encoded: str) -> bool:

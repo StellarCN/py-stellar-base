@@ -1,0 +1,2 @@
+class TestStrKey:
+    pass

@@ -1,10 +1,11 @@
 import pytest
 
-from stellar_sdk.transaction_envelope import TransactionEnvelope
+from stellar_sdk.account import Thresholds
 from stellar_sdk.asset import Asset
 from stellar_sdk.call_builder import FeeStatsCallBuilder
 from stellar_sdk.call_builder.accounts_call_builder import AccountsCallBuilder
 from stellar_sdk.call_builder.assets_call_builder import AssetsCallBuilder
+from stellar_sdk.call_builder.data_call_builder import DataCallBuilder
 from stellar_sdk.call_builder.effects_call_builder import EffectsCallBuilder
 from stellar_sdk.call_builder.ledgers_call_builder import LedgersCallBuilder
 from stellar_sdk.call_builder.offers_call_builder import OffersCallBuilder
@@ -29,6 +30,7 @@ from stellar_sdk.client.requests_client import RequestsClient
 from stellar_sdk.exceptions import TypeError
 from stellar_sdk.network import Network
 from stellar_sdk.server import Server
+from stellar_sdk.transaction_envelope import TransactionEnvelope
 
 
 class TestServer:
@@ -39,6 +41,7 @@ class TestServer:
             account = server.load_account(account_id)
             assert account.account_id == account_id
             assert isinstance(account.sequence, int)
+            assert account.thresholds == Thresholds(1, 2, 3)
 
     @pytest.mark.asyncio
     async def test_load_acount_async(self):
@@ -49,6 +52,7 @@ class TestServer:
             account = await server.load_account(account_id)
             assert account.account_id == account_id
             assert isinstance(account.sequence, int)
+            assert account.thresholds == Thresholds(1, 2, 3)
 
     def test_fetch_base_fee_sync(self):
         horizon_url = "https://horizon.stellar.org"
@@ -70,16 +74,18 @@ class TestServer:
         with Server(horizon_url, client) as server:
             assert server.accounts() == AccountsCallBuilder(horizon_url, client)
             assert server.assets() == AssetsCallBuilder(horizon_url, client)
-            assert server.effects() == EffectsCallBuilder(horizon_url, client)
-            assert server.fee_stats() == FeeStatsCallBuilder(horizon_url, client)
-            assert server.ledgers() == LedgersCallBuilder(horizon_url, client)
-            assert server.offers(
-                "GDV6FVHPY4JH7EEBSJYPQQYZA3OC6TKTM2TAXRHWT4EEL7BJ2BTDQT5D"
-            ) == OffersCallBuilder(
+            assert server.data(
+                "GDV6FVHPY4JH7EEBSJYPQQYZA3OC6TKTM2TAXRHWT4EEL7BJ2BTDQT5D", "hello"
+            ) == DataCallBuilder(
                 horizon_url,
                 client,
                 "GDV6FVHPY4JH7EEBSJYPQQYZA3OC6TKTM2TAXRHWT4EEL7BJ2BTDQT5D",
+                "hello",
             )
+            assert server.effects() == EffectsCallBuilder(horizon_url, client)
+            assert server.fee_stats() == FeeStatsCallBuilder(horizon_url, client)
+            assert server.ledgers() == LedgersCallBuilder(horizon_url, client)
+            assert server.offers() == OffersCallBuilder(horizon_url, client)
             assert server.operations() == OperationsCallBuilder(horizon_url, client)
             buying = Asset.native()
             selling = Asset(
@@ -169,7 +175,7 @@ class TestServer:
         horizon_url = "https://horizon.stellar.org"
         client = RequestsClient()
         with Server(horizon_url, client) as server:
-            resp = server.submit_transaction(xdr)
+            resp = server.submit_transaction(xdr, True)
             assert resp["envelope_xdr"] == xdr
 
     @pytest.mark.asyncio
@@ -179,5 +185,5 @@ class TestServer:
         horizon_url = "https://horizon.stellar.org"
         client = AiohttpClient()
         async with Server(horizon_url, client) as server:
-            resp = await server.submit_transaction(te)
+            resp = await server.submit_transaction(te, True)
             assert resp["envelope_xdr"] == xdr

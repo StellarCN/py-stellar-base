@@ -3,10 +3,11 @@ import warnings
 from decimal import Decimal
 from typing import List, Union, Optional
 
-from .utils import hex_to_bytes
 from .account import Account
 from .asset import Asset
 from .exceptions import ValueError
+from .fee_bump_transaction import FeeBumpTransaction
+from .fee_bump_transaction_envelope import FeeBumpTransactionEnvelope
 from .keypair import Keypair
 from .memo import *
 from .network import Network
@@ -16,6 +17,8 @@ from .signer import Signer
 from .time_bounds import TimeBounds
 from .transaction import Transaction
 from .transaction_envelope import TransactionEnvelope
+from .utils import hex_to_bytes
+from .xdr import Xdr
 
 __all__ = ["TransactionBuilder"]
 
@@ -39,6 +42,9 @@ class TransactionBuilder:
         Defaults to **Test SDF Network ; September 2015**.
     :param base_fee: Base fee in stroops. The network base fee is obtained by default from the latest ledger.
         Transaction fee is equal to base fee times number of operations in this transaction.
+    :param v1: When this value is set to True, V1 transactions will be generated,
+        otherwise V0 transactions will be generated.
+        See `CAP-0015 <https://github.com/stellar/stellar-protocol/blob/master/core/cap-0015.md>`_ for more information.
     """
 
     # TODO: add an example
@@ -47,6 +53,7 @@ class TransactionBuilder:
         source_account: Account,
         network_passphrase: str = Network.TESTNET_NETWORK_PASSPHRASE,
         base_fee: int = 100,
+        v1: bool = True,
     ):
         self.source_account: Account = source_account
         self.base_fee: int = base_fee
@@ -54,6 +61,7 @@ class TransactionBuilder:
         self.operations: List[Operation] = []
         self.time_bounds: Optional[TimeBounds] = None
         self.memo: Memo = NoneMemo()
+        self.v1: bool = v1
 
     def build(self) -> TransactionEnvelope:
         """This will build the transaction envelope.
@@ -61,7 +69,7 @@ class TransactionBuilder:
 
         :return: The transaction envelope.
         """
-        source = Keypair.from_public_key(self.source_account.account_id)
+        source = self.source_account.account_id
         sequence = self.source_account.sequence + 1
         transaction = Transaction(
             source=source,
@@ -70,6 +78,7 @@ class TransactionBuilder:
             operations=self.operations,
             memo=self.memo,
             time_bounds=self.time_bounds,
+            v1=self.v1,
         )
         transaction_envelope = TransactionEnvelope(
             transaction=transaction, network_passphrase=self.network_passphrase
@@ -78,19 +87,62 @@ class TransactionBuilder:
         return transaction_envelope
 
     @staticmethod
-    def from_xdr(xdr: str, network_passphrase: str) -> "TransactionBuilder":
-        """Create a :class:`TransactionBuilder
-        <stellar_sdk.transaction_envelope.TransactionEnvelope>` via an XDR
+    def build_fee_bump_transaction(
+        fee_source: Union[Keypair, str],
+        base_fee: int,
+        inner_transaction_envelope: TransactionEnvelope,
+        network_passphrase: str = Network.TESTNET_NETWORK_PASSPHRASE,
+    ) -> "FeeBumpTransactionEnvelope":
+        """Create a
+        :py:class:`FeeBumpTransactionEnvelope <stellar_sdk.fee_bump_transaction_envelope.FeeBumpTransactionEnvelope>`
         object.
 
-        In addition, sets the fields of this builder (the transaction envelope,
+        See `CAP-0015 <https://github.com/stellar/stellar-protocol/blob/master/core/cap-0015.md>`_ for more information.
+
+        :param fee_source: The account paying for the transaction.
+        :param base_fee: The max fee willing to pay per operation in inner transaction (**in stroops**).
+        :param inner_transaction_envelope: The TransactionEnvelope to be bumped by the fee bump transaction.
+        :param network_passphrase: The network to connect to for verifying and retrieving additional attributes from.
+        :return: a :class:`TransactionBuilder <stellar_sdk.transaction_envelope.TransactionBuilder>` via the XDR object.
+        """
+        fee_bump_transaction = FeeBumpTransaction(
+            fee_source=fee_source,
+            base_fee=base_fee,
+            inner_transaction_envelope=inner_transaction_envelope,
+        )
+        transaction_envelope = FeeBumpTransactionEnvelope(
+            transaction=fee_bump_transaction, network_passphrase=network_passphrase,
+        )
+        return transaction_envelope
+
+    @staticmethod
+    def from_xdr(
+        xdr: str, network_passphrase: str
+    ) -> Union["TransactionBuilder", FeeBumpTransactionEnvelope]:
+        """Create a :class:`TransactionBuilder
+        <stellar_sdk.transaction_envelope.TransactionBuilder>` or
+        :py:class:`FeeBumpTransactionEnvelope <stellar_sdk.fee_bump_transaction_envelope.FeeBumpTransactionEnvelope>`
+        via an XDR object.
+
+        In addition, if xdr is not of
+        :py:class:`TransactionEnvelope <stellar_sdk.transaction_envelope.TransactionEnvelope>`,
+        it sets the fields of this builder (the transaction envelope,
         transaction, operations, source, etc.) to all of the fields in the
         provided XDR transaction envelope, but the signature will not be added to it.
 
         :param xdr: The XDR object representing the transaction envelope to
             which this builder is setting its state to.
         :param network_passphrase: The network to connect to for verifying and retrieving additional attributes from.
+        :return: a :class:`TransactionBuilder <stellar_sdk.transaction_envelope.TransactionBuilder>` or
+            :py:class:`FeeBumpTransactionEnvelope <stellar_sdk.fee_bump_transaction_envelope.FeeBumpTransactionEnvelope>`
+            via the XDR object.
         """
+        xdr_object = Xdr.types.TransactionEnvelope.from_xdr(xdr)
+        te_type = xdr_object.type
+        if te_type == Xdr.const.ENVELOPE_TYPE_TX_FEE_BUMP:
+            return FeeBumpTransactionEnvelope.from_xdr_object(
+                xdr_object, network_passphrase
+            )
         transaction_envelope = TransactionEnvelope.from_xdr(
             xdr=xdr, network_passphrase=network_passphrase
         )
@@ -106,6 +158,7 @@ class TransactionBuilder:
                 transaction_envelope.transaction.fee
                 / len(transaction_envelope.transaction.operations)
             ),
+            v1=transaction_envelope.transaction.v1,
         )
         transaction_builder.time_bounds = transaction_envelope.transaction.time_bounds
         transaction_builder.operations = transaction_envelope.transaction.operations
@@ -294,7 +347,7 @@ class TransactionBuilder:
         dest_issuer: Optional[str],
         dest_amount: Union[str, Decimal],
         path: List[Asset],
-        source=None,
+        source: str = None,
     ) -> "TransactionBuilder":
         """Append a :class:`PathPayment <stellar_sdk.operation.PathPayment>`
         operation to the list of operations.
@@ -318,7 +371,7 @@ class TransactionBuilder:
         """
 
         warnings.warn(
-            "Will be removed in version v2.1.0, "
+            "Will be removed in version v3.0.0, "
             "use stellar_sdk.transaction_builder.append_path_payment_strict_receive_op",
             DeprecationWarning,
         )
@@ -350,7 +403,7 @@ class TransactionBuilder:
         dest_issuer: Optional[str],
         dest_amount: Union[str, Decimal],
         path: List[Asset],
-        source=None,
+        source: str = None,
     ) -> "TransactionBuilder":
         """Append a :class:`PathPaymentStrictReceive <stellar_sdk.operation.PathPaymentStrictReceive>`
         operation to the list of operations.
@@ -400,7 +453,7 @@ class TransactionBuilder:
         dest_issuer: Optional[str],
         dest_min: Union[str, Decimal],
         path: List[Asset],
-        source=None,
+        source: str = None,
     ) -> "TransactionBuilder":
         """Append a :class:`PathPaymentStrictSend <stellar_sdk.operation.PathPaymentStrictSend>`
         operation to the list of operations.
@@ -439,7 +492,11 @@ class TransactionBuilder:
         return self.append_operation(op)
 
     def append_allow_trust_op(
-        self, trustor: str, asset_code: str, authorize: bool, source: str = None
+        self,
+        trustor: str,
+        asset_code: str,
+        authorize: Union[TrustLineEntryFlag, bool],
+        source: str = None,
     ) -> "TransactionBuilder":
         """Append an :class:`AllowTrust <stellar_sdk.operation.AllowTrust>`
         operation to the list of operations.
@@ -448,8 +505,8 @@ class TransactionBuilder:
         :param asset_code:  The asset of the trustline the source account
             is authorizing. For example, if an anchor wants to allow another
             account to hold its USD credit, the type is USD:anchor.
-        :param authorize: Flag indicating whether the trustline is
-            authorized.
+        :param authorize: `True` to authorize the line, `False` to deauthorize，if you need further control,
+            you can also use :class:`stellar_sdk.operation.allow_trust.TrustLineEntryFlag`.
         :param source: The source address that is establishing the trust in
             the allow trust operation.
         :return: This builder instance.
@@ -461,8 +518,8 @@ class TransactionBuilder:
     def append_set_options_op(
         self,
         inflation_dest: str = None,
-        clear_flags: int = None,
-        set_flags: int = None,
+        clear_flags: Union[int, Flag] = None,
+        set_flags: Union[int, Flag] = None,
         master_weight: int = None,
         low_threshold: int = None,
         med_threshold: int = None,
@@ -478,14 +535,16 @@ class TransactionBuilder:
         :param clear_flags: Indicates which flags to clear. For details about the flags,
             please refer to the `accounts doc <https://www.stellar.org/developers/guides/concepts/accounts.html>`__.
             The `bit mask <https://en.wikipedia.org/wiki/Bit_field>`_ integer subtracts from the existing flags of the account.
-            This allows for setting specific bits without knowledge of existing flags.
+            This allows for setting specific bits without knowledge of existing flags, you can also use
+            :class:`stellar_sdk.operation.set_options.Flag`
             - AUTHORIZATION_REQUIRED = 1
             - AUTHORIZATION_REVOCABLE = 2
             - AUTHORIZATION_IMMUTABLE = 4
         :param set_flags: Indicates which flags to set. For details about the flags,
             please refer to the `accounts doc <https://www.stellar.org/developers/guides/concepts/accounts.html>`__.
             The bit mask integer adds onto the existing flags of the account.
-            This allows for setting specific bits without knowledge of existing flags.
+            This allows for setting specific bits without knowledge of existing flags, you can also use
+            :class:`stellar_sdk.operation.set_options.Flag`
             - AUTHORIZATION_REQUIRED = 1
             - AUTHORIZATION_REVOCABLE = 2
             - AUTHORIZATION_IMMUTABLE = 4
@@ -519,7 +578,7 @@ class TransactionBuilder:
         return self.append_operation(op)
 
     def append_ed25519_public_key_signer(
-        self, account_id: str, weight: int, source=None
+        self, account_id: str, weight: int, source: str = None
     ) -> "TransactionBuilder":
         """Add a ed25519 public key signer to an account.
 
@@ -538,7 +597,7 @@ class TransactionBuilder:
         return self.append_set_options_op(signer=signer, source=source)
 
     def append_hashx_signer(
-        self, sha256_hash: [bytes, str], weight: int, source=None
+        self, sha256_hash: [bytes, str], weight: int, source: str = None,
     ) -> "TransactionBuilder":
         """Add a sha256 hash(HashX) signer to an account.
 
@@ -707,7 +766,7 @@ class TransactionBuilder:
         return self.append_operation(op)
 
     def append_account_merge_op(
-        self, destination: str, source: str = None
+        self, destination: str, source: str = None,
     ) -> "TransactionBuilder":
         """Append a :class:`AccountMerge
         <stellar_sdk.operation.AccountMerge>` operation to the list of
@@ -737,7 +796,7 @@ class TransactionBuilder:
         return self.append_operation(op)
 
     def append_manage_data_op(
-        self, data_name: str, data_value: Union[str, bytes, None], source: str = None
+        self, data_name: str, data_value: Union[str, bytes, None], source: str = None,
     ) -> "TransactionBuilder":
         """Append a :class:`ManageData <stellar_sdk.operation.ManageData>`
         operation to the list of operations.

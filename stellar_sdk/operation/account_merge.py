@@ -1,7 +1,9 @@
+from typing import Optional
+
 from .operation import Operation
-from .utils import check_ed25519_public_key, check_source
+from .utils import check_ed25519_public_key
 from ..keypair import Keypair
-from ..strkey import StrKey
+from ..utils import parse_ed25519_account_id_from_muxed_account_xdr_object
 from ..xdr import Xdr
 
 
@@ -19,17 +21,31 @@ class AccountMerge(Operation):
 
     """
 
-    def __init__(self, destination: str, source: str = None) -> None:
+    def __init__(self, destination: str, source: str = None,) -> None:
         super().__init__(source)
         check_ed25519_public_key(destination)
-        self.destination: str = destination
+        self._destination: str = destination
+        self._destination_muxed: Optional[Xdr.types.MuxedAccount] = None
+
+    @property
+    def destination(self) -> str:
+        return self._destination
+
+    @destination.setter
+    def destination(self, value: str):
+        check_ed25519_public_key(value)
+        self._destination_muxed = None
+        self._destination = value
 
     @classmethod
     def type_code(cls) -> int:
         return Xdr.const.ACCOUNT_MERGE
 
     def _to_operation_body(self) -> Xdr.nullclass:
-        destination = Keypair.from_public_key(self.destination).xdr_account_id()
+        if self._destination_muxed is not None:
+            destination = self._destination_muxed
+        else:
+            destination = Keypair.from_public_key(self._destination).xdr_muxed_account()
         body = Xdr.nullclass()
         body.type = Xdr.const.ACCOUNT_MERGE
         body.destination = destination
@@ -44,7 +60,10 @@ class AccountMerge(Operation):
 
         """
         source = Operation.get_source_from_xdr_obj(operation_xdr_object)
-        destination = StrKey.encode_ed25519_public_key(
-            operation_xdr_object.body.destination.ed25519
+        destination = parse_ed25519_account_id_from_muxed_account_xdr_object(
+            operation_xdr_object.body.destination
         )
-        return cls(source=source, destination=destination)
+        op = cls(source=source, destination=destination)
+        op._destination_muxed = operation_xdr_object.body.destination
+        op._source_muxed = Operation.get_source_muxed_from_xdr_obj(operation_xdr_object)
+        return op

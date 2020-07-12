@@ -7,7 +7,7 @@ source =
 omit =
     stellar_sdk/xdr/*
     stellar_sdk/vendor/*
-    tests/conftest.py
+    setup.py
 
 exclude_lines =
     pragma: no cover

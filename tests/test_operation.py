@@ -2,11 +2,11 @@ from decimal import Decimal
 
 import pytest
 
-from stellar_sdk import Price, Asset
+from stellar_sdk import Price, Asset, Keypair
 from stellar_sdk.exceptions import Ed25519PublicKeyInvalidError, AssetCodeInvalidError
 from stellar_sdk.operation import Operation, CreateAccount
 from stellar_sdk.operation.account_merge import AccountMerge
-from stellar_sdk.operation.allow_trust import AllowTrust
+from stellar_sdk.operation.allow_trust import AllowTrust, TrustLineEntryFlag
 from stellar_sdk.operation.bump_sequence import BumpSequence
 from stellar_sdk.operation.change_trust import ChangeTrust
 from stellar_sdk.operation.create_passive_sell_offer import CreatePassiveSellOffer
@@ -18,7 +18,7 @@ from stellar_sdk.operation.path_payment import PathPayment
 from stellar_sdk.operation.path_payment_strict_receive import PathPaymentStrictReceive
 from stellar_sdk.operation.path_payment_strict_send import PathPaymentStrictSend
 from stellar_sdk.operation.payment import Payment
-from stellar_sdk.operation.set_options import SetOptions
+from stellar_sdk.operation.set_options import SetOptions, Flag
 from stellar_sdk.operation.utils import (
     check_price,
     check_amount,
@@ -86,18 +86,6 @@ class TestBaseOperation:
     def test_from_xdr_amount(self, origin_amount, expect_value):
         assert Operation.from_xdr_amount(origin_amount) == expect_value
 
-    def test_get_source_exist_from_xdr_obj(self):  # BAD TEST
-        source = "GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV"
-        destination = "GCEZWKCA5VLDNRLN3RPRJMRZOX3Z6G5CHCGSNFHEYVXM3XOJMDS674JZ"
-        starting_balance = "1000.00"
-        origin_op = CreateAccount(destination, starting_balance, source)
-        origin_xdr_obj = origin_op.to_xdr_object()
-
-        op = Operation.from_xdr_object(origin_xdr_obj)
-        assert op.source == source
-        assert op.starting_balance == "1000"
-        assert op.destination == destination
-
     def test_get_source_no_exist_from_xdr_obj(self):  # BAD TEST
         destination = "GCEZWKCA5VLDNRLN3RPRJMRZOX3Z6G5CHCGSNFHEYVXM3XOJMDS674JZ"
         starting_balance = "1000.00"
@@ -105,7 +93,8 @@ class TestBaseOperation:
         origin_xdr_obj = origin_op.to_xdr_object()
 
         op = Operation.from_xdr_object(origin_xdr_obj)
-        assert op.source == None
+        assert op.source is None
+        assert op._source_muxed is None
         assert op.starting_balance == "1000"
         assert op.destination == destination
 
@@ -114,8 +103,26 @@ class TestBaseOperation:
         op2 = ManageData("a", "b")
         op3 = ManageData("A", "B")
         op4 = "BAD TYEE"
-
         assert op1 == op2 != op3 != op4
+
+    def test_get_source_muxed_from_xdr_obj(self):  # BAD TEST
+        destination = "GCEZWKCA5VLDNRLN3RPRJMRZOX3Z6G5CHCGSNFHEYVXM3XOJMDS674JZ"
+        source = "GBBM6BKZPEHWYO3E3YKREDPQXMS4VK35YLNU7NFBRI26RAN7GI5POFBB"
+        source2 = "GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV"
+        starting_balance = "1000.00"
+        origin_op = CreateAccount(destination, starting_balance, source)
+        origin_xdr_obj = origin_op.to_xdr_object()
+
+        op = Operation.from_xdr_object(origin_xdr_obj)
+        assert op.to_xdr_object().to_xdr() == origin_xdr_obj.to_xdr()
+        assert op.source == source
+        assert (
+            op._source_muxed.to_xdr()
+            == Keypair.from_public_key(source).xdr_muxed_account().to_xdr()
+        )
+        op.source = source2
+        assert op.source == source2
+        assert op._source_muxed is None
 
 
 class TestCreateAccount:
@@ -238,6 +245,21 @@ class TestAccountMerge:
         assert op.source == source
         assert op.destination == destination
 
+    def test_from_xdr_muxed(self):
+        source = "GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV"
+        destination = "GCEZWKCA5VLDNRLN3RPRJMRZOX3Z6G5CHCGSNFHEYVXM3XOJMDS674JZ"
+        destination2 = "GBL3NR5XNBNFAYVQMZ7R6RMUKLMGRUHNIYDYMEUPANQV6OROQXSDZYHV"
+        origin_xdr_obj = AccountMerge(destination, source).to_xdr_object()
+        restore_op = AccountMerge.from_xdr_object(origin_xdr_obj)
+        assert restore_op.to_xdr_object().to_xdr() == origin_xdr_obj.to_xdr()
+        assert (
+            restore_op._destination_muxed.to_xdr()
+            == Keypair.from_public_key(destination).xdr_muxed_account().to_xdr()
+        )
+        restore_op.destination = destination2
+        assert restore_op._destination_muxed is None
+        assert restore_op.destination == destination2
+
 
 class TestChangeTrust:
     @pytest.mark.parametrize(
@@ -296,7 +318,7 @@ class TestPayment:
         destination = "GCEZW"
         amount = "1000.0000000"
         asset = Asset("USD", "GDGU5OAPHNPU5UCLE5RDJHG7PXZFQYWKCFOEXSXNMR6KRQRI5T6XXCD7")
-        with pytest.raises(Ed25519PublicKeyInvalidError):
+        with pytest.raises(ValueError):
             Payment(destination, asset, amount, source)
 
     def test_to_xdr_obj_with_invalid_amount_raise(self):
@@ -319,6 +341,23 @@ class TestPayment:
         assert op.destination == destination
         assert op.amount == "1000"
         assert op.asset == asset
+
+    def test_from_xdr_muxed(self):
+        source = "GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV"
+        destination = "GCEZWKCA5VLDNRLN3RPRJMRZOX3Z6G5CHCGSNFHEYVXM3XOJMDS674JZ"
+        destination2 = "GBL3NR5XNBNFAYVQMZ7R6RMUKLMGRUHNIYDYMEUPANQV6OROQXSDZYHV"
+        amount = "1000.0000000"
+        asset = Asset("USD", "GDGU5OAPHNPU5UCLE5RDJHG7PXZFQYWKCFOEXSXNMR6KRQRI5T6XXCD7")
+        origin_xdr_obj = Payment(destination, asset, amount, source).to_xdr_object()
+        restore_op = Payment.from_xdr_object(origin_xdr_obj)
+        assert restore_op.to_xdr_object().to_xdr() == origin_xdr_obj.to_xdr()
+        assert (
+            restore_op._destination_muxed.to_xdr()
+            == Keypair.from_public_key(destination).xdr_muxed_account().to_xdr()
+        )
+        restore_op.destination = destination2
+        assert restore_op._destination_muxed is None
+        assert restore_op.destination == destination2
 
 
 class TestPathPayment:
@@ -360,7 +399,7 @@ class TestPathPayment:
             Asset("USD", "GBBM6BKZPEHWYO3E3YKREDPQXMS4VK35YLNU7NFBRI26RAN7GI5POFBB"),
             Asset("EUR", "GDTNXRLOJD2YEBPKK7KCMR7J33AAG5VZXHAJTHIG736D6LVEFLLLKPDL"),
         ]
-        with pytest.raises(Ed25519PublicKeyInvalidError):
+        with pytest.raises(ValueError):
             PathPayment(
                 destination, send_asset, send_max, dest_asset, dest_amount, path, source
             )
@@ -437,7 +476,7 @@ class TestPathPaymentStrictReceive:
             Asset("USD", "GBBM6BKZPEHWYO3E3YKREDPQXMS4VK35YLNU7NFBRI26RAN7GI5POFBB"),
             Asset("EUR", "GDTNXRLOJD2YEBPKK7KCMR7J33AAG5VZXHAJTHIG736D6LVEFLLLKPDL"),
         ]
-        with pytest.raises(Ed25519PublicKeyInvalidError):
+        with pytest.raises(ValueError):
             PathPaymentStrictReceive(
                 destination, send_asset, send_max, dest_asset, dest_amount, path, source
             )
@@ -469,6 +508,35 @@ class TestPathPaymentStrictReceive:
         assert op.send_max == "3.007"
         assert op.dest_amount == "3.1415"
         assert op.path == path
+
+    def test_from_xdr_muxed(self):
+        source = "GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV"
+        destination = "GCEZWKCA5VLDNRLN3RPRJMRZOX3Z6G5CHCGSNFHEYVXM3XOJMDS674JZ"
+        destination2 = "GBL3NR5XNBNFAYVQMZ7R6RMUKLMGRUHNIYDYMEUPANQV6OROQXSDZYHV"
+        send_asset = Asset(
+            "USD", "GDGU5OAPHNPU5UCLE5RDJHG7PXZFQYWKCFOEXSXNMR6KRQRI5T6XXCD7"
+        )
+        dest_asset = Asset(
+            "USD", "GDGU5OAPHNPU5UCLE5RDJHG7PXZFQYWKCFOEXSXNMR6KRQRI5T6XXCD7"
+        )
+        send_max = "3.0070000"
+        dest_amount = "3.1415000"
+        path = [
+            Asset("USD", "GBBM6BKZPEHWYO3E3YKREDPQXMS4VK35YLNU7NFBRI26RAN7GI5POFBB"),
+            Asset("EUR", "GDTNXRLOJD2YEBPKK7KCMR7J33AAG5VZXHAJTHIG736D6LVEFLLLKPDL"),
+        ]
+        origin_xdr_obj = PathPaymentStrictReceive(
+            destination, send_asset, send_max, dest_asset, dest_amount, path, source
+        ).to_xdr_object()
+        restore_op = PathPaymentStrictReceive.from_xdr_object(origin_xdr_obj)
+        assert restore_op.to_xdr_object().to_xdr() == origin_xdr_obj.to_xdr()
+        assert (
+            restore_op._destination_muxed.to_xdr()
+            == Keypair.from_public_key(destination).xdr_muxed_account().to_xdr()
+        )
+        restore_op.destination = destination2
+        assert restore_op._destination_muxed is None
+        assert restore_op.destination == destination2
 
 
 class TestPathPaymentStrictSend:
@@ -510,7 +578,7 @@ class TestPathPaymentStrictSend:
             Asset("USD", "GBBM6BKZPEHWYO3E3YKREDPQXMS4VK35YLNU7NFBRI26RAN7GI5POFBB"),
             Asset("EUR", "GDTNXRLOJD2YEBPKK7KCMR7J33AAG5VZXHAJTHIG736D6LVEFLLLKPDL"),
         ]
-        with pytest.raises(Ed25519PublicKeyInvalidError):
+        with pytest.raises(ValueError):
             PathPaymentStrictSend(
                 destination, send_asset, send_amount, dest_asset, dest_min, path, source
             )
@@ -543,6 +611,35 @@ class TestPathPaymentStrictSend:
         assert op.dest_min == "3.007"
         assert op.path == path
 
+    def test_from_xdr_muxed(self):
+        source = "GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV"
+        destination = "GCEZWKCA5VLDNRLN3RPRJMRZOX3Z6G5CHCGSNFHEYVXM3XOJMDS674JZ"
+        destination2 = "GBL3NR5XNBNFAYVQMZ7R6RMUKLMGRUHNIYDYMEUPANQV6OROQXSDZYHV"
+        send_asset = Asset(
+            "USD", "GDGU5OAPHNPU5UCLE5RDJHG7PXZFQYWKCFOEXSXNMR6KRQRI5T6XXCD7"
+        )
+        dest_asset = Asset(
+            "USD", "GDGU5OAPHNPU5UCLE5RDJHG7PXZFQYWKCFOEXSXNMR6KRQRI5T6XXCD7"
+        )
+        send_amount = "3.1415000"
+        dest_min = "3.0070000"
+        path = [
+            Asset("USD", "GBBM6BKZPEHWYO3E3YKREDPQXMS4VK35YLNU7NFBRI26RAN7GI5POFBB"),
+            Asset("EUR", "GDTNXRLOJD2YEBPKK7KCMR7J33AAG5VZXHAJTHIG736D6LVEFLLLKPDL"),
+        ]
+        origin_xdr_obj = PathPaymentStrictSend(
+            destination, send_asset, send_amount, dest_asset, dest_min, path, source
+        ).to_xdr_object()
+        restore_op = PathPaymentStrictSend.from_xdr_object(origin_xdr_obj)
+        assert restore_op.to_xdr_object().to_xdr() == origin_xdr_obj.to_xdr()
+        assert (
+            restore_op._destination_muxed.to_xdr()
+            == Keypair.from_public_key(destination).xdr_muxed_account().to_xdr()
+        )
+        restore_op.destination = destination2
+        assert restore_op._destination_muxed is None
+        assert restore_op.destination == destination2
+
 
 class TestAllowTrust:
     @pytest.mark.parametrize(
@@ -556,6 +653,18 @@ class TestAllowTrust:
                 False,
                 "AAAAAQAAAADX7fRsY6KTqIc8EIDyr8M9gxGPW6ODnZoZDgo6l1ymwwAAAAcAAAAAzU64DztfTtBLJ2I0nN998lhiyhFcS8rtZHyowijs/XsAAAABVVNEAAAAAAA=",
             ),
+            (
+                TrustLineEntryFlag.AUTHORIZED_FLAG,
+                "AAAAAQAAAADX7fRsY6KTqIc8EIDyr8M9gxGPW6ODnZoZDgo6l1ymwwAAAAcAAAAAzU64DztfTtBLJ2I0nN998lhiyhFcS8rtZHyowijs/XsAAAABVVNEAAAAAAE=",
+            ),
+            (
+                TrustLineEntryFlag.UNAUTHORIZED_FLAG,
+                "AAAAAQAAAADX7fRsY6KTqIc8EIDyr8M9gxGPW6ODnZoZDgo6l1ymwwAAAAcAAAAAzU64DztfTtBLJ2I0nN998lhiyhFcS8rtZHyowijs/XsAAAABVVNEAAAAAAA=",
+            ),
+            (
+                TrustLineEntryFlag.AUTHORIZED_TO_MAINTAIN_LIABILITIES_FLAG,
+                "AAAAAQAAAADX7fRsY6KTqIc8EIDyr8M9gxGPW6ODnZoZDgo6l1ymwwAAAAcAAAAAzU64DztfTtBLJ2I0nN998lhiyhFcS8rtZHyowijs/XsAAAABVVNEAAAAAAI=",
+            ),
         ],
     )
     def test_to_xdr_obj(self, authorize, xdr):
@@ -567,7 +676,12 @@ class TestAllowTrust:
 
     @pytest.mark.parametrize(
         "asset_code, authorize",
-        [("USD", True), ("USDT", False), ("Banana", True), ("STELLAROVERC", False)],
+        [
+            ("USD", TrustLineEntryFlag.AUTHORIZED_FLAG),
+            ("USDT", TrustLineEntryFlag.UNAUTHORIZED_FLAG),
+            ("Banana", TrustLineEntryFlag.AUTHORIZED_FLAG),
+            ("STELLAROVERC", TrustLineEntryFlag.UNAUTHORIZED_FLAG),
+        ],
     )
     def test_from_xdr_obj(self, asset_code, authorize):
         source = "GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV"
@@ -658,6 +772,21 @@ class TestSetOptions:
                 "GDGU5OAPHNPU5UCLE5RDJHG7PXZFQYWKCFOEXSXNMR6KRQRI5T6XXCD7",
                 AUTHORIZATION_REVOCABLE | AUTHORIZATION_IMMUTABLE,
                 AUTHORIZATION_REQUIRED,
+                0,
+                1,
+                2,
+                3,
+                "www.example.com",
+                Signer.ed25519_public_key(
+                    "GDGU5OAPHNPU5UCLE5RDJHG7PXZFQYWKCFOEXSXNMR6KRQRI5T6XXCD7", 1
+                ),
+                None,
+                "AAAAAAAAAAUAAAABAAAAAM1OuA87X07QSydiNJzfffJYYsoRXEvK7WR8qMIo7P17AAAAAQAAAAYAAAABAAAAAQAAAAEAAAAAAAAAAQAAAAEAAAABAAAAAgAAAAEAAAADAAAAAQAAAA93d3cuZXhhbXBsZS5jb20AAAAAAQAAAADNTrgPO19O0EsnYjSc333yWGLKEVxLyu1kfKjCKOz9ewAAAAE=",
+            ),
+            (
+                "GDGU5OAPHNPU5UCLE5RDJHG7PXZFQYWKCFOEXSXNMR6KRQRI5T6XXCD7",
+                Flag.AUTHORIZATION_REVOCABLE | Flag.AUTHORIZATION_IMMUTABLE,
+                Flag.AUTHORIZATION_REQUIRED,
                 0,
                 1,
                 2,
@@ -930,13 +1059,20 @@ class TestOperationUtils:
         check_source("GCNY5OXYSY4FKHOPT2SPOQZAOEIGXB5LBYW3HVU3OWSTQITS65M5RCNY")
 
     @pytest.mark.parametrize(
-        "source",
-        ["GCNY5OXYSY4FKHOPT2SPOQZAOEIGXB5LBYW3HVU3OWSTQITS65M5RBAD", "", " ", 123],
+        "source,msg",
+        [
+            (
+                "GCNY5OXYSY4FKHOPT2SPOQZAOEIGXB5LBYW3HVU3OWSTQITS65M5RBAD",
+                "Invalid Ed25519 Public Key: ",
+            ),
+            (
+                "MAAAAAAAAAAAJURAAB2X52XFQP6FBXLGT6LWOOWMEXWHEWBDVRZ7V5WH34Y22MPFBHBAD",
+                "Invalid Ed25519 Public Key: ",
+            ),
+        ],
     )
-    def test_check_source_raise(self, source):
-        with pytest.raises(
-            ValueError, match="Invalid Ed25519 Public Key: {}".format(source)
-        ):
+    def test_check_source_raise(self, source, msg):
+        with pytest.raises(ValueError, match=msg + source):
             check_source(source)
 
     def test_check_ed25519_public_key(self):

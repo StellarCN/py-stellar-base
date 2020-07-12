@@ -8,11 +8,11 @@ from typing import (
     AsyncGenerator,
     Optional,
 )
-from urllib.parse import urljoin
 
 from ..client.base_async_client import BaseAsyncClient
 from ..client.base_sync_client import BaseSyncClient
 from ..exceptions import raise_request_exception, NotPageableError
+from ..utils import urljoin_with_query
 
 
 class BaseCallBuilder:
@@ -54,7 +54,7 @@ class BaseCallBuilder:
             | :exc:`UnknownRequestError <stellar_sdk.exceptions.UnknownRequestError>`: if an unknown error occurs,
                 please submit an issue
         """
-        url = urljoin(self.horizon_url, self.endpoint)
+        url = urljoin_with_query(self.horizon_url, self.endpoint)
         return self.__call(url, self.params)
 
     def __call(self, url: str, params: dict = None):
@@ -78,7 +78,7 @@ class BaseCallBuilder:
         return resp
 
     def stream(
-        self
+        self,
     ) -> Union[
         AsyncGenerator[Dict[str, Any], None], Generator[Dict[str, Any], None, None]
     ]:
@@ -90,6 +90,8 @@ class BaseCallBuilder:
 
         :return: If it is called synchronous, it will return ``Generator``, If
             it is called asynchronously, it will return ``AsyncGenerator``.
+
+        :raise: :exc:`StreamClientError <stellar_sdk.exceptions.StreamClientError>` - Failed to fetch stream resource.
         """
         if self.__async:
             return self.__stream_async()
@@ -97,13 +99,13 @@ class BaseCallBuilder:
             return self.__stream_sync()
 
     async def __stream_async(self) -> AsyncGenerator[Dict[str, Any], None]:
-        url = urljoin(self.horizon_url, self.endpoint)
+        url = urljoin_with_query(self.horizon_url, self.endpoint)
         stream = self.client.stream(url, self.params)
         while True:
             yield await stream.__anext__()
 
     def __stream_sync(self) -> Generator[Dict[str, Any], None, None]:
-        url = urljoin(self.horizon_url, self.endpoint)
+        url = urljoin_with_query(self.horizon_url, self.endpoint)
         return self.client.stream(url, self.params)
 
     def cursor(self, cursor: Union) -> "BaseCallBuilder":
@@ -146,7 +148,7 @@ class BaseCallBuilder:
         return self.__call(self.next_href, None)
 
     def prev(self):
-        if self.next_href is None:
+        if self.prev_href is None:
             raise NotPageableError("The prev page does not exist.")
         return self.__call(self.prev_href, None)
 

@@ -8,8 +8,8 @@ from ..exceptions import ValueError
 
 
 class TradeAggregationsCallBuilder(BaseCallBuilder):
-    """ Creates a new :class:`AccountsCallBuilder` pointed to server defined by horizon_url.
-    Do not create this object directly, use :func:`stellar_sdk.server.Server.accounts`.
+    """ Creates a new :class:`TradeAggregationsCallBuilder` pointed to server defined by horizon_url.
+    Do not create this object directly, use :func:`stellar_sdk.server.Server.trade_aggregations`.
 
     Trade Aggregations facilitate efficient gathering of historical trade data.
 

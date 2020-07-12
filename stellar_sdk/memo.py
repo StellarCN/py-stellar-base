@@ -160,9 +160,11 @@ class HashMemo(Memo):
     def __init__(self, memo_hash: Union[bytes, str]) -> None:
         memo_hash = hex_to_bytes(memo_hash)
         length = len(memo_hash)
-        if length > 32:
+        if length != 32:
             raise MemoInvalidException(
-                "HashMemo can contain 32 bytes at max, got {:d} bytes".format(length)
+                "The length of HashMemo should be 32 bytes, got {:d} bytes.".format(
+                    length
+                )
             )
 
         self.memo_hash: bytes = memo_hash
@@ -197,9 +199,9 @@ class ReturnHashMemo(Memo):
     def __init__(self, memo_return: bytes) -> None:
         memo_return = hex_to_bytes(memo_return)
         length = len(memo_return)
-        if length > 32:
+        if length != 32:
             raise MemoInvalidException(
-                "ReturnHashMemo can contain 32 bytes at max, got {:d} bytes".format(
+                "The length of ReturnHashMemo should be 32 bytes, got {:d} bytes.".format(
                     length
                 )
             )

@@ -1,5 +1,5 @@
 -r requirements-test.txt
-sphinx
+sphinx~=3.1.1
 sphinx-rtd-theme
-sphinx-autodoc-typehints
+sphinx-autodoc-typehints~=1.11.0
 ply

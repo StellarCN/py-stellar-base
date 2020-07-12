@@ -2,10 +2,10 @@ from decimal import Decimal
 from typing import Union
 
 from .operation import Operation
-from ..keypair import Keypair
-from ..xdr import Xdr
-from ..strkey import StrKey
 from .utils import check_ed25519_public_key, check_amount
+from ..keypair import Keypair
+from ..strkey import StrKey
+from ..xdr import Xdr
 
 
 class CreateAccount(Operation):
@@ -70,6 +70,8 @@ class CreateAccount(Operation):
             operation_xdr_object.body.createAccountOp.startingBalance
         )
 
-        return cls(
+        op = cls(
             source=source, destination=destination, starting_balance=starting_balance
         )
+        op._source_muxed = Operation.get_source_muxed_from_xdr_obj(operation_xdr_object)
+        return op

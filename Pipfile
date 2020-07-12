@@ -12,6 +12,7 @@ sphinx-rtd-theme = "*"
 sphinx-autodoc-typehints = "*"
 pytest-timeout = "*"
 pytest-asyncio = "*"
+pytest-httpserver = "*"
 
 [packages]
 crc16 = "*"
@@ -24,7 +25,7 @@ mnemonic = "*"
 toml = "*"
 
 [requires]
-python_version = "3.7"
+python_version = "3.8"
 
 [pipenv]
 allow_prereleases = true

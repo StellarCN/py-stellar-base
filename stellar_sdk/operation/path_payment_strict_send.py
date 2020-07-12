@@ -1,12 +1,12 @@
 from decimal import Decimal
-from typing import List, Union
+from typing import List, Union, Optional
 
 from .operation import Operation
+from .utils import check_amount, check_ed25519_public_key
 from ..asset import Asset
 from ..keypair import Keypair
+from ..utils import parse_ed25519_account_id_from_muxed_account_xdr_object
 from ..xdr import Xdr
-from ..strkey import StrKey
-from .utils import check_ed25519_public_key, check_amount
 
 
 class PathPaymentStrictSend(Operation):
@@ -40,22 +40,36 @@ class PathPaymentStrictSend(Operation):
         source: str = None,
     ) -> None:
         super().__init__(source)
-        check_ed25519_public_key(destination)
         check_amount(send_amount)
         check_amount(dest_min)
-        self.destination: str = destination
+        check_ed25519_public_key(destination)
+        self._destination: str = destination
+        self._destination_muxed: Optional[Xdr.types.MuxedAccount] = None
         self.send_asset: Asset = send_asset
         self.send_amount: Union[str, Decimal] = send_amount
         self.dest_asset: Asset = dest_asset
         self.dest_min: Union[str, Decimal] = dest_min
         self.path: List[Asset] = path  # a list of paths/assets
 
+    @property
+    def destination(self) -> str:
+        return self._destination
+
+    @destination.setter
+    def destination(self, value: str):
+        check_ed25519_public_key(value)
+        self._destination_muxed = None
+        self._destination = value
+
     @classmethod
     def type_code(cls) -> int:
         return Xdr.const.PATH_PAYMENT_STRICT_SEND
 
     def _to_operation_body(self) -> Xdr.nullclass:
-        destination = Keypair.from_public_key(self.destination).xdr_account_id()
+        if self._destination_muxed is not None:
+            destination = self._destination_muxed
+        else:
+            destination = Keypair.from_public_key(self._destination).xdr_muxed_account()
         send_asset = self.send_asset.to_xdr_object()
         dest_asset = self.dest_asset.to_xdr_object()
         path = [asset.to_xdr_object() for asset in self.path]
@@ -82,8 +96,8 @@ class PathPaymentStrictSend(Operation):
 
         """
         source = Operation.get_source_from_xdr_obj(operation_xdr_object)
-        destination = StrKey.encode_ed25519_public_key(
-            operation_xdr_object.body.pathPaymentStrictSendOp.destination.ed25519
+        destination = parse_ed25519_account_id_from_muxed_account_xdr_object(
+            operation_xdr_object.body.pathPaymentStrictSendOp.destination
         )
 
         send_asset = Asset.from_xdr_object(
@@ -104,7 +118,7 @@ class PathPaymentStrictSend(Operation):
             for x in operation_xdr_object.body.pathPaymentStrictSendOp.path:
                 path.append(Asset.from_xdr_object(x))
 
-        return cls(
+        op = cls(
             source=source,
             destination=destination,
             send_asset=send_asset,
@@ -113,3 +127,8 @@ class PathPaymentStrictSend(Operation):
             dest_min=dest_min,
             path=path,
         )
+        op._destination_muxed = (
+            operation_xdr_object.body.pathPaymentStrictSendOp.destination
+        )
+        op._source_muxed = Operation.get_source_muxed_from_xdr_obj(operation_xdr_object)
+        return op

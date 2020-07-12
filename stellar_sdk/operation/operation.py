@@ -5,9 +5,9 @@ from typing import Optional, List, Union
 
 from .utils import check_source
 from ..keypair import Keypair
-from ..strkey import StrKey
-from ..xdr import Xdr
 from ..exceptions import ValueError, TypeError
+from ..utils import parse_ed25519_account_id_from_muxed_account_xdr_object
+from ..xdr import Xdr
 
 
 class Operation(metaclass=ABCMeta):
@@ -41,7 +41,18 @@ class Operation(metaclass=ABCMeta):
 
     def __init__(self, source: str = None) -> None:
         check_source(source)
-        self.source: Optional[str] = source
+        self._source: Optional[str] = source
+        self._source_muxed: Optional[Xdr.types.MuxedAccount] = None
+
+    @property
+    def source(self) -> str:
+        return self._source
+
+    @source.setter
+    def source(self, value: str):
+        check_source(value)
+        self._source_muxed = None
+        self._source = value
 
     @classmethod
     def type_code(cls) -> int:
@@ -118,10 +129,11 @@ class Operation(metaclass=ABCMeta):
         :class:`Operation`.
 
         """
-        source_account: List[Xdr.types.PublicKey] = []
-        if self.source is not None:
-            source_account = [Keypair.from_public_key(self.source).xdr_account_id()]
-
+        source_account: List[Xdr.types.MuxedAccount] = []
+        if self._source_muxed is not None:
+            source_account = [self._source_muxed]
+        elif self.source is not None:
+            source_account = [Keypair.from_public_key(self._source).xdr_muxed_account()]
         return Xdr.types.Operation(source_account, self._to_operation_body())
 
     @classmethod
@@ -141,14 +153,29 @@ class Operation(metaclass=ABCMeta):
         )
 
     @staticmethod
-    def get_source_from_xdr_obj(xdr_object: Xdr.types.Operation) -> Optional[str]:
+    def get_source_from_xdr_obj(xdr_object: Xdr.types.Operation,) -> Optional[str]:
         """Get the source account from account the operation xdr object.
 
         :param xdr_object: the operation xdr object.
         :return: The source account from account the operation xdr object.
         """
         if xdr_object.sourceAccount:
-            return StrKey.encode_ed25519_public_key(xdr_object.sourceAccount[0].ed25519)
+            return parse_ed25519_account_id_from_muxed_account_xdr_object(
+                xdr_object.sourceAccount[0]
+            )
+        return None
+
+    @staticmethod
+    def get_source_muxed_from_xdr_obj(
+        xdr_object: Xdr.types.Operation,
+    ) -> Optional[Xdr.types.MuxedAccount]:
+        """Get the source account from account the operation xdr object.
+
+        :param xdr_object: the operation xdr object.
+        :return: The source account from account the operation xdr object.
+        """
+        if xdr_object.sourceAccount:
+            return xdr_object.sourceAccount[0]
         return None
 
     def __eq__(self, other: object) -> bool:

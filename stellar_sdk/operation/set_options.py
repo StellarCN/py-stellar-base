@@ -1,12 +1,26 @@
-from typing import List, Optional
+from enum import IntFlag
+from typing import List, Optional, Union
 
 from .operation import Operation
+from .utils import check_ed25519_public_key
 from ..keypair import Keypair
 from ..signer import Signer
-from ..xdr import Xdr
 from ..strkey import StrKey
 from ..utils import pack_xdr_array, unpack_xdr_array
-from .utils import check_ed25519_public_key
+from ..xdr import Xdr
+
+__all__ = ["Flag", "SetOptions"]
+
+
+class Flag(IntFlag):
+    """Indicates which flags to set. For details about the flags,
+    please refer to the `accounts doc <https://www.stellar.org/developers/guides/concepts/accounts.html>`_.
+    The bit mask integer adds onto the existing flags of the account.
+    """
+
+    AUTHORIZATION_REQUIRED = 1
+    AUTHORIZATION_REVOCABLE = 2
+    AUTHORIZATION_IMMUTABLE = 4
 
 
 class SetOptions(Operation):
@@ -27,14 +41,16 @@ class SetOptions(Operation):
     :param clear_flags: Indicates which flags to clear. For details about the flags,
         please refer to the `accounts doc <https://www.stellar.org/developers/guides/concepts/accounts.html>`_.
         The `bit mask <https://en.wikipedia.org/wiki/Bit_field>`_ integer subtracts from the existing flags of the account.
-        This allows for setting specific bits without knowledge of existing flags.
+        This allows for setting specific bits without knowledge of existing flags, you can also use
+        :class:`stellar_sdk.operation.set_options.Flag`
         - AUTHORIZATION_REQUIRED = 1
         - AUTHORIZATION_REVOCABLE = 2
         - AUTHORIZATION_IMMUTABLE = 4
     :param set_flags: Indicates which flags to set. For details about the flags,
         please refer to the `accounts doc <https://www.stellar.org/developers/guides/concepts/accounts.html>`_.
         The bit mask integer adds onto the existing flags of the account.
-        This allows for setting specific bits without knowledge of existing flags.
+        This allows for setting specific bits without knowledge of existing flags, you can also use
+        :class:`stellar_sdk.operation.set_options.Flag`
         - AUTHORIZATION_REQUIRED = 1
         - AUTHORIZATION_REVOCABLE = 2
         - AUTHORIZATION_IMMUTABLE = 4
@@ -56,8 +72,8 @@ class SetOptions(Operation):
     def __init__(
         self,
         inflation_dest: str = None,
-        clear_flags: int = None,
-        set_flags: int = None,
+        clear_flags: Union[int, Flag] = None,
+        set_flags: Union[int, Flag] = None,
         master_weight: int = None,
         low_threshold: int = None,
         med_threshold: int = None,
@@ -69,6 +85,12 @@ class SetOptions(Operation):
         super().__init__(source)
         if inflation_dest is not None:
             check_ed25519_public_key(inflation_dest)
+
+        if isinstance(set_flags, Flag):
+            set_flags = set_flags.value
+
+        if isinstance(clear_flags, Flag):
+            clear_flags = clear_flags.value
 
         self.inflation_dest: str = inflation_dest
         self.clear_flags: int = clear_flags
@@ -165,7 +187,7 @@ class SetOptions(Operation):
         if signer_xdr_object:
             signer = Signer.from_xdr_object(signer_xdr_object[0])
 
-        return cls(
+        op = cls(
             inflation_dest=inflation_dest,
             clear_flags=clear_flags,
             set_flags=set_flags,
@@ -177,3 +199,5 @@ class SetOptions(Operation):
             signer=signer,
             source=source,
         )
+        op._source_muxed = Operation.get_source_muxed_from_xdr_obj(operation_xdr_object)
+        return op

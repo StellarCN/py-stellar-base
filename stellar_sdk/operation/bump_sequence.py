@@ -1,5 +1,4 @@
 from .operation import Operation
-
 from ..xdr import Xdr
 
 
@@ -45,4 +44,6 @@ class BumpSequence(Operation):
         source = Operation.get_source_from_xdr_obj(operation_xdr_object)
 
         bump_to = operation_xdr_object.body.bumpSequenceOp.bumpTo
-        return cls(source=source, bump_to=bump_to)
+        op = cls(source=source, bump_to=bump_to)
+        op._source_muxed = Operation.get_source_muxed_from_xdr_obj(operation_xdr_object)
+        return op

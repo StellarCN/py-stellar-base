@@ -1,5 +1,5 @@
 from .account_merge import AccountMerge
-from .allow_trust import AllowTrust
+from .allow_trust import AllowTrust, TrustLineEntryFlag
 from .bump_sequence import BumpSequence
 from .change_trust import ChangeTrust
 from .create_account import CreateAccount
@@ -13,7 +13,7 @@ from .path_payment import PathPayment
 from .path_payment_strict_receive import PathPaymentStrictReceive
 from .path_payment_strict_send import PathPaymentStrictSend
 from .payment import Payment
-from .set_options import SetOptions
+from .set_options import SetOptions, Flag
 
 __all__ = [
     "Operation",
@@ -32,4 +32,6 @@ __all__ = [
     "PathPaymentStrictSend",
     "Payment",
     "SetOptions",
+    "TrustLineEntryFlag",
+    "Flag",  # TODO: act like TrustLineEntryFlag
 ]

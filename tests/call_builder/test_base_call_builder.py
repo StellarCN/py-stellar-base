@@ -21,15 +21,11 @@ class TestBaseCallBuilder:
         )
 
         assert resp["args"] == {"cursor": "89777", "limit": "25", "order": "asc"}
-        assert resp["headers"] == {
-            "Accept": "*/*",
-            "Accept-Encoding": "gzip, deflate",
-            "Content-Type": "application/x-www-form-urlencoded",
-            "Host": "httpbin.org",
-            "User-Agent": "py-stellar-sdk/{}/AiohttpClient".format(__version__),
-            "X-Client-Name": "py-stellar-sdk",
-            "X-Client-Version": __version__,
-        }
+        assert resp["headers"][
+            "User-Agent"
+        ] == "py-stellar-sdk/{}/AiohttpClient".format(__version__)
+        assert resp["headers"]["X-Client-Name"] == "py-stellar-sdk"
+        assert resp["headers"]["X-Client-Version"] == __version__
         assert resp["url"] == "https://httpbin.org/get?cursor=89777&order=asc&limit=25"
 
     def test_get_data_sync(self):
@@ -39,14 +35,11 @@ class TestBaseCallBuilder:
             BaseCallBuilder(url, client).limit(10).cursor(10086).order(desc=True).call()
         )
         assert resp["args"] == {"cursor": "10086", "limit": "10", "order": "desc"}
-        assert resp["headers"] == {
-            "Accept": "*/*",
-            "Accept-Encoding": "gzip, deflate",
-            "Host": "httpbin.org",
-            "User-Agent": "py-stellar-sdk/{}/RequestsClient".format(__version__),
-            "X-Client-Name": "py-stellar-sdk",
-            "X-Client-Version": __version__,
-        }
+        assert resp["headers"][
+            "User-Agent"
+        ] == "py-stellar-sdk/{}/RequestsClient".format(__version__)
+        assert resp["headers"]["X-Client-Name"] == "py-stellar-sdk"
+        assert resp["headers"]["X-Client-Version"] == __version__
         assert resp["url"] == "https://httpbin.org/get?limit=10&cursor=10086&order=desc"
 
     @pytest.mark.slow
@@ -146,30 +139,6 @@ class TestBaseCallBuilder:
         )
         assert exception.extras is None
 
-    @pytest.mark.asyncio
-    async def test_get_data_async(self):
-        url = "https://httpbin.org/get"
-        client = AiohttpClient()
-        resp = (
-            await BaseCallBuilder(url, client)
-            .cursor(89777)
-            .order(desc=False)
-            .limit(25)
-            .call()
-        )
-
-        assert resp["args"] == {"cursor": "89777", "limit": "25", "order": "asc"}
-        assert resp["headers"] == {
-            "Accept": "*/*",
-            "Accept-Encoding": "gzip, deflate",
-            "Content-Type": "application/x-www-form-urlencoded",
-            "Host": "httpbin.org",
-            "User-Agent": "py-stellar-sdk/{}/AiohttpClient".format(__version__),
-            "X-Client-Name": "py-stellar-sdk",
-            "X-Client-Version": __version__,
-        }
-        assert resp["url"] == "https://httpbin.org/get?cursor=89777&order=asc&limit=25"
-
     def test_get_data_no_link(self):
         url = "https://httpbin.org/get"
         client = RequestsClient()
@@ -238,3 +207,26 @@ class TestBaseCallBuilder:
                 "href": "https://horizon.stellar.org/transactions?cursor=33676838572032&limit=10&order=desc"
             },
         }
+
+    def test_horizon_url_params(self):
+        url = "https://httpbin.org/get?version=1.2&auth=myPassw0wd"
+        client = RequestsClient()
+        resp = (
+            BaseCallBuilder(url, client).limit(10).cursor(10086).order(desc=True).call()
+        )
+        assert resp["args"] == {
+            "auth": "myPassw0wd",
+            "cursor": "10086",
+            "limit": "10",
+            "order": "desc",
+            "version": "1.2",
+        }
+        assert resp["headers"][
+            "User-Agent"
+        ] == "py-stellar-sdk/{}/RequestsClient".format(__version__)
+        assert resp["headers"]["X-Client-Name"] == "py-stellar-sdk"
+        assert resp["headers"]["X-Client-Version"] == __version__
+        assert (
+            resp["url"]
+            == "https://httpbin.org/get?version=1.2&auth=myPassw0wd&limit=10&cursor=10086&order=desc"
+        )

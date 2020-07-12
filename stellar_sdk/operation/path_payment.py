@@ -37,7 +37,7 @@ class PathPayment(PathPaymentStrictReceive):
         source: str = None,
     ) -> None:
         warnings.warn(
-            "Will be removed in version v2.1.0, "
+            "Will be removed in version v3.0.0, "
             "use stellar_sdk.operation.PathPaymentStrictReceive",
             DeprecationWarning,
         )
