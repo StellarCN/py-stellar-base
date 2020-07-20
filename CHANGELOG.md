@@ -1,6 +1,13 @@
 Release History
 ==============
 
+### Version 2.6.2
+
+Released on Jul 20, 2020
+
+#### Added
+* feat: add support for SEP-0007 (URI Scheme to facilitate delegated signing). ([#349](https://github.com/StellarCN/py-stellar-base/pull/349))
+
 ### Version 2.6.1
 
 Released on Jun 21, 2020
