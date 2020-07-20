@@ -196,7 +196,7 @@ class ReturnHashMemo(Memo):
         if ``memo_return`` is not a valid return hash memo.
     """
 
-    def __init__(self, memo_return: bytes) -> None:
+    def __init__(self, memo_return: Union[bytes, str]) -> None:
         memo_return = hex_to_bytes(memo_return)
         length = len(memo_return)
         if length != 32:
