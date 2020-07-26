@@ -29,7 +29,7 @@ def check_price(price: Union[str, Decimal, Price]) -> None:
         isinstance(price, str) or isinstance(price, Decimal) or isinstance(price, Price)
     ):
         raise TypeError(
-            "amount should be type of {}, {} or {}.".format(str, Decimal, Price)
+            "price should be type of {}, {} or {}.".format(str, Decimal, Price)
         )
 
     if isinstance(price, str) or isinstance(price, Decimal):
