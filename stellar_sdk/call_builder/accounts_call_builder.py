@@ -31,7 +31,7 @@ class AccountsCallBuilder(BaseCallBuilder):
         :param account_id: account id, for example: `GDGQVOKHW4VEJRU2TETD6DBRKEO5ERCNF353LW5WBFW3JJWQ2BRQ6KDD`
         :return: current AccountCallBuilder instance
         """
-        self.endpoint = "accounts/{account_id}".format(account_id=account_id)
+        self.endpoint = f"accounts/{account_id}"
         return self
 
     def signer(self, signer: str) -> "AccountsCallBuilder":

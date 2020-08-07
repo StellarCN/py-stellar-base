@@ -88,8 +88,7 @@ class Signer:
             return cls.sha256_hash(signer_xdr_object.hashX, weight)
         else:
             raise ValueError(
-                "This is an unknown signer type, "
-                "please consider creating an issuer at {}.".format(__issues__)
+                f"This is an unknown signer type, please consider creating an issuer at {__issues__}."
             )
 
     def __eq__(self, other: object) -> bool:

@@ -43,13 +43,8 @@ class FederationRecord:
 
     def __str__(self):
         return (
-            "<FederationRecord [account_id={account_id}, stellar_address={stellar_address}, "
-            "memo_type={memo_type}, memo={memo}]>".format(
-                account_id=self.account_id,
-                stellar_address=self.stellar_address,
-                memo_type=self.memo_type,
-                memo=self.memo,
-            )
+            f"<FederationRecord [account_id={self.account_id}, stellar_address={self.stellar_address}, "
+            f"memo_type={self.memo_type}, memo={self.memo}]>"
         )
 
     def __eq__(self, other: object) -> bool:
@@ -149,7 +144,7 @@ def __resolve_stellar_address_sync(
         )
     if federation_url is None:
         raise FederationServerNotFoundError(
-            "Unable to find federation server at {}.".format(domain)
+            f"Unable to find federation server at {domain}."
         )
     raw_resp = client.get(federation_url, {"type": "name", "q": stellar_address})
     return __handle_raw_response(raw_resp, stellar_address=stellar_address)
@@ -169,7 +164,7 @@ async def __resolve_stellar_address_async(
         ).get(FEDERATION_SERVER_KEY)
     if federation_url is None:
         raise FederationServerNotFoundError(
-            "Unable to find federation server at {}.".format(domain)
+            f"Unable to find federation server at {domain}."
         )
     raw_resp = await client.get(federation_url, {"type": "name", "q": stellar_address})
     return __handle_raw_response(raw_resp, stellar_address=stellar_address)
@@ -188,7 +183,7 @@ def __resolve_account_id_sync(
         )
         if federation_url is None:
             raise FederationServerNotFoundError(
-                "Unable to find federation server at {}.".format(domain)
+                f"Unable to find federation server at {domain}."
             )
     raw_resp = client.get(federation_url, {"type": "id", "q": account_id})
     return __handle_raw_response(raw_resp, account_id=account_id)
@@ -207,7 +202,7 @@ async def __resolve_account_id_async(
         )
         if federation_url is None:
             raise FederationServerNotFoundError(
-                "Unable to find federation server at {}.".format(domain)
+                f"Unable to find federation server at {domain}."
             )
     raw_resp = await client.get(federation_url, {"type": "id", "q": account_id})
     return __handle_raw_response(raw_resp, account_id=account_id)

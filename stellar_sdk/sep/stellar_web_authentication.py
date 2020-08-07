@@ -66,7 +66,7 @@ def build_challenge_transaction(
     nonce = os.urandom(48)
     nonce_encoded = base64.b64encode(nonce)
     transaction_builder.append_manage_data_op(
-        data_name="{} auth".format(anchor_name),
+        data_name=f"{anchor_name} auth",
         data_value=nonce_encoded,
         source=client_account_id,
     )
@@ -177,7 +177,7 @@ def read_challenge_transaction(
     # verify that transaction envelope has a correct signature by server's signing key
     if not _verify_te_signed_by_account_id(transaction_envelope, server_account_id):
         raise InvalidSep10ChallengeError(
-            "Transaction not signed by server: {}.".format(server_account_id)
+            f"Transaction not signed by server: {server_account_id}."
         )
 
     # TODO: I don't think this is a good idea.
@@ -250,7 +250,7 @@ def verify_challenge_transaction_signers(
     # Confirm we matched a signature to the server signer.
     if not server_signer_found:
         raise InvalidSep10ChallengeError(
-            "Transaction not signed by server: {}.".format(server_keypair.public_key)
+            f"Transaction not signed by server: {server_keypair.public_key}."
         )
 
     # Confirm we matched signatures to the client signers.
@@ -340,7 +340,7 @@ def verify_challenge_transaction_threshold(
     weight = sum(signer.weight for signer in signers_found)
     if weight < threshold:
         raise InvalidSep10ChallengeError(
-            "signers with weight %d do not meet threshold %d." % (weight, threshold)
+            f"signers with weight {weight} do not meet threshold {threshold}."
         )
 
     return signers_found

@@ -88,9 +88,7 @@ class StrKey:
         try:
             return decode_check("ed25519_secret_seed", data)
         except Exception:
-            raise Ed25519SecretSeedInvalidError(
-                "Invalid Ed25519 Secret Seed: {}".format(data)
-            )
+            raise Ed25519SecretSeedInvalidError(f"Invalid Ed25519 Secret Seed: {data}")
 
     @staticmethod
     def is_valid_ed25519_secret_seed(seed: str):
@@ -173,17 +171,13 @@ def decode_check(version_byte_name: str, encoded: str) -> bytes:
     expected_version = _version_bytes.get(version_byte_name)
     if expected_version is None:
         raise TypeError(
-            '{} is not a valid version byte name. expected one of "ed25519_public_key", '
-            '"ed25519_secret_seed", "pre_auth_tx", "sha256_hash"'.format(
-                version_byte_name
-            )
+            f'{version_byte_name} is not a valid version byte name. expected one of "ed25519_public_key", '
+            '"ed25519_secret_seed", "pre_auth_tx", "sha256_hash"'
         )
 
     if version_byte != expected_version:
         raise TypeError(
-            "Invalid version byte. Expected {}, got {}".format(
-                str(expected_version), str(version_byte)
-            )
+            f"Invalid version byte. Expected {expected_version}, got {version_byte}"
         )
 
     expected_checksum = _calculate_checksum(payload)
@@ -200,10 +194,8 @@ def encode_check(version_byte_name: str, data: bytes) -> str:
     version_byte = _version_bytes.get(version_byte_name)
     if version_byte is None:
         raise TypeError(
-            '{} is not a valid version byte name. expected one of "ed25519_public_key", '
-            '"ed25519_secret_seed", "pre_auth_tx", "sha256_hash"'.format(
-                version_byte_name
-            )
+            f'{version_byte_name} is not a valid version byte name. expected one of "ed25519_public_key", '
+            '"ed25519_secret_seed", "pre_auth_tx", "sha256_hash"'
         )
     payload = version_byte + data
     crc = _calculate_checksum(payload)
@@ -237,8 +229,8 @@ def _bytes_from_decode_data(s: Union[str, bytes, bytearray]) -> bytes:
         return memoryview(s).tobytes()
     except TypeError:
         raise TypeError(
-            "argument should be a bytes-like object or ASCII "
-            "string, not %r" % s.__class__.__name__
+            f"argument should be a bytes-like object or ASCII "
+            f"string, not {s.__class__.__name__}"
         ) from None
 
 

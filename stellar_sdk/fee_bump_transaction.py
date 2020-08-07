@@ -29,8 +29,10 @@ class FeeBumpTransaction:
         base_fee: int,
         inner_transaction_envelope: TransactionEnvelope,
     ) -> None:
-        if not isinstance(inner_transaction_envelope.transaction, Transaction) :
-            raise ValueError("Invalid `inner_transaction`, it should be `stellar_sdk.transaction.Transaction`.")
+        if not isinstance(inner_transaction_envelope.transaction, Transaction):
+            raise ValueError(
+                "Invalid `inner_transaction`, it should be `stellar_sdk.transaction.Transaction`."
+            )
 
         if isinstance(fee_source, str):
             fee_source = Keypair.from_public_key(fee_source)
@@ -38,19 +40,16 @@ class FeeBumpTransaction:
         self._fee_source: Keypair = fee_source
         self._fee_source_muxed: Optional[Xdr.types.MuxedAccount] = None
         self.base_fee = base_fee
-        self.inner_transaction_envelope = inner_transaction_envelope.to_transaction_envelope_v1()
+        self.inner_transaction_envelope = (
+            inner_transaction_envelope.to_transaction_envelope_v1()
+        )
         self._inner_transaction = self.inner_transaction_envelope.transaction
 
         inner_operations_length = len(self._inner_transaction.operations)
         inner_base_fee_rate = self._inner_transaction.fee / inner_operations_length
         if self.base_fee < inner_base_fee_rate or self.base_fee < BASE_FEE:
             raise ValueError(
-                "Invalid `base_fee`, it should be at least %d stroops."
-                % (
-                    self._inner_transaction.fee
-                    if self._inner_transaction.fee > BASE_FEE
-                    else BASE_FEE
-                )
+                f"Invalid `base_fee`, it should be at least {self._inner_transaction.fee if self._inner_transaction.fee > BASE_FEE else BASE_FEE} stroops."
             )
 
     @property

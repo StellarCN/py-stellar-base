@@ -52,6 +52,4 @@ class Network:
         return self.network_passphrase == other.network_passphrase
 
     def __str__(self):
-        return "<Network [network_passphrase={network_passphrase}]>".format(
-            network_passphrase=self.network_passphrase
-        )
+        return f"<Network [network_passphrase={self.network_passphrase}]>"

@@ -16,7 +16,7 @@ from ..exceptions import ConnectionError
 
 DEFAULT_NUM_RETRIES = 3
 DEFAULT_BACKOFF_FACTOR = 0.5
-USER_AGENT = "py-stellar-sdk/%s/RequestsClient" % __version__
+USER_AGENT = f"py-stellar-sdk/{__version__}/RequestsClient"
 IDENTIFICATION_HEADERS = {
     "X-Client-Name": "py-stellar-sdk",
     "X-Client-Version": __version__,
@@ -197,7 +197,7 @@ class _SSEClient:
         session: Session = None,
         chunk_size: int = 1024,
         connect_retry: int = 0,
-        **kwargs
+        **kwargs,
     ):
         if SSEClient is None:
             raise ImportError(

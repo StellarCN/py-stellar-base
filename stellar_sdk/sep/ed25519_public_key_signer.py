@@ -14,6 +14,4 @@ class Ed25519PublicKeySigner:
         return self.account_id == other.account_id and self.weight == other.weight
 
     def __str__(self):
-        return "<Ed25519PublicKeySigner [account_id={account_id}, weight={weight}]>".format(
-            account_id=self.account_id, weight=self.weight
-        )
+        return f"<Ed25519PublicKeySigner [account_id={self.account_id}, weight={self.weight}]>"

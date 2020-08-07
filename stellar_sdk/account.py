@@ -60,9 +60,7 @@ class Account:
         return self.account_id == other.account_id and self.sequence == other.sequence
 
     def __str__(self):
-        return "<Account [account_id={account_id}, sequence={sequence}]>".format(
-            account_id=self.account_id, sequence=self.sequence
-        )
+        return f"<Account [account_id={self.account_id}, sequence={self.sequence}]>"
 
 
 class Thresholds:
@@ -81,8 +79,4 @@ class Thresholds:
         )
 
     def __str__(self):
-        return "<Thresholds [low_threshold={low_threshold}, med_threshold={med_threshold}, high_threshold={high_threshold}]>".format(
-            low_threshold=self.low_threshold,
-            med_threshold=self.med_threshold,
-            high_threshold=self.high_threshold,
-        )
+        return f"<Thresholds [low_threshold={self.low_threshold}, med_threshold={self.med_threshold}, high_threshold={self.high_threshold}]>"
