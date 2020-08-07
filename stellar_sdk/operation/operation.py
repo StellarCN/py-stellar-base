@@ -144,7 +144,7 @@ class Operation(metaclass=ABCMeta):
             if sub_cls.type_code() == operation_xdr_object.type:
                 return sub_cls.from_xdr_object(operation_xdr_object)
         raise NotImplementedError(
-            f"Operation of type={operation_xdr_object} is not implemented."
+            f"Operation of type={operation_xdr_object.type} is not implemented."
         )
 
     @staticmethod
