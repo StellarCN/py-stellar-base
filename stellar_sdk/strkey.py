@@ -230,7 +230,7 @@ def _bytes_from_decode_data(s: Union[str, bytes, bytearray]) -> bytes:
     except TypeError:
         raise TypeError(
             f"argument should be a bytes-like object or ASCII "
-            "string, not {s.__class__.__name__}"
+            f"string, not {s.__class__.__name__}"
         ) from None
 
 
