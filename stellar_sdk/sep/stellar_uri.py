@@ -142,29 +142,15 @@ class PayStellarUri(StellarUri):
             query_params["origin_domain"] = self.origin_domain
         if self.signature is not None:
             query_params["signature"] = self.signature
-        return "{scheme}:pay?{query_string}".format(
-            scheme=STELLAR_SCHEME, query_string=urlencode(query_params, quote_via=quote)
-        )
+        return f"{STELLAR_SCHEME}:pay?{urlencode(query_params, quote_via=quote)}"
 
     def __str__(self):
         return (
-            "<PayStellarUri [destination={destination}, amount={amount}, "
-            "asset_code={asset_code}, asset_issuer={asset_issuer}, "
-            "memo={memo}, memo_type={memo_type}, callback={callback}, "
-            "msg={msg}, network_passphrase={network_passphrase}, "
-            "origin_domain={origin_domain}, signature={signature}]>".format(
-                destination=self.destination,
-                amount=self.amount,
-                asset_code=self.asset_code,
-                asset_issuer=self.asset_issuer,
-                memo=self.memo,
-                memo_type=self.memo_type,
-                callback=self.callback,
-                msg=self.msg,
-                network_passphrase=self.network_passphrase,
-                origin_domain=self.origin_domain,
-                signature=self.signature,
-            )
+            f"<PayStellarUri [destination={self.destination}, amount={self.amount}, "
+            f"asset_code={self.asset_code}, asset_issuer={self.asset_issuer}, "
+            f"memo={self.memo}, memo_type={self.memo_type}, callback={self.callback}, "
+            f"msg={self.msg}, network_passphrase={self.network_passphrase}, "
+            f"origin_domain={self.origin_domain}, signature={self.signature}]>"
         )
 
     def __eq__(self, other: object) -> bool:
@@ -209,13 +195,9 @@ class Replacement:
 
     def __str__(self):
         return (
-            "<Replacement [txrep_tx_field_name={txrep_tx_field_name}, "
-            "reference_identifier={reference_identifier}, "
-            "hint={hint}]>".format(
-                txrep_tx_field_name=self.txrep_tx_field_name,
-                reference_identifier=self.reference_identifier,
-                hint=self.hint,
-            )
+            f"<Replacement [txrep_tx_field_name={self.txrep_tx_field_name}, "
+            f"reference_identifier={self.reference_identifier}, "
+            f"hint={self.hint}]>"
         )
 
     def __eq__(self, other: object) -> bool:
@@ -298,25 +280,14 @@ class TransactionStellarUri(StellarUri):
             query_params["origin_domain"] = self.origin_domain
         if self.signature is not None:
             query_params["signature"] = self.signature
-        return "{scheme}:tx?{query_string}".format(
-            scheme=STELLAR_SCHEME, query_string=urlencode(query_params, quote_via=quote)
-        )
+        return f"{STELLAR_SCHEME}:tx?{urlencode(query_params, quote_via=quote)}"
 
     def __str__(self):
         return (
-            "<TransactionStellarUri [xdr={xdr}, replace={replace}, "
-            "callback={callback}, pubkey={pubkey}, "
-            "msg={msg}, network_passphrase={network_passphrase}, "
-            "origin_domain={origin_domain}, signature={signature}]>".format(
-                xdr=self.transaction_envelope.to_xdr(),
-                replace=self._replace,
-                callback=self.callback,
-                pubkey=self.pubkey,
-                msg=self.msg,
-                network_passphrase=self.network_passphrase,
-                origin_domain=self.origin_domain,
-                signature=self.signature,
-            )
+            f"<TransactionStellarUri [xdr={self.transaction_envelope.to_xdr()}, replace={self.replace}, "
+            f"callback={self.callback}, pubkey={self.pubkey}, "
+            f"msg={self.msg}, network_passphrase={self.network_passphrase}, "
+            f"origin_domain={self.origin_domain}, signature={self.signature}]>"
         )
 
     def __eq__(self, other: object) -> bool:

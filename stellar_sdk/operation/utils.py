@@ -28,9 +28,7 @@ def check_price(price: Union[str, Decimal, Price]) -> None:
     if not (
         isinstance(price, str) or isinstance(price, Decimal) or isinstance(price, Price)
     ):
-        raise TypeError(
-            "price should be type of {}, {} or {}.".format(str, Decimal, Price)
-        )
+        raise TypeError(f"price should be type of {str}, {Decimal} or {Price}.")
 
     if isinstance(price, str) or isinstance(price, Decimal):
         check_amount(price)
@@ -38,14 +36,14 @@ def check_price(price: Union[str, Decimal, Price]) -> None:
 
 def check_amount(amount: Union[str, Decimal]) -> None:
     if not (isinstance(amount, str) or isinstance(amount, Decimal)):
-        raise TypeError("amount should be type of {} or {}.".format(str, Decimal))
+        raise TypeError(f"amount should be type of {str} or {Decimal}.")
     amount = Decimal(amount)
     if abs(amount.as_tuple().exponent) > _EXPONENT:
         raise ValueError(
-            "Value of '{}' must have at most 7 digits after the decimal.".format(amount)
+            f"Value of '{amount}' must have at most 7 digits after the decimal."
         )
     if amount < Decimal(_LOWER_LIMIT) or amount > Decimal(_UPPER_LIMIT):
         raise ValueError(
-            "Value of '{}' must represent a positive number "
-            "and the max valid value is {}.".format(amount, _UPPER_LIMIT)
+            f"Value of '{amount}' must represent a positive number "
+            f"and the max valid value is {_UPPER_LIMIT}."
         )

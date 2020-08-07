@@ -44,10 +44,10 @@ class TradeAggregationsCallBuilder(BaseCallBuilder):
         self.endpoint: str = "trade_aggregations"
 
         if not self.__is_valid_resolution(resolution):
-            raise ValueError("Invalid resolution: {}".format(resolution))
+            raise ValueError(f"Invalid resolution: {resolution}")
 
         if offset and not self.__is_valid_offset(offset, resolution):
-            raise ValueError("Invalid offset: {}".format(offset))
+            raise ValueError(f"Invalid offset: {offset}")
 
         params = {
             "base_asset_type": base.type,

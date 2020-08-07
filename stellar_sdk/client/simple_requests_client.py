@@ -8,7 +8,7 @@ from .base_sync_client import BaseSyncClient
 from ..__version__ import __version__
 from ..client.response import Response
 
-USER_AGENT = "py-stellar-sdk/%s/SimpleRequestsClient" % __version__
+USER_AGENT = f"py-stellar-sdk/{__version__}/SimpleRequestsClient"
 HEADERS = {
     "X-Client-Name": "py-stellar-sdk",
     "X-Client-Version": __version__,

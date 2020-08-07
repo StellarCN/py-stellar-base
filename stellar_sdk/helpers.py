@@ -36,7 +36,5 @@ def parse_transaction_envelope_from_xdr(
         return TransactionEnvelope.from_xdr_object(xdr_object, network_passphrase)
     else:
         raise ValueError(
-            "This transaction envelope type is not supported, type = {}.".format(
-                te_type
-            )
+            f"This transaction envelope type is not supported, type = {te_type}."
         )

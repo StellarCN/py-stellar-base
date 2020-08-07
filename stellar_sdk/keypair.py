@@ -259,12 +259,12 @@ class Keypair:
         )
 
     def __str__(self):
-        return "<Keypair [public_key={public_key}]>".format(public_key=self.public_key)
+        return f"<Keypair [public_key={self.public_key}]>"
 
 
 def _get_key_of_expected_type(key: Any, expected_type: Any) -> Any:
     if key is not None and not isinstance(key, expected_type):
         raise TypeError(
-            "The given key_type={} is not of type {}.".format(type(key), expected_type)
+            f"The given key_type={type(key)} is not of type {expected_type}."
         )
     return key

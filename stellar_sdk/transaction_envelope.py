@@ -101,6 +101,6 @@ class TransactionEnvelope(BaseTransactionEnvelope["TransactionEnvelope"]):
             tx = Transaction.from_xdr_object(te_xdr_object.v1, v1=True)
             signatures = te_xdr_object.v1.signatures
         else:
-            raise ValueError("Invalid EnvelopeType: %d.", te_xdr_object.type)
+            raise ValueError(f"Invalid EnvelopeType: {te_xdr_object.type}.",)
         te = cls(tx, network_passphrase=network_passphrase, signatures=signatures)
         return te
