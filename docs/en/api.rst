@@ -511,6 +511,18 @@ SEP 0005: Key Derivation Methods for Stellar Accounts
    :members:
    :undoc-members:
 
+SEP 0007: URI Scheme to facilitate delegated signing
+-----------------------------------------------------
+.. autoclass:: stellar_sdk.sep.stellar_uri.PayStellarUri
+   :members:
+   :inherited-members:
+.. autoclass:: stellar_sdk.sep.stellar_uri.TransactionStellarUri
+   :members:
+   :inherited-members:
+.. autoclass:: stellar_sdk.sep.stellar_uri.Replacement
+   :members:
+   :inherited-members:
+
 SEP 0010: Stellar Web Authentication
 ------------------------------------
 .. autofunction:: stellar_sdk.sep.stellar_web_authentication.build_challenge_transaction

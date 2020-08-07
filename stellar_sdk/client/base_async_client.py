@@ -1,5 +1,5 @@
 from abc import ABCMeta, abstractmethod
-from typing import AsyncGenerator, Dict, Union, Any
+from typing import AsyncGenerator, Dict, Any
 
 from .response import Response
 

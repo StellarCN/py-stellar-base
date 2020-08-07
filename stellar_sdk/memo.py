@@ -89,7 +89,7 @@ class TextMemo(Memo):
     def __init__(self, text: Union[str, bytes]) -> None:
         if not isinstance(text, (str, bytes)):
             raise MemoInvalidException(
-                "TextMemo expects string or bytes type got a {}".format(type(text))
+                f"TextMemo expects string or bytes type got a {type(text)}"
             )
 
         self.memo_text: bytes = text
@@ -99,9 +99,7 @@ class TextMemo(Memo):
         length = len(self.memo_text)
         if length > 28:
             raise MemoInvalidException(
-                "Text should be <= 28 bytes (ascii encoded), got {:d} bytes.".format(
-                    length
-                )
+                f"Text should be <= 28 bytes (ascii encoded), got {length} bytes."
             )
 
     @classmethod
@@ -115,7 +113,7 @@ class TextMemo(Memo):
         return Xdr.types.Memo(type=Xdr.const.MEMO_TEXT, text=self.memo_text)
 
     def __str__(self):
-        return "<TextMemo [memo={memo}]>".format(memo=self.memo_text)
+        return f"<TextMemo [memo={self.memo_text}]>"
 
 
 class IdMemo(Memo):
@@ -146,7 +144,7 @@ class IdMemo(Memo):
         return Xdr.types.Memo(type=Xdr.const.MEMO_ID, id=self.memo_id)
 
     def __str__(self):
-        return "<IdMemo [memo={memo}]>".format(memo=self.memo_id)
+        return f"<IdMemo [memo={self.memo_id}]>"
 
 
 class HashMemo(Memo):
@@ -162,9 +160,7 @@ class HashMemo(Memo):
         length = len(memo_hash)
         if length != 32:
             raise MemoInvalidException(
-                "The length of HashMemo should be 32 bytes, got {:d} bytes.".format(
-                    length
-                )
+                f"The length of HashMemo should be 32 bytes, got {length} bytes."
             )
 
         self.memo_hash: bytes = memo_hash
@@ -180,7 +176,7 @@ class HashMemo(Memo):
         return Xdr.types.Memo(type=Xdr.const.MEMO_HASH, hash=self.memo_hash)
 
     def __str__(self):
-        return "<HashMemo [memo={memo}]>".format(memo=self.memo_hash)
+        return f"<HashMemo [memo={self.memo_hash}]>"
 
 
 class ReturnHashMemo(Memo):
@@ -196,14 +192,12 @@ class ReturnHashMemo(Memo):
         if ``memo_return`` is not a valid return hash memo.
     """
 
-    def __init__(self, memo_return: bytes) -> None:
+    def __init__(self, memo_return: Union[bytes, str]) -> None:
         memo_return = hex_to_bytes(memo_return)
         length = len(memo_return)
         if length != 32:
             raise MemoInvalidException(
-                "The length of ReturnHashMemo should be 32 bytes, got {:d} bytes.".format(
-                    length
-                )
+                f"The length of ReturnHashMemo should be 32 bytes, got {length} bytes."
             )
 
         self.memo_return: bytes = memo_return
@@ -218,4 +212,4 @@ class ReturnHashMemo(Memo):
         return Xdr.types.Memo(type=Xdr.const.MEMO_RETURN, retHash=self.memo_return)
 
     def __str__(self):
-        return "<ReturnHashMemo [memo={memo}]>".format(memo=self.memo_return)
+        return f"<ReturnHashMemo [memo={self.memo_return}]>"

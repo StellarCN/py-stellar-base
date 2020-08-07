@@ -25,6 +25,4 @@ class DataCallBuilder(BaseCallBuilder):
         data_name: str,
     ) -> None:
         super().__init__(horizon_url, client)
-        self.endpoint: str = "/accounts/{account}/data/{key}".format(
-            account=account_id, key=data_name
-        )
+        self.endpoint: str = f"/accounts/{account_id}/data/{data_name}"

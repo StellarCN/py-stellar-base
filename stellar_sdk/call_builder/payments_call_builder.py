@@ -30,7 +30,7 @@ class PaymentsCallBuilder(BaseCallBuilder):
         :param account_id: Account ID
         :return: current PaymentsCallBuilder instance
         """
-        self.endpoint = "accounts/{account_id}/payments".format(account_id=account_id)
+        self.endpoint = f"accounts/{account_id}/payments"
         return self
 
     def for_ledger(self, sequence: Union[int, str]) -> "PaymentsCallBuilder":
@@ -41,7 +41,7 @@ class PaymentsCallBuilder(BaseCallBuilder):
         :param sequence: Ledger sequence
         :return: current PaymentsCallBuilder instance
         """
-        self.endpoint: str = "ledgers/{sequence}/payments".format(sequence=sequence)
+        self.endpoint: str = f"ledgers/{sequence}/payments"
         return self
 
     def for_transaction(self, transaction_hash: str) -> "PaymentsCallBuilder":
@@ -52,9 +52,7 @@ class PaymentsCallBuilder(BaseCallBuilder):
         :param transaction_hash: Transaction hash
         :return: current PaymentsCallBuilder instance
         """
-        self.endpoint: str = "transactions/{transaction_hash}/payments".format(
-            transaction_hash=transaction_hash
-        )
+        self.endpoint: str = f"transactions/{transaction_hash}/payments"
         return self
 
     def include_failed(self, include_failed: bool) -> "PaymentsCallBuilder":

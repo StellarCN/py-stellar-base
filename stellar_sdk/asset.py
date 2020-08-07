@@ -150,6 +150,4 @@ class Asset:
         return self.code == other.code and self.issuer == other.issuer
 
     def __str__(self):
-        return "<Asset [code={code}, issuer={issuer}, type={type}]>".format(
-            code=self.code, issuer=self.issuer, type=self.type
-        )
+        return f"<Asset [code={self.code}, issuer={self.issuer}, type={self.type}]>"

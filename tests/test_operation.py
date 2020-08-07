@@ -1167,7 +1167,7 @@ class TestOperationUtils:
     def test_check_price_type_raise(self, price):
         with pytest.raises(
             TypeError,
-            match="amount should be type of {}, {} or {}.".format(str, Decimal, Price),
+            match="price should be type of {}, {} or {}.".format(str, Decimal, Price),
         ):
             check_price(price)
 

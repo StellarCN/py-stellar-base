@@ -30,7 +30,7 @@ class EffectsCallBuilder(BaseCallBuilder):
         :param account_id: account id, for example: `GDGQVOKHW4VEJRU2TETD6DBRKEO5ERCNF353LW5WBFW3JJWQ2BRQ6KDD`
         :return: this EffectCallBuilder instance
         """
-        self.endpoint = "accounts/{account_id}/effects".format(account_id=account_id)
+        self.endpoint = f"accounts/{account_id}/effects"
         return self
 
     def for_ledger(self, sequence: Union[int, str]) -> "EffectsCallBuilder":
@@ -42,7 +42,7 @@ class EffectsCallBuilder(BaseCallBuilder):
         :param sequence: ledger sequence
         :return: this EffectCallBuilder instance
         """
-        self.endpoint: str = "ledgers/{sequence}/effects".format(sequence=sequence)
+        self.endpoint: str = f"ledgers/{sequence}/effects"
         return self
 
     def for_transaction(self, transaction_hash: str) -> "EffectsCallBuilder":
@@ -53,9 +53,7 @@ class EffectsCallBuilder(BaseCallBuilder):
         :param transaction_hash: transaction hash
         :return: this EffectCallBuilder instance
         """
-        self.endpoint: str = "transactions/{transaction_hash}/effects".format(
-            transaction_hash=transaction_hash
-        )
+        self.endpoint: str = f"transactions/{transaction_hash}/effects"
         return self
 
     def for_operation(self, operation_id: Union[int, str]) -> "EffectsCallBuilder":
@@ -66,7 +64,5 @@ class EffectsCallBuilder(BaseCallBuilder):
         :param operation_id: operation ID
         :return: this EffectCallBuilder instance
         """
-        self.endpoint: str = "operations/{operation_id}/effects".format(
-            operation_id=operation_id
-        )
+        self.endpoint: str = f"operations/{operation_id}/effects"
         return self

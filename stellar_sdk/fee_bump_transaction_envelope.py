@@ -81,7 +81,7 @@ class FeeBumpTransactionEnvelope(BaseTransactionEnvelope["FeeBumpTransactionEnve
                 te_xdr_object.feeBump, network_passphrase
             )
         else:
-            raise ValueError("Invalid EnvelopeType: %d.", te_xdr_object.type)
+            raise ValueError(f"Invalid EnvelopeType: {te_xdr_object.type}.")
         signatures = te_xdr_object.signatures
         te = cls(tx, network_passphrase=network_passphrase, signatures=signatures)
         return te
