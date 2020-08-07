@@ -71,7 +71,7 @@ def convert_assets_to_horizon_param(assets: List[Asset]) -> str:
         if asset.is_native():
             assets_string.append(asset.type)
         else:
-            assets_string.append(f"{asset.code}:{ asset.issuer}")
+            assets_string.append(f"{asset.code}:{asset.issuer}")
     return ",".join(assets_string)
 
 
