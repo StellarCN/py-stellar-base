@@ -247,7 +247,7 @@ def _remove_non_string_value_comment(value: str) -> str:
 
 
 def _remove_string_value_comment(value: str) -> str:
-    v = ""
+    v = '"'
     in_escape_sequence = False
     for char in value[1:]:
         if in_escape_sequence:
@@ -361,25 +361,25 @@ def _get_set_options_op(
     high_threshold = None
     signer = None
     home_domain = None
-    if _get_bool_value(raw_data_map, f"{operation_prefix}.inflationDest._present"):
-        inflation_dest = _get_value(raw_data_map, f"{operation_prefix}.inflationDest")
-    if _get_bool_value(raw_data_map, f"{operation_prefix}.clearFlags._present"):
-        clear_flags = _get_int_value(raw_data_map, f"{operation_prefix}.clearFlags")
-    if _get_bool_value(raw_data_map, f"{operation_prefix}.setFlags._present"):
-        set_flags = _get_int_value(raw_data_map, f"{operation_prefix}.setFlags")
-    if _get_bool_value(raw_data_map, f"{operation_prefix}.masterWeight._present"):
-        master_weight = _get_int_value(raw_data_map, f"{operation_prefix}.masterWeight")
-    if _get_bool_value(raw_data_map, f"{operation_prefix}.lowThreshold._present"):
-        low_threshold = _get_int_value(raw_data_map, f"{operation_prefix}.lowThreshold")
-    if _get_bool_value(raw_data_map, f"{operation_prefix}.medThreshold._present"):
-        med_threshold = _get_int_value(raw_data_map, f"{operation_prefix}.medThreshold")
-    if _get_bool_value(raw_data_map, f"{operation_prefix}.highThreshold._present"):
+    if _get_bool_value(raw_data_map, f"{operation_prefix}inflationDest._present"):
+        inflation_dest = _get_value(raw_data_map, f"{operation_prefix}inflationDest")
+    if _get_bool_value(raw_data_map, f"{operation_prefix}clearFlags._present"):
+        clear_flags = _get_int_value(raw_data_map, f"{operation_prefix}clearFlags")
+    if _get_bool_value(raw_data_map, f"{operation_prefix}setFlags._present"):
+        set_flags = _get_int_value(raw_data_map, f"{operation_prefix}setFlags")
+    if _get_bool_value(raw_data_map, f"{operation_prefix}masterWeight._present"):
+        master_weight = _get_int_value(raw_data_map, f"{operation_prefix}masterWeight")
+    if _get_bool_value(raw_data_map, f"{operation_prefix}lowThreshold._present"):
+        low_threshold = _get_int_value(raw_data_map, f"{operation_prefix}lowThreshold")
+    if _get_bool_value(raw_data_map, f"{operation_prefix}medThreshold._present"):
+        med_threshold = _get_int_value(raw_data_map, f"{operation_prefix}medThreshold")
+    if _get_bool_value(raw_data_map, f"{operation_prefix}highThreshold._present"):
         high_threshold = _get_int_value(
-            raw_data_map, f"{operation_prefix}.highThreshold"
+            raw_data_map, f"{operation_prefix}highThreshold"
         )
-    if _get_bool_value(raw_data_map, f"{operation_prefix}.signer._present"):
-        weight = _get_int_value(raw_data_map, f"{operation_prefix}.signer.weight")
-        key = _get_value(raw_data_map, f"{operation_prefix}.signer.key")
+    if _get_bool_value(raw_data_map, f"{operation_prefix}signer._present"):
+        weight = _get_int_value(raw_data_map, f"{operation_prefix}signer.weight")
+        key = _get_value(raw_data_map, f"{operation_prefix}signer.key")
         if key.startswith("G"):
             signer = Signer.ed25519_public_key(key, weight)
         elif key.startswith("X"):
@@ -391,8 +391,8 @@ def _get_set_options_op(
         else:
             raise ValueError
 
-    if _get_bool_value(raw_data_map, f"{operation_prefix}.homeDomain._present"):
-        home_domain = _get_bytes_value(raw_data_map, f"{operation_prefix}.homeDomain")
+    if _get_bool_value(raw_data_map, f"{operation_prefix}homeDomain._present"):
+        home_domain = _get_bytes_value(raw_data_map, f"{operation_prefix}homeDomain")
 
     return SetOptions(
         inflation_dest=inflation_dest,
@@ -411,15 +411,15 @@ def _get_set_options_op(
 def _get_path_payment_strict_receive_op(
     source: str, operation_prefix: str, raw_data_map: Dict[str, str]
 ) -> PathPaymentStrictReceive:
-    send_asset = _get_asset(raw_data_map, f"{operation_prefix}.sendAsset")
-    send_max = _get_amount_value(raw_data_map, f"{operation_prefix}.sendMax")
-    destination = _get_value(raw_data_map, f"{operation_prefix}.destination")
-    dest_asset = _get_asset(raw_data_map, f"{operation_prefix}.destAsset")
-    dest_amount = _get_amount_value(raw_data_map, f"{operation_prefix}.destAmount")
-    path_length = _get_int_value(raw_data_map, f"{operation_prefix}.path.len")
+    send_asset = _get_asset(raw_data_map, f"{operation_prefix}sendAsset")
+    send_max = _get_amount_value(raw_data_map, f"{operation_prefix}sendMax")
+    destination = _get_value(raw_data_map, f"{operation_prefix}destination")
+    dest_asset = _get_asset(raw_data_map, f"{operation_prefix}destAsset")
+    dest_amount = _get_amount_value(raw_data_map, f"{operation_prefix}destAmount")
+    path_length = _get_int_value(raw_data_map, f"{operation_prefix}path.len")
     path = []
     for i in range(path_length):
-        asset = _get_asset(raw_data_map, f"{operation_prefix}.path[{i}]")
+        asset = _get_asset(raw_data_map, f"{operation_prefix}path[{i}]")
         path.append(asset)
     return PathPaymentStrictReceive(
         destination=destination,
@@ -435,15 +435,15 @@ def _get_path_payment_strict_receive_op(
 def _get_path_payment_strict_send_op(
     source: str, operation_prefix: str, raw_data_map: Dict[str, str]
 ) -> PathPaymentStrictSend:
-    send_asset = _get_asset(raw_data_map, f"{operation_prefix}.sendAsset")
-    send_amount = _get_amount_value(raw_data_map, f"{operation_prefix}.sendAmount")
-    destination = _get_value(raw_data_map, f"{operation_prefix}.destination")
-    dest_asset = _get_asset(raw_data_map, f"{operation_prefix}.destAsset")
-    dest_min = _get_amount_value(raw_data_map, f"{operation_prefix}.destMin")
-    path_length = _get_int_value(raw_data_map, f"{operation_prefix}.path.len")
+    send_asset = _get_asset(raw_data_map, f"{operation_prefix}sendAsset")
+    send_amount = _get_amount_value(raw_data_map, f"{operation_prefix}sendAmount")
+    destination = _get_value(raw_data_map, f"{operation_prefix}destination")
+    dest_asset = _get_asset(raw_data_map, f"{operation_prefix}destAsset")
+    dest_min = _get_amount_value(raw_data_map, f"{operation_prefix}destMin")
+    path_length = _get_int_value(raw_data_map, f"{operation_prefix}path.len")
     path = []
     for i in range(path_length):
-        asset = _get_asset(raw_data_map, f"{operation_prefix}.path[{i}]")
+        asset = _get_asset(raw_data_map, f"{operation_prefix}path[{i}]")
         path.append(asset)
     return PathPaymentStrictSend(
         destination=destination,
@@ -459,11 +459,11 @@ def _get_path_payment_strict_send_op(
 def _get_create_passive_sell_offer_op(
     source: str, operation_prefix: str, raw_data_map: Dict[str, str]
 ) -> CreatePassiveSellOffer:
-    selling = _get_asset(raw_data_map, f"{operation_prefix}.selling")
-    buying = _get_asset(raw_data_map, f"{operation_prefix}.buying")
-    amount = _get_amount_value(raw_data_map, f"{operation_prefix}.buyAmount")
-    price_n = _get_int_value(raw_data_map, f"{operation_prefix}.price.n")
-    price_d = _get_int_value(raw_data_map, f"{operation_prefix}.price.d")
+    selling = _get_asset(raw_data_map, f"{operation_prefix}selling")
+    buying = _get_asset(raw_data_map, f"{operation_prefix}buying")
+    amount = _get_amount_value(raw_data_map, f"{operation_prefix}amount")
+    price_n = _get_int_value(raw_data_map, f"{operation_prefix}price.n")
+    price_d = _get_int_value(raw_data_map, f"{operation_prefix}price.d")
     price = Price(n=price_n, d=price_d)
     return CreatePassiveSellOffer(
         selling=selling, buying=buying, amount=amount, price=price, source=source
@@ -473,12 +473,12 @@ def _get_create_passive_sell_offer_op(
 def _get_manage_buy_offer_op(
     source: str, operation_prefix: str, raw_data_map: Dict[str, str]
 ) -> ManageBuyOffer:
-    selling = _get_asset(raw_data_map, f"{operation_prefix}.selling")
-    buying = _get_asset(raw_data_map, f"{operation_prefix}.buying")
-    amount = _get_amount_value(raw_data_map, f"{operation_prefix}.buyAmount")
-    offer_id = _get_int_value(raw_data_map, f"{operation_prefix}.offerID")
-    price_n = _get_int_value(raw_data_map, f"{operation_prefix}.price.n")
-    price_d = _get_int_value(raw_data_map, f"{operation_prefix}.price.d")
+    selling = _get_asset(raw_data_map, f"{operation_prefix}selling")
+    buying = _get_asset(raw_data_map, f"{operation_prefix}buying")
+    amount = _get_amount_value(raw_data_map, f"{operation_prefix}buyAmount")
+    offer_id = _get_int_value(raw_data_map, f"{operation_prefix}offerID")
+    price_n = _get_int_value(raw_data_map, f"{operation_prefix}price.n")
+    price_d = _get_int_value(raw_data_map, f"{operation_prefix}price.d")
     price = Price(n=price_n, d=price_d)
     return ManageBuyOffer(
         selling=selling,
@@ -493,12 +493,12 @@ def _get_manage_buy_offer_op(
 def _get_manage_sell_offer_op(
     source: str, operation_prefix: str, raw_data_map: Dict[str, str]
 ) -> ManageSellOffer:
-    selling = _get_asset(raw_data_map, f"{operation_prefix}.selling")
-    buying = _get_asset(raw_data_map, f"{operation_prefix}.buying")
-    amount = _get_amount_value(raw_data_map, f"{operation_prefix}.amount")
-    offer_id = _get_int_value(raw_data_map, f"{operation_prefix}.offerID")
-    price_n = _get_int_value(raw_data_map, f"{operation_prefix}.price.n")
-    price_d = _get_int_value(raw_data_map, f"{operation_prefix}.price.d")
+    selling = _get_asset(raw_data_map, f"{operation_prefix}selling")
+    buying = _get_asset(raw_data_map, f"{operation_prefix}buying")
+    amount = _get_amount_value(raw_data_map, f"{operation_prefix}amount")
+    offer_id = _get_int_value(raw_data_map, f"{operation_prefix}offerID")
+    price_n = _get_int_value(raw_data_map, f"{operation_prefix}price.n")
+    price_d = _get_int_value(raw_data_map, f"{operation_prefix}price.d")
     price = Price(n=price_n, d=price_d)
     return ManageSellOffer(
         selling=selling,
@@ -522,26 +522,26 @@ def _get_payment_op(
 def _get_manage_data_op(
     source: str, operation_prefix: str, raw_data_map: Dict[str, str]
 ) -> ManageData:
-    data_name = _get_value(raw_data_map, f"{operation_prefix}.dataName")
+    data_name = _get_value(raw_data_map, f"{operation_prefix}dataName")
     data_value = None
-    if _get_bool_value(raw_data_map, f"{operation_prefix}.dataValue._present"):
-        data_value = _get_bytes_value(raw_data_map, f"{operation_prefix}.dataValue")
+    if _get_bool_value(raw_data_map, f"{operation_prefix}dataValue._present"):
+        data_value = _get_bytes_value(raw_data_map, f"{operation_prefix}dataValue")
     return ManageData(data_name=data_name, data_value=data_value, source=source)
 
 
 def _get_bump_sequence_op(
     source: str, operation_prefix: str, raw_data_map: Dict[str, str]
 ) -> BumpSequence:
-    bump_to = _get_int_value(raw_data_map, f"{operation_prefix}.bumpTo")
+    bump_to = _get_int_value(raw_data_map, f"{operation_prefix}bumpTo")
     return BumpSequence(bump_to=bump_to, source=source)
 
 
 def _get_allow_trust_op(
     source: str, operation_prefix: str, raw_data_map: Dict[str, str]
 ) -> AllowTrust:
-    trustor = _get_value(raw_data_map, f"{operation_prefix}.trustor")
-    asset_code = _get_value(raw_data_map, f"{operation_prefix}.asset")
-    authorize = _get_bool_value(raw_data_map, f"{operation_prefix}.authorize")
+    trustor = _get_value(raw_data_map, f"{operation_prefix}trustor")
+    asset_code = _get_value(raw_data_map, f"{operation_prefix}asset")
+    authorize = _get_bool_value(raw_data_map, f"{operation_prefix}authorize")
     return AllowTrust(
         trustor=trustor, asset_code=asset_code, authorize=authorize, source=source
     )
@@ -550,8 +550,8 @@ def _get_allow_trust_op(
 def _get_change_trust_op(
     source: str, operation_prefix: str, raw_data_map: Dict[str, str]
 ) -> ChangeTrust:
-    line = _get_asset(raw_data_map, f"{operation_prefix}.line")
-    limit = _get_amount_value(raw_data_map, f"{operation_prefix}.limit")
+    line = _get_asset(raw_data_map, f"{operation_prefix}line")
+    limit = _get_amount_value(raw_data_map, f"{operation_prefix}limit")
     return ChangeTrust(asset=line, limit=limit, source=source)
 
 
@@ -571,9 +571,9 @@ def _get_account_merge_op(
 def _get_create_account_op(
     source: str, operation_prefix: str, raw_data_map: Dict[str, str]
 ) -> CreateAccount:
-    destination = _get_value(raw_data_map, f"{operation_prefix}.destination")
+    destination = _get_value(raw_data_map, f"{operation_prefix}destination")
     starting_balance = _get_amount_value(
-        raw_data_map, f"{operation_prefix}.startingBalance"
+        raw_data_map, f"{operation_prefix}startingBalance"
     )
     return CreateAccount(
         destination=destination, starting_balance=starting_balance, source=source
@@ -709,9 +709,9 @@ def _add_operation(
             add_operation_line(key, value)
 
     def add_signer(signer: Signer) -> None:
+        add_body_line("signer._present", _false if signer is None else _true)
         if signer is None:
             return
-        add_body_line("signer._present", _false if signer is None else _true)
         if signer.signer_key.type == Xdr.const.SIGNER_KEY_TYPE_ED25519:
             add_body_line(
                 "signer.key",

@@ -80,6 +80,7 @@ tx.operations[6].body.setOptionsOp.medThreshold._present: false
 tx.operations[6].body.setOptionsOp.highThreshold._present: false
 tx.operations[6].body.setOptionsOp.homeDomain._present: true
 tx.operations[6].body.setOptionsOp.homeDomain: "stellarcn.org"
+tx.operations[6].body.setOptionsOp.signer._present: false
 tx.operations[7].sourceAccount._present: false
 tx.operations[7].body.type: SET_OPTIONS
 tx.operations[7].body.setOptionsOp.inflationDest._present: false

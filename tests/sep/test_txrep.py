@@ -1,7 +1,7 @@
 import os
 
 from stellar_sdk import Account, Keypair, Network, Asset, Price, Signer
-from stellar_sdk.sep.txrep import to_txrep
+from stellar_sdk.sep.txrep import to_txrep, from_txrep
 from stellar_sdk.transaction_builder import TransactionBuilder
 
 
@@ -37,6 +37,7 @@ class TestTxrep:
         te.sign(keypair)
         txrep = to_txrep(te)
         assert txrep == get_txrep_file("test_to_txrep.txt")
+        assert from_txrep(txrep, Network.TESTNET_NETWORK_PASSPHRASE).to_xdr() == te.to_xdr()
 
     def test_to_txrep_no_utf8(self):
         keypair = Keypair.from_secret(
@@ -62,6 +63,7 @@ class TestTxrep:
         te.sign(keypair)
         txrep = to_txrep(te)
         assert txrep == get_txrep_file("test_to_txrep_no_utf8.txt")
+        assert from_txrep(txrep, Network.TESTNET_NETWORK_PASSPHRASE).to_xdr() == te.to_xdr()
 
     def test_to_txrep_from_xdr(self):
         keypair = Keypair.from_secret(
@@ -86,6 +88,7 @@ class TestTxrep:
         te.sign(keypair)
         txrep = to_txrep(te)
         assert txrep == get_txrep_file("test_to_txrep.txt")
+        assert from_txrep(txrep, Network.TESTNET_NETWORK_PASSPHRASE).to_xdr() == te.to_xdr()
 
     def test_to_txrep_no_signer(self):
         keypair = Keypair.from_secret(
@@ -109,6 +112,7 @@ class TestTxrep:
         te = transaction_builder.build()
         txrep = to_txrep(te)
         assert txrep == get_txrep_file("test_to_txrep_no_signer.txt")
+        assert from_txrep(txrep, Network.TESTNET_NETWORK_PASSPHRASE).to_xdr() == te.to_xdr()
 
     def test_to_txrep_no_source(self):
         keypair = Keypair.from_secret(
@@ -132,6 +136,7 @@ class TestTxrep:
         te.sign(keypair)
         txrep = to_txrep(te)
         assert txrep == get_txrep_file("test_to_txrep_no_source.txt")
+        assert from_txrep(txrep, Network.TESTNET_NETWORK_PASSPHRASE).to_xdr() == te.to_xdr()
 
     def test_to_txrep_no_timebounds(self):
         keypair = Keypair.from_secret(
@@ -155,6 +160,7 @@ class TestTxrep:
         te.sign(keypair)
         txrep = to_txrep(te)
         assert txrep == get_txrep_file("test_to_txrep_no_timebounds.txt")
+        assert from_txrep(txrep, Network.TESTNET_NETWORK_PASSPHRASE).to_xdr() == te.to_xdr()
 
     def test_to_txrep_id_memo(self):
         keypair = Keypair.from_secret(
@@ -179,6 +185,7 @@ class TestTxrep:
         te.sign(keypair)
         txrep = to_txrep(te)
         assert txrep == get_txrep_file("test_to_txrep_id_memo.txt")
+        assert from_txrep(txrep, Network.TESTNET_NETWORK_PASSPHRASE).to_xdr() == te.to_xdr()
 
     def test_to_txrep_none_memo(self):
         keypair = Keypair.from_secret(
@@ -202,6 +209,7 @@ class TestTxrep:
         te.sign(keypair)
         txrep = to_txrep(te)
         assert txrep == get_txrep_file("test_to_txrep_none_memo.txt")
+        assert from_txrep(txrep, Network.TESTNET_NETWORK_PASSPHRASE).to_xdr() == te.to_xdr()
 
     def test_to_txrep_hash_memo(self):
         keypair = Keypair.from_secret(
@@ -228,6 +236,7 @@ class TestTxrep:
         te.sign(keypair)
         txrep = to_txrep(te)
         assert txrep == get_txrep_file("test_to_txrep_hash_memo.txt")
+        assert from_txrep(txrep, Network.TESTNET_NETWORK_PASSPHRASE).to_xdr() == te.to_xdr()
 
     def test_to_txrep_return_memo(self):
         keypair = Keypair.from_secret(
@@ -254,6 +263,7 @@ class TestTxrep:
         te.sign(keypair)
         txrep = to_txrep(te)
         assert txrep == get_txrep_file("test_to_txrep_return_memo.txt")
+        assert from_txrep(txrep, Network.TESTNET_NETWORK_PASSPHRASE).to_xdr() == te.to_xdr()
 
     def test_to_txrep_full_tx(self):
         keypair = Keypair.from_secret(
@@ -401,3 +411,4 @@ class TestTxrep:
         )
         txrep = to_txrep(te)
         assert txrep == get_txrep_file("test_to_txrep_full_tx.txt")
+        assert from_txrep(txrep, Network.TESTNET_NETWORK_PASSPHRASE).to_xdr() == te.to_xdr()
