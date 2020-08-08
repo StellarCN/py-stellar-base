@@ -392,7 +392,7 @@ def _get_set_options_op(
             raise ValueError
 
     if _get_bool_value(raw_data_map, f"{operation_prefix}homeDomain._present"):
-        home_domain = _get_bytes_value(raw_data_map, f"{operation_prefix}homeDomain")
+        home_domain = _get_string_value(raw_data_map, f"{operation_prefix}homeDomain")
 
     return SetOptions(
         inflation_dest=inflation_dest,
@@ -522,7 +522,7 @@ def _get_payment_op(
 def _get_manage_data_op(
     source: str, operation_prefix: str, raw_data_map: Dict[str, str]
 ) -> ManageData:
-    data_name = _get_value(raw_data_map, f"{operation_prefix}dataName")
+    data_name = _get_string_value(raw_data_map, f"{operation_prefix}dataName")
     data_value = None
     if _get_bool_value(raw_data_map, f"{operation_prefix}dataValue._present"):
         data_value = _get_bytes_value(raw_data_map, f"{operation_prefix}dataValue")
