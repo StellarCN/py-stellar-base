@@ -535,6 +535,7 @@ SEP 0010: Stellar Web Authentication
 SEP 0011: Txrep: human-readable low-level representation of Stellar transactions
 ---------------------------------------------------------------------------------
 .. autofunction:: stellar_sdk.sep.txrep.to_txrep
+.. autofunction:: stellar_sdk.sep.txrep.from_txrep
 
 Exceptions
 ----------
