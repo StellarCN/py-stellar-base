@@ -84,7 +84,7 @@ class TestTxrep:
         )
         te = transaction_builder.build()
         te.sign(keypair)
-        txrep = to_txrep(te.to_xdr())
+        txrep = to_txrep(te)
         assert txrep == get_txrep_file("test_to_txrep.txt")
 
     def test_to_txrep_no_signer(self):
