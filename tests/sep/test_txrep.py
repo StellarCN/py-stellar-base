@@ -37,7 +37,40 @@ class TestTxrep:
         te.sign(keypair)
         txrep = to_txrep(te)
         assert txrep == get_txrep_file("test_to_txrep.txt")
-        assert from_txrep(txrep, Network.TESTNET_NETWORK_PASSPHRASE).to_xdr() == te.to_xdr()
+        assert txrep == to_txrep(from_txrep(txrep, Network.TESTNET_NETWORK_PASSPHRASE))
+        assert (
+            from_txrep(txrep, Network.TESTNET_NETWORK_PASSPHRASE).to_xdr()
+            == te.to_xdr()
+        )
+
+    def test_to_txrep_v0(self):
+        keypair = Keypair.from_secret(
+            "SAHGKA7QJB6SRFDZSPZDEEIOEHUHTQS4XVN4IMR5YCKBPEN5A6YNKKUO"
+        )
+        account = Account(keypair.public_key, 46489056724385792)
+        transaction_builder = TransactionBuilder(
+            source_account=account,
+            network_passphrase=Network.TESTNET_NETWORK_PASSPHRASE,
+            base_fee=100,
+            v1=False,
+        )
+        transaction_builder.add_text_memo("Enjoy this transaction")
+        transaction_builder.add_time_bounds(1535756672, 1567292672)
+        transaction_builder.append_payment_op(
+            destination="GBAF6NXN3DHSF357QBZLTBNWUTABKUODJXJYYE32ZDKA2QBM2H33IK6O",
+            asset_code="USD",
+            asset_issuer="GAZFEVBSEGJJ63WPVVIWXLZLWN2JYZECECGT6GUNP4FJDVZVNXWQWMYI",
+            amount="40.0004",
+            source=keypair.public_key,
+        )
+        te = transaction_builder.build()
+        te.sign(keypair)
+        txrep = to_txrep(te)
+        assert txrep == get_txrep_file("test_to_txrep_v0.txt")
+        assert (
+            from_txrep(txrep, Network.TESTNET_NETWORK_PASSPHRASE).to_xdr()
+            == te.to_xdr()
+        )
 
     def test_to_txrep_no_utf8(self):
         keypair = Keypair.from_secret(
@@ -63,7 +96,10 @@ class TestTxrep:
         te.sign(keypair)
         txrep = to_txrep(te)
         assert txrep == get_txrep_file("test_to_txrep_no_utf8.txt")
-        assert from_txrep(txrep, Network.TESTNET_NETWORK_PASSPHRASE).to_xdr() == te.to_xdr()
+        assert (
+            from_txrep(txrep, Network.TESTNET_NETWORK_PASSPHRASE).to_xdr()
+            == te.to_xdr()
+        )
 
     def test_to_txrep_from_xdr(self):
         keypair = Keypair.from_secret(
@@ -88,7 +124,10 @@ class TestTxrep:
         te.sign(keypair)
         txrep = to_txrep(te)
         assert txrep == get_txrep_file("test_to_txrep.txt")
-        assert from_txrep(txrep, Network.TESTNET_NETWORK_PASSPHRASE).to_xdr() == te.to_xdr()
+        assert (
+            from_txrep(txrep, Network.TESTNET_NETWORK_PASSPHRASE).to_xdr()
+            == te.to_xdr()
+        )
 
     def test_to_txrep_no_signer(self):
         keypair = Keypair.from_secret(
@@ -112,7 +151,10 @@ class TestTxrep:
         te = transaction_builder.build()
         txrep = to_txrep(te)
         assert txrep == get_txrep_file("test_to_txrep_no_signer.txt")
-        assert from_txrep(txrep, Network.TESTNET_NETWORK_PASSPHRASE).to_xdr() == te.to_xdr()
+        assert (
+            from_txrep(txrep, Network.TESTNET_NETWORK_PASSPHRASE).to_xdr()
+            == te.to_xdr()
+        )
 
     def test_to_txrep_no_source(self):
         keypair = Keypair.from_secret(
@@ -136,7 +178,10 @@ class TestTxrep:
         te.sign(keypair)
         txrep = to_txrep(te)
         assert txrep == get_txrep_file("test_to_txrep_no_source.txt")
-        assert from_txrep(txrep, Network.TESTNET_NETWORK_PASSPHRASE).to_xdr() == te.to_xdr()
+        assert (
+            from_txrep(txrep, Network.TESTNET_NETWORK_PASSPHRASE).to_xdr()
+            == te.to_xdr()
+        )
 
     def test_to_txrep_no_timebounds(self):
         keypair = Keypair.from_secret(
@@ -160,7 +205,10 @@ class TestTxrep:
         te.sign(keypair)
         txrep = to_txrep(te)
         assert txrep == get_txrep_file("test_to_txrep_no_timebounds.txt")
-        assert from_txrep(txrep, Network.TESTNET_NETWORK_PASSPHRASE).to_xdr() == te.to_xdr()
+        assert (
+            from_txrep(txrep, Network.TESTNET_NETWORK_PASSPHRASE).to_xdr()
+            == te.to_xdr()
+        )
 
     def test_to_txrep_id_memo(self):
         keypair = Keypair.from_secret(
@@ -185,7 +233,10 @@ class TestTxrep:
         te.sign(keypair)
         txrep = to_txrep(te)
         assert txrep == get_txrep_file("test_to_txrep_id_memo.txt")
-        assert from_txrep(txrep, Network.TESTNET_NETWORK_PASSPHRASE).to_xdr() == te.to_xdr()
+        assert (
+            from_txrep(txrep, Network.TESTNET_NETWORK_PASSPHRASE).to_xdr()
+            == te.to_xdr()
+        )
 
     def test_to_txrep_none_memo(self):
         keypair = Keypair.from_secret(
@@ -209,7 +260,10 @@ class TestTxrep:
         te.sign(keypair)
         txrep = to_txrep(te)
         assert txrep == get_txrep_file("test_to_txrep_none_memo.txt")
-        assert from_txrep(txrep, Network.TESTNET_NETWORK_PASSPHRASE).to_xdr() == te.to_xdr()
+        assert (
+            from_txrep(txrep, Network.TESTNET_NETWORK_PASSPHRASE).to_xdr()
+            == te.to_xdr()
+        )
 
     def test_to_txrep_hash_memo(self):
         keypair = Keypair.from_secret(
@@ -236,7 +290,10 @@ class TestTxrep:
         te.sign(keypair)
         txrep = to_txrep(te)
         assert txrep == get_txrep_file("test_to_txrep_hash_memo.txt")
-        assert from_txrep(txrep, Network.TESTNET_NETWORK_PASSPHRASE).to_xdr() == te.to_xdr()
+        assert (
+            from_txrep(txrep, Network.TESTNET_NETWORK_PASSPHRASE).to_xdr()
+            == te.to_xdr()
+        )
 
     def test_to_txrep_return_memo(self):
         keypair = Keypair.from_secret(
@@ -263,7 +320,10 @@ class TestTxrep:
         te.sign(keypair)
         txrep = to_txrep(te)
         assert txrep == get_txrep_file("test_to_txrep_return_memo.txt")
-        assert from_txrep(txrep, Network.TESTNET_NETWORK_PASSPHRASE).to_xdr() == te.to_xdr()
+        assert (
+            from_txrep(txrep, Network.TESTNET_NETWORK_PASSPHRASE).to_xdr()
+            == te.to_xdr()
+        )
 
     def test_to_txrep_full_tx(self):
         keypair = Keypair.from_secret(
@@ -411,4 +471,46 @@ class TestTxrep:
         )
         txrep = to_txrep(te)
         assert txrep == get_txrep_file("test_to_txrep_full_tx.txt")
-        assert from_txrep(txrep, Network.TESTNET_NETWORK_PASSPHRASE).to_xdr() == te.to_xdr()
+        assert (
+            from_txrep(txrep, Network.TESTNET_NETWORK_PASSPHRASE).to_xdr()
+            == te.to_xdr()
+        )
+
+    def test_to_txrep_fee_bump(self):
+        keypair = Keypair.from_secret(
+            "SAHGKA7QJB6SRFDZSPZDEEIOEHUHTQS4XVN4IMR5YCKBPEN5A6YNKKUO"
+        )
+        account = Account(keypair.public_key, 46489056724385792)
+        transaction_builder = TransactionBuilder(
+            source_account=account,
+            network_passphrase=Network.TESTNET_NETWORK_PASSPHRASE,
+            base_fee=100,
+        )
+        transaction_builder.add_text_memo("Enjoy this transaction")
+        transaction_builder.add_time_bounds(1535756672, 1567292672)
+        transaction_builder.append_payment_op(
+            destination="GBAF6NXN3DHSF357QBZLTBNWUTABKUODJXJYYE32ZDKA2QBM2H33IK6O",
+            asset_code="USD",
+            asset_issuer="GAZFEVBSEGJJ63WPVVIWXLZLWN2JYZECECGT6GUNP4FJDVZVNXWQWMYI",
+            amount="40.0004",
+            source=keypair.public_key,
+        )
+        inner_tx = transaction_builder.build()
+        inner_tx.sign(keypair)
+        fee_source_keypair = Keypair.from_secret(
+            "SASZKBDB6PFHXN6LRH4NQNTRGLGDTI3PSUVIKMZMLTYYBB7NDVMA6DSL"
+        )
+
+        fee_bump_tx = TransactionBuilder.build_fee_bump_transaction(
+            fee_source=fee_source_keypair,
+            base_fee=200,
+            inner_transaction_envelope=inner_tx,
+            network_passphrase=Network.TESTNET_NETWORK_PASSPHRASE,
+        )
+        fee_bump_tx.sign(fee_source_keypair)
+        txrep = to_txrep(fee_bump_tx)
+        assert txrep == get_txrep_file("test_to_txrep_fee_bump.txt")
+        assert (
+            from_txrep(txrep, Network.TESTNET_NETWORK_PASSPHRASE).to_xdr()
+            == fee_bump_tx.to_xdr()
+        )

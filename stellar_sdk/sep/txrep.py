@@ -81,12 +81,9 @@ def to_txrep(
             fee_bump_transaction.base_fee * (len(transaction.operations) + 1),
             lines,
         )
-        _tx_type = (
-            _EnvelopeType.ENVELOPE_TYPE_TX.value
-            if transaction.v1
-            else _EnvelopeType.ENVELOPE_TYPE_TX_V0.value
+        _add_line(
+            "feeBump.tx.innerTx.type", _EnvelopeType.ENVELOPE_TYPE_TX.value, lines
         )
-        _add_line("feeBump.tx.innerTx.type", _tx_type, lines)
 
     _add_line(f"{prefix}sourceAccount", transaction.source.public_key, lines)
     _add_line(f"{prefix}fee", transaction.fee, lines)
@@ -137,14 +134,11 @@ def from_txrep(
     prefix = "feeBump.tx.innerTx." if is_fee_bump else ""
     transaction_signatures = _get_signatures(raw_data_map, prefix)
 
-    v1 = True
-    if is_fee_bump:
-        inner_tx_type = _get_value(raw_data_map, "feeBump.tx.innerTx.type")
-        if _EnvelopeType(inner_tx_type) == _EnvelopeType.ENVELOPE_TYPE_TX_V0:
-            v1 = False
-    else:
-        v1 = tx_type == _EnvelopeType.ENVELOPE_TYPE_TX
-
+    v1 = (
+        False
+        if not is_fee_bump and tx_type == _EnvelopeType.ENVELOPE_TYPE_TX_V0
+        else True
+    )
     transaction = Transaction(
         source=source,
         sequence=sequence,
