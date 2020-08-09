@@ -1,6 +1,13 @@
 Release History
 ==============
 
+### Version 2.6.3
+
+Released on Aug 09, 2020
+
+#### Added
+* feat: add support to SEP-0011 (Txrep: human-readable low-level representation of Stellar transactions). ([#357](https://github.com/StellarCN/py-stellar-base/pull/357))
+
 ### Version 2.6.2
 
 Released on Jul 20, 2020
