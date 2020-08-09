@@ -77,4 +77,4 @@ class SimpleRequestsClient(BaseSyncClient):
         raise NotImplementedError  # pragma: no cover
 
     def close(self):
-        pass
+        pass  # pragma: no cover
