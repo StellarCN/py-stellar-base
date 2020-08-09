@@ -105,6 +105,7 @@ def to_txrep(
     return "\n".join(lines)
 
 
+# Setting to ignore pass in .coveragerc will cause this function to not be counted by pytest.
 def from_txrep(
     txrep: str, network_passphrase: str
 ) -> Union[TransactionEnvelope, FeeBumpTransactionEnvelope]:
@@ -225,8 +226,10 @@ def _get_memo(raw_data_map: Dict[str, str], prefix: str) -> Memo:
     elif memo_type == "MEMO_NONE":
         memo = NoneMemo()
     else:
-        raise SdkValueError(f"`{memo_type}` is not a valid memo type, expected one of `MEMO_TEXT`, `MEMO_ID`, "
-                         f"`MEMO_HASH`, `MEMO_RETURN`, `MEMO_NONE`.")
+        raise SdkValueError(
+            f"`{memo_type}` is not a valid memo type, expected one of `MEMO_TEXT`, `MEMO_ID`, "
+            f"`MEMO_HASH`, `MEMO_RETURN`, `MEMO_NONE`."
+        )
     return memo
 
 
@@ -811,6 +814,8 @@ def _add_operation(
         add_body_line("path.len", len(operation.path))
         for index, asset in enumerate(operation.path):
             add_body_line(f"path[{index}]", _to_asset(asset))
+    elif isinstance(operation, Inflation):
+        pass
     else:
         raise SdkValueError(
             f"This operation has not been implemented yet, "

@@ -1,13 +1,13 @@
 type: ENVELOPE_TYPE_TX
 tx.sourceAccount: GBEFNJVA2347XAJ4HYAECN5S7DIMLRDKXYT7BSFGF6SDM4VH5TD5HGJB
-tx.fee: 3400
+tx.fee: 3600
 tx.seqNum: 46489056724385793
 tx.timeBounds._present: true
 tx.timeBounds.minTime: 1535756672
 tx.timeBounds.maxTime: 1567292672
 tx.memo.type: MEMO_TEXT
 tx.memo.text: "Enjoy this transaction"
-tx.operations.len: 17
+tx.operations.len: 18
 tx.operations[0].sourceAccount._present: true
 tx.operations[0].sourceAccount: GBEFNJVA2347XAJ4HYAECN5S7DIMLRDKXYT7BSFGF6SDM4VH5TD5HGJB
 tx.operations[0].body.type: CREATE_ACCOUNT
@@ -53,7 +53,8 @@ tx.operations[5].sourceAccount: GBEFNJVA2347XAJ4HYAECN5S7DIMLRDKXYT7BSFGF6SDM4VH
 tx.operations[5].body.type: SET_OPTIONS
 tx.operations[5].body.setOptionsOp.inflationDest._present: true
 tx.operations[5].body.setOptionsOp.inflationDest: GCVAZXCGX3HLHZ6P5WKEPE3U2YJMTLMPTZJFGY67MTNPSOA4COKVJ6AF
-tx.operations[5].body.setOptionsOp.clearFlags._present: false
+tx.operations[5].body.setOptionsOp.clearFlags._present: true
+tx.operations[5].body.setOptionsOp.clearFlags: 3
 tx.operations[5].body.setOptionsOp.setFlags._present: true
 tx.operations[5].body.setOptionsOp.setFlags: 3
 tx.operations[5].body.setOptionsOp.masterWeight._present: true
@@ -158,9 +159,11 @@ tx.operations[16].body.pathPaymentStrictSendOp.path.len: 3
 tx.operations[16].body.pathPaymentStrictSendOp.path[0]: Hello:GD3RXMK2GHSXXEHPBZY5IL7VW5BXQEDJMCD4KVMXOH2GRFKDGZXR5PFO
 tx.operations[16].body.pathPaymentStrictSendOp.path[1]: native
 tx.operations[16].body.pathPaymentStrictSendOp.path[2]: MOEW:GBR765FQTCAJLLJGZVYLXCFAOZI6ORTHPDPOOHJOHFRZ5GHNVYGK4IFM
+tx.operations[17].sourceAccount._present: false
+tx.operations[17].body.type: INFLATION
 tx.ext.v: 0
 signatures.len: 2
 signatures[0].hint: a7ecc7d3
-signatures[0].signature: 4ff5b1e574bcd5a2d74341934e8bdb14b75de3bcd98a67abb025963ca62f5929c48e997dd4a050a5a52d7452fe4dd71b856b09b8dd175b999641423c8b3f190f
+signatures[0].signature: 77e32511764602f7cd8c7cb567bb2b4838460c8c321cc0dd40d83bd8fdb05767f1414f0448fa12b4dc6937939b4d919e630d7756dff614bd73a065ee50474f0e
 signatures[1].hint: 21d0289a
 signatures[1].signature: 8b73f9e12fcc8cd9580a2a26aec14d6175aa1ff45e76b816618635d03f3256b8
