@@ -43,6 +43,8 @@ def to_txrep(
 ) -> str:
     """Generate a human-readable format for Stellar transactions.
 
+    MuxAccount is currently not supported.
+
     Txrep is a human-readable representation of Stellar transactions that functions like an assembly language for XDR.
 
     See `SEP-0011 <https://github.com/stellar/stellar-protocol/blob/master/ecosystem/sep-0011.md>`_
@@ -108,6 +110,8 @@ def from_txrep(
 ) -> Union[TransactionEnvelope, FeeBumpTransactionEnvelope]:
     """Parse txrep and generate transaction envelope object.
 
+    MuxAccount is currently not supported.
+
     Txrep is a human-readable representation of Stellar transactions that functions like an assembly language for XDR.
 
     See `SEP-0011 <https://github.com/stellar/stellar-protocol/blob/master/ecosystem/sep-0011.md>`_
@@ -130,7 +134,6 @@ def from_txrep(
     memo = _get_memo(raw_data_map, prefix)
     operations = _get_operations(raw_data_map, prefix)
 
-    # Signatures
     prefix = "feeBump.tx.innerTx." if is_fee_bump else ""
     transaction_signatures = _get_signatures(raw_data_map, prefix)
 
