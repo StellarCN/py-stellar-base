@@ -1,7 +1,10 @@
 import os
 
+import pytest
+
 from stellar_sdk import Account, Keypair, Network, Asset, Price, Signer
-from stellar_sdk.sep.txrep import to_txrep, from_txrep
+from stellar_sdk.exceptions import ValueError
+from stellar_sdk.sep.txrep import to_txrep, from_txrep, _get_value, _get_bytes_value, _get_int_value, _get_bool_value
 from stellar_sdk.transaction_builder import TransactionBuilder
 
 
@@ -39,8 +42,8 @@ class TestTxrep:
         assert txrep == get_txrep_file("test_to_txrep.txt")
         assert txrep == to_txrep(from_txrep(txrep, Network.TESTNET_NETWORK_PASSPHRASE))
         assert (
-            from_txrep(txrep, Network.TESTNET_NETWORK_PASSPHRASE).to_xdr()
-            == te.to_xdr()
+                from_txrep(txrep, Network.TESTNET_NETWORK_PASSPHRASE).to_xdr()
+                == te.to_xdr()
         )
 
     def test_to_txrep_v0(self):
@@ -68,8 +71,8 @@ class TestTxrep:
         txrep = to_txrep(te)
         assert txrep == get_txrep_file("test_to_txrep_v0.txt")
         assert (
-            from_txrep(txrep, Network.TESTNET_NETWORK_PASSPHRASE).to_xdr()
-            == te.to_xdr()
+                from_txrep(txrep, Network.TESTNET_NETWORK_PASSPHRASE).to_xdr()
+                == te.to_xdr()
         )
 
     def test_to_txrep_no_utf8(self):
@@ -97,8 +100,8 @@ class TestTxrep:
         txrep = to_txrep(te)
         assert txrep == get_txrep_file("test_to_txrep_no_utf8.txt")
         assert (
-            from_txrep(txrep, Network.TESTNET_NETWORK_PASSPHRASE).to_xdr()
-            == te.to_xdr()
+                from_txrep(txrep, Network.TESTNET_NETWORK_PASSPHRASE).to_xdr()
+                == te.to_xdr()
         )
 
     def test_to_txrep_from_xdr(self):
@@ -125,8 +128,8 @@ class TestTxrep:
         txrep = to_txrep(te)
         assert txrep == get_txrep_file("test_to_txrep.txt")
         assert (
-            from_txrep(txrep, Network.TESTNET_NETWORK_PASSPHRASE).to_xdr()
-            == te.to_xdr()
+                from_txrep(txrep, Network.TESTNET_NETWORK_PASSPHRASE).to_xdr()
+                == te.to_xdr()
         )
 
     def test_to_txrep_no_signer(self):
@@ -152,8 +155,8 @@ class TestTxrep:
         txrep = to_txrep(te)
         assert txrep == get_txrep_file("test_to_txrep_no_signer.txt")
         assert (
-            from_txrep(txrep, Network.TESTNET_NETWORK_PASSPHRASE).to_xdr()
-            == te.to_xdr()
+                from_txrep(txrep, Network.TESTNET_NETWORK_PASSPHRASE).to_xdr()
+                == te.to_xdr()
         )
 
     def test_to_txrep_no_source(self):
@@ -179,8 +182,8 @@ class TestTxrep:
         txrep = to_txrep(te)
         assert txrep == get_txrep_file("test_to_txrep_no_source.txt")
         assert (
-            from_txrep(txrep, Network.TESTNET_NETWORK_PASSPHRASE).to_xdr()
-            == te.to_xdr()
+                from_txrep(txrep, Network.TESTNET_NETWORK_PASSPHRASE).to_xdr()
+                == te.to_xdr()
         )
 
     def test_to_txrep_no_timebounds(self):
@@ -206,8 +209,8 @@ class TestTxrep:
         txrep = to_txrep(te)
         assert txrep == get_txrep_file("test_to_txrep_no_timebounds.txt")
         assert (
-            from_txrep(txrep, Network.TESTNET_NETWORK_PASSPHRASE).to_xdr()
-            == te.to_xdr()
+                from_txrep(txrep, Network.TESTNET_NETWORK_PASSPHRASE).to_xdr()
+                == te.to_xdr()
         )
 
     def test_to_txrep_id_memo(self):
@@ -234,8 +237,8 @@ class TestTxrep:
         txrep = to_txrep(te)
         assert txrep == get_txrep_file("test_to_txrep_id_memo.txt")
         assert (
-            from_txrep(txrep, Network.TESTNET_NETWORK_PASSPHRASE).to_xdr()
-            == te.to_xdr()
+                from_txrep(txrep, Network.TESTNET_NETWORK_PASSPHRASE).to_xdr()
+                == te.to_xdr()
         )
 
     def test_to_txrep_none_memo(self):
@@ -261,8 +264,8 @@ class TestTxrep:
         txrep = to_txrep(te)
         assert txrep == get_txrep_file("test_to_txrep_none_memo.txt")
         assert (
-            from_txrep(txrep, Network.TESTNET_NETWORK_PASSPHRASE).to_xdr()
-            == te.to_xdr()
+                from_txrep(txrep, Network.TESTNET_NETWORK_PASSPHRASE).to_xdr()
+                == te.to_xdr()
         )
 
     def test_to_txrep_hash_memo(self):
@@ -291,8 +294,8 @@ class TestTxrep:
         txrep = to_txrep(te)
         assert txrep == get_txrep_file("test_to_txrep_hash_memo.txt")
         assert (
-            from_txrep(txrep, Network.TESTNET_NETWORK_PASSPHRASE).to_xdr()
-            == te.to_xdr()
+                from_txrep(txrep, Network.TESTNET_NETWORK_PASSPHRASE).to_xdr()
+                == te.to_xdr()
         )
 
     def test_to_txrep_return_memo(self):
@@ -321,8 +324,8 @@ class TestTxrep:
         txrep = to_txrep(te)
         assert txrep == get_txrep_file("test_to_txrep_return_memo.txt")
         assert (
-            from_txrep(txrep, Network.TESTNET_NETWORK_PASSPHRASE).to_xdr()
-            == te.to_xdr()
+                from_txrep(txrep, Network.TESTNET_NETWORK_PASSPHRASE).to_xdr()
+                == te.to_xdr()
         )
 
     def test_to_txrep_full_tx(self):
@@ -472,8 +475,8 @@ class TestTxrep:
         txrep = to_txrep(te)
         assert txrep == get_txrep_file("test_to_txrep_full_tx.txt")
         assert (
-            from_txrep(txrep, Network.TESTNET_NETWORK_PASSPHRASE).to_xdr()
-            == te.to_xdr()
+                from_txrep(txrep, Network.TESTNET_NETWORK_PASSPHRASE).to_xdr()
+                == te.to_xdr()
         )
 
     def test_to_txrep_fee_bump(self):
@@ -511,6 +514,30 @@ class TestTxrep:
         txrep = to_txrep(fee_bump_tx)
         assert txrep == get_txrep_file("test_to_txrep_fee_bump.txt")
         assert (
-            from_txrep(txrep, Network.TESTNET_NETWORK_PASSPHRASE).to_xdr()
-            == fee_bump_tx.to_xdr()
+                from_txrep(txrep, Network.TESTNET_NETWORK_PASSPHRASE).to_xdr()
+                == fee_bump_tx.to_xdr()
         )
+
+    def test_get_value_missing_raise(self):
+        raw_data_map = {'k': 'v'}
+        missing_key = "missing_key"
+        with pytest.raises(ValueError, match=f"`{missing_key}` is missing from txrep."):
+            _get_value(raw_data_map, missing_key)
+
+    def test_get_bytes_value_invalid_bytes_raise(self):
+        raw_data_map = {'k': 'v'}
+        key = "k"
+        with pytest.raises(ValueError, match=f"Failed to convert `{raw_data_map[key]}` to bytes type."):
+            _get_bytes_value(raw_data_map, key)
+
+    def test_get_int_value_raise(self):
+        raw_data_map = {'k': 'v'}
+        key = "k"
+        with pytest.raises(ValueError, match=f"Failed to convert `{raw_data_map[key]}` to int type."):
+            _get_int_value(raw_data_map, key)
+
+    def test_get_bool_value_raise(self):
+        raw_data_map = {'k': 'v'}
+        key = "k"
+        with pytest.raises(ValueError, match=f"Failed to convert `{raw_data_map[key]}` to bool type."):
+            _get_bool_value(raw_data_map, key)

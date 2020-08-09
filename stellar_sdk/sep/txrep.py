@@ -12,7 +12,7 @@ from enum import Enum
 from typing import List, Union, Optional, Dict
 
 from ..asset import Asset
-from ..exceptions import ValueError
+from ..exceptions import ValueError as SdkValueError
 from ..fee_bump_transaction import FeeBumpTransaction
 from ..fee_bump_transaction_envelope import FeeBumpTransactionEnvelope
 from ..memo import *
@@ -222,7 +222,8 @@ def _get_memo(raw_data_map: Dict[str, str], prefix: str) -> Memo:
     elif memo_type == "MEMO_NONE":
         memo = NoneMemo()
     else:
-        raise ValueError("")
+        raise SdkValueError(f"`{memo_type}` is not a valid memo type, expected one of `MEMO_TEXT`, `MEMO_ID`, "
+                         f"`MEMO_HASH`, `MEMO_RETURN`, `MEMO_NONE`.")
     return memo
 
 
@@ -340,7 +341,10 @@ def _get_operation(index, raw_data_map, tx_prefix):
         operation_prefix = prefix + "setOptionsOp."
         return _get_set_options_op(source_account_id, operation_prefix, raw_data_map)
     else:
-        raise ValueError
+        raise SdkValueError(
+            f"This operation has not been implemented yet, "
+            f"operation type: {operation_type}."
+        )
 
 
 def _get_set_options_op(
@@ -383,7 +387,7 @@ def _get_set_options_op(
             key = StrKey.decode_pre_auth_tx(key)
             signer = Signer.pre_auth_tx(key, weight)
         else:
-            raise ValueError
+            raise SdkValueError("")
 
     if _get_bool_value(raw_data_map, f"{operation_prefix}homeDomain._present"):
         home_domain = _get_string_value(raw_data_map, f"{operation_prefix}homeDomain")
@@ -588,7 +592,7 @@ def _get_int_value(raw_data_map: Dict[str, str], key: str) -> int:
     try:
         return int(value)
     except ValueError as e:
-        raise ValueError(f"Failed to convert `{value}` to int type.") from e
+        raise SdkValueError(f"Failed to convert `{value}` to int type.") from e
 
 
 def _get_bool_value(raw_data_map: Dict[str, str], key: str) -> bool:
@@ -598,7 +602,7 @@ def _get_bool_value(raw_data_map: Dict[str, str], key: str) -> bool:
     elif value == _false:
         return False
     else:
-        raise ValueError(f"Failed to convert `{value}` to bool type.")
+        raise SdkValueError(f"Failed to convert `{value}` to bool type.")
 
 
 def _get_bytes_value(raw_data_map: Dict[str, str], key: str) -> bytes:
@@ -609,7 +613,7 @@ def _get_bytes_value(raw_data_map: Dict[str, str], key: str) -> bytes:
     try:
         return bytes.fromhex(value)
     except ValueError as e:
-        raise ValueError(f"Failed to convert `{value}` to bytes type.") from e
+        raise SdkValueError(f"Failed to convert `{value}` to bytes type.") from e
 
 
 def _get_string_value(raw_data_map: Dict[str, str], key: str) -> str:
@@ -623,7 +627,7 @@ def _get_value(raw_data_map: Dict[str, str], key: str) -> str:
     try:
         return raw_data_map[key]
     except KeyError as e:
-        raise ValueError(f"`{key}` is missing from txrep.") from e
+        raise SdkValueError(f"`{key}` is missing from txrep.") from e
 
 
 def _decode_asset(asset: str) -> Asset:
@@ -632,7 +636,7 @@ def _decode_asset(asset: str) -> Asset:
         return Asset.native()
     parts = asset.split(":")
     if len(parts) != 2:
-        raise ValueError()
+        raise SdkValueError("Failed to decode asset string.")
     return Asset(parts[0], parts[1])
 
 
@@ -805,7 +809,7 @@ def _add_operation(
         for index, asset in enumerate(operation.path):
             add_body_line(f"path[{index}]", _to_asset(asset))
     else:
-        raise NotImplementedError(
+        raise SdkValueError(
             f"This operation has not been implemented yet, "
             f"operation type: {operation}."
         )
