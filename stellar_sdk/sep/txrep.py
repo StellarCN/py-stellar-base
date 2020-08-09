@@ -387,7 +387,7 @@ def _get_set_options_op(
             key = StrKey.decode_pre_auth_tx(key)
             signer = Signer.pre_auth_tx(key, weight)
         else:
-            raise SdkValueError("")
+            raise SdkValueError("Signer key should start with `G`, `X` or `T`.")
 
     if _get_bool_value(raw_data_map, f"{operation_prefix}homeDomain._present"):
         home_domain = _get_string_value(raw_data_map, f"{operation_prefix}homeDomain")
