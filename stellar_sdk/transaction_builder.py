@@ -619,7 +619,7 @@ class TransactionBuilder:
         return self.append_set_options_op(signer=signer, source=source)
 
     def append_pre_auth_tx_signer(
-        self, pre_auth_tx_hash: bytes, weight: int, source: str = None,
+        self, pre_auth_tx_hash: Union[str, bytes], weight: int, source=None
     ) -> "TransactionBuilder":
         """Add a PreAuthTx signer to an account.
 

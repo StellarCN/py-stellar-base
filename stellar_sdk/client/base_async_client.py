@@ -1,5 +1,5 @@
 from abc import ABCMeta, abstractmethod
-from typing import AsyncGenerator, Dict, Union, Any
+from typing import AsyncGenerator, Dict, Any
 
 from .response import Response
 
@@ -19,7 +19,7 @@ class BaseAsyncClient(metaclass=ABCMeta):
         :return: the response from server
         :raise: :exc:`ConnectionError <stellar_sdk.exceptions.ConnectionError>`
         """
-        pass
+        pass  # pragma: no cover
 
     @abstractmethod
     async def post(self, url: str, data: Dict[str, str]) -> Response:
@@ -30,7 +30,7 @@ class BaseAsyncClient(metaclass=ABCMeta):
         :return: the response from server
         :raise: :exc:`ConnectionError <stellar_sdk.exceptions.ConnectionError>`
         """
-        pass
+        pass  # pragma: no cover
 
     @abstractmethod
     async def stream(
@@ -47,8 +47,8 @@ class BaseAsyncClient(metaclass=ABCMeta):
         :return: a dict AsyncGenerator for server response
         :raise: :exc:`ConnectionError <stellar_sdk.exceptions.ConnectionError>`
         """
-        pass
+        pass  # pragma: no cover
 
     @abstractmethod
     async def close(self) -> None:
-        pass
+        pass  # pragma: no cover

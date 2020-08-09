@@ -134,7 +134,7 @@ class BaseHorizonError(BaseRequestError):
         try:
             message = response.json()
         except JSONDecodeError:
-            pass
+            pass  # pragma: no cover
         self.type: Optional[str] = message.get("type")
         self.title: Optional[str] = message.get("title")
         self.detail: Optional[str] = message.get("detail")
@@ -202,7 +202,7 @@ class StreamClientError(BaseRequestError):
 def raise_request_exception(response: Response) -> None:
     status_code = response.status_code
     if status_code == 200:
-        pass
+        pass  # pragma: no cover
     elif status_code == 404:
         raise NotFoundError(response)
     elif 400 <= status_code < 500:

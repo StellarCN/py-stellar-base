@@ -48,7 +48,7 @@ class TradesCallBuilder(BaseCallBuilder):
         :param offer_id: offer id
         :return: current TradesCallBuilder instance
         """
-        self.endpoint = "offers/{offer_id}/trades".format(offer_id=offer_id)
+        self.endpoint = f"offers/{offer_id}/trades"
         return self
 
     def for_account(self, account_id: str) -> "TradesCallBuilder":
@@ -59,5 +59,5 @@ class TradesCallBuilder(BaseCallBuilder):
         :param account_id: account id
         :return: current TradesCallBuilder instance
         """
-        self.endpoint = "accounts/{account_id}/trades".format(account_id=account_id)
+        self.endpoint = f"accounts/{account_id}/trades"
         return self

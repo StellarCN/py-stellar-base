@@ -1,0 +1,19 @@
+type: ENVELOPE_TYPE_TX
+tx.sourceAccount: GBEFNJVA2347XAJ4HYAECN5S7DIMLRDKXYT7BSFGF6SDM4VH5TD5HGJB
+tx.fee: 100
+tx.seqNum: 46489056724385793
+tx.timeBounds._present: true
+tx.timeBounds.minTime: 1535756672
+tx.timeBounds.maxTime: 1567292672
+tx.memo.type: MEMO_TEXT
+tx.memo.text: "Enjoy this transaction"
+tx.operations.len: 1
+tx.operations[0].sourceAccount._present: false
+tx.operations[0].body.type: PAYMENT
+tx.operations[0].body.paymentOp.destination: GBAF6NXN3DHSF357QBZLTBNWUTABKUODJXJYYE32ZDKA2QBM2H33IK6O
+tx.operations[0].body.paymentOp.asset: USD:GAZFEVBSEGJJ63WPVVIWXLZLWN2JYZECECGT6GUNP4FJDVZVNXWQWMYI
+tx.operations[0].body.paymentOp.amount: 400004000
+tx.ext.v: 0
+signatures.len: 1
+signatures[0].hint: a7ecc7d3
+signatures[0].signature: 60302a0d500afb8dae887f5f338f5e0ab6096ff1cab44939e2fda4059aa1a1b035ee09c7836376b86451fc052a06254f021d6afd6f39fd2c57541aaba8a3940c

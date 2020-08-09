@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 
 DEFAULT_NUM_RETRIES = 3
 DEFAULT_BACKOFF_FACTOR = 0.5
-USER_AGENT = "py-stellar-sdk/%s/AiohttpClient" % __version__
+USER_AGENT = f"py-stellar-sdk/{__version__}/AiohttpClient"
 IDENTIFICATION_HEADERS = {
     "X-Client-Name": "py-stellar-sdk",
     "X-Client-Version": __version__,
@@ -38,7 +38,7 @@ async def __readline(self) -> bytes:
     while not_enough:
         while self._buffer and not_enough:
             offset = self._buffer_offset
-            ichar = self._buffer[0].find(b'\n', offset) + 1
+            ichar = self._buffer[0].find(b"\n", offset) + 1
             # Read from current offset to found b'\n' or to the end.
             data = self._read_nowait_chunk(ichar - offset if ichar else -1)
             line.append(data)
@@ -52,9 +52,9 @@ async def __readline(self) -> bytes:
             break
 
         if not_enough:
-            await self._wait('readline')
+            await self._wait("readline")
 
-    return b''.join(line)
+    return b"".join(line)
 
 
 aiohttp.streams.StreamReader.readline = __readline
@@ -137,7 +137,9 @@ class AiohttpClient(BaseAsyncClient):
         :raise: :exc:`ConnectionError <stellar_sdk.exceptions.ConnectionError>`
         """
         try:
-            response = await self._session.post(url, data=data, timeout=aiohttp.ClientTimeout(total=self.post_timeout))
+            response = await self._session.post(
+                url, data=data, timeout=aiohttp.ClientTimeout(total=self.post_timeout)
+            )
             return Response(
                 status_code=response.status,
                 text=await response.text(),
@@ -204,16 +206,14 @@ class AiohttpClient(BaseAsyncClient):
                                 yield json.loads(data)
                         except json.JSONDecodeError:
                             # Content was not json-decodable
-                            pass
+                            pass  # pragma: no cover
             except aiohttp.ClientError as e:
                 raise StreamClientError(
                     query_params["cursor"], "Failed to get stream message."
                 ) from e
             except asyncio.exceptions.TimeoutError:
                 logger.warning(
-                    "We have encountered an timeout error and we will try to reconnect, cursor = {}".format(
-                        query_params.get("cursor")
-                    )
+                    f"We have encountered an timeout error and we will try to reconnect, cursor = {query_params.get('cursor')}"
                 )
                 await asyncio.sleep(retry)
 

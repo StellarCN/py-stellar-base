@@ -532,6 +532,11 @@ SEP 0010: Stellar Web Authentication
 .. autofunction:: stellar_sdk.sep.stellar_web_authentication.verify_challenge_transaction_signers
 .. autofunction:: stellar_sdk.sep.stellar_web_authentication.verify_challenge_transaction
 
+SEP 0011: Txrep: human-readable low-level representation of Stellar transactions
+---------------------------------------------------------------------------------
+.. autofunction:: stellar_sdk.sep.txrep.to_txrep
+.. autofunction:: stellar_sdk.sep.txrep.from_txrep
+
 Exceptions
 ----------
 .. autoclass:: stellar_sdk.sep.exceptions.StellarTomlNotFoundError

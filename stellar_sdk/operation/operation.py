@@ -56,7 +56,7 @@ class Operation(metaclass=ABCMeta):
 
     @classmethod
     def type_code(cls) -> int:
-        pass
+        pass  # pragma: no cover
 
     @staticmethod
     def to_xdr_amount(value: Union[str, Decimal]) -> int:
@@ -84,9 +84,7 @@ class Operation(metaclass=ABCMeta):
         """
         if not (isinstance(value, str) or isinstance(value, Decimal)):
             raise TypeError(
-                "Value of type '{}' must be of type {} or {}, but got {}.".format(
-                    value, str, Decimal, type(value)
-                )
+                f"Value of type '{value}' must be of type {str} or {Decimal}, but got {type(value)}."
             )
         # throw exception if value * ONE has decimal places (it can't be represented as int64)
         try:
@@ -97,15 +95,13 @@ class Operation(metaclass=ABCMeta):
             )
         except decimal.Inexact:
             raise ValueError(
-                "Value of '{}' must have at most 7 digits after the decimal.".format(
-                    value
-                )
+                f"Value of '{value}' must have at most 7 digits after the decimal."
             )
 
         if amount < 0 or amount > 9223372036854775807:
             raise ValueError(
-                "Value of '{}' must represent a positive number "
-                "and the max valid value is 922337203685.4775807.".format(value)
+                f"Value of '{value}' must represent a positive number "
+                "and the max valid value is 922337203685.4775807."
             )
 
         return amount
@@ -122,7 +118,7 @@ class Operation(metaclass=ABCMeta):
 
     @abstractmethod
     def _to_operation_body(self) -> Xdr.nullclass:
-        pass
+        pass  # pragma: no cover
 
     def to_xdr_object(self) -> Xdr.types.Operation:
         """Creates an XDR Operation object that represents this
@@ -148,8 +144,7 @@ class Operation(metaclass=ABCMeta):
             if sub_cls.type_code() == operation_xdr_object.type:
                 return sub_cls.from_xdr_object(operation_xdr_object)
         raise NotImplementedError(
-            "Operation of type={} is not implemented"
-            ".".format(operation_xdr_object.type)
+            f"Operation of type={operation_xdr_object.type} is not implemented."
         )
 
     @staticmethod

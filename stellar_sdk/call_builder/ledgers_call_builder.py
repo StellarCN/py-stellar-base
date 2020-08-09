@@ -29,5 +29,5 @@ class LedgersCallBuilder(BaseCallBuilder):
         :param sequence: Ledger sequence
         :return: current LedgerCallBuilder instance
         """
-        self.endpoint = "ledgers/{sequence}".format(sequence=sequence)
+        self.endpoint = f"ledgers/{sequence}"
         return self

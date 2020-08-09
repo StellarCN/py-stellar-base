@@ -36,7 +36,7 @@ class OffersCallBuilder(BaseCallBuilder):
             "Will be removed in future, use OffersCallBuilder.for_seller",
             DeprecationWarning,
         )
-        self.endpoint = "accounts/{account_id}/offers".format(account_id=account_id)
+        self.endpoint = f"accounts/{account_id}/offers"
         return self
 
     def for_seller(self, seller: str):
@@ -103,5 +103,5 @@ class OffersCallBuilder(BaseCallBuilder):
         :param offer_id: Offer ID.
         :return: this OffersCallBuilder instance
         """
-        self.endpoint = "offers/{offer}".format(offer=offer_id)
+        self.endpoint = f"offers/{offer_id}"
         return self

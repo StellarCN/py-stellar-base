@@ -53,4 +53,4 @@ class Price:
         return self.n == other.n and self.d == other.d
 
     def __str__(self):
-        return "<Price [n={n}, d={d}]>".format(n=self.n, d=self.d)
+        return f"<Price [n={self.n}, d={self.d}]>"
