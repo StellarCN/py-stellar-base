@@ -56,7 +56,7 @@ class Operation(metaclass=ABCMeta):
 
     @classmethod
     def type_code(cls) -> int:
-        pass
+        pass  # pragma: no cover
 
     @staticmethod
     def to_xdr_amount(value: Union[str, Decimal]) -> int:
@@ -118,7 +118,7 @@ class Operation(metaclass=ABCMeta):
 
     @abstractmethod
     def _to_operation_body(self) -> Xdr.nullclass:
-        pass
+        pass  # pragma: no cover
 
     def to_xdr_object(self) -> Xdr.types.Operation:
         """Creates an XDR Operation object that represents this

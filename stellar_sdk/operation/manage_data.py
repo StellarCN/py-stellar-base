@@ -31,6 +31,8 @@ class ManageData(Operation):
     ) -> None:  # TODO: bytes only?
         super().__init__(source)
         self.data_name: str = data_name
+        if isinstance(data_value, str):
+            data_value = data_value.encode()
         self.data_value: Union[str, bytes, None] = data_value
 
         valid_data_name_len = len(self.data_name) <= 64
@@ -46,13 +48,7 @@ class ManageData(Operation):
     def _to_operation_body(self) -> Xdr.nullclass:
         data_name = bytes(self.data_name, encoding="utf-8")
 
-        if self.data_value is not None:
-            if isinstance(self.data_value, bytes):
-                data_value = pack_xdr_array(self.data_value)
-            else:
-                data_value = pack_xdr_array(bytes(self.data_value, "utf-8"))
-        else:
-            data_value = pack_xdr_array(self.data_value)
+        data_value = pack_xdr_array(self.data_value)
         manage_data_op = Xdr.types.ManageDataOp(data_name, data_value)
 
         body = Xdr.nullclass()

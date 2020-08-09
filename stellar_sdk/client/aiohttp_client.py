@@ -206,7 +206,7 @@ class AiohttpClient(BaseAsyncClient):
                                 yield json.loads(data)
                         except json.JSONDecodeError:
                             # Content was not json-decodable
-                            pass
+                            pass  # pragma: no cover
             except aiohttp.ClientError as e:
                 raise StreamClientError(
                     query_params["cursor"], "Failed to get stream message."

@@ -1,0 +1,27 @@
+type: ENVELOPE_TYPE_TX_FEE_BUMP
+feeBump.tx.feeSource: GBB2UWEFNJIKGYBIOJ3BFTNLJFLTXQ6WGCI2XMS7E5USPD2OSNI5WITS
+feeBump.tx.fee: 400
+feeBump.tx.innerTx.type: ENVELOPE_TYPE_TX
+feeBump.tx.innerTx.tx.sourceAccount: GBEFNJVA2347XAJ4HYAECN5S7DIMLRDKXYT7BSFGF6SDM4VH5TD5HGJB
+feeBump.tx.innerTx.tx.fee: 100
+feeBump.tx.innerTx.tx.seqNum: 46489056724385793
+feeBump.tx.innerTx.tx.timeBounds._present: true
+feeBump.tx.innerTx.tx.timeBounds.minTime: 1535756672
+feeBump.tx.innerTx.tx.timeBounds.maxTime: 1567292672
+feeBump.tx.innerTx.tx.memo.type: MEMO_TEXT
+feeBump.tx.innerTx.tx.memo.text: "Enjoy this transaction"
+feeBump.tx.innerTx.tx.operations.len: 1
+feeBump.tx.innerTx.tx.operations[0].sourceAccount._present: true
+feeBump.tx.innerTx.tx.operations[0].sourceAccount: GBEFNJVA2347XAJ4HYAECN5S7DIMLRDKXYT7BSFGF6SDM4VH5TD5HGJB
+feeBump.tx.innerTx.tx.operations[0].body.type: PAYMENT
+feeBump.tx.innerTx.tx.operations[0].body.paymentOp.destination: GBAF6NXN3DHSF357QBZLTBNWUTABKUODJXJYYE32ZDKA2QBM2H33IK6O
+feeBump.tx.innerTx.tx.operations[0].body.paymentOp.asset: USD:GAZFEVBSEGJJ63WPVVIWXLZLWN2JYZECECGT6GUNP4FJDVZVNXWQWMYI
+feeBump.tx.innerTx.tx.operations[0].body.paymentOp.amount: 400004000
+feeBump.tx.innerTx.tx.ext.v: 0
+feeBump.tx.innerTx.signatures.len: 1
+feeBump.tx.innerTx.signatures[0].hint: a7ecc7d3
+feeBump.tx.innerTx.signatures[0].signature: b05b10add9d99ddeede48682085f487359f797047190a8199b3a5171017df259ba2085f1f7a48a5ffe4a379892273c63c81d25c736eca4570c96fe9f64556a0c
+feeBump.tx.ext.v: 0
+feeBump.signatures.len: 1
+feeBump.signatures[0].hint: 4e9351db
+feeBump.signatures[0].signature: fadb6f9f97e306890fbf2a362ce04527d4273835c8bd14a3a7bb20879576e4ea41570780ab222307e98ba667df9becc3d78b52ef92ff5e8a015a31aab28fcd01
