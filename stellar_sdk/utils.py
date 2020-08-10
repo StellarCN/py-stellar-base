@@ -93,3 +93,19 @@ def parse_ed25519_account_id_from_muxed_account_xdr_object(
     if data.ed25519 is not None:
         return StrKey.encode_ed25519_public_key(data.ed25519)
     return StrKey.encode_ed25519_public_key(data.med25519.ed25519)
+
+
+def is_fee_bump_transaction(xdr: str) -> bool:
+    xdr_object = Xdr.types.TransactionEnvelope.from_xdr(xdr)
+    te_type = xdr_object.type
+    if te_type == Xdr.const.ENVELOPE_TYPE_TX_FEE_BUMP:
+        return True
+    elif (
+        te_type == Xdr.const.ENVELOPE_TYPE_TX
+        or te_type == Xdr.const.ENVELOPE_TYPE_TX_V0
+    ):
+        return False
+    else:
+        raise ValueError(
+            f"This transaction envelope type is not supported, type = {te_type}."
+        )

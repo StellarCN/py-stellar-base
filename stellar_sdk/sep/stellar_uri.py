@@ -10,14 +10,16 @@ Version: 2.0.0
 
 import abc
 import base64
-from typing import Optional, List, Union
-from urllib.parse import urlencode, quote
+from typing import Optional, List, Union, Dict, Tuple
+from urllib import parse
 
 from ..asset import Asset
 from ..exceptions import ValueError
+from ..fee_bump_transaction_envelope import FeeBumpTransactionEnvelope
 from ..keypair import Keypair
 from ..memo import Memo, NoneMemo, IdMemo, TextMemo, HashMemo, ReturnHashMemo
 from ..transaction_envelope import TransactionEnvelope
+from ..utils import is_fee_bump_transaction
 
 __all__ = ["PayStellarUri", "TransactionStellarUri", "Replacement"]
 
@@ -51,6 +53,18 @@ class StellarUri(object, metaclass=abc.ABCMeta):
         sign_data = self._signature_payload
         signature = signer.sign(sign_data)
         self.signature = base64.b64encode(signature).decode()
+
+    @staticmethod
+    def _parse_uri_query(uri_query) -> Dict[str, str]:
+        return dict(parse.parse_qsl(uri_query))
+
+    @staticmethod
+    def _parse_callback(callback: str) -> Optional[str]:
+        if callback is None:
+            return None
+        if not callback.startswith("url:"):
+            raise ValueError("`callback` should start with `url:`.")
+        return callback[4:]
 
 
 class PayStellarUri(StellarUri):
@@ -95,21 +109,7 @@ class PayStellarUri(StellarUri):
         self.memo = None
         self.memo_type = None
         self._memo = memo
-        if memo and not isinstance(memo, NoneMemo):
-            if isinstance(memo, TextMemo):
-                self.memo = memo.memo_text
-                self.memo_type = "MEMO_TEXT"
-            elif isinstance(memo, IdMemo):
-                self.memo = memo.memo_id
-                self.memo_type = "MEMO_ID"
-            elif isinstance(memo, HashMemo):
-                self.memo = base64.b64encode(memo.memo_hash).decode()
-                self.memo_type = "MEMO_HASH"
-            elif isinstance(memo, ReturnHashMemo):
-                self.memo = base64.b64encode(memo.memo_return).decode()
-                self.memo_type = "MEMO_RETURN"
-            else:
-                raise ValueError("Invalid memo.")
+        self.memo_type, self.memo = self._encode_memo(memo)
         self.destination = destination
         self.amount = amount
         self.callback = callback
@@ -117,10 +117,51 @@ class PayStellarUri(StellarUri):
         self.network_passphrase = network_passphrase
         self.origin_domain = origin_domain
 
+    @staticmethod
+    def _encode_memo(memo) -> Union[Tuple[str, str], Tuple[None, None]]:
+        if memo and not isinstance(memo, NoneMemo):
+            if isinstance(memo, TextMemo):
+                memo_value = memo.memo_text
+                memo_type = "MEMO_TEXT"
+            elif isinstance(memo, IdMemo):
+                memo_value = memo.memo_id
+                memo_type = "MEMO_ID"
+            elif isinstance(memo, HashMemo):
+                memo_value = base64.b64encode(memo.memo_hash).decode()
+                memo_type = "MEMO_HASH"
+            elif isinstance(memo, ReturnHashMemo):
+                memo_value = base64.b64encode(memo.memo_return).decode()
+                memo_type = "MEMO_RETURN"
+            else:
+                raise ValueError("Invalid memo.")
+            return memo_type, memo_value
+        return None, None
+
+    @staticmethod
+    def _decode_memo(memo_type: str, memo_value: str) -> Optional[Memo]:
+        if memo_type is None:
+            return None
+        if memo_value is None:
+            raise ValueError("`memo` is missing from uri.")
+        if memo_type == "MEMO_TEXT":
+            return TextMemo(memo_value)
+        elif memo_type == "MEMO_ID":
+            return IdMemo(int(memo_value))
+        elif memo_type == "MEMO_HASH":
+            value = base64.b64decode(memo_value.encode())
+            return HashMemo(value)
+        elif memo_type == "MEMO_RETURN":
+            value = base64.b64decode(memo_value.encode())
+            return ReturnHashMemo(value)
+        else:
+            raise ValueError("Invalid `memo_type`.")
+
     def to_uri(self) -> str:
         """Generate the request URI.
+
+        :return: Stellar Pay URI.
         """
-        query_params = dict()
+        query_params = {}
         query_params["destination"] = self.destination
         if self.amount is not None:
             query_params["amount"] = self.amount
@@ -142,7 +183,55 @@ class PayStellarUri(StellarUri):
             query_params["origin_domain"] = self.origin_domain
         if self.signature is not None:
             query_params["signature"] = self.signature
-        return f"{STELLAR_SCHEME}:pay?{urlencode(query_params, quote_via=quote)}"
+        return f"{STELLAR_SCHEME}:pay?{parse.urlencode(query_params, quote_via=parse.quote)}"
+
+    @classmethod
+    def from_uri(cls, uri: str) -> "PayStellarUri":
+        """Parse Stellar Pay URI and generate :class:`PayStellarUri` object.
+
+        :param uri: Stellar Pay URI.
+        :return: :class:`PayStellarUri` object from uri.
+        """
+        parsed_uri = parse.urlparse(uri)
+        if parsed_uri.scheme != STELLAR_SCHEME:
+            raise ValueError(
+                f"Stellar URI scheme should be `{STELLAR_SCHEME}`, but got `{parsed_uri.scheme}`."
+            )
+        if parsed_uri.path != "pay":
+            raise ValueError(
+                f"Stellar URI path should be `pay`, but got `{parsed_uri.path}`."
+            )
+        query = cls._parse_uri_query(parsed_uri.query)
+        destination = query.get("destination")
+        amount = query.get("amount")
+        asset_code = query.get("asset_code")
+        asset_issuer = query.get("asset_issuer")
+        memo_value = query.get("memo")
+        memo_type = query.get("memo_type")
+        callback = cls._parse_callback(query.get("callback"))
+        msg = query.get("msg")
+        network_passphrase = query.get("network_passphrase")
+        origin_domain = query.get("origin_domain")
+        signature = query.get("signature")
+        asset = None
+        if asset_code is not None:
+            asset = Asset(asset_code, asset_issuer)
+        memo = cls._decode_memo(memo_type=memo_type, memo_value=memo_value)
+
+        if destination is None:
+            raise ValueError("`destination` is missing from uri.")
+
+        return cls(
+            destination=destination,
+            amount=amount,
+            asset=asset,
+            memo=memo,
+            callback=callback,
+            message=msg,
+            network_passphrase=network_passphrase,
+            origin_domain=origin_domain,
+            signature=signature,
+        )
 
     def __str__(self):
         return (
@@ -250,7 +339,7 @@ class TransactionStellarUri(StellarUri):
 
     @property
     def _replace(self) -> Optional[str]:
-        if self.replace is None:
+        if not self.replace:
             return None
         replaces = []
         hits = dict()
@@ -263,13 +352,16 @@ class TransactionStellarUri(StellarUri):
 
     def to_uri(self) -> str:
         """Generate the request URI.
+
+        :return: Stellar Transaction URI.
         """
         query_params = dict()
         query_params["xdr"] = self.transaction_envelope.to_xdr()
         if self.callback is not None:
             query_params["callback"] = "url:" + self.callback
-        if self.replace is not None:
-            query_params["replace"] = self._replace
+        replace = self._replace
+        if replace is not None:
+            query_params["replace"] = replace
         if self.pubkey is not None:
             query_params["pubkey"] = self.pubkey
         if self.msg is not None:
@@ -280,7 +372,81 @@ class TransactionStellarUri(StellarUri):
             query_params["origin_domain"] = self.origin_domain
         if self.signature is not None:
             query_params["signature"] = self.signature
-        return f"{STELLAR_SCHEME}:tx?{urlencode(query_params, quote_via=quote)}"
+        return f"{STELLAR_SCHEME}:tx?{parse.urlencode(query_params, quote_via=parse.quote)}"
+
+    @classmethod
+    def from_uri(
+        cls, uri: str, network_passphrase: Optional[str]
+    ) -> "TransactionStellarUri":
+        """Parse Stellar Transaction URI and generate :class:`TransactionStellarUri` object.
+
+        :param uri: Stellar Transaction URI.
+        :param network_passphrase: The network to connect to for verifying and retrieving xdr,
+            If it is set to `None`, the `network_passphrase` in the uri will not be verified.
+        :return: :class:`TransactionStellarUri` object from uri.
+        """
+        parsed_uri = parse.urlparse(uri)
+        if parsed_uri.scheme != STELLAR_SCHEME:
+            raise ValueError(
+                f"Stellar URI scheme should be `{STELLAR_SCHEME}`, but got `{parsed_uri.scheme}`."
+            )
+        if parsed_uri.path != "tx":
+            raise ValueError(
+                f"Stellar URI path should be `tx`, but got `{parsed_uri.path}`."
+            )
+        query = cls._parse_uri_query(parsed_uri.query)
+        uri_network_passphrase = query.get("network_passphrase")
+        if network_passphrase is None and uri_network_passphrase is None:
+            raise ValueError("`network_passphrase` is required.")
+
+        if (
+            uri_network_passphrase is not None
+            and network_passphrase is not None
+            and network_passphrase != uri_network_passphrase
+        ):
+            raise ValueError(
+                "The `network_passphrase` in the function parameter does not "
+                "match the `network_passphrase` in the uri."
+            )
+        network_passphrase = network_passphrase or uri_network_passphrase
+
+        xdr = query.get("xdr")
+        callback = cls._parse_callback(query.get("callback"))
+        pubkey = query.get("pubkey")
+        msg = query.get("msg")
+        origin_domain = query.get("origin_domain")
+        signature = query.get("signature")
+        if xdr is None:
+            raise ValueError("`xdr` is missing from uri.")
+        if is_fee_bump_transaction(xdr):
+            tx = FeeBumpTransactionEnvelope.from_xdr(xdr, network_passphrase)
+        else:
+            tx = TransactionEnvelope.from_xdr(xdr, network_passphrase)
+        raw_replacements = query.get("replace")
+        replacements = []
+        if raw_replacements is not None:
+            descriptions_map = {}
+            identifiers, descriptions = raw_replacements.split(";")
+            for description in descriptions.split(","):
+                k, v = description.split(":")
+                descriptions_map[k] = v
+            for identifier in identifiers.split(","):
+                k, v = identifier.split(":")
+                hint = descriptions_map.get(v)
+                if hint is None:
+                    raise ValueError("Invalid `replace`.")
+                replacement = Replacement(k, v, hint)
+                replacements.append(replacement)
+        return cls(
+            transaction_envelope=tx,
+            replace=replacements,
+            callback=callback,
+            pubkey=pubkey,
+            message=msg,
+            network_passphrase=network_passphrase,
+            origin_domain=origin_domain,
+            signature=signature,
+        )
 
     def __str__(self):
         return (
