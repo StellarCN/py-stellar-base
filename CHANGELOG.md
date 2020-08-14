@@ -1,6 +1,13 @@
 Release History
 ==============
 
+### Version 2.6.4
+
+Released on Aug 14, 2020
+
+#### Added
+* feat: add support for parsing Stellar URI (SEP-0007). ([#360](https://github.com/StellarCN/py-stellar-base/pull/360))
+
 ### Version 2.6.3
 
 Released on Aug 09, 2020
