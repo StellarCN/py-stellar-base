@@ -1,11 +1,12 @@
 """
 SEP: 0010
 Title: Stellar Web Authentication
-Author: Sergey Nebolsin <sergey@mobius.network>, Tom Quisel <tom.quisel@gmail.com>, Leigh McCulloch <@leighmcculloch>
+Author: Sergey Nebolsin <sergey@mobius.network>, Tom Quisel <tom.quisel@gmail.com>,
+    Leigh McCulloch <@leighmcculloch>, Jake Urban <jake@stellar.org>
 Status: Active
 Created: 2018-07-31
-Updated: 2019-12-04
-Version 1.3.0
+Updated: 2020-08-14
+Version 2.0.0
 """
 import base64
 import os
@@ -38,16 +39,17 @@ MUXED_ACCOUNT_STARTING_LETTER: str = "M"
 def build_challenge_transaction(
     server_secret: str,
     client_account_id: str,
-    anchor_name: str,
+    domain_name: str,
     network_passphrase: str,
     timeout: int = 900,
 ) -> str:
     """Returns a valid `SEP0010 <https://github.com/stellar/stellar-protocol/blob/master/ecosystem/sep-0010.md>`_
     challenge transaction which you can use for Stellar Web Authentication.
 
-    :param server_secret: secret key for server's signing account.
+    :param server_secret: secret key for server's stellar.toml `SIGNING_KEY`.
     :param client_account_id: The stellar account that the wallet wishes to authenticate with the server.
-    :param anchor_name: Anchor's name to be used in the manage_data key.
+    :param domain_name: The signing server's
+        `fully qualified domain name <https://en.wikipedia.org/wiki/Fully_qualified_domain_name>`_.
     :param network_passphrase: The network to connect to for verifying and retrieving
         additional attributes from. (ex. 'Public Global Stellar Network ; September 2015')
     :param timeout: Challenge duration in seconds (default to 15 minutes).
@@ -66,7 +68,7 @@ def build_challenge_transaction(
     nonce = os.urandom(48)
     nonce_encoded = base64.b64encode(nonce)
     transaction_builder.append_manage_data_op(
-        data_name=f"{anchor_name} auth",
+        data_name=f"{domain_name} auth",
         data_value=nonce_encoded,
         source=client_account_id,
     )
