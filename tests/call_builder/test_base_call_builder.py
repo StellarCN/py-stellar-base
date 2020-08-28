@@ -82,7 +82,7 @@ class TestBaseCallBuilder:
         assert exception.detail == "The request you sent was invalid in some way."
         assert exception.extras == {
             "invalid_field": "account_id",
-            "reason": "invalid address",
+            "reason": "Account ID must start with `G` and contain 56 alphanum characters",
         }
 
     def test_status_404_raise_sync(self):
@@ -117,7 +117,7 @@ class TestBaseCallBuilder:
         assert exception.detail == "The request you sent was invalid in some way."
         assert exception.extras == {
             "invalid_field": "account_id",
-            "reason": "invalid address",
+            "reason": "Account ID must start with `G` and contain 56 alphanum characters",
         }
 
     @pytest.mark.asyncio
