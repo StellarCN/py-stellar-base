@@ -1,6 +1,32 @@
 Release History
 ==============
 
+### Version 2.7.0
+
+Released on Aug 28, 2020
+
+**This update include breaking changes**
+
+#### Update
+* feat: add support for SEP-0010 v2.0.0. ([#363](https://github.com/StellarCN/py-stellar-base/pull/363))
+
+#### Breaking changes
+
+Due to the addition of support for SEP-10 v2.0.0, we no longer support SEP-10 v1.x. 
+
+The **domain_name** parameter is required in SEP-10, and the **anchor_name** parameter is no longer needed, you can get these SEP-10 changes [here](https://github.com/stellar/stellar-protocol/pull/708).
+
+There have been some breaking changes to SEP-10 related functions, the following is a breaking changes list, you can also check our [latest document](https://stellar-sdk.readthedocs.io/en/2.7.0/api.html#sep-0010-stellar-web-authentication).
+
+- stellar_sdk.sep.stellar_web_authentication.build_challenge_transaction (**domain_name** parameter is required, **anchor_name**  parameter has been removed.)
+- stellar_sdk.sep.stellar_web_authentication.read_challenge_transaction (**domain_name** parameter is required)
+- stellar_sdk.sep.stellar_web_authentication.verify_challenge_transaction_signers (**domain_name** parameter is required)
+- stellar_sdk.sep.stellar_web_authentication.verify_challenge_transaction_signed_by_client (**domain_name** parameter is required)
+- stellar_sdk.sep.stellar_web_authentication.verify_challenge_transaction_signed_by_client_master_key (**domain_name** parameter is required)
+- stellar_sdk.sep.stellar_web_authentication.verify_challenge_transaction_threshold (**domain_name** parameter is required)
+- stellar_sdk.sep.stellar_web_authentication.verify_challenge_transaction (**domain_name** parameter is required)
+
+
 ### Version 2.6.4
 
 Released on Aug 14, 2020
