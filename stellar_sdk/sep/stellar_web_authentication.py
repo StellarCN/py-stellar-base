@@ -214,6 +214,8 @@ def verify_challenge_transaction_signers(
 
     :param challenge_transaction: SEP0010 transaction challenge transaction in base64.
     :param server_account_id: public key for server's account.
+    :param domain_name: The `fully qualified domain name <https://en.wikipedia.org/wiki/Fully_qualified_domain_name>`_
+        of the service requiring authentication, for example: `example.com`.
     :param network_passphrase: The network to connect to for verifying and retrieving
         additional attributes from. (ex. 'Public Global Stellar Network ; September 2015')
     :param signers: The signers of client account.
