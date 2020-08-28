@@ -77,7 +77,7 @@ class TestStellarWebAuthentication:
         transaction.sign(client_kp)
         challenge_tx = transaction.to_xdr()
         verify_challenge_transaction(
-            challenge_tx, server_kp.public_key, network_passphrase
+            challenge_tx, server_kp.public_key, domain_name, network_passphrase
         )
 
     def test_verify_challenge_tx_sequence_not_zero(self):
@@ -109,7 +109,10 @@ class TestStellarWebAuthentication:
             match="The transaction sequence number should be zero.",
         ):
             verify_challenge_transaction(
-                challenge_tx_signed, server_kp.public_key, network_passphrase
+                challenge_tx_signed,
+                server_kp.public_key,
+                domain_name,
+                network_passphrase,
             )
 
     def test_verify_challenge_tx_source_is_different_to_server_account_id(self):
@@ -131,13 +134,17 @@ class TestStellarWebAuthentication:
             match="Transaction source account is not equal to server's account.",
         ):
             verify_challenge_transaction(
-                challenge_tx, Keypair.random().public_key, network_passphrase
+                challenge_tx,
+                Keypair.random().public_key,
+                domain_name,
+                network_passphrase,
             )
 
     def test_verify_challenge_tx_donot_contain_any_operation(self):
         server_kp = Keypair.random()
         client_kp = Keypair.random()
         network_passphrase = Network.PUBLIC_NETWORK_PASSPHRASE
+        domain_name = "example.com"
         now = int(time.time())
         server_account = Account(server_kp.public_key, -1)
         challenge_te = (
@@ -155,13 +162,17 @@ class TestStellarWebAuthentication:
             match="Transaction requires a single ManageData operation.",
         ):
             verify_challenge_transaction(
-                challenge_tx_signed, server_kp.public_key, network_passphrase
+                challenge_tx_signed,
+                server_kp.public_key,
+                domain_name,
+                network_passphrase,
             )
 
     def test_verify_challenge_tx_donot_contain_managedata_operation(self):
         server_kp = Keypair.random()
         client_kp = Keypair.random()
         network_passphrase = Network.PUBLIC_NETWORK_PASSPHRASE
+        domain_name = "example.com"
         now = int(time.time())
         server_account = Account(server_kp.public_key, -1)
         challenge_te = (
@@ -179,7 +190,10 @@ class TestStellarWebAuthentication:
             InvalidSep10ChallengeError, match="Operation type should be ManageData."
         ):
             verify_challenge_transaction(
-                challenge_tx_signed, server_kp.public_key, network_passphrase
+                challenge_tx_signed,
+                server_kp.public_key,
+                domain_name,
+                network_passphrase,
             )
 
     def test_verify_challenge_tx_operation_does_not_contain_the_source_account(self):
@@ -208,7 +222,10 @@ class TestStellarWebAuthentication:
             InvalidSep10ChallengeError, match="Operation should have a source account."
         ):
             verify_challenge_transaction(
-                challenge_tx_signed, server_kp.public_key, network_passphrase
+                challenge_tx_signed,
+                server_kp.public_key,
+                domain_name,
+                network_passphrase,
             )
 
     def test_verify_challenge_tx_operation_value_is_not_a_64_bytes_base64_string(self):
@@ -240,7 +257,10 @@ class TestStellarWebAuthentication:
             match="Operation value encoded as base64 should be 64 bytes long.",
         ):
             verify_challenge_transaction(
-                challenge_tx_signed, server_kp.public_key, network_passphrase
+                challenge_tx_signed,
+                server_kp.public_key,
+                domain_name,
+                network_passphrase,
             )
 
     def test_verify_challenge_tx_transaction_is_not_signed_by_the_server(self):
@@ -274,7 +294,7 @@ class TestStellarWebAuthentication:
             match="Transaction not signed by server: {}".format(server_kp.public_key),
         ):
             verify_challenge_transaction(
-                challenge_tx, server_kp.public_key, network_passphrase
+                challenge_tx, server_kp.public_key, domain_name, network_passphrase
             )
 
     def test_verify_challenge_tx_transaction_is_not_signed_by_the_client(self):
@@ -297,7 +317,7 @@ class TestStellarWebAuthentication:
             match="Transaction not signed by any client signer.",
         ):
             verify_challenge_transaction(
-                challenge, server_kp.public_key, network_passphrase
+                challenge, server_kp.public_key, domain_name, network_passphrase
             )
 
     def test_verify_challenge_tx_dont_contains_timebound(self):
@@ -326,7 +346,10 @@ class TestStellarWebAuthentication:
             InvalidSep10ChallengeError, match="Transaction requires timebounds."
         ):
             verify_challenge_transaction(
-                challenge_tx_signed, server_kp.public_key, network_passphrase
+                challenge_tx_signed,
+                server_kp.public_key,
+                domain_name,
+                network_passphrase,
             )
 
     def test_verify_challenge_tx_contains_infinite_timebounds(self):
@@ -358,7 +381,10 @@ class TestStellarWebAuthentication:
             match="Transaction requires non-infinite timebounds.",
         ):
             verify_challenge_transaction(
-                challenge_tx_signed, server_kp.public_key, network_passphrase
+                challenge_tx_signed,
+                server_kp.public_key,
+                domain_name,
+                network_passphrase,
             )
 
     def test_verify_challenge_tx_not_within_range_of_the_specified_timebounds(self):
@@ -390,7 +416,41 @@ class TestStellarWebAuthentication:
             match="Transaction is not within range of the specified timebounds.",
         ):
             verify_challenge_transaction(
-                challenge_tx_signed, server_kp.public_key, network_passphrase
+                challenge_tx_signed,
+                server_kp.public_key,
+                domain_name,
+                network_passphrase,
+            )
+
+    def test_verify_challenge_transaction_domain_name_mismatch_raise(self):
+        server_kp = Keypair.random()
+        client_kp = Keypair.random()
+        timeout = 600
+        network_passphrase = Network.PUBLIC_NETWORK_PASSPHRASE
+        domain_name = "example.com"
+        invalid_domain_name = "invalid_example.com"
+
+        challenge = build_challenge_transaction(
+            server_secret=server_kp.secret,
+            client_account_id=client_kp.public_key,
+            domain_name=domain_name,
+            network_passphrase=network_passphrase,
+            timeout=timeout,
+        )
+
+        transaction = TransactionEnvelope.from_xdr(challenge, network_passphrase)
+        transaction.sign(client_kp)
+        challenge_tx = transaction.to_xdr()
+        with pytest.raises(
+            InvalidSep10ChallengeError,
+            match="The transaction's operation key name "
+            "does not include the expected home domain.",
+        ):
+            verify_challenge_transaction(
+                challenge_tx,
+                server_kp.public_key,
+                invalid_domain_name,
+                network_passphrase,
             )
 
     def test_verify_transaction_signatures(self):
@@ -483,7 +543,7 @@ class TestStellarWebAuthentication:
             Ed25519PublicKeySigner(Keypair.random().public_key, 255),
         ]
         signers_found = verify_challenge_transaction_signers(
-            challenge_tx, server_kp.public_key, network_passphrase, signers
+            challenge_tx, server_kp.public_key, domain_name, network_passphrase, signers
         )
         assert signers_found == [
             Ed25519PublicKeySigner(client_kp_a.public_key, 1),
@@ -518,7 +578,11 @@ class TestStellarWebAuthentication:
 
         with pytest.raises(InvalidSep10ChallengeError, match="No signers provided."):
             verify_challenge_transaction_signers(
-                challenge_tx, server_kp.public_key, network_passphrase, signers
+                challenge_tx,
+                server_kp.public_key,
+                domain_name,
+                network_passphrase,
+                signers,
             )
 
     def test_verify_challenge_transaction_signers_raise_no_client_signer_found(self):
@@ -555,7 +619,11 @@ class TestStellarWebAuthentication:
             match="Transaction not signed by any client signer.",
         ):
             verify_challenge_transaction_signers(
-                challenge_tx, server_kp.public_key, network_passphrase, signers
+                challenge_tx,
+                server_kp.public_key,
+                domain_name,
+                network_passphrase,
+                signers,
             )
 
     def test_verify_challenge_transaction_signers_raise_no_server_signature(self):
@@ -593,7 +661,11 @@ class TestStellarWebAuthentication:
             match="Transaction not signed by server: {}.".format(server_kp.public_key),
         ):
             verify_challenge_transaction_signers(
-                challenge_tx, server_kp.public_key, network_passphrase, signers
+                challenge_tx,
+                server_kp.public_key,
+                domain_name,
+                network_passphrase,
+                signers,
             )
 
     def test_verify_challenge_transaction_signers_raise_unrecognized_signatures(self):
@@ -632,7 +704,11 @@ class TestStellarWebAuthentication:
             InvalidSep10ChallengeError, match="Transaction has unrecognized signatures."
         ):
             verify_challenge_transaction_signers(
-                challenge_tx, server_kp.public_key, network_passphrase, signers
+                challenge_tx,
+                server_kp.public_key,
+                domain_name,
+                network_passphrase,
+                signers,
             )
 
     def test_verify_challenge_transaction_signed_by_client(self):
@@ -656,7 +732,7 @@ class TestStellarWebAuthentication:
         challenge_tx = transaction.to_xdr()
 
         verify_challenge_transaction_signed_by_client_master_key(
-            challenge_tx, server_kp.public_key, network_passphrase
+            challenge_tx, server_kp.public_key, domain_name, network_passphrase
         )
 
     def test_verify_challenge_transaction_signed_by_client_raise_not_signed(self):
@@ -682,7 +758,7 @@ class TestStellarWebAuthentication:
             match="Transaction not signed by any client signer.",
         ):
             verify_challenge_transaction_signed_by_client_master_key(
-                challenge_tx, server_kp.public_key, network_passphrase
+                challenge_tx, server_kp.public_key, domain_name, network_passphrase
             )
 
     def test_verify_challenge_transaction_threshold(self):
@@ -718,6 +794,7 @@ class TestStellarWebAuthentication:
         signers_found = verify_challenge_transaction_threshold(
             challenge_tx,
             server_kp.public_key,
+            domain_name,
             network_passphrase,
             med_threshold,
             signers,
@@ -765,6 +842,7 @@ class TestStellarWebAuthentication:
             verify_challenge_transaction_threshold(
                 challenge_tx,
                 server_kp.public_key,
+                domain_name,
                 network_passphrase,
                 med_threshold,
                 signers,
@@ -777,6 +855,7 @@ class TestStellarWebAuthentication:
         inner_source = Account(inner_keypair.public_key, 7)
         destination = "GDQERENWDDSQZS7R7WKHZI3BSOYMV3FSWR7TFUYFTKQ447PIX6NREOJM"
         amount = "2000.0000000"
+        domain_name = "example.com"
         inner_tx = (
             TransactionBuilder(
                 inner_source, Network.TESTNET_NETWORK_PASSPHRASE, 200, v1=True
@@ -803,7 +882,10 @@ class TestStellarWebAuthentication:
             match="Invalid challenge, expected a TransactionEnvelope but received a FeeBumpTransactionEnvelope.",
         ):
             read_challenge_transaction(
-                challenge, inner_keypair.public_key, Network.TESTNET_NETWORK_PASSPHRASE
+                challenge,
+                inner_keypair.public_key,
+                domain_name,
+                Network.TESTNET_NETWORK_PASSPHRASE,
             )
 
     def test_verify_challenge_transaction_signed_by_client_master_key_raise_unrecognized_signatures(
@@ -834,5 +916,5 @@ class TestStellarWebAuthentication:
             InvalidSep10ChallengeError, match="Transaction has unrecognized signatures."
         ):
             verify_challenge_transaction_signed_by_client_master_key(
-                challenge_tx, server_kp.public_key, network_passphrase
+                challenge_tx, server_kp.public_key, domain_name, network_passphrase
             )
