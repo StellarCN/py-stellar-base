@@ -48,8 +48,7 @@ def build_challenge_transaction(
 
     :param server_secret: secret key for server's stellar.toml `SIGNING_KEY`.
     :param client_account_id: The stellar account that the wallet wishes to authenticate with the server.
-    :param domain_name: The signing server's
-        `fully qualified domain name <https://en.wikipedia.org/wiki/Fully_qualified_domain_name>`_.
+    :param domain_name: The `fully qualified domain name <https://en.wikipedia.org/wiki/Fully_qualified_domain_name>`_ of the service requiring authentication.
     :param network_passphrase: The network to connect to for verifying and retrieving
         additional attributes from. (ex. 'Public Global Stellar Network ; September 2015')
     :param timeout: Challenge duration in seconds (default to 15 minutes).
