@@ -114,37 +114,6 @@ case LEDGER_UPGRADE_BASE_RESERVE:
 };
 
 /* Entries used to define the bucket list */
-
-union LedgerKey switch (LedgerEntryType type)
-{
-case ACCOUNT:
-    struct
-    {
-        AccountID accountID;
-    } account;
-
-case TRUSTLINE:
-    struct
-    {
-        AccountID accountID;
-        Asset asset;
-    } trustLine;
-
-case OFFER:
-    struct
-    {
-        AccountID sellerID;
-        int64 offerID;
-    } offer;
-
-case DATA:
-    struct
-    {
-        AccountID accountID;
-        string64 dataName;
-    } data;
-};
-
 enum BucketEntryType
 {
     METAENTRY =
