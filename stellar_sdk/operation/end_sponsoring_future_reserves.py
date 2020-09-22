@@ -1,0 +1,2 @@
+class EndSponsoringFutureReserves:
+    pass
