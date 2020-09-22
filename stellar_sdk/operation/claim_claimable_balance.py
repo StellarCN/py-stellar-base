@@ -21,8 +21,8 @@ class ClaimClaimableBalance(Operation):
         body.type = Xdr.const.CLAIM_CLAIMABLE_BALANCE
 
         balance_id = Xdr.nullclass()
-        balance_id.type = Xdr.const.CLAIMABLE_BALANCE_ID_TYPE_V0
-        balance_id.v0 = self.balance_id[-32:]
+        balance_id.type = Xdr.const.CLAIMABLE_BALANCE_ID_TYPE_V0  # int32
+        balance_id.v0 = self.balance_id[4:]
         claim_claimable_balance_op = Xdr.types.ClaimClaimableBalanceOp(balanceID=balance_id)
 
         body.claimClaimableBalanceOp = claim_claimable_balance_op
