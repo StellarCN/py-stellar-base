@@ -39,4 +39,5 @@ class ClaimClaimableBalance(Operation):
         source = Operation.get_source_from_xdr_obj(operation_xdr_object)
         balance_id = b'0' * 4 + operation_xdr_object.body.claimClaimableBalanceOp.v0
         op = cls(balance_id=balance_id, source=source)
+        op._source_muxed = Operation.get_source_muxed_from_xdr_obj(operation_xdr_object)
         return op

@@ -213,4 +213,6 @@ class CreateClaimableBalance(Operation):
         claimants = []
         for claimant_xdr_obj in operation_xdr_object.body.createClaimableBalanceOp.claimants:
             claimants.append(Claimant.from_xdr_object(claimant_xdr_obj))
-        return cls(asset=asset, amount=amount, claimants=claimants, source=source)
+        op = cls(asset=asset, amount=amount, claimants=claimants, source=source)
+        op._source_muxed = Operation.get_source_muxed_from_xdr_obj(operation_xdr_object)
+        return op
