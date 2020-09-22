@@ -5,6 +5,7 @@ from typing import Union, List, Optional
 from .operation import Operation
 from ..asset import Asset
 from ..keypair import Keypair
+from ..strkey import StrKey
 from ..utils import pack_xdr_array
 from ..xdr import Xdr
 
@@ -36,7 +37,7 @@ class ClaimPredicate:
         self.rel_before = rel_before
 
     @classmethod
-    def generate_and_predicate(cls, left: 'ClaimPredicate', right: 'ClaimPredicate'):
+    def create_and_predicate(cls, left: 'ClaimPredicate', right: 'ClaimPredicate'):
         return cls(
             claim_predicate_type=ClaimPredicateType.CLAIM_PREDICATE_AND,
             and_predicates=[left, right],
@@ -47,7 +48,7 @@ class ClaimPredicate:
         )
 
     @classmethod
-    def generate_or_predicate(cls, left: 'ClaimPredicate', right: 'ClaimPredicate'):
+    def create_or_predicate(cls, left: 'ClaimPredicate', right: 'ClaimPredicate'):
         return cls(
             claim_predicate_type=ClaimPredicateType.CLAIM_PREDICATE_OR,
             and_predicates=None,
@@ -58,7 +59,7 @@ class ClaimPredicate:
         )
 
     @classmethod
-    def generate_not_predicate(cls, predicate: 'ClaimPredicate'):
+    def create_not_predicate(cls, predicate: 'ClaimPredicate'):
         return cls(
             claim_predicate_type=ClaimPredicateType.CLAIM_PREDICATE_NOT,
             and_predicates=None,
@@ -69,7 +70,7 @@ class ClaimPredicate:
         )
 
     @classmethod
-    def generate_before_absolute_time_predicate(cls, seconds_before: int):
+    def create_before_absolute_time_predicate(cls, seconds_before: int):
         return cls(
             claim_predicate_type=ClaimPredicateType.CLAIM_PREDICATE_BEFORE_ABSOLUTE_TIME,
             and_predicates=None,
@@ -80,7 +81,7 @@ class ClaimPredicate:
         )
 
     @classmethod
-    def generate_before_relative_time_predicate(cls, seconds_before: int):
+    def create_before_relative_time_predicate(cls, seconds_before: int):
         return cls(
             claim_predicate_type=ClaimPredicateType.CLAIM_PREDICATE_BEFORE_RELATIVE_TIME,
             and_predicates=None,
@@ -91,7 +92,7 @@ class ClaimPredicate:
         )
 
     @classmethod
-    def generate_unconditional_predicate(cls):
+    def create_unconditional_predicate(cls):
         return cls(
             claim_predicate_type=ClaimPredicateType.CLAIM_PREDICATE_UNCONDITIONAL,
             and_predicates=None,
@@ -127,17 +128,35 @@ class ClaimPredicate:
             data.orPredicates = [self.or_predicates[0].to_xdr_object(), self.or_predicates[1].to_xdr_object()]
             return data
         else:
-            raise Exception
+            raise ValueError
 
-    # def from_xdr_object(self, xdr_object: Xdr.nullclass):
-    #     claim_predicate_type = xdr_object.type
-    #
-
-    def __str__(self):
-        pass
-
-    def __eq__(self, other):
-        pass
+    @classmethod
+    def from_xdr_object(cls, xdr_object: Xdr.nullclass) -> "ClaimPredicate":
+        claim_predicate_type = ClaimPredicateType(xdr_object.type)
+        if claim_predicate_type == ClaimPredicateType.CLAIM_PREDICATE_UNCONDITIONAL:
+            return cls.create_unconditional_predicate()
+        elif claim_predicate_type == ClaimPredicateType.CLAIM_PREDICATE_BEFORE_ABSOLUTE_TIME:
+            abs_before = xdr_object.absBefore
+            return cls.create_before_absolute_time_predicate(abs_before)
+        elif claim_predicate_type == ClaimPredicateType.CLAIM_PREDICATE_BEFORE_RELATIVE_TIME:
+            rel_before = xdr_object.relBefore
+            return cls.create_before_relative_time_predicate(rel_before)
+        elif claim_predicate_type == ClaimPredicateType.CLAIM_PREDICATE_NOT:
+            not_pedicate = xdr_object.notPredicate
+            pedicate = cls.from_xdr_object(not_pedicate)
+            return cls.create_not_predicate(pedicate)
+        elif claim_predicate_type == ClaimPredicateType.CLAIM_PREDICATE_AND:
+            and_predicates = xdr_object.andPredicates
+            left = cls.from_xdr_object(and_predicates[0])
+            right = cls.from_xdr_object(and_predicates[1])
+            return cls.create_and_predicate(left, right)
+        elif claim_predicate_type == ClaimPredicateType.CLAIM_PREDICATE_OR:
+            or_predicates = xdr_object.orPredicates
+            left = cls.from_xdr_object(or_predicates[0])
+            right = cls.from_xdr_object(or_predicates[1])
+            return cls.create_or_predicate(left, right)
+        else:
+            raise ValueError
 
 
 class Claimant:
@@ -154,11 +173,13 @@ class Claimant:
         data.v0 = v0
         return data
 
-    def __str__(self):
-        pass
-
-    def __eq__(self, other):
-        pass
+    @classmethod
+    def from_xdr_object(cls, xdr_object: Xdr.nullclass) -> "Claimant":
+        destination = StrKey.encode_ed25519_public_key(
+            xdr_object.v0.destination.ed25519
+        )
+        predicate = ClaimPredicate.from_xdr_object(xdr_object.v0.predicate)
+        return cls(destination=destination, predicate=predicate)
 
 
 class CreateClaimableBalance(Operation):
@@ -184,8 +205,12 @@ class CreateClaimableBalance(Operation):
         body.createClaimableBalanceOp = create_claimable_balance_op
         return body
 
-    def __str__(self):
-        pass
-
-    def __eq__(self, other):
-        pass
+    @classmethod
+    def from_xdr_object(cls, operation_xdr_object: Xdr.types.Operation) -> "CreateClaimableBalance":
+        source = Operation.get_source_from_xdr_obj(operation_xdr_object)
+        asset = Asset.from_xdr_object(operation_xdr_object.body.createClaimableBalanceOp.asset)
+        amount = Operation.from_xdr_amount(operation_xdr_object.body.createClaimableBalanceOp.amount)
+        claimants = []
+        for claimant_xdr_obj in operation_xdr_object.body.createClaimableBalanceOp.claimants:
+            claimants.append(Claimant.from_xdr_object(claimant_xdr_obj))
+        return cls(asset=asset, amount=amount, claimants=claimants, source=source)
