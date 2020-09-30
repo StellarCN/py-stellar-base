@@ -446,6 +446,13 @@ Signer
    :members:
    :inherited-members:
 
+SignerKey
+^^^^^^^^^
+
+.. autoclass:: stellar_sdk.signer_key.SignerKey
+   :members:
+   :inherited-members:
+
 TimeBounds
 ^^^^^^^^^^
 
