@@ -1368,6 +1368,13 @@ class TestClaimant:
         assert self.to_xdr(claimant) == xdr
         assert xdr == self.to_xdr(Claimant.from_xdr_object(claimant.to_xdr_object()))
 
+    def test_claimant_default(self):
+        xdr = "AAAAAAAAAACJmyhA7VY2xW3cXxSyOXX3nxuiOI0mlOTFbs3dyWDl7wAAAAA="
+        destination = "GCEZWKCA5VLDNRLN3RPRJMRZOX3Z6G5CHCGSNFHEYVXM3XOJMDS674JZ"
+        claimant = Claimant(destination=destination)
+        assert self.to_xdr(claimant) == xdr
+        assert xdr == self.to_xdr(Claimant.from_xdr_object(claimant.to_xdr_object()))
+
 
 class TestCreateClaimableBalance:
     def test_xdr(self):

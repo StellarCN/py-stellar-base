@@ -5,6 +5,20 @@ from ..xdr import Xdr
 
 
 class ClaimClaimableBalance(Operation):
+    """The :class:`ClaimClaimableBalance` object, which represents a ClaimClaimableBalance
+    operation on Stellar's network.
+
+    Claims a ClaimableBalanceEntry and adds the amount of asset on the entry to the source account.
+
+    See `Claim Claimable Balance Documentation
+    <https://developers.stellar.org/docs/start/list-of-operations/#claim-claimable-balance>_`.
+
+    Threshold: Low
+
+    :param balance_id: The claimable balance id to be claimed.
+    :param source: The source account (defaults to transaction source).
+    """
+
     def __init__(self, balance_id: str, source: str = None,) -> None:
         super().__init__(source)
         self.balance_id: str = balance_id
@@ -34,7 +48,6 @@ class ClaimClaimableBalance(Operation):
     ) -> "ClaimClaimableBalance":
         """Creates a :class:`ClaimClaimableBalance` object from an XDR Operation
         object.
-
         """
         source = Operation.get_source_from_xdr_obj(operation_xdr_object)
         balance_id = b"\x00" * 4 + operation_xdr_object.body.claimClaimableBalanceOp.v0

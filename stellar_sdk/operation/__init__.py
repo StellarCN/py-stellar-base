@@ -4,7 +4,7 @@ from .bump_sequence import BumpSequence
 from .change_trust import ChangeTrust
 from .claim_claimable_balance import ClaimClaimableBalance
 from .create_account import CreateAccount
-from .create_claimable_balance import CreateClaimableBalance
+from .create_claimable_balance import CreateClaimableBalance, Claimant, ClaimPredicate
 from .create_passive_sell_offer import CreatePassiveSellOffer
 from .inflation import Inflation
 from .manage_buy_offer import ManageBuyOffer
@@ -23,7 +23,11 @@ __all__ = [
     "AllowTrust",
     "BumpSequence",
     "ChangeTrust",
+    "ClaimClaimableBalance",
     "CreateAccount",
+    "CreateClaimableBalance",
+    "Claimant",
+    "ClaimPredicate",
     "CreatePassiveSellOffer",
     "Inflation",
     "ManageBuyOffer",
