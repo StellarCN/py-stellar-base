@@ -2,6 +2,7 @@ import base64
 from decimal import Decimal
 
 import pytest
+from stellar_sdk.operation.claim_claimable_balance import ClaimClaimableBalance
 
 from stellar_sdk import Price, Asset, Keypair
 from stellar_sdk.exceptions import Ed25519PublicKeyInvalidError, AssetCodeInvalidError
@@ -328,17 +329,6 @@ class TestClaimClaimableBalance:
         assert isinstance(op, ClaimClaimableBalance)
         assert op.source == source
         assert op.balance_id == balance_id
-
-    def test_from_xdr_muxed(self):
-        source = "GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV"
-        balance_id = (
-            "00000000da0d57da7d4850e7fc10d2a9d0ebc731f7afb40574c03395b17d49149b91f5be"
-        )
-        origin_xdr_obj = ClaimClaimableBalance(
-            balance_id=balance_id, source=source
-        ).to_xdr_object()
-        restore_op = Operation.from_xdr_object(origin_xdr_obj)
-        assert restore_op.to_xdr_object().to_xdr() == origin_xdr_obj.to_xdr()
 
 
 class TestPayment:
