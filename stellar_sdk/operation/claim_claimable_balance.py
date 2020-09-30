@@ -1,7 +1,9 @@
+import base64
 import binascii
 
 from .operation import Operation
 from ..xdr import Xdr
+from ..xdr.StellarXDR_type import ClaimableBalanceID
 
 
 class ClaimClaimableBalance(Operation):
@@ -32,9 +34,7 @@ class ClaimClaimableBalance(Operation):
         body.type = Xdr.const.CLAIM_CLAIMABLE_BALANCE
 
         balance_id_bytes: bytes = binascii.unhexlify(self.balance_id)
-        balance_id = Xdr.nullclass()
-        balance_id.type = Xdr.const.CLAIMABLE_BALANCE_ID_TYPE_V0  # int32
-        balance_id.v0 = balance_id_bytes[4:]
+        balance_id = ClaimableBalanceID.from_xdr(base64.b64encode(balance_id_bytes))
         claim_claimable_balance_op = Xdr.types.ClaimClaimableBalanceOp(
             balanceID=balance_id
         )
@@ -50,7 +50,9 @@ class ClaimClaimableBalance(Operation):
         object.
         """
         source = Operation.get_source_from_xdr_obj(operation_xdr_object)
-        balance_id = b"\x00" * 4 + operation_xdr_object.body.claimClaimableBalanceOp.v0
+        balance_id = base64.b64decode(
+            operation_xdr_object.body.claimClaimableBalanceOp.to_xdr()
+        )
         balance_id = binascii.hexlify(balance_id).decode()
         op = cls(balance_id=balance_id, source=source)
         op._source_muxed = Operation.get_source_muxed_from_xdr_obj(operation_xdr_object)
