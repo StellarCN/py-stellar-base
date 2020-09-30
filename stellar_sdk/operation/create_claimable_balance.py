@@ -9,11 +9,15 @@ from ..strkey import StrKey
 from ..utils import pack_xdr_array
 from ..xdr import Xdr
 from ..exceptions import ValueError
+from .utils import check_amount
 
-__all__ = ["ClaimPredicateType", "ClaimPredicate", "Claimant", "CreateClaimableBalance"]
+__all__ = ["ClaimPredicate", "Claimant", "CreateClaimableBalance"]
 
 
 class ClaimPredicateType(IntEnum):
+    """Currently supported claim predicate types.
+    """
+
     CLAIM_PREDICATE_UNCONDITIONAL = 0
     CLAIM_PREDICATE_AND = 1
     CLAIM_PREDICATE_OR = 2
@@ -23,6 +27,18 @@ class ClaimPredicateType(IntEnum):
 
 
 class ClaimPredicate:
+    """The :class:`ClaimPredicate` object, which represents a ClaimPredicate on Stellar's network.
+
+    **We do not recommend that you build it through the constructor, please use the helper function.**
+
+    :param claim_predicate_type: Type of ClaimPredicate.
+    :param and_predicates: The ClaimPredicates.
+    :param or_predicates: The ClaimPredicates.
+    :param not_predicate: The ClaimPredicate.
+    :param abs_before: Unix epoch.
+    :param rel_before: seconds since closeTime of the ledger in which the ClaimableBalanceEntry was created.
+    """
+
     def __init__(
         self,
         claim_predicate_type: ClaimPredicateType,
@@ -31,7 +47,7 @@ class ClaimPredicate:
         not_predicate: Optional["ClaimPredicate"],
         abs_before: Optional[int],
         rel_before: Optional[int],
-    ):
+    ) -> None:
         self.claim_predicate_type = claim_predicate_type
         self.and_predicates = and_predicates
         self.or_predicates = or_predicates
@@ -40,7 +56,15 @@ class ClaimPredicate:
         self.rel_before = rel_before
 
     @classmethod
-    def predicate_and(cls, left: "ClaimPredicate", right: "ClaimPredicate"):
+    def predicate_and(
+        cls, left: "ClaimPredicate", right: "ClaimPredicate"
+    ) -> "ClaimPredicate":
+        """Returns an `and` claim predicate
+
+        :param left: a ClaimPredicate.
+        :param right: a ClaimPredicate.
+        :return: an `and` claim predicate.
+        """
         return cls(
             claim_predicate_type=ClaimPredicateType.CLAIM_PREDICATE_AND,
             and_predicates=[left, right],
@@ -51,7 +75,15 @@ class ClaimPredicate:
         )
 
     @classmethod
-    def predicate_or(cls, left: "ClaimPredicate", right: "ClaimPredicate"):
+    def predicate_or(
+        cls, left: "ClaimPredicate", right: "ClaimPredicate"
+    ) -> "ClaimPredicate":
+        """Returns an `or` claim predicate
+
+        :param left: a ClaimPredicate.
+        :param right: a ClaimPredicate.
+        :return: an `or` claim predicate.
+        """
         return cls(
             claim_predicate_type=ClaimPredicateType.CLAIM_PREDICATE_OR,
             and_predicates=None,
@@ -62,7 +94,12 @@ class ClaimPredicate:
         )
 
     @classmethod
-    def predicate_not(cls, predicate: "ClaimPredicate"):
+    def predicate_not(cls, predicate: "ClaimPredicate") -> "ClaimPredicate":
+        """Returns a `not` claim predicate.
+
+        :param predicate: a ClaimPredicate.
+        :return: a `not` claim predicate.
+        """
         return cls(
             claim_predicate_type=ClaimPredicateType.CLAIM_PREDICATE_NOT,
             and_predicates=None,
@@ -73,7 +110,15 @@ class ClaimPredicate:
         )
 
     @classmethod
-    def predicate_before_absolute_time(cls, abs_before: int):
+    def predicate_before_absolute_time(cls, abs_before: int) -> "ClaimPredicate":
+        """Returns a `before_absolute_time` claim predicate.
+
+        This predicate will be fulfilled if the closing time of the ledger that includes
+        the :class:`CreateClaimableBalance` operation is less than this (absolute) Unix timestamp.
+
+        :param abs_before: Unix epoch.
+        :return: a `before_absolute_time` claim predicate.
+        """
         return cls(
             claim_predicate_type=ClaimPredicateType.CLAIM_PREDICATE_BEFORE_ABSOLUTE_TIME,
             and_predicates=None,
@@ -84,7 +129,16 @@ class ClaimPredicate:
         )
 
     @classmethod
-    def predicate_before_relative_time(cls, seconds: int):
+    def predicate_before_relative_time(cls, seconds: int) -> "ClaimPredicate":
+        """Returns a `before_relative_time` claim predicate.
+
+        This predicate will be fulfilled if the closing time of the ledger that
+        includes the :class:`CreateClaimableBalance` operation plus this relative time delta (in seconds)
+        is less than the current time.
+
+        :param seconds: seconds since closeTime of the ledger in which the ClaimableBalanceEntry was created.
+        :return: a `before_relative_time` claim predicate.
+        """
         return cls(
             claim_predicate_type=ClaimPredicateType.CLAIM_PREDICATE_BEFORE_RELATIVE_TIME,
             and_predicates=None,
@@ -95,7 +149,11 @@ class ClaimPredicate:
         )
 
     @classmethod
-    def predicate_unconditional(cls):
+    def predicate_unconditional(cls) -> "ClaimPredicate":
+        """Returns an unconditional claim predicate.
+
+        :return: an unconditional claim predicate.
+        """
         return cls(
             claim_predicate_type=ClaimPredicateType.CLAIM_PREDICATE_UNCONDITIONAL,
             and_predicates=None,
@@ -105,7 +163,7 @@ class ClaimPredicate:
             rel_before=None,
         )
 
-    def to_xdr_object(self):
+    def to_xdr_object(self) -> Xdr.nullclass:
         data = Xdr.nullclass()
         if (
             self.claim_predicate_type
@@ -182,15 +240,25 @@ class ClaimPredicate:
             right = cls.from_xdr_object(or_predicates[1])
             return cls.predicate_or(left, right)
         else:
-            raise ValueError("{} is an unsupported ClaimPredicateType.")
+            raise ValueError(
+                "{} is an unsupported ClaimPredicateType."
+            )  # pragma: no cover
 
 
 class Claimant:
-    def __init__(self, destination: str, predicate: ClaimPredicate):
-        self.destination = destination
-        self.predicate = predicate
+    """The :class:`Claimant` object represents a claimable balance claimant.
 
-    def to_xdr_object(self):
+    :param destination: The destination account ID.
+    :param predicate: The claim predicate. It is optional, it defaults to unconditional if none is specified.
+    """
+
+    def __init__(self, destination: str, predicate: ClaimPredicate = None) -> None:
+        self.destination = destination
+        if predicate is None:
+            predicate = ClaimPredicate.predicate_unconditional()
+        self.predicate: ClaimPredicate = predicate
+
+    def to_xdr_object(self) -> Xdr.nullclass:
         v0 = Xdr.nullclass()
         v0.destination = Keypair.from_public_key(self.destination).xdr_account_id()
         v0.predicate = self.predicate.to_xdr_object()
@@ -210,14 +278,32 @@ class Claimant:
 
 
 class CreateClaimableBalance(Operation):
+    """The :class:`CreateClaimableBalance` object, which represents a CreateClaimableBalance
+    operation on Stellar's network.
+
+    Creates a ClaimableBalanceEntry. See Claimable Balance
+    <https://developers.stellar.org/docs/glossary/claimable-balance/>_` for more information on parameters and usage.
+
+    See `Create Claimable Balance
+    <https://developers.stellar.org/docs/start/list-of-operations/#create-claimable-balance>_`.
+
+    Threshold: Medium
+
+    :param asset: The asset for the claimable balance.
+    :param amount: the amount of the asset.
+    :param claimants: A list of Claimants.
+    :param source: The source account (defaults to transaction source).
+    """
+
     def __init__(
         self,
         asset: Asset,
         amount: Union[str, Decimal],
         claimants: List[Claimant],
         source: str = None,
-    ):
+    ) -> None:
         super().__init__(source)
+        check_amount(amount)
         self.asset = asset
         self.amount = amount
         self.claimants = claimants
@@ -227,7 +313,7 @@ class CreateClaimableBalance(Operation):
     def type_code(cls) -> int:
         return Xdr.const.CREATE_CLAIMABLE_BALANCE
 
-    def _to_operation_body(self):
+    def _to_operation_body(self) -> Xdr.nullclass:
         body = Xdr.nullclass()
         body.type = Xdr.const.CREATE_CLAIMABLE_BALANCE
         asset = self.asset.to_xdr_object()
@@ -243,6 +329,9 @@ class CreateClaimableBalance(Operation):
     def from_xdr_object(
         cls, operation_xdr_object: Xdr.types.Operation
     ) -> "CreateClaimableBalance":
+        """Creates a :class:`CreateClaimableBalance` object from an XDR Operation
+        object.
+        """
         source = Operation.get_source_from_xdr_obj(operation_xdr_object)
         asset = Asset.from_xdr_object(
             operation_xdr_object.body.createClaimableBalanceOp.asset

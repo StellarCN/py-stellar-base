@@ -1342,6 +1342,20 @@ class TestClaimPredicate:
             ClaimPredicate.from_xdr_object(predicate.to_xdr_object())
         )
 
+    def test_predicate_invalid_type_raise(self):
+        predicate = ClaimPredicate(
+            claim_predicate_type="invalid",
+            and_predicates=None,
+            or_predicates=None,
+            not_predicate=None,
+            abs_before=None,
+            rel_before=1,
+        )
+        with pytest.raises(
+            ValueError, match=f"invalid is not a valid ClaimPredicateType."
+        ):
+            predicate.to_xdr_object()
+
 
 class TestClaimant:
     @staticmethod
@@ -1365,6 +1379,13 @@ class TestClaimant:
         )
         predicate = ClaimPredicate.predicate_and(predicate_left, predicate_right)
         claimant = Claimant(destination=destination, predicate=predicate)
+        assert self.to_xdr(claimant) == xdr
+        assert xdr == self.to_xdr(Claimant.from_xdr_object(claimant.to_xdr_object()))
+
+    def test_claimant_default(self):
+        xdr = "AAAAAAAAAACJmyhA7VY2xW3cXxSyOXX3nxuiOI0mlOTFbs3dyWDl7wAAAAA="
+        destination = "GCEZWKCA5VLDNRLN3RPRJMRZOX3Z6G5CHCGSNFHEYVXM3XOJMDS674JZ"
+        claimant = Claimant(destination=destination)
         assert self.to_xdr(claimant) == xdr
         assert xdr == self.to_xdr(Claimant.from_xdr_object(claimant.to_xdr_object()))
 
