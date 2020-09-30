@@ -17,12 +17,12 @@ class EndSponsoringFutureReserves(Operation):
 
     @classmethod
     def from_xdr_object(
-            cls, operation_xdr_object: Xdr.types.Operation
+        cls, operation_xdr_object: Xdr.types.Operation
     ) -> "EndSponsoringFutureReserves":
         """Creates a :class:`EndSponsoringFutureReserves` object from an XDR Operation
         object.
         """
         source = Operation.get_source_from_xdr_obj(operation_xdr_object)
-        op = cls(source=source, )
+        op = cls(source=source,)
         op._source_muxed = Operation.get_source_muxed_from_xdr_obj(operation_xdr_object)
         return op

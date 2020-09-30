@@ -1,9 +1,11 @@
 from .account_merge import AccountMerge
 from .allow_trust import AllowTrust, TrustLineEntryFlag
+from .begin_sponsoring_future_reserves import BeginSponsoringFutureReserves
 from .bump_sequence import BumpSequence
 from .change_trust import ChangeTrust
 from .create_account import CreateAccount
 from .create_passive_sell_offer import CreatePassiveSellOffer
+from .end_sponsoring_future_reserves import EndSponsoringFutureReserves
 from .inflation import Inflation
 from .manage_buy_offer import ManageBuyOffer
 from .manage_data import ManageData
@@ -13,6 +15,7 @@ from .path_payment import PathPayment
 from .path_payment_strict_receive import PathPaymentStrictReceive
 from .path_payment_strict_send import PathPaymentStrictSend
 from .payment import Payment
+from .revoke_sponsorship import RevokeSponsorship
 from .set_options import SetOptions, Flag
 
 __all__ = [
@@ -32,6 +35,9 @@ __all__ = [
     "PathPaymentStrictSend",
     "Payment",
     "SetOptions",
+    "BeginSponsoringFutureReserves",
+    "EndSponsoringFutureReserves",
+    "RevokeSponsorship",
     "TrustLineEntryFlag",
     "Flag",  # TODO: act like TrustLineEntryFlag
 ]

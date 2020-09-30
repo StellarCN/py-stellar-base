@@ -17,7 +17,9 @@ class BeginSponsoringFutureReserves(Operation):
 
     def _to_operation_body(self) -> Xdr.nullclass:
         sponsored_id = Keypair.from_public_key(self.sponsored_id).xdr_account_id()
-        begin_sponsoring_future_reserves_op = Xdr.types.BeginSponsoringFutureReservesOp(sponsoredID=sponsored_id)
+        begin_sponsoring_future_reserves_op = Xdr.types.BeginSponsoringFutureReservesOp(
+            sponsoredID=sponsored_id
+        )
         body = Xdr.nullclass()
         body.type = Xdr.const.BEGIN_SPONSORING_FUTURE_RESERVES
         body.beginSponsoringFutureReservesOp = begin_sponsoring_future_reserves_op
@@ -25,7 +27,7 @@ class BeginSponsoringFutureReserves(Operation):
 
     @classmethod
     def from_xdr_object(
-            cls, operation_xdr_object: Xdr.types.Operation
+        cls, operation_xdr_object: Xdr.types.Operation
     ) -> "BeginSponsoringFutureReserves":
         """Creates a :class:`BeginSponsoringFutureReserves` object from an XDR Operation
         object.

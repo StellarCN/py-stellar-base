@@ -7,9 +7,15 @@ from stellar_sdk.exceptions import Ed25519PublicKeyInvalidError, AssetCodeInvali
 from stellar_sdk.operation import Operation, CreateAccount
 from stellar_sdk.operation.account_merge import AccountMerge
 from stellar_sdk.operation.allow_trust import AllowTrust, TrustLineEntryFlag
+from stellar_sdk.operation.begin_sponsoring_future_reserves import (
+    BeginSponsoringFutureReserves,
+)
 from stellar_sdk.operation.bump_sequence import BumpSequence
 from stellar_sdk.operation.change_trust import ChangeTrust
 from stellar_sdk.operation.create_passive_sell_offer import CreatePassiveSellOffer
+from stellar_sdk.operation.end_sponsoring_future_reserves import (
+    EndSponsoringFutureReserves,
+)
 from stellar_sdk.operation.inflation import Inflation
 from stellar_sdk.operation.manage_buy_offer import ManageBuyOffer
 from stellar_sdk.operation.manage_data import ManageData
@@ -19,6 +25,7 @@ from stellar_sdk.operation.path_payment_strict_receive import PathPaymentStrictR
 from stellar_sdk.operation.path_payment_strict_send import PathPaymentStrictSend
 from stellar_sdk.operation.payment import Payment
 from stellar_sdk.operation.set_options import SetOptions, Flag
+from stellar_sdk.operation.revoke_sponsorship import RevokeSponsorship
 from stellar_sdk.operation.utils import (
     check_price,
     check_amount,
@@ -27,6 +34,7 @@ from stellar_sdk.operation.utils import (
     check_ed25519_public_key,
 )
 from stellar_sdk.signer import Signer
+from stellar_sdk.signer_key import SignerKey
 from stellar_sdk.utils import sha256
 
 
@@ -1212,3 +1220,131 @@ class TestOperationUtils:
     def test_check_asset_code_raise(self, asset_code):
         with pytest.raises(AssetCodeInvalidError, match="Asset code is invalid"):
             check_asset_code(asset_code)
+
+
+class TestBeginSponsoringFutureReserves:
+    def test_xdr(self):
+        source = "GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV"
+        sponsored_id = "GB2DRLHCWHUCB2BS4IRRY2GBQKVAKEXOU2EMTMLSUOXVNMZY7W6BSGZ7"
+        xdr = "AAAAAQAAAADX7fRsY6KTqIc8EIDyr8M9gxGPW6ODnZoZDgo6l1ymwwAAABAAAAAAdDis4rHoIOgy4iMcaMGCqgUS7qaIybFyo69Wszj9vBk="
+        op = BeginSponsoringFutureReserves(sponsored_id, source)
+        assert op.to_xdr_object().to_xdr() == xdr
+        assert (
+            Operation.from_xdr_object(op.to_xdr_object()).to_xdr_object().to_xdr()
+            == xdr
+        )
+
+    def test_xdr_no_source(self):
+        source = None
+        sponsored_id = "GB2DRLHCWHUCB2BS4IRRY2GBQKVAKEXOU2EMTMLSUOXVNMZY7W6BSGZ7"
+        xdr = "AAAAAAAAABAAAAAAdDis4rHoIOgy4iMcaMGCqgUS7qaIybFyo69Wszj9vBk="
+        op = BeginSponsoringFutureReserves(sponsored_id, source)
+        assert op.to_xdr_object().to_xdr() == xdr
+        assert (
+            Operation.from_xdr_object(op.to_xdr_object()).to_xdr_object().to_xdr()
+            == xdr
+        )
+
+
+class TestEndSponsoringFutureReserves:
+    def test_xdr(self):
+        source = "GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV"
+        xdr = "AAAAAQAAAADX7fRsY6KTqIc8EIDyr8M9gxGPW6ODnZoZDgo6l1ymwwAAABE="
+        op = EndSponsoringFutureReserves(source)
+        assert op.to_xdr_object().to_xdr() == xdr
+        assert (
+            Operation.from_xdr_object(op.to_xdr_object()).to_xdr_object().to_xdr()
+            == xdr
+        )
+
+    def test_xdr_no_source(self):
+        source = None
+        xdr = "AAAAAAAAABE="
+        op = EndSponsoringFutureReserves(source)
+        assert op.to_xdr_object().to_xdr() == xdr
+        assert (
+            Operation.from_xdr_object(op.to_xdr_object()).to_xdr_object().to_xdr()
+            == xdr
+        )
+
+
+class TestRevokeSponsorship:
+    def test_account_xdr(self):
+        source = "GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV"
+        account_id = "GB2DRLHCWHUCB2BS4IRRY2GBQKVAKEXOU2EMTMLSUOXVNMZY7W6BSGZ7"
+        xdr = "AAAAAQAAAADX7fRsY6KTqIc8EIDyr8M9gxGPW6ODnZoZDgo6l1ymwwAAABIAAAAAAAAAAAAAAAB0OKzisegg6DLiIxxowYKqBRLupojJsXKjr1azOP28GQ=="
+
+        op = RevokeSponsorship.revoke_account_sponsorship(account_id, source)
+        assert op.to_xdr_object().to_xdr() == xdr
+        assert (
+            Operation.from_xdr_object(op.to_xdr_object()).to_xdr_object().to_xdr()
+            == xdr
+        )
+
+    def test_trustline_xdr(self):
+        source = "GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV"
+        account_id = "GB2DRLHCWHUCB2BS4IRRY2GBQKVAKEXOU2EMTMLSUOXVNMZY7W6BSGZ7"
+        asset = Asset("CAT", "GCEYOF66NL73LL6RIPSIP34WOCESQ3GKJOAYXOEVNKRWRNQRYUILCQWC")
+        xdr = "AAAAAQAAAADX7fRsY6KTqIc8EIDyr8M9gxGPW6ODnZoZDgo6l1ymwwAAABIAAAAAAAAAAQAAAAB0OKzisegg6DLiIxxowYKqBRLupojJsXKjr1azOP28GQAAAAFDQVQAAAAAAImHF95q/7Wv0UPkh++WcIkobMpLgYu4lWqjaLYRxRCx"
+
+        op = RevokeSponsorship.revoke_trustline_sponsorship(account_id, asset, source)
+        assert op.to_xdr_object().to_xdr() == xdr
+        assert (
+            Operation.from_xdr_object(op.to_xdr_object()).to_xdr_object().to_xdr()
+            == xdr
+        )
+
+    def test_offer_xdr(self):
+        source = "GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV"
+        seller_id = "GB2DRLHCWHUCB2BS4IRRY2GBQKVAKEXOU2EMTMLSUOXVNMZY7W6BSGZ7"
+        offer_id = 12345
+        xdr = "AAAAAQAAAADX7fRsY6KTqIc8EIDyr8M9gxGPW6ODnZoZDgo6l1ymwwAAABIAAAAAAAAAAgAAAAB0OKzisegg6DLiIxxowYKqBRLupojJsXKjr1azOP28GQAAAAAAADA5"
+
+        op = RevokeSponsorship.revoke_offer_sponsorship(seller_id, offer_id, source)
+        assert op.to_xdr_object().to_xdr() == xdr
+        assert (
+            Operation.from_xdr_object(op.to_xdr_object()).to_xdr_object().to_xdr()
+            == xdr
+        )
+
+    def test_date_xdr(self):
+        source = "GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV"
+        account_id = "GB2DRLHCWHUCB2BS4IRRY2GBQKVAKEXOU2EMTMLSUOXVNMZY7W6BSGZ7"
+        data_name = "Stellar Python SDK"
+        xdr = "AAAAAQAAAADX7fRsY6KTqIc8EIDyr8M9gxGPW6ODnZoZDgo6l1ymwwAAABIAAAAAAAAAAwAAAAB0OKzisegg6DLiIxxowYKqBRLupojJsXKjr1azOP28GQAAABJTdGVsbGFyIFB5dGhvbiBTREsAAA=="
+
+        op = RevokeSponsorship.revoke_data_sponsorship(account_id, data_name, source)
+        assert op.to_xdr_object().to_xdr() == xdr
+        assert (
+            Operation.from_xdr_object(op.to_xdr_object()).to_xdr_object().to_xdr()
+            == xdr
+        )
+
+    def test_claimable_balance_id_xdr(self):
+        source = "GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV"
+        balance_id = (
+            "00000000da0d57da7d4850e7fc10d2a9d0ebc731f7afb40574c03395b17d49149b91f5be"
+        )
+        xdr = "AAAAAQAAAADX7fRsY6KTqIc8EIDyr8M9gxGPW6ODnZoZDgo6l1ymwwAAABIAAAAAAAAABAAAAADaDVfafUhQ5/wQ0qnQ68cx96+0BXTAM5WxfUkUm5H1vg=="
+
+        op = RevokeSponsorship.revoke_claimable_balance_sponsorship(balance_id, source)
+        assert op.to_xdr_object().to_xdr() == xdr
+        assert (
+            Operation.from_xdr_object(op.to_xdr_object()).to_xdr_object().to_xdr()
+            == xdr
+        )
+
+    def test_signer_xdr(self):
+        source = "GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV"
+        account_id = "GB2DRLHCWHUCB2BS4IRRY2GBQKVAKEXOU2EMTMLSUOXVNMZY7W6BSGZ7"
+        signer_key = SignerKey.ed25519_public_key(
+            "GCEYOF66NL73LL6RIPSIP34WOCESQ3GKJOAYXOEVNKRWRNQRYUILCQWC"
+        )
+        xdr = "AAAAAQAAAADX7fRsY6KTqIc8EIDyr8M9gxGPW6ODnZoZDgo6l1ymwwAAABIAAAABAAAAAHQ4rOKx6CDoMuIjHGjBgqoFEu6miMmxcqOvVrM4/bwZAAAAAImHF95q/7Wv0UPkh++WcIkobMpLgYu4lWqjaLYRxRCx"
+
+        op = RevokeSponsorship.revoke_signer_sponsorship(account_id, signer_key, source)
+        assert op.to_xdr_object().to_xdr() == xdr
+        assert (
+            Operation.from_xdr_object(op.to_xdr_object()).to_xdr_object().to_xdr()
+            == xdr
+        )
