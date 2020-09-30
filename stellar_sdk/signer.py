@@ -12,7 +12,7 @@ class Signer:
     """
 
     def __init__(self, signer_key: SignerKey, weight) -> "None":
-        self.signer_key: Xdr.types.SignerKey = signer_key
+        self.signer_key: SignerKey = signer_key
         self.weight: int = weight
 
     @classmethod
@@ -58,7 +58,7 @@ class Signer:
 
         :return: XDR Signer object
         """
-        return Xdr.types.Signer(self.signer_key, self.weight)
+        return Xdr.types.Signer(self.signer_key.to_xdr_object(), self.weight)
 
     @classmethod
     def from_xdr_object(cls, signer_xdr_object: Xdr.types.Signer) -> "Signer":
