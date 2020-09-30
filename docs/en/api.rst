@@ -425,6 +425,25 @@ SetOptions
 .. autoclass:: stellar_sdk.operation.set_options.Flag
    :members:
 
+CreateClaimableBalance
+----------------------
+.. autoclass:: stellar_sdk.operation.CreateClaimableBalance
+   :members: to_xdr_object, from_xdr_object
+
+.. autoclass:: stellar_sdk.operation.Claimant
+   :members:
+
+.. autoclass:: stellar_sdk.operation.ClaimPredicate
+   :members:
+
+.. autoclass:: stellar_sdk.operation.create_claimable_balance.ClaimPredicateType
+   :members:
+
+ClaimClaimableBalance
+---------------------
+.. autoclass:: stellar_sdk.operation.ClaimClaimableBalance
+   :members: to_xdr_object, from_xdr_object
+
 Price
 ^^^^^
 
