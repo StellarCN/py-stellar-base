@@ -716,18 +716,18 @@ def _add_operation(
         add_body_line("signer._present", _false if signer is None else _true)
         if signer is None:
             return
-        if signer.signer_key.type == Xdr.const.SIGNER_KEY_TYPE_ED25519:
+        if signer.signer_key.signer_key.type == Xdr.const.SIGNER_KEY_TYPE_ED25519:
             add_body_line(
                 "signer.key",
-                StrKey.encode_ed25519_public_key(signer.signer_key.ed25519),
+                StrKey.encode_ed25519_public_key(signer.signer_key.signer_key.ed25519),
             )
-        if signer.signer_key.type == Xdr.const.SIGNER_KEY_TYPE_PRE_AUTH_TX:
+        if signer.signer_key.signer_key.type == Xdr.const.SIGNER_KEY_TYPE_PRE_AUTH_TX:
             add_body_line(
-                "signer.key", StrKey.encode_pre_auth_tx(signer.signer_key.preAuthTx)
+                "signer.key", StrKey.encode_pre_auth_tx(signer.signer_key.signer_key.preAuthTx)
             )
-        if signer.signer_key.type == Xdr.const.SIGNER_KEY_TYPE_HASH_X:
+        if signer.signer_key.signer_key.type == Xdr.const.SIGNER_KEY_TYPE_HASH_X:
             add_body_line(
-                "signer.key", StrKey.encode_sha256_hash(signer.signer_key.hashX)
+                "signer.key", StrKey.encode_sha256_hash(signer.signer_key.signer_key.hashX)
             )
         add_body_line("signer.weight", signer.weight)
 
