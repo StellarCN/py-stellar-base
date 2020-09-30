@@ -6,6 +6,21 @@ from ..xdr import Xdr
 
 
 class BeginSponsoringFutureReserves(Operation):
+    """The :class:`BeginSponsoringFutureReserves` object, which represents a BeginSponsoringFutureReserves
+    operation on Stellar's network.
+
+    Establishes the is-sponsoring-future-reserves-for relationship between the source account and sponsoredID.
+    See `Sponsored Reserves <https://developers.stellar.org/docs/glossary/sponsored-reserves/>_` for more information.
+
+    See `Begin Sponsoring Future Reserves
+    <https://developers.stellar.org/docs/start/list-of-operations/#begin-sponsoring-future-reserves>_`.
+
+    Threshold: Medium
+
+    :param sponsored_id: The sponsored account id.
+    :param source: The source account (defaults to transaction source).
+    """
+
     def __init__(self, sponsored_id: str, source: str = None) -> None:
         super().__init__(source)
         check_ed25519_public_key(sponsored_id)

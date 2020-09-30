@@ -9,6 +9,7 @@ from ..signer_key import SignerKey
 from ..strkey import StrKey
 from ..xdr import Xdr
 from ..exceptions import ValueError
+from .utils import check_ed25519_public_key
 
 
 class RevokeSponsorshipType(IntEnum):
@@ -25,29 +26,37 @@ class RevokeSponsorshipType(IntEnum):
 
 class TrustLine:
     def __init__(self, account_id: str, asset: Asset) -> None:
+        check_ed25519_public_key(account_id)
         self.account_id = account_id
         self.asset = asset
 
 
 class Offer:
     def __init__(self, seller_id: str, offer_id: int) -> None:
+        check_ed25519_public_key(seller_id)
         self.seller_id = seller_id
         self.offer_id = offer_id
 
 
 class Data:
     def __init__(self, account_id: str, data_name: str) -> None:
+        check_ed25519_public_key(account_id)
         self.account_id = account_id
         self.data_name = data_name
 
 
 class Signer:
     def __init__(self, account_id: str, signer_key: SignerKey) -> None:
+        check_ed25519_public_key(account_id)
         self.account_id = account_id
         self.signer_key = signer_key
 
 
 class RevokeSponsorship(Operation):
+    """
+
+    """
+
     def __init__(
         self,
         revoke_sponsorship_type: RevokeSponsorshipType,
@@ -74,6 +83,12 @@ class RevokeSponsorship(Operation):
 
     @classmethod
     def revoke_account_sponsorship(cls, account_id: str, source: str = None):
+        """Create a "revoke sponsorship" operation for an account.
+
+        :param account_id: The sponsored account ID.
+        :param source: The source account (defaults to transaction source).
+        :return: A "revoke sponsorship" operation for an account.
+        """
         return cls(
             revoke_sponsorship_type=RevokeSponsorshipType.ACCOUNT,
             account_id=account_id,
@@ -89,6 +104,13 @@ class RevokeSponsorship(Operation):
     def revoke_trustline_sponsorship(
         cls, account_id: str, asset: Asset, source: str = None
     ):
+        """Create a "revoke sponsorship" operation for a trustline.
+
+        :param account_id: The account ID which owns the trustline.
+        :param asset: The asset in the trustline.
+        :param source: The source account (defaults to transaction source).
+        :return: A "revoke sponsorship" operation for a trustline.
+        """
         trustline = TrustLine(account_id=account_id, asset=asset)
         return cls(
             revoke_sponsorship_type=RevokeSponsorshipType.TRUSTLINE,
@@ -105,6 +127,13 @@ class RevokeSponsorship(Operation):
     def revoke_offer_sponsorship(
         cls, seller_id: str, offer_id: int, source: str = None
     ):
+        """Create a "revoke sponsorship" operation for an offer.
+
+        :param seller_id: The account ID which created the offer.
+        :param offer_id: The offer ID.
+        :param source: The source account (defaults to transaction source).
+        :return: A "revoke sponsorship" operation for an offer.
+        """
         offer = Offer(seller_id=seller_id, offer_id=offer_id)
         return cls(
             revoke_sponsorship_type=RevokeSponsorshipType.OFFER,
@@ -121,6 +150,13 @@ class RevokeSponsorship(Operation):
     def revoke_data_sponsorship(
         cls, account_id: str, data_name: str, source: str = None
     ):
+        """Create a "revoke sponsorship" operation for a data entry.
+
+        :param account_id: The account ID which owns the data entry.
+        :param data_name: The name of the data entry
+        :param source: The source account (defaults to transaction source).
+        :return: A "revoke sponsorship" operation for a data entry.
+        """
         data = Data(account_id=account_id, data_name=data_name)
         return cls(
             revoke_sponsorship_type=RevokeSponsorshipType.DATA,
@@ -137,6 +173,12 @@ class RevokeSponsorship(Operation):
     def revoke_claimable_balance_sponsorship(
         cls, claimable_balance_id: str, source: str = None
     ):
+        """Create a "revoke sponsorship" operation for a claimable balance.
+
+        :param claimable_balance_id: The sponsored claimable balance ID.
+        :param source: The source account (defaults to transaction source).
+        :return: A "revoke sponsorship" operation for a claimable balance.
+        """
         return cls(
             revoke_sponsorship_type=RevokeSponsorshipType.CLAIMABLE_BALANCE,
             account_id=None,
@@ -152,6 +194,13 @@ class RevokeSponsorship(Operation):
     def revoke_signer_sponsorship(
         cls, account_id: str, signer_key: SignerKey, source: str = None
     ):
+        """Create a "revoke sponsorship" operation for a signer.
+
+        :param account_id: The account ID where the signer sponsorship is being removed from.
+        :param signer_key: The signer whose sponsorship is being removed.
+        :param source: The source account (defaults to transaction source).
+        :return: A "revoke sponsorship" operation for a signer.
+        """
         signer = Signer(account_id=account_id, signer_key=signer_key)
         return cls(
             revoke_sponsorship_type=RevokeSponsorshipType.SIGNER,
@@ -293,8 +342,7 @@ class RevokeSponsorship(Operation):
                 balance_id = binascii.hexlify(balance_id).decode()
                 op = cls.revoke_claimable_balance_sponsorship(balance_id, source)
             else:
-                raise ValueError
-
+                raise ValueError(f"{ledger_key_type} is an unsupported LedgerKey type.")
         elif op_type == Xdr.const.REVOKE_SPONSORSHIP_SIGNER:
             account_id = StrKey.encode_ed25519_public_key(
                 operation_xdr_object.body.revokeSponsorshipOp.signer.accountID.ed25519
@@ -302,9 +350,8 @@ class RevokeSponsorship(Operation):
             signer_key = SignerKey.from_xdr_object(
                 operation_xdr_object.body.revokeSponsorshipOp.signer.signerKey
             )
-            return cls.revoke_signer_sponsorship(account_id, signer_key, source)
+            op = cls.revoke_signer_sponsorship(account_id, signer_key, source)
         else:
-            pass
-
+            raise ValueError(f"{op_type} is an unsupported RevokeSponsorship type.")
         op._source_muxed = Operation.get_source_muxed_from_xdr_obj(operation_xdr_object)
         return op

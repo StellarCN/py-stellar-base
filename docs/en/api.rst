@@ -425,6 +425,21 @@ SetOptions
 .. autoclass:: stellar_sdk.operation.set_options.Flag
    :members:
 
+BeginSponsoringFutureReserves
+-----------------------------
+.. autoclass:: stellar_sdk.operation.BeginSponsoringFutureReserves
+   :members: to_xdr_object, from_xdr_object
+
+EndSponsoringFutureReserves
+---------------------------
+.. autoclass:: stellar_sdk.operation.EndSponsoringFutureReserves
+   :members: to_xdr_object, from_xdr_object
+
+RevokeSponsorship
+-----------------
+.. autoclass:: stellar_sdk.operation.RevokeSponsorship
+   :members: to_xdr_object, from_xdr_object
+
 Price
 ^^^^^
 
