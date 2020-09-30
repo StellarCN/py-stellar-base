@@ -281,7 +281,7 @@ class CreateClaimableBalance(Operation):
     """The :class:`CreateClaimableBalance` object, which represents a CreateClaimableBalance
     operation on Stellar's network.
 
-    Creates a ClaimableBalanceEntry. See Claimable Balance
+    Creates a ClaimableBalanceEntry. See `Claimable Balance
     <https://developers.stellar.org/docs/glossary/claimable-balance/>_` for more information on parameters and usage.
 
     See `Create Claimable Balance
