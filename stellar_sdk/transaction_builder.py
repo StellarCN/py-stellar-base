@@ -828,3 +828,33 @@ class TransactionBuilder:
         """
         op = BumpSequence(bump_to, source)
         return self.append_operation(op)
+
+    def append_create_claimable_balance_op(
+        self,
+        asset: Asset,
+        amount: Union[str, Decimal],
+        claimants: List[Claimant],
+        source: str = None,
+    ) -> "TransactionBuilder":
+        """Append a :class:`CreateClaimableBalance <stellar_sdk.operation.CreateClaimableBalance>`
+        operation to the list of operations.
+
+        :param asset: The asset for the claimable balance.
+        :param amount: the amount of the asset.
+        :param claimants: A list of Claimants.
+        :param source: The source account (defaults to transaction source).
+        """
+        op = CreateClaimableBalance(asset, amount, claimants, source)
+        return self.append_operation(op)
+
+    def append_claim_claimable_balance_op(
+        self, balance_id: str, source: str = None
+    ) -> "TransactionBuilder":
+        """Append a :class:`ClaimClaimableBalance <stellar_sdk.operation.ClaimClaimableBalance>`
+        operation to the list of operations.
+
+        :param balance_id: The claimable balance id to be claimed.
+        :param source: The source account (defaults to transaction source).
+        """
+        op = ClaimClaimableBalance(balance_id, source)
+        return self.append_operation(op)
