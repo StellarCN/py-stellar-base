@@ -413,3 +413,62 @@ class TestTransactionBuilder:
             source, Network.TESTNET_NETWORK_PASSPHRASE, base_fee=150
         ).add_return_hash_memo(memo_hash)
         assert builder.memo == ReturnHashMemo(memo_hash)
+
+    def test_to_xdr_sponsored_reserves(self):
+        sequence = 1
+        source = Account(
+            "GDF5O4OWEMVBY5FLDHWA5RZTYSV2U276XGKZZ6VSHDDR3THSQ6OQS7UM", sequence
+        )
+        builder = TransactionBuilder(
+            source, Network.TESTNET_NETWORK_PASSPHRASE, base_fee=150, v1=False
+        )
+        builder.add_text_memo("Stellar Python SDK")
+        builder.add_time_bounds(1565590000, 1565600000)
+        op_source = "GDF5O4OWEMVBY5FLDHWA5RZTYSV2U276XGKZZ6VSHDDR3THSQ6OQS7UM"
+        op_account_id = "GCWWANEIF3Z4DMOE4LDRCS22HLLHOEQCOF3QKAC2XWTSYR2AEEQ3P5FW"
+        te = (
+            builder.append_begin_sponsoring_future_reserves_op(
+                sponsored_id="GCEYOF66NL73LL6RIPSIP34WOCESQ3GKJOAYXOEVNKRWRNQRYUILCQWC",
+                source=op_source,
+            )
+            .append_end_sponsoring_future_reserves_op(source=op_source)
+            .append_revoke_account_sponsorship_op(
+                account_id=op_account_id, source=op_source
+            )
+            .append_revoke_trustline_sponsorship_op(
+                account_id=op_account_id, asset=Asset.native(), source=op_source
+            )
+            .append_revoke_offer_sponsorship_op(
+                seller_id=op_account_id, offer_id=12315, source=op_source
+            )
+            .append_revoke_data_sponsorship_op(
+                account_id=op_account_id, data_name="stellar", source=op_source
+            )
+            .append_revoke_claimable_balance_sponsorship_op(
+                claimable_balance_id="00000000da0d57da7d4850e7fc10d2a9d0ebc731f7afb40574c03395b17d49149b91f5be",
+                source=op_source,
+            )
+            .append_revoke_ed25519_public_key_signer_sponsorship_op(
+                account_id=op_account_id,
+                signer_key="GBWYVWA2PZBTRRBNZI55OG4EFDJSDNL6ASP2VAQKHORNUSSXP2NCV4N2",
+                source=op_source,
+            )
+            .append_revoke_hashx_signer_sponsorship_op(
+                account_id=op_account_id,
+                signer_key="da0d57da7d4850e7fc10d2a9d0ebc731f7afb40574c03395b17d49149b91f5be",
+                source=op_source,
+            )
+            .append_revoke_pre_auth_tx_signer_sponsorship_op(
+                account_id=op_account_id,
+                signer_key="da0d57da7d4850e7fc10d2a9d0ebc731f7afb40574c03395b17d49149b91f5be",
+                source=op_source,
+            )
+            .build()
+        )
+
+        xdr = "AAAAAMvXcdYjKhx0qxnsDsczxKuqa/65lZz6sjjHHczyh50JAAAF3AAAAAAAAAACAAAAAQAAAABdUQHwAAAAAF1RKQAAAAABAAAAElN0ZWxsYXIgUHl0aG9uIFNESwAAAAAACgAAAAEAAAAAy9dx1iMqHHSrGewOxzPEq6pr/rmVnPqyOMcdzPKHnQkAAAAQAAAAAImHF95q/7Wv0UPkh++WcIkobMpLgYu4lWqjaLYRxRCxAAAAAQAAAADL13HWIyocdKsZ7A7HM8Srqmv+uZWc+rI4xx3M8oedCQAAABEAAAABAAAAAMvXcdYjKhx0qxnsDsczxKuqa/65lZz6sjjHHczyh50JAAAAEgAAAAAAAAAAAAAAAK1gNIgu88GxxOLHEUtaOtZ3EgJxdwUAWr2nLEdAISG3AAAAAQAAAADL13HWIyocdKsZ7A7HM8Srqmv+uZWc+rI4xx3M8oedCQAAABIAAAAAAAAAAQAAAACtYDSILvPBscTixxFLWjrWdxICcXcFAFq9pyxHQCEhtwAAAAAAAAABAAAAAMvXcdYjKhx0qxnsDsczxKuqa/65lZz6sjjHHczyh50JAAAAEgAAAAAAAAACAAAAAK1gNIgu88GxxOLHEUtaOtZ3EgJxdwUAWr2nLEdAISG3AAAAAAAAMBsAAAABAAAAAMvXcdYjKhx0qxnsDsczxKuqa/65lZz6sjjHHczyh50JAAAAEgAAAAAAAAADAAAAAK1gNIgu88GxxOLHEUtaOtZ3EgJxdwUAWr2nLEdAISG3AAAAB3N0ZWxsYXIAAAAAAQAAAADL13HWIyocdKsZ7A7HM8Srqmv+uZWc+rI4xx3M8oedCQAAABIAAAAAAAAABAAAAADaDVfafUhQ5/wQ0qnQ68cx96+0BXTAM5WxfUkUm5H1vgAAAAEAAAAAy9dx1iMqHHSrGewOxzPEq6pr/rmVnPqyOMcdzPKHnQkAAAASAAAAAQAAAACtYDSILvPBscTixxFLWjrWdxICcXcFAFq9pyxHQCEhtwAAAABtitgafkM4xC3KO9cbhCjTIbV+BJ+qggo7otpKV36aKgAAAAEAAAAAy9dx1iMqHHSrGewOxzPEq6pr/rmVnPqyOMcdzPKHnQkAAAASAAAAAQAAAACtYDSILvPBscTixxFLWjrWdxICcXcFAFq9pyxHQCEhtwAAAALaDVfafUhQ5/wQ0qnQ68cx96+0BXTAM5WxfUkUm5H1vgAAAAEAAAAAy9dx1iMqHHSrGewOxzPEq6pr/rmVnPqyOMcdzPKHnQkAAAASAAAAAQAAAACtYDSILvPBscTixxFLWjrWdxICcXcFAFq9pyxHQCEhtwAAAAHaDVfafUhQ5/wQ0qnQ68cx96+0BXTAM5WxfUkUm5H1vgAAAAAAAAAA"
+        assert te.to_xdr() == xdr
+        restore_te = TransactionBuilder.from_xdr(
+            xdr, Network.TESTNET_NETWORK_PASSPHRASE
+        ).build()
+        assert restore_te.to_xdr() == xdr

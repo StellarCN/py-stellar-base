@@ -459,6 +459,21 @@ RevokeSponsorship
 .. autoclass:: stellar_sdk.operation.RevokeSponsorship
    :members: to_xdr_object, from_xdr_object
 
+.. autoclass:: stellar_sdk.operation.revoke_sponsorship.RevokeSponsorshipType
+   :members:
+
+.. autoclass:: stellar_sdk.operation.revoke_sponsorship.TrustLine
+   :members:
+
+.. autoclass:: stellar_sdk.operation.revoke_sponsorship.Offer
+   :members:
+
+.. autoclass:: stellar_sdk.operation.revoke_sponsorship.Data
+   :members:
+
+.. autoclass:: stellar_sdk.operation.revoke_sponsorship.Signer
+   :members:
+
 Price
 ^^^^^
 
