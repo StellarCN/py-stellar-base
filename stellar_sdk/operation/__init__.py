@@ -3,7 +3,9 @@ from .allow_trust import AllowTrust, TrustLineEntryFlag
 from .begin_sponsoring_future_reserves import BeginSponsoringFutureReserves
 from .bump_sequence import BumpSequence
 from .change_trust import ChangeTrust
+from .claim_claimable_balance import ClaimClaimableBalance
 from .create_account import CreateAccount
+from .create_claimable_balance import CreateClaimableBalance, Claimant, ClaimPredicate
 from .create_passive_sell_offer import CreatePassiveSellOffer
 from .end_sponsoring_future_reserves import EndSponsoringFutureReserves
 from .inflation import Inflation
@@ -24,7 +26,11 @@ __all__ = [
     "AllowTrust",
     "BumpSequence",
     "ChangeTrust",
+    "ClaimClaimableBalance",
     "CreateAccount",
+    "CreateClaimableBalance",
+    "Claimant",
+    "ClaimPredicate",
     "CreatePassiveSellOffer",
     "Inflation",
     "ManageBuyOffer",
