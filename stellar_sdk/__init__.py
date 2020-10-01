@@ -21,6 +21,7 @@ from .network import Network
 from .price import Price
 from .server import Server
 from .signer import Signer
+from .signer_key import SignerKey
 from .time_bounds import TimeBounds
 from .transaction import Transaction
 from .transaction_builder import TransactionBuilder
@@ -53,6 +54,7 @@ __all__ = (
         "Price",
         "Server",
         "Signer",
+        "SignerKey",
         "TimeBounds",
         "Transaction",
         "TransactionBuilder",

@@ -3,6 +3,7 @@ import warnings
 from decimal import Decimal
 from typing import List, Union, Optional
 
+from .signer_key import SignerKey
 from .account import Account
 from .asset import Asset
 from .exceptions import ValueError
@@ -857,4 +858,144 @@ class TransactionBuilder:
         :param source: The source account (defaults to transaction source).
         """
         op = ClaimClaimableBalance(balance_id, source)
+        return self.append_operation(op)
+
+    def append_begin_sponsoring_future_reserves_op(
+        self, sponsored_id: str, source: str = None
+    ) -> "TransactionBuilder":
+        """Append a :class:`BeginSponsoringFutureReserves <stellar_sdk.operation.BeginSponsoringFutureReserves>`
+        operation to the list of operations.
+
+        :param sponsored_id: The sponsored account id.
+        :param source: The source account (defaults to transaction source).
+        :return: This builder instance.
+        """
+        op = BeginSponsoringFutureReserves(sponsored_id, source)
+        return self.append_operation(op)
+
+    def append_end_sponsoring_future_reserves_op(
+        self, source: str = None
+    ) -> "TransactionBuilder":
+        """Append a :class:`EndSponsoringFutureReserves <stellar_sdk.operation.EndSponsoringFutureReserves>`
+        operation to the list of operations.
+
+        :param source: The source account (defaults to transaction source).
+        :return: This builder instance.
+        """
+        op = EndSponsoringFutureReserves(source)
+        return self.append_operation(op)
+
+    def append_revoke_account_sponsorship_op(
+        self, account_id: str, source: str = None
+    ) -> "TransactionBuilder":
+        """Append a :class:`EndSponsoringFutureReserves <stellar_sdk.operation.EndSponsoringFutureReserves>` operation
+        for an account to the list of operations.
+
+        :param account_id: The sponsored account ID.
+        :param source: The source account (defaults to transaction source).
+        :return: This builder instance.
+        """
+        op = RevokeSponsorship.revoke_account_sponsorship(account_id, source)
+        return self.append_operation(op)
+
+    def append_revoke_trustline_sponsorship_op(
+        self, account_id: str, asset: Asset, source: str = None
+    ) -> "TransactionBuilder":
+        """Append a :class:`EndSponsoringFutureReserves <stellar_sdk.operation.EndSponsoringFutureReserves>` operation
+        for a trustline to the list of operations.
+
+        :param account_id: The account ID which owns the trustline.
+        :param asset: The asset in the trustline.
+        :param source: The source account (defaults to transaction source).
+        :return: This builder instance.
+        """
+        op = RevokeSponsorship.revoke_trustline_sponsorship(account_id, asset, source)
+        return self.append_operation(op)
+
+    def append_revoke_offer_sponsorship_op(
+        self, seller_id: str, offer_id: int, source: str = None
+    ) -> "TransactionBuilder":
+        """Append a :class:`EndSponsoringFutureReserves <stellar_sdk.operation.EndSponsoringFutureReserves>` operation
+        for an offer to the list of operations.
+
+        :param seller_id: The account ID which created the offer.
+        :param offer_id: The offer ID.
+        :param source: The source account (defaults to transaction source).
+        :return: This builder instance.
+        """
+        op = RevokeSponsorship.revoke_offer_sponsorship(seller_id, offer_id, source)
+        return self.append_operation(op)
+
+    def append_revoke_data_sponsorship_op(
+        self, account_id: str, data_name: str, source: str = None
+    ) -> "TransactionBuilder":
+        """Append a :class:`EndSponsoringFutureReserves <stellar_sdk.operation.EndSponsoringFutureReserves>` operation
+        for a data entry to the list of operations.
+
+        :param account_id: The account ID which owns the data entry.
+        :param data_name: The name of the data entry
+        :param source: The source account (defaults to transaction source).
+        :return: This builder instance.
+        """
+        op = RevokeSponsorship.revoke_data_sponsorship(account_id, data_name, source)
+        return self.append_operation(op)
+
+    def append_revoke_claimable_balance_sponsorship_op(
+        self, claimable_balance_id: str, source: str = None
+    ) -> "TransactionBuilder":
+        """Append a :class:`EndSponsoringFutureReserves <stellar_sdk.operation.EndSponsoringFutureReserves>` operation
+        for a claimable to the list of operations.
+
+        :param claimable_balance_id: The sponsored claimable balance ID.
+        :param source: The source account (defaults to transaction source).
+        :return: This builder instance.
+        """
+        op = RevokeSponsorship.revoke_claimable_balance_sponsorship(
+            claimable_balance_id, source
+        )
+        return self.append_operation(op)
+
+    def append_revoke_ed25519_public_key_signer_sponsorship_op(
+        self, account_id: str, signer_key: str, source: str = None
+    ) -> "TransactionBuilder":
+        """Append a :class:`EndSponsoringFutureReserves <stellar_sdk.operation.EndSponsoringFutureReserves>` operation
+        for a ed25519_public_key signer to the list of operations.
+
+        :param account_id: The account ID where the signer sponsorship is being removed from.
+        :param signer_key: The account id of the ed25519_public_key signer.
+        :param source: The source account (defaults to transaction source).
+        :return: This builder instance.
+        """
+        signer_key = SignerKey.ed25519_public_key(signer_key)
+        op = RevokeSponsorship.revoke_signer_sponsorship(account_id, signer_key, source)
+        return self.append_operation(op)
+
+    def append_revoke_hashx_signer_sponsorship_op(
+        self, account_id: str, signer_key: Union[bytes, str], source: str = None
+    ) -> "TransactionBuilder":
+        """Append a :class:`EndSponsoringFutureReserves <stellar_sdk.operation.EndSponsoringFutureReserves>` operation
+        for a hashx signer to the list of operations.
+
+        :param account_id: The account ID where the signer sponsorship is being removed from.
+        :param signer_key: The account id of the hashx signer.
+        :param source: The source account (defaults to transaction source).
+        :return: This builder instance.
+        """
+        signer_key = SignerKey.sha256_hash(hex_to_bytes(signer_key))
+        op = RevokeSponsorship.revoke_signer_sponsorship(account_id, signer_key, source)
+        return self.append_operation(op)
+
+    def append_revoke_pre_auth_tx_signer_sponsorship_op(
+        self, account_id: str, signer_key: Union[bytes, str], source: str = None
+    ) -> "TransactionBuilder":
+        """Append a :class:`EndSponsoringFutureReserves <stellar_sdk.operation.EndSponsoringFutureReserves>` operation
+        for a pre_auth_tx signer to the list of operations.
+
+        :param account_id: The account ID where the signer sponsorship is being removed from.
+        :param signer_key: The account id of the pre_auth_tx signer.
+        :param source: The source account (defaults to transaction source).
+        :return: This builder instance.
+        """
+        signer_key = SignerKey.pre_auth_tx(hex_to_bytes(signer_key))
+        op = RevokeSponsorship.revoke_signer_sponsorship(account_id, signer_key, source)
         return self.append_operation(op)
