@@ -5,6 +5,7 @@ from stellar_sdk.asset import Asset
 from stellar_sdk.call_builder import FeeStatsCallBuilder
 from stellar_sdk.call_builder.accounts_call_builder import AccountsCallBuilder
 from stellar_sdk.call_builder.assets_call_builder import AssetsCallBuilder
+from stellar_sdk.call_builder.claimable_balances_call_builder import ClaimableBalanceCallBuilder
 from stellar_sdk.call_builder.data_call_builder import DataCallBuilder
 from stellar_sdk.call_builder.effects_call_builder import EffectsCallBuilder
 from stellar_sdk.call_builder.ledgers_call_builder import LedgersCallBuilder
@@ -74,6 +75,7 @@ class TestServer:
         with Server(horizon_url, client) as server:
             assert server.accounts() == AccountsCallBuilder(horizon_url, client)
             assert server.assets() == AssetsCallBuilder(horizon_url, client)
+            assert server.claimable_balance() == ClaimableBalanceCallBuilder(horizon_url, client)
             assert server.data(
                 "GDV6FVHPY4JH7EEBSJYPQQYZA3OC6TKTM2TAXRHWT4EEL7BJ2BTDQT5D", "hello"
             ) == DataCallBuilder(

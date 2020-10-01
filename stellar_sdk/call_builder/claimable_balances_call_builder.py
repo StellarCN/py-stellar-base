@@ -9,7 +9,7 @@ from ..utils import convert_assets_to_horizon_param
 
 class ClaimableBalanceCallBuilder(BaseCallBuilder):
     """ Creates a new :class:`ClaimableBalanceCallBuilder` pointed to server defined by horizon_url.
-    Do not create this object directly, use :func:`stellar_sdk.server.Server.accounts`.
+    Do not create this object directly, use :func:`stellar_sdk.server.Server.claimable_balance`.
 
     :param horizon_url: Horizon server URL.
     :param client: The client instance used to send request.
