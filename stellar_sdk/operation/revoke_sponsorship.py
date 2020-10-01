@@ -1,3 +1,4 @@
+import base64
 import binascii
 from enum import IntEnum
 from typing import Optional
@@ -10,6 +11,7 @@ from ..strkey import StrKey
 from ..xdr import Xdr
 from ..exceptions import ValueError
 from .utils import check_ed25519_public_key
+from ..xdr.StellarXDR_type import ClaimableBalanceID
 
 
 class RevokeSponsorshipType(IntEnum):
@@ -53,8 +55,30 @@ class Signer:
 
 
 class RevokeSponsorship(Operation):
-    """
+    """The :class:`RevokeSponsorship` object, which represents a RevokeSponsorship
+    operation on Stellar's network.
 
+    The logic of this operation depends on the state of the source account.
+
+    If the source account is not sponsored or is sponsored by the owner of the specified entry or sub-entry,
+    then attempt to revoke the sponsorship. If the source account is sponsored, the next step depends on whether the
+    entry is sponsored or not. If it is sponsored, attempt to transfer the sponsorship to the sponsor
+    of the source account. If the entry is not sponsored, then establish the sponsorship.
+    See `Sponsored Reserves <https://developers.stellar.org/docs/glossary/sponsored-reserves/>_` for more information.
+
+    See `Revoke Sponsorship
+    <https://developers.stellar.org/docs/start/list-of-operations/#revoke-sponsorship>_`.
+
+    Threshold: Medium
+
+    :param revoke_sponsorship_type: The sponsored account id.
+    :param account_id: The sponsored account ID.
+    :param trustline: The sponsored trustline.
+    :param offer: The sponsored offer.
+    :param data: The sponsored data.
+    :param claimable_balance_id: The sponsored claimable balance.
+    :param signer: The sponsored signer.
+    :param source: The source account (defaults to transaction source).
     """
 
     def __init__(
@@ -276,9 +300,9 @@ class RevokeSponsorship(Operation):
             ledger_key.type = Xdr.const.CLAIMABLE_BALANCE
             claimable_balance_bytes = binascii.unhexlify(self.claimable_balance_id)
             claimable_balance = Xdr.nullclass()
-            balance_id = Xdr.nullclass()
-            balance_id.type = Xdr.const.CLAIMABLE_BALANCE_ID_TYPE_V0  # int32
-            balance_id.v0 = claimable_balance_bytes[4:]
+            balance_id = ClaimableBalanceID.from_xdr(
+                base64.b64encode(claimable_balance_bytes)
+            )
             claimable_balance.balanceID = balance_id
             ledger_key.claimableBalance = claimable_balance
             revoke_sponsorship_op = Xdr.nullclass()
@@ -338,7 +362,9 @@ class RevokeSponsorship(Operation):
                 data_name = ledger_key.data.dataName.decode()
                 op = cls.revoke_data_sponsorship(account_id, data_name, source)
             elif ledger_key_type == Xdr.const.CLAIMABLE_BALANCE:
-                balance_id = b"\x00" * 4 + ledger_key.claimableBalance.balanceID.v0
+                balance_id = base64.b64decode(
+                    ledger_key.claimableBalance.balanceID.to_xdr()
+                )
                 balance_id = binascii.hexlify(balance_id).decode()
                 op = cls.revoke_claimable_balance_sponsorship(balance_id, source)
             else:
