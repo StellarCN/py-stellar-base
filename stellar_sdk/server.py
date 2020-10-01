@@ -6,7 +6,7 @@ from .asset import Asset
 from .base_transaction_envelope import BaseTransactionEnvelope
 from .call_builder.accounts_call_builder import AccountsCallBuilder
 from .call_builder.assets_call_builder import AssetsCallBuilder
-from .call_builder.claimable_balances_call_builder import ClaimableBalanceCallBuilder
+from .call_builder.claimable_balances_call_builder import ClaimableBalancesCallBuilder
 from .call_builder.data_call_builder import DataCallBuilder
 from .call_builder.effects_call_builder import EffectsCallBuilder
 from .call_builder.fee_stats_call_builder import FeeStatsCallBuilder
@@ -184,12 +184,12 @@ class Server:
         """
         return AssetsCallBuilder(horizon_url=self.horizon_url, client=self._client)
 
-    def claimable_balance(self) -> ClaimableBalanceCallBuilder:
+    def claimable_balances(self) -> ClaimableBalancesCallBuilder:
         """
-        :return: New :class:`stellar_sdk.call_builder.ClaimableBalanceCallBuilder` object configured by
+        :return: New :class:`stellar_sdk.call_builder.ClaimableBalancesCallBuilder` object configured by
             a current Horizon server configuration.
         """
-        return ClaimableBalanceCallBuilder(
+        return ClaimableBalancesCallBuilder(
             horizon_url=self.horizon_url, client=self._client
         )
 

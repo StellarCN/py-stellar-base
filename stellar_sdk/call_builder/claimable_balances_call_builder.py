@@ -7,8 +7,8 @@ from ..client.base_sync_client import BaseSyncClient
 from ..utils import convert_assets_to_horizon_param
 
 
-class ClaimableBalanceCallBuilder(BaseCallBuilder):
-    """ Creates a new :class:`ClaimableBalanceCallBuilder` pointed to server defined by horizon_url.
+class ClaimableBalancesCallBuilder(BaseCallBuilder):
+    """ Creates a new :class:`ClaimableBalancesCallBuilder` pointed to server defined by horizon_url.
     Do not create this object directly, use :func:`stellar_sdk.server.Server.claimable_balance`.
 
     :param horizon_url: Horizon server URL.
@@ -21,36 +21,36 @@ class ClaimableBalanceCallBuilder(BaseCallBuilder):
         super().__init__(horizon_url, client)
         self.endpoint: str = "claimable_balances"
 
-    def for_sponsor(self, sponsor: str) -> "ClaimableBalanceCallBuilder":
+    def for_sponsor(self, sponsor: str) -> "ClaimableBalancesCallBuilder":
         """Returns all claimable balances which are sponsored by the given account ID.
 
         See `Claimable Balances <https://developers.stellar.org/api/resources/claimablebalances/list/>`_
 
         :param sponsor: the sponsor id, for example: `GDGQVOKHW4VEJRU2TETD6DBRKEO5ERCNF353LW5WBFW3JJWQ2BRQ6KDD`
-        :return: current ClaimableBalanceCallBuilder instance
+        :return: current ClaimableBalancesCallBuilder instance
         """
         self._add_query_param("sponsor", sponsor)
         return self
 
-    def for_asset(self, asset: Asset) -> "ClaimableBalanceCallBuilder":
+    def for_asset(self, asset: Asset) -> "ClaimableBalancesCallBuilder":
         """Returns all claimable balances which provide a balance for the given asset.
 
         See `Account Details <https://www.stellar.org/developers/horizon/reference/endpoints/accounts-single.html>`_
 
         :param asset: an asset
-        :return: current ClaimableBalanceCallBuilder instance
+        :return: current ClaimableBalancesCallBuilder instance
         """
         assets_param = convert_assets_to_horizon_param([asset])
         self._add_query_param("asset", assets_param)
         return self
 
-    def for_claimant(self, claimant: str) -> "ClaimableBalanceCallBuilder":
+    def for_claimant(self, claimant: str) -> "ClaimableBalancesCallBuilder":
         """Returns all claimable balances which can be claimed by the given account ID.
 
         See `Account Details <https://www.stellar.org/developers/horizon/reference/endpoints/accounts-single.html>`_
 
         :param claimant: the account id, for example: `GDGQVOKHW4VEJRU2TETD6DBRKEO5ERCNF353LW5WBFW3JJWQ2BRQ6KDD`
-        :return: current ClaimableBalanceCallBuilder instance
+        :return: current ClaimableBalancesCallBuilder instance
         """
         self._add_query_param("claimant", claimant)
         return self
