@@ -439,6 +439,9 @@ CreateClaimableBalance
 .. autoclass:: stellar_sdk.operation.create_claimable_balance.ClaimPredicateType
    :members:
 
+.. autoclass:: stellar_sdk.operation.create_claimable_balance.ClaimPredicateGroup
+   :members:
+
 ClaimClaimableBalance
 ---------------------
 .. autoclass:: stellar_sdk.operation.ClaimClaimableBalance

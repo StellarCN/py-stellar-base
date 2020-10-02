@@ -26,6 +26,18 @@ class ClaimPredicateType(IntEnum):
     CLAIM_PREDICATE_BEFORE_RELATIVE_TIME = 5
 
 
+class ClaimPredicateGroup:
+    """Used to assemble the left and right values for and_predicates and or_predicates.
+
+    :param left: The ClaimPredicate.
+    :param right: The ClaimPredicate.
+    """
+
+    def __init__(self, left: "ClaimPredicate", right: "ClaimPredicate") -> None:
+        self.left = left
+        self.right = right
+
+
 class ClaimPredicate:
     """The :class:`ClaimPredicate` object, which represents a ClaimPredicate on Stellar's network.
 
@@ -42,8 +54,8 @@ class ClaimPredicate:
     def __init__(
         self,
         claim_predicate_type: ClaimPredicateType,
-        and_predicates: Optional[List["ClaimPredicate"]],
-        or_predicates: Optional[List["ClaimPredicate"]],
+        and_predicates: Optional[ClaimPredicateGroup],
+        or_predicates: Optional[ClaimPredicateGroup],
         not_predicate: Optional["ClaimPredicate"],
         abs_before: Optional[int],
         rel_before: Optional[int],
@@ -67,7 +79,7 @@ class ClaimPredicate:
         """
         return cls(
             claim_predicate_type=ClaimPredicateType.CLAIM_PREDICATE_AND,
-            and_predicates=[left, right],
+            and_predicates=ClaimPredicateGroup(left, right),
             or_predicates=None,
             not_predicate=None,
             abs_before=None,
@@ -87,7 +99,7 @@ class ClaimPredicate:
         return cls(
             claim_predicate_type=ClaimPredicateType.CLAIM_PREDICATE_OR,
             and_predicates=None,
-            or_predicates=[left, right],
+            or_predicates=ClaimPredicateGroup(left, right),
             not_predicate=None,
             abs_before=None,
             rel_before=None,
@@ -192,15 +204,15 @@ class ClaimPredicate:
         elif self.claim_predicate_type == ClaimPredicateType.CLAIM_PREDICATE_AND:
             data.type = Xdr.const.CLAIM_PREDICATE_AND
             data.andPredicates = [
-                self.and_predicates[0].to_xdr_object(),
-                self.and_predicates[1].to_xdr_object(),
+                self.and_predicates.left.to_xdr_object(),
+                self.and_predicates.right.to_xdr_object(),
             ]
             return data
         elif self.claim_predicate_type == ClaimPredicateType.CLAIM_PREDICATE_OR:
             data.type = Xdr.const.CLAIM_PREDICATE_OR
             data.orPredicates = [
-                self.or_predicates[0].to_xdr_object(),
-                self.or_predicates[1].to_xdr_object(),
+                self.or_predicates.left.to_xdr_object(),
+                self.or_predicates.right.to_xdr_object(),
             ]
             return data
         else:
