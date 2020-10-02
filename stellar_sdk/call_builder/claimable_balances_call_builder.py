@@ -21,6 +21,19 @@ class ClaimableBalancesCallBuilder(BaseCallBuilder):
         super().__init__(horizon_url, client)
         self.endpoint: str = "claimable_balances"
 
+    def claimable_balance(
+        self, claimable_balance_id: str
+    ) -> "ClaimableBalancesCallBuilder":
+        """Returns information and links relating to a single claimable balance.
+
+        See `Claimable Balances <https://developers.stellar.org/api/resources/claimablebalances/list/>`_
+
+        :param claimable_balance_id: claimable balance id
+        :return: current AccountCallBuilder instance
+        """
+        self.endpoint = f"claimable_balances/{claimable_balance_id}"
+        return self
+
     def for_sponsor(self, sponsor: str) -> "ClaimableBalancesCallBuilder":
         """Returns all claimable balances which are sponsored by the given account ID.
 

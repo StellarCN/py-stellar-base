@@ -12,6 +12,17 @@ class TestClaimableBalancesCallBuilder:
         assert builder.endpoint == "claimable_balances"
         assert builder.params == {}
 
+    def test_claimable_balance(self):
+        claimable_balance_id = (
+            "0000000043d380c38a2f2cac46ab63674064c56fdce6b977fdef1a278ad50e1a7e6a5e18"
+        )
+        builder = ClaimableBalancesCallBuilder(horizon_url, client).claimable_balance(
+            claimable_balance_id
+        )
+
+        assert builder.endpoint == f"claimable_balances/{claimable_balance_id}"
+        assert builder.params == {}
+
     def test_for_claimant(self):
         claimant = "GATEMHCCKCY67ZUCKTROYN24ZYT5GK4EQZ65JJLDHKHRUZI3EUEKMTCH"
         builder = ClaimableBalancesCallBuilder(horizon_url, client).for_claimant(
