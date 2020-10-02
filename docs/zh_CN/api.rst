@@ -43,6 +43,12 @@ AssetsCallBuilder
    :members:
    :inherited-members:
 
+ClaimableBalancesCallBuilder
+---------------------------
+.. autoclass:: stellar_sdk.call_builder.ClaimableBalancesCallBuilder
+   :members:
+   :inherited-members:
+
 DataCallBuilder
 ---------------
 .. autoclass:: stellar_sdk.call_builder.DataCallBuilder
@@ -425,6 +431,58 @@ SetOptions
 .. autoclass:: stellar_sdk.operation.set_options.Flag
    :members:
 
+CreateClaimableBalance
+----------------------
+.. autoclass:: stellar_sdk.operation.CreateClaimableBalance
+   :members: to_xdr_object, from_xdr_object
+
+.. autoclass:: stellar_sdk.operation.Claimant
+   :members:
+
+.. autoclass:: stellar_sdk.operation.ClaimPredicate
+   :members:
+
+.. autoclass:: stellar_sdk.operation.create_claimable_balance.ClaimPredicateType
+   :members:
+
+.. autoclass:: stellar_sdk.operation.create_claimable_balance.ClaimPredicateGroup
+   :members:
+
+ClaimClaimableBalance
+---------------------
+.. autoclass:: stellar_sdk.operation.ClaimClaimableBalance
+   :members: to_xdr_object, from_xdr_object
+
+BeginSponsoringFutureReserves
+-----------------------------
+.. autoclass:: stellar_sdk.operation.BeginSponsoringFutureReserves
+   :members: to_xdr_object, from_xdr_object
+
+EndSponsoringFutureReserves
+---------------------------
+.. autoclass:: stellar_sdk.operation.EndSponsoringFutureReserves
+   :members: to_xdr_object, from_xdr_object
+
+RevokeSponsorship
+-----------------
+.. autoclass:: stellar_sdk.operation.RevokeSponsorship
+   :members: to_xdr_object, from_xdr_object
+
+.. autoclass:: stellar_sdk.operation.revoke_sponsorship.RevokeSponsorshipType
+   :members:
+
+.. autoclass:: stellar_sdk.operation.revoke_sponsorship.TrustLine
+   :members:
+
+.. autoclass:: stellar_sdk.operation.revoke_sponsorship.Offer
+   :members:
+
+.. autoclass:: stellar_sdk.operation.revoke_sponsorship.Data
+   :members:
+
+.. autoclass:: stellar_sdk.operation.revoke_sponsorship.Signer
+   :members:
+
 Price
 ^^^^^
 
@@ -443,6 +501,13 @@ Signer
 ^^^^^^
 
 .. autoclass:: stellar_sdk.signer.Signer
+   :members:
+   :inherited-members:
+
+SignerKey
+^^^^^^^^^
+
+.. autoclass:: stellar_sdk.signer_key.SignerKey
    :members:
    :inherited-members:
 
