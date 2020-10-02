@@ -31,6 +31,12 @@ class TestAccountsCallBuilder:
             "asset": "USD:GAEDTJ4PPEFVW5XV2S7LUXBEHNQMX5Q2GM562RJGOQG7GVCE5H3HIB4V"
         }
 
+    def test_for_sponsor(self):
+        sponsor = "GAEDTJ4PPEFVW5XV2S7LUXBEHNQMX5Q2GM562RJGOQG7GVCE5H3HIB4V"
+        builder = AccountsCallBuilder(horizon_url, client).for_sponsor(sponsor)
+        assert builder.endpoint == "accounts"
+        assert builder.params == {"sponsor": sponsor}
+
     def test_signer(self):
         signer = "GA7YNBW5CBTJZ3ZZOWX3ZNBKD6OE7A7IHUQVWMY62W2ZBG2SGZVOOPVH"
         builder = AccountsCallBuilder(horizon_url, client).signer(signer)

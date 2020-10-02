@@ -43,6 +43,12 @@ AssetsCallBuilder
    :members:
    :inherited-members:
 
+ClaimableBalancesCallBuilder
+---------------------------
+.. autoclass:: stellar_sdk.call_builder.ClaimableBalancesCallBuilder
+   :members:
+   :inherited-members:
+
 DataCallBuilder
 ---------------
 .. autoclass:: stellar_sdk.call_builder.DataCallBuilder

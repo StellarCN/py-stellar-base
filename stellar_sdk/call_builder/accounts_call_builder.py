@@ -84,3 +84,14 @@ class AccountsCallBuilder(BaseCallBuilder):
         assets_param = convert_assets_to_horizon_param([asset])
         self._add_query_param("asset", assets_param)
         return self
+
+    def for_sponsor(self, sponsor: str) -> "AccountsCallBuilder":
+        """Filtering accounts where the given account is sponsoring the account or any of its sub-entries.
+
+        See `Account Details <https://developers.stellar.org/api/resources/accounts/single/>`_
+
+        :param sponsor: the sponsor id, for example: `GDGQVOKHW4VEJRU2TETD6DBRKEO5ERCNF353LW5WBFW3JJWQ2BRQ6KDD`
+        :return: current AccountCallBuilder instance
+        """
+        self._add_query_param("sponsor", sponsor)
+        return self

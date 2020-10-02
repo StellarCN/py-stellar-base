@@ -105,3 +105,14 @@ class OffersCallBuilder(BaseCallBuilder):
         """
         self.endpoint = f"offers/{offer_id}"
         return self
+
+    def for_sponsor(self, sponsor: str) -> "OffersCallBuilder":
+        """Filtering offers where the given account is sponsoring the offer entry.
+
+        See `Offer Details <https://developers.stellar.org/api/resources/offers/>`_
+
+        :param sponsor: the sponsor id, for example: `GDGQVOKHW4VEJRU2TETD6DBRKEO5ERCNF353LW5WBFW3JJWQ2BRQ6KDD`
+        :return: current OffersCallBuilder instance
+        """
+        self._add_query_param("sponsor", sponsor)
+        return self
