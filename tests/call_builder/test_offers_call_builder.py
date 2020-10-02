@@ -51,3 +51,9 @@ class TestOffersCallBuilder:
             "selling_asset_issuer": selling.issuer,
             "buying_asset_type": buying.type,
         }
+
+    def test_for_sponsor(self):
+        sponsor = "GAEDTJ4PPEFVW5XV2S7LUXBEHNQMX5Q2GM562RJGOQG7GVCE5H3HIB4V"
+        builder = OffersCallBuilder(horizon_url, client).for_sponsor(sponsor)
+        assert builder.endpoint == "offers"
+        assert builder.params == {"sponsor": sponsor}
