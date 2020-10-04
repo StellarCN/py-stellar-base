@@ -15,7 +15,7 @@ sponsor_account = server.load_account(sponsor_keypair.public_key)
 predicate_left = ClaimPredicate.predicate_before_relative_time(60 * 60 * 24 * 7)
 predicate_right = ClaimPredicate.predicate_not(ClaimPredicate.predicate_before_relative_time(60 * 3))
 predicate = ClaimPredicate.predicate_and(predicate_left, predicate_right)
-claimant = Claimant(destination=sponsor_keypair.public_key, predicate=predicate)
+claimant = Claimant(destination=claimant_keypair.public_key, predicate=predicate)
 create_claimable_balance_te = TransactionBuilder(
     source_account=sponsor_account,
     network_passphrase=network_passphrase
