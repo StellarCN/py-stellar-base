@@ -1,8 +1,8 @@
 Release History
 ==============
-### Version 2.8.0-beta1
+### Version 2.8.0
 
-Released on Oct 02, 2020
+Released on Oct 04, 2020
 
 **This update include breaking changes**
 
@@ -28,7 +28,7 @@ Released on Oct 02, 2020
   - predicate_before_relative_time
   - predicate_unconditional
 
-  The following is an [example](https://github.com/StellarCN/py-stellar-base/blob/046e239615b2cc1e508b02ccac9c4ef3df7aec8b/examples/claimable_balances.py).
+  The following is an [example](https://github.com/StellarCN/py-stellar-base/blob/9a6f1e4a3dbf2693016e678b108737b3a7cfb967/examples/claimable_balances.py).
 
   ```python
   from stellar_sdk import Server, TransactionBuilder, Keypair, ClaimPredicate, Claimant, Asset, Network
@@ -48,7 +48,7 @@ Released on Oct 02, 2020
   predicate_left = ClaimPredicate.predicate_before_relative_time(60 * 60 * 24 * 7)
   predicate_right = ClaimPredicate.predicate_not(ClaimPredicate.predicate_before_relative_time(60 * 3))
   predicate = ClaimPredicate.predicate_and(predicate_left, predicate_right)
-  claimant = Claimant(destination=sponsor_keypair.public_key, predicate=predicate)
+  claimant = Claimant(destination=claimant_keypair.public_key, predicate=predicate)
   create_claimable_balance_te = TransactionBuilder(
       source_account=sponsor_account,
       network_passphrase=network_passphrase
@@ -93,7 +93,7 @@ Released on Oct 02, 2020
   - append_revoke_hashx_signer_sponsorship_op
   - append_revoke_pre_auth_tx_signer_sponsorship_op
 
-  The following is an [example](https://github.com/StellarCN/py-stellar-base/blob/046e239615/examples/sponsored_reserves.py).
+  The following is an [example](https://github.com/StellarCN/py-stellar-base/blob/9a6f1e4a3dbf2693016e678b108737b3a7cfb967/examples/sponsored_reserves.py).
 
   ```python
   from stellar_sdk import Server, TransactionBuilder, Keypair, Network
@@ -156,7 +156,6 @@ Released on Oct 02, 2020
 #### Breaking changes
 
 * The type of `stellar_sdk.signer.Signer.signer_key` is changed from  `Xdr.types.SignerKey` to  `stellar_sdk.signer_key.SignerKey`.
-
 
 ### Version 2.7.0
 
