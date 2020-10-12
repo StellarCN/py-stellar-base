@@ -1,5 +1,255 @@
 Release History
 ==============
+### Version 2.8.0
+
+Released on Oct 04, 2020
+
+**This update include breaking changes**
+
+#### Update
+
+* feat: add support for Stellar Protocol 14. ([#367](https://github.com/StellarCN/py-stellar-base/pull/367))
+
+#### Added
+
+- feat: add support for [CAP-23](https://github.com/stellar/stellar-protocol/blob/master/core/cap-0023.md). ([#371](https://github.com/StellarCN/py-stellar-base/pull/371))
+
+  We have added methods to `TransactionBuilder`, you can use them to construct corresponding operations, method list:
+
+  - append_create_claimable_balance_op
+  - append_claim_claimable_balance_op
+
+  We have added `ClaimPredicate`, please use helper function to build ClaimPredicate, method list:
+
+  - predicate_and
+  - predicate_or
+  - predicate_not
+  - predicate_before_absolute_time
+  - predicate_before_relative_time
+  - predicate_unconditional
+
+  The following is an [example](https://github.com/StellarCN/py-stellar-base/blob/9a6f1e4a3dbf2693016e678b108737b3a7cfb967/examples/claimable_balances.py).
+
+  ```python
+  from stellar_sdk import Server, TransactionBuilder, Keypair, ClaimPredicate, Claimant, Asset, Network
+  
+  sponsor_secret = "SAOJHTVFCYVKUMPNQI7RUSI566GKWXP7RXOHP4SV6JAVUQKSIWGPZFPJ"
+  claimant_secret = "SBOLGU7D7A7MTY4JZ3WZUKSKB6NZBQFNQG3BZT4HZW4AAVZJRG7TWXGQ"
+  
+  sponsor_keypair = Keypair.from_secret(sponsor_secret)
+  claimant_keypair = Keypair.from_secret(claimant_secret)
+  
+  server = Server("https://horizon-testnet.stellar.org")
+  network_passphrase = Network.TESTNET_NETWORK_PASSPHRASE
+  
+  # Create Claimable Balance
+  sponsor_account = server.load_account(sponsor_keypair.public_key)
+  
+  predicate_left = ClaimPredicate.predicate_before_relative_time(60 * 60 * 24 * 7)
+  predicate_right = ClaimPredicate.predicate_not(ClaimPredicate.predicate_before_relative_time(60 * 3))
+  predicate = ClaimPredicate.predicate_and(predicate_left, predicate_right)
+  claimant = Claimant(destination=claimant_keypair.public_key, predicate=predicate)
+  create_claimable_balance_te = TransactionBuilder(
+      source_account=sponsor_account,
+      network_passphrase=network_passphrase
+  ).append_create_claimable_balance_op(
+      asset=Asset.native(),
+      amount="100",
+      claimants=[claimant],
+      source=sponsor_keypair.public_key
+  ).build()
+  create_claimable_balance_te.sign(sponsor_keypair)
+  create_claimable_balance_resp = server.submit_transaction(create_claimable_balance_te)
+  print(create_claimable_balance_resp)
+  
+  # Claim Claimable Balance
+  balance_id = "00000000550e14acbdafcd3089289363b3b0c8bec9b4edd87298c690655b4b2456d68ba0"
+  claimant_account = server.load_account(claimant_keypair.public_key)
+  claim_claimable_balance_te = TransactionBuilder(
+      source_account=claimant_account,
+      network_passphrase=network_passphrase
+  ).append_claim_claimable_balance_op(
+      balance_id=balance_id,
+      source=claimant_keypair.public_key
+  ).build()
+  
+  claim_claimable_balance_te.sign(claimant_keypair)
+  claim_claimable_balance_resp = server.submit_transaction(claim_claimable_balance_te)
+  print(claim_claimable_balance_resp)
+  ```
+
+- feat: add support for [CAP-33](https://github.com/stellar/stellar-protocol/blob/master/core/cap-0033.md). ([#372](https://github.com/StellarCN/py-stellar-base/pull/372) [#374](https://github.com/StellarCN/py-stellar-base/pull/374))
+
+  We have added methods to `TransactionBuilder`, you can use them to construct corresponding operations, method list:
+
+  - append_begin_sponsoring_future_reserves_op
+  - append_end_sponsoring_future_reserves_op
+  - append_revoke_account_sponsorship_op
+  - append_revoke_trustline_sponsorship_op
+  - append_revoke_offer_sponsorship_op
+  - append_revoke_data_sponsorship_op
+  - append_revoke_claimable_balance_sponsorship_op
+  - append_revoke_ed25519_public_key_signer_sponsorship_op
+  - append_revoke_hashx_signer_sponsorship_op
+  - append_revoke_pre_auth_tx_signer_sponsorship_op
+
+  The following is an [example](https://github.com/StellarCN/py-stellar-base/blob/9a6f1e4a3dbf2693016e678b108737b3a7cfb967/examples/sponsored_reserves.py).
+
+  ```python
+  from stellar_sdk import Server, TransactionBuilder, Keypair, Network
+  
+  sponsor_secret = "SAOJHTVFCYVKUMPNQI7RUSI566GKWXP7RXOHP4SV6JAVUQKSIWGPZFPJ"
+  new_account_secret = "SCN5D72JHQAHUHGIA23SLS3LBYCPHJWD7HLYNJRBBZIG4PD74UCGQBYM"
+  
+  sponsor_keypair = Keypair.from_secret(sponsor_secret)
+  newly_created_keypair = Keypair.from_secret(new_account_secret)
+  
+  server = Server("https://horizon-testnet.stellar.org")
+  network_passphrase = Network.TESTNET_NETWORK_PASSPHRASE
+  
+  # Sponsoring Account Creation
+  # https://github.com/stellar/stellar-protocol/blob/master/core/cap-0033.md#example-sponsoring-account-creation
+  sponsor_account = server.load_account(sponsor_keypair.public_key)
+  sponsoring_account_creation_te = TransactionBuilder(
+      source_account=sponsor_account,
+      network_passphrase=network_passphrase
+  ).append_begin_sponsoring_future_reserves_op(
+      sponsored_id=newly_created_keypair.public_key,
+      source=sponsor_keypair.public_key
+  ).append_create_account_op(
+      destination=newly_created_keypair.public_key,
+      starting_balance="10",
+      source=sponsor_keypair.public_key
+  ).append_end_sponsoring_future_reserves_op(
+      source=newly_created_keypair.public_key
+  ).build()
+  sponsoring_account_creation_te.sign(sponsor_keypair)
+  sponsoring_account_creation_te.sign(new_account_secret)
+  sponsoring_account_creation_resp = server.submit_transaction(sponsoring_account_creation_te)
+  print(sponsoring_account_creation_resp)
+  
+  # Revoke Account Sponsorship
+  sponsor_account = server.load_account(sponsor_keypair.public_key)
+  revoke_account_sponsorship_te = TransactionBuilder(
+      source_account=sponsor_account,
+      network_passphrase=network_passphrase
+  ).append_revoke_account_sponsorship_op(
+      account_id=newly_created_keypair.public_key,
+      source=sponsor_keypair.public_key
+  ).build()
+  revoke_account_sponsorship_te.sign(sponsor_keypair)
+  revoke_account_sponsorship_resp = server.submit_transaction(revoke_account_sponsorship_te)
+  print(revoke_account_sponsorship_resp)
+  ```
+
+- feat: add support for new endpoint of Protocol 14. ([#373](https://github.com/StellarCN/py-stellar-base/pull/373))
+
+  The following are the newly added endpoints.
+
+  - server.claimable_balances().claimable_balance(claimable_balance_id)
+  - server.claimable_balances().for_asset(asset)
+  - server.claimable_balances().for_sponsor(sponsor)
+  - server.claimable_balances().for_claimant(claimant)
+  - server.accounts().for_sponsor(sponsor)
+  - server.offers().for_sponsor(sponsor)
+
+#### Breaking changes
+
+* The type of `stellar_sdk.signer.Signer.signer_key` is changed from  `Xdr.types.SignerKey` to  `stellar_sdk.signer_key.SignerKey`.
+
+### Version 2.7.0
+
+Released on Aug 28, 2020
+
+**This update include breaking changes**
+
+#### Update
+* feat: add support for SEP-0010 v2.0.0. ([#363](https://github.com/StellarCN/py-stellar-base/pull/363))
+
+#### Breaking changes
+
+Due to the addition of support for SEP-10 v2.0.0, we no longer support SEP-10 v1.x. 
+
+The **domain_name** parameter is required in SEP-10, and the **anchor_name** parameter is no longer needed, you can get these SEP-10 changes [here](https://github.com/stellar/stellar-protocol/pull/708).
+
+There have been some breaking changes to SEP-10 related functions, the following is a breaking changes list, you can also check our [latest document](https://stellar-sdk.readthedocs.io/en/2.7.0/api.html#sep-0010-stellar-web-authentication).
+
+- stellar_sdk.sep.stellar_web_authentication.build_challenge_transaction (**domain_name** parameter is required, **anchor_name**  parameter has been removed.)
+- stellar_sdk.sep.stellar_web_authentication.read_challenge_transaction (**domain_name** parameter is required)
+- stellar_sdk.sep.stellar_web_authentication.verify_challenge_transaction_signers (**domain_name** parameter is required)
+- stellar_sdk.sep.stellar_web_authentication.verify_challenge_transaction_signed_by_client (**domain_name** parameter is required)
+- stellar_sdk.sep.stellar_web_authentication.verify_challenge_transaction_signed_by_client_master_key (**domain_name** parameter is required)
+- stellar_sdk.sep.stellar_web_authentication.verify_challenge_transaction_threshold (**domain_name** parameter is required)
+- stellar_sdk.sep.stellar_web_authentication.verify_challenge_transaction (**domain_name** parameter is required)
+
+
+### Version 2.6.4
+
+Released on Aug 14, 2020
+
+#### Added
+* feat: add support for parsing Stellar URI (SEP-0007). ([#360](https://github.com/StellarCN/py-stellar-base/pull/360))
+
+### Version 2.6.3
+
+Released on Aug 09, 2020
+
+#### Added
+* feat: add support to SEP-0011 (Txrep: human-readable low-level representation of Stellar transactions). ([#357](https://github.com/StellarCN/py-stellar-base/pull/357))
+
+### Version 2.6.2
+
+Released on Jul 20, 2020
+
+#### Added
+* feat: add support for SEP-0007 (URI Scheme to facilitate delegated signing). ([#349](https://github.com/StellarCN/py-stellar-base/pull/349))
+
+### Version 2.6.1
+
+Released on Jun 21, 2020
+
+**This update has breaking changes compared to 2.5.3.**
+
+For [some reason](https://github.com/StellarCN/py-stellar-base/issues/338), we yanked [2.6.0](https://pypi.org/project/stellar-sdk/2.6.0/) on PyPi, 
+but actually 2.6.0 can be used normally. 
+
+This update log will contain the updated content of 2.6.0.
+
+#### Update
+- Optimize SEP-10, when you call `stellar_sdk.sep.stellar_web_authentication.verify_challenge_transaction_signed_by_client_master_key`, 
+  an exception will be thrown if the transaction contains extra signatures. ([#338](https://github.com/StellarCN/py-stellar-base/pull/338)) (2.6.1)
+- Generate V1 transactions by default. ([#337](https://github.com/StellarCN/py-stellar-base/pull/337)) (2.6.0)
+- Allow V0 transactions to be fee bumped. ([#331](https://github.com/StellarCN/py-stellar-base/pull/331)) (2.6.0)
+
+#### Breaking changes
+- The default values of the following parameters have changed, 
+  they used to default to False, but now they default to True. (2.6.0)
+    - the `v1` parameter in stellar_sdk.transaction_builder.TransactionBuilder
+    - the `v1` parameter in stellar_sdk.transaction.Transaction
+    
+### Version 2.6.0
+
+Released on Jun 18, 2020
+
+**This update include breaking changes**
+
+#### Update
+- Generate V1 transactions by default. ([#337](https://github.com/StellarCN/py-stellar-base/pull/337))
+- Allow V0 transactions to be fee bumped. ([#331](https://github.com/StellarCN/py-stellar-base/pull/331))
+
+#### Breaking changes
+- The default values of the following parameters have changed, 
+  they used to default to False, but now they default to True.
+    - the `v1` parameter in stellar_sdk.transaction_builder.TransactionBuilder
+    - the `v1` parameter in stellar_sdk.transaction.Transaction
+
+### Version 2.5.3
+
+Released on Jun 14, 2020
+
+#### Fixed
+- Set the value of the `v1` property correctly when calling TransactionBuilder.from_xdr. ([#333](https://github.com/StellarCN/py-stellar-base/pull/333))
+
 
 ### Version 2.5.2
 
