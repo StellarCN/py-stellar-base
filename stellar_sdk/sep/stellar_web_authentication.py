@@ -49,7 +49,8 @@ def build_challenge_transaction(
     :param server_secret: secret key for server's stellar.toml `SIGNING_KEY`.
     :param client_account_id: The stellar account that the wallet wishes to authenticate with the server.
     :param domain_name: The `fully qualified domain name <https://en.wikipedia.org/wiki/Fully_qualified_domain_name>`_
-        of the service requiring authentication, for example: `example.com`.
+        of the service requiring authentication, for example: `example.com`. (The domain_name field is reserved for
+        future use and not used.)
     :param network_passphrase: The network to connect to for verifying and retrieving
         additional attributes from. (ex. 'Public Global Stellar Network ; September 2015')
     :param timeout: Challenge duration in seconds (default to 15 minutes).
@@ -96,7 +97,8 @@ def read_challenge_transaction(
     :param challenge_transaction: SEP0010 transaction challenge transaction in base64.
     :param server_account_id: public key for server's account.
     :param domain_name: The `fully qualified domain name <https://en.wikipedia.org/wiki/Fully_qualified_domain_name>`_
-        of the service requiring authentication, for example: `example.com`.
+        of the service requiring authentication, for example: `example.com`. (The domain_name field is reserved for
+        future use and not used.)
     :param network_passphrase: The network to connect to for verifying and retrieving
         additional attributes from. (ex. 'Public Global Stellar Network ; September 2015')
     :raises: :exc:`InvalidSep10ChallengeError <stellar_sdk.sep.exceptions.InvalidSep10ChallengeError>` - if the
@@ -157,9 +159,9 @@ def read_challenge_transaction(
         )
 
     # verify that transaction contains a single Manage Data operation and its source account is not null
-    if len(transaction.operations) != 1:
+    if len(transaction.operations) < 1:
         raise InvalidSep10ChallengeError(
-            "Transaction requires a single ManageData operation."
+            "Transaction should contain at least one operation."
         )
 
     manage_data_op = transaction.operations[0]
@@ -169,12 +171,6 @@ def read_challenge_transaction(
     client_account = manage_data_op.source
     if not client_account:
         raise InvalidSep10ChallengeError("Operation should have a source account.")
-
-    if manage_data_op.data_name != f"{domain_name} auth":
-        raise InvalidSep10ChallengeError(
-            "The transaction's operation key name does not "
-            "include the expected home domain."
-        )
 
     if len(manage_data_op.data_value) != 64:
         raise InvalidSep10ChallengeError(
@@ -186,6 +182,17 @@ def read_challenge_transaction(
         raise InvalidSep10ChallengeError(
             "Operation value before encoding as base64 should be 48 bytes long."
         )
+
+    # verify any subsequent operations are manage data ops and source account is the server
+    for op in transaction.operations[1:]:
+        if not isinstance(op, ManageData):
+            raise InvalidSep10ChallengeError("Operation type should be ManageData.")
+        if op.source is None:
+            raise InvalidSep10ChallengeError("Operation should have a source account.")
+        if op.source != server_account_id:
+            raise InvalidSep10ChallengeError(
+                "The transaction has operations that are unrecognized."
+            )
 
     # verify that transaction envelope has a correct signature by server's signing key
     if not _verify_te_signed_by_account_id(transaction_envelope, server_account_id):
@@ -215,7 +222,8 @@ def verify_challenge_transaction_signers(
     :param challenge_transaction: SEP0010 transaction challenge transaction in base64.
     :param server_account_id: public key for server's account.
     :param domain_name: The `fully qualified domain name <https://en.wikipedia.org/wiki/Fully_qualified_domain_name>`_
-        of the service requiring authentication, for example: `example.com`.
+        of the service requiring authentication, for example: `example.com`. (The domain_name field is reserved for
+        future use and not used.)
     :param network_passphrase: The network to connect to for verifying and retrieving
         additional attributes from. (ex. 'Public Global Stellar Network ; September 2015')
     :param signers: The signers of client account.
@@ -291,7 +299,8 @@ def verify_challenge_transaction_signed_by_client(
     :param challenge_transaction: SEP0010 transaction challenge transaction in base64.
     :param server_account_id: public key for server's account.
     :param domain_name: The `fully qualified domain name <https://en.wikipedia.org/wiki/Fully_qualified_domain_name>`_
-        of the service requiring authentication, for example: `example.com`.
+        of the service requiring authentication, for example: `example.com`. (The domain_name field is reserved for
+        future use and not used.)
     :param network_passphrase: The network to connect to for verifying and retrieving
         additional attributes from. (ex. 'Public Global Stellar Network ; September 2015')
 
@@ -320,7 +329,8 @@ def verify_challenge_transaction_signed_by_client_master_key(
     :param challenge_transaction: SEP0010 transaction challenge transaction in base64.
     :param server_account_id: public key for server's account.
     :param domain_name: The `fully qualified domain name <https://en.wikipedia.org/wiki/Fully_qualified_domain_name>`_
-        of the service requiring authentication, for example: `example.com`.
+        of the service requiring authentication, for example: `example.com`. (The domain_name field is reserved for
+        future use and not used.)
     :param network_passphrase: The network to connect to for verifying and retrieving
         additional attributes from. (ex. 'Public Global Stellar Network ; September 2015')
 
@@ -351,7 +361,8 @@ def verify_challenge_transaction_threshold(
     :param challenge_transaction: SEP0010 transaction challenge transaction in base64.
     :param server_account_id: public key for server's account.
     :param domain_name: The `fully qualified domain name <https://en.wikipedia.org/wiki/Fully_qualified_domain_name>`_
-        of the service requiring authentication, for example: `example.com`.
+        of the service requiring authentication, for example: `example.com`. (The domain_name field is reserved for
+        future use and not used.)
     :param network_passphrase: The network to connect to for verifying and retrieving
         additional attributes from. (ex. 'Public Global Stellar Network ; September 2015')
     :param threshold: The medThreshold on the client account.
@@ -401,7 +412,8 @@ def verify_challenge_transaction(
     :param challenge_transaction: SEP0010 transaction challenge transaction in base64.
     :param server_account_id: public key for server's account.
     :param domain_name: The `fully qualified domain name <https://en.wikipedia.org/wiki/Fully_qualified_domain_name>`_
-        of the service requiring authentication, for example: `example.com`.
+        of the service requiring authentication, for example: `example.com`. (The domain_name field is reserved for
+        future use and not used.)
     :param network_passphrase: The network to connect to for verifying and retrieving
         additional attributes from. (ex. 'Public Global Stellar Network ; September 2015')
     :raises: :exc:`InvalidSep10ChallengeError <stellar_sdk.sep.exceptions.InvalidSep10ChallengeError>` - if the

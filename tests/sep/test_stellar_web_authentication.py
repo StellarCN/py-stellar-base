@@ -140,34 +140,6 @@ class TestStellarWebAuthentication:
                 network_passphrase,
             )
 
-    def test_verify_challenge_tx_donot_contain_any_operation(self):
-        server_kp = Keypair.random()
-        client_kp = Keypair.random()
-        network_passphrase = Network.PUBLIC_NETWORK_PASSPHRASE
-        domain_name = "example.com"
-        now = int(time.time())
-        server_account = Account(server_kp.public_key, -1)
-        challenge_te = (
-            TransactionBuilder(server_account, network_passphrase, 100)
-            .add_time_bounds(now, now + 900)
-            .build()
-        )
-
-        challenge_te.sign(server_kp)
-        challenge_te.sign(client_kp)
-        challenge_tx_signed = challenge_te.to_xdr()
-
-        with pytest.raises(
-            InvalidSep10ChallengeError,
-            match="Transaction requires a single ManageData operation.",
-        ):
-            verify_challenge_transaction(
-                challenge_tx_signed,
-                server_kp.public_key,
-                domain_name,
-                network_passphrase,
-            )
-
     def test_verify_challenge_tx_donot_contain_managedata_operation(self):
         server_kp = Keypair.random()
         client_kp = Keypair.random()
@@ -422,34 +394,211 @@ class TestStellarWebAuthentication:
                 network_passphrase,
             )
 
-    def test_verify_challenge_transaction_domain_name_mismatch_raise(self):
+    def test_verify_challenge_tx_allows_any_value_in_home_domain_field(self):
         server_kp = Keypair.random()
         client_kp = Keypair.random()
-        timeout = 600
         network_passphrase = Network.PUBLIC_NETWORK_PASSPHRASE
         domain_name = "example.com"
-        invalid_domain_name = "invalid_example.com"
-
-        challenge = build_challenge_transaction(
-            server_secret=server_kp.secret,
-            client_account_id=client_kp.public_key,
-            domain_name=domain_name,
-            network_passphrase=network_passphrase,
-            timeout=timeout,
+        now = int(time.time())
+        nonce = os.urandom(48)
+        nonce_encoded = base64.b64encode(nonce)
+        server_account = Account(server_kp.public_key, -1)
+        challenge_te = (
+            TransactionBuilder(server_account, network_passphrase, 100)
+            .append_manage_data_op(
+                data_name="{} auth".format(domain_name),
+                data_value=nonce_encoded,
+                source=client_kp.public_key,
+            )
+            .add_time_bounds(now, now + 900)
+            .build()
         )
 
-        transaction = TransactionEnvelope.from_xdr(challenge, network_passphrase)
-        transaction.sign(client_kp)
-        challenge_tx = transaction.to_xdr()
+        challenge_te.sign(server_kp)
+        challenge_te.sign(client_kp)
+        challenge_tx_signed = challenge_te.to_xdr()
+
+        verify_challenge_transaction(
+            challenge_tx_signed, server_kp.public_key, None, network_passphrase,
+        )
+
+    def test_verify_challenge_tx_contain_subsequent_manage_data_ops_with_server_account_as_source_account(
+        self,
+    ):
+        server_kp = Keypair.random()
+        client_kp = Keypair.random()
+        network_passphrase = Network.PUBLIC_NETWORK_PASSPHRASE
+        domain_name = "example.com"
+        now = int(time.time())
+        nonce = os.urandom(48)
+        nonce_encoded = base64.b64encode(nonce)
+        server_account = Account(server_kp.public_key, -1)
+        challenge_te = (
+            TransactionBuilder(server_account, network_passphrase, 100)
+            .append_manage_data_op(
+                data_name="{} auth".format(domain_name),
+                data_value=nonce_encoded,
+                source=client_kp.public_key,
+            )
+            .append_manage_data_op(
+                data_name="data key",
+                data_value="data value",
+                source=server_kp.public_key,
+            )
+            .add_time_bounds(now, now + 900)
+            .build()
+        )
+
+        challenge_te.sign(server_kp)
+        challenge_te.sign(client_kp)
+        challenge_tx_signed = challenge_te.to_xdr()
+
+        verify_challenge_transaction(
+            challenge_tx_signed, server_kp.public_key, domain_name, network_passphrase,
+        )
+
+    def test_verify_challenge_tx_contain_subsequent_manage_data_ops_without_the_server_account_as_the_source_account(
+        self,
+    ):
+        server_kp = Keypair.random()
+        client_kp = Keypair.random()
+        network_passphrase = Network.PUBLIC_NETWORK_PASSPHRASE
+        domain_name = "example.com"
+        now = int(time.time())
+        nonce = os.urandom(48)
+        nonce_encoded = base64.b64encode(nonce)
+        server_account = Account(server_kp.public_key, -1)
+        challenge_te = (
+            TransactionBuilder(server_account, network_passphrase, 100)
+            .append_manage_data_op(
+                data_name="{} auth".format(domain_name),
+                data_value=nonce_encoded,
+                source=client_kp.public_key,
+            )
+            .append_manage_data_op(
+                data_name="data key",
+                data_value="data value",
+                source=client_kp.public_key,
+            )
+            .add_time_bounds(now, now + 900)
+            .build()
+        )
+
+        challenge_te.sign(server_kp)
+        challenge_te.sign(client_kp)
+        challenge_tx_signed = challenge_te.to_xdr()
+
         with pytest.raises(
             InvalidSep10ChallengeError,
-            match="The transaction's operation key name "
-            "does not include the expected home domain.",
+            match="The transaction has operations that are unrecognized.",
         ):
             verify_challenge_transaction(
-                challenge_tx,
+                challenge_tx_signed,
                 server_kp.public_key,
-                invalid_domain_name,
+                domain_name,
+                network_passphrase,
+            )
+
+    def test_verify_challenge_tx_contain_subsequent_ops_that_are_not_manage_data_ops(
+        self,
+    ):
+        server_kp = Keypair.random()
+        client_kp = Keypair.random()
+        network_passphrase = Network.PUBLIC_NETWORK_PASSPHRASE
+        domain_name = "example.com"
+        now = int(time.time())
+        nonce = os.urandom(48)
+        nonce_encoded = base64.b64encode(nonce)
+        server_account = Account(server_kp.public_key, -1)
+        challenge_te = (
+            TransactionBuilder(server_account, network_passphrase, 100)
+            .append_manage_data_op(
+                data_name="{} auth".format(domain_name),
+                data_value=nonce_encoded,
+                source=client_kp.public_key,
+            )
+            .append_bump_sequence_op(bump_to=0, source=server_kp.public_key,)
+            .add_time_bounds(now, now + 900)
+            .build()
+        )
+
+        challenge_te.sign(server_kp)
+        challenge_te.sign(client_kp)
+        challenge_tx_signed = challenge_te.to_xdr()
+
+        with pytest.raises(
+            InvalidSep10ChallengeError, match="Operation type should be ManageData.",
+        ):
+            verify_challenge_transaction(
+                challenge_tx_signed,
+                server_kp.public_key,
+                domain_name,
+                network_passphrase,
+            )
+
+    def test_verify_challenge_tx_contain_subsequent_ops_that_secend_op_no_source_account(
+        self,
+    ):
+        server_kp = Keypair.random()
+        client_kp = Keypair.random()
+        network_passphrase = Network.PUBLIC_NETWORK_PASSPHRASE
+        domain_name = "example.com"
+        now = int(time.time())
+        nonce = os.urandom(48)
+        nonce_encoded = base64.b64encode(nonce)
+        server_account = Account(server_kp.public_key, -1)
+        challenge_te = (
+            TransactionBuilder(server_account, network_passphrase, 100)
+            .append_manage_data_op(
+                data_name="{} auth".format(domain_name),
+                data_value=nonce_encoded,
+                source=client_kp.public_key,
+            )
+            .append_manage_data_op(data_name="Hello", data_value="world")
+            .add_time_bounds(now, now + 900)
+            .build()
+        )
+
+        challenge_te.sign(server_kp)
+        challenge_te.sign(client_kp)
+        challenge_tx_signed = challenge_te.to_xdr()
+
+        with pytest.raises(
+            InvalidSep10ChallengeError, match="Operation should have a source account.",
+        ):
+            verify_challenge_transaction(
+                challenge_tx_signed,
+                server_kp.public_key,
+                domain_name,
+                network_passphrase,
+            )
+
+    def test_verify_challenge_tx_contain_zero_op(self,):
+        server_kp = Keypair.random()
+        client_kp = Keypair.random()
+        network_passphrase = Network.PUBLIC_NETWORK_PASSPHRASE
+        domain_name = "example.com"
+        now = int(time.time())
+        nonce = os.urandom(48)
+        server_account = Account(server_kp.public_key, -1)
+        challenge_te = (
+            TransactionBuilder(server_account, network_passphrase, 100)
+            .add_time_bounds(now, now + 900)
+            .build()
+        )
+
+        challenge_te.sign(server_kp)
+        challenge_te.sign(client_kp)
+        challenge_tx_signed = challenge_te.to_xdr()
+
+        with pytest.raises(
+            InvalidSep10ChallengeError,
+            match="Transaction should contain at least one operation.",
+        ):
+            verify_challenge_transaction(
+                challenge_tx_signed,
+                server_kp.public_key,
+                domain_name,
                 network_passphrase,
             )
 
