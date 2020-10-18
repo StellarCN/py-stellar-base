@@ -161,27 +161,27 @@ class SetOptions(Operation):
         return body
 
     @classmethod
-    def from_xdr_object(cls, operation_xdr_object) -> "SetOptions":
+    def from_xdr_object(cls, xdr_object) -> "SetOptions":
         """Creates a :class:`SetOptions` object from an XDR Operation
         object.
 
         """
-        source = Operation.get_source_from_xdr_obj(operation_xdr_object)
+        source = Operation.get_source_from_xdr_obj(xdr_object)
 
         inflation_dest = None
-        if operation_xdr_object.body.set_options_op.inflation_dest:
+        if xdr_object.body.set_options_op.inflation_dest:
             inflation_dest = StrKey.encode_ed25519_public_key(
-                operation_xdr_object.body.set_options_op.inflation_dest.account_id.ed25519.uint256
+                xdr_object.body.set_options_op.inflation_dest.account_id.ed25519.uint256
             )
 
-        clear_flags_xdr = operation_xdr_object.body.set_options_op.clear_flags
-        set_flags_xdr = operation_xdr_object.body.set_options_op.set_flags
-        master_weight_xdr = operation_xdr_object.body.set_options_op.master_weight
-        low_threshold_xdr = operation_xdr_object.body.set_options_op.low_threshold
-        med_threshold_xdr = operation_xdr_object.body.set_options_op.med_threshold
-        high_threshold_xdr = operation_xdr_object.body.set_options_op.high_threshold
-        home_domain_xdr = operation_xdr_object.body.set_options_op.home_domain
-        signer_xdr_object = operation_xdr_object.body.set_options_op.signer
+        clear_flags_xdr = xdr_object.body.set_options_op.clear_flags
+        set_flags_xdr = xdr_object.body.set_options_op.set_flags
+        master_weight_xdr = xdr_object.body.set_options_op.master_weight
+        low_threshold_xdr = xdr_object.body.set_options_op.low_threshold
+        med_threshold_xdr = xdr_object.body.set_options_op.med_threshold
+        high_threshold_xdr = xdr_object.body.set_options_op.high_threshold
+        home_domain_xdr = xdr_object.body.set_options_op.home_domain
+        signer_xdr_object = xdr_object.body.set_options_op.signer
 
         clear_flags = None if clear_flags_xdr is None else clear_flags_xdr.uint32
         set_flags = None if set_flags_xdr is None else set_flags_xdr.uint32
@@ -213,5 +213,5 @@ class SetOptions(Operation):
             signer=signer,
             source=source,
         )
-        op._source_muxed = Operation.get_source_muxed_from_xdr_obj(operation_xdr_object)
+        op._source_muxed = Operation.get_source_muxed_from_xdr_obj(xdr_object)
         return op

@@ -55,21 +55,21 @@ class CreateAccount(Operation):
 
     @classmethod
     def from_xdr_object(
-        cls, operation_xdr_object: stellar_xdr.Operation
+        cls, xdr_object: stellar_xdr.Operation
     ) -> "CreateAccount":
         """Creates a :class:`CreateAccount` object from an XDR Operation object.
 
         """
-        source = Operation.get_source_from_xdr_obj(operation_xdr_object)
+        source = Operation.get_source_from_xdr_obj(xdr_object)
 
         destination = StrKey.encode_ed25519_public_key(
-            operation_xdr_object.body.create_account_op.destination.account_id.ed25519.uint256
+            xdr_object.body.create_account_op.destination.account_id.ed25519.uint256
         )
         starting_balance = Operation.from_xdr_amount(
-            operation_xdr_object.body.create_account_op.starting_balance.int64
+            xdr_object.body.create_account_op.starting_balance.int64
         )
         op = cls(
             source=source, destination=destination, starting_balance=starting_balance
         )
-        op._source_muxed = Operation.get_source_muxed_from_xdr_obj(operation_xdr_object)
+        op._source_muxed = Operation.get_source_muxed_from_xdr_obj(xdr_object)
         return op

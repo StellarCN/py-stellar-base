@@ -39,14 +39,14 @@ class Price:
         )
 
     @classmethod
-    def from_xdr_object(cls, price_xdr_object: stellar_xdr.Price) -> "Price":
+    def from_xdr_object(cls, xdr_object: stellar_xdr.Price) -> "Price":
         """Create a :class:`Price` from an XDR Asset object.
 
-        :param price_xdr_object: The XDR Price object.
+        :param xdr_object: The XDR Price object.
         :return: A new :class:`Price` object from the given XDR Price object.
         """
-        n = price_xdr_object.n.int32
-        d = price_xdr_object.d.int32
+        n = xdr_object.n.int32
+        d = xdr_object.d.int32
         return cls(n, d)
 
     def __eq__(self, other: object) -> bool:

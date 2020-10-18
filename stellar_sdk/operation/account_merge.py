@@ -51,17 +51,17 @@ class AccountMerge(Operation):
 
     @classmethod
     def from_xdr_object(
-        cls, operation_xdr_object: stellar_xdr.Operation
+        cls, xdr_object: stellar_xdr.Operation
     ) -> "AccountMerge":
         """Creates a :class:`AccountMerge` object from an XDR Operation
         object.
 
         """
-        source = Operation.get_source_from_xdr_obj(operation_xdr_object)
+        source = Operation.get_source_from_xdr_obj(xdr_object)
         destination = parse_ed25519_account_id_from_muxed_account_xdr_object(
-            operation_xdr_object.body.destination
+            xdr_object.body.destination
         )
         op = cls(source=source, destination=destination)
-        op._destination_muxed = operation_xdr_object.body.destination
-        op._source_muxed = Operation.get_source_muxed_from_xdr_obj(operation_xdr_object)
+        op._destination_muxed = xdr_object.body.destination
+        op._source_muxed = Operation.get_source_muxed_from_xdr_obj(xdr_object)
         return op

@@ -43,16 +43,16 @@ class BeginSponsoringFutureReserves(Operation):
 
     @classmethod
     def from_xdr_object(
-        cls, operation_xdr_object: stellar_xdr.Operation
+        cls, xdr_object: stellar_xdr.Operation
     ) -> "BeginSponsoringFutureReserves":
         """Creates a :class:`BeginSponsoringFutureReserves` object from an XDR Operation
         object.
         """
-        source = Operation.get_source_from_xdr_obj(operation_xdr_object)
+        source = Operation.get_source_from_xdr_obj(xdr_object)
 
         sponsored_id = StrKey.encode_ed25519_public_key(
-            operation_xdr_object.body.begin_sponsoring_future_reserves_op.sponsored_id.account_id.ed25519.uint256
+            xdr_object.body.begin_sponsoring_future_reserves_op.sponsored_id.account_id.ed25519.uint256
         )
         op = cls(source=source, sponsored_id=sponsored_id)
-        op._source_muxed = Operation.get_source_muxed_from_xdr_obj(operation_xdr_object)
+        op._source_muxed = Operation.get_source_muxed_from_xdr_obj(xdr_object)
         return op

@@ -82,23 +82,23 @@ class TransactionEnvelope(BaseTransactionEnvelope["TransactionEnvelope"]):
 
     @classmethod
     def from_xdr_object(
-        cls, te_xdr_object: stellar_xdr.TransactionEnvelope, network_passphrase: str
+        cls, xdr_object: stellar_xdr.TransactionEnvelope, network_passphrase: str
     ) -> "TransactionEnvelope":
         """Create a new :class:`TransactionEnvelope` from an XDR object.
 
-        :param te_xdr_object: The XDR object that represents a transaction envelope.
+        :param xdr_object: The XDR object that represents a transaction envelope.
         :param network_passphrase: The network to connect to for verifying and retrieving additional attributes from.
 
         :return: A new :class:`TransactionEnvelope` object from the given XDR TransactionEnvelope object.
         """
-        te_type = te_xdr_object.type
+        te_type = xdr_object.type
         if te_type == stellar_xdr.EnvelopeType.ENVELOPE_TYPE_TX_V0:
-            tx = Transaction.from_xdr_object(te_xdr_object.v0.tx, v1=False)
-            signatures = te_xdr_object.v0.signatures
+            tx = Transaction.from_xdr_object(xdr_object.v0.tx, v1=False)
+            signatures = xdr_object.v0.signatures
         elif te_type == stellar_xdr.EnvelopeType.ENVELOPE_TYPE_TX:
-            tx = Transaction.from_xdr_object(te_xdr_object.v1.tx, v1=True)
-            signatures = te_xdr_object.v1.signatures
+            tx = Transaction.from_xdr_object(xdr_object.v1.tx, v1=True)
+            signatures = xdr_object.v1.signatures
         else:
-            raise ValueError("Invalid EnvelopeType: %d.", te_xdr_object.type)
+            raise ValueError("Invalid EnvelopeType: %d.", xdr_object.type)
         te = cls(tx, network_passphrase=network_passphrase, signatures=signatures)
         return te

@@ -63,14 +63,14 @@ class Signer:
         )
 
     @classmethod
-    def from_xdr_object(cls, signer_xdr_object: stellar_xdr.Signer) -> "Signer":
+    def from_xdr_object(cls, xdr_object: stellar_xdr.Signer) -> "Signer":
         """Create a :class:`Signer` from an XDR Signer object.
 
-        :param signer_xdr_object: The XDR Signer object.
+        :param xdr_object: The XDR Signer object.
         :return: A new :class:`Signer` object from the given XDR Signer object.
         """
-        weight = signer_xdr_object.weight.uint32
-        signer_key = SignerKey.from_xdr_object(signer_xdr_object.key)
+        weight = xdr_object.weight.uint32
+        signer_key = SignerKey.from_xdr_object(xdr_object.key)
         return cls(signer_key, weight)
 
     def __eq__(self, other: object) -> bool:
