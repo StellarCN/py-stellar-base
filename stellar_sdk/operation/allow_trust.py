@@ -135,7 +135,7 @@ class AllowTrust(Operation):
 
     def __str__(self):
         return (
-            f"<AllowTrust [destination={self.trustor}, "
+            f"<AllowTrust [trustor={self.trustor}, "
             f"asset_code={self.asset_code}, "
             f"authorize={self.authorize}, "
             f"source={self.source}]>"

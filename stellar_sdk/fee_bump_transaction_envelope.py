@@ -90,6 +90,6 @@ class FeeBumpTransactionEnvelope(BaseTransactionEnvelope["FeeBumpTransactionEnve
 
     def __str__(self):
         return (
-            f"<FeeBumpTransactionEnvelope [transaction={self.transaction} "
+            f"<FeeBumpTransactionEnvelope [transaction={self.transaction}, "
             f"network_passphrase={self.network_passphrase}, signatures={self.signatures}]>"
         )

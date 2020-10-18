@@ -110,6 +110,6 @@ class TransactionEnvelope(BaseTransactionEnvelope["TransactionEnvelope"]):
 
     def __str__(self):
         return (
-            f"<TransactionEnvelope [transaction={self.transaction} "
+            f"<TransactionEnvelope [transaction={self.transaction}, "
             f"network_passphrase={self.network_passphrase}, signatures={self.signatures}]>"
         )

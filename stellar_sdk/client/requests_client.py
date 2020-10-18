@@ -195,7 +195,7 @@ class RequestsClient(BaseSyncClient):
             f"request_timeout={self.request_timeout}, "
             f"post_timeout={self.post_timeout}, "
             f"backoff_factor={self.backoff_factor}, "
-            f"session={self.backoff_factor}, "
+            f"session={self._session}, "
             f"stream_session={self.backoff_factor}]>"
         )
 

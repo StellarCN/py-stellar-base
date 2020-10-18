@@ -141,6 +141,6 @@ class BaseTransactionEnvelope(Generic[T]):
 
     def __str__(self):
         return (
-            f"<BaseTransactionEnvelope [network_id={self.network_id} "
+            f"<BaseTransactionEnvelope [network_id={self.network_id}, "
             f"signatures={self.signatures}]>"
         )

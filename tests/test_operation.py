@@ -28,7 +28,7 @@ from stellar_sdk.operation.path_payment_strict_receive import PathPaymentStrictR
 from stellar_sdk.operation.path_payment_strict_send import PathPaymentStrictSend
 from stellar_sdk.operation.payment import Payment
 from stellar_sdk.operation.set_options import SetOptions, Flag
-from stellar_sdk.operation.revoke_sponsorship import RevokeSponsorship
+from stellar_sdk.operation.revoke_sponsorship import RevokeSponsorship, TrustLine, Offer, Data, Signer
 from stellar_sdk.operation.utils import (
     check_price,
     check_amount,
@@ -1378,6 +1378,42 @@ class TestRevokeSponsorship:
             Operation.from_xdr_object(op.to_xdr_object()).to_xdr_object().to_xdr()
             == xdr
         )
+
+    def test_trustline_equal(self):
+        account1 = "GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV"
+        account2 = "GB2DRLHCWHUCB2BS4IRRY2GBQKVAKEXOU2EMTMLSUOXVNMZY7W6BSGZ7"
+        asset1 = Asset.native()
+        asset2 = Asset("TEST", "GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV")
+        assert TrustLine(account1, asset1) == TrustLine(account1, asset1)
+        assert TrustLine(account1, asset1) != TrustLine(account1, asset2)
+        assert TrustLine(account1, asset1) != TrustLine(account2, asset1)
+
+    def test_offer_equal(self):
+        seller1 = "GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV"
+        seller2 = "GB2DRLHCWHUCB2BS4IRRY2GBQKVAKEXOU2EMTMLSUOXVNMZY7W6BSGZ7"
+        offer_id1 = 0
+        offer_id2 = 1
+        assert Offer(seller1, offer_id1) == Offer(seller1, offer_id1)
+        assert Offer(seller1, offer_id1) != Offer(seller1, offer_id2)
+        assert Offer(seller1, offer_id1) != Offer(seller2, offer_id1)
+
+    def test_data_equal(self):
+        account1 = "GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV"
+        account2 = "GB2DRLHCWHUCB2BS4IRRY2GBQKVAKEXOU2EMTMLSUOXVNMZY7W6BSGZ7"
+        data_name1 = "data_name1"
+        data_name2 = "data_name2"
+        assert Data(account1, data_name1) == Data(account1, data_name1)
+        assert Data(account1, data_name1) != Data(account1, data_name2)
+        assert Data(account1, data_name1) != Data(account2, data_name1)
+
+    def test_signer_equal(self):
+        account1 = "GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV"
+        account2 = "GB2DRLHCWHUCB2BS4IRRY2GBQKVAKEXOU2EMTMLSUOXVNMZY7W6BSGZ7"
+        signer1 = SignerKey.ed25519_public_key(account1)
+        signer2 = SignerKey.ed25519_public_key(account2)
+        assert Signer(account1, signer1) == Signer(account1, signer1)
+        assert Signer(account1, signer1) != Signer(account1, signer2)
+        assert Signer(account1, signer1) != Signer(account2, signer1)
 
 
 class TestClaimPredicate:

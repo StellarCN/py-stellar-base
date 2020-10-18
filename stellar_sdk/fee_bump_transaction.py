@@ -139,6 +139,6 @@ class FeeBumpTransaction:
 
     def __str__(self):
         return (
-            f"<FeeBumpTransaction [fee_source={self.base_fee} "
+            f"<FeeBumpTransaction [fee_source={self.fee_source}, "
             f"base_fee={self.base_fee}, inner_transaction_envelope={self.inner_transaction_envelope}]>"
         )
