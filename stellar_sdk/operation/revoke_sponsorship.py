@@ -4,14 +4,13 @@ from enum import IntEnum
 from typing import Optional
 
 from .operation import Operation
+from .utils import check_ed25519_public_key
+from .. import xdr as stellar_xdr
 from ..asset import Asset
+from ..exceptions import ValueError
 from ..keypair import Keypair
 from ..signer_key import SignerKey
 from ..strkey import StrKey
-from ..xdr import Xdr
-from ..exceptions import ValueError
-from .utils import check_ed25519_public_key
-from ..xdr.StellarXDR_type import ClaimableBalanceID
 
 
 class RevokeSponsorshipType(IntEnum):
@@ -102,8 +101,8 @@ class RevokeSponsorship(Operation):
         self.signer = signer
 
     @classmethod
-    def type_code(cls) -> int:
-        return Xdr.const.REVOKE_SPONSORSHIP
+    def type_code(cls) -> stellar_xdr.OperationType:
+        return stellar_xdr.OperationType.REVOKE_SPONSORSHIP
 
     @classmethod
     def revoke_account_sponsorship(cls, account_id: str, source: str = None):
@@ -237,144 +236,137 @@ class RevokeSponsorship(Operation):
             source=source,
         )
 
-    def _to_operation_body(self) -> Xdr.nullclass:
-        body = Xdr.nullclass()
-        body.type = Xdr.const.REVOKE_SPONSORSHIP
+    def _to_operation_body(self) -> stellar_xdr.OperationBody:
         if self.revoke_sponsorship_type == RevokeSponsorshipType.ACCOUNT:
-            ledger_key = Xdr.nullclass()
-            ledger_key.type = Xdr.const.ACCOUNT
-            account = Xdr.nullclass()
-            account.accountID = Keypair.from_public_key(
-                self.account_id
-            ).xdr_account_id()
-            ledger_key.account = account
-            revoke_sponsorship_op = Xdr.nullclass()
-            revoke_sponsorship_op.type = Xdr.const.REVOKE_SPONSORSHIP_LEDGER_ENTRY
-            revoke_sponsorship_op.ledgerKey = ledger_key
-            body.revokeSponsorshipOp = revoke_sponsorship_op
-            return body
-        elif self.revoke_sponsorship_type == RevokeSponsorshipType.TRUSTLINE:
-            ledger_key = Xdr.nullclass()
-            ledger_key.type = Xdr.const.TRUSTLINE
-            trust_line = Xdr.nullclass()
-            trust_line.accountID = Keypair.from_public_key(
-                self.trustline.account_id
-            ).xdr_account_id()
-            trust_line.asset = self.trustline.asset.to_xdr_object()
-            ledger_key.trustLine = trust_line
-            revoke_sponsorship_op = Xdr.nullclass()
-            revoke_sponsorship_op.type = Xdr.const.REVOKE_SPONSORSHIP_LEDGER_ENTRY
-            revoke_sponsorship_op.ledgerKey = ledger_key
-            body.revokeSponsorshipOp = revoke_sponsorship_op
-            return body
-        elif self.revoke_sponsorship_type == RevokeSponsorshipType.OFFER:
-            ledger_key = Xdr.nullclass()
-            ledger_key.type = Xdr.const.OFFER
-            offer = Xdr.nullclass()
-            offer.sellerID = Keypair.from_public_key(
-                self.offer.seller_id
-            ).xdr_account_id()
-            offer.offerID = self.offer.offer_id
-            ledger_key.offer = offer
-            revoke_sponsorship_op = Xdr.nullclass()
-            revoke_sponsorship_op.type = Xdr.const.REVOKE_SPONSORSHIP_LEDGER_ENTRY
-            revoke_sponsorship_op.ledgerKey = ledger_key
-            body.revokeSponsorshipOp = revoke_sponsorship_op
-            return body
-        elif self.revoke_sponsorship_type == RevokeSponsorshipType.DATA:
-            ledger_key = Xdr.nullclass()
-            ledger_key.type = Xdr.const.DATA
-            data = Xdr.nullclass()
-            data.accountID = Keypair.from_public_key(
-                self.data.account_id
-            ).xdr_account_id()
-            data.dataName = self.data.data_name.encode()
-            ledger_key.data = data
-            revoke_sponsorship_op = Xdr.nullclass()
-            revoke_sponsorship_op.type = Xdr.const.REVOKE_SPONSORSHIP_LEDGER_ENTRY
-            revoke_sponsorship_op.ledgerKey = ledger_key
-            body.revokeSponsorshipOp = revoke_sponsorship_op
-            return body
-        elif self.revoke_sponsorship_type == RevokeSponsorshipType.CLAIMABLE_BALANCE:
-            ledger_key = Xdr.nullclass()
-            ledger_key.type = Xdr.const.CLAIMABLE_BALANCE
-            claimable_balance_bytes = binascii.unhexlify(self.claimable_balance_id)
-            claimable_balance = Xdr.nullclass()
-            balance_id = ClaimableBalanceID.from_xdr(
-                base64.b64encode(claimable_balance_bytes)
+            account = stellar_xdr.LedgerKeyAccount(
+                Keypair.from_public_key(self.account_id).xdr_account_id()
             )
-            claimable_balance.balanceID = balance_id
-            ledger_key.claimableBalance = claimable_balance
-            revoke_sponsorship_op = Xdr.nullclass()
-            revoke_sponsorship_op.type = Xdr.const.REVOKE_SPONSORSHIP_LEDGER_ENTRY
-            revoke_sponsorship_op.ledgerKey = ledger_key
-            body.revokeSponsorshipOp = revoke_sponsorship_op
-            return body
+            ledger_key = stellar_xdr.LedgerKey(
+                stellar_xdr.LedgerEntryType.ACCOUNT, account=account
+            )
+            revoke_sponsorship_op = stellar_xdr.RevokeSponsorshipOp(
+                stellar_xdr.RevokeSponsorshipType.REVOKE_SPONSORSHIP_LEDGER_ENTRY,
+                ledger_key=ledger_key,
+            )
+        elif self.revoke_sponsorship_type == RevokeSponsorshipType.TRUSTLINE:
+            trust_line = stellar_xdr.LedgerKeyTrustLine(
+                Keypair.from_public_key(self.trustline.account_id).xdr_account_id(),
+                self.trustline.asset.to_xdr_object(),
+            )
+            ledger_key = stellar_xdr.LedgerKey(
+                stellar_xdr.LedgerEntryType.TRUSTLINE, trust_line=trust_line
+            )
+            revoke_sponsorship_op = stellar_xdr.RevokeSponsorshipOp(
+                stellar_xdr.RevokeSponsorshipType.REVOKE_SPONSORSHIP_LEDGER_ENTRY,
+                ledger_key=ledger_key,
+            )
+        elif self.revoke_sponsorship_type == RevokeSponsorshipType.OFFER:
+            offer = stellar_xdr.LedgerKeyOffer(
+                Keypair.from_public_key(self.offer.seller_id).xdr_account_id(),
+                stellar_xdr.Int64(self.offer.offer_id),
+            )
+            ledger_key = stellar_xdr.LedgerKey(
+                stellar_xdr.LedgerEntryType.OFFER, offer=offer
+            )
+            revoke_sponsorship_op = stellar_xdr.RevokeSponsorshipOp(
+                stellar_xdr.RevokeSponsorshipType.REVOKE_SPONSORSHIP_LEDGER_ENTRY,
+                ledger_key=ledger_key,
+            )
+        elif self.revoke_sponsorship_type == RevokeSponsorshipType.DATA:
+            data = stellar_xdr.LedgerKeyData(
+                Keypair.from_public_key(self.data.account_id).xdr_account_id(),
+                stellar_xdr.String64(self.data.data_name.encode()),
+            )
+            ledger_key = stellar_xdr.LedgerKey(
+                stellar_xdr.LedgerEntryType.DATA, data=data
+            )
+            revoke_sponsorship_op = stellar_xdr.RevokeSponsorshipOp(
+                stellar_xdr.RevokeSponsorshipType.REVOKE_SPONSORSHIP_LEDGER_ENTRY,
+                ledger_key=ledger_key,
+            )
+        elif self.revoke_sponsorship_type == RevokeSponsorshipType.CLAIMABLE_BALANCE:
+            claimable_balance_bytes = binascii.unhexlify(self.claimable_balance_id)
+            balance_id = stellar_xdr.ClaimableBalanceID.from_xdr_bytes(
+                claimable_balance_bytes
+            )
+            claimable_balance = stellar_xdr.LedgerKeyClaimableBalance(
+                balance_id=balance_id
+            )
+            ledger_key = stellar_xdr.LedgerKey(
+                stellar_xdr.LedgerEntryType.CLAIMABLE_BALANCE,
+                claimable_balance=claimable_balance,
+            )
+            revoke_sponsorship_op = stellar_xdr.RevokeSponsorshipOp(
+                stellar_xdr.RevokeSponsorshipType.REVOKE_SPONSORSHIP_LEDGER_ENTRY,
+                ledger_key=ledger_key,
+            )
         elif self.revoke_sponsorship_type == RevokeSponsorshipType.SIGNER:
-            signer = Xdr.nullclass()
-            signer.accountID = Keypair.from_public_key(
-                self.signer.account_id
-            ).xdr_account_id()
-            signer.signerKey = self.signer.signer_key.to_xdr_object()
-            revoke_sponsorship_op = Xdr.nullclass()
-            revoke_sponsorship_op.type = Xdr.const.REVOKE_SPONSORSHIP_SIGNER
-            revoke_sponsorship_op.signer = signer
-            body.revokeSponsorshipOp = revoke_sponsorship_op
-            return body
+            signer_key = stellar_xdr.RevokeSponsorshipOpSigner(
+                Keypair.from_public_key(self.signer.account_id).xdr_account_id(),
+                self.signer.signer_key.to_xdr_object(),
+            )
+            revoke_sponsorship_op = stellar_xdr.RevokeSponsorshipOp(
+                stellar_xdr.RevokeSponsorshipType.REVOKE_SPONSORSHIP_SIGNER,
+                signer=signer_key,
+            )
         else:
             raise ValueError(
                 f"{self.revoke_sponsorship_type} is not a valid RevokeSponsorshipType."
             )
+        body = stellar_xdr.OperationBody(
+            type=self.type_code(), revoke_sponsorship_op=revoke_sponsorship_op
+        )
+        return body
 
     @classmethod
     def from_xdr_object(
-        cls, operation_xdr_object: Xdr.types.Operation
+        cls, operation_xdr_object: stellar_xdr.Operation
     ) -> "RevokeSponsorship":
         """Creates a :class:`RevokeSponsorship` object from an XDR Operation
         object.
         """
         source = Operation.get_source_from_xdr_obj(operation_xdr_object)
-        op_type = operation_xdr_object.body.revokeSponsorshipOp.type
-        if op_type == Xdr.const.REVOKE_SPONSORSHIP_LEDGER_ENTRY:
-            ledger_key = operation_xdr_object.body.revokeSponsorshipOp.ledgerKey
+        op_type = operation_xdr_object.body.revoke_sponsorship_op.type
+        if op_type == stellar_xdr.RevokeSponsorshipType.REVOKE_SPONSORSHIP_LEDGER_ENTRY:
+            ledger_key = operation_xdr_object.body.revoke_sponsorship_op.ledger_key
             ledger_key_type = ledger_key.type
-            if ledger_key_type == Xdr.const.ACCOUNT:
+            if ledger_key_type == stellar_xdr.LedgerEntryType.ACCOUNT:
                 account_id = StrKey.encode_ed25519_public_key(
-                    ledger_key.account.accountID.ed25519
+                    ledger_key.account.account_id.account_id.ed25519.uint256
                 )
                 op = cls.revoke_account_sponsorship(account_id, source)
-            elif ledger_key_type == Xdr.const.TRUSTLINE:
+            elif ledger_key_type == stellar_xdr.LedgerEntryType.TRUSTLINE:
                 account_id = StrKey.encode_ed25519_public_key(
-                    ledger_key.trustLine.accountID.ed25519
+                    ledger_key.trust_line.account_id.account_id.ed25519.uint256
                 )
-                asset = Asset.from_xdr_object(ledger_key.trustLine.asset)
+                asset = Asset.from_xdr_object(ledger_key.trust_line.asset)
                 op = cls.revoke_trustline_sponsorship(account_id, asset, source)
-            elif ledger_key_type == Xdr.const.OFFER:
+            elif ledger_key_type == stellar_xdr.LedgerEntryType.OFFER:
                 seller_id = StrKey.encode_ed25519_public_key(
-                    ledger_key.offer.sellerID.ed25519
+                    ledger_key.offer.seller_id.account_id.ed25519.uint256
                 )
-                offer_id = ledger_key.offer.offerID
+                offer_id = ledger_key.offer.offer_id.int64
                 op = cls.revoke_offer_sponsorship(seller_id, offer_id, source)
-            elif ledger_key_type == Xdr.const.DATA:
+            elif ledger_key_type == stellar_xdr.LedgerEntryType.DATA:
                 account_id = StrKey.encode_ed25519_public_key(
-                    ledger_key.data.accountID.ed25519
+                    ledger_key.data.account_id.account_id.ed25519.uint256
                 )
-                data_name = ledger_key.data.dataName.decode()
+                data_name = ledger_key.data.data_name.string64.decode()
                 op = cls.revoke_data_sponsorship(account_id, data_name, source)
-            elif ledger_key_type == Xdr.const.CLAIMABLE_BALANCE:
+            elif ledger_key_type == stellar_xdr.LedgerEntryType.CLAIMABLE_BALANCE:
                 balance_id = base64.b64decode(
-                    ledger_key.claimableBalance.balanceID.to_xdr()
+                    ledger_key.claimable_balance.balance_id.to_xdr()
                 )
                 balance_id = binascii.hexlify(balance_id).decode()
                 op = cls.revoke_claimable_balance_sponsorship(balance_id, source)
             else:
                 raise ValueError(f"{ledger_key_type} is an unsupported LedgerKey type.")
-        elif op_type == Xdr.const.REVOKE_SPONSORSHIP_SIGNER:
+        elif op_type == stellar_xdr.RevokeSponsorshipType.REVOKE_SPONSORSHIP_SIGNER:
             account_id = StrKey.encode_ed25519_public_key(
-                operation_xdr_object.body.revokeSponsorshipOp.signer.accountID.ed25519
+                operation_xdr_object.body.revoke_sponsorship_op.signer.account_id.account_id.ed25519.uint256
             )
             signer_key = SignerKey.from_xdr_object(
-                operation_xdr_object.body.revokeSponsorshipOp.signer.signerKey
+                operation_xdr_object.body.revoke_sponsorship_op.signer.signer_key
             )
             op = cls.revoke_signer_sponsorship(account_id, signer_key, source)
         else:

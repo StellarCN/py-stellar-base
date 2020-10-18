@@ -1,11 +1,11 @@
 from typing import Union, Optional
 
+from . import xdr as stellar_xdr
 from .exceptions import ValueError
 from .keypair import Keypair
 from .transaction import Transaction
 from .transaction_envelope import TransactionEnvelope
 from .utils import parse_ed25519_account_id_from_muxed_account_xdr_object
-from .xdr import Xdr
 
 BASE_FEE = 100
 
@@ -38,7 +38,7 @@ class FeeBumpTransaction:
             fee_source = Keypair.from_public_key(fee_source)
 
         self._fee_source: Keypair = fee_source
-        self._fee_source_muxed: Optional[Xdr.types.MuxedAccount] = None
+        self._fee_source_muxed: Optional[stellar_xdr.MuxedAccount] = None
         self.base_fee = base_fee
         self.inner_transaction_envelope = (
             inner_transaction_envelope.to_transaction_envelope_v1()
@@ -62,9 +62,9 @@ class FeeBumpTransaction:
             value = Keypair.from_public_key(value)
 
         self._fee_source: Keypair = value
-        self._fee_source_muxed: Optional[Xdr.types.MuxedAccount] = None
+        self._fee_source_muxed: Optional[stellar_xdr.MuxedAccount] = None
 
-    def to_xdr_object(self) -> Xdr.types.FeeBumpTransaction:
+    def to_xdr_object(self) -> stellar_xdr.FeeBumpTransaction:
         """Get an XDR object representation of this :class:`FeeBumpTransaction`.
 
         :return: XDR Transaction object
@@ -74,18 +74,21 @@ class FeeBumpTransaction:
         else:
             fee_source = self._fee_source.xdr_muxed_account()
         fee = self.base_fee * (len(self._inner_transaction.operations) + 1)
-        ext = Xdr.nullclass()
-        ext.v = 0
-        return Xdr.types.FeeBumpTransaction(
-            feeSource=fee_source,
-            fee=fee,
-            innerTx=self.inner_transaction_envelope.to_xdr_object(),
+        ext = stellar_xdr.FeeBumpTransactionExt(0)
+        inner_tx = stellar_xdr.FeeBumpTransactionInnerTx(
+            type=stellar_xdr.EnvelopeType.ENVELOPE_TYPE_TX,
+            v1=self.inner_transaction_envelope.to_xdr_object().v1,
+        )
+        return stellar_xdr.FeeBumpTransaction(
+            fee_source=fee_source,
+            fee=stellar_xdr.Int64(fee),
+            inner_tx=inner_tx,
             ext=ext,
         )
 
     @classmethod
     def from_xdr_object(
-        cls, tx_xdr_object: Xdr.types.FeeBumpTransaction, network_passphrase: str
+        cls, tx_xdr_object: stellar_xdr.FeeBumpTransaction, network_passphrase: str
     ) -> "FeeBumpTransaction":
         """Create a new :class:`FeeBumpTransaction` from an XDR object.
 
@@ -95,21 +98,26 @@ class FeeBumpTransaction:
         :return: A new :class:`FeeBumpTransaction` object from the given XDR Transaction object.
         """
         source = parse_ed25519_account_id_from_muxed_account_xdr_object(
-            tx_xdr_object.feeSource
+            tx_xdr_object.fee_source
+        )
+        te = stellar_xdr.TransactionEnvelope(
+            type=stellar_xdr.EnvelopeType.ENVELOPE_TYPE_TX, v1=tx_xdr_object.inner_tx.v1
         )
         inner_transaction_envelope = TransactionEnvelope.from_xdr_object(
-            tx_xdr_object.innerTx, network_passphrase
+            te, network_passphrase
         )
         inner_transaction_operation_length = len(
             inner_transaction_envelope.transaction.operations
         )
-        base_fee = int(tx_xdr_object.fee / (inner_transaction_operation_length + 1))
+        base_fee = int(
+            tx_xdr_object.fee.int64 / (inner_transaction_operation_length + 1)
+        )
         tx = cls(
             fee_source=source,
             base_fee=base_fee,
             inner_transaction_envelope=inner_transaction_envelope,
         )
-        tx._fee_source_muxed = tx_xdr_object.feeSource
+        tx._fee_source_muxed = tx_xdr_object.fee_source
         return tx
 
     @classmethod
@@ -121,5 +129,5 @@ class FeeBumpTransaction:
 
         :return: A new :class:`FeeBumpTransaction` object from the given XDR FeeBumpTransaction base64 string object.
         """
-        xdr_object = Xdr.types.FeeBumpTransaction.from_xdr(xdr)
+        xdr_object = stellar_xdr.FeeBumpTransaction.from_xdr(xdr)
         return cls.from_xdr_object(xdr_object, network_passphrase)

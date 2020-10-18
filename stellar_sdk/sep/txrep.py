@@ -11,6 +11,7 @@ from decimal import Decimal
 from enum import Enum
 from typing import List, Union, Optional, Dict
 
+from .. import xdr as stellar_xdr
 from ..asset import Asset
 from ..exceptions import ValueError as SdkValueError
 from ..fee_bump_transaction import FeeBumpTransaction
@@ -23,8 +24,6 @@ from ..strkey import StrKey
 from ..time_bounds import TimeBounds
 from ..transaction import Transaction
 from ..transaction_envelope import TransactionEnvelope
-from ..xdr import Xdr
-from ..xdr.StellarXDR_const import OperationType
 
 __all__ = ["to_txrep", "from_txrep"]
 
@@ -269,16 +268,18 @@ def _remove_string_value_comment(value: str) -> str:
 
 def _get_signature(
     index: int, raw_data_map: Dict[str, str], prefix: str
-) -> Xdr.types.DecoratedSignature:
+) -> stellar_xdr.DecoratedSignature:
     hint = _get_bytes_value(raw_data_map, f"{prefix}signatures[{index}].hint")
     signature = _get_bytes_value(raw_data_map, f"{prefix}signatures[{index}].signature")
-    return Xdr.types.DecoratedSignature(hint, signature)
+    return stellar_xdr.DecoratedSignature(
+        stellar_xdr.SignatureHint(hint), stellar_xdr.Signature(signature)
+    )
 
 
 def _get_signatures(
     raw_data_map: Dict[str, str], prefix: str
-) -> List[Xdr.types.DecoratedSignature]:
-    signatures: List[Xdr.types.DecoratedSignature] = []
+) -> List[stellar_xdr.DecoratedSignature]:
+    signatures: List[stellar_xdr.DecoratedSignature] = []
     signature_length = _get_int_value(raw_data_map, f"{prefix}signatures.len")
     for i in range(signature_length):
         signature = _get_signature(i, raw_data_map, prefix)
@@ -296,54 +297,54 @@ def _get_operation(index, raw_data_map, tx_prefix):
             raw_data_map, f"{tx_prefix}operations[{index}].sourceAccount"
         )
     operation_type = _get_value(raw_data_map, f"{prefix}type")
-    if operation_type == OperationType[AccountMerge.type_code()]:
+    if operation_type == AccountMerge.type_code().name:
         return _get_account_merge_op(source_account_id, tx_prefix, raw_data_map, index)
-    elif operation_type == OperationType[AllowTrust.type_code()]:
+    elif operation_type == AllowTrust.type_code().name:
         operation_prefix = prefix + "allowTrustOp."
         return _get_allow_trust_op(source_account_id, operation_prefix, raw_data_map)
-    elif operation_type == OperationType[BumpSequence.type_code()]:
+    elif operation_type == BumpSequence.type_code().name:
         operation_prefix = prefix + "bumpSequenceOp."
         return _get_bump_sequence_op(source_account_id, operation_prefix, raw_data_map)
-    elif operation_type == OperationType[ChangeTrust.type_code()]:
+    elif operation_type == ChangeTrust.type_code().name:
         operation_prefix = prefix + "changeTrustOp."
         return _get_change_trust_op(source_account_id, operation_prefix, raw_data_map)
-    elif operation_type == OperationType[CreateAccount.type_code()]:
+    elif operation_type == CreateAccount.type_code().name:
         operation_prefix = prefix + "createAccountOp."
         return _get_create_account_op(source_account_id, operation_prefix, raw_data_map)
-    elif operation_type == OperationType[CreatePassiveSellOffer.type_code()]:
+    elif operation_type == CreatePassiveSellOffer.type_code().name:
         operation_prefix = prefix + "createPassiveSellOfferOp."
         return _get_create_passive_sell_offer_op(
             source_account_id, operation_prefix, raw_data_map
         )
-    elif operation_type == OperationType[Inflation.type_code()]:
+    elif operation_type == Inflation.type_code().name:
         return _get_inflation_op(source_account_id)
-    elif operation_type == OperationType[ManageBuyOffer.type_code()]:
+    elif operation_type == ManageBuyOffer.type_code().name:
         operation_prefix = prefix + "manageBuyOfferOp."
         return _get_manage_buy_offer_op(
             source_account_id, operation_prefix, raw_data_map
         )
-    elif operation_type == OperationType[ManageData.type_code()]:
+    elif operation_type == ManageData.type_code().name:
         operation_prefix = prefix + "manageDataOp."
         return _get_manage_data_op(source_account_id, operation_prefix, raw_data_map)
-    elif operation_type == OperationType[ManageSellOffer.type_code()]:
+    elif operation_type == ManageSellOffer.type_code().name:
         operation_prefix = prefix + "manageSellOfferOp."
         return _get_manage_sell_offer_op(
             source_account_id, operation_prefix, raw_data_map
         )
-    elif operation_type == OperationType[PathPaymentStrictReceive.type_code()]:
+    elif operation_type == PathPaymentStrictReceive.type_code().name:
         operation_prefix = prefix + "pathPaymentStrictReceiveOp."
         return _get_path_payment_strict_receive_op(
             source_account_id, operation_prefix, raw_data_map
         )
-    elif operation_type == OperationType[PathPaymentStrictSend.type_code()]:
+    elif operation_type == PathPaymentStrictSend.type_code().name:
         operation_prefix = prefix + "pathPaymentStrictSendOp."
         return _get_path_payment_strict_send_op(
             source_account_id, operation_prefix, raw_data_map
         )
-    elif operation_type == OperationType[Payment.type_code()]:
+    elif operation_type == Payment.type_code().name:
         operation_prefix = prefix + "paymentOp."
         return _get_payment_op(source_account_id, operation_prefix, raw_data_map)
-    elif operation_type == OperationType[SetOptions.type_code()]:
+    elif operation_type == SetOptions.type_code().name:
         operation_prefix = prefix + "setOptionsOp."
         return _get_set_options_op(source_account_id, operation_prefix, raw_data_map)
     else:
@@ -687,7 +688,7 @@ def _add_operation(
     index: int, operation: Operation, prefix: str, lines: List[str]
 ) -> None:
     prefix = f"{prefix}operations[{index}]."
-    operation_type = OperationType[operation.type_code()]
+    operation_type = operation.type_code()
 
     def add_operation_line(key: str, value: Union[str, int]) -> None:
         _add_line(f"{prefix}{key}", value, lines)
@@ -697,13 +698,13 @@ def _add_operation(
         add_operation_line("sourceAccount", operation.source)
     else:
         add_operation_line("sourceAccount._present", _false)
-    add_operation_line("body.type", operation_type)
+    add_operation_line("body.type", operation_type.name)
 
     def add_body_line(
         key: str, value: Union[str, int, None], optional: bool = False
     ) -> None:
-        operation_type = OperationType[operation.type_code()]
-        key = f"body.{_to_camel_case(operation_type)}Op.{key}"
+        operation_type = operation.type_code()
+        key = f"body.{_to_camel_case(operation_type.name)}Op.{key}"
         if optional:
             present = True if value is not None else False
             add_operation_line(f"{key}._present", _true if present else _false)
@@ -716,18 +717,33 @@ def _add_operation(
         add_body_line("signer._present", _false if signer is None else _true)
         if signer is None:
             return
-        if signer.signer_key.signer_key.type == Xdr.const.SIGNER_KEY_TYPE_ED25519:
+        if (
+            signer.signer_key.signer_key.type
+            == stellar_xdr.SignerKeyType.SIGNER_KEY_TYPE_ED25519
+        ):
             add_body_line(
                 "signer.key",
-                StrKey.encode_ed25519_public_key(signer.signer_key.signer_key.ed25519),
+                StrKey.encode_ed25519_public_key(
+                    signer.signer_key.signer_key.ed25519.uint256
+                ),
             )
-        if signer.signer_key.signer_key.type == Xdr.const.SIGNER_KEY_TYPE_PRE_AUTH_TX:
+        if (
+            signer.signer_key.signer_key.type
+            == stellar_xdr.SignerKeyType.SIGNER_KEY_TYPE_PRE_AUTH_TX
+        ):
             add_body_line(
-                "signer.key", StrKey.encode_pre_auth_tx(signer.signer_key.signer_key.preAuthTx)
+                "signer.key",
+                StrKey.encode_pre_auth_tx(
+                    signer.signer_key.signer_key.pre_auth_tx.uint256
+                ),
             )
-        if signer.signer_key.signer_key.type == Xdr.const.SIGNER_KEY_TYPE_HASH_X:
+        if (
+            signer.signer_key.signer_key.type
+            == stellar_xdr.SignerKeyType.SIGNER_KEY_TYPE_HASH_X
+        ):
             add_body_line(
-                "signer.key", StrKey.encode_sha256_hash(signer.signer_key.signer_key.hashX)
+                "signer.key",
+                StrKey.encode_sha256_hash(signer.signer_key.signer_key.hash_x.uint256),
             )
         add_body_line("signer.weight", signer.weight)
 
@@ -824,7 +840,7 @@ def _add_operation(
 
 
 def _add_signatures(
-    signatures: List[Xdr.types.DecoratedSignature], prefix: str, lines: List[str]
+    signatures: List[stellar_xdr.DecoratedSignature], prefix: str, lines: List[str]
 ) -> None:
     _add_line(f"{prefix}signatures.len", len(signatures), lines)
     for index, signature in enumerate(signatures):
@@ -832,11 +848,11 @@ def _add_signatures(
 
 
 def _add_signature(
-    index: int, signature: Xdr.types.DecoratedSignature, prefix: str, lines: List[str]
+    index: int, signature: stellar_xdr.DecoratedSignature, prefix: str, lines: List[str]
 ) -> None:
     prefix = f"{prefix}signatures[{index}]."
-    _add_line(f"{prefix}hint", _to_opaque(signature.hint), lines)
-    _add_line(f"{prefix}signature", _to_opaque(signature.signature), lines)
+    _add_line(f"{prefix}hint", _to_opaque(signature.hint.signature_hint), lines)
+    _add_line(f"{prefix}signature", _to_opaque(signature.signature.signature), lines)
 
 
 def _to_asset(asset: Asset):

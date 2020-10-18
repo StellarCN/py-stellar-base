@@ -1,9 +1,10 @@
 import copy
 from typing import List
+from xdrlib import Packer
 
+from . import xdr as stellar_xdr
 from .base_transaction_envelope import BaseTransactionEnvelope
 from .transaction import Transaction
-from .xdr import Xdr
 
 __all__ = ["TransactionEnvelope"]
 
@@ -28,7 +29,7 @@ class TransactionEnvelope(BaseTransactionEnvelope["TransactionEnvelope"]):
         self,
         transaction: Transaction,
         network_passphrase: str,
-        signatures: List[Xdr.types.DecoratedSignature] = None,
+        signatures: List[stellar_xdr.DecoratedSignature] = None,
     ) -> None:
         super().__init__(network_passphrase, signatures)
         self.transaction = transaction
@@ -47,32 +48,29 @@ class TransactionEnvelope(BaseTransactionEnvelope["TransactionEnvelope"]):
 
         """
         network_id = self.network_id
-        tx_type = Xdr.StellarXDRPacker()
-        tx_packer = Xdr.StellarXDRPacker()
         tx = self.transaction
         if isinstance(self.transaction, Transaction) and not self.transaction.v1:
             tx = Transaction.from_xdr_object(self.transaction.to_xdr_object(), v1=False)
             tx.v1 = True
-        tx_type.pack_EnvelopeType(Xdr.const.ENVELOPE_TYPE_TX)
-        tx_packer.pack_Transaction(tx.to_xdr_object())
-        tx_type_buffer = tx_type.get_buffer()
-        tx_buffer = tx_packer.get_buffer()
-        return network_id + tx_type_buffer + tx_buffer
+        packer = Packer()
+        stellar_xdr.EnvelopeType.ENVELOPE_TYPE_TX.pack(packer)
+        tx.to_xdr_object().pack(packer)
+        return network_id + packer.get_buffer()
 
-    def to_xdr_object(self) -> Xdr.types.TransactionEnvelope:
+    def to_xdr_object(self) -> stellar_xdr.TransactionEnvelope:
         """Get an XDR object representation of this :class:`TransactionEnvelope`.
 
         :return: XDR TransactionEnvelope object
         """
         tx = self.transaction.to_xdr_object()
         if self.transaction.v1:
-            te_type = Xdr.const.ENVELOPE_TYPE_TX
-            tx_envelope = Xdr.types.TransactionV1Envelope(tx, self.signatures)
-            return Xdr.types.TransactionEnvelope(type=te_type, v1=tx_envelope)
+            te_type = stellar_xdr.EnvelopeType.ENVELOPE_TYPE_TX
+            tx_envelope = stellar_xdr.TransactionV1Envelope(tx, self.signatures)
+            return stellar_xdr.TransactionEnvelope(type=te_type, v1=tx_envelope)
         else:
-            te_type = Xdr.const.ENVELOPE_TYPE_TX_V0
-            tx_envelope = Xdr.types.TransactionV0Envelope(tx, self.signatures)
-            return Xdr.types.TransactionEnvelope(type=te_type, v0=tx_envelope)
+            te_type = stellar_xdr.EnvelopeType.ENVELOPE_TYPE_TX_V0
+            tx_envelope = stellar_xdr.TransactionV0Envelope(tx, self.signatures)
+            return stellar_xdr.TransactionEnvelope(type=te_type, v0=tx_envelope)
 
     def to_transaction_envelope_v1(self) -> "TransactionEnvelope":
         """Create a new :class:`TransactionEnvelope`, if the internal tx is not v1, we will convert it to v1.
@@ -84,7 +82,7 @@ class TransactionEnvelope(BaseTransactionEnvelope["TransactionEnvelope"]):
 
     @classmethod
     def from_xdr_object(
-        cls, te_xdr_object: Xdr.types.TransactionEnvelope, network_passphrase: str
+        cls, te_xdr_object: stellar_xdr.TransactionEnvelope, network_passphrase: str
     ) -> "TransactionEnvelope":
         """Create a new :class:`TransactionEnvelope` from an XDR object.
 
@@ -94,13 +92,13 @@ class TransactionEnvelope(BaseTransactionEnvelope["TransactionEnvelope"]):
         :return: A new :class:`TransactionEnvelope` object from the given XDR TransactionEnvelope object.
         """
         te_type = te_xdr_object.type
-        if te_type == Xdr.const.ENVELOPE_TYPE_TX_V0:
-            tx = Transaction.from_xdr_object(te_xdr_object.v0, v1=False)
+        if te_type == stellar_xdr.EnvelopeType.ENVELOPE_TYPE_TX_V0:
+            tx = Transaction.from_xdr_object(te_xdr_object.v0.tx, v1=False)
             signatures = te_xdr_object.v0.signatures
-        elif te_type == Xdr.const.ENVELOPE_TYPE_TX:
-            tx = Transaction.from_xdr_object(te_xdr_object.v1, v1=True)
+        elif te_type == stellar_xdr.EnvelopeType.ENVELOPE_TYPE_TX:
+            tx = Transaction.from_xdr_object(te_xdr_object.v1.tx, v1=True)
             signatures = te_xdr_object.v1.signatures
         else:
-            raise ValueError(f"Invalid EnvelopeType: {te_xdr_object.type}.")
+            raise ValueError("Invalid EnvelopeType: %d.", te_xdr_object.type)
         te = cls(tx, network_passphrase=network_passphrase, signatures=signatures)
         return te

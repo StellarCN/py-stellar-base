@@ -1,9 +1,8 @@
 from typing import Union
 
 from .operation import Operation
+from .. import xdr as stellar_xdr
 from ..exceptions import ValueError
-from ..utils import pack_xdr_array, unpack_xdr_array
-from ..xdr import Xdr
 
 
 class ManageData(Operation):
@@ -42,30 +41,37 @@ class ManageData(Operation):
             raise ValueError("Data and value should be <= 64 bytes (ascii encoded).")
 
     @classmethod
-    def type_code(cls) -> int:
-        return Xdr.const.MANAGE_DATA
+    def type_code(cls) -> stellar_xdr.OperationType:
+        return stellar_xdr.OperationType.MANAGE_DATA
 
-    def _to_operation_body(self) -> Xdr.nullclass:
-        data_name = bytes(self.data_name, encoding="utf-8")
+    def _to_operation_body(self) -> stellar_xdr.OperationBody:
+        data_name = stellar_xdr.String64(bytes(self.data_name, encoding="utf-8"))
+        if self.data_value is None:
+            data_value = None
+        else:
+            data_value = stellar_xdr.DataValue(self.data_value)
 
-        data_value = pack_xdr_array(self.data_value)
-        manage_data_op = Xdr.types.ManageDataOp(data_name, data_value)
+        manage_data_op = stellar_xdr.ManageDataOp(data_name, data_value)
 
-        body = Xdr.nullclass()
-        body.type = Xdr.const.MANAGE_DATA
-        body.manageDataOp = manage_data_op
+        body = stellar_xdr.OperationBody(
+            type=self.type_code(), manage_data_op=manage_data_op
+        )
         return body
 
     @classmethod
-    def from_xdr_object(cls, operation_xdr_object: Xdr.types.Operation) -> "ManageData":
+    def from_xdr_object(
+        cls, operation_xdr_object: stellar_xdr.Operation
+    ) -> "ManageData":
         """Creates a :class:`ManageData` object from an XDR Operation
         object.
 
         """
         source = Operation.get_source_from_xdr_obj(operation_xdr_object)
-        data_name = operation_xdr_object.body.manageDataOp.dataName.decode()
+        # TODO: should we decode it?
+        data_name = operation_xdr_object.body.manage_data_op.data_name.string64.decode()
+        data_value_xdr = operation_xdr_object.body.manage_data_op.data_value
+        data_value = None if data_value_xdr is None else data_value_xdr.data_value
 
-        data_value = unpack_xdr_array(operation_xdr_object.body.manageDataOp.dataValue)
         op = cls(data_name=data_name, data_value=data_value, source=source)
         op._source_muxed = Operation.get_source_muxed_from_xdr_obj(operation_xdr_object)
         return op

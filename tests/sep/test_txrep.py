@@ -616,12 +616,16 @@ class TestTxrep:
         assert _get_string_value(raw_data_map, key) == v
 
     @pytest.mark.parametrize(
-        "k, v", [
+        "k, v",
+        [
             ("", ""),
             ("  ", ""),
             ("123 (comment here)", "123"),
-            ('"\\"Enjoy this \\"\\" transaction\\n\\""', '""Enjoy this "" transaction\n""'),
-        ]
+            (
+                '"\\"Enjoy this \\"\\" transaction\\n\\""',
+                '""Enjoy this "" transaction\n""',
+            ),
+        ],
     )
     def test_remove_comment(self, k, v):
         assert _remove_comment(k) == v

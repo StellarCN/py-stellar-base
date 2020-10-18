@@ -1,4 +1,4 @@
-from .xdr import Xdr
+from . import xdr as stellar_xdr
 from .exceptions import ValueError
 
 __all__ = ["TimeBounds"]
@@ -36,16 +36,18 @@ class TimeBounds:
         self.min_time: int = min_time
         self.max_time: int = max_time
 
-    def to_xdr_object(self) -> Xdr.types.TimeBounds:
+    def to_xdr_object(self) -> stellar_xdr.TimeBounds:
         """Returns the xdr object for this TimeBounds object.
 
         :return: XDR TimeBounds object
         """
-        return Xdr.types.TimeBounds(minTime=self.min_time, maxTime=self.max_time)
+        min_time = stellar_xdr.TimePoint(stellar_xdr.Uint64(self.min_time))
+        max_time = stellar_xdr.TimePoint(stellar_xdr.Uint64(self.max_time))
+        return stellar_xdr.TimeBounds(min_time, max_time)
 
     @classmethod
     def from_xdr_object(
-        cls, time_bounds_xdr_object: Xdr.types.TimeBounds
+        cls, time_bounds_xdr_object: stellar_xdr.TimeBounds
     ) -> "TimeBounds":
         """Create a :class:`TimeBounds` from an XDR TimeBounds object.
 
@@ -53,8 +55,8 @@ class TimeBounds:
         :return: A new :class:`TimeBounds` object from the given XDR TimeBounds object.
         """
         return cls(
-            min_time=time_bounds_xdr_object.minTime,
-            max_time=time_bounds_xdr_object.maxTime,
+            min_time=time_bounds_xdr_object.min_time.time_point.uint64,
+            max_time=time_bounds_xdr_object.max_time.time_point.uint64,
         )
 
     def __eq__(self, other: object) -> bool:

@@ -1,16 +1,12 @@
 from typing import List, Union, Optional
 
+from . import xdr as stellar_xdr
 from .keypair import Keypair
 from .memo import NoneMemo, Memo
 from .operation.operation import Operation
 from .strkey import StrKey
 from .time_bounds import TimeBounds
-from .utils import (
-    pack_xdr_array,
-    unpack_xdr_array,
-    parse_ed25519_account_id_from_muxed_account_xdr_object,
-)
-from .xdr import Xdr
+from .utils import parse_ed25519_account_id_from_muxed_account_xdr_object
 
 __all__ = ["Transaction"]
 
@@ -72,7 +68,7 @@ class Transaction:
             source = Keypair.from_public_key(source)
 
         self._source: Keypair = source
-        self._source_muxed: Optional[Xdr.types.MuxedAccount] = None
+        self._source_muxed: Optional[stellar_xdr.MuxedAccount] = None
         self.sequence: int = sequence
         self.operations: List[Operation] = operations
         self.memo: Memo = memo
@@ -90,37 +86,42 @@ class Transaction:
             value = Keypair.from_public_key(value)
 
         self._source: Keypair = value
-        self._source_muxed: Optional[Xdr.types.MuxedAccount] = None
+        self._source_muxed: Optional[stellar_xdr.MuxedAccount] = None
 
-    def to_xdr_object(self) -> Union[Xdr.types.Transaction, Xdr.types.TransactionV0]:
+    def to_xdr_object(
+        self,
+    ) -> Union[stellar_xdr.Transaction, stellar_xdr.TransactionV0]:
         """Get an XDR object representation of this :class:`Transaction`.
 
         :return: XDR Transaction object
         """
         memo = self.memo.to_xdr_object()
         operations = [operation.to_xdr_object() for operation in self.operations]
-        time_bounds: List[TimeBounds] = []
-        if self.time_bounds:
-            time_bounds = pack_xdr_array(self.time_bounds.to_xdr_object())
-        ext = Xdr.nullclass()
-        ext.v = 0
+        time_bounds = (
+            self.time_bounds.to_xdr_object() if self.time_bounds is not None else None
+        )
+        fee = stellar_xdr.Uint32(self.fee)
+        sequence = stellar_xdr.SequenceNumber(stellar_xdr.Int64(self.sequence))
+
         if self.v1:
             if self._source_muxed is not None:
                 source_xdr = self._source_muxed
             else:
                 source_xdr = self.source.xdr_muxed_account()
-            return Xdr.types.Transaction(
-                source_xdr, self.fee, self.sequence, time_bounds, memo, operations, ext,
+            ext = stellar_xdr.TransactionExt(0)
+            return stellar_xdr.Transaction(
+                source_xdr, fee, sequence, time_bounds, memo, operations, ext,
             )
         source_xdr = self.source.xdr_public_key().ed25519
-        return Xdr.types.TransactionV0(
-            source_xdr, self.fee, self.sequence, time_bounds, memo, operations, ext,
+        ext = stellar_xdr.TransactionV0Ext(0)
+        return stellar_xdr.TransactionV0(
+            source_xdr, fee, sequence, time_bounds, memo, operations, ext,
         )
 
     @classmethod
     def from_xdr_object(
         cls,
-        tx_xdr_object: Union[Xdr.types.Transaction, Xdr.types.TransactionV0],
+        tx_xdr_object: Union[stellar_xdr.Transaction, stellar_xdr.TransactionV0],
         v1: bool = False,
     ) -> "Transaction":
         """Create a new :class:`Transaction` from an XDR object.
@@ -135,21 +136,20 @@ class Transaction:
         """
         if v1:
             source = parse_ed25519_account_id_from_muxed_account_xdr_object(
-                tx_xdr_object.sourceAccount
+                tx_xdr_object.source_account
             )
         else:
             source = StrKey.encode_ed25519_public_key(
-                tx_xdr_object.sourceAccountEd25519
+                tx_xdr_object.source_account_ed25519.uint256
             )
-        sequence = tx_xdr_object.seqNum
-        fee = tx_xdr_object.fee
-        time_bounds_in_xdr = tx_xdr_object.timeBounds
-        time_bounds = None
-        if time_bounds_in_xdr:
-            time_bounds = TimeBounds.from_xdr_object(
-                unpack_xdr_array(time_bounds_in_xdr)
-            )
-
+        sequence = tx_xdr_object.seq_num.sequence_number.int64
+        fee = tx_xdr_object.fee.uint32
+        time_bounds_xdr = tx_xdr_object.time_bounds
+        time_bounds = (
+            None
+            if time_bounds_xdr is None
+            else TimeBounds.from_xdr_object(time_bounds_xdr)
+        )
         memo = Memo.from_xdr_object(tx_xdr_object.memo)
         operations = list(map(Operation.from_xdr_object, tx_xdr_object.operations))
         tx = cls(
@@ -162,7 +162,7 @@ class Transaction:
             v1=v1,
         )
         if v1:
-            tx._source_muxed = tx_xdr_object.sourceAccount
+            tx._source_muxed = tx_xdr_object.source_account
         return tx
 
     @classmethod
@@ -178,7 +178,7 @@ class Transaction:
         :return: A new :class:`Transaction` object from the given XDR Transaction base64 string object.
         """
         if v1:
-            xdr_object = Xdr.types.Transaction.from_xdr(xdr)
+            xdr_object = stellar_xdr.Transaction.from_xdr(xdr)
         else:
-            xdr_object = Xdr.types.TransactionV0.from_xdr(xdr)
+            xdr_object = stellar_xdr.TransactionV0.from_xdr(xdr)
         return cls.from_xdr_object(xdr_object, v1)

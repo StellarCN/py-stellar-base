@@ -1,8 +1,8 @@
 from .operation import Operation
 from .utils import check_ed25519_public_key
+from .. import xdr as stellar_xdr
 from ..keypair import Keypair
 from ..strkey import StrKey
-from ..xdr import Xdr
 
 
 class BeginSponsoringFutureReserves(Operation):
@@ -27,22 +27,23 @@ class BeginSponsoringFutureReserves(Operation):
         self.sponsored_id: str = sponsored_id
 
     @classmethod
-    def type_code(cls) -> int:
-        return Xdr.const.BEGIN_SPONSORING_FUTURE_RESERVES
+    def type_code(cls) -> stellar_xdr.OperationType:
+        return stellar_xdr.OperationType.BEGIN_SPONSORING_FUTURE_RESERVES
 
-    def _to_operation_body(self) -> Xdr.nullclass:
+    def _to_operation_body(self) -> stellar_xdr.OperationBody:
         sponsored_id = Keypair.from_public_key(self.sponsored_id).xdr_account_id()
-        begin_sponsoring_future_reserves_op = Xdr.types.BeginSponsoringFutureReservesOp(
-            sponsoredID=sponsored_id
+        begin_sponsoring_future_reserves_op = stellar_xdr.BeginSponsoringFutureReservesOp(
+            sponsored_id=sponsored_id
         )
-        body = Xdr.nullclass()
-        body.type = Xdr.const.BEGIN_SPONSORING_FUTURE_RESERVES
-        body.beginSponsoringFutureReservesOp = begin_sponsoring_future_reserves_op
+        body = stellar_xdr.OperationBody(
+            type=self.type_code(),
+            begin_sponsoring_future_reserves_op=begin_sponsoring_future_reserves_op,
+        )
         return body
 
     @classmethod
     def from_xdr_object(
-        cls, operation_xdr_object: Xdr.types.Operation
+        cls, operation_xdr_object: stellar_xdr.Operation
     ) -> "BeginSponsoringFutureReserves":
         """Creates a :class:`BeginSponsoringFutureReserves` object from an XDR Operation
         object.
@@ -50,7 +51,7 @@ class BeginSponsoringFutureReserves(Operation):
         source = Operation.get_source_from_xdr_obj(operation_xdr_object)
 
         sponsored_id = StrKey.encode_ed25519_public_key(
-            operation_xdr_object.body.beginSponsoringFutureReservesOp.sponsoredID.ed25519
+            operation_xdr_object.body.begin_sponsoring_future_reserves_op.sponsored_id.account_id.ed25519.uint256
         )
         op = cls(source=source, sponsored_id=sponsored_id)
         op._source_muxed = Operation.get_source_muxed_from_xdr_obj(operation_xdr_object)

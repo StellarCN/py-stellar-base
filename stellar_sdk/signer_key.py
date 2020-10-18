@@ -1,7 +1,7 @@
+from . import xdr as stellar_xdr
 from .__version__ import __issues__
 from .exceptions import ValueError
 from .strkey import StrKey
-from .xdr import Xdr
 
 __all__ = ["SignerKey"]
 
@@ -12,8 +12,8 @@ class SignerKey:
     :param signer_key: The XDR signer object
     """
 
-    def __init__(self, signer_key: Xdr.types.SignerKey) -> "None":
-        self.signer_key: Xdr.types.SignerKey = signer_key
+    def __init__(self, signer_key: stellar_xdr.SignerKey) -> "None":
+        self.signer_key: stellar_xdr.SignerKey = signer_key
 
     @classmethod
     def ed25519_public_key(cls, account_id: str) -> "SignerKey":
@@ -25,9 +25,9 @@ class SignerKey:
             :exc:`Ed25519PublicKeyInvalidError <stellar_sdk.exceptions.Ed25519PublicKeyInvalidError>`: if ``account_id``
             is not a valid ed25519 public key.
         """
-        signer_key = Xdr.types.SignerKey(
-            Xdr.const.SIGNER_KEY_TYPE_ED25519,
-            ed25519=StrKey.decode_ed25519_public_key(account_id),
+        signer_key = stellar_xdr.SignerKey(
+            stellar_xdr.SignerKeyType.SIGNER_KEY_TYPE_ED25519,
+            ed25519=stellar_xdr.Uint256(StrKey.decode_ed25519_public_key(account_id)),
         )
 
         return cls(signer_key)
@@ -40,8 +40,9 @@ class SignerKey:
         :param pre_auth_tx_hash: The sha256 hash of a transaction.
         :return: Pre AUTH TX Signer
         """
-        signer_key = Xdr.types.SignerKey(
-            Xdr.const.SIGNER_KEY_TYPE_PRE_AUTH_TX, preAuthTx=pre_auth_tx_hash
+        signer_key = stellar_xdr.SignerKey(
+            stellar_xdr.SignerKeyType.SIGNER_KEY_TYPE_PRE_AUTH_TX,
+            pre_auth_tx=stellar_xdr.Uint256(pre_auth_tx_hash),
         )
 
         return cls(signer_key)
@@ -54,12 +55,13 @@ class SignerKey:
         :param sha256_hash: a sha256 hash of a preimage
         :return: SHA256 HASH Signer
         """
-        signer_key = Xdr.types.SignerKey(
-            Xdr.const.SIGNER_KEY_TYPE_HASH_X, hashX=sha256_hash
+        signer_key = stellar_xdr.SignerKey(
+            stellar_xdr.SignerKeyType.SIGNER_KEY_TYPE_HASH_X,
+            hash_x=stellar_xdr.Uint256(sha256_hash),
         )
         return cls(signer_key)
 
-    def to_xdr_object(self) -> Xdr.types.SignerKey:
+    def to_xdr_object(self) -> stellar_xdr.SignerKey:
         """Returns the xdr object for this SignerKey object.
 
         :return: XDR Signer object
@@ -67,19 +69,24 @@ class SignerKey:
         return self.signer_key
 
     @classmethod
-    def from_xdr_object(cls, signer_xdr_object: Xdr.types.Signer) -> "SignerKey":
+    def from_xdr_object(cls, signer_xdr_object: stellar_xdr.SignerKey) -> "SignerKey":
         """Create a :class:`SignerKey` from an XDR SignerKey object.
 
         :param signer_xdr_object: The XDR SignerKey object.
         :return: A new :class:`SignerKey` object from the given XDR SignerKey object.
         """
-        if signer_xdr_object.type == Xdr.const.SIGNER_KEY_TYPE_ED25519:
-            account_id = StrKey.encode_ed25519_public_key(signer_xdr_object.ed25519)
+        if signer_xdr_object.type == stellar_xdr.SignerKeyType.SIGNER_KEY_TYPE_ED25519:
+            account_id = StrKey.encode_ed25519_public_key(
+                signer_xdr_object.ed25519.uint256
+            )
             return cls.ed25519_public_key(account_id)
-        elif signer_xdr_object.type == Xdr.const.SIGNER_KEY_TYPE_PRE_AUTH_TX:
-            return cls.pre_auth_tx(signer_xdr_object.preAuthTx)
-        elif signer_xdr_object.type == Xdr.const.SIGNER_KEY_TYPE_HASH_X:
-            return cls.sha256_hash(signer_xdr_object.hashX)
+        elif (
+            signer_xdr_object.type
+            == stellar_xdr.SignerKeyType.SIGNER_KEY_TYPE_PRE_AUTH_TX
+        ):
+            return cls.pre_auth_tx(signer_xdr_object.pre_auth_tx.uint256)
+        elif signer_xdr_object.type == stellar_xdr.SignerKeyType.SIGNER_KEY_TYPE_HASH_X:
+            return cls.sha256_hash(signer_xdr_object.hash_x.uint256)
         else:
             raise ValueError(
                 f"This is an unknown signer type, please consider creating an issuer at {__issues__}."
@@ -88,4 +95,4 @@ class SignerKey:
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
             return NotImplemented  # pragma: no cover
-        return self.to_xdr_object().to_xdr() == other.to_xdr_object().to_xdr()
+        return self.signer_key == other.signer_key

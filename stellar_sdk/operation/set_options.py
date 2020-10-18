@@ -1,13 +1,12 @@
 from enum import IntFlag
-from typing import List, Optional, Union
+from typing import Optional, Union
 
 from .operation import Operation
 from .utils import check_ed25519_public_key
+from .. import xdr as stellar_xdr
 from ..keypair import Keypair
 from ..signer import Signer
 from ..strkey import StrKey
-from ..utils import pack_xdr_array, unpack_xdr_array
-from ..xdr import Xdr
 
 __all__ = ["Flag", "SetOptions"]
 
@@ -103,33 +102,49 @@ class SetOptions(Operation):
         self.signer: Optional[Signer] = signer
 
     @classmethod
-    def type_code(cls) -> int:
-        return Xdr.const.SET_OPTIONS
+    def type_code(cls) -> stellar_xdr.OperationType:
+        return stellar_xdr.OperationType.SET_OPTIONS
 
-    def _to_operation_body(self) -> Xdr.nullclass:
-        if self.inflation_dest is not None:
-            inflation_dest = [
-                Keypair.from_public_key(self.inflation_dest).xdr_account_id()
-            ]
-        else:
-            inflation_dest = []
+    def _to_operation_body(self) -> stellar_xdr.OperationBody:
+        inflation_dest = (
+            Keypair.from_public_key(self.inflation_dest).xdr_account_id()
+            if self.inflation_dest is not None
+            else None
+        )
+        home_domain = (
+            stellar_xdr.String32(bytes(self.home_domain, encoding="utf-8"))
+            if self.home_domain is not None
+            else None
+        )
+        clear_flags = (
+            None if self.clear_flags is None else stellar_xdr.Uint32(self.clear_flags)
+        )
+        set_flags = (
+            None if self.set_flags is None else stellar_xdr.Uint32(self.set_flags)
+        )
+        master_weight = (
+            None
+            if self.master_weight is None
+            else stellar_xdr.Uint32(self.master_weight)
+        )
+        low_threshold = (
+            None
+            if self.low_threshold is None
+            else stellar_xdr.Uint32(self.low_threshold)
+        )
+        med_threshold = (
+            None
+            if self.med_threshold is None
+            else stellar_xdr.Uint32(self.med_threshold)
+        )
+        high_threshold = (
+            None
+            if self.high_threshold is None
+            else stellar_xdr.Uint32(self.high_threshold)
+        )
+        signer = None if self.signer is None else self.signer.to_xdr_object()
 
-        home_domain: List[bytes] = []
-        if self.home_domain:
-            home_domain = pack_xdr_array(bytes(self.home_domain, encoding="utf-8"))
-
-        clear_flags = pack_xdr_array(self.clear_flags)
-        set_flags = pack_xdr_array(self.set_flags)
-        master_weight = pack_xdr_array(self.master_weight)
-        low_threshold = pack_xdr_array(self.low_threshold)
-        med_threshold = pack_xdr_array(self.med_threshold)
-        high_threshold = pack_xdr_array(self.high_threshold)
-
-        signer: List[Xdr.types.Signer] = []
-        if self.signer:
-            signer = [self.signer.to_xdr_object()]
-
-        set_options_op = Xdr.types.SetOptionsOp(
+        set_options_op = stellar_xdr.SetOptionsOp(
             inflation_dest,
             clear_flags,
             set_flags,
@@ -140,9 +155,9 @@ class SetOptions(Operation):
             home_domain,
             signer,
         )
-        body = Xdr.nullclass()
-        body.type = Xdr.const.SET_OPTIONS
-        body.setOptionsOp = set_options_op
+        body = stellar_xdr.OperationBody(
+            type=self.type_code(), set_options_op=set_options_op
+        )
         return body
 
     @classmethod
@@ -154,38 +169,37 @@ class SetOptions(Operation):
         source = Operation.get_source_from_xdr_obj(operation_xdr_object)
 
         inflation_dest = None
-        if operation_xdr_object.body.setOptionsOp.inflationDest:
+        if operation_xdr_object.body.set_options_op.inflation_dest:
             inflation_dest = StrKey.encode_ed25519_public_key(
-                operation_xdr_object.body.setOptionsOp.inflationDest[0].ed25519
+                operation_xdr_object.body.set_options_op.inflation_dest.account_id.ed25519.uint256
             )
 
-        clear_flags = unpack_xdr_array(
-            operation_xdr_object.body.setOptionsOp.clearFlags
-        )  # list
-        set_flags = unpack_xdr_array(operation_xdr_object.body.setOptionsOp.setFlags)
-        master_weight = unpack_xdr_array(
-            operation_xdr_object.body.setOptionsOp.masterWeight
+        clear_flags_xdr = operation_xdr_object.body.set_options_op.clear_flags
+        set_flags_xdr = operation_xdr_object.body.set_options_op.set_flags
+        master_weight_xdr = operation_xdr_object.body.set_options_op.master_weight
+        low_threshold_xdr = operation_xdr_object.body.set_options_op.low_threshold
+        med_threshold_xdr = operation_xdr_object.body.set_options_op.med_threshold
+        high_threshold_xdr = operation_xdr_object.body.set_options_op.high_threshold
+        home_domain_xdr = operation_xdr_object.body.set_options_op.home_domain
+        signer_xdr_object = operation_xdr_object.body.set_options_op.signer
+
+        clear_flags = None if clear_flags_xdr is None else clear_flags_xdr.uint32
+        set_flags = None if set_flags_xdr is None else set_flags_xdr.uint32
+        master_weight = None if master_weight_xdr is None else master_weight_xdr.uint32
+        low_threshold = None if low_threshold_xdr is None else low_threshold_xdr.uint32
+        med_threshold = None if med_threshold_xdr is None else med_threshold_xdr.uint32
+        high_threshold = (
+            None if high_threshold_xdr is None else high_threshold_xdr.uint32
         )
-        low_threshold = unpack_xdr_array(
-            operation_xdr_object.body.setOptionsOp.lowThreshold
-        )
-        med_threshold = unpack_xdr_array(
-            operation_xdr_object.body.setOptionsOp.medThreshold
-        )
-        high_threshold = unpack_xdr_array(
-            operation_xdr_object.body.setOptionsOp.highThreshold
-        )
-        home_domain = unpack_xdr_array(
-            operation_xdr_object.body.setOptionsOp.homeDomain
+        home_domain = None if home_domain_xdr is None else home_domain_xdr.string32
+        signer = (
+            None
+            if signer_xdr_object is None
+            else Signer.from_xdr_object(signer_xdr_object)
         )
 
-        if home_domain:
+        if home_domain is not None:
             home_domain = home_domain.decode("utf-8")
-
-        signer = None
-        signer_xdr_object = operation_xdr_object.body.setOptionsOp.signer
-        if signer_xdr_object:
-            signer = Signer.from_xdr_object(signer_xdr_object[0])
 
         op = cls(
             inflation_dest=inflation_dest,
