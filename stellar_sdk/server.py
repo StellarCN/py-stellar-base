@@ -1,6 +1,7 @@
 import warnings
 from typing import Union, Coroutine, Any, Dict, List, Tuple, Generator
 
+from . import xdr as stellar_xdr
 from .account import Account, Thresholds
 from .asset import Asset
 from .base_transaction_envelope import BaseTransactionEnvelope
@@ -40,7 +41,6 @@ from .utils import (
     urljoin_with_query,
     MUXED_ACCOUNT_STARTING_LETTER,
 )
-from .xdr import Xdr
 
 __all__ = ["Server"]
 
@@ -486,10 +486,10 @@ class Server:
     ) -> Generator[Tuple[int, str], Any, Any]:
         destinations = set()
         memo_required_operation_code = (
-            Xdr.const.PAYMENT,
-            Xdr.const.ACCOUNT_MERGE,
-            Xdr.const.PATH_PAYMENT_STRICT_RECEIVE,
-            Xdr.const.PATH_PAYMENT_STRICT_SEND,
+            stellar_xdr.OperationType.PAYMENT,
+            stellar_xdr.OperationType.ACCOUNT_MERGE,
+            stellar_xdr.OperationType.PATH_PAYMENT_STRICT_RECEIVE,
+            stellar_xdr.OperationType.PATH_PAYMENT_STRICT_SEND,
         )
         for index, operation in enumerate(transaction.operations):
             if operation.type_code() in memo_required_operation_code:

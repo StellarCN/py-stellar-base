@@ -3,7 +3,7 @@ import warnings
 from decimal import Decimal
 from typing import List, Union, Optional
 
-from .signer_key import SignerKey
+from . import xdr as stellar_xdr
 from .account import Account
 from .asset import Asset
 from .exceptions import ValueError
@@ -15,11 +15,11 @@ from .network import Network
 from .operation import *
 from .price import Price
 from .signer import Signer
+from .signer_key import SignerKey
 from .time_bounds import TimeBounds
 from .transaction import Transaction
 from .transaction_envelope import TransactionEnvelope
 from .utils import hex_to_bytes
-from .xdr import Xdr
 
 __all__ = ["TransactionBuilder"]
 
@@ -138,9 +138,9 @@ class TransactionBuilder:
             :py:class:`FeeBumpTransactionEnvelope <stellar_sdk.fee_bump_transaction_envelope.FeeBumpTransactionEnvelope>`
             via the XDR object.
         """
-        xdr_object = Xdr.types.TransactionEnvelope.from_xdr(xdr)
+        xdr_object = stellar_xdr.TransactionEnvelope.from_xdr(xdr)
         te_type = xdr_object.type
-        if te_type == Xdr.const.ENVELOPE_TYPE_TX_FEE_BUMP:
+        if te_type == stellar_xdr.EnvelopeType.ENVELOPE_TYPE_TX_FEE_BUMP:
             return FeeBumpTransactionEnvelope.from_xdr_object(
                 xdr_object, network_passphrase
             )

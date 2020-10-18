@@ -3,10 +3,10 @@ from typing import Union, Optional
 
 from .operation import Operation
 from .utils import check_amount, check_ed25519_public_key
-from ..keypair import Keypair
+from .. import xdr as stellar_xdr
 from ..asset import Asset
+from ..keypair import Keypair
 from ..utils import parse_ed25519_account_id_from_muxed_account_xdr_object
-from ..xdr import Xdr
 
 
 class Payment(Operation):
@@ -36,7 +36,7 @@ class Payment(Operation):
         check_amount(amount)
         check_ed25519_public_key(destination)
         self._destination: str = destination
-        self._destination_muxed: Optional[Xdr.types.MuxedAccount] = None
+        self._destination_muxed: Optional[stellar_xdr.MuxedAccount] = None
         self.asset: Asset = asset
         self.amount: Union[str, Decimal] = amount
 
@@ -51,37 +51,35 @@ class Payment(Operation):
         self._destination = value
 
     @classmethod
-    def type_code(cls) -> int:
-        return Xdr.const.PAYMENT
+    def type_code(cls) -> stellar_xdr.OperationType:
+        return stellar_xdr.OperationType.PAYMENT
 
-    def _to_operation_body(self) -> Xdr.nullclass:
+    def _to_operation_body(self) -> stellar_xdr.OperationBody:
         asset = self.asset.to_xdr_object()
         if self._destination_muxed is not None:
             destination = self._destination_muxed
         else:
             destination = Keypair.from_public_key(self._destination).xdr_muxed_account()
-        amount = Operation.to_xdr_amount(self.amount)
-        payment_op = Xdr.types.PaymentOp(destination, asset, amount)
-        body = Xdr.nullclass()
-        body.type = Xdr.const.PAYMENT
-        body.paymentOp = payment_op
+        amount = stellar_xdr.Int64(Operation.to_xdr_amount(self.amount))
+        payment_op = stellar_xdr.PaymentOp(destination, asset, amount)
+        body = stellar_xdr.OperationBody(type=self.type_code(), payment_op=payment_op)
         return body
 
     @classmethod
-    def from_xdr_object(cls, operation_xdr_object: Xdr.types.Operation) -> "Payment":
+    def from_xdr_object(cls, operation_xdr_object: stellar_xdr.Operation) -> "Payment":
         """Creates a :class:`Payment` object from an XDR Operation
         object.
 
         """
         source = Operation.get_source_from_xdr_obj(operation_xdr_object)
-
         destination = parse_ed25519_account_id_from_muxed_account_xdr_object(
-            operation_xdr_object.body.paymentOp.destination
+            operation_xdr_object.body.payment_op.destination
         )
-        asset = Asset.from_xdr_object(operation_xdr_object.body.paymentOp.asset)
-        amount = Operation.from_xdr_amount(operation_xdr_object.body.paymentOp.amount)
-
+        asset = Asset.from_xdr_object(operation_xdr_object.body.payment_op.asset)
+        amount = Operation.from_xdr_amount(
+            operation_xdr_object.body.payment_op.amount.int64
+        )
         op = cls(source=source, destination=destination, asset=asset, amount=amount)
-        op._destination_muxed = operation_xdr_object.body.paymentOp.destination
+        op._destination_muxed = operation_xdr_object.body.payment_op.destination
         op._source_muxed = Operation.get_source_muxed_from_xdr_obj(operation_xdr_object)
         return op

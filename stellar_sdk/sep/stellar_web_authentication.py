@@ -16,13 +16,13 @@ from typing import List, Tuple
 
 from .ed25519_public_key_signer import Ed25519PublicKeySigner
 from .exceptions import InvalidSep10ChallengeError
+from .. import xdr as stellar_xdr
 from ..account import Account
 from ..exceptions import BadSignatureError, ValueError
 from ..keypair import Keypair
 from ..operation.manage_data import ManageData
 from ..transaction_builder import TransactionBuilder
 from ..transaction_envelope import TransactionEnvelope
-from ..xdr import Xdr
 
 __all__ = [
     "build_challenge_transaction",
@@ -109,8 +109,8 @@ def read_challenge_transaction(
             "Invalid server_account_id, multiplexed account are not supported."
         )
 
-    xdr_object = Xdr.types.TransactionEnvelope.from_xdr(challenge_transaction)
-    if xdr_object.type == Xdr.const.ENVELOPE_TYPE_TX_FEE_BUMP:
+    xdr_object = stellar_xdr.TransactionEnvelope.from_xdr(challenge_transaction)
+    if xdr_object.type == stellar_xdr.EnvelopeType.ENVELOPE_TYPE_TX_FEE_BUMP:
         raise ValueError(
             "Invalid challenge, expected a TransactionEnvelope but received a FeeBumpTransactionEnvelope."
         )
@@ -446,10 +446,10 @@ def _verify_transaction_signatures(
             # See https://github.com/StellarCN/py-stellar-base/issues/252#issuecomment-580882560
             if index in signature_used:
                 continue
-            if decorated_signature.hint != kp.signature_hint():
+            if decorated_signature.hint.signature_hint != kp.signature_hint():
                 continue
             try:
-                kp.verify(tx_hash, decorated_signature.signature)
+                kp.verify(tx_hash, decorated_signature.signature.signature)
                 signature_used.add(index)
                 signers_found.append(signer)
                 break

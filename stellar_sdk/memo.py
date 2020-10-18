@@ -1,9 +1,9 @@
 import abc
 from typing import Union
 
-from .utils import hex_to_bytes
+from . import xdr as stellar_xdr
 from .exceptions import MemoInvalidException
-from .xdr import Xdr
+from .utils import hex_to_bytes
 
 __all__ = ["Memo", "NoneMemo", "TextMemo", "IdMemo", "HashMemo", "ReturnHashMemo"]
 
@@ -33,19 +33,19 @@ class Memo(object, metaclass=abc.ABCMeta):
     """
 
     @abc.abstractmethod
-    def to_xdr_object(self) -> Xdr.types.Memo:
+    def to_xdr_object(self) -> stellar_xdr.Memo:
         """Creates an XDR Memo object that represents this :class:`Memo`."""
 
     @staticmethod
-    def from_xdr_object(xdr_obj: Xdr.types.Memo) -> "Memo":
+    def from_xdr_object(xdr_obj: stellar_xdr.Memo) -> "Memo":
         """Returns an Memo object from XDR memo object."""
 
         xdr_types = {
-            Xdr.const.MEMO_TEXT: TextMemo,
-            Xdr.const.MEMO_ID: IdMemo,
-            Xdr.const.MEMO_HASH: HashMemo,
-            Xdr.const.MEMO_RETURN: ReturnHashMemo,
-            Xdr.const.MEMO_NONE: NoneMemo,
+            stellar_xdr.MemoType.MEMO_TEXT: TextMemo,
+            stellar_xdr.MemoType.MEMO_ID: IdMemo,
+            stellar_xdr.MemoType.MEMO_HASH: HashMemo,
+            stellar_xdr.MemoType.MEMO_RETURN: ReturnHashMemo,
+            stellar_xdr.MemoType.MEMO_NONE: NoneMemo,
         }
 
         # TODO: Maybe we should raise Key Error here
@@ -62,14 +62,14 @@ class NoneMemo(Memo):
     """The :class:`NoneMemo`, which represents no memo for a transaction."""
 
     @classmethod
-    def from_xdr_object(cls, xdr_obj: Xdr.types.Memo) -> "NoneMemo":
+    def from_xdr_object(cls, xdr_obj: stellar_xdr.Memo) -> "NoneMemo":
         """Returns an :class:`NoneMemo` object from XDR memo object."""
 
         return cls()
 
-    def to_xdr_object(self) -> Xdr.types.Memo:
+    def to_xdr_object(self) -> stellar_xdr.Memo:
         """Creates an XDR Memo object that represents this :class:`NoneMemo`."""
-        return Xdr.types.Memo(type=Xdr.const.MEMO_NONE)
+        return stellar_xdr.Memo(type=stellar_xdr.MemoType.MEMO_NONE)
 
     def __str__(self):
         return "<NoneMemo>"
@@ -103,14 +103,15 @@ class TextMemo(Memo):
             )
 
     @classmethod
-    def from_xdr_object(cls, xdr_obj: Xdr.types.Memo) -> "TextMemo":
+    def from_xdr_object(cls, xdr_obj: stellar_xdr.Memo) -> "TextMemo":
         """Returns an :class:`TextMemo` object from XDR memo object."""
+        return cls(bytes(xdr_obj.text))
 
-        return cls(bytes(xdr_obj.switch))
-
-    def to_xdr_object(self) -> Xdr.types.Memo:
+    def to_xdr_object(self) -> stellar_xdr.Memo:
         """Creates an XDR Memo object that represents this :class:`TextMemo`."""
-        return Xdr.types.Memo(type=Xdr.const.MEMO_TEXT, text=self.memo_text)
+        return stellar_xdr.Memo(
+            type=stellar_xdr.MemoType.MEMO_TEXT, text=self.memo_text
+        )
 
     def __str__(self):
         return f"<TextMemo [memo={self.memo_text}]>"
@@ -134,14 +135,16 @@ class IdMemo(Memo):
         self.memo_id: int = memo_id
 
     @classmethod
-    def from_xdr_object(cls, xdr_obj: Xdr.types.Memo) -> "IdMemo":
+    def from_xdr_object(cls, xdr_obj: stellar_xdr.Memo) -> "IdMemo":
         """Returns an :class:`IdMemo` object from XDR memo object."""
 
-        return cls(xdr_obj.switch)
+        return cls(xdr_obj.id.uint64)
 
-    def to_xdr_object(self) -> Xdr.types.Memo:
+    def to_xdr_object(self) -> stellar_xdr.Memo:
         """Creates an XDR Memo object that represents this :class:`IdMemo`."""
-        return Xdr.types.Memo(type=Xdr.const.MEMO_ID, id=self.memo_id)
+        return stellar_xdr.Memo(
+            type=stellar_xdr.MemoType.MEMO_ID, id=stellar_xdr.Uint64(self.memo_id)
+        )
 
     def __str__(self):
         return f"<IdMemo [memo={self.memo_id}]>"
@@ -166,14 +169,16 @@ class HashMemo(Memo):
         self.memo_hash: bytes = memo_hash
 
     @classmethod
-    def from_xdr_object(cls, xdr_obj: Xdr.types.Memo) -> "HashMemo":
+    def from_xdr_object(cls, xdr_obj: stellar_xdr.Memo) -> "HashMemo":
         """Returns an :class:`HashMemo` object from XDR memo object."""
 
-        return cls(xdr_obj.switch)
+        return cls(xdr_obj.hash.hash)
 
-    def to_xdr_object(self) -> Xdr.types.Memo:
+    def to_xdr_object(self) -> stellar_xdr.Memo:
         """Creates an XDR Memo object that represents this :class:`HashMemo`."""
-        return Xdr.types.Memo(type=Xdr.const.MEMO_HASH, hash=self.memo_hash)
+        return stellar_xdr.Memo(
+            type=stellar_xdr.MemoType.MEMO_HASH, hash=stellar_xdr.Hash(self.memo_hash)
+        )
 
     def __str__(self):
         return f"<HashMemo [memo={self.memo_hash}]>"
@@ -203,13 +208,16 @@ class ReturnHashMemo(Memo):
         self.memo_return: bytes = memo_return
 
     @classmethod
-    def from_xdr_object(cls, xdr_obj: Xdr.types.Memo) -> "ReturnHashMemo":
+    def from_xdr_object(cls, xdr_obj: stellar_xdr.Memo) -> "ReturnHashMemo":
         """Returns an :class:`ReturnHashMemo` object from XDR memo object."""
-        return cls(xdr_obj.switch)
+        return cls(xdr_obj.ret_hash.hash)
 
-    def to_xdr_object(self) -> Xdr.types.Memo:
+    def to_xdr_object(self) -> stellar_xdr.Memo:
         """Creates an XDR Memo object that represents this :class:`ReturnHashMemo`."""
-        return Xdr.types.Memo(type=Xdr.const.MEMO_RETURN, retHash=self.memo_return)
+        return stellar_xdr.Memo(
+            type=stellar_xdr.MemoType.MEMO_RETURN,
+            ret_hash=stellar_xdr.Hash(self.memo_return),
+        )
 
     def __str__(self):
         return f"<ReturnHashMemo [memo={self.memo_return}]>"

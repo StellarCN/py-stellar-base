@@ -39,7 +39,7 @@ from stellar_sdk.operation.utils import (
 from stellar_sdk.signer import Signer
 from stellar_sdk.signer_key import SignerKey
 from stellar_sdk.utils import sha256
-from stellar_sdk.xdr import StellarXDR_pack as XdrPacker
+from stellar_sdk import xdr as stellar_xdr
 
 
 class TestBaseOperation:
@@ -1383,9 +1383,7 @@ class TestRevokeSponsorship:
 class TestClaimPredicate:
     @staticmethod
     def to_xdr(predicate):
-        packer = XdrPacker.StellarXDRPacker()
-        packer.pack_ClaimPredicate(predicate.to_xdr_object())
-        return base64.b64encode(packer.get_buffer()).decode()
+        return predicate.to_xdr_object().to_xdr()
 
     def test_predicate_unconditional(self):
         xdr = "AAAAAA=="
@@ -1496,9 +1494,7 @@ class TestClaimPredicate:
 class TestClaimant:
     @staticmethod
     def to_xdr(claimant):
-        packer = XdrPacker.StellarXDRPacker()
-        packer.pack_Claimant(claimant.to_xdr_object())
-        return base64.b64encode(packer.get_buffer()).decode()
+        return claimant.to_xdr_object().to_xdr()
 
     def test_claimant(self):
         xdr = "AAAAAAAAAACJmyhA7VY2xW3cXxSyOXX3nxuiOI0mlOTFbs3dyWDl7wAAAAEAAAACAAAAAQAAAAIAAAAEAAAAAF9eEAAAAAAAAAAAAgAAAAIAAAAFAAAAAAAAw1AAAAADAAAAAQAAAAQAAAAAZVPxAA=="
