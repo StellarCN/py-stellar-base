@@ -27,13 +27,13 @@ class Inflation(Operation):
 
     @classmethod
     def from_xdr_object(
-        cls, operation_xdr_object: stellar_xdr.Operation
+        cls, xdr_object: stellar_xdr.Operation
     ) -> "Inflation":
         """Creates a :class:`Inflation` object from an XDR Operation
         object.
 
         """
-        source = Operation.get_source_from_xdr_obj(operation_xdr_object)
+        source = Operation.get_source_from_xdr_obj(xdr_object)
         op = cls(source)
-        op._source_muxed = Operation.get_source_muxed_from_xdr_obj(operation_xdr_object)
+        op._source_muxed = Operation.get_source_muxed_from_xdr_obj(xdr_object)
         return op

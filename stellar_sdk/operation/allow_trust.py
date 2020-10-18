@@ -99,26 +99,26 @@ class AllowTrust(Operation):
 
     @classmethod
     def from_xdr_object(
-        cls, operation_xdr_object: stellar_xdr.Operation
+        cls, xdr_object: stellar_xdr.Operation
     ) -> "AllowTrust":
         """Creates a :class:`AllowTrust` object from an XDR Operation
         object.
 
         """
-        source = Operation.get_source_from_xdr_obj(operation_xdr_object)
+        source = Operation.get_source_from_xdr_obj(xdr_object)
         trustor = StrKey.encode_ed25519_public_key(
-            operation_xdr_object.body.allow_trust_op.trustor.account_id.ed25519.uint256
+            xdr_object.body.allow_trust_op.trustor.account_id.ed25519.uint256
         )
-        authorize = operation_xdr_object.body.allow_trust_op.authorize.uint32
+        authorize = xdr_object.body.allow_trust_op.authorize.uint32
         authorize = TrustLineEntryFlag(authorize)
-        asset_type = operation_xdr_object.body.allow_trust_op.asset.type
+        asset_type = xdr_object.body.allow_trust_op.asset.type
         if asset_type == stellar_xdr.AssetType.ASSET_TYPE_CREDIT_ALPHANUM4:
             asset_code = (
-                operation_xdr_object.body.allow_trust_op.asset.asset_code4.asset_code4.decode()
+                xdr_object.body.allow_trust_op.asset.asset_code4.asset_code4.decode()
             )
         elif asset_type == stellar_xdr.AssetType.ASSET_TYPE_CREDIT_ALPHANUM12:
             asset_code = (
-                operation_xdr_object.body.allow_trust_op.asset.asset_code12.asset_code12.decode()
+                xdr_object.body.allow_trust_op.asset.asset_code12.asset_code12.decode()
             )
         else:
             raise NotImplementedError(
@@ -130,5 +130,5 @@ class AllowTrust(Operation):
         op = cls(
             source=source, trustor=trustor, authorize=authorize, asset_code=asset_code
         )
-        op._source_muxed = Operation.get_source_muxed_from_xdr_obj(operation_xdr_object)
+        op._source_muxed = Operation.get_source_muxed_from_xdr_obj(xdr_object)
         return op

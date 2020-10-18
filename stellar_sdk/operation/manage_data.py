@@ -60,18 +60,18 @@ class ManageData(Operation):
 
     @classmethod
     def from_xdr_object(
-        cls, operation_xdr_object: stellar_xdr.Operation
+        cls, xdr_object: stellar_xdr.Operation
     ) -> "ManageData":
         """Creates a :class:`ManageData` object from an XDR Operation
         object.
 
         """
-        source = Operation.get_source_from_xdr_obj(operation_xdr_object)
+        source = Operation.get_source_from_xdr_obj(xdr_object)
         # TODO: should we decode it?
-        data_name = operation_xdr_object.body.manage_data_op.data_name.string64.decode()
-        data_value_xdr = operation_xdr_object.body.manage_data_op.data_value
+        data_name = xdr_object.body.manage_data_op.data_name.string64.decode()
+        data_value_xdr = xdr_object.body.manage_data_op.data_value
         data_value = None if data_value_xdr is None else data_value_xdr.data_value
 
         op = cls(data_name=data_name, data_value=data_value, source=source)
-        op._source_muxed = Operation.get_source_muxed_from_xdr_obj(operation_xdr_object)
+        op._source_muxed = Operation.get_source_muxed_from_xdr_obj(xdr_object)
         return op

@@ -349,23 +349,23 @@ class CreateClaimableBalance(Operation):
 
     @classmethod
     def from_xdr_object(
-        cls, operation_xdr_object: stellar_xdr.Operation
+        cls, xdr_object: stellar_xdr.Operation
     ) -> "CreateClaimableBalance":
         """Creates a :class:`CreateClaimableBalance` object from an XDR Operation
         object.
         """
-        source = Operation.get_source_from_xdr_obj(operation_xdr_object)
+        source = Operation.get_source_from_xdr_obj(xdr_object)
         asset = Asset.from_xdr_object(
-            operation_xdr_object.body.create_claimable_balance_op.asset
+            xdr_object.body.create_claimable_balance_op.asset
         )
         amount = Operation.from_xdr_amount(
-            operation_xdr_object.body.create_claimable_balance_op.amount.int64
+            xdr_object.body.create_claimable_balance_op.amount.int64
         )
         claimants = []
         for (
             claimant_xdr_obj
-        ) in operation_xdr_object.body.create_claimable_balance_op.claimants:
+        ) in xdr_object.body.create_claimable_balance_op.claimants:
             claimants.append(Claimant.from_xdr_object(claimant_xdr_obj))
         op = cls(asset=asset, amount=amount, claimants=claimants, source=source)
-        op._source_muxed = Operation.get_source_muxed_from_xdr_obj(operation_xdr_object)
+        op._source_muxed = Operation.get_source_muxed_from_xdr_obj(xdr_object)
         return op

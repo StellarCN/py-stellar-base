@@ -69,24 +69,24 @@ class SignerKey:
         return self.signer_key
 
     @classmethod
-    def from_xdr_object(cls, signer_xdr_object: stellar_xdr.SignerKey) -> "SignerKey":
+    def from_xdr_object(cls, xdr_object: stellar_xdr.SignerKey) -> "SignerKey":
         """Create a :class:`SignerKey` from an XDR SignerKey object.
 
-        :param signer_xdr_object: The XDR SignerKey object.
+        :param xdr_object: The XDR SignerKey object.
         :return: A new :class:`SignerKey` object from the given XDR SignerKey object.
         """
-        if signer_xdr_object.type == stellar_xdr.SignerKeyType.SIGNER_KEY_TYPE_ED25519:
+        if xdr_object.type == stellar_xdr.SignerKeyType.SIGNER_KEY_TYPE_ED25519:
             account_id = StrKey.encode_ed25519_public_key(
-                signer_xdr_object.ed25519.uint256
+                xdr_object.ed25519.uint256
             )
             return cls.ed25519_public_key(account_id)
         elif (
-            signer_xdr_object.type
-            == stellar_xdr.SignerKeyType.SIGNER_KEY_TYPE_PRE_AUTH_TX
+                xdr_object.type
+                == stellar_xdr.SignerKeyType.SIGNER_KEY_TYPE_PRE_AUTH_TX
         ):
-            return cls.pre_auth_tx(signer_xdr_object.pre_auth_tx.uint256)
-        elif signer_xdr_object.type == stellar_xdr.SignerKeyType.SIGNER_KEY_TYPE_HASH_X:
-            return cls.sha256_hash(signer_xdr_object.hash_x.uint256)
+            return cls.pre_auth_tx(xdr_object.pre_auth_tx.uint256)
+        elif xdr_object.type == stellar_xdr.SignerKeyType.SIGNER_KEY_TYPE_HASH_X:
+            return cls.sha256_hash(xdr_object.hash_x.uint256)
         else:
             raise ValueError(
                 f"This is an unknown signer type, please consider creating an issuer at {__issues__}."

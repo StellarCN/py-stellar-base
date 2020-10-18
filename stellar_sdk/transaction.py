@@ -121,12 +121,12 @@ class Transaction:
     @classmethod
     def from_xdr_object(
         cls,
-        tx_xdr_object: Union[stellar_xdr.Transaction, stellar_xdr.TransactionV0],
+        xdr_object: Union[stellar_xdr.Transaction, stellar_xdr.TransactionV0],
         v1: bool = False,
     ) -> "Transaction":
         """Create a new :class:`Transaction` from an XDR object.
 
-        :param tx_xdr_object: The XDR object that represents a transaction.
+        :param xdr_object: The XDR object that represents a transaction.
         :param v1: Temporary feature flag to allow alpha testing of Stellar Protocol 13 transactions.
             We will remove this once all transactions are supposed to be v1.
             See `CAP-0015 <https://github.com/stellar/stellar-protocol/blob/master/core/cap-0015.md>`_
@@ -136,22 +136,22 @@ class Transaction:
         """
         if v1:
             source = parse_ed25519_account_id_from_muxed_account_xdr_object(
-                tx_xdr_object.source_account
+                xdr_object.source_account
             )
         else:
             source = StrKey.encode_ed25519_public_key(
-                tx_xdr_object.source_account_ed25519.uint256
+                xdr_object.source_account_ed25519.uint256
             )
-        sequence = tx_xdr_object.seq_num.sequence_number.int64
-        fee = tx_xdr_object.fee.uint32
-        time_bounds_xdr = tx_xdr_object.time_bounds
+        sequence = xdr_object.seq_num.sequence_number.int64
+        fee = xdr_object.fee.uint32
+        time_bounds_xdr = xdr_object.time_bounds
         time_bounds = (
             None
             if time_bounds_xdr is None
             else TimeBounds.from_xdr_object(time_bounds_xdr)
         )
-        memo = Memo.from_xdr_object(tx_xdr_object.memo)
-        operations = list(map(Operation.from_xdr_object, tx_xdr_object.operations))
+        memo = Memo.from_xdr_object(xdr_object.memo)
+        operations = list(map(Operation.from_xdr_object, xdr_object.operations))
         tx = cls(
             source=source,
             sequence=sequence,
@@ -162,7 +162,7 @@ class Transaction:
             v1=v1,
         )
         if v1:
-            tx._source_muxed = tx_xdr_object.source_account
+            tx._source_muxed = xdr_object.source_account
         return tx
 
     @classmethod

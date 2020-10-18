@@ -64,21 +64,21 @@ class FeeBumpTransactionEnvelope(BaseTransactionEnvelope["FeeBumpTransactionEnve
 
     @classmethod
     def from_xdr_object(
-        cls, te_xdr_object: stellar_xdr.TransactionEnvelope, network_passphrase: str
+        cls, xdr_object: stellar_xdr.TransactionEnvelope, network_passphrase: str
     ) -> "FeeBumpTransactionEnvelope":
         """Create a new :class:`FeeBumpTransactionEnvelope` from an XDR object.
 
-        :param te_xdr_object: The XDR object that represents a fee bump transaction envelope.
+        :param xdr_object: The XDR object that represents a fee bump transaction envelope.
         :param network_passphrase: The network to connect to for verifying and retrieving additional attributes from.
         :return: A new :class:`FeeBumpTransactionEnvelope` object from the given XDR TransactionEnvelope object.
         """
-        te_type = te_xdr_object.type
+        te_type = xdr_object.type
         if te_type == stellar_xdr.EnvelopeType.ENVELOPE_TYPE_TX_FEE_BUMP:
             tx = FeeBumpTransaction.from_xdr_object(
-                te_xdr_object.fee_bump.tx, network_passphrase
+                xdr_object.fee_bump.tx, network_passphrase
             )
         else:
-            raise ValueError("Invalid EnvelopeType: %d.", te_xdr_object.type)
-        signatures = te_xdr_object.fee_bump.signatures
+            raise ValueError("Invalid EnvelopeType: %d.", xdr_object.type)
+        signatures = xdr_object.fee_bump.signatures
         te = cls(tx, network_passphrase=network_passphrase, signatures=signatures)
         return te

@@ -47,16 +47,16 @@ class TimeBounds:
 
     @classmethod
     def from_xdr_object(
-        cls, time_bounds_xdr_object: stellar_xdr.TimeBounds
+        cls, xdr_object: stellar_xdr.TimeBounds
     ) -> "TimeBounds":
         """Create a :class:`TimeBounds` from an XDR TimeBounds object.
 
-        :param time_bounds_xdr_object: The XDR TimeBounds object.
+        :param xdr_object: The XDR TimeBounds object.
         :return: A new :class:`TimeBounds` object from the given XDR TimeBounds object.
         """
         return cls(
-            min_time=time_bounds_xdr_object.min_time.time_point.uint64,
-            max_time=time_bounds_xdr_object.max_time.time_point.uint64,
+            min_time=xdr_object.min_time.time_point.uint64,
+            max_time=xdr_object.max_time.time_point.uint64,
         )
 
     def __eq__(self, other: object) -> bool:

@@ -320,15 +320,15 @@ class RevokeSponsorship(Operation):
 
     @classmethod
     def from_xdr_object(
-        cls, operation_xdr_object: stellar_xdr.Operation
+        cls, xdr_object: stellar_xdr.Operation
     ) -> "RevokeSponsorship":
         """Creates a :class:`RevokeSponsorship` object from an XDR Operation
         object.
         """
-        source = Operation.get_source_from_xdr_obj(operation_xdr_object)
-        op_type = operation_xdr_object.body.revoke_sponsorship_op.type
+        source = Operation.get_source_from_xdr_obj(xdr_object)
+        op_type = xdr_object.body.revoke_sponsorship_op.type
         if op_type == stellar_xdr.RevokeSponsorshipType.REVOKE_SPONSORSHIP_LEDGER_ENTRY:
-            ledger_key = operation_xdr_object.body.revoke_sponsorship_op.ledger_key
+            ledger_key = xdr_object.body.revoke_sponsorship_op.ledger_key
             ledger_key_type = ledger_key.type
             if ledger_key_type == stellar_xdr.LedgerEntryType.ACCOUNT:
                 account_id = StrKey.encode_ed25519_public_key(
@@ -363,13 +363,13 @@ class RevokeSponsorship(Operation):
                 raise ValueError(f"{ledger_key_type} is an unsupported LedgerKey type.")
         elif op_type == stellar_xdr.RevokeSponsorshipType.REVOKE_SPONSORSHIP_SIGNER:
             account_id = StrKey.encode_ed25519_public_key(
-                operation_xdr_object.body.revoke_sponsorship_op.signer.account_id.account_id.ed25519.uint256
+                xdr_object.body.revoke_sponsorship_op.signer.account_id.account_id.ed25519.uint256
             )
             signer_key = SignerKey.from_xdr_object(
-                operation_xdr_object.body.revoke_sponsorship_op.signer.signer_key
+                xdr_object.body.revoke_sponsorship_op.signer.signer_key
             )
             op = cls.revoke_signer_sponsorship(account_id, signer_key, source)
         else:
             raise ValueError(f"{op_type} is an unsupported RevokeSponsorship type.")
-        op._source_muxed = Operation.get_source_muxed_from_xdr_obj(operation_xdr_object)
+        op._source_muxed = Operation.get_source_muxed_from_xdr_obj(xdr_object)
         return op

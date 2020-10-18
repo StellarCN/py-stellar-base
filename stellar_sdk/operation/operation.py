@@ -134,19 +134,19 @@ class Operation(metaclass=ABCMeta):
 
     @classmethod
     def from_xdr_object(
-        cls, operation_xdr_object: stellar_xdr.Operation
+        cls, xdr_object: stellar_xdr.Operation
     ) -> "Operation":
         """Create the appropriate :class:`Operation` subclass from the XDR
         object.
 
-        :param operation_xdr_object: The XDR object to create an :class:`Operation` (or
+        :param xdr_object: The XDR object to create an :class:`Operation` (or
             subclass) instance from.
         """
         for sub_cls in cls.__subclasses__():
-            if sub_cls.type_code() == operation_xdr_object.body.type:
-                return sub_cls.from_xdr_object(operation_xdr_object)
+            if sub_cls.type_code() == xdr_object.body.type:
+                return sub_cls.from_xdr_object(xdr_object)
         raise NotImplementedError(
-            f"Operation of type={operation_xdr_object.body.type} is not implemented."
+            f"Operation of type={xdr_object.body.type} is not implemented."
         )
 
     @staticmethod

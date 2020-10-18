@@ -112,11 +112,11 @@ class BaseTransactionEnvelope(Generic[T]):
 
     @classmethod
     def from_xdr_object(
-        cls, te_xdr_object: stellar_xdr.TransactionEnvelope, network_passphrase: str
+        cls, xdr_object: stellar_xdr.TransactionEnvelope, network_passphrase: str
     ) -> T:
         """Create a new :class:`BaseTransactionEnvelope` from an XDR object.
 
-        :param te_xdr_object: The XDR object that represents a transaction envelope.
+        :param xdr_object: The XDR object that represents a transaction envelope.
         :param network_passphrase: The network to connect to for verifying and retrieving additional attributes from.
         :return: A new :class:`TransactionEnvelope` object from the given XDR TransactionEnvelope object.
         """

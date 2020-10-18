@@ -36,16 +36,16 @@ class BumpSequence(Operation):
 
     @classmethod
     def from_xdr_object(
-        cls, operation_xdr_object: stellar_xdr.Operation
+        cls, xdr_object: stellar_xdr.Operation
     ) -> "BumpSequence":
         """Creates a :class:`BumpSequence` object from an XDR Operation
         object.
 
         """
-        source = Operation.get_source_from_xdr_obj(operation_xdr_object)
+        source = Operation.get_source_from_xdr_obj(xdr_object)
         bump_to = (
-            operation_xdr_object.body.bump_sequence_op.bump_to.sequence_number.int64
+            xdr_object.body.bump_sequence_op.bump_to.sequence_number.int64
         )
         op = cls(source=source, bump_to=bump_to)
-        op._source_muxed = Operation.get_source_muxed_from_xdr_obj(operation_xdr_object)
+        op._source_muxed = Operation.get_source_muxed_from_xdr_obj(xdr_object)
         return op

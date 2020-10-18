@@ -82,27 +82,27 @@ class CreatePassiveSellOffer(Operation):
 
     @classmethod
     def from_xdr_object(
-        cls, operation_xdr_object: stellar_xdr.Operation
+        cls, xdr_object: stellar_xdr.Operation
     ) -> "CreatePassiveSellOffer":
         """Creates a :class:`CreatePassiveSellOffer` object from an XDR Operation object.
 
         """
-        source = Operation.get_source_from_xdr_obj(operation_xdr_object)
+        source = Operation.get_source_from_xdr_obj(xdr_object)
         selling = Asset.from_xdr_object(
-            operation_xdr_object.body.create_passive_sell_offer_op.selling
+            xdr_object.body.create_passive_sell_offer_op.selling
         )
         buying = Asset.from_xdr_object(
-            operation_xdr_object.body.create_passive_sell_offer_op.buying
+            xdr_object.body.create_passive_sell_offer_op.buying
         )
         amount = Operation.from_xdr_amount(
-            operation_xdr_object.body.create_passive_sell_offer_op.amount.int64
+            xdr_object.body.create_passive_sell_offer_op.amount.int64
         )
         price = Price.from_xdr_object(
-            operation_xdr_object.body.create_passive_sell_offer_op.price
+            xdr_object.body.create_passive_sell_offer_op.price
         )
 
         op = cls(
             source=source, selling=selling, buying=buying, amount=amount, price=price
         )
-        op._source_muxed = Operation.get_source_muxed_from_xdr_obj(operation_xdr_object)
+        op._source_muxed = Operation.get_source_muxed_from_xdr_obj(xdr_object)
         return op

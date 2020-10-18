@@ -54,17 +54,17 @@ class ChangeTrust(Operation):
 
     @classmethod
     def from_xdr_object(
-        cls, operation_xdr_object: stellar_xdr.Operation
+        cls, xdr_object: stellar_xdr.Operation
     ) -> "ChangeTrust":
         """Creates a :class:`ChangeTrust` object from an XDR Operation
         object.
 
         """
-        source = Operation.get_source_from_xdr_obj(operation_xdr_object)
-        line = Asset.from_xdr_object(operation_xdr_object.body.change_trust_op.line)
+        source = Operation.get_source_from_xdr_obj(xdr_object)
+        line = Asset.from_xdr_object(xdr_object.body.change_trust_op.line)
         limit = Operation.from_xdr_amount(
-            operation_xdr_object.body.change_trust_op.limit.int64
+            xdr_object.body.change_trust_op.limit.int64
         )
         op = cls(source=source, asset=line, limit=limit)
-        op._source_muxed = Operation.get_source_muxed_from_xdr_obj(operation_xdr_object)
+        op._source_muxed = Operation.get_source_muxed_from_xdr_obj(xdr_object)
         return op

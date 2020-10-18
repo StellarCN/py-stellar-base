@@ -127,26 +127,26 @@ class Asset:
             return stellar_xdr.Asset(type=xdr_type, alpha_num12=alpha_num12)
 
     @classmethod
-    def from_xdr_object(cls, asset_xdr_object: stellar_xdr.Asset) -> "Asset":
+    def from_xdr_object(cls, xdr_object: stellar_xdr.Asset) -> "Asset":
         """Create a :class:`Asset` from an XDR Asset object.
 
-        :param asset_xdr_object: The XDR Asset object.
+        :param xdr_object: The XDR Asset object.
         :return: A new :class:`Asset` object from the given XDR Asset object.
         """
-        if asset_xdr_object.type == stellar_xdr.AssetType.ASSET_TYPE_NATIVE:
+        if xdr_object.type == stellar_xdr.AssetType.ASSET_TYPE_NATIVE:
             return Asset.native()
-        elif asset_xdr_object.type == stellar_xdr.AssetType.ASSET_TYPE_CREDIT_ALPHANUM4:
+        elif xdr_object.type == stellar_xdr.AssetType.ASSET_TYPE_CREDIT_ALPHANUM4:
             issuer = StrKey.encode_ed25519_public_key(
-                asset_xdr_object.alpha_num4.issuer.account_id.ed25519.uint256
+                xdr_object.alpha_num4.issuer.account_id.ed25519.uint256
             )
-            code = asset_xdr_object.alpha_num4.asset_code.asset_code4.decode().rstrip(
+            code = xdr_object.alpha_num4.asset_code.asset_code4.decode().rstrip(
                 "\x00"
             )
         else:
             issuer = StrKey.encode_ed25519_public_key(
-                asset_xdr_object.alpha_num12.issuer.account_id.ed25519.uint256
+                xdr_object.alpha_num12.issuer.account_id.ed25519.uint256
             )
-            code = asset_xdr_object.alpha_num12.asset_code.asset_code12.decode().rstrip(
+            code = xdr_object.alpha_num12.asset_code.asset_code12.decode().rstrip(
                 "\x00"
             )
         return cls(code, issuer)

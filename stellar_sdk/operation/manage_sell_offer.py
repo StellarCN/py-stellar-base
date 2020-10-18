@@ -76,26 +76,26 @@ class ManageSellOffer(Operation):
 
     @classmethod
     def from_xdr_object(
-        cls, operation_xdr_object: stellar_xdr.Operation
+        cls, xdr_object: stellar_xdr.Operation
     ) -> "ManageSellOffer":
         """Creates a :class:`ManageSellOffer` object from an XDR Operation object.
 
         """
-        source = Operation.get_source_from_xdr_obj(operation_xdr_object)
+        source = Operation.get_source_from_xdr_obj(xdr_object)
 
         selling = Asset.from_xdr_object(
-            operation_xdr_object.body.manage_sell_offer_op.selling
+            xdr_object.body.manage_sell_offer_op.selling
         )
         buying = Asset.from_xdr_object(
-            operation_xdr_object.body.manage_sell_offer_op.buying
+            xdr_object.body.manage_sell_offer_op.buying
         )
         amount = Operation.from_xdr_amount(
-            operation_xdr_object.body.manage_sell_offer_op.amount.int64
+            xdr_object.body.manage_sell_offer_op.amount.int64
         )
         price = Price.from_xdr_object(
-            operation_xdr_object.body.manage_sell_offer_op.price
+            xdr_object.body.manage_sell_offer_op.price
         )
-        offer_id = operation_xdr_object.body.manage_sell_offer_op.offer_id.int64
+        offer_id = xdr_object.body.manage_sell_offer_op.offer_id.int64
 
         op = cls(
             source=source,
@@ -105,5 +105,5 @@ class ManageSellOffer(Operation):
             price=price,
             offer_id=offer_id,
         )
-        op._source_muxed = Operation.get_source_muxed_from_xdr_obj(operation_xdr_object)
+        op._source_muxed = Operation.get_source_muxed_from_xdr_obj(xdr_object)
         return op
