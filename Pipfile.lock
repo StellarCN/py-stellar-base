@@ -366,10 +366,10 @@
         },
         "iniconfig": {
             "hashes": [
-                "sha256:80cf40c597eb564e86346103f609d74efce0f6b4d4f30ec8ce9e2c26411ba437",
-                "sha256:e5f92f89355a67de0595932a6c6c02ab4afddc6fcdc0bfc5becd0d60884d3f69"
+                "sha256:011e24c64b7f47f6ebd835bb12a743f2fbe9a26d4cecaa7f53bc4f35ee9da8b3",
+                "sha256:bc3af051d7d14b2ee5ef9969666def0cd1a000e121eaea580d4a313df4b37f32"
             ],
-            "version": "==1.0.1"
+            "version": "==1.1.1"
         },
         "jinja2": {
             "hashes": [
@@ -474,11 +474,11 @@
         },
         "pytest-httpserver": {
             "hashes": [
-                "sha256:1d553dc0fb27483d00a1e25ddcfc38bd3438336ed60f862cad8c50b11621a11a",
-                "sha256:c55289404b7604bfd1c103d243824b441add501828e05807795c2b851b9b0747"
+                "sha256:896e93bc191a2e887f906e07b312a4b753c2803185e9c7b1c6648b6ef65fb0f1",
+                "sha256:8cdab4bb68be0ed7bc6894d08bd043270ce0bb52ecdedc3955be1b86119984e5"
             ],
             "index": "pypi",
-            "version": "==0.3.5"
+            "version": "==0.3.6"
         },
         "pytest-timeout": {
             "hashes": [
