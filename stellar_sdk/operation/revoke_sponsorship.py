@@ -31,12 +31,28 @@ class TrustLine:
         self.account_id = account_id
         self.asset = asset
 
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, self.__class__):
+            return NotImplemented  # pragma: no cover
+        return self.account_id == other.account_id and self.asset == other.asset
+
+    def __str__(self):
+        return f"<TrustLine [account_id={self.account_id}, asset={self.asset}]>"
+
 
 class Offer:
     def __init__(self, seller_id: str, offer_id: int) -> None:
         check_ed25519_public_key(seller_id)
         self.seller_id = seller_id
         self.offer_id = offer_id
+
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, self.__class__):
+            return NotImplemented  # pragma: no cover
+        return self.seller_id == other.seller_id and self.offer_id == other.offer_id
+
+    def __str__(self):
+        return f"<Offer [seller_id={self.seller_id}, offer_id={self.offer_id}]>"
 
 
 class Data:
@@ -45,12 +61,30 @@ class Data:
         self.account_id = account_id
         self.data_name = data_name
 
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, self.__class__):
+            return NotImplemented  # pragma: no cover
+        return self.account_id == other.account_id and self.data_name == other.data_name
+
+    def __str__(self):
+        return f"<Data [account_id={self.account_id}, data_name={self.data_name}]>"
+
 
 class Signer:
     def __init__(self, account_id: str, signer_key: SignerKey) -> None:
         check_ed25519_public_key(account_id)
         self.account_id = account_id
         self.signer_key = signer_key
+
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, self.__class__):
+            return NotImplemented  # pragma: no cover
+        return (
+            self.account_id == other.account_id and self.signer_key == other.signer_key
+        )
+
+    def __str__(self):
+        return f"<Signer [account_id={self.account_id}, signer_key={self.signer_key}]>"
 
 
 class RevokeSponsorship(Operation):
@@ -373,3 +407,15 @@ class RevokeSponsorship(Operation):
             raise ValueError(f"{op_type} is an unsupported RevokeSponsorship type.")
         op._source_muxed = Operation.get_source_muxed_from_xdr_obj(xdr_object)
         return op
+
+    def __str__(self):
+        return (
+            f"<RevokeSponsorship [revoke_sponsorship_type={self.revoke_sponsorship_type}, "
+            f"account_id={self.account_id}, "
+            f"trustline={self.trustline}, "
+            f"offer={self.offer}, "
+            f"data={self.data}, "
+            f"claimable_balance_id={self.claimable_balance_id}, "
+            f"signer={self.signer}, "
+            f"source={self.source}]>"
+        )

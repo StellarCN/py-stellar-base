@@ -182,3 +182,15 @@ class Transaction:
         else:
             xdr_object = stellar_xdr.TransactionV0.from_xdr(xdr)
         return cls.from_xdr_object(xdr_object, v1)
+
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, self.__class__):
+            return NotImplemented  # pragma: no cover
+        return self.to_xdr_object() == other.to_xdr_object()
+
+    def __str__(self):
+        return (
+            f"<Transaction [source={self._source}, sequence={self.sequence}, "
+            f"fee={self.fee}, operations={self.operations}, memo={self.memo}, "
+            f"time_bounds={self.time_bounds}, v1={self.v1}]>"
+        )

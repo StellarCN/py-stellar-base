@@ -68,3 +68,6 @@ class ChangeTrust(Operation):
         op = cls(source=source, asset=line, limit=limit)
         op._source_muxed = Operation.get_source_muxed_from_xdr_obj(xdr_object)
         return op
+
+    def __str__(self):
+        return f"<ChangeTrust [asset={self.asset}, limit={self.limit}, source={self.source}]>"

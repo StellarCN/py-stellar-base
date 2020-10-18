@@ -106,3 +106,9 @@ class CreatePassiveSellOffer(Operation):
         )
         op._source_muxed = Operation.get_source_muxed_from_xdr_obj(xdr_object)
         return op
+
+    def __str__(self):
+        return (
+            f"<CreatePassiveSellOffer [selling={self.selling}, buying={self.buying}, "
+            f"amount={self.amount}, price={self.price}, source={self.source}]>"
+        )

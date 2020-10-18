@@ -37,3 +37,6 @@ class Inflation(Operation):
         op = cls(source)
         op._source_muxed = Operation.get_source_muxed_from_xdr_obj(xdr_object)
         return op
+
+    def __str__(self):
+        return f"<Inflation [source={self.source}]>"

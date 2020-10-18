@@ -131,3 +131,14 @@ class FeeBumpTransaction:
         """
         xdr_object = stellar_xdr.FeeBumpTransaction.from_xdr(xdr)
         return cls.from_xdr_object(xdr_object, network_passphrase)
+
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, self.__class__):
+            return NotImplemented  # pragma: no cover
+        return self.to_xdr_object() == other.to_xdr_object()
+
+    def __str__(self):
+        return (
+            f"<FeeBumpTransaction [fee_source={self.fee_source}, "
+            f"base_fee={self.base_fee}, inner_transaction_envelope={self.inner_transaction_envelope}]>"
+        )

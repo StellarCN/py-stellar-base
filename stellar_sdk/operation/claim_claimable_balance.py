@@ -54,3 +54,6 @@ class ClaimClaimableBalance(Operation):
         op = cls(balance_id=balance_id, source=source)
         op._source_muxed = Operation.get_source_muxed_from_xdr_obj(xdr_object)
         return op
+
+    def __str__(self):
+        return f"<ClaimClaimableBalance [balance_id={self.balance_id}, source={self.source}]>"

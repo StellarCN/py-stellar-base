@@ -96,3 +96,6 @@ class SignerKey:
         if not isinstance(other, self.__class__):
             return NotImplemented  # pragma: no cover
         return self.signer_key == other.signer_key
+
+    def __str__(self):
+        return f"<SignerKey [signer_key={self.signer_key}]>"

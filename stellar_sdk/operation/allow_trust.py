@@ -132,3 +132,11 @@ class AllowTrust(Operation):
         )
         op._source_muxed = Operation.get_source_muxed_from_xdr_obj(xdr_object)
         return op
+
+    def __str__(self):
+        return (
+            f"<AllowTrust [trustor={self.trustor}, "
+            f"asset_code={self.asset_code}, "
+            f"authorize={self.authorize}, "
+            f"source={self.source}]>"
+        )

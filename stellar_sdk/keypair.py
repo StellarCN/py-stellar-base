@@ -263,7 +263,7 @@ class Keypair:
         )
 
     def __str__(self):
-        return f"<Keypair [public_key={self.public_key}]>"
+        return f"<Keypair [public_key={self.public_key}, private_key_exists={self.signing_key is not None}]>"
 
 
 def _get_key_of_expected_type(key: Any, expected_type: Any) -> Any:

@@ -134,3 +134,13 @@ class BaseTransactionEnvelope(Generic[T]):
         """
         xdr_object = stellar_xdr.TransactionEnvelope.from_xdr(xdr)
         return cls.from_xdr_object(xdr_object, network_passphrase)
+
+    @abstractmethod
+    def __eq__(self, other: object) -> bool:
+        pass  # pragma: no cover
+
+    def __str__(self):
+        return (
+            f"<BaseTransactionEnvelope [network_id={self.network_id}, "
+            f"signatures={self.signatures}]>"
+        )

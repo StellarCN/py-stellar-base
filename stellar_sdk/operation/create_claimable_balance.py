@@ -36,6 +36,14 @@ class ClaimPredicateGroup:
         self.left = left
         self.right = right
 
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, self.__class__):
+            return NotImplemented  # pragma: no cover
+        return self.left == other.left and self.right == other.right
+
+    def __str__(self):
+        return f"<ClaimPredicateGroup [left={self.left}, right={self.right}]>"
+
 
 class ClaimPredicate:
     """The :class:`ClaimPredicate` object, which represents a ClaimPredicate on Stellar's network.
@@ -265,6 +273,28 @@ class ClaimPredicate:
         else:
             raise ValueError("{} is an unsupported ClaimPredicateType.")
 
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, self.__class__):
+            return NotImplemented  # pragma: no cover
+        return (
+            self.claim_predicate_type == other.claim_predicate_type
+            and self.and_predicates == other.and_predicates
+            and self.or_predicates == other.or_predicates
+            and self.not_predicate == other.not_predicate
+            and self.abs_before == other.abs_before
+            and self.rel_before == other.rel_before
+        )
+
+    def __str__(self):
+        return (
+            f"<ClaimPredicate [claim_predicate_type={self.claim_predicate_type}, "
+            f"and_predicates={self.and_predicates}, "
+            f"or_predicates={self.or_predicates}, "
+            f"not_predicate={self.not_predicate}, "
+            f"abs_before={self.abs_before}, "
+            f"rel_before={self.rel_before}]>"
+        )
+
 
 class Claimant:
     """The :class:`Claimant` object represents a claimable balance claimant.
@@ -296,6 +326,18 @@ class Claimant:
         )
         predicate = ClaimPredicate.from_xdr_object(xdr_object.v0.predicate)
         return cls(destination=destination, predicate=predicate)
+
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, self.__class__):
+            return NotImplemented  # pragma: no cover
+        return (
+            self.destination == other.destination and self.predicate == other.predicate
+        )
+
+    def __str__(self):
+        return (
+            f"<Claimant [destination={self.destination}, predicate={self.predicate}]>"
+        )
 
 
 class CreateClaimableBalance(Operation):
@@ -369,3 +411,9 @@ class CreateClaimableBalance(Operation):
         op = cls(asset=asset, amount=amount, claimants=claimants, source=source)
         op._source_muxed = Operation.get_source_muxed_from_xdr_obj(xdr_object)
         return op
+
+    def __str__(self):
+        return (
+            f"<CreateClaimableBalance [asset={self.asset}, amount={self.amount}, "
+            f"claimants={self.claimants}, source={self.source}]>"
+        )

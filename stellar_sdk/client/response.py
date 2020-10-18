@@ -37,4 +37,9 @@ class Response:
         )
 
     def __str__(self):
-        return f"<Response [{self.status_code}]>"
+        return (
+            f"<Response [status_code={self.status_code}, "
+            f"text={self.text}, "
+            f"headers={self.headers}, "
+            f"url={self.url}]>"
+        )

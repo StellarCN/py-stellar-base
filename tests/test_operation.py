@@ -28,7 +28,7 @@ from stellar_sdk.operation.path_payment_strict_receive import PathPaymentStrictR
 from stellar_sdk.operation.path_payment_strict_send import PathPaymentStrictSend
 from stellar_sdk.operation.payment import Payment
 from stellar_sdk.operation.set_options import SetOptions, Flag
-from stellar_sdk.operation.revoke_sponsorship import RevokeSponsorship
+from stellar_sdk.operation.revoke_sponsorship import RevokeSponsorship, TrustLine, Offer, Data, Signer
 from stellar_sdk.operation.utils import (
     check_price,
     check_amount,
@@ -1379,6 +1379,42 @@ class TestRevokeSponsorship:
             == xdr
         )
 
+    def test_trustline_equal(self):
+        account1 = "GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV"
+        account2 = "GB2DRLHCWHUCB2BS4IRRY2GBQKVAKEXOU2EMTMLSUOXVNMZY7W6BSGZ7"
+        asset1 = Asset.native()
+        asset2 = Asset("TEST", "GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV")
+        assert TrustLine(account1, asset1) == TrustLine(account1, asset1)
+        assert TrustLine(account1, asset1) != TrustLine(account1, asset2)
+        assert TrustLine(account1, asset1) != TrustLine(account2, asset1)
+
+    def test_offer_equal(self):
+        seller1 = "GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV"
+        seller2 = "GB2DRLHCWHUCB2BS4IRRY2GBQKVAKEXOU2EMTMLSUOXVNMZY7W6BSGZ7"
+        offer_id1 = 0
+        offer_id2 = 1
+        assert Offer(seller1, offer_id1) == Offer(seller1, offer_id1)
+        assert Offer(seller1, offer_id1) != Offer(seller1, offer_id2)
+        assert Offer(seller1, offer_id1) != Offer(seller2, offer_id1)
+
+    def test_data_equal(self):
+        account1 = "GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV"
+        account2 = "GB2DRLHCWHUCB2BS4IRRY2GBQKVAKEXOU2EMTMLSUOXVNMZY7W6BSGZ7"
+        data_name1 = "data_name1"
+        data_name2 = "data_name2"
+        assert Data(account1, data_name1) == Data(account1, data_name1)
+        assert Data(account1, data_name1) != Data(account1, data_name2)
+        assert Data(account1, data_name1) != Data(account2, data_name1)
+
+    def test_signer_equal(self):
+        account1 = "GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV"
+        account2 = "GB2DRLHCWHUCB2BS4IRRY2GBQKVAKEXOU2EMTMLSUOXVNMZY7W6BSGZ7"
+        signer1 = SignerKey.ed25519_public_key(account1)
+        signer2 = SignerKey.ed25519_public_key(account2)
+        assert Signer(account1, signer1) == Signer(account1, signer1)
+        assert Signer(account1, signer1) != Signer(account1, signer2)
+        assert Signer(account1, signer1) != Signer(account2, signer1)
+
 
 class TestClaimPredicate:
     @staticmethod
@@ -1389,34 +1425,29 @@ class TestClaimPredicate:
         xdr = "AAAAAA=="
         predicate = ClaimPredicate.predicate_unconditional()
         assert xdr == self.to_xdr(predicate)
-        assert xdr == self.to_xdr(
-            ClaimPredicate.from_xdr_object(predicate.to_xdr_object())
-        )
+        assert predicate == ClaimPredicate.from_xdr_object(predicate.to_xdr_object())
 
     def test_predicate_before_relative_time(self):
         xdr = "AAAABQAAAAAAAAPo"
         predicate = ClaimPredicate.predicate_before_relative_time(1000)
         assert xdr == self.to_xdr(predicate)
-        assert xdr == self.to_xdr(
-            ClaimPredicate.from_xdr_object(predicate.to_xdr_object())
-        )
+        assert predicate == ClaimPredicate.from_xdr_object(predicate.to_xdr_object())
+
 
     def test_predicate_before_absolute_time(self):
         xdr = "AAAABAAAAABfc0qi"
         predicate = ClaimPredicate.predicate_before_absolute_time(1601391266)
         assert xdr == self.to_xdr(predicate)
-        assert xdr == self.to_xdr(
-            ClaimPredicate.from_xdr_object(predicate.to_xdr_object())
-        )
+        assert predicate == ClaimPredicate.from_xdr_object(predicate.to_xdr_object())
+
 
     def test_predicate_not(self):
         xdr = "AAAAAwAAAAEAAAAEAAAAAF9zSqI="
         predicate_abs = ClaimPredicate.predicate_before_absolute_time(1601391266)
         predicate = ClaimPredicate.predicate_not(predicate_abs)
         assert xdr == self.to_xdr(predicate)
-        assert xdr == self.to_xdr(
-            ClaimPredicate.from_xdr_object(predicate.to_xdr_object())
-        )
+        assert predicate == ClaimPredicate.from_xdr_object(predicate.to_xdr_object())
+
 
     def test_predicate_and_1(self):
         xdr = "AAAAAQAAAAIAAAAEAAAAAF9zSqIAAAAFAAAAAAAAA+g="
@@ -1424,9 +1455,7 @@ class TestClaimPredicate:
         predicate_rel = ClaimPredicate.predicate_before_relative_time(1000)
         predicate = ClaimPredicate.predicate_and(predicate_abs, predicate_rel)
         assert xdr == self.to_xdr(predicate)
-        assert xdr == self.to_xdr(
-            ClaimPredicate.from_xdr_object(predicate.to_xdr_object())
-        )
+        assert predicate == ClaimPredicate.from_xdr_object(predicate.to_xdr_object())
 
     def test_predicate_and_2(self):
         xdr = "AAAAAQAAAAIAAAAFAAAAAAAAA+gAAAAEAAAAAF9zSqI="
@@ -1434,9 +1463,7 @@ class TestClaimPredicate:
         predicate_rel = ClaimPredicate.predicate_before_relative_time(1000)
         predicate = ClaimPredicate.predicate_and(predicate_rel, predicate_abs)
         assert xdr == self.to_xdr(predicate)
-        assert xdr == self.to_xdr(
-            ClaimPredicate.from_xdr_object(predicate.to_xdr_object())
-        )
+        assert predicate == ClaimPredicate.from_xdr_object(predicate.to_xdr_object())
 
     def test_predicate_or_1(self):
         xdr = "AAAAAgAAAAIAAAAEAAAAAF9zSqIAAAAFAAAAAAAAA+g="
@@ -1444,9 +1471,7 @@ class TestClaimPredicate:
         predicate_rel = ClaimPredicate.predicate_before_relative_time(1000)
         predicate = ClaimPredicate.predicate_or(predicate_abs, predicate_rel)
         assert xdr == self.to_xdr(predicate)
-        assert xdr == self.to_xdr(
-            ClaimPredicate.from_xdr_object(predicate.to_xdr_object())
-        )
+        assert predicate == ClaimPredicate.from_xdr_object(predicate.to_xdr_object())
 
     def test_predicate_or_2(self):
         xdr = "AAAAAgAAAAIAAAAFAAAAAAAAA+gAAAAEAAAAAF9zSqI="
@@ -1454,9 +1479,7 @@ class TestClaimPredicate:
         predicate_rel = ClaimPredicate.predicate_before_relative_time(1000)
         predicate = ClaimPredicate.predicate_or(predicate_rel, predicate_abs)
         assert xdr == self.to_xdr(predicate)
-        assert xdr == self.to_xdr(
-            ClaimPredicate.from_xdr_object(predicate.to_xdr_object())
-        )
+        assert predicate == ClaimPredicate.from_xdr_object(predicate.to_xdr_object())
 
     def test_predicate_mix(self):
         xdr = "AAAAAQAAAAIAAAABAAAAAgAAAAQAAAAAX14QAAAAAAAAAAACAAAAAgAAAAUAAAAAAADDUAAAAAMAAAABAAAABAAAAABlU/EA"
@@ -1472,9 +1495,7 @@ class TestClaimPredicate:
         )
         predicate = ClaimPredicate.predicate_and(predicate_left, predicate_right)
         assert xdr == self.to_xdr(predicate)
-        assert xdr == self.to_xdr(
-            ClaimPredicate.from_xdr_object(predicate.to_xdr_object())
-        )
+        assert predicate == ClaimPredicate.from_xdr_object(predicate.to_xdr_object())
 
     def test_predicate_invalid_type_raise(self):
         predicate = ClaimPredicate(
@@ -1512,14 +1533,14 @@ class TestClaimant:
         predicate = ClaimPredicate.predicate_and(predicate_left, predicate_right)
         claimant = Claimant(destination=destination, predicate=predicate)
         assert self.to_xdr(claimant) == xdr
-        assert xdr == self.to_xdr(Claimant.from_xdr_object(claimant.to_xdr_object()))
+        assert claimant == Claimant.from_xdr_object(claimant.to_xdr_object())
 
     def test_claimant_default(self):
         xdr = "AAAAAAAAAACJmyhA7VY2xW3cXxSyOXX3nxuiOI0mlOTFbs3dyWDl7wAAAAA="
         destination = "GCEZWKCA5VLDNRLN3RPRJMRZOX3Z6G5CHCGSNFHEYVXM3XOJMDS674JZ"
         claimant = Claimant(destination=destination)
         assert self.to_xdr(claimant) == xdr
-        assert xdr == self.to_xdr(Claimant.from_xdr_object(claimant.to_xdr_object()))
+        assert claimant == Claimant.from_xdr_object(claimant.to_xdr_object())
 
 
 class TestCreateClaimableBalance:

@@ -75,3 +75,6 @@ class ManageData(Operation):
         op = cls(data_name=data_name, data_value=data_value, source=source)
         op._source_muxed = Operation.get_source_muxed_from_xdr_obj(xdr_object)
         return op
+
+    def __str__(self):
+        return f"<ManageData [data_name={self.data_name}, data_value={self.data_value}, source={self.source}]>"

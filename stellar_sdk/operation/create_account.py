@@ -73,3 +73,10 @@ class CreateAccount(Operation):
         )
         op._source_muxed = Operation.get_source_muxed_from_xdr_obj(xdr_object)
         return op
+
+    def __str__(self):
+        return (
+            f"<CreateAccount [destination={self.destination}, "
+            f"starting_balance={self.starting_balance}, "
+            f"source={self.source}]>"
+        )
