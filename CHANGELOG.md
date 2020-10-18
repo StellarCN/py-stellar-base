@@ -1,5 +1,15 @@
 Release History
 ==============
+### Version 2.8.1
+
+Released on Oct 15, 2020
+
+#### Update
+* feat: add support for SEP-0010 v2.1.0. ([#380](https://github.com/StellarCN/py-stellar-base/pull/380))
+
+In SEP-10 SEP-0010 v2.1.0, the `domain_name` field is no longer needed, but we still keep it to reduce breaking changes.
+
+
 ### Version 2.8.0
 
 Released on Oct 04, 2020
