@@ -14,7 +14,6 @@ class EndSponsoringFutureReserves(Operation):
 
     Threshold: Medium
 
-    :param sponsored_id: The sponsored account id.
     :param source: The source account (defaults to transaction source).
     """
 
