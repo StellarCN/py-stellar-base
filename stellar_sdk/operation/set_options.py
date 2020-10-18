@@ -215,3 +215,17 @@ class SetOptions(Operation):
         )
         op._source_muxed = Operation.get_source_muxed_from_xdr_obj(xdr_object)
         return op
+
+    def __str__(self):
+        return (
+            f"<SetOptions [inflation_dest={self.inflation_dest}, "
+            f"clear_flags={self.clear_flags}, "
+            f"set_flags={self.set_flags}, "
+            f"master_weight={self.master_weight}, "
+            f"low_threshold={self.low_threshold}, "
+            f"med_threshold={self.med_threshold}, "
+            f"high_threshold={self.high_threshold}, "
+            f"signer={self.signer}, "
+            f"home_domain={self.home_domain}, "
+            f"source={self.source}]>"
+        )

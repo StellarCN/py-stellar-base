@@ -56,3 +56,6 @@ class BeginSponsoringFutureReserves(Operation):
         op = cls(source=source, sponsored_id=sponsored_id)
         op._source_muxed = Operation.get_source_muxed_from_xdr_obj(xdr_object)
         return op
+
+    def __str__(self):
+        return f"<BeginSponsoringFutureReserves [sponsored_id={self.sponsored_id}, source={self.source}]>"

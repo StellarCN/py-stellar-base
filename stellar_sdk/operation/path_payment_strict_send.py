@@ -133,3 +133,10 @@ class PathPaymentStrictSend(Operation):
         )
         op._source_muxed = Operation.get_source_muxed_from_xdr_obj(xdr_object)
         return op
+
+    def __str__(self):
+        return (
+            f"<PathPaymentStrictSend [destination={self.destination}, send_asset={self.send_asset}, "
+            f"send_amount={self.send_amount}, dest_asset={self.dest_asset}, dest_min={self.dest_min}, "
+            f"path={self.path}, source={self.source}]>"
+        )

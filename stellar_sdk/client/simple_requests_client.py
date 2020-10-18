@@ -78,3 +78,6 @@ class SimpleRequestsClient(BaseSyncClient):
 
     def close(self):
         pass  # pragma: no cover
+
+    def __str__(self):
+        return "<SimpleRequestsClient>"

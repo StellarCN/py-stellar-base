@@ -566,3 +566,6 @@ class Server:
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.close()
+
+    def __str__(self):
+        return f"<Server [horizon_url={self.horizon_url}, client={self._client}]>"

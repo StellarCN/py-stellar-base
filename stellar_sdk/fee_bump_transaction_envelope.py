@@ -82,3 +82,14 @@ class FeeBumpTransactionEnvelope(BaseTransactionEnvelope["FeeBumpTransactionEnve
         signatures = xdr_object.fee_bump.signatures
         te = cls(tx, network_passphrase=network_passphrase, signatures=signatures)
         return te
+
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, self.__class__):
+            return NotImplemented  # pragma: no cover
+        return self.to_xdr_object() == other.to_xdr_object()
+
+    def __str__(self):
+        return (
+            f"<FeeBumpTransactionEnvelope [transaction={self.transaction} "
+            f"network_passphrase={self.network_passphrase}, signatures={self.signatures}]>"
+        )

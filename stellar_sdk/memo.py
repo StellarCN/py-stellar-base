@@ -52,10 +52,9 @@ class Memo(object, metaclass=abc.ABCMeta):
         memo_cls = xdr_types.get(xdr_object.type, NoneMemo)
         return memo_cls.from_xdr_object(xdr_object)
 
+    @abc.abstractmethod
     def __eq__(self, other: object) -> bool:
-        if not isinstance(other, self.__class__):
-            return NotImplemented  # pragma: no cover
-        return self.to_xdr_object().to_xdr() == other.to_xdr_object().to_xdr()
+        pass  # pragma: no cover
 
 
 class NoneMemo(Memo):
@@ -70,6 +69,11 @@ class NoneMemo(Memo):
     def to_xdr_object(self) -> stellar_xdr.Memo:
         """Creates an XDR Memo object that represents this :class:`NoneMemo`."""
         return stellar_xdr.Memo(type=stellar_xdr.MemoType.MEMO_NONE)
+
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, self.__class__):
+            return NotImplemented  # pragma: no cover
+        return True
 
     def __str__(self):
         return "<NoneMemo>"
@@ -113,6 +117,11 @@ class TextMemo(Memo):
             type=stellar_xdr.MemoType.MEMO_TEXT, text=self.memo_text
         )
 
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, self.__class__):
+            return NotImplemented  # pragma: no cover
+        return self.memo_text == other.memo_text
+
     def __str__(self):
         return f"<TextMemo [memo={self.memo_text}]>"
 
@@ -145,6 +154,11 @@ class IdMemo(Memo):
         return stellar_xdr.Memo(
             type=stellar_xdr.MemoType.MEMO_ID, id=stellar_xdr.Uint64(self.memo_id)
         )
+
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, self.__class__):
+            return NotImplemented  # pragma: no cover
+        return self.memo_id == other.memo_id
 
     def __str__(self):
         return f"<IdMemo [memo={self.memo_id}]>"
@@ -179,6 +193,11 @@ class HashMemo(Memo):
         return stellar_xdr.Memo(
             type=stellar_xdr.MemoType.MEMO_HASH, hash=stellar_xdr.Hash(self.memo_hash)
         )
+
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, self.__class__):
+            return NotImplemented  # pragma: no cover
+        return self.memo_hash == other.memo_hash
 
     def __str__(self):
         return f"<HashMemo [memo={self.memo_hash}]>"
@@ -218,6 +237,11 @@ class ReturnHashMemo(Memo):
             type=stellar_xdr.MemoType.MEMO_RETURN,
             ret_hash=stellar_xdr.Hash(self.memo_return),
         )
+
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, self.__class__):
+            return NotImplemented  # pragma: no cover
+        return self.memo_return == other.memo_return
 
     def __str__(self):
         return f"<ReturnHashMemo [memo={self.memo_return}]>"

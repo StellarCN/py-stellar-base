@@ -188,3 +188,13 @@ class BaseCallBuilder:
             and self.endpoint == other.endpoint
             and self.horizon_url == other.horizon_url
         )
+
+    def __str__(self):
+        return (
+            f"<CallBuilder [horizon_url={self.horizon_url}, "
+            f"endpoint={self.endpoint}, "
+            f"params={self.params}, "
+            f"prev_href={self.prev_href}, "
+            f"next_href={self.next_href}, "
+            f"client={self.client}]>"
+        )

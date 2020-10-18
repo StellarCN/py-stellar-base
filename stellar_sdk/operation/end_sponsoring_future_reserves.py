@@ -39,3 +39,6 @@ class EndSponsoringFutureReserves(Operation):
         op = cls(source=source)
         op._source_muxed = Operation.get_source_muxed_from_xdr_obj(xdr_object)
         return op
+
+    def __str__(self):
+        return f"<EndSponsoringFutureReserves [source={self.source}]>"

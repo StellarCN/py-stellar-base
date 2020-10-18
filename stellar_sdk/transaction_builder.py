@@ -999,3 +999,11 @@ class TransactionBuilder:
         signer_key = SignerKey.pre_auth_tx(hex_to_bytes(signer_key))
         op = RevokeSponsorship.revoke_signer_sponsorship(account_id, signer_key, source)
         return self.append_operation(op)
+
+    def __str__(self):
+        return (
+            f"<TransactionBuilder [source_account={self.source_account}, "
+            f"base_fee={self.base_fee}, network_passphrase={self.network_passphrase}, "
+            f"operations={self.operations}, memo={self.memo}, "
+            f"time_bounds={self.time_bounds}, v1={self.v1}]>"
+        )
