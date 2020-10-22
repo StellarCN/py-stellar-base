@@ -1,4 +1,3 @@
-import warnings
 from typing import Union
 
 from ..asset import Asset
@@ -23,21 +22,6 @@ class OffersCallBuilder(BaseCallBuilder):
     ) -> None:
         super().__init__(horizon_url, client)
         self.endpoint: str = "offers"
-
-    def account(self, account_id):
-        """Returns all offers where the given account is the seller.
-
-        See `Offers for Account <https://www.stellar.org/developers/horizon/reference/endpoints/offers-for-account.html>`_
-
-        :param account_id: Account ID
-        :return: this OffersCallBuilder instance
-        """
-        warnings.warn(
-            "Will be removed in future, use OffersCallBuilder.for_seller",
-            DeprecationWarning,
-        )
-        self.endpoint = f"accounts/{account_id}/offers"
-        return self
 
     def for_seller(self, seller: str):
         """Returns all offers where the given account is the seller.

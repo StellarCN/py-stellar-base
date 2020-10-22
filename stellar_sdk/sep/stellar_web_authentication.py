@@ -11,7 +11,6 @@ Version 2.0.0
 import base64
 import os
 import time
-import warnings
 from typing import List, Tuple
 
 from .ed25519_public_key_signer import Ed25519PublicKeySigner
@@ -286,36 +285,6 @@ def verify_challenge_transaction_signers(
         raise InvalidSep10ChallengeError("Transaction has unrecognized signatures.")
 
     return signers_found
-
-
-def verify_challenge_transaction_signed_by_client(
-    challenge_transaction: str,
-    server_account_id: str,
-    domain_name: str,
-    network_passphrase: str,
-) -> None:
-    """An alias for :func:`stellar_sdk.sep.stellar_web_authentication.verify_challenge_transaction`.
-
-    :param challenge_transaction: SEP0010 transaction challenge transaction in base64.
-    :param server_account_id: public key for server's account.
-    :param domain_name: The `fully qualified domain name <https://en.wikipedia.org/wiki/Fully_qualified_domain_name>`_
-        of the service requiring authentication, for example: `example.com`. (The domain_name field is reserved for
-        future use and not used.)
-    :param network_passphrase: The network to connect to for verifying and retrieving
-        additional attributes from. (ex. 'Public Global Stellar Network ; September 2015')
-
-    :raises: :exc:`InvalidSep10ChallengeError <stellar_sdk.sep.exceptions.InvalidSep10ChallengeError>` - if the
-        validation fails, the exception will be thrown.
-    """
-    warnings.warn(
-        "Will be removed in version v3.0.0, "
-        "use stellar_sdk.sep.test_stellar_web_authentication.verify_challenge_transaction_signed_by_client_master_key",
-        DeprecationWarning,
-    )  # pragma: no cover
-
-    return verify_challenge_transaction_signed_by_client_master_key(
-        challenge_transaction, server_account_id, domain_name, network_passphrase
-    )  # pragma: no cover
 
 
 def verify_challenge_transaction_signed_by_client_master_key(
