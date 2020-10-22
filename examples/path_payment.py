@@ -11,7 +11,7 @@ path = [
 ]
 transaction = TransactionBuilder(
     source_account=source_account, network_passphrase=Network.TESTNET_NETWORK_PASSPHRASE, base_fee=100) \
-    .append_path_payment_op(destination="GBBM6BKZPEHWYO3E3YKREDPQXMS4VK35YLNU7NFBRI26RAN7GI5POFBB",
+    .append_path_payment_strict_receive_op(destination="GBBM6BKZPEHWYO3E3YKREDPQXMS4VK35YLNU7NFBRI26RAN7GI5POFBB",
                             send_code="XLM", send_issuer=None, send_max="1000", dest_code="GBP",
                             dest_issuer="GASOCNHNNLYFNMDJYQ3XFMI7BYHIOCFW3GJEOWRPEGK2TDPGTG2E5EDW",
                             dest_amount="5.50", path=path) \
