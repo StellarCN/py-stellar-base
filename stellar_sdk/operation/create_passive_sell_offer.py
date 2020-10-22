@@ -40,6 +40,9 @@ class CreatePassiveSellOffer(Operation):
 
     """
 
+    TYPE_CODE: stellar_xdr.OperationType = stellar_xdr.OperationType.CREATE_PASSIVE_SELL_OFFER
+
+
     def __init__(
         self,
         selling: Asset,
@@ -56,10 +59,6 @@ class CreatePassiveSellOffer(Operation):
         self.amount: Union[str, Decimal] = amount
         self.price: Union[Price, str, Decimal] = price
 
-    @classmethod
-    def type_code(cls) -> stellar_xdr.OperationType:
-        return stellar_xdr.OperationType.CREATE_PASSIVE_SELL_OFFER
-
     def _to_operation_body(self) -> stellar_xdr.OperationBody:
         selling = self.selling.to_xdr_object()
         buying = self.buying.to_xdr_object()
@@ -75,7 +74,7 @@ class CreatePassiveSellOffer(Operation):
             selling, buying, amount, price
         )
         body = stellar_xdr.OperationBody(
-            type=self.type_code(),
+            type=self.TYPE_CODE,
             create_passive_sell_offer_op=create_passive_sell_offer_op,
         )
         return body

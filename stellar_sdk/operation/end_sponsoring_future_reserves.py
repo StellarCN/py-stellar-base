@@ -17,15 +17,13 @@ class EndSponsoringFutureReserves(Operation):
     :param source: The source account (defaults to transaction source).
     """
 
+    TYPE_CODE: stellar_xdr.OperationType = stellar_xdr.OperationType.END_SPONSORING_FUTURE_RESERVES
+
     def __init__(self, source: str = None) -> None:
         super().__init__(source)
 
-    @classmethod
-    def type_code(cls) -> stellar_xdr.OperationType:
-        return stellar_xdr.OperationType.END_SPONSORING_FUTURE_RESERVES
-
     def _to_operation_body(self) -> stellar_xdr.OperationBody:
-        body = stellar_xdr.OperationBody(type=self.type_code())
+        body = stellar_xdr.OperationBody(type=self.TYPE_CODE)
         return body
 
     @classmethod

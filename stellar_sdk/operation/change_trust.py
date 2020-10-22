@@ -26,6 +26,8 @@ class ChangeTrust(Operation):
 
     _DEFAULT_LIMIT = "922337203685.4775807"
 
+    TYPE_CODE: stellar_xdr.OperationType = stellar_xdr.OperationType.CHANGE_TRUST
+
     def __init__(
         self, asset: Asset, limit: Union[str, Decimal] = None, source: str = None,
     ) -> None:
@@ -39,16 +41,12 @@ class ChangeTrust(Operation):
             check_amount(limit)
             self.limit = limit
 
-    @classmethod
-    def type_code(cls) -> stellar_xdr.OperationType:
-        return stellar_xdr.OperationType.CHANGE_TRUST
-
     def _to_operation_body(self) -> stellar_xdr.OperationBody:
         line = self.asset.to_xdr_object()
         limit = stellar_xdr.Int64(Operation.to_xdr_amount(self.limit))
         change_trust_op = stellar_xdr.ChangeTrustOp(line, limit)
         body = stellar_xdr.OperationBody(
-            type=self.type_code(), change_trust_op=change_trust_op
+            type=self.TYPE_CODE, change_trust_op=change_trust_op
         )
         return body
 

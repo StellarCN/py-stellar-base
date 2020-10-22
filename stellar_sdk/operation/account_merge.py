@@ -21,6 +21,8 @@ class AccountMerge(Operation):
 
     """
 
+    TYPE_CODE: stellar_xdr.OperationType = stellar_xdr.OperationType.ACCOUNT_MERGE
+
     def __init__(self, destination: str, source: str = None,) -> None:
         super().__init__(source)
         check_ed25519_public_key(destination)
@@ -37,16 +39,12 @@ class AccountMerge(Operation):
         self._destination_muxed = None
         self._destination = value
 
-    @classmethod
-    def type_code(cls) -> stellar_xdr.OperationType:
-        return stellar_xdr.OperationType.ACCOUNT_MERGE
-
     def _to_operation_body(self) -> stellar_xdr.OperationBody:
         if self._destination_muxed is not None:
             destination = self._destination_muxed
         else:
             destination = Keypair.from_public_key(self._destination).xdr_muxed_account()
-        body = stellar_xdr.OperationBody(type=self.type_code(), destination=destination)
+        body = stellar_xdr.OperationBody(type=self.TYPE_CODE, destination=destination)
         return body
 
     @classmethod

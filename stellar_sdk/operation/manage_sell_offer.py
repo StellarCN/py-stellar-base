@@ -33,6 +33,8 @@ class ManageSellOffer(Operation):
 
     """
 
+    TYPE_CODE: stellar_xdr.OperationType = stellar_xdr.OperationType.MANAGE_SELL_OFFER
+
     def __init__(
         self,
         selling: Asset,
@@ -51,10 +53,6 @@ class ManageSellOffer(Operation):
         self.price: Union[Price, str, Decimal] = price
         self.offer_id: int = offer_id
 
-    @classmethod
-    def type_code(cls) -> stellar_xdr.OperationType:
-        return stellar_xdr.OperationType.MANAGE_SELL_OFFER
-
     def _to_operation_body(self) -> stellar_xdr.OperationBody:
         selling = self.selling.to_xdr_object()
         buying = self.buying.to_xdr_object()
@@ -70,7 +68,7 @@ class ManageSellOffer(Operation):
             selling, buying, amount, price, stellar_xdr.Int64(self.offer_id)
         )
         body = stellar_xdr.OperationBody(
-            type=self.type_code(), manage_sell_offer_op=manage_sell_offer_op
+            type=self.TYPE_CODE, manage_sell_offer_op=manage_sell_offer_op
         )
         return body
 
