@@ -67,6 +67,7 @@ class SetOptions(Operation):
     :param source: The source account (defaults to transaction source).
 
     """
+    TYPE_CODE: stellar_xdr.OperationType = stellar_xdr.OperationType.SET_OPTIONS
 
     def __init__(
         self,
@@ -100,10 +101,6 @@ class SetOptions(Operation):
         self.high_threshold: int = high_threshold
         self.home_domain: str = home_domain
         self.signer: Optional[Signer] = signer
-
-    @classmethod
-    def type_code(cls) -> stellar_xdr.OperationType:
-        return stellar_xdr.OperationType.SET_OPTIONS
 
     def _to_operation_body(self) -> stellar_xdr.OperationBody:
         inflation_dest = (
@@ -156,7 +153,7 @@ class SetOptions(Operation):
             signer,
         )
         body = stellar_xdr.OperationBody(
-            type=self.type_code(), set_options_op=set_options_op
+            type=self.TYPE_CODE, set_options_op=set_options_op
         )
         return body
 

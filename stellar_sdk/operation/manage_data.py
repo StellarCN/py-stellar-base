@@ -25,6 +25,8 @@ class ManageData(Operation):
 
     """
 
+    TYPE_CODE: stellar_xdr.OperationType = stellar_xdr.OperationType.MANAGE_DATA
+
     def __init__(
         self, data_name: str, data_value: Union[str, bytes, None], source: str = None,
     ) -> None:  # TODO: bytes only?
@@ -40,10 +42,6 @@ class ManageData(Operation):
         if not valid_data_name_len or not valid_data_val_len:
             raise ValueError("Data and value should be <= 64 bytes (ascii encoded).")
 
-    @classmethod
-    def type_code(cls) -> stellar_xdr.OperationType:
-        return stellar_xdr.OperationType.MANAGE_DATA
-
     def _to_operation_body(self) -> stellar_xdr.OperationBody:
         data_name = stellar_xdr.String64(bytes(self.data_name, encoding="utf-8"))
         if self.data_value is None:
@@ -54,7 +52,7 @@ class ManageData(Operation):
         manage_data_op = stellar_xdr.ManageDataOp(data_name, data_value)
 
         body = stellar_xdr.OperationBody(
-            type=self.type_code(), manage_data_op=manage_data_op
+            type=self.TYPE_CODE, manage_data_op=manage_data_op
         )
         return body
 

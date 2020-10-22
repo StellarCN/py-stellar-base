@@ -113,6 +113,7 @@ class RevokeSponsorship(Operation):
     :param signer: The sponsored signer.
     :param source: The source account (defaults to transaction source).
     """
+    TYPE_CODE: stellar_xdr.OperationType = stellar_xdr.OperationType.REVOKE_SPONSORSHIP
 
     def __init__(
         self,
@@ -133,10 +134,6 @@ class RevokeSponsorship(Operation):
         self.data = data
         self.claimable_balance_id = claimable_balance_id
         self.signer = signer
-
-    @classmethod
-    def type_code(cls) -> stellar_xdr.OperationType:
-        return stellar_xdr.OperationType.REVOKE_SPONSORSHIP
 
     @classmethod
     def revoke_account_sponsorship(cls, account_id: str, source: str = None):
@@ -348,7 +345,7 @@ class RevokeSponsorship(Operation):
                 f"{self.revoke_sponsorship_type} is not a valid RevokeSponsorshipType."
             )
         body = stellar_xdr.OperationBody(
-            type=self.type_code(), revoke_sponsorship_op=revoke_sponsorship_op
+            type=self.TYPE_CODE, revoke_sponsorship_op=revoke_sponsorship_op
         )
         return body
 

@@ -28,6 +28,7 @@ class PathPaymentStrictSend(Operation):
     :param source: The source account for the payment. Defaults to the
         transaction's source account.
     """
+    TYPE_CODE: stellar_xdr.OperationType = stellar_xdr.OperationType.PATH_PAYMENT_STRICT_SEND
 
     def __init__(
         self,
@@ -61,10 +62,6 @@ class PathPaymentStrictSend(Operation):
         self._destination_muxed = None
         self._destination = value
 
-    @classmethod
-    def type_code(cls) -> stellar_xdr.OperationType:
-        return stellar_xdr.OperationType.PATH_PAYMENT_STRICT_SEND
-
     def _to_operation_body(self) -> stellar_xdr.OperationBody:
         if self._destination_muxed is not None:
             destination = self._destination_muxed
@@ -83,7 +80,7 @@ class PathPaymentStrictSend(Operation):
             path,
         )
         body = stellar_xdr.OperationBody(
-            type=self.type_code(),
+            type=self.TYPE_CODE,
             path_payment_strict_send_op=path_payment_strict_send_op,
         )
         return body

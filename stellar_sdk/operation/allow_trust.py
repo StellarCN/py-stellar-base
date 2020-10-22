@@ -47,6 +47,8 @@ class AllowTrust(Operation):
 
     """
 
+    TYPE_CODE: stellar_xdr.OperationType = stellar_xdr.OperationType.ALLOW_TRUST
+
     def __init__(
         self,
         trustor: str,
@@ -67,10 +69,6 @@ class AllowTrust(Operation):
                 self.authorize: TrustLineEntryFlag = TrustLineEntryFlag.UNAUTHORIZED_FLAG
         else:
             self.authorize: TrustLineEntryFlag = authorize
-
-    @classmethod
-    def type_code(cls) -> stellar_xdr.OperationType:
-        return stellar_xdr.OperationType.ALLOW_TRUST
 
     def _to_operation_body(self) -> stellar_xdr.OperationBody:
         Asset.check_if_asset_code_is_valid(self.asset_code)
@@ -93,7 +91,7 @@ class AllowTrust(Operation):
             )
         allow_trust_op = stellar_xdr.AllowTrustOp(trustor, asset, authorize)
         body = stellar_xdr.OperationBody(
-            type=self.type_code(), allow_trust_op=allow_trust_op
+            type=self.TYPE_CODE, allow_trust_op=allow_trust_op
         )
         return body
 

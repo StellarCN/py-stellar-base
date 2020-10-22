@@ -39,6 +39,8 @@ class Operation(metaclass=ABCMeta):
 
     _ONE = Decimal(10 ** 7)
 
+    TYPE_CODE = None
+
     def __init__(self, source: str = None) -> None:
         check_source(source)
         self._source: Optional[str] = source
@@ -53,10 +55,6 @@ class Operation(metaclass=ABCMeta):
         check_source(value)
         self._source_muxed = None
         self._source = value
-
-    @classmethod
-    def type_code(cls) -> stellar_xdr.OperationType:
-        pass  # pragma: no cover
 
     @staticmethod
     def to_xdr_amount(value: Union[str, Decimal]) -> int:
@@ -143,7 +141,7 @@ class Operation(metaclass=ABCMeta):
             subclass) instance from.
         """
         for sub_cls in cls.__subclasses__():
-            if sub_cls.type_code() == xdr_object.body.type:
+            if sub_cls.TYPE_CODE == xdr_object.body.type:
                 return sub_cls.from_xdr_object(xdr_object)
         raise NotImplementedError(
             f"Operation of type={xdr_object.body.type} is not implemented."

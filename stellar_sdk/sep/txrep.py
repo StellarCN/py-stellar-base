@@ -297,54 +297,54 @@ def _get_operation(index, raw_data_map, tx_prefix):
             raw_data_map, f"{tx_prefix}operations[{index}].sourceAccount"
         )
     operation_type = _get_value(raw_data_map, f"{prefix}type")
-    if operation_type == AccountMerge.type_code().name:
+    if operation_type == AccountMerge.TYPE_CODE.name:
         return _get_account_merge_op(source_account_id, tx_prefix, raw_data_map, index)
-    elif operation_type == AllowTrust.type_code().name:
+    elif operation_type == AllowTrust.TYPE_CODE.name:
         operation_prefix = prefix + "allowTrustOp."
         return _get_allow_trust_op(source_account_id, operation_prefix, raw_data_map)
-    elif operation_type == BumpSequence.type_code().name:
+    elif operation_type == BumpSequence.TYPE_CODE.name:
         operation_prefix = prefix + "bumpSequenceOp."
         return _get_bump_sequence_op(source_account_id, operation_prefix, raw_data_map)
-    elif operation_type == ChangeTrust.type_code().name:
+    elif operation_type == ChangeTrust.TYPE_CODE.name:
         operation_prefix = prefix + "changeTrustOp."
         return _get_change_trust_op(source_account_id, operation_prefix, raw_data_map)
-    elif operation_type == CreateAccount.type_code().name:
+    elif operation_type == CreateAccount.TYPE_CODE.name:
         operation_prefix = prefix + "createAccountOp."
         return _get_create_account_op(source_account_id, operation_prefix, raw_data_map)
-    elif operation_type == CreatePassiveSellOffer.type_code().name:
+    elif operation_type == CreatePassiveSellOffer.TYPE_CODE.name:
         operation_prefix = prefix + "createPassiveSellOfferOp."
         return _get_create_passive_sell_offer_op(
             source_account_id, operation_prefix, raw_data_map
         )
-    elif operation_type == Inflation.type_code().name:
+    elif operation_type == Inflation.TYPE_CODE.name:
         return _get_inflation_op(source_account_id)
-    elif operation_type == ManageBuyOffer.type_code().name:
+    elif operation_type == ManageBuyOffer.TYPE_CODE.name:
         operation_prefix = prefix + "manageBuyOfferOp."
         return _get_manage_buy_offer_op(
             source_account_id, operation_prefix, raw_data_map
         )
-    elif operation_type == ManageData.type_code().name:
+    elif operation_type == ManageData.TYPE_CODE.name:
         operation_prefix = prefix + "manageDataOp."
         return _get_manage_data_op(source_account_id, operation_prefix, raw_data_map)
-    elif operation_type == ManageSellOffer.type_code().name:
+    elif operation_type == ManageSellOffer.TYPE_CODE.name:
         operation_prefix = prefix + "manageSellOfferOp."
         return _get_manage_sell_offer_op(
             source_account_id, operation_prefix, raw_data_map
         )
-    elif operation_type == PathPaymentStrictReceive.type_code().name:
+    elif operation_type == PathPaymentStrictReceive.TYPE_CODE.name:
         operation_prefix = prefix + "pathPaymentStrictReceiveOp."
         return _get_path_payment_strict_receive_op(
             source_account_id, operation_prefix, raw_data_map
         )
-    elif operation_type == PathPaymentStrictSend.type_code().name:
+    elif operation_type == PathPaymentStrictSend.TYPE_CODE.name:
         operation_prefix = prefix + "pathPaymentStrictSendOp."
         return _get_path_payment_strict_send_op(
             source_account_id, operation_prefix, raw_data_map
         )
-    elif operation_type == Payment.type_code().name:
+    elif operation_type == Payment.TYPE_CODE.name:
         operation_prefix = prefix + "paymentOp."
         return _get_payment_op(source_account_id, operation_prefix, raw_data_map)
-    elif operation_type == SetOptions.type_code().name:
+    elif operation_type == SetOptions.TYPE_CODE.name:
         operation_prefix = prefix + "setOptionsOp."
         return _get_set_options_op(source_account_id, operation_prefix, raw_data_map)
     else:
@@ -688,7 +688,7 @@ def _add_operation(
     index: int, operation: Operation, prefix: str, lines: List[str]
 ) -> None:
     prefix = f"{prefix}operations[{index}]."
-    operation_type = operation.type_code()
+    operation_type = operation.TYPE_CODE
 
     def add_operation_line(key: str, value: Union[str, int]) -> None:
         _add_line(f"{prefix}{key}", value, lines)
@@ -703,7 +703,7 @@ def _add_operation(
     def add_body_line(
         key: str, value: Union[str, int, None], optional: bool = False
     ) -> None:
-        operation_type = operation.type_code()
+        operation_type = operation.TYPE_CODE
         key = f"body.{_to_camel_case(operation_type.name)}Op.{key}"
         if optional:
             present = True if value is not None else False

@@ -26,6 +26,8 @@ class CreateAccount(Operation):
 
     """
 
+    TYPE_CODE: stellar_xdr.OperationType = stellar_xdr.OperationType.CREATE_ACCOUNT
+
     def __init__(
         self,
         destination: str,
@@ -38,10 +40,6 @@ class CreateAccount(Operation):
         self.destination: str = destination
         self.starting_balance: Union[str, Decimal] = starting_balance
 
-    @classmethod
-    def type_code(cls) -> stellar_xdr.OperationType:
-        return stellar_xdr.OperationType.CREATE_ACCOUNT
-
     def _to_operation_body(self) -> stellar_xdr.OperationBody:
         destination = Keypair.from_public_key(self.destination).xdr_account_id()
         starting_balance = stellar_xdr.Int64(
@@ -49,7 +47,7 @@ class CreateAccount(Operation):
         )
         create_account_op = stellar_xdr.CreateAccountOp(destination, starting_balance)
         body = stellar_xdr.OperationBody(
-            type=self.type_code(), create_account_op=create_account_op
+            type=self.TYPE_CODE, create_account_op=create_account_op
         )
         return body
 
