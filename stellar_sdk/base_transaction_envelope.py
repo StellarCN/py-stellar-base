@@ -17,8 +17,8 @@ class BaseTransactionEnvelope(Generic[T]):
         signatures: List[stellar_xdr.DecoratedSignature] = None,
     ) -> None:
         self.network_passphrase: str = network_passphrase
-        self.network_id: bytes = Network(network_passphrase).network_id()
         self.signatures: List[stellar_xdr.DecoratedSignature] = signatures or []
+        self._network_id: bytes = Network(network_passphrase).network_id()
 
     def hash(self) -> bytes:
         """Get the XDR Hash of the signature base.
@@ -141,6 +141,6 @@ class BaseTransactionEnvelope(Generic[T]):
 
     def __str__(self):
         return (
-            f"<BaseTransactionEnvelope [network_id={self.network_id}, "
+            f"<BaseTransactionEnvelope [network_passphrase={self.network_passphrase}, "
             f"signatures={self.signatures}]>"
         )

@@ -46,7 +46,7 @@ class FeeBumpTransactionEnvelope(BaseTransactionEnvelope["FeeBumpTransactionEnve
         :return: The signature base of this transaction envelope.
 
         """
-        network_id = self.network_id
+        network_id = self._network_id
         packer = Packer()
         stellar_xdr.EnvelopeType.ENVELOPE_TYPE_TX_FEE_BUMP.pack(packer)
         self.transaction.to_xdr_object().pack(packer)

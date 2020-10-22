@@ -47,7 +47,7 @@ class TransactionEnvelope(BaseTransactionEnvelope["TransactionEnvelope"]):
         :return: The signature base of this transaction envelope.
 
         """
-        network_id = self.network_id
+        network_id = self._network_id
         tx = self.transaction
         if isinstance(self.transaction, Transaction) and not self.transaction.v1:
             tx = Transaction.from_xdr_object(self.transaction.to_xdr_object(), v1=False)
