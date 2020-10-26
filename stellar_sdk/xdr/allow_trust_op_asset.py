@@ -58,9 +58,13 @@ class AllowTrustOpAsset:
         type = AssetType.unpack(unpacker)
         if type == AssetType.ASSET_TYPE_CREDIT_ALPHANUM4:
             asset_code4 = AssetCode4.unpack(unpacker)
+            if asset_code4 is None:
+                raise ValueError("asset_code4 should not be None.")
             return cls(type, asset_code4=asset_code4)
         if type == AssetType.ASSET_TYPE_CREDIT_ALPHANUM12:
             asset_code12 = AssetCode12.unpack(unpacker)
+            if asset_code12 is None:
+                raise ValueError("asset_code12 should not be None.")
             return cls(type, asset_code12=asset_code12)
         raise ValueError("Invalid type.")
 

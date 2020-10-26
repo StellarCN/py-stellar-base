@@ -58,9 +58,13 @@ class MuxedAccount:
         type = CryptoKeyType.unpack(unpacker)
         if type == CryptoKeyType.KEY_TYPE_ED25519:
             ed25519 = Uint256.unpack(unpacker)
+            if ed25519 is None:
+                raise ValueError("ed25519 should not be None.")
             return cls(type, ed25519=ed25519)
         if type == CryptoKeyType.KEY_TYPE_MUXED_ED25519:
             med25519 = MuxedAccountMed25519.unpack(unpacker)
+            if med25519 is None:
+                raise ValueError("med25519 should not be None.")
             return cls(type, med25519=med25519)
         raise ValueError("Invalid type.")
 

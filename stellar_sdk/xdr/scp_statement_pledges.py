@@ -94,15 +94,23 @@ class SCPStatementPledges:
         type = SCPStatementType.unpack(unpacker)
         if type == SCPStatementType.SCP_ST_PREPARE:
             prepare = SCPStatementPrepare.unpack(unpacker)
+            if prepare is None:
+                raise ValueError("prepare should not be None.")
             return cls(type, prepare=prepare)
         if type == SCPStatementType.SCP_ST_CONFIRM:
             confirm = SCPStatementConfirm.unpack(unpacker)
+            if confirm is None:
+                raise ValueError("confirm should not be None.")
             return cls(type, confirm=confirm)
         if type == SCPStatementType.SCP_ST_EXTERNALIZE:
             externalize = SCPStatementExternalize.unpack(unpacker)
+            if externalize is None:
+                raise ValueError("externalize should not be None.")
             return cls(type, externalize=externalize)
         if type == SCPStatementType.SCP_ST_NOMINATE:
             nominate = SCPNomination.unpack(unpacker)
+            if nominate is None:
+                raise ValueError("nominate should not be None.")
             return cls(type, nominate=nominate)
         raise ValueError("Invalid type.")
 

@@ -72,15 +72,23 @@ class LedgerEntryChange:
         type = LedgerEntryChangeType.unpack(unpacker)
         if type == LedgerEntryChangeType.LEDGER_ENTRY_CREATED:
             created = LedgerEntry.unpack(unpacker)
+            if created is None:
+                raise ValueError("created should not be None.")
             return cls(type, created=created)
         if type == LedgerEntryChangeType.LEDGER_ENTRY_UPDATED:
             updated = LedgerEntry.unpack(unpacker)
+            if updated is None:
+                raise ValueError("updated should not be None.")
             return cls(type, updated=updated)
         if type == LedgerEntryChangeType.LEDGER_ENTRY_REMOVED:
             removed = LedgerKey.unpack(unpacker)
+            if removed is None:
+                raise ValueError("removed should not be None.")
             return cls(type, removed=removed)
         if type == LedgerEntryChangeType.LEDGER_ENTRY_STATE:
             state = LedgerEntry.unpack(unpacker)
+            if state is None:
+                raise ValueError("state should not be None.")
             return cls(type, state=state)
         raise ValueError("Invalid type.")
 

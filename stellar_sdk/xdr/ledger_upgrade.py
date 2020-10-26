@@ -71,15 +71,23 @@ class LedgerUpgrade:
         type = LedgerUpgradeType.unpack(unpacker)
         if type == LedgerUpgradeType.LEDGER_UPGRADE_VERSION:
             new_ledger_version = Uint32.unpack(unpacker)
+            if new_ledger_version is None:
+                raise ValueError("new_ledger_version should not be None.")
             return cls(type, new_ledger_version=new_ledger_version)
         if type == LedgerUpgradeType.LEDGER_UPGRADE_BASE_FEE:
             new_base_fee = Uint32.unpack(unpacker)
+            if new_base_fee is None:
+                raise ValueError("new_base_fee should not be None.")
             return cls(type, new_base_fee=new_base_fee)
         if type == LedgerUpgradeType.LEDGER_UPGRADE_MAX_TX_SET_SIZE:
             new_max_tx_set_size = Uint32.unpack(unpacker)
+            if new_max_tx_set_size is None:
+                raise ValueError("new_max_tx_set_size should not be None.")
             return cls(type, new_max_tx_set_size=new_max_tx_set_size)
         if type == LedgerUpgradeType.LEDGER_UPGRADE_BASE_RESERVE:
             new_base_reserve = Uint32.unpack(unpacker)
+            if new_base_reserve is None:
+                raise ValueError("new_base_reserve should not be None.")
             return cls(type, new_base_reserve=new_base_reserve)
         raise ValueError("Invalid type.")
 

@@ -49,6 +49,8 @@ class ManageOfferSuccessResultOffer:
             or effect == ManageOfferEffect.MANAGE_OFFER_UPDATED
         ):
             offer = OfferEntry.unpack(unpacker)
+            if offer is None:
+                raise ValueError("offer should not be None.")
             return cls(effect, offer=offer)
         raise ValueError("Invalid effect.")
 

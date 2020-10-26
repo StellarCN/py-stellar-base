@@ -50,6 +50,8 @@ class CreateClaimableBalanceResult:
         code = CreateClaimableBalanceResultCode.unpack(unpacker)
         if code == CreateClaimableBalanceResultCode.CREATE_CLAIMABLE_BALANCE_SUCCESS:
             balance_id = ClaimableBalanceID.unpack(unpacker)
+            if balance_id is None:
+                raise ValueError("balance_id should not be None.")
             return cls(code, balance_id=balance_id)
         raise ValueError("Invalid code.")
 

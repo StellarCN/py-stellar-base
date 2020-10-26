@@ -77,9 +77,13 @@ class TransactionMeta:
             return cls(v, operations=operations)
         if v == 1:
             v1 = TransactionMetaV1.unpack(unpacker)
+            if v1 is None:
+                raise ValueError("v1 should not be None.")
             return cls(v, v1=v1)
         if v == 2:
             v2 = TransactionMetaV2.unpack(unpacker)
+            if v2 is None:
+                raise ValueError("v2 should not be None.")
             return cls(v, v2=v2)
         raise ValueError("Invalid v.")
 

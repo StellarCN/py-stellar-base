@@ -69,12 +69,18 @@ class BucketEntry:
         type = BucketEntryType.unpack(unpacker)
         if type == BucketEntryType.LIVEENTRY or type == BucketEntryType.INITENTRY:
             live_entry = LedgerEntry.unpack(unpacker)
+            if live_entry is None:
+                raise ValueError("live_entry should not be None.")
             return cls(type, live_entry=live_entry)
         if type == BucketEntryType.DEADENTRY:
             dead_entry = LedgerKey.unpack(unpacker)
+            if dead_entry is None:
+                raise ValueError("dead_entry should not be None.")
             return cls(type, dead_entry=dead_entry)
         if type == BucketEntryType.METAENTRY:
             meta_entry = BucketMetadata.unpack(unpacker)
+            if meta_entry is None:
+                raise ValueError("meta_entry should not be None.")
             return cls(type, meta_entry=meta_entry)
         raise ValueError("Invalid type.")
 

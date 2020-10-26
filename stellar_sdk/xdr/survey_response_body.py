@@ -44,6 +44,8 @@ class SurveyResponseBody:
         type = SurveyMessageCommandType.unpack(unpacker)
         if type == SurveyMessageCommandType.SURVEY_TOPOLOGY:
             topology_response_body = TopologyResponseBody.unpack(unpacker)
+            if topology_response_body is None:
+                raise ValueError("topology_response_body should not be None.")
             return cls(type, topology_response_body=topology_response_body)
         raise ValueError("Invalid type.")
 

@@ -40,6 +40,8 @@ class ClaimableBalanceID:
         type = ClaimableBalanceIDType.unpack(unpacker)
         if type == ClaimableBalanceIDType.CLAIMABLE_BALANCE_ID_TYPE_V0:
             v0 = Hash.unpack(unpacker)
+            if v0 is None:
+                raise ValueError("v0 should not be None.")
             return cls(type, v0=v0)
         raise ValueError("Invalid type.")
 

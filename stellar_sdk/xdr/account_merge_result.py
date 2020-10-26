@@ -44,6 +44,8 @@ class AccountMergeResult:
         code = AccountMergeResultCode.unpack(unpacker)
         if code == AccountMergeResultCode.ACCOUNT_MERGE_SUCCESS:
             source_account_balance = Int64.unpack(unpacker)
+            if source_account_balance is None:
+                raise ValueError("source_account_balance should not be None.")
             return cls(code, source_account_balance=source_account_balance)
         raise ValueError("Invalid code.")
 

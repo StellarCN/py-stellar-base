@@ -190,15 +190,23 @@ class StellarMessage:
         type = MessageType.unpack(unpacker)
         if type == MessageType.ERROR_MSG:
             error = Error.unpack(unpacker)
+            if error is None:
+                raise ValueError("error should not be None.")
             return cls(type, error=error)
         if type == MessageType.HELLO:
             hello = Hello.unpack(unpacker)
+            if hello is None:
+                raise ValueError("hello should not be None.")
             return cls(type, hello=hello)
         if type == MessageType.AUTH:
             auth = Auth.unpack(unpacker)
+            if auth is None:
+                raise ValueError("auth should not be None.")
             return cls(type, auth=auth)
         if type == MessageType.DONT_HAVE:
             dont_have = DontHave.unpack(unpacker)
+            if dont_have is None:
+                raise ValueError("dont_have should not be None.")
             return cls(type, dont_have=dont_have)
         if type == MessageType.GET_PEERS:
             return cls(type)
@@ -210,15 +218,23 @@ class StellarMessage:
             return cls(type, peers=peers)
         if type == MessageType.GET_TX_SET:
             tx_set_hash = Uint256.unpack(unpacker)
+            if tx_set_hash is None:
+                raise ValueError("tx_set_hash should not be None.")
             return cls(type, tx_set_hash=tx_set_hash)
         if type == MessageType.TX_SET:
             tx_set = TransactionSet.unpack(unpacker)
+            if tx_set is None:
+                raise ValueError("tx_set should not be None.")
             return cls(type, tx_set=tx_set)
         if type == MessageType.TRANSACTION:
             transaction = TransactionEnvelope.unpack(unpacker)
+            if transaction is None:
+                raise ValueError("transaction should not be None.")
             return cls(type, transaction=transaction)
         if type == MessageType.SURVEY_REQUEST:
             signed_survey_request_message = SignedSurveyRequestMessage.unpack(unpacker)
+            if signed_survey_request_message is None:
+                raise ValueError("signed_survey_request_message should not be None.")
             return cls(
                 type, signed_survey_request_message=signed_survey_request_message
             )
@@ -226,20 +242,30 @@ class StellarMessage:
             signed_survey_response_message = SignedSurveyResponseMessage.unpack(
                 unpacker
             )
+            if signed_survey_response_message is None:
+                raise ValueError("signed_survey_response_message should not be None.")
             return cls(
                 type, signed_survey_response_message=signed_survey_response_message
             )
         if type == MessageType.GET_SCP_QUORUMSET:
             q_set_hash = Uint256.unpack(unpacker)
+            if q_set_hash is None:
+                raise ValueError("q_set_hash should not be None.")
             return cls(type, q_set_hash=q_set_hash)
         if type == MessageType.SCP_QUORUMSET:
             q_set = SCPQuorumSet.unpack(unpacker)
+            if q_set is None:
+                raise ValueError("q_set should not be None.")
             return cls(type, q_set=q_set)
         if type == MessageType.SCP_MESSAGE:
             envelope = SCPEnvelope.unpack(unpacker)
+            if envelope is None:
+                raise ValueError("envelope should not be None.")
             return cls(type, envelope=envelope)
         if type == MessageType.GET_SCP_STATE:
             get_scp_ledger_seq = Uint32.unpack(unpacker)
+            if get_scp_ledger_seq is None:
+                raise ValueError("get_scp_ledger_seq should not be None.")
             return cls(type, get_scp_ledger_seq=get_scp_ledger_seq)
         raise ValueError("Invalid type.")
 

@@ -40,6 +40,8 @@ class LedgerCloseMeta:
         v = Integer.unpack(unpacker)
         if v == 0:
             v0 = LedgerCloseMetaV0.unpack(unpacker)
+            if v0 is None:
+                raise ValueError("v0 should not be None.")
             return cls(v, v0=v0)
         raise ValueError("Invalid v.")
 

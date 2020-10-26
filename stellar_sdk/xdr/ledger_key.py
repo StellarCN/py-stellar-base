@@ -106,18 +106,28 @@ class LedgerKey:
         type = LedgerEntryType.unpack(unpacker)
         if type == LedgerEntryType.ACCOUNT:
             account = LedgerKeyAccount.unpack(unpacker)
+            if account is None:
+                raise ValueError("account should not be None.")
             return cls(type, account=account)
         if type == LedgerEntryType.TRUSTLINE:
             trust_line = LedgerKeyTrustLine.unpack(unpacker)
+            if trust_line is None:
+                raise ValueError("trust_line should not be None.")
             return cls(type, trust_line=trust_line)
         if type == LedgerEntryType.OFFER:
             offer = LedgerKeyOffer.unpack(unpacker)
+            if offer is None:
+                raise ValueError("offer should not be None.")
             return cls(type, offer=offer)
         if type == LedgerEntryType.DATA:
             data = LedgerKeyData.unpack(unpacker)
+            if data is None:
+                raise ValueError("data should not be None.")
             return cls(type, data=data)
         if type == LedgerEntryType.CLAIMABLE_BALANCE:
             claimable_balance = LedgerKeyClaimableBalance.unpack(unpacker)
+            if claimable_balance is None:
+                raise ValueError("claimable_balance should not be None.")
             return cls(type, claimable_balance=claimable_balance)
         raise ValueError("Invalid type.")
 

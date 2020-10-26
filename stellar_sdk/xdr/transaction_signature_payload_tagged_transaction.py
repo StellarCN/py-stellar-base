@@ -57,9 +57,13 @@ class TransactionSignaturePayloadTaggedTransaction:
         type = EnvelopeType.unpack(unpacker)
         if type == EnvelopeType.ENVELOPE_TYPE_TX:
             tx = Transaction.unpack(unpacker)
+            if tx is None:
+                raise ValueError("tx should not be None.")
             return cls(type, tx=tx)
         if type == EnvelopeType.ENVELOPE_TYPE_TX_FEE_BUMP:
             fee_bump = FeeBumpTransaction.unpack(unpacker)
+            if fee_bump is None:
+                raise ValueError("fee_bump should not be None.")
             return cls(type, fee_bump=fee_bump)
         raise ValueError("Invalid type.")
 

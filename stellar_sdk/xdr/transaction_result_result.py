@@ -74,6 +74,8 @@ class TransactionResultResult:
             or code == TransactionResultCode.txFEE_BUMP_INNER_FAILED
         ):
             inner_result_pair = InnerTransactionResultPair.unpack(unpacker)
+            if inner_result_pair is None:
+                raise ValueError("inner_result_pair should not be None.")
             return cls(code, inner_result_pair=inner_result_pair)
         if (
             code == TransactionResultCode.txSUCCESS

@@ -40,6 +40,8 @@ class PublicKey:
         type = PublicKeyType.unpack(unpacker)
         if type == PublicKeyType.PUBLIC_KEY_TYPE_ED25519:
             ed25519 = Uint256.unpack(unpacker)
+            if ed25519 is None:
+                raise ValueError("ed25519 should not be None.")
             return cls(type, ed25519=ed25519)
         raise ValueError("Invalid type.")
 

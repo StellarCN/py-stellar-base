@@ -79,15 +79,23 @@ class Memo:
             return cls(type)
         if type == MemoType.MEMO_TEXT:
             text = String.unpack(unpacker)
+            if text is None:
+                raise ValueError("text should not be None.")
             return cls(type, text=text)
         if type == MemoType.MEMO_ID:
             id = Uint64.unpack(unpacker)
+            if id is None:
+                raise ValueError("id should not be None.")
             return cls(type, id=id)
         if type == MemoType.MEMO_HASH:
             hash = Hash.unpack(unpacker)
+            if hash is None:
+                raise ValueError("hash should not be None.")
             return cls(type, hash=hash)
         if type == MemoType.MEMO_RETURN:
             ret_hash = Hash.unpack(unpacker)
+            if ret_hash is None:
+                raise ValueError("ret_hash should not be None.")
             return cls(type, ret_hash=ret_hash)
         raise ValueError("Invalid type.")
 

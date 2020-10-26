@@ -85,6 +85,8 @@ class OperationResult:
         code = OperationResultCode.unpack(unpacker)
         if code == OperationResultCode.opINNER:
             tr = OperationResultTr.unpack(unpacker)
+            if tr is None:
+                raise ValueError("tr should not be None.")
             return cls(code, tr=tr)
         raise ValueError("Invalid code.")
 

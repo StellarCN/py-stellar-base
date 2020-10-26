@@ -64,12 +64,18 @@ class TransactionEnvelope:
         type = EnvelopeType.unpack(unpacker)
         if type == EnvelopeType.ENVELOPE_TYPE_TX_V0:
             v0 = TransactionV0Envelope.unpack(unpacker)
+            if v0 is None:
+                raise ValueError("v0 should not be None.")
             return cls(type, v0=v0)
         if type == EnvelopeType.ENVELOPE_TYPE_TX:
             v1 = TransactionV1Envelope.unpack(unpacker)
+            if v1 is None:
+                raise ValueError("v1 should not be None.")
             return cls(type, v1=v1)
         if type == EnvelopeType.ENVELOPE_TYPE_TX_FEE_BUMP:
             fee_bump = FeeBumpTransactionEnvelope.unpack(unpacker)
+            if fee_bump is None:
+                raise ValueError("fee_bump should not be None.")
             return cls(type, fee_bump=fee_bump)
         raise ValueError("Invalid type.")
 

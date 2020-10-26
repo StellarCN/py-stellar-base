@@ -45,6 +45,8 @@ class OperationID:
         type = EnvelopeType.unpack(unpacker)
         if type == EnvelopeType.ENVELOPE_TYPE_OP_ID:
             id = OperationIDId.unpack(unpacker)
+            if id is None:
+                raise ValueError("id should not be None.")
             return cls(type, id=id)
         raise ValueError("Invalid type.")
 

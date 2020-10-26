@@ -64,12 +64,18 @@ class SignerKey:
         type = SignerKeyType.unpack(unpacker)
         if type == SignerKeyType.SIGNER_KEY_TYPE_ED25519:
             ed25519 = Uint256.unpack(unpacker)
+            if ed25519 is None:
+                raise ValueError("ed25519 should not be None.")
             return cls(type, ed25519=ed25519)
         if type == SignerKeyType.SIGNER_KEY_TYPE_PRE_AUTH_TX:
             pre_auth_tx = Uint256.unpack(unpacker)
+            if pre_auth_tx is None:
+                raise ValueError("pre_auth_tx should not be None.")
             return cls(type, pre_auth_tx=pre_auth_tx)
         if type == SignerKeyType.SIGNER_KEY_TYPE_HASH_X:
             hash_x = Uint256.unpack(unpacker)
+            if hash_x is None:
+                raise ValueError("hash_x should not be None.")
             return cls(type, hash_x=hash_x)
         raise ValueError("Invalid type.")
 

@@ -72,9 +72,13 @@ class Asset:
             return cls(type)
         if type == AssetType.ASSET_TYPE_CREDIT_ALPHANUM4:
             alpha_num4 = AssetAlphaNum4.unpack(unpacker)
+            if alpha_num4 is None:
+                raise ValueError("alpha_num4 should not be None.")
             return cls(type, alpha_num4=alpha_num4)
         if type == AssetType.ASSET_TYPE_CREDIT_ALPHANUM12:
             alpha_num12 = AssetAlphaNum12.unpack(unpacker)
+            if alpha_num12 is None:
+                raise ValueError("alpha_num12 should not be None.")
             return cls(type, alpha_num12=alpha_num12)
         raise ValueError("Invalid type.")
 

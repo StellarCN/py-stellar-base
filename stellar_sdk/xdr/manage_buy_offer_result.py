@@ -44,6 +44,8 @@ class ManageBuyOfferResult:
         code = ManageBuyOfferResultCode.unpack(unpacker)
         if code == ManageBuyOfferResultCode.MANAGE_BUY_OFFER_SUCCESS:
             success = ManageOfferSuccessResult.unpack(unpacker)
+            if success is None:
+                raise ValueError("success should not be None.")
             return cls(code, success=success)
         raise ValueError("Invalid code.")
 

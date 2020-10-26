@@ -116,12 +116,18 @@ class ClaimPredicate:
             return cls(type, or_predicates=or_predicates)
         if type == ClaimPredicateType.CLAIM_PREDICATE_NOT:
             not_predicate = ClaimPredicate.unpack(unpacker)
+            if not_predicate is None:
+                raise ValueError("not_predicate should not be None.")
             return cls(type, not_predicate=not_predicate)
         if type == ClaimPredicateType.CLAIM_PREDICATE_BEFORE_ABSOLUTE_TIME:
             abs_before = Int64.unpack(unpacker)
+            if abs_before is None:
+                raise ValueError("abs_before should not be None.")
             return cls(type, abs_before=abs_before)
         if type == ClaimPredicateType.CLAIM_PREDICATE_BEFORE_RELATIVE_TIME:
             rel_before = Int64.unpack(unpacker)
+            if rel_before is None:
+                raise ValueError("rel_before should not be None.")
             return cls(type, rel_before=rel_before)
         raise ValueError("Invalid type.")
 

@@ -46,6 +46,8 @@ class AccountEntryExtensionV1Ext:
             return cls(v)
         if v == 2:
             v2 = AccountEntryExtensionV2.unpack(unpacker)
+            if v2 is None:
+                raise ValueError("v2 should not be None.")
             return cls(v, v2=v2)
         raise ValueError("Invalid v.")
 

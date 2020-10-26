@@ -48,6 +48,8 @@ class StellarValueExt:
             return cls(v)
         if v == StellarValueType.STELLAR_VALUE_SIGNED:
             lc_value_signature = LedgerCloseValueSignature.unpack(unpacker)
+            if lc_value_signature is None:
+                raise ValueError("lc_value_signature should not be None.")
             return cls(v, lc_value_signature=lc_value_signature)
         raise ValueError("Invalid v.")
 

@@ -66,9 +66,13 @@ class PathPaymentStrictSendResult:
         code = PathPaymentStrictSendResultCode.unpack(unpacker)
         if code == PathPaymentStrictSendResultCode.PATH_PAYMENT_STRICT_SEND_SUCCESS:
             success = PathPaymentStrictSendResultSuccess.unpack(unpacker)
+            if success is None:
+                raise ValueError("success should not be None.")
             return cls(code, success=success)
         if code == PathPaymentStrictSendResultCode.PATH_PAYMENT_STRICT_SEND_NO_ISSUER:
             no_issuer = Asset.unpack(unpacker)
+            if no_issuer is None:
+                raise ValueError("no_issuer should not be None.")
             return cls(code, no_issuer=no_issuer)
         raise ValueError("Invalid code.")
 

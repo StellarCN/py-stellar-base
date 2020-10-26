@@ -44,6 +44,8 @@ class Claimant:
         type = ClaimantType.unpack(unpacker)
         if type == ClaimantType.CLAIMANT_TYPE_V0:
             v0 = ClaimantV0.unpack(unpacker)
+            if v0 is None:
+                raise ValueError("v0 should not be None.")
             return cls(type, v0=v0)
         raise ValueError("Invalid type.")
 
