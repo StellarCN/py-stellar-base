@@ -5,6 +5,7 @@ from xdrlib import Packer, Unpacker
 
 from .base import *
 from .ledger_close_meta_v0 import LedgerCloseMetaV0
+from ..exceptions import ValueError
 
 __all__ = ["LedgerCloseMeta"]
 
@@ -28,8 +29,11 @@ class LedgerCloseMeta:
     def pack(self, packer: Packer) -> None:
         Integer(self.v).pack(packer)
         if self.v == 0:
+            if self.v0 is None:
+                raise ValueError("v0 should not be None.")
             self.v0.pack(packer)
             return
+        raise ValueError("Invalid v.")
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "LedgerCloseMeta":
@@ -37,6 +41,7 @@ class LedgerCloseMeta:
         if v == 0:
             v0 = LedgerCloseMetaV0.unpack(unpacker)
             return cls(v, v0=v0)
+        raise ValueError("Invalid v.")
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()
@@ -54,8 +59,8 @@ class LedgerCloseMeta:
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "LedgerCloseMeta":
-        xdr = base64.b64decode(xdr.encode())
-        return cls.from_xdr_bytes(xdr)
+        xdr_bytes = base64.b64decode(xdr.encode())
+        return cls.from_xdr_bytes(xdr_bytes)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):

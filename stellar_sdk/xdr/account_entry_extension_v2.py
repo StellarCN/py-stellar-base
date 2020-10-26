@@ -53,8 +53,8 @@ class AccountEntryExtensionV2:
         self.num_sponsored.pack(packer)
         self.num_sponsoring.pack(packer)
         packer.pack_uint(len(self.signer_sponsoring_i_ds))
-        for element in self.signer_sponsoring_i_ds:
-            element.pack(packer)
+        for signer_sponsoring_i_d in self.signer_sponsoring_i_ds:
+            signer_sponsoring_i_d.pack(packer)
         self.ext.pack(packer)
 
     @classmethod
@@ -89,8 +89,8 @@ class AccountEntryExtensionV2:
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "AccountEntryExtensionV2":
-        xdr = base64.b64decode(xdr.encode())
-        return cls.from_xdr_bytes(xdr)
+        xdr_bytes = base64.b64decode(xdr.encode())
+        return cls.from_xdr_bytes(xdr_bytes)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):

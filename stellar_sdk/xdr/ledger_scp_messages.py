@@ -34,8 +34,8 @@ class LedgerSCPMessages:
     def pack(self, packer: Packer) -> None:
         self.ledger_seq.pack(packer)
         packer.pack_uint(len(self.messages))
-        for element in self.messages:
-            element.pack(packer)
+        for message in self.messages:
+            message.pack(packer)
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "LedgerSCPMessages":
@@ -62,8 +62,8 @@ class LedgerSCPMessages:
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "LedgerSCPMessages":
-        xdr = base64.b64decode(xdr.encode())
-        return cls.from_xdr_bytes(xdr)
+        xdr_bytes = base64.b64decode(xdr.encode())
+        return cls.from_xdr_bytes(xdr_bytes)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):

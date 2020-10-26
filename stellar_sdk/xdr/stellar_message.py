@@ -110,51 +110,80 @@ class StellarMessage:
     def pack(self, packer: Packer) -> None:
         self.type.pack(packer)
         if self.type == MessageType.ERROR_MSG:
+            if self.error is None:
+                raise ValueError("error should not be None.")
             self.error.pack(packer)
             return
         if self.type == MessageType.HELLO:
+            if self.hello is None:
+                raise ValueError("hello should not be None.")
             self.hello.pack(packer)
             return
         if self.type == MessageType.AUTH:
+            if self.auth is None:
+                raise ValueError("auth should not be None.")
             self.auth.pack(packer)
             return
         if self.type == MessageType.DONT_HAVE:
+            if self.dont_have is None:
+                raise ValueError("dont_have should not be None.")
             self.dont_have.pack(packer)
             return
         if self.type == MessageType.GET_PEERS:
             return
         if self.type == MessageType.PEERS:
+            if self.peers is None:
+                raise ValueError("peers should not be None.")
             packer.pack_uint(len(self.peers))
-            for element in self.peers:
-                element.pack(packer)
+            for peer in self.peers:
+                peer.pack(packer)
             return
         if self.type == MessageType.GET_TX_SET:
+            if self.tx_set_hash is None:
+                raise ValueError("tx_set_hash should not be None.")
             self.tx_set_hash.pack(packer)
             return
         if self.type == MessageType.TX_SET:
+            if self.tx_set is None:
+                raise ValueError("tx_set should not be None.")
             self.tx_set.pack(packer)
             return
         if self.type == MessageType.TRANSACTION:
+            if self.transaction is None:
+                raise ValueError("transaction should not be None.")
             self.transaction.pack(packer)
             return
         if self.type == MessageType.SURVEY_REQUEST:
+            if self.signed_survey_request_message is None:
+                raise ValueError("signed_survey_request_message should not be None.")
             self.signed_survey_request_message.pack(packer)
             return
         if self.type == MessageType.SURVEY_RESPONSE:
+            if self.signed_survey_response_message is None:
+                raise ValueError("signed_survey_response_message should not be None.")
             self.signed_survey_response_message.pack(packer)
             return
         if self.type == MessageType.GET_SCP_QUORUMSET:
+            if self.q_set_hash is None:
+                raise ValueError("q_set_hash should not be None.")
             self.q_set_hash.pack(packer)
             return
         if self.type == MessageType.SCP_QUORUMSET:
+            if self.q_set is None:
+                raise ValueError("q_set should not be None.")
             self.q_set.pack(packer)
             return
         if self.type == MessageType.SCP_MESSAGE:
+            if self.envelope is None:
+                raise ValueError("envelope should not be None.")
             self.envelope.pack(packer)
             return
         if self.type == MessageType.GET_SCP_STATE:
+            if self.get_scp_ledger_seq is None:
+                raise ValueError("get_scp_ledger_seq should not be None.")
             self.get_scp_ledger_seq.pack(packer)
             return
+        raise ValueError("Invalid type.")
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "StellarMessage":
@@ -212,6 +241,7 @@ class StellarMessage:
         if type == MessageType.GET_SCP_STATE:
             get_scp_ledger_seq = Uint32.unpack(unpacker)
             return cls(type, get_scp_ledger_seq=get_scp_ledger_seq)
+        raise ValueError("Invalid type.")
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()
@@ -229,8 +259,8 @@ class StellarMessage:
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "StellarMessage":
-        xdr = base64.b64decode(xdr.encode())
-        return cls.from_xdr_bytes(xdr)
+        xdr_bytes = base64.b64decode(xdr.encode())
+        return cls.from_xdr_bytes(xdr_bytes)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):

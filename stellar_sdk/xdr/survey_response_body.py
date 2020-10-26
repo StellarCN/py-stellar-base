@@ -5,6 +5,7 @@ from xdrlib import Packer, Unpacker
 
 from .survey_message_command_type import SurveyMessageCommandType
 from .topology_response_body import TopologyResponseBody
+from ..exceptions import ValueError
 
 __all__ = ["SurveyResponseBody"]
 
@@ -32,8 +33,11 @@ class SurveyResponseBody:
     def pack(self, packer: Packer) -> None:
         self.type.pack(packer)
         if self.type == SurveyMessageCommandType.SURVEY_TOPOLOGY:
+            if self.topology_response_body is None:
+                raise ValueError("topology_response_body should not be None.")
             self.topology_response_body.pack(packer)
             return
+        raise ValueError("Invalid type.")
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "SurveyResponseBody":
@@ -41,6 +45,7 @@ class SurveyResponseBody:
         if type == SurveyMessageCommandType.SURVEY_TOPOLOGY:
             topology_response_body = TopologyResponseBody.unpack(unpacker)
             return cls(type, topology_response_body=topology_response_body)
+        raise ValueError("Invalid type.")
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()
@@ -58,8 +63,8 @@ class SurveyResponseBody:
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "SurveyResponseBody":
-        xdr = base64.b64decode(xdr.encode())
-        return cls.from_xdr_bytes(xdr)
+        xdr_bytes = base64.b64decode(xdr.encode())
+        return cls.from_xdr_bytes(xdr_bytes)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):

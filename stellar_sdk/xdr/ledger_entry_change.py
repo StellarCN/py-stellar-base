@@ -6,6 +6,7 @@ from xdrlib import Packer, Unpacker
 from .ledger_entry import LedgerEntry
 from .ledger_entry_change_type import LedgerEntryChangeType
 from .ledger_key import LedgerKey
+from ..exceptions import ValueError
 
 __all__ = ["LedgerEntryChange"]
 
@@ -45,17 +46,26 @@ class LedgerEntryChange:
     def pack(self, packer: Packer) -> None:
         self.type.pack(packer)
         if self.type == LedgerEntryChangeType.LEDGER_ENTRY_CREATED:
+            if self.created is None:
+                raise ValueError("created should not be None.")
             self.created.pack(packer)
             return
         if self.type == LedgerEntryChangeType.LEDGER_ENTRY_UPDATED:
+            if self.updated is None:
+                raise ValueError("updated should not be None.")
             self.updated.pack(packer)
             return
         if self.type == LedgerEntryChangeType.LEDGER_ENTRY_REMOVED:
+            if self.removed is None:
+                raise ValueError("removed should not be None.")
             self.removed.pack(packer)
             return
         if self.type == LedgerEntryChangeType.LEDGER_ENTRY_STATE:
+            if self.state is None:
+                raise ValueError("state should not be None.")
             self.state.pack(packer)
             return
+        raise ValueError("Invalid type.")
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "LedgerEntryChange":
@@ -72,6 +82,7 @@ class LedgerEntryChange:
         if type == LedgerEntryChangeType.LEDGER_ENTRY_STATE:
             state = LedgerEntry.unpack(unpacker)
             return cls(type, state=state)
+        raise ValueError("Invalid type.")
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()
@@ -89,8 +100,8 @@ class LedgerEntryChange:
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "LedgerEntryChange":
-        xdr = base64.b64decode(xdr.encode())
-        return cls.from_xdr_bytes(xdr)
+        xdr_bytes = base64.b64decode(xdr.encode())
+        return cls.from_xdr_bytes(xdr_bytes)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):

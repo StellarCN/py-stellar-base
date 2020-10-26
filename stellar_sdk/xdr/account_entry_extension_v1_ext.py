@@ -5,6 +5,7 @@ from xdrlib import Packer, Unpacker
 
 from .account_entry_extension_v2 import AccountEntryExtensionV2
 from .base import *
+from ..exceptions import ValueError
 
 __all__ = ["AccountEntryExtensionV1Ext"]
 
@@ -32,8 +33,11 @@ class AccountEntryExtensionV1Ext:
         if self.v == 0:
             return
         if self.v == 2:
+            if self.v2 is None:
+                raise ValueError("v2 should not be None.")
             self.v2.pack(packer)
             return
+        raise ValueError("Invalid v.")
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "AccountEntryExtensionV1Ext":
@@ -43,6 +47,7 @@ class AccountEntryExtensionV1Ext:
         if v == 2:
             v2 = AccountEntryExtensionV2.unpack(unpacker)
             return cls(v, v2=v2)
+        raise ValueError("Invalid v.")
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()
@@ -60,8 +65,8 @@ class AccountEntryExtensionV1Ext:
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "AccountEntryExtensionV1Ext":
-        xdr = base64.b64decode(xdr.encode())
-        return cls.from_xdr_bytes(xdr)
+        xdr_bytes = base64.b64decode(xdr.encode())
+        return cls.from_xdr_bytes(xdr_bytes)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):

@@ -30,8 +30,8 @@ class TransactionResultSet:
 
     def pack(self, packer: Packer) -> None:
         packer.pack_uint(len(self.results))
-        for element in self.results:
-            element.pack(packer)
+        for result in self.results:
+            result.pack(packer)
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "TransactionResultSet":
@@ -57,8 +57,8 @@ class TransactionResultSet:
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "TransactionResultSet":
-        xdr = base64.b64decode(xdr.encode())
-        return cls.from_xdr_bytes(xdr)
+        xdr_bytes = base64.b64decode(xdr.encode())
+        return cls.from_xdr_bytes(xdr_bytes)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):

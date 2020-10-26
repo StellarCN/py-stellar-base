@@ -6,6 +6,7 @@ from xdrlib import Packer, Unpacker
 from .crypto_key_type import CryptoKeyType
 from .muxed_account_med25519 import MuxedAccountMed25519
 from .uint256 import Uint256
+from ..exceptions import ValueError
 
 __all__ = ["MuxedAccount"]
 
@@ -41,11 +42,16 @@ class MuxedAccount:
     def pack(self, packer: Packer) -> None:
         self.type.pack(packer)
         if self.type == CryptoKeyType.KEY_TYPE_ED25519:
+            if self.ed25519 is None:
+                raise ValueError("ed25519 should not be None.")
             self.ed25519.pack(packer)
             return
         if self.type == CryptoKeyType.KEY_TYPE_MUXED_ED25519:
+            if self.med25519 is None:
+                raise ValueError("med25519 should not be None.")
             self.med25519.pack(packer)
             return
+        raise ValueError("Invalid type.")
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "MuxedAccount":
@@ -56,6 +62,7 @@ class MuxedAccount:
         if type == CryptoKeyType.KEY_TYPE_MUXED_ED25519:
             med25519 = MuxedAccountMed25519.unpack(unpacker)
             return cls(type, med25519=med25519)
+        raise ValueError("Invalid type.")
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()
@@ -73,8 +80,8 @@ class MuxedAccount:
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "MuxedAccount":
-        xdr = base64.b64decode(xdr.encode())
-        return cls.from_xdr_bytes(xdr)
+        xdr_bytes = base64.b64decode(xdr.encode())
+        return cls.from_xdr_bytes(xdr_bytes)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):

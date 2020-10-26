@@ -38,8 +38,8 @@ class FeeBumpTransactionEnvelope:
     def pack(self, packer: Packer) -> None:
         self.tx.pack(packer)
         packer.pack_uint(len(self.signatures))
-        for element in self.signatures:
-            element.pack(packer)
+        for signature in self.signatures:
+            signature.pack(packer)
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "FeeBumpTransactionEnvelope":
@@ -66,8 +66,8 @@ class FeeBumpTransactionEnvelope:
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "FeeBumpTransactionEnvelope":
-        xdr = base64.b64decode(xdr.encode())
-        return cls.from_xdr_bytes(xdr)
+        xdr_bytes = base64.b64decode(xdr.encode())
+        return cls.from_xdr_bytes(xdr_bytes)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):

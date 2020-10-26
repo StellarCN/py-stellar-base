@@ -9,6 +9,7 @@ from .data_entry import DataEntry
 from .ledger_entry_type import LedgerEntryType
 from .offer_entry import OfferEntry
 from .trust_line_entry import TrustLineEntry
+from ..exceptions import ValueError
 
 __all__ = ["LedgerEntryData"]
 
@@ -52,20 +53,31 @@ class LedgerEntryData:
     def pack(self, packer: Packer) -> None:
         self.type.pack(packer)
         if self.type == LedgerEntryType.ACCOUNT:
+            if self.account is None:
+                raise ValueError("account should not be None.")
             self.account.pack(packer)
             return
         if self.type == LedgerEntryType.TRUSTLINE:
+            if self.trust_line is None:
+                raise ValueError("trust_line should not be None.")
             self.trust_line.pack(packer)
             return
         if self.type == LedgerEntryType.OFFER:
+            if self.offer is None:
+                raise ValueError("offer should not be None.")
             self.offer.pack(packer)
             return
         if self.type == LedgerEntryType.DATA:
+            if self.data is None:
+                raise ValueError("data should not be None.")
             self.data.pack(packer)
             return
         if self.type == LedgerEntryType.CLAIMABLE_BALANCE:
+            if self.claimable_balance is None:
+                raise ValueError("claimable_balance should not be None.")
             self.claimable_balance.pack(packer)
             return
+        raise ValueError("Invalid type.")
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "LedgerEntryData":
@@ -85,6 +97,7 @@ class LedgerEntryData:
         if type == LedgerEntryType.CLAIMABLE_BALANCE:
             claimable_balance = ClaimableBalanceEntry.unpack(unpacker)
             return cls(type, claimable_balance=claimable_balance)
+        raise ValueError("Invalid type.")
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()
@@ -102,8 +115,8 @@ class LedgerEntryData:
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "LedgerEntryData":
-        xdr = base64.b64decode(xdr.encode())
-        return cls.from_xdr_bytes(xdr)
+        xdr_bytes = base64.b64decode(xdr.encode())
+        return cls.from_xdr_bytes(xdr_bytes)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):

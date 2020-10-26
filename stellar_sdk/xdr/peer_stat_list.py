@@ -28,8 +28,8 @@ class PeerStatList:
 
     def pack(self, packer: Packer) -> None:
         packer.pack_uint(len(self.peer_stat_list))
-        for element in self.peer_stat_list:
-            element.pack(packer)
+        for peer_stat_list in self.peer_stat_list:
+            peer_stat_list.pack(packer)
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "PeerStatList":
@@ -56,8 +56,8 @@ class PeerStatList:
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "PeerStatList":
-        xdr = base64.b64decode(xdr.encode())
-        return cls.from_xdr_bytes(xdr)
+        xdr_bytes = base64.b64decode(xdr.encode())
+        return cls.from_xdr_bytes(xdr_bytes)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):

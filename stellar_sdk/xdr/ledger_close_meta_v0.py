@@ -68,14 +68,14 @@ class LedgerCloseMetaV0:
         self.ledger_header.pack(packer)
         self.tx_set.pack(packer)
         packer.pack_uint(len(self.tx_processing))
-        for element in self.tx_processing:
-            element.pack(packer)
+        for tx_processing in self.tx_processing:
+            tx_processing.pack(packer)
         packer.pack_uint(len(self.upgrades_processing))
-        for element in self.upgrades_processing:
-            element.pack(packer)
+        for upgrades_processing in self.upgrades_processing:
+            upgrades_processing.pack(packer)
         packer.pack_uint(len(self.scp_info))
-        for element in self.scp_info:
-            element.pack(packer)
+        for scp_info in self.scp_info:
+            scp_info.pack(packer)
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "LedgerCloseMetaV0":
@@ -117,8 +117,8 @@ class LedgerCloseMetaV0:
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "LedgerCloseMetaV0":
-        xdr = base64.b64decode(xdr.encode())
-        return cls.from_xdr_bytes(xdr)
+        xdr_bytes = base64.b64decode(xdr.encode())
+        return cls.from_xdr_bytes(xdr_bytes)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):

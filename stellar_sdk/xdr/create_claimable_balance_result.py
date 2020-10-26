@@ -5,6 +5,7 @@ from xdrlib import Packer, Unpacker
 
 from .claimable_balance_id import ClaimableBalanceID
 from .create_claimable_balance_result_code import CreateClaimableBalanceResultCode
+from ..exceptions import ValueError
 
 __all__ = ["CreateClaimableBalanceResult"]
 
@@ -38,8 +39,11 @@ class CreateClaimableBalanceResult:
             self.code
             == CreateClaimableBalanceResultCode.CREATE_CLAIMABLE_BALANCE_SUCCESS
         ):
+            if self.balance_id is None:
+                raise ValueError("balance_id should not be None.")
             self.balance_id.pack(packer)
             return
+        raise ValueError("Invalid code.")
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "CreateClaimableBalanceResult":
@@ -47,6 +51,7 @@ class CreateClaimableBalanceResult:
         if code == CreateClaimableBalanceResultCode.CREATE_CLAIMABLE_BALANCE_SUCCESS:
             balance_id = ClaimableBalanceID.unpack(unpacker)
             return cls(code, balance_id=balance_id)
+        raise ValueError("Invalid code.")
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()
@@ -64,8 +69,8 @@ class CreateClaimableBalanceResult:
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "CreateClaimableBalanceResult":
-        xdr = base64.b64decode(xdr.encode())
-        return cls.from_xdr_bytes(xdr)
+        xdr_bytes = base64.b64decode(xdr.encode())
+        return cls.from_xdr_bytes(xdr_bytes)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):

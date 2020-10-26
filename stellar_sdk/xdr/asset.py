@@ -6,6 +6,7 @@ from xdrlib import Packer, Unpacker
 from .asset_alpha_num12 import AssetAlphaNum12
 from .asset_alpha_num4 import AssetAlphaNum4
 from .asset_type import AssetType
+from ..exceptions import ValueError
 
 __all__ = ["Asset"]
 
@@ -53,11 +54,16 @@ class Asset:
         if self.type == AssetType.ASSET_TYPE_NATIVE:
             return
         if self.type == AssetType.ASSET_TYPE_CREDIT_ALPHANUM4:
+            if self.alpha_num4 is None:
+                raise ValueError("alpha_num4 should not be None.")
             self.alpha_num4.pack(packer)
             return
         if self.type == AssetType.ASSET_TYPE_CREDIT_ALPHANUM12:
+            if self.alpha_num12 is None:
+                raise ValueError("alpha_num12 should not be None.")
             self.alpha_num12.pack(packer)
             return
+        raise ValueError("Invalid type.")
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "Asset":
@@ -70,6 +76,7 @@ class Asset:
         if type == AssetType.ASSET_TYPE_CREDIT_ALPHANUM12:
             alpha_num12 = AssetAlphaNum12.unpack(unpacker)
             return cls(type, alpha_num12=alpha_num12)
+        raise ValueError("Invalid type.")
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()
@@ -87,8 +94,8 @@ class Asset:
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "Asset":
-        xdr = base64.b64decode(xdr.encode())
-        return cls.from_xdr_bytes(xdr)
+        xdr_bytes = base64.b64decode(xdr.encode())
+        return cls.from_xdr_bytes(xdr_bytes)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):

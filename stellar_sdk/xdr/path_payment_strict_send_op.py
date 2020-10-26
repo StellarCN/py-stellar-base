@@ -59,8 +59,8 @@ class PathPaymentStrictSendOp:
         self.dest_asset.pack(packer)
         self.dest_min.pack(packer)
         packer.pack_uint(len(self.path))
-        for element in self.path:
-            element.pack(packer)
+        for path in self.path:
+            path.pack(packer)
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "PathPaymentStrictSendOp":
@@ -98,8 +98,8 @@ class PathPaymentStrictSendOp:
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "PathPaymentStrictSendOp":
-        xdr = base64.b64decode(xdr.encode())
-        return cls.from_xdr_bytes(xdr)
+        xdr_bytes = base64.b64decode(xdr.encode())
+        return cls.from_xdr_bytes(xdr_bytes)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):

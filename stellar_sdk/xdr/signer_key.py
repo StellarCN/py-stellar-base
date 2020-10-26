@@ -5,6 +5,7 @@ from xdrlib import Packer, Unpacker
 
 from .signer_key_type import SignerKeyType
 from .uint256 import Uint256
+from ..exceptions import ValueError
 
 __all__ = ["SignerKey"]
 
@@ -42,14 +43,21 @@ class SignerKey:
     def pack(self, packer: Packer) -> None:
         self.type.pack(packer)
         if self.type == SignerKeyType.SIGNER_KEY_TYPE_ED25519:
+            if self.ed25519 is None:
+                raise ValueError("ed25519 should not be None.")
             self.ed25519.pack(packer)
             return
         if self.type == SignerKeyType.SIGNER_KEY_TYPE_PRE_AUTH_TX:
+            if self.pre_auth_tx is None:
+                raise ValueError("pre_auth_tx should not be None.")
             self.pre_auth_tx.pack(packer)
             return
         if self.type == SignerKeyType.SIGNER_KEY_TYPE_HASH_X:
+            if self.hash_x is None:
+                raise ValueError("hash_x should not be None.")
             self.hash_x.pack(packer)
             return
+        raise ValueError("Invalid type.")
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "SignerKey":
@@ -63,6 +71,7 @@ class SignerKey:
         if type == SignerKeyType.SIGNER_KEY_TYPE_HASH_X:
             hash_x = Uint256.unpack(unpacker)
             return cls(type, hash_x=hash_x)
+        raise ValueError("Invalid type.")
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()
@@ -80,8 +89,8 @@ class SignerKey:
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "SignerKey":
-        xdr = base64.b64decode(xdr.encode())
-        return cls.from_xdr_bytes(xdr)
+        xdr_bytes = base64.b64decode(xdr.encode())
+        return cls.from_xdr_bytes(xdr_bytes)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):

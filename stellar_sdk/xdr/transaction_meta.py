@@ -48,16 +48,23 @@ class TransactionMeta:
     def pack(self, packer: Packer) -> None:
         Integer(self.v).pack(packer)
         if self.v == 0:
+            if self.operations is None:
+                raise ValueError("operations should not be None.")
             packer.pack_uint(len(self.operations))
-            for element in self.operations:
-                element.pack(packer)
+            for operation in self.operations:
+                operation.pack(packer)
             return
         if self.v == 1:
+            if self.v1 is None:
+                raise ValueError("v1 should not be None.")
             self.v1.pack(packer)
             return
         if self.v == 2:
+            if self.v2 is None:
+                raise ValueError("v2 should not be None.")
             self.v2.pack(packer)
             return
+        raise ValueError("Invalid v.")
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "TransactionMeta":
@@ -74,6 +81,7 @@ class TransactionMeta:
         if v == 2:
             v2 = TransactionMetaV2.unpack(unpacker)
             return cls(v, v2=v2)
+        raise ValueError("Invalid v.")
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()
@@ -91,8 +99,8 @@ class TransactionMeta:
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "TransactionMeta":
-        xdr = base64.b64decode(xdr.encode())
-        return cls.from_xdr_bytes(xdr)
+        xdr_bytes = base64.b64decode(xdr.encode())
+        return cls.from_xdr_bytes(xdr_bytes)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):

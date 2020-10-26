@@ -7,6 +7,7 @@ from .envelope_type import EnvelopeType
 from .fee_bump_transaction_envelope import FeeBumpTransactionEnvelope
 from .transaction_v0_envelope import TransactionV0Envelope
 from .transaction_v1_envelope import TransactionV1Envelope
+from ..exceptions import ValueError
 
 __all__ = ["TransactionEnvelope"]
 
@@ -42,14 +43,21 @@ class TransactionEnvelope:
     def pack(self, packer: Packer) -> None:
         self.type.pack(packer)
         if self.type == EnvelopeType.ENVELOPE_TYPE_TX_V0:
+            if self.v0 is None:
+                raise ValueError("v0 should not be None.")
             self.v0.pack(packer)
             return
         if self.type == EnvelopeType.ENVELOPE_TYPE_TX:
+            if self.v1 is None:
+                raise ValueError("v1 should not be None.")
             self.v1.pack(packer)
             return
         if self.type == EnvelopeType.ENVELOPE_TYPE_TX_FEE_BUMP:
+            if self.fee_bump is None:
+                raise ValueError("fee_bump should not be None.")
             self.fee_bump.pack(packer)
             return
+        raise ValueError("Invalid type.")
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "TransactionEnvelope":
@@ -63,6 +71,7 @@ class TransactionEnvelope:
         if type == EnvelopeType.ENVELOPE_TYPE_TX_FEE_BUMP:
             fee_bump = FeeBumpTransactionEnvelope.unpack(unpacker)
             return cls(type, fee_bump=fee_bump)
+        raise ValueError("Invalid type.")
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()
@@ -80,8 +89,8 @@ class TransactionEnvelope:
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "TransactionEnvelope":
-        xdr = base64.b64decode(xdr.encode())
-        return cls.from_xdr_bytes(xdr)
+        xdr_bytes = base64.b64decode(xdr.encode())
+        return cls.from_xdr_bytes(xdr_bytes)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):

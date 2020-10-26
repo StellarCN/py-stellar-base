@@ -5,6 +5,7 @@ from xdrlib import Packer, Unpacker
 
 from .claimant_type import ClaimantType
 from .claimant_v0 import ClaimantV0
+from ..exceptions import ValueError
 
 __all__ = ["Claimant"]
 
@@ -32,8 +33,11 @@ class Claimant:
     def pack(self, packer: Packer) -> None:
         self.type.pack(packer)
         if self.type == ClaimantType.CLAIMANT_TYPE_V0:
+            if self.v0 is None:
+                raise ValueError("v0 should not be None.")
             self.v0.pack(packer)
             return
+        raise ValueError("Invalid type.")
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "Claimant":
@@ -41,6 +45,7 @@ class Claimant:
         if type == ClaimantType.CLAIMANT_TYPE_V0:
             v0 = ClaimantV0.unpack(unpacker)
             return cls(type, v0=v0)
+        raise ValueError("Invalid type.")
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()
@@ -58,8 +63,8 @@ class Claimant:
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "Claimant":
-        xdr = base64.b64decode(xdr.encode())
-        return cls.from_xdr_bytes(xdr)
+        xdr_bytes = base64.b64decode(xdr.encode())
+        return cls.from_xdr_bytes(xdr_bytes)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):

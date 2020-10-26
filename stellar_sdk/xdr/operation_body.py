@@ -21,6 +21,7 @@ from .path_payment_strict_send_op import PathPaymentStrictSendOp
 from .payment_op import PaymentOp
 from .revoke_sponsorship_op import RevokeSponsorshipOp
 from .set_options_op import SetOptionsOp
+from ..exceptions import ValueError
 
 __all__ = ["OperationBody"]
 
@@ -116,60 +117,97 @@ class OperationBody:
     def pack(self, packer: Packer) -> None:
         self.type.pack(packer)
         if self.type == OperationType.CREATE_ACCOUNT:
+            if self.create_account_op is None:
+                raise ValueError("create_account_op should not be None.")
             self.create_account_op.pack(packer)
             return
         if self.type == OperationType.PAYMENT:
+            if self.payment_op is None:
+                raise ValueError("payment_op should not be None.")
             self.payment_op.pack(packer)
             return
         if self.type == OperationType.PATH_PAYMENT_STRICT_RECEIVE:
+            if self.path_payment_strict_receive_op is None:
+                raise ValueError("path_payment_strict_receive_op should not be None.")
             self.path_payment_strict_receive_op.pack(packer)
             return
         if self.type == OperationType.MANAGE_SELL_OFFER:
+            if self.manage_sell_offer_op is None:
+                raise ValueError("manage_sell_offer_op should not be None.")
             self.manage_sell_offer_op.pack(packer)
             return
         if self.type == OperationType.CREATE_PASSIVE_SELL_OFFER:
+            if self.create_passive_sell_offer_op is None:
+                raise ValueError("create_passive_sell_offer_op should not be None.")
             self.create_passive_sell_offer_op.pack(packer)
             return
         if self.type == OperationType.SET_OPTIONS:
+            if self.set_options_op is None:
+                raise ValueError("set_options_op should not be None.")
             self.set_options_op.pack(packer)
             return
         if self.type == OperationType.CHANGE_TRUST:
+            if self.change_trust_op is None:
+                raise ValueError("change_trust_op should not be None.")
             self.change_trust_op.pack(packer)
             return
         if self.type == OperationType.ALLOW_TRUST:
+            if self.allow_trust_op is None:
+                raise ValueError("allow_trust_op should not be None.")
             self.allow_trust_op.pack(packer)
             return
         if self.type == OperationType.ACCOUNT_MERGE:
+            if self.destination is None:
+                raise ValueError("destination should not be None.")
             self.destination.pack(packer)
             return
         if self.type == OperationType.INFLATION:
             return
         if self.type == OperationType.MANAGE_DATA:
+            if self.manage_data_op is None:
+                raise ValueError("manage_data_op should not be None.")
             self.manage_data_op.pack(packer)
             return
         if self.type == OperationType.BUMP_SEQUENCE:
+            if self.bump_sequence_op is None:
+                raise ValueError("bump_sequence_op should not be None.")
             self.bump_sequence_op.pack(packer)
             return
         if self.type == OperationType.MANAGE_BUY_OFFER:
+            if self.manage_buy_offer_op is None:
+                raise ValueError("manage_buy_offer_op should not be None.")
             self.manage_buy_offer_op.pack(packer)
             return
         if self.type == OperationType.PATH_PAYMENT_STRICT_SEND:
+            if self.path_payment_strict_send_op is None:
+                raise ValueError("path_payment_strict_send_op should not be None.")
             self.path_payment_strict_send_op.pack(packer)
             return
         if self.type == OperationType.CREATE_CLAIMABLE_BALANCE:
+            if self.create_claimable_balance_op is None:
+                raise ValueError("create_claimable_balance_op should not be None.")
             self.create_claimable_balance_op.pack(packer)
             return
         if self.type == OperationType.CLAIM_CLAIMABLE_BALANCE:
+            if self.claim_claimable_balance_op is None:
+                raise ValueError("claim_claimable_balance_op should not be None.")
             self.claim_claimable_balance_op.pack(packer)
             return
         if self.type == OperationType.BEGIN_SPONSORING_FUTURE_RESERVES:
+            if self.begin_sponsoring_future_reserves_op is None:
+                raise ValueError(
+                    "begin_sponsoring_future_reserves_op should not be None."
+                )
             self.begin_sponsoring_future_reserves_op.pack(packer)
             return
         if self.type == OperationType.END_SPONSORING_FUTURE_RESERVES:
             return
         if self.type == OperationType.REVOKE_SPONSORSHIP:
+            if self.revoke_sponsorship_op is None:
+                raise ValueError("revoke_sponsorship_op should not be None.")
             self.revoke_sponsorship_op.pack(packer)
             return
+        raise ValueError("Invalid type.")
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "OperationBody":
@@ -236,6 +274,7 @@ class OperationBody:
         if type == OperationType.REVOKE_SPONSORSHIP:
             revoke_sponsorship_op = RevokeSponsorshipOp.unpack(unpacker)
             return cls(type, revoke_sponsorship_op=revoke_sponsorship_op)
+        raise ValueError("Invalid type.")
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()
@@ -253,8 +292,8 @@ class OperationBody:
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "OperationBody":
-        xdr = base64.b64decode(xdr.encode())
-        return cls.from_xdr_bytes(xdr)
+        xdr_bytes = base64.b64decode(xdr.encode())
+        return cls.from_xdr_bytes(xdr_bytes)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):

@@ -8,6 +8,7 @@ from .path_payment_strict_receive_result_code import PathPaymentStrictReceiveRes
 from .path_payment_strict_receive_result_success import (
     PathPaymentStrictReceiveResultSuccess,
 )
+from ..exceptions import ValueError
 
 __all__ = ["PathPaymentStrictReceiveResult"]
 
@@ -49,14 +50,19 @@ class PathPaymentStrictReceiveResult:
             self.code
             == PathPaymentStrictReceiveResultCode.PATH_PAYMENT_STRICT_RECEIVE_SUCCESS
         ):
+            if self.success is None:
+                raise ValueError("success should not be None.")
             self.success.pack(packer)
             return
         if (
             self.code
             == PathPaymentStrictReceiveResultCode.PATH_PAYMENT_STRICT_RECEIVE_NO_ISSUER
         ):
+            if self.no_issuer is None:
+                raise ValueError("no_issuer should not be None.")
             self.no_issuer.pack(packer)
             return
+        raise ValueError("Invalid code.")
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "PathPaymentStrictReceiveResult":
@@ -73,6 +79,7 @@ class PathPaymentStrictReceiveResult:
         ):
             no_issuer = Asset.unpack(unpacker)
             return cls(code, no_issuer=no_issuer)
+        raise ValueError("Invalid code.")
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()
@@ -90,8 +97,8 @@ class PathPaymentStrictReceiveResult:
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "PathPaymentStrictReceiveResult":
-        xdr = base64.b64decode(xdr.encode())
-        return cls.from_xdr_bytes(xdr)
+        xdr_bytes = base64.b64decode(xdr.encode())
+        return cls.from_xdr_bytes(xdr_bytes)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):

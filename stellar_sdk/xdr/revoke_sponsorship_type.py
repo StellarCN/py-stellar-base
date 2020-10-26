@@ -49,8 +49,8 @@ class RevokeSponsorshipType(IntEnum):
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "RevokeSponsorshipType":
-        xdr = base64.b64decode(xdr.encode())
-        return cls.from_xdr_bytes(xdr)
+        xdr_bytes = base64.b64decode(xdr.encode())
+        return cls.from_xdr_bytes(xdr_bytes)
 
     @classmethod
     def _missing_(cls, value):

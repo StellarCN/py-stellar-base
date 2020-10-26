@@ -38,10 +38,13 @@ class InflationResult:
     def pack(self, packer: Packer) -> None:
         self.code.pack(packer)
         if self.code == InflationResultCode.INFLATION_SUCCESS:
+            if self.payouts is None:
+                raise ValueError("payouts should not be None.")
             packer.pack_uint(len(self.payouts))
-            for element in self.payouts:
-                element.pack(packer)
+            for payout in self.payouts:
+                payout.pack(packer)
             return
+        raise ValueError("Invalid code.")
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "InflationResult":
@@ -52,6 +55,7 @@ class InflationResult:
             for _ in range(length):
                 payouts.append(InflationPayout.unpack(unpacker))
             return cls(code, payouts=payouts)
+        raise ValueError("Invalid code.")
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()
@@ -69,8 +73,8 @@ class InflationResult:
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "InflationResult":
-        xdr = base64.b64decode(xdr.encode())
-        return cls.from_xdr_bytes(xdr)
+        xdr_bytes = base64.b64decode(xdr.encode())
+        return cls.from_xdr_bytes(xdr_bytes)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):

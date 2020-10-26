@@ -64,8 +64,8 @@ class ClaimableBalanceEntry:
     def pack(self, packer: Packer) -> None:
         self.balance_id.pack(packer)
         packer.pack_uint(len(self.claimants))
-        for element in self.claimants:
-            element.pack(packer)
+        for claimant in self.claimants:
+            claimant.pack(packer)
         self.asset.pack(packer)
         self.amount.pack(packer)
         self.ext.pack(packer)
@@ -104,8 +104,8 @@ class ClaimableBalanceEntry:
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "ClaimableBalanceEntry":
-        xdr = base64.b64decode(xdr.encode())
-        return cls.from_xdr_bytes(xdr)
+        xdr_bytes = base64.b64decode(xdr.encode())
+        return cls.from_xdr_bytes(xdr_bytes)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):

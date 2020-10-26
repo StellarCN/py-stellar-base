@@ -4,6 +4,7 @@ import base64
 from xdrlib import Packer, Unpacker
 
 from .base import *
+from ..exceptions import ValueError
 
 __all__ = ["LedgerHeaderExt"]
 
@@ -27,12 +28,14 @@ class LedgerHeaderExt:
         Integer(self.v).pack(packer)
         if self.v == 0:
             return
+        raise ValueError("Invalid v.")
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "LedgerHeaderExt":
         v = Integer.unpack(unpacker)
         if v == 0:
             return cls(v)
+        raise ValueError("Invalid v.")
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()
@@ -50,8 +53,8 @@ class LedgerHeaderExt:
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "LedgerHeaderExt":
-        xdr = base64.b64decode(xdr.encode())
-        return cls.from_xdr_bytes(xdr)
+        xdr_bytes = base64.b64decode(xdr.encode())
+        return cls.from_xdr_bytes(xdr_bytes)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):

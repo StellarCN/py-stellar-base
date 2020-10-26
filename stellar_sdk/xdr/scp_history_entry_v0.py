@@ -35,8 +35,8 @@ class SCPHistoryEntryV0:
 
     def pack(self, packer: Packer) -> None:
         packer.pack_uint(len(self.quorum_sets))
-        for element in self.quorum_sets:
-            element.pack(packer)
+        for quorum_set in self.quorum_sets:
+            quorum_set.pack(packer)
         self.ledger_messages.pack(packer)
 
     @classmethod
@@ -64,8 +64,8 @@ class SCPHistoryEntryV0:
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "SCPHistoryEntryV0":
-        xdr = base64.b64decode(xdr.encode())
-        return cls.from_xdr_bytes(xdr)
+        xdr_bytes = base64.b64decode(xdr.encode())
+        return cls.from_xdr_bytes(xdr_bytes)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):

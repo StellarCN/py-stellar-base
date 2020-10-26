@@ -7,6 +7,7 @@ from .bucket_entry_type import BucketEntryType
 from .bucket_metadata import BucketMetadata
 from .ledger_entry import LedgerEntry
 from .ledger_key import LedgerKey
+from ..exceptions import ValueError
 
 __all__ = ["BucketEntry"]
 
@@ -47,14 +48,21 @@ class BucketEntry:
             self.type == BucketEntryType.LIVEENTRY
             or self.type == BucketEntryType.INITENTRY
         ):
+            if self.live_entry is None:
+                raise ValueError("live_entry should not be None.")
             self.live_entry.pack(packer)
             return
         if self.type == BucketEntryType.DEADENTRY:
+            if self.dead_entry is None:
+                raise ValueError("dead_entry should not be None.")
             self.dead_entry.pack(packer)
             return
         if self.type == BucketEntryType.METAENTRY:
+            if self.meta_entry is None:
+                raise ValueError("meta_entry should not be None.")
             self.meta_entry.pack(packer)
             return
+        raise ValueError("Invalid type.")
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "BucketEntry":
@@ -68,6 +76,7 @@ class BucketEntry:
         if type == BucketEntryType.METAENTRY:
             meta_entry = BucketMetadata.unpack(unpacker)
             return cls(type, meta_entry=meta_entry)
+        raise ValueError("Invalid type.")
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()
@@ -85,8 +94,8 @@ class BucketEntry:
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "BucketEntry":
-        xdr = base64.b64decode(xdr.encode())
-        return cls.from_xdr_bytes(xdr)
+        xdr_bytes = base64.b64decode(xdr.encode())
+        return cls.from_xdr_bytes(xdr_bytes)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
