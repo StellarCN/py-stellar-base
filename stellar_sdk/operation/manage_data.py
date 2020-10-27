@@ -34,7 +34,7 @@ class ManageData(Operation):
         self.data_name: str = data_name
         if isinstance(data_value, str):
             data_value = data_value.encode()
-        self.data_value: Union[str, bytes, None] = data_value
+        self.data_value: Union[bytes, None] = data_value
 
         valid_data_name_len = len(self.data_name) <= 64
         valid_data_val_len = self.data_value is None or len(self.data_value) <= 64
@@ -65,6 +65,7 @@ class ManageData(Operation):
 
         """
         source = Operation.get_source_from_xdr_obj(xdr_object)
+        assert xdr_object.body.manage_data_op is not None
         # TODO: should we decode it?
         data_name = xdr_object.body.manage_data_op.data_name.string64.decode()
         data_value_xdr = xdr_object.body.manage_data_op.data_value

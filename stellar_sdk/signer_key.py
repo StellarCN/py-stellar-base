@@ -76,6 +76,7 @@ class SignerKey:
         :return: A new :class:`SignerKey` object from the given XDR SignerKey object.
         """
         if xdr_object.type == stellar_xdr.SignerKeyType.SIGNER_KEY_TYPE_ED25519:
+            assert xdr_object.ed25519 is not None
             account_id = StrKey.encode_ed25519_public_key(
                 xdr_object.ed25519.uint256
             )
@@ -84,8 +85,10 @@ class SignerKey:
                 xdr_object.type
                 == stellar_xdr.SignerKeyType.SIGNER_KEY_TYPE_PRE_AUTH_TX
         ):
+            assert xdr_object.pre_auth_tx is not None
             return cls.pre_auth_tx(xdr_object.pre_auth_tx.uint256)
         elif xdr_object.type == stellar_xdr.SignerKeyType.SIGNER_KEY_TYPE_HASH_X:
+            assert xdr_object.hash_x is not None
             return cls.sha256_hash(xdr_object.hash_x.uint256)
         else:
             raise ValueError(

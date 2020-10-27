@@ -66,9 +66,9 @@ class AllowTrust(Operation):
             if authorize is True:
                 self.authorize: TrustLineEntryFlag = TrustLineEntryFlag.AUTHORIZED_FLAG
             else:
-                self.authorize: TrustLineEntryFlag = TrustLineEntryFlag.UNAUTHORIZED_FLAG
+                self.authorize = TrustLineEntryFlag.UNAUTHORIZED_FLAG
         else:
-            self.authorize: TrustLineEntryFlag = authorize
+            self.authorize = authorize
 
     def _to_operation_body(self) -> stellar_xdr.OperationBody:
         Asset.check_if_asset_code_is_valid(self.asset_code)
@@ -104,6 +104,8 @@ class AllowTrust(Operation):
 
         """
         source = Operation.get_source_from_xdr_obj(xdr_object)
+        assert xdr_object.body.allow_trust_op is not None
+        assert xdr_object.body.allow_trust_op.trustor.account_id.ed25519 is not None
         trustor = StrKey.encode_ed25519_public_key(
             xdr_object.body.allow_trust_op.trustor.account_id.ed25519.uint256
         )
@@ -111,17 +113,19 @@ class AllowTrust(Operation):
         authorize = TrustLineEntryFlag(authorize)
         asset_type = xdr_object.body.allow_trust_op.asset.type
         if asset_type == stellar_xdr.AssetType.ASSET_TYPE_CREDIT_ALPHANUM4:
+            assert xdr_object.body.allow_trust_op.asset.asset_code4 is not None
             asset_code = (
                 xdr_object.body.allow_trust_op.asset.asset_code4.asset_code4.decode()
             )
         elif asset_type == stellar_xdr.AssetType.ASSET_TYPE_CREDIT_ALPHANUM12:
+            assert xdr_object.body.allow_trust_op.asset.asset_code12 is not None
             asset_code = (
                 xdr_object.body.allow_trust_op.asset.asset_code12.asset_code12.decode()
             )
         else:
             raise NotImplementedError(
                 "Operation of asset_type={} is not implemented"
-                ".".format(asset_type.type)
+                ".".format(asset_type)
             )
 
         asset_code = asset_code.rstrip("\x00")

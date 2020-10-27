@@ -59,6 +59,7 @@ class ChangeTrust(Operation):
 
         """
         source = Operation.get_source_from_xdr_obj(xdr_object)
+        assert xdr_object.body.change_trust_op is not None
         line = Asset.from_xdr_object(xdr_object.body.change_trust_op.line)
         limit = Operation.from_xdr_amount(
             xdr_object.body.change_trust_op.limit.int64

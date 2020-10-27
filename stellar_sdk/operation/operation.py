@@ -39,15 +39,13 @@ class Operation(metaclass=ABCMeta):
 
     _ONE = Decimal(10 ** 7)
 
-    TYPE_CODE = None
-
     def __init__(self, source: str = None) -> None:
         check_source(source)
         self._source: Optional[str] = source
         self._source_muxed: Optional[stellar_xdr.MuxedAccount] = None
 
     @property
-    def source(self) -> str:
+    def source(self) -> Optional[str]:
         return self._source
 
     @source.setter
@@ -141,7 +139,7 @@ class Operation(metaclass=ABCMeta):
             subclass) instance from.
         """
         for sub_cls in cls.__subclasses__():
-            if sub_cls.TYPE_CODE == xdr_object.body.type:
+            if sub_cls.TYPE_CODE == xdr_object.body.type:  # type: ignore[attr-defined]
                 return sub_cls.from_xdr_object(xdr_object)
         raise NotImplementedError(
             f"Operation of type={xdr_object.body.type} is not implemented."

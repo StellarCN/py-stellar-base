@@ -60,6 +60,7 @@ class ManageSellOffer(Operation):
         if isinstance(self.price, Price):
             price_fraction = self.price
         else:
+            assert isinstance(self.price, str)
             price_fraction = Price.from_raw_price(self.price)
 
         price = price_fraction.to_xdr_object()
@@ -80,7 +81,7 @@ class ManageSellOffer(Operation):
 
         """
         source = Operation.get_source_from_xdr_obj(xdr_object)
-
+        assert xdr_object.body.manage_sell_offer_op is not None
         selling = Asset.from_xdr_object(
             xdr_object.body.manage_sell_offer_op.selling
         )

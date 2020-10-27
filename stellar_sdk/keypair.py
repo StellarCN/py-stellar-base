@@ -163,6 +163,7 @@ class Keypair:
 
         :return: signature hint
         """
+        assert self.xdr_account_id().account_id.ed25519 is not None
         return bytes(self.xdr_account_id().account_id.ed25519.uint256[-4:])
 
     def raw_secret_key(self) -> bytes:

@@ -41,6 +41,7 @@ class BumpSequence(Operation):
 
         """
         source = Operation.get_source_from_xdr_obj(xdr_object)
+        assert xdr_object.body.bump_sequence_op is not None
         bump_to = (
             xdr_object.body.bump_sequence_op.bump_to.sequence_number.int64
         )

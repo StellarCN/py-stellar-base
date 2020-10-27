@@ -741,6 +741,7 @@ def _add_operation(
             signer.signer_key.signer_key.type
             == stellar_xdr.SignerKeyType.SIGNER_KEY_TYPE_HASH_X
         ):
+            assert signer.signer_key.signer_key.hash_x is not None
             add_body_line(
                 "signer.key",
                 StrKey.encode_sha256_hash(signer.signer_key.signer_key.hash_x.uint256),

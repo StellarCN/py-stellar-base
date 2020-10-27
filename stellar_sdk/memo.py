@@ -96,9 +96,9 @@ class TextMemo(Memo):
                 f"TextMemo expects string or bytes type got a {type(text)}"
             )
 
-        self.memo_text: bytes = text
         if not isinstance(text, bytes):
-            self.memo_text = bytes(text, encoding="utf-8")
+            text = bytes(text, encoding="utf-8")
+        self.memo_text: bytes = text
 
         length = len(self.memo_text)
         if length > 28:

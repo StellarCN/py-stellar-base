@@ -35,7 +35,7 @@ class OffersCallBuilder(BaseCallBuilder):
         :param seller: Account ID of the offer creator
         :return: this OffersCallBuilder instance
         """
-        self.endpoint: str = "offers"
+        self.endpoint = "offers"
         self._add_query_param("seller", seller)
         return self
 

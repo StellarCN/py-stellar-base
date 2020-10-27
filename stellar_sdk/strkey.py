@@ -177,7 +177,7 @@ def decode_check(version_byte_name: str, encoded: str) -> bytes:
 
     if version_byte != expected_version:
         raise TypeError(
-            f"Invalid version byte. Expected {expected_version}, got {version_byte}"
+            f"Invalid version byte. Expected {expected_version!r}, got {version_byte!r}"
         )
 
     expected_checksum = _calculate_checksum(payload)

@@ -47,7 +47,8 @@ class BeginSponsoringFutureReserves(Operation):
         object.
         """
         source = Operation.get_source_from_xdr_obj(xdr_object)
-
+        assert xdr_object.body.begin_sponsoring_future_reserves_op is not None
+        assert xdr_object.body.begin_sponsoring_future_reserves_op.sponsored_id.account_id.ed25519 is not None
         sponsored_id = StrKey.encode_ed25519_public_key(
             xdr_object.body.begin_sponsoring_future_reserves_op.sponsored_id.account_id.ed25519.uint256
         )
