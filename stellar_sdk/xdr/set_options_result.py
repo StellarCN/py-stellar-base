@@ -4,6 +4,7 @@ import base64
 from xdrlib import Packer, Unpacker
 
 from .set_options_result_code import SetOptionsResultCode
+from ..exceptions import ValueError
 
 __all__ = ["SetOptionsResult"]
 
@@ -29,12 +30,14 @@ class SetOptionsResult:
         self.code.pack(packer)
         if self.code == SetOptionsResultCode.SET_OPTIONS_SUCCESS:
             return
+        raise ValueError("Invalid code.")
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "SetOptionsResult":
         code = SetOptionsResultCode.unpack(unpacker)
         if code == SetOptionsResultCode.SET_OPTIONS_SUCCESS:
             return cls(code)
+        raise ValueError("Invalid code.")
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()
@@ -52,8 +55,8 @@ class SetOptionsResult:
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "SetOptionsResult":
-        xdr = base64.b64decode(xdr.encode())
-        return cls.from_xdr_bytes(xdr)
+        xdr_bytes = base64.b64decode(xdr.encode())
+        return cls.from_xdr_bytes(xdr_bytes)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):

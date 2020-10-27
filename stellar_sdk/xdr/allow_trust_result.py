@@ -4,6 +4,7 @@ import base64
 from xdrlib import Packer, Unpacker
 
 from .allow_trust_result_code import AllowTrustResultCode
+from ..exceptions import ValueError
 
 __all__ = ["AllowTrustResult"]
 
@@ -29,12 +30,14 @@ class AllowTrustResult:
         self.code.pack(packer)
         if self.code == AllowTrustResultCode.ALLOW_TRUST_SUCCESS:
             return
+        raise ValueError("Invalid code.")
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "AllowTrustResult":
         code = AllowTrustResultCode.unpack(unpacker)
         if code == AllowTrustResultCode.ALLOW_TRUST_SUCCESS:
             return cls(code)
+        raise ValueError("Invalid code.")
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()
@@ -52,8 +55,8 @@ class AllowTrustResult:
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "AllowTrustResult":
-        xdr = base64.b64decode(xdr.encode())
-        return cls.from_xdr_bytes(xdr)
+        xdr_bytes = base64.b64decode(xdr.encode())
+        return cls.from_xdr_bytes(xdr_bytes)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):

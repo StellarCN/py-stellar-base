@@ -6,6 +6,7 @@ from xdrlib import Packer, Unpacker
 from .begin_sponsoring_future_reserves_result_code import (
     BeginSponsoringFutureReservesResultCode,
 )
+from ..exceptions import ValueError
 
 __all__ = ["BeginSponsoringFutureReservesResult"]
 
@@ -34,6 +35,7 @@ class BeginSponsoringFutureReservesResult:
             == BeginSponsoringFutureReservesResultCode.BEGIN_SPONSORING_FUTURE_RESERVES_SUCCESS
         ):
             return
+        raise ValueError("Invalid code.")
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "BeginSponsoringFutureReservesResult":
@@ -43,6 +45,7 @@ class BeginSponsoringFutureReservesResult:
             == BeginSponsoringFutureReservesResultCode.BEGIN_SPONSORING_FUTURE_RESERVES_SUCCESS
         ):
             return cls(code)
+        raise ValueError("Invalid code.")
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()
@@ -60,8 +63,8 @@ class BeginSponsoringFutureReservesResult:
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "BeginSponsoringFutureReservesResult":
-        xdr = base64.b64decode(xdr.encode())
-        return cls.from_xdr_bytes(xdr)
+        xdr_bytes = base64.b64decode(xdr.encode())
+        return cls.from_xdr_bytes(xdr_bytes)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):

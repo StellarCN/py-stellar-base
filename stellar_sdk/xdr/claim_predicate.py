@@ -63,28 +63,39 @@ class ClaimPredicate:
         if self.type == ClaimPredicateType.CLAIM_PREDICATE_UNCONDITIONAL:
             return
         if self.type == ClaimPredicateType.CLAIM_PREDICATE_AND:
+            if self.and_predicates is None:
+                raise ValueError("and_predicates should not be None.")
             packer.pack_uint(len(self.and_predicates))
-            for element in self.and_predicates:
-                element.pack(packer)
+            for and_predicate in self.and_predicates:
+                and_predicate.pack(packer)
             return
         if self.type == ClaimPredicateType.CLAIM_PREDICATE_OR:
+            if self.or_predicates is None:
+                raise ValueError("or_predicates should not be None.")
             packer.pack_uint(len(self.or_predicates))
-            for element in self.or_predicates:
-                element.pack(packer)
+            for or_predicate in self.or_predicates:
+                or_predicate.pack(packer)
             return
         if self.type == ClaimPredicateType.CLAIM_PREDICATE_NOT:
             if self.not_predicate is None:
                 packer.pack_uint(0)
                 return
             packer.pack_uint(1)
+            if self.not_predicate is None:
+                raise ValueError("not_predicate should not be None.")
             self.not_predicate.pack(packer)
             return
         if self.type == ClaimPredicateType.CLAIM_PREDICATE_BEFORE_ABSOLUTE_TIME:
+            if self.abs_before is None:
+                raise ValueError("abs_before should not be None.")
             self.abs_before.pack(packer)
             return
         if self.type == ClaimPredicateType.CLAIM_PREDICATE_BEFORE_RELATIVE_TIME:
+            if self.rel_before is None:
+                raise ValueError("rel_before should not be None.")
             self.rel_before.pack(packer)
             return
+        raise ValueError("Invalid type.")
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "ClaimPredicate":
@@ -105,13 +116,20 @@ class ClaimPredicate:
             return cls(type, or_predicates=or_predicates)
         if type == ClaimPredicateType.CLAIM_PREDICATE_NOT:
             not_predicate = ClaimPredicate.unpack(unpacker)
+            if not_predicate is None:
+                raise ValueError("not_predicate should not be None.")
             return cls(type, not_predicate=not_predicate)
         if type == ClaimPredicateType.CLAIM_PREDICATE_BEFORE_ABSOLUTE_TIME:
             abs_before = Int64.unpack(unpacker)
+            if abs_before is None:
+                raise ValueError("abs_before should not be None.")
             return cls(type, abs_before=abs_before)
         if type == ClaimPredicateType.CLAIM_PREDICATE_BEFORE_RELATIVE_TIME:
             rel_before = Int64.unpack(unpacker)
+            if rel_before is None:
+                raise ValueError("rel_before should not be None.")
             return cls(type, rel_before=rel_before)
+        raise ValueError("Invalid type.")
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()
@@ -129,8 +147,8 @@ class ClaimPredicate:
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "ClaimPredicate":
-        xdr = base64.b64decode(xdr.encode())
-        return cls.from_xdr_bytes(xdr)
+        xdr_bytes = base64.b64decode(xdr.encode())
+        return cls.from_xdr_bytes(xdr_bytes)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):

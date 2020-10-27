@@ -5,6 +5,7 @@ from xdrlib import Packer, Unpacker
 
 from .ledger_upgrade_type import LedgerUpgradeType
 from .uint32 import Uint32
+from ..exceptions import ValueError
 
 __all__ = ["LedgerUpgrade"]
 
@@ -44,33 +45,51 @@ class LedgerUpgrade:
     def pack(self, packer: Packer) -> None:
         self.type.pack(packer)
         if self.type == LedgerUpgradeType.LEDGER_UPGRADE_VERSION:
+            if self.new_ledger_version is None:
+                raise ValueError("new_ledger_version should not be None.")
             self.new_ledger_version.pack(packer)
             return
         if self.type == LedgerUpgradeType.LEDGER_UPGRADE_BASE_FEE:
+            if self.new_base_fee is None:
+                raise ValueError("new_base_fee should not be None.")
             self.new_base_fee.pack(packer)
             return
         if self.type == LedgerUpgradeType.LEDGER_UPGRADE_MAX_TX_SET_SIZE:
+            if self.new_max_tx_set_size is None:
+                raise ValueError("new_max_tx_set_size should not be None.")
             self.new_max_tx_set_size.pack(packer)
             return
         if self.type == LedgerUpgradeType.LEDGER_UPGRADE_BASE_RESERVE:
+            if self.new_base_reserve is None:
+                raise ValueError("new_base_reserve should not be None.")
             self.new_base_reserve.pack(packer)
             return
+        raise ValueError("Invalid type.")
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "LedgerUpgrade":
         type = LedgerUpgradeType.unpack(unpacker)
         if type == LedgerUpgradeType.LEDGER_UPGRADE_VERSION:
             new_ledger_version = Uint32.unpack(unpacker)
+            if new_ledger_version is None:
+                raise ValueError("new_ledger_version should not be None.")
             return cls(type, new_ledger_version=new_ledger_version)
         if type == LedgerUpgradeType.LEDGER_UPGRADE_BASE_FEE:
             new_base_fee = Uint32.unpack(unpacker)
+            if new_base_fee is None:
+                raise ValueError("new_base_fee should not be None.")
             return cls(type, new_base_fee=new_base_fee)
         if type == LedgerUpgradeType.LEDGER_UPGRADE_MAX_TX_SET_SIZE:
             new_max_tx_set_size = Uint32.unpack(unpacker)
+            if new_max_tx_set_size is None:
+                raise ValueError("new_max_tx_set_size should not be None.")
             return cls(type, new_max_tx_set_size=new_max_tx_set_size)
         if type == LedgerUpgradeType.LEDGER_UPGRADE_BASE_RESERVE:
             new_base_reserve = Uint32.unpack(unpacker)
+            if new_base_reserve is None:
+                raise ValueError("new_base_reserve should not be None.")
             return cls(type, new_base_reserve=new_base_reserve)
+        raise ValueError("Invalid type.")
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()
@@ -88,8 +107,8 @@ class LedgerUpgrade:
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "LedgerUpgrade":
-        xdr = base64.b64decode(xdr.encode())
-        return cls.from_xdr_bytes(xdr)
+        xdr_bytes = base64.b64decode(xdr.encode())
+        return cls.from_xdr_bytes(xdr_bytes)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):

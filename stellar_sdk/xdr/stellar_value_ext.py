@@ -5,6 +5,7 @@ from xdrlib import Packer, Unpacker
 
 from .ledger_close_value_signature import LedgerCloseValueSignature
 from .stellar_value_type import StellarValueType
+from ..exceptions import ValueError
 
 __all__ = ["StellarValueExt"]
 
@@ -34,8 +35,11 @@ class StellarValueExt:
         if self.v == StellarValueType.STELLAR_VALUE_BASIC:
             return
         if self.v == StellarValueType.STELLAR_VALUE_SIGNED:
+            if self.lc_value_signature is None:
+                raise ValueError("lc_value_signature should not be None.")
             self.lc_value_signature.pack(packer)
             return
+        raise ValueError("Invalid v.")
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "StellarValueExt":
@@ -44,7 +48,10 @@ class StellarValueExt:
             return cls(v)
         if v == StellarValueType.STELLAR_VALUE_SIGNED:
             lc_value_signature = LedgerCloseValueSignature.unpack(unpacker)
+            if lc_value_signature is None:
+                raise ValueError("lc_value_signature should not be None.")
             return cls(v, lc_value_signature=lc_value_signature)
+        raise ValueError("Invalid v.")
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()
@@ -62,8 +69,8 @@ class StellarValueExt:
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "StellarValueExt":
-        xdr = base64.b64decode(xdr.encode())
-        return cls.from_xdr_bytes(xdr)
+        xdr_bytes = base64.b64decode(xdr.encode())
+        return cls.from_xdr_bytes(xdr_bytes)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):

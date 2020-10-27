@@ -38,8 +38,8 @@ class CreateClaimableBalanceOp:
         self.asset.pack(packer)
         self.amount.pack(packer)
         packer.pack_uint(len(self.claimants))
-        for element in self.claimants:
-            element.pack(packer)
+        for claimant in self.claimants:
+            claimant.pack(packer)
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "CreateClaimableBalanceOp":
@@ -67,8 +67,8 @@ class CreateClaimableBalanceOp:
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "CreateClaimableBalanceOp":
-        xdr = base64.b64decode(xdr.encode())
-        return cls.from_xdr_bytes(xdr)
+        xdr_bytes = base64.b64decode(xdr.encode())
+        return cls.from_xdr_bytes(xdr_bytes)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):

@@ -5,6 +5,7 @@ from xdrlib import Packer, Unpacker
 
 from .manage_offer_effect import ManageOfferEffect
 from .offer_entry import OfferEntry
+from ..exceptions import ValueError
 
 __all__ = ["ManageOfferSuccessResultOffer"]
 
@@ -34,8 +35,11 @@ class ManageOfferSuccessResultOffer:
             self.effect == ManageOfferEffect.MANAGE_OFFER_CREATED
             or self.effect == ManageOfferEffect.MANAGE_OFFER_UPDATED
         ):
+            if self.offer is None:
+                raise ValueError("offer should not be None.")
             self.offer.pack(packer)
             return
+        raise ValueError("Invalid effect.")
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "ManageOfferSuccessResultOffer":
@@ -45,7 +49,10 @@ class ManageOfferSuccessResultOffer:
             or effect == ManageOfferEffect.MANAGE_OFFER_UPDATED
         ):
             offer = OfferEntry.unpack(unpacker)
+            if offer is None:
+                raise ValueError("offer should not be None.")
             return cls(effect, offer=offer)
+        raise ValueError("Invalid effect.")
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()
@@ -63,8 +70,8 @@ class ManageOfferSuccessResultOffer:
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "ManageOfferSuccessResultOffer":
-        xdr = base64.b64decode(xdr.encode())
-        return cls.from_xdr_bytes(xdr)
+        xdr_bytes = base64.b64decode(xdr.encode())
+        return cls.from_xdr_bytes(xdr_bytes)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):

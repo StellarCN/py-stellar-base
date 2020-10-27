@@ -5,6 +5,7 @@ from xdrlib import Packer, Unpacker
 
 from .base import *
 from .trust_line_entry_v1 import TrustLineEntryV1
+from ..exceptions import ValueError
 
 __all__ = ["TrustLineEntryExt"]
 
@@ -42,8 +43,11 @@ class TrustLineEntryExt:
         if self.v == 0:
             return
         if self.v == 1:
+            if self.v1 is None:
+                raise ValueError("v1 should not be None.")
             self.v1.pack(packer)
             return
+        raise ValueError("Invalid v.")
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "TrustLineEntryExt":
@@ -52,7 +56,10 @@ class TrustLineEntryExt:
             return cls(v)
         if v == 1:
             v1 = TrustLineEntryV1.unpack(unpacker)
+            if v1 is None:
+                raise ValueError("v1 should not be None.")
             return cls(v, v1=v1)
+        raise ValueError("Invalid v.")
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()
@@ -70,8 +77,8 @@ class TrustLineEntryExt:
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "TrustLineEntryExt":
-        xdr = base64.b64decode(xdr.encode())
-        return cls.from_xdr_bytes(xdr)
+        xdr_bytes = base64.b64decode(xdr.encode())
+        return cls.from_xdr_bytes(xdr_bytes)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):

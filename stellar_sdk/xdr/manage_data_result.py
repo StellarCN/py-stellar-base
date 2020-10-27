@@ -4,6 +4,7 @@ import base64
 from xdrlib import Packer, Unpacker
 
 from .manage_data_result_code import ManageDataResultCode
+from ..exceptions import ValueError
 
 __all__ = ["ManageDataResult"]
 
@@ -29,12 +30,14 @@ class ManageDataResult:
         self.code.pack(packer)
         if self.code == ManageDataResultCode.MANAGE_DATA_SUCCESS:
             return
+        raise ValueError("Invalid code.")
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "ManageDataResult":
         code = ManageDataResultCode.unpack(unpacker)
         if code == ManageDataResultCode.MANAGE_DATA_SUCCESS:
             return cls(code)
+        raise ValueError("Invalid code.")
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()
@@ -52,8 +55,8 @@ class ManageDataResult:
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "ManageDataResult":
-        xdr = base64.b64decode(xdr.encode())
-        return cls.from_xdr_bytes(xdr)
+        xdr_bytes = base64.b64decode(xdr.encode())
+        return cls.from_xdr_bytes(xdr_bytes)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):

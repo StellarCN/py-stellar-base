@@ -45,11 +45,11 @@ class SCPQuorumSet:
     def pack(self, packer: Packer) -> None:
         self.threshold.pack(packer)
         packer.pack_uint(len(self.validators))
-        for element in self.validators:
-            element.pack(packer)
+        for validator in self.validators:
+            validator.pack(packer)
         packer.pack_uint(len(self.inner_sets))
-        for element in self.inner_sets:
-            element.pack(packer)
+        for inner_set in self.inner_sets:
+            inner_set.pack(packer)
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "SCPQuorumSet":
@@ -80,8 +80,8 @@ class SCPQuorumSet:
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "SCPQuorumSet":
-        xdr = base64.b64decode(xdr.encode())
-        return cls.from_xdr_bytes(xdr)
+        xdr_bytes = base64.b64decode(xdr.encode())
+        return cls.from_xdr_bytes(xdr_bytes)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):

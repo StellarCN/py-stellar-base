@@ -5,6 +5,7 @@ from xdrlib import Packer, Unpacker
 
 from .envelope_type import EnvelopeType
 from .operation_id_id import OperationIDId
+from ..exceptions import ValueError
 
 __all__ = ["OperationID"]
 
@@ -33,15 +34,21 @@ class OperationID:
     def pack(self, packer: Packer) -> None:
         self.type.pack(packer)
         if self.type == EnvelopeType.ENVELOPE_TYPE_OP_ID:
+            if self.id is None:
+                raise ValueError("id should not be None.")
             self.id.pack(packer)
             return
+        raise ValueError("Invalid type.")
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "OperationID":
         type = EnvelopeType.unpack(unpacker)
         if type == EnvelopeType.ENVELOPE_TYPE_OP_ID:
             id = OperationIDId.unpack(unpacker)
+            if id is None:
+                raise ValueError("id should not be None.")
             return cls(type, id=id)
+        raise ValueError("Invalid type.")
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()
@@ -59,8 +66,8 @@ class OperationID:
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "OperationID":
-        xdr = base64.b64decode(xdr.encode())
-        return cls.from_xdr_bytes(xdr)
+        xdr_bytes = base64.b64decode(xdr.encode())
+        return cls.from_xdr_bytes(xdr_bytes)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):

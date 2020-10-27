@@ -35,8 +35,8 @@ class PathPaymentStrictSendResultSuccess:
 
     def pack(self, packer: Packer) -> None:
         packer.pack_uint(len(self.offers))
-        for element in self.offers:
-            element.pack(packer)
+        for offer in self.offers:
+            offer.pack(packer)
         self.last.pack(packer)
 
     @classmethod
@@ -64,8 +64,8 @@ class PathPaymentStrictSendResultSuccess:
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "PathPaymentStrictSendResultSuccess":
-        xdr = base64.b64decode(xdr.encode())
-        return cls.from_xdr_bytes(xdr)
+        xdr_bytes = base64.b64decode(xdr.encode())
+        return cls.from_xdr_bytes(xdr_bytes)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):

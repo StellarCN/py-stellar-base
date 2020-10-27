@@ -5,6 +5,7 @@ from xdrlib import Packer, Unpacker
 
 from .account_merge_result_code import AccountMergeResultCode
 from .int64 import Int64
+from ..exceptions import ValueError
 
 __all__ = ["AccountMergeResult"]
 
@@ -32,15 +33,21 @@ class AccountMergeResult:
     def pack(self, packer: Packer) -> None:
         self.code.pack(packer)
         if self.code == AccountMergeResultCode.ACCOUNT_MERGE_SUCCESS:
+            if self.source_account_balance is None:
+                raise ValueError("source_account_balance should not be None.")
             self.source_account_balance.pack(packer)
             return
+        raise ValueError("Invalid code.")
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "AccountMergeResult":
         code = AccountMergeResultCode.unpack(unpacker)
         if code == AccountMergeResultCode.ACCOUNT_MERGE_SUCCESS:
             source_account_balance = Int64.unpack(unpacker)
+            if source_account_balance is None:
+                raise ValueError("source_account_balance should not be None.")
             return cls(code, source_account_balance=source_account_balance)
+        raise ValueError("Invalid code.")
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()
@@ -58,8 +65,8 @@ class AccountMergeResult:
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "AccountMergeResult":
-        xdr = base64.b64decode(xdr.encode())
-        return cls.from_xdr_bytes(xdr)
+        xdr_bytes = base64.b64decode(xdr.encode())
+        return cls.from_xdr_bytes(xdr_bytes)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):

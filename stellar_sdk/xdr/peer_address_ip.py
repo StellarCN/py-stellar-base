@@ -5,6 +5,7 @@ from xdrlib import Packer, Unpacker
 
 from .base import *
 from .ip_addr_type import IPAddrType
+from ..exceptions import ValueError
 
 __all__ = ["PeerAddressIp"]
 
@@ -33,21 +34,31 @@ class PeerAddressIp:
     def pack(self, packer: Packer) -> None:
         self.type.pack(packer)
         if self.type == IPAddrType.IPv4:
+            if self.ipv4 is None:
+                raise ValueError("ipv4 should not be None.")
             Opaque(self.ipv4, 4, True).pack(packer)
             return
         if self.type == IPAddrType.IPv6:
+            if self.ipv6 is None:
+                raise ValueError("ipv6 should not be None.")
             Opaque(self.ipv6, 16, True).pack(packer)
             return
+        raise ValueError("Invalid type.")
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "PeerAddressIp":
         type = IPAddrType.unpack(unpacker)
         if type == IPAddrType.IPv4:
             ipv4 = Opaque.unpack(unpacker, 4, True)
+            if ipv4 is None:
+                raise ValueError("ipv4 should not be None.")
             return cls(type, ipv4=ipv4)
         if type == IPAddrType.IPv6:
             ipv6 = Opaque.unpack(unpacker, 16, True)
+            if ipv6 is None:
+                raise ValueError("ipv6 should not be None.")
             return cls(type, ipv6=ipv6)
+        raise ValueError("Invalid type.")
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()
@@ -65,8 +76,8 @@ class PeerAddressIp:
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "PeerAddressIp":
-        xdr = base64.b64decode(xdr.encode())
-        return cls.from_xdr_bytes(xdr)
+        xdr_bytes = base64.b64decode(xdr.encode())
+        return cls.from_xdr_bytes(xdr_bytes)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):

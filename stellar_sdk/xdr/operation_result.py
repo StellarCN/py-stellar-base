@@ -5,6 +5,7 @@ from xdrlib import Packer, Unpacker
 
 from .operation_result_code import OperationResultCode
 from .operation_result_tr import OperationResultTr
+from ..exceptions import ValueError
 
 __all__ = ["OperationResult"]
 
@@ -73,15 +74,21 @@ class OperationResult:
     def pack(self, packer: Packer) -> None:
         self.code.pack(packer)
         if self.code == OperationResultCode.opINNER:
+            if self.tr is None:
+                raise ValueError("tr should not be None.")
             self.tr.pack(packer)
             return
+        raise ValueError("Invalid code.")
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "OperationResult":
         code = OperationResultCode.unpack(unpacker)
         if code == OperationResultCode.opINNER:
             tr = OperationResultTr.unpack(unpacker)
+            if tr is None:
+                raise ValueError("tr should not be None.")
             return cls(code, tr=tr)
+        raise ValueError("Invalid code.")
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()
@@ -99,8 +106,8 @@ class OperationResult:
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "OperationResult":
-        xdr = base64.b64decode(xdr.encode())
-        return cls.from_xdr_bytes(xdr)
+        xdr_bytes = base64.b64decode(xdr.encode())
+        return cls.from_xdr_bytes(xdr_bytes)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):

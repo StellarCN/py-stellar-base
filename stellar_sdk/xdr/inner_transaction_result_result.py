@@ -55,9 +55,11 @@ class InnerTransactionResultResult:
             self.code == TransactionResultCode.txSUCCESS
             or self.code == TransactionResultCode.txFAILED
         ):
+            if self.results is None:
+                raise ValueError("results should not be None.")
             packer.pack_uint(len(self.results))
-            for element in self.results:
-                element.pack(packer)
+            for result in self.results:
+                result.pack(packer)
             return
         if (
             self.code == TransactionResultCode.txTOO_EARLY
@@ -74,6 +76,7 @@ class InnerTransactionResultResult:
             or self.code == TransactionResultCode.txBAD_SPONSORSHIP
         ):
             return
+        raise ValueError("Invalid code.")
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "InnerTransactionResultResult":
@@ -102,6 +105,7 @@ class InnerTransactionResultResult:
             or code == TransactionResultCode.txBAD_SPONSORSHIP
         ):
             return cls(code)
+        raise ValueError("Invalid code.")
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()
@@ -119,8 +123,8 @@ class InnerTransactionResultResult:
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "InnerTransactionResultResult":
-        xdr = base64.b64decode(xdr.encode())
-        return cls.from_xdr_bytes(xdr)
+        xdr_bytes = base64.b64decode(xdr.encode())
+        return cls.from_xdr_bytes(xdr_bytes)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):

@@ -43,8 +43,8 @@ class TransactionMetaV2:
     def pack(self, packer: Packer) -> None:
         self.tx_changes_before.pack(packer)
         packer.pack_uint(len(self.operations))
-        for element in self.operations:
-            element.pack(packer)
+        for operation in self.operations:
+            operation.pack(packer)
         self.tx_changes_after.pack(packer)
 
     @classmethod
@@ -77,8 +77,8 @@ class TransactionMetaV2:
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "TransactionMetaV2":
-        xdr = base64.b64decode(xdr.encode())
-        return cls.from_xdr_bytes(xdr)
+        xdr_bytes = base64.b64decode(xdr.encode())
+        return cls.from_xdr_bytes(xdr_bytes)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):

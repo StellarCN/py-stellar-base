@@ -5,6 +5,7 @@ from xdrlib import Packer, Unpacker
 
 from .public_key_type import PublicKeyType
 from .uint256 import Uint256
+from ..exceptions import ValueError
 
 __all__ = ["PublicKey"]
 
@@ -28,15 +29,21 @@ class PublicKey:
     def pack(self, packer: Packer) -> None:
         self.type.pack(packer)
         if self.type == PublicKeyType.PUBLIC_KEY_TYPE_ED25519:
+            if self.ed25519 is None:
+                raise ValueError("ed25519 should not be None.")
             self.ed25519.pack(packer)
             return
+        raise ValueError("Invalid type.")
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "PublicKey":
         type = PublicKeyType.unpack(unpacker)
         if type == PublicKeyType.PUBLIC_KEY_TYPE_ED25519:
             ed25519 = Uint256.unpack(unpacker)
+            if ed25519 is None:
+                raise ValueError("ed25519 should not be None.")
             return cls(type, ed25519=ed25519)
+        raise ValueError("Invalid type.")
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()
@@ -54,8 +61,8 @@ class PublicKey:
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "PublicKey":
-        xdr = base64.b64decode(xdr.encode())
-        return cls.from_xdr_bytes(xdr)
+        xdr_bytes = base64.b64decode(xdr.encode())
+        return cls.from_xdr_bytes(xdr_bytes)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):

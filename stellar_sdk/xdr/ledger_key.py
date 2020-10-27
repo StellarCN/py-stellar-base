@@ -9,6 +9,7 @@ from .ledger_key_claimable_balance import LedgerKeyClaimableBalance
 from .ledger_key_data import LedgerKeyData
 from .ledger_key_offer import LedgerKeyOffer
 from .ledger_key_trust_line import LedgerKeyTrustLine
+from ..exceptions import ValueError
 
 __all__ = ["LedgerKey"]
 
@@ -74,39 +75,61 @@ class LedgerKey:
     def pack(self, packer: Packer) -> None:
         self.type.pack(packer)
         if self.type == LedgerEntryType.ACCOUNT:
+            if self.account is None:
+                raise ValueError("account should not be None.")
             self.account.pack(packer)
             return
         if self.type == LedgerEntryType.TRUSTLINE:
+            if self.trust_line is None:
+                raise ValueError("trust_line should not be None.")
             self.trust_line.pack(packer)
             return
         if self.type == LedgerEntryType.OFFER:
+            if self.offer is None:
+                raise ValueError("offer should not be None.")
             self.offer.pack(packer)
             return
         if self.type == LedgerEntryType.DATA:
+            if self.data is None:
+                raise ValueError("data should not be None.")
             self.data.pack(packer)
             return
         if self.type == LedgerEntryType.CLAIMABLE_BALANCE:
+            if self.claimable_balance is None:
+                raise ValueError("claimable_balance should not be None.")
             self.claimable_balance.pack(packer)
             return
+        raise ValueError("Invalid type.")
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "LedgerKey":
         type = LedgerEntryType.unpack(unpacker)
         if type == LedgerEntryType.ACCOUNT:
             account = LedgerKeyAccount.unpack(unpacker)
+            if account is None:
+                raise ValueError("account should not be None.")
             return cls(type, account=account)
         if type == LedgerEntryType.TRUSTLINE:
             trust_line = LedgerKeyTrustLine.unpack(unpacker)
+            if trust_line is None:
+                raise ValueError("trust_line should not be None.")
             return cls(type, trust_line=trust_line)
         if type == LedgerEntryType.OFFER:
             offer = LedgerKeyOffer.unpack(unpacker)
+            if offer is None:
+                raise ValueError("offer should not be None.")
             return cls(type, offer=offer)
         if type == LedgerEntryType.DATA:
             data = LedgerKeyData.unpack(unpacker)
+            if data is None:
+                raise ValueError("data should not be None.")
             return cls(type, data=data)
         if type == LedgerEntryType.CLAIMABLE_BALANCE:
             claimable_balance = LedgerKeyClaimableBalance.unpack(unpacker)
+            if claimable_balance is None:
+                raise ValueError("claimable_balance should not be None.")
             return cls(type, claimable_balance=claimable_balance)
+        raise ValueError("Invalid type.")
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()
@@ -124,8 +147,8 @@ class LedgerKey:
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "LedgerKey":
-        xdr = base64.b64decode(xdr.encode())
-        return cls.from_xdr_bytes(xdr)
+        xdr_bytes = base64.b64decode(xdr.encode())
+        return cls.from_xdr_bytes(xdr_bytes)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):

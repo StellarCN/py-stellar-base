@@ -8,6 +8,7 @@ from .scp_statement_confirm import SCPStatementConfirm
 from .scp_statement_externalize import SCPStatementExternalize
 from .scp_statement_prepare import SCPStatementPrepare
 from .scp_statement_type import SCPStatementType
+from ..exceptions import ValueError
 
 __all__ = ["SCPStatementPledges"]
 
@@ -67,33 +68,51 @@ class SCPStatementPledges:
     def pack(self, packer: Packer) -> None:
         self.type.pack(packer)
         if self.type == SCPStatementType.SCP_ST_PREPARE:
+            if self.prepare is None:
+                raise ValueError("prepare should not be None.")
             self.prepare.pack(packer)
             return
         if self.type == SCPStatementType.SCP_ST_CONFIRM:
+            if self.confirm is None:
+                raise ValueError("confirm should not be None.")
             self.confirm.pack(packer)
             return
         if self.type == SCPStatementType.SCP_ST_EXTERNALIZE:
+            if self.externalize is None:
+                raise ValueError("externalize should not be None.")
             self.externalize.pack(packer)
             return
         if self.type == SCPStatementType.SCP_ST_NOMINATE:
+            if self.nominate is None:
+                raise ValueError("nominate should not be None.")
             self.nominate.pack(packer)
             return
+        raise ValueError("Invalid type.")
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "SCPStatementPledges":
         type = SCPStatementType.unpack(unpacker)
         if type == SCPStatementType.SCP_ST_PREPARE:
             prepare = SCPStatementPrepare.unpack(unpacker)
+            if prepare is None:
+                raise ValueError("prepare should not be None.")
             return cls(type, prepare=prepare)
         if type == SCPStatementType.SCP_ST_CONFIRM:
             confirm = SCPStatementConfirm.unpack(unpacker)
+            if confirm is None:
+                raise ValueError("confirm should not be None.")
             return cls(type, confirm=confirm)
         if type == SCPStatementType.SCP_ST_EXTERNALIZE:
             externalize = SCPStatementExternalize.unpack(unpacker)
+            if externalize is None:
+                raise ValueError("externalize should not be None.")
             return cls(type, externalize=externalize)
         if type == SCPStatementType.SCP_ST_NOMINATE:
             nominate = SCPNomination.unpack(unpacker)
+            if nominate is None:
+                raise ValueError("nominate should not be None.")
             return cls(type, nominate=nominate)
+        raise ValueError("Invalid type.")
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()
@@ -111,8 +130,8 @@ class SCPStatementPledges:
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "SCPStatementPledges":
-        xdr = base64.b64decode(xdr.encode())
-        return cls.from_xdr_bytes(xdr)
+        xdr_bytes = base64.b64decode(xdr.encode())
+        return cls.from_xdr_bytes(xdr_bytes)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):

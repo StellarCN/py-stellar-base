@@ -5,6 +5,7 @@ from xdrlib import Packer, Unpacker
 
 from .manage_buy_offer_result_code import ManageBuyOfferResultCode
 from .manage_offer_success_result import ManageOfferSuccessResult
+from ..exceptions import ValueError
 
 __all__ = ["ManageBuyOfferResult"]
 
@@ -32,15 +33,21 @@ class ManageBuyOfferResult:
     def pack(self, packer: Packer) -> None:
         self.code.pack(packer)
         if self.code == ManageBuyOfferResultCode.MANAGE_BUY_OFFER_SUCCESS:
+            if self.success is None:
+                raise ValueError("success should not be None.")
             self.success.pack(packer)
             return
+        raise ValueError("Invalid code.")
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "ManageBuyOfferResult":
         code = ManageBuyOfferResultCode.unpack(unpacker)
         if code == ManageBuyOfferResultCode.MANAGE_BUY_OFFER_SUCCESS:
             success = ManageOfferSuccessResult.unpack(unpacker)
+            if success is None:
+                raise ValueError("success should not be None.")
             return cls(code, success=success)
+        raise ValueError("Invalid code.")
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()
@@ -58,8 +65,8 @@ class ManageBuyOfferResult:
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "ManageBuyOfferResult":
-        xdr = base64.b64decode(xdr.encode())
-        return cls.from_xdr_bytes(xdr)
+        xdr_bytes = base64.b64decode(xdr.encode())
+        return cls.from_xdr_bytes(xdr_bytes)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):

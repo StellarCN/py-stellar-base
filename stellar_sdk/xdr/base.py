@@ -1,4 +1,3 @@
-from typing import Union
 from xdrlib import Packer, Unpacker
 
 from ..exceptions import ValueError
@@ -115,7 +114,7 @@ class Boolean:
 
 
 class String:
-    def __init__(self, value: Union[str, bytes], size: int) -> None:
+    def __init__(self, value: bytes, size: int) -> None:
         if len(value) > size:
             raise ValueError(
                 f"The maximum length of `value` should be #{size}, but got {len(value)}."
@@ -129,7 +128,7 @@ class String:
         packer.pack_fopaque(len(self.value), self.value)
 
     @staticmethod
-    def unpack(unpacker: Unpacker) -> Union[str, bytes]:
+    def unpack(unpacker: Unpacker) -> bytes:
         size = unpacker.unpack_uint()
         return unpacker.unpack_fopaque(size)
 

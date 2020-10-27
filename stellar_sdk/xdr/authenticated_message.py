@@ -5,6 +5,7 @@ from xdrlib import Packer, Unpacker
 
 from .authenticated_message_v0 import AuthenticatedMessageV0
 from .uint32 import Uint32
+from ..exceptions import ValueError
 
 __all__ = ["AuthenticatedMessage"]
 
@@ -33,15 +34,21 @@ class AuthenticatedMessage:
     def pack(self, packer: Packer) -> None:
         self.v.pack(packer)
         if self.v == 0:
+            if self.v0 is None:
+                raise ValueError("v0 should not be None.")
             self.v0.pack(packer)
             return
+        raise ValueError("Invalid v.")
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "AuthenticatedMessage":
         v = Uint32.unpack(unpacker)
         if v == 0:
             v0 = AuthenticatedMessageV0.unpack(unpacker)
+            if v0 is None:
+                raise ValueError("v0 should not be None.")
             return cls(v, v0=v0)
+        raise ValueError("Invalid v.")
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()
@@ -59,8 +66,8 @@ class AuthenticatedMessage:
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "AuthenticatedMessage":
-        xdr = base64.b64decode(xdr.encode())
-        return cls.from_xdr_bytes(xdr)
+        xdr_bytes = base64.b64decode(xdr.encode())
+        return cls.from_xdr_bytes(xdr_bytes)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):

@@ -7,6 +7,7 @@ from .base import *
 from .hash import Hash
 from .memo_type import MemoType
 from .uint64 import Uint64
+from ..exceptions import ValueError
 
 __all__ = ["Memo"]
 
@@ -50,17 +51,26 @@ class Memo:
         if self.type == MemoType.MEMO_NONE:
             return
         if self.type == MemoType.MEMO_TEXT:
+            if self.text is None:
+                raise ValueError("text should not be None.")
             String(self.text, 28).pack(packer)
             return
         if self.type == MemoType.MEMO_ID:
+            if self.id is None:
+                raise ValueError("id should not be None.")
             self.id.pack(packer)
             return
         if self.type == MemoType.MEMO_HASH:
+            if self.hash is None:
+                raise ValueError("hash should not be None.")
             self.hash.pack(packer)
             return
         if self.type == MemoType.MEMO_RETURN:
+            if self.ret_hash is None:
+                raise ValueError("ret_hash should not be None.")
             self.ret_hash.pack(packer)
             return
+        raise ValueError("Invalid type.")
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "Memo":
@@ -69,16 +79,25 @@ class Memo:
             return cls(type)
         if type == MemoType.MEMO_TEXT:
             text = String.unpack(unpacker)
+            if text is None:
+                raise ValueError("text should not be None.")
             return cls(type, text=text)
         if type == MemoType.MEMO_ID:
             id = Uint64.unpack(unpacker)
+            if id is None:
+                raise ValueError("id should not be None.")
             return cls(type, id=id)
         if type == MemoType.MEMO_HASH:
             hash = Hash.unpack(unpacker)
+            if hash is None:
+                raise ValueError("hash should not be None.")
             return cls(type, hash=hash)
         if type == MemoType.MEMO_RETURN:
             ret_hash = Hash.unpack(unpacker)
+            if ret_hash is None:
+                raise ValueError("ret_hash should not be None.")
             return cls(type, ret_hash=ret_hash)
+        raise ValueError("Invalid type.")
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()
@@ -96,8 +115,8 @@ class Memo:
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "Memo":
-        xdr = base64.b64decode(xdr.encode())
-        return cls.from_xdr_bytes(xdr)
+        xdr_bytes = base64.b64decode(xdr.encode())
+        return cls.from_xdr_bytes(xdr_bytes)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):

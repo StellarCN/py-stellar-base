@@ -4,6 +4,7 @@ import base64
 from xdrlib import Packer, Unpacker
 
 from .bump_sequence_result_code import BumpSequenceResultCode
+from ..exceptions import ValueError
 
 __all__ = ["BumpSequenceResult"]
 
@@ -29,12 +30,14 @@ class BumpSequenceResult:
         self.code.pack(packer)
         if self.code == BumpSequenceResultCode.BUMP_SEQUENCE_SUCCESS:
             return
+        raise ValueError("Invalid code.")
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "BumpSequenceResult":
         code = BumpSequenceResultCode.unpack(unpacker)
         if code == BumpSequenceResultCode.BUMP_SEQUENCE_SUCCESS:
             return cls(code)
+        raise ValueError("Invalid code.")
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()
@@ -52,8 +55,8 @@ class BumpSequenceResult:
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "BumpSequenceResult":
-        xdr = base64.b64decode(xdr.encode())
-        return cls.from_xdr_bytes(xdr)
+        xdr_bytes = base64.b64decode(xdr.encode())
+        return cls.from_xdr_bytes(xdr_bytes)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):

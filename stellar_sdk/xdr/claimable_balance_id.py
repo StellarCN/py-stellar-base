@@ -5,6 +5,7 @@ from xdrlib import Packer, Unpacker
 
 from .claimable_balance_id_type import ClaimableBalanceIDType
 from .hash import Hash
+from ..exceptions import ValueError
 
 __all__ = ["ClaimableBalanceID"]
 
@@ -28,15 +29,21 @@ class ClaimableBalanceID:
     def pack(self, packer: Packer) -> None:
         self.type.pack(packer)
         if self.type == ClaimableBalanceIDType.CLAIMABLE_BALANCE_ID_TYPE_V0:
+            if self.v0 is None:
+                raise ValueError("v0 should not be None.")
             self.v0.pack(packer)
             return
+        raise ValueError("Invalid type.")
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "ClaimableBalanceID":
         type = ClaimableBalanceIDType.unpack(unpacker)
         if type == ClaimableBalanceIDType.CLAIMABLE_BALANCE_ID_TYPE_V0:
             v0 = Hash.unpack(unpacker)
+            if v0 is None:
+                raise ValueError("v0 should not be None.")
             return cls(type, v0=v0)
+        raise ValueError("Invalid type.")
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()
@@ -54,8 +61,8 @@ class ClaimableBalanceID:
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "ClaimableBalanceID":
-        xdr = base64.b64decode(xdr.encode())
-        return cls.from_xdr_bytes(xdr)
+        xdr_bytes = base64.b64decode(xdr.encode())
+        return cls.from_xdr_bytes(xdr_bytes)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):

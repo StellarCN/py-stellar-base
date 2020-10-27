@@ -6,6 +6,7 @@ from xdrlib import Packer, Unpacker
 from .envelope_type import EnvelopeType
 from .fee_bump_transaction import FeeBumpTransaction
 from .transaction import Transaction
+from ..exceptions import ValueError
 
 __all__ = ["TransactionSignaturePayloadTaggedTransaction"]
 
@@ -38,11 +39,16 @@ class TransactionSignaturePayloadTaggedTransaction:
     def pack(self, packer: Packer) -> None:
         self.type.pack(packer)
         if self.type == EnvelopeType.ENVELOPE_TYPE_TX:
+            if self.tx is None:
+                raise ValueError("tx should not be None.")
             self.tx.pack(packer)
             return
         if self.type == EnvelopeType.ENVELOPE_TYPE_TX_FEE_BUMP:
+            if self.fee_bump is None:
+                raise ValueError("fee_bump should not be None.")
             self.fee_bump.pack(packer)
             return
+        raise ValueError("Invalid type.")
 
     @classmethod
     def unpack(
@@ -51,10 +57,15 @@ class TransactionSignaturePayloadTaggedTransaction:
         type = EnvelopeType.unpack(unpacker)
         if type == EnvelopeType.ENVELOPE_TYPE_TX:
             tx = Transaction.unpack(unpacker)
+            if tx is None:
+                raise ValueError("tx should not be None.")
             return cls(type, tx=tx)
         if type == EnvelopeType.ENVELOPE_TYPE_TX_FEE_BUMP:
             fee_bump = FeeBumpTransaction.unpack(unpacker)
+            if fee_bump is None:
+                raise ValueError("fee_bump should not be None.")
             return cls(type, fee_bump=fee_bump)
+        raise ValueError("Invalid type.")
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()
@@ -74,8 +85,8 @@ class TransactionSignaturePayloadTaggedTransaction:
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "TransactionSignaturePayloadTaggedTransaction":
-        xdr = base64.b64decode(xdr.encode())
-        return cls.from_xdr_bytes(xdr)
+        xdr_bytes = base64.b64decode(xdr.encode())
+        return cls.from_xdr_bytes(xdr_bytes)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):

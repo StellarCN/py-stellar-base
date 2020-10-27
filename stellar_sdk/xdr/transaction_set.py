@@ -36,8 +36,8 @@ class TransactionSet:
     def pack(self, packer: Packer) -> None:
         self.previous_ledger_hash.pack(packer)
         packer.pack_uint(len(self.txs))
-        for element in self.txs:
-            element.pack(packer)
+        for tx in self.txs:
+            tx.pack(packer)
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "TransactionSet":
@@ -64,8 +64,8 @@ class TransactionSet:
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "TransactionSet":
-        xdr = base64.b64decode(xdr.encode())
-        return cls.from_xdr_bytes(xdr)
+        xdr_bytes = base64.b64decode(xdr.encode())
+        return cls.from_xdr_bytes(xdr_bytes)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):

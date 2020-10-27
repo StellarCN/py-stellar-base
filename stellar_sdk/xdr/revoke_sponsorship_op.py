@@ -6,6 +6,7 @@ from xdrlib import Packer, Unpacker
 from .ledger_key import LedgerKey
 from .revoke_sponsorship_op_signer import RevokeSponsorshipOpSigner
 from .revoke_sponsorship_type import RevokeSponsorshipType
+from ..exceptions import ValueError
 
 __all__ = ["RevokeSponsorshipOp"]
 
@@ -42,21 +43,31 @@ class RevokeSponsorshipOp:
     def pack(self, packer: Packer) -> None:
         self.type.pack(packer)
         if self.type == RevokeSponsorshipType.REVOKE_SPONSORSHIP_LEDGER_ENTRY:
+            if self.ledger_key is None:
+                raise ValueError("ledger_key should not be None.")
             self.ledger_key.pack(packer)
             return
         if self.type == RevokeSponsorshipType.REVOKE_SPONSORSHIP_SIGNER:
+            if self.signer is None:
+                raise ValueError("signer should not be None.")
             self.signer.pack(packer)
             return
+        raise ValueError("Invalid type.")
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "RevokeSponsorshipOp":
         type = RevokeSponsorshipType.unpack(unpacker)
         if type == RevokeSponsorshipType.REVOKE_SPONSORSHIP_LEDGER_ENTRY:
             ledger_key = LedgerKey.unpack(unpacker)
+            if ledger_key is None:
+                raise ValueError("ledger_key should not be None.")
             return cls(type, ledger_key=ledger_key)
         if type == RevokeSponsorshipType.REVOKE_SPONSORSHIP_SIGNER:
             signer = RevokeSponsorshipOpSigner.unpack(unpacker)
+            if signer is None:
+                raise ValueError("signer should not be None.")
             return cls(type, signer=signer)
+        raise ValueError("Invalid type.")
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()
@@ -74,8 +85,8 @@ class RevokeSponsorshipOp:
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "RevokeSponsorshipOp":
-        xdr = base64.b64decode(xdr.encode())
-        return cls.from_xdr_bytes(xdr)
+        xdr_bytes = base64.b64decode(xdr.encode())
+        return cls.from_xdr_bytes(xdr_bytes)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):

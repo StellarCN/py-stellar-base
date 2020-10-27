@@ -50,16 +50,21 @@ class TransactionResultResult:
             self.code == TransactionResultCode.txFEE_BUMP_INNER_SUCCESS
             or self.code == TransactionResultCode.txFEE_BUMP_INNER_FAILED
         ):
+            if self.inner_result_pair is None:
+                raise ValueError("inner_result_pair should not be None.")
             self.inner_result_pair.pack(packer)
             return
         if (
             self.code == TransactionResultCode.txSUCCESS
             or self.code == TransactionResultCode.txFAILED
         ):
+            if self.results is None:
+                raise ValueError("results should not be None.")
             packer.pack_uint(len(self.results))
-            for element in self.results:
-                element.pack(packer)
+            for result in self.results:
+                result.pack(packer)
             return
+        raise ValueError("Invalid code.")
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "TransactionResultResult":
@@ -69,6 +74,8 @@ class TransactionResultResult:
             or code == TransactionResultCode.txFEE_BUMP_INNER_FAILED
         ):
             inner_result_pair = InnerTransactionResultPair.unpack(unpacker)
+            if inner_result_pair is None:
+                raise ValueError("inner_result_pair should not be None.")
             return cls(code, inner_result_pair=inner_result_pair)
         if (
             code == TransactionResultCode.txSUCCESS
@@ -79,6 +86,7 @@ class TransactionResultResult:
             for _ in range(length):
                 results.append(OperationResult.unpack(unpacker))
             return cls(code, results=results)
+        raise ValueError("Invalid code.")
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()
@@ -96,8 +104,8 @@ class TransactionResultResult:
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "TransactionResultResult":
-        xdr = base64.b64decode(xdr.encode())
-        return cls.from_xdr_bytes(xdr)
+        xdr_bytes = base64.b64decode(xdr.encode())
+        return cls.from_xdr_bytes(xdr_bytes)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):

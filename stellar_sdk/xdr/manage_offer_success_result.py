@@ -47,8 +47,8 @@ class ManageOfferSuccessResult:
 
     def pack(self, packer: Packer) -> None:
         packer.pack_uint(len(self.offers_claimed))
-        for element in self.offers_claimed:
-            element.pack(packer)
+        for offers_claimed in self.offers_claimed:
+            offers_claimed.pack(packer)
         self.offer.pack(packer)
 
     @classmethod
@@ -76,8 +76,8 @@ class ManageOfferSuccessResult:
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "ManageOfferSuccessResult":
-        xdr = base64.b64decode(xdr.encode())
-        return cls.from_xdr_bytes(xdr)
+        xdr_bytes = base64.b64decode(xdr.encode())
+        return cls.from_xdr_bytes(xdr_bytes)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):

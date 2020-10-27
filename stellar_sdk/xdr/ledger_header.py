@@ -112,8 +112,8 @@ class LedgerHeader:
         self.base_reserve.pack(packer)
         self.max_tx_set_size.pack(packer)
         packer.pack_uint(4)
-        for element in self.skip_list:
-            element.pack(packer)
+        for skip_list in self.skip_list:
+            skip_list.pack(packer)
         self.ext.pack(packer)
 
     @classmethod
@@ -170,8 +170,8 @@ class LedgerHeader:
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "LedgerHeader":
-        xdr = base64.b64decode(xdr.encode())
-        return cls.from_xdr_bytes(xdr)
+        xdr_bytes = base64.b64decode(xdr.encode())
+        return cls.from_xdr_bytes(xdr_bytes)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):

@@ -42,11 +42,11 @@ class SCPNomination:
     def pack(self, packer: Packer) -> None:
         self.quorum_set_hash.pack(packer)
         packer.pack_uint(len(self.votes))
-        for element in self.votes:
-            element.pack(packer)
+        for vote in self.votes:
+            vote.pack(packer)
         packer.pack_uint(len(self.accepted))
-        for element in self.accepted:
-            element.pack(packer)
+        for accepted in self.accepted:
+            accepted.pack(packer)
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "SCPNomination":
@@ -77,8 +77,8 @@ class SCPNomination:
 
     @classmethod
     def from_xdr(cls, xdr: str) -> "SCPNomination":
-        xdr = base64.b64decode(xdr.encode())
-        return cls.from_xdr_bytes(xdr)
+        xdr_bytes = base64.b64decode(xdr.encode())
+        return cls.from_xdr_bytes(xdr_bytes)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
