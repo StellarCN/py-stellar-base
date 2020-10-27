@@ -164,7 +164,9 @@ class Keypair:
         :return: signature hint
         """
         assert self.xdr_account_id().account_id.ed25519 is not None
-        return bytes(self.xdr_account_id().account_id.ed25519.uint256[-4:])
+        # FIXME: mypy
+        signature_hint = bytes(self.xdr_account_id().account_id.ed25519.uint256[-4:])
+        return signature_hint
 
     def raw_secret_key(self) -> bytes:
         """Returns raw secret key.
