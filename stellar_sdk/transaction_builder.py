@@ -598,7 +598,7 @@ class TransactionBuilder:
         return self.append_set_options_op(signer=signer, source=source)
 
     def append_hashx_signer(
-        self, sha256_hash: [bytes, str], weight: int, source: str = None,
+        self, sha256_hash: Union[bytes, str], weight: int, source: str = None,
     ) -> "TransactionBuilder":
         """Add a sha256 hash(HashX) signer to an account.
 
