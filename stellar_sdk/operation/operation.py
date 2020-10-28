@@ -45,6 +45,11 @@ class Operation(metaclass=ABCMeta):
         self._source_muxed: Optional[stellar_xdr.MuxedAccount] = None
 
     @property
+    @abstractmethod
+    def TYPE_CODE(self) -> stellar_xdr.OperationType:
+        pass
+
+    @property
     def source(self) -> Optional[str]:
         return self._source
 
@@ -139,7 +144,7 @@ class Operation(metaclass=ABCMeta):
             subclass) instance from.
         """
         for sub_cls in cls.__subclasses__():
-            if sub_cls.TYPE_CODE == xdr_object.body.type:  # type: ignore[attr-defined]
+            if sub_cls.TYPE_CODE == xdr_object.body.type:
                 return sub_cls.from_xdr_object(xdr_object)
         raise NotImplementedError(
             f"Operation of type={xdr_object.body.type} is not implemented."

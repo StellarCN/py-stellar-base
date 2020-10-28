@@ -60,7 +60,6 @@ class ManageBuyOffer(Operation):
         if isinstance(self.price, Price):
             price_fraction = self.price
         else:
-            assert isinstance(self.price, str)
             price_fraction = Price.from_raw_price(self.price)
 
         price = price_fraction.to_xdr_object()

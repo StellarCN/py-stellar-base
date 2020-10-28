@@ -7,7 +7,7 @@ Created: 2017-10-30
 Updated: 2019-06-12
 Version: 2.1.0
 """
-from typing import Union, Dict, Any, Coroutine
+from typing import Union, Any, Coroutine, MutableMapping
 
 import toml
 
@@ -22,7 +22,7 @@ def fetch_stellar_toml(
     domain: str,
     client: Union[BaseAsyncClient, BaseSyncClient] = None,
     use_http: bool = False,
-) -> Union[Coroutine[Any, Any, Dict[str, Any]], Dict[str, Any]]:
+) -> Union[Coroutine[Any, Any, MutableMapping[str, Any]], MutableMapping[str, Any]]:
     """Retrieve the stellar.toml file from a given domain.
 
     Retrieve the stellar.toml file for information about interacting with
@@ -58,17 +58,17 @@ def fetch_stellar_toml(
         )
 
 
-async def __fetch_async(url: str, client: BaseAsyncClient) -> Dict[str, Any]:
+async def __fetch_async(url: str, client: BaseAsyncClient) -> MutableMapping[str, Any]:
     raw_resp = await client.get(url)
     return __handle_raw_response(raw_resp)
 
 
-def __fetch_sync(url: str, client: BaseSyncClient) -> Dict[str, Any]:
+def __fetch_sync(url: str, client: BaseSyncClient) -> MutableMapping[str, Any]:
     raw_resp = client.get(url)
     return __handle_raw_response(raw_resp)
 
 
-def __handle_raw_response(raw_resp: Response) -> Dict[str, Any]:
+def __handle_raw_response(raw_resp: Response) -> MutableMapping[str, Any]:
     if raw_resp.status_code == 404:
         raise StellarTomlNotFoundError
     resp = raw_resp.text

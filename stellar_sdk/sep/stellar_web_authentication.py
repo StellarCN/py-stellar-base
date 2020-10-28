@@ -175,7 +175,6 @@ def read_challenge_transaction(
         raise InvalidSep10ChallengeError(
             "Operation value encoded as base64 should be 64 bytes long."
         )
-
     nonce = base64.b64decode(manage_data_op.data_value)
     if len(nonce) != 48:
         raise InvalidSep10ChallengeError(
