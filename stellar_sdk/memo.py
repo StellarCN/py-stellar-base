@@ -109,6 +109,7 @@ class TextMemo(Memo):
     @classmethod
     def from_xdr_object(cls, xdr_object: stellar_xdr.Memo) -> "TextMemo":
         """Returns an :class:`TextMemo` object from XDR memo object."""
+        assert xdr_object.text is not None
         return cls(bytes(xdr_object.text))
 
     def to_xdr_object(self) -> stellar_xdr.Memo:
@@ -146,7 +147,7 @@ class IdMemo(Memo):
     @classmethod
     def from_xdr_object(cls, xdr_object: stellar_xdr.Memo) -> "IdMemo":
         """Returns an :class:`IdMemo` object from XDR memo object."""
-
+        assert xdr_object.id is not None
         return cls(xdr_object.id.uint64)
 
     def to_xdr_object(self) -> stellar_xdr.Memo:
@@ -180,12 +181,12 @@ class HashMemo(Memo):
                 f"The length of HashMemo should be 32 bytes, got {length} bytes."
             )
 
-        self.memo_hash: bytes = memo_hash
+        self.memo_hash: bytes = memo_hash  # type: ignore[assignment]
 
     @classmethod
     def from_xdr_object(cls, xdr_object: stellar_xdr.Memo) -> "HashMemo":
         """Returns an :class:`HashMemo` object from XDR memo object."""
-
+        assert xdr_object.hash is not None
         return cls(xdr_object.hash.hash)
 
     def to_xdr_object(self) -> stellar_xdr.Memo:
@@ -224,11 +225,12 @@ class ReturnHashMemo(Memo):
                 f"The length of ReturnHashMemo should be 32 bytes, got {length} bytes."
             )
 
-        self.memo_return: bytes = memo_return
+        self.memo_return: bytes = memo_return  # type: ignore[assignment]
 
     @classmethod
     def from_xdr_object(cls, xdr_object: stellar_xdr.Memo) -> "ReturnHashMemo":
         """Returns an :class:`ReturnHashMemo` object from XDR memo object."""
+        assert xdr_object.ret_hash is not None
         return cls(xdr_object.ret_hash.hash)
 
     def to_xdr_object(self) -> stellar_xdr.Memo:

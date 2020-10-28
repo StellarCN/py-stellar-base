@@ -909,8 +909,8 @@ class TransactionBuilder:
         :param source: The source account (defaults to transaction source).
         :return: This builder instance.
         """
-        signer_key = SignerKey.ed25519_public_key(signer_key)
-        op = RevokeSponsorship.revoke_signer_sponsorship(account_id, signer_key, source)
+        key = SignerKey.ed25519_public_key(signer_key)
+        op = RevokeSponsorship.revoke_signer_sponsorship(account_id, key, source)
         return self.append_operation(op)
 
     def append_revoke_hashx_signer_sponsorship_op(
@@ -924,8 +924,8 @@ class TransactionBuilder:
         :param source: The source account (defaults to transaction source).
         :return: This builder instance.
         """
-        signer_key = SignerKey.sha256_hash(hex_to_bytes(signer_key))
-        op = RevokeSponsorship.revoke_signer_sponsorship(account_id, signer_key, source)
+        key = SignerKey.sha256_hash(hex_to_bytes(signer_key))
+        op = RevokeSponsorship.revoke_signer_sponsorship(account_id, key, source)
         return self.append_operation(op)
 
     def append_revoke_pre_auth_tx_signer_sponsorship_op(
@@ -939,8 +939,8 @@ class TransactionBuilder:
         :param source: The source account (defaults to transaction source).
         :return: This builder instance.
         """
-        signer_key = SignerKey.pre_auth_tx(hex_to_bytes(signer_key))
-        op = RevokeSponsorship.revoke_signer_sponsorship(account_id, signer_key, source)
+        key = SignerKey.pre_auth_tx(hex_to_bytes(signer_key))
+        op = RevokeSponsorship.revoke_signer_sponsorship(account_id, key, source)
         return self.append_operation(op)
 
     def __str__(self):

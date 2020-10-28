@@ -81,7 +81,7 @@ class Asset:
 
         :return: A dict representing an :class:`Asset`
         """
-        rv: Dict[str, str] = {"type": self.type}
+        rv: Dict[str, Optional[str]] = {"type": self.type}
         if not self.is_native():
             rv["code"] = self.code
             rv["issuer"] = self.issuer
@@ -111,6 +111,7 @@ class Asset:
             asset_type = stellar_xdr.AssetType.ASSET_TYPE_NATIVE
             return stellar_xdr.Asset(type=asset_type)
         else:
+            assert self.issuer is not None
             length = len(self.code)
             pad_length = 4 - length if length <= 4 else 12 - length
             asset_code = bytearray(self.code, "ascii") + b"\x00" * pad_length
@@ -136,6 +137,8 @@ class Asset:
         if xdr_object.type == stellar_xdr.AssetType.ASSET_TYPE_NATIVE:
             return Asset.native()
         elif xdr_object.type == stellar_xdr.AssetType.ASSET_TYPE_CREDIT_ALPHANUM4:
+            assert xdr_object.alpha_num4 is not None
+            assert xdr_object.alpha_num4.issuer.account_id.ed25519 is not None
             issuer = StrKey.encode_ed25519_public_key(
                 xdr_object.alpha_num4.issuer.account_id.ed25519.uint256
             )
@@ -143,6 +146,8 @@ class Asset:
                 "\x00"
             )
         else:
+            assert xdr_object.alpha_num12 is not None
+            assert xdr_object.alpha_num12.issuer.account_id.ed25519 is not None
             issuer = StrKey.encode_ed25519_public_key(
                 xdr_object.alpha_num12.issuer.account_id.ed25519.uint256
             )
