@@ -61,8 +61,8 @@ class FeeBumpTransaction:
         if isinstance(value, str):
             value = Keypair.from_public_key(value)
 
-        self._fee_source: Keypair = value
-        self._fee_source_muxed: Optional[stellar_xdr.MuxedAccount] = None
+        self._fee_source = value
+        self._fee_source_muxed = None
 
     def to_xdr_object(self) -> stellar_xdr.FeeBumpTransaction:
         """Get an XDR object representation of this :class:`FeeBumpTransaction`.

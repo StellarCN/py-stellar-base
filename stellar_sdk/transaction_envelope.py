@@ -64,13 +64,15 @@ class TransactionEnvelope(BaseTransactionEnvelope["TransactionEnvelope"]):
         """
         tx = self.transaction.to_xdr_object()
         if self.transaction.v1:
+            assert isinstance(tx, stellar_xdr.Transaction)
             te_type = stellar_xdr.EnvelopeType.ENVELOPE_TYPE_TX
-            tx_envelope = stellar_xdr.TransactionV1Envelope(tx, self.signatures)
-            return stellar_xdr.TransactionEnvelope(type=te_type, v1=tx_envelope)
+            tx_v1_envelope = stellar_xdr.TransactionV1Envelope(tx, self.signatures)
+            return stellar_xdr.TransactionEnvelope(type=te_type, v1=tx_v1_envelope)
         else:
+            assert isinstance(tx, stellar_xdr.TransactionV0)
             te_type = stellar_xdr.EnvelopeType.ENVELOPE_TYPE_TX_V0
-            tx_envelope = stellar_xdr.TransactionV0Envelope(tx, self.signatures)
-            return stellar_xdr.TransactionEnvelope(type=te_type, v0=tx_envelope)
+            tx_v0_envelope = stellar_xdr.TransactionV0Envelope(tx, self.signatures)
+            return stellar_xdr.TransactionEnvelope(type=te_type, v0=tx_v0_envelope)
 
     def to_transaction_envelope_v1(self) -> "TransactionEnvelope":
         """Create a new :class:`TransactionEnvelope`, if the internal tx is not v1, we will convert it to v1.
@@ -93,9 +95,13 @@ class TransactionEnvelope(BaseTransactionEnvelope["TransactionEnvelope"]):
         """
         te_type = xdr_object.type
         if te_type == stellar_xdr.EnvelopeType.ENVELOPE_TYPE_TX_V0:
+            assert xdr_object.v0 is not None
+            assert xdr_object.v0.signatures is not None
             tx = Transaction.from_xdr_object(xdr_object.v0.tx, v1=False)
             signatures = xdr_object.v0.signatures
         elif te_type == stellar_xdr.EnvelopeType.ENVELOPE_TYPE_TX:
+            assert xdr_object.v1 is not None
+            assert xdr_object.v1.signatures is not None
             tx = Transaction.from_xdr_object(xdr_object.v1.tx, v1=True)
             signatures = xdr_object.v1.signatures
         else:
