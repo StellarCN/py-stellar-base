@@ -90,7 +90,7 @@ class AiohttpClient(BaseAsyncClient):
         else:
             connector = aiohttp.TCPConnector(limit=pool_size)
 
-        self.user_agent: dict = USER_AGENT
+        self.user_agent: Optional[str] = USER_AGENT
         if user_agent:
             self.user_agent = user_agent
 

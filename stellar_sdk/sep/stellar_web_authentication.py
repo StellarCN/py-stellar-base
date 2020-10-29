@@ -258,7 +258,7 @@ def verify_challenge_transaction_signers(
     all_signers = client_signers + [Ed25519PublicKeySigner(server_keypair.public_key)]
     all_signers_found = _verify_transaction_signatures(te, all_signers)
 
-    signers_found = []
+    signers_found: List[Ed25519PublicKeySigner] = []
     server_signer_found = False
     for signer in all_signers_found:
         if signer.account_id == server_keypair.public_key:

@@ -391,11 +391,11 @@ def _get_set_options_op(
         if key.startswith("G"):
             signer = Signer.ed25519_public_key(key, weight)
         elif key.startswith("X"):
-            key = StrKey.decode_sha256_hash(key)
-            signer = Signer.sha256_hash(key, weight)
+            sha256_hash = StrKey.decode_sha256_hash(key)
+            signer = Signer.sha256_hash(sha256_hash, weight)
         elif key.startswith("T"):
-            key = StrKey.decode_pre_auth_tx(key)
-            signer = Signer.pre_auth_tx(key, weight)
+            pre_auth_tx_hash = StrKey.decode_pre_auth_tx(key)
+            signer = Signer.pre_auth_tx(pre_auth_tx_hash, weight)
         else:
             raise SdkValueError("Signer key should start with `G`, `X` or `T`.")
 
