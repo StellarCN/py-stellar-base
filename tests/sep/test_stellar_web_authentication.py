@@ -200,6 +200,40 @@ class TestStellarWebAuthentication:
                 network_passphrase,
             )
 
+    def test_verify_challenge_tx_operation_value_is_none(self):
+        server_kp = Keypair.random()
+        client_kp = Keypair.random()
+        network_passphrase = Network.PUBLIC_NETWORK_PASSPHRASE
+        domain_name = "example.com"
+        now = int(time.time())
+        nonce_encoded = None
+        server_account = Account(server_kp.public_key, -1)
+        challenge_te = (
+            TransactionBuilder(server_account, network_passphrase, 100)
+            .append_manage_data_op(
+                data_name="{} auth".format(domain_name),
+                data_value=nonce_encoded,
+                source=client_kp.public_key,
+            )
+            .add_time_bounds(now, now + 900)
+            .build()
+        )
+
+        challenge_te.sign(server_kp)
+        challenge_te.sign(client_kp)
+        challenge_tx_signed = challenge_te.to_xdr()
+
+        with pytest.raises(
+            InvalidSep10ChallengeError,
+            match="Operation value should not be null.",
+        ):
+            verify_challenge_transaction(
+                challenge_tx_signed,
+                server_kp.public_key,
+                domain_name,
+                network_passphrase,
+            )
+
     def test_verify_challenge_tx_operation_value_is_not_a_64_bytes_base64_string(self):
         server_kp = Keypair.random()
         client_kp = Keypair.random()

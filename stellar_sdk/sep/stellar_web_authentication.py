@@ -172,6 +172,11 @@ def read_challenge_transaction(
     if not client_account:
         raise InvalidSep10ChallengeError("Operation should have a source account.")
 
+    if manage_data_op.data_value is None:
+        raise InvalidSep10ChallengeError(
+            "Operation value should not be null."
+        )
+
     if len(manage_data_op.data_value) != 64:
         raise InvalidSep10ChallengeError(
             "Operation value encoded as base64 should be 64 bytes long."
