@@ -1,3 +1,4 @@
+import inspect
 from typing import Union, Coroutine, Any, Dict, List, Tuple, Generator
 
 from . import xdr as stellar_xdr
@@ -25,6 +26,7 @@ from .call_builder.transactions_call_builder import TransactionsCallBuilder
 from .client.base_async_client import BaseAsyncClient
 from .client.base_sync_client import BaseSyncClient
 from .client.requests_client import RequestsClient
+from .client.response import Response
 from .exceptions import TypeError, NotFoundError, raise_request_exception
 from .fee_bump_transaction import FeeBumpTransaction
 from .fee_bump_transaction_envelope import FeeBumpTransactionEnvelope
@@ -38,6 +40,7 @@ from .utils import (
     urljoin_with_query,
     MUXED_ACCOUNT_STARTING_LETTER,
 )
+from .operation import Payment, AccountMerge, PathPaymentStrictSend, PathPaymentStrictReceive
 
 __all__ = ["Server"]
 
@@ -123,6 +126,7 @@ class Server:
             self.__check_memo_required_sync(tx)
         data = {"tx": xdr}
         resp = self._client.post(url=url, data=data)
+        assert isinstance(resp, Response)
         raise_request_exception(resp)
         return resp.json()
 
@@ -140,7 +144,8 @@ class Server:
         if not skip_memo_required_check:
             await self.__check_memo_required_async(tx)
         data = {"tx": xdr}
-        resp = await self._client.post(url=url, data=data)
+        resp = await self._client.post(url=url, data=data)  # type: ignore[misc]
+        assert isinstance(resp, Response)
         raise_request_exception(resp)
         return resp.json()
 
@@ -368,7 +373,8 @@ class Server:
         return self.__load_account_sync(account)
 
     async def __load_account_async(self, account_id: str) -> Account:
-        resp = await self.accounts().account_id(account_id=account_id).call()
+        resp = await self.accounts().account_id(account_id=account_id).call()  # type: ignore[misc]
+        assert isinstance(resp, dict)
         sequence = int(resp["sequence"])
         thresholds = Thresholds(
             resp["thresholds"]["low_threshold"],
@@ -382,6 +388,7 @@ class Server:
 
     def __load_account_sync(self, account_id: str) -> Account:
         resp = self.accounts().account_id(account_id=account_id).call()
+        assert isinstance(resp, dict)
         sequence = int(resp["sequence"])
         thresholds = Thresholds(
             resp["thresholds"]["low_threshold"],
@@ -393,7 +400,7 @@ class Server:
         account.thresholds = thresholds
         return account
 
-    def __check_memo_required_sync(self, transaction: Transaction) -> None:
+    def __check_memo_required_sync(self, transaction: Union[Transaction, FeeBumpTransaction]) -> None:
         if isinstance(transaction, FeeBumpTransaction):
             transaction = transaction.inner_transaction_envelope.transaction
         if not (transaction.memo is None or isinstance(transaction.memo, NoneMemo)):
@@ -407,6 +414,7 @@ class Server:
                 account_resp = self.accounts().account_id(destination).call()
             except NotFoundError:
                 continue
+            assert isinstance(account_resp, dict)
             self.__check_destination_memo(account_resp, index, destination)
 
     async def __check_memo_required_async(
@@ -422,7 +430,7 @@ class Server:
             if destination.startswith(MUXED_ACCOUNT_STARTING_LETTER):
                 continue
             try:
-                account_resp = await self.accounts().account_id(destination).call()
+                account_resp = await self.accounts().account_id(destination).call()  # type: ignore[misc]
             except NotFoundError:
                 continue
             self.__check_destination_memo(account_resp, index, destination)
@@ -451,6 +459,7 @@ class Server:
             stellar_xdr.OperationType.PATH_PAYMENT_STRICT_SEND,
         )
         for index, operation in enumerate(transaction.operations):
+            assert isinstance(operation, (Payment, AccountMerge, PathPaymentStrictSend, PathPaymentStrictReceive))
             if operation.TYPE_CODE in memo_required_operation_code:
                 destination: str = operation.destination
             else:
@@ -478,11 +487,12 @@ class Server:
 
     def __fetch_base_fee_sync(self) -> int:
         latest_ledger = self.ledgers().order(desc=True).limit(1).call()
+        assert isinstance(latest_ledger, dict)
         base_fee = self.__handle_base_fee(latest_ledger)
         return base_fee
 
     async def __fetch_base_fee_async(self) -> int:
-        latest_ledger = await self.ledgers().order(desc=True).limit(1).call()
+        latest_ledger = await self.ledgers().order(desc=True).limit(1).call()  # type: ignore[misc]
         base_fee = self.__handle_base_fee(latest_ledger)
         return base_fee
 

@@ -11,6 +11,7 @@ from typing import (
 
 from ..client.base_async_client import BaseAsyncClient
 from ..client.base_sync_client import BaseSyncClient
+from ..client.response import Response
 from ..exceptions import raise_request_exception, NotPageableError
 from ..utils import urljoin_with_query
 
@@ -65,6 +66,7 @@ class BaseCallBuilder:
 
     def __call_sync(self, url: str, params: dict = None) -> Dict[str, Any]:
         raw_resp = self.client.get(url, params)
+        assert isinstance(raw_resp, Response)
         raise_request_exception(raw_resp)
         resp = raw_resp.json()
         self._check_pageable(resp)
@@ -72,6 +74,7 @@ class BaseCallBuilder:
 
     async def __call_async(self, url: str, params: dict = None) -> Dict[str, Any]:
         raw_resp = await self.client.get(url, params)
+        assert isinstance(raw_resp, Response)
         raise_request_exception(raw_resp)
         resp = raw_resp.json()
         self._check_pageable(resp)

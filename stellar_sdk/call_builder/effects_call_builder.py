@@ -64,5 +64,5 @@ class EffectsCallBuilder(BaseCallBuilder):
         :param operation_id: operation ID
         :return: this EffectCallBuilder instance
         """
-        self.endpoint: str = f"operations/{operation_id}/effects"
+        self.endpoint = f"operations/{operation_id}/effects"
         return self

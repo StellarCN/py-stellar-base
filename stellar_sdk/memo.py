@@ -50,7 +50,7 @@ class Memo(object, metaclass=abc.ABCMeta):
 
         # TODO: Maybe we should raise Key Error here
         memo_cls = xdr_types.get(xdr_object.type, NoneMemo)
-        return memo_cls.from_xdr_object(xdr_object)
+        return memo_cls.from_xdr_object(xdr_object)  # type: ignore[attr-defined]
 
     @abc.abstractmethod
     def __eq__(self, other: object) -> bool:

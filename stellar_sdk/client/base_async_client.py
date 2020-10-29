@@ -35,7 +35,7 @@ class BaseAsyncClient(metaclass=ABCMeta):
     @abstractmethod
     async def stream(
         self, url: str, params: Dict[str, str] = None
-    ) -> AsyncGenerator[Dict[str, Any], None]:
+    ) -> Dict[str, Any]:
         """Creates an EventSource that listens for incoming messages from the server.
 
         See `Horizon Response Format <https://www.stellar.org/developers/horizon/reference/responses.html>`_
