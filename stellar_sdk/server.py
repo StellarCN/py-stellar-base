@@ -1,4 +1,3 @@
-import inspect
 from typing import Union, Coroutine, Any, Dict, List, Tuple, Generator
 
 from . import xdr as stellar_xdr
