@@ -57,7 +57,7 @@ async def __readline(self) -> bytes:
     return b"".join(line)
 
 
-aiohttp.streams.StreamReader.readline = __readline
+aiohttp.streams.StreamReader.readline = __readline  # type: ignore[assignment]
 
 
 class AiohttpClient(BaseAsyncClient):
