@@ -56,6 +56,7 @@ class AccountMerge(Operation):
 
         """
         source = Operation.get_source_from_xdr_obj(xdr_object)
+        assert xdr_object.body.destination is not None
         destination = parse_ed25519_account_id_from_muxed_account_xdr_object(
             xdr_object.body.destination
         )

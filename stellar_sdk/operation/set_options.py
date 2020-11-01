@@ -92,14 +92,14 @@ class SetOptions(Operation):
         if isinstance(clear_flags, Flag):
             clear_flags = clear_flags.value
 
-        self.inflation_dest: str = inflation_dest
-        self.clear_flags: int = clear_flags
-        self.set_flags: int = set_flags
-        self.master_weight: int = master_weight
-        self.low_threshold: int = low_threshold
-        self.med_threshold: int = med_threshold
-        self.high_threshold: int = high_threshold
-        self.home_domain: str = home_domain
+        self.inflation_dest = inflation_dest
+        self.clear_flags: int = clear_flags  # type: ignore[assignment]
+        self.set_flags: int = set_flags  # type: ignore[assignment]
+        self.master_weight = master_weight
+        self.low_threshold = low_threshold
+        self.med_threshold = med_threshold
+        self.high_threshold = high_threshold
+        self.home_domain = home_domain
         self.signer: Optional[Signer] = signer
 
     def _to_operation_body(self) -> stellar_xdr.OperationBody:

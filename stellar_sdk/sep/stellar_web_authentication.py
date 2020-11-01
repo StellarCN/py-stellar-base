@@ -180,7 +180,6 @@ def read_challenge_transaction(
         raise InvalidSep10ChallengeError(
             "Operation value encoded as base64 should be 64 bytes long."
         )
-
     nonce = base64.b64decode(manage_data_op.data_value)
     if len(nonce) != 48:
         raise InvalidSep10ChallengeError(
@@ -264,7 +263,7 @@ def verify_challenge_transaction_signers(
     all_signers = client_signers + [Ed25519PublicKeySigner(server_keypair.public_key)]
     all_signers_found = _verify_transaction_signatures(te, all_signers)
 
-    signers_found = []
+    signers_found: List[Ed25519PublicKeySigner] = []
     server_signer_found = False
     for signer in all_signers_found:
         if signer.account_id == server_keypair.public_key:

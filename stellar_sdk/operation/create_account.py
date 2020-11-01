@@ -59,7 +59,8 @@ class CreateAccount(Operation):
 
         """
         source = Operation.get_source_from_xdr_obj(xdr_object)
-
+        assert xdr_object.body.create_account_op is not None
+        assert xdr_object.body.create_account_op.destination.account_id.ed25519 is not None
         destination = StrKey.encode_ed25519_public_key(
             xdr_object.body.create_account_op.destination.account_id.ed25519.uint256
         )

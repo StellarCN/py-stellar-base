@@ -57,7 +57,7 @@ async def __readline(self) -> bytes:
     return b"".join(line)
 
 
-aiohttp.streams.StreamReader.readline = __readline
+aiohttp.streams.StreamReader.readline = __readline  # type: ignore[assignment]
 
 
 class AiohttpClient(BaseAsyncClient):
@@ -90,7 +90,7 @@ class AiohttpClient(BaseAsyncClient):
         else:
             connector = aiohttp.TCPConnector(limit=pool_size)
 
-        self.user_agent: dict = USER_AGENT
+        self.user_agent: Optional[str] = USER_AGENT
         if user_agent:
             self.user_agent = user_agent
 
@@ -149,7 +149,7 @@ class AiohttpClient(BaseAsyncClient):
         except aiohttp.ClientConnectionError as e:
             raise ConnectionError(e)
 
-    async def stream(
+    async def stream(  # type: ignore[override]
         self, url: str, params: Dict[str, str] = None
     ) -> AsyncGenerator[Dict[str, Any], None]:
         """Perform Stream request.

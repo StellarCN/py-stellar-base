@@ -69,12 +69,12 @@ class Transaction:
 
         self._source: Keypair = source
         self._source_muxed: Optional[stellar_xdr.MuxedAccount] = None
-        self.sequence: int = sequence
-        self.operations: List[Operation] = operations
-        self.memo: Memo = memo
-        self.fee: int = fee
-        self.time_bounds: TimeBounds = time_bounds
-        self.v1: bool = v1
+        self.sequence = sequence
+        self.operations = operations
+        self.memo = memo
+        self.fee = fee
+        self.time_bounds = time_bounds
+        self.v1 = v1
 
     @property
     def source(self) -> Keypair:
@@ -85,8 +85,8 @@ class Transaction:
         if isinstance(value, str):
             value = Keypair.from_public_key(value)
 
-        self._source: Keypair = value
-        self._source_muxed: Optional[stellar_xdr.MuxedAccount] = None
+        self._source = value
+        self._source_muxed = None
 
     def to_xdr_object(
         self,
@@ -112,10 +112,11 @@ class Transaction:
             return stellar_xdr.Transaction(
                 source_xdr, fee, sequence, time_bounds, memo, operations, ext,
             )
-        source_xdr = self.source.xdr_public_key().ed25519
-        ext = stellar_xdr.TransactionV0Ext(0)
+        source_xdr_v0 = self.source.xdr_public_key().ed25519
+        assert source_xdr_v0 is not None
+        ext_v0 = stellar_xdr.TransactionV0Ext(0)
         return stellar_xdr.TransactionV0(
-            source_xdr, fee, sequence, time_bounds, memo, operations, ext,
+            source_xdr_v0, fee, sequence, time_bounds, memo, operations, ext_v0,
         )
 
     @classmethod
@@ -135,10 +136,12 @@ class Transaction:
         :return: A new :class:`Transaction` object from the given XDR Transaction object.
         """
         if v1:
+            assert isinstance(xdr_object, stellar_xdr.Transaction)
             source = parse_ed25519_account_id_from_muxed_account_xdr_object(
                 xdr_object.source_account
             )
         else:
+            assert isinstance(xdr_object, stellar_xdr.TransactionV0)
             source = StrKey.encode_ed25519_public_key(
                 xdr_object.source_account_ed25519.uint256
             )
@@ -162,6 +165,7 @@ class Transaction:
             v1=v1,
         )
         if v1:
+            assert isinstance(xdr_object, stellar_xdr.Transaction)
             tx._source_muxed = xdr_object.source_account
         return tx
 
@@ -179,9 +183,9 @@ class Transaction:
         """
         if v1:
             xdr_object = stellar_xdr.Transaction.from_xdr(xdr)
-        else:
-            xdr_object = stellar_xdr.TransactionV0.from_xdr(xdr)
-        return cls.from_xdr_object(xdr_object, v1)
+            return cls.from_xdr_object(xdr_object, v1)
+        xdr_object_v0 = stellar_xdr.TransactionV0.from_xdr(xdr)
+        return cls.from_xdr_object(xdr_object_v0, v1)
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):

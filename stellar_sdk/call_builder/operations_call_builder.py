@@ -42,7 +42,7 @@ class OperationsCallBuilder(BaseCallBuilder):
         :param account_id: Account ID
         :return: this OperationCallBuilder instance
         """
-        self.endpoint: str = f"accounts/{account_id}/operations"
+        self.endpoint = f"accounts/{account_id}/operations"
         return self
 
     def for_ledger(self, sequence: Union[int, str]) -> "OperationsCallBuilder":
@@ -53,7 +53,7 @@ class OperationsCallBuilder(BaseCallBuilder):
         :param sequence: Sequence ID
         :return: this OperationCallBuilder instance
         """
-        self.endpoint: str = f"ledgers/{sequence}/operations"
+        self.endpoint = f"ledgers/{sequence}/operations"
         return self
 
     def for_transaction(self, transaction_hash: str) -> "OperationsCallBuilder":
@@ -64,7 +64,7 @@ class OperationsCallBuilder(BaseCallBuilder):
         :param transaction_hash:
         :return: this OperationCallBuilder instance
         """
-        self.endpoint: str = f"transactions/{transaction_hash}/operations"
+        self.endpoint = f"transactions/{transaction_hash}/operations"
         return self
 
     def include_failed(self, include_failed: bool) -> "OperationsCallBuilder":

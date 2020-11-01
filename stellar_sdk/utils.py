@@ -78,6 +78,7 @@ def parse_ed25519_account_id_from_muxed_account_xdr_object(
 ) -> str:
     if data.ed25519 is not None:
         return StrKey.encode_ed25519_public_key(data.ed25519.uint256)
+    assert data.med25519 is not None
     return StrKey.encode_ed25519_public_key(data.med25519.ed25519.uint256)
 
 

@@ -45,10 +45,11 @@ class ClaimClaimableBalance(Operation):
         object.
         """
         source = Operation.get_source_from_xdr_obj(xdr_object)
-        balance_id = base64.b64decode(
+        assert xdr_object.body.claim_claimable_balance_op is not None
+        balance_id_bytes = base64.b64decode(
             xdr_object.body.claim_claimable_balance_op.to_xdr()
         )
-        balance_id = binascii.hexlify(balance_id).decode()
+        balance_id = binascii.hexlify(balance_id_bytes).decode()
         op = cls(balance_id=balance_id, source=source)
         op._source_muxed = Operation.get_source_muxed_from_xdr_obj(xdr_object)
         return op

@@ -1,3 +1,6 @@
+from decimal import Decimal
+from typing import Union
+
 from . import xdr as stellar_xdr
 from .utils import best_rational_approximation
 
@@ -16,7 +19,7 @@ class Price:
         self.d: int = d
 
     @classmethod
-    def from_raw_price(cls, price: str) -> "Price":
+    def from_raw_price(cls, price: Union[str, Decimal]) -> "Price":
         """Create a :class:`Price` from the given str price.
 
         :param price: the str price. (ex. `'0.125'`)
@@ -24,7 +27,7 @@ class Price:
         :raises: :exc:`NoApproximationError <stellar_sdk.exceptions.NoApproximationError>`:
             if the approximation could not not be found.
         """
-        best_r = best_rational_approximation(price)
+        best_r = best_rational_approximation(str(price))
         n = best_r["n"]
         d = best_r["d"]
         return cls(n, d)

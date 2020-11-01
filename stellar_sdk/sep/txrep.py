@@ -56,6 +56,7 @@ def to_txrep(
     is_fee_bump = isinstance(transaction_envelope, FeeBumpTransactionEnvelope)
     tx_type = _EnvelopeType.ENVELOPE_TYPE_TX_FEE_BUMP.value
     if not is_fee_bump:
+        assert isinstance(transaction_envelope, TransactionEnvelope)
         if transaction_envelope.transaction.v1:
             tx_type = _EnvelopeType.ENVELOPE_TYPE_TX.value
         else:
@@ -65,15 +66,18 @@ def to_txrep(
 
     transaction = transaction_envelope.transaction
     if is_fee_bump:
+        assert isinstance(transaction_envelope, FeeBumpTransactionEnvelope)
         fee_bump_transaction_envelope = transaction_envelope
         fee_bump_transaction = fee_bump_transaction_envelope.transaction
         transaction_envelope = fee_bump_transaction.inner_transaction_envelope
         transaction = transaction_envelope.transaction
 
-    lines = []
+    lines: List[str] = []
 
     _add_line("type", tx_type, lines)
     if is_fee_bump:
+        assert isinstance(fee_bump_transaction, FeeBumpTransaction)
+        assert isinstance(transaction, Transaction)
         _add_line(
             "feeBump.tx.feeSource", fee_bump_transaction.fee_source.public_key, lines
         )
@@ -85,7 +89,7 @@ def to_txrep(
         _add_line(
             "feeBump.tx.innerTx.type", _EnvelopeType.ENVELOPE_TYPE_TX.value, lines
         )
-
+    assert isinstance(transaction, Transaction)
     _add_line(f"{prefix}sourceAccount", transaction.source.public_key, lines)
     _add_line(f"{prefix}fee", transaction.fee, lines)
     _add_line(f"{prefix}seqNum", transaction.sequence, lines)
@@ -215,21 +219,20 @@ def _get_time_bounds(raw_data_map: Dict[str, str], prefix: str) -> Optional[Time
 def _get_memo(raw_data_map: Dict[str, str], prefix: str) -> Memo:
     memo_type = _get_value(raw_data_map, f"{prefix}memo.type")
     if memo_type == "MEMO_TEXT":
-        memo = TextMemo(_get_bytes_value(raw_data_map, f"{prefix}memo.text"))
+        return TextMemo(_get_bytes_value(raw_data_map, f"{prefix}memo.text"))
     elif memo_type == "MEMO_ID":
-        memo = IdMemo(_get_int_value(raw_data_map, f"{prefix}memo.id"))
+        return IdMemo(_get_int_value(raw_data_map, f"{prefix}memo.id"))
     elif memo_type == "MEMO_HASH":
-        memo = HashMemo(_get_bytes_value(raw_data_map, f"{prefix}memo.hash"))
+        return HashMemo(_get_bytes_value(raw_data_map, f"{prefix}memo.hash"))
     elif memo_type == "MEMO_RETURN":
-        memo = ReturnHashMemo(_get_bytes_value(raw_data_map, f"{prefix}memo.retHash"))
+        return ReturnHashMemo(_get_bytes_value(raw_data_map, f"{prefix}memo.retHash"))
     elif memo_type == "MEMO_NONE":
-        memo = NoneMemo()
+        return NoneMemo()
     else:
         raise SdkValueError(
             f"`{memo_type}` is not a valid memo type, expected one of `MEMO_TEXT`, `MEMO_ID`, "
             f"`MEMO_HASH`, `MEMO_RETURN`, `MEMO_NONE`."
         )
-    return memo
 
 
 def _remove_comment(value: str) -> str:
@@ -388,11 +391,11 @@ def _get_set_options_op(
         if key.startswith("G"):
             signer = Signer.ed25519_public_key(key, weight)
         elif key.startswith("X"):
-            key = StrKey.decode_sha256_hash(key)
-            signer = Signer.sha256_hash(key, weight)
+            sha256_hash = StrKey.decode_sha256_hash(key)
+            signer = Signer.sha256_hash(sha256_hash, weight)
         elif key.startswith("T"):
-            key = StrKey.decode_pre_auth_tx(key)
-            signer = Signer.pre_auth_tx(key, weight)
+            pre_auth_tx_hash = StrKey.decode_pre_auth_tx(key)
+            signer = Signer.pre_auth_tx(pre_auth_tx_hash, weight)
         else:
             raise SdkValueError("Signer key should start with `G`, `X` or `T`.")
 
@@ -651,7 +654,7 @@ def _add_line(key: str, value: Union[str, int], lines: List[str]) -> None:
     lines.append(f"{key}: {value}")
 
 
-def _add_time_bounds(time_bounds: TimeBounds, prefix: str, lines: List[str]) -> None:
+def _add_time_bounds(time_bounds: Optional[TimeBounds], prefix: str, lines: List[str]) -> None:
     if time_bounds is None:
         _add_line(f"{prefix}timeBounds._present", _false, lines)
     else:
@@ -709,11 +712,13 @@ def _add_operation(
             present = True if value is not None else False
             add_operation_line(f"{key}._present", _true if present else _false)
             if present:
+                assert value is not None
                 add_operation_line(key, value)
         else:
+            assert value is not None
             add_operation_line(key, value)
 
-    def add_signer(signer: Signer) -> None:
+    def add_signer(signer: Optional[Signer]) -> None:
         add_body_line("signer._present", _false if signer is None else _true)
         if signer is None:
             return
@@ -721,6 +726,7 @@ def _add_operation(
             signer.signer_key.signer_key.type
             == stellar_xdr.SignerKeyType.SIGNER_KEY_TYPE_ED25519
         ):
+            assert signer.signer_key.signer_key.ed25519 is not None
             add_body_line(
                 "signer.key",
                 StrKey.encode_ed25519_public_key(
@@ -731,6 +737,7 @@ def _add_operation(
             signer.signer_key.signer_key.type
             == stellar_xdr.SignerKeyType.SIGNER_KEY_TYPE_PRE_AUTH_TX
         ):
+            assert signer.signer_key.signer_key.pre_auth_tx is not None
             add_body_line(
                 "signer.key",
                 StrKey.encode_pre_auth_tx(
@@ -741,13 +748,14 @@ def _add_operation(
             signer.signer_key.signer_key.type
             == stellar_xdr.SignerKeyType.SIGNER_KEY_TYPE_HASH_X
         ):
+            assert signer.signer_key.signer_key.hash_x is not None
             add_body_line(
                 "signer.key",
                 StrKey.encode_sha256_hash(signer.signer_key.signer_key.hash_x.uint256),
             )
         add_body_line("signer.weight", signer.weight)
 
-    def add_price(price: Union[Price, str, None]) -> None:
+    def add_price(price: Union[Price, str, Decimal]) -> None:
         price = _to_price(price)
         add_body_line("price.n", price.n)
         add_body_line("price.d", price.d)
@@ -855,7 +863,7 @@ def _add_signature(
     _add_line(f"{prefix}signature", _to_opaque(signature.signature.signature), lines)
 
 
-def _to_asset(asset: Asset):
+def _to_asset(asset: Asset) -> str:
     if asset.is_native():
         return "native"
     return f"{asset.code}:{asset.issuer}"
@@ -878,16 +886,17 @@ def _to_camel_case(snake_str: str) -> str:
     return components[0] + "".join(x.title() for x in components[1:])
 
 
-def _to_string(value: Union[str, bytes]):
+def _to_string(value: Union[str, bytes]) -> str:
     if isinstance(value, str):
         return json.dumps(value)
     # We are not following the standard here, it needs more discussion.
     try:
         value = value.decode("utf-8")
     except UnicodeDecodeError:
+        assert isinstance(value, bytes)
         return _to_opaque(value)
     return json.dumps(value)
 
 
-def _to_opaque(value: Union[bytes]):
+def _to_opaque(value: Union[bytes]) -> str:
     return value.hex()

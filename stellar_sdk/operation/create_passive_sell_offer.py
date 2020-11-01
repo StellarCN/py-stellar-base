@@ -87,6 +87,7 @@ class CreatePassiveSellOffer(Operation):
 
         """
         source = Operation.get_source_from_xdr_obj(xdr_object)
+        assert xdr_object.body.create_passive_sell_offer_op is not None
         selling = Asset.from_xdr_object(
             xdr_object.body.create_passive_sell_offer_op.selling
         )

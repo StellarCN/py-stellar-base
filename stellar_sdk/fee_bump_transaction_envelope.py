@@ -74,11 +74,13 @@ class FeeBumpTransactionEnvelope(BaseTransactionEnvelope["FeeBumpTransactionEnve
         """
         te_type = xdr_object.type
         if te_type == stellar_xdr.EnvelopeType.ENVELOPE_TYPE_TX_FEE_BUMP:
+            assert xdr_object.fee_bump is not None
             tx = FeeBumpTransaction.from_xdr_object(
                 xdr_object.fee_bump.tx, network_passphrase
             )
         else:
             raise ValueError("Invalid EnvelopeType: %d.", xdr_object.type)
+        assert xdr_object.fee_bump is not None
         signatures = xdr_object.fee_bump.signatures
         te = cls(tx, network_passphrase=network_passphrase, signatures=signatures)
         return te
