@@ -507,7 +507,7 @@ class Server:
             )
         return base_fee
 
-    def close(self) -> Union[None, Coroutine[Any, Any, None]]:
+    def close(self) -> Union[None, Coroutine[Any, Any, None]]:  # type: ignore[misc]
         """Close underlying connector.
 
         Release all acquired resources.
@@ -515,7 +515,7 @@ class Server:
         if self.__async:
             return self.__close_async()
         else:
-            return self.__close_sync()
+            return self.__close_sync()  # type: ignore[func-returns-value]
 
     async def __close_async(self) -> None:
         await self._client.close()
@@ -527,7 +527,7 @@ class Server:
         return self
 
     async def __aexit__(self, exc_type, exc_val, exc_tb) -> None:
-        await self.close()
+        await self.close()  # type: ignore[misc]
 
     def __enter__(self) -> "Server":
         return self

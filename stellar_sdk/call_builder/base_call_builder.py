@@ -73,7 +73,7 @@ class BaseCallBuilder:
         return resp
 
     async def __call_async(self, url: str, params: dict = None) -> Dict[str, Any]:
-        raw_resp = await self.client.get(url, params)
+        raw_resp = await self.client.get(url, params)  # type: ignore[misc]
         assert isinstance(raw_resp, Response)
         raise_request_exception(raw_resp)
         resp = raw_resp.json()
@@ -105,11 +105,11 @@ class BaseCallBuilder:
         url = urljoin_with_query(self.horizon_url, self.endpoint)
         stream = self.client.stream(url, self.params)
         while True:
-            yield await stream.__anext__()
+            yield await stream.__anext__()  # type: ignore[union-attr]
 
     def __stream_sync(self) -> Generator[Dict[str, Any], None, None]:
         url = urljoin_with_query(self.horizon_url, self.endpoint)
-        return self.client.stream(url, self.params)
+        return self.client.stream(url, self.params)  # type: ignore[return-value]
 
     def cursor(self, cursor: Union) -> "BaseCallBuilder":
         """Sets ``cursor`` parameter for the current call. Returns the CallBuilder object on which this method has been called.
