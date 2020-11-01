@@ -451,15 +451,8 @@ class Server:
         self, transaction: Transaction
     ) -> Generator[Tuple[int, str], Any, Any]:
         destinations = set()
-        memo_required_operation_code = (
-            stellar_xdr.OperationType.PAYMENT,
-            stellar_xdr.OperationType.ACCOUNT_MERGE,
-            stellar_xdr.OperationType.PATH_PAYMENT_STRICT_RECEIVE,
-            stellar_xdr.OperationType.PATH_PAYMENT_STRICT_SEND,
-        )
         for index, operation in enumerate(transaction.operations):
-            assert isinstance(operation, (Payment, AccountMerge, PathPaymentStrictSend, PathPaymentStrictReceive))
-            if operation.TYPE_CODE in memo_required_operation_code:
+            if isinstance(operation, (Payment, AccountMerge, PathPaymentStrictSend, PathPaymentStrictReceive)):
                 destination: str = operation.destination
             else:
                 continue
