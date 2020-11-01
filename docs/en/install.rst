@@ -11,7 +11,7 @@ To install py-stellar-sdk, use pipenv to install the module:
 
 .. code-block:: text
 
-    pipenv install stellar-sdk==3.0.0b0
+    pipenv install stellar-sdk==3.0.0b1
 
 If you're not using `pipenv <https://docs.pipenv.org/>`_, you should.
 Otherwise, you can install it via plain old `pip <https://pip.pypa.io/en/stable/quickstart/>`_. More on installing Python

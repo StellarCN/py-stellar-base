@@ -11,7 +11,7 @@
 
 .. code-block:: text
 
-    pipenv install stellar-sdk==3.0.0b0
+    pipenv install stellar-sdk==3.0.0b1
 
 我们推荐你使用 `pipenv <https://docs.pipenv.org/>`_ 来安装这个模块。当然你也可以使用 `pip <https://pip.pypa.io/en/stable/quickstart/>`_。
 想要更多的了解如何安装依赖，请参阅 `Hitchhiker's Guide to Python

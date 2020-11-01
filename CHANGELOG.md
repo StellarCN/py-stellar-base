@@ -1,6 +1,13 @@
 Release History
 ==============
 
+### Version 3.0.0-beta1
+Released on Nov 01, 2020
+
+#### Update
+* Add mypy check and bug fix. ([#398](https://github.com/StellarCN/py-stellar-base/pull/398))
+* Fix wrong type hinting.
+
 ### Version 3.0.0-beta0
 
 Released on Oct 22, 2020
