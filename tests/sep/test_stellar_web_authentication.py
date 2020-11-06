@@ -490,34 +490,6 @@ class TestStellarWebAuthentication:
                 network_passphrase,
             )
 
-    def test_verify_challenge_tx_allows_any_value_in_home_domain_field(self):
-        server_kp = Keypair.random()
-        client_kp = Keypair.random()
-        network_passphrase = Network.PUBLIC_NETWORK_PASSPHRASE
-        home_domain = "example.com"
-        now = int(time.time())
-        nonce = os.urandom(48)
-        nonce_encoded = base64.b64encode(nonce)
-        server_account = Account(server_kp.public_key, -1)
-        challenge_te = (
-            TransactionBuilder(server_account, network_passphrase, 100)
-            .append_manage_data_op(
-                data_name="{} auth".format(home_domain),
-                data_value=nonce_encoded,
-                source=client_kp.public_key,
-            )
-            .add_time_bounds(now, now + 900)
-            .build()
-        )
-
-        challenge_te.sign(server_kp)
-        challenge_te.sign(client_kp)
-        challenge_tx_signed = challenge_te.to_xdr()
-
-        verify_challenge_transaction(
-            challenge_tx_signed, server_kp.public_key, None, network_passphrase,
-        )
-
     def test_verify_challenge_tx_contain_subsequent_manage_data_ops_with_server_account_as_source_account(
         self,
     ):
