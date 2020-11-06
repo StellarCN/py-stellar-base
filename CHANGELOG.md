@@ -1,6 +1,12 @@
 Release History
 ==============
 
+### Version 3.0.0-beta2
+Released on Nov 07, 2020
+
+#### Update
+* refactor: change the type of Operation.TYPE_CODE from `stellar_sdk.xdr.OperationType` to `str`. ([#401](https://github.com/StellarCN/py-stellar-base/pull/401))
+
 ### Version 3.0.0-beta1
 Released on Nov 01, 2020
 
