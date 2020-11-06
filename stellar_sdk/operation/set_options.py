@@ -67,7 +67,8 @@ class SetOptions(Operation):
     :param source: The source account (defaults to transaction source).
 
     """
-    TYPE_CODE: stellar_xdr.OperationType = stellar_xdr.OperationType.SET_OPTIONS
+    _TYPE: stellar_xdr.OperationType = stellar_xdr.OperationType.SET_OPTIONS
+    TYPE_CODE: str = _TYPE.name
 
     def __init__(
         self,
@@ -153,7 +154,7 @@ class SetOptions(Operation):
             signer,
         )
         body = stellar_xdr.OperationBody(
-            type=self.TYPE_CODE, set_options_op=set_options_op
+            type=self._TYPE, set_options_op=set_options_op
         )
         return body
 

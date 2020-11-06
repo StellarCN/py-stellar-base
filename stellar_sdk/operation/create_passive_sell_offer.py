@@ -40,8 +40,8 @@ class CreatePassiveSellOffer(Operation):
 
     """
 
-    TYPE_CODE: stellar_xdr.OperationType = stellar_xdr.OperationType.CREATE_PASSIVE_SELL_OFFER
-
+    _TYPE: stellar_xdr.OperationType = stellar_xdr.OperationType.CREATE_PASSIVE_SELL_OFFER
+    TYPE_CODE: str = _TYPE.name
 
     def __init__(
         self,
@@ -74,7 +74,7 @@ class CreatePassiveSellOffer(Operation):
             selling, buying, amount, price
         )
         body = stellar_xdr.OperationBody(
-            type=self.TYPE_CODE,
+            type=self._TYPE,
             create_passive_sell_offer_op=create_passive_sell_offer_op,
         )
         return body
