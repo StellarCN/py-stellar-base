@@ -39,7 +39,7 @@ MUXED_ACCOUNT_STARTING_LETTER: str = "M"
 def build_challenge_transaction(
     server_secret: str,
     client_account_id: str,
-    domain_name: str,
+    home_domain: str,
     network_passphrase: str,
     timeout: int = 900,
 ) -> str:
@@ -48,9 +48,8 @@ def build_challenge_transaction(
 
     :param server_secret: secret key for server's stellar.toml `SIGNING_KEY`.
     :param client_account_id: The stellar account that the wallet wishes to authenticate with the server.
-    :param domain_name: The `fully qualified domain name <https://en.wikipedia.org/wiki/Fully_qualified_domain_name>`_
-        of the service requiring authentication, for example: `example.com`. (The domain_name field is reserved for
-        future use and not used.)
+    :param home_domain: The `fully qualified domain name <https://en.wikipedia.org/wiki/Fully_qualified_home_domain>`_
+        of the service requiring authentication, for example: `example.com`.
     :param network_passphrase: The network to connect to for verifying and retrieving
         additional attributes from. (ex. 'Public Global Stellar Network ; September 2015')
     :param timeout: Challenge duration in seconds (default to 15 minutes).
@@ -69,7 +68,7 @@ def build_challenge_transaction(
     nonce = os.urandom(48)
     nonce_encoded = base64.b64encode(nonce)
     transaction_builder.append_manage_data_op(
-        data_name=f"{domain_name} auth",
+        data_name=f"{home_domain} auth",
         data_value=nonce_encoded,
         source=client_account_id,
     )
@@ -81,7 +80,7 @@ def build_challenge_transaction(
 def read_challenge_transaction(
     challenge_transaction: str,
     server_account_id: str,
-    domain_name: str,
+    home_domain: str,
     network_passphrase: str,
 ) -> Tuple[TransactionEnvelope, str]:
     """Reads a SEP 10 challenge transaction and returns the decoded transaction envelope and client account ID contained within.
@@ -96,9 +95,8 @@ def read_challenge_transaction(
 
     :param challenge_transaction: SEP0010 transaction challenge transaction in base64.
     :param server_account_id: public key for server's account.
-    :param domain_name: The `fully qualified domain name <https://en.wikipedia.org/wiki/Fully_qualified_domain_name>`_
-        of the service requiring authentication, for example: `example.com`. (The domain_name field is reserved for
-        future use and not used.)
+    :param home_domain: The `fully qualified domain name <https://en.wikipedia.org/wiki/Fully_qualified_home_domain>`_
+        of the service requiring authentication, for example: `example.com`.
     :param network_passphrase: The network to connect to for verifying and retrieving
         additional attributes from. (ex. 'Public Global Stellar Network ; September 2015')
     :raises: :exc:`InvalidSep10ChallengeError <stellar_sdk.sep.exceptions.InvalidSep10ChallengeError>` - if the
@@ -172,6 +170,12 @@ def read_challenge_transaction(
     if not client_account:
         raise InvalidSep10ChallengeError("Operation should have a source account.")
 
+    if manage_data_op.data_name != f"{home_domain} auth":
+        raise InvalidSep10ChallengeError(
+            "The transaction's operation key name does not "
+            "include the expected home domain."
+        )
+
     if manage_data_op.data_value is None:
         raise InvalidSep10ChallengeError(
             "Operation value should not be null."
@@ -212,7 +216,7 @@ def read_challenge_transaction(
 def verify_challenge_transaction_signers(
     challenge_transaction: str,
     server_account_id: str,
-    domain_name: str,
+    home_domain: str,
     network_passphrase: str,
     signers: List[Ed25519PublicKeySigner],
 ) -> List[Ed25519PublicKeySigner]:
@@ -226,9 +230,8 @@ def verify_challenge_transaction_signers(
 
     :param challenge_transaction: SEP0010 transaction challenge transaction in base64.
     :param server_account_id: public key for server's account.
-    :param domain_name: The `fully qualified domain name <https://en.wikipedia.org/wiki/Fully_qualified_domain_name>`_
-        of the service requiring authentication, for example: `example.com`. (The domain_name field is reserved for
-        future use and not used.)
+    :param home_domain: The `fully qualified domain name <https://en.wikipedia.org/wiki/Fully_qualified_home_domain>`_
+        of the service requiring authentication, for example: `example.com`.
     :param network_passphrase: The network to connect to for verifying and retrieving
         additional attributes from. (ex. 'Public Global Stellar Network ; September 2015')
     :param signers: The signers of client account.
@@ -241,7 +244,7 @@ def verify_challenge_transaction_signers(
         raise InvalidSep10ChallengeError("No signers provided.")
 
     te, _ = read_challenge_transaction(
-        challenge_transaction, server_account_id, domain_name, network_passphrase
+        challenge_transaction, server_account_id, home_domain, network_passphrase
     )
     server_keypair = Keypair.from_public_key(server_account_id)
 
@@ -296,16 +299,15 @@ def verify_challenge_transaction_signers(
 def verify_challenge_transaction_signed_by_client(
     challenge_transaction: str,
     server_account_id: str,
-    domain_name: str,
+    home_domain: str,
     network_passphrase: str,
 ) -> None:
     """An alias for :func:`stellar_sdk.sep.stellar_web_authentication.verify_challenge_transaction`.
 
     :param challenge_transaction: SEP0010 transaction challenge transaction in base64.
     :param server_account_id: public key for server's account.
-    :param domain_name: The `fully qualified domain name <https://en.wikipedia.org/wiki/Fully_qualified_domain_name>`_
-        of the service requiring authentication, for example: `example.com`. (The domain_name field is reserved for
-        future use and not used.)
+    :param home_domain: The `fully qualified domain name <https://en.wikipedia.org/wiki/Fully_qualified_home_domain>`_
+        of the service requiring authentication, for example: `example.com`.
     :param network_passphrase: The network to connect to for verifying and retrieving
         additional attributes from. (ex. 'Public Global Stellar Network ; September 2015')
 
@@ -319,23 +321,22 @@ def verify_challenge_transaction_signed_by_client(
     )  # pragma: no cover
 
     return verify_challenge_transaction_signed_by_client_master_key(
-        challenge_transaction, server_account_id, domain_name, network_passphrase
+        challenge_transaction, server_account_id, home_domain, network_passphrase
     )  # pragma: no cover
 
 
 def verify_challenge_transaction_signed_by_client_master_key(
     challenge_transaction: str,
     server_account_id: str,
-    domain_name: str,
+    home_domain: str,
     network_passphrase: str,
 ) -> None:
     """An alias for :func:`stellar_sdk.sep.stellar_web_authentication.verify_challenge_transaction`.
 
     :param challenge_transaction: SEP0010 transaction challenge transaction in base64.
     :param server_account_id: public key for server's account.
-    :param domain_name: The `fully qualified domain name <https://en.wikipedia.org/wiki/Fully_qualified_domain_name>`_
-        of the service requiring authentication, for example: `example.com`. (The domain_name field is reserved for
-        future use and not used.)
+    :param home_domain: The `fully qualified domain name <https://en.wikipedia.org/wiki/Fully_qualified_home_domain>`_
+        of the service requiring authentication, for example: `example.com`.
     :param network_passphrase: The network to connect to for verifying and retrieving
         additional attributes from. (ex. 'Public Global Stellar Network ; September 2015')
 
@@ -344,14 +345,14 @@ def verify_challenge_transaction_signed_by_client_master_key(
     """
 
     return verify_challenge_transaction(
-        challenge_transaction, server_account_id, domain_name, network_passphrase
+        challenge_transaction, server_account_id, home_domain, network_passphrase
     )
 
 
 def verify_challenge_transaction_threshold(
     challenge_transaction: str,
     server_account_id: str,
-    domain_name: str,
+    home_domain: str,
     network_passphrase: str,
     threshold: int,
     signers: List[Ed25519PublicKeySigner],
@@ -365,9 +366,8 @@ def verify_challenge_transaction_threshold(
 
     :param challenge_transaction: SEP0010 transaction challenge transaction in base64.
     :param server_account_id: public key for server's account.
-    :param domain_name: The `fully qualified domain name <https://en.wikipedia.org/wiki/Fully_qualified_domain_name>`_
-        of the service requiring authentication, for example: `example.com`. (The domain_name field is reserved for
-        future use and not used.)
+    :param home_domain: The `fully qualified domain name <https://en.wikipedia.org/wiki/Fully_qualified_home_domain>`_
+        of the service requiring authentication, for example: `example.com`.
     :param network_passphrase: The network to connect to for verifying and retrieving
         additional attributes from. (ex. 'Public Global Stellar Network ; September 2015')
     :param threshold: The medThreshold on the client account.
@@ -381,7 +381,7 @@ def verify_challenge_transaction_threshold(
     signers_found = verify_challenge_transaction_signers(
         challenge_transaction,
         server_account_id,
-        domain_name,
+        home_domain,
         network_passphrase,
         signers,
     )
@@ -398,7 +398,7 @@ def verify_challenge_transaction_threshold(
 def verify_challenge_transaction(
     challenge_transaction: str,
     server_account_id: str,
-    domain_name: str,
+    home_domain: str,
     network_passphrase: str,
 ) -> None:
     """Verifies if a transaction is a valid
@@ -416,9 +416,8 @@ def verify_challenge_transaction(
 
     :param challenge_transaction: SEP0010 transaction challenge transaction in base64.
     :param server_account_id: public key for server's account.
-    :param domain_name: The `fully qualified domain name <https://en.wikipedia.org/wiki/Fully_qualified_domain_name>`_
-        of the service requiring authentication, for example: `example.com`. (The domain_name field is reserved for
-        future use and not used.)
+    :param home_domain: The `fully qualified domain name <https://en.wikipedia.org/wiki/Fully_qualified_home_domain>`_
+        of the service requiring authentication, for example: `example.com`.
     :param network_passphrase: The network to connect to for verifying and retrieving
         additional attributes from. (ex. 'Public Global Stellar Network ; September 2015')
     :raises: :exc:`InvalidSep10ChallengeError <stellar_sdk.sep.exceptions.InvalidSep10ChallengeError>` - if the
@@ -426,13 +425,13 @@ def verify_challenge_transaction(
     """
 
     _, client_account_id = read_challenge_transaction(
-        challenge_transaction, server_account_id, domain_name, network_passphrase
+        challenge_transaction, server_account_id, home_domain, network_passphrase
     )
     signers = [Ed25519PublicKeySigner(client_account_id, 255)]
     verify_challenge_transaction_signers(
         challenge_transaction,
         server_account_id,
-        domain_name,
+        home_domain,
         network_passphrase,
         signers,
     )
