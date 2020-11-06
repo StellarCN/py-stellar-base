@@ -20,7 +20,8 @@ class ClaimClaimableBalance(Operation):
     :param source: The source account (defaults to transaction source).
     """
 
-    TYPE_CODE: stellar_xdr.OperationType = stellar_xdr.OperationType.CLAIM_CLAIMABLE_BALANCE
+    _TYPE: stellar_xdr.OperationType = stellar_xdr.OperationType.CLAIM_CLAIMABLE_BALANCE
+    TYPE_CODE: str = _TYPE.name
 
     def __init__(self, balance_id: str, source: str = None,) -> None:
         super().__init__(source)
@@ -33,7 +34,7 @@ class ClaimClaimableBalance(Operation):
             balance_id=balance_id
         )
         body = stellar_xdr.OperationBody(
-            type=self.TYPE_CODE, claim_claimable_balance_op=claim_claimable_balance_op
+            type=self._TYPE, claim_claimable_balance_op=claim_claimable_balance_op
         )
         return body
 
