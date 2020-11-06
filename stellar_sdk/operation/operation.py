@@ -47,12 +47,12 @@ class Operation(metaclass=ABCMeta):
     @property
     @abstractmethod
     def _TYPE(self) -> stellar_xdr.OperationType:
-        pass
+        pass  # pragma: no cover
 
     @property
     @abstractmethod
     def TYPE_CODE(self) -> str:
-        pass
+        pass  # pragma: no cover
 
     @property
     def source(self) -> Optional[str]:
