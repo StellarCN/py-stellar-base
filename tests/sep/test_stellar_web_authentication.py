@@ -80,6 +80,89 @@ class TestStellarWebAuthentication:
             challenge_tx, server_kp.public_key, home_domain, network_passphrase
         )
 
+    def test_verify_challenge_transaction_with_multi_domain_names(self):
+        server_kp = Keypair.random()
+        client_kp = Keypair.random()
+        timeout = 600
+        network_passphrase = Network.PUBLIC_NETWORK_PASSPHRASE
+        home_domain = "example.com"
+
+        challenge = build_challenge_transaction(
+            server_secret=server_kp.secret,
+            client_account_id=client_kp.public_key,
+            home_domain=home_domain,
+            network_passphrase=network_passphrase,
+            timeout=timeout,
+        )
+
+        transaction = TransactionEnvelope.from_xdr(challenge, network_passphrase)
+        transaction.sign(client_kp)
+        challenge_tx = transaction.to_xdr()
+        verify_challenge_transaction(
+            challenge_tx,
+            server_kp.public_key,
+            ["example.com2", "example.com1", home_domain],
+            network_passphrase
+        )
+
+    def test_verify_challenge_transaction_with_multi_domain_names_not_include(self):
+        server_kp = Keypair.random()
+        client_kp = Keypair.random()
+        timeout = 600
+        network_passphrase = Network.PUBLIC_NETWORK_PASSPHRASE
+        home_domain = "example.com"
+
+        challenge = build_challenge_transaction(
+            server_secret=server_kp.secret,
+            client_account_id=client_kp.public_key,
+            home_domain=home_domain,
+            network_passphrase=network_passphrase,
+            timeout=timeout,
+        )
+
+        transaction = TransactionEnvelope.from_xdr(challenge, network_passphrase)
+        transaction.sign(client_kp)
+        challenge_tx = transaction.to_xdr()
+        with pytest.raises(
+            InvalidSep10ChallengeError,
+            match="The transaction's operation key name does not include the expected home domain.",
+        ):
+            verify_challenge_transaction(
+                challenge_tx,
+                server_kp.public_key,
+                ["example.com2", "example.com1"],
+                network_passphrase
+            )
+
+    def test_verify_challenge_transaction_with_empty_domain_names(self):
+        server_kp = Keypair.random()
+        client_kp = Keypair.random()
+        timeout = 600
+        network_passphrase = Network.PUBLIC_NETWORK_PASSPHRASE
+        home_domain = "example.com"
+
+        challenge = build_challenge_transaction(
+            server_secret=server_kp.secret,
+            client_account_id=client_kp.public_key,
+            home_domain=home_domain,
+            network_passphrase=network_passphrase,
+            timeout=timeout,
+        )
+
+        transaction = TransactionEnvelope.from_xdr(challenge, network_passphrase)
+        transaction.sign(client_kp)
+        challenge_tx = transaction.to_xdr()
+        with pytest.raises(
+            InvalidSep10ChallengeError,
+            match="The transaction's operation key name does not include the expected home domain.",
+        ):
+            verify_challenge_transaction(
+                challenge_tx,
+                server_kp.public_key,
+                [],
+                network_passphrase
+            )
+
     def test_verify_challenge_tx_sequence_not_zero(self):
         server_kp = Keypair.random()
         client_kp = Keypair.random()
@@ -435,37 +518,6 @@ class TestStellarWebAuthentication:
         network_passphrase = Network.PUBLIC_NETWORK_PASSPHRASE
         home_domain = "example.com"
         invalid_home_domain = "invalid_example.com"
-
-        challenge = build_challenge_transaction(
-            server_secret=server_kp.secret,
-            client_account_id=client_kp.public_key,
-            home_domain=home_domain,
-            network_passphrase=network_passphrase,
-            timeout=timeout,
-        )
-
-        transaction = TransactionEnvelope.from_xdr(challenge, network_passphrase)
-        transaction.sign(client_kp)
-        challenge_tx = transaction.to_xdr()
-        with pytest.raises(
-            InvalidSep10ChallengeError,
-            match="The transaction's operation key name "
-            "does not include the expected home domain.",
-        ):
-            verify_challenge_transaction(
-                challenge_tx,
-                server_kp.public_key,
-                invalid_home_domain,
-                network_passphrase,
-            )
-
-    def test_verify_challenge_transaction_home_domain_mismatch_value_none_raise(self):
-        server_kp = Keypair.random()
-        client_kp = Keypair.random()
-        timeout = 600
-        network_passphrase = Network.PUBLIC_NETWORK_PASSPHRASE
-        home_domain = "example.com"
-        invalid_home_domain = None
 
         challenge = build_challenge_transaction(
             server_secret=server_kp.secret,
