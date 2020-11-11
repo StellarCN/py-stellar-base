@@ -2,6 +2,7 @@ from decimal import Decimal
 from typing import Union
 
 from .operation import Operation
+from .operation_type import OperationType
 from .utils import check_ed25519_public_key, check_amount
 from .. import xdr as stellar_xdr
 from ..keypair import Keypair
@@ -26,7 +27,8 @@ class CreateAccount(Operation):
 
     """
 
-    TYPE_CODE: stellar_xdr.OperationType = stellar_xdr.OperationType.CREATE_ACCOUNT
+    _TYPE: stellar_xdr.OperationType = stellar_xdr.OperationType.CREATE_ACCOUNT
+    TYPE: OperationType = OperationType.CREATE_ACCOUNT
 
     def __init__(
         self,
@@ -47,7 +49,7 @@ class CreateAccount(Operation):
         )
         create_account_op = stellar_xdr.CreateAccountOp(destination, starting_balance)
         body = stellar_xdr.OperationBody(
-            type=self.TYPE_CODE, create_account_op=create_account_op
+            type=self._TYPE, create_account_op=create_account_op
         )
         return body
 

@@ -1,4 +1,5 @@
 from .operation import Operation
+from .operation_type import OperationType
 from .utils import check_ed25519_public_key
 from .. import xdr as stellar_xdr
 from ..keypair import Keypair
@@ -21,7 +22,8 @@ class BeginSponsoringFutureReserves(Operation):
     :param source: The source account (defaults to transaction source).
     """
 
-    TYPE_CODE: stellar_xdr.OperationType = stellar_xdr.OperationType.BEGIN_SPONSORING_FUTURE_RESERVES
+    _TYPE: stellar_xdr.OperationType = stellar_xdr.OperationType.BEGIN_SPONSORING_FUTURE_RESERVES
+    TYPE: OperationType = OperationType.BEGIN_SPONSORING_FUTURE_RESERVES
 
     def __init__(self, sponsored_id: str, source: str = None) -> None:
         super().__init__(source)
@@ -34,7 +36,7 @@ class BeginSponsoringFutureReserves(Operation):
             sponsored_id=sponsored_id
         )
         body = stellar_xdr.OperationBody(
-            type=self.TYPE_CODE,
+            type=self._TYPE,
             begin_sponsoring_future_reserves_op=begin_sponsoring_future_reserves_op,
         )
         return body

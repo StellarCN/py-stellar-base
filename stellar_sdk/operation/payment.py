@@ -2,6 +2,7 @@ from decimal import Decimal
 from typing import Union, Optional
 
 from .operation import Operation
+from .operation_type import OperationType
 from .utils import check_amount, check_ed25519_public_key
 from .. import xdr as stellar_xdr
 from ..asset import Asset
@@ -24,7 +25,8 @@ class Payment(Operation):
         transaction's source account.
 
     """
-    TYPE_CODE: stellar_xdr.OperationType = stellar_xdr.OperationType.PAYMENT
+    _TYPE: stellar_xdr.OperationType = stellar_xdr.OperationType.PAYMENT
+    TYPE: OperationType = OperationType.PAYMENT
 
 
     def __init__(
@@ -60,7 +62,7 @@ class Payment(Operation):
             destination = Keypair.from_public_key(self._destination).xdr_muxed_account()
         amount = stellar_xdr.Int64(Operation.to_xdr_amount(self.amount))
         payment_op = stellar_xdr.PaymentOp(destination, asset, amount)
-        body = stellar_xdr.OperationBody(type=self.TYPE_CODE, payment_op=payment_op)
+        body = stellar_xdr.OperationBody(type=self._TYPE, payment_op=payment_op)
         return body
 
     @classmethod

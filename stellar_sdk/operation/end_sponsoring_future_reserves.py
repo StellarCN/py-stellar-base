@@ -1,4 +1,5 @@
 from .operation import Operation
+from .operation_type import OperationType
 from .. import xdr as stellar_xdr
 
 
@@ -17,13 +18,14 @@ class EndSponsoringFutureReserves(Operation):
     :param source: The source account (defaults to transaction source).
     """
 
-    TYPE_CODE: stellar_xdr.OperationType = stellar_xdr.OperationType.END_SPONSORING_FUTURE_RESERVES
+    _TYPE: stellar_xdr.OperationType = stellar_xdr.OperationType.END_SPONSORING_FUTURE_RESERVES
+    TYPE: OperationType = OperationType.END_SPONSORING_FUTURE_RESERVES
 
     def __init__(self, source: str = None) -> None:
         super().__init__(source)
 
     def _to_operation_body(self) -> stellar_xdr.OperationBody:
-        body = stellar_xdr.OperationBody(type=self.TYPE_CODE)
+        body = stellar_xdr.OperationBody(type=self._TYPE)
         return body
 
     @classmethod

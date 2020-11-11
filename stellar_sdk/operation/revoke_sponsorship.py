@@ -4,6 +4,7 @@ from enum import IntEnum
 from typing import Optional
 
 from .operation import Operation
+from .operation_type import OperationType
 from .utils import check_ed25519_public_key
 from .. import xdr as stellar_xdr
 from ..asset import Asset
@@ -113,7 +114,8 @@ class RevokeSponsorship(Operation):
     :param signer: The sponsored signer.
     :param source: The source account (defaults to transaction source).
     """
-    TYPE_CODE: stellar_xdr.OperationType = stellar_xdr.OperationType.REVOKE_SPONSORSHIP
+    _TYPE: stellar_xdr.OperationType = stellar_xdr.OperationType.REVOKE_SPONSORSHIP
+    TYPE: OperationType = OperationType.REVOKE_SPONSORSHIP
 
     def __init__(
         self,
@@ -351,7 +353,7 @@ class RevokeSponsorship(Operation):
                 f"{self.revoke_sponsorship_type} is not a valid RevokeSponsorshipType."
             )
         body = stellar_xdr.OperationBody(
-            type=self.TYPE_CODE, revoke_sponsorship_op=revoke_sponsorship_op
+            type=self._TYPE, revoke_sponsorship_op=revoke_sponsorship_op
         )
         return body
 

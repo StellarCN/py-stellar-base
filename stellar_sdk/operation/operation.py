@@ -3,6 +3,7 @@ from abc import ABCMeta, abstractmethod
 from decimal import Decimal, Context, Inexact
 from typing import Optional, Union
 
+from .operation_type import OperationType
 from .utils import check_source
 from .. import xdr as stellar_xdr
 from ..exceptions import ValueError, TypeError
@@ -46,8 +47,13 @@ class Operation(metaclass=ABCMeta):
 
     @property
     @abstractmethod
-    def TYPE_CODE(self) -> stellar_xdr.OperationType:
-        pass
+    def _TYPE(self) -> stellar_xdr.OperationType:
+        pass  # pragma: no cover
+
+    @property
+    @abstractmethod
+    def TYPE(self) -> OperationType:
+        pass  # pragma: no cover
 
     @property
     def source(self) -> Optional[str]:
@@ -144,7 +150,7 @@ class Operation(metaclass=ABCMeta):
             subclass) instance from.
         """
         for sub_cls in cls.__subclasses__():
-            if sub_cls.TYPE_CODE == xdr_object.body.type:
+            if sub_cls._TYPE == xdr_object.body.type:
                 return sub_cls.from_xdr_object(xdr_object)
         raise NotImplementedError(
             f"Operation of type={xdr_object.body.type} is not implemented."

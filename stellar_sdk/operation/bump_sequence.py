@@ -1,4 +1,5 @@
 from .operation import Operation
+from .operation_type import OperationType
 from .. import xdr as stellar_xdr
 
 
@@ -18,7 +19,8 @@ class BumpSequence(Operation):
 
     """
 
-    TYPE_CODE: stellar_xdr.OperationType = stellar_xdr.OperationType.BUMP_SEQUENCE
+    _TYPE: stellar_xdr.OperationType = stellar_xdr.OperationType.BUMP_SEQUENCE
+    TYPE: OperationType = OperationType.BUMP_SEQUENCE
 
     def __init__(self, bump_to: int, source: str = None) -> None:
         super().__init__(source)
@@ -28,7 +30,7 @@ class BumpSequence(Operation):
         sequence = stellar_xdr.SequenceNumber(stellar_xdr.Int64(self.bump_to))
         bump_sequence_op = stellar_xdr.BumpSequenceOp(sequence)
         body = stellar_xdr.OperationBody(
-            type=self.TYPE_CODE, bump_sequence_op=bump_sequence_op
+            type=self._TYPE, bump_sequence_op=bump_sequence_op
         )
         return body
 
