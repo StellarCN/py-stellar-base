@@ -7,14 +7,14 @@ __all__ = ["Account"]
 
 
 class Account:
-    """The :class:`Account` object, which represents represents a single
-    account in Stellar network and its sequence number.
+    """The :class:`Account` object represents a single
+    account on the Stellar network and its sequence number.
 
     Account tracks the sequence number as it is used
     by :class:`TransactionBuilder <stellar_sdk.transaction_builder.TransactionBuilder>`
 
     See `Accounts`_ For more information about the formats used for asset codes and how issuers
-    work on Stellar's network,
+    work on Stellar,
 
     :param account_id: Account ID of the
         account (ex. `GB3KJPLFUYN5VL6R3GU3EGCGVCKFDSD7BEDX42HWG5BWFKB3KQGJJRMA`)
