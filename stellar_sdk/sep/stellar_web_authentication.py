@@ -80,7 +80,7 @@ def build_challenge_transaction(
 def read_challenge_transaction(
     challenge_transaction: str,
     server_account_id: str,
-    home_domain: Union[str, Iterable[str]],
+    home_domains: Union[str, Iterable[str]],
     network_passphrase: str,
 ) -> Tuple[TransactionEnvelope, str, str]:
     """Reads a SEP 10 challenge transaction and returns the decoded transaction envelope and client account ID contained within.
@@ -95,7 +95,7 @@ def read_challenge_transaction(
 
     :param challenge_transaction: SEP0010 transaction challenge transaction in base64.
     :param server_account_id: public key for server's account.
-    :param home_domain: The home domain that is expected to be included in the first Manage Data operation's string
+    :param home_domains: The home domain that is expected to be included in the first Manage Data operation's string
         key. If a list is provided, one of the domain names in the array must match.
     :param network_passphrase: The network to connect to for verifying and retrieving
         additional attributes from. (ex. 'Public Global Stellar Network ; September 2015')
@@ -171,12 +171,12 @@ def read_challenge_transaction(
         raise InvalidSep10ChallengeError("Operation should have a source account.")
 
     matched_home_domain = None
-    if isinstance(home_domain, str):
-        if manage_data_op.data_name == f"{home_domain} auth":
-            matched_home_domain = home_domain
+    if isinstance(home_domains, str):
+        if manage_data_op.data_name == f"{home_domains} auth":
+            matched_home_domain = home_domains
     else:
-        for domain in home_domain:
-            if manage_data_op.data_name == f"{domain} auth":
+        for home_domain in home_domains:
+            if manage_data_op.data_name == f"{home_domain} auth":
                 matched_home_domain = home_domain
                 break
 
@@ -226,7 +226,7 @@ def read_challenge_transaction(
 def verify_challenge_transaction_signers(
     challenge_transaction: str,
     server_account_id: str,
-    home_domain: Union[str, Iterable[str]],
+    home_domains: Union[str, Iterable[str]],
     network_passphrase: str,
     signers: List[Ed25519PublicKeySigner],
 ) -> List[Ed25519PublicKeySigner]:
@@ -240,7 +240,7 @@ def verify_challenge_transaction_signers(
 
     :param challenge_transaction: SEP0010 transaction challenge transaction in base64.
     :param server_account_id: public key for server's account.
-    :param home_domain: The home domain that is expected to be included in the first Manage Data operation's string
+    :param home_domains: The home domain that is expected to be included in the first Manage Data operation's string
         key. If a list is provided, one of the domain names in the array must match.
     :param network_passphrase: The network to connect to for verifying and retrieving
         additional attributes from. (ex. 'Public Global Stellar Network ; September 2015')
@@ -254,7 +254,7 @@ def verify_challenge_transaction_signers(
         raise InvalidSep10ChallengeError("No signers provided.")
 
     te, _, _ = read_challenge_transaction(
-        challenge_transaction, server_account_id, home_domain, network_passphrase
+        challenge_transaction, server_account_id, home_domains, network_passphrase
     )
     server_keypair = Keypair.from_public_key(server_account_id)
 
@@ -309,14 +309,14 @@ def verify_challenge_transaction_signers(
 def verify_challenge_transaction_signed_by_client(
     challenge_transaction: str,
     server_account_id: str,
-    home_domain: Union[str, Iterable[str]],
+    home_domains: Union[str, Iterable[str]],
     network_passphrase: str,
 ) -> None:
     """An alias for :func:`stellar_sdk.sep.stellar_web_authentication.verify_challenge_transaction`.
 
     :param challenge_transaction: SEP0010 transaction challenge transaction in base64.
     :param server_account_id: public key for server's account.
-    :param home_domain: The home domain that is expected to be included in the first Manage Data operation's string
+    :param home_domains: The home domain that is expected to be included in the first Manage Data operation's string
         key. If a list is provided, one of the domain names in the array must match.
     :param network_passphrase: The network to connect to for verifying and retrieving
         additional attributes from. (ex. 'Public Global Stellar Network ; September 2015')
@@ -331,21 +331,21 @@ def verify_challenge_transaction_signed_by_client(
     )  # pragma: no cover
 
     return verify_challenge_transaction_signed_by_client_master_key(
-        challenge_transaction, server_account_id, home_domain, network_passphrase
+        challenge_transaction, server_account_id, home_domains, network_passphrase
     )  # pragma: no cover
 
 
 def verify_challenge_transaction_signed_by_client_master_key(
     challenge_transaction: str,
     server_account_id: str,
-    home_domain: Union[str, Iterable[str]],
+    home_domains: Union[str, Iterable[str]],
     network_passphrase: str,
 ) -> None:
     """An alias for :func:`stellar_sdk.sep.stellar_web_authentication.verify_challenge_transaction`.
 
     :param challenge_transaction: SEP0010 transaction challenge transaction in base64.
     :param server_account_id: public key for server's account.
-    :param home_domain: The home domain that is expected to be included in the first Manage Data operation's string
+    :param home_domains: The home domain that is expected to be included in the first Manage Data operation's string
         key. If a list is provided, one of the domain names in the array must match.
     :param network_passphrase: The network to connect to for verifying and retrieving
         additional attributes from. (ex. 'Public Global Stellar Network ; September 2015')
@@ -355,14 +355,14 @@ def verify_challenge_transaction_signed_by_client_master_key(
     """
 
     return verify_challenge_transaction(
-        challenge_transaction, server_account_id, home_domain, network_passphrase
+        challenge_transaction, server_account_id, home_domains, network_passphrase
     )
 
 
 def verify_challenge_transaction_threshold(
     challenge_transaction: str,
     server_account_id: str,
-    home_domain: Union[str, Iterable[str]],
+    home_domains: Union[str, Iterable[str]],
     network_passphrase: str,
     threshold: int,
     signers: List[Ed25519PublicKeySigner],
@@ -376,7 +376,7 @@ def verify_challenge_transaction_threshold(
 
     :param challenge_transaction: SEP0010 transaction challenge transaction in base64.
     :param server_account_id: public key for server's account.
-    :param home_domain: The home domain that is expected to be included in the first Manage Data operation's string
+    :param home_domains: The home domain that is expected to be included in the first Manage Data operation's string
         key. If a list is provided, one of the domain names in the array must match.
     :param network_passphrase: The network to connect to for verifying and retrieving
         additional attributes from. (ex. 'Public Global Stellar Network ; September 2015')
@@ -391,7 +391,7 @@ def verify_challenge_transaction_threshold(
     signers_found = verify_challenge_transaction_signers(
         challenge_transaction,
         server_account_id,
-        home_domain,
+        home_domains,
         network_passphrase,
         signers,
     )
@@ -408,7 +408,7 @@ def verify_challenge_transaction_threshold(
 def verify_challenge_transaction(
     challenge_transaction: str,
     server_account_id: str,
-    home_domain: Union[str, Iterable[str]],
+    home_domains: Union[str, Iterable[str]],
     network_passphrase: str,
 ) -> None:
     """Verifies if a transaction is a valid
@@ -426,7 +426,7 @@ def verify_challenge_transaction(
 
     :param challenge_transaction: SEP0010 transaction challenge transaction in base64.
     :param server_account_id: public key for server's account.
-    :param home_domain: The home domain that is expected to be included in the first Manage Data operation's string
+    :param home_domains: The home domain that is expected to be included in the first Manage Data operation's string
         key. If a list is provided, one of the domain names in the array must match.
     :param network_passphrase: The network to connect to for verifying and retrieving
         additional attributes from. (ex. 'Public Global Stellar Network ; September 2015')
@@ -435,13 +435,13 @@ def verify_challenge_transaction(
     """
 
     _, client_account_id, _ = read_challenge_transaction(
-        challenge_transaction, server_account_id, home_domain, network_passphrase
+        challenge_transaction, server_account_id, home_domains, network_passphrase
     )
     signers = [Ed25519PublicKeySigner(client_account_id, 255)]
     verify_challenge_transaction_signers(
         challenge_transaction,
         server_account_id,
-        home_domain,
+        home_domains,
         network_passphrase,
         signers,
     )
