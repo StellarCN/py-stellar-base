@@ -1,6 +1,13 @@
 Release History
 ==============
 
+### Version 3.0.0-beta3
+Released on Nov 11, 2020
+
+#### Update
+* feat: updates the SEP-10 utility function parameters and return values to support [SEP-10 v3.0](https://github.com/stellar/stellar-protocol/commit/9d121f98fd2201a5edfe0ed2befe92f4bf88bfe4)  ([#400](https://github.com/StellarCN/py-stellar-base/pull/400))
+* refactor: change the type of Operation.TYPE_CODE from `stellar_sdk.xdr.OperationType` to `str`. ([#401](https://github.com/StellarCN/py-stellar-base/pull/401))
+
 ### Version 3.0.0-beta2
 Released on Nov 07, 2020
 

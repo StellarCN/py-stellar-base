@@ -350,6 +350,11 @@ Operation
    :members:
    :inherited-members:
 
+OperationType
+-------------
+.. autoclass:: stellar_sdk.operation.operation_type.OperationType
+   :members:
+
 AccountMerge
 ------------
 .. autoclass:: stellar_sdk.operation.AccountMerge
