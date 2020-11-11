@@ -26,8 +26,7 @@ class CreateAccount(Operation):
 
     """
 
-    _TYPE: stellar_xdr.OperationType = stellar_xdr.OperationType.CREATE_ACCOUNT
-    TYPE_CODE: str = _TYPE.name
+    TYPE_CODE: stellar_xdr.OperationType = stellar_xdr.OperationType.CREATE_ACCOUNT
 
     def __init__(
         self,
@@ -48,7 +47,7 @@ class CreateAccount(Operation):
         )
         create_account_op = stellar_xdr.CreateAccountOp(destination, starting_balance)
         body = stellar_xdr.OperationBody(
-            type=self._TYPE, create_account_op=create_account_op
+            type=self.TYPE_CODE, create_account_op=create_account_op
         )
         return body
 

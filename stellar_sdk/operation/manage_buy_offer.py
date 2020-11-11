@@ -33,8 +33,7 @@ class ManageBuyOffer(Operation):
 
     """
 
-    _TYPE: stellar_xdr.OperationType = stellar_xdr.OperationType.MANAGE_BUY_OFFER
-    TYPE_CODE: str = _TYPE.name
+    TYPE_CODE: stellar_xdr.OperationType = stellar_xdr.OperationType.MANAGE_BUY_OFFER
 
     def __init__(
         self,
@@ -70,7 +69,7 @@ class ManageBuyOffer(Operation):
         )
 
         body = stellar_xdr.OperationBody(
-            type=self._TYPE, manage_buy_offer_op=manage_buy_offer_op
+            type=self.TYPE_CODE, manage_buy_offer_op=manage_buy_offer_op
         )
         return body
 

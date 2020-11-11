@@ -370,8 +370,7 @@ class CreateClaimableBalance(Operation):
     :param claimants: A list of Claimants.
     :param source: The source account (defaults to transaction source).
     """
-    _TYPE: stellar_xdr.OperationType = stellar_xdr.OperationType.CREATE_CLAIMABLE_BALANCE
-    TYPE_CODE: str = _TYPE.name
+    TYPE_CODE: stellar_xdr.OperationType = stellar_xdr.OperationType.CREATE_CLAIMABLE_BALANCE
 
     def __init__(
         self,
@@ -394,7 +393,7 @@ class CreateClaimableBalance(Operation):
             asset=asset, amount=stellar_xdr.Int64(amount), claimants=claimants
         )
         body = stellar_xdr.OperationBody(
-            type=self._TYPE,
+            type=self.TYPE_CODE,
             create_claimable_balance_op=create_claimable_balance_op,
         )
         return body

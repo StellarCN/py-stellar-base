@@ -47,8 +47,7 @@ class AllowTrust(Operation):
 
     """
 
-    _TYPE: stellar_xdr.OperationType = stellar_xdr.OperationType.ALLOW_TRUST
-    TYPE_CODE: str = _TYPE.name
+    TYPE_CODE: stellar_xdr.OperationType = stellar_xdr.OperationType.ALLOW_TRUST
 
     def __init__(
         self,
@@ -92,7 +91,7 @@ class AllowTrust(Operation):
             )
         allow_trust_op = stellar_xdr.AllowTrustOp(trustor, asset, authorize)
         body = stellar_xdr.OperationBody(
-            type=self._TYPE, allow_trust_op=allow_trust_op
+            type=self.TYPE_CODE, allow_trust_op=allow_trust_op
         )
         return body
 

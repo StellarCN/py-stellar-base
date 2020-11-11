@@ -18,8 +18,7 @@ class BumpSequence(Operation):
 
     """
 
-    _TYPE: stellar_xdr.OperationType = stellar_xdr.OperationType.BUMP_SEQUENCE
-    TYPE_CODE: str = _TYPE.name
+    TYPE_CODE: stellar_xdr.OperationType = stellar_xdr.OperationType.BUMP_SEQUENCE
 
     def __init__(self, bump_to: int, source: str = None) -> None:
         super().__init__(source)
@@ -29,7 +28,7 @@ class BumpSequence(Operation):
         sequence = stellar_xdr.SequenceNumber(stellar_xdr.Int64(self.bump_to))
         bump_sequence_op = stellar_xdr.BumpSequenceOp(sequence)
         body = stellar_xdr.OperationBody(
-            type=self._TYPE, bump_sequence_op=bump_sequence_op
+            type=self.TYPE_CODE, bump_sequence_op=bump_sequence_op
         )
         return body
 

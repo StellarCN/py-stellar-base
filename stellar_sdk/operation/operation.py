@@ -46,13 +46,8 @@ class Operation(metaclass=ABCMeta):
 
     @property
     @abstractmethod
-    def _TYPE(self) -> stellar_xdr.OperationType:
-        pass  # pragma: no cover
-
-    @property
-    @abstractmethod
-    def TYPE_CODE(self) -> str:
-        pass  # pragma: no cover
+    def TYPE_CODE(self) -> stellar_xdr.OperationType:
+        pass
 
     @property
     def source(self) -> Optional[str]:
@@ -149,7 +144,7 @@ class Operation(metaclass=ABCMeta):
             subclass) instance from.
         """
         for sub_cls in cls.__subclasses__():
-            if sub_cls._TYPE == xdr_object.body.type:
+            if sub_cls.TYPE_CODE == xdr_object.body.type:
                 return sub_cls.from_xdr_object(xdr_object)
         raise NotImplementedError(
             f"Operation of type={xdr_object.body.type} is not implemented."
