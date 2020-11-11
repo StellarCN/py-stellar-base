@@ -1,5 +1,30 @@
 Release History
 ==============
+
+### Version 2.9.0
+
+Released on Nov 11, 2020
+
+**This update include breaking changes**
+
+#### Breaking changes
+* Updates the SEP-10 utility function parameters and return values to support [SEP-10 v3.0](https://github.com/stellar/stellar-protocol/commit/9d121f98fd2201a5edfe0ed2befe92f4bf88bfe4)
+
+    - The following functions replaced the `domain_name` parameter with `home_domains`:
+
+        - `stellar_sdk.sep.stellar_web_authentication.read_challenge_transaction()`
+        - `stellar_sdk.sep.stellar_web_authentication.verify_challenge_transaction_signers()`
+        - `stellar_sdk.sep.stellar_web_authentication.verify_challenge_transaction_signed_by_client()`
+        - `stellar_sdk.sep.stellar_web_authentication.verify_challenge_transaction_signed_by_client_master_key()`
+        - `stellar_sdk.sep.stellar_web_authentication.verify_challenge_transaction_threshold()`
+        - `stellar_sdk.sep.stellar_web_authentication.verify_challenge_transaction()`
+
+    - The following function replaced the `domain_name` parameter with `home_domain`:
+        - `stellar_sdk.sep.stellar_web_authentication.build_challenge_transaction()`
+
+    - `stellar_sdk.sep.stellar_web_authentication.read_challenge_transaction()` now returns an additional object attribute, `matched_home_domain`
+
+
 ### Version 2.8.1
 
 Released on Oct 15, 2020
