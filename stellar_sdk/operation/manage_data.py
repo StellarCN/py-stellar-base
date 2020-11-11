@@ -1,6 +1,7 @@
 from typing import Union
 
 from .operation import Operation
+from .operation_type import OperationType
 from .. import xdr as stellar_xdr
 from ..exceptions import ValueError
 
@@ -26,7 +27,7 @@ class ManageData(Operation):
     """
 
     _TYPE: stellar_xdr.OperationType = stellar_xdr.OperationType.MANAGE_DATA
-    TYPE_CODE: str = _TYPE.name
+    TYPE: OperationType = OperationType.MANAGE_DATA
 
     def __init__(
         self, data_name: str, data_value: Union[str, bytes, None], source: str = None,

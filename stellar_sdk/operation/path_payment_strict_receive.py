@@ -2,6 +2,7 @@ from decimal import Decimal
 from typing import List, Union, Optional
 
 from .operation import Operation
+from .operation_type import OperationType
 from .utils import check_amount, check_ed25519_public_key
 from .. import xdr as stellar_xdr
 from ..asset import Asset
@@ -29,7 +30,7 @@ class PathPaymentStrictReceive(Operation):
         transaction's source account.
     """
     _TYPE: stellar_xdr.OperationType = stellar_xdr.OperationType.PATH_PAYMENT_STRICT_RECEIVE
-    TYPE_CODE: str = _TYPE.name
+    TYPE: OperationType = OperationType.PATH_PAYMENT_STRICT_RECEIVE
 
     def __init__(
         self,

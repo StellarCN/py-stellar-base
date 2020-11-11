@@ -1,4 +1,5 @@
 from .operation import Operation
+from .operation_type import OperationType
 from .utils import check_ed25519_public_key
 from .. import xdr as stellar_xdr
 from ..keypair import Keypair
@@ -22,7 +23,7 @@ class BeginSponsoringFutureReserves(Operation):
     """
 
     _TYPE: stellar_xdr.OperationType = stellar_xdr.OperationType.BEGIN_SPONSORING_FUTURE_RESERVES
-    TYPE_CODE: str = _TYPE.name
+    TYPE: OperationType = OperationType.BEGIN_SPONSORING_FUTURE_RESERVES
 
     def __init__(self, sponsored_id: str, source: str = None) -> None:
         super().__init__(source)

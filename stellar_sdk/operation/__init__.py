@@ -1,3 +1,5 @@
+from enum import IntEnum
+
 from .account_merge import AccountMerge
 from .allow_trust import AllowTrust, TrustLineEntryFlag
 from .begin_sponsoring_future_reserves import BeginSponsoringFutureReserves
@@ -13,6 +15,7 @@ from .manage_buy_offer import ManageBuyOffer
 from .manage_data import ManageData
 from .manage_sell_offer import ManageSellOffer
 from .operation import Operation
+from .operation_type import OperationType
 from .path_payment_strict_receive import PathPaymentStrictReceive
 from .path_payment_strict_send import PathPaymentStrictSend
 from .payment import Payment
@@ -44,4 +47,5 @@ __all__ = [
     "RevokeSponsorship",
     "TrustLineEntryFlag",
     "Flag",  # TODO: act like TrustLineEntryFlag
+    "OperationType"
 ]

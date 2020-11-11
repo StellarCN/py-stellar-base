@@ -2,6 +2,7 @@ from decimal import Decimal
 from typing import Union
 
 from .operation import Operation
+from .operation_type import OperationType
 from .utils import check_amount
 from .. import xdr as stellar_xdr
 from ..asset import Asset
@@ -27,7 +28,7 @@ class ChangeTrust(Operation):
     _DEFAULT_LIMIT = "922337203685.4775807"
 
     _TYPE: stellar_xdr.OperationType = stellar_xdr.OperationType.CHANGE_TRUST
-    TYPE_CODE: str = _TYPE.name
+    TYPE: OperationType = OperationType.CHANGE_TRUST
 
     def __init__(
         self, asset: Asset, limit: Union[str, Decimal] = None, source: str = None,

@@ -2,6 +2,7 @@ from decimal import Decimal
 from typing import Union, Optional
 
 from .operation import Operation
+from .operation_type import OperationType
 from .utils import check_amount, check_ed25519_public_key
 from .. import xdr as stellar_xdr
 from ..asset import Asset
@@ -25,7 +26,8 @@ class Payment(Operation):
 
     """
     _TYPE: stellar_xdr.OperationType = stellar_xdr.OperationType.PAYMENT
-    TYPE_CODE: str = _TYPE.name
+    TYPE: OperationType = OperationType.PAYMENT
+
 
     def __init__(
         self,

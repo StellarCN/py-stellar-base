@@ -3,6 +3,7 @@ from abc import ABCMeta, abstractmethod
 from decimal import Decimal, Context, Inexact
 from typing import Optional, Union
 
+from .operation_type import OperationType
 from .utils import check_source
 from .. import xdr as stellar_xdr
 from ..exceptions import ValueError, TypeError
@@ -51,7 +52,7 @@ class Operation(metaclass=ABCMeta):
 
     @property
     @abstractmethod
-    def TYPE_CODE(self) -> str:
+    def TYPE(self) -> OperationType:
         pass  # pragma: no cover
 
     @property

@@ -4,6 +4,7 @@ from enum import IntEnum
 from typing import Optional
 
 from .operation import Operation
+from .operation_type import OperationType
 from .utils import check_ed25519_public_key
 from .. import xdr as stellar_xdr
 from ..asset import Asset
@@ -114,7 +115,7 @@ class RevokeSponsorship(Operation):
     :param source: The source account (defaults to transaction source).
     """
     _TYPE: stellar_xdr.OperationType = stellar_xdr.OperationType.REVOKE_SPONSORSHIP
-    TYPE_CODE: str = _TYPE.name
+    TYPE: OperationType = OperationType.REVOKE_SPONSORSHIP
 
     def __init__(
         self,

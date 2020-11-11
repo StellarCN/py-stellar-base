@@ -2,6 +2,7 @@ import base64
 import binascii
 
 from .operation import Operation
+from .operation_type import OperationType
 from .. import xdr as stellar_xdr
 
 
@@ -21,7 +22,7 @@ class ClaimClaimableBalance(Operation):
     """
 
     _TYPE: stellar_xdr.OperationType = stellar_xdr.OperationType.CLAIM_CLAIMABLE_BALANCE
-    TYPE_CODE: str = _TYPE.name
+    TYPE: OperationType = OperationType.CLAIM_CLAIMABLE_BALANCE
 
     def __init__(self, balance_id: str, source: str = None,) -> None:
         super().__init__(source)

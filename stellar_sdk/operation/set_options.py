@@ -2,6 +2,7 @@ from enum import IntFlag
 from typing import Optional, Union
 
 from .operation import Operation
+from .operation_type import OperationType
 from .utils import check_ed25519_public_key
 from .. import xdr as stellar_xdr
 from ..keypair import Keypair
@@ -68,7 +69,7 @@ class SetOptions(Operation):
 
     """
     _TYPE: stellar_xdr.OperationType = stellar_xdr.OperationType.SET_OPTIONS
-    TYPE_CODE: str = _TYPE.name
+    TYPE: OperationType = OperationType.SET_OPTIONS
 
     def __init__(
         self,

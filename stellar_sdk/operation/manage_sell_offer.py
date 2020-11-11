@@ -2,6 +2,7 @@ from decimal import Decimal
 from typing import Union
 
 from .operation import Operation
+from .operation_type import OperationType
 from .utils import check_price, check_amount
 from .. import xdr as stellar_xdr
 from ..asset import Asset
@@ -34,7 +35,7 @@ class ManageSellOffer(Operation):
     """
 
     _TYPE: stellar_xdr.OperationType = stellar_xdr.OperationType.MANAGE_SELL_OFFER
-    TYPE_CODE: str = _TYPE.name
+    TYPE: OperationType = OperationType.MANAGE_SELL_OFFER
 
     def __init__(
         self,

@@ -38,8 +38,7 @@ from stellar_sdk.operation.utils import (
 from stellar_sdk.signer import Signer
 from stellar_sdk.signer_key import SignerKey
 from stellar_sdk.utils import sha256
-from stellar_sdk import xdr as stellar_xdr
-
+from stellar_sdk.operation.operation_type import OperationType
 
 class TestBaseOperation:
     @pytest.mark.parametrize(
@@ -138,7 +137,7 @@ class TestBaseOperation:
 
 class TestCreateAccount:
     def test_type_code(self):
-        assert CreateAccount.TYPE_CODE == "CREATE_ACCOUNT"
+        assert CreateAccount.TYPE == OperationType.CREATE_ACCOUNT
 
     def test_to_xdr_obj(self):
         source = "GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV"
@@ -204,7 +203,7 @@ class TestCreateAccount:
 
 class TestBumpSequence:
     def test_type_code(self):
-        assert BumpSequence.TYPE_CODE == "BUMP_SEQUENCE"
+        assert BumpSequence.TYPE == OperationType.BUMP_SEQUENCE
 
     def test_to_xdr_obj(self):
         bump_to = 114514
@@ -228,7 +227,7 @@ class TestBumpSequence:
 
 class TestInflation:
     def test_type_code(self):
-        assert Inflation.TYPE_CODE == "INFLATION"
+        assert Inflation.TYPE == OperationType.INFLATION
 
     def test_to_xdr_obj(self):
         source = "GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV"
@@ -248,7 +247,7 @@ class TestInflation:
 
 class TestAccountMerge:
     def test_type_code(self):
-        assert AccountMerge.TYPE_CODE == "ACCOUNT_MERGE"
+        assert AccountMerge.TYPE == OperationType.ACCOUNT_MERGE
 
     def test_to_xdr_obj(self):
         source = "GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV"
@@ -286,7 +285,7 @@ class TestAccountMerge:
 
 class TestChangeTrust:
     def test_type_code(self):
-        assert ChangeTrust.TYPE_CODE == "CHANGE_TRUST"
+        assert ChangeTrust.TYPE == OperationType.CHANGE_TRUST
 
     @pytest.mark.parametrize(
         "limit, xdr",
@@ -329,7 +328,7 @@ class TestChangeTrust:
 
 class TestClaimClaimableBalance:
     def test_type_code(self):
-        assert ClaimClaimableBalance.TYPE_CODE == "CLAIM_CLAIMABLE_BALANCE"
+        assert ClaimClaimableBalance.TYPE == OperationType.CLAIM_CLAIMABLE_BALANCE
 
     def test_to_xdr_obj(self):
         source = "GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV"
@@ -358,7 +357,7 @@ class TestClaimClaimableBalance:
 
 class TestPayment:
     def test_type_code(self):
-        assert Payment.TYPE_CODE == "PAYMENT"
+        assert Payment.TYPE == OperationType.PAYMENT
 
     def test_to_xdr_obj(self):
         source = "GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV"
@@ -420,7 +419,7 @@ class TestPayment:
 
 class TestPathPaymentStrictReceive:
     def test_type_code(self):
-        assert PathPaymentStrictReceive.TYPE_CODE == "PATH_PAYMENT_STRICT_RECEIVE"
+        assert PathPaymentStrictReceive.TYPE == OperationType.PATH_PAYMENT_STRICT_RECEIVE
 
     def test_to_xdr_obj(self):
         source = "GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV"
@@ -525,7 +524,7 @@ class TestPathPaymentStrictReceive:
 
 class TestPathPaymentStrictSend:
     def test_type_code(self):
-        assert PathPaymentStrictSend.TYPE_CODE == "PATH_PAYMENT_STRICT_SEND"
+        assert PathPaymentStrictSend.TYPE == OperationType.PATH_PAYMENT_STRICT_SEND
 
     def test_to_xdr_obj(self):
         source = "GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV"
@@ -630,7 +629,7 @@ class TestPathPaymentStrictSend:
 
 class TestAllowTrust:
     def test_type_code(self):
-        assert AllowTrust.TYPE_CODE == "ALLOW_TRUST"
+        assert AllowTrust.TYPE == OperationType.ALLOW_TRUST
 
     @pytest.mark.parametrize(
         "authorize, xdr",
@@ -689,7 +688,7 @@ class TestAllowTrust:
 
 class TestManageData:
     def test_type_code(self):
-        assert ManageData.TYPE_CODE == "MANAGE_DATA"
+        assert ManageData.TYPE == OperationType.MANAGE_DATA
 
     @pytest.mark.parametrize(
         "name, value, xdr",
@@ -759,7 +758,7 @@ class TestSetOptions:
     AUTHORIZATION_IMMUTABLE = 4
 
     def test_type_code(self):
-        assert SetOptions.TYPE_CODE == "SET_OPTIONS"
+        assert SetOptions.TYPE == OperationType.SET_OPTIONS
 
     @pytest.mark.parametrize(
         "inflation_dest, clear_flags, set_flags, master_weight, low_threshold, med_threshold, high_threshold, home_domain, signer, source, xdr",
@@ -878,7 +877,7 @@ class TestSetOptions:
 
 class TestManageSellOffer:
     def test_type_code(self):
-        assert ManageSellOffer.TYPE_CODE == "MANAGE_SELL_OFFER"
+        assert ManageSellOffer.TYPE == OperationType.MANAGE_SELL_OFFER
 
     @pytest.mark.parametrize(
         "selling, buying, amount, price, offer_id, source, xdr",
@@ -940,7 +939,7 @@ class TestManageSellOffer:
 
 class TestManageBuyOffer:
     def test_type_code(self):
-        assert ManageBuyOffer.TYPE_CODE == "MANAGE_BUY_OFFER"
+        assert ManageBuyOffer.TYPE == OperationType.MANAGE_BUY_OFFER
 
     @pytest.mark.parametrize(
         "selling, buying, amount, price, offer_id, source, xdr",
@@ -1002,7 +1001,7 @@ class TestManageBuyOffer:
 
 class TestCreatePassiveSellOffer:
     def test_type_code(self):
-        assert CreatePassiveSellOffer.TYPE_CODE == "CREATE_PASSIVE_SELL_OFFER"
+        assert CreatePassiveSellOffer.TYPE == OperationType.CREATE_PASSIVE_SELL_OFFER
 
     @pytest.mark.parametrize(
         "selling, buying, amount, price, source, xdr",
@@ -1221,7 +1220,7 @@ class TestOperationUtils:
 
 class TestBeginSponsoringFutureReserves:
     def test_type_code(self):
-        assert BeginSponsoringFutureReserves.TYPE_CODE == "BEGIN_SPONSORING_FUTURE_RESERVES"
+        assert BeginSponsoringFutureReserves.TYPE == OperationType.BEGIN_SPONSORING_FUTURE_RESERVES
 
     def test_xdr(self):
         source = "GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV"
@@ -1248,7 +1247,7 @@ class TestBeginSponsoringFutureReserves:
 
 class TestEndSponsoringFutureReserves:
     def test_type_code(self):
-        assert EndSponsoringFutureReserves.TYPE_CODE == "END_SPONSORING_FUTURE_RESERVES"
+        assert EndSponsoringFutureReserves.TYPE == OperationType.END_SPONSORING_FUTURE_RESERVES
 
     def test_xdr(self):
         source = "GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV"
@@ -1273,7 +1272,7 @@ class TestEndSponsoringFutureReserves:
 
 class TestRevokeSponsorship:
     def test_type_code(self):
-        assert RevokeSponsorship.TYPE_CODE == "REVOKE_SPONSORSHIP"
+        assert RevokeSponsorship.TYPE == OperationType.REVOKE_SPONSORSHIP
 
     def test_account_xdr(self):
         source = "GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV"
@@ -1521,7 +1520,7 @@ class TestClaimant:
 
 class TestCreateClaimableBalance:
     def test_type_code(self):
-        assert CreateClaimableBalance.TYPE_CODE == "CREATE_CLAIMABLE_BALANCE"
+        assert CreateClaimableBalance.TYPE == OperationType.CREATE_CLAIMABLE_BALANCE
 
     def test_xdr(self):
         xdr = "AAAAAQAAAADX7fRsY6KTqIc8EIDyr8M9gxGPW6ODnZoZDgo6l1ymwwAAAA4AAAAAAAAAAEqTzAAAAAADAAAAAAAAAACJmyhA7VY2xW3cXxSyOXX3nxuiOI0mlOTFbs3dyWDl7wAAAAEAAAACAAAAAQAAAAIAAAAEAAAAAF9eEAAAAAAAAAAAAgAAAAIAAAAFAAAAAAAAw1AAAAADAAAAAQAAAAQAAAAAZVPxAAAAAAAAAAAAYyi+wCa8rss9LBoofzuttQ+74vczrrbpvZfDhNL/7/EAAAAAAAAAAAAAAACuYyIkw8jWz2vBYj6jUhgWWzNtUpaID2NifbYvrdlNxwAAAAQAAAAAX3NKog=="
@@ -1566,3 +1565,4 @@ class TestCreateClaimableBalance:
             Operation.from_xdr_object(op.to_xdr_object()).to_xdr_object().to_xdr()
             == xdr
         )
+

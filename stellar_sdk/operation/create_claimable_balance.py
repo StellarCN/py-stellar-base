@@ -3,6 +3,7 @@ from enum import IntEnum
 from typing import Union, List, Optional
 
 from .operation import Operation
+from .operation_type import OperationType
 from .utils import check_amount
 from .. import xdr as stellar_xdr
 from ..asset import Asset
@@ -371,7 +372,7 @@ class CreateClaimableBalance(Operation):
     :param source: The source account (defaults to transaction source).
     """
     _TYPE: stellar_xdr.OperationType = stellar_xdr.OperationType.CREATE_CLAIMABLE_BALANCE
-    TYPE_CODE: str = _TYPE.name
+    TYPE: OperationType = OperationType.CREATE_CLAIMABLE_BALANCE
 
     def __init__(
         self,
