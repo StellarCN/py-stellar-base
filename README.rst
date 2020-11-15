@@ -21,7 +21,7 @@ Stellar Python SDK
     :alt: PyPI
     :target: https://pypi.python.org/pypi/stellar-sdk
 
-.. image:: https://img.shields.io/badge/python-3.6%20%7C%203.7%20%7C%203.8-blue?style=flat-square
+.. image:: https://img.shields.io/badge/python-3.6%20%7C%203.7%20%7C%203.8%20%7C%203.9-blue?style=flat-square
     :alt: Python - Version
     :target: https://pypi.python.org/pypi/stellar-sdk
 
@@ -29,13 +29,13 @@ Stellar Python SDK
     :alt: PyPI - Implementation
     :target: https://pypi.python.org/pypi/stellar-sdk
 
-.. image:: https://img.shields.io/badge/Stellar%20Protocol-14-blue?style=flat-square
+.. image:: https://img.shields.io/badge/Stellar%20Protocol-15-blue?style=flat-square
     :alt: Stellar Protocol
     :target: https://www.stellar.org/developers/guides/concepts/scp.html
 
-.. image:: https://img.shields.io/badge/Horizon%20Version-1.9.0-blue?style=flat-square
+.. image:: https://img.shields.io/badge/Horizon%20Version-1.11.1-blue?style=flat-square
     :alt: Horizon Version
-    :target: https://github.com/stellar/go/releases/tag/horizon-v1.9.0
+    :target: https://github.com/stellar/go/releases/tag/horizon-v1.11.1
 
 py-stellar-sdk is a Python library for communicating with
 a `Stellar Horizon server`_. It is used for building Stellar apps on Python. It supports **Python 3.6+** as
@@ -57,7 +57,7 @@ Install and update using `pipenv`_ or `pip`_:
 
 .. code-block:: text
 
-    pip install stellar-sdk==2.9.0
+    pip install stellar-sdk==2.10.0
 
 
 A Simple Example

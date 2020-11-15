@@ -1,6 +1,16 @@
 Release History
 ==============
 
+### Version 2.10.0
+
+Released on Nov 15, 2020
+
+**This update include breaking changes**
+
+#### Breaking changes
+* feat: check the mnemonic is correct before using it to generate the seed. ([#406](https://github.com/StellarCN/py-stellar-base/pull/406))
+    - A parameter named `language` is added to `stellar_sdk.keypair.Keypair.from_mnemonic_phrase()`.
+
 ### Version 2.9.0
 
 Released on Nov 11, 2020
@@ -8,7 +18,7 @@ Released on Nov 11, 2020
 **This update include breaking changes**
 
 #### Breaking changes
-* Updates the SEP-10 utility function parameters and return values to support [SEP-10 v3.0](https://github.com/stellar/stellar-protocol/commit/9d121f98fd2201a5edfe0ed2befe92f4bf88bfe4)
+* Updates the SEP-10 utility function parameters and return values to support [SEP-10 v3.0](https://github.com/stellar/stellar-protocol/commit/9d121f98fd2201a5edfe0ed2befe92f4bf88bfe4) ([#400](https://github.com/StellarCN/py-stellar-base/pull/400))
 
     - The following functions replaced the `domain_name` parameter with `home_domains`:
 
