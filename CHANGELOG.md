@@ -1,6 +1,12 @@
 Release History
 ==============
 
+### Version 2.10.1-beta0
+Released on Dec 22, 2020
+
+#### Update
+* Upgrade dependencies so that this SDK can run on Apple M1 Chip.
+
 ### Version 2.10.0
 
 Released on Nov 15, 2020
