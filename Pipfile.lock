@@ -33,11 +33,11 @@
         },
         "aiohttp-sse-client": {
             "hashes": [
-                "sha256:90704f9c7f28447b61687ab2df2340c38cfa5549ecf51c620fddf0a39fbf37ef",
-                "sha256:9636d02e0efc9475e46f0bf2df2d35219c7fd1118c7c4812c31474020728d763"
+                "sha256:e78139c8fdae83310eec9d2c600786d7472fea798dc4db39833381c043204301",
+                "sha256:fb8b5815086f3164abcb95665505e8c486fe388e683ba4081431c0305a1a3eda"
             ],
             "index": "pypi",
-            "version": "==0.1.7"
+            "version": "==0.2.0"
         },
         "async-timeout": {
             "hashes": [
