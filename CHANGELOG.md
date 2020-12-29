@@ -1,6 +1,12 @@
 Release History
 ==============
 
+### Version 3.0.0-beta4
+Released on Dec 29, 2020
+
+#### Update
+* Upgrade dependencies.
+
 ### Version 3.0.0-beta3
 Released on Nov 11, 2020
 
