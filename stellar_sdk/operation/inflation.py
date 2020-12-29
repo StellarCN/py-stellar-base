@@ -15,14 +15,14 @@ class Inflation(Operation):
 
     """
 
-    _TYPE: stellar_xdr.OperationType = stellar_xdr.OperationType.INFLATION
+    _XDR_TYPE: stellar_xdr.OperationType = stellar_xdr.OperationType.INFLATION
     TYPE: OperationType = OperationType.INFLATION
 
     def __init__(self, source: str = None) -> None:
         super().__init__(source)
 
     def _to_operation_body(self) -> stellar_xdr.OperationBody:
-        body = stellar_xdr.OperationBody(type=self._TYPE)
+        body = stellar_xdr.OperationBody(type=self._XDR_TYPE)
         return body
 
     @classmethod

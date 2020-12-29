@@ -22,7 +22,7 @@ class AccountMerge(Operation):
 
     """
 
-    _TYPE: stellar_xdr.OperationType = stellar_xdr.OperationType.ACCOUNT_MERGE
+    _XDR_TYPE: stellar_xdr.OperationType = stellar_xdr.OperationType.ACCOUNT_MERGE
     TYPE: OperationType = OperationType.ACCOUNT_MERGE
 
     def __init__(self, destination: str, source: str = None,) -> None:
@@ -46,7 +46,7 @@ class AccountMerge(Operation):
             destination = self._destination_muxed
         else:
             destination = Keypair.from_public_key(self._destination).xdr_muxed_account()
-        body = stellar_xdr.OperationBody(type=self._TYPE, destination=destination)
+        body = stellar_xdr.OperationBody(type=self._XDR_TYPE, destination=destination)
         return body
 
     @classmethod

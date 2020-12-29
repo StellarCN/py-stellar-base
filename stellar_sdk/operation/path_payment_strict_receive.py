@@ -29,7 +29,7 @@ class PathPaymentStrictReceive(Operation):
     :param source: The source account for the payment. Defaults to the
         transaction's source account.
     """
-    _TYPE: stellar_xdr.OperationType = stellar_xdr.OperationType.PATH_PAYMENT_STRICT_RECEIVE
+    _XDR_TYPE: stellar_xdr.OperationType = stellar_xdr.OperationType.PATH_PAYMENT_STRICT_RECEIVE
     TYPE: OperationType = OperationType.PATH_PAYMENT_STRICT_RECEIVE
 
     def __init__(
@@ -82,7 +82,7 @@ class PathPaymentStrictReceive(Operation):
             path,
         )
         body = stellar_xdr.OperationBody(
-            type=self._TYPE,
+            type=self._XDR_TYPE,
             path_payment_strict_receive_op=path_payment_strict_receive_op,
         )
         return body

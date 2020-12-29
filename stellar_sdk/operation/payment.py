@@ -25,7 +25,7 @@ class Payment(Operation):
         transaction's source account.
 
     """
-    _TYPE: stellar_xdr.OperationType = stellar_xdr.OperationType.PAYMENT
+    _XDR_TYPE: stellar_xdr.OperationType = stellar_xdr.OperationType.PAYMENT
     TYPE: OperationType = OperationType.PAYMENT
 
 
@@ -62,7 +62,7 @@ class Payment(Operation):
             destination = Keypair.from_public_key(self._destination).xdr_muxed_account()
         amount = stellar_xdr.Int64(Operation.to_xdr_amount(self.amount))
         payment_op = stellar_xdr.PaymentOp(destination, asset, amount)
-        body = stellar_xdr.OperationBody(type=self._TYPE, payment_op=payment_op)
+        body = stellar_xdr.OperationBody(type=self._XDR_TYPE, payment_op=payment_op)
         return body
 
     @classmethod

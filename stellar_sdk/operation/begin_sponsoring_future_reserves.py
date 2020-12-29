@@ -22,7 +22,7 @@ class BeginSponsoringFutureReserves(Operation):
     :param source: The source account (defaults to transaction source).
     """
 
-    _TYPE: stellar_xdr.OperationType = stellar_xdr.OperationType.BEGIN_SPONSORING_FUTURE_RESERVES
+    _XDR_TYPE: stellar_xdr.OperationType = stellar_xdr.OperationType.BEGIN_SPONSORING_FUTURE_RESERVES
     TYPE: OperationType = OperationType.BEGIN_SPONSORING_FUTURE_RESERVES
 
     def __init__(self, sponsored_id: str, source: str = None) -> None:
@@ -36,7 +36,7 @@ class BeginSponsoringFutureReserves(Operation):
             sponsored_id=sponsored_id
         )
         body = stellar_xdr.OperationBody(
-            type=self._TYPE,
+            type=self._XDR_TYPE,
             begin_sponsoring_future_reserves_op=begin_sponsoring_future_reserves_op,
         )
         return body

@@ -26,7 +26,7 @@ class ManageData(Operation):
 
     """
 
-    _TYPE: stellar_xdr.OperationType = stellar_xdr.OperationType.MANAGE_DATA
+    _XDR_TYPE: stellar_xdr.OperationType = stellar_xdr.OperationType.MANAGE_DATA
     TYPE: OperationType = OperationType.MANAGE_DATA
 
     def __init__(
@@ -54,7 +54,7 @@ class ManageData(Operation):
         manage_data_op = stellar_xdr.ManageDataOp(data_name, data_value)
 
         body = stellar_xdr.OperationBody(
-            type=self._TYPE, manage_data_op=manage_data_op
+            type=self._XDR_TYPE, manage_data_op=manage_data_op
         )
         return body
 
