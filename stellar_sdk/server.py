@@ -1,6 +1,5 @@
 from typing import Union, Coroutine, Any, Dict, List, Tuple, Generator
 
-from . import xdr as stellar_xdr
 from .account import Account, Thresholds
 from .asset import Asset
 from .base_transaction_envelope import BaseTransactionEnvelope
@@ -14,6 +13,7 @@ from .call_builder.ledgers_call_builder import LedgersCallBuilder
 from .call_builder.offers_call_builder import OffersCallBuilder
 from .call_builder.operations_call_builder import OperationsCallBuilder
 from .call_builder.orderbook_call_builder import OrderbookCallBuilder
+from .call_builder.payments_call_builder import PaymentsCallBuilder
 from .call_builder.root_call_builder import RootCallBuilder
 from .call_builder.strict_receive_paths_call_builder import (
     StrictReceivePathsCallBuilder,
@@ -296,6 +296,13 @@ class Server:
             source_amount=source_amount,
             destination=destination,
         )
+
+    def payments(self) -> PaymentsCallBuilder:
+        """
+        :return: New :class:`stellar_sdk.call_builder.PaymentsCallBuilder` object configured by
+            a current Horizon server configuration.
+        """
+        return PaymentsCallBuilder(horizon_url=self.horizon_url, client=self._client)
 
     def trade_aggregations(
         self,

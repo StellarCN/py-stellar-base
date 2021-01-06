@@ -14,6 +14,7 @@ from stellar_sdk.call_builder.ledgers_call_builder import LedgersCallBuilder
 from stellar_sdk.call_builder.offers_call_builder import OffersCallBuilder
 from stellar_sdk.call_builder.operations_call_builder import OperationsCallBuilder
 from stellar_sdk.call_builder.orderbook_call_builder import OrderbookCallBuilder
+from stellar_sdk.call_builder.payments_call_builder import PaymentsCallBuilder
 from stellar_sdk.call_builder.root_call_builder import RootCallBuilder
 from stellar_sdk.call_builder.strict_receive_paths_call_builder import (
     StrictReceivePathsCallBuilder,
@@ -119,6 +120,7 @@ class TestServer:
             ) == StrictSendPathsCallBuilder(
                 horizon_url, client, source_asset, source_amount, destination
             )
+            assert server.payments() == PaymentsCallBuilder(horizon_url, client)
             assert server.root() == RootCallBuilder(horizon_url, client)
             base = Asset.native()
             counter = Asset(
