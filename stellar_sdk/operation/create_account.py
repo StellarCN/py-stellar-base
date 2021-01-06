@@ -2,7 +2,6 @@ from decimal import Decimal
 from typing import Union
 
 from .operation import Operation
-from .operation_type import OperationType
 from .utils import check_ed25519_public_key, check_amount
 from .. import xdr as stellar_xdr
 from ..keypair import Keypair
@@ -27,8 +26,7 @@ class CreateAccount(Operation):
 
     """
 
-    _XDR_TYPE: stellar_xdr.OperationType = stellar_xdr.OperationType.CREATE_ACCOUNT
-    TYPE: OperationType = OperationType.CREATE_ACCOUNT
+    _XDR_OPERATION_TYPE: stellar_xdr.OperationType = stellar_xdr.OperationType.CREATE_ACCOUNT
 
     def __init__(
         self,
@@ -49,20 +47,20 @@ class CreateAccount(Operation):
         )
         create_account_op = stellar_xdr.CreateAccountOp(destination, starting_balance)
         body = stellar_xdr.OperationBody(
-            type=self._XDR_TYPE, create_account_op=create_account_op
+            type=self._XDR_OPERATION_TYPE, create_account_op=create_account_op
         )
         return body
 
     @classmethod
-    def from_xdr_object(
-        cls, xdr_object: stellar_xdr.Operation
-    ) -> "CreateAccount":
+    def from_xdr_object(cls, xdr_object: stellar_xdr.Operation) -> "CreateAccount":
         """Creates a :class:`CreateAccount` object from an XDR Operation object.
 
         """
         source = Operation.get_source_from_xdr_obj(xdr_object)
         assert xdr_object.body.create_account_op is not None
-        assert xdr_object.body.create_account_op.destination.account_id.ed25519 is not None
+        assert (
+            xdr_object.body.create_account_op.destination.account_id.ed25519 is not None
+        )
         destination = StrKey.encode_ed25519_public_key(
             xdr_object.body.create_account_op.destination.account_id.ed25519.uint256
         )

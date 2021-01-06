@@ -2,7 +2,6 @@ import base64
 import binascii
 
 from .operation import Operation
-from .operation_type import OperationType
 from .. import xdr as stellar_xdr
 
 
@@ -21,8 +20,7 @@ class ClaimClaimableBalance(Operation):
     :param source: The source account (defaults to transaction source).
     """
 
-    _XDR_TYPE: stellar_xdr.OperationType = stellar_xdr.OperationType.CLAIM_CLAIMABLE_BALANCE
-    TYPE: OperationType = OperationType.CLAIM_CLAIMABLE_BALANCE
+    _XDR_OPERATION_TYPE: stellar_xdr.OperationType = stellar_xdr.OperationType.CLAIM_CLAIMABLE_BALANCE
 
     def __init__(self, balance_id: str, source: str = None,) -> None:
         super().__init__(source)
@@ -35,7 +33,8 @@ class ClaimClaimableBalance(Operation):
             balance_id=balance_id
         )
         body = stellar_xdr.OperationBody(
-            type=self._XDR_TYPE, claim_claimable_balance_op=claim_claimable_balance_op
+            type=self._XDR_OPERATION_TYPE,
+            claim_claimable_balance_op=claim_claimable_balance_op,
         )
         return body
 

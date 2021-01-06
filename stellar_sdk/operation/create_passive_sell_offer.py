@@ -2,7 +2,6 @@ from decimal import Decimal
 from typing import Union
 
 from .operation import Operation
-from .operation_type import OperationType
 from .utils import check_amount, check_price
 from .. import xdr as stellar_xdr
 from ..asset import Asset
@@ -41,8 +40,7 @@ class CreatePassiveSellOffer(Operation):
 
     """
 
-    _XDR_TYPE: stellar_xdr.OperationType = stellar_xdr.OperationType.CREATE_PASSIVE_SELL_OFFER
-    TYPE: OperationType = OperationType.CREATE_PASSIVE_SELL_OFFER
+    _XDR_OPERATION_TYPE: stellar_xdr.OperationType = stellar_xdr.OperationType.CREATE_PASSIVE_SELL_OFFER
 
     def __init__(
         self,
@@ -75,7 +73,7 @@ class CreatePassiveSellOffer(Operation):
             selling, buying, amount, price
         )
         body = stellar_xdr.OperationBody(
-            type=self._XDR_TYPE,
+            type=self._XDR_OPERATION_TYPE,
             create_passive_sell_offer_op=create_passive_sell_offer_op,
         )
         return body

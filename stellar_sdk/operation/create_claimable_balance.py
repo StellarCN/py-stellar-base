@@ -3,7 +3,6 @@ from enum import IntEnum
 from typing import Union, List, Optional
 
 from .operation import Operation
-from .operation_type import OperationType
 from .utils import check_amount
 from .. import xdr as stellar_xdr
 from ..asset import Asset
@@ -371,8 +370,8 @@ class CreateClaimableBalance(Operation):
     :param claimants: A list of Claimants.
     :param source: The source account (defaults to transaction source).
     """
-    _XDR_TYPE: stellar_xdr.OperationType = stellar_xdr.OperationType.CREATE_CLAIMABLE_BALANCE
-    TYPE: OperationType = OperationType.CREATE_CLAIMABLE_BALANCE
+
+    _XDR_OPERATION_TYPE: stellar_xdr.OperationType = stellar_xdr.OperationType.CREATE_CLAIMABLE_BALANCE
 
     def __init__(
         self,
@@ -395,7 +394,7 @@ class CreateClaimableBalance(Operation):
             asset=asset, amount=stellar_xdr.Int64(amount), claimants=claimants
         )
         body = stellar_xdr.OperationBody(
-            type=self._XDR_TYPE,
+            type=self._XDR_OPERATION_TYPE,
             create_claimable_balance_op=create_claimable_balance_op,
         )
         return body
@@ -409,16 +408,12 @@ class CreateClaimableBalance(Operation):
         """
         source = Operation.get_source_from_xdr_obj(xdr_object)
         assert xdr_object.body.create_claimable_balance_op is not None
-        asset = Asset.from_xdr_object(
-            xdr_object.body.create_claimable_balance_op.asset
-        )
+        asset = Asset.from_xdr_object(xdr_object.body.create_claimable_balance_op.asset)
         amount = Operation.from_xdr_amount(
             xdr_object.body.create_claimable_balance_op.amount.int64
         )
         claimants = []
-        for (
-            claimant_xdr_obj
-        ) in xdr_object.body.create_claimable_balance_op.claimants:
+        for claimant_xdr_obj in xdr_object.body.create_claimable_balance_op.claimants:
             claimants.append(Claimant.from_xdr_object(claimant_xdr_obj))
         op = cls(asset=asset, amount=amount, claimants=claimants, source=source)
         op._source_muxed = Operation.get_source_muxed_from_xdr_obj(xdr_object)

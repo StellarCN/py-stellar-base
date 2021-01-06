@@ -1,7 +1,6 @@
 from typing import Union
 
 from .operation import Operation
-from .operation_type import OperationType
 from .. import xdr as stellar_xdr
 from ..exceptions import ValueError
 
@@ -26,8 +25,7 @@ class ManageData(Operation):
 
     """
 
-    _XDR_TYPE: stellar_xdr.OperationType = stellar_xdr.OperationType.MANAGE_DATA
-    TYPE: OperationType = OperationType.MANAGE_DATA
+    _XDR_OPERATION_TYPE: stellar_xdr.OperationType = stellar_xdr.OperationType.MANAGE_DATA
 
     def __init__(
         self, data_name: str, data_value: Union[str, bytes, None], source: str = None,
@@ -54,14 +52,12 @@ class ManageData(Operation):
         manage_data_op = stellar_xdr.ManageDataOp(data_name, data_value)
 
         body = stellar_xdr.OperationBody(
-            type=self._XDR_TYPE, manage_data_op=manage_data_op
+            type=self._XDR_OPERATION_TYPE, manage_data_op=manage_data_op
         )
         return body
 
     @classmethod
-    def from_xdr_object(
-        cls, xdr_object: stellar_xdr.Operation
-    ) -> "ManageData":
+    def from_xdr_object(cls, xdr_object: stellar_xdr.Operation) -> "ManageData":
         """Creates a :class:`ManageData` object from an XDR Operation
         object.
 

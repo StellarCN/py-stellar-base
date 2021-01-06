@@ -2,7 +2,6 @@ from decimal import Decimal
 from typing import List, Union, Optional
 
 from .operation import Operation
-from .operation_type import OperationType
 from .utils import check_amount, check_ed25519_public_key
 from .. import xdr as stellar_xdr
 from ..asset import Asset
@@ -29,8 +28,8 @@ class PathPaymentStrictSend(Operation):
     :param source: The source account for the payment. Defaults to the
         transaction's source account.
     """
-    _XDR_TYPE: stellar_xdr.OperationType = stellar_xdr.OperationType.PATH_PAYMENT_STRICT_SEND
-    TYPE: OperationType = OperationType.PATH_PAYMENT_STRICT_SEND
+
+    _XDR_OPERATION_TYPE: stellar_xdr.OperationType = stellar_xdr.OperationType.PATH_PAYMENT_STRICT_SEND
 
     def __init__(
         self,
@@ -82,7 +81,7 @@ class PathPaymentStrictSend(Operation):
             path,
         )
         body = stellar_xdr.OperationBody(
-            type=self._XDR_TYPE,
+            type=self._XDR_OPERATION_TYPE,
             path_payment_strict_send_op=path_payment_strict_send_op,
         )
         return body
@@ -128,9 +127,7 @@ class PathPaymentStrictSend(Operation):
             dest_min=dest_min,
             path=path,
         )
-        op._destination_muxed = (
-            xdr_object.body.path_payment_strict_send_op.destination
-        )
+        op._destination_muxed = xdr_object.body.path_payment_strict_send_op.destination
         op._source_muxed = Operation.get_source_muxed_from_xdr_obj(xdr_object)
         return op
 

@@ -1,5 +1,4 @@
 from .operation import Operation
-from .operation_type import OperationType
 from .utils import check_ed25519_public_key
 from .. import xdr as stellar_xdr
 from ..keypair import Keypair
@@ -22,8 +21,7 @@ class BeginSponsoringFutureReserves(Operation):
     :param source: The source account (defaults to transaction source).
     """
 
-    _XDR_TYPE: stellar_xdr.OperationType = stellar_xdr.OperationType.BEGIN_SPONSORING_FUTURE_RESERVES
-    TYPE: OperationType = OperationType.BEGIN_SPONSORING_FUTURE_RESERVES
+    _XDR_OPERATION_TYPE: stellar_xdr.OperationType = stellar_xdr.OperationType.BEGIN_SPONSORING_FUTURE_RESERVES
 
     def __init__(self, sponsored_id: str, source: str = None) -> None:
         super().__init__(source)
@@ -36,7 +34,7 @@ class BeginSponsoringFutureReserves(Operation):
             sponsored_id=sponsored_id
         )
         body = stellar_xdr.OperationBody(
-            type=self._XDR_TYPE,
+            type=self._XDR_OPERATION_TYPE,
             begin_sponsoring_future_reserves_op=begin_sponsoring_future_reserves_op,
         )
         return body
@@ -50,7 +48,10 @@ class BeginSponsoringFutureReserves(Operation):
         """
         source = Operation.get_source_from_xdr_obj(xdr_object)
         assert xdr_object.body.begin_sponsoring_future_reserves_op is not None
-        assert xdr_object.body.begin_sponsoring_future_reserves_op.sponsored_id.account_id.ed25519 is not None
+        assert (
+            xdr_object.body.begin_sponsoring_future_reserves_op.sponsored_id.account_id.ed25519
+            is not None
+        )
         sponsored_id = StrKey.encode_ed25519_public_key(
             xdr_object.body.begin_sponsoring_future_reserves_op.sponsored_id.account_id.ed25519.uint256
         )
