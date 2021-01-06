@@ -1,6 +1,16 @@
 Release History
 ==============
 
+### Version 3.0.0-beta5
+Released on Jan 06, 2021
+
+#### Update
+- Add `from_xdr_amount` and `to_xdr_amount` to stellar_sdk.xdr.utils.
+
+#### Breaking changes
+- Rename `stellar_sdk.operation.set_options.Flag` to `stellar_sdk.operation.set_options.AuthorizationFlag`.
+- Remove `TYPE` field in Operations.
+
 ### Version 3.0.0-beta4
 Released on Dec 29, 2020
 
