@@ -34,9 +34,7 @@ def to_xdr_amount(value: Union[str, Decimal]) -> int:
     # throw exception if value * ONE has decimal places (it can't be represented as int64)
     try:
         amount = int(
-            (Decimal(value) * _ONE).to_integral_exact(
-                context=Context(traps=[Inexact])
-            )
+            (Decimal(value) * _ONE).to_integral_exact(context=Context(traps=[Inexact]))
         )
     except Inexact:
         raise ValueError(

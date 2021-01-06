@@ -186,9 +186,7 @@ def read_challenge_transaction(
         )
 
     if manage_data_op.data_value is None:
-        raise InvalidSep10ChallengeError(
-            "Operation value should not be null."
-        )
+        raise InvalidSep10ChallengeError("Operation value should not be null.")
 
     if len(manage_data_op.data_value) != 64:
         raise InvalidSep10ChallengeError(
@@ -302,6 +300,7 @@ def verify_challenge_transaction_signers(
         raise InvalidSep10ChallengeError("Transaction has unrecognized signatures.")
 
     return signers_found
+
 
 def verify_challenge_transaction_signed_by_client_master_key(
     challenge_transaction: str,

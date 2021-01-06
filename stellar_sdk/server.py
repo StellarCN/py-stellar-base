@@ -39,7 +39,12 @@ from .utils import (
     urljoin_with_query,
     MUXED_ACCOUNT_STARTING_LETTER,
 )
-from .operation import Payment, AccountMerge, PathPaymentStrictSend, PathPaymentStrictReceive
+from .operation import (
+    Payment,
+    AccountMerge,
+    PathPaymentStrictSend,
+    PathPaymentStrictReceive,
+)
 
 __all__ = ["Server"]
 
@@ -406,7 +411,9 @@ class Server:
         account.thresholds = thresholds
         return account
 
-    def __check_memo_required_sync(self, transaction: Union[Transaction, FeeBumpTransaction]) -> None:
+    def __check_memo_required_sync(
+        self, transaction: Union[Transaction, FeeBumpTransaction]
+    ) -> None:
         if isinstance(transaction, FeeBumpTransaction):
             transaction = transaction.inner_transaction_envelope.transaction
         if not (transaction.memo is None or isinstance(transaction.memo, NoneMemo)):
@@ -459,7 +466,15 @@ class Server:
     ) -> Generator[Tuple[int, str], Any, Any]:
         destinations = set()
         for index, operation in enumerate(transaction.operations):
-            if isinstance(operation, (Payment, AccountMerge, PathPaymentStrictSend, PathPaymentStrictReceive)):
+            if isinstance(
+                operation,
+                (
+                    Payment,
+                    AccountMerge,
+                    PathPaymentStrictSend,
+                    PathPaymentStrictReceive,
+                ),
+            ):
                 destination: str = operation.destination
             else:
                 continue

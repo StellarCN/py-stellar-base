@@ -60,5 +60,6 @@ __all__ = (
         "RequestsClient",
         "AiohttpClient",
     ]
-    + operation_all + helpers_all
+    + operation_all
+    + helpers_all
 )

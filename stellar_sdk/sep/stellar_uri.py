@@ -141,7 +141,9 @@ class PayStellarUri(StellarUri):
         return None, None
 
     @staticmethod
-    def _decode_memo(memo_type: Optional[str], memo_value: Optional[str]) -> Optional[Memo]:
+    def _decode_memo(
+        memo_type: Optional[str], memo_value: Optional[str]
+    ) -> Optional[Memo]:
         if memo_type is None:
             return None
         if memo_value is None:

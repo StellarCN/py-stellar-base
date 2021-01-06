@@ -142,9 +142,7 @@ class Asset:
             issuer = StrKey.encode_ed25519_public_key(
                 xdr_object.alpha_num4.issuer.account_id.ed25519.uint256
             )
-            code = xdr_object.alpha_num4.asset_code.asset_code4.decode().rstrip(
-                "\x00"
-            )
+            code = xdr_object.alpha_num4.asset_code.asset_code4.decode().rstrip("\x00")
         else:
             assert xdr_object.alpha_num12 is not None
             assert xdr_object.alpha_num12.issuer.account_id.ed25519 is not None

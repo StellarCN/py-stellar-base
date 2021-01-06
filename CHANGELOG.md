@@ -5,11 +5,11 @@ Release History
 Released on Jan 06, 2021
 
 #### Update
-- Add `from_xdr_amount` and `to_xdr_amount` to stellar_sdk.xdr.utils.
+- Add `from_xdr_amount` and `to_xdr_amount` to stellar_sdk.xdr.utils. ([#419](https://github.com/StellarCN/py-stellar-base/pull/419))
 
 #### Breaking changes
 - Rename `stellar_sdk.operation.set_options.Flag` to `stellar_sdk.operation.set_options.AuthorizationFlag`.
-- Remove `TYPE` field in Operations.
+- Remove `TYPE` field in Operations. ([#418](https://github.com/StellarCN/py-stellar-base/pull/418))
 
 ### Version 3.0.0-beta4
 Released on Dec 29, 2020

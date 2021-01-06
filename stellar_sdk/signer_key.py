@@ -77,14 +77,9 @@ class SignerKey:
         """
         if xdr_object.type == stellar_xdr.SignerKeyType.SIGNER_KEY_TYPE_ED25519:
             assert xdr_object.ed25519 is not None
-            account_id = StrKey.encode_ed25519_public_key(
-                xdr_object.ed25519.uint256
-            )
+            account_id = StrKey.encode_ed25519_public_key(xdr_object.ed25519.uint256)
             return cls.ed25519_public_key(account_id)
-        elif (
-                xdr_object.type
-                == stellar_xdr.SignerKeyType.SIGNER_KEY_TYPE_PRE_AUTH_TX
-        ):
+        elif xdr_object.type == stellar_xdr.SignerKeyType.SIGNER_KEY_TYPE_PRE_AUTH_TX:
             assert xdr_object.pre_auth_tx is not None
             return cls.pre_auth_tx(xdr_object.pre_auth_tx.uint256)
         elif xdr_object.type == stellar_xdr.SignerKeyType.SIGNER_KEY_TYPE_HASH_X:

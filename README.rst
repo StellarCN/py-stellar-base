@@ -95,10 +95,7 @@ Building transaction with synchronous server
     print(response)
 
 
-.. raw:: html
-
-   <details>
-   <summary>Building transaction with asynchronous server</summary>
+* Building transaction with asynchronous server
 
 .. code-block:: python
 
@@ -137,9 +134,6 @@ Building transaction with synchronous server
     if __name__ == "__main__":
         asyncio.run(payment())
 
-.. raw:: html
-
-   </details>
 
 Links
 -----

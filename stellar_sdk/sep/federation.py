@@ -208,7 +208,9 @@ async def __resolve_account_id_async(
     return __handle_raw_response(raw_resp, account_id=account_id)
 
 
-def __handle_raw_response(raw_resp: Response, stellar_address=None, account_id=None) -> FederationRecord:
+def __handle_raw_response(
+    raw_resp: Response, stellar_address=None, account_id=None
+) -> FederationRecord:
     if not 200 <= raw_resp.status_code < 300:
         raise BadFederationResponseError(raw_resp)
     data = raw_resp.json()

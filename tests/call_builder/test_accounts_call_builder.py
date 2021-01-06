@@ -36,4 +36,3 @@ class TestAccountsCallBuilder:
         builder = AccountsCallBuilder(horizon_url, client).for_sponsor(sponsor)
         assert builder.endpoint == "accounts"
         assert builder.params == {"sponsor": sponsor}
-

@@ -46,9 +46,7 @@ class TimeBounds:
         return stellar_xdr.TimeBounds(min_time, max_time)
 
     @classmethod
-    def from_xdr_object(
-        cls, xdr_object: stellar_xdr.TimeBounds
-    ) -> "TimeBounds":
+    def from_xdr_object(cls, xdr_object: stellar_xdr.TimeBounds) -> "TimeBounds":
         """Create a :class:`TimeBounds` from an XDR TimeBounds object.
 
         :param xdr_object: The XDR TimeBounds object.
