@@ -2,7 +2,6 @@ from decimal import Decimal
 from typing import Union, Optional
 
 from .operation import Operation
-from .operation_type import OperationType
 from .utils import check_amount, check_ed25519_public_key
 from .. import xdr as stellar_xdr
 from ..asset import Asset
@@ -25,9 +24,8 @@ class Payment(Operation):
         transaction's source account.
 
     """
-    _XDR_TYPE: stellar_xdr.OperationType = stellar_xdr.OperationType.PAYMENT
-    TYPE: OperationType = OperationType.PAYMENT
 
+    _XDR_OPERATION_TYPE: stellar_xdr.OperationType = stellar_xdr.OperationType.PAYMENT
 
     def __init__(
         self,
@@ -62,7 +60,9 @@ class Payment(Operation):
             destination = Keypair.from_public_key(self._destination).xdr_muxed_account()
         amount = stellar_xdr.Int64(Operation.to_xdr_amount(self.amount))
         payment_op = stellar_xdr.PaymentOp(destination, asset, amount)
-        body = stellar_xdr.OperationBody(type=self._XDR_TYPE, payment_op=payment_op)
+        body = stellar_xdr.OperationBody(
+            type=self._XDR_OPERATION_TYPE, payment_op=payment_op
+        )
         return body
 
     @classmethod
@@ -77,9 +77,7 @@ class Payment(Operation):
             xdr_object.body.payment_op.destination
         )
         asset = Asset.from_xdr_object(xdr_object.body.payment_op.asset)
-        amount = Operation.from_xdr_amount(
-            xdr_object.body.payment_op.amount.int64
-        )
+        amount = Operation.from_xdr_amount(xdr_object.body.payment_op.amount.int64)
         op = cls(source=source, destination=destination, asset=asset, amount=amount)
         op._destination_muxed = xdr_object.body.payment_op.destination
         op._source_muxed = Operation.get_source_muxed_from_xdr_obj(xdr_object)

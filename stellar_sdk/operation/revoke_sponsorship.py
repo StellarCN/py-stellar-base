@@ -4,7 +4,6 @@ from enum import IntEnum
 from typing import Optional
 
 from .operation import Operation
-from .operation_type import OperationType
 from .utils import check_ed25519_public_key
 from .. import xdr as stellar_xdr
 from ..asset import Asset
@@ -114,8 +113,8 @@ class RevokeSponsorship(Operation):
     :param signer: The sponsored signer.
     :param source: The source account (defaults to transaction source).
     """
-    _XDR_TYPE: stellar_xdr.OperationType = stellar_xdr.OperationType.REVOKE_SPONSORSHIP
-    TYPE: OperationType = OperationType.REVOKE_SPONSORSHIP
+
+    _XDR_OPERATION_TYPE: stellar_xdr.OperationType = stellar_xdr.OperationType.REVOKE_SPONSORSHIP
 
     def __init__(
         self,
@@ -353,14 +352,12 @@ class RevokeSponsorship(Operation):
                 f"{self.revoke_sponsorship_type} is not a valid RevokeSponsorshipType."
             )
         body = stellar_xdr.OperationBody(
-            type=self._XDR_TYPE, revoke_sponsorship_op=revoke_sponsorship_op
+            type=self._XDR_OPERATION_TYPE, revoke_sponsorship_op=revoke_sponsorship_op
         )
         return body
 
     @classmethod
-    def from_xdr_object(
-        cls, xdr_object: stellar_xdr.Operation
-    ) -> "RevokeSponsorship":
+    def from_xdr_object(cls, xdr_object: stellar_xdr.Operation) -> "RevokeSponsorship":
         """Creates a :class:`RevokeSponsorship` object from an XDR Operation
         object.
         """
@@ -418,7 +415,10 @@ class RevokeSponsorship(Operation):
                 raise ValueError(f"{ledger_key_type} is an unsupported LedgerKey type.")
         elif op_type == stellar_xdr.RevokeSponsorshipType.REVOKE_SPONSORSHIP_SIGNER:
             assert xdr_object.body.revoke_sponsorship_op.signer is not None
-            assert xdr_object.body.revoke_sponsorship_op.signer.account_id.account_id.ed25519 is not None
+            assert (
+                xdr_object.body.revoke_sponsorship_op.signer.account_id.account_id.ed25519
+                is not None
+            )
             account_id = StrKey.encode_ed25519_public_key(
                 xdr_object.body.revoke_sponsorship_op.signer.account_id.account_id.ed25519.uint256
             )

@@ -2,7 +2,6 @@ from enum import IntFlag
 from typing import Optional, Union
 
 from .operation import Operation
-from .operation_type import OperationType
 from .utils import check_ed25519_public_key
 from .. import xdr as stellar_xdr
 from ..keypair import Keypair
@@ -68,8 +67,8 @@ class SetOptions(Operation):
     :param source: The source account (defaults to transaction source).
 
     """
-    _XDR_TYPE: stellar_xdr.OperationType = stellar_xdr.OperationType.SET_OPTIONS
-    TYPE: OperationType = OperationType.SET_OPTIONS
+
+    _XDR_OPERATION_TYPE: stellar_xdr.OperationType = stellar_xdr.OperationType.SET_OPTIONS
 
     def __init__(
         self,
@@ -155,7 +154,7 @@ class SetOptions(Operation):
             signer,
         )
         body = stellar_xdr.OperationBody(
-            type=self._XDR_TYPE, set_options_op=set_options_op
+            type=self._XDR_OPERATION_TYPE, set_options_op=set_options_op
         )
         return body
 

@@ -2,7 +2,6 @@ from enum import IntFlag
 from typing import Union
 
 from .operation import Operation
-from .operation_type import OperationType
 from .utils import check_ed25519_public_key, check_asset_code
 from .. import xdr as stellar_xdr
 from ..asset import Asset
@@ -48,8 +47,7 @@ class AllowTrust(Operation):
 
     """
 
-    _XDR_TYPE: stellar_xdr.OperationType = stellar_xdr.OperationType.ALLOW_TRUST
-    TYPE: OperationType = OperationType.ALLOW_TRUST
+    _XDR_OPERATION_TYPE: stellar_xdr.OperationType = stellar_xdr.OperationType.ALLOW_TRUST
 
     def __init__(
         self,
@@ -93,14 +91,12 @@ class AllowTrust(Operation):
             )
         allow_trust_op = stellar_xdr.AllowTrustOp(trustor, asset, authorize)
         body = stellar_xdr.OperationBody(
-            type=self._XDR_TYPE, allow_trust_op=allow_trust_op
+            type=self._XDR_OPERATION_TYPE, allow_trust_op=allow_trust_op
         )
         return body
 
     @classmethod
-    def from_xdr_object(
-        cls, xdr_object: stellar_xdr.Operation
-    ) -> "AllowTrust":
+    def from_xdr_object(cls, xdr_object: stellar_xdr.Operation) -> "AllowTrust":
         """Creates a :class:`AllowTrust` object from an XDR Operation
         object.
 
@@ -126,8 +122,7 @@ class AllowTrust(Operation):
             )
         else:
             raise NotImplementedError(
-                "Operation of asset_type={} is not implemented"
-                ".".format(asset_type)
+                "Operation of asset_type={} is not implemented" ".".format(asset_type)
             )
 
         asset_code = asset_code.rstrip("\x00")

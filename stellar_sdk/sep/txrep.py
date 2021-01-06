@@ -300,54 +300,54 @@ def _get_operation(index, raw_data_map, tx_prefix):
             raw_data_map, f"{tx_prefix}operations[{index}].sourceAccount"
         )
     operation_type = _get_value(raw_data_map, f"{prefix}type")
-    if operation_type == AccountMerge.TYPE.name:
+    if operation_type == _to_caps_with_under(AccountMerge.__name__):
         return _get_account_merge_op(source_account_id, tx_prefix, raw_data_map, index)
-    elif operation_type == AllowTrust.TYPE.name:
+    elif operation_type == _to_caps_with_under(AllowTrust.__name__):
         operation_prefix = prefix + "allowTrustOp."
         return _get_allow_trust_op(source_account_id, operation_prefix, raw_data_map)
-    elif operation_type == BumpSequence.TYPE.name:
+    elif operation_type == _to_caps_with_under(BumpSequence.__name__):
         operation_prefix = prefix + "bumpSequenceOp."
         return _get_bump_sequence_op(source_account_id, operation_prefix, raw_data_map)
-    elif operation_type == ChangeTrust.TYPE.name:
+    elif operation_type == _to_caps_with_under(ChangeTrust.__name__):
         operation_prefix = prefix + "changeTrustOp."
         return _get_change_trust_op(source_account_id, operation_prefix, raw_data_map)
-    elif operation_type == CreateAccount.TYPE.name:
+    elif operation_type == _to_caps_with_under(CreateAccount.__name__):
         operation_prefix = prefix + "createAccountOp."
         return _get_create_account_op(source_account_id, operation_prefix, raw_data_map)
-    elif operation_type == CreatePassiveSellOffer.TYPE.name:
+    elif operation_type == _to_caps_with_under(CreatePassiveSellOffer.__name__):
         operation_prefix = prefix + "createPassiveSellOfferOp."
         return _get_create_passive_sell_offer_op(
             source_account_id, operation_prefix, raw_data_map
         )
-    elif operation_type == Inflation.TYPE.name:
+    elif operation_type == _to_caps_with_under(Inflation.__name__):
         return _get_inflation_op(source_account_id)
-    elif operation_type == ManageBuyOffer.TYPE.name:
+    elif operation_type == _to_caps_with_under(ManageBuyOffer.__name__):
         operation_prefix = prefix + "manageBuyOfferOp."
         return _get_manage_buy_offer_op(
             source_account_id, operation_prefix, raw_data_map
         )
-    elif operation_type == ManageData.TYPE.name:
+    elif operation_type == _to_caps_with_under(ManageData.__name__):
         operation_prefix = prefix + "manageDataOp."
         return _get_manage_data_op(source_account_id, operation_prefix, raw_data_map)
-    elif operation_type == ManageSellOffer.TYPE.name:
+    elif operation_type == _to_caps_with_under(ManageSellOffer.__name__):
         operation_prefix = prefix + "manageSellOfferOp."
         return _get_manage_sell_offer_op(
             source_account_id, operation_prefix, raw_data_map
         )
-    elif operation_type == PathPaymentStrictReceive.TYPE.name:
+    elif operation_type == _to_caps_with_under(PathPaymentStrictReceive.__name__):
         operation_prefix = prefix + "pathPaymentStrictReceiveOp."
         return _get_path_payment_strict_receive_op(
             source_account_id, operation_prefix, raw_data_map
         )
-    elif operation_type == PathPaymentStrictSend.TYPE.name:
+    elif operation_type == _to_caps_with_under(PathPaymentStrictSend.__name__):
         operation_prefix = prefix + "pathPaymentStrictSendOp."
         return _get_path_payment_strict_send_op(
             source_account_id, operation_prefix, raw_data_map
         )
-    elif operation_type == Payment.TYPE.name:
+    elif operation_type == _to_caps_with_under(Payment.__name__):
         operation_prefix = prefix + "paymentOp."
         return _get_payment_op(source_account_id, operation_prefix, raw_data_map)
-    elif operation_type == SetOptions.TYPE.name:
+    elif operation_type == _to_caps_with_under(SetOptions.__name__):
         operation_prefix = prefix + "setOptionsOp."
         return _get_set_options_op(source_account_id, operation_prefix, raw_data_map)
     else:
@@ -654,7 +654,9 @@ def _add_line(key: str, value: Union[str, int], lines: List[str]) -> None:
     lines.append(f"{key}: {value}")
 
 
-def _add_time_bounds(time_bounds: Optional[TimeBounds], prefix: str, lines: List[str]) -> None:
+def _add_time_bounds(
+    time_bounds: Optional[TimeBounds], prefix: str, lines: List[str]
+) -> None:
     if time_bounds is None:
         _add_line(f"{prefix}timeBounds._present", _false, lines)
     else:
@@ -691,7 +693,7 @@ def _add_operation(
     index: int, operation: Operation, prefix: str, lines: List[str]
 ) -> None:
     prefix = f"{prefix}operations[{index}]."
-    operation_type = operation.TYPE
+    operation_type = operation.__class__.__name__
 
     def add_operation_line(key: str, value: Union[str, int]) -> None:
         _add_line(f"{prefix}{key}", value, lines)
@@ -701,13 +703,14 @@ def _add_operation(
         add_operation_line("sourceAccount", operation.source)
     else:
         add_operation_line("sourceAccount._present", _false)
-    add_operation_line("body.type", operation_type.name)
+
+    add_operation_line("body.type", _to_caps_with_under(operation_type))
 
     def add_body_line(
         key: str, value: Union[str, int, None], optional: bool = False
     ) -> None:
-        operation_type = operation.TYPE
-        key = f"body.{_to_camel_case(operation_type.name)}Op.{key}"
+        operation_type = operation.__class__.__name__
+        key = f"body.{_to_camel_case(operation_type)}Op.{key}"
         if optional:
             present = True if value is not None else False
             add_operation_line(f"{key}._present", _true if present else _false)
@@ -881,9 +884,12 @@ def _to_price(price: Union[Price, str, Decimal]) -> Price:
     return price_fraction
 
 
-def _to_camel_case(snake_str: str) -> str:
-    components = snake_str.lower().split("_")
-    return components[0] + "".join(x.title() for x in components[1:])
+def _to_camel_case(cap_words: str) -> str:
+    return cap_words[0].lower() + cap_words[1:]
+
+
+def _to_caps_with_under(word):
+    return "".join(["_" + c if c.isupper() else c for c in word]).lstrip("_").upper()
 
 
 def _to_string(value: Union[str, bytes]) -> str:

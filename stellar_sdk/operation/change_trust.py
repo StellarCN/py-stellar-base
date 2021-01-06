@@ -2,7 +2,6 @@ from decimal import Decimal
 from typing import Union
 
 from .operation import Operation
-from .operation_type import OperationType
 from .utils import check_amount
 from .. import xdr as stellar_xdr
 from ..asset import Asset
@@ -27,8 +26,7 @@ class ChangeTrust(Operation):
 
     _DEFAULT_LIMIT = "922337203685.4775807"
 
-    _XDR_TYPE: stellar_xdr.OperationType = stellar_xdr.OperationType.CHANGE_TRUST
-    TYPE: OperationType = OperationType.CHANGE_TRUST
+    _XDR_OPERATION_TYPE: stellar_xdr.OperationType = stellar_xdr.OperationType.CHANGE_TRUST
 
     def __init__(
         self, asset: Asset, limit: Union[str, Decimal] = None, source: str = None,
@@ -48,14 +46,12 @@ class ChangeTrust(Operation):
         limit = stellar_xdr.Int64(Operation.to_xdr_amount(self.limit))
         change_trust_op = stellar_xdr.ChangeTrustOp(line, limit)
         body = stellar_xdr.OperationBody(
-            type=self._XDR_TYPE, change_trust_op=change_trust_op
+            type=self._XDR_OPERATION_TYPE, change_trust_op=change_trust_op
         )
         return body
 
     @classmethod
-    def from_xdr_object(
-        cls, xdr_object: stellar_xdr.Operation
-    ) -> "ChangeTrust":
+    def from_xdr_object(cls, xdr_object: stellar_xdr.Operation) -> "ChangeTrust":
         """Creates a :class:`ChangeTrust` object from an XDR Operation
         object.
 
@@ -63,9 +59,7 @@ class ChangeTrust(Operation):
         source = Operation.get_source_from_xdr_obj(xdr_object)
         assert xdr_object.body.change_trust_op is not None
         line = Asset.from_xdr_object(xdr_object.body.change_trust_op.line)
-        limit = Operation.from_xdr_amount(
-            xdr_object.body.change_trust_op.limit.int64
-        )
+        limit = Operation.from_xdr_amount(xdr_object.body.change_trust_op.limit.int64)
         op = cls(source=source, asset=line, limit=limit)
         op._source_muxed = Operation.get_source_muxed_from_xdr_obj(xdr_object)
         return op

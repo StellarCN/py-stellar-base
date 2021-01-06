@@ -1,7 +1,6 @@
 from typing import Optional
 
 from .operation import Operation
-from .operation_type import OperationType
 from .utils import check_ed25519_public_key
 from .. import xdr as stellar_xdr
 from ..keypair import Keypair
@@ -22,8 +21,7 @@ class AccountMerge(Operation):
 
     """
 
-    _XDR_TYPE: stellar_xdr.OperationType = stellar_xdr.OperationType.ACCOUNT_MERGE
-    TYPE: OperationType = OperationType.ACCOUNT_MERGE
+    _XDR_OPERATION_TYPE: stellar_xdr.OperationType = stellar_xdr.OperationType.ACCOUNT_MERGE
 
     def __init__(self, destination: str, source: str = None,) -> None:
         super().__init__(source)
@@ -46,13 +44,13 @@ class AccountMerge(Operation):
             destination = self._destination_muxed
         else:
             destination = Keypair.from_public_key(self._destination).xdr_muxed_account()
-        body = stellar_xdr.OperationBody(type=self._XDR_TYPE, destination=destination)
+        body = stellar_xdr.OperationBody(
+            type=self._XDR_OPERATION_TYPE, destination=destination
+        )
         return body
 
     @classmethod
-    def from_xdr_object(
-        cls, xdr_object: stellar_xdr.Operation
-    ) -> "AccountMerge":
+    def from_xdr_object(cls, xdr_object: stellar_xdr.Operation) -> "AccountMerge":
         """Creates a :class:`AccountMerge` object from an XDR Operation
         object.
 

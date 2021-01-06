@@ -1,5 +1,4 @@
 from .operation import Operation
-from .operation_type import OperationType
 from .. import xdr as stellar_xdr
 
 
@@ -15,20 +14,17 @@ class Inflation(Operation):
 
     """
 
-    _XDR_TYPE: stellar_xdr.OperationType = stellar_xdr.OperationType.INFLATION
-    TYPE: OperationType = OperationType.INFLATION
+    _XDR_OPERATION_TYPE: stellar_xdr.OperationType = stellar_xdr.OperationType.INFLATION
 
     def __init__(self, source: str = None) -> None:
         super().__init__(source)
 
     def _to_operation_body(self) -> stellar_xdr.OperationBody:
-        body = stellar_xdr.OperationBody(type=self._XDR_TYPE)
+        body = stellar_xdr.OperationBody(type=self._XDR_OPERATION_TYPE)
         return body
 
     @classmethod
-    def from_xdr_object(
-        cls, xdr_object: stellar_xdr.Operation
-    ) -> "Inflation":
+    def from_xdr_object(cls, xdr_object: stellar_xdr.Operation) -> "Inflation":
         """Creates a :class:`Inflation` object from an XDR Operation
         object.
 
