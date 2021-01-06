@@ -44,7 +44,6 @@ from stellar_sdk.operation.utils import (
 from stellar_sdk.signer import Signer
 from stellar_sdk.signer_key import SignerKey
 from stellar_sdk.utils import sha256
-from stellar_sdk.operation.operation_type import OperationType
 
 
 class TestBaseOperation:
