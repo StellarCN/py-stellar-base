@@ -11,18 +11,17 @@ Version 2.0.0
 import base64
 import os
 import time
-import warnings
 from typing import List, Tuple, Union, Iterable
 
 from .ed25519_public_key_signer import Ed25519PublicKeySigner
 from .exceptions import InvalidSep10ChallengeError
+from .. import xdr as stellar_xdr
 from ..account import Account
 from ..exceptions import BadSignatureError, ValueError
 from ..keypair import Keypair
 from ..operation.manage_data import ManageData
 from ..transaction_builder import TransactionBuilder
 from ..transaction_envelope import TransactionEnvelope
-from ..xdr import Xdr
 
 __all__ = [
     "build_challenge_transaction",
@@ -109,8 +108,8 @@ def read_challenge_transaction(
             "Invalid server_account_id, multiplexed account are not supported."
         )
 
-    xdr_object = Xdr.types.TransactionEnvelope.from_xdr(challenge_transaction)
-    if xdr_object.type == Xdr.const.ENVELOPE_TYPE_TX_FEE_BUMP:
+    xdr_object = stellar_xdr.TransactionEnvelope.from_xdr(challenge_transaction)
+    if xdr_object.type == stellar_xdr.EnvelopeType.ENVELOPE_TYPE_TX_FEE_BUMP:
         raise ValueError(
             "Invalid challenge, expected a TransactionEnvelope but received a FeeBumpTransactionEnvelope."
         )
@@ -187,15 +186,12 @@ def read_challenge_transaction(
         )
 
     if manage_data_op.data_value is None:
-        raise InvalidSep10ChallengeError(
-            "Operation value should not be null."
-        )
+        raise InvalidSep10ChallengeError("Operation value should not be null.")
 
     if len(manage_data_op.data_value) != 64:
         raise InvalidSep10ChallengeError(
             "Operation value encoded as base64 should be 64 bytes long."
         )
-
     nonce = base64.b64decode(manage_data_op.data_value)
     if len(nonce) != 48:
         raise InvalidSep10ChallengeError(
@@ -278,7 +274,7 @@ def verify_challenge_transaction_signers(
     all_signers = client_signers + [Ed25519PublicKeySigner(server_keypair.public_key)]
     all_signers_found = _verify_transaction_signatures(te, all_signers)
 
-    signers_found = []
+    signers_found: List[Ed25519PublicKeySigner] = []
     server_signer_found = False
     for signer in all_signers_found:
         if signer.account_id == server_keypair.public_key:
@@ -304,35 +300,6 @@ def verify_challenge_transaction_signers(
         raise InvalidSep10ChallengeError("Transaction has unrecognized signatures.")
 
     return signers_found
-
-
-def verify_challenge_transaction_signed_by_client(
-    challenge_transaction: str,
-    server_account_id: str,
-    home_domains: Union[str, Iterable[str]],
-    network_passphrase: str,
-) -> None:
-    """An alias for :func:`stellar_sdk.sep.stellar_web_authentication.verify_challenge_transaction`.
-
-    :param challenge_transaction: SEP0010 transaction challenge transaction in base64.
-    :param server_account_id: public key for server's account.
-    :param home_domains: The home domain that is expected to be included in the first Manage Data operation's string
-        key. If a list is provided, one of the domain names in the array must match.
-    :param network_passphrase: The network to connect to for verifying and retrieving
-        additional attributes from. (ex. 'Public Global Stellar Network ; September 2015')
-
-    :raises: :exc:`InvalidSep10ChallengeError <stellar_sdk.sep.exceptions.InvalidSep10ChallengeError>` - if the
-        validation fails, the exception will be thrown.
-    """
-    warnings.warn(
-        "Will be removed in version v3.0.0, "
-        "use stellar_sdk.sep.test_stellar_web_authentication.verify_challenge_transaction_signed_by_client_master_key",
-        DeprecationWarning,
-    )  # pragma: no cover
-
-    return verify_challenge_transaction_signed_by_client_master_key(
-        challenge_transaction, server_account_id, home_domains, network_passphrase
-    )  # pragma: no cover
 
 
 def verify_challenge_transaction_signed_by_client_master_key(
@@ -472,10 +439,10 @@ def _verify_transaction_signatures(
             # See https://github.com/StellarCN/py-stellar-base/issues/252#issuecomment-580882560
             if index in signature_used:
                 continue
-            if decorated_signature.hint != kp.signature_hint():
+            if decorated_signature.hint.signature_hint != kp.signature_hint():
                 continue
             try:
-                kp.verify(tx_hash, decorated_signature.signature)
+                kp.verify(tx_hash, decorated_signature.signature.signature)
                 signature_used.add(index)
                 signers_found.append(signer)
                 break

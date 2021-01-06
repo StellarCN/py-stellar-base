@@ -1,4 +1,3 @@
-import warnings
 from typing import Union, Coroutine, Any, Dict, List, Tuple, Generator
 
 from .account import Account, Thresholds
@@ -14,7 +13,6 @@ from .call_builder.ledgers_call_builder import LedgersCallBuilder
 from .call_builder.offers_call_builder import OffersCallBuilder
 from .call_builder.operations_call_builder import OperationsCallBuilder
 from .call_builder.orderbook_call_builder import OrderbookCallBuilder
-from .call_builder.paths_call_builder import PathsCallBuilder
 from .call_builder.payments_call_builder import PaymentsCallBuilder
 from .call_builder.root_call_builder import RootCallBuilder
 from .call_builder.strict_receive_paths_call_builder import (
@@ -27,6 +25,7 @@ from .call_builder.transactions_call_builder import TransactionsCallBuilder
 from .client.base_async_client import BaseAsyncClient
 from .client.base_sync_client import BaseSyncClient
 from .client.requests_client import RequestsClient
+from .client.response import Response
 from .exceptions import TypeError, NotFoundError, raise_request_exception
 from .fee_bump_transaction import FeeBumpTransaction
 from .fee_bump_transaction_envelope import FeeBumpTransactionEnvelope
@@ -40,7 +39,12 @@ from .utils import (
     urljoin_with_query,
     MUXED_ACCOUNT_STARTING_LETTER,
 )
-from .xdr import Xdr
+from .operation import (
+    Payment,
+    AccountMerge,
+    PathPaymentStrictSend,
+    PathPaymentStrictReceive,
+)
 
 __all__ = ["Server"]
 
@@ -126,6 +130,7 @@ class Server:
             self.__check_memo_required_sync(tx)
         data = {"tx": xdr}
         resp = self._client.post(url=url, data=data)
+        assert isinstance(resp, Response)
         raise_request_exception(resp)
         return resp.json()
 
@@ -143,7 +148,8 @@ class Server:
         if not skip_memo_required_check:
             await self.__check_memo_required_async(tx)
         data = {"tx": xdr}
-        resp = await self._client.post(url=url, data=data)
+        resp = await self._client.post(url=url, data=data)  # type: ignore[misc]
+        assert isinstance(resp, Response)
         raise_request_exception(resp)
         return resp.json()
 
@@ -252,37 +258,6 @@ class Server:
             client=self._client,
             buying=buying,
             selling=selling,
-        )
-
-    def paths(
-        self,
-        source_account: str,
-        destination_account: str,
-        destination_asset: Asset,
-        destination_amount: str,
-    ) -> PathsCallBuilder:
-        """
-        :param source_account: The sender's account ID. Any returned path must use a source that the sender can hold.
-        :param destination_account: The destination account ID that any returned path should use.
-        :param destination_asset: The destination asset.
-        :param destination_amount: The amount, denominated in the destination asset, that any returned path should be able to satisfy.
-        :return: New :class:`stellar_sdk.call_builder.PathsCallBuilder` object configured by
-            a current Horizon server configuration.
-        """
-
-        warnings.warn(
-            "Will be removed in version v3.0.0, "
-            "use stellar_sdk.server.strict_receive_paths",
-            DeprecationWarning,
-        )
-
-        return PathsCallBuilder(
-            horizon_url=self.horizon_url,
-            client=self._client,
-            source_account=source_account,
-            destination_account=destination_account,
-            destination_asset=destination_asset,
-            destination_amount=destination_amount,
         )
 
     def strict_receive_paths(
@@ -409,7 +384,8 @@ class Server:
         return self.__load_account_sync(account)
 
     async def __load_account_async(self, account_id: str) -> Account:
-        resp = await self.accounts().account_id(account_id=account_id).call()
+        resp = await self.accounts().account_id(account_id=account_id).call()  # type: ignore[misc]
+        assert isinstance(resp, dict)
         sequence = int(resp["sequence"])
         thresholds = Thresholds(
             resp["thresholds"]["low_threshold"],
@@ -423,6 +399,7 @@ class Server:
 
     def __load_account_sync(self, account_id: str) -> Account:
         resp = self.accounts().account_id(account_id=account_id).call()
+        assert isinstance(resp, dict)
         sequence = int(resp["sequence"])
         thresholds = Thresholds(
             resp["thresholds"]["low_threshold"],
@@ -434,7 +411,9 @@ class Server:
         account.thresholds = thresholds
         return account
 
-    def __check_memo_required_sync(self, transaction: Transaction) -> None:
+    def __check_memo_required_sync(
+        self, transaction: Union[Transaction, FeeBumpTransaction]
+    ) -> None:
         if isinstance(transaction, FeeBumpTransaction):
             transaction = transaction.inner_transaction_envelope.transaction
         if not (transaction.memo is None or isinstance(transaction.memo, NoneMemo)):
@@ -448,6 +427,7 @@ class Server:
                 account_resp = self.accounts().account_id(destination).call()
             except NotFoundError:
                 continue
+            assert isinstance(account_resp, dict)
             self.__check_destination_memo(account_resp, index, destination)
 
     async def __check_memo_required_async(
@@ -463,7 +443,7 @@ class Server:
             if destination.startswith(MUXED_ACCOUNT_STARTING_LETTER):
                 continue
             try:
-                account_resp = await self.accounts().account_id(destination).call()
+                account_resp = await self.accounts().account_id(destination).call()  # type: ignore[misc]
             except NotFoundError:
                 continue
             self.__check_destination_memo(account_resp, index, destination)
@@ -485,14 +465,16 @@ class Server:
         self, transaction: Transaction
     ) -> Generator[Tuple[int, str], Any, Any]:
         destinations = set()
-        memo_required_operation_code = (
-            Xdr.const.PAYMENT,
-            Xdr.const.ACCOUNT_MERGE,
-            Xdr.const.PATH_PAYMENT_STRICT_RECEIVE,
-            Xdr.const.PATH_PAYMENT_STRICT_SEND,
-        )
         for index, operation in enumerate(transaction.operations):
-            if operation.type_code() in memo_required_operation_code:
+            if isinstance(
+                operation,
+                (
+                    Payment,
+                    AccountMerge,
+                    PathPaymentStrictSend,
+                    PathPaymentStrictReceive,
+                ),
+            ):
                 destination: str = operation.destination
             else:
                 continue
@@ -519,11 +501,12 @@ class Server:
 
     def __fetch_base_fee_sync(self) -> int:
         latest_ledger = self.ledgers().order(desc=True).limit(1).call()
+        assert isinstance(latest_ledger, dict)
         base_fee = self.__handle_base_fee(latest_ledger)
         return base_fee
 
     async def __fetch_base_fee_async(self) -> int:
-        latest_ledger = await self.ledgers().order(desc=True).limit(1).call()
+        latest_ledger = await self.ledgers().order(desc=True).limit(1).call()  # type: ignore[misc]
         base_fee = self.__handle_base_fee(latest_ledger)
         return base_fee
 
@@ -539,7 +522,7 @@ class Server:
             )
         return base_fee
 
-    def close(self) -> Union[None, Coroutine[Any, Any, None]]:
+    def close(self) -> Union[None, Coroutine[Any, Any, None]]:  # type: ignore[misc]
         """Close underlying connector.
 
         Release all acquired resources.
@@ -547,7 +530,7 @@ class Server:
         if self.__async:
             return self.__close_async()
         else:
-            return self.__close_sync()
+            return self.__close_sync()  # type: ignore[func-returns-value]
 
     async def __close_async(self) -> None:
         await self._client.close()
@@ -559,10 +542,13 @@ class Server:
         return self
 
     async def __aexit__(self, exc_type, exc_val, exc_tb) -> None:
-        await self.close()
+        await self.close()  # type: ignore[misc]
 
     def __enter__(self) -> "Server":
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.close()
+
+    def __str__(self):
+        return f"<Server [horizon_url={self.horizon_url}, client={self._client}]>"

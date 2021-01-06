@@ -3,10 +3,10 @@ from typing import List, Union, Optional
 
 from .operation import Operation
 from .utils import check_amount, check_ed25519_public_key
+from .. import xdr as stellar_xdr
 from ..asset import Asset
 from ..keypair import Keypair
 from ..utils import parse_ed25519_account_id_from_muxed_account_xdr_object
-from ..xdr import Xdr
 
 
 class PathPaymentStrictReceive(Operation):
@@ -29,6 +29,8 @@ class PathPaymentStrictReceive(Operation):
         transaction's source account.
     """
 
+    _XDR_OPERATION_TYPE: stellar_xdr.OperationType = stellar_xdr.OperationType.PATH_PAYMENT_STRICT_RECEIVE
+
     def __init__(
         self,
         destination: str,
@@ -44,7 +46,7 @@ class PathPaymentStrictReceive(Operation):
         check_amount(dest_amount)
         check_ed25519_public_key(destination)
         self._destination: str = destination
-        self._destination_muxed: Optional[Xdr.types.MuxedAccount] = None
+        self._destination_muxed: Optional[stellar_xdr.MuxedAccount] = None
         self.send_asset: Asset = send_asset
         self.send_max: Union[str, Decimal] = send_max
         self.dest_asset: Asset = dest_asset
@@ -61,11 +63,7 @@ class PathPaymentStrictReceive(Operation):
         self._destination_muxed = None
         self._destination = value
 
-    @classmethod
-    def type_code(cls) -> int:
-        return Xdr.const.PATH_PAYMENT_STRICT_RECEIVE
-
-    def _to_operation_body(self) -> Xdr.nullclass:
+    def _to_operation_body(self) -> stellar_xdr.OperationBody:
         if self._destination_muxed is not None:
             destination = self._destination_muxed
         else:
@@ -74,48 +72,50 @@ class PathPaymentStrictReceive(Operation):
         dest_asset = self.dest_asset.to_xdr_object()
         path = [asset.to_xdr_object() for asset in self.path]
 
-        path_payment_strict_receive_op = Xdr.types.PathPaymentStrictReceiveOp(
+        path_payment_strict_receive_op = stellar_xdr.PathPaymentStrictReceiveOp(
             send_asset,
-            Operation.to_xdr_amount(self.send_max),
+            stellar_xdr.Int64(Operation.to_xdr_amount(self.send_max)),
             destination,
             dest_asset,
-            Operation.to_xdr_amount(self.dest_amount),
+            stellar_xdr.Int64(Operation.to_xdr_amount(self.dest_amount)),
             path,
         )
-        body = Xdr.nullclass()
-        body.type = Xdr.const.PATH_PAYMENT_STRICT_RECEIVE
-        body.pathPaymentStrictReceiveOp = path_payment_strict_receive_op
+        body = stellar_xdr.OperationBody(
+            type=self._XDR_OPERATION_TYPE,
+            path_payment_strict_receive_op=path_payment_strict_receive_op,
+        )
         return body
 
     @classmethod
     def from_xdr_object(
-        cls, operation_xdr_object: Xdr.types.Operation
+        cls, xdr_object: stellar_xdr.Operation
     ) -> "PathPaymentStrictReceive":
         """Creates a :class:`PathPaymentStrictReceive` object from an XDR Operation
         object.
 
         """
-        source = Operation.get_source_from_xdr_obj(operation_xdr_object)
+        source = Operation.get_source_from_xdr_obj(xdr_object)
+        assert xdr_object.body.path_payment_strict_receive_op is not None
         destination = parse_ed25519_account_id_from_muxed_account_xdr_object(
-            operation_xdr_object.body.pathPaymentStrictReceiveOp.destination
+            xdr_object.body.path_payment_strict_receive_op.destination
         )
-
         send_asset = Asset.from_xdr_object(
-            operation_xdr_object.body.pathPaymentStrictReceiveOp.sendAsset
+            xdr_object.body.path_payment_strict_receive_op.send_asset
         )
         dest_asset = Asset.from_xdr_object(
-            operation_xdr_object.body.pathPaymentStrictReceiveOp.destAsset
+            xdr_object.body.path_payment_strict_receive_op.dest_asset
         )
         send_max = Operation.from_xdr_amount(
-            operation_xdr_object.body.pathPaymentStrictReceiveOp.sendMax
+            xdr_object.body.path_payment_strict_receive_op.send_max.int64
         )
         dest_amount = Operation.from_xdr_amount(
-            operation_xdr_object.body.pathPaymentStrictReceiveOp.destAmount
+            xdr_object.body.path_payment_strict_receive_op.dest_amount.int64
         )
 
         path = []
-        if operation_xdr_object.body.pathPaymentStrictReceiveOp.path:
-            for x in operation_xdr_object.body.pathPaymentStrictReceiveOp.path:
+        # In fact, we don't need to check it.
+        if xdr_object.body.path_payment_strict_receive_op.path:
+            for x in xdr_object.body.path_payment_strict_receive_op.path:
                 path.append(Asset.from_xdr_object(x))
 
         op = cls(
@@ -128,7 +128,14 @@ class PathPaymentStrictReceive(Operation):
             path=path,
         )
         op._destination_muxed = (
-            operation_xdr_object.body.pathPaymentStrictReceiveOp.destination
+            xdr_object.body.path_payment_strict_receive_op.destination
         )
-        op._source_muxed = Operation.get_source_muxed_from_xdr_obj(operation_xdr_object)
+        op._source_muxed = Operation.get_source_muxed_from_xdr_obj(xdr_object)
         return op
+
+    def __str__(self):
+        return (
+            f"<PathPaymentStrictReceive [destination={self.destination}, send_asset={self.send_asset}, "
+            f"send_max={self.send_max}, dest_asset={self.dest_asset}, dest_amount={self.dest_amount}, "
+            f"path={self.path}, source={self.source}]>"
+        )

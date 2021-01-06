@@ -3,10 +3,10 @@ from typing import Union
 
 from .operation import Operation
 from .utils import check_ed25519_public_key, check_asset_code
+from .. import xdr as stellar_xdr
 from ..asset import Asset
 from ..keypair import Keypair
 from ..strkey import StrKey
-from ..xdr import Xdr
 
 
 class TrustLineEntryFlag(IntFlag):
@@ -47,6 +47,8 @@ class AllowTrust(Operation):
 
     """
 
+    _XDR_OPERATION_TYPE: stellar_xdr.OperationType = stellar_xdr.OperationType.ALLOW_TRUST
+
     def __init__(
         self,
         trustor: str,
@@ -64,67 +66,76 @@ class AllowTrust(Operation):
             if authorize is True:
                 self.authorize: TrustLineEntryFlag = TrustLineEntryFlag.AUTHORIZED_FLAG
             else:
-                self.authorize: TrustLineEntryFlag = TrustLineEntryFlag.UNAUTHORIZED_FLAG
+                self.authorize = TrustLineEntryFlag.UNAUTHORIZED_FLAG
         else:
-            self.authorize: TrustLineEntryFlag = authorize
+            self.authorize = authorize
 
-    @classmethod
-    def type_code(cls) -> int:
-        return Xdr.const.ALLOW_TRUST
-
-    def _to_operation_body(self) -> Xdr.nullclass:
+    def _to_operation_body(self) -> stellar_xdr.OperationBody:
         Asset.check_if_asset_code_is_valid(self.asset_code)
         trustor = Keypair.from_public_key(self.trustor).xdr_account_id()
         length = len(self.asset_code)
-        # assert length <= 12
         pad_length = 4 - length if length <= 4 else 12 - length
-        # asset_code = self.asset_code + '\x00' * pad_length
-        # asset_code = bytearray(asset_code, encoding='utf-8')
         asset_code = bytearray(self.asset_code, "ascii") + b"\x00" * pad_length
-        asset = Xdr.nullclass()
+        authorize = stellar_xdr.Uint32(self.authorize.value)
         if len(asset_code) == 4:
-            asset.type = Xdr.const.ASSET_TYPE_CREDIT_ALPHANUM4
-            asset.assetCode4 = asset_code
+            asset_type = stellar_xdr.AssetType.ASSET_TYPE_CREDIT_ALPHANUM4
+            asset_code4 = stellar_xdr.AssetCode4(asset_code)
+            asset = stellar_xdr.AllowTrustOpAsset(
+                type=asset_type, asset_code4=asset_code4
+            )
         else:
-            asset.type = Xdr.const.ASSET_TYPE_CREDIT_ALPHANUM12
-            asset.assetCode12 = asset_code
-
-        allow_trust_op = Xdr.types.AllowTrustOp(trustor, asset, self.authorize.value)
-        body = Xdr.nullclass()
-        body.type = Xdr.const.ALLOW_TRUST
-        body.allowTrustOp = allow_trust_op
+            asset_type = stellar_xdr.AssetType.ASSET_TYPE_CREDIT_ALPHANUM12
+            asset_code12 = stellar_xdr.AssetCode12(asset_code)
+            asset = stellar_xdr.AllowTrustOpAsset(
+                type=asset_type, asset_code12=asset_code12
+            )
+        allow_trust_op = stellar_xdr.AllowTrustOp(trustor, asset, authorize)
+        body = stellar_xdr.OperationBody(
+            type=self._XDR_OPERATION_TYPE, allow_trust_op=allow_trust_op
+        )
         return body
 
     @classmethod
-    def from_xdr_object(cls, operation_xdr_object: Xdr.types.Operation) -> "AllowTrust":
+    def from_xdr_object(cls, xdr_object: stellar_xdr.Operation) -> "AllowTrust":
         """Creates a :class:`AllowTrust` object from an XDR Operation
         object.
 
         """
-        source = Operation.get_source_from_xdr_obj(operation_xdr_object)
+        source = Operation.get_source_from_xdr_obj(xdr_object)
+        assert xdr_object.body.allow_trust_op is not None
+        assert xdr_object.body.allow_trust_op.trustor.account_id.ed25519 is not None
         trustor = StrKey.encode_ed25519_public_key(
-            operation_xdr_object.body.allowTrustOp.trustor.ed25519
+            xdr_object.body.allow_trust_op.trustor.account_id.ed25519.uint256
         )
-        authorize = operation_xdr_object.body.allowTrustOp.authorize
+        authorize = xdr_object.body.allow_trust_op.authorize.uint32
         authorize = TrustLineEntryFlag(authorize)
-
-        asset_type = operation_xdr_object.body.allowTrustOp.asset.type
-        if asset_type == Xdr.const.ASSET_TYPE_CREDIT_ALPHANUM4:
+        asset_type = xdr_object.body.allow_trust_op.asset.type
+        if asset_type == stellar_xdr.AssetType.ASSET_TYPE_CREDIT_ALPHANUM4:
+            assert xdr_object.body.allow_trust_op.asset.asset_code4 is not None
             asset_code = (
-                operation_xdr_object.body.allowTrustOp.asset.assetCode4.decode()
+                xdr_object.body.allow_trust_op.asset.asset_code4.asset_code4.decode()
             )
-        elif asset_type == Xdr.const.ASSET_TYPE_CREDIT_ALPHANUM12:
+        elif asset_type == stellar_xdr.AssetType.ASSET_TYPE_CREDIT_ALPHANUM12:
+            assert xdr_object.body.allow_trust_op.asset.asset_code12 is not None
             asset_code = (
-                operation_xdr_object.body.allowTrustOp.asset.assetCode12.decode()
+                xdr_object.body.allow_trust_op.asset.asset_code12.asset_code12.decode()
             )
         else:
             raise NotImplementedError(
-                f"Operation of asset_type={asset_type} is not implemented."
+                "Operation of asset_type={} is not implemented" ".".format(asset_type)
             )
 
         asset_code = asset_code.rstrip("\x00")
         op = cls(
             source=source, trustor=trustor, authorize=authorize, asset_code=asset_code
         )
-        op._source_muxed = Operation.get_source_muxed_from_xdr_obj(operation_xdr_object)
+        op._source_muxed = Operation.get_source_muxed_from_xdr_obj(xdr_object)
         return op
+
+    def __str__(self):
+        return (
+            f"<AllowTrust [trustor={self.trustor}, "
+            f"asset_code={self.asset_code}, "
+            f"authorize={self.authorize}, "
+            f"source={self.source}]>"
+        )

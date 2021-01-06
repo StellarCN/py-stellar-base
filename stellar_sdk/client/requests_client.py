@@ -38,6 +38,7 @@ class RequestsClient(BaseSyncClient):
     :param stream_session: the stream request session
     """
 
+    # TODO: Custom user agent.
     def __init__(
         self,
         pool_size: int = DEFAULT_POOLSIZE,
@@ -57,7 +58,7 @@ class RequestsClient(BaseSyncClient):
         # adding 504 to the tuple of statuses to retry
         self.status_forcelist: Tuple[int] = tuple(Retry.RETRY_AFTER_STATUS_CODES) + (
             504,
-        )
+        )  # type: ignore[assignment]
 
         # configure standard session
 
@@ -187,6 +188,17 @@ class RequestsClient(BaseSyncClient):
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.close()
 
+    def __str__(self):
+        return (
+            f"<RequestsClient [pool_size={self.pool_size}, "
+            f"num_retries={self.num_retries}, "
+            f"request_timeout={self.request_timeout}, "
+            f"post_timeout={self.post_timeout}, "
+            f"backoff_factor={self.backoff_factor}, "
+            f"session={self._session}, "
+            f"stream_session={self.backoff_factor}]>"
+        )
+
 
 class _SSEClient:
     def __init__(
@@ -217,3 +229,13 @@ class _SSEClient:
             data = msg.data
             if data != '"hello"' and data != '"byebye"':
                 return json.loads(data)
+
+    def __str__(self):
+        return (
+            f"<_SSEClient [url={self.client.url}, "
+            f"last_id={self.client.last_id}, "
+            f"retry={self.client.retry}, "
+            f"session={self.client.session}, "
+            f"chunk_size={self.client.chunk_size}, "
+            f"connect_retry={self.client.connect_retry}]>"
+        )

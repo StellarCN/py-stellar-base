@@ -7,9 +7,8 @@ Created: 2017-10-30
 Updated: 2019-10-10
 Version 1.1.0
 """
-from typing import Optional, Union, Coroutine, Any
+from typing import Optional, Union, Coroutine, Any, Dict
 
-from ..exceptions import ValueError
 from .exceptions import (
     InvalidFederationAddress,
     FederationServerNotFoundError,
@@ -20,6 +19,7 @@ from ..client.base_async_client import BaseAsyncClient
 from ..client.base_sync_client import BaseSyncClient
 from ..client.requests_client import RequestsClient
 from ..client.response import Response
+from ..exceptions import ValueError
 
 SEPARATOR = "*"
 FEDERATION_SERVER_KEY = "FEDERATION_SERVER"
@@ -139,7 +139,7 @@ def __resolve_stellar_address_sync(
     parts = split_stellar_address(stellar_address)
     domain = parts["domain"]
     if federation_url is None:
-        federation_url = fetch_stellar_toml(domain, use_http=use_http).get(
+        federation_url = fetch_stellar_toml(domain, use_http=use_http).get(  # type: ignore[union-attr]
             FEDERATION_SERVER_KEY
         )
     if federation_url is None:
@@ -160,7 +160,7 @@ async def __resolve_stellar_address_async(
     domain = parts["domain"]
     if federation_url is None:
         federation_url = (
-            await fetch_stellar_toml(domain, client=client, use_http=use_http)
+            await fetch_stellar_toml(domain, client=client, use_http=use_http)  # type: ignore[misc]
         ).get(FEDERATION_SERVER_KEY)
     if federation_url is None:
         raise FederationServerNotFoundError(
@@ -178,7 +178,7 @@ def __resolve_account_id_sync(
     use_http: bool = False,
 ) -> FederationRecord:
     if domain is not None:
-        federation_url = fetch_stellar_toml(domain, client, use_http).get(
+        federation_url = fetch_stellar_toml(domain, client, use_http).get(  # type: ignore[union-attr]
             FEDERATION_SERVER_KEY
         )
         if federation_url is None:
@@ -197,7 +197,7 @@ async def __resolve_account_id_async(
     use_http: bool = False,
 ) -> FederationRecord:
     if domain is not None:
-        federation_url = (await fetch_stellar_toml(domain, client, use_http)).get(
+        federation_url = (await fetch_stellar_toml(domain, client, use_http)).get(  # type: ignore[misc]
             FEDERATION_SERVER_KEY
         )
         if federation_url is None:
@@ -208,7 +208,9 @@ async def __resolve_account_id_async(
     return __handle_raw_response(raw_resp, account_id=account_id)
 
 
-def __handle_raw_response(raw_resp: Response, stellar_address=None, account_id=None):
+def __handle_raw_response(
+    raw_resp: Response, stellar_address=None, account_id=None
+) -> FederationRecord:
     if not 200 <= raw_resp.status_code < 300:
         raise BadFederationResponseError(raw_resp)
     data = raw_resp.json()
@@ -224,7 +226,7 @@ def __handle_raw_response(raw_resp: Response, stellar_address=None, account_id=N
     )
 
 
-def split_stellar_address(address: str) -> dict:
+def split_stellar_address(address: str) -> Dict[str, str]:
     parts = address.split(SEPARATOR)
     if len(parts) != 2:
         raise InvalidFederationAddress(

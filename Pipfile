@@ -5,7 +5,6 @@ verify_ssl = true
 
 [dev-packages]
 pytest = "*"
-ply = "*"
 pytest-cov = "*"
 sphinx = "*"
 sphinx-rtd-theme = "*"
@@ -26,6 +25,3 @@ toml = "*"
 
 [requires]
 python_version = "3.8"
-
-[pipenv]
-allow_prereleases = true

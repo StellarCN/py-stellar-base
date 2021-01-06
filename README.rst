@@ -9,19 +9,23 @@ Stellar Python SDK
     :alt: Read the Docs
     :target: https://stellar-sdk.readthedocs.io/en/latest/
 
-.. image:: https://img.shields.io/codecov/c/github/StellarCN/py-stellar-base/v2?style=flat-square&maxAge=1800
-    :alt: Codecov
-    :target: https://codecov.io/gh/StellarCN/py-stellar-base
+.. image:: https://img.shields.io/pypi/dm/stellar-sdk?style=flat-square
+    :alt: PyPI - Downloads
+    :target: https://pypi.python.org/pypi/stellar-sdk
 
 .. image:: https://img.shields.io/codeclimate/maintainability/StellarCN/py-stellar-base?style=flat-square&maxAge=1800
     :alt: Code Climate maintainability
     :target: https://codeclimate.com/github/StellarCN/py-stellar-base/maintainability
 
+.. image:: https://img.shields.io/codecov/c/github/StellarCN/py-stellar-base/v2?style=flat-square&maxAge=1800
+    :alt: Codecov
+    :target: https://codecov.io/gh/StellarCN/py-stellar-base
+
 .. image:: https://img.shields.io/pypi/v/stellar-sdk.svg?style=flat-square&maxAge=1800
     :alt: PyPI
     :target: https://pypi.python.org/pypi/stellar-sdk
 
-.. image:: https://img.shields.io/badge/python-3.6%20%7C%203.7%20%7C%203.8%20%7C%203.9-blue?style=flat-square
+.. image:: https://img.shields.io/badge/python-3.6%20%7C%203.7%20%7C%203.8-blue?style=flat-square
     :alt: Python - Version
     :target: https://pypi.python.org/pypi/stellar-sdk
 
@@ -33,9 +37,9 @@ Stellar Python SDK
     :alt: Stellar Protocol
     :target: https://www.stellar.org/developers/guides/concepts/scp.html
 
-.. image:: https://img.shields.io/badge/Horizon%20Version-1.11.1-blue?style=flat-square
+.. image:: https://img.shields.io/badge/Horizon%20Version-1.13.0-blue?style=flat-square
     :alt: Horizon Version
-    :target: https://github.com/stellar/go/releases/tag/horizon-v1.11.1
+    :target: https://github.com/stellar/go/releases/tag/horizon-v1.13.0
 
 py-stellar-sdk is a Python library for communicating with
 a `Stellar Horizon server`_. It is used for building Stellar apps on Python. It supports **Python 3.6+** as
@@ -57,13 +61,13 @@ Install and update using `pipenv`_ or `pip`_:
 
 .. code-block:: text
 
-    pip install stellar-sdk==2.10.1
+    pip install stellar-sdk==3.0.0b5
 
 
 A Simple Example
 ----------------
 
-* Building transaction with synchronous server
+Building transaction with synchronous server
 
 .. code-block:: python
 
@@ -89,6 +93,7 @@ A Simple Example
     transaction.sign(alice_keypair)
     response = server.submit_transaction(transaction)
     print(response)
+
 
 * Building transaction with asynchronous server
 
@@ -128,6 +133,7 @@ A Simple Example
 
     if __name__ == "__main__":
         asyncio.run(payment())
+
 
 Links
 -----

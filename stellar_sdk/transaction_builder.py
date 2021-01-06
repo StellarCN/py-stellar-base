@@ -1,9 +1,8 @@
 import time
-import warnings
 from decimal import Decimal
 from typing import List, Union, Optional
 
-from .signer_key import SignerKey
+from . import xdr as stellar_xdr
 from .account import Account
 from .asset import Asset
 from .exceptions import ValueError
@@ -15,11 +14,11 @@ from .network import Network
 from .operation import *
 from .price import Price
 from .signer import Signer
+from .signer_key import SignerKey
 from .time_bounds import TimeBounds
 from .transaction import Transaction
 from .transaction_envelope import TransactionEnvelope
 from .utils import hex_to_bytes
-from .xdr import Xdr
 
 __all__ = ["TransactionBuilder"]
 
@@ -138,9 +137,9 @@ class TransactionBuilder:
             :py:class:`FeeBumpTransactionEnvelope <stellar_sdk.fee_bump_transaction_envelope.FeeBumpTransactionEnvelope>`
             via the XDR object.
         """
-        xdr_object = Xdr.types.TransactionEnvelope.from_xdr(xdr)
+        xdr_object = stellar_xdr.TransactionEnvelope.from_xdr(xdr)
         te_type = xdr_object.type
-        if te_type == Xdr.const.ENVELOPE_TYPE_TX_FEE_BUMP:
+        if te_type == stellar_xdr.EnvelopeType.ENVELOPE_TYPE_TX_FEE_BUMP:
             return FeeBumpTransactionEnvelope.from_xdr_object(
                 xdr_object, network_passphrase
             )
@@ -338,62 +337,6 @@ class TransactionBuilder:
         op = Payment(destination, asset, amount, source)
         return self.append_operation(op)
 
-    def append_path_payment_op(
-        self,
-        destination: str,
-        send_code: str,
-        send_issuer: Optional[str],
-        send_max: Union[str, Decimal],
-        dest_code: str,
-        dest_issuer: Optional[str],
-        dest_amount: Union[str, Decimal],
-        path: List[Asset],
-        source: str = None,
-    ) -> "TransactionBuilder":
-        """Append a :class:`PathPayment <stellar_sdk.operation.PathPayment>`
-        operation to the list of operations.
-
-        :param destination: The destination address (Account ID) for the
-            payment.
-        :param send_code: The asset code for the source asset deducted from
-            the source account.
-        :param send_issuer: The address of the issuer of the source asset.
-        :param send_max: The maximum amount of send asset to deduct
-            (excluding fees).
-        :param dest_code: The asset code for the final destination asset
-            sent to the recipient.
-        :param dest_issuer: Account address that receives the payment.
-        :param dest_amount: The amount of destination asset the destination
-            account receives.
-        :param path: A list of Asset objects to use as the path.
-        :param source: The source address of the path payment.
-        :return: This builder instance.
-
-        """
-
-        warnings.warn(
-            "Will be removed in version v3.0.0, "
-            "use stellar_sdk.transaction_builder.append_path_payment_strict_receive_op",
-            DeprecationWarning,
-        )
-
-        send_asset = Asset(send_code, send_issuer)
-        dest_asset = Asset(dest_code, dest_issuer)
-
-        assets = []
-        for asset in path:
-            assets.append(asset)
-        op = PathPayment(
-            destination=destination,
-            send_asset=send_asset,
-            send_max=send_max,
-            dest_asset=dest_asset,
-            dest_amount=dest_amount,
-            path=assets,
-            source=source,
-        )
-        return self.append_operation(op)
-
     def append_path_payment_strict_receive_op(
         self,
         destination: str,
@@ -519,8 +462,8 @@ class TransactionBuilder:
     def append_set_options_op(
         self,
         inflation_dest: str = None,
-        clear_flags: Union[int, Flag] = None,
-        set_flags: Union[int, Flag] = None,
+        clear_flags: Union[int, AuthorizationFlag] = None,
+        set_flags: Union[int, AuthorizationFlag] = None,
         master_weight: int = None,
         low_threshold: int = None,
         med_threshold: int = None,
@@ -537,7 +480,7 @@ class TransactionBuilder:
             please refer to the `accounts doc <https://www.stellar.org/developers/guides/concepts/accounts.html>`__.
             The `bit mask <https://en.wikipedia.org/wiki/Bit_field>`_ integer subtracts from the existing flags of the account.
             This allows for setting specific bits without knowledge of existing flags, you can also use
-            :class:`stellar_sdk.operation.set_options.Flag`
+            :class:`stellar_sdk.operation.set_options.AuthorizationFlag`
             - AUTHORIZATION_REQUIRED = 1
             - AUTHORIZATION_REVOCABLE = 2
             - AUTHORIZATION_IMMUTABLE = 4
@@ -966,8 +909,8 @@ class TransactionBuilder:
         :param source: The source account (defaults to transaction source).
         :return: This builder instance.
         """
-        signer_key = SignerKey.ed25519_public_key(signer_key)
-        op = RevokeSponsorship.revoke_signer_sponsorship(account_id, signer_key, source)
+        key = SignerKey.ed25519_public_key(signer_key)
+        op = RevokeSponsorship.revoke_signer_sponsorship(account_id, key, source)
         return self.append_operation(op)
 
     def append_revoke_hashx_signer_sponsorship_op(
@@ -981,8 +924,8 @@ class TransactionBuilder:
         :param source: The source account (defaults to transaction source).
         :return: This builder instance.
         """
-        signer_key = SignerKey.sha256_hash(hex_to_bytes(signer_key))
-        op = RevokeSponsorship.revoke_signer_sponsorship(account_id, signer_key, source)
+        key = SignerKey.sha256_hash(hex_to_bytes(signer_key))
+        op = RevokeSponsorship.revoke_signer_sponsorship(account_id, key, source)
         return self.append_operation(op)
 
     def append_revoke_pre_auth_tx_signer_sponsorship_op(
@@ -996,6 +939,14 @@ class TransactionBuilder:
         :param source: The source account (defaults to transaction source).
         :return: This builder instance.
         """
-        signer_key = SignerKey.pre_auth_tx(hex_to_bytes(signer_key))
-        op = RevokeSponsorship.revoke_signer_sponsorship(account_id, signer_key, source)
+        key = SignerKey.pre_auth_tx(hex_to_bytes(signer_key))
+        op = RevokeSponsorship.revoke_signer_sponsorship(account_id, key, source)
         return self.append_operation(op)
+
+    def __str__(self):
+        return (
+            f"<TransactionBuilder [source_account={self.source_account}, "
+            f"base_fee={self.base_fee}, network_passphrase={self.network_passphrase}, "
+            f"operations={self.operations}, memo={self.memo}, "
+            f"time_bounds={self.time_bounds}, v1={self.v1}]>"
+        )

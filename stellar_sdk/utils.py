@@ -4,10 +4,10 @@ from decimal import Decimal, ROUND_FLOOR
 from typing import List
 from urllib.parse import urlsplit, urlunsplit
 
+from . import xdr as stellar_xdr
 from .asset import Asset
 from .exceptions import NoApproximationError, TypeError
 from .strkey import StrKey
-from .xdr import Xdr
 
 MUXED_ACCOUNT_STARTING_LETTER: str = "M"
 ED25519_PUBLIC_KEY_STARTING_LETTER: str = "G"
@@ -43,20 +43,6 @@ def best_rational_approximation(x):
     return {"n": int(n), "d": int(d)}
 
 
-def pack_xdr_array(x):
-    if x is None:
-        return []
-    # if not isinstance(x, list):
-    #     return [x]
-    return [x]
-
-
-def unpack_xdr_array(x):
-    if not x:
-        return None
-    return x[0]
-
-
 def hex_to_bytes(hex_string):
     if isinstance(hex_string, bytes):
         return hex_string
@@ -88,21 +74,22 @@ def urljoin_with_query(base: str, path: str) -> str:
 
 
 def parse_ed25519_account_id_from_muxed_account_xdr_object(
-    data: Xdr.types.MuxedAccount,
+    data: stellar_xdr.MuxedAccount,
 ) -> str:
     if data.ed25519 is not None:
-        return StrKey.encode_ed25519_public_key(data.ed25519)
-    return StrKey.encode_ed25519_public_key(data.med25519.ed25519)
+        return StrKey.encode_ed25519_public_key(data.ed25519.uint256)
+    assert data.med25519 is not None
+    return StrKey.encode_ed25519_public_key(data.med25519.ed25519.uint256)
 
 
 def is_fee_bump_transaction(xdr: str) -> bool:
-    xdr_object = Xdr.types.TransactionEnvelope.from_xdr(xdr)
+    xdr_object = stellar_xdr.TransactionEnvelope.from_xdr(xdr)
     te_type = xdr_object.type
-    if te_type == Xdr.const.ENVELOPE_TYPE_TX_FEE_BUMP:
+    if te_type == stellar_xdr.EnvelopeType.ENVELOPE_TYPE_TX_FEE_BUMP:
         return True
     elif (
-        te_type == Xdr.const.ENVELOPE_TYPE_TX
-        or te_type == Xdr.const.ENVELOPE_TYPE_TX_V0
+        te_type == stellar_xdr.EnvelopeType.ENVELOPE_TYPE_TX
+        or te_type == stellar_xdr.EnvelopeType.ENVELOPE_TYPE_TX_V0
     ):
         return False
     else:

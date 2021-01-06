@@ -102,7 +102,7 @@ class TestStellarWebAuthentication:
             challenge_tx,
             server_kp.public_key,
             ["example.com2", "example.com1", home_domain],
-            network_passphrase
+            network_passphrase,
         )
 
     def test_verify_challenge_transaction_with_multi_domain_names_not_include(self):
@@ -131,7 +131,7 @@ class TestStellarWebAuthentication:
                 challenge_tx,
                 server_kp.public_key,
                 ["example.com2", "example.com1"],
-                network_passphrase
+                network_passphrase,
             )
 
     def test_verify_challenge_transaction_with_empty_domain_names(self):
@@ -157,10 +157,7 @@ class TestStellarWebAuthentication:
             match="The transaction's operation key name does not include the expected home domain.",
         ):
             verify_challenge_transaction(
-                challenge_tx,
-                server_kp.public_key,
-                [],
-                network_passphrase
+                challenge_tx, server_kp.public_key, [], network_passphrase
             )
 
     def test_verify_challenge_tx_sequence_not_zero(self):
@@ -307,8 +304,7 @@ class TestStellarWebAuthentication:
         challenge_tx_signed = challenge_te.to_xdr()
 
         with pytest.raises(
-            InvalidSep10ChallengeError,
-            match="Operation value should not be null.",
+            InvalidSep10ChallengeError, match="Operation value should not be null.",
         ):
             verify_challenge_transaction(
                 challenge_tx_signed,

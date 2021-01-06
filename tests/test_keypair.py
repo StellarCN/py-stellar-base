@@ -478,13 +478,27 @@ class TestKeypair:
     @pytest.mark.parametrize(
         "mnemonic, language",
         [
-            ("usual canvas judge video wall ride rookie together enhance able evoke one", Language.CHINESE_SIMPLIFIED),
-            ("invalid_mnemonic canvas judge video wall ride rookie together enhance able evoke one", Language.ENGLISH),
-            ("usual canvas judge video wall ride rookie together enhance able evoke", Language.ENGLISH),
+            (
+                "usual canvas judge video wall ride rookie together enhance able evoke one",
+                Language.CHINESE_SIMPLIFIED,
+            ),
+            (
+                "invalid_mnemonic canvas judge video wall ride rookie together enhance able evoke one",
+                Language.ENGLISH,
+            ),
+            (
+                "usual canvas judge video wall ride rookie together enhance able evoke",
+                Language.ENGLISH,
+            ),
             ("胸泉谈新钉励确连球遇孤资氯递陪壤框碧折锋慌拖射潮", Language.CHINESE_SIMPLIFIED),
         ],
     )
     def test_invalid_mnemonic_raise(self, mnemonic, language):
-        with pytest.raises(ValueError, match="Invalid mnemonic, please check if the mnemonic is correct, "
-                                             "or if the language is set correctly."):
-            assert Keypair.from_mnemonic_phrase(mnemonic_phrase=mnemonic, language=language)
+        with pytest.raises(
+            ValueError,
+            match="Invalid mnemonic, please check if the mnemonic is correct, "
+            "or if the language is set correctly.",
+        ):
+            assert Keypair.from_mnemonic_phrase(
+                mnemonic_phrase=mnemonic, language=language
+            )

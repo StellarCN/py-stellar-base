@@ -6,7 +6,7 @@ from ..client.base_sync_client import BaseSyncClient
 
 
 class PaymentsCallBuilder(BaseCallBuilder):
-    """ Creates a new :class:`PaymentsCallBuilder` pointed to server defined by horizon_url.
+    """Creates a new :class:`PaymentsCallBuilder` pointed to server defined by horizon_url.
     Do not create this object directly, use :func:`stellar_sdk.server.Server.payments`.
 
     See `All Payments <https://www.stellar.org/developers/horizon/reference/endpoints/payments-all.html>`_
@@ -41,7 +41,7 @@ class PaymentsCallBuilder(BaseCallBuilder):
         :param sequence: Ledger sequence
         :return: current PaymentsCallBuilder instance
         """
-        self.endpoint: str = f"ledgers/{sequence}/payments"
+        self.endpoint = f"ledgers/{sequence}/payments"
         return self
 
     def for_transaction(self, transaction_hash: str) -> "PaymentsCallBuilder":
@@ -52,7 +52,7 @@ class PaymentsCallBuilder(BaseCallBuilder):
         :param transaction_hash: Transaction hash
         :return: current PaymentsCallBuilder instance
         """
-        self.endpoint: str = f"transactions/{transaction_hash}/payments"
+        self.endpoint = f"transactions/{transaction_hash}/payments"
         return self
 
     def include_failed(self, include_failed: bool) -> "PaymentsCallBuilder":

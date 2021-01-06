@@ -33,7 +33,7 @@ class Account:
         self.sequence = sequence
 
         # The following properties will change in 3.0
-        self.signers: Optional[dict] = None
+        self.signers: List[dict] = []
         self.thresholds: Optional[Thresholds] = None
 
     def increment_sequence_number(self) -> None:

@@ -1,9 +1,9 @@
 import abc
 from typing import Union
 
-from .utils import hex_to_bytes
+from . import xdr as stellar_xdr
 from .exceptions import MemoInvalidException
-from .xdr import Xdr
+from .utils import hex_to_bytes
 
 __all__ = ["Memo", "NoneMemo", "TextMemo", "IdMemo", "HashMemo", "ReturnHashMemo"]
 
@@ -33,43 +33,47 @@ class Memo(object, metaclass=abc.ABCMeta):
     """
 
     @abc.abstractmethod
-    def to_xdr_object(self) -> Xdr.types.Memo:
+    def to_xdr_object(self) -> stellar_xdr.Memo:
         """Creates an XDR Memo object that represents this :class:`Memo`."""
 
     @staticmethod
-    def from_xdr_object(xdr_obj: Xdr.types.Memo) -> "Memo":
+    def from_xdr_object(xdr_object: stellar_xdr.Memo) -> "Memo":
         """Returns an Memo object from XDR memo object."""
 
         xdr_types = {
-            Xdr.const.MEMO_TEXT: TextMemo,
-            Xdr.const.MEMO_ID: IdMemo,
-            Xdr.const.MEMO_HASH: HashMemo,
-            Xdr.const.MEMO_RETURN: ReturnHashMemo,
-            Xdr.const.MEMO_NONE: NoneMemo,
+            stellar_xdr.MemoType.MEMO_TEXT: TextMemo,
+            stellar_xdr.MemoType.MEMO_ID: IdMemo,
+            stellar_xdr.MemoType.MEMO_HASH: HashMemo,
+            stellar_xdr.MemoType.MEMO_RETURN: ReturnHashMemo,
+            stellar_xdr.MemoType.MEMO_NONE: NoneMemo,
         }
 
         # TODO: Maybe we should raise Key Error here
-        memo_cls = xdr_types.get(xdr_obj.type, NoneMemo)
-        return memo_cls.from_xdr_object(xdr_obj)
+        memo_cls = xdr_types.get(xdr_object.type, NoneMemo)
+        return memo_cls.from_xdr_object(xdr_object)  # type: ignore[attr-defined]
 
+    @abc.abstractmethod
     def __eq__(self, other: object) -> bool:
-        if not isinstance(other, self.__class__):
-            return NotImplemented  # pragma: no cover
-        return self.to_xdr_object().to_xdr() == other.to_xdr_object().to_xdr()
+        pass  # pragma: no cover
 
 
 class NoneMemo(Memo):
     """The :class:`NoneMemo`, which represents no memo for a transaction."""
 
     @classmethod
-    def from_xdr_object(cls, xdr_obj: Xdr.types.Memo) -> "NoneMemo":
+    def from_xdr_object(cls, xdr_object: stellar_xdr.Memo) -> "NoneMemo":
         """Returns an :class:`NoneMemo` object from XDR memo object."""
 
         return cls()
 
-    def to_xdr_object(self) -> Xdr.types.Memo:
+    def to_xdr_object(self) -> stellar_xdr.Memo:
         """Creates an XDR Memo object that represents this :class:`NoneMemo`."""
-        return Xdr.types.Memo(type=Xdr.const.MEMO_NONE)
+        return stellar_xdr.Memo(type=stellar_xdr.MemoType.MEMO_NONE)
+
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, self.__class__):
+            return NotImplemented  # pragma: no cover
+        return True
 
     def __str__(self):
         return "<NoneMemo>"
@@ -92,9 +96,9 @@ class TextMemo(Memo):
                 f"TextMemo expects string or bytes type got a {type(text)}"
             )
 
-        self.memo_text: bytes = text
         if not isinstance(text, bytes):
-            self.memo_text = bytes(text, encoding="utf-8")
+            text = bytes(text, encoding="utf-8")
+        self.memo_text: bytes = text
 
         length = len(self.memo_text)
         if length > 28:
@@ -103,14 +107,21 @@ class TextMemo(Memo):
             )
 
     @classmethod
-    def from_xdr_object(cls, xdr_obj: Xdr.types.Memo) -> "TextMemo":
+    def from_xdr_object(cls, xdr_object: stellar_xdr.Memo) -> "TextMemo":
         """Returns an :class:`TextMemo` object from XDR memo object."""
+        assert xdr_object.text is not None
+        return cls(bytes(xdr_object.text))
 
-        return cls(bytes(xdr_obj.switch))
-
-    def to_xdr_object(self) -> Xdr.types.Memo:
+    def to_xdr_object(self) -> stellar_xdr.Memo:
         """Creates an XDR Memo object that represents this :class:`TextMemo`."""
-        return Xdr.types.Memo(type=Xdr.const.MEMO_TEXT, text=self.memo_text)
+        return stellar_xdr.Memo(
+            type=stellar_xdr.MemoType.MEMO_TEXT, text=self.memo_text
+        )
+
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, self.__class__):
+            return NotImplemented  # pragma: no cover
+        return self.memo_text == other.memo_text
 
     def __str__(self):
         return f"<TextMemo [memo={self.memo_text}]>"
@@ -134,14 +145,21 @@ class IdMemo(Memo):
         self.memo_id: int = memo_id
 
     @classmethod
-    def from_xdr_object(cls, xdr_obj: Xdr.types.Memo) -> "IdMemo":
+    def from_xdr_object(cls, xdr_object: stellar_xdr.Memo) -> "IdMemo":
         """Returns an :class:`IdMemo` object from XDR memo object."""
+        assert xdr_object.id is not None
+        return cls(xdr_object.id.uint64)
 
-        return cls(xdr_obj.switch)
-
-    def to_xdr_object(self) -> Xdr.types.Memo:
+    def to_xdr_object(self) -> stellar_xdr.Memo:
         """Creates an XDR Memo object that represents this :class:`IdMemo`."""
-        return Xdr.types.Memo(type=Xdr.const.MEMO_ID, id=self.memo_id)
+        return stellar_xdr.Memo(
+            type=stellar_xdr.MemoType.MEMO_ID, id=stellar_xdr.Uint64(self.memo_id)
+        )
+
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, self.__class__):
+            return NotImplemented  # pragma: no cover
+        return self.memo_id == other.memo_id
 
     def __str__(self):
         return f"<IdMemo [memo={self.memo_id}]>"
@@ -163,17 +181,24 @@ class HashMemo(Memo):
                 f"The length of HashMemo should be 32 bytes, got {length} bytes."
             )
 
-        self.memo_hash: bytes = memo_hash
+        self.memo_hash: bytes = memo_hash  # type: ignore[assignment]
 
     @classmethod
-    def from_xdr_object(cls, xdr_obj: Xdr.types.Memo) -> "HashMemo":
+    def from_xdr_object(cls, xdr_object: stellar_xdr.Memo) -> "HashMemo":
         """Returns an :class:`HashMemo` object from XDR memo object."""
+        assert xdr_object.hash is not None
+        return cls(xdr_object.hash.hash)
 
-        return cls(xdr_obj.switch)
-
-    def to_xdr_object(self) -> Xdr.types.Memo:
+    def to_xdr_object(self) -> stellar_xdr.Memo:
         """Creates an XDR Memo object that represents this :class:`HashMemo`."""
-        return Xdr.types.Memo(type=Xdr.const.MEMO_HASH, hash=self.memo_hash)
+        return stellar_xdr.Memo(
+            type=stellar_xdr.MemoType.MEMO_HASH, hash=stellar_xdr.Hash(self.memo_hash)
+        )
+
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, self.__class__):
+            return NotImplemented  # pragma: no cover
+        return self.memo_hash == other.memo_hash
 
     def __str__(self):
         return f"<HashMemo [memo={self.memo_hash}]>"
@@ -200,16 +225,25 @@ class ReturnHashMemo(Memo):
                 f"The length of ReturnHashMemo should be 32 bytes, got {length} bytes."
             )
 
-        self.memo_return: bytes = memo_return
+        self.memo_return: bytes = memo_return  # type: ignore[assignment]
 
     @classmethod
-    def from_xdr_object(cls, xdr_obj: Xdr.types.Memo) -> "ReturnHashMemo":
+    def from_xdr_object(cls, xdr_object: stellar_xdr.Memo) -> "ReturnHashMemo":
         """Returns an :class:`ReturnHashMemo` object from XDR memo object."""
-        return cls(xdr_obj.switch)
+        assert xdr_object.ret_hash is not None
+        return cls(xdr_object.ret_hash.hash)
 
-    def to_xdr_object(self) -> Xdr.types.Memo:
+    def to_xdr_object(self) -> stellar_xdr.Memo:
         """Creates an XDR Memo object that represents this :class:`ReturnHashMemo`."""
-        return Xdr.types.Memo(type=Xdr.const.MEMO_RETURN, retHash=self.memo_return)
+        return stellar_xdr.Memo(
+            type=stellar_xdr.MemoType.MEMO_RETURN,
+            ret_hash=stellar_xdr.Hash(self.memo_return),
+        )
+
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, self.__class__):
+            return NotImplemented  # pragma: no cover
+        return self.memo_return == other.memo_return
 
     def __str__(self):
         return f"<ReturnHashMemo [memo={self.memo_return}]>"

@@ -42,7 +42,7 @@ class EffectsCallBuilder(BaseCallBuilder):
         :param sequence: ledger sequence
         :return: this EffectCallBuilder instance
         """
-        self.endpoint: str = f"ledgers/{sequence}/effects"
+        self.endpoint = f"ledgers/{sequence}/effects"
         return self
 
     def for_transaction(self, transaction_hash: str) -> "EffectsCallBuilder":
@@ -53,7 +53,7 @@ class EffectsCallBuilder(BaseCallBuilder):
         :param transaction_hash: transaction hash
         :return: this EffectCallBuilder instance
         """
-        self.endpoint: str = f"transactions/{transaction_hash}/effects"
+        self.endpoint = f"transactions/{transaction_hash}/effects"
         return self
 
     def for_operation(self, operation_id: Union[int, str]) -> "EffectsCallBuilder":
@@ -64,5 +64,5 @@ class EffectsCallBuilder(BaseCallBuilder):
         :param operation_id: operation ID
         :return: this EffectCallBuilder instance
         """
-        self.endpoint: str = f"operations/{operation_id}/effects"
+        self.endpoint = f"operations/{operation_id}/effects"
         return self

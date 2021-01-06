@@ -1,5 +1,5 @@
 from .operation import Operation
-from ..xdr import Xdr
+from .. import xdr as stellar_xdr
 
 
 class EndSponsoringFutureReserves(Operation):
@@ -17,26 +17,26 @@ class EndSponsoringFutureReserves(Operation):
     :param source: The source account (defaults to transaction source).
     """
 
+    _XDR_OPERATION_TYPE: stellar_xdr.OperationType = stellar_xdr.OperationType.END_SPONSORING_FUTURE_RESERVES
+
     def __init__(self, source: str = None) -> None:
         super().__init__(source)
 
-    @classmethod
-    def type_code(cls) -> int:
-        return Xdr.const.END_SPONSORING_FUTURE_RESERVES
-
-    def _to_operation_body(self) -> Xdr.nullclass:
-        body = Xdr.nullclass()
-        body.type = Xdr.const.END_SPONSORING_FUTURE_RESERVES
+    def _to_operation_body(self) -> stellar_xdr.OperationBody:
+        body = stellar_xdr.OperationBody(type=self._XDR_OPERATION_TYPE)
         return body
 
     @classmethod
     def from_xdr_object(
-        cls, operation_xdr_object: Xdr.types.Operation
+        cls, xdr_object: stellar_xdr.Operation
     ) -> "EndSponsoringFutureReserves":
         """Creates a :class:`EndSponsoringFutureReserves` object from an XDR Operation
         object.
         """
-        source = Operation.get_source_from_xdr_obj(operation_xdr_object)
-        op = cls(source=source,)
-        op._source_muxed = Operation.get_source_muxed_from_xdr_obj(operation_xdr_object)
+        source = Operation.get_source_from_xdr_obj(xdr_object)
+        op = cls(source=source)
+        op._source_muxed = Operation.get_source_muxed_from_xdr_obj(xdr_object)
         return op
+
+    def __str__(self):
+        return f"<EndSponsoringFutureReserves [source={self.source}]>"

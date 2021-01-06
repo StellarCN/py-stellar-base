@@ -9,7 +9,6 @@ from .ledgers_call_builder import LedgersCallBuilder
 from .offers_call_builder import OffersCallBuilder
 from .operations_call_builder import OperationsCallBuilder
 from .orderbook_call_builder import OrderbookCallBuilder
-from .paths_call_builder import PathsCallBuilder
 from .payments_call_builder import PaymentsCallBuilder
 from .root_call_builder import RootCallBuilder
 from .trades_aggregation_call_builder import TradeAggregationsCallBuilder
@@ -30,7 +29,6 @@ __all__ = [
     "OffersCallBuilder",
     "OperationsCallBuilder",
     "OrderbookCallBuilder",
-    "PathsCallBuilder",
     "PaymentsCallBuilder",
     "RootCallBuilder",
     "StrictReceivePathsCallBuilder",

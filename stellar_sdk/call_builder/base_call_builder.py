@@ -11,6 +11,7 @@ from typing import (
 
 from ..client.base_async_client import BaseAsyncClient
 from ..client.base_sync_client import BaseSyncClient
+from ..client.response import Response
 from ..exceptions import raise_request_exception, NotPageableError
 from ..utils import urljoin_with_query
 
@@ -65,13 +66,15 @@ class BaseCallBuilder:
 
     def __call_sync(self, url: str, params: dict = None) -> Dict[str, Any]:
         raw_resp = self.client.get(url, params)
+        assert isinstance(raw_resp, Response)
         raise_request_exception(raw_resp)
         resp = raw_resp.json()
         self._check_pageable(resp)
         return resp
 
     async def __call_async(self, url: str, params: dict = None) -> Dict[str, Any]:
-        raw_resp = await self.client.get(url, params)
+        raw_resp = await self.client.get(url, params)  # type: ignore[misc]
+        assert isinstance(raw_resp, Response)
         raise_request_exception(raw_resp)
         resp = raw_resp.json()
         self._check_pageable(resp)
@@ -102,11 +105,11 @@ class BaseCallBuilder:
         url = urljoin_with_query(self.horizon_url, self.endpoint)
         stream = self.client.stream(url, self.params)
         while True:
-            yield await stream.__anext__()
+            yield await stream.__anext__()  # type: ignore[union-attr]
 
     def __stream_sync(self) -> Generator[Dict[str, Any], None, None]:
         url = urljoin_with_query(self.horizon_url, self.endpoint)
-        return self.client.stream(url, self.params)
+        return self.client.stream(url, self.params)  # type: ignore[return-value]
 
     def cursor(self, cursor: Union) -> "BaseCallBuilder":
         """Sets ``cursor`` parameter for the current call. Returns the CallBuilder object on which this method has been called.
@@ -187,4 +190,14 @@ class BaseCallBuilder:
             and self.params == other.params
             and self.endpoint == other.endpoint
             and self.horizon_url == other.horizon_url
+        )
+
+    def __str__(self):
+        return (
+            f"<CallBuilder [horizon_url={self.horizon_url}, "
+            f"endpoint={self.endpoint}, "
+            f"params={self.params}, "
+            f"prev_href={self.prev_href}, "
+            f"next_href={self.next_href}, "
+            f"client={self.client}]>"
         )

@@ -17,10 +17,8 @@ class TestTransaction:
         asset = Asset.native()
         time_bounds = TimeBounds(12345, 56789)
         ops = [Payment(destination, asset, amount), ManageData("hello", "world")]
-
-        tx_object = Transaction(
-            source, sequence, fee, ops, memo, time_bounds, True
-        ).to_xdr_object()
+        tx = Transaction(source, sequence, fee, ops, memo, time_bounds, True)
+        tx_object = tx.to_xdr_object()
         assert (
             tx_object.to_xdr()
             == "AAAAAImbKEDtVjbFbdxfFLI5dfefG6I4jSaU5MVuzd3JYOXvAAAAyAAAAAAAAAABAAAAAQAAAAAAADA5AAAAAAAA3dUAAAACAAAAAAAAAGQAAAACAAAAAAAAAAEAAAAA0pjFgVcRZZHpMgnpXHpb/xIbLh0/YYto0PzI7+Xl5HAAAAAAAAAAAlQL5AAAAAAAAAAACgAAAAVoZWxsbwAAAAAAAAEAAAAFd29ybGQAAAAAAAAA"
@@ -33,6 +31,7 @@ class TestTransaction:
         assert restore_transaction.memo == memo
         assert restore_transaction.time_bounds == time_bounds
         assert restore_transaction.sequence == sequence
+        assert restore_transaction == tx
 
     def test_to_xdr_str_source_v1(self):
         source = "GCEZWKCA5VLDNRLN3RPRJMRZOX3Z6G5CHCGSNFHEYVXM3XOJMDS674JZ"
@@ -44,10 +43,8 @@ class TestTransaction:
         asset = Asset.native()
         time_bounds = TimeBounds(12345, 56789)
         ops = [Payment(destination, asset, amount), ManageData("hello", "world")]
-
-        tx_object = Transaction(
-            source, sequence, fee, ops, memo, time_bounds, True
-        ).to_xdr_object()
+        tx = Transaction(source, sequence, fee, ops, memo, time_bounds, True)
+        tx_object = tx.to_xdr_object()
         xdr = "AAAAAImbKEDtVjbFbdxfFLI5dfefG6I4jSaU5MVuzd3JYOXvAAAAyAAAAAAAAAABAAAAAQAAAAAAADA5AAAAAAAA3dUAAAACAAAAAAAAAGQAAAACAAAAAAAAAAEAAAAA0pjFgVcRZZHpMgnpXHpb/xIbLh0/YYto0PzI7+Xl5HAAAAAAAAAAAlQL5AAAAAAAAAAACgAAAAVoZWxsbwAAAAAAAAEAAAAFd29ybGQAAAAAAAAA"
 
         assert tx_object.to_xdr() == xdr
@@ -59,6 +56,7 @@ class TestTransaction:
         assert restore_transaction.memo == memo
         assert restore_transaction.time_bounds == time_bounds
         assert restore_transaction.sequence == sequence
+        assert restore_transaction == tx
 
     def test_to_xdr_str_source_muxed_v1(self):
         source = "GCEZWKCA5VLDNRLN3RPRJMRZOX3Z6G5CHCGSNFHEYVXM3XOJMDS674JZ"
@@ -72,9 +70,8 @@ class TestTransaction:
         time_bounds = TimeBounds(12345, 56789)
         ops = [Payment(destination, asset, amount), ManageData("hello", "world")]
 
-        tx_object = Transaction(
-            source, sequence, fee, ops, memo, time_bounds, True
-        ).to_xdr_object()
+        tx = Transaction(source, sequence, fee, ops, memo, time_bounds, True)
+        tx_object = tx.to_xdr_object()
         restore_tx = Transaction.from_xdr_object(tx_object, v1=True)
         assert restore_tx.to_xdr_object().to_xdr() == tx_object.to_xdr()
         assert restore_tx.source == Keypair.from_public_key(source)
@@ -82,9 +79,11 @@ class TestTransaction:
             restore_tx._source_muxed.to_xdr()
             == Keypair.from_public_key(source).xdr_muxed_account().to_xdr()
         )
+        assert restore_tx == tx
         restore_tx.source = source2
         assert restore_tx.source == Keypair.from_public_key(source2)
         assert restore_tx._source_muxed is None
+        assert restore_tx != tx
 
     def test_none_memo_v1(self):
         source = Keypair.from_public_key(
@@ -112,10 +111,8 @@ class TestTransaction:
         asset = Asset.native()
         time_bounds = TimeBounds(12345, 56789)
         ops = [Payment(destination, asset, amount)]
-
-        tx_object = Transaction(
-            source, sequence, fee, ops, memo, time_bounds, False
-        ).to_xdr_object()
+        tx = Transaction(source, sequence, fee, ops, memo, time_bounds, False)
+        tx_object = tx.to_xdr_object()
 
         restore_transaction = Transaction.from_xdr_object(tx_object, False)
         assert isinstance(restore_transaction, Transaction)
@@ -124,6 +121,7 @@ class TestTransaction:
         assert restore_transaction.memo == memo
         assert restore_transaction.time_bounds == time_bounds
         assert restore_transaction.sequence == sequence
+        assert restore_transaction == tx
 
     def test_to_xdr_str_source_v0(self):
         source = "GCEZWKCA5VLDNRLN3RPRJMRZOX3Z6G5CHCGSNFHEYVXM3XOJMDS674JZ"
@@ -135,10 +133,8 @@ class TestTransaction:
         asset = Asset.native()
         time_bounds = TimeBounds(12345, 56789)
         ops = [Payment(destination, asset, amount), ManageData("hello", "world")]
-
-        tx_object = Transaction(
-            source, sequence, fee, ops, memo, time_bounds, False
-        ).to_xdr_object()
+        tx = Transaction(source, sequence, fee, ops, memo, time_bounds, False)
+        tx_object = tx.to_xdr_object()
         # assert (
         #     tx_object.to_xdr()
         #     == "AAAAAImbKEDtVjbFbdxfFLI5dfefG6I4jSaU5MVuzd3JYOXvAAAAyAAAAAAAAAABAAAAAQAAAAAAADA5AAAAAAAA3dUAAAACAAAAAAAAAGQAAAACAAAAAAAAAAEAAAAA0pjFgVcRZZHpMgnpXHpb/xIbLh0/YYto0PzI7+Xl5HAAAAAAAAAAAlQL5AAAAAAAAAAACgAAAAVoZWxsbwAAAAAAAAEAAAAFd29ybGQAAAAAAAAA"
@@ -151,6 +147,7 @@ class TestTransaction:
         assert restore_transaction.memo == memo
         assert restore_transaction.time_bounds == time_bounds
         assert restore_transaction.sequence == sequence
+        assert restore_transaction == tx
 
     def test_none_memo_v0(self):
         source = Keypair.from_public_key(
