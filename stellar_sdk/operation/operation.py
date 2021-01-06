@@ -1,13 +1,12 @@
-import decimal
 from abc import ABCMeta, abstractmethod
-from decimal import Decimal, Context, Inexact
+from decimal import Decimal
 from typing import Optional, Union
 
 from .utils import check_source
 from .. import xdr as stellar_xdr
-from ..exceptions import ValueError, TypeError
 from ..keypair import Keypair
 from ..utils import parse_ed25519_account_id_from_muxed_account_xdr_object
+from ..xdr import utils as xdr_utils
 
 
 class Operation(metaclass=ABCMeta):
@@ -36,8 +35,6 @@ class Operation(metaclass=ABCMeta):
         transaction's source account.
 
     """
-
-    _ONE = Decimal(10 ** 7)
 
     def __init__(self, source: str = None) -> None:
         check_source(source)
@@ -83,29 +80,7 @@ class Operation(metaclass=ABCMeta):
             serialization.
 
         """
-        if not (isinstance(value, str) or isinstance(value, Decimal)):
-            raise TypeError(
-                f"Value of type '{value}' must be of type {str} or {Decimal}, but got {type(value)}."
-            )
-        # throw exception if value * ONE has decimal places (it can't be represented as int64)
-        try:
-            amount = int(
-                (Decimal(value) * Operation._ONE).to_integral_exact(
-                    context=Context(traps=[Inexact])
-                )
-            )
-        except decimal.Inexact:
-            raise ValueError(
-                f"Value of '{value}' must have at most 7 digits after the decimal."
-            )
-
-        if amount < 0 or amount > 9223372036854775807:
-            raise ValueError(
-                f"Value of '{value}' must represent a positive number "
-                "and the max valid value is 922337203685.4775807."
-            )
-
-        return amount
+        return xdr_utils.to_xdr_amount(value)
 
     @staticmethod
     def from_xdr_amount(value: int) -> str:
@@ -115,7 +90,7 @@ class Operation(metaclass=ABCMeta):
             amount.
 
         """
-        return str(Decimal(value) / Operation._ONE)
+        return xdr_utils.from_xdr_amount(value)
 
     @abstractmethod
     def _to_operation_body(self) -> stellar_xdr.OperationBody:
