@@ -560,6 +560,11 @@ Helpers
 ^^^^^^^
 .. autofunction:: stellar_sdk.helpers.parse_transaction_envelope_from_xdr
 
+XDR Utils
+^^^^^^^^^
+.. autofunction:: stellar_sdk.xdr.utils.from_xdr_amount
+.. autofunction:: stellar_sdk.xdr.utils.to_xdr_amount
+
 Stellar Ecosystem Proposals
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 SEP 0001: stellar.toml
