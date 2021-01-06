@@ -462,8 +462,8 @@ class TransactionBuilder:
     def append_set_options_op(
         self,
         inflation_dest: str = None,
-        clear_flags: Union[int, Flag] = None,
-        set_flags: Union[int, Flag] = None,
+        clear_flags: Union[int, AuthorizationFlag] = None,
+        set_flags: Union[int, AuthorizationFlag] = None,
         master_weight: int = None,
         low_threshold: int = None,
         med_threshold: int = None,
@@ -480,7 +480,7 @@ class TransactionBuilder:
             please refer to the `accounts doc <https://www.stellar.org/developers/guides/concepts/accounts.html>`__.
             The `bit mask <https://en.wikipedia.org/wiki/Bit_field>`_ integer subtracts from the existing flags of the account.
             This allows for setting specific bits without knowledge of existing flags, you can also use
-            :class:`stellar_sdk.operation.set_options.Flag`
+            :class:`stellar_sdk.operation.set_options.AuthorizationFlag`
             - AUTHORIZATION_REQUIRED = 1
             - AUTHORIZATION_REVOCABLE = 2
             - AUTHORIZATION_IMMUTABLE = 4

@@ -26,7 +26,7 @@ from stellar_sdk.operation.manage_sell_offer import ManageSellOffer
 from stellar_sdk.operation.path_payment_strict_receive import PathPaymentStrictReceive
 from stellar_sdk.operation.path_payment_strict_send import PathPaymentStrictSend
 from stellar_sdk.operation.payment import Payment
-from stellar_sdk.operation.set_options import SetOptions, Flag
+from stellar_sdk.operation.set_options import SetOptions, AuthorizationFlag
 from stellar_sdk.operation.revoke_sponsorship import (
     RevokeSponsorship,
     TrustLine,
@@ -750,8 +750,8 @@ class TestSetOptions:
             ),
             (
                 "GDGU5OAPHNPU5UCLE5RDJHG7PXZFQYWKCFOEXSXNMR6KRQRI5T6XXCD7",
-                Flag.AUTHORIZATION_REVOCABLE | Flag.AUTHORIZATION_IMMUTABLE,
-                Flag.AUTHORIZATION_REQUIRED,
+                AuthorizationFlag.AUTHORIZATION_REVOCABLE | AuthorizationFlag.AUTHORIZATION_IMMUTABLE,
+                AuthorizationFlag.AUTHORIZATION_REQUIRED,
                 0,
                 1,
                 2,
