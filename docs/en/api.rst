@@ -91,12 +91,6 @@ OrderbookCallBuilder
    :members:
    :inherited-members:
 
-PathsCallBuilder
-----------------
-.. autoclass:: stellar_sdk.call_builder.PathsCallBuilder
-   :members:
-   :inherited-members:
-
 PaymentsCallBuilder
 -------------------
 .. autoclass:: stellar_sdk.call_builder.PaymentsCallBuilder
