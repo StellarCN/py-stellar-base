@@ -29,11 +29,13 @@ class TestStellarWebAuthentication:
         timeout = 600
         network_passphrase = Network.TESTNET_NETWORK_PASSPHRASE
         home_domain = "example.com"
+        web_auth_domain = "auth.example.com"
 
         challenge = build_challenge_transaction(
             server_secret=server_kp.secret,
             client_account_id=client_account_id,
             home_domain=home_domain,
+            web_auth_domain=web_auth_domain,
             network_passphrase=network_passphrase,
             timeout=timeout,
         )
@@ -41,13 +43,19 @@ class TestStellarWebAuthentication:
         transaction = TransactionEnvelope.from_xdr(
             challenge, network_passphrase
         ).transaction
-        assert len(transaction.operations) == 1
-        op = transaction.operations[0]
-        assert isinstance(op, ManageData)
-        assert op.data_name == f"{home_domain} auth"
-        assert len(op.data_value) == 64
-        assert len(base64.b64decode(op.data_value)) == 48
-        assert op.source == client_account_id
+        assert len(transaction.operations) == 2
+        op0 = transaction.operations[0]
+        assert isinstance(op0, ManageData)
+        assert op0.data_name == f"{home_domain} auth"
+        assert len(op0.data_value) == 64
+        assert len(base64.b64decode(op0.data_value)) == 48
+        assert op0.source == client_account_id
+
+        op1 = transaction.operations[1]
+        assert isinstance(op1, ManageData)
+        assert op1.data_name == "web_auth_domain"
+        assert op1.data_value.decode() == web_auth_domain
+        assert op1.source == server_kp.public_key
 
         now = int(time.time())
         assert now - 3 < transaction.time_bounds.min_time < now + 3
@@ -64,11 +72,13 @@ class TestStellarWebAuthentication:
         timeout = 600
         network_passphrase = Network.PUBLIC_NETWORK_PASSPHRASE
         home_domain = "example.com"
+        web_auth_domain = "auth.example.com"
 
         challenge = build_challenge_transaction(
             server_secret=server_kp.secret,
             client_account_id=client_kp.public_key,
             home_domain=home_domain,
+            web_auth_domain=web_auth_domain,
             network_passphrase=network_passphrase,
             timeout=timeout,
         )
@@ -77,7 +87,11 @@ class TestStellarWebAuthentication:
         transaction.sign(client_kp)
         challenge_tx = transaction.to_xdr()
         verify_challenge_transaction(
-            challenge_tx, server_kp.public_key, home_domain, network_passphrase
+            challenge_tx,
+            server_kp.public_key,
+            home_domain,
+            web_auth_domain,
+            network_passphrase,
         )
 
     def test_verify_challenge_transaction_with_multi_domain_names(self):
@@ -86,11 +100,13 @@ class TestStellarWebAuthentication:
         timeout = 600
         network_passphrase = Network.PUBLIC_NETWORK_PASSPHRASE
         home_domain = "example.com"
+        web_auth_domain = "auth.example.com"
 
         challenge = build_challenge_transaction(
             server_secret=server_kp.secret,
             client_account_id=client_kp.public_key,
             home_domain=home_domain,
+            web_auth_domain=web_auth_domain,
             network_passphrase=network_passphrase,
             timeout=timeout,
         )
@@ -102,7 +118,8 @@ class TestStellarWebAuthentication:
             challenge_tx,
             server_kp.public_key,
             ["example.com2", "example.com1", home_domain],
-            network_passphrase
+            web_auth_domain,
+            network_passphrase,
         )
 
     def test_verify_challenge_transaction_with_multi_domain_names_not_include(self):
@@ -111,11 +128,13 @@ class TestStellarWebAuthentication:
         timeout = 600
         network_passphrase = Network.PUBLIC_NETWORK_PASSPHRASE
         home_domain = "example.com"
+        web_auth_domain = "auth.example.com"
 
         challenge = build_challenge_transaction(
             server_secret=server_kp.secret,
             client_account_id=client_kp.public_key,
             home_domain=home_domain,
+            web_auth_domain=web_auth_domain,
             network_passphrase=network_passphrase,
             timeout=timeout,
         )
@@ -131,7 +150,8 @@ class TestStellarWebAuthentication:
                 challenge_tx,
                 server_kp.public_key,
                 ["example.com2", "example.com1"],
-                network_passphrase
+                web_auth_domain,
+                network_passphrase,
             )
 
     def test_verify_challenge_transaction_with_empty_domain_names(self):
@@ -140,11 +160,13 @@ class TestStellarWebAuthentication:
         timeout = 600
         network_passphrase = Network.PUBLIC_NETWORK_PASSPHRASE
         home_domain = "example.com"
+        web_auth_domain = "auth.example.com"
 
         challenge = build_challenge_transaction(
             server_secret=server_kp.secret,
             client_account_id=client_kp.public_key,
             home_domain=home_domain,
+            web_auth_domain=web_auth_domain,
             network_passphrase=network_passphrase,
             timeout=timeout,
         )
@@ -160,7 +182,8 @@ class TestStellarWebAuthentication:
                 challenge_tx,
                 server_kp.public_key,
                 [],
-                network_passphrase
+                web_auth_domain,
+                network_passphrase,
             )
 
     def test_verify_challenge_tx_sequence_not_zero(self):
@@ -168,6 +191,8 @@ class TestStellarWebAuthentication:
         client_kp = Keypair.random()
         network_passphrase = Network.PUBLIC_NETWORK_PASSPHRASE
         home_domain = "example.com"
+        web_auth_domain = "auth.example.com"
+
         now = int(time.time())
         nonce = os.urandom(48)
         nonce_encoded = base64.b64encode(nonce)
@@ -178,6 +203,11 @@ class TestStellarWebAuthentication:
                 data_name="{} auth".format(home_domain),
                 data_value=nonce_encoded,
                 source=client_kp.public_key,
+            )
+            .append_manage_data_op(
+                data_name="web_auth_domain",
+                data_value=web_auth_domain,
+                source=server_account.account_id,
             )
             .add_time_bounds(now, now + 900)
             .build()
@@ -195,6 +225,7 @@ class TestStellarWebAuthentication:
                 challenge_tx_signed,
                 server_kp.public_key,
                 home_domain,
+                web_auth_domain,
                 network_passphrase,
             )
 
@@ -203,9 +234,14 @@ class TestStellarWebAuthentication:
         client_kp = Keypair.random()
         network_passphrase = Network.TESTNET_NETWORK_PASSPHRASE
         home_domain = "example.com"
+        web_auth_domain = "auth.example.com"
 
         challenge = build_challenge_transaction(
-            server_kp.secret, client_kp.public_key, home_domain, network_passphrase
+            server_kp.secret,
+            client_kp.public_key,
+            home_domain,
+            web_auth_domain,
+            network_passphrase,
         )
 
         transaction = TransactionEnvelope.from_xdr(challenge, network_passphrase)
@@ -220,6 +256,7 @@ class TestStellarWebAuthentication:
                 challenge_tx,
                 Keypair.random().public_key,
                 home_domain,
+                web_auth_domain,
                 network_passphrase,
             )
 
@@ -228,6 +265,7 @@ class TestStellarWebAuthentication:
         client_kp = Keypair.random()
         network_passphrase = Network.PUBLIC_NETWORK_PASSPHRASE
         home_domain = "example.com"
+        web_auth_domain = "auth.example.com"
         now = int(time.time())
         server_account = Account(server_kp.public_key, -1)
         challenge_te = (
@@ -248,6 +286,7 @@ class TestStellarWebAuthentication:
                 challenge_tx_signed,
                 server_kp.public_key,
                 home_domain,
+                web_auth_domain,
                 network_passphrase,
             )
 
@@ -256,6 +295,7 @@ class TestStellarWebAuthentication:
         client_kp = Keypair.random()
         network_passphrase = Network.PUBLIC_NETWORK_PASSPHRASE
         home_domain = "example.com"
+        web_auth_domain = "auth.example.com"
         now = int(time.time())
         nonce = os.urandom(48)
         nonce_encoded = base64.b64encode(nonce)
@@ -264,6 +304,11 @@ class TestStellarWebAuthentication:
             TransactionBuilder(server_account, network_passphrase, 100)
             .append_manage_data_op(
                 data_name="{} auth".format(home_domain), data_value=nonce_encoded
+            )
+            .append_manage_data_op(
+                data_name="web_auth_domain",
+                data_value=web_auth_domain,
+                source=server_account.account_id,
             )
             .add_time_bounds(now, now + 900)
             .build()
@@ -280,6 +325,7 @@ class TestStellarWebAuthentication:
                 challenge_tx_signed,
                 server_kp.public_key,
                 home_domain,
+                web_auth_domain,
                 network_passphrase,
             )
 
@@ -288,6 +334,7 @@ class TestStellarWebAuthentication:
         client_kp = Keypair.random()
         network_passphrase = Network.PUBLIC_NETWORK_PASSPHRASE
         home_domain = "example.com"
+        web_auth_domain = "auth.example.com"
         now = int(time.time())
         nonce_encoded = None
         server_account = Account(server_kp.public_key, -1)
@@ -298,6 +345,11 @@ class TestStellarWebAuthentication:
                 data_value=nonce_encoded,
                 source=client_kp.public_key,
             )
+            .append_manage_data_op(
+                data_name="web_auth_domain",
+                data_value=web_auth_domain,
+                source=server_account.account_id,
+            )
             .add_time_bounds(now, now + 900)
             .build()
         )
@@ -307,13 +359,13 @@ class TestStellarWebAuthentication:
         challenge_tx_signed = challenge_te.to_xdr()
 
         with pytest.raises(
-            InvalidSep10ChallengeError,
-            match="Operation value should not be null.",
+            InvalidSep10ChallengeError, match="Operation value should not be null.",
         ):
             verify_challenge_transaction(
                 challenge_tx_signed,
                 server_kp.public_key,
                 home_domain,
+                web_auth_domain,
                 network_passphrase,
             )
 
@@ -322,6 +374,7 @@ class TestStellarWebAuthentication:
         client_kp = Keypair.random()
         network_passphrase = Network.PUBLIC_NETWORK_PASSPHRASE
         home_domain = "example.com"
+        web_auth_domain = "auth.example.com"
         now = int(time.time())
         nonce = os.urandom(32)
         nonce_encoded = base64.b64encode(nonce)
@@ -332,6 +385,11 @@ class TestStellarWebAuthentication:
                 data_name="{} auth".format(home_domain),
                 data_value=nonce_encoded,
                 source=client_kp.public_key,
+            )
+            .append_manage_data_op(
+                data_name="web_auth_domain",
+                data_value=web_auth_domain,
+                source=server_account.account_id,
             )
             .add_time_bounds(now, now + 900)
             .build()
@@ -349,6 +407,7 @@ class TestStellarWebAuthentication:
                 challenge_tx_signed,
                 server_kp.public_key,
                 home_domain,
+                web_auth_domain,
                 network_passphrase,
             )
 
@@ -357,6 +416,7 @@ class TestStellarWebAuthentication:
         client_kp = Keypair.random()
         network_passphrase = Network.PUBLIC_NETWORK_PASSPHRASE
         home_domain = "example.com"
+        web_auth_domain = "auth.example.com"
         timeout = 900
 
         now = int(time.time())
@@ -372,6 +432,10 @@ class TestStellarWebAuthentication:
             data_name="{} auth".format(home_domain),
             data_value=nonce_encoded,
             source=client_kp.public_key,
+        ).append_manage_data_op(
+            data_name="web_auth_domain",
+            data_value=web_auth_domain,
+            source=server_account.account_id,
         )
         challenge = transaction_builder.build().to_xdr()
 
@@ -383,7 +447,11 @@ class TestStellarWebAuthentication:
             match="Transaction not signed by server: {}".format(server_kp.public_key),
         ):
             verify_challenge_transaction(
-                challenge_tx, server_kp.public_key, home_domain, network_passphrase
+                challenge_tx,
+                server_kp.public_key,
+                home_domain,
+                web_auth_domain,
+                network_passphrase,
             )
 
     def test_verify_challenge_tx_transaction_is_not_signed_by_the_client(self):
@@ -392,11 +460,13 @@ class TestStellarWebAuthentication:
         timeout = 600
         network_passphrase = Network.TESTNET_NETWORK_PASSPHRASE
         home_domain = "example.com"
+        web_auth_domain = "auth.example.com"
 
         challenge = build_challenge_transaction(
             server_secret=server_kp.secret,
             client_account_id=client_account_id,
             home_domain=home_domain,
+            web_auth_domain=web_auth_domain,
             network_passphrase=network_passphrase,
             timeout=timeout,
         )
@@ -406,7 +476,11 @@ class TestStellarWebAuthentication:
             match="Transaction not signed by any client signer.",
         ):
             verify_challenge_transaction(
-                challenge, server_kp.public_key, home_domain, network_passphrase
+                challenge,
+                server_kp.public_key,
+                home_domain,
+                web_auth_domain,
+                network_passphrase,
             )
 
     def test_verify_challenge_tx_dont_contains_timebound(self):
@@ -414,6 +488,7 @@ class TestStellarWebAuthentication:
         client_kp = Keypair.random()
         network_passphrase = Network.PUBLIC_NETWORK_PASSPHRASE
         home_domain = "example.com"
+        web_auth_domain = "auth.example.com"
         nonce = os.urandom(48)
         nonce_encoded = base64.b64encode(nonce)
         server_account = Account(server_kp.public_key, -1)
@@ -423,6 +498,11 @@ class TestStellarWebAuthentication:
                 data_name="{} auth".format(home_domain),
                 data_value=nonce_encoded,
                 source=client_kp.public_key,
+            )
+            .append_manage_data_op(
+                data_name="web_auth_domain",
+                data_value=web_auth_domain,
+                source=server_account.account_id,
             )
             .build()
         )
@@ -438,6 +518,7 @@ class TestStellarWebAuthentication:
                 challenge_tx_signed,
                 server_kp.public_key,
                 home_domain,
+                web_auth_domain,
                 network_passphrase,
             )
 
@@ -446,6 +527,7 @@ class TestStellarWebAuthentication:
         client_kp = Keypair.random()
         network_passphrase = Network.PUBLIC_NETWORK_PASSPHRASE
         home_domain = "example.com"
+        web_auth_domain = "auth.example.com"
         now = int(time.time())
         nonce = os.urandom(48)
         nonce_encoded = base64.b64encode(nonce)
@@ -456,6 +538,11 @@ class TestStellarWebAuthentication:
                 data_name="{} auth".format(home_domain),
                 data_value=nonce_encoded,
                 source=client_kp.public_key,
+            )
+            .append_manage_data_op(
+                data_name="web_auth_domain",
+                data_value=web_auth_domain,
+                source=server_account.account_id,
             )
             .add_time_bounds(now, 0)
             .build()
@@ -473,6 +560,7 @@ class TestStellarWebAuthentication:
                 challenge_tx_signed,
                 server_kp.public_key,
                 home_domain,
+                web_auth_domain,
                 network_passphrase,
             )
 
@@ -481,6 +569,7 @@ class TestStellarWebAuthentication:
         client_kp = Keypair.random()
         network_passphrase = Network.PUBLIC_NETWORK_PASSPHRASE
         home_domain = "example.com"
+        web_auth_domain = "auth.example.com"
         now = int(time.time())
         nonce = os.urandom(48)
         nonce_encoded = base64.b64encode(nonce)
@@ -491,6 +580,11 @@ class TestStellarWebAuthentication:
                 data_name="{} auth".format(home_domain),
                 data_value=nonce_encoded,
                 source=client_kp.public_key,
+            )
+            .append_manage_data_op(
+                data_name="web_auth_domain",
+                data_value=web_auth_domain,
+                source=server_account.account_id,
             )
             .add_time_bounds(now - 100, now - 50)
             .build()
@@ -508,9 +602,90 @@ class TestStellarWebAuthentication:
                 challenge_tx_signed,
                 server_kp.public_key,
                 home_domain,
+                web_auth_domain,
                 network_passphrase,
             )
 
+    def test_verify_challenge_transaction_auth_domain_mismatch_raise(self):
+        server_kp = Keypair.random()
+        client_kp = Keypair.random()
+        timeout = 600
+        network_passphrase = Network.PUBLIC_NETWORK_PASSPHRASE
+        home_domain = "example.com"
+        web_auth_domain = "auth.example.com"
+        mismatch_web_auth_domain = "mismatch_auth.example.com"
+
+        challenge = build_challenge_transaction(
+            server_secret=server_kp.secret,
+            client_account_id=client_kp.public_key,
+            home_domain=home_domain,
+            web_auth_domain=mismatch_web_auth_domain,
+            network_passphrase=network_passphrase,
+            timeout=timeout,
+        )
+
+        transaction = TransactionEnvelope.from_xdr(challenge, network_passphrase)
+        transaction.sign(client_kp)
+        challenge_tx = transaction.to_xdr()
+        with pytest.raises(
+            InvalidSep10ChallengeError,
+            match=f"Invalid 'web_auth_domain' value, expected: {web_auth_domain.encode()}, "
+            f"contained: {mismatch_web_auth_domain.encode()}.",
+        ):
+            verify_challenge_transaction(
+                challenge_tx,
+                server_kp.public_key,
+                home_domain,
+                web_auth_domain,
+                network_passphrase,
+            )
+
+    def test_verify_challenge_transaction_auth_domain_op_source_not_equal_server_account_raise(
+        self,
+    ):
+        server_kp = Keypair.random()
+        client_kp = Keypair.random()
+        network_passphrase = Network.PUBLIC_NETWORK_PASSPHRASE
+        home_domain = "example.com"
+        web_auth_domain = "auth.example.com"
+
+        now = int(time.time())
+        nonce = os.urandom(48)
+        nonce_encoded = base64.b64encode(nonce)
+        server_account = Account(server_kp.public_key, -1)
+        challenge_te = (
+            TransactionBuilder(server_account, network_passphrase, 100)
+            .append_manage_data_op(
+                data_name="{} auth".format(home_domain),
+                data_value=nonce_encoded,
+                source=client_kp.public_key,
+            )
+            .append_manage_data_op(
+                data_name="web_auth_domain",
+                data_value=web_auth_domain,
+                source=client_kp.public_key,
+            )
+            .add_time_bounds(now, now + 900)
+            .build()
+        )
+
+        challenge_te.sign(server_kp)
+        challenge_te.sign(client_kp)
+        challenge_tx_signed = challenge_te.to_xdr()
+
+        with pytest.raises(
+            InvalidSep10ChallengeError,
+            match="The transaction has operations that are unrecognized.",
+        ):
+            verify_challenge_transaction(
+                challenge_tx_signed,
+                server_kp.public_key,
+                home_domain,
+                web_auth_domain,
+                network_passphrase,
+            )
+
+    # TODO
     def test_verify_challenge_transaction_home_domain_mismatch_raise(self):
         server_kp = Keypair.random()
         client_kp = Keypair.random()
@@ -518,11 +693,13 @@ class TestStellarWebAuthentication:
         network_passphrase = Network.PUBLIC_NETWORK_PASSPHRASE
         home_domain = "example.com"
         invalid_home_domain = "invalid_example.com"
+        web_auth_domain = "auth.example.com"
 
         challenge = build_challenge_transaction(
             server_secret=server_kp.secret,
             client_account_id=client_kp.public_key,
             home_domain=home_domain,
+            web_auth_domain=web_auth_domain,
             network_passphrase=network_passphrase,
             timeout=timeout,
         )
@@ -539,6 +716,7 @@ class TestStellarWebAuthentication:
                 challenge_tx,
                 server_kp.public_key,
                 invalid_home_domain,
+                web_auth_domain,
                 network_passphrase,
             )
 
@@ -549,6 +727,7 @@ class TestStellarWebAuthentication:
         client_kp = Keypair.random()
         network_passphrase = Network.PUBLIC_NETWORK_PASSPHRASE
         home_domain = "example.com"
+        web_auth_domain = "auth.example.com"
         now = int(time.time())
         nonce = os.urandom(48)
         nonce_encoded = base64.b64encode(nonce)
@@ -561,9 +740,19 @@ class TestStellarWebAuthentication:
                 source=client_kp.public_key,
             )
             .append_manage_data_op(
+                data_name="web_auth_domain",
+                data_value=web_auth_domain,
+                source=server_account.account_id,
+            )
+            .append_manage_data_op(
                 data_name="data key",
                 data_value="data value",
                 source=server_kp.public_key,
+            )
+            .append_manage_data_op(
+                data_name="web_auth_domain",
+                data_value=web_auth_domain,
+                source=server_account.account_id,
             )
             .add_time_bounds(now, now + 900)
             .build()
@@ -574,7 +763,11 @@ class TestStellarWebAuthentication:
         challenge_tx_signed = challenge_te.to_xdr()
 
         verify_challenge_transaction(
-            challenge_tx_signed, server_kp.public_key, home_domain, network_passphrase,
+            challenge_tx_signed,
+            server_kp.public_key,
+            home_domain,
+            web_auth_domain,
+            network_passphrase,
         )
 
     def test_verify_challenge_tx_contain_subsequent_manage_data_ops_without_the_server_account_as_the_source_account(
@@ -584,6 +777,7 @@ class TestStellarWebAuthentication:
         client_kp = Keypair.random()
         network_passphrase = Network.PUBLIC_NETWORK_PASSPHRASE
         home_domain = "example.com"
+        web_auth_domain = "auth.example.com"
         now = int(time.time())
         nonce = os.urandom(48)
         nonce_encoded = base64.b64encode(nonce)
@@ -594,6 +788,11 @@ class TestStellarWebAuthentication:
                 data_name="{} auth".format(home_domain),
                 data_value=nonce_encoded,
                 source=client_kp.public_key,
+            )
+            .append_manage_data_op(
+                data_name="web_auth_domain",
+                data_value=web_auth_domain,
+                source=server_account.account_id,
             )
             .append_manage_data_op(
                 data_name="data key",
@@ -616,6 +815,7 @@ class TestStellarWebAuthentication:
                 challenge_tx_signed,
                 server_kp.public_key,
                 home_domain,
+                web_auth_domain,
                 network_passphrase,
             )
 
@@ -626,6 +826,7 @@ class TestStellarWebAuthentication:
         client_kp = Keypair.random()
         network_passphrase = Network.PUBLIC_NETWORK_PASSPHRASE
         home_domain = "example.com"
+        web_auth_domain = "auth.example.com"
         now = int(time.time())
         nonce = os.urandom(48)
         nonce_encoded = base64.b64encode(nonce)
@@ -636,6 +837,11 @@ class TestStellarWebAuthentication:
                 data_name="{} auth".format(home_domain),
                 data_value=nonce_encoded,
                 source=client_kp.public_key,
+            )
+            .append_manage_data_op(
+                data_name="web_auth_domain",
+                data_value=web_auth_domain,
+                source=server_account.account_id,
             )
             .append_bump_sequence_op(bump_to=0, source=server_kp.public_key,)
             .add_time_bounds(now, now + 900)
@@ -653,6 +859,7 @@ class TestStellarWebAuthentication:
                 challenge_tx_signed,
                 server_kp.public_key,
                 home_domain,
+                web_auth_domain,
                 network_passphrase,
             )
 
@@ -663,6 +870,7 @@ class TestStellarWebAuthentication:
         client_kp = Keypair.random()
         network_passphrase = Network.PUBLIC_NETWORK_PASSPHRASE
         home_domain = "example.com"
+        web_auth_domain = "auth.example.com"
         now = int(time.time())
         nonce = os.urandom(48)
         nonce_encoded = base64.b64encode(nonce)
@@ -673,6 +881,11 @@ class TestStellarWebAuthentication:
                 data_name="{} auth".format(home_domain),
                 data_value=nonce_encoded,
                 source=client_kp.public_key,
+            )
+            .append_manage_data_op(
+                data_name="web_auth_domain",
+                data_value=web_auth_domain,
+                source=server_account.account_id,
             )
             .append_manage_data_op(data_name="Hello", data_value="world")
             .add_time_bounds(now, now + 900)
@@ -690,6 +903,7 @@ class TestStellarWebAuthentication:
                 challenge_tx_signed,
                 server_kp.public_key,
                 home_domain,
+                web_auth_domain,
                 network_passphrase,
             )
 
@@ -698,6 +912,7 @@ class TestStellarWebAuthentication:
         client_kp = Keypair.random()
         network_passphrase = Network.PUBLIC_NETWORK_PASSPHRASE
         home_domain = "example.com"
+        web_auth_domain = "auth.example.com"
         now = int(time.time())
         nonce = os.urandom(48)
         server_account = Account(server_kp.public_key, -1)
@@ -719,6 +934,7 @@ class TestStellarWebAuthentication:
                 challenge_tx_signed,
                 server_kp.public_key,
                 home_domain,
+                web_auth_domain,
                 network_passphrase,
             )
 
@@ -730,11 +946,13 @@ class TestStellarWebAuthentication:
         timeout = 600
         network_passphrase = Network.PUBLIC_NETWORK_PASSPHRASE
         home_domain = "example.com"
+        web_auth_domain = "auth.example.com"
 
         challenge = build_challenge_transaction(
             server_secret=server_kp.secret,
             client_account_id=client_kp_a.public_key,
             home_domain=home_domain,
+            web_auth_domain=web_auth_domain,
             network_passphrase=network_passphrase,
             timeout=timeout,
         )
@@ -761,6 +979,7 @@ class TestStellarWebAuthentication:
         client_kp = Keypair.random()
         network_passphrase = Network.PUBLIC_NETWORK_PASSPHRASE
         home_domain = "example.com"
+        web_auth_domain = "auth.example.com"
         now = int(time.time())
         nonce = os.urandom(48)
         nonce_encoded = base64.b64encode(nonce)
@@ -771,6 +990,11 @@ class TestStellarWebAuthentication:
                 data_name="{} auth".format(home_domain),
                 data_value=nonce_encoded,
                 source=client_kp.public_key,
+            )
+            .append_manage_data_op(
+                data_name="web_auth_domain",
+                data_value=web_auth_domain,
+                source=server_account.account_id,
             )
             .add_time_bounds(now, now + 900)
             .build()
@@ -790,11 +1014,13 @@ class TestStellarWebAuthentication:
         timeout = 600
         network_passphrase = Network.PUBLIC_NETWORK_PASSPHRASE
         home_domain = "example.com"
+        web_auth_domain = "auth.example.com"
 
         challenge = build_challenge_transaction(
             server_secret=server_kp.secret,
             client_account_id=client_kp_a.public_key,
             home_domain=home_domain,
+            web_auth_domain=web_auth_domain,
             network_passphrase=network_passphrase,
             timeout=timeout,
         )
@@ -812,7 +1038,12 @@ class TestStellarWebAuthentication:
             Ed25519PublicKeySigner(Keypair.random().public_key, 255),
         ]
         signers_found = verify_challenge_transaction_signers(
-            challenge_tx, server_kp.public_key, home_domain, network_passphrase, signers
+            challenge_tx,
+            server_kp.public_key,
+            home_domain,
+            web_auth_domain,
+            network_passphrase,
+            signers,
         )
         assert signers_found == [
             Ed25519PublicKeySigner(client_kp_a.public_key, 1),
@@ -828,11 +1059,13 @@ class TestStellarWebAuthentication:
         timeout = 600
         network_passphrase = Network.PUBLIC_NETWORK_PASSPHRASE
         home_domain = "example.com"
+        web_auth_domain = "auth.example.com"
 
         challenge = build_challenge_transaction(
             server_secret=server_kp.secret,
             client_account_id=client_kp_a.public_key,
             home_domain=home_domain,
+            web_auth_domain=web_auth_domain,
             network_passphrase=network_passphrase,
             timeout=timeout,
         )
@@ -850,6 +1083,7 @@ class TestStellarWebAuthentication:
                 challenge_tx,
                 server_kp.public_key,
                 home_domain,
+                web_auth_domain,
                 network_passphrase,
                 signers,
             )
@@ -862,11 +1096,13 @@ class TestStellarWebAuthentication:
         timeout = 600
         network_passphrase = Network.PUBLIC_NETWORK_PASSPHRASE
         home_domain = "example.com"
+        web_auth_domain = "auth.example.com"
 
         challenge = build_challenge_transaction(
             server_secret=server_kp.secret,
             client_account_id=client_kp_a.public_key,
             home_domain=home_domain,
+            web_auth_domain=web_auth_domain,
             network_passphrase=network_passphrase,
             timeout=timeout,
         )
@@ -891,6 +1127,7 @@ class TestStellarWebAuthentication:
                 challenge_tx,
                 server_kp.public_key,
                 home_domain,
+                web_auth_domain,
                 network_passphrase,
                 signers,
             )
@@ -903,11 +1140,13 @@ class TestStellarWebAuthentication:
         timeout = 600
         network_passphrase = Network.PUBLIC_NETWORK_PASSPHRASE
         home_domain = "example.com"
+        web_auth_domain = "auth.example.com"
 
         challenge = build_challenge_transaction(
             server_secret=server_kp.secret,
             client_account_id=client_kp_a.public_key,
             home_domain=home_domain,
+            web_auth_domain=web_auth_domain,
             network_passphrase=network_passphrase,
             timeout=timeout,
         )
@@ -933,6 +1172,7 @@ class TestStellarWebAuthentication:
                 challenge_tx,
                 server_kp.public_key,
                 home_domain,
+                web_auth_domain,
                 network_passphrase,
                 signers,
             )
@@ -947,11 +1187,13 @@ class TestStellarWebAuthentication:
         timeout = 600
         network_passphrase = Network.PUBLIC_NETWORK_PASSPHRASE
         home_domain = "example.com"
+        web_auth_domain = "auth.example.com"
 
         challenge = build_challenge_transaction(
             server_secret=server_kp.secret,
             client_account_id=client_kp_a.public_key,
             home_domain=home_domain,
+            web_auth_domain=web_auth_domain,
             network_passphrase=network_passphrase,
             timeout=timeout,
         )
@@ -976,6 +1218,7 @@ class TestStellarWebAuthentication:
                 challenge_tx,
                 server_kp.public_key,
                 home_domain,
+                web_auth_domain,
                 network_passphrase,
                 signers,
             )
@@ -986,11 +1229,13 @@ class TestStellarWebAuthentication:
         timeout = 600
         network_passphrase = Network.PUBLIC_NETWORK_PASSPHRASE
         home_domain = "example.com"
+        web_auth_domain = "auth.example.com"
 
         challenge = build_challenge_transaction(
             server_secret=server_kp.secret,
             client_account_id=client_kp.public_key,
             home_domain=home_domain,
+            web_auth_domain=web_auth_domain,
             network_passphrase=network_passphrase,
             timeout=timeout,
         )
@@ -1001,7 +1246,11 @@ class TestStellarWebAuthentication:
         challenge_tx = transaction.to_xdr()
 
         verify_challenge_transaction_signed_by_client_master_key(
-            challenge_tx, server_kp.public_key, home_domain, network_passphrase
+            challenge_tx,
+            server_kp.public_key,
+            home_domain,
+            web_auth_domain,
+            network_passphrase,
         )
 
     def test_verify_challenge_transaction_signed_by_client_raise_not_signed(self):
@@ -1010,11 +1259,13 @@ class TestStellarWebAuthentication:
         timeout = 600
         network_passphrase = Network.PUBLIC_NETWORK_PASSPHRASE
         home_domain = "example.com"
+        web_auth_domain = "auth.example.com"
 
         challenge = build_challenge_transaction(
             server_secret=server_kp.secret,
             client_account_id=client_kp.public_key,
             home_domain=home_domain,
+            web_auth_domain=web_auth_domain,
             network_passphrase=network_passphrase,
             timeout=timeout,
         )
@@ -1027,7 +1278,11 @@ class TestStellarWebAuthentication:
             match="Transaction not signed by any client signer.",
         ):
             verify_challenge_transaction_signed_by_client_master_key(
-                challenge_tx, server_kp.public_key, home_domain, network_passphrase
+                challenge_tx,
+                server_kp.public_key,
+                home_domain,
+                web_auth_domain,
+                network_passphrase,
             )
 
     def test_verify_challenge_transaction_threshold(self):
@@ -1038,11 +1293,13 @@ class TestStellarWebAuthentication:
         timeout = 600
         network_passphrase = Network.PUBLIC_NETWORK_PASSPHRASE
         home_domain = "example.com"
+        web_auth_domain = "auth.example.com"
 
         challenge = build_challenge_transaction(
             server_secret=server_kp.secret,
             client_account_id=client_kp_a.public_key,
             home_domain=home_domain,
+            web_auth_domain=web_auth_domain,
             network_passphrase=network_passphrase,
             timeout=timeout,
         )
@@ -1064,6 +1321,7 @@ class TestStellarWebAuthentication:
             challenge_tx,
             server_kp.public_key,
             home_domain,
+            web_auth_domain,
             network_passphrase,
             med_threshold,
             signers,
@@ -1082,11 +1340,13 @@ class TestStellarWebAuthentication:
         timeout = 600
         network_passphrase = Network.PUBLIC_NETWORK_PASSPHRASE
         home_domain = "example.com"
+        web_auth_domain = "auth.example.com"
 
         challenge = build_challenge_transaction(
             server_secret=server_kp.secret,
             client_account_id=client_kp_a.public_key,
             home_domain=home_domain,
+            web_auth_domain=web_auth_domain,
             network_passphrase=network_passphrase,
             timeout=timeout,
         )
@@ -1112,6 +1372,7 @@ class TestStellarWebAuthentication:
                 challenge_tx,
                 server_kp.public_key,
                 home_domain,
+                web_auth_domain,
                 network_passphrase,
                 med_threshold,
                 signers,
@@ -1125,6 +1386,8 @@ class TestStellarWebAuthentication:
         destination = "GDQERENWDDSQZS7R7WKHZI3BSOYMV3FSWR7TFUYFTKQ447PIX6NREOJM"
         amount = "2000.0000000"
         home_domain = "example.com"
+        web_auth_domain = "auth.example.com"
+
         inner_tx = (
             TransactionBuilder(
                 inner_source, Network.TESTNET_NETWORK_PASSPHRASE, 200, v1=True
@@ -1154,6 +1417,7 @@ class TestStellarWebAuthentication:
                 challenge,
                 inner_keypair.public_key,
                 home_domain,
+                web_auth_domain,
                 Network.TESTNET_NETWORK_PASSPHRASE,
             )
 
@@ -1167,11 +1431,13 @@ class TestStellarWebAuthentication:
         timeout = 600
         network_passphrase = Network.PUBLIC_NETWORK_PASSPHRASE
         home_domain = "example.com"
+        web_auth_domain = "auth.example.com"
 
         challenge = build_challenge_transaction(
             server_secret=server_kp.secret,
             client_account_id=client_kp_a.public_key,
             home_domain=home_domain,
+            web_auth_domain=web_auth_domain,
             network_passphrase=network_passphrase,
             timeout=timeout,
         )
@@ -1185,5 +1451,9 @@ class TestStellarWebAuthentication:
             InvalidSep10ChallengeError, match="Transaction has unrecognized signatures."
         ):
             verify_challenge_transaction_signed_by_client_master_key(
-                challenge_tx, server_kp.public_key, home_domain, network_passphrase
+                challenge_tx,
+                server_kp.public_key,
+                home_domain,
+                web_auth_domain,
+                network_passphrase,
             )
