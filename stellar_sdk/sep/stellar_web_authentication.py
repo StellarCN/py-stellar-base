@@ -223,10 +223,8 @@ def read_challenge_transaction(
             op.data_name == "web_auth_domain"
             and op.data_value != web_auth_domain.encode()
         ):
-            # We cannot confirm whether the value of manage data can be decoded.
             raise InvalidSep10ChallengeError(
-                f"Invalid 'web_auth_domain' value, expected: {web_auth_domain.encode()}, "
-                f"contained: {op.data_value}."
+                f"'web_auth_domain' operation value does not match {web_auth_domain}."
             )
 
     # verify that transaction envelope has a correct signature by server's signing key

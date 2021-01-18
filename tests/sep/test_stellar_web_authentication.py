@@ -629,8 +629,7 @@ class TestStellarWebAuthentication:
         challenge_tx = transaction.to_xdr()
         with pytest.raises(
             InvalidSep10ChallengeError,
-            match=f"Invalid 'web_auth_domain' value, expected: {web_auth_domain.encode()}, "
-            f"contained: {mismatch_web_auth_domain.encode()}.",
+            match=f"'web_auth_domain' operation value does not match {web_auth_domain}.",
         ):
             verify_challenge_transaction(
                 challenge_tx,
