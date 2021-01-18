@@ -219,6 +219,8 @@ def read_challenge_transaction(
             raise InvalidSep10ChallengeError(
                 "The transaction has operations that are unrecognized."
             )
+        if op.data_value is None:
+            raise InvalidSep10ChallengeError("Operation value should not be null.")
         if (
             op.data_name == "web_auth_domain"
             and op.data_value != web_auth_domain.encode()
