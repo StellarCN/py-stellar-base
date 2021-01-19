@@ -725,7 +725,6 @@ class TestStellarWebAuthentication:
                 network_passphrase,
             )
 
-    # TODO
     def test_verify_challenge_transaction_home_domain_mismatch_raise(self):
         server_kp = Keypair.random()
         client_kp = Keypair.random()
