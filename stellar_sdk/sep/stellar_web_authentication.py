@@ -1,12 +1,11 @@
 """
 SEP: 0010
 Title: Stellar Web Authentication
-Author: Sergey Nebolsin <sergey@mobius.network>, Tom Quisel <tom.quisel@gmail.com>,
-    Leigh McCulloch <@leighmcculloch>, Jake Urban <jake@stellar.org>
+Author: Sergey Nebolsin <@nebolsin>, Tom Quisel <tom.quisel@gmail.com>, Leigh McCulloch <@leighmcculloch>, Jake Urban <jake@stellar.org>
 Status: Active
 Created: 2018-07-31
-Updated: 2020-08-14
-Version 2.0.0
+Updated: 2021-01-11
+Version 3.1.0
 """
 import base64
 import os
