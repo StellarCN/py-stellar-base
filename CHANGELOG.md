@@ -1,6 +1,12 @@
 Release History
 ==============
 
+### Version 2.11.1
+Released on Jan 20, 2021
+
+#### Update
+* fix: SEP-10, removed non-null constraint for manageData op values. ([#424](https://github.com/StellarCN/py-stellar-base/pull/424))
+
 ### Version 2.11.0
 Released on Jan 19, 2021
 
