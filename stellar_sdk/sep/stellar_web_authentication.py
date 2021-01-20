@@ -219,15 +219,13 @@ def read_challenge_transaction(
             raise InvalidSep10ChallengeError(
                 "The transaction has operations that are unrecognized."
             )
-        if op.data_value is None:
-            raise InvalidSep10ChallengeError("Operation value should not be null.")
-        if (
-            op.data_name == "web_auth_domain"
-            and op.data_value != web_auth_domain.encode()
-        ):
-            raise InvalidSep10ChallengeError(
-                f"'web_auth_domain' operation value does not match {web_auth_domain}."
-            )
+        if op.data_name == "web_auth_domain":
+            if op.data_value is None:
+                raise InvalidSep10ChallengeError("'web_auth_domain' operation value should not be null.")
+            if op.data_value != web_auth_domain.encode():
+                raise InvalidSep10ChallengeError(
+                    f"'web_auth_domain' operation value does not match {web_auth_domain}."
+                )
 
     # verify that transaction envelope has a correct signature by server's signing key
     if not _verify_te_signed_by_account_id(transaction_envelope, server_account_id):
