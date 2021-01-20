@@ -7,6 +7,20 @@ Released on Jan 20, 2021
 #### Update
 * fix: SEP-10, removed non-null constraint for manageData op values. ([#424](https://github.com/StellarCN/py-stellar-base/pull/424))
 
+### Version 3.1.0
+Released on Jan 19, 2021
+
+#### Breaking changes
+* Updates the SEP-10 utility function parameters to support [SEP-10 v3.1.0](https://github.com/stellar/stellar-protocol/commit/6c8c9cf6685c85509835188a136ffb8cd6b9c11c).
+
+    - The following functions add the `web_auth_domain` parameter:
+        - `stellar_sdk.sep.stellar_web_authentication.build_challenge_transaction()`
+        - `stellar_sdk.sep.stellar_web_authentication.read_challenge_transaction()`
+        - `stellar_sdk.sep.stellar_web_authentication.verify_challenge_transaction_signers()`
+        - `stellar_sdk.sep.stellar_web_authentication.verify_challenge_transaction_signed_by_client_master_key()`
+        - `stellar_sdk.sep.stellar_web_authentication.verify_challenge_transaction_threshold()`
+        - `stellar_sdk.sep.stellar_web_authentication.verify_challenge_transaction()`
+
 ### Version 2.11.0
 Released on Jan 19, 2021
 
