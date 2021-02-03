@@ -11,7 +11,7 @@ import base64
 import os
 import time
 import warnings
-from typing import List, Tuple, Union, Iterable
+from typing import List, Tuple, Union, Iterable, Optional
 
 from .ed25519_public_key_signer import Ed25519PublicKeySigner
 from .exceptions import InvalidSep10ChallengeError
@@ -42,6 +42,8 @@ def build_challenge_transaction(
     web_auth_domain: str,
     network_passphrase: str,
     timeout: int = 900,
+    client_domain: Optional[str] = None,
+    client_signing_key: Optional[str] = None
 ) -> str:
     """Returns a valid `SEP0010 <https://github.com/stellar/stellar-protocol/blob/master/ecosystem/sep-0010.md>`_
     challenge transaction which you can use for Stellar Web Authentication.
@@ -54,6 +56,8 @@ def build_challenge_transaction(
     :param network_passphrase: The network to connect to for verifying and retrieving
         additional attributes from. (ex. 'Public Global Stellar Network ; September 2015')
     :param timeout: Challenge duration in seconds (default to 15 minutes).
+    :param client_domain: The domain of the client application requesting authentication
+    :param client_signing_key: The stellar account listed as the SIGNING_KEY on the client domain's TOML file
     :return: A base64 encoded string of the raw TransactionEnvelope xdr struct for the transaction.
     """
     if client_account_id.startswith(MUXED_ACCOUNT_STARTING_LETTER):
@@ -77,6 +81,12 @@ def build_challenge_transaction(
         data_value=web_auth_domain,
         source=server_account.account_id,
     )
+    if client_domain:
+        transaction_builder.append_manage_data_op(
+            data_name="client_domain",
+            data_value=client_domain,
+            source=client_signing_key
+        )
     transaction = transaction_builder.build()
     transaction.sign(server_keypair)
     return transaction.to_xdr()
@@ -214,7 +224,7 @@ def read_challenge_transaction(
             raise InvalidSep10ChallengeError("Operation type should be ManageData.")
         if op.source is None:
             raise InvalidSep10ChallengeError("Operation should have a source account.")
-        if op.source != server_account_id:
+        if op.source != server_account_id and op.data_name != "client_domain":
             raise InvalidSep10ChallengeError(
                 "The transaction has operations that are unrecognized."
             )
@@ -233,6 +243,7 @@ def read_challenge_transaction(
         )
 
     # TODO: I don't think this is a good idea.
+    # What if we used the Java SDK's approach and had a ChallengeTransaction class?
     return transaction_envelope, client_account, matched_home_domain
 
 
@@ -278,6 +289,14 @@ def verify_challenge_transaction_signers(
     )
     server_keypair = Keypair.from_public_key(server_account_id)
 
+    # If the client domain is included the challenge transaction,
+    # verify that the transaction is signed by the operation's source account.
+    client_signing_key = None
+    for operation in te.transaction.operations:
+        if isinstance(operation, ManageData) and operation.data_name == "client_domain":
+            client_signing_key = operation.source
+            break
+
     # Ensure the server is not included
     # anywhere we check or output the list of signers.
     client_signers = []
@@ -295,14 +314,21 @@ def verify_challenge_transaction_signers(
     # hit. We do this in one hit here even though the server signature was
     # checked in the read_challenge_transaction to ensure that every signature and signer
     # are consumed only once on the transaction.
-    all_signers = client_signers + [Ed25519PublicKeySigner(server_keypair.public_key)]
+    additional_signers = [Ed25519PublicKeySigner(server_keypair.public_key)]
+    if client_signing_key:
+        additional_signers.append(Ed25519PublicKeySigner(client_signing_key))
+    all_signers = client_signers + additional_signers
     all_signers_found = _verify_transaction_signatures(te, all_signers)
 
     signers_found = []
     server_signer_found = False
+    client_signing_key_found = False
     for signer in all_signers_found:
         if signer.account_id == server_keypair.public_key:
             server_signer_found = True
+            continue
+        if signer.account_id == client_signing_key:
+            client_signing_key_found = True
             continue
         # Deduplicate the client signers
         if _signer_in_signers(signer, signers_found):
@@ -313,6 +339,12 @@ def verify_challenge_transaction_signers(
     if not server_signer_found:
         raise InvalidSep10ChallengeError(
             f"Transaction not signed by server: {server_keypair.public_key}."
+        )
+
+    if client_signing_key and not client_signing_key_found:
+        raise InvalidSep10ChallengeError(
+            f"Transaction not signed by the source account of the 'client_domain' "
+            "ManageData operation"
         )
 
     # Confirm we matched signatures to the client signers.
@@ -475,7 +507,7 @@ def verify_challenge_transaction(
         validation fails, the exception will be thrown.
     """
 
-    _, client_account_id, _ = read_challenge_transaction(
+    tx_envelope, client_account_id, _ = read_challenge_transaction(
         challenge_transaction,
         server_account_id,
         home_domains,
