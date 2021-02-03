@@ -507,7 +507,7 @@ def verify_challenge_transaction(
         validation fails, the exception will be thrown.
     """
 
-    tx_envelope, client_account_id, _ = read_challenge_transaction(
+    _, client_account_id, _ = read_challenge_transaction(
         challenge_transaction,
         server_account_id,
         home_domains,
