@@ -46,9 +46,10 @@ setup(
         "Code": "https://github.com/StellarCN/py-stellar-base",
         "Issue tracker": "https://github.com/StellarCN/py-stellar-base/issues",
     },
-    include_package_data=True,
     install_requires=install_requires,
-    packages=find_packages(exclude=["tests", "tests.*"]),
+    packages=["stellar_sdk"],
+    package_data={"stellar_sdk": ["py.typed"]},
+    zip_safe=False,
     python_requires=">=3.6.0",
     classifiers=[
         "Development Status :: 5 - Production/Stable",
