@@ -3,10 +3,11 @@ import sys
 
 from setuptools import setup, find_packages
 
-assert sys.version_info >= (3, 6, 0), "stellar-sdk v2 requires Python 3.6+"
+assert sys.version_info >= (3, 6, 0), "stellar-sdk requires Python 3.6+"
 
 here = os.path.abspath(os.path.dirname(__file__))
 requirements_file = "requirements.txt"
+install_requires = [dep for dep in open(requirements_file).readlines() if not dep.startswith("-i ")]
 
 about = {}
 with open(
@@ -46,7 +47,7 @@ setup(
         "Issue tracker": "https://github.com/StellarCN/py-stellar-base/issues",
     },
     include_package_data=True,
-    install_requires=open(requirements_file).readlines(),
+    install_requires=install_requires,
     packages=find_packages(exclude=["tests", "tests.*"]),
     python_requires=">=3.6.0",
     classifiers=[
@@ -56,8 +57,6 @@ setup(
         "Operating System :: OS Independent",
         "License :: OSI Approved :: Apache Software License",
         "Programming Language :: Python",
-        "Programming Language :: Python :: 3.6",
-        "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3 :: Only",
         "Programming Language :: Python :: Implementation :: CPython",
         "Programming Language :: Python :: Implementation :: PyPy",

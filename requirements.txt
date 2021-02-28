@@ -1,9 +1,10 @@
+-i https://pypi.org/simple/
 aiohttp-sse-client==0.2.0
-aiohttp==3.7.3
+aiohttp==3.7.4
 async-timeout==3.0.1
 attrs==20.3.0
 certifi==2020.12.5
-cffi==1.14.4
+cffi==1.14.5
 chardet==3.0.4
 crc16==0.1.1
 idna==2.10
@@ -16,5 +17,5 @@ six==1.15.0
 stellar-base-sseclient==0.0.21
 toml==0.10.2
 typing-extensions==3.7.4.3
-urllib3==1.26.2
+urllib3==1.26.3
 yarl==1.6.3
