@@ -1,6 +1,14 @@
 Release History
 ==============
 
+### Version 3.1.2
+Released on Feb 28, 2021
+
+#### Update
+* Update dependencies.
+  
+  The latest version of aiohttp includes [security updates](https://github.com/aio-libs/aiohttp/security/advisories/GHSA-v6wp-4m6f-gcjg), this security issue has no direct impact on this SDK. ([#437](https://github.com/StellarCN/py-stellar-base/pull/437))
+
 ### Version 3.1.1
 Released on Jan 20, 2021
 
