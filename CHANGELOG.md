@@ -1,6 +1,12 @@
 Release History
 ==============
 
+### Version 2.11.2
+Released on Mar 4, 2021
+
+#### Update
+* fix: throw stellar_sdk.exceptions.ConnectionError in AiohttpClient instead of the built-in ConnectionError. ([#441](https://github.com/StellarCN/py-stellar-base/pull/441))
+
 ### Version 2.11.1
 Released on Jan 20, 2021
 
