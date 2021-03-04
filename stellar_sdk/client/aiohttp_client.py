@@ -9,7 +9,7 @@ from . import defines
 from .base_async_client import BaseAsyncClient
 from .response import Response
 from ..__version__ import __version__
-from ..exceptions import StreamClientError
+from ..exceptions import StreamClientError, ConnectionError
 
 logger = logging.getLogger(__name__)
 
@@ -146,7 +146,7 @@ class AiohttpClient(BaseAsyncClient):
                 headers=dict(response.headers),
                 url=str(response.url),
             )
-        except aiohttp.ClientConnectionError as e:
+        except aiohttp.ClientError as e:
             raise ConnectionError(e)
 
     async def stream(  # type: ignore[override]
