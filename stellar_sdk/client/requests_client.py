@@ -68,7 +68,7 @@ class RequestsClient(BaseSyncClient):
             backoff_factor=self.backoff_factor,
             redirect=0,
             status_forcelist=self.status_forcelist,
-            method_whitelist=frozenset(["GET", "POST"]),
+            allowed_methods=frozenset(["GET", "POST"]),
             raise_on_status=False,
         )
         # init transport adapter
