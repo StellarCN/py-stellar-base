@@ -1,6 +1,12 @@
 Release History
 ==============
 
+### Version 3.1.4
+Released on Mar 16, 2021
+
+#### Update
+* fix: make `AiohttpClient` compatible with Python 3.6 and 3.7. ([#449](https://github.com/StellarCN/py-stellar-base/pull/449))
+
 ### Version 2.11.3
 Released on Mar 16, 2021
 
