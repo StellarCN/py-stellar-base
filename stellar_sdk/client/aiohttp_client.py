@@ -211,7 +211,7 @@ class AiohttpClient(BaseAsyncClient):
                 raise StreamClientError(
                     query_params["cursor"], "Failed to get stream message."
                 ) from e
-            except asyncio.exceptions.TimeoutError:
+            except asyncio.TimeoutError:
                 logger.warning(
                     f"We have encountered an timeout error and we will try to reconnect, cursor = {query_params.get('cursor')}"
                 )
