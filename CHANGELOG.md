@@ -1,11 +1,31 @@
 Release History
 ==============
 
+### Version 3.1.3
+Released on Mar 4, 2021
+
+#### Update
+* fix: throw stellar_sdk.exceptions.ConnectionError in AiohttpClient instead of the built-in ConnectionError. ([#441](https://github.com/StellarCN/py-stellar-base/pull/441))
+
 ### Version 2.11.2
 Released on Mar 4, 2021
 
 #### Update
 * fix: throw stellar_sdk.exceptions.ConnectionError in AiohttpClient instead of the built-in ConnectionError. ([#441](https://github.com/StellarCN/py-stellar-base/pull/441))
+
+### Version 3.1.2
+Released on Feb 28, 2021
+
+#### Update
+* Update dependencies.
+  
+  The latest version of aiohttp includes [security updates](https://github.com/aio-libs/aiohttp/security/advisories/GHSA-v6wp-4m6f-gcjg), this security issue has no direct impact on this SDK. ([#437](https://github.com/StellarCN/py-stellar-base/pull/437))
+
+### Version 3.1.1
+Released on Jan 20, 2021
+
+#### Update
+* fix: SEP-10, removed non-null constraint for manageData op values. ([#424](https://github.com/StellarCN/py-stellar-base/pull/424))
 
 ### Version 2.11.1
 Released on Jan 20, 2021
