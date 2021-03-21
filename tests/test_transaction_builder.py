@@ -16,6 +16,7 @@ from stellar_sdk import (
     HashMemo,
     ReturnHashMemo,
     Claimant,
+    TrustLineFlags,
 )
 
 
@@ -320,6 +321,23 @@ class TestTransactionBuilder:
                         destination="GCXGGIREYPENNT3LYFRD5I2SDALFWM3NKKLIQD3DMJ63ML5N3FG4OQQG"
                     )
                 ],
+            )
+            .append_clawback_op(
+                Asset(
+                    "XCN", "GDF5O4OWEMVBY5FLDHWA5RZTYSV2U276XGKZZ6VSHDDR3THSQ6OQS7UM"
+                ),
+                "GCXGGIREYPENNT3LYFRD5I2SDALFWM3NKKLIQD3DMJ63ML5N3FG4OQQG",
+                "100",
+            )
+            .append_clawback_claimable_balance_op(
+                "00000000929b20b72e5890ab51c24f1cc46fa01c4f318d8d33367d24dd614cfdf5491072"
+            )
+            .append_set_trust_line_flags_op(
+                "GCXGGIREYPENNT3LYFRD5I2SDALFWM3NKKLIQD3DMJ63ML5N3FG4OQQG",
+                Asset(
+                    "XCN", "GDF5O4OWEMVBY5FLDHWA5RZTYSV2U276XGKZZ6VSHDDR3THSQ6OQS7UM"
+                ),
+                TrustLineFlags.AUTHORIZED_FLAG,
             )
             .build()
         )

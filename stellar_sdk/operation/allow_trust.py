@@ -1,3 +1,4 @@
+import warnings
 from enum import IntFlag
 from typing import Union
 
@@ -56,6 +57,11 @@ class AllowTrust(Operation):
         authorize: Union[TrustLineEntryFlag, bool],
         source: str = None,
     ) -> None:
+        warnings.warn(
+            "Will be removed in version v4.0.0, "
+            "use `stellar_sdk.operation.set_trust_line_flags.SetTrustLineFlags` instead.",
+            DeprecationWarning,
+        )
         super().__init__(source)
         check_ed25519_public_key(trustor)
         check_asset_code(asset_code)

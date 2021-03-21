@@ -482,6 +482,24 @@ RevokeSponsorship
 .. autoclass:: stellar_sdk.operation.revoke_sponsorship.Signer
    :members:
 
+Clawback
+--------
+.. autoclass:: stellar_sdk.operation.Clawback
+   :members: to_xdr_object, from_xdr_object
+
+ClawbackClaimableBalance
+------------------------
+.. autoclass:: stellar_sdk.operation.ClawbackClaimableBalance
+   :members: to_xdr_object, from_xdr_object
+
+SetTrustLineFlags
+-----------------
+.. autoclass:: stellar_sdk.operation.SetTrustLineFlags
+   :members: to_xdr_object, from_xdr_object
+
+.. autoclass:: stellar_sdk.operation.set_trust_line_flags.TrustLineFlags
+   :members:
+
 Price
 ^^^^^
 
