@@ -541,6 +541,7 @@ class TransactionBuilder:
             - AUTHORIZATION_REQUIRED = 1
             - AUTHORIZATION_REVOCABLE = 2
             - AUTHORIZATION_IMMUTABLE = 4
+            - AUTHORIZATION_CLAWBACK_ENABLED = 8
         :param set_flags: Indicates which flags to set. For details about the flags,
             please refer to the `accounts doc <https://www.stellar.org/developers/guides/concepts/accounts.html>`__.
             The bit mask integer adds onto the existing flags of the account.
@@ -549,6 +550,7 @@ class TransactionBuilder:
             - AUTHORIZATION_REQUIRED = 1
             - AUTHORIZATION_REVOCABLE = 2
             - AUTHORIZATION_IMMUTABLE = 4
+            - AUTHORIZATION_CLAWBACK_ENABLED = 8
         :param master_weight: A number from 0-255 (inclusive) representing the weight of the master key.
             If the weight of the master key is updated to 0, it is effectively disabled.
         :param low_threshold: A number from 0-255 (inclusive) representing the threshold this account sets on all
