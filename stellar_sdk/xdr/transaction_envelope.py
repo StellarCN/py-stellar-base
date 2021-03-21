@@ -1,19 +1,13 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
 import base64
-from enum import IntEnum
-from typing import List, Optional
 from xdrlib import Packer, Unpacker
 
-from .base import *
-from .constants import *
-from ..__version__ import __issues__
-from ..exceptions import ValueError
-
 from .envelope_type import EnvelopeType
+from .fee_bump_transaction_envelope import FeeBumpTransactionEnvelope
 from .transaction_v0_envelope import TransactionV0Envelope
 from .transaction_v1_envelope import TransactionV1Envelope
-from .fee_bump_transaction_envelope import FeeBumpTransactionEnvelope
+from ..exceptions import ValueError
 
 __all__ = ["TransactionEnvelope"]
 

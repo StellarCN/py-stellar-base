@@ -1,22 +1,18 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
 import base64
-from enum import IntEnum
 from typing import List, Optional
 from xdrlib import Packer, Unpacker
 
-from .base import *
 from .constants import *
-from ..__version__ import __issues__
-from ..exceptions import ValueError
-
-from .uint256 import Uint256
-from .uint32 import Uint32
-from .sequence_number import SequenceNumber
-from .time_bounds import TimeBounds
 from .memo import Memo
 from .operation import Operation
+from .sequence_number import SequenceNumber
+from .time_bounds import TimeBounds
 from .transaction_v0_ext import TransactionV0Ext
+from .uint256 import Uint256
+from .uint32 import Uint32
+from ..exceptions import ValueError
 
 __all__ = ["TransactionV0"]
 

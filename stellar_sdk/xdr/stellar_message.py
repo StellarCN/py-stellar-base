@@ -1,30 +1,24 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
 import base64
-from enum import IntEnum
-from typing import List, Optional
+from typing import List
 from xdrlib import Packer, Unpacker
 
-from .base import *
-from .constants import *
-from ..__version__ import __issues__
-from ..exceptions import ValueError
-
-from .message_type import MessageType
-from .error import Error
-from .hello import Hello
 from .auth import Auth
 from .dont_have import DontHave
+from .error import Error
+from .hello import Hello
+from .message_type import MessageType
 from .peer_address import PeerAddress
-from .uint256 import Uint256
-from .transaction_set import TransactionSet
-from .transaction_envelope import TransactionEnvelope
+from .scp_envelope import SCPEnvelope
+from .scp_quorum_set import SCPQuorumSet
 from .signed_survey_request_message import SignedSurveyRequestMessage
 from .signed_survey_response_message import SignedSurveyResponseMessage
+from .transaction_envelope import TransactionEnvelope
+from .transaction_set import TransactionSet
 from .uint256 import Uint256
-from .scp_quorum_set import SCPQuorumSet
-from .scp_envelope import SCPEnvelope
 from .uint32 import Uint32
+from ..exceptions import ValueError
 
 __all__ = ["StellarMessage"]
 

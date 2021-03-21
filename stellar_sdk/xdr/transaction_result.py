@@ -1,18 +1,11 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
 import base64
-from enum import IntEnum
-from typing import List, Optional
 from xdrlib import Packer, Unpacker
 
-from .base import *
-from .constants import *
-from ..__version__ import __issues__
-from ..exceptions import ValueError
-
 from .int64 import Int64
-from .transaction_result_result import TransactionResultResult
 from .transaction_result_ext import TransactionResultExt
+from .transaction_result_result import TransactionResultResult
 
 __all__ = ["TransactionResult"]
 

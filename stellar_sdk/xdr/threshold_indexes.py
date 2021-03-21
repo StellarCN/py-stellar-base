@@ -2,11 +2,8 @@
 # DO NOT EDIT or your changes may be overwritten
 import base64
 from enum import IntEnum
-from typing import List, Optional
 from xdrlib import Packer, Unpacker
 
-from .base import *
-from .constants import *
 from ..__version__ import __issues__
 from ..exceptions import ValueError
 
