@@ -21,7 +21,11 @@ class DontHave:
     ----------------------------------------------------------------
     """
 
-    def __init__(self, type: MessageType, req_hash: Uint256,) -> None:
+    def __init__(
+        self,
+        type: MessageType,
+        req_hash: Uint256,
+    ) -> None:
         self.type = type
         self.req_hash = req_hash
 
@@ -33,7 +37,10 @@ class DontHave:
     def unpack(cls, unpacker: Unpacker) -> "DontHave":
         type = MessageType.unpack(unpacker)
         req_hash = Uint256.unpack(unpacker)
-        return cls(type=type, req_hash=req_hash,)
+        return cls(
+            type=type,
+            req_hash=req_hash,
+        )
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

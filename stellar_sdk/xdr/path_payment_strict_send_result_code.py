@@ -18,7 +18,7 @@ class PathPaymentStrictSendResultCode(IntEnum):
     {
         // codes considered as "success" for the operation
         PATH_PAYMENT_STRICT_SEND_SUCCESS = 0, // success
-    
+
         // codes considered as "failure" for the operation
         PATH_PAYMENT_STRICT_SEND_MALFORMED = -1, // bad input
         PATH_PAYMENT_STRICT_SEND_UNDERFUNDED =

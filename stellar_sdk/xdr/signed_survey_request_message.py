@@ -1,7 +1,14 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
 import base64
+from enum import IntEnum
+from typing import List, Optional
 from xdrlib import Packer, Unpacker
+
+from .base import *
+from .constants import *
+from ..__version__ import __issues__
+from ..exceptions import ValueError
 
 from .signature import Signature
 from .survey_request_message import SurveyRequestMessage
@@ -22,7 +29,9 @@ class SignedSurveyRequestMessage:
     """
 
     def __init__(
-        self, request_signature: Signature, request: SurveyRequestMessage,
+        self,
+        request_signature: Signature,
+        request: SurveyRequestMessage,
     ) -> None:
         self.request_signature = request_signature
         self.request = request
@@ -35,7 +44,10 @@ class SignedSurveyRequestMessage:
     def unpack(cls, unpacker: Unpacker) -> "SignedSurveyRequestMessage":
         request_signature = Signature.unpack(unpacker)
         request = SurveyRequestMessage.unpack(unpacker)
-        return cls(request_signature=request_signature, request=request,)
+        return cls(
+            request_signature=request_signature,
+            request=request,
+        )
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

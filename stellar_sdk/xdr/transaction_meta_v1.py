@@ -1,12 +1,17 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
 import base64
-from typing import List
+from enum import IntEnum
+from typing import List, Optional
 from xdrlib import Packer, Unpacker
+
+from .base import *
+from .constants import *
+from ..__version__ import __issues__
+from ..exceptions import ValueError
 
 from .ledger_entry_changes import LedgerEntryChanges
 from .operation_meta import OperationMeta
-from ..exceptions import ValueError
 
 __all__ = ["TransactionMetaV1"]
 
@@ -24,7 +29,9 @@ class TransactionMetaV1:
     """
 
     def __init__(
-        self, tx_changes: LedgerEntryChanges, operations: List[OperationMeta],
+        self,
+        tx_changes: LedgerEntryChanges,
+        operations: List[OperationMeta],
     ) -> None:
         if operations and len(operations) > 4294967295:
             raise ValueError(
@@ -46,7 +53,10 @@ class TransactionMetaV1:
         operations = []
         for _ in range(length):
             operations.append(OperationMeta.unpack(unpacker))
-        return cls(tx_changes=tx_changes, operations=operations,)
+        return cls(
+            tx_changes=tx_changes,
+            operations=operations,
+        )
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

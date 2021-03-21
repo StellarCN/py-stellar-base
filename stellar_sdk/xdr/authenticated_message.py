@@ -27,7 +27,11 @@ class AuthenticatedMessage:
     ----------------------------------------------------------------
     """
 
-    def __init__(self, v: Uint32, v0: AuthenticatedMessageV0 = None,) -> None:
+    def __init__(
+        self,
+        v: Uint32,
+        v0: AuthenticatedMessageV0 = None,
+    ) -> None:
         self.v = v
         self.v0 = v0
 

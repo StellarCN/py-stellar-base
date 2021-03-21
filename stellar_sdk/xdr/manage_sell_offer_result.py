@@ -25,7 +25,9 @@ class ManageSellOfferResult:
     """
 
     def __init__(
-        self, code: ManageSellOfferResultCode, success: ManageOfferSuccessResult = None,
+        self,
+        code: ManageSellOfferResultCode,
+        success: ManageOfferSuccessResult = None,
     ) -> None:
         self.code = code
         self.success = success

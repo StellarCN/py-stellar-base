@@ -25,7 +25,9 @@ class AccountMergeResult:
     """
 
     def __init__(
-        self, code: AccountMergeResultCode, source_account_balance: Int64 = None,
+        self,
+        code: AccountMergeResultCode,
+        source_account_balance: Int64 = None,
     ) -> None:
         self.code = code
         self.source_account_balance = source_account_balance

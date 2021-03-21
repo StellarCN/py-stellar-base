@@ -19,7 +19,10 @@ class HmacSha256Key:
     ----------------------------------------------------------------
     """
 
-    def __init__(self, key: bytes,) -> None:
+    def __init__(
+        self,
+        key: bytes,
+    ) -> None:
         self.key = key
 
     def pack(self, packer: Packer) -> None:
@@ -28,7 +31,9 @@ class HmacSha256Key:
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "HmacSha256Key":
         key = Opaque.unpack(unpacker, 32, True)
-        return cls(key=key,)
+        return cls(
+            key=key,
+        )
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

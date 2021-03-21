@@ -21,7 +21,11 @@ class LedgerCloseValueSignature:
     ----------------------------------------------------------------
     """
 
-    def __init__(self, node_id: NodeID, signature: Signature,) -> None:
+    def __init__(
+        self,
+        node_id: NodeID,
+        signature: Signature,
+    ) -> None:
         self.node_id = node_id
         self.signature = signature
 
@@ -33,7 +37,10 @@ class LedgerCloseValueSignature:
     def unpack(cls, unpacker: Unpacker) -> "LedgerCloseValueSignature":
         node_id = NodeID.unpack(unpacker)
         signature = Signature.unpack(unpacker)
-        return cls(node_id=node_id, signature=signature,)
+        return cls(
+            node_id=node_id,
+            signature=signature,
+        )
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

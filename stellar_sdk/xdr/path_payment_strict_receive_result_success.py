@@ -24,7 +24,9 @@ class PathPaymentStrictReceiveResultSuccess:
     """
 
     def __init__(
-        self, offers: List[ClaimOfferAtom], last: SimplePaymentResult,
+        self,
+        offers: List[ClaimOfferAtom],
+        last: SimplePaymentResult,
     ) -> None:
         if offers and len(offers) > 4294967295:
             raise ValueError(
@@ -46,7 +48,10 @@ class PathPaymentStrictReceiveResultSuccess:
         for _ in range(length):
             offers.append(ClaimOfferAtom.unpack(unpacker))
         last = SimplePaymentResult.unpack(unpacker)
-        return cls(offers=offers, last=last,)
+        return cls(
+            offers=offers,
+            last=last,
+        )
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

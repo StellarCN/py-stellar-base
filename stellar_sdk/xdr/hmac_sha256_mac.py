@@ -19,7 +19,10 @@ class HmacSha256Mac:
     ----------------------------------------------------------------
     """
 
-    def __init__(self, mac: bytes,) -> None:
+    def __init__(
+        self,
+        mac: bytes,
+    ) -> None:
         self.mac = mac
 
     def pack(self, packer: Packer) -> None:
@@ -28,7 +31,9 @@ class HmacSha256Mac:
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "HmacSha256Mac":
         mac = Opaque.unpack(unpacker, 32, True)
-        return cls(mac=mac,)
+        return cls(
+            mac=mac,
+        )
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

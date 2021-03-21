@@ -24,7 +24,10 @@ class AuthenticatedMessageV0:
     """
 
     def __init__(
-        self, sequence: Uint64, message: StellarMessage, mac: HmacSha256Mac,
+        self,
+        sequence: Uint64,
+        message: StellarMessage,
+        mac: HmacSha256Mac,
     ) -> None:
         self.sequence = sequence
         self.message = message
@@ -40,7 +43,11 @@ class AuthenticatedMessageV0:
         sequence = Uint64.unpack(unpacker)
         message = StellarMessage.unpack(unpacker)
         mac = HmacSha256Mac.unpack(unpacker)
-        return cls(sequence=sequence, message=message, mac=mac,)
+        return cls(
+            sequence=sequence,
+            message=message,
+            mac=mac,
+        )
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

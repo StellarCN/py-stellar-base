@@ -24,7 +24,11 @@ class AccountEntryExtensionV1Ext:
     ----------------------------------------------------------------
     """
 
-    def __init__(self, v: int, v2: AccountEntryExtensionV2 = None,) -> None:
+    def __init__(
+        self,
+        v: int,
+        v2: AccountEntryExtensionV2 = None,
+    ) -> None:
         self.v = v
         self.v2 = v2
 

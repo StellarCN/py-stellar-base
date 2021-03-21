@@ -19,7 +19,10 @@ class OperationMeta:
     ----------------------------------------------------------------
     """
 
-    def __init__(self, changes: LedgerEntryChanges,) -> None:
+    def __init__(
+        self,
+        changes: LedgerEntryChanges,
+    ) -> None:
         self.changes = changes
 
     def pack(self, packer: Packer) -> None:
@@ -28,7 +31,9 @@ class OperationMeta:
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "OperationMeta":
         changes = LedgerEntryChanges.unpack(unpacker)
-        return cls(changes=changes,)
+        return cls(
+            changes=changes,
+        )
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

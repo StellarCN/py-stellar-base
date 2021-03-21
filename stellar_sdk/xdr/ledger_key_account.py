@@ -19,7 +19,10 @@ class LedgerKeyAccount:
     ----------------------------------------------------------------
     """
 
-    def __init__(self, account_id: AccountID,) -> None:
+    def __init__(
+        self,
+        account_id: AccountID,
+    ) -> None:
         self.account_id = account_id
 
     def pack(self, packer: Packer) -> None:
@@ -28,7 +31,9 @@ class LedgerKeyAccount:
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "LedgerKeyAccount":
         account_id = AccountID.unpack(unpacker)
-        return cls(account_id=account_id,)
+        return cls(
+            account_id=account_id,
+        )
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

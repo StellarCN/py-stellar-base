@@ -21,7 +21,11 @@ class Error:
     ----------------------------------------------------------------
     """
 
-    def __init__(self, code: ErrorCode, msg: bytes,) -> None:
+    def __init__(
+        self,
+        code: ErrorCode,
+        msg: bytes,
+    ) -> None:
         self.code = code
         self.msg = msg
 
@@ -33,7 +37,10 @@ class Error:
     def unpack(cls, unpacker: Unpacker) -> "Error":
         code = ErrorCode.unpack(unpacker)
         msg = String.unpack(unpacker)
-        return cls(code=code, msg=msg,)
+        return cls(
+            code=code,
+            msg=msg,
+        )
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

@@ -1,8 +1,16 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
 import base64
+from enum import IntEnum
+from typing import List, Optional
 from xdrlib import Packer, Unpacker
 
+from .base import *
+from .constants import *
+from ..__version__ import __issues__
+from ..exceptions import ValueError
+
+from .time_point import TimePoint
 from .time_point import TimePoint
 
 __all__ = ["TimeBounds"]
@@ -20,7 +28,11 @@ class TimeBounds:
     ----------------------------------------------------------------
     """
 
-    def __init__(self, min_time: TimePoint, max_time: TimePoint,) -> None:
+    def __init__(
+        self,
+        min_time: TimePoint,
+        max_time: TimePoint,
+    ) -> None:
         self.min_time = min_time
         self.max_time = max_time
 
@@ -32,7 +44,10 @@ class TimeBounds:
     def unpack(cls, unpacker: Unpacker) -> "TimeBounds":
         min_time = TimePoint.unpack(unpacker)
         max_time = TimePoint.unpack(unpacker)
-        return cls(min_time=min_time, max_time=max_time,)
+        return cls(
+            min_time=min_time,
+            max_time=max_time,
+        )
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

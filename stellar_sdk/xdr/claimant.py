@@ -26,7 +26,11 @@ class Claimant:
     ----------------------------------------------------------------
     """
 
-    def __init__(self, type: ClaimantType, v0: ClaimantV0 = None,) -> None:
+    def __init__(
+        self,
+        type: ClaimantType,
+        v0: ClaimantV0 = None,
+    ) -> None:
         self.type = type
         self.v0 = v0
 

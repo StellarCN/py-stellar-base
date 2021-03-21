@@ -24,7 +24,10 @@ class AuthCert:
     """
 
     def __init__(
-        self, pubkey: Curve25519Public, expiration: Uint64, sig: Signature,
+        self,
+        pubkey: Curve25519Public,
+        expiration: Uint64,
+        sig: Signature,
     ) -> None:
         self.pubkey = pubkey
         self.expiration = expiration
@@ -40,7 +43,11 @@ class AuthCert:
         pubkey = Curve25519Public.unpack(unpacker)
         expiration = Uint64.unpack(unpacker)
         sig = Signature.unpack(unpacker)
-        return cls(pubkey=pubkey, expiration=expiration, sig=sig,)
+        return cls(
+            pubkey=pubkey,
+            expiration=expiration,
+            sig=sig,
+        )
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

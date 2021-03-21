@@ -1,7 +1,14 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
 import base64
+from enum import IntEnum
+from typing import List, Optional
 from xdrlib import Packer, Unpacker
+
+from .base import *
+from .constants import *
+from ..__version__ import __issues__
+from ..exceptions import ValueError
 
 from .hash import Hash
 from .transaction_signature_payload_tagged_transaction import (
@@ -49,7 +56,10 @@ class TransactionSignaturePayload:
         tagged_transaction = TransactionSignaturePayloadTaggedTransaction.unpack(
             unpacker
         )
-        return cls(network_id=network_id, tagged_transaction=tagged_transaction,)
+        return cls(
+            network_id=network_id,
+            tagged_transaction=tagged_transaction,
+        )
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

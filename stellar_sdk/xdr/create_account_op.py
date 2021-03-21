@@ -21,7 +21,11 @@ class CreateAccountOp:
     ----------------------------------------------------------------
     """
 
-    def __init__(self, destination: AccountID, starting_balance: Int64,) -> None:
+    def __init__(
+        self,
+        destination: AccountID,
+        starting_balance: Int64,
+    ) -> None:
         self.destination = destination
         self.starting_balance = starting_balance
 
@@ -33,7 +37,10 @@ class CreateAccountOp:
     def unpack(cls, unpacker: Unpacker) -> "CreateAccountOp":
         destination = AccountID.unpack(unpacker)
         starting_balance = Int64.unpack(unpacker)
-        return cls(destination=destination, starting_balance=starting_balance,)
+        return cls(
+            destination=destination,
+            starting_balance=starting_balance,
+        )
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

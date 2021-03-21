@@ -1,12 +1,17 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
 import base64
-from typing import List
+from enum import IntEnum
+from typing import List, Optional
 from xdrlib import Packer, Unpacker
 
-from .decorated_signature import DecoratedSignature
-from .transaction import Transaction
+from .base import *
+from .constants import *
+from ..__version__ import __issues__
 from ..exceptions import ValueError
+
+from .transaction import Transaction
+from .decorated_signature import DecoratedSignature
 
 __all__ = ["TransactionV1Envelope"]
 
@@ -25,7 +30,11 @@ class TransactionV1Envelope:
     ----------------------------------------------------------------
     """
 
-    def __init__(self, tx: Transaction, signatures: List[DecoratedSignature],) -> None:
+    def __init__(
+        self,
+        tx: Transaction,
+        signatures: List[DecoratedSignature],
+    ) -> None:
         if signatures and len(signatures) > 20:
             raise ValueError(
                 f"The maximum length of `signatures` should be 20, but got {len(signatures)}."
@@ -46,7 +55,10 @@ class TransactionV1Envelope:
         signatures = []
         for _ in range(length):
             signatures.append(DecoratedSignature.unpack(unpacker))
-        return cls(tx=tx, signatures=signatures,)
+        return cls(
+            tx=tx,
+            signatures=signatures,
+        )
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

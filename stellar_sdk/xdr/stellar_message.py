@@ -1,24 +1,30 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
 import base64
-from typing import List
+from enum import IntEnum
+from typing import List, Optional
 from xdrlib import Packer, Unpacker
 
-from .auth import Auth
-from .dont_have import DontHave
+from .base import *
+from .constants import *
+from ..__version__ import __issues__
+from ..exceptions import ValueError
+
+from .message_type import MessageType
 from .error import Error
 from .hello import Hello
-from .message_type import MessageType
+from .auth import Auth
+from .dont_have import DontHave
 from .peer_address import PeerAddress
-from .scp_envelope import SCPEnvelope
-from .scp_quorum_set import SCPQuorumSet
+from .uint256 import Uint256
+from .transaction_set import TransactionSet
+from .transaction_envelope import TransactionEnvelope
 from .signed_survey_request_message import SignedSurveyRequestMessage
 from .signed_survey_response_message import SignedSurveyResponseMessage
-from .transaction_envelope import TransactionEnvelope
-from .transaction_set import TransactionSet
 from .uint256 import Uint256
+from .scp_quorum_set import SCPQuorumSet
+from .scp_envelope import SCPEnvelope
 from .uint32 import Uint32
-from ..exceptions import ValueError
 
 __all__ = ["StellarMessage"]
 
@@ -41,21 +47,21 @@ class StellarMessage:
         void;
     case PEERS:
         PeerAddress peers<100>;
-    
+
     case GET_TX_SET:
         uint256 txSetHash;
     case TX_SET:
         TransactionSet txSet;
-    
+
     case TRANSACTION:
         TransactionEnvelope transaction;
-    
+
     case SURVEY_REQUEST:
         SignedSurveyRequestMessage signedSurveyRequestMessage;
-    
+
     case SURVEY_RESPONSE:
         SignedSurveyResponseMessage signedSurveyResponseMessage;
-    
+
     // SCP
     case GET_SCP_QUORUMSET:
         uint256 qSetHash;

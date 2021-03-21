@@ -18,7 +18,7 @@ class ManageBuyOfferResultCode(IntEnum):
     {
         // codes considered as "success" for the operation
         MANAGE_BUY_OFFER_SUCCESS = 0,
-    
+
         // codes considered as "failure" for the operation
         MANAGE_BUY_OFFER_MALFORMED = -1,     // generated offer would be invalid
         MANAGE_BUY_OFFER_SELL_NO_TRUST = -2, // no trust line for what we're selling
@@ -30,11 +30,11 @@ class ManageBuyOfferResultCode(IntEnum):
         MANAGE_BUY_OFFER_CROSS_SELF = -8, // would cross an offer from the same user
         MANAGE_BUY_OFFER_SELL_NO_ISSUER = -9, // no issuer for what we're selling
         MANAGE_BUY_OFFER_BUY_NO_ISSUER = -10, // no issuer for what we're buying
-    
+
         // update errors
         MANAGE_BUY_OFFER_NOT_FOUND =
             -11, // offerID does not match an existing offer
-    
+
         MANAGE_BUY_OFFER_LOW_RESERVE = -12 // not enough funds to create a new Offer
     };
     ----------------------------------------------------------------

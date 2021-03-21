@@ -19,21 +19,21 @@ class Asset:
     {
     case ASSET_TYPE_NATIVE: // Not credit
         void;
-    
+
     case ASSET_TYPE_CREDIT_ALPHANUM4:
         struct
         {
             AssetCode4 assetCode;
             AccountID issuer;
         } alphaNum4;
-    
+
     case ASSET_TYPE_CREDIT_ALPHANUM12:
         struct
         {
             AssetCode12 assetCode;
             AccountID issuer;
         } alphaNum12;
-    
+
         // add other asset types here in the future
     };
     ----------------------------------------------------------------

@@ -21,7 +21,11 @@ class MuxedAccountMed25519:
     ----------------------------------------------------------------
     """
 
-    def __init__(self, id: Uint64, ed25519: Uint256,) -> None:
+    def __init__(
+        self,
+        id: Uint64,
+        ed25519: Uint256,
+    ) -> None:
         self.id = id
         self.ed25519 = ed25519
 
@@ -33,7 +37,10 @@ class MuxedAccountMed25519:
     def unpack(cls, unpacker: Unpacker) -> "MuxedAccountMed25519":
         id = Uint64.unpack(unpacker)
         ed25519 = Uint256.unpack(unpacker)
-        return cls(id=id, ed25519=ed25519,)
+        return cls(
+            id=id,
+            ed25519=ed25519,
+        )
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

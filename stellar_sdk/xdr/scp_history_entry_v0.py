@@ -24,7 +24,9 @@ class SCPHistoryEntryV0:
     """
 
     def __init__(
-        self, quorum_sets: List[SCPQuorumSet], ledger_messages: LedgerSCPMessages,
+        self,
+        quorum_sets: List[SCPQuorumSet],
+        ledger_messages: LedgerSCPMessages,
     ) -> None:
         if quorum_sets and len(quorum_sets) > 4294967295:
             raise ValueError(
@@ -46,7 +48,10 @@ class SCPHistoryEntryV0:
         for _ in range(length):
             quorum_sets.append(SCPQuorumSet.unpack(unpacker))
         ledger_messages = LedgerSCPMessages.unpack(unpacker)
-        return cls(quorum_sets=quorum_sets, ledger_messages=ledger_messages,)
+        return cls(
+            quorum_sets=quorum_sets,
+            ledger_messages=ledger_messages,
+        )
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

@@ -22,7 +22,11 @@ class FeeBumpTransactionInnerTx:
     ----------------------------------------------------------------
     """
 
-    def __init__(self, type: EnvelopeType, v1: TransactionV1Envelope = None,) -> None:
+    def __init__(
+        self,
+        type: EnvelopeType,
+        v1: TransactionV1Envelope = None,
+    ) -> None:
         self.type = type
         self.v1 = v1
 

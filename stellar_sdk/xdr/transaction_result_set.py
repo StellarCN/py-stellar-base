@@ -1,11 +1,16 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
 import base64
-from typing import List
+from enum import IntEnum
+from typing import List, Optional
 from xdrlib import Packer, Unpacker
 
-from .transaction_result_pair import TransactionResultPair
+from .base import *
+from .constants import *
+from ..__version__ import __issues__
 from ..exceptions import ValueError
+
+from .transaction_result_pair import TransactionResultPair
 
 __all__ = ["TransactionResultSet"]
 
@@ -21,7 +26,10 @@ class TransactionResultSet:
     ----------------------------------------------------------------
     """
 
-    def __init__(self, results: List[TransactionResultPair],) -> None:
+    def __init__(
+        self,
+        results: List[TransactionResultPair],
+    ) -> None:
         if results and len(results) > 4294967295:
             raise ValueError(
                 f"The maximum length of `results` should be 4294967295, but got {len(results)}."
@@ -39,7 +47,9 @@ class TransactionResultSet:
         results = []
         for _ in range(length):
             results.append(TransactionResultPair.unpack(unpacker))
-        return cls(results=results,)
+        return cls(
+            results=results,
+        )
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

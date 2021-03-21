@@ -1,14 +1,19 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
 import base64
-from typing import List
+from enum import IntEnum
+from typing import List, Optional
 from xdrlib import Packer, Unpacker
 
+from .base import *
+from .constants import *
+from ..__version__ import __issues__
+from ..exceptions import ValueError
+
 from .hash import Hash
-from .stellar_value_ext import StellarValueExt
 from .time_point import TimePoint
 from .upgrade_type import UpgradeType
-from ..exceptions import ValueError
+from .stellar_value_ext import StellarValueExt
 
 __all__ = ["StellarValue"]
 
@@ -21,14 +26,14 @@ class StellarValue:
     {
         Hash txSetHash;      // transaction set to apply to previous ledger
         TimePoint closeTime; // network close time
-    
+
         // upgrades to apply to the previous ledger (usually empty)
         // this is a vector of encoded 'LedgerUpgrade' so that nodes can drop
         // unknown steps during consensus if needed.
         // see notes below on 'LedgerUpgrade' for more detail
         // max size is dictated by number of upgrade types (+ room for future)
         UpgradeType upgrades<6>;
-    
+
         // reserved for future use
         union switch (StellarValueType v)
         {
@@ -76,7 +81,10 @@ class StellarValue:
             upgrades.append(UpgradeType.unpack(unpacker))
         ext = StellarValueExt.unpack(unpacker)
         return cls(
-            tx_set_hash=tx_set_hash, close_time=close_time, upgrades=upgrades, ext=ext,
+            tx_set_hash=tx_set_hash,
+            close_time=close_time,
+            upgrades=upgrades,
+            ext=ext,
         )
 
     def to_xdr_bytes(self) -> bytes:

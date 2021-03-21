@@ -1,13 +1,21 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
 import base64
+from enum import IntEnum
+from typing import List, Optional
 from xdrlib import Packer, Unpacker
+
+from .base import *
+from .constants import *
+from ..__version__ import __issues__
+from ..exceptions import ValueError
 
 from .account_id import AccountID
 from .asset import Asset
 from .int64 import Int64
-from .trust_line_entry_ext import TrustLineEntryExt
+from .int64 import Int64
 from .uint32 import Uint32
+from .trust_line_entry_ext import TrustLineEntryExt
 
 __all__ = ["TrustLineEntry"]
 
@@ -22,10 +30,10 @@ class TrustLineEntry:
         Asset asset;         // type of asset (with issuer)
         int64 balance;       // how much of this asset the user has.
                              // Asset defines the unit for this;
-    
+
         int64 limit;  // balance cannot be above this
         uint32 flags; // see TrustLineFlags
-    
+
         // reserved for future use
         union switch (int v)
         {
@@ -35,7 +43,7 @@ class TrustLineEntry:
             struct
             {
                 Liabilities liabilities;
-    
+
                 union switch (int v)
                 {
                 case 0:

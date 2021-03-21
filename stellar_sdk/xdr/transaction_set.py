@@ -1,12 +1,17 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
 import base64
-from typing import List
+from enum import IntEnum
+from typing import List, Optional
 from xdrlib import Packer, Unpacker
+
+from .base import *
+from .constants import *
+from ..__version__ import __issues__
+from ..exceptions import ValueError
 
 from .hash import Hash
 from .transaction_envelope import TransactionEnvelope
-from ..exceptions import ValueError
 
 __all__ = ["TransactionSet"]
 
@@ -24,7 +29,9 @@ class TransactionSet:
     """
 
     def __init__(
-        self, previous_ledger_hash: Hash, txs: List[TransactionEnvelope],
+        self,
+        previous_ledger_hash: Hash,
+        txs: List[TransactionEnvelope],
     ) -> None:
         if txs and len(txs) > 4294967295:
             raise ValueError(
@@ -46,7 +53,10 @@ class TransactionSet:
         txs = []
         for _ in range(length):
             txs.append(TransactionEnvelope.unpack(unpacker))
-        return cls(previous_ledger_hash=previous_ledger_hash, txs=txs,)
+        return cls(
+            previous_ledger_hash=previous_ledger_hash,
+            txs=txs,
+        )
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

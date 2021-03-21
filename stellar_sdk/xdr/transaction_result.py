@@ -1,11 +1,18 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
 import base64
+from enum import IntEnum
+from typing import List, Optional
 from xdrlib import Packer, Unpacker
 
+from .base import *
+from .constants import *
+from ..__version__ import __issues__
+from ..exceptions import ValueError
+
 from .int64 import Int64
-from .transaction_result_ext import TransactionResultExt
 from .transaction_result_result import TransactionResultResult
+from .transaction_result_ext import TransactionResultExt
 
 __all__ = ["TransactionResult"]
 
@@ -17,7 +24,7 @@ class TransactionResult:
     struct TransactionResult
     {
         int64 feeCharged; // actual fee charged for the transaction
-    
+
         union switch (TransactionResultCode code)
         {
         case txFEE_BUMP_INNER_SUCCESS:
@@ -30,7 +37,7 @@ class TransactionResult:
             void;
         }
         result;
-    
+
         // reserved for future use
         union switch (int v)
         {
@@ -62,7 +69,11 @@ class TransactionResult:
         fee_charged = Int64.unpack(unpacker)
         result = TransactionResultResult.unpack(unpacker)
         ext = TransactionResultExt.unpack(unpacker)
-        return cls(fee_charged=fee_charged, result=result, ext=ext,)
+        return cls(
+            fee_charged=fee_charged,
+            result=result,
+            ext=ext,
+        )
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

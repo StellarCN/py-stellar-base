@@ -22,7 +22,11 @@ class ClaimableBalanceID:
     ----------------------------------------------------------------
     """
 
-    def __init__(self, type: ClaimableBalanceIDType, v0: Hash = None,) -> None:
+    def __init__(
+        self,
+        type: ClaimableBalanceIDType,
+        v0: Hash = None,
+    ) -> None:
         self.type = type
         self.v0 = v0
 

@@ -1,11 +1,18 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
 import base64
+from enum import IntEnum
+from typing import List, Optional
 from xdrlib import Packer, Unpacker
 
+from .base import *
+from .constants import *
+from ..__version__ import __issues__
+from ..exceptions import ValueError
+
+from .transaction_result_pair import TransactionResultPair
 from .ledger_entry_changes import LedgerEntryChanges
 from .transaction_meta import TransactionMeta
-from .transaction_result_pair import TransactionResultPair
 
 __all__ = ["TransactionResultMeta"]
 

@@ -1,7 +1,14 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
 import base64
+from enum import IntEnum
+from typing import List, Optional
 from xdrlib import Packer, Unpacker
+
+from .base import *
+from .constants import *
+from ..__version__ import __issues__
+from ..exceptions import ValueError
 
 from .signer_key import SignerKey
 from .uint32 import Uint32
@@ -21,7 +28,11 @@ class Signer:
     ----------------------------------------------------------------
     """
 
-    def __init__(self, key: SignerKey, weight: Uint32,) -> None:
+    def __init__(
+        self,
+        key: SignerKey,
+        weight: Uint32,
+    ) -> None:
         self.key = key
         self.weight = weight
 
@@ -33,7 +44,10 @@ class Signer:
     def unpack(cls, unpacker: Unpacker) -> "Signer":
         key = SignerKey.unpack(unpacker)
         weight = Uint32.unpack(unpacker)
-        return cls(key=key, weight=weight,)
+        return cls(
+            key=key,
+            weight=weight,
+        )
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

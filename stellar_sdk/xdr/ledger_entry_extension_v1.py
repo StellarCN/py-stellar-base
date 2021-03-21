@@ -16,7 +16,7 @@ class LedgerEntryExtensionV1:
     struct LedgerEntryExtensionV1
     {
         SponsorshipDescriptor sponsoringID;
-    
+
         union switch (int v)
         {
         case 0:
@@ -28,7 +28,9 @@ class LedgerEntryExtensionV1:
     """
 
     def __init__(
-        self, sponsoring_id: SponsorshipDescriptor, ext: LedgerEntryExtensionV1Ext,
+        self,
+        sponsoring_id: SponsorshipDescriptor,
+        ext: LedgerEntryExtensionV1Ext,
     ) -> None:
         self.sponsoring_id = sponsoring_id
         self.ext = ext
@@ -41,7 +43,10 @@ class LedgerEntryExtensionV1:
     def unpack(cls, unpacker: Unpacker) -> "LedgerEntryExtensionV1":
         sponsoring_id = SponsorshipDescriptor.unpack(unpacker)
         ext = LedgerEntryExtensionV1Ext.unpack(unpacker)
-        return cls(sponsoring_id=sponsoring_id, ext=ext,)
+        return cls(
+            sponsoring_id=sponsoring_id,
+            ext=ext,
+        )
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

@@ -20,13 +20,13 @@ class PathPaymentStrictSendOp:
     {
         Asset sendAsset;  // asset we pay with
         int64 sendAmount; // amount of sendAsset to send (excluding fees)
-    
+
         MuxedAccount destination; // recipient of the payment
         Asset destAsset;          // what they end up with
         int64 destMin;            // the minimum amount of dest asset to
                                   // be received
                                   // The operation will fail if it can't be met
-    
+
         Asset path<5>; // additional hops it must go through to get there
     };
     ----------------------------------------------------------------

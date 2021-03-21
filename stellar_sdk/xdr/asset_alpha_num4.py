@@ -21,7 +21,11 @@ class AssetAlphaNum4:
     ----------------------------------------------------------------
     """
 
-    def __init__(self, asset_code: AssetCode4, issuer: AccountID,) -> None:
+    def __init__(
+        self,
+        asset_code: AssetCode4,
+        issuer: AccountID,
+    ) -> None:
         self.asset_code = asset_code
         self.issuer = issuer
 
@@ -33,7 +37,10 @@ class AssetAlphaNum4:
     def unpack(cls, unpacker: Unpacker) -> "AssetAlphaNum4":
         asset_code = AssetCode4.unpack(unpacker)
         issuer = AccountID.unpack(unpacker)
-        return cls(asset_code=asset_code, issuer=issuer,)
+        return cls(
+            asset_code=asset_code,
+            issuer=issuer,
+        )
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

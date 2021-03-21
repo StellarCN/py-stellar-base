@@ -1,11 +1,16 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
 import base64
+from enum import IntEnum
+from typing import List, Optional
 from xdrlib import Packer, Unpacker
 
 from .base import *
-from .trust_line_entry_v1 import TrustLineEntryV1
+from .constants import *
+from ..__version__ import __issues__
 from ..exceptions import ValueError
+
+from .trust_line_entry_v1 import TrustLineEntryV1
 
 __all__ = ["TrustLineEntryExt"]
 
@@ -22,7 +27,7 @@ class TrustLineEntryExt:
             struct
             {
                 Liabilities liabilities;
-    
+
                 union switch (int v)
                 {
                 case 0:
@@ -34,7 +39,11 @@ class TrustLineEntryExt:
     ----------------------------------------------------------------
     """
 
-    def __init__(self, v: int, v1: TrustLineEntryV1 = None,) -> None:
+    def __init__(
+        self,
+        v: int,
+        v1: TrustLineEntryV1 = None,
+    ) -> None:
         self.v = v
         self.v1 = v1
 

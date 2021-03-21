@@ -1,7 +1,14 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
 import base64
+from enum import IntEnum
+from typing import List, Optional
 from xdrlib import Packer, Unpacker
+
+from .base import *
+from .constants import *
+from ..__version__ import __issues__
+from ..exceptions import ValueError
 
 from .hash import Hash
 from .transaction_result import TransactionResult
@@ -21,7 +28,11 @@ class TransactionResultPair:
     ----------------------------------------------------------------
     """
 
-    def __init__(self, transaction_hash: Hash, result: TransactionResult,) -> None:
+    def __init__(
+        self,
+        transaction_hash: Hash,
+        result: TransactionResult,
+    ) -> None:
         self.transaction_hash = transaction_hash
         self.result = result
 
@@ -33,7 +44,10 @@ class TransactionResultPair:
     def unpack(cls, unpacker: Unpacker) -> "TransactionResultPair":
         transaction_hash = Hash.unpack(unpacker)
         result = TransactionResult.unpack(unpacker)
-        return cls(transaction_hash=transaction_hash, result=result,)
+        return cls(
+            transaction_hash=transaction_hash,
+            result=result,
+        )
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

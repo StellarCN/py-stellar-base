@@ -17,7 +17,7 @@ class BucketMetadata:
     {
         // Indicates the protocol version used to create / merge this bucket.
         uint32 ledgerVersion;
-    
+
         // reserved for future use
         union switch (int v)
         {
@@ -29,7 +29,11 @@ class BucketMetadata:
     ----------------------------------------------------------------
     """
 
-    def __init__(self, ledger_version: Uint32, ext: BucketMetadataExt,) -> None:
+    def __init__(
+        self,
+        ledger_version: Uint32,
+        ext: BucketMetadataExt,
+    ) -> None:
         self.ledger_version = ledger_version
         self.ext = ext
 
@@ -41,7 +45,10 @@ class BucketMetadata:
     def unpack(cls, unpacker: Unpacker) -> "BucketMetadata":
         ledger_version = Uint32.unpack(unpacker)
         ext = BucketMetadataExt.unpack(unpacker)
-        return cls(ledger_version=ledger_version, ext=ext,)
+        return cls(
+            ledger_version=ledger_version,
+            ext=ext,
+        )
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

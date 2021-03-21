@@ -21,7 +21,11 @@ class DecoratedSignature:
     ----------------------------------------------------------------
     """
 
-    def __init__(self, hint: SignatureHint, signature: Signature,) -> None:
+    def __init__(
+        self,
+        hint: SignatureHint,
+        signature: Signature,
+    ) -> None:
         self.hint = hint
         self.signature = signature
 
@@ -33,7 +37,10 @@ class DecoratedSignature:
     def unpack(cls, unpacker: Unpacker) -> "DecoratedSignature":
         hint = SignatureHint.unpack(unpacker)
         signature = Signature.unpack(unpacker)
-        return cls(hint=hint, signature=signature,)
+        return cls(
+            hint=hint,
+            signature=signature,
+        )
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

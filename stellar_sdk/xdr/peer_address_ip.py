@@ -25,7 +25,10 @@ class PeerAddressIp:
     """
 
     def __init__(
-        self, type: IPAddrType, ipv4: bytes = None, ipv6: bytes = None,
+        self,
+        type: IPAddrType,
+        ipv4: bytes = None,
+        ipv6: bytes = None,
     ) -> None:
         self.type = type
         self.ipv4 = ipv4

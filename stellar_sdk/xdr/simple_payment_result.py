@@ -1,7 +1,14 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
 import base64
+from enum import IntEnum
+from typing import List, Optional
 from xdrlib import Packer, Unpacker
+
+from .base import *
+from .constants import *
+from ..__version__ import __issues__
+from ..exceptions import ValueError
 
 from .account_id import AccountID
 from .asset import Asset
@@ -23,7 +30,12 @@ class SimplePaymentResult:
     ----------------------------------------------------------------
     """
 
-    def __init__(self, destination: AccountID, asset: Asset, amount: Int64,) -> None:
+    def __init__(
+        self,
+        destination: AccountID,
+        asset: Asset,
+        amount: Int64,
+    ) -> None:
         self.destination = destination
         self.asset = asset
         self.amount = amount
@@ -38,7 +50,11 @@ class SimplePaymentResult:
         destination = AccountID.unpack(unpacker)
         asset = Asset.unpack(unpacker)
         amount = Int64.unpack(unpacker)
-        return cls(destination=destination, asset=asset, amount=amount,)
+        return cls(
+            destination=destination,
+            asset=asset,
+            amount=amount,
+        )
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

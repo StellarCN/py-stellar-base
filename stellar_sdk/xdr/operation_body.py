@@ -8,6 +8,8 @@ from .begin_sponsoring_future_reserves_op import BeginSponsoringFutureReservesOp
 from .bump_sequence_op import BumpSequenceOp
 from .change_trust_op import ChangeTrustOp
 from .claim_claimable_balance_op import ClaimClaimableBalanceOp
+from .clawback_claimable_balance_op import ClawbackClaimableBalanceOp
+from .clawback_op import ClawbackOp
 from .create_account_op import CreateAccountOp
 from .create_claimable_balance_op import CreateClaimableBalanceOp
 from .create_passive_sell_offer_op import CreatePassiveSellOfferOp
@@ -21,6 +23,7 @@ from .path_payment_strict_send_op import PathPaymentStrictSendOp
 from .payment_op import PaymentOp
 from .revoke_sponsorship_op import RevokeSponsorshipOp
 from .set_options_op import SetOptionsOp
+from .set_trust_line_flags_op import SetTrustLineFlagsOp
 from ..exceptions import ValueError
 
 __all__ = ["OperationBody"]
@@ -70,6 +73,12 @@ class OperationBody:
             void;
         case REVOKE_SPONSORSHIP:
             RevokeSponsorshipOp revokeSponsorshipOp;
+        case CLAWBACK:
+            ClawbackOp clawbackOp;
+        case CLAWBACK_CLAIMABLE_BALANCE:
+            ClawbackClaimableBalanceOp clawbackClaimableBalanceOp;
+        case SET_TRUST_LINE_FLAGS:
+            SetTrustLineFlagsOp setTrustLineFlagsOp;
         }
     ----------------------------------------------------------------
     """
@@ -94,6 +103,9 @@ class OperationBody:
         claim_claimable_balance_op: ClaimClaimableBalanceOp = None,
         begin_sponsoring_future_reserves_op: BeginSponsoringFutureReservesOp = None,
         revoke_sponsorship_op: RevokeSponsorshipOp = None,
+        clawback_op: ClawbackOp = None,
+        clawback_claimable_balance_op: ClawbackClaimableBalanceOp = None,
+        set_trust_line_flags_op: SetTrustLineFlagsOp = None,
     ) -> None:
         self.type = type
         self.create_account_op = create_account_op
@@ -113,6 +125,9 @@ class OperationBody:
         self.claim_claimable_balance_op = claim_claimable_balance_op
         self.begin_sponsoring_future_reserves_op = begin_sponsoring_future_reserves_op
         self.revoke_sponsorship_op = revoke_sponsorship_op
+        self.clawback_op = clawback_op
+        self.clawback_claimable_balance_op = clawback_claimable_balance_op
+        self.set_trust_line_flags_op = set_trust_line_flags_op
 
     def pack(self, packer: Packer) -> None:
         self.type.pack(packer)
@@ -207,6 +222,21 @@ class OperationBody:
                 raise ValueError("revoke_sponsorship_op should not be None.")
             self.revoke_sponsorship_op.pack(packer)
             return
+        if self.type == OperationType.CLAWBACK:
+            if self.clawback_op is None:
+                raise ValueError("clawback_op should not be None.")
+            self.clawback_op.pack(packer)
+            return
+        if self.type == OperationType.CLAWBACK_CLAIMABLE_BALANCE:
+            if self.clawback_claimable_balance_op is None:
+                raise ValueError("clawback_claimable_balance_op should not be None.")
+            self.clawback_claimable_balance_op.pack(packer)
+            return
+        if self.type == OperationType.SET_TRUST_LINE_FLAGS:
+            if self.set_trust_line_flags_op is None:
+                raise ValueError("set_trust_line_flags_op should not be None.")
+            self.set_trust_line_flags_op.pack(packer)
+            return
         raise ValueError("Invalid type.")
 
     @classmethod
@@ -292,8 +322,8 @@ class OperationBody:
                 raise ValueError("claim_claimable_balance_op should not be None.")
             return cls(type, claim_claimable_balance_op=claim_claimable_balance_op)
         if type == OperationType.BEGIN_SPONSORING_FUTURE_RESERVES:
-            begin_sponsoring_future_reserves_op = BeginSponsoringFutureReservesOp.unpack(
-                unpacker
+            begin_sponsoring_future_reserves_op = (
+                BeginSponsoringFutureReservesOp.unpack(unpacker)
             )
             if begin_sponsoring_future_reserves_op is None:
                 raise ValueError(
@@ -310,6 +340,23 @@ class OperationBody:
             if revoke_sponsorship_op is None:
                 raise ValueError("revoke_sponsorship_op should not be None.")
             return cls(type, revoke_sponsorship_op=revoke_sponsorship_op)
+        if type == OperationType.CLAWBACK:
+            clawback_op = ClawbackOp.unpack(unpacker)
+            if clawback_op is None:
+                raise ValueError("clawback_op should not be None.")
+            return cls(type, clawback_op=clawback_op)
+        if type == OperationType.CLAWBACK_CLAIMABLE_BALANCE:
+            clawback_claimable_balance_op = ClawbackClaimableBalanceOp.unpack(unpacker)
+            if clawback_claimable_balance_op is None:
+                raise ValueError("clawback_claimable_balance_op should not be None.")
+            return cls(
+                type, clawback_claimable_balance_op=clawback_claimable_balance_op
+            )
+        if type == OperationType.SET_TRUST_LINE_FLAGS:
+            set_trust_line_flags_op = SetTrustLineFlagsOp.unpack(unpacker)
+            if set_trust_line_flags_op is None:
+                raise ValueError("set_trust_line_flags_op should not be None.")
+            return cls(type, set_trust_line_flags_op=set_trust_line_flags_op)
         raise ValueError("Invalid type.")
 
     def to_xdr_bytes(self) -> bytes:
@@ -355,6 +402,10 @@ class OperationBody:
             and self.begin_sponsoring_future_reserves_op
             == other.begin_sponsoring_future_reserves_op
             and self.revoke_sponsorship_op == other.revoke_sponsorship_op
+            and self.clawback_op == other.clawback_op
+            and self.clawback_claimable_balance_op
+            == other.clawback_claimable_balance_op
+            and self.set_trust_line_flags_op == other.set_trust_line_flags_op
         )
 
     def __str__(self):
@@ -411,4 +462,13 @@ class OperationBody:
         out.append(
             f"revoke_sponsorship_op={self.revoke_sponsorship_op}"
         ) if self.revoke_sponsorship_op is not None else None
+        out.append(
+            f"clawback_op={self.clawback_op}"
+        ) if self.clawback_op is not None else None
+        out.append(
+            f"clawback_claimable_balance_op={self.clawback_claimable_balance_op}"
+        ) if self.clawback_claimable_balance_op is not None else None
+        out.append(
+            f"set_trust_line_flags_op={self.set_trust_line_flags_op}"
+        ) if self.set_trust_line_flags_op is not None else None
         return f"<OperationBody {[', '.join(out)]}>"

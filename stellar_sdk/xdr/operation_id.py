@@ -27,7 +27,11 @@ class OperationID:
     ----------------------------------------------------------------
     """
 
-    def __init__(self, type: EnvelopeType, id: OperationIDId = None,) -> None:
+    def __init__(
+        self,
+        type: EnvelopeType,
+        id: OperationIDId = None,
+    ) -> None:
         self.type = type
         self.id = id
 

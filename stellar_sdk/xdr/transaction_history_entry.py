@@ -1,11 +1,18 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
 import base64
+from enum import IntEnum
+from typing import List, Optional
 from xdrlib import Packer, Unpacker
 
-from .transaction_history_entry_ext import TransactionHistoryEntryExt
-from .transaction_set import TransactionSet
+from .base import *
+from .constants import *
+from ..__version__ import __issues__
+from ..exceptions import ValueError
+
 from .uint32 import Uint32
+from .transaction_set import TransactionSet
+from .transaction_history_entry_ext import TransactionHistoryEntryExt
 
 __all__ = ["TransactionHistoryEntry"]
 
@@ -18,7 +25,7 @@ class TransactionHistoryEntry:
     {
         uint32 ledgerSeq;
         TransactionSet txSet;
-    
+
         // reserved for future use
         union switch (int v)
         {
@@ -50,7 +57,11 @@ class TransactionHistoryEntry:
         ledger_seq = Uint32.unpack(unpacker)
         tx_set = TransactionSet.unpack(unpacker)
         ext = TransactionHistoryEntryExt.unpack(unpacker)
-        return cls(ledger_seq=ledger_seq, tx_set=tx_set, ext=ext,)
+        return cls(
+            ledger_seq=ledger_seq,
+            tx_set=tx_set,
+            ext=ext,
+        )
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()
