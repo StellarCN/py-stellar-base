@@ -82,6 +82,8 @@ def build_challenge_transaction(
         source=server_account.account_id,
     )
     if client_domain:
+        if not client_signing_key:
+            raise ValueError("client_signing_key is required if client_domain is provided.")
         transaction_builder.append_manage_data_op(
             data_name="client_domain",
             data_value=client_domain,
@@ -243,7 +245,6 @@ def read_challenge_transaction(
         )
 
     # TODO: I don't think this is a good idea.
-    # What if we used the Java SDK's approach and had a ChallengeTransaction class?
     return transaction_envelope, client_account, matched_home_domain
 
 
