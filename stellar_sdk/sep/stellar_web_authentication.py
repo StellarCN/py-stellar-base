@@ -11,7 +11,7 @@ import base64
 import os
 import time
 import warnings
-from typing import List, Tuple, Union, Iterable
+from typing import List, Union, Iterable
 
 from .ed25519_public_key_signer import Ed25519PublicKeySigner
 from .exceptions import InvalidSep10ChallengeError
@@ -33,6 +33,37 @@ __all__ = [
 ]
 
 MUXED_ACCOUNT_STARTING_LETTER: str = "M"
+
+
+class ChallengeTransaction:
+    """ Used to store the results produced
+    by :func:`stellar_sdk.sep.stellar_web_authentication.read_challenge_transaction`.
+
+    :param transaction: The TransactionEnvelope parsed from challenge xdr.
+    :param client_account_id: The stellar account that the wallet wishes to authenticate with the server.
+    :param matched_home_domain: The domain name that has been matched.
+    """
+    def __init__(
+        self,
+        transaction: TransactionEnvelope,
+        client_account_id: str,
+        matched_home_domain: str,
+    ) -> None:
+        self.transaction = transaction
+        self.client_account_id = client_account_id
+        self.matched_home_domain = matched_home_domain
+
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, self.__class__):
+            return NotImplemented  # pragma: no cover
+        return (
+            self.transaction == other.transaction
+            and self.client_account_id == other.client_account_id
+            and self.matched_home_domain == other.matched_home_domain
+        )
+
+    def __str__(self):
+        return f"<ChallengeTransaction [transaction={self.transaction}, client_account_id={self.client_account_id}, matched_home_domain={self.matched_home_domain}]>"
 
 
 def build_challenge_transaction(
@@ -88,7 +119,7 @@ def read_challenge_transaction(
     home_domains: Union[str, Iterable[str]],
     web_auth_domain: str,
     network_passphrase: str,
-) -> Tuple[TransactionEnvelope, str, str]:
+) -> ChallengeTransaction:
     """Reads a SEP 10 challenge transaction and returns the decoded transaction envelope and client account ID contained within.
 
     It also verifies that transaction is signed by the server.
@@ -232,8 +263,9 @@ def read_challenge_transaction(
             f"Transaction not signed by server: {server_account_id}."
         )
 
-    # TODO: I don't think this is a good idea.
-    return transaction_envelope, client_account, matched_home_domain
+    return ChallengeTransaction(
+        transaction_envelope, client_account, matched_home_domain
+    )
 
 
 def verify_challenge_transaction_signers(
@@ -269,13 +301,14 @@ def verify_challenge_transaction_signers(
     if not signers:
         raise InvalidSep10ChallengeError("No signers provided.")
 
-    te, _, _ = read_challenge_transaction(
+    parsed_challenge_transaction = read_challenge_transaction(
         challenge_transaction,
         server_account_id,
         home_domains,
         web_auth_domain,
         network_passphrase,
     )
+    te = parsed_challenge_transaction.transaction
     server_keypair = Keypair.from_public_key(server_account_id)
 
     # Ensure the server is not included
@@ -475,13 +508,14 @@ def verify_challenge_transaction(
         validation fails, the exception will be thrown.
     """
 
-    _, client_account_id, _ = read_challenge_transaction(
+    parsed_challenge_transaction = read_challenge_transaction(
         challenge_transaction,
         server_account_id,
         home_domains,
         web_auth_domain,
         network_passphrase,
     )
+    client_account_id = parsed_challenge_transaction.client_account_id
     signers = [Ed25519PublicKeySigner(client_account_id, 255)]
     verify_challenge_transaction_signers(
         challenge_transaction,
