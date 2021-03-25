@@ -4,8 +4,8 @@ Title: Stellar Web Authentication
 Author: Sergey Nebolsin <@nebolsin>, Tom Quisel <tom.quisel@gmail.com>, Leigh McCulloch <@leighmcculloch>, Jake Urban <jake@stellar.org>
 Status: Active
 Created: 2018-07-31
-Updated: 2021-01-11
-Version 3.1.0
+Updated: 2021-03-04
+Version 3.2.0
 """
 import base64
 import os
