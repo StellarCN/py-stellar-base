@@ -10,7 +10,8 @@ client_signer_keypair1 = Keypair.from_secret("SCKJFEF2H767XINUY5YFBORUO7AAWOAXST
 client_signer_keypair2 = Keypair.from_secret("SCE2JBZ6FKPTQ5LM4X4NIZOOZPIC5DXVG6VP2TKSBZCQAGXABJV55IN5")
 
 server = Server("https://horizon-testnet.stellar.org")
-domain_name = "example.com"
+home_domain = "example.com"
+web_auth_domain = "auth.example.com"
 network_passphrase = Network.TESTNET_NETWORK_PASSPHRASE
 
 
@@ -28,12 +29,12 @@ def setup_multisig():
 
 def example_verify_challenge_tx_threshold():
     # Server builds challenge transaction
-    challenge_tx = build_challenge_transaction(server_keypair.secret, client_master_keypair.public_key, domain_name,
-                                               network_passphrase, 300)
+    challenge_tx = build_challenge_transaction(server_keypair.secret, client_master_keypair.public_key, home_domain,
+                                               web_auth_domain, network_passphrase, 300)
 
     # Client reads and signs challenge transaction
-    tx, tx_client_account_id = read_challenge_transaction(challenge_tx, server_keypair.public_key, domain_name,
-                                                          network_passphrase)
+    tx, tx_client_account_id, _ = read_challenge_transaction(challenge_tx, server_keypair.public_key,
+                                                             home_domain, web_auth_domain, network_passphrase)
     if tx_client_account_id != client_master_keypair.public_key:
         print("Error: challenge tx is not for expected client account")
         return
@@ -42,8 +43,8 @@ def example_verify_challenge_tx_threshold():
     signed_challenge_tx = tx.to_xdr()
 
     # Server verifies signed challenge transaction
-    _, tx_client_account_id = read_challenge_transaction(challenge_tx, server_keypair.public_key, domain_name,
-                                                         network_passphrase)
+    _, tx_client_account_id, _ = read_challenge_transaction(challenge_tx, server_keypair.public_key,
+                                                            home_domain, web_auth_domain, network_passphrase)
     client_account_exists = False
     horizon_client_account = None
     try:
@@ -59,7 +60,7 @@ def example_verify_challenge_tx_threshold():
         threshold = horizon_client_account.thresholds.med_threshold
         try:
             signers_found = verify_challenge_transaction_threshold(signed_challenge_tx, server_keypair.public_key,
-                                                                   domain_name, network_passphrase, threshold, signers)
+                                                                   home_domain, web_auth_domain, network_passphrase, threshold, signers)
         except InvalidSep10ChallengeError as e:
             print("You should handle possible exceptions:")
             print(e)
@@ -72,7 +73,7 @@ def example_verify_challenge_tx_threshold():
         # verifies that master key has signed challenge transaction
         try:
             verify_challenge_transaction_signed_by_client_master_key(signed_challenge_tx, server_keypair.public_key,
-                                                                     domain_name, network_passphrase)
+                                                                     home_domain, web_auth_domain, network_passphrase)
             print("Client Master Key Verified.")
         except InvalidSep10ChallengeError as e:
             print("You should handle possible exceptions:")

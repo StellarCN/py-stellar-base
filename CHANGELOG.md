@@ -1,6 +1,12 @@
 Release History
 ==============
 
+### Version 2.12.0-beta0
+Released on Mar 25, 2021
+
+#### Update
+feat: SEP-10: added support for 'client_domain' ManageData operations in challenges (client attribution). ([#428](https://github.com/StellarCN/py-stellar-base/pull/428))
+
 ### Version 2.11.3
 Released on Mar 16, 2021
 
