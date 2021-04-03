@@ -25,28 +25,28 @@ class LedgerKey:
         {
             AccountID accountID;
         } account;
-    
+
     case TRUSTLINE:
         struct
         {
             AccountID accountID;
             Asset asset;
         } trustLine;
-    
+
     case OFFER:
         struct
         {
             AccountID sellerID;
             int64 offerID;
         } offer;
-    
+
     case DATA:
         struct
         {
             AccountID accountID;
             string64 dataName;
         } data;
-    
+
     case CLAIMABLE_BALANCE:
         struct
         {

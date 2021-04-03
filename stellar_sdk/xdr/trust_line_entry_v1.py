@@ -16,7 +16,7 @@ class TrustLineEntryV1:
     struct
             {
                 Liabilities liabilities;
-    
+
                 union switch (int v)
                 {
                 case 0:
@@ -27,7 +27,11 @@ class TrustLineEntryV1:
     ----------------------------------------------------------------
     """
 
-    def __init__(self, liabilities: Liabilities, ext: TrustLineEntryV1Ext,) -> None:
+    def __init__(
+        self,
+        liabilities: Liabilities,
+        ext: TrustLineEntryV1Ext,
+    ) -> None:
         self.liabilities = liabilities
         self.ext = ext
 
@@ -39,7 +43,10 @@ class TrustLineEntryV1:
     def unpack(cls, unpacker: Unpacker) -> "TrustLineEntryV1":
         liabilities = Liabilities.unpack(unpacker)
         ext = TrustLineEntryV1Ext.unpack(unpacker)
-        return cls(liabilities=liabilities, ext=ext,)
+        return cls(
+            liabilities=liabilities,
+            ext=ext,
+        )
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

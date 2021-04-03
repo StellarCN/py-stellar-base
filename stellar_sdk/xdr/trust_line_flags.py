@@ -20,13 +20,17 @@ class TrustLineFlags(IntEnum):
         AUTHORIZED_FLAG = 1,
         // issuer has authorized account to maintain and reduce liabilities for its
         // credit
-        AUTHORIZED_TO_MAINTAIN_LIABILITIES_FLAG = 2
+        AUTHORIZED_TO_MAINTAIN_LIABILITIES_FLAG = 2,
+        // issuer has specified that it may clawback its credit, and that claimable
+        // balances created with its credit may also be clawed back
+        TRUSTLINE_CLAWBACK_ENABLED_FLAG = 4
     };
     ----------------------------------------------------------------
     """
 
     AUTHORIZED_FLAG = 1
     AUTHORIZED_TO_MAINTAIN_LIABILITIES_FLAG = 2
+    TRUSTLINE_CLAWBACK_ENABLED_FLAG = 4
 
     def pack(self, packer: Packer) -> None:
         packer.pack_int(self.value)

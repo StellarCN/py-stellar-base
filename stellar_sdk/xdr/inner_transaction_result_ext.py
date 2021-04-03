@@ -21,7 +21,10 @@ class InnerTransactionResultExt:
     ----------------------------------------------------------------
     """
 
-    def __init__(self, v: int,) -> None:
+    def __init__(
+        self,
+        v: int,
+    ) -> None:
         self.v = v
 
     def pack(self, packer: Packer) -> None:

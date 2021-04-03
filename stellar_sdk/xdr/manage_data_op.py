@@ -22,7 +22,11 @@ class ManageDataOp:
     ----------------------------------------------------------------
     """
 
-    def __init__(self, data_name: String64, data_value: Optional[DataValue],) -> None:
+    def __init__(
+        self,
+        data_name: String64,
+        data_value: Optional[DataValue],
+    ) -> None:
         self.data_name = data_name
         self.data_value = data_value
 
@@ -38,7 +42,10 @@ class ManageDataOp:
     def unpack(cls, unpacker: Unpacker) -> "ManageDataOp":
         data_name = String64.unpack(unpacker)
         data_value = DataValue.unpack(unpacker) if unpacker.unpack_uint() else None
-        return cls(data_name=data_name, data_value=data_value,)
+        return cls(
+            data_name=data_name,
+            data_value=data_value,
+        )
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

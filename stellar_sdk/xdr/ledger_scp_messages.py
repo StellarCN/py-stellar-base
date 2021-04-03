@@ -23,7 +23,11 @@ class LedgerSCPMessages:
     ----------------------------------------------------------------
     """
 
-    def __init__(self, ledger_seq: Uint32, messages: List[SCPEnvelope],) -> None:
+    def __init__(
+        self,
+        ledger_seq: Uint32,
+        messages: List[SCPEnvelope],
+    ) -> None:
         if messages and len(messages) > 4294967295:
             raise ValueError(
                 f"The maximum length of `messages` should be 4294967295, but got {len(messages)}."
@@ -44,7 +48,10 @@ class LedgerSCPMessages:
         messages = []
         for _ in range(length):
             messages.append(SCPEnvelope.unpack(unpacker))
-        return cls(ledger_seq=ledger_seq, messages=messages,)
+        return cls(
+            ledger_seq=ledger_seq,
+            messages=messages,
+        )
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

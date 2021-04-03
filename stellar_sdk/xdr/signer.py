@@ -21,7 +21,11 @@ class Signer:
     ----------------------------------------------------------------
     """
 
-    def __init__(self, key: SignerKey, weight: Uint32,) -> None:
+    def __init__(
+        self,
+        key: SignerKey,
+        weight: Uint32,
+    ) -> None:
         self.key = key
         self.weight = weight
 
@@ -33,7 +37,10 @@ class Signer:
     def unpack(cls, unpacker: Unpacker) -> "Signer":
         key = SignerKey.unpack(unpacker)
         weight = Uint32.unpack(unpacker)
-        return cls(key=key, weight=weight,)
+        return cls(
+            key=key,
+            weight=weight,
+        )
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

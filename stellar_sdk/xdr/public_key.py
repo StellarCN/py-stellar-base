@@ -22,7 +22,11 @@ class PublicKey:
     ----------------------------------------------------------------
     """
 
-    def __init__(self, type: PublicKeyType, ed25519: Uint256 = None,) -> None:
+    def __init__(
+        self,
+        type: PublicKeyType,
+        ed25519: Uint256 = None,
+    ) -> None:
         self.type = type
         self.ed25519 = ed25519
 

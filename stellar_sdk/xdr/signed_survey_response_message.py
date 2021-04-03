@@ -22,7 +22,9 @@ class SignedSurveyResponseMessage:
     """
 
     def __init__(
-        self, response_signature: Signature, response: SurveyResponseMessage,
+        self,
+        response_signature: Signature,
+        response: SurveyResponseMessage,
     ) -> None:
         self.response_signature = response_signature
         self.response = response
@@ -35,7 +37,10 @@ class SignedSurveyResponseMessage:
     def unpack(cls, unpacker: Unpacker) -> "SignedSurveyResponseMessage":
         response_signature = Signature.unpack(unpacker)
         response = SurveyResponseMessage.unpack(unpacker)
-        return cls(response_signature=response_signature, response=response,)
+        return cls(
+            response_signature=response_signature,
+            response=response,
+        )
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

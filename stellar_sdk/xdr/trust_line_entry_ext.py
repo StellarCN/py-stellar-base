@@ -22,7 +22,7 @@ class TrustLineEntryExt:
             struct
             {
                 Liabilities liabilities;
-    
+
                 union switch (int v)
                 {
                 case 0:
@@ -34,7 +34,11 @@ class TrustLineEntryExt:
     ----------------------------------------------------------------
     """
 
-    def __init__(self, v: int, v1: TrustLineEntryV1 = None,) -> None:
+    def __init__(
+        self,
+        v: int,
+        v1: TrustLineEntryV1 = None,
+    ) -> None:
         self.v = v
         self.v1 = v1
 

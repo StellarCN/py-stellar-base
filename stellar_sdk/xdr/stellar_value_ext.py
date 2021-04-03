@@ -25,7 +25,9 @@ class StellarValueExt:
     """
 
     def __init__(
-        self, v: StellarValueType, lc_value_signature: LedgerCloseValueSignature = None,
+        self,
+        v: StellarValueType,
+        lc_value_signature: LedgerCloseValueSignature = None,
     ) -> None:
         self.v = v
         self.lc_value_signature = lc_value_signature

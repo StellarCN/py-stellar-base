@@ -19,7 +19,10 @@ class Curve25519Public:
     ----------------------------------------------------------------
     """
 
-    def __init__(self, key: bytes,) -> None:
+    def __init__(
+        self,
+        key: bytes,
+    ) -> None:
         self.key = key
 
     def pack(self, packer: Packer) -> None:
@@ -28,7 +31,9 @@ class Curve25519Public:
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "Curve25519Public":
         key = Opaque.unpack(unpacker, 32, True)
-        return cls(key=key,)
+        return cls(
+            key=key,
+        )
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

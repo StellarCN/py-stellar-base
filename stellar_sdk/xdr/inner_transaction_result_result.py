@@ -40,7 +40,9 @@ class InnerTransactionResultResult:
     """
 
     def __init__(
-        self, code: TransactionResultCode, results: List[OperationResult] = None,
+        self,
+        code: TransactionResultCode,
+        results: List[OperationResult] = None,
     ) -> None:
         if results and len(results) > 4294967295:
             raise ValueError(

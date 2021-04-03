@@ -62,7 +62,11 @@ class SCPQuorumSet:
         inner_sets = []
         for _ in range(length):
             inner_sets.append(SCPQuorumSet.unpack(unpacker))
-        return cls(threshold=threshold, validators=validators, inner_sets=inner_sets,)
+        return cls(
+            threshold=threshold,
+            validators=validators,
+            inner_sets=inner_sets,
+        )
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

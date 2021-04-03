@@ -59,7 +59,12 @@ class FeeBumpTransaction:
         fee = Int64.unpack(unpacker)
         inner_tx = FeeBumpTransactionInnerTx.unpack(unpacker)
         ext = FeeBumpTransactionExt.unpack(unpacker)
-        return cls(fee_source=fee_source, fee=fee, inner_tx=inner_tx, ext=ext,)
+        return cls(
+            fee_source=fee_source,
+            fee=fee,
+            inner_tx=inner_tx,
+            ext=ext,
+        )
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

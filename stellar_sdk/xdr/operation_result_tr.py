@@ -9,6 +9,8 @@ from .begin_sponsoring_future_reserves_result import BeginSponsoringFutureReserv
 from .bump_sequence_result import BumpSequenceResult
 from .change_trust_result import ChangeTrustResult
 from .claim_claimable_balance_result import ClaimClaimableBalanceResult
+from .clawback_claimable_balance_result import ClawbackClaimableBalanceResult
+from .clawback_result import ClawbackResult
 from .create_account_result import CreateAccountResult
 from .create_claimable_balance_result import CreateClaimableBalanceResult
 from .end_sponsoring_future_reserves_result import EndSponsoringFutureReservesResult
@@ -22,6 +24,7 @@ from .path_payment_strict_send_result import PathPaymentStrictSendResult
 from .payment_result import PaymentResult
 from .revoke_sponsorship_result import RevokeSponsorshipResult
 from .set_options_result import SetOptionsResult
+from .set_trust_line_flags_result import SetTrustLineFlagsResult
 from ..exceptions import ValueError
 
 __all__ = ["OperationResultTr"]
@@ -71,6 +74,12 @@ class OperationResultTr:
             EndSponsoringFutureReservesResult endSponsoringFutureReservesResult;
         case REVOKE_SPONSORSHIP:
             RevokeSponsorshipResult revokeSponsorshipResult;
+        case CLAWBACK:
+            ClawbackResult clawbackResult;
+        case CLAWBACK_CLAIMABLE_BALANCE:
+            ClawbackClaimableBalanceResult clawbackClaimableBalanceResult;
+        case SET_TRUST_LINE_FLAGS:
+            SetTrustLineFlagsResult setTrustLineFlagsResult;
         }
     ----------------------------------------------------------------
     """
@@ -97,6 +106,9 @@ class OperationResultTr:
         begin_sponsoring_future_reserves_result: BeginSponsoringFutureReservesResult = None,
         end_sponsoring_future_reserves_result: EndSponsoringFutureReservesResult = None,
         revoke_sponsorship_result: RevokeSponsorshipResult = None,
+        clawback_result: ClawbackResult = None,
+        clawback_claimable_balance_result: ClawbackClaimableBalanceResult = None,
+        set_trust_line_flags_result: SetTrustLineFlagsResult = None,
     ) -> None:
         self.type = type
         self.create_account_result = create_account_result
@@ -122,6 +134,9 @@ class OperationResultTr:
             end_sponsoring_future_reserves_result
         )
         self.revoke_sponsorship_result = revoke_sponsorship_result
+        self.clawback_result = clawback_result
+        self.clawback_claimable_balance_result = clawback_claimable_balance_result
+        self.set_trust_line_flags_result = set_trust_line_flags_result
 
     def pack(self, packer: Packer) -> None:
         self.type.pack(packer)
@@ -225,6 +240,23 @@ class OperationResultTr:
             if self.revoke_sponsorship_result is None:
                 raise ValueError("revoke_sponsorship_result should not be None.")
             self.revoke_sponsorship_result.pack(packer)
+            return
+        if self.type == OperationType.CLAWBACK:
+            if self.clawback_result is None:
+                raise ValueError("clawback_result should not be None.")
+            self.clawback_result.pack(packer)
+            return
+        if self.type == OperationType.CLAWBACK_CLAIMABLE_BALANCE:
+            if self.clawback_claimable_balance_result is None:
+                raise ValueError(
+                    "clawback_claimable_balance_result should not be None."
+                )
+            self.clawback_claimable_balance_result.pack(packer)
+            return
+        if self.type == OperationType.SET_TRUST_LINE_FLAGS:
+            if self.set_trust_line_flags_result is None:
+                raise ValueError("set_trust_line_flags_result should not be None.")
+            self.set_trust_line_flags_result.pack(packer)
             return
         raise ValueError("Invalid type.")
 
@@ -333,8 +365,8 @@ class OperationResultTr:
                 type, claim_claimable_balance_result=claim_claimable_balance_result
             )
         if type == OperationType.BEGIN_SPONSORING_FUTURE_RESERVES:
-            begin_sponsoring_future_reserves_result = BeginSponsoringFutureReservesResult.unpack(
-                unpacker
+            begin_sponsoring_future_reserves_result = (
+                BeginSponsoringFutureReservesResult.unpack(unpacker)
             )
             if begin_sponsoring_future_reserves_result is None:
                 raise ValueError(
@@ -345,8 +377,8 @@ class OperationResultTr:
                 begin_sponsoring_future_reserves_result=begin_sponsoring_future_reserves_result,
             )
         if type == OperationType.END_SPONSORING_FUTURE_RESERVES:
-            end_sponsoring_future_reserves_result = EndSponsoringFutureReservesResult.unpack(
-                unpacker
+            end_sponsoring_future_reserves_result = (
+                EndSponsoringFutureReservesResult.unpack(unpacker)
             )
             if end_sponsoring_future_reserves_result is None:
                 raise ValueError(
@@ -361,6 +393,28 @@ class OperationResultTr:
             if revoke_sponsorship_result is None:
                 raise ValueError("revoke_sponsorship_result should not be None.")
             return cls(type, revoke_sponsorship_result=revoke_sponsorship_result)
+        if type == OperationType.CLAWBACK:
+            clawback_result = ClawbackResult.unpack(unpacker)
+            if clawback_result is None:
+                raise ValueError("clawback_result should not be None.")
+            return cls(type, clawback_result=clawback_result)
+        if type == OperationType.CLAWBACK_CLAIMABLE_BALANCE:
+            clawback_claimable_balance_result = ClawbackClaimableBalanceResult.unpack(
+                unpacker
+            )
+            if clawback_claimable_balance_result is None:
+                raise ValueError(
+                    "clawback_claimable_balance_result should not be None."
+                )
+            return cls(
+                type,
+                clawback_claimable_balance_result=clawback_claimable_balance_result,
+            )
+        if type == OperationType.SET_TRUST_LINE_FLAGS:
+            set_trust_line_flags_result = SetTrustLineFlagsResult.unpack(unpacker)
+            if set_trust_line_flags_result is None:
+                raise ValueError("set_trust_line_flags_result should not be None.")
+            return cls(type, set_trust_line_flags_result=set_trust_line_flags_result)
         raise ValueError("Invalid type.")
 
     def to_xdr_bytes(self) -> bytes:
@@ -413,6 +467,10 @@ class OperationResultTr:
             and self.end_sponsoring_future_reserves_result
             == other.end_sponsoring_future_reserves_result
             and self.revoke_sponsorship_result == other.revoke_sponsorship_result
+            and self.clawback_result == other.clawback_result
+            and self.clawback_claimable_balance_result
+            == other.clawback_claimable_balance_result
+            and self.set_trust_line_flags_result == other.set_trust_line_flags_result
         )
 
     def __str__(self):
@@ -475,4 +533,13 @@ class OperationResultTr:
         out.append(
             f"revoke_sponsorship_result={self.revoke_sponsorship_result}"
         ) if self.revoke_sponsorship_result is not None else None
+        out.append(
+            f"clawback_result={self.clawback_result}"
+        ) if self.clawback_result is not None else None
+        out.append(
+            f"clawback_claimable_balance_result={self.clawback_claimable_balance_result}"
+        ) if self.clawback_claimable_balance_result is not None else None
+        out.append(
+            f"set_trust_line_flags_result={self.set_trust_line_flags_result}"
+        ) if self.set_trust_line_flags_result is not None else None
         return f"<OperationResultTr {[', '.join(out)]}>"

@@ -20,7 +20,7 @@ class Operation:
         // if not set, the runtime defaults to "sourceAccount" specified at
         // the transaction level
         MuxedAccount* sourceAccount;
-    
+
         union switch (OperationType type)
         {
         case CREATE_ACCOUNT:
@@ -61,6 +61,12 @@ class Operation:
             void;
         case REVOKE_SPONSORSHIP:
             RevokeSponsorshipOp revokeSponsorshipOp;
+        case CLAWBACK:
+            ClawbackOp clawbackOp;
+        case CLAWBACK_CLAIMABLE_BALANCE:
+            ClawbackClaimableBalanceOp clawbackClaimableBalanceOp;
+        case SET_TRUST_LINE_FLAGS:
+            SetTrustLineFlagsOp setTrustLineFlagsOp;
         }
         body;
     };
@@ -68,7 +74,9 @@ class Operation:
     """
 
     def __init__(
-        self, source_account: Optional[MuxedAccount], body: OperationBody,
+        self,
+        source_account: Optional[MuxedAccount],
+        body: OperationBody,
     ) -> None:
         self.source_account = source_account
         self.body = body
@@ -87,7 +95,10 @@ class Operation:
             MuxedAccount.unpack(unpacker) if unpacker.unpack_uint() else None
         )
         body = OperationBody.unpack(unpacker)
-        return cls(source_account=source_account, body=body,)
+        return cls(
+            source_account=source_account,
+            body=body,
+        )
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

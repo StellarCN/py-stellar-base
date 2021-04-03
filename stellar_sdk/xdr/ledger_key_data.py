@@ -21,7 +21,11 @@ class LedgerKeyData:
     ----------------------------------------------------------------
     """
 
-    def __init__(self, account_id: AccountID, data_name: String64,) -> None:
+    def __init__(
+        self,
+        account_id: AccountID,
+        data_name: String64,
+    ) -> None:
         self.account_id = account_id
         self.data_name = data_name
 
@@ -33,7 +37,10 @@ class LedgerKeyData:
     def unpack(cls, unpacker: Unpacker) -> "LedgerKeyData":
         account_id = AccountID.unpack(unpacker)
         data_name = String64.unpack(unpacker)
-        return cls(account_id=account_id, data_name=data_name,)
+        return cls(
+            account_id=account_id,
+            data_name=data_name,
+        )
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

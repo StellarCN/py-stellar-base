@@ -17,6 +17,7 @@ class Uint32:
     """
 
     def __init__(self, uint32: int) -> None:
+
         self.uint32 = uint32
 
     def pack(self, packer: Packer) -> None:

@@ -23,7 +23,10 @@ class RevokeSponsorshipResult:
     ----------------------------------------------------------------
     """
 
-    def __init__(self, code: RevokeSponsorshipResultCode,) -> None:
+    def __init__(
+        self,
+        code: RevokeSponsorshipResultCode,
+    ) -> None:
         self.code = code
 
     def pack(self, packer: Packer) -> None:

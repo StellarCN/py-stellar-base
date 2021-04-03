@@ -25,7 +25,11 @@ class ManageOfferSuccessResultOffer:
     ----------------------------------------------------------------
     """
 
-    def __init__(self, effect: ManageOfferEffect, offer: OfferEntry = None,) -> None:
+    def __init__(
+        self,
+        effect: ManageOfferEffect,
+        offer: OfferEntry = None,
+    ) -> None:
         self.effect = effect
         self.offer = offer
 

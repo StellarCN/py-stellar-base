@@ -21,7 +21,10 @@ class Auth:
     ----------------------------------------------------------------
     """
 
-    def __init__(self, unused: int,) -> None:
+    def __init__(
+        self,
+        unused: int,
+    ) -> None:
         self.unused = unused
 
     def pack(self, packer: Packer) -> None:
@@ -30,7 +33,9 @@ class Auth:
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "Auth":
         unused = Integer.unpack(unpacker)
-        return cls(unused=unused,)
+        return cls(
+            unused=unused,
+        )
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

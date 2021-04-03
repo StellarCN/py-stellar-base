@@ -22,7 +22,7 @@ class AccountEntryExtensionV2:
         uint32 numSponsored;
         uint32 numSponsoring;
         SponsorshipDescriptor signerSponsoringIDs<MAX_SIGNERS>;
-    
+
         union switch (int v)
         {
         case 0:

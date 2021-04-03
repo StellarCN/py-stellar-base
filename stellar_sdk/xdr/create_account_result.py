@@ -23,7 +23,10 @@ class CreateAccountResult:
     ----------------------------------------------------------------
     """
 
-    def __init__(self, code: CreateAccountResultCode,) -> None:
+    def __init__(
+        self,
+        code: CreateAccountResultCode,
+    ) -> None:
         self.code = code
 
     def pack(self, packer: Packer) -> None:

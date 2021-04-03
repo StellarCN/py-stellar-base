@@ -18,7 +18,7 @@ class InnerTransactionResult:
     {
         // Always 0. Here for binary compatibility.
         int64 feeCharged;
-    
+
         union switch (TransactionResultCode code)
         {
         // txFEE_BUMP_INNER_SUCCESS is not included
@@ -41,7 +41,7 @@ class InnerTransactionResult:
             void;
         }
         result;
-    
+
         // reserved for future use
         union switch (int v)
         {
@@ -73,7 +73,11 @@ class InnerTransactionResult:
         fee_charged = Int64.unpack(unpacker)
         result = InnerTransactionResultResult.unpack(unpacker)
         ext = InnerTransactionResultExt.unpack(unpacker)
-        return cls(fee_charged=fee_charged, result=result, ext=ext,)
+        return cls(
+            fee_charged=fee_charged,
+            result=result,
+            ext=ext,
+        )
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

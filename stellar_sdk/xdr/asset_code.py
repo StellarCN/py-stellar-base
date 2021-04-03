@@ -8,24 +8,23 @@ from .asset_code4 import AssetCode4
 from .asset_type import AssetType
 from ..exceptions import ValueError
 
-__all__ = ["AllowTrustOpAsset"]
+__all__ = ["AssetCode"]
 
 
-class AllowTrustOpAsset:
+class AssetCode:
     """
     XDR Source Code
     ----------------------------------------------------------------
-    union switch (AssetType type)
-        {
-        // ASSET_TYPE_NATIVE is not allowed
-        case ASSET_TYPE_CREDIT_ALPHANUM4:
-            AssetCode4 assetCode4;
-    
-        case ASSET_TYPE_CREDIT_ALPHANUM12:
-            AssetCode12 assetCode12;
-    
-            // add other asset types here in the future
-        }
+    union AssetCode switch (AssetType type)
+    {
+    case ASSET_TYPE_CREDIT_ALPHANUM4:
+        AssetCode4 assetCode4;
+
+    case ASSET_TYPE_CREDIT_ALPHANUM12:
+        AssetCode12 assetCode12;
+
+        // add other asset types here in the future
+    };
     ----------------------------------------------------------------
     """
 
@@ -54,7 +53,7 @@ class AllowTrustOpAsset:
         raise ValueError("Invalid type.")
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "AllowTrustOpAsset":
+    def unpack(cls, unpacker: Unpacker) -> "AssetCode":
         type = AssetType.unpack(unpacker)
         if type == AssetType.ASSET_TYPE_CREDIT_ALPHANUM4:
             asset_code4 = AssetCode4.unpack(unpacker)
@@ -74,7 +73,7 @@ class AllowTrustOpAsset:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "AllowTrustOpAsset":
+    def from_xdr_bytes(cls, xdr: bytes) -> "AssetCode":
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -83,7 +82,7 @@ class AllowTrustOpAsset:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "AllowTrustOpAsset":
+    def from_xdr(cls, xdr: str) -> "AssetCode":
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
 
@@ -105,4 +104,4 @@ class AllowTrustOpAsset:
         out.append(
             f"asset_code12={self.asset_code12}"
         ) if self.asset_code12 is not None else None
-        return f"<AllowTrustOpAsset {[', '.join(out)]}>"
+        return f"<AssetCode {[', '.join(out)]}>"

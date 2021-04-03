@@ -27,7 +27,8 @@ class SetOptionsResultCode(IntEnum):
         SET_OPTIONS_UNKNOWN_FLAG = -6,           // can't set an unknown flag
         SET_OPTIONS_THRESHOLD_OUT_OF_RANGE = -7, // bad value for weight/threshold
         SET_OPTIONS_BAD_SIGNER = -8,             // signer cannot be masterkey
-        SET_OPTIONS_INVALID_HOME_DOMAIN = -9     // malformed home domain
+        SET_OPTIONS_INVALID_HOME_DOMAIN = -9,     // malformed home domain
+        SET_OPTIONS_AUTH_REVOCABLE_REQUIRED = -10 // auth revocable is required for clawback
     };
     ----------------------------------------------------------------
     """
@@ -42,6 +43,7 @@ class SetOptionsResultCode(IntEnum):
     SET_OPTIONS_THRESHOLD_OUT_OF_RANGE = -7
     SET_OPTIONS_BAD_SIGNER = -8
     SET_OPTIONS_INVALID_HOME_DOMAIN = -9
+    SET_OPTIONS_AUTH_REVOCABLE_REQUIRED = -10
 
     def pack(self, packer: Packer) -> None:
         packer.pack_int(self.value)

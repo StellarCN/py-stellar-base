@@ -25,7 +25,11 @@ class CreatePassiveSellOfferOp:
     """
 
     def __init__(
-        self, selling: Asset, buying: Asset, amount: Int64, price: Price,
+        self,
+        selling: Asset,
+        buying: Asset,
+        amount: Int64,
+        price: Price,
     ) -> None:
         self.selling = selling
         self.buying = buying
@@ -44,7 +48,12 @@ class CreatePassiveSellOfferOp:
         buying = Asset.unpack(unpacker)
         amount = Int64.unpack(unpacker)
         price = Price.unpack(unpacker)
-        return cls(selling=selling, buying=buying, amount=amount, price=price,)
+        return cls(
+            selling=selling,
+            buying=buying,
+            amount=amount,
+            price=price,
+        )
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

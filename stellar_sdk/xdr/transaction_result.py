@@ -17,7 +17,7 @@ class TransactionResult:
     struct TransactionResult
     {
         int64 feeCharged; // actual fee charged for the transaction
-    
+
         union switch (TransactionResultCode code)
         {
         case txFEE_BUMP_INNER_SUCCESS:
@@ -30,7 +30,7 @@ class TransactionResult:
             void;
         }
         result;
-    
+
         // reserved for future use
         union switch (int v)
         {
@@ -62,7 +62,11 @@ class TransactionResult:
         fee_charged = Int64.unpack(unpacker)
         result = TransactionResultResult.unpack(unpacker)
         ext = TransactionResultExt.unpack(unpacker)
-        return cls(fee_charged=fee_charged, result=result, ext=ext,)
+        return cls(
+            fee_charged=fee_charged,
+            result=result,
+            ext=ext,
+        )
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

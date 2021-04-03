@@ -26,7 +26,9 @@ class InflationResult:
     """
 
     def __init__(
-        self, code: InflationResultCode, payouts: List[InflationPayout] = None,
+        self,
+        code: InflationResultCode,
+        payouts: List[InflationPayout] = None,
     ) -> None:
         if payouts and len(payouts) > 4294967295:
             raise ValueError(

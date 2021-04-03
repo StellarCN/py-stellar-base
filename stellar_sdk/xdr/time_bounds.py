@@ -20,7 +20,11 @@ class TimeBounds:
     ----------------------------------------------------------------
     """
 
-    def __init__(self, min_time: TimePoint, max_time: TimePoint,) -> None:
+    def __init__(
+        self,
+        min_time: TimePoint,
+        max_time: TimePoint,
+    ) -> None:
         self.min_time = min_time
         self.max_time = max_time
 
@@ -32,7 +36,10 @@ class TimeBounds:
     def unpack(cls, unpacker: Unpacker) -> "TimeBounds":
         min_time = TimePoint.unpack(unpacker)
         max_time = TimePoint.unpack(unpacker)
-        return cls(min_time=min_time, max_time=max_time,)
+        return cls(
+            min_time=min_time,
+            max_time=max_time,
+        )
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

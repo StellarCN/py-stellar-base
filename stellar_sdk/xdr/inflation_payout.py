@@ -21,7 +21,11 @@ class InflationPayout:
     ----------------------------------------------------------------
     """
 
-    def __init__(self, destination: AccountID, amount: Int64,) -> None:
+    def __init__(
+        self,
+        destination: AccountID,
+        amount: Int64,
+    ) -> None:
         self.destination = destination
         self.amount = amount
 
@@ -33,7 +37,10 @@ class InflationPayout:
     def unpack(cls, unpacker: Unpacker) -> "InflationPayout":
         destination = AccountID.unpack(unpacker)
         amount = Int64.unpack(unpacker)
-        return cls(destination=destination, amount=amount,)
+        return cls(
+            destination=destination,
+            amount=amount,
+        )
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

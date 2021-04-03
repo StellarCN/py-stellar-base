@@ -34,7 +34,10 @@ class OperationType(IntEnum):
         CLAIM_CLAIMABLE_BALANCE = 15,
         BEGIN_SPONSORING_FUTURE_RESERVES = 16,
         END_SPONSORING_FUTURE_RESERVES = 17,
-        REVOKE_SPONSORSHIP = 18
+        REVOKE_SPONSORSHIP = 18,
+        CLAWBACK = 19,
+        CLAWBACK_CLAIMABLE_BALANCE = 20,
+        SET_TRUST_LINE_FLAGS = 21
     };
     ----------------------------------------------------------------
     """
@@ -58,6 +61,9 @@ class OperationType(IntEnum):
     BEGIN_SPONSORING_FUTURE_RESERVES = 16
     END_SPONSORING_FUTURE_RESERVES = 17
     REVOKE_SPONSORSHIP = 18
+    CLAWBACK = 19
+    CLAWBACK_CLAIMABLE_BALANCE = 20
+    SET_TRUST_LINE_FLAGS = 21
 
     def pack(self, packer: Packer) -> None:
         packer.pack_int(self.value)

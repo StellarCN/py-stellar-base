@@ -17,6 +17,7 @@ class Value:
     """
 
     def __init__(self, value: bytes) -> None:
+
         self.value = value
 
     def pack(self, packer: Packer) -> None:

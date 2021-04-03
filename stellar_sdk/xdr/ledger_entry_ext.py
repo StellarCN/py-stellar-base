@@ -24,7 +24,11 @@ class LedgerEntryExt:
     ----------------------------------------------------------------
     """
 
-    def __init__(self, v: int, v1: LedgerEntryExtensionV1 = None,) -> None:
+    def __init__(
+        self,
+        v: int,
+        v1: LedgerEntryExtensionV1 = None,
+    ) -> None:
         self.v = v
         self.v1 = v1
 

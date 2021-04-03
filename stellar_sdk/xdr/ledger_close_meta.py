@@ -22,7 +22,11 @@ class LedgerCloseMeta:
     ----------------------------------------------------------------
     """
 
-    def __init__(self, v: int, v0: LedgerCloseMetaV0 = None,) -> None:
+    def __init__(
+        self,
+        v: int,
+        v0: LedgerCloseMetaV0 = None,
+    ) -> None:
         self.v = v
         self.v0 = v0
 

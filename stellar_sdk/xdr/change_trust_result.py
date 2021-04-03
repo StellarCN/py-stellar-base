@@ -23,7 +23,10 @@ class ChangeTrustResult:
     ----------------------------------------------------------------
     """
 
-    def __init__(self, code: ChangeTrustResultCode,) -> None:
+    def __init__(
+        self,
+        code: ChangeTrustResultCode,
+    ) -> None:
         self.code = code
 
     def pack(self, packer: Packer) -> None:

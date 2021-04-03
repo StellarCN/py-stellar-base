@@ -23,7 +23,10 @@ class PaymentResult:
     ----------------------------------------------------------------
     """
 
-    def __init__(self, code: PaymentResultCode,) -> None:
+    def __init__(
+        self,
+        code: PaymentResultCode,
+    ) -> None:
         self.code = code
 
     def pack(self, packer: Packer) -> None:

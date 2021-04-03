@@ -19,7 +19,7 @@ class ManageOfferSuccessResult:
     {
         // offers that got claimed while creating this offer
         ClaimOfferAtom offersClaimed<>;
-    
+
         union switch (ManageOfferEffect effect)
         {
         case MANAGE_OFFER_CREATED:
@@ -58,7 +58,10 @@ class ManageOfferSuccessResult:
         for _ in range(length):
             offers_claimed.append(ClaimOfferAtom.unpack(unpacker))
         offer = ManageOfferSuccessResultOffer.unpack(unpacker)
-        return cls(offers_claimed=offers_claimed, offer=offer,)
+        return cls(
+            offers_claimed=offers_claimed,
+            offer=offer,
+        )
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

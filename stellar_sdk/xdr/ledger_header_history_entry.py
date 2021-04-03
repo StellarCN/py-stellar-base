@@ -18,7 +18,7 @@ class LedgerHeaderHistoryEntry:
     {
         Hash hash;
         LedgerHeader header;
-    
+
         // reserved for future use
         union switch (int v)
         {
@@ -31,7 +31,10 @@ class LedgerHeaderHistoryEntry:
     """
 
     def __init__(
-        self, hash: Hash, header: LedgerHeader, ext: LedgerHeaderHistoryEntryExt,
+        self,
+        hash: Hash,
+        header: LedgerHeader,
+        ext: LedgerHeaderHistoryEntryExt,
     ) -> None:
         self.hash = hash
         self.header = header
@@ -47,7 +50,11 @@ class LedgerHeaderHistoryEntry:
         hash = Hash.unpack(unpacker)
         header = LedgerHeader.unpack(unpacker)
         ext = LedgerHeaderHistoryEntryExt.unpack(unpacker)
-        return cls(hash=hash, header=header, ext=ext,)
+        return cls(
+            hash=hash,
+            header=header,
+            ext=ext,
+        )
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()
