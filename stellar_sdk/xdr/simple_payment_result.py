@@ -23,7 +23,12 @@ class SimplePaymentResult:
     ----------------------------------------------------------------
     """
 
-    def __init__(self, destination: AccountID, asset: Asset, amount: Int64,) -> None:
+    def __init__(
+        self,
+        destination: AccountID,
+        asset: Asset,
+        amount: Int64,
+    ) -> None:
         self.destination = destination
         self.asset = asset
         self.amount = amount
@@ -38,7 +43,11 @@ class SimplePaymentResult:
         destination = AccountID.unpack(unpacker)
         asset = Asset.unpack(unpacker)
         amount = Int64.unpack(unpacker)
-        return cls(destination=destination, asset=asset, amount=amount,)
+        return cls(
+            destination=destination,
+            asset=asset,
+            amount=amount,
+        )
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

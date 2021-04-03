@@ -4,7 +4,7 @@ import base64
 from xdrlib import Packer, Unpacker
 
 from .account_id import AccountID
-from .allow_trust_op_asset import AllowTrustOpAsset
+from .asset_code import AssetCode
 from .uint32 import Uint32
 
 __all__ = ["AllowTrustOp"]
@@ -17,27 +17,19 @@ class AllowTrustOp:
     struct AllowTrustOp
     {
         AccountID trustor;
-        union switch (AssetType type)
-        {
-        // ASSET_TYPE_NATIVE is not allowed
-        case ASSET_TYPE_CREDIT_ALPHANUM4:
-            AssetCode4 assetCode4;
-    
-        case ASSET_TYPE_CREDIT_ALPHANUM12:
-            AssetCode12 assetCode12;
-    
-            // add other asset types here in the future
-        }
-        asset;
-    
-        // 0, or any bitwise combination of TrustLineFlags
+        AssetCode asset;
+
+        // 0, or any bitwise combination of the AUTHORIZED_* flags of TrustLineFlags
         uint32 authorize;
     };
     ----------------------------------------------------------------
     """
 
     def __init__(
-        self, trustor: AccountID, asset: AllowTrustOpAsset, authorize: Uint32,
+        self,
+        trustor: AccountID,
+        asset: AssetCode,
+        authorize: Uint32,
     ) -> None:
         self.trustor = trustor
         self.asset = asset
@@ -51,9 +43,13 @@ class AllowTrustOp:
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "AllowTrustOp":
         trustor = AccountID.unpack(unpacker)
-        asset = AllowTrustOpAsset.unpack(unpacker)
+        asset = AssetCode.unpack(unpacker)
         authorize = Uint32.unpack(unpacker)
-        return cls(trustor=trustor, asset=asset, authorize=authorize,)
+        return cls(
+            trustor=trustor,
+            asset=asset,
+            authorize=authorize,
+        )
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

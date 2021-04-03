@@ -17,6 +17,7 @@ class TimePoint:
     """
 
     def __init__(self, time_point: Uint64) -> None:
+
         self.time_point = time_point
 
     def pack(self, packer: Packer) -> None:

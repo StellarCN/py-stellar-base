@@ -24,7 +24,9 @@ class TransactionSet:
     """
 
     def __init__(
-        self, previous_ledger_hash: Hash, txs: List[TransactionEnvelope],
+        self,
+        previous_ledger_hash: Hash,
+        txs: List[TransactionEnvelope],
     ) -> None:
         if txs and len(txs) > 4294967295:
             raise ValueError(
@@ -46,7 +48,10 @@ class TransactionSet:
         txs = []
         for _ in range(length):
             txs.append(TransactionEnvelope.unpack(unpacker))
-        return cls(previous_ledger_hash=previous_ledger_hash, txs=txs,)
+        return cls(
+            previous_ledger_hash=previous_ledger_hash,
+            txs=txs,
+        )
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

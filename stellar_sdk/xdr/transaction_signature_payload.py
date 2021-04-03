@@ -49,7 +49,10 @@ class TransactionSignaturePayload:
         tagged_transaction = TransactionSignaturePayloadTaggedTransaction.unpack(
             unpacker
         )
-        return cls(network_id=network_id, tagged_transaction=tagged_transaction,)
+        return cls(
+            network_id=network_id,
+            tagged_transaction=tagged_transaction,
+        )
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

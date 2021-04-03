@@ -25,7 +25,11 @@ class TransactionV1Envelope:
     ----------------------------------------------------------------
     """
 
-    def __init__(self, tx: Transaction, signatures: List[DecoratedSignature],) -> None:
+    def __init__(
+        self,
+        tx: Transaction,
+        signatures: List[DecoratedSignature],
+    ) -> None:
         if signatures and len(signatures) > 20:
             raise ValueError(
                 f"The maximum length of `signatures` should be 20, but got {len(signatures)}."
@@ -46,7 +50,10 @@ class TransactionV1Envelope:
         signatures = []
         for _ in range(length):
             signatures.append(DecoratedSignature.unpack(unpacker))
-        return cls(tx=tx, signatures=signatures,)
+        return cls(
+            tx=tx,
+            signatures=signatures,
+        )
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

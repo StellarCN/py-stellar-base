@@ -21,7 +21,11 @@ class LedgerKeyTrustLine:
     ----------------------------------------------------------------
     """
 
-    def __init__(self, account_id: AccountID, asset: Asset,) -> None:
+    def __init__(
+        self,
+        account_id: AccountID,
+        asset: Asset,
+    ) -> None:
         self.account_id = account_id
         self.asset = asset
 
@@ -33,7 +37,10 @@ class LedgerKeyTrustLine:
     def unpack(cls, unpacker: Unpacker) -> "LedgerKeyTrustLine":
         account_id = AccountID.unpack(unpacker)
         asset = Asset.unpack(unpacker)
-        return cls(account_id=account_id, asset=asset,)
+        return cls(
+            account_id=account_id,
+            asset=asset,
+        )
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

@@ -19,7 +19,10 @@ class LedgerKeyClaimableBalance:
     ----------------------------------------------------------------
     """
 
-    def __init__(self, balance_id: ClaimableBalanceID,) -> None:
+    def __init__(
+        self,
+        balance_id: ClaimableBalanceID,
+    ) -> None:
         self.balance_id = balance_id
 
     def pack(self, packer: Packer) -> None:
@@ -28,7 +31,9 @@ class LedgerKeyClaimableBalance:
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "LedgerKeyClaimableBalance":
         balance_id = ClaimableBalanceID.unpack(unpacker)
-        return cls(balance_id=balance_id,)
+        return cls(
+            balance_id=balance_id,
+        )
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

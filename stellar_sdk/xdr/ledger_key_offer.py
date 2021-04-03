@@ -21,7 +21,11 @@ class LedgerKeyOffer:
     ----------------------------------------------------------------
     """
 
-    def __init__(self, seller_id: AccountID, offer_id: Int64,) -> None:
+    def __init__(
+        self,
+        seller_id: AccountID,
+        offer_id: Int64,
+    ) -> None:
         self.seller_id = seller_id
         self.offer_id = offer_id
 
@@ -33,7 +37,10 @@ class LedgerKeyOffer:
     def unpack(cls, unpacker: Unpacker) -> "LedgerKeyOffer":
         seller_id = AccountID.unpack(unpacker)
         offer_id = Int64.unpack(unpacker)
-        return cls(seller_id=seller_id, offer_id=offer_id,)
+        return cls(
+            seller_id=seller_id,
+            offer_id=offer_id,
+        )
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

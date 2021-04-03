@@ -22,7 +22,9 @@ class SignedSurveyRequestMessage:
     """
 
     def __init__(
-        self, request_signature: Signature, request: SurveyRequestMessage,
+        self,
+        request_signature: Signature,
+        request: SurveyRequestMessage,
     ) -> None:
         self.request_signature = request_signature
         self.request = request
@@ -35,7 +37,10 @@ class SignedSurveyRequestMessage:
     def unpack(cls, unpacker: Unpacker) -> "SignedSurveyRequestMessage":
         request_signature = Signature.unpack(unpacker)
         request = SurveyRequestMessage.unpack(unpacker)
-        return cls(request_signature=request_signature, request=request,)
+        return cls(
+            request_signature=request_signature,
+            request=request,
+        )
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

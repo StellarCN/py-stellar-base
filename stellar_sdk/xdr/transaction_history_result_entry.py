@@ -18,7 +18,7 @@ class TransactionHistoryResultEntry:
     {
         uint32 ledgerSeq;
         TransactionResultSet txResultSet;
-    
+
         // reserved for future use
         union switch (int v)
         {
@@ -50,7 +50,11 @@ class TransactionHistoryResultEntry:
         ledger_seq = Uint32.unpack(unpacker)
         tx_result_set = TransactionResultSet.unpack(unpacker)
         ext = TransactionHistoryResultEntryExt.unpack(unpacker)
-        return cls(ledger_seq=ledger_seq, tx_result_set=tx_result_set, ext=ext,)
+        return cls(
+            ledger_seq=ledger_seq,
+            tx_result_set=tx_result_set,
+            ext=ext,
+        )
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

@@ -17,7 +17,7 @@ class OperationResultCode(IntEnum):
     enum OperationResultCode
     {
         opINNER = 0, // inner object result is valid
-    
+
         opBAD_AUTH = -1,            // too few valid signatures / wrong network
         opNO_ACCOUNT = -2,          // source account was not found
         opNOT_SUPPORTED = -3,       // operation not supported at this time

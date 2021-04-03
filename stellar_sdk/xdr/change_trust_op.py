@@ -16,14 +16,18 @@ class ChangeTrustOp:
     struct ChangeTrustOp
     {
         Asset line;
-    
+
         // if limit is set to 0, deletes the trust line
         int64 limit;
     };
     ----------------------------------------------------------------
     """
 
-    def __init__(self, line: Asset, limit: Int64,) -> None:
+    def __init__(
+        self,
+        line: Asset,
+        limit: Int64,
+    ) -> None:
         self.line = line
         self.limit = limit
 
@@ -35,7 +39,10 @@ class ChangeTrustOp:
     def unpack(cls, unpacker: Unpacker) -> "ChangeTrustOp":
         line = Asset.unpack(unpacker)
         limit = Int64.unpack(unpacker)
-        return cls(line=line, limit=limit,)
+        return cls(
+            line=line,
+            limit=limit,
+        )
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

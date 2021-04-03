@@ -23,7 +23,10 @@ class BumpSequenceResult:
     ----------------------------------------------------------------
     """
 
-    def __init__(self, code: BumpSequenceResultCode,) -> None:
+    def __init__(
+        self,
+        code: BumpSequenceResultCode,
+    ) -> None:
         self.code = code
 
     def pack(self, packer: Packer) -> None:

@@ -17,7 +17,7 @@ class LedgerEntry:
     struct LedgerEntry
     {
         uint32 lastModifiedLedgerSeq; // ledger the LedgerEntry was last changed
-    
+
         union switch (LedgerEntryType type)
         {
         case ACCOUNT:
@@ -32,7 +32,7 @@ class LedgerEntry:
             ClaimableBalanceEntry claimableBalance;
         }
         data;
-    
+
         // reserved for future use
         union switch (int v)
         {
@@ -67,7 +67,9 @@ class LedgerEntry:
         data = LedgerEntryData.unpack(unpacker)
         ext = LedgerEntryExt.unpack(unpacker)
         return cls(
-            last_modified_ledger_seq=last_modified_ledger_seq, data=data, ext=ext,
+            last_modified_ledger_seq=last_modified_ledger_seq,
+            data=data,
+            ext=ext,
         )
 
     def to_xdr_bytes(self) -> bytes:

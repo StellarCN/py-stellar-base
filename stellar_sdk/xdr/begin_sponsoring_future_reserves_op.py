@@ -19,7 +19,10 @@ class BeginSponsoringFutureReservesOp:
     ----------------------------------------------------------------
     """
 
-    def __init__(self, sponsored_id: AccountID,) -> None:
+    def __init__(
+        self,
+        sponsored_id: AccountID,
+    ) -> None:
         self.sponsored_id = sponsored_id
 
     def pack(self, packer: Packer) -> None:
@@ -28,7 +31,9 @@ class BeginSponsoringFutureReservesOp:
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "BeginSponsoringFutureReservesOp":
         sponsored_id = AccountID.unpack(unpacker)
-        return cls(sponsored_id=sponsored_id,)
+        return cls(
+            sponsored_id=sponsored_id,
+        )
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

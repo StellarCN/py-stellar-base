@@ -18,7 +18,7 @@ class SCPStatement:
     {
         NodeID nodeID;    // v
         uint64 slotIndex; // i
-    
+
         union switch (SCPStatementType type)
         {
         case SCP_ST_PREPARE:
@@ -56,7 +56,10 @@ class SCPStatement:
     """
 
     def __init__(
-        self, node_id: NodeID, slot_index: Uint64, pledges: SCPStatementPledges,
+        self,
+        node_id: NodeID,
+        slot_index: Uint64,
+        pledges: SCPStatementPledges,
     ) -> None:
         self.node_id = node_id
         self.slot_index = slot_index
@@ -72,7 +75,11 @@ class SCPStatement:
         node_id = NodeID.unpack(unpacker)
         slot_index = Uint64.unpack(unpacker)
         pledges = SCPStatementPledges.unpack(unpacker)
-        return cls(node_id=node_id, slot_index=slot_index, pledges=pledges,)
+        return cls(
+            node_id=node_id,
+            slot_index=slot_index,
+            pledges=pledges,
+        )
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

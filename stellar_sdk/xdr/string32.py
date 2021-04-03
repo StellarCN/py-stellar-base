@@ -17,6 +17,7 @@ class String32:
     """
 
     def __init__(self, string32: bytes) -> None:
+
         self.string32 = string32
 
     def pack(self, packer: Packer) -> None:

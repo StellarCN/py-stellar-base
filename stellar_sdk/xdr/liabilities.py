@@ -20,7 +20,11 @@ class Liabilities:
     ----------------------------------------------------------------
     """
 
-    def __init__(self, buying: Int64, selling: Int64,) -> None:
+    def __init__(
+        self,
+        buying: Int64,
+        selling: Int64,
+    ) -> None:
         self.buying = buying
         self.selling = selling
 
@@ -32,7 +36,10 @@ class Liabilities:
     def unpack(cls, unpacker: Unpacker) -> "Liabilities":
         buying = Int64.unpack(unpacker)
         selling = Int64.unpack(unpacker)
-        return cls(buying=buying, selling=selling,)
+        return cls(
+            buying=buying,
+            selling=selling,
+        )
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

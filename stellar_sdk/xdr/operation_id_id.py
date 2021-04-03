@@ -24,7 +24,10 @@ class OperationIDId:
     """
 
     def __init__(
-        self, source_account: MuxedAccount, seq_num: SequenceNumber, op_num: Uint32,
+        self,
+        source_account: MuxedAccount,
+        seq_num: SequenceNumber,
+        op_num: Uint32,
     ) -> None:
         self.source_account = source_account
         self.seq_num = seq_num
@@ -40,7 +43,11 @@ class OperationIDId:
         source_account = MuxedAccount.unpack(unpacker)
         seq_num = SequenceNumber.unpack(unpacker)
         op_num = Uint32.unpack(unpacker)
-        return cls(source_account=source_account, seq_num=seq_num, op_num=op_num,)
+        return cls(
+            source_account=source_account,
+            seq_num=seq_num,
+            op_num=op_num,
+        )
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

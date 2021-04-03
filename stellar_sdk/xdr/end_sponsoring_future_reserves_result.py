@@ -25,7 +25,10 @@ class EndSponsoringFutureReservesResult:
     ----------------------------------------------------------------
     """
 
-    def __init__(self, code: EndSponsoringFutureReservesResultCode,) -> None:
+    def __init__(
+        self,
+        code: EndSponsoringFutureReservesResultCode,
+    ) -> None:
         self.code = code
 
     def pack(self, packer: Packer) -> None:

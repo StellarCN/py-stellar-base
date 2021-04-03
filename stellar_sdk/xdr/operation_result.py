@@ -57,6 +57,12 @@ class OperationResult:
             EndSponsoringFutureReservesResult endSponsoringFutureReservesResult;
         case REVOKE_SPONSORSHIP:
             RevokeSponsorshipResult revokeSponsorshipResult;
+        case CLAWBACK:
+            ClawbackResult clawbackResult;
+        case CLAWBACK_CLAIMABLE_BALANCE:
+            ClawbackClaimableBalanceResult clawbackClaimableBalanceResult;
+        case SET_TRUST_LINE_FLAGS:
+            SetTrustLineFlagsResult setTrustLineFlagsResult;
         }
         tr;
     default:
@@ -66,7 +72,9 @@ class OperationResult:
     """
 
     def __init__(
-        self, code: OperationResultCode, tr: OperationResultTr = None,
+        self,
+        code: OperationResultCode,
+        tr: OperationResultTr = None,
     ) -> None:
         self.code = code
         self.tr = tr

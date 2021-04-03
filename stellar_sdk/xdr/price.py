@@ -20,7 +20,11 @@ class Price:
     ----------------------------------------------------------------
     """
 
-    def __init__(self, n: Int32, d: Int32,) -> None:
+    def __init__(
+        self,
+        n: Int32,
+        d: Int32,
+    ) -> None:
         self.n = n
         self.d = d
 
@@ -32,7 +36,10 @@ class Price:
     def unpack(cls, unpacker: Unpacker) -> "Price":
         n = Int32.unpack(unpacker)
         d = Int32.unpack(unpacker)
-        return cls(n=n, d=d,)
+        return cls(
+            n=n,
+            d=d,
+        )
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

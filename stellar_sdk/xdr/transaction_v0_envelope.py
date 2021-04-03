@@ -26,7 +26,9 @@ class TransactionV0Envelope:
     """
 
     def __init__(
-        self, tx: TransactionV0, signatures: List[DecoratedSignature],
+        self,
+        tx: TransactionV0,
+        signatures: List[DecoratedSignature],
     ) -> None:
         if signatures and len(signatures) > 20:
             raise ValueError(
@@ -48,7 +50,10 @@ class TransactionV0Envelope:
         signatures = []
         for _ in range(length):
             signatures.append(DecoratedSignature.unpack(unpacker))
-        return cls(tx=tx, signatures=signatures,)
+        return cls(
+            tx=tx,
+            signatures=signatures,
+        )
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

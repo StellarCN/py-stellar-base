@@ -21,7 +21,11 @@ class SCPEnvelope:
     ----------------------------------------------------------------
     """
 
-    def __init__(self, statement: SCPStatement, signature: Signature,) -> None:
+    def __init__(
+        self,
+        statement: SCPStatement,
+        signature: Signature,
+    ) -> None:
         self.statement = statement
         self.signature = signature
 
@@ -33,7 +37,10 @@ class SCPEnvelope:
     def unpack(cls, unpacker: Unpacker) -> "SCPEnvelope":
         statement = SCPStatement.unpack(unpacker)
         signature = Signature.unpack(unpacker)
-        return cls(statement=statement, signature=signature,)
+        return cls(
+            statement=statement,
+            signature=signature,
+        )
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

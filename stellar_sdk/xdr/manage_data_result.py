@@ -23,7 +23,10 @@ class ManageDataResult:
     ----------------------------------------------------------------
     """
 
-    def __init__(self, code: ManageDataResultCode,) -> None:
+    def __init__(
+        self,
+        code: ManageDataResultCode,
+    ) -> None:
         self.code = code
 
     def pack(self, packer: Packer) -> None:

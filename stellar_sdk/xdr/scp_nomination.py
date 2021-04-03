@@ -25,7 +25,10 @@ class SCPNomination:
     """
 
     def __init__(
-        self, quorum_set_hash: Hash, votes: List[Value], accepted: List[Value],
+        self,
+        quorum_set_hash: Hash,
+        votes: List[Value],
+        accepted: List[Value],
     ) -> None:
         if votes and len(votes) > 4294967295:
             raise ValueError(
@@ -59,7 +62,11 @@ class SCPNomination:
         accepted = []
         for _ in range(length):
             accepted.append(Value.unpack(unpacker))
-        return cls(quorum_set_hash=quorum_set_hash, votes=votes, accepted=accepted,)
+        return cls(
+            quorum_set_hash=quorum_set_hash,
+            votes=votes,
+            accepted=accepted,
+        )
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

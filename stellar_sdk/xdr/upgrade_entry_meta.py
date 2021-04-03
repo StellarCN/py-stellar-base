@@ -21,7 +21,11 @@ class UpgradeEntryMeta:
     ----------------------------------------------------------------
     """
 
-    def __init__(self, upgrade: LedgerUpgrade, changes: LedgerEntryChanges,) -> None:
+    def __init__(
+        self,
+        upgrade: LedgerUpgrade,
+        changes: LedgerEntryChanges,
+    ) -> None:
         self.upgrade = upgrade
         self.changes = changes
 
@@ -33,7 +37,10 @@ class UpgradeEntryMeta:
     def unpack(cls, unpacker: Unpacker) -> "UpgradeEntryMeta":
         upgrade = LedgerUpgrade.unpack(unpacker)
         changes = LedgerEntryChanges.unpack(unpacker)
-        return cls(upgrade=upgrade, changes=changes,)
+        return cls(
+            upgrade=upgrade,
+            changes=changes,
+        )
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

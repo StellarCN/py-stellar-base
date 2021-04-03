@@ -19,7 +19,10 @@ class BumpSequenceOp:
     ----------------------------------------------------------------
     """
 
-    def __init__(self, bump_to: SequenceNumber,) -> None:
+    def __init__(
+        self,
+        bump_to: SequenceNumber,
+    ) -> None:
         self.bump_to = bump_to
 
     def pack(self, packer: Packer) -> None:
@@ -28,7 +31,9 @@ class BumpSequenceOp:
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "BumpSequenceOp":
         bump_to = SequenceNumber.unpack(unpacker)
-        return cls(bump_to=bump_to,)
+        return cls(
+            bump_to=bump_to,
+        )
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

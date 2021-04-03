@@ -17,6 +17,7 @@ class String64:
     """
 
     def __init__(self, string64: bytes) -> None:
+
         self.string64 = string64
 
     def pack(self, packer: Packer) -> None:

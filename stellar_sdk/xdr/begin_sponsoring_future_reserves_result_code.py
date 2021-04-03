@@ -18,7 +18,7 @@ class BeginSponsoringFutureReservesResultCode(IntEnum):
     {
         // codes considered as "success" for the operation
         BEGIN_SPONSORING_FUTURE_RESERVES_SUCCESS = 0,
-    
+
         // codes considered as "failure" for the operation
         BEGIN_SPONSORING_FUTURE_RESERVES_MALFORMED = -1,
         BEGIN_SPONSORING_FUTURE_RESERVES_ALREADY_SPONSORED = -2,

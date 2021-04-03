@@ -20,7 +20,7 @@ class DataEntry:
         AccountID accountID; // account this data belongs to
         string64 dataName;
         DataValue dataValue;
-    
+
         // reserved for future use
         union switch (int v)
         {
@@ -57,7 +57,10 @@ class DataEntry:
         data_value = DataValue.unpack(unpacker)
         ext = DataEntryExt.unpack(unpacker)
         return cls(
-            account_id=account_id, data_name=data_name, data_value=data_value, ext=ext,
+            account_id=account_id,
+            data_name=data_name,
+            data_value=data_value,
+            ext=ext,
         )
 
     def to_xdr_bytes(self) -> bytes:

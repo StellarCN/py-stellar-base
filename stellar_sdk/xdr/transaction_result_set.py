@@ -21,7 +21,10 @@ class TransactionResultSet:
     ----------------------------------------------------------------
     """
 
-    def __init__(self, results: List[TransactionResultPair],) -> None:
+    def __init__(
+        self,
+        results: List[TransactionResultPair],
+    ) -> None:
         if results and len(results) > 4294967295:
             raise ValueError(
                 f"The maximum length of `results` should be 4294967295, but got {len(results)}."
@@ -39,7 +42,9 @@ class TransactionResultSet:
         results = []
         for _ in range(length):
             results.append(TransactionResultPair.unpack(unpacker))
-        return cls(results=results,)
+        return cls(
+            results=results,
+        )
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

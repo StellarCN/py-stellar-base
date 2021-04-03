@@ -41,21 +41,21 @@ class StellarMessage:
         void;
     case PEERS:
         PeerAddress peers<100>;
-    
+
     case GET_TX_SET:
         uint256 txSetHash;
     case TX_SET:
         TransactionSet txSet;
-    
+
     case TRANSACTION:
         TransactionEnvelope transaction;
-    
+
     case SURVEY_REQUEST:
         SignedSurveyRequestMessage signedSurveyRequestMessage;
-    
+
     case SURVEY_RESPONSE:
         SignedSurveyResponseMessage signedSurveyResponseMessage;
-    
+
     // SCP
     case GET_SCP_QUORUMSET:
         uint256 qSetHash;

@@ -21,7 +21,11 @@ class ClaimantV0:
     ----------------------------------------------------------------
     """
 
-    def __init__(self, destination: AccountID, predicate: ClaimPredicate,) -> None:
+    def __init__(
+        self,
+        destination: AccountID,
+        predicate: ClaimPredicate,
+    ) -> None:
         self.destination = destination
         self.predicate = predicate
 
@@ -33,7 +37,10 @@ class ClaimantV0:
     def unpack(cls, unpacker: Unpacker) -> "ClaimantV0":
         destination = AccountID.unpack(unpacker)
         predicate = ClaimPredicate.unpack(unpacker)
-        return cls(destination=destination, predicate=predicate,)
+        return cls(
+            destination=destination,
+            predicate=predicate,
+        )
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

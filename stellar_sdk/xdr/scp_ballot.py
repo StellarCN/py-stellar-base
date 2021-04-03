@@ -21,7 +21,11 @@ class SCPBallot:
     ----------------------------------------------------------------
     """
 
-    def __init__(self, counter: Uint32, value: Value,) -> None:
+    def __init__(
+        self,
+        counter: Uint32,
+        value: Value,
+    ) -> None:
         self.counter = counter
         self.value = value
 
@@ -33,7 +37,10 @@ class SCPBallot:
     def unpack(cls, unpacker: Unpacker) -> "SCPBallot":
         counter = Uint32.unpack(unpacker)
         value = Value.unpack(unpacker)
-        return cls(counter=counter, value=value,)
+        return cls(
+            counter=counter,
+            value=value,
+        )
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

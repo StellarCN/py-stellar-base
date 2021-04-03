@@ -1,3 +1,4 @@
+import warnings
 from enum import IntFlag
 from typing import Union
 
@@ -56,6 +57,11 @@ class AllowTrust(Operation):
         authorize: Union[TrustLineEntryFlag, bool],
         source: str = None,
     ) -> None:
+        warnings.warn(
+            "Will be removed in version v4.0.0, "
+            "use `stellar_sdk.operation.set_trust_line_flags.SetTrustLineFlags` instead.",
+            DeprecationWarning,
+        )
         super().__init__(source)
         check_ed25519_public_key(trustor)
         check_asset_code(asset_code)
@@ -80,13 +86,13 @@ class AllowTrust(Operation):
         if len(asset_code) == 4:
             asset_type = stellar_xdr.AssetType.ASSET_TYPE_CREDIT_ALPHANUM4
             asset_code4 = stellar_xdr.AssetCode4(asset_code)
-            asset = stellar_xdr.AllowTrustOpAsset(
+            asset = stellar_xdr.AssetCode(
                 type=asset_type, asset_code4=asset_code4
             )
         else:
             asset_type = stellar_xdr.AssetType.ASSET_TYPE_CREDIT_ALPHANUM12
             asset_code12 = stellar_xdr.AssetCode12(asset_code)
-            asset = stellar_xdr.AllowTrustOpAsset(
+            asset = stellar_xdr.AssetCode(
                 type=asset_type, asset_code12=asset_code12
             )
         allow_trust_op = stellar_xdr.AllowTrustOp(trustor, asset, authorize)

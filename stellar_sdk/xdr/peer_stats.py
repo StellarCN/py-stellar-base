@@ -23,12 +23,12 @@ class PeerStats:
         uint64 bytesRead;
         uint64 bytesWritten;
         uint64 secondsConnected;
-    
+
         uint64 uniqueFloodBytesRecv;
         uint64 duplicateFloodBytesRecv;
         uint64 uniqueFetchBytesRecv;
         uint64 duplicateFetchBytesRecv;
-    
+
         uint64 uniqueFloodMessageRecv;
         uint64 duplicateFloodMessageRecv;
         uint64 uniqueFetchMessageRecv;

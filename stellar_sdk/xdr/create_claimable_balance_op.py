@@ -25,7 +25,12 @@ class CreateClaimableBalanceOp:
     ----------------------------------------------------------------
     """
 
-    def __init__(self, asset: Asset, amount: Int64, claimants: List[Claimant],) -> None:
+    def __init__(
+        self,
+        asset: Asset,
+        amount: Int64,
+        claimants: List[Claimant],
+    ) -> None:
         if claimants and len(claimants) > 10:
             raise ValueError(
                 f"The maximum length of `claimants` should be 10, but got {len(claimants)}."
@@ -49,7 +54,11 @@ class CreateClaimableBalanceOp:
         claimants = []
         for _ in range(length):
             claimants.append(Claimant.unpack(unpacker))
-        return cls(asset=asset, amount=amount, claimants=claimants,)
+        return cls(
+            asset=asset,
+            amount=amount,
+            claimants=claimants,
+        )
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

@@ -19,18 +19,18 @@ class SetOptionsOp:
     struct SetOptionsOp
     {
         AccountID* inflationDest; // sets the inflation destination
-    
+
         uint32* clearFlags; // which flags to clear
         uint32* setFlags;   // which flags to set
-    
+
         // account threshold manipulation
         uint32* masterWeight; // weight of the master account
         uint32* lowThreshold;
         uint32* medThreshold;
         uint32* highThreshold;
-    
+
         string32* homeDomain; // sets the home domain
-    
+
         // Add, update or remove a signer for the account
         // signer is deleted if the weight is 0
         Signer* signer;

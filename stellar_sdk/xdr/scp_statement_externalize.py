@@ -24,7 +24,10 @@ class SCPStatementExternalize:
     """
 
     def __init__(
-        self, commit: SCPBallot, n_h: Uint32, commit_quorum_set_hash: Hash,
+        self,
+        commit: SCPBallot,
+        n_h: Uint32,
+        commit_quorum_set_hash: Hash,
     ) -> None:
         self.commit = commit
         self.n_h = n_h
@@ -41,7 +44,9 @@ class SCPStatementExternalize:
         n_h = Uint32.unpack(unpacker)
         commit_quorum_set_hash = Hash.unpack(unpacker)
         return cls(
-            commit=commit, n_h=n_h, commit_quorum_set_hash=commit_quorum_set_hash,
+            commit=commit,
+            n_h=n_h,
+            commit_quorum_set_hash=commit_quorum_set_hash,
         )
 
     def to_xdr_bytes(self) -> bytes:

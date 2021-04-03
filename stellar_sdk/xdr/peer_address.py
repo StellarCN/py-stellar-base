@@ -29,7 +29,12 @@ class PeerAddress:
     ----------------------------------------------------------------
     """
 
-    def __init__(self, ip: PeerAddressIp, port: Uint32, num_failures: Uint32,) -> None:
+    def __init__(
+        self,
+        ip: PeerAddressIp,
+        port: Uint32,
+        num_failures: Uint32,
+    ) -> None:
         self.ip = ip
         self.port = port
         self.num_failures = num_failures
@@ -44,7 +49,11 @@ class PeerAddress:
         ip = PeerAddressIp.unpack(unpacker)
         port = Uint32.unpack(unpacker)
         num_failures = Uint32.unpack(unpacker)
-        return cls(ip=ip, port=port, num_failures=num_failures,)
+        return cls(
+            ip=ip,
+            port=port,
+            num_failures=num_failures,
+        )
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

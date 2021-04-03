@@ -21,7 +21,11 @@ class RevokeSponsorshipOpSigner:
     ----------------------------------------------------------------
     """
 
-    def __init__(self, account_id: AccountID, signer_key: SignerKey,) -> None:
+    def __init__(
+        self,
+        account_id: AccountID,
+        signer_key: SignerKey,
+    ) -> None:
         self.account_id = account_id
         self.signer_key = signer_key
 
@@ -33,7 +37,10 @@ class RevokeSponsorshipOpSigner:
     def unpack(cls, unpacker: Unpacker) -> "RevokeSponsorshipOpSigner":
         account_id = AccountID.unpack(unpacker)
         signer_key = SignerKey.unpack(unpacker)
-        return cls(account_id=account_id, signer_key=signer_key,)
+        return cls(
+            account_id=account_id,
+            signer_key=signer_key,
+        )
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

@@ -21,7 +21,11 @@ class TransactionResultPair:
     ----------------------------------------------------------------
     """
 
-    def __init__(self, transaction_hash: Hash, result: TransactionResult,) -> None:
+    def __init__(
+        self,
+        transaction_hash: Hash,
+        result: TransactionResult,
+    ) -> None:
         self.transaction_hash = transaction_hash
         self.result = result
 
@@ -33,7 +37,10 @@ class TransactionResultPair:
     def unpack(cls, unpacker: Unpacker) -> "TransactionResultPair":
         transaction_hash = Hash.unpack(unpacker)
         result = TransactionResult.unpack(unpacker)
-        return cls(transaction_hash=transaction_hash, result=result,)
+        return cls(
+            transaction_hash=transaction_hash,
+            result=result,
+        )
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()
