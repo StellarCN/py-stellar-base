@@ -29,6 +29,9 @@ from stellar_sdk.operation.path_payment_strict_send import PathPaymentStrictSend
 from stellar_sdk.operation.payment import Payment
 from stellar_sdk.operation.set_options import SetOptions, Flag
 from stellar_sdk.operation.revoke_sponsorship import RevokeSponsorship
+from stellar_sdk.operation.clawback import Clawback
+from stellar_sdk.operation.clawback_claimable_balance import ClawbackClaimableBalance
+from stellar_sdk.operation.set_trust_line_flags import SetTrustLineFlags, TrustLineFlags
 from stellar_sdk.operation.utils import (
     check_price,
     check_amount,
@@ -802,6 +805,7 @@ class TestSetOptions:
     AUTHORIZATION_REQUIRED = 1
     AUTHORIZATION_REVOCABLE = 2
     AUTHORIZATION_IMMUTABLE = 4
+    AUTHORIZATION_CLAWBACK_ENABLED = 8
 
     @pytest.mark.parametrize(
         "inflation_dest, clear_flags, set_flags, master_weight, low_threshold, med_threshold, high_threshold, home_domain, signer, source, xdr",
@@ -1570,3 +1574,211 @@ class TestCreateClaimableBalance:
             Operation.from_xdr_object(op.to_xdr_object()).to_xdr_object().to_xdr()
             == xdr
         )
+
+
+class TestClawback:
+    def test_xdr(self):
+        source = "GA2N7NI5WEMJILMK4UPDTF2ZX2BIRQUM3HZUE27TRUNRFN5M5EXU6RQV"
+        from_ = "GAGQ7DNQUVQR6OWYOI563L5EMJE6KCAHPQSFCZFLY5PDRYMRCA5UWCMP"
+        asset = Asset(
+            "DEMO", "GCWPICV6IV35FQ2MVZSEDLORHEMMIAODRQPVDEIKZOW2GC2JGGDCXVVV"
+        )
+        amount = "100"
+        op = Clawback(asset, from_, amount, source)
+        restore_op = Operation.from_xdr_object(op.to_xdr_object())
+        assert isinstance(restore_op, Clawback)
+        xdr = "AAAAAQAAAAA037UdsRiULYrlHjmXWb6CiMKM2fNCa/ONGxK3rOkvTwAAABMAAAABREVNTwAAAACs9Aq+RXfSw0yuZEGt0TkYxAHDjB9RkQrLraMLSTGGKwAAAAAND42wpWEfOthyO+2vpGJJ5QgHfCRRZKvHXjjhkRA7SwAAAAA7msoA"
+        assert op.to_xdr_object().to_xdr() == xdr
+        assert restore_op.source == source
+        assert restore_op.from_ == from_
+        assert restore_op.asset == asset
+        assert restore_op.amount == amount
+        assert (
+            restore_op._from__muxed.to_xdr()
+            == Keypair.from_public_key(from_).xdr_muxed_account().to_xdr()
+        )
+        assert restore_op._from__muxed is not None
+        assert op._from__muxed is None
+
+    def test_xdr_no_source(self):
+        source = None
+        from_ = "GAGQ7DNQUVQR6OWYOI563L5EMJE6KCAHPQSFCZFLY5PDRYMRCA5UWCMP"
+        asset = Asset(
+            "DEMO", "GCWPICV6IV35FQ2MVZSEDLORHEMMIAODRQPVDEIKZOW2GC2JGGDCXVVV"
+        )
+        amount = "100"
+        op = Clawback(asset, from_, amount, source)
+        restore_op = Operation.from_xdr_object(op.to_xdr_object())
+        assert isinstance(restore_op, Clawback)
+        xdr = "AAAAAAAAABMAAAABREVNTwAAAACs9Aq+RXfSw0yuZEGt0TkYxAHDjB9RkQrLraMLSTGGKwAAAAAND42wpWEfOthyO+2vpGJJ5QgHfCRRZKvHXjjhkRA7SwAAAAA7msoA"
+        assert op.to_xdr_object().to_xdr() == xdr
+        assert restore_op.source == source
+        assert restore_op.from_ == from_
+        assert restore_op.asset == asset
+        assert restore_op.amount == amount
+
+    def test_xdr_set_from(self):
+        source = "GA2N7NI5WEMJILMK4UPDTF2ZX2BIRQUM3HZUE27TRUNRFN5M5EXU6RQV"
+        from_ = "GAGQ7DNQUVQR6OWYOI563L5EMJE6KCAHPQSFCZFLY5PDRYMRCA5UWCMP"
+        asset = Asset(
+            "DEMO", "GCWPICV6IV35FQ2MVZSEDLORHEMMIAODRQPVDEIKZOW2GC2JGGDCXVVV"
+        )
+        amount = "100"
+        op = Clawback(asset, from_, amount, source)
+        restore_op = Operation.from_xdr_object(op.to_xdr_object())
+        assert isinstance(restore_op, Clawback)
+        xdr = "AAAAAQAAAAA037UdsRiULYrlHjmXWb6CiMKM2fNCa/ONGxK3rOkvTwAAABMAAAABREVNTwAAAACs9Aq+RXfSw0yuZEGt0TkYxAHDjB9RkQrLraMLSTGGKwAAAAAND42wpWEfOthyO+2vpGJJ5QgHfCRRZKvHXjjhkRA7SwAAAAA7msoA"
+        assert op.to_xdr_object().to_xdr() == xdr
+        assert restore_op.source == source
+        assert restore_op.from_ == from_
+        assert restore_op.asset == asset
+        assert restore_op.amount == amount
+        assert (
+            restore_op._from__muxed.to_xdr()
+            == Keypair.from_public_key(from_).xdr_muxed_account().to_xdr()
+        )
+        assert restore_op._from__muxed is not None
+        assert op._from__muxed is None
+        restore_op.from_ = from_
+        assert restore_op.to_xdr_object().to_xdr() == xdr
+        assert restore_op._from__muxed is None
+
+
+class TestClawbackClaimableBalance:
+    def test_xdr(self):
+        source = "GA2N7NI5WEMJILMK4UPDTF2ZX2BIRQUM3HZUE27TRUNRFN5M5EXU6RQV"
+        balance_id = (
+            "00000000929b20b72e5890ab51c24f1cc46fa01c4f318d8d33367d24dd614cfdf5491072"
+        )
+        xdr = "AAAAAQAAAAA037UdsRiULYrlHjmXWb6CiMKM2fNCa/ONGxK3rOkvTwAAABQAAAAAkpsgty5YkKtRwk8cxG+gHE8xjY0zNn0k3WFM/fVJEHI="
+        op = ClawbackClaimableBalance(balance_id, source)
+        restore_op = Operation.from_xdr_object(op.to_xdr_object())
+        assert isinstance(restore_op, ClawbackClaimableBalance)
+        assert op.to_xdr_object().to_xdr() == xdr
+        assert restore_op.to_xdr_object().to_xdr() == xdr
+        assert restore_op.source == source
+        assert restore_op.balance_id == balance_id
+
+    def test_xdr_no_source(self):
+        source = None
+        balance_id = (
+            "00000000929b20b72e5890ab51c24f1cc46fa01c4f318d8d33367d24dd614cfdf5491072"
+        )
+        xdr = "AAAAAAAAABQAAAAAkpsgty5YkKtRwk8cxG+gHE8xjY0zNn0k3WFM/fVJEHI="
+        op = ClawbackClaimableBalance(balance_id, source)
+        restore_op = Operation.from_xdr_object(op.to_xdr_object())
+        assert isinstance(restore_op, ClawbackClaimableBalance)
+        assert op.to_xdr_object().to_xdr() == xdr
+        assert restore_op.to_xdr_object().to_xdr() == xdr
+        assert restore_op.source == source
+        assert restore_op.balance_id == balance_id
+
+
+class TestSetTrustLineFlags:
+    def test_xdr(self):
+        source = "GA2N7NI5WEMJILMK4UPDTF2ZX2BIRQUM3HZUE27TRUNRFN5M5EXU6RQV"
+        trustor = "GAGQ7DNQUVQR6OWYOI563L5EMJE6KCAHPQSFCZFLY5PDRYMRCA5UWCMP"
+        asset = Asset(
+            "DEMO", "GCWPICV6IV35FQ2MVZSEDLORHEMMIAODRQPVDEIKZOW2GC2JGGDCXVVV"
+        )
+        clear_flags = TrustLineFlags.AUTHORIZED_FLAG
+        set_flags = (
+            TrustLineFlags.AUTHORIZED_TO_MAINTAIN_LIABILITIES_FLAG
+            | TrustLineFlags.TRUSTLINE_CLAWBACK_ENABLED_FLAG
+        )
+        xdr = "AAAAAQAAAAA037UdsRiULYrlHjmXWb6CiMKM2fNCa/ONGxK3rOkvTwAAABUAAAAADQ+NsKVhHzrYcjvtr6RiSeUIB3wkUWSrx1444ZEQO0sAAAABREVNTwAAAACs9Aq+RXfSw0yuZEGt0TkYxAHDjB9RkQrLraMLSTGGKwAAAAEAAAAG"
+
+        op = SetTrustLineFlags(trustor, asset, clear_flags, set_flags, source)
+        restore_op = Operation.from_xdr_object(op.to_xdr_object())
+        assert isinstance(restore_op, SetTrustLineFlags)
+        assert op.to_xdr_object().to_xdr() == xdr
+        assert restore_op.to_xdr_object().to_xdr() == xdr
+        assert restore_op.source == source
+        assert restore_op.trustor == trustor
+        assert restore_op.clear_flags == clear_flags
+        assert restore_op.set_flags == set_flags
+        assert restore_op.asset == asset
+
+    def test_xdr_no_source(self):
+        source = None
+        trustor = "GAGQ7DNQUVQR6OWYOI563L5EMJE6KCAHPQSFCZFLY5PDRYMRCA5UWCMP"
+        asset = Asset(
+            "DEMO", "GCWPICV6IV35FQ2MVZSEDLORHEMMIAODRQPVDEIKZOW2GC2JGGDCXVVV"
+        )
+        clear_flags = TrustLineFlags.AUTHORIZED_FLAG
+        set_flags = (
+            TrustLineFlags.AUTHORIZED_TO_MAINTAIN_LIABILITIES_FLAG
+            | TrustLineFlags.TRUSTLINE_CLAWBACK_ENABLED_FLAG
+        )
+        xdr = "AAAAAAAAABUAAAAADQ+NsKVhHzrYcjvtr6RiSeUIB3wkUWSrx1444ZEQO0sAAAABREVNTwAAAACs9Aq+RXfSw0yuZEGt0TkYxAHDjB9RkQrLraMLSTGGKwAAAAEAAAAG"
+
+        op = SetTrustLineFlags(trustor, asset, clear_flags, set_flags, source)
+        restore_op = Operation.from_xdr_object(op.to_xdr_object())
+        assert isinstance(restore_op, SetTrustLineFlags)
+        assert op.to_xdr_object().to_xdr() == xdr
+        assert restore_op.to_xdr_object().to_xdr() == xdr
+        assert restore_op.source == source
+        assert restore_op.trustor == trustor
+        assert restore_op.clear_flags == clear_flags
+        assert restore_op.set_flags == set_flags
+        assert restore_op.asset == asset
+
+    def test_xdr_set_flags_and_clear_flags_is_none(self):
+        source = "GA2N7NI5WEMJILMK4UPDTF2ZX2BIRQUM3HZUE27TRUNRFN5M5EXU6RQV"
+        trustor = "GAGQ7DNQUVQR6OWYOI563L5EMJE6KCAHPQSFCZFLY5PDRYMRCA5UWCMP"
+        asset = Asset(
+            "DEMO", "GCWPICV6IV35FQ2MVZSEDLORHEMMIAODRQPVDEIKZOW2GC2JGGDCXVVV"
+        )
+        clear_flags = None
+        set_flags = None
+        xdr = "AAAAAQAAAAA037UdsRiULYrlHjmXWb6CiMKM2fNCa/ONGxK3rOkvTwAAABUAAAAADQ+NsKVhHzrYcjvtr6RiSeUIB3wkUWSrx1444ZEQO0sAAAABREVNTwAAAACs9Aq+RXfSw0yuZEGt0TkYxAHDjB9RkQrLraMLSTGGKwAAAAAAAAAA"
+        op = SetTrustLineFlags(trustor, asset, clear_flags, set_flags, source)
+        restore_op = Operation.from_xdr_object(op.to_xdr_object())
+        assert isinstance(restore_op, SetTrustLineFlags)
+        assert op.to_xdr_object().to_xdr() == xdr
+        assert restore_op.to_xdr_object().to_xdr() == xdr
+        assert restore_op.source == source
+        assert restore_op.trustor == trustor
+        assert restore_op.clear_flags == clear_flags
+        assert restore_op.set_flags == set_flags
+        assert restore_op.asset == asset
+
+    def test_xdr_set_flags_is_none(self):
+        source = "GA2N7NI5WEMJILMK4UPDTF2ZX2BIRQUM3HZUE27TRUNRFN5M5EXU6RQV"
+        trustor = "GAGQ7DNQUVQR6OWYOI563L5EMJE6KCAHPQSFCZFLY5PDRYMRCA5UWCMP"
+        asset = Asset(
+            "DEMO", "GCWPICV6IV35FQ2MVZSEDLORHEMMIAODRQPVDEIKZOW2GC2JGGDCXVVV"
+        )
+        clear_flags = TrustLineFlags.AUTHORIZED_FLAG
+        set_flags = None
+        xdr = "AAAAAQAAAAA037UdsRiULYrlHjmXWb6CiMKM2fNCa/ONGxK3rOkvTwAAABUAAAAADQ+NsKVhHzrYcjvtr6RiSeUIB3wkUWSrx1444ZEQO0sAAAABREVNTwAAAACs9Aq+RXfSw0yuZEGt0TkYxAHDjB9RkQrLraMLSTGGKwAAAAEAAAAA"
+        op = SetTrustLineFlags(trustor, asset, clear_flags, set_flags, source)
+        restore_op = Operation.from_xdr_object(op.to_xdr_object())
+        assert isinstance(restore_op, SetTrustLineFlags)
+        assert op.to_xdr_object().to_xdr() == xdr
+        assert restore_op.to_xdr_object().to_xdr() == xdr
+        assert restore_op.source == source
+        assert restore_op.trustor == trustor
+        assert restore_op.clear_flags == clear_flags
+        assert restore_op.set_flags == set_flags
+        assert restore_op.asset == asset
+
+    def test_xdr_clear_flags_is_none(self):
+        source = "GA2N7NI5WEMJILMK4UPDTF2ZX2BIRQUM3HZUE27TRUNRFN5M5EXU6RQV"
+        trustor = "GAGQ7DNQUVQR6OWYOI563L5EMJE6KCAHPQSFCZFLY5PDRYMRCA5UWCMP"
+        asset = Asset(
+            "DEMO", "GCWPICV6IV35FQ2MVZSEDLORHEMMIAODRQPVDEIKZOW2GC2JGGDCXVVV"
+        )
+        clear_flags = None
+        set_flags = TrustLineFlags.AUTHORIZED_FLAG
+        xdr = "AAAAAQAAAAA037UdsRiULYrlHjmXWb6CiMKM2fNCa/ONGxK3rOkvTwAAABUAAAAADQ+NsKVhHzrYcjvtr6RiSeUIB3wkUWSrx1444ZEQO0sAAAABREVNTwAAAACs9Aq+RXfSw0yuZEGt0TkYxAHDjB9RkQrLraMLSTGGKwAAAAAAAAAB"
+        op = SetTrustLineFlags(trustor, asset, clear_flags, set_flags, source)
+        restore_op = Operation.from_xdr_object(op.to_xdr_object())
+        assert isinstance(restore_op, SetTrustLineFlags)
+        assert op.to_xdr_object().to_xdr() == xdr
+        assert restore_op.to_xdr_object().to_xdr() == xdr
+        assert restore_op.source == source
+        assert restore_op.trustor == trustor
+        assert restore_op.clear_flags == clear_flags
+        assert restore_op.set_flags == set_flags
+        assert restore_op.asset == asset

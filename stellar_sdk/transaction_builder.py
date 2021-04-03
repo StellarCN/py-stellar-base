@@ -513,6 +513,11 @@ class TransactionBuilder:
         :return: This builder instance.
 
         """
+        warnings.warn(
+            "Will be removed in version v4.0.0, "
+            "use `stellar_sdk.transaction_builder.TransactionBuilder.append_set_trust_line_flags_op` instead.",
+            DeprecationWarning,
+        )
         op = AllowTrust(trustor, asset_code, authorize, source)
         return self.append_operation(op)
 
@@ -541,6 +546,7 @@ class TransactionBuilder:
             - AUTHORIZATION_REQUIRED = 1
             - AUTHORIZATION_REVOCABLE = 2
             - AUTHORIZATION_IMMUTABLE = 4
+            - AUTHORIZATION_CLAWBACK_ENABLED = 8
         :param set_flags: Indicates which flags to set. For details about the flags,
             please refer to the `accounts doc <https://www.stellar.org/developers/guides/concepts/accounts.html>`__.
             The bit mask integer adds onto the existing flags of the account.
@@ -549,6 +555,7 @@ class TransactionBuilder:
             - AUTHORIZATION_REQUIRED = 1
             - AUTHORIZATION_REVOCABLE = 2
             - AUTHORIZATION_IMMUTABLE = 4
+            - AUTHORIZATION_CLAWBACK_ENABLED = 8
         :param master_weight: A number from 0-255 (inclusive) representing the weight of the master key.
             If the weight of the master key is updated to 0, it is effectively disabled.
         :param low_threshold: A number from 0-255 (inclusive) representing the threshold this account sets on all
@@ -998,4 +1005,57 @@ class TransactionBuilder:
         """
         signer_key = SignerKey.pre_auth_tx(hex_to_bytes(signer_key))
         op = RevokeSponsorship.revoke_signer_sponsorship(account_id, signer_key, source)
+        return self.append_operation(op)
+
+    def append_clawback_op(
+        self,
+        asset: Asset,
+        from_: str,
+        amount: Union[str, Decimal],
+        source: str = None,
+    ):
+        """Append an :class:`Clawback <stellar_sdk.operation.Clawback>`
+        operation to the list of operations.
+
+        :param asset: The asset being clawed back.
+        :param from_: The public key of the account to claw back from.
+        :param amount: The amount of the asset to claw back.
+        :param source: The source account for the operation. Defaults to the
+            transaction's source account.
+        """
+        op = Clawback(asset, from_, amount, source)
+        return self.append_operation(op)
+
+    def append_clawback_claimable_balance_op(self, balance_id: str, source: str = None):
+        """Append an :class:`ClawbackClaimableBalance <stellar_sdk.operation.ClawbackClaimableBalance>`
+        operation to the list of operations.
+
+        :param balance_id: The claimable balance ID to be clawed back.
+        :param source: The source account for the operation. Defaults to the
+            transaction's source account.
+        :return: This builder instance.
+        """
+        op = ClawbackClaimableBalance(balance_id, source)
+        return self.append_operation(op)
+
+    def append_set_trust_line_flags_op(
+        self,
+        trustor: str,
+        asset: Asset,
+        clear_flags: TrustLineFlags = None,
+        set_flags: TrustLineFlags = None,
+        source: str = None,
+    ):
+        """Append an :class:`SetTrustLineFlags <stellar_sdk.operation.SetTrustLineFlags>`
+        operation to the list of operations.
+
+        :param trustor: The account whose trustline this is.
+        :param asset: The asset on the trustline.
+        :param clear_flags: The flags to clear.
+        :param set_flags: The flags to set.
+        :param source: The source account for the operation. Defaults to the
+            transaction's source account.
+        :return: This builder instance.
+        """
+        op = SetTrustLineFlags(trustor, asset, clear_flags, set_flags, source)
         return self.append_operation(op)
