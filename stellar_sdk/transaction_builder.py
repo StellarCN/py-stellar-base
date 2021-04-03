@@ -495,7 +495,7 @@ class TransactionBuilder:
             please refer to the `accounts doc <https://www.stellar.org/developers/guides/concepts/accounts.html>`__.
             The bit mask integer adds onto the existing flags of the account.
             This allows for setting specific bits without knowledge of existing flags, you can also use
-            :class:`stellar_sdk.operation.set_options.Flag`
+            :class:`stellar_sdk.operation.set_options.AuthorizationFlag`
             - AUTHORIZATION_REQUIRED = 1
             - AUTHORIZATION_REVOCABLE = 2
             - AUTHORIZATION_IMMUTABLE = 4
