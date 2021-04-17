@@ -1,12 +1,35 @@
 Release History
 ==============
 
-### Version 2.13.0-beta0
-Released on April 03, 2021
+### Version 3.3.0
+Released on April 17, 2021
 
 #### Update
 
-* feat: add support for Stellar Protocol 16. ([#446](https://github.com/StellarCN/py-stellar-base/pull/446))
+* feat: add support for Stellar Protocol 17. ([#453](https://github.com/StellarCN/py-stellar-base/pull/453))
+
+#### Added
+
+* feat: add support for [CAP-35](https://github.com/stellar/stellar-protocol/blob/master/core/cap-0035.md). ([#453](https://github.com/StellarCN/py-stellar-base/pull/453))
+
+  We have added methods to `TransactionBuilder`, you can use them to construct corresponding operations, method list:
+
+  - append_clawback_op
+  - append_clawback_claimable_balance_op
+  - append_set_trust_line_flags_op
+
+* `AUTHORIZATION_CLAWBACK_ENABLED` has been added in `stellar_sdk.operation.set_options.AuthorizationFlag`. ([#453](https://github.com/StellarCN/py-stellar-base/pull/453))
+
+#### Deprecated
+
+* `stellar_sdk.TransactionBuilder.append_allow_trust_op` and `stellar_sdk.operation.AllowTrust` have now been marked as deprecated, they will be removed in v4.0.0. ([#453](https://github.com/StellarCN/py-stellar-base/pull/453))
+
+### Version 2.13.0
+Released on April 17, 2021
+
+#### Update
+
+* feat: add support for Stellar Protocol 17. ([#446](https://github.com/StellarCN/py-stellar-base/pull/446))
 
 #### Added
 
@@ -24,6 +47,64 @@ Released on April 03, 2021
 
 * `stellar_sdk.TransactionBuilder.append_allow_trust_op` and `stellar_sdk.operation.AllowTrust` have now been marked as deprecated, they will be removed in v4.0.0. ([#446](https://github.com/StellarCN/py-stellar-base/pull/446))
 
+### Version 3.2.1
+Released on April 16, 2021
+
+#### Update
+fix: fix the issue that `not_predicate` cannot be parsed normally. ([#465](https://github.com/StellarCN/py-stellar-base/pull/465))
+
+### Version 3.3.0-beta0
+Released on April 03, 2021
+
+#### Update
+
+* feat: add support for Stellar Protocol 17. ([#453](https://github.com/StellarCN/py-stellar-base/pull/453))
+
+#### Added
+
+* feat: add support for [CAP-35](https://github.com/stellar/stellar-protocol/blob/master/core/cap-0035.md). ([#453](https://github.com/StellarCN/py-stellar-base/pull/453))
+
+  We have added methods to `TransactionBuilder`, you can use them to construct corresponding operations, method list:
+
+  - append_clawback_op
+  - append_clawback_claimable_balance_op
+  - append_set_trust_line_flags_op
+
+* `AUTHORIZATION_CLAWBACK_ENABLED` has been added in `stellar_sdk.operation.set_options.AuthorizationFlag`. ([#453](https://github.com/StellarCN/py-stellar-base/pull/453))
+
+#### Deprecated
+
+* `stellar_sdk.TransactionBuilder.append_allow_trust_op` and `stellar_sdk.operation.AllowTrust` have now been marked as deprecated, they will be removed in v4.0.0. ([#453](https://github.com/StellarCN/py-stellar-base/pull/453))
+
+### Version 2.13.0-beta0
+Released on April 03, 2021
+
+#### Update
+
+* feat: add support for Stellar Protocol 17. ([#446](https://github.com/StellarCN/py-stellar-base/pull/446))
+
+#### Added
+
+* feat: add support for [CAP-35](https://github.com/stellar/stellar-protocol/blob/master/core/cap-0035.md). ([#446](https://github.com/StellarCN/py-stellar-base/pull/446))
+
+  We have added methods to `TransactionBuilder`, you can use them to construct corresponding operations, method list:
+
+  - append_clawback_op
+  - append_clawback_claimable_balance_op
+  - append_set_trust_line_flags_op
+
+* `AUTHORIZATION_CLAWBACK_ENABLED` has been added in `stellar_sdk.operation.set_options.Flag`. ([#446](https://github.com/StellarCN/py-stellar-base/pull/446))
+
+#### Deprecated
+
+* `stellar_sdk.TransactionBuilder.append_allow_trust_op` and `stellar_sdk.operation.AllowTrust` have now been marked as deprecated, they will be removed in v4.0.0. ([#446](https://github.com/StellarCN/py-stellar-base/pull/446))
+
+### Version 3.2.0
+Released on April 01, 2021
+
+#### Update
+feat: SEP-10: added support for 'client_domain' ManageData operations in challenges (client attribution). ([#428](https://github.com/StellarCN/py-stellar-base/pull/428))
+
 ### Version 2.12.0
 Released on April 01, 2021
 
@@ -35,6 +116,12 @@ Released on Mar 25, 2021
 
 #### Update
 feat: SEP-10: added support for 'client_domain' ManageData operations in challenges (client attribution). ([#428](https://github.com/StellarCN/py-stellar-base/pull/428))
+
+### Version 3.1.4
+Released on Mar 16, 2021
+
+#### Update
+* fix: make `AiohttpClient` compatible with Python 3.6 and 3.7. ([#449](https://github.com/StellarCN/py-stellar-base/pull/449))
 
 ### Version 2.11.3
 Released on Mar 16, 2021
