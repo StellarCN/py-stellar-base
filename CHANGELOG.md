@@ -1,6 +1,12 @@
 Release History
 ==============
 
+### Version 3.2.1
+Released on April 16, 2021
+
+#### Update
+fix: fix the issue that `not_predicate` cannot be parsed normally. ([#465](https://github.com/StellarCN/py-stellar-base/pull/465))
+
 ### Version 3.3.0-beta0
 Released on April 03, 2021
 
