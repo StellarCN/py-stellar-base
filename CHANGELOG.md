@@ -1,6 +1,29 @@
 Release History
 ==============
 
+### Version 3.3.0
+Released on April 17, 2021
+
+#### Update
+
+* feat: add support for Stellar Protocol 17. ([#453](https://github.com/StellarCN/py-stellar-base/pull/453))
+
+#### Added
+
+* feat: add support for [CAP-35](https://github.com/stellar/stellar-protocol/blob/master/core/cap-0035.md). ([#453](https://github.com/StellarCN/py-stellar-base/pull/453))
+
+  We have added methods to `TransactionBuilder`, you can use them to construct corresponding operations, method list:
+
+  - append_clawback_op
+  - append_clawback_claimable_balance_op
+  - append_set_trust_line_flags_op
+
+* `AUTHORIZATION_CLAWBACK_ENABLED` has been added in `stellar_sdk.operation.set_options.AuthorizationFlag`. ([#453](https://github.com/StellarCN/py-stellar-base/pull/453))
+
+#### Deprecated
+
+* `stellar_sdk.TransactionBuilder.append_allow_trust_op` and `stellar_sdk.operation.AllowTrust` have now been marked as deprecated, they will be removed in v4.0.0. ([#453](https://github.com/StellarCN/py-stellar-base/pull/453))
+
 ### Version 2.13.0
 Released on April 17, 2021
 
@@ -35,7 +58,7 @@ Released on April 03, 2021
 
 #### Update
 
-* feat: add support for Stellar Protocol 16. ([#453](https://github.com/StellarCN/py-stellar-base/pull/453))
+* feat: add support for Stellar Protocol 17. ([#453](https://github.com/StellarCN/py-stellar-base/pull/453))
 
 #### Added
 
