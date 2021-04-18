@@ -551,11 +551,11 @@
         },
         "pytest-asyncio": {
             "hashes": [
-                "sha256:2eae1e34f6c68fc0a9dc12d4bea190483843ff4708d24277c41568d6b6044f1d",
-                "sha256:9882c0c6b24429449f5f969a5158b528f39bde47dc32e85b9f0403965017e700"
+                "sha256:5d9f9f64ab5ed41dc90e4d18dcbf0a74cdaac3d3dc30eb1cc1e49246dc382f3c",
+                "sha256:eeff4bd913405770882427d62685a8973681932f2ef53e964371af339628ad8a"
             ],
             "index": "pypi",
-            "version": "==0.14.0"
+            "version": "==0.15.0"
         },
         "pytest-cov": {
             "hashes": [
