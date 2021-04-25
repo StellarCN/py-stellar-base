@@ -1,6 +1,13 @@
 Release History
 ==============
 
+### Version 3.3.1
+Released on April 25, 2021
+
+#### Update
+
+* fix: remove exceptions that should not be thrown in XDR. ([#469](https://github.com/StellarCN/py-stellar-base/pull/469))
+
 ### Version 3.3.0
 Released on April 17, 2021
 
