@@ -6,7 +6,6 @@ from xdrlib import Packer, Unpacker
 from .end_sponsoring_future_reserves_result_code import (
     EndSponsoringFutureReservesResultCode,
 )
-from ..exceptions import ValueError
 
 __all__ = ["EndSponsoringFutureReservesResult"]
 
@@ -38,7 +37,6 @@ class EndSponsoringFutureReservesResult:
             == EndSponsoringFutureReservesResultCode.END_SPONSORING_FUTURE_RESERVES_SUCCESS
         ):
             return
-        raise ValueError("Invalid code.")
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "EndSponsoringFutureReservesResult":
@@ -48,7 +46,7 @@ class EndSponsoringFutureReservesResult:
             == EndSponsoringFutureReservesResultCode.END_SPONSORING_FUTURE_RESERVES_SUCCESS
         ):
             return cls(code)
-        raise ValueError("Invalid code.")
+        return cls(code)
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

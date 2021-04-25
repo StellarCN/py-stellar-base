@@ -4,7 +4,6 @@ import base64
 from xdrlib import Packer, Unpacker
 
 from .set_trust_line_flags_result_code import SetTrustLineFlagsResultCode
-from ..exceptions import ValueError
 
 __all__ = ["SetTrustLineFlagsResult"]
 
@@ -33,14 +32,13 @@ class SetTrustLineFlagsResult:
         self.code.pack(packer)
         if self.code == SetTrustLineFlagsResultCode.SET_TRUST_LINE_FLAGS_SUCCESS:
             return
-        raise ValueError("Invalid code.")
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "SetTrustLineFlagsResult":
         code = SetTrustLineFlagsResultCode.unpack(unpacker)
         if code == SetTrustLineFlagsResultCode.SET_TRUST_LINE_FLAGS_SUCCESS:
             return cls(code)
-        raise ValueError("Invalid code.")
+        return cls(code)
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

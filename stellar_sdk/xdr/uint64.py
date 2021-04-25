@@ -17,7 +17,6 @@ class Uint64:
     """
 
     def __init__(self, uint64: int) -> None:
-
         self.uint64 = uint64
 
     def pack(self, packer: Packer) -> None:

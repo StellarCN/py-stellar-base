@@ -37,7 +37,6 @@ class PublicKey:
                 raise ValueError("ed25519 should not be None.")
             self.ed25519.pack(packer)
             return
-        raise ValueError("Invalid type.")
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "PublicKey":
@@ -47,7 +46,7 @@ class PublicKey:
             if ed25519 is None:
                 raise ValueError("ed25519 should not be None.")
             return cls(type, ed25519=ed25519)
-        raise ValueError("Invalid type.")
+        return cls(type)
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

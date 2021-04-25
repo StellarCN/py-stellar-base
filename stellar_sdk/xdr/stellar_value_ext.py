@@ -41,7 +41,6 @@ class StellarValueExt:
                 raise ValueError("lc_value_signature should not be None.")
             self.lc_value_signature.pack(packer)
             return
-        raise ValueError("Invalid v.")
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "StellarValueExt":
@@ -53,7 +52,7 @@ class StellarValueExt:
             if lc_value_signature is None:
                 raise ValueError("lc_value_signature should not be None.")
             return cls(v, lc_value_signature=lc_value_signature)
-        raise ValueError("Invalid v.")
+        return cls(v)
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

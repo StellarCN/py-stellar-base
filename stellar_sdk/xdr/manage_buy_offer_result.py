@@ -39,7 +39,6 @@ class ManageBuyOfferResult:
                 raise ValueError("success should not be None.")
             self.success.pack(packer)
             return
-        raise ValueError("Invalid code.")
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "ManageBuyOfferResult":
@@ -49,7 +48,7 @@ class ManageBuyOfferResult:
             if success is None:
                 raise ValueError("success should not be None.")
             return cls(code, success=success)
-        raise ValueError("Invalid code.")
+        return cls(code)
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

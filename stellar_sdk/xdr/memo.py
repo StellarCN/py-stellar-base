@@ -70,7 +70,6 @@ class Memo:
                 raise ValueError("ret_hash should not be None.")
             self.ret_hash.pack(packer)
             return
-        raise ValueError("Invalid type.")
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "Memo":
@@ -97,7 +96,7 @@ class Memo:
             if ret_hash is None:
                 raise ValueError("ret_hash should not be None.")
             return cls(type, ret_hash=ret_hash)
-        raise ValueError("Invalid type.")
+        return cls(type)
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

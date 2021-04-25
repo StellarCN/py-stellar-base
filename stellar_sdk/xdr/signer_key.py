@@ -57,7 +57,6 @@ class SignerKey:
                 raise ValueError("hash_x should not be None.")
             self.hash_x.pack(packer)
             return
-        raise ValueError("Invalid type.")
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "SignerKey":
@@ -77,7 +76,7 @@ class SignerKey:
             if hash_x is None:
                 raise ValueError("hash_x should not be None.")
             return cls(type, hash_x=hash_x)
-        raise ValueError("Invalid type.")
+        return cls(type)
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

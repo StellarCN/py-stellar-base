@@ -39,7 +39,6 @@ class AccountMergeResult:
                 raise ValueError("source_account_balance should not be None.")
             self.source_account_balance.pack(packer)
             return
-        raise ValueError("Invalid code.")
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "AccountMergeResult":
@@ -49,7 +48,7 @@ class AccountMergeResult:
             if source_account_balance is None:
                 raise ValueError("source_account_balance should not be None.")
             return cls(code, source_account_balance=source_account_balance)
-        raise ValueError("Invalid code.")
+        return cls(code)
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

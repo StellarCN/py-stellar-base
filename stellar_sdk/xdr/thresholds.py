@@ -17,7 +17,6 @@ class Thresholds:
     """
 
     def __init__(self, thresholds: bytes) -> None:
-
         self.thresholds = thresholds
 
     def pack(self, packer: Packer) -> None:

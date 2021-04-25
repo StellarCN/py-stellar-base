@@ -87,7 +87,6 @@ class SCPStatementPledges:
                 raise ValueError("nominate should not be None.")
             self.nominate.pack(packer)
             return
-        raise ValueError("Invalid type.")
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "SCPStatementPledges":
@@ -112,7 +111,7 @@ class SCPStatementPledges:
             if nominate is None:
                 raise ValueError("nominate should not be None.")
             return cls(type, nominate=nominate)
-        raise ValueError("Invalid type.")
+        return cls(type)
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

@@ -17,7 +17,6 @@ class SponsorshipDescriptor:
     """
 
     def __init__(self, sponsorship_descriptor: AccountID) -> None:
-
         self.sponsorship_descriptor = sponsorship_descriptor
 
     def pack(self, packer: Packer) -> None:
