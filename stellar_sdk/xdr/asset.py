@@ -63,7 +63,6 @@ class Asset:
                 raise ValueError("alpha_num12 should not be None.")
             self.alpha_num12.pack(packer)
             return
-        raise ValueError("Invalid type.")
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "Asset":
@@ -80,7 +79,7 @@ class Asset:
             if alpha_num12 is None:
                 raise ValueError("alpha_num12 should not be None.")
             return cls(type, alpha_num12=alpha_num12)
-        raise ValueError("Invalid type.")
+        return cls(type)
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

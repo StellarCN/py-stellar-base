@@ -17,7 +17,6 @@ class UpgradeType:
     """
 
     def __init__(self, upgrade_type: bytes) -> None:
-
         self.upgrade_type = upgrade_type
 
     def pack(self, packer: Packer) -> None:

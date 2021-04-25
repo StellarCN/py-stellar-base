@@ -86,7 +86,6 @@ class OperationResult:
                 raise ValueError("tr should not be None.")
             self.tr.pack(packer)
             return
-        raise ValueError("Invalid code.")
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "OperationResult":
@@ -96,7 +95,7 @@ class OperationResult:
             if tr is None:
                 raise ValueError("tr should not be None.")
             return cls(code, tr=tr)
-        raise ValueError("Invalid code.")
+        return cls(code)
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

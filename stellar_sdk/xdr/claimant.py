@@ -41,7 +41,6 @@ class Claimant:
                 raise ValueError("v0 should not be None.")
             self.v0.pack(packer)
             return
-        raise ValueError("Invalid type.")
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "Claimant":
@@ -51,7 +50,7 @@ class Claimant:
             if v0 is None:
                 raise ValueError("v0 should not be None.")
             return cls(type, v0=v0)
-        raise ValueError("Invalid type.")
+        return cls(type)
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

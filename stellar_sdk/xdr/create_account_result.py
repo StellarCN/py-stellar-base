@@ -4,7 +4,6 @@ import base64
 from xdrlib import Packer, Unpacker
 
 from .create_account_result_code import CreateAccountResultCode
-from ..exceptions import ValueError
 
 __all__ = ["CreateAccountResult"]
 
@@ -33,14 +32,13 @@ class CreateAccountResult:
         self.code.pack(packer)
         if self.code == CreateAccountResultCode.CREATE_ACCOUNT_SUCCESS:
             return
-        raise ValueError("Invalid code.")
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "CreateAccountResult":
         code = CreateAccountResultCode.unpack(unpacker)
         if code == CreateAccountResultCode.CREATE_ACCOUNT_SUCCESS:
             return cls(code)
-        raise ValueError("Invalid code.")
+        return cls(code)
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

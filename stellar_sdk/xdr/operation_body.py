@@ -237,7 +237,6 @@ class OperationBody:
                 raise ValueError("set_trust_line_flags_op should not be None.")
             self.set_trust_line_flags_op.pack(packer)
             return
-        raise ValueError("Invalid type.")
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "OperationBody":
@@ -357,7 +356,7 @@ class OperationBody:
             if set_trust_line_flags_op is None:
                 raise ValueError("set_trust_line_flags_op should not be None.")
             return cls(type, set_trust_line_flags_op=set_trust_line_flags_op)
-        raise ValueError("Invalid type.")
+        return cls(type)
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

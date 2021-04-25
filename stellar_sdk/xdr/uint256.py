@@ -17,7 +17,6 @@ class Uint256:
     """
 
     def __init__(self, uint256: bytes) -> None:
-
         self.uint256 = uint256
 
     def pack(self, packer: Packer) -> None:

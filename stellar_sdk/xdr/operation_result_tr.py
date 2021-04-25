@@ -258,7 +258,6 @@ class OperationResultTr:
                 raise ValueError("set_trust_line_flags_result should not be None.")
             self.set_trust_line_flags_result.pack(packer)
             return
-        raise ValueError("Invalid type.")
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "OperationResultTr":
@@ -415,7 +414,7 @@ class OperationResultTr:
             if set_trust_line_flags_result is None:
                 raise ValueError("set_trust_line_flags_result should not be None.")
             return cls(type, set_trust_line_flags_result=set_trust_line_flags_result)
-        raise ValueError("Invalid type.")
+        return cls(type)
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

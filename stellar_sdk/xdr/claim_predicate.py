@@ -95,7 +95,6 @@ class ClaimPredicate:
                 raise ValueError("rel_before should not be None.")
             self.rel_before.pack(packer)
             return
-        raise ValueError("Invalid type.")
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "ClaimPredicate":
@@ -130,7 +129,7 @@ class ClaimPredicate:
             if rel_before is None:
                 raise ValueError("rel_before should not be None.")
             return cls(type, rel_before=rel_before)
-        raise ValueError("Invalid type.")
+        return cls(type)
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

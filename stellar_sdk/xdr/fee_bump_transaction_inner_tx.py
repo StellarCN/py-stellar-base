@@ -37,7 +37,6 @@ class FeeBumpTransactionInnerTx:
                 raise ValueError("v1 should not be None.")
             self.v1.pack(packer)
             return
-        raise ValueError("Invalid type.")
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "FeeBumpTransactionInnerTx":
@@ -47,7 +46,7 @@ class FeeBumpTransactionInnerTx:
             if v1 is None:
                 raise ValueError("v1 should not be None.")
             return cls(type, v1=v1)
-        raise ValueError("Invalid type.")
+        return cls(type)
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

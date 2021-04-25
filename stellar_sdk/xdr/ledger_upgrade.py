@@ -64,7 +64,6 @@ class LedgerUpgrade:
                 raise ValueError("new_base_reserve should not be None.")
             self.new_base_reserve.pack(packer)
             return
-        raise ValueError("Invalid type.")
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "LedgerUpgrade":
@@ -89,7 +88,7 @@ class LedgerUpgrade:
             if new_base_reserve is None:
                 raise ValueError("new_base_reserve should not be None.")
             return cls(type, new_base_reserve=new_base_reserve)
-        raise ValueError("Invalid type.")
+        return cls(type)
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

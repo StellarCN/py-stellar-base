@@ -78,7 +78,6 @@ class InnerTransactionResultResult:
             or self.code == TransactionResultCode.txBAD_SPONSORSHIP
         ):
             return
-        raise ValueError("Invalid code.")
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "InnerTransactionResultResult":
@@ -107,7 +106,7 @@ class InnerTransactionResultResult:
             or code == TransactionResultCode.txBAD_SPONSORSHIP
         ):
             return cls(code)
-        raise ValueError("Invalid code.")
+        return cls(code)
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()
