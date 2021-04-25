@@ -4,7 +4,6 @@ import base64
 from xdrlib import Packer, Unpacker
 
 from .base import *
-from ..exceptions import ValueError
 
 __all__ = ["ClaimableBalanceEntryExtensionV1Ext"]
 
@@ -31,14 +30,13 @@ class ClaimableBalanceEntryExtensionV1Ext:
         Integer(self.v).pack(packer)
         if self.v == 0:
             return
-        raise ValueError("Invalid v.")
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "ClaimableBalanceEntryExtensionV1Ext":
         v = Integer.unpack(unpacker)
         if v == 0:
             return cls(v)
-        raise ValueError("Invalid v.")
+        return cls(v)
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

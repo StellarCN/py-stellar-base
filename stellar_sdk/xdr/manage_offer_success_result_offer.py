@@ -43,7 +43,6 @@ class ManageOfferSuccessResultOffer:
                 raise ValueError("offer should not be None.")
             self.offer.pack(packer)
             return
-        raise ValueError("Invalid effect.")
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "ManageOfferSuccessResultOffer":
@@ -56,7 +55,7 @@ class ManageOfferSuccessResultOffer:
             if offer is None:
                 raise ValueError("offer should not be None.")
             return cls(effect, offer=offer)
-        raise ValueError("Invalid effect.")
+        return cls(effect)
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

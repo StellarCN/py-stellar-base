@@ -183,7 +183,6 @@ class StellarMessage:
                 raise ValueError("get_scp_ledger_seq should not be None.")
             self.get_scp_ledger_seq.pack(packer)
             return
-        raise ValueError("Invalid type.")
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "StellarMessage":
@@ -267,7 +266,7 @@ class StellarMessage:
             if get_scp_ledger_seq is None:
                 raise ValueError("get_scp_ledger_seq should not be None.")
             return cls(type, get_scp_ledger_seq=get_scp_ledger_seq)
-        raise ValueError("Invalid type.")
+        return cls(type)
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

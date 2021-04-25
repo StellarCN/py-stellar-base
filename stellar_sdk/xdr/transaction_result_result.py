@@ -64,7 +64,6 @@ class TransactionResultResult:
             for result in self.results:
                 result.pack(packer)
             return
-        raise ValueError("Invalid code.")
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "TransactionResultResult":
@@ -86,7 +85,7 @@ class TransactionResultResult:
             for _ in range(length):
                 results.append(OperationResult.unpack(unpacker))
             return cls(code, results=results)
-        raise ValueError("Invalid code.")
+        return cls(code)
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

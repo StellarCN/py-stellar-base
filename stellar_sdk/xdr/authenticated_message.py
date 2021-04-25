@@ -42,7 +42,6 @@ class AuthenticatedMessage:
                 raise ValueError("v0 should not be None.")
             self.v0.pack(packer)
             return
-        raise ValueError("Invalid v.")
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "AuthenticatedMessage":
@@ -52,7 +51,7 @@ class AuthenticatedMessage:
             if v0 is None:
                 raise ValueError("v0 should not be None.")
             return cls(v, v0=v0)
-        raise ValueError("Invalid v.")
+        return cls(v)
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

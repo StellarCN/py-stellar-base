@@ -4,7 +4,6 @@ import base64
 from xdrlib import Packer, Unpacker
 
 from .change_trust_result_code import ChangeTrustResultCode
-from ..exceptions import ValueError
 
 __all__ = ["ChangeTrustResult"]
 
@@ -33,14 +32,13 @@ class ChangeTrustResult:
         self.code.pack(packer)
         if self.code == ChangeTrustResultCode.CHANGE_TRUST_SUCCESS:
             return
-        raise ValueError("Invalid code.")
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "ChangeTrustResult":
         code = ChangeTrustResultCode.unpack(unpacker)
         if code == ChangeTrustResultCode.CHANGE_TRUST_SUCCESS:
             return cls(code)
-        raise ValueError("Invalid code.")
+        return cls(code)
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

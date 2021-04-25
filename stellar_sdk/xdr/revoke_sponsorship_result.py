@@ -4,7 +4,6 @@ import base64
 from xdrlib import Packer, Unpacker
 
 from .revoke_sponsorship_result_code import RevokeSponsorshipResultCode
-from ..exceptions import ValueError
 
 __all__ = ["RevokeSponsorshipResult"]
 
@@ -33,14 +32,13 @@ class RevokeSponsorshipResult:
         self.code.pack(packer)
         if self.code == RevokeSponsorshipResultCode.REVOKE_SPONSORSHIP_SUCCESS:
             return
-        raise ValueError("Invalid code.")
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "RevokeSponsorshipResult":
         code = RevokeSponsorshipResultCode.unpack(unpacker)
         if code == RevokeSponsorshipResultCode.REVOKE_SPONSORSHIP_SUCCESS:
             return cls(code)
-        raise ValueError("Invalid code.")
+        return cls(code)
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

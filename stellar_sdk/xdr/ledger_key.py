@@ -99,7 +99,6 @@ class LedgerKey:
                 raise ValueError("claimable_balance should not be None.")
             self.claimable_balance.pack(packer)
             return
-        raise ValueError("Invalid type.")
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "LedgerKey":
@@ -129,7 +128,7 @@ class LedgerKey:
             if claimable_balance is None:
                 raise ValueError("claimable_balance should not be None.")
             return cls(type, claimable_balance=claimable_balance)
-        raise ValueError("Invalid type.")
+        return cls(type)
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

@@ -46,7 +46,6 @@ class InflationResult:
             for payout in self.payouts:
                 payout.pack(packer)
             return
-        raise ValueError("Invalid code.")
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "InflationResult":
@@ -57,7 +56,7 @@ class InflationResult:
             for _ in range(length):
                 payouts.append(InflationPayout.unpack(unpacker))
             return cls(code, payouts=payouts)
-        raise ValueError("Invalid code.")
+        return cls(code)
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

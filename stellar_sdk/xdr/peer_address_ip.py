@@ -46,7 +46,6 @@ class PeerAddressIp:
                 raise ValueError("ipv6 should not be None.")
             Opaque(self.ipv6, 16, True).pack(packer)
             return
-        raise ValueError("Invalid type.")
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "PeerAddressIp":
@@ -61,7 +60,7 @@ class PeerAddressIp:
             if ipv6 is None:
                 raise ValueError("ipv6 should not be None.")
             return cls(type, ipv6=ipv6)
-        raise ValueError("Invalid type.")
+        return cls(type)
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

@@ -65,7 +65,6 @@ class LedgerEntryChange:
                 raise ValueError("state should not be None.")
             self.state.pack(packer)
             return
-        raise ValueError("Invalid type.")
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "LedgerEntryChange":
@@ -90,7 +89,7 @@ class LedgerEntryChange:
             if state is None:
                 raise ValueError("state should not be None.")
             return cls(type, state=state)
-        raise ValueError("Invalid type.")
+        return cls(type)
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

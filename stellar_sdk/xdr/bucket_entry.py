@@ -62,7 +62,6 @@ class BucketEntry:
                 raise ValueError("meta_entry should not be None.")
             self.meta_entry.pack(packer)
             return
-        raise ValueError("Invalid type.")
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "BucketEntry":
@@ -82,7 +81,7 @@ class BucketEntry:
             if meta_entry is None:
                 raise ValueError("meta_entry should not be None.")
             return cls(type, meta_entry=meta_entry)
-        raise ValueError("Invalid type.")
+        return cls(type)
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

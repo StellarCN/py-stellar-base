@@ -48,7 +48,6 @@ class TransactionSignaturePayloadTaggedTransaction:
                 raise ValueError("fee_bump should not be None.")
             self.fee_bump.pack(packer)
             return
-        raise ValueError("Invalid type.")
 
     @classmethod
     def unpack(
@@ -65,7 +64,7 @@ class TransactionSignaturePayloadTaggedTransaction:
             if fee_bump is None:
                 raise ValueError("fee_bump should not be None.")
             return cls(type, fee_bump=fee_bump)
-        raise ValueError("Invalid type.")
+        return cls(type)
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

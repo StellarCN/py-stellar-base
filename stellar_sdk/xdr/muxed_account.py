@@ -51,7 +51,6 @@ class MuxedAccount:
                 raise ValueError("med25519 should not be None.")
             self.med25519.pack(packer)
             return
-        raise ValueError("Invalid type.")
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "MuxedAccount":
@@ -66,7 +65,7 @@ class MuxedAccount:
             if med25519 is None:
                 raise ValueError("med25519 should not be None.")
             return cls(type, med25519=med25519)
-        raise ValueError("Invalid type.")
+        return cls(type)
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

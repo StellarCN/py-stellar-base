@@ -41,7 +41,6 @@ class LedgerEntryExt:
                 raise ValueError("v1 should not be None.")
             self.v1.pack(packer)
             return
-        raise ValueError("Invalid v.")
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "LedgerEntryExt":
@@ -53,7 +52,7 @@ class LedgerEntryExt:
             if v1 is None:
                 raise ValueError("v1 should not be None.")
             return cls(v, v1=v1)
-        raise ValueError("Invalid v.")
+        return cls(v)
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

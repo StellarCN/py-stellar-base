@@ -42,7 +42,6 @@ class CreateClaimableBalanceResult:
                 raise ValueError("balance_id should not be None.")
             self.balance_id.pack(packer)
             return
-        raise ValueError("Invalid code.")
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "CreateClaimableBalanceResult":
@@ -52,7 +51,7 @@ class CreateClaimableBalanceResult:
             if balance_id is None:
                 raise ValueError("balance_id should not be None.")
             return cls(code, balance_id=balance_id)
-        raise ValueError("Invalid code.")
+        return cls(code)
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

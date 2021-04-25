@@ -37,7 +37,6 @@ class SurveyResponseBody:
                 raise ValueError("topology_response_body should not be None.")
             self.topology_response_body.pack(packer)
             return
-        raise ValueError("Invalid type.")
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "SurveyResponseBody":
@@ -47,7 +46,7 @@ class SurveyResponseBody:
             if topology_response_body is None:
                 raise ValueError("topology_response_body should not be None.")
             return cls(type, topology_response_body=topology_response_body)
-        raise ValueError("Invalid type.")
+        return cls(type)
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

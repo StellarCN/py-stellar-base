@@ -42,7 +42,6 @@ class OperationID:
                 raise ValueError("id should not be None.")
             self.id.pack(packer)
             return
-        raise ValueError("Invalid type.")
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "OperationID":
@@ -52,7 +51,7 @@ class OperationID:
             if id is None:
                 raise ValueError("id should not be None.")
             return cls(type, id=id)
-        raise ValueError("Invalid type.")
+        return cls(type)
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

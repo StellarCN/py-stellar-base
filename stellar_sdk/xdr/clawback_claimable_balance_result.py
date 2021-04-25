@@ -4,7 +4,6 @@ import base64
 from xdrlib import Packer, Unpacker
 
 from .clawback_claimable_balance_result_code import ClawbackClaimableBalanceResultCode
-from ..exceptions import ValueError
 
 __all__ = ["ClawbackClaimableBalanceResult"]
 
@@ -36,7 +35,6 @@ class ClawbackClaimableBalanceResult:
             == ClawbackClaimableBalanceResultCode.CLAWBACK_CLAIMABLE_BALANCE_SUCCESS
         ):
             return
-        raise ValueError("Invalid code.")
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "ClawbackClaimableBalanceResult":
@@ -46,7 +44,7 @@ class ClawbackClaimableBalanceResult:
             == ClawbackClaimableBalanceResultCode.CLAWBACK_CLAIMABLE_BALANCE_SUCCESS
         ):
             return cls(code)
-        raise ValueError("Invalid code.")
+        return cls(code)
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

@@ -61,7 +61,6 @@ class PathPaymentStrictReceiveResult:
                 raise ValueError("no_issuer should not be None.")
             self.no_issuer.pack(packer)
             return
-        raise ValueError("Invalid code.")
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "PathPaymentStrictReceiveResult":
@@ -82,7 +81,7 @@ class PathPaymentStrictReceiveResult:
             if no_issuer is None:
                 raise ValueError("no_issuer should not be None.")
             return cls(code, no_issuer=no_issuer)
-        raise ValueError("Invalid code.")
+        return cls(code)
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

@@ -52,7 +52,6 @@ class RevokeSponsorshipOp:
                 raise ValueError("signer should not be None.")
             self.signer.pack(packer)
             return
-        raise ValueError("Invalid type.")
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "RevokeSponsorshipOp":
@@ -67,7 +66,7 @@ class RevokeSponsorshipOp:
             if signer is None:
                 raise ValueError("signer should not be None.")
             return cls(type, signer=signer)
-        raise ValueError("Invalid type.")
+        return cls(type)
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()
