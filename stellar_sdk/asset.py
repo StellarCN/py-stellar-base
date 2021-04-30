@@ -164,5 +164,5 @@ class Asset:
     
     def __hash__(self):
         if self.issuer:
-            return self.code + "-" + self.issuer
-        return self.code
+            return hash(self.code + "-" + self.issuer)
+        return hash(self.code)
