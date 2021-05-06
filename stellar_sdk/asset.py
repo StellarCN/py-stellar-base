@@ -161,8 +161,3 @@ class Asset:
 
     def __str__(self):
         return f"<Asset [code={self.code}, issuer={self.issuer}, type={self.type}]>"
-    
-    def __hash__(self):
-        if self.issuer:
-            return hash(self.code + "-" + self.issuer)
-        return hash(self.code)
