@@ -6,6 +6,8 @@ from .. import xdr as stellar_xdr
 from ..keypair import Keypair
 from ..utils import parse_ed25519_account_id_from_muxed_account_xdr_object
 
+__all__ = ["AccountMerge"]
+
 
 class AccountMerge(Operation):
     """The :class:`AccountMerge` object, which represents a
@@ -21,9 +23,15 @@ class AccountMerge(Operation):
 
     """
 
-    _XDR_OPERATION_TYPE: stellar_xdr.OperationType = stellar_xdr.OperationType.ACCOUNT_MERGE
+    _XDR_OPERATION_TYPE: stellar_xdr.OperationType = (
+        stellar_xdr.OperationType.ACCOUNT_MERGE
+    )
 
-    def __init__(self, destination: str, source: str = None,) -> None:
+    def __init__(
+        self,
+        destination: str,
+        source: str = None,
+    ) -> None:
         super().__init__(source)
         check_ed25519_public_key(destination)
         self._destination: str = destination

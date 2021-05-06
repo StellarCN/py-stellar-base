@@ -12,10 +12,11 @@ from ..keypair import Keypair
 from ..signer_key import SignerKey
 from ..strkey import StrKey
 
+__all__ = ["RevokeSponsorship"]
+
 
 class RevokeSponsorshipType(IntEnum):
-    """Currently supported RevokeSponsorship types.
-    """
+    """Currently supported RevokeSponsorship types."""
 
     ACCOUNT = 0
     TRUSTLINE = 1
@@ -114,7 +115,9 @@ class RevokeSponsorship(Operation):
     :param source: The source account (defaults to transaction source).
     """
 
-    _XDR_OPERATION_TYPE: stellar_xdr.OperationType = stellar_xdr.OperationType.REVOKE_SPONSORSHIP
+    _XDR_OPERATION_TYPE: stellar_xdr.OperationType = (
+        stellar_xdr.OperationType.REVOKE_SPONSORSHIP
+    )
 
     def __init__(
         self,

@@ -8,6 +8,8 @@ from ..asset import Asset
 from ..keypair import Keypair
 from ..utils import parse_ed25519_account_id_from_muxed_account_xdr_object
 
+__all__ = ["PathPaymentStrictSend"]
+
 
 class PathPaymentStrictSend(Operation):
     """The :class:`PathPaymentStrictSend` object, which represents a PathPaymentStrictSend
@@ -29,7 +31,9 @@ class PathPaymentStrictSend(Operation):
         transaction's source account.
     """
 
-    _XDR_OPERATION_TYPE: stellar_xdr.OperationType = stellar_xdr.OperationType.PATH_PAYMENT_STRICT_SEND
+    _XDR_OPERATION_TYPE: stellar_xdr.OperationType = (
+        stellar_xdr.OperationType.PATH_PAYMENT_STRICT_SEND
+    )
 
     def __init__(
         self,

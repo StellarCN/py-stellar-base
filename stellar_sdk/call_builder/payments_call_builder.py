@@ -4,6 +4,8 @@ from ..call_builder.base_call_builder import BaseCallBuilder
 from ..client.base_async_client import BaseAsyncClient
 from ..client.base_sync_client import BaseSyncClient
 
+__all__ = ["PaymentsCallBuilder"]
+
 
 class PaymentsCallBuilder(BaseCallBuilder):
     """Creates a new :class:`PaymentsCallBuilder` pointed to server defined by horizon_url.

@@ -4,6 +4,8 @@ from .operation import Operation
 from .. import xdr as stellar_xdr
 from ..exceptions import ValueError
 
+__all__ = ["ManageData"]
+
 
 class ManageData(Operation):
     """The :class:`ManageData` object, which represents a
@@ -25,10 +27,15 @@ class ManageData(Operation):
 
     """
 
-    _XDR_OPERATION_TYPE: stellar_xdr.OperationType = stellar_xdr.OperationType.MANAGE_DATA
+    _XDR_OPERATION_TYPE: stellar_xdr.OperationType = (
+        stellar_xdr.OperationType.MANAGE_DATA
+    )
 
     def __init__(
-        self, data_name: str, data_value: Union[str, bytes, None], source: str = None,
+        self,
+        data_name: str,
+        data_value: Union[str, bytes, None],
+        source: str = None,
     ) -> None:  # TODO: bytes only?
         super().__init__(source)
         self.data_name: str = data_name

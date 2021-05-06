@@ -42,7 +42,7 @@ def build_challenge_transaction(
     network_passphrase: str,
     timeout: int = 900,
     client_domain: Optional[str] = None,
-    client_signing_key: Optional[str] = None
+    client_signing_key: Optional[str] = None,
 ) -> str:
     """Returns a valid `SEP0010 <https://github.com/stellar/stellar-protocol/blob/master/ecosystem/sep-0010.md>`_
     challenge transaction which you can use for Stellar Web Authentication.
@@ -82,11 +82,13 @@ def build_challenge_transaction(
     )
     if client_domain:
         if not client_signing_key:
-            raise ValueError("client_signing_key is required if client_domain is provided.")
+            raise ValueError(
+                "client_signing_key is required if client_domain is provided."
+            )
         transaction_builder.append_manage_data_op(
             data_name="client_domain",
             data_value=client_domain,
-            source=client_signing_key
+            source=client_signing_key,
         )
     transaction = transaction_builder.build()
     transaction.sign(server_keypair)
@@ -231,7 +233,9 @@ def read_challenge_transaction(
             )
         if op.data_name == "web_auth_domain":
             if op.data_value is None:
-                raise InvalidSep10ChallengeError("'web_auth_domain' operation value should not be null.")
+                raise InvalidSep10ChallengeError(
+                    "'web_auth_domain' operation value should not be null."
+                )
             if op.data_value != web_auth_domain.encode():
                 raise InvalidSep10ChallengeError(
                     f"'web_auth_domain' operation value does not match {web_auth_domain}."

@@ -4,6 +4,8 @@ import binascii
 from .operation import Operation
 from .. import xdr as stellar_xdr
 
+__all__ = ["ClaimClaimableBalance"]
+
 
 class ClaimClaimableBalance(Operation):
     """The :class:`ClaimClaimableBalance` object, which represents a ClaimClaimableBalance
@@ -20,9 +22,15 @@ class ClaimClaimableBalance(Operation):
     :param source: The source account (defaults to transaction source).
     """
 
-    _XDR_OPERATION_TYPE: stellar_xdr.OperationType = stellar_xdr.OperationType.CLAIM_CLAIMABLE_BALANCE
+    _XDR_OPERATION_TYPE: stellar_xdr.OperationType = (
+        stellar_xdr.OperationType.CLAIM_CLAIMABLE_BALANCE
+    )
 
-    def __init__(self, balance_id: str, source: str = None,) -> None:
+    def __init__(
+        self,
+        balance_id: str,
+        source: str = None,
+    ) -> None:
         super().__init__(source)
         self.balance_id: str = balance_id
 

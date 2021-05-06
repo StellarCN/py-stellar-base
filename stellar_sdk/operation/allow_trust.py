@@ -9,6 +9,8 @@ from ..asset import Asset
 from ..keypair import Keypair
 from ..strkey import StrKey
 
+__all__ = ["TrustLineEntryFlag", "AllowTrust"]
+
 
 class TrustLineEntryFlag(IntFlag):
     """Indicates which flags to set. For details about the flags,
@@ -48,7 +50,9 @@ class AllowTrust(Operation):
 
     """
 
-    _XDR_OPERATION_TYPE: stellar_xdr.OperationType = stellar_xdr.OperationType.ALLOW_TRUST
+    _XDR_OPERATION_TYPE: stellar_xdr.OperationType = (
+        stellar_xdr.OperationType.ALLOW_TRUST
+    )
 
     def __init__(
         self,
@@ -86,15 +90,11 @@ class AllowTrust(Operation):
         if len(asset_code) == 4:
             asset_type = stellar_xdr.AssetType.ASSET_TYPE_CREDIT_ALPHANUM4
             asset_code4 = stellar_xdr.AssetCode4(asset_code)
-            asset = stellar_xdr.AssetCode(
-                type=asset_type, asset_code4=asset_code4
-            )
+            asset = stellar_xdr.AssetCode(type=asset_type, asset_code4=asset_code4)
         else:
             asset_type = stellar_xdr.AssetType.ASSET_TYPE_CREDIT_ALPHANUM12
             asset_code12 = stellar_xdr.AssetCode12(asset_code)
-            asset = stellar_xdr.AssetCode(
-                type=asset_type, asset_code12=asset_code12
-            )
+            asset = stellar_xdr.AssetCode(type=asset_type, asset_code12=asset_code12)
         allow_trust_op = stellar_xdr.AllowTrustOp(trustor, asset, authorize)
         body = stellar_xdr.OperationBody(
             type=self._XDR_OPERATION_TYPE, allow_trust_op=allow_trust_op

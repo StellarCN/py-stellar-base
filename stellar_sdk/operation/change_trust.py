@@ -6,6 +6,8 @@ from .utils import check_amount
 from .. import xdr as stellar_xdr
 from ..asset import Asset
 
+__all__ = ["ChangeTrust"]
+
 
 class ChangeTrust(Operation):
     """The :class:`ChangeTrust` object, which represents a ChangeTrust
@@ -26,10 +28,15 @@ class ChangeTrust(Operation):
 
     _DEFAULT_LIMIT = "922337203685.4775807"
 
-    _XDR_OPERATION_TYPE: stellar_xdr.OperationType = stellar_xdr.OperationType.CHANGE_TRUST
+    _XDR_OPERATION_TYPE: stellar_xdr.OperationType = (
+        stellar_xdr.OperationType.CHANGE_TRUST
+    )
 
     def __init__(
-        self, asset: Asset, limit: Union[str, Decimal] = None, source: str = None,
+        self,
+        asset: Asset,
+        limit: Union[str, Decimal] = None,
+        source: str = None,
     ) -> None:
         super().__init__(source)
         self.asset: Asset = asset

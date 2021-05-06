@@ -7,6 +7,8 @@ from .. import xdr as stellar_xdr
 from ..asset import Asset
 from ..price import Price
 
+__all__ = ["CreatePassiveSellOffer"]
+
 
 class CreatePassiveSellOffer(Operation):
     """The :class:`CreatePassiveSellOffer` object, which represents a
@@ -40,7 +42,9 @@ class CreatePassiveSellOffer(Operation):
 
     """
 
-    _XDR_OPERATION_TYPE: stellar_xdr.OperationType = stellar_xdr.OperationType.CREATE_PASSIVE_SELL_OFFER
+    _XDR_OPERATION_TYPE: stellar_xdr.OperationType = (
+        stellar_xdr.OperationType.CREATE_PASSIVE_SELL_OFFER
+    )
 
     def __init__(
         self,
@@ -82,9 +86,7 @@ class CreatePassiveSellOffer(Operation):
     def from_xdr_object(
         cls, xdr_object: stellar_xdr.Operation
     ) -> "CreatePassiveSellOffer":
-        """Creates a :class:`CreatePassiveSellOffer` object from an XDR Operation object.
-
-        """
+        """Creates a :class:`CreatePassiveSellOffer` object from an XDR Operation object."""
         source = Operation.get_source_from_xdr_obj(xdr_object)
         assert xdr_object.body.create_passive_sell_offer_op is not None
         selling = Asset.from_xdr_object(

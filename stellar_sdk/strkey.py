@@ -23,9 +23,7 @@ _version_bytes = {
 
 
 class StrKey:
-    """StrKey is a helper class that allows encoding and decoding strkey.
-
-    """
+    """StrKey is a helper class that allows encoding and decoding strkey."""
 
     @staticmethod
     def encode_ed25519_public_key(data: bytes) -> str:
@@ -215,8 +213,7 @@ def is_valid(version_byte_name: str, encoded: str) -> bool:
 
 
 def _bytes_from_decode_data(s: Union[str, bytes, bytearray]) -> bytes:
-    """copy from base64._bytes_from_decode_data
-    """
+    """copy from base64._bytes_from_decode_data"""
     bytes_types = (bytes, bytearray)  # Types acceptable as binary data
     if isinstance(s, str):
         try:

@@ -1,6 +1,8 @@
 from .operation import Operation
 from .. import xdr as stellar_xdr
 
+__all__ = ["BumpSequence"]
+
 
 class BumpSequence(Operation):
     """The :class:`BumpSequence` object, which represents a
@@ -18,7 +20,9 @@ class BumpSequence(Operation):
 
     """
 
-    _XDR_OPERATION_TYPE: stellar_xdr.OperationType = stellar_xdr.OperationType.BUMP_SEQUENCE
+    _XDR_OPERATION_TYPE: stellar_xdr.OperationType = (
+        stellar_xdr.OperationType.BUMP_SEQUENCE
+    )
 
     def __init__(self, bump_to: int, source: str = None) -> None:
         super().__init__(source)

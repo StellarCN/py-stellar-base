@@ -8,6 +8,8 @@ from ..keypair import Keypair
 from ..utils import parse_ed25519_account_id_from_muxed_account_xdr_object
 from ..xdr import utils as xdr_utils
 
+__all__ = ["Operation"]
+
 
 class Operation(metaclass=ABCMeta):
     """The :class:`Operation` object, which represents an operation on
@@ -124,7 +126,9 @@ class Operation(metaclass=ABCMeta):
         )
 
     @staticmethod
-    def get_source_from_xdr_obj(xdr_object: stellar_xdr.Operation,) -> Optional[str]:
+    def get_source_from_xdr_obj(
+        xdr_object: stellar_xdr.Operation,
+    ) -> Optional[str]:
         """Get the source account from account the operation xdr object.
 
         :param xdr_object: the operation xdr object.

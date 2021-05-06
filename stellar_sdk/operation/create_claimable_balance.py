@@ -14,8 +14,7 @@ __all__ = ["ClaimPredicate", "Claimant", "CreateClaimableBalance"]
 
 
 class ClaimPredicateType(IntEnum):
-    """Currently supported claim predicate types.
-    """
+    """Currently supported claim predicate types."""
 
     CLAIM_PREDICATE_UNCONDITIONAL = 0
     CLAIM_PREDICATE_AND = 1
@@ -371,7 +370,9 @@ class CreateClaimableBalance(Operation):
     :param source: The source account (defaults to transaction source).
     """
 
-    _XDR_OPERATION_TYPE: stellar_xdr.OperationType = stellar_xdr.OperationType.CREATE_CLAIMABLE_BALANCE
+    _XDR_OPERATION_TYPE: stellar_xdr.OperationType = (
+        stellar_xdr.OperationType.CREATE_CLAIMABLE_BALANCE
+    )
 
     def __init__(
         self,
