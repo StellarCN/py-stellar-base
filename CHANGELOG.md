@@ -1,6 +1,14 @@
 Release History
 ==============
 
+### Version 3.3.2
+Released on May 06, 2021
+
+#### Update
+
+* fix: fix an import related bug and optimize the import code. ([#473](https://github.com/StellarCN/py-stellar-base/pull/473))
+* example: added clawback operation [example](https://github.com/StellarCN/py-stellar-base/blob/bbdf42dd75/examples/clawback.py). ([#474](https://github.com/StellarCN/py-stellar-base/pull/474))
+
 ### Version 3.3.1
 Released on April 25, 2021
 

@@ -61,7 +61,7 @@ Install and update using `pipenv`_ or `pip`_:
 
 .. code-block:: text
 
-    pip install stellar-sdk==3.3.1
+    pip install stellar-sdk==3.3.2
 
 
 A Simple Example
@@ -134,6 +134,10 @@ Building transaction with synchronous server
     if __name__ == "__main__":
         asyncio.run(payment())
 
+stellar-model
+-------------
+stellar-model allows you to parse the JSON returned by Stellar Horizon
+into the Python models, click `here <https://github.com/StellarCN/stellar-model>`_ for more information.
 
 Links
 -----
