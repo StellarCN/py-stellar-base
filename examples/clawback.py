@@ -3,7 +3,7 @@
 
 # Configure StellarSdk to talk to the horizon instance hosted by Stellar.org
 # To use the live network, set the hostname to 'horizon.stellar.org'
-from stellar_sdk import Server, Keypair, Asset, TransactionBuilder, Network, Flag
+from stellar_sdk import Server, Keypair, Asset, TransactionBuilder, Network, AuthorizationFlag
 
 server = Server(horizon_url="https://horizon-testnet.stellar.org")
 
@@ -34,7 +34,8 @@ set_options_transaction = (
         network_passphrase=Network.TESTNET_NETWORK_PASSPHRASE,
         base_fee=100,
     )
-        .append_set_options_op(set_flags=Flag.AUTHORIZATION_CLAWBACK_ENABLED | Flag.AUTHORIZATION_REVOCABLE)
+        .append_set_options_op(
+        set_flags=AuthorizationFlag.AUTHORIZATION_CLAWBACK_ENABLED | AuthorizationFlag.AUTHORIZATION_REVOCABLE)
         .build()
 )
 set_options_transaction.sign(issuing_keypair)

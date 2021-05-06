@@ -1,4 +1,13 @@
-from .__version__ import *
+from .__version__ import (
+    __title__,
+    __description__,
+    __url__,
+    __issues__,
+    __version__,
+    __author__,
+    __author_email__,
+    __license__,
+)
 from .account import *
 from .asset import *
 from .client.requests_client import RequestsClient
