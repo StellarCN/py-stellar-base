@@ -110,13 +110,25 @@ class Transaction:
                 source_xdr = self.source.xdr_muxed_account()
             ext = stellar_xdr.TransactionExt(0)
             return stellar_xdr.Transaction(
-                source_xdr, fee, sequence, time_bounds, memo, operations, ext,
+                source_xdr,
+                fee,
+                sequence,
+                time_bounds,
+                memo,
+                operations,
+                ext,
             )
         source_xdr_v0 = self.source.xdr_public_key().ed25519
         assert source_xdr_v0 is not None
         ext_v0 = stellar_xdr.TransactionV0Ext(0)
         return stellar_xdr.TransactionV0(
-            source_xdr_v0, fee, sequence, time_bounds, memo, operations, ext_v0,
+            source_xdr_v0,
+            fee,
+            sequence,
+            time_bounds,
+            memo,
+            operations,
+            ext_v0,
         )
 
     @classmethod

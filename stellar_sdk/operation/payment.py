@@ -8,6 +8,8 @@ from ..asset import Asset
 from ..keypair import Keypair
 from ..utils import parse_ed25519_account_id_from_muxed_account_xdr_object
 
+__all__ = ["Payment"]
+
 
 class Payment(Operation):
     """The :class:`Payment` object, which represents a Payment operation on

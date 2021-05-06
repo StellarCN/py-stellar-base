@@ -4,6 +4,8 @@ import binascii
 from .operation import Operation
 from .. import xdr as stellar_xdr
 
+__all__ = ["ClawbackClaimableBalance"]
+
 
 class ClawbackClaimableBalance(Operation):
     """The :class:`ClawbackClaimableBalance` object, which represents a ClawbackClaimableBalance operation on

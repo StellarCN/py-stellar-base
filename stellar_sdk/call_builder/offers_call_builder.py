@@ -1,13 +1,15 @@
 from typing import Union
 
 from ..asset import Asset
-from ..call_builder import BaseCallBuilder
+from ..call_builder.base_call_builder import BaseCallBuilder
 from ..client.base_async_client import BaseAsyncClient
 from ..client.base_sync_client import BaseSyncClient
 
+__all__ = ["OffersCallBuilder"]
+
 
 class OffersCallBuilder(BaseCallBuilder):
-    """ Creates a new :class:`OffersCallBuilder` pointed to server defined by horizon_url.
+    """Creates a new :class:`OffersCallBuilder` pointed to server defined by horizon_url.
     Do not create this object directly, use :func:`stellar_sdk.server.Server.offers`.
 
     See `Offer Details <https://www.stellar.org/developers/horizon/reference/endpoints/offer-details.html>`_

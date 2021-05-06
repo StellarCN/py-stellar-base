@@ -71,7 +71,9 @@ class SetOptions(Operation):
 
     """
 
-    _XDR_OPERATION_TYPE: stellar_xdr.OperationType = stellar_xdr.OperationType.SET_OPTIONS
+    _XDR_OPERATION_TYPE: stellar_xdr.OperationType = (
+        stellar_xdr.OperationType.SET_OPTIONS
+    )
 
     def __init__(
         self,

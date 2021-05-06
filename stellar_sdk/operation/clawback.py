@@ -8,6 +8,8 @@ from ..asset import Asset
 from ..keypair import Keypair
 from ..utils import parse_ed25519_account_id_from_muxed_account_xdr_object
 
+__all__ = ["Clawback"]
+
 
 class Clawback(Operation):
     """The :class:`Clawback` object, which represents a Clawback operation on

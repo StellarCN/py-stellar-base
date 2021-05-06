@@ -75,9 +75,7 @@ class TransactionEnvelope(BaseTransactionEnvelope["TransactionEnvelope"]):
             return stellar_xdr.TransactionEnvelope(type=te_type, v0=tx_v0_envelope)
 
     def to_transaction_envelope_v1(self) -> "TransactionEnvelope":
-        """Create a new :class:`TransactionEnvelope`, if the internal tx is not v1, we will convert it to v1.
-
-        """
+        """Create a new :class:`TransactionEnvelope`, if the internal tx is not v1, we will convert it to v1."""
         tx = copy.deepcopy(self.transaction)
         tx.v1 = True
         return TransactionEnvelope(tx, self.network_passphrase, self.signatures)

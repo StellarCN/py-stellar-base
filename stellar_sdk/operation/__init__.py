@@ -1,54 +1,23 @@
-from .account_merge import AccountMerge
-from .allow_trust import AllowTrust, TrustLineEntryFlag
-from .begin_sponsoring_future_reserves import BeginSponsoringFutureReserves
-from .bump_sequence import BumpSequence
-from .change_trust import ChangeTrust
-from .claim_claimable_balance import ClaimClaimableBalance
-from .clawback import Clawback
-from .clawback_claimable_balance import ClawbackClaimableBalance
-from .create_account import CreateAccount
-from .create_claimable_balance import CreateClaimableBalance, Claimant, ClaimPredicate
-from .create_passive_sell_offer import CreatePassiveSellOffer
-from .end_sponsoring_future_reserves import EndSponsoringFutureReserves
-from .inflation import Inflation
-from .manage_buy_offer import ManageBuyOffer
-from .manage_data import ManageData
-from .manage_sell_offer import ManageSellOffer
-from .operation import Operation
-from .path_payment_strict_receive import PathPaymentStrictReceive
-from .path_payment_strict_send import PathPaymentStrictSend
-from .payment import Payment
-from .revoke_sponsorship import RevokeSponsorship
-from .set_options import SetOptions, AuthorizationFlag
-from .set_trust_line_flags import SetTrustLineFlags, TrustLineFlags
-
-__all__ = [
-    "Operation",
-    "AccountMerge",
-    "AllowTrust",
-    "BumpSequence",
-    "ChangeTrust",
-    "ClaimClaimableBalance",
-    "Clawback",
-    "ClawbackClaimableBalance",
-    "CreateAccount",
-    "CreateClaimableBalance",
-    "Claimant",
-    "ClaimPredicate",
-    "CreatePassiveSellOffer",
-    "Inflation",
-    "ManageBuyOffer",
-    "ManageData",
-    "ManageSellOffer",
-    "PathPaymentStrictReceive",
-    "PathPaymentStrictSend",
-    "Payment",
-    "SetOptions",
-    "BeginSponsoringFutureReserves",
-    "EndSponsoringFutureReserves",
-    "RevokeSponsorship",
-    "TrustLineEntryFlag",
-    "AuthorizationFlag",
-    "SetTrustLineFlags",
-    "TrustLineFlags",
-]
+from .account_merge import *
+from .allow_trust import *
+from .begin_sponsoring_future_reserves import *
+from .bump_sequence import *
+from .change_trust import *
+from .claim_claimable_balance import *
+from .clawback import *
+from .clawback_claimable_balance import *
+from .create_account import *
+from .create_claimable_balance import *
+from .create_passive_sell_offer import *
+from .end_sponsoring_future_reserves import *
+from .inflation import *
+from .manage_buy_offer import *
+from .manage_data import *
+from .manage_sell_offer import *
+from .operation import *
+from .path_payment_strict_receive import *
+from .path_payment_strict_send import *
+from .payment import *
+from .revoke_sponsorship import *
+from .set_options import *
+from .set_trust_line_flags import *

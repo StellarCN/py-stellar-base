@@ -6,9 +6,11 @@ from ..client.base_async_client import BaseAsyncClient
 from ..client.base_sync_client import BaseSyncClient
 from ..utils import convert_assets_to_horizon_param
 
+__all__ = ["AccountsCallBuilder"]
+
 
 class AccountsCallBuilder(BaseCallBuilder):
-    """ Creates a new :class:`AccountsCallBuilder` pointed to server defined by horizon_url.
+    """Creates a new :class:`AccountsCallBuilder` pointed to server defined by horizon_url.
     Do not create this object directly, use :func:`stellar_sdk.server.Server.accounts`.
 
     :param horizon_url: Horizon server URL.

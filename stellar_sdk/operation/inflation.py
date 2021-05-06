@@ -1,6 +1,8 @@
 from .operation import Operation
 from .. import xdr as stellar_xdr
 
+__all__ = ["Inflation"]
+
 
 class Inflation(Operation):
     """The :class:`Inflation` object, which represents a

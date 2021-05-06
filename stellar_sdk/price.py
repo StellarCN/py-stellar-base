@@ -10,8 +10,8 @@ __all__ = ["Price"]
 class Price:
     """Create a new price. Price in Stellar is represented as a fraction.
 
-      :param n: numerator
-      :param d: denominator
+    :param n: numerator
+    :param d: denominator
     """
 
     def __init__(self, n: int, d: int) -> None:

@@ -4,9 +4,11 @@ from ..call_builder.base_call_builder import BaseCallBuilder
 from ..client.base_async_client import BaseAsyncClient
 from ..client.base_sync_client import BaseSyncClient
 
+__all__ = ["OperationsCallBuilder"]
+
 
 class OperationsCallBuilder(BaseCallBuilder):
-    """ Creates a new :class:`OperationsCallBuilder` pointed to server defined by horizon_url.
+    """Creates a new :class:`OperationsCallBuilder` pointed to server defined by horizon_url.
     Do not create this object directly, use :func:`stellar_sdk.server.Server.operations`.
 
     See `All Operations <https://www.stellar.org/developers/horizon/reference/endpoints/operations-all.html>`_

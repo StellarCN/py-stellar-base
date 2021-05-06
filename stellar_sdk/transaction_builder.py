@@ -112,7 +112,8 @@ class TransactionBuilder:
             inner_transaction_envelope=inner_transaction_envelope,
         )
         transaction_envelope = FeeBumpTransactionEnvelope(
-            transaction=fee_bump_transaction, network_passphrase=network_passphrase,
+            transaction=fee_bump_transaction,
+            network_passphrase=network_passphrase,
         )
         return transaction_envelope
 
@@ -549,7 +550,10 @@ class TransactionBuilder:
         return self.append_set_options_op(signer=signer, source=source)
 
     def append_hashx_signer(
-        self, sha256_hash: Union[bytes, str], weight: int, source: str = None,
+        self,
+        sha256_hash: Union[bytes, str],
+        weight: int,
+        source: str = None,
     ) -> "TransactionBuilder":
         """Add a sha256 hash(HashX) signer to an account.
 
@@ -718,7 +722,9 @@ class TransactionBuilder:
         return self.append_operation(op)
 
     def append_account_merge_op(
-        self, destination: str, source: str = None,
+        self,
+        destination: str,
+        source: str = None,
     ) -> "TransactionBuilder":
         """Append a :class:`AccountMerge
         <stellar_sdk.operation.AccountMerge>` operation to the list of
@@ -748,7 +754,10 @@ class TransactionBuilder:
         return self.append_operation(op)
 
     def append_manage_data_op(
-        self, data_name: str, data_value: Union[str, bytes, None], source: str = None,
+        self,
+        data_name: str,
+        data_value: Union[str, bytes, None],
+        source: str = None,
     ) -> "TransactionBuilder":
         """Append a :class:`ManageData <stellar_sdk.operation.ManageData>`
         operation to the list of operations.

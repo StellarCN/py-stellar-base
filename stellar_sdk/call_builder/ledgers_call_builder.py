@@ -4,9 +4,11 @@ from ..call_builder.base_call_builder import BaseCallBuilder
 from ..client.base_async_client import BaseAsyncClient
 from ..client.base_sync_client import BaseSyncClient
 
+__all__ = ["LedgersCallBuilder"]
+
 
 class LedgersCallBuilder(BaseCallBuilder):
-    """ Creates a new :class:`LedgersCallBuilder` pointed to server defined by horizon_url.
+    """Creates a new :class:`LedgersCallBuilder` pointed to server defined by horizon_url.
     Do not create this object directly, use :func:`stellar_sdk.server.Server.ledgers`.
 
     See `All Ledgers <https://www.stellar.org/developers/horizon/reference/endpoints/ledgers-all.html>`_

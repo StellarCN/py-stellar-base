@@ -7,6 +7,8 @@ from .. import xdr as stellar_xdr
 from ..asset import Asset
 from ..price import Price
 
+__all__ = ["ManageBuyOffer"]
+
 
 class ManageBuyOffer(Operation):
     """The :class:`ManageBuyOffer` object, which represents a ManageBuyOffer
@@ -33,7 +35,9 @@ class ManageBuyOffer(Operation):
 
     """
 
-    _XDR_OPERATION_TYPE: stellar_xdr.OperationType = stellar_xdr.OperationType.MANAGE_BUY_OFFER
+    _XDR_OPERATION_TYPE: stellar_xdr.OperationType = (
+        stellar_xdr.OperationType.MANAGE_BUY_OFFER
+    )
 
     def __init__(
         self,
@@ -75,9 +79,7 @@ class ManageBuyOffer(Operation):
 
     @classmethod
     def from_xdr_object(cls, xdr_object: stellar_xdr.Operation) -> "ManageBuyOffer":
-        """Creates a :class:`ManageBuyOffer` object from an XDR Operation object.
-
-        """
+        """Creates a :class:`ManageBuyOffer` object from an XDR Operation object."""
         source = Operation.get_source_from_xdr_obj(xdr_object)
         assert xdr_object.body.manage_buy_offer_op is not None
         selling = Asset.from_xdr_object(xdr_object.body.manage_buy_offer_op.selling)

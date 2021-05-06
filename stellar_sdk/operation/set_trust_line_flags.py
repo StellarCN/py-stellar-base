@@ -7,6 +7,8 @@ from ..keypair import Keypair
 from ..strkey import StrKey
 from .. import xdr as stellar_xdr
 
+__all__ = ["TrustLineFlags", "SetTrustLineFlags"]
+
 
 class TrustLineFlags(IntFlag):
     """Indicates which flags to set. For details about the flags,
