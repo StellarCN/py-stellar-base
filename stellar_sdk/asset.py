@@ -87,13 +87,13 @@ class Asset:
             rv["issuer"] = self.issuer
         return rv
 
-    @staticmethod
-    def native() -> "Asset":
+    @classmethod
+    def native(cls) -> "Asset":
         """Returns an asset object for the native asset.
 
         :return: An asset object for the native asset.
         """
-        return Asset("XLM")
+        return cls("XLM")
 
     def is_native(self) -> bool:
         """Return true if the :class:`Asset` is the native asset.
