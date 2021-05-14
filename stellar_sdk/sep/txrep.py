@@ -79,7 +79,7 @@ def to_txrep(
         assert isinstance(fee_bump_transaction, FeeBumpTransaction)
         assert isinstance(transaction, Transaction)
         _add_line(
-            "feeBump.tx.feeSource", fee_bump_transaction.fee_source.public_key, lines
+            "feeBump.tx.feeSource", fee_bump_transaction.fee_source, lines
         )
         _add_line(
             "feeBump.tx.fee",
@@ -90,7 +90,7 @@ def to_txrep(
             "feeBump.tx.innerTx.type", _EnvelopeType.ENVELOPE_TYPE_TX.value, lines
         )
     assert isinstance(transaction, Transaction)
-    _add_line(f"{prefix}sourceAccount", transaction.source.public_key, lines)
+    _add_line(f"{prefix}sourceAccount", transaction.source, lines)
     _add_line(f"{prefix}fee", transaction.fee, lines)
     _add_line(f"{prefix}seqNum", transaction.sequence, lines)
     _add_time_bounds(transaction.time_bounds, prefix, lines)
