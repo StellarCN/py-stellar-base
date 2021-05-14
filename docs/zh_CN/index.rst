@@ -8,33 +8,45 @@
 Stellar Python SDK
 ==================
 
-.. image:: https://img.shields.io/travis/StellarCN/py-stellar-base/v2?style=flat-square&maxAge=1800
-    :alt: Travis (.org)
-    :target: https://travis-ci.org/StellarCN/py-stellar-base/
+.. image:: https://img.shields.io/github/workflow/status/StellarCN/py-stellar-base/GitHub%20Action/master?style=flat-square&maxAge=1800
+    :alt: GitHub Action
+    :target: https://github.com/StellarCN/py-stellar-base/actions
 
 .. image:: https://img.shields.io/readthedocs/stellar-sdk.svg?style=flat-square&maxAge=1800
     :alt: Read the Docs
     :target: https://stellar-sdk.readthedocs.io/en/latest/
 
-.. image:: https://img.shields.io/codecov/c/github/StellarCN/py-stellar-base/v2?style=flat-square&maxAge=1800
-    :alt: Codecov
-    :target: https://codecov.io/gh/StellarCN/py-stellar-base
+.. image:: https://img.shields.io/pypi/dm/stellar-sdk?style=flat-square
+    :alt: PyPI - Downloads
+    :target: https://pypi.python.org/pypi/stellar-sdk
 
 .. image:: https://img.shields.io/codeclimate/maintainability/StellarCN/py-stellar-base?style=flat-square&maxAge=1800
     :alt: Code Climate maintainability
     :target: https://codeclimate.com/github/StellarCN/py-stellar-base/maintainability
 
+.. image:: https://img.shields.io/codecov/c/github/StellarCN/py-stellar-base/v2?style=flat-square&maxAge=1800
+    :alt: Codecov
+    :target: https://codecov.io/gh/StellarCN/py-stellar-base
+
 .. image:: https://img.shields.io/pypi/v/stellar-sdk.svg?style=flat-square&maxAge=1800
     :alt: PyPI
     :target: https://pypi.python.org/pypi/stellar-sdk
 
-.. image:: https://img.shields.io/badge/python-3.6%20%7C%203.7%20%7C%203.8-blue?style=flat-square
+.. image:: https://img.shields.io/badge/python-3.6%20%7C%203.7%20%7C%203.8%20%7C%203.9-blue?style=flat-square
     :alt: Python - Version
     :target: https://pypi.python.org/pypi/stellar-sdk
 
 .. image:: https://img.shields.io/badge/implementation-cpython%20%7C%20pypy-blue?style=flat-square
     :alt: PyPI - Implementation
     :target: https://pypi.python.org/pypi/stellar-sdk
+
+.. image:: https://img.shields.io/badge/Stellar%20Protocol-17-blue?style=flat-square
+    :alt: Stellar Protocol
+    :target: https://www.stellar.org/developers/guides/concepts/scp.html
+
+.. image:: https://img.shields.io/badge/Horizon%20Version-2.1.0-blue?style=flat-square
+    :alt: Horizon Version
+    :target: https://github.com/stellar/go/releases/tag/horizon-v2.1.0
 
 py-stellar-sdk 是用于开发 Stellar 应用程序的 Python 库。它目前支持 Python 3.6+ 和 PyPy3.6+。
 
