@@ -1,6 +1,12 @@
 Release History
 ==============
 
+### Version 3.3.3
+Released on May 15, 2021
+
+#### Update
+* fix: correct the type of `stellar_sdk.xdr.SponsorshipDescriptor.sponsorship_descriptor` from `AccountID` to `Optional[AccountID]`. ([#478](https://github.com/StellarCN/py-stellar-base/pull/478))
+
 ### Version 3.3.2
 Released on May 06, 2021
 
