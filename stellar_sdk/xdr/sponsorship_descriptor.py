@@ -1,6 +1,7 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
 import base64
+from typing import Optional
 from xdrlib import Packer, Unpacker
 
 from .account_id import AccountID
@@ -16,15 +17,21 @@ class SponsorshipDescriptor:
     ----------------------------------------------------------------
     """
 
-    def __init__(self, sponsorship_descriptor: AccountID) -> None:
+    def __init__(self, sponsorship_descriptor: Optional[AccountID]) -> None:
         self.sponsorship_descriptor = sponsorship_descriptor
 
     def pack(self, packer: Packer) -> None:
-        self.sponsorship_descriptor.pack(packer)
+        if self.sponsorship_descriptor is None:
+            packer.pack_uint(0)
+        else:
+            packer.pack_uint(1)
+            self.sponsorship_descriptor.pack(packer)
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "SponsorshipDescriptor":
-        sponsorship_descriptor = AccountID.unpack(unpacker)
+        sponsorship_descriptor = (
+            AccountID.unpack(unpacker) if unpacker.unpack_uint() else None
+        )
         return cls(sponsorship_descriptor)
 
     def to_xdr_bytes(self) -> bytes:
