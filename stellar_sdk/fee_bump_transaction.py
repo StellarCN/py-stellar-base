@@ -53,8 +53,8 @@ class FeeBumpTransaction:
             )
 
     @property
-    def fee_source(self) -> Keypair:
-        return self._fee_source
+    def fee_source(self) -> str:
+        return self._fee_source.public_key
 
     @fee_source.setter
     def fee_source(self, value: Union[Keypair, str]):

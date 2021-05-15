@@ -63,7 +63,7 @@ class TestStellarWebAuthentication:
             transaction.time_bounds.max_time - transaction.time_bounds.min_time
             == timeout
         )
-        assert transaction.source.public_key == server_kp.public_key
+        assert transaction.source == server_kp.public_key
         assert transaction.sequence == 0
 
     def test_challenge_transaction_with_client_domain(self):
@@ -116,7 +116,7 @@ class TestStellarWebAuthentication:
             transaction.time_bounds.max_time - transaction.time_bounds.min_time
             == timeout
         )
-        assert transaction.source.public_key == server_kp.public_key
+        assert transaction.source == server_kp.public_key
         assert transaction.sequence == 0
 
     def test_challenge_transaction_with_client_domain_fails_without_client_signing_key(self):

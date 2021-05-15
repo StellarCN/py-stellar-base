@@ -77,8 +77,8 @@ class Transaction:
         self.v1 = v1
 
     @property
-    def source(self) -> Keypair:
-        return self._source
+    def source(self) -> str:
+        return self._source.public_key
 
     @source.setter
     def source(self, value: Union[Keypair, str]):
@@ -107,7 +107,7 @@ class Transaction:
             if self._source_muxed is not None:
                 source_xdr = self._source_muxed
             else:
-                source_xdr = self.source.xdr_muxed_account()
+                source_xdr = self._source.xdr_muxed_account()
             ext = stellar_xdr.TransactionExt(0)
             return stellar_xdr.Transaction(
                 source_xdr,
@@ -118,7 +118,7 @@ class Transaction:
                 operations,
                 ext,
             )
-        source_xdr_v0 = self.source.xdr_public_key().ed25519
+        source_xdr_v0 = self._source.xdr_public_key().ed25519
         assert source_xdr_v0 is not None
         ext_v0 = stellar_xdr.TransactionV0Ext(0)
         return stellar_xdr.TransactionV0(
