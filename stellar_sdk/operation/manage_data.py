@@ -1,8 +1,10 @@
+from typing import Optional
 from typing import Union
 
 from .operation import Operation
 from .. import xdr as stellar_xdr
 from ..exceptions import ValueError
+from ..muxed_account import MuxedAccount
 
 __all__ = ["ManageData"]
 
@@ -35,7 +37,7 @@ class ManageData(Operation):
         self,
         data_name: str,
         data_value: Union[str, bytes, None],
-        source: str = None,
+        source: Optional[Union[MuxedAccount, str]] = None,
     ) -> None:  # TODO: bytes only?
         super().__init__(source)
         self.data_name: str = data_name
@@ -77,7 +79,6 @@ class ManageData(Operation):
         data_value = None if data_value_xdr is None else data_value_xdr.data_value
 
         op = cls(data_name=data_name, data_value=data_value, source=source)
-        op._source_muxed = Operation.get_source_muxed_from_xdr_obj(xdr_object)
         return op
 
     def __str__(self):

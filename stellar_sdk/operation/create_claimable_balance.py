@@ -1,6 +1,7 @@
 from decimal import Decimal
 from enum import IntEnum
-from typing import Union, List, Optional
+from typing import Optional
+from typing import Union, List
 
 from .operation import Operation
 from .utils import check_amount
@@ -8,6 +9,7 @@ from .. import xdr as stellar_xdr
 from ..asset import Asset
 from ..exceptions import ValueError
 from ..keypair import Keypair
+from ..muxed_account import MuxedAccount
 from ..strkey import StrKey
 
 __all__ = ["ClaimPredicate", "Claimant", "CreateClaimableBalance"]
@@ -379,7 +381,7 @@ class CreateClaimableBalance(Operation):
         asset: Asset,
         amount: Union[str, Decimal],
         claimants: List[Claimant],
-        source: str = None,
+        source: Optional[Union[MuxedAccount, str]] = None,
     ) -> None:
         super().__init__(source)
         check_amount(amount)
@@ -417,7 +419,6 @@ class CreateClaimableBalance(Operation):
         for claimant_xdr_obj in xdr_object.body.create_claimable_balance_op.claimants:
             claimants.append(Claimant.from_xdr_object(claimant_xdr_obj))
         op = cls(asset=asset, amount=amount, claimants=claimants, source=source)
-        op._source_muxed = Operation.get_source_muxed_from_xdr_obj(xdr_object)
         return op
 
     def __str__(self):

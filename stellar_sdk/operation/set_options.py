@@ -1,10 +1,12 @@
 from enum import IntFlag
-from typing import Optional, Union
+from typing import Optional
+from typing import Union
 
 from .operation import Operation
 from .utils import check_ed25519_public_key
 from .. import xdr as stellar_xdr
 from ..keypair import Keypair
+from ..muxed_account import MuxedAccount
 from ..signer import Signer
 from ..strkey import StrKey
 
@@ -86,7 +88,7 @@ class SetOptions(Operation):
         high_threshold: int = None,
         signer: Signer = None,
         home_domain: str = None,
-        source: str = None,
+        source: Optional[Union[MuxedAccount, str]] = None,
     ) -> None:
         super().__init__(source)
         if inflation_dest is not None:
@@ -216,7 +218,6 @@ class SetOptions(Operation):
             signer=signer,
             source=source,
         )
-        op._source_muxed = Operation.get_source_muxed_from_xdr_obj(xdr_object)
         return op
 
     def __str__(self):

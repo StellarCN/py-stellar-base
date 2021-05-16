@@ -2,10 +2,8 @@ from abc import ABCMeta, abstractmethod
 from decimal import Decimal
 from typing import Optional, Union
 
-from .utils import check_source
 from .. import xdr as stellar_xdr
-from ..keypair import Keypair
-from ..utils import parse_ed25519_account_id_from_muxed_account_xdr_object
+from ..muxed_account import MuxedAccount
 from ..xdr import utils as xdr_utils
 
 __all__ = ["Operation"]
@@ -38,25 +36,15 @@ class Operation(metaclass=ABCMeta):
 
     """
 
-    def __init__(self, source: str = None) -> None:
-        check_source(source)
-        self._source: Optional[str] = source
-        self._source_muxed: Optional[stellar_xdr.MuxedAccount] = None
+    def __init__(self, source: Optional[Union[MuxedAccount, str]] = None) -> None:
+        if isinstance(source, str):
+            source = MuxedAccount.from_account(source)
+        self.source: Optional[MuxedAccount] = source
 
     @property
     @abstractmethod
     def _XDR_OPERATION_TYPE(self) -> stellar_xdr.OperationType:
         pass  # pragma: no cover
-
-    @property
-    def source(self) -> Optional[str]:
-        return self._source
-
-    @source.setter
-    def source(self, value: str):
-        check_source(value)
-        self._source_muxed = None
-        self._source = value
 
     @staticmethod
     def to_xdr_amount(value: Union[str, Decimal]) -> int:
@@ -104,10 +92,8 @@ class Operation(metaclass=ABCMeta):
 
         """
         source_account = None
-        if self._source is not None:
-            source_account = Keypair.from_public_key(self._source).xdr_muxed_account()
-        if self._source_muxed is not None:
-            source_account = self._source_muxed
+        if self.source:
+            source_account = self.source.to_xdr_object()
         return stellar_xdr.Operation(source_account, self._to_operation_body())
 
     @classmethod
@@ -128,29 +114,27 @@ class Operation(metaclass=ABCMeta):
     @staticmethod
     def get_source_from_xdr_obj(
         xdr_object: stellar_xdr.Operation,
-    ) -> Optional[str]:
+    ) -> Optional[MuxedAccount]:
         """Get the source account from account the operation xdr object.
 
         :param xdr_object: the operation xdr object.
         :return: The source account from account the operation xdr object.
         """
         if xdr_object.source_account:
-            return parse_ed25519_account_id_from_muxed_account_xdr_object(
-                xdr_object.source_account
-            )
+            return MuxedAccount.from_xdr_object(xdr_object.source_account)
         return None
 
     @staticmethod
     def get_source_muxed_from_xdr_obj(
         xdr_object: stellar_xdr.Operation,
-    ) -> Optional[stellar_xdr.MuxedAccount]:
+    ) -> Optional[MuxedAccount]:
         """Get the source account from account the operation xdr object.
 
         :param xdr_object: the operation xdr object.
         :return: The source account from account the operation xdr object.
         """
         if xdr_object.source_account:
-            return xdr_object.source_account
+            return MuxedAccount.from_xdr_object(xdr_object.source_account)
         return None
 
     def __eq__(self, other: object) -> bool:

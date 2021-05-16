@@ -3,6 +3,7 @@ from typing import Optional
 from . import xdr as stellar_xdr
 from .exceptions import ValueError
 from .strkey import StrKey
+from .keypair import Keypair
 
 __all__ = ["MuxedAccount"]
 
@@ -19,6 +20,7 @@ class MuxedAccount:
 
     def __init__(self, account_id: str, account_id_id: int = None) -> None:
         # TODO: check valid
+        Keypair.from_public_key(account_id)
         self.account_id: str = account_id
         self.account_id_id: Optional[int] = account_id_id
 

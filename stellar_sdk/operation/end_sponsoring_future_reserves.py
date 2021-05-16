@@ -1,5 +1,8 @@
+from typing import Optional, Union
+
 from .operation import Operation
 from .. import xdr as stellar_xdr
+from ..muxed_account import MuxedAccount
 
 __all__ = ["EndSponsoringFutureReserves"]
 
@@ -23,7 +26,7 @@ class EndSponsoringFutureReserves(Operation):
         stellar_xdr.OperationType.END_SPONSORING_FUTURE_RESERVES
     )
 
-    def __init__(self, source: str = None) -> None:
+    def __init__(self, source: Optional[Union[MuxedAccount, str]] = None) -> None:
         super().__init__(source)
 
     def _to_operation_body(self) -> stellar_xdr.OperationBody:
@@ -39,7 +42,6 @@ class EndSponsoringFutureReserves(Operation):
         """
         source = Operation.get_source_from_xdr_obj(xdr_object)
         op = cls(source=source)
-        op._source_muxed = Operation.get_source_muxed_from_xdr_obj(xdr_object)
         return op
 
     def __str__(self):

@@ -1,5 +1,8 @@
+from typing import Optional, Union
+
 from .operation import Operation
 from .. import xdr as stellar_xdr
+from ..muxed_account import MuxedAccount
 
 __all__ = ["Inflation"]
 
@@ -18,7 +21,7 @@ class Inflation(Operation):
 
     _XDR_OPERATION_TYPE: stellar_xdr.OperationType = stellar_xdr.OperationType.INFLATION
 
-    def __init__(self, source: str = None) -> None:
+    def __init__(self, source: Optional[Union[MuxedAccount, str]] = None) -> None:
         super().__init__(source)
 
     def _to_operation_body(self) -> stellar_xdr.OperationBody:
@@ -33,7 +36,6 @@ class Inflation(Operation):
         """
         source = Operation.get_source_from_xdr_obj(xdr_object)
         op = cls(source)
-        op._source_muxed = Operation.get_source_muxed_from_xdr_obj(xdr_object)
         return op
 
     def __str__(self):
