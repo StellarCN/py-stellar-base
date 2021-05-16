@@ -1,7 +1,7 @@
-from typing import Optional, List
+from typing import Optional, List, Union
 
 from .sep.ed25519_public_key_signer import Ed25519PublicKeySigner
-from .strkey import StrKey
+from .muxed_account import MuxedAccount
 
 __all__ = ["Account"]
 
@@ -27,12 +27,14 @@ class Account:
         https://stellar.org/developers/learn/concepts/accounts.html
     """
 
-    def __init__(self, account_id: str, sequence: int) -> None:
-        StrKey.decode_ed25519_public_key(account_id)
-        self.account_id: str = account_id
-        self.sequence = sequence
+    # TODO: rename account_id -> account?
+    def __init__(self, account_id: Union[str, MuxedAccount], sequence: int) -> None:
+        if isinstance(account_id, str):
+            account_id = MuxedAccount.from_account(account_id)
+        self.account_id: MuxedAccount = account_id
+        self.sequence: int = sequence
 
-        # The following properties will change in 3.0
+        # The following properties will change in future
         self.signers: List[dict] = []
         self.thresholds: Optional[Thresholds] = None
 
