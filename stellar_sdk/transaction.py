@@ -7,7 +7,6 @@ from .memo import NoneMemo, Memo
 from .operation.operation import Operation
 from .strkey import StrKey
 from .time_bounds import TimeBounds
-from .utils import parse_ed25519_account_id_from_muxed_account_xdr_object
 
 __all__ = ["Transaction"]
 

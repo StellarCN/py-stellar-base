@@ -1,11 +1,11 @@
-from typing import Union, Optional
+from typing import Union
 
 from . import xdr as stellar_xdr
 from .exceptions import ValueError
 from .keypair import Keypair
 from .transaction import Transaction
 from .transaction_envelope import TransactionEnvelope
-from .utils import parse_ed25519_account_id_from_muxed_account_xdr_object
+from .muxed_account import MuxedAccount
 
 BASE_FEE = 100
 
@@ -25,7 +25,7 @@ class FeeBumpTransaction:
 
     def __init__(
         self,
-        fee_source: Union[Keypair, str],
+        fee_source: Union[MuxedAccount, Keypair, str],
         base_fee: int,
         inner_transaction_envelope: TransactionEnvelope,
     ) -> None:
@@ -35,10 +35,11 @@ class FeeBumpTransaction:
             )
 
         if isinstance(fee_source, str):
-            fee_source = Keypair.from_public_key(fee_source)
+            fee_source = MuxedAccount.from_account(fee_source)
+        if isinstance(fee_source, Keypair):
+            fee_source = MuxedAccount.from_account(fee_source.public_key)
 
-        self._fee_source: Keypair = fee_source
-        self._fee_source_muxed: Optional[stellar_xdr.MuxedAccount] = None
+        self.fee_source: MuxedAccount = fee_source
         self.base_fee = base_fee
         self.inner_transaction_envelope = (
             inner_transaction_envelope.to_transaction_envelope_v1()
@@ -52,27 +53,13 @@ class FeeBumpTransaction:
                 f"Invalid `base_fee`, it should be at least {self._inner_transaction.fee if self._inner_transaction.fee > BASE_FEE else BASE_FEE} stroops."
             )
 
-    @property
-    def fee_source(self) -> str:
-        return self._fee_source.public_key
-
-    @fee_source.setter
-    def fee_source(self, value: Union[Keypair, str]):
-        if isinstance(value, str):
-            value = Keypair.from_public_key(value)
-
-        self._fee_source = value
-        self._fee_source_muxed = None
-
     def to_xdr_object(self) -> stellar_xdr.FeeBumpTransaction:
         """Get an XDR object representation of this :class:`FeeBumpTransaction`.
 
         :return: XDR Transaction object
         """
-        if self._fee_source_muxed is not None:
-            fee_source = self._fee_source_muxed
-        else:
-            fee_source = self._fee_source.xdr_muxed_account()
+
+        fee_source = self.fee_source.to_xdr_object()
         fee = self.base_fee * (len(self._inner_transaction.operations) + 1)
         ext = stellar_xdr.FeeBumpTransactionExt(0)
         inner_tx = stellar_xdr.FeeBumpTransactionInnerTx(
@@ -97,9 +84,7 @@ class FeeBumpTransaction:
 
         :return: A new :class:`FeeBumpTransaction` object from the given XDR Transaction object.
         """
-        source = parse_ed25519_account_id_from_muxed_account_xdr_object(
-            xdr_object.fee_source
-        )
+        source = MuxedAccount.from_xdr_object(xdr_object.fee_source)
         te = stellar_xdr.TransactionEnvelope(
             type=stellar_xdr.EnvelopeType.ENVELOPE_TYPE_TX, v1=xdr_object.inner_tx.v1
         )
@@ -115,7 +100,6 @@ class FeeBumpTransaction:
             base_fee=base_fee,
             inner_transaction_envelope=inner_transaction_envelope,
         )
-        tx._fee_source_muxed = xdr_object.fee_source
         return tx
 
     @classmethod
