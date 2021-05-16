@@ -16,6 +16,7 @@ __all__ = [
     "Ed25519PublicKeyInvalidError",
     "Ed25519SecretSeedInvalidError",
     "MissingEd25519SecretSeedError",
+    "MuxedEd25519AccountInvalidError",
     "MemoInvalidException",
     "AssetCodeInvalidError",
     "AssetIssuerInvalidError",
@@ -64,6 +65,8 @@ class Ed25519SecretSeedInvalidError(ValueError):
 class MissingEd25519SecretSeedError(ValueError):
     """Missing Ed25519 secret seed in the keypair"""
 
+class MuxedEd25519AccountInvalidError(ValueError):
+    """Muxed Ed25519 public key is incorrect."""
 
 class MemoInvalidException(ValueError):
     """Memo is incorrect."""

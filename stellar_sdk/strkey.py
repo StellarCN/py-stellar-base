@@ -2,6 +2,7 @@ import base64
 import binascii
 import struct
 from typing import Union
+from xdrlib import Packer, Unpacker
 
 from crc16 import crc16xmodem
 
@@ -10,7 +11,9 @@ from .exceptions import (
     Ed25519PublicKeyInvalidError,
     ValueError,
     TypeError,
+    MuxedEd25519AccountInvalidError,
 )
+from . import xdr as stellar_xdr
 
 __all__ = ["StrKey"]
 
@@ -19,6 +22,7 @@ _version_bytes = {
     "ed25519_secret_seed": binascii.a2b_hex("90"),  # S 144 18 << 3
     "pre_auth_tx": binascii.a2b_hex("98"),  # T 152 19 << 3
     "sha256_hash": binascii.a2b_hex("b8"),  # X 184 23 << 3
+    "muxed_account": binascii.a2b_hex("60"),  # M 96 12 << 3
 }
 
 
@@ -148,6 +152,61 @@ class StrKey:
         """
         return decode_check("sha256_hash", data)
 
+    @staticmethod
+    def encode_muxed_account(data: stellar_xdr.MuxedAccount) -> str:
+        """Encodes data to strkey muxed account.
+
+        :param data: data to encode
+        :return: strkey muxed account
+        :raises:
+            :exc:`ValueError <stellar_sdk.exceptions.ValueError>`
+            :exc:`TypeError <stellar_sdk.exceptions.TypeError>`
+        """
+        if data.type == stellar_xdr.CryptoKeyType.KEY_TYPE_ED25519:
+            return StrKey.encode_ed25519_public_key(data.ed25519.uint256)
+
+        packer = Packer()
+        data.med25519.id.pack(packer)
+        data.med25519.ed25519.pack(packer)
+        return encode_check("muxed_account", packer.get_buffer())
+
+    @staticmethod
+    def decode_muxed_account(data: str) -> stellar_xdr.MuxedAccount:
+        """Decodes strkey muxed account to raw data.
+
+        :param data: strkey muxed account
+        :return: raw bytes
+        :raises:
+            :exc:`ValueError <stellar_sdk.exceptions.ValueError>`
+            :exc:`TypeError <stellar_sdk.exceptions.TypeError>`
+        """
+        data_length = len(data)
+        if data_length == 56:
+            muxed = stellar_xdr.MuxedAccount(
+                type=stellar_xdr.CryptoKeyType.KEY_TYPE_ED25519,
+                ed25519=stellar_xdr.Uint256(StrKey.decode_ed25519_public_key(data)),
+            )
+        elif data_length == 69:
+            # let's optimize it in v3.
+            try:
+                xdr_bytes = decode_check("muxed_account", data)
+            except Exception:
+                raise MuxedEd25519AccountInvalidError(
+                    "Invalid Muxed Account: {}".format(data)
+                )
+
+            unpacker = Unpacker(xdr_bytes)
+            med25519 = stellar_xdr.MuxedAccountMed25519(
+                id=stellar_xdr.Uint64.unpack(unpacker),
+                ed25519=stellar_xdr.Uint256.unpack(unpacker),
+            )
+            muxed = stellar_xdr.MuxedAccount(
+                type=stellar_xdr.CryptoKeyType.KEY_TYPE_MUXED_ED25519, med25519=med25519
+            )
+        else:
+            raise ValueError("Invalid encoded string, this is not a valid account.")
+        return muxed
+
 
 def decode_check(version_byte_name: str, encoded: str) -> bytes:
     encoded_data = _bytes_from_decode_data(encoded)
@@ -170,7 +229,7 @@ def decode_check(version_byte_name: str, encoded: str) -> bytes:
     if expected_version is None:
         raise TypeError(
             f'{version_byte_name} is not a valid version byte name. expected one of "ed25519_public_key", '
-            '"ed25519_secret_seed", "pre_auth_tx", "sha256_hash"'
+            '"ed25519_secret_seed", "pre_auth_tx", "sha256_hash", "muxed_account"'
         )
 
     if version_byte != expected_version:
@@ -193,7 +252,7 @@ def encode_check(version_byte_name: str, data: bytes) -> str:
     if version_byte is None:
         raise TypeError(
             f'{version_byte_name} is not a valid version byte name. expected one of "ed25519_public_key", '
-            '"ed25519_secret_seed", "pre_auth_tx", "sha256_hash"'
+            '"ed25519_secret_seed", "pre_auth_tx", "sha256_hash", "muxed_account"'
         )
     payload = version_byte + data
     crc = _calculate_checksum(payload)
