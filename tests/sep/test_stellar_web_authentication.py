@@ -4,7 +4,7 @@ import time
 
 import pytest
 
-from stellar_sdk import Keypair, Network, Account
+from stellar_sdk import Keypair, Network, Account, MuxedAccount
 from stellar_sdk.exceptions import ValueError
 from stellar_sdk.operation import ManageData
 from stellar_sdk.sep.ed25519_public_key_signer import Ed25519PublicKeySigner
@@ -49,13 +49,13 @@ class TestStellarWebAuthentication:
         assert op0.data_name == f"{home_domain} auth"
         assert len(op0.data_value) == 64
         assert len(base64.b64decode(op0.data_value)) == 48
-        assert op0.source == client_account_id
+        assert op0.source == MuxedAccount.from_account(client_account_id)
 
         op1 = transaction.operations[1]
         assert isinstance(op1, ManageData)
         assert op1.data_name == "web_auth_domain"
         assert op1.data_value.decode() == web_auth_domain
-        assert op1.source == server_kp.public_key
+        assert op1.source == MuxedAccount.from_account(server_kp.public_key)
 
         now = int(time.time())
         assert now - 3 < transaction.time_bounds.min_time < now + 3
@@ -63,8 +63,30 @@ class TestStellarWebAuthentication:
             transaction.time_bounds.max_time - transaction.time_bounds.min_time
             == timeout
         )
-        assert transaction.source == server_kp.public_key
+        assert transaction.source == MuxedAccount.from_account(server_kp.public_key)
         assert transaction.sequence == 0
+
+    def test_challenge_transaction_mux_client_account_id_raise(self):
+        server_kp = Keypair.random()
+        client_account_id = (
+            "MAAAAAAAAAAAJURAAB2X52XFQP6FBXLGT6LWOOWMEXWHEWBDVRZ7V5WH34Y22MPFBHUHY"
+        )
+        timeout = 600
+        network_passphrase = Network.TESTNET_NETWORK_PASSPHRASE
+        home_domain = "example.com"
+        web_auth_domain = "auth.example.com"
+        with pytest.raises(
+            ValueError,
+            match="Invalid client_account_id, multiplexed account are not supported.",
+        ):
+            build_challenge_transaction(
+                server_secret=server_kp.secret,
+                client_account_id=client_account_id,
+                home_domain=home_domain,
+                web_auth_domain=web_auth_domain,
+                network_passphrase=network_passphrase,
+                timeout=timeout,
+            )
 
     def test_challenge_transaction_with_client_domain(self):
         server_kp = Keypair.random()
@@ -84,7 +106,7 @@ class TestStellarWebAuthentication:
             network_passphrase=network_passphrase,
             timeout=timeout,
             client_domain=client_domain,
-            client_signing_key=client_signing_key
+            client_signing_key=client_signing_key,
         )
 
         transaction = TransactionEnvelope.from_xdr(
@@ -96,19 +118,19 @@ class TestStellarWebAuthentication:
         assert op0.data_name == f"{home_domain} auth"
         assert len(op0.data_value) == 64
         assert len(base64.b64decode(op0.data_value)) == 48
-        assert op0.source == client_account_id
+        assert op0.source == MuxedAccount.from_account(client_account_id)
 
         op1 = transaction.operations[1]
         assert isinstance(op1, ManageData)
         assert op1.data_name == "web_auth_domain"
         assert op1.data_value.decode() == web_auth_domain
-        assert op1.source == server_kp.public_key
+        assert op1.source == MuxedAccount.from_account(server_kp.public_key)
 
         op2 = transaction.operations[2]
         assert isinstance(op2, ManageData)
         assert op2.data_name == "client_domain"
         assert op2.data_value.decode() == client_domain
-        assert op2.source == client_signing_key
+        assert op2.source == MuxedAccount.from_account(client_signing_key)
 
         now = int(time.time())
         assert now - 3 < transaction.time_bounds.min_time < now + 3
@@ -116,10 +138,12 @@ class TestStellarWebAuthentication:
             transaction.time_bounds.max_time - transaction.time_bounds.min_time
             == timeout
         )
-        assert transaction.source == server_kp.public_key
+        assert transaction.source == MuxedAccount.from_account(server_kp.public_key)
         assert transaction.sequence == 0
 
-    def test_challenge_transaction_with_client_domain_fails_without_client_signing_key(self):
+    def test_challenge_transaction_with_client_domain_fails_without_client_signing_key(
+        self,
+    ):
         server_kp = Keypair.random()
         client_account_id = "GBDIT5GUJ7R5BXO3GJHFXJ6AZ5UQK6MNOIDMPQUSMXLIHTUNR2Q5CFNF"
         timeout = 600
@@ -129,8 +153,8 @@ class TestStellarWebAuthentication:
         client_domain = "client.domain.com"
 
         with pytest.raises(
-                ValueError,
-                match="client_signing_key is required if client_domain is provided."
+            ValueError,
+            match="client_signing_key is required if client_domain is provided.",
         ):
             build_challenge_transaction(
                 server_secret=server_kp.secret,
@@ -435,7 +459,8 @@ class TestStellarWebAuthentication:
         challenge_tx_signed = challenge_te.to_xdr()
 
         with pytest.raises(
-            InvalidSep10ChallengeError, match="Operation value should not be null.",
+            InvalidSep10ChallengeError,
+            match="Operation value should not be null.",
         ):
             verify_challenge_transaction(
                 challenge_tx_signed,
@@ -476,7 +501,8 @@ class TestStellarWebAuthentication:
         challenge_tx_signed = challenge_te.to_xdr()
 
         with pytest.raises(
-            InvalidSep10ChallengeError, match="'web_auth_domain' operation value should not be null.",
+            InvalidSep10ChallengeError,
+            match="'web_auth_domain' operation value should not be null.",
         ):
             verify_challenge_transaction(
                 challenge_tx_signed,
@@ -507,7 +533,8 @@ class TestStellarWebAuthentication:
                 data_name="web_auth_domain",
                 data_value=web_auth_domain,
                 source=server_account.account_id,
-            ).append_manage_data_op(
+            )
+            .append_manage_data_op(
                 data_name="empty_value_test",
                 data_value=None,
                 source=server_account.account_id,
@@ -1000,7 +1027,10 @@ class TestStellarWebAuthentication:
                 data_value=web_auth_domain,
                 source=server_account.account_id,
             )
-            .append_bump_sequence_op(bump_to=0, source=server_kp.public_key,)
+            .append_bump_sequence_op(
+                bump_to=0,
+                source=server_kp.public_key,
+            )
             .add_time_bounds(now, now + 900)
             .build()
         )
@@ -1010,7 +1040,8 @@ class TestStellarWebAuthentication:
         challenge_tx_signed = challenge_te.to_xdr()
 
         with pytest.raises(
-            InvalidSep10ChallengeError, match="Operation type should be ManageData.",
+            InvalidSep10ChallengeError,
+            match="Operation type should be ManageData.",
         ):
             verify_challenge_transaction(
                 challenge_tx_signed,
@@ -1054,7 +1085,8 @@ class TestStellarWebAuthentication:
         challenge_tx_signed = challenge_te.to_xdr()
 
         with pytest.raises(
-            InvalidSep10ChallengeError, match="Operation should have a source account.",
+            InvalidSep10ChallengeError,
+            match="Operation should have a source account.",
         ):
             verify_challenge_transaction(
                 challenge_tx_signed,
@@ -1064,7 +1096,9 @@ class TestStellarWebAuthentication:
                 network_passphrase,
             )
 
-    def test_verify_challenge_tx_contain_zero_op(self,):
+    def test_verify_challenge_tx_contain_zero_op(
+        self,
+    ):
         server_kp = Keypair.random()
         client_kp = Keypair.random()
         network_passphrase = Network.PUBLIC_NETWORK_PASSPHRASE
@@ -1420,7 +1454,9 @@ class TestStellarWebAuthentication:
             signers,
         )
 
-    def test_verify_challenge_transaction_signers_accepts_client_domain_operation_include_client_domain_signer(self):
+    def test_verify_challenge_transaction_signers_accepts_client_domain_operation_include_client_domain_signer(
+        self,
+    ):
         server_kp = Keypair.random()
         client_kp = Keypair.random()
         client_domain_kp = Keypair.random()
@@ -1490,8 +1526,8 @@ class TestStellarWebAuthentication:
         signers = [Ed25519PublicKeySigner(client_kp.public_key, 1)]
 
         with pytest.raises(
-                InvalidSep10ChallengeError,
-                match="Transaction not signed by the source account of the 'client_domain' ManageData operation"
+            InvalidSep10ChallengeError,
+            match="Transaction not signed by the source account of the 'client_domain' ManageData operation",
         ):
             verify_challenge_transaction_signers(
                 challenge_tx,
@@ -1655,6 +1691,34 @@ class TestStellarWebAuthentication:
                 network_passphrase,
                 med_threshold,
                 signers,
+            )
+
+    def test_read_challenge_transaction_mux_server_id_raise(self):
+        server_kp = Keypair.random()
+        client_kp = Keypair.random()
+        timeout = 600
+        network_passphrase = Network.PUBLIC_NETWORK_PASSPHRASE
+        home_domain = "example.com"
+        web_auth_domain = "auth.example.com"
+
+        challenge = build_challenge_transaction(
+            server_secret=server_kp.secret,
+            client_account_id=client_kp.public_key,
+            home_domain=home_domain,
+            web_auth_domain=web_auth_domain,
+            network_passphrase=network_passphrase,
+            timeout=timeout,
+        )
+        with pytest.raises(
+            ValueError,
+            match="Invalid server_account_id, multiplexed account are not supported.",
+        ):
+            read_challenge_transaction(
+                challenge,
+                "MAAAAAAAAAAAJURAAB2X52XFQP6FBXLGT6LWOOWMEXWHEWBDVRZ7V5WH34Y22MPFBHUHY",
+                network_passphrase,
+                web_auth_domain,
+                home_domain,
             )
 
     def test_read_challenge_transaction_fee_bump_transaction_raise(self):
