@@ -85,9 +85,10 @@ class BaseTransactionEnvelope(Generic[T]):
 
         :param preimage: Preimage of hash used as signer, byte hash or hex encoded string
         """
-        hash_preimage = sha256(hex_to_bytes(preimage))
+        preimage_bytes: bytes = hex_to_bytes(preimage)
+        hash_preimage = sha256(preimage_bytes)
         hint = stellar_xdr.SignatureHint(hash_preimage[-4:])
-        sig = stellar_xdr.DecoratedSignature(hint, stellar_xdr.Signature(preimage))
+        sig = stellar_xdr.DecoratedSignature(hint, stellar_xdr.Signature(preimage_bytes))
         sig_dict = [signature.__dict__ for signature in self.signatures]
         if sig.__dict__ in sig_dict:
             raise SignatureExistError("The preimage has already signed.")
