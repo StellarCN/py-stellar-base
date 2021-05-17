@@ -76,15 +76,14 @@ class BaseTransactionEnvelope(Generic[T]):
         """
         raise NotImplementedError("The method has not been implemented.")
 
-    def sign_hashx(self, preimage: bytes) -> None:
+    def sign_hashx(self, preimage: Union[bytes, str]) -> None:
         """Sign this transaction envelope with a Hash(x) signature.
 
         See Stellar's documentation on `Multi-Sig
         <https://www.stellar.org/developers/guides/concepts/multi-sig.html>`_
         for more details on Hash(x) signatures.
 
-        :param preimage: 32 byte hash or hex encoded string , the "x" value to be hashed and used as a
-            signature.
+        :param preimage: Preimage of hash used as signer, byte hash or hex encoded string
         """
         hash_preimage = sha256(hex_to_bytes(preimage))
         hint = stellar_xdr.SignatureHint(hash_preimage[-4:])
