@@ -14,7 +14,6 @@ pytest-asyncio = "*"
 pytest-httpserver = "*"
 
 [packages]
-crc16 = "*"
 pynacl = "*"
 requests = "*"
 aiohttp = "*"
