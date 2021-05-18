@@ -6,7 +6,6 @@ attrs==21.2.0
 certifi==2020.12.5
 cffi==1.14.5
 chardet==4.0.0
-crc16==0.1.1
 idna==2.10
 mnemonic==0.19
 multidict==5.1.0

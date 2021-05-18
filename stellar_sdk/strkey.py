@@ -3,7 +3,7 @@ import binascii
 import struct
 from typing import Union
 
-from crc16 import crc16xmodem
+from .vendor.crc16 import crc16xmodem
 
 from .exceptions import (
     Ed25519SecretSeedInvalidError,
