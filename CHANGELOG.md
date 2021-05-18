@@ -1,6 +1,12 @@
 Release History
 ==============
 
+### Version 3.3.4
+Released on May 18, 2021
+
+#### Update
+* refactor: use the pure Python implemented crc16 module instead of the C implemented. ([#483](https://github.com/StellarCN/py-stellar-base/pull/483))
+
 ### Version 3.3.3
 Released on May 15, 2021
 
