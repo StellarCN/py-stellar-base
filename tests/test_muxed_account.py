@@ -11,7 +11,7 @@ class TestMuxedAccount:
         account_id = "GAQAA5L65LSYH7CQ3VTJ7F3HHLGCL3DSLAR2Y47263D56MNNGHSQSTVY"
         account_id_id = 1234
         account_id_muxed = (
-            "MAAAAAAAAAAAJURAAB2X52XFQP6FBXLGT6LWOOWMEXWHEWBDVRZ7V5WH34Y22MPFBHUHY"
+            "MAQAA5L65LSYH7CQ3VTJ7F3HHLGCL3DSLAR2Y47263D56MNNGHSQSAAAAAAAAAAE2LP26"
         )
         med25519 = stellar_xdr.MuxedAccountMed25519(
             id=stellar_xdr.Uint64(account_id_id),
@@ -41,7 +41,7 @@ class TestMuxedAccount:
         account_id = "GAQAA5L65LSYH7CQ3VTJ7F3HHLGCL3DSLAR2Y47263D56MNNGHSQSTVY"
         account_id_id = 1234
         account_id_muxed = (
-            "MAAAAAAAAAAAJURAAB2X52XFQP6FBXLGT6LWOOWMEXWHEWBDVRZ7V5WH34Y22MPFBHUHY"
+            "MAQAA5L65LSYH7CQ3VTJ7F3HHLGCL3DSLAR2Y47263D56MNNGHSQSAAAAAAAAAAE2LP26"
         )
         muxed_account = MuxedAccount.from_account(account_id_muxed)
         assert muxed_account.account_id == account_id
@@ -58,7 +58,7 @@ class TestMuxedAccount:
         account_id = "GAQAA5L65LSYH7CQ3VTJ7F3HHLGCL3DSLAR2Y47263D56MNNGHSQSTVY"
         account_id_id = 1234
         account_id_muxed = (
-            "MAAAAAAAAAAAJURAAB2X52XFQP6FBXLGT6LWOOWMEXWHEWBDVRZ7V5WH34Y22MPFBHUHY"
+            "MAQAA5L65LSYH7CQ3VTJ7F3HHLGCL3DSLAR2Y47263D56MNNGHSQSAAAAAAAAAAE2LP26"
         )
         muxed_account = MuxedAccount(account_id, account_id_id)
         with pytest.raises(

@@ -42,19 +42,19 @@ class TestServer:
         horizon_url = "https://horizon.stellar.org"
         with Server(horizon_url) as server:
             account = server.load_account(account_id)
-            assert account.account_id == account_id
+            assert account.account_id == MuxedAccount.from_account(account_id)
             assert isinstance(account.sequence, int)
             assert account.thresholds == Thresholds(1, 2, 3)
 
     def test_load_acount_muxed_account_str_sync(self):
         account_id = (
-            "MAAAAAAAAAAAJUXL4LKO7RYSP6IIDETQ7BBRSBW4F5GVGZVGBPCPNHYIIX6CTUDGHDUWO"
+            "MDV6FVHPY4JH7EEBSJYPQQYZA3OC6TKTM2TAXRHWT4EEL7BJ2BTDQAAAAAAAAAAE2KS7Y"
         )
         horizon_url = "https://horizon.stellar.org"
         with Server(horizon_url) as server:
             account = server.load_account(account_id)
             assert account.account_id == MuxedAccount.from_account(
-                "MAAAAAAAAAAAJUXL4LKO7RYSP6IIDETQ7BBRSBW4F5GVGZVGBPCPNHYIIX6CTUDGHDUWO"
+                "MDV6FVHPY4JH7EEBSJYPQQYZA3OC6TKTM2TAXRHWT4EEL7BJ2BTDQAAAAAAAAAAE2KS7Y"
             )
             assert isinstance(account.sequence, int)
             assert account.thresholds == Thresholds(1, 2, 3)
@@ -77,14 +77,14 @@ class TestServer:
         client = AiohttpClient()
         async with Server(horizon_url, client) as server:
             account = await server.load_account(account_id)
-            assert account.account_id == account_id
+            assert account.account_id == MuxedAccount.from_account(account_id)
             assert isinstance(account.sequence, int)
             assert account.thresholds == Thresholds(1, 2, 3)
 
     @pytest.mark.asyncio
     async def test_load_acount_muxed_account_str_async(self):
         account_id = (
-            "MAAAAAAAAAAAJUXL4LKO7RYSP6IIDETQ7BBRSBW4F5GVGZVGBPCPNHYIIX6CTUDGHDUWO"
+            "MDV6FVHPY4JH7EEBSJYPQQYZA3OC6TKTM2TAXRHWT4EEL7BJ2BTDQAAAAAAAAAAE2KS7Y"
         )
         horizon_url = "https://horizon.stellar.org"
         client = AiohttpClient()

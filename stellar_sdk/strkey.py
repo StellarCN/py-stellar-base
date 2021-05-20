@@ -166,8 +166,8 @@ class StrKey:
             return StrKey.encode_ed25519_public_key(data.ed25519.uint256)
 
         packer = Packer()
-        data.med25519.id.pack(packer)
         data.med25519.ed25519.pack(packer)
+        data.med25519.id.pack(packer)
         return encode_check("muxed_account", packer.get_buffer())
 
     @staticmethod
@@ -196,9 +196,11 @@ class StrKey:
                 )
 
             unpacker = Unpacker(xdr_bytes)
+            ed25519 = stellar_xdr.Uint256.unpack(unpacker)
+            id = stellar_xdr.Uint64.unpack(unpacker)
             med25519 = stellar_xdr.MuxedAccountMed25519(
-                id=stellar_xdr.Uint64.unpack(unpacker),
-                ed25519=stellar_xdr.Uint256.unpack(unpacker),
+                id=id,
+                ed25519=ed25519,
             )
             muxed = stellar_xdr.MuxedAccount(
                 type=stellar_xdr.CryptoKeyType.KEY_TYPE_MUXED_ED25519, med25519=med25519
