@@ -1,3 +1,9 @@
+"""
+This example shows how to transfer the native balance (the amount of XLM an account holds) to
+another account and removes the source account from the ledger.
+
+See: https://developers.stellar.org/docs/start/list-of-operations/#account-merge
+"""
 from stellar_sdk import Server, Keypair, TransactionBuilder, Network
 
 # Configure StellarSdk to talk to the horizon instance hosted by Stellar.org
@@ -25,12 +31,15 @@ source_account = server.load_account(source_public_key)
 # The current code uses the testnetwork and if you wanted to use
 # the public network 'Network.TESTNET_NETWORK_PASSPHRASE' would
 # have to be replaced with 'Network.PUBLIC_NETWORK_PASSPHRASE'.
-transaction = TransactionBuilder(
-    source_account=source_account,
-    network_passphrase=Network.TESTNET_NETWORK_PASSPHRASE,
-    base_fee=100) \
-    .append_account_merge_op(destination=destination_public_key) \
+transaction = (
+    TransactionBuilder(
+        source_account=source_account,
+        network_passphrase=Network.TESTNET_NETWORK_PASSPHRASE,
+        base_fee=100,
+    )
+    .append_account_merge_op(destination=destination_public_key)
     .build()
+)
 
 
 # source account signs the transaction
