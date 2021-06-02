@@ -1,5 +1,9 @@
-# Let's assume Alice and Bob hold an escrow account and now they want to
-# send 100 XLM from the escrow account to Eve, the following code shows how to achieve it.
+"""
+Let's assume Alice and Bob hold an escrow account and now they want to
+send 100 XLM from the escrow account to Eve, the following code shows how to achieve it.
+
+I recommend that you check the `./set_up_multisig_account.py` before reading this example.
+"""
 from stellar_sdk import Server, TransactionBuilder, Network, TransactionEnvelope
 
 escrow_public = "GD7ZZHKFKFPV2KR6JPE5L6QOZ43LV6HBJWLITCC73V6R7YFERSAITE4S"
@@ -13,14 +17,17 @@ server = Server(horizon_url="https://horizon-testnet.stellar.org")
 escrow_account = server.load_account(eve_public)
 base_fee = 100
 
-transaction = TransactionBuilder(
-    source_account=escrow_account,
-    network_passphrase=network_passphrase,
-    base_fee=base_fee,
-).add_text_memo("Hello, Stellar!") \
-    .append_payment_op(eve_public, "100", "XLM") \
-    .set_timeout(30) \
+transaction = (
+    TransactionBuilder(
+        source_account=escrow_account,
+        network_passphrase=network_passphrase,
+        base_fee=base_fee,
+    )
+    .add_text_memo("Hello, Stellar!")
+    .append_payment_op(eve_public, "100", "XLM")
+    .set_timeout(30)
     .build()
+)
 
 # Now Alice signs this transaction and sends the generated XDR to Bob
 transaction.sign(alice_secret)

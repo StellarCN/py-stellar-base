@@ -1,3 +1,6 @@
+"""
+See: https://stellar-sdk.readthedocs.io/en/latest/asynchronous.html
+"""
 import asyncio
 
 from stellar_sdk import AiohttpClient, Server
@@ -30,13 +33,8 @@ async def transactions():
 
 
 async def listen():
-    await asyncio.gather(
-        payments(),
-        effects(),
-        operations(),
-        transactions()
-    )
+    await asyncio.gather(payments(), effects(), operations(), transactions())
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     asyncio.run(listen())

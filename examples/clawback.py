@@ -1,9 +1,29 @@
-# Please go through this article for a more detailed explanation.
-# See: https://developers.stellar.org/docs/glossary/clawback/
+"""
+Protocol 17 introduces operations that allow asset issuers to maintain tighter control
+over how their asset is distributed to the world. Specifically, it gives them power to
+burn their asset from a trustline or claimable balance, effectively removing it from the
+recipient’s balance sheet:
+
+> The amount of the asset clawed back is burned and is not sent to any other address.
+The issuer may reissue the asset to the same account or to another account if the intent
+of the clawback is to move the asset to another account.
+
+This allows for things like regulatory enforcement, safety and control over certain assets,
+etc. You can refer to CAP-35 for more motivations or technical details behind these new features.
+
+See: https://developers.stellar.org/docs/glossary/clawback/
+"""
 
 # Configure StellarSdk to talk to the horizon instance hosted by Stellar.org
 # To use the live network, set the hostname to 'horizon.stellar.org'
-from stellar_sdk import Server, Keypair, Asset, TransactionBuilder, Network, AuthorizationFlag
+from stellar_sdk import (
+    Server,
+    Keypair,
+    Asset,
+    TransactionBuilder,
+    Network,
+    AuthorizationFlag,
+)
 
 server = Server(horizon_url="https://horizon-testnet.stellar.org")
 
@@ -34,9 +54,11 @@ set_options_transaction = (
         network_passphrase=Network.TESTNET_NETWORK_PASSPHRASE,
         base_fee=100,
     )
-        .append_set_options_op(
-        set_flags=AuthorizationFlag.AUTHORIZATION_CLAWBACK_ENABLED | AuthorizationFlag.AUTHORIZATION_REVOCABLE)
-        .build()
+    .append_set_options_op(
+        set_flags=AuthorizationFlag.AUTHORIZATION_CLAWBACK_ENABLED
+        | AuthorizationFlag.AUTHORIZATION_REVOCABLE
+    )
+    .build()
 )
 set_options_transaction.sign(issuing_keypair)
 resp = server.submit_transaction(set_options_transaction)
@@ -50,10 +72,10 @@ trust_transaction = (
         network_passphrase=Network.TESTNET_NETWORK_PASSPHRASE,
         base_fee=100,
     )
-        .append_change_trust_op(
+    .append_change_trust_op(
         asset_code=hello_asset.code, asset_issuer=hello_asset.issuer
     )
-        .build()
+    .build()
 )
 
 trust_transaction.sign(customer_keypair)
@@ -68,13 +90,13 @@ payment_transaction = (
         network_passphrase=Network.TESTNET_NETWORK_PASSPHRASE,
         base_fee=100,
     )
-        .append_payment_op(
+    .append_payment_op(
         destination=customer_public,
         amount="1000",
         asset_code=hello_asset.code,
         asset_issuer=hello_asset.issuer,
     )
-        .build()
+    .build()
 )
 payment_transaction.sign(issuing_keypair)
 resp = server.submit_transaction(payment_transaction)
@@ -88,8 +110,8 @@ clawback_transaction = (
         network_passphrase=Network.TESTNET_NETWORK_PASSPHRASE,
         base_fee=100,
     )
-        .append_clawback_op(asset=hello_asset, from_=customer_public, amount="300")
-        .build()
+    .append_clawback_op(asset=hello_asset, from_=customer_public, amount="300")
+    .build()
 )
 clawback_transaction.sign(issuing_keypair)
 resp = server.submit_transaction(clawback_transaction)

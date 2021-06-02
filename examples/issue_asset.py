@@ -1,4 +1,8 @@
-# See: https://www.stellar.org/developers/guides/issuing-assets.html
+"""
+This example shows how to issue assets on the Stellar network.
+
+# See: https://developers.stellar.org/docs/issuing-assets/
+"""
 
 from stellar_sdk.keypair import Keypair
 from stellar_sdk.asset import Asset
@@ -35,10 +39,10 @@ trust_transaction = (
         network_passphrase=Network.TESTNET_NETWORK_PASSPHRASE,
         base_fee=100,
     )
-        .append_change_trust_op(
+    .append_change_trust_op(
         asset_code=hello_asset.code, asset_issuer=hello_asset.issuer
     )
-        .build()
+    .build()
 )
 
 trust_transaction.sign(distributor_keypair)
@@ -57,13 +61,13 @@ payment_transaction = (
         network_passphrase=Network.TESTNET_NETWORK_PASSPHRASE,
         base_fee=100,
     )
-        .append_payment_op(
+    .append_payment_op(
         destination=distributor_public,
         amount="1000",
         asset_code=hello_asset.code,
         asset_issuer=hello_asset.issuer,
     )
-        .build()
+    .build()
 )
 payment_transaction.sign(issuing_keypair)
 resp = server.submit_transaction(payment_transaction)
