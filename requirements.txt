@@ -3,7 +3,7 @@ aiohttp-sse-client==0.2.1
 aiohttp==3.7.4.post0
 async-timeout==3.0.1
 attrs==21.2.0
-certifi==2020.12.5
+certifi==2021.5.30
 cffi==1.14.5
 chardet==4.0.0
 idna==2.10
@@ -16,5 +16,5 @@ six==1.16.0
 stellar-base-sseclient==0.0.21
 toml==0.10.2
 typing-extensions==3.10.0.0
-urllib3==1.26.4
+urllib3==1.26.5
 yarl==1.6.3
