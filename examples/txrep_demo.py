@@ -1,3 +1,12 @@
+"""
+Txrep is a human-readable representation of Stellar transactions that functions
+like an assembly language for XDR.
+
+This example shows how to convert stellar transaction to human-readable text,
+and then convert it back.
+
+See: https://github.com/stellar/stellar-protocol/blob/master/ecosystem/sep-0011.md
+"""
 from stellar_sdk.sep.txrep import from_txrep, to_txrep
 from stellar_sdk import Keypair, TransactionBuilder, Network, Account
 

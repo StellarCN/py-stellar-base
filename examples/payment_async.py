@@ -9,6 +9,8 @@ Assumes that you have the following items:
     These two keys can be created and funded by the friendbot at
     https://www.stellar.org/laboratory/ under the heading "Quick Start: Test Account"
 3. Access to Python Stellar SDK (https://github.com/StellarCN/py-stellar-base) through Python shell.
+
+See: https://developers.stellar.org/docs/start/list-of-operations/#payment
 """
 import asyncio
 
@@ -29,7 +31,7 @@ async def main():
     # To use the live network, set the hostname to 'horizon.stellar.org'
     # When we use the `with` syntax, it automatically releases the resources it occupies.
     async with Server(
-            horizon_url="https://horizon-testnet.stellar.org", client=AiohttpClient()
+        horizon_url="https://horizon-testnet.stellar.org", client=AiohttpClient()
     ) as server:
         # Transactions require a valid sequence number that is specific to this account.
         # We can fetch the current sequence number for the source account from Horizon.
@@ -45,13 +47,13 @@ async def main():
                 network_passphrase=Network.TESTNET_NETWORK_PASSPHRASE,
                 base_fee=base_fee,
             )
-                .add_text_memo("Hello, Stellar!")  # Add a memo
-                # Add a payment operation to the transaction
-                # Send 350.1234567 XLM to receiver
-                # Specify 350.1234567 lumens. Lumens are divisible to seven digits past the decimal.
-                .append_payment_op(receiver_public_key, "350.1234567", "XLM")
-                .set_timeout(30)  # Make this transaction valid for the next 30 seconds only
-                .build()
+            .add_text_memo("Hello, Stellar!")  # Add a memo
+            # Add a payment operation to the transaction
+            # Send 350.1234567 XLM to receiver
+            # Specify 350.1234567 lumens. Lumens are divisible to seven digits past the decimal.
+            .append_payment_op(receiver_public_key, "350.1234567", "XLM")
+            .set_timeout(30)  # Make this transaction valid for the next 30 seconds only
+            .build()
         )
 
         # Sign this transaction with the secret key

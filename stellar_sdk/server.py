@@ -363,8 +363,11 @@ class Server:
     def load_account(
         self, account_id: Union[MuxedAccount, Keypair, str]
     ) -> Union[Account, Coroutine[Any, Any, Account]]:
-        """Fetches an account's most current state in the ledger and then creates
+        """Fetches an account's most current base state (like sequence) in the ledger and then creates
         and returns an :class:`stellar_sdk.account.Account` object.
+
+        If you want to get complete account information, please
+        use :func:`stellar_sdk.server.Server.accounts`.
 
         :param account_id: The account to load.
         :return: an :class:`stellar_sdk.account.Account` object.

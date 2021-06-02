@@ -4,7 +4,7 @@ import struct
 from typing import Union
 from xdrlib import Packer, Unpacker
 
-from crc16 import crc16xmodem
+from .vendor.crc16 import crc16xmodem
 
 from .exceptions import (
     Ed25519SecretSeedInvalidError,
