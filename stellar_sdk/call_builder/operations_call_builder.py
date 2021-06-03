@@ -63,10 +63,25 @@ class OperationsCallBuilder(BaseCallBuilder):
 
         See `Operations for Transaction <https://www.stellar.org/developers/horizon/reference/endpoints/operations-for-transaction.html>`_
 
-        :param transaction_hash:
+        :param transaction_hash: Transaction Hash
         :return: this OperationCallBuilder instance
         """
         self.endpoint = f"transactions/{transaction_hash}/operations"
+        return self
+
+    def for_claimable_balance(
+        self, claimable_balance_id: str
+    ) -> "OperationsCallBuilder":
+        """This endpoint represents successful operations referencing a given
+        claimable balance and can be used in streaming mode.
+
+
+        See `Claimable Balances - Retrieve related Operations <https://developers.stellar.org/api/resources/claimablebalances/operations/>`_
+
+        :param claimable_balance_id: This claimable balance’s id encoded in a hex string representation.
+        :return: this OperationCallBuilder instance
+        """
+        self.endpoint = f"claimable_balances/{claimable_balance_id}/operations"
         return self
 
     def include_failed(self, include_failed: bool) -> "OperationsCallBuilder":

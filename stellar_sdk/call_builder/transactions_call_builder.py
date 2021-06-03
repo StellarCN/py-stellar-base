@@ -58,6 +58,19 @@ class TransactionsCallBuilder(BaseCallBuilder):
         self.endpoint = f"ledgers/{sequence}/transactions"
         return self
 
+    def for_claimable_balance(
+        self, claimable_balance_id: str
+    ) -> "TransactionsCallBuilder":
+        """This endpoint represents successful transactions referencing a given claimable balance and can be used in streaming mode.
+
+        See `Claimable Balances - Retrieve related Transactions <https://developers.stellar.org/api/resources/claimablebalances/transactions/>`_
+
+        :param claimable_balance_id: This claimable balance’s id encoded in a hex string representation.
+        :return: current TransactionsCallBuilder instance
+        """
+        self.endpoint = f"claimable_balances/{claimable_balance_id}/transactions"
+        return self
+
     def include_failed(self, include_failed: bool) -> "TransactionsCallBuilder":
         """Adds a parameter defining whether to include failed transactions. By default only
         transactions of successful transactions are returned.
