@@ -11,7 +11,7 @@ To install py-stellar-sdk, use pipenv to install the module:
 
 .. code-block:: text
 
-    pipenv install stellar-sdk==3.3.4
+    pipenv install stellar-sdk==3.3.5
 
 If you're not using `pipenv <https://docs.pipenv.org/>`_, you should.
 Otherwise, you can install it via plain old `pip <https://pip.pypa.io/en/stable/quickstart/>`_. More on installing Python
@@ -29,5 +29,5 @@ You can clone `the repository <https://github.com/StellarCN/py-stellar-base>`_ d
 
     git clone https://github.com/StellarCN/py-stellar-base.git
     cd py-stellar-base
-    git checkout 3.3.4
+    git checkout 3.3.5
     pip install .
