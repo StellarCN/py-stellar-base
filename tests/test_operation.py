@@ -1789,7 +1789,7 @@ class TestClawback:
         xdr = "AAAAAQAAAAA037UdsRiULYrlHjmXWb6CiMKM2fNCa/ONGxK3rOkvTwAAABMAAAABREVNTwAAAACs9Aq+RXfSw0yuZEGt0TkYxAHDjB9RkQrLraMLSTGGKwAAAQAAAAAAAAAE0iAAdX7q5YP8UN1mn5dnOswl7HJYI6xz+vbH3zGtMeUJAAAAADuaygA="
         assert op.to_xdr_object().to_xdr() == xdr
         assert restore_op.source.account_id == source
-        assert restore_op.from_.account_id_muxed == from_
+        assert restore_op.from_.account_muxed == from_
         assert restore_op.asset == asset
         assert restore_op.amount == amount
 

@@ -16,9 +16,9 @@ class Account:
     See `Accounts`_ For more information about the formats used for asset codes and how issuers
     work on Stellar,
 
-    :param account_id: MuxedAccount or Account ID of the
+    :param account: Account Id of the
         account (ex. `GB3KJPLFUYN5VL6R3GU3EGCGVCKFDSD7BEDX42HWG5BWFKB3KQGJJRMA`)
-        or muxed account (ex. `MAAAAAAAAAAAJURAAB2X52XFQP6FBXLGT6LWOOWMEXWHEWBDVRZ7V5WH34Y22MPFBHUHY`)
+        or muxed account (ex. `MBZSQ3YZMZEWL5ZRCEQ5CCSOTXCFCMKDGFFP4IEQN2KN6LCHCLI46AAAAAAAAAAE2L2QE`)
     :param sequence: sequence current sequence number of the account
     :raises:
         :exc:`Ed25519PublicKeyInvalidError <stellar_sdk.exceptions.Ed25519PublicKeyInvalidError>`: if ``account_id``
@@ -28,11 +28,10 @@ class Account:
         https://stellar.org/developers/learn/concepts/accounts.html
     """
 
-    # TODO: rename account_id -> account?
-    def __init__(self, account_id: Union[str, MuxedAccount], sequence: int) -> None:
-        if isinstance(account_id, str):
-            account_id = MuxedAccount.from_account(account_id)
-        self.account_id: MuxedAccount = account_id
+    def __init__(self, account: Union[str, MuxedAccount], sequence: int) -> None:
+        if isinstance(account, str):
+            account = MuxedAccount.from_account(account)
+        self.account_id: MuxedAccount = account
         self.sequence: int = sequence
 
         # The following properties will change in future

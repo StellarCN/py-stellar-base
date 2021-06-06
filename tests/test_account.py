@@ -9,10 +9,10 @@ class TestAccount:
     def test_account(self):
         account_id = "GA7YNBW5CBTJZ3ZZOWX3ZNBKD6OE7A7IHUQVWMY62W2ZBG2SGZVOOPVH"
         sequence = 123123
-        account = Account(account_id=account_id, sequence=sequence)
+        account = Account(account=account_id, sequence=sequence)
         assert account.sequence == sequence
         assert account.account_id.account_id == account_id
-        other_account = Account(account_id=account_id, sequence=sequence)
+        other_account = Account(account=account_id, sequence=sequence)
         assert account == other_account
 
         account.increment_sequence_number()
@@ -40,7 +40,7 @@ class TestAccount:
         ]
         account_id = "GA7YNBW5CBTJZ3ZZOWX3ZNBKD6OE7A7IHUQVWMY62W2ZBG2SGZVOOPVH"
         sequence = 123123
-        account = Account(account_id=account_id, sequence=sequence)
+        account = Account(account=account_id, sequence=sequence)
         account.signers = signers
         assert account.load_ed25519_public_key_signers() == [
             Ed25519PublicKeySigner(

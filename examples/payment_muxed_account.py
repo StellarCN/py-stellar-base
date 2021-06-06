@@ -8,9 +8,9 @@ network_passphrase = Network.TESTNET_NETWORK_PASSPHRASE
 alice_secret = "SAHN2RCKC5I7NFDCIUKA3BG4H4T6WMLLGSAZVDKUHF7PQXHMYWD7UAIH"
 bob_account = MuxedAccount(
     account_id="GBZSQ3YZMZEWL5ZRCEQ5CCSOTXCFCMKDGFFP4IEQN2KN6LCHCLI46UMF",
-    account_id_id=1234,
+    account_muxed_id=1234,
 )
-print(f"account_id_muxed: {bob_account.account_id_muxed}")
+print(f"account_id_muxed: {bob_account.account_muxed}")
 # You can also use addresses starting with M.
 # bob_account = "MBZSQ3YZMZEWL5ZRCEQ5CCSOTXCFCMKDGFFP4IEQN2KN6LCHCLI46AAAAAAAAAAE2L2QE"
 

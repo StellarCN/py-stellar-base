@@ -10,7 +10,7 @@ root_keypair = Keypair.from_secret(
     "SA6XHAH4GNLRWWWF6TEVEWNS44CBNFAJWHWOPZCVZOUXSQA7BOYN7XHC"
 )
 # Create an Account object from an address and sequence number.
-root_account = Account(account_id=root_keypair.public_key, sequence=1)
+root_account = Account(account=root_keypair.public_key, sequence=1)
 
 transaction = (
     TransactionBuilder(
