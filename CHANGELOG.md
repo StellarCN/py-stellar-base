@@ -1,6 +1,12 @@
 Release History
 ==============
 
+### Version 3.3.5
+Released on June 03, 2021
+
+#### Update
+* feat: add support for claimable balances endpoints. ([#491](https://github.com/StellarCN/py-stellar-base/pull/491))
+
 ### Version 3.3.4
 Released on May 18, 2021
 
