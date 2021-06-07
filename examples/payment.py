@@ -12,14 +12,29 @@ See: https://developers.stellar.org/docs/start/list-of-operations/#payment
 """
 from stellar_sdk import Server, Keypair, TransactionBuilder, Network
 
+
+def create_account():
+    """To make this script work, create an account on the testnet."""
+    import requests
+    from stellar_sdk import Keypair
+
+    keypair = Keypair.random()
+    url = "https://friendbot.stellar.org"
+    _response = requests.get(url, params={"addr": keypair.public_key})
+    # Check _response.json() in case something goes wrong
+    return keypair
+
+
 # The source account is the account we will be signing and sending from.
-source_secret_key = "SBFZCHU5645DOKRWYBXVOXY2ELGJKFRX6VGGPRYUWHQ7PMXXJNDZFMKD"
+example_keypair = create_account()
+source_secret_key = example_keypair.secret
 
 # Derive Keypair object and public key (that starts with a G) from the secret
 source_keypair = Keypair.from_secret(source_secret_key)
 source_public_key = source_keypair.public_key
 
-receiver_public_key = "GA7YNBW5CBTJZ3ZZOWX3ZNBKD6OE7A7IHUQVWMY62W2ZBG2SGZVOOPVH"
+# We just send lumen to ourselves in this simple example
+receiver_public_key = example_keypair.public_key
 
 # Configure StellarSdk to talk to the horizon instance hosted by Stellar.org
 # To use the live network, set the hostname to 'horizon.stellar.org'
