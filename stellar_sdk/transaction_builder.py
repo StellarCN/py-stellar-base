@@ -71,7 +71,7 @@ class TransactionBuilder:
 
         :return: The transaction envelope.
         """
-        source = self.source_account.account_id
+        source = self.source_account.account
         sequence = self.source_account.sequence + 1
         transaction = Transaction(
             source=source,

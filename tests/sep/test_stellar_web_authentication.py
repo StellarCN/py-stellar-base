@@ -307,7 +307,7 @@ class TestStellarWebAuthentication:
             .append_manage_data_op(
                 data_name="web_auth_domain",
                 data_value=web_auth_domain,
-                source=server_account.account_id,
+                source=server_account.account,
             )
             .add_time_bounds(now, now + 900)
             .build()
@@ -408,7 +408,7 @@ class TestStellarWebAuthentication:
             .append_manage_data_op(
                 data_name="web_auth_domain",
                 data_value=web_auth_domain,
-                source=server_account.account_id,
+                source=server_account.account,
             )
             .add_time_bounds(now, now + 900)
             .build()
@@ -448,7 +448,7 @@ class TestStellarWebAuthentication:
             .append_manage_data_op(
                 data_name="web_auth_domain",
                 data_value=web_auth_domain,
-                source=server_account.account_id,
+                source=server_account.account,
             )
             .add_time_bounds(now, now + 900)
             .build()
@@ -490,7 +490,7 @@ class TestStellarWebAuthentication:
             .append_manage_data_op(
                 data_name="web_auth_domain",
                 data_value=web_auth_domain,
-                source=server_account.account_id,
+                source=server_account.account,
             )
             .add_time_bounds(now, now + 900)
             .build()
@@ -532,12 +532,12 @@ class TestStellarWebAuthentication:
             .append_manage_data_op(
                 data_name="web_auth_domain",
                 data_value=web_auth_domain,
-                source=server_account.account_id,
+                source=server_account.account,
             )
             .append_manage_data_op(
                 data_name="empty_value_test",
                 data_value=None,
-                source=server_account.account_id,
+                source=server_account.account,
             )
             .add_time_bounds(now, now + 900)
             .build()
@@ -575,7 +575,7 @@ class TestStellarWebAuthentication:
             .append_manage_data_op(
                 data_name="web_auth_domain",
                 data_value=web_auth_domain,
-                source=server_account.account_id,
+                source=server_account.account,
             )
             .add_time_bounds(now, now + 900)
             .build()
@@ -621,7 +621,7 @@ class TestStellarWebAuthentication:
         ).append_manage_data_op(
             data_name="web_auth_domain",
             data_value=web_auth_domain,
-            source=server_account.account_id,
+            source=server_account.account,
         )
         challenge = transaction_builder.build().to_xdr()
 
@@ -688,7 +688,7 @@ class TestStellarWebAuthentication:
             .append_manage_data_op(
                 data_name="web_auth_domain",
                 data_value=web_auth_domain,
-                source=server_account.account_id,
+                source=server_account.account,
             )
             .build()
         )
@@ -728,7 +728,7 @@ class TestStellarWebAuthentication:
             .append_manage_data_op(
                 data_name="web_auth_domain",
                 data_value=web_auth_domain,
-                source=server_account.account_id,
+                source=server_account.account,
             )
             .add_time_bounds(now, 0)
             .build()
@@ -770,7 +770,7 @@ class TestStellarWebAuthentication:
             .append_manage_data_op(
                 data_name="web_auth_domain",
                 data_value=web_auth_domain,
-                source=server_account.account_id,
+                source=server_account.account,
             )
             .add_time_bounds(now - 100, now - 50)
             .build()
@@ -926,7 +926,7 @@ class TestStellarWebAuthentication:
             .append_manage_data_op(
                 data_name="web_auth_domain",
                 data_value=web_auth_domain,
-                source=server_account.account_id,
+                source=server_account.account,
             )
             .append_manage_data_op(
                 data_name="data key",
@@ -936,7 +936,7 @@ class TestStellarWebAuthentication:
             .append_manage_data_op(
                 data_name="web_auth_domain",
                 data_value=web_auth_domain,
-                source=server_account.account_id,
+                source=server_account.account,
             )
             .add_time_bounds(now, now + 900)
             .build()
@@ -976,7 +976,7 @@ class TestStellarWebAuthentication:
             .append_manage_data_op(
                 data_name="web_auth_domain",
                 data_value=web_auth_domain,
-                source=server_account.account_id,
+                source=server_account.account,
             )
             .append_manage_data_op(
                 data_name="data key",
@@ -1025,7 +1025,7 @@ class TestStellarWebAuthentication:
             .append_manage_data_op(
                 data_name="web_auth_domain",
                 data_value=web_auth_domain,
-                source=server_account.account_id,
+                source=server_account.account,
             )
             .append_bump_sequence_op(
                 bump_to=0,
@@ -1073,7 +1073,7 @@ class TestStellarWebAuthentication:
             .append_manage_data_op(
                 data_name="web_auth_domain",
                 data_value=web_auth_domain,
-                source=server_account.account_id,
+                source=server_account.account,
             )
             .append_manage_data_op(data_name="Hello", data_value="world")
             .add_time_bounds(now, now + 900)
@@ -1185,7 +1185,7 @@ class TestStellarWebAuthentication:
             .append_manage_data_op(
                 data_name="web_auth_domain",
                 data_value=web_auth_domain,
-                source=server_account.account_id,
+                source=server_account.account,
             )
             .add_time_bounds(now, now + 900)
             .build()

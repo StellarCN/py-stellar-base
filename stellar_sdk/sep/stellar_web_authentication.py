@@ -78,7 +78,7 @@ def build_challenge_transaction(
     ).append_manage_data_op(
         data_name="web_auth_domain",
         data_value=web_auth_domain,
-        source=server_account.account_id,
+        source=server_account.account,
     )
     if client_domain:
         if not client_signing_key:

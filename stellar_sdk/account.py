@@ -31,7 +31,7 @@ class Account:
     def __init__(self, account: Union[str, MuxedAccount], sequence: int) -> None:
         if isinstance(account, str):
             account = MuxedAccount.from_account(account)
-        self.account_id: MuxedAccount = account
+        self.account: MuxedAccount = account
         self.sequence: int = sequence
 
         # The following properties will change in future
@@ -59,10 +59,10 @@ class Account:
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
             return NotImplemented  # pragma: no cover
-        return self.account_id == other.account_id and self.sequence == other.sequence
+        return self.account == other.account and self.sequence == other.sequence
 
     def __str__(self):
-        return f"<Account [account_id={self.account_id}, sequence={self.sequence}]>"
+        return f"<Account [account_id={self.account}, sequence={self.sequence}]>"
 
 
 class Thresholds:

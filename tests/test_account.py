@@ -11,7 +11,7 @@ class TestAccount:
         sequence = 123123
         account = Account(account=account_id, sequence=sequence)
         assert account.sequence == sequence
-        assert account.account_id.account_id == account_id
+        assert account.account.account_id == account_id
         other_account = Account(account=account_id, sequence=sequence)
         assert account == other_account
 
