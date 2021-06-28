@@ -282,7 +282,7 @@ def read_challenge_transaction(
         )
 
     return ChallengeTransaction(
-        transaction_envelope, client_account, matched_home_domain
+        transaction_envelope, client_account.account_id, matched_home_domain
     )
 
 
