@@ -163,8 +163,10 @@ class StrKey:
             :exc:`TypeError <stellar_sdk.exceptions.TypeError>`
         """
         if data.type == stellar_xdr.CryptoKeyType.KEY_TYPE_ED25519:
+            assert data.ed25519 is not None
             return StrKey.encode_ed25519_public_key(data.ed25519.uint256)
 
+        assert data.med25519 is not None
         packer = Packer()
         data.med25519.ed25519.pack(packer)
         data.med25519.id.pack(packer)

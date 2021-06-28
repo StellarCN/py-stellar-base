@@ -389,7 +389,8 @@ class Server:
         return self.__load_account_sync(account)
 
     async def __load_account_async(self, account_id: MuxedAccount) -> Account:
-        resp = await self.accounts().account_id(account_id=account_id.account_id).call()
+        resp = await self.accounts().account_id(account_id=account_id.account_id).call()  # type: ignore[misc]
+        assert isinstance(resp, dict)
         sequence = int(resp["sequence"])
         thresholds = Thresholds(
             resp["thresholds"]["low_threshold"],
@@ -402,7 +403,8 @@ class Server:
         return account
 
     def __load_account_sync(self, account_id: MuxedAccount) -> Account:
-        resp = self.accounts().account_id(account_id=account_id.account_id).call()
+        resp = self.accounts().account_id(account_id=account_id.account_id).call()  # type: ignore[misc]
+        assert isinstance(resp, dict)
         sequence = int(resp["sequence"])
         thresholds = Thresholds(
             resp["thresholds"]["low_threshold"],

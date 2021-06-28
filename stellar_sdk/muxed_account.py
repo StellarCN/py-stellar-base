@@ -37,8 +37,10 @@ class MuxedAccount:
             :exc:`ValueError <stellar_sdk.exceptions.ConnectionError>`: if `account_muxed_id` is `None`.
         """
         if self.account_muxed_id is None:
-            raise ValueError("Cannot get `account_muxed` when `account_muxed_id` is `None`. Please make sure "
-                             "`account_muxed_id` is not `None` before accessing `account_muxed`.")
+            raise ValueError(
+                "Cannot get `account_muxed` when `account_muxed_id` is `None`. Please make sure "
+                "`account_muxed_id` is not `None` before accessing `account_muxed`."
+            )
         muxed_xdr = stellar_xdr.MuxedAccount(
             type=stellar_xdr.CryptoKeyType.KEY_TYPE_MUXED_ED25519,
             med25519=stellar_xdr.MuxedAccountMed25519(
@@ -69,6 +71,8 @@ class MuxedAccount:
             return cls(account_id=account, account_muxed_id=None)
         elif data_length == 69:
             muxed_xdr = StrKey.decode_muxed_account(account)
+            assert muxed_xdr.med25519 is not None
+            assert muxed_xdr.med25519.ed25519 is not None
             return cls(
                 account_id=StrKey.encode_ed25519_public_key(
                     muxed_xdr.med25519.ed25519.uint256
@@ -97,11 +101,14 @@ class MuxedAccount:
         :return: A new :class:`MuxedAccount` object from the given XDR MuxedAccount object.
         """
         if muxed_account_xdr_object.type == stellar_xdr.CryptoKeyType.KEY_TYPE_ED25519:
+            assert muxed_account_xdr_object.ed25519 is not None
             account_id = StrKey.encode_ed25519_public_key(
                 muxed_account_xdr_object.ed25519.uint256
             )
             return cls(account_id=account_id, account_muxed_id=None)
+        assert muxed_account_xdr_object.med25519 is not None
         account_id_id = muxed_account_xdr_object.med25519.id.uint64
+        assert muxed_account_xdr_object.med25519 is not None
         account_id = StrKey.encode_ed25519_public_key(
             muxed_account_xdr_object.med25519.ed25519.uint256
         )
@@ -111,8 +118,8 @@ class MuxedAccount:
         if not isinstance(other, self.__class__):
             return NotImplemented  # pragma: no cover
         return (
-                self.account_id == other.account_id
-                and self.account_muxed_id == other.account_muxed_id
+            self.account_id == other.account_id
+            and self.account_muxed_id == other.account_muxed_id
         )
 
     def __str__(self):

@@ -34,7 +34,7 @@ print(f"Seller Account Public Key: {seller_public_key}")
 friendbot_url = "https://friendbot.stellar.org"
 response = requests.get(friendbot_url, params={"addr": seller_public_key})
 
-seller_account = server.load_account(account_id=seller_public_key)
+seller_account = server.load_account(account=seller_public_key)
 
 ## Create issuer account
 print("\nCreate Issuer Account:")
@@ -56,7 +56,7 @@ transaction = (
 transaction.sign(seller_secret_key)
 response = server.submit_transaction(transaction)
 
-issuer_account = server.load_account(account_id=issuer_public_key)
+issuer_account = server.load_account(account=issuer_public_key)
 
 print("#" * 30)
 print("\nCreate new Asset\n")

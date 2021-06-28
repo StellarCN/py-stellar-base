@@ -144,9 +144,10 @@ class Transaction:
             source = MuxedAccount.from_xdr_object(xdr_object.source_account)
         else:
             assert isinstance(xdr_object, stellar_xdr.TransactionV0)
-            source = StrKey.encode_ed25519_public_key(
+            ed25519_key = StrKey.encode_ed25519_public_key(
                 xdr_object.source_account_ed25519.uint256
             )
+            source = MuxedAccount(ed25519_key, None)
         sequence = xdr_object.seq_num.sequence_number.int64
         fee = xdr_object.fee.uint32
         time_bounds_xdr = xdr_object.time_bounds
@@ -166,9 +167,6 @@ class Transaction:
             operations=operations,
             v1=v1,
         )
-        if v1:
-            assert isinstance(xdr_object, stellar_xdr.Transaction)
-            tx._source_muxed = xdr_object.source_account
         return tx
 
     @classmethod
