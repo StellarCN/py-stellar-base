@@ -44,7 +44,7 @@ AssetsCallBuilder
    :inherited-members:
 
 ClaimableBalancesCallBuilder
----------------------------
+----------------------------
 .. autoclass:: stellar_sdk.call_builder.ClaimableBalancesCallBuilder
    :members:
    :inherited-members:
@@ -406,11 +406,6 @@ ManageData
 ManageSellOffer
 ---------------
 .. autoclass:: stellar_sdk.operation.ManageSellOffer
-   :members: to_xdr_object, from_xdr_object
-
-PathPayment
------------
-.. autoclass:: stellar_sdk.operation.PathPayment
    :members: to_xdr_object, from_xdr_object
 
 PathPaymentStrictReceive
