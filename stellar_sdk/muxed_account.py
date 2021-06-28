@@ -143,6 +143,6 @@ class MuxedAccount:
         )
 
     def __str__(self):
-        return "<MuxedAccount [account_id={account_id}, account_id_id={account_id_id}]>".format(
-            account_id=self.account_id, account_id_id=self.account_muxed_id
+        return "<MuxedAccount [account_id={account_id}, account_muxed_id={account_muxed_id}]>".format(
+            account_id=self.account_id, account_muxed_id=self.account_muxed_id
         )
