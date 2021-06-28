@@ -41,6 +41,9 @@ class Account:
         self.thresholds: Optional[Thresholds] = None
 
     def account_id(self) -> str:
+        """
+        Return ed25519 account id.
+        """
         warnings.warn(
             "Will be removed in version v5.0.0, "
             "use `stellar_sdk.account.Account.account` instead.",
