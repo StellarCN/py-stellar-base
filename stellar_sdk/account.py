@@ -33,7 +33,7 @@ class Account:
         if isinstance(account_id, str):
             self.account: MuxedAccount = MuxedAccount.from_account(account_id)
         else:
-            self.account: MuxedAccount = account_id
+            self.account = account_id
         self.sequence: int = sequence
 
         # The following properties will change in future
