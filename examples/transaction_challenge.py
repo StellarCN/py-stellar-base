@@ -60,12 +60,16 @@ def example_verify_challenge_tx_threshold():
     )
 
     # Client reads and signs challenge transaction
-    tx, tx_client_account_id, _ = read_challenge_transaction(
+    parsed_challenge_tx = read_challenge_transaction(
         challenge_tx,
         server_keypair.public_key,
         home_domain,
         web_auth_domain,
         network_passphrase,
+    )
+    tx, tx_client_account_id = (
+        parsed_challenge_tx.transaction,
+        parsed_challenge_tx.client_account_id,
     )
     if tx_client_account_id != client_master_keypair.public_key:
         print("Error: challenge tx is not for expected client account")
@@ -75,7 +79,7 @@ def example_verify_challenge_tx_threshold():
     signed_challenge_tx = tx.to_xdr()
 
     # Server verifies signed challenge transaction
-    _, tx_client_account_id, _ = read_challenge_transaction(
+    read_challenge_transaction(
         challenge_tx,
         server_keypair.public_key,
         home_domain,
