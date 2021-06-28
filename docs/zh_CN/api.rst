@@ -285,6 +285,12 @@ BadResponseError
 .. autoclass:: stellar_sdk.exceptions.BadResponseError
    :members:
 
+FeatureNotEnabledError
+----------------------
+
+.. autoclass:: stellar_sdk.exceptions.FeatureNotEnabledError
+   :members:
+
 Keypair
 ^^^^^^^
 

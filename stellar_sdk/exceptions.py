@@ -31,6 +31,7 @@ __all__ = [
     "UnknownRequestError",
     "NotPageableError",
     "StreamClientError",
+    "FeatureNotEnabledError",
 ]
 
 
@@ -174,6 +175,10 @@ class StreamClientError(BaseRequestError):
     def __init__(self, current_cursor: str, message: str) -> None:
         super().__init__(message)
         self.current_cursor = current_cursor
+
+
+class FeatureNotEnabledError(SdkError):
+    """The feature is not enabled."""
 
 
 def raise_request_exception(response: Response) -> None:
