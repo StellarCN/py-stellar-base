@@ -607,7 +607,7 @@ class TestStellarWebAuthentication:
 
         now = int(time.time())
         server_keypair = Keypair.from_secret(server_kp.secret)
-        server_account = Account(account=server_keypair.public_key, sequence=-1)
+        server_account = Account(account_id=server_keypair.public_key, sequence=-1)
         transaction_builder = TransactionBuilder(
             server_account, network_passphrase, 100
         )

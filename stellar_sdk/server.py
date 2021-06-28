@@ -397,7 +397,7 @@ class Server:
             resp["thresholds"]["med_threshold"],
             resp["thresholds"]["high_threshold"],
         )
-        account = Account(account=account_id, sequence=sequence)
+        account = Account(account_id=account_id, sequence=sequence)
         account.signers = resp["signers"]
         account.thresholds = thresholds
         return account
@@ -411,7 +411,7 @@ class Server:
             resp["thresholds"]["med_threshold"],
             resp["thresholds"]["high_threshold"],
         )
-        account = Account(account=account_id, sequence=sequence)
+        account = Account(account_id=account_id, sequence=sequence)
         account.signers = resp["signers"]
         account.thresholds = thresholds
         return account

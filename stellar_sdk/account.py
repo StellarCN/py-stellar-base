@@ -1,4 +1,5 @@
 from typing import Optional, List, Union
+import warnings
 
 from .sep.ed25519_public_key_signer import Ed25519PublicKeySigner
 from .muxed_account import MuxedAccount
@@ -16,7 +17,7 @@ class Account:
     See `Accounts`_ For more information about the formats used for asset codes and how issuers
     work on Stellar,
 
-    :param account: Account Id of the
+    :param account_id: Account Id of the
         account (ex. `GB3KJPLFUYN5VL6R3GU3EGCGVCKFDSD7BEDX42HWG5BWFKB3KQGJJRMA`)
         or muxed account (ex. `MBZSQ3YZMZEWL5ZRCEQ5CCSOTXCFCMKDGFFP4IEQN2KN6LCHCLI46AAAAAAAAAAE2L2QE`)
     :param sequence: sequence current sequence number of the account
@@ -28,15 +29,24 @@ class Account:
         https://stellar.org/developers/learn/concepts/accounts.html
     """
 
-    def __init__(self, account: Union[str, MuxedAccount], sequence: int) -> None:
-        if isinstance(account, str):
-            account = MuxedAccount.from_account(account)
-        self.account: MuxedAccount = account
+    def __init__(self, account_id: Union[str, MuxedAccount], sequence: int) -> None:
+        if isinstance(account_id, str):
+            self.account: MuxedAccount = MuxedAccount.from_account(account_id)
+        else:
+            self.account: MuxedAccount = account_id
         self.sequence: int = sequence
 
         # The following properties will change in future
         self.signers: List[dict] = []
         self.thresholds: Optional[Thresholds] = None
+
+    def account_id(self) -> str:
+        warnings.warn(
+            "Will be removed in version v5.0.0, "
+            "use `stellar_sdk.account.Account.account` instead.",
+            DeprecationWarning,
+        )
+        return self.account.account_id
 
     def increment_sequence_number(self) -> None:
         """

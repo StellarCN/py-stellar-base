@@ -1,4 +1,5 @@
 import pytest
+from stellar_sdk import MuxedAccount
 
 from stellar_sdk.account import Account
 from stellar_sdk.exceptions import Ed25519PublicKeyInvalidError
@@ -6,13 +7,47 @@ from stellar_sdk.sep.ed25519_public_key_signer import Ed25519PublicKeySigner
 
 
 class TestAccount:
-    def test_account(self):
+    def test_account_with_ed25519_key(self):
         account_id = "GA7YNBW5CBTJZ3ZZOWX3ZNBKD6OE7A7IHUQVWMY62W2ZBG2SGZVOOPVH"
         sequence = 123123
-        account = Account(account=account_id, sequence=sequence)
+        account = Account(account_id=account_id, sequence=sequence)
+        assert account.account == MuxedAccount(account_id, None)
         assert account.sequence == sequence
         assert account.account.account_id == account_id
-        other_account = Account(account=account_id, sequence=sequence)
+        other_account = Account(account_id=account_id, sequence=sequence)
+        assert account == other_account
+
+        account.increment_sequence_number()
+        assert account.sequence == sequence + 1
+        assert account != other_account
+        assert account != "bad type"
+
+    def test_account_with_muxed_account_key(self):
+        account_muxed = (
+            "MA7YNBW5CBTJZ3ZZOWX3ZNBKD6OE7A7IHUQVWMY62W2ZBG2SGZVOOAAAAAAAAAAE2LEM6"
+        )
+        account_id = "GA7YNBW5CBTJZ3ZZOWX3ZNBKD6OE7A7IHUQVWMY62W2ZBG2SGZVOOPVH"
+        account_muxed_id = 1234
+        sequence = 123123
+        account = Account(account_id=account_muxed, sequence=sequence)
+        assert account.sequence == sequence
+        assert account.account == MuxedAccount(account_id, account_muxed_id)
+        assert account.account.account_id == account_id
+        other_account = Account(account_id=account_muxed, sequence=sequence)
+        assert account == other_account
+
+        account.increment_sequence_number()
+        assert account.sequence == sequence + 1
+        assert account != other_account
+        assert account != "bad type"
+
+    def test_account_with_muxed_account_instance(self):
+        account_id = "GA7YNBW5CBTJZ3ZZOWX3ZNBKD6OE7A7IHUQVWMY62W2ZBG2SGZVOOPVH"
+        sequence = 123123
+        account = Account(account_id=account_id, sequence=sequence)
+        assert account.sequence == sequence
+        assert account.account.account_id == account_id
+        other_account = Account(account_id=account_id, sequence=sequence)
         assert account == other_account
 
         account.increment_sequence_number()
@@ -40,7 +75,7 @@ class TestAccount:
         ]
         account_id = "GA7YNBW5CBTJZ3ZZOWX3ZNBKD6OE7A7IHUQVWMY62W2ZBG2SGZVOOPVH"
         sequence = 123123
-        account = Account(account=account_id, sequence=sequence)
+        account = Account(account_id=account_id, sequence=sequence)
         account.signers = signers
         assert account.load_ed25519_public_key_signers() == [
             Ed25519PublicKeySigner(

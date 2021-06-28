@@ -66,7 +66,7 @@ def build_challenge_transaction(
 
     now = int(time.time())
     server_keypair = Keypair.from_secret(server_secret)
-    server_account = Account(account=server_keypair.public_key, sequence=-1)
+    server_account = Account(account_id=server_keypair.public_key, sequence=-1)
     transaction_builder = TransactionBuilder(server_account, network_passphrase, 100)
     transaction_builder.add_time_bounds(min_time=now, max_time=now + timeout)
     nonce = os.urandom(48)
