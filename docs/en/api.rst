@@ -285,6 +285,12 @@ BadResponseError
 .. autoclass:: stellar_sdk.exceptions.BadResponseError
    :members:
 
+FeatureNotEnabledError
+----------------------
+
+.. autoclass:: stellar_sdk.exceptions.FeatureNotEnabledError
+   :members:
+
 Keypair
 ^^^^^^^
 
@@ -619,6 +625,8 @@ SEP 0010: Stellar Web Authentication
 .. autofunction:: stellar_sdk.sep.stellar_web_authentication.verify_challenge_transaction_signed_by_client_master_key
 .. autofunction:: stellar_sdk.sep.stellar_web_authentication.verify_challenge_transaction_signers
 .. autofunction:: stellar_sdk.sep.stellar_web_authentication.verify_challenge_transaction
+.. autoclass:: stellar_sdk.sep.stellar_web_authentication.ChallengeTransaction
+   :members:
 
 SEP 0011: Txrep: human-readable low-level representation of Stellar transactions
 ---------------------------------------------------------------------------------
