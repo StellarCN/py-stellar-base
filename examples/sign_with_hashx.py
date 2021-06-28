@@ -26,7 +26,7 @@ server = Server(horizon_url="https://horizon-testnet.stellar.org")
 root_keypair = Keypair.from_secret(
     "SDSMBDZKTGPTYGXOM7VLC52PICHMI3LOZTMKXSDCU3H75AGXLITMHBUG"
 )
-root_account = server.load_account(account=root_keypair.public_key)
+root_account = server.load_account(account_id=root_keypair.public_key)
 
 # This is the `x` in the description
 preimage = b"your_preimage_value"

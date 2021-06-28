@@ -17,7 +17,7 @@ source_keypair = Keypair.from_secret(
     "SA6XHAH4GNLRWWWF6TEVEWNS44CBNFAJWHWOPZCVZOUXSQA7BOYN7XHC"
 )
 
-source_account = server.load_account(account=source_keypair.public_key)
+source_account = server.load_account(account_id=source_keypair.public_key)
 
 path = [
     Asset("USD", "GBBM6BKZPEHWYO3E3YKREDPQXMS4VK35YLNU7NFBRI26RAN7GI5POFBB"),

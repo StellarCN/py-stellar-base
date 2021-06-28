@@ -10,7 +10,7 @@ server = Server(horizon_url="https://horizon-testnet.stellar.org")
 source = Keypair.from_secret("SBFZCHU5645DOKRWYBXVOXY2ELGJKFRX6VGGPRYUWHQ7PMXXJNDZFMKD")
 destination = Keypair.random()
 
-source_account = server.load_account(account=source.public_key)
+source_account = server.load_account(account_id=source.public_key)
 transaction = (
     TransactionBuilder(
         source_account=source_account,
