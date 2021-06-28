@@ -1,11 +1,18 @@
+import os
 from typing import Optional
 
 from . import xdr as stellar_xdr
-from .exceptions import ValueError
+from .exceptions import ValueError, FeatureNotEnabledError
 from .strkey import StrKey
 from .keypair import Keypair
 
 __all__ = ["MuxedAccount"]
+
+_SEP_0023_ENABLE_FLAG: str = "ENABLE_SEP_0023"
+
+
+def _sep_0023_enabled() -> bool:
+    return os.getenv(_SEP_0023_ENABLE_FLAG, "False").lower() in ("true", "1", "t")
 
 
 class MuxedAccount:
@@ -36,6 +43,13 @@ class MuxedAccount:
         :raises:
             :exc:`ValueError <stellar_sdk.exceptions.ConnectionError>`: if `account_muxed_id` is `None`.
         """
+        if not _sep_0023_enabled():
+            raise FeatureNotEnabledError(
+                "SEP-0023 related features are not enabled, "
+                "if you want to enable it, please add `ENABLE_SEP_0023=true` to "
+                "the system environment variables."
+            )
+
         if self.account_muxed_id is None:
             raise ValueError(
                 "Cannot get `account_muxed` when `account_muxed_id` is `None`. Please make sure "
@@ -70,6 +84,12 @@ class MuxedAccount:
         if data_length == 56:
             return cls(account_id=account, account_muxed_id=None)
         elif data_length == 69:
+            if not _sep_0023_enabled():
+                raise FeatureNotEnabledError(
+                    "SEP-0023 related features are not enabled, "
+                    "if you want to enable it, please add `ENABLE_SEP_0023=true` to "
+                    "the system environment variables."
+                )
             muxed_xdr = StrKey.decode_muxed_account(account)
             assert muxed_xdr.med25519 is not None
             assert muxed_xdr.med25519.ed25519 is not None
@@ -123,6 +143,6 @@ class MuxedAccount:
         )
 
     def __str__(self):
-        return "<MuxedAccount [account_id={account_id}, account_id_id={account_id_id}]>".format(
-            account_id=self.account_id, account_id_id=self.account_muxed_id
+        return "<MuxedAccount [account_id={account_id}, account_muxed_id={account_muxed_id}]>".format(
+            account_id=self.account_id, account_muxed_id=self.account_muxed_id
         )
