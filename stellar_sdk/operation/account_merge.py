@@ -1,10 +1,10 @@
-from typing import Optional
+from typing import Optional, Union
 
 from .operation import Operation
-from .utils import check_ed25519_public_key
-from ..keypair import Keypair
-from ..utils import parse_ed25519_account_id_from_muxed_account_xdr_object
-from ..xdr import Xdr
+from .. import xdr as stellar_xdr
+from ..muxed_account import MuxedAccount
+
+__all__ = ["AccountMerge"]
 
 
 class AccountMerge(Operation):
@@ -21,49 +21,38 @@ class AccountMerge(Operation):
 
     """
 
-    def __init__(self, destination: str, source: str = None,) -> None:
+    _XDR_OPERATION_TYPE: stellar_xdr.OperationType = (
+        stellar_xdr.OperationType.ACCOUNT_MERGE
+    )
+
+    def __init__(
+        self,
+        destination: Union[MuxedAccount, str],
+        source: Optional[Union[MuxedAccount, str]] = None,
+    ) -> None:
         super().__init__(source)
-        check_ed25519_public_key(destination)
-        self._destination: str = destination
-        self._destination_muxed: Optional[Xdr.types.MuxedAccount] = None
+        if isinstance(destination, str):
+            destination = MuxedAccount.from_account(destination)
+        self.destination: MuxedAccount = destination
 
-    @property
-    def destination(self) -> str:
-        return self._destination
-
-    @destination.setter
-    def destination(self, value: str):
-        check_ed25519_public_key(value)
-        self._destination_muxed = None
-        self._destination = value
-
-    @classmethod
-    def type_code(cls) -> int:
-        return Xdr.const.ACCOUNT_MERGE
-
-    def _to_operation_body(self) -> Xdr.nullclass:
-        if self._destination_muxed is not None:
-            destination = self._destination_muxed
-        else:
-            destination = Keypair.from_public_key(self._destination).xdr_muxed_account()
-        body = Xdr.nullclass()
-        body.type = Xdr.const.ACCOUNT_MERGE
-        body.destination = destination
+    def _to_operation_body(self) -> stellar_xdr.OperationBody:
+        destination = self.destination.to_xdr_object()
+        body = stellar_xdr.OperationBody(
+            type=self._XDR_OPERATION_TYPE, destination=destination
+        )
         return body
 
     @classmethod
-    def from_xdr_object(
-        cls, operation_xdr_object: Xdr.types.Operation
-    ) -> "AccountMerge":
+    def from_xdr_object(cls, xdr_object: stellar_xdr.Operation) -> "AccountMerge":
         """Creates a :class:`AccountMerge` object from an XDR Operation
         object.
 
         """
-        source = Operation.get_source_from_xdr_obj(operation_xdr_object)
-        destination = parse_ed25519_account_id_from_muxed_account_xdr_object(
-            operation_xdr_object.body.destination
-        )
+        source = Operation.get_source_from_xdr_obj(xdr_object)
+        assert xdr_object.body.destination is not None
+        destination = MuxedAccount.from_xdr_object(xdr_object.body.destination)
         op = cls(source=source, destination=destination)
-        op._destination_muxed = operation_xdr_object.body.destination
-        op._source_muxed = Operation.get_source_muxed_from_xdr_obj(operation_xdr_object)
         return op
+
+    def __str__(self):
+        return f"<AccountMerge [destination={self.destination}, source={self.source}]>"

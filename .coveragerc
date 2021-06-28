@@ -5,6 +5,7 @@ source =
 
 [report]
 omit =
+    .xdr/*
     stellar_sdk/xdr/*
     stellar_sdk/vendor/*
     setup.py

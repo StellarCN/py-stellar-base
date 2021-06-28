@@ -1,4 +1,4 @@
-from .xdr import Xdr
+from . import xdr as stellar_xdr
 from .signer_key import SignerKey
 
 __all__ = ["Signer"]
@@ -53,25 +53,30 @@ class Signer:
         signer_key = SignerKey.sha256_hash(sha256_hash)
         return cls(signer_key, weight)
 
-    def to_xdr_object(self) -> Xdr.types.Signer:
+    def to_xdr_object(self) -> stellar_xdr.Signer:
         """Returns the xdr object for this Signer object.
 
         :return: XDR Signer object
         """
-        return Xdr.types.Signer(self.signer_key.to_xdr_object(), self.weight)
+        return stellar_xdr.Signer(
+            self.signer_key.to_xdr_object(), stellar_xdr.Uint32(self.weight)
+        )
 
     @classmethod
-    def from_xdr_object(cls, signer_xdr_object: Xdr.types.Signer) -> "Signer":
+    def from_xdr_object(cls, xdr_object: stellar_xdr.Signer) -> "Signer":
         """Create a :class:`Signer` from an XDR Signer object.
 
-        :param signer_xdr_object: The XDR Signer object.
+        :param xdr_object: The XDR Signer object.
         :return: A new :class:`Signer` object from the given XDR Signer object.
         """
-        weight = signer_xdr_object.weight
-        signer_key = SignerKey.from_xdr_object(signer_xdr_object.key)
+        weight = xdr_object.weight.uint32
+        signer_key = SignerKey.from_xdr_object(xdr_object.key)
         return cls(signer_key, weight)
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
             return NotImplemented  # pragma: no cover
-        return self.to_xdr_object().to_xdr() == other.to_xdr_object().to_xdr()
+        return self.signer_key == other.signer_key and self.weight == other.weight
+
+    def __str__(self):
+        return f"<Signer [signer_key={self.signer_key}, weight={self.weight}]>"

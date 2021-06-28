@@ -59,7 +59,7 @@ class StellarUri(object, metaclass=abc.ABCMeta):
         return dict(parse.parse_qsl(uri_query))
 
     @staticmethod
-    def _parse_callback(callback: str) -> Optional[str]:
+    def _parse_callback(callback: Optional[str]) -> Optional[str]:
         if callback is None:
             return None
         if not callback.startswith("url:"):
@@ -118,27 +118,32 @@ class PayStellarUri(StellarUri):
         self.origin_domain = origin_domain
 
     @staticmethod
-    def _encode_memo(memo) -> Union[Tuple[str, str], Tuple[None, None]]:
+    def _encode_memo(memo) -> Union[Tuple[str, Union[str, int]], Tuple[None, None]]:
         if memo and not isinstance(memo, NoneMemo):
             if isinstance(memo, TextMemo):
-                memo_value = memo.memo_text
+                memo_text = memo.memo_text.decode()  # memo text cant decode?
                 memo_type = "MEMO_TEXT"
+                return memo_type, memo_text
             elif isinstance(memo, IdMemo):
-                memo_value = memo.memo_id
+                memo_id = memo.memo_id
                 memo_type = "MEMO_ID"
+                return memo_type, memo_id
             elif isinstance(memo, HashMemo):
-                memo_value = base64.b64encode(memo.memo_hash).decode()
+                memo_hash = base64.b64encode(memo.memo_hash).decode()
                 memo_type = "MEMO_HASH"
+                return memo_type, memo_hash
             elif isinstance(memo, ReturnHashMemo):
-                memo_value = base64.b64encode(memo.memo_return).decode()
+                memo_return = base64.b64encode(memo.memo_return).decode()
                 memo_type = "MEMO_RETURN"
+                return memo_type, memo_return
             else:
                 raise ValueError("Invalid memo.")
-            return memo_type, memo_value
         return None, None
 
     @staticmethod
-    def _decode_memo(memo_type: str, memo_value: str) -> Optional[Memo]:
+    def _decode_memo(
+        memo_type: Optional[str], memo_value: Optional[str]
+    ) -> Optional[Memo]:
         if memo_type is None:
             return None
         if memo_value is None:
@@ -161,7 +166,7 @@ class PayStellarUri(StellarUri):
 
         :return: Stellar Pay URI.
         """
-        query_params = {}
+        query_params: Dict[str, Union[str, int, None]] = {}
         query_params["destination"] = self.destination
         if self.amount is not None:
             query_params["amount"] = self.amount
@@ -171,6 +176,7 @@ class PayStellarUri(StellarUri):
             query_params["asset_code"] = self.asset_code
             query_params["asset_issuer"] = self.asset_issuer
         if self._memo is not None and not isinstance(self._memo, NoneMemo):
+            assert self.memo is not None
             query_params["memo"] = self.memo
             query_params["memo_type"] = self.memo_type
         if self.callback is not None:
@@ -183,7 +189,8 @@ class PayStellarUri(StellarUri):
             query_params["origin_domain"] = self.origin_domain
         if self.signature is not None:
             query_params["signature"] = self.signature
-        return f"{STELLAR_SCHEME}:pay?{parse.urlencode(query_params, quote_via=parse.quote)}"
+        # https://github.com/python/typeshed/issues/4234
+        return f"{STELLAR_SCHEME}:pay?{parse.urlencode(query_params, quote_via=parse.quote)}"  # type: ignore[type-var]
 
     @classmethod
     def from_uri(cls, uri: str) -> "PayStellarUri":
@@ -316,7 +323,7 @@ class TransactionStellarUri(StellarUri):
 
     def __init__(
         self,
-        transaction_envelope: TransactionEnvelope,
+        transaction_envelope: Union[TransactionEnvelope, FeeBumpTransactionEnvelope],
         replace: Optional[List[Replacement]] = None,
         callback: Optional[str] = None,
         pubkey: Optional[str] = None,
@@ -372,7 +379,7 @@ class TransactionStellarUri(StellarUri):
             query_params["origin_domain"] = self.origin_domain
         if self.signature is not None:
             query_params["signature"] = self.signature
-        return f"{STELLAR_SCHEME}:tx?{parse.urlencode(query_params, quote_via=parse.quote)}"
+        return f"{STELLAR_SCHEME}:tx?{parse.urlencode(query_params, quote_via=parse.quote)}"  # type: ignore[type-var]
 
     @classmethod
     def from_uri(
@@ -409,6 +416,7 @@ class TransactionStellarUri(StellarUri):
                 "match the `network_passphrase` in the uri."
             )
         network_passphrase = network_passphrase or uri_network_passphrase
+        assert network_passphrase is not None
 
         xdr = query.get("xdr")
         callback = cls._parse_callback(query.get("callback"))
@@ -421,7 +429,7 @@ class TransactionStellarUri(StellarUri):
         if is_fee_bump_transaction(xdr):
             tx = FeeBumpTransactionEnvelope.from_xdr(xdr, network_passphrase)
         else:
-            tx = TransactionEnvelope.from_xdr(xdr, network_passphrase)
+            tx = TransactionEnvelope.from_xdr(xdr, network_passphrase)  # type: ignore[assignment]
         raw_replacements = query.get("replace")
         replacements = []
         if raw_replacements is not None:

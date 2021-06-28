@@ -91,12 +91,6 @@ OrderbookCallBuilder
    :members:
    :inherited-members:
 
-PathsCallBuilder
-----------------
-.. autoclass:: stellar_sdk.call_builder.PathsCallBuilder
-   :members:
-   :inherited-members:
-
 PaymentsCallBuilder
 -------------------
 .. autoclass:: stellar_sdk.call_builder.PaymentsCallBuilder
@@ -332,6 +326,12 @@ ReturnHashMemo
 .. autoclass:: stellar_sdk.memo.ReturnHashMemo
    :members:
 
+MuxedAccount
+^^^^^^^^^^^^
+
+.. autoclass:: stellar_sdk.muxed_account.MuxedAccount
+   :members:
+
 Network
 ^^^^^^^
 
@@ -349,6 +349,11 @@ Operation
 .. autoclass:: stellar_sdk.operation.Operation
    :members:
    :inherited-members:
+
+OperationType
+-------------
+.. autoclass:: stellar_sdk.operation.operation_type.OperationType
+   :members:
 
 AccountMerge
 ------------
@@ -428,7 +433,7 @@ SetOptions
 .. autoclass:: stellar_sdk.operation.SetOptions
    :members: to_xdr_object, from_xdr_object
 
-.. autoclass:: stellar_sdk.operation.set_options.Flag
+.. autoclass:: stellar_sdk.operation.set_options.AuthorizationFlag
    :members:
 
 CreateClaimableBalance
@@ -481,6 +486,24 @@ RevokeSponsorship
    :members:
 
 .. autoclass:: stellar_sdk.operation.revoke_sponsorship.Signer
+   :members:
+
+Clawback
+--------
+.. autoclass:: stellar_sdk.operation.Clawback
+   :members: to_xdr_object, from_xdr_object
+
+ClawbackClaimableBalance
+------------------------
+.. autoclass:: stellar_sdk.operation.ClawbackClaimableBalance
+   :members: to_xdr_object, from_xdr_object
+
+SetTrustLineFlags
+-----------------
+.. autoclass:: stellar_sdk.operation.SetTrustLineFlags
+   :members: to_xdr_object, from_xdr_object
+
+.. autoclass:: stellar_sdk.operation.set_trust_line_flags.TrustLineFlags
    :members:
 
 Price
@@ -554,6 +577,11 @@ TransactionBuilder
 Helpers
 ^^^^^^^
 .. autofunction:: stellar_sdk.helpers.parse_transaction_envelope_from_xdr
+
+XDR Utils
+^^^^^^^^^
+.. autofunction:: stellar_sdk.xdr.utils.from_xdr_amount
+.. autofunction:: stellar_sdk.xdr.utils.to_xdr_amount
 
 Stellar Ecosystem Proposals
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^

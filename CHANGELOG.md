@@ -1,11 +1,212 @@
 Release History
 ==============
 
+### Version 3.3.5
+Released on June 03, 2021
+
+#### Update
+* feat: add support for claimable balances endpoints. ([#491](https://github.com/StellarCN/py-stellar-base/pull/491))
+
+### Version 3.3.4
+Released on May 18, 2021
+
+#### Update
+* refactor: use the pure Python implemented crc16 module instead of the C implemented. ([#483](https://github.com/StellarCN/py-stellar-base/pull/483))
+
+### Version 3.3.3
+Released on May 15, 2021
+
+#### Update
+* fix: correct the type of `stellar_sdk.xdr.SponsorshipDescriptor.sponsorship_descriptor` from `AccountID` to `Optional[AccountID]`. ([#478](https://github.com/StellarCN/py-stellar-base/pull/478))
+
+### Version 3.3.2
+Released on May 06, 2021
+
+#### Update
+
+* fix: fix an import related bug and optimize the import code. ([#473](https://github.com/StellarCN/py-stellar-base/pull/473))
+* example: added clawback operation [example](https://github.com/StellarCN/py-stellar-base/blob/bbdf42dd75/examples/clawback.py). ([#474](https://github.com/StellarCN/py-stellar-base/pull/474))
+
+### Version 3.3.1
+Released on April 25, 2021
+
+#### Update
+
+* fix: remove exceptions that should not be thrown in XDR. ([#469](https://github.com/StellarCN/py-stellar-base/pull/469))
+
+### Version 3.3.0
+Released on April 17, 2021
+
+#### Update
+
+* feat: add support for Stellar Protocol 17. ([#453](https://github.com/StellarCN/py-stellar-base/pull/453))
+
+#### Added
+
+* feat: add support for [CAP-35](https://github.com/stellar/stellar-protocol/blob/master/core/cap-0035.md). ([#453](https://github.com/StellarCN/py-stellar-base/pull/453))
+
+  We have added methods to `TransactionBuilder`, you can use them to construct corresponding operations, method list:
+
+  - append_clawback_op
+  - append_clawback_claimable_balance_op
+  - append_set_trust_line_flags_op
+
+* `AUTHORIZATION_CLAWBACK_ENABLED` has been added in `stellar_sdk.operation.set_options.AuthorizationFlag`. ([#453](https://github.com/StellarCN/py-stellar-base/pull/453))
+
+#### Deprecated
+
+* `stellar_sdk.TransactionBuilder.append_allow_trust_op` and `stellar_sdk.operation.AllowTrust` have now been marked as deprecated, they will be removed in v4.0.0. ([#453](https://github.com/StellarCN/py-stellar-base/pull/453))
+
+### Version 2.13.0
+Released on April 17, 2021
+
+#### Update
+
+* feat: add support for Stellar Protocol 17. ([#446](https://github.com/StellarCN/py-stellar-base/pull/446))
+
+#### Added
+
+* feat: add support for [CAP-35](https://github.com/stellar/stellar-protocol/blob/master/core/cap-0035.md). ([#446](https://github.com/StellarCN/py-stellar-base/pull/446))
+
+  We have added methods to `TransactionBuilder`, you can use them to construct corresponding operations, method list:
+
+  - append_clawback_op
+  - append_clawback_claimable_balance_op
+  - append_set_trust_line_flags_op
+
+* `AUTHORIZATION_CLAWBACK_ENABLED` has been added in `stellar_sdk.operation.set_options.Flag`. ([#446](https://github.com/StellarCN/py-stellar-base/pull/446))
+
+#### Deprecated
+
+* `stellar_sdk.TransactionBuilder.append_allow_trust_op` and `stellar_sdk.operation.AllowTrust` have now been marked as deprecated, they will be removed in v4.0.0. ([#446](https://github.com/StellarCN/py-stellar-base/pull/446))
+
+### Version 3.2.1
+Released on April 16, 2021
+
+#### Update
+fix: fix the issue that `not_predicate` cannot be parsed normally. ([#465](https://github.com/StellarCN/py-stellar-base/pull/465))
+
+### Version 3.3.0-beta0
+Released on April 03, 2021
+
+#### Update
+
+* feat: add support for Stellar Protocol 17. ([#453](https://github.com/StellarCN/py-stellar-base/pull/453))
+
+#### Added
+
+* feat: add support for [CAP-35](https://github.com/stellar/stellar-protocol/blob/master/core/cap-0035.md). ([#453](https://github.com/StellarCN/py-stellar-base/pull/453))
+
+  We have added methods to `TransactionBuilder`, you can use them to construct corresponding operations, method list:
+
+  - append_clawback_op
+  - append_clawback_claimable_balance_op
+  - append_set_trust_line_flags_op
+
+* `AUTHORIZATION_CLAWBACK_ENABLED` has been added in `stellar_sdk.operation.set_options.AuthorizationFlag`. ([#453](https://github.com/StellarCN/py-stellar-base/pull/453))
+
+#### Deprecated
+
+* `stellar_sdk.TransactionBuilder.append_allow_trust_op` and `stellar_sdk.operation.AllowTrust` have now been marked as deprecated, they will be removed in v4.0.0. ([#453](https://github.com/StellarCN/py-stellar-base/pull/453))
+
+### Version 2.13.0-beta0
+Released on April 03, 2021
+
+#### Update
+
+* feat: add support for Stellar Protocol 17. ([#446](https://github.com/StellarCN/py-stellar-base/pull/446))
+
+#### Added
+
+* feat: add support for [CAP-35](https://github.com/stellar/stellar-protocol/blob/master/core/cap-0035.md). ([#446](https://github.com/StellarCN/py-stellar-base/pull/446))
+
+  We have added methods to `TransactionBuilder`, you can use them to construct corresponding operations, method list:
+
+  - append_clawback_op
+  - append_clawback_claimable_balance_op
+  - append_set_trust_line_flags_op
+
+* `AUTHORIZATION_CLAWBACK_ENABLED` has been added in `stellar_sdk.operation.set_options.Flag`. ([#446](https://github.com/StellarCN/py-stellar-base/pull/446))
+
+#### Deprecated
+
+* `stellar_sdk.TransactionBuilder.append_allow_trust_op` and `stellar_sdk.operation.AllowTrust` have now been marked as deprecated, they will be removed in v4.0.0. ([#446](https://github.com/StellarCN/py-stellar-base/pull/446))
+
+### Version 3.2.0
+Released on April 01, 2021
+
+#### Update
+feat: SEP-10: added support for 'client_domain' ManageData operations in challenges (client attribution). ([#428](https://github.com/StellarCN/py-stellar-base/pull/428))
+
+### Version 2.12.0
+Released on April 01, 2021
+
+#### Update
+feat: SEP-10: added support for 'client_domain' ManageData operations in challenges (client attribution). ([#428](https://github.com/StellarCN/py-stellar-base/pull/428))
+
+### Version 2.12.0-beta0
+Released on Mar 25, 2021
+
+#### Update
+feat: SEP-10: added support for 'client_domain' ManageData operations in challenges (client attribution). ([#428](https://github.com/StellarCN/py-stellar-base/pull/428))
+
+### Version 3.1.4
+Released on Mar 16, 2021
+
+#### Update
+* fix: make `AiohttpClient` compatible with Python 3.6 and 3.7. ([#449](https://github.com/StellarCN/py-stellar-base/pull/449))
+
+### Version 2.11.3
+Released on Mar 16, 2021
+
+#### Update
+* fix: make `AiohttpClient` compatible with Python 3.6 and 3.7. ([#449](https://github.com/StellarCN/py-stellar-base/pull/449))
+
+### Version 3.1.3
+Released on Mar 4, 2021
+
+#### Update
+* fix: throw stellar_sdk.exceptions.ConnectionError in AiohttpClient instead of the built-in ConnectionError. ([#441](https://github.com/StellarCN/py-stellar-base/pull/441))
+
+### Version 2.11.2
+Released on Mar 4, 2021
+
+#### Update
+* fix: throw stellar_sdk.exceptions.ConnectionError in AiohttpClient instead of the built-in ConnectionError. ([#441](https://github.com/StellarCN/py-stellar-base/pull/441))
+
+### Version 3.1.2
+Released on Feb 28, 2021
+
+#### Update
+* Update dependencies.
+  
+  The latest version of aiohttp includes [security updates](https://github.com/aio-libs/aiohttp/security/advisories/GHSA-v6wp-4m6f-gcjg), this security issue has no direct impact on this SDK. ([#437](https://github.com/StellarCN/py-stellar-base/pull/437))
+
+### Version 3.1.1
+Released on Jan 20, 2021
+
+#### Update
+* fix: SEP-10, removed non-null constraint for manageData op values. ([#424](https://github.com/StellarCN/py-stellar-base/pull/424))
+
 ### Version 2.11.1
 Released on Jan 20, 2021
 
 #### Update
 * fix: SEP-10, removed non-null constraint for manageData op values. ([#424](https://github.com/StellarCN/py-stellar-base/pull/424))
+
+### Version 3.1.0
+Released on Jan 19, 2021
+
+#### Breaking changes
+* Updates the SEP-10 utility function parameters to support [SEP-10 v3.1.0](https://github.com/stellar/stellar-protocol/commit/6c8c9cf6685c85509835188a136ffb8cd6b9c11c).
+
+    - The following functions add the `web_auth_domain` parameter:
+        - `stellar_sdk.sep.stellar_web_authentication.build_challenge_transaction()`
+        - `stellar_sdk.sep.stellar_web_authentication.read_challenge_transaction()`
+        - `stellar_sdk.sep.stellar_web_authentication.verify_challenge_transaction_signers()`
+        - `stellar_sdk.sep.stellar_web_authentication.verify_challenge_transaction_signed_by_client_master_key()`
+        - `stellar_sdk.sep.stellar_web_authentication.verify_challenge_transaction_threshold()`
+        - `stellar_sdk.sep.stellar_web_authentication.verify_challenge_transaction()`
 
 ### Version 2.11.0
 Released on Jan 19, 2021
@@ -22,6 +223,109 @@ Released on Jan 19, 2021
         - `stellar_sdk.sep.stellar_web_authentication.verify_challenge_transaction_threshold()`
         - `stellar_sdk.sep.stellar_web_authentication.verify_challenge_transaction()`
 
+### Version 3.0.0
+
+Released on Jan 06, 2021
+
+**This update include breaking changes.**
+
+**The v2.x version will continue to be maintained until at least Jun 01, 2021.**
+
+I've upgraded [django-polaris](https://github.com/stellar/django-polaris/pull/369) to stellar-sdk 3.0.0, perhaps this can be used as a reference for the upgrade.
+
+This release brings new XDR code generated by the new XDR generator, with type hint support, if you need to use XDR objects, this release will bring a great experience improvement.
+
+#### Breaking changes
+- The old XDR code has been completely removed, and you can find the new XDR code [here](https://github.com/StellarCN/py-stellar-base/tree/c45d0874db5feccefe7ba57b7141eb06e064e09b/.xdr). ([#383](https://github.com/StellarCN/py-stellar-base/pull/383))
+
+  The XDR Object returned by the following functions has changed:
+
+  - Asset.to_xdr_object()
+  - TransactionEnvelope.to_xdr_object()
+  - FeeBumpTransaction.to_xdr_object()
+  - TransactionEnvelope.to_xdr_object()
+  - Keypair.xdr_public_key()
+  - Keypair.xdr_account_id()
+  - Keypair.xdr_muxed_account()
+  - Keypair.sign_decorated()
+  - Memo.to_xdr_object() (All types of Memos.)
+  - ClaimPredicate.to_xdr_object()
+  - Claimant.to_xdr_object()
+  - Operation.to_xdr_object() (All types of Operations.)
+  - Price.to_xdr_object()
+  - Signer.to_xdr_object()
+  - SignerKey.to_xdr_object()
+  - TimeBounds.to_xdr_object()
+
+- Rename the parameter name that accepts XDR Object in the `from_xdr_object` functions to `xdr_object`. ([#384](https://github.com/StellarCN/py-stellar-base/pull/384))
+  
+  This change affects the following functions:
+  
+  - Asset.from_xdr_object(cls, asset_xdr_object: stellar_xdr.Asset)
+  - FeeBumpTransaction.from_xdr_object(cls, te_xdr_object: stellar_xdr.TransactionEnvelope, cls, te_xdr_object: stellar_xdr.TransactionEnvelope)
+  - Memo.from_xdr_object(cls, xdr_obj: stellar_xdr.Memo) (All types of Memos.)
+  - Opeartion.from_xdr_object(cls, operation_xdr_object: stellar_xdr.Operation) (All types of Operations.)
+  - Price.from_xdr_object(cls, price_xdr_object: stellar_xdr.Price)
+  - Signer.from_xdr_object(cls, signer_xdr_object: stellar_xdr.Signer)
+  - SignerKey.from_xdr_object(cls, xdr_object: stellar_xdr.SignerKey)
+  - TimeBounds.from_xdr_object(cls, time_bounds_xdr_object: stellar_xdr.TimeBounds)
+  - Transaction.from_xdr_object(cls, tx_xdr_object: Union[stellar_xdr.Transaction, stellar_xdr.TransactionV0], v1: bool = False)
+  - TransactionEnvelope.from_xdr_object(cls, te_xdr_object: stellar_xdr.TransactionEnvelope, network_passphrase: str)
+
+- Remove Operation.type_code(). ([#390](https://github.com/StellarCN/py-stellar-base/pull/390))
+  
+- Remove deprecated classes and functions. ([#389](https://github.com/StellarCN/py-stellar-base/pull/389))
+  
+  The following classes and functions were marked as deprecated in v2, and now we have removed them.
+  
+  Classes:
+  
+  - stellar_sdk.call_builder.paths_call_builder.PathsCallBuilder
+
+  - stellar_sdk.operation.path_payment.PathPayment
+  
+  Functions:
+
+  - stellar_sdk.call_builder.accounts_call_builder.AccountsCallBuilder.signer(self, signer: str)
+
+  - stellar_sdk.call_builder.accounts_call_builder.AccountsCallBuilder.asset(self, asset: Asset)
+
+  - stellar_sdk.call_builder.offers_call_builder.OffersCallBuilder.account(self, account_id: str)
+
+  - stellar_sdk.sep.stellar_web_authentication.verify_challenge_transaction_signed_by_client(challenge_transaction: str, server_account_id: str, domain_name: str, network_passphrase: str)
+
+  - stellar_sdk.server.Server.paths(selfsource_account: str, destination_account: str, destination_asset: Asset, destination_amount: str)
+
+  - stellar_sdk.transaction_builder.TransactionBuilder.append_path_payment_op(self, destination: str, send_code: str, send_issuer: Optional[str], send_max: Union[str, Decimal], dest_code: str, dest_issuer: Optional[str], dest_amount: Union[str, Decimal], path: List[Asset], source: str = None)
+
+- Rename `stellar_sdk.operation.set_options.Flag` to `stellar_sdk.operation.set_options.AuthorizationFlag`.
+
+#### Update
+
+- add missing `__str__` and `__equals__` functions. ([#385](https://github.com/StellarCN/py-stellar-base/pull/385))
+
+#### Tips
+
+- Parse XDR into XDR object, the resolved object has complete type hint support, and you can also analyze it through the debug tool(such as PyCharm Debugger).
+
+  ```python
+  from stellar_sdk.xdr import TransactionEnvelope
+  
+  xdr = "AAAAAgAAAAA1y7+IlEXtO3+d01lKBazo8wCpZsqsEItW7y2WHv2sOgAAAfQAD5ZNAAQJtwAAAAAAAAAAAAAAAQAAAAAAAAABAAAAAGAQSwhD6XHfd4T2PjJc088ZwWyrfxr6Tcq7baksg1EHAAAAAlNJTEFVU0QAAAAAAAAAAABgEEsIQ+lx33eE9j4yXNPPGcFsq38a+k3Ku22pLINRBwAAAAAC+vCAAAAAAAAAAAEe/aw6AAAAQEDTXnTMoAwF7zM/dWDLAmxA02mVSXdqAbUzs1N/pJtrkOwlEk021zLnjTEo/5FeYGDaNktS8RemgQDYPxoL1QY="
+  te = TransactionEnvelope.from_xdr(xdr)
+  ...
+  ```
+ 
+### Version 3.0.0-beta5
+Released on Jan 06, 2021
+
+#### Update
+- Add `from_xdr_amount` and `to_xdr_amount` to stellar_sdk.xdr.utils. ([#419](https://github.com/StellarCN/py-stellar-base/pull/419))
+
+#### Breaking changes
+- Rename `stellar_sdk.operation.set_options.Flag` to `stellar_sdk.operation.set_options.AuthorizationFlag`.
+- Remove `TYPE` field in Operations. ([#418](https://github.com/StellarCN/py-stellar-base/pull/418))
+
 ### Version 2.10.1
 Released on Dec 22, 2020
 
@@ -34,6 +338,12 @@ Released on Dec 22, 2020
 #### Update
 * Upgrade dependencies so that this SDK can run on Apple M1 Chip.
 
+### Version 3.0.0-beta4
+Released on Dec 29, 2020
+
+#### Update
+* Upgrade dependencies.
+
 ### Version 2.10.0
 
 Released on Nov 15, 2020
@@ -43,6 +353,119 @@ Released on Nov 15, 2020
 #### Breaking changes
 * feat: check the mnemonic is correct before using it to generate the seed. ([#406](https://github.com/StellarCN/py-stellar-base/pull/406))
     - A parameter named `language` is added to `stellar_sdk.keypair.Keypair.from_mnemonic_phrase()`.
+
+### Version 3.0.0-beta3
+Released on Nov 11, 2020
+
+#### Update
+* feat: updates the SEP-10 utility function parameters and return values to support [SEP-10 v3.0](https://github.com/stellar/stellar-protocol/commit/9d121f98fd2201a5edfe0ed2befe92f4bf88bfe4)  ([#400](https://github.com/StellarCN/py-stellar-base/pull/400))
+* refactor: change the type of Operation.TYPE_CODE from `stellar_sdk.xdr.OperationType` to `str`. ([#401](https://github.com/StellarCN/py-stellar-base/pull/401))
+
+### Version 3.0.0-beta2
+Released on Nov 07, 2020
+
+#### Update
+* refactor: change the type of Operation.TYPE_CODE from `stellar_sdk.xdr.OperationType` to `str`. ([#401](https://github.com/StellarCN/py-stellar-base/pull/401))
+
+### Version 3.0.0-beta1
+Released on Nov 01, 2020
+
+#### Update
+* Add mypy check and bug fix. ([#398](https://github.com/StellarCN/py-stellar-base/pull/398))
+* Fix wrong type hinting.
+
+### Version 3.0.0-beta0
+
+Released on Oct 22, 2020
+
+**This update include breaking changes.**
+
+**This is a pre-release version, please do not use it in production.**
+
+This release brings new XDR code generated by the new XDR generator, with type hint support, if you need to use XDR objects, this release will bring a great experience improvement.
+
+#### Breaking changes
+- The old XDR code has been completely removed, and you can find the new XDR code [here](https://github.com/StellarCN/py-stellar-base/tree/c45d0874db5feccefe7ba57b7141eb06e064e09b/.xdr). ([#383](https://github.com/StellarCN/py-stellar-base/pull/383))
+
+  The XDR Object returned by the following functions has changed:
+
+  - Asset.to_xdr_object()
+  - TransactionEnvelope.to_xdr_object()
+  - FeeBumpTransaction.to_xdr_object()
+  - TransactionEnvelope.to_xdr_object()
+  - Keypair.xdr_public_key()
+  - Keypair.xdr_account_id()
+  - Keypair.xdr_muxed_account()
+  - Keypair.sign_decorated()
+  - Memo.to_xdr_object() (All types of Memos.)
+  - ClaimPredicate.to_xdr_object()
+  - Claimant.to_xdr_object()
+  - Operation.to_xdr_object() (All types of Operations.)
+  - Price.to_xdr_object()
+  - Signer.to_xdr_object()
+  - SignerKey.to_xdr_object()
+  - TimeBounds.to_xdr_object()
+
+- Rename the field that accepts XDR Object in the `from_xdr_object` function to `xdr_object`. ([#384](https://github.com/StellarCN/py-stellar-base/pull/384))
+  
+  This change affects the following functions:
+  
+  - Asset.from_xdr_object(cls, asset_xdr_object: stellar_xdr.Asset)
+  - FeeBumpTransaction.from_xdr_object(cls, te_xdr_object: stellar_xdr.TransactionEnvelope, cls, te_xdr_object: stellar_xdr.TransactionEnvelope)
+  - Memo.from_xdr_object(cls, xdr_obj: stellar_xdr.Memo) (All types of Memos.)
+  - Opeartion.from_xdr_object(cls, operation_xdr_object: stellar_xdr.Operation) (All types of Operations.)
+  - Price.from_xdr_object(cls, price_xdr_object: stellar_xdr.Price)
+  - Signer.from_xdr_object(cls, signer_xdr_object: stellar_xdr.Signer)
+  - SignerKey.from_xdr_object(cls, xdr_object: stellar_xdr.SignerKey)
+  - TimeBounds.from_xdr_object(cls, time_bounds_xdr_object: stellar_xdr.TimeBounds)
+  - Transaction.from_xdr_object(cls, tx_xdr_object: Union[stellar_xdr.Transaction, stellar_xdr.TransactionV0], v1: bool = False)
+  - TransactionEnvelope.from_xdr_object(cls, te_xdr_object: stellar_xdr.TransactionEnvelope, network_passphrase: str)
+
+- Remove Operation.type_code(), and add Operation.TYPE_CODE, it returns `stellar_sdk.xdr.OperationType`. ([#390](https://github.com/StellarCN/py-stellar-base/pull/390))
+  
+- Remove deprecated classes and functions. ([#389](https://github.com/StellarCN/py-stellar-base/pull/389))
+  
+  The following classes and functions were marked as deprecated in v2, and now we have removed them.
+  
+  Classes:
+  
+  - stellar_sdk.call_builder.paths_call_builder.PathsCallBuilder
+
+  - stellar_sdk.call_builder.payments_call_builder.PaymentsCallBuilder
+
+  - stellar_sdk.operation.path_payment.PathPayment
+  
+  Functions:
+
+  - stellar_sdk.call_builder.accounts_call_builder.AccountsCallBuilder.signer(self, signer: str)
+
+  - stellar_sdk.call_builder.accounts_call_builder.AccountsCallBuilder.asset(self, asset: Asset)
+
+  - stellar_sdk.call_builder.offers_call_builder.OffersCallBuilder.account(self, account_id: str)
+
+  - stellar_sdk.sep.stellar_web_authentication.verify_challenge_transaction_signed_by_client(challenge_transaction: str, server_account_id: str, domain_name: str, network_passphrase: str)
+
+  - stellar_sdk.server.Server.paths(selfsource_account: str, destination_account: str, destination_asset: Asset, destination_amount: str)
+
+  - stellar_sdk.server.Server.payments(self)
+
+  - stellar_sdk.transaction_builder.TransactionBuilder.append_path_payment_op(self, destination: str, send_code: str, send_issuer: Optional[str], send_max: Union[str, Decimal], dest_code: str, dest_issuer: Optional[str], dest_amount: Union[str, Decimal], path: List[Asset], source: str = None)
+
+#### Updated
+
+- add missing `__str__` and `__equals__` functions. ([#385](https://github.com/StellarCN/py-stellar-base/pull/385))
+
+#### Tips
+
+- Parse XDR into XDR object, the resolved object has complete type hint support, and you can also analyze it through the debug tool(such as PyCharm Debugger).
+
+  ```python
+  from stellar_sdk.xdr import TransactionEnvelope
+  
+  xdr = "AAAAAgAAAAA1y7+IlEXtO3+d01lKBazo8wCpZsqsEItW7y2WHv2sOgAAAfQAD5ZNAAQJtwAAAAAAAAAAAAAAAQAAAAAAAAABAAAAAGAQSwhD6XHfd4T2PjJc088ZwWyrfxr6Tcq7baksg1EHAAAAAlNJTEFVU0QAAAAAAAAAAABgEEsIQ+lx33eE9j4yXNPPGcFsq38a+k3Ku22pLINRBwAAAAAC+vCAAAAAAAAAAAEe/aw6AAAAQEDTXnTMoAwF7zM/dWDLAmxA02mVSXdqAbUzs1N/pJtrkOwlEk021zLnjTEo/5FeYGDaNktS8RemgQDYPxoL1QY="
+  te = TransactionEnvelope.from_xdr(xdr)
+  ...
+  ```
 
 ### Version 2.9.0
 

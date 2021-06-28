@@ -4,9 +4,11 @@ from ..call_builder.base_call_builder import BaseCallBuilder
 from ..client.base_async_client import BaseAsyncClient
 from ..client.base_sync_client import BaseSyncClient
 
+__all__ = ["EffectsCallBuilder"]
+
 
 class EffectsCallBuilder(BaseCallBuilder):
-    """ Creates a new :class:`EffectsCallBuilder` pointed to server defined by horizon_url.
+    """Creates a new :class:`EffectsCallBuilder` pointed to server defined by horizon_url.
     Do not create this object directly, use :func:`stellar_sdk.server.Server.effects`.
 
     See `All Effects <https://www.stellar.org/developers/horizon/reference/endpoints/effects-all.html>`_
@@ -42,7 +44,7 @@ class EffectsCallBuilder(BaseCallBuilder):
         :param sequence: ledger sequence
         :return: this EffectCallBuilder instance
         """
-        self.endpoint: str = f"ledgers/{sequence}/effects"
+        self.endpoint = f"ledgers/{sequence}/effects"
         return self
 
     def for_transaction(self, transaction_hash: str) -> "EffectsCallBuilder":
@@ -53,7 +55,7 @@ class EffectsCallBuilder(BaseCallBuilder):
         :param transaction_hash: transaction hash
         :return: this EffectCallBuilder instance
         """
-        self.endpoint: str = f"transactions/{transaction_hash}/effects"
+        self.endpoint = f"transactions/{transaction_hash}/effects"
         return self
 
     def for_operation(self, operation_id: Union[int, str]) -> "EffectsCallBuilder":
@@ -64,5 +66,5 @@ class EffectsCallBuilder(BaseCallBuilder):
         :param operation_id: operation ID
         :return: this EffectCallBuilder instance
         """
-        self.endpoint: str = f"operations/{operation_id}/effects"
+        self.endpoint = f"operations/{operation_id}/effects"
         return self

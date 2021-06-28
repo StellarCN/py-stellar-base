@@ -4,9 +4,11 @@ from ..call_builder.base_call_builder import BaseCallBuilder
 from ..client.base_async_client import BaseAsyncClient
 from ..client.base_sync_client import BaseSyncClient
 
+__all__ = ["TransactionsCallBuilder"]
+
 
 class TransactionsCallBuilder(BaseCallBuilder):
-    """ Creates a new :class:`TransactionsCallBuilder` pointed to server defined by horizon_url.
+    """Creates a new :class:`TransactionsCallBuilder` pointed to server defined by horizon_url.
     Do not create this object directly, use :func:`stellar_sdk.server.Server.transactions`.
 
     See `All Transactions <https://www.stellar.org/developers/horizon/reference/endpoints/transactions-all.html>`_
@@ -54,6 +56,19 @@ class TransactionsCallBuilder(BaseCallBuilder):
         :return: current TransactionsCallBuilder instance
         """
         self.endpoint = f"ledgers/{sequence}/transactions"
+        return self
+
+    def for_claimable_balance(
+        self, claimable_balance_id: str
+    ) -> "TransactionsCallBuilder":
+        """This endpoint represents successful transactions referencing a given claimable balance and can be used in streaming mode.
+
+        See `Claimable Balances - Retrieve related Transactions <https://developers.stellar.org/api/resources/claimablebalances/transactions/>`_
+
+        :param claimable_balance_id: This claimable balance’s id encoded in a hex string representation.
+        :return: current TransactionsCallBuilder instance
+        """
+        self.endpoint = f"claimable_balances/{claimable_balance_id}/transactions"
         return self
 
     def include_failed(self, include_failed: bool) -> "TransactionsCallBuilder":

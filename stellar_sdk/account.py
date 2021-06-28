@@ -1,7 +1,8 @@
-from typing import Optional, List
+from typing import Optional, List, Union
+import warnings
 
 from .sep.ed25519_public_key_signer import Ed25519PublicKeySigner
-from .strkey import StrKey
+from .muxed_account import MuxedAccount
 
 __all__ = ["Account"]
 
@@ -16,8 +17,9 @@ class Account:
     See `Accounts`_ For more information about the formats used for asset codes and how issuers
     work on Stellar,
 
-    :param account_id: Account ID of the
+    :param account_id: Account Id of the
         account (ex. `GB3KJPLFUYN5VL6R3GU3EGCGVCKFDSD7BEDX42HWG5BWFKB3KQGJJRMA`)
+        or muxed account (ex. `MBZSQ3YZMZEWL5ZRCEQ5CCSOTXCFCMKDGFFP4IEQN2KN6LCHCLI46AAAAAAAAAAE2L2QE`)
     :param sequence: sequence current sequence number of the account
     :raises:
         :exc:`Ed25519PublicKeyInvalidError <stellar_sdk.exceptions.Ed25519PublicKeyInvalidError>`: if ``account_id``
@@ -27,14 +29,27 @@ class Account:
         https://stellar.org/developers/learn/concepts/accounts.html
     """
 
-    def __init__(self, account_id: str, sequence: int) -> None:
-        StrKey.decode_ed25519_public_key(account_id)
-        self.account_id: str = account_id
-        self.sequence = sequence
+    def __init__(self, account_id: Union[str, MuxedAccount], sequence: int) -> None:
+        if isinstance(account_id, str):
+            self.account: MuxedAccount = MuxedAccount.from_account(account_id)
+        else:
+            self.account = account_id
+        self.sequence: int = sequence
 
-        # The following properties will change in 3.0
-        self.signers: Optional[dict] = None
+        # The following properties will change in future
+        self.signers: List[dict] = []
         self.thresholds: Optional[Thresholds] = None
+
+    def account_id(self) -> str:
+        """
+        Return ed25519 account id.
+        """
+        warnings.warn(
+            "Will be removed in version v5.0.0, "
+            "use `stellar_sdk.account.Account.account` instead.",
+            DeprecationWarning,
+        )
+        return self.account.account_id
 
     def increment_sequence_number(self) -> None:
         """
@@ -57,10 +72,10 @@ class Account:
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
             return NotImplemented  # pragma: no cover
-        return self.account_id == other.account_id and self.sequence == other.sequence
+        return self.account == other.account and self.sequence == other.sequence
 
     def __str__(self):
-        return f"<Account [account_id={self.account_id}, sequence={self.sequence}]>"
+        return f"<Account [account={self.account}, sequence={self.sequence}]>"
 
 
 class Thresholds:
@@ -79,4 +94,7 @@ class Thresholds:
         )
 
     def __str__(self):
-        return f"<Thresholds [low_threshold={self.low_threshold}, med_threshold={self.med_threshold}, high_threshold={self.high_threshold}]>"
+        return (
+            f"<Thresholds [low_threshold={self.low_threshold}, med_threshold={self.med_threshold}, "
+            f"high_threshold={self.high_threshold}]>"
+        )

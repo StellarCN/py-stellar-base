@@ -1,4 +1,4 @@
-from typing import Union, Dict
+from typing import Union, Dict, Generator, Any
 
 import requests
 from requests import RequestException
@@ -66,7 +66,7 @@ class SimpleRequestsClient(BaseSyncClient):
 
     def stream(
         self, url: str, params: Dict[str, str] = None
-    ) -> None:  # Here should return NoReturn, but it has not been implemented in PyPy.
+    ) -> Generator[Dict[str, Any], None, None]:
         """
         **Not Implemented**
 
@@ -78,3 +78,6 @@ class SimpleRequestsClient(BaseSyncClient):
 
     def close(self):
         pass  # pragma: no cover
+
+    def __str__(self):
+        return "<SimpleRequestsClient>"

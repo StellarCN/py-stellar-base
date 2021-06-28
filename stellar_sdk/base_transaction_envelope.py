@@ -1,11 +1,11 @@
 from abc import abstractmethod
 from typing import List, Union, Generic, TypeVar
 
+from . import xdr as stellar_xdr
 from .exceptions import SignatureExistError
 from .keypair import Keypair
 from .network import Network
 from .utils import hex_to_bytes, sha256
-from .xdr import Xdr
 
 T = TypeVar("T")
 
@@ -14,11 +14,11 @@ class BaseTransactionEnvelope(Generic[T]):
     def __init__(
         self,
         network_passphrase: str,
-        signatures: List[Xdr.types.DecoratedSignature] = None,
+        signatures: List[stellar_xdr.DecoratedSignature] = None,
     ) -> None:
         self.network_passphrase: str = network_passphrase
-        self.network_id: bytes = Network(network_passphrase).network_id()
-        self.signatures: List[Xdr.types.DecoratedSignature] = signatures or []
+        self.signatures: List[stellar_xdr.DecoratedSignature] = signatures or []
+        self._network_id: bytes = Network(network_passphrase).network_id()
 
     def hash(self) -> bytes:
         """Get the XDR Hash of the signature base.
@@ -76,26 +76,28 @@ class BaseTransactionEnvelope(Generic[T]):
         """
         raise NotImplementedError("The method has not been implemented.")
 
-    def sign_hashx(self, preimage: bytes) -> None:
+    def sign_hashx(self, preimage: Union[bytes, str]) -> None:
         """Sign this transaction envelope with a Hash(x) signature.
 
         See Stellar's documentation on `Multi-Sig
         <https://www.stellar.org/developers/guides/concepts/multi-sig.html>`_
         for more details on Hash(x) signatures.
 
-        :param preimage: 32 byte hash or hex encoded string , the "x" value to be hashed and used as a
-            signature.
+        :param preimage: Preimage of hash used as signer, byte hash or hex encoded string
         """
-        hash_preimage = sha256(hex_to_bytes(preimage))
-        hint = hash_preimage[-4:]
-        sig = Xdr.types.DecoratedSignature(hint, preimage)
+        preimage_bytes: bytes = hex_to_bytes(preimage)
+        hash_preimage = sha256(preimage_bytes)
+        hint = stellar_xdr.SignatureHint(hash_preimage[-4:])
+        sig = stellar_xdr.DecoratedSignature(
+            hint, stellar_xdr.Signature(preimage_bytes)
+        )
         sig_dict = [signature.__dict__ for signature in self.signatures]
         if sig.__dict__ in sig_dict:
             raise SignatureExistError("The preimage has already signed.")
         else:
             self.signatures.append(sig)
 
-    def to_xdr_object(self) -> Xdr.types.TransactionEnvelope:
+    def to_xdr_object(self) -> stellar_xdr.TransactionEnvelope:
         """Get an XDR object representation of this :class:`BaseTransactionEnvelope`.
 
         :return: XDR TransactionEnvelope object
@@ -112,11 +114,11 @@ class BaseTransactionEnvelope(Generic[T]):
 
     @classmethod
     def from_xdr_object(
-        cls, te_xdr_object: Xdr.types.TransactionEnvelope, network_passphrase: str
+        cls, xdr_object: stellar_xdr.TransactionEnvelope, network_passphrase: str
     ) -> T:
         """Create a new :class:`BaseTransactionEnvelope` from an XDR object.
 
-        :param te_xdr_object: The XDR object that represents a transaction envelope.
+        :param xdr_object: The XDR object that represents a transaction envelope.
         :param network_passphrase: The network to connect to for verifying and retrieving additional attributes from.
         :return: A new :class:`TransactionEnvelope` object from the given XDR TransactionEnvelope object.
         """
@@ -132,5 +134,15 @@ class BaseTransactionEnvelope(Generic[T]):
 
         :return: A new :class:`BaseTransactionEnvelope` object from the given XDR TransactionEnvelope base64 string object.
         """
-        xdr_object = Xdr.types.TransactionEnvelope.from_xdr(xdr)
+        xdr_object = stellar_xdr.TransactionEnvelope.from_xdr(xdr)
         return cls.from_xdr_object(xdr_object, network_passphrase)
+
+    @abstractmethod
+    def __eq__(self, other: object) -> bool:
+        pass  # pragma: no cover
+
+    def __str__(self):
+        return (
+            f"<BaseTransactionEnvelope [network_passphrase={self.network_passphrase}, "
+            f"signatures={self.signatures}]>"
+        )

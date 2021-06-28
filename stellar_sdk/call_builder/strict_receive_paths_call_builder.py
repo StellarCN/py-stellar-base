@@ -6,6 +6,8 @@ from ..call_builder.base_call_builder import BaseCallBuilder
 from ..client.base_async_client import BaseAsyncClient
 from ..client.base_sync_client import BaseSyncClient
 
+__all__ = ["StrictReceivePathsCallBuilder"]
+
 
 class StrictReceivePathsCallBuilder(BaseCallBuilder):
     """Creates a new :class:`StrictReceivePathsCallBuilder` pointed to server defined by horizon_url.

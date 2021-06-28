@@ -3,6 +3,8 @@ from typing import Dict, Any, Generator
 
 from .response import Response
 
+__all__ = ["BaseSyncClient"]
+
 
 class BaseSyncClient(metaclass=ABCMeta):
     """This is an abstract class,

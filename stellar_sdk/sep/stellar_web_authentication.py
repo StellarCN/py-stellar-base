@@ -4,24 +4,23 @@ Title: Stellar Web Authentication
 Author: Sergey Nebolsin <@nebolsin>, Tom Quisel <tom.quisel@gmail.com>, Leigh McCulloch <@leighmcculloch>, Jake Urban <jake@stellar.org>
 Status: Active
 Created: 2018-07-31
-Updated: 2021-01-11
-Version 3.1.0
+Updated: 2021-03-04
+Version 3.2.0
 """
 import base64
 import os
 import time
-import warnings
-from typing import List, Union, Iterable
+from typing import List, Union, Iterable, Optional
 
 from .ed25519_public_key_signer import Ed25519PublicKeySigner
 from .exceptions import InvalidSep10ChallengeError
+from .. import xdr as stellar_xdr
 from ..account import Account
 from ..exceptions import BadSignatureError, ValueError
 from ..keypair import Keypair
 from ..operation.manage_data import ManageData
 from ..transaction_builder import TransactionBuilder
 from ..transaction_envelope import TransactionEnvelope
-from ..xdr import Xdr
 
 __all__ = [
     "build_challenge_transaction",
@@ -73,6 +72,8 @@ def build_challenge_transaction(
     web_auth_domain: str,
     network_passphrase: str,
     timeout: int = 900,
+    client_domain: Optional[str] = None,
+    client_signing_key: Optional[str] = None,
 ) -> str:
     """Returns a valid `SEP0010 <https://github.com/stellar/stellar-protocol/blob/master/ecosystem/sep-0010.md>`_
     challenge transaction which you can use for Stellar Web Authentication.
@@ -85,6 +86,8 @@ def build_challenge_transaction(
     :param network_passphrase: The network to connect to for verifying and retrieving
         additional attributes from. (ex. 'Public Global Stellar Network ; September 2015')
     :param timeout: Challenge duration in seconds (default to 15 minutes).
+    :param client_domain: The domain of the client application requesting authentication
+    :param client_signing_key: The stellar account listed as the SIGNING_KEY on the client domain's TOML file
     :return: A base64 encoded string of the raw TransactionEnvelope xdr struct for the transaction.
     """
     if client_account_id.startswith(MUXED_ACCOUNT_STARTING_LETTER):
@@ -106,8 +109,18 @@ def build_challenge_transaction(
     ).append_manage_data_op(
         data_name="web_auth_domain",
         data_value=web_auth_domain,
-        source=server_account.account_id,
+        source=server_account.account,
     )
+    if client_domain:
+        if not client_signing_key:
+            raise ValueError(
+                "client_signing_key is required if client_domain is provided."
+            )
+        transaction_builder.append_manage_data_op(
+            data_name="client_domain",
+            data_value=client_domain,
+            source=client_signing_key,
+        )
     transaction = transaction_builder.build()
     transaction.sign(server_keypair)
     return transaction.to_xdr()
@@ -148,8 +161,8 @@ def read_challenge_transaction(
             "Invalid server_account_id, multiplexed account are not supported."
         )
 
-    xdr_object = Xdr.types.TransactionEnvelope.from_xdr(challenge_transaction)
-    if xdr_object.type == Xdr.const.ENVELOPE_TYPE_TX_FEE_BUMP:
+    xdr_object = stellar_xdr.TransactionEnvelope.from_xdr(challenge_transaction)
+    if xdr_object.type == stellar_xdr.EnvelopeType.ENVELOPE_TYPE_TX_FEE_BUMP:
         raise ValueError(
             "Invalid challenge, expected a TransactionEnvelope but received a FeeBumpTransactionEnvelope."
         )
@@ -166,7 +179,7 @@ def read_challenge_transaction(
     transaction = transaction_envelope.transaction
 
     # verify that transaction source account is equal to the server's signing key
-    if transaction.source.public_key != server_account_id:
+    if transaction.source.account_id != server_account_id:
         raise InvalidSep10ChallengeError(
             "Transaction source account is not equal to server's account."
         )
@@ -245,13 +258,18 @@ def read_challenge_transaction(
             raise InvalidSep10ChallengeError("Operation type should be ManageData.")
         if op.source is None:
             raise InvalidSep10ChallengeError("Operation should have a source account.")
-        if op.source != server_account_id:
+        if (
+            op.source.account_id != server_account_id
+            and op.data_name != "client_domain"
+        ):
             raise InvalidSep10ChallengeError(
                 "The transaction has operations that are unrecognized."
             )
         if op.data_name == "web_auth_domain":
             if op.data_value is None:
-                raise InvalidSep10ChallengeError("'web_auth_domain' operation value should not be null.")
+                raise InvalidSep10ChallengeError(
+                    "'web_auth_domain' operation value should not be null."
+                )
             if op.data_value != web_auth_domain.encode():
                 raise InvalidSep10ChallengeError(
                     f"'web_auth_domain' operation value does not match {web_auth_domain}."
@@ -311,6 +329,14 @@ def verify_challenge_transaction_signers(
     te = parsed_challenge_transaction.transaction
     server_keypair = Keypair.from_public_key(server_account_id)
 
+    # If the client domain is included the challenge transaction,
+    # verify that the transaction is signed by the operation's source account.
+    client_signing_key = None
+    for operation in te.transaction.operations:
+        if isinstance(operation, ManageData) and operation.data_name == "client_domain":
+            client_signing_key = operation.source
+            break
+
     # Ensure the server is not included
     # anywhere we check or output the list of signers.
     client_signers = []
@@ -328,14 +354,21 @@ def verify_challenge_transaction_signers(
     # hit. We do this in one hit here even though the server signature was
     # checked in the read_challenge_transaction to ensure that every signature and signer
     # are consumed only once on the transaction.
-    all_signers = client_signers + [Ed25519PublicKeySigner(server_keypair.public_key)]
+    additional_signers = [Ed25519PublicKeySigner(server_keypair.public_key)]
+    if client_signing_key:
+        additional_signers.append(Ed25519PublicKeySigner(client_signing_key.account_id))
+    all_signers = client_signers + additional_signers
     all_signers_found = _verify_transaction_signatures(te, all_signers)
 
-    signers_found = []
+    signers_found: List[Ed25519PublicKeySigner] = []
     server_signer_found = False
+    client_signing_key_found = False
     for signer in all_signers_found:
         if signer.account_id == server_keypair.public_key:
             server_signer_found = True
+            continue
+        if client_signing_key and signer.account_id == client_signing_key.account_id:
+            client_signing_key_found = True
             continue
         # Deduplicate the client signers
         if _signer_in_signers(signer, signers_found):
@@ -348,6 +381,12 @@ def verify_challenge_transaction_signers(
             f"Transaction not signed by server: {server_keypair.public_key}."
         )
 
+    if client_signing_key and not client_signing_key_found:
+        raise InvalidSep10ChallengeError(
+            f"Transaction not signed by the source account of the 'client_domain' "
+            "ManageData operation"
+        )
+
     # Confirm we matched signatures to the client signers.
     if not signers_found:
         raise InvalidSep10ChallengeError("Transaction not signed by any client signer.")
@@ -357,42 +396,6 @@ def verify_challenge_transaction_signers(
         raise InvalidSep10ChallengeError("Transaction has unrecognized signatures.")
 
     return signers_found
-
-
-def verify_challenge_transaction_signed_by_client(
-    challenge_transaction: str,
-    server_account_id: str,
-    home_domains: Union[str, Iterable[str]],
-    web_auth_domain: str,
-    network_passphrase: str,
-) -> None:
-    """An alias for :func:`stellar_sdk.sep.stellar_web_authentication.verify_challenge_transaction`.
-
-    :param challenge_transaction: SEP0010 transaction challenge transaction in base64.
-    :param server_account_id: public key for server's account.
-    :param home_domains: The home domain that is expected to be included in the first Manage Data operation's string
-        key. If a list is provided, one of the domain names in the array must match.
-    :param web_auth_domain: The home domain that is expected to be included as the value of the Manage Data operation with
-        the 'web_auth_domain' key. If no such operation is included, this parameter is not used.
-    :param network_passphrase: The network to connect to for verifying and retrieving
-        additional attributes from. (ex. 'Public Global Stellar Network ; September 2015')
-
-    :raises: :exc:`InvalidSep10ChallengeError <stellar_sdk.sep.exceptions.InvalidSep10ChallengeError>` - if the
-        validation fails, the exception will be thrown.
-    """
-    warnings.warn(
-        "Will be removed in version v3.0.0, "
-        "use stellar_sdk.sep.test_stellar_web_authentication.verify_challenge_transaction_signed_by_client_master_key",
-        DeprecationWarning,
-    )  # pragma: no cover
-
-    return verify_challenge_transaction_signed_by_client_master_key(
-        challenge_transaction,
-        server_account_id,
-        home_domains,
-        web_auth_domain,
-        network_passphrase,
-    )  # pragma: no cover
 
 
 def verify_challenge_transaction_signed_by_client_master_key(
@@ -552,10 +555,10 @@ def _verify_transaction_signatures(
             # See https://github.com/StellarCN/py-stellar-base/issues/252#issuecomment-580882560
             if index in signature_used:
                 continue
-            if decorated_signature.hint != kp.signature_hint():
+            if decorated_signature.hint.signature_hint != kp.signature_hint():
                 continue
             try:
-                kp.verify(tx_hash, decorated_signature.signature)
+                kp.verify(tx_hash, decorated_signature.signature.signature)
                 signature_used.add(index)
                 signers_found.append(signer)
                 break

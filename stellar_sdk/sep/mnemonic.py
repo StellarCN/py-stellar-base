@@ -48,14 +48,18 @@ class StellarMnemonic(Mnemonic):
 
     def to_seed(self, mnemonic: str, passphrase: str = "", index: int = 0) -> bytes:
         if not self.check(mnemonic):
-            raise ValueError("Invalid mnemonic, please check if the mnemonic is correct, "
-                             "or if the language is set correctly.")
+            raise ValueError(
+                "Invalid mnemonic, please check if the mnemonic is correct, "
+                "or if the language is set correctly."
+            )
         mnemonic = self.normalize_string(mnemonic)
         passphrase = self.normalize_string(passphrase)
         passphrase = "mnemonic" + passphrase
-        mnemonic = mnemonic.encode("utf-8")
-        passphrase = passphrase.encode("utf-8")
-        stretched = hashlib.pbkdf2_hmac("sha512", mnemonic, passphrase, PBKDF2_ROUNDS)
+        mnemonic_bytes = mnemonic.encode("utf-8")
+        passphrase_bytes = passphrase.encode("utf-8")
+        stretched = hashlib.pbkdf2_hmac(
+            "sha512", mnemonic_bytes, passphrase_bytes, PBKDF2_ROUNDS
+        )
         return self.derive(stretched[:64], index)
 
     def generate(self, strength: int = 128) -> str:

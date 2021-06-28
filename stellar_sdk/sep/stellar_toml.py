@@ -7,7 +7,7 @@ Created: 2017-10-30
 Updated: 2019-06-12
 Version: 2.1.0
 """
-from typing import Union, Dict, Any, Coroutine
+from typing import Union, Any, Coroutine, Dict
 
 import toml
 
@@ -72,4 +72,4 @@ def __handle_raw_response(raw_resp: Response) -> Dict[str, Any]:
     if raw_resp.status_code == 404:
         raise StellarTomlNotFoundError
     resp = raw_resp.text
-    return toml.loads(resp)
+    return toml.loads(resp)  # type: ignore[return-value]

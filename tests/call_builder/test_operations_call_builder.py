@@ -42,6 +42,18 @@ class TestOperationsCallBuilder:
         )
         assert builder.params == {}
 
+    def test_for_claimable_balance(self):
+        claimable_balance_id = (
+            "3389e9f0f1a65f19736cacf544c2e825313e8447f569233bb8db39aa607c8889"
+        )
+        builder = OperationsCallBuilder(horizon_url, client).for_claimable_balance(
+            claimable_balance_id
+        )
+        assert builder.endpoint == "claimable_balances/{transaction}/operations".format(
+            transaction=claimable_balance_id
+        )
+        assert builder.params == {}
+
     def test_include_failed(self):
         account_id = "GATEMHCCKCY67ZUCKTROYN24ZYT5GK4EQZ65JJLDHKHRUZI3EUEKMTCH"
         builder = (

@@ -16,6 +16,7 @@ __all__ = [
     "Ed25519PublicKeyInvalidError",
     "Ed25519SecretSeedInvalidError",
     "MissingEd25519SecretSeedError",
+    "MuxedEd25519AccountInvalidError",
     "MemoInvalidException",
     "AssetCodeInvalidError",
     "AssetIssuerInvalidError",
@@ -34,20 +35,15 @@ __all__ = [
 
 
 class SdkError(Exception):
-    """Base exception for all stellar sdk related errors
-    """
+    """Base exception for all stellar sdk related errors"""
 
 
 class ValueError(BuildInValueError, SdkError):
-    """exception for all values related errors
-
-    """
+    """exception for all values related errors"""
 
 
 class TypeError(BuildInTypeError, SdkError):
-    """exception for all type related errors
-
-    """
+    """exception for all type related errors"""
 
 
 class AttributeError(BuildInAttributeError, SdkError):
@@ -55,67 +51,51 @@ class AttributeError(BuildInAttributeError, SdkError):
 
 
 class BadSignatureError(ValueError):
-    """Raised when the signature was forged or otherwise corrupt.
-    """
+    """Raised when the signature was forged or otherwise corrupt."""
 
 
 class Ed25519PublicKeyInvalidError(ValueError):
-    """Ed25519 public key is incorrect.
-
-    """
+    """Ed25519 public key is incorrect."""
 
 
 class Ed25519SecretSeedInvalidError(ValueError):
-    """Ed25519 secret seed is incorrect.
-
-    """
+    """Ed25519 secret seed is incorrect."""
 
 
 class MissingEd25519SecretSeedError(ValueError):
-    """Missing Ed25519 secret seed in the keypair
+    """Missing Ed25519 secret seed in the keypair"""
 
-    """
+
+class MuxedEd25519AccountInvalidError(ValueError):
+    """Muxed Ed25519 public key is incorrect."""
 
 
 class MemoInvalidException(ValueError):
-    """Memo is incorrect.
-
-    """
+    """Memo is incorrect."""
 
 
 class AssetCodeInvalidError(ValueError):
-    """Asset Code is incorrect.
-
-    """
+    """Asset Code is incorrect."""
 
 
 class AssetIssuerInvalidError(ValueError):
-    """Asset issuer is incorrect.
-
-    """
+    """Asset issuer is incorrect."""
 
 
 class NoApproximationError(SdkError):
-    """Approximation cannot be found
-
-    """
+    """Approximation cannot be found"""
 
 
 class SignatureExistError(ValueError):
-    """A keypair can only sign a transaction once.
-
-    """
+    """A keypair can only sign a transaction once."""
 
 
 class BaseRequestError(SdkError):
-    """Base class for requests errors.
-    """
+    """Base class for requests errors."""
 
 
 class ConnectionError(BaseRequestError):
-    """Base class for client connection errors.
-
-    """
+    """Base class for client connection errors."""
 
 
 class BaseHorizonError(BaseRequestError):
@@ -177,14 +157,11 @@ class BadResponseError(BaseHorizonError):
 
 
 class UnknownRequestError(BaseHorizonError):
-    """Unknown request exception, please create an issue feedback for this issue.
-
-    """
+    """Unknown request exception, please create an issue feedback for this issue."""
 
 
 class NotPageableError(BaseRequestError):
-    """There is no previous or next page
-    """
+    """There is no previous or next page"""
 
 
 class StreamClientError(BaseRequestError):

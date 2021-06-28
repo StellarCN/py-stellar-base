@@ -57,7 +57,7 @@ async def __readline(self) -> bytes:
     return b"".join(line)
 
 
-aiohttp.streams.StreamReader.readline = __readline
+aiohttp.streams.StreamReader.readline = __readline  # type: ignore[assignment]
 
 
 class AiohttpClient(BaseAsyncClient):
@@ -90,7 +90,7 @@ class AiohttpClient(BaseAsyncClient):
         else:
             connector = aiohttp.TCPConnector(limit=pool_size)
 
-        self.user_agent: dict = USER_AGENT
+        self.user_agent: Optional[str] = USER_AGENT
         if user_agent:
             self.user_agent = user_agent
 
@@ -149,7 +149,7 @@ class AiohttpClient(BaseAsyncClient):
         except aiohttp.ClientError as e:
             raise ConnectionError(e)
 
-    async def stream(
+    async def stream(  # type: ignore[override]
         self, url: str, params: Dict[str, str] = None
     ) -> AsyncGenerator[Dict[str, Any], None]:
         """Perform Stream request.
@@ -231,3 +231,12 @@ class AiohttpClient(BaseAsyncClient):
         await self._session.__aexit__(None, None, None)
         if self._sse_session is not None:
             await self._sse_session.__aexit__(None, None, None)
+
+    def __str__(self):
+        return (
+            f"<AiohttpClient [pool_size={self.pool_size}, "
+            f"request_timeout={self.request_timeout}, "
+            f"post_timeout={self.post_timeout}, "
+            f"backoff_factor={self.backoff_factor}, "
+            f"user_agent={self.user_agent}]>"
+        )

@@ -1,11 +1,15 @@
 from decimal import Decimal
+from typing import Optional
 from typing import Union
 
 from .operation import Operation
 from .utils import check_price, check_amount
+from .. import xdr as stellar_xdr
 from ..asset import Asset
+from ..muxed_account import MuxedAccount
 from ..price import Price
-from ..xdr import Xdr
+
+__all__ = ["ManageBuyOffer"]
 
 
 class ManageBuyOffer(Operation):
@@ -33,6 +37,10 @@ class ManageBuyOffer(Operation):
 
     """
 
+    _XDR_OPERATION_TYPE: stellar_xdr.OperationType = (
+        stellar_xdr.OperationType.MANAGE_BUY_OFFER
+    )
+
     def __init__(
         self,
         selling: Asset,
@@ -40,7 +48,7 @@ class ManageBuyOffer(Operation):
         amount: Union[str, Decimal],
         price: Union[Price, str, Decimal],
         offer_id: int = 0,
-        source: str = None,
+        source: Optional[Union[MuxedAccount, str]] = None,
     ) -> None:
         super().__init__(source)
         check_amount(amount)
@@ -51,11 +59,7 @@ class ManageBuyOffer(Operation):
         self.price: Union[Price, str, Decimal] = price
         self.offer_id: int = offer_id
 
-    @classmethod
-    def type_code(cls) -> int:
-        return Xdr.const.MANAGE_BUY_OFFER
-
-    def _to_operation_body(self) -> Xdr.nullclass:
+    def _to_operation_body(self) -> stellar_xdr.OperationBody:
         selling = self.selling.to_xdr_object()
         buying = self.buying.to_xdr_object()
 
@@ -65,37 +69,28 @@ class ManageBuyOffer(Operation):
             price_fraction = Price.from_raw_price(self.price)
 
         price = price_fraction.to_xdr_object()
-
-        amount = Operation.to_xdr_amount(self.amount)
-
-        manage_buy_offer_op = Xdr.types.ManageBuyOfferOp(
-            selling, buying, amount, price, self.offer_id
+        amount = stellar_xdr.Int64(Operation.to_xdr_amount(self.amount))
+        manage_buy_offer_op = stellar_xdr.ManageBuyOfferOp(
+            selling, buying, amount, price, stellar_xdr.Int64(self.offer_id)
         )
-        body = Xdr.nullclass()
-        body.type = Xdr.const.MANAGE_BUY_OFFER
-        body.manageBuyOfferOp = manage_buy_offer_op
+
+        body = stellar_xdr.OperationBody(
+            type=self._XDR_OPERATION_TYPE, manage_buy_offer_op=manage_buy_offer_op
+        )
         return body
 
     @classmethod
-    def from_xdr_object(
-        cls, operation_xdr_object: Xdr.types.Operation
-    ) -> "ManageBuyOffer":
-        """Creates a :class:`ManageBuyOffer` object from an XDR Operation object.
-
-        """
-        source = Operation.get_source_from_xdr_obj(operation_xdr_object)
-
-        selling = Asset.from_xdr_object(
-            operation_xdr_object.body.manageBuyOfferOp.selling
-        )
-        buying = Asset.from_xdr_object(
-            operation_xdr_object.body.manageBuyOfferOp.buying
-        )
+    def from_xdr_object(cls, xdr_object: stellar_xdr.Operation) -> "ManageBuyOffer":
+        """Creates a :class:`ManageBuyOffer` object from an XDR Operation object."""
+        source = Operation.get_source_from_xdr_obj(xdr_object)
+        assert xdr_object.body.manage_buy_offer_op is not None
+        selling = Asset.from_xdr_object(xdr_object.body.manage_buy_offer_op.selling)
+        buying = Asset.from_xdr_object(xdr_object.body.manage_buy_offer_op.buying)
         amount = Operation.from_xdr_amount(
-            operation_xdr_object.body.manageBuyOfferOp.buyAmount
+            xdr_object.body.manage_buy_offer_op.buy_amount.int64
         )
-        price = Price.from_xdr_object(operation_xdr_object.body.manageBuyOfferOp.price)
-        offer_id = operation_xdr_object.body.manageBuyOfferOp.offerID
+        price = Price.from_xdr_object(xdr_object.body.manage_buy_offer_op.price)
+        offer_id = xdr_object.body.manage_buy_offer_op.offer_id.int64
 
         op = cls(
             source=source,
@@ -105,5 +100,10 @@ class ManageBuyOffer(Operation):
             price=price,
             offer_id=offer_id,
         )
-        op._source_muxed = Operation.get_source_muxed_from_xdr_obj(operation_xdr_object)
         return op
+
+    def __str__(self):
+        return (
+            f"<ManageBuyOffer [selling={self.selling}, buying={self.buying}, "
+            f"amount={self.amount}, price={self.price}, offer_id={self.offer_id}, source={self.source}]>"
+        )

@@ -5,7 +5,6 @@ verify_ssl = true
 
 [dev-packages]
 pytest = "*"
-ply = "*"
 pytest-cov = "*"
 sphinx = "*"
 sphinx-rtd-theme = "*"
@@ -15,7 +14,6 @@ pytest-asyncio = "*"
 pytest-httpserver = "*"
 
 [packages]
-crc16 = "*"
 pynacl = "*"
 requests = "*"
 aiohttp = "*"
@@ -26,6 +24,3 @@ toml = "*"
 
 [requires]
 python_version = "3.8"
-
-[pipenv]
-allow_prereleases = true

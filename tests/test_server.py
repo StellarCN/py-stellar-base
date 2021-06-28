@@ -1,18 +1,20 @@
 import pytest
 
+from stellar_sdk import MuxedAccount
 from stellar_sdk.account import Thresholds
 from stellar_sdk.asset import Asset
 from stellar_sdk.call_builder import FeeStatsCallBuilder
 from stellar_sdk.call_builder.accounts_call_builder import AccountsCallBuilder
 from stellar_sdk.call_builder.assets_call_builder import AssetsCallBuilder
-from stellar_sdk.call_builder.claimable_balances_call_builder import ClaimableBalancesCallBuilder
+from stellar_sdk.call_builder.claimable_balances_call_builder import (
+    ClaimableBalancesCallBuilder,
+)
 from stellar_sdk.call_builder.data_call_builder import DataCallBuilder
 from stellar_sdk.call_builder.effects_call_builder import EffectsCallBuilder
 from stellar_sdk.call_builder.ledgers_call_builder import LedgersCallBuilder
 from stellar_sdk.call_builder.offers_call_builder import OffersCallBuilder
 from stellar_sdk.call_builder.operations_call_builder import OperationsCallBuilder
 from stellar_sdk.call_builder.orderbook_call_builder import OrderbookCallBuilder
-from stellar_sdk.call_builder.paths_call_builder import PathsCallBuilder
 from stellar_sdk.call_builder.payments_call_builder import PaymentsCallBuilder
 from stellar_sdk.call_builder.root_call_builder import RootCallBuilder
 from stellar_sdk.call_builder.strict_receive_paths_call_builder import (
@@ -40,7 +42,31 @@ class TestServer:
         horizon_url = "https://horizon.stellar.org"
         with Server(horizon_url) as server:
             account = server.load_account(account_id)
-            assert account.account_id == account_id
+            assert account.account == MuxedAccount.from_account(account_id)
+            assert isinstance(account.sequence, int)
+            assert account.thresholds == Thresholds(1, 2, 3)
+
+    def test_load_acount_muxed_account_str_sync(self):
+        account_id = (
+            "MDV6FVHPY4JH7EEBSJYPQQYZA3OC6TKTM2TAXRHWT4EEL7BJ2BTDQAAAAAAAAAAE2KS7Y"
+        )
+        horizon_url = "https://horizon.stellar.org"
+        with Server(horizon_url) as server:
+            account = server.load_account(account_id)
+            assert account.account == MuxedAccount.from_account(
+                "MDV6FVHPY4JH7EEBSJYPQQYZA3OC6TKTM2TAXRHWT4EEL7BJ2BTDQAAAAAAAAAAE2KS7Y"
+            )
+            assert isinstance(account.sequence, int)
+            assert account.thresholds == Thresholds(1, 2, 3)
+
+    def test_load_acount_muxed_account_sync(self):
+        account_id = MuxedAccount(
+            "GDV6FVHPY4JH7EEBSJYPQQYZA3OC6TKTM2TAXRHWT4EEL7BJ2BTDQT5D", 1234
+        )
+        horizon_url = "https://horizon.stellar.org"
+        with Server(horizon_url) as server:
+            account = server.load_account(account_id)
+            assert account.account == account_id
             assert isinstance(account.sequence, int)
             assert account.thresholds == Thresholds(1, 2, 3)
 
@@ -51,7 +77,33 @@ class TestServer:
         client = AiohttpClient()
         async with Server(horizon_url, client) as server:
             account = await server.load_account(account_id)
-            assert account.account_id == account_id
+            assert account.account == MuxedAccount.from_account(account_id)
+            assert isinstance(account.sequence, int)
+            assert account.thresholds == Thresholds(1, 2, 3)
+
+    @pytest.mark.asyncio
+    async def test_load_acount_muxed_account_str_async(self):
+        account_id = (
+            "MDV6FVHPY4JH7EEBSJYPQQYZA3OC6TKTM2TAXRHWT4EEL7BJ2BTDQAAAAAAAAAAE2KS7Y"
+        )
+        horizon_url = "https://horizon.stellar.org"
+        client = AiohttpClient()
+        async with Server(horizon_url, client) as server:
+            account = await server.load_account(account_id)
+            assert account.account == MuxedAccount.from_account(account_id)
+            assert isinstance(account.sequence, int)
+            assert account.thresholds == Thresholds(1, 2, 3)
+
+    @pytest.mark.asyncio
+    async def test_load_acount_muxed_account_async(self):
+        account_id = MuxedAccount(
+            "GDV6FVHPY4JH7EEBSJYPQQYZA3OC6TKTM2TAXRHWT4EEL7BJ2BTDQT5D", 1234
+        )
+        horizon_url = "https://horizon.stellar.org"
+        client = AiohttpClient()
+        async with Server(horizon_url, client) as server:
+            account = await server.load_account(account_id)
+            assert account.account == account_id
             assert isinstance(account.sequence, int)
             assert account.thresholds == Thresholds(1, 2, 3)
 
@@ -75,7 +127,9 @@ class TestServer:
         with Server(horizon_url, client) as server:
             assert server.accounts() == AccountsCallBuilder(horizon_url, client)
             assert server.assets() == AssetsCallBuilder(horizon_url, client)
-            assert server.claimable_balances() == ClaimableBalancesCallBuilder(horizon_url, client)
+            assert server.claimable_balances() == ClaimableBalancesCallBuilder(
+                horizon_url, client
+            )
             assert server.data(
                 "GDV6FVHPY4JH7EEBSJYPQQYZA3OC6TKTM2TAXRHWT4EEL7BJ2BTDQT5D", "hello"
             ) == DataCallBuilder(
@@ -95,25 +149,6 @@ class TestServer:
             )
             assert server.orderbook(buying, selling) == OrderbookCallBuilder(
                 horizon_url, client, buying, selling
-            )
-            source_account = "GABUVMDURJFF477AEDAXOG5TL7JBHGDAKJQLH5K6FB5QONMLEV52C6IO"
-            destination_account = (
-                "GDV6FVHPY4JH7EEBSJYPQQYZA3OC6TKTM2TAXRHWT4EEL7BJ2BTDQT5D"
-            )
-            destination_asset = Asset.native()
-            destination_amount = "100.0"
-            assert server.paths(
-                source_account,
-                destination_account,
-                destination_asset,
-                destination_amount,
-            ) == PathsCallBuilder(
-                horizon_url,
-                client,
-                source_account,
-                destination_account,
-                destination_asset,
-                destination_amount,
             )
             source = "GAYSHLG75RPSMXWJ5KX7O7STE6RSZTD6NE4CTWAXFZYYVYIFRUVJIBJH"
             destination_asset = Asset(

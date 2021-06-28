@@ -4,9 +4,11 @@ from ..call_builder.base_call_builder import BaseCallBuilder
 from ..client.base_async_client import BaseAsyncClient
 from ..client.base_sync_client import BaseSyncClient
 
+__all__ = ["AssetsCallBuilder"]
+
 
 class AssetsCallBuilder(BaseCallBuilder):
-    """ Creates a new :class:`AssetsCallBuilder` pointed to server defined by horizon_url.
+    """Creates a new :class:`AssetsCallBuilder` pointed to server defined by horizon_url.
     Do not create this object directly, use :func:`stellar_sdk.server.Server.assets`.
 
     See `All Assets <https://www.stellar.org/developers/horizon/reference/endpoints/assets-all.html>`_
@@ -22,7 +24,7 @@ class AssetsCallBuilder(BaseCallBuilder):
         self.endpoint: str = "assets"
 
     def for_code(self, asset_code: str) -> "AssetsCallBuilder":
-        """ This endpoint filters all assets by the asset code.
+        """This endpoint filters all assets by the asset code.
 
         :param asset_code: asset code, for example: `USD`
         :return: current AssetCallBuilder instance
@@ -31,7 +33,7 @@ class AssetsCallBuilder(BaseCallBuilder):
         return self
 
     def for_issuer(self, asset_issuer: str) -> "AssetsCallBuilder":
-        """ This endpoint filters all assets by the asset issuer.
+        """This endpoint filters all assets by the asset issuer.
 
         :param asset_issuer: asset issuer,
             for example: `GDGQVOKHW4VEJRU2TETD6DBRKEO5ERCNF353LW5WBFW3JJWQ2BRQ6KDD`

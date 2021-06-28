@@ -1,4 +1,3 @@
-import warnings
 from typing import Union
 
 from ..asset import Asset
@@ -7,9 +6,11 @@ from ..client.base_async_client import BaseAsyncClient
 from ..client.base_sync_client import BaseSyncClient
 from ..utils import convert_assets_to_horizon_param
 
+__all__ = ["AccountsCallBuilder"]
+
 
 class AccountsCallBuilder(BaseCallBuilder):
-    """ Creates a new :class:`AccountsCallBuilder` pointed to server defined by horizon_url.
+    """Creates a new :class:`AccountsCallBuilder` pointed to server defined by horizon_url.
     Do not create this object directly, use :func:`stellar_sdk.server.Server.accounts`.
 
     :param horizon_url: Horizon server URL.
@@ -34,20 +35,6 @@ class AccountsCallBuilder(BaseCallBuilder):
         self.endpoint = f"accounts/{account_id}"
         return self
 
-    def signer(self, signer: str) -> "AccountsCallBuilder":
-        """Filtering accounts who have a given signer. The result is a list of accounts.
-
-        See `Account Details <https://www.stellar.org/developers/horizon/reference/endpoints/accounts-single.html>`_
-
-        :param signer: signer's account id, for example: `GDGQVOKHW4VEJRU2TETD6DBRKEO5ERCNF353LW5WBFW3JJWQ2BRQ6KDD`
-        :return: current AccountCallBuilder instance
-        """
-        warnings.warn(
-            "Will be removed in future, use AccountsCallBuilder.for_signer",
-            DeprecationWarning,
-        )
-        return self.for_signer(signer)
-
     def for_signer(self, signer: str) -> "AccountsCallBuilder":
         """Filtering accounts who have a given signer. The result is a list of accounts.
 
@@ -58,20 +45,6 @@ class AccountsCallBuilder(BaseCallBuilder):
         """
         self._add_query_param("signer", signer)
         return self
-
-    def asset(self, asset: Asset) -> "AccountsCallBuilder":
-        """Filtering accounts who have a trustline to an asset. The result is a list of accounts.
-
-        See `Account Details <https://www.stellar.org/developers/horizon/reference/endpoints/accounts-single.html>`_
-
-        :param asset: an issued asset
-        :return: current AccountCallBuilder instance
-        """
-        warnings.warn(
-            "Will be removed in future, use AccountsCallBuilder.for_asset",
-            DeprecationWarning,
-        )
-        return self.for_asset(asset)
 
     def for_asset(self, asset: Asset) -> "AccountsCallBuilder":
         """Filtering accounts who have a trustline to an asset. The result is a list of accounts.
