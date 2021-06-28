@@ -32,6 +32,7 @@ from .fee_bump_transaction_envelope import FeeBumpTransactionEnvelope
 from .helpers import parse_transaction_envelope_from_xdr
 from .keypair import Keypair
 from .memo import NoneMemo
+from .muxed_account import MuxedAccount
 from .sep.exceptions import AccountRequiresMemoError
 from .transaction import Transaction
 from .transaction_envelope import TransactionEnvelope
@@ -360,7 +361,7 @@ class Server:
         )
 
     def load_account(
-        self, account_id: Union[Keypair, str]
+        self, account_id: Union[MuxedAccount, Keypair, str]
     ) -> Union[Account, Coroutine[Any, Any, Account]]:
         """Fetches an account's most current base state (like sequence) in the ledger and then creates
         and returns an :class:`stellar_sdk.account.Account` object.
@@ -377,17 +378,18 @@ class Server:
             :exc:`BadResponseError <stellar_sdk.exceptions.BadResponseError>`
             :exc:`UnknownRequestError <stellar_sdk.exceptions.UnknownRequestError>`
         """
-
-        if isinstance(account_id, Keypair):
-            account = account_id.public_key
+        if isinstance(account_id, str):
+            account = MuxedAccount.from_account(account_id)
+        elif isinstance(account_id, Keypair):
+            account = MuxedAccount.from_account(account_id.public_key)
         else:
             account = account_id
         if self.__async:
             return self.__load_account_async(account)
         return self.__load_account_sync(account)
 
-    async def __load_account_async(self, account_id: str) -> Account:
-        resp = await self.accounts().account_id(account_id=account_id).call()  # type: ignore[misc]
+    async def __load_account_async(self, account_id: MuxedAccount) -> Account:
+        resp = await self.accounts().account_id(account_id=account_id.account_id).call()  # type: ignore[misc]
         assert isinstance(resp, dict)
         sequence = int(resp["sequence"])
         thresholds = Thresholds(
@@ -400,8 +402,8 @@ class Server:
         account.thresholds = thresholds
         return account
 
-    def __load_account_sync(self, account_id: str) -> Account:
-        resp = self.accounts().account_id(account_id=account_id).call()
+    def __load_account_sync(self, account_id: MuxedAccount) -> Account:
+        resp = self.accounts().account_id(account_id=account_id.account_id).call()  # type: ignore[misc]
         assert isinstance(resp, dict)
         sequence = int(resp["sequence"])
         thresholds = Thresholds(
@@ -478,7 +480,7 @@ class Server:
                     PathPaymentStrictReceive,
                 ),
             ):
-                destination: str = operation.destination
+                destination: str = operation.destination.account_id
             else:
                 continue
             if destination in destinations:

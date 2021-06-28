@@ -1,10 +1,9 @@
-import base64
 from decimal import Decimal
 
 import pytest
 from stellar_sdk.operation.claim_claimable_balance import ClaimClaimableBalance
 
-from stellar_sdk import Price, Asset, Keypair
+from stellar_sdk import Price, Asset, MuxedAccount
 from stellar_sdk.exceptions import Ed25519PublicKeyInvalidError, AssetCodeInvalidError
 from stellar_sdk.operation import Operation, CreateAccount
 from stellar_sdk.operation.create_claimable_balance import *
@@ -48,6 +47,7 @@ from stellar_sdk.signer import Signer
 from stellar_sdk.signer_key import SignerKey
 from stellar_sdk.utils import sha256
 from stellar_sdk.xdr.claim_predicate import ClaimPredicate as XdrClaimPredicate
+
 
 class TestBaseOperation:
     @pytest.mark.parametrize(
@@ -113,7 +113,6 @@ class TestBaseOperation:
 
         op = Operation.from_xdr_object(origin_xdr_obj)
         assert op.source is None
-        assert op._source_muxed is None
         assert op.starting_balance == "1000"
         assert op.destination == destination
 
@@ -134,14 +133,7 @@ class TestBaseOperation:
 
         op = Operation.from_xdr_object(origin_xdr_obj)
         assert op.to_xdr_object().to_xdr() == origin_xdr_obj.to_xdr()
-        assert op.source == source
-        assert (
-            op._source_muxed.to_xdr()
-            == Keypair.from_public_key(source).xdr_muxed_account().to_xdr()
-        )
-        op.source = source2
-        assert op.source == source2
-        assert op._source_muxed is None
+        assert op.source.account_id == source
 
 
 class TestCreateAccount:
@@ -202,6 +194,32 @@ class TestCreateAccount:
         origin_xdr_obj = origin_op.to_xdr_object()
 
         op = Operation.from_xdr_object(origin_xdr_obj)
+        assert op.source.account_id == source
+        assert op.starting_balance == "1000"
+        assert op.destination == destination
+
+    def test_get_muxed_account_str_source_exist_from_xdr_obj(self):  # BAD TEST
+        source = "MAAAAAAAAAAAJURAAB2X52XFQP6FBXLGT6LWOOWMEXWHEWBDVRZ7V5WH34Y22MPFBHUHY"
+        destination = "GCEZWKCA5VLDNRLN3RPRJMRZOX3Z6G5CHCGSNFHEYVXM3XOJMDS674JZ"
+        starting_balance = "1000.00"
+        origin_op = CreateAccount(destination, starting_balance, source)
+        origin_xdr_obj = origin_op.to_xdr_object()
+
+        op = Operation.from_xdr_object(origin_xdr_obj)
+        assert op.source == MuxedAccount.from_account(source)
+        assert op.starting_balance == "1000"
+        assert op.destination == destination
+
+    def test_get_muxed_account_source_exist_from_xdr_obj(self):  # BAD TEST
+        source = MuxedAccount(
+            "GAQAA5L65LSYH7CQ3VTJ7F3HHLGCL3DSLAR2Y47263D56MNNGHSQSTVY", 1234
+        )
+        destination = "GCEZWKCA5VLDNRLN3RPRJMRZOX3Z6G5CHCGSNFHEYVXM3XOJMDS674JZ"
+        starting_balance = "1000.00"
+        origin_op = CreateAccount(destination, starting_balance, source)
+        origin_xdr_obj = origin_op.to_xdr_object()
+
+        op = Operation.from_xdr_object(origin_xdr_obj)
         assert op.source == source
         assert op.starting_balance == "1000"
         assert op.destination == destination
@@ -224,7 +242,7 @@ class TestBumpSequence:
         origin_xdr_obj = BumpSequence(bump_to, source).to_xdr_object()
         op = Operation.from_xdr_object(origin_xdr_obj)
         assert isinstance(op, BumpSequence)
-        assert op.source == source
+        assert op.source.account_id == source
         assert op.bump_to == bump_to
 
 
@@ -242,7 +260,7 @@ class TestInflation:
         origin_xdr_obj = Inflation(source).to_xdr_object()
         op = Operation.from_xdr_object(origin_xdr_obj)
         assert isinstance(op, Inflation)
-        assert op.source == source
+        assert op.source.account_id == source
 
 
 class TestAccountMerge:
@@ -261,8 +279,8 @@ class TestAccountMerge:
         origin_xdr_obj = AccountMerge(destination, source).to_xdr_object()
         op = Operation.from_xdr_object(origin_xdr_obj)
         assert isinstance(op, AccountMerge)
-        assert op.source == source
-        assert op.destination == destination
+        assert op.source.account_id == source
+        assert op.destination.account_id == destination
 
     def test_from_xdr_muxed(self):
         source = "GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV"
@@ -271,13 +289,34 @@ class TestAccountMerge:
         origin_xdr_obj = AccountMerge(destination, source).to_xdr_object()
         restore_op = AccountMerge.from_xdr_object(origin_xdr_obj)
         assert restore_op.to_xdr_object().to_xdr() == origin_xdr_obj.to_xdr()
-        assert (
-            restore_op._destination_muxed.to_xdr()
-            == Keypair.from_public_key(destination).xdr_muxed_account().to_xdr()
-        )
         restore_op.destination = destination2
-        assert restore_op._destination_muxed is None
         assert restore_op.destination == destination2
+
+    def test_from_xdr_obj_muxed_str_account(self):
+        source = "GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV"
+        destination = (
+            "MAAAAAAAAAAAJURAAB2X52XFQP6FBXLGT6LWOOWMEXWHEWBDVRZ7V5WH34Y22MPFBHUHY"
+        )
+        origin_xdr_obj = AccountMerge(destination, source).to_xdr_object()
+        op = Operation.from_xdr_object(origin_xdr_obj)
+        assert isinstance(op, AccountMerge)
+        assert (
+            op.source == source if source is None else MuxedAccount.from_account(source)
+        )
+        assert op.destination == MuxedAccount.from_account(destination)
+
+    def test_from_xdr_obj_muxed_account(self):
+        source = "GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV"
+        destination = MuxedAccount(
+            "GAQAA5L65LSYH7CQ3VTJ7F3HHLGCL3DSLAR2Y47263D56MNNGHSQSTVY", 1234
+        )
+        origin_xdr_obj = AccountMerge(destination, source).to_xdr_object()
+        op = Operation.from_xdr_object(origin_xdr_obj)
+        assert isinstance(op, AccountMerge)
+        assert (
+            op.source == source if source is None else MuxedAccount.from_account(source)
+        )
+        assert op.destination == destination
 
 
 class TestChangeTrust:
@@ -315,7 +354,7 @@ class TestChangeTrust:
         origin_xdr_obj = ChangeTrust(asset, limit, source).to_xdr_object()
         op = Operation.from_xdr_object(origin_xdr_obj)
         assert isinstance(op, ChangeTrust)
-        assert op.source == source
+        assert op.source.account_id == source
         assert op.limit == limit
         assert op.asset == asset
 
@@ -342,7 +381,7 @@ class TestClaimClaimableBalance:
         ).to_xdr_object()
         op = Operation.from_xdr_object(origin_xdr_obj)
         assert isinstance(op, ClaimClaimableBalance)
-        assert op.source == source
+        assert op.source.account_id == source
         assert op.balance_id == balance_id
 
 
@@ -382,27 +421,53 @@ class TestPayment:
         origin_xdr_obj = Payment(destination, asset, amount, source).to_xdr_object()
         op = Operation.from_xdr_object(origin_xdr_obj)
         assert isinstance(op, Payment)
-        assert op.source == source
-        assert op.destination == destination
+        assert op.source.account_id == source
+        assert op.destination.account_id == destination
         assert op.amount == "1000"
         assert op.asset == asset
 
     def test_from_xdr_muxed(self):
         source = "GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV"
         destination = "GCEZWKCA5VLDNRLN3RPRJMRZOX3Z6G5CHCGSNFHEYVXM3XOJMDS674JZ"
-        destination2 = "GBL3NR5XNBNFAYVQMZ7R6RMUKLMGRUHNIYDYMEUPANQV6OROQXSDZYHV"
         amount = "1000.0000000"
         asset = Asset("USD", "GDGU5OAPHNPU5UCLE5RDJHG7PXZFQYWKCFOEXSXNMR6KRQRI5T6XXCD7")
         origin_xdr_obj = Payment(destination, asset, amount, source).to_xdr_object()
         restore_op = Payment.from_xdr_object(origin_xdr_obj)
         assert restore_op.to_xdr_object().to_xdr() == origin_xdr_obj.to_xdr()
-        assert (
-            restore_op._destination_muxed.to_xdr()
-            == Keypair.from_public_key(destination).xdr_muxed_account().to_xdr()
+
+    def test_from_xdr_obj_mux_account_str(self):
+        source = "GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV"
+        destination = (
+            "MAAAAAAAAAAAJURAAB2X52XFQP6FBXLGT6LWOOWMEXWHEWBDVRZ7V5WH34Y22MPFBHUHY"
         )
-        restore_op.destination = destination2
-        assert restore_op._destination_muxed is None
-        assert restore_op.destination == destination2
+        amount = "1000.0000000"
+        asset = Asset("USD", "GDGU5OAPHNPU5UCLE5RDJHG7PXZFQYWKCFOEXSXNMR6KRQRI5T6XXCD7")
+        origin_xdr_obj = Payment(destination, asset, amount, source).to_xdr_object()
+        op = Operation.from_xdr_object(origin_xdr_obj)
+        assert isinstance(op, Payment)
+        assert (
+            op.source == source if source is None else MuxedAccount.from_account(source)
+        )
+        assert op.destination == MuxedAccount.from_account(destination)
+        assert op.amount == "1000"
+        assert op.asset == asset
+
+    def test_from_xdr_obj_mux_account(self):
+        source = "GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV"
+        destination = MuxedAccount(
+            "GAQAA5L65LSYH7CQ3VTJ7F3HHLGCL3DSLAR2Y47263D56MNNGHSQSTVY", 1234
+        )
+        amount = "1000.0000000"
+        asset = Asset("USD", "GDGU5OAPHNPU5UCLE5RDJHG7PXZFQYWKCFOEXSXNMR6KRQRI5T6XXCD7")
+        origin_xdr_obj = Payment(destination, asset, amount, source).to_xdr_object()
+        op = Operation.from_xdr_object(origin_xdr_obj)
+        assert isinstance(op, Payment)
+        assert (
+            op.source == source if source is None else MuxedAccount.from_account(source)
+        )
+        assert op.destination == destination
+        assert op.amount == "1000"
+        assert op.asset == asset
 
 
 class TestPathPaymentStrictReceive:
@@ -469,8 +534,8 @@ class TestPathPaymentStrictReceive:
         ).to_xdr_object()
         op = Operation.from_xdr_object(origin_xdr_obj)
         assert isinstance(op, PathPaymentStrictReceive)
-        assert op.source == source
-        assert op.destination == destination
+        assert op.source.account_id == source
+        assert op.destination.account_id == destination
         assert op.send_asset == send_asset
         assert op.dest_asset == dest_asset
         assert op.send_max == "3.007"
@@ -498,13 +563,72 @@ class TestPathPaymentStrictReceive:
         ).to_xdr_object()
         restore_op = PathPaymentStrictReceive.from_xdr_object(origin_xdr_obj)
         assert restore_op.to_xdr_object().to_xdr() == origin_xdr_obj.to_xdr()
-        assert (
-            restore_op._destination_muxed.to_xdr()
-            == Keypair.from_public_key(destination).xdr_muxed_account().to_xdr()
-        )
         restore_op.destination = destination2
-        assert restore_op._destination_muxed is None
         assert restore_op.destination == destination2
+
+    def test_from_xdr_obj_muxed_account_str(self):
+        source = "GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV"
+        destination = (
+            "MAAAAAAAAAAAJURAAB2X52XFQP6FBXLGT6LWOOWMEXWHEWBDVRZ7V5WH34Y22MPFBHUHY"
+        )
+        send_asset = Asset(
+            "USD", "GDGU5OAPHNPU5UCLE5RDJHG7PXZFQYWKCFOEXSXNMR6KRQRI5T6XXCD7"
+        )
+        dest_asset = Asset(
+            "USD", "GDGU5OAPHNPU5UCLE5RDJHG7PXZFQYWKCFOEXSXNMR6KRQRI5T6XXCD7"
+        )
+        send_max = "3.0070000"
+        dest_amount = "3.1415000"
+        path = [
+            Asset("USD", "GBBM6BKZPEHWYO3E3YKREDPQXMS4VK35YLNU7NFBRI26RAN7GI5POFBB"),
+            Asset("EUR", "GDTNXRLOJD2YEBPKK7KCMR7J33AAG5VZXHAJTHIG736D6LVEFLLLKPDL"),
+        ]
+        origin_xdr_obj = PathPaymentStrictReceive(
+            destination, send_asset, send_max, dest_asset, dest_amount, path, source
+        ).to_xdr_object()
+        op = Operation.from_xdr_object(origin_xdr_obj)
+        assert isinstance(op, PathPaymentStrictReceive)
+        assert (
+            op.source == source if source is None else MuxedAccount.from_account(source)
+        )
+        assert op.destination == MuxedAccount.from_account(destination)
+        assert op.send_asset == send_asset
+        assert op.dest_asset == dest_asset
+        assert op.send_max == "3.007"
+        assert op.dest_amount == "3.1415"
+        assert op.path == path
+
+    def test_from_xdr_obj_muxed_account(self):
+        source = "GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV"
+        destination = MuxedAccount(
+            "GAQAA5L65LSYH7CQ3VTJ7F3HHLGCL3DSLAR2Y47263D56MNNGHSQSTVY", 1234
+        )
+        send_asset = Asset(
+            "USD", "GDGU5OAPHNPU5UCLE5RDJHG7PXZFQYWKCFOEXSXNMR6KRQRI5T6XXCD7"
+        )
+        dest_asset = Asset(
+            "USD", "GDGU5OAPHNPU5UCLE5RDJHG7PXZFQYWKCFOEXSXNMR6KRQRI5T6XXCD7"
+        )
+        send_max = "3.0070000"
+        dest_amount = "3.1415000"
+        path = [
+            Asset("USD", "GBBM6BKZPEHWYO3E3YKREDPQXMS4VK35YLNU7NFBRI26RAN7GI5POFBB"),
+            Asset("EUR", "GDTNXRLOJD2YEBPKK7KCMR7J33AAG5VZXHAJTHIG736D6LVEFLLLKPDL"),
+        ]
+        origin_xdr_obj = PathPaymentStrictReceive(
+            destination, send_asset, send_max, dest_asset, dest_amount, path, source
+        ).to_xdr_object()
+        op = Operation.from_xdr_object(origin_xdr_obj)
+        assert isinstance(op, PathPaymentStrictReceive)
+        assert (
+            op.source == source if source is None else MuxedAccount.from_account(source)
+        )
+        assert op.destination == destination
+        assert op.send_asset == send_asset
+        assert op.dest_asset == dest_asset
+        assert op.send_max == "3.007"
+        assert op.dest_amount == "3.1415"
+        assert op.path == path
 
 
 class TestPathPaymentStrictSend:
@@ -571,8 +695,8 @@ class TestPathPaymentStrictSend:
         ).to_xdr_object()
         op = Operation.from_xdr_object(origin_xdr_obj)
         assert isinstance(op, PathPaymentStrictSend)
-        assert op.source == source
-        assert op.destination == destination
+        assert op.source.account_id == source
+        assert op.destination.account_id == destination
         assert op.send_asset == send_asset
         assert op.dest_asset == dest_asset
         assert op.send_amount == "3.1415"
@@ -600,13 +724,72 @@ class TestPathPaymentStrictSend:
         ).to_xdr_object()
         restore_op = PathPaymentStrictSend.from_xdr_object(origin_xdr_obj)
         assert restore_op.to_xdr_object().to_xdr() == origin_xdr_obj.to_xdr()
-        assert (
-            restore_op._destination_muxed.to_xdr()
-            == Keypair.from_public_key(destination).xdr_muxed_account().to_xdr()
-        )
         restore_op.destination = destination2
-        assert restore_op._destination_muxed is None
         assert restore_op.destination == destination2
+
+    def test_from_xdr_obj_muxed_account_str(self):
+        source = "GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV"
+        destination = (
+            "MAAAAAAAAAAAJURAAB2X52XFQP6FBXLGT6LWOOWMEXWHEWBDVRZ7V5WH34Y22MPFBHUHY"
+        )
+        send_asset = Asset(
+            "USD", "GDGU5OAPHNPU5UCLE5RDJHG7PXZFQYWKCFOEXSXNMR6KRQRI5T6XXCD7"
+        )
+        dest_asset = Asset(
+            "USD", "GDGU5OAPHNPU5UCLE5RDJHG7PXZFQYWKCFOEXSXNMR6KRQRI5T6XXCD7"
+        )
+        send_amount = "3.1415000"
+        dest_min = "3.0070000"
+        path = [
+            Asset("USD", "GBBM6BKZPEHWYO3E3YKREDPQXMS4VK35YLNU7NFBRI26RAN7GI5POFBB"),
+            Asset("EUR", "GDTNXRLOJD2YEBPKK7KCMR7J33AAG5VZXHAJTHIG736D6LVEFLLLKPDL"),
+        ]
+        origin_xdr_obj = PathPaymentStrictSend(
+            destination, send_asset, send_amount, dest_asset, dest_min, path, source
+        ).to_xdr_object()
+        op = Operation.from_xdr_object(origin_xdr_obj)
+        assert isinstance(op, PathPaymentStrictSend)
+        assert (
+            op.source == source if source is None else MuxedAccount.from_account(source)
+        )
+        assert op.destination == MuxedAccount.from_account(destination)
+        assert op.send_asset == send_asset
+        assert op.dest_asset == dest_asset
+        assert op.send_amount == "3.1415"
+        assert op.dest_min == "3.007"
+        assert op.path == path
+
+    def test_from_xdr_obj_muxed_account(self):
+        source = "GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV"
+        destination = MuxedAccount(
+            "GAQAA5L65LSYH7CQ3VTJ7F3HHLGCL3DSLAR2Y47263D56MNNGHSQSTVY", 1234
+        )
+        send_asset = Asset(
+            "USD", "GDGU5OAPHNPU5UCLE5RDJHG7PXZFQYWKCFOEXSXNMR6KRQRI5T6XXCD7"
+        )
+        dest_asset = Asset(
+            "USD", "GDGU5OAPHNPU5UCLE5RDJHG7PXZFQYWKCFOEXSXNMR6KRQRI5T6XXCD7"
+        )
+        send_amount = "3.1415000"
+        dest_min = "3.0070000"
+        path = [
+            Asset("USD", "GBBM6BKZPEHWYO3E3YKREDPQXMS4VK35YLNU7NFBRI26RAN7GI5POFBB"),
+            Asset("EUR", "GDTNXRLOJD2YEBPKK7KCMR7J33AAG5VZXHAJTHIG736D6LVEFLLLKPDL"),
+        ]
+        origin_xdr_obj = PathPaymentStrictSend(
+            destination, send_asset, send_amount, dest_asset, dest_min, path, source
+        ).to_xdr_object()
+        op = Operation.from_xdr_object(origin_xdr_obj)
+        assert isinstance(op, PathPaymentStrictSend)
+        assert (
+            op.source == source if source is None else MuxedAccount.from_account(source)
+        )
+        assert op.destination == destination
+        assert op.send_asset == send_asset
+        assert op.dest_asset == dest_asset
+        assert op.send_amount == "3.1415"
+        assert op.dest_min == "3.007"
+        assert op.path == path
 
 
 class TestAllowTrust:
@@ -659,7 +842,7 @@ class TestAllowTrust:
         ).to_xdr_object()
         op = Operation.from_xdr_object(origin_xdr_obj)
         assert isinstance(op, AllowTrust)
-        assert op.source == source
+        assert op.source.account_id == source
         assert op.trustor == trustor
         assert op.asset_code == asset_code
         assert op.authorize == authorize
@@ -721,7 +904,7 @@ class TestManageData:
         origin_xdr_obj = ManageData(name, value, source).to_xdr_object()
         op = Operation.from_xdr_object(origin_xdr_obj)
         assert isinstance(op, ManageData)
-        assert op.source == source
+        assert op.source.account_id == source
         assert op.data_name == name
         if isinstance(value, str):
             value = value.encode()
@@ -839,7 +1022,10 @@ class TestSetOptions:
         assert xdr_obj.to_xdr() == xdr
         from_instance = Operation.from_xdr_object(xdr_obj)
         assert isinstance(from_instance, SetOptions)
-        assert from_instance.source == source
+        if source:
+            assert from_instance.source == MuxedAccount.from_account(source)
+        else:
+            assert from_instance.source is None
         assert from_instance.clear_flags == clear_flags
         assert from_instance.set_flags == set_flags
         assert from_instance.master_weight == master_weight
@@ -899,7 +1085,10 @@ class TestManageSellOffer:
         assert xdr_obj.to_xdr() == xdr
         from_instance = Operation.from_xdr_object(xdr_obj)
         assert isinstance(from_instance, ManageSellOffer)
-        assert from_instance.source == source
+        if source:
+            assert from_instance.source == MuxedAccount.from_account(source)
+        else:
+            assert from_instance.source is None
         assert from_instance.buying == buying
         assert from_instance.selling == selling
         assert from_instance.amount == amount
@@ -958,7 +1147,10 @@ class TestManageBuyOffer:
         assert xdr_obj.to_xdr() == xdr
         from_instance = Operation.from_xdr_object(xdr_obj)
         assert isinstance(from_instance, ManageBuyOffer)
-        assert from_instance.source == source
+        if source:
+            assert from_instance.source == MuxedAccount.from_account(source)
+        else:
+            assert from_instance.source is None
         assert from_instance.buying == buying
         assert from_instance.selling == selling
         assert from_instance.amount == amount
@@ -1014,7 +1206,10 @@ class TestCreatePassiveSellOffer:
         assert xdr_obj.to_xdr() == xdr
         from_instance = Operation.from_xdr_object(xdr_obj)
         assert isinstance(from_instance, CreatePassiveSellOffer)
-        assert from_instance.source == source
+        if source:
+            assert from_instance.source == MuxedAccount.from_account(source)
+        else:
+            assert from_instance.source is None
         assert from_instance.buying == buying
         assert from_instance.selling == selling
         assert Decimal(from_instance.amount) == Decimal(amount)
@@ -1037,7 +1232,7 @@ class TestOperationUtils:
             ),
             (
                 "MAAAAAAAAAAAJURAAB2X52XFQP6FBXLGT6LWOOWMEXWHEWBDVRZ7V5WH34Y22MPFBHBAD",
-                "Invalid Ed25519 Public Key: ",
+                "Invalid Muxed Account: ",
             ),
         ],
     )
@@ -1542,16 +1737,10 @@ class TestClawback:
         assert isinstance(restore_op, Clawback)
         xdr = "AAAAAQAAAAA037UdsRiULYrlHjmXWb6CiMKM2fNCa/ONGxK3rOkvTwAAABMAAAABREVNTwAAAACs9Aq+RXfSw0yuZEGt0TkYxAHDjB9RkQrLraMLSTGGKwAAAAAND42wpWEfOthyO+2vpGJJ5QgHfCRRZKvHXjjhkRA7SwAAAAA7msoA"
         assert op.to_xdr_object().to_xdr() == xdr
-        assert restore_op.source == source
-        assert restore_op.from_ == from_
+        assert restore_op.source.account_id == source
+        assert restore_op.from_.account_id == from_
         assert restore_op.asset == asset
         assert restore_op.amount == amount
-        assert (
-            restore_op._from__muxed.to_xdr()
-            == Keypair.from_public_key(from_).xdr_muxed_account().to_xdr()
-        )
-        assert restore_op._from__muxed is not None
-        assert op._from__muxed is None
 
     def test_xdr_no_source(self):
         source = None
@@ -1565,8 +1754,8 @@ class TestClawback:
         assert isinstance(restore_op, Clawback)
         xdr = "AAAAAAAAABMAAAABREVNTwAAAACs9Aq+RXfSw0yuZEGt0TkYxAHDjB9RkQrLraMLSTGGKwAAAAAND42wpWEfOthyO+2vpGJJ5QgHfCRRZKvHXjjhkRA7SwAAAAA7msoA"
         assert op.to_xdr_object().to_xdr() == xdr
-        assert restore_op.source == source
-        assert restore_op.from_ == from_
+        assert restore_op.source is None
+        assert restore_op.from_.account_id == from_
         assert restore_op.asset == asset
         assert restore_op.amount == amount
 
@@ -1582,19 +1771,46 @@ class TestClawback:
         assert isinstance(restore_op, Clawback)
         xdr = "AAAAAQAAAAA037UdsRiULYrlHjmXWb6CiMKM2fNCa/ONGxK3rOkvTwAAABMAAAABREVNTwAAAACs9Aq+RXfSw0yuZEGt0TkYxAHDjB9RkQrLraMLSTGGKwAAAAAND42wpWEfOthyO+2vpGJJ5QgHfCRRZKvHXjjhkRA7SwAAAAA7msoA"
         assert op.to_xdr_object().to_xdr() == xdr
-        assert restore_op.source == source
+        assert restore_op.source.account_id == source
+        assert restore_op.from_.account_id == from_
+        assert restore_op.asset == asset
+        assert restore_op.amount == amount
+
+    def test_from_xdr_obj_muxed_account_str(self):
+        source = "GA2N7NI5WEMJILMK4UPDTF2ZX2BIRQUM3HZUE27TRUNRFN5M5EXU6RQV"
+        from_ = "MAQAA5L65LSYH7CQ3VTJ7F3HHLGCL3DSLAR2Y47263D56MNNGHSQSAAAAAAAAAAE2LP26"
+        asset = Asset(
+            "DEMO", "GCWPICV6IV35FQ2MVZSEDLORHEMMIAODRQPVDEIKZOW2GC2JGGDCXVVV"
+        )
+        amount = "100"
+        op = Clawback(asset, from_, amount, source)
+        restore_op = Operation.from_xdr_object(op.to_xdr_object())
+        assert isinstance(restore_op, Clawback)
+        xdr = "AAAAAQAAAAA037UdsRiULYrlHjmXWb6CiMKM2fNCa/ONGxK3rOkvTwAAABMAAAABREVNTwAAAACs9Aq+RXfSw0yuZEGt0TkYxAHDjB9RkQrLraMLSTGGKwAAAQAAAAAAAAAE0iAAdX7q5YP8UN1mn5dnOswl7HJYI6xz+vbH3zGtMeUJAAAAADuaygA="
+        assert op.to_xdr_object().to_xdr() == xdr
+        assert restore_op.source.account_id == source
+        assert restore_op.from_.account_muxed == from_
+        assert restore_op.asset == asset
+        assert restore_op.amount == amount
+
+    def test_from_xdr_obj_muxed_account(self):
+        source = "GA2N7NI5WEMJILMK4UPDTF2ZX2BIRQUM3HZUE27TRUNRFN5M5EXU6RQV"
+        from_ = MuxedAccount(
+            "GAQAA5L65LSYH7CQ3VTJ7F3HHLGCL3DSLAR2Y47263D56MNNGHSQSTVY", 1234
+        )
+        asset = Asset(
+            "DEMO", "GCWPICV6IV35FQ2MVZSEDLORHEMMIAODRQPVDEIKZOW2GC2JGGDCXVVV"
+        )
+        amount = "100"
+        op = Clawback(asset, from_, amount, source)
+        restore_op = Operation.from_xdr_object(op.to_xdr_object())
+        assert isinstance(restore_op, Clawback)
+        xdr = "AAAAAQAAAAA037UdsRiULYrlHjmXWb6CiMKM2fNCa/ONGxK3rOkvTwAAABMAAAABREVNTwAAAACs9Aq+RXfSw0yuZEGt0TkYxAHDjB9RkQrLraMLSTGGKwAAAQAAAAAAAAAE0iAAdX7q5YP8UN1mn5dnOswl7HJYI6xz+vbH3zGtMeUJAAAAADuaygA="
+        assert op.to_xdr_object().to_xdr() == xdr
+        assert restore_op.source.account_id == source
         assert restore_op.from_ == from_
         assert restore_op.asset == asset
         assert restore_op.amount == amount
-        assert (
-            restore_op._from__muxed.to_xdr()
-            == Keypair.from_public_key(from_).xdr_muxed_account().to_xdr()
-        )
-        assert restore_op._from__muxed is not None
-        assert op._from__muxed is None
-        restore_op.from_ = from_
-        assert restore_op.to_xdr_object().to_xdr() == xdr
-        assert restore_op._from__muxed is None
 
 
 class TestClawbackClaimableBalance:
@@ -1609,7 +1825,7 @@ class TestClawbackClaimableBalance:
         assert isinstance(restore_op, ClawbackClaimableBalance)
         assert op.to_xdr_object().to_xdr() == xdr
         assert restore_op.to_xdr_object().to_xdr() == xdr
-        assert restore_op.source == source
+        assert restore_op.source.account_id == source
         assert restore_op.balance_id == balance_id
 
     def test_xdr_no_source(self):
@@ -1623,7 +1839,7 @@ class TestClawbackClaimableBalance:
         assert isinstance(restore_op, ClawbackClaimableBalance)
         assert op.to_xdr_object().to_xdr() == xdr
         assert restore_op.to_xdr_object().to_xdr() == xdr
-        assert restore_op.source == source
+        assert restore_op.source is None
         assert restore_op.balance_id == balance_id
 
 
@@ -1646,7 +1862,7 @@ class TestSetTrustLineFlags:
         assert isinstance(restore_op, SetTrustLineFlags)
         assert op.to_xdr_object().to_xdr() == xdr
         assert restore_op.to_xdr_object().to_xdr() == xdr
-        assert restore_op.source == source
+        assert restore_op.source.account_id == source
         assert restore_op.trustor == trustor
         assert restore_op.clear_flags == clear_flags
         assert restore_op.set_flags == set_flags
@@ -1670,7 +1886,7 @@ class TestSetTrustLineFlags:
         assert isinstance(restore_op, SetTrustLineFlags)
         assert op.to_xdr_object().to_xdr() == xdr
         assert restore_op.to_xdr_object().to_xdr() == xdr
-        assert restore_op.source == source
+        assert restore_op.source is None
         assert restore_op.trustor == trustor
         assert restore_op.clear_flags == clear_flags
         assert restore_op.set_flags == set_flags
@@ -1690,7 +1906,7 @@ class TestSetTrustLineFlags:
         assert isinstance(restore_op, SetTrustLineFlags)
         assert op.to_xdr_object().to_xdr() == xdr
         assert restore_op.to_xdr_object().to_xdr() == xdr
-        assert restore_op.source == source
+        assert restore_op.source.account_id == source
         assert restore_op.trustor == trustor
         assert restore_op.clear_flags == clear_flags
         assert restore_op.set_flags == set_flags
@@ -1710,7 +1926,7 @@ class TestSetTrustLineFlags:
         assert isinstance(restore_op, SetTrustLineFlags)
         assert op.to_xdr_object().to_xdr() == xdr
         assert restore_op.to_xdr_object().to_xdr() == xdr
-        assert restore_op.source == source
+        assert restore_op.source.account_id == source
         assert restore_op.trustor == trustor
         assert restore_op.clear_flags == clear_flags
         assert restore_op.set_flags == set_flags
@@ -1730,7 +1946,7 @@ class TestSetTrustLineFlags:
         assert isinstance(restore_op, SetTrustLineFlags)
         assert op.to_xdr_object().to_xdr() == xdr
         assert restore_op.to_xdr_object().to_xdr() == xdr
-        assert restore_op.source == source
+        assert restore_op.source.account_id == source
         assert restore_op.trustor == trustor
         assert restore_op.clear_flags == clear_flags
         assert restore_op.set_flags == set_flags

@@ -1,8 +1,10 @@
 import base64
 import binascii
+from typing import Optional, Union
 
 from .operation import Operation
 from .. import xdr as stellar_xdr
+from ..muxed_account import MuxedAccount
 
 __all__ = ["ClaimClaimableBalance"]
 
@@ -29,7 +31,7 @@ class ClaimClaimableBalance(Operation):
     def __init__(
         self,
         balance_id: str,
-        source: str = None,
+        source: Optional[Union[MuxedAccount, str]] = None,
     ) -> None:
         super().__init__(source)
         self.balance_id: str = balance_id
@@ -60,7 +62,6 @@ class ClaimClaimableBalance(Operation):
         )
         balance_id = binascii.hexlify(balance_id_bytes).decode()
         op = cls(balance_id=balance_id, source=source)
-        op._source_muxed = Operation.get_source_muxed_from_xdr_obj(xdr_object)
         return op
 
     def __str__(self):

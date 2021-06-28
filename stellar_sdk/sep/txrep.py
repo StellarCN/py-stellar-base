@@ -79,7 +79,7 @@ def to_txrep(
         assert isinstance(fee_bump_transaction, FeeBumpTransaction)
         assert isinstance(transaction, Transaction)
         _add_line(
-            "feeBump.tx.feeSource", fee_bump_transaction.fee_source.public_key, lines
+            "feeBump.tx.feeSource", fee_bump_transaction.fee_source.account_id, lines
         )
         _add_line(
             "feeBump.tx.fee",
@@ -90,7 +90,7 @@ def to_txrep(
             "feeBump.tx.innerTx.type", _EnvelopeType.ENVELOPE_TYPE_TX.value, lines
         )
     assert isinstance(transaction, Transaction)
-    _add_line(f"{prefix}sourceAccount", transaction.source.public_key, lines)
+    _add_line(f"{prefix}sourceAccount", transaction.source.account_id, lines)
     _add_line(f"{prefix}fee", transaction.fee, lines)
     _add_line(f"{prefix}seqNum", transaction.sequence, lines)
     _add_time_bounds(transaction.time_bounds, prefix, lines)
@@ -700,7 +700,7 @@ def _add_operation(
 
     if operation.source is not None:
         add_operation_line("sourceAccount._present", _true)
-        add_operation_line("sourceAccount", operation.source)
+        add_operation_line("sourceAccount", operation.source.account_id)
     else:
         add_operation_line("sourceAccount._present", _false)
 
@@ -773,13 +773,13 @@ def _add_operation(
         add_body_line("destination", operation.destination)
         add_body_line("startingBalance", _to_amount(operation.starting_balance))
     elif isinstance(operation, Payment):
-        add_body_line("destination", operation.destination)
+        add_body_line("destination", operation.destination.account_id)
         add_body_line("asset", _to_asset(operation.asset))
         add_body_line("amount", _to_amount(operation.amount))
     elif isinstance(operation, PathPaymentStrictReceive):
         add_body_line("sendAsset", _to_asset(operation.send_asset))
         add_body_line("sendMax", _to_amount(operation.send_max))
-        add_body_line("destination", operation.destination)
+        add_body_line("destination", operation.destination.account_id)
         add_body_line("destAsset", _to_asset(operation.dest_asset))
         add_body_line("destAmount", _to_amount(operation.dest_amount))
         add_body_line("path.len", len(operation.path))
@@ -816,7 +816,7 @@ def _add_operation(
     elif isinstance(operation, AccountMerge):
         # AccountMerge does not include 'accountMergeOp' prefix
         # see https://github.com/StellarCN/py-stellar-base/blob/master/.xdr/Stellar-transaction.x#L282
-        add_operation_line("body.destination", operation.destination)
+        add_operation_line("body.destination", operation.destination.account_id)
     elif isinstance(operation, ManageData):
         add_body_line("dataName", _to_string(operation.data_name))
         if operation.data_value is None:
@@ -835,7 +835,7 @@ def _add_operation(
     elif isinstance(operation, PathPaymentStrictSend):
         add_body_line("sendAsset", _to_asset(operation.send_asset))
         add_body_line("sendAmount", _to_amount(operation.send_amount))
-        add_body_line("destination", operation.destination)
+        add_body_line("destination", operation.destination.account_id)
         add_body_line("destAsset", _to_asset(operation.dest_asset))
         add_body_line("destMin", _to_amount(operation.dest_min))
         add_body_line("path.len", len(operation.path))

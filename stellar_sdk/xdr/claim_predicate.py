@@ -115,7 +115,9 @@ class ClaimPredicate:
             return cls(type, or_predicates=or_predicates)
         if type == ClaimPredicateType.CLAIM_PREDICATE_NOT:
             # not_predicate is optional.
-            not_predicate = ClaimPredicate.unpack(unpacker) if unpacker.unpack_uint() else None
+            not_predicate = (
+                ClaimPredicate.unpack(unpacker) if unpacker.unpack_uint() else None
+            )
             if not_predicate is None:
                 raise ValueError("not_predicate should not be None.")
             return cls(type, not_predicate=not_predicate)

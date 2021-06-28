@@ -78,7 +78,7 @@ def build_challenge_transaction(
     ).append_manage_data_op(
         data_name="web_auth_domain",
         data_value=web_auth_domain,
-        source=server_account.account_id,
+        source=server_account.account,
     )
     if client_domain:
         if not client_signing_key:
@@ -148,7 +148,7 @@ def read_challenge_transaction(
     transaction = transaction_envelope.transaction
 
     # verify that transaction source account is equal to the server's signing key
-    if transaction.source.public_key != server_account_id:
+    if transaction.source.account_id != server_account_id:
         raise InvalidSep10ChallengeError(
             "Transaction source account is not equal to server's account."
         )
@@ -227,7 +227,10 @@ def read_challenge_transaction(
             raise InvalidSep10ChallengeError("Operation type should be ManageData.")
         if op.source is None:
             raise InvalidSep10ChallengeError("Operation should have a source account.")
-        if op.source != server_account_id and op.data_name != "client_domain":
+        if (
+            op.source.account_id != server_account_id
+            and op.data_name != "client_domain"
+        ):
             raise InvalidSep10ChallengeError(
                 "The transaction has operations that are unrecognized."
             )
@@ -248,7 +251,7 @@ def read_challenge_transaction(
         )
 
     # TODO: I don't think this is a good idea.
-    return transaction_envelope, client_account, matched_home_domain
+    return transaction_envelope, client_account.account_id, matched_home_domain
 
 
 def verify_challenge_transaction_signers(
@@ -320,7 +323,7 @@ def verify_challenge_transaction_signers(
     # are consumed only once on the transaction.
     additional_signers = [Ed25519PublicKeySigner(server_keypair.public_key)]
     if client_signing_key:
-        additional_signers.append(Ed25519PublicKeySigner(client_signing_key))
+        additional_signers.append(Ed25519PublicKeySigner(client_signing_key.account_id))
     all_signers = client_signers + additional_signers
     all_signers_found = _verify_transaction_signatures(te, all_signers)
 
@@ -331,7 +334,7 @@ def verify_challenge_transaction_signers(
         if signer.account_id == server_keypair.public_key:
             server_signer_found = True
             continue
-        if signer.account_id == client_signing_key:
+        if client_signing_key and signer.account_id == client_signing_key.account_id:
             client_signing_key_found = True
             continue
         # Deduplicate the client signers

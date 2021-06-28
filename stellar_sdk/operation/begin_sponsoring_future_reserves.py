@@ -1,7 +1,10 @@
+from typing import Optional, Union
+
 from .operation import Operation
 from .utils import check_ed25519_public_key
 from .. import xdr as stellar_xdr
 from ..keypair import Keypair
+from ..muxed_account import MuxedAccount
 from ..strkey import StrKey
 
 __all__ = ["BeginSponsoringFutureReserves"]
@@ -27,7 +30,9 @@ class BeginSponsoringFutureReserves(Operation):
         stellar_xdr.OperationType.BEGIN_SPONSORING_FUTURE_RESERVES
     )
 
-    def __init__(self, sponsored_id: str, source: str = None) -> None:
+    def __init__(
+        self, sponsored_id: str, source: Optional[Union[MuxedAccount, str]] = None
+    ) -> None:
         super().__init__(source)
         check_ed25519_public_key(sponsored_id)
         self.sponsored_id: str = sponsored_id
@@ -60,7 +65,6 @@ class BeginSponsoringFutureReserves(Operation):
             xdr_object.body.begin_sponsoring_future_reserves_op.sponsored_id.account_id.ed25519.uint256
         )
         op = cls(source=source, sponsored_id=sponsored_id)
-        op._source_muxed = Operation.get_source_muxed_from_xdr_obj(xdr_object)
         return op
 
     def __str__(self):

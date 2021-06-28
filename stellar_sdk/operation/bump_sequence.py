@@ -1,5 +1,8 @@
+from typing import Optional, Union
+
 from .operation import Operation
 from .. import xdr as stellar_xdr
+from ..muxed_account import MuxedAccount
 
 __all__ = ["BumpSequence"]
 
@@ -24,7 +27,9 @@ class BumpSequence(Operation):
         stellar_xdr.OperationType.BUMP_SEQUENCE
     )
 
-    def __init__(self, bump_to: int, source: str = None) -> None:
+    def __init__(
+        self, bump_to: int, source: Optional[Union[MuxedAccount, str]] = None
+    ) -> None:
         super().__init__(source)
         self.bump_to: int = bump_to
 
@@ -46,7 +51,6 @@ class BumpSequence(Operation):
         assert xdr_object.body.bump_sequence_op is not None
         bump_to = xdr_object.body.bump_sequence_op.bump_to.sequence_number.int64
         op = cls(source=source, bump_to=bump_to)
-        op._source_muxed = Operation.get_source_muxed_from_xdr_obj(xdr_object)
         return op
 
     def __str__(self):

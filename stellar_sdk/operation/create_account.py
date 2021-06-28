@@ -1,10 +1,12 @@
 from decimal import Decimal
+from typing import Optional
 from typing import Union
 
 from .operation import Operation
 from .utils import check_ed25519_public_key, check_amount
 from .. import xdr as stellar_xdr
 from ..keypair import Keypair
+from ..muxed_account import MuxedAccount
 from ..strkey import StrKey
 
 __all__ = ["CreateAccount"]
@@ -36,7 +38,7 @@ class CreateAccount(Operation):
         self,
         destination: str,
         starting_balance: Union[str, Decimal],
-        source: str = None,
+        source: Optional[Union[MuxedAccount, str]] = None,
     ) -> None:
         super().__init__(source)
         check_ed25519_public_key(destination)
@@ -72,7 +74,6 @@ class CreateAccount(Operation):
         op = cls(
             source=source, destination=destination, starting_balance=starting_balance
         )
-        op._source_muxed = Operation.get_source_muxed_from_xdr_obj(xdr_object)
         return op
 
     def __str__(self):
