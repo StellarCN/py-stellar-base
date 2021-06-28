@@ -1,4 +1,3 @@
-
 # default target does nothing
 .DEFAULT_GOAL: default
 default: ;
@@ -7,17 +6,17 @@ install:
 	pip install .
 .PHONY: install
 
-install-test:
-	pip install -r requirements-test.txt
-.PHONY: install-test
+install-dev:
+	pipenv install --dev
+.PHONY: install-dev
 
 test:
 	pytest -v -s -rs tests --cov --cov-report=html
 .PHONY: test
 
-fulltest:
+full-test:
 	pytest -v -s -rs tests --runslow --cov --cov-report=html
-.PHONY: fulltest
+.PHONY: full-test
 
 codecov:
 	codecov
@@ -35,6 +34,11 @@ clean:
 	find . -name \*.pyc -delete
 .PHONY: clean
 
-updatexdr:
+update-xdr:
 	python .xdr/update_xdr.py
-.PHONY: updatexdr
+.PHONY: update-xdr
+
+lock:
+	pipenv lock --requirements > requirements.txt
+	pipenv lock --requirements --dev > requirements-dev.txt
+.PHONY: lock
