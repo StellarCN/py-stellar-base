@@ -33,16 +33,8 @@ class MuxedAccount:
         self.account_muxed_id: Optional[int] = account_muxed_id
 
     @property
-    def account_muxed(self) -> str:
-        """Get the multiplex address starting with `M`.
-
-        You cannot get `account_muxed` when `account_muxed_id` is `None`. Please make sure
-        `account_muxed_id` is not `None` before accessing `account_muxed`.
-
-        :return: The multiplex address starting with `M`.
-        :raises:
-            :exc:`ValueError <stellar_sdk.exceptions.ConnectionError>`: if `account_muxed_id` is `None`.
-        """
+    def account_muxed(self) -> Optional[str]:
+        """Get the multiplex address starting with `M`, return `None` if `account_id_id` is `None`."""
         if not _sep_0023_enabled():
             raise FeatureNotEnabledError(
                 "SEP-0023 related features are not enabled, "
@@ -51,10 +43,8 @@ class MuxedAccount:
             )
 
         if self.account_muxed_id is None:
-            raise ValueError(
-                "Cannot get `account_muxed` when `account_muxed_id` is `None`. Please make sure "
-                "`account_muxed_id` is not `None` before accessing `account_muxed`."
-            )
+            return None
+
         muxed_xdr = stellar_xdr.MuxedAccount(
             type=stellar_xdr.CryptoKeyType.KEY_TYPE_MUXED_ED25519,
             med25519=stellar_xdr.MuxedAccountMed25519(
