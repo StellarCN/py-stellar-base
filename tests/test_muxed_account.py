@@ -35,9 +35,7 @@ class TestMuxedAccount:
         muxed_account = MuxedAccount(account_id, account_id_id)
         assert muxed_account.to_xdr_object().to_xdr() == muxed_account_xdr.to_xdr()
         assert MuxedAccount.from_xdr_object(muxed_account_xdr) == muxed_account
-        with pytest.raises(ValueError, match="Cannot get `account_muxed` when `account_muxed_id` is `None`. Please make sure "
-                             "`account_muxed_id` is not `None` before accessing `account_muxed`."):
-            assert muxed_account.account_muxed is None
+        assert muxed_account.account_muxed is None
 
     def test_from_account_muxed_account(self):
         account_id = "GAQAA5L65LSYH7CQ3VTJ7F3HHLGCL3DSLAR2Y47263D56MNNGHSQSTVY"
@@ -55,19 +53,6 @@ class TestMuxedAccount:
         muxed_account = MuxedAccount.from_account(account_id)
         assert muxed_account.account_id == account_id
         assert muxed_account.account_muxed_id == account_id_id
-
-    def test_set_muxed_account_raise(self):
-        account_id = "GAQAA5L65LSYH7CQ3VTJ7F3HHLGCL3DSLAR2Y47263D56MNNGHSQSTVY"
-        account_id_id = 1234
-        account_id_muxed = (
-            "MAQAA5L65LSYH7CQ3VTJ7F3HHLGCL3DSLAR2Y47263D56MNNGHSQSAAAAAAAAAAE2LP26"
-        )
-        muxed_account = MuxedAccount(account_id, account_id_id)
-        with pytest.raises(
-            AttributeError,
-            match="Can't set attribute, use `MuxedAccount.from_account` instead.",
-        ):
-            muxed_account.account_muxed = account_id_muxed
 
     def test_from_account_invalid_account_raise(self):
         invalid_account = "A" * 100
