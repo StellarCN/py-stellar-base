@@ -99,6 +99,7 @@ class MuxedAccount:
         """
         if self.account_muxed_id is None:
             return StrKey.decode_muxed_account(self.account_id)
+        assert self.account_muxed is not None
         return StrKey.decode_muxed_account(self.account_muxed)
 
     @classmethod
