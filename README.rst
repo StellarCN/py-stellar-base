@@ -41,7 +41,7 @@ Stellar Python SDK
     :alt: Horizon Version
     :target: https://github.com/stellar/go/releases/tag/horizon-v2.1.0
 
-py-stellar-sdk is a Python library for communicating with
+py-stellar-base is a Python library for communicating with
 a `Stellar Horizon server`_. It is used for building Stellar apps on Python. It supports **Python 3.6+** as
 well as PyPy 3.6+.
 
@@ -52,7 +52,7 @@ It provides:
 
 Documentation
 -------------
-py-stellar-sdk's documentation can be found at https://stellar-sdk.readthedocs.io.
+py-stellar-base's documentation can be found at https://stellar-sdk.readthedocs.io.
 
 Installing
 ----------
@@ -61,7 +61,7 @@ Install and update using `pipenv`_ or `pip`_:
 
 .. code-block:: text
 
-    pip install stellar-sdk==3.3.5
+    pip install stellar-sdk==4.0.0b0
 
 
 A Simple Example
@@ -148,7 +148,7 @@ Links
 * License: `Apache License 2.0 <https://github.com/StellarCN/py-stellar-base/blob/master/LICENSE>`_
 * Releases: https://pypi.org/project/stellar-sdk/
 
-Thank you to all the people who have already contributed to py-stellar-sdk!
+Thank you to all the people who have already contributed to py-stellar-base!
 
 .. _Stellar Horizon server: https://github.com/stellar/go/tree/master/services/horizon
 .. _pip: https://pip.pypa.io/en/stable/quickstart/
