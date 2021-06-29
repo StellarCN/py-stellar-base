@@ -9,7 +9,7 @@ if "%SPHINXBUILD%" == "" (
 )
 set SOURCEDIR=.
 set BUILDDIR=_build
-set SPHINXPROJ=py-stellar-sdk
+set SPHINXPROJ=py-stellar-base
 
 if "%1" == "" goto help
 

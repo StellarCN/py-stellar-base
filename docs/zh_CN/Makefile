@@ -4,7 +4,7 @@
 # You can set these variables from the command line.
 SPHINXOPTS    =
 SPHINXBUILD   = sphinx-build
-SPHINXPROJ    = py-stellar-sdk
+SPHINXPROJ    = py-stellar-base
 SOURCEDIR     = .
 BUILDDIR      = _build
 
