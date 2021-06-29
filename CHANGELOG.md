@@ -15,18 +15,20 @@ Release History
 
 #### Breaking changes
 
-* The following fields, which were previously an `str`/`Optional[str]` are now a `stellar_sdk.MuxedAccount`/`Optional[stellar_sdk.MuxedAccount]` ([#479](https://github.com/StellarCN/py-stellar-base/pull/479)):
+* The following fields, which were previously an `str` are now a `stellar_sdk.MuxedAccount` ([#479](https://github.com/StellarCN/py-stellar-base/pull/479)):
 
   - `stellar_sdk.Transaction.source`
   - `stellar_sdk.FeeBumpTransaction.fee_source`
-  - `stellar_sdk.operation.Operation.source`
   - `stellar_sdk.operation.AccountMerge.destination`
   - `stellar_sdk.operation.PathPaymentStrictReceive.destination`
   - `stellar_sdk.operation.PathPaymentStrictSend.destination`
   - `stellar_sdk.operation.PathPayment.destination`
   - `stellar_sdk.operation.Payment.destination`
   - `stellar_sdk.operation.Clawback.from_`
-  - `stellar_sdk.sep.stellar_web_authentication.read_challenge_transaction` previously returned a tuple, now it returns `stellar_sdk.sep.stellar_web_authentication.ChallengeTransaction`. ([#454](https://github.com/StellarCN/py-stellar-base/pull/454))
+  
+* `stellar_sdk.operation.Operation.source` previously returned `Optional[str]`, now it returns `Optional[stellar_sdk.MuxedAccount]`. ([#479](https://github.com/StellarCN/py-stellar-base/pull/479))
+
+* `stellar_sdk.sep.stellar_web_authentication.read_challenge_transaction` previously returned a tuple, now it returns `stellar_sdk.sep.stellar_web_authentication.ChallengeTransaction`. ([#454](https://github.com/StellarCN/py-stellar-base/pull/454))
 
 #### Deprecated
 
