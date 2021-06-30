@@ -126,9 +126,8 @@ class Transaction:
     def from_xdr_object(
         cls,
         xdr_object: Union[stellar_xdr.Transaction, stellar_xdr.TransactionV0],
-        v1: bool = False,
+        v1: bool = True,
     ) -> "Transaction":
-        # TODO: enable v1 default
         """Create a new :class:`Transaction` from an XDR object.
 
         :param xdr_object: The XDR object that represents a transaction.
@@ -170,8 +169,7 @@ class Transaction:
         return tx
 
     @classmethod
-    def from_xdr(cls, xdr: str, v1: bool = False) -> "Transaction":
-        # TODO: enable v1 default
+    def from_xdr(cls, xdr: str, v1: bool = True) -> "Transaction":
         """Create a new :class:`Transaction` from an XDR string.
 
         :param xdr: The XDR string that represents a transaction.
