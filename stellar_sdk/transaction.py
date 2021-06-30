@@ -1,12 +1,12 @@
-from typing import List, Union, Optional
+from typing import List, Union
 
 from . import xdr as stellar_xdr
+from .muxed_account import MuxedAccount
 from .keypair import Keypair
 from .memo import NoneMemo, Memo
 from .operation.operation import Operation
 from .strkey import StrKey
 from .time_bounds import TimeBounds
-from .utils import parse_ed25519_account_id_from_muxed_account_xdr_object
 
 __all__ = ["Transaction"]
 
@@ -50,7 +50,7 @@ class Transaction:
 
     def __init__(
         self,
-        source: Union[Keypair, str],
+        source: Union[MuxedAccount, Keypair, str],
         sequence: int,
         fee: int,
         operations: List[Operation],
@@ -65,28 +65,17 @@ class Transaction:
         if memo is None:
             memo = NoneMemo()
         if isinstance(source, str):
-            source = Keypair.from_public_key(source)
+            source = MuxedAccount.from_account(source)
+        if isinstance(source, Keypair):
+            source = MuxedAccount.from_account(source.public_key)
 
-        self._source: Keypair = source
-        self._source_muxed: Optional[stellar_xdr.MuxedAccount] = None
+        self.source: MuxedAccount = source
         self.sequence = sequence
         self.operations = operations
         self.memo = memo
         self.fee = fee
         self.time_bounds = time_bounds
         self.v1 = v1
-
-    @property
-    def source(self) -> Keypair:
-        return self._source
-
-    @source.setter
-    def source(self, value: Union[Keypair, str]):
-        if isinstance(value, str):
-            value = Keypair.from_public_key(value)
-
-        self._source = value
-        self._source_muxed = None
 
     def to_xdr_object(
         self,
@@ -104,10 +93,7 @@ class Transaction:
         sequence = stellar_xdr.SequenceNumber(stellar_xdr.Int64(self.sequence))
 
         if self.v1:
-            if self._source_muxed is not None:
-                source_xdr = self._source_muxed
-            else:
-                source_xdr = self.source.xdr_muxed_account()
+            source_xdr = self.source.to_xdr_object()
             ext = stellar_xdr.TransactionExt(0)
             return stellar_xdr.Transaction(
                 source_xdr,
@@ -118,7 +104,12 @@ class Transaction:
                 operations,
                 ext,
             )
-        source_xdr_v0 = self.source.xdr_public_key().ed25519
+
+        source_xdr_v0 = (
+            Keypair.from_public_key(self.source.account_id)
+            .xdr_account_id()
+            .account_id.ed25519
+        )
         assert source_xdr_v0 is not None
         ext_v0 = stellar_xdr.TransactionV0Ext(0)
         return stellar_xdr.TransactionV0(
@@ -135,7 +126,7 @@ class Transaction:
     def from_xdr_object(
         cls,
         xdr_object: Union[stellar_xdr.Transaction, stellar_xdr.TransactionV0],
-        v1: bool = False,
+        v1: bool = True,
     ) -> "Transaction":
         """Create a new :class:`Transaction` from an XDR object.
 
@@ -149,14 +140,13 @@ class Transaction:
         """
         if v1:
             assert isinstance(xdr_object, stellar_xdr.Transaction)
-            source = parse_ed25519_account_id_from_muxed_account_xdr_object(
-                xdr_object.source_account
-            )
+            source = MuxedAccount.from_xdr_object(xdr_object.source_account)
         else:
             assert isinstance(xdr_object, stellar_xdr.TransactionV0)
-            source = StrKey.encode_ed25519_public_key(
+            ed25519_key = StrKey.encode_ed25519_public_key(
                 xdr_object.source_account_ed25519.uint256
             )
+            source = MuxedAccount(ed25519_key, None)
         sequence = xdr_object.seq_num.sequence_number.int64
         fee = xdr_object.fee.uint32
         time_bounds_xdr = xdr_object.time_bounds
@@ -176,13 +166,10 @@ class Transaction:
             operations=operations,
             v1=v1,
         )
-        if v1:
-            assert isinstance(xdr_object, stellar_xdr.Transaction)
-            tx._source_muxed = xdr_object.source_account
         return tx
 
     @classmethod
-    def from_xdr(cls, xdr: str, v1: bool = False) -> "Transaction":
+    def from_xdr(cls, xdr: str, v1: bool = True) -> "Transaction":
         """Create a new :class:`Transaction` from an XDR string.
 
         :param xdr: The XDR string that represents a transaction.
@@ -206,7 +193,7 @@ class Transaction:
 
     def __str__(self):
         return (
-            f"<Transaction [source={self._source}, sequence={self.sequence}, "
+            f"<Transaction [source={self.source}, sequence={self.sequence}, "
             f"fee={self.fee}, operations={self.operations}, memo={self.memo}, "
             f"time_bounds={self.time_bounds}, v1={self.v1}]>"
         )

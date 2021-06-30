@@ -5,7 +5,7 @@
 Asynchronous
 ************
 
-Now we have supported the use of asynchronous methods to submit transactions, py-stellar-sdk gives you the choice,
+Now we have supported the use of asynchronous methods to submit transactions, py-stellar-base gives you the choice,
 rather than forcing you into always writing async;
 sync code is easier to write, generally safer, and has many more libraries to choose from.
 

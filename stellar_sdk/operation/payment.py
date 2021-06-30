@@ -1,12 +1,12 @@
 from decimal import Decimal
-from typing import Union, Optional
+from typing import Optional
+from typing import Union
 
 from .operation import Operation
-from .utils import check_amount, check_ed25519_public_key
+from .utils import check_amount
 from .. import xdr as stellar_xdr
 from ..asset import Asset
-from ..keypair import Keypair
-from ..utils import parse_ed25519_account_id_from_muxed_account_xdr_object
+from ..muxed_account import MuxedAccount
 
 __all__ = ["Payment"]
 
@@ -31,35 +31,22 @@ class Payment(Operation):
 
     def __init__(
         self,
-        destination: str,
+        destination: Union[MuxedAccount, str],
         asset: Asset,
         amount: Union[str, Decimal],
-        source: str = None,
+        source: Optional[Union[MuxedAccount, str]] = None,
     ) -> None:
         super().__init__(source)
         check_amount(amount)
-        check_ed25519_public_key(destination)
-        self._destination: str = destination
-        self._destination_muxed: Optional[stellar_xdr.MuxedAccount] = None
+        if isinstance(destination, str):
+            destination = MuxedAccount.from_account(destination)
+        self.destination: MuxedAccount = destination
         self.asset: Asset = asset
         self.amount: Union[str, Decimal] = amount
 
-    @property
-    def destination(self) -> str:
-        return self._destination
-
-    @destination.setter
-    def destination(self, value: str):
-        check_ed25519_public_key(value)
-        self._destination_muxed = None
-        self._destination = value
-
     def _to_operation_body(self) -> stellar_xdr.OperationBody:
         asset = self.asset.to_xdr_object()
-        if self._destination_muxed is not None:
-            destination = self._destination_muxed
-        else:
-            destination = Keypair.from_public_key(self._destination).xdr_muxed_account()
+        destination = self.destination.to_xdr_object()
         amount = stellar_xdr.Int64(Operation.to_xdr_amount(self.amount))
         payment_op = stellar_xdr.PaymentOp(destination, asset, amount)
         body = stellar_xdr.OperationBody(
@@ -75,14 +62,12 @@ class Payment(Operation):
         """
         source = Operation.get_source_from_xdr_obj(xdr_object)
         assert xdr_object.body.payment_op is not None
-        destination = parse_ed25519_account_id_from_muxed_account_xdr_object(
+        destination = MuxedAccount.from_xdr_object(
             xdr_object.body.payment_op.destination
         )
         asset = Asset.from_xdr_object(xdr_object.body.payment_op.asset)
         amount = Operation.from_xdr_amount(xdr_object.body.payment_op.amount.int64)
         op = cls(source=source, destination=destination, asset=asset, amount=amount)
-        op._destination_muxed = xdr_object.body.payment_op.destination
-        op._source_muxed = Operation.get_source_muxed_from_xdr_obj(xdr_object)
         return op
 
     def __str__(self):

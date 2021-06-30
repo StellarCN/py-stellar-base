@@ -1,4 +1,4 @@
-.. py-stellar-sdk documentation master file, created by
+.. py-stellar-base documentation master file, created by
    sphinx-quickstart on Sat Jan 20 11:58:02 2018.
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
@@ -48,7 +48,7 @@ Stellar Python SDK
     :alt: Horizon Version
     :target: https://github.com/stellar/go/releases/tag/horizon-v2.1.0
 
-py-stellar-sdk 是用于开发 Stellar 应用程序的 Python 库。它目前支持 Python 3.6+ 和 PyPy3.6+。
+py-stellar-base 是用于开发 Stellar 应用程序的 Python 库。它目前支持 Python 3.6+ 和 PyPy3.6+。
 
 它提供了：
 

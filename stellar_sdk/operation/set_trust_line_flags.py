@@ -1,11 +1,13 @@
 from enum import IntFlag
+from typing import Optional, Union
 
 from .operation import Operation
 from .utils import check_ed25519_public_key
+from .. import xdr as stellar_xdr
 from ..asset import Asset
 from ..keypair import Keypair
+from ..muxed_account import MuxedAccount
 from ..strkey import StrKey
-from .. import xdr as stellar_xdr
 
 __all__ = ["TrustLineFlags", "SetTrustLineFlags"]
 
@@ -53,7 +55,7 @@ class SetTrustLineFlags(Operation):
         asset: Asset,
         clear_flags: TrustLineFlags = None,
         set_flags: TrustLineFlags = None,
-        source: str = None,
+        source: Optional[Union[MuxedAccount, str]] = None,
     ):
         super().__init__(source)
         check_ed25519_public_key(trustor)
@@ -106,7 +108,6 @@ class SetTrustLineFlags(Operation):
             set_flags=set_flags,
             source=source,
         )
-        op._source_muxed = Operation.get_source_muxed_from_xdr_obj(xdr_object)
         return op
 
     def __str__(self):

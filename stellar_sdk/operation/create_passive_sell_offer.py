@@ -1,10 +1,12 @@
 from decimal import Decimal
+from typing import Optional
 from typing import Union
 
 from .operation import Operation
 from .utils import check_amount, check_price
 from .. import xdr as stellar_xdr
 from ..asset import Asset
+from ..muxed_account import MuxedAccount
 from ..price import Price
 
 __all__ = ["CreatePassiveSellOffer"]
@@ -52,7 +54,7 @@ class CreatePassiveSellOffer(Operation):
         buying: Asset,
         amount: Union[str, Decimal],
         price: Union[Price, str, Decimal],
-        source: str = None,
+        source: Optional[Union[MuxedAccount, str]] = None,
     ) -> None:
         super().__init__(source)
         check_amount(amount)
@@ -105,7 +107,6 @@ class CreatePassiveSellOffer(Operation):
         op = cls(
             source=source, selling=selling, buying=buying, amount=amount, price=price
         )
-        op._source_muxed = Operation.get_source_muxed_from_xdr_obj(xdr_object)
         return op
 
     def __str__(self):

@@ -1,5 +1,6 @@
 import warnings
 from enum import IntFlag
+from typing import Optional
 from typing import Union
 
 from .operation import Operation
@@ -7,6 +8,7 @@ from .utils import check_ed25519_public_key, check_asset_code
 from .. import xdr as stellar_xdr
 from ..asset import Asset
 from ..keypair import Keypair
+from ..muxed_account import MuxedAccount
 from ..strkey import StrKey
 
 __all__ = ["TrustLineEntryFlag", "AllowTrust"]
@@ -59,10 +61,10 @@ class AllowTrust(Operation):
         trustor: str,
         asset_code: str,
         authorize: Union[TrustLineEntryFlag, bool],
-        source: str = None,
+        source: Optional[Union[MuxedAccount, str]] = None,
     ) -> None:
         warnings.warn(
-            "Will be removed in version v4.0.0, "
+            "Will be removed in version v5.0.0, "
             "use `stellar_sdk.operation.set_trust_line_flags.SetTrustLineFlags` instead.",
             DeprecationWarning,
         )
@@ -135,7 +137,6 @@ class AllowTrust(Operation):
         op = cls(
             source=source, trustor=trustor, authorize=authorize, asset_code=asset_code
         )
-        op._source_muxed = Operation.get_source_muxed_from_xdr_obj(xdr_object)
         return op
 
     def __str__(self):

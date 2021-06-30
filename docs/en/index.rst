@@ -1,4 +1,4 @@
-.. py-stellar-sdk documentation master file, created by
+.. py-stellar-base documentation master file, created by
    sphinx-quickstart on Sat Jan 20 11:58:02 2018.
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
@@ -48,7 +48,7 @@ Stellar Python SDK
     :alt: Horizon Version
     :target: https://github.com/stellar/go/releases/tag/horizon-v2.1.0
 
-py-stellar-sdk is a Python library for communicating with
+py-stellar-base is a Python library for communicating with
 a `Stellar Horizon server`_. It is used for building Stellar apps on Python. It supports **Python 3.6+** as
 well as PyPy 3.6+.
 

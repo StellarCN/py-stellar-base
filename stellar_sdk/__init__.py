@@ -17,6 +17,7 @@ from .fee_bump_transaction_envelope import *
 from .helpers import *
 from .keypair import *
 from .memo import *
+from .muxed_account import *
 from .network import *
 from .operation import *
 from .price import *

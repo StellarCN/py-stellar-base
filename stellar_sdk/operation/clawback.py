@@ -1,12 +1,12 @@
 from decimal import Decimal
-from typing import Union, Optional
+from typing import Optional
+from typing import Union
 
 from .operation import Operation
-from .utils import check_amount, check_ed25519_public_key
+from .utils import check_amount
 from .. import xdr as stellar_xdr
 from ..asset import Asset
-from ..keypair import Keypair
-from ..utils import parse_ed25519_account_id_from_muxed_account_xdr_object
+from ..muxed_account import MuxedAccount
 
 __all__ = ["Clawback"]
 
@@ -31,34 +31,21 @@ class Clawback(Operation):
     def __init__(
         self,
         asset: Asset,
-        from_: str,
+        from_: Union[MuxedAccount, str],
         amount: Union[str, Decimal],
-        source: str = None,
+        source: Optional[Union[MuxedAccount, str]] = None,
     ) -> None:
         super().__init__(source)
         check_amount(amount)
-        check_ed25519_public_key(from_)
-        self._from_: str = from_
-        self._from__muxed: Optional[stellar_xdr.MuxedAccount] = None
+        if isinstance(from_, str):
+            from_ = MuxedAccount.from_account(from_)
+        self.from_: MuxedAccount = from_
         self.asset: Asset = asset
         self.amount: Union[str, Decimal] = amount
 
-    @property
-    def from_(self) -> str:
-        return self._from_
-
-    @from_.setter
-    def from_(self, value: str):
-        check_ed25519_public_key(value)
-        self._from__muxed = None
-        self._from_ = value
-
     def _to_operation_body(self) -> stellar_xdr.OperationBody:
         asset = self.asset.to_xdr_object()
-        if self._from__muxed is not None:
-            from_ = self._from__muxed
-        else:
-            from_ = Keypair.from_public_key(self._from_).xdr_muxed_account()
+        from_ = self.from_.to_xdr_object()
         amount = Operation.to_xdr_amount(self.amount)
         clawback_op = stellar_xdr.ClawbackOp(asset, from_, stellar_xdr.Int64(amount))
         body = stellar_xdr.OperationBody(
@@ -74,14 +61,10 @@ class Clawback(Operation):
         source = Operation.get_source_from_xdr_obj(xdr_object)
         assert xdr_object.body.clawback_op is not None
         asset = Asset.from_xdr_object(xdr_object.body.clawback_op.asset)
-        from_ = parse_ed25519_account_id_from_muxed_account_xdr_object(
-            xdr_object.body.clawback_op.from_
-        )
+        from_ = MuxedAccount.from_xdr_object(xdr_object.body.clawback_op.from_)
         amount = Operation.from_xdr_amount(xdr_object.body.clawback_op.amount.int64)
 
         op = cls(source=source, from_=from_, asset=asset, amount=amount)
-        op._from__muxed = xdr_object.body.clawback_op.from_
-        op._source_muxed = Operation.get_source_muxed_from_xdr_obj(xdr_object)
         return op
 
     def __str__(self):

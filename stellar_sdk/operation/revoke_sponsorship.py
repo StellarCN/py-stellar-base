@@ -1,7 +1,7 @@
 import base64
 import binascii
 from enum import IntEnum
-from typing import Optional
+from typing import Optional, Union
 
 from .operation import Operation
 from .utils import check_ed25519_public_key
@@ -9,6 +9,7 @@ from .. import xdr as stellar_xdr
 from ..asset import Asset
 from ..exceptions import ValueError
 from ..keypair import Keypair
+from ..muxed_account import MuxedAccount
 from ..signer_key import SignerKey
 from ..strkey import StrKey
 
@@ -128,7 +129,7 @@ class RevokeSponsorship(Operation):
         data: Optional[Data],
         claimable_balance_id: Optional[str],
         signer: Optional[Signer],
-        source: str = None,
+        source: Optional[Union[MuxedAccount, str]] = None,
     ) -> None:
         super().__init__(source)
         self.revoke_sponsorship_type = revoke_sponsorship_type
@@ -140,7 +141,9 @@ class RevokeSponsorship(Operation):
         self.signer = signer
 
     @classmethod
-    def revoke_account_sponsorship(cls, account_id: str, source: str = None):
+    def revoke_account_sponsorship(
+        cls, account_id: str, source: Optional[Union[MuxedAccount, str]] = None
+    ):
         """Create a "revoke sponsorship" operation for an account.
 
         :param account_id: The sponsored account ID.
@@ -160,7 +163,10 @@ class RevokeSponsorship(Operation):
 
     @classmethod
     def revoke_trustline_sponsorship(
-        cls, account_id: str, asset: Asset, source: str = None
+        cls,
+        account_id: str,
+        asset: Asset,
+        source: Optional[Union[MuxedAccount, str]] = None,
     ):
         """Create a "revoke sponsorship" operation for a trustline.
 
@@ -183,7 +189,10 @@ class RevokeSponsorship(Operation):
 
     @classmethod
     def revoke_offer_sponsorship(
-        cls, seller_id: str, offer_id: int, source: str = None
+        cls,
+        seller_id: str,
+        offer_id: int,
+        source: Optional[Union[MuxedAccount, str]] = None,
     ):
         """Create a "revoke sponsorship" operation for an offer.
 
@@ -206,7 +215,10 @@ class RevokeSponsorship(Operation):
 
     @classmethod
     def revoke_data_sponsorship(
-        cls, account_id: str, data_name: str, source: str = None
+        cls,
+        account_id: str,
+        data_name: str,
+        source: Optional[Union[MuxedAccount, str]] = None,
     ):
         """Create a "revoke sponsorship" operation for a data entry.
 
@@ -229,7 +241,9 @@ class RevokeSponsorship(Operation):
 
     @classmethod
     def revoke_claimable_balance_sponsorship(
-        cls, claimable_balance_id: str, source: str = None
+        cls,
+        claimable_balance_id: str,
+        source: Optional[Union[MuxedAccount, str]] = None,
     ):
         """Create a "revoke sponsorship" operation for a claimable balance.
 
@@ -250,7 +264,10 @@ class RevokeSponsorship(Operation):
 
     @classmethod
     def revoke_signer_sponsorship(
-        cls, account_id: str, signer_key: SignerKey, source: str = None
+        cls,
+        account_id: str,
+        signer_key: SignerKey,
+        source: Optional[Union[MuxedAccount, str]] = None,
     ):
         """Create a "revoke sponsorship" operation for a signer.
 
@@ -431,7 +448,6 @@ class RevokeSponsorship(Operation):
             op = cls.revoke_signer_sponsorship(account_id, signer_key, source)
         else:
             raise ValueError(f"{op_type} is an unsupported RevokeSponsorship type.")
-        op._source_muxed = Operation.get_source_muxed_from_xdr_obj(xdr_object)
         return op
 
     def __str__(self):

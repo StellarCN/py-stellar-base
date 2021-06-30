@@ -88,7 +88,9 @@ class BaseTransactionEnvelope(Generic[T]):
         preimage_bytes: bytes = hex_to_bytes(preimage)
         hash_preimage = sha256(preimage_bytes)
         hint = stellar_xdr.SignatureHint(hash_preimage[-4:])
-        sig = stellar_xdr.DecoratedSignature(hint, stellar_xdr.Signature(preimage_bytes))
+        sig = stellar_xdr.DecoratedSignature(
+            hint, stellar_xdr.Signature(preimage_bytes)
+        )
         sig_dict = [signature.__dict__ for signature in self.signatures]
         if sig.__dict__ in sig_dict:
             raise SignatureExistError("The preimage has already signed.")

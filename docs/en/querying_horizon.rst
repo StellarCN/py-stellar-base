@@ -5,12 +5,12 @@
 Querying Horizon
 ****************
 
-py-stellar-sdk gives you access to all the endpoints exposed by Horizon.
+py-stellar-base gives you access to all the endpoints exposed by Horizon.
 
 Building requests
 =================
 
-py-stellar-sdk uses the `Builder pattern <https://en.wikipedia.org/wiki/Builder_pattern>`_ to create the requests to send
+py-stellar-base uses the `Builder pattern <https://en.wikipedia.org/wiki/Builder_pattern>`_ to create the requests to send
 to Horizon. Starting with a :py:class:`Server <stellar_sdk.server.Server>` object, you can chain methods together to generate a query.
 (See the `Horizon reference <https://www.stellar.org/developers/reference/>`_ documentation for what methods are possible.)
 
