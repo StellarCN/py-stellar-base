@@ -124,19 +124,6 @@ class Operation(metaclass=ABCMeta):
             return MuxedAccount.from_xdr_object(xdr_object.source_account)
         return None
 
-    @staticmethod
-    def get_source_muxed_from_xdr_obj(
-        xdr_object: stellar_xdr.Operation,
-    ) -> Optional[MuxedAccount]:
-        """Get the source account from account the operation xdr object.
-
-        :param xdr_object: the operation xdr object.
-        :return: The source account from account the operation xdr object.
-        """
-        if xdr_object.source_account:
-            return MuxedAccount.from_xdr_object(xdr_object.source_account)
-        return None
-
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
             return NotImplemented  # pragma: no cover
