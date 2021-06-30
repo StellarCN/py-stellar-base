@@ -64,7 +64,7 @@ class AllowTrust(Operation):
         source: Optional[Union[MuxedAccount, str]] = None,
     ) -> None:
         warnings.warn(
-            "Will be removed in version v4.0.0, "
+            "Will be removed in version v5.0.0, "
             "use `stellar_sdk.operation.set_trust_line_flags.SetTrustLineFlags` instead.",
             DeprecationWarning,
         )

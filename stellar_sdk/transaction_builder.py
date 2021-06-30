@@ -460,7 +460,7 @@ class TransactionBuilder:
 
         """
         warnings.warn(
-            "Will be removed in version v4.0.0, "
+            "Will be removed in version v5.0.0, "
             "use `stellar_sdk.transaction_builder.TransactionBuilder.append_set_trust_line_flags_op` instead.",
             DeprecationWarning,
         )
