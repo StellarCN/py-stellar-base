@@ -5,7 +5,7 @@
 #    pipenv lock --requirements
 #
 
--i https://pypi.org/simple
+-i https://pypi.org/simple/
 aiohttp-sse-client==0.2.1
 aiohttp==3.7.4.post0
 async-timeout==3.0.1; python_full_version >= '3.5.3'
