@@ -1,7 +1,100 @@
 Release History
 ==============
 
+### Version 4.0.0
+Released on June 30, 2021
+
+**This update includes breaking changes.**
+
+#### Added:
+
+* feat: add support for [CAP-0027](https://github.com/stellar/stellar-protocol/blob/master/core/cap-0027.md) and [SEP-0023](https://github.com/stellar/stellar-protocol/blob/master/ecosystem/sep-0023.md). ([#479](https://github.com/StellarCN/py-stellar-base/pull/479) [#492](https://github.com/StellarCN/py-stellar-base/pull/492) [#493](https://github.com/StellarCN/py-stellar-base/pull/493)):
+
+  SEP-0023 is still a Draft, so currently we do not enable it by default. If you want to enable this feature, please set `ENABLE_SEP_0023` to `true` in the environment variable
+
+#### Breaking changes
+
+* The following fields, which were previously an `str` are now a `stellar_sdk.MuxedAccount` ([#479](https://github.com/StellarCN/py-stellar-base/pull/479)):
+
+  - `stellar_sdk.Transaction.source`
+  - `stellar_sdk.FeeBumpTransaction.fee_source`
+  - `stellar_sdk.operation.AccountMerge.destination`
+  - `stellar_sdk.operation.PathPaymentStrictReceive.destination`
+  - `stellar_sdk.operation.PathPaymentStrictSend.destination`
+  - `stellar_sdk.operation.PathPayment.destination`
+  - `stellar_sdk.operation.Payment.destination`
+  - `stellar_sdk.operation.Clawback.from_`
+  
+* `stellar_sdk.operation.Operation.source` previously returned `Optional[str]`, now it returns `Optional[stellar_sdk.MuxedAccount]`. ([#479](https://github.com/StellarCN/py-stellar-base/pull/479))
+
+* `stellar_sdk.sep.stellar_web_authentication.read_challenge_transaction` previously returned a tuple, now it returns `stellar_sdk.sep.stellar_web_authentication.ChallengeTransaction`. ([#454](https://github.com/StellarCN/py-stellar-base/pull/454))
+
+* The `v1` parameter in the `stellar_sdk.Transaction.from_xdr_object` and `stellar_sdk.Transaction.from_xdr` functions is set to `True` by default. ([#494](https://github.com/StellarCN/py-stellar-base/pull/494))
+
+#### Deprecated
+
+* `stellar_sdk.Account.account_id` has been marked as deprecated, it will be removed in v5.0.0, use `stellar_sdk.Account.account` instead.  ([#479](https://github.com/StellarCN/py-stellar-base/pull/479))
+
+### Example
+
+If you want to enable SEP-0023 support, please set `ENABLE_SEP_0023` to `true` in the environment variable, on Linux and MacOS, generally you can use `export ENABLE_SEP_0023=true` to set it.
+
+- MuxedAccount
+
+  ```python
+  from stellar_sdk import MuxedAccount
+  
+  account_id = "GAQAA5L65LSYH7CQ3VTJ7F3HHLGCL3DSLAR2Y47263D56MNNGHSQSTVY"
+  account_muxed_id = 1234
+  account_muxed = "MAQAA5L65LSYH7CQ3VTJ7F3HHLGCL3DSLAR2Y47263D56MNNGHSQSAAAAAAAAAAE2LP26"
+  
+  # generate account_muxed
+  muxed = MuxedAccount(account_id=account_id, account_muxed_id=1234)  # account_muxed_id is optional.
+  print(f"account_muxed: {muxed.account_muxed}")  # `account_muxed` returns `None` if `account_id_id` is `None`.
+  
+  # parse account_muxed
+  muxed = MuxedAccount.from_account(account_muxed)
+  print(f"account_id: {muxed.account_id}\naccount_muxed_id: {muxed.account_muxed_id}")
+  ```
+
+- Pay to muxed account
+
+  ```python
+  import pprint
+  
+  from stellar_sdk import Keypair, Server, MuxedAccount, TransactionBuilder, Network
+  
+  horizon_url = "https://horizon-testnet.stellar.org/"
+  network_passphrase = Network.TESTNET_NETWORK_PASSPHRASE
+  
+  alice_secret = "SAHN2RCKC5I7NFDCIUKA3BG4H4T6WMLLGSAZVDKUHF7PQXHMYWD7UAIH"
+  bob_account = MuxedAccount(
+      account_id="GBZSQ3YZMZEWL5ZRCEQ5CCSOTXCFCMKDGFFP4IEQN2KN6LCHCLI46UMF",
+      account_muxed_id=1234,
+  )
+  print(f"account_id_muxed: {bob_account.account_muxed}")
+  # You can also use addresses starting with M.
+  # bob_account = "MBZSQ3YZMZEWL5ZRCEQ5CCSOTXCFCMKDGFFP4IEQN2KN6LCHCLI46AAAAAAAAAAE2L2QE"
+  
+  alice_keypair = Keypair.from_secret(alice_secret)
+  
+  server = Server(horizon_url=horizon_url)
+  alice_account = server.load_account(alice_keypair.public_key)
+  transaction = TransactionBuilder(
+      source_account=alice_account,
+      network_passphrase=network_passphrase,
+      base_fee=100
+  ) \
+      .append_payment_op(destination=bob_account, amount="100", asset_code="XLM") \
+      .build()
+  
+  transaction.sign(alice_keypair)
+  resp = server.submit_transaction(transaction)
+  pprint.pprint(resp)
+  ```
+
 ### Version 4.0.0-beta0
+Released on June 29, 2021
 
 **This update includes breaking changes.**
 
