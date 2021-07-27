@@ -11,8 +11,6 @@ from decimal import Decimal
 from enum import Enum
 from typing import List, Union, Optional, Dict
 
-from stellar_sdk.xdr import SignerKeyType
-
 from .. import xdr as stellar_xdr
 from ..asset import Asset
 from ..exceptions import ValueError as SdkValueError
@@ -783,17 +781,20 @@ def _get_revoke_sponsorship_op(
             raw_data_map, f"{operation_prefix}signer.signerKey.type"
         )
         account_id = _get_value(raw_data_map, f"{operation_prefix}signer.accountID")
-        if signer_key_type == SignerKeyType.SIGNER_KEY_TYPE_PRE_AUTH_TX.name:
+        if (
+            signer_key_type
+            == stellar_xdr.SignerKeyType.SIGNER_KEY_TYPE_PRE_AUTH_TX.name
+        ):
             key = _get_value(
                 raw_data_map, f"{operation_prefix}signer.signerKey.preAuthTx"
             )
             signer_key = SignerKey.pre_auth_tx(StrKey.decode_pre_auth_tx(key))
-        elif signer_key_type == SignerKeyType.SIGNER_KEY_TYPE_ED25519.name:
+        elif signer_key_type == stellar_xdr.SignerKeyType.SIGNER_KEY_TYPE_ED25519.name:
             key = _get_value(
                 raw_data_map, f"{operation_prefix}signer.signerKey.ed25519"
             )
             signer_key = SignerKey.ed25519_public_key(key)
-        elif signer_key_type == SignerKeyType.SIGNER_KEY_TYPE_HASH_X.name:
+        elif signer_key_type == stellar_xdr.SignerKeyType.SIGNER_KEY_TYPE_HASH_X.name:
             key = _get_value(raw_data_map, f"{operation_prefix}signer.signerKey.hashX")
             signer_key = SignerKey.sha256_hash(StrKey.decode_sha256_hash(key))
         else:
