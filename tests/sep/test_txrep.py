@@ -2,7 +2,7 @@ import os
 
 import pytest
 
-from stellar_sdk import Account, Keypair, Network, Asset, Price, Signer
+from stellar_sdk import *
 from stellar_sdk.exceptions import ValueError
 from stellar_sdk.sep.txrep import (
     to_txrep,
@@ -378,11 +378,6 @@ class TestTxrep:
         )
         transaction_builder.add_text_memo("Enjoy this transaction")
         transaction_builder.add_time_bounds(1535756672, 1567292672)
-        transaction_builder.append_create_account_op(
-            destination="GAZFEVBSEGJJ63WPVVIWXLZLWN2JYZECECGT6GUNP4FJDVZVNXWQWMYI",
-            starting_balance="10",
-            source=keypair.public_key,
-        )
         transaction_builder.append_payment_op(
             destination="GBAF6NXN3DHSF357QBZLTBNWUTABKUODJXJYYE32ZDKA2QBM2H33IK6O",
             asset_code="USD",
@@ -503,7 +498,127 @@ class TestTxrep:
             source=keypair.public_key,
         )
         transaction_builder.append_inflation_op()
-
+        claim_predicate = ClaimPredicate.predicate_and(
+            left=ClaimPredicate.predicate_and(
+                left=ClaimPredicate.predicate_and(
+                    left=ClaimPredicate.predicate_before_relative_time(40000),
+                    right=ClaimPredicate.predicate_not(
+                        ClaimPredicate.predicate_before_relative_time(50000)
+                    ),
+                ),
+                right=ClaimPredicate.predicate_before_relative_time(30000),
+            ),
+            right=ClaimPredicate.predicate_or(
+                left=ClaimPredicate.predicate_not(
+                    ClaimPredicate.predicate_before_relative_time(10000)
+                ),
+                right=ClaimPredicate.predicate_before_absolute_time(20000),
+            ),
+        )
+        transaction_builder.append_create_claimable_balance_op(
+            asset=Asset(
+                "XCN", "GAYE5SDEM5JIEMGQ7LBMQVRQRVJB6A5E7AZVLJYFL3CNHLZX24DFD35F"
+            ),
+            amount="10000.567",
+            claimants=[
+                Claimant(
+                    "GAYE5SDEM5JIEMGQ7LBMQVRQRVJB6A5E7AZVLJYFL3CNHLZX24DFD35F",
+                    claim_predicate,
+                ),
+                Claimant(
+                    "GAZFEVBSEGJJ63WPVVIWXLZLWN2JYZECECGT6GUNP4FJDVZVNXWQWMYI",
+                    claim_predicate,
+                ),
+            ],
+            source=keypair.public_key,
+        )
+        transaction_builder.append_claim_claimable_balance_op(
+            balance_id="00000000da0d57da7d4850e7fc10d2a9d0ebc731f7afb40574c03395b17d49149b91f5be",
+            source=keypair.public_key,
+        )
+        transaction_builder.append_begin_sponsoring_future_reserves_op(
+            sponsored_id=keypair.public_key, source=keypair.public_key
+        )
+        transaction_builder.append_create_account_op(
+            destination="GAZFEVBSEGJJ63WPVVIWXLZLWN2JYZECECGT6GUNP4FJDVZVNXWQWMYI",
+            starting_balance="10",
+            source=keypair.public_key,
+        )
+        transaction_builder.append_end_sponsoring_future_reserves_op(            source=keypair.public_key)
+        transaction_builder.append_revoke_ed25519_public_key_signer_sponsorship_op(
+            account_id="GAYE5SDEM5JIEMGQ7LBMQVRQRVJB6A5E7AZVLJYFL3CNHLZX24DFD35F",
+            signer_key="GAZFEVBSEGJJ63WPVVIWXLZLWN2JYZECECGT6GUNP4FJDVZVNXWQWMYI",
+            source=keypair.public_key,
+        )
+        transaction_builder.append_revoke_hashx_signer_sponsorship_op(
+            account_id="GAYE5SDEM5JIEMGQ7LBMQVRQRVJB6A5E7AZVLJYFL3CNHLZX24DFD35F",
+            signer_key="0d64fac556c1545616b3c915a4ec215239500bce287007cff038b6020950af46",
+            source=keypair.public_key,
+        )
+        transaction_builder.append_revoke_pre_auth_tx_signer_sponsorship_op(
+            account_id="GAYE5SDEM5JIEMGQ7LBMQVRQRVJB6A5E7AZVLJYFL3CNHLZX24DFD35F",
+            signer_key="0ab0c76b1c661db0e829abfdd9e32e6ce3c11f756bdf71aa23846582106c1783",
+            source=keypair.public_key,
+        )
+        transaction_builder.append_revoke_ed25519_public_key_signer_sponsorship_op(
+            account_id="GAYE5SDEM5JIEMGQ7LBMQVRQRVJB6A5E7AZVLJYFL3CNHLZX24DFD35F",
+            signer_key="GAZFEVBSEGJJ63WPVVIWXLZLWN2JYZECECGT6GUNP4FJDVZVNXWQWMYI",
+            source=keypair.public_key,
+        )
+        transaction_builder.append_revoke_account_sponsorship_op(
+            account_id="GAZFEVBSEGJJ63WPVVIWXLZLWN2JYZECECGT6GUNP4FJDVZVNXWQWMYI",
+            source=keypair.public_key,
+        )
+        transaction_builder.append_revoke_data_sponsorship_op(
+            account_id="GAZFEVBSEGJJ63WPVVIWXLZLWN2JYZECECGT6GUNP4FJDVZVNXWQWMYI",
+            data_name="hello",
+            source=keypair.public_key,
+        )
+        transaction_builder.append_revoke_offer_sponsorship_op(
+            seller_id="GAZFEVBSEGJJ63WPVVIWXLZLWN2JYZECECGT6GUNP4FJDVZVNXWQWMYI",
+            offer_id=99876,
+            source=keypair.public_key,
+        )
+        transaction_builder.append_revoke_trustline_sponsorship_op(
+            account_id="GAZFEVBSEGJJ63WPVVIWXLZLWN2JYZECECGT6GUNP4FJDVZVNXWQWMYI",
+            asset=Asset(
+                "XCN", "GAYE5SDEM5JIEMGQ7LBMQVRQRVJB6A5E7AZVLJYFL3CNHLZX24DFD35F"
+            ),
+            source=keypair.public_key,
+        )
+        transaction_builder.append_revoke_claimable_balance_sponsorship_op(
+            "00000000da0d57da7d4850e7fc10d2a9d0ebc731f7afb40574c03395b17d49149b91f5be",
+            source=keypair.public_key,
+        )
+        transaction_builder.append_clawback_op(
+            asset=Asset(
+                "XCN", "GAYE5SDEM5JIEMGQ7LBMQVRQRVJB6A5E7AZVLJYFL3CNHLZX24DFD35F"
+            ),
+            from_="GAZFEVBSEGJJ63WPVVIWXLZLWN2JYZECECGT6GUNP4FJDVZVNXWQWMYI",
+            amount="1234.5678",
+            source=keypair.public_key,
+        )
+        transaction_builder.append_clawback_claimable_balance_op(
+            balance_id="00000000da0d57da7d4850e7fc10d2a9d0ebc731f7afb40574c03395b17d49149b91f5be",
+            source=keypair.public_key,
+        )
+        transaction_builder.append_set_trust_line_flags_op(
+            trustor="GAZFEVBSEGJJ63WPVVIWXLZLWN2JYZECECGT6GUNP4FJDVZVNXWQWMYI",
+            asset=Asset(
+                "XCN", "GAYE5SDEM5JIEMGQ7LBMQVRQRVJB6A5E7AZVLJYFL3CNHLZX24DFD35F"
+            ),
+            set_flags=TrustLineFlags.AUTHORIZED_FLAG
+            | TrustLineFlags.AUTHORIZED_TO_MAINTAIN_LIABILITIES_FLAG,
+            clear_flags=TrustLineFlags.TRUSTLINE_CLAWBACK_ENABLED_FLAG,
+            source=keypair.public_key,
+        )
+        transaction_builder.append_set_trust_line_flags_op(
+            trustor="GDUF4TESKD5H47VB6KRWIYX7CL4TADDB2QJALCFHPIZLCGFMNTRVX4HM",
+            asset=Asset(
+                "XCN", "GAYE5SDEM5JIEMGQ7LBMQVRQRVJB6A5E7AZVLJYFL3CNHLZX24DFD35F"
+            ),
+            source=keypair.public_key
+        )
         te = transaction_builder.build()
         te.sign(keypair)
         te.sign_hashx(
