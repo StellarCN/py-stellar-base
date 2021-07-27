@@ -311,7 +311,7 @@ def _get_operation(index, raw_data_map, tx_prefix):
         operation_prefix = prefix + "allowTrustOp."
         return _get_allow_trust_op(source_account_id, operation_prefix, raw_data_map)
     elif operation_type == _to_caps_with_under(BeginSponsoringFutureReserves.__name__):
-        operation_prefix = prefix + "beginSponsoringFutureReserves."
+        operation_prefix = prefix + "beginSponsoringFutureReservesOp."
         return _get_begin_sponsoring_future_reserves_op(
             source_account_id, operation_prefix, raw_data_map
         )
@@ -322,15 +322,15 @@ def _get_operation(index, raw_data_map, tx_prefix):
         operation_prefix = prefix + "changeTrustOp."
         return _get_change_trust_op(source_account_id, operation_prefix, raw_data_map)
     elif operation_type == _to_caps_with_under(ClaimClaimableBalance.__name__):
-        operation_prefix = prefix + "claimClaimableBalance."
+        operation_prefix = prefix + "claimClaimableBalanceOp."
         return _get_claim_claimable_balance_op(
             source_account_id, operation_prefix, raw_data_map
         )
     elif operation_type == _to_caps_with_under(Clawback.__name__):
-        operation_prefix = prefix + "clawback."
+        operation_prefix = prefix + "clawbackOp."
         return _get_clawback_op(source_account_id, operation_prefix, raw_data_map)
     elif operation_type == _to_caps_with_under(ClawbackClaimableBalance.__name__):
-        operation_prefix = prefix + "clawbackClaimableBalance."
+        operation_prefix = prefix + "clawbackClaimableBalanceOp."
         return _get_clawback_claimable_balance_op(
             source_account_id, operation_prefix, raw_data_map
         )
@@ -338,7 +338,7 @@ def _get_operation(index, raw_data_map, tx_prefix):
         operation_prefix = prefix + "createAccountOp."
         return _get_create_account_op(source_account_id, operation_prefix, raw_data_map)
     elif operation_type == _to_caps_with_under(CreateClaimableBalance.__name__):
-        operation_prefix = prefix + "createClaimableBalance."
+        operation_prefix = prefix + "createClaimableBalanceOp."
         return _get_create_claimable_balance_op(
             source_account_id, operation_prefix, raw_data_map
         )
@@ -348,7 +348,6 @@ def _get_operation(index, raw_data_map, tx_prefix):
             source_account_id, operation_prefix, raw_data_map
         )
     elif operation_type == _to_caps_with_under(EndSponsoringFutureReserves.__name__):
-        operation_prefix = prefix + "endSponsoringFutureReserves."
         return _get_end_sponsoring_future_reserves_op(source_account_id)
     elif operation_type == _to_caps_with_under(Inflation.__name__):
         return _get_inflation_op(source_account_id)
@@ -379,7 +378,7 @@ def _get_operation(index, raw_data_map, tx_prefix):
         operation_prefix = prefix + "paymentOp."
         return _get_payment_op(source_account_id, operation_prefix, raw_data_map)
     elif operation_type == _to_caps_with_under(RevokeSponsorship.__name__):
-        operation_prefix = prefix + "revokeSponsorship."
+        operation_prefix = prefix + "revokeSponsorshipOp."
         return _get_revoke_sponsorship_op(
             source_account_id, operation_prefix, raw_data_map
         )
@@ -387,7 +386,7 @@ def _get_operation(index, raw_data_map, tx_prefix):
         operation_prefix = prefix + "setOptionsOp."
         return _get_set_options_op(source_account_id, operation_prefix, raw_data_map)
     elif operation_type == _to_caps_with_under(SetTrustLineFlags.__name__):
-        operation_prefix = prefix + "setTrustLineFlags."
+        operation_prefix = prefix + "setTrustLineFlagsOp."
         return _get_set_trust_line_flags_op(
             source_account_id, operation_prefix, raw_data_map
         )
@@ -647,7 +646,7 @@ def _get_clawback_op(
     source: str, operation_prefix: str, raw_data_map: Dict[str, str]
 ) -> Clawback:
     asset = _get_asset(raw_data_map, f"{operation_prefix}asset")
-    from_ = _get_value(raw_data_map, f"{operation_prefix}from_")
+    from_ = _get_value(raw_data_map, f"{operation_prefix}from")
     amount = _get_amount_value(raw_data_map, f"{operation_prefix}amount")
     return Clawback(asset=asset, from_=from_, amount=amount, source=source)
 
@@ -665,29 +664,29 @@ def _get_create_claimable_balance_op(
     def parse_claimant_predicate(
         prefix: str, raw_data_map: Dict[str, str]
     ) -> ClaimPredicate:
-        claimant_predicate_type = _get_value(raw_data_map, f"{prefix}type")
+        claimant_predicate_type = _get_value(raw_data_map, f"{prefix}.type")
         if claimant_predicate_type == ClaimPredicateType.CLAIM_PREDICATE_AND.name:
-            left = parse_claimant_predicate(f"{prefix}andPredicates[0]", raw_data_map)
-            right = parse_claimant_predicate(f"{prefix}andPredicates[1]", raw_data_map)
+            left = parse_claimant_predicate(f"{prefix}.andPredicates[0]", raw_data_map)
+            right = parse_claimant_predicate(f"{prefix}.andPredicates[1]", raw_data_map)
             return ClaimPredicate.predicate_and(left, right)
         elif claimant_predicate_type == ClaimPredicateType.CLAIM_PREDICATE_OR.name:
-            left = parse_claimant_predicate(f"{prefix}orPredicates[0]", raw_data_map)
-            right = parse_claimant_predicate(f"{prefix}orPredicates[1]", raw_data_map)
+            left = parse_claimant_predicate(f"{prefix}.orPredicates[0]", raw_data_map)
+            right = parse_claimant_predicate(f"{prefix}.orPredicates[1]", raw_data_map)
             return ClaimPredicate.predicate_or(left, right)
         elif claimant_predicate_type == ClaimPredicateType.CLAIM_PREDICATE_NOT.name:
-            predicate = parse_claimant_predicate(f"{prefix}notPredicate", raw_data_map)
+            predicate = parse_claimant_predicate(f"{prefix}.notPredicate", raw_data_map)
             return ClaimPredicate.predicate_not(predicate)
         elif (
             claimant_predicate_type
             == ClaimPredicateType.CLAIM_PREDICATE_BEFORE_ABSOLUTE_TIME.name
         ):
-            before_absolute_time = _get_int_value(raw_data_map, f"{prefix}absBefore")
+            before_absolute_time = _get_int_value(raw_data_map, f"{prefix}.absBefore")
             return ClaimPredicate.predicate_before_absolute_time(before_absolute_time)
         elif (
             claimant_predicate_type
             == ClaimPredicateType.CLAIM_PREDICATE_BEFORE_RELATIVE_TIME.name
         ):
-            before_relative_time = _get_int_value(raw_data_map, f"{prefix}relBefore")
+            before_relative_time = _get_int_value(raw_data_map, f"{prefix}.relBefore")
             return ClaimPredicate.predicate_before_relative_time(before_relative_time)
         else:
             raise SdkValueError(
@@ -705,7 +704,7 @@ def _get_create_claimable_balance_op(
             raw_data_map, f"{operation_prefix}claimants[{index}].v0.destination"
         )
         claimant_predicate = parse_claimant_predicate(
-            f"{operation_prefix}claimants[{index}].v0", raw_data_map
+            f"{operation_prefix}claimants[{index}].v0.predicate", raw_data_map
         )
         claimant = Claimant(destination=destination, predicate=claimant_predicate)
         claimants.append(claimant)
@@ -784,17 +783,17 @@ def _get_revoke_sponsorship_op(
             raw_data_map, f"{operation_prefix}signer.signerKey.type"
         )
         account_id = _get_value(raw_data_map, f"{operation_prefix}signer.accountID")
-        if signer_key_type == SignerKeyType.SIGNER_KEY_TYPE_PRE_AUTH_TX.value:
+        if signer_key_type == SignerKeyType.SIGNER_KEY_TYPE_PRE_AUTH_TX.name:
             key = _get_value(
                 raw_data_map, f"{operation_prefix}signer.signerKey.preAuthTx"
             )
             signer_key = SignerKey.pre_auth_tx(StrKey.decode_pre_auth_tx(key))
-        elif signer_key_type == SignerKeyType.SIGNER_KEY_TYPE_ED25519.value:
+        elif signer_key_type == SignerKeyType.SIGNER_KEY_TYPE_ED25519.name:
             key = _get_value(
                 raw_data_map, f"{operation_prefix}signer.signerKey.ed25519"
             )
             signer_key = SignerKey.ed25519_public_key(key)
-        elif signer_key_type == SignerKeyType.SIGNER_KEY_TYPE_HASH_X.value:
+        elif signer_key_type == SignerKeyType.SIGNER_KEY_TYPE_HASH_X.name:
             key = _get_value(raw_data_map, f"{operation_prefix}signer.signerKey.hashX")
             signer_key = SignerKey.sha256_hash(StrKey.decode_sha256_hash(key))
         else:
@@ -1144,7 +1143,7 @@ def _add_operation(
         add_body_line("asset", _to_asset(operation.asset))
         add_body_line("amount", _to_amount(operation.amount))
         add_body_line("claimants.len", len(operation.claimants))
-        for claimant in operation.claimants:
+        for index, claimant in enumerate(operation.claimants):
             # current CLAIMANT_TYPE is CLAIMANT_TYPE_V0
             add_body_line(
                 f"claimants[{index}].type",
@@ -1257,7 +1256,7 @@ def _add_operation(
         add_body_line("from", operation.from_.account_id)
         add_body_line("amount", _to_amount(operation.amount))
     elif isinstance(operation, ClawbackClaimableBalance):
-        add_body_line("balanceID", _to_amount(operation.balance_id))
+        add_body_line("balanceID", operation.balance_id)
     elif isinstance(operation, SetTrustLineFlags):
         add_body_line("trustor", operation.trustor)
         add_body_line("asset", _to_asset(operation.asset))
