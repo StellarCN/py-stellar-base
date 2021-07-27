@@ -1231,7 +1231,7 @@ def _add_operation(
             )
             if (
                 operation.signer.signer_key.signer_key.type
-                == SignerKeyType.SIGNER_KEY_TYPE_HASH_X
+                == stellar_xdr.SignerKeyType.SIGNER_KEY_TYPE_HASH_X
             ):
                 assert operation.signer.signer_key.signer_key.hash_x is not None
                 key = StrKey.encode_sha256_hash(
@@ -1240,7 +1240,7 @@ def _add_operation(
                 add_body_line("signer.signerKey.hashX", key)
             elif (
                 operation.signer.signer_key.signer_key.type
-                == SignerKeyType.SIGNER_KEY_TYPE_ED25519
+                == stellar_xdr.SignerKeyType.SIGNER_KEY_TYPE_ED25519
             ):
                 assert operation.signer.signer_key.signer_key.ed25519 is not None
                 key = StrKey.encode_ed25519_public_key(
@@ -1249,7 +1249,7 @@ def _add_operation(
                 add_body_line("signer.signerKey.ed25519", key)
             elif (
                 operation.signer.signer_key.signer_key.type
-                == SignerKeyType.SIGNER_KEY_TYPE_PRE_AUTH_TX
+                == stellar_xdr.SignerKeyType.SIGNER_KEY_TYPE_PRE_AUTH_TX
             ):
                 assert operation.signer.signer_key.signer_key.pre_auth_tx is not None
                 key = StrKey.encode_pre_auth_tx(
