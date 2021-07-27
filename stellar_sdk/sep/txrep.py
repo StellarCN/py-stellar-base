@@ -24,6 +24,7 @@ from ..operation.create_claimable_balance import ClaimPredicateType
 from ..operation.revoke_sponsorship import RevokeSponsorshipType
 from ..price import Price
 from ..signer import Signer
+from ..signer_key import SignerKey
 from ..strkey import StrKey
 from ..time_bounds import TimeBounds
 from ..transaction import Transaction
@@ -311,7 +312,9 @@ def _get_operation(index, raw_data_map, tx_prefix):
         return _get_allow_trust_op(source_account_id, operation_prefix, raw_data_map)
     elif operation_type == _to_caps_with_under(BeginSponsoringFutureReserves.__name__):
         operation_prefix = prefix + "beginSponsoringFutureReserves."
-        pass
+        return _get_begin_sponsoring_future_reserves_op(
+            source_account_id, operation_prefix, raw_data_map
+        )
     elif operation_type == _to_caps_with_under(BumpSequence.__name__):
         operation_prefix = prefix + "bumpSequenceOp."
         return _get_bump_sequence_op(source_account_id, operation_prefix, raw_data_map)
@@ -320,19 +323,25 @@ def _get_operation(index, raw_data_map, tx_prefix):
         return _get_change_trust_op(source_account_id, operation_prefix, raw_data_map)
     elif operation_type == _to_caps_with_under(ClaimClaimableBalance.__name__):
         operation_prefix = prefix + "claimClaimableBalance."
-        pass
+        return _get_claim_claimable_balance_op(
+            source_account_id, operation_prefix, raw_data_map
+        )
     elif operation_type == _to_caps_with_under(Clawback.__name__):
         operation_prefix = prefix + "clawback."
-        pass
+        return _get_clawback_op(source_account_id, operation_prefix, raw_data_map)
     elif operation_type == _to_caps_with_under(ClawbackClaimableBalance.__name__):
         operation_prefix = prefix + "clawbackClaimableBalance."
-        pass
+        return _get_clawback_claimable_balance_op(
+            source_account_id, operation_prefix, raw_data_map
+        )
     elif operation_type == _to_caps_with_under(CreateAccount.__name__):
         operation_prefix = prefix + "createAccountOp."
         return _get_create_account_op(source_account_id, operation_prefix, raw_data_map)
     elif operation_type == _to_caps_with_under(CreateClaimableBalance.__name__):
         operation_prefix = prefix + "createClaimableBalance."
-        pass
+        return _get_create_claimable_balance_op(
+            source_account_id, operation_prefix, raw_data_map
+        )
     elif operation_type == _to_caps_with_under(CreatePassiveSellOffer.__name__):
         operation_prefix = prefix + "createPassiveSellOfferOp."
         return _get_create_passive_sell_offer_op(
@@ -340,7 +349,7 @@ def _get_operation(index, raw_data_map, tx_prefix):
         )
     elif operation_type == _to_caps_with_under(EndSponsoringFutureReserves.__name__):
         operation_prefix = prefix + "endSponsoringFutureReserves."
-        pass
+        return _get_end_sponsoring_future_reserves_op(source_account_id)
     elif operation_type == _to_caps_with_under(Inflation.__name__):
         return _get_inflation_op(source_account_id)
     elif operation_type == _to_caps_with_under(ManageBuyOffer.__name__):
@@ -371,13 +380,17 @@ def _get_operation(index, raw_data_map, tx_prefix):
         return _get_payment_op(source_account_id, operation_prefix, raw_data_map)
     elif operation_type == _to_caps_with_under(RevokeSponsorship.__name__):
         operation_prefix = prefix + "revokeSponsorship."
-        pass
+        return _get_revoke_sponsorship_op(
+            source_account_id, operation_prefix, raw_data_map
+        )
     elif operation_type == _to_caps_with_under(SetOptions.__name__):
         operation_prefix = prefix + "setOptionsOp."
         return _get_set_options_op(source_account_id, operation_prefix, raw_data_map)
     elif operation_type == _to_caps_with_under(SetTrustLineFlags.__name__):
         operation_prefix = prefix + "setTrustLineFlags."
-        pass
+        return _get_set_trust_line_flags_op(
+            source_account_id, operation_prefix, raw_data_map
+        )
     else:
         raise SdkValueError(
             f"This operation has not been implemented yet, "
@@ -613,6 +626,213 @@ def _get_create_account_op(
     )
     return CreateAccount(
         destination=destination, starting_balance=starting_balance, source=source
+    )
+
+
+def _get_begin_sponsoring_future_reserves_op(
+    source: str, operation_prefix: str, raw_data_map: Dict[str, str]
+) -> BeginSponsoringFutureReserves:
+    sponsored_id = _get_value(raw_data_map, f"{operation_prefix}sponsoredID")
+    return BeginSponsoringFutureReserves(sponsored_id=sponsored_id, source=source)
+
+
+def _get_claim_claimable_balance_op(
+    source: str, operation_prefix: str, raw_data_map: Dict[str, str]
+) -> ClaimClaimableBalance:
+    balance_id = _get_value(raw_data_map, f"{operation_prefix}balanceID")
+    return ClaimClaimableBalance(balance_id=balance_id, source=source)
+
+
+def _get_clawback_op(
+    source: str, operation_prefix: str, raw_data_map: Dict[str, str]
+) -> Clawback:
+    asset = _get_asset(raw_data_map, f"{operation_prefix}asset")
+    from_ = _get_value(raw_data_map, f"{operation_prefix}from_")
+    amount = _get_amount_value(raw_data_map, f"{operation_prefix}amount")
+    return Clawback(asset=asset, from_=from_, amount=amount, source=source)
+
+
+def _get_clawback_claimable_balance_op(
+    source: str, operation_prefix: str, raw_data_map: Dict[str, str]
+) -> ClawbackClaimableBalance:
+    balance_id = _get_value(raw_data_map, f"{operation_prefix}balanceID")
+    return ClawbackClaimableBalance(balance_id=balance_id, source=source)
+
+
+def _get_create_claimable_balance_op(
+    source: str, operation_prefix: str, raw_data_map: Dict[str, str]
+):
+    def parse_claimant_predicate(
+        prefix: str, raw_data_map: Dict[str, str]
+    ) -> ClaimPredicate:
+        claimant_predicate_type = _get_value(raw_data_map, f"{prefix}type")
+        if claimant_predicate_type == ClaimPredicateType.CLAIM_PREDICATE_AND.name:
+            left = parse_claimant_predicate(f"{prefix}andPredicates[0]", raw_data_map)
+            right = parse_claimant_predicate(f"{prefix}andPredicates[1]", raw_data_map)
+            return ClaimPredicate.predicate_and(left, right)
+        elif claimant_predicate_type == ClaimPredicateType.CLAIM_PREDICATE_OR.name:
+            left = parse_claimant_predicate(f"{prefix}orPredicates[0]", raw_data_map)
+            right = parse_claimant_predicate(f"{prefix}orPredicates[1]", raw_data_map)
+            return ClaimPredicate.predicate_or(left, right)
+        elif claimant_predicate_type == ClaimPredicateType.CLAIM_PREDICATE_NOT.name:
+            predicate = parse_claimant_predicate(f"{prefix}notPredicate", raw_data_map)
+            return ClaimPredicate.predicate_not(predicate)
+        elif (
+            claimant_predicate_type
+            == ClaimPredicateType.CLAIM_PREDICATE_BEFORE_ABSOLUTE_TIME.name
+        ):
+            before_absolute_time = _get_int_value(raw_data_map, f"{prefix}absBefore")
+            return ClaimPredicate.predicate_before_absolute_time(before_absolute_time)
+        elif (
+            claimant_predicate_type
+            == ClaimPredicateType.CLAIM_PREDICATE_BEFORE_RELATIVE_TIME.name
+        ):
+            before_relative_time = _get_int_value(raw_data_map, f"{prefix}relBefore")
+            return ClaimPredicate.predicate_before_relative_time(before_relative_time)
+        else:
+            raise SdkValueError(
+                f"This claim predicate type has not been implemented yet, "
+                f"claim predicate type: {claimant_predicate_type}."
+            )
+
+    asset = _get_asset(raw_data_map, f"{operation_prefix}asset")
+    amount = _get_amount_value(raw_data_map, f"{operation_prefix}amount")
+    claimants: List[Claimant] = []
+    claimants_len = _get_int_value(raw_data_map, f"{operation_prefix}claimants.len")
+
+    for index in range(claimants_len):
+        destination = _get_value(
+            raw_data_map, f"{operation_prefix}claimants[{index}].v0.destination"
+        )
+        claimant_predicate = parse_claimant_predicate(
+            f"{operation_prefix}claimants[{index}].v0", raw_data_map
+        )
+        claimant = Claimant(destination=destination, predicate=claimant_predicate)
+        claimants.append(claimant)
+    return CreateClaimableBalance(
+        asset=asset, amount=amount, claimants=claimants, source=source
+    )
+
+
+def _get_end_sponsoring_future_reserves_op(source: str) -> EndSponsoringFutureReserves:
+    return EndSponsoringFutureReserves(source=source)
+
+
+def _get_revoke_sponsorship_op(
+    source: str, operation_prefix: str, raw_data_map: Dict[str, str]
+) -> RevokeSponsorship:
+    revoke_sponsorship_type = _get_value(raw_data_map, f"{operation_prefix}type")
+    if (
+        revoke_sponsorship_type
+        == stellar_xdr.RevokeSponsorshipType.REVOKE_SPONSORSHIP_LEDGER_ENTRY.name
+    ):
+        ledger_entry_type = _get_value(
+            raw_data_map, f"{operation_prefix}ledgerKey.type"
+        )
+        if ledger_entry_type == stellar_xdr.LedgerEntryType.ACCOUNT.name:
+            account = _get_value(raw_data_map, f"{operation_prefix}ledgerKey.account")
+            return RevokeSponsorship.revoke_account_sponsorship(
+                account_id=account, source=source
+            )
+        elif ledger_entry_type == stellar_xdr.LedgerEntryType.TRUSTLINE.name:
+            account = _get_value(
+                raw_data_map, f"{operation_prefix}ledgerKey.trustLine.accountID"
+            )
+            asset = _get_asset(
+                raw_data_map, f"{operation_prefix}ledgerKey.trustLine.asset"
+            )
+            return RevokeSponsorship.revoke_trustline_sponsorship(
+                account_id=account, asset=asset, source=source
+            )
+        elif ledger_entry_type == stellar_xdr.LedgerEntryType.OFFER.name:
+            sell_id = _get_value(
+                raw_data_map, f"{operation_prefix}ledgerKey.offer.sellerID"
+            )
+            offer_id = _get_int_value(
+                raw_data_map, f"{operation_prefix}ledgerKey.offer.offerID"
+            )
+            return RevokeSponsorship.revoke_offer_sponsorship(
+                seller_id=sell_id, offer_id=offer_id, source=source
+            )
+        elif ledger_entry_type == stellar_xdr.LedgerEntryType.DATA.name:
+            account_id = _get_value(
+                raw_data_map, f"{operation_prefix}ledgerKey.data.accountID"
+            )
+            data_name = _get_value(
+                raw_data_map, f"{operation_prefix}ledgerKey.data.dataName"
+            )
+            return RevokeSponsorship.revoke_data_sponsorship(
+                account_id=account_id, data_name=data_name, source=source
+            )
+        elif ledger_entry_type == stellar_xdr.LedgerEntryType.CLAIMABLE_BALANCE.name:
+            claimable_balance_id = _get_value(
+                raw_data_map, f"{operation_prefix}ledgerKey.claimableBalance.balanceID"
+            )
+            return RevokeSponsorship.revoke_claimable_balance_sponsorship(
+                claimable_balance_id=claimable_balance_id, source=source
+            )
+        else:
+            raise SdkValueError(
+                f"This ledger entry type has not been implemented yet, "
+                f"ledger entry type: {ledger_entry_type}."
+            )
+    elif (
+        revoke_sponsorship_type
+        == stellar_xdr.RevokeSponsorshipType.REVOKE_SPONSORSHIP_SIGNER.name
+    ):
+        signer_key_type = _get_value(
+            raw_data_map, f"{operation_prefix}signer.signerKey.type"
+        )
+        account_id = _get_value(raw_data_map, f"{operation_prefix}signer.accountID")
+        if signer_key_type == SignerKeyType.SIGNER_KEY_TYPE_PRE_AUTH_TX.value:
+            key = _get_value(
+                raw_data_map, f"{operation_prefix}signer.signerKey.preAuthTx"
+            )
+            signer_key = SignerKey.pre_auth_tx(StrKey.decode_pre_auth_tx(key))
+        elif signer_key_type == SignerKeyType.SIGNER_KEY_TYPE_ED25519.value:
+            key = _get_value(
+                raw_data_map, f"{operation_prefix}signer.signerKey.ed25519"
+            )
+            signer_key = SignerKey.ed25519_public_key(key)
+        elif signer_key_type == SignerKeyType.SIGNER_KEY_TYPE_HASH_X.value:
+            key = _get_value(raw_data_map, f"{operation_prefix}signer.signerKey.hashX")
+            signer_key = SignerKey.sha256_hash(StrKey.decode_sha256_hash(key))
+        else:
+            raise SdkValueError(
+                f"This signer key type has not been implemented yet, "
+                f"signer key type: {signer_key_type}."
+            )
+        return RevokeSponsorship.revoke_signer_sponsorship(
+            account_id=account_id, signer_key=signer_key, source=source
+        )
+    else:
+        raise SdkValueError(
+            f"This revoke sponsorship type has not been implemented yet, "
+            f"revoke sponsorship type: {revoke_sponsorship_type}."
+        )
+
+
+def _get_set_trust_line_flags_op(
+    source: str, operation_prefix: str, raw_data_map: Dict[str, str]
+) -> SetTrustLineFlags:
+    trustor = _get_value(raw_data_map, f"{operation_prefix}trustor")
+    asset = _get_asset(raw_data_map, f"{operation_prefix}asset")
+    clear_flags = _get_int_value(raw_data_map, f"{operation_prefix}clearFlags")
+    set_flags = _get_int_value(raw_data_map, f"{operation_prefix}setFlags")
+    if clear_flags == 0:
+        clear_flags = None
+    else:
+        clear_flags = TrustLineFlags(clear_flags)
+    if set_flags == 0:
+        set_flags = None
+    else:
+        set_flags = TrustLineFlags(set_flags)
+    return SetTrustLineFlags(
+        trustor=trustor,
+        asset=asset,
+        clear_flags=clear_flags,
+        set_flags=set_flags,
+        source=source,
     )
 
 
