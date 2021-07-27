@@ -544,7 +544,7 @@ class TestTxrep:
             starting_balance="10",
             source=keypair.public_key,
         )
-        transaction_builder.append_end_sponsoring_future_reserves_op()
+        transaction_builder.append_end_sponsoring_future_reserves_op(            source=keypair.public_key)
         transaction_builder.append_revoke_ed25519_public_key_signer_sponsorship_op(
             account_id="GAYE5SDEM5JIEMGQ7LBMQVRQRVJB6A5E7AZVLJYFL3CNHLZX24DFD35F",
             signer_key="GAZFEVBSEGJJ63WPVVIWXLZLWN2JYZECECGT6GUNP4FJDVZVNXWQWMYI",
@@ -611,6 +611,13 @@ class TestTxrep:
             | TrustLineFlags.AUTHORIZED_TO_MAINTAIN_LIABILITIES_FLAG,
             clear_flags=TrustLineFlags.TRUSTLINE_CLAWBACK_ENABLED_FLAG,
             source=keypair.public_key,
+        )
+        transaction_builder.append_set_trust_line_flags_op(
+            trustor="GDUF4TESKD5H47VB6KRWIYX7CL4TADDB2QJALCFHPIZLCGFMNTRVX4HM",
+            asset=Asset(
+                "XCN", "GAYE5SDEM5JIEMGQ7LBMQVRQRVJB6A5E7AZVLJYFL3CNHLZX24DFD35F"
+            ),
+            source=keypair.public_key
         )
         te = transaction_builder.build()
         te.sign(keypair)

@@ -1,13 +1,13 @@
 type: ENVELOPE_TYPE_TX
 tx.sourceAccount: GBEFNJVA2347XAJ4HYAECN5S7DIMLRDKXYT7BSFGF6SDM4VH5TD5HGJB
-tx.fee: 6800
+tx.fee: 7000
 tx.seqNum: 46489056724385793
 tx.timeBounds._present: true
 tx.timeBounds.minTime: 1535756672
 tx.timeBounds.maxTime: 1567292672
 tx.memo.type: MEMO_TEXT
 tx.memo.text: "Enjoy this transaction"
-tx.operations.len: 34
+tx.operations.len: 35
 tx.operations[0].sourceAccount._present: true
 tx.operations[0].sourceAccount: GBEFNJVA2347XAJ4HYAECN5S7DIMLRDKXYT7BSFGF6SDM4VH5TD5HGJB
 tx.operations[0].body.type: PAYMENT
@@ -219,7 +219,8 @@ tx.operations[20].sourceAccount: GBEFNJVA2347XAJ4HYAECN5S7DIMLRDKXYT7BSFGF6SDM4V
 tx.operations[20].body.type: CREATE_ACCOUNT
 tx.operations[20].body.createAccountOp.destination: GAZFEVBSEGJJ63WPVVIWXLZLWN2JYZECECGT6GUNP4FJDVZVNXWQWMYI
 tx.operations[20].body.createAccountOp.startingBalance: 100000000
-tx.operations[21].sourceAccount._present: false
+tx.operations[21].sourceAccount._present: true
+tx.operations[21].sourceAccount: GBEFNJVA2347XAJ4HYAECN5S7DIMLRDKXYT7BSFGF6SDM4VH5TD5HGJB
 tx.operations[21].body.type: END_SPONSORING_FUTURE_RESERVES
 tx.operations[22].sourceAccount._present: true
 tx.operations[22].sourceAccount: GBEFNJVA2347XAJ4HYAECN5S7DIMLRDKXYT7BSFGF6SDM4VH5TD5HGJB
@@ -299,9 +300,16 @@ tx.operations[33].body.setTrustLineFlagsOp.trustor: GAZFEVBSEGJJ63WPVVIWXLZLWN2J
 tx.operations[33].body.setTrustLineFlagsOp.asset: XCN:GAYE5SDEM5JIEMGQ7LBMQVRQRVJB6A5E7AZVLJYFL3CNHLZX24DFD35F
 tx.operations[33].body.setTrustLineFlagsOp.clearFlags: 4
 tx.operations[33].body.setTrustLineFlagsOp.setFlags: 3
+tx.operations[34].sourceAccount._present: true
+tx.operations[34].sourceAccount: GBEFNJVA2347XAJ4HYAECN5S7DIMLRDKXYT7BSFGF6SDM4VH5TD5HGJB
+tx.operations[34].body.type: SET_TRUST_LINE_FLAGS
+tx.operations[34].body.setTrustLineFlagsOp.trustor: GDUF4TESKD5H47VB6KRWIYX7CL4TADDB2QJALCFHPIZLCGFMNTRVX4HM
+tx.operations[34].body.setTrustLineFlagsOp.asset: XCN:GAYE5SDEM5JIEMGQ7LBMQVRQRVJB6A5E7AZVLJYFL3CNHLZX24DFD35F
+tx.operations[34].body.setTrustLineFlagsOp.clearFlags: 0
+tx.operations[34].body.setTrustLineFlagsOp.setFlags: 0
 tx.ext.v: 0
 signatures.len: 2
 signatures[0].hint: a7ecc7d3
-signatures[0].signature: f5b5a96d4526ef778df821f3e92f502beb132c0654880bc4195b2ed856ceaf1b929c7b809daf7b0989346f89b0c638d2ae0b2c7e74a6e7f899b93a3a1ea45b0d
+signatures[0].signature: 38b8d7e21412712fc22a064fb80f64500dc822d90a38f1f2f7a564f669f8d7096e7e2ce3752329a25d1ba7b980cf7ecfa2511a9ef79fea3d1018f0f6ac862d0f
 signatures[1].hint: 21d0289a
 signatures[1].signature: 8b73f9e12fcc8cd9580a2a26aec14d6175aa1ff45e76b816618635d03f3256b8
