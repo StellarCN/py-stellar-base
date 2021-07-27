@@ -544,7 +544,9 @@ class TestTxrep:
             starting_balance="10",
             source=keypair.public_key,
         )
-        transaction_builder.append_end_sponsoring_future_reserves_op(            source=keypair.public_key)
+        transaction_builder.append_end_sponsoring_future_reserves_op(
+            source=keypair.public_key
+        )
         transaction_builder.append_revoke_ed25519_public_key_signer_sponsorship_op(
             account_id="GAYE5SDEM5JIEMGQ7LBMQVRQRVJB6A5E7AZVLJYFL3CNHLZX24DFD35F",
             signer_key="GAZFEVBSEGJJ63WPVVIWXLZLWN2JYZECECGT6GUNP4FJDVZVNXWQWMYI",
@@ -617,7 +619,7 @@ class TestTxrep:
             asset=Asset(
                 "XCN", "GAYE5SDEM5JIEMGQ7LBMQVRQRVJB6A5E7AZVLJYFL3CNHLZX24DFD35F"
             ),
-            source=keypair.public_key
+            source=keypair.public_key,
         )
         te = transaction_builder.build()
         te.sign(keypair)
@@ -667,6 +669,97 @@ class TestTxrep:
         fee_bump_tx.sign(fee_source_keypair)
         txrep = to_txrep(fee_bump_tx)
         assert txrep == get_txrep_file("test_to_txrep_fee_bump.txt")
+        assert (
+            from_txrep(txrep, Network.TESTNET_NETWORK_PASSPHRASE).to_xdr()
+            == fee_bump_tx.to_xdr()
+        )
+
+    def test_muxed_account(self):
+        keypair = Keypair.from_secret(
+            "SAHGKA7QJB6SRFDZSPZDEEIOEHUHTQS4XVN4IMR5YCKBPEN5A6YNKKUO"
+        )
+        account_muxed = MuxedAccount(keypair.public_key, 1)
+        account = Account(account_muxed, 46489056724385792)
+        transaction_builder = TransactionBuilder(
+            source_account=account,
+            network_passphrase=Network.TESTNET_NETWORK_PASSPHRASE,
+            base_fee=100,
+        )
+        transaction_builder.add_text_memo("Enjoy this transaction")
+        transaction_builder.add_time_bounds(1535756672, 1567292672)
+        transaction_builder.append_account_merge_op(
+            destination="MCMXCNQPSKNQC4KSKZ6EEC56W525V63SV7BUWKEOKPNHAWBKYLPS2AAAAAAAAAAAAHKEE",
+            source=account_muxed,
+        )
+        transaction_builder.append_payment_op(
+            destination="MBAF6NXN3DHSF357QBZLTBNWUTABKUODJXJYYE32ZDKA2QBM2H33IAAAAAAAAAAAAF7WE",
+            asset_code="USD",
+            asset_issuer="GAZFEVBSEGJJ63WPVVIWXLZLWN2JYZECECGT6GUNP4FJDVZVNXWQWMYI",
+            amount="40.0004",
+            source=account_muxed,
+        )
+        transaction_builder.append_path_payment_strict_receive_op(
+            destination="MBCCOULOS5TNW5HEQLGZMF4HMJXWT47HKA5GOHCHF437SMXX3CWIQAAAAAAAAAAAAGFTY",
+            send_code="USD",
+            send_issuer="GAZFEVBSEGJJ63WPVVIWXLZLWN2JYZECECGT6GUNP4FJDVZVNXWQWMYI",
+            send_max="10",
+            dest_code="XCN",
+            dest_issuer="GAYE5SDEM5JIEMGQ7LBMQVRQRVJB6A5E7AZVLJYFL3CNHLZX24DFD35F",
+            dest_amount="5.125",
+            path=[
+                Asset(
+                    "Hello", "GD3RXMK2GHSXXEHPBZY5IL7VW5BXQEDJMCD4KVMXOH2GRFKDGZXR5PFO"
+                ),
+                Asset.native(),
+                Asset(
+                    "MOEW", "GBR765FQTCAJLLJGZVYLXCFAOZI6ORTHPDPOOHJOHFRZ5GHNVYGK4IFM"
+                ),
+            ],
+            source=account_muxed,
+        )
+        transaction_builder.append_path_payment_strict_send_op(
+            destination="MATDIL6CGXI6HFQ7UPBGIJR5QNMGNPVVTTHIPZWIQ3AFCS2YO3M3CAAAAAAAAAAAAFGHU",
+            send_code="USD",
+            send_issuer="GAZFEVBSEGJJ63WPVVIWXLZLWN2JYZECECGT6GUNP4FJDVZVNXWQWMYI",
+            send_amount="10",
+            dest_code="XCN",
+            dest_issuer="GAYE5SDEM5JIEMGQ7LBMQVRQRVJB6A5E7AZVLJYFL3CNHLZX24DFD35F",
+            dest_min="5.125",
+            path=[
+                Asset(
+                    "Hello", "GD3RXMK2GHSXXEHPBZY5IL7VW5BXQEDJMCD4KVMXOH2GRFKDGZXR5PFO"
+                ),
+                Asset.native(),
+                Asset(
+                    "MOEW", "GBR765FQTCAJLLJGZVYLXCFAOZI6ORTHPDPOOHJOHFRZ5GHNVYGK4IFM"
+                ),
+            ],
+            source=account_muxed,
+        )
+        transaction_builder.append_clawback_op(
+            asset=Asset(
+                "XCN", "GAYE5SDEM5JIEMGQ7LBMQVRQRVJB6A5E7AZVLJYFL3CNHLZX24DFD35F"
+            ),
+            from_="MD6Q33M4R4PLM7TXU75G2UFDP6XBW7UEBSWT6ECDVNGBKIY2Z44HUAAAAAAAAAAAAECFU",
+            amount="1234.5678",
+            source=account_muxed,
+        )
+        inner_tx = transaction_builder.build()
+        inner_tx.sign(keypair)
+        fee_source_keypair = Keypair.from_secret(
+            "SASZKBDB6PFHXN6LRH4NQNTRGLGDTI3PSUVIKMZMLTYYBB7NDVMA6DSL"
+        )
+        fee_source_muxed = MuxedAccount(fee_source_keypair.public_key, 1)
+
+        fee_bump_tx = TransactionBuilder.build_fee_bump_transaction(
+            fee_source=fee_source_muxed,
+            base_fee=200,
+            inner_transaction_envelope=inner_tx,
+            network_passphrase=Network.TESTNET_NETWORK_PASSPHRASE,
+        )
+        fee_bump_tx.sign(fee_source_keypair)
+        txrep = to_txrep(fee_bump_tx)
+        assert txrep == get_txrep_file("test_to_txrep_muxed_account.txt")
         assert (
             from_txrep(txrep, Network.TESTNET_NETWORK_PASSPHRASE).to_xdr()
             == fee_bump_tx.to_xdr()
