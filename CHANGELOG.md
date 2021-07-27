@@ -50,7 +50,7 @@ If you want to enable SEP-0023 support, please set `ENABLE_SEP_0023` to `true` i
   
   # generate account_muxed
   muxed = MuxedAccount(account_id=account_id, account_muxed_id=1234)  # account_muxed_id is optional.
-  print(f"account_muxed: {muxed.account_muxed}")  # `account_muxed` returns `None` if `account_id_id` is `None`.
+  print(f"account_muxed: {muxed.account_muxed}")  # `account_muxed` returns `None` if `account_muxed_id` is `None`.
   
   # parse account_muxed
   muxed = MuxedAccount.from_account(account_muxed)
@@ -142,7 +142,7 @@ If you want to enable SEP-0023 support, please set `ENABLE_SEP_0023` to `true` i
   
   # generate account_muxed
   muxed = MuxedAccount(account_id=account_id, account_muxed_id=1234)  # account_muxed_id is optional.
-  print(f"account_muxed: {muxed.account_muxed}")  # `account_muxed` returns `None` if `account_id_id` is `None`.
+  print(f"account_muxed: {muxed.account_muxed}")  # `account_muxed` returns `None` if `account_muxed_id` is `None`.
   
   # parse account_muxed
   muxed = MuxedAccount.from_account(account_muxed)
