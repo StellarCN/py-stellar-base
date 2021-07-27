@@ -816,16 +816,16 @@ def _get_set_trust_line_flags_op(
 ) -> SetTrustLineFlags:
     trustor = _get_value(raw_data_map, f"{operation_prefix}trustor")
     asset = _get_asset(raw_data_map, f"{operation_prefix}asset")
-    clear_flags = _get_int_value(raw_data_map, f"{operation_prefix}clearFlags")
-    set_flags = _get_int_value(raw_data_map, f"{operation_prefix}setFlags")
-    if clear_flags == 0:
+    clear_flags_raw = _get_int_value(raw_data_map, f"{operation_prefix}clearFlags")
+    set_flags_raw = _get_int_value(raw_data_map, f"{operation_prefix}setFlags")
+    if clear_flags_raw == 0:
         clear_flags = None
     else:
-        clear_flags = TrustLineFlags(clear_flags)
-    if set_flags == 0:
+        clear_flags = TrustLineFlags(clear_flags_raw)
+    if set_flags_raw == 0:
         set_flags = None
     else:
-        set_flags = TrustLineFlags(set_flags)
+        set_flags = TrustLineFlags(set_flags_raw)
     return SetTrustLineFlags(
         trustor=trustor,
         asset=asset,
@@ -1027,6 +1027,7 @@ def _add_operation(
             claimant_predicate.claim_predicate_type
             == ClaimPredicateType.CLAIM_PREDICATE_NOT
         ):
+            assert claimant_predicate.not_predicate is not None
             add_claim_predicate(
                 f"{prefix}.notPredicate", claimant_predicate.not_predicate
             )
@@ -1035,6 +1036,7 @@ def _add_operation(
             == ClaimPredicateType.CLAIM_PREDICATE_AND
         ):
             add_body_line(f"{prefix}.andPredicates.len", 2)
+            assert claimant_predicate.and_predicates is not None
             add_claim_predicate(
                 f"{prefix}.andPredicates[0]", claimant_predicate.and_predicates.left
             )
@@ -1046,6 +1048,7 @@ def _add_operation(
             == ClaimPredicateType.CLAIM_PREDICATE_OR
         ):
             add_body_line(f"{prefix}.orPredicates.len", 2)
+            assert claimant_predicate.or_predicates is not None
             add_claim_predicate(
                 f"{prefix}.orPredicates[0]", claimant_predicate.or_predicates.left
             )
@@ -1118,7 +1121,11 @@ def _add_operation(
         add_operation_line("body.destination", operation.destination.account_id)
     elif isinstance(operation, ManageData):
         add_body_line("dataName", _to_string(operation.data_name))
-        add_body_line("dataValue", _to_opaque(operation.data_value), True)
+        if operation.data_value is None:
+            add_body_line("dataValue._present", _false)
+        else:
+            add_body_line("dataValue._present", _true)
+            add_body_line("dataValue", _to_opaque(operation.data_value))
     elif isinstance(operation, BumpSequence):
         add_body_line("bumpTo", operation.bump_to)
     elif isinstance(operation, ManageBuyOffer):
@@ -1172,6 +1179,7 @@ def _add_operation(
                 stellar_xdr.revoke_sponsorship_type.RevokeSponsorshipType.REVOKE_SPONSORSHIP_LEDGER_ENTRY.name,
             )
             add_body_line("ledgerKey.type", stellar_xdr.LedgerEntryType.TRUSTLINE.name)
+            assert operation.trustline is not None
             add_body_line(
                 "ledgerKey.trustLine.accountID", operation.trustline.account_id
             )
@@ -1184,6 +1192,7 @@ def _add_operation(
                 stellar_xdr.revoke_sponsorship_type.RevokeSponsorshipType.REVOKE_SPONSORSHIP_LEDGER_ENTRY.name,
             )
             add_body_line("ledgerKey.type", stellar_xdr.LedgerEntryType.OFFER.name)
+            assert operation.offer is not None
             add_body_line("ledgerKey.offer.sellerID", operation.offer.seller_id)
             add_body_line("ledgerKey.offer.offerID", operation.offer.offer_id)
         elif operation.revoke_sponsorship_type == RevokeSponsorshipType.DATA:
@@ -1192,6 +1201,7 @@ def _add_operation(
                 stellar_xdr.revoke_sponsorship_type.RevokeSponsorshipType.REVOKE_SPONSORSHIP_LEDGER_ENTRY.name,
             )
             add_body_line("ledgerKey.type", stellar_xdr.LedgerEntryType.DATA.name)
+            assert operation.data is not None
             add_body_line("ledgerKey.data.accountID", operation.data.account_id)
             add_body_line("ledgerKey.data.dataName", operation.data.data_name)
         elif (
@@ -1208,6 +1218,7 @@ def _add_operation(
                 "ledgerKey.claimableBalance.balanceID", operation.claimable_balance_id
             )
         elif operation.revoke_sponsorship_type == RevokeSponsorshipType.SIGNER:
+            assert operation.signer is not None
             add_body_line(
                 "type",
                 stellar_xdr.revoke_sponsorship_type.RevokeSponsorshipType.REVOKE_SPONSORSHIP_SIGNER.name,
@@ -1221,6 +1232,7 @@ def _add_operation(
                 operation.signer.signer_key.signer_key.type
                 == SignerKeyType.SIGNER_KEY_TYPE_HASH_X
             ):
+                assert operation.signer.signer_key.signer_key.hash_x is not None
                 key = StrKey.encode_sha256_hash(
                     operation.signer.signer_key.signer_key.hash_x.uint256
                 )
@@ -1229,6 +1241,7 @@ def _add_operation(
                 operation.signer.signer_key.signer_key.type
                 == SignerKeyType.SIGNER_KEY_TYPE_ED25519
             ):
+                assert operation.signer.signer_key.signer_key.ed25519 is not None
                 key = StrKey.encode_ed25519_public_key(
                     operation.signer.signer_key.signer_key.ed25519.uint256
                 )
@@ -1237,6 +1250,7 @@ def _add_operation(
                 operation.signer.signer_key.signer_key.type
                 == SignerKeyType.SIGNER_KEY_TYPE_PRE_AUTH_TX
             ):
+                assert operation.signer.signer_key.signer_key.pre_auth_tx is not None
                 key = StrKey.encode_pre_auth_tx(
                     operation.signer.signer_key.signer_key.pre_auth_tx.uint256
                 )
@@ -1329,7 +1343,5 @@ def _to_string(value: Union[str, bytes]) -> str:
     return json.dumps(value)
 
 
-def _to_opaque(value: Optional[bytes]) -> Optional[str]:
-    if value is None:
-        return None
+def _to_opaque(value: bytes) -> str:
     return value.hex()
