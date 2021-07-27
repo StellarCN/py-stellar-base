@@ -11,6 +11,8 @@ from decimal import Decimal
 from enum import Enum
 from typing import List, Union, Optional, Dict
 
+from stellar_sdk.xdr import SignerKeyType
+
 from .. import xdr as stellar_xdr
 from ..asset import Asset
 from ..exceptions import ValueError as SdkValueError
@@ -18,6 +20,8 @@ from ..fee_bump_transaction import FeeBumpTransaction
 from ..fee_bump_transaction_envelope import FeeBumpTransactionEnvelope
 from ..memo import *
 from ..operation import *
+from ..operation.create_claimable_balance import ClaimPredicateType
+from ..operation.revoke_sponsorship import RevokeSponsorshipType
 from ..price import Price
 from ..signer import Signer
 from ..strkey import StrKey
@@ -305,20 +309,38 @@ def _get_operation(index, raw_data_map, tx_prefix):
     elif operation_type == _to_caps_with_under(AllowTrust.__name__):
         operation_prefix = prefix + "allowTrustOp."
         return _get_allow_trust_op(source_account_id, operation_prefix, raw_data_map)
+    elif operation_type == _to_caps_with_under(BeginSponsoringFutureReserves.__name__):
+        operation_prefix = prefix + "beginSponsoringFutureReserves."
+        pass
     elif operation_type == _to_caps_with_under(BumpSequence.__name__):
         operation_prefix = prefix + "bumpSequenceOp."
         return _get_bump_sequence_op(source_account_id, operation_prefix, raw_data_map)
     elif operation_type == _to_caps_with_under(ChangeTrust.__name__):
         operation_prefix = prefix + "changeTrustOp."
         return _get_change_trust_op(source_account_id, operation_prefix, raw_data_map)
+    elif operation_type == _to_caps_with_under(ClaimClaimableBalance.__name__):
+        operation_prefix = prefix + "claimClaimableBalance."
+        pass
+    elif operation_type == _to_caps_with_under(Clawback.__name__):
+        operation_prefix = prefix + "clawback."
+        pass
+    elif operation_type == _to_caps_with_under(ClawbackClaimableBalance.__name__):
+        operation_prefix = prefix + "clawbackClaimableBalance."
+        pass
     elif operation_type == _to_caps_with_under(CreateAccount.__name__):
         operation_prefix = prefix + "createAccountOp."
         return _get_create_account_op(source_account_id, operation_prefix, raw_data_map)
+    elif operation_type == _to_caps_with_under(CreateClaimableBalance.__name__):
+        operation_prefix = prefix + "createClaimableBalance."
+        pass
     elif operation_type == _to_caps_with_under(CreatePassiveSellOffer.__name__):
         operation_prefix = prefix + "createPassiveSellOfferOp."
         return _get_create_passive_sell_offer_op(
             source_account_id, operation_prefix, raw_data_map
         )
+    elif operation_type == _to_caps_with_under(EndSponsoringFutureReserves.__name__):
+        operation_prefix = prefix + "endSponsoringFutureReserves."
+        pass
     elif operation_type == _to_caps_with_under(Inflation.__name__):
         return _get_inflation_op(source_account_id)
     elif operation_type == _to_caps_with_under(ManageBuyOffer.__name__):
@@ -347,9 +369,15 @@ def _get_operation(index, raw_data_map, tx_prefix):
     elif operation_type == _to_caps_with_under(Payment.__name__):
         operation_prefix = prefix + "paymentOp."
         return _get_payment_op(source_account_id, operation_prefix, raw_data_map)
+    elif operation_type == _to_caps_with_under(RevokeSponsorship.__name__):
+        operation_prefix = prefix + "revokeSponsorship."
+        pass
     elif operation_type == _to_caps_with_under(SetOptions.__name__):
         operation_prefix = prefix + "setOptionsOp."
         return _get_set_options_op(source_account_id, operation_prefix, raw_data_map)
+    elif operation_type == _to_caps_with_under(SetTrustLineFlags.__name__):
+        operation_prefix = prefix + "setTrustLineFlags."
+        pass
     else:
         raise SdkValueError(
             f"This operation has not been implemented yet, "
@@ -769,6 +797,58 @@ def _add_operation(
         else:
             add_body_line("homeDomain", _to_string(home_domain), True)
 
+    def add_claim_predicate(prefix: str, claimant_predicate: ClaimPredicate):
+        add_body_line(f"{prefix}.type", claimant_predicate.claim_predicate_type.name)
+        if (
+            claimant_predicate.claim_predicate_type
+            == ClaimPredicateType.CLAIM_PREDICATE_UNCONDITIONAL
+        ):
+            pass
+        elif (
+            claimant_predicate.claim_predicate_type
+            == ClaimPredicateType.CLAIM_PREDICATE_NOT
+        ):
+            add_claim_predicate(
+                f"{prefix}.notPredicate", claimant_predicate.not_predicate
+            )
+        elif (
+            claimant_predicate.claim_predicate_type
+            == ClaimPredicateType.CLAIM_PREDICATE_AND
+        ):
+            add_body_line(f"{prefix}.andPredicates.len", 2)
+            add_claim_predicate(
+                f"{prefix}.andPredicates[0]", claimant_predicate.and_predicates.left
+            )
+            add_claim_predicate(
+                f"{prefix}.andPredicates[1]", claimant_predicate.and_predicates.right
+            )
+        elif (
+            claimant_predicate.claim_predicate_type
+            == ClaimPredicateType.CLAIM_PREDICATE_OR
+        ):
+            add_body_line(f"{prefix}.orPredicates.len", 2)
+            add_claim_predicate(
+                f"{prefix}.orPredicates[0]", claimant_predicate.or_predicates.left
+            )
+            add_claim_predicate(
+                f"{prefix}.orPredicates[1]", claimant_predicate.or_predicates.right
+            )
+        elif (
+            claimant_predicate.claim_predicate_type
+            == ClaimPredicateType.CLAIM_PREDICATE_BEFORE_ABSOLUTE_TIME
+        ):
+            add_body_line(f"{prefix}.absBefore", claimant_predicate.abs_before)
+        elif (
+            claimant_predicate.claim_predicate_type
+            == ClaimPredicateType.CLAIM_PREDICATE_BEFORE_RELATIVE_TIME
+        ):
+            add_body_line(f"{prefix}.relBefore", claimant_predicate.rel_before)
+        else:
+            raise SdkValueError(
+                f"This claim predicate type has not been implemented yet, "
+                f"claim predicate type: {claimant_predicate.claim_predicate_type}."
+            )
+
     if isinstance(operation, CreateAccount):
         add_body_line("destination", operation.destination)
         add_body_line("startingBalance", _to_amount(operation.starting_balance))
@@ -819,11 +899,7 @@ def _add_operation(
         add_operation_line("body.destination", operation.destination.account_id)
     elif isinstance(operation, ManageData):
         add_body_line("dataName", _to_string(operation.data_name))
-        if operation.data_value is None:
-            add_body_line("dataValue._present", _false)
-        else:
-            add_body_line("dataValue._present", _true)
-            add_body_line("dataValue", _to_opaque(operation.data_value))
+        add_body_line("dataValue", _to_opaque(operation.data_value), True)
     elif isinstance(operation, BumpSequence):
         add_body_line("bumpTo", operation.bump_to)
     elif isinstance(operation, ManageBuyOffer):
@@ -842,7 +918,137 @@ def _add_operation(
         for index, asset in enumerate(operation.path):
             add_body_line(f"path[{index}]", _to_asset(asset))
     elif isinstance(operation, Inflation):
+        # no body
         pass
+    elif isinstance(operation, CreateClaimableBalance):
+        add_body_line("asset", _to_asset(operation.asset))
+        add_body_line("amount", _to_amount(operation.amount))
+        add_body_line("claimants.len", len(operation.claimants))
+        for claimant in operation.claimants:
+            # current CLAIMANT_TYPE is CLAIMANT_TYPE_V0
+            add_body_line(
+                f"claimants[{index}].type",
+                stellar_xdr.ClaimantType.CLAIMANT_TYPE_V0.name,
+            )
+            add_body_line(f"claimants[{index}].v0.destination", claimant.destination)
+            add_claim_predicate(f"claimants[{index}].v0.predicate", claimant.predicate)
+    elif isinstance(operation, ClaimClaimableBalance):
+        add_body_line("balanceID", operation.balance_id)
+    elif isinstance(operation, BeginSponsoringFutureReserves):
+        add_body_line("sponsoredID", operation.sponsored_id)
+    elif isinstance(operation, EndSponsoringFutureReserves):
+        # no body
+        pass
+    elif isinstance(operation, RevokeSponsorship):
+        if operation.revoke_sponsorship_type == RevokeSponsorshipType.ACCOUNT:
+            add_body_line(
+                "type",
+                stellar_xdr.revoke_sponsorship_type.RevokeSponsorshipType.REVOKE_SPONSORSHIP_LEDGER_ENTRY.name,
+            )
+            add_body_line("ledgerKey.type", stellar_xdr.LedgerEntryType.ACCOUNT.name)
+            add_body_line("ledgerKey.account", operation.account_id)
+        elif operation.revoke_sponsorship_type == RevokeSponsorshipType.TRUSTLINE:
+            add_body_line(
+                "type",
+                stellar_xdr.revoke_sponsorship_type.RevokeSponsorshipType.REVOKE_SPONSORSHIP_LEDGER_ENTRY.name,
+            )
+            add_body_line("ledgerKey.type", stellar_xdr.LedgerEntryType.TRUSTLINE.name)
+            add_body_line(
+                "ledgerKey.trustLine.accountID", operation.trustline.account_id
+            )
+            add_body_line(
+                "ledgerKey.trustLine.asset", _to_asset(operation.trustline.asset)
+            )
+        elif operation.revoke_sponsorship_type == RevokeSponsorshipType.OFFER:
+            add_body_line(
+                "type",
+                stellar_xdr.revoke_sponsorship_type.RevokeSponsorshipType.REVOKE_SPONSORSHIP_LEDGER_ENTRY.name,
+            )
+            add_body_line("ledgerKey.type", stellar_xdr.LedgerEntryType.OFFER.name)
+            add_body_line("ledgerKey.offer.sellerID", operation.offer.seller_id)
+            add_body_line("ledgerKey.offer.offerID", operation.offer.offer_id)
+        elif operation.revoke_sponsorship_type == RevokeSponsorshipType.DATA:
+            add_body_line(
+                "type",
+                stellar_xdr.revoke_sponsorship_type.RevokeSponsorshipType.REVOKE_SPONSORSHIP_LEDGER_ENTRY.name,
+            )
+            add_body_line("ledgerKey.type", stellar_xdr.LedgerEntryType.DATA.name)
+            add_body_line("ledgerKey.data.accountID", operation.data.account_id)
+            add_body_line("ledgerKey.data.dataName", operation.data.data_name)
+        elif (
+            operation.revoke_sponsorship_type == RevokeSponsorshipType.CLAIMABLE_BALANCE
+        ):
+            add_body_line(
+                "type",
+                stellar_xdr.revoke_sponsorship_type.RevokeSponsorshipType.REVOKE_SPONSORSHIP_LEDGER_ENTRY.name,
+            )
+            add_body_line(
+                "ledgerKey.type", stellar_xdr.LedgerEntryType.CLAIMABLE_BALANCE.name
+            )
+            add_body_line(
+                "ledgerKey.claimableBalance.balanceID", operation.claimable_balance_id
+            )
+        elif operation.revoke_sponsorship_type == RevokeSponsorshipType.SIGNER:
+            add_body_line(
+                "type",
+                stellar_xdr.revoke_sponsorship_type.RevokeSponsorshipType.REVOKE_SPONSORSHIP_SIGNER.name,
+            )
+            add_body_line("signer.accountID", operation.signer.account_id)
+            add_body_line(
+                "signer.signerKey.type",
+                operation.signer.signer_key.signer_key.type.name,
+            )
+            if (
+                operation.signer.signer_key.signer_key.type
+                == SignerKeyType.SIGNER_KEY_TYPE_HASH_X
+            ):
+                key = StrKey.encode_sha256_hash(
+                    operation.signer.signer_key.signer_key.hash_x.uint256
+                )
+                add_body_line("signer.signerKey.hashX", key)
+            elif (
+                operation.signer.signer_key.signer_key.type
+                == SignerKeyType.SIGNER_KEY_TYPE_ED25519
+            ):
+                key = StrKey.encode_ed25519_public_key(
+                    operation.signer.signer_key.signer_key.ed25519.uint256
+                )
+                add_body_line("signer.signerKey.ed25519", key)
+            elif (
+                operation.signer.signer_key.signer_key.type
+                == SignerKeyType.SIGNER_KEY_TYPE_PRE_AUTH_TX
+            ):
+                key = StrKey.encode_pre_auth_tx(
+                    operation.signer.signer_key.signer_key.pre_auth_tx.uint256
+                )
+                add_body_line("signer.signerKey.preAuthTx", key)
+            else:
+                raise SdkValueError(
+                    f"This signer key type has not been implemented yet, "
+                    f"signer key type: {operation.signer.signer_key.signer_key.type}."
+                )
+        else:
+            raise SdkValueError(
+                f"This revoke sponsorship type has not been implemented yet, "
+                f"revoke sponsorship type: {operation.revoke_sponsorship_type}."
+            )
+    elif isinstance(operation, Clawback):
+        add_body_line("asset", _to_asset(operation.asset))
+        add_body_line("from", operation.from_.account_id)
+        add_body_line("amount", _to_amount(operation.amount))
+    elif isinstance(operation, ClawbackClaimableBalance):
+        add_body_line("balanceID", _to_amount(operation.balance_id))
+    elif isinstance(operation, SetTrustLineFlags):
+        add_body_line("trustor", operation.trustor)
+        add_body_line("asset", _to_asset(operation.asset))
+        if operation.clear_flags is None:
+            add_body_line("clearFlags", 0)
+        else:
+            add_body_line("clearFlags", operation.clear_flags.value)
+        if operation.set_flags is None:
+            add_body_line("setFlags", 0)
+        else:
+            add_body_line("setFlags", operation.set_flags.value)
     else:
         raise SdkValueError(
             f"This operation has not been implemented yet, "
@@ -904,5 +1110,7 @@ def _to_string(value: Union[str, bytes]) -> str:
     return json.dumps(value)
 
 
-def _to_opaque(value: Union[bytes]) -> str:
+def _to_opaque(value: Optional[bytes]) -> Optional[str]:
+    if value is None:
+        return None
     return value.hex()
