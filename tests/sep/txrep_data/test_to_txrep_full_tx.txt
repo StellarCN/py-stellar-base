@@ -3,8 +3,8 @@ tx.sourceAccount: GBEFNJVA2347XAJ4HYAECN5S7DIMLRDKXYT7BSFGF6SDM4VH5TD5HGJB
 tx.fee: 7000
 tx.seqNum: 46489056724385793
 tx.timeBounds._present: true
-tx.timeBounds.minTime: 1535756672
-tx.timeBounds.maxTime: 1567292672
+tx.timeBounds.minTime: 1535756672 (2018-08-31 23:04:32.000000+00:00 (UTC))
+tx.timeBounds.maxTime: 1567292672 (2019-08-31 23:04:32.000000+00:00 (UTC))
 tx.memo.type: MEMO_TEXT
 tx.memo.text: "Enjoy this transaction"
 tx.operations.len: 35
@@ -13,15 +13,15 @@ tx.operations[0].sourceAccount: GBEFNJVA2347XAJ4HYAECN5S7DIMLRDKXYT7BSFGF6SDM4VH
 tx.operations[0].body.type: PAYMENT
 tx.operations[0].body.paymentOp.destination: GBAF6NXN3DHSF357QBZLTBNWUTABKUODJXJYYE32ZDKA2QBM2H33IK6O
 tx.operations[0].body.paymentOp.asset: USD:GAZFEVBSEGJJ63WPVVIWXLZLWN2JYZECECGT6GUNP4FJDVZVNXWQWMYI
-tx.operations[0].body.paymentOp.amount: 400004000
+tx.operations[0].body.paymentOp.amount: 400004000 (40.0004)
 tx.operations[1].sourceAccount._present: true
 tx.operations[1].sourceAccount: GBEFNJVA2347XAJ4HYAECN5S7DIMLRDKXYT7BSFGF6SDM4VH5TD5HGJB
 tx.operations[1].body.type: PATH_PAYMENT_STRICT_RECEIVE
 tx.operations[1].body.pathPaymentStrictReceiveOp.sendAsset: USD:GAZFEVBSEGJJ63WPVVIWXLZLWN2JYZECECGT6GUNP4FJDVZVNXWQWMYI
-tx.operations[1].body.pathPaymentStrictReceiveOp.sendMax: 100000000
+tx.operations[1].body.pathPaymentStrictReceiveOp.sendMax: 100000000 (10)
 tx.operations[1].body.pathPaymentStrictReceiveOp.destination: GBAF6NXN3DHSF357QBZLTBNWUTABKUODJXJYYE32ZDKA2QBM2H33IK6O
 tx.operations[1].body.pathPaymentStrictReceiveOp.destAsset: XCN:GAYE5SDEM5JIEMGQ7LBMQVRQRVJB6A5E7AZVLJYFL3CNHLZX24DFD35F
-tx.operations[1].body.pathPaymentStrictReceiveOp.destAmount: 51250000
+tx.operations[1].body.pathPaymentStrictReceiveOp.destAmount: 51250000 (5.125)
 tx.operations[1].body.pathPaymentStrictReceiveOp.path.len: 3
 tx.operations[1].body.pathPaymentStrictReceiveOp.path[0]: Hello:GD3RXMK2GHSXXEHPBZY5IL7VW5BXQEDJMCD4KVMXOH2GRFKDGZXR5PFO
 tx.operations[1].body.pathPaymentStrictReceiveOp.path[1]: native
@@ -31,7 +31,7 @@ tx.operations[2].sourceAccount: GBEFNJVA2347XAJ4HYAECN5S7DIMLRDKXYT7BSFGF6SDM4VH
 tx.operations[2].body.type: MANAGE_SELL_OFFER
 tx.operations[2].body.manageSellOfferOp.selling: XCN:GAYE5SDEM5JIEMGQ7LBMQVRQRVJB6A5E7AZVLJYFL3CNHLZX24DFD35F
 tx.operations[2].body.manageSellOfferOp.buying: USD:GAZFEVBSEGJJ63WPVVIWXLZLWN2JYZECECGT6GUNP4FJDVZVNXWQWMYI
-tx.operations[2].body.manageSellOfferOp.amount: 1001230000
+tx.operations[2].body.manageSellOfferOp.amount: 1001230000 (100.123)
 tx.operations[2].body.manageSellOfferOp.price.n: 7
 tx.operations[2].body.manageSellOfferOp.price.d: 1
 tx.operations[2].body.manageSellOfferOp.offerID: 12345
@@ -40,7 +40,7 @@ tx.operations[3].sourceAccount: GBEFNJVA2347XAJ4HYAECN5S7DIMLRDKXYT7BSFGF6SDM4VH
 tx.operations[3].body.type: CREATE_PASSIVE_SELL_OFFER
 tx.operations[3].body.createPassiveSellOfferOp.selling: XCN:GAYE5SDEM5JIEMGQ7LBMQVRQRVJB6A5E7AZVLJYFL3CNHLZX24DFD35F
 tx.operations[3].body.createPassiveSellOfferOp.buying: USD:GAZFEVBSEGJJ63WPVVIWXLZLWN2JYZECECGT6GUNP4FJDVZVNXWQWMYI
-tx.operations[3].body.createPassiveSellOfferOp.amount: 1001230000
+tx.operations[3].body.createPassiveSellOfferOp.amount: 1001230000 (100.123)
 tx.operations[3].body.createPassiveSellOfferOp.price.n: 71
 tx.operations[3].body.createPassiveSellOfferOp.price.d: 10
 tx.operations[4].sourceAccount._present: true
@@ -107,7 +107,7 @@ tx.operations[8].sourceAccount._present: true
 tx.operations[8].sourceAccount: GBEFNJVA2347XAJ4HYAECN5S7DIMLRDKXYT7BSFGF6SDM4VH5TD5HGJB
 tx.operations[8].body.type: CHANGE_TRUST
 tx.operations[8].body.changeTrustOp.line: XCN:GAYE5SDEM5JIEMGQ7LBMQVRQRVJB6A5E7AZVLJYFL3CNHLZX24DFD35F
-tx.operations[8].body.changeTrustOp.limit: 10000000000
+tx.operations[8].body.changeTrustOp.limit: 10000000000 (1000)
 tx.operations[9].sourceAccount._present: true
 tx.operations[9].sourceAccount: GBEFNJVA2347XAJ4HYAECN5S7DIMLRDKXYT7BSFGF6SDM4VH5TD5HGJB
 tx.operations[9].body.type: ALLOW_TRUST
@@ -138,7 +138,7 @@ tx.operations[14].sourceAccount: GBEFNJVA2347XAJ4HYAECN5S7DIMLRDKXYT7BSFGF6SDM4V
 tx.operations[14].body.type: MANAGE_BUY_OFFER
 tx.operations[14].body.manageBuyOfferOp.selling: XCN:GAYE5SDEM5JIEMGQ7LBMQVRQRVJB6A5E7AZVLJYFL3CNHLZX24DFD35F
 tx.operations[14].body.manageBuyOfferOp.buying: USD:GAZFEVBSEGJJ63WPVVIWXLZLWN2JYZECECGT6GUNP4FJDVZVNXWQWMYI
-tx.operations[14].body.manageBuyOfferOp.buyAmount: 1001230000
+tx.operations[14].body.manageBuyOfferOp.buyAmount: 1001230000 (100.123)
 tx.operations[14].body.manageBuyOfferOp.price.n: 71
 tx.operations[14].body.manageBuyOfferOp.price.d: 10
 tx.operations[14].body.manageBuyOfferOp.offerID: 0
@@ -146,10 +146,10 @@ tx.operations[15].sourceAccount._present: true
 tx.operations[15].sourceAccount: GBEFNJVA2347XAJ4HYAECN5S7DIMLRDKXYT7BSFGF6SDM4VH5TD5HGJB
 tx.operations[15].body.type: PATH_PAYMENT_STRICT_SEND
 tx.operations[15].body.pathPaymentStrictSendOp.sendAsset: USD:GAZFEVBSEGJJ63WPVVIWXLZLWN2JYZECECGT6GUNP4FJDVZVNXWQWMYI
-tx.operations[15].body.pathPaymentStrictSendOp.sendAmount: 100000000
+tx.operations[15].body.pathPaymentStrictSendOp.sendAmount: 100000000 (10)
 tx.operations[15].body.pathPaymentStrictSendOp.destination: GBAF6NXN3DHSF357QBZLTBNWUTABKUODJXJYYE32ZDKA2QBM2H33IK6O
 tx.operations[15].body.pathPaymentStrictSendOp.destAsset: XCN:GAYE5SDEM5JIEMGQ7LBMQVRQRVJB6A5E7AZVLJYFL3CNHLZX24DFD35F
-tx.operations[15].body.pathPaymentStrictSendOp.destMin: 51250000
+tx.operations[15].body.pathPaymentStrictSendOp.destMin: 51250000 (5.125)
 tx.operations[15].body.pathPaymentStrictSendOp.path.len: 3
 tx.operations[15].body.pathPaymentStrictSendOp.path[0]: Hello:GD3RXMK2GHSXXEHPBZY5IL7VW5BXQEDJMCD4KVMXOH2GRFKDGZXR5PFO
 tx.operations[15].body.pathPaymentStrictSendOp.path[1]: native
@@ -160,7 +160,7 @@ tx.operations[17].sourceAccount._present: true
 tx.operations[17].sourceAccount: GBEFNJVA2347XAJ4HYAECN5S7DIMLRDKXYT7BSFGF6SDM4VH5TD5HGJB
 tx.operations[17].body.type: CREATE_CLAIMABLE_BALANCE
 tx.operations[17].body.createClaimableBalanceOp.asset: XCN:GAYE5SDEM5JIEMGQ7LBMQVRQRVJB6A5E7AZVLJYFL3CNHLZX24DFD35F
-tx.operations[17].body.createClaimableBalanceOp.amount: 100005670000
+tx.operations[17].body.createClaimableBalanceOp.amount: 100005670000 (10000.567)
 tx.operations[17].body.createClaimableBalanceOp.claimants.len: 2
 tx.operations[17].body.createClaimableBalanceOp.claimants[0].type: CLAIMANT_TYPE_V0
 tx.operations[17].body.createClaimableBalanceOp.claimants[0].v0.destination: GAYE5SDEM5JIEMGQ7LBMQVRQRVJB6A5E7AZVLJYFL3CNHLZX24DFD35F
@@ -171,19 +171,19 @@ tx.operations[17].body.createClaimableBalanceOp.claimants[0].v0.predicate.andPre
 tx.operations[17].body.createClaimableBalanceOp.claimants[0].v0.predicate.andPredicates[0].andPredicates[0].type: CLAIM_PREDICATE_AND
 tx.operations[17].body.createClaimableBalanceOp.claimants[0].v0.predicate.andPredicates[0].andPredicates[0].andPredicates.len: 2
 tx.operations[17].body.createClaimableBalanceOp.claimants[0].v0.predicate.andPredicates[0].andPredicates[0].andPredicates[0].type: CLAIM_PREDICATE_BEFORE_RELATIVE_TIME
-tx.operations[17].body.createClaimableBalanceOp.claimants[0].v0.predicate.andPredicates[0].andPredicates[0].andPredicates[0].relBefore: 40000
+tx.operations[17].body.createClaimableBalanceOp.claimants[0].v0.predicate.andPredicates[0].andPredicates[0].andPredicates[0].relBefore: 40000 (1970-01-01 11:06:40.000000+00:00 (UTC))
 tx.operations[17].body.createClaimableBalanceOp.claimants[0].v0.predicate.andPredicates[0].andPredicates[0].andPredicates[1].type: CLAIM_PREDICATE_NOT
 tx.operations[17].body.createClaimableBalanceOp.claimants[0].v0.predicate.andPredicates[0].andPredicates[0].andPredicates[1].notPredicate.type: CLAIM_PREDICATE_BEFORE_RELATIVE_TIME
-tx.operations[17].body.createClaimableBalanceOp.claimants[0].v0.predicate.andPredicates[0].andPredicates[0].andPredicates[1].notPredicate.relBefore: 50000
+tx.operations[17].body.createClaimableBalanceOp.claimants[0].v0.predicate.andPredicates[0].andPredicates[0].andPredicates[1].notPredicate.relBefore: 50000 (1970-01-01 13:53:20.000000+00:00 (UTC))
 tx.operations[17].body.createClaimableBalanceOp.claimants[0].v0.predicate.andPredicates[0].andPredicates[1].type: CLAIM_PREDICATE_BEFORE_RELATIVE_TIME
-tx.operations[17].body.createClaimableBalanceOp.claimants[0].v0.predicate.andPredicates[0].andPredicates[1].relBefore: 30000
+tx.operations[17].body.createClaimableBalanceOp.claimants[0].v0.predicate.andPredicates[0].andPredicates[1].relBefore: 30000 (1970-01-01 08:20:00.000000+00:00 (UTC))
 tx.operations[17].body.createClaimableBalanceOp.claimants[0].v0.predicate.andPredicates[1].type: CLAIM_PREDICATE_OR
 tx.operations[17].body.createClaimableBalanceOp.claimants[0].v0.predicate.andPredicates[1].orPredicates.len: 2
 tx.operations[17].body.createClaimableBalanceOp.claimants[0].v0.predicate.andPredicates[1].orPredicates[0].type: CLAIM_PREDICATE_NOT
 tx.operations[17].body.createClaimableBalanceOp.claimants[0].v0.predicate.andPredicates[1].orPredicates[0].notPredicate.type: CLAIM_PREDICATE_BEFORE_RELATIVE_TIME
-tx.operations[17].body.createClaimableBalanceOp.claimants[0].v0.predicate.andPredicates[1].orPredicates[0].notPredicate.relBefore: 10000
+tx.operations[17].body.createClaimableBalanceOp.claimants[0].v0.predicate.andPredicates[1].orPredicates[0].notPredicate.relBefore: 10000 (1970-01-01 02:46:40.000000+00:00 (UTC))
 tx.operations[17].body.createClaimableBalanceOp.claimants[0].v0.predicate.andPredicates[1].orPredicates[1].type: CLAIM_PREDICATE_BEFORE_ABSOLUTE_TIME
-tx.operations[17].body.createClaimableBalanceOp.claimants[0].v0.predicate.andPredicates[1].orPredicates[1].absBefore: 20000
+tx.operations[17].body.createClaimableBalanceOp.claimants[0].v0.predicate.andPredicates[1].orPredicates[1].absBefore: 20000 (1970-01-01 05:33:20.000000+00:00 (UTC))
 tx.operations[17].body.createClaimableBalanceOp.claimants[1].type: CLAIMANT_TYPE_V0
 tx.operations[17].body.createClaimableBalanceOp.claimants[1].v0.destination: GAZFEVBSEGJJ63WPVVIWXLZLWN2JYZECECGT6GUNP4FJDVZVNXWQWMYI
 tx.operations[17].body.createClaimableBalanceOp.claimants[1].v0.predicate.type: CLAIM_PREDICATE_AND
@@ -193,19 +193,19 @@ tx.operations[17].body.createClaimableBalanceOp.claimants[1].v0.predicate.andPre
 tx.operations[17].body.createClaimableBalanceOp.claimants[1].v0.predicate.andPredicates[0].andPredicates[0].type: CLAIM_PREDICATE_AND
 tx.operations[17].body.createClaimableBalanceOp.claimants[1].v0.predicate.andPredicates[0].andPredicates[0].andPredicates.len: 2
 tx.operations[17].body.createClaimableBalanceOp.claimants[1].v0.predicate.andPredicates[0].andPredicates[0].andPredicates[0].type: CLAIM_PREDICATE_BEFORE_RELATIVE_TIME
-tx.operations[17].body.createClaimableBalanceOp.claimants[1].v0.predicate.andPredicates[0].andPredicates[0].andPredicates[0].relBefore: 40000
+tx.operations[17].body.createClaimableBalanceOp.claimants[1].v0.predicate.andPredicates[0].andPredicates[0].andPredicates[0].relBefore: 40000 (1970-01-01 11:06:40.000000+00:00 (UTC))
 tx.operations[17].body.createClaimableBalanceOp.claimants[1].v0.predicate.andPredicates[0].andPredicates[0].andPredicates[1].type: CLAIM_PREDICATE_NOT
 tx.operations[17].body.createClaimableBalanceOp.claimants[1].v0.predicate.andPredicates[0].andPredicates[0].andPredicates[1].notPredicate.type: CLAIM_PREDICATE_BEFORE_RELATIVE_TIME
-tx.operations[17].body.createClaimableBalanceOp.claimants[1].v0.predicate.andPredicates[0].andPredicates[0].andPredicates[1].notPredicate.relBefore: 50000
+tx.operations[17].body.createClaimableBalanceOp.claimants[1].v0.predicate.andPredicates[0].andPredicates[0].andPredicates[1].notPredicate.relBefore: 50000 (1970-01-01 13:53:20.000000+00:00 (UTC))
 tx.operations[17].body.createClaimableBalanceOp.claimants[1].v0.predicate.andPredicates[0].andPredicates[1].type: CLAIM_PREDICATE_BEFORE_RELATIVE_TIME
-tx.operations[17].body.createClaimableBalanceOp.claimants[1].v0.predicate.andPredicates[0].andPredicates[1].relBefore: 30000
+tx.operations[17].body.createClaimableBalanceOp.claimants[1].v0.predicate.andPredicates[0].andPredicates[1].relBefore: 30000 (1970-01-01 08:20:00.000000+00:00 (UTC))
 tx.operations[17].body.createClaimableBalanceOp.claimants[1].v0.predicate.andPredicates[1].type: CLAIM_PREDICATE_OR
 tx.operations[17].body.createClaimableBalanceOp.claimants[1].v0.predicate.andPredicates[1].orPredicates.len: 2
 tx.operations[17].body.createClaimableBalanceOp.claimants[1].v0.predicate.andPredicates[1].orPredicates[0].type: CLAIM_PREDICATE_NOT
 tx.operations[17].body.createClaimableBalanceOp.claimants[1].v0.predicate.andPredicates[1].orPredicates[0].notPredicate.type: CLAIM_PREDICATE_BEFORE_RELATIVE_TIME
-tx.operations[17].body.createClaimableBalanceOp.claimants[1].v0.predicate.andPredicates[1].orPredicates[0].notPredicate.relBefore: 10000
+tx.operations[17].body.createClaimableBalanceOp.claimants[1].v0.predicate.andPredicates[1].orPredicates[0].notPredicate.relBefore: 10000 (1970-01-01 02:46:40.000000+00:00 (UTC))
 tx.operations[17].body.createClaimableBalanceOp.claimants[1].v0.predicate.andPredicates[1].orPredicates[1].type: CLAIM_PREDICATE_BEFORE_ABSOLUTE_TIME
-tx.operations[17].body.createClaimableBalanceOp.claimants[1].v0.predicate.andPredicates[1].orPredicates[1].absBefore: 20000
+tx.operations[17].body.createClaimableBalanceOp.claimants[1].v0.predicate.andPredicates[1].orPredicates[1].absBefore: 20000 (1970-01-01 05:33:20.000000+00:00 (UTC))
 tx.operations[18].sourceAccount._present: true
 tx.operations[18].sourceAccount: GBEFNJVA2347XAJ4HYAECN5S7DIMLRDKXYT7BSFGF6SDM4VH5TD5HGJB
 tx.operations[18].body.type: CLAIM_CLAIMABLE_BALANCE
@@ -218,7 +218,7 @@ tx.operations[20].sourceAccount._present: true
 tx.operations[20].sourceAccount: GBEFNJVA2347XAJ4HYAECN5S7DIMLRDKXYT7BSFGF6SDM4VH5TD5HGJB
 tx.operations[20].body.type: CREATE_ACCOUNT
 tx.operations[20].body.createAccountOp.destination: GAZFEVBSEGJJ63WPVVIWXLZLWN2JYZECECGT6GUNP4FJDVZVNXWQWMYI
-tx.operations[20].body.createAccountOp.startingBalance: 100000000
+tx.operations[20].body.createAccountOp.startingBalance: 100000000 (10)
 tx.operations[21].sourceAccount._present: true
 tx.operations[21].sourceAccount: GBEFNJVA2347XAJ4HYAECN5S7DIMLRDKXYT7BSFGF6SDM4VH5TD5HGJB
 tx.operations[21].body.type: END_SPONSORING_FUTURE_RESERVES
@@ -288,7 +288,7 @@ tx.operations[31].sourceAccount: GBEFNJVA2347XAJ4HYAECN5S7DIMLRDKXYT7BSFGF6SDM4V
 tx.operations[31].body.type: CLAWBACK
 tx.operations[31].body.clawbackOp.asset: XCN:GAYE5SDEM5JIEMGQ7LBMQVRQRVJB6A5E7AZVLJYFL3CNHLZX24DFD35F
 tx.operations[31].body.clawbackOp.from: GAZFEVBSEGJJ63WPVVIWXLZLWN2JYZECECGT6GUNP4FJDVZVNXWQWMYI
-tx.operations[31].body.clawbackOp.amount: 12345678000
+tx.operations[31].body.clawbackOp.amount: 12345678000 (1234.5678)
 tx.operations[32].sourceAccount._present: true
 tx.operations[32].sourceAccount: GBEFNJVA2347XAJ4HYAECN5S7DIMLRDKXYT7BSFGF6SDM4VH5TD5HGJB
 tx.operations[32].body.type: CLAWBACK_CLAIMABLE_BALANCE

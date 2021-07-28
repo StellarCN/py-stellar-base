@@ -7,6 +7,7 @@ Created: 2018-08-31
 """
 
 import json
+from datetime import datetime
 from decimal import Decimal
 from enum import Enum
 from typing import List, Union, Optional, Dict
@@ -86,6 +87,7 @@ def to_txrep(
             "feeBump.tx.feeSource",
             _to_muxed_account(fee_bump_transaction.fee_source),
             lines,
+            comment=_to_muxed_account_comment(fee_bump_transaction.fee_source),
         )
         _add_line(
             "feeBump.tx.fee",
@@ -96,7 +98,12 @@ def to_txrep(
             "feeBump.tx.innerTx.type", _EnvelopeType.ENVELOPE_TYPE_TX.value, lines
         )
     assert isinstance(transaction, Transaction)
-    _add_line(f"{prefix}sourceAccount", _to_muxed_account(transaction.source), lines)
+    _add_line(
+        f"{prefix}sourceAccount",
+        _to_muxed_account(transaction.source),
+        lines,
+        comment=_to_muxed_account_comment(transaction.source),
+    )
     _add_line(f"{prefix}fee", transaction.fee, lines)
     _add_line(f"{prefix}seqNum", transaction.sequence, lines)
     _add_time_bounds(transaction.time_bounds, prefix, lines)
@@ -908,8 +915,13 @@ def _decode_asset(asset: str) -> Asset:
     return Asset(parts[0], parts[1])
 
 
-def _add_line(key: str, value: Union[str, int], lines: List[str]) -> None:
-    lines.append(f"{key}: {value}")
+def _add_line(
+    key: str,
+    value: Union[str, int],
+    lines: List[str],
+    comment: Union[str, int, Decimal] = None,
+) -> None:
+    lines.append(f"{key}: {value}{' (' + str(comment) + ')' if comment else ''}")
 
 
 def _add_time_bounds(
@@ -919,8 +931,18 @@ def _add_time_bounds(
         _add_line(f"{prefix}timeBounds._present", _false, lines)
     else:
         _add_line(f"{prefix}timeBounds._present", _true, lines)
-        _add_line(f"{prefix}timeBounds.minTime", time_bounds.min_time, lines)
-        _add_line(f"{prefix}timeBounds.maxTime", time_bounds.max_time, lines)
+        _add_line(
+            f"{prefix}timeBounds.minTime",
+            time_bounds.min_time,
+            lines,
+            _to_readable_utc_time_comment(time_bounds.min_time),
+        )
+        _add_line(
+            f"{prefix}timeBounds.maxTime",
+            time_bounds.max_time,
+            lines,
+            _to_readable_utc_time_comment(time_bounds.max_time),
+        )
 
 
 def _add_memo(memo: Memo, prefix: str, lines: List[str]) -> None:
@@ -953,19 +975,28 @@ def _add_operation(
     prefix = f"{prefix}operations[{index}]."
     operation_type = operation.__class__.__name__
 
-    def add_operation_line(key: str, value: Union[str, int]) -> None:
-        _add_line(f"{prefix}{key}", value, lines)
+    def add_operation_line(
+        key: str, value: Union[str, int], comment: Union[str, int, Decimal] = None
+    ) -> None:
+        _add_line(f"{prefix}{key}", value, lines, comment)
 
     if operation.source is not None:
         add_operation_line("sourceAccount._present", _true)
-        add_operation_line("sourceAccount", _to_muxed_account(operation.source))
+        add_operation_line(
+            "sourceAccount",
+            _to_muxed_account(operation.source),
+            comment=_to_muxed_account_comment(operation.source),
+        )
     else:
         add_operation_line("sourceAccount._present", _false)
 
     add_operation_line("body.type", _to_caps_with_under(operation_type))
 
     def add_body_line(
-        key: str, value: Union[str, int, None], optional: bool = False
+        key: str,
+        value: Union[str, int, None],
+        optional: bool = False,
+        comment: Union[str, int, Decimal] = None,
     ) -> None:
         operation_type = operation.__class__.__name__
         key = f"body.{_to_camel_case(operation_type)}Op.{key}"
@@ -974,10 +1005,10 @@ def _add_operation(
             add_operation_line(f"{key}._present", _true if present else _false)
             if present:
                 assert value is not None
-                add_operation_line(key, value)
+                add_operation_line(key, value, comment=comment)
         else:
             assert value is not None
-            add_operation_line(key, value)
+            add_operation_line(key, value, comment=comment)
 
     def add_signer(signer: Optional[Signer]) -> None:
         add_body_line("signer._present", _false if signer is None else _true)
@@ -1070,12 +1101,22 @@ def _add_operation(
             claimant_predicate.claim_predicate_type
             == ClaimPredicateType.CLAIM_PREDICATE_BEFORE_ABSOLUTE_TIME
         ):
-            add_body_line(f"{prefix}.absBefore", claimant_predicate.abs_before)
+            assert claimant_predicate.abs_before is not None
+            add_body_line(
+                f"{prefix}.absBefore",
+                claimant_predicate.abs_before,
+                comment=_to_readable_utc_time_comment(claimant_predicate.abs_before),
+            )
         elif (
             claimant_predicate.claim_predicate_type
             == ClaimPredicateType.CLAIM_PREDICATE_BEFORE_RELATIVE_TIME
         ):
-            add_body_line(f"{prefix}.relBefore", claimant_predicate.rel_before)
+            assert claimant_predicate.rel_before is not None
+            add_body_line(
+                f"{prefix}.relBefore",
+                claimant_predicate.rel_before,
+                comment=_to_readable_utc_time_comment(claimant_predicate.rel_before),
+            )
         else:
             raise SdkValueError(
                 f"This claim predicate type has not been implemented yet, "
@@ -1084,30 +1125,48 @@ def _add_operation(
 
     if isinstance(operation, CreateAccount):
         add_body_line("destination", operation.destination)
-        add_body_line("startingBalance", _to_amount(operation.starting_balance))
+        add_body_line(
+            "startingBalance",
+            _to_amount(operation.starting_balance),
+            comment=operation.starting_balance,
+        )
     elif isinstance(operation, Payment):
-        add_body_line("destination", _to_muxed_account(operation.destination))
+        add_body_line(
+            "destination",
+            _to_muxed_account(operation.destination),
+            comment=_to_muxed_account_comment(operation.destination),
+        )
         add_body_line("asset", _to_asset(operation.asset))
-        add_body_line("amount", _to_amount(operation.amount))
+        add_body_line("amount", _to_amount(operation.amount), comment=operation.amount)
     elif isinstance(operation, PathPaymentStrictReceive):
         add_body_line("sendAsset", _to_asset(operation.send_asset))
-        add_body_line("sendMax", _to_amount(operation.send_max))
-        add_body_line("destination", _to_muxed_account(operation.destination))
+        add_body_line(
+            "sendMax", _to_amount(operation.send_max), comment=operation.send_max
+        )
+        add_body_line(
+            "destination",
+            _to_muxed_account(operation.destination),
+            comment=_to_muxed_account_comment(operation.destination),
+        )
         add_body_line("destAsset", _to_asset(operation.dest_asset))
-        add_body_line("destAmount", _to_amount(operation.dest_amount))
+        add_body_line(
+            "destAmount",
+            _to_amount(operation.dest_amount),
+            comment=operation.dest_amount,
+        )
         add_body_line("path.len", len(operation.path))
         for index, asset in enumerate(operation.path):
             add_body_line(f"path[{index}]", _to_asset(asset))
     elif isinstance(operation, ManageSellOffer):
         add_body_line("selling", _to_asset(operation.selling))
         add_body_line("buying", _to_asset(operation.buying))
-        add_body_line("amount", _to_amount(operation.amount))
+        add_body_line("amount", _to_amount(operation.amount), comment=operation.amount)
         add_price(operation.price)
         add_body_line("offerID", operation.offer_id)
     elif isinstance(operation, CreatePassiveSellOffer):
         add_body_line("selling", _to_asset(operation.selling))
         add_body_line("buying", _to_asset(operation.buying))
-        add_body_line("amount", _to_amount(operation.amount))
+        add_body_line("amount", _to_amount(operation.amount), comment=operation.amount)
         add_price(operation.price)
     elif isinstance(operation, SetOptions):
         add_body_line("inflationDest", operation.inflation_dest, True)
@@ -1121,7 +1180,7 @@ def _add_operation(
         add_signer(operation.signer)
     elif isinstance(operation, ChangeTrust):
         add_body_line("line", _to_asset(operation.asset))
-        add_body_line("limit", _to_amount(operation.limit))
+        add_body_line("limit", _to_amount(operation.limit), comment=operation.limit)
     elif isinstance(operation, AllowTrust):
         add_body_line("trustor", operation.trustor)
         add_body_line("asset", operation.asset_code)
@@ -1129,7 +1188,11 @@ def _add_operation(
     elif isinstance(operation, AccountMerge):
         # AccountMerge does not include 'accountMergeOp' prefix
         # see https://github.com/StellarCN/py-stellar-base/blob/master/.xdr/Stellar-transaction.x#L282
-        add_operation_line("body.destination", _to_muxed_account(operation.destination))
+        add_operation_line(
+            "body.destination",
+            _to_muxed_account(operation.destination),
+            comment=_to_muxed_account_comment(operation.destination),
+        )
     elif isinstance(operation, ManageData):
         add_body_line("dataName", _to_string(operation.data_name))
         if operation.data_value is None:
@@ -1142,15 +1205,27 @@ def _add_operation(
     elif isinstance(operation, ManageBuyOffer):
         add_body_line("selling", _to_asset(operation.selling))
         add_body_line("buying", _to_asset(operation.buying))
-        add_body_line("buyAmount", _to_amount(operation.amount))
+        add_body_line(
+            "buyAmount", _to_amount(operation.amount), comment=operation.amount
+        )
         add_price(operation.price)
         add_body_line("offerID", operation.offer_id)
     elif isinstance(operation, PathPaymentStrictSend):
         add_body_line("sendAsset", _to_asset(operation.send_asset))
-        add_body_line("sendAmount", _to_amount(operation.send_amount))
-        add_body_line("destination", _to_muxed_account(operation.destination))
+        add_body_line(
+            "sendAmount",
+            _to_amount(operation.send_amount),
+            comment=operation.send_amount,
+        )
+        add_body_line(
+            "destination",
+            _to_muxed_account(operation.destination),
+            comment=_to_muxed_account_comment(operation.destination),
+        )
         add_body_line("destAsset", _to_asset(operation.dest_asset))
-        add_body_line("destMin", _to_amount(operation.dest_min))
+        add_body_line(
+            "destMin", _to_amount(operation.dest_min), comment=operation.dest_min
+        )
         add_body_line("path.len", len(operation.path))
         for index, asset in enumerate(operation.path):
             add_body_line(f"path[{index}]", _to_asset(asset))
@@ -1159,7 +1234,7 @@ def _add_operation(
         pass
     elif isinstance(operation, CreateClaimableBalance):
         add_body_line("asset", _to_asset(operation.asset))
-        add_body_line("amount", _to_amount(operation.amount))
+        add_body_line("amount", _to_amount(operation.amount), comment=operation.amount)
         add_body_line("claimants.len", len(operation.claimants))
         for index, claimant in enumerate(operation.claimants):
             # current CLAIMANT_TYPE is CLAIMANT_TYPE_V0
@@ -1278,8 +1353,12 @@ def _add_operation(
             )
     elif isinstance(operation, Clawback):
         add_body_line("asset", _to_asset(operation.asset))
-        add_body_line("from", _to_muxed_account(operation.from_))
-        add_body_line("amount", _to_amount(operation.amount))
+        add_body_line(
+            "from",
+            _to_muxed_account(operation.from_),
+            comment=_to_muxed_account_comment(operation.from_),
+        )
+        add_body_line("amount", _to_amount(operation.amount), comment=operation.amount)
     elif isinstance(operation, ClawbackClaimableBalance):
         add_body_line("balanceID", operation.balance_id)
     elif isinstance(operation, SetTrustLineFlags):
@@ -1320,6 +1399,19 @@ def _to_asset(asset: Asset) -> str:
     if asset.is_native():
         return "native"
     return f"{asset.code}:{asset.issuer}"
+
+
+def _to_readable_utc_time_comment(timestamp: int) -> str:
+    utc_time = datetime.utcfromtimestamp(timestamp)
+    return utc_time.strftime("%Y-%m-%d %H:%M:%S.%f+00:00 (UTC)")
+
+
+def _to_muxed_account_comment(account: MuxedAccount) -> Optional[str]:
+    if account.account_muxed_id is None:
+        return None
+    return (
+        f"accountID: {account.account_id}, accountMuxedID: {account.account_muxed_id}"
+    )
 
 
 def _to_amount(amount: Union[Decimal, str]) -> int:

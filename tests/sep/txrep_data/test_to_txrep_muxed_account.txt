@@ -1,56 +1,56 @@
 type: ENVELOPE_TYPE_TX_FEE_BUMP
-feeBump.tx.feeSource: MBB2UWEFNJIKGYBIOJ3BFTNLJFLTXQ6WGCI2XMS7E5USPD2OSNI5WAAAAAAAAAAAAFM6G
+feeBump.tx.feeSource: MBB2UWEFNJIKGYBIOJ3BFTNLJFLTXQ6WGCI2XMS7E5USPD2OSNI5WAAAAAAAAAAAAFM6G (accountID: GBB2UWEFNJIKGYBIOJ3BFTNLJFLTXQ6WGCI2XMS7E5USPD2OSNI5WITS, accountMuxedID: 1)
 feeBump.tx.fee: 1200
 feeBump.tx.innerTx.type: ENVELOPE_TYPE_TX
-feeBump.tx.innerTx.tx.sourceAccount: MBEFNJVA2347XAJ4HYAECN5S7DIMLRDKXYT7BSFGF6SDM4VH5TD5GAAAAAAAAAAAAEJVS
+feeBump.tx.innerTx.tx.sourceAccount: MBEFNJVA2347XAJ4HYAECN5S7DIMLRDKXYT7BSFGF6SDM4VH5TD5GAAAAAAAAAAAAEJVS (accountID: GBEFNJVA2347XAJ4HYAECN5S7DIMLRDKXYT7BSFGF6SDM4VH5TD5HGJB, accountMuxedID: 1)
 feeBump.tx.innerTx.tx.fee: 500
 feeBump.tx.innerTx.tx.seqNum: 46489056724385793
 feeBump.tx.innerTx.tx.timeBounds._present: true
-feeBump.tx.innerTx.tx.timeBounds.minTime: 1535756672
-feeBump.tx.innerTx.tx.timeBounds.maxTime: 1567292672
+feeBump.tx.innerTx.tx.timeBounds.minTime: 1535756672 (2018-08-31 23:04:32.000000+00:00 (UTC))
+feeBump.tx.innerTx.tx.timeBounds.maxTime: 1567292672 (2019-08-31 23:04:32.000000+00:00 (UTC))
 feeBump.tx.innerTx.tx.memo.type: MEMO_TEXT
 feeBump.tx.innerTx.tx.memo.text: "Enjoy this transaction"
 feeBump.tx.innerTx.tx.operations.len: 5
 feeBump.tx.innerTx.tx.operations[0].sourceAccount._present: true
-feeBump.tx.innerTx.tx.operations[0].sourceAccount: MBEFNJVA2347XAJ4HYAECN5S7DIMLRDKXYT7BSFGF6SDM4VH5TD5GAAAAAAAAAAAAEJVS
+feeBump.tx.innerTx.tx.operations[0].sourceAccount: MBEFNJVA2347XAJ4HYAECN5S7DIMLRDKXYT7BSFGF6SDM4VH5TD5GAAAAAAAAAAAAEJVS (accountID: GBEFNJVA2347XAJ4HYAECN5S7DIMLRDKXYT7BSFGF6SDM4VH5TD5HGJB, accountMuxedID: 1)
 feeBump.tx.innerTx.tx.operations[0].body.type: ACCOUNT_MERGE
-feeBump.tx.innerTx.tx.operations[0].body.destination: MCMXCNQPSKNQC4KSKZ6EEC56W525V63SV7BUWKEOKPNHAWBKYLPS2AAAAAAAAAAAAHKEE
+feeBump.tx.innerTx.tx.operations[0].body.destination: MCMXCNQPSKNQC4KSKZ6EEC56W525V63SV7BUWKEOKPNHAWBKYLPS2AAAAAAAAAAAAHKEE (accountID: GCMXCNQPSKNQC4KSKZ6EEC56W525V63SV7BUWKEOKPNHAWBKYLPS3Q2D, accountMuxedID: 1)
 feeBump.tx.innerTx.tx.operations[1].sourceAccount._present: true
-feeBump.tx.innerTx.tx.operations[1].sourceAccount: MBEFNJVA2347XAJ4HYAECN5S7DIMLRDKXYT7BSFGF6SDM4VH5TD5GAAAAAAAAAAAAEJVS
+feeBump.tx.innerTx.tx.operations[1].sourceAccount: MBEFNJVA2347XAJ4HYAECN5S7DIMLRDKXYT7BSFGF6SDM4VH5TD5GAAAAAAAAAAAAEJVS (accountID: GBEFNJVA2347XAJ4HYAECN5S7DIMLRDKXYT7BSFGF6SDM4VH5TD5HGJB, accountMuxedID: 1)
 feeBump.tx.innerTx.tx.operations[1].body.type: PAYMENT
-feeBump.tx.innerTx.tx.operations[1].body.paymentOp.destination: MBAF6NXN3DHSF357QBZLTBNWUTABKUODJXJYYE32ZDKA2QBM2H33IAAAAAAAAAAAAF7WE
+feeBump.tx.innerTx.tx.operations[1].body.paymentOp.destination: MBAF6NXN3DHSF357QBZLTBNWUTABKUODJXJYYE32ZDKA2QBM2H33IAAAAAAAAAAAAF7WE (accountID: GBAF6NXN3DHSF357QBZLTBNWUTABKUODJXJYYE32ZDKA2QBM2H33IK6O, accountMuxedID: 1)
 feeBump.tx.innerTx.tx.operations[1].body.paymentOp.asset: USD:GAZFEVBSEGJJ63WPVVIWXLZLWN2JYZECECGT6GUNP4FJDVZVNXWQWMYI
-feeBump.tx.innerTx.tx.operations[1].body.paymentOp.amount: 400004000
+feeBump.tx.innerTx.tx.operations[1].body.paymentOp.amount: 400004000 (40.0004)
 feeBump.tx.innerTx.tx.operations[2].sourceAccount._present: true
-feeBump.tx.innerTx.tx.operations[2].sourceAccount: MBEFNJVA2347XAJ4HYAECN5S7DIMLRDKXYT7BSFGF6SDM4VH5TD5GAAAAAAAAAAAAEJVS
+feeBump.tx.innerTx.tx.operations[2].sourceAccount: MBEFNJVA2347XAJ4HYAECN5S7DIMLRDKXYT7BSFGF6SDM4VH5TD5GAAAAAAAAAAAAEJVS (accountID: GBEFNJVA2347XAJ4HYAECN5S7DIMLRDKXYT7BSFGF6SDM4VH5TD5HGJB, accountMuxedID: 1)
 feeBump.tx.innerTx.tx.operations[2].body.type: PATH_PAYMENT_STRICT_RECEIVE
 feeBump.tx.innerTx.tx.operations[2].body.pathPaymentStrictReceiveOp.sendAsset: USD:GAZFEVBSEGJJ63WPVVIWXLZLWN2JYZECECGT6GUNP4FJDVZVNXWQWMYI
-feeBump.tx.innerTx.tx.operations[2].body.pathPaymentStrictReceiveOp.sendMax: 100000000
-feeBump.tx.innerTx.tx.operations[2].body.pathPaymentStrictReceiveOp.destination: MBCCOULOS5TNW5HEQLGZMF4HMJXWT47HKA5GOHCHF437SMXX3CWIQAAAAAAAAAAAAGFTY
+feeBump.tx.innerTx.tx.operations[2].body.pathPaymentStrictReceiveOp.sendMax: 100000000 (10)
+feeBump.tx.innerTx.tx.operations[2].body.pathPaymentStrictReceiveOp.destination: MBCCOULOS5TNW5HEQLGZMF4HMJXWT47HKA5GOHCHF437SMXX3CWIQAAAAAAAAAAAAGFTY (accountID: GBCCOULOS5TNW5HEQLGZMF4HMJXWT47HKA5GOHCHF437SMXX3CWIR6GJ, accountMuxedID: 1)
 feeBump.tx.innerTx.tx.operations[2].body.pathPaymentStrictReceiveOp.destAsset: XCN:GAYE5SDEM5JIEMGQ7LBMQVRQRVJB6A5E7AZVLJYFL3CNHLZX24DFD35F
-feeBump.tx.innerTx.tx.operations[2].body.pathPaymentStrictReceiveOp.destAmount: 51250000
+feeBump.tx.innerTx.tx.operations[2].body.pathPaymentStrictReceiveOp.destAmount: 51250000 (5.125)
 feeBump.tx.innerTx.tx.operations[2].body.pathPaymentStrictReceiveOp.path.len: 3
 feeBump.tx.innerTx.tx.operations[2].body.pathPaymentStrictReceiveOp.path[0]: Hello:GD3RXMK2GHSXXEHPBZY5IL7VW5BXQEDJMCD4KVMXOH2GRFKDGZXR5PFO
 feeBump.tx.innerTx.tx.operations[2].body.pathPaymentStrictReceiveOp.path[1]: native
 feeBump.tx.innerTx.tx.operations[2].body.pathPaymentStrictReceiveOp.path[2]: MOEW:GBR765FQTCAJLLJGZVYLXCFAOZI6ORTHPDPOOHJOHFRZ5GHNVYGK4IFM
 feeBump.tx.innerTx.tx.operations[3].sourceAccount._present: true
-feeBump.tx.innerTx.tx.operations[3].sourceAccount: MBEFNJVA2347XAJ4HYAECN5S7DIMLRDKXYT7BSFGF6SDM4VH5TD5GAAAAAAAAAAAAEJVS
+feeBump.tx.innerTx.tx.operations[3].sourceAccount: MBEFNJVA2347XAJ4HYAECN5S7DIMLRDKXYT7BSFGF6SDM4VH5TD5GAAAAAAAAAAAAEJVS (accountID: GBEFNJVA2347XAJ4HYAECN5S7DIMLRDKXYT7BSFGF6SDM4VH5TD5HGJB, accountMuxedID: 1)
 feeBump.tx.innerTx.tx.operations[3].body.type: PATH_PAYMENT_STRICT_SEND
 feeBump.tx.innerTx.tx.operations[3].body.pathPaymentStrictSendOp.sendAsset: USD:GAZFEVBSEGJJ63WPVVIWXLZLWN2JYZECECGT6GUNP4FJDVZVNXWQWMYI
-feeBump.tx.innerTx.tx.operations[3].body.pathPaymentStrictSendOp.sendAmount: 100000000
-feeBump.tx.innerTx.tx.operations[3].body.pathPaymentStrictSendOp.destination: MATDIL6CGXI6HFQ7UPBGIJR5QNMGNPVVTTHIPZWIQ3AFCS2YO3M3CAAAAAAAAAAAAFGHU
+feeBump.tx.innerTx.tx.operations[3].body.pathPaymentStrictSendOp.sendAmount: 100000000 (10)
+feeBump.tx.innerTx.tx.operations[3].body.pathPaymentStrictSendOp.destination: MATDIL6CGXI6HFQ7UPBGIJR5QNMGNPVVTTHIPZWIQ3AFCS2YO3M3CAAAAAAAAAAAAFGHU (accountID: GATDIL6CGXI6HFQ7UPBGIJR5QNMGNPVVTTHIPZWIQ3AFCS2YO3M3CGCX, accountMuxedID: 1)
 feeBump.tx.innerTx.tx.operations[3].body.pathPaymentStrictSendOp.destAsset: XCN:GAYE5SDEM5JIEMGQ7LBMQVRQRVJB6A5E7AZVLJYFL3CNHLZX24DFD35F
-feeBump.tx.innerTx.tx.operations[3].body.pathPaymentStrictSendOp.destMin: 51250000
+feeBump.tx.innerTx.tx.operations[3].body.pathPaymentStrictSendOp.destMin: 51250000 (5.125)
 feeBump.tx.innerTx.tx.operations[3].body.pathPaymentStrictSendOp.path.len: 3
 feeBump.tx.innerTx.tx.operations[3].body.pathPaymentStrictSendOp.path[0]: Hello:GD3RXMK2GHSXXEHPBZY5IL7VW5BXQEDJMCD4KVMXOH2GRFKDGZXR5PFO
 feeBump.tx.innerTx.tx.operations[3].body.pathPaymentStrictSendOp.path[1]: native
 feeBump.tx.innerTx.tx.operations[3].body.pathPaymentStrictSendOp.path[2]: MOEW:GBR765FQTCAJLLJGZVYLXCFAOZI6ORTHPDPOOHJOHFRZ5GHNVYGK4IFM
 feeBump.tx.innerTx.tx.operations[4].sourceAccount._present: true
-feeBump.tx.innerTx.tx.operations[4].sourceAccount: MBEFNJVA2347XAJ4HYAECN5S7DIMLRDKXYT7BSFGF6SDM4VH5TD5GAAAAAAAAAAAAEJVS
+feeBump.tx.innerTx.tx.operations[4].sourceAccount: MBEFNJVA2347XAJ4HYAECN5S7DIMLRDKXYT7BSFGF6SDM4VH5TD5GAAAAAAAAAAAAEJVS (accountID: GBEFNJVA2347XAJ4HYAECN5S7DIMLRDKXYT7BSFGF6SDM4VH5TD5HGJB, accountMuxedID: 1)
 feeBump.tx.innerTx.tx.operations[4].body.type: CLAWBACK
 feeBump.tx.innerTx.tx.operations[4].body.clawbackOp.asset: XCN:GAYE5SDEM5JIEMGQ7LBMQVRQRVJB6A5E7AZVLJYFL3CNHLZX24DFD35F
-feeBump.tx.innerTx.tx.operations[4].body.clawbackOp.from: MD6Q33M4R4PLM7TXU75G2UFDP6XBW7UEBSWT6ECDVNGBKIY2Z44HUAAAAAAAAAAAAECFU
-feeBump.tx.innerTx.tx.operations[4].body.clawbackOp.amount: 12345678000
+feeBump.tx.innerTx.tx.operations[4].body.clawbackOp.from: MD6Q33M4R4PLM7TXU75G2UFDP6XBW7UEBSWT6ECDVNGBKIY2Z44HUAAAAAAAAAAAAECFU (accountID: GD6Q33M4R4PLM7TXU75G2UFDP6XBW7UEBSWT6ECDVNGBKIY2Z44HUL4K, accountMuxedID: 1)
+feeBump.tx.innerTx.tx.operations[4].body.clawbackOp.amount: 12345678000 (1234.5678)
 feeBump.tx.innerTx.tx.ext.v: 0
 feeBump.tx.innerTx.signatures.len: 1
 feeBump.tx.innerTx.signatures[0].hint: a7ecc7d3

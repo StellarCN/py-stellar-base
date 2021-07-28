@@ -6,8 +6,8 @@ feeBump.tx.innerTx.tx.sourceAccount: GBEFNJVA2347XAJ4HYAECN5S7DIMLRDKXYT7BSFGF6S
 feeBump.tx.innerTx.tx.fee: 100
 feeBump.tx.innerTx.tx.seqNum: 46489056724385793
 feeBump.tx.innerTx.tx.timeBounds._present: true
-feeBump.tx.innerTx.tx.timeBounds.minTime: 1535756672
-feeBump.tx.innerTx.tx.timeBounds.maxTime: 1567292672
+feeBump.tx.innerTx.tx.timeBounds.minTime: 1535756672 (2018-08-31 23:04:32.000000+00:00 (UTC))
+feeBump.tx.innerTx.tx.timeBounds.maxTime: 1567292672 (2019-08-31 23:04:32.000000+00:00 (UTC))
 feeBump.tx.innerTx.tx.memo.type: MEMO_TEXT
 feeBump.tx.innerTx.tx.memo.text: "Enjoy this transaction"
 feeBump.tx.innerTx.tx.operations.len: 1
@@ -16,7 +16,7 @@ feeBump.tx.innerTx.tx.operations[0].sourceAccount: GBEFNJVA2347XAJ4HYAECN5S7DIML
 feeBump.tx.innerTx.tx.operations[0].body.type: PAYMENT
 feeBump.tx.innerTx.tx.operations[0].body.paymentOp.destination: GBAF6NXN3DHSF357QBZLTBNWUTABKUODJXJYYE32ZDKA2QBM2H33IK6O
 feeBump.tx.innerTx.tx.operations[0].body.paymentOp.asset: USD:GAZFEVBSEGJJ63WPVVIWXLZLWN2JYZECECGT6GUNP4FJDVZVNXWQWMYI
-feeBump.tx.innerTx.tx.operations[0].body.paymentOp.amount: 400004000
+feeBump.tx.innerTx.tx.operations[0].body.paymentOp.amount: 400004000 (40.0004)
 feeBump.tx.innerTx.tx.ext.v: 0
 feeBump.tx.innerTx.signatures.len: 1
 feeBump.tx.innerTx.signatures[0].hint: a7ecc7d3
