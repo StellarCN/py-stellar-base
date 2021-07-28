@@ -62,12 +62,12 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v1
         with:
-          python-version: '3.8'
+          python-version: '3.9'
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install mypy==0.800
-          pip install .
+          pip install -r requirements-dev.txt
+          pip install mypy==0.910 types-toml types-requests
       - name: Run mypy check
         run: mypy -p stellar_sdk
 
@@ -80,7 +80,7 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v1
         with:
-          python-version: '3.7'
+          python-version: '3.9'
 
       - name: Install dependencies
         run: |

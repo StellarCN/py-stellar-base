@@ -46,7 +46,7 @@ class StellarMnemonic(Mnemonic):
 
         super().__init__(language)
 
-    def to_seed(self, mnemonic: str, passphrase: str = "", index: int = 0) -> bytes:
+    def to_seed(self, mnemonic: str, passphrase: str = "", index: int = 0) -> bytes:  # type: ignore[override]
         if not self.check(mnemonic):
             raise ValueError(
                 "Invalid mnemonic, please check if the mnemonic is correct, "
