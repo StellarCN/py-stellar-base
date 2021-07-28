@@ -1,6 +1,26 @@
 Release History
 ==============
 
+### Version 4.1.0
+Released on July 28, 2021
+
+#### Update
+* feat: SEP-0011, add support for the following operations: ([#502](https://github.com/StellarCN/py-stellar-base/pull/502))
+	- CreateClaimableBalance
+	- ClaimClaimableBalance
+	- BeginSponsoringFutureReserves
+  - EndSponsoringFutureReserves
+	- RevokeSponsorship
+	- Clawback
+	- ClawbackClaimableBalance
+	- SetTrustLineFlags
+
+- feat: SEP-0011, add support for the muxed account. ([#503](https://github.com/StellarCN/py-stellar-base/pull/503))
+
+  If you want to enable this feature, please set `ENABLE_SEP_0023` to `true` in the environment variable; otherwise, you will encounter exceptions when processing with muxed account, check [here](https://github.com/StellarCN/py-stellar-base/releases/tag/4.1.0) for more detail.
+
+- feat: SEP-0011, add comments to txrep to improve readability. ([#504](https://github.com/StellarCN/py-stellar-base/pull/504))
+
 ### Version 4.0.0
 Released on June 30, 2021
 
