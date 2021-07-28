@@ -921,7 +921,7 @@ def _add_line(
     lines: List[str],
     comment: Union[str, int, Decimal] = None,
 ) -> None:
-    lines.append(f"{key}: {value}{' (' + comment + ')' if comment else ''}")
+    lines.append(f"{key}: {value}{' (' + str(comment) + ')' if comment else ''}")
 
 
 def _add_time_bounds(
@@ -1101,6 +1101,7 @@ def _add_operation(
             claimant_predicate.claim_predicate_type
             == ClaimPredicateType.CLAIM_PREDICATE_BEFORE_ABSOLUTE_TIME
         ):
+            assert claimant_predicate.abs_before is not None
             add_body_line(
                 f"{prefix}.absBefore",
                 claimant_predicate.abs_before,
@@ -1110,6 +1111,7 @@ def _add_operation(
             claimant_predicate.claim_predicate_type
             == ClaimPredicateType.CLAIM_PREDICATE_BEFORE_RELATIVE_TIME
         ):
+            assert claimant_predicate.rel_before is not None
             add_body_line(
                 f"{prefix}.relBefore",
                 claimant_predicate.rel_before,
