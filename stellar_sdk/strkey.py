@@ -293,6 +293,7 @@ def _bytes_from_decode_data(s: Union[str, bytes, bytearray]) -> bytes:
 
 
 def _calculate_checksum(payload):
+    # memo note: https://gist.github.com/manran/a8357808ef71415d266dc64f0079f298
     # This code calculates CRC16-XModem checksum of payload
     checksum = binascii.crc_hqx(payload, 0)
     # Ensure that the checksum is in LSB order.
