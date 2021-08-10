@@ -1,22 +1,10 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
 import base64
-from enum import IntEnum
-from typing import List, Optional
 from xdrlib import Packer, Unpacker
 
-from ..__version__ import __issues__
 from ..exceptions import ValueError
-from .base import (
-    Boolean,
-    Hyper,
-    Integer,
-    Opaque,
-    String,
-    UnsignedHyper,
-    UnsignedInteger,
-)
-from .constants import *
+from .base import Integer
 from .scp_history_entry_v0 import SCPHistoryEntryV0
 
 __all__ = ["SCPHistoryEntry"]

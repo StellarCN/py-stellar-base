@@ -1,25 +1,12 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
 import base64
-from enum import IntEnum
-from typing import List, Optional
 from xdrlib import Packer, Unpacker
 
-from ..__version__ import __issues__
 from ..exceptions import ValueError
 from .asset_alpha_num4 import AssetAlphaNum4
 from .asset_alpha_num12 import AssetAlphaNum12
 from .asset_type import AssetType
-from .base import (
-    Boolean,
-    Hyper,
-    Integer,
-    Opaque,
-    String,
-    UnsignedHyper,
-    UnsignedInteger,
-)
-from .constants import *
 
 __all__ = ["Asset"]
 

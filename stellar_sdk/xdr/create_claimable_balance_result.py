@@ -1,23 +1,10 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
 import base64
-from enum import IntEnum
-from typing import List, Optional
 from xdrlib import Packer, Unpacker
 
-from ..__version__ import __issues__
 from ..exceptions import ValueError
-from .base import (
-    Boolean,
-    Hyper,
-    Integer,
-    Opaque,
-    String,
-    UnsignedHyper,
-    UnsignedInteger,
-)
 from .claimable_balance_id import ClaimableBalanceID
-from .constants import *
 from .create_claimable_balance_result_code import CreateClaimableBalanceResultCode
 
 __all__ = ["CreateClaimableBalanceResult"]

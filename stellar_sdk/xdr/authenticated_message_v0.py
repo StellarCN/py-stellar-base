@@ -1,22 +1,8 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
 import base64
-from enum import IntEnum
-from typing import List, Optional
 from xdrlib import Packer, Unpacker
 
-from ..__version__ import __issues__
-from ..exceptions import ValueError
-from .base import (
-    Boolean,
-    Hyper,
-    Integer,
-    Opaque,
-    String,
-    UnsignedHyper,
-    UnsignedInteger,
-)
-from .constants import *
 from .hmac_sha256_mac import HmacSha256Mac
 from .stellar_message import StellarMessage
 from .uint64 import Uint64
