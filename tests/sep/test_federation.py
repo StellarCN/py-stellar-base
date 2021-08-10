@@ -1,18 +1,18 @@
 import pytest
 
 from stellar_sdk.client.aiohttp_client import AiohttpClient
+from stellar_sdk.exceptions import ValueError
 from stellar_sdk.sep.exceptions import (
-    InvalidFederationAddress,
-    FederationServerNotFoundError,
     BadFederationResponseError,
+    FederationServerNotFoundError,
+    InvalidFederationAddress,
 )
 from stellar_sdk.sep.federation import (
-    resolve_stellar_address,
-    resolve_account_id,
     FederationRecord,
+    resolve_account_id,
+    resolve_stellar_address,
     split_stellar_address,
 )
-from stellar_sdk.exceptions import ValueError
 
 
 class TestFederation:

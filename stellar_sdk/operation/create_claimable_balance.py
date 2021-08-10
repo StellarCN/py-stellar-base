@@ -1,16 +1,15 @@
 from decimal import Decimal
 from enum import IntEnum
-from typing import Optional
-from typing import Union, List
+from typing import List, Optional, Union
 
-from .operation import Operation
-from .utils import check_amount
 from .. import xdr as stellar_xdr
 from ..asset import Asset
 from ..exceptions import ValueError
 from ..keypair import Keypair
 from ..muxed_account import MuxedAccount
 from ..strkey import StrKey
+from .operation import Operation
+from .utils import check_amount
 
 __all__ = ["ClaimPredicate", "Claimant", "CreateClaimableBalance"]
 

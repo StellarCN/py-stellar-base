@@ -1,7 +1,7 @@
 import time
 import warnings
 from decimal import Decimal
-from typing import List, Union, Optional
+from typing import List, Optional, Union
 
 from . import xdr as stellar_xdr
 from .account import Account

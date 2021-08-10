@@ -1,4 +1,4 @@
-from stellar_sdk.client.simple_requests_client import SimpleRequestsClient, USER_AGENT
+from stellar_sdk.client.simple_requests_client import USER_AGENT, SimpleRequestsClient
 
 
 class TestSimpleRequestsClient:

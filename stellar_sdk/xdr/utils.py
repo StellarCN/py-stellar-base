@@ -1,4 +1,4 @@
-from decimal import Decimal, Context, Inexact
+from decimal import Context, Decimal, Inexact
 from typing import Union
 
 _ONE = Decimal(10 ** 7)

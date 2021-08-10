@@ -1,11 +1,24 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
 import base64
+from enum import IntEnum
+from typing import List, Optional
 from xdrlib import Packer, Unpacker
 
+from ..__version__ import __issues__
+from ..exceptions import ValueError
+from .base import (
+    Boolean,
+    Hyper,
+    Integer,
+    Opaque,
+    String,
+    UnsignedHyper,
+    UnsignedInteger,
+)
+from .constants import *
 from .operation_result_code import OperationResultCode
 from .operation_result_tr import OperationResultTr
-from ..exceptions import ValueError
 
 __all__ = ["OperationResult"]
 

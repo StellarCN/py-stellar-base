@@ -1,11 +1,23 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
 import base64
+from enum import IntEnum
+from typing import List, Optional
 from xdrlib import Packer, Unpacker
 
-from .base import *
-from .trust_line_entry_v1 import TrustLineEntryV1
+from ..__version__ import __issues__
 from ..exceptions import ValueError
+from .base import (
+    Boolean,
+    Hyper,
+    Integer,
+    Opaque,
+    String,
+    UnsignedHyper,
+    UnsignedInteger,
+)
+from .constants import *
+from .trust_line_entry_v1 import TrustLineEntryV1
 
 __all__ = ["TrustLineEntryExt"]
 

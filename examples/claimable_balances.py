@@ -9,13 +9,13 @@ later time with Claim Claimable Balance.
 See: https://developers.stellar.org/docs/glossary/claimable-balance/
 """
 from stellar_sdk import (
+    Asset,
+    Claimant,
+    ClaimPredicate,
+    Keypair,
+    Network,
     Server,
     TransactionBuilder,
-    Keypair,
-    ClaimPredicate,
-    Claimant,
-    Asset,
-    Network,
 )
 
 sponsor_secret = "SAOJHTVFCYVKUMPNQI7RUSI566GKWXP7RXOHP4SV6JAVUQKSIWGPZFPJ"

@@ -1,4 +1,4 @@
-from typing import Union, Coroutine, Any, Dict, List, Tuple, Generator
+from typing import Any, Coroutine, Dict, Generator, List, Tuple, Union
 
 from .account import Account, Thresholds
 from .asset import Asset
@@ -26,26 +26,23 @@ from .client.base_async_client import BaseAsyncClient
 from .client.base_sync_client import BaseSyncClient
 from .client.requests_client import RequestsClient
 from .client.response import Response
-from .exceptions import TypeError, NotFoundError, raise_request_exception
+from .exceptions import NotFoundError, TypeError, raise_request_exception
 from .fee_bump_transaction import FeeBumpTransaction
 from .fee_bump_transaction_envelope import FeeBumpTransactionEnvelope
 from .helpers import parse_transaction_envelope_from_xdr
 from .keypair import Keypair
 from .memo import NoneMemo
 from .muxed_account import MuxedAccount
+from .operation import (
+    AccountMerge,
+    PathPaymentStrictReceive,
+    PathPaymentStrictSend,
+    Payment,
+)
 from .sep.exceptions import AccountRequiresMemoError
 from .transaction import Transaction
 from .transaction_envelope import TransactionEnvelope
-from .utils import (
-    urljoin_with_query,
-    MUXED_ACCOUNT_STARTING_LETTER,
-)
-from .operation import (
-    Payment,
-    AccountMerge,
-    PathPaymentStrictSend,
-    PathPaymentStrictReceive,
-)
+from .utils import MUXED_ACCOUNT_STARTING_LETTER, urljoin_with_query
 
 __all__ = ["Server"]
 

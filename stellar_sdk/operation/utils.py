@@ -2,7 +2,7 @@ from decimal import Decimal
 from typing import Optional, Union
 
 from ..asset import Asset
-from ..exceptions import ValueError, TypeError
+from ..exceptions import TypeError, ValueError
 from ..keypair import Keypair
 from ..muxed_account import MuxedAccount
 from ..price import Price

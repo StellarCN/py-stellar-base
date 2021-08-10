@@ -1,12 +1,12 @@
-from typing import Union, Dict, Generator, Any
+from typing import Any, Dict, Generator, Union
 
 import requests
 from requests import RequestException
 from urllib3.exceptions import NewConnectionError
 
-from .base_sync_client import BaseSyncClient
 from ..__version__ import __version__
 from ..client.response import Response
+from .base_sync_client import BaseSyncClient
 
 USER_AGENT = f"py-stellar-sdk/{__version__}/SimpleRequestsClient"
 HEADERS = {

@@ -1,14 +1,14 @@
 import pytest
 
+from stellar_sdk import xdr as stellar_xdr
 from stellar_sdk.exceptions import NoApproximationError, TypeError
 from stellar_sdk.strkey import StrKey
 from stellar_sdk.utils import (
     best_rational_approximation,
     hex_to_bytes,
-    urljoin_with_query,
     parse_ed25519_account_id_from_muxed_account_xdr_object,
+    urljoin_with_query,
 )
-from stellar_sdk import xdr as stellar_xdr
 
 
 class TestUtils:

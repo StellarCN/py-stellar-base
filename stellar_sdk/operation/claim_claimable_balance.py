@@ -2,9 +2,9 @@ import base64
 import binascii
 from typing import Optional, Union
 
-from .operation import Operation
 from .. import xdr as stellar_xdr
 from ..muxed_account import MuxedAccount
+from .operation import Operation
 
 __all__ = ["ClaimClaimableBalance"]
 

@@ -1,18 +1,18 @@
 from typing import (
-    Union,
-    Coroutine,
     Any,
-    Dict,
-    Mapping,
-    Generator,
     AsyncGenerator,
+    Coroutine,
+    Dict,
+    Generator,
+    Mapping,
     Optional,
+    Union,
 )
 
 from ..client.base_async_client import BaseAsyncClient
 from ..client.base_sync_client import BaseSyncClient
 from ..client.response import Response
-from ..exceptions import raise_request_exception, NotPageableError
+from ..exceptions import NotPageableError, raise_request_exception
 from ..utils import urljoin_with_query
 
 __all__ = ["BaseCallBuilder"]

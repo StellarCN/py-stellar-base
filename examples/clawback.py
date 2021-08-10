@@ -17,12 +17,12 @@ See: https://developers.stellar.org/docs/glossary/clawback/
 # Configure StellarSdk to talk to the horizon instance hosted by Stellar.org
 # To use the live network, set the hostname to 'horizon.stellar.org'
 from stellar_sdk import (
-    Server,
-    Keypair,
     Asset,
-    TransactionBuilder,
-    Network,
     AuthorizationFlag,
+    Keypair,
+    Network,
+    Server,
+    TransactionBuilder,
 )
 
 server = Server(horizon_url="https://horizon-testnet.stellar.org")

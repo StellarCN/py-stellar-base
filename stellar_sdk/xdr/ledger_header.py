@@ -1,16 +1,28 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
 import base64
-from typing import List
+from enum import IntEnum
+from typing import List, Optional
 from xdrlib import Packer, Unpacker
 
+from ..__version__ import __issues__
+from ..exceptions import ValueError
+from .base import (
+    Boolean,
+    Hyper,
+    Integer,
+    Opaque,
+    String,
+    UnsignedHyper,
+    UnsignedInteger,
+)
+from .constants import *
 from .hash import Hash
 from .int64 import Int64
 from .ledger_header_ext import LedgerHeaderExt
 from .stellar_value import StellarValue
 from .uint32 import Uint32
 from .uint64 import Uint64
-from ..exceptions import ValueError
 
 __all__ = ["LedgerHeader"]
 

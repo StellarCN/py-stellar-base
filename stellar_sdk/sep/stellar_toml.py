@@ -7,15 +7,15 @@ Created: 2017-10-30
 Updated: 2019-06-12
 Version: 2.1.0
 """
-from typing import Union, Any, Coroutine, Dict
+from typing import Any, Coroutine, Dict, Union
 
 import toml
 
-from .exceptions import StellarTomlNotFoundError
 from ..client.base_async_client import BaseAsyncClient
 from ..client.base_sync_client import BaseSyncClient
 from ..client.requests_client import RequestsClient
 from ..client.response import Response
+from .exceptions import StellarTomlNotFoundError
 
 
 def fetch_stellar_toml(

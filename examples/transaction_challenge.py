@@ -3,14 +3,14 @@ This example demonstrates how the client interacts with the server as described 
 
 See: https://github.com/stellar/stellar-protocol/blob/master/ecosystem/sep-0010.md
 """
-from stellar_sdk import Server, TransactionBuilder, Keypair, Network
+from stellar_sdk import Keypair, Network, Server, TransactionBuilder
 from stellar_sdk.exceptions import NotFoundError
 from stellar_sdk.sep.exceptions import InvalidSep10ChallengeError
 from stellar_sdk.sep.stellar_web_authentication import (
     build_challenge_transaction,
     read_challenge_transaction,
-    verify_challenge_transaction_threshold,
     verify_challenge_transaction_signed_by_client_master_key,
+    verify_challenge_transaction_threshold,
 )
 
 server_keypair = Keypair.from_secret(

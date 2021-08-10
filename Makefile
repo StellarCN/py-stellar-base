@@ -42,3 +42,8 @@ lock:
 	pipenv lock --requirements > requirements.txt
 	pipenv lock --requirements --dev > requirements-dev.txt
 .PHONY: lock
+
+format:
+	isort .
+	black --required-version 21.7b0 .
+.PHONY: format

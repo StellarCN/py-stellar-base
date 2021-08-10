@@ -10,7 +10,7 @@ instead specify the amount received, use the Path Payment Strict Receive operati
 See: https://developers.stellar.org/docs/start/list-of-operations/#path-payment-strict-send
 See: https://youtu.be/KzlSgSPStz8
 """
-from stellar_sdk import Keypair, Server, TransactionBuilder, Network, Asset
+from stellar_sdk import Asset, Keypair, Network, Server, TransactionBuilder
 
 server = Server(horizon_url="https://horizon-testnet.stellar.org")
 source_keypair = Keypair.from_secret(

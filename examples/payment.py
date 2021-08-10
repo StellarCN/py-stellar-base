@@ -10,12 +10,13 @@ Assumes that you have the following items:
 
 See: https://developers.stellar.org/docs/start/list-of-operations/#payment
 """
-from stellar_sdk import Server, Keypair, TransactionBuilder, Network
+from stellar_sdk import Keypair, Network, Server, TransactionBuilder
 
 
 def create_account():
     """To make this script work, create an account on the testnet."""
     import requests
+
     from stellar_sdk import Keypair
 
     keypair = Keypair.random()

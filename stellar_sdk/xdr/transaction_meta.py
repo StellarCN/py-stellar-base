@@ -1,14 +1,25 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
 import base64
-from typing import List
+from enum import IntEnum
+from typing import List, Optional
 from xdrlib import Packer, Unpacker
 
-from .base import *
+from ..__version__ import __issues__
+from ..exceptions import ValueError
+from .base import (
+    Boolean,
+    Hyper,
+    Integer,
+    Opaque,
+    String,
+    UnsignedHyper,
+    UnsignedInteger,
+)
+from .constants import *
 from .operation_meta import OperationMeta
 from .transaction_meta_v1 import TransactionMetaV1
 from .transaction_meta_v2 import TransactionMetaV2
-from ..exceptions import ValueError
 
 __all__ = ["TransactionMeta"]
 

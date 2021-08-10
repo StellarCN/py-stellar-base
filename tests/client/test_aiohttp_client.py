@@ -1,6 +1,6 @@
 import pytest
 
-from stellar_sdk.client.aiohttp_client import AiohttpClient, USER_AGENT
+from stellar_sdk.client.aiohttp_client import USER_AGENT, AiohttpClient
 
 
 class TestAiohttpClient:

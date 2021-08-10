@@ -1,12 +1,11 @@
 from decimal import Decimal
-from typing import List
-from typing import Optional, Union
+from typing import List, Optional, Union
 
-from .operation import Operation
-from .utils import check_amount
 from .. import xdr as stellar_xdr
 from ..asset import Asset
 from ..muxed_account import MuxedAccount
+from .operation import Operation
+from .utils import check_amount
 
 __all__ = ["PathPaymentStrictSend"]
 

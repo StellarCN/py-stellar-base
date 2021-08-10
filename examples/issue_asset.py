@@ -4,11 +4,11 @@ This example shows how to issue assets on the Stellar network.
 # See: https://developers.stellar.org/docs/issuing-assets/
 """
 
-from stellar_sdk.keypair import Keypair
 from stellar_sdk.asset import Asset
-from stellar_sdk.transaction_builder import TransactionBuilder
-from stellar_sdk.server import Server
+from stellar_sdk.keypair import Keypair
 from stellar_sdk.network import Network
+from stellar_sdk.server import Server
+from stellar_sdk.transaction_builder import TransactionBuilder
 
 # Configure StellarSdk to talk to the horizon instance hosted by Stellar.org
 # To use the live network, set the hostname to 'horizon.stellar.org'

@@ -1,16 +1,30 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
 import base64
+from enum import IntEnum
+from typing import List, Optional
 from xdrlib import Packer, Unpacker
 
+from ..__version__ import __issues__
+from ..exceptions import ValueError
 from .account_merge_result import AccountMergeResult
 from .allow_trust_result import AllowTrustResult
+from .base import (
+    Boolean,
+    Hyper,
+    Integer,
+    Opaque,
+    String,
+    UnsignedHyper,
+    UnsignedInteger,
+)
 from .begin_sponsoring_future_reserves_result import BeginSponsoringFutureReservesResult
 from .bump_sequence_result import BumpSequenceResult
 from .change_trust_result import ChangeTrustResult
 from .claim_claimable_balance_result import ClaimClaimableBalanceResult
 from .clawback_claimable_balance_result import ClawbackClaimableBalanceResult
 from .clawback_result import ClawbackResult
+from .constants import *
 from .create_account_result import CreateAccountResult
 from .create_claimable_balance_result import CreateClaimableBalanceResult
 from .end_sponsoring_future_reserves_result import EndSponsoringFutureReservesResult
@@ -25,7 +39,6 @@ from .payment_result import PaymentResult
 from .revoke_sponsorship_result import RevokeSponsorshipResult
 from .set_options_result import SetOptionsResult
 from .set_trust_line_flags_result import SetTrustLineFlagsResult
-from ..exceptions import ValueError
 
 __all__ = ["OperationResultTr"]
 

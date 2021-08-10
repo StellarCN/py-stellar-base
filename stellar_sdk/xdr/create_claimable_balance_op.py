@@ -1,13 +1,25 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
 import base64
-from typing import List
+from enum import IntEnum
+from typing import List, Optional
 from xdrlib import Packer, Unpacker
 
-from .asset import Asset
-from .claimant import Claimant
-from .int64 import Int64
+from ..__version__ import __issues__
 from ..exceptions import ValueError
+from .asset import Asset
+from .base import (
+    Boolean,
+    Hyper,
+    Integer,
+    Opaque,
+    String,
+    UnsignedHyper,
+    UnsignedInteger,
+)
+from .claimant import Claimant
+from .constants import *
+from .int64 import Int64
 
 __all__ = ["CreateClaimableBalanceOp"]
 

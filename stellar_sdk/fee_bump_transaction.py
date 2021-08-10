@@ -3,9 +3,9 @@ from typing import Union
 from . import xdr as stellar_xdr
 from .exceptions import ValueError
 from .keypair import Keypair
+from .muxed_account import MuxedAccount
 from .transaction import Transaction
 from .transaction_envelope import TransactionEnvelope
-from .muxed_account import MuxedAccount
 
 BASE_FEE = 100
 

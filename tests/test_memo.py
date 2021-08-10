@@ -4,7 +4,7 @@ import os
 import pytest
 
 from stellar_sdk.exceptions import MemoInvalidException
-from stellar_sdk.memo import NoneMemo, Memo, TextMemo, IdMemo, HashMemo, ReturnHashMemo
+from stellar_sdk.memo import HashMemo, IdMemo, Memo, NoneMemo, ReturnHashMemo, TextMemo
 
 
 class TestMemo:

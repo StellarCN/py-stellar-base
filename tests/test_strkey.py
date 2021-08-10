@@ -1,7 +1,7 @@
 import pytest
 
-from stellar_sdk.strkey import StrKey
 from stellar_sdk import xdr as stellar_xdr
+from stellar_sdk.strkey import StrKey
 
 
 class TestStrKey:

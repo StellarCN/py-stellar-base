@@ -1,15 +1,15 @@
 import pytest
 
-from stellar_sdk import Keypair, Asset, Network
+from stellar_sdk import Asset, Keypair, Network
 from stellar_sdk.exceptions import ValueError
+from stellar_sdk.fee_bump_transaction_envelope import FeeBumpTransactionEnvelope
 from stellar_sdk.memo import *
 from stellar_sdk.sep.stellar_uri import (
     PayStellarUri,
-    TransactionStellarUri,
     Replacement,
+    TransactionStellarUri,
 )
 from stellar_sdk.transaction_envelope import TransactionEnvelope
-from stellar_sdk.fee_bump_transaction_envelope import FeeBumpTransactionEnvelope
 
 
 class TestStellarTransactionStellarUri:
@@ -208,7 +208,8 @@ class TestStellarTransactionStellarUri:
         message = "_" * 301
         with pytest.raises(ValueError, match="Message must not exceed 300 characters."):
             TransactionStellarUri(
-                transaction_envelope=self.tx, message=message,
+                transaction_envelope=self.tx,
+                message=message,
             )
 
     def test_equal(self):

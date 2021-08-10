@@ -11,7 +11,7 @@ that both the sponsoring and sponsored accounts agree to every sponsorship.
 
 See: https://developers.stellar.org/docs/glossary/sponsored-reserves/
 """
-from stellar_sdk import Server, TransactionBuilder, Keypair, Network
+from stellar_sdk import Keypair, Network, Server, TransactionBuilder
 
 sponsor_secret = "SAOJHTVFCYVKUMPNQI7RUSI566GKWXP7RXOHP4SV6JAVUQKSIWGPZFPJ"
 new_account_secret = "SCN5D72JHQAHUHGIA23SLS3LBYCPHJWD7HLYNJRBBZIG4PD74UCGQBYM"

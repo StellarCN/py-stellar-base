@@ -3,8 +3,6 @@ import binascii
 from enum import IntEnum
 from typing import Optional, Union
 
-from .operation import Operation
-from .utils import check_ed25519_public_key
 from .. import xdr as stellar_xdr
 from ..asset import Asset
 from ..exceptions import ValueError
@@ -12,6 +10,8 @@ from ..keypair import Keypair
 from ..muxed_account import MuxedAccount
 from ..signer_key import SignerKey
 from ..strkey import StrKey
+from .operation import Operation
+from .utils import check_ed25519_public_key
 
 __all__ = ["RevokeSponsorship"]
 

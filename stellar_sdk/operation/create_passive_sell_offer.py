@@ -1,13 +1,12 @@
 from decimal import Decimal
-from typing import Optional
-from typing import Union
+from typing import Optional, Union
 
-from .operation import Operation
-from .utils import check_amount, check_price
 from .. import xdr as stellar_xdr
 from ..asset import Asset
 from ..muxed_account import MuxedAccount
 from ..price import Price
+from .operation import Operation
+from .utils import check_amount, check_price
 
 __all__ = ["CreatePassiveSellOffer"]
 

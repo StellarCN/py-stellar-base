@@ -1,15 +1,27 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
 import base64
-from typing import List
+from enum import IntEnum
+from typing import List, Optional
 from xdrlib import Packer, Unpacker
 
+from ..__version__ import __issues__
+from ..exceptions import ValueError
+from .base import (
+    Boolean,
+    Hyper,
+    Integer,
+    Opaque,
+    String,
+    UnsignedHyper,
+    UnsignedInteger,
+)
+from .constants import *
 from .ledger_header_history_entry import LedgerHeaderHistoryEntry
 from .scp_history_entry import SCPHistoryEntry
 from .transaction_result_meta import TransactionResultMeta
 from .transaction_set import TransactionSet
 from .upgrade_entry_meta import UpgradeEntryMeta
-from ..exceptions import ValueError
 
 __all__ = ["LedgerCloseMetaV0"]
 

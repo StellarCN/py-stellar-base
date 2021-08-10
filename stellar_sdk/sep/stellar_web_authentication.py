@@ -10,10 +10,8 @@ Version 3.2.0
 import base64
 import os
 import time
-from typing import List, Union, Iterable, Optional
+from typing import Iterable, List, Optional, Union
 
-from .ed25519_public_key_signer import Ed25519PublicKeySigner
-from .exceptions import InvalidSep10ChallengeError
 from .. import xdr as stellar_xdr
 from ..account import Account
 from ..exceptions import BadSignatureError, ValueError
@@ -21,6 +19,8 @@ from ..keypair import Keypair
 from ..operation.manage_data import ManageData
 from ..transaction_builder import TransactionBuilder
 from ..transaction_envelope import TransactionEnvelope
+from .ed25519_public_key_signer import Ed25519PublicKeySigner
+from .exceptions import InvalidSep10ChallengeError
 
 __all__ = [
     "build_challenge_transaction",
@@ -35,13 +35,14 @@ MUXED_ACCOUNT_STARTING_LETTER: str = "M"
 
 
 class ChallengeTransaction:
-    """ Used to store the results produced
+    """Used to store the results produced
     by :func:`stellar_sdk.sep.stellar_web_authentication.read_challenge_transaction`.
 
     :param transaction: The TransactionEnvelope parsed from challenge xdr.
     :param client_account_id: The stellar account that the wallet wishes to authenticate with the server.
     :param matched_home_domain: The domain name that has been matched.
     """
+
     def __init__(
         self,
         transaction: TransactionEnvelope,

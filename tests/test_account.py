@@ -1,6 +1,6 @@
 import pytest
-from stellar_sdk import MuxedAccount
 
+from stellar_sdk import MuxedAccount
 from stellar_sdk.account import Account
 from stellar_sdk.exceptions import Ed25519PublicKeyInvalidError
 from stellar_sdk.sep.ed25519_public_key_signer import Ed25519PublicKeySigner

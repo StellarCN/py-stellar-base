@@ -1,14 +1,26 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
 import base64
-from typing import List
+from enum import IntEnum
+from typing import List, Optional
 from xdrlib import Packer, Unpacker
 
+from ..__version__ import __issues__
+from ..exceptions import ValueError
+from .base import (
+    Boolean,
+    Hyper,
+    Integer,
+    Opaque,
+    String,
+    UnsignedHyper,
+    UnsignedInteger,
+)
+from .constants import *
 from .hash import Hash
 from .stellar_value_ext import StellarValueExt
 from .time_point import TimePoint
 from .upgrade_type import UpgradeType
-from ..exceptions import ValueError
 
 __all__ = ["StellarValue"]
 

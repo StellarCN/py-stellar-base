@@ -1,11 +1,23 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
 import base64
-from typing import List
+from enum import IntEnum
+from typing import List, Optional
 from xdrlib import Packer, Unpacker
 
-from .peer_stats import PeerStats
+from ..__version__ import __issues__
 from ..exceptions import ValueError
+from .base import (
+    Boolean,
+    Hyper,
+    Integer,
+    Opaque,
+    String,
+    UnsignedHyper,
+    UnsignedInteger,
+)
+from .constants import *
+from .peer_stats import PeerStats
 
 __all__ = ["PeerStatList"]
 
@@ -23,7 +35,6 @@ class PeerStatList:
             raise ValueError(
                 f"The maximum length of `peer_stat_list` should be 25, but got {len(peer_stat_list)}."
             )
-
         self.peer_stat_list = peer_stat_list
 
     def pack(self, packer: Packer) -> None:

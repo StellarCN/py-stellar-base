@@ -1,5 +1,5 @@
 import re
-from typing import Optional, Dict
+from typing import Dict, Optional
 
 from . import xdr as stellar_xdr
 from .exceptions import AssetCodeInvalidError, AssetIssuerInvalidError, AttributeError

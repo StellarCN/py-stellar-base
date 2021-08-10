@@ -4,19 +4,19 @@ import time
 
 import pytest
 
-from stellar_sdk import Keypair, Network, Account, MuxedAccount
+from stellar_sdk import Account, Keypair, MuxedAccount, Network
 from stellar_sdk.exceptions import ValueError
 from stellar_sdk.operation import ManageData
 from stellar_sdk.sep.ed25519_public_key_signer import Ed25519PublicKeySigner
 from stellar_sdk.sep.exceptions import InvalidSep10ChallengeError
 from stellar_sdk.sep.stellar_web_authentication import (
-    build_challenge_transaction,
-    verify_challenge_transaction,
     _verify_transaction_signatures,
+    build_challenge_transaction,
+    read_challenge_transaction,
+    verify_challenge_transaction,
+    verify_challenge_transaction_signed_by_client_master_key,
     verify_challenge_transaction_signers,
     verify_challenge_transaction_threshold,
-    verify_challenge_transaction_signed_by_client_master_key,
-    read_challenge_transaction,
 )
 from stellar_sdk.transaction_builder import TransactionBuilder
 from stellar_sdk.transaction_envelope import TransactionEnvelope

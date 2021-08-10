@@ -48,7 +48,7 @@ class TypeError(BuildInTypeError, SdkError):
 
 
 class AttributeError(BuildInAttributeError, SdkError):
-    """ Attribute not found. """
+    """Attribute not found."""
 
 
 class BadSignatureError(ValueError):

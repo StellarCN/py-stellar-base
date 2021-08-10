@@ -1,6 +1,6 @@
 import pprint
 
-from stellar_sdk import Keypair, Server, MuxedAccount, TransactionBuilder, Network
+from stellar_sdk import Keypair, MuxedAccount, Network, Server, TransactionBuilder
 
 horizon_url = "https://horizon-testnet.stellar.org/"
 network_passphrase = Network.TESTNET_NETWORK_PASSPHRASE
@@ -18,13 +18,15 @@ alice_keypair = Keypair.from_secret(alice_secret)
 
 server = Server(horizon_url=horizon_url)
 alice_account = server.load_account(alice_keypair.public_key)
-transaction = TransactionBuilder(
-    source_account=alice_account,
-    network_passphrase=network_passphrase,
-    base_fee=100
-) \
-    .append_payment_op(destination=bob_account, amount="100", asset_code="XLM") \
+transaction = (
+    TransactionBuilder(
+        source_account=alice_account,
+        network_passphrase=network_passphrase,
+        base_fee=100,
+    )
+    .append_payment_op(destination=bob_account, amount="100", asset_code="XLM")
     .build()
+)
 
 transaction.sign(alice_keypair)
 resp = server.submit_transaction(transaction)

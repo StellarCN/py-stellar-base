@@ -1,5 +1,5 @@
 from abc import abstractmethod
-from typing import List, Union, Generic, TypeVar
+from typing import Generic, List, TypeVar, Union
 
 from . import xdr as stellar_xdr
 from .exceptions import SignatureExistError

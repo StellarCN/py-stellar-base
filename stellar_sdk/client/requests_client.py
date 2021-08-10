@@ -1,18 +1,18 @@
 import json
-from typing import Generator, Union, Dict, Any, Tuple
+from typing import Any, Dict, Generator, Tuple, Union
 
 import requests
-from requests import Session, RequestException
-from requests.adapters import HTTPAdapter, DEFAULT_POOLSIZE
+from requests import RequestException, Session
+from requests.adapters import DEFAULT_POOLSIZE, HTTPAdapter
 from sseclient import SSEClient
 from urllib3.exceptions import NewConnectionError
 from urllib3.util import Retry
 
-from . import defines
 from ..__version__ import __version__
 from ..client.base_sync_client import BaseSyncClient
 from ..client.response import Response
 from ..exceptions import ConnectionError
+from . import defines
 
 DEFAULT_NUM_RETRIES = 3
 DEFAULT_BACKOFF_FACTOR = 0.5
