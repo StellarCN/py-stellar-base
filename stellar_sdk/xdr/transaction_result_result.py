@@ -4,10 +4,10 @@ import base64
 from typing import List
 from xdrlib import Packer, Unpacker
 
+from ..exceptions import ValueError
 from .inner_transaction_result_pair import InnerTransactionResultPair
 from .operation_result import OperationResult
 from .transaction_result_code import TransactionResultCode
-from ..exceptions import ValueError
 
 __all__ = ["TransactionResultResult"]
 

@@ -4,9 +4,9 @@ import base64
 from typing import List, Optional
 from xdrlib import Packer, Unpacker
 
+from ..exceptions import ValueError
 from .claim_predicate_type import ClaimPredicateType
 from .int64 import Int64
-from ..exceptions import ValueError
 
 __all__ = ["ClaimPredicate"]
 
@@ -114,7 +114,6 @@ class ClaimPredicate:
                 or_predicates.append(ClaimPredicate.unpack(unpacker))
             return cls(type, or_predicates=or_predicates)
         if type == ClaimPredicateType.CLAIM_PREDICATE_NOT:
-            # not_predicate is optional.
             not_predicate = (
                 ClaimPredicate.unpack(unpacker) if unpacker.unpack_uint() else None
             )

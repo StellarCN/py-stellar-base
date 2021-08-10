@@ -3,9 +3,9 @@
 import base64
 from xdrlib import Packer, Unpacker
 
-from .base import *
-from .claimable_balance_entry_extension_v1 import ClaimableBalanceEntryExtensionV1
 from ..exceptions import ValueError
+from .base import Integer
+from .claimable_balance_entry_extension_v1 import ClaimableBalanceEntryExtensionV1
 
 __all__ = ["ClaimableBalanceEntryExt"]
 

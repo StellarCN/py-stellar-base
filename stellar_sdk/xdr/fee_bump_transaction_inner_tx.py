@@ -3,9 +3,9 @@
 import base64
 from xdrlib import Packer, Unpacker
 
+from ..exceptions import ValueError
 from .envelope_type import EnvelopeType
 from .transaction_v1_envelope import TransactionV1Envelope
-from ..exceptions import ValueError
 
 __all__ = ["FeeBumpTransactionInnerTx"]
 

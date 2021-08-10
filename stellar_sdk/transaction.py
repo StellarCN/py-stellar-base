@@ -1,9 +1,9 @@
 from typing import List, Union
 
 from . import xdr as stellar_xdr
-from .muxed_account import MuxedAccount
 from .keypair import Keypair
-from .memo import NoneMemo, Memo
+from .memo import Memo, NoneMemo
+from .muxed_account import MuxedAccount
 from .operation.operation import Operation
 from .strkey import StrKey
 from .time_bounds import TimeBounds

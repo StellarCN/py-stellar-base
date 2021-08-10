@@ -1,5 +1,5 @@
 from stellar_sdk.call_builder import LedgersCallBuilder
-from tests.call_builder import horizon_url, client
+from tests.call_builder import client, horizon_url
 
 
 class TestLedgersCallBuilder:

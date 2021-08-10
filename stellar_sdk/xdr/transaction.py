@@ -4,6 +4,7 @@ import base64
 from typing import List, Optional
 from xdrlib import Packer, Unpacker
 
+from ..exceptions import ValueError
 from .constants import *
 from .memo import Memo
 from .muxed_account import MuxedAccount
@@ -12,7 +13,6 @@ from .sequence_number import SequenceNumber
 from .time_bounds import TimeBounds
 from .transaction_ext import TransactionExt
 from .uint32 import Uint32
-from ..exceptions import ValueError
 
 __all__ = ["Transaction"]
 

@@ -3,9 +3,9 @@
 import base64
 from xdrlib import Packer, Unpacker
 
+from ..exceptions import ValueError
 from .envelope_type import EnvelopeType
 from .operation_id_id import OperationIDId
-from ..exceptions import ValueError
 
 __all__ = ["OperationID"]
 

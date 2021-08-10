@@ -1,8 +1,8 @@
-from typing import Optional, List, Union
 import warnings
+from typing import List, Optional, Union
 
-from .sep.ed25519_public_key_signer import Ed25519PublicKeySigner
 from .muxed_account import MuxedAccount
+from .sep.ed25519_public_key_signer import Ed25519PublicKeySigner
 
 __all__ = ["Account"]
 

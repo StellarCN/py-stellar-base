@@ -3,10 +3,10 @@
 import base64
 from xdrlib import Packer, Unpacker
 
+from ..exceptions import ValueError
 from .ledger_key import LedgerKey
 from .revoke_sponsorship_op_signer import RevokeSponsorshipOpSigner
 from .revoke_sponsorship_type import RevokeSponsorshipType
-from ..exceptions import ValueError
 
 __all__ = ["RevokeSponsorshipOp"]
 

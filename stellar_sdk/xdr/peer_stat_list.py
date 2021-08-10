@@ -4,8 +4,8 @@ import base64
 from typing import List
 from xdrlib import Packer, Unpacker
 
-from .peer_stats import PeerStats
 from ..exceptions import ValueError
+from .peer_stats import PeerStats
 
 __all__ = ["PeerStatList"]
 
@@ -23,7 +23,6 @@ class PeerStatList:
             raise ValueError(
                 f"The maximum length of `peer_stat_list` should be 25, but got {len(peer_stat_list)}."
             )
-
         self.peer_stat_list = peer_stat_list
 
     def pack(self, packer: Packer) -> None:

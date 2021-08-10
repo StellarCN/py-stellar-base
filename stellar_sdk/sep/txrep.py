@@ -10,7 +10,7 @@ import json
 from datetime import datetime
 from decimal import Decimal
 from enum import Enum
-from typing import List, Union, Optional, Dict
+from typing import Dict, List, Optional, Union
 
 from .. import xdr as stellar_xdr
 from ..asset import Asset

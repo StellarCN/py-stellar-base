@@ -4,7 +4,7 @@ This example shows how to add memo to a transaction.
 See: https://developers.stellar.org/docs/glossary/transactions/#memo
 See: https://stellar-sdk.readthedocs.io/en/latest/building_transactions.html#building-transactions
 """
-from stellar_sdk import TransactionBuilder, Network, Keypair, Account
+from stellar_sdk import Account, Keypair, Network, TransactionBuilder
 
 root_keypair = Keypair.from_secret(
     "SA6XHAH4GNLRWWWF6TEVEWNS44CBNFAJWHWOPZCVZOUXSQA7BOYN7XHC"

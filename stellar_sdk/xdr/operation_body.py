@@ -3,6 +3,7 @@
 import base64
 from xdrlib import Packer, Unpacker
 
+from ..exceptions import ValueError
 from .allow_trust_op import AllowTrustOp
 from .begin_sponsoring_future_reserves_op import BeginSponsoringFutureReservesOp
 from .bump_sequence_op import BumpSequenceOp
@@ -24,7 +25,6 @@ from .payment_op import PaymentOp
 from .revoke_sponsorship_op import RevokeSponsorshipOp
 from .set_options_op import SetOptionsOp
 from .set_trust_line_flags_op import SetTrustLineFlagsOp
-from ..exceptions import ValueError
 
 __all__ = ["OperationBody"]
 

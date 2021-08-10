@@ -3,9 +3,9 @@
 import base64
 from xdrlib import Packer, Unpacker
 
-from .base import *
-from .ip_addr_type import IPAddrType
 from ..exceptions import ValueError
+from .base import Opaque
+from .ip_addr_type import IPAddrType
 
 __all__ = ["PeerAddressIp"]
 

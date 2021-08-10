@@ -1,10 +1,10 @@
-from typing import Union, List
+from typing import List, Union
 
-from ..utils import convert_assets_to_horizon_param
 from ..asset import Asset
 from ..call_builder.base_call_builder import BaseCallBuilder
 from ..client.base_async_client import BaseAsyncClient
 from ..client.base_sync_client import BaseSyncClient
+from ..utils import convert_assets_to_horizon_param
 
 __all__ = ["StrictReceivePathsCallBuilder"]
 

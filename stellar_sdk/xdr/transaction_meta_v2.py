@@ -4,9 +4,9 @@ import base64
 from typing import List
 from xdrlib import Packer, Unpacker
 
+from ..exceptions import ValueError
 from .ledger_entry_changes import LedgerEntryChanges
 from .operation_meta import OperationMeta
-from ..exceptions import ValueError
 
 __all__ = ["TransactionMetaV2"]
 

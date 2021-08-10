@@ -1,6 +1,6 @@
 import hashlib
 import os
-from decimal import Decimal, ROUND_FLOOR
+from decimal import ROUND_FLOOR, Decimal
 from typing import List
 from urllib.parse import urlsplit, urlunsplit
 

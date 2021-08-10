@@ -3,9 +3,9 @@
 import base64
 from xdrlib import Packer, Unpacker
 
-from .base import *
-from .ledger_entry_extension_v1 import LedgerEntryExtensionV1
 from ..exceptions import ValueError
+from .base import Integer
+from .ledger_entry_extension_v1 import LedgerEntryExtensionV1
 
 __all__ = ["LedgerEntryExt"]
 

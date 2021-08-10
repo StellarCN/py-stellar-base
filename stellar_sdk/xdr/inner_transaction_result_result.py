@@ -4,9 +4,9 @@ import base64
 from typing import List
 from xdrlib import Packer, Unpacker
 
+from ..exceptions import ValueError
 from .operation_result import OperationResult
 from .transaction_result_code import TransactionResultCode
-from ..exceptions import ValueError
 
 __all__ = ["InnerTransactionResultResult"]
 

@@ -4,9 +4,9 @@ import base64
 from typing import List
 from xdrlib import Packer, Unpacker
 
+from ..exceptions import ValueError
 from .hash import Hash
 from .value import Value
-from ..exceptions import ValueError
 
 __all__ = ["SCPNomination"]
 

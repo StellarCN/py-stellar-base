@@ -3,10 +3,10 @@
 import base64
 from xdrlib import Packer, Unpacker
 
-from .asset_code12 import AssetCode12
-from .asset_code4 import AssetCode4
-from .asset_type import AssetType
 from ..exceptions import ValueError
+from .asset_code4 import AssetCode4
+from .asset_code12 import AssetCode12
+from .asset_type import AssetType
 
 __all__ = ["AssetCode"]
 

@@ -1,6 +1,6 @@
 from stellar_sdk import Asset
 from stellar_sdk.call_builder import OrderbookCallBuilder
-from tests.call_builder import horizon_url, client
+from tests.call_builder import client, horizon_url
 
 
 class TestOrderbookCallBuilder:

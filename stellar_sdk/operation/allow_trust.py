@@ -1,15 +1,14 @@
 import warnings
 from enum import IntFlag
-from typing import Optional
-from typing import Union
+from typing import Optional, Union
 
-from .operation import Operation
-from .utils import check_ed25519_public_key, check_asset_code
 from .. import xdr as stellar_xdr
 from ..asset import Asset
 from ..keypair import Keypair
 from ..muxed_account import MuxedAccount
 from ..strkey import StrKey
+from .operation import Operation
+from .utils import check_asset_code, check_ed25519_public_key
 
 __all__ = ["TrustLineEntryFlag", "AllowTrust"]
 

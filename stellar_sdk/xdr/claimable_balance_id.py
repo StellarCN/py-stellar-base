@@ -3,9 +3,9 @@
 import base64
 from xdrlib import Packer, Unpacker
 
+from ..exceptions import ValueError
 from .claimable_balance_id_type import ClaimableBalanceIDType
 from .hash import Hash
-from ..exceptions import ValueError
 
 __all__ = ["ClaimableBalanceID"]
 

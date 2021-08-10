@@ -3,8 +3,8 @@
 import base64
 from xdrlib import Packer, Unpacker
 
-from .uint256 import Uint256
 from .uint64 import Uint64
+from .uint256 import Uint256
 
 __all__ = ["MuxedAccountMed25519"]
 

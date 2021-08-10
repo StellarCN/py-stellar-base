@@ -114,8 +114,8 @@ def b58decode_check(v):
 def main():
     """Base58 encode or decode FILE, or standard input, to standard output."""
 
-    import sys
     import argparse
+    import sys
 
     stdout = buffer(sys.stdout)
 

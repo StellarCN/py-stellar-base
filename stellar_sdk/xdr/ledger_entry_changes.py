@@ -4,8 +4,8 @@ import base64
 from typing import List
 from xdrlib import Packer, Unpacker
 
-from .ledger_entry_change import LedgerEntryChange
 from ..exceptions import ValueError
+from .ledger_entry_change import LedgerEntryChange
 
 __all__ = ["LedgerEntryChanges"]
 
@@ -23,7 +23,6 @@ class LedgerEntryChanges:
             raise ValueError(
                 f"The maximum length of `ledger_entry_changes` should be 4294967295, but got {len(ledger_entry_changes)}."
             )
-
         self.ledger_entry_changes = ledger_entry_changes
 
     def pack(self, packer: Packer) -> None:

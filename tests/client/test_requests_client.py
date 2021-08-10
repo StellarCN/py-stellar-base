@@ -1,6 +1,6 @@
 import pytest
 
-from stellar_sdk.client.requests_client import RequestsClient, USER_AGENT
+from stellar_sdk.client.requests_client import USER_AGENT, RequestsClient
 
 
 class TestRequestsClient:

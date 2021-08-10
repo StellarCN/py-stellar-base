@@ -4,9 +4,9 @@ import base64
 from typing import List
 from xdrlib import Packer, Unpacker
 
+from ..exceptions import ValueError
 from .decorated_signature import DecoratedSignature
 from .fee_bump_transaction import FeeBumpTransaction
-from ..exceptions import ValueError
 
 __all__ = ["FeeBumpTransactionEnvelope"]
 

@@ -3,9 +3,9 @@
 import base64
 from xdrlib import Packer, Unpacker
 
-from .base import *
-from .trust_line_entry_v1 import TrustLineEntryV1
 from ..exceptions import ValueError
+from .base import Integer
+from .trust_line_entry_v1 import TrustLineEntryV1
 
 __all__ = ["TrustLineEntryExt"]
 

@@ -19,7 +19,7 @@ on the account.
 
 import hashlib
 
-from stellar_sdk import Server, TransactionBuilder, Network, Keypair
+from stellar_sdk import Keypair, Network, Server, TransactionBuilder
 
 server = Server(horizon_url="https://horizon-testnet.stellar.org")
 

@@ -3,9 +3,9 @@
 import base64
 from xdrlib import Packer, Unpacker
 
+from ..exceptions import ValueError
 from .account_merge_result_code import AccountMergeResultCode
 from .int64 import Int64
-from ..exceptions import ValueError
 
 __all__ = ["AccountMergeResult"]
 

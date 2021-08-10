@@ -4,8 +4,8 @@ import base64
 from typing import List
 from xdrlib import Packer, Unpacker
 
-from .transaction_result_pair import TransactionResultPair
 from ..exceptions import ValueError
+from .transaction_result_pair import TransactionResultPair
 
 __all__ = ["TransactionResultSet"]
 

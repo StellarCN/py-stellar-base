@@ -3,10 +3,10 @@
 import base64
 from xdrlib import Packer, Unpacker
 
+from ..exceptions import ValueError
 from .asset import Asset
 from .path_payment_strict_send_result_code import PathPaymentStrictSendResultCode
 from .path_payment_strict_send_result_success import PathPaymentStrictSendResultSuccess
-from ..exceptions import ValueError
 
 __all__ = ["PathPaymentStrictSendResult"]
 

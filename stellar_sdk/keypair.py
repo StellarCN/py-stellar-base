@@ -6,10 +6,10 @@ from nacl.exceptions import BadSignatureError as NaclBadSignatureError
 
 from . import xdr as stellar_xdr
 from .exceptions import (
+    AttributeError,
     BadSignatureError,
     MissingEd25519SecretSeedError,
     TypeError,
-    AttributeError,
 )
 from .sep.mnemonic import Language, StellarMnemonic
 from .strkey import StrKey

@@ -2,9 +2,9 @@ import os
 from typing import Optional
 
 from . import xdr as stellar_xdr
-from .exceptions import ValueError, FeatureNotEnabledError
-from .strkey import StrKey
+from .exceptions import FeatureNotEnabledError, ValueError
 from .keypair import Keypair
+from .strkey import StrKey
 
 __all__ = ["MuxedAccount"]
 

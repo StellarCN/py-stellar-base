@@ -117,7 +117,7 @@ class String:
     def __init__(self, value: bytes, size: int) -> None:
         if len(value) > size:
             raise ValueError(
-                f"The maximum length of `value` should be #{size}, but got {len(value)}."
+                f"The maximum length of `value` should be {size}, but got {len(value)}."
             )
 
         self.value = value

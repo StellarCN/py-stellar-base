@@ -3,9 +3,9 @@
 import base64
 from xdrlib import Packer, Unpacker
 
-from .base import *
-from .ledger_close_meta_v0 import LedgerCloseMetaV0
 from ..exceptions import ValueError
+from .base import Integer
+from .ledger_close_meta_v0 import LedgerCloseMetaV0
 
 __all__ = ["LedgerCloseMeta"]
 

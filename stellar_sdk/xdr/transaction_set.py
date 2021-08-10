@@ -4,9 +4,9 @@ import base64
 from typing import List
 from xdrlib import Packer, Unpacker
 
+from ..exceptions import ValueError
 from .hash import Hash
 from .transaction_envelope import TransactionEnvelope
-from ..exceptions import ValueError
 
 __all__ = ["TransactionSet"]
 

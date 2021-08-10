@@ -5,16 +5,16 @@ import pytest
 from stellar_sdk import *
 from stellar_sdk.exceptions import ValueError
 from stellar_sdk.sep.txrep import (
-    to_txrep,
-    from_txrep,
-    _get_value,
+    _decode_asset,
+    _get_bool_value,
     _get_bytes_value,
     _get_int_value,
-    _get_bool_value,
-    _decode_asset,
-    _get_string_value,
     _get_memo,
+    _get_string_value,
+    _get_value,
     _remove_comment,
+    from_txrep,
+    to_txrep,
 )
 from stellar_sdk.transaction_builder import TransactionBuilder
 

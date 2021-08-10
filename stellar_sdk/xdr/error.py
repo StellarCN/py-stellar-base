@@ -3,7 +3,7 @@
 import base64
 from xdrlib import Packer, Unpacker
 
-from .base import *
+from .base import String
 from .error_code import ErrorCode
 
 __all__ = ["Error"]

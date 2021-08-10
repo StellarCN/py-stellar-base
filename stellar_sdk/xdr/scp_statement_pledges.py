@@ -3,12 +3,12 @@
 import base64
 from xdrlib import Packer, Unpacker
 
+from ..exceptions import ValueError
 from .scp_nomination import SCPNomination
 from .scp_statement_confirm import SCPStatementConfirm
 from .scp_statement_externalize import SCPStatementExternalize
 from .scp_statement_prepare import SCPStatementPrepare
 from .scp_statement_type import SCPStatementType
-from ..exceptions import ValueError
 
 __all__ = ["SCPStatementPledges"]
 

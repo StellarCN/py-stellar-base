@@ -3,9 +3,9 @@
 import base64
 from xdrlib import Packer, Unpacker
 
-from .base import *
-from .scp_history_entry_v0 import SCPHistoryEntryV0
 from ..exceptions import ValueError
+from .base import Integer
+from .scp_history_entry_v0 import SCPHistoryEntryV0
 
 __all__ = ["SCPHistoryEntry"]
 

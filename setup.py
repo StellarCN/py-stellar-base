@@ -1,13 +1,15 @@
 import os
 import sys
 
-from setuptools import setup, find_packages
+from setuptools import find_packages, setup
 
 assert sys.version_info >= (3, 6, 0), "stellar-sdk requires Python 3.6+"
 
 here = os.path.abspath(os.path.dirname(__file__))
 requirements_file = "requirements.txt"
-install_requires = [dep for dep in open(requirements_file).readlines() if not dep.startswith("-i ")]
+install_requires = [
+    dep for dep in open(requirements_file).readlines() if not dep.startswith("-i ")
+]
 
 about = {}
 with open(

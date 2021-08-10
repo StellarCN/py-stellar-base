@@ -4,11 +4,11 @@ import base64
 from typing import List
 from xdrlib import Packer, Unpacker
 
+from ..exceptions import ValueError
 from .hash import Hash
 from .stellar_value_ext import StellarValueExt
 from .time_point import TimePoint
 from .upgrade_type import UpgradeType
-from ..exceptions import ValueError
 
 __all__ = ["StellarValue"]
 

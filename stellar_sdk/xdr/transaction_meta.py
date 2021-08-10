@@ -4,11 +4,11 @@ import base64
 from typing import List
 from xdrlib import Packer, Unpacker
 
-from .base import *
+from ..exceptions import ValueError
+from .base import Integer
 from .operation_meta import OperationMeta
 from .transaction_meta_v1 import TransactionMetaV1
 from .transaction_meta_v2 import TransactionMetaV2
-from ..exceptions import ValueError
 
 __all__ = ["TransactionMeta"]
 

@@ -3,9 +3,9 @@
 import base64
 from xdrlib import Packer, Unpacker
 
+from ..exceptions import ValueError
 from .public_key_type import PublicKeyType
 from .uint256 import Uint256
-from ..exceptions import ValueError
 
 __all__ = ["PublicKey"]
 

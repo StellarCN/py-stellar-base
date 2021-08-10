@@ -2,7 +2,7 @@ import pytest
 
 from stellar_sdk import xdr as stellar_xdr
 from stellar_sdk.asset import Asset
-from stellar_sdk.exceptions import AssetIssuerInvalidError, AssetCodeInvalidError
+from stellar_sdk.exceptions import AssetCodeInvalidError, AssetIssuerInvalidError
 from stellar_sdk.keypair import Keypair
 
 

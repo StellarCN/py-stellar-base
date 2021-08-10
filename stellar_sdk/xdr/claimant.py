@@ -3,9 +3,9 @@
 import base64
 from xdrlib import Packer, Unpacker
 
+from ..exceptions import ValueError
 from .claimant_type import ClaimantType
 from .claimant_v0 import ClaimantV0
-from ..exceptions import ValueError
 
 __all__ = ["Claimant"]
 

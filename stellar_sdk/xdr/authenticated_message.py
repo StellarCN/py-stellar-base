@@ -3,9 +3,9 @@
 import base64
 from xdrlib import Packer, Unpacker
 
+from ..exceptions import ValueError
 from .authenticated_message_v0 import AuthenticatedMessageV0
 from .uint32 import Uint32
-from ..exceptions import ValueError
 
 __all__ = ["AuthenticatedMessage"]
 

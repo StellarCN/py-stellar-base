@@ -3,9 +3,9 @@
 import base64
 from xdrlib import Packer, Unpacker
 
-from .account_entry_extension_v2 import AccountEntryExtensionV2
-from .base import *
 from ..exceptions import ValueError
+from .account_entry_extension_v2 import AccountEntryExtensionV2
+from .base import Integer
 
 __all__ = ["AccountEntryExtensionV1Ext"]
 

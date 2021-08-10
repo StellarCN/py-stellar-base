@@ -3,9 +3,9 @@
 import base64
 from xdrlib import Packer, Unpacker
 
+from ..exceptions import ValueError
 from .operation_result_code import OperationResultCode
 from .operation_result_tr import OperationResultTr
-from ..exceptions import ValueError
 
 __all__ = ["OperationResult"]
 

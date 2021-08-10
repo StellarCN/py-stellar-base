@@ -3,9 +3,9 @@
 import base64
 from xdrlib import Packer, Unpacker
 
+from ..exceptions import ValueError
 from .survey_message_command_type import SurveyMessageCommandType
 from .topology_response_body import TopologyResponseBody
-from ..exceptions import ValueError
 
 __all__ = ["SurveyResponseBody"]
 

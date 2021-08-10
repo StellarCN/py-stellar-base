@@ -4,6 +4,7 @@ import base64
 from typing import List
 from xdrlib import Packer, Unpacker
 
+from ..exceptions import ValueError
 from .auth import Auth
 from .dont_have import DontHave
 from .error import Error
@@ -16,9 +17,8 @@ from .signed_survey_request_message import SignedSurveyRequestMessage
 from .signed_survey_response_message import SignedSurveyResponseMessage
 from .transaction_envelope import TransactionEnvelope
 from .transaction_set import TransactionSet
-from .uint256 import Uint256
 from .uint32 import Uint32
-from ..exceptions import ValueError
+from .uint256 import Uint256
 
 __all__ = ["StellarMessage"]
 

@@ -4,9 +4,9 @@ import base64
 from typing import List
 from xdrlib import Packer, Unpacker
 
+from ..exceptions import ValueError
 from .claim_offer_atom import ClaimOfferAtom
 from .simple_payment_result import SimplePaymentResult
-from ..exceptions import ValueError
 
 __all__ = ["PathPaymentStrictReceiveResultSuccess"]
 

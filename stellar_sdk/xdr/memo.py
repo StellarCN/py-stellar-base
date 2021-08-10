@@ -3,11 +3,11 @@
 import base64
 from xdrlib import Packer, Unpacker
 
-from .base import *
+from ..exceptions import ValueError
+from .base import String
 from .hash import Hash
 from .memo_type import MemoType
 from .uint64 import Uint64
-from ..exceptions import ValueError
 
 __all__ = ["Memo"]
 

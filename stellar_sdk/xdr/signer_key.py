@@ -3,9 +3,9 @@
 import base64
 from xdrlib import Packer, Unpacker
 
+from ..exceptions import ValueError
 from .signer_key_type import SignerKeyType
 from .uint256 import Uint256
-from ..exceptions import ValueError
 
 __all__ = ["SignerKey"]
 

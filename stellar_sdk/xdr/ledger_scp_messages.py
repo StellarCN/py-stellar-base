@@ -4,9 +4,9 @@ import base64
 from typing import List
 from xdrlib import Packer, Unpacker
 
+from ..exceptions import ValueError
 from .scp_envelope import SCPEnvelope
 from .uint32 import Uint32
-from ..exceptions import ValueError
 
 __all__ = ["LedgerSCPMessages"]
 

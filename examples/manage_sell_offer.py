@@ -6,12 +6,13 @@ https://developers.stellar.org/docs/start/list-of-operations/#manage-sell-offer
 """
 
 import requests
+
 from stellar_sdk.asset import Asset
 from stellar_sdk.keypair import Keypair
 from stellar_sdk.network import Network
+from stellar_sdk.operation.manage_sell_offer import ManageSellOffer
 from stellar_sdk.server import Server
 from stellar_sdk.transaction_builder import TransactionBuilder
-from stellar_sdk.operation.manage_sell_offer import ManageSellOffer
 
 # Preparation
 ## Configure Stellar SDK to talk to the horizon instance hosted by Stellar.org

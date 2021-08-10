@@ -3,9 +3,9 @@
 import base64
 from xdrlib import Packer, Unpacker
 
+from ..exceptions import ValueError
 from .ledger_close_value_signature import LedgerCloseValueSignature
 from .stellar_value_type import StellarValueType
-from ..exceptions import ValueError
 
 __all__ = ["StellarValueExt"]
 

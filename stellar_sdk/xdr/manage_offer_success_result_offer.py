@@ -3,9 +3,9 @@
 import base64
 from xdrlib import Packer, Unpacker
 
+from ..exceptions import ValueError
 from .manage_offer_effect import ManageOfferEffect
 from .offer_entry import OfferEntry
-from ..exceptions import ValueError
 
 __all__ = ["ManageOfferSuccessResultOffer"]
 
