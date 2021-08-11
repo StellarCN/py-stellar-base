@@ -62,9 +62,9 @@ class AllowTrust(Operation):
         authorize: Union[TrustLineEntryFlag, bool],
         source: Optional[Union[MuxedAccount, str]] = None,
     ) -> None:
+        # We keep this class to ensure that the SDK can correctly parse historical transactions.
         warnings.warn(
-            "Will be removed in version v5.0.0, "
-            "use `stellar_sdk.operation.set_trust_line_flags.SetTrustLineFlags` instead.",
+            "Use `stellar_sdk.operation.set_trust_line_flags.SetTrustLineFlags` instead.",
             DeprecationWarning,
         )
         super().__init__(source)
