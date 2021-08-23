@@ -81,10 +81,10 @@ class AiohttpClient(BaseAsyncClient):
         user_agent: Optional[str] = None,
         **kwargs,
     ) -> None:
+        self.pool_size = pool_size
         self.backoff_factor: Optional[float] = backoff_factor
         self.request_timeout: float = request_timeout
         self.post_timeout: float = post_timeout
-
         # init session
         if pool_size is None:
             connector = aiohttp.TCPConnector()
