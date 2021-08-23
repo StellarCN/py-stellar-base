@@ -57,7 +57,7 @@ Install and update using `pipenv`_ or `pip`_:
 
 .. code-block:: text
 
-    pip install stellar-sdk==4.1.0
+    pip install stellar-sdk==4.1.1
 
 
 A Simple Example

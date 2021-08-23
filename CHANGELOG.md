@@ -1,6 +1,14 @@
 Release History
 ==============
 
+### Version 4.1.1
+Released on August 23, 2021
+
+#### Update
+* fix: AiohttpClient.__str__() references missing instance attribute self.pool_size. ([#511](https://github.com/StellarCN/py-stellar-base/pull/511))
+* refactor: use binascii.crc_hqx to calculate checksum. ([#507](https://github.com/StellarCN/py-stellar-base/pull/507))
+* chore: upgrade package dependencies.
+
 ### Version 4.1.0
 Released on July 28, 2021
 
