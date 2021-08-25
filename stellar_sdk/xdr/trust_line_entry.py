@@ -4,8 +4,8 @@ import base64
 from xdrlib import Packer, Unpacker
 
 from .account_id import AccountID
-from .asset import Asset
 from .int64 import Int64
+from .trust_line_asset import TrustLineAsset
 from .trust_line_entry_ext import TrustLineEntryExt
 from .uint32 import Uint32
 
@@ -19,7 +19,7 @@ class TrustLineEntry:
     struct TrustLineEntry
     {
         AccountID accountID; // account this trustline belongs to
-        Asset asset;         // type of asset (with issuer)
+        TrustLineAsset asset;         // type of asset (with issuer)
         int64 balance;       // how much of this asset the user has.
                              // Asset defines the unit for this;
 
@@ -40,6 +40,8 @@ class TrustLineEntry:
                 {
                 case 0:
                     void;
+                case 2:
+                    TrustLineEntryExtensionV2 v2;
                 }
                 ext;
             } v1;
@@ -52,7 +54,7 @@ class TrustLineEntry:
     def __init__(
         self,
         account_id: AccountID,
-        asset: Asset,
+        asset: TrustLineAsset,
         balance: Int64,
         limit: Int64,
         flags: Uint32,
@@ -76,7 +78,7 @@ class TrustLineEntry:
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "TrustLineEntry":
         account_id = AccountID.unpack(unpacker)
-        asset = Asset.unpack(unpacker)
+        asset = TrustLineAsset.unpack(unpacker)
         balance = Int64.unpack(unpacker)
         limit = Int64.unpack(unpacker)
         flags = Uint32.unpack(unpacker)

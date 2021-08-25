@@ -37,7 +37,9 @@ class OperationType(IntEnum):
         REVOKE_SPONSORSHIP = 18,
         CLAWBACK = 19,
         CLAWBACK_CLAIMABLE_BALANCE = 20,
-        SET_TRUST_LINE_FLAGS = 21
+        SET_TRUST_LINE_FLAGS = 21,
+        LIQUIDITY_POOL_DEPOSIT = 22,
+        LIQUIDITY_POOL_WITHDRAW = 23
     };
     ----------------------------------------------------------------
     """
@@ -64,6 +66,8 @@ class OperationType(IntEnum):
     CLAWBACK = 19
     CLAWBACK_CLAIMABLE_BALANCE = 20
     SET_TRUST_LINE_FLAGS = 21
+    LIQUIDITY_POOL_DEPOSIT = 22
+    LIQUIDITY_POOL_WITHDRAW = 23
 
     def pack(self, packer: Packer) -> None:
         packer.pack_int(self.value)

@@ -18,7 +18,8 @@ class AssetType(IntEnum):
     {
         ASSET_TYPE_NATIVE = 0,
         ASSET_TYPE_CREDIT_ALPHANUM4 = 1,
-        ASSET_TYPE_CREDIT_ALPHANUM12 = 2
+        ASSET_TYPE_CREDIT_ALPHANUM12 = 2,
+        ASSET_TYPE_POOL_SHARE = 3
     };
     ----------------------------------------------------------------
     """
@@ -26,6 +27,7 @@ class AssetType(IntEnum):
     ASSET_TYPE_NATIVE = 0
     ASSET_TYPE_CREDIT_ALPHANUM4 = 1
     ASSET_TYPE_CREDIT_ALPHANUM12 = 2
+    ASSET_TYPE_POOL_SHARE = 3
 
     def pack(self, packer: Packer) -> None:
         packer.pack_int(self.value)

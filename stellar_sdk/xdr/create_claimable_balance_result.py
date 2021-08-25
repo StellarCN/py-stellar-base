@@ -14,7 +14,8 @@ class CreateClaimableBalanceResult:
     """
     XDR Source Code
     ----------------------------------------------------------------
-    union CreateClaimableBalanceResult switch (CreateClaimableBalanceResultCode code)
+    union CreateClaimableBalanceResult switch (
+        CreateClaimableBalanceResultCode code)
     {
     case CREATE_CLAIMABLE_BALANCE_SUCCESS:
         ClaimableBalanceID balanceID;

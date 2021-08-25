@@ -8,11 +8,11 @@ const MASK_ACCOUNT_FLAGS = 0x7;
 ----------------------------------------------------------------
 """
 
-MASK_ACCOUNT_FLAGS_V16: int = 0xF
+MASK_ACCOUNT_FLAGS_V17: int = 0xF
 """
 XDR Source Code
 ----------------------------------------------------------------
-const MASK_ACCOUNT_FLAGS_V16 = 0xF;
+const MASK_ACCOUNT_FLAGS_V17 = 0xF;
 ----------------------------------------------------------------
 """
 
@@ -40,11 +40,11 @@ const MASK_TRUSTLINE_FLAGS_V13 = 3;
 ----------------------------------------------------------------
 """
 
-MASK_TRUSTLINE_FLAGS_V16: int = 7
+MASK_TRUSTLINE_FLAGS_V17: int = 7
 """
 XDR Source Code
 ----------------------------------------------------------------
-const MASK_TRUSTLINE_FLAGS_V16 = 7;
+const MASK_TRUSTLINE_FLAGS_V17 = 7;
 ----------------------------------------------------------------
 """
 
@@ -61,6 +61,14 @@ MASK_CLAIMABLE_BALANCE_FLAGS: int = 0x1
 XDR Source Code
 ----------------------------------------------------------------
 const MASK_CLAIMABLE_BALANCE_FLAGS = 0x1;
+----------------------------------------------------------------
+"""
+
+LIQUIDITY_POOL_FEE_V18: int = 30
+"""
+XDR Source Code
+----------------------------------------------------------------
+const LIQUIDITY_POOL_FEE_V18 = 30;
 ----------------------------------------------------------------
 """
 

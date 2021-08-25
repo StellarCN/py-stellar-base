@@ -25,7 +25,10 @@ class ChangeTrustResultCode(IntEnum):
                                          // cannot create with a limit of 0
         CHANGE_TRUST_LOW_RESERVE =
             -4, // not enough funds to create a new trust line,
-        CHANGE_TRUST_SELF_NOT_ALLOWED = -5 // trusting self is not allowed
+        CHANGE_TRUST_SELF_NOT_ALLOWED = -5, // trusting self is not allowed
+        CHANGE_TRUST_TRUST_LINE_MISSING = -6, // Asset trustline is missing for pool
+        CHANGE_TRUST_CANNOT_DELETE = -7, // Asset trustline is still referenced in a pool
+        CHANGE_TRUST_NOT_AUTH_MAINTAIN_LIABILITIES = -8 // Asset trustline is deauthorized
     };
     ----------------------------------------------------------------
     """
@@ -36,6 +39,9 @@ class ChangeTrustResultCode(IntEnum):
     CHANGE_TRUST_INVALID_LIMIT = -3
     CHANGE_TRUST_LOW_RESERVE = -4
     CHANGE_TRUST_SELF_NOT_ALLOWED = -5
+    CHANGE_TRUST_TRUST_LINE_MISSING = -6
+    CHANGE_TRUST_CANNOT_DELETE = -7
+    CHANGE_TRUST_NOT_AUTH_MAINTAIN_LIABILITIES = -8
 
     def pack(self, packer: Packer) -> None:
         packer.pack_int(self.value)

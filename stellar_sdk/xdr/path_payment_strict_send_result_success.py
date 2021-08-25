@@ -5,7 +5,7 @@ from typing import List
 from xdrlib import Packer, Unpacker
 
 from ..exceptions import ValueError
-from .claim_offer_atom import ClaimOfferAtom
+from .claim_atom import ClaimAtom
 from .simple_payment_result import SimplePaymentResult
 
 __all__ = ["PathPaymentStrictSendResultSuccess"]
@@ -17,7 +17,7 @@ class PathPaymentStrictSendResultSuccess:
     ----------------------------------------------------------------
     struct
         {
-            ClaimOfferAtom offers<>;
+            ClaimAtom offers<>;
             SimplePaymentResult last;
         }
     ----------------------------------------------------------------
@@ -25,7 +25,7 @@ class PathPaymentStrictSendResultSuccess:
 
     def __init__(
         self,
-        offers: List[ClaimOfferAtom],
+        offers: List[ClaimAtom],
         last: SimplePaymentResult,
     ) -> None:
         if offers and len(offers) > 4294967295:
@@ -46,7 +46,7 @@ class PathPaymentStrictSendResultSuccess:
         length = unpacker.unpack_uint()
         offers = []
         for _ in range(length):
-            offers.append(ClaimOfferAtom.unpack(unpacker))
+            offers.append(ClaimAtom.unpack(unpacker))
         last = SimplePaymentResult.unpack(unpacker)
         return cls(
             offers=offers,

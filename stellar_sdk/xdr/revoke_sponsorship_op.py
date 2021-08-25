@@ -24,8 +24,7 @@ class RevokeSponsorshipOp:
         {
             AccountID accountID;
             SignerKey signerKey;
-        }
-        signer;
+        } signer;
     };
     ----------------------------------------------------------------
     """

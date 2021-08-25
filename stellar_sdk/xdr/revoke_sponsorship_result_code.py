@@ -23,7 +23,8 @@ class RevokeSponsorshipResultCode(IntEnum):
         REVOKE_SPONSORSHIP_DOES_NOT_EXIST = -1,
         REVOKE_SPONSORSHIP_NOT_SPONSOR = -2,
         REVOKE_SPONSORSHIP_LOW_RESERVE = -3,
-        REVOKE_SPONSORSHIP_ONLY_TRANSFERABLE = -4
+        REVOKE_SPONSORSHIP_ONLY_TRANSFERABLE = -4,
+        REVOKE_SPONSORSHIP_MALFORMED = -5
     };
     ----------------------------------------------------------------
     """
@@ -33,6 +34,7 @@ class RevokeSponsorshipResultCode(IntEnum):
     REVOKE_SPONSORSHIP_NOT_SPONSOR = -2
     REVOKE_SPONSORSHIP_LOW_RESERVE = -3
     REVOKE_SPONSORSHIP_ONLY_TRANSFERABLE = -4
+    REVOKE_SPONSORSHIP_MALFORMED = -5
 
     def pack(self, packer: Packer) -> None:
         packer.pack_int(self.value)

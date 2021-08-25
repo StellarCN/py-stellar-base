@@ -3,7 +3,7 @@
 import base64
 from xdrlib import Packer, Unpacker
 
-from .muxed_account import MuxedAccount
+from .account_id import AccountID
 from .sequence_number import SequenceNumber
 from .uint32 import Uint32
 
@@ -16,7 +16,7 @@ class OperationIDId:
     ----------------------------------------------------------------
     struct
         {
-            MuxedAccount sourceAccount;
+            AccountID sourceAccount;
             SequenceNumber seqNum;
             uint32 opNum;
         }
@@ -25,7 +25,7 @@ class OperationIDId:
 
     def __init__(
         self,
-        source_account: MuxedAccount,
+        source_account: AccountID,
         seq_num: SequenceNumber,
         op_num: Uint32,
     ) -> None:
@@ -40,7 +40,7 @@ class OperationIDId:
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "OperationIDId":
-        source_account = MuxedAccount.unpack(unpacker)
+        source_account = AccountID.unpack(unpacker)
         seq_num = SequenceNumber.unpack(unpacker)
         op_num = Uint32.unpack(unpacker)
         return cls(

@@ -19,7 +19,7 @@ class AllowTrustOp:
         AccountID trustor;
         AssetCode asset;
 
-        // 0, or any bitwise combination of the AUTHORIZED_* flags of TrustLineFlags
+        // One of 0, AUTHORIZED_FLAG, or AUTHORIZED_TO_MAINTAIN_LIABILITIES_FLAG
         uint32 authorize;
     };
     ----------------------------------------------------------------

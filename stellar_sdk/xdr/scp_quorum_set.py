@@ -5,7 +5,7 @@ from typing import List
 from xdrlib import Packer, Unpacker
 
 from ..exceptions import ValueError
-from .public_key import PublicKey
+from .node_id import NodeID
 from .uint32 import Uint32
 
 __all__ = ["SCPQuorumSet"]
@@ -18,7 +18,7 @@ class SCPQuorumSet:
     struct SCPQuorumSet
     {
         uint32 threshold;
-        PublicKey validators<>;
+        NodeID validators<>;
         SCPQuorumSet innerSets<>;
     };
     ----------------------------------------------------------------
@@ -27,7 +27,7 @@ class SCPQuorumSet:
     def __init__(
         self,
         threshold: Uint32,
-        validators: List[PublicKey],
+        validators: List[NodeID],
         inner_sets: List["SCPQuorumSet"],
     ) -> None:
         if validators and len(validators) > 4294967295:
@@ -57,7 +57,7 @@ class SCPQuorumSet:
         length = unpacker.unpack_uint()
         validators = []
         for _ in range(length):
-            validators.append(PublicKey.unpack(unpacker))
+            validators.append(NodeID.unpack(unpacker))
         length = unpacker.unpack_uint()
         inner_sets = []
         for _ in range(length):

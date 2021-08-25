@@ -14,7 +14,8 @@ class EndSponsoringFutureReservesResult:
     """
     XDR Source Code
     ----------------------------------------------------------------
-    union EndSponsoringFutureReservesResult switch (EndSponsoringFutureReservesResultCode code)
+    union EndSponsoringFutureReservesResult switch (
+        EndSponsoringFutureReservesResultCode code)
     {
     case END_SPONSORING_FUTURE_RESERVES_SUCCESS:
         void;
