@@ -117,7 +117,7 @@ class TestAsset:
         asset_code = stellar_xdr.AssetCode4(
             bytearray(code, "ascii") + b"\x00" * (4 - len(code))
         )
-        asset = stellar_xdr.AssetAlphaNum4(
+        asset = stellar_xdr.AlphaNum4(
             asset_code=asset_code,
             issuer=Keypair.from_public_key(issuer).xdr_account_id(),
         )
@@ -136,7 +136,7 @@ class TestAsset:
         asset_code = stellar_xdr.AssetCode12(
             bytearray(code, "ascii") + b"\x00" * (12 - len(code))
         )
-        asset = stellar_xdr.AssetAlphaNum12(
+        asset = stellar_xdr.AlphaNum12(
             asset_code=asset_code,
             issuer=Keypair.from_public_key(issuer).xdr_account_id(),
         )

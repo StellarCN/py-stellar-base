@@ -305,7 +305,7 @@ class RevokeSponsorship(Operation):
             assert self.trustline is not None
             trust_line = stellar_xdr.LedgerKeyTrustLine(
                 Keypair.from_public_key(self.trustline.account_id).xdr_account_id(),
-                self.trustline.asset.to_xdr_object(),
+                self.trustline.asset.to_trust_line_xdr_object(),
             )
             ledger_key = stellar_xdr.LedgerKey(
                 stellar_xdr.LedgerEntryType.TRUSTLINE, trust_line=trust_line

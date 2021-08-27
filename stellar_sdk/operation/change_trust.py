@@ -50,7 +50,7 @@ class ChangeTrust(Operation):
             self.limit = limit
 
     def _to_operation_body(self) -> stellar_xdr.OperationBody:
-        line = self.asset.to_xdr_object()
+        line = self.asset.to_change_trust_xdr_object()
         limit = stellar_xdr.Int64(Operation.to_xdr_amount(self.limit))
         change_trust_op = stellar_xdr.ChangeTrustOp(line, limit)
         body = stellar_xdr.OperationBody(
