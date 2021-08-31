@@ -2,7 +2,16 @@ from decimal import Decimal
 
 import pytest
 
-from stellar_sdk import Asset, MuxedAccount, Price
+from stellar_sdk import (
+    LIQUIDITY_POOL_FEE_V18,
+    Asset,
+    LiquidityPoolAsset,
+    LiquidityPoolDeposit,
+    LiquidityPoolId,
+    LiquidityPoolWithdraw,
+    MuxedAccount,
+    Price,
+)
 from stellar_sdk.exceptions import AssetCodeInvalidError, Ed25519PublicKeyInvalidError
 from stellar_sdk.operation import CreateAccount, Operation
 from stellar_sdk.operation.account_merge import AccountMerge
@@ -341,22 +350,61 @@ class TestChangeTrust:
             ),
         ],
     )
-    def test_to_xdr_obj(self, limit, xdr):
+    def test_xdr_with_asset(self, limit, xdr):
         asset = Asset("USD", "GDGU5OAPHNPU5UCLE5RDJHG7PXZFQYWKCFOEXSXNMR6KRQRI5T6XXCD7")
         source = "GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV"
         op = ChangeTrust(asset, limit, source)
+        restore_op = Operation.from_xdr_object(op.to_xdr_object())
+        assert isinstance(restore_op, ChangeTrust)
         assert op.to_xdr_object().to_xdr() == xdr
+        assert restore_op.to_xdr_object().to_xdr() == xdr
+        assert restore_op.source.account_id == source
+        if limit is None:
+            limit = "922337203685.4775807"
+        assert restore_op.limit == limit
+        assert restore_op.asset == asset
 
-    def test_from_xdr_obj(self):
-        asset = Asset("USD", "GDGU5OAPHNPU5UCLE5RDJHG7PXZFQYWKCFOEXSXNMR6KRQRI5T6XXCD7")
+    @pytest.mark.parametrize(
+        "limit, xdr",
+        [
+            (
+                "922337203685.4775807",
+                "AAAAAQAAAADX7fRsY6KTqIc8EIDyr8M9gxGPW6ODnZoZDgo6l1ymwwAAAAYAAAADAAAAAAAAAAFBUlNUAAAAAH8wYjTJienWf2nf2TEZi2APPWzmtkwiQHAftisIgyuHAAAAAVVTRAAAAAAAiZsoQO1WNsVt3F8Usjl1958bojiNJpTkxW7N3clg5e8AAAAef/////////8=",
+            ),
+            (
+                "0",
+                "AAAAAQAAAADX7fRsY6KTqIc8EIDyr8M9gxGPW6ODnZoZDgo6l1ymwwAAAAYAAAADAAAAAAAAAAFBUlNUAAAAAH8wYjTJienWf2nf2TEZi2APPWzmtkwiQHAftisIgyuHAAAAAVVTRAAAAAAAiZsoQO1WNsVt3F8Usjl1958bojiNJpTkxW7N3clg5e8AAAAeAAAAAAAAAAA=",
+            ),
+            (
+                "50.1234567",
+                "AAAAAQAAAADX7fRsY6KTqIc8EIDyr8M9gxGPW6ODnZoZDgo6l1ymwwAAAAYAAAADAAAAAAAAAAFBUlNUAAAAAH8wYjTJienWf2nf2TEZi2APPWzmtkwiQHAftisIgyuHAAAAAVVTRAAAAAAAiZsoQO1WNsVt3F8Usjl1958bojiNJpTkxW7N3clg5e8AAAAeAAAAAB3gO4c=",
+            ),
+            (
+                None,
+                "AAAAAQAAAADX7fRsY6KTqIc8EIDyr8M9gxGPW6ODnZoZDgo6l1ymwwAAAAYAAAADAAAAAAAAAAFBUlNUAAAAAH8wYjTJienWf2nf2TEZi2APPWzmtkwiQHAftisIgyuHAAAAAVVTRAAAAAAAiZsoQO1WNsVt3F8Usjl1958bojiNJpTkxW7N3clg5e8AAAAef/////////8=",
+            ),
+        ],
+    )
+    def test_xdr_with_liquidity_pool_asset(self, limit, xdr):
+        asset_a = Asset(
+            "ARST", "GB7TAYRUZGE6TVT7NHP5SMIZRNQA6PLM423EYISAOAP3MKYIQMVYP2JO"
+        )
+        asset_b = Asset(
+            "USD", "GCEZWKCA5VLDNRLN3RPRJMRZOX3Z6G5CHCGSNFHEYVXM3XOJMDS674JZ"
+        )
+        fee = LIQUIDITY_POOL_FEE_V18
+        asset = LiquidityPoolAsset(asset_a, asset_b, fee=fee)
         source = "GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV"
-        limit = "123456.789"
-        origin_xdr_obj = ChangeTrust(asset, limit, source).to_xdr_object()
-        op = Operation.from_xdr_object(origin_xdr_obj)
-        assert isinstance(op, ChangeTrust)
-        assert op.source.account_id == source
-        assert op.limit == limit
-        assert op.asset == asset
+        op = ChangeTrust(asset, limit, source)
+        restore_op = Operation.from_xdr_object(op.to_xdr_object())
+        assert isinstance(restore_op, ChangeTrust)
+        assert op.to_xdr_object().to_xdr() == xdr
+        assert restore_op.to_xdr_object().to_xdr() == xdr
+        assert restore_op.source.account_id == source
+        if limit is None:
+            limit = "922337203685.4775807"
+        assert restore_op.limit == limit
+        assert restore_op.asset == asset
 
 
 class TestClaimClaimableBalance:
@@ -1433,12 +1481,11 @@ class TestRevokeSponsorship:
 
         op = RevokeSponsorship.revoke_account_sponsorship(account_id, source)
         assert op.to_xdr_object().to_xdr() == xdr
-        assert (
-            Operation.from_xdr_object(op.to_xdr_object()).to_xdr_object().to_xdr()
-            == xdr
-        )
+        restore_op = Operation.from_xdr_object(op.to_xdr_object())
+        assert restore_op == op
+        assert restore_op.to_xdr_object().to_xdr() == xdr
 
-    def test_trustline_xdr(self):
+    def test_trustline_xdr_with_asset(self):
         source = "GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV"
         account_id = "GB2DRLHCWHUCB2BS4IRRY2GBQKVAKEXOU2EMTMLSUOXVNMZY7W6BSGZ7"
         asset = Asset("CAT", "GCEYOF66NL73LL6RIPSIP34WOCESQ3GKJOAYXOEVNKRWRNQRYUILCQWC")
@@ -1446,10 +1493,23 @@ class TestRevokeSponsorship:
 
         op = RevokeSponsorship.revoke_trustline_sponsorship(account_id, asset, source)
         assert op.to_xdr_object().to_xdr() == xdr
-        assert (
-            Operation.from_xdr_object(op.to_xdr_object()).to_xdr_object().to_xdr()
-            == xdr
+        restore_op = Operation.from_xdr_object(op.to_xdr_object())
+        assert restore_op == op
+        assert restore_op.to_xdr_object().to_xdr() == xdr
+
+    def test_trustline_xdr_with_liquidity_pool_id(self):
+        source = "GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV"
+        account_id = "GB2DRLHCWHUCB2BS4IRRY2GBQKVAKEXOU2EMTMLSUOXVNMZY7W6BSGZ7"
+        asset = LiquidityPoolId(
+            "dd7b1ab831c273310ddbec6f97870aa83c2fbd78ce22aded37ecbf4f3380fac7"
         )
+        xdr = "AAAAAQAAAADX7fRsY6KTqIc8EIDyr8M9gxGPW6ODnZoZDgo6l1ymwwAAABIAAAAAAAAAAQAAAAB0OKzisegg6DLiIxxowYKqBRLupojJsXKjr1azOP28GQAAAAPdexq4McJzMQ3b7G+XhwqoPC+9eM4ire037L9PM4D6xw=="
+
+        op = RevokeSponsorship.revoke_trustline_sponsorship(account_id, asset, source)
+        assert op.to_xdr_object().to_xdr() == xdr
+        restore_op = Operation.from_xdr_object(op.to_xdr_object())
+        assert restore_op == op
+        assert restore_op.to_xdr_object().to_xdr() == xdr
 
     def test_offer_xdr(self):
         source = "GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV"
@@ -1459,10 +1519,9 @@ class TestRevokeSponsorship:
 
         op = RevokeSponsorship.revoke_offer_sponsorship(seller_id, offer_id, source)
         assert op.to_xdr_object().to_xdr() == xdr
-        assert (
-            Operation.from_xdr_object(op.to_xdr_object()).to_xdr_object().to_xdr()
-            == xdr
-        )
+        restore_op = Operation.from_xdr_object(op.to_xdr_object())
+        assert restore_op == op
+        assert restore_op.to_xdr_object().to_xdr() == xdr
 
     def test_date_xdr(self):
         source = "GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV"
@@ -1472,10 +1531,9 @@ class TestRevokeSponsorship:
 
         op = RevokeSponsorship.revoke_data_sponsorship(account_id, data_name, source)
         assert op.to_xdr_object().to_xdr() == xdr
-        assert (
-            Operation.from_xdr_object(op.to_xdr_object()).to_xdr_object().to_xdr()
-            == xdr
-        )
+        restore_op = Operation.from_xdr_object(op.to_xdr_object())
+        assert restore_op == op
+        assert restore_op.to_xdr_object().to_xdr() == xdr
 
     def test_claimable_balance_id_xdr(self):
         source = "GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV"
@@ -1486,10 +1544,24 @@ class TestRevokeSponsorship:
 
         op = RevokeSponsorship.revoke_claimable_balance_sponsorship(balance_id, source)
         assert op.to_xdr_object().to_xdr() == xdr
-        assert (
-            Operation.from_xdr_object(op.to_xdr_object()).to_xdr_object().to_xdr()
-            == xdr
+        restore_op = Operation.from_xdr_object(op.to_xdr_object())
+        assert restore_op == op
+        assert restore_op.to_xdr_object().to_xdr() == xdr
+
+    def test_liquidity_pool(self):
+        source = "GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV"
+        liquidity_pool_id = (
+            "dd7b1ab831c273310ddbec6f97870aa83c2fbd78ce22aded37ecbf4f3380fac7"
         )
+        xdr = "AAAAAQAAAADX7fRsY6KTqIc8EIDyr8M9gxGPW6ODnZoZDgo6l1ymwwAAABIAAAAAAAAABd17GrgxwnMxDdvsb5eHCqg8L714ziKt7Tfsv08zgPrH"
+
+        op = RevokeSponsorship.revoke_liquidity_pool_sponsorship(
+            liquidity_pool_id, source
+        )
+        assert op.to_xdr_object().to_xdr() == xdr
+        restore_op = Operation.from_xdr_object(op.to_xdr_object())
+        assert restore_op == op
+        assert restore_op.to_xdr_object().to_xdr() == xdr
 
     def test_signer_xdr(self):
         source = "GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV"
@@ -1501,10 +1573,9 @@ class TestRevokeSponsorship:
 
         op = RevokeSponsorship.revoke_signer_sponsorship(account_id, signer_key, source)
         assert op.to_xdr_object().to_xdr() == xdr
-        assert (
-            Operation.from_xdr_object(op.to_xdr_object()).to_xdr_object().to_xdr()
-            == xdr
-        )
+        restore_op = Operation.from_xdr_object(op.to_xdr_object())
+        assert restore_op == op
+        assert restore_op.to_xdr_object().to_xdr() == xdr
 
     def test_trustline_equal(self):
         account1 = "GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV"
@@ -1951,3 +2022,99 @@ class TestSetTrustLineFlags:
         assert restore_op.clear_flags == clear_flags
         assert restore_op.set_flags == set_flags
         assert restore_op.asset == asset
+
+
+class TestLiquidityPoolDeposit:
+    def test_xdr(self):
+        source = "GA2N7NI5WEMJILMK4UPDTF2ZX2BIRQUM3HZUE27TRUNRFN5M5EXU6RQV"
+        liquidity_pool_id = (
+            "dd7b1ab831c273310ddbec6f97870aa83c2fbd78ce22aded37ecbf4f3380fac7"
+        )
+        max_amount_a = "10"
+        max_amount_b = "20"
+        min_price = "0.45"
+        max_price = "0.55"
+        xdr = "AAAAAQAAAAA037UdsRiULYrlHjmXWb6CiMKM2fNCa/ONGxK3rOkvTwAAABbdexq4McJzMQ3b7G+XhwqoPC+9eM4ire037L9PM4D6xwAAAAAF9eEAAAAAAAvrwgAAAAAJAAAAFAAAAAsAAAAU"
+        op = LiquidityPoolDeposit(
+            liquidity_pool_id, max_amount_a, max_amount_b, min_price, max_price, source
+        )
+        restore_op = Operation.from_xdr_object(op.to_xdr_object())
+        assert isinstance(restore_op, LiquidityPoolDeposit)
+        assert op.to_xdr_object().to_xdr() == xdr
+        assert restore_op.to_xdr_object().to_xdr() == xdr
+        assert restore_op.source.account_id == source
+        assert restore_op.liquidity_pool_id == liquidity_pool_id
+        assert restore_op.max_amount_a == max_amount_a
+        assert restore_op.max_amount_b == max_amount_b
+        assert restore_op.min_price == Price.from_raw_price(min_price)
+        assert restore_op.max_price == Price.from_raw_price(max_price)
+
+    def test_xdr_no_source(self):
+        source = None
+        liquidity_pool_id = (
+            "dd7b1ab831c273310ddbec6f97870aa83c2fbd78ce22aded37ecbf4f3380fac7"
+        )
+        max_amount_a = "10"
+        max_amount_b = "20"
+        min_price = "0.45"
+        max_price = "0.55"
+        xdr = "AAAAAAAAABbdexq4McJzMQ3b7G+XhwqoPC+9eM4ire037L9PM4D6xwAAAAAF9eEAAAAAAAvrwgAAAAAJAAAAFAAAAAsAAAAU"
+        op = LiquidityPoolDeposit(
+            liquidity_pool_id, max_amount_a, max_amount_b, min_price, max_price, source
+        )
+        restore_op = Operation.from_xdr_object(op.to_xdr_object())
+        assert isinstance(restore_op, LiquidityPoolDeposit)
+        assert op.to_xdr_object().to_xdr() == xdr
+        assert restore_op.to_xdr_object().to_xdr() == xdr
+        assert restore_op.source is None
+        assert restore_op.liquidity_pool_id == liquidity_pool_id
+        assert restore_op.max_amount_a == max_amount_a
+        assert restore_op.max_amount_b == max_amount_b
+        assert restore_op.min_price == Price.from_raw_price(min_price)
+        assert restore_op.max_price == Price.from_raw_price(max_price)
+
+
+class TestLiquidityPoolWithdraw:
+    def test_xdr(self):
+        source = "GA2N7NI5WEMJILMK4UPDTF2ZX2BIRQUM3HZUE27TRUNRFN5M5EXU6RQV"
+        liquidity_pool_id = (
+            "dd7b1ab831c273310ddbec6f97870aa83c2fbd78ce22aded37ecbf4f3380fac7"
+        )
+        amount = "5"
+        min_amount_a = "10"
+        min_amount_b = "20"
+        xdr = "AAAAAQAAAAA037UdsRiULYrlHjmXWb6CiMKM2fNCa/ONGxK3rOkvTwAAABfdexq4McJzMQ3b7G+XhwqoPC+9eM4ire037L9PM4D6xwAAAAAC+vCAAAAAAAX14QAAAAAAC+vCAA=="
+        op = LiquidityPoolWithdraw(
+            liquidity_pool_id, amount, min_amount_a, min_amount_b, source
+        )
+        restore_op = Operation.from_xdr_object(op.to_xdr_object())
+        assert isinstance(restore_op, LiquidityPoolWithdraw)
+        assert op.to_xdr_object().to_xdr() == xdr
+        assert restore_op.to_xdr_object().to_xdr() == xdr
+        assert restore_op.source.account_id == source
+        assert restore_op.liquidity_pool_id == liquidity_pool_id
+        assert restore_op.amount == amount
+        assert restore_op.min_amount_a == min_amount_a
+        assert restore_op.min_amount_b == min_amount_b
+
+    def test_xdr_no_source(self):
+        source = None
+        liquidity_pool_id = (
+            "dd7b1ab831c273310ddbec6f97870aa83c2fbd78ce22aded37ecbf4f3380fac7"
+        )
+        amount = "5"
+        min_amount_a = "10"
+        min_amount_b = "20"
+        xdr = "AAAAAAAAABfdexq4McJzMQ3b7G+XhwqoPC+9eM4ire037L9PM4D6xwAAAAAC+vCAAAAAAAX14QAAAAAAC+vCAA=="
+        op = LiquidityPoolWithdraw(
+            liquidity_pool_id, amount, min_amount_a, min_amount_b, source
+        )
+        restore_op = Operation.from_xdr_object(op.to_xdr_object())
+        assert isinstance(restore_op, LiquidityPoolWithdraw)
+        assert op.to_xdr_object().to_xdr() == xdr
+        assert restore_op.to_xdr_object().to_xdr() == xdr
+        assert restore_op.source is None
+        assert restore_op.liquidity_pool_id == liquidity_pool_id
+        assert restore_op.amount == amount
+        assert restore_op.min_amount_a == min_amount_a
+        assert restore_op.min_amount_b == min_amount_b

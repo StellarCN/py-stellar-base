@@ -17,6 +17,8 @@ from ..asset import Asset
 from ..exceptions import ValueError as SdkValueError
 from ..fee_bump_transaction import FeeBumpTransaction
 from ..fee_bump_transaction_envelope import FeeBumpTransactionEnvelope
+from ..liquidity_pool_asset import LiquidityPoolAsset
+from ..liquidity_pool_id import LiquidityPoolId
 from ..memo import *
 from ..muxed_account import MuxedAccount
 from ..operation import *
@@ -1395,7 +1397,9 @@ def _add_signature(
     _add_line(f"{prefix}signature", _to_opaque(signature.signature.signature), lines)
 
 
-def _to_asset(asset: Asset) -> str:
+def _to_asset(asset: Union[Asset, LiquidityPoolAsset, LiquidityPoolId]) -> str:
+    if not isinstance(asset, Asset):
+        raise ValueError("Unexpected asset type.")
     if asset.is_native():
         return "native"
     return f"{asset.code}:{asset.issuer}"

@@ -1,5 +1,6 @@
 import hashlib
 import os
+import re
 from decimal import ROUND_FLOOR, Decimal
 from typing import List
 from urllib.parse import urlsplit, urlunsplit
@@ -96,3 +97,10 @@ def is_fee_bump_transaction(xdr: str) -> bool:
         raise ValueError(
             f"This transaction envelope type is not supported, type = {te_type}."
         )
+
+
+def is_valid_hash(data: str) -> bool:
+    if not data:
+        return False
+    asset_code_re = re.compile(r"^[a-zA-Z0-9]{64}$")
+    return bool(asset_code_re.match(data))

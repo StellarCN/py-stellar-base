@@ -6,6 +6,7 @@ from stellar_sdk.strkey import StrKey
 from stellar_sdk.utils import (
     best_rational_approximation,
     hex_to_bytes,
+    is_valid_hash,
     parse_ed25519_account_id_from_muxed_account_xdr_object,
     urljoin_with_query,
 )
@@ -151,3 +152,21 @@ class TestUtils:
         assert (
             parse_ed25519_account_id_from_muxed_account_xdr_object(muxed) == account_id
         )
+
+    @pytest.mark.parametrize(
+        "data, result",
+        [
+            ("", False),
+            (None, False),
+            ("abc", False),
+            (
+                "dd7b1ab831c273310ddbec6f97870aa83c2fbd78ce22aded37ecbf4f3380fac7d",
+                False,
+            ),
+            ("dd7b1ab831c273310ddbec6f97870aa83c2fbd78ce22aded37ecbf4f3380fac7", True),
+            ("DD7B1AB831C273310DDBEC6F97870AA83C2FBD78CE22ADED37ECBF4F3380FAC7", True),
+            ("DD7b1ab831c273310ddbec6f97870aa83c2fbd78ce22aded37ecbf4f3380fac7", True),
+        ],
+    )
+    def test_is_valid_hash(self, data, result):
+        assert is_valid_hash(data) == result

@@ -445,8 +445,9 @@ class TestTxrep:
             "0d64fac556c1545616b3c915a4ec215239500bce287007cff038b6020950af46", 10
         )
         transaction_builder.append_change_trust_op(
-            asset_code="XCN",
-            asset_issuer="GAYE5SDEM5JIEMGQ7LBMQVRQRVJB6A5E7AZVLJYFL3CNHLZX24DFD35F",
+            asset=Asset(
+                "XCN", "GAYE5SDEM5JIEMGQ7LBMQVRQRVJB6A5E7AZVLJYFL3CNHLZX24DFD35F"
+            ),
             limit="1000",
             source=keypair.public_key,
         )

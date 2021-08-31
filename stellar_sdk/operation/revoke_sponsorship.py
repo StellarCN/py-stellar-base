@@ -7,6 +7,7 @@ from .. import xdr as stellar_xdr
 from ..asset import Asset
 from ..exceptions import ValueError
 from ..keypair import Keypair
+from ..liquidity_pool_id import LiquidityPoolId
 from ..muxed_account import MuxedAccount
 from ..signer_key import SignerKey
 from ..strkey import StrKey
@@ -25,10 +26,11 @@ class RevokeSponsorshipType(IntEnum):
     DATA = 3
     CLAIMABLE_BALANCE = 4
     SIGNER = 5
+    LIQUIDITY_POOL = 6
 
 
 class TrustLine:
-    def __init__(self, account_id: str, asset: Asset) -> None:
+    def __init__(self, account_id: str, asset: Union[Asset, LiquidityPoolId]) -> None:
         check_ed25519_public_key(account_id)
         self.account_id = account_id
         self.asset = asset
@@ -129,6 +131,7 @@ class RevokeSponsorship(Operation):
         data: Optional[Data],
         claimable_balance_id: Optional[str],
         signer: Optional[Signer],
+        liquidity_pool_id: Optional[str],
         source: Optional[Union[MuxedAccount, str]] = None,
     ) -> None:
         super().__init__(source)
@@ -139,6 +142,7 @@ class RevokeSponsorship(Operation):
         self.data = data
         self.claimable_balance_id = claimable_balance_id
         self.signer = signer
+        self.liquidity_pool_id = liquidity_pool_id
 
     @classmethod
     def revoke_account_sponsorship(
@@ -158,6 +162,7 @@ class RevokeSponsorship(Operation):
             data=None,
             claimable_balance_id=None,
             signer=None,
+            liquidity_pool_id=None,
             source=source,
         )
 
@@ -165,7 +170,7 @@ class RevokeSponsorship(Operation):
     def revoke_trustline_sponsorship(
         cls,
         account_id: str,
-        asset: Asset,
+        asset: Union[Asset, LiquidityPoolId],
         source: Optional[Union[MuxedAccount, str]] = None,
     ):
         """Create a "revoke sponsorship" operation for a trustline.
@@ -184,6 +189,7 @@ class RevokeSponsorship(Operation):
             data=None,
             claimable_balance_id=None,
             signer=None,
+            liquidity_pool_id=None,
             source=source,
         )
 
@@ -210,6 +216,7 @@ class RevokeSponsorship(Operation):
             data=None,
             claimable_balance_id=None,
             signer=None,
+            liquidity_pool_id=None,
             source=source,
         )
 
@@ -236,6 +243,7 @@ class RevokeSponsorship(Operation):
             data=data,
             claimable_balance_id=None,
             signer=None,
+            liquidity_pool_id=None,
             source=source,
         )
 
@@ -259,6 +267,7 @@ class RevokeSponsorship(Operation):
             data=None,
             claimable_balance_id=claimable_balance_id,
             signer=None,
+            liquidity_pool_id=None,
             source=source,
         )
 
@@ -285,6 +294,29 @@ class RevokeSponsorship(Operation):
             data=None,
             claimable_balance_id=None,
             signer=signer,
+            liquidity_pool_id=None,
+            source=source,
+        )
+
+    @classmethod
+    def revoke_liquidity_pool_sponsorship(
+        cls, liquidity_pool_id: str, source: Optional[Union[MuxedAccount, str]] = None
+    ):
+        """Create a "revoke sponsorship" operation for a liquidity pool.
+
+        :param liquidity_pool_id: The sponsored liquidity pool ID in hex string.
+        :param source: The source account (defaults to transaction source).
+        :return: A "revoke sponsorship" operation for a liquidity pool.
+        """
+        return cls(
+            revoke_sponsorship_type=RevokeSponsorshipType.LIQUIDITY_POOL,
+            account_id=None,
+            trustline=None,
+            offer=None,
+            data=None,
+            claimable_balance_id=None,
+            signer=None,
+            liquidity_pool_id=liquidity_pool_id,
             source=source,
         )
 
@@ -305,7 +337,7 @@ class RevokeSponsorship(Operation):
             assert self.trustline is not None
             trust_line = stellar_xdr.LedgerKeyTrustLine(
                 Keypair.from_public_key(self.trustline.account_id).xdr_account_id(),
-                self.trustline.asset.to_trust_line_xdr_object(),
+                self.trustline.asset.to_trust_line_asset_xdr_object(),
             )
             ledger_key = stellar_xdr.LedgerKey(
                 stellar_xdr.LedgerEntryType.TRUSTLINE, trust_line=trust_line
@@ -367,6 +399,19 @@ class RevokeSponsorship(Operation):
                 stellar_xdr.RevokeSponsorshipType.REVOKE_SPONSORSHIP_SIGNER,
                 signer=signer_key,
             )
+        elif self.revoke_sponsorship_type == RevokeSponsorshipType.LIQUIDITY_POOL:
+            assert self.liquidity_pool_id is not None
+            liquidity_pool_id_bytes = binascii.unhexlify(self.liquidity_pool_id)
+            pool_id = stellar_xdr.PoolID.from_xdr_bytes(liquidity_pool_id_bytes)
+            liquidity_pool = stellar_xdr.LedgerKeyLiquidityPool(pool_id)
+            ledger_key = stellar_xdr.LedgerKey(
+                stellar_xdr.LedgerEntryType.LIQUIDITY_POOL,
+                liquidity_pool=liquidity_pool,
+            )
+            revoke_sponsorship_op = stellar_xdr.RevokeSponsorshipOp(
+                stellar_xdr.RevokeSponsorshipType.REVOKE_SPONSORSHIP_LEDGER_ENTRY,
+                ledger_key=ledger_key,
+            )
         else:
             raise ValueError(
                 f"{self.revoke_sponsorship_type} is not a valid RevokeSponsorshipType."
@@ -404,7 +449,15 @@ class RevokeSponsorship(Operation):
                 account_id = StrKey.encode_ed25519_public_key(
                     ledger_key.trust_line.account_id.account_id.ed25519.uint256
                 )
-                asset = Asset.from_xdr_object(ledger_key.trust_line.asset)
+                if (
+                    ledger_key.trust_line.asset.type
+                    == stellar_xdr.AssetType.ASSET_TYPE_POOL_SHARE
+                ):
+                    asset: Union[
+                        Asset, LiquidityPoolId
+                    ] = LiquidityPoolId.from_xdr_object(ledger_key.trust_line.asset)
+                else:
+                    asset = Asset.from_xdr_object(ledger_key.trust_line.asset)
                 op = cls.revoke_trustline_sponsorship(account_id, asset, source)
             elif ledger_key_type == stellar_xdr.LedgerEntryType.OFFER:
                 assert ledger_key.offer is not None
@@ -431,6 +484,14 @@ class RevokeSponsorship(Operation):
                 )
                 balance_id = binascii.hexlify(balance_id_bytes).decode()
                 op = cls.revoke_claimable_balance_sponsorship(balance_id, source)
+            elif ledger_key_type == stellar_xdr.LedgerEntryType.LIQUIDITY_POOL:
+                assert ledger_key.liquidity_pool is not None
+                assert ledger_key.liquidity_pool.liquidity_pool_id is not None
+                assert ledger_key.liquidity_pool.liquidity_pool_id.pool_id is not None
+                liquidity_pool_id = (
+                    ledger_key.liquidity_pool.liquidity_pool_id.pool_id.hash.hex()
+                )
+                op = cls.revoke_liquidity_pool_sponsorship(liquidity_pool_id, source)
             else:
                 raise ValueError(f"{ledger_key_type} is an unsupported LedgerKey type.")
         elif op_type == stellar_xdr.RevokeSponsorshipType.REVOKE_SPONSORSHIP_SIGNER:
@@ -450,6 +511,21 @@ class RevokeSponsorship(Operation):
             raise ValueError(f"{op_type} is an unsupported RevokeSponsorship type.")
         return op
 
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, self.__class__):
+            return NotImplemented  # pragma: no cover
+        return (
+            self.revoke_sponsorship_type == other.revoke_sponsorship_type
+            and self.account_id == other.account_id
+            and self.trustline == other.trustline
+            and self.offer == other.offer
+            and self.data == other.data
+            and self.claimable_balance_id == other.claimable_balance_id
+            and self.liquidity_pool_id == other.liquidity_pool_id
+            and self.signer == other.signer
+            and self.source == other.source
+        )
+
     def __str__(self):
         return (
             f"<RevokeSponsorship [revoke_sponsorship_type={self.revoke_sponsorship_type}, "
@@ -458,6 +534,7 @@ class RevokeSponsorship(Operation):
             f"offer={self.offer}, "
             f"data={self.data}, "
             f"claimable_balance_id={self.claimable_balance_id}, "
+            f"liquidity_pool_id={self.liquidity_pool_id}, "
             f"signer={self.signer}, "
             f"source={self.source}]>"
         )

@@ -111,7 +111,7 @@ class Asset:
         assert isinstance(asset_xdr, stellar_xdr.Asset)
         return asset_xdr
 
-    def to_change_trust_xdr_object(self) -> stellar_xdr.ChangeTrustAsset:
+    def to_change_trust_asset_xdr_object(self) -> stellar_xdr.ChangeTrustAsset:
         """Returns the xdr object for this asset.
 
         :return: XDR ChangeTrustAsset object
@@ -120,7 +120,7 @@ class Asset:
         assert isinstance(asset_xdr, stellar_xdr.ChangeTrustAsset)
         return asset_xdr
 
-    def to_trust_line_xdr_object(self) -> stellar_xdr.TrustLineAsset:
+    def to_trust_line_asset_xdr_object(self) -> stellar_xdr.TrustLineAsset:
         """Returns the xdr object for this asset.
 
         :return: XDR TrustLineAsset object

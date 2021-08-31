@@ -17,6 +17,8 @@ from stellar_sdk import (
     TimeBounds,
     TransactionBuilder,
     TrustLineFlags,
+    LIQUIDITY_POOL_FEE_V18,
+    LiquidityPoolAsset,
 )
 
 
@@ -38,8 +40,9 @@ class TestTransactionBuilder:
                 "GDF5O4OWEMVBY5FLDHWA5RZTYSV2U276XGKZZ6VSHDDR3THSQ6OQS7UM",
             )
             .append_change_trust_op(
-                "XCN",
-                "GDF5O4OWEMVBY5FLDHWA5RZTYSV2U276XGKZZ6VSHDDR3THSQ6OQS7UM",
+                Asset(
+                    "XCN", "GDF5O4OWEMVBY5FLDHWA5RZTYSV2U276XGKZZ6VSHDDR3THSQ6OQS7UM"
+                ),
                 "100000",
             )
             .append_payment_op(
@@ -200,8 +203,9 @@ class TestTransactionBuilder:
                 "GDF5O4OWEMVBY5FLDHWA5RZTYSV2U276XGKZZ6VSHDDR3THSQ6OQS7UM",
             )
             .append_change_trust_op(
-                "XCN",
-                "GDF5O4OWEMVBY5FLDHWA5RZTYSV2U276XGKZZ6VSHDDR3THSQ6OQS7UM",
+                Asset(
+                    "XCN", "GDF5O4OWEMVBY5FLDHWA5RZTYSV2U276XGKZZ6VSHDDR3THSQ6OQS7UM"
+                ),
                 "100000",
             )
             .append_payment_op(
@@ -447,6 +451,105 @@ class TestTransactionBuilder:
         )
 
         xdr = "AAAAAMvXcdYjKhx0qxnsDsczxKuqa/65lZz6sjjHHczyh50JAAAF3AAAAAAAAAACAAAAAQAAAABdUQHwAAAAAF1RKQAAAAABAAAAElN0ZWxsYXIgUHl0aG9uIFNESwAAAAAACgAAAAEAAAAAy9dx1iMqHHSrGewOxzPEq6pr/rmVnPqyOMcdzPKHnQkAAAAQAAAAAImHF95q/7Wv0UPkh++WcIkobMpLgYu4lWqjaLYRxRCxAAAAAQAAAADL13HWIyocdKsZ7A7HM8Srqmv+uZWc+rI4xx3M8oedCQAAABEAAAABAAAAAMvXcdYjKhx0qxnsDsczxKuqa/65lZz6sjjHHczyh50JAAAAEgAAAAAAAAAAAAAAAK1gNIgu88GxxOLHEUtaOtZ3EgJxdwUAWr2nLEdAISG3AAAAAQAAAADL13HWIyocdKsZ7A7HM8Srqmv+uZWc+rI4xx3M8oedCQAAABIAAAAAAAAAAQAAAACtYDSILvPBscTixxFLWjrWdxICcXcFAFq9pyxHQCEhtwAAAAAAAAABAAAAAMvXcdYjKhx0qxnsDsczxKuqa/65lZz6sjjHHczyh50JAAAAEgAAAAAAAAACAAAAAK1gNIgu88GxxOLHEUtaOtZ3EgJxdwUAWr2nLEdAISG3AAAAAAAAMBsAAAABAAAAAMvXcdYjKhx0qxnsDsczxKuqa/65lZz6sjjHHczyh50JAAAAEgAAAAAAAAADAAAAAK1gNIgu88GxxOLHEUtaOtZ3EgJxdwUAWr2nLEdAISG3AAAAB3N0ZWxsYXIAAAAAAQAAAADL13HWIyocdKsZ7A7HM8Srqmv+uZWc+rI4xx3M8oedCQAAABIAAAAAAAAABAAAAADaDVfafUhQ5/wQ0qnQ68cx96+0BXTAM5WxfUkUm5H1vgAAAAEAAAAAy9dx1iMqHHSrGewOxzPEq6pr/rmVnPqyOMcdzPKHnQkAAAASAAAAAQAAAACtYDSILvPBscTixxFLWjrWdxICcXcFAFq9pyxHQCEhtwAAAABtitgafkM4xC3KO9cbhCjTIbV+BJ+qggo7otpKV36aKgAAAAEAAAAAy9dx1iMqHHSrGewOxzPEq6pr/rmVnPqyOMcdzPKHnQkAAAASAAAAAQAAAACtYDSILvPBscTixxFLWjrWdxICcXcFAFq9pyxHQCEhtwAAAALaDVfafUhQ5/wQ0qnQ68cx96+0BXTAM5WxfUkUm5H1vgAAAAEAAAAAy9dx1iMqHHSrGewOxzPEq6pr/rmVnPqyOMcdzPKHnQkAAAASAAAAAQAAAACtYDSILvPBscTixxFLWjrWdxICcXcFAFq9pyxHQCEhtwAAAAHaDVfafUhQ5/wQ0qnQ68cx96+0BXTAM5WxfUkUm5H1vgAAAAAAAAAA"
+        assert te.to_xdr() == xdr
+        restore_te = TransactionBuilder.from_xdr(
+            xdr, Network.TESTNET_NETWORK_PASSPHRASE
+        ).build()
+        assert restore_te.to_xdr() == xdr
+
+    def test_to_xdr_liquidity_pool_deposit(self):
+        sequence = 1
+        source = Account(
+            "GDF5O4OWEMVBY5FLDHWA5RZTYSV2U276XGKZZ6VSHDDR3THSQ6OQS7UM", sequence
+        )
+        builder = TransactionBuilder(
+            source, Network.TESTNET_NETWORK_PASSPHRASE, base_fee=100, v1=True
+        )
+        builder.add_time_bounds(0, 0)
+        op_source = "GDF5O4OWEMVBY5FLDHWA5RZTYSV2U276XGKZZ6VSHDDR3THSQ6OQS7UM"
+        te = builder.append_liquidity_pool_deposit_op(
+            "dd7b1ab831c273310ddbec6f97870aa83c2fbd78ce22aded37ecbf4f3380fac7",
+            "10",
+            "20",
+            "0.45",
+            "0.55",
+            op_source,
+        ).build()
+        xdr = "AAAAAgAAAADL13HWIyocdKsZ7A7HM8Srqmv+uZWc+rI4xx3M8oedCQAAAGQAAAAAAAAAAgAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAABAAAAAMvXcdYjKhx0qxnsDsczxKuqa/65lZz6sjjHHczyh50JAAAAFt17GrgxwnMxDdvsb5eHCqg8L714ziKt7Tfsv08zgPrHAAAAAAX14QAAAAAAC+vCAAAAAAkAAAAUAAAACwAAABQAAAAAAAAAAA=="
+        assert te.to_xdr() == xdr
+        restore_te = TransactionBuilder.from_xdr(
+            xdr, Network.TESTNET_NETWORK_PASSPHRASE
+        ).build()
+        assert restore_te.to_xdr() == xdr
+
+    def test_to_xdr_liquidity_pool_withdraw(self):
+        sequence = 1
+        source = Account(
+            "GDF5O4OWEMVBY5FLDHWA5RZTYSV2U276XGKZZ6VSHDDR3THSQ6OQS7UM", sequence
+        )
+        builder = TransactionBuilder(
+            source, Network.TESTNET_NETWORK_PASSPHRASE, base_fee=100, v1=True
+        )
+        builder.add_time_bounds(0, 0)
+        op_source = "GDF5O4OWEMVBY5FLDHWA5RZTYSV2U276XGKZZ6VSHDDR3THSQ6OQS7UM"
+        te = builder.append_liquidity_pool_withdraw_op(
+            "dd7b1ab831c273310ddbec6f97870aa83c2fbd78ce22aded37ecbf4f3380fac7",
+            "5",
+            "10",
+            "20",
+            op_source,
+        ).build()
+        xdr = "AAAAAgAAAADL13HWIyocdKsZ7A7HM8Srqmv+uZWc+rI4xx3M8oedCQAAAGQAAAAAAAAAAgAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAABAAAAAMvXcdYjKhx0qxnsDsczxKuqa/65lZz6sjjHHczyh50JAAAAF917GrgxwnMxDdvsb5eHCqg8L714ziKt7Tfsv08zgPrHAAAAAAL68IAAAAAABfXhAAAAAAAL68IAAAAAAAAAAAA="
+        assert te.to_xdr() == xdr
+        restore_te = TransactionBuilder.from_xdr(
+            xdr, Network.TESTNET_NETWORK_PASSPHRASE
+        ).build()
+        assert restore_te.to_xdr() == xdr
+
+    def test_to_xdr_change_trust_liquidity_pool_asset(self):
+        sequence = 1
+        source = Account(
+            "GDF5O4OWEMVBY5FLDHWA5RZTYSV2U276XGKZZ6VSHDDR3THSQ6OQS7UM", sequence
+        )
+        builder = TransactionBuilder(
+            source, Network.TESTNET_NETWORK_PASSPHRASE, base_fee=100, v1=True
+        )
+        builder.add_time_bounds(0, 0)
+        op_source = "GDF5O4OWEMVBY5FLDHWA5RZTYSV2U276XGKZZ6VSHDDR3THSQ6OQS7UM"
+        asset_a = Asset(
+            "ARST", "GB7TAYRUZGE6TVT7NHP5SMIZRNQA6PLM423EYISAOAP3MKYIQMVYP2JO"
+        )
+        asset_b = Asset(
+            "USD", "GCEZWKCA5VLDNRLN3RPRJMRZOX3Z6G5CHCGSNFHEYVXM3XOJMDS674JZ"
+        )
+        fee = LIQUIDITY_POOL_FEE_V18
+        asset = LiquidityPoolAsset(asset_a, asset_b, fee)
+
+        te = builder.append_change_trust_op(
+            asset, limit="10000", source=op_source
+        ).build()
+        xdr = "AAAAAgAAAADL13HWIyocdKsZ7A7HM8Srqmv+uZWc+rI4xx3M8oedCQAAAGQAAAAAAAAAAgAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAABAAAAAMvXcdYjKhx0qxnsDsczxKuqa/65lZz6sjjHHczyh50JAAAABgAAAAMAAAAAAAAAAUFSU1QAAAAAfzBiNMmJ6dZ/ad/ZMRmLYA89bOa2TCJAcB+2KwiDK4cAAAABVVNEAAAAAACJmyhA7VY2xW3cXxSyOXX3nxuiOI0mlOTFbs3dyWDl7wAAAB4AAAAXSHboAAAAAAAAAAAA"
+        assert te.to_xdr() == xdr
+        restore_te = TransactionBuilder.from_xdr(
+            xdr, Network.TESTNET_NETWORK_PASSPHRASE
+        ).build()
+        assert restore_te.to_xdr() == xdr
+
+    def test_to_xdr_revoke_liquidity_pool_sponsorship(self):
+        sequence = 1
+        source = Account(
+            "GDF5O4OWEMVBY5FLDHWA5RZTYSV2U276XGKZZ6VSHDDR3THSQ6OQS7UM", sequence
+        )
+        builder = TransactionBuilder(
+            source, Network.TESTNET_NETWORK_PASSPHRASE, base_fee=100, v1=True
+        )
+        builder.add_time_bounds(0, 0)
+        op_source = "GDF5O4OWEMVBY5FLDHWA5RZTYSV2U276XGKZZ6VSHDDR3THSQ6OQS7UM"
+        te = builder.append_revoke_liquidity_pool_sponsorship_op(
+            "dd7b1ab831c273310ddbec6f97870aa83c2fbd78ce22aded37ecbf4f3380fac7",
+            op_source,
+        ).build()
+        xdr = "AAAAAgAAAADL13HWIyocdKsZ7A7HM8Srqmv+uZWc+rI4xx3M8oedCQAAAGQAAAAAAAAAAgAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAABAAAAAMvXcdYjKhx0qxnsDsczxKuqa/65lZz6sjjHHczyh50JAAAAEgAAAAAAAAAF3XsauDHCczEN2+xvl4cKqDwvvXjOIq3tN+y/TzOA+scAAAAAAAAAAA=="
         assert te.to_xdr() == xdr
         restore_te = TransactionBuilder.from_xdr(
             xdr, Network.TESTNET_NETWORK_PASSPHRASE

@@ -298,6 +298,17 @@ Keypair
    :members:
    :inherited-members:
 
+LiquidityPoolAsset
+^^^^^^^^^^^^^^^^^^
+.. autodata:: stellar_sdk.liquidity_pool_asset.LIQUIDITY_POOL_FEE_V18
+.. autoclass:: stellar_sdk.liquidity_pool_asset.LiquidityPoolAsset
+   :members:
+
+LiquidityPoolId
+^^^^^^^^^^^^^^^
+.. autoclass:: stellar_sdk.liquidity_pool_id.LiquidityPoolId
+   :members:
+
 Memo
 ^^^^
 
@@ -356,11 +367,6 @@ Operation
    :members:
    :inherited-members:
 
-OperationType
--------------
-.. autoclass:: stellar_sdk.operation.operation_type.OperationType
-   :members:
-
 AccountMerge
 ------------
 .. autoclass:: stellar_sdk.operation.AccountMerge
@@ -397,6 +403,16 @@ CreatePassiveSellOffer
 Inflation
 ---------
 .. autoclass:: stellar_sdk.operation.Inflation
+   :members: to_xdr_object, from_xdr_object
+
+LiquidityPoolDeposit
+--------------------
+.. autoclass:: stellar_sdk.operation.LiquidityPoolDeposit
+   :members: to_xdr_object, from_xdr_object
+
+LiquidityPoolWithdraw
+---------------------
+.. autoclass:: stellar_sdk.operation.LiquidityPoolWithdraw
    :members: to_xdr_object, from_xdr_object
 
 ManageBuyOffer

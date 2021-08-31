@@ -1,3 +1,4 @@
+import re
 from decimal import Decimal
 from typing import Optional, Union
 
@@ -59,3 +60,11 @@ def parse_mux_account_from_account(account: Union[str, MuxedAccount]) -> MuxedAc
     if isinstance(account, str):
         return MuxedAccount.from_account(account)
     return account
+
+
+# TODO: refactor this in next major release
+def is_valid_hash(data: str) -> bool:
+    if not data:
+        return False
+    asset_code_re = re.compile(r"^[a-zA-Z0-9]{64}$")
+    return bool(asset_code_re.match(data))
