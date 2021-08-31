@@ -10,7 +10,7 @@ from stellar_sdk.exceptions import BadRequestError, NotFoundError, NotPageableEr
 class TestBaseCallBuilder:
     @pytest.mark.asyncio
     async def test_get_data_async(self):
-        url = "https://httpbin.org/get"
+        url = "https://httpbin.overcat.me/get"
         client = AiohttpClient()
         resp = (
             await BaseCallBuilder(url, client)
@@ -26,10 +26,10 @@ class TestBaseCallBuilder:
         ] == "py-stellar-sdk/{}/AiohttpClient".format(__version__)
         assert resp["headers"]["X-Client-Name"] == "py-stellar-sdk"
         assert resp["headers"]["X-Client-Version"] == __version__
-        assert resp["url"] == "https://httpbin.org/get?cursor=89777&order=asc&limit=25"
+        assert resp["url"] == "https://httpbin.overcat.me/get?cursor=89777&order=asc&limit=25"
 
     def test_get_data_sync(self):
-        url = "https://httpbin.org/get"
+        url = "https://httpbin.overcat.me/get"
         client = RequestsClient()
         resp = (
             BaseCallBuilder(url, client).limit(10).cursor(10086).order(desc=True).call()
@@ -40,7 +40,7 @@ class TestBaseCallBuilder:
         ] == "py-stellar-sdk/{}/RequestsClient".format(__version__)
         assert resp["headers"]["X-Client-Name"] == "py-stellar-sdk"
         assert resp["headers"]["X-Client-Version"] == __version__
-        assert resp["url"] == "https://httpbin.org/get?limit=10&cursor=10086&order=desc"
+        assert resp["url"] == "https://httpbin.overcat.me/get?limit=10&cursor=10086&order=desc"
 
     @pytest.mark.slow
     @pytest.mark.asyncio
@@ -140,7 +140,7 @@ class TestBaseCallBuilder:
         assert exception.extras is None
 
     def test_get_data_no_link(self):
-        url = "https://httpbin.org/get"
+        url = "https://httpbin.overcat.me/get"
         client = RequestsClient()
         call_builder = (
             BaseCallBuilder(url, client).limit(10).cursor(10086).order(desc=True)
@@ -150,7 +150,7 @@ class TestBaseCallBuilder:
         assert call_builder.prev_href is None
 
     def test_get_data_not_pageable_raise(self):
-        url = "https://httpbin.org/get"
+        url = "https://httpbin.overcat.me/get"
         client = RequestsClient()
         call_builder = (
             BaseCallBuilder(url, client).limit(10).cursor(10086).order(desc=True)
@@ -209,7 +209,7 @@ class TestBaseCallBuilder:
         }
 
     def test_horizon_url_params(self):
-        url = "https://httpbin.org/get?version=1.2&auth=myPassw0wd"
+        url = "https://httpbin.overcat.me/get?version=1.2&auth=myPassw0wd"
         client = RequestsClient()
         resp = (
             BaseCallBuilder(url, client).limit(10).cursor(10086).order(desc=True).call()
@@ -228,5 +228,5 @@ class TestBaseCallBuilder:
         assert resp["headers"]["X-Client-Version"] == __version__
         assert (
             resp["url"]
-            == "https://httpbin.org/get?version=1.2&auth=myPassw0wd&limit=10&cursor=10086&order=desc"
+            == "https://httpbin.overcat.me/get?version=1.2&auth=myPassw0wd&limit=10&cursor=10086&order=desc"
         )

@@ -7,7 +7,7 @@ class TestResponse:
             status_code=200,
             text='{"a": "b", "c": "d"}',
             headers={"User-Agent": "Stellar"},
-            url="https://httpbin.org",
+            url="https://httpbin.overcat.me",
         )
         assert resp.json() == {"a": "b", "c": "d"}
 
@@ -16,21 +16,21 @@ class TestResponse:
             status_code=200,
             text="{'a': 'b', 'c': 'd'}",
             headers={"User-Agent": "Stellar"},
-            url="https://httpbin.org",
+            url="https://httpbin.overcat.me",
         )
 
         resp2 = Response(
             status_code=200,
             text="{'a': 'b', 'c': 'd'}",
             headers={"User-Agent": "Stellar"},
-            url="https://httpbin.org",
+            url="https://httpbin.overcat.me",
         )
 
         resp3 = Response(
             status_code=404,
             text="{'a': 'b', 'c': 'd'}",
             headers={"User-Agent": "Stellar"},
-            url="https://httpbin.org",
+            url="https://httpbin.overcat.me",
         )
 
         resp4 = "BAD TYPE"
