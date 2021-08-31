@@ -68,3 +68,15 @@ class AccountsCallBuilder(BaseCallBuilder):
         """
         self._add_query_param("sponsor", sponsor)
         return self
+
+    def for_liquidity_pool(self, liquidity_pool_id: str) -> "AccountsCallBuilder":
+        """Filtering accounts who have a trustline for the given pool. The result is a list of accounts.
+
+        See `Account Details <https://developers.stellar.org/api/resources/accounts/single/>`_
+
+        :param liquidity_pool_id: The ID of the liquidity pool in hex string.,
+            for example: `dd7b1ab831c273310ddbec6f97870aa83c2fbd78ce22aded37ecbf4f3380fac7`
+        :return: current AccountCallBuilder instance
+        """
+        self._add_query_param("liquidity_pool", liquidity_pool_id)
+        return self

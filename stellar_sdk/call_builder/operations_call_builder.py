@@ -84,6 +84,17 @@ class OperationsCallBuilder(BaseCallBuilder):
         self.endpoint = f"claimable_balances/{claimable_balance_id}/operations"
         return self
 
+    def for_liquidity_pool(self, liquidity_pool_id: str) -> "OperationsCallBuilder":
+        """This endpoint represents all operations that are part of a given liquidity pool.
+
+        TODO: docs link
+
+        :param liquidity_pool_id: The ID of the liquidity pool in hex string.
+        :return: this OperationCallBuilder instance
+        """
+        self.endpoint = f"liquidity_pools/{liquidity_pool_id}/operations"
+        return self
+
     def include_failed(self, include_failed: bool) -> "OperationsCallBuilder":
         """Adds a parameter defining whether to include failed transactions. By default only
         operations of successful transactions are returned.

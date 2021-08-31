@@ -73,6 +73,12 @@ LedgersCallBuilder
    :members:
    :inherited-members:
 
+LiquidityPoolsBuilder
+---------------------
+.. autoclass:: stellar_sdk.call_builder.LiquidityPoolsBuilder
+   :members:
+   :inherited-members:
+
 OffersCallBuilder
 ---------------------
 .. autoclass:: stellar_sdk.call_builder.OffersCallBuilder

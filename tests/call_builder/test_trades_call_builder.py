@@ -36,3 +36,11 @@ class TestTradesCallBuilder:
             "base_asset_issuer": base.issuer,
             "counter_asset_type": counter.type,
         }
+
+    def test_for_trade_type(self):
+        trade_type = "liquidity_pools"
+        builder = TradesCallBuilder(horizon_url, client).for_trade_type(trade_type)
+        assert builder.endpoint == "trades"
+        assert builder.params == {
+            "trade_type": trade_type,
+        }

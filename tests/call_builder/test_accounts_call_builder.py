@@ -35,3 +35,13 @@ class TestAccountsCallBuilder:
         builder = AccountsCallBuilder(horizon_url, client).for_sponsor(sponsor)
         assert builder.endpoint == "accounts"
         assert builder.params == {"sponsor": sponsor}
+
+    def test_for_liquidity_pool(self):
+        liquidity_pool_id = (
+            "dd7b1ab831c273310ddbec6f97870aa83c2fbd78ce22aded37ecbf4f3380fac7"
+        )
+        builder = AccountsCallBuilder(horizon_url, client).for_liquidity_pool(
+            liquidity_pool_id
+        )
+        assert builder.endpoint == "accounts"
+        assert builder.params == {"liquidity_pool": liquidity_pool_id}

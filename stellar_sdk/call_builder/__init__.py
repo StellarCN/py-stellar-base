@@ -6,6 +6,7 @@ from .data_call_builder import *
 from .effects_call_builder import *
 from .fee_stats_call_builder import *
 from .ledgers_call_builder import *
+from .liquidity_pools_builder import *
 from .offers_call_builder import *
 from .operations_call_builder import *
 from .orderbook_call_builder import *

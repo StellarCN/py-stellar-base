@@ -10,6 +10,7 @@ from .call_builder.data_call_builder import DataCallBuilder
 from .call_builder.effects_call_builder import EffectsCallBuilder
 from .call_builder.fee_stats_call_builder import FeeStatsCallBuilder
 from .call_builder.ledgers_call_builder import LedgersCallBuilder
+from .call_builder.liquidity_pools_builder import LiquidityPoolsBuilder
 from .call_builder.offers_call_builder import OffersCallBuilder
 from .call_builder.operations_call_builder import OperationsCallBuilder
 from .call_builder.orderbook_call_builder import OrderbookCallBuilder
@@ -229,6 +230,13 @@ class Server:
             a current Horizon server configuration.
         """
         return LedgersCallBuilder(horizon_url=self.horizon_url, client=self._client)
+
+    def liquidity_pools(self) -> LiquidityPoolsBuilder:
+        """
+        :return: New :class:`stellar_sdk.call_builder.LiquidityPoolsBuilder` object configured by
+            a current Horizon server configuration.
+        """
+        return LiquidityPoolsBuilder(horizon_url=self.horizon_url, client=self._client)
 
     def offers(self) -> OffersCallBuilder:
         """
