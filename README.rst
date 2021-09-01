@@ -68,7 +68,7 @@ Building transaction with synchronous server
 .. code-block:: python
 
     # Alice pay 10.25 XLM to Bob
-    from stellar_sdk import Server, Keypair, TransactionBuilder, Network
+    from stellar_sdk import Asset, Server, Keypair, TransactionBuilder, Network
 
     alice_keypair = Keypair.from_secret("SBFZCHU5645DOKRWYBXVOXY2ELGJKFRX6VGGPRYUWHQ7PMXXJNDZFMKD")
     bob_address = "GA7YNBW5CBTJZ3ZZOWX3ZNBKD6OE7A7IHUQVWMY62W2ZBG2SGZVOOPVH"
@@ -83,7 +83,7 @@ Building transaction with synchronous server
             base_fee=base_fee,
         )
         .add_text_memo("Hello, Stellar!")
-        .append_payment_op(bob_address, "10.25", "XLM")
+        .append_payment_op(bob_address, Asset.native(), "10.25")
         .build()
     )
     transaction.sign(alice_keypair)
@@ -98,7 +98,7 @@ Building transaction with synchronous server
     # Alice pay 10.25 XLM to Bob
     import asyncio
 
-    from stellar_sdk import Server, Keypair, TransactionBuilder, Network
+    from stellar_sdk import Asset, Server, Keypair, TransactionBuilder, Network
     from stellar_sdk.client.aiohttp_client import AiohttpClient
 
     alice_keypair = Keypair.from_secret("SBFZCHU5645DOKRWYBXVOXY2ELGJKFRX6VGGPRYUWHQ7PMXXJNDZFMKD")
@@ -118,7 +118,7 @@ Building transaction with synchronous server
                     base_fee=base_fee,
                 )
                 .add_text_memo("Hello, Stellar!")
-                .append_payment_op(bob_address, "10.25", "XLM")
+                .append_payment_op(bob_address, Asset.native(), "10.25")
                 .build()
             )
 

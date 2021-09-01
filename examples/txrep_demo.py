@@ -7,7 +7,7 @@ and then convert it back.
 
 See: https://github.com/stellar/stellar-protocol/blob/master/ecosystem/sep-0011.md
 """
-from stellar_sdk import Account, Keypair, Network, TransactionBuilder
+from stellar_sdk import Account, Keypair, Network, TransactionBuilder, Asset
 from stellar_sdk.sep.txrep import from_txrep, to_txrep
 
 source_secret_key = "SBFZCHU5645DOKRWYBXVOXY2ELGJKFRX6VGGPRYUWHQ7PMXXJNDZFMKD"
@@ -26,7 +26,7 @@ transaction = (
         base_fee=100,
     )
     .add_text_memo("Hello, Stellar!")
-    .append_payment_op(receiver_public_key, "350.1234567", "XLM")
+    .append_payment_op(receiver_public_key, Asset.native(), "350.1234567")
     .set_timeout(30)
     .build()
 )

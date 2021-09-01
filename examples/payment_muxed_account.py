@@ -1,6 +1,13 @@
 import pprint
 
-from stellar_sdk import Keypair, MuxedAccount, Network, Server, TransactionBuilder
+from stellar_sdk import (
+    Keypair,
+    MuxedAccount,
+    Network,
+    Server,
+    TransactionBuilder,
+    Asset,
+)
 
 horizon_url = "https://horizon-testnet.stellar.org/"
 network_passphrase = Network.TESTNET_NETWORK_PASSPHRASE
@@ -24,7 +31,7 @@ transaction = (
         network_passphrase=network_passphrase,
         base_fee=100,
     )
-    .append_payment_op(destination=bob_account, amount="100", asset_code="XLM")
+    .append_payment_op(destination=bob_account, amount="100", asset=Asset.native())
     .build()
 )
 

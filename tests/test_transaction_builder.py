@@ -47,16 +47,16 @@ class TestTransactionBuilder:
             )
             .append_payment_op(
                 "GAXN7HZQTHIPW7N2HGPAXMR42LPJ5VLYXMCCOX4D3JC4CQZGID3UYUPF",
+                Asset.native(),
                 "12.25",
-                "XLM",
             )
             .append_path_payment_strict_receive_op(
                 "GAXN7HZQTHIPW7N2HGPAXMR42LPJ5VLYXMCCOX4D3JC4CQZGID3UYUPF",
-                "XLM",
-                None,
+                Asset.native(),
                 "100",
-                "XCN",
-                "GDF5O4OWEMVBY5FLDHWA5RZTYSV2U276XGKZZ6VSHDDR3THSQ6OQS7UM",
+                Asset(
+                    "XCN", "GDF5O4OWEMVBY5FLDHWA5RZTYSV2U276XGKZZ6VSHDDR3THSQ6OQS7UM"
+                ),
                 "1000.5",
                 [
                     Asset(
@@ -71,11 +71,11 @@ class TestTransactionBuilder:
             )
             .append_path_payment_strict_send_op(
                 "GAXN7HZQTHIPW7N2HGPAXMR42LPJ5VLYXMCCOX4D3JC4CQZGID3UYUPF",
-                "XLM",
-                None,
+                Asset.native(),
                 "100",
-                "XCN",
-                "GDF5O4OWEMVBY5FLDHWA5RZTYSV2U276XGKZZ6VSHDDR3THSQ6OQS7UM",
+                Asset(
+                    "XCN", "GDF5O4OWEMVBY5FLDHWA5RZTYSV2U276XGKZZ6VSHDDR3THSQ6OQS7UM"
+                ),
                 "1000.5",
                 [
                     Asset(
@@ -124,27 +124,27 @@ class TestTransactionBuilder:
             .append_manage_data_op("hello", "overcat")
             .append_bump_sequence_op(10)
             .append_manage_buy_offer_op(
-                "XCN",
-                "GCN4HBZGFPOAI5DF4YQIS6OBC6KJKDC7CJSS5B4FWEXMJSWOPEYABLSD",
-                "XLM",
-                None,
+                Asset(
+                    "XCN", "GCN4HBZGFPOAI5DF4YQIS6OBC6KJKDC7CJSS5B4FWEXMJSWOPEYABLSD"
+                ),
+                Asset.native(),
                 "10.5",
                 "11.25",
             )
             .append_manage_sell_offer_op(
-                "XLM",
-                None,
-                "XCN",
-                "GCN4HBZGFPOAI5DF4YQIS6OBC6KJKDC7CJSS5B4FWEXMJSWOPEYABLSD",
+                Asset.native(),
+                Asset(
+                    "XCN", "GCN4HBZGFPOAI5DF4YQIS6OBC6KJKDC7CJSS5B4FWEXMJSWOPEYABLSD"
+                ),
                 "10.5",
                 Price(8, 9),
                 10086,
             )
             .append_create_passive_sell_offer_op(
-                "XCN",
-                "GCN4HBZGFPOAI5DF4YQIS6OBC6KJKDC7CJSS5B4FWEXMJSWOPEYABLSD",
-                "XLM",
-                None,
+                Asset(
+                    "XCN", "GCN4HBZGFPOAI5DF4YQIS6OBC6KJKDC7CJSS5B4FWEXMJSWOPEYABLSD"
+                ),
+                Asset.native(),
                 "10.5",
                 "11.25",
             )
@@ -210,16 +210,16 @@ class TestTransactionBuilder:
             )
             .append_payment_op(
                 "GAXN7HZQTHIPW7N2HGPAXMR42LPJ5VLYXMCCOX4D3JC4CQZGID3UYUPF",
+                Asset.native(),
                 "12.25",
-                "XLM",
             )
             .append_path_payment_strict_receive_op(
                 "GAXN7HZQTHIPW7N2HGPAXMR42LPJ5VLYXMCCOX4D3JC4CQZGID3UYUPF",
-                "XLM",
-                None,
+                Asset.native(),
                 "100",
-                "XCN",
-                "GDF5O4OWEMVBY5FLDHWA5RZTYSV2U276XGKZZ6VSHDDR3THSQ6OQS7UM",
+                Asset(
+                    "XCN", "GCN4HBZGFPOAI5DF4YQIS6OBC6KJKDC7CJSS5B4FWEXMJSWOPEYABLSD"
+                ),
                 "1000.5",
                 [
                     Asset(
@@ -234,11 +234,11 @@ class TestTransactionBuilder:
             )
             .append_path_payment_strict_send_op(
                 "GAXN7HZQTHIPW7N2HGPAXMR42LPJ5VLYXMCCOX4D3JC4CQZGID3UYUPF",
-                "XLM",
-                None,
+                Asset.native(),
                 "100",
-                "XCN",
-                "GDF5O4OWEMVBY5FLDHWA5RZTYSV2U276XGKZZ6VSHDDR3THSQ6OQS7UM",
+                Asset(
+                    "XCN", "GCN4HBZGFPOAI5DF4YQIS6OBC6KJKDC7CJSS5B4FWEXMJSWOPEYABLSD"
+                ),
                 "1000.5",
                 [
                     Asset(
@@ -287,27 +287,27 @@ class TestTransactionBuilder:
             .append_manage_data_op("hello", "overcat")
             .append_bump_sequence_op(10)
             .append_manage_buy_offer_op(
-                "XCN",
-                "GCN4HBZGFPOAI5DF4YQIS6OBC6KJKDC7CJSS5B4FWEXMJSWOPEYABLSD",
-                "XLM",
-                None,
+                Asset(
+                    "XCN", "GCN4HBZGFPOAI5DF4YQIS6OBC6KJKDC7CJSS5B4FWEXMJSWOPEYABLSD"
+                ),
+                Asset.native(),
                 "10.5",
                 "11.25",
             )
             .append_manage_sell_offer_op(
-                "XLM",
-                None,
-                "XCN",
-                "GCN4HBZGFPOAI5DF4YQIS6OBC6KJKDC7CJSS5B4FWEXMJSWOPEYABLSD",
+                Asset.native(),
+                Asset(
+                    "XCN", "GCN4HBZGFPOAI5DF4YQIS6OBC6KJKDC7CJSS5B4FWEXMJSWOPEYABLSD"
+                ),
                 "10.5",
                 Price(8, 9),
                 10086,
             )
             .append_create_passive_sell_offer_op(
-                "XCN",
-                "GCN4HBZGFPOAI5DF4YQIS6OBC6KJKDC7CJSS5B4FWEXMJSWOPEYABLSD",
-                "XLM",
-                None,
+                Asset(
+                    "XCN", "GCN4HBZGFPOAI5DF4YQIS6OBC6KJKDC7CJSS5B4FWEXMJSWOPEYABLSD"
+                ),
+                Asset.native(),
                 "10.5",
                 "11.25",
             )

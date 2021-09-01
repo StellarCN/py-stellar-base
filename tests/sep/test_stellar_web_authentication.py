@@ -4,7 +4,7 @@ import time
 
 import pytest
 
-from stellar_sdk import Account, Keypair, MuxedAccount, Network
+from stellar_sdk import Account, Keypair, MuxedAccount, Network, Asset
 from stellar_sdk.exceptions import ValueError
 from stellar_sdk.operation import ManageData
 from stellar_sdk.sep.ed25519_public_key_signer import Ed25519PublicKeySigner
@@ -1735,7 +1735,9 @@ class TestStellarWebAuthentication:
             TransactionBuilder(
                 inner_source, Network.TESTNET_NETWORK_PASSPHRASE, 200, v1=True
             )
-            .append_payment_op(destination=destination, amount=amount, asset_code="XLM")
+            .append_payment_op(
+                destination=destination, amount=amount, asset=Asset.native()
+            )
             .add_time_bounds(0, 0)
             .build()
         )

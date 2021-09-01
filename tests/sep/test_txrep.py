@@ -42,8 +42,9 @@ class TestTxrep:
         transaction_builder.add_time_bounds(1535756672, 1567292672)
         transaction_builder.append_payment_op(
             destination="GBAF6NXN3DHSF357QBZLTBNWUTABKUODJXJYYE32ZDKA2QBM2H33IK6O",
-            asset_code="USD",
-            asset_issuer="GAZFEVBSEGJJ63WPVVIWXLZLWN2JYZECECGT6GUNP4FJDVZVNXWQWMYI",
+            asset=Asset(
+                "USD", "GAZFEVBSEGJJ63WPVVIWXLZLWN2JYZECECGT6GUNP4FJDVZVNXWQWMYI"
+            ),
             amount="40.0004",
             source=keypair.public_key,
         )
@@ -72,8 +73,9 @@ class TestTxrep:
         transaction_builder.add_time_bounds(1535756672, 1567292672)
         transaction_builder.append_payment_op(
             destination="GBAF6NXN3DHSF357QBZLTBNWUTABKUODJXJYYE32ZDKA2QBM2H33IK6O",
-            asset_code="USD",
-            asset_issuer="GAZFEVBSEGJJ63WPVVIWXLZLWN2JYZECECGT6GUNP4FJDVZVNXWQWMYI",
+            asset=Asset(
+                "USD", "GAZFEVBSEGJJ63WPVVIWXLZLWN2JYZECECGT6GUNP4FJDVZVNXWQWMYI"
+            ),
             amount="40.0004",
             source=keypair.public_key,
         )
@@ -100,8 +102,9 @@ class TestTxrep:
         transaction_builder.add_time_bounds(1535756672, 1567292672)
         transaction_builder.append_payment_op(
             destination="GBAF6NXN3DHSF357QBZLTBNWUTABKUODJXJYYE32ZDKA2QBM2H33IK6O",
-            asset_code="USD",
-            asset_issuer="GAZFEVBSEGJJ63WPVVIWXLZLWN2JYZECECGT6GUNP4FJDVZVNXWQWMYI",
+            asset=Asset(
+                "USD", "GAZFEVBSEGJJ63WPVVIWXLZLWN2JYZECECGT6GUNP4FJDVZVNXWQWMYI"
+            ),
             amount="40.0004",
             source=keypair.public_key,
         )
@@ -128,8 +131,9 @@ class TestTxrep:
         transaction_builder.add_time_bounds(1535756672, 1567292672)
         transaction_builder.append_payment_op(
             destination="GBAF6NXN3DHSF357QBZLTBNWUTABKUODJXJYYE32ZDKA2QBM2H33IK6O",
-            asset_code="USD",
-            asset_issuer="GAZFEVBSEGJJ63WPVVIWXLZLWN2JYZECECGT6GUNP4FJDVZVNXWQWMYI",
+            asset=Asset(
+                "USD", "GAZFEVBSEGJJ63WPVVIWXLZLWN2JYZECECGT6GUNP4FJDVZVNXWQWMYI"
+            ),
             amount="40.0004",
             source=keypair.public_key,
         )
@@ -156,8 +160,9 @@ class TestTxrep:
         transaction_builder.add_time_bounds(1535756672, 1567292672)
         transaction_builder.append_payment_op(
             destination="GBAF6NXN3DHSF357QBZLTBNWUTABKUODJXJYYE32ZDKA2QBM2H33IK6O",
-            asset_code="USD",
-            asset_issuer="GAZFEVBSEGJJ63WPVVIWXLZLWN2JYZECECGT6GUNP4FJDVZVNXWQWMYI",
+            asset=Asset(
+                "USD", "GAZFEVBSEGJJ63WPVVIWXLZLWN2JYZECECGT6GUNP4FJDVZVNXWQWMYI"
+            ),
             amount="40.0004",
             source=keypair.public_key,
         )
@@ -184,8 +189,9 @@ class TestTxrep:
         transaction_builder.add_time_bounds(1535756672, 1567292672)
         transaction_builder.append_payment_op(
             destination="GBAF6NXN3DHSF357QBZLTBNWUTABKUODJXJYYE32ZDKA2QBM2H33IK6O",
-            asset_code="USD",
-            asset_issuer="GAZFEVBSEGJJ63WPVVIWXLZLWN2JYZECECGT6GUNP4FJDVZVNXWQWMYI",
+            asset=Asset(
+                "USD", "GAZFEVBSEGJJ63WPVVIWXLZLWN2JYZECECGT6GUNP4FJDVZVNXWQWMYI"
+            ),
             amount="40.0004",
             source=keypair.public_key,
         )
@@ -211,8 +217,9 @@ class TestTxrep:
         transaction_builder.add_time_bounds(1535756672, 1567292672)
         transaction_builder.append_payment_op(
             destination="GBAF6NXN3DHSF357QBZLTBNWUTABKUODJXJYYE32ZDKA2QBM2H33IK6O",
-            asset_code="USD",
-            asset_issuer="GAZFEVBSEGJJ63WPVVIWXLZLWN2JYZECECGT6GUNP4FJDVZVNXWQWMYI",
+            asset=Asset(
+                "USD", "GAZFEVBSEGJJ63WPVVIWXLZLWN2JYZECECGT6GUNP4FJDVZVNXWQWMYI"
+            ),
             amount="40.0004",
         )
         te = transaction_builder.build()
@@ -237,8 +244,9 @@ class TestTxrep:
         transaction_builder.add_text_memo("Enjoy this transaction")
         transaction_builder.append_payment_op(
             destination="GBAF6NXN3DHSF357QBZLTBNWUTABKUODJXJYYE32ZDKA2QBM2H33IK6O",
-            asset_code="USD",
-            asset_issuer="GAZFEVBSEGJJ63WPVVIWXLZLWN2JYZECECGT6GUNP4FJDVZVNXWQWMYI",
+            asset=Asset(
+                "USD", "GAZFEVBSEGJJ63WPVVIWXLZLWN2JYZECECGT6GUNP4FJDVZVNXWQWMYI"
+            ),
             amount="40.0004",
             source=keypair.public_key,
         )
@@ -265,8 +273,9 @@ class TestTxrep:
         transaction_builder.add_time_bounds(1535756672, 1567292672)
         transaction_builder.append_payment_op(
             destination="GBAF6NXN3DHSF357QBZLTBNWUTABKUODJXJYYE32ZDKA2QBM2H33IK6O",
-            asset_code="USD",
-            asset_issuer="GAZFEVBSEGJJ63WPVVIWXLZLWN2JYZECECGT6GUNP4FJDVZVNXWQWMYI",
+            asset=Asset(
+                "USD", "GAZFEVBSEGJJ63WPVVIWXLZLWN2JYZECECGT6GUNP4FJDVZVNXWQWMYI"
+            ),
             amount="40.0004",
             source=keypair.public_key,
         )
@@ -292,8 +301,9 @@ class TestTxrep:
         transaction_builder.add_time_bounds(1535756672, 1567292672)
         transaction_builder.append_payment_op(
             destination="GBAF6NXN3DHSF357QBZLTBNWUTABKUODJXJYYE32ZDKA2QBM2H33IK6O",
-            asset_code="USD",
-            asset_issuer="GAZFEVBSEGJJ63WPVVIWXLZLWN2JYZECECGT6GUNP4FJDVZVNXWQWMYI",
+            asset=Asset(
+                "USD", "GAZFEVBSEGJJ63WPVVIWXLZLWN2JYZECECGT6GUNP4FJDVZVNXWQWMYI"
+            ),
             amount="40.0004",
             source=keypair.public_key,
         )
@@ -322,8 +332,9 @@ class TestTxrep:
         transaction_builder.add_time_bounds(1535756672, 1567292672)
         transaction_builder.append_payment_op(
             destination="GBAF6NXN3DHSF357QBZLTBNWUTABKUODJXJYYE32ZDKA2QBM2H33IK6O",
-            asset_code="USD",
-            asset_issuer="GAZFEVBSEGJJ63WPVVIWXLZLWN2JYZECECGT6GUNP4FJDVZVNXWQWMYI",
+            asset=Asset(
+                "USD", "GAZFEVBSEGJJ63WPVVIWXLZLWN2JYZECECGT6GUNP4FJDVZVNXWQWMYI"
+            ),
             amount="40.0004",
             source=keypair.public_key,
         )
@@ -352,8 +363,9 @@ class TestTxrep:
         transaction_builder.add_time_bounds(1535756672, 1567292672)
         transaction_builder.append_payment_op(
             destination="GBAF6NXN3DHSF357QBZLTBNWUTABKUODJXJYYE32ZDKA2QBM2H33IK6O",
-            asset_code="USD",
-            asset_issuer="GAZFEVBSEGJJ63WPVVIWXLZLWN2JYZECECGT6GUNP4FJDVZVNXWQWMYI",
+            asset=Asset(
+                "USD", "GAZFEVBSEGJJ63WPVVIWXLZLWN2JYZECECGT6GUNP4FJDVZVNXWQWMYI"
+            ),
             amount="40.0004",
             source=keypair.public_key,
         )
@@ -380,18 +392,21 @@ class TestTxrep:
         transaction_builder.add_time_bounds(1535756672, 1567292672)
         transaction_builder.append_payment_op(
             destination="GBAF6NXN3DHSF357QBZLTBNWUTABKUODJXJYYE32ZDKA2QBM2H33IK6O",
-            asset_code="USD",
-            asset_issuer="GAZFEVBSEGJJ63WPVVIWXLZLWN2JYZECECGT6GUNP4FJDVZVNXWQWMYI",
+            asset=Asset(
+                "USD", "GAZFEVBSEGJJ63WPVVIWXLZLWN2JYZECECGT6GUNP4FJDVZVNXWQWMYI"
+            ),
             amount="40.0004",
             source=keypair.public_key,
         ),
         transaction_builder.append_path_payment_strict_receive_op(
             destination="GBAF6NXN3DHSF357QBZLTBNWUTABKUODJXJYYE32ZDKA2QBM2H33IK6O",
-            send_code="USD",
-            send_issuer="GAZFEVBSEGJJ63WPVVIWXLZLWN2JYZECECGT6GUNP4FJDVZVNXWQWMYI",
+            send_asset=Asset(
+                "USD", "GAZFEVBSEGJJ63WPVVIWXLZLWN2JYZECECGT6GUNP4FJDVZVNXWQWMYI"
+            ),
             send_max="10",
-            dest_code="XCN",
-            dest_issuer="GAYE5SDEM5JIEMGQ7LBMQVRQRVJB6A5E7AZVLJYFL3CNHLZX24DFD35F",
+            dest_asset=Asset(
+                "XCN", "GAYE5SDEM5JIEMGQ7LBMQVRQRVJB6A5E7AZVLJYFL3CNHLZX24DFD35F"
+            ),
             dest_amount="5.125",
             path=[
                 Asset(
@@ -405,20 +420,24 @@ class TestTxrep:
             source=keypair.public_key,
         )
         transaction_builder.append_manage_sell_offer_op(
-            selling_code="XCN",
-            selling_issuer="GAYE5SDEM5JIEMGQ7LBMQVRQRVJB6A5E7AZVLJYFL3CNHLZX24DFD35F",
-            buying_code="USD",
-            buying_issuer="GAZFEVBSEGJJ63WPVVIWXLZLWN2JYZECECGT6GUNP4FJDVZVNXWQWMYI",
+            selling=Asset(
+                "XCN", "GAYE5SDEM5JIEMGQ7LBMQVRQRVJB6A5E7AZVLJYFL3CNHLZX24DFD35F"
+            ),
+            buying=Asset(
+                "USD", "GAZFEVBSEGJJ63WPVVIWXLZLWN2JYZECECGT6GUNP4FJDVZVNXWQWMYI"
+            ),
             amount="100.123",
             price=Price(n=7, d=1),
             offer_id=12345,
             source=keypair.public_key,
         )
         transaction_builder.append_create_passive_sell_offer_op(
-            selling_code="XCN",
-            selling_issuer="GAYE5SDEM5JIEMGQ7LBMQVRQRVJB6A5E7AZVLJYFL3CNHLZX24DFD35F",
-            buying_code="USD",
-            buying_issuer="GAZFEVBSEGJJ63WPVVIWXLZLWN2JYZECECGT6GUNP4FJDVZVNXWQWMYI",
+            selling=Asset(
+                "XCN", "GAYE5SDEM5JIEMGQ7LBMQVRQRVJB6A5E7AZVLJYFL3CNHLZX24DFD35F"
+            ),
+            buying=Asset(
+                "USD", "GAZFEVBSEGJJ63WPVVIWXLZLWN2JYZECECGT6GUNP4FJDVZVNXWQWMYI"
+            ),
             amount="100.123",
             price="7.1",
             source=keypair.public_key,
@@ -471,21 +490,25 @@ class TestTxrep:
             bump_to=46489056724385800, source=keypair.public_key
         )
         transaction_builder.append_manage_buy_offer_op(
-            selling_code="XCN",
-            selling_issuer="GAYE5SDEM5JIEMGQ7LBMQVRQRVJB6A5E7AZVLJYFL3CNHLZX24DFD35F",
-            buying_code="USD",
-            buying_issuer="GAZFEVBSEGJJ63WPVVIWXLZLWN2JYZECECGT6GUNP4FJDVZVNXWQWMYI",
+            selling=Asset(
+                "XCN", "GAYE5SDEM5JIEMGQ7LBMQVRQRVJB6A5E7AZVLJYFL3CNHLZX24DFD35F"
+            ),
+            buying=Asset(
+                "USD", "GAZFEVBSEGJJ63WPVVIWXLZLWN2JYZECECGT6GUNP4FJDVZVNXWQWMYI"
+            ),
             amount="100.123",
             price="7.1",
             source=keypair.public_key,
         )
         transaction_builder.append_path_payment_strict_send_op(
             destination="GBAF6NXN3DHSF357QBZLTBNWUTABKUODJXJYYE32ZDKA2QBM2H33IK6O",
-            send_code="USD",
-            send_issuer="GAZFEVBSEGJJ63WPVVIWXLZLWN2JYZECECGT6GUNP4FJDVZVNXWQWMYI",
+            send_asset=Asset(
+                "USD", "GAZFEVBSEGJJ63WPVVIWXLZLWN2JYZECECGT6GUNP4FJDVZVNXWQWMYI"
+            ),
             send_amount="10",
-            dest_code="XCN",
-            dest_issuer="GAYE5SDEM5JIEMGQ7LBMQVRQRVJB6A5E7AZVLJYFL3CNHLZX24DFD35F",
+            dest_asset=Asset(
+                "XCN", "GAYE5SDEM5JIEMGQ7LBMQVRQRVJB6A5E7AZVLJYFL3CNHLZX24DFD35F"
+            ),
             dest_min="5.125",
             path=[
                 Asset(
@@ -650,8 +673,9 @@ class TestTxrep:
         transaction_builder.add_time_bounds(1535756672, 1567292672)
         transaction_builder.append_payment_op(
             destination="GBAF6NXN3DHSF357QBZLTBNWUTABKUODJXJYYE32ZDKA2QBM2H33IK6O",
-            asset_code="USD",
-            asset_issuer="GAZFEVBSEGJJ63WPVVIWXLZLWN2JYZECECGT6GUNP4FJDVZVNXWQWMYI",
+            asset=Asset(
+                "USD", "GAZFEVBSEGJJ63WPVVIWXLZLWN2JYZECECGT6GUNP4FJDVZVNXWQWMYI"
+            ),
             amount="40.0004",
             source=keypair.public_key,
         )
@@ -694,18 +718,21 @@ class TestTxrep:
         )
         transaction_builder.append_payment_op(
             destination="MBAF6NXN3DHSF357QBZLTBNWUTABKUODJXJYYE32ZDKA2QBM2H33IAAAAAAAAAAAAF7WE",
-            asset_code="USD",
-            asset_issuer="GAZFEVBSEGJJ63WPVVIWXLZLWN2JYZECECGT6GUNP4FJDVZVNXWQWMYI",
+            asset=Asset(
+                "USD", "GAZFEVBSEGJJ63WPVVIWXLZLWN2JYZECECGT6GUNP4FJDVZVNXWQWMYI"
+            ),
             amount="40.0004",
             source=account_muxed,
         )
         transaction_builder.append_path_payment_strict_receive_op(
             destination="MBCCOULOS5TNW5HEQLGZMF4HMJXWT47HKA5GOHCHF437SMXX3CWIQAAAAAAAAAAAAGFTY",
-            send_code="USD",
-            send_issuer="GAZFEVBSEGJJ63WPVVIWXLZLWN2JYZECECGT6GUNP4FJDVZVNXWQWMYI",
+            send_asset=Asset(
+                "USD", "GAZFEVBSEGJJ63WPVVIWXLZLWN2JYZECECGT6GUNP4FJDVZVNXWQWMYI"
+            ),
             send_max="10",
-            dest_code="XCN",
-            dest_issuer="GAYE5SDEM5JIEMGQ7LBMQVRQRVJB6A5E7AZVLJYFL3CNHLZX24DFD35F",
+            dest_asset=Asset(
+                "XCN", "GAYE5SDEM5JIEMGQ7LBMQVRQRVJB6A5E7AZVLJYFL3CNHLZX24DFD35F"
+            ),
             dest_amount="5.125",
             path=[
                 Asset(
@@ -720,11 +747,13 @@ class TestTxrep:
         )
         transaction_builder.append_path_payment_strict_send_op(
             destination="MATDIL6CGXI6HFQ7UPBGIJR5QNMGNPVVTTHIPZWIQ3AFCS2YO3M3CAAAAAAAAAAAAFGHU",
-            send_code="USD",
-            send_issuer="GAZFEVBSEGJJ63WPVVIWXLZLWN2JYZECECGT6GUNP4FJDVZVNXWQWMYI",
+            send_asset=Asset(
+                "USD", "GAZFEVBSEGJJ63WPVVIWXLZLWN2JYZECECGT6GUNP4FJDVZVNXWQWMYI"
+            ),
             send_amount="10",
-            dest_code="XCN",
-            dest_issuer="GAYE5SDEM5JIEMGQ7LBMQVRQRVJB6A5E7AZVLJYFL3CNHLZX24DFD35F",
+            dest_asset=Asset(
+                "XCN", "GAYE5SDEM5JIEMGQ7LBMQVRQRVJB6A5E7AZVLJYFL3CNHLZX24DFD35F"
+            ),
             dest_min="5.125",
             path=[
                 Asset(

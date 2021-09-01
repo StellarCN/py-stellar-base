@@ -11,7 +11,7 @@ See: https://developers.stellar.org/docs/glossary/fee-bumps/
 """
 import pprint
 
-from stellar_sdk import Keypair, Network, Server, TransactionBuilder
+from stellar_sdk import Keypair, Network, Server, TransactionBuilder, Asset
 from stellar_sdk.exceptions import BadRequestError
 
 horizon_url = "https://horizon-testnet.stellar.org/"
@@ -35,7 +35,9 @@ inner_tx = (
         base_fee=50,
         v1=True,
     )
-    .append_payment_op(destination=destination_address, amount="100", asset_code="XLM")
+    .append_payment_op(
+        destination=destination_address, amount="100", asset=Asset.native()
+    )
     .build()
 )
 inner_tx.sign(inner_source_keypair)

@@ -15,7 +15,7 @@ with the transaction has multiple public keys.
 
 See: https://developers.stellar.org/docs/glossary/multisig/
 """
-from stellar_sdk import Keypair, Network, Server, Signer, TransactionBuilder
+from stellar_sdk import Keypair, Network, Server, Signer, TransactionBuilder, Asset
 
 server = Server(horizon_url="https://horizon-testnet.stellar.org")
 root_keypair = Keypair.from_secret(
@@ -60,7 +60,7 @@ transaction = (
         network_passphrase=Network.TESTNET_NETWORK_PASSPHRASE,
         base_fee=100,
     )
-    .append_payment_op(destination=destination, amount="2000", asset_code="XLM")
+    .append_payment_op(destination=destination, amount="2000", asset=Asset.native())
     .set_timeout(30)
     .build()
 )
