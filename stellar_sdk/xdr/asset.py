@@ -4,8 +4,8 @@ import base64
 from xdrlib import Packer, Unpacker
 
 from ..exceptions import ValueError
-from .asset_alpha_num4 import AssetAlphaNum4
-from .asset_alpha_num12 import AssetAlphaNum12
+from .alpha_num4 import AlphaNum4
+from .alpha_num12 import AlphaNum12
 from .asset_type import AssetType
 
 __all__ = ["Asset"]
@@ -21,18 +21,10 @@ class Asset:
         void;
 
     case ASSET_TYPE_CREDIT_ALPHANUM4:
-        struct
-        {
-            AssetCode4 assetCode;
-            AccountID issuer;
-        } alphaNum4;
+        AlphaNum4 alphaNum4;
 
     case ASSET_TYPE_CREDIT_ALPHANUM12:
-        struct
-        {
-            AssetCode12 assetCode;
-            AccountID issuer;
-        } alphaNum12;
+        AlphaNum12 alphaNum12;
 
         // add other asset types here in the future
     };
@@ -42,8 +34,8 @@ class Asset:
     def __init__(
         self,
         type: AssetType,
-        alpha_num4: AssetAlphaNum4 = None,
-        alpha_num12: AssetAlphaNum12 = None,
+        alpha_num4: AlphaNum4 = None,
+        alpha_num12: AlphaNum12 = None,
     ) -> None:
         self.type = type
         self.alpha_num4 = alpha_num4
@@ -70,12 +62,12 @@ class Asset:
         if type == AssetType.ASSET_TYPE_NATIVE:
             return cls(type)
         if type == AssetType.ASSET_TYPE_CREDIT_ALPHANUM4:
-            alpha_num4 = AssetAlphaNum4.unpack(unpacker)
+            alpha_num4 = AlphaNum4.unpack(unpacker)
             if alpha_num4 is None:
                 raise ValueError("alpha_num4 should not be None.")
             return cls(type, alpha_num4=alpha_num4)
         if type == AssetType.ASSET_TYPE_CREDIT_ALPHANUM12:
-            alpha_num12 = AssetAlphaNum12.unpack(unpacker)
+            alpha_num12 = AlphaNum12.unpack(unpacker)
             if alpha_num12 is None:
                 raise ValueError("alpha_num12 should not be None.")
             return cls(type, alpha_num12=alpha_num12)

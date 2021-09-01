@@ -63,3 +63,17 @@ class TradesCallBuilder(BaseCallBuilder):
         """
         self.endpoint = f"accounts/{account_id}/trades"
         return self
+
+    def for_trade_type(self, trade_type: str) -> "TradesCallBuilder":
+        """Filter trades for a specific trade type
+
+        Horizon will reject requests which attempt to set
+        trade_type=liquidity_pools when using the offer id filter.
+
+        :param trade_type: trade type, the currently supported types are `orderbook`, `liquidity_pools` and `all`,
+            defaults to `all`.
+        :return: current TradesCallBuilder instance
+        """
+        params = {"trade_type": trade_type}
+        self._add_query_params(params)
+        return self

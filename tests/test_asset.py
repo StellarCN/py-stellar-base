@@ -101,7 +101,61 @@ class TestAsset:
         ],
     )
     def test_to_xdr_object(self, asset, xdr):
-        assert asset.to_xdr_object().to_xdr() == xdr
+        xdr_object = asset.to_xdr_object()
+        assert xdr_object.to_xdr() == xdr
+        assert Asset.from_xdr_object(xdr_object) == asset
+
+    @pytest.mark.parametrize(
+        "asset, xdr",
+        [
+            pytest.param(Asset.native(), "AAAAAA==", id="native"),
+            pytest.param(
+                Asset(
+                    "XCN", "GCNY5OXYSY4FKHOPT2SPOQZAOEIGXB5LBYW3HVU3OWSTQITS65M5RCNY"
+                ),
+                "AAAAAVhDTgAAAAAAm466+JY4VR3PnqT3QyBxEGuHqw4ts9abdaU4InL3Wdg=",
+                id="alphanum4",
+            ),
+            pytest.param(
+                Asset(
+                    "CATCOIN",
+                    "GDJVFDG5OCW5PYWHB64MGTHGFF57DRRJEDUEFDEL2SLNIOONHYJWHA3Z",
+                ),
+                "AAAAAkNBVENPSU4AAAAAAAAAAADTUozdcK3X4scPuMNM5il78cYpIOhCjIvUltQ5zT4TYw==",
+                id="alphanum12",
+            ),
+        ],
+    )
+    def test_to_xdr_trust_line_xdr_asset_object(self, asset: Asset, xdr):
+        xdr_object = asset.to_trust_line_asset_xdr_object()
+        assert xdr_object.to_xdr() == xdr
+        assert Asset.from_xdr_object(xdr_object) == asset
+
+    @pytest.mark.parametrize(
+        "asset, xdr",
+        [
+            pytest.param(Asset.native(), "AAAAAA==", id="native"),
+            pytest.param(
+                Asset(
+                    "XCN", "GCNY5OXYSY4FKHOPT2SPOQZAOEIGXB5LBYW3HVU3OWSTQITS65M5RCNY"
+                ),
+                "AAAAAVhDTgAAAAAAm466+JY4VR3PnqT3QyBxEGuHqw4ts9abdaU4InL3Wdg=",
+                id="alphanum4",
+            ),
+            pytest.param(
+                Asset(
+                    "CATCOIN",
+                    "GDJVFDG5OCW5PYWHB64MGTHGFF57DRRJEDUEFDEL2SLNIOONHYJWHA3Z",
+                ),
+                "AAAAAkNBVENPSU4AAAAAAAAAAADTUozdcK3X4scPuMNM5il78cYpIOhCjIvUltQ5zT4TYw==",
+                id="alphanum12",
+            ),
+        ],
+    )
+    def test_to_xdr_change_trust_xdr_asset_object(self, asset, xdr):
+        xdr_object = asset.to_change_trust_asset_xdr_object()
+        assert xdr_object.to_xdr() == xdr
+        assert Asset.from_xdr_object(xdr_object) == asset
 
     def test_from_xdr_object_native(self):
         xdr_type = stellar_xdr.AssetType.ASSET_TYPE_NATIVE
@@ -117,7 +171,7 @@ class TestAsset:
         asset_code = stellar_xdr.AssetCode4(
             bytearray(code, "ascii") + b"\x00" * (4 - len(code))
         )
-        asset = stellar_xdr.AssetAlphaNum4(
+        asset = stellar_xdr.AlphaNum4(
             asset_code=asset_code,
             issuer=Keypair.from_public_key(issuer).xdr_account_id(),
         )
@@ -136,7 +190,7 @@ class TestAsset:
         asset_code = stellar_xdr.AssetCode12(
             bytearray(code, "ascii") + b"\x00" * (12 - len(code))
         )
-        asset = stellar_xdr.AssetAlphaNum12(
+        asset = stellar_xdr.AlphaNum12(
             asset_code=asset_code,
             issuer=Keypair.from_public_key(issuer).xdr_account_id(),
         )

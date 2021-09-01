@@ -16,6 +16,8 @@ from .create_account_result import CreateAccountResult
 from .create_claimable_balance_result import CreateClaimableBalanceResult
 from .end_sponsoring_future_reserves_result import EndSponsoringFutureReservesResult
 from .inflation_result import InflationResult
+from .liquidity_pool_deposit_result import LiquidityPoolDepositResult
+from .liquidity_pool_withdraw_result import LiquidityPoolWithdrawResult
 from .manage_buy_offer_result import ManageBuyOfferResult
 from .manage_data_result import ManageDataResult
 from .manage_sell_offer_result import ManageSellOfferResult
@@ -80,6 +82,10 @@ class OperationResultTr:
             ClawbackClaimableBalanceResult clawbackClaimableBalanceResult;
         case SET_TRUST_LINE_FLAGS:
             SetTrustLineFlagsResult setTrustLineFlagsResult;
+        case LIQUIDITY_POOL_DEPOSIT:
+            LiquidityPoolDepositResult liquidityPoolDepositResult;
+        case LIQUIDITY_POOL_WITHDRAW:
+            LiquidityPoolWithdrawResult liquidityPoolWithdrawResult;
         }
     ----------------------------------------------------------------
     """
@@ -109,6 +115,8 @@ class OperationResultTr:
         clawback_result: ClawbackResult = None,
         clawback_claimable_balance_result: ClawbackClaimableBalanceResult = None,
         set_trust_line_flags_result: SetTrustLineFlagsResult = None,
+        liquidity_pool_deposit_result: LiquidityPoolDepositResult = None,
+        liquidity_pool_withdraw_result: LiquidityPoolWithdrawResult = None,
     ) -> None:
         self.type = type
         self.create_account_result = create_account_result
@@ -137,6 +145,8 @@ class OperationResultTr:
         self.clawback_result = clawback_result
         self.clawback_claimable_balance_result = clawback_claimable_balance_result
         self.set_trust_line_flags_result = set_trust_line_flags_result
+        self.liquidity_pool_deposit_result = liquidity_pool_deposit_result
+        self.liquidity_pool_withdraw_result = liquidity_pool_withdraw_result
 
     def pack(self, packer: Packer) -> None:
         self.type.pack(packer)
@@ -257,6 +267,16 @@ class OperationResultTr:
             if self.set_trust_line_flags_result is None:
                 raise ValueError("set_trust_line_flags_result should not be None.")
             self.set_trust_line_flags_result.pack(packer)
+            return
+        if self.type == OperationType.LIQUIDITY_POOL_DEPOSIT:
+            if self.liquidity_pool_deposit_result is None:
+                raise ValueError("liquidity_pool_deposit_result should not be None.")
+            self.liquidity_pool_deposit_result.pack(packer)
+            return
+        if self.type == OperationType.LIQUIDITY_POOL_WITHDRAW:
+            if self.liquidity_pool_withdraw_result is None:
+                raise ValueError("liquidity_pool_withdraw_result should not be None.")
+            self.liquidity_pool_withdraw_result.pack(packer)
             return
 
     @classmethod
@@ -414,6 +434,22 @@ class OperationResultTr:
             if set_trust_line_flags_result is None:
                 raise ValueError("set_trust_line_flags_result should not be None.")
             return cls(type, set_trust_line_flags_result=set_trust_line_flags_result)
+        if type == OperationType.LIQUIDITY_POOL_DEPOSIT:
+            liquidity_pool_deposit_result = LiquidityPoolDepositResult.unpack(unpacker)
+            if liquidity_pool_deposit_result is None:
+                raise ValueError("liquidity_pool_deposit_result should not be None.")
+            return cls(
+                type, liquidity_pool_deposit_result=liquidity_pool_deposit_result
+            )
+        if type == OperationType.LIQUIDITY_POOL_WITHDRAW:
+            liquidity_pool_withdraw_result = LiquidityPoolWithdrawResult.unpack(
+                unpacker
+            )
+            if liquidity_pool_withdraw_result is None:
+                raise ValueError("liquidity_pool_withdraw_result should not be None.")
+            return cls(
+                type, liquidity_pool_withdraw_result=liquidity_pool_withdraw_result
+            )
         return cls(type)
 
     def to_xdr_bytes(self) -> bytes:
@@ -470,6 +506,10 @@ class OperationResultTr:
             and self.clawback_claimable_balance_result
             == other.clawback_claimable_balance_result
             and self.set_trust_line_flags_result == other.set_trust_line_flags_result
+            and self.liquidity_pool_deposit_result
+            == other.liquidity_pool_deposit_result
+            and self.liquidity_pool_withdraw_result
+            == other.liquidity_pool_withdraw_result
         )
 
     def __str__(self):
@@ -541,4 +581,10 @@ class OperationResultTr:
         out.append(
             f"set_trust_line_flags_result={self.set_trust_line_flags_result}"
         ) if self.set_trust_line_flags_result is not None else None
+        out.append(
+            f"liquidity_pool_deposit_result={self.liquidity_pool_deposit_result}"
+        ) if self.liquidity_pool_deposit_result is not None else None
+        out.append(
+            f"liquidity_pool_withdraw_result={self.liquidity_pool_withdraw_result}"
+        ) if self.liquidity_pool_withdraw_result is not None else None
         return f"<OperationResultTr {[', '.join(out)]}>"

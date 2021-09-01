@@ -68,3 +68,14 @@ class EffectsCallBuilder(BaseCallBuilder):
         """
         self.endpoint = f"operations/{operation_id}/effects"
         return self
+
+    def for_liquidity_pool(self, liquidity_pool_id: str) -> "EffectsCallBuilder":
+        """This endpoint represents all effects that occurred as a result of a given liquidity pool.
+
+        TODO: docs link
+
+        :param liquidity_pool_id: The ID of the liquidity pool in hex string.
+        :return: this EffectsCallBuilder instance
+        """
+        self.endpoint = f"liquidity_pools/{liquidity_pool_id}/effects"
+        return self

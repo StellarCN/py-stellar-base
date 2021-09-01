@@ -3,31 +3,7 @@ import pytest
 from stellar_sdk import MuxedAccount
 from stellar_sdk.account import Thresholds
 from stellar_sdk.asset import Asset
-from stellar_sdk.call_builder import FeeStatsCallBuilder
-from stellar_sdk.call_builder.accounts_call_builder import AccountsCallBuilder
-from stellar_sdk.call_builder.assets_call_builder import AssetsCallBuilder
-from stellar_sdk.call_builder.claimable_balances_call_builder import (
-    ClaimableBalancesCallBuilder,
-)
-from stellar_sdk.call_builder.data_call_builder import DataCallBuilder
-from stellar_sdk.call_builder.effects_call_builder import EffectsCallBuilder
-from stellar_sdk.call_builder.ledgers_call_builder import LedgersCallBuilder
-from stellar_sdk.call_builder.offers_call_builder import OffersCallBuilder
-from stellar_sdk.call_builder.operations_call_builder import OperationsCallBuilder
-from stellar_sdk.call_builder.orderbook_call_builder import OrderbookCallBuilder
-from stellar_sdk.call_builder.payments_call_builder import PaymentsCallBuilder
-from stellar_sdk.call_builder.root_call_builder import RootCallBuilder
-from stellar_sdk.call_builder.strict_receive_paths_call_builder import (
-    StrictReceivePathsCallBuilder,
-)
-from stellar_sdk.call_builder.strict_send_paths_call_builder import (
-    StrictSendPathsCallBuilder,
-)
-from stellar_sdk.call_builder.trades_aggregation_call_builder import (
-    TradeAggregationsCallBuilder,
-)
-from stellar_sdk.call_builder.trades_call_builder import TradesCallBuilder
-from stellar_sdk.call_builder.transactions_call_builder import TransactionsCallBuilder
+from stellar_sdk.call_builder import *
 from stellar_sdk.client.aiohttp_client import AiohttpClient
 from stellar_sdk.client.requests_client import RequestsClient
 from stellar_sdk.exceptions import TypeError
@@ -141,6 +117,9 @@ class TestServer:
             assert server.effects() == EffectsCallBuilder(horizon_url, client)
             assert server.fee_stats() == FeeStatsCallBuilder(horizon_url, client)
             assert server.ledgers() == LedgersCallBuilder(horizon_url, client)
+            assert server.liquidity_pools() == LiquidityPoolsBuilder(
+                horizon_url, client
+            )
             assert server.offers() == OffersCallBuilder(horizon_url, client)
             assert server.operations() == OperationsCallBuilder(horizon_url, client)
             buying = Asset.native()

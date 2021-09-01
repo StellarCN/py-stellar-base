@@ -11,6 +11,8 @@ from .create_claimable_balance import *
 from .create_passive_sell_offer import *
 from .end_sponsoring_future_reserves import *
 from .inflation import *
+from .liquidity_pool_deposit import *
+from .liquidity_pool_withdraw import *
 from .manage_buy_offer import *
 from .manage_data import *
 from .manage_sell_offer import *

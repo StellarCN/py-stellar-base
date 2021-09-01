@@ -3,6 +3,7 @@ from typing import Optional, Union
 
 from .. import xdr as stellar_xdr
 from ..asset import Asset
+from ..liquidity_pool_asset import LiquidityPoolAsset
 from ..muxed_account import MuxedAccount
 from .operation import Operation
 from .utils import check_amount
@@ -35,12 +36,12 @@ class ChangeTrust(Operation):
 
     def __init__(
         self,
-        asset: Asset,
+        asset: Union[Asset, LiquidityPoolAsset],
         limit: Union[str, Decimal] = None,
         source: Optional[Union[MuxedAccount, str]] = None,
     ) -> None:
         super().__init__(source)
-        self.asset: Asset = asset
+        self.asset = asset
         if (
             limit is None
         ):  # We don't need this if the user can send the value with correct type.
@@ -50,7 +51,7 @@ class ChangeTrust(Operation):
             self.limit = limit
 
     def _to_operation_body(self) -> stellar_xdr.OperationBody:
-        line = self.asset.to_xdr_object()
+        line = self.asset.to_change_trust_asset_xdr_object()
         limit = stellar_xdr.Int64(Operation.to_xdr_amount(self.limit))
         change_trust_op = stellar_xdr.ChangeTrustOp(line, limit)
         body = stellar_xdr.OperationBody(
@@ -66,7 +67,15 @@ class ChangeTrust(Operation):
         """
         source = Operation.get_source_from_xdr_obj(xdr_object)
         assert xdr_object.body.change_trust_op is not None
-        line = Asset.from_xdr_object(xdr_object.body.change_trust_op.line)
+        if (
+            xdr_object.body.change_trust_op.line.type
+            == stellar_xdr.AssetType.ASSET_TYPE_POOL_SHARE
+        ):
+            line: Union[Asset, LiquidityPoolAsset] = LiquidityPoolAsset.from_xdr_object(
+                xdr_object.body.change_trust_op.line
+            )
+        else:
+            line = Asset.from_xdr_object(xdr_object.body.change_trust_op.line)
         limit = Operation.from_xdr_amount(xdr_object.body.change_trust_op.limit.int64)
         op = cls(source=source, asset=line, limit=limit)
         return op

@@ -4,7 +4,7 @@ import base64
 from xdrlib import Packer, Unpacker
 
 from .account_id import AccountID
-from .asset import Asset
+from .trust_line_asset import TrustLineAsset
 
 __all__ = ["LedgerKeyTrustLine"]
 
@@ -16,7 +16,7 @@ class LedgerKeyTrustLine:
     struct
         {
             AccountID accountID;
-            Asset asset;
+            TrustLineAsset asset;
         }
     ----------------------------------------------------------------
     """
@@ -24,7 +24,7 @@ class LedgerKeyTrustLine:
     def __init__(
         self,
         account_id: AccountID,
-        asset: Asset,
+        asset: TrustLineAsset,
     ) -> None:
         self.account_id = account_id
         self.asset = asset
@@ -36,7 +36,7 @@ class LedgerKeyTrustLine:
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "LedgerKeyTrustLine":
         account_id = AccountID.unpack(unpacker)
-        asset = Asset.unpack(unpacker)
+        asset = TrustLineAsset.unpack(unpacker)
         return cls(
             account_id=account_id,
             asset=asset,

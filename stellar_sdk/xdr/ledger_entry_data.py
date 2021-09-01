@@ -8,6 +8,7 @@ from .account_entry import AccountEntry
 from .claimable_balance_entry import ClaimableBalanceEntry
 from .data_entry import DataEntry
 from .ledger_entry_type import LedgerEntryType
+from .liquidity_pool_entry import LiquidityPoolEntry
 from .offer_entry import OfferEntry
 from .trust_line_entry import TrustLineEntry
 
@@ -30,6 +31,8 @@ class LedgerEntryData:
             DataEntry data;
         case CLAIMABLE_BALANCE:
             ClaimableBalanceEntry claimableBalance;
+        case LIQUIDITY_POOL:
+            LiquidityPoolEntry liquidityPool;
         }
     ----------------------------------------------------------------
     """
@@ -42,6 +45,7 @@ class LedgerEntryData:
         offer: OfferEntry = None,
         data: DataEntry = None,
         claimable_balance: ClaimableBalanceEntry = None,
+        liquidity_pool: LiquidityPoolEntry = None,
     ) -> None:
         self.type = type
         self.account = account
@@ -49,6 +53,7 @@ class LedgerEntryData:
         self.offer = offer
         self.data = data
         self.claimable_balance = claimable_balance
+        self.liquidity_pool = liquidity_pool
 
     def pack(self, packer: Packer) -> None:
         self.type.pack(packer)
@@ -76,6 +81,11 @@ class LedgerEntryData:
             if self.claimable_balance is None:
                 raise ValueError("claimable_balance should not be None.")
             self.claimable_balance.pack(packer)
+            return
+        if self.type == LedgerEntryType.LIQUIDITY_POOL:
+            if self.liquidity_pool is None:
+                raise ValueError("liquidity_pool should not be None.")
+            self.liquidity_pool.pack(packer)
             return
 
     @classmethod
@@ -106,6 +116,11 @@ class LedgerEntryData:
             if claimable_balance is None:
                 raise ValueError("claimable_balance should not be None.")
             return cls(type, claimable_balance=claimable_balance)
+        if type == LedgerEntryType.LIQUIDITY_POOL:
+            liquidity_pool = LiquidityPoolEntry.unpack(unpacker)
+            if liquidity_pool is None:
+                raise ValueError("liquidity_pool should not be None.")
+            return cls(type, liquidity_pool=liquidity_pool)
         return cls(type)
 
     def to_xdr_bytes(self) -> bytes:
@@ -137,6 +152,7 @@ class LedgerEntryData:
             and self.offer == other.offer
             and self.data == other.data
             and self.claimable_balance == other.claimable_balance
+            and self.liquidity_pool == other.liquidity_pool
         )
 
     def __str__(self):
@@ -151,4 +167,7 @@ class LedgerEntryData:
         out.append(
             f"claimable_balance={self.claimable_balance}"
         ) if self.claimable_balance is not None else None
+        out.append(
+            f"liquidity_pool={self.liquidity_pool}"
+        ) if self.liquidity_pool is not None else None
         return f"<LedgerEntryData {[', '.join(out)]}>"

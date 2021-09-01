@@ -67,6 +67,10 @@ class Operation:
             ClawbackClaimableBalanceOp clawbackClaimableBalanceOp;
         case SET_TRUST_LINE_FLAGS:
             SetTrustLineFlagsOp setTrustLineFlagsOp;
+        case LIQUIDITY_POOL_DEPOSIT:
+            LiquidityPoolDepositOp liquidityPoolDepositOp;
+        case LIQUIDITY_POOL_WITHDRAW:
+            LiquidityPoolWithdrawOp liquidityPoolWithdrawOp;
         }
         body;
     };

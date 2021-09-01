@@ -49,6 +49,16 @@ class TestTransactionsCallBuilder:
         )
         assert builder.params == {}
 
+    def test_for_liquidity_pool(self):
+        liquidity_pool_id = (
+            "dd7b1ab831c273310ddbec6f97870aa83c2fbd78ce22aded37ecbf4f3380fac7"
+        )
+        builder = TransactionsCallBuilder(horizon_url, client).for_liquidity_pool(
+            liquidity_pool_id
+        )
+        assert builder.endpoint == f"liquidity_pools/{liquidity_pool_id}/transactions"
+        assert builder.params == {}
+
     def test_include_failed(self):
         account_id = "GATEMHCCKCY67ZUCKTROYN24ZYT5GK4EQZ65JJLDHKHRUZI3EUEKMTCH"
         builder = (

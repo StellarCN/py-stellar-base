@@ -19,7 +19,7 @@ class OperationID:
     case ENVELOPE_TYPE_OP_ID:
         struct
         {
-            MuxedAccount sourceAccount;
+            AccountID sourceAccount;
             SequenceNumber seqNum;
             uint32 opNum;
         } id;

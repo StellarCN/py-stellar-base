@@ -5,7 +5,7 @@ from typing import List
 from xdrlib import Packer, Unpacker
 
 from ..exceptions import ValueError
-from .claim_offer_atom import ClaimOfferAtom
+from .claim_atom import ClaimAtom
 from .manage_offer_success_result_offer import ManageOfferSuccessResultOffer
 
 __all__ = ["ManageOfferSuccessResult"]
@@ -18,7 +18,7 @@ class ManageOfferSuccessResult:
     struct ManageOfferSuccessResult
     {
         // offers that got claimed while creating this offer
-        ClaimOfferAtom offersClaimed<>;
+        ClaimAtom offersClaimed<>;
 
         union switch (ManageOfferEffect effect)
         {
@@ -35,7 +35,7 @@ class ManageOfferSuccessResult:
 
     def __init__(
         self,
-        offers_claimed: List[ClaimOfferAtom],
+        offers_claimed: List[ClaimAtom],
         offer: ManageOfferSuccessResultOffer,
     ) -> None:
         if offers_claimed and len(offers_claimed) > 4294967295:
@@ -56,7 +56,7 @@ class ManageOfferSuccessResult:
         length = unpacker.unpack_uint()
         offers_claimed = []
         for _ in range(length):
-            offers_claimed.append(ClaimOfferAtom.unpack(unpacker))
+            offers_claimed.append(ClaimAtom.unpack(unpacker))
         offer = ManageOfferSuccessResultOffer.unpack(unpacker)
         return cls(
             offers_claimed=offers_claimed,

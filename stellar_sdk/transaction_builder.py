@@ -10,6 +10,8 @@ from .exceptions import ValueError
 from .fee_bump_transaction import FeeBumpTransaction
 from .fee_bump_transaction_envelope import FeeBumpTransactionEnvelope
 from .keypair import Keypair
+from .liquidity_pool_asset import LiquidityPoolAsset
+from .liquidity_pool_id import LiquidityPoolId
 from .memo import *
 from .muxed_account import MuxedAccount
 from .network import Network
@@ -298,22 +300,20 @@ class TransactionBuilder:
 
     def append_change_trust_op(
         self,
-        asset_code: str,
-        asset_issuer: str,
+        asset: Union[Asset, LiquidityPoolAsset],
         limit: Union[str, Decimal] = None,
         source: Optional[Union[MuxedAccount, str]] = None,
     ) -> "TransactionBuilder":
         """Append a :class:`ChangeTrust <stellar_sdk.operation.ChangeTrust>`
         operation to the list of operations.
 
-        :param asset_issuer: The issuer address for the asset.
-        :param asset_code: The asset code for the asset.
-        :param limit: The limit of the new trustline.
+        :param asset: The asset for the trust line.
+        :param limit: The limit for the asset, defaults to max int64(922337203685.4775807).
+            If the limit is set to "0" it deletes the trustline.
         :param source: The source address to add the trustline to.
         :return: This builder instance.
 
         """
-        asset = Asset(asset_code, asset_issuer)
         op = ChangeTrust(asset, limit, source)
         return self.append_operation(op)
 
@@ -867,7 +867,7 @@ class TransactionBuilder:
     def append_revoke_trustline_sponsorship_op(
         self,
         account_id: str,
-        asset: Asset,
+        asset: Union[Asset, LiquidityPoolId],
         source: Optional[Union[MuxedAccount, str]] = None,
     ) -> "TransactionBuilder":
         """Append a :class:`EndSponsoringFutureReserves <stellar_sdk.operation.EndSponsoringFutureReserves>` operation
@@ -929,6 +929,23 @@ class TransactionBuilder:
         """
         op = RevokeSponsorship.revoke_claimable_balance_sponsorship(
             claimable_balance_id, source
+        )
+        return self.append_operation(op)
+
+    def append_revoke_liquidity_pool_sponsorship_op(
+        self,
+        liquidity_pool_id: str,
+        source: Optional[Union[MuxedAccount, str]] = None,
+    ) -> "TransactionBuilder":
+        """Append a :class:`EndSponsoringFutureReserves <stellar_sdk.operation.EndSponsoringFutureReserves>` operation
+        for a claimable to the list of operations.
+
+        :param liquidity_pool_id: The sponsored liquidity pool ID in hex string.
+        :param source: The source account (defaults to transaction source).
+        :return: This builder instance.
+        """
+        op = RevokeSponsorship.revoke_liquidity_pool_sponsorship(
+            liquidity_pool_id, source
         )
         return self.append_operation(op)
 
@@ -1039,6 +1056,56 @@ class TransactionBuilder:
         :return: This builder instance.
         """
         op = SetTrustLineFlags(trustor, asset, clear_flags, set_flags, source)
+        return self.append_operation(op)
+
+    def append_liquidity_pool_deposit_op(
+        self,
+        liquidity_pool_id: str,
+        max_amount_a: Union[str, Decimal],
+        max_amount_b: Union[str, Decimal],
+        min_price: Union[str, Decimal, Price],
+        max_price: Union[str, Decimal, Price],
+        source: Optional[Union[MuxedAccount, str]] = None,
+    ):
+        """Append an :class:`LiquidityPoolDeposit <stellar_sdk.operation.LiquidityPoolDeposit>`
+        operation to the list of operations.
+
+        :param liquidity_pool_id: The liquidity pool ID.
+        :param max_amount_a: Maximum amount of first asset to deposit.
+        :param max_amount_b: Maximum amount of second asset to deposit.
+        :param min_price: Minimum deposit_a/deposit_b price.
+        :param max_price: Maximum deposit_a/deposit_b price.
+        :param source: The source account for the operation. Defaults to the
+            transaction's source account.
+        :return: This builder instance.
+        """
+        op = LiquidityPoolDeposit(
+            liquidity_pool_id, max_amount_a, max_amount_b, min_price, max_price, source
+        )
+        return self.append_operation(op)
+
+    def append_liquidity_pool_withdraw_op(
+        self,
+        liquidity_pool_id: str,
+        amount: Union[str, Decimal],
+        min_amount_a: Union[str, Decimal],
+        min_amount_b: Union[str, Decimal],
+        source: Optional[Union[MuxedAccount, str]] = None,
+    ):
+        """Append an :class:`LiquidityPoolWithdraw <stellar_sdk.operation.LiquidityPoolWithdraw>`
+        operation to the list of operations.
+
+        :param liquidity_pool_id: The liquidity pool ID.
+        :param amount: Amount of pool shares to withdraw.
+        :param min_amount_a: Minimum amount of first asset to withdraw.
+        :param min_amount_b: Minimum amount of second asset to withdraw.
+        :param source: The source account for the operation. Defaults to the
+            transaction's source account.
+        :return: This builder instance.
+        """
+        op = LiquidityPoolWithdraw(
+            liquidity_pool_id, amount, min_amount_a, min_amount_b, source
+        )
         return self.append_operation(op)
 
     def __str__(self):

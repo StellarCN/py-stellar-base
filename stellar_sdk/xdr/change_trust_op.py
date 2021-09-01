@@ -3,7 +3,7 @@
 import base64
 from xdrlib import Packer, Unpacker
 
-from .asset import Asset
+from .change_trust_asset import ChangeTrustAsset
 from .int64 import Int64
 
 __all__ = ["ChangeTrustOp"]
@@ -15,7 +15,7 @@ class ChangeTrustOp:
     ----------------------------------------------------------------
     struct ChangeTrustOp
     {
-        Asset line;
+        ChangeTrustAsset line;
 
         // if limit is set to 0, deletes the trust line
         int64 limit;
@@ -25,7 +25,7 @@ class ChangeTrustOp:
 
     def __init__(
         self,
-        line: Asset,
+        line: ChangeTrustAsset,
         limit: Int64,
     ) -> None:
         self.line = line
@@ -37,7 +37,7 @@ class ChangeTrustOp:
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "ChangeTrustOp":
-        line = Asset.unpack(unpacker)
+        line = ChangeTrustAsset.unpack(unpacker)
         limit = Int64.unpack(unpacker)
         return cls(
             line=line,

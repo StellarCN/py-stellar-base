@@ -1,5 +1,5 @@
 import re
-from typing import Dict, Optional
+from typing import Dict, Optional, Type, Union
 
 from . import xdr as stellar_xdr
 from .exceptions import AssetCodeInvalidError, AssetIssuerInvalidError, AttributeError
@@ -107,9 +107,41 @@ class Asset:
 
         :return: XDR Asset object
         """
+        asset_xdr = self._to_xdr_object(stellar_xdr.Asset)
+        assert isinstance(asset_xdr, stellar_xdr.Asset)
+        return asset_xdr
+
+    def to_change_trust_asset_xdr_object(self) -> stellar_xdr.ChangeTrustAsset:
+        """Returns the xdr object for this asset.
+
+        :return: XDR ChangeTrustAsset object
+        """
+        asset_xdr = self._to_xdr_object(stellar_xdr.ChangeTrustAsset)
+        assert isinstance(asset_xdr, stellar_xdr.ChangeTrustAsset)
+        return asset_xdr
+
+    def to_trust_line_asset_xdr_object(self) -> stellar_xdr.TrustLineAsset:
+        """Returns the xdr object for this asset.
+
+        :return: XDR TrustLineAsset object
+        """
+        asset_xdr = self._to_xdr_object(stellar_xdr.TrustLineAsset)
+        assert isinstance(asset_xdr, stellar_xdr.TrustLineAsset)
+        return asset_xdr
+
+    def _to_xdr_object(
+        self,
+        xdr_asset: Union[
+            Type[stellar_xdr.Asset],
+            Type[stellar_xdr.ChangeTrustAsset],
+            Type[stellar_xdr.TrustLineAsset],
+        ],
+    ) -> Union[
+        stellar_xdr.Asset, stellar_xdr.ChangeTrustAsset, stellar_xdr.TrustLineAsset
+    ]:
         if self.is_native():
             asset_type = stellar_xdr.AssetType.ASSET_TYPE_NATIVE
-            return stellar_xdr.Asset(type=asset_type)
+            return xdr_asset(type=asset_type)
         else:
             assert self.issuer is not None
             length = len(self.code)
@@ -119,20 +151,27 @@ class Asset:
         if length <= 4:
             xdr_type = stellar_xdr.AssetType.ASSET_TYPE_CREDIT_ALPHANUM4
             asset_code4 = stellar_xdr.AssetCode4(asset_code)
-            alpha_num4 = stellar_xdr.AssetAlphaNum4(asset_code4, issuer)
-            return stellar_xdr.Asset(type=xdr_type, alpha_num4=alpha_num4)
+            alpha_num4 = stellar_xdr.AlphaNum4(asset_code4, issuer)
+            return xdr_asset(type=xdr_type, alpha_num4=alpha_num4)
         else:
             xdr_type = stellar_xdr.AssetType.ASSET_TYPE_CREDIT_ALPHANUM12
             asset_code12 = stellar_xdr.AssetCode12(asset_code)
-            alpha_num12 = stellar_xdr.AssetAlphaNum12(asset_code12, issuer)
-            return stellar_xdr.Asset(type=xdr_type, alpha_num12=alpha_num12)
+            alpha_num12 = stellar_xdr.AlphaNum12(asset_code12, issuer)
+            return xdr_asset(type=xdr_type, alpha_num12=alpha_num12)
 
     @classmethod
-    def from_xdr_object(cls, xdr_object: stellar_xdr.Asset) -> "Asset":
-        """Create a :class:`Asset` from an XDR Asset object.
+    def from_xdr_object(
+        cls,
+        xdr_object: Union[
+            stellar_xdr.Asset, stellar_xdr.ChangeTrustAsset, stellar_xdr.TrustLineAsset
+        ],
+    ) -> "Asset":
+        """Create a :class:`Asset` from an XDR Asset/ChangeTrustAsset/TrustLineAsset object.
 
-        :param xdr_object: The XDR Asset object.
-        :return: A new :class:`Asset` object from the given XDR Asset object.
+        Cannot process XDR objects with asset type ASSET_TYPE_POOL_SHARE.
+
+        :param xdr_object: The XDR Asset/ChangeTrustAsset/TrustLineAsset object.
+        :return: A new :class:`Asset` object from the given XDR object.
         """
         if xdr_object.type == stellar_xdr.AssetType.ASSET_TYPE_NATIVE:
             return Asset.native()
@@ -143,7 +182,7 @@ class Asset:
                 xdr_object.alpha_num4.issuer.account_id.ed25519.uint256
             )
             code = xdr_object.alpha_num4.asset_code.asset_code4.decode().rstrip("\x00")
-        else:
+        elif xdr_object.type == stellar_xdr.AssetType.ASSET_TYPE_CREDIT_ALPHANUM12:
             assert xdr_object.alpha_num12 is not None
             assert xdr_object.alpha_num12.issuer.account_id.ed25519 is not None
             issuer = StrKey.encode_ed25519_public_key(
@@ -152,6 +191,8 @@ class Asset:
             code = xdr_object.alpha_num12.asset_code.asset_code12.decode().rstrip(
                 "\x00"
             )
+        else:
+            raise ValueError(f"Invalid asset type: {xdr_object.type}")
         return cls(code, issuer)
 
     def __eq__(self, other: object) -> bool:

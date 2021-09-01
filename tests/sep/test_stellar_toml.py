@@ -22,7 +22,7 @@ class TestStellarToml:
 
     def test_get_not_found(self):
         with pytest.raises(StellarTomlNotFoundError):
-            fetch_stellar_toml("httpbin.org")
+            fetch_stellar_toml("httpbin.overcat.me")
 
     def test_invalid_client(self):
         client = "BAD TYPE"
@@ -32,4 +32,4 @@ class TestStellarToml:
             "of `stellar_sdk.client.base_async_client.BaseAsyncClient` "
             "or `stellar_sdk.client.base_sync_client.BaseSyncClient`.",
         ):
-            fetch_stellar_toml("httpbin.org", client)
+            fetch_stellar_toml("httpbin.overcat.me", client)

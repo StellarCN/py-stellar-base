@@ -14,6 +14,8 @@ from .clawback_op import ClawbackOp
 from .create_account_op import CreateAccountOp
 from .create_claimable_balance_op import CreateClaimableBalanceOp
 from .create_passive_sell_offer_op import CreatePassiveSellOfferOp
+from .liquidity_pool_deposit_op import LiquidityPoolDepositOp
+from .liquidity_pool_withdraw_op import LiquidityPoolWithdrawOp
 from .manage_buy_offer_op import ManageBuyOfferOp
 from .manage_data_op import ManageDataOp
 from .manage_sell_offer_op import ManageSellOfferOp
@@ -79,6 +81,10 @@ class OperationBody:
             ClawbackClaimableBalanceOp clawbackClaimableBalanceOp;
         case SET_TRUST_LINE_FLAGS:
             SetTrustLineFlagsOp setTrustLineFlagsOp;
+        case LIQUIDITY_POOL_DEPOSIT:
+            LiquidityPoolDepositOp liquidityPoolDepositOp;
+        case LIQUIDITY_POOL_WITHDRAW:
+            LiquidityPoolWithdrawOp liquidityPoolWithdrawOp;
         }
     ----------------------------------------------------------------
     """
@@ -106,6 +112,8 @@ class OperationBody:
         clawback_op: ClawbackOp = None,
         clawback_claimable_balance_op: ClawbackClaimableBalanceOp = None,
         set_trust_line_flags_op: SetTrustLineFlagsOp = None,
+        liquidity_pool_deposit_op: LiquidityPoolDepositOp = None,
+        liquidity_pool_withdraw_op: LiquidityPoolWithdrawOp = None,
     ) -> None:
         self.type = type
         self.create_account_op = create_account_op
@@ -128,6 +136,8 @@ class OperationBody:
         self.clawback_op = clawback_op
         self.clawback_claimable_balance_op = clawback_claimable_balance_op
         self.set_trust_line_flags_op = set_trust_line_flags_op
+        self.liquidity_pool_deposit_op = liquidity_pool_deposit_op
+        self.liquidity_pool_withdraw_op = liquidity_pool_withdraw_op
 
     def pack(self, packer: Packer) -> None:
         self.type.pack(packer)
@@ -236,6 +246,16 @@ class OperationBody:
             if self.set_trust_line_flags_op is None:
                 raise ValueError("set_trust_line_flags_op should not be None.")
             self.set_trust_line_flags_op.pack(packer)
+            return
+        if self.type == OperationType.LIQUIDITY_POOL_DEPOSIT:
+            if self.liquidity_pool_deposit_op is None:
+                raise ValueError("liquidity_pool_deposit_op should not be None.")
+            self.liquidity_pool_deposit_op.pack(packer)
+            return
+        if self.type == OperationType.LIQUIDITY_POOL_WITHDRAW:
+            if self.liquidity_pool_withdraw_op is None:
+                raise ValueError("liquidity_pool_withdraw_op should not be None.")
+            self.liquidity_pool_withdraw_op.pack(packer)
             return
 
     @classmethod
@@ -356,6 +376,16 @@ class OperationBody:
             if set_trust_line_flags_op is None:
                 raise ValueError("set_trust_line_flags_op should not be None.")
             return cls(type, set_trust_line_flags_op=set_trust_line_flags_op)
+        if type == OperationType.LIQUIDITY_POOL_DEPOSIT:
+            liquidity_pool_deposit_op = LiquidityPoolDepositOp.unpack(unpacker)
+            if liquidity_pool_deposit_op is None:
+                raise ValueError("liquidity_pool_deposit_op should not be None.")
+            return cls(type, liquidity_pool_deposit_op=liquidity_pool_deposit_op)
+        if type == OperationType.LIQUIDITY_POOL_WITHDRAW:
+            liquidity_pool_withdraw_op = LiquidityPoolWithdrawOp.unpack(unpacker)
+            if liquidity_pool_withdraw_op is None:
+                raise ValueError("liquidity_pool_withdraw_op should not be None.")
+            return cls(type, liquidity_pool_withdraw_op=liquidity_pool_withdraw_op)
         return cls(type)
 
     def to_xdr_bytes(self) -> bytes:
@@ -405,6 +435,8 @@ class OperationBody:
             and self.clawback_claimable_balance_op
             == other.clawback_claimable_balance_op
             and self.set_trust_line_flags_op == other.set_trust_line_flags_op
+            and self.liquidity_pool_deposit_op == other.liquidity_pool_deposit_op
+            and self.liquidity_pool_withdraw_op == other.liquidity_pool_withdraw_op
         )
 
     def __str__(self):
@@ -470,4 +502,10 @@ class OperationBody:
         out.append(
             f"set_trust_line_flags_op={self.set_trust_line_flags_op}"
         ) if self.set_trust_line_flags_op is not None else None
+        out.append(
+            f"liquidity_pool_deposit_op={self.liquidity_pool_deposit_op}"
+        ) if self.liquidity_pool_deposit_op is not None else None
+        out.append(
+            f"liquidity_pool_withdraw_op={self.liquidity_pool_withdraw_op}"
+        ) if self.liquidity_pool_withdraw_op is not None else None
         return f"<OperationBody {[', '.join(out)]}>"
