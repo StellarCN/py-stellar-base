@@ -80,8 +80,7 @@ trust_transaction = (
     #  The `changeTrust` operation creates (or alters) a trustline
     #  The `limit` parameter below is optional
     .append_change_trust_op(
-        asset_code=awesome_asset_coin.code,
-        asset_issuer=awesome_asset_coin.issuer,
+        asset=awesome_asset_coin,
         limit="3000",
     )
     .set_timeout(100)
