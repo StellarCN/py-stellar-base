@@ -1,6 +1,62 @@
 Release History
 ==============
 
+### Version 5.0.0-beta0
+Released on September 05, 2021
+
+**This update includes breaking changes.**
+
+**This is a pre-release version, please do not use it in production.**
+
+#### Note
+
+- Although this update is a major version update, it only **contains a small number of breaking changes**, and you should be able to migrate easily.
+- I want to make some improvements to the SDK, but I don’t want to introduce too many breaking changes in this version, so I plan to postpone it to the next major version. The next major version features will not include feature updates, I will make it as easy to migrate as possible, thanks.
+- I will not be adding Stellar Protocol 18 support to v2.x. I will only provide the necessary security updates and will end support for it on 2022.01.01.
+- Since Stellar Protocol 18 has not yet been deployed to the test network, I have not provided relevant examples for the time being, I will provide it later.
+
+#### Add ([#512](https://github.com/StellarCN/py-stellar-base/pull/512))
+
+- Introduced new CAP-38 operations `LiquidityPoolDeposit` and `LiquidityPoolWithdraw`.
+- Introduced two new types of assets, `LiquidityPoolId` and `LiquidityPoolAsset`.
+- The following functions have been added to `TransactionBuilder`:
+  - `append_liquidity_pool_deposit_op`
+  - `append_liquidity_pool_withdraw_op`
+  - `append_revoke_liquidity_pool_sponsorship_op`
+- Introduced a `LiquidityPoolsCallBuilder` to make calls to a new endpoint, you can use `Server.liquidity_pools` to build it.
+- Expanded the `TransactionsCallBuilder`, `OperationsCallBuilder`, and `EffectsCallBuilder` to apply to specific liquidity pools.
+- Expanded the `TradesCallBuilder` to support fetching liquidity pool trades and accepts a new `trade_type` filter.
+
+#### Breaking changes ([#512](https://github.com/StellarCN/py-stellar-base/pull/512))
+
+- This XDR file contains breaking changes, you can click [here](https://github.com/StellarCN/py-stellar-base/commit/bffd02dfe9487a254c0c6ceaae889db380ba878a) to view the changes.
+- Due to the introduction of new asset types, the signature of `TransactionBuilder.append_change_trust_op` has been changed.  ([c152dbb](https://github.com/StellarCN/py-stellar-base/commit/c152dbbf8cb7e18e93f900b3fce8f6d86b1ec6ad))
+
+  Formerly:
+
+  ```python
+  def append_change_trust_op(
+      self,
+      asset_code: str,
+      asset_issuer: str,
+      limit: Union[str, Decimal] = None,
+      source: Optional[Union[MuxedAccount, str]] = None,
+  ) -> "TransactionBuilder":
+      pass
+  ```
+
+  Now:
+
+  ```python
+  def append_change_trust_op(
+      self,
+      asset: Union[Asset, LiquidityPoolAsset],
+      limit: Union[str, Decimal] = None,
+      source: Optional[Union[MuxedAccount, str]] = None,
+  ) -> "TransactionBuilder":
+      pass
+  ```
+
 ### Version 4.1.1
 Released on August 23, 2021
 
