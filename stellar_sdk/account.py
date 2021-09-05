@@ -45,7 +45,7 @@ class Account:
         Return ed25519 account id.
         """
         warnings.warn(
-            "Will be removed in version v5.0.0, "
+            "Will be removed in version v6.0.0, "
             "use `stellar_sdk.account.Account.account` instead.",
             DeprecationWarning,
         )
