@@ -40,9 +40,8 @@ class TestTransactionBuilder:
                 "GDF5O4OWEMVBY5FLDHWA5RZTYSV2U276XGKZZ6VSHDDR3THSQ6OQS7UM",
             )
             .append_change_trust_op(
-                Asset(
-                    "XCN", "GDF5O4OWEMVBY5FLDHWA5RZTYSV2U276XGKZZ6VSHDDR3THSQ6OQS7UM"
-                ),
+                "XCN",
+                "GDF5O4OWEMVBY5FLDHWA5RZTYSV2U276XGKZZ6VSHDDR3THSQ6OQS7UM",
                 "100000",
             )
             .append_payment_op(
@@ -203,9 +202,8 @@ class TestTransactionBuilder:
                 "GDF5O4OWEMVBY5FLDHWA5RZTYSV2U276XGKZZ6VSHDDR3THSQ6OQS7UM",
             )
             .append_change_trust_op(
-                Asset(
-                    "XCN", "GDF5O4OWEMVBY5FLDHWA5RZTYSV2U276XGKZZ6VSHDDR3THSQ6OQS7UM"
-                ),
+                "XCN",
+                "GDF5O4OWEMVBY5FLDHWA5RZTYSV2U276XGKZZ6VSHDDR3THSQ6OQS7UM",
                 "100000",
             )
             .append_payment_op(
@@ -525,7 +523,7 @@ class TestTransactionBuilder:
         fee = LIQUIDITY_POOL_FEE_V18
         asset = LiquidityPoolAsset(asset_a, asset_b, fee)
 
-        te = builder.append_change_trust_op(
+        te = builder.append_change_trust_liquidity_pool_asset_op(
             asset, limit="10000", source=op_source
         ).build()
         xdr = "AAAAAgAAAADL13HWIyocdKsZ7A7HM8Srqmv+uZWc+rI4xx3M8oedCQAAAGQAAAAAAAAAAgAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAABAAAAAMvXcdYjKhx0qxnsDsczxKuqa/65lZz6sjjHHczyh50JAAAABgAAAAMAAAAAAAAAAUFSU1QAAAAAfzBiNMmJ6dZ/ad/ZMRmLYA89bOa2TCJAcB+2KwiDK4cAAAABVVNEAAAAAACJmyhA7VY2xW3cXxSyOXX3nxuiOI0mlOTFbs3dyWDl7wAAAB4AAAAXSHboAAAAAAAAAAAA"

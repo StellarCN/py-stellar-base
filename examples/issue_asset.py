@@ -39,7 +39,9 @@ trust_transaction = (
         network_passphrase=Network.TESTNET_NETWORK_PASSPHRASE,
         base_fee=100,
     )
-    .append_change_trust_op(asset=hello_asset)
+    .append_change_trust_op(
+        asset_code=hello_asset.code, asset_issuer=hello_asset.issuer
+    )
     .build()
 )
 
