@@ -300,7 +300,28 @@ class TransactionBuilder:
 
     def append_change_trust_op(
         self,
-        asset: Union[Asset, LiquidityPoolAsset],
+        asset_code: str,
+        asset_issuer: str,
+        limit: Union[str, Decimal] = None,
+        source: Optional[Union[MuxedAccount, str]] = None,
+    ) -> "TransactionBuilder":
+        """Append a :class:`ChangeTrust <stellar_sdk.operation.ChangeTrust>`
+        operation to the list of operations.
+
+        :param asset_issuer: The issuer address for the asset.
+        :param asset_code: The asset code for the asset.
+        :param limit: The limit of the new trustline.
+        :param source: The source address to add the trustline to.
+        :return: This builder instance.
+
+        """
+        asset = Asset(asset_code, asset_issuer)
+        op = ChangeTrust(asset, limit, source)
+        return self.append_operation(op)
+
+    def append_change_trust_liquidity_pool_asset_op(
+        self,
+        asset: LiquidityPoolAsset,
         limit: Union[str, Decimal] = None,
         source: Optional[Union[MuxedAccount, str]] = None,
     ) -> "TransactionBuilder":
