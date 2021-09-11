@@ -621,6 +621,36 @@ class TestTxrep:
             ),
             source=keypair.public_key,
         )
+        transaction_builder.append_liquidity_pool_deposit_op(
+            "dd7b1ab831c273310ddbec6f97870aa83c2fbd78ce22aded37ecbf4f3380fac7",
+            "10",
+            "20",
+            "0.45",
+            "0.55",
+            keypair.public_key,
+        )
+        transaction_builder.append_liquidity_pool_withdraw_op(
+            "dd7b1ab831c273310ddbec6f97870aa83c2fbd78ce22aded37ecbf4f3380fac7",
+            "5",
+            "10",
+            "20",
+            keypair.public_key,
+        )
+        transaction_builder.append_revoke_liquidity_pool_sponsorship_op(
+            "dd7b1ab831c273310ddbec6f97870aa83c2fbd78ce22aded37ecbf4f3380fac7",
+            keypair.public_key,
+        )
+        asset_a = Asset(
+            "ARST", "GB7TAYRUZGE6TVT7NHP5SMIZRNQA6PLM423EYISAOAP3MKYIQMVYP2JO"
+        )
+        asset_b = Asset(
+            "USD", "GCEZWKCA5VLDNRLN3RPRJMRZOX3Z6G5CHCGSNFHEYVXM3XOJMDS674JZ"
+        )
+        fee = LIQUIDITY_POOL_FEE_V18
+        line = LiquidityPoolAsset(asset_a, asset_b, fee)
+        transaction_builder.append_change_trust_liquidity_pool_asset_op(
+            line, "10000", keypair.public_key
+        )
         te = transaction_builder.build()
         te.sign(keypair)
         te.sign_hashx(

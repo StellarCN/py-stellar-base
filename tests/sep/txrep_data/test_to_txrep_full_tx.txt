@@ -1,13 +1,13 @@
 type: ENVELOPE_TYPE_TX
 tx.sourceAccount: GBEFNJVA2347XAJ4HYAECN5S7DIMLRDKXYT7BSFGF6SDM4VH5TD5HGJB
-tx.fee: 7000
+tx.fee: 7800
 tx.seqNum: 46489056724385793
 tx.timeBounds._present: true
 tx.timeBounds.minTime: 1535756672 (2018-08-31 23:04:32.000000+00:00 (UTC))
 tx.timeBounds.maxTime: 1567292672 (2019-08-31 23:04:32.000000+00:00 (UTC))
 tx.memo.type: MEMO_TEXT
 tx.memo.text: "Enjoy this transaction"
-tx.operations.len: 35
+tx.operations.len: 39
 tx.operations[0].sourceAccount._present: true
 tx.operations[0].sourceAccount: GBEFNJVA2347XAJ4HYAECN5S7DIMLRDKXYT7BSFGF6SDM4VH5TD5HGJB
 tx.operations[0].body.type: PAYMENT
@@ -106,6 +106,7 @@ tx.operations[7].body.setOptionsOp.signer.weight: 10
 tx.operations[8].sourceAccount._present: true
 tx.operations[8].sourceAccount: GBEFNJVA2347XAJ4HYAECN5S7DIMLRDKXYT7BSFGF6SDM4VH5TD5HGJB
 tx.operations[8].body.type: CHANGE_TRUST
+tx.operations[8].body.changeTrustOp.line.type: ASSET_TYPE_CREDIT_ALPHANUM4
 tx.operations[8].body.changeTrustOp.line: XCN:GAYE5SDEM5JIEMGQ7LBMQVRQRVJB6A5E7AZVLJYFL3CNHLZX24DFD35F
 tx.operations[8].body.changeTrustOp.limit: 10000000000 (1000)
 tx.operations[9].sourceAccount._present: true
@@ -307,9 +308,40 @@ tx.operations[34].body.setTrustLineFlagsOp.trustor: GDUF4TESKD5H47VB6KRWIYX7CL4T
 tx.operations[34].body.setTrustLineFlagsOp.asset: XCN:GAYE5SDEM5JIEMGQ7LBMQVRQRVJB6A5E7AZVLJYFL3CNHLZX24DFD35F
 tx.operations[34].body.setTrustLineFlagsOp.clearFlags: 0
 tx.operations[34].body.setTrustLineFlagsOp.setFlags: 0
+tx.operations[35].sourceAccount._present: true
+tx.operations[35].sourceAccount: GBEFNJVA2347XAJ4HYAECN5S7DIMLRDKXYT7BSFGF6SDM4VH5TD5HGJB
+tx.operations[35].body.type: LIQUIDITY_POOL_DEPOSIT
+tx.operations[35].body.liquidityPoolDepositOp.liquidityPoolID: dd7b1ab831c273310ddbec6f97870aa83c2fbd78ce22aded37ecbf4f3380fac7
+tx.operations[35].body.liquidityPoolDepositOp.maxAmountA: 100000000 (10)
+tx.operations[35].body.liquidityPoolDepositOp.maxAmountB: 200000000 (20)
+tx.operations[35].body.liquidityPoolDepositOp.minPrice.n: 9
+tx.operations[35].body.liquidityPoolDepositOp.minPrice.d: 20
+tx.operations[35].body.liquidityPoolDepositOp.maxPrice.n: 11
+tx.operations[35].body.liquidityPoolDepositOp.maxPrice.d: 20
+tx.operations[36].sourceAccount._present: true
+tx.operations[36].sourceAccount: GBEFNJVA2347XAJ4HYAECN5S7DIMLRDKXYT7BSFGF6SDM4VH5TD5HGJB
+tx.operations[36].body.type: LIQUIDITY_POOL_WITHDRAW
+tx.operations[36].body.liquidityPoolWithdrawOp.liquidityPoolID: dd7b1ab831c273310ddbec6f97870aa83c2fbd78ce22aded37ecbf4f3380fac7
+tx.operations[36].body.liquidityPoolWithdrawOp.amount: 50000000 (5)
+tx.operations[36].body.liquidityPoolWithdrawOp.minAmountA: 100000000 (10)
+tx.operations[36].body.liquidityPoolWithdrawOp.minAmountB: 200000000 (20)
+tx.operations[37].sourceAccount._present: true
+tx.operations[37].sourceAccount: GBEFNJVA2347XAJ4HYAECN5S7DIMLRDKXYT7BSFGF6SDM4VH5TD5HGJB
+tx.operations[37].body.type: REVOKE_SPONSORSHIP
+tx.operations[37].body.revokeSponsorshipOp.type: REVOKE_SPONSORSHIP_LEDGER_ENTRY
+tx.operations[37].body.revokeSponsorshipOp.ledgerKey.type: LIQUIDITY_POOL
+tx.operations[37].body.revokeSponsorshipOp.ledgerKey.liquidityPool.liquidityPoolID: dd7b1ab831c273310ddbec6f97870aa83c2fbd78ce22aded37ecbf4f3380fac7
+tx.operations[38].sourceAccount._present: true
+tx.operations[38].sourceAccount: GBEFNJVA2347XAJ4HYAECN5S7DIMLRDKXYT7BSFGF6SDM4VH5TD5HGJB
+tx.operations[38].body.type: CHANGE_TRUST
+tx.operations[38].body.changeTrustOp.line.type: ASSET_TYPE_POOL_SHARE
+tx.operations[38].body.changeTrustOp.line.liquidityPool.constantProduct.assetA: ARST:GB7TAYRUZGE6TVT7NHP5SMIZRNQA6PLM423EYISAOAP3MKYIQMVYP2JO
+tx.operations[38].body.changeTrustOp.line.liquidityPool.constantProduct.assetB: USD:GCEZWKCA5VLDNRLN3RPRJMRZOX3Z6G5CHCGSNFHEYVXM3XOJMDS674JZ
+tx.operations[38].body.changeTrustOp.line.liquidityPool.constantProduct.fee: 30
+tx.operations[38].body.changeTrustOp.limit: 100000000000 (10000)
 tx.ext.v: 0
 signatures.len: 2
 signatures[0].hint: a7ecc7d3
-signatures[0].signature: 38b8d7e21412712fc22a064fb80f64500dc822d90a38f1f2f7a564f669f8d7096e7e2ce3752329a25d1ba7b980cf7ecfa2511a9ef79fea3d1018f0f6ac862d0f
+signatures[0].signature: 73e77a746fa2642e533b0d19f51395ff0345a25b317cd3e11b7f588a8bf27813c287a05605a47070bcbbe50bff416280763e4d0739645cba2ced0379ca29220e
 signatures[1].hint: 21d0289a
 signatures[1].signature: 8b73f9e12fcc8cd9580a2a26aec14d6175aa1ff45e76b816618635d03f3256b8

@@ -407,6 +407,16 @@ def _get_operation(index, raw_data_map, tx_prefix):
         return _get_set_trust_line_flags_op(
             source_account_id, operation_prefix, raw_data_map
         )
+    elif operation_type == _to_caps_with_under(LiquidityPoolDeposit.__name__):
+        operation_prefix = prefix + "liquidityPoolDepositOp."
+        return _get_liquidity_pool_deposit_op(
+            source_account_id, operation_prefix, raw_data_map
+        )
+    elif operation_type == _to_caps_with_under(LiquidityPoolWithdraw.__name__):
+        operation_prefix = prefix + "liquidityPoolWithdrawOp."
+        return _get_liquidity_pool_withdraw_op(
+            source_account_id, operation_prefix, raw_data_map
+        )
     else:
         raise SdkValueError(
             f"This operation has not been implemented yet, "
@@ -615,7 +625,21 @@ def _get_allow_trust_op(
 def _get_change_trust_op(
     source: str, operation_prefix: str, raw_data_map: Dict[str, str]
 ) -> ChangeTrust:
-    line = _get_asset(raw_data_map, f"{operation_prefix}line")
+    # Keep compatibility
+    line_type = raw_data_map.get(f"{operation_prefix}line.type", None)
+    if line_type == stellar_xdr.AssetType.ASSET_TYPE_POOL_SHARE.name:
+        asset_a = _get_asset(
+            raw_data_map, f"{operation_prefix}line.liquidityPool.constantProduct.assetA"
+        )
+        asset_b = _get_asset(
+            raw_data_map, f"{operation_prefix}line.liquidityPool.constantProduct.assetB"
+        )
+        fee = _get_int_value(
+            raw_data_map, f"{operation_prefix}line.liquidityPool.constantProduct.fee"
+        )
+        line: Union[Asset, LiquidityPoolAsset] = LiquidityPoolAsset(asset_a, asset_b, fee)
+    else:
+        line = _get_asset(raw_data_map, f"{operation_prefix}line")
     limit = _get_amount_value(raw_data_map, f"{operation_prefix}limit")
     return ChangeTrust(asset=line, limit=limit, source=source)
 
@@ -787,6 +811,14 @@ def _get_revoke_sponsorship_op(
             return RevokeSponsorship.revoke_claimable_balance_sponsorship(
                 claimable_balance_id=claimable_balance_id, source=source
             )
+        elif ledger_entry_type == stellar_xdr.LedgerEntryType.LIQUIDITY_POOL.name:
+            liquidity_pool_id = _get_value(
+                raw_data_map,
+                f"{operation_prefix}ledgerKey.liquidityPool.liquidityPoolID",
+            )
+            return RevokeSponsorship.revoke_liquidity_pool_sponsorship(
+                liquidity_pool_id=liquidity_pool_id, source=source
+            )
         else:
             raise SdkValueError(
                 f"This ledger entry type has not been implemented yet, "
@@ -851,6 +883,44 @@ def _get_set_trust_line_flags_op(
         asset=asset,
         clear_flags=clear_flags,
         set_flags=set_flags,
+        source=source,
+    )
+
+
+def _get_liquidity_pool_deposit_op(
+    source: str, operation_prefix: str, raw_data_map: Dict[str, str]
+):
+    liquidity_pool_id = _get_value(raw_data_map, f"{operation_prefix}liquidityPoolID")
+    max_amount_a = _get_amount_value(raw_data_map, f"{operation_prefix}maxAmountA")
+    max_amount_b = _get_amount_value(raw_data_map, f"{operation_prefix}maxAmountB")
+    min_price_n = _get_int_value(raw_data_map, f"{operation_prefix}minPrice.n")
+    min_price_d = _get_int_value(raw_data_map, f"{operation_prefix}minPrice.d")
+    min_price = Price(min_price_n, min_price_d)
+    max_price_n = _get_int_value(raw_data_map, f"{operation_prefix}maxPrice.n")
+    max_price_d = _get_int_value(raw_data_map, f"{operation_prefix}maxPrice.d")
+    max_price = Price(max_price_n, max_price_d)
+    return LiquidityPoolDeposit(
+        liquidity_pool_id=liquidity_pool_id,
+        max_amount_a=max_amount_a,
+        max_amount_b=max_amount_b,
+        min_price=min_price,
+        max_price=max_price,
+        source=source,
+    )
+
+
+def _get_liquidity_pool_withdraw_op(
+    source: str, operation_prefix: str, raw_data_map: Dict[str, str]
+):
+    liquidity_pool_id = _get_value(raw_data_map, f"{operation_prefix}liquidityPoolID")
+    amount = _get_amount_value(raw_data_map, f"{operation_prefix}amount")
+    min_amount_a = _get_amount_value(raw_data_map, f"{operation_prefix}minAmountA")
+    min_amount_b = _get_amount_value(raw_data_map, f"{operation_prefix}minAmountB")
+    return LiquidityPoolWithdraw(
+        liquidity_pool_id=liquidity_pool_id,
+        amount=amount,
+        min_amount_a=min_amount_a,
+        min_amount_b=min_amount_b,
         source=source,
     )
 
@@ -1181,7 +1251,22 @@ def _add_operation(
         add_home_domain(operation.home_domain)
         add_signer(operation.signer)
     elif isinstance(operation, ChangeTrust):
-        add_body_line("line", _to_asset(operation.asset))
+        asset_xdr = operation.asset.to_change_trust_asset_xdr_object()
+        add_body_line("line.type", asset_xdr.type.name)
+        if asset_xdr.type == stellar_xdr.AssetType.ASSET_TYPE_POOL_SHARE:
+            assert isinstance(operation.asset, LiquidityPoolAsset)
+            add_body_line(
+                "line.liquidityPool.constantProduct.assetA",
+                _to_asset(operation.asset.asset_a),
+            )
+            add_body_line(
+                "line.liquidityPool.constantProduct.assetB",
+                _to_asset(operation.asset.asset_b),
+            )
+            add_body_line("line.liquidityPool.constantProduct.fee", operation.asset.fee)
+        else:
+            assert isinstance(operation.asset, Asset)
+            add_body_line("line", _to_asset(operation.asset))
         add_body_line("limit", _to_amount(operation.limit), comment=operation.limit)
     elif isinstance(operation, AllowTrust):
         add_body_line("trustor", operation.trustor)
@@ -1305,6 +1390,17 @@ def _add_operation(
             add_body_line(
                 "ledgerKey.claimableBalance.balanceID", operation.claimable_balance_id
             )
+        elif operation.revoke_sponsorship_type == RevokeSponsorshipType.LIQUIDITY_POOL:
+            add_body_line(
+                "type",
+                stellar_xdr.revoke_sponsorship_type.RevokeSponsorshipType.REVOKE_SPONSORSHIP_LEDGER_ENTRY.name,
+            )
+            add_body_line(
+                "ledgerKey.type", stellar_xdr.LedgerEntryType.LIQUIDITY_POOL.name
+            )
+            add_body_line(
+                "ledgerKey.liquidityPool.liquidityPoolID", operation.liquidity_pool_id
+            )
         elif operation.revoke_sponsorship_type == RevokeSponsorshipType.SIGNER:
             assert operation.signer is not None
             add_body_line(
@@ -1374,6 +1470,35 @@ def _add_operation(
             add_body_line("setFlags", 0)
         else:
             add_body_line("setFlags", operation.set_flags.value)
+    elif isinstance(operation, LiquidityPoolDeposit):
+        add_body_line("liquidityPoolID", operation.liquidity_pool_id)
+        add_body_line(
+            "maxAmountA",
+            _to_amount(operation.max_amount_a),
+            comment=operation.max_amount_a,
+        )
+        add_body_line(
+            "maxAmountB",
+            _to_amount(operation.max_amount_b),
+            comment=operation.max_amount_b,
+        )
+        add_body_line("minPrice.n", operation.min_price.n)
+        add_body_line("minPrice.d", operation.min_price.d)
+        add_body_line("maxPrice.n", operation.max_price.n)
+        add_body_line("maxPrice.d", operation.max_price.d)
+    elif isinstance(operation, LiquidityPoolWithdraw):
+        add_body_line("liquidityPoolID", operation.liquidity_pool_id)
+        add_body_line("amount", _to_amount(operation.amount), comment=operation.amount)
+        add_body_line(
+            "minAmountA",
+            _to_amount(operation.min_amount_a),
+            comment=operation.min_amount_a,
+        )
+        add_body_line(
+            "minAmountB",
+            _to_amount(operation.min_amount_b),
+            comment=operation.min_amount_b,
+        )
     else:
         raise SdkValueError(
             f"This operation has not been implemented yet, "
