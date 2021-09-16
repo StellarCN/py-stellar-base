@@ -25,7 +25,7 @@ transaction = (
         base_fee=100,
     )
     .append_payment_op(  # add a payment operation to the transaction
-        destination="GASOCNHNNLYFNMDJYQ3XFMI7BYHIOCFW3GJEOWRPEGK2TDPGTG2E5EDW",
+        destination=key_func['destination_acct_0'],
         asset_code="XLM",
         amount="125.5",
     )

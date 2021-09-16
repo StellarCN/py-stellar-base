@@ -27,7 +27,8 @@ fee_source_keypair = Keypair.from_secret(
 inner_source_keypair = Keypair.from_secret(
     func_key['source_key_1']
 )
-destination_address = "GBVKI23OQZCANDUZ2SI7XU7W6ICYKYT74JBXDD2CYRDAFZHZNRPASSQK"
+
+destination_address = func_key['destination_acct_0']
 
 server = Server(horizon_url=horizon_url)
 inner_account = server.load_account(inner_source_keypair)

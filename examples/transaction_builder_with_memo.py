@@ -25,7 +25,7 @@ transaction = (
     )
     .add_text_memo("Happy birthday!")
     .append_payment_op(
-        destination="GASOCNHNNLYFNMDJYQ3XFMI7BYHIOCFW3GJEOWRPEGK2TDPGTG2E5EDW",
+        destination=key_func['destination_acct_0'],
         amount="2000",
         asset_code="XLM",
     )

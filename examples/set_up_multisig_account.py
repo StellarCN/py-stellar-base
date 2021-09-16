@@ -56,7 +56,7 @@ response = server.submit_transaction(transaction)
 print(response)
 
 # now create a payment with the account that has two signers
-destination = "GBA5SMM5OYAOOPL6R773MV7O3CCLUDVLCWHIVVL3W4XTD3DA5FJ4JSEZ" #This will cause an error, account not created 
+destination = func_key['destination_acct_0'] #This will cause an error, account not created 
 transaction = (
     TransactionBuilder(
         source_account=root_account,

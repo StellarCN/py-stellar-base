@@ -2,9 +2,13 @@
 See: https://stellar-sdk.readthedocs.io/en/latest/querying_horizon.html#streaming-requests
 """
 from stellar_sdk import Server
+from e_utils import read_key
+
+
+func_key = read_key()
 
 server = Server(horizon_url="https://horizon-testnet.stellar.org")
-account_id = "GASOCNHNNLYFNMDJYQ3XFMI7BYHIOCFW3GJEOWRPEGK2TDPGTG2E5EDW"
+account_id = func_key['destination_acct_0']
 last_cursor = "now"  # or load where you left off
 
 

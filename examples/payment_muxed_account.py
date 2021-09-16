@@ -10,7 +10,7 @@ func_key = read_key()
 
 alice_secret = func_key['source_key_2']
 bob_account = MuxedAccount(
-    account_id="GBZSQ3YZMZEWL5ZRCEQ5CCSOTXCFCMKDGFFP4IEQN2KN6LCHCLI46UMF",
+    account_id=func_key['destination_acct_0'],
     account_muxed_id=1234,
 )
 print(f"account_id_muxed: {bob_account.account_muxed}")

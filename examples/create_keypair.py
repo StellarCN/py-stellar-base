@@ -27,6 +27,6 @@ print("-" * 68)
 
 # create a keypair from public key
 print("create a keypair from public key")
-public_key = "GDCZ6JDZMWYORTIHEO2E4ZXKBQ2TLXNRQJPJH5RCFN7Q7I24G4RGLXP6"
+public_key = key_func['destination_acct_0']
 kp = Keypair.from_public_key(public_key)
 print(f"Public Key: {kp.public_key}")

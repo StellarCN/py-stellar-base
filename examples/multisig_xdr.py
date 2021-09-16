@@ -9,10 +9,10 @@ from e_utils import read_key
 
 key_func = read_key()
 
-escrow_public = "GD7ZZHKFKFPV2KR6JPE5L6QOZ43LV6HBJWLITCC73V6R7YFERSAITE4S"
+escrow_public = key_func['destination_acct_0']
 alice_secret = key_func['source_key_2']
 bob_secret = key_func['source_key_0']
-eve_public = "GAPE2V77237AQJGTFNYNI3RBMERSFLTUYPVXDMANXUGUN6IEWCVY3VXN"
+eve_public = key_func['destination_acct_1']
 
 network_passphrase = Network.TESTNET_NETWORK_PASSPHRASE
 server = Server(horizon_url="https://horizon-testnet.stellar.org")

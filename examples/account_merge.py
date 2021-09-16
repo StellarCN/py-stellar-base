@@ -24,7 +24,7 @@ source_public_key = source_keypair.public_key
 # This is the public key of another account created by the friendbot. When I wrote this
 # code it was active on the test network, but I would recommened creating a new account
 # the same way the source account was created.
-destination_public_key = "GANXMF6DCQNHZP5ULDONM4VNXBV5YECTDGLGXCESXNT66H6AZSAHLFGK"
+destination_public_key = key_func['destination_acct_0']
 
 # loads the source account from the testnet
 source_account = server.load_account(source_public_key)

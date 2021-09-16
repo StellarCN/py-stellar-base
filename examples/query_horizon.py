@@ -2,9 +2,13 @@
 See: https://stellar-sdk.readthedocs.io/en/latest/querying_horizon.html#building-requests
 """
 from stellar_sdk import Server
+from e_utils import read_key
+
+
+key_func = read_key()
 
 server = Server(horizon_url="https://horizon.stellar.org")
-account = "GB6NVEN5HSUBKMYCE5ZOWSK5K23TBWRUQLZY3KNMXUZ3AQ2ESC4MY4AQ"
+account = key_func['destination_acct_0']
 
 # get a list of transactions that occurred in ledger 1400
 transactions = server.transactions().for_ledger(1400).call()

@@ -19,7 +19,7 @@ source_secret_key = key_func['source_key_0']
 source_keypair = Keypair.from_secret(source_secret_key)
 source_public_key = source_keypair.public_key
 
-receiver_public_key = "GA7YNBW5CBTJZ3ZZOWX3ZNBKD6OE7A7IHUQVWMY62W2ZBG2SGZVOOPVH"
+receiver_public_key = key_func['destination_acct_0']
 source_account = Account(source_public_key, 12345)
 
 
