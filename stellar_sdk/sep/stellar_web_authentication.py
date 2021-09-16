@@ -306,14 +306,9 @@ def read_challenge_transaction(
             f"Transaction not signed by server: {server_account_id}."
         )
 
-    if client_account.account_muxed_id:
-        client_account_id = client_account.account_muxed
-    else:
-        client_account_id = client_account.account_id
-
     return ChallengeTransaction(
         transaction=transaction_envelope,
-        client_account_id=client_account_id,
+        client_account_id=client_account.account_muxed or client_account.account_id,
         matched_home_domain=matched_home_domain,
         memo=memo
     )
