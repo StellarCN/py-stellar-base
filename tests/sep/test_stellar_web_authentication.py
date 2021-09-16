@@ -7,7 +7,7 @@ import pytest
 
 from stellar_sdk import Account, Keypair, MuxedAccount, Network
 from stellar_sdk.memo import IdMemo
-from stellar_sdk.exceptions import ValueError, MemoInvalidException
+from stellar_sdk.exceptions import ValueError
 from stellar_sdk.operation import ManageData
 from stellar_sdk.sep.ed25519_public_key_signer import Ed25519PublicKeySigner
 from stellar_sdk.sep.exceptions import InvalidSep10ChallengeError
