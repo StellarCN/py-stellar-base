@@ -18,9 +18,8 @@ After the Setup is done, you will have the following in a .stellar_env file in y
 ## * **private keys**
 ## * **Public Keys**
 ## * **Asset Object**
----
+
 ## USING THE PRIVATE KEYS
----
 This is by default, used for signing transaction in the example file, you can change them within the example file if you want, they are named "source_key_0", "source_key_1" and so on.
 
 To use any of the Source Key to sign Transaction, You just need to
@@ -32,9 +31,8 @@ To use any of the Source Key to sign Transaction, You just need to
 
     transaction.sign(adc['source_key_3'])
 ```
----
+
 ## USING THE PUBLIC KEYS
----
 These public keys are used as disposable public address and are used where you dont need that public key to sign a transaction, mainly as destination account, they are named "destination_acct_0", "destination_acct_1", and so on, reference to their private key is not stored anywhere.
 
 To use any of the Public keys
@@ -61,9 +59,7 @@ To use any of the Public keys
 )
 
 ```
----
 ## USING THE ASSET OBJECT
----
 The Asset created is mainly to be used for sending transaction (other than XLM), placing order on testnet, etc. You can find details about the asset in the **.stellar_env** file in your current workig directory.
 * **asset_key** -- This is the private key for the issuing Account
 * **asset_code** -- The Asset Code
