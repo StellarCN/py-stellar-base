@@ -50,12 +50,12 @@ class ChallengeTransaction:
         transaction: TransactionEnvelope,
         client_account_id: str,
         matched_home_domain: str,
-        memo: Union[int, IdMemo] = None
+        memo: Optional[int] = None
     ) -> None:
         self.transaction = transaction
         self.client_account_id = client_account_id
         self.matched_home_domain = matched_home_domain
-        self.memo = memo if not isinstance(memo, int) else IdMemo(memo)
+        self.memo = memo
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
@@ -80,7 +80,7 @@ def build_challenge_transaction(
     timeout: int = 900,
     client_domain: Optional[str] = None,
     client_signing_key: Optional[str] = None,
-    memo: Optional[Union[int, IdMemo]] = None
+    memo: Optional[int] = None
 ) -> str:
     """Returns a valid `SEP0010 <https://github.com/stellar/stellar-protocol/blob/master/ecosystem/sep-0010.md>`_
     challenge transaction which you can use for Stellar Web Authentication.
@@ -102,8 +102,8 @@ def build_challenge_transaction(
         raise ValueError(
             "memos are not valid for challenge transactions with a muxed client account"
         )
-    if memo and not isinstance(memo, IdMemo):
-        memo = IdMemo(memo)
+    if memo and not isinstance(memo, int):
+        raise ValueError("memo must be an integer")
 
     now = int(time.time())
     server_keypair = Keypair.from_secret(server_secret)
@@ -132,7 +132,7 @@ def build_challenge_transaction(
             source=client_signing_key,
         )
     if memo:
-        transaction_builder.add_memo(memo)
+        transaction_builder.add_id_memo(memo)
     transaction = transaction_builder.build()
     transaction.sign(server_keypair)
     return transaction.to_xdr()
@@ -271,7 +271,7 @@ def read_challenge_transaction(
             "Invalid challenge, memos are not permitted if the client account is muxed"
         )
     elif isinstance(transaction.memo, IdMemo):
-        memo = transaction.memo
+        memo = transaction.memo.memo_id
     else:
         raise InvalidSep10ChallengeError(
             "Invalid memo, only ID memos are permitted"
@@ -306,9 +306,14 @@ def read_challenge_transaction(
             f"Transaction not signed by server: {server_account_id}."
         )
 
+    if client_account.account_muxed_id:
+        client_account_id = client_account.account_muxed
+    else:
+        client_account_id = client_account.account_id
+
     return ChallengeTransaction(
         transaction=transaction_envelope,
-        client_account_id=client_account.account_id,
+        client_account_id=client_account_id,
         matched_home_domain=matched_home_domain,
         memo=memo
     )
