@@ -12,9 +12,16 @@ that both the sponsoring and sponsored accounts agree to every sponsorship.
 See: https://developers.stellar.org/docs/glossary/sponsored-reserves/
 """
 from stellar_sdk import Keypair, Network, Server, TransactionBuilder
+from e_utils import read_key
 
-sponsor_secret = "SAOJHTVFCYVKUMPNQI7RUSI566GKWXP7RXOHP4SV6JAVUQKSIWGPZFPJ"
-new_account_secret = "SCN5D72JHQAHUHGIA23SLS3LBYCPHJWD7HLYNJRBBZIG4PD74UCGQBYM"
+
+key_func = read_key()
+
+sponsor_secret = key_func['source_key_4']
+
+#create new keypair to be sponsored, secret key from this account is not stored anywhere
+keys_ =Keypair.random()
+new_account_secret = keys_.secret
 
 sponsor_keypair = Keypair.from_secret(sponsor_secret)
 newly_created_keypair = Keypair.from_secret(new_account_secret)

@@ -17,9 +17,12 @@ from stellar_sdk import (
     Server,
     TransactionBuilder,
 )
+from e_utils import read_key
 
-sponsor_secret = "SAOJHTVFCYVKUMPNQI7RUSI566GKWXP7RXOHP4SV6JAVUQKSIWGPZFPJ"
-claimant_secret = "SBOLGU7D7A7MTY4JZ3WZUKSKB6NZBQFNQG3BZT4HZW4AAVZJRG7TWXGQ"
+func_key = read_key()
+
+sponsor_secret = func_key['source_key_1']
+claimant_secret = func_key['source_key_2']
 
 sponsor_keypair = Keypair.from_secret(sponsor_secret)
 claimant_keypair = Keypair.from_secret(claimant_secret)

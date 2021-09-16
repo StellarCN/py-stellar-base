@@ -24,20 +24,23 @@ from stellar_sdk import (
     Server,
     TransactionBuilder,
 )
+from e_utils import read_key
+
+func_key = read_key()
 
 server = Server(horizon_url="https://horizon-testnet.stellar.org")
 
 # Key for asset issuer
 # GDUGCRQWFXZM4MJ2VOEDNG5WZDJQKOP6CNMFHNL4Z4WFT2JMXOGLXD2K
 issuing_keypair = Keypair.from_secret(
-    "SD3REN5OX2QR7PSWANAKKUQGXOHGCVUG2ZQ7OIJY2IN3O4CXWT42KSM2"
+    func_key['source_key_2']
 )
 issuing_public = issuing_keypair.public_key
 
 # Key for customer
 # GDEHVYLEMNKXMT75TOSB7SMPVZYFSAV7PKLO3O6JJ4RV7PONOXAN2Y6L
 customer_keypair = Keypair.from_secret(
-    "SDG5FE6JR4VHXAEIT6KGGARWOLZF2ZSUV6VOP2JSOFOM7I65D7RKFLER"
+    func_key['source_key_3']
 )
 customer_public = customer_keypair.public_key
 

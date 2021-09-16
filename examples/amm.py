@@ -9,13 +9,15 @@ from stellar_sdk import (
     LiquidityPoolAsset,
     Network,
 )
-
+from e_utils import read_key
 horizon_url = "https://horizon-testnet.stellar.org/"
 network_passphrase = Network.TESTNET_NETWORK_PASSPHRASE
 
 server = Server(horizon_url=horizon_url)
+
+func_key = read_key()
 source_keypair = Keypair.from_secret(
-    "SBLPQEGODE2GKGL2RMQRZAJBR73S3R4UI2RD2I2U2ZDDIVU2NDBSZATS"
+    func_key['source_key_2']
 )
 
 # We assume that Hello asset already exists in the Stellar network,

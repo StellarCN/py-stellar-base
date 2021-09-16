@@ -20,11 +20,13 @@ on the account.
 import hashlib
 
 from stellar_sdk import Keypair, Network, Server, TransactionBuilder
+from e_utils import read_key
 
 server = Server(horizon_url="https://horizon-testnet.stellar.org")
 
+key_func = read_key()
 root_keypair = Keypair.from_secret(
-    "SDSMBDZKTGPTYGXOM7VLC52PICHMI3LOZTMKXSDCU3H75AGXLITMHBUG"
+    key_func['source_key_3']
 )
 root_account = server.load_account(account_id=root_keypair.public_key)
 

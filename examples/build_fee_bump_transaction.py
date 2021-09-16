@@ -13,15 +13,19 @@ import pprint
 
 from stellar_sdk import Keypair, Network, Server, TransactionBuilder
 from stellar_sdk.exceptions import BadRequestError
+from e_utils import read_key
+
+
+func_key = read_key()
 
 horizon_url = "https://horizon-testnet.stellar.org/"
 network_passphrase = Network.TESTNET_NETWORK_PASSPHRASE
 
 fee_source_keypair = Keypair.from_secret(
-    "SASZKBDB6PFHXN6LRH4NQNTRGLGDTI3PSUVIKMZMLTYYBB7NDVMA6DSL"
+    func_key['source_key_3']
 )
 inner_source_keypair = Keypair.from_secret(
-    "SC5O7VZUXDJ6JBDSZ74DSERXL7W3Y5LTOAMRF7RQRL3TAGAPS7LUVG3L"
+    func_key['source_key_1']
 )
 destination_address = "GBVKI23OQZCANDUZ2SI7XU7W6ICYKYT74JBXDD2CYRDAFZHZNRPASSQK"
 

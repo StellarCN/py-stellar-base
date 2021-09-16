@@ -9,19 +9,23 @@ from stellar_sdk.keypair import Keypair
 from stellar_sdk.network import Network
 from stellar_sdk.server import Server
 from stellar_sdk.transaction_builder import TransactionBuilder
+from e_utils import read_key
 
 # Configure StellarSdk to talk to the horizon instance hosted by Stellar.org
 # To use the live network, set the hostname to 'horizon.stellar.org'
 server = Server(horizon_url="https://horizon-testnet.stellar.org")
 
+func_key = read_key()
+print(func_key)
+
 # Keys for accounts to issue and receive the new asset
 issuing_keypair = Keypair.from_secret(
-    "SCBHQEGSNBTT4S7Y73YAF3M3JSVSTSNBGAVU5M4XVFGUF7664EUXQHFU"
+    func_key['source_key_1']
 )
 issuing_public = issuing_keypair.public_key
 
 distributor_keypair = Keypair.from_secret(
-    "SB6MJ6M3BPJZUGFP2QCODUIKWQWF6AIN4Z6L3J6PWL3QGDW4L6YR3QIU"
+    func_key['source_key_2']
 )
 distributor_public = distributor_keypair.public_key
 

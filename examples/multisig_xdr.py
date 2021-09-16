@@ -5,10 +5,13 @@ send 100 XLM from the escrow account to Eve, the following code shows how to ach
 I recommend that you check the `./set_up_multisig_account.py` before reading this example.
 """
 from stellar_sdk import Network, Server, TransactionBuilder, TransactionEnvelope
+from e_utils import read_key
+
+key_func = read_key()
 
 escrow_public = "GD7ZZHKFKFPV2KR6JPE5L6QOZ43LV6HBJWLITCC73V6R7YFERSAITE4S"
-alice_secret = "SDKE26TSKMJDWPTWMA5YJYSIA6VQ5QNBUS5VEUR7P6NY4F7ITL7ZILQG"
-bob_secret = "SBVFXGIXA22LSNZQKXCTNBRBFHBPRWBGZ7KNWAEINCYCPMNFGJDFPWA2"
+alice_secret = key_func['source_key_2']
+bob_secret = key_func['source_key_0']
 eve_public = "GAPE2V77237AQJGTFNYNI3RBMERSFLTUYPVXDMANXUGUN6IEWCVY3VXN"
 
 network_passphrase = Network.TESTNET_NETWORK_PASSPHRASE

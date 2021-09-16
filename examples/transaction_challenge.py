@@ -12,18 +12,21 @@ from stellar_sdk.sep.stellar_web_authentication import (
     verify_challenge_transaction_signed_by_client_master_key,
     verify_challenge_transaction_threshold,
 )
+from e_utils import read_key
 
+
+key_func = read_key()
 server_keypair = Keypair.from_secret(
-    "SBGCNEOQGECW5R4A55C26ZFS736IONKCHY5PPPSFZVXSJSU63MWNM4K6"
+    key_func['source_key_0']
 )
 client_master_keypair = Keypair.from_secret(
-    "SDWZHXKWSHTQ2YGPT6YQQSOJWJX5JX2IEU7KOLGQ2XEJEECIQHUU3RMR"
+    key_func['source_key_1']
 )
 client_signer_keypair1 = Keypair.from_secret(
-    "SCKJFEF2H767XINUY5YFBORUO7AAWOAXSTQ2B2YHSI6N4UF23HFV42I7"
+    key_func['source_key_2']
 )
 client_signer_keypair2 = Keypair.from_secret(
-    "SCE2JBZ6FKPTQ5LM4X4NIZOOZPIC5DXVG6VP2TKSBZCQAGXABJV55IN5"
+    key_func['source_key_3']
 )
 
 server = Server("https://horizon-testnet.stellar.org")

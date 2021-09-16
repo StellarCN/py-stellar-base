@@ -9,8 +9,12 @@ See: https://github.com/stellar/stellar-protocol/blob/master/ecosystem/sep-0011.
 """
 from stellar_sdk import Account, Keypair, Network, TransactionBuilder
 from stellar_sdk.sep.txrep import from_txrep, to_txrep
+from e_utils import read_key
 
-source_secret_key = "SBFZCHU5645DOKRWYBXVOXY2ELGJKFRX6VGGPRYUWHQ7PMXXJNDZFMKD"
+
+
+key_func = read_key()
+source_secret_key = key_func['source_key_0']
 
 source_keypair = Keypair.from_secret(source_secret_key)
 source_public_key = source_keypair.public_key

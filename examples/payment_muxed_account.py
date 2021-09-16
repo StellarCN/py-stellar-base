@@ -1,11 +1,14 @@
 import pprint
 
 from stellar_sdk import Keypair, MuxedAccount, Network, Server, TransactionBuilder
+from e_utils import read_key
 
 horizon_url = "https://horizon-testnet.stellar.org/"
 network_passphrase = Network.TESTNET_NETWORK_PASSPHRASE
 
-alice_secret = "SAHN2RCKC5I7NFDCIUKA3BG4H4T6WMLLGSAZVDKUHF7PQXHMYWD7UAIH"
+func_key = read_key()
+
+alice_secret = func_key['source_key_2']
 bob_account = MuxedAccount(
     account_id="GBZSQ3YZMZEWL5ZRCEQ5CCSOTXCFCMKDGFFP4IEQN2KN6LCHCLI46UMF",
     account_muxed_id=1234,

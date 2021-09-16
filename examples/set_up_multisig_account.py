@@ -16,14 +16,17 @@ with the transaction has multiple public keys.
 See: https://developers.stellar.org/docs/glossary/multisig/
 """
 from stellar_sdk import Keypair, Network, Server, Signer, TransactionBuilder
+from e_utils import read_key
 
 server = Server(horizon_url="https://horizon-testnet.stellar.org")
+
+func_key = read_key()
 root_keypair = Keypair.from_secret(
-    "SA6XHAH4GNLRWWWF6TEVEWNS44CBNFAJWHWOPZCVZOUXSQA7BOYN7XHC"
+    func_key['source_key_3']
 )
 root_account = server.load_account(account_id=root_keypair.public_key)
 secondary_keypair = Keypair.from_secret(
-    "SAMZUAAPLRUH62HH3XE7NVD6ZSMTWPWGM6DS4X47HLVRHEBKP4U2H5E7"
+    func_key['source_key_4']
 )
 
 secondary_signer = Signer.ed25519_public_key(
@@ -53,7 +56,7 @@ response = server.submit_transaction(transaction)
 print(response)
 
 # now create a payment with the account that has two signers
-destination = "GBA5SMM5OYAOOPL6R773MV7O3CCLUDVLCWHIVVL3W4XTD3DA5FJ4JSEZ"
+destination = "GBA5SMM5OYAOOPL6R773MV7O3CCLUDVLCWHIVVL3W4XTD3DA5FJ4JSEZ" #This will cause an error, account not created 
 transaction = (
     TransactionBuilder(
         source_account=root_account,

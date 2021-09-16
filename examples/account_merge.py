@@ -5,6 +5,7 @@ another account and removes the source account from the ledger.
 See: https://developers.stellar.org/docs/start/list-of-operations/#account-merge
 """
 from stellar_sdk import Keypair, Network, Server, TransactionBuilder
+from e_utils import read_key
 
 # Configure StellarSdk to talk to the horizon instance hosted by Stellar.org
 # To use the live network, set the hostname to 'horizon.stellar.org'
@@ -13,7 +14,8 @@ server = Server(horizon_url="https://horizon-testnet.stellar.org")
 # The following source key was created by the friendbot at https://laboratory.stellar.org/#account-creator?network=test
 # before running this example create a new account, fund it and then copy and paste the
 # secret key where the current key is.
-source_secret_key = "SC7AUS23UKVZQL5KMIK4ZK3EZJUS6ZVMTQSVLH3VIK42W6RBQAQXOVQX"
+key_func = read_key()
+source_secret_key = key_func['source_key_1']
 
 # The following obtains the keypair of the source account we will be dealing with.
 source_keypair = Keypair.from_secret(source_secret_key)

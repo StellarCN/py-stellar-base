@@ -4,6 +4,10 @@ This example shows the various ways to create a Keypair.
 See: https://developers.stellar.org/docs/tutorials/create-account/#create-a-keypair
 """
 from stellar_sdk.keypair import Keypair
+from e_utils import read_key
+
+
+key_func = read_key()
 
 # create a random keypair
 print("create a random keypair")
@@ -12,9 +16,10 @@ print(f"Secret: {kp.secret}")
 print(f"Public Key: {kp.public_key}")
 print("-" * 68)
 
+
 # create a keypair from secret
 print("create a keypair from secret")
-secret = "SBRR6ZPBHHTDXYSFRZR2QZCGDZURNE5ON4M4F3HQA42G3Z62SFCR7EEJ"
+secret = key_func['source_key_4']
 kp = Keypair.from_secret(secret)
 print(f"Secret: {kp.secret}")
 print(f"Public Key: {kp.public_key}")

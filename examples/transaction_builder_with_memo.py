@@ -5,9 +5,14 @@ See: https://developers.stellar.org/docs/glossary/transactions/#memo
 See: https://stellar-sdk.readthedocs.io/en/latest/building_transactions.html#building-transactions
 """
 from stellar_sdk import Account, Keypair, Network, TransactionBuilder
+from e_utils import read_key
+
+
+
+key_func = read_key()
 
 root_keypair = Keypair.from_secret(
-    "SA6XHAH4GNLRWWWF6TEVEWNS44CBNFAJWHWOPZCVZOUXSQA7BOYN7XHC"
+    key_func['source_key_2']
 )
 # Create an Account object from an address and sequence number.
 root_account = Account(account_id=root_keypair.public_key, sequence=1)
@@ -27,3 +32,5 @@ transaction = (
     .set_timeout(30)
     .build()
 )
+
+print(transaction)

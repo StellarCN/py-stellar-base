@@ -5,9 +5,12 @@ See: https://developers.stellar.org/docs/tutorials/create-account/#create-accoun
 See: https://developers.stellar.org/docs/start/list-of-operations/#create-account
 """
 from stellar_sdk import Keypair, Network, Server, TransactionBuilder
+from e_utils import read_key
+
+func_key = read_key()
 
 server = Server(horizon_url="https://horizon-testnet.stellar.org")
-source = Keypair.from_secret("SBFZCHU5645DOKRWYBXVOXY2ELGJKFRX6VGGPRYUWHQ7PMXXJNDZFMKD")
+source = Keypair.from_secret(func_key['source_key_1'])
 destination = Keypair.random()
 
 source_account = server.load_account(account_id=source.public_key)

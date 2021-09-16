@@ -11,10 +11,14 @@ See: https://developers.stellar.org/docs/start/list-of-operations/#path-payment-
 See: https://youtu.be/KzlSgSPStz8
 """
 from stellar_sdk import Asset, Keypair, Network, Server, TransactionBuilder
+from e_utils import read_key
+
+
+key_func = read_key()
 
 server = Server(horizon_url="https://horizon-testnet.stellar.org")
 source_keypair = Keypair.from_secret(
-    "SA6XHAH4GNLRWWWF6TEVEWNS44CBNFAJWHWOPZCVZOUXSQA7BOYN7XHC"
+    key_func['source_key_2']
 )
 
 source_account = server.load_account(account_id=source_keypair.public_key)
