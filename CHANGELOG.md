@@ -1,6 +1,17 @@
 Release History
 ==============
 
+### Version 4.2.0
+Released on September 17, 2021
+
+#### Update
+
+* Updated the following SEP-10 utility functions to be compliant with the protocols ([#521](https://github.com/StellarCN/py-stellar-base/pull/521), [stellar-protocol/#1036](https://github.com/stellar/stellar-protocol/pull/1036)):
+  - Updated `build_challenge_transaction()` to accept muxed accounts (`M...`) for client account IDs.
+  - Updated `build_challenge_transaction()` to accept a `memo` parameter to attach to the challenge transaction.
+  - Updated `ChallengeTransaction` to provide a `memo` property.
+  - Updated `read_challenge_transaction()` to validate challenge transactions with muxed accounts (`M...`) as the client account ID.
+  
 ### Version 4.1.1
 Released on August 23, 2021
 
@@ -17,7 +28,7 @@ Released on July 28, 2021
 	- CreateClaimableBalance
 	- ClaimClaimableBalance
 	- BeginSponsoringFutureReserves
-  - EndSponsoringFutureReserves
+    - EndSponsoringFutureReserves
 	- RevokeSponsorship
 	- Clawback
 	- ClawbackClaimableBalance
