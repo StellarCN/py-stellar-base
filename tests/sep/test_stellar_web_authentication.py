@@ -116,6 +116,26 @@ class TestStellarWebAuthentication:
         ).transaction
         assert transaction.memo == IdMemo(memo)
 
+    def test_challenge_transaction_non_id_memo_not_permitted(self):
+        server_kp = Keypair.random()
+        client_account_id = Keypair.random().public_key
+        memo = "test"
+        timeout = 600
+        network_passphrase = Network.TESTNET_NETWORK_PASSPHRASE
+        home_domain = "example.com"
+        web_auth_domain = "auth.example.com"
+
+        with pytest.raises(ValueError, match="memo must be an integer"):
+            build_challenge_transaction(
+                server_secret=server_kp.secret,
+                client_account_id=client_account_id,
+                home_domain=home_domain,
+                web_auth_domain=web_auth_domain,
+                network_passphrase=network_passphrase,
+                timeout=timeout,
+                memo=memo
+            )
+
     def test_challenge_transaction_muxed_client_account_with_memo_not_permitted(self):
         server_kp = Keypair.random()
         client_account_id = (
