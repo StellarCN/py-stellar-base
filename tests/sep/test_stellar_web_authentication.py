@@ -1,10 +1,12 @@
 import base64
 import os
 import time
+from random import randrange
 
 import pytest
 
 from stellar_sdk import Account, Keypair, MuxedAccount, Network
+from stellar_sdk.memo import IdMemo
 from stellar_sdk.exceptions import ValueError
 from stellar_sdk.operation import ManageData
 from stellar_sdk.sep.ed25519_public_key_signer import Ed25519PublicKeySigner
@@ -66,7 +68,7 @@ class TestStellarWebAuthentication:
         assert transaction.source == MuxedAccount.from_account(server_kp.public_key)
         assert transaction.sequence == 0
 
-    def test_challenge_transaction_mux_client_account_id_raise(self):
+    def test_challenge_transaction_mux_client_account_id_permitted(self):
         server_kp = Keypair.random()
         client_account_id = (
             "MAAAAAAAAAAAJURAAB2X52XFQP6FBXLGT6LWOOWMEXWHEWBDVRZ7V5WH34Y22MPFBHUHY"
@@ -75,9 +77,79 @@ class TestStellarWebAuthentication:
         network_passphrase = Network.TESTNET_NETWORK_PASSPHRASE
         home_domain = "example.com"
         web_auth_domain = "auth.example.com"
+
+        challenge = build_challenge_transaction(
+            server_secret=server_kp.secret,
+            client_account_id=client_account_id,
+            home_domain=home_domain,
+            web_auth_domain=web_auth_domain,
+            network_passphrase=network_passphrase,
+            timeout=timeout,
+        )
+
+        transaction = TransactionEnvelope.from_xdr(
+            challenge, network_passphrase
+        ).transaction
+        assert transaction.operations[0].source.account_muxed == client_account_id
+
+    def test_challenge_transaction_id_memo_as_int_permitted(self):
+        server_kp = Keypair.random()
+        client_account_id = Keypair.random().public_key
+        memo = randrange(0, 2**64)
+        timeout = 600
+        network_passphrase = Network.TESTNET_NETWORK_PASSPHRASE
+        home_domain = "example.com"
+        web_auth_domain = "auth.example.com"
+
+        challenge = build_challenge_transaction(
+            server_secret=server_kp.secret,
+            client_account_id=client_account_id,
+            home_domain=home_domain,
+            web_auth_domain=web_auth_domain,
+            network_passphrase=network_passphrase,
+            timeout=timeout,
+            memo=memo
+        )
+
+        transaction = TransactionEnvelope.from_xdr(
+            challenge, network_passphrase
+        ).transaction
+        assert transaction.memo == IdMemo(memo)
+
+    def test_challenge_transaction_non_id_memo_not_permitted(self):
+        server_kp = Keypair.random()
+        client_account_id = Keypair.random().public_key
+        memo = "test"
+        timeout = 600
+        network_passphrase = Network.TESTNET_NETWORK_PASSPHRASE
+        home_domain = "example.com"
+        web_auth_domain = "auth.example.com"
+
+        with pytest.raises(ValueError, match="memo must be an integer"):
+            build_challenge_transaction(
+                server_secret=server_kp.secret,
+                client_account_id=client_account_id,
+                home_domain=home_domain,
+                web_auth_domain=web_auth_domain,
+                network_passphrase=network_passphrase,
+                timeout=timeout,
+                memo=memo
+            )
+
+    def test_challenge_transaction_muxed_client_account_with_memo_not_permitted(self):
+        server_kp = Keypair.random()
+        client_account_id = (
+            "MAAAAAAAAAAAJURAAB2X52XFQP6FBXLGT6LWOOWMEXWHEWBDVRZ7V5WH34Y22MPFBHUHY"
+        )
+        memo = randrange(0, 2**64)
+        timeout = 600
+        network_passphrase = Network.TESTNET_NETWORK_PASSPHRASE
+        home_domain = "example.com"
+        web_auth_domain = "auth.example.com"
+
         with pytest.raises(
             ValueError,
-            match="Invalid client_account_id, multiplexed account are not supported.",
+            match="memos are not valid for challenge transactions with a muxed client account"
         ):
             build_challenge_transaction(
                 server_secret=server_kp.secret,
@@ -86,6 +158,7 @@ class TestStellarWebAuthentication:
                 web_auth_domain=web_auth_domain,
                 network_passphrase=network_passphrase,
                 timeout=timeout,
+                memo=memo
             )
 
     def test_challenge_transaction_with_client_domain(self):
@@ -1714,11 +1787,145 @@ class TestStellarWebAuthentication:
             match="Invalid server_account_id, multiplexed account are not supported.",
         ):
             read_challenge_transaction(
-                challenge,
-                "MAAAAAAAAAAAJURAAB2X52XFQP6FBXLGT6LWOOWMEXWHEWBDVRZ7V5WH34Y22MPFBHUHY",
-                network_passphrase,
-                web_auth_domain,
-                home_domain,
+                challenge_transaction=challenge,
+                server_account_id="MAAAAAAAAAAAJURAAB2X52XFQP6FBXLGT6LWOOWMEXWHEWBDVRZ7V5WH34Y22MPFBHUHY",
+                network_passphrase=network_passphrase,
+                web_auth_domain=web_auth_domain,
+                home_domains=home_domain,
+            )
+
+    def test_read_challenge_transaction_mux_client_id_permitted(self):
+        server_kp = Keypair.random()
+        client_account_id = (
+            "MAAAAAAAAAAAJURAAB2X52XFQP6FBXLGT6LWOOWMEXWHEWBDVRZ7V5WH34Y22MPFBHUHY"
+        )
+        timeout = 600
+        network_passphrase = Network.PUBLIC_NETWORK_PASSPHRASE
+        home_domain = "example.com"
+        web_auth_domain = "auth.example.com"
+
+        challenge = build_challenge_transaction(
+            server_secret=server_kp.secret,
+            client_account_id=client_account_id,
+            home_domain=home_domain,
+            web_auth_domain=web_auth_domain,
+            network_passphrase=network_passphrase,
+            timeout=timeout,
+        )
+        challenge_transaction = read_challenge_transaction(
+            challenge_transaction=challenge,
+            server_account_id=server_kp.public_key,
+            network_passphrase=network_passphrase,
+            web_auth_domain=web_auth_domain,
+            home_domains=home_domain,
+        )
+        assert challenge_transaction.client_account_id == client_account_id
+
+    def test_read_challenge_transaction_with_memo_permitted(self):
+        server_kp = Keypair.random()
+        client_account_id = Keypair.random()
+        timeout = 600
+        network_passphrase = Network.PUBLIC_NETWORK_PASSPHRASE
+        home_domain = "example.com"
+        web_auth_domain = "auth.example.com"
+        memo = randrange(0, 2**64)
+
+        challenge = build_challenge_transaction(
+            server_secret=server_kp.secret,
+            client_account_id=client_account_id.public_key,
+            home_domain=home_domain,
+            web_auth_domain=web_auth_domain,
+            network_passphrase=network_passphrase,
+            timeout=timeout,
+            memo=memo
+        )
+        challenge_transaction = read_challenge_transaction(
+            challenge_transaction=challenge,
+            server_account_id=server_kp.public_key,
+            network_passphrase=network_passphrase,
+            web_auth_domain=web_auth_domain,
+            home_domains=home_domain,
+        )
+        assert challenge_transaction.memo == memo
+
+    def test_read_challenge_transaction_mux_client_id_with_memo_not_permitted(self):
+        server_account = Account(Keypair.random().public_key, -1)
+        client_account_id = (
+            "MAAAAAAAAAAAJURAAB2X52XFQP6FBXLGT6LWOOWMEXWHEWBDVRZ7V5WH34Y22MPFBHUHY"
+        )
+        timeout = 600
+        network_passphrase = Network.PUBLIC_NETWORK_PASSPHRASE
+        home_domain = "example.com"
+        web_auth_domain = "auth.example.com"
+        nonce = os.urandom(48)
+        nonce_encoded = base64.b64encode(nonce)
+
+        challenge = TransactionBuilder(
+            source_account=server_account,
+            network_passphrase=network_passphrase
+        ).append_manage_data_op(
+            data_name=f"{home_domain} auth",
+            data_value=nonce_encoded,
+            source=client_account_id
+        ).append_manage_data_op(
+            data_name="web_auth_domain",
+            data_value=home_domain,
+            source=server_account.account,
+        ).add_id_memo(
+            randrange(0, 2**64)
+        ).set_timeout(
+            timeout
+        ).build()
+
+        with pytest.raises(
+            InvalidSep10ChallengeError,
+            match="Invalid challenge, memos are not permitted if the client account is muxed"
+        ):
+            read_challenge_transaction(
+                challenge_transaction=challenge.to_xdr(),
+                server_account_id=server_account.account.account_id,
+                network_passphrase=network_passphrase,
+                web_auth_domain=web_auth_domain,
+                home_domains=home_domain,
+            )
+
+    def test_read_challenge_transaction_with_non_id_memo_not_permitted(self):
+        server_account = Account(Keypair.random().public_key, -1)
+        client_account_id = Keypair.random().public_key
+        timeout = 600
+        network_passphrase = Network.PUBLIC_NETWORK_PASSPHRASE
+        home_domain = "example.com"
+        web_auth_domain = "auth.example.com"
+        nonce = os.urandom(48)
+        nonce_encoded = base64.b64encode(nonce)
+
+        challenge = TransactionBuilder(
+            source_account=server_account,
+            network_passphrase=network_passphrase
+        ).append_manage_data_op(
+            data_name=f"{home_domain} auth",
+            data_value=nonce_encoded,
+            source=client_account_id
+        ).append_manage_data_op(
+            data_name="web_auth_domain",
+            data_value=home_domain,
+            source=server_account.account,
+        ).add_text_memo(
+            "test"
+        ).set_timeout(
+            timeout
+        ).build()
+
+        with pytest.raises(
+            InvalidSep10ChallengeError,
+            match="Invalid memo, only ID memos are permitted"
+        ):
+            read_challenge_transaction(
+                challenge_transaction=challenge.to_xdr(),
+                server_account_id=server_account.account.account_id,
+                network_passphrase=network_passphrase,
+                web_auth_domain=web_auth_domain,
+                home_domains=home_domain,
             )
 
     def test_read_challenge_transaction_fee_bump_transaction_raise(self):

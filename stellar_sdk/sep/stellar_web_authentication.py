@@ -4,8 +4,8 @@ Title: Stellar Web Authentication
 Author: Sergey Nebolsin <@nebolsin>, Tom Quisel <tom.quisel@gmail.com>, Leigh McCulloch <@leighmcculloch>, Jake Urban <jake@stellar.org>
 Status: Active
 Created: 2018-07-31
-Updated: 2021-03-04
-Version 3.2.0
+Updated: 2021-08-10
+Version 3.3.0
 """
 import base64
 import os
@@ -14,6 +14,7 @@ from typing import Iterable, List, Optional, Union
 
 from .. import xdr as stellar_xdr
 from ..account import Account
+from ..memo import IdMemo, NoneMemo
 from ..exceptions import BadSignatureError, ValueError
 from ..keypair import Keypair
 from ..operation.manage_data import ManageData
@@ -41,6 +42,7 @@ class ChallengeTransaction:
     :param transaction: The TransactionEnvelope parsed from challenge xdr.
     :param client_account_id: The stellar account that the wallet wishes to authenticate with the server.
     :param matched_home_domain: The domain name that has been matched.
+    :param memo: The ID memo attached to the transaction
     """
 
     def __init__(
@@ -48,10 +50,12 @@ class ChallengeTransaction:
         transaction: TransactionEnvelope,
         client_account_id: str,
         matched_home_domain: str,
+        memo: Optional[int] = None
     ) -> None:
         self.transaction = transaction
         self.client_account_id = client_account_id
         self.matched_home_domain = matched_home_domain
+        self.memo = memo
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
@@ -60,10 +64,11 @@ class ChallengeTransaction:
             self.transaction == other.transaction
             and self.client_account_id == other.client_account_id
             and self.matched_home_domain == other.matched_home_domain
+            and self.memo == other.memo
         )
 
     def __str__(self):
-        return f"<ChallengeTransaction [transaction={self.transaction}, client_account_id={self.client_account_id}, matched_home_domain={self.matched_home_domain}]>"
+        return f"<ChallengeTransaction [transaction={self.transaction}, client_account_id={self.client_account_id}, memo={self.memo}, matched_home_domain={self.matched_home_domain}]>"
 
 
 def build_challenge_transaction(
@@ -75,12 +80,13 @@ def build_challenge_transaction(
     timeout: int = 900,
     client_domain: Optional[str] = None,
     client_signing_key: Optional[str] = None,
+    memo: Optional[int] = None
 ) -> str:
     """Returns a valid `SEP0010 <https://github.com/stellar/stellar-protocol/blob/master/ecosystem/sep-0010.md>`_
     challenge transaction which you can use for Stellar Web Authentication.
 
     :param server_secret: secret key for server's stellar.toml `SIGNING_KEY`.
-    :param client_account_id: The stellar account that the wallet wishes to authenticate with the server.
+    :param client_account_id: The stellar account (`G...`) or muxed account (`M...`) that the wallet wishes to authenticate with the server.
     :param home_domain: The `fully qualified domain name <https://en.wikipedia.org/wiki/Fully_qualified_home_domain>`_
         of the service requiring authentication, for example: `example.com`.
     :param web_auth_domain: The fully qualified domain name of the service issuing the challenge.
@@ -89,12 +95,15 @@ def build_challenge_transaction(
     :param timeout: Challenge duration in seconds (default to 15 minutes).
     :param client_domain: The domain of the client application requesting authentication
     :param client_signing_key: The stellar account listed as the SIGNING_KEY on the client domain's TOML file
+    :param memo: The ID memo to attach to the transaction. Not permitted if `client_account_id` is a muxed account
     :return: A base64 encoded string of the raw TransactionEnvelope xdr struct for the transaction.
     """
-    if client_account_id.startswith(MUXED_ACCOUNT_STARTING_LETTER):
+    if client_account_id.startswith(MUXED_ACCOUNT_STARTING_LETTER) and memo:
         raise ValueError(
-            "Invalid client_account_id, multiplexed account are not supported."
+            "memos are not valid for challenge transactions with a muxed client account"
         )
+    if memo and not isinstance(memo, int):
+        raise ValueError("memo must be an integer")
 
     now = int(time.time())
     server_keypair = Keypair.from_secret(server_secret)
@@ -122,6 +131,8 @@ def build_challenge_transaction(
             data_value=client_domain,
             source=client_signing_key,
         )
+    if memo:
+        transaction_builder.add_id_memo(memo)
     transaction = transaction_builder.build()
     transaction.sign(server_keypair)
     return transaction.to_xdr()
@@ -253,6 +264,19 @@ def read_challenge_transaction(
             "Operation value before encoding as base64 should be 48 bytes long."
         )
 
+    if not transaction.memo or isinstance(transaction.memo, NoneMemo):
+        memo = None
+    elif client_account.account_muxed_id:
+        raise InvalidSep10ChallengeError(
+            "Invalid challenge, memos are not permitted if the client account is muxed"
+        )
+    elif isinstance(transaction.memo, IdMemo):
+        memo = transaction.memo.memo_id
+    else:
+        raise InvalidSep10ChallengeError(
+            "Invalid memo, only ID memos are permitted"
+        )
+
     # verify any subsequent operations are manage data ops and source account is the server
     for op in transaction.operations[1:]:
         if not isinstance(op, ManageData):
@@ -283,7 +307,10 @@ def read_challenge_transaction(
         )
 
     return ChallengeTransaction(
-        transaction_envelope, client_account.account_id, matched_home_domain
+        transaction=transaction_envelope,
+        client_account_id=client_account.account_muxed or client_account.account_id,
+        matched_home_domain=matched_home_domain,
+        memo=memo
     )
 
 
