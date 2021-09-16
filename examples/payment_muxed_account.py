@@ -8,7 +8,10 @@ network_passphrase = Network.TESTNET_NETWORK_PASSPHRASE
 
 func_key = read_key()
 
+#getting signing key
 alice_secret = func_key['source_key_2']
+
+#MuxedAccount
 bob_account = MuxedAccount(
     account_id=func_key['destination_acct_0'],
     account_muxed_id=1234,
@@ -17,6 +20,7 @@ print(f"account_id_muxed: {bob_account.account_muxed}")
 # You can also use addresses starting with M.
 # bob_account = "MBZSQ3YZMZEWL5ZRCEQ5CCSOTXCFCMKDGFFP4IEQN2KN6LCHCLI46AAAAAAAAAAE2L2QE"
 
+#Sending Payments
 alice_keypair = Keypair.from_secret(alice_secret)
 
 server = Server(horizon_url=horizon_url)

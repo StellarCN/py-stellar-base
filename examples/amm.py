@@ -24,7 +24,7 @@ source_keypair = Keypair.from_secret(
 # and you can learn how to issue assets through examples/issue_asset.py
 # Here we define a Liquidity Pool Asset.
 asset_a = Asset.native()
-asset_b = Asset("Hello", "GD5Y3PMKI46MPILDG4OQP4SGFMRNKYEPJVDAPR3P3I2BMZ3O7IX6DB2Y")
+asset_b = Asset(func_key['asset_code'], func_key['asset_issuer'])
 liquidity_pool_asset = LiquidityPoolAsset(asset_a=asset_a, asset_b=asset_b)
 liquidity_pool_id = liquidity_pool_asset.liquidity_pool_id
 print(f"Liquidity Pool ID: {liquidity_pool_id}")

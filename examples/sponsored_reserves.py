@@ -17,7 +17,7 @@ from e_utils import read_key
 
 key_func = read_key()
 
-sponsor_secret = key_func['source_key_4']
+sponsor_secret = key_func['source_key_2']
 
 #create new keypair to be sponsored, secret key from this account is not stored anywhere
 keys_ =Keypair.random()

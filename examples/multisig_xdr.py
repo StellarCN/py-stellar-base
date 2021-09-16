@@ -9,6 +9,7 @@ from e_utils import read_key
 
 key_func = read_key()
 
+# getting keys to use
 escrow_public = key_func['destination_acct_0']
 alice_secret = key_func['source_key_2']
 bob_secret = key_func['source_key_0']

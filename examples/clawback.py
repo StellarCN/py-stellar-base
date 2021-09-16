@@ -31,14 +31,12 @@ func_key = read_key()
 server = Server(horizon_url="https://horizon-testnet.stellar.org")
 
 # Key for asset issuer
-# GDUGCRQWFXZM4MJ2VOEDNG5WZDJQKOP6CNMFHNL4Z4WFT2JMXOGLXD2K
 issuing_keypair = Keypair.from_secret(
     func_key['source_key_2']
 )
 issuing_public = issuing_keypair.public_key
 
 # Key for customer
-# GDEHVYLEMNKXMT75TOSB7SMPVZYFSAV7PKLO3O6JJ4RV7PONOXAN2Y6L
 customer_keypair = Keypair.from_secret(
     func_key['source_key_3']
 )

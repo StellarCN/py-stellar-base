@@ -16,7 +16,6 @@ from e_utils import read_key
 server = Server(horizon_url="https://horizon-testnet.stellar.org")
 
 func_key = read_key()
-print(func_key)
 
 # Keys for accounts to issue and receive the new asset
 issuing_keypair = Keypair.from_secret(

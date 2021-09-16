@@ -1,16 +1,6 @@
-"""
-1. Create a .secrets file
-2. Create a keypair
-3. add created keypair secret to the .secret file
-4. make it load to all transactions
 
---- Should create destination account too
---- Create a default Asset Code and Asset Issuer
-
-"""
-
-# Path(os.path.join(dir_link, "Bridges/.distributor")).read_text()
 import os, json, pickle, requests
+from stellar_sdk.asset import Asset
 from stellar_sdk.keypair import Keypair
 
 
@@ -34,7 +24,6 @@ class SetUp:
 
 
     def setup(self):
-
         for i in range(self.acct_num):
             #generate rnadom keypair
             source_key = self.key_pairs()
@@ -65,6 +54,13 @@ class SetUp:
             else:
                 print("Something went wrong")
 
+        asset_key_pair = self.key_pairs()
+
+        test_asset = Asset("AAC", asset_key_pair.public_key)
+        self.all_keys["asset_key"] = asset_key_pair.secret
+        self.all_keys["asset_code"] = test_asset.code
+        self.all_keys["asset_issuer"] = test_asset.issuer
+
         file_path = os.getcwd()
         my_file = open(os.path.join(file_path, ".stellar_env"), mode="w+", encoding="utf-8")
         before_write = json.dumps(self.all_keys, indent=4)
@@ -76,13 +72,9 @@ class SetUp:
 
 
 if __name__ == "__main__":
-    # SetUp()
     acct = input("Total Number of Source Account and Destination Account You will like to Create? ")
     if acct:
         SetUp(int(acct))
 
     else:
         SetUp(5)
-
-# print(all_keys)
-# print(all_keys['source_key'])

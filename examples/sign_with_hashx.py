@@ -26,7 +26,7 @@ server = Server(horizon_url="https://horizon-testnet.stellar.org")
 
 key_func = read_key()
 root_keypair = Keypair.from_secret(
-    key_func['source_key_3']
+    key_func['source_key_2']
 )
 root_account = server.load_account(account_id=root_keypair.public_key)
 

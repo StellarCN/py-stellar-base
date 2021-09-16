@@ -49,3 +49,5 @@ transaction.sign(source_keypair)
 
 # submit the transaction to the server
 response = server.submit_transaction(transaction)
+
+print(response)

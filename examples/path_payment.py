@@ -13,9 +13,10 @@ See: https://youtu.be/KzlSgSPStz8
 from stellar_sdk import Asset, Keypair, Network, Server, TransactionBuilder
 from e_utils import read_key
 
-
+#Getting Signing Key
 key_func = read_key()
 
+#Preparing Horizon 
 server = Server(horizon_url="https://horizon-testnet.stellar.org")
 source_keypair = Keypair.from_secret(
     key_func['source_key_2']
@@ -23,6 +24,7 @@ source_keypair = Keypair.from_secret(
 
 source_account = server.load_account(account_id=source_keypair.public_key)
 
+#This Transaction will always fail after testnet reset
 path = [
     Asset("USD", "GBBM6BKZPEHWYO3E3YKREDPQXMS4VK35YLNU7NFBRI26RAN7GI5POFBB"),
     Asset("EUR", "GDTNXRLOJD2YEBPKK7KCMR7J33AAG5VZXHAJTHIG736D6LVEFLLLKPDL"),
