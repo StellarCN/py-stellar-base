@@ -13,8 +13,9 @@ import time
 from typing import Iterable, List, Optional, Union
 
 from .. import xdr as stellar_xdr
-from ..account import Account
 from ..memo import IdMemo, NoneMemo
+from ..account import Account
+from ..muxed_account import MuxedAccount
 from ..exceptions import BadSignatureError, ValueError
 from ..keypair import Keypair
 from ..operation.manage_data import ManageData
@@ -547,6 +548,8 @@ def verify_challenge_transaction(
         network_passphrase,
     )
     client_account_id = parsed_challenge_transaction.client_account_id
+    if client_account_id.startswith(MUXED_ACCOUNT_STARTING_LETTER):
+        client_account_id = MuxedAccount.from_account(client_account_id).account_id
     signers = [Ed25519PublicKeySigner(client_account_id, 255)]
     verify_challenge_transaction_signers(
         challenge_transaction,
