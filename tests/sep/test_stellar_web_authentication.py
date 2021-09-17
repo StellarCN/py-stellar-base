@@ -267,6 +267,35 @@ class TestStellarWebAuthentication:
             network_passphrase,
         )
 
+    def test_verify_challenge_transaction_muxed_client_account(self):
+        server_kp = Keypair.random()
+        client_kp = Keypair.random()
+        client_muxed_account = MuxedAccount(client_kp.public_key, 123).account_muxed
+        timeout = 600
+        network_passphrase = Network.PUBLIC_NETWORK_PASSPHRASE
+        home_domain = "example.com"
+        web_auth_domain = "auth.example.com"
+
+        challenge = build_challenge_transaction(
+            server_secret=server_kp.secret,
+            client_account_id=client_muxed_account,
+            home_domain=home_domain,
+            web_auth_domain=web_auth_domain,
+            network_passphrase=network_passphrase,
+            timeout=timeout,
+        )
+
+        transaction = TransactionEnvelope.from_xdr(challenge, network_passphrase)
+        transaction.sign(client_kp)
+        challenge_tx = transaction.to_xdr()
+        verify_challenge_transaction(
+            challenge_tx,
+            server_kp.public_key,
+            home_domain,
+            web_auth_domain,
+            network_passphrase,
+        )
+
     def test_verify_challenge_transaction_with_multi_domain_names(self):
         server_kp = Keypair.random()
         client_kp = Keypair.random()
