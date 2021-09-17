@@ -1,4 +1,4 @@
-from typing import List, Union
+from typing import List, Union, Optional
 
 from . import xdr as stellar_xdr
 from .keypair import Keypair
@@ -70,12 +70,12 @@ class Transaction:
             source = MuxedAccount.from_account(source.public_key)
 
         self.source: MuxedAccount = source
-        self.sequence = sequence
-        self.operations = operations
-        self.memo = memo
-        self.fee = fee
-        self.time_bounds = time_bounds
-        self.v1 = v1
+        self.sequence: int = sequence
+        self.operations: List[Operation] = operations
+        self.memo: Memo = memo
+        self.fee: int = fee
+        self.time_bounds: Optional[TimeBounds] = time_bounds
+        self.v1: bool = v1
 
     def to_xdr_object(
         self,

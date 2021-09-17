@@ -135,14 +135,14 @@ class RevokeSponsorship(Operation):
         source: Optional[Union[MuxedAccount, str]] = None,
     ) -> None:
         super().__init__(source)
-        self.revoke_sponsorship_type = revoke_sponsorship_type
-        self.account_id = account_id
-        self.trustline = trustline
-        self.offer = offer
-        self.data = data
-        self.claimable_balance_id = claimable_balance_id
-        self.signer = signer
-        self.liquidity_pool_id = liquidity_pool_id
+        self.revoke_sponsorship_type: RevokeSponsorshipType = revoke_sponsorship_type
+        self.account_id: Optional[str] = account_id
+        self.trustline: Optional[TrustLine] = trustline
+        self.offer: Optional[Offer] = offer
+        self.data: Optional[Data] = data
+        self.claimable_balance_id: Optional[str] = claimable_balance_id
+        self.signer: Optional[Signer] = signer
+        self.liquidity_pool_id: Optional[str] = liquidity_pool_id
 
     @classmethod
     def revoke_account_sponsorship(

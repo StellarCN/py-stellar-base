@@ -40,14 +40,18 @@ class FeeBumpTransaction:
             fee_source = MuxedAccount.from_account(fee_source.public_key)
 
         self.fee_source: MuxedAccount = fee_source
-        self.base_fee = base_fee
-        self.inner_transaction_envelope = (
+        self.base_fee: int = base_fee
+        self.inner_transaction_envelope: TransactionEnvelope = (
             inner_transaction_envelope.to_transaction_envelope_v1()
         )
-        self._inner_transaction = self.inner_transaction_envelope.transaction
+        self._inner_transaction: Transaction = (
+            self.inner_transaction_envelope.transaction
+        )
 
-        inner_operations_length = len(self._inner_transaction.operations)
-        inner_base_fee_rate = self._inner_transaction.fee / inner_operations_length
+        inner_operations_length: int = len(self._inner_transaction.operations)
+        inner_base_fee_rate: int = int(
+            self._inner_transaction.fee / inner_operations_length
+        )
         if self.base_fee < inner_base_fee_rate or self.base_fee < BASE_FEE:
             raise ValueError(
                 f"Invalid `base_fee`, it should be at least {self._inner_transaction.fee if self._inner_transaction.fee > BASE_FEE else BASE_FEE} stroops."

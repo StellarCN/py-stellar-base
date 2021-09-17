@@ -384,9 +384,9 @@ class CreateClaimableBalance(Operation):
     ) -> None:
         super().__init__(source)
         check_amount(amount)
-        self.asset = asset
-        self.amount = amount
-        self.claimants = claimants
+        self.asset: Asset = asset
+        self.amount: str = str(amount)
+        self.claimants: List[Claimant] = claimants
 
     def _to_operation_body(self) -> stellar_xdr.OperationBody:
         asset = self.asset.to_xdr_object()

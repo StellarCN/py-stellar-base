@@ -40,7 +40,7 @@ class Clawback(Operation):
             from_ = MuxedAccount.from_account(from_)
         self.from_: MuxedAccount = from_
         self.asset: Asset = asset
-        self.amount: Union[str, Decimal] = amount
+        self.amount: str = str(amount)
 
     def _to_operation_body(self) -> stellar_xdr.OperationBody:
         asset = self.asset.to_xdr_object()

@@ -51,9 +51,9 @@ class PathPaymentStrictReceive(Operation):
             destination = MuxedAccount.from_account(destination)
         self.destination: MuxedAccount = destination
         self.send_asset: Asset = send_asset
-        self.send_max: Union[str, Decimal] = send_max
+        self.send_max: str = str(send_max)
         self.dest_asset: Asset = dest_asset
-        self.dest_amount: Union[str, Decimal] = dest_amount
+        self.dest_amount: str = str(dest_amount)
         self.path: List[Asset] = path  # a list of paths/assets
 
     def _to_operation_body(self) -> stellar_xdr.OperationBody:

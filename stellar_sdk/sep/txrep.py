@@ -637,7 +637,9 @@ def _get_change_trust_op(
         fee = _get_int_value(
             raw_data_map, f"{operation_prefix}line.liquidityPool.constantProduct.fee"
         )
-        line: Union[Asset, LiquidityPoolAsset] = LiquidityPoolAsset(asset_a, asset_b, fee)
+        line: Union[Asset, LiquidityPoolAsset] = LiquidityPoolAsset(
+            asset_a, asset_b, fee
+        )
     else:
         line = _get_asset(raw_data_map, f"{operation_prefix}line")
     limit = _get_amount_value(raw_data_map, f"{operation_prefix}limit")
@@ -1242,8 +1244,18 @@ def _add_operation(
         add_price(operation.price)
     elif isinstance(operation, SetOptions):
         add_body_line("inflationDest", operation.inflation_dest, True)
-        add_body_line("clearFlags", operation.clear_flags, True)
-        add_body_line("setFlags", operation.set_flags, True)
+        add_body_line(
+            "clearFlags",
+            operation.clear_flags.value if operation.clear_flags else None,
+            True,
+            comment=operation.clear_flags,
+        )
+        add_body_line(
+            "setFlags",
+            operation.set_flags.value if operation.set_flags else None,
+            True,
+            comment=operation.set_flags,
+        )
         add_body_line("masterWeight", operation.master_weight, True)
         add_body_line("lowThreshold", operation.low_threshold, True)
         add_body_line("medThreshold", operation.med_threshold, True)

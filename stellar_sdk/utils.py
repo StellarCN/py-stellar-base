@@ -2,7 +2,7 @@ import hashlib
 import os
 import re
 from decimal import ROUND_FLOOR, Decimal
-from typing import List
+from typing import List, Dict, Union
 from urllib.parse import urlsplit, urlunsplit
 
 from . import xdr as stellar_xdr
@@ -18,7 +18,7 @@ def sha256(data: bytes) -> bytes:
     return hashlib.sha256(data).digest()
 
 
-def best_rational_approximation(x):
+def best_rational_approximation(x) -> Dict[str, int]:
     x = Decimal(x)
     int32_max = Decimal(2147483647)
     fractions = [[Decimal(0), Decimal(1)], [Decimal(1), Decimal(0)]]
@@ -44,7 +44,7 @@ def best_rational_approximation(x):
     return {"n": int(n), "d": int(d)}
 
 
-def hex_to_bytes(hex_string):
+def hex_to_bytes(hex_string: Union[str, bytes]) -> bytes:
     if isinstance(hex_string, bytes):
         return hex_string
     if isinstance(hex_string, str):
