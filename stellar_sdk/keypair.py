@@ -107,8 +107,8 @@ class Keypair:
         """
         if not self.signing_key:
             raise MissingEd25519SecretSeedError(
-                "The keypair does not contain secret seed. Use Keypair.from_secret or "
-                "Keypair.random to create a new keypair with a secret seed."
+                "The keypair does not contain secret seed. Use Keypair.from_secret "
+                "Keypair.random or Keypair.from_mnemonic_phrase to create a new keypair with a secret seed."
             )
 
         return StrKey.encode_ed25519_secret_seed(self.raw_secret_key())

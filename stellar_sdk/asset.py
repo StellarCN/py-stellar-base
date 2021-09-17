@@ -41,7 +41,6 @@ class Asset:
 
         self.code: str = code
         self.issuer: Optional[str] = issuer
-        self._type: str = self.guess_asset_type()
 
     @staticmethod
     def check_if_asset_code_is_valid(code: str) -> None:
@@ -57,7 +56,7 @@ class Asset:
 
         :return: The type of the asset.
         """
-        return self._type
+        return self.guess_asset_type()
 
     @type.setter
     def type(self, v) -> None:

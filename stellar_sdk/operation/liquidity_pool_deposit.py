@@ -49,7 +49,7 @@ class LiquidityPoolDeposit(Operation):
         check_amount(max_amount_b)
         check_price(min_price)
         check_price(max_price)
-        self.liquidity_pool_id = liquidity_pool_id
+        self.liquidity_pool_id: str = liquidity_pool_id
         self.max_amount_a: str = str(max_amount_a)
         self.max_amount_b: str = str(max_amount_b)
         if isinstance(min_price, Price):

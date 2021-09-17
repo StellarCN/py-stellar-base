@@ -32,7 +32,7 @@ class TransactionEnvelope(BaseTransactionEnvelope["TransactionEnvelope"]):
         signatures: List[stellar_xdr.DecoratedSignature] = None,
     ) -> None:
         super().__init__(network_passphrase, signatures)
-        self.transaction = transaction
+        self.transaction: Transaction = transaction
 
     def signature_base(self) -> bytes:
         """Get the signature base of this transaction envelope.

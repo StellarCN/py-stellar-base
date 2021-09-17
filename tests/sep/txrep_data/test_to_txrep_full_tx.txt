@@ -49,9 +49,9 @@ tx.operations[4].body.type: SET_OPTIONS
 tx.operations[4].body.setOptionsOp.inflationDest._present: true
 tx.operations[4].body.setOptionsOp.inflationDest: GCVAZXCGX3HLHZ6P5WKEPE3U2YJMTLMPTZJFGY67MTNPSOA4COKVJ6AF
 tx.operations[4].body.setOptionsOp.clearFlags._present: true
-tx.operations[4].body.setOptionsOp.clearFlags: 3
+tx.operations[4].body.setOptionsOp.clearFlags: 3 (AuthorizationFlag.AUTHORIZATION_REVOCABLE|AUTHORIZATION_REQUIRED)
 tx.operations[4].body.setOptionsOp.setFlags._present: true
-tx.operations[4].body.setOptionsOp.setFlags: 3
+tx.operations[4].body.setOptionsOp.setFlags: 3 (AuthorizationFlag.AUTHORIZATION_REVOCABLE|AUTHORIZATION_REQUIRED)
 tx.operations[4].body.setOptionsOp.masterWeight._present: true
 tx.operations[4].body.setOptionsOp.masterWeight: 255
 tx.operations[4].body.setOptionsOp.lowThreshold._present: true
