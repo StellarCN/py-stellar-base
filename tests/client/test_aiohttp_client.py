@@ -3,6 +3,7 @@ import pytest
 from stellar_sdk.client.aiohttp_client import USER_AGENT, AiohttpClient
 
 
+@pytest.mark.slow
 class TestAiohttpClient:
     @pytest.mark.asyncio
     async def test_get(self):
@@ -35,7 +36,6 @@ class TestAiohttpClient:
         assert json["form"] == data
         await client.close()
 
-    @pytest.mark.slow
     @pytest.mark.asyncio
     @pytest.mark.timeout(30)
     async def test_stream(self):

@@ -5,6 +5,7 @@ from stellar_sdk.sep.exceptions import StellarTomlNotFoundError
 from stellar_sdk.sep.stellar_toml import fetch_stellar_toml
 
 
+@pytest.mark.slow
 class TestStellarToml:
     def test_get_success_sync(self):
         toml = fetch_stellar_toml("overcat.me", None)
