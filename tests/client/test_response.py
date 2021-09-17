@@ -1,6 +1,9 @@
+import pytest
+
 from stellar_sdk.client.response import Response
 
 
+@pytest.mark.slow
 class TestResponse:
     def test_json(self):
         resp = Response(
