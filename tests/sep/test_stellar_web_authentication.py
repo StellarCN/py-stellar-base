@@ -95,7 +95,7 @@ class TestStellarWebAuthentication:
     def test_challenge_transaction_id_memo_as_int_permitted(self):
         server_kp = Keypair.random()
         client_account_id = Keypair.random().public_key
-        memo = randrange(0, 2**64)
+        memo = randrange(0, 2 ** 64)
         timeout = 600
         network_passphrase = Network.TESTNET_NETWORK_PASSPHRASE
         home_domain = "example.com"
@@ -108,7 +108,7 @@ class TestStellarWebAuthentication:
             web_auth_domain=web_auth_domain,
             network_passphrase=network_passphrase,
             timeout=timeout,
-            memo=memo
+            memo=memo,
         )
 
         transaction = TransactionEnvelope.from_xdr(
@@ -133,7 +133,7 @@ class TestStellarWebAuthentication:
                 web_auth_domain=web_auth_domain,
                 network_passphrase=network_passphrase,
                 timeout=timeout,
-                memo=memo
+                memo=memo,
             )
 
     def test_challenge_transaction_muxed_client_account_with_memo_not_permitted(self):
@@ -141,7 +141,7 @@ class TestStellarWebAuthentication:
         client_account_id = (
             "MAAAAAAAAAAAJURAAB2X52XFQP6FBXLGT6LWOOWMEXWHEWBDVRZ7V5WH34Y22MPFBHUHY"
         )
-        memo = randrange(0, 2**64)
+        memo = randrange(0, 2 ** 64)
         timeout = 600
         network_passphrase = Network.TESTNET_NETWORK_PASSPHRASE
         home_domain = "example.com"
@@ -149,7 +149,7 @@ class TestStellarWebAuthentication:
 
         with pytest.raises(
             ValueError,
-            match="memos are not valid for challenge transactions with a muxed client account"
+            match="memos are not valid for challenge transactions with a muxed client account",
         ):
             build_challenge_transaction(
                 server_secret=server_kp.secret,
@@ -158,7 +158,7 @@ class TestStellarWebAuthentication:
                 web_auth_domain=web_auth_domain,
                 network_passphrase=network_passphrase,
                 timeout=timeout,
-                memo=memo
+                memo=memo,
             )
 
     def test_challenge_transaction_with_client_domain(self):
@@ -250,6 +250,35 @@ class TestStellarWebAuthentication:
         challenge = build_challenge_transaction(
             server_secret=server_kp.secret,
             client_account_id=client_kp.public_key,
+            home_domain=home_domain,
+            web_auth_domain=web_auth_domain,
+            network_passphrase=network_passphrase,
+            timeout=timeout,
+        )
+
+        transaction = TransactionEnvelope.from_xdr(challenge, network_passphrase)
+        transaction.sign(client_kp)
+        challenge_tx = transaction.to_xdr()
+        verify_challenge_transaction(
+            challenge_tx,
+            server_kp.public_key,
+            home_domain,
+            web_auth_domain,
+            network_passphrase,
+        )
+
+    def test_verify_challenge_transaction_muxed_client_account(self):
+        server_kp = Keypair.random()
+        client_kp = Keypair.random()
+        client_muxed_account = MuxedAccount(client_kp.public_key, 123).account_muxed
+        timeout = 600
+        network_passphrase = Network.PUBLIC_NETWORK_PASSPHRASE
+        home_domain = "example.com"
+        web_auth_domain = "auth.example.com"
+
+        challenge = build_challenge_transaction(
+            server_secret=server_kp.secret,
+            client_account_id=client_muxed_account,
             home_domain=home_domain,
             web_auth_domain=web_auth_domain,
             network_passphrase=network_passphrase,
@@ -846,6 +875,85 @@ class TestStellarWebAuthentication:
                 source=server_account.account,
             )
             .add_time_bounds(now - 100, now - 50)
+            .build()
+        )
+
+        challenge_te.sign(server_kp)
+        challenge_te.sign(client_kp)
+        challenge_tx_signed = challenge_te.to_xdr()
+
+        with pytest.raises(
+            InvalidSep10ChallengeError,
+            match="Transaction is not within range of the specified timebounds.",
+        ):
+            verify_challenge_transaction(
+                challenge_tx_signed,
+                server_kp.public_key,
+                home_domain,
+                web_auth_domain,
+                network_passphrase,
+            )
+
+    def test_verify_challenge_tx_valid_timebounds_with_grace_period(self):
+        server_kp = Keypair.random()
+        client_kp = Keypair.random()
+        network_passphrase = Network.PUBLIC_NETWORK_PASSPHRASE
+        home_domain = "example.com"
+        web_auth_domain = "auth.example.com"
+        now = int(time.time())
+        nonce = os.urandom(48)
+        nonce_encoded = base64.b64encode(nonce)
+        server_account = Account(server_kp.public_key, -1)
+        challenge_te = (
+            TransactionBuilder(server_account, network_passphrase, 100)
+            .append_manage_data_op(
+                data_name="{} auth".format(home_domain),
+                data_value=nonce_encoded,
+                source=client_kp.public_key,
+            )
+            .append_manage_data_op(
+                data_name="web_auth_domain",
+                data_value=web_auth_domain,
+                source=server_account.account,
+            )
+            .add_time_bounds(now + 5 * 59, now + 60 * 60)
+            .build()
+        )
+
+        challenge_te.sign(server_kp)
+        challenge_te.sign(client_kp)
+        challenge_tx_signed = challenge_te.to_xdr()
+        verify_challenge_transaction(
+            challenge_tx_signed,
+            server_kp.public_key,
+            home_domain,
+            web_auth_domain,
+            network_passphrase,
+        )
+
+    def test_verify_challenge_tx_invalid_timebounds_with_grace_period(self):
+        server_kp = Keypair.random()
+        client_kp = Keypair.random()
+        network_passphrase = Network.PUBLIC_NETWORK_PASSPHRASE
+        home_domain = "example.com"
+        web_auth_domain = "auth.example.com"
+        now = int(time.time())
+        nonce = os.urandom(48)
+        nonce_encoded = base64.b64encode(nonce)
+        server_account = Account(server_kp.public_key, -1)
+        challenge_te = (
+            TransactionBuilder(server_account, network_passphrase, 100)
+            .append_manage_data_op(
+                data_name="{} auth".format(home_domain),
+                data_value=nonce_encoded,
+                source=client_kp.public_key,
+            )
+            .append_manage_data_op(
+                data_name="web_auth_domain",
+                data_value=web_auth_domain,
+                source=server_account.account,
+            )
+            .add_time_bounds(now + 5 * 61, now + 60 * 60)
             .build()
         )
 
@@ -1828,7 +1936,7 @@ class TestStellarWebAuthentication:
         network_passphrase = Network.PUBLIC_NETWORK_PASSPHRASE
         home_domain = "example.com"
         web_auth_domain = "auth.example.com"
-        memo = randrange(0, 2**64)
+        memo = randrange(0, 2 ** 64)
 
         challenge = build_challenge_transaction(
             server_secret=server_kp.secret,
@@ -1837,7 +1945,7 @@ class TestStellarWebAuthentication:
             web_auth_domain=web_auth_domain,
             network_passphrase=network_passphrase,
             timeout=timeout,
-            memo=memo
+            memo=memo,
         )
         challenge_transaction = read_challenge_transaction(
             challenge_transaction=challenge,
@@ -1860,26 +1968,28 @@ class TestStellarWebAuthentication:
         nonce = os.urandom(48)
         nonce_encoded = base64.b64encode(nonce)
 
-        challenge = TransactionBuilder(
-            source_account=server_account,
-            network_passphrase=network_passphrase
-        ).append_manage_data_op(
-            data_name=f"{home_domain} auth",
-            data_value=nonce_encoded,
-            source=client_account_id
-        ).append_manage_data_op(
-            data_name="web_auth_domain",
-            data_value=home_domain,
-            source=server_account.account,
-        ).add_id_memo(
-            randrange(0, 2**64)
-        ).set_timeout(
-            timeout
-        ).build()
+        challenge = (
+            TransactionBuilder(
+                source_account=server_account, network_passphrase=network_passphrase
+            )
+            .append_manage_data_op(
+                data_name=f"{home_domain} auth",
+                data_value=nonce_encoded,
+                source=client_account_id,
+            )
+            .append_manage_data_op(
+                data_name="web_auth_domain",
+                data_value=home_domain,
+                source=server_account.account,
+            )
+            .add_id_memo(randrange(0, 2 ** 64))
+            .set_timeout(timeout)
+            .build()
+        )
 
         with pytest.raises(
             InvalidSep10ChallengeError,
-            match="Invalid challenge, memos are not permitted if the client account is muxed"
+            match="Invalid challenge, memos are not permitted if the client account is muxed",
         ):
             read_challenge_transaction(
                 challenge_transaction=challenge.to_xdr(),
@@ -1899,26 +2009,28 @@ class TestStellarWebAuthentication:
         nonce = os.urandom(48)
         nonce_encoded = base64.b64encode(nonce)
 
-        challenge = TransactionBuilder(
-            source_account=server_account,
-            network_passphrase=network_passphrase
-        ).append_manage_data_op(
-            data_name=f"{home_domain} auth",
-            data_value=nonce_encoded,
-            source=client_account_id
-        ).append_manage_data_op(
-            data_name="web_auth_domain",
-            data_value=home_domain,
-            source=server_account.account,
-        ).add_text_memo(
-            "test"
-        ).set_timeout(
-            timeout
-        ).build()
+        challenge = (
+            TransactionBuilder(
+                source_account=server_account, network_passphrase=network_passphrase
+            )
+            .append_manage_data_op(
+                data_name=f"{home_domain} auth",
+                data_value=nonce_encoded,
+                source=client_account_id,
+            )
+            .append_manage_data_op(
+                data_name="web_auth_domain",
+                data_value=home_domain,
+                source=server_account.account,
+            )
+            .add_text_memo("test")
+            .set_timeout(timeout)
+            .build()
+        )
 
         with pytest.raises(
             InvalidSep10ChallengeError,
-            match="Invalid memo, only ID memos are permitted"
+            match="Invalid memo, only ID memos are permitted",
         ):
             read_challenge_transaction(
                 challenge_transaction=challenge.to_xdr(),

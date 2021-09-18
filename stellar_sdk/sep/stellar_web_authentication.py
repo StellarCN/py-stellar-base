@@ -13,8 +13,9 @@ import time
 from typing import Iterable, List, Optional, Union
 
 from .. import xdr as stellar_xdr
-from ..account import Account
 from ..memo import IdMemo, NoneMemo
+from ..account import Account
+from ..muxed_account import MuxedAccount
 from ..exceptions import BadSignatureError, ValueError
 from ..keypair import Keypair
 from ..operation.manage_data import ManageData
@@ -50,7 +51,7 @@ class ChallengeTransaction:
         transaction: TransactionEnvelope,
         client_account_id: str,
         matched_home_domain: str,
-        memo: Optional[int] = None
+        memo: Optional[int] = None,
     ) -> None:
         self.transaction = transaction
         self.client_account_id = client_account_id
@@ -80,7 +81,7 @@ def build_challenge_transaction(
     timeout: int = 900,
     client_domain: Optional[str] = None,
     client_signing_key: Optional[str] = None,
-    memo: Optional[int] = None
+    memo: Optional[int] = None,
 ) -> str:
     """Returns a valid `SEP0010 <https://github.com/stellar/stellar-protocol/blob/master/ecosystem/sep-0010.md>`_
     challenge transaction which you can use for Stellar Web Authentication.
@@ -215,7 +216,11 @@ def read_challenge_transaction(
         )
 
     current_time = time.time()
-    if current_time < min_time or current_time > max_time:
+    # Apply a grace period to the challenge MinTime to account for
+    # clock drift between the server and client
+    # https://github.com/StellarCN/py-stellar-base/issues/524
+    grace_period = 60 * 5
+    if current_time < min_time - grace_period or current_time > max_time:
         raise InvalidSep10ChallengeError(
             "Transaction is not within range of the specified timebounds."
         )
@@ -273,9 +278,7 @@ def read_challenge_transaction(
     elif isinstance(transaction.memo, IdMemo):
         memo = transaction.memo.memo_id
     else:
-        raise InvalidSep10ChallengeError(
-            "Invalid memo, only ID memos are permitted"
-        )
+        raise InvalidSep10ChallengeError("Invalid memo, only ID memos are permitted")
 
     # verify any subsequent operations are manage data ops and source account is the server
     for op in transaction.operations[1:]:
@@ -310,7 +313,7 @@ def read_challenge_transaction(
         transaction=transaction_envelope,
         client_account_id=client_account.account_muxed or client_account.account_id,
         matched_home_domain=matched_home_domain,
-        memo=memo
+        memo=memo,
     )
 
 
@@ -547,6 +550,8 @@ def verify_challenge_transaction(
         network_passphrase,
     )
     client_account_id = parsed_challenge_transaction.client_account_id
+    if client_account_id.startswith(MUXED_ACCOUNT_STARTING_LETTER):
+        client_account_id = MuxedAccount.from_account(client_account_id).account_id
     signers = [Ed25519PublicKeySigner(client_account_id, 255)]
     verify_challenge_transaction_signers(
         challenge_transaction,
