@@ -1,6 +1,13 @@
 Release History
 ==============
 
+### Version 4.2.1
+Released on September 18, 2021
+
+#### Update
+* add check for muxed accounts in `verify_challenge_transaction()`. ([#525](https://github.com/StellarCN/py-stellar-base/pull/525))
+* `read_challenge_transaction()` now checks `timebounds.min_time` with a 5-minute grace period to account for clock drift. ([#526](https://github.com/StellarCN/py-stellar-base/pull/526))
+
 ### Version 4.2.0
 Released on September 17, 2021
 
