@@ -1,6 +1,18 @@
 Release History
 ==============
 
+### Version 5.0.0-beta2
+Released on September 21, 2021
+
+**This is a pre-release version, please do not use it in production.**
+
+This beta release adds support for Automated Market Makers. For details, you can refer to [CAP-38](https://github.com/stellar/stellar-protocol/blob/master/core/cap-0038.md) for XDR changes and [this document](https://docs.google.com/document/d/1pXL8kr1a2vfYSap9T67R-g72B_WWbaE1YsLMa04OgoU/view) for detailed changes to the Horizon API.
+
+#### Add
+
+* feat: add `/liquidity_pools/:pool_id/trades` endpoint support. ([#527](https://github.com/StellarCN/py-stellar-base/pull/527))
+* Contains the updates provided in [v4.2.0](https://github.com/StellarCN/py-stellar-base/releases/tag/4.2.0) and [v4.2.1](https://github.com/StellarCN/py-stellar-base/releases/tag/4.2.1).
+
 ### Version 4.2.1
 Released on September 18, 2021
 
