@@ -10,7 +10,7 @@ Assumes that you have the following items:
 
 See: https://developers.stellar.org/docs/start/list-of-operations/#payment
 """
-from stellar_sdk import Keypair, Network, Server, TransactionBuilder
+from stellar_sdk import Keypair, Network, Server, TransactionBuilder, Asset
 
 
 def create_account():
@@ -59,7 +59,7 @@ transaction = (
     # Add a payment operation to the transaction
     # Send 350.1234567 XLM to receiver
     # Specify 350.1234567 lumens. Lumens are divisible to seven digits past the decimal.
-    .append_payment_op(receiver_public_key, "350.1234567", "XLM")
+    .append_payment_op(receiver_public_key, Asset.native(), "350.1234567")
     .set_timeout(30)  # Make this transaction valid for the next 30 seconds only
     .build()
 )

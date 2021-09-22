@@ -50,8 +50,6 @@ class TransactionBuilder:
         otherwise V0 transactions will be generated.
         See `CAP-0015 <https://github.com/stellar/stellar-protocol/blob/master/core/cap-0015.md>`_ for more information.
     """
-
-    # TODO: add an example
     def __init__(
         self,
         source_account: Account,
@@ -273,7 +271,6 @@ class TransactionBuilder:
         :param operation: an operation
         :return: This builder instance.
         """
-        # TODO: LOG HERE
         self.operations.append(operation)
         return self
 
@@ -300,22 +297,18 @@ class TransactionBuilder:
 
     def append_change_trust_op(
         self,
-        asset_code: str,
-        asset_issuer: str,
+        asset: Union[Asset, LiquidityPoolAsset],
         limit: Union[str, Decimal] = None,
         source: Optional[Union[MuxedAccount, str]] = None,
     ) -> "TransactionBuilder":
         """Append a :class:`ChangeTrust <stellar_sdk.operation.ChangeTrust>`
         operation to the list of operations.
 
-        :param asset_issuer: The issuer address for the asset.
-        :param asset_code: The asset code for the asset.
-        :param limit: The limit of the new trustline.
-        :param source: The source address to add the trustline to.
+        :param asset: The asset for the trust line.
+        :param limit: The limit of the new trust line.
+        :param source: The source address to add the trust line to.
         :return: This builder instance.
-
         """
-        asset = Asset(asset_code, asset_issuer)
         op = ChangeTrust(asset, limit, source)
         return self.append_operation(op)
 
@@ -332,43 +325,41 @@ class TransactionBuilder:
         :param limit: The limit for the asset, defaults to max int64(922337203685.4775807).
             If the limit is set to "0" it deletes the trustline.
         :param source: The source address to add the trustline to.
-        :return: This builder instance.
-
+        :return: This builder instance
         """
+        warnings.warn(
+            "Will be removed in v7.0.0, use `TransactionBuilder.append_change_trust_op` instead.",
+            DeprecationWarning,
+        )
         op = ChangeTrust(asset, limit, source)
         return self.append_operation(op)
 
     def append_payment_op(
         self,
         destination: Union[MuxedAccount, str],
+        asset: Asset,
         amount: Union[str, Decimal],
-        asset_code: str = "XLM",
-        asset_issuer: Optional[str] = None,
         source: Optional[Union[MuxedAccount, str]] = None,
     ) -> "TransactionBuilder":
         """Append a :class:`Payment <stellar_sdk.operation.Payment>` operation
         to the list of operations.
 
         :param destination: Account address that receives the payment.
+        :param asset: The asset to send.
         :param amount: The amount of the currency to send in the payment.
-        :param asset_code: The asset code for the asset to send.
-        :param asset_issuer: The address of the issuer of the asset.
         :param source: The source address of the payment.
         :return: This builder instance.
 
         """
-        asset = Asset(code=asset_code, issuer=asset_issuer)
         op = Payment(destination, asset, amount, source)
         return self.append_operation(op)
 
     def append_path_payment_strict_receive_op(
         self,
         destination: Union[MuxedAccount, str],
-        send_code: str,
-        send_issuer: Optional[str],
+        send_asset: Asset,
         send_max: Union[str, Decimal],
-        dest_code: str,
-        dest_issuer: Optional[str],
+        dest_asset: Asset,
         dest_amount: Union[str, Decimal],
         path: List[Asset],
         source: Optional[Union[MuxedAccount, str]] = None,
@@ -378,14 +369,10 @@ class TransactionBuilder:
 
         :param destination: The destination address (Account ID) for the
             payment.
-        :param send_code: The asset code for the source asset deducted from
-            the source account.
-        :param send_issuer: The address of the issuer of the source asset.
+        :param send_asset: The asset to pay with.
         :param send_max: The maximum amount of send asset to deduct
             (excluding fees).
-        :param dest_code: The asset code for the final destination asset
-            sent to the recipient.
-        :param dest_issuer: Account address that receives the payment.
+        :param dest_asset: The asset the destination will receive.
         :param dest_amount: The amount of destination asset the destination
             account receives.
         :param path: A list of Asset objects to use as the path.
@@ -393,10 +380,6 @@ class TransactionBuilder:
         :return: This builder instance.
 
         """
-
-        send_asset = Asset(send_code, send_issuer)
-        dest_asset = Asset(dest_code, dest_issuer)
-
         assets = []
         for asset in path:
             assets.append(asset)
@@ -414,11 +397,9 @@ class TransactionBuilder:
     def append_path_payment_strict_send_op(
         self,
         destination: Union[MuxedAccount, str],
-        send_code: str,
-        send_issuer: Optional[str],
+        send_asset: Asset,
         send_amount: Union[str, Decimal],
-        dest_code: str,
-        dest_issuer: Optional[str],
+        dest_asset: Asset,
         dest_min: Union[str, Decimal],
         path: List[Asset],
         source: Optional[Union[MuxedAccount, str]] = None,
@@ -428,22 +409,14 @@ class TransactionBuilder:
 
         :param destination: The destination address (Account ID) for the
             payment.
-        :param send_code: The asset code for the source asset deducted from
-            the source account.
-        :param send_issuer: The address of the issuer of the source asset.
+        :param send_asset: The asset to pay with.
         :param send_amount: Amount of send_asset to send.
-        :param dest_code: The asset code for the final destination asset
-            sent to the recipient.
-        :param dest_issuer: Account address that receives the payment.
+        :param dest_asset: The asset the destination will receive.
         :param dest_min: The minimum amount of dest_asset to be received.
         :param path: A list of Asset objects to use as the path.
         :param source: The source address of the path payment.
         :return: This builder instance.
-
         """
-
-        send_asset = Asset(send_code, send_issuer)
-        dest_asset = Asset(dest_code, dest_issuer)
 
         assets = []
         for asset in path:
@@ -623,10 +596,8 @@ class TransactionBuilder:
 
     def append_manage_buy_offer_op(
         self,
-        selling_code: str,
-        selling_issuer: Optional[str],
-        buying_code: str,
-        buying_issuer: Optional[str],
+        selling: Asset,
+        buying: Asset,
         amount: Union[str, Decimal],
         price: Union[str, Decimal, Price],
         offer_id: int = 0,
@@ -635,14 +606,8 @@ class TransactionBuilder:
         """Append a :class:`ManageBuyOffer <stellar_sdk.operation.ManageBuyOffer>`
         operation to the list of operations.
 
-        :param selling_code: The asset code for the asset the offer creator
-            is selling.
-        :param selling_issuer: The issuing address for the asset the offer
-            creator is selling.
-        :param buying_code: The asset code for the asset the offer creator
-            is buying.
-        :param buying_issuer: The issuing address for the asset the offer
-            creator is buying.
+        :param selling: What you're selling.
+        :param buying: What you're buying.
         :param amount: Amount being bought. if set to. Set to 0 if you want
             to delete an existing offer.
         :param price: Price of thing being bought in terms of what you are selling.
@@ -653,8 +618,7 @@ class TransactionBuilder:
         :return: This builder instance.
 
         """
-        selling = Asset(selling_code, selling_issuer)
-        buying = Asset(buying_code, buying_issuer)
+
         op = ManageBuyOffer(
             selling=selling,
             buying=buying,
@@ -667,10 +631,8 @@ class TransactionBuilder:
 
     def append_manage_sell_offer_op(
         self,
-        selling_code: str,
-        selling_issuer: Optional[str],
-        buying_code: str,
-        buying_issuer: Optional[str],
+        selling: Asset,
+        buying: Asset,
         amount: Union[str, Decimal],
         price: Union[str, Price, Decimal],
         offer_id: int = 0,
@@ -679,14 +641,8 @@ class TransactionBuilder:
         """Append a :class:`ManageSellOffer <stellar_sdk.operation.ManageSellOffer>`
         operation to the list of operations.
 
-        :param selling_code: The asset code for the asset the offer creator
-            is selling.
-        :param selling_issuer: The issuing address for the asset the offer
-            creator is selling.
-        :param buying_code: The asset code for the asset the offer creator
-            is buying.
-        :param buying_issuer: The issuing address for the asset the offer
-            creator is buying.
+        :param selling: What you're selling.
+        :param buying: What you're buying.
         :param amount: Amount of the asset being sold. Set to 0 if you want
             to delete an existing offer.
         :param price: Price of 1 unit of selling in terms of buying.
@@ -697,8 +653,7 @@ class TransactionBuilder:
         :return: This builder instance.
 
         """
-        selling = Asset(selling_code, selling_issuer)
-        buying = Asset(buying_code, buying_issuer)
+
         op = ManageSellOffer(
             selling=selling,
             buying=buying,
@@ -711,10 +666,8 @@ class TransactionBuilder:
 
     def append_create_passive_sell_offer_op(
         self,
-        selling_code: str,
-        selling_issuer: Optional[str],
-        buying_code: str,
-        buying_issuer: Optional[str],
+        selling: Asset,
+        buying: Asset,
         amount: Union[str, Decimal],
         price: Union[str, Price, Decimal],
         source: Optional[Union[MuxedAccount, str]] = None,
@@ -723,14 +676,8 @@ class TransactionBuilder:
         <stellar_sdk.operation.CreatePassiveSellOffer>` operation to the list of
         operations.
 
-        :param selling_code: The asset code for the asset the offer creator
-            is selling.
-        :param selling_issuer: The issuing address for the asset the offer
-            creator is selling.
-        :param buying_code: The asset code for the asset the offer creator
-            is buying.
-        :param buying_issuer: The issuing address for the asset the offer
-            creator is buying.
+        :param selling: What you're selling.
+        :param buying: What you're buying.
         :param amount: Amount of the asset being sold. Set to 0 if you want
             to delete an existing offer.
         :param price: Price of 1 unit of selling in terms of buying.
@@ -740,8 +687,6 @@ class TransactionBuilder:
 
         """
 
-        selling = Asset(selling_code, selling_issuer)
-        buying = Asset(buying_code, buying_issuer)
         op = CreatePassiveSellOffer(selling, buying, amount, price, source)
         return self.append_operation(op)
 

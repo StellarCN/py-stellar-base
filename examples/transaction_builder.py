@@ -5,7 +5,7 @@ most of the work can be done with TransactionBuilder.
 
 See: https://stellar-sdk.readthedocs.io/en/latest/building_transactions.html#building-transactions
 """
-from stellar_sdk import Account, Keypair, Network, TransactionBuilder
+from stellar_sdk import Account, Keypair, Network, TransactionBuilder, Asset
 
 root_keypair = Keypair.from_secret(
     "SA6XHAH4GNLRWWWF6TEVEWNS44CBNFAJWHWOPZCVZOUXSQA7BOYN7XHC"
@@ -22,7 +22,7 @@ transaction = (
     )
     .append_payment_op(  # add a payment operation to the transaction
         destination="GASOCNHNNLYFNMDJYQ3XFMI7BYHIOCFW3GJEOWRPEGK2TDPGTG2E5EDW",
-        asset_code="XLM",
+        asset=Asset.native(),
         amount="125.5",
     )
     .append_set_options_op(  # add a set options operation to the transaction
