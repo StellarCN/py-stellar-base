@@ -1,3 +1,4 @@
+import warnings
 from enum import IntFlag
 from typing import Optional, Union
 
@@ -93,20 +94,28 @@ class SetOptions(Operation):
         if inflation_dest is not None:
             check_ed25519_public_key(inflation_dest)
 
-        if isinstance(set_flags, AuthorizationFlag):
-            set_flags = set_flags.value
+        if set_flags is not None and not isinstance(set_flags, AuthorizationFlag):
+            warnings.warn(
+                "`set_flags` is a int, we recommend using AuthorizationFlag.",
+                DeprecationWarning,
+            )
+            set_flags = AuthorizationFlag(set_flags)
 
-        if isinstance(clear_flags, AuthorizationFlag):
-            clear_flags = clear_flags.value
+        if clear_flags is not None and not isinstance(clear_flags, AuthorizationFlag):
+            warnings.warn(
+                "`clear_flags` is a int, we recommend using AuthorizationFlag.",
+                DeprecationWarning,
+            )
+            clear_flags = AuthorizationFlag(clear_flags)
 
         self.inflation_dest = inflation_dest
-        self.clear_flags: int = clear_flags  # type: ignore[assignment]
-        self.set_flags: int = set_flags  # type: ignore[assignment]
-        self.master_weight = master_weight
-        self.low_threshold = low_threshold
-        self.med_threshold = med_threshold
-        self.high_threshold = high_threshold
-        self.home_domain = home_domain
+        self.clear_flags: Optional[AuthorizationFlag] = clear_flags
+        self.set_flags: Optional[AuthorizationFlag] = set_flags
+        self.master_weight: Optional[int] = master_weight
+        self.low_threshold: Optional[int] = low_threshold
+        self.med_threshold: Optional[int] = med_threshold
+        self.high_threshold: Optional[int] = high_threshold
+        self.home_domain: Optional[str] = home_domain
         self.signer: Optional[Signer] = signer
 
     def _to_operation_body(self) -> stellar_xdr.OperationBody:
@@ -121,10 +130,12 @@ class SetOptions(Operation):
             else None
         )
         clear_flags = (
-            None if self.clear_flags is None else stellar_xdr.Uint32(self.clear_flags)
+            None
+            if self.clear_flags is None
+            else stellar_xdr.Uint32(self.clear_flags.value)
         )
         set_flags = (
-            None if self.set_flags is None else stellar_xdr.Uint32(self.set_flags)
+            None if self.set_flags is None else stellar_xdr.Uint32(self.set_flags.value)
         )
         master_weight = (
             None

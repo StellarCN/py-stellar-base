@@ -12,6 +12,7 @@ from stellar_sdk.server import Server
 from stellar_sdk.transaction_envelope import TransactionEnvelope
 
 
+@pytest.mark.slow
 class TestServer:
     def test_load_acount_sync(self):
         account_id = "GDV6FVHPY4JH7EEBSJYPQQYZA3OC6TKTM2TAXRHWT4EEL7BJ2BTDQT5D"

@@ -3,6 +3,7 @@ import pytest
 from stellar_sdk.client.requests_client import USER_AGENT, RequestsClient
 
 
+@pytest.mark.slow
 class TestRequestsClient:
     def test_get(self):
         client = RequestsClient()
@@ -30,7 +31,6 @@ class TestRequestsClient:
         assert json["headers"]["Content-Type"] == "application/x-www-form-urlencoded"
         assert json["form"] == data
 
-    @pytest.mark.slow
     @pytest.mark.timeout(30)
     def test_stream(self):
         client = RequestsClient()

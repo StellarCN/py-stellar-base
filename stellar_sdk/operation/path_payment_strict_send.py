@@ -51,9 +51,9 @@ class PathPaymentStrictSend(Operation):
             destination = MuxedAccount.from_account(destination)
         self.destination: MuxedAccount = destination
         self.send_asset: Asset = send_asset
-        self.send_amount: Union[str, Decimal] = send_amount
+        self.send_amount: str = str(send_amount)
         self.dest_asset: Asset = dest_asset
-        self.dest_min: Union[str, Decimal] = dest_min
+        self.dest_min: str = str(dest_min)
         self.path: List[Asset] = path  # a list of paths/assets
 
     def _to_operation_body(self) -> stellar_xdr.OperationBody:

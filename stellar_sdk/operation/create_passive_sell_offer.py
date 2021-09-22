@@ -58,21 +58,18 @@ class CreatePassiveSellOffer(Operation):
         super().__init__(source)
         check_amount(amount)
         check_price(price)
+        if not isinstance(price, Price):
+            price = Price.from_raw_price(price)
+
         self.selling: Asset = selling
         self.buying: Asset = buying
-        self.amount: Union[str, Decimal] = amount
-        self.price: Union[Price, str, Decimal] = price
+        self.amount: str = str(amount)
+        self.price: Price = price
 
     def _to_operation_body(self) -> stellar_xdr.OperationBody:
         selling = self.selling.to_xdr_object()
         buying = self.buying.to_xdr_object()
-
-        if isinstance(self.price, Price):
-            price_fraction = self.price
-        else:
-            price_fraction = Price.from_raw_price(self.price)
-
-        price = price_fraction.to_xdr_object()
+        price = self.price.to_xdr_object()
         amount = stellar_xdr.Int64(Operation.to_xdr_amount(self.amount))
         create_passive_sell_offer_op = stellar_xdr.CreatePassiveSellOfferOp(
             selling, buying, amount, price

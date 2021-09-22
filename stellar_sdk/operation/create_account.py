@@ -43,7 +43,7 @@ class CreateAccount(Operation):
         check_ed25519_public_key(destination)
         check_amount(starting_balance)
         self.destination: str = destination
-        self.starting_balance: Union[str, Decimal] = starting_balance
+        self.starting_balance: str = str(starting_balance)
 
     def _to_operation_body(self) -> stellar_xdr.OperationBody:
         destination = Keypair.from_public_key(self.destination).xdr_account_id()

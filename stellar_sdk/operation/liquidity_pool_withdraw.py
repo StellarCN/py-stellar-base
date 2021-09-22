@@ -45,10 +45,10 @@ class LiquidityPoolWithdraw(Operation):
         check_amount(amount)
         check_amount(min_amount_a)
         check_amount(min_amount_b)
-        self.liquidity_pool_id = liquidity_pool_id
-        self.amount = amount
-        self.min_amount_a = min_amount_a
-        self.min_amount_b = min_amount_b
+        self.liquidity_pool_id: str = liquidity_pool_id
+        self.amount: str = str(amount)
+        self.min_amount_a: str = str(min_amount_a)
+        self.min_amount_b: str = str(min_amount_b)
 
     def _to_operation_body(self) -> stellar_xdr.OperationBody:
         liquidity_pool_id_bytes = binascii.unhexlify(self.liquidity_pool_id)

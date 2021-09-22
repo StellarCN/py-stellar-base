@@ -15,6 +15,7 @@ from stellar_sdk.sep.federation import (
 )
 
 
+@pytest.mark.slow
 class TestFederation:
     ACCOUNT_ID = "GAWCQ74PIJO2NH6F3KZ4AMX27UAKBXWC7KG3FLYJOFIMRQF3RSZHCOVN"
     STELLAR_ADDRESS = "hello*overcat.me"

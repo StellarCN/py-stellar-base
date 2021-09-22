@@ -38,10 +38,10 @@ class LiquidityPoolAsset:
         if fee != LIQUIDITY_POOL_FEE_V18:
             raise ValueError("`fee` is invalid.")
 
-        self.type = "liquidity_pool_shares"
-        self.asset_a = asset_a
-        self.asset_b = asset_b
-        self.fee = fee
+        self.type: str = "liquidity_pool_shares"
+        self.asset_a: Asset = asset_a
+        self.asset_b: Asset = asset_b
+        self.fee: int = fee
 
     @property
     def liquidity_pool_id(self) -> str:
