@@ -1,6 +1,12 @@
 Release History
 ==============
 
+### Version 4.2.2
+Released on September 23, 2021
+
+#### Update
+* fix: SEP-10, fix case where muxed accounts are not enabled. ([#530](https://github.com/StellarCN/py-stellar-base/pull/530))
+
 ### Version 4.2.1
 Released on September 18, 2021
 
