@@ -54,8 +54,7 @@ class BaseTransactionEnvelope(Generic[T]):
             signer = Keypair.from_secret(signer)
         tx_hash = self.hash()
         sig = signer.sign_decorated(tx_hash)
-        sig_dict = [signature.__dict__ for signature in self.signatures]
-        if sig.__dict__ in sig_dict:
+        if sig in self.signatures:
             raise SignatureExistError("The keypair has already signed.")
         else:
             self.signatures.append(sig)
