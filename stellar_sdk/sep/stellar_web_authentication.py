@@ -23,6 +23,7 @@ from ..transaction_builder import TransactionBuilder
 from ..transaction_envelope import TransactionEnvelope
 from .ed25519_public_key_signer import Ed25519PublicKeySigner
 from .exceptions import InvalidSep10ChallengeError
+from ..exceptions import FeatureNotEnabledError
 
 __all__ = [
     "build_challenge_transaction",
@@ -239,6 +240,14 @@ def read_challenge_transaction(
     if not client_account:
         raise InvalidSep10ChallengeError("Operation should have a source account.")
 
+    try:
+        client_account_address = client_account.account_muxed or client_account.account_id
+    except FeatureNotEnabledError:
+        if client_account.account_muxed_id:
+            raise InvalidSep10ChallengeError("Muxed accounts are not supported")
+        else:
+            client_account_address = client_account.account_id
+
     matched_home_domain = None
     if isinstance(home_domains, str):
         if manage_data_op.data_name == f"{home_domains} auth":
@@ -311,7 +320,7 @@ def read_challenge_transaction(
 
     return ChallengeTransaction(
         transaction=transaction_envelope,
-        client_account_id=client_account.account_muxed or client_account.account_id,
+        client_account_id=client_account_address,
         matched_home_domain=matched_home_domain,
         memo=memo,
     )
