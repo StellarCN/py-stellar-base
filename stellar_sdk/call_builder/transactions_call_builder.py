@@ -61,7 +61,7 @@ class TransactionsCallBuilder(BaseCallBuilder):
     def for_claimable_balance(
         self, claimable_balance_id: str
     ) -> "TransactionsCallBuilder":
-        """This endpoint represents successful transactions referencing a given claimable balance and can be used in streaming mode.
+        """This endpoint represents all transactions referencing a given claimable balance and can be used in streaming mode.
 
         See `Claimable Balances - Retrieve related Transactions <https://developers.stellar.org/api/resources/claimablebalances/transactions/>`_
 
@@ -72,9 +72,9 @@ class TransactionsCallBuilder(BaseCallBuilder):
         return self
 
     def for_liquidity_pool(self, liquidity_pool_id: str) -> "TransactionsCallBuilder":
-        """This endpoint represents successful transactions referencing a given liquidity pool.
+        """This endpoint represents all transactions referencing a given liquidity pool.
 
-        TODO: docs link, stream mode?
+        See `Liquidity Pools - Retrieve related Transactions <https://developers.stellar.org/api/resources/liquiditypools/transactions/>`_
 
         :param liquidity_pool_id: The ID of the liquidity pool in hex string.
         :return: this TransactionsCallBuilder instance

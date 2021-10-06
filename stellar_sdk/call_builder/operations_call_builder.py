@@ -87,7 +87,7 @@ class OperationsCallBuilder(BaseCallBuilder):
     def for_liquidity_pool(self, liquidity_pool_id: str) -> "OperationsCallBuilder":
         """This endpoint represents all operations that are part of a given liquidity pool.
 
-        TODO: docs link
+        See `Liquidity Pools - Retrieve related Operations <https://developers.stellar.org/api/resources/liquiditypools/operations/>`_
 
         :param liquidity_pool_id: The ID of the liquidity pool in hex string.
         :return: this OperationCallBuilder instance
