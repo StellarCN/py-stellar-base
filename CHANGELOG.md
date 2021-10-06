@@ -1,6 +1,37 @@
 Release History
 ==============
 
+### Version 5.0.0
+Released on October 06, 2021
+
+**This update includes breaking changes.**
+
+#### Note
+
+- This release adds support for Automated Market Makers. For details, you can refer to [CAP-38](https://github.com/stellar/stellar-protocol/blob/master/core/cap-0038.md) for XDR changes and [this document](https://docs.google.com/document/d/1pXL8kr1a2vfYSap9T67R-g72B_WWbaE1YsLMa04OgoU/view) for detailed changes to the Horizon API. ([Download Horizon Liquidity Pool API.pdf](https://github.com/StellarCN/py-stellar-base/files/7199228/Horizon.Liquidity.Pool.API.pdf)) 
+- You can get a simple example of CAP-38 [here](https://github.com/StellarCN/py-stellar-base/blob/55943959958ae6c80170f5ddfd6616a61c104122/examples/amm.py).
+- Although this update is a major version update, but only the `stellar.xdr` module contains breaking changes, if you don’t directly rely on this module in your code, you should be able to migrate easily.
+- I want to make some improvements to the SDK, but I don’t want to introduce too many breaking changes in this version, so I plan to postpone it to the next major version. The next major version features will not include feature updates, I will do my best to make it easy to migrate.
+- I will not be adding Stellar Protocol 18 support to v2.x. I will only provide the necessary security updates and will end support for it on 2022.01.01.
+
+#### Add ([#512](https://github.com/StellarCN/py-stellar-base/pull/512) [#517](https://github.com/StellarCN/py-stellar-base/pull/517) [#518](https://github.com/StellarCN/py-stellar-base/pull/518))
+
+- Introduced new CAP-38 operations `LiquidityPoolDeposit` and `LiquidityPoolWithdraw`.
+- Introduced two new types of assets, `LiquidityPoolId` and `LiquidityPoolAsset`.
+- The following functions have been added to `TransactionBuilder`:
+  - `append_liquidity_pool_deposit_op`
+  - `append_liquidity_pool_withdraw_op`
+  - `append_revoke_liquidity_pool_sponsorship_op`
+  - `append_change_trust_liquidity_pool_asset_op`
+- Introduced a `LiquidityPoolsCallBuilder` to make calls to a new endpoint, you can use `Server.liquidity_pools` to build it.
+- Expanded the `TransactionsCallBuilder`, `OperationsCallBuilder`, `TradesCallBuilder` and `EffectsCallBuilder` to apply to specific liquidity pools.
+- Expanded the `TradesCallBuilder` to support fetching liquidity pool trades and accepts a new `trade_type` filter.
+- Update SEP-11 to support CAP-38 
+
+#### Breaking changes ([#512](https://github.com/StellarCN/py-stellar-base/pull/512))
+
+- This XDR file contains breaking changes, you can click [here](https://github.com/StellarCN/py-stellar-base/commit/bffd02dfe9487a254c0c6ceaae889db380ba878a) to view the changes.
+
 ### Version 5.0.0-beta3
 Released on September 23, 2021
 
