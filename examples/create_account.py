@@ -6,7 +6,7 @@ See: https://developers.stellar.org/docs/start/list-of-operations/#create-accoun
 """
 from stellar_sdk import Keypair, Network, Server, TransactionBuilder
 
-server = Server(horizon_url="https://horizon-testnet.stellar.org")
+server = Server(horizon_url="https://horizon.stellar.org")
 source = Keypair.from_secret("SBFZCHU5645DOKRWYBXVOXY2ELGJKFRX6VGGPRYUWHQ7PMXXJNDZFMKD")
 destination = Keypair.random()
 
@@ -14,7 +14,7 @@ source_account = server.load_account(account_id=source.public_key)
 transaction = (
     TransactionBuilder(
         source_account=source_account,
-        network_passphrase=Network.TESTNET_NETWORK_PASSPHRASE,
+        network_passphrase=Network.PUBLIC_NETWORK_PASSPHRASE,
         base_fee=100,
     )
     .append_create_account_op(
