@@ -72,7 +72,7 @@ class EffectsCallBuilder(BaseCallBuilder):
     def for_liquidity_pool(self, liquidity_pool_id: str) -> "EffectsCallBuilder":
         """This endpoint represents all effects that occurred as a result of a given liquidity pool.
 
-        TODO: docs link
+        See `Liquidity Pools - Retrieve related Effects <https://developers.stellar.org/api/resources/liquiditypools/effects/>`_
 
         :param liquidity_pool_id: The ID of the liquidity pool in hex string.
         :return: this EffectsCallBuilder instance

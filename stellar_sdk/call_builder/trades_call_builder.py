@@ -81,7 +81,7 @@ class TradesCallBuilder(BaseCallBuilder):
     def for_liquidity_pool(self, liquidity_pool_id: str) -> "TradesCallBuilder":
         """Filter trades for a specific liquidity pool.
 
-        See `Trades for Liquidity Pool <https://www.stellar.org/developers/horizon/reference/endpoints/trades-for-liquidity-pool.html>`_
+        See `Liquidity Pools - Retrieve related Trades <https://developers.stellar.org/api/resources/liquiditypools/trades/>`_
 
         :param liquidity_pool_id: The ID of the liquidity pool in hex string.
         :return: current TradesCallBuilder instance

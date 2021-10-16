@@ -11,9 +11,9 @@ __all__ = ["LiquidityPoolsBuilder"]
 
 class LiquidityPoolsBuilder(BaseCallBuilder):
     """Creates a new :class:`LiquidityPoolsBuilder` pointed to server defined by horizon_url.
-    Do not create this object directly, use :func:`stellar_sdk.server.Server.ledgers`.
+    Do not create this object directly, use :func:`stellar_sdk.server.Server.liquidity_pools`.
 
-    TODO: docs link
+    See `Liquidity Pools <https://developers.stellar.org/api/resources/liquiditypools/>`_
 
     :param horizon_url: Horizon server URL.
     :param client: The client instance used to send request.
@@ -28,8 +28,10 @@ class LiquidityPoolsBuilder(BaseCallBuilder):
     def liquidity_pool(self, liquidity_pool_id: str) -> "LiquidityPoolsBuilder":
         """Provides information on a liquidity pool.
 
+        See `Retrieve a Liquidity Pool <https://developers.stellar.org/api/resources/liquiditypools/single/>`_
+
         :param liquidity_pool_id: The ID of the liquidity pool in hex string.
-        :return: current LedgerCallBuilder instance
+        :return: current LiquidityPoolsBuilder instance
         """
         self.endpoint = f"liquidity_pools/{liquidity_pool_id}"
         return self
@@ -40,6 +42,9 @@ class LiquidityPoolsBuilder(BaseCallBuilder):
         Horizon will provide an endpoint to find all liquidity pools
         which contain a given set of reserve assets.
 
+        See `List Liquidity Pools <https://developers.stellar.org/api/resources/liquiditypools/list/>`_
+
+        :return: current LiquidityPoolsBuilder instance
         """
         reserves_param = convert_assets_to_horizon_param(reserves)
         self._add_query_param("reserves", reserves_param)
