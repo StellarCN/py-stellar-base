@@ -13,10 +13,10 @@ name: "CodeQL"
 
 on:
   push:
-    branches-ignore:
-      - 'temp*'
-      - 'tmp*'
-      - 'dependabot*'
+    branches:
+      - 'master'
+      - 'dev'
+      - 'v*'
   pull_request:
     branches-ignore:
       - 'temp*'
