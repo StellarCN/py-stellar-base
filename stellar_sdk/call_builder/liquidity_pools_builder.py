@@ -1,4 +1,4 @@
-from typing import Union, List
+from typing import List, Union
 
 from ..asset import Asset
 from ..call_builder.base_call_builder import BaseCallBuilder

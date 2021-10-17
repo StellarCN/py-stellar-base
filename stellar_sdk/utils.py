@@ -2,7 +2,7 @@ import hashlib
 import os
 import re
 from decimal import ROUND_FLOOR, Decimal
-from typing import List, Dict, Union
+from typing import Dict, List, Union
 from urllib.parse import urlsplit, urlunsplit
 
 from . import xdr as stellar_xdr

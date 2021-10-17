@@ -2,13 +2,13 @@ import base64
 import os
 import time
 from random import randrange
-from unittest.mock import patch, PropertyMock
+from unittest.mock import PropertyMock, patch
 
 import pytest
 
 from stellar_sdk import Account, Keypair, MuxedAccount, Network
+from stellar_sdk.exceptions import FeatureNotEnabledError, ValueError
 from stellar_sdk.memo import IdMemo
-from stellar_sdk.exceptions import ValueError
 from stellar_sdk.operation import ManageData
 from stellar_sdk.sep.ed25519_public_key_signer import Ed25519PublicKeySigner
 from stellar_sdk.sep.exceptions import InvalidSep10ChallengeError
@@ -23,7 +23,6 @@ from stellar_sdk.sep.stellar_web_authentication import (
 )
 from stellar_sdk.transaction_builder import TransactionBuilder
 from stellar_sdk.transaction_envelope import TransactionEnvelope
-from stellar_sdk.exceptions import FeatureNotEnabledError
 
 
 class TestStellarWebAuthentication:
@@ -1949,9 +1948,13 @@ class TestStellarWebAuthentication:
             network_passphrase=network_passphrase,
             timeout=timeout,
         )
-        with patch("stellar_sdk.MuxedAccount.account_muxed", new_callable=PropertyMock) as mocked_account_muxed:
+        with patch(
+            "stellar_sdk.MuxedAccount.account_muxed", new_callable=PropertyMock
+        ) as mocked_account_muxed:
             mocked_account_muxed.side_effect = FeatureNotEnabledError()
-            with pytest.raises(InvalidSep10ChallengeError, match="Muxed accounts are not supported"):
+            with pytest.raises(
+                InvalidSep10ChallengeError, match="Muxed accounts are not supported"
+            ):
                 read_challenge_transaction(
                     challenge_transaction=challenge,
                     server_account_id=server_kp.public_key,
@@ -1960,7 +1963,9 @@ class TestStellarWebAuthentication:
                     home_domains=home_domain,
                 )
 
-    def test_read_challenge_transaction_g_client_id_muxed_not_permitted_by_env_var(self):
+    def test_read_challenge_transaction_g_client_id_muxed_not_permitted_by_env_var(
+        self,
+    ):
         server_kp = Keypair.random()
         client_account_id = Keypair.random().public_key
         timeout = 600
@@ -1976,7 +1981,9 @@ class TestStellarWebAuthentication:
             network_passphrase=network_passphrase,
             timeout=timeout,
         )
-        with patch("stellar_sdk.MuxedAccount.account_muxed", new_callable=PropertyMock) as mocked_account_muxed:
+        with patch(
+            "stellar_sdk.MuxedAccount.account_muxed", new_callable=PropertyMock
+        ) as mocked_account_muxed:
             mocked_account_muxed.side_effect = FeatureNotEnabledError()
             read_challenge_transaction(
                 challenge_transaction=challenge,
