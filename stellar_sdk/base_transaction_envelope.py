@@ -2,6 +2,7 @@ from abc import abstractmethod
 from typing import Generic, List, TypeVar, Union
 
 from . import xdr as stellar_xdr
+from .decorated_signature import DecoratedSignature
 from .exceptions import SignatureExistError
 from .keypair import Keypair
 from .network import Network
@@ -14,10 +15,10 @@ class BaseTransactionEnvelope(Generic[T]):
     def __init__(
         self,
         network_passphrase: str,
-        signatures: List[stellar_xdr.DecoratedSignature] = None,
+        signatures: List[DecoratedSignature] = None,
     ) -> None:
         self.network_passphrase: str = network_passphrase
-        self.signatures: List[stellar_xdr.DecoratedSignature] = signatures or []
+        self.signatures: List[DecoratedSignature] = signatures or []
         self._network_id: bytes = Network(network_passphrase).network_id()
 
     def hash(self) -> bytes:
@@ -86,12 +87,9 @@ class BaseTransactionEnvelope(Generic[T]):
         """
         preimage_bytes: bytes = hex_to_bytes(preimage)
         hash_preimage = sha256(preimage_bytes)
-        hint = stellar_xdr.SignatureHint(hash_preimage[-4:])
-        sig = stellar_xdr.DecoratedSignature(
-            hint, stellar_xdr.Signature(preimage_bytes)
-        )
-        sig_dict = [signature.__dict__ for signature in self.signatures]
-        if sig.__dict__ in sig_dict:
+        hint = hash_preimage[-4:]
+        sig = DecoratedSignature(hint, preimage_bytes)
+        if sig in self.signatures:
             raise SignatureExistError("The preimage has already signed.")
         else:
             self.signatures.append(sig)

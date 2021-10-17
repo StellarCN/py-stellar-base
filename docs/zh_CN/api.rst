@@ -567,6 +567,13 @@ TimeBounds
    :members:
    :inherited-members:
 
+DecoratedSignature
+^^^^^^^^^^^^^^^^^^
+
+.. autoclass:: stellar_sdk.decorated_signature.DecoratedSignature
+   :members:
+   :inherited-members:
+
 Transaction
 ^^^^^^^^^^^
 

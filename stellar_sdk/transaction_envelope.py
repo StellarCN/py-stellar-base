@@ -4,6 +4,7 @@ from xdrlib import Packer
 
 from . import xdr as stellar_xdr
 from .base_transaction_envelope import BaseTransactionEnvelope
+from .decorated_signature import DecoratedSignature
 from .transaction import Transaction
 
 __all__ = ["TransactionEnvelope"]
@@ -29,7 +30,7 @@ class TransactionEnvelope(BaseTransactionEnvelope["TransactionEnvelope"]):
         self,
         transaction: Transaction,
         network_passphrase: str,
-        signatures: List[stellar_xdr.DecoratedSignature] = None,
+        signatures: List[DecoratedSignature] = None,
     ) -> None:
         super().__init__(network_passphrase, signatures)
         self.transaction: Transaction = transaction
@@ -63,15 +64,16 @@ class TransactionEnvelope(BaseTransactionEnvelope["TransactionEnvelope"]):
         :return: XDR TransactionEnvelope object
         """
         tx = self.transaction.to_xdr_object()
+        signatures = [signature.to_xdr_object() for signature in self.signatures]
         if self.transaction.v1:
             assert isinstance(tx, stellar_xdr.Transaction)
             te_type = stellar_xdr.EnvelopeType.ENVELOPE_TYPE_TX
-            tx_v1_envelope = stellar_xdr.TransactionV1Envelope(tx, self.signatures)
+            tx_v1_envelope = stellar_xdr.TransactionV1Envelope(tx, signatures)
             return stellar_xdr.TransactionEnvelope(type=te_type, v1=tx_v1_envelope)
         else:
             assert isinstance(tx, stellar_xdr.TransactionV0)
             te_type = stellar_xdr.EnvelopeType.ENVELOPE_TYPE_TX_V0
-            tx_v0_envelope = stellar_xdr.TransactionV0Envelope(tx, self.signatures)
+            tx_v0_envelope = stellar_xdr.TransactionV0Envelope(tx, signatures)
             return stellar_xdr.TransactionEnvelope(type=te_type, v0=tx_v0_envelope)
 
     def to_transaction_envelope_v1(self) -> "TransactionEnvelope":
@@ -96,12 +98,18 @@ class TransactionEnvelope(BaseTransactionEnvelope["TransactionEnvelope"]):
             assert xdr_object.v0 is not None
             assert xdr_object.v0.signatures is not None
             tx = Transaction.from_xdr_object(xdr_object.v0.tx, v1=False)
-            signatures = xdr_object.v0.signatures
+            signatures = [
+                DecoratedSignature(s.hint.signature_hint, s.signature.signature)
+                for s in xdr_object.v0.signatures
+            ]
         elif te_type == stellar_xdr.EnvelopeType.ENVELOPE_TYPE_TX:
             assert xdr_object.v1 is not None
             assert xdr_object.v1.signatures is not None
             tx = Transaction.from_xdr_object(xdr_object.v1.tx, v1=True)
-            signatures = xdr_object.v1.signatures
+            signatures = [
+                DecoratedSignature(s.hint.signature_hint, s.signature.signature)
+                for s in xdr_object.v1.signatures
+            ]
         else:
             raise ValueError(f"Unexpected EnvelopeType: {xdr_object.type}.")
         te = cls(tx, network_passphrase=network_passphrase, signatures=signatures)

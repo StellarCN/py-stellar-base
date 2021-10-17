@@ -13,17 +13,16 @@ import time
 from typing import Iterable, List, Optional, Union
 
 from .. import xdr as stellar_xdr
-from ..memo import IdMemo, NoneMemo
 from ..account import Account
-from ..muxed_account import MuxedAccount
-from ..exceptions import BadSignatureError, ValueError
+from ..exceptions import BadSignatureError, FeatureNotEnabledError, ValueError
 from ..keypair import Keypair
+from ..memo import IdMemo, NoneMemo
+from ..muxed_account import MuxedAccount
 from ..operation.manage_data import ManageData
 from ..transaction_builder import TransactionBuilder
 from ..transaction_envelope import TransactionEnvelope
 from .ed25519_public_key_signer import Ed25519PublicKeySigner
 from .exceptions import InvalidSep10ChallengeError
-from ..exceptions import FeatureNotEnabledError
 
 __all__ = [
     "build_challenge_transaction",
@@ -241,7 +240,9 @@ def read_challenge_transaction(
         raise InvalidSep10ChallengeError("Operation should have a source account.")
 
     try:
-        client_account_address = client_account.account_muxed or client_account.account_id
+        client_account_address = (
+            client_account.account_muxed or client_account.account_id
+        )
     except FeatureNotEnabledError:
         if client_account.account_muxed_id:
             raise InvalidSep10ChallengeError("Muxed accounts are not supported")
@@ -597,10 +598,10 @@ def _verify_transaction_signatures(
             # See https://github.com/StellarCN/py-stellar-base/issues/252#issuecomment-580882560
             if index in signature_used:
                 continue
-            if decorated_signature.hint.signature_hint != kp.signature_hint():
+            if decorated_signature.signature_hint != kp.signature_hint():
                 continue
             try:
-                kp.verify(tx_hash, decorated_signature.signature.signature)
+                kp.verify(tx_hash, decorated_signature.signature)
                 signature_used.add(index)
                 signers_found.append(signer)
                 break

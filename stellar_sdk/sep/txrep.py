@@ -14,6 +14,7 @@ from typing import Dict, List, Optional, Union
 
 from .. import xdr as stellar_xdr
 from ..asset import Asset
+from ..decorated_signature import DecoratedSignature
 from ..exceptions import ValueError as SdkValueError
 from ..fee_bump_transaction import FeeBumpTransaction
 from ..fee_bump_transaction_envelope import FeeBumpTransactionEnvelope
@@ -293,18 +294,16 @@ def _remove_string_value_comment(value: str) -> str:
 
 def _get_signature(
     index: int, raw_data_map: Dict[str, str], prefix: str
-) -> stellar_xdr.DecoratedSignature:
+) -> DecoratedSignature:
     hint = _get_bytes_value(raw_data_map, f"{prefix}signatures[{index}].hint")
     signature = _get_bytes_value(raw_data_map, f"{prefix}signatures[{index}].signature")
-    return stellar_xdr.DecoratedSignature(
-        stellar_xdr.SignatureHint(hint), stellar_xdr.Signature(signature)
-    )
+    return DecoratedSignature(hint, signature)
 
 
 def _get_signatures(
     raw_data_map: Dict[str, str], prefix: str
-) -> List[stellar_xdr.DecoratedSignature]:
-    signatures: List[stellar_xdr.DecoratedSignature] = []
+) -> List[DecoratedSignature]:
+    signatures: List[DecoratedSignature] = []
     signature_length = _get_int_value(raw_data_map, f"{prefix}signatures.len")
     for i in range(signature_length):
         signature = _get_signature(i, raw_data_map, prefix)
@@ -1475,7 +1474,7 @@ def _add_operation(
 
 
 def _add_signatures(
-    signatures: List[stellar_xdr.DecoratedSignature], prefix: str, lines: List[str]
+    signatures: List[DecoratedSignature], prefix: str, lines: List[str]
 ) -> None:
     _add_line(f"{prefix}signatures.len", len(signatures), lines)
     for index, signature in enumerate(signatures):
@@ -1483,11 +1482,11 @@ def _add_signatures(
 
 
 def _add_signature(
-    index: int, signature: stellar_xdr.DecoratedSignature, prefix: str, lines: List[str]
+    index: int, signature: DecoratedSignature, prefix: str, lines: List[str]
 ) -> None:
     prefix = f"{prefix}signatures[{index}]."
-    _add_line(f"{prefix}hint", _to_opaque(signature.hint.signature_hint), lines)
-    _add_line(f"{prefix}signature", _to_opaque(signature.signature.signature), lines)
+    _add_line(f"{prefix}hint", _to_opaque(signature.signature_hint), lines)
+    _add_line(f"{prefix}signature", _to_opaque(signature.signature), lines)
 
 
 def _to_asset(asset: Union[Asset, LiquidityPoolAsset, LiquidityPoolId]) -> str:
