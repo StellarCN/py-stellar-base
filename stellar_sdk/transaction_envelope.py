@@ -99,16 +99,14 @@ class TransactionEnvelope(BaseTransactionEnvelope["TransactionEnvelope"]):
             assert xdr_object.v0.signatures is not None
             tx = Transaction.from_xdr_object(xdr_object.v0.tx, v1=False)
             signatures = [
-                DecoratedSignature(s.hint.signature_hint, s.signature.signature)
-                for s in xdr_object.v0.signatures
+                DecoratedSignature.from_xdr_object(s) for s in xdr_object.v0.signatures
             ]
         elif te_type == stellar_xdr.EnvelopeType.ENVELOPE_TYPE_TX:
             assert xdr_object.v1 is not None
             assert xdr_object.v1.signatures is not None
             tx = Transaction.from_xdr_object(xdr_object.v1.tx, v1=True)
             signatures = [
-                DecoratedSignature(s.hint.signature_hint, s.signature.signature)
-                for s in xdr_object.v1.signatures
+                DecoratedSignature.from_xdr_object(s) for s in xdr_object.v1.signatures
             ]
         else:
             raise ValueError(f"Unexpected EnvelopeType: {xdr_object.type}.")

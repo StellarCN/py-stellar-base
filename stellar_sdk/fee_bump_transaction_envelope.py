@@ -84,7 +84,7 @@ class FeeBumpTransactionEnvelope(BaseTransactionEnvelope["FeeBumpTransactionEnve
             raise ValueError("Invalid EnvelopeType: %d.", xdr_object.type)
         assert xdr_object.fee_bump is not None
         signatures = [
-            DecoratedSignature(s.hint.signature_hint, s.signature.signature)
+            DecoratedSignature.from_xdr_object(s)
             for s in xdr_object.fee_bump.signatures
         ]
         te = cls(tx, network_passphrase=network_passphrase, signatures=signatures)
