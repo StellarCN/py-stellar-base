@@ -3,6 +3,7 @@ from xdrlib import Packer
 
 from . import xdr as stellar_xdr
 from .base_transaction_envelope import BaseTransactionEnvelope
+from .decorated_signature import DecoratedSignature
 from .fee_bump_transaction import FeeBumpTransaction
 
 __all__ = ["FeeBumpTransactionEnvelope"]
@@ -28,7 +29,7 @@ class FeeBumpTransactionEnvelope(BaseTransactionEnvelope["FeeBumpTransactionEnve
         self,
         transaction: FeeBumpTransaction,
         network_passphrase: str,
-        signatures: List[stellar_xdr.DecoratedSignature] = None,
+        signatures: List[DecoratedSignature] = None,
     ) -> None:
         super().__init__(network_passphrase, signatures)
         self.transaction: FeeBumpTransaction = transaction
@@ -59,7 +60,8 @@ class FeeBumpTransactionEnvelope(BaseTransactionEnvelope["FeeBumpTransactionEnve
         """
         tx = self.transaction.to_xdr_object()
         te_type = stellar_xdr.EnvelopeType.ENVELOPE_TYPE_TX_FEE_BUMP
-        tx_envelope = stellar_xdr.FeeBumpTransactionEnvelope(tx, self.signatures)
+        signatures = [signature.to_xdr_object() for signature in self.signatures]
+        tx_envelope = stellar_xdr.FeeBumpTransactionEnvelope(tx, signatures)
         return stellar_xdr.TransactionEnvelope(type=te_type, fee_bump=tx_envelope)
 
     @classmethod
@@ -81,7 +83,10 @@ class FeeBumpTransactionEnvelope(BaseTransactionEnvelope["FeeBumpTransactionEnve
         else:
             raise ValueError("Invalid EnvelopeType: %d.", xdr_object.type)
         assert xdr_object.fee_bump is not None
-        signatures = xdr_object.fee_bump.signatures
+        signatures = [
+            DecoratedSignature.from_xdr_object(s)
+            for s in xdr_object.fee_bump.signatures
+        ]
         te = cls(tx, network_passphrase=network_passphrase, signatures=signatures)
         return te
 

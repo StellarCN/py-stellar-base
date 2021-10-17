@@ -5,6 +5,7 @@ import nacl.signing as ed25519
 from nacl.exceptions import BadSignatureError as NaclBadSignatureError
 
 from . import xdr as stellar_xdr
+from .decorated_signature import DecoratedSignature
 from .exceptions import (
     AttributeError,
     BadSignatureError,
@@ -254,15 +255,15 @@ class Keypair:
         )
         return cls.from_raw_ed25519_seed(raw_ed25519_seed)
 
-    def sign_decorated(self, data) -> stellar_xdr.DecoratedSignature:
+    def sign_decorated(self, data) -> DecoratedSignature:
         """Sign the provided data with the keypair's private key and returns DecoratedSignature.
 
         :param data: signed bytes
         :return: sign decorated
         """
-        hint = stellar_xdr.SignatureHint(self.signature_hint())
-        signature = stellar_xdr.Signature(self.sign(data))
-        return stellar_xdr.DecoratedSignature(hint, signature)
+        hint = self.signature_hint()
+        signature = self.sign(data)
+        return DecoratedSignature(hint, signature)
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
