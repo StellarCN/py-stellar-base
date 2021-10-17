@@ -26,7 +26,7 @@ from ..operation.create_claimable_balance import ClaimPredicateType
 from ..operation.revoke_sponsorship import RevokeSponsorshipType
 from ..price import Price
 from ..signer import Signer
-from ..signer_key import SignerKey
+from ..signer_key import SignerKey, SignerKeyType
 from ..strkey import StrKey
 from ..time_bounds import TimeBounds
 from ..transaction import Transaction
@@ -1088,37 +1088,7 @@ def _add_operation(
         add_body_line("signer._present", _false if signer is None else _true)
         if signer is None:
             return
-        if (
-            signer.signer_key.signer_key.type
-            == stellar_xdr.SignerKeyType.SIGNER_KEY_TYPE_ED25519
-        ):
-            assert signer.signer_key.signer_key.ed25519 is not None
-            add_body_line(
-                "signer.key",
-                StrKey.encode_ed25519_public_key(
-                    signer.signer_key.signer_key.ed25519.uint256
-                ),
-            )
-        if (
-            signer.signer_key.signer_key.type
-            == stellar_xdr.SignerKeyType.SIGNER_KEY_TYPE_PRE_AUTH_TX
-        ):
-            assert signer.signer_key.signer_key.pre_auth_tx is not None
-            add_body_line(
-                "signer.key",
-                StrKey.encode_pre_auth_tx(
-                    signer.signer_key.signer_key.pre_auth_tx.uint256
-                ),
-            )
-        if (
-            signer.signer_key.signer_key.type
-            == stellar_xdr.SignerKeyType.SIGNER_KEY_TYPE_HASH_X
-        ):
-            assert signer.signer_key.signer_key.hash_x is not None
-            add_body_line(
-                "signer.key",
-                StrKey.encode_sha256_hash(signer.signer_key.signer_key.hash_x.uint256),
-            )
+        add_body_line("signer.key", signer.signer_key.encoded_signer_key)
         add_body_line("signer.weight", signer.weight)
 
     def add_price(price: Union[Price, str, Decimal]) -> None:
@@ -1420,41 +1390,27 @@ def _add_operation(
                 stellar_xdr.revoke_sponsorship_type.RevokeSponsorshipType.REVOKE_SPONSORSHIP_SIGNER.name,
             )
             add_body_line("signer.accountID", operation.signer.account_id)
+            signer_key_xdr = operation.signer.signer_key.to_xdr_object()
             add_body_line(
                 "signer.signerKey.type",
-                operation.signer.signer_key.signer_key.type.name,
+                signer_key_xdr.type.name,
             )
-            if (
-                operation.signer.signer_key.signer_key.type
-                == stellar_xdr.SignerKeyType.SIGNER_KEY_TYPE_HASH_X
-            ):
-                assert operation.signer.signer_key.signer_key.hash_x is not None
-                key = StrKey.encode_sha256_hash(
-                    operation.signer.signer_key.signer_key.hash_x.uint256
-                )
+            key = operation.signer.signer_key.encoded_signer_key
+            if signer_key_xdr.type == stellar_xdr.SignerKeyType.SIGNER_KEY_TYPE_HASH_X:
                 add_body_line("signer.signerKey.hashX", key)
             elif (
-                operation.signer.signer_key.signer_key.type
-                == stellar_xdr.SignerKeyType.SIGNER_KEY_TYPE_ED25519
+                signer_key_xdr.type == stellar_xdr.SignerKeyType.SIGNER_KEY_TYPE_ED25519
             ):
-                assert operation.signer.signer_key.signer_key.ed25519 is not None
-                key = StrKey.encode_ed25519_public_key(
-                    operation.signer.signer_key.signer_key.ed25519.uint256
-                )
                 add_body_line("signer.signerKey.ed25519", key)
             elif (
-                operation.signer.signer_key.signer_key.type
+                signer_key_xdr.type
                 == stellar_xdr.SignerKeyType.SIGNER_KEY_TYPE_PRE_AUTH_TX
             ):
-                assert operation.signer.signer_key.signer_key.pre_auth_tx is not None
-                key = StrKey.encode_pre_auth_tx(
-                    operation.signer.signer_key.signer_key.pre_auth_tx.uint256
-                )
                 add_body_line("signer.signerKey.preAuthTx", key)
             else:
                 raise SdkValueError(
                     f"This signer key type has not been implemented yet, "
-                    f"signer key type: {operation.signer.signer_key.signer_key.type}."
+                    f"signer key type: {signer_key_xdr.type}."
                 )
         else:
             raise SdkValueError(
