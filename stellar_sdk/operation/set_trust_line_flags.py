@@ -6,8 +6,8 @@ from ..asset import Asset
 from ..keypair import Keypair
 from ..muxed_account import MuxedAccount
 from ..strkey import StrKey
+from ..utils import raise_if_not_valid_ed25519_public_key
 from .operation import Operation
-from .utils import check_ed25519_public_key
 
 __all__ = ["TrustLineFlags", "SetTrustLineFlags"]
 
@@ -58,11 +58,11 @@ class SetTrustLineFlags(Operation):
         source: Optional[Union[MuxedAccount, str]] = None,
     ):
         super().__init__(source)
-        check_ed25519_public_key(trustor)
         self.trustor: str = trustor
         self.asset: Asset = asset
         self.clear_flags: Optional[TrustLineFlags] = clear_flags
         self.set_flags: Optional[TrustLineFlags] = set_flags
+        raise_if_not_valid_ed25519_public_key(self.trustor, "trustor")
 
     def _to_operation_body(self) -> stellar_xdr.OperationBody:
         trustor = Keypair.from_public_key(self.trustor).xdr_account_id()

@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Union
 from xdrlib import Packer
 
 from . import xdr as stellar_xdr
@@ -53,6 +53,25 @@ class FeeBumpTransactionEnvelope(BaseTransactionEnvelope["FeeBumpTransactionEnve
         self.transaction.to_xdr_object().pack(packer)
         return network_id + packer.get_buffer()
 
+    @staticmethod
+    def is_fee_bump_transaction_envelope(xdr: Union[str, bytes]) -> bool:
+        if isinstance(xdr, str):
+            xdr_object = stellar_xdr.TransactionEnvelope.from_xdr(xdr)
+        else:
+            xdr_object = stellar_xdr.TransactionEnvelope.from_xdr_bytes(xdr)
+        te_type = xdr_object.type
+        if te_type == stellar_xdr.EnvelopeType.ENVELOPE_TYPE_TX_FEE_BUMP:
+            return True
+        elif (
+            te_type == stellar_xdr.EnvelopeType.ENVELOPE_TYPE_TX
+            or te_type == stellar_xdr.EnvelopeType.ENVELOPE_TYPE_TX_V0
+        ):
+            return False
+        else:
+            raise ValueError(
+                f"This transaction envelope type is not supported, type = {te_type}."
+            )
+
     def to_xdr_object(self) -> stellar_xdr.TransactionEnvelope:
         """Get an XDR object representation of this :class:`TransactionEnvelope`.
 
@@ -93,6 +112,7 @@ class FeeBumpTransactionEnvelope(BaseTransactionEnvelope["FeeBumpTransactionEnve
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
             return NotImplemented  # pragma: no cover
+        # TODO: fix it.
         return self.to_xdr_object() == other.to_xdr_object()
 
     def __str__(self):

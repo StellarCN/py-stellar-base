@@ -4,6 +4,7 @@ from typing import Optional, Union
 
 from .. import xdr as stellar_xdr
 from ..muxed_account import MuxedAccount
+from ..utils import raise_if_not_valid_balance_id
 from .operation import Operation
 
 __all__ = ["ClaimClaimableBalance"]
@@ -35,6 +36,7 @@ class ClaimClaimableBalance(Operation):
     ) -> None:
         super().__init__(source)
         self.balance_id: str = balance_id
+        raise_if_not_valid_balance_id(self.balance_id, "balance_id")
 
     def _to_operation_body(self) -> stellar_xdr.OperationBody:
         balance_id_bytes: bytes = binascii.unhexlify(self.balance_id)

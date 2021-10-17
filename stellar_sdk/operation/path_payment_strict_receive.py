@@ -4,8 +4,8 @@ from typing import List, Optional, Union
 from .. import xdr as stellar_xdr
 from ..asset import Asset
 from ..muxed_account import MuxedAccount
+from ..utils import raise_if_not_valid_amount
 from .operation import Operation
-from .utils import check_amount
 
 __all__ = ["PathPaymentStrictReceive"]
 
@@ -45,8 +45,6 @@ class PathPaymentStrictReceive(Operation):
         source: Optional[Union[MuxedAccount, str]] = None,
     ) -> None:
         super().__init__(source)
-        check_amount(send_max)
-        check_amount(dest_amount)
         if isinstance(destination, str):
             destination = MuxedAccount.from_account(destination)
         self.destination: MuxedAccount = destination
@@ -55,6 +53,8 @@ class PathPaymentStrictReceive(Operation):
         self.dest_asset: Asset = dest_asset
         self.dest_amount: str = str(dest_amount)
         self.path: List[Asset] = path  # a list of paths/assets
+        raise_if_not_valid_amount(self.send_max, "send_max")
+        raise_if_not_valid_amount(self.dest_amount, "dest_amount")
 
     def _to_operation_body(self) -> stellar_xdr.OperationBody:
         destination = self.destination.to_xdr_object()

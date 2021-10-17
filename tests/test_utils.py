@@ -1,13 +1,10 @@
 import pytest
 
-from stellar_sdk import xdr as stellar_xdr
 from stellar_sdk.exceptions import NoApproximationError, TypeError
-from stellar_sdk.strkey import StrKey
 from stellar_sdk.utils import (
     best_rational_approximation,
     hex_to_bytes,
     is_valid_hash,
-    parse_ed25519_account_id_from_muxed_account_xdr_object,
     urljoin_with_query,
 )
 
@@ -128,30 +125,6 @@ class TestUtils:
     )
     def test_urljoin_with_query(self, base, path, output):
         assert output == urljoin_with_query(base, path)
-
-    def test_parse_ed25519_account_id_from_muxed_account_xdr_object_ed25519(self):
-        account_id = "GAQAA5L65LSYH7CQ3VTJ7F3HHLGCL3DSLAR2Y47263D56MNNGHSQSTVY"
-        muxed = stellar_xdr.MuxedAccount(
-            type=stellar_xdr.CryptoKeyType.KEY_TYPE_ED25519,
-            ed25519=stellar_xdr.Uint256(StrKey.decode_ed25519_public_key(account_id)),
-        )
-        assert (
-            parse_ed25519_account_id_from_muxed_account_xdr_object(muxed) == account_id
-        )
-
-    def test_parse_ed25519_account_id_from_muxed_account_xdr_object_muxed_account(self):
-        account_id = "GAQAA5L65LSYH7CQ3VTJ7F3HHLGCL3DSLAR2Y47263D56MNNGHSQSTVY"
-        ed25519 = StrKey.decode_ed25519_public_key(account_id)
-        id = 1234
-        med25519 = stellar_xdr.MuxedAccountMed25519(
-            id=stellar_xdr.Uint64(id), ed25519=stellar_xdr.Uint256(ed25519)
-        )
-        muxed = stellar_xdr.MuxedAccount(
-            type=stellar_xdr.CryptoKeyType.KEY_TYPE_MUXED_ED25519, med25519=med25519
-        )
-        assert (
-            parse_ed25519_account_id_from_muxed_account_xdr_object(muxed) == account_id
-        )
 
     @pytest.mark.parametrize(
         "data, result",

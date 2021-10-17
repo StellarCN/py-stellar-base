@@ -11,8 +11,12 @@ from ..liquidity_pool_id import LiquidityPoolId
 from ..muxed_account import MuxedAccount
 from ..signer_key import SignerKey
 from ..strkey import StrKey
+from ..utils import (
+    raise_if_not_valid_balance_id,
+    raise_if_not_valid_ed25519_public_key,
+    raise_if_not_valid_hash,
+)
 from .operation import Operation
-from .utils import check_ed25519_public_key
 
 __all__ = ["RevokeSponsorship"]
 
@@ -31,9 +35,9 @@ class RevokeSponsorshipType(IntEnum):
 
 class TrustLine:
     def __init__(self, account_id: str, asset: Union[Asset, LiquidityPoolId]) -> None:
-        check_ed25519_public_key(account_id)
         self.account_id = account_id
         self.asset = asset
+        raise_if_not_valid_ed25519_public_key(self.account_id, "account_id")
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
@@ -46,9 +50,9 @@ class TrustLine:
 
 class Offer:
     def __init__(self, seller_id: str, offer_id: int) -> None:
-        check_ed25519_public_key(seller_id)
         self.seller_id = seller_id
         self.offer_id = offer_id
+        raise_if_not_valid_ed25519_public_key(self.seller_id, "seller_id")
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
@@ -61,9 +65,9 @@ class Offer:
 
 class Data:
     def __init__(self, account_id: str, data_name: str) -> None:
-        check_ed25519_public_key(account_id)
         self.account_id = account_id
         self.data_name = data_name
+        raise_if_not_valid_ed25519_public_key(self.account_id, "account_id")
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
@@ -76,9 +80,9 @@ class Data:
 
 class Signer:
     def __init__(self, account_id: str, signer_key: SignerKey) -> None:
-        check_ed25519_public_key(account_id)
         self.account_id = account_id
         self.signer_key = signer_key
+        raise_if_not_valid_ed25519_public_key(self.account_id, "account_id")
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
@@ -143,6 +147,15 @@ class RevokeSponsorship(Operation):
         self.claimable_balance_id: Optional[str] = claimable_balance_id
         self.signer: Optional[Signer] = signer
         self.liquidity_pool_id: Optional[str] = liquidity_pool_id
+
+        if self.account_id is not None:
+            raise_if_not_valid_ed25519_public_key(self.account_id, "account_id")
+        if self.claimable_balance_id is not None:
+            raise_if_not_valid_balance_id(
+                self.claimable_balance_id, "claimable_balance_id"
+            )
+        if self.liquidity_pool_id is not None:
+            raise_if_not_valid_hash(self.liquidity_pool_id, "liquidity_pool_id")
 
     @classmethod
     def revoke_account_sponsorship(

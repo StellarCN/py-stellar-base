@@ -8,8 +8,8 @@ from ..exceptions import ValueError
 from ..keypair import Keypair
 from ..muxed_account import MuxedAccount
 from ..strkey import StrKey
+from ..utils import raise_if_not_valid_amount, raise_if_not_valid_ed25519_public_key
 from .operation import Operation
-from .utils import check_amount
 
 __all__ = ["ClaimPredicate", "Claimant", "CreateClaimableBalance"]
 
@@ -318,6 +318,7 @@ class Claimant:
         if predicate is None:
             predicate = ClaimPredicate.predicate_unconditional()
         self.predicate: ClaimPredicate = predicate
+        raise_if_not_valid_ed25519_public_key(self.destination, "destination")
 
     def to_xdr_object(self) -> stellar_xdr.Claimant:
         claimant_v0 = stellar_xdr.ClaimantV0(
@@ -383,10 +384,10 @@ class CreateClaimableBalance(Operation):
         source: Optional[Union[MuxedAccount, str]] = None,
     ) -> None:
         super().__init__(source)
-        check_amount(amount)
         self.asset: Asset = asset
         self.amount: str = str(amount)
         self.claimants: List[Claimant] = claimants
+        raise_if_not_valid_amount(self.amount, "amount")
 
     def _to_operation_body(self) -> stellar_xdr.OperationBody:
         asset = self.asset.to_xdr_object()

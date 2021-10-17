@@ -19,7 +19,6 @@ from ..fee_bump_transaction_envelope import FeeBumpTransactionEnvelope
 from ..keypair import Keypair
 from ..memo import HashMemo, IdMemo, Memo, NoneMemo, ReturnHashMemo, TextMemo
 from ..transaction_envelope import TransactionEnvelope
-from ..utils import is_fee_bump_transaction
 
 __all__ = ["PayStellarUri", "TransactionStellarUri", "Replacement"]
 
@@ -426,7 +425,7 @@ class TransactionStellarUri(StellarUri):
         signature = query.get("signature")
         if xdr is None:
             raise ValueError("`xdr` is missing from uri.")
-        if is_fee_bump_transaction(xdr):
+        if FeeBumpTransactionEnvelope.is_fee_bump_transaction_envelope(xdr):
             tx = FeeBumpTransactionEnvelope.from_xdr(xdr, network_passphrase)
         else:
             tx = TransactionEnvelope.from_xdr(xdr, network_passphrase)  # type: ignore[assignment]

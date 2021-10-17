@@ -5,8 +5,8 @@ from .. import xdr as stellar_xdr
 from ..asset import Asset
 from ..muxed_account import MuxedAccount
 from ..price import Price
+from ..utils import raise_if_not_valid_amount
 from .operation import Operation
-from .utils import check_amount, check_price
 
 __all__ = ["CreatePassiveSellOffer"]
 
@@ -56,8 +56,6 @@ class CreatePassiveSellOffer(Operation):
         source: Optional[Union[MuxedAccount, str]] = None,
     ) -> None:
         super().__init__(source)
-        check_amount(amount)
-        check_price(price)
         if not isinstance(price, Price):
             price = Price.from_raw_price(price)
 
@@ -65,6 +63,7 @@ class CreatePassiveSellOffer(Operation):
         self.buying: Asset = buying
         self.amount: str = str(amount)
         self.price: Price = price
+        raise_if_not_valid_amount(self.amount, "amount")
 
     def _to_operation_body(self) -> stellar_xdr.OperationBody:
         selling = self.selling.to_xdr_object()

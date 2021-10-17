@@ -2,7 +2,7 @@ import binascii
 
 from . import xdr as stellar_xdr
 from .exceptions import ValueError
-from .utils import is_valid_hash
+from .utils import raise_if_not_valid_hash
 
 __all__ = ["LiquidityPoolId"]
 
@@ -15,10 +15,9 @@ class LiquidityPoolId:
     """
 
     def __init__(self, liquidity_pool_id: str) -> None:
-        if not is_valid_hash(liquidity_pool_id):
-            raise ValueError("`liquidity_pool_id` is not a valid hash.")
         self.liquidity_pool_id: str = liquidity_pool_id
         self.type: str = "liquidity_pool_shares"
+        raise_if_not_valid_hash(self.liquidity_pool_id, "liquidity_pool_id")
 
     def to_trust_line_asset_xdr_object(self) -> stellar_xdr.TrustLineAsset:
         """Returns the xdr object for this LiquidityPoolId object.

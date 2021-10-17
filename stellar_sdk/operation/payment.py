@@ -4,8 +4,8 @@ from typing import Optional, Union
 from .. import xdr as stellar_xdr
 from ..asset import Asset
 from ..muxed_account import MuxedAccount
+from ..utils import raise_if_not_valid_amount
 from .operation import Operation
-from .utils import check_amount
 
 __all__ = ["Payment"]
 
@@ -36,12 +36,12 @@ class Payment(Operation):
         source: Optional[Union[MuxedAccount, str]] = None,
     ) -> None:
         super().__init__(source)
-        check_amount(amount)
         if isinstance(destination, str):
             destination = MuxedAccount.from_account(destination)
         self.destination: MuxedAccount = destination
         self.asset: Asset = asset
         self.amount: str = str(amount)
+        raise_if_not_valid_amount(self.amount, "amount")
 
     def _to_operation_body(self) -> stellar_xdr.OperationBody:
         asset = self.asset.to_xdr_object()

@@ -2,16 +2,23 @@ import hashlib
 import os
 import re
 from decimal import ROUND_FLOOR, Decimal
-from typing import Dict, List, Union
+from typing import Dict, List, Optional, Union
 from urllib.parse import urlsplit, urlunsplit
 
-from . import xdr as stellar_xdr
 from .asset import Asset
-from .exceptions import NoApproximationError, TypeError
+from .exceptions import (
+    Ed25519PublicKeyInvalidError,
+    NoApproximationError,
+    TypeError,
+    ValueError,
+)
 from .strkey import StrKey
 
 MUXED_ACCOUNT_STARTING_LETTER: str = "M"
 ED25519_PUBLIC_KEY_STARTING_LETTER: str = "G"
+_LOWER_LIMIT = "0"
+_UPPER_LIMIT = "922337203685.4775807"
+_EXPONENT = 7
 
 
 def sha256(data: bytes) -> bytes:
@@ -74,33 +81,76 @@ def urljoin_with_query(base: str, path: str) -> str:
     return url
 
 
-def parse_ed25519_account_id_from_muxed_account_xdr_object(
-    data: stellar_xdr.MuxedAccount,
-) -> str:
-    if data.ed25519 is not None:
-        return StrKey.encode_ed25519_public_key(data.ed25519.uint256)
-    assert data.med25519 is not None
-    return StrKey.encode_ed25519_public_key(data.med25519.ed25519.uint256)
-
-
-def is_fee_bump_transaction(xdr: str) -> bool:
-    xdr_object = stellar_xdr.TransactionEnvelope.from_xdr(xdr)
-    te_type = xdr_object.type
-    if te_type == stellar_xdr.EnvelopeType.ENVELOPE_TYPE_TX_FEE_BUMP:
-        return True
-    elif (
-        te_type == stellar_xdr.EnvelopeType.ENVELOPE_TYPE_TX
-        or te_type == stellar_xdr.EnvelopeType.ENVELOPE_TYPE_TX_V0
-    ):
-        return False
-    else:
-        raise ValueError(
-            f"This transaction envelope type is not supported, type = {te_type}."
-        )
-
-
 def is_valid_hash(data: str) -> bool:
     if not data:
         return False
     asset_code_re = re.compile(r"^[a-zA-Z0-9]{64}$")
     return bool(asset_code_re.match(data))
+
+
+def raise_if_not_valid_ed25519_public_key(value: str, argument_name: str) -> None:
+    try:
+        StrKey.decode_ed25519_public_key(value)
+    except Exception as e:
+        raise Ed25519PublicKeyInvalidError(
+            f'Value of argument "{argument_name}" is not a valid ed25519 public key: {value}'
+        ) from e
+
+
+def raise_if_not_valid_sha256_hash_key(value: str, argument_name: str) -> None:
+    try:
+        StrKey.decode_sha256_hash(value)
+    except Exception as e:
+        raise ValueError(
+            f'Value of argument "{argument_name}" is not a valid sha256 hash key: {value}'
+        ) from e
+
+
+def raise_if_not_valid_pre_auth_tx_key(value: str, argument_name: str) -> None:
+    try:
+        StrKey.decode_pre_auth_tx(value)
+    except Exception as e:
+        raise ValueError(
+            f'Value of argument "{argument_name}" is not a valid pre auth tx key: {value}'
+        ) from e
+
+
+def raise_if_not_valid_muxed_account(value: str, argument_name: str) -> None:
+    try:
+        StrKey.decode_muxed_account(value)
+    except Exception as e:
+        raise ValueError(
+            f'Value of argument "{argument_name}" is not a valid muxed account: {value}'
+        ) from e
+
+
+def raise_if_not_valid_amount(amount: str, argument_name: str) -> None:
+    amount = Decimal(amount)
+    if abs(amount.as_tuple().exponent) > _EXPONENT:
+        raise ValueError(
+            f'Value of argument "{argument_name}" must have at most 7 digits after the decimal: {amount}'
+        )
+    if amount < Decimal(_LOWER_LIMIT) or amount > Decimal(_UPPER_LIMIT):
+        raise ValueError(
+            f'Value of argument "{argument_name}" must represent a positive number '
+            f"and the max valid value is {_UPPER_LIMIT}: {amount}"
+        )
+
+
+def raise_if_not_valid_hash(value: str, argument_name: str) -> None:
+    if not is_valid_hash(value):
+        raise ValueError(
+            f'Value of argument "{argument_name}" is not a valid hash: {value}'
+        )
+
+
+def raise_if_not_valid_balance_id(value: str, argument_name: str) -> None:
+    if len(value) != 72 or value[:8] != "00000000" or not is_valid_hash(value[8:]):
+        raise ValueError(
+            f'Value of argument "{argument_name}" is not a valid balance id: {value}'
+        )
+
+
+def raise_if_not_valid_operation_source(source: Optional[str]) -> None:
+    if source is not None:
+        raise_if_not_valid_muxed_account(source, "source")

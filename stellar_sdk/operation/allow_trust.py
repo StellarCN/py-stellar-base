@@ -7,8 +7,8 @@ from ..asset import Asset
 from ..keypair import Keypair
 from ..muxed_account import MuxedAccount
 from ..strkey import StrKey
+from ..utils import raise_if_not_valid_ed25519_public_key
 from .operation import Operation
-from .utils import check_asset_code, check_ed25519_public_key
 
 __all__ = ["TrustLineEntryFlag", "AllowTrust"]
 
@@ -68,8 +68,7 @@ class AllowTrust(Operation):
             DeprecationWarning,
         )
         super().__init__(source)
-        check_ed25519_public_key(trustor)
-        check_asset_code(asset_code)
+
         self.trustor: str = trustor
         self.asset_code: str = asset_code
 
@@ -80,6 +79,8 @@ class AllowTrust(Operation):
                 self.authorize = TrustLineEntryFlag.UNAUTHORIZED_FLAG
         else:
             self.authorize = authorize
+        raise_if_not_valid_ed25519_public_key(self.trustor, "trustor")
+        Asset.check_if_asset_code_is_valid(self.asset_code)
 
     def _to_operation_body(self) -> stellar_xdr.OperationBody:
         Asset.check_if_asset_code_is_valid(self.asset_code)
