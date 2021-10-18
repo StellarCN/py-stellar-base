@@ -124,8 +124,8 @@ def raise_if_not_valid_muxed_account(value: str, argument_name: str) -> None:
         ) from e
 
 
-def raise_if_not_valid_amount(amount: str, argument_name: str) -> None:
-    amount = Decimal(amount)
+def raise_if_not_valid_amount(value: str, argument_name: str) -> None:
+    amount = Decimal(value)
     if abs(amount.as_tuple().exponent) > _EXPONENT:
         raise ValueError(
             f'Value of argument "{argument_name}" must have at most 7 digits after the decimal: {amount}'
