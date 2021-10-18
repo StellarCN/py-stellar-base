@@ -155,37 +155,37 @@ class ServerAsync(BaseServer):
 
     def root(self) -> RootCallBuilder:
         """
-        :return: New :class:`stellar_sdk.call_builder.RootCallBuilder` object configured
+        :return: New :class:`stellar_sdk.call_builder.call_builder_async.RootCallBuilder` object configured
             by a current Horizon server configuration.
         """
         return RootCallBuilder(horizon_url=self.horizon_url, client=self._client)
 
     def accounts(self) -> AccountsCallBuilder:
         """
-        :return: New :class:`stellar_sdk.call_builder.AccountsCallBuilder` object configured
+        :return: New :class:`stellar_sdk.call_builder.call_builder_async.AccountsCallBuilder` object configured
             by a current Horizon server configuration.
         """
         return AccountsCallBuilder(horizon_url=self.horizon_url, client=self._client)
 
     def assets(self) -> AssetsCallBuilder:
         """
-        :return: New :class:`stellar_sdk.call_builder.AssetsCallBuilder` object configured by
+        :return: New :class:`stellar_sdk.call_builder.call_builder_async.AssetsCallBuilder` object configured by
             a current Horizon server configuration.
         """
         return AssetsCallBuilder(horizon_url=self.horizon_url, client=self._client)
 
     def claimable_balances(self) -> ClaimableBalancesCallBuilder:
         """
-        :return: New :class:`stellar_sdk.call_builder.ClaimableBalancesCallBuilder` object configured by
+        :return: New :class:`stellar_sdk.call_builder.call_builder_async.ClaimableBalancesCallBuilder` object configured by
             a current Horizon server configuration.
         """
         return ClaimableBalancesCallBuilder(
             horizon_url=self.horizon_url, client=self._client
         )
 
-    def data(self, account_id: str, data_name: str):
+    def data(self, account_id: str, data_name: str) -> DataCallBuilder:
         """
-        :return: New :class:`stellar_sdk.call_builder.DataCallBuilder` object configured by
+        :return: New :class:`stellar_sdk.call_builder.call_builder_async.DataCallBuilder` object configured by
             a current Horizon server configuration.
         """
         return DataCallBuilder(
@@ -197,42 +197,42 @@ class ServerAsync(BaseServer):
 
     def effects(self) -> EffectsCallBuilder:
         """
-        :return: New :class:`stellar_sdk.call_builder.EffectsCallBuilder` object configured by
+        :return: New :class:`stellar_sdk.call_builder.call_builder_async.EffectsCallBuilder` object configured by
             a current Horizon server configuration.
         """
         return EffectsCallBuilder(horizon_url=self.horizon_url, client=self._client)
 
     def fee_stats(self) -> FeeStatsCallBuilder:
         """
-        :return: New :class:`stellar_sdk.call_builder.FeeStatsCallBuilder` object configured by
+        :return: New :class:`stellar_sdk.call_builder.call_builder_async.FeeStatsCallBuilder` object configured by
             a current Horizon server configuration.
         """
         return FeeStatsCallBuilder(horizon_url=self.horizon_url, client=self._client)
 
     def ledgers(self) -> LedgersCallBuilder:
         """
-        :return: New :class:`stellar_sdk.call_builder.LedgersCallBuilder` object configured by
+        :return: New :class:`stellar_sdk.call_builder.call_builder_async.LedgersCallBuilder` object configured by
             a current Horizon server configuration.
         """
         return LedgersCallBuilder(horizon_url=self.horizon_url, client=self._client)
 
     def liquidity_pools(self) -> LiquidityPoolsBuilder:
         """
-        :return: New :class:`stellar_sdk.call_builder.LiquidityPoolsBuilder` object configured by
+        :return: New :class:`stellar_sdk.call_builder.call_builder_async.LiquidityPoolsBuilder` object configured by
             a current Horizon server configuration.
         """
         return LiquidityPoolsBuilder(horizon_url=self.horizon_url, client=self._client)
 
     def offers(self) -> OffersCallBuilder:
         """
-        :return: New :class:`stellar_sdk.call_builder.OffersCallBuilder` object configured by
+        :return: New :class:`stellar_sdk.call_builder.call_builder_async.OffersCallBuilder` object configured by
             a current Horizon server configuration.
         """
         return OffersCallBuilder(horizon_url=self.horizon_url, client=self._client)
 
     def operations(self) -> OperationsCallBuilder:
         """
-        :return: New :class:`stellar_sdk.call_builder.OperationsCallBuilder` object configured by
+        :return: New :class:`stellar_sdk.call_builder.call_builder_async.OperationsCallBuilder` object configured by
             a current Horizon server configuration.
         """
         return OperationsCallBuilder(horizon_url=self.horizon_url, client=self._client)
@@ -241,7 +241,7 @@ class ServerAsync(BaseServer):
         """
         :param selling: Asset being sold
         :param buying: Asset being bought
-        :return: New :class:`stellar_sdk.call_builder.OrderbookCallBuilder` object configured by
+        :return: New :class:`stellar_sdk.call_builder.call_builder_async.OrderbookCallBuilder` object configured by
             a current Horizon server configuration.
         """
         return OrderbookCallBuilder(
@@ -256,12 +256,12 @@ class ServerAsync(BaseServer):
         source: Union[str, List[Asset]],
         destination_asset: Asset,
         destination_amount: str,
-    ):
+    ) -> StrictReceivePathsCallBuilder:
         """
         :param source: The sender's account ID or a list of Assets. Any returned path must use a source that the sender can hold.
         :param destination_asset: The destination asset.
         :param destination_amount: The amount, denominated in the destination asset, that any returned path should be able to satisfy.
-        :return: New :class:`stellar_sdk.call_builder.StrictReceivePathsCallBuilder` object configured by
+        :return: New :class:`stellar_sdk.call_builder.call_builder_async.StrictReceivePathsCallBuilder` object configured by
             a current Horizon server configuration.
         """
         return StrictReceivePathsCallBuilder(
@@ -277,12 +277,12 @@ class ServerAsync(BaseServer):
         source_asset: Asset,
         source_amount: str,
         destination: Union[str, List[Asset]],
-    ):
+    ) -> StrictSendPathsCallBuilder:
         """
         :param source_asset: The asset to be sent.
         :param source_amount: The amount, denominated in the source asset, that any returned path should be able to satisfy.
         :param destination: The destination account or the destination assets.
-        :return: New :class:`stellar_sdk.call_builder.StrictReceivePathsCallBuilder` object configured by
+        :return: New :class:`stellar_sdk.call_builder.call_builder_async.StrictReceivePathsCallBuilder` object configured by
             a current Horizon server configuration.
         """
         return StrictSendPathsCallBuilder(
@@ -295,7 +295,7 @@ class ServerAsync(BaseServer):
 
     def payments(self) -> PaymentsCallBuilder:
         """
-        :return: New :class:`stellar_sdk.call_builder.PaymentsCallBuilder` object configured by
+        :return: New :class:`stellar_sdk.call_builder.call_builder_async.PaymentsCallBuilder` object configured by
             a current Horizon server configuration.
         """
         return PaymentsCallBuilder(horizon_url=self.horizon_url, client=self._client)
@@ -320,7 +320,7 @@ class ServerAsync(BaseServer):
         :param offset: segments can be offset using this parameter.
             Expressed in milliseconds. *Can only be used if the resolution is greater than 1 hour.
             Value must be in whole hours, less than the provided resolution, and less than 24 hours.*
-        :return: New :class:`stellar_sdk.call_builder.TradeAggregationsCallBuilder` object configured by
+        :return: New :class:`stellar_sdk.call_builder.call_builder_async.TradeAggregationsCallBuilder` object configured by
             a current Horizon server configuration.
         """
         return TradeAggregationsCallBuilder(
@@ -336,14 +336,14 @@ class ServerAsync(BaseServer):
 
     def trades(self) -> TradesCallBuilder:
         """
-        :return: New :class:`stellar_sdk.call_builder.TradesCallBuilder` object configured by
+        :return: New :class:`stellar_sdk.call_builder.call_builder_async.TradesCallBuilder` object configured by
             a current Horizon server configuration.
         """
         return TradesCallBuilder(horizon_url=self.horizon_url, client=self._client)
 
     def transactions(self) -> TransactionsCallBuilder:
         """
-        :return: New :class:`stellar_sdk.call_builder.TransactionsCallBuilder` object configured by
+        :return: New :class:`stellar_sdk.call_builder.call_builder_async.TransactionsCallBuilder` object configured by
             a current Horizon server configuration.
         """
         return TransactionsCallBuilder(
