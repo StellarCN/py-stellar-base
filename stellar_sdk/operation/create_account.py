@@ -5,8 +5,8 @@ from .. import xdr as stellar_xdr
 from ..keypair import Keypair
 from ..muxed_account import MuxedAccount
 from ..strkey import StrKey
+from ..utils import raise_if_not_valid_amount, raise_if_not_valid_ed25519_public_key
 from .operation import Operation
-from .utils import check_amount, check_ed25519_public_key
 
 __all__ = ["CreateAccount"]
 
@@ -40,10 +40,10 @@ class CreateAccount(Operation):
         source: Optional[Union[MuxedAccount, str]] = None,
     ) -> None:
         super().__init__(source)
-        check_ed25519_public_key(destination)
-        check_amount(starting_balance)
         self.destination: str = destination
         self.starting_balance: str = str(starting_balance)
+        raise_if_not_valid_ed25519_public_key(self.destination, "destination")
+        raise_if_not_valid_amount(self.starting_balance, "starting_balance")
 
     def _to_operation_body(self) -> stellar_xdr.OperationBody:
         destination = Keypair.from_public_key(self.destination).xdr_account_id()

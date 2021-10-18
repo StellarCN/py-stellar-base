@@ -7,8 +7,8 @@ from ..keypair import Keypair
 from ..muxed_account import MuxedAccount
 from ..signer import Signer
 from ..strkey import StrKey
+from ..utils import raise_if_not_valid_ed25519_public_key
 from .operation import Operation
-from .utils import check_ed25519_public_key
 
 __all__ = ["AuthorizationFlag", "SetOptions"]
 
@@ -91,9 +91,6 @@ class SetOptions(Operation):
         source: Optional[Union[MuxedAccount, str]] = None,
     ) -> None:
         super().__init__(source)
-        if inflation_dest is not None:
-            check_ed25519_public_key(inflation_dest)
-
         if set_flags is not None and not isinstance(set_flags, AuthorizationFlag):
             warnings.warn(
                 "`set_flags` is a int, we recommend using AuthorizationFlag.",
@@ -117,6 +114,8 @@ class SetOptions(Operation):
         self.high_threshold: Optional[int] = high_threshold
         self.home_domain: Optional[str] = home_domain
         self.signer: Optional[Signer] = signer
+        if self.inflation_dest is not None:
+            raise_if_not_valid_ed25519_public_key(self.inflation_dest, "inflation_dest")
 
     def _to_operation_body(self) -> stellar_xdr.OperationBody:
         inflation_dest = (

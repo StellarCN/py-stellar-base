@@ -42,7 +42,7 @@ class ManageData(Operation):
         self.data_name: str = data_name
         if isinstance(data_value, str):
             data_value = data_value.encode()
-        self.data_value: Union[bytes, None] = data_value
+        self.data_value: Optional[bytes] = data_value
 
         valid_data_name_len = len(self.data_name) <= 64
         valid_data_val_len = self.data_value is None or len(self.data_value) <= 64

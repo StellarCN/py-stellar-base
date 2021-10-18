@@ -6,8 +6,8 @@ from .. import xdr as stellar_xdr
 from ..exceptions import ValueError
 from ..muxed_account import MuxedAccount
 from ..price import Price
+from ..utils import is_valid_hash, raise_if_not_valid_amount, raise_if_not_valid_hash
 from .operation import Operation
-from .utils import check_amount, check_price, is_valid_hash
 
 __all__ = ["LiquidityPoolDeposit"]
 
@@ -43,12 +43,6 @@ class LiquidityPoolDeposit(Operation):
         source: Optional[Union[MuxedAccount, str]] = None,
     ):
         super().__init__(source)
-        if not is_valid_hash(liquidity_pool_id):
-            raise ValueError("`liquidity_pool_id` is not a valid hash.")
-        check_amount(max_amount_a)
-        check_amount(max_amount_b)
-        check_price(min_price)
-        check_price(max_price)
         self.liquidity_pool_id: str = liquidity_pool_id
         self.max_amount_a: str = str(max_amount_a)
         self.max_amount_b: str = str(max_amount_b)
@@ -60,6 +54,9 @@ class LiquidityPoolDeposit(Operation):
             self.max_price: Price = max_price
         else:
             self.max_price = Price.from_raw_price(max_price)
+        raise_if_not_valid_amount(self.max_amount_a, "max_amount_a")
+        raise_if_not_valid_amount(self.max_amount_b, "max_amount_b")
+        raise_if_not_valid_hash(self.liquidity_pool_id, "liquidity_pool_id")
 
     def _to_operation_body(self) -> stellar_xdr.OperationBody:
         liquidity_pool_id_bytes = binascii.unhexlify(self.liquidity_pool_id)

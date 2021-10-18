@@ -16,7 +16,8 @@ class TestLiquidityPoolId:
 
     def test_init_raise(self):
         with pytest.raises(
-            ValueError, match="`liquidity_pool_id` is not a valid hash."
+            ValueError,
+            match=f'Value of argument "liquidity_pool_id" is not a valid hash: abc',
         ):
             LiquidityPoolId("abc")
 

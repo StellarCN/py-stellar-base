@@ -4,8 +4,8 @@ from .. import xdr as stellar_xdr
 from ..keypair import Keypair
 from ..muxed_account import MuxedAccount
 from ..strkey import StrKey
+from ..utils import raise_if_not_valid_ed25519_public_key
 from .operation import Operation
-from .utils import check_ed25519_public_key
 
 __all__ = ["BeginSponsoringFutureReserves"]
 
@@ -34,8 +34,8 @@ class BeginSponsoringFutureReserves(Operation):
         self, sponsored_id: str, source: Optional[Union[MuxedAccount, str]] = None
     ) -> None:
         super().__init__(source)
-        check_ed25519_public_key(sponsored_id)
         self.sponsored_id: str = sponsored_id
+        raise_if_not_valid_ed25519_public_key(self.sponsored_id, "sponsored_id")
 
     def _to_operation_body(self) -> stellar_xdr.OperationBody:
         sponsored_id = Keypair.from_public_key(self.sponsored_id).xdr_account_id()

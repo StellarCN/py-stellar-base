@@ -3,10 +3,9 @@ from decimal import Decimal
 from typing import Optional, Union
 
 from .. import xdr as stellar_xdr
-from ..exceptions import ValueError
 from ..muxed_account import MuxedAccount
+from ..utils import raise_if_not_valid_amount, raise_if_not_valid_hash
 from .operation import Operation
-from .utils import check_amount, is_valid_hash
 
 __all__ = ["LiquidityPoolWithdraw"]
 
@@ -40,15 +39,14 @@ class LiquidityPoolWithdraw(Operation):
         source: Optional[Union[MuxedAccount, str]] = None,
     ):
         super().__init__(source)
-        if not is_valid_hash(liquidity_pool_id):
-            raise ValueError("`liquidity_pool_id` is not a valid hash.")
-        check_amount(amount)
-        check_amount(min_amount_a)
-        check_amount(min_amount_b)
         self.liquidity_pool_id: str = liquidity_pool_id
         self.amount: str = str(amount)
         self.min_amount_a: str = str(min_amount_a)
         self.min_amount_b: str = str(min_amount_b)
+        raise_if_not_valid_amount(self.amount, "amount")
+        raise_if_not_valid_amount(self.min_amount_a, "min_amount_a")
+        raise_if_not_valid_amount(self.min_amount_b, "min_amount_b")
+        raise_if_not_valid_hash(self.liquidity_pool_id, "liquidity_pool_id")
 
     def _to_operation_body(self) -> stellar_xdr.OperationBody:
         liquidity_pool_id_bytes = binascii.unhexlify(self.liquidity_pool_id)

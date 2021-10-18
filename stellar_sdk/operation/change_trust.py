@@ -5,8 +5,8 @@ from .. import xdr as stellar_xdr
 from ..asset import Asset
 from ..liquidity_pool_asset import LiquidityPoolAsset
 from ..muxed_account import MuxedAccount
+from ..utils import raise_if_not_valid_amount
 from .operation import Operation
-from .utils import check_amount
 
 __all__ = ["ChangeTrust"]
 
@@ -46,8 +46,8 @@ class ChangeTrust(Operation):
             self.limit: str = self._DEFAULT_LIMIT
         else:
             limit = str(limit)
-            check_amount(limit)
             self.limit = limit
+        raise_if_not_valid_amount(self.limit, "limit")
 
     def _to_operation_body(self) -> stellar_xdr.OperationBody:
         line = self.asset.to_change_trust_asset_xdr_object()
