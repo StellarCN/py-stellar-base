@@ -10,18 +10,13 @@ class BaseOrderbookCallBuilder(BaseCallBuilder):
 
     See `Orderbook Details <https://www.stellar.org/developers/horizon/reference/endpoints/orderbook-details.html>`_
 
-    :param horizon_url: Horizon server URL.
     :param selling: Asset being sold
     :param buying: Asset being bought
+    :param horizon_url: Horizon server URL.
     """
 
-    def __init__(
-        self,
-        horizon_url: str,
-        selling: Asset,
-        buying: Asset,
-    ) -> None:
-        super().__init__(horizon_url)
+    def __init__(self, selling: Asset, buying: Asset, **kwargs) -> None:
+        super().__init__(**kwargs)
         self.endpoint: str = "order_book"
         params = {
             "selling_asset_type": selling.type,

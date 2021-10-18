@@ -129,20 +129,20 @@ class BaseCallBuilder:
         for k, v in params.items():
             self._add_query_param(k, v)
 
-    def __eq__(self, other: object) -> bool:
-        if not isinstance(other, self.__class__):
-            return NotImplemented  # pragma: no cover
-        return (
-            self.params == other.params
-            and self.endpoint == other.endpoint
-            and self.horizon_url == other.horizon_url
-        )
-
-    def __str__(self):
-        return (
-            f"<CallBuilder [horizon_url={self.horizon_url}, "
-            f"endpoint={self.endpoint}, "
-            f"params={self.params}, "
-            f"prev_href={self.prev_href}, "
-            f"next_href={self.next_href}>"
-        )
+    # def __eq__(self, other: object) -> bool:
+    #     if not isinstance(other, self.__class__):
+    #         return NotImplemented  # pragma: no cover
+    #     return (
+    #         self.params == other.params
+    #         and self.endpoint == other.endpoint
+    #         and self.horizon_url == other.horizon_url
+    #     )
+    #
+    # def __str__(self):
+    #     return (
+    #         f"<CallBuilder [horizon_url={self.horizon_url}, "
+    #         f"endpoint={self.endpoint}, "
+    #         f"params={self.params}, "
+    #         f"prev_href={self.prev_href}, "
+    #         f"next_href={self.next_href}>"
+    #     )

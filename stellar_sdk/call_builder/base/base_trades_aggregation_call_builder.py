@@ -13,7 +13,6 @@ class BaseTradeAggregationsCallBuilder(BaseCallBuilder):
 
     See `Trade Aggregations <https://www.stellar.org/developers/horizon/reference/endpoints/trade_aggregations.html>`_
 
-    :param horizon_url: Horizon server URL.
     :param base: base asset
     :param counter: counter asset
     :param resolution: segment duration as millis since epoch. *Supported values
@@ -24,19 +23,20 @@ class BaseTradeAggregationsCallBuilder(BaseCallBuilder):
     :param offset: segments can be offset using this parameter.
         Expressed in milliseconds. *Can only be used if the resolution is greater than 1 hour.
         Value must be in whole hours, less than the provided resolution, and less than 24 hours.*
+    :param horizon_url: Horizon server URL.
     """
 
     def __init__(
         self,
-        horizon_url: str,
         base: Asset,
         counter: Asset,
         resolution: int,
         start_time: int = None,
         end_time: int = None,
         offset: int = None,
+        **kwargs,
     ) -> None:
-        super().__init__(horizon_url)
+        super().__init__(**kwargs)
         self.endpoint: str = "trade_aggregations"
 
         if not self._is_valid_resolution(resolution):

@@ -1,13 +1,14 @@
 from typing import List, Union
 
 from ...asset import Asset
-from ...call_builder.base.base_call_builder import BaseCallBuilder
-from ...utils import convert_assets_to_horizon_param
+from ...call_builder.base import BaseStrictSendPathsCallBuilder
+from ...call_builder.call_builder_sync.base_call_builder_sync import BaseCallBuilderSync
+from ...client.base_sync_client import BaseSyncClient
 
-__all__ = ["BaseStrictSendPathsCallBuilder"]
+__all__ = ["StrictSendPathsCallBuilder"]
 
 
-class BaseStrictSendPathsCallBuilder(BaseCallBuilder):
+class StrictSendPathsCallBuilder(BaseCallBuilderSync, BaseStrictSendPathsCallBuilder):
     """Creates a new :class:`StrictSendPathsCallBuilder` pointed to server defined by horizon_url.
     Do not create this object directly, use :func:`stellar_sdk.server.Server.strict_send_paths`.
 
@@ -30,32 +31,25 @@ class BaseStrictSendPathsCallBuilder(BaseCallBuilder):
 
     See `Find Payment Paths <https://www.stellar.org/developers/horizon/reference/endpoints/path-finding.html>`_
 
+    :param horizon_url: Horizon server URL.
+    :param client: The client instance used to send request.
     :param source_asset: The asset to be sent.
     :param source_amount: The amount, denominated in the source asset, that any returned path should be able to satisfy.
     :param destination: The destination account or the destination assets.
-    :param horizon_url: Horizon server URL.
     """
 
     def __init__(
         self,
+        horizon_url: str,
+        client: BaseSyncClient,
         source_asset: Asset,
         source_amount: str,
         destination: Union[str, List[Asset]],
-        **kwargs
     ) -> None:
-        super().__init__(**kwargs)
-        self.endpoint: str = "paths/strict-send"
-        params = {
-            "source_amount": source_amount,
-            "source_asset_type": source_asset.type,
-            "source_asset_code": None
-            if source_asset.is_native()
-            else source_asset.code,
-            "source_asset_issuer": source_asset.issuer,
-        }
-
-        if isinstance(destination, str):
-            params["destination_account"] = destination
-        else:
-            params["destination_assets"] = convert_assets_to_horizon_param(destination)
-        self._add_query_params(params)
+        super().__init__(  # type: ignore[call-arg]
+            horizon_url=horizon_url,
+            client=client,
+            source_asset=source_asset,
+            source_amount=source_amount,
+            destination=destination,
+        )
