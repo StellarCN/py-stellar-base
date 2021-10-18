@@ -83,7 +83,6 @@ class AllowTrust(Operation):
         Asset.check_if_asset_code_is_valid(self.asset_code)
 
     def _to_operation_body(self) -> stellar_xdr.OperationBody:
-        Asset.check_if_asset_code_is_valid(self.asset_code)
         trustor = Keypair.from_public_key(self.trustor).xdr_account_id()
         length = len(self.asset_code)
         pad_length = 4 - length if length <= 4 else 12 - length
