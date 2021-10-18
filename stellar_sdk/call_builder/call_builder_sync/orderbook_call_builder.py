@@ -25,4 +25,6 @@ class OrderbookCallBuilder(BaseCallBuilderSync, BaseOrderbookCallBuilder):
         selling: Asset,
         buying: Asset,
     ) -> None:
-        super().__init__(horizon_url, client)
+        super().__init__(
+            horizon_url=horizon_url, client=client, selling=selling, buying=buying
+        )

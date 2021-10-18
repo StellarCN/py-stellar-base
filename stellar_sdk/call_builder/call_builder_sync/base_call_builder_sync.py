@@ -14,12 +14,12 @@ class BaseCallBuilderSync(BaseCallBuilder):
 
     This is an **abstract** class. Do not create this object directly, use :class:`stellar_sdk.server.Server` class.
 
-    :param horizon_url: Horizon server URL.
     :param client: The client instance used to send request.
+    :param horizon_url: Horizon server URL.
     """
 
-    def __init__(self, horizon_url: str, client: BaseSyncClient) -> None:
-        super().__init__(horizon_url)
+    def __init__(self, client: BaseSyncClient, **kwargs) -> None:
+        super().__init__(**kwargs)
         self.client: BaseSyncClient = client
 
     def call(self) -> Dict[str, Any]:
