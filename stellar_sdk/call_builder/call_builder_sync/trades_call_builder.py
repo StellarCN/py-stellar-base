@@ -1,11 +1,11 @@
 from ...call_builder.base import BaseTradesCallBuilder
-from ...call_builder.call_builder_sync.base_call_builder_sync import BaseCallBuilderSync
+from ...call_builder.call_builder_sync.base_call_builder import BaseCallBuilder
 from ...client.base_sync_client import BaseSyncClient
 
 __all__ = ["TradesCallBuilder"]
 
 
-class TradesCallBuilder(BaseCallBuilderSync, BaseTradesCallBuilder):
+class TradesCallBuilder(BaseCallBuilder, BaseTradesCallBuilder):
     """Creates a new :class:`TradesCallBuilder` pointed to server defined by horizon_url.
     Do not create this object directly, use :func:`stellar_sdk.server.Server.trades`.
 

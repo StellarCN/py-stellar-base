@@ -1,14 +1,12 @@
 from ...asset import Asset
 from ...call_builder.base import BaseOrderbookCallBuilder
-from ...call_builder.call_builder_async.base_call_builder_async import (
-    BaseCallBuilderAsync,
-)
+from ...call_builder.call_builder_async.base_call_builder import BaseCallBuilder
 from ...client.base_async_client import BaseAsyncClient
 
 __all__ = ["OrderbookCallBuilder"]
 
 
-class OrderbookCallBuilder(BaseCallBuilderAsync, BaseOrderbookCallBuilder):
+class OrderbookCallBuilder(BaseCallBuilder, BaseOrderbookCallBuilder):
     """Creates a new :class:`OrderbookCallBuilder` pointed to server defined by horizon_url.
     Do not create this object directly, use :func:`stellar_sdk.server.Server.orderbook`.
 

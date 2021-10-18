@@ -1,13 +1,11 @@
 from ...call_builder.base import BaseAssetsCallBuilder
-from ...call_builder.call_builder_async.base_call_builder_async import (
-    BaseCallBuilderAsync,
-)
+from ...call_builder.call_builder_async.base_call_builder import BaseCallBuilder
 from ...client.base_async_client import BaseAsyncClient
 
 __all__ = ["AssetsCallBuilder"]
 
 
-class AssetsCallBuilder(BaseCallBuilderAsync, BaseAssetsCallBuilder):
+class AssetsCallBuilder(BaseCallBuilder, BaseAssetsCallBuilder):
     """Creates a new :class:`AssetsCallBuilder` pointed to server defined by horizon_url.
     Do not create this object directly, use :func:`stellar_sdk.server.Server.assets`.
 

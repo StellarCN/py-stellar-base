@@ -1,13 +1,11 @@
 from ...call_builder.base import BaseOperationsCallBuilder
-from ...call_builder.call_builder_async.base_call_builder_async import (
-    BaseCallBuilderAsync,
-)
+from ...call_builder.call_builder_async.base_call_builder import BaseCallBuilder
 from ...client.base_async_client import BaseAsyncClient
 
 __all__ = ["OperationsCallBuilder"]
 
 
-class OperationsCallBuilder(BaseCallBuilderAsync, BaseOperationsCallBuilder):
+class OperationsCallBuilder(BaseCallBuilder, BaseOperationsCallBuilder):
     """Creates a new :class:`OperationsCallBuilder` pointed to server defined by horizon_url.
     Do not create this object directly, use :func:`stellar_sdk.server.Server.operations`.
 

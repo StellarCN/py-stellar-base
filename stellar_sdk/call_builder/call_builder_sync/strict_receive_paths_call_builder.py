@@ -2,15 +2,13 @@ from typing import List, Union
 
 from ...asset import Asset
 from ...call_builder.base import BaseStrictReceivePathsCallBuilder
-from ...call_builder.call_builder_sync.base_call_builder_sync import BaseCallBuilderSync
+from ...call_builder.call_builder_sync.base_call_builder import BaseCallBuilder
 from ...client.base_sync_client import BaseSyncClient
 
 __all__ = ["StrictReceivePathsCallBuilder"]
 
 
-class StrictReceivePathsCallBuilder(
-    BaseCallBuilderSync, BaseStrictReceivePathsCallBuilder
-):
+class StrictReceivePathsCallBuilder(BaseCallBuilder, BaseStrictReceivePathsCallBuilder):
     """Creates a new :class:`StrictReceivePathsCallBuilder` pointed to server defined by horizon_url.
     Do not create this object directly, use :func:`stellar_sdk.server.Server.strict_receive_paths`.
 

@@ -1,13 +1,11 @@
 from ...call_builder.base import BaseDataCallBuilder
-from ...call_builder.call_builder_async.base_call_builder_async import (
-    BaseCallBuilderAsync,
-)
+from ...call_builder.call_builder_async.base_call_builder import BaseCallBuilder
 from ...client.base_async_client import BaseAsyncClient
 
 __all__ = ["DataCallBuilder"]
 
 
-class DataCallBuilder(BaseCallBuilderAsync, BaseDataCallBuilder):
+class DataCallBuilder(BaseCallBuilder, BaseDataCallBuilder):
     """Creates a new :class:`DataCallBuilder` pointed to server defined by horizon_url.
     Do not create this object directly, use :func:`stellar_sdk.server.Server.data`.
 

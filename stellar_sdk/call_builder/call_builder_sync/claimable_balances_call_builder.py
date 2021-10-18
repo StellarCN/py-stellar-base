@@ -1,13 +1,11 @@
 from ...call_builder.base import BaseClaimableBalancesCallBuilder
-from ...call_builder.call_builder_sync.base_call_builder_sync import BaseCallBuilderSync
+from ...call_builder.call_builder_sync.base_call_builder import BaseCallBuilder
 from ...client.base_sync_client import BaseSyncClient
 
 __all__ = ["ClaimableBalancesCallBuilder"]
 
 
-class ClaimableBalancesCallBuilder(
-    BaseCallBuilderSync, BaseClaimableBalancesCallBuilder
-):
+class ClaimableBalancesCallBuilder(BaseCallBuilder, BaseClaimableBalancesCallBuilder):
     """Creates a new :class:`ClaimableBalancesCallBuilder` pointed to server defined by horizon_url.
     Do not create this object directly, use :func:`stellar_sdk.server.Server.claimable_balance`.
 

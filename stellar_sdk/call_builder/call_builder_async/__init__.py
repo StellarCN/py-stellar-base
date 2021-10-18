@@ -1,6 +1,6 @@
 from .accounts_call_builder import *
 from .assets_call_builder import *
-from .base_call_builder_async import *
+from .base_call_builder import *
 from .claimable_balances_call_builder import *
 from .data_call_builder import *
 from .effects_call_builder import *

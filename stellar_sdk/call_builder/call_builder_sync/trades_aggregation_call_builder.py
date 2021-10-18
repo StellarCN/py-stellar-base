@@ -1,14 +1,12 @@
 from ...asset import Asset
 from ...call_builder.base import BaseTradeAggregationsCallBuilder
-from ...call_builder.call_builder_sync.base_call_builder_sync import BaseCallBuilderSync
+from ...call_builder.call_builder_sync.base_call_builder import BaseCallBuilder
 from ...client.base_sync_client import BaseSyncClient
 
 __all__ = ["TradeAggregationsCallBuilder"]
 
 
-class TradeAggregationsCallBuilder(
-    BaseCallBuilderSync, BaseTradeAggregationsCallBuilder
-):
+class TradeAggregationsCallBuilder(BaseCallBuilder, BaseTradeAggregationsCallBuilder):
     """Creates a new :class:`TradeAggregationsCallBuilder` pointed to server defined by horizon_url.
     Do not create this object directly, use :func:`stellar_sdk.server.Server.trade_aggregations`.
 

@@ -1,28 +1,28 @@
-from typing import Any, Dict, Generator
+from typing import Any, AsyncGenerator, Dict
 
-from ...call_builder.base.base_call_builder import BaseCallBuilder
-from ...client.base_sync_client import BaseSyncClient
+from ...call_builder.base.base_call_builder import BaseCallBuilder as _BaseCallBuilder
+from ...client.base_async_client import BaseAsyncClient
 from ...client.response import Response
 from ...exceptions import NotPageableError, raise_request_exception
 from ...utils import urljoin_with_query
 
-__all__ = ["BaseCallBuilderSync"]
+__all__ = ["BaseCallBuilder"]
 
 
-class BaseCallBuilderSync(BaseCallBuilder):
+class BaseCallBuilder(_BaseCallBuilder):
     """Creates a new :class:`BaseCallBuilder` pointed to server defined by horizon_url.
 
     This is an **abstract** class. Do not create this object directly, use :class:`stellar_sdk.server.Server` class.
 
-    :param client: The client instance used to send request.
     :param horizon_url: Horizon server URL.
+    :param client: The client instance used to send request.
     """
 
-    def __init__(self, client: BaseSyncClient, **kwargs) -> None:
+    def __init__(self, client: BaseAsyncClient, **kwargs) -> None:
         super().__init__(**kwargs)
-        self.client: BaseSyncClient = client
+        self.client: BaseAsyncClient = client
 
-    def call(self) -> Dict[str, Any]:
+    async def call(self) -> Dict[str, Any]:
         """Triggers a HTTP request using this builder's current configuration.
 
         :return: If it is called synchronous, the response will be returned. If
@@ -38,19 +38,19 @@ class BaseCallBuilderSync(BaseCallBuilder):
                 please submit an issue
         """
         url = urljoin_with_query(self.horizon_url, self.endpoint)
-        return self._call(url, self.params)
+        return await self._call(url, self.params)
 
-    def _call(self, url: str, params: dict = None) -> Dict[str, Any]:
-        raw_resp = self.client.get(url, params)
+    async def _call(self, url: str, params: dict = None) -> Dict[str, Any]:
+        raw_resp = await self.client.get(url, params)  # type: ignore[misc]
         assert isinstance(raw_resp, Response)
         raise_request_exception(raw_resp)
         resp = raw_resp.json()
         self._check_pageable(resp)
         return resp
 
-    def stream(
+    async def stream(
         self,
-    ) -> Generator[Dict[str, Any], None, None]:
+    ) -> AsyncGenerator[Dict[str, Any], None]:
         """Creates an EventSource that listens for incoming messages from the server.
 
         See `Horizon Response Format <https://www.stellar.org/developers/horizon/reference/responses.html>`_
@@ -63,17 +63,19 @@ class BaseCallBuilderSync(BaseCallBuilder):
         :raise: :exc:`StreamClientError <stellar_sdk.exceptions.StreamClientError>` - Failed to fetch stream resource.
         """
         url = urljoin_with_query(self.horizon_url, self.endpoint)
-        return self.client.stream(url, self.params)  # type: ignore[return-value]
+        stream = await self.client.stream(url, self.params)
+        while True:
+            yield await stream.__anext__()
 
-    def next(self) -> Dict[str, Any]:
+    async def next(self) -> Dict[str, Any]:
         if self.next_href is None:
             raise NotPageableError("The next page does not exist.")
-        return self._call(self.next_href, None)
+        return await self._call(self.next_href, None)
 
-    def prev(self) -> Dict[str, Any]:
+    async def prev(self) -> Dict[str, Any]:
         if self.prev_href is None:
             raise NotPageableError("The prev page does not exist.")
-        return self._call(self.prev_href, None)
+        return await self._call(self.prev_href, None)
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
@@ -87,7 +89,7 @@ class BaseCallBuilderSync(BaseCallBuilder):
 
     def __str__(self):
         return (
-            f"<CallBuilderSync [horizon_url={self.horizon_url}, "
+            f"<CallBuilderAsync [horizon_url={self.horizon_url}, "
             f"endpoint={self.endpoint}, "
             f"params={self.params}, "
             f"prev_href={self.prev_href}, "
