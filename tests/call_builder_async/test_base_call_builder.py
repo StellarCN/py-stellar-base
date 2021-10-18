@@ -100,12 +100,12 @@ class TestBaseCallBuilder:
             .cursor(10086)
             .order(desc=True)
         )
-        call_builder.call()
+        await call_builder.call()
         with pytest.raises(NotPageableError, match="The next page does not exist."):
-            call_builder.next()
+            await call_builder.next()
 
         with pytest.raises(NotPageableError, match="The prev page does not exist."):
-            call_builder.prev()
+            await call_builder.prev()
 
         await client.close()
 
@@ -118,7 +118,7 @@ class TestBaseCallBuilder:
             .limit(10)
             .order(desc=True)
         )
-        first_resp = call_builder.call()
+        first_resp = await call_builder.call()
         assert first_resp["_links"] == {
             "self": {
                 "href": "https://horizon.stellar.org/transactions?cursor=81058917781504&limit=10&order=desc"
@@ -130,7 +130,7 @@ class TestBaseCallBuilder:
                 "href": "https://horizon.stellar.org/transactions?cursor=80607946215424&limit=10&order=asc"
             },
         }
-        next_resp = call_builder.next()
+        next_resp = await call_builder.next()
         assert next_resp["_links"] == {
             "self": {
                 "href": "https://horizon.stellar.org/transactions?cursor=12884905984&limit=10&order=desc"
@@ -142,7 +142,7 @@ class TestBaseCallBuilder:
                 "href": "https://horizon.stellar.org/transactions?cursor=12884905984&limit=10&order=asc"
             },
         }
-        prev_page = call_builder.prev()
+        prev_page = await call_builder.prev()
         assert prev_page["_links"] == {
             "self": {
                 "href": "https://horizon.stellar.org/transactions?cursor=12884905984&limit=10&order=asc"
@@ -160,7 +160,7 @@ class TestBaseCallBuilder:
         url = "https://httpbin.overcat.me/get?version=1.2&auth=myPassw0wd"
         client = AiohttpClient()
         resp = (
-            BaseCallBuilder(horizon_url=url, client=client)
+            await BaseCallBuilder(horizon_url=url, client=client)
             .limit(10)
             .cursor(10086)
             .order(desc=True)
@@ -175,7 +175,7 @@ class TestBaseCallBuilder:
         }
         assert resp["headers"][
             "User-Agent"
-        ] == "py-stellar-sdk/{}/RequestsClient".format(__version__)
+        ] == "py-stellar-sdk/{}/AiohttpClient".format(__version__)
         assert resp["headers"]["X-Client-Name"] == "py-stellar-sdk"
         assert resp["headers"]["X-Client-Version"] == __version__
         assert (
