@@ -2,16 +2,18 @@ import hashlib
 import os
 import re
 from decimal import ROUND_FLOOR, Decimal
-from typing import Dict, List, Optional, Union
+from functools import wraps
+from typing import Callable, Dict, List, Optional, Union
 from urllib.parse import urlsplit, urlunsplit
 
+from typeguard import T_CallableOrType
+from typeguard import typechecked as _typechecked
+
 from .asset import Asset
-from .exceptions import (
-    Ed25519PublicKeyInvalidError,
-    NoApproximationError,
-    TypeError,
-    ValueError,
-)
+from .exceptions import Ed25519PublicKeyInvalidError, NoApproximationError
+from .exceptions import TypeError
+from .exceptions import TypeError as SDKTypeError
+from .exceptions import ValueError
 from .strkey import StrKey
 
 MUXED_ACCOUNT_STARTING_LETTER: str = "M"
@@ -154,3 +156,25 @@ def raise_if_not_valid_balance_id(value: str, argument_name: str) -> None:
 def raise_if_not_valid_operation_source(source: Optional[str]) -> None:
     if source is not None:
         raise_if_not_valid_muxed_account(source, "source")
+
+
+_STELLAR_SDK_ENFORCE_TYPE_CHECK_FLAG: str = "STELLAR_SDK_ENFORCE_TYPE_CHECK_FLAG"
+_STELLAR_SDK_ENFORCE_TYPE_CHECK: bool = os.getenv(
+    _STELLAR_SDK_ENFORCE_TYPE_CHECK_FLAG, "False"
+).lower() in ("true", "1", "t")
+
+
+def type_checked(
+    func: T_CallableOrType,
+) -> Union[Callable[[T_CallableOrType], T_CallableOrType], T_CallableOrType]:
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        try:
+            result = _typechecked(func=func, always=_STELLAR_SDK_ENFORCE_TYPE_CHECK)(
+                *args, **kwargs
+            )
+        except TypeError as e:
+            raise SDKTypeError(e) from e
+        return result
+
+    return wrapper
