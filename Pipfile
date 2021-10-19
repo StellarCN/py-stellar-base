@@ -21,6 +21,7 @@ aiohttp-sse-client = "*"
 stellar-base-sseclient = "*"
 mnemonic = "*"
 toml = "*"
+typeguard = "*"
 
 [requires]
 python_version = "3.9"
