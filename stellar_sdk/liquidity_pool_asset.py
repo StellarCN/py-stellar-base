@@ -1,6 +1,7 @@
 from . import xdr as stellar_xdr
 from .asset import Asset
 from .exceptions import ValueError
+from .type_checked import type_checked
 from .utils import sha256
 
 __all__ = ["LiquidityPoolAsset", "LIQUIDITY_POOL_FEE_V18"]
@@ -10,6 +11,7 @@ __all__ = ["LiquidityPoolAsset", "LIQUIDITY_POOL_FEE_V18"]
 LIQUIDITY_POOL_FEE_V18 = stellar_xdr.LIQUIDITY_POOL_FEE_V18
 
 
+@type_checked
 class LiquidityPoolAsset:
     """The :class:`LiquidityPoolAsset` object, which represents a liquidity pool trustline change.
 
@@ -26,11 +28,6 @@ class LiquidityPoolAsset:
     def __init__(
         self, asset_a: Asset, asset_b: Asset, fee: int = LIQUIDITY_POOL_FEE_V18
     ) -> None:
-        if not asset_a or not isinstance(asset_a, Asset):
-            raise ValueError("`asset_a` is invalid.")
-
-        if not asset_b or not isinstance(asset_b, Asset):
-            raise ValueError("`asset_b` is invalid.")
 
         if not self.is_valid_lexicographic_order(asset_a, asset_b):
             raise ValueError("`Assets are not in lexicographic order.")

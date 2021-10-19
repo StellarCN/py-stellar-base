@@ -12,7 +12,7 @@ from stellar_sdk import (
     MuxedAccount,
     Price,
 )
-from stellar_sdk.exceptions import AssetCodeInvalidError, Ed25519PublicKeyInvalidError
+from stellar_sdk.exceptions import Ed25519PublicKeyInvalidError
 from stellar_sdk.operation import CreateAccount, Operation
 from stellar_sdk.operation.account_merge import AccountMerge
 from stellar_sdk.operation.allow_trust import AllowTrust, TrustLineEntryFlag
@@ -70,9 +70,7 @@ class TestBaseOperation:
             (
                 10,
                 TypeError,
-                "Value of type '{}' must be of type {} or {}, but got {}.".format(
-                    10, str, Decimal, type(10)
-                ),
+                'type of argument "value" must be one of \(str, decimal.Decimal\); got int instead',
             ),
             (
                 "-0.1",
@@ -1536,18 +1534,18 @@ class TestClaimPredicate:
         assert predicate == ClaimPredicate.from_xdr_object(xdr_object)
 
     def test_predicate_invalid_type_raise(self):
-        predicate = ClaimPredicate(
-            claim_predicate_type="invalid",
-            and_predicates=None,
-            or_predicates=None,
-            not_predicate=None,
-            abs_before=None,
-            rel_before=1,
-        )
         with pytest.raises(
-            ValueError, match=f"invalid is not a valid ClaimPredicateType."
+            TypeError,
+            match='type of argument "claim_predicate_type" must be stellar_sdk.operation.create_claimable_balance.ClaimPredicateType; got str instead',
         ):
-            predicate.to_xdr_object()
+            ClaimPredicate(
+                claim_predicate_type="invalid",
+                and_predicates=None,
+                or_predicates=None,
+                not_predicate=None,
+                abs_before=None,
+                rel_before=1,
+            )
 
 
 class TestClaimant:

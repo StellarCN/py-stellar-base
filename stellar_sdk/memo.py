@@ -3,11 +3,13 @@ from typing import Union
 
 from . import xdr as stellar_xdr
 from .exceptions import MemoInvalidException
+from .type_checked import type_checked
 from .utils import hex_to_bytes
 
 __all__ = ["Memo", "NoneMemo", "TextMemo", "IdMemo", "HashMemo", "ReturnHashMemo"]
 
 
+@type_checked
 class Memo(object, metaclass=abc.ABCMeta):
     """The :class:`Memo` object, which represents the base class for memos for
     use with Stellar transactions.
@@ -57,6 +59,7 @@ class Memo(object, metaclass=abc.ABCMeta):
         pass  # pragma: no cover
 
 
+@type_checked
 class NoneMemo(Memo):
     """The :class:`NoneMemo`, which represents no memo for a transaction."""
 
@@ -107,11 +110,13 @@ class TextMemo(Memo):
             )
 
     @classmethod
+    @type_checked
     def from_xdr_object(cls, xdr_object: stellar_xdr.Memo) -> "TextMemo":
         """Returns an :class:`TextMemo` object from XDR memo object."""
         assert xdr_object.text is not None
         return cls(bytes(xdr_object.text))
 
+    @type_checked
     def to_xdr_object(self) -> stellar_xdr.Memo:
         """Creates an XDR Memo object that represents this :class:`TextMemo`."""
         return stellar_xdr.Memo(
@@ -127,6 +132,7 @@ class TextMemo(Memo):
         return f"<TextMemo [memo={self.memo_text}]>"
 
 
+@type_checked
 class IdMemo(Memo):
     """The :class:`IdMemo` which represents MEMO_ID in a transaction.
 
@@ -165,6 +171,7 @@ class IdMemo(Memo):
         return f"<IdMemo [memo={self.memo_id}]>"
 
 
+@type_checked
 class HashMemo(Memo):
     """The :class:`HashMemo` which represents MEMO_HASH in a transaction.
 
@@ -204,6 +211,7 @@ class HashMemo(Memo):
         return f"<HashMemo [memo={self.memo_hash}]>"
 
 
+@type_checked
 class ReturnHashMemo(Memo):
     """The :class:`ReturnHashMemo` which represents MEMO_RETURN in a transaction.
 

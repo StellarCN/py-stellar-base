@@ -7,10 +7,12 @@ from .muxed_account import MuxedAccount
 from .operation.operation import Operation
 from .strkey import StrKey
 from .time_bounds import TimeBounds
+from .type_checked import type_checked
 
 __all__ = ["Transaction"]
 
 
+@type_checked
 class Transaction:
     """The :class:`Transaction` object, which represents a transaction(Transaction or TransactionV0)
     on Stellar's network.

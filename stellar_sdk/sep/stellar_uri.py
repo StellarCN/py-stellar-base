@@ -19,12 +19,14 @@ from ..fee_bump_transaction_envelope import FeeBumpTransactionEnvelope
 from ..keypair import Keypair
 from ..memo import HashMemo, IdMemo, Memo, NoneMemo, ReturnHashMemo, TextMemo
 from ..transaction_envelope import TransactionEnvelope
+from ..type_checked import type_checked
 
 __all__ = ["PayStellarUri", "TransactionStellarUri", "Replacement"]
 
 STELLAR_SCHEME: str = "web+stellar"
 
 
+@type_checked
 class StellarUri(object, metaclass=abc.ABCMeta):
     def __init__(self, signature: Optional[str] = None):
         self.signature = signature
@@ -66,6 +68,7 @@ class StellarUri(object, metaclass=abc.ABCMeta):
         return callback[4:]
 
 
+@type_checked
 class PayStellarUri(StellarUri):
     """A request for a payment to be signed.
 
@@ -266,6 +269,7 @@ class PayStellarUri(StellarUri):
         )
 
 
+@type_checked
 class Replacement:
     def __init__(
         self, txrep_tx_field_name: str, reference_identifier: str, hint: str
@@ -305,6 +309,7 @@ class Replacement:
         )
 
 
+@type_checked
 class TransactionStellarUri(StellarUri):
     """A request for a transaction to be signed.
 

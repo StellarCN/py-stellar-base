@@ -6,9 +6,12 @@ from typing import Dict, List, Optional, Union
 from urllib.parse import urlsplit, urlunsplit
 
 from .asset import Asset
-from .exceptions import Ed25519PublicKeyInvalidError, NoApproximationError
-from .exceptions import TypeError
-from .exceptions import ValueError
+from .exceptions import (
+    Ed25519PublicKeyInvalidError,
+    NoApproximationError,
+    TypeError,
+    ValueError,
+)
 from .strkey import StrKey
 from .type_checked import type_checked
 
@@ -166,6 +169,3 @@ def raise_if_not_valid_balance_id(value: str, argument_name: str) -> None:
 def raise_if_not_valid_operation_source(source: Optional[str]) -> None:
     if source is not None:
         raise_if_not_valid_muxed_account(source, "source")
-
-
-

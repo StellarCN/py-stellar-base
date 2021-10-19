@@ -14,10 +14,12 @@ from .exceptions import (
 )
 from .sep.mnemonic import Language, StellarMnemonic
 from .strkey import StrKey
+from .type_checked import type_checked
 
 __all__ = ["Keypair"]
 
 
+@type_checked
 class Keypair:
     """The :class:`Keypair` object, which represents a signing and
     verifying key for use with the Stellar network.

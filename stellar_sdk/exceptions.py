@@ -2,6 +2,7 @@ from json import JSONDecodeError
 from typing import Optional
 
 from .client.response import Response
+from .type_checked import type_checked
 
 BuildInValueError = ValueError
 BuildInTypeError = TypeError
@@ -181,6 +182,7 @@ class FeatureNotEnabledError(SdkError):
     """The feature is not enabled."""
 
 
+@type_checked
 def raise_request_exception(response: Response) -> None:
     status_code = response.status_code
     if status_code == 200:

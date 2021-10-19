@@ -5,6 +5,7 @@ from . import xdr as stellar_xdr
 from .__version__ import __issues__
 from .exceptions import ValueError
 from .strkey import StrKey
+from .type_checked import type_checked
 
 __all__ = ["SignerKey", "SignerKeyType"]
 
@@ -15,6 +16,7 @@ class SignerKeyType(IntEnum):
     SIGNER_KEY_TYPE_HASH_X = 2
 
 
+@type_checked
 class SignerKey:
     """The :class:`SignerKey` object, which represents an account signer key on Stellar's network.
 
