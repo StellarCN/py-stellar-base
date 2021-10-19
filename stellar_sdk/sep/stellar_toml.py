@@ -7,7 +7,7 @@ Created: 2017-10-30
 Updated: 2019-06-12
 Version: 2.1.0
 """
-from typing import Any, Dict
+from typing import Any, MutableMapping
 
 import toml
 
@@ -25,7 +25,7 @@ def fetch_stellar_toml(
     domain: str,
     client: BaseSyncClient = None,
     use_http: bool = False,
-) -> Dict[str, Any]:
+) -> MutableMapping[str, Any]:
     """Retrieve the stellar.toml file from a given domain.
 
     Retrieve the stellar.toml file for information about interacting with
@@ -51,7 +51,7 @@ async def fetch_stellar_toml_async(
     domain: str,
     client: BaseAsyncClient = None,
     use_http: bool = False,
-) -> Dict[str, Any]:
+) -> MutableMapping[str, Any]:
     """Retrieve the stellar.toml file from a given domain.
 
     Retrieve the stellar.toml file for information about interacting with
@@ -74,11 +74,11 @@ async def fetch_stellar_toml_async(
     return _handle_raw_response(raw_resp)
 
 
-def _handle_raw_response(raw_resp: Response) -> Dict[str, Any]:
+def _handle_raw_response(raw_resp: Response) -> MutableMapping[str, Any]:
     if raw_resp.status_code == 404:
         raise StellarTomlNotFoundError
     resp = raw_resp.text
-    return toml.loads(resp)  # type: ignore[return-value]
+    return toml.loads(resp)
 
 
 def _build_request_url(domain: str, use_http: bool = False) -> str:
