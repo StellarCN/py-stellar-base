@@ -36,13 +36,9 @@ from stellar_sdk.operation.manage_sell_offer import ManageSellOffer
 from stellar_sdk.operation.path_payment_strict_receive import PathPaymentStrictReceive
 from stellar_sdk.operation.path_payment_strict_send import PathPaymentStrictSend
 from stellar_sdk.operation.payment import Payment
-from stellar_sdk.operation.revoke_sponsorship import (
-    Data,
-    Offer,
-    RevokeSponsorship,
-    Signer,
-    TrustLine,
-)
+from stellar_sdk.operation.revoke_sponsorship import Data, Offer, RevokeSponsorship
+from stellar_sdk.operation.revoke_sponsorship import Signer as RevokeSponsorshipSigner
+from stellar_sdk.operation.revoke_sponsorship import TrustLine
 from stellar_sdk.operation.set_options import AuthorizationFlag, SetOptions
 from stellar_sdk.operation.set_trust_line_flags import SetTrustLineFlags, TrustLineFlags
 from stellar_sdk.signer import Signer
@@ -1441,9 +1437,15 @@ class TestRevokeSponsorship:
         account2 = "GB2DRLHCWHUCB2BS4IRRY2GBQKVAKEXOU2EMTMLSUOXVNMZY7W6BSGZ7"
         signer1 = SignerKey.ed25519_public_key(account1)
         signer2 = SignerKey.ed25519_public_key(account2)
-        assert Signer(account1, signer1) == Signer(account1, signer1)
-        assert Signer(account1, signer1) != Signer(account1, signer2)
-        assert Signer(account1, signer1) != Signer(account2, signer1)
+        assert RevokeSponsorshipSigner(account1, signer1) == RevokeSponsorshipSigner(
+            account1, signer1
+        )
+        assert RevokeSponsorshipSigner(account1, signer1) != RevokeSponsorshipSigner(
+            account1, signer2
+        )
+        assert RevokeSponsorshipSigner(account1, signer1) != RevokeSponsorshipSigner(
+            account2, signer1
+        )
 
 
 class TestClaimPredicate:
