@@ -9,7 +9,7 @@ class DataCallBuilder(BaseCallBuilder, BaseDataCallBuilder):
     """Creates a new :class:`DataCallBuilder` pointed to server defined by horizon_url.
     Do not create this object directly, use :func:`stellar_sdk.Server.data`.
 
-    See `Data for Account <https://www.stellar.org/developers/horizon/reference/endpoints/data-for-account.html>`_
+    See `Data for Account <https://www.stellar.org/developers/horizon/reference/endpoints/data-for-account.html>`__
 
     :param horizon_url: Horizon server URL.
     :param client: The client instance used to send request.

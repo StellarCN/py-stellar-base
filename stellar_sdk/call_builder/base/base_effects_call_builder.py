@@ -7,9 +7,8 @@ __all__ = ["BaseEffectsCallBuilder"]
 
 class BaseEffectsCallBuilder(BaseCallBuilder):
     """Creates a new :class:`EffectsCallBuilder` pointed to server defined by horizon_url.
-    Do not create this object directly, use :func:`stellar_sdk.server.Server.effects`.
 
-    See `All Effects <https://www.stellar.org/developers/horizon/reference/endpoints/effects-all.html>`_
+    See `All Effects <https://www.stellar.org/developers/horizon/reference/endpoints/effects-all.html>`__
 
     :param horizon_url: Horizon server URL.
     """
@@ -22,7 +21,7 @@ class BaseEffectsCallBuilder(BaseCallBuilder):
         """This endpoint represents all effects that changed a given account. It will return relevant
         effects from the creation of the account to the current ledger.
 
-        See `Effects for Account <https://www.stellar.org/developers/horizon/reference/endpoints/effects-all.html>`_
+        See `Effects for Account <https://www.stellar.org/developers/horizon/reference/endpoints/effects-all.html>`__
 
         :param account_id: account id, for example: `GDGQVOKHW4VEJRU2TETD6DBRKEO5ERCNF353LW5WBFW3JJWQ2BRQ6KDD`
         :return: this EffectCallBuilder instance
@@ -34,7 +33,7 @@ class BaseEffectsCallBuilder(BaseCallBuilder):
         """Effects are the specific ways that the ledger was changed by any operation.
         This endpoint represents all effects that occurred in the given ledger.
 
-        See `Effects for Ledger <https://www.stellar.org/developers/horizon/reference/endpoints/effects-for-account.html>`_
+        See `Effects for Ledger <https://www.stellar.org/developers/horizon/reference/endpoints/effects-for-account.html>`__
 
         :param sequence: ledger sequence
         :return: this EffectCallBuilder instance
@@ -45,7 +44,7 @@ class BaseEffectsCallBuilder(BaseCallBuilder):
     def for_transaction(self, transaction_hash: str):
         """This endpoint represents all effects that occurred as a result of a given transaction.
 
-        See `Effects for Transaction <https://www.stellar.org/developers/horizon/reference/endpoints/effects-for-transaction.html>`_
+        See `Effects for Transaction <https://www.stellar.org/developers/horizon/reference/endpoints/effects-for-transaction.html>`__
 
         :param transaction_hash: transaction hash
         :return: this EffectCallBuilder instance
@@ -56,7 +55,7 @@ class BaseEffectsCallBuilder(BaseCallBuilder):
     def for_operation(self, operation_id: Union[int, str]):
         """This endpoint represents all effects that occurred as a result of a given operation.
 
-        See `Effects for Operation <https://www.stellar.org/developers/horizon/reference/endpoints/effects-for-operation.html>`_
+        See `Effects for Operation <https://www.stellar.org/developers/horizon/reference/endpoints/effects-for-operation.html>`__
 
         :param operation_id: operation ID
         :return: this EffectCallBuilder instance
@@ -67,7 +66,7 @@ class BaseEffectsCallBuilder(BaseCallBuilder):
     def for_liquidity_pool(self, liquidity_pool_id: str):
         """This endpoint represents all effects that occurred as a result of a given liquidity pool.
 
-        See `Liquidity Pools - Retrieve related Effects <https://developers.stellar.org/api/resources/liquiditypools/effects/>`_
+        See `Liquidity Pools - Retrieve related Effects <https://developers.stellar.org/api/resources/liquiditypools/effects/>`__
 
         :param liquidity_pool_id: The ID of the liquidity pool in hex string.
         :return: this EffectsCallBuilder instance

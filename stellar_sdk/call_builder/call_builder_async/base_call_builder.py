@@ -12,7 +12,7 @@ __all__ = ["BaseCallBuilder"]
 class BaseCallBuilder(_BaseCallBuilder):
     """Creates a new :class:`BaseCallBuilder` pointed to server defined by horizon_url.
 
-    This is an **abstract** class. Do not create this object directly, use :class:`stellar_sdk.server.Server` class.
+    This is an **abstract** class. Do not create this object directly, use :class:`stellar_sdk.ServerAsync` class.
 
     :param horizon_url: Horizon server URL.
     :param client: The client instance used to send request.
@@ -53,12 +53,11 @@ class BaseCallBuilder(_BaseCallBuilder):
     ) -> AsyncGenerator[Dict[str, Any], None]:
         """Creates an EventSource that listens for incoming messages from the server.
 
-        See `Horizon Response Format <https://www.stellar.org/developers/horizon/reference/responses.html>`_
+        See `Horizon Response Format <https://www.stellar.org/developers/horizon/reference/responses.html>`__
 
-        See `MDN EventSource <https://developer.mozilla.org/en-US/docs/Web/API/EventSource>`_
+        See `MDN EventSource <https://developer.mozilla.org/en-US/docs/Web/API/EventSource>`__
 
-        :return: If it is called synchronous, it will return ``Generator``, If
-            it is called asynchronously, it will return ``AsyncGenerator``.
+        :return: an EventSource.
 
         :raise: :exc:`StreamClientError <stellar_sdk.exceptions.StreamClientError>` - Failed to fetch stream resource.
         """
@@ -89,7 +88,7 @@ class BaseCallBuilder(_BaseCallBuilder):
 
     def __str__(self):
         return (
-            f"<CallBuilderAsync [horizon_url={self.horizon_url}, "
+            f"<CallBuilder [horizon_url={self.horizon_url}, "
             f"endpoint={self.endpoint}, "
             f"params={self.params}, "
             f"prev_href={self.prev_href}, "

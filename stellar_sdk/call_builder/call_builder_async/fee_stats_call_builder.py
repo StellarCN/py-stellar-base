@@ -9,7 +9,7 @@ class FeeStatsCallBuilder(BaseCallBuilder, BaseFeeStatsCallBuilder):
     """Creates a new :class:`FeeStatsCallBuilder` pointed to server defined by horizon_url.
     Do not create this object directly, use :func:`stellar_sdk.ServerAsync.fee_stats`.
 
-    See `Fee Stats <https://www.stellar.org/developers/horizon/reference/endpoints/fee-stats.html>`_
+    See `Fee Stats <https://www.stellar.org/developers/horizon/reference/endpoints/fee-stats.html>`__
 
     :param horizon_url: Horizon server URL.
     :param client: The client instance used to send request.

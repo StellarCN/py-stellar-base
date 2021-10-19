@@ -9,7 +9,7 @@ class LiquidityPoolsBuilder(BaseCallBuilder, BaseLiquidityPoolsBuilder):
     """Creates a new :class:`LiquidityPoolsBuilder` pointed to server defined by horizon_url.
     Do not create this object directly, use :func:`stellar_sdk.ServerAsync.liquidity_pools`.
 
-    See `Liquidity Pools <https://developers.stellar.org/api/resources/liquiditypools/>`_
+    See `Liquidity Pools <https://developers.stellar.org/api/resources/liquiditypools/>`__
 
     :param horizon_url: Horizon server URL.
     :param client: The client instance used to send request.

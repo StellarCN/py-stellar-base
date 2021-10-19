@@ -15,8 +15,6 @@ __all__ = ["BaseCallBuilder"]
 class BaseCallBuilder:
     """Creates a new :class:`BaseCallBuilder` pointed to server defined by horizon_url.
 
-    This is an **abstract** class. Do not create this object directly, use :class:`stellar_sdk.server.Server` class.
-
     :param horizon_url: Horizon server URL.
     """
 
@@ -51,9 +49,9 @@ class BaseCallBuilder:
     ]:
         """Creates an EventSource that listens for incoming messages from the server.
 
-        See `Horizon Response Format <https://www.stellar.org/developers/horizon/reference/responses.html>`_
+        See `Horizon Response Format <https://www.stellar.org/developers/horizon/reference/responses.html>`__
 
-        See `MDN EventSource <https://developer.mozilla.org/en-US/docs/Web/API/EventSource>`_
+        See `MDN EventSource <https://developer.mozilla.org/en-US/docs/Web/API/EventSource>`__
 
         :return: If it is called synchronous, it will return ``Generator``, If
             it is called asynchronously, it will return ``AsyncGenerator``.
@@ -71,7 +69,7 @@ class BaseCallBuilder:
     def cursor(self, cursor: Union):
         """Sets ``cursor`` parameter for the current call. Returns the CallBuilder object on which this method has been called.
 
-        See `Paging <https://www.stellar.org/developers/horizon/reference/paging.html>`_
+        See `Paging <https://www.stellar.org/developers/horizon/reference/paging.html>`__
 
         :param cursor: A cursor is a value that points to a specific location in a collection of resources.
         :return: current CallBuilder instance
@@ -82,7 +80,7 @@ class BaseCallBuilder:
     def limit(self, limit: int):
         """Sets ``limit`` parameter for the current call. Returns the CallBuilder object on which this method has been called.
 
-        See `Paging <https://www.stellar.org/developers/horizon/reference/paging.html>`_
+        See `Paging <https://www.stellar.org/developers/horizon/reference/paging.html>`__
 
         :param limit: Number of records the server should return.
         :return:

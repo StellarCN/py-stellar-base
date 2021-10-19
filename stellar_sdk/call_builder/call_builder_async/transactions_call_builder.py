@@ -9,7 +9,7 @@ class TransactionsCallBuilder(BaseCallBuilder, BaseTransactionsCallBuilder):
     """Creates a new :class:`TransactionsCallBuilder` pointed to server defined by horizon_url.
     Do not create this object directly, use :func:`stellar_sdk.ServerAsync.transactions`.
 
-    See `All Transactions <https://www.stellar.org/developers/horizon/reference/endpoints/transactions-all.html>`_
+    See `All Transactions <https://www.stellar.org/developers/horizon/reference/endpoints/transactions-all.html>`__
 
     :param horizon_url: Horizon server URL.
     :param client: The client instance used to send request.

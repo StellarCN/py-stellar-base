@@ -7,7 +7,6 @@ __all__ = ["BaseClaimableBalancesCallBuilder"]
 
 class BaseClaimableBalancesCallBuilder(BaseCallBuilder):
     """Creates a new :class:`ClaimableBalancesCallBuilder` pointed to server defined by horizon_url.
-    Do not create this object directly, use :func:`stellar_sdk.server.Server.claimable_balance`.
 
     :param horizon_url: Horizon server URL.
     """
@@ -19,7 +18,7 @@ class BaseClaimableBalancesCallBuilder(BaseCallBuilder):
     def claimable_balance(self, claimable_balance_id: str):
         """Returns information and links relating to a single claimable balance.
 
-        See `Claimable Balances <https://developers.stellar.org/api/resources/claimablebalances/list/>`_
+        See `Claimable Balances <https://developers.stellar.org/api/resources/claimablebalances/list/>`__
 
         :param claimable_balance_id: claimable balance id
         :return: current AccountCallBuilder instance
@@ -30,7 +29,7 @@ class BaseClaimableBalancesCallBuilder(BaseCallBuilder):
     def for_sponsor(self, sponsor: str):
         """Returns all claimable balances which are sponsored by the given account ID.
 
-        See `Claimable Balances <https://developers.stellar.org/api/resources/claimablebalances/list/>`_
+        See `Claimable Balances <https://developers.stellar.org/api/resources/claimablebalances/list/>`__
 
         :param sponsor: the sponsor id, for example: `GDGQVOKHW4VEJRU2TETD6DBRKEO5ERCNF353LW5WBFW3JJWQ2BRQ6KDD`
         :return: current ClaimableBalancesCallBuilder instance
@@ -41,7 +40,7 @@ class BaseClaimableBalancesCallBuilder(BaseCallBuilder):
     def for_asset(self, asset: Asset):
         """Returns all claimable balances which provide a balance for the given asset.
 
-        See `Account Details <https://www.stellar.org/developers/horizon/reference/endpoints/accounts-single.html>`_
+        See `Account Details <https://www.stellar.org/developers/horizon/reference/endpoints/accounts-single.html>`__
 
         :param asset: an asset
         :return: current ClaimableBalancesCallBuilder instance
@@ -53,7 +52,7 @@ class BaseClaimableBalancesCallBuilder(BaseCallBuilder):
     def for_claimant(self, claimant: str):
         """Returns all claimable balances which can be claimed by the given account ID.
 
-        See `Account Details <https://www.stellar.org/developers/horizon/reference/endpoints/accounts-single.html>`_
+        See `Account Details <https://www.stellar.org/developers/horizon/reference/endpoints/accounts-single.html>`__
 
         :param claimant: the account id, for example: `GDGQVOKHW4VEJRU2TETD6DBRKEO5ERCNF353LW5WBFW3JJWQ2BRQ6KDD`
         :return: current ClaimableBalancesCallBuilder instance

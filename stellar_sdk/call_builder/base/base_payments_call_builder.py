@@ -7,9 +7,8 @@ __all__ = ["BasePaymentsCallBuilder"]
 
 class BasePaymentsCallBuilder(BaseCallBuilder):
     """Creates a new :class:`PaymentsCallBuilder` pointed to server defined by horizon_url.
-    Do not create this object directly, use :func:`stellar_sdk.server.Server.payments`.
 
-    See `All Payments <https://www.stellar.org/developers/horizon/reference/endpoints/payments-all.html>`_
+    See `All Payments <https://www.stellar.org/developers/horizon/reference/endpoints/payments-all.html>`__
 
     :param horizon_url: Horizon server URL.
     """
@@ -22,7 +21,7 @@ class BasePaymentsCallBuilder(BaseCallBuilder):
         """This endpoint responds with a collection of Payment operations where the given account
         was either the sender or receiver.
 
-        See `Payments for Account <https://www.stellar.org/developers/horizon/reference/endpoints/payments-for-account.html>`_
+        See `Payments for Account <https://www.stellar.org/developers/horizon/reference/endpoints/payments-for-account.html>`__
 
         :param account_id: Account ID
         :return: current PaymentsCallBuilder instance
@@ -33,7 +32,7 @@ class BasePaymentsCallBuilder(BaseCallBuilder):
     def for_ledger(self, sequence: Union[int, str]):
         """This endpoint represents all payment operations that are part of a valid transactions in a given ledger.
 
-        See `Payments for Ledger <https://www.stellar.org/developers/horizon/reference/endpoints/payments-for-ledger.html>`_
+        See `Payments for Ledger <https://www.stellar.org/developers/horizon/reference/endpoints/payments-for-ledger.html>`__
 
         :param sequence: Ledger sequence
         :return: current PaymentsCallBuilder instance
@@ -44,7 +43,7 @@ class BasePaymentsCallBuilder(BaseCallBuilder):
     def for_transaction(self, transaction_hash: str):
         """This endpoint represents all payment operations that are part of a given transaction.
 
-        See `Payments for Transaction <https://www.stellar.org/developers/horizon/reference/endpoints/payments-for-transaction.html>`_
+        See `Payments for Transaction <https://www.stellar.org/developers/horizon/reference/endpoints/payments-for-transaction.html>`__
 
         :param transaction_hash: Transaction hash
         :return: current PaymentsCallBuilder instance

@@ -8,9 +8,8 @@ __all__ = ["BaseTradesCallBuilder"]
 
 class BaseTradesCallBuilder(BaseCallBuilder):
     """Creates a new :class:`TradesCallBuilder` pointed to server defined by horizon_url.
-    Do not create this object directly, use :func:`stellar_sdk.server.Server.trades`.
 
-    See `Trades <https://www.stellar.org/developers/horizon/reference/endpoints/trades.html)>`_
+    See `Trades <https://www.stellar.org/developers/horizon/reference/endpoints/trades.html)>`__
 
     :param horizon_url: Horizon server URL.
     """
@@ -40,7 +39,7 @@ class BaseTradesCallBuilder(BaseCallBuilder):
     def for_offer(self, offer_id: Union[int, str]):
         """Filter trades for a specific offer
 
-        See `Trades for Offer <https://www.stellar.org/developers/horizon/reference/endpoints/trades-for-offer.html>`_
+        See `Trades for Offer <https://www.stellar.org/developers/horizon/reference/endpoints/trades-for-offer.html>`__
 
         :param offer_id: offer id
         :return: current TradesCallBuilder instance
@@ -51,7 +50,7 @@ class BaseTradesCallBuilder(BaseCallBuilder):
     def for_account(self, account_id: str):
         """Filter trades for a specific account
 
-        See `Trades for Account <https://www.stellar.org/developers/horizon/reference/endpoints/trades-for-account.html>`_
+        See `Trades for Account <https://www.stellar.org/developers/horizon/reference/endpoints/trades-for-account.html>`__
 
         :param account_id: account id
         :return: current TradesCallBuilder instance
@@ -76,7 +75,7 @@ class BaseTradesCallBuilder(BaseCallBuilder):
     def for_liquidity_pool(self, liquidity_pool_id: str):
         """Filter trades for a specific liquidity pool.
 
-        See `Liquidity Pools - Retrieve related Trades <https://developers.stellar.org/api/resources/liquiditypools/trades/>`_
+        See `Liquidity Pools - Retrieve related Trades <https://developers.stellar.org/api/resources/liquiditypools/trades/>`__
 
         :param liquidity_pool_id: The ID of the liquidity pool in hex string.
         :return: current TradesCallBuilder instance

@@ -9,7 +9,6 @@ __all__ = ["BaseStrictReceivePathsCallBuilder"]
 
 class BaseStrictReceivePathsCallBuilder(BaseCallBuilder):
     """Creates a new :class:`StrictReceivePathsCallBuilder` pointed to server defined by horizon_url.
-    Do not create this object directly, use :func:`stellar_sdk.server.Server.strict_receive_paths`.
 
     The Stellar Network allows payments to be made across assets through path payments. A path payment specifies a
     series of assets to route a payment through, from source asset (the asset debited from the payer) to destination
@@ -28,7 +27,7 @@ class BaseStrictReceivePathsCallBuilder(BaseCallBuilder):
     If a list of assets is passed as the source, horizon will find any payment
     paths from those source assets to the desired destination asset.
 
-    See `Find Payment Paths <https://www.stellar.org/developers/horizon/reference/endpoints/path-finding.html>`_
+    See `Find Payment Paths <https://www.stellar.org/developers/horizon/reference/endpoints/path-finding.html>`__
 
     :param source: The sender's account ID or a list of Assets. Any returned path must use a source that the sender can hold.
     :param destination_asset: The destination asset.

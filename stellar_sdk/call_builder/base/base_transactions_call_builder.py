@@ -7,9 +7,8 @@ __all__ = ["BaseTransactionsCallBuilder"]
 
 class BaseTransactionsCallBuilder(BaseCallBuilder):
     """Creates a new :class:`TransactionsCallBuilder` pointed to server defined by horizon_url.
-    Do not create this object directly, use :func:`stellar_sdk.server.Server.transactions`.
 
-    See `All Transactions <https://www.stellar.org/developers/horizon/reference/endpoints/transactions-all.html>`_
+    See `All Transactions <https://www.stellar.org/developers/horizon/reference/endpoints/transactions-all.html>`__
 
     :param horizon_url: Horizon server URL.
     """
@@ -22,7 +21,7 @@ class BaseTransactionsCallBuilder(BaseCallBuilder):
         """The transaction details endpoint provides information on a single transaction.
         The transaction hash provided in the hash argument specifies which transaction to load.
 
-        See `Transaction Details <https://www.stellar.org/developers/horizon/reference/endpoints/transactions-single.html>`_
+        See `Transaction Details <https://www.stellar.org/developers/horizon/reference/endpoints/transactions-single.html>`__
 
 
         :param transaction_hash: transaction hash
@@ -34,7 +33,7 @@ class BaseTransactionsCallBuilder(BaseCallBuilder):
     def for_account(self, account_id: str):
         """This endpoint represents all transactions that affected a given account.
 
-        See `Transactions for Account <https://www.stellar.org/developers/horizon/reference/endpoints/transactions-for-account.html>`_
+        See `Transactions for Account <https://www.stellar.org/developers/horizon/reference/endpoints/transactions-for-account.html>`__
 
         :param account_id: account id
         :return: current TransactionsCallBuilder instance
@@ -45,7 +44,7 @@ class BaseTransactionsCallBuilder(BaseCallBuilder):
     def for_ledger(self, sequence: Union[str, int]):
         """This endpoint represents all transactions in a given ledger.
 
-        See `Transactions for Ledger <https://www.stellar.org/developers/horizon/reference/endpoints/transactions-for-ledger.html>`_
+        See `Transactions for Ledger <https://www.stellar.org/developers/horizon/reference/endpoints/transactions-for-ledger.html>`__
 
         :param sequence: ledger sequence
         :return: current TransactionsCallBuilder instance
@@ -56,7 +55,7 @@ class BaseTransactionsCallBuilder(BaseCallBuilder):
     def for_claimable_balance(self, claimable_balance_id: str):
         """This endpoint represents all transactions referencing a given claimable balance and can be used in streaming mode.
 
-        See `Claimable Balances - Retrieve related Transactions <https://developers.stellar.org/api/resources/claimablebalances/transactions/>`_
+        See `Claimable Balances - Retrieve related Transactions <https://developers.stellar.org/api/resources/claimablebalances/transactions/>`__
 
         :param claimable_balance_id: This claimable balance’s id encoded in a hex string representation.
         :return: current TransactionsCallBuilder instance
@@ -67,7 +66,7 @@ class BaseTransactionsCallBuilder(BaseCallBuilder):
     def for_liquidity_pool(self, liquidity_pool_id: str):
         """This endpoint represents all transactions referencing a given liquidity pool.
 
-        See `Liquidity Pools - Retrieve related Transactions <https://developers.stellar.org/api/resources/liquiditypools/transactions/>`_
+        See `Liquidity Pools - Retrieve related Transactions <https://developers.stellar.org/api/resources/liquiditypools/transactions/>`__
 
         :param liquidity_pool_id: The ID of the liquidity pool in hex string.
         :return: this TransactionsCallBuilder instance

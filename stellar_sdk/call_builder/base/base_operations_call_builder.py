@@ -7,9 +7,8 @@ __all__ = ["BaseOperationsCallBuilder"]
 
 class BaseOperationsCallBuilder(BaseCallBuilder):
     """Creates a new :class:`OperationsCallBuilder` pointed to server defined by horizon_url.
-    Do not create this object directly, use :func:`stellar_sdk.server.Server.operations`.
 
-    See `All Operations <https://www.stellar.org/developers/horizon/reference/endpoints/operations-all.html>`_
+    See `All Operations <https://www.stellar.org/developers/horizon/reference/endpoints/operations-all.html>`__
 
     :param horizon_url: Horizon server URL.
     """
@@ -22,7 +21,7 @@ class BaseOperationsCallBuilder(BaseCallBuilder):
         """The operation details endpoint provides information on a single operation. The operation ID provided
         in the id argument specifies which operation to load.
 
-        See `Operation Details <https://www.stellar.org/developers/horizon/reference/endpoints/operations-single.html>`_
+        See `Operation Details <https://www.stellar.org/developers/horizon/reference/endpoints/operations-single.html>`__
 
         :param operation_id: Operation ID
         :return: this OperationCallBuilder instance
@@ -34,7 +33,7 @@ class BaseOperationsCallBuilder(BaseCallBuilder):
         """This endpoint represents all operations that were included in valid transactions that
         affected a particular account.
 
-        See `Operations for Account <https://www.stellar.org/developers/horizon/reference/endpoints/operations-for-account.html>`_
+        See `Operations for Account <https://www.stellar.org/developers/horizon/reference/endpoints/operations-for-account.html>`__
 
         :param account_id: Account ID
         :return: this OperationCallBuilder instance
@@ -45,7 +44,7 @@ class BaseOperationsCallBuilder(BaseCallBuilder):
     def for_ledger(self, sequence: Union[int, str]):
         """This endpoint returns all operations that occurred in a given ledger.
 
-        See `Operations for Ledger <https://www.stellar.org/developers/horizon/reference/endpoints/operations-for-ledger.html>`_
+        See `Operations for Ledger <https://www.stellar.org/developers/horizon/reference/endpoints/operations-for-ledger.html>`__
 
         :param sequence: Sequence ID
         :return: this OperationCallBuilder instance
@@ -56,7 +55,7 @@ class BaseOperationsCallBuilder(BaseCallBuilder):
     def for_transaction(self, transaction_hash: str):
         """This endpoint represents all operations that are part of a given transaction.
 
-        See `Operations for Transaction <https://www.stellar.org/developers/horizon/reference/endpoints/operations-for-transaction.html>`_
+        See `Operations for Transaction <https://www.stellar.org/developers/horizon/reference/endpoints/operations-for-transaction.html>`__
 
         :param transaction_hash: Transaction Hash
         :return: this OperationCallBuilder instance
@@ -69,7 +68,7 @@ class BaseOperationsCallBuilder(BaseCallBuilder):
         claimable balance and can be used in streaming mode.
 
 
-        See `Claimable Balances - Retrieve related Operations <https://developers.stellar.org/api/resources/claimablebalances/operations/>`_
+        See `Claimable Balances - Retrieve related Operations <https://developers.stellar.org/api/resources/claimablebalances/operations/>`__
 
         :param claimable_balance_id: This claimable balance’s id encoded in a hex string representation.
         :return: this OperationCallBuilder instance
@@ -80,7 +79,7 @@ class BaseOperationsCallBuilder(BaseCallBuilder):
     def for_liquidity_pool(self, liquidity_pool_id: str):
         """This endpoint represents all operations that are part of a given liquidity pool.
 
-        See `Liquidity Pools - Retrieve related Operations <https://developers.stellar.org/api/resources/liquiditypools/operations/>`_
+        See `Liquidity Pools - Retrieve related Operations <https://developers.stellar.org/api/resources/liquiditypools/operations/>`__
 
         :param liquidity_pool_id: The ID of the liquidity pool in hex string.
         :return: this OperationCallBuilder instance

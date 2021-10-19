@@ -12,7 +12,7 @@ class TradeAggregationsCallBuilder(BaseCallBuilder, BaseTradeAggregationsCallBui
 
     Trade Aggregations facilitate efficient gathering of historical trade data.
 
-    See `Trade Aggregations <https://www.stellar.org/developers/horizon/reference/endpoints/trade_aggregations.html>`_
+    See `Trade Aggregations <https://www.stellar.org/developers/horizon/reference/endpoints/trade_aggregations.html>`__
 
     :param horizon_url: Horizon server URL.
     :param client: The client instance used to send request.

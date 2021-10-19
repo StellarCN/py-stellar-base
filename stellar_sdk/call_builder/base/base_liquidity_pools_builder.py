@@ -9,9 +9,8 @@ __all__ = ["BaseLiquidityPoolsBuilder"]
 
 class BaseLiquidityPoolsBuilder(BaseCallBuilder):
     """Creates a new :class:`LiquidityPoolsBuilder` pointed to server defined by horizon_url.
-    Do not create this object directly, use :func:`stellar_sdk.server.Server.liquidity_pools`.
 
-    See `Liquidity Pools <https://developers.stellar.org/api/resources/liquiditypools/>`_
+    See `Liquidity Pools <https://developers.stellar.org/api/resources/liquiditypools/>`__
 
     :param horizon_url: Horizon server URL.
     """
@@ -23,7 +22,7 @@ class BaseLiquidityPoolsBuilder(BaseCallBuilder):
     def liquidity_pool(self, liquidity_pool_id: str):
         """Provides information on a liquidity pool.
 
-        See `Retrieve a Liquidity Pool <https://developers.stellar.org/api/resources/liquiditypools/single/>`_
+        See `Retrieve a Liquidity Pool <https://developers.stellar.org/api/resources/liquiditypools/single/>`__
 
         :param liquidity_pool_id: The ID of the liquidity pool in hex string.
         :return: current LiquidityPoolsBuilder instance
@@ -37,7 +36,7 @@ class BaseLiquidityPoolsBuilder(BaseCallBuilder):
         Horizon will provide an endpoint to find all liquidity pools
         which contain a given set of reserve assets.
 
-        See `List Liquidity Pools <https://developers.stellar.org/api/resources/liquiditypools/list/>`_
+        See `List Liquidity Pools <https://developers.stellar.org/api/resources/liquiditypools/list/>`__
 
         :return: current LiquidityPoolsBuilder instance
         """
