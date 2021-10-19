@@ -7,8 +7,9 @@ Created: 2017-10-30
 Updated: 2019-10-10
 Version 1.1.0
 """
-from typing import Any, Coroutine, Dict, Optional, Union
+from typing import Dict, Optional
 
+from .. import AiohttpClient
 from ..client.base_async_client import BaseAsyncClient
 from ..client.base_sync_client import BaseSyncClient
 from ..client.requests_client import RequestsClient
@@ -24,9 +25,23 @@ from .stellar_toml import fetch_stellar_toml
 SEPARATOR = "*"
 FEDERATION_SERVER_KEY = "FEDERATION_SERVER"
 
+__all__ = [
+    "FederationRecord",
+    "resolve_stellar_address",
+    "resolve_stellar_address_async",
+    "resolve_account_id",
+    "resolve_account_id_async",
+]
+
 
 class FederationRecord:
-    def __init__(self, account_id, stellar_address, memo_type, memo):
+    def __init__(
+        self,
+        account_id: str,
+        stellar_address: str,
+        memo_type: Optional[str],
+        memo: Optional[str],
+    ) -> None:
         """The :class:`FederationRecord`, which represents record in federation server.
 
         :param account_id: Stellar public key / account ID
@@ -60,10 +75,10 @@ class FederationRecord:
 
 def resolve_stellar_address(
     stellar_address: str,
-    client: Union[BaseAsyncClient, BaseSyncClient] = None,
+    client: BaseSyncClient = None,
     federation_url: str = None,
     use_http: bool = False,
-) -> Union[Coroutine[Any, Any, FederationRecord], FederationRecord]:
+) -> FederationRecord:
     """Get the federation record if the user was found for a given Stellar address.
 
     :param stellar_address: address Stellar address (ex. bob*stellar.org).
@@ -76,29 +91,59 @@ def resolve_stellar_address(
     """
     if not client:
         client = RequestsClient()
-    if isinstance(client, BaseAsyncClient):
-        return __resolve_stellar_address_async(
-            stellar_address, client, federation_url, use_http
+    parts = _split_stellar_address(stellar_address)
+    domain = parts["domain"]
+    if federation_url is None:
+        federation_url = fetch_stellar_toml(domain, use_http=use_http).get(  # type: ignore[union-attr]
+            FEDERATION_SERVER_KEY
         )
-    elif isinstance(client, BaseSyncClient):
-        return __resolve_stellar_address_sync(
-            stellar_address, client, federation_url, use_http
+    if federation_url is None:
+        raise FederationServerNotFoundError(
+            f"Unable to find federation server at {domain}."
         )
-    else:
-        raise TypeError(
-            "This `client` class should be an instance "
-            "of `stellar_sdk.client.base_async_client.BaseAsyncClient` "
-            "or `stellar_sdk.client.base_sync_client.BaseSyncClient`."
+    raw_resp = client.get(federation_url, {"type": "name", "q": stellar_address})
+    return _handle_raw_response(raw_resp, stellar_address=stellar_address)
+
+
+async def resolve_stellar_address_async(
+    stellar_address: str,
+    client: BaseAsyncClient = None,
+    federation_url: str = None,
+    use_http: bool = False,
+) -> FederationRecord:
+    """Get the federation record if the user was found for a given Stellar address.
+
+    :param stellar_address: address Stellar address (ex. bob*stellar.org).
+    :param client: Http Client used to send the request.
+    :param federation_url: The federation server URL (ex. `https://stellar.org/federation`),
+        if you don't set this value, we will try to get it from ``stellar_address``.
+    :param use_http: Specifies whether the request should go over plain HTTP vs HTTPS.
+        Note it is recommend that you *always* use HTTPS.
+    :return: Federation record.
+    """
+    if not client:
+        client = AiohttpClient()
+    parts = _split_stellar_address(stellar_address)
+    domain = parts["domain"]
+    if federation_url is None:
+        federation_url = (
+            await fetch_stellar_toml(domain, client=client, use_http=use_http)  # type: ignore[misc]
+        ).get(FEDERATION_SERVER_KEY)
+    if federation_url is None:
+        raise FederationServerNotFoundError(
+            f"Unable to find federation server at {domain}."
         )
+    raw_resp = await client.get(federation_url, {"type": "name", "q": stellar_address})
+    return _handle_raw_response(raw_resp, stellar_address=stellar_address)
 
 
 def resolve_account_id(
     account_id: str,
     domain: str = None,
     federation_url: str = None,
-    client: Union[BaseAsyncClient, BaseSyncClient] = None,
+    client: BaseSyncClient = None,
     use_http: bool = False,
-) -> Union[Coroutine[Any, Any, FederationRecord], FederationRecord]:
+) -> FederationRecord:
     """Given an account ID, get their federation record if the user was found
 
     :param account_id: Account ID (ex. GBYNR2QJXLBCBTRN44MRORCMI4YO7FZPFBCNOKTOBCAAFC7KC3LNPRYS)
@@ -114,69 +159,6 @@ def resolve_account_id(
 
     if not client:
         client = RequestsClient()
-    if isinstance(client, BaseAsyncClient):
-        return __resolve_account_id_async(
-            account_id, domain, federation_url, client, use_http
-        )
-    elif isinstance(client, BaseSyncClient):
-        return __resolve_account_id_sync(
-            account_id, domain, federation_url, client, use_http
-        )
-    else:
-        raise TypeError(
-            "This `client` class should be an instance "
-            "of `stellar_sdk.client.base_async_client.BaseAsyncClient` "
-            "or `stellar_sdk.client.base_sync_client.BaseSyncClient`."
-        )
-
-
-def __resolve_stellar_address_sync(
-    stellar_address: str,
-    client: BaseSyncClient,
-    federation_url: str = None,
-    use_http: bool = False,
-) -> FederationRecord:
-    parts = split_stellar_address(stellar_address)
-    domain = parts["domain"]
-    if federation_url is None:
-        federation_url = fetch_stellar_toml(domain, use_http=use_http).get(  # type: ignore[union-attr]
-            FEDERATION_SERVER_KEY
-        )
-    if federation_url is None:
-        raise FederationServerNotFoundError(
-            f"Unable to find federation server at {domain}."
-        )
-    raw_resp = client.get(federation_url, {"type": "name", "q": stellar_address})
-    return __handle_raw_response(raw_resp, stellar_address=stellar_address)
-
-
-async def __resolve_stellar_address_async(
-    stellar_address: str,
-    client: BaseAsyncClient,
-    federation_url: str = None,
-    use_http: bool = False,
-) -> FederationRecord:
-    parts = split_stellar_address(stellar_address)
-    domain = parts["domain"]
-    if federation_url is None:
-        federation_url = (
-            await fetch_stellar_toml(domain, client=client, use_http=use_http)  # type: ignore[misc]
-        ).get(FEDERATION_SERVER_KEY)
-    if federation_url is None:
-        raise FederationServerNotFoundError(
-            f"Unable to find federation server at {domain}."
-        )
-    raw_resp = await client.get(federation_url, {"type": "name", "q": stellar_address})
-    return __handle_raw_response(raw_resp, stellar_address=stellar_address)
-
-
-def __resolve_account_id_sync(
-    account_id: str,
-    domain: str = None,
-    federation_url: str = None,
-    client=None,
-    use_http: bool = False,
-) -> FederationRecord:
     if domain is not None:
         federation_url = fetch_stellar_toml(domain, client, use_http).get(  # type: ignore[union-attr]
             FEDERATION_SERVER_KEY
@@ -185,17 +167,33 @@ def __resolve_account_id_sync(
             raise FederationServerNotFoundError(
                 f"Unable to find federation server at {domain}."
             )
+    assert federation_url is not None
     raw_resp = client.get(federation_url, {"type": "id", "q": account_id})
-    return __handle_raw_response(raw_resp, account_id=account_id)
+    return _handle_raw_response(raw_resp, account_id=account_id)
 
 
-async def __resolve_account_id_async(
+async def resolve_account_id_async(
     account_id: str,
     domain: str = None,
     federation_url: str = None,
-    client=None,
+    client: BaseAsyncClient = None,
     use_http: bool = False,
 ) -> FederationRecord:
+    """Given an account ID, get their federation record if the user was found
+
+    :param account_id: Account ID (ex. GBYNR2QJXLBCBTRN44MRORCMI4YO7FZPFBCNOKTOBCAAFC7KC3LNPRYS)
+    :param domain: Get ``federation_url`` from the domain, you don't need to set this value if ``federation_url`` is set.
+    :param federation_url: The federation server URL (ex. https://stellar.org/federation).
+    :param client: Http Client used to send the request.
+    :param use_http: Specifies whether the request should go over plain HTTP vs HTTPS.
+        Note it is recommend that you *always* use HTTPS.
+    :return: Federation record.
+    """
+    if domain is None and federation_url is None:
+        raise ValueError("You should provide either `domain` or `federation_url`.")
+
+    if not client:
+        client = AiohttpClient()
     if domain is not None:
         federation_url = (await fetch_stellar_toml(domain, client, use_http)).get(  # type: ignore[misc]
             FEDERATION_SERVER_KEY
@@ -204,11 +202,12 @@ async def __resolve_account_id_async(
             raise FederationServerNotFoundError(
                 f"Unable to find federation server at {domain}."
             )
+    assert federation_url is not None
     raw_resp = await client.get(federation_url, {"type": "id", "q": account_id})
-    return __handle_raw_response(raw_resp, account_id=account_id)
+    return _handle_raw_response(raw_resp, account_id=account_id)
 
 
-def __handle_raw_response(
+def _handle_raw_response(
     raw_resp: Response, stellar_address=None, account_id=None
 ) -> FederationRecord:
     if not 200 <= raw_resp.status_code < 300:
@@ -226,7 +225,7 @@ def __handle_raw_response(
     )
 
 
-def split_stellar_address(address: str) -> Dict[str, str]:
+def _split_stellar_address(address: str) -> Dict[str, str]:
     parts = address.split(SEPARATOR)
     if len(parts) != 2:
         raise InvalidFederationAddress(

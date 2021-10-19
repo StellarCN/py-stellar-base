@@ -115,7 +115,7 @@ class Server(BaseServer):
         return self.__load_account_sync(account)
 
     def __load_account_sync(self, account_id: MuxedAccount) -> Account:
-        resp = self.accounts().account_id(account_id=account_id.account_id).call()  # type: ignore[misc]
+        resp = self.accounts().account_id(account_id=account_id.account_id).call()
         assert isinstance(resp, dict)
         sequence = int(resp["sequence"])
         thresholds = Thresholds(

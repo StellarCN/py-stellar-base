@@ -9,9 +9,11 @@ from stellar_sdk.sep.exceptions import (
 )
 from stellar_sdk.sep.federation import (
     FederationRecord,
+    _split_stellar_address,
     resolve_account_id,
+    resolve_account_id_async,
     resolve_stellar_address,
-    split_stellar_address,
+    resolve_stellar_address_async,
 )
 
 
@@ -34,7 +36,7 @@ class TestFederation:
 
     @pytest.mark.asyncio
     async def test_resolve_by_stellar_address_async(self):
-        record = await resolve_stellar_address(
+        record = await resolve_stellar_address_async(
             self.STELLAR_ADDRESS, client=AiohttpClient()
         )
         assert record == self.FEDERATION_RECORD
@@ -52,7 +54,7 @@ class TestFederation:
             FederationServerNotFoundError,
             match="Unable to find federation server at sdk-test.overcat.me.",
         ):
-            await resolve_stellar_address(
+            await resolve_stellar_address_async(
                 "hello*sdk-test.overcat.me", client=AiohttpClient()
             )
 
@@ -67,7 +69,7 @@ class TestFederation:
 
     @pytest.mark.asyncio
     async def test_resolve_by_stellar_address_with_federation_url_async(self):
-        record = await resolve_stellar_address(
+        record = await resolve_stellar_address_async(
             "hello*example.com",
             federation_url=self.FEDERATION_SERVER,
             client=AiohttpClient(),
@@ -83,7 +85,7 @@ class TestFederation:
 
     @pytest.mark.asyncio
     async def test_resolve_by_account_id_with_domain_async(self):
-        record = await resolve_account_id(
+        record = await resolve_account_id_async(
             self.ACCOUNT_ID, domain=self.DOMAIN, client=AiohttpClient()
         )
         assert record == self.FEDERATION_RECORD
@@ -107,7 +109,7 @@ class TestFederation:
             FederationServerNotFoundError,
             match="Unable to find federation server at sdk-test.overcat.me.",
         ):
-            await resolve_account_id(
+            await resolve_account_id_async(
                 self.ACCOUNT_ID, domain="sdk-test.overcat.me", client=AiohttpClient()
             )
 
@@ -117,7 +119,7 @@ class TestFederation:
         assert err.value.status == 404
 
     def test_split_address(self):
-        assert split_stellar_address(self.STELLAR_ADDRESS) == {
+        assert _split_stellar_address(self.STELLAR_ADDRESS) == {
             "name": "hello",
             "domain": "overcat.me",
         }
@@ -125,22 +127,4 @@ class TestFederation:
     @pytest.mark.parametrize("stellar_address", ["", "hey", "hey*hello*overcat.me"])
     def test_split_invalid_address(self, stellar_address):
         with pytest.raises(InvalidFederationAddress):
-            split_stellar_address(stellar_address)
-
-    def test_invalid_client(self):
-        client = "BAD TYPE"
-        with pytest.raises(
-            TypeError,
-            match="This `client` class should be an instance "
-            "of `stellar_sdk.client.base_async_client.BaseAsyncClient` "
-            "or `stellar_sdk.client.base_sync_client.BaseSyncClient`.",
-        ):
-            resolve_account_id(self.ACCOUNT_ID, domain=self.DOMAIN, client=client)
-
-        with pytest.raises(
-            TypeError,
-            match="This `client` class should be an instance "
-            "of `stellar_sdk.client.base_async_client.BaseAsyncClient` "
-            "or `stellar_sdk.client.base_sync_client.BaseSyncClient`.",
-        ):
-            resolve_stellar_address(self.STELLAR_ADDRESS, client=client)
+            _split_stellar_address(stellar_address)

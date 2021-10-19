@@ -332,7 +332,7 @@ class BaseServer:
             )
         return base_fee
 
-    def close(self) -> Union[None, Coroutine[Any, Any, None]]:  # type: ignore[misc]
+    def close(self) -> None:
         """Close underlying connector.
 
         Release all acquired resources.

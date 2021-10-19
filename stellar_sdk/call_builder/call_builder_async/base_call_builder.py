@@ -41,7 +41,7 @@ class BaseCallBuilder(_BaseCallBuilder):
         return await self._call(url, self.params)
 
     async def _call(self, url: str, params: dict = None) -> Dict[str, Any]:
-        raw_resp = await self.client.get(url, params)  # type: ignore[misc]
+        raw_resp = await self.client.get(url, params)
         assert isinstance(raw_resp, Response)
         raise_request_exception(raw_resp)
         resp = raw_resp.json()

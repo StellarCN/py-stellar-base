@@ -74,7 +74,7 @@ class ServerAsync(BaseServer):
         if not skip_memo_required_check:
             await self._check_memo_required(tx)
         data = {"tx": xdr}
-        resp = await self._client.post(url=url, data=data)  # type: ignore[misc]
+        resp = await self._client.post(url=url, data=data)
         assert isinstance(resp, Response)
         raise_request_exception(resp)
         return resp.json()
@@ -106,7 +106,7 @@ class ServerAsync(BaseServer):
         return await self.__load_account_async(account)
 
     async def __load_account_async(self, account_id: MuxedAccount) -> Account:
-        resp = await self.accounts().account_id(account_id=account_id.account_id).call()  # type: ignore[misc]
+        resp = await self.accounts().account_id(account_id=account_id.account_id).call()
         assert isinstance(resp, dict)
         sequence = int(resp["sequence"])
         thresholds = Thresholds(
@@ -132,7 +132,7 @@ class ServerAsync(BaseServer):
             if destination.startswith(MUXED_ACCOUNT_STARTING_LETTER):
                 continue
             try:
-                account_resp = await self.accounts().account_id(destination).call()  # type: ignore[misc]
+                account_resp = await self.accounts().account_id(destination).call()
             except NotFoundError:
                 continue
             self._check_destination_memo(account_resp, index, destination)
@@ -149,7 +149,7 @@ class ServerAsync(BaseServer):
             :exc:`BadResponseError <stellar_sdk.exceptions.BadResponseError>`
             :exc:`UnknownRequestError <stellar_sdk.exceptions.UnknownRequestError>`
         """
-        latest_ledger = await self.ledgers().order(desc=True).limit(1).call()  # type: ignore[misc]
+        latest_ledger = await self.ledgers().order(desc=True).limit(1).call()
         base_fee = self._handle_base_fee(latest_ledger)
         return base_fee
 
@@ -350,7 +350,7 @@ class ServerAsync(BaseServer):
             horizon_url=self.horizon_url, client=self._client
         )
 
-    async def close(self) -> None:
+    async def close(self) -> None:  # type: ignore[override]
         """Close underlying connector.
 
         Release all acquired resources.
