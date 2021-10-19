@@ -7,7 +7,7 @@ __all__ = ["LedgersCallBuilder"]
 
 class LedgersCallBuilder(BaseCallBuilder, BaseLedgersCallBuilder):
     """Creates a new :class:`LedgersCallBuilder` pointed to server defined by horizon_url.
-    Do not create this object directly, use :func:`stellar_sdk.server.Server.ledgers`.
+    Do not create this object directly, use :func:`stellar_sdk.ServerAsync.ledgers`.
 
     See `All Ledgers <https://www.stellar.org/developers/horizon/reference/endpoints/ledgers-all.html>`_
 

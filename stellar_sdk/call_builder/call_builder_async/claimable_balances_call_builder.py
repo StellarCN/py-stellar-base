@@ -7,7 +7,7 @@ __all__ = ["ClaimableBalancesCallBuilder"]
 
 class ClaimableBalancesCallBuilder(BaseCallBuilder, BaseClaimableBalancesCallBuilder):
     """Creates a new :class:`ClaimableBalancesCallBuilder` pointed to server defined by horizon_url.
-    Do not create this object directly, use :func:`stellar_sdk.server.Server.claimable_balance`.
+    Do not create this object directly, use :func:`stellar_sdk.ServerAsync.claimable_balance`.
 
     :param horizon_url: Horizon server URL.
     :param client: The client instance used to send request.

@@ -7,7 +7,7 @@ __all__ = ["RootCallBuilder"]
 
 class RootCallBuilder(BaseCallBuilder, BaseRootCallBuilder):
     """Creates a new :class:`RootCallBuilder` pointed to server defined by horizon_url.
-    Do not create this object directly, use :func:`stellar_sdk.server.Server.root`.
+    Do not create this object directly, use :func:`stellar_sdk.Server.root`.
 
     :param horizon_url: Horizon server URL.
     :param client: The client instance used to send request.

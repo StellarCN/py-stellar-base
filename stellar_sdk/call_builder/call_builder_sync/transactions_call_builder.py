@@ -7,7 +7,7 @@ __all__ = ["TransactionsCallBuilder"]
 
 class TransactionsCallBuilder(BaseCallBuilder, BaseTransactionsCallBuilder):
     """Creates a new :class:`TransactionsCallBuilder` pointed to server defined by horizon_url.
-    Do not create this object directly, use :func:`stellar_sdk.server.Server.transactions`.
+    Do not create this object directly, use :func:`stellar_sdk.Server.transactions`.
 
     See `All Transactions <https://www.stellar.org/developers/horizon/reference/endpoints/transactions-all.html>`_
 

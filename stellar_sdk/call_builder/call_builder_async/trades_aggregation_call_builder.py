@@ -8,7 +8,7 @@ __all__ = ["TradeAggregationsCallBuilder"]
 
 class TradeAggregationsCallBuilder(BaseCallBuilder, BaseTradeAggregationsCallBuilder):
     """Creates a new :class:`TradeAggregationsCallBuilder` pointed to server defined by horizon_url.
-    Do not create this object directly, use :func:`stellar_sdk.server.Server.trade_aggregations`.
+    Do not create this object directly, use :func:`stellar_sdk.ServerAsync.trade_aggregations`.
 
     Trade Aggregations facilitate efficient gathering of historical trade data.
 

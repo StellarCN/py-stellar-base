@@ -7,7 +7,7 @@ __all__ = ["LiquidityPoolsBuilder"]
 
 class LiquidityPoolsBuilder(BaseCallBuilder, BaseLiquidityPoolsBuilder):
     """Creates a new :class:`LiquidityPoolsBuilder` pointed to server defined by horizon_url.
-    Do not create this object directly, use :func:`stellar_sdk.server.Server.liquidity_pools`.
+    Do not create this object directly, use :func:`stellar_sdk.Server.liquidity_pools`.
 
     See `Liquidity Pools <https://developers.stellar.org/api/resources/liquiditypools/>`_
 

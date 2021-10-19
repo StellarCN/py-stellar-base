@@ -10,7 +10,7 @@ __all__ = ["StrictSendPathsCallBuilder"]
 
 class StrictSendPathsCallBuilder(BaseCallBuilder, BaseStrictSendPathsCallBuilder):
     """Creates a new :class:`StrictSendPathsCallBuilder` pointed to server defined by horizon_url.
-    Do not create this object directly, use :func:`stellar_sdk.server.Server.strict_send_paths`.
+    Do not create this object directly, use :func:`stellar_sdk.ServerAsync.strict_send_paths`.
 
     The Stellar Network allows payments to be made across assets through path
     payments. A strict send path payment specifies a series of assets to route a

@@ -7,7 +7,7 @@ __all__ = ["AccountsCallBuilder"]
 
 class AccountsCallBuilder(BaseCallBuilder, BaseAccountsCallBuilder):
     """Creates a new :class:`AccountsCallBuilder` pointed to server defined by horizon_url.
-    Do not create this object directly, use :func:`stellar_sdk.server.Server.accounts`.
+    Do not create this object directly, use :func:`stellar_sdk.Server.accounts`.
 
     :param horizon_url: Horizon server URL.
     :param client: The client instance used to send request.

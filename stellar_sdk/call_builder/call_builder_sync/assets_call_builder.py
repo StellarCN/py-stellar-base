@@ -7,7 +7,7 @@ __all__ = ["AssetsCallBuilder"]
 
 class AssetsCallBuilder(BaseCallBuilder, BaseAssetsCallBuilder):
     """Creates a new :class:`AssetsCallBuilder` pointed to server defined by horizon_url.
-    Do not create this object directly, use :func:`stellar_sdk.server.Server.assets`.
+    Do not create this object directly, use :func:`stellar_sdk.Server.assets`.
 
     See `All Assets <https://www.stellar.org/developers/horizon/reference/endpoints/assets-all.html>`_
 
