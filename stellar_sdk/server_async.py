@@ -1,3 +1,4 @@
+from abc import ABC
 from typing import Any, Dict, List, Union
 
 from .account import Account, Thresholds
@@ -20,7 +21,7 @@ from .utils import MUXED_ACCOUNT_STARTING_LETTER, urljoin_with_query
 __all__ = ["ServerAsync"]
 
 
-class ServerAsync(BaseServer):
+class ServerAsync(BaseServer, ABC):
     """Server handles the network connection to a `Horizon <https://www.stellar.org/developers/horizon/reference/>`_
     instance and exposes an interface for requests to that instance.
 
@@ -98,14 +99,11 @@ class ServerAsync(BaseServer):
             :exc:`UnknownRequestError <stellar_sdk.exceptions.UnknownRequestError>`
         """
         if isinstance(account_id, str):
-            account = MuxedAccount.from_account(account_id)
+            account_id = MuxedAccount.from_account(account_id)
         elif isinstance(account_id, Keypair):
-            account = MuxedAccount.from_account(account_id.public_key)
+            account_id = MuxedAccount.from_account(account_id.public_key)
         else:
-            account = account_id
-        return await self.__load_account_async(account)
-
-    async def __load_account_async(self, account_id: MuxedAccount) -> Account:
+            account_id = account_id
         resp = await self.accounts().account_id(account_id=account_id.account_id).call()
         assert isinstance(resp, dict)
         sequence = int(resp["sequence"])

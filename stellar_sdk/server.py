@@ -67,17 +67,6 @@ class Server(BaseServer):
             :exc:`UnknownRequestError <stellar_sdk.exceptions.UnknownRequestError>`
             :exc:`AccountRequiresMemoError <stellar_sdk.sep.exceptions.AccountRequiresMemoError>`
         """
-        return self.__submit_transaction_sync(
-            transaction_envelope, skip_memo_required_check
-        )
-
-    def __submit_transaction_sync(
-        self,
-        transaction_envelope: Union[
-            TransactionEnvelope, FeeBumpTransactionEnvelope, str
-        ],
-        skip_memo_required_check: bool,
-    ) -> Dict[str, Any]:
         url = urljoin_with_query(self.horizon_url, "transactions")
         xdr, tx = self._get_xdr_and_transaction_from_transaction_envelope(
             transaction_envelope
@@ -107,14 +96,11 @@ class Server(BaseServer):
             :exc:`UnknownRequestError <stellar_sdk.exceptions.UnknownRequestError>`
         """
         if isinstance(account_id, str):
-            account = MuxedAccount.from_account(account_id)
+            account_id = MuxedAccount.from_account(account_id)
         elif isinstance(account_id, Keypair):
-            account = MuxedAccount.from_account(account_id.public_key)
+            account_id = MuxedAccount.from_account(account_id.public_key)
         else:
-            account = account_id
-        return self.__load_account_sync(account)
-
-    def __load_account_sync(self, account_id: MuxedAccount) -> Account:
+            account_id = account_id
         resp = self.accounts().account_id(account_id=account_id.account_id).call()
         assert isinstance(resp, dict)
         sequence = int(resp["sequence"])
