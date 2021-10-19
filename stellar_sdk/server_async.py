@@ -1,7 +1,7 @@
 from typing import Any, Dict, List, Union
 
-from . import Asset
 from .account import Account, Thresholds
+from .asset import Asset
 from .base_server import BaseServer
 from .call_builder.call_builder_async import *
 from .client.aiohttp_client import AiohttpClient

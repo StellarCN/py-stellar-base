@@ -6,6 +6,7 @@ from stellar_sdk import (
     Keypair,
     Network,
     Server,
+    ServerAsync,
     TransactionBuilder,
 )
 from stellar_sdk.exceptions import BadRequestError
@@ -429,7 +430,7 @@ class TestAccountMemoRequirements:
             "SDQXFKA32UVQHUTLYJ42N56ZUEM5PNVVI4XE7EA5QFMLA2DHDCQX3GPY"
         )
         account = Account(keypair.public_key, 1)
-        async with Server(horizon_url, AiohttpClient()) as server:
+        async with ServerAsync(horizon_url, AiohttpClient()) as server:
             transaction = (
                 TransactionBuilder(account)
                 .append_payment_op(
@@ -470,7 +471,7 @@ class TestAccountMemoRequirements:
             "SDQXFKA32UVQHUTLYJ42N56ZUEM5PNVVI4XE7EA5QFMLA2DHDCQX3GPY"
         )
         account = Account(keypair.public_key, 1)
-        async with Server(horizon_url, AiohttpClient()) as server:
+        async with ServerAsync(horizon_url, AiohttpClient()) as server:
             transaction = (
                 TransactionBuilder(account)
                 .append_payment_op(
@@ -510,7 +511,7 @@ class TestAccountMemoRequirements:
             "SDQXFKA32UVQHUTLYJ42N56ZUEM5PNVVI4XE7EA5QFMLA2DHDCQX3GPY"
         )
         account = Account(keypair.public_key, 1)
-        async with Server(horizon_url, AiohttpClient()) as server:
+        async with ServerAsync(horizon_url, AiohttpClient()) as server:
             transaction = (
                 TransactionBuilder(account)
                 .append_payment_op(
@@ -558,7 +559,7 @@ class TestAccountMemoRequirements:
             "SDQXFKA32UVQHUTLYJ42N56ZUEM5PNVVI4XE7EA5QFMLA2DHDCQX3GPY"
         )
         account = Account(keypair.public_key, 1)
-        async with Server(horizon_url, AiohttpClient()) as server:
+        async with ServerAsync(horizon_url, AiohttpClient()) as server:
             transaction = (
                 TransactionBuilder(account)
                 .append_payment_op(
@@ -606,7 +607,7 @@ class TestAccountMemoRequirements:
             "SDQXFKA32UVQHUTLYJ42N56ZUEM5PNVVI4XE7EA5QFMLA2DHDCQX3GPY"
         )
         account = Account(keypair.public_key, 1)
-        async with Server(horizon_url, AiohttpClient()) as server:
+        async with ServerAsync(horizon_url, AiohttpClient()) as server:
             transaction = (
                 TransactionBuilder(account)
                 .append_payment_op(
@@ -652,7 +653,7 @@ class TestAccountMemoRequirements:
             "SDQXFKA32UVQHUTLYJ42N56ZUEM5PNVVI4XE7EA5QFMLA2DHDCQX3GPY"
         )
         account = Account(keypair.public_key, 1)
-        async with Server(horizon_url, AiohttpClient()) as server:
+        async with ServerAsync(horizon_url, AiohttpClient()) as server:
             transaction = (
                 TransactionBuilder(account)
                 .append_payment_op(
@@ -700,7 +701,7 @@ class TestAccountMemoRequirements:
             "SDQXFKA32UVQHUTLYJ42N56ZUEM5PNVVI4XE7EA5QFMLA2DHDCQX3GPY"
         )
         account = Account(keypair.public_key, 1)
-        async with Server(horizon_url, AiohttpClient()) as server:
+        async with ServerAsync(horizon_url, AiohttpClient()) as server:
             transaction = (
                 TransactionBuilder(account)
                 .append_payment_op(
@@ -748,7 +749,7 @@ class TestAccountMemoRequirements:
             "SDQXFKA32UVQHUTLYJ42N56ZUEM5PNVVI4XE7EA5QFMLA2DHDCQX3GPY"
         )
         account = Account(keypair.public_key, 1)
-        async with Server(horizon_url, AiohttpClient()) as server:
+        async with ServerAsync(horizon_url, AiohttpClient()) as server:
             transaction = (
                 TransactionBuilder(account)
                 .append_manage_data_op("Hello", "world")
@@ -765,7 +766,7 @@ class TestAccountMemoRequirements:
             "SDQXFKA32UVQHUTLYJ42N56ZUEM5PNVVI4XE7EA5QFMLA2DHDCQX3GPY"
         )
         account = Account(keypair.public_key, 1)
-        async with Server(horizon_url, AiohttpClient()) as server:
+        async with ServerAsync(horizon_url, AiohttpClient()) as server:
             transaction = (
                 TransactionBuilder(account)
                 .append_payment_op(self.DESTINATION_ACCOUNT_NO_FOUND, "10", "XLM")
@@ -805,7 +806,7 @@ class TestAccountMemoRequirements:
             "SDQXFKA32UVQHUTLYJ42N56ZUEM5PNVVI4XE7EA5QFMLA2DHDCQX3GPY"
         )
         account = Account(keypair.public_key, 1)
-        async with Server(horizon_url, AiohttpClient()) as server:
+        async with ServerAsync(horizon_url, AiohttpClient()) as server:
             transaction = (
                 TransactionBuilder(account)
                 .append_payment_op(self.DESTINATION_ACCOUNT_FETCH_ERROR, "10", "XLM")
@@ -883,7 +884,7 @@ class TestAccountMemoRequirements:
             "SDQXFKA32UVQHUTLYJ42N56ZUEM5PNVVI4XE7EA5QFMLA2DHDCQX3GPY"
         )
         account = Account(keypair.public_key, 1)
-        async with Server(horizon_url, AiohttpClient()) as server:
+        async with ServerAsync(horizon_url, AiohttpClient()) as server:
             transaction = (
                 TransactionBuilder(account)
                 .append_payment_op(
@@ -960,7 +961,7 @@ class TestAccountMemoRequirements:
             "SDQXFKA32UVQHUTLYJ42N56ZUEM5PNVVI4XE7EA5QFMLA2DHDCQX3GPY"
         )
         account = Account(keypair.public_key, 1)
-        async with Server(horizon_url, AiohttpClient()) as server:
+        async with ServerAsync(horizon_url, AiohttpClient()) as server:
             transaction = (
                 TransactionBuilder(account, v1=True)
                 .append_payment_op(

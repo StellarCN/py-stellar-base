@@ -98,7 +98,7 @@ Building transaction with synchronous server
     # Alice pay 10.25 XLM to Bob
     import asyncio
 
-    from stellar_sdk import Server, Keypair, TransactionBuilder, Network
+    from stellar_sdk import ServerAsync, Keypair, TransactionBuilder, Network
     from stellar_sdk.client.aiohttp_client import AiohttpClient
 
     alice_keypair = Keypair.from_secret("SBFZCHU5645DOKRWYBXVOXY2ELGJKFRX6VGGPRYUWHQ7PMXXJNDZFMKD")
@@ -106,7 +106,7 @@ Building transaction with synchronous server
 
 
     async def payment():
-        async with Server(
+        async with ServerAsync(
             horizon_url="https://horizon-testnet.stellar.org", client=AiohttpClient()
         ) as server:
             alice_account = await server.load_account(alice_keypair.public_key)

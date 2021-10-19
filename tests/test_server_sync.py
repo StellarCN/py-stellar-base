@@ -6,7 +6,7 @@ from stellar_sdk.asset import Asset
 from stellar_sdk.call_builder.call_builder_sync import *
 from stellar_sdk.client.requests_client import RequestsClient
 from stellar_sdk.network import Network
-from stellar_sdk.server_sync import Server
+from stellar_sdk.server import Server
 from stellar_sdk.transaction_envelope import TransactionEnvelope
 
 
