@@ -2,7 +2,7 @@ import pytest
 
 from stellar_sdk.client.aiohttp_client import AiohttpClient
 from stellar_sdk.sep.exceptions import StellarTomlNotFoundError
-from stellar_sdk.sep.stellar_toml import fetch_stellar_toml
+from stellar_sdk.sep.stellar_toml import fetch_stellar_toml, fetch_stellar_toml_async
 
 
 @pytest.mark.slow
@@ -14,7 +14,7 @@ class TestStellarToml:
     @pytest.mark.asyncio
     async def test_get_success_async(self):
         client = AiohttpClient()
-        toml = await fetch_stellar_toml("overcat.me", client)
+        toml = await fetch_stellar_toml_async("overcat.me", client)
         assert toml.get("FEDERATION_SERVER") == "https://federation.overcat.workers.dev"
 
     def test_get_success_http(self):
@@ -24,13 +24,3 @@ class TestStellarToml:
     def test_get_not_found(self):
         with pytest.raises(StellarTomlNotFoundError):
             fetch_stellar_toml("httpbin.overcat.me")
-
-    def test_invalid_client(self):
-        client = "BAD TYPE"
-        with pytest.raises(
-            TypeError,
-            match="This `client` class should be an instance "
-            "of `stellar_sdk.client.base_async_client.BaseAsyncClient` "
-            "or `stellar_sdk.client.base_sync_client.BaseSyncClient`.",
-        ):
-            fetch_stellar_toml("httpbin.overcat.me", client)

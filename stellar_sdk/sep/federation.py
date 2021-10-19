@@ -20,7 +20,7 @@ from .exceptions import (
     FederationServerNotFoundError,
     InvalidFederationAddress,
 )
-from .stellar_toml import fetch_stellar_toml
+from .stellar_toml import fetch_stellar_toml, fetch_stellar_toml_async
 
 SEPARATOR = "*"
 FEDERATION_SERVER_KEY = "FEDERATION_SERVER"
@@ -127,7 +127,7 @@ async def resolve_stellar_address_async(
     domain = parts["domain"]
     if federation_url is None:
         federation_url = (
-            await fetch_stellar_toml(domain, client=client, use_http=use_http)  # type: ignore[misc]
+            await fetch_stellar_toml_async(domain, client=client, use_http=use_http)
         ).get(FEDERATION_SERVER_KEY)
     if federation_url is None:
         raise FederationServerNotFoundError(
@@ -195,7 +195,7 @@ async def resolve_account_id_async(
     if not client:
         client = AiohttpClient()
     if domain is not None:
-        federation_url = (await fetch_stellar_toml(domain, client, use_http)).get(  # type: ignore[misc]
+        federation_url = (await fetch_stellar_toml_async(domain, client, use_http)).get(
             FEDERATION_SERVER_KEY
         )
         if federation_url is None:
