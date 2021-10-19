@@ -304,5 +304,4 @@ def _calculate_checksum(payload: bytes) -> bytes:
     # This code calculates CRC16-XModem checksum of payload
     checksum = binascii.crc_hqx(payload, 0)
     # Ensure that the checksum is in LSB order.
-    checksum = struct.pack("<H", checksum)
-    return checksum
+    return struct.pack("<H", checksum)
