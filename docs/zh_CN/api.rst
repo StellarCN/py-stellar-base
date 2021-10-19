@@ -25,117 +25,222 @@ Asset
 Call Builder
 ^^^^^^^^^^^^
 
-BaseCallBuilder
--------------------
-.. autoclass:: stellar_sdk.call_builder.BaseCallBuilder
-   :members:
-   :inherited-members:
-
 AccountsCallBuilder
 -------------------
-.. autoclass:: stellar_sdk.call_builder.AccountsCallBuilder
+.. autoclass:: stellar_sdk.call_builder.call_builder_sync.AccountsCallBuilder
    :members:
    :inherited-members:
 
 AssetsCallBuilder
 -----------------
-.. autoclass:: stellar_sdk.call_builder.AssetsCallBuilder
+.. autoclass:: stellar_sdk.call_builder.call_builder_sync.AssetsCallBuilder
    :members:
    :inherited-members:
 
 ClaimableBalancesCallBuilder
 ----------------------------
-.. autoclass:: stellar_sdk.call_builder.ClaimableBalancesCallBuilder
+.. autoclass:: stellar_sdk.call_builder.call_builder_sync.ClaimableBalancesCallBuilder
    :members:
    :inherited-members:
 
 DataCallBuilder
 ---------------
-.. autoclass:: stellar_sdk.call_builder.DataCallBuilder
+.. autoclass:: stellar_sdk.call_builder.call_builder_sync.DataCallBuilder
    :members:
    :inherited-members:
 
 EffectsCallBuilder
 ------------------
-.. autoclass:: stellar_sdk.call_builder.EffectsCallBuilder
+.. autoclass:: stellar_sdk.call_builder.call_builder_sync.EffectsCallBuilder
    :members:
    :inherited-members:
 
 FeeStatsCallBuilder
 -------------------
-.. autoclass:: stellar_sdk.call_builder.FeeStatsCallBuilder
+.. autoclass:: stellar_sdk.call_builder.call_builder_sync.FeeStatsCallBuilder
    :members:
    :inherited-members:
 
 LedgersCallBuilder
 ------------------
-.. autoclass:: stellar_sdk.call_builder.LedgersCallBuilder
+.. autoclass:: stellar_sdk.call_builder.call_builder_sync.LedgersCallBuilder
    :members:
    :inherited-members:
 
 LiquidityPoolsBuilder
 ---------------------
-.. autoclass:: stellar_sdk.call_builder.LiquidityPoolsBuilder
+.. autoclass:: stellar_sdk.call_builder.call_builder_sync.LiquidityPoolsBuilder
    :members:
    :inherited-members:
 
 OffersCallBuilder
 ---------------------
-.. autoclass:: stellar_sdk.call_builder.OffersCallBuilder
+.. autoclass:: stellar_sdk.call_builder.call_builder_sync.OffersCallBuilder
    :members:
    :inherited-members:
 
 OperationsCallBuilder
 ---------------------
-.. autoclass:: stellar_sdk.call_builder.OperationsCallBuilder
+.. autoclass:: stellar_sdk.call_builder.call_builder_sync.OperationsCallBuilder
    :members:
    :inherited-members:
 
 OrderbookCallBuilder
 --------------------
-.. autoclass:: stellar_sdk.call_builder.OrderbookCallBuilder
+.. autoclass:: stellar_sdk.call_builder.call_builder_sync.OrderbookCallBuilder
    :members:
    :inherited-members:
 
 PaymentsCallBuilder
 -------------------
-.. autoclass:: stellar_sdk.call_builder.PaymentsCallBuilder
+.. autoclass:: stellar_sdk.call_builder.call_builder_sync.PaymentsCallBuilder
    :members:
    :inherited-members:
 
 RootCallBuilder
 -------------------
-.. autoclass:: stellar_sdk.call_builder.RootCallBuilder
+.. autoclass:: stellar_sdk.call_builder.call_builder_sync.RootCallBuilder
    :members:
    :inherited-members:
 
 StrictReceivePathsCallBuilder
 ------------------------------
-.. autoclass:: stellar_sdk.call_builder.StrictReceivePathsCallBuilder
+.. autoclass:: stellar_sdk.call_builder.call_builder_sync.StrictReceivePathsCallBuilder
    :members:
    :inherited-members:
 
 StrictSendPathsCallBuilder
 ------------------------------
-.. autoclass:: stellar_sdk.call_builder.StrictSendPathsCallBuilder
+.. autoclass:: stellar_sdk.call_builder.call_builder_sync.StrictSendPathsCallBuilder
    :members:
    :inherited-members:
 
 TradeAggregationsCallBuilder
 ----------------------------
-.. autoclass:: stellar_sdk.call_builder.TradeAggregationsCallBuilder
+.. autoclass:: stellar_sdk.call_builder.call_builder_sync.TradeAggregationsCallBuilder
    :members:
    :inherited-members:
 
 TradesCallBuilder
 -----------------
-.. autoclass:: stellar_sdk.call_builder.TradesCallBuilder
+.. autoclass:: stellar_sdk.call_builder.call_builder_sync.TradesCallBuilder
    :members:
    :inherited-members:
 
 TransactionsCallBuilder
 -----------------------
-.. autoclass:: stellar_sdk.call_builder.TransactionsCallBuilder
+.. autoclass:: stellar_sdk.call_builder.call_builder_sync.TransactionsCallBuilder
+   :members:
+   :inherited-members:
+
+Call Builder Async
+^^^^^^^^^^^^^^^^^^
+
+AccountsCallBuilder
+-------------------
+.. autoclass:: stellar_sdk.call_builder.call_builder_async.AccountsCallBuilder
+   :members:
+   :inherited-members:
+
+AssetsCallBuilder
+-----------------
+.. autoclass:: stellar_sdk.call_builder.call_builder_async.AssetsCallBuilder
+   :members:
+   :inherited-members:
+
+ClaimableBalancesCallBuilder
+----------------------------
+.. autoclass:: stellar_sdk.call_builder.call_builder_async.ClaimableBalancesCallBuilder
+   :members:
+   :inherited-members:
+
+DataCallBuilder
+---------------
+.. autoclass:: stellar_sdk.call_builder.call_builder_async.DataCallBuilder
+   :members:
+   :inherited-members:
+
+EffectsCallBuilder
+------------------
+.. autoclass:: stellar_sdk.call_builder.call_builder_async.EffectsCallBuilder
+   :members:
+   :inherited-members:
+
+FeeStatsCallBuilder
+-------------------
+.. autoclass:: stellar_sdk.call_builder.call_builder_async.FeeStatsCallBuilder
+   :members:
+   :inherited-members:
+
+LedgersCallBuilder
+------------------
+.. autoclass:: stellar_sdk.call_builder.call_builder_async.LedgersCallBuilder
+   :members:
+   :inherited-members:
+
+LiquidityPoolsBuilder
+---------------------
+.. autoclass:: stellar_sdk.call_builder.call_builder_async.LiquidityPoolsBuilder
+   :members:
+   :inherited-members:
+
+OffersCallBuilder
+---------------------
+.. autoclass:: stellar_sdk.call_builder.call_builder_async.OffersCallBuilder
+   :members:
+   :inherited-members:
+
+OperationsCallBuilder
+---------------------
+.. autoclass:: stellar_sdk.call_builder.call_builder_async.OperationsCallBuilder
+   :members:
+   :inherited-members:
+
+OrderbookCallBuilder
+--------------------
+.. autoclass:: stellar_sdk.call_builder.call_builder_async.OrderbookCallBuilder
+   :members:
+   :inherited-members:
+
+PaymentsCallBuilder
+-------------------
+.. autoclass:: stellar_sdk.call_builder.call_builder_async.PaymentsCallBuilder
+   :members:
+   :inherited-members:
+
+RootCallBuilder
+-------------------
+.. autoclass:: stellar_sdk.call_builder.call_builder_async.RootCallBuilder
+   :members:
+   :inherited-members:
+
+StrictReceivePathsCallBuilder
+------------------------------
+.. autoclass:: stellar_sdk.call_builder.call_builder_async.StrictReceivePathsCallBuilder
+   :members:
+   :inherited-members:
+
+StrictSendPathsCallBuilder
+------------------------------
+.. autoclass:: stellar_sdk.call_builder.call_builder_async.StrictSendPathsCallBuilder
+   :members:
+   :inherited-members:
+
+TradeAggregationsCallBuilder
+----------------------------
+.. autoclass:: stellar_sdk.call_builder.call_builder_async.TradeAggregationsCallBuilder
+   :members:
+   :inherited-members:
+
+TradesCallBuilder
+-----------------
+.. autoclass:: stellar_sdk.call_builder.call_builder_async.TradesCallBuilder
+   :members:
+   :inherited-members:
+
+TransactionsCallBuilder
+-----------------------
+.. autoclass:: stellar_sdk.call_builder.call_builder_async.TransactionsCallBuilder
    :members:
    :inherited-members:
 
@@ -543,6 +648,13 @@ Server
    :members:
    :inherited-members:
 
+ServerAsync
+^^^^^^^^^^^
+
+.. autoclass:: stellar_sdk.server_async.ServerAsync
+   :members:
+   :inherited-members:
+
 Signer
 ^^^^^^
 
@@ -621,10 +733,13 @@ Stellar Ecosystem Proposals
 SEP 0001: stellar.toml
 ----------------------
 .. autofunction:: stellar_sdk.sep.stellar_toml.fetch_stellar_toml
+.. autofunction:: stellar_sdk.sep.stellar_toml.fetch_stellar_toml_async
 
 SEP 0002: Federation protocol
 -----------------------------
 .. autofunction:: stellar_sdk.sep.federation.resolve_stellar_address
+.. autofunction:: stellar_sdk.sep.federation.resolve_stellar_address_async
+.. autofunction:: stellar_sdk.sep.federation.resolve_account_id_async
 .. autofunction:: stellar_sdk.sep.federation.resolve_account_id
 .. autoclass:: stellar_sdk.sep.federation.FederationRecord
    :members:

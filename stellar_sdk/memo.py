@@ -181,7 +181,7 @@ class HashMemo(Memo):
                 f"The length of HashMemo should be 32 bytes, got {length} bytes."
             )
 
-        self.memo_hash: bytes = memo_hash  # type: ignore[assignment]
+        self.memo_hash: bytes = memo_hash
 
     @classmethod
     def from_xdr_object(cls, xdr_object: stellar_xdr.Memo) -> "HashMemo":
@@ -225,7 +225,7 @@ class ReturnHashMemo(Memo):
                 f"The length of ReturnHashMemo should be 32 bytes, got {length} bytes."
             )
 
-        self.memo_return: bytes = memo_return  # type: ignore[assignment]
+        self.memo_return: bytes = memo_return
 
     @classmethod
     def from_xdr_object(cls, xdr_object: stellar_xdr.Memo) -> "ReturnHashMemo":
