@@ -659,11 +659,11 @@
         },
         "pytest-httpserver": {
             "hashes": [
-                "sha256:3b2663b539849a2e5bd7d7f380a99b19c4650e154581af699ad6431b5424cacc",
-                "sha256:e359c5722ce2bd3bb68f4606f57d5c846e52bf7c748a70de4a3097bb91006089"
+                "sha256:2701fd1d9814d58551f9d1044db335c6ba9873169366c58349523a58cf74ed40",
+                "sha256:6d2be45b784125d5e1788689bc2239426b59ff9896cad7fa826d2c3912416f4b"
             ],
             "index": "pypi",
-            "version": "==1.0.1"
+            "version": "==1.0.2"
         },
         "pytest-timeout": {
             "hashes": [
