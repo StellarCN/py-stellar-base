@@ -12,6 +12,7 @@ from .exceptions import (
     TypeError,
     ValueError,
 )
+from .type_checked import type_checked
 
 __all__ = ["StrKey"]
 
@@ -24,6 +25,7 @@ _version_bytes = {
 }
 
 
+@type_checked
 class StrKey:
     """StrKey is a helper class that allows encoding and decoding strkey."""
 
@@ -210,6 +212,7 @@ class StrKey:
         return muxed
 
 
+@type_checked
 def decode_check(version_byte_name: str, encoded: str) -> bytes:
     encoded_data = _bytes_from_decode_data(encoded)
     encoded_data = encoded_data + b"=" * ((4 - len(encoded_data) % 4) % 4)
@@ -246,6 +249,7 @@ def decode_check(version_byte_name: str, encoded: str) -> bytes:
     return data
 
 
+@type_checked
 def encode_check(version_byte_name: str, data: bytes) -> str:
     if data is None:
         raise ValueError("cannot encode null data")
@@ -261,6 +265,7 @@ def encode_check(version_byte_name: str, data: bytes) -> str:
     return base64.b32encode(payload + crc).decode("utf-8").rstrip("=")
 
 
+@type_checked
 def is_valid(version_byte_name: str, encoded: str) -> bool:
     if encoded and len(encoded) != 56:
         return False
@@ -273,6 +278,7 @@ def is_valid(version_byte_name: str, encoded: str) -> bool:
     return True
 
 
+@type_checked
 def _bytes_from_decode_data(s: Union[str, bytes, bytearray]) -> bytes:
     """copy from base64._bytes_from_decode_data"""
     bytes_types = (bytes, bytearray)  # Types acceptable as binary data
@@ -292,10 +298,10 @@ def _bytes_from_decode_data(s: Union[str, bytes, bytearray]) -> bytes:
         ) from None
 
 
-def _calculate_checksum(payload):
+@type_checked
+def _calculate_checksum(payload: bytes) -> bytes:
     # memo note: https://gist.github.com/manran/a8357808ef71415d266dc64f0079f298
     # This code calculates CRC16-XModem checksum of payload
     checksum = binascii.crc_hqx(payload, 0)
     # Ensure that the checksum is in LSB order.
-    checksum = struct.pack("<H", checksum)
-    return checksum
+    return struct.pack("<H", checksum)

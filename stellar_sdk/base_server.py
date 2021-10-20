@@ -37,22 +37,13 @@ from .operation import (
 from .sep.exceptions import AccountRequiresMemoError
 from .transaction import Transaction
 from .transaction_envelope import TransactionEnvelope
+from .type_checked import type_checked
 
 __all__ = ["BaseServer"]
 
 
+@type_checked
 class BaseServer:
-    """Server handles the network connection to a `Horizon <https://www.stellar.org/developers/horizon/reference/>`_
-    instance and exposes an interface for requests to that instance.
-
-    Here we need to talk about the **client** parameter, if you do not specify the client, we will use
-    the :class:`stellar_sdk.client.requests_client.RequestsClient` instance by default, it is a synchronous HTTPClient,
-    you can also specify an asynchronous HTTP Client,
-    for example: :class:`stellar_sdk.client.aiohttp_client.AiohttpClient`. If you use a synchronous client,
-    then all requests are synchronous. If you use an asynchronous client,
-    then all requests are asynchronous. The choice is in your hands.
-    """
-
     def submit_transaction(
         self,
         transaction_envelope: Union[
@@ -64,6 +55,7 @@ class BaseServer:
 
         :param transaction_envelope: :class:`stellar_sdk.transaction_envelope.TransactionEnvelope` object
             or base64 encoded xdr
+        :param skip_memo_required_check: Allow skipping memo
         :return: the response from horizon
         :raises:
             :exc:`ConnectionError <stellar_sdk.exceptions.ConnectionError>`

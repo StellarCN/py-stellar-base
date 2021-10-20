@@ -126,7 +126,10 @@ class TestStellarWebAuthentication:
         home_domain = "example.com"
         web_auth_domain = "auth.example.com"
 
-        with pytest.raises(ValueError, match="memo must be an integer"):
+        with pytest.raises(
+            TypeError,
+            match=r'type of argument "memo" must be one of \(int, NoneType\); got str instead',
+        ):
             build_challenge_transaction(
                 server_secret=server_kp.secret,
                 client_account_id=client_account_id,
@@ -611,7 +614,7 @@ class TestStellarWebAuthentication:
                 challenge_tx_signed,
                 server_kp.public_key,
                 home_domain,
-                web_auth_domain,
+                "",
                 network_passphrase,
             )
 

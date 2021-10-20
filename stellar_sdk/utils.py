@@ -13,6 +13,7 @@ from .exceptions import (
     ValueError,
 )
 from .strkey import StrKey
+from .type_checked import type_checked
 
 MUXED_ACCOUNT_STARTING_LETTER: str = "M"
 ED25519_PUBLIC_KEY_STARTING_LETTER: str = "G"
@@ -21,10 +22,12 @@ _UPPER_LIMIT = "922337203685.4775807"
 _EXPONENT = 7
 
 
+@type_checked
 def sha256(data: bytes) -> bytes:
     return hashlib.sha256(data).digest()
 
 
+@type_checked
 def best_rational_approximation(x) -> Dict[str, int]:
     x = Decimal(x)
     int32_max = Decimal(2147483647)
@@ -51,6 +54,7 @@ def best_rational_approximation(x) -> Dict[str, int]:
     return {"n": int(n), "d": int(d)}
 
 
+@type_checked
 def hex_to_bytes(hex_string: Union[str, bytes]) -> bytes:
     if isinstance(hex_string, bytes):
         return hex_string
@@ -59,6 +63,7 @@ def hex_to_bytes(hex_string: Union[str, bytes]) -> bytes:
     raise TypeError("`hex_string` should be a 32 byte hash or hex encoded string.")
 
 
+@type_checked
 def convert_assets_to_horizon_param(assets: List[Asset]) -> str:
     assets_string = []
     for asset in assets:
@@ -69,7 +74,8 @@ def convert_assets_to_horizon_param(assets: List[Asset]) -> str:
     return ",".join(assets_string)
 
 
-def urljoin_with_query(base: str, path: str) -> str:
+@type_checked
+def urljoin_with_query(base: str, path: Optional[str]) -> str:
     split_url = urlsplit(base)
     query = split_url.query
     real_path = split_url.path
@@ -81,6 +87,7 @@ def urljoin_with_query(base: str, path: str) -> str:
     return url
 
 
+@type_checked
 def is_valid_hash(data: str) -> bool:
     if not data:
         return False
@@ -88,6 +95,7 @@ def is_valid_hash(data: str) -> bool:
     return bool(asset_code_re.match(data))
 
 
+@type_checked
 def raise_if_not_valid_ed25519_public_key(value: str, argument_name: str) -> None:
     try:
         StrKey.decode_ed25519_public_key(value)
@@ -97,6 +105,7 @@ def raise_if_not_valid_ed25519_public_key(value: str, argument_name: str) -> Non
         ) from e
 
 
+@type_checked
 def raise_if_not_valid_sha256_hash_key(value: str, argument_name: str) -> None:
     try:
         StrKey.decode_sha256_hash(value)
@@ -106,6 +115,7 @@ def raise_if_not_valid_sha256_hash_key(value: str, argument_name: str) -> None:
         ) from e
 
 
+@type_checked
 def raise_if_not_valid_pre_auth_tx_key(value: str, argument_name: str) -> None:
     try:
         StrKey.decode_pre_auth_tx(value)
@@ -115,6 +125,7 @@ def raise_if_not_valid_pre_auth_tx_key(value: str, argument_name: str) -> None:
         ) from e
 
 
+@type_checked
 def raise_if_not_valid_muxed_account(value: str, argument_name: str) -> None:
     try:
         StrKey.decode_muxed_account(value)
@@ -124,6 +135,7 @@ def raise_if_not_valid_muxed_account(value: str, argument_name: str) -> None:
         ) from e
 
 
+@type_checked
 def raise_if_not_valid_amount(value: str, argument_name: str) -> None:
     amount = Decimal(value)
     if abs(amount.as_tuple().exponent) > _EXPONENT:
@@ -137,6 +149,7 @@ def raise_if_not_valid_amount(value: str, argument_name: str) -> None:
         )
 
 
+@type_checked
 def raise_if_not_valid_hash(value: str, argument_name: str) -> None:
     if not is_valid_hash(value):
         raise ValueError(
@@ -144,6 +157,7 @@ def raise_if_not_valid_hash(value: str, argument_name: str) -> None:
         )
 
 
+@type_checked
 def raise_if_not_valid_balance_id(value: str, argument_name: str) -> None:
     if len(value) != 72 or value[:8] != "00000000" or not is_valid_hash(value[8:]):
         raise ValueError(
@@ -151,6 +165,7 @@ def raise_if_not_valid_balance_id(value: str, argument_name: str) -> None:
         )
 
 
+@type_checked
 def raise_if_not_valid_operation_source(source: Optional[str]) -> None:
     if source is not None:
         raise_if_not_valid_muxed_account(source, "source")

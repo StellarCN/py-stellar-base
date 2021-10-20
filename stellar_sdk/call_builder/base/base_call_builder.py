@@ -9,9 +9,12 @@ from typing import (
     Union,
 )
 
+from ...type_checked import type_checked
+
 __all__ = ["BaseCallBuilder"]
 
 
+@type_checked
 class BaseCallBuilder:
     """Creates a new :class:`BaseCallBuilder` pointed to server defined by horizon_url.
 
@@ -66,7 +69,7 @@ class BaseCallBuilder:
     def prev(self):
         raise NotImplementedError
 
-    def cursor(self, cursor: Union):
+    def cursor(self, cursor: Union[int, str]):
         """Sets ``cursor`` parameter for the current call. Returns the CallBuilder object on which this method has been called.
 
         See `Paging <https://www.stellar.org/developers/horizon/reference/paging.html>`__

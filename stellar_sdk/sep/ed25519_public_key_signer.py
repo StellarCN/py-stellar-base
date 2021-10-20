@@ -1,3 +1,7 @@
+from ..type_checked import type_checked
+
+
+@type_checked
 class Ed25519PublicKeySigner:
     def __init__(self, account_id: str, weight: int = 0) -> None:
         """The :class:`Signer` object, which represents represents the signer for the client account.

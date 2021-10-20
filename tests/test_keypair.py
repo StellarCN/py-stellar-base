@@ -220,16 +220,15 @@ class TestKeypair:
         mnemonic_phrase = Keypair.generate_mnemonic_phrase(language, strength)
         assert len(mnemonic_phrase.split(" ")) == length
 
-    @pytest.mark.parametrize("language", ["test", 123])
-    def test_generate_mnemonic_phrase_language_raise(self, language):
+    def test_generate_mnemonic_phrase_language_raise(self):
         with pytest.raises(ValueError, match="This language is not supported."):
-            Keypair.generate_mnemonic_phrase(language)
+            Keypair.generate_mnemonic_phrase("unsupported_language")
 
     def test_generate_mnemonic_phrase_strength_raise(self):
         strength = 1024
         with pytest.raises(
             ValueError,
-            match="Strength should be one of the following \(128, 160, 192, 224, 256\), but it is not \(%d\)."
+            match=r"Strength should be one of the following \(128, 160, 192, 224, 256\), but it is not \(%d\)."
             % strength,
         ):
             Keypair.generate_mnemonic_phrase(strength=strength)

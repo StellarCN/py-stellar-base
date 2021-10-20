@@ -1,10 +1,12 @@
 from ...call_builder.base import BaseLiquidityPoolsBuilder
 from ...call_builder.call_builder_sync.base_call_builder import BaseCallBuilder
 from ...client.base_sync_client import BaseSyncClient
+from ...type_checked import type_checked
 
 __all__ = ["LiquidityPoolsBuilder"]
 
 
+@type_checked
 class LiquidityPoolsBuilder(BaseCallBuilder, BaseLiquidityPoolsBuilder):
     """Creates a new :class:`LiquidityPoolsBuilder` pointed to server defined by horizon_url.
     Do not create this object directly, use :func:`stellar_sdk.Server.liquidity_pools`.

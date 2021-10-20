@@ -5,10 +5,12 @@ from . import xdr as stellar_xdr
 from .base_transaction_envelope import BaseTransactionEnvelope
 from .decorated_signature import DecoratedSignature
 from .fee_bump_transaction import FeeBumpTransaction
+from .type_checked import type_checked
 
 __all__ = ["FeeBumpTransactionEnvelope"]
 
 
+@type_checked
 class FeeBumpTransactionEnvelope(BaseTransactionEnvelope["FeeBumpTransactionEnvelope"]):
     """The :class:`FeeBumpTransactionEnvelope` object, which represents a transaction
     envelope ready to sign and submit to send over the network.

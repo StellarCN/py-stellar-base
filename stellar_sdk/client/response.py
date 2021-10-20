@@ -1,8 +1,11 @@
 import json
 
+from ..type_checked import type_checked
+
 __all__ = ["Response"]
 
 
+@type_checked
 class Response:
     """The :class:`Response <Response>` object, which contains a
     server's response to an HTTP request.

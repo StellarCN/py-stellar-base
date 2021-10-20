@@ -24,11 +24,20 @@ class TestLiquidityPoolAsset:
             (1, asset_b, fee, "`asset_a` is invalid."),
             (asset_a, None, fee, "`asset_b` is invalid."),
             (asset_a, 1, fee, "`asset_b` is invalid."),
+        ],
+    )
+    def test_init_type_error_raise(self, asset_a, asset_b, fee, msg):
+        with pytest.raises(TypeError):
+            LiquidityPoolAsset(asset_a, asset_b, fee)
+
+    @pytest.mark.parametrize(
+        "asset_a, asset_b, fee, msg",
+        [
             (asset_b, asset_a, fee, "Assets are not in lexicographic order."),
             (asset_a, asset_b, fee + 10, "`fee` is invalid."),
         ],
     )
-    def test_init_raise(self, asset_a, asset_b, fee, msg):
+    def test_init_type_error_raise(self, asset_a, asset_b, fee, msg):
         with pytest.raises(ValueError, match=msg):
             LiquidityPoolAsset(asset_a, asset_b, fee)
 
@@ -87,7 +96,7 @@ class TestLiquidityPoolAsset:
     def test_from_xdr_with_asset_xdr_raise(self, asset_code, asset_issuer, asset_type):
         asset = Asset(asset_code, asset_issuer)
         with pytest.raises(ValueError, match=f"Unexpected asset type: {asset_type}"):
-            LiquidityPoolAsset.from_xdr_object(asset.to_xdr_object())
+            LiquidityPoolAsset.from_xdr_object(asset.to_change_trust_asset_xdr_object())
 
     xlm = Asset.native()
     anum4 = Asset("USD", "GCEZWKCA5VLDNRLN3RPRJMRZOX3Z6G5CHCGSNFHEYVXM3XOJMDS674JZ")

@@ -55,14 +55,6 @@ class TestUtils:
     def test_hex_to_bytes(self, input_value, except_return):
         assert hex_to_bytes(input_value) == except_return
 
-    @pytest.mark.parametrize("input_value", [12, None])
-    def test_hex_to_bytes_type_raise(self, input_value):
-        with pytest.raises(
-            TypeError,
-            match="`hex_string` should be a 32 byte hash or hex encoded string.",
-        ):
-            hex_to_bytes(input_value)
-
     @pytest.mark.parametrize(
         "base, path, output",
         [
@@ -130,7 +122,6 @@ class TestUtils:
         "data, result",
         [
             ("", False),
-            (None, False),
             ("abc", False),
             (
                 "dd7b1ab831c273310ddbec6f97870aa83c2fbd78ce22aded37ecbf4f3380fac7d",

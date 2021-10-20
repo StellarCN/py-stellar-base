@@ -8,6 +8,7 @@ from ..exceptions import ValueError
 from ..keypair import Keypair
 from ..muxed_account import MuxedAccount
 from ..strkey import StrKey
+from ..type_checked import type_checked
 from ..utils import raise_if_not_valid_amount, raise_if_not_valid_ed25519_public_key
 from .operation import Operation
 
@@ -25,6 +26,7 @@ class ClaimPredicateType(IntEnum):
     CLAIM_PREDICATE_BEFORE_RELATIVE_TIME = 5
 
 
+@type_checked
 class ClaimPredicateGroup:
     """Used to assemble the left and right values for and_predicates and or_predicates.
 
@@ -45,6 +47,7 @@ class ClaimPredicateGroup:
         return f"<ClaimPredicateGroup [left={self.left}, right={self.right}]>"
 
 
+@type_checked
 class ClaimPredicate:
     """The :class:`ClaimPredicate` object, which represents a ClaimPredicate on Stellar's network.
 
@@ -306,6 +309,7 @@ class ClaimPredicate:
         )
 
 
+@type_checked
 class Claimant:
     """The :class:`Claimant` object represents a claimable balance claimant.
 
@@ -354,6 +358,7 @@ class Claimant:
         )
 
 
+@type_checked
 class CreateClaimableBalance(Operation):
     """The :class:`CreateClaimableBalance` object, which represents a CreateClaimableBalance
     operation on Stellar's network.

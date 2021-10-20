@@ -12,7 +12,7 @@ from stellar_sdk import (
     MuxedAccount,
     Price,
 )
-from stellar_sdk.exceptions import AssetCodeInvalidError, Ed25519PublicKeyInvalidError
+from stellar_sdk.exceptions import Ed25519PublicKeyInvalidError
 from stellar_sdk.operation import CreateAccount, Operation
 from stellar_sdk.operation.account_merge import AccountMerge
 from stellar_sdk.operation.allow_trust import AllowTrust, TrustLineEntryFlag
@@ -36,13 +36,9 @@ from stellar_sdk.operation.manage_sell_offer import ManageSellOffer
 from stellar_sdk.operation.path_payment_strict_receive import PathPaymentStrictReceive
 from stellar_sdk.operation.path_payment_strict_send import PathPaymentStrictSend
 from stellar_sdk.operation.payment import Payment
-from stellar_sdk.operation.revoke_sponsorship import (
-    Data,
-    Offer,
-    RevokeSponsorship,
-    Signer,
-    TrustLine,
-)
+from stellar_sdk.operation.revoke_sponsorship import Data, Offer, RevokeSponsorship
+from stellar_sdk.operation.revoke_sponsorship import Signer as RevokeSponsorshipSigner
+from stellar_sdk.operation.revoke_sponsorship import TrustLine
 from stellar_sdk.operation.set_options import AuthorizationFlag, SetOptions
 from stellar_sdk.operation.set_trust_line_flags import SetTrustLineFlags, TrustLineFlags
 from stellar_sdk.signer import Signer
@@ -70,9 +66,7 @@ class TestBaseOperation:
             (
                 10,
                 TypeError,
-                "Value of type '{}' must be of type {} or {}, but got {}.".format(
-                    10, str, Decimal, type(10)
-                ),
+                'type of argument "value" must be one of \\(str, decimal.Decimal\\); got int instead',
             ),
             (
                 "-0.1",
@@ -927,7 +921,8 @@ class TestManageData:
     def test_to_xdr_obj_with_invalid_value_raise(self, name, value):
         source = "GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV"
         with pytest.raises(
-            ValueError, match=r"Data and value should be <= 64 bytes \(ascii encoded\)."
+            ValueError,
+            match="Data and value should be <= 64 bytes \\(ascii encoded\\).",
         ):
             ManageData(name, value, source)
 
@@ -1443,9 +1438,15 @@ class TestRevokeSponsorship:
         account2 = "GB2DRLHCWHUCB2BS4IRRY2GBQKVAKEXOU2EMTMLSUOXVNMZY7W6BSGZ7"
         signer1 = SignerKey.ed25519_public_key(account1)
         signer2 = SignerKey.ed25519_public_key(account2)
-        assert Signer(account1, signer1) == Signer(account1, signer1)
-        assert Signer(account1, signer1) != Signer(account1, signer2)
-        assert Signer(account1, signer1) != Signer(account2, signer1)
+        assert RevokeSponsorshipSigner(account1, signer1) == RevokeSponsorshipSigner(
+            account1, signer1
+        )
+        assert RevokeSponsorshipSigner(account1, signer1) != RevokeSponsorshipSigner(
+            account1, signer2
+        )
+        assert RevokeSponsorshipSigner(account1, signer1) != RevokeSponsorshipSigner(
+            account2, signer1
+        )
 
 
 class TestClaimPredicate:
@@ -1536,18 +1537,18 @@ class TestClaimPredicate:
         assert predicate == ClaimPredicate.from_xdr_object(xdr_object)
 
     def test_predicate_invalid_type_raise(self):
-        predicate = ClaimPredicate(
-            claim_predicate_type="invalid",
-            and_predicates=None,
-            or_predicates=None,
-            not_predicate=None,
-            abs_before=None,
-            rel_before=1,
-        )
         with pytest.raises(
-            ValueError, match=f"invalid is not a valid ClaimPredicateType."
+            TypeError,
+            match='type of argument "claim_predicate_type" must be stellar_sdk.operation.create_claimable_balance.ClaimPredicateType; got str instead',
         ):
-            predicate.to_xdr_object()
+            ClaimPredicate(
+                claim_predicate_type="invalid",
+                and_predicates=None,
+                or_predicates=None,
+                not_predicate=None,
+                abs_before=None,
+                rel_before=1,
+            )
 
 
 class TestClaimant:

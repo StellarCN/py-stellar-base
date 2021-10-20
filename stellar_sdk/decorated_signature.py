@@ -1,8 +1,10 @@
 from . import xdr as stellar_xdr
+from .type_checked import type_checked
 
 __all__ = ["DecoratedSignature"]
 
 
+@type_checked
 class DecoratedSignature:
     def __init__(
         self,

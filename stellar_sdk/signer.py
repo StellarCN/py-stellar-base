@@ -1,9 +1,11 @@
 from . import xdr as stellar_xdr
 from .signer_key import SignerKey
+from .type_checked import type_checked
 
 __all__ = ["Signer"]
 
 
+@type_checked
 class Signer:
     """The :class:`Signer` object, which represents an account signer on Stellar's network.
 
