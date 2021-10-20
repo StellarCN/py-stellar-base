@@ -4,6 +4,7 @@ import base64
 from xdrlib import Packer, Unpacker
 
 from ..exceptions import ValueError
+from ..type_checked import type_checked
 from .envelope_type import EnvelopeType
 from .fee_bump_transaction_envelope import FeeBumpTransactionEnvelope
 from .transaction_v0_envelope import TransactionV0Envelope
@@ -12,6 +13,7 @@ from .transaction_v1_envelope import TransactionV1Envelope
 __all__ = ["TransactionEnvelope"]
 
 
+@type_checked
 class TransactionEnvelope:
     """
     XDR Source Code

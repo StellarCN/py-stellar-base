@@ -4,6 +4,7 @@ import base64
 from xdrlib import Packer, Unpacker
 
 from ..exceptions import ValueError
+from ..type_checked import type_checked
 from .asset import Asset
 from .path_payment_strict_receive_result_code import PathPaymentStrictReceiveResultCode
 from .path_payment_strict_receive_result_success import (
@@ -13,6 +14,7 @@ from .path_payment_strict_receive_result_success import (
 __all__ = ["PathPaymentStrictReceiveResult"]
 
 
+@type_checked
 class PathPaymentStrictReceiveResult:
     """
     XDR Source Code

@@ -4,6 +4,7 @@ import base64
 from xdrlib import Packer, Unpacker
 
 from ..exceptions import ValueError
+from ..type_checked import type_checked
 from .alpha_num4 import AlphaNum4
 from .alpha_num12 import AlphaNum12
 from .asset_type import AssetType
@@ -12,6 +13,7 @@ from .liquidity_pool_parameters import LiquidityPoolParameters
 __all__ = ["ChangeTrustAsset"]
 
 
+@type_checked
 class ChangeTrustAsset:
     """
     XDR Source Code

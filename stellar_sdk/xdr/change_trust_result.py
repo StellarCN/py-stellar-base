@@ -3,11 +3,13 @@
 import base64
 from xdrlib import Packer, Unpacker
 
+from ..type_checked import type_checked
 from .change_trust_result_code import ChangeTrustResultCode
 
 __all__ = ["ChangeTrustResult"]
 
 
+@type_checked
 class ChangeTrustResult:
     """
     XDR Source Code

@@ -3,12 +3,14 @@
 import base64
 from xdrlib import Packer, Unpacker
 
+from ..type_checked import type_checked
 from .uint64 import Uint64
 from .uint256 import Uint256
 
 __all__ = ["MuxedAccountMed25519"]
 
 
+@type_checked
 class MuxedAccountMed25519:
     """
     XDR Source Code

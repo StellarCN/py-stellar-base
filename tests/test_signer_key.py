@@ -1,10 +1,7 @@
-import pytest
-
 import stellar_sdk
 import stellar_sdk.xdr
 from stellar_sdk import SignerKey, SignerKeyType
 from stellar_sdk import xdr as stellar_xdr
-from stellar_sdk.exceptions import ValueError
 
 
 class TestSignerKey:
@@ -52,14 +49,3 @@ class TestSignerKey:
         assert SignerKey.from_xdr_object(signer_key_xdr) == signer_key
         assert SignerKey.sha256_hash(sha256_hash) == signer_key
         assert SignerKey.sha256_hash(signer_key_data) == signer_key
-
-    def test_from_xdr_object_invalid_signer_type_raise(self):
-        signer_key_data = b"\x85\xba{e\xeb\x92\x83r\xb2\xf5\xc4Z$\xc2\x84b\xc6\x8a\xa6\x04\x86dg$x6\x0c\xeb\x9aW\x13W"
-        signer_key_xdr = stellar_xdr.SignerKey(
-            type="Invalid", hash_x=stellar_sdk.xdr.Uint256(signer_key_data)
-        )
-        with pytest.raises(
-            ValueError,
-            match=f"This is an unknown signer key type, please consider creating an issuer at {stellar_sdk.__issues__}.",
-        ):
-            SignerKey.from_xdr_object(signer_key_xdr)

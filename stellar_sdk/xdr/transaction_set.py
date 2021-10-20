@@ -5,12 +5,14 @@ from typing import List
 from xdrlib import Packer, Unpacker
 
 from ..exceptions import ValueError
+from ..type_checked import type_checked
 from .hash import Hash
 from .transaction_envelope import TransactionEnvelope
 
 __all__ = ["TransactionSet"]
 
 
+@type_checked
 class TransactionSet:
     """
     XDR Source Code

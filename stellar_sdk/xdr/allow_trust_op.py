@@ -3,6 +3,7 @@
 import base64
 from xdrlib import Packer, Unpacker
 
+from ..type_checked import type_checked
 from .account_id import AccountID
 from .asset_code import AssetCode
 from .uint32 import Uint32
@@ -10,6 +11,7 @@ from .uint32 import Uint32
 __all__ = ["AllowTrustOp"]
 
 
+@type_checked
 class AllowTrustOp:
     """
     XDR Source Code

@@ -3,6 +3,7 @@
 import base64
 from xdrlib import Packer, Unpacker
 
+from ..type_checked import type_checked
 from .transaction_history_entry_ext import TransactionHistoryEntryExt
 from .transaction_set import TransactionSet
 from .uint32 import Uint32
@@ -10,6 +11,7 @@ from .uint32 import Uint32
 __all__ = ["TransactionHistoryEntry"]
 
 
+@type_checked
 class TransactionHistoryEntry:
     """
     XDR Source Code

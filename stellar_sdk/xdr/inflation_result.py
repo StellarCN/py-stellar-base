@@ -5,12 +5,14 @@ from typing import List
 from xdrlib import Packer, Unpacker
 
 from ..exceptions import ValueError
+from ..type_checked import type_checked
 from .inflation_payout import InflationPayout
 from .inflation_result_code import InflationResultCode
 
 __all__ = ["InflationResult"]
 
 
+@type_checked
 class InflationResult:
     """
     XDR Source Code

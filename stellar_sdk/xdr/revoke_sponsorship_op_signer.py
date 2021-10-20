@@ -3,12 +3,14 @@
 import base64
 from xdrlib import Packer, Unpacker
 
+from ..type_checked import type_checked
 from .account_id import AccountID
 from .signer_key import SignerKey
 
 __all__ = ["RevokeSponsorshipOpSigner"]
 
 
+@type_checked
 class RevokeSponsorshipOpSigner:
     """
     XDR Source Code

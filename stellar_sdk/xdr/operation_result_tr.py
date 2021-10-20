@@ -4,6 +4,7 @@ import base64
 from xdrlib import Packer, Unpacker
 
 from ..exceptions import ValueError
+from ..type_checked import type_checked
 from .account_merge_result import AccountMergeResult
 from .allow_trust_result import AllowTrustResult
 from .begin_sponsoring_future_reserves_result import BeginSponsoringFutureReservesResult
@@ -32,6 +33,7 @@ from .set_trust_line_flags_result import SetTrustLineFlagsResult
 __all__ = ["OperationResultTr"]
 
 
+@type_checked
 class OperationResultTr:
     """
     XDR Source Code

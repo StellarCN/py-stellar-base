@@ -4,12 +4,14 @@ import base64
 from xdrlib import Packer, Unpacker
 
 from ..exceptions import ValueError
+from ..type_checked import type_checked
 from .public_key_type import PublicKeyType
 from .uint256 import Uint256
 
 __all__ = ["PublicKey"]
 
 
+@type_checked
 class PublicKey:
     """
     XDR Source Code

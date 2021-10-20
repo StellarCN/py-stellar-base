@@ -3,12 +3,14 @@
 import base64
 from xdrlib import Packer, Unpacker
 
+from ..type_checked import type_checked
 from .account_id import AccountID
 from .asset_code4 import AssetCode4
 
 __all__ = ["AlphaNum4"]
 
 
+@type_checked
 class AlphaNum4:
     """
     XDR Source Code

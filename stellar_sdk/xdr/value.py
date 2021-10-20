@@ -3,11 +3,13 @@
 import base64
 from xdrlib import Packer, Unpacker
 
+from ..type_checked import type_checked
 from .base import Opaque
 
 __all__ = ["Value"]
 
 
+@type_checked
 class Value:
     """
     XDR Source Code

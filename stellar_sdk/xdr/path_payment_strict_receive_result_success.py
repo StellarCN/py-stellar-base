@@ -5,12 +5,14 @@ from typing import List
 from xdrlib import Packer, Unpacker
 
 from ..exceptions import ValueError
+from ..type_checked import type_checked
 from .claim_atom import ClaimAtom
 from .simple_payment_result import SimplePaymentResult
 
 __all__ = ["PathPaymentStrictReceiveResultSuccess"]
 
 
+@type_checked
 class PathPaymentStrictReceiveResultSuccess:
     """
     XDR Source Code

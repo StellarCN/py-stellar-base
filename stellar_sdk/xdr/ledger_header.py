@@ -5,6 +5,7 @@ from typing import List
 from xdrlib import Packer, Unpacker
 
 from ..exceptions import ValueError
+from ..type_checked import type_checked
 from .hash import Hash
 from .int64 import Int64
 from .ledger_header_ext import LedgerHeaderExt
@@ -15,6 +16,7 @@ from .uint64 import Uint64
 __all__ = ["LedgerHeader"]
 
 
+@type_checked
 class LedgerHeader:
     """
     XDR Source Code

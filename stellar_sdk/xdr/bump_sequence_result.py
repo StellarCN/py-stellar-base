@@ -3,11 +3,13 @@
 import base64
 from xdrlib import Packer, Unpacker
 
+from ..type_checked import type_checked
 from .bump_sequence_result_code import BumpSequenceResultCode
 
 __all__ = ["BumpSequenceResult"]
 
 
+@type_checked
 class BumpSequenceResult:
     """
     XDR Source Code

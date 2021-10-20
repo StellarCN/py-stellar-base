@@ -4,12 +4,14 @@ import base64
 from xdrlib import Packer, Unpacker
 
 from ..exceptions import ValueError
+from ..type_checked import type_checked
 from .liquidity_pool_entry_constant_product import LiquidityPoolEntryConstantProduct
 from .liquidity_pool_type import LiquidityPoolType
 
 __all__ = ["LiquidityPoolEntryBody"]
 
 
+@type_checked
 class LiquidityPoolEntryBody:
     """
     XDR Source Code

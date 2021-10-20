@@ -5,6 +5,7 @@ from typing import List
 from xdrlib import Packer, Unpacker
 
 from ..exceptions import ValueError
+from ..type_checked import type_checked
 from .asset import Asset
 from .int64 import Int64
 from .muxed_account import MuxedAccount
@@ -12,6 +13,7 @@ from .muxed_account import MuxedAccount
 __all__ = ["PathPaymentStrictReceiveOp"]
 
 
+@type_checked
 class PathPaymentStrictReceiveOp:
     """
     XDR Source Code

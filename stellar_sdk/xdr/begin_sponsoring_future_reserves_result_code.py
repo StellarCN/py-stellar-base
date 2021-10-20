@@ -6,10 +6,12 @@ from xdrlib import Packer, Unpacker
 
 from ..__version__ import __issues__
 from ..exceptions import ValueError
+from ..type_checked import type_checked
 
 __all__ = ["BeginSponsoringFutureReservesResultCode"]
 
 
+@type_checked
 class BeginSponsoringFutureReservesResultCode(IntEnum):
     """
     XDR Source Code

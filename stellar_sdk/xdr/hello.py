@@ -3,6 +3,7 @@
 import base64
 from xdrlib import Packer, Unpacker
 
+from ..type_checked import type_checked
 from .auth_cert import AuthCert
 from .base import Integer, String
 from .hash import Hash
@@ -13,6 +14,7 @@ from .uint256 import Uint256
 __all__ = ["Hello"]
 
 
+@type_checked
 class Hello:
     """
     XDR Source Code

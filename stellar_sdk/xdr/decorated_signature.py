@@ -3,12 +3,14 @@
 import base64
 from xdrlib import Packer, Unpacker
 
+from ..type_checked import type_checked
 from .signature import Signature
 from .signature_hint import SignatureHint
 
 __all__ = ["DecoratedSignature"]
 
 
+@type_checked
 class DecoratedSignature:
     """
     XDR Source Code

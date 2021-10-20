@@ -4,12 +4,14 @@ import base64
 from xdrlib import Packer, Unpacker
 
 from ..exceptions import ValueError
+from ..type_checked import type_checked
 from .authenticated_message_v0 import AuthenticatedMessageV0
 from .uint32 import Uint32
 
 __all__ = ["AuthenticatedMessage"]
 
 
+@type_checked
 class AuthenticatedMessage:
     """
     XDR Source Code

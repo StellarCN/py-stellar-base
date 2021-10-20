@@ -4,12 +4,14 @@ import base64
 from typing import Optional
 from xdrlib import Packer, Unpacker
 
+from ..type_checked import type_checked
 from .data_value import DataValue
 from .string64 import String64
 
 __all__ = ["ManageDataOp"]
 
 
+@type_checked
 class ManageDataOp:
     """
     XDR Source Code

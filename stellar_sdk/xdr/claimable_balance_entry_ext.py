@@ -4,12 +4,14 @@ import base64
 from xdrlib import Packer, Unpacker
 
 from ..exceptions import ValueError
+from ..type_checked import type_checked
 from .base import Integer
 from .claimable_balance_entry_extension_v1 import ClaimableBalanceEntryExtensionV1
 
 __all__ = ["ClaimableBalanceEntryExt"]
 
 
+@type_checked
 class ClaimableBalanceEntryExt:
     """
     XDR Source Code

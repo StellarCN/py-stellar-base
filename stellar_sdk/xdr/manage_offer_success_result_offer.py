@@ -4,12 +4,14 @@ import base64
 from xdrlib import Packer, Unpacker
 
 from ..exceptions import ValueError
+from ..type_checked import type_checked
 from .manage_offer_effect import ManageOfferEffect
 from .offer_entry import OfferEntry
 
 __all__ = ["ManageOfferSuccessResultOffer"]
 
 
+@type_checked
 class ManageOfferSuccessResultOffer:
     """
     XDR Source Code

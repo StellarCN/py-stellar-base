@@ -4,12 +4,14 @@ import base64
 from xdrlib import Packer, Unpacker
 
 from ..exceptions import ValueError
+from ..type_checked import type_checked
 from .base import Integer
 from .scp_history_entry_v0 import SCPHistoryEntryV0
 
 __all__ = ["SCPHistoryEntry"]
 
 
+@type_checked
 class SCPHistoryEntry:
     """
     XDR Source Code

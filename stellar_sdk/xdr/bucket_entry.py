@@ -4,6 +4,7 @@ import base64
 from xdrlib import Packer, Unpacker
 
 from ..exceptions import ValueError
+from ..type_checked import type_checked
 from .bucket_entry_type import BucketEntryType
 from .bucket_metadata import BucketMetadata
 from .ledger_entry import LedgerEntry
@@ -12,6 +13,7 @@ from .ledger_key import LedgerKey
 __all__ = ["BucketEntry"]
 
 
+@type_checked
 class BucketEntry:
     """
     XDR Source Code

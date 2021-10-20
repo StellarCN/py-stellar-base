@@ -4,6 +4,7 @@ import base64
 from xdrlib import Packer, Unpacker
 
 from ..exceptions import ValueError
+from ..type_checked import type_checked
 from .liquidity_pool_constant_product_parameters import (
     LiquidityPoolConstantProductParameters,
 )
@@ -12,6 +13,7 @@ from .liquidity_pool_type import LiquidityPoolType
 __all__ = ["LiquidityPoolParameters"]
 
 
+@type_checked
 class LiquidityPoolParameters:
     """
     XDR Source Code

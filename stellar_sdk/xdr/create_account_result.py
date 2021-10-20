@@ -3,11 +3,13 @@
 import base64
 from xdrlib import Packer, Unpacker
 
+from ..type_checked import type_checked
 from .create_account_result_code import CreateAccountResultCode
 
 __all__ = ["CreateAccountResult"]
 
 
+@type_checked
 class CreateAccountResult:
     """
     XDR Source Code

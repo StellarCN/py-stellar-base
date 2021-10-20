@@ -5,6 +5,7 @@ from typing import List
 from xdrlib import Packer, Unpacker
 
 from ..exceptions import ValueError
+from ..type_checked import type_checked
 from .ledger_header_history_entry import LedgerHeaderHistoryEntry
 from .scp_history_entry import SCPHistoryEntry
 from .transaction_result_meta import TransactionResultMeta
@@ -14,6 +15,7 @@ from .upgrade_entry_meta import UpgradeEntryMeta
 __all__ = ["LedgerCloseMetaV0"]
 
 
+@type_checked
 class LedgerCloseMetaV0:
     """
     XDR Source Code

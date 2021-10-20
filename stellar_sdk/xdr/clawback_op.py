@@ -3,6 +3,7 @@
 import base64
 from xdrlib import Packer, Unpacker
 
+from ..type_checked import type_checked
 from .asset import Asset
 from .int64 import Int64
 from .muxed_account import MuxedAccount
@@ -10,6 +11,7 @@ from .muxed_account import MuxedAccount
 __all__ = ["ClawbackOp"]
 
 
+@type_checked
 class ClawbackOp:
     """
     XDR Source Code

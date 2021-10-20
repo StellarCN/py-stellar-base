@@ -3,12 +3,14 @@
 import base64
 from xdrlib import Packer, Unpacker
 
+from ..type_checked import type_checked
 from .account_id import AccountID
 from .claim_predicate import ClaimPredicate
 
 __all__ = ["ClaimantV0"]
 
 
+@type_checked
 class ClaimantV0:
     """
     XDR Source Code

@@ -1,9 +1,12 @@
 from decimal import Context, Decimal, Inexact
 from typing import Union
 
+from ..type_checked import type_checked
+
 _ONE = Decimal(10 ** 7)
 
 
+@type_checked
 def to_xdr_amount(value: Union[str, Decimal]) -> int:
     """Converts an amount to the appropriate value to send over the network
     as a part of an XDR object.
@@ -27,10 +30,6 @@ def to_xdr_amount(value: Union[str, Decimal]) -> int:
         serialization.
 
     """
-    if not (isinstance(value, str) or isinstance(value, Decimal)):
-        raise TypeError(
-            f"Value of type '{value}' must be of type {str} or {Decimal}, but got {type(value)}."
-        )
     # throw exception if value * ONE has decimal places (it can't be represented as int64)
     try:
         amount = int(
@@ -50,6 +49,7 @@ def to_xdr_amount(value: Union[str, Decimal]) -> int:
     return amount
 
 
+@type_checked
 def from_xdr_amount(value: int) -> str:
     """Converts an str amount from an XDR amount object
 

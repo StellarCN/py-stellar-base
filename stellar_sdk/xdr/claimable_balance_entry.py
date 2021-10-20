@@ -5,6 +5,7 @@ from typing import List
 from xdrlib import Packer, Unpacker
 
 from ..exceptions import ValueError
+from ..type_checked import type_checked
 from .asset import Asset
 from .claimable_balance_entry_ext import ClaimableBalanceEntryExt
 from .claimable_balance_id import ClaimableBalanceID
@@ -14,6 +15,7 @@ from .int64 import Int64
 __all__ = ["ClaimableBalanceEntry"]
 
 
+@type_checked
 class ClaimableBalanceEntry:
     """
     XDR Source Code

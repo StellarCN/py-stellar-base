@@ -5,12 +5,14 @@ from typing import List
 from xdrlib import Packer, Unpacker
 
 from ..exceptions import ValueError
+from ..type_checked import type_checked
 from .decorated_signature import DecoratedSignature
 from .transaction_v0 import TransactionV0
 
 __all__ = ["TransactionV0Envelope"]
 
 
+@type_checked
 class TransactionV0Envelope:
     """
     XDR Source Code
