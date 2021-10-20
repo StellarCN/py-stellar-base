@@ -4,7 +4,7 @@ from typing import Callable, overload
 from typeguard import T_CallableOrType
 from typeguard import typechecked as _typechecked
 
-_STELLAR_SDK_ENFORCE_TYPE_CHECK_FLAG: str = "STELLAR_SDK_ENFORCE_TYPE_CHECK_FLAG"
+_STELLAR_SDK_ENFORCE_TYPE_CHECK_FLAG: str = "STELLAR_SDK_ENFORCE_TYPE_CHECK"
 _STELLAR_SDK_ENFORCE_TYPE_CHECK: bool = os.getenv(
     _STELLAR_SDK_ENFORCE_TYPE_CHECK_FLAG, "False"
 ).lower() in ("true", "1", "t")
