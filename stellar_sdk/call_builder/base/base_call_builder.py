@@ -69,7 +69,7 @@ class BaseCallBuilder:
     def prev(self):
         raise NotImplementedError
 
-    def cursor(self, cursor: Union):
+    def cursor(self, cursor: Union[int, str]):
         """Sets ``cursor`` parameter for the current call. Returns the CallBuilder object on which this method has been called.
 
         See `Paging <https://www.stellar.org/developers/horizon/reference/paging.html>`__

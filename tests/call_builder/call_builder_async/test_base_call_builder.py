@@ -86,7 +86,7 @@ class TestBaseCallBuilder:
             .cursor(10086)
             .order(desc=True)
         )
-        call_builder.call()
+        await call_builder.call()
         assert call_builder.next_href is None
         assert call_builder.prev_href is None
         await client.close()
