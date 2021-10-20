@@ -66,7 +66,7 @@ class TestBaseOperation:
             (
                 10,
                 TypeError,
-                'type of argument "value" must be one of \(str, decimal.Decimal\); got int instead',
+                'type of argument "value" must be one of \\(str, decimal.Decimal\\); got int instead',
             ),
             (
                 "-0.1",
@@ -921,7 +921,8 @@ class TestManageData:
     def test_to_xdr_obj_with_invalid_value_raise(self, name, value):
         source = "GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV"
         with pytest.raises(
-            ValueError, match=r"Data and value should be <= 64 bytes \(ascii encoded\)."
+            ValueError,
+            match="Data and value should be <= 64 bytes \\(ascii encoded\\).",
         ):
             ManageData(name, value, source)
 

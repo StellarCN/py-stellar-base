@@ -36,7 +36,7 @@ class TestMemo:
         invalid_value = 123
         with pytest.raises(
             TypeError,
-            match='type of argument "text" must be one of \(str, bytes\); got int instead',
+            match=r'type of argument "text" must be one of \(str, bytes\); got int instead',
         ):
             TextMemo(invalid_value)
 

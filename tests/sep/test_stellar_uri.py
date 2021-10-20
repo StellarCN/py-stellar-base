@@ -485,7 +485,7 @@ class TestPayStellarUri:
         memo = "invalid memo"
         with pytest.raises(
             TypeError,
-            match='type of argument "memo" must be one of \(stellar_sdk.memo.Memo, NoneType\); got str instead',
+            match=r'type of argument "memo" must be one of \(stellar_sdk.memo.Memo, NoneType\); got str instead',
         ):
             PayStellarUri(
                 "GCALNQQBXAPZ2WIRSDDBMSTAKCUH5SG6U76YBFLQLIXJTF7FE5AX7AOO", memo=memo

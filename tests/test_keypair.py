@@ -228,7 +228,7 @@ class TestKeypair:
         strength = 1024
         with pytest.raises(
             ValueError,
-            match="Strength should be one of the following \(128, 160, 192, 224, 256\), but it is not \(%d\)."
+            match=r"Strength should be one of the following \(128, 160, 192, 224, 256\), but it is not \(%d\)."
             % strength,
         ):
             Keypair.generate_mnemonic_phrase(strength=strength)

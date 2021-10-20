@@ -16,11 +16,13 @@ from ..client.base_async_client import BaseAsyncClient
 from ..client.base_sync_client import BaseSyncClient
 from ..client.requests_client import RequestsClient
 from ..client.response import Response
+from ..type_checked import type_checked
 from .exceptions import StellarTomlNotFoundError
 
 __all__ = ["fetch_stellar_toml", "fetch_stellar_toml_async"]
 
 
+@type_checked
 def fetch_stellar_toml(
     domain: str,
     client: BaseSyncClient = None,
@@ -47,6 +49,7 @@ def fetch_stellar_toml(
     return _handle_raw_response(raw_resp)
 
 
+@type_checked
 async def fetch_stellar_toml_async(
     domain: str,
     client: BaseAsyncClient = None,
