@@ -4,6 +4,7 @@ import base64
 from typing import Optional
 from xdrlib import Packer, Unpacker
 
+from ..type_checked import type_checked
 from .hash import Hash
 from .scp_ballot import SCPBallot
 from .uint32 import Uint32
@@ -11,6 +12,7 @@ from .uint32 import Uint32
 __all__ = ["SCPStatementPrepare"]
 
 
+@type_checked
 class SCPStatementPrepare:
     """
     XDR Source Code

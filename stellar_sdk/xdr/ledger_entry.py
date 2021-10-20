@@ -3,6 +3,7 @@
 import base64
 from xdrlib import Packer, Unpacker
 
+from ..type_checked import type_checked
 from .ledger_entry_data import LedgerEntryData
 from .ledger_entry_ext import LedgerEntryExt
 from .uint32 import Uint32
@@ -10,6 +11,7 @@ from .uint32 import Uint32
 __all__ = ["LedgerEntry"]
 
 
+@type_checked
 class LedgerEntry:
     """
     XDR Source Code

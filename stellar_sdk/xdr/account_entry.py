@@ -5,6 +5,7 @@ from typing import List, Optional
 from xdrlib import Packer, Unpacker
 
 from ..exceptions import ValueError
+from ..type_checked import type_checked
 from .account_entry_ext import AccountEntryExt
 from .account_id import AccountID
 from .constants import *
@@ -18,6 +19,7 @@ from .uint32 import Uint32
 __all__ = ["AccountEntry"]
 
 
+@type_checked
 class AccountEntry:
     """
     XDR Source Code

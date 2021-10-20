@@ -5,12 +5,14 @@ from typing import List, Optional
 from xdrlib import Packer, Unpacker
 
 from ..exceptions import ValueError
+from ..type_checked import type_checked
 from .claim_predicate_type import ClaimPredicateType
 from .int64 import Int64
 
 __all__ = ["ClaimPredicate"]
 
 
+@type_checked
 class ClaimPredicate:
     """
     XDR Source Code

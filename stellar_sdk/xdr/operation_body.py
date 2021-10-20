@@ -4,6 +4,7 @@ import base64
 from xdrlib import Packer, Unpacker
 
 from ..exceptions import ValueError
+from ..type_checked import type_checked
 from .allow_trust_op import AllowTrustOp
 from .begin_sponsoring_future_reserves_op import BeginSponsoringFutureReservesOp
 from .bump_sequence_op import BumpSequenceOp
@@ -31,6 +32,7 @@ from .set_trust_line_flags_op import SetTrustLineFlagsOp
 __all__ = ["OperationBody"]
 
 
+@type_checked
 class OperationBody:
     """
     XDR Source Code

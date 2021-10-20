@@ -4,12 +4,14 @@ import base64
 from xdrlib import Packer, Unpacker
 
 from ..exceptions import ValueError
+from ..type_checked import type_checked
 from .account_merge_result_code import AccountMergeResultCode
 from .int64 import Int64
 
 __all__ = ["AccountMergeResult"]
 
 
+@type_checked
 class AccountMergeResult:
     """
     XDR Source Code

@@ -4,12 +4,14 @@ import base64
 from xdrlib import Packer, Unpacker
 
 from ..exceptions import ValueError
+from ..type_checked import type_checked
 from .envelope_type import EnvelopeType
 from .operation_id_id import OperationIDId
 
 __all__ = ["OperationID"]
 
 
+@type_checked
 class OperationID:
     """
     XDR Source Code

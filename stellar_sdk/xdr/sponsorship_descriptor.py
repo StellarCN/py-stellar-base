@@ -4,11 +4,13 @@ import base64
 from typing import Optional
 from xdrlib import Packer, Unpacker
 
+from ..type_checked import type_checked
 from .account_id import AccountID
 
 __all__ = ["SponsorshipDescriptor"]
 
 
+@type_checked
 class SponsorshipDescriptor:
     """
     XDR Source Code

@@ -3,6 +3,7 @@
 import base64
 from xdrlib import Packer, Unpacker
 
+from ..type_checked import type_checked
 from .asset import Asset
 from .int64 import Int64
 from .pool_id import PoolID
@@ -10,6 +11,7 @@ from .pool_id import PoolID
 __all__ = ["ClaimLiquidityAtom"]
 
 
+@type_checked
 class ClaimLiquidityAtom:
     """
     XDR Source Code

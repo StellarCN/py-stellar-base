@@ -4,12 +4,14 @@ import base64
 from xdrlib import Packer, Unpacker
 
 from ..exceptions import ValueError
+from ..type_checked import type_checked
 from .claimant_type import ClaimantType
 from .claimant_v0 import ClaimantV0
 
 __all__ = ["Claimant"]
 
 
+@type_checked
 class Claimant:
     """
     XDR Source Code

@@ -3,12 +3,14 @@
 import base64
 from xdrlib import Packer, Unpacker
 
+from ..type_checked import type_checked
 from .peer_stat_list import PeerStatList
 from .uint32 import Uint32
 
 __all__ = ["TopologyResponseBody"]
 
 
+@type_checked
 class TopologyResponseBody:
     """
     XDR Source Code

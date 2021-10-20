@@ -3,6 +3,7 @@
 import base64
 from xdrlib import Packer, Unpacker
 
+from ..type_checked import type_checked
 from .asset import Asset
 from .int64 import Int64
 from .price import Price
@@ -10,6 +11,7 @@ from .price import Price
 __all__ = ["ManageBuyOfferOp"]
 
 
+@type_checked
 class ManageBuyOfferOp:
     """
     XDR Source Code

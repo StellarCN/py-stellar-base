@@ -3,12 +3,14 @@
 import base64
 from xdrlib import Packer, Unpacker
 
+from ..type_checked import type_checked
 from .base import String
 from .error_code import ErrorCode
 
 __all__ = ["Error"]
 
 
+@type_checked
 class Error:
     """
     XDR Source Code

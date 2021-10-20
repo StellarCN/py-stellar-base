@@ -5,12 +5,14 @@ from typing import List
 from xdrlib import Packer, Unpacker
 
 from ..exceptions import ValueError
+from ..type_checked import type_checked
 from .operation_result import OperationResult
 from .transaction_result_code import TransactionResultCode
 
 __all__ = ["InnerTransactionResultResult"]
 
 
+@type_checked
 class InnerTransactionResultResult:
     """
     XDR Source Code

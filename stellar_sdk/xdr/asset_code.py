@@ -4,6 +4,7 @@ import base64
 from xdrlib import Packer, Unpacker
 
 from ..exceptions import ValueError
+from ..type_checked import type_checked
 from .asset_code4 import AssetCode4
 from .asset_code12 import AssetCode12
 from .asset_type import AssetType
@@ -11,6 +12,7 @@ from .asset_type import AssetType
 __all__ = ["AssetCode"]
 
 
+@type_checked
 class AssetCode:
     """
     XDR Source Code

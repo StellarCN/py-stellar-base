@@ -3,6 +3,7 @@
 import base64
 from xdrlib import Packer, Unpacker
 
+from ..type_checked import type_checked
 from .hmac_sha256_mac import HmacSha256Mac
 from .stellar_message import StellarMessage
 from .uint64 import Uint64
@@ -10,6 +11,7 @@ from .uint64 import Uint64
 __all__ = ["AuthenticatedMessageV0"]
 
 
+@type_checked
 class AuthenticatedMessageV0:
     """
     XDR Source Code

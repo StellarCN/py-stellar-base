@@ -3,12 +3,14 @@
 import base64
 from xdrlib import Packer, Unpacker
 
+from ..type_checked import type_checked
 from .account_id import AccountID
 from .int64 import Int64
 
 __all__ = ["LedgerKeyOffer"]
 
 
+@type_checked
 class LedgerKeyOffer:
     """
     XDR Source Code

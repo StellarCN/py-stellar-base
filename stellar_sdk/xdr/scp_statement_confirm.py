@@ -3,6 +3,7 @@
 import base64
 from xdrlib import Packer, Unpacker
 
+from ..type_checked import type_checked
 from .hash import Hash
 from .scp_ballot import SCPBallot
 from .uint32 import Uint32
@@ -10,6 +11,7 @@ from .uint32 import Uint32
 __all__ = ["SCPStatementConfirm"]
 
 
+@type_checked
 class SCPStatementConfirm:
     """
     XDR Source Code

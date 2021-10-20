@@ -3,11 +3,13 @@
 import base64
 from xdrlib import Packer, Unpacker
 
+from ..type_checked import type_checked
 from .time_point import TimePoint
 
 __all__ = ["TimeBounds"]
 
 
+@type_checked
 class TimeBounds:
     """
     XDR Source Code

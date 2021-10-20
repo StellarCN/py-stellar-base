@@ -3,12 +3,14 @@
 import base64
 from xdrlib import Packer, Unpacker
 
+from ..type_checked import type_checked
 from .asset import Asset
 from .int32 import Int32
 
 __all__ = ["LiquidityPoolConstantProductParameters"]
 
 
+@type_checked
 class LiquidityPoolConstantProductParameters:
     """
     XDR Source Code

@@ -4,12 +4,14 @@ import base64
 from xdrlib import Packer, Unpacker
 
 from ..exceptions import ValueError
+from ..type_checked import type_checked
 from .ledger_close_value_signature import LedgerCloseValueSignature
 from .stellar_value_type import StellarValueType
 
 __all__ = ["StellarValueExt"]
 
 
+@type_checked
 class StellarValueExt:
     """
     XDR Source Code

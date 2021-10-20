@@ -3,11 +3,13 @@
 import base64
 from xdrlib import Packer, Unpacker
 
+from ..type_checked import type_checked
 from .pool_id import PoolID
 
 __all__ = ["LedgerKeyLiquidityPool"]
 
 
+@type_checked
 class LedgerKeyLiquidityPool:
     """
     XDR Source Code

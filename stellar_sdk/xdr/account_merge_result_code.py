@@ -6,10 +6,12 @@ from xdrlib import Packer, Unpacker
 
 from ..__version__ import __issues__
 from ..exceptions import ValueError
+from ..type_checked import type_checked
 
 __all__ = ["AccountMergeResultCode"]
 
 
+@type_checked
 class AccountMergeResultCode(IntEnum):
     """
     XDR Source Code

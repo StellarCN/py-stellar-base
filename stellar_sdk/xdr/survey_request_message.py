@@ -3,6 +3,7 @@
 import base64
 from xdrlib import Packer, Unpacker
 
+from ..type_checked import type_checked
 from .curve25519_public import Curve25519Public
 from .node_id import NodeID
 from .survey_message_command_type import SurveyMessageCommandType
@@ -11,6 +12,7 @@ from .uint32 import Uint32
 __all__ = ["SurveyRequestMessage"]
 
 
+@type_checked
 class SurveyRequestMessage:
     """
     XDR Source Code

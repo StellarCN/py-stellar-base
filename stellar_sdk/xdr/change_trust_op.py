@@ -3,12 +3,14 @@
 import base64
 from xdrlib import Packer, Unpacker
 
+from ..type_checked import type_checked
 from .change_trust_asset import ChangeTrustAsset
 from .int64 import Int64
 
 __all__ = ["ChangeTrustOp"]
 
 
+@type_checked
 class ChangeTrustOp:
     """
     XDR Source Code

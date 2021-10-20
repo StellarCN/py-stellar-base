@@ -4,6 +4,7 @@ import base64
 from xdrlib import Packer, Unpacker
 
 from ..exceptions import ValueError
+from ..type_checked import type_checked
 from .account_entry import AccountEntry
 from .claimable_balance_entry import ClaimableBalanceEntry
 from .data_entry import DataEntry
@@ -15,6 +16,7 @@ from .trust_line_entry import TrustLineEntry
 __all__ = ["LedgerEntryData"]
 
 
+@type_checked
 class LedgerEntryData:
     """
     XDR Source Code

@@ -3,11 +3,13 @@
 import base64
 from xdrlib import Packer, Unpacker
 
+from ..type_checked import type_checked
 from .int64 import Int64
 
 __all__ = ["SequenceNumber"]
 
 
+@type_checked
 class SequenceNumber:
     """
     XDR Source Code

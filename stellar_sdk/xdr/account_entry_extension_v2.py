@@ -5,6 +5,7 @@ from typing import List
 from xdrlib import Packer, Unpacker
 
 from ..exceptions import ValueError
+from ..type_checked import type_checked
 from .account_entry_extension_v2_ext import AccountEntryExtensionV2Ext
 from .constants import *
 from .sponsorship_descriptor import SponsorshipDescriptor
@@ -13,6 +14,7 @@ from .uint32 import Uint32
 __all__ = ["AccountEntryExtensionV2"]
 
 
+@type_checked
 class AccountEntryExtensionV2:
     """
     XDR Source Code

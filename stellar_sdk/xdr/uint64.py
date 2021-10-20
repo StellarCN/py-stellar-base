@@ -3,11 +3,13 @@
 import base64
 from xdrlib import Packer, Unpacker
 
+from ..type_checked import type_checked
 from .base import UnsignedHyper
 
 __all__ = ["Uint64"]
 
 
+@type_checked
 class Uint64:
     """
     XDR Source Code

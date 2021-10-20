@@ -5,6 +5,7 @@ from typing import List, Optional
 from xdrlib import Packer, Unpacker
 
 from ..exceptions import ValueError
+from ..type_checked import type_checked
 from .constants import *
 from .memo import Memo
 from .muxed_account import MuxedAccount
@@ -17,6 +18,7 @@ from .uint32 import Uint32
 __all__ = ["Transaction"]
 
 
+@type_checked
 class Transaction:
     """
     XDR Source Code

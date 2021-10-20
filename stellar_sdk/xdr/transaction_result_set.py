@@ -5,11 +5,13 @@ from typing import List
 from xdrlib import Packer, Unpacker
 
 from ..exceptions import ValueError
+from ..type_checked import type_checked
 from .transaction_result_pair import TransactionResultPair
 
 __all__ = ["TransactionResultSet"]
 
 
+@type_checked
 class TransactionResultSet:
     """
     XDR Source Code

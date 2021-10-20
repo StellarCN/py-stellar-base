@@ -3,6 +3,7 @@
 import base64
 from xdrlib import Packer, Unpacker
 
+from ..type_checked import type_checked
 from .hash import Hash
 from .transaction_signature_payload_tagged_transaction import (
     TransactionSignaturePayloadTaggedTransaction,
@@ -11,6 +12,7 @@ from .transaction_signature_payload_tagged_transaction import (
 __all__ = ["TransactionSignaturePayload"]
 
 
+@type_checked
 class TransactionSignaturePayload:
     """
     XDR Source Code

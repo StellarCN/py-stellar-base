@@ -3,11 +3,13 @@
 import base64
 from xdrlib import Packer, Unpacker
 
+from ..type_checked import type_checked
 from .clawback_result_code import ClawbackResultCode
 
 __all__ = ["ClawbackResult"]
 
 
+@type_checked
 class ClawbackResult:
     """
     XDR Source Code

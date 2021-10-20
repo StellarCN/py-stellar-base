@@ -4,6 +4,7 @@ import base64
 from xdrlib import Packer, Unpacker
 
 from ..exceptions import ValueError
+from ..type_checked import type_checked
 from .crypto_key_type import CryptoKeyType
 from .muxed_account_med25519 import MuxedAccountMed25519
 from .uint256 import Uint256
@@ -11,6 +12,7 @@ from .uint256 import Uint256
 __all__ = ["MuxedAccount"]
 
 
+@type_checked
 class MuxedAccount:
     """
     XDR Source Code

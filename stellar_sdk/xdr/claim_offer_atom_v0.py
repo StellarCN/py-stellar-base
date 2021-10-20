@@ -3,6 +3,7 @@
 import base64
 from xdrlib import Packer, Unpacker
 
+from ..type_checked import type_checked
 from .asset import Asset
 from .int64 import Int64
 from .uint256 import Uint256
@@ -10,6 +11,7 @@ from .uint256 import Uint256
 __all__ = ["ClaimOfferAtomV0"]
 
 
+@type_checked
 class ClaimOfferAtomV0:
     """
     XDR Source Code

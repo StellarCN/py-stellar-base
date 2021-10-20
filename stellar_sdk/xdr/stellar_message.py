@@ -5,6 +5,7 @@ from typing import List
 from xdrlib import Packer, Unpacker
 
 from ..exceptions import ValueError
+from ..type_checked import type_checked
 from .auth import Auth
 from .dont_have import DontHave
 from .error import Error
@@ -23,6 +24,7 @@ from .uint256 import Uint256
 __all__ = ["StellarMessage"]
 
 
+@type_checked
 class StellarMessage:
     """
     XDR Source Code

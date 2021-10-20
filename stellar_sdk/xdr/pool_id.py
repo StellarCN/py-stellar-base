@@ -3,11 +3,13 @@
 import base64
 from xdrlib import Packer, Unpacker
 
+from ..type_checked import type_checked
 from .hash import Hash
 
 __all__ = ["PoolID"]
 
 
+@type_checked
 class PoolID:
     """
     XDR Source Code

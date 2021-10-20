@@ -5,12 +5,14 @@ from typing import List
 from xdrlib import Packer, Unpacker
 
 from ..exceptions import ValueError
+from ..type_checked import type_checked
 from .node_id import NodeID
 from .uint32 import Uint32
 
 __all__ = ["SCPQuorumSet"]
 
 
+@type_checked
 class SCPQuorumSet:
     """
     XDR Source Code

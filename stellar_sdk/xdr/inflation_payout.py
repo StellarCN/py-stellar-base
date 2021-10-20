@@ -3,12 +3,14 @@
 import base64
 from xdrlib import Packer, Unpacker
 
+from ..type_checked import type_checked
 from .account_id import AccountID
 from .int64 import Int64
 
 __all__ = ["InflationPayout"]
 
 
+@type_checked
 class InflationPayout:
     """
     XDR Source Code

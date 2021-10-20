@@ -3,11 +3,13 @@
 import base64
 from xdrlib import Packer, Unpacker
 
+from ..type_checked import type_checked
 from .public_key import PublicKey
 
 __all__ = ["NodeID"]
 
 
+@type_checked
 class NodeID:
     """
     XDR Source Code
