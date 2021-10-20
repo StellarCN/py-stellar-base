@@ -51,6 +51,7 @@ class ServerAsync(BaseServer, ABC):
 
         :param transaction_envelope: :class:`stellar_sdk.transaction_envelope.TransactionEnvelope` object
             or base64 encoded xdr
+        :param skip_memo_required_check: Allow skipping memo
         :return: the response from horizon
         :raises:
             :exc:`ConnectionError <stellar_sdk.exceptions.ConnectionError>`

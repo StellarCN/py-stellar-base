@@ -82,6 +82,7 @@ class NoneMemo(Memo):
         return "<NoneMemo>"
 
 
+@type_checked
 class TextMemo(Memo):
     """The :class:`TextMemo`, which represents MEMO_TEXT in a transaction.
 
@@ -94,11 +95,6 @@ class TextMemo(Memo):
     """
 
     def __init__(self, text: Union[str, bytes]) -> None:
-        if not isinstance(text, (str, bytes)):
-            raise MemoInvalidException(
-                f"TextMemo expects string or bytes type got a {type(text)}"
-            )
-
         if not isinstance(text, bytes):
             text = bytes(text, encoding="utf-8")
         self.memo_text: bytes = text
@@ -110,13 +106,11 @@ class TextMemo(Memo):
             )
 
     @classmethod
-    @type_checked
     def from_xdr_object(cls, xdr_object: stellar_xdr.Memo) -> "TextMemo":
         """Returns an :class:`TextMemo` object from XDR memo object."""
         assert xdr_object.text is not None
         return cls(bytes(xdr_object.text))
 
-    @type_checked
     def to_xdr_object(self) -> stellar_xdr.Memo:
         """Creates an XDR Memo object that represents this :class:`TextMemo`."""
         return stellar_xdr.Memo(

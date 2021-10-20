@@ -35,10 +35,8 @@ class TestMemo:
     def test_text_memo_invalid_type_raise(self):
         invalid_value = 123
         with pytest.raises(
-            MemoInvalidException,
-            match="TextMemo expects string or bytes type got a {}".format(
-                type(invalid_value)
-            ),
+            TypeError,
+            match='type of argument "text" must be one of \(str, bytes\); got int instead',
         ):
             TextMemo(invalid_value)
 

@@ -53,7 +53,6 @@ class TransactionBuilder:
         See `CAP-0015 <https://github.com/stellar/stellar-protocol/blob/master/core/cap-0015.md>`_ for more information.
     """
 
-    # TODO: add an example
     def __init__(
         self,
         source_account: Account,

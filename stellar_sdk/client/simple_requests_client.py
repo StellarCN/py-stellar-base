@@ -6,6 +6,7 @@ from urllib3.exceptions import NewConnectionError
 
 from ..__version__ import __version__
 from ..client.response import Response
+from ..type_checked import type_checked
 from .base_sync_client import BaseSyncClient
 
 USER_AGENT = f"py-stellar-sdk/{__version__}/SimpleRequestsClient"
@@ -18,6 +19,7 @@ HEADERS = {
 __all__ = ["SimpleRequestsClient"]
 
 
+@type_checked
 class SimpleRequestsClient(BaseSyncClient):
     """The :class:`SimpleRequestsClient` object is a synchronous http client,
     which represents the interface for making requests to a server instance.

@@ -80,8 +80,9 @@ class Account:
         return f"<Account [account={self.account}, sequence={self.sequence}]>"
 
 
+@type_checked
 class Thresholds:
-    def __init__(self, low_threshold, med_threshold, high_threshold):
+    def __init__(self, low_threshold: int, med_threshold: int, high_threshold: int):
         self.low_threshold = low_threshold
         self.med_threshold = med_threshold
         self.high_threshold = high_threshold

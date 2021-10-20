@@ -15,6 +15,7 @@ from ..client.base_sync_client import BaseSyncClient
 from ..client.requests_client import RequestsClient
 from ..client.response import Response
 from ..exceptions import ValueError
+from ..type_checked import type_checked
 from .exceptions import (
     BadFederationResponseError,
     FederationServerNotFoundError,
@@ -34,6 +35,7 @@ __all__ = [
 ]
 
 
+@type_checked
 class FederationRecord:
     def __init__(
         self,
@@ -73,6 +75,7 @@ class FederationRecord:
         )
 
 
+@type_checked
 def resolve_stellar_address(
     stellar_address: str,
     client: BaseSyncClient = None,
@@ -105,6 +108,7 @@ def resolve_stellar_address(
     return _handle_raw_response(raw_resp, stellar_address=stellar_address)
 
 
+@type_checked
 async def resolve_stellar_address_async(
     stellar_address: str,
     client: BaseAsyncClient = None,
@@ -137,6 +141,7 @@ async def resolve_stellar_address_async(
     return _handle_raw_response(raw_resp, stellar_address=stellar_address)
 
 
+@type_checked
 def resolve_account_id(
     account_id: str,
     domain: str = None,
@@ -172,6 +177,7 @@ def resolve_account_id(
     return _handle_raw_response(raw_resp, account_id=account_id)
 
 
+@type_checked
 async def resolve_account_id_async(
     account_id: str,
     domain: str = None,
@@ -207,6 +213,7 @@ async def resolve_account_id_async(
     return _handle_raw_response(raw_resp, account_id=account_id)
 
 
+@type_checked
 def _handle_raw_response(
     raw_resp: Response, stellar_address=None, account_id=None
 ) -> FederationRecord:
@@ -225,6 +232,7 @@ def _handle_raw_response(
     )
 
 
+@type_checked
 def _split_stellar_address(address: str) -> Dict[str, str]:
     parts = address.split(SEPARATOR)
     if len(parts) != 2:
