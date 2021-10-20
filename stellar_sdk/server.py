@@ -15,25 +15,19 @@ from .memo import NoneMemo
 from .muxed_account import MuxedAccount
 from .transaction import Transaction
 from .transaction_envelope import TransactionEnvelope
+from .type_checked import type_checked
 from .utils import MUXED_ACCOUNT_STARTING_LETTER, urljoin_with_query
 
 __all__ = ["Server"]
 
 
+@type_checked
 class Server(BaseServer):
     """Server handles the network connection to a `Horizon <https://www.stellar.org/developers/horizon/reference/>`_
     instance and exposes an interface for requests to that instance.
 
-    Here we need to talk about the **client** parameter, if you do not specify the client, we will use
-    the :class:`stellar_sdk.client.requests_client.RequestsClient` instance by default, it is a synchronous HTTPClient,
-    you can also specify an asynchronous HTTP Client,
-    for example: :class:`stellar_sdk.client.aiohttp_client.AiohttpClient`. If you use a synchronous client,
-    then all requests are synchronous. If you use an asynchronous client,
-    then all requests are asynchronous. The choice is in your hands.
-
     :param horizon_url: Horizon Server URL (ex. `https://horizon-testnet.stellar.org`)
     :param client: Http Client used to send the request
-    :raises: :exc:`TypeError <stellar_sdk.exceptions.TypeError>`: if the ``client`` does not meet the standard.
     """
 
     def __init__(

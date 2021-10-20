@@ -2,11 +2,13 @@ from typing import List
 
 from ... import Asset
 from ...call_builder.base.base_call_builder import BaseCallBuilder
+from ...type_checked import type_checked
 from ...utils import convert_assets_to_horizon_param
 
 __all__ = ["BaseLiquidityPoolsBuilder"]
 
 
+@type_checked
 class BaseLiquidityPoolsBuilder(BaseCallBuilder):
     """Creates a new :class:`LiquidityPoolsBuilder` pointed to server defined by horizon_url.
 
