@@ -14,7 +14,7 @@ See: https://developers.stellar.org/docs/start/list-of-operations/#payment
 """
 import asyncio
 
-from stellar_sdk import AiohttpClient, Keypair, Network, Server, TransactionBuilder
+from stellar_sdk import AiohttpClient, Keypair, Network, ServerAsync, TransactionBuilder
 
 
 def create_account():
@@ -46,7 +46,7 @@ async def main():
     # Configure StellarSdk to talk to the horizon instance hosted by Stellar.org
     # To use the live network, set the hostname to 'horizon.stellar.org'
     # When we use the `with` syntax, it automatically releases the resources it occupies.
-    async with Server(
+    async with ServerAsync(
         horizon_url="https://horizon-testnet.stellar.org", client=AiohttpClient()
     ) as server:
         # Transactions require a valid sequence number that is specific to this account.
