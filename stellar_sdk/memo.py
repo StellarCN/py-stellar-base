@@ -84,11 +84,11 @@ class NoneMemo(Memo):
 
 @type_checked
 class TextMemo(Memo):
-    """The :class:`TextMemo`, which represents MEMO_TEXT in a transaction.
+    """The :class:`TextMemo`, which represents ``MEMO_TEXT`` in a transaction.
 
     :param text: A string encoded using either ASCII or UTF-8, up to
-        28-bytes long.
-    :type text: str, bytes
+        28-bytes long. Note, `text` can be anything,
+        see `this issue <https://github.com/stellar/new-docs/issues/555>`__ for more information.
     :raises: :exc:`MemoInvalidException <stellar_sdk.exceptions.MemoInvalidException>`:
         if ``text`` is not a valid text memo.
 
@@ -128,9 +128,9 @@ class TextMemo(Memo):
 
 @type_checked
 class IdMemo(Memo):
-    """The :class:`IdMemo` which represents MEMO_ID in a transaction.
+    """The :class:`IdMemo` which represents ``MEMO_ID`` in a transaction.
 
-    :param int memo_id: A 64 bit unsigned integer.
+    :param memo_id: A 64 bit unsigned integer.
     :raises:
         :exc:`MemoInvalidException <stellar_sdk.exceptions.MemoInvalidException>`:
         if ``id`` is not a valid id memo.
@@ -167,7 +167,7 @@ class IdMemo(Memo):
 
 @type_checked
 class HashMemo(Memo):
-    """The :class:`HashMemo` which represents MEMO_HASH in a transaction.
+    """The :class:`HashMemo` which represents ``MEMO_HASH`` in a transaction.
 
     :param memo_hash: A 32 byte hash hex encoded string.
     :raises: :exc:`MemoInvalidException <stellar_sdk.exceptions.MemoInvalidException>`:
@@ -207,7 +207,7 @@ class HashMemo(Memo):
 
 @type_checked
 class ReturnHashMemo(Memo):
-    """The :class:`ReturnHashMemo` which represents MEMO_RETURN in a transaction.
+    """The :class:`ReturnHashMemo` which represents ``MEMO_RETURN`` in a transaction.
 
     MEMO_RETURN is typically used with refunds/returns over the network - it is
     a 32 byte hash intended to be interpreted as the hash of the transaction

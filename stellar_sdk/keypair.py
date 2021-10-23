@@ -31,6 +31,9 @@ class Keypair:
     * :meth:`Keypair.from_secret`
     * :meth:`Keypair.from_public_key`
 
+    Learn how to create a key through our documentation:
+    `Generate Keypair <https://stellar-sdk.readthedocs.io/en/latest/generate_keypair.html>`__.
+
     :param verify_key: The verifying (public) Ed25519 key in the keypair.
     :param signing_key: The signing (private) Ed25519 key in the keypair.
     """
@@ -49,19 +52,19 @@ class Keypair:
     def random(cls) -> "Keypair":
         """Generate a :class:`Keypair` object from a randomly generated seed.
 
-        :return: A new :class:`Keypair` instance derived by the randomly seed.
+        :return: A new :class:`Keypair` object derived by the randomly seed.
         """
         seed = os.urandom(32)
         return cls.from_raw_ed25519_seed(seed)
 
     @classmethod
     def from_secret(cls, secret: str) -> "Keypair":
-        """Generate a :class:`Keypair` object from a secret seed.
+        """Generate a :class:`Keypair` object from a secret key.
 
-        :param secret: strkey ed25519 seed, for example: `SB2LHKBL24ITV2Y346BU46XPEL45BDAFOOJLZ6SESCJZ6V5JMP7D6G5X`
-        :return: A new :class:`Keypair` instance derived by the secret.
+        :param secret: secret key (ex. ``SB2LHKBL24ITV2Y346BU46XPEL45BDAFOOJLZ6SESCJZ6V5JMP7D6G5X``)
+        :return: A new :class:`Keypair` object derived by the secret.
         :raise: :exc:`Ed25519SecretSeedInvalidError <stellar_sdk.exceptions.Ed25519SecretSeedInvalidError>`:
-            if ``secret`` is not a valid ed25519 secret seed.
+            if `secret` is not a valid ed25519 secret seed.
         """
         raw_secret = StrKey.decode_ed25519_secret_seed(secret)
         return cls.from_raw_ed25519_seed(raw_secret)
@@ -70,11 +73,10 @@ class Keypair:
     def from_public_key(cls, public_key: str) -> "Keypair":
         """Generate a :class:`Keypair` object from a public key.
 
-        :param public_key: strkey ed25519 public key,
-            for example: `GATPGGOIE6VWADVKD3ER3IFO2IH6DTOA5G535ITB3TT66FZFSIZEAU2B`
-        :return: A new :class:`Keypair` instance derived by the public key.
+        :param public_key: public key (ex. ``GATPGGOIE6VWADVKD3ER3IFO2IH6DTOA5G535ITB3TT66FZFSIZEAU2B``)
+        :return: A new :class:`Keypair` object derived by the public key.
         :raise: :exc:`Ed25519PublicKeyInvalidError <stellar_sdk.exceptions.Ed25519PublicKeyInvalidError>`:
-            if ``public_key`` is not a valid ed25519 public key.
+            if `public_key` is not a valid ed25519 public key.
         """
         key = StrKey.decode_ed25519_public_key(public_key)
         return cls.from_raw_ed25519_public_key(key)
@@ -84,7 +86,7 @@ class Keypair:
         """Generate a :class:`Keypair` object from ed25519 secret key seed raw bytes.
 
         :param raw_seed: ed25519 secret key seed raw bytes
-        :return: A new :class:`Keypair` instance derived by the ed25519 secret key seed raw bytes
+        :return: A new :class:`Keypair` object derived by the ed25519 secret key seed raw bytes
         """
         signing_key = ed25519.SigningKey(raw_seed)
         verify_key = signing_key.verify_key
@@ -95,14 +97,14 @@ class Keypair:
         """Generate a :class:`Keypair` object from ed25519 public key raw bytes.
 
         :param raw_public_key: ed25519 public key raw bytes
-        :return: A new :class:`Keypair` instance derived by the ed25519 public key raw bytes
+        :return: A new :class:`Keypair` object derived by the ed25519 public key raw bytes
         """
         verify_key = ed25519.VerifyKey(raw_public_key)
         return cls(verify_key)
 
     @property
     def secret(self) -> str:
-        """Returns secret key associated with this :class:`Keypair` instance
+        """Returns secret key associated with this :class:`Keypair` object
 
         :return: secret key
         :raise: :exc:`MissingEd25519SecretSeedError <stellar_sdk.exceptions.MissingEd25519SecretSeedError>`
@@ -124,7 +126,7 @@ class Keypair:
 
     @property
     def public_key(self) -> str:
-        """Returns public key associated with this :class:`Keypair` instance
+        """Returns public key associated with this :class:`Keypair` object
 
         :return: public key
         """
@@ -162,7 +164,7 @@ class Keypair:
         return bytes(self.verify_key)
 
     def signature_hint(self) -> bytes:
-        """Returns signature hint associated with this :class:`Keypair` instance
+        """Returns signature hint associated with this :class:`Keypair` object
 
         :return: signature hint
         """
@@ -220,7 +222,8 @@ class Keypair:
         """Generate a mnemonic phrase.
 
         :param language: The language of the mnemonic phrase, defaults to english.
-        :param strength: The complexity of the mnemonic.
+        :param strength: The complexity of the mnemonic, its possible value
+            is ``128``, ``160``, ``192``, ``224`` and ``256``.
         :return: A mnemonic phrase.
         """
         mnemonic_phrase = StellarMnemonic(language).generate(strength)
@@ -250,7 +253,7 @@ class Keypair:
             >>> kp1 = Keypair.from_mnemonic_phrase(mnemonic, index=0)
             >>> kp2 = Keypair.from_mnemonic_phrase(mnemonic, index=1)
             >>> kp3 = Keypair.from_mnemonic_phrase(mnemonic, index=2)
-        :return: A new :class:`Keypair` instance derived from the mnemonic.
+        :return: A new :class:`Keypair` object derived from the mnemonic.
         """
         raw_ed25519_seed = StellarMnemonic(language).to_seed(
             mnemonic_phrase, passphrase, index
@@ -276,9 +279,10 @@ class Keypair:
         )
 
     def __str__(self):
-        return f"<Keypair [public_key={self.public_key}, private_key_exists={self.signing_key is not None}]>"
+        return f"<Keypair [public_key={self.public_key}, private_key_exists={self.can_sign()}]>"
 
 
+# TODO: remove this
 def _get_key_of_expected_type(key: Any, expected_type: Any) -> Any:
     if key is not None and not isinstance(key, expected_type):
         raise TypeError(
