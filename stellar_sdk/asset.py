@@ -220,5 +220,10 @@ class Asset:
             raise ValueError(f"Invalid asset type: {xdr_object.type}")
         return cls(code, issuer)
 
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, self.__class__):
+            return NotImplemented  # pragma: no cover
+        return self.code == other.code and self.issuer == other.issuer
+
     def __str__(self):
         return f"<Asset [code={self.code}, issuer={self.issuer}, type={self.type}]>"
