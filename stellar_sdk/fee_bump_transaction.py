@@ -32,11 +32,6 @@ class FeeBumpTransaction:
         base_fee: int,
         inner_transaction_envelope: TransactionEnvelope,
     ) -> None:
-        if not isinstance(inner_transaction_envelope.transaction, Transaction):
-            raise ValueError(
-                "Invalid `inner_transaction`, it should be `stellar_sdk.transaction.Transaction`."
-            )
-
         if isinstance(fee_source, str):
             fee_source = MuxedAccount.from_account(fee_source)
         if isinstance(fee_source, Keypair):

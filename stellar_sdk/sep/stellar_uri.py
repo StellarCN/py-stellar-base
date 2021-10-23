@@ -281,7 +281,7 @@ class Replacement:
             >>> r2 = Replacement("seqNum", "Y", "sequence for sourceAccount")
             >>> replacements = [r1, r2]
 
-        See `SEP-0007 <https://github.com/stellar/stellar-protocol/blob/master/ecosystem/sep-0007.md#operation-tx>`_
+        See `SEP-0007 <https://github.com/stellar/stellar-protocol/blob/master/ecosystem/sep-0007.md#operation-tx>`__
 
         :param txrep_tx_field_name: Txrep tx field name.
         :param reference_identifier: Reference identifier.
@@ -313,7 +313,7 @@ class Replacement:
 class TransactionStellarUri(StellarUri):
     """A request for a transaction to be signed.
 
-    See `SEP-0007 <https://github.com/stellar/stellar-protocol/blob/master/ecosystem/sep-0007.md#operation-tx>`_
+    See `SEP-0007 <https://github.com/stellar/stellar-protocol/blob/master/ecosystem/sep-0007.md#operation-tx>`__
 
     :param transaction_envelope: Transaction waiting to be signed.
     :param replace: A value that identifies the fields to be replaced in the xdr using the Txrep (SEP-0011) representation.

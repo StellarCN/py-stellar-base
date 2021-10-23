@@ -96,7 +96,7 @@ def build_challenge_transaction(
         of the service requiring authentication, for example: `example.com`.
     :param web_auth_domain: The fully qualified domain name of the service issuing the challenge.
     :param network_passphrase: The network to connect to for verifying and retrieving
-        additional attributes from. (ex. 'Public Global Stellar Network ; September 2015')
+        additional attributes from. (ex. ``'Public Global Stellar Network ; September 2015'``)
     :param timeout: Challenge duration in seconds (default to 15 minutes).
     :param client_domain: The domain of the client application requesting authentication
     :param client_signing_key: The stellar account listed as the SIGNING_KEY on the client domain's TOML file
@@ -156,8 +156,9 @@ def read_challenge_transaction(
     It does not verify that the transaction has been signed by the client or
     that any signatures other than the servers on the transaction are valid. Use
     one of the following functions to completely verify the transaction:
-        - :func:`stellar_sdk.sep.stellar_web_authentication.verify_challenge_transaction_threshold`
-        - :func:`stellar_sdk.sep.stellar_web_authentication.verify_challenge_transaction_signers`
+
+    * :func:`stellar_sdk.sep.stellar_web_authentication.verify_challenge_transaction_threshold`
+    * :func:`stellar_sdk.sep.stellar_web_authentication.verify_challenge_transaction_signers`
 
     :param challenge_transaction: SEP0010 transaction challenge transaction in base64.
     :param server_account_id: public key for server's account.
@@ -166,7 +167,7 @@ def read_challenge_transaction(
     :param web_auth_domain: The home domain that is expected to be included as the value of the Manage Data operation with
         the 'web_auth_domain' key. If no such operation is included, this parameter is not used.
     :param network_passphrase: The network to connect to for verifying and retrieving
-        additional attributes from. (ex. 'Public Global Stellar Network ; September 2015')
+        additional attributes from. (ex. ``'Public Global Stellar Network ; September 2015'``)
     :raises: :exc:`InvalidSep10ChallengeError <stellar_sdk.sep.exceptions.InvalidSep10ChallengeError>` - if the
         validation fails, the exception will be thrown.
     """
@@ -354,7 +355,7 @@ def verify_challenge_transaction_signers(
     :param web_auth_domain: The home domain that is expected to be included as the value of the Manage Data
         operation with the 'web_auth_domain' key, if present.
     :param network_passphrase: The network to connect to for verifying and retrieving
-        additional attributes from. (ex. 'Public Global Stellar Network ; September 2015')
+        additional attributes from. (ex. ``'Public Global Stellar Network ; September 2015'``)
     :param signers: The signers of client account.
 
     :raises: :exc:`InvalidSep10ChallengeError <stellar_sdk.sep.exceptions.InvalidSep10ChallengeError>`:
@@ -460,7 +461,7 @@ def verify_challenge_transaction_signed_by_client_master_key(
     :param web_auth_domain: The home domain that is expected to be included as the value of the Manage Data operation with
         the 'web_auth_domain' key. If no such operation is included, this parameter is not used.
     :param network_passphrase: The network to connect to for verifying and retrieving
-        additional attributes from. (ex. 'Public Global Stellar Network ; September 2015')
+        additional attributes from. (ex. ``'Public Global Stellar Network ; September 2015'``)
 
     :raises: :exc:`InvalidSep10ChallengeError <stellar_sdk.sep.exceptions.InvalidSep10ChallengeError>` - if the
         validation fails, the exception will be thrown.
@@ -499,7 +500,7 @@ def verify_challenge_transaction_threshold(
     :param web_auth_domain: The home domain that is expected to be included as the value of the Manage Data operation with
         the 'web_auth_domain' key. If no such operation is included, this parameter is not used.
     :param network_passphrase: The network to connect to for verifying and retrieving
-        additional attributes from. (ex. 'Public Global Stellar Network ; September 2015')
+        additional attributes from. (ex. ``'Public Global Stellar Network ; September 2015'``)
     :param threshold: The medThreshold on the client account.
     :param signers: The signers of client account.
 
@@ -554,7 +555,7 @@ def verify_challenge_transaction(
     :param web_auth_domain: The home domain that is expected to be included as the value of the Manage Data
         operation with the 'web_auth_domain' key, if present.
     :param network_passphrase: The network to connect to for verifying and retrieving
-        additional attributes from. (ex. 'Public Global Stellar Network ; September 2015')
+        additional attributes from. (ex. ``'Public Global Stellar Network ; September 2015'``)
     :raises: :exc:`InvalidSep10ChallengeError <stellar_sdk.sep.exceptions.InvalidSep10ChallengeError>` - if the
         validation fails, the exception will be thrown.
     """

@@ -45,9 +45,8 @@ class TransactionBuilder:
 
     :param source_account: The source account for this transaction.
     :param network_passphrase: The network to connect to for verifying and retrieving additional attributes from.
-        Defaults to **Test SDF Network ; September 2015**.
-    :param base_fee: Base fee in stroops. The network base fee is obtained by default from the latest ledger.
-        Transaction fee is equal to base fee times number of operations in this transaction.
+        Defaults to ``Test SDF Network ; September 2015``.
+    :param base_fee: Max fee you're willing to pay per operation in this transaction (**in stroops**).
     :param v1: When this value is set to True, V1 transactions will be generated,
         otherwise V0 transactions will be generated.
         See `CAP-0015 <https://github.com/stellar/stellar-protocol/blob/master/core/cap-0015.md>`_ for more information.
@@ -72,7 +71,7 @@ class TransactionBuilder:
         """This will build the transaction envelope.
         It will also increment the source account's sequence number by 1.
 
-        :return: The transaction envelope.
+        :return: New transaction envelope.
         """
         source = self.source_account.account
         sequence = self.source_account.sequence + 1
@@ -130,6 +129,11 @@ class TransactionBuilder:
         :py:class:`FeeBumpTransactionEnvelope <stellar_sdk.fee_bump_transaction_envelope.FeeBumpTransactionEnvelope>`
         via an XDR object.
 
+        .. warning::
+            I don't recommend you to use this function,
+            because it loses its signature when constructing TransactionBuilder.
+            Please use :py:func:`stellar_sdk.helpers.parse_transaction_envelope_from_xdr` instead.
+
         In addition, if xdr is not of
         :py:class:`TransactionEnvelope <stellar_sdk.transaction_envelope.TransactionEnvelope>`,
         it sets the fields of this builder (the transaction envelope,
@@ -143,6 +147,7 @@ class TransactionBuilder:
             :py:class:`FeeBumpTransactionEnvelope <stellar_sdk.fee_bump_transaction_envelope.FeeBumpTransactionEnvelope>`
             via the XDR object.
         """
+        # TODO: warn?
         xdr_object = stellar_xdr.TransactionEnvelope.from_xdr(xdr)
         te_type = xdr_object.type
         if te_type == stellar_xdr.EnvelopeType.ENVELOPE_TYPE_TX_FEE_BUMP:

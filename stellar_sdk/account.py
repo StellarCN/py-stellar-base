@@ -14,21 +14,25 @@ class Account:
     account on the Stellar network and its sequence number.
 
     Account tracks the sequence number as it is used
-    by :class:`TransactionBuilder <stellar_sdk.transaction_builder.TransactionBuilder>`
+    by :class:`TransactionBuilder <stellar_sdk.transaction_builder.TransactionBuilder>`.
 
-    See `Accounts`_ For more information about the formats used for asset codes and how issuers
-    work on Stellar,
+    Normally, you can get an :class:`Account` instance through the :meth:`stellar_sdk.Server.load_account` method,
+    an example::
+
+        from stellar_sdk import Keypair, Server
+
+        server = Server(horizon_url="https://horizon-testnet.stellar.org")
+        source = Keypair.from_secret("SBFZCHU5645DOKRWYBXVOXY2ELGJKFRX6VGGPRYUWHQ7PMXXJNDZFMKD")
+        # account_id can also be a muxed account
+        source_account = server.load_account(account_id=source.public_key)
+
+    See `Accounts <https://developers.stellar.org/docs/glossary/accounts/>`__ for
+    more information.
 
     :param account_id: Account Id of the
-        account (ex. `GB3KJPLFUYN5VL6R3GU3EGCGVCKFDSD7BEDX42HWG5BWFKB3KQGJJRMA`)
-        or muxed account (ex. `MBZSQ3YZMZEWL5ZRCEQ5CCSOTXCFCMKDGFFP4IEQN2KN6LCHCLI46AAAAAAAAAAE2L2QE`)
-    :param sequence: sequence current sequence number of the account
-    :raises:
-        :exc:`Ed25519PublicKeyInvalidError <stellar_sdk.exceptions.Ed25519PublicKeyInvalidError>`: if ``account_id``
-        is not a valid ed25519 public key.
-
-    .. _Accounts:
-        https://stellar.org/developers/learn/concepts/accounts.html
+        account (ex. ``'GB3KJPLFUYN5VL6R3GU3EGCGVCKFDSD7BEDX42HWG5BWFKB3KQGJJRMA'``)
+        or muxed account (ex. ``'MBZSQ3YZMZEWL5ZRCEQ5CCSOTXCFCMKDGFFP4IEQN2KN6LCHCLI46AAAAAAAAAAE2L2QE'``)
+    :param sequence: Current sequence number of the account.
     """
 
     def __init__(self, account_id: Union[str, MuxedAccount], sequence: int) -> None:
@@ -44,7 +48,7 @@ class Account:
 
     def account_id(self) -> str:
         """
-        Return ed25519 account id.
+        :returns: The network ID of the network.
         """
         warnings.warn(
             "Will be removed in version v6.0.0, "
@@ -54,15 +58,11 @@ class Account:
         return self.account.account_id
 
     def increment_sequence_number(self) -> None:
-        """
-        Increments sequence number in this object by one.
-        """
+        """Increments sequence number in this object by one."""
         self.sequence += 1
 
     def load_ed25519_public_key_signers(self) -> List[Ed25519PublicKeySigner]:
-        """
-        Load ed25519 public key signers, may change in 3.0.
-        """
+        """Load ed25519 public key signers, may change in 3.0."""
         ed25519_public_key_signers = []
         for signer in self.signers:
             if signer["type"] == "ed25519_public_key":

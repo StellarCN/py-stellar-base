@@ -21,12 +21,26 @@ from .utils import MUXED_ACCOUNT_STARTING_LETTER, urljoin_with_query
 __all__ = ["ServerAsync"]
 
 
-class ServerAsync(BaseServer, ABC):
+class ServerAsync(BaseServer):
     """ServerAsync handles the network connection to a `Horizon <https://www.stellar.org/developers/horizon/reference/>`_
     instance and exposes an interface for requests to that instance.
 
-    :param horizon_url: Horizon Server URL (ex. `https://horizon-testnet.stellar.org`)
-    :param client: Http Client used to send the request
+    An example::
+
+        import asyncio
+        from stellar_sdk import ServerAsync
+
+        async def example():
+            async with ServerAsync("https://horizon-testnet.stellar.org") as server:
+                resp = await server.transactions().limit(10).order(desc=True).call()
+                print(resp)
+
+        asyncio.run(example())
+
+    :param horizon_url: Horizon Server URL
+        (ex. ``'https://horizon-testnet.stellar.org'`` for test network,
+        ``'https://horizon-testnet.stellar.org'`` for public network)
+    :param client: Http client used to send the request
     """
 
     def __init__(
@@ -342,10 +356,7 @@ class ServerAsync(BaseServer, ABC):
         )
 
     async def close(self) -> None:  # type: ignore[override]
-        """Close underlying connector.
-
-        Release all acquired resources.
-        """
+        """Close underlying connector, and release all acquired resources."""
         await self._client.close()
 
     async def __aenter__(self) -> "ServerAsync":

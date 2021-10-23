@@ -98,8 +98,8 @@ class MuxedAccount:
         """Create a :class:`MuxedAccount` object from account id or muxed account id.
 
         :param account: account id
-            or muxed account id (ex. ``GDGQVOKHW4VEJRU2TETD6DBRKEO5ERCNF353LW5WBFW3JJWQ2BRQ6KDD``
-            or ``MAAAAAAAAAAAJURAAB2X52XFQP6FBXLGT6LWOOWMEXWHEWBDVRZ7V5WH34Y22MPFBHUHY``)
+            or muxed account id (ex. ``'GDGQVOKHW4VEJRU2TETD6DBRKEO5ERCNF353LW5WBFW3JJWQ2BRQ6KDD'``
+            or ``'MAAAAAAAAAAAJURAAB2X52XFQP6FBXLGT6LWOOWMEXWHEWBDVRZ7V5WH34Y22MPFBHUHY'``)
         """
         data_length = len(account)
         if data_length == 56:
@@ -134,9 +134,7 @@ class MuxedAccount:
         return StrKey.decode_muxed_account(self.account_muxed)
 
     @classmethod
-    def from_xdr_object(
-        cls, xdr_object: stellar_xdr.MuxedAccount
-    ) -> "MuxedAccount":
+    def from_xdr_object(cls, xdr_object: stellar_xdr.MuxedAccount) -> "MuxedAccount":
         """Create a :class:`MuxedAccount` object from an XDR Asset object.
 
         :param xdr_object: The MuxedAccount object.
@@ -144,9 +142,7 @@ class MuxedAccount:
         """
         if xdr_object.type == stellar_xdr.CryptoKeyType.KEY_TYPE_ED25519:
             assert xdr_object.ed25519 is not None
-            account_id = StrKey.encode_ed25519_public_key(
-                xdr_object.ed25519.uint256
-            )
+            account_id = StrKey.encode_ed25519_public_key(xdr_object.ed25519.uint256)
             return cls(account_id=account_id, account_muxed_id=None)
         assert xdr_object.med25519 is not None
         account_id_id = xdr_object.med25519.id.uint64
