@@ -10,7 +10,7 @@ __all__ = ["BaseTransactionsCallBuilder"]
 class BaseTransactionsCallBuilder(BaseCallBuilder):
     """Creates a new :class:`TransactionsCallBuilder` pointed to server defined by horizon_url.
 
-    See `All Transactions <https://www.stellar.org/developers/horizon/reference/endpoints/transactions-all.html>`__
+    See `List All Transactions <https://developers.stellar.org/api/resources/transactions/list/>`__ for more information.
 
     :param horizon_url: Horizon server URL.
     """
@@ -23,7 +23,7 @@ class BaseTransactionsCallBuilder(BaseCallBuilder):
         """The transaction details endpoint provides information on a single transaction.
         The transaction hash provided in the hash argument specifies which transaction to load.
 
-        See `Transaction Details <https://www.stellar.org/developers/horizon/reference/endpoints/transactions-single.html>`__
+        See `Retrieve a Transaction <https://developers.stellar.org/api/resources/transactions/single/>`__ for more information.
 
 
         :param transaction_hash: transaction hash
@@ -35,7 +35,7 @@ class BaseTransactionsCallBuilder(BaseCallBuilder):
     def for_account(self, account_id: str):
         """This endpoint represents all transactions that affected a given account.
 
-        See `Transactions for Account <https://www.stellar.org/developers/horizon/reference/endpoints/transactions-for-account.html>`__
+        See `Retrieve an Account's Transactions <https://developers.stellar.org/api/resources/accounts/transactions/>`__ for more information.
 
         :param account_id: account id
         :return: current TransactionsCallBuilder instance
@@ -46,7 +46,7 @@ class BaseTransactionsCallBuilder(BaseCallBuilder):
     def for_ledger(self, sequence: Union[str, int]):
         """This endpoint represents all transactions in a given ledger.
 
-        See `Transactions for Ledger <https://www.stellar.org/developers/horizon/reference/endpoints/transactions-for-ledger.html>`__
+        See `Retrieve a Ledger's Transactions <https://developers.stellar.org/api/resources/ledgers/transactions/>`__ for more information.
 
         :param sequence: ledger sequence
         :return: current TransactionsCallBuilder instance

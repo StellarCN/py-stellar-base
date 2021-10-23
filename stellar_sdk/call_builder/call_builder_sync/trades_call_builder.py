@@ -11,7 +11,7 @@ class TradesCallBuilder(BaseCallBuilder, BaseTradesCallBuilder):
     """Creates a new :class:`TradesCallBuilder` pointed to server defined by horizon_url.
     Do not create this object directly, use :func:`stellar_sdk.Server.trades`.
 
-    See `Trades <https://www.stellar.org/developers/horizon/reference/endpoints/trades.html)>`__
+    See `List All Trades <https://developers.stellar.org/api/resources/trades/list/>`__ for more information.
 
     :param horizon_url: Horizon server URL.
     :param client: The client instance used to send request.

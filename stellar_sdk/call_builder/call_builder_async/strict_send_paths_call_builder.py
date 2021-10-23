@@ -31,7 +31,7 @@ class StrictSendPathsCallBuilder(BaseCallBuilder, BaseStrictSendPathsCallBuilder
     used to determine if there a given path can satisfy a payment of the desired
     amount.
 
-    See `Find Payment Paths <https://www.stellar.org/developers/horizon/reference/endpoints/path-finding.html>`__
+    See `List Strict Send Payment Paths <https://developers.stellar.org/api/aggregations/paths/strict-send/>`__ for more information.
 
     :param horizon_url: Horizon server URL.
     :param client: The client instance used to send request.

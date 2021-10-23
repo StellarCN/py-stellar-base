@@ -91,9 +91,10 @@ def build_challenge_transaction(
     challenge transaction which you can use for Stellar Web Authentication.
 
     :param server_secret: secret key for server's stellar.toml `SIGNING_KEY`.
-    :param client_account_id: The stellar account (`G...`) or muxed account (`M...`) that the wallet wishes to authenticate with the server.
+    :param client_account_id: The stellar account (``G...``) or
+        muxed account (``M...``) that the wallet wishes to authenticate with the server.
     :param home_domain: The `fully qualified domain name <https://en.wikipedia.org/wiki/Fully_qualified_home_domain>`_
-        of the service requiring authentication, for example: `example.com`.
+        of the service requiring authentication (ex. ``"example.com"``).
     :param web_auth_domain: The fully qualified domain name of the service issuing the challenge.
     :param network_passphrase: The network to connect to for verifying and retrieving
         additional attributes from. (ex. ``"Public Global Stellar Network ; September 2015"``)
@@ -553,7 +554,7 @@ def verify_challenge_transaction(
     :param home_domains: The home domain that is expected to be included in the first Manage Data operation's string
         key. If a list is provided, one of the domain names in the array must match.
     :param web_auth_domain: The home domain that is expected to be included as the value of the Manage Data
-        operation with the 'web_auth_domain' key, if present.
+        operation with the `web_auth_domain` key, if present.
     :param network_passphrase: The network to connect to for verifying and retrieving
         additional attributes from. (ex. ``"Public Global Stellar Network ; September 2015"``)
     :raises: :exc:`InvalidSep10ChallengeError <stellar_sdk.sep.exceptions.InvalidSep10ChallengeError>` - if the

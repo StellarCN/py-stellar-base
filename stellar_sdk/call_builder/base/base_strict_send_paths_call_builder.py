@@ -29,7 +29,7 @@ class BaseStrictSendPathsCallBuilder(BaseCallBuilder):
     used to determine if there a given path can satisfy a payment of the desired
     amount.
 
-    See `Find Payment Paths <https://www.stellar.org/developers/horizon/reference/endpoints/path-finding.html>`__
+    See `List Strict Send Payment Paths <https://developers.stellar.org/api/aggregations/paths/strict-send/>`__ for more information.
 
     :param source_asset: The asset to be sent.
     :param source_amount: The amount, denominated in the source asset, that any returned path should be able to satisfy.

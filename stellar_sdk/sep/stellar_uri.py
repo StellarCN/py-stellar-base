@@ -271,23 +271,25 @@ class PayStellarUri(StellarUri):
 
 @type_checked
 class Replacement:
+    """Used to represent a single replacement.
+
+    An example::
+
+        r1 = Replacement("sourceAccount", "X", "account on which to create the trustline")
+        r2 = Replacement("seqNum", "Y", "sequence for sourceAccount")
+        replacements = [r1, r2]
+
+    See `SEP-0007 <https://github.com/stellar/stellar-protocol/blob/master/ecosystem/sep-0007.md#operation-tx>`__
+
+    :param txrep_tx_field_name: Txrep tx field name.
+    :param reference_identifier: Reference identifier.
+    :param hint: A brief and clear explanation of the context for the `reference_identifier`.
+
+    """
+
     def __init__(
         self, txrep_tx_field_name: str, reference_identifier: str, hint: str
     ) -> None:
-        """Used to represent a single replacement.
-
-        Example:
-            >>> r1 = Replacement("sourceAccount", "X", "account on which to create the trustline")
-            >>> r2 = Replacement("seqNum", "Y", "sequence for sourceAccount")
-            >>> replacements = [r1, r2]
-
-        See `SEP-0007 <https://github.com/stellar/stellar-protocol/blob/master/ecosystem/sep-0007.md#operation-tx>`__
-
-        :param txrep_tx_field_name: Txrep tx field name.
-        :param reference_identifier: Reference identifier.
-        :param hint: A brief and clear explanation of the context for the `reference_identifier`.
-
-        """
         self.txrep_tx_field_name = txrep_tx_field_name
         self.reference_identifier = reference_identifier
         self.hint = hint

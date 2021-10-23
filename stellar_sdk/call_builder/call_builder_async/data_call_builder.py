@@ -15,7 +15,7 @@ class DataCallBuilder(BaseCallBuilder, BaseDataCallBuilder):
 
     :param horizon_url: Horizon server URL.
     :param client: The client instance used to send request.
-    :param account_id: account id, for example: `GDGQVOKHW4VEJRU2TETD6DBRKEO5ERCNF353LW5WBFW3JJWQ2BRQ6KDD`
+    :param account_id: account id, for example: ``"GDGQVOKHW4VEJRU2TETD6DBRKEO5ERCNF353LW5WBFW3JJWQ2BRQ6KDD"``
     :param data_name: Key name
     """
 

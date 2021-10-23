@@ -58,7 +58,6 @@ def to_txrep(
 
     See `SEP-0011 <https://github.com/stellar/stellar-protocol/blob/master/ecosystem/sep-0011.md>`_
 
-
     :param transaction_envelope: Transaction envelope object.
     :return: A human-readable format for Stellar transactions.
     """

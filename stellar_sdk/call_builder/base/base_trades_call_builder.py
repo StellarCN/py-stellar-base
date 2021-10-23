@@ -11,7 +11,7 @@ __all__ = ["BaseTradesCallBuilder"]
 class BaseTradesCallBuilder(BaseCallBuilder):
     """Creates a new :class:`TradesCallBuilder` pointed to server defined by horizon_url.
 
-    See `Trades <https://www.stellar.org/developers/horizon/reference/endpoints/trades.html)>`__
+    See `List All Trades <https://developers.stellar.org/api/resources/trades/list/>`__ for more information.
 
     :param horizon_url: Horizon server URL.
     """
@@ -22,6 +22,8 @@ class BaseTradesCallBuilder(BaseCallBuilder):
 
     def for_asset_pair(self, base: Asset, counter: Asset):
         """Filter trades for a specific asset pair (orderbook)
+
+        See `List All Trades <https://developers.stellar.org/api/resources/trades/list/>`__ for more information.
 
         :param base: base asset
         :param counter: counter asset
@@ -41,7 +43,7 @@ class BaseTradesCallBuilder(BaseCallBuilder):
     def for_offer(self, offer_id: Union[int, str]):
         """Filter trades for a specific offer
 
-        See `Trades for Offer <https://www.stellar.org/developers/horizon/reference/endpoints/trades-for-offer.html>`__
+        See `List All Trades <https://developers.stellar.org/api/resources/trades/list/>`__ for more information.
 
         :param offer_id: offer id
         :return: current TradesCallBuilder instance
@@ -52,7 +54,7 @@ class BaseTradesCallBuilder(BaseCallBuilder):
     def for_account(self, account_id: str):
         """Filter trades for a specific account
 
-        See `Trades for Account <https://www.stellar.org/developers/horizon/reference/endpoints/trades-for-account.html>`__
+        See `Retrieve an Account's Trades <https://developers.stellar.org/api/resources/accounts/trades/>`__ for more information.
 
         :param account_id: account id
         :return: current TradesCallBuilder instance
@@ -64,10 +66,10 @@ class BaseTradesCallBuilder(BaseCallBuilder):
         """Filter trades for a specific trade type
 
         Horizon will reject requests which attempt to set
-        trade_type=liquidity_pools when using the offer id filter.
+        `trade_type` to ``liquidity_pools`` when using the offer id filter.
 
-        :param trade_type: trade type, the currently supported types are `orderbook`, `liquidity_pools` and `all`,
-            defaults to `all`.
+        :param trade_type: trade type, the currently supported types are ``"orderbook"``, ``"liquidity_pools"`` and ``"all"``,
+            defaults to ``"all"``.
         :return: current TradesCallBuilder instance
         """
         params = {"trade_type": trade_type}

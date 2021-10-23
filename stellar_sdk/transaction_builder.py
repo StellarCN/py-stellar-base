@@ -44,6 +44,31 @@ class TransactionBuilder:
     with :func:`stellar_sdk.server.Server.load_account` or :func:`stellar_sdk.server_async.ServerAsync.load_account`
     before creating another transaction.
 
+    An example::
+
+        # Alice pay 10.25 XLM to Bob
+        from stellar_sdk import Server, Keypair, TransactionBuilder, Network
+
+        alice_keypair = Keypair.from_secret("SBFZCHU5645DOKRWYBXVOXY2ELGJKFRX6VGGPRYUWHQ7PMXXJNDZFMKD")
+        bob_address = "GA7YNBW5CBTJZ3ZZOWX3ZNBKD6OE7A7IHUQVWMY62W2ZBG2SGZVOOPVH"
+
+        server = Server("https://horizon-testnet.stellar.org")
+        alice_account = server.load_account(alice_keypair.public_key)
+        base_fee = server.fetch_base_fee()
+        transaction = (
+            TransactionBuilder(
+                source_account=alice_account,
+                network_passphrase=Network.TESTNET_NETWORK_PASSPHRASE,
+                base_fee=base_fee,
+            )
+                .add_text_memo("Hello, Stellar!")
+                .append_payment_op(bob_address, "10.25", "XLM")
+                .build()
+        )
+        transaction.sign(alice_keypair)
+        response = server.submit_transaction(transaction)
+        print(response)
+
     :param source_account: The source account for this transaction.
     :param network_passphrase: The network to connect to for verifying and retrieving additional attributes from.
         Defaults to ``Test SDF Network ; September 2015``.

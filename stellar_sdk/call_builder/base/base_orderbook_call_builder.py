@@ -9,7 +9,7 @@ __all__ = ["BaseOrderbookCallBuilder"]
 class BaseOrderbookCallBuilder(BaseCallBuilder):
     """Creates a new :class:`OrderbookCallBuilder` pointed to server defined by horizon_url.
 
-    See `Orderbook Details <https://www.stellar.org/developers/horizon/reference/endpoints/orderbook-details.html>`__
+    See `Orderbook <https://developers.stellar.org/api/aggregations/order-books/>`__ for more information.
 
     :param selling: Asset being sold
     :param buying: Asset being bought

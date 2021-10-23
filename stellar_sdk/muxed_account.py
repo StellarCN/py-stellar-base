@@ -46,7 +46,7 @@ class MuxedAccount:
     See `SEP-0023 <https://github.com/stellar/stellar-protocol/blob/master/ecosystem/sep-0023.md>`_ for more
     information.
 
-    :param account_id: ed25519 account id, for example: `GDGQVOKHW4VEJRU2TETD6DBRKEO5ERCNF353LW5WBFW3JJWQ2BRQ6KDD`.
+    :param account_id: ed25519 account id, for example: ``"GDGQVOKHW4VEJRU2TETD6DBRKEO5ERCNF353LW5WBFW3JJWQ2BRQ6KDD"``.
         It should be a string starting with ``G``. If you want to build a MuxedAccount
         object using an address starting with ``M``, please use :func:`stellar_sdk.MuxedAccount.from_account`.
     :param account_muxed_id: account multiplexing id (ex. ``1234``)

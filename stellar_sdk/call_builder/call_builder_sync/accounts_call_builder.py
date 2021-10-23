@@ -11,6 +11,8 @@ class AccountsCallBuilder(BaseCallBuilder, BaseAccountsCallBuilder):
     """Creates a new :class:`AccountsCallBuilder` pointed to server defined by horizon_url.
     Do not create this object directly, use :func:`stellar_sdk.Server.accounts`.
 
+    See `List All Accounts <https://developers.stellar.org/api/resources/accounts/list/>`__ for more information.
+
     :param horizon_url: Horizon server URL.
     :param client: The client instance used to send request.
     """
