@@ -10,22 +10,22 @@ class Network:
 
     This class represents such a stellar network such as the Public network and the Test network.
 
-    :param str network_passphrase: The passphrase for the network.
-        (ex. 'Public Global Stellar Network ; September 2015')
+    :param network_passphrase: The passphrase for the network.
+        (ex. ``"Public Global Stellar Network ; September 2015"``)
 
     """
 
     PUBLIC_NETWORK_PASSPHRASE: str = "Public Global Stellar Network ; September 2015"
-    """Get the Public network passphrase."""
+    """The Public network passphrase."""
 
     TESTNET_NETWORK_PASSPHRASE: str = "Test SDF Network ; September 2015"
-    """Get the Test network passphrase."""
+    """The Test network passphrase."""
 
     def __init__(self, network_passphrase: str) -> None:
         self.network_passphrase: str = network_passphrase
 
     def network_id(self) -> bytes:
-        """Get the network ID of the network, which is an XDR hash of the
+        """Get the network ID of the network, which is an hash of the
         passphrase.
 
         :returns: The network ID of the network.

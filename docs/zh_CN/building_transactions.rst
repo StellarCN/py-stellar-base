@@ -5,11 +5,11 @@
 构建事务
 ********
 
-`事务 <https://stellar.org/developers/learn/concepts/transactions.html>`_ 是修改账本的命令，事务中一般包含了付款、创建订单、配置账户等操作。
+`事务 <https://developers.stellar.org/docs/glossary/transactions/>`_ 是修改账本的命令，事务中一般包含了付款、创建订单、配置账户等操作。
 
-每个事务都有一个源 `账户 <https://stellar.org/developers/learn/concepts/accounts.html>`__，这个帐号将会为这笔事务支付 `手续费 <https://stellar.org/developers/learn/concepts/fees.html>`_，且这个事务会使用源账户的序列号。
+每个事务都有一个源 `账户 <https://developers.stellar.org/docs/glossary/accounts/>`__，这个帐号将会为这笔事务支付 `手续费 <https://stellar.org/developers/learn/concepts/fees.html>`_，且这个事务会使用源账户的序列号。
 
-事务由一个或多个 `操作组成 <https://stellar.org/developers/learn/concepts/operations.html>`_，
+事务由一个或多个 `操作组成 <https://developers.stellar.org/docs/glossary/operations/>`_，
 每个操作都有一个源账户，如果一个账户没有设置源账户的话，那么它将使用事务的源账户作为它的源账户。
 
 `TransactionBuilder <https://github.com/stellar/js-stellar-base/blob/master/src/transaction_builder.js>`_

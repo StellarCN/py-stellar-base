@@ -81,11 +81,11 @@ class ClaimPredicate:
     def predicate_and(
         cls, left: "ClaimPredicate", right: "ClaimPredicate"
     ) -> "ClaimPredicate":
-        """Returns an `and` claim predicate
+        """Returns an **and** claim predicate
 
         :param left: a ClaimPredicate.
         :param right: a ClaimPredicate.
-        :return: an `and` claim predicate.
+        :return: an **and** claim predicate.
         """
         return cls(
             claim_predicate_type=ClaimPredicateType.CLAIM_PREDICATE_AND,
@@ -100,11 +100,11 @@ class ClaimPredicate:
     def predicate_or(
         cls, left: "ClaimPredicate", right: "ClaimPredicate"
     ) -> "ClaimPredicate":
-        """Returns an `or` claim predicate
+        """Returns an **or** claim predicate
 
         :param left: a ClaimPredicate.
         :param right: a ClaimPredicate.
-        :return: an `or` claim predicate.
+        :return: an **or** claim predicate.
         """
         return cls(
             claim_predicate_type=ClaimPredicateType.CLAIM_PREDICATE_OR,
@@ -117,10 +117,10 @@ class ClaimPredicate:
 
     @classmethod
     def predicate_not(cls, predicate: "ClaimPredicate") -> "ClaimPredicate":
-        """Returns a `not` claim predicate.
+        """Returns a **not** claim predicate.
 
         :param predicate: a ClaimPredicate.
-        :return: a `not` claim predicate.
+        :return: a **not** claim predicate.
         """
         return cls(
             claim_predicate_type=ClaimPredicateType.CLAIM_PREDICATE_NOT,
@@ -133,13 +133,13 @@ class ClaimPredicate:
 
     @classmethod
     def predicate_before_absolute_time(cls, abs_before: int) -> "ClaimPredicate":
-        """Returns a `before_absolute_time` claim predicate.
+        """Returns a **before_absolute_time** claim predicate.
 
         This predicate will be fulfilled if the closing time of the ledger that includes
         the :class:`CreateClaimableBalance` operation is less than this (absolute) Unix timestamp.
 
         :param abs_before: Unix epoch.
-        :return: a `before_absolute_time` claim predicate.
+        :return: a **before_absolute_time** claim predicate.
         """
         return cls(
             claim_predicate_type=ClaimPredicateType.CLAIM_PREDICATE_BEFORE_ABSOLUTE_TIME,
@@ -152,14 +152,14 @@ class ClaimPredicate:
 
     @classmethod
     def predicate_before_relative_time(cls, seconds: int) -> "ClaimPredicate":
-        """Returns a `before_relative_time` claim predicate.
+        """Returns a **before_relative_time** claim predicate.
 
         This predicate will be fulfilled if the closing time of the ledger that
         includes the :class:`CreateClaimableBalance` operation plus this relative time delta (in seconds)
         is less than the current time.
 
         :param seconds: seconds since closeTime of the ledger in which the ClaimableBalanceEntry was created.
-        :return: a `before_relative_time` claim predicate.
+        :return: a **before_relative_time** claim predicate.
         """
         return cls(
             claim_predicate_type=ClaimPredicateType.CLAIM_PREDICATE_BEFORE_RELATIVE_TIME,
@@ -172,9 +172,9 @@ class ClaimPredicate:
 
     @classmethod
     def predicate_unconditional(cls) -> "ClaimPredicate":
-        """Returns an unconditional claim predicate.
+        """Returns an **unconditional** claim predicate.
 
-        :return: an unconditional claim predicate.
+        :return: an **unconditional** claim predicate.
         """
         return cls(
             claim_predicate_type=ClaimPredicateType.CLAIM_PREDICATE_UNCONDITIONAL,
@@ -363,18 +363,18 @@ class CreateClaimableBalance(Operation):
     """The :class:`CreateClaimableBalance` object, which represents a CreateClaimableBalance
     operation on Stellar's network.
 
-    Creates a ClaimableBalanceEntry. See `Claimable Balance
-    <https://developers.stellar.org/docs/glossary/claimable-balance/>_` for more information on parameters and usage.
-
-    See `Create Claimable Balance
-    <https://developers.stellar.org/docs/start/list-of-operations/#create-claimable-balance>_`.
+    Creates a ClaimableBalanceEntry.
+    See `Claimable Balance <https://developers.stellar.org/docs/glossary/claimable-balance/>`_
+    for more information on parameters and usage.
 
     Threshold: Medium
+
+    See `Create Claimable Balance <https://developers.stellar.org/docs/start/list-of-operations/#create-claimable-balance>`_ for more information.
 
     :param asset: The asset for the claimable balance.
     :param amount: the amount of the asset.
     :param claimants: A list of Claimants.
-    :param source: The source account (defaults to transaction source).
+    :param source: The source account for the operation. Defaults to the transaction's source account.
     """
 
     _XDR_OPERATION_TYPE: stellar_xdr.OperationType = (

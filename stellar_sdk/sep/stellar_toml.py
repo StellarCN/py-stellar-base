@@ -36,9 +36,9 @@ def fetch_stellar_toml(
 
     :param domain: The domain the .toml file is hosted at.
     :param use_http: Specifies whether the request should go over plain HTTP vs HTTPS.
-        Note it is recommend that you *always* use HTTPS.
+        Note it is recommend that you **always** use HTTPS.
     :param client: Http Client used to send the request.
-    :return: The stellar.toml file as a an object via :func:`toml.loads`.
+    :return: The stellar.toml file as an object via :func:`toml.loads`.
     :raises: :exc:`StellarTomlNotFoundError <stellar_sdk.sep.exceptions.StellarTomlNotFoundError>`:
         if the Stellar toml file could not not be found.
     """
@@ -63,9 +63,9 @@ async def fetch_stellar_toml_async(
 
     :param domain: The domain the .toml file is hosted at.
     :param use_http: Specifies whether the request should go over plain HTTP vs HTTPS.
-        Note it is recommend that you *always* use HTTPS.
+        Note it is recommend that you **always** use HTTPS.
     :param client: Http Client used to send the request.
-    :return: The stellar.toml file as a an object via :func:`toml.loads`.
+    :return: The stellar.toml file as an object via :func:`toml.loads`.
     :raises: :exc:`StellarTomlNotFoundError <stellar_sdk.sep.exceptions.StellarTomlNotFoundError>`:
         if the Stellar toml file could not not be found.
     """

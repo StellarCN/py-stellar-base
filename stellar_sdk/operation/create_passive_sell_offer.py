@@ -32,8 +32,12 @@ class CreatePassiveSellOffer(Operation):
     two passive sell offers so the two offers don't immediately act on each other.
 
     Once the passive sell offer is created, you can manage it like any other offer
-    using the manage offer operation - see :class:`ManageOffer` for more
+    using the manage offer operation - see :class:`ManageBuyOffer` for more
     details.
+
+    Threshold: Medium
+
+    See `Create Passive Sell Offer <https://developers.stellar.org/docs/start/list-of-operations/#create-passive-sell-offer>`_ for more information.
 
     :param selling: What you're selling.
     :param buying: What you're buying.
@@ -41,7 +45,7 @@ class CreatePassiveSellOffer(Operation):
         deletes the offer.
     :param price: Price of 1 unit of `selling` in
         terms of `buying`.
-    :param source: The source account (defaults to transaction source).
+    :param source: The source account for the operation. Defaults to the transaction's source account.
 
     """
 

@@ -29,15 +29,15 @@ class Transaction:
     on transactions`_.
 
     .. _Stellar's guide on transactions:
-        https://www.stellar.org/developers/guides/concepts/transactions.html
+        https://developers.stellar.org/docs/glossary/transactions/
 
     :param source: the source account for the transaction.
     :param sequence: The sequence number for the transaction.
-    :param fee: The fee amount for the transaction, which should equal
-          FEE (currently 100 stroops) multiplied by the number of
+    :param fee: The max fee amount for the transaction, which should equal
+          FEE (currently least 100 stroops) multiplied by the number of
           operations in the transaction. See `Stellar's latest documentation
           on fees
-          <https://www.stellar.org/developers/guides/concepts/fees.html#transaction-fee>`_
+          <https://developers.stellar.org/docs/glossary/fees/#transaction-fee>`__
           for more information.
     :param operations: A list of operations objects (typically its
           subclasses as defined in :mod:`stellar_sdk.operation.Operation`.
@@ -45,9 +45,9 @@ class Transaction:
     :param memo: The memo being sent with the transaction, being
           represented as one of the subclasses of the
           :class:`Memo <stellar_sdk.memo.Memo>` object.
-    :param v1: When this value is set to True, V1 transactions will be generated,
+    :param v1: When this value is set to ``True``, V1 transactions will be generated,
         otherwise V0 transactions will be generated.
-        See `CAP-0015 <https://github.com/stellar/stellar-protocol/blob/master/core/cap-0015.md>`_ for more information.
+        See `CAP-0015 <https://github.com/stellar/stellar-protocol/blob/master/core/cap-0015.md>`__ for more information.
     """
 
     def __init__(

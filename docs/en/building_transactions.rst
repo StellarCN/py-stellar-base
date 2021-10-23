@@ -5,13 +5,13 @@
 Building Transactions
 *********************
 
-`Transactions <https://stellar.org/developers/learn/concepts/transactions.html>`_ are the commands that modify the state of the ledger.
+`Transactions <https://developers.stellar.org/docs/glossary/transactions/>`_ are the commands that modify the state of the ledger.
 They include sending payments, creating offers, making account configuration changes, etc.
 
-Every transaction has a source `account <https://stellar.org/developers/learn/concepts/accounts.html>`__. This is the account
-that pays the `fee <https://stellar.org/developers/learn/concepts/fees.html>`_ and uses up a sequence number for the transaction.
+Every transaction has a source `account <https://developers.stellar.org/docs/glossary/accounts/>`__. This is the account
+that pays the `fee <https://developers.stellar.org/docs/glossary/fees/>`_ and uses up a sequence number for the transaction.
 
-Transactions are made up of one or more `operations <https://stellar.org/developers/learn/concepts/operations.html>`_.
+Transactions are made up of one or more `operations <https://developers.stellar.org/docs/glossary/operations/>`_.
 Each operation also has a source account, which defaults to the transaction's source account.
 
 `TransactionBuilder <https://github.com/stellar/js-stellar-base/blob/master/src/transaction_builder.js>`_

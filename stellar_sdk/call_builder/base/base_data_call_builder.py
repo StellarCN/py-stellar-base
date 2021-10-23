@@ -8,10 +8,10 @@ __all__ = ["BaseDataCallBuilder"]
 class BaseDataCallBuilder(BaseCallBuilder):
     """Creates a new :class:`DataCallBuilder` pointed to server defined by horizon_url.
 
-    See `Data for Account <https://www.stellar.org/developers/horizon/reference/endpoints/data-for-account.html>`__
+    See `Retrieve an Account's Data <https://developers.stellar.org/api/resources/accounts/data/>`__ for more information.
 
     :param horizon_url: Horizon server URL.
-    :param account_id: account id, for example: `GDGQVOKHW4VEJRU2TETD6DBRKEO5ERCNF353LW5WBFW3JJWQ2BRQ6KDD`
+    :param account_id: account id, for example: ``"GDGQVOKHW4VEJRU2TETD6DBRKEO5ERCNF353LW5WBFW3JJWQ2BRQ6KDD"``
     :param data_name: Key name
     """
 

@@ -154,7 +154,7 @@ class RequestsClient(BaseSyncClient):
     ) -> Generator[Dict[str, Any], None, None]:
         """Creates an EventSource that listens for incoming messages from the server.
 
-        See `Horizon Response Format <https://www.stellar.org/developers/horizon/reference/responses.html>`_
+        See `Horizon Response Format <https://developers.stellar.org/api/introduction/response-format/>`__
 
         See `MDN EventSource <https://developer.mozilla.org/en-US/docs/Web/API/EventSource>`_
 

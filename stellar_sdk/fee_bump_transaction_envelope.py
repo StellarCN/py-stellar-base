@@ -12,14 +12,17 @@ __all__ = ["FeeBumpTransactionEnvelope"]
 
 @type_checked
 class FeeBumpTransactionEnvelope(BaseTransactionEnvelope["FeeBumpTransactionEnvelope"]):
-    """The :class:`FeeBumpTransactionEnvelope` object, which represents a transaction
+    """The :class:`FeeBumpTransactionEnvelope` object, which represents a fee bump transaction
     envelope ready to sign and submit to send over the network.
 
-    When a transaction is ready to be prepared for sending over the network, it
+    When a fee bump transaction is ready to be prepared for sending over the network, it
     must be put into a :class:`FeeBumpTransactionEnvelope`, which includes additional
     metadata such as the signers for a given transaction. Ultimately, this
     class handles signing and conversion to and from XDR for usage on Stellar's
     network.
+
+    See `Fee-Bump Transactions <https://developers.stellar.org/docs/glossary/fee-bumps/>`__ for more information.
+    See `CAP-0015 <https://github.com/stellar/stellar-protocol/blob/master/core/cap-0015.md>`__ for more information.
 
     :param transaction: The fee bump transaction that is encapsulated in this envelope.
     :param list signatures: which contains a list of signatures that have

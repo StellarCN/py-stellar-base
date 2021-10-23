@@ -10,7 +10,7 @@ __all__ = ["BasePaymentsCallBuilder"]
 class BasePaymentsCallBuilder(BaseCallBuilder):
     """Creates a new :class:`PaymentsCallBuilder` pointed to server defined by horizon_url.
 
-    See `All Payments <https://www.stellar.org/developers/horizon/reference/endpoints/payments-all.html>`__
+    See `List All Payments <https://developers.stellar.org/api/resources/operations/list-payments/>`__ for more information.
 
     :param horizon_url: Horizon server URL.
     """
@@ -23,7 +23,7 @@ class BasePaymentsCallBuilder(BaseCallBuilder):
         """This endpoint responds with a collection of Payment operations where the given account
         was either the sender or receiver.
 
-        See `Payments for Account <https://www.stellar.org/developers/horizon/reference/endpoints/payments-for-account.html>`__
+        See `Retrieve an Account's Payments <https://developers.stellar.org/api/resources/accounts/payments/>`__ for more information.
 
         :param account_id: Account ID
         :return: current PaymentsCallBuilder instance
@@ -34,7 +34,7 @@ class BasePaymentsCallBuilder(BaseCallBuilder):
     def for_ledger(self, sequence: Union[int, str]):
         """This endpoint represents all payment operations that are part of a valid transactions in a given ledger.
 
-        See `Payments for Ledger <https://www.stellar.org/developers/horizon/reference/endpoints/payments-for-ledger.html>`__
+        See `Retrieve a Ledger's Payments <https://developers.stellar.org/api/resources/ledgers/payments/>`__ for more information.
 
         :param sequence: Ledger sequence
         :return: current PaymentsCallBuilder instance
@@ -45,7 +45,7 @@ class BasePaymentsCallBuilder(BaseCallBuilder):
     def for_transaction(self, transaction_hash: str):
         """This endpoint represents all payment operations that are part of a given transaction.
 
-        See `Payments for Transaction <https://www.stellar.org/developers/horizon/reference/endpoints/payments-for-transaction.html>`__
+        P.S. The documentation provided by SDF seems to be missing this API.
 
         :param transaction_hash: Transaction hash
         :return: current PaymentsCallBuilder instance

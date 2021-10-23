@@ -11,7 +11,7 @@
 =========
 
 SDK 使用 `建造者模式 <https://en.wikipedia.org/wiki/Builder_pattern>`_ 来创建请求。通过 :py:class:`Server <stellar_sdk.server.Server>` ，我们可以链式的构建一个请求。
-(请参阅 `Horizon 文档 <https://www.stellar.org/developers/reference/>`_ 来了解有哪些方法是可用的。)
+(请参阅 `Horizon 文档 <https://developers.stellar.org/api/>`_ 来了解有哪些方法是可用的。)
 
 .. literalinclude:: ../../examples/query_horizon.py
    :language: python
@@ -28,7 +28,7 @@ SDK 使用 `建造者模式 <https://en.wikipedia.org/wiki/Builder_pattern>`_ �
 而是会返回一个 EventSource。
 
 Horizon 将会实时的返回从当前时间开始产生的数据，当然你也可以通过 :py:meth:`cursor() <stellar_sdk.call_builder.BaseCallBuilder.cursor>` 指定一个时间点。
-(请参阅 `Horizon 文档 <https://www.stellar.org/developers/reference/>`_ 了解有哪些接口支持 Stream。)
+(请参阅 `Horizon 文档 <https://developers.stellar.org/api/>`_ 了解有哪些接口支持 Stream。)
 
 下面这个示例将会实时打印这个账户提交的事务。
 

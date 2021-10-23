@@ -20,6 +20,8 @@ class Clawback(Operation):
 
     Threshold: Medium
 
+    See `Clawback <https://developers.stellar.org/docs/start/list-of-operations/#clawback>`_ for more information.
+
     :param asset: The asset being clawed back.
     :param from_: The public key of the account to claw back from.
     :param amount: The amount of the asset to claw back.

@@ -19,22 +19,24 @@ class ManageBuyOffer(Operation):
 
     Creates, updates, or deletes an buy offer.
 
-    If you want to create a new offer set Offer ID to 0.
+    If you want to create a new offer set `offer_id` to ``0``.
 
-    If you want to update an existing offer set Offer ID to existing offer ID.
+    If you want to update an existing offer set `offer_id` to existing offer ID.
 
-    If you want to delete an existing offer set Offer ID to existing offer ID
-    and set Amount to 0.
+    If you want to delete an existing offer set `offer_id` to existing offer ID
+    and set `amount` to ``0``.
 
     Threshold: Medium
 
+    See `Manage Buy Offer <https://developers.stellar.org/docs/start/list-of-operations/#manage-buy-offer>`_ for more information.
+
     :param selling: What you're selling.
     :param buying: What you're buying.
-    :param amount: Amount being bought. if set to 0, delete the offer.
+    :param amount: Amount being bought. if set to ``"0"``, delete the offer.
     :param price: Price of thing being bought in terms of what you are selling.
-    :param offer_id: If `0`, will create a new offer (default). Otherwise,
+    :param offer_id: If ``"0"``, will create a new offer (default). Otherwise,
         edits an existing offer.
-    :param source: The source account (defaults to transaction source).
+    :param source: The source account for the operation. Defaults to the transaction's source account.
 
     """
 

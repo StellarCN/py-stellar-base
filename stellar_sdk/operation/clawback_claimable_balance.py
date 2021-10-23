@@ -20,6 +20,8 @@ class ClawbackClaimableBalance(Operation):
 
     Threshold: Medium
 
+    See `Clawback Claimable Balance <https://developers.stellar.org/docs/start/list-of-operations/#clawback-claimable-balance>`_ for more information.
+
     :param balance_id: The claimable balance ID to be clawed back.
     :param source: The source account for the operation. Defaults to the
         transaction's source account.

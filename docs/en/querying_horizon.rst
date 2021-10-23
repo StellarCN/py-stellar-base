@@ -12,7 +12,7 @@ Building requests
 
 py-stellar-base uses the `Builder pattern <https://en.wikipedia.org/wiki/Builder_pattern>`_ to create the requests to send
 to Horizon. Starting with a :py:class:`Server <stellar_sdk.server.Server>` object, you can chain methods together to generate a query.
-(See the `Horizon reference <https://www.stellar.org/developers/reference/>`_ documentation for what methods are possible.)
+(See the `Horizon reference <https://developers.stellar.org/api/>`_ documentation for what methods are possible.)
 
 .. literalinclude:: ../../examples/query_horizon.py
    :language: python
@@ -31,7 +31,7 @@ Instead of returning a result like :py:meth:`call() <stellar_sdk.call_builder.Ba
 :py:meth:`stream() <stellar_sdk.call_builder.BaseCallBuilder.stream>` will return an EventSource.
 Horizon will start sending responses from either the beginning of time or from the point
 specified with :py:meth:`cursor() <stellar_sdk.call_builder.BaseCallBuilder.cursor>`.
-(See the `Horizon reference <https://www.stellar.org/developers/reference/>`_ documentation to learn which endpoints support streaming.)
+(See the `Horizon reference <https://developers.stellar.org/api/>`_ documentation to learn which endpoints support streaming.)
 
 For example, to log instances of transactions from a particular account:
 

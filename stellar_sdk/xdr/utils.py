@@ -23,7 +23,7 @@ def to_xdr_amount(value: Union[str, Decimal]) -> int:
     in order to come to the integer value used in XDR structures.
 
     See `Stellar's documentation on Asset Precision
-    <https://www.stellar.org/developers/guides/concepts/assets.html#amount-precision-and-representation>`_
+    <https://developers.stellar.org/docs/issuing-assets/anatomy-of-an-asset/#amount-precision>`_
     for more information.
 
     :param value: The amount to convert to an integer for XDR

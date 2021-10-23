@@ -48,9 +48,9 @@ class FederationRecord:
 
         :param account_id: Stellar public key / account ID
         :param stellar_address: Stellar address
-        :param memo_type: Type of memo to attach to transaction, one of *text*, *id* or *hash*
-        :param memo: value of memo to attach to transaction, for *hash* this should be base64-encoded.
-            This field should always be of type *string* (even when ``memo_type`` is equal *id*) to support parsing
+        :param memo_type: Type of memo to attach to transaction, one of ``text``, ``id`` or ``hash``
+        :param memo: value of memo to attach to transaction, for ``hash`` this should be base64-encoded.
+            This field should always be of type ``string`` (even when `memo_type` is equal ``id``) to support parsing
             value in languages that don't support big numbers.
         """
         self.account_id: str = account_id
@@ -84,12 +84,12 @@ def resolve_stellar_address(
 ) -> FederationRecord:
     """Get the federation record if the user was found for a given Stellar address.
 
-    :param stellar_address: address Stellar address (ex. bob*stellar.org).
+    :param stellar_address: address Stellar address (ex. ``"bob*stellar.org"``).
     :param client: Http Client used to send the request.
-    :param federation_url: The federation server URL (ex. `https://stellar.org/federation`),
-        if you don't set this value, we will try to get it from ``stellar_address``.
+    :param federation_url: The federation server URL (ex. ``"https://stellar.org/federation"``),
+        if you don't set this value, we will try to get it from `stellar_address`.
     :param use_http: Specifies whether the request should go over plain HTTP vs HTTPS.
-        Note it is recommend that you *always* use HTTPS.
+        Note it is recommend that you **always** use HTTPS.
     :return: Federation record.
     """
     if not client:
@@ -117,12 +117,12 @@ async def resolve_stellar_address_async(
 ) -> FederationRecord:
     """Get the federation record if the user was found for a given Stellar address.
 
-    :param stellar_address: address Stellar address (ex. bob*stellar.org).
+    :param stellar_address: address Stellar address (ex. ``"bob*stellar.org"``).
     :param client: Http Client used to send the request.
-    :param federation_url: The federation server URL (ex. `https://stellar.org/federation`),
-        if you don't set this value, we will try to get it from ``stellar_address``.
+    :param federation_url: The federation server URL (ex. ``"https://stellar.org/federation"``),
+        if you don't set this value, we will try to get it from `stellar_address`.
     :param use_http: Specifies whether the request should go over plain HTTP vs HTTPS.
-        Note it is recommend that you *always* use HTTPS.
+        Note it is recommend that you **always** use HTTPS.
     :return: Federation record.
     """
     if not client:
@@ -151,12 +151,12 @@ def resolve_account_id(
 ) -> FederationRecord:
     """Given an account ID, get their federation record if the user was found
 
-    :param account_id: Account ID (ex. GBYNR2QJXLBCBTRN44MRORCMI4YO7FZPFBCNOKTOBCAAFC7KC3LNPRYS)
-    :param domain: Get ``federation_url`` from the domain, you don't need to set this value if ``federation_url`` is set.
-    :param federation_url: The federation server URL (ex. https://stellar.org/federation).
+    :param account_id: Account ID (ex. ``"GBYNR2QJXLBCBTRN44MRORCMI4YO7FZPFBCNOKTOBCAAFC7KC3LNPRYS"``)
+    :param domain: Get `federation_url` from the domain, you don't need to set this value if `federation_url` is set.
+    :param federation_url: The federation server URL (ex. ``"https://stellar.org/federation"``).
     :param client: Http Client used to send the request.
     :param use_http: Specifies whether the request should go over plain HTTP vs HTTPS.
-        Note it is recommend that you *always* use HTTPS.
+        Note it is recommend that you **always** use HTTPS.
     :return: Federation record.
     """
     if domain is None and federation_url is None:
@@ -187,12 +187,12 @@ async def resolve_account_id_async(
 ) -> FederationRecord:
     """Given an account ID, get their federation record if the user was found
 
-    :param account_id: Account ID (ex. GBYNR2QJXLBCBTRN44MRORCMI4YO7FZPFBCNOKTOBCAAFC7KC3LNPRYS)
-    :param domain: Get ``federation_url`` from the domain, you don't need to set this value if ``federation_url`` is set.
-    :param federation_url: The federation server URL (ex. https://stellar.org/federation).
+    :param account_id: Account ID (ex. ``"GBYNR2QJXLBCBTRN44MRORCMI4YO7FZPFBCNOKTOBCAAFC7KC3LNPRYS"``)
+    :param domain: Get `federation_url` from the domain, you don't need to set this value if `federation_url` is set.
+    :param federation_url: The federation server URL (ex. ``"https://stellar.org/federation"``).
     :param client: Http Client used to send the request.
     :param use_http: Specifies whether the request should go over plain HTTP vs HTTPS.
-        Note it is recommend that you *always* use HTTPS.
+        Note it is recommend that you **always** use HTTPS.
     :return: Federation record.
     """
     if domain is None and federation_url is None:

@@ -1,3 +1,5 @@
+from typing import Union
+
 from . import xdr as stellar_xdr
 from .signer_key import SignerKey
 from .type_checked import type_checked
@@ -9,6 +11,16 @@ __all__ = ["Signer"]
 class Signer:
     """The :class:`Signer` object, which represents an account signer on Stellar's network.
 
+    An example:
+
+        from stellar_sdk import Signer
+
+        signer_ed25519 = Signer.ed25519_public_key("GCC3U63F5OJIG4VS6XCFUJGCQRRMNCVGASDGIZZEPA3AZ242K4JVPIYV", 1)
+        signer_sha256_hash = Signer.sha256_hash("XCC3U63F5OJIG4VS6XCFUJGCQRRMNCVGASDGIZZEPA3AZ242K4JVPRP5", 2)
+        signer_pre_auth_tx = Signer.pre_auth_tx("TCC3U63F5OJIG4VS6XCFUJGCQRRMNCVGASDGIZZEPA3AZ242K4JVOVKE", 3)
+        print(f"signer_ed25519 account id: {signer_ed25519.signer_key.encoded_signer_key}")
+        print(f"signer_ed25519 weight: {signer_ed25519.weight}")
+
     :param signer_key: The signer object
     :param weight: The weight of the key
     """
@@ -18,7 +30,7 @@ class Signer:
         self.weight: int = weight
 
     @classmethod
-    def ed25519_public_key(cls, account_id: str, weight: int) -> "Signer":
+    def ed25519_public_key(cls, account_id: Union[str, bytes], weight: int) -> "Signer":
         """Create ED25519 PUBLIC KEY Signer from account id.
 
         :param account_id: account id
@@ -32,9 +44,10 @@ class Signer:
         return cls(signer_key, weight)
 
     @classmethod
-    def pre_auth_tx(cls, pre_auth_tx_hash: bytes, weight: int) -> "Signer":
+    # TODO: add encoded strkey support
+    def pre_auth_tx(cls, pre_auth_tx_hash: Union[str, bytes], weight: int) -> "Signer":
         """Create Pre AUTH TX Signer from the sha256 hash of a transaction,
-        click `here <https://www.stellar.org/developers/guides/concepts/multi-sig.html#pre-authorized-transaction>`__ for more information.
+        click `here <https://developers.stellar.org/docs/glossary/multisig/#pre-authorized-transaction>`__ for more information.
 
         :param pre_auth_tx_hash: The sha256 hash of a transaction.
         :param weight: The weight of the signer (0 to delete or 1-255)
@@ -44,9 +57,10 @@ class Signer:
         return cls(signer_key, weight)
 
     @classmethod
-    def sha256_hash(cls, sha256_hash: bytes, weight: int) -> "Signer":
+    # TODO: add encoded strkey support
+    def sha256_hash(cls, sha256_hash: Union[str, bytes], weight: int) -> "Signer":
         """Create SHA256 HASH Signer from a sha256 hash of a preimage,
-        click `here <https://www.stellar.org/developers/guides/concepts/multi-sig.html#hashx>`__ for more information.
+        click `here <https://developers.stellar.org/docs/glossary/multisig/#hashx>`__ for more information.
 
         :param sha256_hash: a sha256 hash of a preimage
         :param weight: The weight of the signer (0 to delete or 1-255)

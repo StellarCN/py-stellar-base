@@ -33,7 +33,9 @@ class Language(Enum):
 
 @type_checked
 class StellarMnemonic(Mnemonic):
-    """Please use :meth:`Keypair.generate_mnemonic_phrase` and :meth:`Keypair.from_mnemonic_phrase`"""
+    """Please use :func:`stellar_sdk.keypair.Keypair.generate_mnemonic_phrase`
+    and :func:`stellar_sdk.keypair.Keypair.from_mnemonic_phrase`
+    """
 
     STELLAR_ACCOUNT_PATH_FORMAT = "m/44'/148'/%d'"
     FIRST_HARDENED_INDEX = 0x80000000

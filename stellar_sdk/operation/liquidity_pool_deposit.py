@@ -3,11 +3,10 @@ from decimal import Decimal
 from typing import Optional, Union
 
 from .. import xdr as stellar_xdr
-from ..exceptions import ValueError
 from ..muxed_account import MuxedAccount
 from ..price import Price
 from ..type_checked import type_checked
-from ..utils import is_valid_hash, raise_if_not_valid_amount, raise_if_not_valid_hash
+from ..utils import raise_if_not_valid_amount, raise_if_not_valid_hash
 from .operation import Operation
 
 __all__ = ["LiquidityPoolDeposit"]
@@ -21,6 +20,8 @@ class LiquidityPoolDeposit(Operation):
     Creates a liquidity pool deposit operation.
 
     Threshold: Medium
+
+    See `Liquidity Pool Deposit <https://developers.stellar.org/docs/start/list-of-operations/#liquidity-pool-deposit>`_ for more information.
 
     :param liquidity_pool_id: The liquidity pool ID.
     :param max_amount_a: Maximum amount of first asset to deposit.

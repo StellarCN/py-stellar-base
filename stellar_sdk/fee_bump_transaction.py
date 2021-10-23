@@ -18,7 +18,8 @@ class FeeBumpTransaction:
     """The :class:`FeeBumpTransaction` object, which represents a fee bump transaction
     on Stellar's network.
 
-    See `CAP-0015 <https://github.com/stellar/stellar-protocol/blob/master/core/cap-0015.md>`_ for more information.
+    See `Fee-Bump Transactions <https://developers.stellar.org/docs/glossary/fee-bumps/>`__ for more information.
+    See `CAP-0015 <https://github.com/stellar/stellar-protocol/blob/master/core/cap-0015.md>`__ for more information.
 
     :param fee_source: The account paying for the transaction.
     :param base_fee: The max fee willing to pay per operation in inner transaction (**in stroops**).
@@ -31,11 +32,6 @@ class FeeBumpTransaction:
         base_fee: int,
         inner_transaction_envelope: TransactionEnvelope,
     ) -> None:
-        if not isinstance(inner_transaction_envelope.transaction, Transaction):
-            raise ValueError(
-                "Invalid `inner_transaction`, it should be `stellar_sdk.transaction.Transaction`."
-            )
-
         if isinstance(fee_source, str):
             fee_source = MuxedAccount.from_account(fee_source)
         if isinstance(fee_source, Keypair):

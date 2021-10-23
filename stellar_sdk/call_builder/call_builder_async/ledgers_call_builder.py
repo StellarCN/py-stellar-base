@@ -11,7 +11,7 @@ class LedgersCallBuilder(BaseCallBuilder, BaseLedgersCallBuilder):
     """Creates a new :class:`LedgersCallBuilder` pointed to server defined by horizon_url.
     Do not create this object directly, use :func:`stellar_sdk.ServerAsync.ledgers`.
 
-    See `All Ledgers <https://www.stellar.org/developers/horizon/reference/endpoints/ledgers-all.html>`__
+    See `List All Ledgers <https://developers.stellar.org/api/resources/ledgers/list/>`__ for more information.
 
     :param horizon_url: Horizon server URL.
     :param client: The client instance used to send request.

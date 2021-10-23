@@ -12,6 +12,13 @@ __all__ = ["Price"]
 class Price:
     """Create a new price. Price in Stellar is represented as a fraction.
 
+    An example::
+
+        from stellar_sdk import Price
+
+        price_a = Price(1, 2)
+        price_b = Price.from_raw_price("0.5")
+
     :param n: numerator
     :param d: denominator
     """
@@ -22,10 +29,10 @@ class Price:
 
     @classmethod
     def from_raw_price(cls, price: Union[str, Decimal]) -> "Price":
-        """Create a :class:`Price` from the given str price.
+        """Create a :class:`Price` from the given str or Decimal price.
 
-        :param price: the str price. (ex. `'0.125'`)
-        :return: A new :class:`Price` object from the given str price.
+        :param price: the str or Decimal price. (ex. ``"0.125"``)
+        :return: A new :class:`Price` object from the given str or Decimal price.
         :raises: :exc:`NoApproximationError <stellar_sdk.exceptions.NoApproximationError>`:
             if the approximation could not not be found.
         """
@@ -45,7 +52,7 @@ class Price:
 
     @classmethod
     def from_xdr_object(cls, xdr_object: stellar_xdr.Price) -> "Price":
-        """Create a :class:`Price` from an XDR Asset object.
+        """Create a :class:`Price` from an XDR Price object.
 
         :param xdr_object: The XDR Price object.
         :return: A new :class:`Price` object from the given XDR Price object.

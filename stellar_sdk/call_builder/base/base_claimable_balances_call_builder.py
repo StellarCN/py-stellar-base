@@ -10,6 +10,8 @@ __all__ = ["BaseClaimableBalancesCallBuilder"]
 class BaseClaimableBalancesCallBuilder(BaseCallBuilder):
     """Creates a new :class:`ClaimableBalancesCallBuilder` pointed to server defined by horizon_url.
 
+    See `List Claimable Balances <https://developers.stellar.org/api/resources/claimablebalances/list/>`__ for more information.
+
     :param horizon_url: Horizon server URL.
     """
 
@@ -20,7 +22,7 @@ class BaseClaimableBalancesCallBuilder(BaseCallBuilder):
     def claimable_balance(self, claimable_balance_id: str):
         """Returns information and links relating to a single claimable balance.
 
-        See `Claimable Balances <https://developers.stellar.org/api/resources/claimablebalances/list/>`__
+        See `List Claimable Balances <https://developers.stellar.org/api/resources/claimablebalances/list/>`__ for more information.
 
         :param claimable_balance_id: claimable balance id
         :return: current AccountCallBuilder instance
@@ -31,9 +33,9 @@ class BaseClaimableBalancesCallBuilder(BaseCallBuilder):
     def for_sponsor(self, sponsor: str):
         """Returns all claimable balances which are sponsored by the given account ID.
 
-        See `Claimable Balances <https://developers.stellar.org/api/resources/claimablebalances/list/>`__
+        See `List Claimable Balances <https://developers.stellar.org/api/resources/claimablebalances/list/>`__ for more information.
 
-        :param sponsor: the sponsor id, for example: `GDGQVOKHW4VEJRU2TETD6DBRKEO5ERCNF353LW5WBFW3JJWQ2BRQ6KDD`
+        :param sponsor: the sponsor id, for example: ``"GDGQVOKHW4VEJRU2TETD6DBRKEO5ERCNF353LW5WBFW3JJWQ2BRQ6KDD"``
         :return: current ClaimableBalancesCallBuilder instance
         """
         self._add_query_param("sponsor", sponsor)
@@ -42,7 +44,7 @@ class BaseClaimableBalancesCallBuilder(BaseCallBuilder):
     def for_asset(self, asset: Asset):
         """Returns all claimable balances which provide a balance for the given asset.
 
-        See `Account Details <https://www.stellar.org/developers/horizon/reference/endpoints/accounts-single.html>`__
+        See `List Claimable Balances <https://developers.stellar.org/api/resources/claimablebalances/list/>`__ for more information.
 
         :param asset: an asset
         :return: current ClaimableBalancesCallBuilder instance
@@ -54,9 +56,9 @@ class BaseClaimableBalancesCallBuilder(BaseCallBuilder):
     def for_claimant(self, claimant: str):
         """Returns all claimable balances which can be claimed by the given account ID.
 
-        See `Account Details <https://www.stellar.org/developers/horizon/reference/endpoints/accounts-single.html>`__
+        See `List Claimable Balances <https://developers.stellar.org/api/resources/claimablebalances/list/>`__ for more information.
 
-        :param claimant: the account id, for example: `GDGQVOKHW4VEJRU2TETD6DBRKEO5ERCNF353LW5WBFW3JJWQ2BRQ6KDD`
+        :param claimant: the account id, for example: ``"GDGQVOKHW4VEJRU2TETD6DBRKEO5ERCNF353LW5WBFW3JJWQ2BRQ6KDD"``
         :return: current ClaimableBalancesCallBuilder instance
         """
         self._add_query_param("claimant", claimant)

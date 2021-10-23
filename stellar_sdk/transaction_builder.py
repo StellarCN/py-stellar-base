@@ -40,14 +40,39 @@ class TransactionBuilder:
     Be careful about **unsubmitted transactions**! When you build a transaction, stellar-sdk automatically
     increments the source account's sequence number. If you end up not submitting this transaction and submitting
     another one instead, it'll fail due to the sequence number being wrong. So if you decide not to use a built
-    transaction, make sure to update the source account's sequence number with :meth:`stellar_sdk.Server.load_account`
+    transaction, make sure to update the source account's sequence number
+    with :func:`stellar_sdk.server.Server.load_account` or :func:`stellar_sdk.server_async.ServerAsync.load_account`
     before creating another transaction.
+
+    An example::
+
+        # Alice pay 10.25 XLM to Bob
+        from stellar_sdk import Server, Keypair, TransactionBuilder, Network
+
+        alice_keypair = Keypair.from_secret("SBFZCHU5645DOKRWYBXVOXY2ELGJKFRX6VGGPRYUWHQ7PMXXJNDZFMKD")
+        bob_address = "GA7YNBW5CBTJZ3ZZOWX3ZNBKD6OE7A7IHUQVWMY62W2ZBG2SGZVOOPVH"
+
+        server = Server("https://horizon-testnet.stellar.org")
+        alice_account = server.load_account(alice_keypair.public_key)
+        base_fee = server.fetch_base_fee()
+        transaction = (
+            TransactionBuilder(
+                source_account=alice_account,
+                network_passphrase=Network.TESTNET_NETWORK_PASSPHRASE,
+                base_fee=base_fee,
+            )
+                .add_text_memo("Hello, Stellar!")
+                .append_payment_op(bob_address, "10.25", "XLM")
+                .build()
+        )
+        transaction.sign(alice_keypair)
+        response = server.submit_transaction(transaction)
+        print(response)
 
     :param source_account: The source account for this transaction.
     :param network_passphrase: The network to connect to for verifying and retrieving additional attributes from.
-        Defaults to **Test SDF Network ; September 2015**.
-    :param base_fee: Base fee in stroops. The network base fee is obtained by default from the latest ledger.
-        Transaction fee is equal to base fee times number of operations in this transaction.
+        Defaults to ``Test SDF Network ; September 2015``.
+    :param base_fee: Max fee you're willing to pay per operation in this transaction (**in stroops**).
     :param v1: When this value is set to True, V1 transactions will be generated,
         otherwise V0 transactions will be generated.
         See `CAP-0015 <https://github.com/stellar/stellar-protocol/blob/master/core/cap-0015.md>`_ for more information.
@@ -72,7 +97,7 @@ class TransactionBuilder:
         """This will build the transaction envelope.
         It will also increment the source account's sequence number by 1.
 
-        :return: The transaction envelope.
+        :return: New transaction envelope.
         """
         source = self.source_account.account
         sequence = self.source_account.sequence + 1
@@ -130,6 +155,11 @@ class TransactionBuilder:
         :py:class:`FeeBumpTransactionEnvelope <stellar_sdk.fee_bump_transaction_envelope.FeeBumpTransactionEnvelope>`
         via an XDR object.
 
+        .. warning::
+            I don't recommend you to use this function,
+            because it loses its signature when constructing TransactionBuilder.
+            Please use :py:func:`stellar_sdk.helpers.parse_transaction_envelope_from_xdr` instead.
+
         In addition, if xdr is not of
         :py:class:`TransactionEnvelope <stellar_sdk.transaction_envelope.TransactionEnvelope>`,
         it sets the fields of this builder (the transaction envelope,
@@ -143,6 +173,7 @@ class TransactionBuilder:
             :py:class:`FeeBumpTransactionEnvelope <stellar_sdk.fee_bump_transaction_envelope.FeeBumpTransactionEnvelope>`
             via the XDR object.
         """
+        # TODO: warn?
         xdr_object = stellar_xdr.TransactionEnvelope.from_xdr(xdr)
         te_type = xdr_object.type
         if te_type == stellar_xdr.EnvelopeType.ENVELOPE_TYPE_TX_FEE_BUMP:
@@ -177,7 +208,7 @@ class TransactionBuilder:
         Add a UNIX timestamp, determined by ledger time, of a lower and
         upper bound of when this transaction will be valid. If a transaction is
         submitted too early or too late, it will fail to make it into the
-        transaction set. maxTime equal 0 means that it's not set.
+        transaction set. `max_time` equal ``0`` means that it's not set.
 
         :param min_time: the UNIX timestamp (in seconds)
         :param max_time: the UNIX timestamp (in seconds)
@@ -193,7 +224,7 @@ class TransactionBuilder:
         :param timeout: timeout in second.
         :return: This builder instance.
         :raises:
-            :exc:`ValueError <stellar_sdk.exceptions.ValueError>`: if time_bound is already set.
+            :exc:`ValueError <stellar_sdk.exceptions.ValueError>`: if `time_bound` is already set.
         """
         if self.time_bounds:
             raise ValueError(
@@ -220,7 +251,7 @@ class TransactionBuilder:
         :param memo_text: The text for the memo to add.
         :return: This builder instance.
         :raises: :exc:`MemoInvalidException <stellar_sdk.exceptions.MemoInvalidException>`:
-            if ``memo_text`` is not a valid text memo.
+            if `memo_text` is not a valid text memo.
         """
         memo = TextMemo(memo_text)
         return self.add_memo(memo)
@@ -233,7 +264,7 @@ class TransactionBuilder:
         :return: This builder instance.
         :raises:
             :exc:`MemoInvalidException <stellar_sdk.exceptions.MemoInvalidException>`:
-            if ``memo_id`` is not a valid id memo.
+            if `memo_id` is not a valid id memo.
 
         """
         memo = IdMemo(memo_id)
@@ -247,7 +278,7 @@ class TransactionBuilder:
         :return: This builder instance.
         :raises:
             :exc:`MemoInvalidException <stellar_sdk.exceptions.MemoInvalidException>`:
-            if ``memo_hash`` is not a valid hash memo.
+            if `memo_hash` is not a valid hash memo.
         """
         memo = HashMemo(hex_to_bytes(memo_hash))
         return self.add_memo(memo)
@@ -263,7 +294,7 @@ class TransactionBuilder:
         :return: This builder instance.
         :raises:
             :exc:`MemoInvalidException <stellar_sdk.exceptions.MemoInvalidException>`:
-            if ``memo_return`` is not a valid return hash memo.
+            if `memo_return` is not a valid return hash memo.
         """
         memo = ReturnHashMemo(hex_to_bytes(memo_return))
         return self.add_memo(memo)
@@ -311,7 +342,8 @@ class TransactionBuilder:
 
         :param asset_issuer: The issuer address for the asset.
         :param asset_code: The asset code for the asset.
-        :param limit: The limit of the new trustline.
+        :param limit: The limit for the asset, defaults to max int64(``922337203685.4775807``).
+            If the limit is set to ``"0"`` it deletes the trustline.
         :param source: The source address to add the trustline to.
         :return: This builder instance.
 
@@ -330,8 +362,8 @@ class TransactionBuilder:
         operation to the list of operations.
 
         :param asset: The asset for the trust line.
-        :param limit: The limit for the asset, defaults to max int64(922337203685.4775807).
-            If the limit is set to "0" it deletes the trustline.
+        :param limit: The limit for the asset, defaults to max int64(``922337203685.4775807``).
+            If the limit is set to ``"0"`` it deletes the trustline.
         :param source: The source address to add the trustline to.
         :return: This builder instance.
 
@@ -506,35 +538,39 @@ class TransactionBuilder:
 
         :param inflation_dest: Account of the inflation destination.
         :param clear_flags: Indicates which flags to clear. For details about the flags,
-            please refer to the `accounts doc <https://www.stellar.org/developers/guides/concepts/accounts.html>`__.
+            please refer to the `Control Access to an Asset - Flag <https://developers.stellar.org/docs/issuing-assets/control-asset-access/#flags>`__.
             The `bit mask <https://en.wikipedia.org/wiki/Bit_field>`_ integer subtracts from the existing flags of the account.
             This allows for setting specific bits without knowledge of existing flags, you can also use
             :class:`stellar_sdk.operation.set_options.AuthorizationFlag`
-            - AUTHORIZATION_REQUIRED = 1
-            - AUTHORIZATION_REVOCABLE = 2
-            - AUTHORIZATION_IMMUTABLE = 4
-            - AUTHORIZATION_CLAWBACK_ENABLED = 8
+
+            * AUTHORIZATION_REQUIRED = 1
+            * AUTHORIZATION_REVOCABLE = 2
+            * AUTHORIZATION_IMMUTABLE = 4
+            * AUTHORIZATION_CLAWBACK_ENABLED = 8
+
         :param set_flags: Indicates which flags to set. For details about the flags,
-            please refer to the `accounts doc <https://www.stellar.org/developers/guides/concepts/accounts.html>`__.
+            please refer to the `Control Access to an Asset - Flag <https://developers.stellar.org/docs/issuing-assets/control-asset-access/#flags>`__.
             The bit mask integer adds onto the existing flags of the account.
             This allows for setting specific bits without knowledge of existing flags, you can also use
             :class:`stellar_sdk.operation.set_options.AuthorizationFlag`
-            - AUTHORIZATION_REQUIRED = 1
-            - AUTHORIZATION_REVOCABLE = 2
-            - AUTHORIZATION_IMMUTABLE = 4
-            - AUTHORIZATION_CLAWBACK_ENABLED = 8
+
+            * AUTHORIZATION_REQUIRED = 1
+            * AUTHORIZATION_REVOCABLE = 2
+            * AUTHORIZATION_IMMUTABLE = 4
+            * AUTHORIZATION_CLAWBACK_ENABLED = 8
+
         :param master_weight: A number from 0-255 (inclusive) representing the weight of the master key.
             If the weight of the master key is updated to 0, it is effectively disabled.
         :param low_threshold: A number from 0-255 (inclusive) representing the threshold this account sets on all
-            operations it performs that have `a low threshold <https://www.stellar.org/developers/guides/concepts/multi-sig.html>`_.
+            operations it performs that have `a low threshold <https://developers.stellar.org/docs/glossary/multisig/>`_.
         :param med_threshold: A number from 0-255 (inclusive) representing the threshold this account sets on all
-            operations it performs that have `a medium threshold <https://www.stellar.org/developers/guides/concepts/multi-sig.html>`_.
+            operations it performs that have `a medium threshold <https://developers.stellar.org/docs/glossary/multisig/>`_.
         :param high_threshold: A number from 0-255 (inclusive) representing the threshold this account sets on all
-            operations it performs that have `a high threshold <https://www.stellar.org/developers/guides/concepts/multi-sig.html>`_.
+            operations it performs that have `a high threshold <https://developers.stellar.org/docs/glossary/multisig/>`_.
         :param home_domain: sets the home domain used for
-            reverse `federation <https://www.stellar.org/developers/guides/concepts/federation.html>`_ lookup.
+            reverse `federation <https://developers.stellar.org/docs/glossary/federation/>`_ lookup.
         :param signer: Add, update, or remove a signer from the account.
-        :param source: The source account (defaults to transaction source).
+        :param source: The source account for the operation. Defaults to the transaction's source account.
         :return: This builder instance.
 
         """
@@ -558,9 +594,7 @@ class TransactionBuilder:
         weight: int,
         source: Optional[Union[MuxedAccount, str]] = None,
     ) -> "TransactionBuilder":
-        """Add a ed25519 public key signer to an account.
-
-        Add a ed25519 public key signer to an account via a :class:`SetOptions
+        """Add a ed25519 public key signer to an account via a :class:`SetOptions
         <stellar_sdk.operation.SetOptions` operation. This is a helper
         function for :meth:`append_set_options_op`.
 
@@ -580,9 +614,7 @@ class TransactionBuilder:
         weight: int,
         source: Optional[Union[MuxedAccount, str]] = None,
     ) -> "TransactionBuilder":
-        """Add a sha256 hash(HashX) signer to an account.
-
-        Add a HashX signer to an account via a :class:`SetOptions
+        """Add a sha256 hash(HashX) signer to an account via a :class:`SetOptions
         <stellar_sdk.operation.SetOptions` operation. This is a helper
         function for :meth:`append_set_options_op`.
 
@@ -602,20 +634,16 @@ class TransactionBuilder:
     def append_pre_auth_tx_signer(
         self, pre_auth_tx_hash: Union[str, bytes], weight: int, source=None
     ) -> "TransactionBuilder":
-        """Add a PreAuthTx signer to an account.
+        """Add a PreAuthTx signer to an account via a :class:`SetOptions <stellar_sdk.operation.SetOptions` operation.
+        This is a helper function for :meth:`append_set_options_op`.
 
-        Add a PreAuthTx signer to an account via a :class:`SetOptions
-        <stellar_sdk.operation.SetOptions` operation. This is a helper
-        function for :meth:`append_set_options_op`.
-
-        :param pre_auth_tx_hash: The address of the new preAuthTx signer - obtained by calling ``hash`` on
+        :param pre_auth_tx_hash: The address of the new preAuthTx signer - obtained by calling `hash` on
             the :class:`TransactionEnvelope <stellar_sdk.transaction_envelope.TransactionEnvelope>`,
             a 32 byte hash or hex encoded string.
         :param weight: The weight of the new signer.
         :param source: The source account that is adding a signer to its
             list of signers.
         :return: This builder instance.
-
         """
         signer = Signer.pre_auth_tx(
             pre_auth_tx_hash=hex_to_bytes(pre_auth_tx_hash), weight=weight
@@ -644,10 +672,10 @@ class TransactionBuilder:
             is buying.
         :param buying_issuer: The issuing address for the asset the offer
             creator is buying.
-        :param amount: Amount being bought. if set to. Set to 0 if you want
+        :param amount: Amount being bought. if set to. Set to ``"0"`` if you want
             to delete an existing offer.
         :param price: Price of thing being bought in terms of what you are selling.
-        :param offer_id: The ID of the offer. 0 for new offer. Set to
+        :param offer_id: The ID of the offer. ``"0"`` for new offer. Set to
             existing offer ID to update or delete.
         :param source: The source address that is managing a buying offer on
             Stellar's distributed exchange.
@@ -688,10 +716,10 @@ class TransactionBuilder:
             is buying.
         :param buying_issuer: The issuing address for the asset the offer
             creator is buying.
-        :param amount: Amount of the asset being sold. Set to 0 if you want
+        :param amount: Amount of the asset being sold. Set to ``"0"`` if you want
             to delete an existing offer.
         :param price: Price of 1 unit of selling in terms of buying.
-        :param offer_id: The ID of the offer. 0 for new offer. Set to
+        :param offer_id: The ID of the offer. ``"0"`` for new offer. Set to
             existing offer ID to update or delete.
         :param source: The source address that is managing an offer on
             Stellar's distributed exchange.
@@ -789,12 +817,11 @@ class TransactionBuilder:
         """Append a :class:`ManageData <stellar_sdk.operation.ManageData>`
         operation to the list of operations.
 
-        :param data_name: String up to 64 bytes long. If this is a new Name
+        :param data_name: If this is a new Name
             it will add the given name/value pair to the account. If this Name
-            is already present then the associated value will be modified.
-        :param data_value: If not present then the existing
-            Name will be deleted. If present then this value will be set in the
-            DataEntry. Up to 64 bytes long.
+            is already present then the associated value will be modified. Up to 64 bytes long.
+        :param data_value: If not present then the existing `data_name` will be deleted.
+            If present then this value will be set in the DataEntry. Up to 64 bytes long.
         :param source: The source account on which data is being managed.
             operation.
         :return: This builder instance.
@@ -830,7 +857,7 @@ class TransactionBuilder:
         :param asset: The asset for the claimable balance.
         :param amount: the amount of the asset.
         :param claimants: A list of Claimants.
-        :param source: The source account (defaults to transaction source).
+        :param source: The source account for the operation. Defaults to the transaction's source account.
         """
         op = CreateClaimableBalance(asset, amount, claimants, source)
         return self.append_operation(op)
@@ -842,7 +869,7 @@ class TransactionBuilder:
         operation to the list of operations.
 
         :param balance_id: The claimable balance id to be claimed.
-        :param source: The source account (defaults to transaction source).
+        :param source: The source account for the operation. Defaults to the transaction's source account.
         """
         op = ClaimClaimableBalance(balance_id, source)
         return self.append_operation(op)
@@ -854,7 +881,7 @@ class TransactionBuilder:
         operation to the list of operations.
 
         :param sponsored_id: The sponsored account id.
-        :param source: The source account (defaults to transaction source).
+        :param source: The source account for the operation. Defaults to the transaction's source account.
         :return: This builder instance.
         """
         op = BeginSponsoringFutureReserves(sponsored_id, source)
@@ -866,7 +893,7 @@ class TransactionBuilder:
         """Append a :class:`EndSponsoringFutureReserves <stellar_sdk.operation.EndSponsoringFutureReserves>`
         operation to the list of operations.
 
-        :param source: The source account (defaults to transaction source).
+        :param source: The source account for the operation. Defaults to the transaction's source account.
         :return: This builder instance.
         """
         op = EndSponsoringFutureReserves(source)
@@ -879,7 +906,7 @@ class TransactionBuilder:
         for an account to the list of operations.
 
         :param account_id: The sponsored account ID.
-        :param source: The source account (defaults to transaction source).
+        :param source: The source account for the operation. Defaults to the transaction's source account.
         :return: This builder instance.
         """
         op = RevokeSponsorship.revoke_account_sponsorship(account_id, source)
@@ -896,7 +923,7 @@ class TransactionBuilder:
 
         :param account_id: The account ID which owns the trustline.
         :param asset: The asset in the trustline.
-        :param source: The source account (defaults to transaction source).
+        :param source: The source account for the operation. Defaults to the transaction's source account.
         :return: This builder instance.
         """
         op = RevokeSponsorship.revoke_trustline_sponsorship(account_id, asset, source)
@@ -913,7 +940,7 @@ class TransactionBuilder:
 
         :param seller_id: The account ID which created the offer.
         :param offer_id: The offer ID.
-        :param source: The source account (defaults to transaction source).
+        :param source: The source account for the operation. Defaults to the transaction's source account.
         :return: This builder instance.
         """
         op = RevokeSponsorship.revoke_offer_sponsorship(seller_id, offer_id, source)
@@ -930,7 +957,7 @@ class TransactionBuilder:
 
         :param account_id: The account ID which owns the data entry.
         :param data_name: The name of the data entry
-        :param source: The source account (defaults to transaction source).
+        :param source: The source account for the operation. Defaults to the transaction's source account.
         :return: This builder instance.
         """
         op = RevokeSponsorship.revoke_data_sponsorship(account_id, data_name, source)
@@ -945,7 +972,7 @@ class TransactionBuilder:
         for a claimable to the list of operations.
 
         :param claimable_balance_id: The sponsored claimable balance ID.
-        :param source: The source account (defaults to transaction source).
+        :param source: The source account for the operation. Defaults to the transaction's source account.
         :return: This builder instance.
         """
         op = RevokeSponsorship.revoke_claimable_balance_sponsorship(
@@ -962,7 +989,7 @@ class TransactionBuilder:
         for a claimable to the list of operations.
 
         :param liquidity_pool_id: The sponsored liquidity pool ID in hex string.
-        :param source: The source account (defaults to transaction source).
+        :param source: The source account for the operation. Defaults to the transaction's source account.
         :return: This builder instance.
         """
         op = RevokeSponsorship.revoke_liquidity_pool_sponsorship(
@@ -981,7 +1008,7 @@ class TransactionBuilder:
 
         :param account_id: The account ID where the signer sponsorship is being removed from.
         :param signer_key: The account id of the ed25519_public_key signer.
-        :param source: The source account (defaults to transaction source).
+        :param source: The source account for the operation. Defaults to the transaction's source account.
         :return: This builder instance.
         """
         key = SignerKey.ed25519_public_key(signer_key)
@@ -999,7 +1026,7 @@ class TransactionBuilder:
 
         :param account_id: The account ID where the signer sponsorship is being removed from.
         :param signer_key: The account id of the hashx signer.
-        :param source: The source account (defaults to transaction source).
+        :param source: The source account for the operation. Defaults to the transaction's source account.
         :return: This builder instance.
         """
         key = SignerKey.sha256_hash(hex_to_bytes(signer_key))
@@ -1017,7 +1044,7 @@ class TransactionBuilder:
 
         :param account_id: The account ID where the signer sponsorship is being removed from.
         :param signer_key: The account id of the pre_auth_tx signer.
-        :param source: The source account (defaults to transaction source).
+        :param source: The source account for the operation. Defaults to the transaction's source account.
         :return: This builder instance.
         """
         key = SignerKey.pre_auth_tx(hex_to_bytes(signer_key))

@@ -13,16 +13,16 @@ class TimeBounds:
     of a lower and upper bound of when this transaction will be valid.
     If a transaction is submitted too early or too late,
     it will fail to make it into the transaction set.
-    **max_time** equal 0 means that it’s not set.
+    *max_time* equal ``0`` means that it’s not set.
 
     See `Stellar's documentation on Transactions
-    <https://www.stellar.org/developers/guides/concepts/transactions.html#time-bounds>`__
+    <https://developers.stellar.org/docs/glossary/transactions/#time-bounds>`__
     for more information on how TimeBounds are used within transactions.
 
 
     :param min_time: the UNIX timestamp (in seconds)
     :param max_time: the UNIX timestamp (in seconds)
-    :raises: :exc:`ValueError <stellar_sdk.exceptions.ValueError>`: if ``max_time`` less than ``min_time``.
+    :raises: :exc:`ValueError <stellar_sdk.exceptions.ValueError>`: if `max_time` less than `min_time`.
     """
 
     def __init__(self, min_time: int, max_time: int) -> None:

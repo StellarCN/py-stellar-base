@@ -12,7 +12,7 @@ class BaseTradeAggregationsCallBuilder(BaseCallBuilder):
 
     Trade Aggregations facilitate efficient gathering of historical trade data.
 
-    See `Trade Aggregations <https://www.stellar.org/developers/horizon/reference/endpoints/trade_aggregations.html>`__
+    See `List Trade Aggregations <https://developers.stellar.org/api/aggregations/trade-aggregations/list/>`__ for more information.
 
     :param base: base asset
     :param counter: counter asset

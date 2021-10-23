@@ -11,7 +11,7 @@ class AssetsCallBuilder(BaseCallBuilder, BaseAssetsCallBuilder):
     """Creates a new :class:`AssetsCallBuilder` pointed to server defined by horizon_url.
     Do not create this object directly, use :func:`stellar_sdk.ServerAsync.assets`.
 
-    See `All Assets <https://www.stellar.org/developers/horizon/reference/endpoints/assets-all.html>`__
+    See `List All Assets <https://developers.stellar.org/api/resources/assets/list/>`__ for more information.
 
     :param horizon_url: Horizon server URL.
     :param client: The client instance used to send request.

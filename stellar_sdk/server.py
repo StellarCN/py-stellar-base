@@ -23,11 +23,21 @@ __all__ = ["Server"]
 
 @type_checked
 class Server(BaseServer):
-    """Server handles the network connection to a `Horizon <https://www.stellar.org/developers/horizon/reference/>`_
+    """Server handles the network connection to a `Horizon <https://developers.stellar.org/api/introduction/>`_
     instance and exposes an interface for requests to that instance.
 
-    :param horizon_url: Horizon Server URL (ex. `https://horizon-testnet.stellar.org`)
-    :param client: Http Client used to send the request
+    An example::
+
+        from stellar_sdk import Server
+
+        server = Server("https://horizon-testnet.stellar.org")
+        resp = server.transactions().limit(10).order(desc=True).call()
+        print(resp)
+
+    :param horizon_url: Horizon Server URL
+        (ex. ``"https://horizon-testnet.stellar.org"`` for test network,
+        ``"https://horizon-testnet.stellar.org"`` for public network)
+    :param client: Http client used to send the request
     """
 
     def __init__(
@@ -343,10 +353,7 @@ class Server(BaseServer):
         )
 
     def close(self) -> None:
-        """Close underlying connector.
-
-        Release all acquired resources.
-        """
+        """Close underlying connector, and release all acquired resources."""
         self._client.close()
 
     def __enter__(self) -> "Server":

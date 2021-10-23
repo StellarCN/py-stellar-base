@@ -111,12 +111,11 @@ class RevokeSponsorship(Operation):
     then attempt to revoke the sponsorship. If the source account is sponsored, the next step depends on whether the
     entry is sponsored or not. If it is sponsored, attempt to transfer the sponsorship to the sponsor
     of the source account. If the entry is not sponsored, then establish the sponsorship.
-    See `Sponsored Reserves <https://developers.stellar.org/docs/glossary/sponsored-reserves/>_` for more information.
-
-    See `Revoke Sponsorship
-    <https://developers.stellar.org/docs/start/list-of-operations/#revoke-sponsorship>_`.
+    See `Sponsored Reserves <https://developers.stellar.org/docs/glossary/sponsored-reserves/>`_ for more information.
 
     Threshold: Medium
+
+    See `Revoke Sponsorship <https://developers.stellar.org/docs/start/list-of-operations/#revoke-sponsorship>`_ for more information.
 
     :param revoke_sponsorship_type: The sponsored account id.
     :param account_id: The sponsored account ID.
@@ -125,7 +124,7 @@ class RevokeSponsorship(Operation):
     :param data: The sponsored data.
     :param claimable_balance_id: The sponsored claimable balance.
     :param signer: The sponsored signer.
-    :param source: The source account (defaults to transaction source).
+    :param source: The source account for the operation. Defaults to the transaction's source account.
     """
 
     _XDR_OPERATION_TYPE: stellar_xdr.OperationType = (
@@ -167,10 +166,10 @@ class RevokeSponsorship(Operation):
     def revoke_account_sponsorship(
         cls, account_id: str, source: Optional[Union[MuxedAccount, str]] = None
     ):
-        """Create a "revoke sponsorship" operation for an account.
+        """Create a **revoke sponsorship** operation for an account.
 
         :param account_id: The sponsored account ID.
-        :param source: The source account (defaults to transaction source).
+        :param source: The source account for the operation. Defaults to the transaction's source account.
         :return: A "revoke sponsorship" operation for an account.
         """
         return cls(
@@ -192,11 +191,11 @@ class RevokeSponsorship(Operation):
         asset: Union[Asset, LiquidityPoolId],
         source: Optional[Union[MuxedAccount, str]] = None,
     ):
-        """Create a "revoke sponsorship" operation for a trustline.
+        """Create a **revoke sponsorship** operation for a trustline.
 
         :param account_id: The account ID which owns the trustline.
         :param asset: The asset in the trustline.
-        :param source: The source account (defaults to transaction source).
+        :param source: The source account for the operation. Defaults to the transaction's source account.
         :return: A "revoke sponsorship" operation for a trustline.
         """
         trustline = TrustLine(account_id=account_id, asset=asset)
@@ -219,11 +218,11 @@ class RevokeSponsorship(Operation):
         offer_id: int,
         source: Optional[Union[MuxedAccount, str]] = None,
     ):
-        """Create a "revoke sponsorship" operation for an offer.
+        """Create a **revoke sponsorship** operation for an offer.
 
         :param seller_id: The account ID which created the offer.
         :param offer_id: The offer ID.
-        :param source: The source account (defaults to transaction source).
+        :param source: The source account for the operation. Defaults to the transaction's source account.
         :return: A "revoke sponsorship" operation for an offer.
         """
         offer = Offer(seller_id=seller_id, offer_id=offer_id)
@@ -246,11 +245,11 @@ class RevokeSponsorship(Operation):
         data_name: str,
         source: Optional[Union[MuxedAccount, str]] = None,
     ):
-        """Create a "revoke sponsorship" operation for a data entry.
+        """Create a **revoke sponsorship** operation for a data entry.
 
         :param account_id: The account ID which owns the data entry.
         :param data_name: The name of the data entry
-        :param source: The source account (defaults to transaction source).
+        :param source: The source account for the operation. Defaults to the transaction's source account.
         :return: A "revoke sponsorship" operation for a data entry.
         """
         data = Data(account_id=account_id, data_name=data_name)
@@ -272,10 +271,10 @@ class RevokeSponsorship(Operation):
         claimable_balance_id: str,
         source: Optional[Union[MuxedAccount, str]] = None,
     ):
-        """Create a "revoke sponsorship" operation for a claimable balance.
+        """Create a **revoke sponsorship** operation for a claimable balance.
 
         :param claimable_balance_id: The sponsored claimable balance ID.
-        :param source: The source account (defaults to transaction source).
+        :param source: The source account for the operation. Defaults to the transaction's source account.
         :return: A "revoke sponsorship" operation for a claimable balance.
         """
         return cls(
@@ -297,11 +296,11 @@ class RevokeSponsorship(Operation):
         signer_key: SignerKey,
         source: Optional[Union[MuxedAccount, str]] = None,
     ):
-        """Create a "revoke sponsorship" operation for a signer.
+        """Create a **revoke sponsorship** operation for a signer.
 
         :param account_id: The account ID where the signer sponsorship is being removed from.
         :param signer_key: The signer whose sponsorship is being removed.
-        :param source: The source account (defaults to transaction source).
+        :param source: The source account for the operation. Defaults to the transaction's source account.
         :return: A "revoke sponsorship" operation for a signer.
         """
         signer = Signer(account_id=account_id, signer_key=signer_key)
@@ -321,10 +320,10 @@ class RevokeSponsorship(Operation):
     def revoke_liquidity_pool_sponsorship(
         cls, liquidity_pool_id: str, source: Optional[Union[MuxedAccount, str]] = None
     ):
-        """Create a "revoke sponsorship" operation for a liquidity pool.
+        """Create a **revoke sponsorship** operation for a liquidity pool.
 
         :param liquidity_pool_id: The sponsored liquidity pool ID in hex string.
-        :param source: The source account (defaults to transaction source).
+        :param source: The source account for the operation. Defaults to the transaction's source account.
         :return: A "revoke sponsorship" operation for a liquidity pool.
         """
         return cls(

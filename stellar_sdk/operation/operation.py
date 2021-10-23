@@ -23,9 +23,9 @@ class Operation(metaclass=ABCMeta):
     transaction, unless there is an override defined for the operation.
 
     For more on operations, see `Stellar's documentation on operations
-    <https://www.stellar.org/developers/guides/concepts/operations.html>`_ as
+    <https://developers.stellar.org/docs/glossary/operations/>`_ as
     well as `Stellar's List of Operations
-    <https://www.stellar.org/developers/guides/concepts/list-of-operations.html>`_,
+    <https://developers.stellar.org/docs/start/list-of-operations/>`_,
     which includes information such as the security necessary for a given
     operation, as well as information about when validity checks occur on the
     network.
@@ -33,7 +33,7 @@ class Operation(metaclass=ABCMeta):
     The :class:`Operation` class is typically not used, but rather one of its
     subclasses is typically included in transactions.
 
-    :param source: The source account for the payment. Defaults to the
+    :param source: The source account for the operation. Defaults to the
         transaction's source account.
 
     """
@@ -65,7 +65,7 @@ class Operation(metaclass=ABCMeta):
         in order to come to the integer value used in XDR structures.
 
         See `Stellar's documentation on Asset Precision
-        <https://www.stellar.org/developers/guides/concepts/assets.html#amount-precision-and-representation>`_
+        <https://developers.stellar.org/docs/issuing-assets/anatomy-of-an-asset/#amount-precision>`_
         for more information.
 
         :param value: The amount to convert to an integer for XDR
