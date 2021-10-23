@@ -42,7 +42,7 @@ Stellar Python SDK
 
 .. image:: https://img.shields.io/badge/Stellar%20Protocol-18-blue?style=flat-square
     :alt: Stellar Protocol
-    :target: https://www.stellar.org/developers/guides/concepts/scp.html
+    :target: https://developers.stellar.org/docs/glossary/scp/
 
 py-stellar-base is a Python library for communicating with
 a `Stellar Horizon server`_. It is used for building Stellar apps on Python. It supports **Python 3.6+** as
@@ -56,7 +56,7 @@ It provides:
 Quickstart
 ----------
 At the absolute basics, you'll want to read up on `Stellar's Documentation
-Guides <https://www.stellar.org/developers/guides/>`_, as it contains a lot of
+Guides <https://developers.stellar.org/docs/>`_, as it contains a lot of
 information on the concepts used below (Transactions, Payments, Operations,
 KeyPairs, etc.).
 
@@ -84,13 +84,16 @@ methods.
 
    api
 
+stellar-model
+-------------
+stellar-model allows you to parse the JSON returned by Stellar Horizon
+into the Python models, click `here <https://github.com/StellarCN/stellar-model>`__ for more information.
 
 Links
 -----
 * Document: https://stellar-sdk.readthedocs.io
-* Code: https://github.com/StellarCN/py-stellar-base/tree/v2
-* Docker: https://hub.docker.com/r/overcat/py-stellar-base
-* Examples: https://github.com/StellarCN/py-stellar-base/blob/v2/examples
+* Code: https://github.com/StellarCN/py-stellar-base
+* Examples: https://github.com/StellarCN/py-stellar-base/tree/dev/examples
 * Issue tracker: https://github.com/StellarCN/py-stellar-base/issues
 * License: `Apache License 2.0 <https://github.com/StellarCN/py-stellar-base/blob/master/LICENSE>`_
 * Releases: https://pypi.org/project/stellar-sdk/
@@ -109,4 +112,4 @@ Thank you to all the people who have already contributed to Stellar ecosystem!
 .. _Stellar Horizon server: https://github.com/stellar/go/tree/master/services/horizon
 .. _pip: https://pip.pypa.io/en/stable/quickstart/
 .. _pipenv: https://github.com/pypa/pipenv
-.. _Stellar JavaScript SDK: https://www.stellar.org/developers/js-stellar-sdk/reference/
+.. _Stellar JavaScript SDK: https://github.com/stellar/js-stellar-sdk

@@ -27,7 +27,7 @@ In the example below we're sending 1000 XLM (at max) from *GABJLI6IVBKJ7HIC5NN7H
 * *USD* issued by *GBBM6BKZPEHWYO3E3YKREDPQXMS4VK35YLNU7NFBRI26RAN7GI5POFBB*
 * *EUR* issued by *GDTNXRLOJD2YEBPKK7KCMR7J33AAG5VZXHAJTHIG736D6LVEFLLLKPDL*
 
-The `path payment <https://www.stellar.org/developers/learn/concepts/list-of-operations.html#path-payment>`_ will
+The `path payment <https://developers.stellar.org/docs/start/list-of-operations/#path-payment-strict-receive>`_ will
 cause the destination address to get 5.5 GBP. It will cost the sender no more than 1000 XLM.
 In this example there will be 3 exchanges, XLM->USD, USD->EUR, EUR->GBP.
 

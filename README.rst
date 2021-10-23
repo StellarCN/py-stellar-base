@@ -35,7 +35,7 @@ Stellar Python SDK
 
 .. image:: https://img.shields.io/badge/Stellar%20Protocol-18-blue?style=flat-square
     :alt: Stellar Protocol
-    :target: https://www.stellar.org/developers/guides/concepts/scp.html
+    :target: https://developers.stellar.org/docs/glossary/scp/
 
 py-stellar-base is a Python library for communicating with
 a `Stellar Horizon server`_. It is used for building Stellar apps on Python. It supports **Python 3.6+** as
@@ -133,7 +133,7 @@ Building transaction with synchronous server
 stellar-model
 -------------
 stellar-model allows you to parse the JSON returned by Stellar Horizon
-into the Python models, click `here <https://github.com/StellarCN/stellar-model>`_ for more information.
+into the Python models, click `here <https://github.com/StellarCN/stellar-model>`__ for more information.
 
 Links
 -----

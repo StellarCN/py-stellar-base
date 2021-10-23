@@ -5,7 +5,7 @@
 Multi-signature account
 ***********************
 
-`Multi-signature accounts <https://www.stellar.org/developers/learn/concepts/multi-sig.html>`_
+`Multi-signature accounts <https://developers.stellar.org/docs/glossary/multisig/>`_
 can be used to require that transactions require multiple public keys to sign before they are considered valid.
 This is done by first configuring your account's **threshold** levels. Each operation has a threshold level of either low, medium,
 or high. You give each threshold level a number between 1-255 in your account. Then, for each key in your account, you

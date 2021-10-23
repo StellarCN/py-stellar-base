@@ -8,14 +8,14 @@
 你需要通过 :py:class:`CreateAccount
 <stellar_sdk.operation.CreateAccount>` 操作来创建 Stellar 中的账户。
 由于 `恒星网络对账户有着最低持币要求
-<https://www.stellar.org/developers/guides/concepts/fees.html#minimum-account-balance>`_,
+<https://developers.stellar.org/docs/glossary/minimum-balance/>`_,
 所以你需要给待激活账户发送一定数量的 XLM。当前这个数量是 **1 XLM (2
 x 0.5 Base Reserve)**，它可能会变化，但是通常很长时间才会变动一次，所以你可以将它视为一个固定值。
 
 使用测试网络
 =====================
 如果你想在测试网络中进行测试，你可以通过 `Friendbot
-<https://www.stellar.org/developers/guides/get-started/create-account.html>`_
+<https://developers.stellar.org/docs/tutorials/create-account/>`_
 来激活你的帐号。
 
 .. literalinclude:: ../../examples/create_account_friendbot.py
