@@ -15,6 +15,18 @@ class Asset:
     """The :class:`Asset` object, which represents an asset and its
     corresponding issuer on the Stellar network.
 
+    The following example shows how to create an Asset object::
+
+        from stellar_sdk import Asset
+
+        native_asset = Asset.native()  # You can also create an asset asset through Asset("XLM").
+        credit_alphanum4_asset = Asset("USD", "GBSKJPM2FM6O2C6GVZNAUAMGXZ6I4QIUPMNWVDN2NZULPWWTV3GI2SOX")
+        credit_alphanum12_asset = Asset("BANANA", "GA6VT2PDD73TNNRYLPJPJYAAI7EGKBATZ7V562S7XY7TJD4GNOXRG6OS")
+        print(f"Asset type: {credit_alphanum4_asset.type}\\n"
+              f"Asset code: {credit_alphanum4_asset.code}\\n"
+              f"Asset issuer: {credit_alphanum4_asset.issuer}\\n"
+              f"Is native asset: {credit_alphanum4_asset.is_native()}")
+
     For more information about the formats used for asset codes and how issuers
     work on Stellar's network, see `Stellar's guide on assets`_.
 
@@ -27,7 +39,7 @@ class Asset:
         | :exc:`AssetIssuerInvalidError <stellar_sdk.exceptions.AssetIssuerInvalidError>`: if ``issuer`` is not a valid ed25519 public key.
 
     .. _Stellar's guide on assets:
-        https://www.stellar.org/developers/guides/concepts/assets.html
+        https://developers.stellar.org/docs/glossary/assets/
     """
 
     def __init__(self, code: str, issuer: Optional[str] = None) -> None:
@@ -46,6 +58,12 @@ class Asset:
 
     @staticmethod
     def check_if_asset_code_is_valid(code: str) -> None:
+        """Check whether the `code` passed in by the user is a valid asset code,
+        if not, an exception will be thrown.
+
+        :param code: The asset code.
+        :raises: :exc:`AssetCodeInvalidError <stellar_sdk.exceptions.AssetCodeInvalidError>`: if ``code`` is invalid.
+        """
         asset_code_re = re.compile(r"^[a-zA-Z0-9]{1,12}$")
         if not asset_code_re.match(code):
             raise AssetCodeInvalidError(
@@ -54,7 +72,8 @@ class Asset:
 
     @property
     def type(self) -> str:
-        """Return the type of the asset, Can be one of following types: `native`, `credit_alphanum4` or `credit_alphanum12`
+        """Return the type of the asset, can be one of
+        following types: `native`, `credit_alphanum4` or `credit_alphanum12`
 
         :return: The type of the asset.
         """
@@ -65,7 +84,8 @@ class Asset:
         raise AttributeError("Asset type is immutable.")
 
     def guess_asset_type(self) -> str:
-        """Return the type of the asset, Can be one of following types: `native`, `credit_alphanum4` or `credit_alphanum12`
+        """Return the type of the asset, Can be one of
+        following types: ``native``, ``credit_alphanum4`` or ``credit_alphanum12``.
 
         :return: The type of the asset.
         """
@@ -97,9 +117,9 @@ class Asset:
         return cls("XLM")
 
     def is_native(self) -> bool:
-        """Return true if the :class:`Asset` is the native asset.
+        """Return ``Ture`` if the :class:`Asset` object is the native asset.
 
-        :return: True if the Asset is native, False otherwise.
+        :return: ``True`` if the asset object is native, ``False`` otherwise.
         """
         return self.issuer is None
 
@@ -169,7 +189,11 @@ class Asset:
     ) -> "Asset":
         """Create a :class:`Asset` from an XDR Asset/ChangeTrustAsset/TrustLineAsset object.
 
-        Cannot process XDR objects with asset type ASSET_TYPE_POOL_SHARE.
+        Please note that this function only supports processing the following types of assets:
+
+        - ASSET_TYPE_NATIVE
+        - ASSET_TYPE_CREDIT_ALPHANUM4
+        - ASSET_TYPE_CREDIT_ALPHANUM4
 
         :param xdr_object: The XDR Asset/ChangeTrustAsset/TrustLineAsset object.
         :return: A new :class:`Asset` object from the given XDR object.
@@ -195,11 +219,6 @@ class Asset:
         else:
             raise ValueError(f"Invalid asset type: {xdr_object.type}")
         return cls(code, issuer)
-
-    def __eq__(self, other: object) -> bool:
-        if not isinstance(other, self.__class__):
-            return NotImplemented  # pragma: no cover
-        return self.code == other.code and self.issuer == other.issuer
 
     def __str__(self):
         return f"<Asset [code={self.code}, issuer={self.issuer}, type={self.type}]>"
