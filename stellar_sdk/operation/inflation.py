@@ -17,8 +17,7 @@ class Inflation(Operation):
 
     Threshold: Low
 
-    :param str source: The source account (defaults to transaction source).
-
+    :param source: The source account for the operation. Defaults to the transaction's source account.
     """
 
     _XDR_OPERATION_TYPE: stellar_xdr.OperationType = stellar_xdr.OperationType.INFLATION

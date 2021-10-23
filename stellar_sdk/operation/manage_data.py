@@ -24,8 +24,13 @@ class ManageData(Operation):
 
     Threshold: Medium
 
-    :param data_name: The name of the data entry.
-    :param data_value: The value of the data entry.
+    See `Manage Data <https://developers.stellar.org/docs/start/list-of-operations/#manage-data>`_ for more information.
+
+    :param data_name: If this is a new Name
+        it will add the given name/value pair to the account. If this Name
+        is already present then the associated value will be modified. Up to 64 bytes long.
+    :param data_value: If not present then the existing `data_name` will be deleted.
+        If present then this value will be set in the DataEntry. Up to 64 bytes long.
     :param source: The optional source account.
 
     """

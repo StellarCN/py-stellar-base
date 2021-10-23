@@ -19,14 +19,16 @@ class ChangeTrust(Operation):
 
     Creates, updates, or deletes a trustline. For more on trustlines, please
     refer to the `assets documentation
-    <https://www.stellar.org/developers/guides/concepts/assets.html>_`.
+    <https://developers.stellar.org/docs/glossary/assets/>`_.
 
     Threshold: Medium
+
+    See `Change Trust <https://developers.stellar.org/docs/start/list-of-operations/#change-trust>`_ for more information.
 
     :param asset: The asset for the trust line.
     :param limit: The limit for the asset, defaults to max int64(``922337203685.4775807``).
         If the limit is set to ``"0"`` it deletes the trustline.
-    :param source: The source account (defaults to transaction source).
+    :param source: The source account for the operation. Defaults to the transaction's source account.
 
     """
 

@@ -37,19 +37,21 @@ class AllowTrust(Operation):
 
     Updates the authorized flag of an existing trustline. This can only be
     called by the issuer of a trustline's `asset
-    <https://www.stellar.org/developers/guides/concepts/assets.html>`_.
+    <https://developers.stellar.org/docs/glossary/assets/>`_.
 
     The issuer can only clear the authorized flag if the issuer has the
-    AUTH_REVOCABLE_FLAG set. Otherwise, the issuer can only set the authorized
+    ``AUTH_REVOCABLE_FLAG`` set. Otherwise, the issuer can only set the authorized
     flag.
 
     Threshold: Low
+
+    See `Allow Trust <https://developers.stellar.org/docs/start/list-of-operations/#allow-trust>`_ for more information.
 
     :param trustor: The trusting account (the one being authorized).
     :param asset_code: The asset code being authorized.
     :param authorize: `True` to authorize the line, `False` to deauthorize，if you need further control,
         you can also use :class:`stellar_sdk.operation.allow_trust.TrustLineEntryFlag`.
-    :param source: The source account (defaults to transaction source).
+    :param source: The source account for the operation. Defaults to the transaction's source account.
 
     """
 

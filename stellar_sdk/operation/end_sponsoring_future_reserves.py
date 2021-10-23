@@ -14,14 +14,13 @@ class EndSponsoringFutureReserves(Operation):
     operation on Stellar's network.
 
     Terminates the current is-sponsoring-future-reserves-for relationship in which the source account is sponsored.
-    See `Sponsored Reserves <https://developers.stellar.org/docs/glossary/sponsored-reserves/>_` for more information.
-
-    See `End Sponsoring Future Reserves
-    <https://developers.stellar.org/docs/start/list-of-operations/#end-sponsoring-future-reserves>_`.
+    See `Sponsored Reserves <https://developers.stellar.org/docs/glossary/sponsored-reserves/>`_ for more information.
 
     Threshold: Medium
 
-    :param source: The source account (defaults to transaction source).
+    See `End Sponsoring Future Reserves <https://developers.stellar.org/docs/start/list-of-operations/#end-sponsoring-future-reserves>`_.
+
+    :param source: The source account for the operation. Defaults to the transaction's source account.
     """
 
     _XDR_OPERATION_TYPE: stellar_xdr.OperationType = (

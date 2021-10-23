@@ -17,11 +17,11 @@ class TrustLineFlags(IntFlag):
     """Indicates which flags to set. For details about the flags,
     please refer to the `CAP-0035 <https://github.com/stellar/stellar-protocol/blob/master/core/cap-0035.md>`_.
 
-    - AUTHORIZED_FLAG: issuer has authorized account to perform transactions with its credit
+    - **AUTHORIZED_FLAG**: issuer has authorized account to perform transactions with its credit
 
-    - AUTHORIZED_TO_MAINTAIN_LIABILITIES_FLAG: issuer has authorized account to maintain and reduce liabilities for its credit
+    - **AUTHORIZED_TO_MAINTAIN_LIABILITIES_FLAG**: issuer has authorized account to maintain and reduce liabilities for its credit
 
-    - TRUSTLINE_CLAWBACK_ENABLED_FLAG: issuer has specified that it may clawback its credit, and that claimable balances created with its credit may also be clawed back
+    - **TRUSTLINE_CLAWBACK_ENABLED_FLAG**: issuer has specified that it may clawback its credit, and that claimable balances created with its credit may also be clawed back
     """
 
     AUTHORIZED_FLAG = 1
@@ -38,6 +38,8 @@ class SetTrustLineFlags(Operation):
     This is called by the issuer of the related asset.
 
     Threshold: Low
+
+    See `Set Trustline Flags <https://developers.stellar.org/docs/start/list-of-operations/#set-trustline-flags>`_ for more information.
 
     :param trustor: The account whose trustline this is.
     :param asset: The asset on the trustline.

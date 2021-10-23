@@ -545,7 +545,7 @@ class TransactionBuilder:
         :param home_domain: sets the home domain used for
             reverse `federation <https://developers.stellar.org/docs/glossary/federation/>`_ lookup.
         :param signer: Add, update, or remove a signer from the account.
-        :param source: The source account (defaults to transaction source).
+        :param source: The source account for the operation. Defaults to the transaction's source account.
         :return: This builder instance.
 
         """
@@ -647,10 +647,10 @@ class TransactionBuilder:
             is buying.
         :param buying_issuer: The issuing address for the asset the offer
             creator is buying.
-        :param amount: Amount being bought. if set to. Set to 0 if you want
+        :param amount: Amount being bought. if set to. Set to ``"0"`` if you want
             to delete an existing offer.
         :param price: Price of thing being bought in terms of what you are selling.
-        :param offer_id: The ID of the offer. 0 for new offer. Set to
+        :param offer_id: The ID of the offer. ``"0"`` for new offer. Set to
             existing offer ID to update or delete.
         :param source: The source address that is managing a buying offer on
             Stellar's distributed exchange.
@@ -691,10 +691,10 @@ class TransactionBuilder:
             is buying.
         :param buying_issuer: The issuing address for the asset the offer
             creator is buying.
-        :param amount: Amount of the asset being sold. Set to 0 if you want
+        :param amount: Amount of the asset being sold. Set to ``"0"`` if you want
             to delete an existing offer.
         :param price: Price of 1 unit of selling in terms of buying.
-        :param offer_id: The ID of the offer. 0 for new offer. Set to
+        :param offer_id: The ID of the offer. ``"0"`` for new offer. Set to
             existing offer ID to update or delete.
         :param source: The source address that is managing an offer on
             Stellar's distributed exchange.
@@ -792,12 +792,11 @@ class TransactionBuilder:
         """Append a :class:`ManageData <stellar_sdk.operation.ManageData>`
         operation to the list of operations.
 
-        :param data_name: String up to 64 bytes long. If this is a new Name
+        :param data_name: If this is a new Name
             it will add the given name/value pair to the account. If this Name
-            is already present then the associated value will be modified.
-        :param data_value: If not present then the existing
-            Name will be deleted. If present then this value will be set in the
-            DataEntry. Up to 64 bytes long.
+            is already present then the associated value will be modified. Up to 64 bytes long.
+        :param data_value: If not present then the existing `data_name` will be deleted.
+            If present then this value will be set in the DataEntry. Up to 64 bytes long.
         :param source: The source account on which data is being managed.
             operation.
         :return: This builder instance.
@@ -833,7 +832,7 @@ class TransactionBuilder:
         :param asset: The asset for the claimable balance.
         :param amount: the amount of the asset.
         :param claimants: A list of Claimants.
-        :param source: The source account (defaults to transaction source).
+        :param source: The source account for the operation. Defaults to the transaction's source account.
         """
         op = CreateClaimableBalance(asset, amount, claimants, source)
         return self.append_operation(op)
@@ -845,7 +844,7 @@ class TransactionBuilder:
         operation to the list of operations.
 
         :param balance_id: The claimable balance id to be claimed.
-        :param source: The source account (defaults to transaction source).
+        :param source: The source account for the operation. Defaults to the transaction's source account.
         """
         op = ClaimClaimableBalance(balance_id, source)
         return self.append_operation(op)
@@ -857,7 +856,7 @@ class TransactionBuilder:
         operation to the list of operations.
 
         :param sponsored_id: The sponsored account id.
-        :param source: The source account (defaults to transaction source).
+        :param source: The source account for the operation. Defaults to the transaction's source account.
         :return: This builder instance.
         """
         op = BeginSponsoringFutureReserves(sponsored_id, source)
@@ -869,7 +868,7 @@ class TransactionBuilder:
         """Append a :class:`EndSponsoringFutureReserves <stellar_sdk.operation.EndSponsoringFutureReserves>`
         operation to the list of operations.
 
-        :param source: The source account (defaults to transaction source).
+        :param source: The source account for the operation. Defaults to the transaction's source account.
         :return: This builder instance.
         """
         op = EndSponsoringFutureReserves(source)
@@ -882,7 +881,7 @@ class TransactionBuilder:
         for an account to the list of operations.
 
         :param account_id: The sponsored account ID.
-        :param source: The source account (defaults to transaction source).
+        :param source: The source account for the operation. Defaults to the transaction's source account.
         :return: This builder instance.
         """
         op = RevokeSponsorship.revoke_account_sponsorship(account_id, source)
@@ -899,7 +898,7 @@ class TransactionBuilder:
 
         :param account_id: The account ID which owns the trustline.
         :param asset: The asset in the trustline.
-        :param source: The source account (defaults to transaction source).
+        :param source: The source account for the operation. Defaults to the transaction's source account.
         :return: This builder instance.
         """
         op = RevokeSponsorship.revoke_trustline_sponsorship(account_id, asset, source)
@@ -916,7 +915,7 @@ class TransactionBuilder:
 
         :param seller_id: The account ID which created the offer.
         :param offer_id: The offer ID.
-        :param source: The source account (defaults to transaction source).
+        :param source: The source account for the operation. Defaults to the transaction's source account.
         :return: This builder instance.
         """
         op = RevokeSponsorship.revoke_offer_sponsorship(seller_id, offer_id, source)
@@ -933,7 +932,7 @@ class TransactionBuilder:
 
         :param account_id: The account ID which owns the data entry.
         :param data_name: The name of the data entry
-        :param source: The source account (defaults to transaction source).
+        :param source: The source account for the operation. Defaults to the transaction's source account.
         :return: This builder instance.
         """
         op = RevokeSponsorship.revoke_data_sponsorship(account_id, data_name, source)
@@ -948,7 +947,7 @@ class TransactionBuilder:
         for a claimable to the list of operations.
 
         :param claimable_balance_id: The sponsored claimable balance ID.
-        :param source: The source account (defaults to transaction source).
+        :param source: The source account for the operation. Defaults to the transaction's source account.
         :return: This builder instance.
         """
         op = RevokeSponsorship.revoke_claimable_balance_sponsorship(
@@ -965,7 +964,7 @@ class TransactionBuilder:
         for a claimable to the list of operations.
 
         :param liquidity_pool_id: The sponsored liquidity pool ID in hex string.
-        :param source: The source account (defaults to transaction source).
+        :param source: The source account for the operation. Defaults to the transaction's source account.
         :return: This builder instance.
         """
         op = RevokeSponsorship.revoke_liquidity_pool_sponsorship(
@@ -984,7 +983,7 @@ class TransactionBuilder:
 
         :param account_id: The account ID where the signer sponsorship is being removed from.
         :param signer_key: The account id of the ed25519_public_key signer.
-        :param source: The source account (defaults to transaction source).
+        :param source: The source account for the operation. Defaults to the transaction's source account.
         :return: This builder instance.
         """
         key = SignerKey.ed25519_public_key(signer_key)
@@ -1002,7 +1001,7 @@ class TransactionBuilder:
 
         :param account_id: The account ID where the signer sponsorship is being removed from.
         :param signer_key: The account id of the hashx signer.
-        :param source: The source account (defaults to transaction source).
+        :param source: The source account for the operation. Defaults to the transaction's source account.
         :return: This builder instance.
         """
         key = SignerKey.sha256_hash(hex_to_bytes(signer_key))
@@ -1020,7 +1019,7 @@ class TransactionBuilder:
 
         :param account_id: The account ID where the signer sponsorship is being removed from.
         :param signer_key: The account id of the pre_auth_tx signer.
-        :param source: The source account (defaults to transaction source).
+        :param source: The source account for the operation. Defaults to the transaction's source account.
         :return: This builder instance.
         """
         key = SignerKey.pre_auth_tx(hex_to_bytes(signer_key))

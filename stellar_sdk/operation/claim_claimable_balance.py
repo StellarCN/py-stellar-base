@@ -18,13 +18,12 @@ class ClaimClaimableBalance(Operation):
 
     Claims a ClaimableBalanceEntry and adds the amount of asset on the entry to the source account.
 
-    See `Claim Claimable Balance Documentation
-    <https://developers.stellar.org/docs/start/list-of-operations/#claim-claimable-balance>_`.
-
     Threshold: Low
 
+    See `Claim Claimable Balance <https://developers.stellar.org/docs/start/list-of-operations/#claim-claimable-balance>`_ for more information.
+
     :param balance_id: The claimable balance id to be claimed.
-    :param source: The source account (defaults to transaction source).
+    :param source: The source account for the operation. Defaults to the transaction's source account.
     """
 
     _XDR_OPERATION_TYPE: stellar_xdr.OperationType = (

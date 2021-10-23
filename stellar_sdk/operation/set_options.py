@@ -40,6 +40,8 @@ class SetOptions(Operation):
 
     Threshold: Medium or High
 
+    See `Set Options <https://developers.stellar.org/docs/start/list-of-operations/#set-options>`_ for more information.
+
     :param inflation_dest: Account of the inflation destination.
     :param clear_flags: Indicates which flags to clear. For details about the flags,
         please refer to the `Control Access to an Asset - Flag <https://developers.stellar.org/docs/issuing-assets/control-asset-access/#flags>`__.
@@ -74,7 +76,7 @@ class SetOptions(Operation):
     :param home_domain: sets the home domain used for
         reverse `federation <https://developers.stellar.org/docs/glossary/federation/>`_ lookup.
     :param signer: Add, update, or remove a signer from the account.
-    :param source: The source account (defaults to transaction source).
+    :param source: The source account for the operation. Defaults to the transaction's source account.
 
     """
 

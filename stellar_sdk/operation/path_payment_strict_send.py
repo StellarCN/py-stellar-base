@@ -22,13 +22,15 @@ class PathPaymentStrictSend(Operation):
 
     Threshold: Medium
 
+    See `Path Payment Strict Send <https://developers.stellar.org/docs/start/list-of-operations/#path-payment-strict-send>`_ for more information.
+
     :param destination: The destination account to send to.
-    :param send_asset: The asset to pay with.
-    :param send_amount: Amount of send_asset to send.
-    :param dest_asset: The asset the destination will receive.
-    :param dest_min: The minimum amount of dest_asset to be received.
+    :param send_asset: The `asset` to pay with.
+    :param send_amount: Amount of `send_asset` to send.
+    :param dest_asset: The asset the `destination` will receive.
+    :param dest_min: The minimum amount of `dest_asset` to be received.
     :param path: A list of Asset objects to use as the path.
-    :param source: The source account for the payment. Defaults to the
+    :param source: The source account for the operation. Defaults to the
         transaction's source account.
     """
 
