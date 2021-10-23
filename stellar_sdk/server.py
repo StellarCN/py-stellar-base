@@ -23,7 +23,7 @@ __all__ = ["Server"]
 
 @type_checked
 class Server(BaseServer):
-    """Server handles the network connection to a `Horizon <https://www.stellar.org/developers/horizon/reference/>`_
+    """Server handles the network connection to a `Horizon <https://developers.stellar.org/api/introduction/>`_
     instance and exposes an interface for requests to that instance.
 
     An example::

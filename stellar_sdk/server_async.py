@@ -22,7 +22,7 @@ __all__ = ["ServerAsync"]
 
 
 class ServerAsync(BaseServer):
-    """ServerAsync handles the network connection to a `Horizon <https://www.stellar.org/developers/horizon/reference/>`_
+    """ServerAsync handles the network connection to a `Horizon <https://developers.stellar.org/api/introduction/>`_
     instance and exposes an interface for requests to that instance.
 
     An example::

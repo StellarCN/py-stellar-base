@@ -52,7 +52,7 @@ class BaseCallBuilder:
     ]:
         """Creates an EventSource that listens for incoming messages from the server.
 
-        See `Horizon Response Format <https://www.stellar.org/developers/horizon/reference/responses.html>`__
+        See `Horizon Response Format <https://developers.stellar.org/api/introduction/response-format/>`__
 
         See `MDN EventSource <https://developer.mozilla.org/en-US/docs/Web/API/EventSource>`__
 
@@ -72,7 +72,7 @@ class BaseCallBuilder:
     def cursor(self, cursor: Union[int, str]):
         """Sets ``cursor`` parameter for the current call. Returns the CallBuilder object on which this method has been called.
 
-        See `Paging <https://www.stellar.org/developers/horizon/reference/paging.html>`__
+        See `Pagination <https://developers.stellar.org/api/introduction/pagination/>`__
 
         :param cursor: A cursor is a value that points to a specific location in a collection of resources.
         :return: current CallBuilder instance
@@ -83,7 +83,7 @@ class BaseCallBuilder:
     def limit(self, limit: int):
         """Sets ``limit`` parameter for the current call. Returns the CallBuilder object on which this method has been called.
 
-        See `Paging <https://www.stellar.org/developers/horizon/reference/paging.html>`__
+        See `Pagination <https://developers.stellar.org/api/introduction/pagination/>`__
 
         :param limit: Number of records the server should return.
         :return:
@@ -92,7 +92,7 @@ class BaseCallBuilder:
         return self
 
     def order(self, desc: bool = True):
-        """Sets ``order`` parameter for the current call. Returns the CallBuilder object on which this method has been called.
+        """Sets `order` parameter for the current call. Returns the CallBuilder object on which this method has been called.
 
         :param desc: Sort direction, ``True`` to get desc sort direction, the default setting is ``True``.
         :return: current CallBuilder instance

@@ -28,7 +28,7 @@ class Memo(object, metaclass=abc.ABCMeta):
     * :class:`RetHashMemo` -  A 32 byte hash intended to be interpreted as the hash of the transaction the sender is refunding.
 
     See `Stellar's documentation on Transactions
-    <https://www.stellar.org/developers/guides/concepts/transactions.html#memo>`__
+    <https://developers.stellar.org/docs/glossary/transactions/#memo>`__
     for more information on how memos are used within transactions, as well as
     information on the available types of memos.
 

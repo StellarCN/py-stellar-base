@@ -27,7 +27,7 @@ class CreateAccount(Operation):
     :param destination: Destination account ID to create an account for.
     :param starting_balance: Amount in XLM the account should be
         funded for. Must be greater than the `reserve balance amount
-        <https://www.stellar.org/developers/learn/concepts/fees.html>`_.
+        <https://developers.stellar.org/docs/glossary/minimum-balance/>`_.
     :param source: The source account for the operation. Defaults to the
         transaction's source account.
 
