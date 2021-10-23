@@ -16,8 +16,10 @@ class Account:
     Account tracks the sequence number as it is used
     by :class:`TransactionBuilder <stellar_sdk.transaction_builder.TransactionBuilder>`.
 
-    Normally, you can get an :class:`Account` instance through the :meth:`stellar_sdk.Server.load_account` method,
-    an example::
+    Normally, you can get an :class:`Account` instance through :func:`stellar_sdk.server.Server.load_account`
+    or :func:`stellar_sdk.server_async.ServerAsync.load_account`.
+
+    An example::
 
         from stellar_sdk import Keypair, Server
 

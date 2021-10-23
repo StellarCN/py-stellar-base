@@ -16,8 +16,7 @@ __all__ = ["AuthorizationFlag", "SetOptions"]
 
 class AuthorizationFlag(IntFlag):
     """Indicates which flags to set. For details about the flags,
-    please refer to the `accounts doc <https://www.stellar.org/developers/guides/concepts/accounts.html>`_.
-    The bit mask integer adds onto the existing flags of the account.
+    please refer to the `Control Access to an Asset - Flag <https://developers.stellar.org/docs/issuing-assets/control-asset-access/#flags>`__.
     """
 
     AUTHORIZATION_REQUIRED = 1
@@ -34,7 +33,7 @@ class SetOptions(Operation):
     This operation sets the options for an account.
 
     For more information on the signing options, please refer to the `multi-sig
-    doc <https://www.stellar.org/developers/guides/concepts/multi-sig.html>`_.
+    doc <https://developers.stellar.org/docs/glossary/multisig/>`_.
 
     When updating signers or other thresholds, the threshold of this operation
     is high.
@@ -43,33 +42,37 @@ class SetOptions(Operation):
 
     :param inflation_dest: Account of the inflation destination.
     :param clear_flags: Indicates which flags to clear. For details about the flags,
-        please refer to the `accounts doc <https://www.stellar.org/developers/guides/concepts/accounts.html>`_.
+        please refer to the `Control Access to an Asset - Flag <https://developers.stellar.org/docs/issuing-assets/control-asset-access/#flags>`__.
         The `bit mask <https://en.wikipedia.org/wiki/Bit_field>`_ integer subtracts from the existing flags of the account.
         This allows for setting specific bits without knowledge of existing flags, you can also use
         :class:`stellar_sdk.operation.set_options.AuthorizationFlag`
-        - AUTHORIZATION_REQUIRED = 1
-        - AUTHORIZATION_REVOCABLE = 2
-        - AUTHORIZATION_IMMUTABLE = 4
-        - AUTHORIZATION_CLAWBACK_ENABLED = 8
+
+        * AUTHORIZATION_REQUIRED = 1
+        * AUTHORIZATION_REVOCABLE = 2
+        * AUTHORIZATION_IMMUTABLE = 4
+        * AUTHORIZATION_CLAWBACK_ENABLED = 8
+
     :param set_flags: Indicates which flags to set. For details about the flags,
-        please refer to the `accounts doc <https://www.stellar.org/developers/guides/concepts/accounts.html>`_.
+        please refer to the `Control Access to an Asset - Flag <https://developers.stellar.org/docs/issuing-assets/control-asset-access/#flags>`__.
         The bit mask integer adds onto the existing flags of the account.
         This allows for setting specific bits without knowledge of existing flags, you can also use
         :class:`stellar_sdk.operation.set_options.AuthorizationFlag`
-        - AUTHORIZATION_REQUIRED = 1
-        - AUTHORIZATION_REVOCABLE = 2
-        - AUTHORIZATION_IMMUTABLE = 4
-        - AUTHORIZATION_CLAWBACK_ENABLED = 8
+
+        * AUTHORIZATION_REQUIRED = 1
+        * AUTHORIZATION_REVOCABLE = 2
+        * AUTHORIZATION_IMMUTABLE = 4
+        * AUTHORIZATION_CLAWBACK_ENABLED = 8
+
     :param master_weight: A number from 0-255 (inclusive) representing the weight of the master key.
         If the weight of the master key is updated to 0, it is effectively disabled.
     :param low_threshold: A number from 0-255 (inclusive) representing the threshold this account sets on all
-        operations it performs that have `a low threshold <https://www.stellar.org/developers/guides/concepts/multi-sig.html>`_.
+        operations it performs that have `a low threshold <https://developers.stellar.org/docs/glossary/multisig/>`_.
     :param med_threshold: A number from 0-255 (inclusive) representing the threshold this account sets on all
-        operations it performs that have `a medium threshold <https://www.stellar.org/developers/guides/concepts/multi-sig.html>`_.
+        operations it performs that have `a medium threshold <https://developers.stellar.org/docs/glossary/multisig/>`_.
     :param high_threshold: A number from 0-255 (inclusive) representing the threshold this account sets on all
-        operations it performs that have `a high threshold <https://www.stellar.org/developers/guides/concepts/multi-sig.html>`_.
+        operations it performs that have `a high threshold <https://developers.stellar.org/docs/glossary/multisig/>`_.
     :param home_domain: sets the home domain used for
-        reverse `federation <https://www.stellar.org/developers/guides/concepts/federation.html>`_ lookup.
+        reverse `federation <https://developers.stellar.org/docs/glossary/federation/>`_ lookup.
     :param signer: Add, update, or remove a signer from the account.
     :param source: The source account (defaults to transaction source).
 

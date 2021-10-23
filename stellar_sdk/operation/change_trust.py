@@ -24,8 +24,8 @@ class ChangeTrust(Operation):
     Threshold: Medium
 
     :param asset: The asset for the trust line.
-    :param limit: The limit for the asset, defaults to max int64(922337203685.4775807).
-        If the limit is set to "0" it deletes the trustline.
+    :param limit: The limit for the asset, defaults to max int64(``922337203685.4775807``).
+        If the limit is set to ``"0"`` it deletes the trustline.
     :param source: The source account (defaults to transaction source).
 
     """

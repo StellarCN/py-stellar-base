@@ -12,9 +12,18 @@ def parse_transaction_envelope_from_xdr(
     xdr: str, network_passphrase: str
 ) -> Union[TransactionEnvelope, FeeBumpTransactionEnvelope]:
     """When you are not sure whether your XDR belongs to
-        :py:class:`TransactionEnvelope <stellar_sdk.transaction_envelope.TransactionEnvelope>`
-        or :py:class:`FeeBumpTransactionEnvelope <stellar_sdk.fee_bump_transaction_envelope.FeeBumpTransactionEnvelope>`,
-        you can use this helper function.
+    :py:class:`TransactionEnvelope <stellar_sdk.transaction_envelope.TransactionEnvelope>`
+    or :py:class:`FeeBumpTransactionEnvelope <stellar_sdk.fee_bump_transaction_envelope.FeeBumpTransactionEnvelope>`,
+    you can use this helper function.
+
+    An example::
+
+        from stellar_sdk import Network
+        from stellar_sdk.helpers import parse_transaction_envelope_from_xdr
+
+        xdr = "AAAAAgAAAADHJNEDn33/C1uDkDfzDfKVq/4XE9IxDfGiLCfoV7riZQAAA+gCI4TVABpRPgAAAAAAAAAAAAAAAQAAAAAAAAADAAAAAUxpcmEAAAAAabIaDgm0ypyJpsVfEjZw2mO3Enq4Q4t5URKfWtqukSUAAAABVVNEAAAAAADophqGHmCvYPgHc+BjRuXHLL5Z3K3aN2CNWO9CUR2f3AAAAAAAAAAAE8G9mAADcH8AAAAAMYdBWgAAAAAAAAABV7riZQAAAEARGCGwYk/kEB2Z4UL20y536evnwmmSc4c2FnxlvUcPZl5jgWHcNwY8LTpFhdrUN9TZWciCRp/JCZYa0SJh8cYB"
+        te = parse_transaction_envelope_from_xdr(xdr, Network.PUBLIC_NETWORK_PASSPHRASE)
+        print(te)
 
     :param xdr: Transaction envelope XDR
     :param network_passphrase: The network to connect to for verifying and retrieving

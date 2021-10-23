@@ -40,7 +40,8 @@ class TransactionBuilder:
     Be careful about **unsubmitted transactions**! When you build a transaction, stellar-sdk automatically
     increments the source account's sequence number. If you end up not submitting this transaction and submitting
     another one instead, it'll fail due to the sequence number being wrong. So if you decide not to use a built
-    transaction, make sure to update the source account's sequence number with :meth:`stellar_sdk.Server.load_account`
+    transaction, make sure to update the source account's sequence number
+    with :func:`stellar_sdk.server.Server.load_account` or :func:`stellar_sdk.server_async.ServerAsync.load_account`
     before creating another transaction.
 
     :param source_account: The source account for this transaction.
@@ -182,7 +183,7 @@ class TransactionBuilder:
         Add a UNIX timestamp, determined by ledger time, of a lower and
         upper bound of when this transaction will be valid. If a transaction is
         submitted too early or too late, it will fail to make it into the
-        transaction set. maxTime equal 0 means that it's not set.
+        transaction set. `max_time` equal ``0`` means that it's not set.
 
         :param min_time: the UNIX timestamp (in seconds)
         :param max_time: the UNIX timestamp (in seconds)
@@ -198,7 +199,7 @@ class TransactionBuilder:
         :param timeout: timeout in second.
         :return: This builder instance.
         :raises:
-            :exc:`ValueError <stellar_sdk.exceptions.ValueError>`: if time_bound is already set.
+            :exc:`ValueError <stellar_sdk.exceptions.ValueError>`: if `time_bound` is already set.
         """
         if self.time_bounds:
             raise ValueError(
@@ -225,7 +226,7 @@ class TransactionBuilder:
         :param memo_text: The text for the memo to add.
         :return: This builder instance.
         :raises: :exc:`MemoInvalidException <stellar_sdk.exceptions.MemoInvalidException>`:
-            if ``memo_text`` is not a valid text memo.
+            if `memo_text` is not a valid text memo.
         """
         memo = TextMemo(memo_text)
         return self.add_memo(memo)
@@ -238,7 +239,7 @@ class TransactionBuilder:
         :return: This builder instance.
         :raises:
             :exc:`MemoInvalidException <stellar_sdk.exceptions.MemoInvalidException>`:
-            if ``memo_id`` is not a valid id memo.
+            if `memo_id` is not a valid id memo.
 
         """
         memo = IdMemo(memo_id)
@@ -252,7 +253,7 @@ class TransactionBuilder:
         :return: This builder instance.
         :raises:
             :exc:`MemoInvalidException <stellar_sdk.exceptions.MemoInvalidException>`:
-            if ``memo_hash`` is not a valid hash memo.
+            if `memo_hash` is not a valid hash memo.
         """
         memo = HashMemo(hex_to_bytes(memo_hash))
         return self.add_memo(memo)
@@ -268,7 +269,7 @@ class TransactionBuilder:
         :return: This builder instance.
         :raises:
             :exc:`MemoInvalidException <stellar_sdk.exceptions.MemoInvalidException>`:
-            if ``memo_return`` is not a valid return hash memo.
+            if `memo_return` is not a valid return hash memo.
         """
         memo = ReturnHashMemo(hex_to_bytes(memo_return))
         return self.add_memo(memo)
@@ -316,7 +317,8 @@ class TransactionBuilder:
 
         :param asset_issuer: The issuer address for the asset.
         :param asset_code: The asset code for the asset.
-        :param limit: The limit of the new trustline.
+        :param limit: The limit for the asset, defaults to max int64(``922337203685.4775807``).
+            If the limit is set to ``"0"`` it deletes the trustline.
         :param source: The source address to add the trustline to.
         :return: This builder instance.
 
@@ -335,8 +337,8 @@ class TransactionBuilder:
         operation to the list of operations.
 
         :param asset: The asset for the trust line.
-        :param limit: The limit for the asset, defaults to max int64(922337203685.4775807).
-            If the limit is set to "0" it deletes the trustline.
+        :param limit: The limit for the asset, defaults to max int64(``922337203685.4775807``).
+            If the limit is set to ``"0"`` it deletes the trustline.
         :param source: The source address to add the trustline to.
         :return: This builder instance.
 
@@ -511,33 +513,37 @@ class TransactionBuilder:
 
         :param inflation_dest: Account of the inflation destination.
         :param clear_flags: Indicates which flags to clear. For details about the flags,
-            please refer to the `accounts doc <https://www.stellar.org/developers/guides/concepts/accounts.html>`__.
+            please refer to the `Control Access to an Asset - Flag <https://developers.stellar.org/docs/issuing-assets/control-asset-access/#flags>`__.
             The `bit mask <https://en.wikipedia.org/wiki/Bit_field>`_ integer subtracts from the existing flags of the account.
             This allows for setting specific bits without knowledge of existing flags, you can also use
             :class:`stellar_sdk.operation.set_options.AuthorizationFlag`
-            - AUTHORIZATION_REQUIRED = 1
-            - AUTHORIZATION_REVOCABLE = 2
-            - AUTHORIZATION_IMMUTABLE = 4
-            - AUTHORIZATION_CLAWBACK_ENABLED = 8
+
+            * AUTHORIZATION_REQUIRED = 1
+            * AUTHORIZATION_REVOCABLE = 2
+            * AUTHORIZATION_IMMUTABLE = 4
+            * AUTHORIZATION_CLAWBACK_ENABLED = 8
+
         :param set_flags: Indicates which flags to set. For details about the flags,
-            please refer to the `accounts doc <https://www.stellar.org/developers/guides/concepts/accounts.html>`__.
+            please refer to the `Control Access to an Asset - Flag <https://developers.stellar.org/docs/issuing-assets/control-asset-access/#flags>`__.
             The bit mask integer adds onto the existing flags of the account.
             This allows for setting specific bits without knowledge of existing flags, you can also use
             :class:`stellar_sdk.operation.set_options.AuthorizationFlag`
-            - AUTHORIZATION_REQUIRED = 1
-            - AUTHORIZATION_REVOCABLE = 2
-            - AUTHORIZATION_IMMUTABLE = 4
-            - AUTHORIZATION_CLAWBACK_ENABLED = 8
+
+            * AUTHORIZATION_REQUIRED = 1
+            * AUTHORIZATION_REVOCABLE = 2
+            * AUTHORIZATION_IMMUTABLE = 4
+            * AUTHORIZATION_CLAWBACK_ENABLED = 8
+
         :param master_weight: A number from 0-255 (inclusive) representing the weight of the master key.
             If the weight of the master key is updated to 0, it is effectively disabled.
         :param low_threshold: A number from 0-255 (inclusive) representing the threshold this account sets on all
-            operations it performs that have `a low threshold <https://www.stellar.org/developers/guides/concepts/multi-sig.html>`_.
+            operations it performs that have `a low threshold <https://developers.stellar.org/docs/glossary/multisig/>`_.
         :param med_threshold: A number from 0-255 (inclusive) representing the threshold this account sets on all
-            operations it performs that have `a medium threshold <https://www.stellar.org/developers/guides/concepts/multi-sig.html>`_.
+            operations it performs that have `a medium threshold <https://developers.stellar.org/docs/glossary/multisig/>`_.
         :param high_threshold: A number from 0-255 (inclusive) representing the threshold this account sets on all
-            operations it performs that have `a high threshold <https://www.stellar.org/developers/guides/concepts/multi-sig.html>`_.
+            operations it performs that have `a high threshold <https://developers.stellar.org/docs/glossary/multisig/>`_.
         :param home_domain: sets the home domain used for
-            reverse `federation <https://www.stellar.org/developers/guides/concepts/federation.html>`_ lookup.
+            reverse `federation <https://developers.stellar.org/docs/glossary/federation/>`_ lookup.
         :param signer: Add, update, or remove a signer from the account.
         :param source: The source account (defaults to transaction source).
         :return: This builder instance.
@@ -563,9 +569,7 @@ class TransactionBuilder:
         weight: int,
         source: Optional[Union[MuxedAccount, str]] = None,
     ) -> "TransactionBuilder":
-        """Add a ed25519 public key signer to an account.
-
-        Add a ed25519 public key signer to an account via a :class:`SetOptions
+        """Add a ed25519 public key signer to an account via a :class:`SetOptions
         <stellar_sdk.operation.SetOptions` operation. This is a helper
         function for :meth:`append_set_options_op`.
 
@@ -585,9 +589,7 @@ class TransactionBuilder:
         weight: int,
         source: Optional[Union[MuxedAccount, str]] = None,
     ) -> "TransactionBuilder":
-        """Add a sha256 hash(HashX) signer to an account.
-
-        Add a HashX signer to an account via a :class:`SetOptions
+        """Add a sha256 hash(HashX) signer to an account via a :class:`SetOptions
         <stellar_sdk.operation.SetOptions` operation. This is a helper
         function for :meth:`append_set_options_op`.
 
@@ -607,20 +609,16 @@ class TransactionBuilder:
     def append_pre_auth_tx_signer(
         self, pre_auth_tx_hash: Union[str, bytes], weight: int, source=None
     ) -> "TransactionBuilder":
-        """Add a PreAuthTx signer to an account.
+        """Add a PreAuthTx signer to an account via a :class:`SetOptions <stellar_sdk.operation.SetOptions` operation.
+        This is a helper function for :meth:`append_set_options_op`.
 
-        Add a PreAuthTx signer to an account via a :class:`SetOptions
-        <stellar_sdk.operation.SetOptions` operation. This is a helper
-        function for :meth:`append_set_options_op`.
-
-        :param pre_auth_tx_hash: The address of the new preAuthTx signer - obtained by calling ``hash`` on
+        :param pre_auth_tx_hash: The address of the new preAuthTx signer - obtained by calling `hash` on
             the :class:`TransactionEnvelope <stellar_sdk.transaction_envelope.TransactionEnvelope>`,
             a 32 byte hash or hex encoded string.
         :param weight: The weight of the new signer.
         :param source: The source account that is adding a signer to its
             list of signers.
         :return: This builder instance.
-
         """
         signer = Signer.pre_auth_tx(
             pre_auth_tx_hash=hex_to_bytes(pre_auth_tx_hash), weight=weight
