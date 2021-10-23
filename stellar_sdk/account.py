@@ -32,8 +32,8 @@ class Account:
     more information.
 
     :param account_id: Account Id of the
-        account (ex. ``'GB3KJPLFUYN5VL6R3GU3EGCGVCKFDSD7BEDX42HWG5BWFKB3KQGJJRMA'``)
-        or muxed account (ex. ``'MBZSQ3YZMZEWL5ZRCEQ5CCSOTXCFCMKDGFFP4IEQN2KN6LCHCLI46AAAAAAAAAAE2L2QE'``)
+        account (ex. ``"GB3KJPLFUYN5VL6R3GU3EGCGVCKFDSD7BEDX42HWG5BWFKB3KQGJJRMA"``)
+        or muxed account (ex. ``"MBZSQ3YZMZEWL5ZRCEQ5CCSOTXCFCMKDGFFP4IEQN2KN6LCHCLI46AAAAAAAAAAE2L2QE"``)
     :param sequence: Current sequence number of the account.
     """
 

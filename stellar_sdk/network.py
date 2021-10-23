@@ -11,7 +11,7 @@ class Network:
     This class represents such a stellar network such as the Public network and the Test network.
 
     :param network_passphrase: The passphrase for the network.
-        (ex. ``'Public Global Stellar Network ; September 2015'``)
+        (ex. ``"Public Global Stellar Network ; September 2015"``)
 
     """
 

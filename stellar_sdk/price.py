@@ -31,7 +31,7 @@ class Price:
     def from_raw_price(cls, price: Union[str, Decimal]) -> "Price":
         """Create a :class:`Price` from the given str or Decimal price.
 
-        :param price: the str or Decimal price. (ex. ``'0.125'``)
+        :param price: the str or Decimal price. (ex. ``"0.125"``)
         :return: A new :class:`Price` object from the given str or Decimal price.
         :raises: :exc:`NoApproximationError <stellar_sdk.exceptions.NoApproximationError>`:
             if the approximation could not not be found.

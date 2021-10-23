@@ -38,8 +38,8 @@ class ServerAsync(BaseServer):
         asyncio.run(example())
 
     :param horizon_url: Horizon Server URL
-        (ex. ``'https://horizon-testnet.stellar.org'`` for test network,
-        ``'https://horizon-testnet.stellar.org'`` for public network)
+        (ex. ``"https://horizon-testnet.stellar.org"`` for test network,
+        ``"https://horizon-testnet.stellar.org"`` for public network)
     :param client: Http client used to send the request
     """
 

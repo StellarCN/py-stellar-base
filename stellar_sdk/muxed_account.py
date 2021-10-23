@@ -98,8 +98,8 @@ class MuxedAccount:
         """Create a :class:`MuxedAccount` object from account id or muxed account id.
 
         :param account: account id
-            or muxed account id (ex. ``'GDGQVOKHW4VEJRU2TETD6DBRKEO5ERCNF353LW5WBFW3JJWQ2BRQ6KDD'``
-            or ``'MAAAAAAAAAAAJURAAB2X52XFQP6FBXLGT6LWOOWMEXWHEWBDVRZ7V5WH34Y22MPFBHUHY'``)
+            or muxed account id (ex. ``"GDGQVOKHW4VEJRU2TETD6DBRKEO5ERCNF353LW5WBFW3JJWQ2BRQ6KDD"``
+            or ``"MAAAAAAAAAAAJURAAB2X52XFQP6FBXLGT6LWOOWMEXWHEWBDVRZ7V5WH34Y22MPFBHUHY"``)
         """
         data_length = len(account)
         if data_length == 56:

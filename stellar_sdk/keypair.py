@@ -61,7 +61,7 @@ class Keypair:
     def from_secret(cls, secret: str) -> "Keypair":
         """Generate a :class:`Keypair` object from a secret key.
 
-        :param secret: secret key (ex. ``'SB2LHKBL24ITV2Y346BU46XPEL45BDAFOOJLZ6SESCJZ6V5JMP7D6G5X'``)
+        :param secret: secret key (ex. ``"SB2LHKBL24ITV2Y346BU46XPEL45BDAFOOJLZ6SESCJZ6V5JMP7D6G5X"``)
         :return: A new :class:`Keypair` object derived by the secret.
         :raise: :exc:`Ed25519SecretSeedInvalidError <stellar_sdk.exceptions.Ed25519SecretSeedInvalidError>`:
             if `secret` is not a valid ed25519 secret seed.
@@ -73,7 +73,7 @@ class Keypair:
     def from_public_key(cls, public_key: str) -> "Keypair":
         """Generate a :class:`Keypair` object from a public key.
 
-        :param public_key: public key (ex. ``'GATPGGOIE6VWADVKD3ER3IFO2IH6DTOA5G535ITB3TT66FZFSIZEAU2B'``)
+        :param public_key: public key (ex. ``"GATPGGOIE6VWADVKD3ER3IFO2IH6DTOA5G535ITB3TT66FZFSIZEAU2B"``)
         :return: A new :class:`Keypair` object derived by the public key.
         :raise: :exc:`Ed25519PublicKeyInvalidError <stellar_sdk.exceptions.Ed25519PublicKeyInvalidError>`:
             if `public_key` is not a valid ed25519 public key.
