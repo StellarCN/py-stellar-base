@@ -10,10 +10,9 @@ __all__ = ["Int64"]
 
 class Int64:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    typedef hyper int64;
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        typedef hyper int64;
     """
 
     def __init__(self, int64: int) -> None:

@@ -11,10 +11,9 @@ __all__ = ["SponsorshipDescriptor"]
 
 class SponsorshipDescriptor:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    typedef AccountID* SponsorshipDescriptor;
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        typedef AccountID* SponsorshipDescriptor;
     """
 
     def __init__(self, sponsorship_descriptor: Optional[AccountID]) -> None:

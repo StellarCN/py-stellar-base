@@ -12,17 +12,16 @@ __all__ = ["ManageOfferSuccessResultOffer"]
 
 class ManageOfferSuccessResultOffer:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    union switch (ManageOfferEffect effect)
-        {
-        case MANAGE_OFFER_CREATED:
-        case MANAGE_OFFER_UPDATED:
-            OfferEntry offer;
-        default:
-            void;
-        }
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        union switch (ManageOfferEffect effect)
+            {
+            case MANAGE_OFFER_CREATED:
+            case MANAGE_OFFER_UPDATED:
+                OfferEntry offer;
+            default:
+                void;
+            }
     """
 
     def __init__(

@@ -10,16 +10,15 @@ __all__ = ["AllowTrustResult"]
 
 class AllowTrustResult:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    union AllowTrustResult switch (AllowTrustResultCode code)
-    {
-    case ALLOW_TRUST_SUCCESS:
-        void;
-    default:
-        void;
-    };
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        union AllowTrustResult switch (AllowTrustResultCode code)
+        {
+        case ALLOW_TRUST_SUCCESS:
+            void;
+        default:
+            void;
+        };
     """
 
     def __init__(

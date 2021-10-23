@@ -12,23 +12,22 @@ __all__ = ["ClaimOfferAtom"]
 
 class ClaimOfferAtom:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    struct ClaimOfferAtom
-    {
-        // emitted to identify the offer
-        AccountID sellerID; // Account that owns the offer
-        int64 offerID;
+    XDR Source Code::
 
-        // amount and asset taken from the owner
-        Asset assetSold;
-        int64 amountSold;
+        struct ClaimOfferAtom
+        {
+            // emitted to identify the offer
+            AccountID sellerID; // Account that owns the offer
+            int64 offerID;
 
-        // amount and asset sent to the owner
-        Asset assetBought;
-        int64 amountBought;
-    };
-    ----------------------------------------------------------------
+            // amount and asset taken from the owner
+            Asset assetSold;
+            int64 amountSold;
+
+            // amount and asset sent to the owner
+            Asset assetBought;
+            int64 amountBought;
+        };
     """
 
     def __init__(

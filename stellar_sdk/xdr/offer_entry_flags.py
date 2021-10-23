@@ -12,14 +12,13 @@ __all__ = ["OfferEntryFlags"]
 
 class OfferEntryFlags(IntEnum):
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    enum OfferEntryFlags
-    {
-        // issuer has authorized account to perform transactions with its credit
-        PASSIVE_FLAG = 1
-    };
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        enum OfferEntryFlags
+        {
+            // issuer has authorized account to perform transactions with its credit
+            PASSIVE_FLAG = 1
+        };
     """
 
     PASSIVE_FLAG = 1

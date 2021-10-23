@@ -12,14 +12,13 @@ __all__ = ["SCPHistoryEntry"]
 
 class SCPHistoryEntry:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    union SCPHistoryEntry switch (int v)
-    {
-    case 0:
-        SCPHistoryEntryV0 v0;
-    };
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        union SCPHistoryEntry switch (int v)
+        {
+        case 0:
+            SCPHistoryEntryV0 v0;
+        };
     """
 
     def __init__(

@@ -11,14 +11,13 @@ __all__ = ["SignedSurveyRequestMessage"]
 
 class SignedSurveyRequestMessage:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    struct SignedSurveyRequestMessage
-    {
-        Signature requestSignature;
-        SurveyRequestMessage request;
-    };
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        struct SignedSurveyRequestMessage
+        {
+            Signature requestSignature;
+            SurveyRequestMessage request;
+        };
     """
 
     def __init__(

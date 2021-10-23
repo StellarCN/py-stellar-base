@@ -12,16 +12,15 @@ __all__ = ["AccountMergeResult"]
 
 class AccountMergeResult:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    union AccountMergeResult switch (AccountMergeResultCode code)
-    {
-    case ACCOUNT_MERGE_SUCCESS:
-        int64 sourceAccountBalance; // how much got transferred from source account
-    default:
-        void;
-    };
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        union AccountMergeResult switch (AccountMergeResultCode code)
+        {
+        case ACCOUNT_MERGE_SUCCESS:
+            int64 sourceAccountBalance; // how much got transferred from source account
+        default:
+            void;
+        };
     """
 
     def __init__(

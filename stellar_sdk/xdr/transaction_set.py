@@ -13,14 +13,13 @@ __all__ = ["TransactionSet"]
 
 class TransactionSet:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    struct TransactionSet
-    {
-        Hash previousLedgerHash;
-        TransactionEnvelope txs<>;
-    };
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        struct TransactionSet
+        {
+            Hash previousLedgerHash;
+            TransactionEnvelope txs<>;
+        };
     """
 
     def __init__(

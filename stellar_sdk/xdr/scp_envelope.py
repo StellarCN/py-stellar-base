@@ -11,14 +11,13 @@ __all__ = ["SCPEnvelope"]
 
 class SCPEnvelope:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    struct SCPEnvelope
-    {
-        SCPStatement statement;
-        Signature signature;
-    };
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        struct SCPEnvelope
+        {
+            SCPStatement statement;
+            Signature signature;
+        };
     """
 
     def __init__(

@@ -12,17 +12,16 @@ __all__ = ["CreateClaimableBalanceResult"]
 
 class CreateClaimableBalanceResult:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    union CreateClaimableBalanceResult switch (
-        CreateClaimableBalanceResultCode code)
-    {
-    case CREATE_CLAIMABLE_BALANCE_SUCCESS:
-        ClaimableBalanceID balanceID;
-    default:
-        void;
-    };
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        union CreateClaimableBalanceResult switch (
+            CreateClaimableBalanceResultCode code)
+        {
+        case CREATE_CLAIMABLE_BALANCE_SUCCESS:
+            ClaimableBalanceID balanceID;
+        default:
+            void;
+        };
     """
 
     def __init__(

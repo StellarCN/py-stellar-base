@@ -12,15 +12,14 @@ __all__ = ["ClawbackOp"]
 
 class ClawbackOp:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    struct ClawbackOp
-    {
-        Asset asset;
-        MuxedAccount from_;
-        int64 amount;
-    };
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        struct ClawbackOp
+        {
+            Asset asset;
+            MuxedAccount from_;
+            int64 amount;
+        };
     """
 
     def __init__(

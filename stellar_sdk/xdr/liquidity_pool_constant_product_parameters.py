@@ -11,15 +11,14 @@ __all__ = ["LiquidityPoolConstantProductParameters"]
 
 class LiquidityPoolConstantProductParameters:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    struct LiquidityPoolConstantProductParameters
-    {
-        Asset assetA; // assetA < assetB
-        Asset assetB;
-        int32 fee;    // Fee is in basis points, so the actual rate is (fee/100)%
-    };
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        struct LiquidityPoolConstantProductParameters
+        {
+            Asset assetA; // assetA < assetB
+            Asset assetB;
+            int32 fee;    // Fee is in basis points, so the actual rate is (fee/100)%
+        };
     """
 
     def __init__(

@@ -15,21 +15,20 @@ __all__ = ["Hello"]
 
 class Hello:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    struct Hello
-    {
-        uint32 ledgerVersion;
-        uint32 overlayVersion;
-        uint32 overlayMinVersion;
-        Hash networkID;
-        string versionStr<100>;
-        int listeningPort;
-        NodeID peerID;
-        AuthCert cert;
-        uint256 nonce;
-    };
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        struct Hello
+        {
+            uint32 ledgerVersion;
+            uint32 overlayVersion;
+            uint32 overlayMinVersion;
+            Hash networkID;
+            string versionStr<100>;
+            int listeningPort;
+            NodeID peerID;
+            AuthCert cert;
+            uint256 nonce;
+        };
     """
 
     def __init__(

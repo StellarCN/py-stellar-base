@@ -12,19 +12,18 @@ __all__ = ["BeginSponsoringFutureReservesResultCode"]
 
 class BeginSponsoringFutureReservesResultCode(IntEnum):
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    enum BeginSponsoringFutureReservesResultCode
-    {
-        // codes considered as "success" for the operation
-        BEGIN_SPONSORING_FUTURE_RESERVES_SUCCESS = 0,
+    XDR Source Code::
 
-        // codes considered as "failure" for the operation
-        BEGIN_SPONSORING_FUTURE_RESERVES_MALFORMED = -1,
-        BEGIN_SPONSORING_FUTURE_RESERVES_ALREADY_SPONSORED = -2,
-        BEGIN_SPONSORING_FUTURE_RESERVES_RECURSIVE = -3
-    };
-    ----------------------------------------------------------------
+        enum BeginSponsoringFutureReservesResultCode
+        {
+            // codes considered as "success" for the operation
+            BEGIN_SPONSORING_FUTURE_RESERVES_SUCCESS = 0,
+
+            // codes considered as "failure" for the operation
+            BEGIN_SPONSORING_FUTURE_RESERVES_MALFORMED = -1,
+            BEGIN_SPONSORING_FUTURE_RESERVES_ALREADY_SPONSORED = -2,
+            BEGIN_SPONSORING_FUTURE_RESERVES_RECURSIVE = -3
+        };
     """
 
     BEGIN_SPONSORING_FUTURE_RESERVES_SUCCESS = 0

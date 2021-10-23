@@ -12,35 +12,34 @@ __all__ = ["MessageType"]
 
 class MessageType(IntEnum):
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    enum MessageType
-    {
-        ERROR_MSG = 0,
-        AUTH = 2,
-        DONT_HAVE = 3,
+    XDR Source Code::
 
-        GET_PEERS = 4, // gets a list of peers this guy knows about
-        PEERS = 5,
+        enum MessageType
+        {
+            ERROR_MSG = 0,
+            AUTH = 2,
+            DONT_HAVE = 3,
 
-        GET_TX_SET = 6, // gets a particular txset by hash
-        TX_SET = 7,
+            GET_PEERS = 4, // gets a list of peers this guy knows about
+            PEERS = 5,
 
-        TRANSACTION = 8, // pass on a tx you have heard about
+            GET_TX_SET = 6, // gets a particular txset by hash
+            TX_SET = 7,
 
-        // SCP
-        GET_SCP_QUORUMSET = 9,
-        SCP_QUORUMSET = 10,
-        SCP_MESSAGE = 11,
-        GET_SCP_STATE = 12,
+            TRANSACTION = 8, // pass on a tx you have heard about
 
-        // new messages
-        HELLO = 13,
+            // SCP
+            GET_SCP_QUORUMSET = 9,
+            SCP_QUORUMSET = 10,
+            SCP_MESSAGE = 11,
+            GET_SCP_STATE = 12,
 
-        SURVEY_REQUEST = 14,
-        SURVEY_RESPONSE = 15
-    };
-    ----------------------------------------------------------------
+            // new messages
+            HELLO = 13,
+
+            SURVEY_REQUEST = 14,
+            SURVEY_RESPONSE = 15
+        };
     """
 
     ERROR_MSG = 0

@@ -12,10 +12,9 @@ __all__ = ["LedgerEntryChanges"]
 
 class LedgerEntryChanges:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    typedef LedgerEntryChange LedgerEntryChanges<>;
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        typedef LedgerEntryChange LedgerEntryChanges<>;
     """
 
     def __init__(self, ledger_entry_changes: List[LedgerEntryChange]) -> None:

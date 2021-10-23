@@ -13,17 +13,16 @@ __all__ = ["TransactionMetaV2"]
 
 class TransactionMetaV2:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    struct TransactionMetaV2
-    {
-        LedgerEntryChanges txChangesBefore; // tx level changes before operations
-                                            // are applied if any
-        OperationMeta operations<>;         // meta for each operation
-        LedgerEntryChanges txChangesAfter;  // tx level changes after operations are
-                                            // applied if any
-    };
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        struct TransactionMetaV2
+        {
+            LedgerEntryChanges txChangesBefore; // tx level changes before operations
+                                                // are applied if any
+            OperationMeta operations<>;         // meta for each operation
+            LedgerEntryChanges txChangesAfter;  // tx level changes after operations are
+                                                // applied if any
+        };
     """
 
     def __init__(

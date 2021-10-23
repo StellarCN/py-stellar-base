@@ -14,15 +14,14 @@ __all__ = ["CreateClaimableBalanceOp"]
 
 class CreateClaimableBalanceOp:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    struct CreateClaimableBalanceOp
-    {
-        Asset asset;
-        int64 amount;
-        Claimant claimants<10>;
-    };
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        struct CreateClaimableBalanceOp
+        {
+            Asset asset;
+            int64 amount;
+            Claimant claimants<10>;
+        };
     """
 
     def __init__(

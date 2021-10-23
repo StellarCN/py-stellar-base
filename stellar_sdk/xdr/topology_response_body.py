@@ -11,17 +11,16 @@ __all__ = ["TopologyResponseBody"]
 
 class TopologyResponseBody:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    struct TopologyResponseBody
-    {
-        PeerStatList inboundPeers;
-        PeerStatList outboundPeers;
+    XDR Source Code::
 
-        uint32 totalInboundPeerCount;
-        uint32 totalOutboundPeerCount;
-    };
-    ----------------------------------------------------------------
+        struct TopologyResponseBody
+        {
+            PeerStatList inboundPeers;
+            PeerStatList outboundPeers;
+
+            uint32 totalInboundPeerCount;
+            uint32 totalOutboundPeerCount;
+        };
     """
 
     def __init__(

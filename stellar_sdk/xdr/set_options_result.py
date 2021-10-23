@@ -10,16 +10,15 @@ __all__ = ["SetOptionsResult"]
 
 class SetOptionsResult:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    union SetOptionsResult switch (SetOptionsResultCode code)
-    {
-    case SET_OPTIONS_SUCCESS:
-        void;
-    default:
-        void;
-    };
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        union SetOptionsResult switch (SetOptionsResultCode code)
+        {
+        case SET_OPTIONS_SUCCESS:
+            void;
+        default:
+            void;
+        };
     """
 
     def __init__(

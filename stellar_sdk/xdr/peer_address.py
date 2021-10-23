@@ -11,22 +11,21 @@ __all__ = ["PeerAddress"]
 
 class PeerAddress:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    struct PeerAddress
-    {
-        union switch (IPAddrType type)
+    XDR Source Code::
+
+        struct PeerAddress
         {
-        case IPv4:
-            opaque ipv4[4];
-        case IPv6:
-            opaque ipv6[16];
-        }
-        ip;
-        uint32 port;
-        uint32 numFailures;
-    };
-    ----------------------------------------------------------------
+            union switch (IPAddrType type)
+            {
+            case IPv4:
+                opaque ipv4[4];
+            case IPv6:
+                opaque ipv6[16];
+            }
+            ip;
+            uint32 port;
+            uint32 numFailures;
+        };
     """
 
     def __init__(

@@ -10,10 +10,9 @@ __all__ = ["PoolID"]
 
 class PoolID:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    typedef Hash PoolID;
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        typedef Hash PoolID;
     """
 
     def __init__(self, pool_id: Hash) -> None:

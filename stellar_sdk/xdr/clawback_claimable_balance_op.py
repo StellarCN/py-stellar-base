@@ -10,13 +10,12 @@ __all__ = ["ClawbackClaimableBalanceOp"]
 
 class ClawbackClaimableBalanceOp:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    struct ClawbackClaimableBalanceOp
-    {
-        ClaimableBalanceID balanceID;
-    };
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        struct ClawbackClaimableBalanceOp
+        {
+            ClaimableBalanceID balanceID;
+        };
     """
 
     def __init__(

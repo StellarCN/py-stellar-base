@@ -13,22 +13,21 @@ __all__ = ["TransactionSignaturePayload"]
 
 class TransactionSignaturePayload:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    struct TransactionSignaturePayload
-    {
-        Hash networkId;
-        union switch (EnvelopeType type)
+    XDR Source Code::
+
+        struct TransactionSignaturePayload
         {
-        // Backwards Compatibility: Use ENVELOPE_TYPE_TX to sign ENVELOPE_TYPE_TX_V0
-        case ENVELOPE_TYPE_TX:
-            Transaction tx;
-        case ENVELOPE_TYPE_TX_FEE_BUMP:
-            FeeBumpTransaction feeBump;
-        }
-        taggedTransaction;
-    };
-    ----------------------------------------------------------------
+            Hash networkId;
+            union switch (EnvelopeType type)
+            {
+            // Backwards Compatibility: Use ENVELOPE_TYPE_TX to sign ENVELOPE_TYPE_TX_V0
+            case ENVELOPE_TYPE_TX:
+                Transaction tx;
+            case ENVELOPE_TYPE_TX_FEE_BUMP:
+                FeeBumpTransaction feeBump;
+            }
+            taggedTransaction;
+        };
     """
 
     def __init__(

@@ -10,14 +10,13 @@ __all__ = ["TransactionExt"]
 
 class TransactionExt:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    union switch (int v)
-        {
-        case 0:
-            void;
-        }
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        union switch (int v)
+            {
+            case 0:
+                void;
+            }
     """
 
     def __init__(

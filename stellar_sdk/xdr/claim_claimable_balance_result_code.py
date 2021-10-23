@@ -12,19 +12,18 @@ __all__ = ["ClaimClaimableBalanceResultCode"]
 
 class ClaimClaimableBalanceResultCode(IntEnum):
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    enum ClaimClaimableBalanceResultCode
-    {
-        CLAIM_CLAIMABLE_BALANCE_SUCCESS = 0,
-        CLAIM_CLAIMABLE_BALANCE_DOES_NOT_EXIST = -1,
-        CLAIM_CLAIMABLE_BALANCE_CANNOT_CLAIM = -2,
-        CLAIM_CLAIMABLE_BALANCE_LINE_FULL = -3,
-        CLAIM_CLAIMABLE_BALANCE_NO_TRUST = -4,
-        CLAIM_CLAIMABLE_BALANCE_NOT_AUTHORIZED = -5
+    XDR Source Code::
 
-    };
-    ----------------------------------------------------------------
+        enum ClaimClaimableBalanceResultCode
+        {
+            CLAIM_CLAIMABLE_BALANCE_SUCCESS = 0,
+            CLAIM_CLAIMABLE_BALANCE_DOES_NOT_EXIST = -1,
+            CLAIM_CLAIMABLE_BALANCE_CANNOT_CLAIM = -2,
+            CLAIM_CLAIMABLE_BALANCE_LINE_FULL = -3,
+            CLAIM_CLAIMABLE_BALANCE_NO_TRUST = -4,
+            CLAIM_CLAIMABLE_BALANCE_NOT_AUTHORIZED = -5
+
+        };
     """
 
     CLAIM_CLAIMABLE_BALANCE_SUCCESS = 0

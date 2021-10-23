@@ -11,28 +11,27 @@ __all__ = ["LiquidityPoolEntry"]
 
 class LiquidityPoolEntry:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    struct LiquidityPoolEntry
-    {
-        PoolID liquidityPoolID;
+    XDR Source Code::
 
-        union switch (LiquidityPoolType type)
+        struct LiquidityPoolEntry
         {
-        case LIQUIDITY_POOL_CONSTANT_PRODUCT:
-            struct
-            {
-                LiquidityPoolConstantProductParameters params;
+            PoolID liquidityPoolID;
 
-                int64 reserveA;        // amount of A in the pool
-                int64 reserveB;        // amount of B in the pool
-                int64 totalPoolShares; // total number of pool shares issued
-                int64 poolSharesTrustLineCount; // number of trust lines for the associated pool shares
-            } constantProduct;
-        }
-        body;
-    };
-    ----------------------------------------------------------------
+            union switch (LiquidityPoolType type)
+            {
+            case LIQUIDITY_POOL_CONSTANT_PRODUCT:
+                struct
+                {
+                    LiquidityPoolConstantProductParameters params;
+
+                    int64 reserveA;        // amount of A in the pool
+                    int64 reserveB;        // amount of B in the pool
+                    int64 totalPoolShares; // total number of pool shares issued
+                    int64 poolSharesTrustLineCount; // number of trust lines for the associated pool shares
+                } constantProduct;
+            }
+            body;
+        };
     """
 
     def __init__(

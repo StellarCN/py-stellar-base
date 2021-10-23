@@ -10,13 +10,12 @@ __all__ = ["HmacSha256Key"]
 
 class HmacSha256Key:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    struct HmacSha256Key
-    {
-        opaque key[32];
-    };
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        struct HmacSha256Key
+        {
+            opaque key[32];
+        };
     """
 
     def __init__(

@@ -11,14 +11,13 @@ __all__ = ["TransactionResultPair"]
 
 class TransactionResultPair:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    struct TransactionResultPair
-    {
-        Hash transactionHash;
-        TransactionResult result; // result for the transaction
-    };
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        struct TransactionResultPair
+        {
+            Hash transactionHash;
+            TransactionResult result; // result for the transaction
+        };
     """
 
     def __init__(

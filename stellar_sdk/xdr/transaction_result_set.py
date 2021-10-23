@@ -12,13 +12,12 @@ __all__ = ["TransactionResultSet"]
 
 class TransactionResultSet:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    struct TransactionResultSet
-    {
-        TransactionResultPair results<>;
-    };
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        struct TransactionResultSet
+        {
+            TransactionResultPair results<>;
+        };
     """
 
     def __init__(

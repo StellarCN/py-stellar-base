@@ -13,20 +13,19 @@ __all__ = ["ClaimableBalanceEntryExtensionV1"]
 
 class ClaimableBalanceEntryExtensionV1:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    struct ClaimableBalanceEntryExtensionV1
-    {
-        union switch (int v)
-        {
-        case 0:
-            void;
-        }
-        ext;
+    XDR Source Code::
 
-        uint32 flags; // see ClaimableBalanceFlags
-    };
-    ----------------------------------------------------------------
+        struct ClaimableBalanceEntryExtensionV1
+        {
+            union switch (int v)
+            {
+            case 0:
+                void;
+            }
+            ext;
+
+            uint32 flags; // see ClaimableBalanceFlags
+        };
     """
 
     def __init__(

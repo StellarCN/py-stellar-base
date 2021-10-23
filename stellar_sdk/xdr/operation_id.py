@@ -12,19 +12,18 @@ __all__ = ["OperationID"]
 
 class OperationID:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    union OperationID switch (EnvelopeType type)
-    {
-    case ENVELOPE_TYPE_OP_ID:
-        struct
+    XDR Source Code::
+
+        union OperationID switch (EnvelopeType type)
         {
-            AccountID sourceAccount;
-            SequenceNumber seqNum;
-            uint32 opNum;
-        } id;
-    };
-    ----------------------------------------------------------------
+        case ENVELOPE_TYPE_OP_ID:
+            struct
+            {
+                AccountID sourceAccount;
+                SequenceNumber seqNum;
+                uint32 opNum;
+            } id;
+        };
     """
 
     def __init__(

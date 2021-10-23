@@ -12,40 +12,39 @@ __all__ = ["LedgerEntry"]
 
 class LedgerEntry:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    struct LedgerEntry
-    {
-        uint32 lastModifiedLedgerSeq; // ledger the LedgerEntry was last changed
+    XDR Source Code::
 
-        union switch (LedgerEntryType type)
+        struct LedgerEntry
         {
-        case ACCOUNT:
-            AccountEntry account;
-        case TRUSTLINE:
-            TrustLineEntry trustLine;
-        case OFFER:
-            OfferEntry offer;
-        case DATA:
-            DataEntry data;
-        case CLAIMABLE_BALANCE:
-            ClaimableBalanceEntry claimableBalance;
-        case LIQUIDITY_POOL:
-            LiquidityPoolEntry liquidityPool;
-        }
-        data;
+            uint32 lastModifiedLedgerSeq; // ledger the LedgerEntry was last changed
 
-        // reserved for future use
-        union switch (int v)
-        {
-        case 0:
-            void;
-        case 1:
-            LedgerEntryExtensionV1 v1;
-        }
-        ext;
-    };
-    ----------------------------------------------------------------
+            union switch (LedgerEntryType type)
+            {
+            case ACCOUNT:
+                AccountEntry account;
+            case TRUSTLINE:
+                TrustLineEntry trustLine;
+            case OFFER:
+                OfferEntry offer;
+            case DATA:
+                DataEntry data;
+            case CLAIMABLE_BALANCE:
+                ClaimableBalanceEntry claimableBalance;
+            case LIQUIDITY_POOL:
+                LiquidityPoolEntry liquidityPool;
+            }
+            data;
+
+            // reserved for future use
+            union switch (int v)
+            {
+            case 0:
+                void;
+            case 1:
+                LedgerEntryExtensionV1 v1;
+            }
+            ext;
+        };
     """
 
     def __init__(

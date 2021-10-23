@@ -11,14 +11,13 @@ __all__ = ["LedgerKeyTrustLine"]
 
 class LedgerKeyTrustLine:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    struct
-        {
-            AccountID accountID;
-            TrustLineAsset asset;
-        }
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        struct
+            {
+                AccountID accountID;
+                TrustLineAsset asset;
+            }
     """
 
     def __init__(

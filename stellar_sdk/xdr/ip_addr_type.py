@@ -12,14 +12,13 @@ __all__ = ["IPAddrType"]
 
 class IPAddrType(IntEnum):
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    enum IPAddrType
-    {
-        IPv4 = 0,
-        IPv6 = 1
-    };
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        enum IPAddrType
+        {
+            IPv4 = 0,
+            IPv6 = 1
+        };
     """
 
     IPv4 = 0

@@ -10,10 +10,9 @@ __all__ = ["Signature"]
 
 class Signature:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    typedef opaque Signature<64>;
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        typedef opaque Signature<64>;
     """
 
     def __init__(self, signature: bytes) -> None:

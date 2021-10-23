@@ -12,25 +12,24 @@ __all__ = ["ChangeTrustResultCode"]
 
 class ChangeTrustResultCode(IntEnum):
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    enum ChangeTrustResultCode
-    {
-        // codes considered as "success" for the operation
-        CHANGE_TRUST_SUCCESS = 0,
-        // codes considered as "failure" for the operation
-        CHANGE_TRUST_MALFORMED = -1,     // bad input
-        CHANGE_TRUST_NO_ISSUER = -2,     // could not find issuer
-        CHANGE_TRUST_INVALID_LIMIT = -3, // cannot drop limit below balance
-                                         // cannot create with a limit of 0
-        CHANGE_TRUST_LOW_RESERVE =
-            -4, // not enough funds to create a new trust line,
-        CHANGE_TRUST_SELF_NOT_ALLOWED = -5, // trusting self is not allowed
-        CHANGE_TRUST_TRUST_LINE_MISSING = -6, // Asset trustline is missing for pool
-        CHANGE_TRUST_CANNOT_DELETE = -7, // Asset trustline is still referenced in a pool
-        CHANGE_TRUST_NOT_AUTH_MAINTAIN_LIABILITIES = -8 // Asset trustline is deauthorized
-    };
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        enum ChangeTrustResultCode
+        {
+            // codes considered as "success" for the operation
+            CHANGE_TRUST_SUCCESS = 0,
+            // codes considered as "failure" for the operation
+            CHANGE_TRUST_MALFORMED = -1,     // bad input
+            CHANGE_TRUST_NO_ISSUER = -2,     // could not find issuer
+            CHANGE_TRUST_INVALID_LIMIT = -3, // cannot drop limit below balance
+                                             // cannot create with a limit of 0
+            CHANGE_TRUST_LOW_RESERVE =
+                -4, // not enough funds to create a new trust line,
+            CHANGE_TRUST_SELF_NOT_ALLOWED = -5, // trusting self is not allowed
+            CHANGE_TRUST_TRUST_LINE_MISSING = -6, // Asset trustline is missing for pool
+            CHANGE_TRUST_CANNOT_DELETE = -7, // Asset trustline is still referenced in a pool
+            CHANGE_TRUST_NOT_AUTH_MAINTAIN_LIABILITIES = -8 // Asset trustline is deauthorized
+        };
     """
 
     CHANGE_TRUST_SUCCESS = 0

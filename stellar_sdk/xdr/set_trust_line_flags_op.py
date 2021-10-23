@@ -12,17 +12,16 @@ __all__ = ["SetTrustLineFlagsOp"]
 
 class SetTrustLineFlagsOp:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    struct SetTrustLineFlagsOp
-    {
-        AccountID trustor;
-        Asset asset;
+    XDR Source Code::
 
-        uint32 clearFlags; // which flags to clear
-        uint32 setFlags;   // which flags to set
-    };
-    ----------------------------------------------------------------
+        struct SetTrustLineFlagsOp
+        {
+            AccountID trustor;
+            Asset asset;
+
+            uint32 clearFlags; // which flags to clear
+            uint32 setFlags;   // which flags to set
+        };
     """
 
     def __init__(

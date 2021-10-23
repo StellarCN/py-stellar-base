@@ -13,14 +13,13 @@ __all__ = ["LedgerSCPMessages"]
 
 class LedgerSCPMessages:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    struct LedgerSCPMessages
-    {
-        uint32 ledgerSeq;
-        SCPEnvelope messages<>;
-    };
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        struct LedgerSCPMessages
+        {
+            uint32 ledgerSeq;
+            SCPEnvelope messages<>;
+        };
     """
 
     def __init__(

@@ -13,14 +13,13 @@ __all__ = ["SCPHistoryEntryV0"]
 
 class SCPHistoryEntryV0:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    struct SCPHistoryEntryV0
-    {
-        SCPQuorumSet quorumSets<>; // additional quorum sets used by ledgerMessages
-        LedgerSCPMessages ledgerMessages;
-    };
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        struct SCPHistoryEntryV0
+        {
+            SCPQuorumSet quorumSets<>; // additional quorum sets used by ledgerMessages
+            LedgerSCPMessages ledgerMessages;
+        };
     """
 
     def __init__(

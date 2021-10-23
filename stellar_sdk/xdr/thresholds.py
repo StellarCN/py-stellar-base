@@ -10,10 +10,9 @@ __all__ = ["Thresholds"]
 
 class Thresholds:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    typedef opaque Thresholds[4];
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        typedef opaque Thresholds[4];
     """
 
     def __init__(self, thresholds: bytes) -> None:

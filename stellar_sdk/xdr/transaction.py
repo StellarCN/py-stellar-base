@@ -19,35 +19,34 @@ __all__ = ["Transaction"]
 
 class Transaction:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    struct Transaction
-    {
-        // account used to run the transaction
-        MuxedAccount sourceAccount;
+    XDR Source Code::
 
-        // the fee the sourceAccount will pay
-        uint32 fee;
-
-        // sequence number to consume in the account
-        SequenceNumber seqNum;
-
-        // validity range (inclusive) for the last ledger close time
-        TimeBounds* timeBounds;
-
-        Memo memo;
-
-        Operation operations<MAX_OPS_PER_TX>;
-
-        // reserved for future use
-        union switch (int v)
+        struct Transaction
         {
-        case 0:
-            void;
-        }
-        ext;
-    };
-    ----------------------------------------------------------------
+            // account used to run the transaction
+            MuxedAccount sourceAccount;
+
+            // the fee the sourceAccount will pay
+            uint32 fee;
+
+            // sequence number to consume in the account
+            SequenceNumber seqNum;
+
+            // validity range (inclusive) for the last ledger close time
+            TimeBounds* timeBounds;
+
+            Memo memo;
+
+            Operation operations<MAX_OPS_PER_TX>;
+
+            // reserved for future use
+            union switch (int v)
+            {
+            case 0:
+                void;
+            }
+            ext;
+        };
     """
 
     def __init__(
