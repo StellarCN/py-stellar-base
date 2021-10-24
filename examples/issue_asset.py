@@ -59,11 +59,7 @@ payment_transaction = (
         network_passphrase=Network.TESTNET_NETWORK_PASSPHRASE,
         base_fee=100,
     )
-    .append_payment_op(
-        destination=distributor_public,
-        amount="1000",
-        asset=hello_asset
-    )
+    .append_payment_op(destination=distributor_public, amount="1000", asset=hello_asset)
     .build()
 )
 payment_transaction.sign(issuing_keypair)

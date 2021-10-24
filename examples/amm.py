@@ -4,10 +4,10 @@ This example shows how to interact with the liquidity pool.
 from stellar_sdk import (
     Asset,
     Keypair,
-    Server,
-    TransactionBuilder,
     LiquidityPoolAsset,
     Network,
+    Server,
+    TransactionBuilder,
 )
 
 horizon_url = "https://horizon-testnet.stellar.org/"

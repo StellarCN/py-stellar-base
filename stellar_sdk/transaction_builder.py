@@ -916,8 +916,8 @@ class TransactionBuilder:
 
     def append_revoke_ed25519_public_key_signer_sponsorship_op(
         self,
-        account_id: Union[bytes, str],
-        signer_key: str,
+        account_id: str,
+        signer_key: Union[bytes, str],
         source: Optional[Union[MuxedAccount, str]] = None,
     ) -> "TransactionBuilder":
         """Append a :class:`RevokeSponsorship <stellar_sdk.operation.RevokeSponsorship>` operation

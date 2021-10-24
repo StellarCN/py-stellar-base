@@ -33,7 +33,9 @@ transaction = (
         destination="GBBM6BKZPEHWYO3E3YKREDPQXMS4VK35YLNU7NFBRI26RAN7GI5POFBB",
         send_asset=Asset.native(),
         send_max="1000",
-        dest_asset=Asset("GBP", "GASOCNHNNLYFNMDJYQ3XFMI7BYHIOCFW3GJEOWRPEGK2TDPGTG2E5EDW"),
+        dest_asset=Asset(
+            "GBP", "GASOCNHNNLYFNMDJYQ3XFMI7BYHIOCFW3GJEOWRPEGK2TDPGTG2E5EDW"
+        ),
         dest_amount="5.50",
         path=path,
     )

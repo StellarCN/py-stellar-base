@@ -1,5 +1,5 @@
 from abc import ABC
-from typing import Any, Dict, List, Union
+from typing import Any, Coroutine, Dict, List, Union
 
 from .account import Account, Thresholds
 from .asset import Asset
@@ -87,7 +87,7 @@ class ServerAsync(BaseServer):
         raise_request_exception(resp)
         return resp.json()
 
-    async def load_account(  # type: ignore[override]
+    async def load_account(
         self, account_id: Union[MuxedAccount, Keypair, str]
     ) -> Account:
         """Fetches an account's most current base state (like sequence) in the ledger and then creates
@@ -142,7 +142,7 @@ class ServerAsync(BaseServer):
                 continue
             self._check_destination_memo(account_resp, index, destination)
 
-    async def fetch_base_fee(self) -> int:  # type: ignore[override]
+    async def fetch_base_fee(self) -> int:
         """Fetch the base fee. Since this hits the server, if the server call fails,
         you might get an error. You should be prepared to use a default value if that happens.
 
@@ -355,7 +355,7 @@ class ServerAsync(BaseServer):
             horizon_url=self.horizon_url, client=self._client
         )
 
-    async def close(self) -> None:  # type: ignore[override]
+    async def close(self) -> None:
         """Close underlying connector, and release all acquired resources."""
         await self._client.close()
 

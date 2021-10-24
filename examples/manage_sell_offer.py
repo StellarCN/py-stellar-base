@@ -33,7 +33,7 @@ print(f"Seller Account Secret Key: {seller_secret_key}")
 print(f"Seller Account Public Key: {seller_public_key}")
 
 friendbot_url = "https://friendbot.stellar.org"
-response = requests.get(friendbot_url, params={"addr": seller_public_key})
+response1 = requests.get(friendbot_url, params={"addr": seller_public_key})
 
 seller_account = server.load_account(account_id=seller_public_key)
 
@@ -55,7 +55,7 @@ transaction = (
     .build()
 )
 transaction.sign(seller_secret_key)
-response = server.submit_transaction(transaction)
+response2 = server.submit_transaction(transaction)
 
 issuer_account = server.load_account(account_id=issuer_public_key)
 
