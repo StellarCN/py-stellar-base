@@ -22,37 +22,36 @@ __all__ = ["AccountEntry"]
 @type_checked
 class AccountEntry:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    struct AccountEntry
-    {
-        AccountID accountID;      // master public key for this account
-        int64 balance;            // in stroops
-        SequenceNumber seqNum;    // last sequence number used for this account
-        uint32 numSubEntries;     // number of sub-entries this account has
-                                  // drives the reserve
-        AccountID* inflationDest; // Account to vote for during inflation
-        uint32 flags;             // see AccountFlags
+    XDR Source Code::
 
-        string32 homeDomain; // can be used for reverse federation and memo lookup
-
-        // fields used for signatures
-        // thresholds stores unsigned bytes: [weight of master|low|medium|high]
-        Thresholds thresholds;
-
-        Signer signers<MAX_SIGNERS>; // possible signers for this account
-
-        // reserved for future use
-        union switch (int v)
+        struct AccountEntry
         {
-        case 0:
-            void;
-        case 1:
-            AccountEntryExtensionV1 v1;
-        }
-        ext;
-    };
-    ----------------------------------------------------------------
+            AccountID accountID;      // master public key for this account
+            int64 balance;            // in stroops
+            SequenceNumber seqNum;    // last sequence number used for this account
+            uint32 numSubEntries;     // number of sub-entries this account has
+                                      // drives the reserve
+            AccountID* inflationDest; // Account to vote for during inflation
+            uint32 flags;             // see AccountFlags
+
+            string32 homeDomain; // can be used for reverse federation and memo lookup
+
+            // fields used for signatures
+            // thresholds stores unsigned bytes: [weight of master|low|medium|high]
+            Thresholds thresholds;
+
+            Signer signers<MAX_SIGNERS>; // possible signers for this account
+
+            // reserved for future use
+            union switch (int v)
+            {
+            case 0:
+                void;
+            case 1:
+                AccountEntryExtensionV1 v1;
+            }
+            ext;
+        };
     """
 
     def __init__(

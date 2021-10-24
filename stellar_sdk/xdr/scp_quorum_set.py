@@ -15,15 +15,14 @@ __all__ = ["SCPQuorumSet"]
 @type_checked
 class SCPQuorumSet:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    struct SCPQuorumSet
-    {
-        uint32 threshold;
-        NodeID validators<>;
-        SCPQuorumSet innerSets<>;
-    };
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        struct SCPQuorumSet
+        {
+            uint32 threshold;
+            NodeID validators<>;
+            SCPQuorumSet innerSets<>;
+        };
     """
 
     def __init__(

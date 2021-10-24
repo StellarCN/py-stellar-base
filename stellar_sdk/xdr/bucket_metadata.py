@@ -13,22 +13,21 @@ __all__ = ["BucketMetadata"]
 @type_checked
 class BucketMetadata:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    struct BucketMetadata
-    {
-        // Indicates the protocol version used to create / merge this bucket.
-        uint32 ledgerVersion;
+    XDR Source Code::
 
-        // reserved for future use
-        union switch (int v)
+        struct BucketMetadata
         {
-        case 0:
-            void;
-        }
-        ext;
-    };
-    ----------------------------------------------------------------
+            // Indicates the protocol version used to create / merge this bucket.
+            uint32 ledgerVersion;
+
+            // reserved for future use
+            union switch (int v)
+            {
+            case 0:
+                void;
+            }
+            ext;
+        };
     """
 
     def __init__(

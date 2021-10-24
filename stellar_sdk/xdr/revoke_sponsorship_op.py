@@ -15,20 +15,19 @@ __all__ = ["RevokeSponsorshipOp"]
 @type_checked
 class RevokeSponsorshipOp:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    union RevokeSponsorshipOp switch (RevokeSponsorshipType type)
-    {
-    case REVOKE_SPONSORSHIP_LEDGER_ENTRY:
-        LedgerKey ledgerKey;
-    case REVOKE_SPONSORSHIP_SIGNER:
-        struct
+    XDR Source Code::
+
+        union RevokeSponsorshipOp switch (RevokeSponsorshipType type)
         {
-            AccountID accountID;
-            SignerKey signerKey;
-        } signer;
-    };
-    ----------------------------------------------------------------
+        case REVOKE_SPONSORSHIP_LEDGER_ENTRY:
+            LedgerKey ledgerKey;
+        case REVOKE_SPONSORSHIP_SIGNER:
+            struct
+            {
+                AccountID accountID;
+                SignerKey signerKey;
+            } signer;
+        };
     """
 
     def __init__(

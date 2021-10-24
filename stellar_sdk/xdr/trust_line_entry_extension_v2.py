@@ -13,20 +13,19 @@ __all__ = ["TrustLineEntryExtensionV2"]
 @type_checked
 class TrustLineEntryExtensionV2:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    struct TrustLineEntryExtensionV2
-    {
-        int32 liquidityPoolUseCount;
+    XDR Source Code::
 
-        union switch (int v)
+        struct TrustLineEntryExtensionV2
         {
-        case 0:
-            void;
-        }
-        ext;
-    };
-    ----------------------------------------------------------------
+            int32 liquidityPoolUseCount;
+
+            union switch (int v)
+            {
+            case 0:
+                void;
+            }
+            ext;
+        };
     """
 
     def __init__(

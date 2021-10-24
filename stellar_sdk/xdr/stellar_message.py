@@ -27,48 +27,47 @@ __all__ = ["StellarMessage"]
 @type_checked
 class StellarMessage:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    union StellarMessage switch (MessageType type)
-    {
-    case ERROR_MSG:
-        Error error;
-    case HELLO:
-        Hello hello;
-    case AUTH:
-        Auth auth;
-    case DONT_HAVE:
-        DontHave dontHave;
-    case GET_PEERS:
-        void;
-    case PEERS:
-        PeerAddress peers<100>;
+    XDR Source Code::
 
-    case GET_TX_SET:
-        uint256 txSetHash;
-    case TX_SET:
-        TransactionSet txSet;
+        union StellarMessage switch (MessageType type)
+        {
+        case ERROR_MSG:
+            Error error;
+        case HELLO:
+            Hello hello;
+        case AUTH:
+            Auth auth;
+        case DONT_HAVE:
+            DontHave dontHave;
+        case GET_PEERS:
+            void;
+        case PEERS:
+            PeerAddress peers<100>;
 
-    case TRANSACTION:
-        TransactionEnvelope transaction;
+        case GET_TX_SET:
+            uint256 txSetHash;
+        case TX_SET:
+            TransactionSet txSet;
 
-    case SURVEY_REQUEST:
-        SignedSurveyRequestMessage signedSurveyRequestMessage;
+        case TRANSACTION:
+            TransactionEnvelope transaction;
 
-    case SURVEY_RESPONSE:
-        SignedSurveyResponseMessage signedSurveyResponseMessage;
+        case SURVEY_REQUEST:
+            SignedSurveyRequestMessage signedSurveyRequestMessage;
 
-    // SCP
-    case GET_SCP_QUORUMSET:
-        uint256 qSetHash;
-    case SCP_QUORUMSET:
-        SCPQuorumSet qSet;
-    case SCP_MESSAGE:
-        SCPEnvelope envelope;
-    case GET_SCP_STATE:
-        uint32 getSCPLedgerSeq; // ledger seq requested ; if 0, requests the latest
-    };
-    ----------------------------------------------------------------
+        case SURVEY_RESPONSE:
+            SignedSurveyResponseMessage signedSurveyResponseMessage;
+
+        // SCP
+        case GET_SCP_QUORUMSET:
+            uint256 qSetHash;
+        case SCP_QUORUMSET:
+            SCPQuorumSet qSet;
+        case SCP_MESSAGE:
+            SCPEnvelope envelope;
+        case GET_SCP_STATE:
+            uint32 getSCPLedgerSeq; // ledger seq requested ; if 0, requests the latest
+        };
     """
 
     def __init__(

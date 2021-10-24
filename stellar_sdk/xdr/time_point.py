@@ -12,10 +12,9 @@ __all__ = ["TimePoint"]
 @type_checked
 class TimePoint:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    typedef uint64 TimePoint;
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        typedef uint64 TimePoint;
     """
 
     def __init__(self, time_point: Uint64) -> None:

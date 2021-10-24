@@ -14,16 +14,15 @@ __all__ = ["ThresholdIndexes"]
 @type_checked
 class ThresholdIndexes(IntEnum):
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    enum ThresholdIndexes
-    {
-        THRESHOLD_MASTER_WEIGHT = 0,
-        THRESHOLD_LOW = 1,
-        THRESHOLD_MED = 2,
-        THRESHOLD_HIGH = 3
-    };
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        enum ThresholdIndexes
+        {
+            THRESHOLD_MASTER_WEIGHT = 0,
+            THRESHOLD_LOW = 1,
+            THRESHOLD_MED = 2,
+            THRESHOLD_HIGH = 3
+        };
     """
 
     THRESHOLD_MASTER_WEIGHT = 0

@@ -14,17 +14,16 @@ __all__ = ["EndSponsoringFutureReservesResultCode"]
 @type_checked
 class EndSponsoringFutureReservesResultCode(IntEnum):
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    enum EndSponsoringFutureReservesResultCode
-    {
-        // codes considered as "success" for the operation
-        END_SPONSORING_FUTURE_RESERVES_SUCCESS = 0,
+    XDR Source Code::
 
-        // codes considered as "failure" for the operation
-        END_SPONSORING_FUTURE_RESERVES_NOT_SPONSORED = -1
-    };
-    ----------------------------------------------------------------
+        enum EndSponsoringFutureReservesResultCode
+        {
+            // codes considered as "success" for the operation
+            END_SPONSORING_FUTURE_RESERVES_SUCCESS = 0,
+
+            // codes considered as "failure" for the operation
+            END_SPONSORING_FUTURE_RESERVES_NOT_SPONSORED = -1
+        };
     """
 
     END_SPONSORING_FUTURE_RESERVES_SUCCESS = 0

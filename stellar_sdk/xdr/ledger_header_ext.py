@@ -12,14 +12,13 @@ __all__ = ["LedgerHeaderExt"]
 @type_checked
 class LedgerHeaderExt:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    union switch (int v)
-        {
-        case 0:
-            void;
-        }
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        union switch (int v)
+            {
+            case 0:
+                void;
+            }
     """
 
     def __init__(

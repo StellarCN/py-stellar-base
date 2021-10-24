@@ -14,22 +14,21 @@ __all__ = ["LedgerHeaderHistoryEntry"]
 @type_checked
 class LedgerHeaderHistoryEntry:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    struct LedgerHeaderHistoryEntry
-    {
-        Hash hash;
-        LedgerHeader header;
+    XDR Source Code::
 
-        // reserved for future use
-        union switch (int v)
+        struct LedgerHeaderHistoryEntry
         {
-        case 0:
-            void;
-        }
-        ext;
-    };
-    ----------------------------------------------------------------
+            Hash hash;
+            LedgerHeader header;
+
+            // reserved for future use
+            union switch (int v)
+            {
+            case 0:
+                void;
+            }
+            ext;
+        };
     """
 
     def __init__(

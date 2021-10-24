@@ -15,14 +15,13 @@ __all__ = ["TransactionSet"]
 @type_checked
 class TransactionSet:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    struct TransactionSet
-    {
-        Hash previousLedgerHash;
-        TransactionEnvelope txs<>;
-    };
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        struct TransactionSet
+        {
+            Hash previousLedgerHash;
+            TransactionEnvelope txs<>;
+        };
     """
 
     def __init__(

@@ -14,14 +14,13 @@ __all__ = ["RevokeSponsorshipType"]
 @type_checked
 class RevokeSponsorshipType(IntEnum):
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    enum RevokeSponsorshipType
-    {
-        REVOKE_SPONSORSHIP_LEDGER_ENTRY = 0,
-        REVOKE_SPONSORSHIP_SIGNER = 1
-    };
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        enum RevokeSponsorshipType
+        {
+            REVOKE_SPONSORSHIP_LEDGER_ENTRY = 0,
+            REVOKE_SPONSORSHIP_SIGNER = 1
+        };
     """
 
     REVOKE_SPONSORSHIP_LEDGER_ENTRY = 0

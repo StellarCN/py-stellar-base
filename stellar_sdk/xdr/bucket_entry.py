@@ -16,20 +16,19 @@ __all__ = ["BucketEntry"]
 @type_checked
 class BucketEntry:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    union BucketEntry switch (BucketEntryType type)
-    {
-    case LIVEENTRY:
-    case INITENTRY:
-        LedgerEntry liveEntry;
+    XDR Source Code::
 
-    case DEADENTRY:
-        LedgerKey deadEntry;
-    case METAENTRY:
-        BucketMetadata metaEntry;
-    };
-    ----------------------------------------------------------------
+        union BucketEntry switch (BucketEntryType type)
+        {
+        case LIVEENTRY:
+        case INITENTRY:
+            LedgerEntry liveEntry;
+
+        case DEADENTRY:
+            LedgerKey deadEntry;
+        case METAENTRY:
+            BucketMetadata metaEntry;
+        };
     """
 
     def __init__(

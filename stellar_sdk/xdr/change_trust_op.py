@@ -13,16 +13,15 @@ __all__ = ["ChangeTrustOp"]
 @type_checked
 class ChangeTrustOp:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    struct ChangeTrustOp
-    {
-        ChangeTrustAsset line;
+    XDR Source Code::
 
-        // if limit is set to 0, deletes the trust line
-        int64 limit;
-    };
-    ----------------------------------------------------------------
+        struct ChangeTrustOp
+        {
+            ChangeTrustAsset line;
+
+            // if limit is set to 0, deletes the trust line
+            int64 limit;
+        };
     """
 
     def __init__(

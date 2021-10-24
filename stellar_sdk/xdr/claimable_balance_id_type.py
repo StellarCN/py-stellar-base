@@ -14,13 +14,12 @@ __all__ = ["ClaimableBalanceIDType"]
 @type_checked
 class ClaimableBalanceIDType(IntEnum):
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    enum ClaimableBalanceIDType
-    {
-        CLAIMABLE_BALANCE_ID_TYPE_V0 = 0
-    };
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        enum ClaimableBalanceIDType
+        {
+            CLAIMABLE_BALANCE_ID_TYPE_V0 = 0
+        };
     """
 
     CLAIMABLE_BALANCE_ID_TYPE_V0 = 0

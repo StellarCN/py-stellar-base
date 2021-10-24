@@ -12,10 +12,9 @@ __all__ = ["String64"]
 @type_checked
 class String64:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    typedef string string64<64>;
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        typedef string string64<64>;
     """
 
     def __init__(self, string64: bytes) -> None:

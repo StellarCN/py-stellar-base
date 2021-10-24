@@ -14,19 +14,18 @@ __all__ = ["ManageSellOfferOp"]
 @type_checked
 class ManageSellOfferOp:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    struct ManageSellOfferOp
-    {
-        Asset selling;
-        Asset buying;
-        int64 amount; // amount being sold. if set to 0, delete the offer
-        Price price;  // price of thing being sold in terms of what you are buying
+    XDR Source Code::
 
-        // 0=create a new offer, otherwise edit an existing offer
-        int64 offerID;
-    };
-    ----------------------------------------------------------------
+        struct ManageSellOfferOp
+        {
+            Asset selling;
+            Asset buying;
+            int64 amount; // amount being sold. if set to 0, delete the offer
+            Price price;  // price of thing being sold in terms of what you are buying
+
+            // 0=create a new offer, otherwise edit an existing offer
+            int64 offerID;
+        };
     """
 
     def __init__(

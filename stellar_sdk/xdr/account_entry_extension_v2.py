@@ -17,22 +17,21 @@ __all__ = ["AccountEntryExtensionV2"]
 @type_checked
 class AccountEntryExtensionV2:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    struct AccountEntryExtensionV2
-    {
-        uint32 numSponsored;
-        uint32 numSponsoring;
-        SponsorshipDescriptor signerSponsoringIDs<MAX_SIGNERS>;
+    XDR Source Code::
 
-        union switch (int v)
+        struct AccountEntryExtensionV2
         {
-        case 0:
-            void;
-        }
-        ext;
-    };
-    ----------------------------------------------------------------
+            uint32 numSponsored;
+            uint32 numSponsoring;
+            SponsorshipDescriptor signerSponsoringIDs<MAX_SIGNERS>;
+
+            union switch (int v)
+            {
+            case 0:
+                void;
+            }
+            ext;
+        };
     """
 
     def __init__(

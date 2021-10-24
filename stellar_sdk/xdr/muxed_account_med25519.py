@@ -13,14 +13,13 @@ __all__ = ["MuxedAccountMed25519"]
 @type_checked
 class MuxedAccountMed25519:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    struct
-        {
-            uint64 id;
-            uint256 ed25519;
-        }
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        struct
+            {
+                uint64 id;
+                uint256 ed25519;
+            }
     """
 
     def __init__(

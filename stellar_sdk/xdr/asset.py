@@ -15,22 +15,21 @@ __all__ = ["Asset"]
 @type_checked
 class Asset:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    union Asset switch (AssetType type)
-    {
-    case ASSET_TYPE_NATIVE: // Not credit
-        void;
+    XDR Source Code::
 
-    case ASSET_TYPE_CREDIT_ALPHANUM4:
-        AlphaNum4 alphaNum4;
+        union Asset switch (AssetType type)
+        {
+        case ASSET_TYPE_NATIVE: // Not credit
+            void;
 
-    case ASSET_TYPE_CREDIT_ALPHANUM12:
-        AlphaNum12 alphaNum12;
+        case ASSET_TYPE_CREDIT_ALPHANUM4:
+            AlphaNum4 alphaNum4;
 
-        // add other asset types here in the future
-    };
-    ----------------------------------------------------------------
+        case ASSET_TYPE_CREDIT_ALPHANUM12:
+            AlphaNum12 alphaNum12;
+
+            // add other asset types here in the future
+        };
     """
 
     def __init__(

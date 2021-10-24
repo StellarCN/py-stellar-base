@@ -16,22 +16,21 @@ __all__ = ["PathPaymentStrictSendOp"]
 @type_checked
 class PathPaymentStrictSendOp:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    struct PathPaymentStrictSendOp
-    {
-        Asset sendAsset;  // asset we pay with
-        int64 sendAmount; // amount of sendAsset to send (excluding fees)
+    XDR Source Code::
 
-        MuxedAccount destination; // recipient of the payment
-        Asset destAsset;          // what they end up with
-        int64 destMin;            // the minimum amount of dest asset to
-                                  // be received
-                                  // The operation will fail if it can't be met
+        struct PathPaymentStrictSendOp
+        {
+            Asset sendAsset;  // asset we pay with
+            int64 sendAmount; // amount of sendAsset to send (excluding fees)
 
-        Asset path<5>; // additional hops it must go through to get there
-    };
-    ----------------------------------------------------------------
+            MuxedAccount destination; // recipient of the payment
+            Asset destAsset;          // what they end up with
+            int64 destMin;            // the minimum amount of dest asset to
+                                      // be received
+                                      // The operation will fail if it can't be met
+
+            Asset path<5>; // additional hops it must go through to get there
+        };
     """
 
     def __init__(

@@ -14,14 +14,13 @@ __all__ = ["LedgerCloseMeta"]
 @type_checked
 class LedgerCloseMeta:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    union LedgerCloseMeta switch (int v)
-    {
-    case 0:
-        LedgerCloseMetaV0 v0;
-    };
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        union LedgerCloseMeta switch (int v)
+        {
+        case 0:
+            LedgerCloseMetaV0 v0;
+        };
     """
 
     def __init__(

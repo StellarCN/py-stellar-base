@@ -13,14 +13,13 @@ __all__ = ["DecoratedSignature"]
 @type_checked
 class DecoratedSignature:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    struct DecoratedSignature
-    {
-        SignatureHint hint;  // last 4 bytes of the public key, used as a hint
-        Signature signature; // actual signature
-    };
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        struct DecoratedSignature
+        {
+            SignatureHint hint;  // last 4 bytes of the public key, used as a hint
+            Signature signature; // actual signature
+        };
     """
 
     def __init__(

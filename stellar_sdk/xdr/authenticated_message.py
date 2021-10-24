@@ -14,19 +14,18 @@ __all__ = ["AuthenticatedMessage"]
 @type_checked
 class AuthenticatedMessage:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    union AuthenticatedMessage switch (uint32 v)
-    {
-    case 0:
-        struct
+    XDR Source Code::
+
+        union AuthenticatedMessage switch (uint32 v)
         {
-            uint64 sequence;
-            StellarMessage message;
-            HmacSha256Mac mac;
-        } v0;
-    };
-    ----------------------------------------------------------------
+        case 0:
+            struct
+            {
+                uint64 sequence;
+                StellarMessage message;
+                HmacSha256Mac mac;
+            } v0;
+        };
     """
 
     def __init__(

@@ -14,14 +14,13 @@ __all__ = ["FeeBumpTransactionInnerTx"]
 @type_checked
 class FeeBumpTransactionInnerTx:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    union switch (EnvelopeType type)
-        {
-        case ENVELOPE_TYPE_TX:
-            TransactionV1Envelope v1;
-        }
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        union switch (EnvelopeType type)
+            {
+            case ENVELOPE_TYPE_TX:
+                TransactionV1Envelope v1;
+            }
     """
 
     def __init__(

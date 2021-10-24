@@ -16,20 +16,19 @@ __all__ = ["TransactionResultResult"]
 @type_checked
 class TransactionResultResult:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    union switch (TransactionResultCode code)
-        {
-        case txFEE_BUMP_INNER_SUCCESS:
-        case txFEE_BUMP_INNER_FAILED:
-            InnerTransactionResultPair innerResultPair;
-        case txSUCCESS:
-        case txFAILED:
-            OperationResult results<>;
-        default:
-            void;
-        }
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        union switch (TransactionResultCode code)
+            {
+            case txFEE_BUMP_INNER_SUCCESS:
+            case txFEE_BUMP_INNER_FAILED:
+                InnerTransactionResultPair innerResultPair;
+            case txSUCCESS:
+            case txFAILED:
+                OperationResult results<>;
+            default:
+                void;
+            }
     """
 
     def __init__(

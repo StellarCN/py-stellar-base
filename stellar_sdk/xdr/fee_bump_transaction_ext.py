@@ -12,14 +12,13 @@ __all__ = ["FeeBumpTransactionExt"]
 @type_checked
 class FeeBumpTransactionExt:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    union switch (int v)
-        {
-        case 0:
-            void;
-        }
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        union switch (int v)
+            {
+            case 0:
+                void;
+            }
     """
 
     def __init__(

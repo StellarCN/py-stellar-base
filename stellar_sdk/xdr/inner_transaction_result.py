@@ -14,45 +14,44 @@ __all__ = ["InnerTransactionResult"]
 @type_checked
 class InnerTransactionResult:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    struct InnerTransactionResult
-    {
-        // Always 0. Here for binary compatibility.
-        int64 feeCharged;
+    XDR Source Code::
 
-        union switch (TransactionResultCode code)
+        struct InnerTransactionResult
         {
-        // txFEE_BUMP_INNER_SUCCESS is not included
-        case txSUCCESS:
-        case txFAILED:
-            OperationResult results<>;
-        case txTOO_EARLY:
-        case txTOO_LATE:
-        case txMISSING_OPERATION:
-        case txBAD_SEQ:
-        case txBAD_AUTH:
-        case txINSUFFICIENT_BALANCE:
-        case txNO_ACCOUNT:
-        case txINSUFFICIENT_FEE:
-        case txBAD_AUTH_EXTRA:
-        case txINTERNAL_ERROR:
-        case txNOT_SUPPORTED:
-        // txFEE_BUMP_INNER_FAILED is not included
-        case txBAD_SPONSORSHIP:
-            void;
-        }
-        result;
+            // Always 0. Here for binary compatibility.
+            int64 feeCharged;
 
-        // reserved for future use
-        union switch (int v)
-        {
-        case 0:
-            void;
-        }
-        ext;
-    };
-    ----------------------------------------------------------------
+            union switch (TransactionResultCode code)
+            {
+            // txFEE_BUMP_INNER_SUCCESS is not included
+            case txSUCCESS:
+            case txFAILED:
+                OperationResult results<>;
+            case txTOO_EARLY:
+            case txTOO_LATE:
+            case txMISSING_OPERATION:
+            case txBAD_SEQ:
+            case txBAD_AUTH:
+            case txINSUFFICIENT_BALANCE:
+            case txNO_ACCOUNT:
+            case txINSUFFICIENT_FEE:
+            case txBAD_AUTH_EXTRA:
+            case txINTERNAL_ERROR:
+            case txNOT_SUPPORTED:
+            // txFEE_BUMP_INNER_FAILED is not included
+            case txBAD_SPONSORSHIP:
+                void;
+            }
+            result;
+
+            // reserved for future use
+            union switch (int v)
+            {
+            case 0:
+                void;
+            }
+            ext;
+        };
     """
 
     def __init__(

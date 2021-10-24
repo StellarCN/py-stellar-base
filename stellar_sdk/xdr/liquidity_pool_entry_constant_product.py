@@ -15,18 +15,17 @@ __all__ = ["LiquidityPoolEntryConstantProduct"]
 @type_checked
 class LiquidityPoolEntryConstantProduct:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    struct
-            {
-                LiquidityPoolConstantProductParameters params;
+    XDR Source Code::
 
-                int64 reserveA;        // amount of A in the pool
-                int64 reserveB;        // amount of B in the pool
-                int64 totalPoolShares; // total number of pool shares issued
-                int64 poolSharesTrustLineCount; // number of trust lines for the associated pool shares
-            }
-    ----------------------------------------------------------------
+        struct
+                {
+                    LiquidityPoolConstantProductParameters params;
+
+                    int64 reserveA;        // amount of A in the pool
+                    int64 reserveB;        // amount of B in the pool
+                    int64 totalPoolShares; // total number of pool shares issued
+                    int64 poolSharesTrustLineCount; // number of trust lines for the associated pool shares
+                }
     """
 
     def __init__(

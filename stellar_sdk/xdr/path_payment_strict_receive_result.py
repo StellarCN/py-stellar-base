@@ -17,23 +17,22 @@ __all__ = ["PathPaymentStrictReceiveResult"]
 @type_checked
 class PathPaymentStrictReceiveResult:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    union PathPaymentStrictReceiveResult switch (
-        PathPaymentStrictReceiveResultCode code)
-    {
-    case PATH_PAYMENT_STRICT_RECEIVE_SUCCESS:
-        struct
+    XDR Source Code::
+
+        union PathPaymentStrictReceiveResult switch (
+            PathPaymentStrictReceiveResultCode code)
         {
-            ClaimAtom offers<>;
-            SimplePaymentResult last;
-        } success;
-    case PATH_PAYMENT_STRICT_RECEIVE_NO_ISSUER:
-        Asset noIssuer; // the asset that caused the error
-    default:
-        void;
-    };
-    ----------------------------------------------------------------
+        case PATH_PAYMENT_STRICT_RECEIVE_SUCCESS:
+            struct
+            {
+                ClaimAtom offers<>;
+                SimplePaymentResult last;
+            } success;
+        case PATH_PAYMENT_STRICT_RECEIVE_NO_ISSUER:
+            Asset noIssuer; // the asset that caused the error
+        default:
+            void;
+        };
     """
 
     def __init__(

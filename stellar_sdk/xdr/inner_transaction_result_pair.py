@@ -13,14 +13,13 @@ __all__ = ["InnerTransactionResultPair"]
 @type_checked
 class InnerTransactionResultPair:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    struct InnerTransactionResultPair
-    {
-        Hash transactionHash;          // hash of the inner transaction
-        InnerTransactionResult result; // result for the inner transaction
-    };
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        struct InnerTransactionResultPair
+        {
+            Hash transactionHash;          // hash of the inner transaction
+            InnerTransactionResult result; // result for the inner transaction
+        };
     """
 
     def __init__(

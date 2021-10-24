@@ -72,6 +72,7 @@ KeyPairs, etc.).
    payment
    asynchronous
    multi_signature_account
+   xdr
 
 
 API Documentation

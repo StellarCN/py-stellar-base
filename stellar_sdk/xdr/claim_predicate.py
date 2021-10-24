@@ -15,25 +15,24 @@ __all__ = ["ClaimPredicate"]
 @type_checked
 class ClaimPredicate:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    union ClaimPredicate switch (ClaimPredicateType type)
-    {
-    case CLAIM_PREDICATE_UNCONDITIONAL:
-        void;
-    case CLAIM_PREDICATE_AND:
-        ClaimPredicate andPredicates<2>;
-    case CLAIM_PREDICATE_OR:
-        ClaimPredicate orPredicates<2>;
-    case CLAIM_PREDICATE_NOT:
-        ClaimPredicate* notPredicate;
-    case CLAIM_PREDICATE_BEFORE_ABSOLUTE_TIME:
-        int64 absBefore; // Predicate will be true if closeTime < absBefore
-    case CLAIM_PREDICATE_BEFORE_RELATIVE_TIME:
-        int64 relBefore; // Seconds since closeTime of the ledger in which the
-                         // ClaimableBalanceEntry was created
-    };
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        union ClaimPredicate switch (ClaimPredicateType type)
+        {
+        case CLAIM_PREDICATE_UNCONDITIONAL:
+            void;
+        case CLAIM_PREDICATE_AND:
+            ClaimPredicate andPredicates<2>;
+        case CLAIM_PREDICATE_OR:
+            ClaimPredicate orPredicates<2>;
+        case CLAIM_PREDICATE_NOT:
+            ClaimPredicate* notPredicate;
+        case CLAIM_PREDICATE_BEFORE_ABSOLUTE_TIME:
+            int64 absBefore; // Predicate will be true if closeTime < absBefore
+        case CLAIM_PREDICATE_BEFORE_RELATIVE_TIME:
+            int64 relBefore; // Seconds since closeTime of the ledger in which the
+                             // ClaimableBalanceEntry was created
+        };
     """
 
     def __init__(

@@ -14,17 +14,16 @@ __all__ = ["SCPStatementConfirm"]
 @type_checked
 class SCPStatementConfirm:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    struct
-            {
-                SCPBallot ballot;   // b
-                uint32 nPrepared;   // p.n
-                uint32 nCommit;     // c.n
-                uint32 nH;          // h.n
-                Hash quorumSetHash; // D
-            }
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        struct
+                {
+                    SCPBallot ballot;   // b
+                    uint32 nPrepared;   // p.n
+                    uint32 nCommit;     // c.n
+                    uint32 nH;          // h.n
+                    Hash quorumSetHash; // D
+                }
     """
 
     def __init__(

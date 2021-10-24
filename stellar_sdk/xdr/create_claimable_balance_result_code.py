@@ -14,18 +14,17 @@ __all__ = ["CreateClaimableBalanceResultCode"]
 @type_checked
 class CreateClaimableBalanceResultCode(IntEnum):
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    enum CreateClaimableBalanceResultCode
-    {
-        CREATE_CLAIMABLE_BALANCE_SUCCESS = 0,
-        CREATE_CLAIMABLE_BALANCE_MALFORMED = -1,
-        CREATE_CLAIMABLE_BALANCE_LOW_RESERVE = -2,
-        CREATE_CLAIMABLE_BALANCE_NO_TRUST = -3,
-        CREATE_CLAIMABLE_BALANCE_NOT_AUTHORIZED = -4,
-        CREATE_CLAIMABLE_BALANCE_UNDERFUNDED = -5
-    };
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        enum CreateClaimableBalanceResultCode
+        {
+            CREATE_CLAIMABLE_BALANCE_SUCCESS = 0,
+            CREATE_CLAIMABLE_BALANCE_MALFORMED = -1,
+            CREATE_CLAIMABLE_BALANCE_LOW_RESERVE = -2,
+            CREATE_CLAIMABLE_BALANCE_NO_TRUST = -3,
+            CREATE_CLAIMABLE_BALANCE_NOT_AUTHORIZED = -4,
+            CREATE_CLAIMABLE_BALANCE_UNDERFUNDED = -5
+        };
     """
 
     CREATE_CLAIMABLE_BALANCE_SUCCESS = 0

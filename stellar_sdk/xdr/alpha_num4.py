@@ -13,14 +13,13 @@ __all__ = ["AlphaNum4"]
 @type_checked
 class AlphaNum4:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    struct AlphaNum4
-    {
-        AssetCode4 assetCode;
-        AccountID issuer;
-    };
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        struct AlphaNum4
+        {
+            AssetCode4 assetCode;
+            AccountID issuer;
+        };
     """
 
     def __init__(

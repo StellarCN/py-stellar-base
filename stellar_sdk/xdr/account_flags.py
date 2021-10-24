@@ -14,26 +14,25 @@ __all__ = ["AccountFlags"]
 @type_checked
 class AccountFlags(IntEnum):
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    enum AccountFlags
-    { // masks for each flag
+    XDR Source Code::
 
-        // Flags set on issuer accounts
-        // TrustLines are created with authorized set to "false" requiring
-        // the issuer to set it for each TrustLine
-        AUTH_REQUIRED_FLAG = 0x1,
-        // If set, the authorized flag in TrustLines can be cleared
-        // otherwise, authorization cannot be revoked
-        AUTH_REVOCABLE_FLAG = 0x2,
-        // Once set, causes all AUTH_* flags to be read-only
-        AUTH_IMMUTABLE_FLAG = 0x4,
-        // Trustlines are created with clawback enabled set to "true",
-        // and claimable balances created from those trustlines are created
-        // with clawback enabled set to "true"
-        AUTH_CLAWBACK_ENABLED_FLAG = 0x8
-    };
-    ----------------------------------------------------------------
+        enum AccountFlags
+        { // masks for each flag
+
+            // Flags set on issuer accounts
+            // TrustLines are created with authorized set to "false" requiring
+            // the issuer to set it for each TrustLine
+            AUTH_REQUIRED_FLAG = 0x1,
+            // If set, the authorized flag in TrustLines can be cleared
+            // otherwise, authorization cannot be revoked
+            AUTH_REVOCABLE_FLAG = 0x2,
+            // Once set, causes all AUTH_* flags to be read-only
+            AUTH_IMMUTABLE_FLAG = 0x4,
+            // Trustlines are created with clawback enabled set to "true",
+            // and claimable balances created from those trustlines are created
+            // with clawback enabled set to "true"
+            AUTH_CLAWBACK_ENABLED_FLAG = 0x8
+        };
     """
 
     AUTH_REQUIRED_FLAG = 1

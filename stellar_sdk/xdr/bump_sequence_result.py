@@ -12,16 +12,15 @@ __all__ = ["BumpSequenceResult"]
 @type_checked
 class BumpSequenceResult:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    union BumpSequenceResult switch (BumpSequenceResultCode code)
-    {
-    case BUMP_SEQUENCE_SUCCESS:
-        void;
-    default:
-        void;
-    };
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        union BumpSequenceResult switch (BumpSequenceResultCode code)
+        {
+        case BUMP_SEQUENCE_SUCCESS:
+            void;
+        default:
+            void;
+        };
     """
 
     def __init__(

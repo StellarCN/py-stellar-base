@@ -14,16 +14,15 @@ __all__ = ["ManageBuyOfferResult"]
 @type_checked
 class ManageBuyOfferResult:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    union ManageBuyOfferResult switch (ManageBuyOfferResultCode code)
-    {
-    case MANAGE_BUY_OFFER_SUCCESS:
-        ManageOfferSuccessResult success;
-    default:
-        void;
-    };
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        union ManageBuyOfferResult switch (ManageBuyOfferResultCode code)
+        {
+        case MANAGE_BUY_OFFER_SUCCESS:
+            ManageOfferSuccessResult success;
+        default:
+            void;
+        };
     """
 
     def __init__(

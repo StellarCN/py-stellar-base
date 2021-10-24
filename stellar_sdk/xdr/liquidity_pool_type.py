@@ -14,13 +14,12 @@ __all__ = ["LiquidityPoolType"]
 @type_checked
 class LiquidityPoolType(IntEnum):
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    enum LiquidityPoolType
-    {
-        LIQUIDITY_POOL_CONSTANT_PRODUCT = 0
-    };
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        enum LiquidityPoolType
+        {
+            LIQUIDITY_POOL_CONSTANT_PRODUCT = 0
+        };
     """
 
     LIQUIDITY_POOL_CONSTANT_PRODUCT = 0

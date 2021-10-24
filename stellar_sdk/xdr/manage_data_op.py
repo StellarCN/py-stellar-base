@@ -14,14 +14,13 @@ __all__ = ["ManageDataOp"]
 @type_checked
 class ManageDataOp:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    struct ManageDataOp
-    {
-        string64 dataName;
-        DataValue* dataValue; // set to null to clear
-    };
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        struct ManageDataOp
+        {
+            string64 dataName;
+            DataValue* dataValue; // set to null to clear
+        };
     """
 
     def __init__(

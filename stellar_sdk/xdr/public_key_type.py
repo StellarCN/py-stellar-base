@@ -14,13 +14,12 @@ __all__ = ["PublicKeyType"]
 @type_checked
 class PublicKeyType(IntEnum):
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    enum PublicKeyType
-    {
-        PUBLIC_KEY_TYPE_ED25519 = KEY_TYPE_ED25519
-    };
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        enum PublicKeyType
+        {
+            PUBLIC_KEY_TYPE_ED25519 = KEY_TYPE_ED25519
+        };
     """
 
     PUBLIC_KEY_TYPE_ED25519 = 0

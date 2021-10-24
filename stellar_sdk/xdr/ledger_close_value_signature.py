@@ -13,14 +13,13 @@ __all__ = ["LedgerCloseValueSignature"]
 @type_checked
 class LedgerCloseValueSignature:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    struct LedgerCloseValueSignature
-    {
-        NodeID nodeID;       // which node introduced the value
-        Signature signature; // nodeID's signature
-    };
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        struct LedgerCloseValueSignature
+        {
+            NodeID nodeID;       // which node introduced the value
+            Signature signature; // nodeID's signature
+        };
     """
 
     def __init__(

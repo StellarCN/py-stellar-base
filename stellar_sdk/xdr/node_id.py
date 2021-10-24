@@ -12,10 +12,9 @@ __all__ = ["NodeID"]
 @type_checked
 class NodeID:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    typedef PublicKey NodeID;
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        typedef PublicKey NodeID;
     """
 
     def __init__(self, node_id: PublicKey) -> None:

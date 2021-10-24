@@ -15,14 +15,13 @@ __all__ = ["PathPaymentStrictSendResultSuccess"]
 @type_checked
 class PathPaymentStrictSendResultSuccess:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    struct
-        {
-            ClaimAtom offers<>;
-            SimplePaymentResult last;
-        }
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        struct
+            {
+                ClaimAtom offers<>;
+                SimplePaymentResult last;
+            }
     """
 
     def __init__(

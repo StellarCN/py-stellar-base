@@ -16,41 +16,40 @@ __all__ = ["TrustLineEntry"]
 @type_checked
 class TrustLineEntry:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    struct TrustLineEntry
-    {
-        AccountID accountID; // account this trustline belongs to
-        TrustLineAsset asset;         // type of asset (with issuer)
-        int64 balance;       // how much of this asset the user has.
-                             // Asset defines the unit for this;
+    XDR Source Code::
 
-        int64 limit;  // balance cannot be above this
-        uint32 flags; // see TrustLineFlags
-
-        // reserved for future use
-        union switch (int v)
+        struct TrustLineEntry
         {
-        case 0:
-            void;
-        case 1:
-            struct
-            {
-                Liabilities liabilities;
+            AccountID accountID; // account this trustline belongs to
+            TrustLineAsset asset;         // type of asset (with issuer)
+            int64 balance;       // how much of this asset the user has.
+                                 // Asset defines the unit for this;
 
-                union switch (int v)
+            int64 limit;  // balance cannot be above this
+            uint32 flags; // see TrustLineFlags
+
+            // reserved for future use
+            union switch (int v)
+            {
+            case 0:
+                void;
+            case 1:
+                struct
                 {
-                case 0:
-                    void;
-                case 2:
-                    TrustLineEntryExtensionV2 v2;
-                }
-                ext;
-            } v1;
-        }
-        ext;
-    };
-    ----------------------------------------------------------------
+                    Liabilities liabilities;
+
+                    union switch (int v)
+                    {
+                    case 0:
+                        void;
+                    case 2:
+                        TrustLineEntryExtensionV2 v2;
+                    }
+                    ext;
+                } v1;
+            }
+            ext;
+        };
     """
 
     def __init__(

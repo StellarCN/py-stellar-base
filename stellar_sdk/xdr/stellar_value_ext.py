@@ -14,16 +14,15 @@ __all__ = ["StellarValueExt"]
 @type_checked
 class StellarValueExt:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    union switch (StellarValueType v)
-        {
-        case STELLAR_VALUE_BASIC:
-            void;
-        case STELLAR_VALUE_SIGNED:
-            LedgerCloseValueSignature lcValueSignature;
-        }
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        union switch (StellarValueType v)
+            {
+            case STELLAR_VALUE_BASIC:
+                void;
+            case STELLAR_VALUE_SIGNED:
+                LedgerCloseValueSignature lcValueSignature;
+            }
     """
 
     def __init__(

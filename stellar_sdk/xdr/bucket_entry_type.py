@@ -14,18 +14,17 @@ __all__ = ["BucketEntryType"]
 @type_checked
 class BucketEntryType(IntEnum):
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    enum BucketEntryType
-    {
-        METAENTRY =
-            -1, // At-and-after protocol 11: bucket metadata, should come first.
-        LIVEENTRY = 0, // Before protocol 11: created-or-updated;
-                       // At-and-after protocol 11: only updated.
-        DEADENTRY = 1,
-        INITENTRY = 2 // At-and-after protocol 11: only created.
-    };
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        enum BucketEntryType
+        {
+            METAENTRY =
+                -1, // At-and-after protocol 11: bucket metadata, should come first.
+            LIVEENTRY = 0, // Before protocol 11: created-or-updated;
+                           // At-and-after protocol 11: only updated.
+            DEADENTRY = 1,
+            INITENTRY = 2 // At-and-after protocol 11: only created.
+        };
     """
 
     METAENTRY = -1

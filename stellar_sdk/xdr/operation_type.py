@@ -14,36 +14,35 @@ __all__ = ["OperationType"]
 @type_checked
 class OperationType(IntEnum):
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    enum OperationType
-    {
-        CREATE_ACCOUNT = 0,
-        PAYMENT = 1,
-        PATH_PAYMENT_STRICT_RECEIVE = 2,
-        MANAGE_SELL_OFFER = 3,
-        CREATE_PASSIVE_SELL_OFFER = 4,
-        SET_OPTIONS = 5,
-        CHANGE_TRUST = 6,
-        ALLOW_TRUST = 7,
-        ACCOUNT_MERGE = 8,
-        INFLATION = 9,
-        MANAGE_DATA = 10,
-        BUMP_SEQUENCE = 11,
-        MANAGE_BUY_OFFER = 12,
-        PATH_PAYMENT_STRICT_SEND = 13,
-        CREATE_CLAIMABLE_BALANCE = 14,
-        CLAIM_CLAIMABLE_BALANCE = 15,
-        BEGIN_SPONSORING_FUTURE_RESERVES = 16,
-        END_SPONSORING_FUTURE_RESERVES = 17,
-        REVOKE_SPONSORSHIP = 18,
-        CLAWBACK = 19,
-        CLAWBACK_CLAIMABLE_BALANCE = 20,
-        SET_TRUST_LINE_FLAGS = 21,
-        LIQUIDITY_POOL_DEPOSIT = 22,
-        LIQUIDITY_POOL_WITHDRAW = 23
-    };
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        enum OperationType
+        {
+            CREATE_ACCOUNT = 0,
+            PAYMENT = 1,
+            PATH_PAYMENT_STRICT_RECEIVE = 2,
+            MANAGE_SELL_OFFER = 3,
+            CREATE_PASSIVE_SELL_OFFER = 4,
+            SET_OPTIONS = 5,
+            CHANGE_TRUST = 6,
+            ALLOW_TRUST = 7,
+            ACCOUNT_MERGE = 8,
+            INFLATION = 9,
+            MANAGE_DATA = 10,
+            BUMP_SEQUENCE = 11,
+            MANAGE_BUY_OFFER = 12,
+            PATH_PAYMENT_STRICT_SEND = 13,
+            CREATE_CLAIMABLE_BALANCE = 14,
+            CLAIM_CLAIMABLE_BALANCE = 15,
+            BEGIN_SPONSORING_FUTURE_RESERVES = 16,
+            END_SPONSORING_FUTURE_RESERVES = 17,
+            REVOKE_SPONSORSHIP = 18,
+            CLAWBACK = 19,
+            CLAWBACK_CLAIMABLE_BALANCE = 20,
+            SET_TRUST_LINE_FLAGS = 21,
+            LIQUIDITY_POOL_DEPOSIT = 22,
+            LIQUIDITY_POOL_WITHDRAW = 23
+        };
     """
 
     CREATE_ACCOUNT = 0

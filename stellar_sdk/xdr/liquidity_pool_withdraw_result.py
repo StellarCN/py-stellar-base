@@ -12,17 +12,16 @@ __all__ = ["LiquidityPoolWithdrawResult"]
 @type_checked
 class LiquidityPoolWithdrawResult:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    union LiquidityPoolWithdrawResult switch (
-        LiquidityPoolWithdrawResultCode code)
-    {
-    case LIQUIDITY_POOL_WITHDRAW_SUCCESS:
-        void;
-    default:
-        void;
-    };
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        union LiquidityPoolWithdrawResult switch (
+            LiquidityPoolWithdrawResultCode code)
+        {
+        case LIQUIDITY_POOL_WITHDRAW_SUCCESS:
+            void;
+        default:
+            void;
+        };
     """
 
     def __init__(

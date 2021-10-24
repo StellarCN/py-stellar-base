@@ -14,16 +14,15 @@ __all__ = ["ClaimableBalanceEntryExt"]
 @type_checked
 class ClaimableBalanceEntryExt:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    union switch (int v)
-        {
-        case 0:
-            void;
-        case 1:
-            ClaimableBalanceEntryExtensionV1 v1;
-        }
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        union switch (int v)
+            {
+            case 0:
+                void;
+            case 1:
+                ClaimableBalanceEntryExtensionV1 v1;
+            }
     """
 
     def __init__(

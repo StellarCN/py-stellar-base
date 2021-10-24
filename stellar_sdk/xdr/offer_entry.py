@@ -17,33 +17,32 @@ __all__ = ["OfferEntry"]
 @type_checked
 class OfferEntry:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    struct OfferEntry
-    {
-        AccountID sellerID;
-        int64 offerID;
-        Asset selling; // A
-        Asset buying;  // B
-        int64 amount;  // amount of A
+    XDR Source Code::
 
-        /* price for this offer:
-            price of A in terms of B
-            price=AmountB/AmountA=priceNumerator/priceDenominator
-            price is after fees
-        */
-        Price price;
-        uint32 flags; // see OfferEntryFlags
-
-        // reserved for future use
-        union switch (int v)
+        struct OfferEntry
         {
-        case 0:
-            void;
-        }
-        ext;
-    };
-    ----------------------------------------------------------------
+            AccountID sellerID;
+            int64 offerID;
+            Asset selling; // A
+            Asset buying;  // B
+            int64 amount;  // amount of A
+
+            /* price for this offer:
+                price of A in terms of B
+                price=AmountB/AmountA=priceNumerator/priceDenominator
+                price is after fees
+            */
+            Price price;
+            uint32 flags; // see OfferEntryFlags
+
+            // reserved for future use
+            union switch (int v)
+            {
+            case 0:
+                void;
+            }
+            ext;
+        };
     """
 
     def __init__(

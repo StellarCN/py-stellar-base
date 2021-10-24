@@ -14,14 +14,13 @@ __all__ = ["StellarValueType"]
 @type_checked
 class StellarValueType(IntEnum):
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    enum StellarValueType
-    {
-        STELLAR_VALUE_BASIC = 0,
-        STELLAR_VALUE_SIGNED = 1
-    };
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        enum StellarValueType
+        {
+            STELLAR_VALUE_BASIC = 0,
+            STELLAR_VALUE_SIGNED = 1
+        };
     """
 
     STELLAR_VALUE_BASIC = 0

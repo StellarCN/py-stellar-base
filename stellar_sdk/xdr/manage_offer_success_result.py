@@ -15,24 +15,23 @@ __all__ = ["ManageOfferSuccessResult"]
 @type_checked
 class ManageOfferSuccessResult:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    struct ManageOfferSuccessResult
-    {
-        // offers that got claimed while creating this offer
-        ClaimAtom offersClaimed<>;
+    XDR Source Code::
 
-        union switch (ManageOfferEffect effect)
+        struct ManageOfferSuccessResult
         {
-        case MANAGE_OFFER_CREATED:
-        case MANAGE_OFFER_UPDATED:
-            OfferEntry offer;
-        default:
-            void;
-        }
-        offer;
-    };
-    ----------------------------------------------------------------
+            // offers that got claimed while creating this offer
+            ClaimAtom offersClaimed<>;
+
+            union switch (ManageOfferEffect effect)
+            {
+            case MANAGE_OFFER_CREATED:
+            case MANAGE_OFFER_UPDATED:
+                OfferEntry offer;
+            default:
+                void;
+            }
+            offer;
+        };
     """
 
     def __init__(

@@ -14,14 +14,13 @@ __all__ = ["PublicKey"]
 @type_checked
 class PublicKey:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    union PublicKey switch (PublicKeyType type)
-    {
-    case PUBLIC_KEY_TYPE_ED25519:
-        uint256 ed25519;
-    };
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        union PublicKey switch (PublicKeyType type)
+        {
+        case PUBLIC_KEY_TYPE_ED25519:
+            uint256 ed25519;
+        };
     """
 
     def __init__(

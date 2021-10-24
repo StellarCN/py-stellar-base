@@ -14,17 +14,16 @@ __all__ = ["MemoType"]
 @type_checked
 class MemoType(IntEnum):
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    enum MemoType
-    {
-        MEMO_NONE = 0,
-        MEMO_TEXT = 1,
-        MEMO_ID = 2,
-        MEMO_HASH = 3,
-        MEMO_RETURN = 4
-    };
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        enum MemoType
+        {
+            MEMO_NONE = 0,
+            MEMO_TEXT = 1,
+            MEMO_ID = 2,
+            MEMO_HASH = 3,
+            MEMO_RETURN = 4
+        };
     """
 
     MEMO_NONE = 0

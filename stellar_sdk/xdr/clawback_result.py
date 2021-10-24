@@ -12,16 +12,15 @@ __all__ = ["ClawbackResult"]
 @type_checked
 class ClawbackResult:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    union ClawbackResult switch (ClawbackResultCode code)
-    {
-    case CLAWBACK_SUCCESS:
-        void;
-    default:
-        void;
-    };
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        union ClawbackResult switch (ClawbackResultCode code)
+        {
+        case CLAWBACK_SUCCESS:
+            void;
+        default:
+            void;
+        };
     """
 
     def __init__(

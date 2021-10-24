@@ -12,10 +12,9 @@ __all__ = ["Hash"]
 @type_checked
 class Hash:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    typedef opaque Hash[32];
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        typedef opaque Hash[32];
     """
 
     def __init__(self, hash: bytes) -> None:

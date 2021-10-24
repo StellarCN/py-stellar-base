@@ -13,14 +13,13 @@ __all__ = ["InflationPayout"]
 @type_checked
 class InflationPayout:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    struct InflationPayout // or use PaymentResultAtom to limit types?
-    {
-        AccountID destination;
-        int64 amount;
-    };
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        struct InflationPayout // or use PaymentResultAtom to limit types?
+        {
+            AccountID destination;
+            int64 amount;
+        };
     """
 
     def __init__(

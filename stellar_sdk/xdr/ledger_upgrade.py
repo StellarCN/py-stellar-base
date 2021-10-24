@@ -14,20 +14,19 @@ __all__ = ["LedgerUpgrade"]
 @type_checked
 class LedgerUpgrade:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    union LedgerUpgrade switch (LedgerUpgradeType type)
-    {
-    case LEDGER_UPGRADE_VERSION:
-        uint32 newLedgerVersion; // update ledgerVersion
-    case LEDGER_UPGRADE_BASE_FEE:
-        uint32 newBaseFee; // update baseFee
-    case LEDGER_UPGRADE_MAX_TX_SET_SIZE:
-        uint32 newMaxTxSetSize; // update maxTxSetSize
-    case LEDGER_UPGRADE_BASE_RESERVE:
-        uint32 newBaseReserve; // update baseReserve
-    };
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        union LedgerUpgrade switch (LedgerUpgradeType type)
+        {
+        case LEDGER_UPGRADE_VERSION:
+            uint32 newLedgerVersion; // update ledgerVersion
+        case LEDGER_UPGRADE_BASE_FEE:
+            uint32 newBaseFee; // update baseFee
+        case LEDGER_UPGRADE_MAX_TX_SET_SIZE:
+            uint32 newMaxTxSetSize; // update maxTxSetSize
+        case LEDGER_UPGRADE_BASE_RESERVE:
+            uint32 newBaseReserve; // update baseReserve
+        };
     """
 
     def __init__(

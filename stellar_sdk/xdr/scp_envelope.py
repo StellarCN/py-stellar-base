@@ -13,14 +13,13 @@ __all__ = ["SCPEnvelope"]
 @type_checked
 class SCPEnvelope:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    struct SCPEnvelope
-    {
-        SCPStatement statement;
-        Signature signature;
-    };
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        struct SCPEnvelope
+        {
+            SCPStatement statement;
+            Signature signature;
+        };
     """
 
     def __init__(

@@ -14,34 +14,33 @@ __all__ = ["TransactionResult"]
 @type_checked
 class TransactionResult:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    struct TransactionResult
-    {
-        int64 feeCharged; // actual fee charged for the transaction
+    XDR Source Code::
 
-        union switch (TransactionResultCode code)
+        struct TransactionResult
         {
-        case txFEE_BUMP_INNER_SUCCESS:
-        case txFEE_BUMP_INNER_FAILED:
-            InnerTransactionResultPair innerResultPair;
-        case txSUCCESS:
-        case txFAILED:
-            OperationResult results<>;
-        default:
-            void;
-        }
-        result;
+            int64 feeCharged; // actual fee charged for the transaction
 
-        // reserved for future use
-        union switch (int v)
-        {
-        case 0:
-            void;
-        }
-        ext;
-    };
-    ----------------------------------------------------------------
+            union switch (TransactionResultCode code)
+            {
+            case txFEE_BUMP_INNER_SUCCESS:
+            case txFEE_BUMP_INNER_FAILED:
+                InnerTransactionResultPair innerResultPair;
+            case txSUCCESS:
+            case txFAILED:
+                OperationResult results<>;
+            default:
+                void;
+            }
+            result;
+
+            // reserved for future use
+            union switch (int v)
+            {
+            case 0:
+                void;
+            }
+            ext;
+        };
     """
 
     def __init__(

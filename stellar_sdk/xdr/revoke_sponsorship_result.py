@@ -12,16 +12,15 @@ __all__ = ["RevokeSponsorshipResult"]
 @type_checked
 class RevokeSponsorshipResult:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    union RevokeSponsorshipResult switch (RevokeSponsorshipResultCode code)
-    {
-    case REVOKE_SPONSORSHIP_SUCCESS:
-        void;
-    default:
-        void;
-    };
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        union RevokeSponsorshipResult switch (RevokeSponsorshipResultCode code)
+        {
+        case REVOKE_SPONSORSHIP_SUCCESS:
+            void;
+        default:
+            void;
+        };
     """
 
     def __init__(

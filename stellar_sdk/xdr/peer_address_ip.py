@@ -14,16 +14,15 @@ __all__ = ["PeerAddressIp"]
 @type_checked
 class PeerAddressIp:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    union switch (IPAddrType type)
-        {
-        case IPv4:
-            opaque ipv4[4];
-        case IPv6:
-            opaque ipv6[16];
-        }
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        union switch (IPAddrType type)
+            {
+            case IPv4:
+                opaque ipv4[4];
+            case IPv6:
+                opaque ipv6[16];
+            }
     """
 
     def __init__(

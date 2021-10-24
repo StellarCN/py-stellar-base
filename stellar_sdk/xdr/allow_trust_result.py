@@ -12,16 +12,15 @@ __all__ = ["AllowTrustResult"]
 @type_checked
 class AllowTrustResult:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    union AllowTrustResult switch (AllowTrustResultCode code)
-    {
-    case ALLOW_TRUST_SUCCESS:
-        void;
-    default:
-        void;
-    };
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        union AllowTrustResult switch (AllowTrustResultCode code)
+        {
+        case ALLOW_TRUST_SUCCESS:
+            void;
+        default:
+            void;
+        };
     """
 
     def __init__(

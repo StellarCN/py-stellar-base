@@ -12,13 +12,12 @@ __all__ = ["LedgerKeyLiquidityPool"]
 @type_checked
 class LedgerKeyLiquidityPool:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    struct
-        {
-            PoolID liquidityPoolID;
-        }
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        struct
+            {
+                PoolID liquidityPoolID;
+            }
     """
 
     def __init__(

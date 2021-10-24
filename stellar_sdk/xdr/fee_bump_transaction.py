@@ -15,26 +15,25 @@ __all__ = ["FeeBumpTransaction"]
 @type_checked
 class FeeBumpTransaction:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    struct FeeBumpTransaction
-    {
-        MuxedAccount feeSource;
-        int64 fee;
-        union switch (EnvelopeType type)
+    XDR Source Code::
+
+        struct FeeBumpTransaction
         {
-        case ENVELOPE_TYPE_TX:
-            TransactionV1Envelope v1;
-        }
-        innerTx;
-        union switch (int v)
-        {
-        case 0:
-            void;
-        }
-        ext;
-    };
-    ----------------------------------------------------------------
+            MuxedAccount feeSource;
+            int64 fee;
+            union switch (EnvelopeType type)
+            {
+            case ENVELOPE_TYPE_TX:
+                TransactionV1Envelope v1;
+            }
+            innerTx;
+            union switch (int v)
+            {
+            case 0:
+                void;
+            }
+            ext;
+        };
     """
 
     def __init__(

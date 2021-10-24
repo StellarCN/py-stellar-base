@@ -12,10 +12,9 @@ __all__ = ["Uint64"]
 @type_checked
 class Uint64:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    typedef unsigned hyper uint64;
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        typedef unsigned hyper uint64;
     """
 
     def __init__(self, uint64: int) -> None:

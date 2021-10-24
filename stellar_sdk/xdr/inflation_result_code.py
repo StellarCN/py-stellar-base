@@ -14,16 +14,15 @@ __all__ = ["InflationResultCode"]
 @type_checked
 class InflationResultCode(IntEnum):
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    enum InflationResultCode
-    {
-        // codes considered as "success" for the operation
-        INFLATION_SUCCESS = 0,
-        // codes considered as "failure" for the operation
-        INFLATION_NOT_TIME = -1
-    };
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        enum InflationResultCode
+        {
+            // codes considered as "success" for the operation
+            INFLATION_SUCCESS = 0,
+            // codes considered as "failure" for the operation
+            INFLATION_NOT_TIME = -1
+        };
     """
 
     INFLATION_SUCCESS = 0

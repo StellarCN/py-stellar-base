@@ -12,10 +12,9 @@ __all__ = ["Thresholds"]
 @type_checked
 class Thresholds:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    typedef opaque Thresholds[4];
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        typedef opaque Thresholds[4];
     """
 
     def __init__(self, thresholds: bytes) -> None:

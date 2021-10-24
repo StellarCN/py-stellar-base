@@ -14,20 +14,19 @@ __all__ = ["TrustLineFlags"]
 @type_checked
 class TrustLineFlags(IntEnum):
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    enum TrustLineFlags
-    {
-        // issuer has authorized account to perform transactions with its credit
-        AUTHORIZED_FLAG = 1,
-        // issuer has authorized account to maintain and reduce liabilities for its
-        // credit
-        AUTHORIZED_TO_MAINTAIN_LIABILITIES_FLAG = 2,
-        // issuer has specified that it may clawback its credit, and that claimable
-        // balances created with its credit may also be clawed back
-        TRUSTLINE_CLAWBACK_ENABLED_FLAG = 4
-    };
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        enum TrustLineFlags
+        {
+            // issuer has authorized account to perform transactions with its credit
+            AUTHORIZED_FLAG = 1,
+            // issuer has authorized account to maintain and reduce liabilities for its
+            // credit
+            AUTHORIZED_TO_MAINTAIN_LIABILITIES_FLAG = 2,
+            // issuer has specified that it may clawback its credit, and that claimable
+            // balances created with its credit may also be clawed back
+            TRUSTLINE_CLAWBACK_ENABLED_FLAG = 4
+        };
     """
 
     AUTHORIZED_FLAG = 1

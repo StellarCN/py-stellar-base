@@ -14,15 +14,14 @@ __all__ = ["ClaimAtomType"]
 @type_checked
 class ClaimAtomType(IntEnum):
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    enum ClaimAtomType
-    {
-        CLAIM_ATOM_TYPE_V0 = 0,
-        CLAIM_ATOM_TYPE_ORDER_BOOK = 1,
-        CLAIM_ATOM_TYPE_LIQUIDITY_POOL = 2
-    };
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        enum ClaimAtomType
+        {
+            CLAIM_ATOM_TYPE_V0 = 0,
+            CLAIM_ATOM_TYPE_ORDER_BOOK = 1,
+            CLAIM_ATOM_TYPE_LIQUIDITY_POOL = 2
+        };
     """
 
     CLAIM_ATOM_TYPE_V0 = 0

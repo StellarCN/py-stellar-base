@@ -12,10 +12,9 @@ __all__ = ["EncryptedBody"]
 @type_checked
 class EncryptedBody:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    typedef opaque EncryptedBody<64000>;
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        typedef opaque EncryptedBody<64000>;
     """
 
     def __init__(self, encrypted_body: bytes) -> None:

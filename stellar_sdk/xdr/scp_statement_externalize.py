@@ -14,15 +14,14 @@ __all__ = ["SCPStatementExternalize"]
 @type_checked
 class SCPStatementExternalize:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    struct
-            {
-                SCPBallot commit;         // c
-                uint32 nH;                // h.n
-                Hash commitQuorumSetHash; // D used before EXTERNALIZE
-            }
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        struct
+                {
+                    SCPBallot commit;         // c
+                    uint32 nH;                // h.n
+                    Hash commitQuorumSetHash; // D used before EXTERNALIZE
+                }
     """
 
     def __init__(

@@ -14,15 +14,14 @@ __all__ = ["OperationIDId"]
 @type_checked
 class OperationIDId:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    struct
-        {
-            AccountID sourceAccount;
-            SequenceNumber seqNum;
-            uint32 opNum;
-        }
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        struct
+            {
+                AccountID sourceAccount;
+                SequenceNumber seqNum;
+                uint32 opNum;
+            }
     """
 
     def __init__(

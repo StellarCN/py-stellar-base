@@ -12,14 +12,13 @@ __all__ = ["TransactionHistoryEntryExt"]
 @type_checked
 class TransactionHistoryEntryExt:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    union switch (int v)
-        {
-        case 0:
-            void;
-        }
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        union switch (int v)
+            {
+            case 0:
+                void;
+            }
     """
 
     def __init__(

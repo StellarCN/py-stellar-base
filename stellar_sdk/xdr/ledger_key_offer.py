@@ -13,14 +13,13 @@ __all__ = ["LedgerKeyOffer"]
 @type_checked
 class LedgerKeyOffer:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    struct
-        {
-            AccountID sellerID;
-            int64 offerID;
-        }
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        struct
+            {
+                AccountID sellerID;
+                int64 offerID;
+            }
     """
 
     def __init__(

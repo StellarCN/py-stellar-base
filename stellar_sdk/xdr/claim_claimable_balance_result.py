@@ -12,16 +12,15 @@ __all__ = ["ClaimClaimableBalanceResult"]
 @type_checked
 class ClaimClaimableBalanceResult:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    union ClaimClaimableBalanceResult switch (ClaimClaimableBalanceResultCode code)
-    {
-    case CLAIM_CLAIMABLE_BALANCE_SUCCESS:
-        void;
-    default:
-        void;
-    };
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        union ClaimClaimableBalanceResult switch (ClaimClaimableBalanceResultCode code)
+        {
+        case CLAIM_CLAIMABLE_BALANCE_SUCCESS:
+            void;
+        default:
+            void;
+        };
     """
 
     def __init__(

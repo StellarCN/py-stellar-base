@@ -19,24 +19,23 @@ __all__ = ["LedgerEntryData"]
 @type_checked
 class LedgerEntryData:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    union switch (LedgerEntryType type)
-        {
-        case ACCOUNT:
-            AccountEntry account;
-        case TRUSTLINE:
-            TrustLineEntry trustLine;
-        case OFFER:
-            OfferEntry offer;
-        case DATA:
-            DataEntry data;
-        case CLAIMABLE_BALANCE:
-            ClaimableBalanceEntry claimableBalance;
-        case LIQUIDITY_POOL:
-            LiquidityPoolEntry liquidityPool;
-        }
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        union switch (LedgerEntryType type)
+            {
+            case ACCOUNT:
+                AccountEntry account;
+            case TRUSTLINE:
+                TrustLineEntry trustLine;
+            case OFFER:
+                OfferEntry offer;
+            case DATA:
+                DataEntry data;
+            case CLAIMABLE_BALANCE:
+                ClaimableBalanceEntry claimableBalance;
+            case LIQUIDITY_POOL:
+                LiquidityPoolEntry liquidityPool;
+            }
     """
 
     def __init__(

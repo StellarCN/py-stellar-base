@@ -14,16 +14,15 @@ __all__ = ["AssetType"]
 @type_checked
 class AssetType(IntEnum):
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    enum AssetType
-    {
-        ASSET_TYPE_NATIVE = 0,
-        ASSET_TYPE_CREDIT_ALPHANUM4 = 1,
-        ASSET_TYPE_CREDIT_ALPHANUM12 = 2,
-        ASSET_TYPE_POOL_SHARE = 3
-    };
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        enum AssetType
+        {
+            ASSET_TYPE_NATIVE = 0,
+            ASSET_TYPE_CREDIT_ALPHANUM4 = 1,
+            ASSET_TYPE_CREDIT_ALPHANUM12 = 2,
+            ASSET_TYPE_POOL_SHARE = 3
+        };
     """
 
     ASSET_TYPE_NATIVE = 0

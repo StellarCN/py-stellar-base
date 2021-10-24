@@ -14,16 +14,15 @@ __all__ = ["LedgerEntryExt"]
 @type_checked
 class LedgerEntryExt:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    union switch (int v)
-        {
-        case 0:
-            void;
-        case 1:
-            LedgerEntryExtensionV1 v1;
-        }
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        union switch (int v)
+            {
+            case 0:
+                void;
+            case 1:
+                LedgerEntryExtensionV1 v1;
+            }
     """
 
     def __init__(

@@ -14,18 +14,17 @@ __all__ = ["ClaimPredicateType"]
 @type_checked
 class ClaimPredicateType(IntEnum):
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    enum ClaimPredicateType
-    {
-        CLAIM_PREDICATE_UNCONDITIONAL = 0,
-        CLAIM_PREDICATE_AND = 1,
-        CLAIM_PREDICATE_OR = 2,
-        CLAIM_PREDICATE_NOT = 3,
-        CLAIM_PREDICATE_BEFORE_ABSOLUTE_TIME = 4,
-        CLAIM_PREDICATE_BEFORE_RELATIVE_TIME = 5
-    };
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        enum ClaimPredicateType
+        {
+            CLAIM_PREDICATE_UNCONDITIONAL = 0,
+            CLAIM_PREDICATE_AND = 1,
+            CLAIM_PREDICATE_OR = 2,
+            CLAIM_PREDICATE_NOT = 3,
+            CLAIM_PREDICATE_BEFORE_ABSOLUTE_TIME = 4,
+            CLAIM_PREDICATE_BEFORE_RELATIVE_TIME = 5
+        };
     """
 
     CLAIM_PREDICATE_UNCONDITIONAL = 0

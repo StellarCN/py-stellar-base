@@ -12,16 +12,15 @@ __all__ = ["SetTrustLineFlagsResult"]
 @type_checked
 class SetTrustLineFlagsResult:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    union SetTrustLineFlagsResult switch (SetTrustLineFlagsResultCode code)
-    {
-    case SET_TRUST_LINE_FLAGS_SUCCESS:
-        void;
-    default:
-        void;
-    };
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        union SetTrustLineFlagsResult switch (SetTrustLineFlagsResultCode code)
+        {
+        case SET_TRUST_LINE_FLAGS_SUCCESS:
+            void;
+        default:
+            void;
+        };
     """
 
     def __init__(

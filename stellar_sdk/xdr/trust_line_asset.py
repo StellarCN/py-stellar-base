@@ -16,25 +16,24 @@ __all__ = ["TrustLineAsset"]
 @type_checked
 class TrustLineAsset:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    union TrustLineAsset switch (AssetType type)
-    {
-    case ASSET_TYPE_NATIVE: // Not credit
-        void;
+    XDR Source Code::
 
-    case ASSET_TYPE_CREDIT_ALPHANUM4:
-        AlphaNum4 alphaNum4;
+        union TrustLineAsset switch (AssetType type)
+        {
+        case ASSET_TYPE_NATIVE: // Not credit
+            void;
 
-    case ASSET_TYPE_CREDIT_ALPHANUM12:
-        AlphaNum12 alphaNum12;
+        case ASSET_TYPE_CREDIT_ALPHANUM4:
+            AlphaNum4 alphaNum4;
 
-    case ASSET_TYPE_POOL_SHARE:
-        PoolID liquidityPoolID;
+        case ASSET_TYPE_CREDIT_ALPHANUM12:
+            AlphaNum12 alphaNum12;
 
-        // add other asset types here in the future
-    };
-    ----------------------------------------------------------------
+        case ASSET_TYPE_POOL_SHARE:
+            PoolID liquidityPoolID;
+
+            // add other asset types here in the future
+        };
     """
 
     def __init__(

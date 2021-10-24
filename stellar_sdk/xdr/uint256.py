@@ -12,10 +12,9 @@ __all__ = ["Uint256"]
 @type_checked
 class Uint256:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    typedef opaque uint256[32];
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        typedef opaque uint256[32];
     """
 
     def __init__(self, uint256: bytes) -> None:

@@ -18,33 +18,32 @@ __all__ = ["ClaimableBalanceEntry"]
 @type_checked
 class ClaimableBalanceEntry:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    struct ClaimableBalanceEntry
-    {
-        // Unique identifier for this ClaimableBalanceEntry
-        ClaimableBalanceID balanceID;
+    XDR Source Code::
 
-        // List of claimants with associated predicate
-        Claimant claimants<10>;
-
-        // Any asset including native
-        Asset asset;
-
-        // Amount of asset
-        int64 amount;
-
-        // reserved for future use
-        union switch (int v)
+        struct ClaimableBalanceEntry
         {
-        case 0:
-            void;
-        case 1:
-            ClaimableBalanceEntryExtensionV1 v1;
-        }
-        ext;
-    };
-    ----------------------------------------------------------------
+            // Unique identifier for this ClaimableBalanceEntry
+            ClaimableBalanceID balanceID;
+
+            // List of claimants with associated predicate
+            Claimant claimants<10>;
+
+            // Any asset including native
+            Asset asset;
+
+            // Amount of asset
+            int64 amount;
+
+            // reserved for future use
+            union switch (int v)
+            {
+            case 0:
+                void;
+            case 1:
+                ClaimableBalanceEntryExtensionV1 v1;
+            }
+            ext;
+        };
     """
 
     def __init__(

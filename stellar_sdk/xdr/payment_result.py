@@ -12,16 +12,15 @@ __all__ = ["PaymentResult"]
 @type_checked
 class PaymentResult:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    union PaymentResult switch (PaymentResultCode code)
-    {
-    case PAYMENT_SUCCESS:
-        void;
-    default:
-        void;
-    };
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        union PaymentResult switch (PaymentResultCode code)
+        {
+        case PAYMENT_SUCCESS:
+            void;
+        default:
+            void;
+        };
     """
 
     def __init__(

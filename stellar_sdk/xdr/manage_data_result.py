@@ -12,16 +12,15 @@ __all__ = ["ManageDataResult"]
 @type_checked
 class ManageDataResult:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    union ManageDataResult switch (ManageDataResultCode code)
-    {
-    case MANAGE_DATA_SUCCESS:
-        void;
-    default:
-        void;
-    };
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        union ManageDataResult switch (ManageDataResultCode code)
+        {
+        case MANAGE_DATA_SUCCESS:
+            void;
+        default:
+            void;
+        };
     """
 
     def __init__(

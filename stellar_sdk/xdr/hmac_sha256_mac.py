@@ -12,13 +12,12 @@ __all__ = ["HmacSha256Mac"]
 @type_checked
 class HmacSha256Mac:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    struct HmacSha256Mac
-    {
-        opaque mac[32];
-    };
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        struct HmacSha256Mac
+        {
+            opaque mac[32];
+        };
     """
 
     def __init__(

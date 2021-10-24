@@ -12,10 +12,9 @@ __all__ = ["SequenceNumber"]
 @type_checked
 class SequenceNumber:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    typedef int64 SequenceNumber;
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        typedef int64 SequenceNumber;
     """
 
     def __init__(self, sequence_number: Int64) -> None:

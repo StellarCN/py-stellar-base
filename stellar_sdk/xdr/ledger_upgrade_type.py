@@ -14,16 +14,15 @@ __all__ = ["LedgerUpgradeType"]
 @type_checked
 class LedgerUpgradeType(IntEnum):
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    enum LedgerUpgradeType
-    {
-        LEDGER_UPGRADE_VERSION = 1,
-        LEDGER_UPGRADE_BASE_FEE = 2,
-        LEDGER_UPGRADE_MAX_TX_SET_SIZE = 3,
-        LEDGER_UPGRADE_BASE_RESERVE = 4
-    };
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        enum LedgerUpgradeType
+        {
+            LEDGER_UPGRADE_VERSION = 1,
+            LEDGER_UPGRADE_BASE_FEE = 2,
+            LEDGER_UPGRADE_MAX_TX_SET_SIZE = 3,
+            LEDGER_UPGRADE_BASE_RESERVE = 4
+        };
     """
 
     LEDGER_UPGRADE_VERSION = 1

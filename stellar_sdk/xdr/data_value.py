@@ -12,10 +12,9 @@ __all__ = ["DataValue"]
 @type_checked
 class DataValue:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    typedef opaque DataValue<64>;
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        typedef opaque DataValue<64>;
     """
 
     def __init__(self, data_value: bytes) -> None:

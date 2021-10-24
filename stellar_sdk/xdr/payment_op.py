@@ -14,15 +14,14 @@ __all__ = ["PaymentOp"]
 @type_checked
 class PaymentOp:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    struct PaymentOp
-    {
-        MuxedAccount destination; // recipient of the payment
-        Asset asset;              // what they end up with
-        int64 amount;             // amount they end up with
-    };
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        struct PaymentOp
+        {
+            MuxedAccount destination; // recipient of the payment
+            Asset asset;              // what they end up with
+            int64 amount;             // amount they end up with
+        };
     """
 
     def __init__(

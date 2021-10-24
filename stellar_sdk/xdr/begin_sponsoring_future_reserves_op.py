@@ -12,13 +12,12 @@ __all__ = ["BeginSponsoringFutureReservesOp"]
 @type_checked
 class BeginSponsoringFutureReservesOp:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    struct BeginSponsoringFutureReservesOp
-    {
-        AccountID sponsoredID;
-    };
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        struct BeginSponsoringFutureReservesOp
+        {
+            AccountID sponsoredID;
+        };
     """
 
     def __init__(

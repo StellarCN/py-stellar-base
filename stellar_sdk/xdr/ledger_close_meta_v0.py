@@ -18,26 +18,25 @@ __all__ = ["LedgerCloseMetaV0"]
 @type_checked
 class LedgerCloseMetaV0:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    struct LedgerCloseMetaV0
-    {
-        LedgerHeaderHistoryEntry ledgerHeader;
-        // NB: txSet is sorted in "Hash order"
-        TransactionSet txSet;
+    XDR Source Code::
 
-        // NB: transactions are sorted in apply order here
-        // fees for all transactions are processed first
-        // followed by applying transactions
-        TransactionResultMeta txProcessing<>;
+        struct LedgerCloseMetaV0
+        {
+            LedgerHeaderHistoryEntry ledgerHeader;
+            // NB: txSet is sorted in "Hash order"
+            TransactionSet txSet;
 
-        // upgrades are applied last
-        UpgradeEntryMeta upgradesProcessing<>;
+            // NB: transactions are sorted in apply order here
+            // fees for all transactions are processed first
+            // followed by applying transactions
+            TransactionResultMeta txProcessing<>;
 
-        // other misc information attached to the ledger close
-        SCPHistoryEntry scpInfo<>;
-    };
-    ----------------------------------------------------------------
+            // upgrades are applied last
+            UpgradeEntryMeta upgradesProcessing<>;
+
+            // other misc information attached to the ledger close
+            SCPHistoryEntry scpInfo<>;
+        };
     """
 
     def __init__(

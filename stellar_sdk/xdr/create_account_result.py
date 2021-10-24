@@ -12,16 +12,15 @@ __all__ = ["CreateAccountResult"]
 @type_checked
 class CreateAccountResult:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    union CreateAccountResult switch (CreateAccountResultCode code)
-    {
-    case CREATE_ACCOUNT_SUCCESS:
-        void;
-    default:
-        void;
-    };
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        union CreateAccountResult switch (CreateAccountResultCode code)
+        {
+        case CREATE_ACCOUNT_SUCCESS:
+            void;
+        default:
+            void;
+        };
     """
 
     def __init__(

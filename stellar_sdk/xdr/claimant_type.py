@@ -14,13 +14,12 @@ __all__ = ["ClaimantType"]
 @type_checked
 class ClaimantType(IntEnum):
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    enum ClaimantType
-    {
-        CLAIMANT_TYPE_V0 = 0
-    };
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        enum ClaimantType
+        {
+            CLAIMANT_TYPE_V0 = 0
+        };
     """
 
     CLAIMANT_TYPE_V0 = 0

@@ -13,14 +13,13 @@ __all__ = ["CreateAccountOp"]
 @type_checked
 class CreateAccountOp:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    struct CreateAccountOp
-    {
-        AccountID destination; // account to create
-        int64 startingBalance; // amount they end up with
-    };
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        struct CreateAccountOp
+        {
+            AccountID destination; // account to create
+            int64 startingBalance; // amount they end up with
+        };
     """
 
     def __init__(

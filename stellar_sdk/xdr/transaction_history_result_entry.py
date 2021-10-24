@@ -14,22 +14,21 @@ __all__ = ["TransactionHistoryResultEntry"]
 @type_checked
 class TransactionHistoryResultEntry:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    struct TransactionHistoryResultEntry
-    {
-        uint32 ledgerSeq;
-        TransactionResultSet txResultSet;
+    XDR Source Code::
 
-        // reserved for future use
-        union switch (int v)
+        struct TransactionHistoryResultEntry
         {
-        case 0:
-            void;
-        }
-        ext;
-    };
-    ----------------------------------------------------------------
+            uint32 ledgerSeq;
+            TransactionResultSet txResultSet;
+
+            // reserved for future use
+            union switch (int v)
+            {
+            case 0:
+                void;
+            }
+            ext;
+        };
     """
 
     def __init__(

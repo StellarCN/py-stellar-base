@@ -12,14 +12,13 @@ __all__ = ["AccountEntryExtensionV2Ext"]
 @type_checked
 class AccountEntryExtensionV2Ext:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    union switch (int v)
-        {
-        case 0:
-            void;
-        }
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        union switch (int v)
+            {
+            case 0:
+                void;
+            }
     """
 
     def __init__(

@@ -12,10 +12,9 @@ __all__ = ["AssetCode4"]
 @type_checked
 class AssetCode4:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    typedef opaque AssetCode4[4];
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        typedef opaque AssetCode4[4];
     """
 
     def __init__(self, asset_code4: bytes) -> None:

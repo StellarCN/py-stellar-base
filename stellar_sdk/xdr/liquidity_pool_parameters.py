@@ -16,14 +16,13 @@ __all__ = ["LiquidityPoolParameters"]
 @type_checked
 class LiquidityPoolParameters:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    union LiquidityPoolParameters switch (LiquidityPoolType type)
-    {
-    case LIQUIDITY_POOL_CONSTANT_PRODUCT:
-        LiquidityPoolConstantProductParameters constantProduct;
-    };
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        union LiquidityPoolParameters switch (LiquidityPoolType type)
+        {
+        case LIQUIDITY_POOL_CONSTANT_PRODUCT:
+            LiquidityPoolConstantProductParameters constantProduct;
+        };
     """
 
     def __init__(

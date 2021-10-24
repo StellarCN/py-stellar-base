@@ -14,10 +14,9 @@ __all__ = ["PeerStatList"]
 @type_checked
 class PeerStatList:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    typedef PeerStats PeerStatList<25>;
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        typedef PeerStats PeerStatList<25>;
     """
 
     def __init__(self, peer_stat_list: List[PeerStats]) -> None:

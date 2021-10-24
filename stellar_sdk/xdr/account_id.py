@@ -12,10 +12,9 @@ __all__ = ["AccountID"]
 @type_checked
 class AccountID:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    typedef PublicKey AccountID;
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        typedef PublicKey AccountID;
     """
 
     def __init__(self, account_id: PublicKey) -> None:

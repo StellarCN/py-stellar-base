@@ -19,50 +19,49 @@ __all__ = ["LedgerKey"]
 @type_checked
 class LedgerKey:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    union LedgerKey switch (LedgerEntryType type)
-    {
-    case ACCOUNT:
-        struct
-        {
-            AccountID accountID;
-        } account;
+    XDR Source Code::
 
-    case TRUSTLINE:
-        struct
+        union LedgerKey switch (LedgerEntryType type)
         {
-            AccountID accountID;
-            TrustLineAsset asset;
-        } trustLine;
+        case ACCOUNT:
+            struct
+            {
+                AccountID accountID;
+            } account;
 
-    case OFFER:
-        struct
-        {
-            AccountID sellerID;
-            int64 offerID;
-        } offer;
+        case TRUSTLINE:
+            struct
+            {
+                AccountID accountID;
+                TrustLineAsset asset;
+            } trustLine;
 
-    case DATA:
-        struct
-        {
-            AccountID accountID;
-            string64 dataName;
-        } data;
+        case OFFER:
+            struct
+            {
+                AccountID sellerID;
+                int64 offerID;
+            } offer;
 
-    case CLAIMABLE_BALANCE:
-        struct
-        {
-            ClaimableBalanceID balanceID;
-        } claimableBalance;
+        case DATA:
+            struct
+            {
+                AccountID accountID;
+                string64 dataName;
+            } data;
 
-    case LIQUIDITY_POOL:
-        struct
-        {
-            PoolID liquidityPoolID;
-        } liquidityPool;
-    };
-    ----------------------------------------------------------------
+        case CLAIMABLE_BALANCE:
+            struct
+            {
+                ClaimableBalanceID balanceID;
+            } claimableBalance;
+
+        case LIQUIDITY_POOL:
+            struct
+            {
+                PoolID liquidityPoolID;
+            } liquidityPool;
+        };
     """
 
     def __init__(

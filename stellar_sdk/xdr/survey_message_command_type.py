@@ -14,13 +14,12 @@ __all__ = ["SurveyMessageCommandType"]
 @type_checked
 class SurveyMessageCommandType(IntEnum):
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    enum SurveyMessageCommandType
-    {
-        SURVEY_TOPOLOGY = 0
-    };
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        enum SurveyMessageCommandType
+        {
+            SURVEY_TOPOLOGY = 0
+        };
     """
 
     SURVEY_TOPOLOGY = 0

@@ -16,22 +16,21 @@ __all__ = ["Memo"]
 @type_checked
 class Memo:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    union Memo switch (MemoType type)
-    {
-    case MEMO_NONE:
-        void;
-    case MEMO_TEXT:
-        string text<28>;
-    case MEMO_ID:
-        uint64 id;
-    case MEMO_HASH:
-        Hash hash; // the hash of what to pull from the content server
-    case MEMO_RETURN:
-        Hash retHash; // the hash of the tx you are rejecting
-    };
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        union Memo switch (MemoType type)
+        {
+        case MEMO_NONE:
+            void;
+        case MEMO_TEXT:
+            string text<28>;
+        case MEMO_ID:
+            uint64 id;
+        case MEMO_HASH:
+            Hash hash; // the hash of what to pull from the content server
+        case MEMO_RETURN:
+            Hash retHash; // the hash of the tx you are rejecting
+        };
     """
 
     def __init__(

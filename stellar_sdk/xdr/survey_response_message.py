@@ -15,17 +15,16 @@ __all__ = ["SurveyResponseMessage"]
 @type_checked
 class SurveyResponseMessage:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    struct SurveyResponseMessage
-    {
-        NodeID surveyorPeerID;
-        NodeID surveyedPeerID;
-        uint32 ledgerNum;
-        SurveyMessageCommandType commandType;
-        EncryptedBody encryptedBody;
-    };
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        struct SurveyResponseMessage
+        {
+            NodeID surveyorPeerID;
+            NodeID surveyedPeerID;
+            uint32 ledgerNum;
+            SurveyMessageCommandType commandType;
+            EncryptedBody encryptedBody;
+        };
     """
 
     def __init__(

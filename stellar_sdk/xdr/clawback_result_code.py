@@ -14,20 +14,19 @@ __all__ = ["ClawbackResultCode"]
 @type_checked
 class ClawbackResultCode(IntEnum):
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    enum ClawbackResultCode
-    {
-        // codes considered as "success" for the operation
-        CLAWBACK_SUCCESS = 0,
+    XDR Source Code::
 
-        // codes considered as "failure" for the operation
-        CLAWBACK_MALFORMED = -1,
-        CLAWBACK_NOT_CLAWBACK_ENABLED = -2,
-        CLAWBACK_NO_TRUST = -3,
-        CLAWBACK_UNDERFUNDED = -4
-    };
-    ----------------------------------------------------------------
+        enum ClawbackResultCode
+        {
+            // codes considered as "success" for the operation
+            CLAWBACK_SUCCESS = 0,
+
+            // codes considered as "failure" for the operation
+            CLAWBACK_MALFORMED = -1,
+            CLAWBACK_NOT_CLAWBACK_ENABLED = -2,
+            CLAWBACK_NO_TRUST = -3,
+            CLAWBACK_UNDERFUNDED = -4
+        };
     """
 
     CLAWBACK_SUCCESS = 0

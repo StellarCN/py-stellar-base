@@ -13,22 +13,21 @@ __all__ = ["AccountEntryExtensionV1"]
 @type_checked
 class AccountEntryExtensionV1:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    struct AccountEntryExtensionV1
-    {
-        Liabilities liabilities;
+    XDR Source Code::
 
-        union switch (int v)
+        struct AccountEntryExtensionV1
         {
-        case 0:
-            void;
-        case 2:
-            AccountEntryExtensionV2 v2;
-        }
-        ext;
-    };
-    ----------------------------------------------------------------
+            Liabilities liabilities;
+
+            union switch (int v)
+            {
+            case 0:
+                void;
+            case 2:
+                AccountEntryExtensionV2 v2;
+            }
+            ext;
+        };
     """
 
     def __init__(

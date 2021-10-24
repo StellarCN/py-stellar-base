@@ -15,15 +15,14 @@ __all__ = ["SCPNomination"]
 @type_checked
 class SCPNomination:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    struct SCPNomination
-    {
-        Hash quorumSetHash; // D
-        Value votes<>;      // X
-        Value accepted<>;   // Y
-    };
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        struct SCPNomination
+        {
+            Hash quorumSetHash; // D
+            Value votes<>;      // X
+            Value accepted<>;   // Y
+        };
     """
 
     def __init__(

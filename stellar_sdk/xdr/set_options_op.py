@@ -16,28 +16,27 @@ __all__ = ["SetOptionsOp"]
 @type_checked
 class SetOptionsOp:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    struct SetOptionsOp
-    {
-        AccountID* inflationDest; // sets the inflation destination
+    XDR Source Code::
 
-        uint32* clearFlags; // which flags to clear
-        uint32* setFlags;   // which flags to set
+        struct SetOptionsOp
+        {
+            AccountID* inflationDest; // sets the inflation destination
 
-        // account threshold manipulation
-        uint32* masterWeight; // weight of the master account
-        uint32* lowThreshold;
-        uint32* medThreshold;
-        uint32* highThreshold;
+            uint32* clearFlags; // which flags to clear
+            uint32* setFlags;   // which flags to set
 
-        string32* homeDomain; // sets the home domain
+            // account threshold manipulation
+            uint32* masterWeight; // weight of the master account
+            uint32* lowThreshold;
+            uint32* medThreshold;
+            uint32* highThreshold;
 
-        // Add, update or remove a signer for the account
-        // signer is deleted if the weight is 0
-        Signer* signer;
-    };
-    ----------------------------------------------------------------
+            string32* homeDomain; // sets the home domain
+
+            // Add, update or remove a signer for the account
+            // signer is deleted if the weight is 0
+            Signer* signer;
+        };
     """
 
     def __init__(

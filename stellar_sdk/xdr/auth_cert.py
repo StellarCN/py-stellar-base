@@ -14,15 +14,14 @@ __all__ = ["AuthCert"]
 @type_checked
 class AuthCert:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    struct AuthCert
-    {
-        Curve25519Public pubkey;
-        uint64 expiration;
-        Signature sig;
-    };
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        struct AuthCert
+        {
+            Curve25519Public pubkey;
+            uint64 expiration;
+            Signature sig;
+        };
     """
 
     def __init__(

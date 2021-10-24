@@ -15,17 +15,16 @@ __all__ = ["TransactionSignaturePayloadTaggedTransaction"]
 @type_checked
 class TransactionSignaturePayloadTaggedTransaction:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    union switch (EnvelopeType type)
-        {
-        // Backwards Compatibility: Use ENVELOPE_TYPE_TX to sign ENVELOPE_TYPE_TX_V0
-        case ENVELOPE_TYPE_TX:
-            Transaction tx;
-        case ENVELOPE_TYPE_TX_FEE_BUMP:
-            FeeBumpTransaction feeBump;
-        }
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        union switch (EnvelopeType type)
+            {
+            // Backwards Compatibility: Use ENVELOPE_TYPE_TX to sign ENVELOPE_TYPE_TX_V0
+            case ENVELOPE_TYPE_TX:
+                Transaction tx;
+            case ENVELOPE_TYPE_TX_FEE_BUMP:
+                FeeBumpTransaction feeBump;
+            }
     """
 
     def __init__(

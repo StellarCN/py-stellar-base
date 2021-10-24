@@ -14,18 +14,17 @@ __all__ = ["LedgerEntryType"]
 @type_checked
 class LedgerEntryType(IntEnum):
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    enum LedgerEntryType
-    {
-        ACCOUNT = 0,
-        TRUSTLINE = 1,
-        OFFER = 2,
-        DATA = 3,
-        CLAIMABLE_BALANCE = 4,
-        LIQUIDITY_POOL = 5
-    };
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        enum LedgerEntryType
+        {
+            ACCOUNT = 0,
+            TRUSTLINE = 1,
+            OFFER = 2,
+            DATA = 3,
+            CLAIMABLE_BALANCE = 4,
+            LIQUIDITY_POOL = 5
+        };
     """
 
     ACCOUNT = 0

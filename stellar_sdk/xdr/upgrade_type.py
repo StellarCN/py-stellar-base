@@ -12,10 +12,9 @@ __all__ = ["UpgradeType"]
 @type_checked
 class UpgradeType:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    typedef opaque UpgradeType<128>;
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        typedef opaque UpgradeType<128>;
     """
 
     def __init__(self, upgrade_type: bytes) -> None:

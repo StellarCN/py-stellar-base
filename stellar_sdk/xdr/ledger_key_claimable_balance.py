@@ -12,13 +12,12 @@ __all__ = ["LedgerKeyClaimableBalance"]
 @type_checked
 class LedgerKeyClaimableBalance:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    struct
-        {
-            ClaimableBalanceID balanceID;
-        }
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        struct
+            {
+                ClaimableBalanceID balanceID;
+            }
     """
 
     def __init__(

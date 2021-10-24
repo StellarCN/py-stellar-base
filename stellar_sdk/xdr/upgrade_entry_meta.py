@@ -13,14 +13,13 @@ __all__ = ["UpgradeEntryMeta"]
 @type_checked
 class UpgradeEntryMeta:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    struct UpgradeEntryMeta
-    {
-        LedgerUpgrade upgrade;
-        LedgerEntryChanges changes;
-    };
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        struct UpgradeEntryMeta
+        {
+            LedgerUpgrade upgrade;
+            LedgerEntryChanges changes;
+        };
     """
 
     def __init__(

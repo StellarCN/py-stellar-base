@@ -13,14 +13,13 @@ __all__ = ["RevokeSponsorshipOpSigner"]
 @type_checked
 class RevokeSponsorshipOpSigner:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    struct
-        {
-            AccountID accountID;
-            SignerKey signerKey;
-        }
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        struct
+            {
+                AccountID accountID;
+                SignerKey signerKey;
+            }
     """
 
     def __init__(
