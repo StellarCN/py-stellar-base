@@ -33,7 +33,7 @@ print(f"Seller Account Secret Key: {seller_secret_key}")
 print(f"Seller Account Public Key: {seller_public_key}")
 
 friendbot_url = "https://friendbot.stellar.org"
-response = requests.get(friendbot_url, params={"addr": seller_public_key})
+response1 = requests.get(friendbot_url, params={"addr": seller_public_key})
 
 seller_account = server.load_account(account_id=seller_public_key)
 
@@ -55,7 +55,7 @@ transaction = (
     .build()
 )
 transaction.sign(seller_secret_key)
-response = server.submit_transaction(transaction)
+response2 = server.submit_transaction(transaction)
 
 issuer_account = server.load_account(account_id=issuer_public_key)
 
@@ -80,8 +80,7 @@ trust_transaction = (
     #  The `changeTrust` operation creates (or alters) a trustline
     #  The `limit` parameter below is optional
     .append_change_trust_op(
-        asset_code=awesome_asset_coin.code,
-        asset_issuer=awesome_asset_coin.issuer,
+        asset=awesome_asset_coin,
         limit="3000",
     )
     .set_timeout(100)
@@ -102,8 +101,7 @@ aac_payment_transaction = (
     .append_payment_op(
         destination=seller_public_key,
         amount="1000",
-        asset_code=awesome_asset_coin.code,
-        asset_issuer=awesome_asset_coin.issuer,
+        asset=awesome_asset_coin,
     )
     .build()
 )

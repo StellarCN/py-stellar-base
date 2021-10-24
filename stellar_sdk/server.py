@@ -1,4 +1,4 @@
-from typing import Any, Coroutine, Dict, List, Union
+from typing import Any, Dict, List, Union
 
 from .account import Account, Thresholds
 from .asset import Asset
@@ -57,7 +57,7 @@ class Server(BaseServer):
             TransactionEnvelope, FeeBumpTransactionEnvelope, str
         ],
         skip_memo_required_check: bool = False,
-    ) -> Union[Dict[str, Any], Coroutine[Any, Any, Dict[str, Any]]]:
+    ) -> Dict[str, Any]:
         """Submits a transaction to the network.
 
         :param transaction_envelope: :class:`stellar_sdk.transaction_envelope.TransactionEnvelope` object

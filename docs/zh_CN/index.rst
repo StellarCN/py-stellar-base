@@ -8,39 +8,39 @@
 Stellar Python SDK
 ==================
 
-.. image:: https://img.shields.io/github/workflow/status/StellarCN/py-stellar-base/GitHub%20Action/master?style=flat-square&maxAge=1800
+.. image:: https://img.shields.io/github/workflow/status/StellarCN/py-stellar-base/GitHub%20Action/master?maxAge=1800
     :alt: GitHub Action
     :target: https://github.com/StellarCN/py-stellar-base/actions
 
-.. image:: https://img.shields.io/readthedocs/stellar-sdk.svg?style=flat-square&maxAge=1800
+.. image:: https://img.shields.io/readthedocs/stellar-sdk.svg?maxAge=1800
     :alt: Read the Docs
     :target: https://stellar-sdk.readthedocs.io/en/latest/
 
-.. image:: https://img.shields.io/pypi/dm/stellar-sdk?style=flat-square
+.. image:: https://static.pepy.tech/personalized-badge/stellar-sdk?period=total&units=abbreviation&left_color=grey&right_color=brightgreen&left_text=Downloads
     :alt: PyPI - Downloads
     :target: https://pypi.python.org/pypi/stellar-sdk
 
-.. image:: https://img.shields.io/codeclimate/maintainability/StellarCN/py-stellar-base?style=flat-square&maxAge=1800
+.. image:: https://img.shields.io/codeclimate/maintainability/StellarCN/py-stellar-base?maxAge=1800
     :alt: Code Climate maintainability
     :target: https://codeclimate.com/github/StellarCN/py-stellar-base/maintainability
 
-.. image:: https://img.shields.io/codecov/c/github/StellarCN/py-stellar-base/v2?style=flat-square&maxAge=1800
+.. image:: https://img.shields.io/codecov/c/github/StellarCN/py-stellar-base/v2?maxAge=1800
     :alt: Codecov
     :target: https://codecov.io/gh/StellarCN/py-stellar-base
 
-.. image:: https://img.shields.io/pypi/v/stellar-sdk.svg?style=flat-square&maxAge=1800
+.. image:: https://img.shields.io/pypi/v/stellar-sdk.svg?maxAge=1800
     :alt: PyPI
     :target: https://pypi.python.org/pypi/stellar-sdk
 
-.. image:: https://img.shields.io/badge/python-3.6%20%7C%203.7%20%7C%203.8%20%7C%203.9-blue?style=flat-square
+.. image:: https://img.shields.io/badge/python-3.6%20%7C%203.7%20%7C%203.8%20%7C%203.9-blue
     :alt: Python - Version
     :target: https://pypi.python.org/pypi/stellar-sdk
 
-.. image:: https://img.shields.io/badge/implementation-cpython%20%7C%20pypy-blue?style=flat-square
+.. image:: https://img.shields.io/badge/implementation-cpython%20%7C%20pypy-blue
     :alt: PyPI - Implementation
     :target: https://pypi.python.org/pypi/stellar-sdk
 
-.. image:: https://img.shields.io/badge/Stellar%20Protocol-18-blue?style=flat-square
+.. image:: https://img.shields.io/badge/Stellar%20Protocol-18-blue
     :alt: Stellar Protocol
     :target: https://developers.stellar.org/docs/glossary/scp/
 

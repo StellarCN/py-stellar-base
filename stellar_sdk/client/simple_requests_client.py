@@ -1,4 +1,4 @@
-from typing import Any, Dict, Generator, Union
+from typing import Any, Dict, Generator
 
 import requests
 from requests import RequestException

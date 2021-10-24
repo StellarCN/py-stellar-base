@@ -39,9 +39,7 @@ trust_transaction = (
         network_passphrase=Network.TESTNET_NETWORK_PASSPHRASE,
         base_fee=100,
     )
-    .append_change_trust_op(
-        asset_code=hello_asset.code, asset_issuer=hello_asset.issuer
-    )
+    .append_change_trust_op(asset=hello_asset)
     .build()
 )
 
@@ -61,12 +59,7 @@ payment_transaction = (
         network_passphrase=Network.TESTNET_NETWORK_PASSPHRASE,
         base_fee=100,
     )
-    .append_payment_op(
-        destination=distributor_public,
-        amount="1000",
-        asset_code=hello_asset.code,
-        asset_issuer=hello_asset.issuer,
-    )
+    .append_payment_op(destination=distributor_public, amount="1000", asset=hello_asset)
     .build()
 )
 payment_transaction.sign(issuing_keypair)

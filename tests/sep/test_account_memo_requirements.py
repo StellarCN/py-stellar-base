@@ -3,6 +3,7 @@ import pytest
 from stellar_sdk import (
     Account,
     AiohttpClient,
+    Asset,
     Keypair,
     Network,
     Server,
@@ -46,24 +47,26 @@ class TestAccountMemoRequirements:
         account = Account(keypair.public_key, 1)
         transaction = (
             TransactionBuilder(account)
-            .append_payment_op(self.DESTINATION_ACCOUNT_MEMO_REQUIRED_A, "10", "XLM")
+            .append_payment_op(
+                self.DESTINATION_ACCOUNT_MEMO_REQUIRED_A, Asset.native(), "10"
+            )
             .append_path_payment_strict_receive_op(
                 self.DESTINATION_ACCOUNT_MEMO_REQUIRED_B,
-                "XLM",
-                None,
+                Asset.native(),
                 "10",
-                "BTC",
-                "GA7GYB3QGLTZNHNGXN3BMANS6TC7KJT3TCGTR763J4JOU4QHKL37RVV2",
+                Asset(
+                    "BTC", "GA7GYB3QGLTZNHNGXN3BMANS6TC7KJT3TCGTR763J4JOU4QHKL37RVV2"
+                ),
                 "1",
                 [],
             )
             .append_path_payment_strict_send_op(
                 self.DESTINATION_ACCOUNT_MEMO_REQUIRED_C,
-                "XLM",
-                None,
+                Asset.native(),
                 "10",
-                "BTC",
-                "GA7GYB3QGLTZNHNGXN3BMANS6TC7KJT3TCGTR763J4JOU4QHKL37RVV2",
+                Asset(
+                    "BTC", "GA7GYB3QGLTZNHNGXN3BMANS6TC7KJT3TCGTR763J4JOU4QHKL37RVV2"
+                ),
                 "1",
                 [],
             )
@@ -84,24 +87,26 @@ class TestAccountMemoRequirements:
         account = Account(keypair.public_key, 1)
         transaction = (
             TransactionBuilder(account)
-            .append_payment_op(self.DESTINATION_ACCOUNT_MEMO_REQUIRED_A, "10", "XLM")
+            .append_payment_op(
+                self.DESTINATION_ACCOUNT_MEMO_REQUIRED_A, Asset.native(), "10"
+            )
             .append_path_payment_strict_receive_op(
                 self.DESTINATION_ACCOUNT_MEMO_REQUIRED_B,
-                "XLM",
-                None,
+                Asset.native(),
                 "10",
-                "BTC",
-                "GA7GYB3QGLTZNHNGXN3BMANS6TC7KJT3TCGTR763J4JOU4QHKL37RVV2",
+                Asset(
+                    "BTC", "GA7GYB3QGLTZNHNGXN3BMANS6TC7KJT3TCGTR763J4JOU4QHKL37RVV2"
+                ),
                 "1",
                 [],
             )
             .append_path_payment_strict_send_op(
                 self.DESTINATION_ACCOUNT_MEMO_REQUIRED_C,
-                "XLM",
-                None,
+                Asset.native(),
                 "10",
-                "BTC",
-                "GA7GYB3QGLTZNHNGXN3BMANS6TC7KJT3TCGTR763J4JOU4QHKL37RVV2",
+                Asset(
+                    "BTC", "GA7GYB3QGLTZNHNGXN3BMANS6TC7KJT3TCGTR763J4JOU4QHKL37RVV2"
+                ),
                 "1",
                 [],
             )
@@ -121,24 +126,26 @@ class TestAccountMemoRequirements:
         account = Account(keypair.public_key, 1)
         transaction = (
             TransactionBuilder(account)
-            .append_payment_op(self.DESTINATION_ACCOUNT_MEMO_REQUIRED_A, "10", "XLM")
+            .append_payment_op(
+                self.DESTINATION_ACCOUNT_MEMO_REQUIRED_A, Asset.native(), "10"
+            )
             .append_path_payment_strict_receive_op(
                 self.DESTINATION_ACCOUNT_MEMO_REQUIRED_B,
-                "XLM",
-                None,
+                Asset.native(),
                 "10",
-                "BTC",
-                "GA7GYB3QGLTZNHNGXN3BMANS6TC7KJT3TCGTR763J4JOU4QHKL37RVV2",
+                Asset(
+                    "BTC", "GA7GYB3QGLTZNHNGXN3BMANS6TC7KJT3TCGTR763J4JOU4QHKL37RVV2"
+                ),
                 "1",
                 [],
             )
             .append_path_payment_strict_send_op(
                 self.DESTINATION_ACCOUNT_MEMO_REQUIRED_C,
-                "XLM",
-                None,
+                Asset.native(),
                 "10",
-                "BTC",
-                "GA7GYB3QGLTZNHNGXN3BMANS6TC7KJT3TCGTR763J4JOU4QHKL37RVV2",
+                Asset(
+                    "BTC", "GA7GYB3QGLTZNHNGXN3BMANS6TC7KJT3TCGTR763J4JOU4QHKL37RVV2"
+                ),
                 "1",
                 [],
             )
@@ -166,24 +173,26 @@ class TestAccountMemoRequirements:
         account = Account(keypair.public_key, 1)
         transaction = (
             TransactionBuilder(account)
-            .append_payment_op(self.DESTINATION_ACCOUNT_NO_MEMO_REQUIRED, "10", "XLM")
+            .append_payment_op(
+                self.DESTINATION_ACCOUNT_NO_MEMO_REQUIRED, Asset.native(), "10"
+            )
             .append_path_payment_strict_receive_op(
                 self.DESTINATION_ACCOUNT_MEMO_REQUIRED_B,
-                "XLM",
-                None,
+                Asset.native(),
                 "10",
-                "BTC",
-                "GA7GYB3QGLTZNHNGXN3BMANS6TC7KJT3TCGTR763J4JOU4QHKL37RVV2",
+                Asset(
+                    "BTC", "GA7GYB3QGLTZNHNGXN3BMANS6TC7KJT3TCGTR763J4JOU4QHKL37RVV2"
+                ),
                 "1",
                 [],
             )
             .append_path_payment_strict_send_op(
                 self.DESTINATION_ACCOUNT_MEMO_REQUIRED_C,
-                "XLM",
-                None,
+                Asset.native(),
                 "10",
-                "BTC",
-                "GA7GYB3QGLTZNHNGXN3BMANS6TC7KJT3TCGTR763J4JOU4QHKL37RVV2",
+                Asset(
+                    "BTC", "GA7GYB3QGLTZNHNGXN3BMANS6TC7KJT3TCGTR763J4JOU4QHKL37RVV2"
+                ),
                 "1",
                 [],
             )
@@ -211,24 +220,26 @@ class TestAccountMemoRequirements:
         account = Account(keypair.public_key, 1)
         transaction = (
             TransactionBuilder(account)
-            .append_payment_op(self.DESTINATION_ACCOUNT_NO_MEMO_REQUIRED, "10", "XLM")
+            .append_payment_op(
+                self.DESTINATION_ACCOUNT_NO_MEMO_REQUIRED, Asset.native(), "10"
+            )
             .append_path_payment_strict_receive_op(
                 self.DESTINATION_ACCOUNT_NO_MEMO_REQUIRED,
-                "XLM",
-                None,
+                Asset.native(),
                 "10",
-                "BTC",
-                "GA7GYB3QGLTZNHNGXN3BMANS6TC7KJT3TCGTR763J4JOU4QHKL37RVV2",
+                Asset(
+                    "BTC", "GA7GYB3QGLTZNHNGXN3BMANS6TC7KJT3TCGTR763J4JOU4QHKL37RVV2"
+                ),
                 "1",
                 [],
             )
             .append_path_payment_strict_send_op(
                 self.DESTINATION_ACCOUNT_MEMO_REQUIRED_C,
-                "XLM",
-                None,
+                Asset.native(),
                 "10",
-                "BTC",
-                "GA7GYB3QGLTZNHNGXN3BMANS6TC7KJT3TCGTR763J4JOU4QHKL37RVV2",
+                Asset(
+                    "BTC", "GA7GYB3QGLTZNHNGXN3BMANS6TC7KJT3TCGTR763J4JOU4QHKL37RVV2"
+                ),
                 "1",
                 [],
             )
@@ -254,24 +265,26 @@ class TestAccountMemoRequirements:
         account = Account(keypair.public_key, 1)
         transaction = (
             TransactionBuilder(account)
-            .append_payment_op(self.DESTINATION_ACCOUNT_NO_MEMO_REQUIRED, "10", "XLM")
+            .append_payment_op(
+                self.DESTINATION_ACCOUNT_NO_MEMO_REQUIRED, Asset.native(), "10"
+            )
             .append_path_payment_strict_receive_op(
                 self.DESTINATION_ACCOUNT_NO_MEMO_REQUIRED,
-                "XLM",
-                None,
+                Asset.native(),
                 "10",
-                "BTC",
-                "GA7GYB3QGLTZNHNGXN3BMANS6TC7KJT3TCGTR763J4JOU4QHKL37RVV2",
+                Asset(
+                    "BTC", "GA7GYB3QGLTZNHNGXN3BMANS6TC7KJT3TCGTR763J4JOU4QHKL37RVV2"
+                ),
                 "1",
                 [],
             )
             .append_path_payment_strict_send_op(
                 self.DESTINATION_ACCOUNT_NO_MEMO_REQUIRED,
-                "XLM",
-                None,
+                Asset.native(),
                 "10",
-                "BTC",
-                "GA7GYB3QGLTZNHNGXN3BMANS6TC7KJT3TCGTR763J4JOU4QHKL37RVV2",
+                Asset(
+                    "BTC", "GA7GYB3QGLTZNHNGXN3BMANS6TC7KJT3TCGTR763J4JOU4QHKL37RVV2"
+                ),
                 "1",
                 [],
             )
@@ -299,24 +312,26 @@ class TestAccountMemoRequirements:
         account = Account(keypair.public_key, 1)
         transaction = (
             TransactionBuilder(account)
-            .append_payment_op(self.DESTINATION_ACCOUNT_NO_MEMO_REQUIRED, "10", "XLM")
+            .append_payment_op(
+                self.DESTINATION_ACCOUNT_NO_MEMO_REQUIRED, Asset.native(), "10"
+            )
             .append_path_payment_strict_receive_op(
                 self.DESTINATION_ACCOUNT_NO_MEMO_REQUIRED,
-                "XLM",
-                None,
+                Asset.native(),
                 "10",
-                "BTC",
-                "GA7GYB3QGLTZNHNGXN3BMANS6TC7KJT3TCGTR763J4JOU4QHKL37RVV2",
+                Asset(
+                    "BTC", "GA7GYB3QGLTZNHNGXN3BMANS6TC7KJT3TCGTR763J4JOU4QHKL37RVV2"
+                ),
                 "1",
                 [],
             )
             .append_path_payment_strict_send_op(
                 self.DESTINATION_ACCOUNT_NO_MEMO_REQUIRED,
-                "XLM",
-                None,
+                Asset.native(),
                 "10",
-                "BTC",
-                "GA7GYB3QGLTZNHNGXN3BMANS6TC7KJT3TCGTR763J4JOU4QHKL37RVV2",
+                Asset(
+                    "BTC", "GA7GYB3QGLTZNHNGXN3BMANS6TC7KJT3TCGTR763J4JOU4QHKL37RVV2"
+                ),
                 "1",
                 [],
             )
@@ -356,24 +371,24 @@ class TestAccountMemoRequirements:
         account = Account(keypair.public_key, 1)
         transaction = (
             TransactionBuilder(account)
-            .append_payment_op(self.DESTINATION_ACCOUNT_NO_FOUND, "10", "XLM")
+            .append_payment_op(self.DESTINATION_ACCOUNT_NO_FOUND, Asset.native(), "10")
             .append_path_payment_strict_receive_op(
                 self.DESTINATION_ACCOUNT_NO_FOUND,
-                "XLM",
-                None,
+                Asset.native(),
                 "10",
-                "BTC",
-                "GA7GYB3QGLTZNHNGXN3BMANS6TC7KJT3TCGTR763J4JOU4QHKL37RVV2",
+                Asset(
+                    "BTC", "GA7GYB3QGLTZNHNGXN3BMANS6TC7KJT3TCGTR763J4JOU4QHKL37RVV2"
+                ),
                 "1",
                 [],
             )
             .append_path_payment_strict_send_op(
                 self.DESTINATION_ACCOUNT_NO_FOUND,
-                "XLM",
-                None,
+                Asset.native(),
                 "10",
-                "BTC",
-                "GA7GYB3QGLTZNHNGXN3BMANS6TC7KJT3TCGTR763J4JOU4QHKL37RVV2",
+                Asset(
+                    "BTC", "GA7GYB3QGLTZNHNGXN3BMANS6TC7KJT3TCGTR763J4JOU4QHKL37RVV2"
+                ),
                 "1",
                 [],
             )
@@ -393,24 +408,26 @@ class TestAccountMemoRequirements:
         account = Account(keypair.public_key, 1)
         transaction = (
             TransactionBuilder(account)
-            .append_payment_op(self.DESTINATION_ACCOUNT_FETCH_ERROR, "10", "XLM")
+            .append_payment_op(
+                self.DESTINATION_ACCOUNT_FETCH_ERROR, Asset.native(), "10"
+            )
             .append_path_payment_strict_receive_op(
                 self.DESTINATION_ACCOUNT_NO_MEMO_REQUIRED,
-                "XLM",
-                None,
+                Asset.native(),
                 "10",
-                "BTC",
-                "GA7GYB3QGLTZNHNGXN3BMANS6TC7KJT3TCGTR763J4JOU4QHKL37RVV2",
+                Asset(
+                    "BTC", "GA7GYB3QGLTZNHNGXN3BMANS6TC7KJT3TCGTR763J4JOU4QHKL37RVV2"
+                ),
                 "1",
                 [],
             )
             .append_path_payment_strict_send_op(
                 self.DESTINATION_ACCOUNT_NO_MEMO_REQUIRED,
-                "XLM",
-                None,
+                Asset.native(),
                 "10",
-                "BTC",
-                "GA7GYB3QGLTZNHNGXN3BMANS6TC7KJT3TCGTR763J4JOU4QHKL37RVV2",
+                Asset(
+                    "BTC", "GA7GYB3QGLTZNHNGXN3BMANS6TC7KJT3TCGTR763J4JOU4QHKL37RVV2"
+                ),
                 "1",
                 [],
             )
@@ -434,25 +451,27 @@ class TestAccountMemoRequirements:
             transaction = (
                 TransactionBuilder(account)
                 .append_payment_op(
-                    self.DESTINATION_ACCOUNT_MEMO_REQUIRED_A, "10", "XLM"
+                    self.DESTINATION_ACCOUNT_MEMO_REQUIRED_A, Asset.native(), "10"
                 )
                 .append_path_payment_strict_receive_op(
                     self.DESTINATION_ACCOUNT_MEMO_REQUIRED_B,
-                    "XLM",
-                    None,
+                    Asset.native(),
                     "10",
-                    "BTC",
-                    "GA7GYB3QGLTZNHNGXN3BMANS6TC7KJT3TCGTR763J4JOU4QHKL37RVV2",
+                    Asset(
+                        "BTC",
+                        "GA7GYB3QGLTZNHNGXN3BMANS6TC7KJT3TCGTR763J4JOU4QHKL37RVV2",
+                    ),
                     "1",
                     [],
                 )
                 .append_path_payment_strict_send_op(
                     self.DESTINATION_ACCOUNT_MEMO_REQUIRED_C,
-                    "XLM",
-                    None,
+                    Asset.native(),
                     "10",
-                    "BTC",
-                    "GA7GYB3QGLTZNHNGXN3BMANS6TC7KJT3TCGTR763J4JOU4QHKL37RVV2",
+                    Asset(
+                        "BTC",
+                        "GA7GYB3QGLTZNHNGXN3BMANS6TC7KJT3TCGTR763J4JOU4QHKL37RVV2",
+                    ),
                     "1",
                     [],
                 )
@@ -475,25 +494,27 @@ class TestAccountMemoRequirements:
             transaction = (
                 TransactionBuilder(account)
                 .append_payment_op(
-                    self.DESTINATION_ACCOUNT_MEMO_REQUIRED_A, "10", "XLM"
+                    self.DESTINATION_ACCOUNT_MEMO_REQUIRED_A, Asset.native(), "10"
                 )
                 .append_path_payment_strict_receive_op(
                     self.DESTINATION_ACCOUNT_MEMO_REQUIRED_B,
-                    "XLM",
-                    None,
+                    Asset.native(),
                     "10",
-                    "BTC",
-                    "GA7GYB3QGLTZNHNGXN3BMANS6TC7KJT3TCGTR763J4JOU4QHKL37RVV2",
+                    Asset(
+                        "BTC",
+                        "GA7GYB3QGLTZNHNGXN3BMANS6TC7KJT3TCGTR763J4JOU4QHKL37RVV2",
+                    ),
                     "1",
                     [],
                 )
                 .append_path_payment_strict_send_op(
                     self.DESTINATION_ACCOUNT_MEMO_REQUIRED_C,
-                    "XLM",
-                    None,
+                    Asset.native(),
                     "10",
-                    "BTC",
-                    "GA7GYB3QGLTZNHNGXN3BMANS6TC7KJT3TCGTR763J4JOU4QHKL37RVV2",
+                    Asset(
+                        "BTC",
+                        "GA7GYB3QGLTZNHNGXN3BMANS6TC7KJT3TCGTR763J4JOU4QHKL37RVV2",
+                    ),
                     "1",
                     [],
                 )
@@ -515,25 +536,27 @@ class TestAccountMemoRequirements:
             transaction = (
                 TransactionBuilder(account)
                 .append_payment_op(
-                    self.DESTINATION_ACCOUNT_MEMO_REQUIRED_A, "10", "XLM"
+                    self.DESTINATION_ACCOUNT_MEMO_REQUIRED_A, Asset.native(), "10"
                 )
                 .append_path_payment_strict_receive_op(
                     self.DESTINATION_ACCOUNT_MEMO_REQUIRED_B,
-                    "XLM",
-                    None,
+                    Asset.native(),
                     "10",
-                    "BTC",
-                    "GA7GYB3QGLTZNHNGXN3BMANS6TC7KJT3TCGTR763J4JOU4QHKL37RVV2",
+                    Asset(
+                        "BTC",
+                        "GA7GYB3QGLTZNHNGXN3BMANS6TC7KJT3TCGTR763J4JOU4QHKL37RVV2",
+                    ),
                     "1",
                     [],
                 )
                 .append_path_payment_strict_send_op(
                     self.DESTINATION_ACCOUNT_MEMO_REQUIRED_C,
-                    "XLM",
-                    None,
+                    Asset.native(),
                     "10",
-                    "BTC",
-                    "GA7GYB3QGLTZNHNGXN3BMANS6TC7KJT3TCGTR763J4JOU4QHKL37RVV2",
+                    Asset(
+                        "BTC",
+                        "GA7GYB3QGLTZNHNGXN3BMANS6TC7KJT3TCGTR763J4JOU4QHKL37RVV2",
+                    ),
                     "1",
                     [],
                 )
@@ -563,25 +586,27 @@ class TestAccountMemoRequirements:
             transaction = (
                 TransactionBuilder(account)
                 .append_payment_op(
-                    self.DESTINATION_ACCOUNT_NO_MEMO_REQUIRED, "10", "XLM"
+                    self.DESTINATION_ACCOUNT_NO_MEMO_REQUIRED, Asset.native(), "10"
                 )
                 .append_path_payment_strict_receive_op(
                     self.DESTINATION_ACCOUNT_MEMO_REQUIRED_B,
-                    "XLM",
-                    None,
+                    Asset.native(),
                     "10",
-                    "BTC",
-                    "GA7GYB3QGLTZNHNGXN3BMANS6TC7KJT3TCGTR763J4JOU4QHKL37RVV2",
+                    Asset(
+                        "BTC",
+                        "GA7GYB3QGLTZNHNGXN3BMANS6TC7KJT3TCGTR763J4JOU4QHKL37RVV2",
+                    ),
                     "1",
                     [],
                 )
                 .append_path_payment_strict_send_op(
                     self.DESTINATION_ACCOUNT_MEMO_REQUIRED_C,
-                    "XLM",
-                    None,
+                    Asset.native(),
                     "10",
-                    "BTC",
-                    "GA7GYB3QGLTZNHNGXN3BMANS6TC7KJT3TCGTR763J4JOU4QHKL37RVV2",
+                    Asset(
+                        "BTC",
+                        "GA7GYB3QGLTZNHNGXN3BMANS6TC7KJT3TCGTR763J4JOU4QHKL37RVV2",
+                    ),
                     "1",
                     [],
                 )
@@ -611,25 +636,27 @@ class TestAccountMemoRequirements:
             transaction = (
                 TransactionBuilder(account)
                 .append_payment_op(
-                    self.DESTINATION_ACCOUNT_NO_MEMO_REQUIRED, "10", "XLM"
+                    self.DESTINATION_ACCOUNT_NO_MEMO_REQUIRED, Asset.native(), "10"
                 )
                 .append_path_payment_strict_receive_op(
                     self.DESTINATION_ACCOUNT_NO_MEMO_REQUIRED,
-                    "XLM",
-                    None,
+                    Asset.native(),
                     "10",
-                    "BTC",
-                    "GA7GYB3QGLTZNHNGXN3BMANS6TC7KJT3TCGTR763J4JOU4QHKL37RVV2",
+                    Asset(
+                        "BTC",
+                        "GA7GYB3QGLTZNHNGXN3BMANS6TC7KJT3TCGTR763J4JOU4QHKL37RVV2",
+                    ),
                     "1",
                     [],
                 )
                 .append_path_payment_strict_send_op(
                     self.DESTINATION_ACCOUNT_MEMO_REQUIRED_C,
-                    "XLM",
-                    None,
+                    Asset.native(),
                     "10",
-                    "BTC",
-                    "GA7GYB3QGLTZNHNGXN3BMANS6TC7KJT3TCGTR763J4JOU4QHKL37RVV2",
+                    Asset(
+                        "BTC",
+                        "GA7GYB3QGLTZNHNGXN3BMANS6TC7KJT3TCGTR763J4JOU4QHKL37RVV2",
+                    ),
                     "1",
                     [],
                 )
@@ -657,25 +684,27 @@ class TestAccountMemoRequirements:
             transaction = (
                 TransactionBuilder(account)
                 .append_payment_op(
-                    self.DESTINATION_ACCOUNT_NO_MEMO_REQUIRED, "10", "XLM"
+                    self.DESTINATION_ACCOUNT_NO_MEMO_REQUIRED, Asset.native(), "10"
                 )
                 .append_path_payment_strict_receive_op(
                     self.DESTINATION_ACCOUNT_NO_MEMO_REQUIRED,
-                    "XLM",
-                    None,
+                    Asset.native(),
                     "10",
-                    "BTC",
-                    "GA7GYB3QGLTZNHNGXN3BMANS6TC7KJT3TCGTR763J4JOU4QHKL37RVV2",
+                    Asset(
+                        "BTC",
+                        "GA7GYB3QGLTZNHNGXN3BMANS6TC7KJT3TCGTR763J4JOU4QHKL37RVV2",
+                    ),
                     "1",
                     [],
                 )
                 .append_path_payment_strict_send_op(
                     self.DESTINATION_ACCOUNT_NO_MEMO_REQUIRED,
-                    "XLM",
-                    None,
+                    Asset.native(),
                     "10",
-                    "BTC",
-                    "GA7GYB3QGLTZNHNGXN3BMANS6TC7KJT3TCGTR763J4JOU4QHKL37RVV2",
+                    Asset(
+                        "BTC",
+                        "GA7GYB3QGLTZNHNGXN3BMANS6TC7KJT3TCGTR763J4JOU4QHKL37RVV2",
+                    ),
                     "1",
                     [],
                 )
@@ -705,25 +734,27 @@ class TestAccountMemoRequirements:
             transaction = (
                 TransactionBuilder(account)
                 .append_payment_op(
-                    self.DESTINATION_ACCOUNT_NO_MEMO_REQUIRED, "10", "XLM"
+                    self.DESTINATION_ACCOUNT_NO_MEMO_REQUIRED, Asset.native(), "10"
                 )
                 .append_path_payment_strict_receive_op(
                     self.DESTINATION_ACCOUNT_NO_MEMO_REQUIRED,
-                    "XLM",
-                    None,
+                    Asset.native(),
                     "10",
-                    "BTC",
-                    "GA7GYB3QGLTZNHNGXN3BMANS6TC7KJT3TCGTR763J4JOU4QHKL37RVV2",
+                    Asset(
+                        "BTC",
+                        "GA7GYB3QGLTZNHNGXN3BMANS6TC7KJT3TCGTR763J4JOU4QHKL37RVV2",
+                    ),
                     "1",
                     [],
                 )
                 .append_path_payment_strict_send_op(
                     self.DESTINATION_ACCOUNT_NO_MEMO_REQUIRED,
-                    "XLM",
-                    None,
+                    Asset.native(),
                     "10",
-                    "BTC",
-                    "GA7GYB3QGLTZNHNGXN3BMANS6TC7KJT3TCGTR763J4JOU4QHKL37RVV2",
+                    Asset(
+                        "BTC",
+                        "GA7GYB3QGLTZNHNGXN3BMANS6TC7KJT3TCGTR763J4JOU4QHKL37RVV2",
+                    ),
                     "1",
                     [],
                 )
@@ -769,24 +800,28 @@ class TestAccountMemoRequirements:
         async with ServerAsync(horizon_url, AiohttpClient()) as server:
             transaction = (
                 TransactionBuilder(account)
-                .append_payment_op(self.DESTINATION_ACCOUNT_NO_FOUND, "10", "XLM")
+                .append_payment_op(
+                    self.DESTINATION_ACCOUNT_NO_FOUND, Asset.native(), "10"
+                )
                 .append_path_payment_strict_receive_op(
                     self.DESTINATION_ACCOUNT_NO_FOUND,
-                    "XLM",
-                    None,
+                    Asset.native(),
                     "10",
-                    "BTC",
-                    "GA7GYB3QGLTZNHNGXN3BMANS6TC7KJT3TCGTR763J4JOU4QHKL37RVV2",
+                    Asset(
+                        "BTC",
+                        "GA7GYB3QGLTZNHNGXN3BMANS6TC7KJT3TCGTR763J4JOU4QHKL37RVV2",
+                    ),
                     "1",
                     [],
                 )
                 .append_path_payment_strict_send_op(
                     self.DESTINATION_ACCOUNT_NO_FOUND,
-                    "XLM",
-                    None,
+                    Asset.native(),
                     "10",
-                    "BTC",
-                    "GA7GYB3QGLTZNHNGXN3BMANS6TC7KJT3TCGTR763J4JOU4QHKL37RVV2",
+                    Asset(
+                        "BTC",
+                        "GA7GYB3QGLTZNHNGXN3BMANS6TC7KJT3TCGTR763J4JOU4QHKL37RVV2",
+                    ),
                     "1",
                     [],
                 )
@@ -809,24 +844,28 @@ class TestAccountMemoRequirements:
         async with ServerAsync(horizon_url, AiohttpClient()) as server:
             transaction = (
                 TransactionBuilder(account)
-                .append_payment_op(self.DESTINATION_ACCOUNT_FETCH_ERROR, "10", "XLM")
+                .append_payment_op(
+                    self.DESTINATION_ACCOUNT_FETCH_ERROR, Asset.native(), "10"
+                )
                 .append_path_payment_strict_receive_op(
                     self.DESTINATION_ACCOUNT_NO_MEMO_REQUIRED,
-                    "XLM",
-                    None,
+                    Asset.native(),
                     "10",
-                    "BTC",
-                    "GA7GYB3QGLTZNHNGXN3BMANS6TC7KJT3TCGTR763J4JOU4QHKL37RVV2",
+                    Asset(
+                        "BTC",
+                        "GA7GYB3QGLTZNHNGXN3BMANS6TC7KJT3TCGTR763J4JOU4QHKL37RVV2",
+                    ),
                     "1",
                     [],
                 )
                 .append_path_payment_strict_send_op(
                     self.DESTINATION_ACCOUNT_NO_MEMO_REQUIRED,
-                    "XLM",
-                    None,
+                    Asset.native(),
                     "10",
-                    "BTC",
-                    "GA7GYB3QGLTZNHNGXN3BMANS6TC7KJT3TCGTR763J4JOU4QHKL37RVV2",
+                    Asset(
+                        "BTC",
+                        "GA7GYB3QGLTZNHNGXN3BMANS6TC7KJT3TCGTR763J4JOU4QHKL37RVV2",
+                    ),
                     "1",
                     [],
                 )
@@ -848,24 +887,26 @@ class TestAccountMemoRequirements:
         account = Account(keypair.public_key, 1)
         transaction = (
             TransactionBuilder(account)
-            .append_payment_op(self.DESTINATION_ACCOUNT_MEMO_REQUIRED_A, "10", "XLM")
+            .append_payment_op(
+                self.DESTINATION_ACCOUNT_MEMO_REQUIRED_A, Asset.native(), "10"
+            )
             .append_path_payment_strict_receive_op(
                 self.DESTINATION_ACCOUNT_MEMO_REQUIRED_B,
-                "XLM",
-                None,
+                Asset.native(),
                 "10",
-                "BTC",
-                "GA7GYB3QGLTZNHNGXN3BMANS6TC7KJT3TCGTR763J4JOU4QHKL37RVV2",
+                Asset(
+                    "BTC", "GA7GYB3QGLTZNHNGXN3BMANS6TC7KJT3TCGTR763J4JOU4QHKL37RVV2"
+                ),
                 "1",
                 [],
             )
             .append_path_payment_strict_send_op(
                 self.DESTINATION_ACCOUNT_MEMO_REQUIRED_C,
-                "XLM",
-                None,
+                Asset.native(),
                 "10",
-                "BTC",
-                "GA7GYB3QGLTZNHNGXN3BMANS6TC7KJT3TCGTR763J4JOU4QHKL37RVV2",
+                Asset(
+                    "BTC", "GA7GYB3QGLTZNHNGXN3BMANS6TC7KJT3TCGTR763J4JOU4QHKL37RVV2"
+                ),
                 "1",
                 [],
             )
@@ -888,25 +929,27 @@ class TestAccountMemoRequirements:
             transaction = (
                 TransactionBuilder(account)
                 .append_payment_op(
-                    self.DESTINATION_ACCOUNT_MEMO_REQUIRED_A, "10", "XLM"
+                    self.DESTINATION_ACCOUNT_MEMO_REQUIRED_A, Asset.native(), "10"
                 )
                 .append_path_payment_strict_receive_op(
                     self.DESTINATION_ACCOUNT_MEMO_REQUIRED_B,
-                    "XLM",
-                    None,
+                    Asset.native(),
                     "10",
-                    "BTC",
-                    "GA7GYB3QGLTZNHNGXN3BMANS6TC7KJT3TCGTR763J4JOU4QHKL37RVV2",
+                    Asset(
+                        "BTC",
+                        "GA7GYB3QGLTZNHNGXN3BMANS6TC7KJT3TCGTR763J4JOU4QHKL37RVV2",
+                    ),
                     "1",
                     [],
                 )
                 .append_path_payment_strict_send_op(
                     self.DESTINATION_ACCOUNT_MEMO_REQUIRED_C,
-                    "XLM",
-                    None,
+                    Asset.native(),
                     "10",
-                    "BTC",
-                    "GA7GYB3QGLTZNHNGXN3BMANS6TC7KJT3TCGTR763J4JOU4QHKL37RVV2",
+                    Asset(
+                        "BTC",
+                        "GA7GYB3QGLTZNHNGXN3BMANS6TC7KJT3TCGTR763J4JOU4QHKL37RVV2",
+                    ),
                     "1",
                     [],
                 )
@@ -927,14 +970,16 @@ class TestAccountMemoRequirements:
         account = Account(keypair.public_key, 1)
         transaction = (
             TransactionBuilder(account, v1=True)
-            .append_payment_op(self.DESTINATION_ACCOUNT_MEMO_REQUIRED_A, "10", "XLM")
+            .append_payment_op(
+                self.DESTINATION_ACCOUNT_MEMO_REQUIRED_A, Asset.native(), "10"
+            )
             .append_path_payment_strict_send_op(
                 self.DESTINATION_ACCOUNT_MEMO_REQUIRED_C,
-                "XLM",
-                None,
+                Asset.native(),
                 "10",
-                "BTC",
-                "GA7GYB3QGLTZNHNGXN3BMANS6TC7KJT3TCGTR763J4JOU4QHKL37RVV2",
+                Asset(
+                    "BTC", "GA7GYB3QGLTZNHNGXN3BMANS6TC7KJT3TCGTR763J4JOU4QHKL37RVV2"
+                ),
                 "1",
                 [],
             )
@@ -965,15 +1010,16 @@ class TestAccountMemoRequirements:
             transaction = (
                 TransactionBuilder(account, v1=True)
                 .append_payment_op(
-                    self.DESTINATION_ACCOUNT_MEMO_REQUIRED_A, "10", "XLM"
+                    self.DESTINATION_ACCOUNT_MEMO_REQUIRED_A, Asset.native(), "10"
                 )
                 .append_path_payment_strict_send_op(
                     self.DESTINATION_ACCOUNT_MEMO_REQUIRED_C,
-                    "XLM",
-                    None,
+                    Asset.native(),
                     "10",
-                    "BTC",
-                    "GA7GYB3QGLTZNHNGXN3BMANS6TC7KJT3TCGTR763J4JOU4QHKL37RVV2",
+                    Asset(
+                        "BTC",
+                        "GA7GYB3QGLTZNHNGXN3BMANS6TC7KJT3TCGTR763J4JOU4QHKL37RVV2",
+                    ),
                     "1",
                     [],
                 )

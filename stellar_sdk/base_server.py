@@ -245,7 +245,9 @@ class BaseServer:
         """
         raise NotImplementedError
 
-    def load_account(self, account_id: Union[MuxedAccount, Keypair, str]) -> Account:
+    def load_account(
+        self, account_id: Union[MuxedAccount, Keypair, str]
+    ) -> Union[Account, Coroutine[Any, Any, Account]]:
         """Fetches an account's most current base state (like sequence) in the ledger and then creates
         and returns an :class:`stellar_sdk.account.Account` object.
 
@@ -298,7 +300,7 @@ class BaseServer:
             destinations.add(destination)
             yield index, destination
 
-    def fetch_base_fee(self) -> int:
+    def fetch_base_fee(self) -> Union[int, Coroutine[Any, Any, int]]:
         """Fetch the base fee. Since this hits the server, if the server call fails,
         you might get an error. You should be prepared to use a default value if that happens.
 
@@ -324,7 +326,7 @@ class BaseServer:
             )
         return base_fee
 
-    def close(self) -> None:
+    def close(self) -> Union[None, Coroutine[Any, Any, None]]:
         """Close underlying connector.
 
         Release all acquired resources.

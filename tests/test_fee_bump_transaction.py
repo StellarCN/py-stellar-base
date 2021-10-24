@@ -2,6 +2,7 @@ import pytest
 
 from stellar_sdk import (
     Account,
+    Asset,
     FeeBumpTransaction,
     FeeBumpTransactionEnvelope,
     Keypair,
@@ -24,7 +25,9 @@ class TestFeeBumpTransaction:
             TransactionBuilder(
                 inner_source, Network.TESTNET_NETWORK_PASSPHRASE, 200, v1=True
             )
-            .append_payment_op(destination=destination, amount=amount, asset_code="XLM")
+            .append_payment_op(
+                destination=destination, amount=amount, asset=Asset.native()
+            )
             .add_time_bounds(0, 0)
             .build()
         )
@@ -76,7 +79,9 @@ class TestFeeBumpTransaction:
             TransactionBuilder(
                 inner_source, Network.TESTNET_NETWORK_PASSPHRASE, 200, v1=True
             )
-            .append_payment_op(destination=destination, amount=amount, asset_code="XLM")
+            .append_payment_op(
+                destination=destination, amount=amount, asset=Asset.native()
+            )
             .add_time_bounds(0, 0)
             .build()
         )
@@ -127,7 +132,9 @@ class TestFeeBumpTransaction:
             TransactionBuilder(
                 inner_source, Network.TESTNET_NETWORK_PASSPHRASE, 200, v1=True
             )
-            .append_payment_op(destination=destination, amount=amount, asset_code="XLM")
+            .append_payment_op(
+                destination=destination, amount=amount, asset=Asset.native()
+            )
             .add_time_bounds(0, 0)
             .build()
         )
@@ -177,7 +184,9 @@ class TestFeeBumpTransaction:
             TransactionBuilder(
                 inner_source, Network.TESTNET_NETWORK_PASSPHRASE, 200, v1=True
             )
-            .append_payment_op(destination=destination, amount=amount, asset_code="XLM")
+            .append_payment_op(
+                destination=destination, amount=amount, asset=Asset.native()
+            )
             .add_time_bounds(0, 0)
             .build()
         )
@@ -223,7 +232,9 @@ class TestFeeBumpTransaction:
             TransactionBuilder(
                 inner_source, Network.TESTNET_NETWORK_PASSPHRASE, 200, v1=True
             )
-            .append_payment_op(destination=destination, amount=amount, asset_code="XLM")
+            .append_payment_op(
+                destination=destination, amount=amount, asset=Asset.native()
+            )
             .add_time_bounds(0, 0)
             .build()
         )
@@ -271,7 +282,9 @@ class TestFeeBumpTransaction:
             TransactionBuilder(
                 inner_source, Network.TESTNET_NETWORK_PASSPHRASE, 200, v1=False
             )
-            .append_payment_op(destination=destination, amount=amount, asset_code="XLM")
+            .append_payment_op(
+                destination=destination, amount=amount, asset=Asset.native()
+            )
             .add_time_bounds(0, 0)
             .build()
         )
@@ -324,7 +337,9 @@ class TestFeeBumpTransaction:
             TransactionBuilder(
                 inner_source, Network.TESTNET_NETWORK_PASSPHRASE, 200, v1=True
             )
-            .append_payment_op(destination=destination, amount=amount, asset_code="XLM")
+            .append_payment_op(
+                destination=destination, amount=amount, asset=Asset.native()
+            )
             .add_time_bounds(0, 0)
             .build()
         )
@@ -355,7 +370,9 @@ class TestFeeBumpTransaction:
             TransactionBuilder(
                 inner_source, Network.TESTNET_NETWORK_PASSPHRASE, 50, v1=True
             )
-            .append_payment_op(destination=destination, amount=amount, asset_code="XLM")
+            .append_payment_op(
+                destination=destination, amount=amount, asset=Asset.native()
+            )
             .add_time_bounds(0, 0)
             .build()
         )

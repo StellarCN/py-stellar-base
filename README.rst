@@ -1,39 +1,39 @@
 Stellar Python SDK
 ==================
 
-.. image:: https://img.shields.io/github/workflow/status/StellarCN/py-stellar-base/GitHub%20Action/master?style=flat-square&maxAge=1800
+.. image:: https://img.shields.io/github/workflow/status/StellarCN/py-stellar-base/GitHub%20Action/master?maxAge=1800
     :alt: GitHub Action
     :target: https://github.com/StellarCN/py-stellar-base/actions
 
-.. image:: https://img.shields.io/readthedocs/stellar-sdk.svg?style=flat-square&maxAge=1800
+.. image:: https://img.shields.io/readthedocs/stellar-sdk.svg?maxAge=1800
     :alt: Read the Docs
     :target: https://stellar-sdk.readthedocs.io/en/latest/
 
-.. image:: https://img.shields.io/pypi/dm/stellar-sdk?style=flat-square
+.. image:: https://static.pepy.tech/personalized-badge/stellar-sdk?period=total&units=abbreviation&left_color=grey&right_color=brightgreen&left_text=Downloads
     :alt: PyPI - Downloads
     :target: https://pypi.python.org/pypi/stellar-sdk
 
-.. image:: https://img.shields.io/codeclimate/maintainability/StellarCN/py-stellar-base?style=flat-square&maxAge=1800
+.. image:: https://img.shields.io/codeclimate/maintainability/StellarCN/py-stellar-base?maxAge=1800
     :alt: Code Climate maintainability
     :target: https://codeclimate.com/github/StellarCN/py-stellar-base/maintainability
 
-.. image:: https://img.shields.io/codecov/c/github/StellarCN/py-stellar-base/v2?style=flat-square&maxAge=1800
+.. image:: https://img.shields.io/codecov/c/github/StellarCN/py-stellar-base/v2?maxAge=1800
     :alt: Codecov
     :target: https://codecov.io/gh/StellarCN/py-stellar-base
 
-.. image:: https://img.shields.io/pypi/v/stellar-sdk.svg?style=flat-square&maxAge=1800
+.. image:: https://img.shields.io/pypi/v/stellar-sdk.svg?maxAge=1800
     :alt: PyPI
     :target: https://pypi.python.org/pypi/stellar-sdk
 
-.. image:: https://img.shields.io/badge/python-3.6%20%7C%203.7%20%7C%203.8%20%7C%203.9-blue?style=flat-square
+.. image:: https://img.shields.io/badge/python-3.6%20%7C%203.7%20%7C%203.8%20%7C%203.9-blue
     :alt: Python - Version
     :target: https://pypi.python.org/pypi/stellar-sdk
 
-.. image:: https://img.shields.io/badge/implementation-cpython%20%7C%20pypy-blue?style=flat-square
+.. image:: https://img.shields.io/badge/implementation-cpython%20%7C%20pypy-blue
     :alt: PyPI - Implementation
     :target: https://pypi.python.org/pypi/stellar-sdk
 
-.. image:: https://img.shields.io/badge/Stellar%20Protocol-18-blue?style=flat-square
+.. image:: https://img.shields.io/badge/Stellar%20Protocol-18-blue
     :alt: Stellar Protocol
     :target: https://developers.stellar.org/docs/glossary/scp/
 
@@ -53,8 +53,6 @@ py-stellar-base's documentation can be found at https://stellar-sdk.readthedocs.
 Installing
 ----------
 
-Install and update using `pipenv`_ or `pip`_:
-
 .. code-block:: text
 
     pip install stellar-sdk==5.0.0
@@ -68,7 +66,7 @@ Building transaction with synchronous server
 .. code-block:: python
 
     # Alice pay 10.25 XLM to Bob
-    from stellar_sdk import Server, Keypair, TransactionBuilder, Network
+    from stellar_sdk import Asset, Server, Keypair, TransactionBuilder, Network
 
     alice_keypair = Keypair.from_secret("SBFZCHU5645DOKRWYBXVOXY2ELGJKFRX6VGGPRYUWHQ7PMXXJNDZFMKD")
     bob_address = "GA7YNBW5CBTJZ3ZZOWX3ZNBKD6OE7A7IHUQVWMY62W2ZBG2SGZVOOPVH"
@@ -83,7 +81,7 @@ Building transaction with synchronous server
             base_fee=base_fee,
         )
         .add_text_memo("Hello, Stellar!")
-        .append_payment_op(bob_address, "10.25", "XLM")
+        .append_payment_op(bob_address, Asset.native(), "10.25")
         .build()
     )
     transaction.sign(alice_keypair)
@@ -98,7 +96,7 @@ Building transaction with synchronous server
     # Alice pay 10.25 XLM to Bob
     import asyncio
 
-    from stellar_sdk import ServerAsync, Keypair, TransactionBuilder, Network
+    from stellar_sdk import Asset, ServerAsync, Keypair, TransactionBuilder, Network
     from stellar_sdk.client.aiohttp_client import AiohttpClient
 
     alice_keypair = Keypair.from_secret("SBFZCHU5645DOKRWYBXVOXY2ELGJKFRX6VGGPRYUWHQ7PMXXJNDZFMKD")
@@ -118,7 +116,7 @@ Building transaction with synchronous server
                     base_fee=base_fee,
                 )
                 .add_text_memo("Hello, Stellar!")
-                .append_payment_op(bob_address, "10.25", "XLM")
+                .append_payment_op(bob_address, Asset.native(), "10.25")
                 .build()
             )
 

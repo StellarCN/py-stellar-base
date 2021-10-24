@@ -4,10 +4,10 @@ This example shows how to interact with the liquidity pool.
 from stellar_sdk import (
     Asset,
     Keypair,
-    Server,
-    TransactionBuilder,
     LiquidityPoolAsset,
     Network,
+    Server,
+    TransactionBuilder,
 )
 
 horizon_url = "https://horizon-testnet.stellar.org/"
@@ -36,7 +36,7 @@ transaction1 = (
         network_passphrase=network_passphrase,
         base_fee=100,
     )
-    .append_change_trust_liquidity_pool_asset_op(liquidity_pool_asset)
+    .append_change_trust_op(liquidity_pool_asset)
     .set_timeout(30)
     .build()
 )
