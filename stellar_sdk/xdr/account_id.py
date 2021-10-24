@@ -10,10 +10,9 @@ __all__ = ["AccountID"]
 
 class AccountID:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    typedef PublicKey AccountID;
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        typedef PublicKey AccountID;
     """
 
     def __init__(self, account_id: PublicKey) -> None:

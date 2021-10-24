@@ -10,17 +10,16 @@ __all__ = ["ClawbackClaimableBalanceResult"]
 
 class ClawbackClaimableBalanceResult:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    union ClawbackClaimableBalanceResult switch (
-        ClawbackClaimableBalanceResultCode code)
-    {
-    case CLAWBACK_CLAIMABLE_BALANCE_SUCCESS:
-        void;
-    default:
-        void;
-    };
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        union ClawbackClaimableBalanceResult switch (
+            ClawbackClaimableBalanceResultCode code)
+        {
+        case CLAWBACK_CLAIMABLE_BALANCE_SUCCESS:
+            void;
+        default:
+            void;
+        };
     """
 
     def __init__(

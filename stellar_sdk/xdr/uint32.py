@@ -10,10 +10,9 @@ __all__ = ["Uint32"]
 
 class Uint32:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    typedef unsigned int uint32;
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        typedef unsigned int uint32;
     """
 
     def __init__(self, uint32: int) -> None:

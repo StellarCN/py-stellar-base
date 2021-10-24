@@ -10,13 +10,12 @@ __all__ = ["Curve25519Public"]
 
 class Curve25519Public:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    struct Curve25519Public
-    {
-        opaque key[32];
-    };
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        struct Curve25519Public
+        {
+            opaque key[32];
+        };
     """
 
     def __init__(

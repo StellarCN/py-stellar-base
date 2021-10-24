@@ -13,17 +13,16 @@ __all__ = ["SurveyRequestMessage"]
 
 class SurveyRequestMessage:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    struct SurveyRequestMessage
-    {
-        NodeID surveyorPeerID;
-        NodeID surveyedPeerID;
-        uint32 ledgerNum;
-        Curve25519Public encryptionKey;
-        SurveyMessageCommandType commandType;
-    };
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        struct SurveyRequestMessage
+        {
+            NodeID surveyorPeerID;
+            NodeID surveyedPeerID;
+            uint32 ledgerNum;
+            Curve25519Public encryptionKey;
+            SurveyMessageCommandType commandType;
+        };
     """
 
     def __init__(

@@ -11,14 +11,13 @@ __all__ = ["LedgerKeyData"]
 
 class LedgerKeyData:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    struct
-        {
-            AccountID accountID;
-            string64 dataName;
-        }
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        struct
+            {
+                AccountID accountID;
+                string64 dataName;
+            }
     """
 
     def __init__(

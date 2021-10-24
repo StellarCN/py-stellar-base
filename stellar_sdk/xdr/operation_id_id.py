@@ -12,15 +12,14 @@ __all__ = ["OperationIDId"]
 
 class OperationIDId:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    struct
-        {
-            AccountID sourceAccount;
-            SequenceNumber seqNum;
-            uint32 opNum;
-        }
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        struct
+            {
+                AccountID sourceAccount;
+                SequenceNumber seqNum;
+                uint32 opNum;
+            }
     """
 
     def __init__(

@@ -11,14 +11,13 @@ __all__ = ["ClaimantV0"]
 
 class ClaimantV0:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    struct
-        {
-            AccountID destination;    // The account that can use this condition
-            ClaimPredicate predicate; // Claimable if predicate is true
-        }
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        struct
+            {
+                AccountID destination;    // The account that can use this condition
+                ClaimPredicate predicate; // Claimable if predicate is true
+            }
     """
 
     def __init__(

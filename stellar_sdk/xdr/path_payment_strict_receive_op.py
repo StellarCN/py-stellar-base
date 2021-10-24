@@ -14,22 +14,21 @@ __all__ = ["PathPaymentStrictReceiveOp"]
 
 class PathPaymentStrictReceiveOp:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    struct PathPaymentStrictReceiveOp
-    {
-        Asset sendAsset; // asset we pay with
-        int64 sendMax;   // the maximum amount of sendAsset to
-                         // send (excluding fees).
-                         // The operation will fail if can't be met
+    XDR Source Code::
 
-        MuxedAccount destination; // recipient of the payment
-        Asset destAsset;          // what they end up with
-        int64 destAmount;         // amount they end up with
+        struct PathPaymentStrictReceiveOp
+        {
+            Asset sendAsset; // asset we pay with
+            int64 sendMax;   // the maximum amount of sendAsset to
+                             // send (excluding fees).
+                             // The operation will fail if can't be met
 
-        Asset path<5>; // additional hops it must go through to get there
-    };
-    ----------------------------------------------------------------
+            MuxedAccount destination; // recipient of the payment
+            Asset destAsset;          // what they end up with
+            int64 destAmount;         // amount they end up with
+
+            Asset path<5>; // additional hops it must go through to get there
+        };
     """
 
     def __init__(

@@ -12,16 +12,15 @@ __all__ = ["BumpSequenceResultCode"]
 
 class BumpSequenceResultCode(IntEnum):
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    enum BumpSequenceResultCode
-    {
-        // codes considered as "success" for the operation
-        BUMP_SEQUENCE_SUCCESS = 0,
-        // codes considered as "failure" for the operation
-        BUMP_SEQUENCE_BAD_SEQ = -1 // `bumpTo` is not within bounds
-    };
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        enum BumpSequenceResultCode
+        {
+            // codes considered as "success" for the operation
+            BUMP_SEQUENCE_SUCCESS = 0,
+            // codes considered as "failure" for the operation
+            BUMP_SEQUENCE_BAD_SEQ = -1 // `bumpTo` is not within bounds
+        };
     """
 
     BUMP_SEQUENCE_SUCCESS = 0

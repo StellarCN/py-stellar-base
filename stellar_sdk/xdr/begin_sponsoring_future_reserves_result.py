@@ -12,17 +12,16 @@ __all__ = ["BeginSponsoringFutureReservesResult"]
 
 class BeginSponsoringFutureReservesResult:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    union BeginSponsoringFutureReservesResult switch (
-        BeginSponsoringFutureReservesResultCode code)
-    {
-    case BEGIN_SPONSORING_FUTURE_RESERVES_SUCCESS:
-        void;
-    default:
-        void;
-    };
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        union BeginSponsoringFutureReservesResult switch (
+            BeginSponsoringFutureReservesResultCode code)
+        {
+        case BEGIN_SPONSORING_FUTURE_RESERVES_SUCCESS:
+            void;
+        default:
+            void;
+        };
     """
 
     def __init__(

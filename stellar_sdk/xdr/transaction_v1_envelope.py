@@ -13,16 +13,15 @@ __all__ = ["TransactionV1Envelope"]
 
 class TransactionV1Envelope:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    struct TransactionV1Envelope
-    {
-        Transaction tx;
-        /* Each decorated signature is a signature over the SHA256 hash of
-         * a TransactionSignaturePayload */
-        DecoratedSignature signatures<20>;
-    };
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        struct TransactionV1Envelope
+        {
+            Transaction tx;
+            /* Each decorated signature is a signature over the SHA256 hash of
+             * a TransactionSignaturePayload */
+            DecoratedSignature signatures<20>;
+        };
     """
 
     def __init__(

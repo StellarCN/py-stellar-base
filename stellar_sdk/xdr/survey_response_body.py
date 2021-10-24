@@ -12,14 +12,13 @@ __all__ = ["SurveyResponseBody"]
 
 class SurveyResponseBody:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    union SurveyResponseBody switch (SurveyMessageCommandType type)
-    {
-    case SURVEY_TOPOLOGY:
-        TopologyResponseBody topologyResponseBody;
-    };
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        union SurveyResponseBody switch (SurveyMessageCommandType type)
+        {
+        case SURVEY_TOPOLOGY:
+            TopologyResponseBody topologyResponseBody;
+        };
     """
 
     def __init__(

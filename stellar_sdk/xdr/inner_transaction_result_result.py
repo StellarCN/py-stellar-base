@@ -13,30 +13,29 @@ __all__ = ["InnerTransactionResultResult"]
 
 class InnerTransactionResultResult:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    union switch (TransactionResultCode code)
-        {
-        // txFEE_BUMP_INNER_SUCCESS is not included
-        case txSUCCESS:
-        case txFAILED:
-            OperationResult results<>;
-        case txTOO_EARLY:
-        case txTOO_LATE:
-        case txMISSING_OPERATION:
-        case txBAD_SEQ:
-        case txBAD_AUTH:
-        case txINSUFFICIENT_BALANCE:
-        case txNO_ACCOUNT:
-        case txINSUFFICIENT_FEE:
-        case txBAD_AUTH_EXTRA:
-        case txINTERNAL_ERROR:
-        case txNOT_SUPPORTED:
-        // txFEE_BUMP_INNER_FAILED is not included
-        case txBAD_SPONSORSHIP:
-            void;
-        }
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        union switch (TransactionResultCode code)
+            {
+            // txFEE_BUMP_INNER_SUCCESS is not included
+            case txSUCCESS:
+            case txFAILED:
+                OperationResult results<>;
+            case txTOO_EARLY:
+            case txTOO_LATE:
+            case txMISSING_OPERATION:
+            case txBAD_SEQ:
+            case txBAD_AUTH:
+            case txINSUFFICIENT_BALANCE:
+            case txNO_ACCOUNT:
+            case txINSUFFICIENT_FEE:
+            case txBAD_AUTH_EXTRA:
+            case txINTERNAL_ERROR:
+            case txNOT_SUPPORTED:
+            // txFEE_BUMP_INNER_FAILED is not included
+            case txBAD_SPONSORSHIP:
+                void;
+            }
     """
 
     def __init__(

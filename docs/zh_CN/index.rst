@@ -72,7 +72,7 @@ py-stellar-base 是用于开发 Stellar 应用程序的 Python 库。它目前�
    payment
    asynchronous
    multi_signature_account
-
+   xdr
 
 API 文档
 -----------------

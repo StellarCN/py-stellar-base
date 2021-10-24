@@ -12,21 +12,20 @@ __all__ = ["ClaimLiquidityAtom"]
 
 class ClaimLiquidityAtom:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    struct ClaimLiquidityAtom
-    {
-        PoolID liquidityPoolID;
+    XDR Source Code::
 
-        // amount and asset taken from the pool
-        Asset assetSold;
-        int64 amountSold;
+        struct ClaimLiquidityAtom
+        {
+            PoolID liquidityPoolID;
 
-        // amount and asset sent to the pool
-        Asset assetBought;
-        int64 amountBought;
-    };
-    ----------------------------------------------------------------
+            // amount and asset taken from the pool
+            Asset assetSold;
+            int64 amountSold;
+
+            // amount and asset sent to the pool
+            Asset assetBought;
+            int64 amountBought;
+        };
     """
 
     def __init__(

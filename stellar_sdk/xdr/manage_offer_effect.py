@@ -12,15 +12,14 @@ __all__ = ["ManageOfferEffect"]
 
 class ManageOfferEffect(IntEnum):
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    enum ManageOfferEffect
-    {
-        MANAGE_OFFER_CREATED = 0,
-        MANAGE_OFFER_UPDATED = 1,
-        MANAGE_OFFER_DELETED = 2
-    };
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        enum ManageOfferEffect
+        {
+            MANAGE_OFFER_CREATED = 0,
+            MANAGE_OFFER_UPDATED = 1,
+            MANAGE_OFFER_DELETED = 2
+        };
     """
 
     MANAGE_OFFER_CREATED = 0

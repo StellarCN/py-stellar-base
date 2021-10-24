@@ -10,10 +10,9 @@ __all__ = ["String32"]
 
 class String32:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    typedef string string32<32>;
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        typedef string string32<32>;
     """
 
     def __init__(self, string32: bytes) -> None:

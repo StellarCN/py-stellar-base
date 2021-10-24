@@ -11,14 +11,13 @@ __all__ = ["Signer"]
 
 class Signer:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    struct Signer
-    {
-        SignerKey key;
-        uint32 weight; // really only need 1 byte
-    };
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        struct Signer
+        {
+            SignerKey key;
+            uint32 weight; // really only need 1 byte
+        };
     """
 
     def __init__(

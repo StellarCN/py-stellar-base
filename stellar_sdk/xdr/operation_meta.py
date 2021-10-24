@@ -10,13 +10,12 @@ __all__ = ["OperationMeta"]
 
 class OperationMeta:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    struct OperationMeta
-    {
-        LedgerEntryChanges changes;
-    };
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        struct OperationMeta
+        {
+            LedgerEntryChanges changes;
+        };
     """
 
     def __init__(

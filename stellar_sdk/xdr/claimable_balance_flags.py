@@ -12,15 +12,14 @@ __all__ = ["ClaimableBalanceFlags"]
 
 class ClaimableBalanceFlags(IntEnum):
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    enum ClaimableBalanceFlags
-    {
-        // If set, the issuer account of the asset held by the claimable balance may
-        // clawback the claimable balance
-        CLAIMABLE_BALANCE_CLAWBACK_ENABLED_FLAG = 0x1
-    };
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        enum ClaimableBalanceFlags
+        {
+            // If set, the issuer account of the asset held by the claimable balance may
+            // clawback the claimable balance
+            CLAIMABLE_BALANCE_CLAWBACK_ENABLED_FLAG = 0x1
+        };
     """
 
     CLAIMABLE_BALANCE_CLAWBACK_ENABLED_FLAG = 1

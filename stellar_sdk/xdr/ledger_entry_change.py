@@ -13,20 +13,19 @@ __all__ = ["LedgerEntryChange"]
 
 class LedgerEntryChange:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    union LedgerEntryChange switch (LedgerEntryChangeType type)
-    {
-    case LEDGER_ENTRY_CREATED:
-        LedgerEntry created;
-    case LEDGER_ENTRY_UPDATED:
-        LedgerEntry updated;
-    case LEDGER_ENTRY_REMOVED:
-        LedgerKey removed;
-    case LEDGER_ENTRY_STATE:
-        LedgerEntry state;
-    };
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        union LedgerEntryChange switch (LedgerEntryChangeType type)
+        {
+        case LEDGER_ENTRY_CREATED:
+            LedgerEntry created;
+        case LEDGER_ENTRY_UPDATED:
+            LedgerEntry updated;
+        case LEDGER_ENTRY_REMOVED:
+            LedgerKey removed;
+        case LEDGER_ENTRY_STATE:
+            LedgerEntry state;
+        };
     """
 
     def __init__(

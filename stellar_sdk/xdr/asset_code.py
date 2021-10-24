@@ -13,19 +13,18 @@ __all__ = ["AssetCode"]
 
 class AssetCode:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    union AssetCode switch (AssetType type)
-    {
-    case ASSET_TYPE_CREDIT_ALPHANUM4:
-        AssetCode4 assetCode4;
+    XDR Source Code::
 
-    case ASSET_TYPE_CREDIT_ALPHANUM12:
-        AssetCode12 assetCode12;
+        union AssetCode switch (AssetType type)
+        {
+        case ASSET_TYPE_CREDIT_ALPHANUM4:
+            AssetCode4 assetCode4;
 
-        // add other asset types here in the future
-    };
-    ----------------------------------------------------------------
+        case ASSET_TYPE_CREDIT_ALPHANUM12:
+            AssetCode12 assetCode12;
+
+            // add other asset types here in the future
+        };
     """
 
     def __init__(

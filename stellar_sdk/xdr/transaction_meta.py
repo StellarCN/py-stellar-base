@@ -15,18 +15,17 @@ __all__ = ["TransactionMeta"]
 
 class TransactionMeta:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    union TransactionMeta switch (int v)
-    {
-    case 0:
-        OperationMeta operations<>;
-    case 1:
-        TransactionMetaV1 v1;
-    case 2:
-        TransactionMetaV2 v2;
-    };
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        union TransactionMeta switch (int v)
+        {
+        case 0:
+            OperationMeta operations<>;
+        case 1:
+            TransactionMetaV1 v1;
+        case 2:
+            TransactionMetaV2 v2;
+        };
     """
 
     def __init__(

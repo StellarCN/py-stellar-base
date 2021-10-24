@@ -12,14 +12,13 @@ __all__ = ["ClaimableBalanceID"]
 
 class ClaimableBalanceID:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    union ClaimableBalanceID switch (ClaimableBalanceIDType type)
-    {
-    case CLAIMABLE_BALANCE_ID_TYPE_V0:
-        Hash v0;
-    };
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        union ClaimableBalanceID switch (ClaimableBalanceIDType type)
+        {
+        case CLAIMABLE_BALANCE_ID_TYPE_V0:
+            Hash v0;
+        };
     """
 
     def __init__(

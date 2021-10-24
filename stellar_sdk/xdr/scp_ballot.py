@@ -11,14 +11,13 @@ __all__ = ["SCPBallot"]
 
 class SCPBallot:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    struct SCPBallot
-    {
-        uint32 counter; // n
-        Value value;    // x
-    };
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        struct SCPBallot
+        {
+            uint32 counter; // n
+            Value value;    // x
+        };
     """
 
     def __init__(

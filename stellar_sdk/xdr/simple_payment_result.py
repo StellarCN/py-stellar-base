@@ -12,15 +12,14 @@ __all__ = ["SimplePaymentResult"]
 
 class SimplePaymentResult:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    struct SimplePaymentResult
-    {
-        AccountID destination;
-        Asset asset;
-        int64 amount;
-    };
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        struct SimplePaymentResult
+        {
+            AccountID destination;
+            Asset asset;
+            int64 amount;
+        };
     """
 
     def __init__(

@@ -10,10 +10,9 @@ __all__ = ["Value"]
 
 class Value:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    typedef opaque Value<>;
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        typedef opaque Value<>;
     """
 
     def __init__(self, value: bytes) -> None:

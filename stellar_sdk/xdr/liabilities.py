@@ -10,14 +10,13 @@ __all__ = ["Liabilities"]
 
 class Liabilities:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    struct Liabilities
-    {
-        int64 buying;
-        int64 selling;
-    };
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        struct Liabilities
+        {
+            int64 buying;
+            int64 selling;
+        };
     """
 
     def __init__(

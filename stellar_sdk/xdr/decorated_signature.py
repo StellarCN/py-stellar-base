@@ -11,14 +11,13 @@ __all__ = ["DecoratedSignature"]
 
 class DecoratedSignature:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    struct DecoratedSignature
-    {
-        SignatureHint hint;  // last 4 bytes of the public key, used as a hint
-        Signature signature; // actual signature
-    };
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        struct DecoratedSignature
+        {
+            SignatureHint hint;  // last 4 bytes of the public key, used as a hint
+            Signature signature; // actual signature
+        };
     """
 
     def __init__(

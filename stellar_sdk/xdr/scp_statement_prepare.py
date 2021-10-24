@@ -13,18 +13,17 @@ __all__ = ["SCPStatementPrepare"]
 
 class SCPStatementPrepare:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    struct
-            {
-                Hash quorumSetHash;       // D
-                SCPBallot ballot;         // b
-                SCPBallot* prepared;      // p
-                SCPBallot* preparedPrime; // p'
-                uint32 nC;                // c.n
-                uint32 nH;                // h.n
-            }
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        struct
+                {
+                    Hash quorumSetHash;       // D
+                    SCPBallot ballot;         // b
+                    SCPBallot* prepared;      // p
+                    SCPBallot* preparedPrime; // p'
+                    uint32 nC;                // c.n
+                    uint32 nH;                // h.n
+                }
     """
 
     def __init__(

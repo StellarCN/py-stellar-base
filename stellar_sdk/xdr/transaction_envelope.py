@@ -14,18 +14,17 @@ __all__ = ["TransactionEnvelope"]
 
 class TransactionEnvelope:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    union TransactionEnvelope switch (EnvelopeType type)
-    {
-    case ENVELOPE_TYPE_TX_V0:
-        TransactionV0Envelope v0;
-    case ENVELOPE_TYPE_TX:
-        TransactionV1Envelope v1;
-    case ENVELOPE_TYPE_TX_FEE_BUMP:
-        FeeBumpTransactionEnvelope feeBump;
-    };
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        union TransactionEnvelope switch (EnvelopeType type)
+        {
+        case ENVELOPE_TYPE_TX_V0:
+            TransactionV0Envelope v0;
+        case ENVELOPE_TYPE_TX:
+            TransactionV1Envelope v1;
+        case ENVELOPE_TYPE_TX_FEE_BUMP:
+            FeeBumpTransactionEnvelope feeBump;
+        };
     """
 
     def __init__(

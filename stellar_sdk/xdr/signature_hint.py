@@ -10,10 +10,9 @@ __all__ = ["SignatureHint"]
 
 class SignatureHint:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    typedef opaque SignatureHint[4];
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        typedef opaque SignatureHint[4];
     """
 
     def __init__(self, signature_hint: bytes) -> None:

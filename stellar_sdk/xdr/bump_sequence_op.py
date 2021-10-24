@@ -10,13 +10,12 @@ __all__ = ["BumpSequenceOp"]
 
 class BumpSequenceOp:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    struct BumpSequenceOp
-    {
-        SequenceNumber bumpTo;
-    };
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        struct BumpSequenceOp
+        {
+            SequenceNumber bumpTo;
+        };
     """
 
     def __init__(

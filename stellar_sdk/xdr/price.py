@@ -10,14 +10,13 @@ __all__ = ["Price"]
 
 class Price:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    struct Price
-    {
-        int32 n; // numerator
-        int32 d; // denominator
-    };
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        struct Price
+        {
+            int32 n; // numerator
+            int32 d; // denominator
+        };
     """
 
     def __init__(

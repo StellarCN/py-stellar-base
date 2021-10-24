@@ -14,18 +14,17 @@ __all__ = ["ClaimAtom"]
 
 class ClaimAtom:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    union ClaimAtom switch (ClaimAtomType type)
-    {
-    case CLAIM_ATOM_TYPE_V0:
-        ClaimOfferAtomV0 v0;
-    case CLAIM_ATOM_TYPE_ORDER_BOOK:
-        ClaimOfferAtom orderBook;
-    case CLAIM_ATOM_TYPE_LIQUIDITY_POOL:
-        ClaimLiquidityAtom liquidityPool;
-    };
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        union ClaimAtom switch (ClaimAtomType type)
+        {
+        case CLAIM_ATOM_TYPE_V0:
+            ClaimOfferAtomV0 v0;
+        case CLAIM_ATOM_TYPE_ORDER_BOOK:
+            ClaimOfferAtom orderBook;
+        case CLAIM_ATOM_TYPE_LIQUIDITY_POOL:
+            ClaimLiquidityAtom liquidityPool;
+        };
     """
 
     def __init__(

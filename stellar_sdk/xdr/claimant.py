@@ -12,18 +12,17 @@ __all__ = ["Claimant"]
 
 class Claimant:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    union Claimant switch (ClaimantType type)
-    {
-    case CLAIMANT_TYPE_V0:
-        struct
+    XDR Source Code::
+
+        union Claimant switch (ClaimantType type)
         {
-            AccountID destination;    // The account that can use this condition
-            ClaimPredicate predicate; // Claimable if predicate is true
-        } v0;
-    };
-    ----------------------------------------------------------------
+        case CLAIMANT_TYPE_V0:
+            struct
+            {
+                AccountID destination;    // The account that can use this condition
+                ClaimPredicate predicate; // Claimable if predicate is true
+            } v0;
+        };
     """
 
     def __init__(

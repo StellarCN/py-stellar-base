@@ -12,17 +12,16 @@ __all__ = ["LiquidityPoolDepositOp"]
 
 class LiquidityPoolDepositOp:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    struct LiquidityPoolDepositOp
-    {
-        PoolID liquidityPoolID;
-        int64 maxAmountA;     // maximum amount of first asset to deposit
-        int64 maxAmountB;     // maximum amount of second asset to deposit
-        Price minPrice;       // minimum depositA/depositB
-        Price maxPrice;       // maximum depositA/depositB
-    };
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        struct LiquidityPoolDepositOp
+        {
+            PoolID liquidityPoolID;
+            int64 maxAmountA;     // maximum amount of first asset to deposit
+            int64 maxAmountB;     // maximum amount of second asset to deposit
+            Price minPrice;       // minimum depositA/depositB
+            Price maxPrice;       // maximum depositA/depositB
+        };
     """
 
     def __init__(

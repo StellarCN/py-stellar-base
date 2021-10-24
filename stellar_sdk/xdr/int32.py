@@ -10,10 +10,9 @@ __all__ = ["Int32"]
 
 class Int32:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    typedef int int32;
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        typedef int int32;
     """
 
     def __init__(self, int32: int) -> None:

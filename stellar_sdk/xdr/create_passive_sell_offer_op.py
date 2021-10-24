@@ -12,16 +12,15 @@ __all__ = ["CreatePassiveSellOfferOp"]
 
 class CreatePassiveSellOfferOp:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    struct CreatePassiveSellOfferOp
-    {
-        Asset selling; // A
-        Asset buying;  // B
-        int64 amount;  // amount taker gets
-        Price price;   // cost of A in terms of B
-    };
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        struct CreatePassiveSellOfferOp
+        {
+            Asset selling; // A
+            Asset buying;  // B
+            int64 amount;  // amount taker gets
+            Price price;   // cost of A in terms of B
+        };
     """
 
     def __init__(

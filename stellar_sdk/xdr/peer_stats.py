@@ -12,29 +12,28 @@ __all__ = ["PeerStats"]
 
 class PeerStats:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    struct PeerStats
-    {
-        NodeID id;
-        string versionStr<100>;
-        uint64 messagesRead;
-        uint64 messagesWritten;
-        uint64 bytesRead;
-        uint64 bytesWritten;
-        uint64 secondsConnected;
+    XDR Source Code::
 
-        uint64 uniqueFloodBytesRecv;
-        uint64 duplicateFloodBytesRecv;
-        uint64 uniqueFetchBytesRecv;
-        uint64 duplicateFetchBytesRecv;
+        struct PeerStats
+        {
+            NodeID id;
+            string versionStr<100>;
+            uint64 messagesRead;
+            uint64 messagesWritten;
+            uint64 bytesRead;
+            uint64 bytesWritten;
+            uint64 secondsConnected;
 
-        uint64 uniqueFloodMessageRecv;
-        uint64 duplicateFloodMessageRecv;
-        uint64 uniqueFetchMessageRecv;
-        uint64 duplicateFetchMessageRecv;
-    };
-    ----------------------------------------------------------------
+            uint64 uniqueFloodBytesRecv;
+            uint64 duplicateFloodBytesRecv;
+            uint64 uniqueFetchBytesRecv;
+            uint64 duplicateFetchBytesRecv;
+
+            uint64 uniqueFloodMessageRecv;
+            uint64 duplicateFloodMessageRecv;
+            uint64 uniqueFetchMessageRecv;
+            uint64 duplicateFetchMessageRecv;
+        };
     """
 
     def __init__(

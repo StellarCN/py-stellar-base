@@ -13,23 +13,22 @@ __all__ = ["DataEntry"]
 
 class DataEntry:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    struct DataEntry
-    {
-        AccountID accountID; // account this data belongs to
-        string64 dataName;
-        DataValue dataValue;
+    XDR Source Code::
 
-        // reserved for future use
-        union switch (int v)
+        struct DataEntry
         {
-        case 0:
-            void;
-        }
-        ext;
-    };
-    ----------------------------------------------------------------
+            AccountID accountID; // account this data belongs to
+            string64 dataName;
+            DataValue dataValue;
+
+            // reserved for future use
+            union switch (int v)
+            {
+            case 0:
+                void;
+            }
+            ext;
+        };
     """
 
     def __init__(

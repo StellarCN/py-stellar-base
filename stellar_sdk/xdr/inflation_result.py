@@ -13,16 +13,15 @@ __all__ = ["InflationResult"]
 
 class InflationResult:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    union InflationResult switch (InflationResultCode code)
-    {
-    case INFLATION_SUCCESS:
-        InflationPayout payouts<>;
-    default:
-        void;
-    };
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        union InflationResult switch (InflationResultCode code)
+        {
+        case INFLATION_SUCCESS:
+            InflationPayout payouts<>;
+        default:
+            void;
+        };
     """
 
     def __init__(

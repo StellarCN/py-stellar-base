@@ -12,22 +12,21 @@ __all__ = ["TransactionHistoryEntry"]
 
 class TransactionHistoryEntry:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    struct TransactionHistoryEntry
-    {
-        uint32 ledgerSeq;
-        TransactionSet txSet;
+    XDR Source Code::
 
-        // reserved for future use
-        union switch (int v)
+        struct TransactionHistoryEntry
         {
-        case 0:
-            void;
-        }
-        ext;
-    };
-    ----------------------------------------------------------------
+            uint32 ledgerSeq;
+            TransactionSet txSet;
+
+            // reserved for future use
+            union switch (int v)
+            {
+            case 0:
+                void;
+            }
+            ext;
+        };
     """
 
     def __init__(

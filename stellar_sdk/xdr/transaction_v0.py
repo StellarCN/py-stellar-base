@@ -19,24 +19,23 @@ __all__ = ["TransactionV0"]
 
 class TransactionV0:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    struct TransactionV0
-    {
-        uint256 sourceAccountEd25519;
-        uint32 fee;
-        SequenceNumber seqNum;
-        TimeBounds* timeBounds;
-        Memo memo;
-        Operation operations<MAX_OPS_PER_TX>;
-        union switch (int v)
+    XDR Source Code::
+
+        struct TransactionV0
         {
-        case 0:
-            void;
-        }
-        ext;
-    };
-    ----------------------------------------------------------------
+            uint256 sourceAccountEd25519;
+            uint32 fee;
+            SequenceNumber seqNum;
+            TimeBounds* timeBounds;
+            Memo memo;
+            Operation operations<MAX_OPS_PER_TX>;
+            union switch (int v)
+            {
+            case 0:
+                void;
+            }
+            ext;
+        };
     """
 
     def __init__(

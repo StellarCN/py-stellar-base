@@ -11,14 +11,13 @@ __all__ = ["MuxedAccountMed25519"]
 
 class MuxedAccountMed25519:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    struct
-        {
-            uint64 id;
-            uint256 ed25519;
-        }
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        struct
+            {
+                uint64 id;
+                uint256 ed25519;
+            }
     """
 
     def __init__(

@@ -11,14 +11,13 @@ __all__ = ["DontHave"]
 
 class DontHave:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    struct DontHave
-    {
-        MessageType type;
-        uint256 reqHash;
-    };
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        struct DontHave
+        {
+            MessageType type;
+            uint256 reqHash;
+        };
     """
 
     def __init__(

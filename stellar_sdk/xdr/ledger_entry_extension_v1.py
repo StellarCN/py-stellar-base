@@ -11,20 +11,19 @@ __all__ = ["LedgerEntryExtensionV1"]
 
 class LedgerEntryExtensionV1:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    struct LedgerEntryExtensionV1
-    {
-        SponsorshipDescriptor sponsoringID;
+    XDR Source Code::
 
-        union switch (int v)
+        struct LedgerEntryExtensionV1
         {
-        case 0:
-            void;
-        }
-        ext;
-    };
-    ----------------------------------------------------------------
+            SponsorshipDescriptor sponsoringID;
+
+            union switch (int v)
+            {
+            case 0:
+                void;
+            }
+            ext;
+        };
     """
 
     def __init__(

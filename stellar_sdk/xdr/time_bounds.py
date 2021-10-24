@@ -10,14 +10,13 @@ __all__ = ["TimeBounds"]
 
 class TimeBounds:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    struct TimeBounds
-    {
-        TimePoint minTime;
-        TimePoint maxTime; // 0 here means no maxTime
-    };
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        struct TimeBounds
+        {
+            TimePoint minTime;
+            TimePoint maxTime; // 0 here means no maxTime
+        };
     """
 
     def __init__(

@@ -10,15 +10,14 @@ __all__ = ["Auth"]
 
 class Auth:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    struct Auth
-    {
-        // Empty message, just to confirm
-        // establishment of MAC keys.
-        int unused;
-    };
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        struct Auth
+        {
+            // Empty message, just to confirm
+            // establishment of MAC keys.
+            int unused;
+        };
     """
 
     def __init__(

@@ -11,14 +11,13 @@ __all__ = ["Error"]
 
 class Error:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    struct Error
-    {
-        ErrorCode code;
-        string msg<100>;
-    };
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        struct Error
+        {
+            ErrorCode code;
+            string msg<100>;
+        };
     """
 
     def __init__(

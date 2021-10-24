@@ -12,15 +12,14 @@ __all__ = ["TransactionResultMeta"]
 
 class TransactionResultMeta:
     """
-    XDR Source Code
-    ----------------------------------------------------------------
-    struct TransactionResultMeta
-    {
-        TransactionResultPair result;
-        LedgerEntryChanges feeProcessing;
-        TransactionMeta txApplyProcessing;
-    };
-    ----------------------------------------------------------------
+    XDR Source Code::
+
+        struct TransactionResultMeta
+        {
+            TransactionResultPair result;
+            LedgerEntryChanges feeProcessing;
+            TransactionMeta txApplyProcessing;
+        };
     """
 
     def __init__(
