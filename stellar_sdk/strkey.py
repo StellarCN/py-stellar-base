@@ -270,7 +270,7 @@ def is_valid(version_byte_name: str, encoded: str) -> bool:
     if encoded and len(encoded) != 56:
         return False
     try:
-        decoded = decode_check(version_byte_name, encoded)
+        decode_check(version_byte_name, encoded)
         # if len(decoded) != 32:
         #     return False
     except (ValueError, TypeError):

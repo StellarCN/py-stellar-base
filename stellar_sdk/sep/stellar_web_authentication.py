@@ -430,7 +430,7 @@ def verify_challenge_transaction_signers(
 
     if client_signing_key and not client_signing_key_found:
         raise InvalidSep10ChallengeError(
-            f"Transaction not signed by the source account of the 'client_domain' "
+            "Transaction not signed by the source account of the 'client_domain' "
             "ManageData operation"
         )
 

@@ -27,7 +27,7 @@ from ..operation.create_claimable_balance import ClaimPredicateType
 from ..operation.revoke_sponsorship import RevokeSponsorshipType
 from ..price import Price
 from ..signer import Signer
-from ..signer_key import SignerKey, SignerKeyType
+from ..signer_key import SignerKey
 from ..strkey import StrKey
 from ..time_bounds import TimeBounds
 from ..transaction import Transaction

@@ -1,4 +1,4 @@
-from typing import Any, Coroutine, Dict, List, Union
+from typing import Any, Dict, List, Union
 
 from .account import Account, Thresholds
 from .asset import Asset
