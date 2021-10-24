@@ -41,10 +41,8 @@ class CreatePassiveSellOffer(Operation):
 
     :param selling: What you're selling.
     :param buying: What you're buying.
-    :param amount: The total amount you're selling. If 0,
-        deletes the offer.
-    :param price: Price of 1 unit of `selling` in
-        terms of `buying`.
+    :param amount: The total amount you're selling. If 0, deletes the offer.
+    :param price: Price of 1 unit of `selling` in terms of `buying`.
     :param source: The source account for the operation. Defaults to the transaction's source account.
 
     """

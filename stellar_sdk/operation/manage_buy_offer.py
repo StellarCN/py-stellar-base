@@ -32,9 +32,9 @@ class ManageBuyOffer(Operation):
 
     :param selling: What you're selling.
     :param buying: What you're buying.
-    :param amount: Amount being bought. if set to ``"0"``, delete the offer.
+    :param amount: Amount being bought. if set to ``0``, delete the offer.
     :param price: Price of thing being bought in terms of what you are selling.
-    :param offer_id: If ``"0"``, will create a new offer (default). Otherwise,
+    :param offer_id: If ``0``, will create a new offer (default). Otherwise,
         edits an existing offer.
     :param source: The source account for the operation. Defaults to the transaction's source account.
 

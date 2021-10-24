@@ -23,7 +23,7 @@ from .time_bounds import TimeBounds
 from .transaction import Transaction
 from .transaction_envelope import TransactionEnvelope
 from .type_checked import type_checked
-from .utils import hex_to_bytes
+from .utils import hex_to_bytes, is_valid_hash
 
 __all__ = ["TransactionBuilder"]
 
@@ -173,7 +173,6 @@ class TransactionBuilder:
             :py:class:`FeeBumpTransactionEnvelope <stellar_sdk.fee_bump_transaction_envelope.FeeBumpTransactionEnvelope>`
             via the XDR object.
         """
-        # TODO: warn?
         xdr_object = stellar_xdr.TransactionEnvelope.from_xdr(xdr)
         te_type = xdr_object.type
         if te_type == stellar_xdr.EnvelopeType.ENVELOPE_TYPE_TX_FEE_BUMP:
@@ -305,7 +304,6 @@ class TransactionBuilder:
         :param operation: an operation
         :return: This builder instance.
         """
-        # TODO: LOG HERE
         self.operations.append(operation)
         return self
 
@@ -332,29 +330,7 @@ class TransactionBuilder:
 
     def append_change_trust_op(
         self,
-        asset_code: str,
-        asset_issuer: str,
-        limit: Union[str, Decimal] = None,
-        source: Optional[Union[MuxedAccount, str]] = None,
-    ) -> "TransactionBuilder":
-        """Append a :class:`ChangeTrust <stellar_sdk.operation.ChangeTrust>`
-        operation to the list of operations.
-
-        :param asset_issuer: The issuer address for the asset.
-        :param asset_code: The asset code for the asset.
-        :param limit: The limit for the asset, defaults to max int64(``922337203685.4775807``).
-            If the limit is set to ``"0"`` it deletes the trustline.
-        :param source: The source address to add the trustline to.
-        :return: This builder instance.
-
-        """
-        asset = Asset(asset_code, asset_issuer)
-        op = ChangeTrust(asset, limit, source)
-        return self.append_operation(op)
-
-    def append_change_trust_liquidity_pool_asset_op(
-        self,
-        asset: LiquidityPoolAsset,
+        asset: Union[Asset, LiquidityPoolAsset],
         limit: Union[str, Decimal] = None,
         source: Optional[Union[MuxedAccount, str]] = None,
     ) -> "TransactionBuilder":
@@ -366,42 +342,38 @@ class TransactionBuilder:
             If the limit is set to ``"0"`` it deletes the trustline.
         :param source: The source address to add the trustline to.
         :return: This builder instance.
-
         """
+
         op = ChangeTrust(asset, limit, source)
         return self.append_operation(op)
 
     def append_payment_op(
         self,
         destination: Union[MuxedAccount, str],
+        asset: Asset,
         amount: Union[str, Decimal],
-        asset_code: str = "XLM",
-        asset_issuer: Optional[str] = None,
         source: Optional[Union[MuxedAccount, str]] = None,
     ) -> "TransactionBuilder":
         """Append a :class:`Payment <stellar_sdk.operation.Payment>` operation
         to the list of operations.
 
-        :param destination: Account address that receives the payment.
-        :param amount: The amount of the currency to send in the payment.
-        :param asset_code: The asset code for the asset to send.
-        :param asset_issuer: The address of the issuer of the asset.
-        :param source: The source address of the payment.
+        :param destination: The destination account ID.
+        :param asset: The asset to send.
+        :param amount: The amount to send.
+        :param source: The source account for the operation. Defaults to the
+            transaction's source account.
         :return: This builder instance.
-
         """
-        asset = Asset(code=asset_code, issuer=asset_issuer)
+
         op = Payment(destination, asset, amount, source)
         return self.append_operation(op)
 
     def append_path_payment_strict_receive_op(
         self,
         destination: Union[MuxedAccount, str],
-        send_code: str,
-        send_issuer: Optional[str],
+        send_asset: Asset,
         send_max: Union[str, Decimal],
-        dest_code: str,
-        dest_issuer: Optional[str],
+        dest_asset: Asset,
         dest_amount: Union[str, Decimal],
         path: List[Asset],
         source: Optional[Union[MuxedAccount, str]] = None,
@@ -409,37 +381,24 @@ class TransactionBuilder:
         """Append a :class:`PathPaymentStrictReceive <stellar_sdk.operation.PathPaymentStrictReceive>`
         operation to the list of operations.
 
-        :param destination: The destination address (Account ID) for the
-            payment.
-        :param send_code: The asset code for the source asset deducted from
-            the source account.
-        :param send_issuer: The address of the issuer of the source asset.
-        :param send_max: The maximum amount of send asset to deduct
-            (excluding fees).
-        :param dest_code: The asset code for the final destination asset
-            sent to the recipient.
-        :param dest_issuer: Account address that receives the payment.
-        :param dest_amount: The amount of destination asset the destination
-            account receives.
+        :param destination: The destination account to send to.
+        :param send_asset: The `asset` to pay with.
+        :param send_max: The maximum amount of `send_asset` to send.
+        :param dest_asset: The asset the `destination` will receive.
+        :param dest_amount: The amount the `destination` receives.
         :param path: A list of Asset objects to use as the path.
-        :param source: The source address of the path payment.
+        :param source: The source account for the operation. Defaults to the
+            transaction's source account.
         :return: This builder instance.
-
         """
 
-        send_asset = Asset(send_code, send_issuer)
-        dest_asset = Asset(dest_code, dest_issuer)
-
-        assets = []
-        for asset in path:
-            assets.append(asset)
         op = PathPaymentStrictReceive(
             destination=destination,
             send_asset=send_asset,
             send_max=send_max,
             dest_asset=dest_asset,
             dest_amount=dest_amount,
-            path=assets,
+            path=path,
             source=source,
         )
         return self.append_operation(op)
@@ -447,11 +406,9 @@ class TransactionBuilder:
     def append_path_payment_strict_send_op(
         self,
         destination: Union[MuxedAccount, str],
-        send_code: str,
-        send_issuer: Optional[str],
+        send_asset: Asset,
         send_amount: Union[str, Decimal],
-        dest_code: str,
-        dest_issuer: Optional[str],
+        dest_asset: Asset,
         dest_min: Union[str, Decimal],
         path: List[Asset],
         source: Optional[Union[MuxedAccount, str]] = None,
@@ -459,35 +416,23 @@ class TransactionBuilder:
         """Append a :class:`PathPaymentStrictSend <stellar_sdk.operation.PathPaymentStrictSend>`
         operation to the list of operations.
 
-        :param destination: The destination address (Account ID) for the
-            payment.
-        :param send_code: The asset code for the source asset deducted from
-            the source account.
-        :param send_issuer: The address of the issuer of the source asset.
-        :param send_amount: Amount of send_asset to send.
-        :param dest_code: The asset code for the final destination asset
-            sent to the recipient.
-        :param dest_issuer: Account address that receives the payment.
-        :param dest_min: The minimum amount of dest_asset to be received.
+        :param destination: The destination account to send to.
+        :param send_asset: The `asset` to pay with.
+        :param send_amount: Amount of `send_asset` to send.
+        :param dest_asset: The asset the `destination` will receive.
+        :param dest_min: The minimum amount of `dest_asset` to be received.
         :param path: A list of Asset objects to use as the path.
-        :param source: The source address of the path payment.
+        :param source: The source account for the operation. Defaults to the
+            transaction's source account.
         :return: This builder instance.
-
         """
-
-        send_asset = Asset(send_code, send_issuer)
-        dest_asset = Asset(dest_code, dest_issuer)
-
-        assets = []
-        for asset in path:
-            assets.append(asset)
         op = PathPaymentStrictSend(
             destination=destination,
             send_asset=send_asset,
             send_amount=send_amount,
             dest_asset=dest_asset,
             dest_min=dest_min,
-            path=assets,
+            path=path,
             source=source,
         )
         return self.append_operation(op)
@@ -590,7 +535,7 @@ class TransactionBuilder:
 
     def append_ed25519_public_key_signer(
         self,
-        account_id: str,
+        account_id: Union[str, bytes],
         weight: int,
         source: Optional[Union[MuxedAccount, str]] = None,
     ) -> "TransactionBuilder":
@@ -599,12 +544,14 @@ class TransactionBuilder:
         function for :meth:`append_set_options_op`.
 
         :param account_id: The account id of the new ed25519_public_key signer.
+            (ex. ``"GDNA2V62PVEFBZ74CDJKTUHLY4Y7PL5UAV2MAM4VWF6USFE3SH2354AD"``)
         :param weight: The weight of the new signer.
         :param source: The source account that is adding a signer to its
             list of signers.
         :return: This builder instance.
-
         """
+        if isinstance(account_id, str) and is_valid_hash(account_id):
+            account_id = hex_to_bytes(account_id)
         signer = Signer.ed25519_public_key(account_id=account_id, weight=weight)
         return self.append_set_options_op(signer=signer, source=source)
 
@@ -619,13 +566,16 @@ class TransactionBuilder:
         function for :meth:`append_set_options_op`.
 
         :param sha256_hash: The address of the new sha256 hash(hashX) signer,
-            a 32 byte hash or hex encoded string.
+            a 32 byte hash, hex encoded string or encode strkey.
+            (ex. ``"XDNA2V62PVEFBZ74CDJKTUHLY4Y7PL5UAV2MAM4VWF6USFE3SH235FXL"``,
+            ``"da0d57da7d4850e7fc10d2a9d0ebc731f7afb40574c03395b17d49149b91f5be"`` or bytes)
         :param weight: The weight of the new signer.
         :param source: The source account that is adding a signer to its
             list of signers.
         :return: This builder instance.
-
         """
+        if isinstance(sha256_hash, str) and is_valid_hash(sha256_hash):
+            sha256_hash = hex_to_bytes(sha256_hash)
         signer = Signer.sha256_hash(
             sha256_hash=hex_to_bytes(sha256_hash), weight=weight
         )
@@ -639,12 +589,16 @@ class TransactionBuilder:
 
         :param pre_auth_tx_hash: The address of the new preAuthTx signer - obtained by calling `hash` on
             the :class:`TransactionEnvelope <stellar_sdk.transaction_envelope.TransactionEnvelope>`,
-            a 32 byte hash or hex encoded string.
+            a 32 byte hash, hex encoded string or encode strkey.
+            (ex. ``"TDNA2V62PVEFBZ74CDJKTUHLY4Y7PL5UAV2MAM4VWF6USFE3SH234BSS"``,
+            ``"da0d57da7d4850e7fc10d2a9d0ebc731f7afb40574c03395b17d49149b91f5be"`` or bytes)
         :param weight: The weight of the new signer.
         :param source: The source account that is adding a signer to its
             list of signers.
         :return: This builder instance.
         """
+        if isinstance(pre_auth_tx_hash, str) and is_valid_hash(pre_auth_tx_hash):
+            pre_auth_tx_hash = hex_to_bytes(pre_auth_tx_hash)
         signer = Signer.pre_auth_tx(
             pre_auth_tx_hash=hex_to_bytes(pre_auth_tx_hash), weight=weight
         )
@@ -652,38 +606,26 @@ class TransactionBuilder:
 
     def append_manage_buy_offer_op(
         self,
-        selling_code: str,
-        selling_issuer: Optional[str],
-        buying_code: str,
-        buying_issuer: Optional[str],
+        selling: Asset,
+        buying: Asset,
         amount: Union[str, Decimal],
-        price: Union[str, Decimal, Price],
+        price: Union[Price, str, Decimal],
         offer_id: int = 0,
         source: Optional[Union[MuxedAccount, str]] = None,
     ) -> "TransactionBuilder":
         """Append a :class:`ManageBuyOffer <stellar_sdk.operation.ManageBuyOffer>`
         operation to the list of operations.
 
-        :param selling_code: The asset code for the asset the offer creator
-            is selling.
-        :param selling_issuer: The issuing address for the asset the offer
-            creator is selling.
-        :param buying_code: The asset code for the asset the offer creator
-            is buying.
-        :param buying_issuer: The issuing address for the asset the offer
-            creator is buying.
-        :param amount: Amount being bought. if set to. Set to ``"0"`` if you want
-            to delete an existing offer.
+        :param selling: What you're selling.
+        :param buying: What you're buying.
+        :param amount: Amount being bought. if set to ``0``, delete the offer.
         :param price: Price of thing being bought in terms of what you are selling.
-        :param offer_id: The ID of the offer. ``"0"`` for new offer. Set to
-            existing offer ID to update or delete.
-        :param source: The source address that is managing a buying offer on
-            Stellar's distributed exchange.
+        :param offer_id: If ``0``, will create a new offer (default). Otherwise,
+            edits an existing offer.
+        :param source: The source account for the operation. Defaults to the transaction's source account.
         :return: This builder instance.
-
         """
-        selling = Asset(selling_code, selling_issuer)
-        buying = Asset(buying_code, buying_issuer)
+
         op = ManageBuyOffer(
             selling=selling,
             buying=buying,
@@ -696,38 +638,26 @@ class TransactionBuilder:
 
     def append_manage_sell_offer_op(
         self,
-        selling_code: str,
-        selling_issuer: Optional[str],
-        buying_code: str,
-        buying_issuer: Optional[str],
+        selling: Asset,
+        buying: Asset,
         amount: Union[str, Decimal],
-        price: Union[str, Price, Decimal],
+        price: Union[Price, str, Decimal],
         offer_id: int = 0,
         source: Optional[Union[MuxedAccount, str]] = None,
     ) -> "TransactionBuilder":
         """Append a :class:`ManageSellOffer <stellar_sdk.operation.ManageSellOffer>`
         operation to the list of operations.
 
-        :param selling_code: The asset code for the asset the offer creator
-            is selling.
-        :param selling_issuer: The issuing address for the asset the offer
-            creator is selling.
-        :param buying_code: The asset code for the asset the offer creator
-            is buying.
-        :param buying_issuer: The issuing address for the asset the offer
-            creator is buying.
-        :param amount: Amount of the asset being sold. Set to ``"0"`` if you want
-            to delete an existing offer.
-        :param price: Price of 1 unit of selling in terms of buying.
-        :param offer_id: The ID of the offer. ``"0"`` for new offer. Set to
-            existing offer ID to update or delete.
-        :param source: The source address that is managing an offer on
-            Stellar's distributed exchange.
+        :param selling: What you're selling.
+        :param buying: What you're buying.
+        :param amount: The total amount you're selling. If ``0``, deletes the offer.
+        :param price: Price of 1 unit of `selling` in terms of `buying`.
+        :param offer_id: If ``0``, will create a new offer (default). Otherwise,
+            edits an existing offer.
+        :param source: The source account for the operation. Defaults to the transaction's source account.
         :return: This builder instance.
-
         """
-        selling = Asset(selling_code, selling_issuer)
-        buying = Asset(buying_code, buying_issuer)
+
         op = ManageSellOffer(
             selling=selling,
             buying=buying,
@@ -740,37 +670,24 @@ class TransactionBuilder:
 
     def append_create_passive_sell_offer_op(
         self,
-        selling_code: str,
-        selling_issuer: Optional[str],
-        buying_code: str,
-        buying_issuer: Optional[str],
+        selling: Asset,
+        buying: Asset,
         amount: Union[str, Decimal],
-        price: Union[str, Price, Decimal],
+        price: Union[Price, str, Decimal],
         source: Optional[Union[MuxedAccount, str]] = None,
     ) -> "TransactionBuilder":
         """Append a :class:`CreatePassiveSellOffer
         <stellar_sdk.operation.CreatePassiveSellOffer>` operation to the list of
         operations.
 
-        :param selling_code: The asset code for the asset the offer creator
-            is selling.
-        :param selling_issuer: The issuing address for the asset the offer
-            creator is selling.
-        :param buying_code: The asset code for the asset the offer creator
-            is buying.
-        :param buying_issuer: The issuing address for the asset the offer
-            creator is buying.
-        :param amount: Amount of the asset being sold. Set to 0 if you want
-            to delete an existing offer.
-        :param price: Price of 1 unit of selling in terms of buying.
-        :param source: The source address that is creating a passive offer
-            on Stellar's distributed exchange.
+        :param selling: What you're selling.
+        :param buying: What you're buying.
+        :param amount: The total amount you're selling. If 0, deletes the offer.
+        :param price: Price of 1 unit of `selling` in terms of `buying`.
+        :param source: The source account for the operation. Defaults to the transaction's source account.
         :return: This builder instance.
-
         """
 
-        selling = Asset(selling_code, selling_issuer)
-        buying = Asset(buying_code, buying_issuer)
         op = CreatePassiveSellOffer(selling, buying, amount, price, source)
         return self.append_operation(op)
 
@@ -902,7 +819,7 @@ class TransactionBuilder:
     def append_revoke_account_sponsorship_op(
         self, account_id: str, source: Optional[Union[MuxedAccount, str]] = None
     ) -> "TransactionBuilder":
-        """Append a :class:`EndSponsoringFutureReserves <stellar_sdk.operation.EndSponsoringFutureReserves>` operation
+        """Append a :class:`RevokeSponsorship <stellar_sdk.operation.RevokeSponsorship>` operation
         for an account to the list of operations.
 
         :param account_id: The sponsored account ID.
@@ -918,7 +835,7 @@ class TransactionBuilder:
         asset: Union[Asset, LiquidityPoolId],
         source: Optional[Union[MuxedAccount, str]] = None,
     ) -> "TransactionBuilder":
-        """Append a :class:`EndSponsoringFutureReserves <stellar_sdk.operation.EndSponsoringFutureReserves>` operation
+        """Append a :class:`RevokeSponsorship <stellar_sdk.operation.RevokeSponsorship>` operation
         for a trustline to the list of operations.
 
         :param account_id: The account ID which owns the trustline.
@@ -935,7 +852,7 @@ class TransactionBuilder:
         offer_id: int,
         source: Optional[Union[MuxedAccount, str]] = None,
     ) -> "TransactionBuilder":
-        """Append a :class:`EndSponsoringFutureReserves <stellar_sdk.operation.EndSponsoringFutureReserves>` operation
+        """Append a :class:`RevokeSponsorship <stellar_sdk.operation.RevokeSponsorship>` operation
         for an offer to the list of operations.
 
         :param seller_id: The account ID which created the offer.
@@ -952,7 +869,7 @@ class TransactionBuilder:
         data_name: str,
         source: Optional[Union[MuxedAccount, str]] = None,
     ) -> "TransactionBuilder":
-        """Append a :class:`EndSponsoringFutureReserves <stellar_sdk.operation.EndSponsoringFutureReserves>` operation
+        """Append a :class:`RevokeSponsorship <stellar_sdk.operation.RevokeSponsorship>` operation
         for a data entry to the list of operations.
 
         :param account_id: The account ID which owns the data entry.
@@ -968,7 +885,7 @@ class TransactionBuilder:
         claimable_balance_id: str,
         source: Optional[Union[MuxedAccount, str]] = None,
     ) -> "TransactionBuilder":
-        """Append a :class:`EndSponsoringFutureReserves <stellar_sdk.operation.EndSponsoringFutureReserves>` operation
+        """Append a :class:`RevokeSponsorship <stellar_sdk.operation.RevokeSponsorship>` operation
         for a claimable to the list of operations.
 
         :param claimable_balance_id: The sponsored claimable balance ID.
@@ -985,7 +902,7 @@ class TransactionBuilder:
         liquidity_pool_id: str,
         source: Optional[Union[MuxedAccount, str]] = None,
     ) -> "TransactionBuilder":
-        """Append a :class:`EndSponsoringFutureReserves <stellar_sdk.operation.EndSponsoringFutureReserves>` operation
+        """Append a :class:`RevokeSponsorship <stellar_sdk.operation.RevokeSponsorship>` operation
         for a claimable to the list of operations.
 
         :param liquidity_pool_id: The sponsored liquidity pool ID in hex string.
@@ -999,18 +916,21 @@ class TransactionBuilder:
 
     def append_revoke_ed25519_public_key_signer_sponsorship_op(
         self,
-        account_id: str,
+        account_id: Union[bytes, str],
         signer_key: str,
         source: Optional[Union[MuxedAccount, str]] = None,
     ) -> "TransactionBuilder":
-        """Append a :class:`EndSponsoringFutureReserves <stellar_sdk.operation.EndSponsoringFutureReserves>` operation
+        """Append a :class:`RevokeSponsorship <stellar_sdk.operation.RevokeSponsorship>` operation
         for a ed25519_public_key signer to the list of operations.
 
         :param account_id: The account ID where the signer sponsorship is being removed from.
         :param signer_key: The account id of the ed25519_public_key signer.
+            (ex. ``"GDNA2V62PVEFBZ74CDJKTUHLY4Y7PL5UAV2MAM4VWF6USFE3SH2354AD"``)
         :param source: The source account for the operation. Defaults to the transaction's source account.
         :return: This builder instance.
         """
+        if isinstance(signer_key, str) and is_valid_hash(signer_key):
+            signer_key = hex_to_bytes(signer_key)
         key = SignerKey.ed25519_public_key(signer_key)
         op = RevokeSponsorship.revoke_signer_sponsorship(account_id, key, source)
         return self.append_operation(op)
@@ -1021,15 +941,19 @@ class TransactionBuilder:
         signer_key: Union[bytes, str],
         source: Optional[Union[MuxedAccount, str]] = None,
     ) -> "TransactionBuilder":
-        """Append a :class:`EndSponsoringFutureReserves <stellar_sdk.operation.EndSponsoringFutureReserves>` operation
+        """Append a :class:`RevokeSponsorship <stellar_sdk.operation.RevokeSponsorship>` operation
         for a hashx signer to the list of operations.
 
         :param account_id: The account ID where the signer sponsorship is being removed from.
         :param signer_key: The account id of the hashx signer.
+            (ex. ``"XDNA2V62PVEFBZ74CDJKTUHLY4Y7PL5UAV2MAM4VWF6USFE3SH235FXL"``,
+            ``"da0d57da7d4850e7fc10d2a9d0ebc731f7afb40574c03395b17d49149b91f5be"`` or bytes)
         :param source: The source account for the operation. Defaults to the transaction's source account.
         :return: This builder instance.
         """
-        key = SignerKey.sha256_hash(hex_to_bytes(signer_key))
+        if isinstance(signer_key, str) and is_valid_hash(signer_key):
+            signer_key = hex_to_bytes(signer_key)
+        key = SignerKey.sha256_hash(signer_key)
         op = RevokeSponsorship.revoke_signer_sponsorship(account_id, key, source)
         return self.append_operation(op)
 
@@ -1039,15 +963,19 @@ class TransactionBuilder:
         signer_key: Union[bytes, str],
         source: Optional[Union[MuxedAccount, str]] = None,
     ) -> "TransactionBuilder":
-        """Append a :class:`EndSponsoringFutureReserves <stellar_sdk.operation.EndSponsoringFutureReserves>` operation
+        """Append a :class:`RevokeSponsorship <stellar_sdk.operation.RevokeSponsorship>` operation
         for a pre_auth_tx signer to the list of operations.
 
         :param account_id: The account ID where the signer sponsorship is being removed from.
         :param signer_key: The account id of the pre_auth_tx signer.
+            (ex. ``"TDNA2V62PVEFBZ74CDJKTUHLY4Y7PL5UAV2MAM4VWF6USFE3SH234BSS"``,
+            ``"da0d57da7d4850e7fc10d2a9d0ebc731f7afb40574c03395b17d49149b91f5be"`` or bytes)
         :param source: The source account for the operation. Defaults to the transaction's source account.
         :return: This builder instance.
         """
-        key = SignerKey.pre_auth_tx(hex_to_bytes(signer_key))
+        if isinstance(signer_key, str) and is_valid_hash(signer_key):
+            signer_key = hex_to_bytes(signer_key)
+        key = SignerKey.pre_auth_tx(signer_key)
         op = RevokeSponsorship.revoke_signer_sponsorship(account_id, key, source)
         return self.append_operation(op)
 
