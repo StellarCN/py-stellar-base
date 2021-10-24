@@ -36,7 +36,7 @@ transaction1 = (
         network_passphrase=network_passphrase,
         base_fee=100,
     )
-    .append_change_trust_liquidity_pool_asset_op(liquidity_pool_asset)
+    .append_change_trust_op(liquidity_pool_asset)
     .set_timeout(30)
     .build()
 )

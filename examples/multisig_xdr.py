@@ -4,7 +4,7 @@ send 100 XLM from the escrow account to Eve, the following code shows how to ach
 
 I recommend that you check the `./set_up_multisig_account.py` before reading this example.
 """
-from stellar_sdk import Network, Server, TransactionBuilder, TransactionEnvelope
+from stellar_sdk import Network, Server, TransactionBuilder, TransactionEnvelope, Asset
 
 escrow_public = "GD7ZZHKFKFPV2KR6JPE5L6QOZ43LV6HBJWLITCC73V6R7YFERSAITE4S"
 alice_secret = "SDKE26TSKMJDWPTWMA5YJYSIA6VQ5QNBUS5VEUR7P6NY4F7ITL7ZILQG"
@@ -24,7 +24,7 @@ transaction = (
         base_fee=base_fee,
     )
     .add_text_memo("Hello, Stellar!")
-    .append_payment_op(eve_public, "100", "XLM")
+    .append_payment_op(eve_public, Asset.native(), "100")
     .set_timeout(30)
     .build()
 )
