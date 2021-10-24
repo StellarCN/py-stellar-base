@@ -47,7 +47,7 @@ class TransactionBuilder:
     An example::
 
         # Alice pay 10.25 XLM to Bob
-        from stellar_sdk import Server, Keypair, TransactionBuilder, Network
+        from stellar_sdk import Server, Asset, Keypair, TransactionBuilder, Network
 
         alice_keypair = Keypair.from_secret("SBFZCHU5645DOKRWYBXVOXY2ELGJKFRX6VGGPRYUWHQ7PMXXJNDZFMKD")
         bob_address = "GA7YNBW5CBTJZ3ZZOWX3ZNBKD6OE7A7IHUQVWMY62W2ZBG2SGZVOOPVH"
@@ -62,7 +62,7 @@ class TransactionBuilder:
                 base_fee=base_fee,
             )
                 .add_text_memo("Hello, Stellar!")
-                .append_payment_op(bob_address, "10.25", "XLM")
+                .append_payment_op(bob_address, Asset.native(), "10.25")
                 .build()
         )
         transaction.sign(alice_keypair)
