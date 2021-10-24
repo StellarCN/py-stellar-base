@@ -535,7 +535,7 @@ class TransactionBuilder:
 
     def append_ed25519_public_key_signer(
         self,
-        account_id: Union[str, bytes],
+        account_id: str,
         weight: int,
         source: Optional[Union[MuxedAccount, str]] = None,
     ) -> "TransactionBuilder":
@@ -550,8 +550,6 @@ class TransactionBuilder:
             list of signers.
         :return: This builder instance.
         """
-        if isinstance(account_id, str) and is_valid_hash(account_id):
-            account_id = hex_to_bytes(account_id)
         signer = Signer.ed25519_public_key(account_id=account_id, weight=weight)
         return self.append_set_options_op(signer=signer, source=source)
 
@@ -917,7 +915,7 @@ class TransactionBuilder:
     def append_revoke_ed25519_public_key_signer_sponsorship_op(
         self,
         account_id: str,
-        signer_key: Union[bytes, str],
+        signer_key: str,
         source: Optional[Union[MuxedAccount, str]] = None,
     ) -> "TransactionBuilder":
         """Append a :class:`RevokeSponsorship <stellar_sdk.operation.RevokeSponsorship>` operation
@@ -929,8 +927,6 @@ class TransactionBuilder:
         :param source: The source account for the operation. Defaults to the transaction's source account.
         :return: This builder instance.
         """
-        if isinstance(signer_key, str) and is_valid_hash(signer_key):
-            signer_key = hex_to_bytes(signer_key)
         key = SignerKey.ed25519_public_key(signer_key)
         op = RevokeSponsorship.revoke_signer_sponsorship(account_id, key, source)
         return self.append_operation(op)
