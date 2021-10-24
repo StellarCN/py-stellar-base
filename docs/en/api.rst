@@ -664,8 +664,10 @@ Exceptions
 .. autoclass:: stellar_sdk.sep.exceptions.InvalidSep10ChallengeError
 .. autoclass:: stellar_sdk.sep.exceptions.AccountRequiresMemoError
 
-XDR
-^^^
+.. _stellar_sdk_xdr:
+
+stellar_sdk.xdr
+^^^^^^^^^^^^^^^
 
 AccountEntry
 ------------
