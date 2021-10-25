@@ -55,7 +55,7 @@ Installing
 
 .. code-block:: text
 
-    pip install stellar-sdk==5.0.0
+    pip install stellar-sdk==6.0.0b0
 
 
 A Simple Example
