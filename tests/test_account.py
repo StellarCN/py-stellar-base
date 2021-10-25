@@ -96,3 +96,27 @@ class TestAccount:
             match="Invalid Ed25519 Public Key: {}".format(invalid_account_id),
         ):
             Account(invalid_account_id, 0)
+
+    def test_thresholds_without_raw_data(self):
+        account_id = "GA7YNBW5CBTJZ3ZZOWX3ZNBKD6OE7A7IHUQVWMY62W2ZBG2SGZVOOPVH"
+        sequence = 123123
+        account = Account(
+            account=account_id, sequence=sequence
+        )
+        with pytest.raises(
+            ValueError,
+            match='"raw_data" is None, unable to get thresholds from it.',
+        ):
+            _ = account.thresholds
+
+    def test_load_ed25519_public_key_signers_without_raw_data(self):
+        account_id = "GA7YNBW5CBTJZ3ZZOWX3ZNBKD6OE7A7IHUQVWMY62W2ZBG2SGZVOOPVH"
+        sequence = 123123
+        account = Account(
+            account=account_id, sequence=sequence
+        )
+        with pytest.raises(
+            ValueError,
+            match='"raw_data" is None, unable to get signers from it.',
+        ):
+            account.load_ed25519_public_key_signers()
