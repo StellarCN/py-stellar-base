@@ -6,12 +6,7 @@ from typing import Dict, List, Optional, Union
 from urllib.parse import urlsplit, urlunsplit
 
 from .asset import Asset
-from .exceptions import (
-    Ed25519PublicKeyInvalidError,
-    NoApproximationError,
-    TypeError,
-    ValueError,
-)
+from .exceptions import Ed25519PublicKeyInvalidError, NoApproximationError, ValueError
 from .strkey import StrKey
 from .type_checked import type_checked
 
@@ -56,11 +51,9 @@ def best_rational_approximation(x) -> Dict[str, int]:
 
 @type_checked
 def hex_to_bytes(hex_string: Union[str, bytes]) -> bytes:
-    if isinstance(hex_string, bytes):
-        return hex_string
     if isinstance(hex_string, str):
         return bytes.fromhex(hex_string)
-    raise TypeError("`hex_string` should be a 32 byte hash or hex encoded string.")
+    return hex_string
 
 
 @type_checked
@@ -106,36 +99,6 @@ def raise_if_not_valid_ed25519_public_key(value: str, argument_name: str) -> Non
 
 
 @type_checked
-def raise_if_not_valid_sha256_hash_key(value: str, argument_name: str) -> None:
-    try:
-        StrKey.decode_sha256_hash(value)
-    except Exception as e:
-        raise ValueError(
-            f'Value of argument "{argument_name}" is not a valid sha256 hash key: {value}'
-        ) from e
-
-
-@type_checked
-def raise_if_not_valid_pre_auth_tx_key(value: str, argument_name: str) -> None:
-    try:
-        StrKey.decode_pre_auth_tx(value)
-    except Exception as e:
-        raise ValueError(
-            f'Value of argument "{argument_name}" is not a valid pre auth tx key: {value}'
-        ) from e
-
-
-@type_checked
-def raise_if_not_valid_muxed_account(value: str, argument_name: str) -> None:
-    try:
-        StrKey.decode_muxed_account(value)
-    except Exception as e:
-        raise ValueError(
-            f'Value of argument "{argument_name}" is not a valid muxed account: {value}'
-        ) from e
-
-
-@type_checked
 def raise_if_not_valid_amount(value: str, argument_name: str) -> None:
     amount = Decimal(value)
     if abs(amount.as_tuple().exponent) > _EXPONENT:
@@ -163,9 +126,3 @@ def raise_if_not_valid_balance_id(value: str, argument_name: str) -> None:
         raise ValueError(
             f'Value of argument "{argument_name}" is not a valid balance id: {value}'
         )
-
-
-@type_checked
-def raise_if_not_valid_operation_source(source: Optional[str]) -> None:
-    if source is not None:
-        raise_if_not_valid_muxed_account(source, "source")
