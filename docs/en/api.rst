@@ -294,18 +294,6 @@ SdkError
 .. autoclass:: stellar_sdk.exceptions.SdkError
    :members:
 
-ValueError
-----------
-
-.. autoclass:: stellar_sdk.exceptions.ValueError
-   :members:
-
-TypeError
----------
-
-.. autoclass:: stellar_sdk.exceptions.TypeError
-   :members:
-
 BadSignatureError
 -----------------
 
