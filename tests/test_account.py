@@ -14,6 +14,7 @@ class TestAccount:
         assert account.account == MuxedAccount(account_id, None)
         assert account.sequence == sequence
         assert account.account.account_id == account_id
+        assert account.universal_account_id == account_id
         other_account = Account(account=account_id, sequence=sequence)
         assert account == other_account
 
@@ -33,6 +34,7 @@ class TestAccount:
         assert account.sequence == sequence
         assert account.account == MuxedAccount(account_id, account_muxed_id)
         assert account.account.account_id == account_id
+        assert account.universal_account_id == account_muxed
         other_account = Account(account=account_muxed, sequence=sequence)
         assert account == other_account
 
