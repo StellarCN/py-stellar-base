@@ -111,7 +111,6 @@ class ServerAsync(BaseServer):
         else:
             account_id = account_id
         resp = await self.accounts().account_id(account_id=account_id.account_id).call()
-        assert isinstance(resp, dict)
         sequence = int(resp["sequence"])
         account = Account(account=account_id, sequence=sequence, raw_data=resp)
         return account
