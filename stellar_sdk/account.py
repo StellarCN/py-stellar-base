@@ -1,5 +1,4 @@
-import warnings
-from typing import List, Optional, Union
+from typing import Any, Dict, List, Optional, Union
 
 from .muxed_account import MuxedAccount
 from .sep.ed25519_public_key_signer import Ed25519PublicKeySigner
@@ -25,48 +24,73 @@ class Account:
 
         server = Server(horizon_url="https://horizon-testnet.stellar.org")
         source = Keypair.from_secret("SBFZCHU5645DOKRWYBXVOXY2ELGJKFRX6VGGPRYUWHQ7PMXXJNDZFMKD")
-        # account_id can also be a muxed account
-        source_account = server.load_account(account_id=source.public_key)
+        # `account` can also be a muxed account
+        source_account = server.load_Account(account=source.public_key)
 
     See `Accounts <https://developers.stellar.org/docs/glossary/accounts/>`__ for
     more information.
 
-    :param account_id: Account Id of the
+    :param account: Account Id of the
         account (ex. ``"GB3KJPLFUYN5VL6R3GU3EGCGVCKFDSD7BEDX42HWG5BWFKB3KQGJJRMA"``)
         or muxed account (ex. ``"MBZSQ3YZMZEWL5ZRCEQ5CCSOTXCFCMKDGFFP4IEQN2KN6LCHCLI46AAAAAAAAAAE2L2QE"``)
     :param sequence: Current sequence number of the account.
+    :param raw_data: Raw horizon response data.
     """
 
-    def __init__(self, account_id: Union[str, MuxedAccount], sequence: int) -> None:
-        if isinstance(account_id, str):
-            self.account: MuxedAccount = MuxedAccount.from_account(account_id)
+    def __init__(
+        self,
+        account: Union[str, MuxedAccount],
+        sequence: int,
+        raw_data: Dict[str, Any] = None,
+    ) -> None:
+        if isinstance(account, str):
+            self.account: MuxedAccount = MuxedAccount.from_account(account)
         else:
-            self.account = account_id
+            self.account = account
         self.sequence: int = sequence
+        self.raw_data: Optional[Dict[str, Any]] = raw_data
 
-        # The following properties will change in future
-        self.signers: List[dict] = []
-        self.thresholds: Optional[Thresholds] = None
+    @property
+    def universal_account_id(self) -> str:
+        """Get the universal account id,
+        if `account` is ed25519 public key, it will return ed25519
+        public key (ex. ``"GDGQVOKHW4VEJRU2TETD6DBRKEO5ERCNF353LW5WBFW3JJWQ2BRQ6KDD"``),
+        otherwise it will return muxed
+        account (ex. ``"MAAAAAAAAAAAJURAAB2X52XFQP6FBXLGT6LWOOWMEXWHEWBDVRZ7V5WH34Y22MPFBHUHY"``)
 
-    def account_id(self) -> str:
+        .. note::
+            SEP-0023 support is not enabled by default, if you want to enable it,
+            please set `ENABLE_SEP_0023` to ``true`` in the environment variable,
+            on Linux and MacOS, generally you can use ``export ENABLE_SEP_0023=true`` to set it.
+
+        :raises: :exc:`FeatureNotEnabledError <stellar_sdk.exceptions.FeatureNotEnabledError>`:
+            if `account_id` is a muxed account and `ENABLE_SEP_0023` is not set to ``true``.
         """
-        :returns: The network ID of the network.
-        """
-        warnings.warn(
-            "Will be removed in version v6.0.0, "
-            "use `stellar_sdk.account.Account.account` instead.",
-            DeprecationWarning,
-        )
-        return self.account.account_id
+        return self.account.universal_account_id
 
     def increment_sequence_number(self) -> None:
         """Increments sequence number in this object by one."""
         self.sequence += 1
 
+    @property
+    def thresholds(self):
+        if self.raw_data is None:
+            raise ValueError('"raw_data" is None, unable to get thresholds from it.')
+
+        return Thresholds(
+            self.raw_data["thresholds"]["low_threshold"],
+            self.raw_data["thresholds"]["med_threshold"],
+            self.raw_data["thresholds"]["high_threshold"],
+        )
+
     def load_ed25519_public_key_signers(self) -> List[Ed25519PublicKeySigner]:
-        """Load ed25519 public key signers, may change in 3.0."""
+        """Load ed25519 public key signers."""
+        if self.raw_data is None:
+            raise ValueError('"raw_data" is None, unable to get signers from it.')
+
+        signers = self.raw_data["signers"]
         ed25519_public_key_signers = []
-        for signer in self.signers:
+        for signer in signers:
             if signer["type"] == "ed25519_public_key":
                 ed25519_public_key_signers.append(
                     Ed25519PublicKeySigner(signer["key"], signer["weight"])
@@ -84,7 +108,9 @@ class Account:
 
 @type_checked
 class Thresholds:
-    def __init__(self, low_threshold: int, med_threshold: int, high_threshold: int):
+    def __init__(
+        self, low_threshold: int, med_threshold: int, high_threshold: int
+    ) -> None:
         self.low_threshold = low_threshold
         self.med_threshold = med_threshold
         self.high_threshold = high_threshold
