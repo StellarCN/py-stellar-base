@@ -34,7 +34,7 @@ class MuxedAccount:
         account_muxed = "MAQAA5L65LSYH7CQ3VTJ7F3HHLGCL3DSLAR2Y47263D56MNNGHSQSAAAAAAAAAAE2LP26"
 
         # generate account_muxed
-        muxed = MuxedAccount(account_id=account_id, account_muxed_id=1234)  # account_muxed_id is optional.
+        muxed = MuxedAccount(account=account_id, account_muxed_id=1234)  # account_muxed_id is optional.
         print(f"account_muxed: {muxed.account_muxed}")  # `account_muxed` returns ``None`` if `account_muxed_id` is ``None``.
 
         # parse account_muxed
@@ -65,6 +65,9 @@ class MuxedAccount:
             SEP-0023 support is not enabled by default, if you want to enable it,
             please set `ENABLE_SEP_0023` to ``true`` in the environment variable,
             on Linux and MacOS, generally you can use ``export ENABLE_SEP_0023=true`` to set it.
+
+        :raises: :exc:`FeatureNotEnabledError <stellar_sdk.exceptions.FeatureNotEnabledError>`:
+            if `ENABLE_SEP_0023` is not set to ``true``.
         """
         if not _sep_0023_enabled():
             raise FeatureNotEnabledError(
@@ -92,6 +95,27 @@ class MuxedAccount:
         raise AttributeError(
             "Can't set attribute, use `MuxedAccount.from_account` instead."
         )
+
+    @property
+    def universal_account_id(self) -> str:
+        """Get the universal account id,
+        if `account_muxed_id` is ``None``, it will return ed25519
+        public key (ex. ``"GDGQVOKHW4VEJRU2TETD6DBRKEO5ERCNF353LW5WBFW3JJWQ2BRQ6KDD"``),
+        otherwise it will return muxed
+        account (ex. ``"MAAAAAAAAAAAJURAAB2X52XFQP6FBXLGT6LWOOWMEXWHEWBDVRZ7V5WH34Y22MPFBHUHY"``)
+
+        .. note::
+            SEP-0023 support is not enabled by default, if you want to enable it,
+            please set `ENABLE_SEP_0023` to ``true`` in the environment variable,
+            on Linux and MacOS, generally you can use ``export ENABLE_SEP_0023=true`` to set it.
+
+        :raises: :exc:`FeatureNotEnabledError <stellar_sdk.exceptions.FeatureNotEnabledError>`:
+            if `account_muxed_id` is not ``None`` and `ENABLE_SEP_0023` is not set to ``true``.
+        """
+        if self.account_muxed_id is None:
+            return self.account_id
+        assert self.account_muxed is not None
+        return self.account_muxed
 
     @classmethod
     def from_account(cls, account: str) -> "MuxedAccount":

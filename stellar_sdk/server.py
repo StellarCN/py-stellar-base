@@ -1,6 +1,6 @@
 from typing import Any, Dict, List, Union
 
-from .account import Account, Thresholds
+from .account import Account
 from .asset import Asset
 from .base_server import BaseServer
 from .call_builder.call_builder_sync import *
@@ -109,14 +109,7 @@ class Server(BaseServer):
         resp = self.accounts().account_id(account_id=account_id.account_id).call()
         assert isinstance(resp, dict)
         sequence = int(resp["sequence"])
-        thresholds = Thresholds(
-            resp["thresholds"]["low_threshold"],
-            resp["thresholds"]["med_threshold"],
-            resp["thresholds"]["high_threshold"],
-        )
-        account = Account(account_id=account_id, sequence=sequence)
-        account.signers = resp["signers"]
-        account.thresholds = thresholds
+        account = Account(account=account_id, sequence=sequence, raw_data=resp)
         return account
 
     def __check_memo_required_sync(
