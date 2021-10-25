@@ -24,7 +24,7 @@ class Account:
 
         server = Server(horizon_url="https://horizon-testnet.stellar.org")
         source = Keypair.from_secret("SBFZCHU5645DOKRWYBXVOXY2ELGJKFRX6VGGPRYUWHQ7PMXXJNDZFMKD")
-        # account_id can also be a muxed account
+        # `account` can also be a muxed account
         source_account = server.load_Account(account=source.public_key)
 
     See `Accounts <https://developers.stellar.org/docs/glossary/accounts/>`__ for
