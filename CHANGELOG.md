@@ -1,6 +1,16 @@
 Release History
 ==============
 
+### Version 6.0.0-beta1
+Released on October 26, 2021
+
+**This update includes breaking changes.**
+**This is a pre-release version, please do not use it in production.**
+
+#### Breaking changes
+
+- refactor: the client's `USER_AGENT` and `IDENTIFICATION_HEADERS` are changed to "py-stellar-base" ([#550](https://github.com/StellarCN/py-stellar-base/pull/550))
+
 ### Version 6.0.0-beta0
 Released on October 25, 2021
 
