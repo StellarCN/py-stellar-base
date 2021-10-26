@@ -17,9 +17,9 @@ logger = logging.getLogger(__name__)
 
 DEFAULT_NUM_RETRIES = 3
 DEFAULT_BACKOFF_FACTOR = 0.5
-USER_AGENT = f"py-stellar-sdk/{__version__}/AiohttpClient"
+USER_AGENT = f"py-stellar-base/{__version__}/AiohttpClient"
 IDENTIFICATION_HEADERS = {
-    "X-Client-Name": "py-stellar-sdk",
+    "X-Client-Name": "py-stellar-base",
     "X-Client-Version": __version__,
 }
 
