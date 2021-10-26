@@ -17,9 +17,9 @@ from . import defines
 
 DEFAULT_NUM_RETRIES = 3
 DEFAULT_BACKOFF_FACTOR = 0.5
-USER_AGENT = f"py-stellar-sdk/{__version__}/RequestsClient"
+USER_AGENT = f"py-stellar-base/{__version__}/RequestsClient"
 IDENTIFICATION_HEADERS = {
-    "X-Client-Name": "py-stellar-sdk",
+    "X-Client-Name": "py-stellar-base",
     "X-Client-Version": __version__,
 }
 

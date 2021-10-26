@@ -23,8 +23,8 @@ class TestBaseCallBuilder:
         assert resp["args"] == {"cursor": "89777", "limit": "25", "order": "asc"}
         assert resp["headers"][
             "User-Agent"
-        ] == "py-stellar-sdk/{}/AiohttpClient".format(__version__)
-        assert resp["headers"]["X-Client-Name"] == "py-stellar-sdk"
+        ] == "py-stellar-base/{}/AiohttpClient".format(__version__)
+        assert resp["headers"]["X-Client-Name"] == "py-stellar-base"
         assert resp["headers"]["X-Client-Version"] == __version__
         assert (
             resp["url"]
@@ -175,8 +175,8 @@ class TestBaseCallBuilder:
         }
         assert resp["headers"][
             "User-Agent"
-        ] == "py-stellar-sdk/{}/AiohttpClient".format(__version__)
-        assert resp["headers"]["X-Client-Name"] == "py-stellar-sdk"
+        ] == "py-stellar-base/{}/AiohttpClient".format(__version__)
+        assert resp["headers"]["X-Client-Name"] == "py-stellar-base"
         assert resp["headers"]["X-Client-Version"] == __version__
         assert (
             resp["url"]

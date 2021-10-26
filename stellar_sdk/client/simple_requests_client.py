@@ -9,9 +9,9 @@ from ..client.response import Response
 from ..type_checked import type_checked
 from .base_sync_client import BaseSyncClient
 
-USER_AGENT = f"py-stellar-sdk/{__version__}/SimpleRequestsClient"
+USER_AGENT = f"py-stellar-base/{__version__}/SimpleRequestsClient"
 HEADERS = {
-    "X-Client-Name": "py-stellar-sdk",
+    "X-Client-Name": "py-stellar-base",
     "X-Client-Version": __version__,
     "User-Agent": USER_AGENT,
 }
