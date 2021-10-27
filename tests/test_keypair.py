@@ -130,7 +130,7 @@ class TestKeypair:
             ("SAMWF63FZ5ZNHY75SNYNAFMWTL5FPBMIV7DLB3UDAVLL7DKPI5ZFS2S6", "091e5da1"),
         ],
     )
-    def test_signature_hint(self, secret, hint):
+    def test_signature_hint_with_secret(self, secret, hint):
         assert Keypair.from_secret(secret).signature_hint().hex() == hint
 
     def test_get_key_of_expected_type(self):
@@ -172,7 +172,7 @@ class TestKeypair:
             ),
         ],
     )
-    def test_signature_hint(self, public_key, hint):
+    def test_signature_hint_with_secret_with_public_key(self, public_key, hint):
         assert Keypair.from_public_key(public_key).signature_hint() == hint
 
     def test_set_keypair_raise(self):

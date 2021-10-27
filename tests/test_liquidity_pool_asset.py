@@ -37,7 +37,7 @@ class TestLiquidityPoolAsset:
             (asset_a, asset_b, fee + 10, "`fee` is invalid."),
         ],
     )
-    def test_init_type_error_raise(self, asset_a, asset_b, fee, msg):
+    def test_init_value_error_raise(self, asset_a, asset_b, fee, msg):
         with pytest.raises(ValueError, match=msg):
             LiquidityPoolAsset(asset_a, asset_b, fee)
 
