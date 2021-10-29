@@ -41,12 +41,8 @@ class Keypair:
     def __init__(
         self, verify_key: ed25519.VerifyKey, signing_key: ed25519.SigningKey = None
     ) -> None:
-        self.verify_key: ed25519.VerifyKey = _get_key_of_expected_type(
-            verify_key, ed25519.VerifyKey
-        )
-        self.signing_key: ed25519.SigningKey = _get_key_of_expected_type(
-            signing_key, ed25519.SigningKey
-        )
+        self.verify_key: ed25519.VerifyKey = verify_key
+        self.signing_key: ed25519.SigningKey = signing_key
 
     @classmethod
     def random(cls) -> "Keypair":
@@ -280,12 +276,3 @@ class Keypair:
 
     def __str__(self):
         return f"<Keypair [public_key={self.public_key}, private_key_exists={self.can_sign()}]>"
-
-
-# TODO: remove this
-def _get_key_of_expected_type(key: Any, expected_type: Any) -> Any:
-    if key is not None and not isinstance(key, expected_type):
-        raise TypeError(
-            f"The given key_type={type(key)} is not of type {expected_type}."
-        )
-    return key
