@@ -117,8 +117,11 @@ class FeeBumpTransactionEnvelope(BaseTransactionEnvelope["FeeBumpTransactionEnve
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
             return NotImplemented  # pragma: no cover
-        # TODO: fix it.
-        return self.to_xdr_object() == other.to_xdr_object()
+        return (
+            self.transaction == other.transaction
+            and self.network_passphrase == other.network_passphrase
+            and self.signatures == other.signatures
+        )
 
     def __str__(self):
         return (

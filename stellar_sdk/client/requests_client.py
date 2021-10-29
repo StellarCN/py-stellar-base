@@ -40,7 +40,7 @@ class RequestsClient(BaseSyncClient):
     :param stream_session: the stream request session
     """
 
-    # TODO: Custom user agent.
+    # TODO: need to allow the user to customize the user agent?
     def __init__(
         self,
         pool_size: int = DEFAULT_POOLSIZE,
