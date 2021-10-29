@@ -1,6 +1,16 @@
 Release History
 ==============
 
+### Version 6.0.0-beta2
+Released on October 29, 2021
+
+**This is a pre-release version, please do not use it in production.**
+
+#### Update
+
+- Improve documentation.
+- refactor: optimize the implementation of StrKey. ([#551](https://github.com/StellarCN/py-stellar-base/pull/551))
+
 ### Version 6.0.0-beta1
 Released on October 26, 2021
 
