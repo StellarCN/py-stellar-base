@@ -28,6 +28,7 @@ from .server import *
 from .server_async import *
 from .signer import *
 from .signer_key import *
+from .strkey import *
 from .time_bounds import *
 from .transaction import *
 from .transaction_builder import *
