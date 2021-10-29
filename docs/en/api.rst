@@ -660,6 +660,13 @@ SignerKey
 .. autoclass:: stellar_sdk.signer_key.SignerKeyType
    :members:
 
+StrKey
+^^^^^^
+
+.. autoclass:: stellar_sdk.strkey.StrKey
+   :members:
+   :inherited-members:
+
 TimeBounds
 ^^^^^^^^^^
 
