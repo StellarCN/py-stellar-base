@@ -44,7 +44,7 @@ class ManageData(Operation):
         data_name: str,
         data_value: Union[str, bytes, None],
         source: Optional[Union[MuxedAccount, str]] = None,
-    ) -> None:  # TODO: bytes only?
+    ) -> None:
         super().__init__(source)
         self.data_name: str = data_name
         if isinstance(data_value, str):
@@ -79,7 +79,6 @@ class ManageData(Operation):
         """
         source = Operation.get_source_from_xdr_obj(xdr_object)
         assert xdr_object.body.manage_data_op is not None
-        # TODO: should we decode it?
         data_name = xdr_object.body.manage_data_op.data_name.string64.decode()
         data_value_xdr = xdr_object.body.manage_data_op.data_value
         data_value = None if data_value_xdr is None else data_value_xdr.data_value

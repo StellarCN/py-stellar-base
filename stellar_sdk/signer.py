@@ -33,7 +33,7 @@ class Signer:
     def ed25519_public_key(cls, account_id: Union[str, bytes], weight: int) -> "Signer":
         """Create ED25519 PUBLIC KEY Signer from account id.
 
-        :param account_id: account id
+        :param account_id: account id (ex. ``"GDNA2V62PVEFBZ74CDJKTUHLY4Y7PL5UAV2MAM4VWF6USFE3SH2354AD"``)
         :param weight: The weight of the signer (0 to delete or 1-255)
         :return: ED25519 PUBLIC KEY Signer
         :raises:
@@ -44,12 +44,12 @@ class Signer:
         return cls(signer_key, weight)
 
     @classmethod
-    # TODO: add encoded strkey support
     def pre_auth_tx(cls, pre_auth_tx_hash: Union[str, bytes], weight: int) -> "Signer":
         """Create Pre AUTH TX Signer from the sha256 hash of a transaction,
         click `here <https://developers.stellar.org/docs/glossary/multisig/#pre-authorized-transaction>`__ for more information.
 
-        :param pre_auth_tx_hash: The sha256 hash of a transaction.
+        :param pre_auth_tx_hash: The sha256 hash of a transaction
+            (ex. ``"TDNA2V62PVEFBZ74CDJKTUHLY4Y7PL5UAV2MAM4VWF6USFE3SH234BSS"`` or bytes)
         :param weight: The weight of the signer (0 to delete or 1-255)
         :return: Pre AUTH TX Signer
         """
@@ -57,12 +57,12 @@ class Signer:
         return cls(signer_key, weight)
 
     @classmethod
-    # TODO: add encoded strkey support
     def sha256_hash(cls, sha256_hash: Union[str, bytes], weight: int) -> "Signer":
         """Create SHA256 HASH Signer from a sha256 hash of a preimage,
         click `here <https://developers.stellar.org/docs/glossary/multisig/#hashx>`__ for more information.
 
         :param sha256_hash: a sha256 hash of a preimage
+            (ex. ``"XDNA2V62PVEFBZ74CDJKTUHLY4Y7PL5UAV2MAM4VWF6USFE3SH235FXL"`` or bytes)
         :param weight: The weight of the signer (0 to delete or 1-255)
         :return: SHA256 HASH Signer
         """
