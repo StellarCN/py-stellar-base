@@ -119,7 +119,6 @@ Building transaction with synchronous server
                 .append_payment_op(bob_address, Asset.native(), "10.25")
                 .build()
             )
-
             transaction.sign(alice_keypair)
             response = await server.submit_transaction(transaction)
             print(response)
@@ -137,7 +136,7 @@ Links
 -----
 * Document: https://stellar-sdk.readthedocs.io
 * Code: https://github.com/StellarCN/py-stellar-base
-* Examples: https://github.com/StellarCN/py-stellar-base/tree/dev/examples
+* Examples: https://github.com/StellarCN/py-stellar-base/tree/master/examples
 * Issue tracker: https://github.com/StellarCN/py-stellar-base/issues
 * License: `Apache License 2.0 <https://github.com/StellarCN/py-stellar-base/blob/master/LICENSE>`_
 * Releases: https://pypi.org/project/stellar-sdk/
