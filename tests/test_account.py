@@ -137,7 +137,7 @@ class TestAccount:
         ):
             account.load_ed25519_public_key_signers()
 
-    def test_equal(self):
+    def test_equals(self):
         account1 = Account(
             account="GA7YNBW5CBTJZ3ZZOWX3ZNBKD6OE7A7IHUQVWMY62W2ZBG2SGZVOOPVH",
             sequence=123123,
