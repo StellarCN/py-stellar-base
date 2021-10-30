@@ -1,17 +1,12 @@
 import os
-from typing import Any, Union
+from typing import Union
 
 import nacl.signing as ed25519
 from nacl.exceptions import BadSignatureError as NaclBadSignatureError
 
 from . import xdr as stellar_xdr
 from .decorated_signature import DecoratedSignature
-from .exceptions import (
-    AttributeError,
-    BadSignatureError,
-    MissingEd25519SecretSeedError,
-    TypeError,
-)
+from .exceptions import AttributeError, BadSignatureError, MissingEd25519SecretSeedError
 from .sep.mnemonic import Language, StellarMnemonic
 from .strkey import StrKey
 from .type_checked import type_checked
@@ -108,10 +103,10 @@ class Keypair:
         """
         if not self.signing_key:
             raise MissingEd25519SecretSeedError(
-                "The keypair does not contain secret seed. Use Keypair.from_secret "
+                "The keypair does not contain secret seed. Use Keypair.from_secret, "
                 "Keypair.random or Keypair.from_mnemonic_phrase to create a new keypair with a secret seed."
             )
-
+        # return None is a better approach
         return StrKey.encode_ed25519_secret_seed(self.raw_secret_key())
 
     @secret.setter
@@ -193,8 +188,8 @@ class Keypair:
         """
         if not self.can_sign():
             raise MissingEd25519SecretSeedError(
-                "The keypair does not contain secret seed. Use Keypair.from_secret or "
-                "Keypair.random to create a new keypair with a secret seed."
+                "The keypair does not contain secret seed. Use Keypair.from_secret, "
+                "Keypair.random or Keypair.from_mnemonic_phrase to create a new keypair with a secret seed."
             )
         return self.signing_key.sign(data).signature
 
@@ -214,7 +209,7 @@ class Keypair:
     @staticmethod
     def generate_mnemonic_phrase(
         language: Union[Language, str] = Language.ENGLISH, strength: int = 128
-    ):
+    ) -> str:
         """Generate a mnemonic phrase.
 
         :param language: The language of the mnemonic phrase, defaults to english.
@@ -232,7 +227,7 @@ class Keypair:
         language: Union[Language, str] = Language.ENGLISH,
         passphrase: str = "",
         index: int = 0,
-    ):
+    ) -> "Keypair":
         """Generate a :class:`Keypair` object via a mnemonic
         phrase.
 
@@ -256,7 +251,7 @@ class Keypair:
         )
         return cls.from_raw_ed25519_seed(raw_ed25519_seed)
 
-    def sign_decorated(self, data) -> DecoratedSignature:
+    def sign_decorated(self, data: bytes) -> DecoratedSignature:
         """Sign the provided data with the keypair's private key and returns DecoratedSignature.
 
         :param data: signed bytes

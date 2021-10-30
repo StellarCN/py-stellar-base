@@ -103,7 +103,7 @@ class TestAccount:
         invalid_account_id = "GA7YNBW5CBTJZ3ZZOWX3ZNBKD6OE7A7IHUQVWMY62W2ZBG2SGZVOOBAD"
         with pytest.raises(
             Ed25519PublicKeyInvalidError,
-            match="Invalid Ed25519 Public Key: {}".format(invalid_account_id),
+            match=f"Invalid Ed25519 Public Key: {invalid_account_id}",
         ):
             Account(invalid_account_id, 0)
 

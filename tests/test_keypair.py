@@ -1,6 +1,3 @@
-import os
-
-import nacl.signing as ed25519
 import pytest
 
 from stellar_sdk.exceptions import (
@@ -9,8 +6,6 @@ from stellar_sdk.exceptions import (
     Ed25519PublicKeyInvalidError,
     Ed25519SecretSeedInvalidError,
     MissingEd25519SecretSeedError,
-    TypeError,
-    ValueError,
 )
 from stellar_sdk.keypair import Keypair
 from stellar_sdk.sep.mnemonic import Language
@@ -24,6 +19,7 @@ class TestKeypair:
         secret = kp.secret
         assert StrKey.is_valid_ed25519_public_key(public_key)
         assert StrKey.is_valid_ed25519_secret_seed(secret)
+        assert kp.can_sign() is True
 
     def test_create_from_secret(self):
         secret = "SD7X7LEHBNMUIKQGKPARG5TDJNBHKC346OUARHGZL5ITC6IJPXHILY36"
@@ -95,7 +91,11 @@ class TestKeypair:
         can_not_sign_kp = Keypair.from_public_key(
             "GAXDYNIBA5E4DXR5TJN522RRYESFQ5UNUXHIPTFGVLLD5O5K552DF5ZH"
         )
-        with pytest.raises(MissingEd25519SecretSeedError):
+        with pytest.raises(
+            MissingEd25519SecretSeedError,
+            match="The keypair does not contain secret seed. Use Keypair.from_secret, "
+            "Keypair.random or Keypair.from_mnemonic_phrase to create a new keypair with a secret seed.",
+        ):
             can_not_sign_kp.sign(data)
 
     def test_sign_and_verify(self):
@@ -133,31 +133,25 @@ class TestKeypair:
     def test_signature_hint_with_secret(self, secret, hint):
         assert Keypair.from_secret(secret).signature_hint().hex() == hint
 
+    @pytest.mark.parametrize(
+        "public_key, hint",
+        [
+            ("GDFQVQCYYB7GKCGSCUSIQYXTPLV5YJ3XWDMWGQMDNM4EAXAL7LITIBQ7", "0bfad134"),
+            ("GD4UGX3TOGNPUOFHT64JR65P6CYIEGDOJKY234UGCNMB2ASKXBBZTAM6", "4ab84399"),
+            ("GBRF6PKZYP4J4WI2A3NF4CGF23SL34GRKA5LTQZCQFEUT2YJDZO2COXH", "091e5da1"),
+        ],
+    )
+    def test_signature_hint_with_public_key(self, public_key, hint):
+        assert Keypair.from_public_key(public_key).signature_hint().hex() == hint
+
     def test_read_secret_without_secret_raise(self):
         kp = Keypair.from_public_key(
             "GAXDYNIBA5E4DXR5TJN522RRYESFQ5UNUXHIPTFGVLLD5O5K552DF5ZH"
         )
         with pytest.raises(MissingEd25519SecretSeedError):
-            secret = kp.secret
+            _ = kp.secret
 
-    @pytest.mark.parametrize(
-        "public_key, hint",
-        [
-            ("GB5YIK5BE2T7ELODR7IN6K7YP4N7NWY7Y37HBJMTWEAOJ5KQI6KLWV6A", b"PG\x94\xbb"),
-            (
-                "GCLJXB3S2M2UD3NDQAKJE3NRQSSVJV4MPHQFPIOIQF4JYWEBSTFBHSAA",
-                b"\x81\x94\xca\x13",
-            ),
-            (
-                "GDKVZRQ4HZ3SKYJARIZABCFKVUZRVRZIWUN7KQYYQKEAR5GAIF7ZOLUK",
-                b"\xc0A\x7f\x97",
-            ),
-        ],
-    )
-    def test_signature_hint_with_secret_with_public_key(self, public_key, hint):
-        assert Keypair.from_public_key(public_key).signature_hint() == hint
-
-    def test_set_keypair_raise(self):
+    def test_set_keypair_secret_raise(self):
         secret = "SD7X7LEHBNMUIKQGKPARG5TDJNBHKC346OUARHGZL5ITC6IJPXHILY36"
         kp = Keypair.from_secret(secret)
         with pytest.raises(
@@ -187,26 +181,54 @@ class TestKeypair:
             ),
         ],
     )
-    def test_secret_equal(self, kp1, kp2, equal):
-        assert (Keypair.from_secret(kp1) == Keypair.from_secret(kp2)) is equal
-
-    def test_not_isinstance_equal(self):
-        assert Keypair.random() != "bad type"
+    def test_equals(self, kp1, kp2, equal):
+        kp1 = Keypair.from_secret(
+            "SD7X7LEHBNMUIKQGKPARG5TDJNBHKC346OUARHGZL5ITC6IJPXHILY36"
+        )  # GDFQVQCYYB7GKCGSCUSIQYXTPLV5YJ3XWDMWGQMDNM4EAXAL7LITIBQ7
+        kp2 = Keypair.from_secret(
+            "SD7X7LEHBNMUIKQGKPARG5TDJNBHKC346OUARHGZL5ITC6IJPXHILY36"
+        )
+        kp3 = Keypair.from_secret(
+            "SAQVS3IPN6U3TBMTXQH32ZESY7SUOZGLEFBH6XWMA6DVNPJ4CLO5M54B"
+        )
+        kp4 = Keypair.from_public_key(
+            "GDFQVQCYYB7GKCGSCUSIQYXTPLV5YJ3XWDMWGQMDNM4EAXAL7LITIBQ7"
+        )
+        kp5 = Keypair.from_public_key(
+            "GDFQVQCYYB7GKCGSCUSIQYXTPLV5YJ3XWDMWGQMDNM4EAXAL7LITIBQ7"
+        )
+        kp6 = Keypair.from_public_key(
+            "GD4UGX3TOGNPUOFHT64JR65P6CYIEGDOJKY234UGCNMB2ASKXBBZTAM6"
+        )
+        assert kp1 == kp2
+        assert kp1 != kp3
+        assert kp1 != kp4
+        assert kp4 == kp5
+        assert kp4 != kp6
 
     @pytest.mark.parametrize(
         "language, strength, length",
-        [("english", 128, 12), (Language.CHINESE_SIMPLIFIED, 256, 24)],
+        [
+            (Language.CHINESE_SIMPLIFIED, 128, 12),
+            ("english", 128, 12),
+            ("chinese_simplified", 128, 12),
+            (Language.ENGLISH, 128, 12),
+            (Language.ENGLISH, 160, 15),
+            (Language.ENGLISH, 192, 18),
+            (Language.ENGLISH, 224, 21),
+            (Language.ENGLISH, 256, 24),
+        ],
     )
     def test_generate_mnemonic_phrase(self, language, strength, length):
         # TODO: assert language type
         mnemonic_phrase = Keypair.generate_mnemonic_phrase(language, strength)
         assert len(mnemonic_phrase.split(" ")) == length
 
-    def test_generate_mnemonic_phrase_language_raise(self):
+    def test_generate_mnemonic_phrase_unsupported_language_raise(self):
         with pytest.raises(ValueError, match="This language is not supported."):
             Keypair.generate_mnemonic_phrase("unsupported_language")
 
-    def test_generate_mnemonic_phrase_strength_raise(self):
+    def test_generate_mnemonic_phrase_invalid_strength_raise(self):
         strength = 1024
         with pytest.raises(
             ValueError,
@@ -484,3 +506,36 @@ class TestKeypair:
             assert Keypair.from_mnemonic_phrase(
                 mnemonic_phrase=mnemonic, language=language
             )
+
+    def test_xdr_public_key(self):
+        public_key = "GBRF6PKZYP4J4WI2A3NF4CGF23SL34GRKA5LTQZCQFEUT2YJDZO2COXH"
+        kp = Keypair.from_public_key(public_key)
+        assert (
+            kp.xdr_public_key().to_xdr()
+            == "AAAAAGJfPVnD+J5ZGgbaXgjF1uS98NFQOrnDIoFJSesJHl2h"
+        )
+
+    def test_xdr_account_id(self):
+        public_key = "GBRF6PKZYP4J4WI2A3NF4CGF23SL34GRKA5LTQZCQFEUT2YJDZO2COXH"
+        kp = Keypair.from_public_key(public_key)
+        assert (
+            kp.xdr_account_id().to_xdr()
+            == "AAAAAGJfPVnD+J5ZGgbaXgjF1uS98NFQOrnDIoFJSesJHl2h"
+        )
+
+    def test_xdr_muxed_account(self):
+        public_key = "GBRF6PKZYP4J4WI2A3NF4CGF23SL34GRKA5LTQZCQFEUT2YJDZO2COXH"
+        kp = Keypair.from_public_key(public_key)
+        assert (
+            kp.xdr_muxed_account().to_xdr()
+            == "AAAAAGJfPVnD+J5ZGgbaXgjF1uS98NFQOrnDIoFJSesJHl2h"
+        )
+
+    def test_sign_decorated(self):
+        data = b"Hello, Stellar!"
+        kp = Keypair.from_secret(
+            "SD7X7LEHBNMUIKQGKPARG5TDJNBHKC346OUARHGZL5ITC6IJPXHILY36"
+        )
+        sign_decorated = kp.sign_decorated(data)
+        assert sign_decorated.signature_hint == kp.signature_hint()
+        assert sign_decorated.signature == kp.sign(data)
