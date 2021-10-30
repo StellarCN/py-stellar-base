@@ -145,7 +145,7 @@ class MuxedAccount:
                 account_muxed_id=muxed_xdr.med25519.id.uint64,
             )
         else:
-            raise ValueError("This is not a valid account.")
+            raise ValueError(f"This is not a valid account: {account}")
 
     def to_xdr_object(self) -> stellar_xdr.MuxedAccount:
         """Returns the xdr object for this MuxedAccount object.

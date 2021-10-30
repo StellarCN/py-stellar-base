@@ -99,7 +99,7 @@ class Account:
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
-            return NotImplemented  # pragma: no cover
+            return NotImplemented
         return self.account == other.account and self.sequence == other.sequence
 
     def __str__(self):
@@ -117,7 +117,7 @@ class Thresholds:
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
-            return NotImplemented  # pragma: no cover
+            return NotImplemented
         return (
             self.low_threshold == other.low_threshold
             and self.med_threshold == other.med_threshold
