@@ -1,4 +1,4 @@
-from stellar_sdk.network import Network
+from stellar_sdk import Network
 
 
 class TestNetwork:

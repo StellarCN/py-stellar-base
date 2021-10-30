@@ -1,6 +1,6 @@
 import pytest
 
-from stellar_sdk.time_bounds import TimeBounds
+from stellar_sdk import TimeBounds
 
 
 class TestTimeBounds:
@@ -35,3 +35,4 @@ class TestTimeBounds:
     def test_equals(self):
         assert TimeBounds(1, 2) == TimeBounds(1, 2)
         assert TimeBounds(1, 2) != TimeBounds(1, 0)
+        assert TimeBounds(1, 2) != TimeBounds(0, 2)

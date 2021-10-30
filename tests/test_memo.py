@@ -3,8 +3,8 @@ import os
 
 import pytest
 
+from stellar_sdk import HashMemo, IdMemo, Memo, NoneMemo, ReturnHashMemo, TextMemo
 from stellar_sdk.exceptions import MemoInvalidException
-from stellar_sdk.memo import HashMemo, IdMemo, Memo, NoneMemo, ReturnHashMemo, TextMemo
 
 
 class TestMemo:

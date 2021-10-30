@@ -25,7 +25,7 @@ class Signer:
     :param weight: The weight of the key
     """
 
-    def __init__(self, signer_key: SignerKey, weight: int) -> "None":
+    def __init__(self, signer_key: SignerKey, weight: int) -> None:
         self.signer_key: SignerKey = signer_key
         self.weight: int = weight
 

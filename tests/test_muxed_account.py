@@ -1,9 +1,8 @@
 import pytest
 
+from stellar_sdk import MuxedAccount, StrKey
 from stellar_sdk import xdr as stellar_xdr
 from stellar_sdk.exceptions import ValueError
-from stellar_sdk.muxed_account import MuxedAccount
-from stellar_sdk.strkey import StrKey
 
 
 class TestMuxedAccount:
@@ -60,3 +59,16 @@ class TestMuxedAccount:
         invalid_account = "A" * 100
         with pytest.raises(ValueError, match="This is not a valid account."):
             MuxedAccount.from_account(invalid_account)
+
+    def test_set_account_muxed_raise(self):
+        account_id = "GAQAA5L65LSYH7CQ3VTJ7F3HHLGCL3DSLAR2Y47263D56MNNGHSQSTVY"
+        account_id_id = None
+
+        muxed_account = MuxedAccount(account_id, account_id_id)
+        with pytest.raises(
+            AttributeError,
+            match="Can't set attribute, use `MuxedAccount.from_account` instead.",
+        ):
+            muxed_account.account_muxed = (
+                "MAQAA5L65LSYH7CQ3VTJ7F3HHLGCL3DSLAR2Y47263D56MNNGHSQSAAAAAAAAAAE2LP26"
+            )

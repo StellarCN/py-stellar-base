@@ -1,13 +1,15 @@
 import pytest
 
-from stellar_sdk import MuxedAccount
+from stellar_sdk import (
+    AiohttpClient,
+    Asset,
+    MuxedAccount,
+    Network,
+    ServerAsync,
+    TransactionEnvelope,
+)
 from stellar_sdk.account import Thresholds
-from stellar_sdk.asset import Asset
 from stellar_sdk.call_builder.call_builder_async import *
-from stellar_sdk.client.aiohttp_client import AiohttpClient
-from stellar_sdk.network import Network
-from stellar_sdk.server_async import ServerAsync as Server
-from stellar_sdk.transaction_envelope import TransactionEnvelope
 
 
 @pytest.mark.slow
@@ -17,7 +19,7 @@ class TestServerAsync:
         account_id = "GDV6FVHPY4JH7EEBSJYPQQYZA3OC6TKTM2TAXRHWT4EEL7BJ2BTDQT5D"
         horizon_url = "https://horizon.stellar.org"
         client = AiohttpClient()
-        async with Server(horizon_url, client) as server:
+        async with ServerAsync(horizon_url, client) as server:
             account = await server.load_account(account_id)
             assert account.account == MuxedAccount.from_account(account_id)
             assert isinstance(account.sequence, int)
@@ -29,7 +31,7 @@ class TestServerAsync:
         )
         horizon_url = "https://horizon.stellar.org"
         client = AiohttpClient()
-        async with Server(horizon_url, client) as server:
+        async with ServerAsync(horizon_url, client) as server:
             account = await server.load_account(account_id)
             assert account.account == MuxedAccount.from_account(account_id)
             assert isinstance(account.sequence, int)
@@ -41,7 +43,7 @@ class TestServerAsync:
         )
         horizon_url = "https://horizon.stellar.org"
         client = AiohttpClient()
-        async with Server(horizon_url, client) as server:
+        async with ServerAsync(horizon_url, client) as server:
             account = await server.load_account(account_id)
             assert account.account == account_id
             assert isinstance(account.sequence, int)
@@ -50,14 +52,14 @@ class TestServerAsync:
     async def test_fetch_base_fee(self):
         horizon_url = "https://horizon.stellar.org"
         client = AiohttpClient()
-        async with Server(horizon_url, client) as server:
+        async with ServerAsync(horizon_url, client) as server:
             base_fee = await server.fetch_base_fee()
             assert isinstance(base_fee, int)
 
     async def test_endpoint(self):
         horizon_url = "https://horizon.stellar.org"
         client = AiohttpClient()
-        async with Server(horizon_url, client) as server:
+        async with ServerAsync(horizon_url, client) as server:
             assert server.accounts() == AccountsCallBuilder(horizon_url, client)
             assert server.assets() == AssetsCallBuilder(horizon_url, client)
             assert server.claimable_balances() == ClaimableBalancesCallBuilder(
@@ -136,7 +138,7 @@ class TestServerAsync:
         xdr = "AAAAAHI7fpgo+b7tgpiFyYWimjV7L7IOYLwmQS7k7F8SronXAAAAZAE+QT4AAAAJAAAAAQAAAAAAAAAAAAAAAF1MG8cAAAAAAAAAAQAAAAAAAAAAAAAAAOvi1O/HEn+QgZJw+EMZBtwvTVNmpgvE9p8IRfwp0GY4AAAAAAExLQAAAAAAAAAAARKuidcAAABAJVc1ASGp35hUquGNbzzSqWPoTG0zgc89zc4p+19QkgbPqsdyEfHs7+ng9VJA49YneEXRa6Fv7pfKpEigb3VTCg=="
         horizon_url = "https://horizon.stellar.org"
         client = AiohttpClient()
-        async with Server(horizon_url, client) as server:
+        async with ServerAsync(horizon_url, client) as server:
             resp = await server.submit_transaction(xdr, True)
             assert resp["envelope_xdr"] == xdr
 
@@ -145,6 +147,6 @@ class TestServerAsync:
         te = TransactionEnvelope.from_xdr(xdr, Network.PUBLIC_NETWORK_PASSPHRASE)
         horizon_url = "https://horizon.stellar.org"
         client = AiohttpClient()
-        async with Server(horizon_url, client) as server:
+        async with ServerAsync(horizon_url, client) as server:
             resp = await server.submit_transaction(te, True)
             assert resp["envelope_xdr"] == xdr

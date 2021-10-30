@@ -1,7 +1,7 @@
 import pytest
 
-from stellar_sdk import MuxedAccount
-from stellar_sdk.account import Account, Thresholds
+from stellar_sdk import Account, MuxedAccount
+from stellar_sdk.account import Thresholds
 from stellar_sdk.exceptions import (
     Ed25519PublicKeyInvalidError,
     MuxedEd25519AccountInvalidError,

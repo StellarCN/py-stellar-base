@@ -1,8 +1,8 @@
-from stellar_sdk.price import Price
+from stellar_sdk import Price
 
 
 class TestPrice:
-    def test_to_xdr(self):
+    def test_xdr(self):
         n, d = 1, 2
         price_obj = Price(n, d).to_xdr_object()
         assert price_obj.to_xdr() == "AAAAAQAAAAI="

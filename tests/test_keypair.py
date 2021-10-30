@@ -1,5 +1,6 @@
 import pytest
 
+from stellar_sdk import Keypair, StrKey
 from stellar_sdk.exceptions import (
     AttributeError,
     BadSignatureError,
@@ -7,9 +8,7 @@ from stellar_sdk.exceptions import (
     Ed25519SecretSeedInvalidError,
     MissingEd25519SecretSeedError,
 )
-from stellar_sdk.keypair import Keypair
 from stellar_sdk.sep.mnemonic import Language
-from stellar_sdk.strkey import StrKey
 
 
 class TestKeypair:

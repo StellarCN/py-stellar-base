@@ -24,12 +24,12 @@ class SignerKey:
     :param signer_key: The signer key type.
     """
 
-    def __init__(self, signer_key: bytes, signer_key_type: SignerKeyType) -> "None":
+    def __init__(self, signer_key: bytes, signer_key_type: SignerKeyType) -> None:
         self.signer_key: bytes = signer_key
         self.signer_key_type: SignerKeyType = signer_key_type
 
     @property
-    def encoded_signer_key(self):
+    def encoded_signer_key(self) -> str:
         """
         return: The signer key encoded in Strkey format.
         """
