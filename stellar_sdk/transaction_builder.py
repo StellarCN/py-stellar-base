@@ -574,9 +574,7 @@ class TransactionBuilder:
         """
         if isinstance(sha256_hash, str) and is_valid_hash(sha256_hash):
             sha256_hash = hex_to_bytes(sha256_hash)
-        signer = Signer.sha256_hash(
-            sha256_hash=hex_to_bytes(sha256_hash), weight=weight
-        )
+        signer = Signer.sha256_hash(sha256_hash=sha256_hash, weight=weight)
         return self.append_set_options_op(signer=signer, source=source)
 
     def append_pre_auth_tx_signer(
@@ -597,9 +595,7 @@ class TransactionBuilder:
         """
         if isinstance(pre_auth_tx_hash, str) and is_valid_hash(pre_auth_tx_hash):
             pre_auth_tx_hash = hex_to_bytes(pre_auth_tx_hash)
-        signer = Signer.pre_auth_tx(
-            pre_auth_tx_hash=hex_to_bytes(pre_auth_tx_hash), weight=weight
-        )
+        signer = Signer.pre_auth_tx(pre_auth_tx_hash=pre_auth_tx_hash, weight=weight)
         return self.append_set_options_op(signer=signer, source=source)
 
     def append_manage_buy_offer_op(
