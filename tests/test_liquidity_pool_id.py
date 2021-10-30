@@ -33,19 +33,12 @@ class TestLiquidityPoolId:
             "dd7b1ab831c273310ddbec6f97870aa83c2fbd78ce22aded37ecbf4f3380faca"
         )
         asset = LiquidityPoolId(liquidity_pool_id)
+        trust_line_asset_xdr_object = asset.to_trust_line_asset_xdr_object()
         assert (
-            asset.to_trust_line_asset_xdr_object().to_xdr()
+            trust_line_asset_xdr_object.to_xdr()
             == "AAAAA917GrgxwnMxDdvsb5eHCqg8L714ziKt7Tfsv08zgPrK"
         )
-
-    def test_from_xdr(self):
-        liquidity_pool_id = (
-            "dd7b1ab831c273310ddbec6f97870aa83c2fbd78ce22aded37ecbf4f3380faca"
-        )
-        asset = LiquidityPoolId(liquidity_pool_id)
-        assert asset == LiquidityPoolId.from_xdr_object(
-            asset.to_trust_line_asset_xdr_object()
-        )
+        assert asset == LiquidityPoolId.from_xdr_object(trust_line_asset_xdr_object)
 
     @pytest.mark.parametrize(
         "asset_code, asset_issuer, asset_type",

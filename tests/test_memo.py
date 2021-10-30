@@ -32,14 +32,6 @@ class TestMemo:
         assert isinstance(base_memo, TextMemo)
         assert base_memo.to_xdr_object().to_xdr() == xdr
 
-    def test_text_memo_invalid_type_raise(self):
-        invalid_value = 123
-        with pytest.raises(
-            TypeError,
-            match=r'type of argument "text" must be one of \(str, bytes\); got int instead',
-        ):
-            TextMemo(invalid_value)
-
     def test_text_memo_too_long_raise(self):
         invalid_value = "a" * 29
         with pytest.raises(
@@ -139,23 +131,14 @@ class TestMemo:
     @pytest.mark.parametrize(
         "asset_a, asset_b, equal",
         [
-            (NoneMemo(), NoneMemo(), True),
-            (TextMemo("hello"), NoneMemo(), False),
-            (TextMemo("恒星"), TextMemo("恒星"), True),
-            (
-                HashMemo(
-                    binascii.unhexlify(
-                        "573c10b148fc4bc7db97540ce49da22930f4bcd48a060dc7347be84ea9f52d9f"
-                    )
-                ),
-                ReturnHashMemo(
-                    binascii.unhexlify(
-                        "573c10b148fc4bc7db97540ce49da22930f4bcd48a060dc7347be84ea9f52d9f"
-                    )
-                ),
-                False,
+            pytest.param(NoneMemo(), NoneMemo(), True, id="NoneMemo_equals"),
+            pytest.param(IdMemo(1), IdMemo(1), True, id="IdMemo_equals"),
+            pytest.param(IdMemo(1), IdMemo(2), False, id="IdMemo_not_equals"),
+            pytest.param(TextMemo("恒星"), TextMemo("恒星"), True, id="TextMemo_equals"),
+            pytest.param(
+                TextMemo("恒星"), TextMemo("太阳"), False, id="TextMemo_not_equals"
             ),
-            (
+            pytest.param(
                 HashMemo(
                     binascii.unhexlify(
                         "573c10b148fc4bc7db97540ce49da22930f4bcd48a060dc7347be84ea9f52d9f"
@@ -167,6 +150,49 @@ class TestMemo:
                     )
                 ),
                 True,
+                id="HashMemo_equals",
+            ),
+            pytest.param(
+                HashMemo(
+                    binascii.unhexlify(
+                        "573c10b148fc4bc7db97540ce49da22930f4bcd48a060dc7347be84ea9f52d9f"
+                    )
+                ),
+                HashMemo(
+                    binascii.unhexlify(
+                        "7c158b252cd972b678a044b5bb5623c01088b521b126e2730b0f90282e5390bd"
+                    )
+                ),
+                False,
+                id="HashMemo_not_equals",
+            ),
+            pytest.param(
+                ReturnHashMemo(
+                    binascii.unhexlify(
+                        "573c10b148fc4bc7db97540ce49da22930f4bcd48a060dc7347be84ea9f52d9f"
+                    )
+                ),
+                ReturnHashMemo(
+                    binascii.unhexlify(
+                        "573c10b148fc4bc7db97540ce49da22930f4bcd48a060dc7347be84ea9f52d9f"
+                    )
+                ),
+                True,
+                id="ReturnHashMemo_equals",
+            ),
+            pytest.param(
+                ReturnHashMemo(
+                    binascii.unhexlify(
+                        "573c10b148fc4bc7db97540ce49da22930f4bcd48a060dc7347be84ea9f52d9f"
+                    )
+                ),
+                ReturnHashMemo(
+                    binascii.unhexlify(
+                        "7c158b252cd972b678a044b5bb5623c01088b521b126e2730b0f90282e5390bd"
+                    )
+                ),
+                False,
+                id="ReturnHashMemo_not_equals",
             ),
         ],
     )

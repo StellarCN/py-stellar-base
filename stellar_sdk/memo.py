@@ -75,7 +75,7 @@ class NoneMemo(Memo):
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
-            return NotImplemented  # pragma: no cover
+            return NotImplemented
         return True
 
     def __str__(self):
@@ -119,7 +119,7 @@ class TextMemo(Memo):
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
-            return NotImplemented  # pragma: no cover
+            return NotImplemented
         return self.memo_text == other.memo_text
 
     def __str__(self):
@@ -158,7 +158,7 @@ class IdMemo(Memo):
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
-            return NotImplemented  # pragma: no cover
+            return NotImplemented
         return self.memo_id == other.memo_id
 
     def __str__(self):
@@ -198,7 +198,7 @@ class HashMemo(Memo):
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
-            return NotImplemented  # pragma: no cover
+            return NotImplemented
         return self.memo_hash == other.memo_hash
 
     def __str__(self):
@@ -244,7 +244,7 @@ class ReturnHashMemo(Memo):
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
-            return NotImplemented  # pragma: no cover
+            return NotImplemented
         return self.memo_return == other.memo_return
 
     def __str__(self):
