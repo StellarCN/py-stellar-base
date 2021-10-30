@@ -20,19 +20,6 @@ class TestLiquidityPoolAsset:
     @pytest.mark.parametrize(
         "asset_a, asset_b, fee, msg",
         [
-            (None, asset_b, fee, "`asset_a` is invalid."),
-            (1, asset_b, fee, "`asset_a` is invalid."),
-            (asset_a, None, fee, "`asset_b` is invalid."),
-            (asset_a, 1, fee, "`asset_b` is invalid."),
-        ],
-    )
-    def test_init_type_error_raise(self, asset_a, asset_b, fee, msg):
-        with pytest.raises(TypeError):
-            LiquidityPoolAsset(asset_a, asset_b, fee)
-
-    @pytest.mark.parametrize(
-        "asset_a, asset_b, fee, msg",
-        [
             (asset_b, asset_a, fee, "Assets are not in lexicographic order."),
             (asset_a, asset_b, fee + 10, "`fee` is invalid."),
         ],
@@ -59,6 +46,7 @@ class TestLiquidityPoolAsset:
             == self.asset_b.to_xdr_object()
         )
         assert xdr_object.liquidity_pool.constant_product.fee.int32 == self.fee
+        assert asset == LiquidityPoolAsset.from_xdr_object(xdr_object)
         assert (
             xdr_object.to_xdr()
             == "AAAAAwAAAAAAAAABQVJTVAAAAAB/MGI0yYnp1n9p39kxGYtgDz1s5rZMIkBwH7YrCIMrhwAAAAFVU0QAAAAAAImbKEDtVjbFbdxfFLI5dfefG6I4jSaU5MVuzd3JYOXvAAAAHg=="
@@ -70,12 +58,6 @@ class TestLiquidityPoolAsset:
             asset.liquidity_pool_id
             == "dd7b1ab831c273310ddbec6f97870aa83c2fbd78ce22aded37ecbf4f3380fac7"
         )
-
-    def test_from_xdr(self):
-        asset = LiquidityPoolAsset(self.asset_a, self.asset_b, fee=self.fee)
-        xdr_object = asset.to_change_trust_asset_xdr_object()
-        restore_asset = LiquidityPoolAsset.from_xdr_object(xdr_object)
-        assert asset == restore_asset
 
     @pytest.mark.parametrize(
         "asset_code, asset_issuer, asset_type",
@@ -118,7 +100,7 @@ class TestLiquidityPoolAsset:
     )
     def test_is_valid_lexicographic_order_asset_types(self, asset_a, asset_b, result):
         assert (
-            LiquidityPoolAsset.is_valid_lexicographic_order(asset_a, asset_b) == result
+            LiquidityPoolAsset.is_valid_lexicographic_order(asset_a, asset_b) is result
         )
 
     asset_arst = Asset(

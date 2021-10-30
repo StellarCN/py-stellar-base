@@ -60,12 +60,6 @@ class LiquidityPoolAsset:
         :param asset_b: The second asset in the lexicographic order.
         :return: return `True` if asset_a < asset_b
         """
-        if not asset_a or not isinstance(asset_a, Asset):
-            raise ValueError("`asset_a` is invalid.")
-
-        if not asset_b or not isinstance(asset_b, Asset):
-            raise ValueError("`asset_b` is invalid.")
-
         if asset_a == asset_b:
             return False
 
@@ -77,11 +71,10 @@ class LiquidityPoolAsset:
                 return False
             if asset_b.type == "credit_alphanum12":
                 return True
-        elif asset_a.type == "credit_alphanum12":
+        else:
+            # asset_a.type == "credit_alphanum12"
             if asset_b.type != "credit_alphanum12":
                 return False
-        else:
-            raise ValueError(f"Unexpected asset type: {asset_a.type}")
 
         # Compare asset codes.
         if asset_a.code != asset_b.code:
