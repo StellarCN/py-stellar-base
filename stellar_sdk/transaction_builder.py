@@ -122,7 +122,7 @@ class TransactionBuilder:
         base_fee: int,
         inner_transaction_envelope: TransactionEnvelope,
         network_passphrase: str = Network.TESTNET_NETWORK_PASSPHRASE,
-    ) -> "FeeBumpTransactionEnvelope":
+    ) -> FeeBumpTransactionEnvelope:
         """Create a
         :py:class:`FeeBumpTransactionEnvelope <stellar_sdk.fee_bump_transaction_envelope.FeeBumpTransactionEnvelope>`
         object.
@@ -977,7 +977,7 @@ class TransactionBuilder:
         from_: Union[MuxedAccount, str],
         amount: Union[str, Decimal],
         source: Optional[Union[MuxedAccount, str]] = None,
-    ):
+    ) -> "TransactionBuilder":
         """Append an :class:`Clawback <stellar_sdk.operation.Clawback>`
         operation to the list of operations.
 
@@ -992,7 +992,7 @@ class TransactionBuilder:
 
     def append_clawback_claimable_balance_op(
         self, balance_id: str, source: Optional[Union[MuxedAccount, str]] = None
-    ):
+    ) -> "TransactionBuilder":
         """Append an :class:`ClawbackClaimableBalance <stellar_sdk.operation.ClawbackClaimableBalance>`
         operation to the list of operations.
 
@@ -1011,7 +1011,7 @@ class TransactionBuilder:
         clear_flags: TrustLineFlags = None,
         set_flags: TrustLineFlags = None,
         source: Optional[Union[MuxedAccount, str]] = None,
-    ):
+    ) -> "TransactionBuilder":
         """Append an :class:`SetTrustLineFlags <stellar_sdk.operation.SetTrustLineFlags>`
         operation to the list of operations.
 
@@ -1034,7 +1034,7 @@ class TransactionBuilder:
         min_price: Union[str, Decimal, Price],
         max_price: Union[str, Decimal, Price],
         source: Optional[Union[MuxedAccount, str]] = None,
-    ):
+    ) -> "TransactionBuilder":
         """Append an :class:`LiquidityPoolDeposit <stellar_sdk.operation.LiquidityPoolDeposit>`
         operation to the list of operations.
 
@@ -1059,7 +1059,7 @@ class TransactionBuilder:
         min_amount_a: Union[str, Decimal],
         min_amount_b: Union[str, Decimal],
         source: Optional[Union[MuxedAccount, str]] = None,
-    ):
+    ) -> "TransactionBuilder":
         """Append an :class:`LiquidityPoolWithdraw <stellar_sdk.operation.LiquidityPoolWithdraw>`
         operation to the list of operations.
 
