@@ -279,7 +279,7 @@ class TransactionBuilder:
             :exc:`MemoInvalidException <stellar_sdk.exceptions.MemoInvalidException>`:
             if `memo_hash` is not a valid hash memo.
         """
-        memo = HashMemo(hex_to_bytes(memo_hash))
+        memo = HashMemo(memo_hash)
         return self.add_memo(memo)
 
     def add_return_hash_memo(
@@ -295,7 +295,7 @@ class TransactionBuilder:
             :exc:`MemoInvalidException <stellar_sdk.exceptions.MemoInvalidException>`:
             if `memo_return` is not a valid return hash memo.
         """
-        memo = ReturnHashMemo(hex_to_bytes(memo_return))
+        memo = ReturnHashMemo(memo_return)
         return self.add_memo(memo)
 
     def append_operation(self, operation: Operation) -> "TransactionBuilder":
