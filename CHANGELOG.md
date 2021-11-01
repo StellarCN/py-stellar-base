@@ -1,6 +1,15 @@
 Release History
 ==============
 
+### Version 6.0.0-beta3
+Released on November 01, 2021
+
+**This is a pre-release version, please do not use it in production.**
+
+#### Update
+
+- Added more test cases.
+
 ### Version 6.0.0-beta2
 Released on October 29, 2021
 
