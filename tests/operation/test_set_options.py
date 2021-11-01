@@ -131,3 +131,11 @@ class TestSetOptions:
         assert from_instance.high_threshold == high_threshold
         assert from_instance.signer == signer
         assert from_instance.home_domain == home_domain
+
+    def test_invalid_inflation_dest_raise(self):
+        key = "GCEZWKCA5VLDNRLN3RPRJMRZOX3Z6G5CHCGSNFHEYVXM3XOJMINVALID"
+        with pytest.raises(
+            ValueError,
+            match=f'Value of argument "inflation_dest" is not a valid ed25519 public key: {key}',
+        ):
+            SetOptions(inflation_dest=key)

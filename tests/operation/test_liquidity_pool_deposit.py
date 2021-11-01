@@ -91,3 +91,66 @@ class TestLiquidityPoolDeposit:
         xdr_object = op.to_xdr_object()
         assert xdr_object.to_xdr() == xdr
         assert Operation.from_xdr_object(xdr_object) == op
+
+    def test_invalid_liquidity_pool_id_raise(self):
+        liquidity_pool_id = (
+            "dd7b1ab831c273310ddbec6f97870aa83c2fbd78ce22aded37ecbf4f3380facainvalid"
+        )
+        max_amount_a = "10"
+        max_amount_b = "20"
+        min_price = "0.45"
+        max_price = "0.55"
+        with pytest.raises(
+            ValueError,
+            match=f'Value of argument "liquidity_pool_id" is not a valid hash: {liquidity_pool_id}',
+        ):
+            LiquidityPoolDeposit(
+                liquidity_pool_id,
+                max_amount_a,
+                max_amount_b,
+                min_price,
+                max_price,
+                kp1.public_key,
+            )
+
+    def test_invalid_max_amount_a_raise(self):
+        fee = LIQUIDITY_POOL_FEE_V18
+        asset = LiquidityPoolAsset(asset1, asset2, fee)
+        liquidity_pool_id = asset.liquidity_pool_id
+        max_amount_a = "12345678902.23423324"
+        max_amount_b = "20"
+        min_price = "0.45"
+        max_price = "0.55"
+        with pytest.raises(
+            ValueError,
+            match=f'Value of argument "max_amount_a" must have at most 7 digits after the decimal: {max_amount_a}',
+        ):
+            LiquidityPoolDeposit(
+                liquidity_pool_id,
+                max_amount_a,
+                max_amount_b,
+                min_price,
+                max_price,
+                kp1.public_key,
+            )
+
+    def test_invalid_max_amount_b_raise(self):
+        fee = LIQUIDITY_POOL_FEE_V18
+        asset = LiquidityPoolAsset(asset1, asset2, fee)
+        liquidity_pool_id = asset.liquidity_pool_id
+        max_amount_a = "10"
+        max_amount_b = "12345678902.23423324"
+        min_price = "0.45"
+        max_price = "0.55"
+        with pytest.raises(
+            ValueError,
+            match=f'Value of argument "max_amount_b" must have at most 7 digits after the decimal: {max_amount_b}',
+        ):
+            LiquidityPoolDeposit(
+                liquidity_pool_id,
+                max_amount_a,
+                max_amount_b,
+                min_price,
+                max_price,
+                kp1.public_key,
+            )

@@ -106,3 +106,35 @@ class TestPathPaymentStrictReceive:
         xdr_object = op.to_xdr_object()
         assert xdr_object.to_xdr() == xdr
         assert Operation.from_xdr_object(xdr_object) == op
+
+    def test_invalid_send_max_raise(self):
+        send_max = "12345678902.23423324"
+        with pytest.raises(
+            ValueError,
+            match=f'Value of argument "send_max" must have at most 7 digits after the decimal: {send_max}',
+        ):
+            PathPaymentStrictReceive(
+                kp2.public_key,
+                native_asset,
+                send_max,
+                asset1,
+                "200",
+                [asset2, asset3],
+                kp1.public_key,
+            )
+
+    def test_invalid_dest_amount_raise(self):
+        dest_amount = "12345678902.23423324"
+        with pytest.raises(
+            ValueError,
+            match=f'Value of argument "dest_amount" must have at most 7 digits after the decimal: {dest_amount}',
+        ):
+            PathPaymentStrictReceive(
+                kp2.public_key,
+                native_asset,
+                "100",
+                asset1,
+                dest_amount,
+                [asset2, asset3],
+                kp1.public_key,
+            )

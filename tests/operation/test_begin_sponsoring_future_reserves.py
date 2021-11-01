@@ -38,3 +38,11 @@ class TestBeginSponsoringFutureReserves:
         xdr_object = op.to_xdr_object()
         assert xdr_object.to_xdr() == xdr
         assert Operation.from_xdr_object(xdr_object) == op
+
+    def test_invalid_sponsored_id_raise(self):
+        key = "GCEZWKCA5VLDNRLN3RPRJMRZOX3Z6G5CHCGSNFHEYVXM3XOJMINVALID"
+        with pytest.raises(
+            ValueError,
+            match=f'Value of argument "sponsored_id" is not a valid ed25519 public key: {key}',
+        ):
+            BeginSponsoringFutureReserves(key, kp1.public_key)

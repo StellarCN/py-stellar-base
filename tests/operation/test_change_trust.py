@@ -77,3 +77,11 @@ class TestChangeTrust:
         assert Operation.from_xdr_object(xdr_object) == op
         assert op.asset == asset
         assert op.limit == str(limit) if limit is not None else "922337203685.4775807"
+
+    def test_invalid_limit_raise(self):
+        limit = "12345678902.23423324"
+        with pytest.raises(
+            ValueError,
+            match=f'Value of argument "limit" must have at most 7 digits after the decimal: {limit}',
+        ):
+            ChangeTrust(asset1, limit, kp1.public_key)

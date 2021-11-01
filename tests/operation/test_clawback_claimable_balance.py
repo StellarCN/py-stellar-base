@@ -41,3 +41,13 @@ class TestClawbackClaimableBalance:
         xdr_object = op.to_xdr_object()
         assert xdr_object.to_xdr() == xdr
         assert Operation.from_xdr_object(xdr_object) == op
+
+    def test_invalid_balance_id_raise(self):
+        balance_id = (
+            "00000000da0d57da7d4850e7fc10d2a9d0ebc731f7afb40574c03395b17d49149b91f5"
+        )
+        with pytest.raises(
+            ValueError,
+            match=f'Value of argument "balance_id" is not a valid balance id: {balance_id}',
+        ):
+            ClawbackClaimableBalance(balance_id, kp1.public_key)

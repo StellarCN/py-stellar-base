@@ -102,3 +102,24 @@ class TestAllowTrust:
                 assert op.authorize == TrustLineEntryFlag.UNAUTHORIZED_FLAG
         else:
             assert op.authorize == authorize
+
+    def test_invalid_trustor_raise(self):
+        key = "GCEZWKCA5VLDNRLN3RPRJMRZOX3Z6G5CHCGSNFHEYVXM3XOJMINVALID"
+        with pytest.raises(
+            ValueError,
+            match=f'Value of argument "trustor" is not a valid ed25519 public key: {key}',
+        ):
+            AllowTrust(key, "USD", TrustLineEntryFlag.UNAUTHORIZED_FLAG, kp1.public_key)
+
+    def test_invalid_asset_code_raise(self):
+        asset_code = "-123456"
+        with pytest.raises(
+            ValueError,
+            match=r"Asset code is invalid \(maximum alphanumeric, 12 characters at max\).",
+        ):
+            AllowTrust(
+                kp2.public_key,
+                asset_code,
+                TrustLineEntryFlag.UNAUTHORIZED_FLAG,
+                kp1.public_key,
+            )

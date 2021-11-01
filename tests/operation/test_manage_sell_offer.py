@@ -102,3 +102,11 @@ class TestManageSellOffer:
         xdr_object = op.to_xdr_object()
         assert xdr_object.to_xdr() == xdr
         assert Operation.from_xdr_object(xdr_object) == op
+
+    def test_invalid_amount_raise(self):
+        amount = "12345678902.23423324"
+        with pytest.raises(
+            ValueError,
+            match=f'Value of argument "amount" must have at most 7 digits after the decimal: {amount}',
+        ):
+            ManageSellOffer(native_asset, asset1, amount, "1", 0, kp1.public_key)

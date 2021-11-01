@@ -88,6 +88,20 @@ class TestCreateClaimableBalance:
         assert xdr_object.to_xdr() == xdr
         assert Operation.from_xdr_object(xdr_object) == op
 
+    def test_invalid_amount_raise(self):
+        amount = "12345678902.23423324"
+        claimants = [
+            Claimant(
+                destination=kp2.public_key,
+                predicate=ClaimPredicate.predicate_unconditional(),
+            )
+        ]
+        with pytest.raises(
+            ValueError,
+            match=f'Value of argument "amount" must have at most 7 digits after the decimal: {amount}',
+        ):
+            CreateClaimableBalance(asset1, amount, claimants, kp1.public_key)
+
 
 class TestClaimPredicate:
     @staticmethod
@@ -206,3 +220,11 @@ class TestClaimant:
         claimant = Claimant(destination=destination)
         assert self.to_xdr(claimant) == xdr
         assert claimant == Claimant.from_xdr_object(claimant.to_xdr_object())
+
+    def test_invalid_destination_raise(self):
+        key = "GCEZWKCA5VLDNRLN3RPRJMRZOX3Z6G5CHCGSNFHEYVXM3XOJMINVALID"
+        with pytest.raises(
+            ValueError,
+            match=f'Value of argument "destination" is not a valid ed25519 public key: {key}',
+        ):
+            Claimant(destination=key)
