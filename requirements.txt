@@ -5,15 +5,16 @@
 #    pipenv lock --requirements
 #
 
--i https://pypi.org/simple
+-i https://pypi.org/simple/
 aiohttp-sse-client==0.2.1
-aiohttp==3.7.4.post0
-async-timeout==3.0.1; python_full_version >= '3.5.3'
+aiohttp==3.8.0
+aiosignal==1.2.0; python_version >= '3.6'
+async-timeout==4.0.0; python_version >= '3.6'
 attrs==21.2.0; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3, 3.4'
 certifi==2021.10.8
 cffi==1.15.0
-chardet==4.0.0; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3, 3.4'
 charset-normalizer==2.0.7; python_version >= '3'
+frozenlist==1.2.0; python_version >= '3.6'
 idna==3.3; python_version >= '3'
 mnemonic==0.20
 multidict==5.2.0; python_version >= '3.6'
@@ -26,4 +27,4 @@ toml==0.10.2
 typeguard==2.13.0
 typing-extensions==3.10.0.2
 urllib3==1.26.7; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3, 3.4' and python_version < '4'
-yarl==1.7.0; python_version >= '3.6'
+yarl==1.7.2; python_version >= '3.6'
