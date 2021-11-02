@@ -21,8 +21,8 @@ server = Server(horizon_url="https://horizon-testnet.stellar.org")
 ## Use test network, if you need to use public network,
 ## please set it to `Network.PUBLIC_NETWORK_PASSPHRASE`
 network_passphrase = Network.TESTNET_NETWORK_PASSPHRASE
-## get fee from stellar network
-fee = server.fetch_base_fee()
+## Max fee you're willing to pay per operation in this transaction (**in stroops**).
+base_fee = 100
 
 ## Create seller account
 print("Create Seller Account:")
@@ -49,7 +49,7 @@ transaction = (
     TransactionBuilder(
         source_account=seller_account,
         network_passphrase=Network.TESTNET_NETWORK_PASSPHRASE,
-        base_fee=fee,
+        base_fee=base_fee,
     )
     .append_create_account_op(destination=issuer_public_key, starting_balance="1000")
     .build()
@@ -75,7 +75,7 @@ trust_transaction = (
     TransactionBuilder(
         source_account=seller_account,
         network_passphrase=network_passphrase,
-        base_fee=fee,
+        base_fee=base_fee,
     )
     #  The `changeTrust` operation creates (or alters) a trustline
     #  The `limit` parameter below is optional
@@ -96,7 +96,7 @@ aac_payment_transaction = (
     TransactionBuilder(
         source_account=issuer_account,
         network_passphrase=network_passphrase,
-        base_fee=fee,
+        base_fee=base_fee,
     )
     .append_payment_op(
         destination=seller_public_key,
@@ -157,7 +157,7 @@ update_offer_transaction = (
     TransactionBuilder(
         source_account=seller_account,
         network_passphrase=network_passphrase,
-        base_fee=fee,
+        base_fee=base_fee,
     )
     .append_operation(sell_offer)
     .build()
@@ -191,7 +191,7 @@ update_offer_transaction = (
     TransactionBuilder(
         source_account=seller_account,
         network_passphrase=network_passphrase,
-        base_fee=fee,
+        base_fee=base_fee,
     )
     .append_operation(sell_offer)
     .build()

@@ -76,7 +76,7 @@ Building transaction with synchronous server
 
     server = Server("https://horizon-testnet.stellar.org")
     alice_account = server.load_account(alice_keypair.public_key)
-    base_fee = server.fetch_base_fee()
+    base_fee = 100
     transaction = (
         TransactionBuilder(
             source_account=alice_account,
@@ -111,7 +111,7 @@ Building transaction with synchronous server
             horizon_url="https://horizon-testnet.stellar.org", client=AiohttpClient()
         ) as server:
             alice_account = await server.load_account(alice_keypair.public_key)
-            base_fee = await server.fetch_base_fee()
+            base_fee = 100
             transaction = (
                 TransactionBuilder(
                     source_account=alice_account,

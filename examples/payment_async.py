@@ -60,7 +60,7 @@ async def main():
         # We can fetch the current sequence number for the source account from Horizon.
         source_account = await server.load_account(source_public_key)
 
-        base_fee = await server.fetch_base_fee()
+        base_fee = 100
         # we are going to submit the transaction to the test network,
         # so network_passphrase is `Network.TESTNET_NETWORK_PASSPHRASE`,
         # if you want to submit to the public network, please use `Network.PUBLIC_NETWORK_PASSPHRASE`.
