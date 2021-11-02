@@ -7,15 +7,15 @@
 通过 pipenv 或 pip 安装
 =========================
 
-通过 pipenv 来安装 Stellar Python SDK ：
+使用 pip 来安装最新版的 Stellar Python SDK ：
 
 .. code-block:: text
 
-    pipenv install stellar-sdk==6.0.0b3
+    pip install -U stellar-sdk
 
-我们推荐你使用 `pipenv <https://docs.pipenv.org/>`_ 来安装这个模块。当然你也可以使用 `pip <https://pip.pypa.io/en/stable/quickstart/>`_。
-想要更多的了解如何安装依赖，请参阅 `Hitchhiker's Guide to Python
-<http://docs.python-guide.org/en/latest/starting/installation/>`_。
+Stellar Python SDK 的发布遵循 `Semantic Versioning 2.0.0 <https://semver.org/>`_ ，我强烈建议
+你在依赖文件中锁定其版本号，以避免破坏性更新带来的未知影响。想要更多的了解如何安装依赖，请参阅 `Hitchhiker's Guide to Python
+<http://docs.python-guide.org/en/latest/starting/installation/>`_ 。
 
 通过源码安装
 ============

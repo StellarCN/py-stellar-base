@@ -55,8 +55,11 @@ Installing
 
 .. code-block:: text
 
-    pip install stellar-sdk==6.0.0b3
+    pip install -U stellar-sdk
 
+We follow `Semantic Versioning 2.0.0 <https://semver.org/>`_, and I strongly
+recommend that you specify its major version number in the dependency
+file to avoid the unknown effects of a corrupt update.
 
 A Simple Example
 ----------------
@@ -144,5 +147,3 @@ Links
 Thank you to all the people who have already contributed to py-stellar-base!
 
 .. _Stellar Horizon server: https://github.com/stellar/go/tree/master/services/horizon
-.. _pip: https://pip.pypa.io/en/stable/quickstart/
-.. _pipenv: https://github.com/pypa/pipenv

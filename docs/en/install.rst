@@ -7,15 +7,16 @@ Installation
 Via pipenv or pip
 ===============================
 
-To install py-stellar-base, use pipenv to install the module:
+Use pip to install and update py-stellar-base:
 
 .. code-block:: text
 
-    pipenv install stellar-sdk==6.0.0b3
+    pip install -U stellar-sdk
 
-If you're not using `pipenv <https://docs.pipenv.org/>`_, you should.
-Otherwise, you can install it via plain old `pip <https://pip.pypa.io/en/stable/quickstart/>`_. More on installing Python
-and dependencies can be found over in the `Hitchhiker's Guide to Python
+The py-stellar-base release follows `Semantic Versioning 2.0.0 <https://semver.org/>`_,
+and I strongly recommend that you specify its major version number
+in the dependency file to avoid the unknown effects of a corrupt update.
+More on installing Python and dependencies can be found over in the `Hitchhiker's Guide to Python
 <http://docs.python-guide.org/en/latest/starting/installation/>`_.
 
 Via Source Code
