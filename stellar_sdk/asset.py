@@ -19,7 +19,7 @@ class Asset:
 
         from stellar_sdk import Asset
 
-        native_asset = Asset.native()  # You can also create an asset asset through Asset("XLM").
+        native_asset = Asset.native()  # You can also create a native asset through Asset("XLM").
         credit_alphanum4_asset = Asset("USD", "GBSKJPM2FM6O2C6GVZNAUAMGXZ6I4QIUPMNWVDN2NZULPWWTV3GI2SOX")
         credit_alphanum12_asset = Asset("BANANA", "GA6VT2PDD73TNNRYLPJPJYAAI7EGKBATZ7V562S7XY7TJD4GNOXRG6OS")
         print(f"Asset type: {credit_alphanum4_asset.type}\\n"
