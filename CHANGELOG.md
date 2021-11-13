@@ -1,6 +1,81 @@
 Release History
 ==============
 
+### Version 6.0.0
+Released on November 13, 2021
+
+**This update includes breaking changes.**
+
+#### Note
+
+- As we introduced in the [5.0.0](https://github.com/StellarCN/py-stellar-base/releases/tag/5.0.0) release log, this release contains almost no new features, but contains a lot of refactorings, which improve the quality of the code and reduce the chance of users making mistakes.
+- I would like to draw your attention to the changes in `TransactionBuilder`. This update changes some functions that have not been changed since v0.1.x, and I know that this change will affect many existing tutorials and programs, so please pay particular attention to this.
+
+#### Update
+
+- Added a `py.typed` file so that mypy will know to use our type annotations, **I strongly recommend that you use it in development**. ([#543](https://github.com/StellarCN/py-stellar-base/pull/543))
+- Strictly check whether the type of data input by the user meets the requirements, and if it does not, `TypeError` will be thrown.  ([#542](https://github.com/StellarCN/py-stellar-base/pull/542)) ([#544](https://github.com/StellarCN/py-stellar-base/pull/544))
+- `universal_account_id` attribute has been added to `stellar_sdk.MuxedAccount` and `stellar_sdk.Account`, please turn to the documentation to find out more. ([#548](https://github.com/StellarCN/py-stellar-base/pull/548))
+- Improve document.
+
+#### Breaking changes
+
+- `stellar_sdk.Server` can now only be used to send synchronous requests, if you need to send asynchronous requests, use `stellar_sdk.ServerAsync` instead.  ([#540](https://github.com/StellarCN/py-stellar-base/pull/540))
+- The signature of the following function contained in `stellar_sdk.TransactionBuilder` has changed: ([#547](https://github.com/StellarCN/py-stellar-base/pull/))
+  - append_change_trust_op
+  - append_payment_op
+  - append_path_payment_strict_receive_op
+  - append_path_payment_strict_send_op
+  - append_manage_buy_offer_op
+  - append_manage_sell_offer_op
+  - append_create_passive_sell_offer_op
+
+
+- `append_change_trust_liquidity_pool_asset_op` in `stellar_sdk.TransactionBuilder` has been removed, please use `append_change_trust_op` instead. ([#547](https://github.com/StellarCN/py-stellar-base/pull/547))
+
+- The initialization function for `stellar_sdk.Account` has changed, previously it was  `def __init__(self, account_id: Union[str, MuxedAccount], sequence: int)` and now it is  `def __init__(self, account: Union[str, MuxedAccount], sequence: int, raw_data: Dict[str, Any])`.  ([#548](https://github.com/StellarCN/py-stellar-base/pull/548))
+
+- `stellar_sdk.exceptions.ValueError`, `stellar_sdk.exceptions.TypeError` and `stellar_sdk.exceptions.AttributeError` are no longer subclass of `stellar_sdk.exceptions.SdkError`, they are now aliases for Python's built-in functions. ([#549](https://github.com/StellarCN/py-stellar-base/pull/549))
+
+- The previous type of `stellar_sdk.BaseTransactionEnvelope.signatures` was `stellar_sdk.xdr.DecoratedSignature`, now it is `stellar_sdk.DecoratedSignature`. ([#538](https://github.com/StellarCN/py-stellar-base/pull/538))
+
+- `stellar_sdk.sep.federation.resolve_stellar_address` and `stellar_sdk.sep.federation.resolve_account_id` can also only be used to send synchronization requests, please `stellar_sdk.sep.federation.resolve_stellar_address_async` and `stellar_sdk.sep.federation.resolve_account_id_async` to send asynchronous requests. ([#540](https://github.com/StellarCN/py-stellar-base/pull/540))
+
+- `stellar_sdk.sep.stellar_toml.fetch_stellar_toml` can also only be used to send synchronization requests, please `stellar_sdk.sep.stellar_toml.fetch_stellar_toml_async`  to send asynchronous requests. ([#540](https://github.com/StellarCN/py-stellar-base/pull/540))
+
+- The initialization function for `stellar_sdk.SignerKey` has changed, previously it was  `def __init__(self, signer_key: stellar_xdr.SignerKey)` and now it is `def __init__(self, signer_key: bytes, signer_key_type: SignerKeyType)`, the attribute contained therein has been changed accordingly. ([#537](https://github.com/StellarCN/py-stellar-base/pull/537))
+
+- `clear_flags` and `set_flags` in `stellar_sdk.operation.SetOptions` have been changed to `stellar_sdk.operation.AuthorizationFlag` type, previously it was `int`. ([#528](https://github.com/StellarCN/py-stellar-base/pull/528))
+
+- the client's `USER_AGENT` and `IDENTIFICATION_HEADERS` are changed to "py-stellar-base" ([#550](https://github.com/StellarCN/py-stellar-base/pull/550))
+
+- The types of the following attribute may have previously varied with the type of the parameters entered by the user, but now they are deterministic: ([#528](https://github.com/StellarCN/py-stellar-base/pull/528))
+
+  | attribute                                                  | current type |
+  | ---------------------------------------------------------- | ------------ |
+  | stellar_sdk.operation.ChangeTrust.limit                    | str          |
+  | stellar_sdk.operation.Clawback.amount                      | str          |
+  | stellar_sdk.operation.CreateAccount.starting_balance       | str          |
+  | stellar_sdk.operation.CreateClaimableBalance.amount        | str          |
+  | stellar_sdk.operation.CreatePassiveSellOffer.amount        | str          |
+  | stellar_sdk.operation.CreatePassiveSellOffer.price         | Price        |
+  | stellar_sdk.operation.LiquidityPoolDeposit.max_amount_a    | str          |
+  | stellar_sdk.operation.LiquidityPoolDeposit.max_amount_b    | str          |
+  | stellar_sdk.operation.LiquidityPoolDeposit.min_price       | Price        |
+  | stellar_sdk.operation.LiquidityPoolDeposit.max_price       | Price        |
+  | stellar_sdk.operation.LiquidityPoolWithdraw.amount         | str          |
+  | stellar_sdk.operation.LiquidityPoolWithdraw.min_amount_a   | str          |
+  | stellar_sdk.operation.LiquidityPoolWithdraw.min_amount_b   | str          |
+  | stellar_sdk.operation.ManageBuyOffer.amount                | str          |
+  | stellar_sdk.operation.ManageBuyOffer.price                 | Price        |
+  | stellar_sdk.operation.ManageSellOffer.amount               | str          |
+  | stellar_sdk.operation.ManageSellOffer.price                | Price        |
+  | stellar_sdk.operation.PathPaymentStrictReceive.send_max    | str          |
+  | stellar_sdk.operation.PathPaymentStrictReceive.dest_amount | str          |
+  | stellar_sdk.operation.PathPaymentStrictSend.send_amount    | str          |
+  | stellar_sdk.operation.PathPaymentStrictSend.dest_min       | str          |
+  | stellar_sdk.operation.Payment.amount                       | str          |
+
 ### Version 6.0.0-beta3
 Released on November 01, 2021
 
@@ -105,7 +180,7 @@ As we introduced in the [5.0.0](https://github.com/StellarCN/py-stellar-base/rel
 
 
 ### Version 5.0.1
-Released on October 06, 2021
+Released on November 10, 2021
 
 #### Update
 * Upgrade outdated third-party dependencies.

@@ -28,5 +28,5 @@ Stellar Python SDK 的发布遵循 `Semantic Versioning 2.0.0 <https://semver.or
 
     git clone https://github.com/StellarCN/py-stellar-base.git
     cd py-stellar-base
-    git checkout 6.0.0-beta3
+    git checkout 6.0.0
     pip install .
