@@ -31,7 +31,7 @@ class Response:
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
-            return NotImplemented  # pragma: no cover
+            return NotImplemented
         return (
             self.status_code == other.status_code
             and self.text == other.text

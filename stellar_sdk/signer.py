@@ -91,7 +91,7 @@ class Signer:
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
-            return NotImplemented  # pragma: no cover
+            return NotImplemented
         return self.signer_key == other.signer_key and self.weight == other.weight
 
     def __str__(self):

@@ -61,7 +61,7 @@ class TimeBounds:
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
-            return NotImplemented  # pragma: no cover
+            return NotImplemented
         return self.min_time == other.min_time and self.max_time == other.max_time
 
     def __str__(self):

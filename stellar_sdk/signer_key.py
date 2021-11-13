@@ -130,7 +130,7 @@ class SignerKey:
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
-            return NotImplemented  # pragma: no cover
+            return NotImplemented
         return (
             self.signer_key == other.signer_key
             and self.signer_key_type == self.signer_key_type

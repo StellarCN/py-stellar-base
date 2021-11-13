@@ -63,7 +63,7 @@ class ChallengeTransaction:
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
-            return NotImplemented  # pragma: no cover
+            return NotImplemented
         return (
             self.transaction == other.transaction
             and self.client_account_id == other.client_account_id

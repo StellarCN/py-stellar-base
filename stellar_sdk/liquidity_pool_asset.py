@@ -142,7 +142,7 @@ class LiquidityPoolAsset:
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
-            return NotImplemented  # pragma: no cover
+            return NotImplemented
         return (
             self.asset_a == other.asset_a
             and self.asset_b == other.asset_b

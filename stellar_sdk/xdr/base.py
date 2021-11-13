@@ -28,7 +28,7 @@ class Integer:
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
-            return NotImplemented  # pragma: no cover
+            return NotImplemented
         return self.value == other.value
 
     def __str__(self):
@@ -49,7 +49,7 @@ class UnsignedInteger:
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
-            return NotImplemented  # pragma: no cover
+            return NotImplemented
         return self.value == other.value
 
     def __str__(self):
@@ -70,7 +70,7 @@ class Hyper:
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
-            return NotImplemented  # pragma: no cover
+            return NotImplemented
         return self.value == other.value
 
     def __str__(self):
@@ -91,7 +91,7 @@ class UnsignedHyper:
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
-            return NotImplemented  # pragma: no cover
+            return NotImplemented
         return self.value == other.value
 
     def __str__(self):
@@ -112,7 +112,7 @@ class Boolean:
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
-            return NotImplemented  # pragma: no cover
+            return NotImplemented
         return self.value == other.value
 
     def __str__(self):
@@ -141,7 +141,7 @@ class String:
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
-            return NotImplemented  # pragma: no cover
+            return NotImplemented
         return self.value == other.value and self.size == other.size
 
     def __str__(self):
@@ -182,7 +182,7 @@ class Opaque:
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
-            return NotImplemented  # pragma: no cover
+            return NotImplemented
         return (
             self.value == other.value
             and self.fixed == other.fixed

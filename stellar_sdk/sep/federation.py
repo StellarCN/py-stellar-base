@@ -66,7 +66,7 @@ class FederationRecord:
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
-            return NotImplemented  # pragma: no cover
+            return NotImplemented
         return (
             self.account_id == other.account_id
             and self.stellar_address == other.stellar_address

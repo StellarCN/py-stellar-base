@@ -40,7 +40,7 @@ class ClaimPredicateGroup:
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
-            return NotImplemented  # pragma: no cover
+            return NotImplemented
         return self.left == other.left and self.right == other.right
 
     def __str__(self):
@@ -288,7 +288,7 @@ class ClaimPredicate:
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
-            return NotImplemented  # pragma: no cover
+            return NotImplemented
         return (
             self.claim_predicate_type == other.claim_predicate_type
             and self.and_predicates == other.and_predicates
@@ -347,7 +347,7 @@ class Claimant:
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
-            return NotImplemented  # pragma: no cover
+            return NotImplemented
         return (
             self.destination == other.destination and self.predicate == other.predicate
         )

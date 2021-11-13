@@ -43,7 +43,7 @@ class DecoratedSignature:
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
-            return NotImplemented  # pragma: no cover
+            return NotImplemented
         return (
             self.signature_hint == other.signature_hint
             and self.signature == other.signature

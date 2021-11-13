@@ -43,7 +43,7 @@ class TrustLine:
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
-            return NotImplemented  # pragma: no cover
+            return NotImplemented
         return self.account_id == other.account_id and self.asset == other.asset
 
     def __str__(self):
@@ -59,7 +59,7 @@ class Offer:
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
-            return NotImplemented  # pragma: no cover
+            return NotImplemented
         return self.seller_id == other.seller_id and self.offer_id == other.offer_id
 
     def __str__(self):
@@ -75,7 +75,7 @@ class Data:
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
-            return NotImplemented  # pragma: no cover
+            return NotImplemented
         return self.account_id == other.account_id and self.data_name == other.data_name
 
     def __str__(self):
@@ -91,7 +91,7 @@ class Signer:
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
-            return NotImplemented  # pragma: no cover
+            return NotImplemented
         return (
             self.account_id == other.account_id and self.signer_key == other.signer_key
         )
@@ -531,7 +531,7 @@ class RevokeSponsorship(Operation):
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
-            return NotImplemented  # pragma: no cover
+            return NotImplemented
         return (
             self.revoke_sponsorship_type == other.revoke_sponsorship_type
             and self.account_id == other.account_id

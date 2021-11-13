@@ -128,5 +128,5 @@ class Operation(metaclass=ABCMeta):
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
-            return NotImplemented  # pragma: no cover
+            return NotImplemented
         return self.to_xdr_object() == other.to_xdr_object()

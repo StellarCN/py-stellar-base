@@ -263,7 +263,7 @@ class Keypair:
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
-            return NotImplemented  # pragma: no cover
+            return NotImplemented
         return (
             self.verify_key == other.verify_key
             and self.signing_key == other.signing_key

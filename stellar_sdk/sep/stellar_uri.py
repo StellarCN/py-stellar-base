@@ -253,7 +253,7 @@ class PayStellarUri(StellarUri):
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
-            return NotImplemented  # pragma: no cover
+            return NotImplemented
         return (
             self.destination == other.destination
             and self.amount == other.amount
@@ -303,7 +303,7 @@ class Replacement:
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
-            return NotImplemented  # pragma: no cover
+            return NotImplemented
         return (
             self.txrep_tx_field_name == other.txrep_tx_field_name
             and self.reference_identifier == other.reference_identifier
@@ -472,7 +472,7 @@ class TransactionStellarUri(StellarUri):
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
-            return NotImplemented  # pragma: no cover
+            return NotImplemented
         return (
             self.transaction_envelope == other.transaction_envelope
             and self.replace == other.replace

@@ -50,7 +50,7 @@ class LiquidityPoolId:
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
-            return NotImplemented  # pragma: no cover
+            return NotImplemented
         return self.liquidity_pool_id == other.liquidity_pool_id
 
     def __str__(self):
