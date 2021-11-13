@@ -10,28 +10,29 @@
 
 -i https://pypi.org/simple
 aiohttp-sse-client==0.2.1
-aiohttp==3.7.4.post0
+aiohttp==3.8.0
+aiosignal==1.2.0; python_version >= '3.6'
 alabaster==0.7.12
-async-timeout==3.0.1; python_full_version >= '3.5.3'
+async-timeout==4.0.1; python_version >= '3.6'
 attrs==21.2.0; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3, 3.4'
 babel==2.9.1; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3'
 certifi==2021.10.8
 cffi==1.15.0
-chardet==4.0.0; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3, 3.4'
 charset-normalizer==2.0.7; python_version >= '3'
-coverage[toml]==6.0.2; python_version >= '3.6'
+coverage[toml]==6.1.2; python_version >= '3.6'
 docutils==0.17.1; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3, 3.4'
+frozenlist==1.2.0; python_version >= '3.6'
 idna==3.3; python_version >= '3'
-imagesize==1.2.0; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3'
+imagesize==1.3.0; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3'
 iniconfig==1.1.1
-jinja2==3.0.2; python_version >= '3.6'
+jinja2==3.0.3; python_version >= '3.6'
 markupsafe==2.0.1; python_version >= '3.6'
 mnemonic==0.20
 multidict==5.2.0; python_version >= '3.6'
-packaging==21.0; python_version >= '3.6'
+packaging==21.2; python_version >= '3.6'
 pluggy==1.0.0; python_version >= '3.6'
-py==1.10.0; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3'
-pycparser==2.20; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3'
+py==1.11.0; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3, 3.4'
+pycparser==2.21; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3'
 pygments==2.10.0; python_version >= '3.5'
 pynacl==1.4.0
 pyparsing==2.4.7; python_version >= '2.6' and python_version not in '3.0, 3.1, 3.2, 3.3'
@@ -42,11 +43,12 @@ pytest-timeout==2.0.1
 pytest==6.2.5
 pytz==2021.3
 requests==2.26.0
+setuptools==58.5.3; python_version >= '3.6'
 six==1.16.0; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3'
 snowballstemmer==2.1.0
 sphinx-autodoc-typehints==1.12.0
 sphinx-rtd-theme==1.0.0
-sphinx==4.2.0
+sphinx==4.3.0
 sphinxcontrib-applehelp==1.0.2; python_version >= '3.5'
 sphinxcontrib-devhelp==1.0.2; python_version >= '3.5'
 sphinxcontrib-htmlhelp==2.0.0; python_version >= '3.6'
@@ -55,9 +57,9 @@ sphinxcontrib-qthelp==1.0.3; python_version >= '3.5'
 sphinxcontrib-serializinghtml==1.1.5; python_version >= '3.5'
 stellar-base-sseclient==0.0.21
 toml==0.10.2
-tomli==1.2.1; python_version >= '3.6'
+tomli==1.2.2; python_version >= '3.6'
 typeguard==2.13.0
 typing-extensions==3.10.0.2
 urllib3==1.26.7; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3, 3.4' and python_version < '4'
 werkzeug==2.0.2; python_version >= '3.6'
-yarl==1.7.0; python_version >= '3.6'
+yarl==1.7.2; python_version >= '3.6'
