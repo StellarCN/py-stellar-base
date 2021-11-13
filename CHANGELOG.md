@@ -104,6 +104,12 @@ As we introduced in the [5.0.0](https://github.com/StellarCN/py-stellar-base/rel
   | stellar_sdk.operation.Payment.amount                       | str          |
 
 
+### Version 5.0.1
+Released on October 06, 2021
+
+#### Update
+* Upgrade outdated third-party dependencies.
+
 ### Version 5.0.0
 Released on October 06, 2021
 
