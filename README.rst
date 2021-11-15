@@ -139,7 +139,7 @@ Links
 -----
 * Document: https://stellar-sdk.readthedocs.io
 * Code: https://github.com/StellarCN/py-stellar-base
-* Examples: https://github.com/StellarCN/py-stellar-base/tree/master/examples
+* Examples: https://github.com/StellarCN/py-stellar-base/tree/v6/examples
 * Issue tracker: https://github.com/StellarCN/py-stellar-base/issues
 * License: `Apache License 2.0 <https://github.com/StellarCN/py-stellar-base/blob/master/LICENSE>`_
 * Releases: https://pypi.org/project/stellar-sdk/
