@@ -85,7 +85,10 @@ jobs:
           poetry install
 
       - name: Run mypy check
-        run: poetry run mypy -p stellar_sdk
+        run: |
+          poetry run mypy -p stellar_sdk
+          poetry run mypy -p tests
+          poetry run mypy examples
 
   deploy:
     needs: test

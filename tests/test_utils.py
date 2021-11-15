@@ -209,7 +209,7 @@ class TestUtils:
             ("922337203685.4775807", "amount", False),
         ],
     )
-    def test_raise_if_not_valid_amount_out_of_range(
+    def test_raise_if_not_valid_too_many_digits(
         self, amount, argument_name, raise_err
     ):
         if raise_err:

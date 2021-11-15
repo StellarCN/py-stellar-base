@@ -59,11 +59,11 @@ def get_tx_builder(
 
 def check_from_xdr(tx: TransactionBuilder):
     xdr = tx.build().to_xdr()
+    tx_builder = TransactionBuilder.from_xdr(xdr, Network.TESTNET_NETWORK_PASSPHRASE)
+    assert isinstance(tx_builder, TransactionBuilder)
     assert (
         xdr
-        == TransactionBuilder.from_xdr(xdr, Network.TESTNET_NETWORK_PASSPHRASE)
-        .build()
-        .to_xdr()
+        == tx_builder.build().to_xdr()
     )
 
 
