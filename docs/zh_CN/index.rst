@@ -106,5 +106,4 @@ stellar-model 可以将 Stellar Horizon 返回的 JSON 解析为 Python 实例�
 .. _here: https://github.com/StellarCN/py-stellar-base/tree/master/examples
 .. _Stellar Horizon server: https://github.com/stellar/go/tree/master/services/horizon
 .. _pip: https://pip.pypa.io/en/stable/quickstart/
-.. _pipenv: https://github.com/pypa/pipenv
 .. _Stellar JavaScript SDK: https://github.com/stellar/js-stellar-sdk

@@ -4,7 +4,7 @@
 Installation
 ************
 
-Via pipenv or pip
+Via pip
 ===============================
 
 Use pip to install and update py-stellar-base:

@@ -4,7 +4,7 @@
 安装
 *****
 
-通过 pipenv 或 pip 安装
+通过 pip 安装
 =========================
 
 使用 pip 来安装最新版的 Stellar Python SDK ：
