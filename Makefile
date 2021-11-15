@@ -7,15 +7,15 @@ install:
 .PHONY: install
 
 install-dev:
-	pipenv install --dev
+	poetry install
 .PHONY: install-dev
 
 test:
-	pytest -v -s -rs tests --cov --cov-report=html
+	poetry run pytest -v -s -rs tests --cov --cov-report=html
 .PHONY: test
 
 full-test:
-	pytest -v -s -rs tests --runslow --cov --cov-report=html
+	poetry run pytest -v -s -rs tests --runslow --cov --cov-report=html
 .PHONY: full-test
 
 codecov:
@@ -23,7 +23,7 @@ codecov:
 .PHONY: codecov
 
 package:
-	python setup.py sdist bdist_wheel
+	poetry build
 .PHONY: package
 
 pypi:
@@ -37,11 +37,6 @@ clean:
 update-xdr:
 	python .xdr/update_xdr.py
 .PHONY: update-xdr
-
-lock:
-	pipenv lock --requirements > requirements.txt
-	pipenv lock --requirements --dev > requirements-dev.txt
-.PHONY: lock
 
 format:
 	isort .
