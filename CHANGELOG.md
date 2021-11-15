@@ -1,6 +1,12 @@
 Release History
 ==============
 
+### Version 6.0.1
+Released on November 15, 2021
+
+#### Update
+* Upgrade outdated third-party dependencies.
+
 ### Version 6.0.0
 Released on November 13, 2021
 
