@@ -30,5 +30,4 @@ You can clone `the repository <https://github.com/StellarCN/py-stellar-base>`_ d
 
     git clone https://github.com/StellarCN/py-stellar-base.git
     cd py-stellar-base
-    git checkout 6.0.1
     pip install .

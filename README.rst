@@ -63,6 +63,7 @@ file to avoid the unknown effects of a corrupt update.
 
 A Simple Example
 ----------------
+You can find more examples `here <https://github.com/StellarCN/py-stellar-base/tree/v6/examples>`__.
 
 Building transaction with synchronous server
 
