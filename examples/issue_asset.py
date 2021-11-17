@@ -25,6 +25,12 @@ distributor_keypair = Keypair.from_secret(
 )
 distributor_public = distributor_keypair.public_key
 
+# Fund the established accounts with XLM to activate the accounts
+# Using Friendbot on testnet:
+
+requests.get(f"https://friendbot.stellar.org?addr={issuing_public}")
+requests.get(f"https://friendbot.stellar.org?addr={distributor_public}")
+
 # Transactions require a valid sequence number that is specific to this account.
 # We can fetch the current sequence number for the source account from Horizon.
 distributor_account = server.load_account(distributor_public)
