@@ -45,3 +45,14 @@ class BaseLiquidityPoolsBuilder(BaseCallBuilder):
         reserves_param = convert_assets_to_horizon_param(reserves)
         self._add_query_param("reserves", reserves_param)
         return self
+
+    def for_account(self, account_id: str):
+        """Filter pools for a specific account
+
+        See `List Liquidity Pools <https://developers.stellar.org/api/resources/liquiditypools/list/>`__ for more information.
+
+        :param account_id: account id
+        :return: current LiquidityPoolsBuilder instance
+        """
+        self._add_query_param("account", account_id)
+        return self
