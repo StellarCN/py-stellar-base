@@ -1,6 +1,12 @@
 Release History
 ==============
 
+### Version 6.1.0
+Released on November 17, 2021
+
+#### Add
+* feat: add a way to filter liquidity pools by participating account. ([#558](https://github.com/StellarCN/py-stellar-base/pull/558))
+
 ### Version 6.0.1
 Released on November 15, 2021
 
