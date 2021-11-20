@@ -194,7 +194,7 @@ class Asset:
 
         - ASSET_TYPE_NATIVE
         - ASSET_TYPE_CREDIT_ALPHANUM4
-        - ASSET_TYPE_CREDIT_ALPHANUM4
+        - ASSET_TYPE_CREDIT_ALPHANUM12
 
         :param xdr_object: The XDR Asset/ChangeTrustAsset/TrustLineAsset object.
         :return: A new :class:`Asset` object from the given XDR object.
