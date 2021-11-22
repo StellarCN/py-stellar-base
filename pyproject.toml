@@ -81,10 +81,7 @@ source = [
 
 [tool.coverage.report]
 omit = [
-    ".xdr/*",
     "stellar_sdk/xdr/*",
-    "stellar_sdk/vendor/*",
-    "setup.py"
 ]
 exclude_lines = [
     "pragma: no cover",
