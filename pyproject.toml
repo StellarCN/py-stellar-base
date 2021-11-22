@@ -68,6 +68,33 @@ types-requests = {version = "^2.26.0", markers = "platform_python_implementation
 [tool.poetry.extras]
 docs = ["sphinx", "sphinx-rtd-theme", "sphinx-autodoc-typehints"]
 
+[tool.mypy]
+show_error_codes = true
+ignore_missing_imports = true
+warn_unused_configs = true
+
+[tool.coverage.run]
+source = [
+    "stellar_sdk/",
+    "tests/"
+]
+
+[tool.coverage.report]
+omit = [
+    "stellar_sdk/xdr/*",
+]
+exclude_lines = [
+    "pragma: no cover",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "return NotImplemented",
+    "def __repr__",
+    "def __str__",
+    "if self\\.debug",
+    "if 0:",
+    "if __name__ == .__main__.:"
+]
+
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
