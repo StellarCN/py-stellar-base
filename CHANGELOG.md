@@ -1,6 +1,12 @@
 Release History
 ==============
 
+### Version 6.1.1
+Released on November 24, 2021
+
+#### Update
+* Specify the version of urllib3 >= 1.26.7 and < 2.0.0. ([#563](https://github.com/StellarCN/py-stellar-base/pull/563))
+
 ### Version 6.1.0
 Released on November 17, 2021
 
