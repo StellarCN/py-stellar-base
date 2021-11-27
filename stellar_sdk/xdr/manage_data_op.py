@@ -37,6 +37,8 @@ class ManageDataOp:
             packer.pack_uint(0)
         else:
             packer.pack_uint(1)
+            if self.data_value is None:
+                raise ValueError("data_value should not be None.")
             self.data_value.pack(packer)
 
     @classmethod

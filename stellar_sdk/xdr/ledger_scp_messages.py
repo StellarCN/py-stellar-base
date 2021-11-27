@@ -4,7 +4,6 @@ import base64
 from typing import List
 from xdrlib import Packer, Unpacker
 
-from ..exceptions import ValueError
 from ..type_checked import type_checked
 from .scp_envelope import SCPEnvelope
 from .uint32 import Uint32
@@ -39,8 +38,8 @@ class LedgerSCPMessages:
     def pack(self, packer: Packer) -> None:
         self.ledger_seq.pack(packer)
         packer.pack_uint(len(self.messages))
-        for message in self.messages:
-            message.pack(packer)
+        for messages_item in self.messages:
+            messages_item.pack(packer)
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "LedgerSCPMessages":

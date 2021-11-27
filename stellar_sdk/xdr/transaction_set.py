@@ -4,7 +4,6 @@ import base64
 from typing import List
 from xdrlib import Packer, Unpacker
 
-from ..exceptions import ValueError
 from ..type_checked import type_checked
 from .hash import Hash
 from .transaction_envelope import TransactionEnvelope
@@ -39,8 +38,8 @@ class TransactionSet:
     def pack(self, packer: Packer) -> None:
         self.previous_ledger_hash.pack(packer)
         packer.pack_uint(len(self.txs))
-        for tx in self.txs:
-            tx.pack(packer)
+        for txs_item in self.txs:
+            txs_item.pack(packer)
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "TransactionSet":

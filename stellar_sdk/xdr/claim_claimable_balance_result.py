@@ -38,8 +38,8 @@ class ClaimClaimableBalanceResult:
     def unpack(cls, unpacker: Unpacker) -> "ClaimClaimableBalanceResult":
         code = ClaimClaimableBalanceResultCode.unpack(unpacker)
         if code == ClaimClaimableBalanceResultCode.CLAIM_CLAIMABLE_BALANCE_SUCCESS:
-            return cls(code)
-        return cls(code)
+            return cls(code=code)
+        return cls(code=code)
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

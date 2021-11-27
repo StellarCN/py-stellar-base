@@ -4,7 +4,6 @@ import base64
 from typing import List, Optional
 from xdrlib import Packer, Unpacker
 
-from ..exceptions import ValueError
 from ..type_checked import type_checked
 from .constants import *
 from .memo import Memo
@@ -70,11 +69,13 @@ class TransactionV0:
             packer.pack_uint(0)
         else:
             packer.pack_uint(1)
+            if self.time_bounds is None:
+                raise ValueError("time_bounds should not be None.")
             self.time_bounds.pack(packer)
         self.memo.pack(packer)
         packer.pack_uint(len(self.operations))
-        for operation in self.operations:
-            operation.pack(packer)
+        for operations_item in self.operations:
+            operations_item.pack(packer)
         self.ext.pack(packer)
 
     @classmethod

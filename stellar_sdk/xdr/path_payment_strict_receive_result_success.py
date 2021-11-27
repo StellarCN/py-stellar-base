@@ -4,7 +4,6 @@ import base64
 from typing import List
 from xdrlib import Packer, Unpacker
 
-from ..exceptions import ValueError
 from ..type_checked import type_checked
 from .claim_atom import ClaimAtom
 from .simple_payment_result import SimplePaymentResult
@@ -38,8 +37,8 @@ class PathPaymentStrictReceiveResultSuccess:
 
     def pack(self, packer: Packer) -> None:
         packer.pack_uint(len(self.offers))
-        for offer in self.offers:
-            offer.pack(packer)
+        for offers_item in self.offers:
+            offers_item.pack(packer)
         self.last.pack(packer)
 
     @classmethod

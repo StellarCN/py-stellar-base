@@ -4,7 +4,6 @@ import base64
 from typing import List
 from xdrlib import Packer, Unpacker
 
-from ..exceptions import ValueError
 from ..type_checked import type_checked
 from .hash import Hash
 from .stellar_value_ext import StellarValueExt
@@ -63,8 +62,8 @@ class StellarValue:
         self.tx_set_hash.pack(packer)
         self.close_time.pack(packer)
         packer.pack_uint(len(self.upgrades))
-        for upgrade in self.upgrades:
-            upgrade.pack(packer)
+        for upgrades_item in self.upgrades:
+            upgrades_item.pack(packer)
         self.ext.pack(packer)
 
     @classmethod

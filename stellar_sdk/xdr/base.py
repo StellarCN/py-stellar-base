@@ -1,11 +1,12 @@
 from xdrlib import Packer, Unpacker
 
-from ..exceptions import ValueError
 from ..type_checked import type_checked
 
 __all__ = [
     "Integer",
     "UnsignedInteger",
+    "Float",
+    "Double",
     "Hyper",
     "UnsignedHyper",
     "Boolean",
@@ -23,7 +24,7 @@ class Integer:
         packer.pack_int(self.value)
 
     @staticmethod
-    def unpack(unpacker: Unpacker) -> "int":
+    def unpack(unpacker: Unpacker) -> int:
         return unpacker.unpack_int()
 
     def __eq__(self, other: object) -> bool:
@@ -44,7 +45,7 @@ class UnsignedInteger:
         packer.pack_uint(self.value)
 
     @staticmethod
-    def unpack(unpacker: Unpacker) -> "int":
+    def unpack(unpacker: Unpacker) -> int:
         return unpacker.unpack_uint()
 
     def __eq__(self, other: object) -> bool:
@@ -57,6 +58,48 @@ class UnsignedInteger:
 
 
 @type_checked
+class Float:
+    def __init__(self, value: float) -> None:
+        self.value = value
+
+    def pack(self, packer: Packer) -> None:
+        packer.pack_float(self.value)
+
+    @staticmethod
+    def unpack(unpacker: Unpacker) -> float:
+        return unpacker.unpack_float()
+
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, self.__class__):
+            return NotImplemented
+        return self.value == other.value
+
+    def __str__(self):
+        return f"<Float [value={self.value}]>"
+
+
+@type_checked
+class Double:
+    def __init__(self, value: float) -> None:
+        self.value = value
+
+    def pack(self, packer: Packer) -> None:
+        packer.pack_double(self.value)
+
+    @staticmethod
+    def unpack(unpacker: Unpacker) -> float:
+        return unpacker.unpack_double()
+
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, self.__class__):
+            return NotImplemented
+        return self.value == other.value
+
+    def __str__(self):
+        return f"<Double [value={self.value}]>"
+
+
+@type_checked
 class Hyper:
     def __init__(self, value: int) -> None:
         self.value = value
@@ -65,7 +108,7 @@ class Hyper:
         packer.pack_hyper(self.value)
 
     @staticmethod
-    def unpack(unpacker: Unpacker) -> "int":
+    def unpack(unpacker: Unpacker) -> int:
         return unpacker.unpack_hyper()
 
     def __eq__(self, other: object) -> bool:
@@ -86,7 +129,7 @@ class UnsignedHyper:
         packer.pack_uhyper(self.value)
 
     @staticmethod
-    def unpack(unpacker: Unpacker) -> "int":
+    def unpack(unpacker: Unpacker) -> int:
         return unpacker.unpack_uhyper()
 
     def __eq__(self, other: object) -> bool:
@@ -107,7 +150,7 @@ class Boolean:
         packer.pack_bool(self.value)
 
     @staticmethod
-    def unpack(unpacker: Unpacker) -> "bool":
+    def unpack(unpacker: Unpacker) -> bool:
         return unpacker.unpack_bool()
 
     def __eq__(self, other: object) -> bool:
@@ -175,7 +218,7 @@ class Opaque:
         packer.pack_fopaque(size, self.value)
 
     @staticmethod
-    def unpack(unpacker: Unpacker, size: int, fixed: bool) -> "bytes":
+    def unpack(unpacker: Unpacker, size: int, fixed: bool) -> bytes:
         if not fixed:
             size = unpacker.unpack_uint()
         return unpacker.unpack_fopaque(size)

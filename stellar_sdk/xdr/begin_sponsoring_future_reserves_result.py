@@ -47,8 +47,8 @@ class BeginSponsoringFutureReservesResult:
             code
             == BeginSponsoringFutureReservesResultCode.BEGIN_SPONSORING_FUTURE_RESERVES_SUCCESS
         ):
-            return cls(code)
-        return cls(code)
+            return cls(code=code)
+        return cls(code=code)
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

@@ -4,7 +4,6 @@ import base64
 from typing import List
 from xdrlib import Packer, Unpacker
 
-from ..exceptions import ValueError
 from ..type_checked import type_checked
 from .hash import Hash
 from .value import Value
@@ -46,11 +45,11 @@ class SCPNomination:
     def pack(self, packer: Packer) -> None:
         self.quorum_set_hash.pack(packer)
         packer.pack_uint(len(self.votes))
-        for vote in self.votes:
-            vote.pack(packer)
+        for votes_item in self.votes:
+            votes_item.pack(packer)
         packer.pack_uint(len(self.accepted))
-        for accepted in self.accepted:
-            accepted.pack(packer)
+        for accepted_item in self.accepted:
+            accepted_item.pack(packer)
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "SCPNomination":

@@ -3,7 +3,6 @@
 import base64
 from xdrlib import Packer, Unpacker
 
-from ..exceptions import ValueError
 from ..type_checked import type_checked
 from .allow_trust_op import AllowTrustOp
 from .begin_sponsoring_future_reserves_op import BeginSponsoringFutureReservesOp
@@ -264,130 +263,90 @@ class OperationBody:
         type = OperationType.unpack(unpacker)
         if type == OperationType.CREATE_ACCOUNT:
             create_account_op = CreateAccountOp.unpack(unpacker)
-            if create_account_op is None:
-                raise ValueError("create_account_op should not be None.")
-            return cls(type, create_account_op=create_account_op)
+            return cls(type=type, create_account_op=create_account_op)
         if type == OperationType.PAYMENT:
             payment_op = PaymentOp.unpack(unpacker)
-            if payment_op is None:
-                raise ValueError("payment_op should not be None.")
-            return cls(type, payment_op=payment_op)
+            return cls(type=type, payment_op=payment_op)
         if type == OperationType.PATH_PAYMENT_STRICT_RECEIVE:
             path_payment_strict_receive_op = PathPaymentStrictReceiveOp.unpack(unpacker)
-            if path_payment_strict_receive_op is None:
-                raise ValueError("path_payment_strict_receive_op should not be None.")
             return cls(
-                type, path_payment_strict_receive_op=path_payment_strict_receive_op
+                type=type, path_payment_strict_receive_op=path_payment_strict_receive_op
             )
         if type == OperationType.MANAGE_SELL_OFFER:
             manage_sell_offer_op = ManageSellOfferOp.unpack(unpacker)
-            if manage_sell_offer_op is None:
-                raise ValueError("manage_sell_offer_op should not be None.")
-            return cls(type, manage_sell_offer_op=manage_sell_offer_op)
+            return cls(type=type, manage_sell_offer_op=manage_sell_offer_op)
         if type == OperationType.CREATE_PASSIVE_SELL_OFFER:
             create_passive_sell_offer_op = CreatePassiveSellOfferOp.unpack(unpacker)
-            if create_passive_sell_offer_op is None:
-                raise ValueError("create_passive_sell_offer_op should not be None.")
-            return cls(type, create_passive_sell_offer_op=create_passive_sell_offer_op)
+            return cls(
+                type=type, create_passive_sell_offer_op=create_passive_sell_offer_op
+            )
         if type == OperationType.SET_OPTIONS:
             set_options_op = SetOptionsOp.unpack(unpacker)
-            if set_options_op is None:
-                raise ValueError("set_options_op should not be None.")
-            return cls(type, set_options_op=set_options_op)
+            return cls(type=type, set_options_op=set_options_op)
         if type == OperationType.CHANGE_TRUST:
             change_trust_op = ChangeTrustOp.unpack(unpacker)
-            if change_trust_op is None:
-                raise ValueError("change_trust_op should not be None.")
-            return cls(type, change_trust_op=change_trust_op)
+            return cls(type=type, change_trust_op=change_trust_op)
         if type == OperationType.ALLOW_TRUST:
             allow_trust_op = AllowTrustOp.unpack(unpacker)
-            if allow_trust_op is None:
-                raise ValueError("allow_trust_op should not be None.")
-            return cls(type, allow_trust_op=allow_trust_op)
+            return cls(type=type, allow_trust_op=allow_trust_op)
         if type == OperationType.ACCOUNT_MERGE:
             destination = MuxedAccount.unpack(unpacker)
-            if destination is None:
-                raise ValueError("destination should not be None.")
-            return cls(type, destination=destination)
+            return cls(type=type, destination=destination)
         if type == OperationType.INFLATION:
-            return cls(type)
+            return cls(type=type)
         if type == OperationType.MANAGE_DATA:
             manage_data_op = ManageDataOp.unpack(unpacker)
-            if manage_data_op is None:
-                raise ValueError("manage_data_op should not be None.")
-            return cls(type, manage_data_op=manage_data_op)
+            return cls(type=type, manage_data_op=manage_data_op)
         if type == OperationType.BUMP_SEQUENCE:
             bump_sequence_op = BumpSequenceOp.unpack(unpacker)
-            if bump_sequence_op is None:
-                raise ValueError("bump_sequence_op should not be None.")
-            return cls(type, bump_sequence_op=bump_sequence_op)
+            return cls(type=type, bump_sequence_op=bump_sequence_op)
         if type == OperationType.MANAGE_BUY_OFFER:
             manage_buy_offer_op = ManageBuyOfferOp.unpack(unpacker)
-            if manage_buy_offer_op is None:
-                raise ValueError("manage_buy_offer_op should not be None.")
-            return cls(type, manage_buy_offer_op=manage_buy_offer_op)
+            return cls(type=type, manage_buy_offer_op=manage_buy_offer_op)
         if type == OperationType.PATH_PAYMENT_STRICT_SEND:
             path_payment_strict_send_op = PathPaymentStrictSendOp.unpack(unpacker)
-            if path_payment_strict_send_op is None:
-                raise ValueError("path_payment_strict_send_op should not be None.")
-            return cls(type, path_payment_strict_send_op=path_payment_strict_send_op)
+            return cls(
+                type=type, path_payment_strict_send_op=path_payment_strict_send_op
+            )
         if type == OperationType.CREATE_CLAIMABLE_BALANCE:
             create_claimable_balance_op = CreateClaimableBalanceOp.unpack(unpacker)
-            if create_claimable_balance_op is None:
-                raise ValueError("create_claimable_balance_op should not be None.")
-            return cls(type, create_claimable_balance_op=create_claimable_balance_op)
+            return cls(
+                type=type, create_claimable_balance_op=create_claimable_balance_op
+            )
         if type == OperationType.CLAIM_CLAIMABLE_BALANCE:
             claim_claimable_balance_op = ClaimClaimableBalanceOp.unpack(unpacker)
-            if claim_claimable_balance_op is None:
-                raise ValueError("claim_claimable_balance_op should not be None.")
-            return cls(type, claim_claimable_balance_op=claim_claimable_balance_op)
+            return cls(type=type, claim_claimable_balance_op=claim_claimable_balance_op)
         if type == OperationType.BEGIN_SPONSORING_FUTURE_RESERVES:
             begin_sponsoring_future_reserves_op = (
                 BeginSponsoringFutureReservesOp.unpack(unpacker)
             )
-            if begin_sponsoring_future_reserves_op is None:
-                raise ValueError(
-                    "begin_sponsoring_future_reserves_op should not be None."
-                )
             return cls(
-                type,
+                type=type,
                 begin_sponsoring_future_reserves_op=begin_sponsoring_future_reserves_op,
             )
         if type == OperationType.END_SPONSORING_FUTURE_RESERVES:
-            return cls(type)
+            return cls(type=type)
         if type == OperationType.REVOKE_SPONSORSHIP:
             revoke_sponsorship_op = RevokeSponsorshipOp.unpack(unpacker)
-            if revoke_sponsorship_op is None:
-                raise ValueError("revoke_sponsorship_op should not be None.")
-            return cls(type, revoke_sponsorship_op=revoke_sponsorship_op)
+            return cls(type=type, revoke_sponsorship_op=revoke_sponsorship_op)
         if type == OperationType.CLAWBACK:
             clawback_op = ClawbackOp.unpack(unpacker)
-            if clawback_op is None:
-                raise ValueError("clawback_op should not be None.")
-            return cls(type, clawback_op=clawback_op)
+            return cls(type=type, clawback_op=clawback_op)
         if type == OperationType.CLAWBACK_CLAIMABLE_BALANCE:
             clawback_claimable_balance_op = ClawbackClaimableBalanceOp.unpack(unpacker)
-            if clawback_claimable_balance_op is None:
-                raise ValueError("clawback_claimable_balance_op should not be None.")
             return cls(
-                type, clawback_claimable_balance_op=clawback_claimable_balance_op
+                type=type, clawback_claimable_balance_op=clawback_claimable_balance_op
             )
         if type == OperationType.SET_TRUST_LINE_FLAGS:
             set_trust_line_flags_op = SetTrustLineFlagsOp.unpack(unpacker)
-            if set_trust_line_flags_op is None:
-                raise ValueError("set_trust_line_flags_op should not be None.")
-            return cls(type, set_trust_line_flags_op=set_trust_line_flags_op)
+            return cls(type=type, set_trust_line_flags_op=set_trust_line_flags_op)
         if type == OperationType.LIQUIDITY_POOL_DEPOSIT:
             liquidity_pool_deposit_op = LiquidityPoolDepositOp.unpack(unpacker)
-            if liquidity_pool_deposit_op is None:
-                raise ValueError("liquidity_pool_deposit_op should not be None.")
-            return cls(type, liquidity_pool_deposit_op=liquidity_pool_deposit_op)
+            return cls(type=type, liquidity_pool_deposit_op=liquidity_pool_deposit_op)
         if type == OperationType.LIQUIDITY_POOL_WITHDRAW:
             liquidity_pool_withdraw_op = LiquidityPoolWithdrawOp.unpack(unpacker)
-            if liquidity_pool_withdraw_op is None:
-                raise ValueError("liquidity_pool_withdraw_op should not be None.")
-            return cls(type, liquidity_pool_withdraw_op=liquidity_pool_withdraw_op)
-        return cls(type)
+            return cls(type=type, liquidity_pool_withdraw_op=liquidity_pool_withdraw_op)
+        return cls(type=type)
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

@@ -3,7 +3,6 @@
 import base64
 from xdrlib import Packer, Unpacker
 
-from ..exceptions import ValueError
 from ..type_checked import type_checked
 from .operation_result_code import OperationResultCode
 from .operation_result_tr import OperationResultTr
@@ -97,10 +96,8 @@ class OperationResult:
         code = OperationResultCode.unpack(unpacker)
         if code == OperationResultCode.opINNER:
             tr = OperationResultTr.unpack(unpacker)
-            if tr is None:
-                raise ValueError("tr should not be None.")
-            return cls(code, tr=tr)
-        return cls(code)
+            return cls(code=code, tr=tr)
+        return cls(code=code)
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

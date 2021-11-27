@@ -38,8 +38,8 @@ class PaymentResult:
     def unpack(cls, unpacker: Unpacker) -> "PaymentResult":
         code = PaymentResultCode.unpack(unpacker)
         if code == PaymentResultCode.PAYMENT_SUCCESS:
-            return cls(code)
-        return cls(code)
+            return cls(code=code)
+        return cls(code=code)
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

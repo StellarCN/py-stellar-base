@@ -3,7 +3,6 @@
 import base64
 from xdrlib import Packer, Unpacker
 
-from ..exceptions import ValueError
 from ..type_checked import type_checked
 from .base import Integer
 from .ledger_close_meta_v0 import LedgerCloseMetaV0
@@ -44,10 +43,8 @@ class LedgerCloseMeta:
         v = Integer.unpack(unpacker)
         if v == 0:
             v0 = LedgerCloseMetaV0.unpack(unpacker)
-            if v0 is None:
-                raise ValueError("v0 should not be None.")
-            return cls(v, v0=v0)
-        return cls(v)
+            return cls(v=v, v0=v0)
+        return cls(v=v)
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

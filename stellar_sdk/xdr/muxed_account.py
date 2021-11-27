@@ -3,7 +3,6 @@
 import base64
 from xdrlib import Packer, Unpacker
 
-from ..exceptions import ValueError
 from ..type_checked import type_checked
 from .crypto_key_type import CryptoKeyType
 from .muxed_account_med25519 import MuxedAccountMed25519
@@ -58,15 +57,11 @@ class MuxedAccount:
         type = CryptoKeyType.unpack(unpacker)
         if type == CryptoKeyType.KEY_TYPE_ED25519:
             ed25519 = Uint256.unpack(unpacker)
-            if ed25519 is None:
-                raise ValueError("ed25519 should not be None.")
-            return cls(type, ed25519=ed25519)
+            return cls(type=type, ed25519=ed25519)
         if type == CryptoKeyType.KEY_TYPE_MUXED_ED25519:
             med25519 = MuxedAccountMed25519.unpack(unpacker)
-            if med25519 is None:
-                raise ValueError("med25519 should not be None.")
-            return cls(type, med25519=med25519)
-        return cls(type)
+            return cls(type=type, med25519=med25519)
+        return cls(type=type)
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

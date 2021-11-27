@@ -4,7 +4,6 @@ import base64
 from typing import List
 from xdrlib import Packer, Unpacker
 
-from ..exceptions import ValueError
 from ..type_checked import type_checked
 from .account_entry_extension_v2_ext import AccountEntryExtensionV2Ext
 from .constants import *
@@ -54,8 +53,8 @@ class AccountEntryExtensionV2:
         self.num_sponsored.pack(packer)
         self.num_sponsoring.pack(packer)
         packer.pack_uint(len(self.signer_sponsoring_i_ds))
-        for signer_sponsoring_i_d in self.signer_sponsoring_i_ds:
-            signer_sponsoring_i_d.pack(packer)
+        for signer_sponsoring_i_ds_item in self.signer_sponsoring_i_ds:
+            signer_sponsoring_i_ds_item.pack(packer)
         self.ext.pack(packer)
 
     @classmethod

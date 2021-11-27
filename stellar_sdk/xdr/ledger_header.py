@@ -4,7 +4,6 @@ import base64
 from typing import List
 from xdrlib import Packer, Unpacker
 
-from ..exceptions import ValueError
 from ..type_checked import type_checked
 from .hash import Hash
 from .int64 import Int64
@@ -113,8 +112,8 @@ class LedgerHeader:
         self.base_reserve.pack(packer)
         self.max_tx_set_size.pack(packer)
         packer.pack_uint(4)
-        for skip_list in self.skip_list:
-            skip_list.pack(packer)
+        for skip_list_item in self.skip_list:
+            skip_list_item.pack(packer)
         self.ext.pack(packer)
 
     @classmethod

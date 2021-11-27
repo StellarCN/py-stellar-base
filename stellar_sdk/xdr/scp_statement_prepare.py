@@ -51,11 +51,15 @@ class SCPStatementPrepare:
             packer.pack_uint(0)
         else:
             packer.pack_uint(1)
+            if self.prepared is None:
+                raise ValueError("prepared should not be None.")
             self.prepared.pack(packer)
         if self.prepared_prime is None:
             packer.pack_uint(0)
         else:
             packer.pack_uint(1)
+            if self.prepared_prime is None:
+                raise ValueError("prepared_prime should not be None.")
             self.prepared_prime.pack(packer)
         self.n_c.pack(packer)
         self.n_h.pack(packer)

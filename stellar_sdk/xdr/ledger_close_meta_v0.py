@@ -4,7 +4,6 @@ import base64
 from typing import List
 from xdrlib import Packer, Unpacker
 
-from ..exceptions import ValueError
 from ..type_checked import type_checked
 from .ledger_header_history_entry import LedgerHeaderHistoryEntry
 from .scp_history_entry import SCPHistoryEntry
@@ -69,14 +68,14 @@ class LedgerCloseMetaV0:
         self.ledger_header.pack(packer)
         self.tx_set.pack(packer)
         packer.pack_uint(len(self.tx_processing))
-        for tx_processing in self.tx_processing:
-            tx_processing.pack(packer)
+        for tx_processing_item in self.tx_processing:
+            tx_processing_item.pack(packer)
         packer.pack_uint(len(self.upgrades_processing))
-        for upgrades_processing in self.upgrades_processing:
-            upgrades_processing.pack(packer)
+        for upgrades_processing_item in self.upgrades_processing:
+            upgrades_processing_item.pack(packer)
         packer.pack_uint(len(self.scp_info))
-        for scp_info in self.scp_info:
-            scp_info.pack(packer)
+        for scp_info_item in self.scp_info:
+            scp_info_item.pack(packer)
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "LedgerCloseMetaV0":

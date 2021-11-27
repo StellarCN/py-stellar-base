@@ -3,7 +3,6 @@
 import base64
 from xdrlib import Packer, Unpacker
 
-from ..exceptions import ValueError
 from ..type_checked import type_checked
 from .authenticated_message_v0 import AuthenticatedMessageV0
 from .uint32 import Uint32
@@ -49,10 +48,8 @@ class AuthenticatedMessage:
         v = Uint32.unpack(unpacker)
         if v == 0:
             v0 = AuthenticatedMessageV0.unpack(unpacker)
-            if v0 is None:
-                raise ValueError("v0 should not be None.")
-            return cls(v, v0=v0)
-        return cls(v)
+            return cls(v=v, v0=v0)
+        return cls(v=v)
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

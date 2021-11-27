@@ -4,7 +4,6 @@ import base64
 from typing import List, Optional
 from xdrlib import Packer, Unpacker
 
-from ..exceptions import ValueError
 from ..type_checked import type_checked
 from .account_entry_ext import AccountEntryExt
 from .account_id import AccountID
@@ -91,13 +90,15 @@ class AccountEntry:
             packer.pack_uint(0)
         else:
             packer.pack_uint(1)
+            if self.inflation_dest is None:
+                raise ValueError("inflation_dest should not be None.")
             self.inflation_dest.pack(packer)
         self.flags.pack(packer)
         self.home_domain.pack(packer)
         self.thresholds.pack(packer)
         packer.pack_uint(len(self.signers))
-        for signer in self.signers:
-            signer.pack(packer)
+        for signers_item in self.signers:
+            signers_item.pack(packer)
         self.ext.pack(packer)
 
     @classmethod

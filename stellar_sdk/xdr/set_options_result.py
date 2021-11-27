@@ -38,8 +38,8 @@ class SetOptionsResult:
     def unpack(cls, unpacker: Unpacker) -> "SetOptionsResult":
         code = SetOptionsResultCode.unpack(unpacker)
         if code == SetOptionsResultCode.SET_OPTIONS_SUCCESS:
-            return cls(code)
-        return cls(code)
+            return cls(code=code)
+        return cls(code=code)
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

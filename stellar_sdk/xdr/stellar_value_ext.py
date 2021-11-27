@@ -3,7 +3,6 @@
 import base64
 from xdrlib import Packer, Unpacker
 
-from ..exceptions import ValueError
 from ..type_checked import type_checked
 from .ledger_close_value_signature import LedgerCloseValueSignature
 from .stellar_value_type import StellarValueType
@@ -47,13 +46,11 @@ class StellarValueExt:
     def unpack(cls, unpacker: Unpacker) -> "StellarValueExt":
         v = StellarValueType.unpack(unpacker)
         if v == StellarValueType.STELLAR_VALUE_BASIC:
-            return cls(v)
+            return cls(v=v)
         if v == StellarValueType.STELLAR_VALUE_SIGNED:
             lc_value_signature = LedgerCloseValueSignature.unpack(unpacker)
-            if lc_value_signature is None:
-                raise ValueError("lc_value_signature should not be None.")
-            return cls(v, lc_value_signature=lc_value_signature)
-        return cls(v)
+            return cls(v=v, lc_value_signature=lc_value_signature)
+        return cls(v=v)
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

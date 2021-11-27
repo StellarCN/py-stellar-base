@@ -38,8 +38,8 @@ class SetTrustLineFlagsResult:
     def unpack(cls, unpacker: Unpacker) -> "SetTrustLineFlagsResult":
         code = SetTrustLineFlagsResultCode.unpack(unpacker)
         if code == SetTrustLineFlagsResultCode.SET_TRUST_LINE_FLAGS_SUCCESS:
-            return cls(code)
-        return cls(code)
+            return cls(code=code)
+        return cls(code=code)
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

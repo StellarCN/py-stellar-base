@@ -3,7 +3,6 @@
 import base64
 from xdrlib import Packer, Unpacker
 
-from ..exceptions import ValueError
 from ..type_checked import type_checked
 from .claimable_balance_id import ClaimableBalanceID
 from .create_claimable_balance_result_code import CreateClaimableBalanceResultCode
@@ -50,10 +49,8 @@ class CreateClaimableBalanceResult:
         code = CreateClaimableBalanceResultCode.unpack(unpacker)
         if code == CreateClaimableBalanceResultCode.CREATE_CLAIMABLE_BALANCE_SUCCESS:
             balance_id = ClaimableBalanceID.unpack(unpacker)
-            if balance_id is None:
-                raise ValueError("balance_id should not be None.")
-            return cls(code, balance_id=balance_id)
-        return cls(code)
+            return cls(code=code, balance_id=balance_id)
+        return cls(code=code)
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

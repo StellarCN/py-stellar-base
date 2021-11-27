@@ -4,7 +4,6 @@ import base64
 from typing import List
 from xdrlib import Packer, Unpacker
 
-from ..exceptions import ValueError
 from ..type_checked import type_checked
 from .peer_stats import PeerStats
 
@@ -28,8 +27,8 @@ class PeerStatList:
 
     def pack(self, packer: Packer) -> None:
         packer.pack_uint(len(self.peer_stat_list))
-        for peer_stat_list in self.peer_stat_list:
-            peer_stat_list.pack(packer)
+        for peer_stat_list_item in self.peer_stat_list:
+            peer_stat_list_item.pack(packer)
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "PeerStatList":
@@ -37,7 +36,6 @@ class PeerStatList:
         peer_stat_list = []
         for _ in range(length):
             peer_stat_list.append(PeerStats.unpack(unpacker))
-
         return cls(peer_stat_list)
 
     def to_xdr_bytes(self) -> bytes:

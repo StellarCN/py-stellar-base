@@ -36,8 +36,8 @@ class LedgerEntryExtensionV1Ext:
     def unpack(cls, unpacker: Unpacker) -> "LedgerEntryExtensionV1Ext":
         v = Integer.unpack(unpacker)
         if v == 0:
-            return cls(v)
-        return cls(v)
+            return cls(v=v)
+        return cls(v=v)
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

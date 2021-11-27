@@ -4,7 +4,6 @@ import base64
 from typing import List
 from xdrlib import Packer, Unpacker
 
-from ..exceptions import ValueError
 from ..type_checked import type_checked
 from .transaction_result_pair import TransactionResultPair
 
@@ -34,8 +33,8 @@ class TransactionResultSet:
 
     def pack(self, packer: Packer) -> None:
         packer.pack_uint(len(self.results))
-        for result in self.results:
-            result.pack(packer)
+        for results_item in self.results:
+            results_item.pack(packer)
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "TransactionResultSet":

@@ -91,6 +91,8 @@ class Operation:
             packer.pack_uint(0)
         else:
             packer.pack_uint(1)
+            if self.source_account is None:
+                raise ValueError("source_account should not be None.")
             self.source_account.pack(packer)
         self.body.pack(packer)
 

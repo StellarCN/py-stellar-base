@@ -38,8 +38,8 @@ class BumpSequenceResult:
     def unpack(cls, unpacker: Unpacker) -> "BumpSequenceResult":
         code = BumpSequenceResultCode.unpack(unpacker)
         if code == BumpSequenceResultCode.BUMP_SEQUENCE_SUCCESS:
-            return cls(code)
-        return cls(code)
+            return cls(code=code)
+        return cls(code=code)
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

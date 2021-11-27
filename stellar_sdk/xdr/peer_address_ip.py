@@ -3,7 +3,6 @@
 import base64
 from xdrlib import Packer, Unpacker
 
-from ..exceptions import ValueError
 from ..type_checked import type_checked
 from .base import Opaque
 from .ip_addr_type import IPAddrType
@@ -53,15 +52,11 @@ class PeerAddressIp:
         type = IPAddrType.unpack(unpacker)
         if type == IPAddrType.IPv4:
             ipv4 = Opaque.unpack(unpacker, 4, True)
-            if ipv4 is None:
-                raise ValueError("ipv4 should not be None.")
-            return cls(type, ipv4=ipv4)
+            return cls(type=type, ipv4=ipv4)
         if type == IPAddrType.IPv6:
             ipv6 = Opaque.unpack(unpacker, 16, True)
-            if ipv6 is None:
-                raise ValueError("ipv6 should not be None.")
-            return cls(type, ipv6=ipv6)
-        return cls(type)
+            return cls(type=type, ipv6=ipv6)
+        return cls(type=type)
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

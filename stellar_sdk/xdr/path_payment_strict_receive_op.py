@@ -4,7 +4,6 @@ import base64
 from typing import List
 from xdrlib import Packer, Unpacker
 
-from ..exceptions import ValueError
 from ..type_checked import type_checked
 from .asset import Asset
 from .int64 import Int64
@@ -60,8 +59,8 @@ class PathPaymentStrictReceiveOp:
         self.dest_asset.pack(packer)
         self.dest_amount.pack(packer)
         packer.pack_uint(len(self.path))
-        for path in self.path:
-            path.pack(packer)
+        for path_item in self.path:
+            path_item.pack(packer)
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "PathPaymentStrictReceiveOp":

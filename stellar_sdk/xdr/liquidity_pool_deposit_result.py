@@ -39,8 +39,8 @@ class LiquidityPoolDepositResult:
     def unpack(cls, unpacker: Unpacker) -> "LiquidityPoolDepositResult":
         code = LiquidityPoolDepositResultCode.unpack(unpacker)
         if code == LiquidityPoolDepositResultCode.LIQUIDITY_POOL_DEPOSIT_SUCCESS:
-            return cls(code)
-        return cls(code)
+            return cls(code=code)
+        return cls(code=code)
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

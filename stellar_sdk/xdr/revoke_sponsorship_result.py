@@ -38,8 +38,8 @@ class RevokeSponsorshipResult:
     def unpack(cls, unpacker: Unpacker) -> "RevokeSponsorshipResult":
         code = RevokeSponsorshipResultCode.unpack(unpacker)
         if code == RevokeSponsorshipResultCode.REVOKE_SPONSORSHIP_SUCCESS:
-            return cls(code)
-        return cls(code)
+            return cls(code=code)
+        return cls(code=code)
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

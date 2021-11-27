@@ -4,7 +4,6 @@ import base64
 from typing import List
 from xdrlib import Packer, Unpacker
 
-from ..exceptions import ValueError
 from ..type_checked import type_checked
 from .decorated_signature import DecoratedSignature
 from .transaction import Transaction
@@ -41,8 +40,8 @@ class TransactionV1Envelope:
     def pack(self, packer: Packer) -> None:
         self.tx.pack(packer)
         packer.pack_uint(len(self.signatures))
-        for signature in self.signatures:
-            signature.pack(packer)
+        for signatures_item in self.signatures:
+            signatures_item.pack(packer)
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "TransactionV1Envelope":

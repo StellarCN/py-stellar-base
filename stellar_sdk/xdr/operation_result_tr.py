@@ -3,7 +3,6 @@
 import base64
 from xdrlib import Packer, Unpacker
 
-from ..exceptions import ValueError
 from ..type_checked import type_checked
 from .account_merge_result import AccountMergeResult
 from .allow_trust_result import AllowTrustResult
@@ -285,173 +284,122 @@ class OperationResultTr:
         type = OperationType.unpack(unpacker)
         if type == OperationType.CREATE_ACCOUNT:
             create_account_result = CreateAccountResult.unpack(unpacker)
-            if create_account_result is None:
-                raise ValueError("create_account_result should not be None.")
-            return cls(type, create_account_result=create_account_result)
+            return cls(type=type, create_account_result=create_account_result)
         if type == OperationType.PAYMENT:
             payment_result = PaymentResult.unpack(unpacker)
-            if payment_result is None:
-                raise ValueError("payment_result should not be None.")
-            return cls(type, payment_result=payment_result)
+            return cls(type=type, payment_result=payment_result)
         if type == OperationType.PATH_PAYMENT_STRICT_RECEIVE:
             path_payment_strict_receive_result = PathPaymentStrictReceiveResult.unpack(
                 unpacker
             )
-            if path_payment_strict_receive_result is None:
-                raise ValueError(
-                    "path_payment_strict_receive_result should not be None."
-                )
             return cls(
-                type,
+                type=type,
                 path_payment_strict_receive_result=path_payment_strict_receive_result,
             )
         if type == OperationType.MANAGE_SELL_OFFER:
             manage_sell_offer_result = ManageSellOfferResult.unpack(unpacker)
-            if manage_sell_offer_result is None:
-                raise ValueError("manage_sell_offer_result should not be None.")
-            return cls(type, manage_sell_offer_result=manage_sell_offer_result)
+            return cls(type=type, manage_sell_offer_result=manage_sell_offer_result)
         if type == OperationType.CREATE_PASSIVE_SELL_OFFER:
             create_passive_sell_offer_result = ManageSellOfferResult.unpack(unpacker)
-            if create_passive_sell_offer_result is None:
-                raise ValueError("create_passive_sell_offer_result should not be None.")
             return cls(
-                type, create_passive_sell_offer_result=create_passive_sell_offer_result
+                type=type,
+                create_passive_sell_offer_result=create_passive_sell_offer_result,
             )
         if type == OperationType.SET_OPTIONS:
             set_options_result = SetOptionsResult.unpack(unpacker)
-            if set_options_result is None:
-                raise ValueError("set_options_result should not be None.")
-            return cls(type, set_options_result=set_options_result)
+            return cls(type=type, set_options_result=set_options_result)
         if type == OperationType.CHANGE_TRUST:
             change_trust_result = ChangeTrustResult.unpack(unpacker)
-            if change_trust_result is None:
-                raise ValueError("change_trust_result should not be None.")
-            return cls(type, change_trust_result=change_trust_result)
+            return cls(type=type, change_trust_result=change_trust_result)
         if type == OperationType.ALLOW_TRUST:
             allow_trust_result = AllowTrustResult.unpack(unpacker)
-            if allow_trust_result is None:
-                raise ValueError("allow_trust_result should not be None.")
-            return cls(type, allow_trust_result=allow_trust_result)
+            return cls(type=type, allow_trust_result=allow_trust_result)
         if type == OperationType.ACCOUNT_MERGE:
             account_merge_result = AccountMergeResult.unpack(unpacker)
-            if account_merge_result is None:
-                raise ValueError("account_merge_result should not be None.")
-            return cls(type, account_merge_result=account_merge_result)
+            return cls(type=type, account_merge_result=account_merge_result)
         if type == OperationType.INFLATION:
             inflation_result = InflationResult.unpack(unpacker)
-            if inflation_result is None:
-                raise ValueError("inflation_result should not be None.")
-            return cls(type, inflation_result=inflation_result)
+            return cls(type=type, inflation_result=inflation_result)
         if type == OperationType.MANAGE_DATA:
             manage_data_result = ManageDataResult.unpack(unpacker)
-            if manage_data_result is None:
-                raise ValueError("manage_data_result should not be None.")
-            return cls(type, manage_data_result=manage_data_result)
+            return cls(type=type, manage_data_result=manage_data_result)
         if type == OperationType.BUMP_SEQUENCE:
             bump_seq_result = BumpSequenceResult.unpack(unpacker)
-            if bump_seq_result is None:
-                raise ValueError("bump_seq_result should not be None.")
-            return cls(type, bump_seq_result=bump_seq_result)
+            return cls(type=type, bump_seq_result=bump_seq_result)
         if type == OperationType.MANAGE_BUY_OFFER:
             manage_buy_offer_result = ManageBuyOfferResult.unpack(unpacker)
-            if manage_buy_offer_result is None:
-                raise ValueError("manage_buy_offer_result should not be None.")
-            return cls(type, manage_buy_offer_result=manage_buy_offer_result)
+            return cls(type=type, manage_buy_offer_result=manage_buy_offer_result)
         if type == OperationType.PATH_PAYMENT_STRICT_SEND:
             path_payment_strict_send_result = PathPaymentStrictSendResult.unpack(
                 unpacker
             )
-            if path_payment_strict_send_result is None:
-                raise ValueError("path_payment_strict_send_result should not be None.")
             return cls(
-                type, path_payment_strict_send_result=path_payment_strict_send_result
+                type=type,
+                path_payment_strict_send_result=path_payment_strict_send_result,
             )
         if type == OperationType.CREATE_CLAIMABLE_BALANCE:
             create_claimable_balance_result = CreateClaimableBalanceResult.unpack(
                 unpacker
             )
-            if create_claimable_balance_result is None:
-                raise ValueError("create_claimable_balance_result should not be None.")
             return cls(
-                type, create_claimable_balance_result=create_claimable_balance_result
+                type=type,
+                create_claimable_balance_result=create_claimable_balance_result,
             )
         if type == OperationType.CLAIM_CLAIMABLE_BALANCE:
             claim_claimable_balance_result = ClaimClaimableBalanceResult.unpack(
                 unpacker
             )
-            if claim_claimable_balance_result is None:
-                raise ValueError("claim_claimable_balance_result should not be None.")
             return cls(
-                type, claim_claimable_balance_result=claim_claimable_balance_result
+                type=type, claim_claimable_balance_result=claim_claimable_balance_result
             )
         if type == OperationType.BEGIN_SPONSORING_FUTURE_RESERVES:
             begin_sponsoring_future_reserves_result = (
                 BeginSponsoringFutureReservesResult.unpack(unpacker)
             )
-            if begin_sponsoring_future_reserves_result is None:
-                raise ValueError(
-                    "begin_sponsoring_future_reserves_result should not be None."
-                )
             return cls(
-                type,
+                type=type,
                 begin_sponsoring_future_reserves_result=begin_sponsoring_future_reserves_result,
             )
         if type == OperationType.END_SPONSORING_FUTURE_RESERVES:
             end_sponsoring_future_reserves_result = (
                 EndSponsoringFutureReservesResult.unpack(unpacker)
             )
-            if end_sponsoring_future_reserves_result is None:
-                raise ValueError(
-                    "end_sponsoring_future_reserves_result should not be None."
-                )
             return cls(
-                type,
+                type=type,
                 end_sponsoring_future_reserves_result=end_sponsoring_future_reserves_result,
             )
         if type == OperationType.REVOKE_SPONSORSHIP:
             revoke_sponsorship_result = RevokeSponsorshipResult.unpack(unpacker)
-            if revoke_sponsorship_result is None:
-                raise ValueError("revoke_sponsorship_result should not be None.")
-            return cls(type, revoke_sponsorship_result=revoke_sponsorship_result)
+            return cls(type=type, revoke_sponsorship_result=revoke_sponsorship_result)
         if type == OperationType.CLAWBACK:
             clawback_result = ClawbackResult.unpack(unpacker)
-            if clawback_result is None:
-                raise ValueError("clawback_result should not be None.")
-            return cls(type, clawback_result=clawback_result)
+            return cls(type=type, clawback_result=clawback_result)
         if type == OperationType.CLAWBACK_CLAIMABLE_BALANCE:
             clawback_claimable_balance_result = ClawbackClaimableBalanceResult.unpack(
                 unpacker
             )
-            if clawback_claimable_balance_result is None:
-                raise ValueError(
-                    "clawback_claimable_balance_result should not be None."
-                )
             return cls(
-                type,
+                type=type,
                 clawback_claimable_balance_result=clawback_claimable_balance_result,
             )
         if type == OperationType.SET_TRUST_LINE_FLAGS:
             set_trust_line_flags_result = SetTrustLineFlagsResult.unpack(unpacker)
-            if set_trust_line_flags_result is None:
-                raise ValueError("set_trust_line_flags_result should not be None.")
-            return cls(type, set_trust_line_flags_result=set_trust_line_flags_result)
+            return cls(
+                type=type, set_trust_line_flags_result=set_trust_line_flags_result
+            )
         if type == OperationType.LIQUIDITY_POOL_DEPOSIT:
             liquidity_pool_deposit_result = LiquidityPoolDepositResult.unpack(unpacker)
-            if liquidity_pool_deposit_result is None:
-                raise ValueError("liquidity_pool_deposit_result should not be None.")
             return cls(
-                type, liquidity_pool_deposit_result=liquidity_pool_deposit_result
+                type=type, liquidity_pool_deposit_result=liquidity_pool_deposit_result
             )
         if type == OperationType.LIQUIDITY_POOL_WITHDRAW:
             liquidity_pool_withdraw_result = LiquidityPoolWithdrawResult.unpack(
                 unpacker
             )
-            if liquidity_pool_withdraw_result is None:
-                raise ValueError("liquidity_pool_withdraw_result should not be None.")
             return cls(
-                type, liquidity_pool_withdraw_result=liquidity_pool_withdraw_result
+                type=type, liquidity_pool_withdraw_result=liquidity_pool_withdraw_result
             )
-        return cls(type)
+        return cls(type=type)
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

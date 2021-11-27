@@ -4,7 +4,6 @@ import base64
 from typing import List
 from xdrlib import Packer, Unpacker
 
-from ..exceptions import ValueError
 from ..type_checked import type_checked
 from .ledger_entry_changes import LedgerEntryChanges
 from .operation_meta import OperationMeta
@@ -44,8 +43,8 @@ class TransactionMetaV2:
     def pack(self, packer: Packer) -> None:
         self.tx_changes_before.pack(packer)
         packer.pack_uint(len(self.operations))
-        for operation in self.operations:
-            operation.pack(packer)
+        for operations_item in self.operations:
+            operations_item.pack(packer)
         self.tx_changes_after.pack(packer)
 
     @classmethod
