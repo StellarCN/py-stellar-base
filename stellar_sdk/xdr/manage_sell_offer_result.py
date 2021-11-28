@@ -3,7 +3,6 @@
 import base64
 from xdrlib import Packer, Unpacker
 
-from ..exceptions import ValueError
 from ..type_checked import type_checked
 from .manage_offer_success_result import ManageOfferSuccessResult
 from .manage_sell_offer_result_code import ManageSellOfferResultCode
@@ -46,10 +45,8 @@ class ManageSellOfferResult:
         code = ManageSellOfferResultCode.unpack(unpacker)
         if code == ManageSellOfferResultCode.MANAGE_SELL_OFFER_SUCCESS:
             success = ManageOfferSuccessResult.unpack(unpacker)
-            if success is None:
-                raise ValueError("success should not be None.")
-            return cls(code, success=success)
-        return cls(code)
+            return cls(code=code, success=success)
+        return cls(code=code)
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

@@ -4,7 +4,6 @@ import base64
 from typing import List
 from xdrlib import Packer, Unpacker
 
-from ..exceptions import ValueError
 from ..type_checked import type_checked
 from .ledger_entry_change import LedgerEntryChange
 
@@ -28,8 +27,8 @@ class LedgerEntryChanges:
 
     def pack(self, packer: Packer) -> None:
         packer.pack_uint(len(self.ledger_entry_changes))
-        for ledger_entry_change in self.ledger_entry_changes:
-            ledger_entry_change.pack(packer)
+        for ledger_entry_changes_item in self.ledger_entry_changes:
+            ledger_entry_changes_item.pack(packer)
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "LedgerEntryChanges":
@@ -37,7 +36,6 @@ class LedgerEntryChanges:
         ledger_entry_changes = []
         for _ in range(length):
             ledger_entry_changes.append(LedgerEntryChange.unpack(unpacker))
-
         return cls(ledger_entry_changes)
 
     def to_xdr_bytes(self) -> bytes:

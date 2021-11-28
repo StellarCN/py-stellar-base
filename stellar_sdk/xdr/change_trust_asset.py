@@ -3,7 +3,6 @@
 import base64
 from xdrlib import Packer, Unpacker
 
-from ..exceptions import ValueError
 from ..type_checked import type_checked
 from .alpha_num4 import AlphaNum4
 from .alpha_num12 import AlphaNum12
@@ -72,23 +71,17 @@ class ChangeTrustAsset:
     def unpack(cls, unpacker: Unpacker) -> "ChangeTrustAsset":
         type = AssetType.unpack(unpacker)
         if type == AssetType.ASSET_TYPE_NATIVE:
-            return cls(type)
+            return cls(type=type)
         if type == AssetType.ASSET_TYPE_CREDIT_ALPHANUM4:
             alpha_num4 = AlphaNum4.unpack(unpacker)
-            if alpha_num4 is None:
-                raise ValueError("alpha_num4 should not be None.")
-            return cls(type, alpha_num4=alpha_num4)
+            return cls(type=type, alpha_num4=alpha_num4)
         if type == AssetType.ASSET_TYPE_CREDIT_ALPHANUM12:
             alpha_num12 = AlphaNum12.unpack(unpacker)
-            if alpha_num12 is None:
-                raise ValueError("alpha_num12 should not be None.")
-            return cls(type, alpha_num12=alpha_num12)
+            return cls(type=type, alpha_num12=alpha_num12)
         if type == AssetType.ASSET_TYPE_POOL_SHARE:
             liquidity_pool = LiquidityPoolParameters.unpack(unpacker)
-            if liquidity_pool is None:
-                raise ValueError("liquidity_pool should not be None.")
-            return cls(type, liquidity_pool=liquidity_pool)
-        return cls(type)
+            return cls(type=type, liquidity_pool=liquidity_pool)
+        return cls(type=type)
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

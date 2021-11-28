@@ -4,7 +4,6 @@ import base64
 from typing import List
 from xdrlib import Packer, Unpacker
 
-from ..exceptions import ValueError
 from ..type_checked import type_checked
 from .base import Integer
 from .operation_meta import OperationMeta
@@ -52,8 +51,8 @@ class TransactionMeta:
             if self.operations is None:
                 raise ValueError("operations should not be None.")
             packer.pack_uint(len(self.operations))
-            for operation in self.operations:
-                operation.pack(packer)
+            for operations_item in self.operations:
+                operations_item.pack(packer)
             return
         if self.v == 1:
             if self.v1 is None:
@@ -74,18 +73,14 @@ class TransactionMeta:
             operations = []
             for _ in range(length):
                 operations.append(OperationMeta.unpack(unpacker))
-            return cls(v, operations=operations)
+            return cls(v=v, operations=operations)
         if v == 1:
             v1 = TransactionMetaV1.unpack(unpacker)
-            if v1 is None:
-                raise ValueError("v1 should not be None.")
-            return cls(v, v1=v1)
+            return cls(v=v, v1=v1)
         if v == 2:
             v2 = TransactionMetaV2.unpack(unpacker)
-            if v2 is None:
-                raise ValueError("v2 should not be None.")
-            return cls(v, v2=v2)
-        return cls(v)
+            return cls(v=v, v2=v2)
+        return cls(v=v)
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

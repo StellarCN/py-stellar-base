@@ -4,7 +4,6 @@ import base64
 from typing import List
 from xdrlib import Packer, Unpacker
 
-from ..exceptions import ValueError
 from ..type_checked import type_checked
 from .ledger_scp_messages import LedgerSCPMessages
 from .scp_quorum_set import SCPQuorumSet
@@ -38,8 +37,8 @@ class SCPHistoryEntryV0:
 
     def pack(self, packer: Packer) -> None:
         packer.pack_uint(len(self.quorum_sets))
-        for quorum_set in self.quorum_sets:
-            quorum_set.pack(packer)
+        for quorum_sets_item in self.quorum_sets:
+            quorum_sets_item.pack(packer)
         self.ledger_messages.pack(packer)
 
     @classmethod

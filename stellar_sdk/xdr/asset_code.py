@@ -3,7 +3,6 @@
 import base64
 from xdrlib import Packer, Unpacker
 
-from ..exceptions import ValueError
 from ..type_checked import type_checked
 from .asset_code4 import AssetCode4
 from .asset_code12 import AssetCode12
@@ -57,15 +56,11 @@ class AssetCode:
         type = AssetType.unpack(unpacker)
         if type == AssetType.ASSET_TYPE_CREDIT_ALPHANUM4:
             asset_code4 = AssetCode4.unpack(unpacker)
-            if asset_code4 is None:
-                raise ValueError("asset_code4 should not be None.")
-            return cls(type, asset_code4=asset_code4)
+            return cls(type=type, asset_code4=asset_code4)
         if type == AssetType.ASSET_TYPE_CREDIT_ALPHANUM12:
             asset_code12 = AssetCode12.unpack(unpacker)
-            if asset_code12 is None:
-                raise ValueError("asset_code12 should not be None.")
-            return cls(type, asset_code12=asset_code12)
-        return cls(type)
+            return cls(type=type, asset_code12=asset_code12)
+        return cls(type=type)
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

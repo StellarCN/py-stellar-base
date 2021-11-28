@@ -3,7 +3,6 @@
 import base64
 from xdrlib import Packer, Unpacker
 
-from ..exceptions import ValueError
 from ..type_checked import type_checked
 from .manage_offer_effect import ManageOfferEffect
 from .offer_entry import OfferEntry
@@ -36,10 +35,12 @@ class ManageOfferSuccessResultOffer:
 
     def pack(self, packer: Packer) -> None:
         self.effect.pack(packer)
-        if (
-            self.effect == ManageOfferEffect.MANAGE_OFFER_CREATED
-            or self.effect == ManageOfferEffect.MANAGE_OFFER_UPDATED
-        ):
+        if self.effect == ManageOfferEffect.MANAGE_OFFER_CREATED:
+            if self.offer is None:
+                raise ValueError("offer should not be None.")
+            self.offer.pack(packer)
+            return
+        if self.effect == ManageOfferEffect.MANAGE_OFFER_UPDATED:
             if self.offer is None:
                 raise ValueError("offer should not be None.")
             self.offer.pack(packer)
@@ -48,15 +49,13 @@ class ManageOfferSuccessResultOffer:
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "ManageOfferSuccessResultOffer":
         effect = ManageOfferEffect.unpack(unpacker)
-        if (
-            effect == ManageOfferEffect.MANAGE_OFFER_CREATED
-            or effect == ManageOfferEffect.MANAGE_OFFER_UPDATED
-        ):
+        if effect == ManageOfferEffect.MANAGE_OFFER_CREATED:
             offer = OfferEntry.unpack(unpacker)
-            if offer is None:
-                raise ValueError("offer should not be None.")
-            return cls(effect, offer=offer)
-        return cls(effect)
+            return cls(effect=effect, offer=offer)
+        if effect == ManageOfferEffect.MANAGE_OFFER_UPDATED:
+            offer = OfferEntry.unpack(unpacker)
+            return cls(effect=effect, offer=offer)
+        return cls(effect=effect)
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

@@ -3,7 +3,6 @@
 import base64
 from xdrlib import Packer, Unpacker
 
-from ..exceptions import ValueError
 from ..type_checked import type_checked
 from .claim_atom_type import ClaimAtomType
 from .claim_liquidity_atom import ClaimLiquidityAtom
@@ -64,20 +63,14 @@ class ClaimAtom:
         type = ClaimAtomType.unpack(unpacker)
         if type == ClaimAtomType.CLAIM_ATOM_TYPE_V0:
             v0 = ClaimOfferAtomV0.unpack(unpacker)
-            if v0 is None:
-                raise ValueError("v0 should not be None.")
-            return cls(type, v0=v0)
+            return cls(type=type, v0=v0)
         if type == ClaimAtomType.CLAIM_ATOM_TYPE_ORDER_BOOK:
             order_book = ClaimOfferAtom.unpack(unpacker)
-            if order_book is None:
-                raise ValueError("order_book should not be None.")
-            return cls(type, order_book=order_book)
+            return cls(type=type, order_book=order_book)
         if type == ClaimAtomType.CLAIM_ATOM_TYPE_LIQUIDITY_POOL:
             liquidity_pool = ClaimLiquidityAtom.unpack(unpacker)
-            if liquidity_pool is None:
-                raise ValueError("liquidity_pool should not be None.")
-            return cls(type, liquidity_pool=liquidity_pool)
-        return cls(type)
+            return cls(type=type, liquidity_pool=liquidity_pool)
+        return cls(type=type)
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

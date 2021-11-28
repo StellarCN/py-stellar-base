@@ -4,7 +4,6 @@ import base64
 from typing import List
 from xdrlib import Packer, Unpacker
 
-from ..exceptions import ValueError
 from ..type_checked import type_checked
 from .asset import Asset
 from .claimant import Claimant
@@ -44,8 +43,8 @@ class CreateClaimableBalanceOp:
         self.asset.pack(packer)
         self.amount.pack(packer)
         packer.pack_uint(len(self.claimants))
-        for claimant in self.claimants:
-            claimant.pack(packer)
+        for claimants_item in self.claimants:
+            claimants_item.pack(packer)
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "CreateClaimableBalanceOp":

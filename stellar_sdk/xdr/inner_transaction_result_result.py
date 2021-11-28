@@ -4,7 +4,6 @@ import base64
 from typing import List
 from xdrlib import Packer, Unpacker
 
-from ..exceptions import ValueError
 from ..type_checked import type_checked
 from .operation_result import OperationResult
 from .transaction_result_code import TransactionResultCode
@@ -54,60 +53,85 @@ class InnerTransactionResultResult:
 
     def pack(self, packer: Packer) -> None:
         self.code.pack(packer)
-        if (
-            self.code == TransactionResultCode.txSUCCESS
-            or self.code == TransactionResultCode.txFAILED
-        ):
+        if self.code == TransactionResultCode.txSUCCESS:
             if self.results is None:
                 raise ValueError("results should not be None.")
             packer.pack_uint(len(self.results))
-            for result in self.results:
-                result.pack(packer)
+            for results_item in self.results:
+                results_item.pack(packer)
             return
-        if (
-            self.code == TransactionResultCode.txTOO_EARLY
-            or self.code == TransactionResultCode.txTOO_LATE
-            or self.code == TransactionResultCode.txMISSING_OPERATION
-            or self.code == TransactionResultCode.txBAD_SEQ
-            or self.code == TransactionResultCode.txBAD_AUTH
-            or self.code == TransactionResultCode.txINSUFFICIENT_BALANCE
-            or self.code == TransactionResultCode.txNO_ACCOUNT
-            or self.code == TransactionResultCode.txINSUFFICIENT_FEE
-            or self.code == TransactionResultCode.txBAD_AUTH_EXTRA
-            or self.code == TransactionResultCode.txINTERNAL_ERROR
-            or self.code == TransactionResultCode.txNOT_SUPPORTED
-            or self.code == TransactionResultCode.txBAD_SPONSORSHIP
-        ):
+        if self.code == TransactionResultCode.txFAILED:
+            if self.results is None:
+                raise ValueError("results should not be None.")
+            packer.pack_uint(len(self.results))
+            for results_item in self.results:
+                results_item.pack(packer)
+            return
+        if self.code == TransactionResultCode.txTOO_EARLY:
+            return
+        if self.code == TransactionResultCode.txTOO_LATE:
+            return
+        if self.code == TransactionResultCode.txMISSING_OPERATION:
+            return
+        if self.code == TransactionResultCode.txBAD_SEQ:
+            return
+        if self.code == TransactionResultCode.txBAD_AUTH:
+            return
+        if self.code == TransactionResultCode.txINSUFFICIENT_BALANCE:
+            return
+        if self.code == TransactionResultCode.txNO_ACCOUNT:
+            return
+        if self.code == TransactionResultCode.txINSUFFICIENT_FEE:
+            return
+        if self.code == TransactionResultCode.txBAD_AUTH_EXTRA:
+            return
+        if self.code == TransactionResultCode.txINTERNAL_ERROR:
+            return
+        if self.code == TransactionResultCode.txNOT_SUPPORTED:
+            return
+        if self.code == TransactionResultCode.txBAD_SPONSORSHIP:
             return
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "InnerTransactionResultResult":
         code = TransactionResultCode.unpack(unpacker)
-        if (
-            code == TransactionResultCode.txSUCCESS
-            or code == TransactionResultCode.txFAILED
-        ):
+        if code == TransactionResultCode.txSUCCESS:
             length = unpacker.unpack_uint()
             results = []
             for _ in range(length):
                 results.append(OperationResult.unpack(unpacker))
-            return cls(code, results=results)
-        if (
-            code == TransactionResultCode.txTOO_EARLY
-            or code == TransactionResultCode.txTOO_LATE
-            or code == TransactionResultCode.txMISSING_OPERATION
-            or code == TransactionResultCode.txBAD_SEQ
-            or code == TransactionResultCode.txBAD_AUTH
-            or code == TransactionResultCode.txINSUFFICIENT_BALANCE
-            or code == TransactionResultCode.txNO_ACCOUNT
-            or code == TransactionResultCode.txINSUFFICIENT_FEE
-            or code == TransactionResultCode.txBAD_AUTH_EXTRA
-            or code == TransactionResultCode.txINTERNAL_ERROR
-            or code == TransactionResultCode.txNOT_SUPPORTED
-            or code == TransactionResultCode.txBAD_SPONSORSHIP
-        ):
-            return cls(code)
-        return cls(code)
+            return cls(code=code, results=results)
+        if code == TransactionResultCode.txFAILED:
+            length = unpacker.unpack_uint()
+            results = []
+            for _ in range(length):
+                results.append(OperationResult.unpack(unpacker))
+            return cls(code=code, results=results)
+        if code == TransactionResultCode.txTOO_EARLY:
+            return cls(code=code)
+        if code == TransactionResultCode.txTOO_LATE:
+            return cls(code=code)
+        if code == TransactionResultCode.txMISSING_OPERATION:
+            return cls(code=code)
+        if code == TransactionResultCode.txBAD_SEQ:
+            return cls(code=code)
+        if code == TransactionResultCode.txBAD_AUTH:
+            return cls(code=code)
+        if code == TransactionResultCode.txINSUFFICIENT_BALANCE:
+            return cls(code=code)
+        if code == TransactionResultCode.txNO_ACCOUNT:
+            return cls(code=code)
+        if code == TransactionResultCode.txINSUFFICIENT_FEE:
+            return cls(code=code)
+        if code == TransactionResultCode.txBAD_AUTH_EXTRA:
+            return cls(code=code)
+        if code == TransactionResultCode.txINTERNAL_ERROR:
+            return cls(code=code)
+        if code == TransactionResultCode.txNOT_SUPPORTED:
+            return cls(code=code)
+        if code == TransactionResultCode.txBAD_SPONSORSHIP:
+            return cls(code=code)
+        return cls(code=code)
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

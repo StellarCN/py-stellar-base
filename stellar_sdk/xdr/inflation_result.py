@@ -4,7 +4,6 @@ import base64
 from typing import List
 from xdrlib import Packer, Unpacker
 
-from ..exceptions import ValueError
 from ..type_checked import type_checked
 from .inflation_payout import InflationPayout
 from .inflation_result_code import InflationResultCode
@@ -44,8 +43,8 @@ class InflationResult:
             if self.payouts is None:
                 raise ValueError("payouts should not be None.")
             packer.pack_uint(len(self.payouts))
-            for payout in self.payouts:
-                payout.pack(packer)
+            for payouts_item in self.payouts:
+                payouts_item.pack(packer)
             return
 
     @classmethod
@@ -56,8 +55,8 @@ class InflationResult:
             payouts = []
             for _ in range(length):
                 payouts.append(InflationPayout.unpack(unpacker))
-            return cls(code, payouts=payouts)
-        return cls(code)
+            return cls(code=code, payouts=payouts)
+        return cls(code=code)
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

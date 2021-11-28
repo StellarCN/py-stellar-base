@@ -4,7 +4,6 @@ import base64
 from typing import List
 from xdrlib import Packer, Unpacker
 
-from ..exceptions import ValueError
 from ..type_checked import type_checked
 from .claim_atom import ClaimAtom
 from .manage_offer_success_result_offer import ManageOfferSuccessResultOffer
@@ -48,8 +47,8 @@ class ManageOfferSuccessResult:
 
     def pack(self, packer: Packer) -> None:
         packer.pack_uint(len(self.offers_claimed))
-        for offers_claimed in self.offers_claimed:
-            offers_claimed.pack(packer)
+        for offers_claimed_item in self.offers_claimed:
+            offers_claimed_item.pack(packer)
         self.offer.pack(packer)
 
     @classmethod

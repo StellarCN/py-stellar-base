@@ -3,7 +3,6 @@
 import base64
 from xdrlib import Packer, Unpacker
 
-from ..exceptions import ValueError
 from ..type_checked import type_checked
 from .base import Integer
 from .ledger_entry_extension_v1 import LedgerEntryExtensionV1
@@ -47,13 +46,11 @@ class LedgerEntryExt:
     def unpack(cls, unpacker: Unpacker) -> "LedgerEntryExt":
         v = Integer.unpack(unpacker)
         if v == 0:
-            return cls(v)
+            return cls(v=v)
         if v == 1:
             v1 = LedgerEntryExtensionV1.unpack(unpacker)
-            if v1 is None:
-                raise ValueError("v1 should not be None.")
-            return cls(v, v1=v1)
-        return cls(v)
+            return cls(v=v, v1=v1)
+        return cls(v=v)
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

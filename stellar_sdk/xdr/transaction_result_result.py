@@ -4,7 +4,6 @@ import base64
 from typing import List
 from xdrlib import Packer, Unpacker
 
-from ..exceptions import ValueError
 from ..type_checked import type_checked
 from .inner_transaction_result_pair import InnerTransactionResultPair
 from .operation_result import OperationResult
@@ -47,46 +46,53 @@ class TransactionResultResult:
 
     def pack(self, packer: Packer) -> None:
         self.code.pack(packer)
-        if (
-            self.code == TransactionResultCode.txFEE_BUMP_INNER_SUCCESS
-            or self.code == TransactionResultCode.txFEE_BUMP_INNER_FAILED
-        ):
+        if self.code == TransactionResultCode.txFEE_BUMP_INNER_SUCCESS:
             if self.inner_result_pair is None:
                 raise ValueError("inner_result_pair should not be None.")
             self.inner_result_pair.pack(packer)
             return
-        if (
-            self.code == TransactionResultCode.txSUCCESS
-            or self.code == TransactionResultCode.txFAILED
-        ):
+        if self.code == TransactionResultCode.txFEE_BUMP_INNER_FAILED:
+            if self.inner_result_pair is None:
+                raise ValueError("inner_result_pair should not be None.")
+            self.inner_result_pair.pack(packer)
+            return
+        if self.code == TransactionResultCode.txSUCCESS:
             if self.results is None:
                 raise ValueError("results should not be None.")
             packer.pack_uint(len(self.results))
-            for result in self.results:
-                result.pack(packer)
+            for results_item in self.results:
+                results_item.pack(packer)
+            return
+        if self.code == TransactionResultCode.txFAILED:
+            if self.results is None:
+                raise ValueError("results should not be None.")
+            packer.pack_uint(len(self.results))
+            for results_item in self.results:
+                results_item.pack(packer)
             return
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "TransactionResultResult":
         code = TransactionResultCode.unpack(unpacker)
-        if (
-            code == TransactionResultCode.txFEE_BUMP_INNER_SUCCESS
-            or code == TransactionResultCode.txFEE_BUMP_INNER_FAILED
-        ):
+        if code == TransactionResultCode.txFEE_BUMP_INNER_SUCCESS:
             inner_result_pair = InnerTransactionResultPair.unpack(unpacker)
-            if inner_result_pair is None:
-                raise ValueError("inner_result_pair should not be None.")
-            return cls(code, inner_result_pair=inner_result_pair)
-        if (
-            code == TransactionResultCode.txSUCCESS
-            or code == TransactionResultCode.txFAILED
-        ):
+            return cls(code=code, inner_result_pair=inner_result_pair)
+        if code == TransactionResultCode.txFEE_BUMP_INNER_FAILED:
+            inner_result_pair = InnerTransactionResultPair.unpack(unpacker)
+            return cls(code=code, inner_result_pair=inner_result_pair)
+        if code == TransactionResultCode.txSUCCESS:
             length = unpacker.unpack_uint()
             results = []
             for _ in range(length):
                 results.append(OperationResult.unpack(unpacker))
-            return cls(code, results=results)
-        return cls(code)
+            return cls(code=code, results=results)
+        if code == TransactionResultCode.txFAILED:
+            length = unpacker.unpack_uint()
+            results = []
+            for _ in range(length):
+                results.append(OperationResult.unpack(unpacker))
+            return cls(code=code, results=results)
+        return cls(code=code)
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

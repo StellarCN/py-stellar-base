@@ -3,7 +3,6 @@
 import base64
 from xdrlib import Packer, Unpacker
 
-from ..exceptions import ValueError
 from ..type_checked import type_checked
 from .base import String
 from .hash import Hash
@@ -76,28 +75,20 @@ class Memo:
     def unpack(cls, unpacker: Unpacker) -> "Memo":
         type = MemoType.unpack(unpacker)
         if type == MemoType.MEMO_NONE:
-            return cls(type)
+            return cls(type=type)
         if type == MemoType.MEMO_TEXT:
             text = String.unpack(unpacker)
-            if text is None:
-                raise ValueError("text should not be None.")
-            return cls(type, text=text)
+            return cls(type=type, text=text)
         if type == MemoType.MEMO_ID:
             id = Uint64.unpack(unpacker)
-            if id is None:
-                raise ValueError("id should not be None.")
-            return cls(type, id=id)
+            return cls(type=type, id=id)
         if type == MemoType.MEMO_HASH:
             hash = Hash.unpack(unpacker)
-            if hash is None:
-                raise ValueError("hash should not be None.")
-            return cls(type, hash=hash)
+            return cls(type=type, hash=hash)
         if type == MemoType.MEMO_RETURN:
             ret_hash = Hash.unpack(unpacker)
-            if ret_hash is None:
-                raise ValueError("ret_hash should not be None.")
-            return cls(type, ret_hash=ret_hash)
-        return cls(type)
+            return cls(type=type, ret_hash=ret_hash)
+        return cls(type=type)
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

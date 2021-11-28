@@ -3,7 +3,6 @@
 import base64
 from xdrlib import Packer, Unpacker
 
-from ..exceptions import ValueError
 from ..type_checked import type_checked
 from .ledger_key import LedgerKey
 from .revoke_sponsorship_op_signer import RevokeSponsorshipOpSigner
@@ -58,15 +57,11 @@ class RevokeSponsorshipOp:
         type = RevokeSponsorshipType.unpack(unpacker)
         if type == RevokeSponsorshipType.REVOKE_SPONSORSHIP_LEDGER_ENTRY:
             ledger_key = LedgerKey.unpack(unpacker)
-            if ledger_key is None:
-                raise ValueError("ledger_key should not be None.")
-            return cls(type, ledger_key=ledger_key)
+            return cls(type=type, ledger_key=ledger_key)
         if type == RevokeSponsorshipType.REVOKE_SPONSORSHIP_SIGNER:
             signer = RevokeSponsorshipOpSigner.unpack(unpacker)
-            if signer is None:
-                raise ValueError("signer should not be None.")
-            return cls(type, signer=signer)
-        return cls(type)
+            return cls(type=type, signer=signer)
+        return cls(type=type)
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

@@ -3,7 +3,6 @@
 import base64
 from xdrlib import Packer, Unpacker
 
-from ..exceptions import ValueError
 from ..type_checked import type_checked
 from .envelope_type import EnvelopeType
 from .operation_id_id import OperationIDId
@@ -49,10 +48,8 @@ class OperationID:
         type = EnvelopeType.unpack(unpacker)
         if type == EnvelopeType.ENVELOPE_TYPE_OP_ID:
             id = OperationIDId.unpack(unpacker)
-            if id is None:
-                raise ValueError("id should not be None.")
-            return cls(type, id=id)
-        return cls(type)
+            return cls(type=type, id=id)
+        return cls(type=type)
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

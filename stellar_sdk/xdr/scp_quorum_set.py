@@ -4,7 +4,6 @@ import base64
 from typing import List
 from xdrlib import Packer, Unpacker
 
-from ..exceptions import ValueError
 from ..type_checked import type_checked
 from .node_id import NodeID
 from .uint32 import Uint32
@@ -46,11 +45,11 @@ class SCPQuorumSet:
     def pack(self, packer: Packer) -> None:
         self.threshold.pack(packer)
         packer.pack_uint(len(self.validators))
-        for validator in self.validators:
-            validator.pack(packer)
+        for validators_item in self.validators:
+            validators_item.pack(packer)
         packer.pack_uint(len(self.inner_sets))
-        for inner_set in self.inner_sets:
-            inner_set.pack(packer)
+        for inner_sets_item in self.inner_sets:
+            inner_sets_item.pack(packer)
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "SCPQuorumSet":

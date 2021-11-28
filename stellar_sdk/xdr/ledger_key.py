@@ -3,7 +3,6 @@
 import base64
 from xdrlib import Packer, Unpacker
 
-from ..exceptions import ValueError
 from ..type_checked import type_checked
 from .ledger_entry_type import LedgerEntryType
 from .ledger_key_account import LedgerKeyAccount
@@ -120,35 +119,23 @@ class LedgerKey:
         type = LedgerEntryType.unpack(unpacker)
         if type == LedgerEntryType.ACCOUNT:
             account = LedgerKeyAccount.unpack(unpacker)
-            if account is None:
-                raise ValueError("account should not be None.")
-            return cls(type, account=account)
+            return cls(type=type, account=account)
         if type == LedgerEntryType.TRUSTLINE:
             trust_line = LedgerKeyTrustLine.unpack(unpacker)
-            if trust_line is None:
-                raise ValueError("trust_line should not be None.")
-            return cls(type, trust_line=trust_line)
+            return cls(type=type, trust_line=trust_line)
         if type == LedgerEntryType.OFFER:
             offer = LedgerKeyOffer.unpack(unpacker)
-            if offer is None:
-                raise ValueError("offer should not be None.")
-            return cls(type, offer=offer)
+            return cls(type=type, offer=offer)
         if type == LedgerEntryType.DATA:
             data = LedgerKeyData.unpack(unpacker)
-            if data is None:
-                raise ValueError("data should not be None.")
-            return cls(type, data=data)
+            return cls(type=type, data=data)
         if type == LedgerEntryType.CLAIMABLE_BALANCE:
             claimable_balance = LedgerKeyClaimableBalance.unpack(unpacker)
-            if claimable_balance is None:
-                raise ValueError("claimable_balance should not be None.")
-            return cls(type, claimable_balance=claimable_balance)
+            return cls(type=type, claimable_balance=claimable_balance)
         if type == LedgerEntryType.LIQUIDITY_POOL:
             liquidity_pool = LedgerKeyLiquidityPool.unpack(unpacker)
-            if liquidity_pool is None:
-                raise ValueError("liquidity_pool should not be None.")
-            return cls(type, liquidity_pool=liquidity_pool)
-        return cls(type)
+            return cls(type=type, liquidity_pool=liquidity_pool)
+        return cls(type=type)
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

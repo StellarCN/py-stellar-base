@@ -3,7 +3,6 @@
 import base64
 from xdrlib import Packer, Unpacker
 
-from ..exceptions import ValueError
 from ..type_checked import type_checked
 from .envelope_type import EnvelopeType
 from .transaction_v1_envelope import TransactionV1Envelope
@@ -44,10 +43,8 @@ class FeeBumpTransactionInnerTx:
         type = EnvelopeType.unpack(unpacker)
         if type == EnvelopeType.ENVELOPE_TYPE_TX:
             v1 = TransactionV1Envelope.unpack(unpacker)
-            if v1 is None:
-                raise ValueError("v1 should not be None.")
-            return cls(type, v1=v1)
-        return cls(type)
+            return cls(type=type, v1=v1)
+        return cls(type=type)
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

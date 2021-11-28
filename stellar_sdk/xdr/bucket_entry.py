@@ -3,7 +3,6 @@
 import base64
 from xdrlib import Packer, Unpacker
 
-from ..exceptions import ValueError
 from ..type_checked import type_checked
 from .bucket_entry_type import BucketEntryType
 from .bucket_metadata import BucketMetadata
@@ -45,10 +44,12 @@ class BucketEntry:
 
     def pack(self, packer: Packer) -> None:
         self.type.pack(packer)
-        if (
-            self.type == BucketEntryType.LIVEENTRY
-            or self.type == BucketEntryType.INITENTRY
-        ):
+        if self.type == BucketEntryType.LIVEENTRY:
+            if self.live_entry is None:
+                raise ValueError("live_entry should not be None.")
+            self.live_entry.pack(packer)
+            return
+        if self.type == BucketEntryType.INITENTRY:
             if self.live_entry is None:
                 raise ValueError("live_entry should not be None.")
             self.live_entry.pack(packer)
@@ -67,22 +68,19 @@ class BucketEntry:
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "BucketEntry":
         type = BucketEntryType.unpack(unpacker)
-        if type == BucketEntryType.LIVEENTRY or type == BucketEntryType.INITENTRY:
+        if type == BucketEntryType.LIVEENTRY:
             live_entry = LedgerEntry.unpack(unpacker)
-            if live_entry is None:
-                raise ValueError("live_entry should not be None.")
-            return cls(type, live_entry=live_entry)
+            return cls(type=type, live_entry=live_entry)
+        if type == BucketEntryType.INITENTRY:
+            live_entry = LedgerEntry.unpack(unpacker)
+            return cls(type=type, live_entry=live_entry)
         if type == BucketEntryType.DEADENTRY:
             dead_entry = LedgerKey.unpack(unpacker)
-            if dead_entry is None:
-                raise ValueError("dead_entry should not be None.")
-            return cls(type, dead_entry=dead_entry)
+            return cls(type=type, dead_entry=dead_entry)
         if type == BucketEntryType.METAENTRY:
             meta_entry = BucketMetadata.unpack(unpacker)
-            if meta_entry is None:
-                raise ValueError("meta_entry should not be None.")
-            return cls(type, meta_entry=meta_entry)
-        return cls(type)
+            return cls(type=type, meta_entry=meta_entry)
+        return cls(type=type)
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

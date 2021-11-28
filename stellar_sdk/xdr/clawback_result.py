@@ -38,8 +38,8 @@ class ClawbackResult:
     def unpack(cls, unpacker: Unpacker) -> "ClawbackResult":
         code = ClawbackResultCode.unpack(unpacker)
         if code == ClawbackResultCode.CLAWBACK_SUCCESS:
-            return cls(code)
-        return cls(code)
+            return cls(code=code)
+        return cls(code=code)
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

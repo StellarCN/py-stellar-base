@@ -3,7 +3,6 @@
 import base64
 from xdrlib import Packer, Unpacker
 
-from ..exceptions import ValueError
 from ..type_checked import type_checked
 from .claimable_balance_id_type import ClaimableBalanceIDType
 from .hash import Hash
@@ -44,10 +43,8 @@ class ClaimableBalanceID:
         type = ClaimableBalanceIDType.unpack(unpacker)
         if type == ClaimableBalanceIDType.CLAIMABLE_BALANCE_ID_TYPE_V0:
             v0 = Hash.unpack(unpacker)
-            if v0 is None:
-                raise ValueError("v0 should not be None.")
-            return cls(type, v0=v0)
-        return cls(type)
+            return cls(type=type, v0=v0)
+        return cls(type=type)
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

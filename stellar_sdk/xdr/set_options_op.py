@@ -66,46 +66,64 @@ class SetOptionsOp:
             packer.pack_uint(0)
         else:
             packer.pack_uint(1)
+            if self.inflation_dest is None:
+                raise ValueError("inflation_dest should not be None.")
             self.inflation_dest.pack(packer)
         if self.clear_flags is None:
             packer.pack_uint(0)
         else:
             packer.pack_uint(1)
+            if self.clear_flags is None:
+                raise ValueError("clear_flags should not be None.")
             self.clear_flags.pack(packer)
         if self.set_flags is None:
             packer.pack_uint(0)
         else:
             packer.pack_uint(1)
+            if self.set_flags is None:
+                raise ValueError("set_flags should not be None.")
             self.set_flags.pack(packer)
         if self.master_weight is None:
             packer.pack_uint(0)
         else:
             packer.pack_uint(1)
+            if self.master_weight is None:
+                raise ValueError("master_weight should not be None.")
             self.master_weight.pack(packer)
         if self.low_threshold is None:
             packer.pack_uint(0)
         else:
             packer.pack_uint(1)
+            if self.low_threshold is None:
+                raise ValueError("low_threshold should not be None.")
             self.low_threshold.pack(packer)
         if self.med_threshold is None:
             packer.pack_uint(0)
         else:
             packer.pack_uint(1)
+            if self.med_threshold is None:
+                raise ValueError("med_threshold should not be None.")
             self.med_threshold.pack(packer)
         if self.high_threshold is None:
             packer.pack_uint(0)
         else:
             packer.pack_uint(1)
+            if self.high_threshold is None:
+                raise ValueError("high_threshold should not be None.")
             self.high_threshold.pack(packer)
         if self.home_domain is None:
             packer.pack_uint(0)
         else:
             packer.pack_uint(1)
+            if self.home_domain is None:
+                raise ValueError("home_domain should not be None.")
             self.home_domain.pack(packer)
         if self.signer is None:
             packer.pack_uint(0)
         else:
             packer.pack_uint(1)
+            if self.signer is None:
+                raise ValueError("signer should not be None.")
             self.signer.pack(packer)
 
     @classmethod

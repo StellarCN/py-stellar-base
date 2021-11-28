@@ -38,8 +38,8 @@ class ManageDataResult:
     def unpack(cls, unpacker: Unpacker) -> "ManageDataResult":
         code = ManageDataResultCode.unpack(unpacker)
         if code == ManageDataResultCode.MANAGE_DATA_SUCCESS:
-            return cls(code)
-        return cls(code)
+            return cls(code=code)
+        return cls(code=code)
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

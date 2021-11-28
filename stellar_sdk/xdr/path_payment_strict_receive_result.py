@@ -3,7 +3,6 @@
 import base64
 from xdrlib import Packer, Unpacker
 
-from ..exceptions import ValueError
 from ..type_checked import type_checked
 from .asset import Asset
 from .path_payment_strict_receive_result_code import PathPaymentStrictReceiveResultCode
@@ -72,18 +71,14 @@ class PathPaymentStrictReceiveResult:
             == PathPaymentStrictReceiveResultCode.PATH_PAYMENT_STRICT_RECEIVE_SUCCESS
         ):
             success = PathPaymentStrictReceiveResultSuccess.unpack(unpacker)
-            if success is None:
-                raise ValueError("success should not be None.")
-            return cls(code, success=success)
+            return cls(code=code, success=success)
         if (
             code
             == PathPaymentStrictReceiveResultCode.PATH_PAYMENT_STRICT_RECEIVE_NO_ISSUER
         ):
             no_issuer = Asset.unpack(unpacker)
-            if no_issuer is None:
-                raise ValueError("no_issuer should not be None.")
-            return cls(code, no_issuer=no_issuer)
-        return cls(code)
+            return cls(code=code, no_issuer=no_issuer)
+        return cls(code=code)
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

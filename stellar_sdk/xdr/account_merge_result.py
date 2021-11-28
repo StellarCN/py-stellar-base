@@ -3,7 +3,6 @@
 import base64
 from xdrlib import Packer, Unpacker
 
-from ..exceptions import ValueError
 from ..type_checked import type_checked
 from .account_merge_result_code import AccountMergeResultCode
 from .int64 import Int64
@@ -46,10 +45,8 @@ class AccountMergeResult:
         code = AccountMergeResultCode.unpack(unpacker)
         if code == AccountMergeResultCode.ACCOUNT_MERGE_SUCCESS:
             source_account_balance = Int64.unpack(unpacker)
-            if source_account_balance is None:
-                raise ValueError("source_account_balance should not be None.")
-            return cls(code, source_account_balance=source_account_balance)
-        return cls(code)
+            return cls(code=code, source_account_balance=source_account_balance)
+        return cls(code=code)
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

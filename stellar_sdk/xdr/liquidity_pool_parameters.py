@@ -3,7 +3,6 @@
 import base64
 from xdrlib import Packer, Unpacker
 
-from ..exceptions import ValueError
 from ..type_checked import type_checked
 from .liquidity_pool_constant_product_parameters import (
     LiquidityPoolConstantProductParameters,
@@ -46,10 +45,8 @@ class LiquidityPoolParameters:
         type = LiquidityPoolType.unpack(unpacker)
         if type == LiquidityPoolType.LIQUIDITY_POOL_CONSTANT_PRODUCT:
             constant_product = LiquidityPoolConstantProductParameters.unpack(unpacker)
-            if constant_product is None:
-                raise ValueError("constant_product should not be None.")
-            return cls(type, constant_product=constant_product)
-        return cls(type)
+            return cls(type=type, constant_product=constant_product)
+        return cls(type=type)
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

@@ -3,7 +3,6 @@
 import base64
 from xdrlib import Packer, Unpacker
 
-from ..exceptions import ValueError
 from ..type_checked import type_checked
 from .survey_message_command_type import SurveyMessageCommandType
 from .topology_response_body import TopologyResponseBody
@@ -44,10 +43,8 @@ class SurveyResponseBody:
         type = SurveyMessageCommandType.unpack(unpacker)
         if type == SurveyMessageCommandType.SURVEY_TOPOLOGY:
             topology_response_body = TopologyResponseBody.unpack(unpacker)
-            if topology_response_body is None:
-                raise ValueError("topology_response_body should not be None.")
-            return cls(type, topology_response_body=topology_response_body)
-        return cls(type)
+            return cls(type=type, topology_response_body=topology_response_body)
+        return cls(type=type)
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

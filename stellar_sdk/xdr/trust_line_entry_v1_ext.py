@@ -3,7 +3,6 @@
 import base64
 from xdrlib import Packer, Unpacker
 
-from ..exceptions import ValueError
 from ..type_checked import type_checked
 from .base import Integer
 from .trust_line_entry_extension_v2 import TrustLineEntryExtensionV2
@@ -47,13 +46,11 @@ class TrustLineEntryV1Ext:
     def unpack(cls, unpacker: Unpacker) -> "TrustLineEntryV1Ext":
         v = Integer.unpack(unpacker)
         if v == 0:
-            return cls(v)
+            return cls(v=v)
         if v == 2:
             v2 = TrustLineEntryExtensionV2.unpack(unpacker)
-            if v2 is None:
-                raise ValueError("v2 should not be None.")
-            return cls(v, v2=v2)
-        return cls(v)
+            return cls(v=v, v2=v2)
+        return cls(v=v)
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

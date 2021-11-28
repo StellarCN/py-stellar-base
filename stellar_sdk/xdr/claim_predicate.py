@@ -4,7 +4,6 @@ import base64
 from typing import List, Optional
 from xdrlib import Packer, Unpacker
 
-from ..exceptions import ValueError
 from ..type_checked import type_checked
 from .claim_predicate_type import ClaimPredicateType
 from .int64 import Int64
@@ -67,24 +66,24 @@ class ClaimPredicate:
             if self.and_predicates is None:
                 raise ValueError("and_predicates should not be None.")
             packer.pack_uint(len(self.and_predicates))
-            for and_predicate in self.and_predicates:
-                and_predicate.pack(packer)
+            for and_predicates_item in self.and_predicates:
+                and_predicates_item.pack(packer)
             return
         if self.type == ClaimPredicateType.CLAIM_PREDICATE_OR:
             if self.or_predicates is None:
                 raise ValueError("or_predicates should not be None.")
             packer.pack_uint(len(self.or_predicates))
-            for or_predicate in self.or_predicates:
-                or_predicate.pack(packer)
+            for or_predicates_item in self.or_predicates:
+                or_predicates_item.pack(packer)
             return
         if self.type == ClaimPredicateType.CLAIM_PREDICATE_NOT:
             if self.not_predicate is None:
                 packer.pack_uint(0)
-                return
-            packer.pack_uint(1)
-            if self.not_predicate is None:
-                raise ValueError("not_predicate should not be None.")
-            self.not_predicate.pack(packer)
+            else:
+                packer.pack_uint(1)
+                if self.not_predicate is None:
+                    raise ValueError("not_predicate should not be None.")
+                self.not_predicate.pack(packer)
             return
         if self.type == ClaimPredicateType.CLAIM_PREDICATE_BEFORE_ABSOLUTE_TIME:
             if self.abs_before is None:
@@ -101,37 +100,31 @@ class ClaimPredicate:
     def unpack(cls, unpacker: Unpacker) -> "ClaimPredicate":
         type = ClaimPredicateType.unpack(unpacker)
         if type == ClaimPredicateType.CLAIM_PREDICATE_UNCONDITIONAL:
-            return cls(type)
+            return cls(type=type)
         if type == ClaimPredicateType.CLAIM_PREDICATE_AND:
             length = unpacker.unpack_uint()
             and_predicates = []
             for _ in range(length):
                 and_predicates.append(ClaimPredicate.unpack(unpacker))
-            return cls(type, and_predicates=and_predicates)
+            return cls(type=type, and_predicates=and_predicates)
         if type == ClaimPredicateType.CLAIM_PREDICATE_OR:
             length = unpacker.unpack_uint()
             or_predicates = []
             for _ in range(length):
                 or_predicates.append(ClaimPredicate.unpack(unpacker))
-            return cls(type, or_predicates=or_predicates)
+            return cls(type=type, or_predicates=or_predicates)
         if type == ClaimPredicateType.CLAIM_PREDICATE_NOT:
             not_predicate = (
                 ClaimPredicate.unpack(unpacker) if unpacker.unpack_uint() else None
             )
-            if not_predicate is None:
-                raise ValueError("not_predicate should not be None.")
-            return cls(type, not_predicate=not_predicate)
+            return cls(type=type, not_predicate=not_predicate)
         if type == ClaimPredicateType.CLAIM_PREDICATE_BEFORE_ABSOLUTE_TIME:
             abs_before = Int64.unpack(unpacker)
-            if abs_before is None:
-                raise ValueError("abs_before should not be None.")
-            return cls(type, abs_before=abs_before)
+            return cls(type=type, abs_before=abs_before)
         if type == ClaimPredicateType.CLAIM_PREDICATE_BEFORE_RELATIVE_TIME:
             rel_before = Int64.unpack(unpacker)
-            if rel_before is None:
-                raise ValueError("rel_before should not be None.")
-            return cls(type, rel_before=rel_before)
-        return cls(type)
+            return cls(type=type, rel_before=rel_before)
+        return cls(type=type)
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()
