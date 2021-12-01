@@ -54,15 +54,17 @@ class TransactionBuilder:
 
         server = Server("https://horizon-testnet.stellar.org")
         alice_account = server.load_account(alice_keypair.public_key)
+        network_passphrase = Network.TESTNET_NETWORK_PASSPHRASE
         base_fee = server.fetch_base_fee()
         transaction = (
             TransactionBuilder(
                 source_account=alice_account,
-                network_passphrase=Network.TESTNET_NETWORK_PASSPHRASE,
+                network_passphrase=network_passphrase,
                 base_fee=base_fee,
             )
                 .add_text_memo("Hello, Stellar!")
                 .append_payment_op(bob_address, Asset.native(), "10.25")
+                .set_timeout(30)
                 .build()
         )
         transaction.sign(alice_keypair)
@@ -99,6 +101,13 @@ class TransactionBuilder:
 
         :return: New transaction envelope.
         """
+        if self.time_bounds is None:
+            warnings.warn(
+                "It looks like you haven't set a TimeBounds for the transaction, "
+                "we strongly recommend that you set it. "
+                "You can learn why you should set it up through this link: "
+                "https://www.stellar.org/developers-blog/transaction-submission-timeouts-and-dynamic-fees-faq"
+            )
         source = self.source_account.account
         sequence = self.source_account.sequence + 1
         transaction = Transaction(

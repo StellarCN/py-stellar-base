@@ -40,6 +40,7 @@ trust_transaction = (
         base_fee=100,
     )
     .append_change_trust_op(asset=hello_asset)
+    .set_timeout(30)
     .build()
 )
 
@@ -60,6 +61,7 @@ payment_transaction = (
         base_fee=100,
     )
     .append_payment_op(destination=distributor_public, amount="1000", asset=hello_asset)
+    .set_timeout(30)
     .build()
 )
 payment_transaction.sign(issuing_keypair)

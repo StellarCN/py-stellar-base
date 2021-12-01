@@ -52,6 +52,7 @@ transaction = (
         base_fee=base_fee,
     )
     .append_create_account_op(destination=issuer_public_key, starting_balance="1000")
+    .set_timeout(30)
     .build()
 )
 transaction.sign(seller_secret_key)
@@ -83,7 +84,7 @@ trust_transaction = (
         asset=awesome_asset_coin,
         limit="3000",
     )
-    .set_timeout(100)
+    .set_timeout(30)
     .build()
 )
 
@@ -103,6 +104,7 @@ aac_payment_transaction = (
         amount="1000",
         asset=awesome_asset_coin,
     )
+    .set_timeout(30)
     .build()
 )
 aac_payment_transaction.sign(issuer_secret_key)
@@ -113,18 +115,18 @@ print("#" * 30)
 # create sell offer
 print("Create Sell Offer")
 
-lumen = Asset("XLM", issuer=None)
 # The Issuer Account sends a payment using the asset.
-sell_offer = ManageSellOffer(
-    selling=awesome_asset_coin, buying=lumen, amount="10", price="0.5"
-)
+lumen = Asset("XLM", issuer=None)
 sell_offer_transaction = (
     TransactionBuilder(
         source_account=seller_account,
         network_passphrase=network_passphrase,
         base_fee=100,
     )
-    .append_operation(sell_offer)
+    .append_manage_sell_offer_op(
+        selling=awesome_asset_coin, buying=lumen, amount="10", price="0.5"
+    )
+    .set_timeout(30)
     .build()
 )
 sell_offer_transaction.sign(seller_secret_key)
@@ -146,20 +148,20 @@ print("#" * 30)
 
 # update offer. We will update the price from 0.5 to 1.0.
 print(f"Update offer {offer_id}")
-sell_offer = ManageSellOffer(
-    offer_id=int(offer_id),
-    selling=awesome_asset_coin,
-    buying=lumen,
-    amount="10",
-    price="1",
-)
 update_offer_transaction = (
     TransactionBuilder(
         source_account=seller_account,
         network_passphrase=network_passphrase,
         base_fee=base_fee,
     )
-    .append_operation(sell_offer)
+    .append_manage_sell_offer_op(
+        offer_id=int(offer_id),
+        selling=awesome_asset_coin,
+        buying=lumen,
+        amount="10",
+        price="1",
+    )
+    .set_timeout(30)
     .build()
 )
 update_offer_transaction.sign(seller_secret_key)
@@ -180,20 +182,20 @@ print("#" * 30)
 
 # delete offer. To delete the offer we set the amount to zero
 print(f"Delete offer {offer_id}")
-sell_offer = ManageSellOffer(
-    offer_id=int(offer_id),
-    selling=awesome_asset_coin,
-    buying=lumen,
-    amount="0",
-    price="1",
-)
 update_offer_transaction = (
     TransactionBuilder(
         source_account=seller_account,
         network_passphrase=network_passphrase,
         base_fee=base_fee,
     )
-    .append_operation(sell_offer)
+    .append_manage_sell_offer_op(
+        offer_id=int(offer_id),
+        selling=awesome_asset_coin,
+        buying=lumen,
+        amount="0",
+        price="1",
+    )
+    .set_timeout(30)
     .build()
 )
 update_offer_transaction.sign(seller_secret_key)

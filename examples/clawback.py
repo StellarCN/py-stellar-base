@@ -58,6 +58,7 @@ set_options_transaction = (
         set_flags=AuthorizationFlag.AUTHORIZATION_CLAWBACK_ENABLED
         | AuthorizationFlag.AUTHORIZATION_REVOCABLE
     )
+    .set_timeout(30)
     .build()
 )
 set_options_transaction.sign(issuing_keypair)
@@ -73,6 +74,7 @@ trust_transaction = (
         base_fee=100,
     )
     .append_change_trust_op(asset=hello_asset)
+    .set_timeout(30)
     .build()
 )
 
@@ -89,6 +91,7 @@ payment_transaction = (
         base_fee=100,
     )
     .append_payment_op(destination=customer_public, amount="1000", asset=hello_asset)
+    .set_timeout(30)
     .build()
 )
 payment_transaction.sign(issuing_keypair)
@@ -104,6 +107,7 @@ clawback_transaction = (
         base_fee=100,
     )
     .append_clawback_op(asset=hello_asset, from_=customer_public, amount="300")
+    .set_timeout(30)
     .build()
 )
 clawback_transaction.sign(issuing_keypair)

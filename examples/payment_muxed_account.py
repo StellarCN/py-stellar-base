@@ -32,6 +32,7 @@ transaction = (
         base_fee=100,
     )
     .append_payment_op(destination=bob_account, amount="100", asset=Asset.native())
+    .set_timeout(30)
     .build()
 )
 

@@ -20,6 +20,7 @@ transaction = (
     .append_create_account_op(
         destination=destination.public_key, starting_balance="12.25"
     )
+    .set_timeout(30)
     .build()
 )
 transaction.sign(source)
