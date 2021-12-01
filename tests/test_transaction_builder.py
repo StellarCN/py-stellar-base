@@ -61,10 +61,7 @@ def check_from_xdr(tx: TransactionBuilder):
     xdr = tx.build().to_xdr()
     tx_builder = TransactionBuilder.from_xdr(xdr, Network.TESTNET_NETWORK_PASSPHRASE)
     assert isinstance(tx_builder, TransactionBuilder)
-    assert (
-        xdr
-        == tx_builder.build().to_xdr()
-    )
+    assert xdr == tx_builder.build().to_xdr()
 
 
 class TestTransaction:
@@ -545,6 +542,25 @@ class TestTransaction:
                 .append_payment_op(kp2.public_key, asset1, "10000", kp1.public_key)
                 .set_timeout(256)
             )
+
+    def test_build_without_timebounds_warn(self):
+        source_account = Account(kp1.public_key, 100000000000000000)
+        tx = TransactionBuilder(
+            source_account=source_account,
+            network_passphrase=Network.TESTNET_NETWORK_PASSPHRASE,
+            base_fee=100,
+            v1=True,
+        )
+        with pytest.warns(
+            UserWarning,
+            match="It looks like you haven't set a TimeBounds for the transaction, "
+            "we strongly recommend that you set it. "
+            "You can learn why you should set it up through this link: "
+            "https://www.stellar.org/developers-blog/transaction-submission-timeouts-and-dynamic-fees-faq",
+        ):
+            _ = tx.append_payment_op(
+                kp2.public_key, asset1, "10000", kp1.public_key
+            ).build()
 
     def test_build_with_base_fee_equals_500(self):
         tx = get_tx_builder(base_fee=500).append_payment_op(

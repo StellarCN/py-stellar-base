@@ -38,6 +38,7 @@ inner_tx = (
     .append_payment_op(
         destination=destination_address, amount="100", asset=Asset.native()
     )
+    .set_timeout(3600)
     .build()
 )
 inner_tx.sign(inner_source_keypair)

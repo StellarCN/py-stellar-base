@@ -46,6 +46,7 @@ create_claimable_balance_te = (
         claimants=[claimant],
         source=sponsor_keypair.public_key,
     )
+    .set_timeout(30)
     .build()
 )
 create_claimable_balance_te.sign(sponsor_keypair)
@@ -62,6 +63,7 @@ claim_claimable_balance_te = (
     .append_claim_claimable_balance_op(
         balance_id=balance_id, source=claimant_keypair.public_key
     )
+    .set_timeout(30)
     .build()
 )
 

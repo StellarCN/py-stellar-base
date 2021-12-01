@@ -39,6 +39,7 @@ add_signer_transaction = (
         base_fee=100,
     )
     .append_hashx_signer(sha256_hash=hashlib.sha256(preimage).digest(), weight=1)
+    .set_timeout(30)
     .build()
 )
 
@@ -54,6 +55,7 @@ manage_data_transaction = (
         base_fee=100,
     )
     .append_manage_data_op("Hello", "Stellar")
+    .set_timeout(30)
     .build()
 )
 # Sign with preimage

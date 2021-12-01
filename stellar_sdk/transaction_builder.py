@@ -99,6 +99,13 @@ class TransactionBuilder:
 
         :return: New transaction envelope.
         """
+        if self.time_bounds is None:
+            warnings.warn(
+                "It looks like you haven't set a TimeBounds for the transaction, "
+                "we strongly recommend that you set it. "
+                "You can learn why you should set it up through this link: "
+                "https://www.stellar.org/developers-blog/transaction-submission-timeouts-and-dynamic-fees-faq"
+            )
         source = self.source_account.account
         sequence = self.source_account.sequence + 1
         transaction = Transaction(

@@ -38,6 +38,7 @@ sponsoring_account_creation_te = (
         source=sponsor_keypair.public_key,
     )
     .append_end_sponsoring_future_reserves_op(source=newly_created_keypair.public_key)
+    .set_timeout(30)
     .build()
 )
 sponsoring_account_creation_te.sign(sponsor_keypair)
@@ -56,6 +57,7 @@ revoke_account_sponsorship_te = (
     .append_revoke_account_sponsorship_op(
         account_id=newly_created_keypair.public_key, source=sponsor_keypair.public_key
     )
+    .set_timeout(30)
     .build()
 )
 revoke_account_sponsorship_te.sign(sponsor_keypair)

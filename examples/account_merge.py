@@ -38,6 +38,7 @@ transaction = (
         base_fee=100,
     )
     .append_account_merge_op(destination=destination_public_key)
+    .set_timeout(30)
     .build()
 )
 
