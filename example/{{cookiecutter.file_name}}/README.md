@@ -11,7 +11,7 @@ After Downloading the repo (You can find Instructions [HERE](https://github.com/
     > cd examples
     > python setup.py
 
-This requires you to enter an amount of account you want to create on Testnet(You can continue to use the default amount which is 5)
+This requires you to enter the number of accounts you want to create on Testnet(You can continue to use the default amount which is 5)
 
 After the Setup is done, you will have the following in a .stellar_env file in your current working directory;
 
@@ -20,7 +20,7 @@ After the Setup is done, you will have the following in a .stellar_env file in y
 ## * **Asset Object**
 
 ## USING THE PRIVATE KEYS
-This is by default, used for signing transaction in the example file, you can change them within the example file if you want, they are named "source_key_0", "source_key_1" and so on.
+This is by default, used for signing transactions in the example file, you can change them within the example file if you want, they are named "source_key_0", "source_key_1" and so on.
 
 To use any of the Source Key to sign Transaction, You just need to
         
@@ -33,7 +33,7 @@ To use any of the Source Key to sign Transaction, You just need to
 ```
 
 ## USING THE PUBLIC KEYS
-These public keys are used as disposable public address and are used where you dont need that public key to sign a transaction, mainly as destination account, they are named "destination_acct_0", "destination_acct_1", and so on, reference to their private key is not stored anywhere.
+These public keys are used as disposable public addresses and are used where you don't need that public key to sign a transaction, mainly as destination account, they are named "destination_acct_0", "destination_acct_1", and so on, reference to their private key is not stored anywhere.
 
 To use any of the Public keys
 
@@ -60,10 +60,10 @@ To use any of the Public keys
 
 ```
 ## USING THE ASSET OBJECT
-The Asset created is mainly to be used for sending transaction (other than XLM), placing order on testnet, etc. You can find details about the asset in the **.stellar_env** file in your current workig directory.
+The Asset created is mainly to be used for sending transactions (other than XLM), placing an order on testnet, etc. You can find details about the asset in the **.stellar_env** file in your current working directory.
 * **asset_key** -- This is the private key for the issuing Account
 * **asset_code** -- The Asset Code
 * **asset_issuer** -- The Asset Issuer
-You can change the deafult asset code in the [Setup.py](./setup.py) file.
+You can change the default asset code in the [Setup.py](./setup.py) file.
 
-With this little changes, you can always run the Setup file as describe above to get new keys or in case of testnet reset
+With these little changes, you can always run the Setup file as describe above to get new keys or in case of testnet reset
