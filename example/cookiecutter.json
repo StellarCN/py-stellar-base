@@ -3,5 +3,6 @@
 
 {
     "variable": "Examples",
-    "file_name":"examples"
+    "file_name":"examples",
+    "cookiecutters_dir":"~/."
 }

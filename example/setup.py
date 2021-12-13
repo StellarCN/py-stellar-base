@@ -90,7 +90,7 @@ current_dir = os.getcwd()
 print(current_dir)
 
 
-adc = cookiecutter(current_dir + '/example')
+adc = cookiecutter("https://github.com/garantor/py-stellar-base.git", no_input=True)
 adc = {{ adc.variables }}
 print(adc)
 
