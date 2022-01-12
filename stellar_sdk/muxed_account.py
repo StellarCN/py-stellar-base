@@ -1,29 +1,17 @@
-import os
 from typing import Optional
 
 from . import xdr as stellar_xdr
-from .exceptions import FeatureNotEnabledError, ValueError
+from .exceptions import ValueError
 from .keypair import Keypair
 from .strkey import StrKey
 from .type_checked import type_checked
 
 __all__ = ["MuxedAccount"]
 
-_SEP_0023_ENABLE_FLAG: str = "ENABLE_SEP_0023"
-
-
-def _sep_0023_enabled() -> bool:
-    return os.getenv(_SEP_0023_ENABLE_FLAG, "False").lower() in ("true", "1", "t")
-
 
 @type_checked
 class MuxedAccount:
     """The :class:`MuxedAccount` object, which represents a multiplexed account on Stellar's network.
-
-    .. note::
-        SEP-0023 support is not enabled by default, if you want to enable it,
-        please set `ENABLE_SEP_0023` to ``true`` in the environment variable,
-        on Linux and MacOS, generally you can use ``export ENABLE_SEP_0023=true`` to set it.
 
     An example::
 
@@ -59,22 +47,7 @@ class MuxedAccount:
 
     @property
     def account_muxed(self) -> Optional[str]:
-        """Get the multiplex address starting with ``M``, return ``None`` if `account_id_id` is ``None``.
-
-        .. note::
-            SEP-0023 support is not enabled by default, if you want to enable it,
-            please set `ENABLE_SEP_0023` to ``true`` in the environment variable,
-            on Linux and MacOS, generally you can use ``export ENABLE_SEP_0023=true`` to set it.
-
-        :raises: :exc:`FeatureNotEnabledError <stellar_sdk.exceptions.FeatureNotEnabledError>`:
-            if `ENABLE_SEP_0023` is not set to ``true``.
-        """
-        if not _sep_0023_enabled():
-            raise FeatureNotEnabledError(
-                "SEP-0023 related features are not enabled, "
-                "if you want to enable it, please add `ENABLE_SEP_0023=true` to "
-                "the system environment variables."
-            )
+        """Get the multiplex address starting with ``M``, return ``None`` if `account_id_id` is ``None``."""
 
         if self.account_muxed_id is None:
             return None
@@ -103,14 +76,6 @@ class MuxedAccount:
         public key (ex. ``"GDGQVOKHW4VEJRU2TETD6DBRKEO5ERCNF353LW5WBFW3JJWQ2BRQ6KDD"``),
         otherwise it will return muxed
         account (ex. ``"MAAAAAAAAAAAJURAAB2X52XFQP6FBXLGT6LWOOWMEXWHEWBDVRZ7V5WH34Y22MPFBHUHY"``)
-
-        .. note::
-            SEP-0023 support is not enabled by default, if you want to enable it,
-            please set `ENABLE_SEP_0023` to ``true`` in the environment variable,
-            on Linux and MacOS, generally you can use ``export ENABLE_SEP_0023=true`` to set it.
-
-        :raises: :exc:`FeatureNotEnabledError <stellar_sdk.exceptions.FeatureNotEnabledError>`:
-            if `account_muxed_id` is not ``None`` and `ENABLE_SEP_0023` is not set to ``true``.
         """
         if self.account_muxed_id is None:
             return self.account_id
@@ -129,12 +94,6 @@ class MuxedAccount:
         if data_length == 56:
             return cls(account_id=account, account_muxed_id=None)
         elif data_length == 69:
-            if not _sep_0023_enabled():
-                raise FeatureNotEnabledError(
-                    "SEP-0023 related features are not enabled, "
-                    "if you want to enable it, please add `ENABLE_SEP_0023=true` to "
-                    "the system environment variables."
-                )
             muxed_xdr = StrKey.decode_muxed_account(account)
             assert muxed_xdr.med25519 is not None
             assert muxed_xdr.med25519.ed25519 is not None

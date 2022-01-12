@@ -17,8 +17,6 @@ jobs:
         os: [ ubuntu-latest, macos-latest, windows-latest ]
         python-version: [ "3.6", "3.7", "3.8", "3.9", "3.10", "pypy3" ]
         # https://endoflife.date/python
-    env:
-      ENABLE_SEP_0023: true
     steps:
       - uses: actions/checkout@v2
       - name: Setup Python ${{ matrix.python-version }} on ${{ matrix.os }}
