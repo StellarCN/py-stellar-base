@@ -55,7 +55,7 @@ class TransactionBuilder:
         server = Server("https://horizon-testnet.stellar.org")
         alice_account = server.load_account(alice_keypair.public_key)
         network_passphrase = Network.TESTNET_NETWORK_PASSPHRASE
-        base_fee = server.fetch_base_fee()
+        base_fee = 100
         transaction = (
             TransactionBuilder(
                 source_account=alice_account,

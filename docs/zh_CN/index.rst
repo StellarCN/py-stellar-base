@@ -32,7 +32,7 @@ Stellar Python SDK
     :alt: PyPI
     :target: https://pypi.python.org/pypi/stellar-sdk
 
-.. image:: https://img.shields.io/badge/python-3.6%20%7C%203.7%20%7C%203.8%20%7C%203.9%20%7C%203.10-blue
+.. image:: https://img.shields.io/badge/python-%3E%3D3.6-blue
     :alt: Python - Version
     :target: https://pypi.python.org/pypi/stellar-sdk
 
@@ -89,7 +89,7 @@ stellar-model 可以将 Stellar Horizon 返回的 JSON 解析为 Python 实例�
 -----
 * 文档: https://stellar-sdk.readthedocs.io
 * 源代码: https://github.com/StellarCN/py-stellar-base
-* 示例: https://github.com/StellarCN/py-stellar-base/tree/dev/examples
+* 示例: https://github.com/StellarCN/py-stellar-base/tree/v7/examples
 * Issue 追踪: https://github.com/StellarCN/py-stellar-base/issues
 * 许可证: `Apache License 2.0 <https://github.com/StellarCN/py-stellar-base/blob/master/LICENSE>`_
 * 已发布版本: https://pypi.org/project/stellar-sdk/

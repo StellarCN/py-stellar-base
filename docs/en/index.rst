@@ -32,7 +32,7 @@ Stellar Python SDK
     :alt: PyPI
     :target: https://pypi.python.org/pypi/stellar-sdk
 
-.. image:: https://img.shields.io/badge/python-3.6%20%7C%203.7%20%7C%203.8%20%7C%203.9%20%7C%203.10-blue
+.. image:: https://img.shields.io/badge/python-%3E%3D3.6-blue
     :alt: Python - Version
     :target: https://pypi.python.org/pypi/stellar-sdk
 
@@ -94,7 +94,7 @@ Links
 -----
 * Document: https://stellar-sdk.readthedocs.io
 * Code: https://github.com/StellarCN/py-stellar-base
-* Examples: https://github.com/StellarCN/py-stellar-base/tree/dev/examples
+* Examples: https://github.com/StellarCN/py-stellar-base/tree/v7/examples
 * Issue tracker: https://github.com/StellarCN/py-stellar-base/issues
 * License: `Apache License 2.0 <https://github.com/StellarCN/py-stellar-base/blob/master/LICENSE>`_
 * Releases: https://pypi.org/project/stellar-sdk/
