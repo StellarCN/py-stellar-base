@@ -1,4 +1,15 @@
-from stellar_sdk import Asset, IdMemo, Keypair, MuxedAccount, NoneMemo
+import pytest
+
+from stellar_sdk import (
+    Asset,
+    IdMemo,
+    Keypair,
+    MuxedAccount,
+    NoneMemo,
+    ClaimPredicate,
+    Claimant,
+    CreateClaimableBalance,
+)
 from stellar_sdk.operation import ManageData, Payment
 from stellar_sdk.time_bounds import TimeBounds
 from stellar_sdk.transaction import Transaction
@@ -212,3 +223,81 @@ class TestTransaction:
     #         time_bounds = TimeBounds(12345, 56789)
     #         ops = []
     #         Transaction(source, sequence, fee, ops, memo, time_bounds).to_xdr_object()
+
+    def test_get_claimable_balance_id(self):
+        predicate = ClaimPredicate.predicate_unconditional()
+        claimant = Claimant(
+            destination="GA7QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLTJJFC7MGXUA74P7UJVSGZ",
+            predicate=predicate,
+        )
+        claimants = [claimant]
+        op = CreateClaimableBalance(
+            asset=Asset.native(),
+            amount="100",
+            claimants=claimants,
+        )
+        source = "GA7QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLTJJFC7MGXUA74P7UJVSGZ"
+        sequence = 1235
+        fee = 100
+        tx = Transaction(source, sequence, fee, [op])
+        assert (
+            tx.get_claimable_balance_id(0)
+            == "00000000536af35c666a28d26775008321655e9eda2039154270484e3f81d72c66d5c26f"
+        )
+
+    def test_get_claimable_balance_id_with_muxed_source(self):
+        predicate = ClaimPredicate.predicate_unconditional()
+        claimant = Claimant(
+            destination="GA7QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLTJJFC7MGXUA74P7UJVSGZ",
+            predicate=predicate,
+        )
+        claimants = [claimant]
+        op = CreateClaimableBalance(
+            asset=Asset.native(),
+            amount="100",
+            claimants=claimants,
+        )
+        source = MuxedAccount(
+            "GA7QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLTJJFC7MGXUA74P7UJVSGZ", 1234
+        )
+        sequence = 1235
+        fee = 100
+        tx = Transaction(source, sequence, fee, [op])
+        assert (
+            tx.get_claimable_balance_id(0)
+            == "00000000536af35c666a28d26775008321655e9eda2039154270484e3f81d72c66d5c26f"
+        )
+
+    def test_get_claimable_balance_id_invalid_operation_index_raise(self):
+        predicate = ClaimPredicate.predicate_unconditional()
+        claimant = Claimant(
+            destination="GA7QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLTJJFC7MGXUA74P7UJVSGZ",
+            predicate=predicate,
+        )
+        claimants = [claimant]
+        op = CreateClaimableBalance(
+            asset=Asset.native(),
+            amount="100",
+            claimants=claimants,
+        )
+        source = "GA7QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLTJJFC7MGXUA74P7UJVSGZ"
+        sequence = 1235
+        fee = 100
+        tx = Transaction(source, sequence, fee, [op])
+        with pytest.raises(
+            ValueError,
+            match='Invalid operation index, "operation_index" should not be greater than 0',
+        ):
+            tx.get_claimable_balance_id(1)
+
+    def test_get_claimable_balance_id_invalid_op_type_raise(self):
+        op = ManageData("a", "b")
+        source = "GA7QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLTJJFC7MGXUA74P7UJVSGZ"
+        sequence = 1235
+        fee = 100
+        tx = Transaction(source, sequence, fee, [op])
+        with pytest.raises(
+            TypeError,
+            match="Type of the operation must be <class 'stellar_sdk.operation.create_claimable_balance.CreateClaimableBalance'>, got <class 'stellar_sdk.operation.manage_data.ManageData'> instead",
+        ):
+            tx.get_claimable_balance_id(0)
