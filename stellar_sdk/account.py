@@ -57,14 +57,6 @@ class Account:
         public key (ex. ``"GDGQVOKHW4VEJRU2TETD6DBRKEO5ERCNF353LW5WBFW3JJWQ2BRQ6KDD"``),
         otherwise it will return muxed
         account (ex. ``"MAAAAAAAAAAAJURAAB2X52XFQP6FBXLGT6LWOOWMEXWHEWBDVRZ7V5WH34Y22MPFBHUHY"``)
-
-        .. note::
-            SEP-0023 support is not enabled by default, if you want to enable it,
-            please set `ENABLE_SEP_0023` to ``true`` in the environment variable,
-            on Linux and MacOS, generally you can use ``export ENABLE_SEP_0023=true`` to set it.
-
-        :raises: :exc:`FeatureNotEnabledError <stellar_sdk.exceptions.FeatureNotEnabledError>`:
-            if `account_id` is a muxed account and `ENABLE_SEP_0023` is not set to ``true``.
         """
         return self.account.universal_account_id
 

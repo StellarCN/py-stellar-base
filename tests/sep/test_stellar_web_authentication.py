@@ -2,12 +2,11 @@ import base64
 import os
 import time
 from random import randrange
-from unittest.mock import PropertyMock, patch
 
 import pytest
 
 from stellar_sdk import Account, Asset, Keypair, MuxedAccount, Network
-from stellar_sdk.exceptions import FeatureNotEnabledError, ValueError
+from stellar_sdk.exceptions import ValueError
 from stellar_sdk.memo import IdMemo
 from stellar_sdk.operation import ManageData
 from stellar_sdk.sep.ed25519_public_key_signer import Ed25519PublicKeySigner
@@ -1932,69 +1931,6 @@ class TestStellarWebAuthentication:
             home_domains=home_domain,
         )
         assert challenge_transaction.client_account_id == client_account_id
-
-    def test_read_challenge_transaction_mux_client_id_not_permitted_by_env_var(self):
-        server_kp = Keypair.random()
-        client_account_id = (
-            "MAAAAAAAAAAAJURAAB2X52XFQP6FBXLGT6LWOOWMEXWHEWBDVRZ7V5WH34Y22MPFBHUHY"
-        )
-        timeout = 600
-        network_passphrase = Network.PUBLIC_NETWORK_PASSPHRASE
-        home_domain = "example.com"
-        web_auth_domain = "auth.example.com"
-
-        challenge = build_challenge_transaction(
-            server_secret=server_kp.secret,
-            client_account_id=client_account_id,
-            home_domain=home_domain,
-            web_auth_domain=web_auth_domain,
-            network_passphrase=network_passphrase,
-            timeout=timeout,
-        )
-        with patch(
-            "stellar_sdk.MuxedAccount.account_muxed", new_callable=PropertyMock
-        ) as mocked_account_muxed:
-            mocked_account_muxed.side_effect = FeatureNotEnabledError()
-            with pytest.raises(
-                InvalidSep10ChallengeError, match="Muxed accounts are not supported"
-            ):
-                read_challenge_transaction(
-                    challenge_transaction=challenge,
-                    server_account_id=server_kp.public_key,
-                    network_passphrase=network_passphrase,
-                    web_auth_domain=web_auth_domain,
-                    home_domains=home_domain,
-                )
-
-    def test_read_challenge_transaction_g_client_id_muxed_not_permitted_by_env_var(
-        self,
-    ):
-        server_kp = Keypair.random()
-        client_account_id = Keypair.random().public_key
-        timeout = 600
-        network_passphrase = Network.PUBLIC_NETWORK_PASSPHRASE
-        home_domain = "example.com"
-        web_auth_domain = "auth.example.com"
-
-        challenge = build_challenge_transaction(
-            server_secret=server_kp.secret,
-            client_account_id=client_account_id,
-            home_domain=home_domain,
-            web_auth_domain=web_auth_domain,
-            network_passphrase=network_passphrase,
-            timeout=timeout,
-        )
-        with patch(
-            "stellar_sdk.MuxedAccount.account_muxed", new_callable=PropertyMock
-        ) as mocked_account_muxed:
-            mocked_account_muxed.side_effect = FeatureNotEnabledError()
-            read_challenge_transaction(
-                challenge_transaction=challenge,
-                server_account_id=server_kp.public_key,
-                network_passphrase=network_passphrase,
-                web_auth_domain=web_auth_domain,
-                home_domains=home_domain,
-            )
 
     def test_read_challenge_transaction_with_memo_permitted(self):
         server_kp = Keypair.random()

@@ -14,7 +14,7 @@ from typing import Iterable, List, Optional, Union
 
 from .. import xdr as stellar_xdr
 from ..account import Account
-from ..exceptions import BadSignatureError, FeatureNotEnabledError, ValueError
+from ..exceptions import BadSignatureError, ValueError
 from ..keypair import Keypair
 from ..memo import IdMemo, NoneMemo
 from ..muxed_account import MuxedAccount
@@ -244,16 +244,7 @@ def read_challenge_transaction(
     if not client_account:
         raise InvalidSep10ChallengeError("Operation should have a source account.")
 
-    try:
-        client_account_address = (
-            client_account.account_muxed or client_account.account_id
-        )
-    except FeatureNotEnabledError:
-        if client_account.account_muxed_id:
-            raise InvalidSep10ChallengeError("Muxed accounts are not supported")
-        else:
-            client_account_address = client_account.account_id
-
+    client_account_address = client_account.account_muxed or client_account.account_id
     matched_home_domain = None
     if isinstance(home_domains, str):
         if manage_data_op.data_name == f"{home_domains} auth":
