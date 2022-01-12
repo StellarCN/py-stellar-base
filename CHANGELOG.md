@@ -1,6 +1,31 @@
 Release History
 ==============
 
+### Version 7.0.0
+Released on January 12, 2022
+
+**This update includes breaking changes.**
+
+This release introduces unconditional support for muxed accounts. ([#574](https://github.com/StellarCN/py-stellar-base/pull/574))
+
+#### Breaking changes
+* In [v4.0.0](https://github.com/StellarCN/py-stellar-base/releases/tag/4.0.0), we introduced opt-in support for muxed accounts, 
+  you would need to set `ENABLE_SEP_0023` to `true` in the environment variable to enable support for this feature. 
+  In the new release, this feature will be enabled by default. ([#574](https://github.com/StellarCN/py-stellar-base/pull/574))
+  
+#### Add
+* Introduced a helper function which lets you pre-determine the hex claimable balance ID of a CreateClaimableBalance operation prior to submission to the network: ([#575](https://github.com/StellarCN/py-stellar-base/pull/575))
+
+  ```python
+  class Transaction:
+      def get_claimable_balance_id(self, operation_index: int) -> str:
+          pass
+  ```
+
+#### Update
+* When the user builds a transaction through TransactionBuilder but does not set TimeBounds, the SDK will give a warning. ([#565](https://github.com/StellarCN/py-stellar-base/pull/565))
+* `stellar_sdk.xdr` module adds some validation to the data. ([#564](https://github.com/StellarCN/py-stellar-base/pull/564))
+
 ### Version 6.1.1
 Released on November 24, 2021
 
