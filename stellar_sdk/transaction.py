@@ -4,10 +4,12 @@ from . import xdr as stellar_xdr
 from .keypair import Keypair
 from .memo import Memo, NoneMemo
 from .muxed_account import MuxedAccount
+from .operation.create_claimable_balance import CreateClaimableBalance
 from .operation.operation import Operation
 from .strkey import StrKey
 from .time_bounds import TimeBounds
 from .type_checked import type_checked
+from .utils import sha256
 
 __all__ = ["Transaction"]
 
@@ -78,6 +80,41 @@ class Transaction:
         self.fee: int = fee
         self.time_bounds: Optional[TimeBounds] = time_bounds
         self.v1: bool = v1
+
+    def get_claimable_balance_id(self, operation_index: int) -> str:
+        """Calculate the claimable balance ID for an operation within the transaction.
+
+        :param operation_index: the index of the CreateClaimableBalance operation.
+        :return: a hex string representing the claimable balance ID.
+        :raises:
+            | :exc:`IndexError`: if `operation_index` is invalid.
+            | :exc:`TypeError`: if operation at `operation_index` is not :py:class:`FeeBumpTransactionEnvelope <stellar_sdk.operation.create_claimable_balance.CreateClaimableBalance>`.
+        """
+        if operation_index >= len(self.operations):
+            raise IndexError(
+                f'Invalid operation index, "operation_index" should not be greater than {len(self.operations) - 1}'
+            )
+        op = self.operations[operation_index]
+        if not isinstance(op, CreateClaimableBalance):
+            raise TypeError(
+                f"Type of the operation "
+                f"must be {CreateClaimableBalance}, got {type(op)} instead"
+            )
+        account_id = Keypair.from_public_key(self.source.account_id).xdr_account_id()
+        operation_id = stellar_xdr.OperationID(
+            type=stellar_xdr.EnvelopeType.ENVELOPE_TYPE_OP_ID,
+            id=stellar_xdr.OperationIDId(
+                source_account=account_id,
+                seq_num=stellar_xdr.SequenceNumber(stellar_xdr.Int64(self.sequence)),
+                op_num=stellar_xdr.Uint32(operation_index),
+            ),
+        )
+        operation_id_hash = sha256(operation_id.to_xdr_bytes())
+        balance_id = stellar_xdr.ClaimableBalanceID(
+            type=stellar_xdr.ClaimableBalanceIDType.CLAIMABLE_BALANCE_ID_TYPE_V0,
+            v0=stellar_xdr.Hash(operation_id_hash),
+        )
+        return balance_id.to_xdr_bytes().hex()
 
     def to_xdr_object(
         self,
