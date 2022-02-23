@@ -1,6 +1,12 @@
 Release History
 ==============
 
+### Version 7.0.1
+Released on February 23, 2022
+
+#### Update
+* feat: make stellar_sdk.Asset hashable. ([#576](https://github.com/StellarCN/py-stellar-base/pull/576))
+
 ### Version 7.0.0
 Released on January 12, 2022
 
