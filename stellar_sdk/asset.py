@@ -221,6 +221,9 @@ class Asset:
             raise ValueError(f"Invalid asset type: {xdr_object.type}")
         return cls(code, issuer)
 
+    def __hash__(self) -> int:
+        return hash((self.type, self.code, self.issuer))
+
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
             return NotImplemented
