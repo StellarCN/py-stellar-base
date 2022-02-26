@@ -1,4 +1,4 @@
-# Automatically generated on 2021-11-27T18:28:43+08:00
+# Automatically generated on 2022-02-26T10:28:14+08:00
 # DO NOT EDIT or your changes may be overwritten
 from .account_entry import AccountEntry
 from .account_entry_ext import AccountEntryExt
@@ -6,6 +6,7 @@ from .account_entry_extension_v1 import AccountEntryExtensionV1
 from .account_entry_extension_v1_ext import AccountEntryExtensionV1Ext
 from .account_entry_extension_v2 import AccountEntryExtensionV2
 from .account_entry_extension_v2_ext import AccountEntryExtensionV2Ext
+from .account_entry_extension_v3 import AccountEntryExtensionV3
 from .account_flags import AccountFlags
 from .account_id import AccountID
 from .account_merge_result import AccountMergeResult
@@ -85,6 +86,7 @@ from .data_entry_ext import DataEntryExt
 from .data_value import DataValue
 from .decorated_signature import DecoratedSignature
 from .dont_have import DontHave
+from .duration import Duration
 from .encrypted_body import EncryptedBody
 from .end_sponsoring_future_reserves_result import EndSponsoringFutureReservesResult
 from .end_sponsoring_future_reserves_result_code import (
@@ -97,7 +99,11 @@ from .fee_bump_transaction import FeeBumpTransaction
 from .fee_bump_transaction_envelope import FeeBumpTransactionEnvelope
 from .fee_bump_transaction_ext import FeeBumpTransactionExt
 from .fee_bump_transaction_inner_tx import FeeBumpTransactionInnerTx
+from .general_preconditions import GeneralPreconditions
 from .hash import Hash
+from .hash_id_preimage import HashIDPreimage
+from .hash_id_preimage_operation_id import HashIDPreimageOperationID
+from .hash_id_preimage_revoke_id import HashIDPreimageRevokeID
 from .hello import Hello
 from .hmac_sha256_key import HmacSha256Key
 from .hmac_sha256_mac import HmacSha256Mac
@@ -111,6 +117,7 @@ from .inner_transaction_result_result import InnerTransactionResultResult
 from .int32 import Int32
 from .int64 import Int64
 from .ip_addr_type import IPAddrType
+from .ledger_bounds import LedgerBounds
 from .ledger_close_meta import LedgerCloseMeta
 from .ledger_close_meta_v0 import LedgerCloseMetaV0
 from .ledger_close_value_signature import LedgerCloseValueSignature
@@ -175,8 +182,6 @@ from .offer_entry_ext import OfferEntryExt
 from .offer_entry_flags import OfferEntryFlags
 from .operation import Operation
 from .operation_body import OperationBody
-from .operation_id import OperationID
-from .operation_id_id import OperationIDId
 from .operation_meta import OperationMeta
 from .operation_result import OperationResult
 from .operation_result_code import OperationResultCode
@@ -200,6 +205,8 @@ from .peer_address_ip import PeerAddressIp
 from .peer_stat_list import PeerStatList
 from .peer_stats import PeerStats
 from .pool_id import PoolID
+from .precondition_type import PreconditionType
+from .preconditions import Preconditions
 from .price import Price
 from .public_key import PublicKey
 from .public_key_type import PublicKeyType
@@ -233,6 +240,7 @@ from .signed_survey_request_message import SignedSurveyRequestMessage
 from .signed_survey_response_message import SignedSurveyResponseMessage
 from .signer import Signer
 from .signer_key import SignerKey
+from .signer_key_ed25519_signed_payload import SignerKeyEd25519SignedPayload
 from .signer_key_type import SignerKeyType
 from .simple_payment_result import SimplePaymentResult
 from .sponsorship_descriptor import SponsorshipDescriptor

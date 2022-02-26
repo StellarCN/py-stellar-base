@@ -4,6 +4,7 @@ import base64
 from xdrlib import Packer, Unpacker
 
 from ..type_checked import type_checked
+from .account_entry_extension_v3 import AccountEntryExtensionV3
 from .base import Integer
 
 __all__ = ["AccountEntryExtensionV2Ext"]
@@ -18,18 +19,27 @@ class AccountEntryExtensionV2Ext:
             {
             case 0:
                 void;
+            case 3:
+                AccountEntryExtensionV3 v3;
             }
     """
 
     def __init__(
         self,
         v: int,
+        v3: AccountEntryExtensionV3 = None,
     ) -> None:
         self.v = v
+        self.v3 = v3
 
     def pack(self, packer: Packer) -> None:
         Integer(self.v).pack(packer)
         if self.v == 0:
+            return
+        if self.v == 3:
+            if self.v3 is None:
+                raise ValueError("v3 should not be None.")
+            self.v3.pack(packer)
             return
 
     @classmethod
@@ -37,6 +47,9 @@ class AccountEntryExtensionV2Ext:
         v = Integer.unpack(unpacker)
         if v == 0:
             return cls(v=v)
+        if v == 3:
+            v3 = AccountEntryExtensionV3.unpack(unpacker)
+            return cls(v=v, v3=v3)
         return cls(v=v)
 
     def to_xdr_bytes(self) -> bytes:
@@ -61,9 +74,10 @@ class AccountEntryExtensionV2Ext:
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented
-        return self.v == other.v
+        return self.v == other.v and self.v3 == other.v3
 
     def __str__(self):
         out = []
         out.append(f"v={self.v}")
+        out.append(f"v3={self.v3}") if self.v3 is not None else None
         return f"<AccountEntryExtensionV2Ext {[', '.join(out)]}>"

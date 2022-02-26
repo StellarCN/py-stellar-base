@@ -7,33 +7,30 @@ from xdrlib import Packer, Unpacker
 from ..__version__ import __issues__
 from ..type_checked import type_checked
 
-__all__ = ["SignerKeyType"]
+__all__ = ["PreconditionType"]
 
 
 @type_checked
-class SignerKeyType(IntEnum):
+class PreconditionType(IntEnum):
     """
     XDR Source Code::
 
-        enum SignerKeyType
-        {
-            SIGNER_KEY_TYPE_ED25519 = KEY_TYPE_ED25519,
-            SIGNER_KEY_TYPE_PRE_AUTH_TX = KEY_TYPE_PRE_AUTH_TX,
-            SIGNER_KEY_TYPE_HASH_X = KEY_TYPE_HASH_X,
-            SIGNER_KEY_TYPE_ED25519_SIGNED_PAYLOAD = KEY_TYPE_ED25519_SIGNED_PAYLOAD
+        enum PreconditionType {
+            PRECOND_NONE = 0,
+            PRECOND_TIME = 1,
+            PRECOND_GENERAL = 2
         };
     """
 
-    SIGNER_KEY_TYPE_ED25519 = 0
-    SIGNER_KEY_TYPE_PRE_AUTH_TX = 1
-    SIGNER_KEY_TYPE_HASH_X = 2
-    SIGNER_KEY_TYPE_ED25519_SIGNED_PAYLOAD = 3
+    PRECOND_NONE = 0
+    PRECOND_TIME = 1
+    PRECOND_GENERAL = 2
 
     def pack(self, packer: Packer) -> None:
         packer.pack_int(self.value)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "SignerKeyType":
+    def unpack(cls, unpacker: Unpacker) -> "PreconditionType":
         value = unpacker.unpack_int()
         return cls(value)
 
@@ -43,7 +40,7 @@ class SignerKeyType(IntEnum):
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "SignerKeyType":
+    def from_xdr_bytes(cls, xdr: bytes) -> "PreconditionType":
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -52,7 +49,7 @@ class SignerKeyType(IntEnum):
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "SignerKeyType":
+    def from_xdr(cls, xdr: str) -> "PreconditionType":
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
 
