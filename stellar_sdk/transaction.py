@@ -101,9 +101,9 @@ class Transaction:
                 f"must be {CreateClaimableBalance}, got {type(op)} instead"
             )
         account_id = Keypair.from_public_key(self.source.account_id).xdr_account_id()
-        operation_id = stellar_xdr.OperationID(
+        operation_id = stellar_xdr.HashIDPreimage(
             type=stellar_xdr.EnvelopeType.ENVELOPE_TYPE_OP_ID,
-            id=stellar_xdr.OperationIDId(
+            operation_id=stellar_xdr.HashIDPreimageOperationID(
                 source_account=account_id,
                 seq_num=stellar_xdr.SequenceNumber(stellar_xdr.Int64(self.sequence)),
                 op_num=stellar_xdr.Uint32(operation_index),
@@ -130,6 +130,14 @@ class Transaction:
         )
         fee = stellar_xdr.Uint32(self.fee)
         sequence = stellar_xdr.SequenceNumber(stellar_xdr.Int64(self.sequence))
+        if time_bounds:
+            preconditions = stellar_xdr.Preconditions(
+                stellar_xdr.PreconditionType.PRECOND_TIME, time_bounds=time_bounds
+            )
+        else:
+            preconditions = stellar_xdr.Preconditions(
+                stellar_xdr.PreconditionType.PRECOND_NONE
+            )
 
         if self.v1:
             source_xdr = self.source.to_xdr_object()
@@ -138,7 +146,7 @@ class Transaction:
                 source_xdr,
                 fee,
                 sequence,
-                time_bounds,
+                preconditions,
                 memo,
                 operations,
                 ext,
@@ -180,15 +188,17 @@ class Transaction:
         if v1:
             assert isinstance(xdr_object, stellar_xdr.Transaction)
             source = MuxedAccount.from_xdr_object(xdr_object.source_account)
+            time_bounds_xdr = xdr_object.cond.time_bounds
         else:
             assert isinstance(xdr_object, stellar_xdr.TransactionV0)
             ed25519_key = StrKey.encode_ed25519_public_key(
                 xdr_object.source_account_ed25519.uint256
             )
             source = MuxedAccount(ed25519_key, None)
+            time_bounds_xdr = xdr_object.time_bounds
         sequence = xdr_object.seq_num.sequence_number.int64
         fee = xdr_object.fee.uint32
-        time_bounds_xdr = xdr_object.time_bounds
+
         time_bounds = (
             None
             if time_bounds_xdr is None

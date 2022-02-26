@@ -200,7 +200,7 @@ class ClaimPredicate:
             assert self.abs_before is not None
             return stellar_xdr.ClaimPredicate(
                 stellar_xdr.ClaimPredicateType.CLAIM_PREDICATE_BEFORE_ABSOLUTE_TIME,
-                abs_before=stellar_xdr.Int64(self.abs_before),
+                abs_before=stellar_xdr.TimePoint(stellar_xdr.Uint64(self.abs_before)),
             )
         elif (
             self.claim_predicate_type
@@ -209,7 +209,7 @@ class ClaimPredicate:
             assert self.rel_before is not None
             return stellar_xdr.ClaimPredicate(
                 stellar_xdr.ClaimPredicateType.CLAIM_PREDICATE_BEFORE_RELATIVE_TIME,
-                rel_before=stellar_xdr.Int64(self.rel_before),
+                rel_before=stellar_xdr.Duration(stellar_xdr.Uint64(self.rel_before)),
             )
         elif self.claim_predicate_type == ClaimPredicateType.CLAIM_PREDICATE_NOT:
             assert self.not_predicate is not None
@@ -257,14 +257,14 @@ class ClaimPredicate:
             == stellar_xdr.ClaimPredicateType.CLAIM_PREDICATE_BEFORE_ABSOLUTE_TIME
         ):
             assert xdr_object.abs_before is not None
-            abs_before = xdr_object.abs_before.int64
+            abs_before = xdr_object.abs_before.time_point.uint64
             return cls.predicate_before_absolute_time(abs_before)
         elif (
             claim_predicate_type
             == stellar_xdr.ClaimPredicateType.CLAIM_PREDICATE_BEFORE_RELATIVE_TIME
         ):
             assert xdr_object.rel_before is not None
-            rel_before = xdr_object.rel_before.int64
+            rel_before = xdr_object.rel_before.duration.uint64
             return cls.predicate_before_relative_time(rel_before)
         elif claim_predicate_type == stellar_xdr.ClaimPredicateType.CLAIM_PREDICATE_NOT:
             not_predicate = xdr_object.not_predicate
