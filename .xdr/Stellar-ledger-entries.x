@@ -13,6 +13,7 @@ typedef string string32<32>;
 typedef string string64<64>;
 typedef int64 SequenceNumber;
 typedef uint64 TimePoint;
+typedef uint64 Duration;
 typedef opaque DataValue<64>;
 typedef Hash PoolID; // SHA256(LiquidityPoolParameters)
 
@@ -133,6 +134,15 @@ const MAX_SIGNERS = 20;
 
 typedef AccountID* SponsorshipDescriptor;
 
+struct AccountEntryExtensionV3
+{
+    // Ledger number at which `seqNum` took on its present value.
+    uint32 seqLedger;
+
+    // Time at which `seqNum` took on its present value.
+    TimePoint seqTime;
+};
+
 struct AccountEntryExtensionV2
 {
     uint32 numSponsored;
@@ -143,6 +153,8 @@ struct AccountEntryExtensionV2
     {
     case 0:
         void;
+    case 3:
+        AccountEntryExtensionV3 v3;
     }
     ext;
 };
@@ -257,10 +269,10 @@ struct TrustLineEntryExtensionV2
 
 struct TrustLineEntry
 {
-    AccountID accountID; // account this trustline belongs to
-    TrustLineAsset asset;         // type of asset (with issuer)
-    int64 balance;       // how much of this asset the user has.
-                         // Asset defines the unit for this;
+    AccountID accountID;  // account this trustline belongs to
+    TrustLineAsset asset; // type of asset (with issuer)
+    int64 balance;        // how much of this asset the user has.
+                          // Asset defines the unit for this;
 
     int64 limit;  // balance cannot be above this
     uint32 flags; // see TrustLineFlags
@@ -368,10 +380,10 @@ case CLAIM_PREDICATE_OR:
 case CLAIM_PREDICATE_NOT:
     ClaimPredicate* notPredicate;
 case CLAIM_PREDICATE_BEFORE_ABSOLUTE_TIME:
-    int64 absBefore; // Predicate will be true if closeTime < absBefore
+    TimePoint absBefore; // Predicate will be true if closeTime < absBefore
 case CLAIM_PREDICATE_BEFORE_RELATIVE_TIME:
-    int64 relBefore; // Seconds since closeTime of the ledger in which the
-                     // ClaimableBalanceEntry was created
+    Duration relBefore; // Seconds since closeTime of the ledger in which the
+                        // ClaimableBalanceEntry was created
 };
 
 enum ClaimantType
@@ -570,6 +582,7 @@ enum EnvelopeType
     ENVELOPE_TYPE_AUTH = 3,
     ENVELOPE_TYPE_SCPVALUE = 4,
     ENVELOPE_TYPE_TX_FEE_BUMP = 5,
-    ENVELOPE_TYPE_OP_ID = 6
+    ENVELOPE_TYPE_OP_ID = 6,
+    ENVELOPE_TYPE_POOL_REVOKE_OP_ID = 7
 };
 }

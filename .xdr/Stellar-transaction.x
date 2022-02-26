@@ -527,7 +527,7 @@ struct Operation
     body;
 };
 
-union OperationID switch (EnvelopeType type)
+union HashIDPreimage switch (EnvelopeType type)
 {
 case ENVELOPE_TYPE_OP_ID:
     struct
@@ -535,7 +535,16 @@ case ENVELOPE_TYPE_OP_ID:
         AccountID sourceAccount;
         SequenceNumber seqNum;
         uint32 opNum;
-    } id;
+    } operationID;
+case ENVELOPE_TYPE_POOL_REVOKE_OP_ID:
+    struct
+    {
+        AccountID sourceAccount;
+        SequenceNumber seqNum;
+        uint32 opNum;
+        PoolID liquidityPoolID;
+        Asset asset;
+    } revokeID;
 };
 
 enum MemoType
@@ -565,6 +574,58 @@ struct TimeBounds
 {
     TimePoint minTime;
     TimePoint maxTime; // 0 here means no maxTime
+};
+
+struct LedgerBounds
+{
+    uint32 minLedger;
+    uint32 maxLedger;
+};
+
+struct GeneralPreconditions {
+    TimeBounds *timeBounds;
+
+    // Transaciton only valid for ledger numbers n such that
+    // minLedger <= n < maxLedger
+    LedgerBounds *ledgerBounds;
+
+    // If NULL, only valid when sourceAccount's sequence number
+    // is seqNum - 1.  Otherwise, valid when sourceAccount's
+    // sequence number n satisfies minSeqNum <= n < tx.seqNum.
+    // Note that after execution the account's sequence number
+    // is always raised to tx.seqNum, and a transaction is not
+    // valid if tx.seqNum is too high to ensure replay protection.
+    SequenceNumber *minSeqNum;
+
+    // For the transaction to be valid, the current ledger time must
+    // be at least minSeqAge greater than sourceAccount's seqTime.
+    Duration minSeqAge;
+
+    // For the transaction to be valid, the current ledger number
+    // must be at least minSeqLedgerGap greater than sourceAccount's
+    // seqLedger.
+    uint32 minSeqLedgerGap;
+
+    // For the transaction to be valid, there must be a signature
+    // corresponding to every Signer in this array, even if the
+    // signature is not otherwise required by the sourceAccount or
+    // operations.
+    SignerKey extraSigners<2>;
+};
+
+enum PreconditionType {
+    PRECOND_NONE = 0,
+    PRECOND_TIME = 1,
+    PRECOND_GENERAL = 2
+};
+
+union Preconditions switch (PreconditionType type) {
+    case PRECOND_NONE:
+        void;
+    case PRECOND_TIME:
+        TimeBounds timeBounds;
+    case PRECOND_GENERAL:
+        GeneralPreconditions general;
 };
 
 // maximum number of operations per transaction
@@ -618,8 +679,8 @@ struct Transaction
     // sequence number to consume in the account
     SequenceNumber seqNum;
 
-    // validity range (inclusive) for the last ledger close time
-    TimeBounds* timeBounds;
+    // validity conditions
+    Preconditions cond;
 
     Memo memo;
 
@@ -1071,7 +1132,9 @@ enum AllowTrustResultCode
                                     // source account does not require trust
     ALLOW_TRUST_TRUST_NOT_REQUIRED = -3,
     ALLOW_TRUST_CANT_REVOKE = -4,     // source account can't revoke trust,
-    ALLOW_TRUST_SELF_NOT_ALLOWED = -5 // trusting self is not allowed
+    ALLOW_TRUST_SELF_NOT_ALLOWED = -5, // trusting self is not allowed
+    ALLOW_TRUST_LOW_RESERVE = -6 // claimable balances can't be created
+                                 // on revoke due to low reserves
 };
 
 union AllowTrustResult switch (AllowTrustResultCode code)
@@ -1334,7 +1397,9 @@ enum SetTrustLineFlagsResultCode
     SET_TRUST_LINE_FLAGS_MALFORMED = -1,
     SET_TRUST_LINE_FLAGS_NO_TRUST_LINE = -2,
     SET_TRUST_LINE_FLAGS_CANT_REVOKE = -3,
-    SET_TRUST_LINE_FLAGS_INVALID_STATE = -4
+    SET_TRUST_LINE_FLAGS_INVALID_STATE = -4,
+    SET_TRUST_LINE_FLAGS_LOW_RESERVE = -5 // claimable balances can't be created
+                                          // on revoke due to low reserves
 };
 
 union SetTrustLineFlagsResult switch (SetTrustLineFlagsResultCode code)
