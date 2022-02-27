@@ -538,3 +538,14 @@ class TestKeypair:
         sign_decorated = kp.sign_decorated(data)
         assert sign_decorated.signature_hint == kp.signature_hint()
         assert sign_decorated.signature == kp.sign(data)
+
+    def test_sign_decorated_for_payload(self):
+        data = b"hello"
+        kp = Keypair.from_secret(
+            "SDHOAMBNLGCE2MV5ZKIVZAQD3VCLGP53P3OBSBI6UN5L5XZI5TKHFQL4"
+        )
+        sign_decorated = kp.sign_decorated_for_payload(data)
+        assert sign_decorated.signature_hint == bytes(
+            bytearray([0x33, 0x90, 0x69, 0x98])
+        )
+        assert sign_decorated.signature == kp.sign(data)

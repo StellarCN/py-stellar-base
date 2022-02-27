@@ -261,6 +261,27 @@ class Keypair:
         signature = self.sign(data)
         return DecoratedSignature(hint, signature)
 
+    def sign_decorated_for_payload(self, data: bytes) -> DecoratedSignature:
+        key_hint = self.signature_hint()
+        signature = self.sign(data)
+        payload_hint = bytearray(4)
+        data_len = len(data)
+        if data_len <= 4:
+            payload_hint[:data_len] = data
+        else:
+            payload_hint = data[data_len - 4 :]
+        hint = bytes(
+            bytearray(
+                [
+                    key_hint[0] ^ payload_hint[0],
+                    key_hint[1] ^ payload_hint[1],
+                    key_hint[2] ^ payload_hint[2],
+                    key_hint[3] ^ payload_hint[3],
+                ]
+            )
+        )
+        return DecoratedSignature(hint, signature)
+
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
             return NotImplemented
