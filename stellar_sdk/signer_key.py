@@ -14,6 +14,7 @@ class SignerKeyType(IntEnum):
     SIGNER_KEY_TYPE_ED25519 = 0
     SIGNER_KEY_TYPE_PRE_AUTH_TX = 1
     SIGNER_KEY_TYPE_HASH_X = 2
+    SIGNER_KEY_TYPE_ED25519_SIGNED_PAYLOAD = 3
 
 
 @type_checked
@@ -37,8 +38,14 @@ class SignerKey:
             return StrKey.encode_ed25519_public_key(self.signer_key)
         elif self.signer_key_type == SignerKeyType.SIGNER_KEY_TYPE_PRE_AUTH_TX:
             return StrKey.encode_pre_auth_tx(self.signer_key)
-        else:
+        elif self.signer_key_type == SignerKeyType.SIGNER_KEY_TYPE_HASH_X:
             return StrKey.encode_sha256_hash(self.signer_key)
+        elif (
+            self.signer_key_type == SignerKeyType.SIGNER_KEY_TYPE_ED25519_SIGNED_PAYLOAD
+        ):
+            return StrKey.encode_ed25519_signed_payload(self.signer_key)
+        else:
+            raise ValueError(f"{self.signer_key_type} is an unsupported SignerKeyType.")
 
     @classmethod
     def ed25519_public_key(cls, account_id: Union[str, bytes]) -> "SignerKey":
@@ -81,6 +88,23 @@ class SignerKey:
             sha256_hash = StrKey.decode_sha256_hash(sha256_hash)
         return cls(signer_key=sha256_hash, signer_key_type=signer_key_type)
 
+    @classmethod
+    def ed25519_signed_payload(
+        cls, ed25519_signed_payload: Union[str, bytes]
+    ) -> "SignerKey":
+        """Create ed25519 signed payload Signer from a ed25519 signed payload.
+
+        :param ed25519_signed_payload: a sha256 hash of a preimage
+        :return: ed25519 signed payload signer
+        """
+        # TODO: add ref link
+        signer_key_type = SignerKeyType.SIGNER_KEY_TYPE_ED25519_SIGNED_PAYLOAD
+        if isinstance(ed25519_signed_payload, str):
+            ed25519_signed_payload = StrKey.decode_ed25519_signed_payload(
+                ed25519_signed_payload
+            )
+        return cls(signer_key=ed25519_signed_payload, signer_key_type=signer_key_type)
+
     def to_xdr_object(self) -> stellar_xdr.SignerKey:
         """Returns the xdr object for this SignerKey object.
 
@@ -95,6 +119,18 @@ class SignerKey:
             return stellar_xdr.SignerKey(
                 type=stellar_xdr.SignerKeyType.SIGNER_KEY_TYPE_PRE_AUTH_TX,
                 pre_auth_tx=stellar_xdr.Uint256(self.signer_key),
+            )
+        elif (
+            self.signer_key_type == SignerKeyType.SIGNER_KEY_TYPE_ED25519_SIGNED_PAYLOAD
+        ):
+            payload_length = int.from_bytes(self.signer_key[32:36], byteorder="big")
+            ed25519_signed_payload = stellar_xdr.SignerKeyEd25519SignedPayload(
+                ed25519=stellar_xdr.Uint256(self.signer_key[:32]),
+                payload=self.signer_key[36 : 36 + payload_length],
+            )
+            return stellar_xdr.SignerKey(
+                type=stellar_xdr.SignerKeyType.SIGNER_KEY_TYPE_ED25519_SIGNED_PAYLOAD,
+                ed25519_signed_payload=ed25519_signed_payload,
             )
         else:
             return stellar_xdr.SignerKey(
@@ -123,6 +159,21 @@ class SignerKey:
         elif xdr_object.type == stellar_xdr.SignerKeyType.SIGNER_KEY_TYPE_HASH_X:
             assert xdr_object.hash_x is not None
             return cls(xdr_object.hash_x.uint256, SignerKeyType.SIGNER_KEY_TYPE_HASH_X)
+        elif (
+            xdr_object.type
+            == stellar_xdr.SignerKeyType.SIGNER_KEY_TYPE_ED25519_SIGNED_PAYLOAD
+        ):
+            assert xdr_object.ed25519_signed_payload is not None
+            ed25519 = xdr_object.ed25519_signed_payload.ed25519.uint256
+            payload = xdr_object.ed25519_signed_payload.payload
+            payload_length = len(payload)
+            payload += b"\0" * ((4 - payload_length % 4) % 4)
+            signer_key = (
+                ed25519
+                + int.to_bytes(payload_length, length=4, byteorder="big")
+                + payload
+            )
+            return cls(signer_key, SignerKeyType.SIGNER_KEY_TYPE_ED25519_SIGNED_PAYLOAD)
         else:
             raise ValueError(
                 f"This is an unknown signer key type, please consider creating an issuer at {__issues__}."

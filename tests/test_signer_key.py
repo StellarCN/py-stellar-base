@@ -49,3 +49,127 @@ class TestSignerKey:
         assert SignerKey.from_xdr_object(signer_key_xdr) == signer_key
         assert SignerKey.sha256_hash(sha256_hash) == signer_key
         assert SignerKey.sha256_hash(signer_key_data) == signer_key
+
+    def test_ed25519_signed_payload(self):
+        ed25519_signed_payload = "PA3D5KRYM6CB7OWQ6TWYRR3Z4T7GNZLKERYNZGGA5SOAOPIFY6YQGAAAAAEQAAAAAAAAAAAAAAAAAABBXA"
+        signer_key_data = bytes(
+            bytearray(
+                [
+                    0x36,
+                    0x3E,
+                    0xAA,
+                    0x38,
+                    0x67,
+                    0x84,
+                    0x1F,
+                    0xBA,
+                    0xD0,
+                    0xF4,
+                    0xED,
+                    0x88,
+                    0xC7,
+                    0x79,
+                    0xE4,
+                    0xFE,
+                    0x66,
+                    0xE5,
+                    0x6A,
+                    0x24,
+                    0x70,
+                    0xDC,
+                    0x98,
+                    0xC0,
+                    0xEC,
+                    0x9C,
+                    0x07,
+                    0x3D,
+                    0x05,
+                    0xC7,
+                    0xB1,
+                    0x03,
+                    0x00,
+                    0x00,
+                    0x00,
+                    0x09,
+                    0x00,
+                    0x00,
+                    0x00,
+                    0x00,
+                    0x00,
+                    0x00,
+                    0x00,
+                    0x00,
+                    0x00,
+                    0x00,
+                    0x00,
+                    0x00,
+                ]
+            )
+        )
+        signer_key_type = SignerKeyType.SIGNER_KEY_TYPE_ED25519_SIGNED_PAYLOAD
+        signer_key = SignerKey(signer_key_data, signer_key_type)
+        signer_key_xdr = stellar_xdr.SignerKey(
+            type=stellar_xdr.SignerKeyType.SIGNER_KEY_TYPE_ED25519_SIGNED_PAYLOAD,
+            ed25519_signed_payload=stellar_xdr.SignerKeyEd25519SignedPayload(
+                ed25519=stellar_xdr.Uint256(
+                    bytes(
+                        bytearray(
+                            [
+                                0x36,
+                                0x3E,
+                                0xAA,
+                                0x38,
+                                0x67,
+                                0x84,
+                                0x1F,
+                                0xBA,
+                                0xD0,
+                                0xF4,
+                                0xED,
+                                0x88,
+                                0xC7,
+                                0x79,
+                                0xE4,
+                                0xFE,
+                                0x66,
+                                0xE5,
+                                0x6A,
+                                0x24,
+                                0x70,
+                                0xDC,
+                                0x98,
+                                0xC0,
+                                0xEC,
+                                0x9C,
+                                0x07,
+                                0x3D,
+                                0x05,
+                                0xC7,
+                                0xB1,
+                                0x03,
+                            ]
+                        )
+                    )
+                ),
+                payload=bytes(
+                    bytearray(
+                        [
+                            0x00,
+                            0x00,
+                            0x00,
+                            0x00,
+                            0x00,
+                            0x00,
+                            0x00,
+                            0x00,
+                            0x00,
+                        ]
+                    )
+                ),
+            ),
+        )
+        assert signer_key.to_xdr_object() == signer_key_xdr
+        assert signer_key.encoded_signer_key == ed25519_signed_payload
+        assert SignerKey.from_xdr_object(signer_key_xdr) == signer_key
+        assert SignerKey.ed25519_signed_payload(ed25519_signed_payload) == signer_key
+        assert SignerKey.ed25519_signed_payload(signer_key_data) == signer_key
