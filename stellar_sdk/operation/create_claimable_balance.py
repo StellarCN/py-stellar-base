@@ -284,7 +284,7 @@ class ClaimPredicate:
             right = cls.from_xdr_object(or_predicates[1])
             return cls.predicate_or(left, right)
         else:
-            raise ValueError("{} is an unsupported ClaimPredicateType.")
+            raise ValueError(f"{claim_predicate_type} is an unsupported ClaimPredicateType.")
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
