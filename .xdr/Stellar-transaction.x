@@ -582,7 +582,7 @@ struct LedgerBounds
     uint32 maxLedger;
 };
 
-struct GeneralPreconditions {
+struct PreconditionsV2 {
     TimeBounds *timeBounds;
 
     // Transaciton only valid for ledger numbers n such that
@@ -616,7 +616,7 @@ struct GeneralPreconditions {
 enum PreconditionType {
     PRECOND_NONE = 0,
     PRECOND_TIME = 1,
-    PRECOND_GENERAL = 2
+    PRECOND_V2 = 2
 };
 
 union Preconditions switch (PreconditionType type) {
@@ -624,8 +624,8 @@ union Preconditions switch (PreconditionType type) {
         void;
     case PRECOND_TIME:
         TimeBounds timeBounds;
-    case PRECOND_GENERAL:
-        GeneralPreconditions general;
+    case PRECOND_V2:
+        PreconditionsV2 v2;
 };
 
 // maximum number of operations per transaction

@@ -13,7 +13,7 @@ typedef string string32<32>;
 typedef string string64<64>;
 typedef int64 SequenceNumber;
 typedef uint64 TimePoint;
-typedef uint64 Duration;
+typedef int64 Duration;
 typedef opaque DataValue<64>;
 typedef Hash PoolID; // SHA256(LiquidityPoolParameters)
 
@@ -136,6 +136,10 @@ typedef AccountID* SponsorshipDescriptor;
 
 struct AccountEntryExtensionV3
 {
+    // We can use this to add more fields, or because it is first, to
+    // change AccountEntryExtensionV3 into a union.
+    ExtensionPoint ext;
+
     // Ledger number at which `seqNum` took on its present value.
     uint32 seqLedger;
 
@@ -302,7 +306,7 @@ struct TrustLineEntry
 
 enum OfferEntryFlags
 {
-    // issuer has authorized account to perform transactions with its credit
+    // an offer with this flag will not act on and take a reverse offer of equal price
     PASSIVE_FLAG = 1
 };
 

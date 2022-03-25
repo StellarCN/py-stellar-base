@@ -14,6 +14,14 @@ typedef int int32;
 typedef unsigned hyper uint64;
 typedef hyper int64;
 
+// An ExtensionPoint is always marshaled as a 32-bit 0 value.  At a
+// later point, it can be replaced by a different union so as to
+// extend a structure.
+union ExtensionPoint switch (int v) {
+case 0:
+     void;
+};
+
 enum CryptoKeyType
 {
     KEY_TYPE_ED25519 = 0,
@@ -59,7 +67,7 @@ case SIGNER_KEY_TYPE_ED25519_SIGNED_PAYLOAD:
         /* Public key that must sign the payload. */
         uint256 ed25519;
         /* Payload to be raw signed by ed25519. */
-        opaque payload<32>;
+        opaque payload<64>;
     } ed25519SignedPayload;
 };
 
