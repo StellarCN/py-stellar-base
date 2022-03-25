@@ -4,6 +4,7 @@ import base64
 from xdrlib import Packer, Unpacker
 
 from ..type_checked import type_checked
+from .extension_point import ExtensionPoint
 from .time_point import TimePoint
 from .uint32 import Uint32
 
@@ -17,6 +18,10 @@ class AccountEntryExtensionV3:
 
         struct AccountEntryExtensionV3
         {
+            // We can use this to add more fields, or because it is first, to
+            // change AccountEntryExtensionV3 into a union.
+            ExtensionPoint ext;
+
             // Ledger number at which `seqNum` took on its present value.
             uint32 seqLedger;
 
@@ -27,21 +32,26 @@ class AccountEntryExtensionV3:
 
     def __init__(
         self,
+        ext: ExtensionPoint,
         seq_ledger: Uint32,
         seq_time: TimePoint,
     ) -> None:
+        self.ext = ext
         self.seq_ledger = seq_ledger
         self.seq_time = seq_time
 
     def pack(self, packer: Packer) -> None:
+        self.ext.pack(packer)
         self.seq_ledger.pack(packer)
         self.seq_time.pack(packer)
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "AccountEntryExtensionV3":
+        ext = ExtensionPoint.unpack(unpacker)
         seq_ledger = Uint32.unpack(unpacker)
         seq_time = TimePoint.unpack(unpacker)
         return cls(
+            ext=ext,
             seq_ledger=seq_ledger,
             seq_time=seq_time,
         )
@@ -68,10 +78,15 @@ class AccountEntryExtensionV3:
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented
-        return self.seq_ledger == other.seq_ledger and self.seq_time == other.seq_time
+        return (
+            self.ext == other.ext
+            and self.seq_ledger == other.seq_ledger
+            and self.seq_time == other.seq_time
+        )
 
     def __str__(self):
         out = [
+            f"ext={self.ext}",
             f"seq_ledger={self.seq_ledger}",
             f"seq_time={self.seq_time}",
         ]

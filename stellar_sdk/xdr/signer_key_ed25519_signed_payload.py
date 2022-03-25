@@ -19,7 +19,7 @@ class SignerKeyEd25519SignedPayload:
                 /* Public key that must sign the payload. */
                 uint256 ed25519;
                 /* Payload to be raw signed by ed25519. */
-                opaque payload<32>;
+                opaque payload<64>;
             }
     """
 
@@ -33,12 +33,12 @@ class SignerKeyEd25519SignedPayload:
 
     def pack(self, packer: Packer) -> None:
         self.ed25519.pack(packer)
-        Opaque(self.payload, 32, False).pack(packer)
+        Opaque(self.payload, 64, False).pack(packer)
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "SignerKeyEd25519SignedPayload":
         ed25519 = Uint256.unpack(unpacker)
-        payload = Opaque.unpack(unpacker, 32, False)
+        payload = Opaque.unpack(unpacker, 64, False)
         return cls(
             ed25519=ed25519,
             payload=payload,

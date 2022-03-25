@@ -1,4 +1,4 @@
-# Automatically generated on 2022-02-26T10:28:14+08:00
+# Automatically generated on 2022-03-25T10:42:02+08:00
 # DO NOT EDIT or your changes may be overwritten
 from .account_entry import AccountEntry
 from .account_entry_ext import AccountEntryExt
@@ -95,11 +95,11 @@ from .end_sponsoring_future_reserves_result_code import (
 from .envelope_type import EnvelopeType
 from .error import Error
 from .error_code import ErrorCode
+from .extension_point import ExtensionPoint
 from .fee_bump_transaction import FeeBumpTransaction
 from .fee_bump_transaction_envelope import FeeBumpTransactionEnvelope
 from .fee_bump_transaction_ext import FeeBumpTransactionExt
 from .fee_bump_transaction_inner_tx import FeeBumpTransactionInnerTx
-from .general_preconditions import GeneralPreconditions
 from .hash import Hash
 from .hash_id_preimage import HashIDPreimage
 from .hash_id_preimage_operation_id import HashIDPreimageOperationID
@@ -132,6 +132,9 @@ from .ledger_entry_extension_v1_ext import LedgerEntryExtensionV1Ext
 from .ledger_entry_type import LedgerEntryType
 from .ledger_header import LedgerHeader
 from .ledger_header_ext import LedgerHeaderExt
+from .ledger_header_extension_v1 import LedgerHeaderExtensionV1
+from .ledger_header_extension_v1_ext import LedgerHeaderExtensionV1Ext
+from .ledger_header_flags import LedgerHeaderFlags
 from .ledger_header_history_entry import LedgerHeaderHistoryEntry
 from .ledger_header_history_entry_ext import LedgerHeaderHistoryEntryExt
 from .ledger_key import LedgerKey
@@ -207,6 +210,7 @@ from .peer_stats import PeerStats
 from .pool_id import PoolID
 from .precondition_type import PreconditionType
 from .preconditions import Preconditions
+from .preconditions_v2 import PreconditionsV2
 from .price import Price
 from .public_key import PublicKey
 from .public_key_type import PublicKeyType
@@ -227,6 +231,7 @@ from .scp_statement_externalize import SCPStatementExternalize
 from .scp_statement_pledges import SCPStatementPledges
 from .scp_statement_prepare import SCPStatementPrepare
 from .scp_statement_type import SCPStatementType
+from .send_more import SendMore
 from .sequence_number import SequenceNumber
 from .set_options_op import SetOptionsOp
 from .set_options_result import SetOptionsResult

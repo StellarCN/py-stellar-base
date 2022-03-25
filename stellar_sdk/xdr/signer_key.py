@@ -31,7 +31,7 @@ class SignerKey:
                 /* Public key that must sign the payload. */
                 uint256 ed25519;
                 /* Payload to be raw signed by ed25519. */
-                opaque payload<32>;
+                opaque payload<64>;
             } ed25519SignedPayload;
         };
     """

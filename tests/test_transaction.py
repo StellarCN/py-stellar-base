@@ -2,13 +2,13 @@ import pytest
 
 from stellar_sdk import (
     Asset,
+    Claimant,
+    ClaimPredicate,
+    CreateClaimableBalance,
     IdMemo,
     Keypair,
     MuxedAccount,
     NoneMemo,
-    ClaimPredicate,
-    Claimant,
-    CreateClaimableBalance,
 )
 from stellar_sdk.operation import ManageData, Payment
 from stellar_sdk.time_bounds import TimeBounds
@@ -28,7 +28,7 @@ class TestTransaction:
         asset = Asset.native()
         time_bounds = TimeBounds(12345, 56789)
         ops = [Payment(destination, asset, amount), ManageData("hello", "world")]
-        tx = Transaction(source, sequence, fee, ops, memo, time_bounds, True)
+        tx = Transaction(source, sequence, fee, ops, memo, time_bounds, v1=True)
         tx_object = tx.to_xdr_object()
         assert (
             tx_object.to_xdr()
@@ -54,7 +54,7 @@ class TestTransaction:
         asset = Asset.native()
         time_bounds = TimeBounds(12345, 56789)
         ops = [Payment(destination, asset, amount), ManageData("hello", "world")]
-        tx = Transaction(source, sequence, fee, ops, memo, time_bounds, True)
+        tx = Transaction(source, sequence, fee, ops, memo, time_bounds, v1=True)
         tx_object = tx.to_xdr_object()
         xdr = "AAAAAImbKEDtVjbFbdxfFLI5dfefG6I4jSaU5MVuzd3JYOXvAAAAyAAAAAAAAAABAAAAAQAAAAAAADA5AAAAAAAA3dUAAAACAAAAAAAAAGQAAAACAAAAAAAAAAEAAAAA0pjFgVcRZZHpMgnpXHpb/xIbLh0/YYto0PzI7+Xl5HAAAAAAAAAAAlQL5AAAAAAAAAAACgAAAAVoZWxsbwAAAAAAAAEAAAAFd29ybGQAAAAAAAAA"
 
@@ -81,7 +81,7 @@ class TestTransaction:
         time_bounds = TimeBounds(12345, 56789)
         ops = [Payment(destination, asset, amount), ManageData("hello", "world")]
 
-        tx = Transaction(source, sequence, fee, ops, memo, time_bounds, True)
+        tx = Transaction(source, sequence, fee, ops, memo, time_bounds, v1=True)
         tx_object = tx.to_xdr_object()
         restore_tx = Transaction.from_xdr_object(tx_object, v1=True)
         assert restore_tx.to_xdr_object().to_xdr() == tx_object.to_xdr()
@@ -160,7 +160,7 @@ class TestTransaction:
         asset = Asset.native()
         time_bounds = TimeBounds(12345, 56789)
         ops = [Payment(destination, asset, amount)]
-        tx = Transaction(source, sequence, fee, ops, memo, time_bounds, False)
+        tx = Transaction(source, sequence, fee, ops, memo, time_bounds, v1=False)
         tx_object = tx.to_xdr_object()
 
         restore_transaction = Transaction.from_xdr_object(tx_object, False)
@@ -182,7 +182,7 @@ class TestTransaction:
         asset = Asset.native()
         time_bounds = TimeBounds(12345, 56789)
         ops = [Payment(destination, asset, amount), ManageData("hello", "world")]
-        tx = Transaction(source, sequence, fee, ops, memo, time_bounds, False)
+        tx = Transaction(source, sequence, fee, ops, memo, time_bounds, v1=False)
         tx_object = tx.to_xdr_object()
         # assert (
         #     tx_object.to_xdr()

@@ -4,8 +4,8 @@ import base64
 from xdrlib import Packer, Unpacker
 
 from ..type_checked import type_checked
-from .general_preconditions import GeneralPreconditions
 from .precondition_type import PreconditionType
+from .preconditions_v2 import PreconditionsV2
 from .time_bounds import TimeBounds
 
 __all__ = ["Preconditions"]
@@ -21,8 +21,8 @@ class Preconditions:
                 void;
             case PRECOND_TIME:
                 TimeBounds timeBounds;
-            case PRECOND_GENERAL:
-                GeneralPreconditions general;
+            case PRECOND_V2:
+                PreconditionsV2 v2;
         };
     """
 
@@ -30,11 +30,11 @@ class Preconditions:
         self,
         type: PreconditionType,
         time_bounds: TimeBounds = None,
-        general: GeneralPreconditions = None,
+        v2: PreconditionsV2 = None,
     ) -> None:
         self.type = type
         self.time_bounds = time_bounds
-        self.general = general
+        self.v2 = v2
 
     def pack(self, packer: Packer) -> None:
         self.type.pack(packer)
@@ -45,10 +45,10 @@ class Preconditions:
                 raise ValueError("time_bounds should not be None.")
             self.time_bounds.pack(packer)
             return
-        if self.type == PreconditionType.PRECOND_GENERAL:
-            if self.general is None:
-                raise ValueError("general should not be None.")
-            self.general.pack(packer)
+        if self.type == PreconditionType.PRECOND_V2:
+            if self.v2 is None:
+                raise ValueError("v2 should not be None.")
+            self.v2.pack(packer)
             return
 
     @classmethod
@@ -59,9 +59,9 @@ class Preconditions:
         if type == PreconditionType.PRECOND_TIME:
             time_bounds = TimeBounds.unpack(unpacker)
             return cls(type=type, time_bounds=time_bounds)
-        if type == PreconditionType.PRECOND_GENERAL:
-            general = GeneralPreconditions.unpack(unpacker)
-            return cls(type=type, general=general)
+        if type == PreconditionType.PRECOND_V2:
+            v2 = PreconditionsV2.unpack(unpacker)
+            return cls(type=type, v2=v2)
         return cls(type=type)
 
     def to_xdr_bytes(self) -> bytes:
@@ -89,7 +89,7 @@ class Preconditions:
         return (
             self.type == other.type
             and self.time_bounds == other.time_bounds
-            and self.general == other.general
+            and self.v2 == other.v2
         )
 
     def __str__(self):
@@ -98,5 +98,5 @@ class Preconditions:
         out.append(
             f"time_bounds={self.time_bounds}"
         ) if self.time_bounds is not None else None
-        out.append(f"general={self.general}") if self.general is not None else None
+        out.append(f"v2={self.v2}") if self.v2 is not None else None
         return f"<Preconditions {[', '.join(out)]}>"

@@ -209,7 +209,7 @@ class ClaimPredicate:
             assert self.rel_before is not None
             return stellar_xdr.ClaimPredicate(
                 stellar_xdr.ClaimPredicateType.CLAIM_PREDICATE_BEFORE_RELATIVE_TIME,
-                rel_before=stellar_xdr.Duration(stellar_xdr.Uint64(self.rel_before)),
+                rel_before=stellar_xdr.Duration(stellar_xdr.Int64(self.rel_before)),
             )
         elif self.claim_predicate_type == ClaimPredicateType.CLAIM_PREDICATE_NOT:
             assert self.not_predicate is not None
@@ -264,7 +264,7 @@ class ClaimPredicate:
             == stellar_xdr.ClaimPredicateType.CLAIM_PREDICATE_BEFORE_RELATIVE_TIME
         ):
             assert xdr_object.rel_before is not None
-            rel_before = xdr_object.rel_before.duration.uint64
+            rel_before = xdr_object.rel_before.duration.int64
             return cls.predicate_before_relative_time(rel_before)
         elif claim_predicate_type == stellar_xdr.ClaimPredicateType.CLAIM_PREDICATE_NOT:
             not_predicate = xdr_object.not_predicate
@@ -284,7 +284,9 @@ class ClaimPredicate:
             right = cls.from_xdr_object(or_predicates[1])
             return cls.predicate_or(left, right)
         else:
-            raise ValueError(f"{claim_predicate_type} is an unsupported ClaimPredicateType.")
+            raise ValueError(
+                f"{claim_predicate_type} is an unsupported ClaimPredicateType."
+            )
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):

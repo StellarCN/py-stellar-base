@@ -4,29 +4,37 @@ import base64
 from xdrlib import Packer, Unpacker
 
 from ..type_checked import type_checked
-from .int64 import Int64
+from .uint32 import Uint32
 
-__all__ = ["Duration"]
+__all__ = ["SendMore"]
 
 
 @type_checked
-class Duration:
+class SendMore:
     """
     XDR Source Code::
 
-        typedef int64 Duration;
+        struct SendMore
+        {
+            uint32 numMessages;
+        };
     """
 
-    def __init__(self, duration: Int64) -> None:
-        self.duration = duration
+    def __init__(
+        self,
+        num_messages: Uint32,
+    ) -> None:
+        self.num_messages = num_messages
 
     def pack(self, packer: Packer) -> None:
-        self.duration.pack(packer)
+        self.num_messages.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "Duration":
-        duration = Int64.unpack(unpacker)
-        return cls(duration)
+    def unpack(cls, unpacker: Unpacker) -> "SendMore":
+        num_messages = Uint32.unpack(unpacker)
+        return cls(
+            num_messages=num_messages,
+        )
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()
@@ -34,7 +42,7 @@ class Duration:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "Duration":
+    def from_xdr_bytes(cls, xdr: bytes) -> "SendMore":
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -43,14 +51,17 @@ class Duration:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "Duration":
+    def from_xdr(cls, xdr: str) -> "SendMore":
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented
-        return self.duration == other.duration
+        return self.num_messages == other.num_messages
 
     def __str__(self):
-        return f"<Duration [duration={self.duration}]>"
+        out = [
+            f"num_messages={self.num_messages}",
+        ]
+        return f"<SendMore {[', '.join(out)]}>"

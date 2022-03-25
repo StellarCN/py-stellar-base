@@ -25,6 +25,8 @@ class LedgerUpgrade:
             uint32 newMaxTxSetSize; // update maxTxSetSize
         case LEDGER_UPGRADE_BASE_RESERVE:
             uint32 newBaseReserve; // update baseReserve
+        case LEDGER_UPGRADE_FLAGS:
+            uint32 newFlags; // update flags
         };
     """
 
@@ -35,12 +37,14 @@ class LedgerUpgrade:
         new_base_fee: Uint32 = None,
         new_max_tx_set_size: Uint32 = None,
         new_base_reserve: Uint32 = None,
+        new_flags: Uint32 = None,
     ) -> None:
         self.type = type
         self.new_ledger_version = new_ledger_version
         self.new_base_fee = new_base_fee
         self.new_max_tx_set_size = new_max_tx_set_size
         self.new_base_reserve = new_base_reserve
+        self.new_flags = new_flags
 
     def pack(self, packer: Packer) -> None:
         self.type.pack(packer)
@@ -64,6 +68,11 @@ class LedgerUpgrade:
                 raise ValueError("new_base_reserve should not be None.")
             self.new_base_reserve.pack(packer)
             return
+        if self.type == LedgerUpgradeType.LEDGER_UPGRADE_FLAGS:
+            if self.new_flags is None:
+                raise ValueError("new_flags should not be None.")
+            self.new_flags.pack(packer)
+            return
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "LedgerUpgrade":
@@ -80,6 +89,9 @@ class LedgerUpgrade:
         if type == LedgerUpgradeType.LEDGER_UPGRADE_BASE_RESERVE:
             new_base_reserve = Uint32.unpack(unpacker)
             return cls(type=type, new_base_reserve=new_base_reserve)
+        if type == LedgerUpgradeType.LEDGER_UPGRADE_FLAGS:
+            new_flags = Uint32.unpack(unpacker)
+            return cls(type=type, new_flags=new_flags)
         return cls(type=type)
 
     def to_xdr_bytes(self) -> bytes:
@@ -110,6 +122,7 @@ class LedgerUpgrade:
             and self.new_base_fee == other.new_base_fee
             and self.new_max_tx_set_size == other.new_max_tx_set_size
             and self.new_base_reserve == other.new_base_reserve
+            and self.new_flags == other.new_flags
         )
 
     def __str__(self):
@@ -127,4 +140,7 @@ class LedgerUpgrade:
         out.append(
             f"new_base_reserve={self.new_base_reserve}"
         ) if self.new_base_reserve is not None else None
+        out.append(
+            f"new_flags={self.new_flags}"
+        ) if self.new_flags is not None else None
         return f"<LedgerUpgrade {[', '.join(out)]}>"

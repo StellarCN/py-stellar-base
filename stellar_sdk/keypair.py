@@ -269,7 +269,7 @@ class Keypair:
         if data_len <= 4:
             payload_hint[:data_len] = data
         else:
-            payload_hint = data[data_len - 4 :]
+            payload_hint = bytearray(data[data_len - 4 :])
         hint = bytes(
             bytearray(
                 [

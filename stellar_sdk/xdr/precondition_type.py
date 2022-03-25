@@ -18,13 +18,13 @@ class PreconditionType(IntEnum):
         enum PreconditionType {
             PRECOND_NONE = 0,
             PRECOND_TIME = 1,
-            PRECOND_GENERAL = 2
+            PRECOND_V2 = 2
         };
     """
 
     PRECOND_NONE = 0
     PRECOND_TIME = 1
-    PRECOND_GENERAL = 2
+    PRECOND_V2 = 2
 
     def pack(self, packer: Packer) -> None:
         packer.pack_int(self.value)

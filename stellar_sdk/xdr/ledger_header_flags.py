@@ -7,35 +7,31 @@ from xdrlib import Packer, Unpacker
 from ..__version__ import __issues__
 from ..type_checked import type_checked
 
-__all__ = ["LedgerUpgradeType"]
+__all__ = ["LedgerHeaderFlags"]
 
 
 @type_checked
-class LedgerUpgradeType(IntEnum):
+class LedgerHeaderFlags(IntEnum):
     """
     XDR Source Code::
 
-        enum LedgerUpgradeType
+        enum LedgerHeaderFlags
         {
-            LEDGER_UPGRADE_VERSION = 1,
-            LEDGER_UPGRADE_BASE_FEE = 2,
-            LEDGER_UPGRADE_MAX_TX_SET_SIZE = 3,
-            LEDGER_UPGRADE_BASE_RESERVE = 4,
-            LEDGER_UPGRADE_FLAGS = 5
+            DISABLE_LIQUIDITY_POOL_TRADING_FLAG = 0x1,
+            DISABLE_LIQUIDITY_POOL_DEPOSIT_FLAG = 0x2,
+            DISABLE_LIQUIDITY_POOL_WITHDRAWAL_FLAG = 0x4
         };
     """
 
-    LEDGER_UPGRADE_VERSION = 1
-    LEDGER_UPGRADE_BASE_FEE = 2
-    LEDGER_UPGRADE_MAX_TX_SET_SIZE = 3
-    LEDGER_UPGRADE_BASE_RESERVE = 4
-    LEDGER_UPGRADE_FLAGS = 5
+    DISABLE_LIQUIDITY_POOL_TRADING_FLAG = 1
+    DISABLE_LIQUIDITY_POOL_DEPOSIT_FLAG = 2
+    DISABLE_LIQUIDITY_POOL_WITHDRAWAL_FLAG = 4
 
     def pack(self, packer: Packer) -> None:
         packer.pack_int(self.value)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "LedgerUpgradeType":
+    def unpack(cls, unpacker: Unpacker) -> "LedgerHeaderFlags":
         value = unpacker.unpack_int()
         return cls(value)
 
@@ -45,7 +41,7 @@ class LedgerUpgradeType(IntEnum):
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "LedgerUpgradeType":
+    def from_xdr_bytes(cls, xdr: bytes) -> "LedgerHeaderFlags":
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -54,7 +50,7 @@ class LedgerUpgradeType(IntEnum):
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "LedgerUpgradeType":
+    def from_xdr(cls, xdr: str) -> "LedgerHeaderFlags":
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
 
