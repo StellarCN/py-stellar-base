@@ -16,6 +16,7 @@ from .memo import *
 from .muxed_account import MuxedAccount
 from .network import Network
 from .operation import *
+from .preconditions import Preconditions
 from .price import Price
 from .signer import Signer
 from .signer_key import SignerKey
@@ -110,13 +111,14 @@ class TransactionBuilder:
             )
         source = self.source_account.account
         sequence = self.source_account.sequence + 1
+        preconditions = Preconditions(time_bounds=self.time_bounds)
         transaction = Transaction(
             source=source,
             sequence=sequence,
             fee=self.base_fee * len(self.operations),
             operations=self.operations,
             memo=self.memo,
-            time_bounds=self.time_bounds,
+            preconditions=preconditions,
             v1=self.v1,
         )
         transaction_envelope = TransactionEnvelope(
@@ -205,7 +207,10 @@ class TransactionBuilder:
             ),
             v1=transaction_envelope.transaction.v1,
         )
-        transaction_builder.time_bounds = transaction_envelope.transaction.time_bounds
+        if transaction_envelope.transaction.preconditions:
+            transaction_builder.time_bounds = (
+                transaction_envelope.transaction.preconditions.time_bounds
+            )
         transaction_builder.operations = transaction_envelope.transaction.operations
         transaction_builder.memo = transaction_envelope.transaction.memo
         return transaction_builder

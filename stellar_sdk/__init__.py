@@ -24,6 +24,7 @@ from .memo import *
 from .muxed_account import *
 from .network import *
 from .operation import *
+from .preconditions import *
 from .price import *
 from .server import *
 from .server_async import *

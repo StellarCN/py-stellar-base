@@ -60,9 +60,10 @@ class TestStellarWebAuthentication:
         assert op1.source == MuxedAccount.from_account(server_kp.public_key)
 
         now = int(time.time())
-        assert now - 3 < transaction.time_bounds.min_time < now + 3
+        assert now - 3 < transaction.preconditions.time_bounds.min_time < now + 3
         assert (
-            transaction.time_bounds.max_time - transaction.time_bounds.min_time
+            transaction.preconditions.time_bounds.max_time
+            - transaction.preconditions.time_bounds.min_time
             == timeout
         )
         assert transaction.source == MuxedAccount.from_account(server_kp.public_key)
@@ -209,9 +210,10 @@ class TestStellarWebAuthentication:
         assert op2.source == MuxedAccount.from_account(client_signing_key)
 
         now = int(time.time())
-        assert now - 3 < transaction.time_bounds.min_time < now + 3
+        assert now - 3 < transaction.preconditions.time_bounds.min_time < now + 3
         assert (
-            transaction.time_bounds.max_time - transaction.time_bounds.min_time
+            transaction.preconditions.time_bounds.max_time
+            - transaction.preconditions.time_bounds.min_time
             == timeout
         )
         assert transaction.source == MuxedAccount.from_account(server_kp.public_key)

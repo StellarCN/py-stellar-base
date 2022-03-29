@@ -25,6 +25,7 @@ from ..muxed_account import MuxedAccount
 from ..operation import *
 from ..operation.create_claimable_balance import ClaimPredicateType
 from ..operation.revoke_sponsorship import RevokeSponsorshipType
+from ..preconditions import Preconditions
 from ..price import Price
 from ..signer import Signer
 from ..signer_key import SignerKey
@@ -110,7 +111,8 @@ def to_txrep(
     )
     _add_line(f"{prefix}fee", transaction.fee, lines)
     _add_line(f"{prefix}seqNum", transaction.sequence, lines)
-    _add_time_bounds(transaction.time_bounds, prefix, lines)
+    # TODO: add CAP-21 support
+    _add_time_bounds(transaction.preconditions.time_bounds, prefix, lines)  # type: ignore[union-attr]
     _add_memo(transaction.memo, prefix, lines)
     _add_operations(transaction.operations, prefix, lines)
     _add_line(f"{prefix}ext.v", 0, lines)
@@ -164,13 +166,14 @@ def from_txrep(
         if not is_fee_bump and tx_type == _EnvelopeType.ENVELOPE_TYPE_TX_V0
         else True
     )
+    preconditions = Preconditions(time_bounds=time_bounds)
     transaction = Transaction(
         source=source,
         sequence=sequence,
         fee=fee,
         operations=operations,
         memo=memo,
-        time_bounds=time_bounds,
+        preconditions=preconditions,
         v1=v1,
     )
     transaction_envelope = TransactionEnvelope(

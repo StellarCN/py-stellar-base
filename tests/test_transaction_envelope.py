@@ -2,6 +2,7 @@ import binascii
 
 import pytest
 
+from stellar_sdk import Preconditions
 from stellar_sdk.asset import Asset
 from stellar_sdk.exceptions import SignatureExistError
 from stellar_sdk.keypair import Keypair
@@ -26,8 +27,10 @@ class TestTransactionEnvelope:
         fee = 200
         asset = Asset.native()
         time_bounds = TimeBounds(12345, 56789)
+        cond = Preconditions(time_bounds=time_bounds)
+
         ops = [Payment(destination, asset, amount), ManageData("hello", "world")]
-        tx = Transaction(source, sequence, fee, ops, memo, time_bounds, v1=False)
+        tx = Transaction(source, sequence, fee, ops, memo, cond, v1=False)
         te = TransactionEnvelope(tx, Network.PUBLIC_NETWORK_PASSPHRASE)
         assert binascii.hexlify(te.hash()).decode() == te.hash_hex()
         te.sign(source)
@@ -54,8 +57,9 @@ class TestTransactionEnvelope:
         fee = 200
         asset = Asset.native()
         time_bounds = TimeBounds(12345, 56789)
+        cond = Preconditions(time_bounds=time_bounds)
         ops = [Payment(destination, asset, amount)]
-        tx = Transaction(source, sequence, fee, ops, memo, time_bounds, v1=True)
+        tx = Transaction(source, sequence, fee, ops, memo, cond, v1=True)
         te = TransactionEnvelope(tx, Network.PUBLIC_NETWORK_PASSPHRASE)
         assert binascii.hexlify(te.hash()).decode() == te.hash_hex()
         te.sign(source)
@@ -78,8 +82,9 @@ class TestTransactionEnvelope:
         fee = 200
         asset = Asset.native()
         time_bounds = TimeBounds(12345, 56789)
+        cond = Preconditions(time_bounds=time_bounds)
         ops = [Payment(destination, asset, amount), ManageData("hello", "world")]
-        tx = Transaction(source, sequence, fee, ops, memo, time_bounds)
+        tx = Transaction(source, sequence, fee, ops, memo, cond)
         te = TransactionEnvelope(tx, Network.PUBLIC_NETWORK_PASSPHRASE)
         assert binascii.hexlify(te.hash()).decode() == te.hash_hex()
         # te.sign(source)

@@ -209,11 +209,11 @@ def read_challenge_transaction(
         )
 
     # verify that transaction has time bounds set, and that current time is between the minimum and maximum bounds
-    if not transaction.time_bounds:
+    if not transaction.preconditions or not transaction.preconditions.time_bounds:
         raise InvalidSep10ChallengeError("Transaction requires timebounds.")
 
-    max_time = transaction.time_bounds.max_time
-    min_time = transaction.time_bounds.min_time
+    max_time = transaction.preconditions.time_bounds.max_time
+    min_time = transaction.preconditions.time_bounds.min_time
 
     if max_time == 0:
         raise InvalidSep10ChallengeError(

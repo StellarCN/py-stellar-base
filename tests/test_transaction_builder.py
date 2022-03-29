@@ -529,8 +529,10 @@ class TestTransaction:
         )
         check_from_xdr(tx)
         tx = tx.build()
-        assert tx.transaction.time_bounds.min_time == 0
-        assert now + 256 <= tx.transaction.time_bounds.max_time <= now + 257
+        assert tx.transaction.preconditions.time_bounds.min_time == 0
+        assert (
+            now + 256 <= tx.transaction.preconditions.time_bounds.max_time <= now + 257
+        )
 
     def test_build_set_timeout_with_timebounds_exists_raise(self):
         with pytest.raises(
