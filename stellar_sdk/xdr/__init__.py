@@ -1,4 +1,4 @@
-# Automatically generated on 2022-03-25T10:42:02+08:00
+# Automatically generated on 2022-03-29T16:48:57+08:00
 # DO NOT EDIT or your changes may be overwritten
 from .account_entry import AccountEntry
 from .account_entry_ext import AccountEntryExt
