@@ -10,6 +10,7 @@ from .exceptions import ValueError
 from .fee_bump_transaction import FeeBumpTransaction
 from .fee_bump_transaction_envelope import FeeBumpTransactionEnvelope
 from .keypair import Keypair
+from .ledger_bounds import LedgerBounds
 from .liquidity_pool_asset import LiquidityPoolAsset
 from .liquidity_pool_id import LiquidityPoolId
 from .memo import *
@@ -18,6 +19,7 @@ from .network import Network
 from .operation import *
 from .preconditions import Preconditions
 from .price import Price
+from .signed_payload_signer import SignedPayloadSigner
 from .signer import Signer
 from .signer_key import SignerKey
 from .time_bounds import TimeBounds
@@ -93,6 +95,11 @@ class TransactionBuilder:
         self.network_passphrase: str = network_passphrase
         self.operations: List[Operation] = []
         self.time_bounds: Optional[TimeBounds] = None
+        self.ledger_bounds: Optional[LedgerBounds] = None
+        self.min_sequence_number: Optional[int] = None
+        self.min_sequence_age: Optional[int] = None
+        self.min_sequence_ledger_gap: Optional[int] = None
+        self.extra_signers: List[SignedPayloadSigner] = []
         self.memo: Memo = NoneMemo()
         self.v1: bool = v1
 
@@ -102,6 +109,7 @@ class TransactionBuilder:
 
         :return: New transaction envelope.
         """
+        # TODO: improve it
         if self.time_bounds is None:
             warnings.warn(
                 "It looks like you haven't set a TimeBounds for the transaction, "
@@ -111,7 +119,14 @@ class TransactionBuilder:
             )
         source = self.source_account.account
         sequence = self.source_account.sequence + 1
-        preconditions = Preconditions(time_bounds=self.time_bounds)
+        preconditions = Preconditions(
+            time_bounds=self.time_bounds,
+            ledger_bounds=self.ledger_bounds,
+            min_sequence_number=self.min_sequence_number,
+            min_sequence_age=self.min_sequence_age,
+            min_sequence_ledger_gap=self.min_sequence_ledger_gap,
+            extra_signers=self.extra_signers,
+        )
         transaction = Transaction(
             source=source,
             sequence=sequence,
@@ -245,6 +260,31 @@ class TransactionBuilder:
             )
         timeout_timestamp = int(time.time()) + timeout
         self.time_bounds = TimeBounds(min_time=0, max_time=timeout_timestamp)
+        return self
+
+    def add_ledger_bounds(
+        self, min_ledger: int, max_ledger: int
+    ) -> "TransactionBuilder":
+        self.ledger_bounds = LedgerBounds(min_ledger, max_ledger)
+        return self
+
+    def add_min_sequence_number(self, min_sequence_number: int) -> "TransactionBuilder":
+        self.min_sequence_number = min_sequence_number
+        return self
+
+    def add_min_sequence_age(self, min_sequence_age: int) -> "TransactionBuilder":
+        self.min_sequence_age = min_sequence_age
+        return self
+
+    def add_min_sequence_ledger_gap(
+        self, min_sequence_ledger_gap: int
+    ) -> "TransactionBuilder":
+        self.min_sequence_ledger_gap = min_sequence_ledger_gap
+        return self
+
+    def add_extra_signer(self, account_id: str, payload: bytes) -> "TransactionBuilder":
+        signer = SignedPayloadSigner(account_id, payload)
+        self.extra_signers.append(signer)
         return self
 
     def add_memo(self, memo: Memo) -> "TransactionBuilder":
