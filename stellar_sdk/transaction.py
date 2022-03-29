@@ -6,7 +6,7 @@ from .memo import Memo, NoneMemo
 from .muxed_account import MuxedAccount
 from .operation.create_claimable_balance import CreateClaimableBalance
 from .operation.operation import Operation
-from .signer_key import SignerKey
+from .signed_payload_signer import SignedPayloadSigner
 from .strkey import StrKey
 from .time_bounds import TimeBounds
 from .type_checked import type_checked
@@ -64,7 +64,7 @@ class Transaction:
         min_sequence_number: int = None,
         min_sequence_age: int = None,
         min_sequence_ledger_gap: int = None,
-        extra_signers: List[SignerKey] = None,
+        extra_signers: List[SignedPayloadSigner] = None,
         v1: bool = True,
     ) -> None:
 
@@ -262,7 +262,7 @@ class Transaction:
                 )
                 if xdr_object.cond.v2.extra_signers:
                     extra_signers = [
-                        SignerKey.from_xdr_object(s)
+                        SignedPayloadSigner.from_xdr_object(s)
                         for s in xdr_object.cond.v2.extra_signers
                     ]
         else:

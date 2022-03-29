@@ -92,7 +92,7 @@ class SignerKey:
     def ed25519_signed_payload(
         cls, ed25519_signed_payload: Union[str, bytes]
     ) -> "SignerKey":
-        """Create ed25519 signed payload Signer from a ed25519 signed payload.
+        """Create ed25519 signed payload Signer from an ed25519 signed payload.
 
         :param ed25519_signed_payload: a sha256 hash of a preimage
         :return: ed25519 signed payload signer
