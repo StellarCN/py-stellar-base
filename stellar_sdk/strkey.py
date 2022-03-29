@@ -16,6 +16,13 @@ from .type_checked import type_checked
 
 __all__ = ["StrKey"]
 
+_MAX_PAYLOAD_SIZE = 68  # 32 + 4 + 64
+# _MAX_PAYLOAD_SIZE is the maximum length of the payload for all versions.
+_MAX_RAW_SIZE = 1 + _MAX_PAYLOAD_SIZE + 2
+
+
+# _MAX_RAW_SIZE is the maximum length of a strkey in its raw form not encoded.
+
 
 class _VersionByte(Enum):
     ED25519_PUBLIC_KEY = binascii.a2b_hex("30")  # G 48 6 << 3
@@ -284,13 +291,21 @@ def _decode_check(version_byte: _VersionByte, encoded: str) -> bytes:
     expected_checksum = _calculate_checksum(payload)
     if expected_checksum != checksum:
         raise ValueError("Invalid checksum")
-
+    if version_byte == _VersionByte.ED25519_SIGNED_PAYLOAD:
+        if len(data) < 32 + 4 + 4:
+            raise ValueError(f"Invalid Ed25519 Signed Payload Key: {data!r}")
+        payload_length_prefix = int.from_bytes(data[32:36], byteorder="big")
+        if len(data[36:]) % 4 != 0:
+            raise ValueError(f"Invalid Ed25519 Signed Payload Key: {data!r}")
+        if payload_length_prefix + ((4 - payload_length_prefix % 4) % 4) != len(
+            data[36:]
+        ):
+            raise ValueError(f"Invalid Ed25519 Signed Payload Key: {data!r}")
     return data
 
 
 @type_checked
 def _encode_check(version_byte: _VersionByte, data: bytes) -> str:
-    # TODO: checking data length?
     payload = version_byte.value + data
     crc = _calculate_checksum(payload)
     return base64.b32encode(payload + crc).decode("utf-8").rstrip("=")
