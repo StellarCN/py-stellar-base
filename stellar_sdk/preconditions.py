@@ -122,12 +122,12 @@ class Preconditions:
                 xdr_object.v2.min_seq_age.duration.int64
                 if xdr_object.v2.min_seq_age
                 else None
-            )
+            ) or None
             min_sequence_ledger_gap = (
                 xdr_object.v2.min_seq_ledger_gap.uint32
                 if xdr_object.v2.min_seq_ledger_gap
                 else None
-            )
+            ) or None
             if xdr_object.v2.extra_signers:
                 extra_signers: Optional[List[SignedPayloadSigner]] = [
                     SignedPayloadSigner.from_xdr_object(s)
