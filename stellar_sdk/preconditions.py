@@ -42,6 +42,9 @@ class Preconditions:
         self.min_sequence_ledger_gap = min_sequence_ledger_gap
         self.extra_signers = extra_signers
 
+        if extra_signers and len(extra_signers) > 2:
+            raise ValueError("extra_signers cannot be longer than 2 elements.")
+
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
             return NotImplemented
