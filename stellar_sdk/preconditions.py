@@ -7,6 +7,25 @@ from .time_bounds import TimeBounds
 
 
 class Preconditions:
+    """This contains a set of conditions, if a transaction can be accepted by the network,
+    it must meet these conditions.
+
+    :param time_bounds: required extra signers.
+    :param ledger_bounds: required extra signers.
+    :param min_sequence_number: The minimum source account sequence
+        number this transaction is valid for. If the value is ``0`` (the default),
+        the transaction is valid when **source account's sequence number == tx.sequence - 1**.
+    :param min_sequence_age: The minimum amount of time between
+        source account sequence time and the ledger time when this transaction
+        will become valid. If the value is ``0``, the transaction is unrestricted
+        by the account sequence age. Cannot be negative.
+    :param min_sequence_ledger_gap: The minimum number of ledgers between source account
+        sequence and the ledger number when this transaction will become valid.
+        If the value is `0`, the transaction is unrestricted by the account sequence
+        ledger. Cannot be negative.
+    :param extra_signers: required extra signers.
+    """
+
     def __init__(
         self,
         time_bounds: TimeBounds = None,

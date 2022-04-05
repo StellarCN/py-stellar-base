@@ -26,7 +26,12 @@ class TestLedgerBounds:
         [
             (-1, 1560844454, "min_ledger cannot be negative."),
             (1560844454, -1, "max_ledger cannot be negative."),
-            (1560844455, 156084454, "max_ledger must be >= min_ledger."),
+            (
+                1560844455,
+                156084454,
+                "max_ledger should be greater than or equal to min_ledger, "
+                "unless max_ledger is set to 0.",
+            ),
         ],
     )
     def test_to_xdr_with_invalid_ledger_raise(self, min_ledger, max_ledger, message):

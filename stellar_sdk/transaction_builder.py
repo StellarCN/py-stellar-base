@@ -231,7 +231,20 @@ class TransactionBuilder:
         return transaction_builder
 
     def add_time_bounds(self, min_time: int, max_time: int) -> "TransactionBuilder":
-        """Add a time bound to this transaction.
+        """Sets a timeout precondition on the transaction.
+
+        Because of the distributed nature of the Stellar network it is possible
+        that the status of your transaction will be determined after a long time
+        if the network is highly congested. If you want to be sure to receive the
+        status of the transaction within a given period you should set
+        the :class:`TimeBounds` with `max_time` on the transaction (this is
+        what :func:`set_timeout` does internally).
+
+        Please note that Horizon may still return **504 Gateway Timeout**
+        error, even for short timeouts. In such case you need to resubmit the same
+        transaction again without making any changes to receive a status. This
+        method is using the machine system time (UTC), make sure it is set
+        correctly.
 
         Add a UNIX timestamp, determined by ledger time, of a lower and
         upper bound of when this transaction will be valid. If a transaction is
@@ -247,7 +260,7 @@ class TransactionBuilder:
         return self
 
     def set_timeout(self, timeout: int) -> "TransactionBuilder":
-        """Set timeout for the transaction, actually set a TimeBounds.
+        """Set timeout for the transaction, actually set a :class:`TimeBounds`.
 
         :param timeout: timeout in second.
         :return: This builder instance.
@@ -262,27 +275,77 @@ class TransactionBuilder:
         self.time_bounds = TimeBounds(min_time=0, max_time=timeout_timestamp)
         return self
 
-    def add_ledger_bounds(
+    def set_ledger_bounds(
         self, min_ledger: int, max_ledger: int
     ) -> "TransactionBuilder":
+        """If you want to prepare a transaction which will only
+        be valid within some range of ledgers, you can set a `ledger_bounds` precondition.
+        Internally this will set the :class:`LedgerBounds` preconditions.
+
+        :param min_ledger: The minimum ledger this transaction is valid at, or after.
+            Cannot be negative. If the value is ``0``, the transaction is valid immediately.
+        :param max_ledger: The maximum ledger this transaction is valid before.
+            Cannot be negative. If the value is ``0``, the transaction is valid indefinitely.
+        :return: This builder instance.
+        """
         self.ledger_bounds = LedgerBounds(min_ledger, max_ledger)
         return self
 
-    def add_min_sequence_number(self, min_sequence_number: int) -> "TransactionBuilder":
+    def set_min_sequence_number(self, min_sequence_number: int) -> "TransactionBuilder":
+        """If you want to prepare a transaction which will be valid only while the account sequence number is
+        **min_sequence_number <= source_account_sequence_number < tx.sequence**.
+
+        Note that after execution the account's sequence number is always raised to `tx.sequence`.
+        Internally this will set the `min_sequence_number` precondition.
+
+        :param min_sequence_number: The minimum source account sequence
+            number this transaction is valid for. If the value is ``0`` (the default),
+            the transaction is valid when **source account's sequence number == tx.sequence - 1**.
+        :return: This builder instance.
+        """
         self.min_sequence_number = min_sequence_number
         return self
 
-    def add_min_sequence_age(self, min_sequence_age: int) -> "TransactionBuilder":
+    def set_min_sequence_age(self, min_sequence_age: int) -> "TransactionBuilder":
+        """For the transaction to be valid, the current ledger time must be
+        at least `min_sequence_age` greater than source account's `sequence_time`.
+        Internally this will set the `min_sequence_age` precondition.
+
+        :param min_sequence_age: The minimum amount of time between
+            source account sequence time and the ledger time when this transaction
+            will become valid. If the value is ``0``, the transaction is unrestricted
+            by the account sequence age. Cannot be negative.
+        :return: This builder instance.
+        """
         self.min_sequence_age = min_sequence_age
         return self
 
-    def add_min_sequence_ledger_gap(
+    def set_min_sequence_ledger_gap(
         self, min_sequence_ledger_gap: int
     ) -> "TransactionBuilder":
+        """For the transaction to be valid, the current ledger number must be at least
+        `min_sequence_ledger_gap` greater than source account's ledger sequence.
+        Internally this will set the `min_sequence_ledger_gap` precondition.
+
+        :param min_sequence_ledger_gap: The minimum number of ledgers between source account
+            sequence and the ledger number when this transaction will become valid.
+            If the value is `0`, the transaction is unrestricted by the account sequence
+            ledger. Cannot be negative.
+        :return: This builder instance.
+        """
         self.min_sequence_ledger_gap = min_sequence_ledger_gap
         return self
 
     def add_extra_signer(self, account_id: str, payload: bytes) -> "TransactionBuilder":
+        """For the transaction to be valid, there must be a signature corresponding to every
+        Signer in this array, even if the signature is not otherwise required by
+        the source account or operations.
+        Internally this will set the :class:`SignedPayloadSigner` precondition.
+
+        :param account_id: The account id, this account needs to sign `payload`.
+        :param payload: The payload.
+        :return: This builder instance.
+        """
         signer = SignedPayloadSigner(account_id, payload)
         self.extra_signers.append(signer)
         return self

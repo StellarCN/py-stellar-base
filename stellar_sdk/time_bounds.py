@@ -32,6 +32,7 @@ class TimeBounds:
         if max_time < 0:
             raise ValueError("max_time cannot be negative.")
 
+        # FIXME: error msg
         if 0 < max_time < min_time:
             raise ValueError("max_time must be >= min_time.")
 

@@ -11,7 +11,7 @@ class SignedPayloadSigner:
     """The :class:`SignedPayloadSigner` object, which represents a signed payload signer on Stellar's network.
 
     :param account_id: The account id.
-    :param payload: The raw payload for a signed payload.
+    :param payload: The raw payload.
     """
 
     def __init__(self, account_id: str, payload: bytes) -> None:
@@ -20,11 +20,19 @@ class SignedPayloadSigner:
 
     @classmethod
     def from_encoded_signer_key(self, signer_key: str) -> "SignedPayloadSigner":
+        """Create Signer from strkey encoded signer key.
+
+        :param signer_key: strkey encoded signer key. (ex. ``PA7QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLTJJFC7MGXUA74P7UJUAAAAAOQCAQDAQCQMBYIBEFAWDANBYHRAEISCMKBKFQXDAMRUGY4DUAAAAFGBU``)
+        :return: SignedPayloadSigner
+        """
         key = SignerKey.ed25519_signed_payload(signer_key)
         return self.from_xdr_object(key.to_xdr_object())
 
     @property
     def encoded_signer_key(self) -> str:
+        """
+        return: The signer key encoded in Strkey format. (ex. ``PA7QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLTJJFC7MGXUA74P7UJUAAAAAOQCAQDAQCQMBYIBEFAWDANBYHRAEISCMKBKFQXDAMRUGY4DUAAAAFGBU``)
+        """
         decoded_account_id = StrKey.decode_ed25519_public_key(self.account_id)
         payload_length = len(self.payload)
         payload = self.payload
@@ -60,7 +68,7 @@ class SignedPayloadSigner:
         """Create a :class:`SignedPayloadSigner` from an XDR SignerKey object.
 
         :param xdr_object: The XDR SignerKey object.
-        :return: A new :class:`SignerKey` object from the given XDR SignerKey object.
+        :return: A new :class:`SignedPayloadSigner` object from the given XDR SignerKey object.
         """
         if (
             xdr_object.type

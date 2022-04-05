@@ -7,6 +7,15 @@ __all__ = ["LedgerBounds"]
 
 @type_checked
 class LedgerBounds:
+    """LedgerBounds represents the ledger interval that a transaction is valid.
+
+    :param min_ledger: The minimum ledger this transaction is valid at, or after.
+        Cannot be negative. If the value is ``0``, the transaction is valid immediately.
+    :param max_ledger: The maximum ledger this transaction is valid before.
+        Cannot be negative. If the value is ``0``, the transaction is valid indefinitely.
+    :raises: :exc:`ValueError <stellar_sdk.exceptions.ValueError>`: if `max_ledger` less than `min_ledger`.
+    """
+
     def __init__(self, min_ledger: int, max_ledger: int) -> None:
         if min_ledger < 0:
             raise ValueError("min_ledger cannot be negative.")
@@ -15,7 +24,10 @@ class LedgerBounds:
             raise ValueError("max_ledger cannot be negative.")
 
         if 0 < max_ledger < min_ledger:
-            raise ValueError("max_ledger must be >= min_ledger.")
+            raise ValueError(
+                "max_ledger should be greater than or equal to min_ledger, "
+                "unless max_ledger is set to 0."
+            )
 
         self.min_ledger: int = min_ledger
         self.max_ledger: int = max_ledger
