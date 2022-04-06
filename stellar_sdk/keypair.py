@@ -261,15 +261,25 @@ class Keypair:
         signature = self.sign(data)
         return DecoratedSignature(hint, signature)
 
-    def sign_decorated_for_payload(self, data: bytes) -> DecoratedSignature:
+    def sign_decorated_for_payload(self, payload: bytes) -> DecoratedSignature:
+        """Sign the provided payload with the keypair's private key and returns DecoratedSignature.
+
+        The signature hint of an ed25519 signed payload signer is the last 4 bytes of the ed25519 public key
+        XORed with last 4 bytes of the payload. If the payload has a length less than 4 bytes,
+        then 1 to 4 zero bytes are appended to the payload such that it has a length of 4 bytes,
+        for calculating the hint.
+
+        :param payload: the payload
+        :return: sign decorated
+        """
         key_hint = self.signature_hint()
-        signature = self.sign(data)
-        data_len = len(data)
-        if data_len <= 4:
+        signature = self.sign(payload)
+        data_len = len(payload)
+        if data_len < 4:
             payload_hint = bytearray(4)
-            payload_hint[:data_len] = data
+            payload_hint[:len(payload)] = payload
         else:
-            payload_hint = bytearray(data[data_len - 4 :])
+            payload_hint = bytearray(payload[data_len - 4 :])
         hint = bytes(
             [
                 key_hint[0] ^ payload_hint[0],
