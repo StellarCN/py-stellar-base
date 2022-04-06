@@ -321,6 +321,13 @@ def _is_valid(version_byte: _VersionByte, encoded: str) -> bool:
 
 
 @type_checked
+def _get_version_byte_for_prefix(encoded: str) -> _VersionByte:
+    prefix = encoded[0]
+    _version_byte = ord(prefix) - ord("A")
+    return _VersionByte(_version_byte)
+
+
+@type_checked
 def _calculate_checksum(payload: bytes) -> bytes:
     # memo note: https://gist.github.com/manran/a8357808ef71415d266dc64f0079f298
     # This code calculates CRC16-XModem checksum of payload

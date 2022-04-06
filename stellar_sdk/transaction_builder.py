@@ -335,7 +335,7 @@ class TransactionBuilder:
         self.min_sequence_ledger_gap = min_sequence_ledger_gap
         return self
 
-    def add_extra_signer(self, signer_key: SignerKey) -> "TransactionBuilder":
+    def add_extra_signer(self, signer_key: Union[SignerKey, str]) -> "TransactionBuilder":
         """For the transaction to be valid, there must be a signature corresponding to every
         Signer in this array, even if the signature is not otherwise required by
         the source account or operations.
@@ -344,6 +344,8 @@ class TransactionBuilder:
         :param signer_key: The signer key
         :return: This builder instance.
         """
+        if isinstance(signer_key, str):
+            signer_key = SignerKey.decode_signer_key(signer_key)
         self.extra_signers.append(signer_key)
         return self
 

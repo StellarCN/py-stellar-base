@@ -4,7 +4,7 @@ from typing import Union
 from . import xdr as stellar_xdr
 from .__version__ import __issues__
 from .exceptions import ValueError
-from .strkey import StrKey
+from .strkey import StrKey, _get_version_byte_for_prefix, _VersionByte
 from .type_checked import type_checked
 
 __all__ = ["SignerKey", "SignerKeyType", "SignedPayloadSigner"]
@@ -19,7 +19,7 @@ class SignerKeyType(IntEnum):
 
 @type_checked
 class SignedPayloadSigner:
-    """The :class:`SignedPayloadSigner` object, which represents a signed payload signer on Stellar's network.
+    """The :class:`SignedPayloadSigner` object, which represents a signed payload signer.
 
     :param account_id: The account id.
     :param payload: The raw payload.
@@ -67,6 +67,25 @@ class SignerKey:
             return StrKey.encode_ed25519_signed_payload(self.signer_key)
         else:
             raise ValueError(f"{self.signer_key_type} is an unsupported SignerKeyType.")
+
+    @classmethod
+    def decode_signer_key(cls, encoded_signer_key: str) -> "SignerKey":
+        """Parse the encoded signer key.
+
+        :param encoded_signer_key: The encoded signer key. (ex. ``GBJCHUKZMTFSLOMNC7P4TS4VJJBTCYL3XKSOLXAUJSD56C4LHND5TWUC``)
+        :return: The :class:`SignerKey` object.
+        """
+        prefix = _get_version_byte_for_prefix(encoded_signer_key)
+        if prefix == _VersionByte.ED25519_PUBLIC_KEY:
+            return cls.ed25519_public_key(encoded_signer_key)
+        elif prefix == _VersionByte.PRE_AUTH_TX:
+            return cls.pre_auth_tx(encoded_signer_key)
+        elif prefix == _VersionByte.SHA256_HASH:
+            return cls.sha256_hash(encoded_signer_key)
+        elif prefix == _VersionByte.ED25519_SIGNED_PAYLOAD:
+            return cls.ed25519_signed_payload(encoded_signer_key)
+        else:
+            raise ValueError(f"Unsupported SignerKeyType.")
 
     @classmethod
     def ed25519_public_key(cls, account_id: Union[str, bytes]) -> "SignerKey":
