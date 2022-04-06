@@ -298,7 +298,7 @@ class TransactionBuilder:
         Internally this will set the `min_sequence_number` precondition.
 
         :param min_sequence_number: The minimum source account sequence
-            number this transaction is valid for. If the value is ``0`` (the default),
+            number this transaction is valid for. If the value is ``0`` or ``None``
             the transaction is valid when **source account's sequence number == tx.sequence - 1**.
         :return: This builder instance.
         """
@@ -312,7 +312,7 @@ class TransactionBuilder:
 
         :param min_sequence_age: The minimum amount of time between
             source account sequence time and the ledger time when this transaction
-            will become valid. If the value is ``0``, the transaction is unrestricted
+            will become valid. If the value is ``0`` or ``None``, the transaction is unrestricted
             by the account sequence age. Cannot be negative.
         :return: This builder instance.
         """
@@ -328,7 +328,7 @@ class TransactionBuilder:
 
         :param min_sequence_ledger_gap: The minimum number of ledgers between source account
             sequence and the ledger number when this transaction will become valid.
-            If the value is `0`, the transaction is unrestricted by the account sequence
+            If the value is ``0`` or ``None``, the transaction is unrestricted by the account sequence
             ledger. Cannot be negative.
         :return: This builder instance.
         """
@@ -345,7 +345,7 @@ class TransactionBuilder:
         :return: This builder instance.
         """
         if isinstance(signer_key, str):
-            signer_key = SignerKey.decode_signer_key(signer_key)
+            signer_key = SignerKey.from_encoded_signer_key(signer_key)
         self.extra_signers.append(signer_key)
         return self
 

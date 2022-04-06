@@ -69,7 +69,7 @@ class SignerKey:
             raise ValueError(f"{self.signer_key_type} is an unsupported SignerKeyType.")
 
     @classmethod
-    def decode_signer_key(cls, encoded_signer_key: str) -> "SignerKey":
+    def from_encoded_signer_key(cls, encoded_signer_key: str) -> "SignerKey":
         """Parse the encoded signer key.
 
         :param encoded_signer_key: The encoded signer key. (ex. ``GBJCHUKZMTFSLOMNC7P4TS4VJJBTCYL3XKSOLXAUJSD56C4LHND5TWUC``)

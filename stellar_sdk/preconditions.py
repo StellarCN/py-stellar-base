@@ -13,15 +13,15 @@ class Preconditions:
     :param time_bounds: required extra signers.
     :param ledger_bounds: required extra signers.
     :param min_sequence_number: The minimum source account sequence
-        number this transaction is valid for. If the value is ``0`` (the default),
+        number this transaction is valid for. If the value is ``0`` or ``None``,
         the transaction is valid when **source account's sequence number == tx.sequence - 1**.
     :param min_sequence_age: The minimum amount of time between
         source account sequence time and the ledger time when this transaction
-        will become valid. If the value is ``0``, the transaction is unrestricted
+        will become valid. If the value is ``0`` or ``None``, the transaction is unrestricted
         by the account sequence age. Cannot be negative.
     :param min_sequence_ledger_gap: The minimum number of ledgers between source account
         sequence and the ledger number when this transaction will become valid.
-        If the value is `0`, the transaction is unrestricted by the account sequence
+        If the value is ``0`` or ``None``, the transaction is unrestricted by the account sequence
         ledger. Cannot be negative.
     :param extra_signers: required extra signers.
     """
@@ -35,6 +35,13 @@ class Preconditions:
         min_sequence_ledger_gap: int = None,
         extra_signers: List[SignerKey] = None,
     ):
+        if min_sequence_age == 0:
+            min_sequence_age = None
+        if min_sequence_ledger_gap == 0:
+            min_sequence_ledger_gap = None
+        if not extra_signers:
+            extra_signers = None
+
         self.time_bounds = time_bounds
         self.ledger_bounds = ledger_bounds
         self.min_sequence_number = min_sequence_number
@@ -144,18 +151,15 @@ class Preconditions:
                 xdr_object.v2.min_seq_age.duration.int64
                 if xdr_object.v2.min_seq_age
                 else None
-            ) or None
+            )
             min_sequence_ledger_gap = (
                 xdr_object.v2.min_seq_ledger_gap.uint32
                 if xdr_object.v2.min_seq_ledger_gap
                 else None
-            ) or None
-            if xdr_object.v2.extra_signers:
-                extra_signers: Optional[List[SignerKey]] = [
-                    SignerKey.from_xdr_object(s) for s in xdr_object.v2.extra_signers
-                ]
-            else:
-                extra_signers = None
+            )
+            extra_signers: Optional[List[SignerKey]] = [
+                SignerKey.from_xdr_object(s) for s in xdr_object.v2.extra_signers
+            ]
             return cls(
                 time_bounds=time_bounds,
                 ledger_bounds=ledger_bounds,

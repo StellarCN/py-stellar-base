@@ -16,14 +16,6 @@ from .type_checked import type_checked
 
 __all__ = ["StrKey"]
 
-_MAX_PAYLOAD_SIZE = 68  # 32 + 4 + 64
-# _MAX_PAYLOAD_SIZE is the maximum length of the payload for all versions.
-_MAX_RAW_SIZE = 1 + _MAX_PAYLOAD_SIZE + 2
-
-
-# _MAX_RAW_SIZE is the maximum length of a strkey in its raw form not encoded.
-
-
 class _VersionByte(Enum):
     ED25519_PUBLIC_KEY = binascii.a2b_hex("30")  # G 48 6 << 3
     ED25519_SECRET_SEED = binascii.a2b_hex("90")  # S 144 18 << 3
