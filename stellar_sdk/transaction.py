@@ -243,5 +243,5 @@ class Transaction:
         return (
             f"<Transaction [source={self.source}, sequence={self.sequence}, "
             f"fee={self.fee}, operations={self.operations}, memo={self.memo}, "
-            f"time_bounds={self.time_bounds}, v1={self.v1}]>"
+            f"preconditions={self.preconditions}, v1={self.v1}]>"
         )

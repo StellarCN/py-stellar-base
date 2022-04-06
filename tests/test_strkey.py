@@ -365,6 +365,7 @@ class TestStrKey:
                 False,
             ),
             ("GAQAA5L65LSYH7CQ3VTJ7F3HHLGCL3DSLAR2Y47263D56MNNGHSQSTVY", False),
+            ("PA3D5KRYM6CB7OWQ6TWYRR3Z4T7GNZLKERYNZGGA5SOAOPIFY6YQGAAAAAAGK7I", False),
         ],
     )
     def test_is_valid_ed25519_signed_payload(self, key, valid):

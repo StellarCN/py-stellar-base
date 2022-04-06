@@ -16,6 +16,7 @@ from .type_checked import type_checked
 
 __all__ = ["StrKey"]
 
+
 class _VersionByte(Enum):
     ED25519_PUBLIC_KEY = binascii.a2b_hex("30")  # G 48 6 << 3
     ED25519_SECRET_SEED = binascii.a2b_hex("90")  # S 144 18 << 3
@@ -315,7 +316,7 @@ def _is_valid(version_byte: _VersionByte, encoded: str) -> bool:
 @type_checked
 def _get_version_byte_for_prefix(encoded: str) -> _VersionByte:
     prefix = encoded[0]
-    _version_byte = ((ord(prefix) - ord("A")) << 3).to_bytes(1, byteorder='big')
+    _version_byte = ((ord(prefix) - ord("A")) << 3).to_bytes(1, byteorder="big")
     return _VersionByte(_version_byte)
 
 

@@ -1,6 +1,6 @@
 import pytest
 
-from stellar_sdk import Preconditions, TimeBounds, LedgerBounds, SignerKey
+from stellar_sdk import LedgerBounds, Preconditions, SignerKey, TimeBounds
 
 
 class TestPreconditions:
@@ -54,9 +54,12 @@ class TestPreconditions:
 
     def test_xdr_with_extra_signers(self):
         extra_signers = [
-            SignerKey.from_encoded_signer_key("GBJCHUKZMTFSLOMNC7P4TS4VJJBTCYL3XKSOLXAUJSD56C4LHND5TWUC"),
             SignerKey.from_encoded_signer_key(
-                "PA7QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLTJJFC7MGXUA74P7UJUAAAAAQACAQDAQCQMBYIBEFAWDANBYHRAEISCMKBKFQXDAMRUGY4DUPB6IBZGM")
+                "GBJCHUKZMTFSLOMNC7P4TS4VJJBTCYL3XKSOLXAUJSD56C4LHND5TWUC"
+            ),
+            SignerKey.from_encoded_signer_key(
+                "PA7QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLTJJFC7MGXUA74P7UJUAAAAAQACAQDAQCQMBYIBEFAWDANBYHRAEISCMKBKFQXDAMRUGY4DUPB6IBZGM"
+            ),
         ]
         cond = Preconditions(extra_signers=extra_signers)
         xdr_object = cond.to_xdr_object()
@@ -69,16 +72,23 @@ class TestPreconditions:
             SignerKey.from_encoded_signer_key(
                 "PA7QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLTJJFC7MGXUA74P7UJUAAAAAQACAQDAQCQMBYIBEFAWDANBYHRAEISCMKBKFQXDAMRUGY4DUPB6IBZGM"
             ),
-            SignerKey.from_encoded_signer_key("GBJCHUKZMTFSLOMNC7P4TS4VJJBTCYL3XKSOLXAUJSD56C4LHND5TWUC"),
-            SignerKey.from_encoded_signer_key("GDQERENWDDSQZS7R7WKHZI3BSOYMV3FSWR7TFUYFTKQ447PIX6NREOJM"),
+            SignerKey.from_encoded_signer_key(
+                "GBJCHUKZMTFSLOMNC7P4TS4VJJBTCYL3XKSOLXAUJSD56C4LHND5TWUC"
+            ),
+            SignerKey.from_encoded_signer_key(
+                "GDQERENWDDSQZS7R7WKHZI3BSOYMV3FSWR7TFUYFTKQ447PIX6NREOJM"
+            ),
         ]
-        with pytest.raises(ValueError, match="extra_signers cannot be longer than 2 elements."):
+        with pytest.raises(
+            ValueError, match="extra_signers cannot be longer than 2 elements."
+        ):
             Preconditions(extra_signers=extra_signers)
 
     def test_xdr_with_too_many_extra_signers_raise(self):
         extra_signers = [
             SignerKey.from_encoded_signer_key(
-                "PA7QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLTJJFC7MGXUA74P7UJUAAAAAQACAQDAQCQMBYIBEFAWDANBYHRAEISCMKBKFQXDAMRUGY4DUPB6IBZGM")
+                "PA7QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLTJJFC7MGXUA74P7UJUAAAAAQACAQDAQCQMBYIBEFAWDANBYHRAEISCMKBKFQXDAMRUGY4DUPB6IBZGM"
+            )
         ]
         cond = Preconditions(extra_signers=extra_signers)
         xdr_object = cond.to_xdr_object()
@@ -93,12 +103,21 @@ class TestPreconditions:
         min_sequence_age = 1649239999
         min_sequence_ledger_gap = 30
         extra_signers = [
-            SignerKey.from_encoded_signer_key("GBJCHUKZMTFSLOMNC7P4TS4VJJBTCYL3XKSOLXAUJSD56C4LHND5TWUC"),
             SignerKey.from_encoded_signer_key(
-                "PA7QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLTJJFC7MGXUA74P7UJUAAAAAQACAQDAQCQMBYIBEFAWDANBYHRAEISCMKBKFQXDAMRUGY4DUPB6IBZGM")
+                "GBJCHUKZMTFSLOMNC7P4TS4VJJBTCYL3XKSOLXAUJSD56C4LHND5TWUC"
+            ),
+            SignerKey.from_encoded_signer_key(
+                "PA7QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLTJJFC7MGXUA74P7UJUAAAAAQACAQDAQCQMBYIBEFAWDANBYHRAEISCMKBKFQXDAMRUGY4DUPB6IBZGM"
+            ),
         ]
-        cond = Preconditions(time_bounds, ledger_bounds, min_sequence_number, min_sequence_age, min_sequence_ledger_gap,
-                             extra_signers)
+        cond = Preconditions(
+            time_bounds,
+            ledger_bounds,
+            min_sequence_number,
+            min_sequence_age,
+            min_sequence_ledger_gap,
+            extra_signers,
+        )
         xdr_object = cond.to_xdr_object()
         restore_cond = Preconditions.from_xdr_object(xdr_object)
         assert cond == restore_cond
@@ -110,10 +129,15 @@ class TestPreconditions:
         min_sequence_number = 0
         min_sequence_age = 0
         min_sequence_ledger_gap = 0
-        extra_signers = [
-        ]
-        cond = Preconditions(time_bounds, ledger_bounds, min_sequence_number, min_sequence_age, min_sequence_ledger_gap,
-                             extra_signers)
+        extra_signers = []
+        cond = Preconditions(
+            time_bounds,
+            ledger_bounds,
+            min_sequence_number,
+            min_sequence_age,
+            min_sequence_ledger_gap,
+            extra_signers,
+        )
         xdr_object = cond.to_xdr_object()
         restore_cond = Preconditions.from_xdr_object(xdr_object)
 
@@ -122,5 +146,7 @@ class TestPreconditions:
         assert cond.ledger_bounds == restore_cond.ledger_bounds
         assert cond.min_sequence_number == restore_cond.min_sequence_number == 0
         assert cond.min_sequence_age is restore_cond.min_sequence_age is None
-        assert cond.min_sequence_ledger_gap is restore_cond.min_sequence_ledger_gap is None
+        assert (
+            cond.min_sequence_ledger_gap is restore_cond.min_sequence_ledger_gap is None
+        )
         assert cond.extra_signers is restore_cond.extra_signers is None

@@ -335,7 +335,9 @@ class TransactionBuilder:
         self.min_sequence_ledger_gap = min_sequence_ledger_gap
         return self
 
-    def add_extra_signer(self, signer_key: Union[SignerKey, str]) -> "TransactionBuilder":
+    def add_extra_signer(
+        self, signer_key: Union[SignerKey, str]
+    ) -> "TransactionBuilder":
         """For the transaction to be valid, there must be a signature corresponding to every
         Signer in this array, even if the signature is not otherwise required by
         the source account or operations.
@@ -1197,5 +1199,11 @@ class TransactionBuilder:
             f"<TransactionBuilder [source_account={self.source_account}, "
             f"base_fee={self.base_fee}, network_passphrase={self.network_passphrase}, "
             f"operations={self.operations}, memo={self.memo}, "
-            f"time_bounds={self.time_bounds}, v1={self.v1}]>"
+            f"time_bounds={self.time_bounds}, "
+            f"ledger_bounds={self.ledger_bounds}, "
+            f"min_sequence_number={self.min_sequence_number}, "
+            f"min_sequence_age={self.min_sequence_age}, "
+            f"min_sequence_ledger_gap={self.min_sequence_ledger_gap}, "
+            f"extra_signers={self.extra_signers}, "
+            f"v1={self.v1}]>"
         )
