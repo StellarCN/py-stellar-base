@@ -89,7 +89,7 @@ class TransactionEnvelope(BaseTransactionEnvelope["TransactionEnvelope"]):
             ):
                 continue
 
-            signed_payload_signer_key = extra_signer.to_signed_payload_signer_key()
+            signed_payload_signer_key = extra_signer.to_signed_payload_signer()
             if signed_payload_signer_key.account_id != signer_account_id:
                 continue
             sig = signer.sign_decorated_for_payload(signed_payload_signer_key.payload)
