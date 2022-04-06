@@ -30,7 +30,7 @@ class _VersionByte(Enum):
     PRE_AUTH_TX = binascii.a2b_hex("98")  # T 152 19 << 3
     SHA256_HASH = binascii.a2b_hex("b8")  # X 184 23 << 3
     MUXED_ACCOUNT = binascii.a2b_hex("60")  # M 96 12 << 3
-    ED25519_SIGNED_PAYLOAD = binascii.a2b_hex("78")  # P 96 15 << 3
+    ED25519_SIGNED_PAYLOAD = binascii.a2b_hex("78")  # P 120 15 << 3
 
 
 @type_checked
@@ -323,7 +323,7 @@ def _is_valid(version_byte: _VersionByte, encoded: str) -> bool:
 @type_checked
 def _get_version_byte_for_prefix(encoded: str) -> _VersionByte:
     prefix = encoded[0]
-    _version_byte = ord(prefix) - ord("A")
+    _version_byte = ((ord(prefix) - ord("A")) << 3).to_bytes(1, byteorder='big')
     return _VersionByte(_version_byte)
 
 

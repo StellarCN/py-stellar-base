@@ -24,10 +24,7 @@ class LedgerBounds:
             raise ValueError("max_ledger cannot be negative.")
 
         if 0 < max_ledger < min_ledger:
-            raise ValueError(
-                "max_ledger should be greater than or equal to min_ledger, "
-                "unless max_ledger is set to 0."
-            )
+            raise ValueError("min_ledger cannot be greater than max_ledger.")
 
         self.min_ledger: int = min_ledger
         self.max_ledger: int = max_ledger
