@@ -29,8 +29,7 @@ class TestLedgerBounds:
             (
                 1560844455,
                 156084454,
-                "max_ledger should be greater than or equal to min_ledger, "
-                "unless max_ledger is set to 0.",
+                "min_ledger cannot be greater than max_ledger.",
             ),
         ],
     )
