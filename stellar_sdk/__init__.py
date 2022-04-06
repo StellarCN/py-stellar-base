@@ -28,7 +28,6 @@ from .preconditions import *
 from .price import *
 from .server import *
 from .server_async import *
-from .signed_payload_signer import *
 from .signer import *
 from .signer_key import *
 from .strkey import *

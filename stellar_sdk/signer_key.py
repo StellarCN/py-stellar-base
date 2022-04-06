@@ -7,7 +7,7 @@ from .exceptions import ValueError
 from .strkey import StrKey
 from .type_checked import type_checked
 
-__all__ = ["SignerKey", "SignerKeyType"]
+__all__ = ["SignerKey", "SignerKeyType", "SignedPayloadSigner"]
 
 
 class SignerKeyType(IntEnum):
@@ -15,6 +15,27 @@ class SignerKeyType(IntEnum):
     SIGNER_KEY_TYPE_PRE_AUTH_TX = 1
     SIGNER_KEY_TYPE_HASH_X = 2
     SIGNER_KEY_TYPE_ED25519_SIGNED_PAYLOAD = 3
+
+
+@type_checked
+class SignedPayloadSigner:
+    """The :class:`SignedPayloadSigner` object, which represents a signed payload signer on Stellar's network.
+
+    :param account_id: The account id.
+    :param payload: The raw payload.
+    """
+
+    def __init__(self, account_id: str, payload: bytes) -> None:
+        self.account_id: str = account_id
+        self.payload: bytes = payload
+
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, self.__class__):
+            return NotImplemented
+        return self.account_id == other.account_id and self.payload == self.payload
+
+    def __str__(self):
+        return f"<SignedPayloadSigner [account_id={self.account_id}, payload={self.payload}]>"
 
 
 @type_checked
@@ -90,7 +111,7 @@ class SignerKey:
 
     @classmethod
     def ed25519_signed_payload(
-        cls, ed25519_signed_payload: Union[str, bytes]
+        cls, ed25519_signed_payload: Union[str, bytes, SignedPayloadSigner]
     ) -> "SignerKey":
         """Create ed25519 signed payload Signer from an ed25519 signed payload.
 
@@ -103,7 +124,28 @@ class SignerKey:
             ed25519_signed_payload = StrKey.decode_ed25519_signed_payload(
                 ed25519_signed_payload
             )
+        if isinstance(ed25519_signed_payload, SignedPayloadSigner):
+            decoded_account_id = StrKey.decode_ed25519_public_key(
+                ed25519_signed_payload.account_id
+            )
+            payload_length = len(ed25519_signed_payload.payload)
+            payload = ed25519_signed_payload.payload
+            payload += b"\0" * ((4 - payload_length % 4) % 4)
+            ed25519_signed_payload = (
+                decoded_account_id
+                + int.to_bytes(payload_length, length=4, byteorder="big")
+                + payload
+            )
         return cls(signer_key=ed25519_signed_payload, signer_key_type=signer_key_type)
+
+    def to_signed_payload_signer(self) -> "SignedPayloadSigner":
+        if self.signer_key_type != SignerKeyType.SIGNER_KEY_TYPE_ED25519_SIGNED_PAYLOAD:
+            raise ValueError(f"Unsupported SignerKeyType.")
+
+        payload_length = int.from_bytes(self.signer_key[32:36], byteorder="big")
+        account_id = StrKey.encode_ed25519_public_key(self.signer_key[:32])
+        payload = self.signer_key[36 : 36 + payload_length]
+        return SignedPayloadSigner(account_id, payload)
 
     def to_xdr_object(self) -> stellar_xdr.SignerKey:
         """Returns the xdr object for this SignerKey object.
@@ -164,16 +206,14 @@ class SignerKey:
             == stellar_xdr.SignerKeyType.SIGNER_KEY_TYPE_ED25519_SIGNED_PAYLOAD
         ):
             assert xdr_object.ed25519_signed_payload is not None
-            ed25519 = xdr_object.ed25519_signed_payload.ed25519.uint256
-            payload = xdr_object.ed25519_signed_payload.payload
-            payload_length = len(payload)
-            payload += b"\0" * ((4 - payload_length % 4) % 4)
-            signer_key = (
-                ed25519
-                + int.to_bytes(payload_length, length=4, byteorder="big")
-                + payload
+            encoded_account_id = StrKey.encode_ed25519_public_key(
+                xdr_object.ed25519_signed_payload.ed25519.uint256
             )
-            return cls(signer_key, SignerKeyType.SIGNER_KEY_TYPE_ED25519_SIGNED_PAYLOAD)
+            payload = xdr_object.ed25519_signed_payload.payload
+            ed25519_signed_payload = SignedPayloadSigner(encoded_account_id, payload)
+            return cls.ed25519_signed_payload(
+                ed25519_signed_payload=ed25519_signed_payload
+            )
         else:
             raise ValueError(
                 f"This is an unknown signer key type, please consider creating an issuer at {__issues__}."

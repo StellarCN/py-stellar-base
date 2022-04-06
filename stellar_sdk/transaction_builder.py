@@ -19,7 +19,6 @@ from .network import Network
 from .operation import *
 from .preconditions import Preconditions
 from .price import Price
-from .signed_payload_signer import SignedPayloadSigner
 from .signer import Signer
 from .signer_key import SignerKey
 from .time_bounds import TimeBounds
@@ -99,7 +98,7 @@ class TransactionBuilder:
         self.min_sequence_number: Optional[int] = None
         self.min_sequence_age: Optional[int] = None
         self.min_sequence_ledger_gap: Optional[int] = None
-        self.extra_signers: List[SignedPayloadSigner] = []
+        self.extra_signers: List[SignerKey] = []
         self.memo: Memo = NoneMemo()
         self.v1: bool = v1
 
@@ -336,18 +335,16 @@ class TransactionBuilder:
         self.min_sequence_ledger_gap = min_sequence_ledger_gap
         return self
 
-    def add_extra_signer(self, account_id: str, payload: bytes) -> "TransactionBuilder":
+    def add_extra_signer(self, signer_key: SignerKey) -> "TransactionBuilder":
         """For the transaction to be valid, there must be a signature corresponding to every
         Signer in this array, even if the signature is not otherwise required by
         the source account or operations.
-        Internally this will set the :class:`SignedPayloadSigner` precondition.
+        Internally this will set the :class:`SignerKey` precondition.
 
-        :param account_id: The account id, this account needs to sign `payload`.
-        :param payload: The payload.
+        :param signer_key: The signer key
         :return: This builder instance.
         """
-        signer = SignedPayloadSigner(account_id, payload)
-        self.extra_signers.append(signer)
+        self.extra_signers.append(signer_key)
         return self
 
     def add_memo(self, memo: Memo) -> "TransactionBuilder":

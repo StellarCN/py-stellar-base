@@ -2,7 +2,7 @@ from typing import List, Optional
 
 from . import xdr as stellar_xdr
 from .ledger_bounds import LedgerBounds
-from .signed_payload_signer import SignedPayloadSigner
+from .signer_key import SignerKey
 from .time_bounds import TimeBounds
 
 
@@ -33,7 +33,7 @@ class Preconditions:
         min_sequence_number: int = None,
         min_sequence_age: int = None,
         min_sequence_ledger_gap: int = None,
-        extra_signers: List[SignedPayloadSigner] = None,
+        extra_signers: List[SignerKey] = None,
     ):
         self.time_bounds = time_bounds
         self.ledger_bounds = ledger_bounds
@@ -151,9 +151,8 @@ class Preconditions:
                 else None
             ) or None
             if xdr_object.v2.extra_signers:
-                extra_signers: Optional[List[SignedPayloadSigner]] = [
-                    SignedPayloadSigner.from_xdr_object(s)
-                    for s in xdr_object.v2.extra_signers
+                extra_signers: Optional[List[SignerKey]] = [
+                    SignerKey.from_xdr_object(s) for s in xdr_object.v2.extra_signers
                 ]
             else:
                 extra_signers = None

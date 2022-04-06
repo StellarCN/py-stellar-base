@@ -7,6 +7,7 @@ from .base_transaction_envelope import BaseTransactionEnvelope
 from .decorated_signature import DecoratedSignature
 from .exceptions import SignatureExistError
 from .keypair import Keypair
+from .signer_key import SignerKeyType
 from .transaction import Transaction
 from .type_checked import type_checked
 
@@ -82,9 +83,16 @@ class TransactionEnvelope(BaseTransactionEnvelope["TransactionEnvelope"]):
         ):
             return
         for extra_signer in self.transaction.preconditions.extra_signers:
-            if extra_signer.account_id != signer_account_id:
-                return
-            sig = signer.sign_decorated_for_payload(extra_signer.payload)
+            if (
+                extra_signer.signer_key_type
+                != SignerKeyType.SIGNER_KEY_TYPE_ED25519_SIGNED_PAYLOAD
+            ):
+                continue
+
+            signed_payload_signer_key = extra_signer.to_signed_payload_signer_key()
+            if signed_payload_signer_key.account_id != signer_account_id:
+                continue
+            sig = signer.sign_decorated_for_payload(signed_payload_signer_key.payload)
             if sig in self.signatures:
                 raise SignatureExistError("The keypair has already signed.")
             else:
