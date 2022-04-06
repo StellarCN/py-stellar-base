@@ -1,3 +1,5 @@
+import pytest
+
 from stellar_sdk import Preconditions, TimeBounds, LedgerBounds, SignerKey
 
 
@@ -63,6 +65,17 @@ class TestPreconditions:
         assert xdr_object == restore_cond.to_xdr_object()
 
     def test_xdr_with_one_extra_signers(self):
+        extra_signers = [
+            SignerKey.from_encoded_signer_key(
+                "PA7QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLTJJFC7MGXUA74P7UJUAAAAAQACAQDAQCQMBYIBEFAWDANBYHRAEISCMKBKFQXDAMRUGY4DUPB6IBZGM"
+            ),
+            SignerKey.from_encoded_signer_key("GBJCHUKZMTFSLOMNC7P4TS4VJJBTCYL3XKSOLXAUJSD56C4LHND5TWUC"),
+            SignerKey.from_encoded_signer_key("GDQERENWDDSQZS7R7WKHZI3BSOYMV3FSWR7TFUYFTKQ447PIX6NREOJM"),
+        ]
+        with pytest.raises(ValueError, match="extra_signers cannot be longer than 2 elements."):
+            Preconditions(extra_signers=extra_signers)
+
+    def test_xdr_with_too_many_extra_signers_raise(self):
         extra_signers = [
             SignerKey.from_encoded_signer_key(
                 "PA7QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLTJJFC7MGXUA74P7UJUAAAAAQACAQDAQCQMBYIBEFAWDANBYHRAEISCMKBKFQXDAMRUGY4DUPB6IBZGM")
