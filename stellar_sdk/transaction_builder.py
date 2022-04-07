@@ -298,7 +298,7 @@ class TransactionBuilder:
         Internally this will set the `min_sequence_number` precondition.
 
         :param min_sequence_number: The minimum source account sequence
-            number this transaction is valid for. If the value is ``0`` or ``None``
+            number this transaction is valid for. If the value is ``None``
             the transaction is valid when **source account's sequence number == tx.sequence - 1**.
         :return: This builder instance.
         """

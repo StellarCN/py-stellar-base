@@ -13,7 +13,7 @@ class Preconditions:
     :param time_bounds: required extra signers.
     :param ledger_bounds: required extra signers.
     :param min_sequence_number: The minimum source account sequence
-        number this transaction is valid for. If the value is ``0`` or ``None``,
+        number this transaction is valid for. If the value is ``None``,
         the transaction is valid when **source account's sequence number == tx.sequence - 1**.
     :param min_sequence_age: The minimum amount of time between
         source account sequence time and the ledger time when this transaction
