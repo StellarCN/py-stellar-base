@@ -285,7 +285,7 @@ def _decode_check(version_byte: _VersionByte, encoded: str) -> bytes:
     if expected_checksum != checksum:
         raise ValueError("Invalid checksum")
     if version_byte == _VersionByte.ED25519_SIGNED_PAYLOAD:
-        if len(data) < 32 + 4 + 4:
+        if len(data) < 32 + 4 + 4 or len(data) > 32 + 4 + 64:
             raise ValueError(f"Invalid Ed25519 Signed Payload Key: {data!r}")
         payload_length_prefix = int.from_bytes(data[32:36], byteorder="big")
         if len(data[36:]) % 4 != 0:
