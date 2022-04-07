@@ -111,7 +111,6 @@ class LedgerHeader:
         self.base_fee.pack(packer)
         self.base_reserve.pack(packer)
         self.max_tx_set_size.pack(packer)
-        packer.pack_uint(4)
         for skip_list_item in self.skip_list:
             skip_list_item.pack(packer)
         self.ext.pack(packer)
@@ -131,7 +130,7 @@ class LedgerHeader:
         base_fee = Uint32.unpack(unpacker)
         base_reserve = Uint32.unpack(unpacker)
         max_tx_set_size = Uint32.unpack(unpacker)
-        length = unpacker.unpack_uint()
+        length = 4
         skip_list = []
         for _ in range(length):
             skip_list.append(Hash.unpack(unpacker))
