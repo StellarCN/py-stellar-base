@@ -35,6 +35,7 @@ class InnerTransactionResultResult:
             case txNOT_SUPPORTED:
             // txFEE_BUMP_INNER_FAILED is not included
             case txBAD_SPONSORSHIP:
+            case txBAD_MIN_SEQ_AGE_OR_GAP:
                 void;
             }
     """
@@ -91,6 +92,8 @@ class InnerTransactionResultResult:
             return
         if self.code == TransactionResultCode.txBAD_SPONSORSHIP:
             return
+        if self.code == TransactionResultCode.txBAD_MIN_SEQ_AGE_OR_GAP:
+            return
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "InnerTransactionResultResult":
@@ -130,6 +133,8 @@ class InnerTransactionResultResult:
         if code == TransactionResultCode.txNOT_SUPPORTED:
             return cls(code=code)
         if code == TransactionResultCode.txBAD_SPONSORSHIP:
+            return cls(code=code)
+        if code == TransactionResultCode.txBAD_MIN_SEQ_AGE_OR_GAP:
             return cls(code=code)
         return cls(code=code)
 

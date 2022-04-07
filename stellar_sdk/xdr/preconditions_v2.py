@@ -23,8 +23,9 @@ class PreconditionsV2:
         struct PreconditionsV2 {
             TimeBounds *timeBounds;
 
-            // Transaciton only valid for ledger numbers n such that
-            // minLedger <= n < maxLedger
+            // Transaction only valid for ledger numbers n such that
+            // minLedger <= n < maxLedger (if maxLedger == 0, then
+            // only minLedger is checked)
             LedgerBounds *ledgerBounds;
 
             // If NULL, only valid when sourceAccount's sequence number

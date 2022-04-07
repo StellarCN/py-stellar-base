@@ -6,8 +6,7 @@ from xdrlib import Packer, Unpacker
 
 from ..type_checked import type_checked
 from .claim_predicate_type import ClaimPredicateType
-from .duration import Duration
-from .time_point import TimePoint
+from .int64 import Int64
 
 __all__ = ["ClaimPredicate"]
 
@@ -28,9 +27,9 @@ class ClaimPredicate:
         case CLAIM_PREDICATE_NOT:
             ClaimPredicate* notPredicate;
         case CLAIM_PREDICATE_BEFORE_ABSOLUTE_TIME:
-            TimePoint absBefore; // Predicate will be true if closeTime < absBefore
+            int64 absBefore; // Predicate will be true if closeTime < absBefore
         case CLAIM_PREDICATE_BEFORE_RELATIVE_TIME:
-            Duration relBefore; // Seconds since closeTime of the ledger in which the
+            int64 relBefore; // Seconds since closeTime of the ledger in which the
                                 // ClaimableBalanceEntry was created
         };
     """
@@ -41,8 +40,8 @@ class ClaimPredicate:
         and_predicates: List["ClaimPredicate"] = None,
         or_predicates: List["ClaimPredicate"] = None,
         not_predicate: Optional["ClaimPredicate"] = None,
-        abs_before: TimePoint = None,
-        rel_before: Duration = None,
+        abs_before: Int64 = None,
+        rel_before: Int64 = None,
     ) -> None:
         if and_predicates and len(and_predicates) > 2:
             raise ValueError(
@@ -120,10 +119,10 @@ class ClaimPredicate:
             )
             return cls(type=type, not_predicate=not_predicate)
         if type == ClaimPredicateType.CLAIM_PREDICATE_BEFORE_ABSOLUTE_TIME:
-            abs_before = TimePoint.unpack(unpacker)
+            abs_before = Int64.unpack(unpacker)
             return cls(type=type, abs_before=abs_before)
         if type == ClaimPredicateType.CLAIM_PREDICATE_BEFORE_RELATIVE_TIME:
-            rel_before = Duration.unpack(unpacker)
+            rel_before = Int64.unpack(unpacker)
             return cls(type=type, rel_before=rel_before)
         return cls(type=type)
 

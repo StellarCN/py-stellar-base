@@ -579,14 +579,15 @@ struct TimeBounds
 struct LedgerBounds
 {
     uint32 minLedger;
-    uint32 maxLedger;
+    uint32 maxLedger; // 0 here means no maxLedger
 };
 
 struct PreconditionsV2 {
     TimeBounds *timeBounds;
 
-    // Transaciton only valid for ledger numbers n such that
-    // minLedger <= n < maxLedger
+    // Transaction only valid for ledger numbers n such that
+    // minLedger <= n < maxLedger (if maxLedger == 0, then
+    // only minLedger is checked)
     LedgerBounds *ledgerBounds;
 
     // If NULL, only valid when sourceAccount's sequence number
@@ -1560,7 +1561,8 @@ enum TransactionResultCode
 
     txNOT_SUPPORTED = -12,         // transaction type not supported
     txFEE_BUMP_INNER_FAILED = -13, // fee bump inner transaction failed
-    txBAD_SPONSORSHIP = -14        // sponsorship not confirmed
+    txBAD_SPONSORSHIP = -14,       // sponsorship not confirmed
+    txBAD_MIN_SEQ_AGE_OR_GAP = -15 //minSeqAge or minSeqLedgerGap conditions not met
 };
 
 // InnerTransactionResult must be binary compatible with TransactionResult
@@ -1589,6 +1591,7 @@ struct InnerTransactionResult
     case txNOT_SUPPORTED:
     // txFEE_BUMP_INNER_FAILED is not included
     case txBAD_SPONSORSHIP:
+    case txBAD_MIN_SEQ_AGE_OR_GAP:
         void;
     }
     result;

@@ -17,7 +17,7 @@ class LedgerBounds:
         struct LedgerBounds
         {
             uint32 minLedger;
-            uint32 maxLedger;
+            uint32 maxLedger; // 0 here means no maxLedger
         };
     """
 

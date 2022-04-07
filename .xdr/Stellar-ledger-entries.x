@@ -13,7 +13,7 @@ typedef string string32<32>;
 typedef string string64<64>;
 typedef int64 SequenceNumber;
 typedef uint64 TimePoint;
-typedef int64 Duration;
+typedef uint64 Duration;
 typedef opaque DataValue<64>;
 typedef Hash PoolID; // SHA256(LiquidityPoolParameters)
 
@@ -384,9 +384,9 @@ case CLAIM_PREDICATE_OR:
 case CLAIM_PREDICATE_NOT:
     ClaimPredicate* notPredicate;
 case CLAIM_PREDICATE_BEFORE_ABSOLUTE_TIME:
-    TimePoint absBefore; // Predicate will be true if closeTime < absBefore
+    int64 absBefore; // Predicate will be true if closeTime < absBefore
 case CLAIM_PREDICATE_BEFORE_RELATIVE_TIME:
-    Duration relBefore; // Seconds since closeTime of the ledger in which the
+    int64 relBefore; // Seconds since closeTime of the ledger in which the
                         // ClaimableBalanceEntry was created
 };
 

@@ -86,9 +86,9 @@ class Preconditions:
                 else None
             )
             min_sequence_age = (
-                stellar_xdr.Duration(stellar_xdr.Int64(self.min_sequence_age))
+                stellar_xdr.Duration(stellar_xdr.Uint64(self.min_sequence_age))
                 if self.min_sequence_age is not None
-                else stellar_xdr.Duration(stellar_xdr.Int64(0))
+                else stellar_xdr.Duration(stellar_xdr.Uint64(0))
             )
             min_sequence_ledger_gap = (
                 stellar_xdr.Uint32(self.min_sequence_ledger_gap)
@@ -148,7 +148,7 @@ class Preconditions:
                 else None
             )
             min_sequence_age = (
-                xdr_object.v2.min_seq_age.duration.int64
+                xdr_object.v2.min_seq_age.duration.uint64
                 if xdr_object.v2.min_seq_age
                 else None
             )

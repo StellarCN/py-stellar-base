@@ -4,7 +4,7 @@ import base64
 from xdrlib import Packer, Unpacker
 
 from ..type_checked import type_checked
-from .int64 import Int64
+from .uint64 import Uint64
 
 __all__ = ["Duration"]
 
@@ -14,10 +14,10 @@ class Duration:
     """
     XDR Source Code::
 
-        typedef int64 Duration;
+        typedef uint64 Duration;
     """
 
-    def __init__(self, duration: Int64) -> None:
+    def __init__(self, duration: Uint64) -> None:
         self.duration = duration
 
     def pack(self, packer: Packer) -> None:
@@ -25,7 +25,7 @@ class Duration:
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "Duration":
-        duration = Int64.unpack(unpacker)
+        duration = Uint64.unpack(unpacker)
         return cls(duration)
 
     def to_xdr_bytes(self) -> bytes:
