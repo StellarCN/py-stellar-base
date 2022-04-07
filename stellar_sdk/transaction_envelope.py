@@ -63,14 +63,13 @@ class TransactionEnvelope(BaseTransactionEnvelope["TransactionEnvelope"]):
         tx.to_xdr_object().pack(packer)
         return network_id + packer.get_buffer()
 
-    def sign_extra_signers(self, signer: Union[Keypair, str]) -> None:
-        """Sign this transaction envelope with a given keypair.
+    def sign_extra_signers_payload(self, signer: Union[Keypair, str]) -> None:
+        """Sign this extra signers' payload with a given keypair.
 
         Note that the signature must not already be in this instance's list of
         signatures.
 
-        :param signer: The keypair or secret to use for signing this transaction
-            envelope.
+        :param signer: The keypair or secret to use for signing this extra signers' payload.
         :raise: :exc:`SignatureExistError <stellar_sdk.exception.SignatureExistError>`:
             if this signature already exists.
         """
