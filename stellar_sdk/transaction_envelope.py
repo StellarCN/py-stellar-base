@@ -1,10 +1,13 @@
 import copy
-from typing import List
+from typing import List, Union
 from xdrlib import Packer
 
 from . import xdr as stellar_xdr
 from .base_transaction_envelope import BaseTransactionEnvelope
 from .decorated_signature import DecoratedSignature
+from .exceptions import SignatureExistError
+from .keypair import Keypair
+from .signer_key import SignerKeyType
 from .transaction import Transaction
 from .type_checked import type_checked
 
@@ -59,6 +62,40 @@ class TransactionEnvelope(BaseTransactionEnvelope["TransactionEnvelope"]):
         stellar_xdr.EnvelopeType.ENVELOPE_TYPE_TX.pack(packer)
         tx.to_xdr_object().pack(packer)
         return network_id + packer.get_buffer()
+
+    def sign_extra_signers_payload(self, signer: Union[Keypair, str]) -> None:
+        """Sign this extra signers' payload with a given keypair.
+
+        Note that the signature must not already be in this instance's list of
+        signatures.
+
+        :param signer: The keypair or secret to use for signing this extra signers' payload.
+        :raise: :exc:`SignatureExistError <stellar_sdk.exception.SignatureExistError>`:
+            if this signature already exists.
+        """
+        if isinstance(signer, str):
+            signer = Keypair.from_secret(signer)
+        signer_account_id = signer.public_key
+        if (
+            not self.transaction.preconditions
+            or not self.transaction.preconditions.extra_signers
+        ):
+            return
+        for extra_signer in self.transaction.preconditions.extra_signers:
+            if (
+                extra_signer.signer_key_type
+                != SignerKeyType.SIGNER_KEY_TYPE_ED25519_SIGNED_PAYLOAD
+            ):
+                continue
+
+            signed_payload_signer_key = extra_signer.to_signed_payload_signer()
+            if signed_payload_signer_key.account_id != signer_account_id:
+                continue
+            sig = signer.sign_payload_decorated(signed_payload_signer_key.payload)
+            if sig in self.signatures:
+                raise SignatureExistError("The keypair has already signed.")
+            else:
+                self.signatures.append(sig)
 
     def to_xdr_object(self) -> stellar_xdr.TransactionEnvelope:
         """Get an XDR object representation of this :class:`TransactionEnvelope`.

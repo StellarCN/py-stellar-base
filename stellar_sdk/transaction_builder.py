@@ -10,12 +10,14 @@ from .exceptions import ValueError
 from .fee_bump_transaction import FeeBumpTransaction
 from .fee_bump_transaction_envelope import FeeBumpTransactionEnvelope
 from .keypair import Keypair
+from .ledger_bounds import LedgerBounds
 from .liquidity_pool_asset import LiquidityPoolAsset
 from .liquidity_pool_id import LiquidityPoolId
 from .memo import *
 from .muxed_account import MuxedAccount
 from .network import Network
 from .operation import *
+from .preconditions import Preconditions
 from .price import Price
 from .signer import Signer
 from .signer_key import SignerKey
@@ -92,6 +94,11 @@ class TransactionBuilder:
         self.network_passphrase: str = network_passphrase
         self.operations: List[Operation] = []
         self.time_bounds: Optional[TimeBounds] = None
+        self.ledger_bounds: Optional[LedgerBounds] = None
+        self.min_sequence_number: Optional[int] = None
+        self.min_sequence_age: Optional[int] = None
+        self.min_sequence_ledger_gap: Optional[int] = None
+        self.extra_signers: List[SignerKey] = []
         self.memo: Memo = NoneMemo()
         self.v1: bool = v1
 
@@ -101,6 +108,7 @@ class TransactionBuilder:
 
         :return: New transaction envelope.
         """
+        # TODO: improve it
         if self.time_bounds is None:
             warnings.warn(
                 "It looks like you haven't set a TimeBounds for the transaction, "
@@ -110,13 +118,21 @@ class TransactionBuilder:
             )
         source = self.source_account.account
         sequence = self.source_account.sequence + 1
+        preconditions = Preconditions(
+            time_bounds=self.time_bounds,
+            ledger_bounds=self.ledger_bounds,
+            min_sequence_number=self.min_sequence_number,
+            min_sequence_age=self.min_sequence_age,
+            min_sequence_ledger_gap=self.min_sequence_ledger_gap,
+            extra_signers=self.extra_signers,
+        )
         transaction = Transaction(
             source=source,
             sequence=sequence,
             fee=self.base_fee * len(self.operations),
             operations=self.operations,
             memo=self.memo,
-            time_bounds=self.time_bounds,
+            preconditions=preconditions,
             v1=self.v1,
         )
         transaction_envelope = TransactionEnvelope(
@@ -205,13 +221,29 @@ class TransactionBuilder:
             ),
             v1=transaction_envelope.transaction.v1,
         )
-        transaction_builder.time_bounds = transaction_envelope.transaction.time_bounds
+        if transaction_envelope.transaction.preconditions:
+            transaction_builder.time_bounds = (
+                transaction_envelope.transaction.preconditions.time_bounds
+            )
         transaction_builder.operations = transaction_envelope.transaction.operations
         transaction_builder.memo = transaction_envelope.transaction.memo
         return transaction_builder
 
     def add_time_bounds(self, min_time: int, max_time: int) -> "TransactionBuilder":
-        """Add a time bound to this transaction.
+        """Sets a timeout precondition on the transaction.
+
+        Because of the distributed nature of the Stellar network it is possible
+        that the status of your transaction will be determined after a long time
+        if the network is highly congested. If you want to be sure to receive the
+        status of the transaction within a given period you should set
+        the :class:`TimeBounds` with `max_time` on the transaction (this is
+        what :func:`set_timeout` does internally).
+
+        Please note that Horizon may still return **504 Gateway Timeout**
+        error, even for short timeouts. In such case you need to resubmit the same
+        transaction again without making any changes to receive a status. This
+        method is using the machine system time (UTC), make sure it is set
+        correctly.
 
         Add a UNIX timestamp, determined by ledger time, of a lower and
         upper bound of when this transaction will be valid. If a transaction is
@@ -227,7 +259,7 @@ class TransactionBuilder:
         return self
 
     def set_timeout(self, timeout: int) -> "TransactionBuilder":
-        """Set timeout for the transaction, actually set a TimeBounds.
+        """Set timeout for the transaction, actually set a :class:`TimeBounds`.
 
         :param timeout: timeout in second.
         :return: This builder instance.
@@ -240,6 +272,83 @@ class TransactionBuilder:
             )
         timeout_timestamp = int(time.time()) + timeout
         self.time_bounds = TimeBounds(min_time=0, max_time=timeout_timestamp)
+        return self
+
+    def set_ledger_bounds(
+        self, min_ledger: int, max_ledger: int
+    ) -> "TransactionBuilder":
+        """If you want to prepare a transaction which will only
+        be valid within some range of ledgers, you can set a `ledger_bounds` precondition.
+        Internally this will set the :class:`LedgerBounds` preconditions.
+
+        :param min_ledger: The minimum ledger this transaction is valid at, or after.
+            Cannot be negative. If the value is ``0``, the transaction is valid immediately.
+        :param max_ledger: The maximum ledger this transaction is valid before.
+            Cannot be negative. If the value is ``0``, the transaction is valid indefinitely.
+        :return: This builder instance.
+        """
+        self.ledger_bounds = LedgerBounds(min_ledger, max_ledger)
+        return self
+
+    def set_min_sequence_number(self, min_sequence_number: int) -> "TransactionBuilder":
+        """If you want to prepare a transaction which will be valid only while the account sequence number is
+        **min_sequence_number <= source_account_sequence_number < tx.sequence**.
+
+        Note that after execution the account's sequence number is always raised to `tx.sequence`.
+        Internally this will set the `min_sequence_number` precondition.
+
+        :param min_sequence_number: The minimum source account sequence
+            number this transaction is valid for. If the value is ``None``
+            the transaction is valid when **source account's sequence number == tx.sequence - 1**.
+        :return: This builder instance.
+        """
+        self.min_sequence_number = min_sequence_number
+        return self
+
+    def set_min_sequence_age(self, min_sequence_age: int) -> "TransactionBuilder":
+        """For the transaction to be valid, the current ledger time must be
+        at least `min_sequence_age` greater than source account's `sequence_time`.
+        Internally this will set the `min_sequence_age` precondition.
+
+        :param min_sequence_age: The minimum amount of time between
+            source account sequence time and the ledger time when this transaction
+            will become valid. If the value is ``0`` or ``None``, the transaction is unrestricted
+            by the account sequence age. Cannot be negative.
+        :return: This builder instance.
+        """
+        self.min_sequence_age = min_sequence_age
+        return self
+
+    def set_min_sequence_ledger_gap(
+        self, min_sequence_ledger_gap: int
+    ) -> "TransactionBuilder":
+        """For the transaction to be valid, the current ledger number must be at least
+        `min_sequence_ledger_gap` greater than source account's ledger sequence.
+        Internally this will set the `min_sequence_ledger_gap` precondition.
+
+        :param min_sequence_ledger_gap: The minimum number of ledgers between source account
+            sequence and the ledger number when this transaction will become valid.
+            If the value is ``0`` or ``None``, the transaction is unrestricted by the account sequence
+            ledger. Cannot be negative.
+        :return: This builder instance.
+        """
+        self.min_sequence_ledger_gap = min_sequence_ledger_gap
+        return self
+
+    def add_extra_signer(
+        self, signer_key: Union[SignerKey, str]
+    ) -> "TransactionBuilder":
+        """For the transaction to be valid, there must be a signature corresponding to every
+        Signer in this array, even if the signature is not otherwise required by
+        the source account or operations.
+        Internally this will set the :class:`SignerKey` precondition.
+
+        :param signer_key: The signer key
+        :return: This builder instance.
+        """
+        if isinstance(signer_key, str):
+            signer_key = SignerKey.from_encoded_signer_key(signer_key)
+        self.extra_signers.append(signer_key)
         return self
 
     def add_memo(self, memo: Memo) -> "TransactionBuilder":
@@ -1090,5 +1199,11 @@ class TransactionBuilder:
             f"<TransactionBuilder [source_account={self.source_account}, "
             f"base_fee={self.base_fee}, network_passphrase={self.network_passphrase}, "
             f"operations={self.operations}, memo={self.memo}, "
-            f"time_bounds={self.time_bounds}, v1={self.v1}]>"
+            f"time_bounds={self.time_bounds}, "
+            f"ledger_bounds={self.ledger_bounds}, "
+            f"min_sequence_number={self.min_sequence_number}, "
+            f"min_sequence_age={self.min_sequence_age}, "
+            f"min_sequence_ledger_gap={self.min_sequence_ledger_gap}, "
+            f"extra_signers={self.extra_signers}, "
+            f"v1={self.v1}]>"
         )

@@ -5,14 +5,16 @@ from xdrlib import Packer, Unpacker
 
 from ..type_checked import type_checked
 from .account_id import AccountID
+from .asset import Asset
+from .pool_id import PoolID
 from .sequence_number import SequenceNumber
 from .uint32 import Uint32
 
-__all__ = ["OperationIDId"]
+__all__ = ["HashIDPreimageRevokeID"]
 
 
 @type_checked
-class OperationIDId:
+class HashIDPreimageRevokeID:
     """
     XDR Source Code::
 
@@ -21,6 +23,8 @@ class OperationIDId:
                 AccountID sourceAccount;
                 SequenceNumber seqNum;
                 uint32 opNum;
+                PoolID liquidityPoolID;
+                Asset asset;
             }
     """
 
@@ -29,25 +33,35 @@ class OperationIDId:
         source_account: AccountID,
         seq_num: SequenceNumber,
         op_num: Uint32,
+        liquidity_pool_id: PoolID,
+        asset: Asset,
     ) -> None:
         self.source_account = source_account
         self.seq_num = seq_num
         self.op_num = op_num
+        self.liquidity_pool_id = liquidity_pool_id
+        self.asset = asset
 
     def pack(self, packer: Packer) -> None:
         self.source_account.pack(packer)
         self.seq_num.pack(packer)
         self.op_num.pack(packer)
+        self.liquidity_pool_id.pack(packer)
+        self.asset.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "OperationIDId":
+    def unpack(cls, unpacker: Unpacker) -> "HashIDPreimageRevokeID":
         source_account = AccountID.unpack(unpacker)
         seq_num = SequenceNumber.unpack(unpacker)
         op_num = Uint32.unpack(unpacker)
+        liquidity_pool_id = PoolID.unpack(unpacker)
+        asset = Asset.unpack(unpacker)
         return cls(
             source_account=source_account,
             seq_num=seq_num,
             op_num=op_num,
+            liquidity_pool_id=liquidity_pool_id,
+            asset=asset,
         )
 
     def to_xdr_bytes(self) -> bytes:
@@ -56,7 +70,7 @@ class OperationIDId:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "OperationIDId":
+    def from_xdr_bytes(cls, xdr: bytes) -> "HashIDPreimageRevokeID":
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -65,7 +79,7 @@ class OperationIDId:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "OperationIDId":
+    def from_xdr(cls, xdr: str) -> "HashIDPreimageRevokeID":
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
 
@@ -76,6 +90,8 @@ class OperationIDId:
             self.source_account == other.source_account
             and self.seq_num == other.seq_num
             and self.op_num == other.op_num
+            and self.liquidity_pool_id == other.liquidity_pool_id
+            and self.asset == other.asset
         )
 
     def __str__(self):
@@ -83,5 +99,7 @@ class OperationIDId:
             f"source_account={self.source_account}",
             f"seq_num={self.seq_num}",
             f"op_num={self.op_num}",
+            f"liquidity_pool_id={self.liquidity_pool_id}",
+            f"asset={self.asset}",
         ]
-        return f"<OperationIDId {[', '.join(out)]}>"
+        return f"<HashIDPreimageRevokeID {[', '.join(out)]}>"

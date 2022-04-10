@@ -25,7 +25,7 @@ class TestTimeBounds:
         [
             (-1, 1560844454, "min_time cannot be negative."),
             (1560844454, -1, "max_time cannot be negative."),
-            (1560844455, 156084454, "max_time must be >= min_time."),
+            (1560844455, 156084454, "min_time cannot be greater than max_time."),
         ],
     )
     def test_to_xdr_with_invalid_time_raise(self, min_time, max_time, message):

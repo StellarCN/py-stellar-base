@@ -2,13 +2,14 @@ import pytest
 
 from stellar_sdk import (
     Asset,
+    Claimant,
+    ClaimPredicate,
+    CreateClaimableBalance,
     IdMemo,
     Keypair,
     MuxedAccount,
     NoneMemo,
-    ClaimPredicate,
-    Claimant,
-    CreateClaimableBalance,
+    Preconditions,
 )
 from stellar_sdk.operation import ManageData, Payment
 from stellar_sdk.time_bounds import TimeBounds
@@ -28,7 +29,8 @@ class TestTransaction:
         asset = Asset.native()
         time_bounds = TimeBounds(12345, 56789)
         ops = [Payment(destination, asset, amount), ManageData("hello", "world")]
-        tx = Transaction(source, sequence, fee, ops, memo, time_bounds, True)
+        cond = Preconditions(time_bounds=time_bounds)
+        tx = Transaction(source, sequence, fee, ops, memo, cond, v1=True)
         tx_object = tx.to_xdr_object()
         assert (
             tx_object.to_xdr()
@@ -40,7 +42,7 @@ class TestTransaction:
         assert restore_transaction.source.account_id == source.public_key
         assert restore_transaction.fee == fee
         assert restore_transaction.memo == memo
-        assert restore_transaction.time_bounds == time_bounds
+        assert restore_transaction.preconditions == cond
         assert restore_transaction.sequence == sequence
         assert restore_transaction == tx
 
@@ -53,8 +55,9 @@ class TestTransaction:
         fee = 200
         asset = Asset.native()
         time_bounds = TimeBounds(12345, 56789)
+        cond = Preconditions(time_bounds=time_bounds)
         ops = [Payment(destination, asset, amount), ManageData("hello", "world")]
-        tx = Transaction(source, sequence, fee, ops, memo, time_bounds, True)
+        tx = Transaction(source, sequence, fee, ops, memo, cond, v1=True)
         tx_object = tx.to_xdr_object()
         xdr = "AAAAAImbKEDtVjbFbdxfFLI5dfefG6I4jSaU5MVuzd3JYOXvAAAAyAAAAAAAAAABAAAAAQAAAAAAADA5AAAAAAAA3dUAAAACAAAAAAAAAGQAAAACAAAAAAAAAAEAAAAA0pjFgVcRZZHpMgnpXHpb/xIbLh0/YYto0PzI7+Xl5HAAAAAAAAAAAlQL5AAAAAAAAAAACgAAAAVoZWxsbwAAAAAAAAEAAAAFd29ybGQAAAAAAAAA"
 
@@ -65,7 +68,7 @@ class TestTransaction:
         assert restore_transaction.source.account_id == source
         assert restore_transaction.fee == fee
         assert restore_transaction.memo == memo
-        assert restore_transaction.time_bounds == time_bounds
+        assert restore_transaction.preconditions == cond
         assert restore_transaction.sequence == sequence
         assert restore_transaction == tx
 
@@ -79,9 +82,10 @@ class TestTransaction:
         fee = 200
         asset = Asset.native()
         time_bounds = TimeBounds(12345, 56789)
+        cond = Preconditions(time_bounds=time_bounds)
         ops = [Payment(destination, asset, amount), ManageData("hello", "world")]
 
-        tx = Transaction(source, sequence, fee, ops, memo, time_bounds, True)
+        tx = Transaction(source, sequence, fee, ops, memo, cond, v1=True)
         tx_object = tx.to_xdr_object()
         restore_tx = Transaction.from_xdr_object(tx_object, v1=True)
         assert restore_tx.to_xdr_object().to_xdr() == tx_object.to_xdr()
@@ -97,17 +101,18 @@ class TestTransaction:
         fee = 200
         asset = Asset.native()
         time_bounds = TimeBounds(12345, 56789)
+        cond = Preconditions(time_bounds=time_bounds)
         ops = [Payment(destination, asset, amount), ManageData("hello", "world")]
 
         tx_object = Transaction(
-            source, sequence, fee, ops, memo, time_bounds, True
+            source, sequence, fee, ops, memo, cond, True
         ).to_xdr_object()
         restore_transaction = Transaction.from_xdr(tx_object.to_xdr(), True)
         assert isinstance(restore_transaction, Transaction)
         assert restore_transaction.source == MuxedAccount.from_account(source)
         assert restore_transaction.fee == fee
         assert restore_transaction.memo == memo
-        assert restore_transaction.time_bounds == time_bounds
+        assert restore_transaction.preconditions == cond
         assert restore_transaction.sequence == sequence
 
     def test_to_xdr_str_muxed_account_source_v1(self):
@@ -121,17 +126,18 @@ class TestTransaction:
         fee = 200
         asset = Asset.native()
         time_bounds = TimeBounds(12345, 56789)
+        cond = Preconditions(time_bounds=time_bounds)
         ops = [Payment(destination, asset, amount), ManageData("hello", "world")]
 
         tx_object = Transaction(
-            source, sequence, fee, ops, memo, time_bounds, True
+            source, sequence, fee, ops, memo, cond, True
         ).to_xdr_object()
         restore_transaction = Transaction.from_xdr(tx_object.to_xdr(), True)
         assert isinstance(restore_transaction, Transaction)
         assert restore_transaction.source == source
         assert restore_transaction.fee == fee
         assert restore_transaction.memo == memo
-        assert restore_transaction.time_bounds == time_bounds
+        assert restore_transaction.preconditions == cond
         assert restore_transaction.sequence == sequence
 
     def test_none_memo_v1(self):
@@ -159,8 +165,9 @@ class TestTransaction:
         fee = 200
         asset = Asset.native()
         time_bounds = TimeBounds(12345, 56789)
+        cond = Preconditions(time_bounds=time_bounds)
         ops = [Payment(destination, asset, amount)]
-        tx = Transaction(source, sequence, fee, ops, memo, time_bounds, False)
+        tx = Transaction(source, sequence, fee, ops, memo, cond, v1=False)
         tx_object = tx.to_xdr_object()
 
         restore_transaction = Transaction.from_xdr_object(tx_object, False)
@@ -168,7 +175,7 @@ class TestTransaction:
         assert restore_transaction.source.account_id == source.public_key
         assert restore_transaction.fee == fee
         assert restore_transaction.memo == memo
-        assert restore_transaction.time_bounds == time_bounds
+        assert restore_transaction.preconditions == cond
         assert restore_transaction.sequence == sequence
         assert restore_transaction == tx
 
@@ -181,8 +188,9 @@ class TestTransaction:
         fee = 200
         asset = Asset.native()
         time_bounds = TimeBounds(12345, 56789)
+        cond = Preconditions(time_bounds=time_bounds)
         ops = [Payment(destination, asset, amount), ManageData("hello", "world")]
-        tx = Transaction(source, sequence, fee, ops, memo, time_bounds, False)
+        tx = Transaction(source, sequence, fee, ops, memo, cond, v1=False)
         tx_object = tx.to_xdr_object()
         # assert (
         #     tx_object.to_xdr()
@@ -194,7 +202,7 @@ class TestTransaction:
         assert restore_transaction.source.account_id == source
         assert restore_transaction.fee == fee
         assert restore_transaction.memo == memo
-        assert restore_transaction.time_bounds == time_bounds
+        assert restore_transaction.preconditions == cond
         assert restore_transaction.sequence == sequence
         assert restore_transaction == tx
 

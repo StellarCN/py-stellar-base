@@ -205,3 +205,168 @@ class TestStrKey:
             "MAQAA5L65LSYH7CQ3VTJ7F3HHLGCL3DSLAR2Y47263D56MNNGHSQSAAAAAAAAAAE2LP26"
         )
         assert StrKey.encode_muxed_account(data) == expected
+
+    def test_encode_ed25519_signed_payload(self):
+        data = bytes(
+            bytearray(
+                [
+                    0x36,
+                    0x3E,
+                    0xAA,
+                    0x38,
+                    0x67,
+                    0x84,
+                    0x1F,
+                    0xBA,
+                    0xD0,
+                    0xF4,
+                    0xED,
+                    0x88,
+                    0xC7,
+                    0x79,
+                    0xE4,
+                    0xFE,
+                    0x66,
+                    0xE5,
+                    0x6A,
+                    0x24,
+                    0x70,
+                    0xDC,
+                    0x98,
+                    0xC0,
+                    0xEC,
+                    0x9C,
+                    0x07,
+                    0x3D,
+                    0x05,
+                    0xC7,
+                    0xB1,
+                    0x03,
+                    0x00,
+                    0x00,
+                    0x00,
+                    0x09,
+                    0x00,
+                    0x00,
+                    0x00,
+                    0x00,
+                    0x00,
+                    0x00,
+                    0x00,
+                    0x00,
+                    0x00,
+                    0x00,
+                    0x00,
+                    0x00,
+                ]
+            )
+        )
+        encoded = "PA3D5KRYM6CB7OWQ6TWYRR3Z4T7GNZLKERYNZGGA5SOAOPIFY6YQGAAAAAEQAAAAAAAAAAAAAAAAAABBXA"
+        assert StrKey.encode_ed25519_signed_payload(data) == encoded
+
+    def test_decode_ed25519_signed_payload(self):
+        decoded = bytes(
+            bytearray(
+                [
+                    0x36,
+                    0x3E,
+                    0xAA,
+                    0x38,
+                    0x67,
+                    0x84,
+                    0x1F,
+                    0xBA,
+                    0xD0,
+                    0xF4,
+                    0xED,
+                    0x88,
+                    0xC7,
+                    0x79,
+                    0xE4,
+                    0xFE,
+                    0x66,
+                    0xE5,
+                    0x6A,
+                    0x24,
+                    0x70,
+                    0xDC,
+                    0x98,
+                    0xC0,
+                    0xEC,
+                    0x9C,
+                    0x07,
+                    0x3D,
+                    0x05,
+                    0xC7,
+                    0xB1,
+                    0x03,
+                    0x00,
+                    0x00,
+                    0x00,
+                    0x09,
+                    0x00,
+                    0x00,
+                    0x00,
+                    0x00,
+                    0x00,
+                    0x00,
+                    0x00,
+                    0x00,
+                    0x00,
+                    0x00,
+                    0x00,
+                    0x00,
+                ]
+            )
+        )
+        data = "PA3D5KRYM6CB7OWQ6TWYRR3Z4T7GNZLKERYNZGGA5SOAOPIFY6YQGAAAAAEQAAAAAAAAAAAAAAAAAABBXA"
+        assert StrKey.decode_ed25519_signed_payload(data) == decoded
+
+    @pytest.mark.parametrize(
+        "key",
+        [
+            "PA3D5KRYM6CB7OWQ6TWYRR3Z4T7GNZLKERYNZGGA5SOAOPIFY6YQGAAAAAEQAAAAAAAAAAAAAAAAAABB",
+            "",
+            "GAQAA5L65LSYH7CQ3VTJ7F3HHLGCL3DSLAR2Y47263D56MNNGHSQSTVY",
+        ],
+    )
+    def test_decode_ed25519_signed_payload_raise(self, key):
+        with pytest.raises(
+            ValueError, match=f"Invalid Ed25519 Signed Payload Key: {key}"
+        ):
+            StrKey.decode_ed25519_signed_payload(key)
+
+    @pytest.mark.parametrize(
+        "key, valid",
+        [
+            (
+                "PA7QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLTJJFC7MGXUA74P7UJUAAAAAQACAQDAQCQMBYIBEFAWDANBYHRAEISCMKBKFQXDAMRUGY4DUPB6IBZGM",
+                True,
+            ),
+            (
+                "PA7QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLTJJFC7MGXUA74P7UJUAAAAAOQCAQDAQCQMBYIBEFAWDANBYHRAEISCMKBKFQXDAMRUGY4DUAAAAFGBU",
+                True,
+            ),
+            (
+                "PA7QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLTJJFC7MGXUA74P7UJUAAAAAQACAQDAQCQMBYIBEFAWDANBYHRAEISCMKBKFQXDAMRUGY4DUPB6IAAAAAAAAPM",
+                False,
+            ),
+            (
+                "PA7QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLTJJFC7MGXUA74P7UJUAAAAAOQCAQDAQCQMBYIBEFAWDANBYHRAEISCMKBKFQXDAMRUGY4Z2PQ",
+                False,
+            ),
+            (
+                "PA7QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLTJJFC7MGXUA74P7UJUAAAAAOQCAQDAQCQMBYIBEFAWDANBYHRAEISCMKBKFQXDAMRUGY4DXFH6",
+                False,
+            ),
+            ("", False),
+            (
+                "PDPYP7E6NEYZSVOTV6M23OFM2XRIMPDUJABHGHHH2Y67X7JL25GW6AAAAAAAAAAAAAAJE",
+                False,
+            ),
+            ("GAQAA5L65LSYH7CQ3VTJ7F3HHLGCL3DSLAR2Y47263D56MNNGHSQSTVY", False),
+            ("PA3D5KRYM6CB7OWQ6TWYRR3Z4T7GNZLKERYNZGGA5SOAOPIFY6YQGAAAAAAGK7I", False),
+        ],
+    )
+    def test_is_valid_ed25519_signed_payload(self, key, valid):
+        assert StrKey.is_valid_ed25519_signed_payload(key) is valid

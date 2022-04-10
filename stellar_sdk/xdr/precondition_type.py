@@ -7,35 +7,30 @@ from xdrlib import Packer, Unpacker
 from ..__version__ import __issues__
 from ..type_checked import type_checked
 
-__all__ = ["LedgerUpgradeType"]
+__all__ = ["PreconditionType"]
 
 
 @type_checked
-class LedgerUpgradeType(IntEnum):
+class PreconditionType(IntEnum):
     """
     XDR Source Code::
 
-        enum LedgerUpgradeType
-        {
-            LEDGER_UPGRADE_VERSION = 1,
-            LEDGER_UPGRADE_BASE_FEE = 2,
-            LEDGER_UPGRADE_MAX_TX_SET_SIZE = 3,
-            LEDGER_UPGRADE_BASE_RESERVE = 4,
-            LEDGER_UPGRADE_FLAGS = 5
+        enum PreconditionType {
+            PRECOND_NONE = 0,
+            PRECOND_TIME = 1,
+            PRECOND_V2 = 2
         };
     """
 
-    LEDGER_UPGRADE_VERSION = 1
-    LEDGER_UPGRADE_BASE_FEE = 2
-    LEDGER_UPGRADE_MAX_TX_SET_SIZE = 3
-    LEDGER_UPGRADE_BASE_RESERVE = 4
-    LEDGER_UPGRADE_FLAGS = 5
+    PRECOND_NONE = 0
+    PRECOND_TIME = 1
+    PRECOND_V2 = 2
 
     def pack(self, packer: Packer) -> None:
         packer.pack_int(self.value)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "LedgerUpgradeType":
+    def unpack(cls, unpacker: Unpacker) -> "PreconditionType":
         value = unpacker.unpack_int()
         return cls(value)
 
@@ -45,7 +40,7 @@ class LedgerUpgradeType(IntEnum):
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "LedgerUpgradeType":
+    def from_xdr_bytes(cls, xdr: bytes) -> "PreconditionType":
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -54,7 +49,7 @@ class LedgerUpgradeType(IntEnum):
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "LedgerUpgradeType":
+    def from_xdr(cls, xdr: str) -> "PreconditionType":
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
 

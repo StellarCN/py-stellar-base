@@ -54,6 +54,8 @@ class LedgerHeader:
             {
             case 0:
                 void;
+            case 1:
+                LedgerHeaderExtensionV1 v1;
             }
             ext;
         };

@@ -39,7 +39,9 @@ class MessageType(IntEnum):
             HELLO = 13,
 
             SURVEY_REQUEST = 14,
-            SURVEY_RESPONSE = 15
+            SURVEY_RESPONSE = 15,
+
+            SEND_MORE = 16
         };
     """
 
@@ -58,6 +60,7 @@ class MessageType(IntEnum):
     HELLO = 13
     SURVEY_REQUEST = 14
     SURVEY_RESPONSE = 15
+    SEND_MORE = 16
 
     def pack(self, packer: Packer) -> None:
         packer.pack_int(self.value)

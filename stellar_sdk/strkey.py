@@ -23,6 +23,7 @@ class _VersionByte(Enum):
     PRE_AUTH_TX = binascii.a2b_hex("98")  # T 152 19 << 3
     SHA256_HASH = binascii.a2b_hex("b8")  # X 184 23 << 3
     MUXED_ACCOUNT = binascii.a2b_hex("60")  # M 96 12 << 3
+    ED25519_SIGNED_PAYLOAD = binascii.a2b_hex("78")  # P 120 15 << 3
 
 
 @type_checked
@@ -222,11 +223,45 @@ class StrKey:
             raise ValueError("Invalid encoded string, this is not a valid account.")
         return muxed
 
+    @staticmethod
+    def encode_ed25519_signed_payload(data: bytes) -> str:
+        """Encodes data to encoded ed25519 signed payload strkey.
+
+        :param data: data to encode
+        :return: encoded ed25519 signed payload strkey
+        :raises:
+            :exc:`ValueError <stellar_sdk.exceptions.ValueError>`
+        """
+        return _encode_check(_VersionByte.ED25519_SIGNED_PAYLOAD, data)
+
+    @staticmethod
+    def decode_ed25519_signed_payload(data: str) -> bytes:
+        """Decodes encoded ed25519 signed payload strkey to raw data.
+
+        :param data: encoded ed25519 signed payload strkey
+        :return: raw bytes
+        :raises:
+            :exc:`ValueError <stellar_sdk.exceptions.ValueError>`
+        """
+        try:
+            return _decode_check(_VersionByte.ED25519_SIGNED_PAYLOAD, data)
+        except Exception as e:
+            raise ValueError(f"Invalid Ed25519 Signed Payload Key: {data}") from e
+
+    @staticmethod
+    def is_valid_ed25519_signed_payload(ed25519_signed_payload: str) -> bool:
+        """Returns ``True`` if the given `ed25519_signed_payload` is a valid encoded ed25519 signed payload strkey.
+
+        :param ed25519_signed_payload: encoded ed25519 signed payload strkey
+        :return: ``True`` if the given key is valid
+        """
+        return _is_valid(_VersionByte.ED25519_SIGNED_PAYLOAD, ed25519_signed_payload)
+
 
 @type_checked
 def _decode_check(version_byte: _VersionByte, encoded: str) -> bytes:
     encoded_data = encoded.encode("ascii")
-    encoded_data = encoded_data + b"=" * ((4 - len(encoded_data) % 4) % 4)
+    encoded_data = encoded_data + b"=" * ((8 - len(encoded_data) % 8) % 8)
 
     try:
         decoded_data = base64.b32decode(encoded_data)
@@ -249,7 +284,16 @@ def _decode_check(version_byte: _VersionByte, encoded: str) -> bytes:
     expected_checksum = _calculate_checksum(payload)
     if expected_checksum != checksum:
         raise ValueError("Invalid checksum")
-
+    if version_byte == _VersionByte.ED25519_SIGNED_PAYLOAD:
+        if len(data) < 32 + 4 + 4 or len(data) > 32 + 4 + 64:
+            raise ValueError(f"Invalid Ed25519 Signed Payload Key: {data!r}")
+        payload_length_prefix = int.from_bytes(data[32:36], byteorder="big")
+        if len(data[36:]) % 4 != 0:
+            raise ValueError(f"Invalid Ed25519 Signed Payload Key: {data!r}")
+        if payload_length_prefix + ((4 - payload_length_prefix % 4) % 4) != len(
+            data[36:]
+        ):
+            raise ValueError(f"Invalid Ed25519 Signed Payload Key: {data!r}")
     return data
 
 
@@ -262,13 +306,18 @@ def _encode_check(version_byte: _VersionByte, data: bytes) -> str:
 
 @type_checked
 def _is_valid(version_byte: _VersionByte, encoded: str) -> bool:
-    if encoded and len(encoded) != 56:
-        return False
     try:
         _decode_check(version_byte, encoded)
     except (ValueError, TypeError):
         return False
     return True
+
+
+@type_checked
+def _get_version_byte_for_prefix(encoded: str) -> _VersionByte:
+    prefix = encoded[0]
+    _version_byte = ((ord(prefix) - ord("A")) << 3).to_bytes(1, byteorder="big")
+    return _VersionByte(_version_byte)
 
 
 @type_checked

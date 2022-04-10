@@ -6,6 +6,7 @@ from .memo import Memo, NoneMemo
 from .muxed_account import MuxedAccount
 from .operation.create_claimable_balance import CreateClaimableBalance
 from .operation.operation import Operation
+from .preconditions import Preconditions
 from .strkey import StrKey
 from .time_bounds import TimeBounds
 from .type_checked import type_checked
@@ -43,7 +44,7 @@ class Transaction:
           for more information.
     :param operations: A list of operations objects (typically its
           subclasses as defined in :mod:`stellar_sdk.operation.Operation`.
-    :param time_bounds: The timebounds for the validity of this transaction.
+    :param preconditions: The preconditions for the validity of this transaction.
     :param memo: The memo being sent with the transaction, being
           represented as one of the subclasses of the
           :class:`Memo <stellar_sdk.memo.Memo>` object.
@@ -59,7 +60,7 @@ class Transaction:
         fee: int,
         operations: List[Operation],
         memo: Memo = None,
-        time_bounds: TimeBounds = None,
+        preconditions: Preconditions = None,
         v1: bool = True,
     ) -> None:
 
@@ -78,7 +79,7 @@ class Transaction:
         self.operations: List[Operation] = operations
         self.memo: Memo = memo
         self.fee: int = fee
-        self.time_bounds: Optional[TimeBounds] = time_bounds
+        self.preconditions: Optional[Preconditions] = preconditions
         self.v1: bool = v1
 
     def get_claimable_balance_id(self, operation_index: int) -> str:
@@ -101,9 +102,9 @@ class Transaction:
                 f"must be {CreateClaimableBalance}, got {type(op)} instead"
             )
         account_id = Keypair.from_public_key(self.source.account_id).xdr_account_id()
-        operation_id = stellar_xdr.OperationID(
+        operation_id = stellar_xdr.HashIDPreimage(
             type=stellar_xdr.EnvelopeType.ENVELOPE_TYPE_OP_ID,
-            id=stellar_xdr.OperationIDId(
+            operation_id=stellar_xdr.HashIDPreimageOperationID(
                 source_account=account_id,
                 seq_num=stellar_xdr.SequenceNumber(stellar_xdr.Int64(self.sequence)),
                 op_num=stellar_xdr.Uint32(operation_index),
@@ -125,40 +126,44 @@ class Transaction:
         """
         memo = self.memo.to_xdr_object()
         operations = [operation.to_xdr_object() for operation in self.operations]
-        time_bounds = (
-            self.time_bounds.to_xdr_object() if self.time_bounds is not None else None
-        )
         fee = stellar_xdr.Uint32(self.fee)
         sequence = stellar_xdr.SequenceNumber(stellar_xdr.Int64(self.sequence))
+        if not self.v1:
+            source_xdr_v0 = (
+                Keypair.from_public_key(self.source.account_id)
+                .xdr_account_id()
+                .account_id.ed25519
+            )
 
-        if self.v1:
-            source_xdr = self.source.to_xdr_object()
-            ext = stellar_xdr.TransactionExt(0)
-            return stellar_xdr.Transaction(
-                source_xdr,
+            time_bounds = None
+            if self.preconditions and self.preconditions.time_bounds:
+                time_bounds = self.preconditions.time_bounds.to_xdr_object()
+            assert source_xdr_v0 is not None
+            ext_v0 = stellar_xdr.TransactionV0Ext(0)
+            return stellar_xdr.TransactionV0(
+                source_xdr_v0,
                 fee,
                 sequence,
                 time_bounds,
                 memo,
                 operations,
-                ext,
+                ext_v0,
             )
-
-        source_xdr_v0 = (
-            Keypair.from_public_key(self.source.account_id)
-            .xdr_account_id()
-            .account_id.ed25519
+        preconditions = (
+            self.preconditions.to_xdr_object()
+            if self.preconditions
+            else Preconditions().to_xdr_object()
         )
-        assert source_xdr_v0 is not None
-        ext_v0 = stellar_xdr.TransactionV0Ext(0)
-        return stellar_xdr.TransactionV0(
-            source_xdr_v0,
+        source_xdr = self.source.to_xdr_object()
+        ext = stellar_xdr.TransactionExt(0)
+        return stellar_xdr.Transaction(
+            source_xdr,
             fee,
             sequence,
-            time_bounds,
+            preconditions,
             memo,
             operations,
-            ext_v0,
+            ext,
         )
 
     @classmethod
@@ -180,29 +185,33 @@ class Transaction:
         if v1:
             assert isinstance(xdr_object, stellar_xdr.Transaction)
             source = MuxedAccount.from_xdr_object(xdr_object.source_account)
+            if xdr_object.cond.type == stellar_xdr.PreconditionType.PRECOND_NONE:
+                preconditions = None
+            else:
+                preconditions = Preconditions.from_xdr_object(xdr_object.cond)
         else:
             assert isinstance(xdr_object, stellar_xdr.TransactionV0)
             ed25519_key = StrKey.encode_ed25519_public_key(
                 xdr_object.source_account_ed25519.uint256
             )
             source = MuxedAccount(ed25519_key, None)
+            if xdr_object.time_bounds:
+                time_bounds = TimeBounds.from_xdr_object(xdr_object.time_bounds)
+                preconditions = Preconditions(time_bounds=time_bounds)
+            else:
+                preconditions = None
+
         sequence = xdr_object.seq_num.sequence_number.int64
         fee = xdr_object.fee.uint32
-        time_bounds_xdr = xdr_object.time_bounds
-        time_bounds = (
-            None
-            if time_bounds_xdr is None
-            else TimeBounds.from_xdr_object(time_bounds_xdr)
-        )
         memo = Memo.from_xdr_object(xdr_object.memo)
         operations = list(map(Operation.from_xdr_object, xdr_object.operations))
         tx = cls(
             source=source,
             sequence=sequence,
-            time_bounds=time_bounds,
             memo=memo,
             fee=fee,
             operations=operations,
+            preconditions=preconditions,
             v1=v1,
         )
         return tx
@@ -234,5 +243,5 @@ class Transaction:
         return (
             f"<Transaction [source={self.source}, sequence={self.sequence}, "
             f"fee={self.fee}, operations={self.operations}, memo={self.memo}, "
-            f"time_bounds={self.time_bounds}, v1={self.v1}]>"
+            f"preconditions={self.preconditions}, v1={self.v1}]>"
         )

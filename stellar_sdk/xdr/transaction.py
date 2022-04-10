@@ -1,7 +1,7 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
 import base64
-from typing import List, Optional
+from typing import List
 from xdrlib import Packer, Unpacker
 
 from ..type_checked import type_checked
@@ -9,8 +9,8 @@ from .constants import *
 from .memo import Memo
 from .muxed_account import MuxedAccount
 from .operation import Operation
+from .preconditions import Preconditions
 from .sequence_number import SequenceNumber
-from .time_bounds import TimeBounds
 from .transaction_ext import TransactionExt
 from .uint32 import Uint32
 
@@ -33,8 +33,8 @@ class Transaction:
             // sequence number to consume in the account
             SequenceNumber seqNum;
 
-            // validity range (inclusive) for the last ledger close time
-            TimeBounds* timeBounds;
+            // validity conditions
+            Preconditions cond;
 
             Memo memo;
 
@@ -55,7 +55,7 @@ class Transaction:
         source_account: MuxedAccount,
         fee: Uint32,
         seq_num: SequenceNumber,
-        time_bounds: Optional[TimeBounds],
+        cond: Preconditions,
         memo: Memo,
         operations: List[Operation],
         ext: TransactionExt,
@@ -67,7 +67,7 @@ class Transaction:
         self.source_account = source_account
         self.fee = fee
         self.seq_num = seq_num
-        self.time_bounds = time_bounds
+        self.cond = cond
         self.memo = memo
         self.operations = operations
         self.ext = ext
@@ -76,13 +76,7 @@ class Transaction:
         self.source_account.pack(packer)
         self.fee.pack(packer)
         self.seq_num.pack(packer)
-        if self.time_bounds is None:
-            packer.pack_uint(0)
-        else:
-            packer.pack_uint(1)
-            if self.time_bounds is None:
-                raise ValueError("time_bounds should not be None.")
-            self.time_bounds.pack(packer)
+        self.cond.pack(packer)
         self.memo.pack(packer)
         packer.pack_uint(len(self.operations))
         for operations_item in self.operations:
@@ -94,7 +88,7 @@ class Transaction:
         source_account = MuxedAccount.unpack(unpacker)
         fee = Uint32.unpack(unpacker)
         seq_num = SequenceNumber.unpack(unpacker)
-        time_bounds = TimeBounds.unpack(unpacker) if unpacker.unpack_uint() else None
+        cond = Preconditions.unpack(unpacker)
         memo = Memo.unpack(unpacker)
         length = unpacker.unpack_uint()
         operations = []
@@ -105,7 +99,7 @@ class Transaction:
             source_account=source_account,
             fee=fee,
             seq_num=seq_num,
-            time_bounds=time_bounds,
+            cond=cond,
             memo=memo,
             operations=operations,
             ext=ext,
@@ -137,7 +131,7 @@ class Transaction:
             self.source_account == other.source_account
             and self.fee == other.fee
             and self.seq_num == other.seq_num
-            and self.time_bounds == other.time_bounds
+            and self.cond == other.cond
             and self.memo == other.memo
             and self.operations == other.operations
             and self.ext == other.ext
@@ -148,7 +142,7 @@ class Transaction:
             f"source_account={self.source_account}",
             f"fee={self.fee}",
             f"seq_num={self.seq_num}",
-            f"time_bounds={self.time_bounds}",
+            f"cond={self.cond}",
             f"memo={self.memo}",
             f"operations={self.operations}",
             f"ext={self.ext}",

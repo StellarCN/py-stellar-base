@@ -13,6 +13,7 @@ from .message_type import MessageType
 from .peer_address import PeerAddress
 from .scp_envelope import SCPEnvelope
 from .scp_quorum_set import SCPQuorumSet
+from .send_more import SendMore
 from .signed_survey_request_message import SignedSurveyRequestMessage
 from .signed_survey_response_message import SignedSurveyResponseMessage
 from .transaction_envelope import TransactionEnvelope
@@ -66,6 +67,8 @@ class StellarMessage:
             SCPEnvelope envelope;
         case GET_SCP_STATE:
             uint32 getSCPLedgerSeq; // ledger seq requested ; if 0, requests the latest
+        case SEND_MORE:
+            SendMore sendMoreMessage;
         };
     """
 
@@ -86,6 +89,7 @@ class StellarMessage:
         q_set: SCPQuorumSet = None,
         envelope: SCPEnvelope = None,
         get_scp_ledger_seq: Uint32 = None,
+        send_more_message: SendMore = None,
     ) -> None:
         if peers and len(peers) > 100:
             raise ValueError(
@@ -106,6 +110,7 @@ class StellarMessage:
         self.q_set = q_set
         self.envelope = envelope
         self.get_scp_ledger_seq = get_scp_ledger_seq
+        self.send_more_message = send_more_message
 
     def pack(self, packer: Packer) -> None:
         self.type.pack(packer)
@@ -183,6 +188,11 @@ class StellarMessage:
                 raise ValueError("get_scp_ledger_seq should not be None.")
             self.get_scp_ledger_seq.pack(packer)
             return
+        if self.type == MessageType.SEND_MORE:
+            if self.send_more_message is None:
+                raise ValueError("send_more_message should not be None.")
+            self.send_more_message.pack(packer)
+            return
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "StellarMessage":
@@ -240,6 +250,9 @@ class StellarMessage:
         if type == MessageType.GET_SCP_STATE:
             get_scp_ledger_seq = Uint32.unpack(unpacker)
             return cls(type=type, get_scp_ledger_seq=get_scp_ledger_seq)
+        if type == MessageType.SEND_MORE:
+            send_more_message = SendMore.unpack(unpacker)
+            return cls(type=type, send_more_message=send_more_message)
         return cls(type=type)
 
     def to_xdr_bytes(self) -> bytes:
@@ -282,6 +295,7 @@ class StellarMessage:
             and self.q_set == other.q_set
             and self.envelope == other.envelope
             and self.get_scp_ledger_seq == other.get_scp_ledger_seq
+            and self.send_more_message == other.send_more_message
         )
 
     def __str__(self):
@@ -315,4 +329,7 @@ class StellarMessage:
         out.append(
             f"get_scp_ledger_seq={self.get_scp_ledger_seq}"
         ) if self.get_scp_ledger_seq is not None else None
+        out.append(
+            f"send_more_message={self.send_more_message}"
+        ) if self.send_more_message is not None else None
         return f"<StellarMessage {[', '.join(out)]}>"

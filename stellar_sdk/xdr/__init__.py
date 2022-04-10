@@ -1,4 +1,4 @@
-# Automatically generated on 2022-04-07T13:52:00+08:00
+# Automatically generated on 2022-04-07T14:33:04+08:00
 # DO NOT EDIT or your changes may be overwritten
 from .account_entry import AccountEntry
 from .account_entry_ext import AccountEntryExt
@@ -6,6 +6,7 @@ from .account_entry_extension_v1 import AccountEntryExtensionV1
 from .account_entry_extension_v1_ext import AccountEntryExtensionV1Ext
 from .account_entry_extension_v2 import AccountEntryExtensionV2
 from .account_entry_extension_v2_ext import AccountEntryExtensionV2Ext
+from .account_entry_extension_v3 import AccountEntryExtensionV3
 from .account_flags import AccountFlags
 from .account_id import AccountID
 from .account_merge_result import AccountMergeResult
@@ -85,6 +86,7 @@ from .data_entry_ext import DataEntryExt
 from .data_value import DataValue
 from .decorated_signature import DecoratedSignature
 from .dont_have import DontHave
+from .duration import Duration
 from .encrypted_body import EncryptedBody
 from .end_sponsoring_future_reserves_result import EndSponsoringFutureReservesResult
 from .end_sponsoring_future_reserves_result_code import (
@@ -93,11 +95,15 @@ from .end_sponsoring_future_reserves_result_code import (
 from .envelope_type import EnvelopeType
 from .error import Error
 from .error_code import ErrorCode
+from .extension_point import ExtensionPoint
 from .fee_bump_transaction import FeeBumpTransaction
 from .fee_bump_transaction_envelope import FeeBumpTransactionEnvelope
 from .fee_bump_transaction_ext import FeeBumpTransactionExt
 from .fee_bump_transaction_inner_tx import FeeBumpTransactionInnerTx
 from .hash import Hash
+from .hash_id_preimage import HashIDPreimage
+from .hash_id_preimage_operation_id import HashIDPreimageOperationID
+from .hash_id_preimage_revoke_id import HashIDPreimageRevokeID
 from .hello import Hello
 from .hmac_sha256_key import HmacSha256Key
 from .hmac_sha256_mac import HmacSha256Mac
@@ -111,6 +117,7 @@ from .inner_transaction_result_result import InnerTransactionResultResult
 from .int32 import Int32
 from .int64 import Int64
 from .ip_addr_type import IPAddrType
+from .ledger_bounds import LedgerBounds
 from .ledger_close_meta import LedgerCloseMeta
 from .ledger_close_meta_v0 import LedgerCloseMetaV0
 from .ledger_close_value_signature import LedgerCloseValueSignature
@@ -125,6 +132,9 @@ from .ledger_entry_extension_v1_ext import LedgerEntryExtensionV1Ext
 from .ledger_entry_type import LedgerEntryType
 from .ledger_header import LedgerHeader
 from .ledger_header_ext import LedgerHeaderExt
+from .ledger_header_extension_v1 import LedgerHeaderExtensionV1
+from .ledger_header_extension_v1_ext import LedgerHeaderExtensionV1Ext
+from .ledger_header_flags import LedgerHeaderFlags
 from .ledger_header_history_entry import LedgerHeaderHistoryEntry
 from .ledger_header_history_entry_ext import LedgerHeaderHistoryEntryExt
 from .ledger_key import LedgerKey
@@ -175,8 +185,6 @@ from .offer_entry_ext import OfferEntryExt
 from .offer_entry_flags import OfferEntryFlags
 from .operation import Operation
 from .operation_body import OperationBody
-from .operation_id import OperationID
-from .operation_id_id import OperationIDId
 from .operation_meta import OperationMeta
 from .operation_result import OperationResult
 from .operation_result_code import OperationResultCode
@@ -200,6 +208,9 @@ from .peer_address_ip import PeerAddressIp
 from .peer_stat_list import PeerStatList
 from .peer_stats import PeerStats
 from .pool_id import PoolID
+from .precondition_type import PreconditionType
+from .preconditions import Preconditions
+from .preconditions_v2 import PreconditionsV2
 from .price import Price
 from .public_key import PublicKey
 from .public_key_type import PublicKeyType
@@ -220,6 +231,7 @@ from .scp_statement_externalize import SCPStatementExternalize
 from .scp_statement_pledges import SCPStatementPledges
 from .scp_statement_prepare import SCPStatementPrepare
 from .scp_statement_type import SCPStatementType
+from .send_more import SendMore
 from .sequence_number import SequenceNumber
 from .set_options_op import SetOptionsOp
 from .set_options_result import SetOptionsResult
@@ -233,6 +245,7 @@ from .signed_survey_request_message import SignedSurveyRequestMessage
 from .signed_survey_response_message import SignedSurveyResponseMessage
 from .signer import Signer
 from .signer_key import SignerKey
+from .signer_key_ed25519_signed_payload import SignerKeyEd25519SignedPayload
 from .signer_key_type import SignerKeyType
 from .simple_payment_result import SimplePaymentResult
 from .sponsorship_descriptor import SponsorshipDescriptor
