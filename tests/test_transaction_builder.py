@@ -18,6 +18,11 @@ from stellar_sdk import (
     TransactionBuilder,
     TrustLineEntryFlag,
     TrustLineFlags,
+    SignerKey,
+    SignedPayloadSigner,
+    TimeBounds,
+    LedgerBounds,
+    Preconditions,
 )
 
 kp1 = Keypair.from_secret(
@@ -623,3 +628,53 @@ class TestTransaction:
             xdr_with_signature, Network.TESTNET_NETWORK_PASSPHRASE
         )
         assert new_tx_builder.build().to_xdr() == xdr
+
+    def test_set_conds(self):
+        source_account = Account(kp1.public_key, 100000000000000000)
+        time_bounds = TimeBounds(1649237469, 1649238469)
+        ledger_bounds = LedgerBounds(40351800, 40352000)
+        min_sequence_number = 103420918407103888
+        min_sequence_age = 1649239999
+        min_sequence_ledger_gap = 30
+        extra_signers = [
+            SignerKey.from_encoded_signer_key(
+                "GBJCHUKZMTFSLOMNC7P4TS4VJJBTCYL3XKSOLXAUJSD56C4LHND5TWUC"
+            ),
+            SignerKey.from_encoded_signer_key(
+                "PA7QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLTJJFC7MGXUA74P7UJUAAAAAQACAQDAQCQMBYIBEFAWDANBYHRAEISCMKBKFQXDAMRUGY4DUPB6IBZGM"
+            ),
+        ]
+        cond = Preconditions(
+            time_bounds,
+            ledger_bounds,
+            min_sequence_number,
+            min_sequence_age,
+            min_sequence_ledger_gap,
+            extra_signers,
+        )
+
+        tx = (
+            TransactionBuilder(
+                source_account=source_account,
+                network_passphrase=Network.TESTNET_NETWORK_PASSPHRASE,
+                base_fee=100,
+                v1=True,
+            )
+            .add_time_bounds(1649237469, 1649238469)
+            .set_ledger_bounds(40351800, 40352000)
+            .set_min_sequence_number(103420918407103888)
+            .set_min_sequence_age(1649239999)
+            .set_min_sequence_ledger_gap(30)
+            .add_extra_signer(
+                "GBJCHUKZMTFSLOMNC7P4TS4VJJBTCYL3XKSOLXAUJSD56C4LHND5TWUC"
+            )
+            .add_extra_signer(
+                SignerKey.from_encoded_signer_key(
+                    "PA7QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLTJJFC7MGXUA74P7UJUAAAAAQACAQDAQCQMBYIBEFAWDANBYHRAEISCMKBKFQXDAMRUGY4DUPB6IBZGM"
+                )
+            )
+            .append_bump_sequence_op(0)
+            .build()
+        )
+
+        assert tx.transaction.preconditions == cond
