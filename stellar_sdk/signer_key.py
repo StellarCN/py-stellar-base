@@ -85,7 +85,7 @@ class SignerKey:
         elif prefix == _VersionByte.ED25519_SIGNED_PAYLOAD:
             return cls.ed25519_signed_payload(encoded_signer_key)
         else:
-            raise ValueError(f"Unsupported SignerKeyType.")
+            raise ValueError(f"Unsupported signer key type.")
 
     @classmethod
     def ed25519_public_key(cls, account_id: Union[str, bytes]) -> "SignerKey":
@@ -159,7 +159,7 @@ class SignerKey:
 
     def to_signed_payload_signer(self) -> "SignedPayloadSigner":
         if self.signer_key_type != SignerKeyType.SIGNER_KEY_TYPE_ED25519_SIGNED_PAYLOAD:
-            raise ValueError(f"Unsupported SignerKeyType.")
+            raise ValueError(f"Unsupported signer key type.")
 
         payload_length = int.from_bytes(self.signer_key[32:36], byteorder="big")
         account_id = StrKey.encode_ed25519_public_key(self.signer_key[:32])
