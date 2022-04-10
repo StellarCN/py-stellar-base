@@ -542,26 +542,16 @@ class TestKeypair:
     @pytest.mark.parametrize(
         "payload, hint",
         [
-            (
-                    b"cat!!!",
-                    [0x22, 0xdd, 0x24, 0xd6]
-            ),
-            (
-                    b"cat!",
-                    [0x35, 0x9d, 0x71, 0xd6]
-            ),
-            (
-                    b"cat",
-                    [0x35, 0x9d, 0x71, 0xf7]
-            ),
+            (b"cat!!!", [0x22, 0xDD, 0x24, 0xD6]),
+            (b"cat!", [0x35, 0x9D, 0x71, 0xD6]),
+            (b"cat", [0x35, 0x9D, 0x71, 0xF7]),
+            (b"", [0x56, 0xFC, 0x05, 0xF7]),
         ],
     )
     def test_sign_decorated_for_payload(self, payload, hint):
         kp = Keypair.from_secret(
             "SDHOAMBNLGCE2MV5ZKIVZAQD3VCLGP53P3OBSBI6UN5L5XZI5TKHFQL4"
         )
-        sign_decorated = kp.sign_decorated_for_payload(payload)
-        assert sign_decorated.signature_hint == bytes(
-            bytearray(hint)
-        )
+        sign_decorated = kp.sign_payload_decorated(payload)
+        assert sign_decorated.signature_hint == bytes(hint)
         assert sign_decorated.signature == kp.sign(payload)
