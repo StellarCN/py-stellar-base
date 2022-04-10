@@ -4,9 +4,8 @@ import pytest
 
 from stellar_sdk import (
     Preconditions,
-    SignerKey,
     SignedPayloadSigner,
-    DecoratedSignature,
+    SignerKey,
 )
 from stellar_sdk.asset import Asset
 from stellar_sdk.exceptions import SignatureExistError
@@ -200,7 +199,7 @@ class TestTransactionEnvelope:
         te.sign_extra_signers_payload(signer2)
         assert len(te.signatures) == 1
         assert te.signatures[0] == signer2.sign_payload_decorated(b"cat")
-        te.sign_extra_signers_payload(signer1)
+        te.sign_extra_signers_payload(signer1.secret)
         assert len(te.signatures) == 2
         assert te.signatures[1] == signer1.sign_payload_decorated(b"cat!!!")
 

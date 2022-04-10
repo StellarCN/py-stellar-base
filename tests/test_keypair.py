@@ -25,7 +25,7 @@ class TestKeypair:
         kp = Keypair.from_secret(secret)
         assert isinstance(kp, Keypair)
         assert (
-                kp.public_key == "GDFQVQCYYB7GKCGSCUSIQYXTPLV5YJ3XWDMWGQMDNM4EAXAL7LITIBQ7"
+            kp.public_key == "GDFQVQCYYB7GKCGSCUSIQYXTPLV5YJ3XWDMWGQMDNM4EAXAL7LITIBQ7"
         )
         assert kp.secret == secret
 
@@ -41,8 +41,8 @@ class TestKeypair:
     )
     def test_create_from_invalid_secret_raise(self, invalid_secret):
         with pytest.raises(
-                Ed25519SecretSeedInvalidError,
-                match="Invalid Ed25519 Secret Seed: {}".format(invalid_secret),
+            Ed25519SecretSeedInvalidError,
+            match="Invalid Ed25519 Secret Seed: {}".format(invalid_secret),
         ):
             Keypair.from_secret(invalid_secret)
 
@@ -51,11 +51,11 @@ class TestKeypair:
         kp = Keypair.from_public_key(public_key)
         assert isinstance(kp, Keypair)
         assert (
-                kp.public_key == "GAXDYNIBA5E4DXR5TJN522RRYESFQ5UNUXHIPTFGVLLD5O5K552DF5ZH"
+            kp.public_key == "GAXDYNIBA5E4DXR5TJN522RRYESFQ5UNUXHIPTFGVLLD5O5K552DF5ZH"
         )
         assert (
-                kp.raw_public_key().hex()
-                == "2e3c35010749c1de3d9a5bdd6a31c12458768da5ce87cca6aad63ebbaaef7432"
+            kp.raw_public_key().hex()
+            == "2e3c35010749c1de3d9a5bdd6a31c12458768da5ce87cca6aad63ebbaaef7432"
         )
 
     @pytest.mark.parametrize(
@@ -70,8 +70,8 @@ class TestKeypair:
     )
     def test_create_from_invalid_public_key_raise(self, invalid_public_key):
         with pytest.raises(
-                Ed25519PublicKeyInvalidError,
-                match="Invalid Ed25519 Public Key: {}".format(invalid_public_key),
+            Ed25519PublicKeyInvalidError,
+            match="Invalid Ed25519 Public Key: {}".format(invalid_public_key),
         ):
             Keypair.from_public_key(invalid_public_key)
 
@@ -91,9 +91,9 @@ class TestKeypair:
             "GAXDYNIBA5E4DXR5TJN522RRYESFQ5UNUXHIPTFGVLLD5O5K552DF5ZH"
         )
         with pytest.raises(
-                MissingEd25519SecretSeedError,
-                match="The keypair does not contain secret seed. Use Keypair.from_secret, "
-                      "Keypair.random or Keypair.from_mnemonic_phrase to create a new keypair with a secret seed.",
+            MissingEd25519SecretSeedError,
+            match="The keypair does not contain secret seed. Use Keypair.from_secret, "
+            "Keypair.random or Keypair.from_mnemonic_phrase to create a new keypair with a secret seed.",
         ):
             can_not_sign_kp.sign(data)
 
@@ -104,9 +104,9 @@ class TestKeypair:
         data = b"Hello, overcat!"
         signature = kp.sign(data)
         assert (
-                signature.hex()
-                == "ff7c4346977144019e7be0c12c033e99f412e70361924e298e6152dd924c88f2"
-                   "725c60c56067f20c35a8ff29c936b983f652b4df2d9de8f2851605df2f680c06"
+            signature.hex()
+            == "ff7c4346977144019e7be0c12c033e99f412e70361924e298e6152dd924c88f2"
+            "725c60c56067f20c35a8ff29c936b983f652b4df2d9de8f2851605df2f680c06"
         )
         kp.verify(data, signature)
 
@@ -154,14 +154,14 @@ class TestKeypair:
         secret = "SD7X7LEHBNMUIKQGKPARG5TDJNBHKC346OUARHGZL5ITC6IJPXHILY36"
         kp = Keypair.from_secret(secret)
         with pytest.raises(
-                AttributeError,
-                match="Please use `Keypair.from_secret` to generate a new Keypair object.",
+            AttributeError,
+            match="Please use `Keypair.from_secret` to generate a new Keypair object.",
         ):
             kp.secret = "SAMWF63FZ5ZNHY75SNYNAFMWTL5FPBMIV7DLB3UDAVLL7DKPI5ZFS2S6"
 
         with pytest.raises(
-                AttributeError,
-                match="Please use `Keypair.from_public_key` to generate a new Keypair object.",
+            AttributeError,
+            match="Please use `Keypair.from_public_key` to generate a new Keypair object.",
         ):
             kp.public_key = "GAXDYNIBA5E4DXR5TJN522RRYESFQ5UNUXHIPTFGVLLD5O5K552DF5ZH"
 
@@ -169,14 +169,14 @@ class TestKeypair:
         "kp1, kp2, equal",
         [
             (
-                    "SD7X7LEHBNMUIKQGKPARG5TDJNBHKC346OUARHGZL5ITC6IJPXHILY36",
-                    "SD7X7LEHBNMUIKQGKPARG5TDJNBHKC346OUARHGZL5ITC6IJPXHILY36",
-                    True,
+                "SD7X7LEHBNMUIKQGKPARG5TDJNBHKC346OUARHGZL5ITC6IJPXHILY36",
+                "SD7X7LEHBNMUIKQGKPARG5TDJNBHKC346OUARHGZL5ITC6IJPXHILY36",
+                True,
             ),
             (
-                    "SAQVS3IPN6U3TBMTXQH32ZESY7SUOZGLEFBH6XWMA6DVNPJ4CLO5M54B",
-                    "SD7X7LEHBNMUIKQGKPARG5TDJNBHKC346OUARHGZL5ITC6IJPXHILY36",
-                    False,
+                "SAQVS3IPN6U3TBMTXQH32ZESY7SUOZGLEFBH6XWMA6DVNPJ4CLO5M54B",
+                "SD7X7LEHBNMUIKQGKPARG5TDJNBHKC346OUARHGZL5ITC6IJPXHILY36",
+                False,
             ),
         ],
     )
@@ -230,9 +230,9 @@ class TestKeypair:
     def test_generate_mnemonic_phrase_invalid_strength_raise(self):
         strength = 1024
         with pytest.raises(
-                ValueError,
-                match=r"Strength should be one of the following \(128, 160, 192, 224, 256\), but it is not \(%d\)."
-                      % strength,
+            ValueError,
+            match=r"Strength should be one of the following \(128, 160, 192, 224, 256\), but it is not \(%d\)."
+            % strength,
         ):
             Keypair.generate_mnemonic_phrase(strength=strength)
 
@@ -482,25 +482,25 @@ class TestKeypair:
         "mnemonic, language",
         [
             (
-                    "usual canvas judge video wall ride rookie together enhance able evoke one",
-                    Language.CHINESE_SIMPLIFIED,
+                "usual canvas judge video wall ride rookie together enhance able evoke one",
+                Language.CHINESE_SIMPLIFIED,
             ),
             (
-                    "invalid_mnemonic canvas judge video wall ride rookie together enhance able evoke one",
-                    Language.ENGLISH,
+                "invalid_mnemonic canvas judge video wall ride rookie together enhance able evoke one",
+                Language.ENGLISH,
             ),
             (
-                    "usual canvas judge video wall ride rookie together enhance able evoke",
-                    Language.ENGLISH,
+                "usual canvas judge video wall ride rookie together enhance able evoke",
+                Language.ENGLISH,
             ),
             ("胸泉谈新钉励确连球遇孤资氯递陪壤框碧折锋慌拖射潮", Language.CHINESE_SIMPLIFIED),
         ],
     )
     def test_invalid_mnemonic_raise(self, mnemonic, language):
         with pytest.raises(
-                ValueError,
-                match="Invalid mnemonic, please check if the mnemonic is correct, "
-                      "or if the language is set correctly.",
+            ValueError,
+            match="Invalid mnemonic, please check if the mnemonic is correct, "
+            "or if the language is set correctly.",
         ):
             assert Keypair.from_mnemonic_phrase(
                 mnemonic_phrase=mnemonic, language=language
@@ -510,24 +510,24 @@ class TestKeypair:
         public_key = "GBRF6PKZYP4J4WI2A3NF4CGF23SL34GRKA5LTQZCQFEUT2YJDZO2COXH"
         kp = Keypair.from_public_key(public_key)
         assert (
-                kp.xdr_public_key().to_xdr()
-                == "AAAAAGJfPVnD+J5ZGgbaXgjF1uS98NFQOrnDIoFJSesJHl2h"
+            kp.xdr_public_key().to_xdr()
+            == "AAAAAGJfPVnD+J5ZGgbaXgjF1uS98NFQOrnDIoFJSesJHl2h"
         )
 
     def test_xdr_account_id(self):
         public_key = "GBRF6PKZYP4J4WI2A3NF4CGF23SL34GRKA5LTQZCQFEUT2YJDZO2COXH"
         kp = Keypair.from_public_key(public_key)
         assert (
-                kp.xdr_account_id().to_xdr()
-                == "AAAAAGJfPVnD+J5ZGgbaXgjF1uS98NFQOrnDIoFJSesJHl2h"
+            kp.xdr_account_id().to_xdr()
+            == "AAAAAGJfPVnD+J5ZGgbaXgjF1uS98NFQOrnDIoFJSesJHl2h"
         )
 
     def test_xdr_muxed_account(self):
         public_key = "GBRF6PKZYP4J4WI2A3NF4CGF23SL34GRKA5LTQZCQFEUT2YJDZO2COXH"
         kp = Keypair.from_public_key(public_key)
         assert (
-                kp.xdr_muxed_account().to_xdr()
-                == "AAAAAGJfPVnD+J5ZGgbaXgjF1uS98NFQOrnDIoFJSesJHl2h"
+            kp.xdr_muxed_account().to_xdr()
+            == "AAAAAGJfPVnD+J5ZGgbaXgjF1uS98NFQOrnDIoFJSesJHl2h"
         )
 
     def test_sign_decorated(self):

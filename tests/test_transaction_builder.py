@@ -12,17 +12,16 @@ from stellar_sdk import (
     Claimant,
     FeeBumpTransactionEnvelope,
     Keypair,
+    LedgerBounds,
     LiquidityPoolAsset,
     Network,
+    Preconditions,
     Signer,
+    SignerKey,
+    TimeBounds,
     TransactionBuilder,
     TrustLineEntryFlag,
     TrustLineFlags,
-    SignerKey,
-    SignedPayloadSigner,
-    TimeBounds,
-    LedgerBounds,
-    Preconditions,
 )
 
 kp1 = Keypair.from_secret(
