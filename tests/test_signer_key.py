@@ -240,3 +240,15 @@ class TestSignedPayloadSigner:
             signed_payload_signer
             == SignerKey.from_xdr_object(xdr_obj).to_signed_payload_signer()
         )
+
+    def test_to_signed_payload_signer_raise(self):
+        signer_key_data = b"\x85\xba{e\xeb\x92\x83r\xb2\xf5\xc4Z$\xc2\x84b\xc6\x8a\xa6\x04\x86dg$x6\x0c\xeb\x9aW\x13W"
+        signer_key_type = SignerKeyType.SIGNER_KEY_TYPE_HASH_X
+        signer_key = SignerKey(signer_key_data, signer_key_type)
+        with pytest.raises(
+            ValueError,
+            match="<SignerKeyType.SIGNER_KEY_TYPE_HASH_X: 2> is an unsupported signer "
+            "key type, it should be "
+            "<SignerKeyType.SIGNER_KEY_TYPE_ED25519_SIGNED_PAYLOAD: 3>",
+        ):
+            signer_key.to_signed_payload_signer()
