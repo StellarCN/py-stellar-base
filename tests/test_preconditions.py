@@ -80,7 +80,7 @@ class TestPreconditions:
             ),
         ]
         with pytest.raises(
-            ValueError, match="extra_signers cannot be longer than 2 elements."
+            ValueError, match='"extra_signers" cannot be longer than 2 elements.'
         ):
             Preconditions(extra_signers=extra_signers)
 

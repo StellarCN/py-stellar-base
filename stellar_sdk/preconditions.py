@@ -42,15 +42,15 @@ class Preconditions:
         if not extra_signers:
             extra_signers = None
 
+        if extra_signers and len(extra_signers) > 2:
+            raise ValueError('"extra_signers" cannot be longer than 2 elements.')
+
         self.time_bounds = time_bounds
         self.ledger_bounds = ledger_bounds
         self.min_sequence_number = min_sequence_number
         self.min_sequence_age = min_sequence_age
         self.min_sequence_ledger_gap = min_sequence_ledger_gap
         self.extra_signers = extra_signers
-
-        if extra_signers and len(extra_signers) > 2:
-            raise ValueError("extra_signers cannot be longer than 2 elements.")
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
@@ -178,7 +178,7 @@ class Preconditions:
         elif xdr_object.type == stellar_xdr.PreconditionType.PRECOND_NONE:
             return cls()
         else:
-            raise ValueError("Invalid Preconditions type.")
+            raise ValueError(f"Invalid PreconditionType: {xdr_object.type!r}")
 
     def __str__(self):
         return (
