@@ -1,6 +1,12 @@
 Release History
 ==============
 
+### Version 7.0.2
+Released on April 07, 2022
+
+#### Update
+* fix: fixed-length arrays pack/unpack should not include length, but the previous releases incorrectly include it. ([#581](https://github.com/StellarCN/py-stellar-base/pull/581))
+
 ### Version 7.0.1
 Released on February 23, 2022
 
