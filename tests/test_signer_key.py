@@ -20,6 +20,7 @@ class TestSignerKey:
         )
         assert signer_key.to_xdr_object() == signer_key_xdr
         assert signer_key.encoded_signer_key == account_id
+        assert SignerKey.from_encoded_signer_key(account_id) == signer_key
         assert SignerKey.from_xdr_object(signer_key_xdr) == signer_key
         assert SignerKey.ed25519_public_key(account_id) == signer_key
         assert SignerKey.ed25519_public_key(signer_key_data) == signer_key
@@ -35,6 +36,7 @@ class TestSignerKey:
         )
         assert signer_key.to_xdr_object() == signer_key_xdr
         assert signer_key.encoded_signer_key == pre_auth_tx
+        assert SignerKey.from_encoded_signer_key(pre_auth_tx) == signer_key
         assert SignerKey.from_xdr_object(signer_key_xdr) == signer_key
         assert SignerKey.pre_auth_tx(pre_auth_tx) == signer_key
         assert SignerKey.pre_auth_tx(signer_key_data) == signer_key
@@ -50,6 +52,7 @@ class TestSignerKey:
         )
         assert signer_key.to_xdr_object() == signer_key_xdr
         assert signer_key.encoded_signer_key == sha256_hash
+        assert SignerKey.from_encoded_signer_key(sha256_hash) == signer_key
         assert SignerKey.from_xdr_object(signer_key_xdr) == signer_key
         assert SignerKey.sha256_hash(sha256_hash) == signer_key
         assert SignerKey.sha256_hash(signer_key_data) == signer_key
@@ -174,6 +177,7 @@ class TestSignerKey:
         )
         assert signer_key.to_xdr_object() == signer_key_xdr
         assert signer_key.encoded_signer_key == ed25519_signed_payload
+        assert SignerKey.from_encoded_signer_key(ed25519_signed_payload) == signer_key
         assert SignerKey.from_xdr_object(signer_key_xdr) == signer_key
         assert SignerKey.ed25519_signed_payload(ed25519_signed_payload) == signer_key
         assert SignerKey.ed25519_signed_payload(signer_key_data) == signer_key
@@ -200,6 +204,7 @@ class TestSignedPayloadSigner:
         signed_payload_signer = SignedPayloadSigner(account_id, payload)
         signer_key = SignerKey.ed25519_signed_payload(signed_payload_signer)
         assert signer_key.encoded_signer_key == strkey
+        assert SignerKey.from_encoded_signer_key(strkey) == signer_key
 
     @pytest.mark.parametrize(
         "account_id, payload, strkey",
