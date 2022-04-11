@@ -1020,6 +1020,34 @@ class TestTxrep:
             == te.to_xdr()
         )
 
+    def test_to_txrep_cond_none(self):
+        keypair = Keypair.from_secret(
+            "SAHGKA7QJB6SRFDZSPZDEEIOEHUHTQS4XVN4IMR5YCKBPEN5A6YNKKUO"
+        )
+        account = Account(keypair.public_key, 46489056724385792)
+        transaction_builder = TransactionBuilder(
+            source_account=account,
+            network_passphrase=Network.TESTNET_NETWORK_PASSPHRASE,
+            base_fee=100,
+        )
+        transaction_builder.add_text_memo("Enjoy this transaction")
+        transaction_builder.append_payment_op(
+            destination="GBAF6NXN3DHSF357QBZLTBNWUTABKUODJXJYYE32ZDKA2QBM2H33IK6O",
+            asset=Asset(
+                "USD", "GAZFEVBSEGJJ63WPVVIWXLZLWN2JYZECECGT6GUNP4FJDVZVNXWQWMYI"
+            ),
+            amount="40.0004",
+            source=keypair.public_key,
+        )
+        te = transaction_builder.build()
+        te.sign(keypair)
+        txrep = to_txrep(te)
+        assert txrep == get_txrep_file("test_to_txrep_cond_precond_none.txt")
+        assert (
+            from_txrep(txrep, Network.TESTNET_NETWORK_PASSPHRASE).to_xdr()
+            == te.to_xdr()
+        )
+
     def test_get_value_missing_raise(self):
         raw_data_map = {"k": "v"}
         missing_key = "missing_key"
