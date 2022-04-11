@@ -5,9 +5,9 @@ feeBump.tx.innerTx.type: ENVELOPE_TYPE_TX
 feeBump.tx.innerTx.tx.sourceAccount: GBEFNJVA2347XAJ4HYAECN5S7DIMLRDKXYT7BSFGF6SDM4VH5TD5HGJB
 feeBump.tx.innerTx.tx.fee: 100
 feeBump.tx.innerTx.tx.seqNum: 46489056724385793
-feeBump.tx.innerTx.tx.timeBounds._present: true
-feeBump.tx.innerTx.tx.timeBounds.minTime: 1535756672 (2018-08-31 23:04:32.000000+00:00 (UTC))
-feeBump.tx.innerTx.tx.timeBounds.maxTime: 1567292672 (2019-08-31 23:04:32.000000+00:00 (UTC))
+feeBump.tx.innerTx.tx.cond.type: PRECOND_TIME
+feeBump.tx.innerTx.tx.cond.timeBounds.minTime: 1535756672 (2018-08-31 23:04:32.000000+00:00 (UTC))
+feeBump.tx.innerTx.tx.cond.timeBounds.maxTime: 1567292672 (2019-08-31 23:04:32.000000+00:00 (UTC))
 feeBump.tx.innerTx.tx.memo.type: MEMO_TEXT
 feeBump.tx.innerTx.tx.memo.text: "Enjoy this transaction"
 feeBump.tx.innerTx.tx.operations.len: 1

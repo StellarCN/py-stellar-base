@@ -231,34 +231,6 @@ class TestTxrep:
             == te.to_xdr()
         )
 
-    def test_to_txrep_no_timebounds(self):
-        keypair = Keypair.from_secret(
-            "SAHGKA7QJB6SRFDZSPZDEEIOEHUHTQS4XVN4IMR5YCKBPEN5A6YNKKUO"
-        )
-        account = Account(keypair.public_key, 46489056724385792)
-        transaction_builder = TransactionBuilder(
-            source_account=account,
-            network_passphrase=Network.TESTNET_NETWORK_PASSPHRASE,
-            base_fee=100,
-        )
-        transaction_builder.add_text_memo("Enjoy this transaction")
-        transaction_builder.append_payment_op(
-            destination="GBAF6NXN3DHSF357QBZLTBNWUTABKUODJXJYYE32ZDKA2QBM2H33IK6O",
-            asset=Asset(
-                "USD", "GAZFEVBSEGJJ63WPVVIWXLZLWN2JYZECECGT6GUNP4FJDVZVNXWQWMYI"
-            ),
-            amount="40.0004",
-            source=keypair.public_key,
-        )
-        te = transaction_builder.build()
-        te.sign(keypair)
-        txrep = to_txrep(te)
-        assert txrep == get_txrep_file("test_to_txrep_no_timebounds.txt")
-        assert (
-            from_txrep(txrep, Network.TESTNET_NETWORK_PASSPHRASE).to_xdr()
-            == te.to_xdr()
-        )
-
     def test_to_txrep_id_memo(self):
         keypair = Keypair.from_secret(
             "SAHGKA7QJB6SRFDZSPZDEEIOEHUHTQS4XVN4IMR5YCKBPEN5A6YNKKUO"
@@ -821,6 +793,228 @@ class TestTxrep:
         assert (
             from_txrep(txrep, Network.TESTNET_NETWORK_PASSPHRASE).to_xdr()
             == fee_bump_tx.to_xdr()
+        )
+
+    def test_to_txrep_cond_precond_timebounds(self):
+        keypair = Keypair.from_secret(
+            "SAHGKA7QJB6SRFDZSPZDEEIOEHUHTQS4XVN4IMR5YCKBPEN5A6YNKKUO"
+        )
+        account = Account(keypair.public_key, 46489056724385792)
+        transaction_builder = TransactionBuilder(
+            source_account=account,
+            network_passphrase=Network.TESTNET_NETWORK_PASSPHRASE,
+            base_fee=100,
+        )
+        transaction_builder.add_time_bounds(1649237469, 1649238469)
+        transaction_builder.add_text_memo("Enjoy this transaction")
+        transaction_builder.append_payment_op(
+            destination="GBAF6NXN3DHSF357QBZLTBNWUTABKUODJXJYYE32ZDKA2QBM2H33IK6O",
+            asset=Asset(
+                "USD", "GAZFEVBSEGJJ63WPVVIWXLZLWN2JYZECECGT6GUNP4FJDVZVNXWQWMYI"
+            ),
+            amount="40.0004",
+            source=keypair.public_key,
+        )
+        te = transaction_builder.build()
+        te.sign(keypair)
+        txrep = to_txrep(te)
+        assert txrep == get_txrep_file("test_to_txrep_cond_precond_timebounds.txt")
+        assert (
+            from_txrep(txrep, Network.TESTNET_NETWORK_PASSPHRASE).to_xdr()
+            == te.to_xdr()
+        )
+
+    def test_to_txrep_cond_precond_ledger_bounds(self):
+        keypair = Keypair.from_secret(
+            "SAHGKA7QJB6SRFDZSPZDEEIOEHUHTQS4XVN4IMR5YCKBPEN5A6YNKKUO"
+        )
+        account = Account(keypair.public_key, 46489056724385792)
+        transaction_builder = TransactionBuilder(
+            source_account=account,
+            network_passphrase=Network.TESTNET_NETWORK_PASSPHRASE,
+            base_fee=100,
+        )
+        transaction_builder.set_ledger_bounds(40351800, 40352000)
+        transaction_builder.add_text_memo("Enjoy this transaction")
+        transaction_builder.append_payment_op(
+            destination="GBAF6NXN3DHSF357QBZLTBNWUTABKUODJXJYYE32ZDKA2QBM2H33IK6O",
+            asset=Asset(
+                "USD", "GAZFEVBSEGJJ63WPVVIWXLZLWN2JYZECECGT6GUNP4FJDVZVNXWQWMYI"
+            ),
+            amount="40.0004",
+            source=keypair.public_key,
+        )
+        te = transaction_builder.build()
+        te.sign(keypair)
+        txrep = to_txrep(te)
+        assert txrep == get_txrep_file("test_to_txrep_cond_precond_ledger_bounds.txt")
+        assert (
+            from_txrep(txrep, Network.TESTNET_NETWORK_PASSPHRASE).to_xdr()
+            == te.to_xdr()
+        )
+
+    def test_to_txrep_cond_precond_min_sequence_number(self):
+        keypair = Keypair.from_secret(
+            "SAHGKA7QJB6SRFDZSPZDEEIOEHUHTQS4XVN4IMR5YCKBPEN5A6YNKKUO"
+        )
+        account = Account(keypair.public_key, 46489056724385792)
+        transaction_builder = TransactionBuilder(
+            source_account=account,
+            network_passphrase=Network.TESTNET_NETWORK_PASSPHRASE,
+            base_fee=100,
+        )
+        transaction_builder.set_min_sequence_number(103420918407103888)
+        transaction_builder.add_text_memo("Enjoy this transaction")
+        transaction_builder.append_payment_op(
+            destination="GBAF6NXN3DHSF357QBZLTBNWUTABKUODJXJYYE32ZDKA2QBM2H33IK6O",
+            asset=Asset(
+                "USD", "GAZFEVBSEGJJ63WPVVIWXLZLWN2JYZECECGT6GUNP4FJDVZVNXWQWMYI"
+            ),
+            amount="40.0004",
+            source=keypair.public_key,
+        )
+        te = transaction_builder.build()
+        te.sign(keypair)
+        txrep = to_txrep(te)
+        assert txrep == get_txrep_file(
+            "test_to_txrep_cond_precond_min_sequence_number.txt"
+        )
+        assert (
+            from_txrep(txrep, Network.TESTNET_NETWORK_PASSPHRASE).to_xdr()
+            == te.to_xdr()
+        )
+
+    def test_to_txrep_cond_precond_min_sequence_age(self):
+        keypair = Keypair.from_secret(
+            "SAHGKA7QJB6SRFDZSPZDEEIOEHUHTQS4XVN4IMR5YCKBPEN5A6YNKKUO"
+        )
+        account = Account(keypair.public_key, 46489056724385792)
+        transaction_builder = TransactionBuilder(
+            source_account=account,
+            network_passphrase=Network.TESTNET_NETWORK_PASSPHRASE,
+            base_fee=100,
+        )
+        transaction_builder.set_min_sequence_age(1649239999)
+        transaction_builder.add_text_memo("Enjoy this transaction")
+        transaction_builder.append_payment_op(
+            destination="GBAF6NXN3DHSF357QBZLTBNWUTABKUODJXJYYE32ZDKA2QBM2H33IK6O",
+            asset=Asset(
+                "USD", "GAZFEVBSEGJJ63WPVVIWXLZLWN2JYZECECGT6GUNP4FJDVZVNXWQWMYI"
+            ),
+            amount="40.0004",
+            source=keypair.public_key,
+        )
+        te = transaction_builder.build()
+        te.sign(keypair)
+        txrep = to_txrep(te)
+        assert txrep == get_txrep_file(
+            "test_to_txrep_cond_precond_min_sequence_age.txt"
+        )
+        assert (
+            from_txrep(txrep, Network.TESTNET_NETWORK_PASSPHRASE).to_xdr()
+            == te.to_xdr()
+        )
+
+    def test_to_txrep_cond_precond_min_sequence_ledger_gap(self):
+        keypair = Keypair.from_secret(
+            "SAHGKA7QJB6SRFDZSPZDEEIOEHUHTQS4XVN4IMR5YCKBPEN5A6YNKKUO"
+        )
+        account = Account(keypair.public_key, 46489056724385792)
+        transaction_builder = TransactionBuilder(
+            source_account=account,
+            network_passphrase=Network.TESTNET_NETWORK_PASSPHRASE,
+            base_fee=100,
+        )
+        transaction_builder.set_min_sequence_ledger_gap(30)
+        transaction_builder.add_text_memo("Enjoy this transaction")
+        transaction_builder.append_payment_op(
+            destination="GBAF6NXN3DHSF357QBZLTBNWUTABKUODJXJYYE32ZDKA2QBM2H33IK6O",
+            asset=Asset(
+                "USD", "GAZFEVBSEGJJ63WPVVIWXLZLWN2JYZECECGT6GUNP4FJDVZVNXWQWMYI"
+            ),
+            amount="40.0004",
+            source=keypair.public_key,
+        )
+        te = transaction_builder.build()
+        te.sign(keypair)
+        txrep = to_txrep(te)
+        assert txrep == get_txrep_file(
+            "test_to_txrep_cond_precond_min_sequence_ledger_gap.txt"
+        )
+        assert (
+            from_txrep(txrep, Network.TESTNET_NETWORK_PASSPHRASE).to_xdr()
+            == te.to_xdr()
+        )
+
+    def test_to_txrep_cond_precond_extra_signers(self):
+        keypair = Keypair.from_secret(
+            "SAHGKA7QJB6SRFDZSPZDEEIOEHUHTQS4XVN4IMR5YCKBPEN5A6YNKKUO"
+        )
+        account = Account(keypair.public_key, 46489056724385792)
+        transaction_builder = TransactionBuilder(
+            source_account=account,
+            network_passphrase=Network.TESTNET_NETWORK_PASSPHRASE,
+            base_fee=100,
+        )
+        transaction_builder.add_extra_signer(
+            "GBJCHUKZMTFSLOMNC7P4TS4VJJBTCYL3XKSOLXAUJSD56C4LHND5TWUC"
+        )
+        transaction_builder.add_text_memo("Enjoy this transaction")
+        transaction_builder.append_payment_op(
+            destination="GBAF6NXN3DHSF357QBZLTBNWUTABKUODJXJYYE32ZDKA2QBM2H33IK6O",
+            asset=Asset(
+                "USD", "GAZFEVBSEGJJ63WPVVIWXLZLWN2JYZECECGT6GUNP4FJDVZVNXWQWMYI"
+            ),
+            amount="40.0004",
+            source=keypair.public_key,
+        )
+        te = transaction_builder.build()
+        te.sign(keypair)
+        txrep = to_txrep(te)
+        assert txrep == get_txrep_file("test_to_txrep_cond_precond_extra_signers.txt")
+        assert (
+            from_txrep(txrep, Network.TESTNET_NETWORK_PASSPHRASE).to_xdr()
+            == te.to_xdr()
+        )
+
+    def test_to_txrep_cond_precond_full(self):
+        keypair = Keypair.from_secret(
+            "SAHGKA7QJB6SRFDZSPZDEEIOEHUHTQS4XVN4IMR5YCKBPEN5A6YNKKUO"
+        )
+        account = Account(keypair.public_key, 46489056724385792)
+        transaction_builder = TransactionBuilder(
+            source_account=account,
+            network_passphrase=Network.TESTNET_NETWORK_PASSPHRASE,
+            base_fee=100,
+        )
+
+        transaction_builder.add_time_bounds(1649237469, 1649238469)
+        transaction_builder.set_ledger_bounds(40351800, 40352000)
+        transaction_builder.set_min_sequence_number(103420918407103888)
+        transaction_builder.set_min_sequence_age(1649239999)
+        transaction_builder.set_min_sequence_ledger_gap(30)
+        transaction_builder.add_extra_signer(
+            "GBJCHUKZMTFSLOMNC7P4TS4VJJBTCYL3XKSOLXAUJSD56C4LHND5TWUC"
+        )
+        transaction_builder.add_extra_signer(
+            "PA7QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLTJJFC7MGXUA74P7UJUAAAAAQACAQDAQCQMBYIBEFAWDANBYHRAEISCMKBKFQXDAMRUGY4DUPB6IBZGM"
+        )
+        transaction_builder.add_text_memo("Enjoy this transaction")
+        transaction_builder.append_payment_op(
+            destination="GBAF6NXN3DHSF357QBZLTBNWUTABKUODJXJYYE32ZDKA2QBM2H33IK6O",
+            asset=Asset(
+                "USD", "GAZFEVBSEGJJ63WPVVIWXLZLWN2JYZECECGT6GUNP4FJDVZVNXWQWMYI"
+            ),
+            amount="40.0004",
+            source=keypair.public_key,
+        )
+        te = transaction_builder.build()
+        te.sign(keypair)
+        txrep = to_txrep(te)
+        assert txrep == get_txrep_file("test_to_txrep_cond_precond_full.txt")
+        assert (
+            from_txrep(txrep, Network.TESTNET_NETWORK_PASSPHRASE).to_xdr()
+            == te.to_xdr()
         )
 
     def test_get_value_missing_raise(self):

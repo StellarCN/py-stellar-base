@@ -2,9 +2,9 @@ type: ENVELOPE_TYPE_TX
 tx.sourceAccount: GBEFNJVA2347XAJ4HYAECN5S7DIMLRDKXYT7BSFGF6SDM4VH5TD5HGJB
 tx.fee: 7800
 tx.seqNum: 46489056724385793
-tx.timeBounds._present: true
-tx.timeBounds.minTime: 1535756672 (2018-08-31 23:04:32.000000+00:00 (UTC))
-tx.timeBounds.maxTime: 1567292672 (2019-08-31 23:04:32.000000+00:00 (UTC))
+tx.cond.type: PRECOND_TIME
+tx.cond.timeBounds.minTime: 1535756672 (2018-08-31 23:04:32.000000+00:00 (UTC))
+tx.cond.timeBounds.maxTime: 1567292672 (2019-08-31 23:04:32.000000+00:00 (UTC))
 tx.memo.type: MEMO_TEXT
 tx.memo.text: "Enjoy this transaction"
 tx.operations.len: 39

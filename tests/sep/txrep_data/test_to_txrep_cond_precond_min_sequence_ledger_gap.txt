@@ -2,11 +2,15 @@ type: ENVELOPE_TYPE_TX
 tx.sourceAccount: GBEFNJVA2347XAJ4HYAECN5S7DIMLRDKXYT7BSFGF6SDM4VH5TD5HGJB
 tx.fee: 100
 tx.seqNum: 46489056724385793
-tx.cond.type: PRECOND_TIME
-tx.cond.timeBounds.minTime: 1535756672 (2018-08-31 23:04:32.000000+00:00 (UTC))
-tx.cond.timeBounds.maxTime: 1567292672 (2019-08-31 23:04:32.000000+00:00 (UTC))
-tx.memo.type: MEMO_ID
-tx.memo.id: 114514
+tx.cond.type: PRECOND_V2
+tx.cond.timeBounds._present: false
+tx.cond.ledgerBounds._present: false
+tx.cond.minSeqNum._present: false
+tx.cond.minSeqAge: 0
+tx.cond.minSeqLedgerGap: 30
+tx.cond.extraSigners.len: 0
+tx.memo.type: MEMO_TEXT
+tx.memo.text: "Enjoy this transaction"
 tx.operations.len: 1
 tx.operations[0].sourceAccount._present: true
 tx.operations[0].sourceAccount: GBEFNJVA2347XAJ4HYAECN5S7DIMLRDKXYT7BSFGF6SDM4VH5TD5HGJB
@@ -17,4 +21,4 @@ tx.operations[0].body.paymentOp.amount: 400004000 (40.0004)
 tx.ext.v: 0
 signatures.len: 1
 signatures[0].hint: a7ecc7d3
-signatures[0].signature: e8933e09dc0ba1429f693172fcb5bfec301087fa8d810d23d90f5c0c7acf553f832186ac2fd1781e6936a4ebafbf4d40b296895e5e8802154cb537d0ae4a4b0d
+signatures[0].signature: b725195b18b5e484639baf6cf74a5dd2f6ddd547448b27d245a59057a89f5bab761eab27e15bfda2b355b7a6783dbb42da6bc12cfe328e2677716b2799782d00
