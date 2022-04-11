@@ -93,7 +93,8 @@ exclude_lines = [
     "def __str__",
     "if self\\.debug",
     "if 0:",
-    "if __name__ == .__main__.:"
+    "if __name__ == .__main__.:",
+    "pass"
 ]
 
 [build-system]

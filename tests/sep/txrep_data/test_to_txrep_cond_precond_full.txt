@@ -1,0 +1,33 @@
+type: ENVELOPE_TYPE_TX
+tx.sourceAccount: GBEFNJVA2347XAJ4HYAECN5S7DIMLRDKXYT7BSFGF6SDM4VH5TD5HGJB
+tx.fee: 100
+tx.seqNum: 46489056724385793
+tx.cond.type: PRECOND_V2
+tx.cond.timeBounds._present: true
+tx.cond.timeBounds.minTime: 1649237469 (2022-04-06 09:31:09.000000+00:00 (UTC))
+tx.cond.timeBounds.maxTime: 1649238469 (2022-04-06 09:47:49.000000+00:00 (UTC))
+tx.cond.ledgerBounds._present: true
+tx.cond.ledgerBounds.minLedger: 40351800
+tx.cond.ledgerBounds.maxLedger: 40352000
+tx.cond.minSeqNum._present: true
+tx.cond.minSeqNum: 103420918407103888
+tx.cond.minSeqAge: 1649239999
+tx.cond.minSeqLedgerGap: 30
+tx.cond.extraSigners.len: 2
+tx.cond.extraSigners[0].type: SIGNER_KEY_TYPE_ED25519
+tx.cond.extraSigners[0].ed25519: GBJCHUKZMTFSLOMNC7P4TS4VJJBTCYL3XKSOLXAUJSD56C4LHND5TWUC
+tx.cond.extraSigners[1].type: SIGNER_KEY_TYPE_ED25519_SIGNED_PAYLOAD
+tx.cond.extraSigners[1].ed25519SignedPayload: PA7QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLTJJFC7MGXUA74P7UJUAAAAAQACAQDAQCQMBYIBEFAWDANBYHRAEISCMKBKFQXDAMRUGY4DUPB6IBZGM
+tx.memo.type: MEMO_TEXT
+tx.memo.text: "Enjoy this transaction"
+tx.operations.len: 1
+tx.operations[0].sourceAccount._present: true
+tx.operations[0].sourceAccount: GBEFNJVA2347XAJ4HYAECN5S7DIMLRDKXYT7BSFGF6SDM4VH5TD5HGJB
+tx.operations[0].body.type: PAYMENT
+tx.operations[0].body.paymentOp.destination: GBAF6NXN3DHSF357QBZLTBNWUTABKUODJXJYYE32ZDKA2QBM2H33IK6O
+tx.operations[0].body.paymentOp.asset: USD:GAZFEVBSEGJJ63WPVVIWXLZLWN2JYZECECGT6GUNP4FJDVZVNXWQWMYI
+tx.operations[0].body.paymentOp.amount: 400004000 (40.0004)
+tx.ext.v: 0
+signatures.len: 1
+signatures[0].hint: a7ecc7d3
+signatures[0].signature: ef279e6430b20e9000cec98c764f7e137eaeadc5f181880455ab39907a90a2da674d0ca64954ca477d5a11d2e9e4a1ffcaa76b81d12603c850b9937871efc400

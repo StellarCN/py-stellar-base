@@ -69,6 +69,8 @@ class Transaction:
 
         if memo is None:
             memo = NoneMemo()
+        if preconditions is None:
+            preconditions = Preconditions()
         if isinstance(source, str):
             source = MuxedAccount.from_account(source)
         if isinstance(source, Keypair):
@@ -79,7 +81,7 @@ class Transaction:
         self.operations: List[Operation] = operations
         self.memo: Memo = memo
         self.fee: int = fee
-        self.preconditions: Optional[Preconditions] = preconditions
+        self.preconditions: Preconditions = preconditions
         self.v1: bool = v1
 
     def get_claimable_balance_id(self, operation_index: int) -> str:

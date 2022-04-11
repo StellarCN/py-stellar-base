@@ -15,7 +15,6 @@ from typing import Dict, List, Optional, Union
 from .. import xdr as stellar_xdr
 from ..asset import Asset
 from ..decorated_signature import DecoratedSignature
-from ..exceptions import ValueError as SdkValueError
 from ..fee_bump_transaction import FeeBumpTransaction
 from ..fee_bump_transaction_envelope import FeeBumpTransactionEnvelope
 from ..liquidity_pool_asset import LiquidityPoolAsset
@@ -28,12 +27,13 @@ from ..operation.revoke_sponsorship import RevokeSponsorshipType
 from ..preconditions import Preconditions
 from ..price import Price
 from ..signer import Signer
-from ..signer_key import SignerKey
+from ..signer_key import SignerKey, SignerKeyType
 from ..strkey import StrKey
 from ..time_bounds import TimeBounds
 from ..transaction import Transaction
 from ..transaction_envelope import TransactionEnvelope
 from ..type_checked import type_checked
+from ..ledger_bounds import LedgerBounds
 
 __all__ = ["to_txrep", "from_txrep"]
 
@@ -111,8 +111,7 @@ def to_txrep(
     )
     _add_line(f"{prefix}fee", transaction.fee, lines)
     _add_line(f"{prefix}seqNum", transaction.sequence, lines)
-    # TODO: add CAP-21 support
-    _add_time_bounds(transaction.preconditions.time_bounds, prefix, lines)  # type: ignore[union-attr]
+    _add_preconditions(transaction.preconditions, f"{prefix}cond.", lines)
     _add_memo(transaction.memo, prefix, lines)
     _add_operations(transaction.operations, prefix, lines)
     _add_line(f"{prefix}ext.v", 0, lines)
@@ -154,7 +153,7 @@ def from_txrep(
     source = _get_value(raw_data_map, f"{prefix}sourceAccount")
     fee = _get_int_value(raw_data_map, f"{prefix}fee")
     sequence = _get_int_value(raw_data_map, f"{prefix}seqNum")
-    time_bounds = _get_time_bounds(raw_data_map, prefix)
+    preconditions = _get_preconditions(raw_data_map, f"{prefix}cond.")
     memo = _get_memo(raw_data_map, prefix)
     operations = _get_operations(raw_data_map, prefix)
 
@@ -166,7 +165,6 @@ def from_txrep(
         if not is_fee_bump and tx_type == _EnvelopeType.ENVELOPE_TYPE_TX_V0
         else True
     )
-    preconditions = Preconditions(time_bounds=time_bounds)
     transaction = Transaction(
         source=source,
         sequence=sequence,
@@ -234,14 +232,101 @@ def _get_raw_data_map(txrep: str) -> Dict[str, str]:
     return raw_data_map
 
 
-def _get_time_bounds(raw_data_map: Dict[str, str], prefix: str) -> Optional[TimeBounds]:
+def _get_preconditions(raw_data_map: Dict[str, str], prefix: str) -> Preconditions:
+    preconditions_type = _get_value(raw_data_map, f"{prefix}type")
+    if preconditions_type == stellar_xdr.PreconditionType.PRECOND_TIME.name:
+        time_bounds = _get_time_bounds(raw_data_map, prefix)
+        return Preconditions(time_bounds=time_bounds)
+    elif preconditions_type == stellar_xdr.PreconditionType.PRECOND_V2.name:
+        time_bounds_optional = _get_time_bounds_optional(raw_data_map, prefix)
+        ledger_bounds = _get_ledger_bounds_optional(raw_data_map, prefix)
+        min_sequence_number_present = _get_bool_value(
+            raw_data_map, f"{prefix}minSeqNum._present"
+        )
+        min_sequence_number = None
+        if min_sequence_number_present:
+            min_sequence_number = _get_int_value(raw_data_map, f"{prefix}minSeqNum")
+        min_seq_age = _get_int_value(raw_data_map, f"{prefix}minSeqAge")
+        min_sequence_ledger_gap = _get_int_value(
+            raw_data_map, f"{prefix}minSeqLedgerGap"
+        )
+        extra_signers = _get_extra_signers(raw_data_map, f"{prefix}extraSigners")
+        return Preconditions(
+            time_bounds_optional,
+            ledger_bounds,
+            min_sequence_number,
+            min_seq_age,
+            min_sequence_ledger_gap,
+            extra_signers,
+        )
+    elif preconditions_type == stellar_xdr.PreconditionType.PRECOND_NONE.name:
+        return Preconditions()
+    else:
+        raise ValueError(
+            f"This preconditions type has not been implemented yet, "
+            f"preconditions type: {preconditions_type}."
+        )
+
+
+def _get_signer_key(raw_data_map: Dict[str, str], prefix: str) -> SignerKey:
+    signer_key_type = _get_value(raw_data_map, f"{prefix}.type")
+    if signer_key_type == SignerKeyType.SIGNER_KEY_TYPE_ED25519.name:
+        key = _get_value(raw_data_map, f"{prefix}.ed25519")
+    elif signer_key_type == SignerKeyType.SIGNER_KEY_TYPE_HASH_X.name:
+        key = _get_value(raw_data_map, f"{prefix}.hashX")
+    elif signer_key_type == SignerKeyType.SIGNER_KEY_TYPE_PRE_AUTH_TX.name:
+        key = _get_value(raw_data_map, f"{prefix}.preAuthTx")
+    elif signer_key_type == SignerKeyType.SIGNER_KEY_TYPE_ED25519_SIGNED_PAYLOAD.name:
+        key = _get_value(raw_data_map, f"{prefix}.ed25519SignedPayload")
+    else:
+        raise ValueError(
+            f"This signer key type has not been implemented yet, "
+            f"signer key type: {signer_key_type}."
+        )
+    return SignerKey.from_encoded_signer_key(key)
+
+
+def _get_extra_signers(raw_data_map: Dict[str, str], prefix: str) -> List[SignerKey]:
+    extra_signers = []
+    extra_signers_length = _get_int_value(raw_data_map, f"{prefix}.len")
+    for i in range(extra_signers_length):
+        key = _get_signer_key(raw_data_map, f"{prefix}[{i}]")
+        extra_signers.append(key)
+    return extra_signers
+
+
+def _get_time_bounds_optional(
+    raw_data_map: Dict[str, str], prefix: str
+) -> Optional[TimeBounds]:
     time_bounds_present = _get_bool_value(raw_data_map, f"{prefix}timeBounds._present")
     time_bounds = None
     if time_bounds_present:
-        min_time = _get_int_value(raw_data_map, f"{prefix}timeBounds.minTime")
-        max_time = _get_int_value(raw_data_map, f"{prefix}timeBounds.maxTime")
-        time_bounds = TimeBounds(min_time=min_time, max_time=max_time)
+        time_bounds = _get_time_bounds(raw_data_map, prefix)
     return time_bounds
+
+
+def _get_time_bounds(raw_data_map: Dict[str, str], prefix: str) -> TimeBounds:
+    min_time = _get_int_value(raw_data_map, f"{prefix}timeBounds.minTime")
+    max_time = _get_int_value(raw_data_map, f"{prefix}timeBounds.maxTime")
+    return TimeBounds(min_time=min_time, max_time=max_time)
+
+
+def _get_ledger_bounds_optional(
+    raw_data_map: Dict[str, str], prefix: str
+) -> Optional[LedgerBounds]:
+    ledger_bounds_present = _get_bool_value(
+        raw_data_map, f"{prefix}ledgerBounds._present"
+    )
+    ledger_bounds = None
+    if ledger_bounds_present:
+        ledger_bounds = _get_ledger_bounds(raw_data_map, prefix)
+    return ledger_bounds
+
+
+def _get_ledger_bounds(raw_data_map: Dict[str, str], prefix: str) -> LedgerBounds:
+    min_ledger = _get_int_value(raw_data_map, f"{prefix}ledgerBounds.minLedger")
+    max_ledger = _get_int_value(raw_data_map, f"{prefix}ledgerBounds.maxLedger")
+    return LedgerBounds(min_ledger=min_ledger, max_ledger=max_ledger)
 
 
 def _get_memo(raw_data_map: Dict[str, str], prefix: str) -> Memo:
@@ -257,7 +342,7 @@ def _get_memo(raw_data_map: Dict[str, str], prefix: str) -> Memo:
     elif memo_type == "MEMO_NONE":
         return NoneMemo()
     else:
-        raise SdkValueError(
+        raise ValueError(
             f"`{memo_type}` is not a valid memo type, expected one of `MEMO_TEXT`, `MEMO_ID`, "
             f"`MEMO_HASH`, `MEMO_RETURN`, `MEMO_NONE`."
         )
@@ -422,7 +507,7 @@ def _get_operation(index, raw_data_map, tx_prefix):
             source_account_id, operation_prefix, raw_data_map
         )
     else:
-        raise SdkValueError(
+        raise ValueError(
             f"This operation has not been implemented yet, "
             f"operation type: {operation_type}."
         )
@@ -468,7 +553,7 @@ def _get_set_options_op(
             pre_auth_tx_hash = StrKey.decode_pre_auth_tx(key)
             signer = Signer.pre_auth_tx(pre_auth_tx_hash, weight)
         else:
-            raise SdkValueError("Signer key should start with `G`, `X` or `T`.")
+            raise ValueError("Signer key should start with `G`, `X` or `T`.")
 
     if _get_bool_value(raw_data_map, f"{operation_prefix}homeDomain._present"):
         home_domain = _get_string_value(raw_data_map, f"{operation_prefix}homeDomain")
@@ -736,7 +821,7 @@ def _get_create_claimable_balance_op(
             before_relative_time = _get_int_value(raw_data_map, f"{prefix}.relBefore")
             return ClaimPredicate.predicate_before_relative_time(before_relative_time)
         else:
-            raise SdkValueError(
+            raise ValueError(
                 f"This claim predicate type has not been implemented yet, "
                 f"claim predicate type: {claimant_predicate_type}."
             )
@@ -826,7 +911,7 @@ def _get_revoke_sponsorship_op(
                 liquidity_pool_id=liquidity_pool_id, source=source
             )
         else:
-            raise SdkValueError(
+            raise ValueError(
                 f"This ledger entry type has not been implemented yet, "
                 f"ledger entry type: {ledger_entry_type}."
             )
@@ -855,7 +940,7 @@ def _get_revoke_sponsorship_op(
             key = _get_value(raw_data_map, f"{operation_prefix}signer.signerKey.hashX")
             signer_key = SignerKey.sha256_hash(StrKey.decode_sha256_hash(key))
         else:
-            raise SdkValueError(
+            raise ValueError(
                 f"This signer key type has not been implemented yet, "
                 f"signer key type: {signer_key_type}."
             )
@@ -863,7 +948,7 @@ def _get_revoke_sponsorship_op(
             account_id=account_id, signer_key=signer_key, source=source
         )
     else:
-        raise SdkValueError(
+        raise ValueError(
             f"This revoke sponsorship type has not been implemented yet, "
             f"revoke sponsorship type: {revoke_sponsorship_type}."
         )
@@ -945,7 +1030,7 @@ def _get_int_value(raw_data_map: Dict[str, str], key: str) -> int:
     try:
         return int(value)
     except ValueError as e:
-        raise SdkValueError(f"Failed to convert `{value}` to int type.") from e
+        raise ValueError(f"Failed to convert `{value}` to int type.") from e
 
 
 def _get_bool_value(raw_data_map: Dict[str, str], key: str) -> bool:
@@ -955,7 +1040,7 @@ def _get_bool_value(raw_data_map: Dict[str, str], key: str) -> bool:
     elif value == _false:
         return False
     else:
-        raise SdkValueError(f"Failed to convert `{value}` to bool type.")
+        raise ValueError(f"Failed to convert `{value}` to bool type.")
 
 
 def _get_bytes_value(raw_data_map: Dict[str, str], key: str) -> bytes:
@@ -966,7 +1051,7 @@ def _get_bytes_value(raw_data_map: Dict[str, str], key: str) -> bytes:
     try:
         return bytes.fromhex(value)
     except ValueError as e:
-        raise SdkValueError(f"Failed to convert `{value}` to bytes type.") from e
+        raise ValueError(f"Failed to convert `{value}` to bytes type.") from e
 
 
 def _get_string_value(raw_data_map: Dict[str, str], key: str) -> str:
@@ -980,7 +1065,7 @@ def _get_value(raw_data_map: Dict[str, str], key: str) -> str:
     try:
         return raw_data_map[key]
     except KeyError as e:
-        raise SdkValueError(f"`{key}` is missing from txrep.") from e
+        raise ValueError(f"`{key}` is missing from txrep.") from e
 
 
 def _decode_asset(asset: str) -> Asset:
@@ -989,7 +1074,7 @@ def _decode_asset(asset: str) -> Asset:
         return Asset.native()
     parts = asset.split(":")
     if len(parts) != 2:
-        raise SdkValueError("Failed to decode asset string.")
+        raise ValueError("Failed to decode asset string.")
     return Asset(parts[0], parts[1])
 
 
@@ -1002,25 +1087,103 @@ def _add_line(
     lines.append(f"{key}: {value}{' (' + str(comment) + ')' if comment else ''}")
 
 
-def _add_time_bounds(
+def _add_preconditions(cond: Preconditions, prefix: str, lines: List[str]) -> None:
+    cond_xdr = cond.to_xdr_object()
+    _add_line(f"{prefix}type", cond_xdr.type.name, lines)
+    if cond_xdr.type == stellar_xdr.PreconditionType.PRECOND_TIME:
+        assert cond.time_bounds is not None
+        _add_time_bounds(cond.time_bounds, prefix, lines)
+    elif cond_xdr.type == stellar_xdr.PreconditionType.PRECOND_V2:
+        _add_time_bounds_optional(cond.time_bounds, prefix, lines)
+        _add_ledger_bounds_optional(cond.ledger_bounds, prefix, lines)
+        if cond.min_sequence_number is None:
+            _add_line(f"{prefix}minSeqNum._present", _false, lines)
+        else:
+            _add_line(f"{prefix}minSeqNum._present", _true, lines)
+            _add_line(f"{prefix}minSeqNum", cond.min_sequence_number, lines)
+        _add_line(f"{prefix}minSeqAge", cond.min_sequence_age or 0, lines)
+        _add_line(f"{prefix}minSeqLedgerGap", cond.min_sequence_ledger_gap or 0, lines)
+        _add_extra_signers(f"{prefix}extraSigners", cond.extra_signers, lines)
+    elif cond_xdr.type == stellar_xdr.PreconditionType.PRECOND_NONE:
+        pass
+    else:
+        raise ValueError(
+            f"This preconditions type has not been implemented yet, "
+            f"preconditions type: {cond_xdr.type}."
+        )
+
+
+def _add_signer_key(prefix: str, signer_key: SignerKey, lines: List[str]) -> None:
+    _add_line(f"{prefix}.type", signer_key.signer_key_type.name, lines)
+    key = signer_key.encoded_signer_key
+    if signer_key.signer_key_type == SignerKeyType.SIGNER_KEY_TYPE_ED25519:
+        _add_line(f"{prefix}.ed25519", key, lines)
+    elif signer_key.signer_key_type == SignerKeyType.SIGNER_KEY_TYPE_HASH_X:
+        _add_line(f"{prefix}.hashX", key, lines)
+    elif signer_key.signer_key_type == SignerKeyType.SIGNER_KEY_TYPE_PRE_AUTH_TX:
+        _add_line(f"{prefix}.preAuthTx", key, lines)
+    elif (
+        signer_key.signer_key_type
+        == SignerKeyType.SIGNER_KEY_TYPE_ED25519_SIGNED_PAYLOAD
+    ):
+        _add_line(f"{prefix}.ed25519SignedPayload", key, lines)
+    else:
+        raise ValueError(
+            f"This signer key type has not been implemented yet, "
+            f"signer key type: {signer_key.signer_key_type}."
+        )
+
+
+def _add_extra_signers(
+    prefix: str, extra_signers: Optional[List[SignerKey]], lines: List[str]
+) -> None:
+    if extra_signers is None:
+        extra_signers = []
+    _add_line(f"{prefix}.len", len(extra_signers), lines)
+    for index, extra_signer in enumerate(extra_signers):
+        _add_signer_key(f"{prefix}[{index}]", extra_signer, lines)
+
+
+def _add_time_bounds_optional(
     time_bounds: Optional[TimeBounds], prefix: str, lines: List[str]
 ) -> None:
     if time_bounds is None:
         _add_line(f"{prefix}timeBounds._present", _false, lines)
     else:
         _add_line(f"{prefix}timeBounds._present", _true, lines)
-        _add_line(
-            f"{prefix}timeBounds.minTime",
-            time_bounds.min_time,
-            lines,
-            _to_readable_utc_time_comment(time_bounds.min_time),
-        )
-        _add_line(
-            f"{prefix}timeBounds.maxTime",
-            time_bounds.max_time,
-            lines,
-            _to_readable_utc_time_comment(time_bounds.max_time),
-        )
+        _add_time_bounds(time_bounds, prefix, lines)
+
+
+def _add_time_bounds(time_bounds: TimeBounds, prefix: str, lines: List[str]) -> None:
+    _add_line(
+        f"{prefix}timeBounds.minTime",
+        time_bounds.min_time,
+        lines,
+        _to_readable_utc_time_comment(time_bounds.min_time),
+    )
+    _add_line(
+        f"{prefix}timeBounds.maxTime",
+        time_bounds.max_time,
+        lines,
+        _to_readable_utc_time_comment(time_bounds.max_time),
+    )
+
+
+def _add_ledger_bounds_optional(
+    ledger_bounds: Optional[LedgerBounds], prefix: str, lines: List[str]
+) -> None:
+    if ledger_bounds is None:
+        _add_line(f"{prefix}ledgerBounds._present", _false, lines)
+    else:
+        _add_line(f"{prefix}ledgerBounds._present", _true, lines)
+        _add_ledger_bounds(ledger_bounds, prefix, lines)
+
+
+def _add_ledger_bounds(
+    ledger_bounds: LedgerBounds, prefix: str, lines: List[str]
+) -> None:
+    _add_line(f"{prefix}ledgerBounds.minLedger", ledger_bounds.min_ledger, lines, None)
+    _add_line(f"{prefix}ledgerBounds.maxLedger", ledger_bounds.max_ledger, lines, None)
 
 
 def _add_memo(memo: Memo, prefix: str, lines: List[str]) -> None:
@@ -1166,7 +1329,7 @@ def _add_operation(
                 comment=_to_readable_utc_time_comment(claimant_predicate.rel_before),
             )
         else:
-            raise SdkValueError(
+            raise ValueError(
                 f"This claim predicate type has not been implemented yet, "
                 f"claim predicate type: {claimant_predicate.claim_predicate_type}."
             )
@@ -1412,12 +1575,12 @@ def _add_operation(
             ):
                 add_body_line("signer.signerKey.preAuthTx", key)
             else:
-                raise SdkValueError(
+                raise ValueError(
                     f"This signer key type has not been implemented yet, "
                     f"signer key type: {signer_key_xdr.type}."
                 )
         else:
-            raise SdkValueError(
+            raise ValueError(
                 f"This revoke sponsorship type has not been implemented yet, "
                 f"revoke sponsorship type: {operation.revoke_sponsorship_type}."
             )
@@ -1472,7 +1635,7 @@ def _add_operation(
             comment=operation.min_amount_b,
         )
     else:
-        raise SdkValueError(
+        raise ValueError(
             f"This operation has not been implemented yet, "
             f"operation type: {operation}."
         )
