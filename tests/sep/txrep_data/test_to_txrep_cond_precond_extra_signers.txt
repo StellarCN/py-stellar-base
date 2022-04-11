@@ -8,9 +8,11 @@ tx.cond.ledgerBounds._present: false
 tx.cond.minSeqNum._present: false
 tx.cond.minSeqAge: 0
 tx.cond.minSeqLedgerGap: 0
-tx.cond.extraSigners.len: 1
-tx.cond.extraSigners[0].type: SIGNER_KEY_TYPE_ED25519
-tx.cond.extraSigners[0].ed25519: GBJCHUKZMTFSLOMNC7P4TS4VJJBTCYL3XKSOLXAUJSD56C4LHND5TWUC
+tx.cond.extraSigners.len: 2
+tx.cond.extraSigners[0].type: SIGNER_KEY_TYPE_PRE_AUTH_TX
+tx.cond.extraSigners[0].preAuthTx: TCC3U63F5OJIG4VS6XCFUJGCQRRMNCVGASDGIZZEPA3AZ242K4JVOVKE
+tx.cond.extraSigners[1].type: SIGNER_KEY_TYPE_HASH_X
+tx.cond.extraSigners[1].hashX: XCC3U63F5OJIG4VS6XCFUJGCQRRMNCVGASDGIZZEPA3AZ242K4JVPRP5
 tx.memo.type: MEMO_TEXT
 tx.memo.text: "Enjoy this transaction"
 tx.operations.len: 1
@@ -23,4 +25,4 @@ tx.operations[0].body.paymentOp.amount: 400004000 (40.0004)
 tx.ext.v: 0
 signatures.len: 1
 signatures[0].hint: a7ecc7d3
-signatures[0].signature: b058728190ee6778f0f489c3e73112b6fd92e6231c336b1fb37eeee273fb234f8d0630407be6eafdef86d958a8e28890c180155e64f94361de71852d9156ce09
+signatures[0].signature: be29fb19e43ad67f0c58d0b1cba9b5831539f0a334a8f7038367063d41d323599280fa88fe495a6de9573edc1e4a859a4a6828bd3159704355f22f14e880530e

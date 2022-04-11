@@ -957,7 +957,10 @@ class TestTxrep:
             base_fee=100,
         )
         transaction_builder.add_extra_signer(
-            "GBJCHUKZMTFSLOMNC7P4TS4VJJBTCYL3XKSOLXAUJSD56C4LHND5TWUC"
+            "TCC3U63F5OJIG4VS6XCFUJGCQRRMNCVGASDGIZZEPA3AZ242K4JVOVKE"
+        )
+        transaction_builder.add_extra_signer(
+            "XCC3U63F5OJIG4VS6XCFUJGCQRRMNCVGASDGIZZEPA3AZ242K4JVPRP5"
         )
         transaction_builder.add_text_memo("Enjoy this transaction")
         transaction_builder.append_payment_op(
