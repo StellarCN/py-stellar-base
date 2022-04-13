@@ -20,7 +20,7 @@ from .operation import *
 from .preconditions import Preconditions
 from .price import Price
 from .signer import Signer
-from .signer_key import SignerKey
+from .signer_key import SignedPayloadSigner, SignerKey
 from .time_bounds import TimeBounds
 from .transaction import Transaction
 from .transaction_envelope import TransactionEnvelope
@@ -336,7 +336,7 @@ class TransactionBuilder:
         return self
 
     def add_extra_signer(
-        self, signer_key: Union[SignerKey, str]
+        self, signer_key: Union[SignerKey, SignedPayloadSigner, str]
     ) -> "TransactionBuilder":
         """For the transaction to be valid, there must be a signature corresponding to every
         Signer in this array, even if the signature is not otherwise required by
@@ -348,6 +348,8 @@ class TransactionBuilder:
         """
         if isinstance(signer_key, str):
             signer_key = SignerKey.from_encoded_signer_key(signer_key)
+        if isinstance(signer_key, SignedPayloadSigner):
+            signer_key = SignerKey.ed25519_signed_payload(signer_key)
         self.extra_signers.append(signer_key)
         return self
 

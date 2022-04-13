@@ -16,6 +16,7 @@ from stellar_sdk import (
     LiquidityPoolAsset,
     Network,
     Preconditions,
+    SignedPayloadSigner,
     Signer,
     SignerKey,
     TimeBounds,
@@ -652,7 +653,7 @@ class TestTransaction:
             extra_signers,
         )
 
-        tx = (
+        tx1 = (
             TransactionBuilder(
                 source_account=source_account,
                 network_passphrase=Network.TESTNET_NETWORK_PASSPHRASE,
@@ -676,4 +677,31 @@ class TestTransaction:
             .build()
         )
 
-        assert tx.transaction.preconditions == cond
+        assert tx1.transaction.preconditions == cond
+
+        tx2 = (
+            TransactionBuilder(
+                source_account=source_account,
+                network_passphrase=Network.TESTNET_NETWORK_PASSPHRASE,
+                base_fee=100,
+                v1=True,
+            )
+            .add_time_bounds(1649237469, 1649238469)
+            .set_ledger_bounds(40351800, 40352000)
+            .set_min_sequence_number(103420918407103888)
+            .set_min_sequence_age(1649239999)
+            .set_min_sequence_ledger_gap(30)
+            .add_extra_signer(
+                "GBJCHUKZMTFSLOMNC7P4TS4VJJBTCYL3XKSOLXAUJSD56C4LHND5TWUC"
+            )
+            .add_extra_signer(
+                SignedPayloadSigner(
+                    "GA7QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLTJJFC7MGXUA74P7UJVSGZ",
+                    b"\x01\x02\x03\x04\x05\x06\x07\x08\t\n\x0b\x0c\r\x0e\x0f\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1a\x1b\x1c\x1d\x1e\x1f ",
+                )
+            )
+            .append_bump_sequence_op(0)
+            .build()
+        )
+
+        assert tx2.transaction.preconditions == cond

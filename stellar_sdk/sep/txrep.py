@@ -17,6 +17,7 @@ from ..asset import Asset
 from ..decorated_signature import DecoratedSignature
 from ..fee_bump_transaction import FeeBumpTransaction
 from ..fee_bump_transaction_envelope import FeeBumpTransactionEnvelope
+from ..ledger_bounds import LedgerBounds
 from ..liquidity_pool_asset import LiquidityPoolAsset
 from ..liquidity_pool_id import LiquidityPoolId
 from ..memo import *
@@ -33,7 +34,6 @@ from ..time_bounds import TimeBounds
 from ..transaction import Transaction
 from ..transaction_envelope import TransactionEnvelope
 from ..type_checked import type_checked
-from ..ledger_bounds import LedgerBounds
 
 __all__ = ["to_txrep", "from_txrep"]
 

@@ -2,11 +2,7 @@ import binascii
 
 import pytest
 
-from stellar_sdk import (
-    Preconditions,
-    SignedPayloadSigner,
-    SignerKey,
-)
+from stellar_sdk import Preconditions, SignedPayloadSigner, SignerKey
 from stellar_sdk.asset import Asset
 from stellar_sdk.exceptions import SignatureExistError
 from stellar_sdk.keypair import Keypair
