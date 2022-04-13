@@ -1,5 +1,38 @@
 Release History
 ==============
+### Version 8.0.0-beta0
+Released on April 13, 2022
+
+**This is a pre-release version, please do not use it in production.**
+
+It includes [CAP-21](https://stellar.org/protocol/cap-21) (new transaction preconditions) and [CAP-40](https://stellar.org/protocol/cap-40) (signed payload signers).
+
+#### Breaking changes
+
+- `Transaction.time_bounds` is moved to `Transaction.preconditions.time_bounds`.
+- Some breaking updates are included in XDR, you can check the changes [here](https://github.com/stellar/stellar-protocol/blob/70cb1449c4/core/cap-0021.md#xdr-diff).
+
+#### Add
+
+- Support for converting signed payloads ([CAP-40](https://stellar.org/protocol/cap-40)) to and from their StrKey (`P...`) representation, you can find the example [here](https://github.com/StellarCN/py-stellar-base/blob/v8/examples/ed25519_signed_payload.py).
+
+- Support for creating transactions with the new preconditions ([CAP-21](https://stellar.org/protocol/cap-21)) via `TransactionBuilder`, you can find the example [here](https://github.com/StellarCN/py-stellar-base/blob/v8/examples/preconditions.py).
+
+  - `TransactionBuilder.set_ledger_bounds(min_ledger: int, max_ledger: int)`
+
+  - `TransactionBuilder.set_min_sequence_number(min_sequence_number: int)`
+
+  - `TransactionBuilder.set_min_sequence_age(min_sequence_age: int)`
+
+  - `TransactionBuilder.set_min_sequence_ledger_gap(min_sequence_ledger_gap: int)`
+
+  - `TransactionBuilder.add_extra_signer(signer_key: Union[SignerKey, SignedPayloadSigner, str])`
+
+- Support for Signing transactions containing the ed25519 payload extra signer, you can find the example [here](https://github.com/StellarCN/py-stellar-base/blob/v8/examples/preconditions.py).
+  - `Keypair.sign_payload_decorated(data: bytes)`
+  - `TransactionEnvelope.sign_extra_signers_payload(signer: Union[Keypair, str])`
+
+-  Support for CAP-21 has been added to `stellar_sdk.sep.txrep`.
 
 ### Version 7.0.2
 Released on April 07, 2022

@@ -33,7 +33,7 @@ Stellar Python SDK
     :alt: PyPI - Implementation
     :target: https://pypi.python.org/pypi/stellar-sdk
 
-.. image:: https://img.shields.io/badge/Stellar%20Protocol-18-blue
+.. image:: https://img.shields.io/badge/Stellar%20Protocol-19-blue
     :alt: Stellar Protocol
     :target: https://developers.stellar.org/docs/glossary/scp/
 
@@ -63,7 +63,7 @@ file to avoid the unknown effects of breaking changes.
 
 A Simple Example
 ----------------
-You can find more examples `here <https://github.com/StellarCN/py-stellar-base/tree/v7/examples>`__.
+You can find more examples `here <https://github.com/StellarCN/py-stellar-base/tree/v8/examples>`__.
 
 Building transaction with synchronous server
 
@@ -142,7 +142,7 @@ Links
 -----
 * Document: https://stellar-sdk.readthedocs.io
 * Code: https://github.com/StellarCN/py-stellar-base
-* Examples: https://github.com/StellarCN/py-stellar-base/tree/v7/examples
+* Examples: https://github.com/StellarCN/py-stellar-base/tree/v8/examples
 * Issue tracker: https://github.com/StellarCN/py-stellar-base/issues
 * License: `Apache License 2.0 <https://github.com/StellarCN/py-stellar-base/blob/master/LICENSE>`_
 * Releases: https://pypi.org/project/stellar-sdk/
