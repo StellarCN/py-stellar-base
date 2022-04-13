@@ -281,19 +281,27 @@ def _decode_check(version_byte: _VersionByte, encoded: str) -> bytes:
             f"Invalid version byte. Expected {version_byte.value!r}, got {version_byte_in_data!r}"
         )
 
+    if version_byte == _VersionByte.ED25519_SIGNED_PAYLOAD:
+        if len(data) < 32 + 4 + 4 or len(data) > 32 + 4 + 64:
+            raise ValueError(f"Invalid length: {encoded}")
+    elif version_byte == _VersionByte.MUXED_ACCOUNT:
+        if len(data) != 32 + 8:
+            raise ValueError(f"Invalid length: {encoded}")
+    else:
+        if len(data) != 32:
+            raise ValueError(f"Invalid length: {encoded}")
+
     expected_checksum = _calculate_checksum(payload)
     if expected_checksum != checksum:
         raise ValueError("Invalid checksum")
     if version_byte == _VersionByte.ED25519_SIGNED_PAYLOAD:
-        if len(data) < 32 + 4 + 4 or len(data) > 32 + 4 + 64:
-            raise ValueError(f"Invalid Ed25519 Signed Payload Key: {data!r}")
         payload_length_prefix = int.from_bytes(data[32:36], byteorder="big")
         if len(data[36:]) % 4 != 0:
-            raise ValueError(f"Invalid Ed25519 Signed Payload Key: {data!r}")
+            raise ValueError(f"Invalid Ed25519 Signed Payload Key: {encoded}")
         if payload_length_prefix + ((4 - payload_length_prefix % 4) % 4) != len(
             data[36:]
         ):
-            raise ValueError(f"Invalid Ed25519 Signed Payload Key: {data!r}")
+            raise ValueError(f"Invalid Ed25519 Signed Payload Key: {encoded}")
     return data
 
 
