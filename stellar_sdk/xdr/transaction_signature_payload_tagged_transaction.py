@@ -3,7 +3,6 @@
 import base64
 from xdrlib import Packer, Unpacker
 
-from ..type_checked import type_checked
 from .envelope_type import EnvelopeType
 from .fee_bump_transaction import FeeBumpTransaction
 from .transaction import Transaction
@@ -11,7 +10,6 @@ from .transaction import Transaction
 __all__ = ["TransactionSignaturePayloadTaggedTransaction"]
 
 
-@type_checked
 class TransactionSignaturePayloadTaggedTransaction:
     """
     XDR Source Code::

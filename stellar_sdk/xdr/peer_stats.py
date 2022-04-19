@@ -3,7 +3,6 @@
 import base64
 from xdrlib import Packer, Unpacker
 
-from ..type_checked import type_checked
 from .base import String
 from .node_id import NodeID
 from .uint64 import Uint64
@@ -11,7 +10,6 @@ from .uint64 import Uint64
 __all__ = ["PeerStats"]
 
 
-@type_checked
 class PeerStats:
     """
     XDR Source Code::

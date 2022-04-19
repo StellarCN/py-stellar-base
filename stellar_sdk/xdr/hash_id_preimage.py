@@ -3,7 +3,6 @@
 import base64
 from xdrlib import Packer, Unpacker
 
-from ..type_checked import type_checked
 from .envelope_type import EnvelopeType
 from .hash_id_preimage_operation_id import HashIDPreimageOperationID
 from .hash_id_preimage_revoke_id import HashIDPreimageRevokeID
@@ -11,7 +10,6 @@ from .hash_id_preimage_revoke_id import HashIDPreimageRevokeID
 __all__ = ["HashIDPreimage"]
 
 
-@type_checked
 class HashIDPreimage:
     """
     XDR Source Code::

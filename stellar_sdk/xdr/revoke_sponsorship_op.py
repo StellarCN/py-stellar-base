@@ -3,7 +3,6 @@
 import base64
 from xdrlib import Packer, Unpacker
 
-from ..type_checked import type_checked
 from .ledger_key import LedgerKey
 from .revoke_sponsorship_op_signer import RevokeSponsorshipOpSigner
 from .revoke_sponsorship_type import RevokeSponsorshipType
@@ -11,7 +10,6 @@ from .revoke_sponsorship_type import RevokeSponsorshipType
 __all__ = ["RevokeSponsorshipOp"]
 
 
-@type_checked
 class RevokeSponsorshipOp:
     """
     XDR Source Code::

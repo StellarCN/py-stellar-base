@@ -3,13 +3,11 @@
 import base64
 from xdrlib import Packer, Unpacker
 
-from ..type_checked import type_checked
 from .int32 import Int32
 
 __all__ = ["Price"]
 
 
-@type_checked
 class Price:
     """
     XDR Source Code::

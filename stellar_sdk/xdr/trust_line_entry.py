@@ -3,7 +3,6 @@
 import base64
 from xdrlib import Packer, Unpacker
 
-from ..type_checked import type_checked
 from .account_id import AccountID
 from .int64 import Int64
 from .trust_line_asset import TrustLineAsset
@@ -13,7 +12,6 @@ from .uint32 import Uint32
 __all__ = ["TrustLineEntry"]
 
 
-@type_checked
 class TrustLineEntry:
     """
     XDR Source Code::

@@ -3,14 +3,12 @@
 import base64
 from xdrlib import Packer, Unpacker
 
-from ..type_checked import type_checked
 from .survey_message_command_type import SurveyMessageCommandType
 from .topology_response_body import TopologyResponseBody
 
 __all__ = ["SurveyResponseBody"]
 
 
-@type_checked
 class SurveyResponseBody:
     """
     XDR Source Code::

@@ -3,14 +3,12 @@
 import base64
 from xdrlib import Packer, Unpacker
 
-from ..type_checked import type_checked
 from .scp_statement import SCPStatement
 from .signature import Signature
 
 __all__ = ["SCPEnvelope"]
 
 
-@type_checked
 class SCPEnvelope:
     """
     XDR Source Code::

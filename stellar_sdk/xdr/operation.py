@@ -4,14 +4,12 @@ import base64
 from typing import Optional
 from xdrlib import Packer, Unpacker
 
-from ..type_checked import type_checked
 from .muxed_account import MuxedAccount
 from .operation_body import OperationBody
 
 __all__ = ["Operation"]
 
 
-@type_checked
 class Operation:
     """
     XDR Source Code::

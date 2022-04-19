@@ -4,14 +4,12 @@ import base64
 from typing import List
 from xdrlib import Packer, Unpacker
 
-from ..type_checked import type_checked
 from .hash import Hash
 from .value import Value
 
 __all__ = ["SCPNomination"]
 
 
-@type_checked
 class SCPNomination:
     """
     XDR Source Code::

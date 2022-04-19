@@ -3,7 +3,6 @@
 import base64
 from xdrlib import Packer, Unpacker
 
-from ..type_checked import type_checked
 from .ledger_entry import LedgerEntry
 from .ledger_entry_change_type import LedgerEntryChangeType
 from .ledger_key import LedgerKey
@@ -11,7 +10,6 @@ from .ledger_key import LedgerKey
 __all__ = ["LedgerEntryChange"]
 
 
-@type_checked
 class LedgerEntryChange:
     """
     XDR Source Code::

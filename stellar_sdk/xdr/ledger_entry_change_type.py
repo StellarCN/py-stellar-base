@@ -5,12 +5,10 @@ from enum import IntEnum
 from xdrlib import Packer, Unpacker
 
 from ..__version__ import __issues__
-from ..type_checked import type_checked
 
 __all__ = ["LedgerEntryChangeType"]
 
 
-@type_checked
 class LedgerEntryChangeType(IntEnum):
     """
     XDR Source Code::

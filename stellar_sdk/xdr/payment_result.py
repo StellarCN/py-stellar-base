@@ -3,13 +3,11 @@
 import base64
 from xdrlib import Packer, Unpacker
 
-from ..type_checked import type_checked
 from .payment_result_code import PaymentResultCode
 
 __all__ = ["PaymentResult"]
 
 
-@type_checked
 class PaymentResult:
     """
     XDR Source Code::

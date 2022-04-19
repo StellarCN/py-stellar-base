@@ -3,7 +3,6 @@
 import base64
 from xdrlib import Packer, Unpacker
 
-from ..type_checked import type_checked
 from .account_id import AccountID
 from .asset import Asset
 from .pool_id import PoolID
@@ -13,7 +12,6 @@ from .uint32 import Uint32
 __all__ = ["HashIDPreimageRevokeID"]
 
 
-@type_checked
 class HashIDPreimageRevokeID:
     """
     XDR Source Code::

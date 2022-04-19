@@ -4,14 +4,12 @@ import base64
 from typing import List
 from xdrlib import Packer, Unpacker
 
-from ..type_checked import type_checked
 from .claim_atom import ClaimAtom
 from .manage_offer_success_result_offer import ManageOfferSuccessResultOffer
 
 __all__ = ["ManageOfferSuccessResult"]
 
 
-@type_checked
 class ManageOfferSuccessResult:
     """
     XDR Source Code::

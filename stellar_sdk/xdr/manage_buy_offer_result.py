@@ -3,14 +3,12 @@
 import base64
 from xdrlib import Packer, Unpacker
 
-from ..type_checked import type_checked
 from .manage_buy_offer_result_code import ManageBuyOfferResultCode
 from .manage_offer_success_result import ManageOfferSuccessResult
 
 __all__ = ["ManageBuyOfferResult"]
 
 
-@type_checked
 class ManageBuyOfferResult:
     """
     XDR Source Code::

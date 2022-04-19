@@ -3,7 +3,6 @@
 import base64
 from xdrlib import Packer, Unpacker
 
-from ..type_checked import type_checked
 from .asset import Asset
 from .path_payment_strict_send_result_code import PathPaymentStrictSendResultCode
 from .path_payment_strict_send_result_success import PathPaymentStrictSendResultSuccess
@@ -11,7 +10,6 @@ from .path_payment_strict_send_result_success import PathPaymentStrictSendResult
 __all__ = ["PathPaymentStrictSendResult"]
 
 
-@type_checked
 class PathPaymentStrictSendResult:
     """
     XDR Source Code::

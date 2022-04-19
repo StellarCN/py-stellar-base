@@ -3,14 +3,12 @@
 import base64
 from xdrlib import Packer, Unpacker
 
-from ..type_checked import type_checked
 from .claimable_balance_id_type import ClaimableBalanceIDType
 from .hash import Hash
 
 __all__ = ["ClaimableBalanceID"]
 
 
-@type_checked
 class ClaimableBalanceID:
     """
     XDR Source Code::

@@ -4,7 +4,6 @@ import base64
 from typing import List, Optional
 from xdrlib import Packer, Unpacker
 
-from ..type_checked import type_checked
 from .constants import *
 from .memo import Memo
 from .operation import Operation
@@ -17,7 +16,6 @@ from .uint256 import Uint256
 __all__ = ["TransactionV0"]
 
 
-@type_checked
 class TransactionV0:
     """
     XDR Source Code::

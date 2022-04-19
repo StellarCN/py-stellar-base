@@ -4,7 +4,6 @@ import base64
 from typing import List
 from xdrlib import Packer, Unpacker
 
-from ..type_checked import type_checked
 from .hash import Hash
 from .stellar_value_ext import StellarValueExt
 from .time_point import TimePoint
@@ -13,7 +12,6 @@ from .upgrade_type import UpgradeType
 __all__ = ["StellarValue"]
 
 
-@type_checked
 class StellarValue:
     """
     XDR Source Code::

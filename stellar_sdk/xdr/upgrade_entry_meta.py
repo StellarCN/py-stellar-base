@@ -3,14 +3,12 @@
 import base64
 from xdrlib import Packer, Unpacker
 
-from ..type_checked import type_checked
 from .ledger_entry_changes import LedgerEntryChanges
 from .ledger_upgrade import LedgerUpgrade
 
 __all__ = ["UpgradeEntryMeta"]
 
 
-@type_checked
 class UpgradeEntryMeta:
     """
     XDR Source Code::

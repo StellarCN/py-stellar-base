@@ -3,14 +3,12 @@
 import base64
 from xdrlib import Packer, Unpacker
 
-from ..type_checked import type_checked
 from .hash import Hash
 from .inner_transaction_result import InnerTransactionResult
 
 __all__ = ["InnerTransactionResultPair"]
 
 
-@type_checked
 class InnerTransactionResultPair:
     """
     XDR Source Code::

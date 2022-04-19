@@ -3,14 +3,12 @@
 import base64
 from xdrlib import Packer, Unpacker
 
-from ..type_checked import type_checked
 from .account_id import AccountID
 from .trust_line_asset import TrustLineAsset
 
 __all__ = ["LedgerKeyTrustLine"]
 
 
-@type_checked
 class LedgerKeyTrustLine:
     """
     XDR Source Code::

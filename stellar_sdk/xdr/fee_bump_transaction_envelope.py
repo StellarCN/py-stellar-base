@@ -4,14 +4,12 @@ import base64
 from typing import List
 from xdrlib import Packer, Unpacker
 
-from ..type_checked import type_checked
 from .decorated_signature import DecoratedSignature
 from .fee_bump_transaction import FeeBumpTransaction
 
 __all__ = ["FeeBumpTransactionEnvelope"]
 
 
-@type_checked
 class FeeBumpTransactionEnvelope:
     """
     XDR Source Code::

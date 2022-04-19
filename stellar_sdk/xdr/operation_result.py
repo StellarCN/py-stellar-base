@@ -3,14 +3,12 @@
 import base64
 from xdrlib import Packer, Unpacker
 
-from ..type_checked import type_checked
 from .operation_result_code import OperationResultCode
 from .operation_result_tr import OperationResultTr
 
 __all__ = ["OperationResult"]
 
 
-@type_checked
 class OperationResult:
     """
     XDR Source Code::

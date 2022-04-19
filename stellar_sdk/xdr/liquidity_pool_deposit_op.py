@@ -3,7 +3,6 @@
 import base64
 from xdrlib import Packer, Unpacker
 
-from ..type_checked import type_checked
 from .int64 import Int64
 from .pool_id import PoolID
 from .price import Price
@@ -11,7 +10,6 @@ from .price import Price
 __all__ = ["LiquidityPoolDepositOp"]
 
 
-@type_checked
 class LiquidityPoolDepositOp:
     """
     XDR Source Code::

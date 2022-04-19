@@ -3,14 +3,12 @@
 import base64
 from xdrlib import Packer, Unpacker
 
-from ..type_checked import type_checked
 from .signer_key import SignerKey
 from .uint32 import Uint32
 
 __all__ = ["Signer"]
 
 
-@type_checked
 class Signer:
     """
     XDR Source Code::

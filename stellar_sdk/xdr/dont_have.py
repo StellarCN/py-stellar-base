@@ -3,14 +3,12 @@
 import base64
 from xdrlib import Packer, Unpacker
 
-from ..type_checked import type_checked
 from .message_type import MessageType
 from .uint256 import Uint256
 
 __all__ = ["DontHave"]
 
 
-@type_checked
 class DontHave:
     """
     XDR Source Code::

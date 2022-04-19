@@ -3,14 +3,12 @@
 import base64
 from xdrlib import Packer, Unpacker
 
-from ..type_checked import type_checked
 from .base import Integer
 from .ledger_entry_extension_v1 import LedgerEntryExtensionV1
 
 __all__ = ["LedgerEntryExt"]
 
 
-@type_checked
 class LedgerEntryExt:
     """
     XDR Source Code::

@@ -3,7 +3,6 @@
 import base64
 from xdrlib import Packer, Unpacker
 
-from ..type_checked import type_checked
 from .int64 import Int64
 from .transaction_result_ext import TransactionResultExt
 from .transaction_result_result import TransactionResultResult
@@ -11,7 +10,6 @@ from .transaction_result_result import TransactionResultResult
 __all__ = ["TransactionResult"]
 
 
-@type_checked
 class TransactionResult:
     """
     XDR Source Code::

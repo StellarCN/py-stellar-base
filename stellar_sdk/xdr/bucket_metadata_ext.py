@@ -3,13 +3,11 @@
 import base64
 from xdrlib import Packer, Unpacker
 
-from ..type_checked import type_checked
 from .base import Integer
 
 __all__ = ["BucketMetadataExt"]
 
 
-@type_checked
 class BucketMetadataExt:
     """
     XDR Source Code::

@@ -3,7 +3,6 @@
 import base64
 from xdrlib import Packer, Unpacker
 
-from ..type_checked import type_checked
 from .begin_sponsoring_future_reserves_result_code import (
     BeginSponsoringFutureReservesResultCode,
 )
@@ -11,7 +10,6 @@ from .begin_sponsoring_future_reserves_result_code import (
 __all__ = ["BeginSponsoringFutureReservesResult"]
 
 
-@type_checked
 class BeginSponsoringFutureReservesResult:
     """
     XDR Source Code::

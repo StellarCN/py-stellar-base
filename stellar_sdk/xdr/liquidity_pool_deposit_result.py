@@ -3,13 +3,11 @@
 import base64
 from xdrlib import Packer, Unpacker
 
-from ..type_checked import type_checked
 from .liquidity_pool_deposit_result_code import LiquidityPoolDepositResultCode
 
 __all__ = ["LiquidityPoolDepositResult"]
 
 
-@type_checked
 class LiquidityPoolDepositResult:
     """
     XDR Source Code::

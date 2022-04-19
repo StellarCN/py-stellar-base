@@ -5,12 +5,10 @@ from enum import IntEnum
 from xdrlib import Packer, Unpacker
 
 from ..__version__ import __issues__
-from ..type_checked import type_checked
 
 __all__ = ["LiquidityPoolWithdrawResultCode"]
 
 
-@type_checked
 class LiquidityPoolWithdrawResultCode(IntEnum):
     """
     XDR Source Code::

@@ -3,14 +3,12 @@
 import base64
 from xdrlib import Packer, Unpacker
 
-from ..type_checked import type_checked
 from .peer_address_ip import PeerAddressIp
 from .uint32 import Uint32
 
 __all__ = ["PeerAddress"]
 
 
-@type_checked
 class PeerAddress:
     """
     XDR Source Code::

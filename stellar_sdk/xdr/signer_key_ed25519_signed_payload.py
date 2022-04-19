@@ -3,14 +3,12 @@
 import base64
 from xdrlib import Packer, Unpacker
 
-from ..type_checked import type_checked
 from .base import Opaque
 from .uint256 import Uint256
 
 __all__ = ["SignerKeyEd25519SignedPayload"]
 
 
-@type_checked
 class SignerKeyEd25519SignedPayload:
     """
     XDR Source Code::

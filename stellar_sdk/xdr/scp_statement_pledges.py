@@ -3,7 +3,6 @@
 import base64
 from xdrlib import Packer, Unpacker
 
-from ..type_checked import type_checked
 from .scp_nomination import SCPNomination
 from .scp_statement_confirm import SCPStatementConfirm
 from .scp_statement_externalize import SCPStatementExternalize
@@ -13,7 +12,6 @@ from .scp_statement_type import SCPStatementType
 __all__ = ["SCPStatementPledges"]
 
 
-@type_checked
 class SCPStatementPledges:
     """
     XDR Source Code::

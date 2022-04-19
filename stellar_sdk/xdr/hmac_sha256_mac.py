@@ -3,13 +3,11 @@
 import base64
 from xdrlib import Packer, Unpacker
 
-from ..type_checked import type_checked
 from .base import Opaque
 
 __all__ = ["HmacSha256Mac"]
 
 
-@type_checked
 class HmacSha256Mac:
     """
     XDR Source Code::

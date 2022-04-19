@@ -3,13 +3,11 @@
 import base64
 from xdrlib import Packer, Unpacker
 
-from ..type_checked import type_checked
 from .set_trust_line_flags_result_code import SetTrustLineFlagsResultCode
 
 __all__ = ["SetTrustLineFlagsResult"]
 
 
-@type_checked
 class SetTrustLineFlagsResult:
     """
     XDR Source Code::

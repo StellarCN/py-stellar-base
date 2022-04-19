@@ -3,14 +3,12 @@
 import base64
 from xdrlib import Packer, Unpacker
 
-from ..type_checked import type_checked
 from .node_id import NodeID
 from .signature import Signature
 
 __all__ = ["LedgerCloseValueSignature"]
 
 
-@type_checked
 class LedgerCloseValueSignature:
     """
     XDR Source Code::

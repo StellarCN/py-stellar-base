@@ -3,13 +3,11 @@
 import base64
 from xdrlib import Packer, Unpacker
 
-from ..type_checked import type_checked
 from .ledger_entry_changes import LedgerEntryChanges
 
 __all__ = ["OperationMeta"]
 
 
-@type_checked
 class OperationMeta:
     """
     XDR Source Code::

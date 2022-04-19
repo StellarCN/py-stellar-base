@@ -3,13 +3,11 @@
 import base64
 from xdrlib import Packer, Unpacker
 
-from ..type_checked import type_checked
 from .revoke_sponsorship_result_code import RevokeSponsorshipResultCode
 
 __all__ = ["RevokeSponsorshipResult"]
 
 
-@type_checked
 class RevokeSponsorshipResult:
     """
     XDR Source Code::
