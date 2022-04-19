@@ -4,8 +4,6 @@ import base64
 from enum import IntEnum
 from xdrlib import Packer, Unpacker
 
-from ..__version__ import __issues__
-
 __all__ = ["CreateAccountResultCode"]
 
 
@@ -59,9 +57,3 @@ class CreateAccountResultCode(IntEnum):
     def from_xdr(cls, xdr: str) -> "CreateAccountResultCode":
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
-
-    @classmethod
-    def _missing_(cls, value):
-        raise ValueError(
-            f"{value} is not a valid {cls.__name__}, please upgrade the SDK or submit an issue here: {__issues__}."
-        )
