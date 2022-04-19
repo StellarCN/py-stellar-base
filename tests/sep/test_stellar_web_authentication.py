@@ -96,7 +96,7 @@ class TestStellarWebAuthentication:
     def test_challenge_transaction_id_memo_as_int_permitted(self):
         server_kp = Keypair.random()
         client_account_id = Keypair.random().public_key
-        memo = randrange(0, 2 ** 64)
+        memo = randrange(0, 2**64)
         timeout = 600
         network_passphrase = Network.TESTNET_NETWORK_PASSPHRASE
         home_domain = "example.com"
@@ -145,7 +145,7 @@ class TestStellarWebAuthentication:
         client_account_id = (
             "MAAAAAAAAAAAJURAAB2X52XFQP6FBXLGT6LWOOWMEXWHEWBDVRZ7V5WH34Y22MPFBHUHY"
         )
-        memo = randrange(0, 2 ** 64)
+        memo = randrange(0, 2**64)
         timeout = 600
         network_passphrase = Network.TESTNET_NETWORK_PASSPHRASE
         home_domain = "example.com"
@@ -1941,7 +1941,7 @@ class TestStellarWebAuthentication:
         network_passphrase = Network.PUBLIC_NETWORK_PASSPHRASE
         home_domain = "example.com"
         web_auth_domain = "auth.example.com"
-        memo = randrange(0, 2 ** 64)
+        memo = randrange(0, 2**64)
 
         challenge = build_challenge_transaction(
             server_secret=server_kp.secret,
@@ -1987,7 +1987,7 @@ class TestStellarWebAuthentication:
                 data_value=home_domain,
                 source=server_account.account,
             )
-            .add_id_memo(randrange(0, 2 ** 64))
+            .add_id_memo(randrange(0, 2**64))
             .set_timeout(timeout)
             .build()
         )

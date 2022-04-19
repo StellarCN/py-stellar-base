@@ -138,7 +138,7 @@ class IdMemo(Memo):
     """
 
     def __init__(self, memo_id: int) -> None:
-        if memo_id < 0 or memo_id > 2 ** 64 - 1:
+        if memo_id < 0 or memo_id > 2**64 - 1:
             raise MemoInvalidException(
                 "IdMemo is an unsigned 64-bit integer and the max valid value is 18446744073709551615."
             )

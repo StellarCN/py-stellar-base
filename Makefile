@@ -39,6 +39,7 @@ update-xdr:
 .PHONY: update-xdr
 
 format:
+	autoflake --in-place --ignore-init-module-imports --remove-all-unused-imports .
 	isort .
-	black --required-version 21.7b0 .
+	black .
 .PHONY: format

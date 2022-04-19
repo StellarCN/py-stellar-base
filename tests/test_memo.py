@@ -47,7 +47,7 @@ class TestMemo:
         [
             (0, "AAAAAgAAAAAAAAAA"),
             (123123123, "AAAAAgAAAAAHVrWz"),
-            (2 ** 64 - 1, "AAAAAv//////////"),
+            (2**64 - 1, "AAAAAv//////////"),
         ],
     )
     def test_id_memo(self, id, xdr):
@@ -58,7 +58,7 @@ class TestMemo:
         assert isinstance(base_memo, IdMemo)
         assert base_memo.to_xdr_object().to_xdr() == xdr
 
-    @pytest.mark.parametrize("id", [-1, 2 ** 64])
+    @pytest.mark.parametrize("id", [-1, 2**64])
     def test_id_memo_invalid_raise(self, id):
         with pytest.raises(
             MemoInvalidException,

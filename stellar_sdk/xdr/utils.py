@@ -1,7 +1,7 @@
 from decimal import Context, Decimal, Inexact
 from typing import Union
 
-_ONE = Decimal(10 ** 7)
+_ONE = Decimal(10**7)
 
 
 def to_xdr_amount(value: Union[str, Decimal]) -> int:

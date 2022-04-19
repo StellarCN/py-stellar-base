@@ -1,4 +1,4 @@
-from typing import List, Optional, Union
+from typing import List, Union
 
 from . import xdr as stellar_xdr
 from .keypair import Keypair
