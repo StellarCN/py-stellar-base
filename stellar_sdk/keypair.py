@@ -1,5 +1,5 @@
 import os
-from typing import Union
+from typing import Optional, Union
 
 import nacl.signing as ed25519
 from nacl.exceptions import BadSignatureError as NaclBadSignatureError
@@ -37,7 +37,7 @@ class Keypair:
         self, verify_key: ed25519.VerifyKey, signing_key: ed25519.SigningKey = None
     ) -> None:
         self.verify_key: ed25519.VerifyKey = verify_key
-        self.signing_key: ed25519.SigningKey = signing_key
+        self.signing_key: Optional[ed25519.SigningKey] = signing_key
 
     @classmethod
     def random(cls) -> "Keypair":
@@ -169,6 +169,11 @@ class Keypair:
 
         :return: raw secret key
         """
+        if self.signing_key is None:
+            raise MissingEd25519SecretSeedError(
+                "The keypair does not contain secret seed. Use Keypair.from_secret, "
+                "Keypair.random or Keypair.from_mnemonic_phrase to create a new keypair with a secret seed."
+            )
         return bytes(self.signing_key)
 
     def can_sign(self) -> bool:
@@ -191,6 +196,7 @@ class Keypair:
                 "The keypair does not contain secret seed. Use Keypair.from_secret, "
                 "Keypair.random or Keypair.from_mnemonic_phrase to create a new keypair with a secret seed."
             )
+        assert self.signing_key is not None
         return self.signing_key.sign(data).signature
 
     def verify(self, data: bytes, signature: bytes) -> None:
@@ -203,8 +209,8 @@ class Keypair:
         """
         try:
             self.verify_key.verify(data, signature)
-        except NaclBadSignatureError:
-            raise BadSignatureError("Signature verification failed.")
+        except (NaclBadSignatureError, ValueError) as e:
+            raise BadSignatureError("Signature verification failed.") from e
 
     @staticmethod
     def generate_mnemonic_phrase(
