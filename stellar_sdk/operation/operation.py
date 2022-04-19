@@ -2,10 +2,10 @@ from abc import ABCMeta, abstractmethod
 from decimal import Decimal
 from typing import Optional, Union
 
+from .. import utils
 from .. import xdr as stellar_xdr
 from ..muxed_account import MuxedAccount
 from ..type_checked import type_checked
-from ..xdr import utils as xdr_utils
 
 __all__ = ["Operation"]
 
@@ -72,7 +72,7 @@ class Operation(metaclass=ABCMeta):
             serialization.
 
         """
-        return xdr_utils.to_xdr_amount(value)
+        return utils.to_xdr_amount(value)
 
     @staticmethod
     def from_xdr_amount(value: int) -> str:
@@ -82,7 +82,7 @@ class Operation(metaclass=ABCMeta):
             amount.
 
         """
-        return xdr_utils.from_xdr_amount(value)
+        return utils.from_xdr_amount(value)
 
     @abstractmethod
     def _to_operation_body(self) -> stellar_xdr.OperationBody:
