@@ -3,7 +3,6 @@
 import base64
 from xdrlib import Packer, Unpacker
 
-from ..type_checked import type_checked
 from .claimable_balance_entry_extension_v1_ext import (
     ClaimableBalanceEntryExtensionV1Ext,
 )
@@ -12,7 +11,6 @@ from .uint32 import Uint32
 __all__ = ["ClaimableBalanceEntryExtensionV1"]
 
 
-@type_checked
 class ClaimableBalanceEntryExtensionV1:
     """
     XDR Source Code::

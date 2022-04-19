@@ -3,7 +3,6 @@
 import base64
 from xdrlib import Packer, Unpacker
 
-from ..type_checked import type_checked
 from .account_id import AccountID
 from .asset import Asset
 from .uint32 import Uint32
@@ -11,7 +10,6 @@ from .uint32 import Uint32
 __all__ = ["SetTrustLineFlagsOp"]
 
 
-@type_checked
 class SetTrustLineFlagsOp:
     """
     XDR Source Code::

@@ -3,13 +3,11 @@
 import base64
 from xdrlib import Packer, Unpacker
 
-from ..type_checked import type_checked
 from .base import Integer
 
 __all__ = ["TransactionResultExt"]
 
 
-@type_checked
 class TransactionResultExt:
     """
     XDR Source Code::

@@ -3,14 +3,12 @@
 import base64
 from xdrlib import Packer, Unpacker
 
-from ..type_checked import type_checked
 from .base import Integer
 from .ledger_close_meta_v0 import LedgerCloseMetaV0
 
 __all__ = ["LedgerCloseMeta"]
 
 
-@type_checked
 class LedgerCloseMeta:
     """
     XDR Source Code::

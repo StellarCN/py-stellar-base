@@ -4,14 +4,12 @@ import base64
 from typing import List
 from xdrlib import Packer, Unpacker
 
-from ..type_checked import type_checked
 from .ledger_entry_changes import LedgerEntryChanges
 from .operation_meta import OperationMeta
 
 __all__ = ["TransactionMetaV1"]
 
 
-@type_checked
 class TransactionMetaV1:
     """
     XDR Source Code::

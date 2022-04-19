@@ -3,7 +3,6 @@
 import base64
 from xdrlib import Packer, Unpacker
 
-from ..type_checked import type_checked
 from .ledger_entry_changes import LedgerEntryChanges
 from .transaction_meta import TransactionMeta
 from .transaction_result_pair import TransactionResultPair
@@ -11,7 +10,6 @@ from .transaction_result_pair import TransactionResultPair
 __all__ = ["TransactionResultMeta"]
 
 
-@type_checked
 class TransactionResultMeta:
     """
     XDR Source Code::

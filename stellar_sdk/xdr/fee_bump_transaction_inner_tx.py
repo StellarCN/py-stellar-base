@@ -3,14 +3,12 @@
 import base64
 from xdrlib import Packer, Unpacker
 
-from ..type_checked import type_checked
 from .envelope_type import EnvelopeType
 from .transaction_v1_envelope import TransactionV1Envelope
 
 __all__ = ["FeeBumpTransactionInnerTx"]
 
 
-@type_checked
 class FeeBumpTransactionInnerTx:
     """
     XDR Source Code::

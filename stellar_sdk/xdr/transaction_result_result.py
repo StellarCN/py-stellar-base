@@ -4,7 +4,6 @@ import base64
 from typing import List
 from xdrlib import Packer, Unpacker
 
-from ..type_checked import type_checked
 from .inner_transaction_result_pair import InnerTransactionResultPair
 from .operation_result import OperationResult
 from .transaction_result_code import TransactionResultCode
@@ -12,7 +11,6 @@ from .transaction_result_code import TransactionResultCode
 __all__ = ["TransactionResultResult"]
 
 
-@type_checked
 class TransactionResultResult:
     """
     XDR Source Code::

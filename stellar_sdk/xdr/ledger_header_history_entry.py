@@ -3,7 +3,6 @@
 import base64
 from xdrlib import Packer, Unpacker
 
-from ..type_checked import type_checked
 from .hash import Hash
 from .ledger_header import LedgerHeader
 from .ledger_header_history_entry_ext import LedgerHeaderHistoryEntryExt
@@ -11,7 +10,6 @@ from .ledger_header_history_entry_ext import LedgerHeaderHistoryEntryExt
 __all__ = ["LedgerHeaderHistoryEntry"]
 
 
-@type_checked
 class LedgerHeaderHistoryEntry:
     """
     XDR Source Code::

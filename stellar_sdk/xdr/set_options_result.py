@@ -3,13 +3,11 @@
 import base64
 from xdrlib import Packer, Unpacker
 
-from ..type_checked import type_checked
 from .set_options_result_code import SetOptionsResultCode
 
 __all__ = ["SetOptionsResult"]
 
 
-@type_checked
 class SetOptionsResult:
     """
     XDR Source Code::

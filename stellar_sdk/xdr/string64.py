@@ -3,13 +3,11 @@
 import base64
 from xdrlib import Packer, Unpacker
 
-from ..type_checked import type_checked
 from .base import String
 
 __all__ = ["String64"]
 
 
-@type_checked
 class String64:
     """
     XDR Source Code::

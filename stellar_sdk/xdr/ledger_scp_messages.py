@@ -4,14 +4,12 @@ import base64
 from typing import List
 from xdrlib import Packer, Unpacker
 
-from ..type_checked import type_checked
 from .scp_envelope import SCPEnvelope
 from .uint32 import Uint32
 
 __all__ = ["LedgerSCPMessages"]
 
 
-@type_checked
 class LedgerSCPMessages:
     """
     XDR Source Code::

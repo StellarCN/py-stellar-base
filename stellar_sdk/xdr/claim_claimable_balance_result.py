@@ -3,13 +3,11 @@
 import base64
 from xdrlib import Packer, Unpacker
 
-from ..type_checked import type_checked
 from .claim_claimable_balance_result_code import ClaimClaimableBalanceResultCode
 
 __all__ = ["ClaimClaimableBalanceResult"]
 
 
-@type_checked
 class ClaimClaimableBalanceResult:
     """
     XDR Source Code::

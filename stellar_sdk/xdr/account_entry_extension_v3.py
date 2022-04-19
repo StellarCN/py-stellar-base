@@ -3,7 +3,6 @@
 import base64
 from xdrlib import Packer, Unpacker
 
-from ..type_checked import type_checked
 from .extension_point import ExtensionPoint
 from .time_point import TimePoint
 from .uint32 import Uint32
@@ -11,7 +10,6 @@ from .uint32 import Uint32
 __all__ = ["AccountEntryExtensionV3"]
 
 
-@type_checked
 class AccountEntryExtensionV3:
     """
     XDR Source Code::

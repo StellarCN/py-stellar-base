@@ -4,7 +4,6 @@ import base64
 from typing import List
 from xdrlib import Packer, Unpacker
 
-from ..type_checked import type_checked
 from .base import Integer
 from .operation_meta import OperationMeta
 from .transaction_meta_v1 import TransactionMetaV1
@@ -13,7 +12,6 @@ from .transaction_meta_v2 import TransactionMetaV2
 __all__ = ["TransactionMeta"]
 
 
-@type_checked
 class TransactionMeta:
     """
     XDR Source Code::

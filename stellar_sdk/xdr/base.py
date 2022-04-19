@@ -1,7 +1,5 @@
 from xdrlib import Packer, Unpacker
 
-from ..type_checked import type_checked
-
 __all__ = [
     "Integer",
     "UnsignedInteger",
@@ -15,7 +13,6 @@ __all__ = [
 ]
 
 
-@type_checked
 class Integer:
     def __init__(self, value: int) -> None:
         self.value = value
@@ -36,7 +33,6 @@ class Integer:
         return f"<Integer [value={self.value}]>"
 
 
-@type_checked
 class UnsignedInteger:
     def __init__(self, value: int) -> None:
         self.value = value
@@ -57,7 +53,6 @@ class UnsignedInteger:
         return f"<UnsignedInteger [value={self.value}]>"
 
 
-@type_checked
 class Float:
     def __init__(self, value: float) -> None:
         self.value = value
@@ -78,7 +73,6 @@ class Float:
         return f"<Float [value={self.value}]>"
 
 
-@type_checked
 class Double:
     def __init__(self, value: float) -> None:
         self.value = value
@@ -99,7 +93,6 @@ class Double:
         return f"<Double [value={self.value}]>"
 
 
-@type_checked
 class Hyper:
     def __init__(self, value: int) -> None:
         self.value = value
@@ -120,7 +113,6 @@ class Hyper:
         return f"<Hyper [value={self.value}]>"
 
 
-@type_checked
 class UnsignedHyper:
     def __init__(self, value: int) -> None:
         self.value = value
@@ -141,7 +133,6 @@ class UnsignedHyper:
         return f"<UnsignedHyper [value={self.value}]>"
 
 
-@type_checked
 class Boolean:
     def __init__(self, value: bool) -> None:
         self.value = value
@@ -162,7 +153,6 @@ class Boolean:
         return f"<Boolean [value={self.value}]>"
 
 
-@type_checked
 class String:
     def __init__(self, value: bytes, size: int) -> None:
         if len(value) > size:
@@ -191,7 +181,6 @@ class String:
         return f"<String [value={self.value}, size={self.size}]>"
 
 
-@type_checked
 class Opaque:
     def __init__(self, value: bytes, size: int, fixed: bool) -> None:
         if fixed:

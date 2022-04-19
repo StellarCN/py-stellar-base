@@ -3,14 +3,12 @@
 import base64
 from xdrlib import Packer, Unpacker
 
-from ..type_checked import type_checked
 from .uint32 import Uint32
 from .value import Value
 
 __all__ = ["SCPBallot"]
 
 
-@type_checked
 class SCPBallot:
     """
     XDR Source Code::

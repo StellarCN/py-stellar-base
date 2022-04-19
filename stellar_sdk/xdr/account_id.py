@@ -3,13 +3,11 @@
 import base64
 from xdrlib import Packer, Unpacker
 
-from ..type_checked import type_checked
 from .public_key import PublicKey
 
 __all__ = ["AccountID"]
 
 
-@type_checked
 class AccountID:
     """
     XDR Source Code::

@@ -3,7 +3,6 @@
 import base64
 from xdrlib import Packer, Unpacker
 
-from ..type_checked import type_checked
 from .signer_key_ed25519_signed_payload import SignerKeyEd25519SignedPayload
 from .signer_key_type import SignerKeyType
 from .uint256 import Uint256
@@ -11,7 +10,6 @@ from .uint256 import Uint256
 __all__ = ["SignerKey"]
 
 
-@type_checked
 class SignerKey:
     """
     XDR Source Code::

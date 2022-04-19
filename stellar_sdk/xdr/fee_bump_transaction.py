@@ -3,7 +3,6 @@
 import base64
 from xdrlib import Packer, Unpacker
 
-from ..type_checked import type_checked
 from .fee_bump_transaction_ext import FeeBumpTransactionExt
 from .fee_bump_transaction_inner_tx import FeeBumpTransactionInnerTx
 from .int64 import Int64
@@ -12,7 +11,6 @@ from .muxed_account import MuxedAccount
 __all__ = ["FeeBumpTransaction"]
 
 
-@type_checked
 class FeeBumpTransaction:
     """
     XDR Source Code::

@@ -3,13 +3,11 @@
 import base64
 from xdrlib import Packer, Unpacker
 
-from ..type_checked import type_checked
 from .base import Opaque
 
 __all__ = ["Thresholds"]
 
 
-@type_checked
 class Thresholds:
     """
     XDR Source Code::

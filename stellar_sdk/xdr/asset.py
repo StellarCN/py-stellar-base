@@ -3,7 +3,6 @@
 import base64
 from xdrlib import Packer, Unpacker
 
-from ..type_checked import type_checked
 from .alpha_num4 import AlphaNum4
 from .alpha_num12 import AlphaNum12
 from .asset_type import AssetType
@@ -11,7 +10,6 @@ from .asset_type import AssetType
 __all__ = ["Asset"]
 
 
-@type_checked
 class Asset:
     """
     XDR Source Code::

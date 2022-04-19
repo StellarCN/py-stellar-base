@@ -3,14 +3,12 @@
 import base64
 from xdrlib import Packer, Unpacker
 
-from ..type_checked import type_checked
 from .account_entry_extension_v1_ext import AccountEntryExtensionV1Ext
 from .liabilities import Liabilities
 
 __all__ = ["AccountEntryExtensionV1"]
 
 
-@type_checked
 class AccountEntryExtensionV1:
     """
     XDR Source Code::

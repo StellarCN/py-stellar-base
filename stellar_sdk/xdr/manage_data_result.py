@@ -3,13 +3,11 @@
 import base64
 from xdrlib import Packer, Unpacker
 
-from ..type_checked import type_checked
 from .manage_data_result_code import ManageDataResultCode
 
 __all__ = ["ManageDataResult"]
 
 
-@type_checked
 class ManageDataResult:
     """
     XDR Source Code::

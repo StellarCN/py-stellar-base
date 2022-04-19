@@ -4,13 +4,11 @@ import base64
 from typing import List
 from xdrlib import Packer, Unpacker
 
-from ..type_checked import type_checked
 from .peer_stats import PeerStats
 
 __all__ = ["PeerStatList"]
 
 
-@type_checked
 class PeerStatList:
     """
     XDR Source Code::

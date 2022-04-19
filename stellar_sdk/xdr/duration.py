@@ -3,13 +3,11 @@
 import base64
 from xdrlib import Packer, Unpacker
 
-from ..type_checked import type_checked
 from .uint64 import Uint64
 
 __all__ = ["Duration"]
 
 
-@type_checked
 class Duration:
     """
     XDR Source Code::

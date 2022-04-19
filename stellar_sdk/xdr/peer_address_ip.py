@@ -3,14 +3,12 @@
 import base64
 from xdrlib import Packer, Unpacker
 
-from ..type_checked import type_checked
 from .base import Opaque
 from .ip_addr_type import IPAddrType
 
 __all__ = ["PeerAddressIp"]
 
 
-@type_checked
 class PeerAddressIp:
     """
     XDR Source Code::

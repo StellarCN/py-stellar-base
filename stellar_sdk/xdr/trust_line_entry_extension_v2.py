@@ -3,14 +3,12 @@
 import base64
 from xdrlib import Packer, Unpacker
 
-from ..type_checked import type_checked
 from .int32 import Int32
 from .trust_line_entry_extension_v2_ext import TrustLineEntryExtensionV2Ext
 
 __all__ = ["TrustLineEntryExtensionV2"]
 
 
-@type_checked
 class TrustLineEntryExtensionV2:
     """
     XDR Source Code::

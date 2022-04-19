@@ -3,14 +3,12 @@
 import base64
 from xdrlib import Packer, Unpacker
 
-from ..type_checked import type_checked
 from .signature import Signature
 from .survey_response_message import SurveyResponseMessage
 
 __all__ = ["SignedSurveyResponseMessage"]
 
 
-@type_checked
 class SignedSurveyResponseMessage:
     """
     XDR Source Code::

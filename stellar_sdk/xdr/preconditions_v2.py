@@ -4,7 +4,6 @@ import base64
 from typing import List, Optional
 from xdrlib import Packer, Unpacker
 
-from ..type_checked import type_checked
 from .duration import Duration
 from .ledger_bounds import LedgerBounds
 from .sequence_number import SequenceNumber
@@ -15,7 +14,6 @@ from .uint32 import Uint32
 __all__ = ["PreconditionsV2"]
 
 
-@type_checked
 class PreconditionsV2:
     """
     XDR Source Code::

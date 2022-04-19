@@ -4,13 +4,11 @@ import base64
 from typing import List
 from xdrlib import Packer, Unpacker
 
-from ..type_checked import type_checked
 from .ledger_entry_change import LedgerEntryChange
 
 __all__ = ["LedgerEntryChanges"]
 
 
-@type_checked
 class LedgerEntryChanges:
     """
     XDR Source Code::

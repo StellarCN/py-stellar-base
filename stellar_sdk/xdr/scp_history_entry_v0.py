@@ -4,14 +4,12 @@ import base64
 from typing import List
 from xdrlib import Packer, Unpacker
 
-from ..type_checked import type_checked
 from .ledger_scp_messages import LedgerSCPMessages
 from .scp_quorum_set import SCPQuorumSet
 
 __all__ = ["SCPHistoryEntryV0"]
 
 
-@type_checked
 class SCPHistoryEntryV0:
     """
     XDR Source Code::

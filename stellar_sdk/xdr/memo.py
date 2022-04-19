@@ -3,7 +3,6 @@
 import base64
 from xdrlib import Packer, Unpacker
 
-from ..type_checked import type_checked
 from .base import String
 from .hash import Hash
 from .memo_type import MemoType
@@ -12,7 +11,6 @@ from .uint64 import Uint64
 __all__ = ["Memo"]
 
 
-@type_checked
 class Memo:
     """
     XDR Source Code::

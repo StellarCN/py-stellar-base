@@ -5,12 +5,10 @@ from enum import IntEnum
 from xdrlib import Packer, Unpacker
 
 from ..__version__ import __issues__
-from ..type_checked import type_checked
 
 __all__ = ["PreconditionType"]
 
 
-@type_checked
 class PreconditionType(IntEnum):
     """
     XDR Source Code::

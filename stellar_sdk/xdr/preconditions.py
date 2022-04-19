@@ -3,7 +3,6 @@
 import base64
 from xdrlib import Packer, Unpacker
 
-from ..type_checked import type_checked
 from .precondition_type import PreconditionType
 from .preconditions_v2 import PreconditionsV2
 from .time_bounds import TimeBounds
@@ -11,7 +10,6 @@ from .time_bounds import TimeBounds
 __all__ = ["Preconditions"]
 
 
-@type_checked
 class Preconditions:
     """
     XDR Source Code::

@@ -3,14 +3,12 @@
 import base64
 from xdrlib import Packer, Unpacker
 
-from ..type_checked import type_checked
 from .ledger_upgrade_type import LedgerUpgradeType
 from .uint32 import Uint32
 
 __all__ = ["LedgerUpgrade"]
 
 
-@type_checked
 class LedgerUpgrade:
     """
     XDR Source Code::
