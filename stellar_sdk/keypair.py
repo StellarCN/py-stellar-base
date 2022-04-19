@@ -209,8 +209,8 @@ class Keypair:
         """
         try:
             self.verify_key.verify(data, signature)
-        except NaclBadSignatureError:
-            raise BadSignatureError("Signature verification failed.")
+        except (NaclBadSignatureError, ValueError) as e:
+            raise BadSignatureError("Signature verification failed.") from e
 
     @staticmethod
     def generate_mnemonic_phrase(
