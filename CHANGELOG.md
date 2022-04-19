@@ -1,5 +1,13 @@
 Release History
 ==============
+### Version 8.0.0-beta1
+Released on April 19, 2022
+
+**This is a pre-release version, please do not use it in production.**
+
+#### Update
+* refactor: remove runtime type checking in `stellar_sdk.xdr` package ([#584](https://github.com/StellarCN/py-stellar-base/pull/584))
+
 ### Version 8.0.0-beta0
 Released on April 13, 2022
 
