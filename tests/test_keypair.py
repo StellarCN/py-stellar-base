@@ -97,6 +97,17 @@ class TestKeypair:
         ):
             can_not_sign_kp.sign(data)
 
+    def test_get_raw_secret_key_without_secret_raise(self):
+        can_not_sign_kp = Keypair.from_public_key(
+            "GAXDYNIBA5E4DXR5TJN522RRYESFQ5UNUXHIPTFGVLLD5O5K552DF5ZH"
+        )
+        with pytest.raises(
+            MissingEd25519SecretSeedError,
+            match="The keypair does not contain secret seed. Use Keypair.from_secret, "
+            "Keypair.random or Keypair.from_mnemonic_phrase to create a new keypair with a secret seed.",
+        ):
+            can_not_sign_kp.raw_secret_key()
+
     def test_sign_and_verify(self):
         kp = Keypair.from_secret(
             "SAQVS3IPN6U3TBMTXQH32ZESY7SUOZGLEFBH6XWMA6DVNPJ4CLO5M54B"
