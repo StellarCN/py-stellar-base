@@ -1,0 +1,46 @@
+// For format details, see https://aka.ms/vscode-remote/devcontainer.json or the definition README at
+// https://github.com/microsoft/vscode-dev-containers/tree/master/containers/ubuntu-18.04-git
+{
+  "name": "Stellar Python SDK Dev",
+  "dockerFile": "Dockerfile",
+  "build": {
+    "args": {}
+  },
+  // https://code.visualstudio.com/remote/advancedcontainers/environment-variables
+  "remoteEnv": {
+    "PIP_INDEX_URL": "https://mirrors.ustc.edu.cn/pypi/web/simple"
+  },
+  // The optional 'runArgs' property can be used to specify additional runtime arguments.
+  "runArgs": [],
+  // Use 'settings' to set *default* container specific settings.json values on container create.
+  // You can edit these settings after create using File > Preferences > Settings > Remote.
+  "settings": {
+    "terminal.integrated.profiles.linux": {
+      "bash": {
+        "path": "/bin/bash"
+      },
+      "fish": {
+        "path": "/bin/fish"
+      }
+    },
+    "terminal.integrated.defaultProfile.linux": "fish"
+  },
+  // Use 'forwardPorts' to make a list of ports inside the container available locally.
+  // "forwardPorts": [3000],
+  // Use 'portsAttributes' to set default properties for specific forwarded ports. More info: https://code.visualstudio.com/docs/remote/devcontainerjson-reference.
+  // "portsAttributes": {
+  // },
+  // Use 'otherPortsAttributes' to configure any ports that aren't configured using 'portsAttributes'.
+  // "otherPortsAttributes": {
+  //   "onAutoForward": "silent"
+  // },
+  // Uncomment the next line to run commands after the container is created.
+  "postCreateCommand": "poetry install",
+  "postAttachCommand": "poetry shell",
+  // Add the IDs of extensions you want installed when the container is created in the array below.
+  "extensions": ["donjayamanne.python-extension-pack"],
+  // Comment out to connect as root instead. More info: https://aka.ms/vscode-remote/containers/non-root.
+  // On Linux, this will prevent new files getting created as root, but you may need to update the USER_UID
+  // and USER_GID in .devcontainer/Dockerfile to match your user if not 1000.
+  "remoteUser": "vscode"
+}

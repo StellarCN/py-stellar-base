@@ -34,9 +34,17 @@ clean:
 	find . -name \*.pyc -delete
 .PHONY: clean
 
-update-xdr:
+download-xdr:
 	python .xdr/update_xdr.py
-.PHONY: update-xdr
+.PHONY: download-xdr
+
+gen-xdr:
+	rm -rf stellar_sdk/xdr/*
+	xdrgen -o stellar_sdk/xdr -l python -n stellar .xdr/*.x
+	autoflake --in-place --ignore-init-module-imports --remove-all-unused-imports stellar_sdk/xdr/*.py
+	isort stellar_sdk/xdr/
+	black stellar_sdk/xdr/
+.PHONY: gen-xdr
 
 format:
 	autoflake --in-place --ignore-init-module-imports --remove-all-unused-imports .
