@@ -1,5 +1,15 @@
 Release History
 ==============
+### Version 8.0.0-beta2
+Released on April 20, 2022
+
+**This is a pre-release version, please do not use it in production.**
+
+#### Update
+* feat: you can turn off runtime type checking by configuring `STELLAR_SDK_RUNTIME_TYPE_CHECKING=0` in environment variables. ([#589](https://github.com/StellarCN/py-stellar-base/pull/589))
+  
+  In order to make the program more rigorous and novice friendly, we previously introduced runtime type checking, but this would cause a significant performance penalty, so now we allow users to turn it off.
+
 ### Version 8.0.0-beta1
 Released on April 19, 2022
 
