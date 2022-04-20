@@ -1,6 +1,7 @@
 import pytest
 
 from stellar_sdk import Operation
+from stellar_sdk.type_checked import _STELLAR_SDK_RUNTIME_TYPE_CHECKING
 
 
 class TestOperation:
@@ -19,10 +20,14 @@ class TestOperation:
     @pytest.mark.parametrize(
         "origin_amount, exception, reason",
         [
-            (
+            pytest.param(
                 10,
                 TypeError,
                 'type of argument "value" must be one of \\(str, decimal.Decimal\\); got int instead',
+                marks=pytest.mark.skipif(
+                    not _STELLAR_SDK_RUNTIME_TYPE_CHECKING,
+                    reason="runtime_type_checking_disabled",
+                ),
             ),
             (
                 "-0.1",

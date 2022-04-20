@@ -45,6 +45,12 @@ jobs:
       - name: Test with pytest
         run: poetry run pytest -v -rs tests --runslow --cov=./ --cov-report=xml
 
+      - name: Test with pytest (runtime type checking disabled)
+        if: matrix.os == 'ubuntu-latest' && matrix.python-version == '3.7'
+        run: poetry run pytest -v -rs tests --runslow
+        env:
+          STELLAR_SDK_RUNTIME_TYPE_CHECKING: 0
+
       - name: Upload coverage to Codecov
         if: matrix.os == 'ubuntu-latest' && matrix.python-version == '3.7'
         uses: codecov/codecov-action@v1
