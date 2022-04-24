@@ -56,3 +56,11 @@ class TestOffersCallBuilder:
         builder = OffersCallBuilder(horizon_url, client).for_sponsor(sponsor)
         assert builder.endpoint == "offers"
         assert builder.params == {"sponsor": sponsor}
+
+    def test_for_account(self):
+        account_id = "GATEMHCCKCY67ZUCKTROYN24ZYT5GK4EQZ65JJLDHKHRUZI3EUEKMTCH"
+        builder = OffersCallBuilder(horizon_url, client).for_account(account_id)
+        assert builder.endpoint == "accounts/{account_id}/offers".format(
+            account_id=account_id
+        )
+        assert builder.params == {}
