@@ -1,6 +1,12 @@
 Release History
 ==============
 
+### Version 8.0.0-beta4
+Released on April 24, 2022
+
+#### Breaking changes
+* refactor: no longer sets "now" as the default cursor for AiohttpClient.stream ([#591](https://github.com/StellarCN/py-stellar-base/pull/591))
+
 ### Version 8.0.0-beta3
 Released on April 24, 2022
 
