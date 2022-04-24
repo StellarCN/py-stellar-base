@@ -52,6 +52,12 @@ It includes [CAP-21](https://stellar.org/protocol/cap-21) (new transaction preco
 
 -  Support for CAP-21 has been added to `stellar_sdk.sep.txrep`.
 
+### Version 7.0.3
+Released on April 24, 2022
+
+#### Add
+* feat: add `server.offers().for_account(account_id)` to retrieve the account's offers. ([#590](https://github.com/StellarCN/py-stellar-base/pull/590))
+
 ### Version 7.0.2
 Released on April 07, 2022
 

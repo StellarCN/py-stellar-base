@@ -20,6 +20,17 @@ class BaseOffersCallBuilder(BaseCallBuilder):
         super().__init__(horizon_url)
         self.endpoint: str = "offers"
 
+    def for_account(self, account_id: str):
+        """This endpoint represents all offers a given account has currently open and can be used in streaming mode.
+
+        See `Retrieve an Account's Offers <https://developers.stellar.org/api/resources/accounts/offers/>`__ for more information.
+
+        :param account_id: Account ID
+        :return: current PaymentsCallBuilder instance
+        """
+        self.endpoint = f"accounts/{account_id}/offers"
+        return self
+
     def for_seller(self, seller: str):
         """Returns all offers where the given account is the seller.
 
