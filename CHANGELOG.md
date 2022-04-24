@@ -1,5 +1,12 @@
 Release History
 ==============
+
+### Version 8.0.0-beta3
+Released on April 24, 2022
+
+#### Add
+* feat: add `server.offers().for_account(account_id)` to retrieve the account's offers. ([#590](https://github.com/StellarCN/py-stellar-base/pull/590))
+
 ### Version 8.0.0-beta2
 Released on April 20, 2022
 
