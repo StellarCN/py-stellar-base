@@ -172,9 +172,6 @@ class AiohttpClient(BaseAsyncClient):
 
         query_params = {**params} if params else dict()
 
-        if query_params.get("cursor") is None:
-            query_params["cursor"] = "now"  # Start monitoring from now.
-
         query_params.update(**IDENTIFICATION_HEADERS)
         retry = 0.1
 
