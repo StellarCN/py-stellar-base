@@ -149,4 +149,4 @@ class TestPreconditions:
         assert (
             cond.min_sequence_ledger_gap is restore_cond.min_sequence_ledger_gap is None
         )
-        assert cond.extra_signers is restore_cond.extra_signers is None
+        assert cond.extra_signers == restore_cond.extra_signers == []

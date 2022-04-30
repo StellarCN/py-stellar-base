@@ -40,9 +40,9 @@ class Preconditions:
         if min_sequence_ledger_gap == 0:
             min_sequence_ledger_gap = None
         if not extra_signers:
-            extra_signers = None
+            extra_signers = []
 
-        if extra_signers and len(extra_signers) > 2:
+        if len(extra_signers) > 2:
             raise ValueError('"extra_signers" cannot be longer than 2 elements.')
 
         self.time_bounds = time_bounds
