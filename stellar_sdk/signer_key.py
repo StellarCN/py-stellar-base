@@ -134,12 +134,12 @@ class SignerKey:
     def ed25519_signed_payload(
         cls, ed25519_signed_payload: Union[str, bytes, SignedPayloadSigner]
     ) -> "SignerKey":
-        """Create ed25519 signed payload Signer from an ed25519 signed payload.
+        """Create ed25519 signed payload Signer from an ed25519 signed payload,
+        click `here <https://github.com/stellar/stellar-protocol/blob/master/core/cap-0040.md>`__ for more information.
 
         :param ed25519_signed_payload: a sha256 hash of a preimage
         :return: ed25519 signed payload signer
         """
-        # TODO: add ref link
         signer_key_type = SignerKeyType.SIGNER_KEY_TYPE_ED25519_SIGNED_PAYLOAD
         if isinstance(ed25519_signed_payload, str):
             ed25519_signed_payload = StrKey.decode_ed25519_signed_payload(
