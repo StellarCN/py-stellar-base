@@ -150,3 +150,31 @@ class TestPreconditions:
             cond.min_sequence_ledger_gap is restore_cond.min_sequence_ledger_gap is None
         )
         assert cond.extra_signers == restore_cond.extra_signers == []
+
+    @pytest.mark.parametrize(
+        "preconditions, is_null",
+        [
+            (Preconditions(), True),
+            (Preconditions(time_bounds=TimeBounds(0, 1)), False),
+            (Preconditions(ledger_bounds=LedgerBounds(0, 1)), False),
+            (Preconditions(min_sequence_number=0), False),
+            (Preconditions(min_sequence_number=1), False),
+            (Preconditions(min_sequence_age=0), True),
+            (Preconditions(min_sequence_age=1), False),
+            (Preconditions(min_sequence_ledger_gap=0), True),
+            (Preconditions(min_sequence_ledger_gap=1), False),
+            (Preconditions(extra_signers=[]), True),
+            (
+                Preconditions(
+                    extra_signers=[
+                        SignerKey.from_encoded_signer_key(
+                            "GBJCHUKZMTFSLOMNC7P4TS4VJJBTCYL3XKSOLXAUJSD56C4LHND5TWUC"
+                        )
+                    ]
+                ),
+                False,
+            ),
+        ],
+    )
+    def test_is_empty_preconditions(self, preconditions: Preconditions, is_null: bool):
+        assert preconditions._is_empty_preconditions() is is_null

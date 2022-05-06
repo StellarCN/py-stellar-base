@@ -1,4 +1,4 @@
-from typing import List, Union
+from typing import List, Optional, Union
 
 from . import xdr as stellar_xdr
 from .keypair import Keypair
@@ -69,8 +69,11 @@ class Transaction:
 
         if memo is None:
             memo = NoneMemo()
-        if preconditions is None:
-            preconditions = Preconditions()
+        if (
+            isinstance(preconditions, Preconditions)
+            and preconditions._is_empty_preconditions()
+        ):
+            preconditions = None
         if isinstance(source, str):
             source = MuxedAccount.from_account(source)
         if isinstance(source, Keypair):
@@ -81,7 +84,7 @@ class Transaction:
         self.operations: List[Operation] = operations
         self.memo: Memo = memo
         self.fee: int = fee
-        self.preconditions: Preconditions = preconditions
+        self.preconditions: Optional[Preconditions] = preconditions
         self.v1: bool = v1
 
     def get_claimable_balance_id(self, operation_index: int) -> str:

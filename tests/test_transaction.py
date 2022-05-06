@@ -309,3 +309,12 @@ class TestTransaction:
             match="Type of the operation must be <class 'stellar_sdk.operation.create_claimable_balance.CreateClaimableBalance'>, got <class 'stellar_sdk.operation.manage_data.ManageData'> instead",
         ):
             tx.get_claimable_balance_id(0)
+
+    def test_convert_empty_preconditions_to_none(self):
+        op = ManageData("a", "b")
+        source = "GA7QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLTJJFC7MGXUA74P7UJVSGZ"
+        sequence = 1235
+        fee = 100
+        preconditions = Preconditions()
+        tx = Transaction(source, sequence, fee, [op], preconditions=preconditions)
+        assert tx.preconditions is None

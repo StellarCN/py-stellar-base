@@ -191,3 +191,13 @@ class Preconditions:
             f"extra_signers={self.extra_signers}"
             f"]>"
         )
+
+    def _is_empty_preconditions(self):
+        return not (
+            self.time_bounds
+            or self.ledger_bounds
+            or self.min_sequence_number is not None
+            or self.min_sequence_age
+            or self.min_sequence_ledger_gap
+            or self.extra_signers
+        )
