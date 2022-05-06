@@ -1087,8 +1087,13 @@ def _add_line(
     lines.append(f"{key}: {value}{' (' + str(comment) + ')' if comment else ''}")
 
 
-def _add_preconditions(cond: Preconditions, prefix: str, lines: List[str]) -> None:
-    cond_xdr = cond.to_xdr_object()
+def _add_preconditions(
+    cond: Optional[Preconditions], prefix: str, lines: List[str]
+) -> None:
+    if cond is None:
+        cond_xdr = stellar_xdr.Preconditions(stellar_xdr.PreconditionType.PRECOND_NONE)
+    else:
+        cond_xdr = cond.to_xdr_object()
     _add_line(f"{prefix}type", cond_xdr.type.name, lines)
     if cond_xdr.type == stellar_xdr.PreconditionType.PRECOND_TIME:
         assert cond.time_bounds is not None
