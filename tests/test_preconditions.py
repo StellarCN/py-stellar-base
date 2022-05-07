@@ -145,10 +145,8 @@ class TestPreconditions:
         assert cond.time_bounds == restore_cond.time_bounds
         assert cond.ledger_bounds == restore_cond.ledger_bounds
         assert cond.min_sequence_number == restore_cond.min_sequence_number == 0
-        assert cond.min_sequence_age is restore_cond.min_sequence_age is None
-        assert (
-            cond.min_sequence_ledger_gap is restore_cond.min_sequence_ledger_gap is None
-        )
+        assert cond.min_sequence_age is restore_cond.min_sequence_age == 0
+        assert cond.min_sequence_ledger_gap is restore_cond.min_sequence_ledger_gap == 0
         assert cond.extra_signers == restore_cond.extra_signers == []
 
     @pytest.mark.parametrize(
@@ -159,9 +157,9 @@ class TestPreconditions:
             (Preconditions(ledger_bounds=LedgerBounds(0, 1)), False),
             (Preconditions(min_sequence_number=0), False),
             (Preconditions(min_sequence_number=1), False),
-            (Preconditions(min_sequence_age=0), True),
+            (Preconditions(min_sequence_age=0), False),
             (Preconditions(min_sequence_age=1), False),
-            (Preconditions(min_sequence_ledger_gap=0), True),
+            (Preconditions(min_sequence_ledger_gap=0), False),
             (Preconditions(min_sequence_ledger_gap=1), False),
             (Preconditions(extra_signers=[]), True),
             (
@@ -178,3 +176,31 @@ class TestPreconditions:
     )
     def test_is_empty_preconditions(self, preconditions: Preconditions, is_null: bool):
         assert preconditions._is_empty_preconditions() is is_null
+
+    @pytest.mark.parametrize(
+        "preconditions, is_v2",
+        [
+            (Preconditions(), False),
+            (Preconditions(time_bounds=TimeBounds(0, 1)), False),
+            (Preconditions(ledger_bounds=LedgerBounds(0, 1)), True),
+            (Preconditions(min_sequence_number=0), True),
+            (Preconditions(min_sequence_number=1), True),
+            (Preconditions(min_sequence_age=0), True),
+            (Preconditions(min_sequence_age=1), True),
+            (Preconditions(min_sequence_ledger_gap=0), True),
+            (Preconditions(min_sequence_ledger_gap=1), True),
+            (Preconditions(extra_signers=[]), False),
+            (
+                Preconditions(
+                    extra_signers=[
+                        SignerKey.from_encoded_signer_key(
+                            "GBJCHUKZMTFSLOMNC7P4TS4VJJBTCYL3XKSOLXAUJSD56C4LHND5TWUC"
+                        )
+                    ]
+                ),
+                True,
+            ),
+        ],
+    )
+    def test_is_v2(self, preconditions: Preconditions, is_v2: bool):
+        assert preconditions._is_v2() is is_v2

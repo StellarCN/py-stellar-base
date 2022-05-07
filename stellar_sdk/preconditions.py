@@ -35,10 +35,6 @@ class Preconditions:
         min_sequence_ledger_gap: int = None,
         extra_signers: List[SignerKey] = None,
     ):
-        if min_sequence_age == 0:
-            min_sequence_age = None
-        if min_sequence_ledger_gap == 0:
-            min_sequence_ledger_gap = None
         if not extra_signers:
             extra_signers = []
 
@@ -52,16 +48,33 @@ class Preconditions:
         self.min_sequence_ledger_gap = min_sequence_ledger_gap
         self.extra_signers = extra_signers
 
-    def __eq__(self, other: object) -> bool:
-        if not isinstance(other, self.__class__):
-            return NotImplemented
-        return (
-            self.time_bounds == other.time_bounds
-            and self.ledger_bounds == other.ledger_bounds
-            and self.min_sequence_number == other.min_sequence_number
-            and self.min_sequence_age == other.min_sequence_age
-            and self.min_sequence_ledger_gap == other.min_sequence_ledger_gap
-            and self.extra_signers == other.extra_signers
+        if self._is_v2():
+            self.min_sequence_age = (
+                0 if self.min_sequence_age is None else self.min_sequence_age
+            )
+            self.min_sequence_ledger_gap = (
+                0
+                if self.min_sequence_ledger_gap is None
+                else self.min_sequence_ledger_gap
+            )
+
+    def _is_empty_preconditions(self) -> bool:
+        return not (
+            self.time_bounds
+            or self.ledger_bounds
+            or self.min_sequence_number is not None
+            or self.min_sequence_age is not None
+            or self.min_sequence_ledger_gap is not None
+            or self.extra_signers
+        )
+
+    def _is_v2(self) -> bool:
+        return bool(
+            self.ledger_bounds
+            or self.min_sequence_number is not None
+            or self.min_sequence_age is not None
+            or self.min_sequence_ledger_gap is not None
+            or self.extra_signers
         )
 
     def to_xdr_object(self) -> stellar_xdr.Preconditions:
@@ -70,13 +83,7 @@ class Preconditions:
         :return: XDR Preconditions object
         """
         time_bounds = self.time_bounds.to_xdr_object() if self.time_bounds else None
-        if (
-            self.ledger_bounds is not None
-            or self.min_sequence_number is not None
-            or self.min_sequence_age is not None
-            or self.min_sequence_ledger_gap is not None
-            or self.extra_signers
-        ):
+        if self._is_v2():
             ledger_bounds = (
                 self.ledger_bounds.to_xdr_object() if self.ledger_bounds else None
             )
@@ -147,16 +154,8 @@ class Preconditions:
                 if xdr_object.v2.min_seq_num is not None
                 else None
             )
-            min_sequence_age = (
-                xdr_object.v2.min_seq_age.duration.uint64
-                if xdr_object.v2.min_seq_age
-                else None
-            )
-            min_sequence_ledger_gap = (
-                xdr_object.v2.min_seq_ledger_gap.uint32
-                if xdr_object.v2.min_seq_ledger_gap
-                else None
-            )
+            min_sequence_age = xdr_object.v2.min_seq_age.duration.uint64
+            min_sequence_ledger_gap = xdr_object.v2.min_seq_ledger_gap.uint32
             extra_signers: Optional[List[SignerKey]] = [
                 SignerKey.from_xdr_object(s) for s in xdr_object.v2.extra_signers
             ]
@@ -180,6 +179,18 @@ class Preconditions:
         else:
             raise ValueError(f"Invalid PreconditionType: {xdr_object.type!r}")
 
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, self.__class__):
+            return NotImplemented
+        return (
+            self.time_bounds == other.time_bounds
+            and self.ledger_bounds == other.ledger_bounds
+            and self.min_sequence_number == other.min_sequence_number
+            and self.min_sequence_age == other.min_sequence_age
+            and self.min_sequence_ledger_gap == other.min_sequence_ledger_gap
+            and self.extra_signers == other.extra_signers
+        )
+
     def __str__(self):
         return (
             f"<Preconditions ["
@@ -190,14 +201,4 @@ class Preconditions:
             f"min_sequence_ledger_gap={self.min_sequence_ledger_gap}, "
             f"extra_signers={self.extra_signers}"
             f"]>"
-        )
-
-    def _is_empty_preconditions(self):
-        return not (
-            self.time_bounds
-            or self.ledger_bounds
-            or self.min_sequence_number is not None
-            or self.min_sequence_age
-            or self.min_sequence_ledger_gap
-            or self.extra_signers
         )

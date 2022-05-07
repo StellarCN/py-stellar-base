@@ -1096,9 +1096,11 @@ def _add_preconditions(
         cond_xdr = cond.to_xdr_object()
     _add_line(f"{prefix}type", cond_xdr.type.name, lines)
     if cond_xdr.type == stellar_xdr.PreconditionType.PRECOND_TIME:
+        assert cond is not None
         assert cond.time_bounds is not None
         _add_time_bounds(cond.time_bounds, prefix, lines)
     elif cond_xdr.type == stellar_xdr.PreconditionType.PRECOND_V2:
+        assert cond is not None
         _add_time_bounds_optional(cond.time_bounds, prefix, lines)
         _add_ledger_bounds_optional(cond.ledger_bounds, prefix, lines)
         if cond.min_sequence_number is None:
