@@ -318,3 +318,16 @@ class TestTransaction:
         preconditions = Preconditions()
         tx = Transaction(source, sequence, fee, [op], preconditions=preconditions)
         assert tx.preconditions is None
+
+    def test_only_min_sequence_ledger_gap_and_set_min_sequence_age_set_to_zero(self):
+        op = ManageData("a", "b")
+        source = "GA7QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLTJJFC7MGXUA74P7UJVSGZ"
+        sequence = 1235
+        fee = 100
+        preconditions = Preconditions(min_sequence_ledger_gap=0, min_sequence_age=0)
+        tx = Transaction(source, sequence, fee, [op], preconditions=preconditions)
+        restore_tx = Transaction.from_xdr_object(tx.to_xdr_object())
+        assert tx == restore_tx
+        assert restore_tx.preconditions._is_v2()
+        assert restore_tx.preconditions.min_sequence_ledger_gap == 0
+        assert restore_tx.preconditions.min_sequence_age == 0
