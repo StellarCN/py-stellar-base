@@ -32,6 +32,7 @@ pypi:
 
 clean:
 	find . -name \*.pyc -delete
+	rm -rf coverage.xml .coverage  dist  htmlcov  stellar_sdk.egg-info  tests/.mypy_cache  tests/.pytest_cache  docs/en/_build  docs/zh_CN/_build
 .PHONY: clean
 
 download-xdr:
