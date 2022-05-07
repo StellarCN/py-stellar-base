@@ -1,6 +1,53 @@
 Release History
 ==============
 
+### Version 8.0.0
+
+Released on May 07, 2022
+
+**This release includes breaking changes.**
+
+**This release adds support for Protocol 19.**
+
+It includes [CAP-21](https://stellar.org/protocol/cap-21) (new transaction preconditions) and [CAP-40](https://stellar.org/protocol/cap-40) (signed payload signers).
+
+#### Breaking changes
+
+- `Transaction.time_bounds` has been removed, please use `Transaction.preconditions.time_bounds` instead.
+- No longer sets "now" as the default cursor for AiohttpClient.stream ([#591](https://github.com/StellarCN/py-stellar-base/pull/591))
+- Some breaking updates are included in XDR, you can check the changes [here](https://github.com/stellar/stellar-protocol/blob/70cb1449c4/core/cap-0021.md#xdr-diff).
+
+#### Add
+
+- Support for converting signed payloads ([CAP-40](https://stellar.org/protocol/cap-40)) to and from their StrKey (`P...`) representation, you can find the example [here](https://github.com/StellarCN/py-stellar-base/blob/v8/examples/ed25519_signed_payload.py).
+  
+- Support for creating transactions with the new preconditions ([CAP-21](https://stellar.org/protocol/cap-21)) via `TransactionBuilder`, you can find the example [here](https://github.com/StellarCN/py-stellar-base/blob/v8/examples/preconditions.py).
+  
+  - `TransactionBuilder.set_ledger_bounds(min_ledger: int, max_ledger: int)`
+    
+  - `TransactionBuilder.set_min_sequence_number(min_sequence_number: int)`
+    
+  - `TransactionBuilder.set_min_sequence_age(min_sequence_age: int)`
+    
+  - `TransactionBuilder.set_min_sequence_ledger_gap(min_sequence_ledger_gap: int)`
+    
+  - `TransactionBuilder.add_extra_signer(signer_key: Union[SignerKey, SignedPayloadSigner, str])`
+    
+- Support for Signing transactions containing the ed25519 payload extra signer, you can find the example [here](https://github.com/StellarCN/py-stellar-base/blob/v8/examples/preconditions.py).
+  
+  - `Keypair.sign_payload_decorated(data: bytes)`
+  - `TransactionEnvelope.sign_extra_signers_payload(signer: Union[Keypair, str])`
+- Support for CAP-21 has been added to `stellar_sdk.sep.txrep`.
+  
+
+#### Update
+
+- feat: you can turn off runtime type checking by configuring `STELLAR_SDK_RUNTIME_TYPE_CHECKING=0` in environment variables. ([#589](https://github.com/StellarCN/py-stellar-base/pull/589))
+  
+  In order to make the program more rigorous and novice friendly, we previously introduced runtime type checking, but this would cause a significant performance penalty, so now we allow users to turn it off.
+  
+- refactor: remove runtime type checking in `stellar_sdk.xdr` package ([#584](https://github.com/StellarCN/py-stellar-base/pull/584))
+
 ### Version 8.0.0-beta4
 Released on April 24, 2022
 
