@@ -89,9 +89,10 @@ class StellarMessage:
         get_scp_ledger_seq: Uint32 = None,
         send_more_message: SendMore = None,
     ) -> None:
-        if peers and len(peers) > 100:
+        _expect_max_length = 100
+        if peers and len(peers) > _expect_max_length:
             raise ValueError(
-                f"The maximum length of `peers` should be 100, but got {len(peers)}."
+                f"The maximum length of `peers` should be {_expect_max_length}, but got {len(peers)}."
             )
         self.type = type
         self.error = error
@@ -330,4 +331,4 @@ class StellarMessage:
         out.append(
             f"send_more_message={self.send_more_message}"
         ) if self.send_more_message is not None else None
-        return f"<StellarMessage {[', '.join(out)]}>"
+        return f"<StellarMessage [{', '.join(out)}]>"

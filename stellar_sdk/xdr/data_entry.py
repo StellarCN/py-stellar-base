@@ -98,4 +98,4 @@ class DataEntry:
             f"data_value={self.data_value}",
             f"ext={self.ext}",
         ]
-        return f"<DataEntry {[', '.join(out)]}>"
+        return f"<DataEntry [{', '.join(out)}]>"

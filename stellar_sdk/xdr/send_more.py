@@ -62,4 +62,4 @@ class SendMore:
         out = [
             f"num_messages={self.num_messages}",
         ]
-        return f"<SendMore {[', '.join(out)]}>"
+        return f"<SendMore [{', '.join(out)}]>"

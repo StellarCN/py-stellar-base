@@ -70,4 +70,4 @@ class LedgerKeyTrustLine:
             f"account_id={self.account_id}",
             f"asset={self.asset}",
         ]
-        return f"<LedgerKeyTrustLine {[', '.join(out)]}>"
+        return f"<LedgerKeyTrustLine [{', '.join(out)}]>"

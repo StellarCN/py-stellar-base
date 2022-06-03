@@ -71,4 +71,4 @@ class LedgerBounds:
             f"min_ledger={self.min_ledger}",
             f"max_ledger={self.max_ledger}",
         ]
-        return f"<LedgerBounds {[', '.join(out)]}>"
+        return f"<LedgerBounds [{', '.join(out)}]>"

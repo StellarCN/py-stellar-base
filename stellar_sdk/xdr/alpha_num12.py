@@ -70,4 +70,4 @@ class AlphaNum12:
             f"asset_code={self.asset_code}",
             f"issuer={self.issuer}",
         ]
-        return f"<AlphaNum12 {[', '.join(out)]}>"
+        return f"<AlphaNum12 [{', '.join(out)}]>"

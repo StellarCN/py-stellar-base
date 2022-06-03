@@ -100,4 +100,4 @@ class LiquidityPoolEntryConstantProduct:
             f"total_pool_shares={self.total_pool_shares}",
             f"pool_shares_trust_line_count={self.pool_shares_trust_line_count}",
         ]
-        return f"<LiquidityPoolEntryConstantProduct {[', '.join(out)]}>"
+        return f"<LiquidityPoolEntryConstantProduct [{', '.join(out)}]>"

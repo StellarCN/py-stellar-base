@@ -44,17 +44,20 @@ class LedgerCloseMetaV0:
         upgrades_processing: List[UpgradeEntryMeta],
         scp_info: List[SCPHistoryEntry],
     ) -> None:
-        if tx_processing and len(tx_processing) > 4294967295:
+        _expect_max_length = 4294967295
+        if tx_processing and len(tx_processing) > _expect_max_length:
             raise ValueError(
-                f"The maximum length of `tx_processing` should be 4294967295, but got {len(tx_processing)}."
+                f"The maximum length of `tx_processing` should be {_expect_max_length}, but got {len(tx_processing)}."
             )
-        if upgrades_processing and len(upgrades_processing) > 4294967295:
+        _expect_max_length = 4294967295
+        if upgrades_processing and len(upgrades_processing) > _expect_max_length:
             raise ValueError(
-                f"The maximum length of `upgrades_processing` should be 4294967295, but got {len(upgrades_processing)}."
+                f"The maximum length of `upgrades_processing` should be {_expect_max_length}, but got {len(upgrades_processing)}."
             )
-        if scp_info and len(scp_info) > 4294967295:
+        _expect_max_length = 4294967295
+        if scp_info and len(scp_info) > _expect_max_length:
             raise ValueError(
-                f"The maximum length of `scp_info` should be 4294967295, but got {len(scp_info)}."
+                f"The maximum length of `scp_info` should be {_expect_max_length}, but got {len(scp_info)}."
             )
         self.ledger_header = ledger_header
         self.tx_set = tx_set
@@ -137,4 +140,4 @@ class LedgerCloseMetaV0:
             f"upgrades_processing={self.upgrades_processing}",
             f"scp_info={self.scp_info}",
         ]
-        return f"<LedgerCloseMetaV0 {[', '.join(out)]}>"
+        return f"<LedgerCloseMetaV0 [{', '.join(out)}]>"

@@ -84,4 +84,4 @@ class AllowTrustOp:
             f"asset={self.asset}",
             f"authorize={self.authorize}",
         ]
-        return f"<AllowTrustOp {[', '.join(out)]}>"
+        return f"<AllowTrustOp [{', '.join(out)}]>"

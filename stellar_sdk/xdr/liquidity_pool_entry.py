@@ -87,4 +87,4 @@ class LiquidityPoolEntry:
             f"liquidity_pool_id={self.liquidity_pool_id}",
             f"body={self.body}",
         ]
-        return f"<LiquidityPoolEntry {[', '.join(out)]}>"
+        return f"<LiquidityPoolEntry [{', '.join(out)}]>"

@@ -70,4 +70,4 @@ class DecoratedSignature:
             f"hint={self.hint}",
             f"signature={self.signature}",
         ]
-        return f"<DecoratedSignature {[', '.join(out)]}>"
+        return f"<DecoratedSignature [{', '.join(out)}]>"

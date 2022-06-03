@@ -82,4 +82,4 @@ class SimplePaymentResult:
             f"asset={self.asset}",
             f"amount={self.amount}",
         ]
-        return f"<SimplePaymentResult {[', '.join(out)]}>"
+        return f"<SimplePaymentResult [{', '.join(out)}]>"

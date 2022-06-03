@@ -28,13 +28,15 @@ class SCPNomination:
         votes: List[Value],
         accepted: List[Value],
     ) -> None:
-        if votes and len(votes) > 4294967295:
+        _expect_max_length = 4294967295
+        if votes and len(votes) > _expect_max_length:
             raise ValueError(
-                f"The maximum length of `votes` should be 4294967295, but got {len(votes)}."
+                f"The maximum length of `votes` should be {_expect_max_length}, but got {len(votes)}."
             )
-        if accepted and len(accepted) > 4294967295:
+        _expect_max_length = 4294967295
+        if accepted and len(accepted) > _expect_max_length:
             raise ValueError(
-                f"The maximum length of `accepted` should be 4294967295, but got {len(accepted)}."
+                f"The maximum length of `accepted` should be {_expect_max_length}, but got {len(accepted)}."
             )
         self.quorum_set_hash = quorum_set_hash
         self.votes = votes
@@ -100,4 +102,4 @@ class SCPNomination:
             f"votes={self.votes}",
             f"accepted={self.accepted}",
         ]
-        return f"<SCPNomination {[', '.join(out)]}>"
+        return f"<SCPNomination [{', '.join(out)}]>"

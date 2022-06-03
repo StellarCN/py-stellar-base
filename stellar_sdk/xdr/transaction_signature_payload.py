@@ -85,4 +85,4 @@ class TransactionSignaturePayload:
             f"network_id={self.network_id}",
             f"tagged_transaction={self.tagged_transaction}",
         ]
-        return f"<TransactionSignaturePayload {[', '.join(out)]}>"
+        return f"<TransactionSignaturePayload [{', '.join(out)}]>"

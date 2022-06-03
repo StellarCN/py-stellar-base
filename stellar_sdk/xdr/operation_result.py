@@ -125,4 +125,4 @@ class OperationResult:
         out = []
         out.append(f"code={self.code}")
         out.append(f"tr={self.tr}") if self.tr is not None else None
-        return f"<OperationResult {[', '.join(out)]}>"
+        return f"<OperationResult [{', '.join(out)}]>"

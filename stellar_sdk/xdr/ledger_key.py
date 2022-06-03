@@ -182,4 +182,4 @@ class LedgerKey:
         out.append(
             f"liquidity_pool={self.liquidity_pool}"
         ) if self.liquidity_pool is not None else None
-        return f"<LedgerKey {[', '.join(out)]}>"
+        return f"<LedgerKey [{', '.join(out)}]>"

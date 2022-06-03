@@ -62,4 +62,4 @@ class LedgerKeyAccount:
         out = [
             f"account_id={self.account_id}",
         ]
-        return f"<LedgerKeyAccount {[', '.join(out)]}>"
+        return f"<LedgerKeyAccount [{', '.join(out)}]>"

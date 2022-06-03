@@ -89,4 +89,4 @@ class PeerAddressIp:
         out.append(f"type={self.type}")
         out.append(f"ipv4={self.ipv4}") if self.ipv4 is not None else None
         out.append(f"ipv6={self.ipv6}") if self.ipv6 is not None else None
-        return f"<PeerAddressIp {[', '.join(out)]}>"
+        return f"<PeerAddressIp [{', '.join(out)}]>"

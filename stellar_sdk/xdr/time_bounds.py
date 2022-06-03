@@ -69,4 +69,4 @@ class TimeBounds:
             f"min_time={self.min_time}",
             f"max_time={self.max_time}",
         ]
-        return f"<TimeBounds {[', '.join(out)]}>"
+        return f"<TimeBounds [{', '.join(out)}]>"

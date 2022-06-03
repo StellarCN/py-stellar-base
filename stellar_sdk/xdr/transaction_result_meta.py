@@ -82,4 +82,4 @@ class TransactionResultMeta:
             f"fee_processing={self.fee_processing}",
             f"tx_apply_processing={self.tx_apply_processing}",
         ]
-        return f"<TransactionResultMeta {[', '.join(out)]}>"
+        return f"<TransactionResultMeta [{', '.join(out)}]>"

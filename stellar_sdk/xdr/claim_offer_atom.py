@@ -111,4 +111,4 @@ class ClaimOfferAtom:
             f"asset_bought={self.asset_bought}",
             f"amount_bought={self.amount_bought}",
         ]
-        return f"<ClaimOfferAtom {[', '.join(out)]}>"
+        return f"<ClaimOfferAtom [{', '.join(out)}]>"

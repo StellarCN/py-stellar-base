@@ -72,4 +72,4 @@ class ChangeTrustOp:
             f"line={self.line}",
             f"limit={self.limit}",
         ]
-        return f"<ChangeTrustOp {[', '.join(out)]}>"
+        return f"<ChangeTrustOp [{', '.join(out)}]>"

@@ -36,9 +36,10 @@ class ManageOfferSuccessResult:
         offers_claimed: List[ClaimAtom],
         offer: ManageOfferSuccessResultOffer,
     ) -> None:
-        if offers_claimed and len(offers_claimed) > 4294967295:
+        _expect_max_length = 4294967295
+        if offers_claimed and len(offers_claimed) > _expect_max_length:
             raise ValueError(
-                f"The maximum length of `offers_claimed` should be 4294967295, but got {len(offers_claimed)}."
+                f"The maximum length of `offers_claimed` should be {_expect_max_length}, but got {len(offers_claimed)}."
             )
         self.offers_claimed = offers_claimed
         self.offer = offer
@@ -90,4 +91,4 @@ class ManageOfferSuccessResult:
             f"offers_claimed={self.offers_claimed}",
             f"offer={self.offer}",
         ]
-        return f"<ManageOfferSuccessResult {[', '.join(out)]}>"
+        return f"<ManageOfferSuccessResult [{', '.join(out)}]>"

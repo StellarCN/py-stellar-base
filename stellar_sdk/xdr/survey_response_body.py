@@ -77,4 +77,4 @@ class SurveyResponseBody:
         out.append(
             f"topology_response_body={self.topology_response_body}"
         ) if self.topology_response_body is not None else None
-        return f"<SurveyResponseBody {[', '.join(out)]}>"
+        return f"<SurveyResponseBody [{', '.join(out)}]>"

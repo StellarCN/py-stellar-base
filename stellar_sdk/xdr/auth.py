@@ -64,4 +64,4 @@ class Auth:
         out = [
             f"unused={self.unused}",
         ]
-        return f"<Auth {[', '.join(out)]}>"
+        return f"<Auth [{', '.join(out)}]>"

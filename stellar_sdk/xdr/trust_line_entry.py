@@ -131,4 +131,4 @@ class TrustLineEntry:
             f"flags={self.flags}",
             f"ext={self.ext}",
         ]
-        return f"<TrustLineEntry {[', '.join(out)]}>"
+        return f"<TrustLineEntry [{', '.join(out)}]>"

@@ -64,4 +64,4 @@ class InnerTransactionResultExt:
     def __str__(self):
         out = []
         out.append(f"v={self.v}")
-        return f"<InnerTransactionResultExt {[', '.join(out)]}>"
+        return f"<InnerTransactionResultExt [{', '.join(out)}]>"

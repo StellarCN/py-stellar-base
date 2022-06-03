@@ -66,4 +66,4 @@ class ChangeTrustResult:
     def __str__(self):
         out = []
         out.append(f"code={self.code}")
-        return f"<ChangeTrustResult {[', '.join(out)]}>"
+        return f"<ChangeTrustResult [{', '.join(out)}]>"

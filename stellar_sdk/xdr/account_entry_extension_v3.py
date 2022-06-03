@@ -88,4 +88,4 @@ class AccountEntryExtensionV3:
             f"seq_ledger={self.seq_ledger}",
             f"seq_time={self.seq_time}",
         ]
-        return f"<AccountEntryExtensionV3 {[', '.join(out)]}>"
+        return f"<AccountEntryExtensionV3 [{', '.join(out)}]>"

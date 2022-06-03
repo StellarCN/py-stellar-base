@@ -64,4 +64,4 @@ class ClaimableBalanceEntryExtensionV1Ext:
     def __str__(self):
         out = []
         out.append(f"v={self.v}")
-        return f"<ClaimableBalanceEntryExtensionV1Ext {[', '.join(out)]}>"
+        return f"<ClaimableBalanceEntryExtensionV1Ext [{', '.join(out)}]>"

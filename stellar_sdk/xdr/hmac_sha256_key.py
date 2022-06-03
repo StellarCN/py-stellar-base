@@ -62,4 +62,4 @@ class HmacSha256Key:
         out = [
             f"key={self.key}",
         ]
-        return f"<HmacSha256Key {[', '.join(out)]}>"
+        return f"<HmacSha256Key [{', '.join(out)}]>"

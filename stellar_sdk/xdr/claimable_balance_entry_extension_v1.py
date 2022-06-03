@@ -78,4 +78,4 @@ class ClaimableBalanceEntryExtensionV1:
             f"ext={self.ext}",
             f"flags={self.flags}",
         ]
-        return f"<ClaimableBalanceEntryExtensionV1 {[', '.join(out)]}>"
+        return f"<ClaimableBalanceEntryExtensionV1 [{', '.join(out)}]>"

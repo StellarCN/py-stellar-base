@@ -82,4 +82,4 @@ class PaymentOp:
             f"asset={self.asset}",
             f"amount={self.amount}",
         ]
-        return f"<PaymentOp {[', '.join(out)]}>"
+        return f"<PaymentOp [{', '.join(out)}]>"

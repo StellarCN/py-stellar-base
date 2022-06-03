@@ -113,4 +113,4 @@ class PathPaymentStrictReceiveResult:
         out.append(
             f"no_issuer={self.no_issuer}"
         ) if self.no_issuer is not None else None
-        return f"<PathPaymentStrictReceiveResult {[', '.join(out)]}>"
+        return f"<PathPaymentStrictReceiveResult [{', '.join(out)}]>"

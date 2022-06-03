@@ -62,4 +62,4 @@ class Curve25519Secret:
         out = [
             f"key={self.key}",
         ]
-        return f"<Curve25519Secret {[', '.join(out)]}>"
+        return f"<Curve25519Secret [{', '.join(out)}]>"

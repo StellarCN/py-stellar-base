@@ -80,4 +80,4 @@ class StellarValueExt:
         out.append(
             f"lc_value_signature={self.lc_value_signature}"
         ) if self.lc_value_signature is not None else None
-        return f"<StellarValueExt {[', '.join(out)]}>"
+        return f"<StellarValueExt [{', '.join(out)}]>"

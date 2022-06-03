@@ -63,4 +63,4 @@ class ExtensionPoint:
     def __str__(self):
         out = []
         out.append(f"v={self.v}")
-        return f"<ExtensionPoint {[', '.join(out)]}>"
+        return f"<ExtensionPoint [{', '.join(out)}]>"

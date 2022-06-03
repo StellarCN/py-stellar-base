@@ -76,4 +76,4 @@ class LedgerEntryExtensionV1:
             f"sponsoring_id={self.sponsoring_id}",
             f"ext={self.ext}",
         ]
-        return f"<LedgerEntryExtensionV1 {[', '.join(out)]}>"
+        return f"<LedgerEntryExtensionV1 [{', '.join(out)}]>"

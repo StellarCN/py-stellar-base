@@ -70,4 +70,4 @@ class MuxedAccountMed25519:
             f"id={self.id}",
             f"ed25519={self.ed25519}",
         ]
-        return f"<MuxedAccountMed25519 {[', '.join(out)]}>"
+        return f"<MuxedAccountMed25519 [{', '.join(out)}]>"

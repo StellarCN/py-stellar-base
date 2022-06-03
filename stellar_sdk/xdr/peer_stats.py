@@ -180,4 +180,4 @@ class PeerStats:
             f"unique_fetch_message_recv={self.unique_fetch_message_recv}",
             f"duplicate_fetch_message_recv={self.duplicate_fetch_message_recv}",
         ]
-        return f"<PeerStats {[', '.join(out)]}>"
+        return f"<PeerStats [{', '.join(out)}]>"

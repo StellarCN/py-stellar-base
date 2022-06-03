@@ -98,4 +98,4 @@ class SCPStatementConfirm:
             f"n_h={self.n_h}",
             f"quorum_set_hash={self.quorum_set_hash}",
         ]
-        return f"<SCPStatementConfirm {[', '.join(out)]}>"
+        return f"<SCPStatementConfirm [{', '.join(out)}]>"

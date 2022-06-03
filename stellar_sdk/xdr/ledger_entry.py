@@ -107,4 +107,4 @@ class LedgerEntry:
             f"data={self.data}",
             f"ext={self.ext}",
         ]
-        return f"<LedgerEntry {[', '.join(out)]}>"
+        return f"<LedgerEntry [{', '.join(out)}]>"

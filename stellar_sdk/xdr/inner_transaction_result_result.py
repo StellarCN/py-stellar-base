@@ -43,9 +43,10 @@ class InnerTransactionResultResult:
         code: TransactionResultCode,
         results: List[OperationResult] = None,
     ) -> None:
-        if results and len(results) > 4294967295:
+        _expect_max_length = 4294967295
+        if results and len(results) > _expect_max_length:
             raise ValueError(
-                f"The maximum length of `results` should be 4294967295, but got {len(results)}."
+                f"The maximum length of `results` should be {_expect_max_length}, but got {len(results)}."
             )
         self.code = code
         self.results = results
@@ -164,4 +165,4 @@ class InnerTransactionResultResult:
         out = []
         out.append(f"code={self.code}")
         out.append(f"results={self.results}") if self.results is not None else None
-        return f"<InnerTransactionResultResult {[', '.join(out)]}>"
+        return f"<InnerTransactionResultResult [{', '.join(out)}]>"

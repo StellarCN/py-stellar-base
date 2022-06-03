@@ -466,4 +466,4 @@ class OperationBody:
         out.append(
             f"liquidity_pool_withdraw_op={self.liquidity_pool_withdraw_op}"
         ) if self.liquidity_pool_withdraw_op is not None else None
-        return f"<OperationBody {[', '.join(out)]}>"
+        return f"<OperationBody [{', '.join(out)}]>"

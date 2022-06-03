@@ -62,4 +62,4 @@ class LedgerKeyClaimableBalance:
         out = [
             f"balance_id={self.balance_id}",
         ]
-        return f"<LedgerKeyClaimableBalance {[', '.join(out)]}>"
+        return f"<LedgerKeyClaimableBalance [{', '.join(out)}]>"

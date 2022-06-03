@@ -66,4 +66,4 @@ class RevokeSponsorshipResult:
     def __str__(self):
         out = []
         out.append(f"code={self.code}")
-        return f"<RevokeSponsorshipResult {[', '.join(out)]}>"
+        return f"<RevokeSponsorshipResult [{', '.join(out)}]>"

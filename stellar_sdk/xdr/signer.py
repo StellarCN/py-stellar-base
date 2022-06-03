@@ -70,4 +70,4 @@ class Signer:
             f"key={self.key}",
             f"weight={self.weight}",
         ]
-        return f"<Signer {[', '.join(out)]}>"
+        return f"<Signer [{', '.join(out)}]>"

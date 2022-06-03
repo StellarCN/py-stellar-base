@@ -66,4 +66,4 @@ class SetTrustLineFlagsResult:
     def __str__(self):
         out = []
         out.append(f"code={self.code}")
-        return f"<SetTrustLineFlagsResult {[', '.join(out)]}>"
+        return f"<SetTrustLineFlagsResult [{', '.join(out)}]>"

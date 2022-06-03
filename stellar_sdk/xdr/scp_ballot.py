@@ -70,4 +70,4 @@ class SCPBallot:
             f"counter={self.counter}",
             f"value={self.value}",
         ]
-        return f"<SCPBallot {[', '.join(out)]}>"
+        return f"<SCPBallot [{', '.join(out)}]>"

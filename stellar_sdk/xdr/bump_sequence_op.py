@@ -62,4 +62,4 @@ class BumpSequenceOp:
         out = [
             f"bump_to={self.bump_to}",
         ]
-        return f"<BumpSequenceOp {[', '.join(out)]}>"
+        return f"<BumpSequenceOp [{', '.join(out)}]>"

@@ -122,4 +122,4 @@ class TrustLineAsset:
         out.append(
             f"liquidity_pool_id={self.liquidity_pool_id}"
         ) if self.liquidity_pool_id is not None else None
-        return f"<TrustLineAsset {[', '.join(out)]}>"
+        return f"<TrustLineAsset [{', '.join(out)}]>"

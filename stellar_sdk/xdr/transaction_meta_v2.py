@@ -30,9 +30,10 @@ class TransactionMetaV2:
         operations: List[OperationMeta],
         tx_changes_after: LedgerEntryChanges,
     ) -> None:
-        if operations and len(operations) > 4294967295:
+        _expect_max_length = 4294967295
+        if operations and len(operations) > _expect_max_length:
             raise ValueError(
-                f"The maximum length of `operations` should be 4294967295, but got {len(operations)}."
+                f"The maximum length of `operations` should be {_expect_max_length}, but got {len(operations)}."
             )
         self.tx_changes_before = tx_changes_before
         self.operations = operations
@@ -93,4 +94,4 @@ class TransactionMetaV2:
             f"operations={self.operations}",
             f"tx_changes_after={self.tx_changes_after}",
         ]
-        return f"<TransactionMetaV2 {[', '.join(out)]}>"
+        return f"<TransactionMetaV2 [{', '.join(out)}]>"

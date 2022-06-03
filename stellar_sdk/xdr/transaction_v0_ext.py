@@ -64,4 +64,4 @@ class TransactionV0Ext:
     def __str__(self):
         out = []
         out.append(f"v={self.v}")
-        return f"<TransactionV0Ext {[', '.join(out)]}>"
+        return f"<TransactionV0Ext [{', '.join(out)}]>"

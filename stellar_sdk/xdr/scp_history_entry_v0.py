@@ -26,9 +26,10 @@ class SCPHistoryEntryV0:
         quorum_sets: List[SCPQuorumSet],
         ledger_messages: LedgerSCPMessages,
     ) -> None:
-        if quorum_sets and len(quorum_sets) > 4294967295:
+        _expect_max_length = 4294967295
+        if quorum_sets and len(quorum_sets) > _expect_max_length:
             raise ValueError(
-                f"The maximum length of `quorum_sets` should be 4294967295, but got {len(quorum_sets)}."
+                f"The maximum length of `quorum_sets` should be {_expect_max_length}, but got {len(quorum_sets)}."
             )
         self.quorum_sets = quorum_sets
         self.ledger_messages = ledger_messages
@@ -83,4 +84,4 @@ class SCPHistoryEntryV0:
             f"quorum_sets={self.quorum_sets}",
             f"ledger_messages={self.ledger_messages}",
         ]
-        return f"<SCPHistoryEntryV0 {[', '.join(out)]}>"
+        return f"<SCPHistoryEntryV0 [{', '.join(out)}]>"

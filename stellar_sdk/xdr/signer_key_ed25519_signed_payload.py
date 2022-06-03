@@ -71,4 +71,4 @@ class SignerKeyEd25519SignedPayload:
             f"ed25519={self.ed25519}",
             f"payload={self.payload}",
         ]
-        return f"<SignerKeyEd25519SignedPayload {[', '.join(out)]}>"
+        return f"<SignerKeyEd25519SignedPayload [{', '.join(out)}]>"

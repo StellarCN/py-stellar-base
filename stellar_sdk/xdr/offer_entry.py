@@ -138,4 +138,4 @@ class OfferEntry:
             f"flags={self.flags}",
             f"ext={self.ext}",
         ]
-        return f"<OfferEntry {[', '.join(out)]}>"
+        return f"<OfferEntry [{', '.join(out)}]>"

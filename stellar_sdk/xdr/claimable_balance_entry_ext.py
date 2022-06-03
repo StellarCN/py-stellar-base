@@ -78,4 +78,4 @@ class ClaimableBalanceEntryExt:
         out = []
         out.append(f"v={self.v}")
         out.append(f"v1={self.v1}") if self.v1 is not None else None
-        return f"<ClaimableBalanceEntryExt {[', '.join(out)]}>"
+        return f"<ClaimableBalanceEntryExt [{', '.join(out)}]>"

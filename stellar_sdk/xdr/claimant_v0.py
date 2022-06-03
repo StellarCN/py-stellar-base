@@ -72,4 +72,4 @@ class ClaimantV0:
             f"destination={self.destination}",
             f"predicate={self.predicate}",
         ]
-        return f"<ClaimantV0 {[', '.join(out)]}>"
+        return f"<ClaimantV0 [{', '.join(out)}]>"

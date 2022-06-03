@@ -89,4 +89,4 @@ class LiquidityPoolWithdrawOp:
             f"min_amount_a={self.min_amount_a}",
             f"min_amount_b={self.min_amount_b}",
         ]
-        return f"<LiquidityPoolWithdrawOp {[', '.join(out)]}>"
+        return f"<LiquidityPoolWithdrawOp [{', '.join(out)}]>"

@@ -80,4 +80,4 @@ class CreateClaimableBalanceResult:
         out.append(
             f"balance_id={self.balance_id}"
         ) if self.balance_id is not None else None
-        return f"<CreateClaimableBalanceResult {[', '.join(out)]}>"
+        return f"<CreateClaimableBalanceResult [{', '.join(out)}]>"

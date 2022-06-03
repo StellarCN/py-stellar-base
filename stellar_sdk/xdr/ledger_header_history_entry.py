@@ -89,4 +89,4 @@ class LedgerHeaderHistoryEntry:
             f"header={self.header}",
             f"ext={self.ext}",
         ]
-        return f"<LedgerHeaderHistoryEntry {[', '.join(out)]}>"
+        return f"<LedgerHeaderHistoryEntry [{', '.join(out)}]>"

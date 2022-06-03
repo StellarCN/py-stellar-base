@@ -28,9 +28,10 @@ class FeeBumpTransactionEnvelope:
         tx: FeeBumpTransaction,
         signatures: List[DecoratedSignature],
     ) -> None:
-        if signatures and len(signatures) > 20:
+        _expect_max_length = 20
+        if signatures and len(signatures) > _expect_max_length:
             raise ValueError(
-                f"The maximum length of `signatures` should be 20, but got {len(signatures)}."
+                f"The maximum length of `signatures` should be {_expect_max_length}, but got {len(signatures)}."
             )
         self.tx = tx
         self.signatures = signatures
@@ -82,4 +83,4 @@ class FeeBumpTransactionEnvelope:
             f"tx={self.tx}",
             f"signatures={self.signatures}",
         ]
-        return f"<FeeBumpTransactionEnvelope {[', '.join(out)]}>"
+        return f"<FeeBumpTransactionEnvelope [{', '.join(out)}]>"

@@ -94,4 +94,4 @@ class MuxedAccount:
         out.append(f"type={self.type}")
         out.append(f"ed25519={self.ed25519}") if self.ed25519 is not None else None
         out.append(f"med25519={self.med25519}") if self.med25519 is not None else None
-        return f"<MuxedAccount {[', '.join(out)]}>"
+        return f"<MuxedAccount [{', '.join(out)}]>"

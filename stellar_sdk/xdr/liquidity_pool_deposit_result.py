@@ -67,4 +67,4 @@ class LiquidityPoolDepositResult:
     def __str__(self):
         out = []
         out.append(f"code={self.code}")
-        return f"<LiquidityPoolDepositResult {[', '.join(out)]}>"
+        return f"<LiquidityPoolDepositResult [{', '.join(out)}]>"

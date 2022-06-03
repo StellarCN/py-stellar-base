@@ -102,4 +102,4 @@ class ClaimLiquidityAtom:
             f"asset_bought={self.asset_bought}",
             f"amount_bought={self.amount_bought}",
         ]
-        return f"<ClaimLiquidityAtom {[', '.join(out)]}>"
+        return f"<ClaimLiquidityAtom [{', '.join(out)}]>"

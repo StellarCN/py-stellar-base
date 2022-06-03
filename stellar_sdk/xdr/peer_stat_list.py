@@ -17,9 +17,10 @@ class PeerStatList:
     """
 
     def __init__(self, peer_stat_list: List[PeerStats]) -> None:
-        if peer_stat_list and len(peer_stat_list) > 25:
+        _expect_max_length = 25
+        if peer_stat_list and len(peer_stat_list) > _expect_max_length:
             raise ValueError(
-                f"The maximum length of `peer_stat_list` should be 25, but got {len(peer_stat_list)}."
+                f"The maximum length of `peer_stat_list` should be {_expect_max_length}, but got {len(peer_stat_list)}."
             )
         self.peer_stat_list = peer_stat_list
 

@@ -70,4 +70,4 @@ class LedgerKeyOffer:
             f"seller_id={self.seller_id}",
             f"offer_id={self.offer_id}",
         ]
-        return f"<LedgerKeyOffer {[', '.join(out)]}>"
+        return f"<LedgerKeyOffer [{', '.join(out)}]>"

@@ -64,4 +64,4 @@ class LedgerEntryExtensionV1Ext:
     def __str__(self):
         out = []
         out.append(f"v={self.v}")
-        return f"<LedgerEntryExtensionV1Ext {[', '.join(out)]}>"
+        return f"<LedgerEntryExtensionV1Ext [{', '.join(out)}]>"

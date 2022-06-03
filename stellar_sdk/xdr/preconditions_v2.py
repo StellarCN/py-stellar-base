@@ -60,9 +60,10 @@ class PreconditionsV2:
         min_seq_ledger_gap: Uint32,
         extra_signers: List[SignerKey],
     ) -> None:
-        if extra_signers and len(extra_signers) > 2:
+        _expect_max_length = 2
+        if extra_signers and len(extra_signers) > _expect_max_length:
             raise ValueError(
-                f"The maximum length of `extra_signers` should be 2, but got {len(extra_signers)}."
+                f"The maximum length of `extra_signers` should be {_expect_max_length}, but got {len(extra_signers)}."
             )
         self.time_bounds = time_bounds
         self.ledger_bounds = ledger_bounds
@@ -76,22 +77,16 @@ class PreconditionsV2:
             packer.pack_uint(0)
         else:
             packer.pack_uint(1)
-            if self.time_bounds is None:
-                raise ValueError("time_bounds should not be None.")
             self.time_bounds.pack(packer)
         if self.ledger_bounds is None:
             packer.pack_uint(0)
         else:
             packer.pack_uint(1)
-            if self.ledger_bounds is None:
-                raise ValueError("ledger_bounds should not be None.")
             self.ledger_bounds.pack(packer)
         if self.min_seq_num is None:
             packer.pack_uint(0)
         else:
             packer.pack_uint(1)
-            if self.min_seq_num is None:
-                raise ValueError("min_seq_num should not be None.")
             self.min_seq_num.pack(packer)
         self.min_seq_age.pack(packer)
         self.min_seq_ledger_gap.pack(packer)
@@ -163,4 +158,4 @@ class PreconditionsV2:
             f"min_seq_ledger_gap={self.min_seq_ledger_gap}",
             f"extra_signers={self.extra_signers}",
         ]
-        return f"<PreconditionsV2 {[', '.join(out)]}>"
+        return f"<PreconditionsV2 [{', '.join(out)}]>"

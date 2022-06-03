@@ -62,4 +62,4 @@ class OperationMeta:
         out = [
             f"changes={self.changes}",
         ]
-        return f"<OperationMeta {[', '.join(out)]}>"
+        return f"<OperationMeta [{', '.join(out)}]>"

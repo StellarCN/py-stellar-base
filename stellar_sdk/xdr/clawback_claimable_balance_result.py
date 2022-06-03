@@ -73,4 +73,4 @@ class ClawbackClaimableBalanceResult:
     def __str__(self):
         out = []
         out.append(f"code={self.code}")
-        return f"<ClawbackClaimableBalanceResult {[', '.join(out)]}>"
+        return f"<ClawbackClaimableBalanceResult [{', '.join(out)}]>"

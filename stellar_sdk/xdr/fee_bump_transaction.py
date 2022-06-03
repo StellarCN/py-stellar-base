@@ -101,4 +101,4 @@ class FeeBumpTransaction:
             f"inner_tx={self.inner_tx}",
             f"ext={self.ext}",
         ]
-        return f"<FeeBumpTransaction {[', '.join(out)]}>"
+        return f"<FeeBumpTransaction [{', '.join(out)}]>"

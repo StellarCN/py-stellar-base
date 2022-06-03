@@ -62,4 +62,4 @@ class HmacSha256Mac:
         out = [
             f"mac={self.mac}",
         ]
-        return f"<HmacSha256Mac {[', '.join(out)]}>"
+        return f"<HmacSha256Mac [{', '.join(out)}]>"

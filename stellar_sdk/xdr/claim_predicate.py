@@ -41,13 +41,15 @@ class ClaimPredicate:
         abs_before: Int64 = None,
         rel_before: Int64 = None,
     ) -> None:
-        if and_predicates and len(and_predicates) > 2:
+        _expect_max_length = 2
+        if and_predicates and len(and_predicates) > _expect_max_length:
             raise ValueError(
-                f"The maximum length of `and_predicates` should be 2, but got {len(and_predicates)}."
+                f"The maximum length of `and_predicates` should be {_expect_max_length}, but got {len(and_predicates)}."
             )
-        if or_predicates and len(or_predicates) > 2:
+        _expect_max_length = 2
+        if or_predicates and len(or_predicates) > _expect_max_length:
             raise ValueError(
-                f"The maximum length of `or_predicates` should be 2, but got {len(or_predicates)}."
+                f"The maximum length of `or_predicates` should be {_expect_max_length}, but got {len(or_predicates)}."
             )
         self.type = type
         self.and_predicates = and_predicates
@@ -173,4 +175,4 @@ class ClaimPredicate:
         out.append(
             f"rel_before={self.rel_before}"
         ) if self.rel_before is not None else None
-        return f"<ClaimPredicate {[', '.join(out)]}>"
+        return f"<ClaimPredicate [{', '.join(out)}]>"

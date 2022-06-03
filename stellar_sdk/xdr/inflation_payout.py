@@ -70,4 +70,4 @@ class InflationPayout:
             f"destination={self.destination}",
             f"amount={self.amount}",
         ]
-        return f"<InflationPayout {[', '.join(out)]}>"
+        return f"<InflationPayout [{', '.join(out)}]>"

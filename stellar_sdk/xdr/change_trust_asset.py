@@ -122,4 +122,4 @@ class ChangeTrustAsset:
         out.append(
             f"liquidity_pool={self.liquidity_pool}"
         ) if self.liquidity_pool is not None else None
-        return f"<ChangeTrustAsset {[', '.join(out)]}>"
+        return f"<ChangeTrustAsset [{', '.join(out)}]>"

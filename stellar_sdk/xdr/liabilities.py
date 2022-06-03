@@ -69,4 +69,4 @@ class Liabilities:
             f"buying={self.buying}",
             f"selling={self.selling}",
         ]
-        return f"<Liabilities {[', '.join(out)]}>"
+        return f"<Liabilities [{', '.join(out)}]>"

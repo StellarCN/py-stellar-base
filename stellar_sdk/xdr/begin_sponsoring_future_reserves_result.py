@@ -75,4 +75,4 @@ class BeginSponsoringFutureReservesResult:
     def __str__(self):
         out = []
         out.append(f"code={self.code}")
-        return f"<BeginSponsoringFutureReservesResult {[', '.join(out)]}>"
+        return f"<BeginSponsoringFutureReservesResult [{', '.join(out)}]>"

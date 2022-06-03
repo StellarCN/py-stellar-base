@@ -47,9 +47,10 @@ class TransactionV0:
         operations: List[Operation],
         ext: TransactionV0Ext,
     ) -> None:
-        if operations and len(operations) > MAX_OPS_PER_TX:
+        _expect_max_length = MAX_OPS_PER_TX
+        if operations and len(operations) > _expect_max_length:
             raise ValueError(
-                f"The maximum length of `operations` should be MAX_OPS_PER_TX, but got {len(operations)}."
+                f"The maximum length of `operations` should be {_expect_max_length}, but got {len(operations)}."
             )
         self.source_account_ed25519 = source_account_ed25519
         self.fee = fee
@@ -67,8 +68,6 @@ class TransactionV0:
             packer.pack_uint(0)
         else:
             packer.pack_uint(1)
-            if self.time_bounds is None:
-                raise ValueError("time_bounds should not be None.")
             self.time_bounds.pack(packer)
         self.memo.pack(packer)
         packer.pack_uint(len(self.operations))
@@ -140,4 +139,4 @@ class TransactionV0:
             f"operations={self.operations}",
             f"ext={self.ext}",
         ]
-        return f"<TransactionV0 {[', '.join(out)]}>"
+        return f"<TransactionV0 [{', '.join(out)}]>"

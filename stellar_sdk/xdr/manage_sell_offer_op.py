@@ -100,4 +100,4 @@ class ManageSellOfferOp:
             f"price={self.price}",
             f"offer_id={self.offer_id}",
         ]
-        return f"<ManageSellOfferOp {[', '.join(out)]}>"
+        return f"<ManageSellOfferOp [{', '.join(out)}]>"

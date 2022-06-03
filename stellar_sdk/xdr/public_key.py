@@ -72,4 +72,4 @@ class PublicKey:
         out = []
         out.append(f"type={self.type}")
         out.append(f"ed25519={self.ed25519}") if self.ed25519 is not None else None
-        return f"<PublicKey {[', '.join(out)]}>"
+        return f"<PublicKey [{', '.join(out)}]>"
