@@ -1,5 +1,13 @@
 Release History
 ==============
+### Version 8.0.1
+
+Released on June 06, 2022
+
+#### Update
+
+- Make some amount fields accept `Decimal`. ([#597](https://github.com/StellarCN/py-stellar-base/pull/597))
+- Regenerate xdr files with the latest xdrgen. ([#595](https://github.com/StellarCN/py-stellar-base/pull/595))
 
 ### Version 8.0.0
 
