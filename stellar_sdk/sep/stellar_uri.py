@@ -10,6 +10,7 @@ Version: 2.0.0
 
 import abc
 import base64
+from decimal import Decimal
 from typing import Dict, List, Optional, Tuple, Union
 from urllib import parse
 
@@ -88,7 +89,7 @@ class PayStellarUri(StellarUri):
     def __init__(
         self,
         destination: str,
-        amount: Optional[str] = None,
+        amount: Union[str, Decimal, None] = None,
         asset: Optional[Asset] = None,
         memo: Optional[Memo] = None,
         callback: Optional[str] = None,
@@ -113,6 +114,8 @@ class PayStellarUri(StellarUri):
         self._memo = memo
         self.memo_type, self.memo = self._encode_memo(memo)
         self.destination = destination
+        if isinstance(amount, Decimal):
+            amount = str(amount)
         self.amount = amount
         self.callback = callback
         self.msg = message

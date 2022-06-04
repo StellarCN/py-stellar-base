@@ -1,3 +1,4 @@
+from decimal import Decimal
 from typing import List, Union
 
 from ...asset import Asset
@@ -40,12 +41,16 @@ class BaseStrictSendPathsCallBuilder(BaseCallBuilder):
     def __init__(
         self,
         source_asset: Asset,
-        source_amount: str,
+        source_amount: Union[str, Decimal],
         destination: Union[str, List[Asset]],
         **kwargs
     ) -> None:
         super().__init__(**kwargs)
         self.endpoint: str = "paths/strict-send"
+
+        if isinstance(source_amount, Decimal):
+            source_amount = str(source_amount)
+
         params = {
             "source_amount": source_amount,
             "source_asset_type": source_asset.type,
@@ -59,4 +64,5 @@ class BaseStrictSendPathsCallBuilder(BaseCallBuilder):
             params["destination_account"] = destination
         else:
             params["destination_assets"] = convert_assets_to_horizon_param(destination)
+
         self._add_query_params(params)
