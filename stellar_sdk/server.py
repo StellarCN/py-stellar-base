@@ -1,3 +1,4 @@
+from decimal import Decimal
 from typing import Any, Dict, List, Union
 
 from .account import Account
@@ -249,7 +250,7 @@ class Server(BaseServer):
         self,
         source: Union[str, List[Asset]],
         destination_asset: Asset,
-        destination_amount: str,
+        destination_amount: Union[str, Decimal],
     ) -> StrictReceivePathsCallBuilder:
         """
         :param source: The sender's account ID or a list of Assets. Any returned path must use a source that the sender can hold.
@@ -269,7 +270,7 @@ class Server(BaseServer):
     def strict_send_paths(
         self,
         source_asset: Asset,
-        source_amount: str,
+        source_amount: Union[str, Decimal],
         destination: Union[str, List[Asset]],
     ) -> StrictSendPathsCallBuilder:
         """

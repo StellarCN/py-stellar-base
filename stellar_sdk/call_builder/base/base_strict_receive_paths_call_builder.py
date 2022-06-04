@@ -1,3 +1,4 @@
+from decimal import Decimal
 from typing import List, Union
 
 from ...asset import Asset
@@ -41,11 +42,15 @@ class BaseStrictReceivePathsCallBuilder(BaseCallBuilder):
         self,
         source: Union[str, List[Asset]],
         destination_asset: Asset,
-        destination_amount: str,
+        destination_amount: Union[str, Decimal],
         **kwargs
     ) -> None:
         super().__init__(**kwargs)
         self.endpoint: str = "paths/strict-receive"
+
+        if isinstance(destination_amount, Decimal):
+            destination_amount = str(destination_amount)
+
         params = {
             "destination_amount": destination_amount,
             "destination_asset_type": destination_asset.type,

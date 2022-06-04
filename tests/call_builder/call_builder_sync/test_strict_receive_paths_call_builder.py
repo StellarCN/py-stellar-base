@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from stellar_sdk import Asset
 from stellar_sdk.call_builder.call_builder_sync import StrictReceivePathsCallBuilder
 from tests.call_builder.call_builder_sync import client, horizon_url
@@ -39,7 +41,7 @@ class TestStrictReceivePathsCallBuilder:
             destination_asset=Asset(
                 "EUR", "GDSBCQO34HWPGUGQSP3QBFEXVTSR2PW46UIGTHVWGWJGQKH3AFNHXHXN"
             ),
-            destination_amount="20.0",
+            destination_amount=Decimal("20.0"),
         )
         assert builder.endpoint == "paths/strict-receive"
         assert builder.params == {

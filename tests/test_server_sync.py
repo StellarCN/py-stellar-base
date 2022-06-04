@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 import pytest
 
 from stellar_sdk import (
@@ -95,6 +97,12 @@ class TestServerSync:
             ) == StrictReceivePathsCallBuilder(
                 horizon_url, client, source, destination_asset, destination_amount
             )
+            destination_amount = Decimal("20.0")
+            assert server.strict_receive_paths(
+                source, destination_asset, destination_amount
+            ) == StrictReceivePathsCallBuilder(
+                horizon_url, client, source, destination_asset, destination_amount
+            )
 
             source_asset = Asset(
                 "EUR", "GDSBCQO34HWPGUGQSP3QBFEXVTSR2PW46UIGTHVWGWJGQKH3AFNHXHXN"
@@ -106,6 +114,13 @@ class TestServerSync:
             ) == StrictSendPathsCallBuilder(
                 horizon_url, client, source_asset, source_amount, destination
             )
+            source_amount = Decimal("10.25")
+            assert server.strict_send_paths(
+                source_asset, source_amount, destination
+            ) == StrictSendPathsCallBuilder(
+                horizon_url, client, source_asset, source_amount, destination
+            )
+
             assert server.payments() == PaymentsCallBuilder(horizon_url, client)
             assert server.root() == RootCallBuilder(horizon_url, client)
             base = Asset.native()

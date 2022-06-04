@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from stellar_sdk import Asset
 from stellar_sdk.call_builder.call_builder_async import StrictSendPathsCallBuilder
 from tests.call_builder.call_builder_async import client, horizon_url
@@ -30,7 +32,7 @@ class TestStrictSendPathsCallBuilder:
             source_asset=Asset(
                 "EUR", "GDSBCQO34HWPGUGQSP3QBFEXVTSR2PW46UIGTHVWGWJGQKH3AFNHXHXN"
             ),
-            source_amount="10.25",
+            source_amount=Decimal("10.25"),
             destination=[
                 Asset(
                     "USD", "GAYSHLG75RPSMXWJ5KX7O7STE6RSZTD6NE4CTWAXFZYYVYIFRUVJIBJH"
