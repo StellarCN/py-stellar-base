@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 import pytest
 
 from stellar_sdk import Asset, Keypair, Network
@@ -269,6 +271,19 @@ class TestPayStellarUri:
             (
                 "GCALNQQBXAPZ2WIRSDDBMSTAKCUH5SG6U76YBFLQLIXJTF7FE5AX7AOO",
                 "120.1234567",
+                None,
+                TextMemo("skdjfasf"),
+                None,
+                "pay me with lumens",
+                None,
+                "someDomain.com",
+                None,
+                "SBPOVRVKTTV7W3IOX2FJPSMPCJ5L2WU2YKTP3HCLYPXNI5MDIGREVNYC",
+                "web+stellar:pay?destination=GCALNQQBXAPZ2WIRSDDBMSTAKCUH5SG6U76YBFLQLIXJTF7FE5AX7AOO&amount=120.1234567&memo=skdjfasf&memo_type=MEMO_TEXT&msg=pay%20me%20with%20lumens&origin_domain=someDomain.com&signature=tbsLtlK%2FfouvRWk2UWFP47yHYeI1g1NEC%2FfEQvuXG6V8P%2BbeLxplYbOVtTk1g94Wp97cHZ3pVJy%2FtZNYobl3Cw%3D%3D",
+            ),
+            (
+                "GCALNQQBXAPZ2WIRSDDBMSTAKCUH5SG6U76YBFLQLIXJTF7FE5AX7AOO",
+                Decimal("120.1234567"),
                 None,
                 TextMemo("skdjfasf"),
                 None,
