@@ -73,4 +73,4 @@ class InnerTransactionResultPair:
             f"transaction_hash={self.transaction_hash}",
             f"result={self.result}",
         ]
-        return f"<InnerTransactionResultPair {[', '.join(out)]}>"
+        return f"<InnerTransactionResultPair [{', '.join(out)}]>"

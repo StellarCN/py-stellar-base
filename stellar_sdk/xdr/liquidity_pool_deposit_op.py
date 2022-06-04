@@ -98,4 +98,4 @@ class LiquidityPoolDepositOp:
             f"min_price={self.min_price}",
             f"max_price={self.max_price}",
         ]
-        return f"<LiquidityPoolDepositOp {[', '.join(out)]}>"
+        return f"<LiquidityPoolDepositOp [{', '.join(out)}]>"

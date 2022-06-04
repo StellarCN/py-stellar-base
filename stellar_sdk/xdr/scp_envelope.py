@@ -70,4 +70,4 @@ class SCPEnvelope:
             f"statement={self.statement}",
             f"signature={self.signature}",
         ]
-        return f"<SCPEnvelope {[', '.join(out)]}>"
+        return f"<SCPEnvelope [{', '.join(out)}]>"

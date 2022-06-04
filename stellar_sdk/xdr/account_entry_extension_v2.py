@@ -40,9 +40,10 @@ class AccountEntryExtensionV2:
         signer_sponsoring_i_ds: List[SponsorshipDescriptor],
         ext: AccountEntryExtensionV2Ext,
     ) -> None:
-        if signer_sponsoring_i_ds and len(signer_sponsoring_i_ds) > MAX_SIGNERS:
+        _expect_max_length = MAX_SIGNERS
+        if signer_sponsoring_i_ds and len(signer_sponsoring_i_ds) > _expect_max_length:
             raise ValueError(
-                f"The maximum length of `signer_sponsoring_i_ds` should be MAX_SIGNERS, but got {len(signer_sponsoring_i_ds)}."
+                f"The maximum length of `signer_sponsoring_i_ds` should be {_expect_max_length}, but got {len(signer_sponsoring_i_ds)}."
             )
         self.num_sponsored = num_sponsored
         self.num_sponsoring = num_sponsoring
@@ -109,4 +110,4 @@ class AccountEntryExtensionV2:
             f"signer_sponsoring_i_ds={self.signer_sponsoring_i_ds}",
             f"ext={self.ext}",
         ]
-        return f"<AccountEntryExtensionV2 {[', '.join(out)]}>"
+        return f"<AccountEntryExtensionV2 [{', '.join(out)}]>"

@@ -28,9 +28,10 @@ class InflationResult:
         code: InflationResultCode,
         payouts: List[InflationPayout] = None,
     ) -> None:
-        if payouts and len(payouts) > 4294967295:
+        _expect_max_length = 4294967295
+        if payouts and len(payouts) > _expect_max_length:
             raise ValueError(
-                f"The maximum length of `payouts` should be 4294967295, but got {len(payouts)}."
+                f"The maximum length of `payouts` should be {_expect_max_length}, but got {len(payouts)}."
             )
         self.code = code
         self.payouts = payouts
@@ -84,4 +85,4 @@ class InflationResult:
         out = []
         out.append(f"code={self.code}")
         out.append(f"payouts={self.payouts}") if self.payouts is not None else None
-        return f"<InflationResult {[', '.join(out)]}>"
+        return f"<InflationResult [{', '.join(out)}]>"

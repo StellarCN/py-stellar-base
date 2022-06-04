@@ -64,4 +64,4 @@ class OfferEntryExt:
     def __str__(self):
         out = []
         out.append(f"v={self.v}")
-        return f"<OfferEntryExt {[', '.join(out)]}>"
+        return f"<OfferEntryExt [{', '.join(out)}]>"

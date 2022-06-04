@@ -70,4 +70,4 @@ class Error:
             f"code={self.code}",
             f"msg={self.msg}",
         ]
-        return f"<Error {[', '.join(out)]}>"
+        return f"<Error [{', '.join(out)}]>"

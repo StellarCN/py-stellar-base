@@ -82,4 +82,4 @@ class SCPStatementExternalize:
             f"n_h={self.n_h}",
             f"commit_quorum_set_hash={self.commit_quorum_set_hash}",
         ]
-        return f"<SCPStatementExternalize {[', '.join(out)]}>"
+        return f"<SCPStatementExternalize [{', '.join(out)}]>"

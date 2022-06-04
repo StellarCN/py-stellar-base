@@ -70,4 +70,4 @@ class DontHave:
             f"type={self.type}",
             f"req_hash={self.req_hash}",
         ]
-        return f"<DontHave {[', '.join(out)]}>"
+        return f"<DontHave [{', '.join(out)}]>"

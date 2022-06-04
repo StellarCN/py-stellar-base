@@ -66,4 +66,4 @@ class ManageDataResult:
     def __str__(self):
         out = []
         out.append(f"code={self.code}")
-        return f"<ManageDataResult {[', '.join(out)]}>"
+        return f"<ManageDataResult [{', '.join(out)}]>"

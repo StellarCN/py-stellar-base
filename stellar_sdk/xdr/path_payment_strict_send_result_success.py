@@ -26,9 +26,10 @@ class PathPaymentStrictSendResultSuccess:
         offers: List[ClaimAtom],
         last: SimplePaymentResult,
     ) -> None:
-        if offers and len(offers) > 4294967295:
+        _expect_max_length = 4294967295
+        if offers and len(offers) > _expect_max_length:
             raise ValueError(
-                f"The maximum length of `offers` should be 4294967295, but got {len(offers)}."
+                f"The maximum length of `offers` should be {_expect_max_length}, but got {len(offers)}."
             )
         self.offers = offers
         self.last = last
@@ -80,4 +81,4 @@ class PathPaymentStrictSendResultSuccess:
             f"offers={self.offers}",
             f"last={self.last}",
         ]
-        return f"<PathPaymentStrictSendResultSuccess {[', '.join(out)]}>"
+        return f"<PathPaymentStrictSendResultSuccess [{', '.join(out)}]>"

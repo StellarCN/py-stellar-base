@@ -91,4 +91,4 @@ class SetTrustLineFlagsOp:
             f"clear_flags={self.clear_flags}",
             f"set_flags={self.set_flags}",
         ]
-        return f"<SetTrustLineFlagsOp {[', '.join(out)]}>"
+        return f"<SetTrustLineFlagsOp [{', '.join(out)}]>"

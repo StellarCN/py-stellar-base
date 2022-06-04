@@ -141,4 +141,4 @@ class LedgerUpgrade:
         out.append(
             f"new_flags={self.new_flags}"
         ) if self.new_flags is not None else None
-        return f"<LedgerUpgrade {[', '.join(out)]}>"
+        return f"<LedgerUpgrade [{', '.join(out)}]>"

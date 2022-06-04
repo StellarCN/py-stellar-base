@@ -79,4 +79,4 @@ class TrustLineEntryExtensionV2:
             f"liquidity_pool_use_count={self.liquidity_pool_use_count}",
             f"ext={self.ext}",
         ]
-        return f"<TrustLineEntryExtensionV2 {[', '.join(out)]}>"
+        return f"<TrustLineEntryExtensionV2 [{', '.join(out)}]>"

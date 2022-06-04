@@ -95,4 +95,4 @@ class TransactionSignaturePayloadTaggedTransaction:
         out.append(f"type={self.type}")
         out.append(f"tx={self.tx}") if self.tx is not None else None
         out.append(f"fee_bump={self.fee_bump}") if self.fee_bump is not None else None
-        return f"<TransactionSignaturePayloadTaggedTransaction {[', '.join(out)]}>"
+        return f"<TransactionSignaturePayloadTaggedTransaction [{', '.join(out)}]>"

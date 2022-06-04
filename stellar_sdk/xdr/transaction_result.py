@@ -101,4 +101,4 @@ class TransactionResult:
             f"result={self.result}",
             f"ext={self.ext}",
         ]
-        return f"<TransactionResult {[', '.join(out)]}>"
+        return f"<TransactionResult [{', '.join(out)}]>"

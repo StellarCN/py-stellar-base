@@ -62,4 +62,4 @@ class LedgerKeyLiquidityPool:
         out = [
             f"liquidity_pool_id={self.liquidity_pool_id}",
         ]
-        return f"<LedgerKeyLiquidityPool {[', '.join(out)]}>"
+        return f"<LedgerKeyLiquidityPool [{', '.join(out)}]>"

@@ -62,4 +62,4 @@ class BeginSponsoringFutureReservesOp:
         out = [
             f"sponsored_id={self.sponsored_id}",
         ]
-        return f"<BeginSponsoringFutureReservesOp {[', '.join(out)]}>"
+        return f"<BeginSponsoringFutureReservesOp [{', '.join(out)}]>"

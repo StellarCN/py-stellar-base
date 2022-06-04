@@ -81,4 +81,4 @@ class LiquidityPoolConstantProductParameters:
             f"asset_b={self.asset_b}",
             f"fee={self.fee}",
         ]
-        return f"<LiquidityPoolConstantProductParameters {[', '.join(out)]}>"
+        return f"<LiquidityPoolConstantProductParameters [{', '.join(out)}]>"

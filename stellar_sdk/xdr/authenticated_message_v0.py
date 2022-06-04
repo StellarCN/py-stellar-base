@@ -82,4 +82,4 @@ class AuthenticatedMessageV0:
             f"message={self.message}",
             f"mac={self.mac}",
         ]
-        return f"<AuthenticatedMessageV0 {[', '.join(out)]}>"
+        return f"<AuthenticatedMessageV0 [{', '.join(out)}]>"

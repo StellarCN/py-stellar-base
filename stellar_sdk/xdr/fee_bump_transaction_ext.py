@@ -64,4 +64,4 @@ class FeeBumpTransactionExt:
     def __str__(self):
         out = []
         out.append(f"v={self.v}")
-        return f"<FeeBumpTransactionExt {[', '.join(out)]}>"
+        return f"<FeeBumpTransactionExt [{', '.join(out)}]>"

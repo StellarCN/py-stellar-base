@@ -83,4 +83,4 @@ class ManageOfferSuccessResultOffer:
         out = []
         out.append(f"effect={self.effect}")
         out.append(f"offer={self.offer}") if self.offer is not None else None
-        return f"<ManageOfferSuccessResultOffer {[', '.join(out)]}>"
+        return f"<ManageOfferSuccessResultOffer [{', '.join(out)}]>"

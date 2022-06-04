@@ -76,4 +76,4 @@ class Claimant:
         out = []
         out.append(f"type={self.type}")
         out.append(f"v0={self.v0}") if self.v0 is not None else None
-        return f"<Claimant {[', '.join(out)]}>"
+        return f"<Claimant [{', '.join(out)}]>"

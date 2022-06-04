@@ -66,4 +66,4 @@ class BumpSequenceResult:
     def __str__(self):
         out = []
         out.append(f"code={self.code}")
-        return f"<BumpSequenceResult {[', '.join(out)]}>"
+        return f"<BumpSequenceResult [{', '.join(out)}]>"

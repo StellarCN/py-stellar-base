@@ -66,4 +66,4 @@ class PaymentResult:
     def __str__(self):
         out = []
         out.append(f"code={self.code}")
-        return f"<PaymentResult {[', '.join(out)]}>"
+        return f"<PaymentResult [{', '.join(out)}]>"

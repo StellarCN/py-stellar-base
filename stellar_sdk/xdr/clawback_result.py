@@ -66,4 +66,4 @@ class ClawbackResult:
     def __str__(self):
         out = []
         out.append(f"code={self.code}")
-        return f"<ClawbackResult {[', '.join(out)]}>"
+        return f"<ClawbackResult [{', '.join(out)}]>"

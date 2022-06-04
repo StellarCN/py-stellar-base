@@ -66,4 +66,4 @@ class SetOptionsResult:
     def __str__(self):
         out = []
         out.append(f"code={self.code}")
-        return f"<SetOptionsResult {[', '.join(out)]}>"
+        return f"<SetOptionsResult [{', '.join(out)}]>"

@@ -114,4 +114,4 @@ class SCPStatement:
             f"slot_index={self.slot_index}",
             f"pledges={self.pledges}",
         ]
-        return f"<SCPStatement {[', '.join(out)]}>"
+        return f"<SCPStatement [{', '.join(out)}]>"

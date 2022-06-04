@@ -129,4 +129,4 @@ class SignerKey:
         out.append(
             f"ed25519_signed_payload={self.ed25519_signed_payload}"
         ) if self.ed25519_signed_payload is not None else None
-        return f"<SignerKey {[', '.join(out)]}>"
+        return f"<SignerKey [{', '.join(out)}]>"

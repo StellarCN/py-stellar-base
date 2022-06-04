@@ -99,4 +99,4 @@ class SurveyResponseMessage:
             f"command_type={self.command_type}",
             f"encrypted_body={self.encrypted_body}",
         ]
-        return f"<SurveyResponseMessage {[', '.join(out)]}>"
+        return f"<SurveyResponseMessage [{', '.join(out)}]>"

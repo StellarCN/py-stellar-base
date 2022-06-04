@@ -28,9 +28,10 @@ class TransactionV0Envelope:
         tx: TransactionV0,
         signatures: List[DecoratedSignature],
     ) -> None:
-        if signatures and len(signatures) > 20:
+        _expect_max_length = 20
+        if signatures and len(signatures) > _expect_max_length:
             raise ValueError(
-                f"The maximum length of `signatures` should be 20, but got {len(signatures)}."
+                f"The maximum length of `signatures` should be {_expect_max_length}, but got {len(signatures)}."
             )
         self.tx = tx
         self.signatures = signatures
@@ -82,4 +83,4 @@ class TransactionV0Envelope:
             f"tx={self.tx}",
             f"signatures={self.signatures}",
         ]
-        return f"<TransactionV0Envelope {[', '.join(out)]}>"
+        return f"<TransactionV0Envelope [{', '.join(out)}]>"

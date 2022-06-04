@@ -64,9 +64,10 @@ class AccountEntry:
         signers: List[Signer],
         ext: AccountEntryExt,
     ) -> None:
-        if signers and len(signers) > MAX_SIGNERS:
+        _expect_max_length = MAX_SIGNERS
+        if signers and len(signers) > _expect_max_length:
             raise ValueError(
-                f"The maximum length of `signers` should be MAX_SIGNERS, but got {len(signers)}."
+                f"The maximum length of `signers` should be {_expect_max_length}, but got {len(signers)}."
             )
         self.account_id = account_id
         self.balance = balance
@@ -88,8 +89,6 @@ class AccountEntry:
             packer.pack_uint(0)
         else:
             packer.pack_uint(1)
-            if self.inflation_dest is None:
-                raise ValueError("inflation_dest should not be None.")
             self.inflation_dest.pack(packer)
         self.flags.pack(packer)
         self.home_domain.pack(packer)
@@ -175,4 +174,4 @@ class AccountEntry:
             f"signers={self.signers}",
             f"ext={self.ext}",
         ]
-        return f"<AccountEntry {[', '.join(out)]}>"
+        return f"<AccountEntry [{', '.join(out)}]>"

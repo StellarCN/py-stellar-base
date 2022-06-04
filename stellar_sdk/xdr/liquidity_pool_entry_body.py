@@ -84,4 +84,4 @@ class LiquidityPoolEntryBody:
         out.append(
             f"constant_product={self.constant_product}"
         ) if self.constant_product is not None else None
-        return f"<LiquidityPoolEntryBody {[', '.join(out)]}>"
+        return f"<LiquidityPoolEntryBody [{', '.join(out)}]>"

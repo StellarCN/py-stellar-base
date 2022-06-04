@@ -105,4 +105,4 @@ class TransactionEnvelope:
         out.append(f"v0={self.v0}") if self.v0 is not None else None
         out.append(f"v1={self.v1}") if self.v1 is not None else None
         out.append(f"fee_bump={self.fee_bump}") if self.fee_bump is not None else None
-        return f"<TransactionEnvelope {[', '.join(out)]}>"
+        return f"<TransactionEnvelope [{', '.join(out)}]>"

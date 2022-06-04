@@ -78,4 +78,4 @@ class BucketMetadata:
             f"ledger_version={self.ledger_version}",
             f"ext={self.ext}",
         ]
-        return f"<BucketMetadata {[', '.join(out)]}>"
+        return f"<BucketMetadata [{', '.join(out)}]>"

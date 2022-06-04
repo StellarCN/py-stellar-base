@@ -74,4 +74,4 @@ class ManageBuyOfferResult:
         out = []
         out.append(f"code={self.code}")
         out.append(f"success={self.success}") if self.success is not None else None
-        return f"<ManageBuyOfferResult {[', '.join(out)]}>"
+        return f"<ManageBuyOfferResult [{', '.join(out)}]>"

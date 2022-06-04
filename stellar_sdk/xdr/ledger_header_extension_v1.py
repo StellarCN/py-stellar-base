@@ -76,4 +76,4 @@ class LedgerHeaderExtensionV1:
             f"flags={self.flags}",
             f"ext={self.ext}",
         ]
-        return f"<LedgerHeaderExtensionV1 {[', '.join(out)]}>"
+        return f"<LedgerHeaderExtensionV1 [{', '.join(out)}]>"

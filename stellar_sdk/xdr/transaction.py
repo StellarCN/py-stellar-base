@@ -58,9 +58,10 @@ class Transaction:
         operations: List[Operation],
         ext: TransactionExt,
     ) -> None:
-        if operations and len(operations) > MAX_OPS_PER_TX:
+        _expect_max_length = MAX_OPS_PER_TX
+        if operations and len(operations) > _expect_max_length:
             raise ValueError(
-                f"The maximum length of `operations` should be MAX_OPS_PER_TX, but got {len(operations)}."
+                f"The maximum length of `operations` should be {_expect_max_length}, but got {len(operations)}."
             )
         self.source_account = source_account
         self.fee = fee
@@ -145,4 +146,4 @@ class Transaction:
             f"operations={self.operations}",
             f"ext={self.ext}",
         ]
-        return f"<Transaction {[', '.join(out)]}>"
+        return f"<Transaction [{', '.join(out)}]>"

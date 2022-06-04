@@ -64,4 +64,4 @@ class TransactionResultExt:
     def __str__(self):
         out = []
         out.append(f"v={self.v}")
-        return f"<TransactionResultExt {[', '.join(out)]}>"
+        return f"<TransactionResultExt [{', '.join(out)}]>"

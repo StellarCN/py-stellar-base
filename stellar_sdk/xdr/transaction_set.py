@@ -26,9 +26,10 @@ class TransactionSet:
         previous_ledger_hash: Hash,
         txs: List[TransactionEnvelope],
     ) -> None:
-        if txs and len(txs) > 4294967295:
+        _expect_max_length = 4294967295
+        if txs and len(txs) > _expect_max_length:
             raise ValueError(
-                f"The maximum length of `txs` should be 4294967295, but got {len(txs)}."
+                f"The maximum length of `txs` should be {_expect_max_length}, but got {len(txs)}."
             )
         self.previous_ledger_hash = previous_ledger_hash
         self.txs = txs
@@ -83,4 +84,4 @@ class TransactionSet:
             f"previous_ledger_hash={self.previous_ledger_hash}",
             f"txs={self.txs}",
         ]
-        return f"<TransactionSet {[', '.join(out)]}>"
+        return f"<TransactionSet [{', '.join(out)}]>"

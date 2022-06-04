@@ -34,9 +34,10 @@ class TransactionMeta:
         v1: TransactionMetaV1 = None,
         v2: TransactionMetaV2 = None,
     ) -> None:
-        if operations and len(operations) > 4294967295:
+        _expect_max_length = 4294967295
+        if operations and len(operations) > _expect_max_length:
             raise ValueError(
-                f"The maximum length of `operations` should be 4294967295, but got {len(operations)}."
+                f"The maximum length of `operations` should be {_expect_max_length}, but got {len(operations)}."
             )
         self.v = v
         self.operations = operations
@@ -117,4 +118,4 @@ class TransactionMeta:
         ) if self.operations is not None else None
         out.append(f"v1={self.v1}") if self.v1 is not None else None
         out.append(f"v2={self.v2}") if self.v2 is not None else None
-        return f"<TransactionMeta {[', '.join(out)]}>"
+        return f"<TransactionMeta [{', '.join(out)}]>"

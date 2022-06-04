@@ -47,9 +47,10 @@ class StellarValue:
         upgrades: List[UpgradeType],
         ext: StellarValueExt,
     ) -> None:
-        if upgrades and len(upgrades) > 6:
+        _expect_max_length = 6
+        if upgrades and len(upgrades) > _expect_max_length:
             raise ValueError(
-                f"The maximum length of `upgrades` should be 6, but got {len(upgrades)}."
+                f"The maximum length of `upgrades` should be {_expect_max_length}, but got {len(upgrades)}."
             )
         self.tx_set_hash = tx_set_hash
         self.close_time = close_time
@@ -116,4 +117,4 @@ class StellarValue:
             f"upgrades={self.upgrades}",
             f"ext={self.ext}",
         ]
-        return f"<StellarValue {[', '.join(out)]}>"
+        return f"<StellarValue [{', '.join(out)}]>"

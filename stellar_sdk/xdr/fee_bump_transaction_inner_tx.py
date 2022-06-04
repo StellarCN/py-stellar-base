@@ -72,4 +72,4 @@ class FeeBumpTransactionInnerTx:
         out = []
         out.append(f"type={self.type}")
         out.append(f"v1={self.v1}") if self.v1 is not None else None
-        return f"<FeeBumpTransactionInnerTx {[', '.join(out)]}>"
+        return f"<FeeBumpTransactionInnerTx [{', '.join(out)}]>"

@@ -125,4 +125,4 @@ class Memo:
         out.append(f"id={self.id}") if self.id is not None else None
         out.append(f"hash={self.hash}") if self.hash is not None else None
         out.append(f"ret_hash={self.ret_hash}") if self.ret_hash is not None else None
-        return f"<Memo {[', '.join(out)]}>"
+        return f"<Memo [{', '.join(out)}]>"

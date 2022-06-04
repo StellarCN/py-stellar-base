@@ -28,13 +28,15 @@ class SCPQuorumSet:
         validators: List[NodeID],
         inner_sets: List["SCPQuorumSet"],
     ) -> None:
-        if validators and len(validators) > 4294967295:
+        _expect_max_length = 4294967295
+        if validators and len(validators) > _expect_max_length:
             raise ValueError(
-                f"The maximum length of `validators` should be 4294967295, but got {len(validators)}."
+                f"The maximum length of `validators` should be {_expect_max_length}, but got {len(validators)}."
             )
-        if inner_sets and len(inner_sets) > 4294967295:
+        _expect_max_length = 4294967295
+        if inner_sets and len(inner_sets) > _expect_max_length:
             raise ValueError(
-                f"The maximum length of `inner_sets` should be 4294967295, but got {len(inner_sets)}."
+                f"The maximum length of `inner_sets` should be {_expect_max_length}, but got {len(inner_sets)}."
             )
         self.threshold = threshold
         self.validators = validators
@@ -100,4 +102,4 @@ class SCPQuorumSet:
             f"validators={self.validators}",
             f"inner_sets={self.inner_sets}",
         ]
-        return f"<SCPQuorumSet {[', '.join(out)]}>"
+        return f"<SCPQuorumSet [{', '.join(out)}]>"

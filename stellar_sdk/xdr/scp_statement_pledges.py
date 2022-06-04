@@ -142,4 +142,4 @@ class SCPStatementPledges:
             f"externalize={self.externalize}"
         ) if self.externalize is not None else None
         out.append(f"nominate={self.nominate}") if self.nominate is not None else None
-        return f"<SCPStatementPledges {[', '.join(out)]}>"
+        return f"<SCPStatementPledges [{', '.join(out)}]>"

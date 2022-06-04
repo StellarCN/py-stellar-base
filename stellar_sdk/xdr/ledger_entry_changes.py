@@ -17,9 +17,10 @@ class LedgerEntryChanges:
     """
 
     def __init__(self, ledger_entry_changes: List[LedgerEntryChange]) -> None:
-        if ledger_entry_changes and len(ledger_entry_changes) > 4294967295:
+        _expect_max_length = 4294967295
+        if ledger_entry_changes and len(ledger_entry_changes) > _expect_max_length:
             raise ValueError(
-                f"The maximum length of `ledger_entry_changes` should be 4294967295, but got {len(ledger_entry_changes)}."
+                f"The maximum length of `ledger_entry_changes` should be {_expect_max_length}, but got {len(ledger_entry_changes)}."
             )
         self.ledger_entry_changes = ledger_entry_changes
 

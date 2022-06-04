@@ -82,4 +82,4 @@ class ClawbackOp:
             f"from_={self.from_}",
             f"amount={self.amount}",
         ]
-        return f"<ClawbackOp {[', '.join(out)]}>"
+        return f"<ClawbackOp [{', '.join(out)}]>"

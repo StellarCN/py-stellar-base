@@ -70,4 +70,4 @@ class LedgerCloseValueSignature:
             f"node_id={self.node_id}",
             f"signature={self.signature}",
         ]
-        return f"<LedgerCloseValueSignature {[', '.join(out)]}>"
+        return f"<LedgerCloseValueSignature [{', '.join(out)}]>"

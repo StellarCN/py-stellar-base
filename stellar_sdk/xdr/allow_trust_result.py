@@ -66,4 +66,4 @@ class AllowTrustResult:
     def __str__(self):
         out = []
         out.append(f"code={self.code}")
-        return f"<AllowTrustResult {[', '.join(out)]}>"
+        return f"<AllowTrustResult [{', '.join(out)}]>"

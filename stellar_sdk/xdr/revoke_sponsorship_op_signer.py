@@ -72,4 +72,4 @@ class RevokeSponsorshipOpSigner:
             f"account_id={self.account_id}",
             f"signer_key={self.signer_key}",
         ]
-        return f"<RevokeSponsorshipOpSigner {[', '.join(out)]}>"
+        return f"<RevokeSponsorshipOpSigner [{', '.join(out)}]>"

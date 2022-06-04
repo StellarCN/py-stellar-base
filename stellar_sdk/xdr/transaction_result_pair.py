@@ -73,4 +73,4 @@ class TransactionResultPair:
             f"transaction_hash={self.transaction_hash}",
             f"result={self.result}",
         ]
-        return f"<TransactionResultPair {[', '.join(out)]}>"
+        return f"<TransactionResultPair [{', '.join(out)}]>"

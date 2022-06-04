@@ -29,9 +29,10 @@ class CreateClaimableBalanceOp:
         amount: Int64,
         claimants: List[Claimant],
     ) -> None:
-        if claimants and len(claimants) > 10:
+        _expect_max_length = 10
+        if claimants and len(claimants) > _expect_max_length:
             raise ValueError(
-                f"The maximum length of `claimants` should be 10, but got {len(claimants)}."
+                f"The maximum length of `claimants` should be {_expect_max_length}, but got {len(claimants)}."
             )
         self.asset = asset
         self.amount = amount
@@ -92,4 +93,4 @@ class CreateClaimableBalanceOp:
             f"amount={self.amount}",
             f"claimants={self.claimants}",
         ]
-        return f"<CreateClaimableBalanceOp {[', '.join(out)]}>"
+        return f"<CreateClaimableBalanceOp [{', '.join(out)}]>"

@@ -133,4 +133,4 @@ class Hello:
             f"cert={self.cert}",
             f"nonce={self.nonce}",
         ]
-        return f"<Hello {[', '.join(out)]}>"
+        return f"<Hello [{', '.join(out)}]>"

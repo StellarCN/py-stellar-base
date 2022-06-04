@@ -90,4 +90,4 @@ class TopologyResponseBody:
             f"total_inbound_peer_count={self.total_inbound_peer_count}",
             f"total_outbound_peer_count={self.total_outbound_peer_count}",
         ]
-        return f"<TopologyResponseBody {[', '.join(out)]}>"
+        return f"<TopologyResponseBody [{', '.join(out)}]>"

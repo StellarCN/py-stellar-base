@@ -64,4 +64,4 @@ class DataEntryExt:
     def __str__(self):
         out = []
         out.append(f"v={self.v}")
-        return f"<DataEntryExt {[', '.join(out)]}>"
+        return f"<DataEntryExt [{', '.join(out)}]>"

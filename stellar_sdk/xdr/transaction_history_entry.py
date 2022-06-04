@@ -89,4 +89,4 @@ class TransactionHistoryEntry:
             f"tx_set={self.tx_set}",
             f"ext={self.ext}",
         ]
-        return f"<TransactionHistoryEntry {[', '.join(out)]}>"
+        return f"<TransactionHistoryEntry [{', '.join(out)}]>"

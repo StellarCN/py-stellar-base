@@ -73,4 +73,4 @@ class CreateAccountOp:
             f"destination={self.destination}",
             f"starting_balance={self.starting_balance}",
         ]
-        return f"<CreateAccountOp {[', '.join(out)]}>"
+        return f"<CreateAccountOp [{', '.join(out)}]>"

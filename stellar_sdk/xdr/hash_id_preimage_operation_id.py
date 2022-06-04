@@ -82,4 +82,4 @@ class HashIDPreimageOperationID:
             f"seq_num={self.seq_num}",
             f"op_num={self.op_num}",
         ]
-        return f"<HashIDPreimageOperationID {[', '.join(out)]}>"
+        return f"<HashIDPreimageOperationID [{', '.join(out)}]>"

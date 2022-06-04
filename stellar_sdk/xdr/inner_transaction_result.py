@@ -113,4 +113,4 @@ class InnerTransactionResult:
             f"result={self.result}",
             f"ext={self.ext}",
         ]
-        return f"<InnerTransactionResult {[', '.join(out)]}>"
+        return f"<InnerTransactionResult [{', '.join(out)}]>"

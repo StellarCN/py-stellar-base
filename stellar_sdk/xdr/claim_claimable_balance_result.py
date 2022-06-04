@@ -66,4 +66,4 @@ class ClaimClaimableBalanceResult:
     def __str__(self):
         out = []
         out.append(f"code={self.code}")
-        return f"<ClaimClaimableBalanceResult {[', '.join(out)]}>"
+        return f"<ClaimClaimableBalanceResult [{', '.join(out)}]>"

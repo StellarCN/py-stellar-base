@@ -101,4 +101,4 @@ class ManageBuyOfferOp:
             f"price={self.price}",
             f"offer_id={self.offer_id}",
         ]
-        return f"<ManageBuyOfferOp {[', '.join(out)]}>"
+        return f"<ManageBuyOfferOp [{', '.join(out)}]>"

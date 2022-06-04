@@ -64,4 +64,4 @@ class TransactionHistoryResultEntryExt:
     def __str__(self):
         out = []
         out.append(f"v={self.v}")
-        return f"<TransactionHistoryResultEntryExt {[', '.join(out)]}>"
+        return f"<TransactionHistoryResultEntryExt [{', '.join(out)}]>"

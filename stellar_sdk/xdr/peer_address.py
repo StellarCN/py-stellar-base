@@ -88,4 +88,4 @@ class PeerAddress:
             f"port={self.port}",
             f"num_failures={self.num_failures}",
         ]
-        return f"<PeerAddress {[', '.join(out)]}>"
+        return f"<PeerAddress [{', '.join(out)}]>"

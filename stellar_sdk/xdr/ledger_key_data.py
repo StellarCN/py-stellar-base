@@ -70,4 +70,4 @@ class LedgerKeyData:
             f"account_id={self.account_id}",
             f"data_name={self.data_name}",
         ]
-        return f"<LedgerKeyData {[', '.join(out)]}>"
+        return f"<LedgerKeyData [{', '.join(out)}]>"

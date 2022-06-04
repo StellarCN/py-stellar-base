@@ -118,4 +118,4 @@ class LedgerEntryChange:
         out.append(f"updated={self.updated}") if self.updated is not None else None
         out.append(f"removed={self.removed}") if self.removed is not None else None
         out.append(f"state={self.state}") if self.state is not None else None
-        return f"<LedgerEntryChange {[', '.join(out)]}>"
+        return f"<LedgerEntryChange [{', '.join(out)}]>"

@@ -77,9 +77,10 @@ class LedgerHeader:
         skip_list: List[Hash],
         ext: LedgerHeaderExt,
     ) -> None:
-        if skip_list and len(skip_list) != 4:
+        _expect_length = 4
+        if skip_list and len(skip_list) != _expect_length:
             raise ValueError(
-                f"The length of `skip_list` should be 4, but got {len(skip_list)}."
+                f"The length of `skip_list` should be {_expect_length}, but got {len(skip_list)}."
             )
         self.ledger_version = ledger_version
         self.previous_ledger_hash = previous_ledger_hash
@@ -211,4 +212,4 @@ class LedgerHeader:
             f"skip_list={self.skip_list}",
             f"ext={self.ext}",
         ]
-        return f"<LedgerHeader {[', '.join(out)]}>"
+        return f"<LedgerHeader [{', '.join(out)}]>"

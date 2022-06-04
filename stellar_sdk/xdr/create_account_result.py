@@ -66,4 +66,4 @@ class CreateAccountResult:
     def __str__(self):
         out = []
         out.append(f"code={self.code}")
-        return f"<CreateAccountResult {[', '.join(out)]}>"
+        return f"<CreateAccountResult [{', '.join(out)}]>"

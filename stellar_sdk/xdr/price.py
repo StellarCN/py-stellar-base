@@ -69,4 +69,4 @@ class Price:
             f"n={self.n}",
             f"d={self.d}",
         ]
-        return f"<Price {[', '.join(out)]}>"
+        return f"<Price [{', '.join(out)}]>"

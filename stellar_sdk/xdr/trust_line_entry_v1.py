@@ -78,4 +78,4 @@ class TrustLineEntryV1:
             f"liabilities={self.liabilities}",
             f"ext={self.ext}",
         ]
-        return f"<TrustLineEntryV1 {[', '.join(out)]}>"
+        return f"<TrustLineEntryV1 [{', '.join(out)}]>"

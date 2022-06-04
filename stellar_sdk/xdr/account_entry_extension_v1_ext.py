@@ -78,4 +78,4 @@ class AccountEntryExtensionV1Ext:
         out = []
         out.append(f"v={self.v}")
         out.append(f"v2={self.v2}") if self.v2 is not None else None
-        return f"<AccountEntryExtensionV1Ext {[', '.join(out)]}>"
+        return f"<AccountEntryExtensionV1Ext [{', '.join(out)}]>"

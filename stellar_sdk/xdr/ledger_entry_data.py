@@ -156,4 +156,4 @@ class LedgerEntryData:
         out.append(
             f"liquidity_pool={self.liquidity_pool}"
         ) if self.liquidity_pool is not None else None
-        return f"<LedgerEntryData {[', '.join(out)]}>"
+        return f"<LedgerEntryData [{', '.join(out)}]>"

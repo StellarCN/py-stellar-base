@@ -62,4 +62,4 @@ class ClaimClaimableBalanceOp:
         out = [
             f"balance_id={self.balance_id}",
         ]
-        return f"<ClaimClaimableBalanceOp {[', '.join(out)]}>"
+        return f"<ClaimClaimableBalanceOp [{', '.join(out)}]>"

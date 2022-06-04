@@ -23,9 +23,10 @@ class TransactionResultSet:
         self,
         results: List[TransactionResultPair],
     ) -> None:
-        if results and len(results) > 4294967295:
+        _expect_max_length = 4294967295
+        if results and len(results) > _expect_max_length:
             raise ValueError(
-                f"The maximum length of `results` should be 4294967295, but got {len(results)}."
+                f"The maximum length of `results` should be {_expect_max_length}, but got {len(results)}."
             )
         self.results = results
 
@@ -72,4 +73,4 @@ class TransactionResultSet:
         out = [
             f"results={self.results}",
         ]
-        return f"<TransactionResultSet {[', '.join(out)]}>"
+        return f"<TransactionResultSet [{', '.join(out)}]>"

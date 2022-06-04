@@ -26,9 +26,10 @@ class LedgerSCPMessages:
         ledger_seq: Uint32,
         messages: List[SCPEnvelope],
     ) -> None:
-        if messages and len(messages) > 4294967295:
+        _expect_max_length = 4294967295
+        if messages and len(messages) > _expect_max_length:
             raise ValueError(
-                f"The maximum length of `messages` should be 4294967295, but got {len(messages)}."
+                f"The maximum length of `messages` should be {_expect_max_length}, but got {len(messages)}."
             )
         self.ledger_seq = ledger_seq
         self.messages = messages
@@ -80,4 +81,4 @@ class LedgerSCPMessages:
             f"ledger_seq={self.ledger_seq}",
             f"messages={self.messages}",
         ]
-        return f"<LedgerSCPMessages {[', '.join(out)]}>"
+        return f"<LedgerSCPMessages [{', '.join(out)}]>"

@@ -90,4 +90,4 @@ class CreatePassiveSellOfferOp:
             f"amount={self.amount}",
             f"price={self.price}",
         ]
-        return f"<CreatePassiveSellOfferOp {[', '.join(out)]}>"
+        return f"<CreatePassiveSellOfferOp [{', '.join(out)}]>"

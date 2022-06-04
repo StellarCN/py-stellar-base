@@ -79,4 +79,4 @@ class AccountMergeResult:
         out.append(
             f"source_account_balance={self.source_account_balance}"
         ) if self.source_account_balance is not None else None
-        return f"<AccountMergeResult {[', '.join(out)]}>"
+        return f"<AccountMergeResult [{', '.join(out)}]>"

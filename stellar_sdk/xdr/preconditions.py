@@ -97,4 +97,4 @@ class Preconditions:
             f"time_bounds={self.time_bounds}"
         ) if self.time_bounds is not None else None
         out.append(f"v2={self.v2}") if self.v2 is not None else None
-        return f"<Preconditions {[', '.join(out)]}>"
+        return f"<Preconditions [{', '.join(out)}]>"

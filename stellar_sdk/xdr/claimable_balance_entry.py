@@ -51,9 +51,10 @@ class ClaimableBalanceEntry:
         amount: Int64,
         ext: ClaimableBalanceEntryExt,
     ) -> None:
-        if claimants and len(claimants) > 10:
+        _expect_max_length = 10
+        if claimants and len(claimants) > _expect_max_length:
             raise ValueError(
-                f"The maximum length of `claimants` should be 10, but got {len(claimants)}."
+                f"The maximum length of `claimants` should be {_expect_max_length}, but got {len(claimants)}."
             )
         self.balance_id = balance_id
         self.claimants = claimants
@@ -126,4 +127,4 @@ class ClaimableBalanceEntry:
             f"amount={self.amount}",
             f"ext={self.ext}",
         ]
-        return f"<ClaimableBalanceEntry {[', '.join(out)]}>"
+        return f"<ClaimableBalanceEntry [{', '.join(out)}]>"

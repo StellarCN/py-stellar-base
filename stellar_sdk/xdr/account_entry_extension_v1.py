@@ -78,4 +78,4 @@ class AccountEntryExtensionV1:
             f"liabilities={self.liabilities}",
             f"ext={self.ext}",
         ]
-        return f"<AccountEntryExtensionV1 {[', '.join(out)]}>"
+        return f"<AccountEntryExtensionV1 [{', '.join(out)}]>"

@@ -534,4 +534,4 @@ class OperationResultTr:
         out.append(
             f"liquidity_pool_withdraw_result={self.liquidity_pool_withdraw_result}"
         ) if self.liquidity_pool_withdraw_result is not None else None
-        return f"<OperationResultTr {[', '.join(out)]}>"
+        return f"<OperationResultTr [{', '.join(out)}]>"

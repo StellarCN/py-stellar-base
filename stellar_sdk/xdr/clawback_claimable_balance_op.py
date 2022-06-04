@@ -62,4 +62,4 @@ class ClawbackClaimableBalanceOp:
         out = [
             f"balance_id={self.balance_id}",
         ]
-        return f"<ClawbackClaimableBalanceOp {[', '.join(out)]}>"
+        return f"<ClawbackClaimableBalanceOp [{', '.join(out)}]>"

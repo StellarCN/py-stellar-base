@@ -70,4 +70,4 @@ class UpgradeEntryMeta:
             f"upgrade={self.upgrade}",
             f"changes={self.changes}",
         ]
-        return f"<UpgradeEntryMeta {[', '.join(out)]}>"
+        return f"<UpgradeEntryMeta [{', '.join(out)}]>"

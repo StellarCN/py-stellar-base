@@ -64,4 +64,4 @@ class BucketMetadataExt:
     def __str__(self):
         out = []
         out.append(f"v={self.v}")
-        return f"<BucketMetadataExt {[', '.join(out)]}>"
+        return f"<BucketMetadataExt [{', '.join(out)}]>"

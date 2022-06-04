@@ -106,4 +106,4 @@ class HashIDPreimage:
         out.append(
             f"revoke_id={self.revoke_id}"
         ) if self.revoke_id is not None else None
-        return f"<HashIDPreimage {[', '.join(out)]}>"
+        return f"<HashIDPreimage [{', '.join(out)}]>"

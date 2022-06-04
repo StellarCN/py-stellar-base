@@ -100,4 +100,4 @@ class HashIDPreimageRevokeID:
             f"liquidity_pool_id={self.liquidity_pool_id}",
             f"asset={self.asset}",
         ]
-        return f"<HashIDPreimageRevokeID {[', '.join(out)]}>"
+        return f"<HashIDPreimageRevokeID [{', '.join(out)}]>"

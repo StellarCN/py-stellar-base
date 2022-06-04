@@ -104,4 +104,4 @@ class Asset:
         out.append(
             f"alpha_num12={self.alpha_num12}"
         ) if self.alpha_num12 is not None else None
-        return f"<Asset {[', '.join(out)]}>"
+        return f"<Asset [{', '.join(out)}]>"

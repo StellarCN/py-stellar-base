@@ -99,4 +99,4 @@ class SurveyRequestMessage:
             f"encryption_key={self.encryption_key}",
             f"command_type={self.command_type}",
         ]
-        return f"<SurveyRequestMessage {[', '.join(out)]}>"
+        return f"<SurveyRequestMessage [{', '.join(out)}]>"

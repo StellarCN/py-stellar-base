@@ -121,4 +121,4 @@ class BucketEntry:
         out.append(
             f"meta_entry={self.meta_entry}"
         ) if self.meta_entry is not None else None
-        return f"<BucketEntry {[', '.join(out)]}>"
+        return f"<BucketEntry [{', '.join(out)}]>"

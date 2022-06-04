@@ -82,4 +82,4 @@ class AuthCert:
             f"expiration={self.expiration}",
             f"sig={self.sig}",
         ]
-        return f"<AuthCert {[', '.join(out)]}>"
+        return f"<AuthCert [{', '.join(out)}]>"

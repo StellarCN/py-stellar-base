@@ -97,4 +97,4 @@ class AssetCode:
         out.append(
             f"asset_code12={self.asset_code12}"
         ) if self.asset_code12 is not None else None
-        return f"<AssetCode {[', '.join(out)]}>"
+        return f"<AssetCode [{', '.join(out)}]>"

@@ -39,9 +39,10 @@ class PathPaymentStrictReceiveOp:
         dest_amount: Int64,
         path: List[Asset],
     ) -> None:
-        if path and len(path) > 5:
+        _expect_max_length = 5
+        if path and len(path) > _expect_max_length:
             raise ValueError(
-                f"The maximum length of `path` should be 5, but got {len(path)}."
+                f"The maximum length of `path` should be {_expect_max_length}, but got {len(path)}."
             )
         self.send_asset = send_asset
         self.send_max = send_max
@@ -120,4 +121,4 @@ class PathPaymentStrictReceiveOp:
             f"dest_amount={self.dest_amount}",
             f"path={self.path}",
         ]
-        return f"<PathPaymentStrictReceiveOp {[', '.join(out)]}>"
+        return f"<PathPaymentStrictReceiveOp [{', '.join(out)}]>"

@@ -24,8 +24,6 @@ class SponsorshipDescriptor:
             packer.pack_uint(0)
         else:
             packer.pack_uint(1)
-            if self.sponsorship_descriptor is None:
-                raise ValueError("sponsorship_descriptor should not be None.")
             self.sponsorship_descriptor.pack(packer)
 
     @classmethod

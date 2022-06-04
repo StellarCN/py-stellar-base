@@ -73,4 +73,4 @@ class SignedSurveyResponseMessage:
             f"response_signature={self.response_signature}",
             f"response={self.response}",
         ]
-        return f"<SignedSurveyResponseMessage {[', '.join(out)]}>"
+        return f"<SignedSurveyResponseMessage [{', '.join(out)}]>"

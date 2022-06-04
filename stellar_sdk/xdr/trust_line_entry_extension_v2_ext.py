@@ -64,4 +64,4 @@ class TrustLineEntryExtensionV2Ext:
     def __str__(self):
         out = []
         out.append(f"v={self.v}")
-        return f"<TrustLineEntryExtensionV2Ext {[', '.join(out)]}>"
+        return f"<TrustLineEntryExtensionV2Ext [{', '.join(out)}]>"
