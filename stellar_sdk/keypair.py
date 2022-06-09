@@ -268,7 +268,7 @@ class Keypair:
         return DecoratedSignature(hint, signature)
 
     def sign_payload_decorated(self, data: bytes) -> DecoratedSignature:
-        """Returns the signature hint for a signed payload signer.
+        """Returns the decorated signature hint for a signed payload signer.
 
         The signature hint of an ed25519 signed payload signer is the last 4 bytes of the ed25519 public key
         XORed with last 4 bytes of the payload. If the payload has a length less than 4 bytes,
