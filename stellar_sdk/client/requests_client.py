@@ -1,5 +1,5 @@
 import json
-from typing import Any, Dict, Generator, Tuple, Union
+from typing import Any, Dict, Generator, Tuple, Union, Optional
 
 import requests
 from requests import RequestException, Session
@@ -50,6 +50,7 @@ class RequestsClient(BaseSyncClient):
         backoff_factor: float = DEFAULT_BACKOFF_FACTOR,
         session: Session = None,
         stream_session: Session = None,
+        custom_headers: Dict[str, str] = {},
     ):
         self.pool_size: int = pool_size
         self.num_retries: int = num_retries
@@ -80,7 +81,7 @@ class RequestsClient(BaseSyncClient):
             max_retries=retry,
         )
 
-        headers = {**IDENTIFICATION_HEADERS, "User-Agent": USER_AGENT}
+        headers = {**IDENTIFICATION_HEADERS, **custom_headers, "User-Agent": USER_AGENT}
 
         # init session
         if session is None:
