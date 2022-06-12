@@ -50,7 +50,7 @@ class RequestsClient(BaseSyncClient):
         backoff_factor: float = DEFAULT_BACKOFF_FACTOR,
         session: Session = None,
         stream_session: Session = None,
-        custom_headers: Dict[str, str] = {},
+        custom_headers: Optional[Dict[str, str]] = None,
     ):
         self.pool_size: int = pool_size
         self.num_retries: int = num_retries
@@ -81,7 +81,10 @@ class RequestsClient(BaseSyncClient):
             max_retries=retry,
         )
 
-        headers = {**IDENTIFICATION_HEADERS, **custom_headers, "User-Agent": USER_AGENT}
+        headers = {**IDENTIFICATION_HEADERS, "User-Agent": USER_AGENT}
+
+        if custom_headers:
+            headers = {**headers, **custom_headers}
 
         # init session
         if session is None:

@@ -1,5 +1,5 @@
 from decimal import Decimal
-from typing import Any, Dict, List, Union
+from typing import Any, Dict, List, Union, Optional
 
 from .account import Account
 from .asset import Asset
@@ -47,7 +47,7 @@ class Server(BaseServer):
         self,
         horizon_url: str = "https://horizon-testnet.stellar.org/",
         client: BaseSyncClient = None,
-        custom_request_headers: Dict[str, str] = {},
+        custom_request_headers: Optional[Dict[str, str]] = None,
     ) -> None:
         self.horizon_url: str = horizon_url
 
