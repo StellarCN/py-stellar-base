@@ -108,7 +108,6 @@ class TransactionBuilder:
 
         :return: New transaction envelope.
         """
-        # TODO: improve it
         if self.time_bounds is None:
             warnings.warn(
                 "It looks like you haven't set a TimeBounds for the transaction, "

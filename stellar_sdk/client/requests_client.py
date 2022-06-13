@@ -1,5 +1,5 @@
 import json
-from typing import Any, Dict, Generator, Tuple, Union, Optional
+from typing import Any, Dict, Generator, Optional, Tuple, Union
 
 import requests
 from requests import RequestException, Session
@@ -41,7 +41,6 @@ class RequestsClient(BaseSyncClient):
     :param custom_headers: any additional HTTP headers to add in requests
     """
 
-    # TODO: need to allow the user to customize the user agent?
     def __init__(
         self,
         pool_size: int = DEFAULT_POOLSIZE,

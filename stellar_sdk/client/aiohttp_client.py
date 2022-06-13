@@ -72,6 +72,7 @@ class AiohttpClient(BaseAsyncClient):
     :param post_timeout: the timeout for all POST requests
     :param backoff_factor: a backoff factor to apply between attempts after the second try
     :param user_agent: the server can use it to identify you
+    :param custom_headers: any additional HTTP headers to add in requests
     """
 
     def __init__(
@@ -81,6 +82,7 @@ class AiohttpClient(BaseAsyncClient):
         post_timeout: float = defines.DEFAULT_POST_TIMEOUT_SECONDS,
         backoff_factor: Optional[float] = DEFAULT_BACKOFF_FACTOR,
         user_agent: Optional[str] = None,
+        custom_headers: Optional[Dict[str, str]] = None,
         **kwargs,
     ) -> None:
         self.pool_size = pool_size
@@ -102,6 +104,10 @@ class AiohttpClient(BaseAsyncClient):
             "Content-Type": "application/x-www-form-urlencoded",
             "User-Agent": self.user_agent,
         }
+
+        if custom_headers:
+            self.headers = {**self.headers, **custom_headers}
+
         session = aiohttp.ClientSession(
             headers=self.headers.copy(),
             connector=connector,
