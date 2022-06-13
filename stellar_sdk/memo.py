@@ -50,7 +50,6 @@ class Memo(object, metaclass=abc.ABCMeta):
             stellar_xdr.MemoType.MEMO_NONE: NoneMemo,
         }
 
-        # TODO: Maybe we should raise Key Error here
         memo_cls = xdr_types.get(xdr_object.type, NoneMemo)
         return memo_cls.from_xdr_object(xdr_object)  # type: ignore[attr-defined]
 

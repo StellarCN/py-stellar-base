@@ -74,6 +74,6 @@ class TestAiohttpClient:
         json = resp.json()
         assert json["args"] == params
         assert json["headers"]["User-Agent"] == user_agent
-        assert json["headers"]["a"] == custom_headers["a"]
-        assert json["headers"]["b"] == custom_headers["b"]
+        assert json["headers"]["A"] == custom_headers["a"]
+        assert json["headers"]["C"] == custom_headers["c"]
         await client.close()

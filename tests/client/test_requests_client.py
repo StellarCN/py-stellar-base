@@ -52,3 +52,16 @@ class TestRequestsClient:
             json = resp.json()
             assert json["args"] == params
             assert json["headers"]["User-Agent"] == USER_AGENT
+
+    def test_custom_headers(self):
+        custom_headers = {"a": "b", "c": "d"}
+        client = RequestsClient(custom_headers=custom_headers)
+        url = "https://httpbin.overcat.me/get"
+        params = {"hello": "world", "stellar": "sdk"}
+        resp = client.get(url, params=params)
+        assert resp.status_code == 200
+        json = resp.json()
+        assert json["args"] == params
+        assert json["headers"]["User-Agent"] == USER_AGENT
+        assert json["headers"]["A"] == custom_headers["a"]  # httpbin makes it upper
+        assert json["headers"]["C"] == custom_headers["c"]

@@ -41,7 +41,7 @@ class ChangeTrust(Operation):
     def __init__(
         self,
         asset: Union[Asset, LiquidityPoolAsset],
-        limit: Union[str, Decimal, None] = None,  # TODO: _DEFAULT_LIMIT default
+        limit: Union[str, Decimal, None] = None,  # _DEFAULT_LIMIT default
         source: Optional[Union[MuxedAccount, str]] = None,
     ) -> None:
         super().__init__(source)
