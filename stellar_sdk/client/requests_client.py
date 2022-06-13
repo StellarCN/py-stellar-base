@@ -1,5 +1,5 @@
 import json
-from typing import Any, Dict, Generator, Tuple, Union
+from typing import Any, Dict, Generator, Tuple, Union, Optional
 
 import requests
 from requests import RequestException, Session
@@ -38,6 +38,7 @@ class RequestsClient(BaseSyncClient):
     :param backoff_factor: a backoff factor to apply between attempts after the second try
     :param session: the request session
     :param stream_session: the stream request session
+    :param custom_headers: any additional HTTP headers to add in requests
     """
 
     # TODO: need to allow the user to customize the user agent?
@@ -50,6 +51,7 @@ class RequestsClient(BaseSyncClient):
         backoff_factor: float = DEFAULT_BACKOFF_FACTOR,
         session: Session = None,
         stream_session: Session = None,
+        custom_headers: Optional[Dict[str, str]] = None,
     ):
         self.pool_size: int = pool_size
         self.num_retries: int = num_retries
@@ -81,6 +83,9 @@ class RequestsClient(BaseSyncClient):
         )
 
         headers = {**IDENTIFICATION_HEADERS, "User-Agent": USER_AGENT}
+
+        if custom_headers:
+            headers = {**headers, **custom_headers}
 
         # init session
         if session is None:
