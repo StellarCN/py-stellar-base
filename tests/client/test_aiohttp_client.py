@@ -59,3 +59,21 @@ class TestAiohttpClient:
             json = resp.json()
             assert json["args"] == params
             assert json["headers"]["User-Agent"] == USER_AGENT
+
+    @pytest.mark.asyncio
+    async def test_custom_headers(self):
+        user_agent = "Hello/Stellar/overcat"
+        custom_headers = {"a": "b", "c": "d"}
+        client = AiohttpClient(
+            pool_size=10, user_agent=user_agent, custom_headers=custom_headers
+        )
+        url = "https://httpbin.overcat.me/get"
+        params = {"hello": "world", "stellar": "sdk"}
+        resp = await client.get(url, params=params)
+        assert resp.status_code == 200
+        json = resp.json()
+        assert json["args"] == params
+        assert json["headers"]["User-Agent"] == user_agent
+        assert json["headers"]["a"] == custom_headers["a"]
+        assert json["headers"]["b"] == custom_headers["b"]
+        await client.close()
