@@ -1,5 +1,5 @@
 from decimal import Decimal
-from typing import Any, Dict, List, Union, Optional
+from typing import Any, Dict, List, Union
 
 from .account import Account
 from .asset import Asset
@@ -39,20 +39,17 @@ class Server(BaseServer):
         (ex. ``"https://horizon-testnet.stellar.org"`` for test network,
         ``"https://horizon-testnet.stellar.org"`` for public network)
     :param client: Http client used to send the request
-    :param custom_request_headers: Any headers that should be added when making HTTP requests to the
-    client.
     """
 
     def __init__(
         self,
         horizon_url: str = "https://horizon-testnet.stellar.org/",
         client: BaseSyncClient = None,
-        custom_request_headers: Optional[Dict[str, str]] = None,
     ) -> None:
         self.horizon_url: str = horizon_url
 
         if not client:
-            client = RequestsClient(custom_headers=custom_request_headers)
+            client = RequestsClient()
         self._client: BaseSyncClient = client
 
     def submit_transaction(
