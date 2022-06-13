@@ -1,5 +1,14 @@
 Release History
 ==============
+### Version 8.1.0
+
+Released on June 13, 2022
+
+#### Add
+
+- feat: allow custom headers to be set in `stellar_sdk.client.requests_client.RequestsClient`. ([#600](https://github.com/StellarCN/py-stellar-base/pull/600))
+- feat: allow custom headers to be set in `stellar_sdk.client.aiohttp_client.AiohttpClient`. ([#601](https://github.com/StellarCN/py-stellar-base/pull/601))
+
 ### Version 8.0.1
 
 Released on June 06, 2022
