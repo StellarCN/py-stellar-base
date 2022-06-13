@@ -38,6 +38,7 @@ class RequestsClient(BaseSyncClient):
     :param backoff_factor: a backoff factor to apply between attempts after the second try
     :param session: the request session
     :param stream_session: the stream request session
+    :param custom_headers: any additional HTTP headers to add in requests
     """
 
     # TODO: need to allow the user to customize the user agent?
