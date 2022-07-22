@@ -35,7 +35,7 @@ class BaseAsyncClient(metaclass=ABCMeta):
         pass  # pragma: no cover
 
     @abstractmethod
-    async def stream(
+    def stream(
         self, url: str, params: Dict[str, str] = None
     ) -> AsyncGenerator[Dict[str, Any], None]:
         """Creates an EventSource that listens for incoming messages from the server.

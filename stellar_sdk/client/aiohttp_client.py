@@ -158,7 +158,7 @@ class AiohttpClient(BaseAsyncClient):
         except aiohttp.ClientError as e:
             raise ConnectionError(e)
 
-    async def stream(  # type: ignore[override]
+    async def stream(
         self, url: str, params: Dict[str, str] = None
     ) -> AsyncGenerator[Dict[str, Any], None]:
         """Perform Stream request.
