@@ -452,7 +452,7 @@ testing = ["virtualenv", "pytest-xdist", "six", "process-tests", "hunter", "fiel
 
 [[package]]
 name = "pytest-httpserver"
-version = "1.0.4"
+version = "1.0.5"
 description = "pytest-httpserver is a httpserver for pytest"
 category = "dev"
 optional = false
@@ -462,9 +462,9 @@ python-versions = ">=3.6,<4.0"
 Werkzeug = ">=2.0.0"
 
 [package.extras]
-dev = ["types-requests", "sphinx-rtd-theme", "sphinx", "requests", "reno", "pytest", "pytest-cov", "mypy", "ipdb", "flake8 (>4.0.0)", "coverage", "autopep8"]
-test = ["types-requests", "requests", "pytest", "pytest-cov", "mypy", "flake8 (>4.0.0)", "coverage"]
-doc = ["sphinx-rtd-theme", "sphinx", "reno"]
+dev = ["types-requests", "mypy", "reno", "sphinx-rtd-theme", "sphinx", "requests", "ipdb", "coverage", "pytest-cov", "pytest"]
+test = ["types-requests", "mypy", "requests", "coverage", "pytest-cov", "pytest"]
+doc = ["sphinx-rtd-theme", "sphinx"]
 
 [[package]]
 name = "pytest-timeout"
@@ -644,7 +644,7 @@ docs = []
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.6.2,<4.0"
-content-hash = "af37df1471d6528c1a1d43b963655bf7a716871debcb0a5f6408cc5df4c7171e"
+content-hash = "42b0db9921af4acea2c6bc975842e443593afa33629313357526fa1c62df0bbc"
 
 [metadata.files]
 aiohttp = [
@@ -1151,8 +1151,8 @@ pytest-cov = [
     {file = "pytest_cov-3.0.0-py3-none-any.whl", hash = "sha256:578d5d15ac4a25e5f961c938b85a05b09fdaae9deef3bb6de9a6e766622ca7a6"},
 ]
 pytest-httpserver = [
-    {file = "pytest_httpserver-1.0.4-py3-none-any.whl", hash = "sha256:17396350d7c0dec067bc8c5ceca7e1137aa0e3395468a9c179bdfc5ede9027a5"},
-    {file = "pytest_httpserver-1.0.4.tar.gz", hash = "sha256:6de464ba5f74628d6182ebbdcb56783edf2c9b0caf598dc35c11f014f24a3f0d"},
+    {file = "pytest_httpserver-1.0.5-py3-none-any.whl", hash = "sha256:9a4c5308da1482e0b2d792278518d400cf4043746e3da0fdb05747f56d6f80b2"},
+    {file = "pytest_httpserver-1.0.5.tar.gz", hash = "sha256:ae3296626d0a10e835a9f423c61b4540547d582422be054c3fcc08626baa1024"},
 ]
 pytest-timeout = [
     {file = "pytest-timeout-2.1.0.tar.gz", hash = "sha256:c07ca07404c612f8abbe22294b23c368e2e5104b521c1790195561f37e1ac3d9"},
