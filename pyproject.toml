@@ -64,7 +64,7 @@ pytest-httpserver = "^1.0.5"
 # currently, mypy cannot run in pypy https://github.com/python/typed_ast/issues/111
 mypy = {version = "^0.971", markers = "platform_python_implementation == 'CPython'"}
 types-toml = {version = "^0.10.8", markers = "platform_python_implementation == 'CPython'"}
-types-requests = {version = "^2.28.7", markers = "platform_python_implementation == 'CPython'"}
+types-requests = {version = "^2.28.8", markers = "platform_python_implementation == 'CPython'"}
 autoflake = "^1.4"
 isort = "^5.10.1"
 black = "^22.6.0"
