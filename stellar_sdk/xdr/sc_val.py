@@ -1,18 +1,22 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
+# This file contains manual patches
 import base64
+import typing
 from typing import Optional
 from xdrlib import Packer, Unpacker
 
 from .int32 import Int32
 from .int64 import Int64
-from .sc_object import SCObject
 from .sc_static import SCStatic
 from .sc_status import SCStatus
 from .sc_symbol import SCSymbol
 from .sc_val_type import SCValType
 from .uint32 import Uint32
 from .uint64 import Uint64
+
+if typing.TYPE_CHECKING:
+    from .sc_object import SCObject
 
 __all__ = ["SCVal"]
 
@@ -49,7 +53,7 @@ class SCVal:
         u32: Uint32 = None,
         i32: Int32 = None,
         ic: SCStatic = None,
-        obj: Optional[SCObject] = None,
+        obj: Optional["SCObject"] = None,
         sym: SCSymbol = None,
         bits: Uint64 = None,
         status: SCStatus = None,
@@ -127,6 +131,8 @@ class SCVal:
             ic = SCStatic.unpack(unpacker)
             return cls(type=type, ic=ic)
         if type == SCValType.SCV_OBJECT:
+            from .sc_object import SCObject  # manual patch
+
             obj = SCObject.unpack(unpacker) if unpacker.unpack_uint() else None
             return cls(type=type, obj=obj)
         if type == SCValType.SCV_SYMBOL:
