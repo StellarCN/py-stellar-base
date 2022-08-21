@@ -7,6 +7,7 @@ from xdrlib import Packer, Unpacker
 from .auth import Auth
 from .dont_have import DontHave
 from .error import Error
+from .generalized_transaction_set import GeneralizedTransactionSet
 from .hello import Hello
 from .message_type import MessageType
 from .peer_address import PeerAddress
@@ -46,6 +47,8 @@ class StellarMessage:
             uint256 txSetHash;
         case TX_SET:
             TransactionSet txSet;
+        case GENERALIZED_TX_SET:
+            GeneralizedTransactionSet generalizedTxSet;
 
         case TRANSACTION:
             TransactionEnvelope transaction;
@@ -80,6 +83,7 @@ class StellarMessage:
         peers: List[PeerAddress] = None,
         tx_set_hash: Uint256 = None,
         tx_set: TransactionSet = None,
+        generalized_tx_set: GeneralizedTransactionSet = None,
         transaction: TransactionEnvelope = None,
         signed_survey_request_message: SignedSurveyRequestMessage = None,
         signed_survey_response_message: SignedSurveyResponseMessage = None,
@@ -102,6 +106,7 @@ class StellarMessage:
         self.peers = peers
         self.tx_set_hash = tx_set_hash
         self.tx_set = tx_set
+        self.generalized_tx_set = generalized_tx_set
         self.transaction = transaction
         self.signed_survey_request_message = signed_survey_request_message
         self.signed_survey_response_message = signed_survey_response_message
@@ -151,6 +156,11 @@ class StellarMessage:
             if self.tx_set is None:
                 raise ValueError("tx_set should not be None.")
             self.tx_set.pack(packer)
+            return
+        if self.type == MessageType.GENERALIZED_TX_SET:
+            if self.generalized_tx_set is None:
+                raise ValueError("generalized_tx_set should not be None.")
+            self.generalized_tx_set.pack(packer)
             return
         if self.type == MessageType.TRANSACTION:
             if self.transaction is None:
@@ -222,6 +232,9 @@ class StellarMessage:
         if type == MessageType.TX_SET:
             tx_set = TransactionSet.unpack(unpacker)
             return cls(type=type, tx_set=tx_set)
+        if type == MessageType.GENERALIZED_TX_SET:
+            generalized_tx_set = GeneralizedTransactionSet.unpack(unpacker)
+            return cls(type=type, generalized_tx_set=generalized_tx_set)
         if type == MessageType.TRANSACTION:
             transaction = TransactionEnvelope.unpack(unpacker)
             return cls(type=type, transaction=transaction)
@@ -285,6 +298,7 @@ class StellarMessage:
             and self.peers == other.peers
             and self.tx_set_hash == other.tx_set_hash
             and self.tx_set == other.tx_set
+            and self.generalized_tx_set == other.generalized_tx_set
             and self.transaction == other.transaction
             and self.signed_survey_request_message
             == other.signed_survey_request_message
@@ -311,6 +325,9 @@ class StellarMessage:
             f"tx_set_hash={self.tx_set_hash}"
         ) if self.tx_set_hash is not None else None
         out.append(f"tx_set={self.tx_set}") if self.tx_set is not None else None
+        out.append(
+            f"generalized_tx_set={self.generalized_tx_set}"
+        ) if self.generalized_tx_set is not None else None
         out.append(
             f"transaction={self.transaction}"
         ) if self.transaction is not None else None

@@ -16,9 +16,9 @@ class LiquidityPoolWithdrawOp:
         struct LiquidityPoolWithdrawOp
         {
             PoolID liquidityPoolID;
-            int64 amount;         // amount of pool shares to withdraw
-            int64 minAmountA;     // minimum amount of first asset to withdraw
-            int64 minAmountB;     // minimum amount of second asset to withdraw
+            int64 amount;     // amount of pool shares to withdraw
+            int64 minAmountA; // minimum amount of first asset to withdraw
+            int64 minAmountB; // minimum amount of second asset to withdraw
         };
     """
 

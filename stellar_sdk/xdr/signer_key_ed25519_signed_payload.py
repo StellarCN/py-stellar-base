@@ -13,7 +13,8 @@ class SignerKeyEd25519SignedPayload:
     """
     XDR Source Code::
 
-        struct {
+        struct
+            {
                 /* Public key that must sign the payload. */
                 uint256 ed25519;
                 /* Payload to be raw signed by ed25519. */

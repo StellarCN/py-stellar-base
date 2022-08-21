@@ -28,7 +28,7 @@ class ClaimPredicate:
             int64 absBefore; // Predicate will be true if closeTime < absBefore
         case CLAIM_PREDICATE_BEFORE_RELATIVE_TIME:
             int64 relBefore; // Seconds since closeTime of the ledger in which the
-                                // ClaimableBalanceEntry was created
+                             // ClaimableBalanceEntry was created
         };
     """
 

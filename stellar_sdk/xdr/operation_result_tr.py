@@ -15,6 +15,7 @@ from .create_account_result import CreateAccountResult
 from .create_claimable_balance_result import CreateClaimableBalanceResult
 from .end_sponsoring_future_reserves_result import EndSponsoringFutureReservesResult
 from .inflation_result import InflationResult
+from .invoke_host_function_result import InvokeHostFunctionResult
 from .liquidity_pool_deposit_result import LiquidityPoolDepositResult
 from .liquidity_pool_withdraw_result import LiquidityPoolWithdrawResult
 from .manage_buy_offer_result import ManageBuyOfferResult
@@ -85,6 +86,8 @@ class OperationResultTr:
                 LiquidityPoolDepositResult liquidityPoolDepositResult;
             case LIQUIDITY_POOL_WITHDRAW:
                 LiquidityPoolWithdrawResult liquidityPoolWithdrawResult;
+            case INVOKE_HOST_FUNCTION:
+                InvokeHostFunctionResult invokeHostFunctionResult;
             }
     """
 
@@ -115,6 +118,7 @@ class OperationResultTr:
         set_trust_line_flags_result: SetTrustLineFlagsResult = None,
         liquidity_pool_deposit_result: LiquidityPoolDepositResult = None,
         liquidity_pool_withdraw_result: LiquidityPoolWithdrawResult = None,
+        invoke_host_function_result: InvokeHostFunctionResult = None,
     ) -> None:
         self.type = type
         self.create_account_result = create_account_result
@@ -145,6 +149,7 @@ class OperationResultTr:
         self.set_trust_line_flags_result = set_trust_line_flags_result
         self.liquidity_pool_deposit_result = liquidity_pool_deposit_result
         self.liquidity_pool_withdraw_result = liquidity_pool_withdraw_result
+        self.invoke_host_function_result = invoke_host_function_result
 
     def pack(self, packer: Packer) -> None:
         self.type.pack(packer)
@@ -276,6 +281,11 @@ class OperationResultTr:
                 raise ValueError("liquidity_pool_withdraw_result should not be None.")
             self.liquidity_pool_withdraw_result.pack(packer)
             return
+        if self.type == OperationType.INVOKE_HOST_FUNCTION:
+            if self.invoke_host_function_result is None:
+                raise ValueError("invoke_host_function_result should not be None.")
+            self.invoke_host_function_result.pack(packer)
+            return
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "OperationResultTr":
@@ -397,6 +407,11 @@ class OperationResultTr:
             return cls(
                 type=type, liquidity_pool_withdraw_result=liquidity_pool_withdraw_result
             )
+        if type == OperationType.INVOKE_HOST_FUNCTION:
+            invoke_host_function_result = InvokeHostFunctionResult.unpack(unpacker)
+            return cls(
+                type=type, invoke_host_function_result=invoke_host_function_result
+            )
         return cls(type=type)
 
     def to_xdr_bytes(self) -> bytes:
@@ -457,6 +472,7 @@ class OperationResultTr:
             == other.liquidity_pool_deposit_result
             and self.liquidity_pool_withdraw_result
             == other.liquidity_pool_withdraw_result
+            and self.invoke_host_function_result == other.invoke_host_function_result
         )
 
     def __str__(self):
@@ -534,4 +550,7 @@ class OperationResultTr:
         out.append(
             f"liquidity_pool_withdraw_result={self.liquidity_pool_withdraw_result}"
         ) if self.liquidity_pool_withdraw_result is not None else None
+        out.append(
+            f"invoke_host_function_result={self.invoke_host_function_result}"
+        ) if self.invoke_host_function_result is not None else None
         return f"<OperationResultTr [{', '.join(out)}]>"

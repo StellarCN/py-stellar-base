@@ -17,7 +17,13 @@ class AccountMergeResult:
         {
         case ACCOUNT_MERGE_SUCCESS:
             int64 sourceAccountBalance; // how much got transferred from source account
-        default:
+        case ACCOUNT_MERGE_MALFORMED:
+        case ACCOUNT_MERGE_NO_ACCOUNT:
+        case ACCOUNT_MERGE_IMMUTABLE_SET:
+        case ACCOUNT_MERGE_HAS_SUB_ENTRIES:
+        case ACCOUNT_MERGE_SEQNUM_TOO_FAR:
+        case ACCOUNT_MERGE_DEST_FULL:
+        case ACCOUNT_MERGE_IS_SPONSOR:
             void;
         };
     """
@@ -37,6 +43,20 @@ class AccountMergeResult:
                 raise ValueError("source_account_balance should not be None.")
             self.source_account_balance.pack(packer)
             return
+        if self.code == AccountMergeResultCode.ACCOUNT_MERGE_MALFORMED:
+            return
+        if self.code == AccountMergeResultCode.ACCOUNT_MERGE_NO_ACCOUNT:
+            return
+        if self.code == AccountMergeResultCode.ACCOUNT_MERGE_IMMUTABLE_SET:
+            return
+        if self.code == AccountMergeResultCode.ACCOUNT_MERGE_HAS_SUB_ENTRIES:
+            return
+        if self.code == AccountMergeResultCode.ACCOUNT_MERGE_SEQNUM_TOO_FAR:
+            return
+        if self.code == AccountMergeResultCode.ACCOUNT_MERGE_DEST_FULL:
+            return
+        if self.code == AccountMergeResultCode.ACCOUNT_MERGE_IS_SPONSOR:
+            return
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "AccountMergeResult":
@@ -44,6 +64,20 @@ class AccountMergeResult:
         if code == AccountMergeResultCode.ACCOUNT_MERGE_SUCCESS:
             source_account_balance = Int64.unpack(unpacker)
             return cls(code=code, source_account_balance=source_account_balance)
+        if code == AccountMergeResultCode.ACCOUNT_MERGE_MALFORMED:
+            return cls(code=code)
+        if code == AccountMergeResultCode.ACCOUNT_MERGE_NO_ACCOUNT:
+            return cls(code=code)
+        if code == AccountMergeResultCode.ACCOUNT_MERGE_IMMUTABLE_SET:
+            return cls(code=code)
+        if code == AccountMergeResultCode.ACCOUNT_MERGE_HAS_SUB_ENTRIES:
+            return cls(code=code)
+        if code == AccountMergeResultCode.ACCOUNT_MERGE_SEQNUM_TOO_FAR:
+            return cls(code=code)
+        if code == AccountMergeResultCode.ACCOUNT_MERGE_DEST_FULL:
+            return cls(code=code)
+        if code == AccountMergeResultCode.ACCOUNT_MERGE_IS_SPONSOR:
+            return cls(code=code)
         return cls(code=code)
 
     def to_xdr_bytes(self) -> bytes:

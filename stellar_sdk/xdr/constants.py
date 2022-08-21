@@ -1,5 +1,7 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
+#: const SCVAL_LIMIT = 256000;
+SCVAL_LIMIT: int = 256000
 #: const MASK_ACCOUNT_FLAGS = 0x7;
 MASK_ACCOUNT_FLAGS: int = 0x7
 #: const MASK_ACCOUNT_FLAGS_V17 = 0xF;
@@ -16,8 +18,8 @@ MASK_TRUSTLINE_FLAGS_V17: int = 7
 MASK_OFFERENTRY_FLAGS: int = 1
 #: const MASK_CLAIMABLE_BALANCE_FLAGS = 0x1;
 MASK_CLAIMABLE_BALANCE_FLAGS: int = 0x1
-#: const MASK_LEDGER_HEADER_FLAGS = 0x7;
-MASK_LEDGER_HEADER_FLAGS: int = 0x7
+#: const MASK_LEDGER_HEADER_FLAGS = 0x7F;
+MASK_LEDGER_HEADER_FLAGS: int = 0x7F
 #: const LIQUIDITY_POOL_FEE_V18 = 30;
 LIQUIDITY_POOL_FEE_V18: int = 30
 #: const MAX_OPS_PER_TX = 100;

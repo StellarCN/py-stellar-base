@@ -22,6 +22,7 @@ class MessageType(IntEnum):
 
             GET_TX_SET = 6, // gets a particular txset by hash
             TX_SET = 7,
+            GENERALIZED_TX_SET = 17,
 
             TRANSACTION = 8, // pass on a tx you have heard about
 
@@ -48,6 +49,7 @@ class MessageType(IntEnum):
     PEERS = 5
     GET_TX_SET = 6
     TX_SET = 7
+    GENERALIZED_TX_SET = 17
     TRANSACTION = 8
     GET_SCP_QUORUMSET = 9
     SCP_QUORUMSET = 10

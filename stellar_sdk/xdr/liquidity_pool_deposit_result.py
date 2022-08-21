@@ -12,12 +12,17 @@ class LiquidityPoolDepositResult:
     """
     XDR Source Code::
 
-        union LiquidityPoolDepositResult switch (
-            LiquidityPoolDepositResultCode code)
+        union LiquidityPoolDepositResult switch (LiquidityPoolDepositResultCode code)
         {
         case LIQUIDITY_POOL_DEPOSIT_SUCCESS:
             void;
-        default:
+        case LIQUIDITY_POOL_DEPOSIT_MALFORMED:
+        case LIQUIDITY_POOL_DEPOSIT_NO_TRUST:
+        case LIQUIDITY_POOL_DEPOSIT_NOT_AUTHORIZED:
+        case LIQUIDITY_POOL_DEPOSIT_UNDERFUNDED:
+        case LIQUIDITY_POOL_DEPOSIT_LINE_FULL:
+        case LIQUIDITY_POOL_DEPOSIT_BAD_PRICE:
+        case LIQUIDITY_POOL_DEPOSIT_POOL_FULL:
             void;
         };
     """
@@ -32,11 +37,45 @@ class LiquidityPoolDepositResult:
         self.code.pack(packer)
         if self.code == LiquidityPoolDepositResultCode.LIQUIDITY_POOL_DEPOSIT_SUCCESS:
             return
+        if self.code == LiquidityPoolDepositResultCode.LIQUIDITY_POOL_DEPOSIT_MALFORMED:
+            return
+        if self.code == LiquidityPoolDepositResultCode.LIQUIDITY_POOL_DEPOSIT_NO_TRUST:
+            return
+        if (
+            self.code
+            == LiquidityPoolDepositResultCode.LIQUIDITY_POOL_DEPOSIT_NOT_AUTHORIZED
+        ):
+            return
+        if (
+            self.code
+            == LiquidityPoolDepositResultCode.LIQUIDITY_POOL_DEPOSIT_UNDERFUNDED
+        ):
+            return
+        if self.code == LiquidityPoolDepositResultCode.LIQUIDITY_POOL_DEPOSIT_LINE_FULL:
+            return
+        if self.code == LiquidityPoolDepositResultCode.LIQUIDITY_POOL_DEPOSIT_BAD_PRICE:
+            return
+        if self.code == LiquidityPoolDepositResultCode.LIQUIDITY_POOL_DEPOSIT_POOL_FULL:
+            return
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "LiquidityPoolDepositResult":
         code = LiquidityPoolDepositResultCode.unpack(unpacker)
         if code == LiquidityPoolDepositResultCode.LIQUIDITY_POOL_DEPOSIT_SUCCESS:
+            return cls(code=code)
+        if code == LiquidityPoolDepositResultCode.LIQUIDITY_POOL_DEPOSIT_MALFORMED:
+            return cls(code=code)
+        if code == LiquidityPoolDepositResultCode.LIQUIDITY_POOL_DEPOSIT_NO_TRUST:
+            return cls(code=code)
+        if code == LiquidityPoolDepositResultCode.LIQUIDITY_POOL_DEPOSIT_NOT_AUTHORIZED:
+            return cls(code=code)
+        if code == LiquidityPoolDepositResultCode.LIQUIDITY_POOL_DEPOSIT_UNDERFUNDED:
+            return cls(code=code)
+        if code == LiquidityPoolDepositResultCode.LIQUIDITY_POOL_DEPOSIT_LINE_FULL:
+            return cls(code=code)
+        if code == LiquidityPoolDepositResultCode.LIQUIDITY_POOL_DEPOSIT_BAD_PRICE:
+            return cls(code=code)
+        if code == LiquidityPoolDepositResultCode.LIQUIDITY_POOL_DEPOSIT_POOL_FULL:
             return cls(code=code)
         return cls(code=code)
 

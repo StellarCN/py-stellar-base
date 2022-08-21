@@ -16,7 +16,10 @@ class ClawbackResult:
         {
         case CLAWBACK_SUCCESS:
             void;
-        default:
+        case CLAWBACK_MALFORMED:
+        case CLAWBACK_NOT_CLAWBACK_ENABLED:
+        case CLAWBACK_NO_TRUST:
+        case CLAWBACK_UNDERFUNDED:
             void;
         };
     """
@@ -31,11 +34,27 @@ class ClawbackResult:
         self.code.pack(packer)
         if self.code == ClawbackResultCode.CLAWBACK_SUCCESS:
             return
+        if self.code == ClawbackResultCode.CLAWBACK_MALFORMED:
+            return
+        if self.code == ClawbackResultCode.CLAWBACK_NOT_CLAWBACK_ENABLED:
+            return
+        if self.code == ClawbackResultCode.CLAWBACK_NO_TRUST:
+            return
+        if self.code == ClawbackResultCode.CLAWBACK_UNDERFUNDED:
+            return
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "ClawbackResult":
         code = ClawbackResultCode.unpack(unpacker)
         if code == ClawbackResultCode.CLAWBACK_SUCCESS:
+            return cls(code=code)
+        if code == ClawbackResultCode.CLAWBACK_MALFORMED:
+            return cls(code=code)
+        if code == ClawbackResultCode.CLAWBACK_NOT_CLAWBACK_ENABLED:
+            return cls(code=code)
+        if code == ClawbackResultCode.CLAWBACK_NO_TRUST:
+            return cls(code=code)
+        if code == ClawbackResultCode.CLAWBACK_UNDERFUNDED:
             return cls(code=code)
         return cls(code=code)
 

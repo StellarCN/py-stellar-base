@@ -25,9 +25,20 @@ class PathPaymentStrictReceiveResult:
                 ClaimAtom offers<>;
                 SimplePaymentResult last;
             } success;
+        case PATH_PAYMENT_STRICT_RECEIVE_MALFORMED:
+        case PATH_PAYMENT_STRICT_RECEIVE_UNDERFUNDED:
+        case PATH_PAYMENT_STRICT_RECEIVE_SRC_NO_TRUST:
+        case PATH_PAYMENT_STRICT_RECEIVE_SRC_NOT_AUTHORIZED:
+        case PATH_PAYMENT_STRICT_RECEIVE_NO_DESTINATION:
+        case PATH_PAYMENT_STRICT_RECEIVE_NO_TRUST:
+        case PATH_PAYMENT_STRICT_RECEIVE_NOT_AUTHORIZED:
+        case PATH_PAYMENT_STRICT_RECEIVE_LINE_FULL:
+            void;
         case PATH_PAYMENT_STRICT_RECEIVE_NO_ISSUER:
             Asset noIssuer; // the asset that caused the error
-        default:
+        case PATH_PAYMENT_STRICT_RECEIVE_TOO_FEW_OFFERS:
+        case PATH_PAYMENT_STRICT_RECEIVE_OFFER_CROSS_SELF:
+        case PATH_PAYMENT_STRICT_RECEIVE_OVER_SENDMAX:
             void;
         };
     """
@@ -54,11 +65,66 @@ class PathPaymentStrictReceiveResult:
             return
         if (
             self.code
+            == PathPaymentStrictReceiveResultCode.PATH_PAYMENT_STRICT_RECEIVE_MALFORMED
+        ):
+            return
+        if (
+            self.code
+            == PathPaymentStrictReceiveResultCode.PATH_PAYMENT_STRICT_RECEIVE_UNDERFUNDED
+        ):
+            return
+        if (
+            self.code
+            == PathPaymentStrictReceiveResultCode.PATH_PAYMENT_STRICT_RECEIVE_SRC_NO_TRUST
+        ):
+            return
+        if (
+            self.code
+            == PathPaymentStrictReceiveResultCode.PATH_PAYMENT_STRICT_RECEIVE_SRC_NOT_AUTHORIZED
+        ):
+            return
+        if (
+            self.code
+            == PathPaymentStrictReceiveResultCode.PATH_PAYMENT_STRICT_RECEIVE_NO_DESTINATION
+        ):
+            return
+        if (
+            self.code
+            == PathPaymentStrictReceiveResultCode.PATH_PAYMENT_STRICT_RECEIVE_NO_TRUST
+        ):
+            return
+        if (
+            self.code
+            == PathPaymentStrictReceiveResultCode.PATH_PAYMENT_STRICT_RECEIVE_NOT_AUTHORIZED
+        ):
+            return
+        if (
+            self.code
+            == PathPaymentStrictReceiveResultCode.PATH_PAYMENT_STRICT_RECEIVE_LINE_FULL
+        ):
+            return
+        if (
+            self.code
             == PathPaymentStrictReceiveResultCode.PATH_PAYMENT_STRICT_RECEIVE_NO_ISSUER
         ):
             if self.no_issuer is None:
                 raise ValueError("no_issuer should not be None.")
             self.no_issuer.pack(packer)
+            return
+        if (
+            self.code
+            == PathPaymentStrictReceiveResultCode.PATH_PAYMENT_STRICT_RECEIVE_TOO_FEW_OFFERS
+        ):
+            return
+        if (
+            self.code
+            == PathPaymentStrictReceiveResultCode.PATH_PAYMENT_STRICT_RECEIVE_OFFER_CROSS_SELF
+        ):
+            return
+        if (
+            self.code
+            == PathPaymentStrictReceiveResultCode.PATH_PAYMENT_STRICT_RECEIVE_OVER_SENDMAX
+        ):
             return
 
     @classmethod
@@ -72,10 +138,65 @@ class PathPaymentStrictReceiveResult:
             return cls(code=code, success=success)
         if (
             code
+            == PathPaymentStrictReceiveResultCode.PATH_PAYMENT_STRICT_RECEIVE_MALFORMED
+        ):
+            return cls(code=code)
+        if (
+            code
+            == PathPaymentStrictReceiveResultCode.PATH_PAYMENT_STRICT_RECEIVE_UNDERFUNDED
+        ):
+            return cls(code=code)
+        if (
+            code
+            == PathPaymentStrictReceiveResultCode.PATH_PAYMENT_STRICT_RECEIVE_SRC_NO_TRUST
+        ):
+            return cls(code=code)
+        if (
+            code
+            == PathPaymentStrictReceiveResultCode.PATH_PAYMENT_STRICT_RECEIVE_SRC_NOT_AUTHORIZED
+        ):
+            return cls(code=code)
+        if (
+            code
+            == PathPaymentStrictReceiveResultCode.PATH_PAYMENT_STRICT_RECEIVE_NO_DESTINATION
+        ):
+            return cls(code=code)
+        if (
+            code
+            == PathPaymentStrictReceiveResultCode.PATH_PAYMENT_STRICT_RECEIVE_NO_TRUST
+        ):
+            return cls(code=code)
+        if (
+            code
+            == PathPaymentStrictReceiveResultCode.PATH_PAYMENT_STRICT_RECEIVE_NOT_AUTHORIZED
+        ):
+            return cls(code=code)
+        if (
+            code
+            == PathPaymentStrictReceiveResultCode.PATH_PAYMENT_STRICT_RECEIVE_LINE_FULL
+        ):
+            return cls(code=code)
+        if (
+            code
             == PathPaymentStrictReceiveResultCode.PATH_PAYMENT_STRICT_RECEIVE_NO_ISSUER
         ):
             no_issuer = Asset.unpack(unpacker)
             return cls(code=code, no_issuer=no_issuer)
+        if (
+            code
+            == PathPaymentStrictReceiveResultCode.PATH_PAYMENT_STRICT_RECEIVE_TOO_FEW_OFFERS
+        ):
+            return cls(code=code)
+        if (
+            code
+            == PathPaymentStrictReceiveResultCode.PATH_PAYMENT_STRICT_RECEIVE_OFFER_CROSS_SELF
+        ):
+            return cls(code=code)
+        if (
+            code
+            == PathPaymentStrictReceiveResultCode.PATH_PAYMENT_STRICT_RECEIVE_OVER_SENDMAX
+        ):
+            return cls(code=code)
         return cls(code=code)
 
     def to_xdr_bytes(self) -> bytes:

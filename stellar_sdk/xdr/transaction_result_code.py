@@ -33,7 +33,9 @@ class TransactionResultCode(IntEnum):
             txNOT_SUPPORTED = -12,         // transaction type not supported
             txFEE_BUMP_INNER_FAILED = -13, // fee bump inner transaction failed
             txBAD_SPONSORSHIP = -14,       // sponsorship not confirmed
-            txBAD_MIN_SEQ_AGE_OR_GAP = -15 //minSeqAge or minSeqLedgerGap conditions not met
+            txBAD_MIN_SEQ_AGE_OR_GAP =
+                -15, // minSeqAge or minSeqLedgerGap conditions not met
+            txMALFORMED = -16 // precondition is invalid
         };
     """
 
@@ -54,6 +56,7 @@ class TransactionResultCode(IntEnum):
     txFEE_BUMP_INNER_FAILED = -13
     txBAD_SPONSORSHIP = -14
     txBAD_MIN_SEQ_AGE_OR_GAP = -15
+    txMALFORMED = -16
 
     def pack(self, packer: Packer) -> None:
         packer.pack_int(self.value)

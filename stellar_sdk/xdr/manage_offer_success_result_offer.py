@@ -18,7 +18,7 @@ class ManageOfferSuccessResultOffer:
             case MANAGE_OFFER_CREATED:
             case MANAGE_OFFER_UPDATED:
                 OfferEntry offer;
-            default:
+            case MANAGE_OFFER_DELETED:
                 void;
             }
     """
@@ -43,6 +43,8 @@ class ManageOfferSuccessResultOffer:
                 raise ValueError("offer should not be None.")
             self.offer.pack(packer)
             return
+        if self.effect == ManageOfferEffect.MANAGE_OFFER_DELETED:
+            return
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "ManageOfferSuccessResultOffer":
@@ -53,6 +55,8 @@ class ManageOfferSuccessResultOffer:
         if effect == ManageOfferEffect.MANAGE_OFFER_UPDATED:
             offer = OfferEntry.unpack(unpacker)
             return cls(effect=effect, offer=offer)
+        if effect == ManageOfferEffect.MANAGE_OFFER_DELETED:
+            return cls(effect=effect)
         return cls(effect=effect)
 
     def to_xdr_bytes(self) -> bytes:

@@ -5,6 +5,8 @@ from xdrlib import Packer, Unpacker
 
 from .account_entry import AccountEntry
 from .claimable_balance_entry import ClaimableBalanceEntry
+from .config_setting_entry import ConfigSettingEntry
+from .contract_data_entry import ContractDataEntry
 from .data_entry import DataEntry
 from .ledger_entry_type import LedgerEntryType
 from .liquidity_pool_entry import LiquidityPoolEntry
@@ -32,6 +34,10 @@ class LedgerEntryData:
                 ClaimableBalanceEntry claimableBalance;
             case LIQUIDITY_POOL:
                 LiquidityPoolEntry liquidityPool;
+            case CONTRACT_DATA:
+                ContractDataEntry contractData;
+            case CONFIG_SETTING:
+                ConfigSettingEntry configSetting;
             }
     """
 
@@ -44,6 +50,8 @@ class LedgerEntryData:
         data: DataEntry = None,
         claimable_balance: ClaimableBalanceEntry = None,
         liquidity_pool: LiquidityPoolEntry = None,
+        contract_data: ContractDataEntry = None,
+        config_setting: ConfigSettingEntry = None,
     ) -> None:
         self.type = type
         self.account = account
@@ -52,6 +60,8 @@ class LedgerEntryData:
         self.data = data
         self.claimable_balance = claimable_balance
         self.liquidity_pool = liquidity_pool
+        self.contract_data = contract_data
+        self.config_setting = config_setting
 
     def pack(self, packer: Packer) -> None:
         self.type.pack(packer)
@@ -85,6 +95,16 @@ class LedgerEntryData:
                 raise ValueError("liquidity_pool should not be None.")
             self.liquidity_pool.pack(packer)
             return
+        if self.type == LedgerEntryType.CONTRACT_DATA:
+            if self.contract_data is None:
+                raise ValueError("contract_data should not be None.")
+            self.contract_data.pack(packer)
+            return
+        if self.type == LedgerEntryType.CONFIG_SETTING:
+            if self.config_setting is None:
+                raise ValueError("config_setting should not be None.")
+            self.config_setting.pack(packer)
+            return
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "LedgerEntryData":
@@ -107,6 +127,12 @@ class LedgerEntryData:
         if type == LedgerEntryType.LIQUIDITY_POOL:
             liquidity_pool = LiquidityPoolEntry.unpack(unpacker)
             return cls(type=type, liquidity_pool=liquidity_pool)
+        if type == LedgerEntryType.CONTRACT_DATA:
+            contract_data = ContractDataEntry.unpack(unpacker)
+            return cls(type=type, contract_data=contract_data)
+        if type == LedgerEntryType.CONFIG_SETTING:
+            config_setting = ConfigSettingEntry.unpack(unpacker)
+            return cls(type=type, config_setting=config_setting)
         return cls(type=type)
 
     def to_xdr_bytes(self) -> bytes:
@@ -139,6 +165,8 @@ class LedgerEntryData:
             and self.data == other.data
             and self.claimable_balance == other.claimable_balance
             and self.liquidity_pool == other.liquidity_pool
+            and self.contract_data == other.contract_data
+            and self.config_setting == other.config_setting
         )
 
     def __str__(self):
@@ -156,4 +184,10 @@ class LedgerEntryData:
         out.append(
             f"liquidity_pool={self.liquidity_pool}"
         ) if self.liquidity_pool is not None else None
+        out.append(
+            f"contract_data={self.contract_data}"
+        ) if self.contract_data is not None else None
+        out.append(
+            f"config_setting={self.config_setting}"
+        ) if self.config_setting is not None else None
         return f"<LedgerEntryData [{', '.join(out)}]>"

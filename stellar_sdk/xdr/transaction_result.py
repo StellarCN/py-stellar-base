@@ -26,7 +26,21 @@ class TransactionResult:
             case txSUCCESS:
             case txFAILED:
                 OperationResult results<>;
-            default:
+            case txTOO_EARLY:
+            case txTOO_LATE:
+            case txMISSING_OPERATION:
+            case txBAD_SEQ:
+            case txBAD_AUTH:
+            case txINSUFFICIENT_BALANCE:
+            case txNO_ACCOUNT:
+            case txINSUFFICIENT_FEE:
+            case txBAD_AUTH_EXTRA:
+            case txINTERNAL_ERROR:
+            case txNOT_SUPPORTED:
+            // case txFEE_BUMP_INNER_FAILED: handled above
+            case txBAD_SPONSORSHIP:
+            case txBAD_MIN_SEQ_AGE_OR_GAP:
+            case txMALFORMED:
                 void;
             }
             result;

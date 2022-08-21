@@ -19,7 +19,9 @@ class BeginSponsoringFutureReservesResult:
         {
         case BEGIN_SPONSORING_FUTURE_RESERVES_SUCCESS:
             void;
-        default:
+        case BEGIN_SPONSORING_FUTURE_RESERVES_MALFORMED:
+        case BEGIN_SPONSORING_FUTURE_RESERVES_ALREADY_SPONSORED:
+        case BEGIN_SPONSORING_FUTURE_RESERVES_RECURSIVE:
             void;
         };
     """
@@ -37,6 +39,21 @@ class BeginSponsoringFutureReservesResult:
             == BeginSponsoringFutureReservesResultCode.BEGIN_SPONSORING_FUTURE_RESERVES_SUCCESS
         ):
             return
+        if (
+            self.code
+            == BeginSponsoringFutureReservesResultCode.BEGIN_SPONSORING_FUTURE_RESERVES_MALFORMED
+        ):
+            return
+        if (
+            self.code
+            == BeginSponsoringFutureReservesResultCode.BEGIN_SPONSORING_FUTURE_RESERVES_ALREADY_SPONSORED
+        ):
+            return
+        if (
+            self.code
+            == BeginSponsoringFutureReservesResultCode.BEGIN_SPONSORING_FUTURE_RESERVES_RECURSIVE
+        ):
+            return
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "BeginSponsoringFutureReservesResult":
@@ -44,6 +61,21 @@ class BeginSponsoringFutureReservesResult:
         if (
             code
             == BeginSponsoringFutureReservesResultCode.BEGIN_SPONSORING_FUTURE_RESERVES_SUCCESS
+        ):
+            return cls(code=code)
+        if (
+            code
+            == BeginSponsoringFutureReservesResultCode.BEGIN_SPONSORING_FUTURE_RESERVES_MALFORMED
+        ):
+            return cls(code=code)
+        if (
+            code
+            == BeginSponsoringFutureReservesResultCode.BEGIN_SPONSORING_FUTURE_RESERVES_ALREADY_SPONSORED
+        ):
+            return cls(code=code)
+        if (
+            code
+            == BeginSponsoringFutureReservesResultCode.BEGIN_SPONSORING_FUTURE_RESERVES_RECURSIVE
         ):
             return cls(code=code)
         return cls(code=code)

@@ -32,6 +32,10 @@ class LedgerEntry:
                 ClaimableBalanceEntry claimableBalance;
             case LIQUIDITY_POOL:
                 LiquidityPoolEntry liquidityPool;
+            case CONTRACT_DATA:
+                ContractDataEntry contractData;
+            case CONFIG_SETTING:
+                ConfigSettingEntry configSetting;
             }
             data;
 

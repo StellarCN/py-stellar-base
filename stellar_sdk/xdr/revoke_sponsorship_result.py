@@ -16,7 +16,11 @@ class RevokeSponsorshipResult:
         {
         case REVOKE_SPONSORSHIP_SUCCESS:
             void;
-        default:
+        case REVOKE_SPONSORSHIP_DOES_NOT_EXIST:
+        case REVOKE_SPONSORSHIP_NOT_SPONSOR:
+        case REVOKE_SPONSORSHIP_LOW_RESERVE:
+        case REVOKE_SPONSORSHIP_ONLY_TRANSFERABLE:
+        case REVOKE_SPONSORSHIP_MALFORMED:
             void;
         };
     """
@@ -31,11 +35,34 @@ class RevokeSponsorshipResult:
         self.code.pack(packer)
         if self.code == RevokeSponsorshipResultCode.REVOKE_SPONSORSHIP_SUCCESS:
             return
+        if self.code == RevokeSponsorshipResultCode.REVOKE_SPONSORSHIP_DOES_NOT_EXIST:
+            return
+        if self.code == RevokeSponsorshipResultCode.REVOKE_SPONSORSHIP_NOT_SPONSOR:
+            return
+        if self.code == RevokeSponsorshipResultCode.REVOKE_SPONSORSHIP_LOW_RESERVE:
+            return
+        if (
+            self.code
+            == RevokeSponsorshipResultCode.REVOKE_SPONSORSHIP_ONLY_TRANSFERABLE
+        ):
+            return
+        if self.code == RevokeSponsorshipResultCode.REVOKE_SPONSORSHIP_MALFORMED:
+            return
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "RevokeSponsorshipResult":
         code = RevokeSponsorshipResultCode.unpack(unpacker)
         if code == RevokeSponsorshipResultCode.REVOKE_SPONSORSHIP_SUCCESS:
+            return cls(code=code)
+        if code == RevokeSponsorshipResultCode.REVOKE_SPONSORSHIP_DOES_NOT_EXIST:
+            return cls(code=code)
+        if code == RevokeSponsorshipResultCode.REVOKE_SPONSORSHIP_NOT_SPONSOR:
+            return cls(code=code)
+        if code == RevokeSponsorshipResultCode.REVOKE_SPONSORSHIP_LOW_RESERVE:
+            return cls(code=code)
+        if code == RevokeSponsorshipResultCode.REVOKE_SPONSORSHIP_ONLY_TRANSFERABLE:
+            return cls(code=code)
+        if code == RevokeSponsorshipResultCode.REVOKE_SPONSORSHIP_MALFORMED:
             return cls(code=code)
         return cls(code=code)
 

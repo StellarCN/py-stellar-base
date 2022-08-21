@@ -36,7 +36,8 @@ class OperationType(IntEnum):
             CLAWBACK_CLAIMABLE_BALANCE = 20,
             SET_TRUST_LINE_FLAGS = 21,
             LIQUIDITY_POOL_DEPOSIT = 22,
-            LIQUIDITY_POOL_WITHDRAW = 23
+            LIQUIDITY_POOL_WITHDRAW = 23,
+            INVOKE_HOST_FUNCTION = 24
         };
     """
 
@@ -64,6 +65,7 @@ class OperationType(IntEnum):
     SET_TRUST_LINE_FLAGS = 21
     LIQUIDITY_POOL_DEPOSIT = 22
     LIQUIDITY_POOL_WITHDRAW = 23
+    INVOKE_HOST_FUNCTION = 24
 
     def pack(self, packer: Packer) -> None:
         packer.pack_int(self.value)

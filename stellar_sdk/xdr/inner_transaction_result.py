@@ -39,6 +39,7 @@ class InnerTransactionResult:
             // txFEE_BUMP_INNER_FAILED is not included
             case txBAD_SPONSORSHIP:
             case txBAD_MIN_SEQ_AGE_OR_GAP:
+            case txMALFORMED:
                 void;
             }
             result;

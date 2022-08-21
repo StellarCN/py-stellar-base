@@ -19,11 +19,13 @@ class TransactionHistoryEntry:
             uint32 ledgerSeq;
             TransactionSet txSet;
 
-            // reserved for future use
+            // when v != 0, txSet must be empty
             union switch (int v)
             {
             case 0:
                 void;
+            case 1:
+                GeneralizedTransactionSet generalizedTxSet;
             }
             ext;
         };

@@ -71,6 +71,8 @@ class Operation:
                 LiquidityPoolDepositOp liquidityPoolDepositOp;
             case LIQUIDITY_POOL_WITHDRAW:
                 LiquidityPoolWithdrawOp liquidityPoolWithdrawOp;
+            case INVOKE_HOST_FUNCTION:
+                InvokeHostFunctionOp invokeHostFunctionOp;
             }
             body;
         };
