@@ -17,7 +17,9 @@ class ClawbackClaimableBalanceResult:
         {
         case CLAWBACK_CLAIMABLE_BALANCE_SUCCESS:
             void;
-        default:
+        case CLAWBACK_CLAIMABLE_BALANCE_DOES_NOT_EXIST:
+        case CLAWBACK_CLAIMABLE_BALANCE_NOT_ISSUER:
+        case CLAWBACK_CLAIMABLE_BALANCE_NOT_CLAWBACK_ENABLED:
             void;
         };
     """
@@ -35,6 +37,21 @@ class ClawbackClaimableBalanceResult:
             == ClawbackClaimableBalanceResultCode.CLAWBACK_CLAIMABLE_BALANCE_SUCCESS
         ):
             return
+        if (
+            self.code
+            == ClawbackClaimableBalanceResultCode.CLAWBACK_CLAIMABLE_BALANCE_DOES_NOT_EXIST
+        ):
+            return
+        if (
+            self.code
+            == ClawbackClaimableBalanceResultCode.CLAWBACK_CLAIMABLE_BALANCE_NOT_ISSUER
+        ):
+            return
+        if (
+            self.code
+            == ClawbackClaimableBalanceResultCode.CLAWBACK_CLAIMABLE_BALANCE_NOT_CLAWBACK_ENABLED
+        ):
+            return
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "ClawbackClaimableBalanceResult":
@@ -42,6 +59,21 @@ class ClawbackClaimableBalanceResult:
         if (
             code
             == ClawbackClaimableBalanceResultCode.CLAWBACK_CLAIMABLE_BALANCE_SUCCESS
+        ):
+            return cls(code=code)
+        if (
+            code
+            == ClawbackClaimableBalanceResultCode.CLAWBACK_CLAIMABLE_BALANCE_DOES_NOT_EXIST
+        ):
+            return cls(code=code)
+        if (
+            code
+            == ClawbackClaimableBalanceResultCode.CLAWBACK_CLAIMABLE_BALANCE_NOT_ISSUER
+        ):
+            return cls(code=code)
+        if (
+            code
+            == ClawbackClaimableBalanceResultCode.CLAWBACK_CLAIMABLE_BALANCE_NOT_CLAWBACK_ENABLED
         ):
             return cls(code=code)
         return cls(code=code)

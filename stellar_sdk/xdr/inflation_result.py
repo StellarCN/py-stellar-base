@@ -18,7 +18,7 @@ class InflationResult:
         {
         case INFLATION_SUCCESS:
             InflationPayout payouts<>;
-        default:
+        case INFLATION_NOT_TIME:
             void;
         };
     """
@@ -45,6 +45,8 @@ class InflationResult:
             for payouts_item in self.payouts:
                 payouts_item.pack(packer)
             return
+        if self.code == InflationResultCode.INFLATION_NOT_TIME:
+            return
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "InflationResult":
@@ -55,6 +57,8 @@ class InflationResult:
             for _ in range(length):
                 payouts.append(InflationPayout.unpack(unpacker))
             return cls(code=code, payouts=payouts)
+        if code == InflationResultCode.INFLATION_NOT_TIME:
+            return cls(code=code)
         return cls(code=code)
 
     def to_xdr_bytes(self) -> bytes:

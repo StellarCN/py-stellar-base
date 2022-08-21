@@ -16,7 +16,7 @@ class BumpSequenceResult:
         {
         case BUMP_SEQUENCE_SUCCESS:
             void;
-        default:
+        case BUMP_SEQUENCE_BAD_SEQ:
             void;
         };
     """
@@ -31,11 +31,15 @@ class BumpSequenceResult:
         self.code.pack(packer)
         if self.code == BumpSequenceResultCode.BUMP_SEQUENCE_SUCCESS:
             return
+        if self.code == BumpSequenceResultCode.BUMP_SEQUENCE_BAD_SEQ:
+            return
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "BumpSequenceResult":
         code = BumpSequenceResultCode.unpack(unpacker)
         if code == BumpSequenceResultCode.BUMP_SEQUENCE_SUCCESS:
+            return cls(code=code)
+        if code == BumpSequenceResultCode.BUMP_SEQUENCE_BAD_SEQ:
             return cls(code=code)
         return cls(code=code)
 

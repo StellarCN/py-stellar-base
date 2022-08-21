@@ -18,7 +18,11 @@ class CreateClaimableBalanceResult:
         {
         case CREATE_CLAIMABLE_BALANCE_SUCCESS:
             ClaimableBalanceID balanceID;
-        default:
+        case CREATE_CLAIMABLE_BALANCE_MALFORMED:
+        case CREATE_CLAIMABLE_BALANCE_LOW_RESERVE:
+        case CREATE_CLAIMABLE_BALANCE_NO_TRUST:
+        case CREATE_CLAIMABLE_BALANCE_NOT_AUTHORIZED:
+        case CREATE_CLAIMABLE_BALANCE_UNDERFUNDED:
             void;
         };
     """
@@ -41,6 +45,31 @@ class CreateClaimableBalanceResult:
                 raise ValueError("balance_id should not be None.")
             self.balance_id.pack(packer)
             return
+        if (
+            self.code
+            == CreateClaimableBalanceResultCode.CREATE_CLAIMABLE_BALANCE_MALFORMED
+        ):
+            return
+        if (
+            self.code
+            == CreateClaimableBalanceResultCode.CREATE_CLAIMABLE_BALANCE_LOW_RESERVE
+        ):
+            return
+        if (
+            self.code
+            == CreateClaimableBalanceResultCode.CREATE_CLAIMABLE_BALANCE_NO_TRUST
+        ):
+            return
+        if (
+            self.code
+            == CreateClaimableBalanceResultCode.CREATE_CLAIMABLE_BALANCE_NOT_AUTHORIZED
+        ):
+            return
+        if (
+            self.code
+            == CreateClaimableBalanceResultCode.CREATE_CLAIMABLE_BALANCE_UNDERFUNDED
+        ):
+            return
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "CreateClaimableBalanceResult":
@@ -48,6 +77,25 @@ class CreateClaimableBalanceResult:
         if code == CreateClaimableBalanceResultCode.CREATE_CLAIMABLE_BALANCE_SUCCESS:
             balance_id = ClaimableBalanceID.unpack(unpacker)
             return cls(code=code, balance_id=balance_id)
+        if code == CreateClaimableBalanceResultCode.CREATE_CLAIMABLE_BALANCE_MALFORMED:
+            return cls(code=code)
+        if (
+            code
+            == CreateClaimableBalanceResultCode.CREATE_CLAIMABLE_BALANCE_LOW_RESERVE
+        ):
+            return cls(code=code)
+        if code == CreateClaimableBalanceResultCode.CREATE_CLAIMABLE_BALANCE_NO_TRUST:
+            return cls(code=code)
+        if (
+            code
+            == CreateClaimableBalanceResultCode.CREATE_CLAIMABLE_BALANCE_NOT_AUTHORIZED
+        ):
+            return cls(code=code)
+        if (
+            code
+            == CreateClaimableBalanceResultCode.CREATE_CLAIMABLE_BALANCE_UNDERFUNDED
+        ):
+            return cls(code=code)
         return cls(code=code)
 
     def to_xdr_bytes(self) -> bytes:

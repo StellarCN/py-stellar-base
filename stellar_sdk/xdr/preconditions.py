@@ -14,13 +14,14 @@ class Preconditions:
     """
     XDR Source Code::
 
-        union Preconditions switch (PreconditionType type) {
-            case PRECOND_NONE:
-                void;
-            case PRECOND_TIME:
-                TimeBounds timeBounds;
-            case PRECOND_V2:
-                PreconditionsV2 v2;
+        union Preconditions switch (PreconditionType type)
+        {
+        case PRECOND_NONE:
+            void;
+        case PRECOND_TIME:
+            TimeBounds timeBounds;
+        case PRECOND_V2:
+            PreconditionsV2 v2;
         };
     """
 

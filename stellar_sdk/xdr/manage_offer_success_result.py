@@ -24,7 +24,7 @@ class ManageOfferSuccessResult:
             case MANAGE_OFFER_CREATED:
             case MANAGE_OFFER_UPDATED:
                 OfferEntry offer;
-            default:
+            case MANAGE_OFFER_DELETED:
                 void;
             }
             offer;

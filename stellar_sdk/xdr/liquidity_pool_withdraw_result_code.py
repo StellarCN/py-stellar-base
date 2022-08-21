@@ -17,14 +17,14 @@ class LiquidityPoolWithdrawResultCode(IntEnum):
             LIQUIDITY_POOL_WITHDRAW_SUCCESS = 0,
 
             // codes considered as "failure" for the operation
-            LIQUIDITY_POOL_WITHDRAW_MALFORMED = -1,      // bad input
-            LIQUIDITY_POOL_WITHDRAW_NO_TRUST = -2,       // no trust line for one of the
-                                                         // assets
-            LIQUIDITY_POOL_WITHDRAW_UNDERFUNDED = -3,    // not enough balance of the
-                                                         // pool share
-            LIQUIDITY_POOL_WITHDRAW_LINE_FULL = -4,      // would go above limit for one
-                                                         // of the assets
-            LIQUIDITY_POOL_WITHDRAW_UNDER_MINIMUM = -5   // didn't withdraw enough
+            LIQUIDITY_POOL_WITHDRAW_MALFORMED = -1,    // bad input
+            LIQUIDITY_POOL_WITHDRAW_NO_TRUST = -2,     // no trust line for one of the
+                                                       // assets
+            LIQUIDITY_POOL_WITHDRAW_UNDERFUNDED = -3,  // not enough balance of the
+                                                       // pool share
+            LIQUIDITY_POOL_WITHDRAW_LINE_FULL = -4,    // would go above limit for one
+                                                       // of the assets
+            LIQUIDITY_POOL_WITHDRAW_UNDER_MINIMUM = -5 // didn't withdraw enough
         };
     """
 

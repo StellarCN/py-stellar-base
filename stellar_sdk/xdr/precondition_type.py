@@ -11,7 +11,8 @@ class PreconditionType(IntEnum):
     """
     XDR Source Code::
 
-        enum PreconditionType {
+        enum PreconditionType
+        {
             PRECOND_NONE = 0,
             PRECOND_TIME = 1,
             PRECOND_V2 = 2

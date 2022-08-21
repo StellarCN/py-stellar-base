@@ -16,7 +16,11 @@ class ClaimClaimableBalanceResult:
         {
         case CLAIM_CLAIMABLE_BALANCE_SUCCESS:
             void;
-        default:
+        case CLAIM_CLAIMABLE_BALANCE_DOES_NOT_EXIST:
+        case CLAIM_CLAIMABLE_BALANCE_CANNOT_CLAIM:
+        case CLAIM_CLAIMABLE_BALANCE_LINE_FULL:
+        case CLAIM_CLAIMABLE_BALANCE_NO_TRUST:
+        case CLAIM_CLAIMABLE_BALANCE_NOT_AUTHORIZED:
             void;
         };
     """
@@ -31,11 +35,52 @@ class ClaimClaimableBalanceResult:
         self.code.pack(packer)
         if self.code == ClaimClaimableBalanceResultCode.CLAIM_CLAIMABLE_BALANCE_SUCCESS:
             return
+        if (
+            self.code
+            == ClaimClaimableBalanceResultCode.CLAIM_CLAIMABLE_BALANCE_DOES_NOT_EXIST
+        ):
+            return
+        if (
+            self.code
+            == ClaimClaimableBalanceResultCode.CLAIM_CLAIMABLE_BALANCE_CANNOT_CLAIM
+        ):
+            return
+        if (
+            self.code
+            == ClaimClaimableBalanceResultCode.CLAIM_CLAIMABLE_BALANCE_LINE_FULL
+        ):
+            return
+        if (
+            self.code
+            == ClaimClaimableBalanceResultCode.CLAIM_CLAIMABLE_BALANCE_NO_TRUST
+        ):
+            return
+        if (
+            self.code
+            == ClaimClaimableBalanceResultCode.CLAIM_CLAIMABLE_BALANCE_NOT_AUTHORIZED
+        ):
+            return
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "ClaimClaimableBalanceResult":
         code = ClaimClaimableBalanceResultCode.unpack(unpacker)
         if code == ClaimClaimableBalanceResultCode.CLAIM_CLAIMABLE_BALANCE_SUCCESS:
+            return cls(code=code)
+        if (
+            code
+            == ClaimClaimableBalanceResultCode.CLAIM_CLAIMABLE_BALANCE_DOES_NOT_EXIST
+        ):
+            return cls(code=code)
+        if code == ClaimClaimableBalanceResultCode.CLAIM_CLAIMABLE_BALANCE_CANNOT_CLAIM:
+            return cls(code=code)
+        if code == ClaimClaimableBalanceResultCode.CLAIM_CLAIMABLE_BALANCE_LINE_FULL:
+            return cls(code=code)
+        if code == ClaimClaimableBalanceResultCode.CLAIM_CLAIMABLE_BALANCE_NO_TRUST:
+            return cls(code=code)
+        if (
+            code
+            == ClaimClaimableBalanceResultCode.CLAIM_CLAIMABLE_BALANCE_NOT_AUTHORIZED
+        ):
             return cls(code=code)
         return cls(code=code)
 

@@ -17,7 +17,18 @@ class ManageSellOfferResult:
         {
         case MANAGE_SELL_OFFER_SUCCESS:
             ManageOfferSuccessResult success;
-        default:
+        case MANAGE_SELL_OFFER_MALFORMED:
+        case MANAGE_SELL_OFFER_SELL_NO_TRUST:
+        case MANAGE_SELL_OFFER_BUY_NO_TRUST:
+        case MANAGE_SELL_OFFER_SELL_NOT_AUTHORIZED:
+        case MANAGE_SELL_OFFER_BUY_NOT_AUTHORIZED:
+        case MANAGE_SELL_OFFER_LINE_FULL:
+        case MANAGE_SELL_OFFER_UNDERFUNDED:
+        case MANAGE_SELL_OFFER_CROSS_SELF:
+        case MANAGE_SELL_OFFER_SELL_NO_ISSUER:
+        case MANAGE_SELL_OFFER_BUY_NO_ISSUER:
+        case MANAGE_SELL_OFFER_NOT_FOUND:
+        case MANAGE_SELL_OFFER_LOW_RESERVE:
             void;
         };
     """
@@ -37,6 +48,30 @@ class ManageSellOfferResult:
                 raise ValueError("success should not be None.")
             self.success.pack(packer)
             return
+        if self.code == ManageSellOfferResultCode.MANAGE_SELL_OFFER_MALFORMED:
+            return
+        if self.code == ManageSellOfferResultCode.MANAGE_SELL_OFFER_SELL_NO_TRUST:
+            return
+        if self.code == ManageSellOfferResultCode.MANAGE_SELL_OFFER_BUY_NO_TRUST:
+            return
+        if self.code == ManageSellOfferResultCode.MANAGE_SELL_OFFER_SELL_NOT_AUTHORIZED:
+            return
+        if self.code == ManageSellOfferResultCode.MANAGE_SELL_OFFER_BUY_NOT_AUTHORIZED:
+            return
+        if self.code == ManageSellOfferResultCode.MANAGE_SELL_OFFER_LINE_FULL:
+            return
+        if self.code == ManageSellOfferResultCode.MANAGE_SELL_OFFER_UNDERFUNDED:
+            return
+        if self.code == ManageSellOfferResultCode.MANAGE_SELL_OFFER_CROSS_SELF:
+            return
+        if self.code == ManageSellOfferResultCode.MANAGE_SELL_OFFER_SELL_NO_ISSUER:
+            return
+        if self.code == ManageSellOfferResultCode.MANAGE_SELL_OFFER_BUY_NO_ISSUER:
+            return
+        if self.code == ManageSellOfferResultCode.MANAGE_SELL_OFFER_NOT_FOUND:
+            return
+        if self.code == ManageSellOfferResultCode.MANAGE_SELL_OFFER_LOW_RESERVE:
+            return
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "ManageSellOfferResult":
@@ -44,6 +79,30 @@ class ManageSellOfferResult:
         if code == ManageSellOfferResultCode.MANAGE_SELL_OFFER_SUCCESS:
             success = ManageOfferSuccessResult.unpack(unpacker)
             return cls(code=code, success=success)
+        if code == ManageSellOfferResultCode.MANAGE_SELL_OFFER_MALFORMED:
+            return cls(code=code)
+        if code == ManageSellOfferResultCode.MANAGE_SELL_OFFER_SELL_NO_TRUST:
+            return cls(code=code)
+        if code == ManageSellOfferResultCode.MANAGE_SELL_OFFER_BUY_NO_TRUST:
+            return cls(code=code)
+        if code == ManageSellOfferResultCode.MANAGE_SELL_OFFER_SELL_NOT_AUTHORIZED:
+            return cls(code=code)
+        if code == ManageSellOfferResultCode.MANAGE_SELL_OFFER_BUY_NOT_AUTHORIZED:
+            return cls(code=code)
+        if code == ManageSellOfferResultCode.MANAGE_SELL_OFFER_LINE_FULL:
+            return cls(code=code)
+        if code == ManageSellOfferResultCode.MANAGE_SELL_OFFER_UNDERFUNDED:
+            return cls(code=code)
+        if code == ManageSellOfferResultCode.MANAGE_SELL_OFFER_CROSS_SELF:
+            return cls(code=code)
+        if code == ManageSellOfferResultCode.MANAGE_SELL_OFFER_SELL_NO_ISSUER:
+            return cls(code=code)
+        if code == ManageSellOfferResultCode.MANAGE_SELL_OFFER_BUY_NO_ISSUER:
+            return cls(code=code)
+        if code == ManageSellOfferResultCode.MANAGE_SELL_OFFER_NOT_FOUND:
+            return cls(code=code)
+        if code == ManageSellOfferResultCode.MANAGE_SELL_OFFER_LOW_RESERVE:
+            return cls(code=code)
         return cls(code=code)
 
     def to_xdr_bytes(self) -> bytes:

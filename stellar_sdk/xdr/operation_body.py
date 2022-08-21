@@ -13,6 +13,7 @@ from .clawback_op import ClawbackOp
 from .create_account_op import CreateAccountOp
 from .create_claimable_balance_op import CreateClaimableBalanceOp
 from .create_passive_sell_offer_op import CreatePassiveSellOfferOp
+from .invoke_host_function_op import InvokeHostFunctionOp
 from .liquidity_pool_deposit_op import LiquidityPoolDepositOp
 from .liquidity_pool_withdraw_op import LiquidityPoolWithdrawOp
 from .manage_buy_offer_op import ManageBuyOfferOp
@@ -84,6 +85,8 @@ class OperationBody:
                 LiquidityPoolDepositOp liquidityPoolDepositOp;
             case LIQUIDITY_POOL_WITHDRAW:
                 LiquidityPoolWithdrawOp liquidityPoolWithdrawOp;
+            case INVOKE_HOST_FUNCTION:
+                InvokeHostFunctionOp invokeHostFunctionOp;
             }
     """
 
@@ -112,6 +115,7 @@ class OperationBody:
         set_trust_line_flags_op: SetTrustLineFlagsOp = None,
         liquidity_pool_deposit_op: LiquidityPoolDepositOp = None,
         liquidity_pool_withdraw_op: LiquidityPoolWithdrawOp = None,
+        invoke_host_function_op: InvokeHostFunctionOp = None,
     ) -> None:
         self.type = type
         self.create_account_op = create_account_op
@@ -136,6 +140,7 @@ class OperationBody:
         self.set_trust_line_flags_op = set_trust_line_flags_op
         self.liquidity_pool_deposit_op = liquidity_pool_deposit_op
         self.liquidity_pool_withdraw_op = liquidity_pool_withdraw_op
+        self.invoke_host_function_op = invoke_host_function_op
 
     def pack(self, packer: Packer) -> None:
         self.type.pack(packer)
@@ -255,6 +260,11 @@ class OperationBody:
                 raise ValueError("liquidity_pool_withdraw_op should not be None.")
             self.liquidity_pool_withdraw_op.pack(packer)
             return
+        if self.type == OperationType.INVOKE_HOST_FUNCTION:
+            if self.invoke_host_function_op is None:
+                raise ValueError("invoke_host_function_op should not be None.")
+            self.invoke_host_function_op.pack(packer)
+            return
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "OperationBody":
@@ -344,6 +354,9 @@ class OperationBody:
         if type == OperationType.LIQUIDITY_POOL_WITHDRAW:
             liquidity_pool_withdraw_op = LiquidityPoolWithdrawOp.unpack(unpacker)
             return cls(type=type, liquidity_pool_withdraw_op=liquidity_pool_withdraw_op)
+        if type == OperationType.INVOKE_HOST_FUNCTION:
+            invoke_host_function_op = InvokeHostFunctionOp.unpack(unpacker)
+            return cls(type=type, invoke_host_function_op=invoke_host_function_op)
         return cls(type=type)
 
     def to_xdr_bytes(self) -> bytes:
@@ -395,6 +408,7 @@ class OperationBody:
             and self.set_trust_line_flags_op == other.set_trust_line_flags_op
             and self.liquidity_pool_deposit_op == other.liquidity_pool_deposit_op
             and self.liquidity_pool_withdraw_op == other.liquidity_pool_withdraw_op
+            and self.invoke_host_function_op == other.invoke_host_function_op
         )
 
     def __str__(self):
@@ -466,4 +480,7 @@ class OperationBody:
         out.append(
             f"liquidity_pool_withdraw_op={self.liquidity_pool_withdraw_op}"
         ) if self.liquidity_pool_withdraw_op is not None else None
+        out.append(
+            f"invoke_host_function_op={self.invoke_host_function_op}"
+        ) if self.invoke_host_function_op is not None else None
         return f"<OperationBody [{', '.join(out)}]>"

@@ -25,7 +25,8 @@ class SignerKey:
             /* Hash of random 256 bit preimage X */
             uint256 hashX;
         case SIGNER_KEY_TYPE_ED25519_SIGNED_PAYLOAD:
-            struct {
+            struct
+            {
                 /* Public key that must sign the payload. */
                 uint256 ed25519;
                 /* Payload to be raw signed by ed25519. */

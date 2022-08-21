@@ -16,7 +16,11 @@ class SetTrustLineFlagsResult:
         {
         case SET_TRUST_LINE_FLAGS_SUCCESS:
             void;
-        default:
+        case SET_TRUST_LINE_FLAGS_MALFORMED:
+        case SET_TRUST_LINE_FLAGS_NO_TRUST_LINE:
+        case SET_TRUST_LINE_FLAGS_CANT_REVOKE:
+        case SET_TRUST_LINE_FLAGS_INVALID_STATE:
+        case SET_TRUST_LINE_FLAGS_LOW_RESERVE:
             void;
         };
     """
@@ -31,11 +35,31 @@ class SetTrustLineFlagsResult:
         self.code.pack(packer)
         if self.code == SetTrustLineFlagsResultCode.SET_TRUST_LINE_FLAGS_SUCCESS:
             return
+        if self.code == SetTrustLineFlagsResultCode.SET_TRUST_LINE_FLAGS_MALFORMED:
+            return
+        if self.code == SetTrustLineFlagsResultCode.SET_TRUST_LINE_FLAGS_NO_TRUST_LINE:
+            return
+        if self.code == SetTrustLineFlagsResultCode.SET_TRUST_LINE_FLAGS_CANT_REVOKE:
+            return
+        if self.code == SetTrustLineFlagsResultCode.SET_TRUST_LINE_FLAGS_INVALID_STATE:
+            return
+        if self.code == SetTrustLineFlagsResultCode.SET_TRUST_LINE_FLAGS_LOW_RESERVE:
+            return
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "SetTrustLineFlagsResult":
         code = SetTrustLineFlagsResultCode.unpack(unpacker)
         if code == SetTrustLineFlagsResultCode.SET_TRUST_LINE_FLAGS_SUCCESS:
+            return cls(code=code)
+        if code == SetTrustLineFlagsResultCode.SET_TRUST_LINE_FLAGS_MALFORMED:
+            return cls(code=code)
+        if code == SetTrustLineFlagsResultCode.SET_TRUST_LINE_FLAGS_NO_TRUST_LINE:
+            return cls(code=code)
+        if code == SetTrustLineFlagsResultCode.SET_TRUST_LINE_FLAGS_CANT_REVOKE:
+            return cls(code=code)
+        if code == SetTrustLineFlagsResultCode.SET_TRUST_LINE_FLAGS_INVALID_STATE:
+            return cls(code=code)
+        if code == SetTrustLineFlagsResultCode.SET_TRUST_LINE_FLAGS_LOW_RESERVE:
             return cls(code=code)
         return cls(code=code)
 

@@ -16,7 +16,10 @@ class ManageDataResult:
         {
         case MANAGE_DATA_SUCCESS:
             void;
-        default:
+        case MANAGE_DATA_NOT_SUPPORTED_YET:
+        case MANAGE_DATA_NAME_NOT_FOUND:
+        case MANAGE_DATA_LOW_RESERVE:
+        case MANAGE_DATA_INVALID_NAME:
             void;
         };
     """
@@ -31,11 +34,27 @@ class ManageDataResult:
         self.code.pack(packer)
         if self.code == ManageDataResultCode.MANAGE_DATA_SUCCESS:
             return
+        if self.code == ManageDataResultCode.MANAGE_DATA_NOT_SUPPORTED_YET:
+            return
+        if self.code == ManageDataResultCode.MANAGE_DATA_NAME_NOT_FOUND:
+            return
+        if self.code == ManageDataResultCode.MANAGE_DATA_LOW_RESERVE:
+            return
+        if self.code == ManageDataResultCode.MANAGE_DATA_INVALID_NAME:
+            return
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "ManageDataResult":
         code = ManageDataResultCode.unpack(unpacker)
         if code == ManageDataResultCode.MANAGE_DATA_SUCCESS:
+            return cls(code=code)
+        if code == ManageDataResultCode.MANAGE_DATA_NOT_SUPPORTED_YET:
+            return cls(code=code)
+        if code == ManageDataResultCode.MANAGE_DATA_NAME_NOT_FOUND:
+            return cls(code=code)
+        if code == ManageDataResultCode.MANAGE_DATA_LOW_RESERVE:
+            return cls(code=code)
+        if code == ManageDataResultCode.MANAGE_DATA_INVALID_NAME:
             return cls(code=code)
         return cls(code=code)
 

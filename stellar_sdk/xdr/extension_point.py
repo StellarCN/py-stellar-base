@@ -12,9 +12,10 @@ class ExtensionPoint:
     """
     XDR Source Code::
 
-        union ExtensionPoint switch (int v) {
+        union ExtensionPoint switch (int v)
+        {
         case 0:
-             void;
+            void;
         };
     """
 

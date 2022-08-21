@@ -13,7 +13,8 @@ class OfferEntryFlags(IntEnum):
 
         enum OfferEntryFlags
         {
-            // an offer with this flag will not act on and take a reverse offer of equal price
+            // an offer with this flag will not act on and take a reverse offer of equal
+            // price
             PASSIVE_FLAG = 1
         };
     """

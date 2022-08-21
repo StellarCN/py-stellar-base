@@ -20,7 +20,9 @@ class EnvelopeType(IntEnum):
             ENVELOPE_TYPE_SCPVALUE = 4,
             ENVELOPE_TYPE_TX_FEE_BUMP = 5,
             ENVELOPE_TYPE_OP_ID = 6,
-            ENVELOPE_TYPE_POOL_REVOKE_OP_ID = 7
+            ENVELOPE_TYPE_POOL_REVOKE_OP_ID = 7,
+            ENVELOPE_TYPE_CONTRACT_ID_FROM_ED25519 = 8,
+            ENVELOPE_TYPE_CONTRACT_ID_FROM_CONTRACT = 9
         };
     """
 
@@ -32,6 +34,8 @@ class EnvelopeType(IntEnum):
     ENVELOPE_TYPE_TX_FEE_BUMP = 5
     ENVELOPE_TYPE_OP_ID = 6
     ENVELOPE_TYPE_POOL_REVOKE_OP_ID = 7
+    ENVELOPE_TYPE_CONTRACT_ID_FROM_ED25519 = 8
+    ENVELOPE_TYPE_CONTRACT_ID_FROM_CONTRACT = 9
 
     def pack(self, packer: Packer) -> None:
         packer.pack_int(self.value)

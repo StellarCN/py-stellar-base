@@ -19,7 +19,7 @@ class EndSponsoringFutureReservesResult:
         {
         case END_SPONSORING_FUTURE_RESERVES_SUCCESS:
             void;
-        default:
+        case END_SPONSORING_FUTURE_RESERVES_NOT_SPONSORED:
             void;
         };
     """
@@ -37,6 +37,11 @@ class EndSponsoringFutureReservesResult:
             == EndSponsoringFutureReservesResultCode.END_SPONSORING_FUTURE_RESERVES_SUCCESS
         ):
             return
+        if (
+            self.code
+            == EndSponsoringFutureReservesResultCode.END_SPONSORING_FUTURE_RESERVES_NOT_SPONSORED
+        ):
+            return
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "EndSponsoringFutureReservesResult":
@@ -44,6 +49,11 @@ class EndSponsoringFutureReservesResult:
         if (
             code
             == EndSponsoringFutureReservesResultCode.END_SPONSORING_FUTURE_RESERVES_SUCCESS
+        ):
+            return cls(code=code)
+        if (
+            code
+            == EndSponsoringFutureReservesResultCode.END_SPONSORING_FUTURE_RESERVES_NOT_SPONSORED
         ):
             return cls(code=code)
         return cls(code=code)
