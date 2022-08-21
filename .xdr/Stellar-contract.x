@@ -168,17 +168,17 @@ case SST_OK:
 case SST_UNKNOWN_ERROR:
     SCUnknownErrorCode unknownCode;
 case SST_HOST_VALUE_ERROR:
-    SCHostValErrorCode errorCode;
+    SCHostValErrorCode hostValErrorCode;
 case SST_HOST_OBJECT_ERROR:
-    SCHostObjErrorCode errorCode;
+    SCHostObjErrorCode hostObjErrorCode;
 case SST_HOST_FUNCTION_ERROR:
-    SCHostFnErrorCode errorCode;
+    SCHostFnErrorCode hostFnErrorCode;
 case SST_HOST_STORAGE_ERROR:
-    SCHostStorageErrorCode errorCode;
+    SCHostStorageErrorCode hostStorageErrorCode;
 case SST_HOST_CONTEXT_ERROR:
-    SCHostContextErrorCode errorCode;
+    SCHostContextErrorCode hostContextErrorCode;
 case SST_VM_ERROR:
-    SCVmErrorCode errorCode;
+    SCVmErrorCode vmErrorCode;
 };
 
 union SCVal switch (SCValType type)
