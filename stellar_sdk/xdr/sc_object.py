@@ -6,10 +6,8 @@ from xdrlib import Packer, Unpacker
 from .base import Opaque
 from .constants import *
 from .int64 import Int64
-from .public_key import PublicKey
 from .sc_big_int import SCBigInt
 from .sc_contract_code import SCContractCode
-from .sc_hash import SCHash
 from .sc_map import SCMap
 from .sc_object_type import SCObjectType
 from .sc_vec import SCVec
@@ -36,10 +34,6 @@ class SCObject:
             opaque bin<SCVAL_LIMIT>;
         case SCO_BIG_INT:
             SCBigInt bigInt;
-        case SCO_HASH:
-            SCHash hash;
-        case SCO_PUBLIC_KEY:
-            PublicKey publicKey;
         case SCO_CONTRACT_CODE:
             SCContractCode contractCode;
         };
@@ -54,8 +48,6 @@ class SCObject:
         i64: Int64 = None,
         bin: bytes = None,
         big_int: SCBigInt = None,
-        hash: SCHash = None,
-        public_key: PublicKey = None,
         contract_code: SCContractCode = None,
     ) -> None:
         self.type = type
@@ -65,8 +57,6 @@ class SCObject:
         self.i64 = i64
         self.bin = bin
         self.big_int = big_int
-        self.hash = hash
-        self.public_key = public_key
         self.contract_code = contract_code
 
     def pack(self, packer: Packer) -> None:
@@ -101,16 +91,6 @@ class SCObject:
                 raise ValueError("big_int should not be None.")
             self.big_int.pack(packer)
             return
-        if self.type == SCObjectType.SCO_HASH:
-            if self.hash is None:
-                raise ValueError("hash should not be None.")
-            self.hash.pack(packer)
-            return
-        if self.type == SCObjectType.SCO_PUBLIC_KEY:
-            if self.public_key is None:
-                raise ValueError("public_key should not be None.")
-            self.public_key.pack(packer)
-            return
         if self.type == SCObjectType.SCO_CONTRACT_CODE:
             if self.contract_code is None:
                 raise ValueError("contract_code should not be None.")
@@ -138,12 +118,6 @@ class SCObject:
         if type == SCObjectType.SCO_BIG_INT:
             big_int = SCBigInt.unpack(unpacker)
             return cls(type=type, big_int=big_int)
-        if type == SCObjectType.SCO_HASH:
-            hash = SCHash.unpack(unpacker)
-            return cls(type=type, hash=hash)
-        if type == SCObjectType.SCO_PUBLIC_KEY:
-            public_key = PublicKey.unpack(unpacker)
-            return cls(type=type, public_key=public_key)
         if type == SCObjectType.SCO_CONTRACT_CODE:
             contract_code = SCContractCode.unpack(unpacker)
             return cls(type=type, contract_code=contract_code)
@@ -179,8 +153,6 @@ class SCObject:
             and self.i64 == other.i64
             and self.bin == other.bin
             and self.big_int == other.big_int
-            and self.hash == other.hash
-            and self.public_key == other.public_key
             and self.contract_code == other.contract_code
         )
 
@@ -193,10 +165,6 @@ class SCObject:
         out.append(f"i64={self.i64}") if self.i64 is not None else None
         out.append(f"bin={self.bin}") if self.bin is not None else None
         out.append(f"big_int={self.big_int}") if self.big_int is not None else None
-        out.append(f"hash={self.hash}") if self.hash is not None else None
-        out.append(
-            f"public_key={self.public_key}"
-        ) if self.public_key is not None else None
         out.append(
             f"contract_code={self.contract_code}"
         ) if self.contract_code is not None else None

@@ -3,35 +3,42 @@
 import base64
 from xdrlib import Packer, Unpacker
 
-from .base import Integer
+from .base import String
+from .sc_spec_type_def import SCSpecTypeDef
 
-__all__ = ["Auth"]
+__all__ = ["SCSpecFunctionInputV0"]
 
 
-class Auth:
+class SCSpecFunctionInputV0:
     """
     XDR Source Code::
 
-        struct Auth
+        struct SCSpecFunctionInputV0
         {
-            int flags;
+            string name<30>;
+            SCSpecTypeDef type;
         };
     """
 
     def __init__(
         self,
-        flags: int,
+        name: bytes,
+        type: SCSpecTypeDef,
     ) -> None:
-        self.flags = flags
+        self.name = name
+        self.type = type
 
     def pack(self, packer: Packer) -> None:
-        Integer(self.flags).pack(packer)
+        String(self.name, 30).pack(packer)
+        self.type.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "Auth":
-        flags = Integer.unpack(unpacker)
+    def unpack(cls, unpacker: Unpacker) -> "SCSpecFunctionInputV0":
+        name = String.unpack(unpacker)
+        type = SCSpecTypeDef.unpack(unpacker)
         return cls(
-            flags=flags,
+            name=name,
+            type=type,
         )
 
     def to_xdr_bytes(self) -> bytes:
@@ -40,7 +47,7 @@ class Auth:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "Auth":
+    def from_xdr_bytes(cls, xdr: bytes) -> "SCSpecFunctionInputV0":
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -49,17 +56,18 @@ class Auth:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "Auth":
+    def from_xdr(cls, xdr: str) -> "SCSpecFunctionInputV0":
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented
-        return self.flags == other.flags
+        return self.name == other.name and self.type == other.type
 
     def __str__(self):
         out = [
-            f"flags={self.flags}",
+            f"name={self.name}",
+            f"type={self.type}",
         ]
-        return f"<Auth [{', '.join(out)}]>"
+        return f"<SCSpecFunctionInputV0 [{', '.join(out)}]>"

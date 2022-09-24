@@ -9,6 +9,7 @@ from xdrlib import Packer, Unpacker
 from .sc_spec_type import SCSpecType
 
 if typing.TYPE_CHECKING:
+    from .sc_spec_type_bytes_n import SCSpecTypeBytesN
     from .sc_spec_type_map import SCSpecTypeMap
     from .sc_spec_type_option import SCSpecTypeOption
     from .sc_spec_type_result import SCSpecTypeResult
@@ -26,6 +27,7 @@ class SCSpecTypeDef:
 
         union SCSpecTypeDef switch (SCSpecType type)
         {
+        case SC_SPEC_TYPE_VAL:
         case SC_SPEC_TYPE_U64:
         case SC_SPEC_TYPE_I64:
         case SC_SPEC_TYPE_U32:
@@ -49,6 +51,8 @@ class SCSpecTypeDef:
             SCSpecTypeSet set;
         case SC_SPEC_TYPE_TUPLE:
             SCSpecTypeTuple tuple;
+        case SC_SPEC_TYPE_BYTES_N:
+            SCSpecTypeBytesN bytesN;
         case SC_SPEC_TYPE_UDT:
             SCSpecTypeUDT udt;
         };
@@ -63,6 +67,7 @@ class SCSpecTypeDef:
         map: "SCSpecTypeMap" = None,
         set: "SCSpecTypeSet" = None,
         tuple: "SCSpecTypeTuple" = None,
+        bytes_n: "SCSpecTypeBytesN" = None,
         udt: "SCSpecTypeUDT" = None,
     ) -> None:
         self.type = type
@@ -72,10 +77,13 @@ class SCSpecTypeDef:
         self.map = map
         self.set = set
         self.tuple = tuple
+        self.bytes_n = bytes_n
         self.udt = udt
 
     def pack(self, packer: Packer) -> None:
         self.type.pack(packer)
+        if self.type == SCSpecType.SC_SPEC_TYPE_VAL:
+            return
         if self.type == SCSpecType.SC_SPEC_TYPE_U64:
             return
         if self.type == SCSpecType.SC_SPEC_TYPE_I64:
@@ -126,6 +134,11 @@ class SCSpecTypeDef:
                 raise ValueError("tuple should not be None.")
             self.tuple.pack(packer)
             return
+        if self.type == SCSpecType.SC_SPEC_TYPE_BYTES_N:
+            if self.bytes_n is None:
+                raise ValueError("bytes_n should not be None.")
+            self.bytes_n.pack(packer)
+            return
         if self.type == SCSpecType.SC_SPEC_TYPE_UDT:
             if self.udt is None:
                 raise ValueError("udt should not be None.")
@@ -135,6 +148,8 @@ class SCSpecTypeDef:
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "SCSpecTypeDef":
         type = SCSpecType.unpack(unpacker)
+        if type == SCSpecType.SC_SPEC_TYPE_VAL:
+            return cls(type=type)
         if type == SCSpecType.SC_SPEC_TYPE_U64:
             return cls(type=type)
         if type == SCSpecType.SC_SPEC_TYPE_I64:
@@ -185,6 +200,11 @@ class SCSpecTypeDef:
 
             tuple = SCSpecTypeTuple.unpack(unpacker)
             return cls(type=type, tuple=tuple)
+        if type == SCSpecType.SC_SPEC_TYPE_BYTES_N:
+            from .sc_spec_type_bytes_n import SCSpecTypeBytesN
+
+            bytes_n = SCSpecTypeBytesN.unpack(unpacker)
+            return cls(type=type, bytes_n=bytes_n)
         if type == SCSpecType.SC_SPEC_TYPE_UDT:
             from .sc_spec_type_udt import SCSpecTypeUDT
 
@@ -222,6 +242,7 @@ class SCSpecTypeDef:
             and self.map == other.map
             and self.set == other.set
             and self.tuple == other.tuple
+            and self.bytes_n == other.bytes_n
             and self.udt == other.udt
         )
 
@@ -234,5 +255,6 @@ class SCSpecTypeDef:
         out.append(f"map={self.map}") if self.map is not None else None
         out.append(f"set={self.set}") if self.set is not None else None
         out.append(f"tuple={self.tuple}") if self.tuple is not None else None
+        out.append(f"bytes_n={self.bytes_n}") if self.bytes_n is not None else None
         out.append(f"udt={self.udt}") if self.udt is not None else None
         return f"<SCSpecTypeDef [{', '.join(out)}]>"

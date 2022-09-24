@@ -7,6 +7,8 @@ from xdrlib import Packer, Unpacker
 from .auth import Auth
 from .dont_have import DontHave
 from .error import Error
+from .flood_advert import FloodAdvert
+from .flood_demand import FloodDemand
 from .generalized_transaction_set import GeneralizedTransactionSet
 from .hello import Hello
 from .message_type import MessageType
@@ -70,6 +72,12 @@ class StellarMessage:
             uint32 getSCPLedgerSeq; // ledger seq requested ; if 0, requests the latest
         case SEND_MORE:
             SendMore sendMoreMessage;
+
+        // Pull mode
+        case FLOOD_ADVERT:
+            FloodAdvert floodAdvert;
+        case FLOOD_DEMAND:
+            FloodDemand floodDemand;
         };
     """
 
@@ -92,6 +100,8 @@ class StellarMessage:
         envelope: SCPEnvelope = None,
         get_scp_ledger_seq: Uint32 = None,
         send_more_message: SendMore = None,
+        flood_advert: FloodAdvert = None,
+        flood_demand: FloodDemand = None,
     ) -> None:
         _expect_max_length = 100
         if peers and len(peers) > _expect_max_length:
@@ -115,6 +125,8 @@ class StellarMessage:
         self.envelope = envelope
         self.get_scp_ledger_seq = get_scp_ledger_seq
         self.send_more_message = send_more_message
+        self.flood_advert = flood_advert
+        self.flood_demand = flood_demand
 
     def pack(self, packer: Packer) -> None:
         self.type.pack(packer)
@@ -202,6 +214,16 @@ class StellarMessage:
                 raise ValueError("send_more_message should not be None.")
             self.send_more_message.pack(packer)
             return
+        if self.type == MessageType.FLOOD_ADVERT:
+            if self.flood_advert is None:
+                raise ValueError("flood_advert should not be None.")
+            self.flood_advert.pack(packer)
+            return
+        if self.type == MessageType.FLOOD_DEMAND:
+            if self.flood_demand is None:
+                raise ValueError("flood_demand should not be None.")
+            self.flood_demand.pack(packer)
+            return
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "StellarMessage":
@@ -265,6 +287,12 @@ class StellarMessage:
         if type == MessageType.SEND_MORE:
             send_more_message = SendMore.unpack(unpacker)
             return cls(type=type, send_more_message=send_more_message)
+        if type == MessageType.FLOOD_ADVERT:
+            flood_advert = FloodAdvert.unpack(unpacker)
+            return cls(type=type, flood_advert=flood_advert)
+        if type == MessageType.FLOOD_DEMAND:
+            flood_demand = FloodDemand.unpack(unpacker)
+            return cls(type=type, flood_demand=flood_demand)
         return cls(type=type)
 
     def to_xdr_bytes(self) -> bytes:
@@ -309,6 +337,8 @@ class StellarMessage:
             and self.envelope == other.envelope
             and self.get_scp_ledger_seq == other.get_scp_ledger_seq
             and self.send_more_message == other.send_more_message
+            and self.flood_advert == other.flood_advert
+            and self.flood_demand == other.flood_demand
         )
 
     def __str__(self):
@@ -348,4 +378,10 @@ class StellarMessage:
         out.append(
             f"send_more_message={self.send_more_message}"
         ) if self.send_more_message is not None else None
+        out.append(
+            f"flood_advert={self.flood_advert}"
+        ) if self.flood_advert is not None else None
+        out.append(
+            f"flood_demand={self.flood_demand}"
+        ) if self.flood_demand is not None else None
         return f"<StellarMessage [{', '.join(out)}]>"

@@ -3,35 +3,35 @@
 import base64
 from xdrlib import Packer, Unpacker
 
-from .base import Integer
+from .tx_demand_vector import TxDemandVector
 
-__all__ = ["Auth"]
+__all__ = ["FloodDemand"]
 
 
-class Auth:
+class FloodDemand:
     """
     XDR Source Code::
 
-        struct Auth
+        struct FloodDemand
         {
-            int flags;
+            TxDemandVector txHashes;
         };
     """
 
     def __init__(
         self,
-        flags: int,
+        tx_hashes: TxDemandVector,
     ) -> None:
-        self.flags = flags
+        self.tx_hashes = tx_hashes
 
     def pack(self, packer: Packer) -> None:
-        Integer(self.flags).pack(packer)
+        self.tx_hashes.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "Auth":
-        flags = Integer.unpack(unpacker)
+    def unpack(cls, unpacker: Unpacker) -> "FloodDemand":
+        tx_hashes = TxDemandVector.unpack(unpacker)
         return cls(
-            flags=flags,
+            tx_hashes=tx_hashes,
         )
 
     def to_xdr_bytes(self) -> bytes:
@@ -40,7 +40,7 @@ class Auth:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "Auth":
+    def from_xdr_bytes(cls, xdr: bytes) -> "FloodDemand":
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -49,17 +49,17 @@ class Auth:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "Auth":
+    def from_xdr(cls, xdr: str) -> "FloodDemand":
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented
-        return self.flags == other.flags
+        return self.tx_hashes == other.tx_hashes
 
     def __str__(self):
         out = [
-            f"flags={self.flags}",
+            f"tx_hashes={self.tx_hashes}",
         ]
-        return f"<Auth [{', '.join(out)}]>"
+        return f"<FloodDemand [{', '.join(out)}]>"

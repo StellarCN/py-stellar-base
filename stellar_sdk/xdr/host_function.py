@@ -14,12 +14,14 @@ class HostFunction(IntEnum):
         enum HostFunction
         {
             HOST_FN_CALL = 0,
-            HOST_FN_CREATE_CONTRACT = 1
+            HOST_FN_CREATE_CONTRACT_WITH_ED25519 = 1,
+            HOST_FN_CREATE_CONTRACT_WITH_SOURCE = 2
         };
     """
 
     HOST_FN_CALL = 0
-    HOST_FN_CREATE_CONTRACT = 1
+    HOST_FN_CREATE_CONTRACT_WITH_ED25519 = 1
+    HOST_FN_CREATE_CONTRACT_WITH_SOURCE = 2
 
     def pack(self, packer: Packer) -> None:
         packer.pack_int(self.value)

@@ -77,6 +77,10 @@ from .config_setting_id import ConfigSettingID
 from .config_setting_type import ConfigSettingType
 from .constants import *
 from .contract_data_entry import ContractDataEntry
+from .contract_event import ContractEvent
+from .contract_event_body import ContractEventBody
+from .contract_event_type import ContractEventType
+from .contract_event_v0 import ContractEventV0
 from .create_account_op import CreateAccountOp
 from .create_account_result import CreateAccountResult
 from .create_account_result_code import CreateAccountResultCode
@@ -106,6 +110,8 @@ from .fee_bump_transaction import FeeBumpTransaction
 from .fee_bump_transaction_envelope import FeeBumpTransactionEnvelope
 from .fee_bump_transaction_ext import FeeBumpTransactionExt
 from .fee_bump_transaction_inner_tx import FeeBumpTransactionInnerTx
+from .flood_advert import FloodAdvert
+from .flood_demand import FloodDemand
 from .generalized_transaction_set import GeneralizedTransactionSet
 from .hash import Hash
 from .hash_id_preimage import HashIDPreimage
@@ -113,6 +119,7 @@ from .hash_id_preimage_contract_id import HashIDPreimageContractID
 from .hash_id_preimage_ed25519_contract_id import HashIDPreimageEd25519ContractID
 from .hash_id_preimage_operation_id import HashIDPreimageOperationID
 from .hash_id_preimage_revoke_id import HashIDPreimageRevokeID
+from .hash_id_preimage_source_contract_id import HashIDPreimageSourceContractID
 from .hello import Hello
 from .hmac_sha256_key import HmacSha256Key
 from .hmac_sha256_mac import HmacSha256Mac
@@ -134,6 +141,7 @@ from .ledger_bounds import LedgerBounds
 from .ledger_close_meta import LedgerCloseMeta
 from .ledger_close_meta_v0 import LedgerCloseMetaV0
 from .ledger_close_meta_v1 import LedgerCloseMetaV1
+from .ledger_close_meta_v2 import LedgerCloseMetaV2
 from .ledger_close_value_signature import LedgerCloseValueSignature
 from .ledger_entry import LedgerEntry
 from .ledger_entry_change import LedgerEntryChange
@@ -225,6 +233,9 @@ from .peer_address import PeerAddress
 from .peer_address_ip import PeerAddressIp
 from .peer_stat_list import PeerStatList
 from .peer_stats import PeerStats
+from .persisted_scp_state import PersistedSCPState
+from .persisted_scp_state_v0 import PersistedSCPStateV0
+from .persisted_scp_state_v1 import PersistedSCPStateV1
 from .pool_id import PoolID
 from .precondition_type import PreconditionType
 from .preconditions import Preconditions
@@ -242,8 +253,6 @@ from .sc_contract_code import SCContractCode
 from .sc_contract_code_type import SCContractCodeType
 from .sc_env_meta_entry import SCEnvMetaEntry
 from .sc_env_meta_kind import SCEnvMetaKind
-from .sc_hash import SCHash
-from .sc_hash_type import SCHashType
 from .sc_host_context_error_code import SCHostContextErrorCode
 from .sc_host_fn_error_code import SCHostFnErrorCode
 from .sc_host_obj_error_code import SCHostObjErrorCode
@@ -256,8 +265,10 @@ from .sc_object import SCObject
 from .sc_object_type import SCObjectType
 from .sc_spec_entry import SCSpecEntry
 from .sc_spec_entry_kind import SCSpecEntryKind
+from .sc_spec_function_input_v0 import SCSpecFunctionInputV0
 from .sc_spec_function_v0 import SCSpecFunctionV0
 from .sc_spec_type import SCSpecType
+from .sc_spec_type_bytes_n import SCSpecTypeBytesN
 from .sc_spec_type_def import SCSpecTypeDef
 from .sc_spec_type_map import SCSpecTypeMap
 from .sc_spec_type_option import SCSpecTypeOption
@@ -266,6 +277,10 @@ from .sc_spec_type_set import SCSpecTypeSet
 from .sc_spec_type_tuple import SCSpecTypeTuple
 from .sc_spec_type_udt import SCSpecTypeUDT
 from .sc_spec_type_vec import SCSpecTypeVec
+from .sc_spec_udt_enum_case_v0 import SCSpecUDTEnumCaseV0
+from .sc_spec_udt_enum_v0 import SCSpecUDTEnumV0
+from .sc_spec_udt_error_enum_case_v0 import SCSpecUDTErrorEnumCaseV0
+from .sc_spec_udt_error_enum_v0 import SCSpecUDTErrorEnumV0
 from .sc_spec_udt_struct_field_v0 import SCSpecUDTStructFieldV0
 from .sc_spec_udt_struct_v0 import SCSpecUDTStructV0
 from .sc_spec_udt_union_case_v0 import SCSpecUDTUnionCaseV0
@@ -313,6 +328,7 @@ from .stellar_message import StellarMessage
 from .stellar_value import StellarValue
 from .stellar_value_ext import StellarValueExt
 from .stellar_value_type import StellarValueType
+from .stored_transaction_set import StoredTransactionSet
 from .string32 import String32
 from .string64 import String64
 from .survey_message_command_type import SurveyMessageCommandType
@@ -331,17 +347,23 @@ from .transaction_history_entry import TransactionHistoryEntry
 from .transaction_history_entry_ext import TransactionHistoryEntryExt
 from .transaction_history_result_entry import TransactionHistoryResultEntry
 from .transaction_history_result_entry_ext import TransactionHistoryResultEntryExt
+from .transaction_history_result_entry_v2 import TransactionHistoryResultEntryV2
+from .transaction_history_result_entry_v2_ext import TransactionHistoryResultEntryV2Ext
 from .transaction_meta import TransactionMeta
 from .transaction_meta_v1 import TransactionMetaV1
 from .transaction_meta_v2 import TransactionMetaV2
+from .transaction_meta_v3 import TransactionMetaV3
 from .transaction_phase import TransactionPhase
 from .transaction_result import TransactionResult
 from .transaction_result_code import TransactionResultCode
 from .transaction_result_ext import TransactionResultExt
 from .transaction_result_meta import TransactionResultMeta
+from .transaction_result_meta_v2 import TransactionResultMetaV2
 from .transaction_result_pair import TransactionResultPair
+from .transaction_result_pair_v2 import TransactionResultPairV2
 from .transaction_result_result import TransactionResultResult
 from .transaction_result_set import TransactionResultSet
+from .transaction_result_set_v2 import TransactionResultSetV2
 from .transaction_set import TransactionSet
 from .transaction_set_v1 import TransactionSetV1
 from .transaction_signature_payload import TransactionSignaturePayload
@@ -360,6 +382,8 @@ from .trust_line_entry_extension_v2_ext import TrustLineEntryExtensionV2Ext
 from .trust_line_entry_v1 import TrustLineEntryV1
 from .trust_line_entry_v1_ext import TrustLineEntryV1Ext
 from .trust_line_flags import TrustLineFlags
+from .tx_advert_vector import TxAdvertVector
+from .tx_demand_vector import TxDemandVector
 from .tx_set_component import TxSetComponent
 from .tx_set_component_txs_maybe_discounted_fee import (
     TxSetComponentTxsMaybeDiscountedFee,

@@ -5,20 +5,20 @@ from typing import List
 from xdrlib import Packer, Unpacker
 
 from .base import String
-from .sc_spec_udt_union_case_v0 import SCSpecUDTUnionCaseV0
+from .sc_spec_udt_error_enum_case_v0 import SCSpecUDTErrorEnumCaseV0
 
-__all__ = ["SCSpecUDTUnionV0"]
+__all__ = ["SCSpecUDTErrorEnumV0"]
 
 
-class SCSpecUDTUnionV0:
+class SCSpecUDTErrorEnumV0:
     """
     XDR Source Code::
 
-        struct SCSpecUDTUnionV0
+        struct SCSpecUDTErrorEnumV0
         {
             string lib<80>;
             string name<60>;
-            SCSpecUDTUnionCaseV0 cases<50>;
+            SCSpecUDTErrorEnumCaseV0 cases<50>;
         };
     """
 
@@ -26,7 +26,7 @@ class SCSpecUDTUnionV0:
         self,
         lib: bytes,
         name: bytes,
-        cases: List[SCSpecUDTUnionCaseV0],
+        cases: List[SCSpecUDTErrorEnumCaseV0],
     ) -> None:
         _expect_max_length = 50
         if cases and len(cases) > _expect_max_length:
@@ -45,13 +45,13 @@ class SCSpecUDTUnionV0:
             cases_item.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "SCSpecUDTUnionV0":
+    def unpack(cls, unpacker: Unpacker) -> "SCSpecUDTErrorEnumV0":
         lib = String.unpack(unpacker)
         name = String.unpack(unpacker)
         length = unpacker.unpack_uint()
         cases = []
         for _ in range(length):
-            cases.append(SCSpecUDTUnionCaseV0.unpack(unpacker))
+            cases.append(SCSpecUDTErrorEnumCaseV0.unpack(unpacker))
         return cls(
             lib=lib,
             name=name,
@@ -64,7 +64,7 @@ class SCSpecUDTUnionV0:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "SCSpecUDTUnionV0":
+    def from_xdr_bytes(cls, xdr: bytes) -> "SCSpecUDTErrorEnumV0":
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -73,7 +73,7 @@ class SCSpecUDTUnionV0:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "SCSpecUDTUnionV0":
+    def from_xdr(cls, xdr: str) -> "SCSpecUDTErrorEnumV0":
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
 
@@ -92,4 +92,4 @@ class SCSpecUDTUnionV0:
             f"name={self.name}",
             f"cases={self.cases}",
         ]
-        return f"<SCSpecUDTUnionV0 [{', '.join(out)}]>"
+        return f"<SCSpecUDTErrorEnumV0 [{', '.join(out)}]>"

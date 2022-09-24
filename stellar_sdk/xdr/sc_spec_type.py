@@ -13,6 +13,8 @@ class SCSpecType(IntEnum):
 
         enum SCSpecType
         {
+            SC_SPEC_TYPE_VAL = 0,
+
             // Types with no parameters.
             SC_SPEC_TYPE_U32 = 1,
             SC_SPEC_TYPE_I32 = 2,
@@ -32,12 +34,14 @@ class SCSpecType(IntEnum):
             SC_SPEC_TYPE_SET = 1003,
             SC_SPEC_TYPE_MAP = 1004,
             SC_SPEC_TYPE_TUPLE = 1005,
+            SC_SPEC_TYPE_BYTES_N = 1006,
 
             // User defined types.
             SC_SPEC_TYPE_UDT = 2000
         };
     """
 
+    SC_SPEC_TYPE_VAL = 0
     SC_SPEC_TYPE_U32 = 1
     SC_SPEC_TYPE_I32 = 2
     SC_SPEC_TYPE_U64 = 3
@@ -54,6 +58,7 @@ class SCSpecType(IntEnum):
     SC_SPEC_TYPE_SET = 1003
     SC_SPEC_TYPE_MAP = 1004
     SC_SPEC_TYPE_TUPLE = 1005
+    SC_SPEC_TYPE_BYTES_N = 1006
     SC_SPEC_TYPE_UDT = 2000
 
     def pack(self, packer: Packer) -> None:

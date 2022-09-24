@@ -20,7 +20,8 @@ class SCStatusType(IntEnum):
             SST_HOST_FUNCTION_ERROR = 4,
             SST_HOST_STORAGE_ERROR = 5,
             SST_HOST_CONTEXT_ERROR = 6,
-            SST_VM_ERROR = 7
+            SST_VM_ERROR = 7,
+            SST_CONTRACT_ERROR = 8
             // TODO: add more
         };
     """
@@ -33,6 +34,7 @@ class SCStatusType(IntEnum):
     SST_HOST_STORAGE_ERROR = 5
     SST_HOST_CONTEXT_ERROR = 6
     SST_VM_ERROR = 7
+    SST_CONTRACT_ERROR = 8
 
     def pack(self, packer: Packer) -> None:
         packer.pack_int(self.value)

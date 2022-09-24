@@ -3,35 +3,35 @@
 import base64
 from xdrlib import Packer, Unpacker
 
-from .base import Integer
+from .uint32 import Uint32
 
-__all__ = ["Auth"]
+__all__ = ["SCSpecTypeBytesN"]
 
 
-class Auth:
+class SCSpecTypeBytesN:
     """
     XDR Source Code::
 
-        struct Auth
+        struct SCSpecTypeBytesN
         {
-            int flags;
+            uint32 n;
         };
     """
 
     def __init__(
         self,
-        flags: int,
+        n: Uint32,
     ) -> None:
-        self.flags = flags
+        self.n = n
 
     def pack(self, packer: Packer) -> None:
-        Integer(self.flags).pack(packer)
+        self.n.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "Auth":
-        flags = Integer.unpack(unpacker)
+    def unpack(cls, unpacker: Unpacker) -> "SCSpecTypeBytesN":
+        n = Uint32.unpack(unpacker)
         return cls(
-            flags=flags,
+            n=n,
         )
 
     def to_xdr_bytes(self) -> bytes:
@@ -40,7 +40,7 @@ class Auth:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "Auth":
+    def from_xdr_bytes(cls, xdr: bytes) -> "SCSpecTypeBytesN":
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -49,17 +49,17 @@ class Auth:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "Auth":
+    def from_xdr(cls, xdr: str) -> "SCSpecTypeBytesN":
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented
-        return self.flags == other.flags
+        return self.n == other.n
 
     def __str__(self):
         out = [
-            f"flags={self.flags}",
+            f"n={self.n}",
         ]
-        return f"<Auth [{', '.join(out)}]>"
+        return f"<SCSpecTypeBytesN [{', '.join(out)}]>"

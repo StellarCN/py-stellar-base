@@ -5,6 +5,8 @@ from xdrlib import Packer, Unpacker
 
 from .sc_spec_entry_kind import SCSpecEntryKind
 from .sc_spec_function_v0 import SCSpecFunctionV0
+from .sc_spec_udt_enum_v0 import SCSpecUDTEnumV0
+from .sc_spec_udt_error_enum_v0 import SCSpecUDTErrorEnumV0
 from .sc_spec_udt_struct_v0 import SCSpecUDTStructV0
 from .sc_spec_udt_union_v0 import SCSpecUDTUnionV0
 
@@ -23,6 +25,10 @@ class SCSpecEntry:
             SCSpecUDTStructV0 udtStructV0;
         case SC_SPEC_ENTRY_UDT_UNION_V0:
             SCSpecUDTUnionV0 udtUnionV0;
+        case SC_SPEC_ENTRY_UDT_ENUM_V0:
+            SCSpecUDTEnumV0 udtEnumV0;
+        case SC_SPEC_ENTRY_UDT_ERROR_ENUM_V0:
+            SCSpecUDTErrorEnumV0 udtErrorEnumV0;
         };
     """
 
@@ -32,11 +38,15 @@ class SCSpecEntry:
         function_v0: SCSpecFunctionV0 = None,
         udt_struct_v0: SCSpecUDTStructV0 = None,
         udt_union_v0: SCSpecUDTUnionV0 = None,
+        udt_enum_v0: SCSpecUDTEnumV0 = None,
+        udt_error_enum_v0: SCSpecUDTErrorEnumV0 = None,
     ) -> None:
         self.kind = kind
         self.function_v0 = function_v0
         self.udt_struct_v0 = udt_struct_v0
         self.udt_union_v0 = udt_union_v0
+        self.udt_enum_v0 = udt_enum_v0
+        self.udt_error_enum_v0 = udt_error_enum_v0
 
     def pack(self, packer: Packer) -> None:
         self.kind.pack(packer)
@@ -55,6 +65,16 @@ class SCSpecEntry:
                 raise ValueError("udt_union_v0 should not be None.")
             self.udt_union_v0.pack(packer)
             return
+        if self.kind == SCSpecEntryKind.SC_SPEC_ENTRY_UDT_ENUM_V0:
+            if self.udt_enum_v0 is None:
+                raise ValueError("udt_enum_v0 should not be None.")
+            self.udt_enum_v0.pack(packer)
+            return
+        if self.kind == SCSpecEntryKind.SC_SPEC_ENTRY_UDT_ERROR_ENUM_V0:
+            if self.udt_error_enum_v0 is None:
+                raise ValueError("udt_error_enum_v0 should not be None.")
+            self.udt_error_enum_v0.pack(packer)
+            return
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "SCSpecEntry":
@@ -68,6 +88,12 @@ class SCSpecEntry:
         if kind == SCSpecEntryKind.SC_SPEC_ENTRY_UDT_UNION_V0:
             udt_union_v0 = SCSpecUDTUnionV0.unpack(unpacker)
             return cls(kind=kind, udt_union_v0=udt_union_v0)
+        if kind == SCSpecEntryKind.SC_SPEC_ENTRY_UDT_ENUM_V0:
+            udt_enum_v0 = SCSpecUDTEnumV0.unpack(unpacker)
+            return cls(kind=kind, udt_enum_v0=udt_enum_v0)
+        if kind == SCSpecEntryKind.SC_SPEC_ENTRY_UDT_ERROR_ENUM_V0:
+            udt_error_enum_v0 = SCSpecUDTErrorEnumV0.unpack(unpacker)
+            return cls(kind=kind, udt_error_enum_v0=udt_error_enum_v0)
         return cls(kind=kind)
 
     def to_xdr_bytes(self) -> bytes:
@@ -97,6 +123,8 @@ class SCSpecEntry:
             and self.function_v0 == other.function_v0
             and self.udt_struct_v0 == other.udt_struct_v0
             and self.udt_union_v0 == other.udt_union_v0
+            and self.udt_enum_v0 == other.udt_enum_v0
+            and self.udt_error_enum_v0 == other.udt_error_enum_v0
         )
 
     def __str__(self):
@@ -111,4 +139,10 @@ class SCSpecEntry:
         out.append(
             f"udt_union_v0={self.udt_union_v0}"
         ) if self.udt_union_v0 is not None else None
+        out.append(
+            f"udt_enum_v0={self.udt_enum_v0}"
+        ) if self.udt_enum_v0 is not None else None
+        out.append(
+            f"udt_error_enum_v0={self.udt_error_enum_v0}"
+        ) if self.udt_error_enum_v0 is not None else None
         return f"<SCSpecEntry [{', '.join(out)}]>"

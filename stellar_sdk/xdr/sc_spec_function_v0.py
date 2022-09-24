@@ -4,6 +4,7 @@ import base64
 from typing import List
 from xdrlib import Packer, Unpacker
 
+from .sc_spec_function_input_v0 import SCSpecFunctionInputV0
 from .sc_spec_type_def import SCSpecTypeDef
 from .sc_symbol import SCSymbol
 
@@ -17,55 +18,55 @@ class SCSpecFunctionV0:
         struct SCSpecFunctionV0
         {
             SCSymbol name;
-            SCSpecTypeDef inputTypes<10>;
-            SCSpecTypeDef outputTypes<1>;
+            SCSpecFunctionInputV0 inputs<10>;
+            SCSpecTypeDef outputs<1>;
         };
     """
 
     def __init__(
         self,
         name: SCSymbol,
-        input_types: List[SCSpecTypeDef],
-        output_types: List[SCSpecTypeDef],
+        inputs: List[SCSpecFunctionInputV0],
+        outputs: List[SCSpecTypeDef],
     ) -> None:
         _expect_max_length = 10
-        if input_types and len(input_types) > _expect_max_length:
+        if inputs and len(inputs) > _expect_max_length:
             raise ValueError(
-                f"The maximum length of `input_types` should be {_expect_max_length}, but got {len(input_types)}."
+                f"The maximum length of `inputs` should be {_expect_max_length}, but got {len(inputs)}."
             )
         _expect_max_length = 1
-        if output_types and len(output_types) > _expect_max_length:
+        if outputs and len(outputs) > _expect_max_length:
             raise ValueError(
-                f"The maximum length of `output_types` should be {_expect_max_length}, but got {len(output_types)}."
+                f"The maximum length of `outputs` should be {_expect_max_length}, but got {len(outputs)}."
             )
         self.name = name
-        self.input_types = input_types
-        self.output_types = output_types
+        self.inputs = inputs
+        self.outputs = outputs
 
     def pack(self, packer: Packer) -> None:
         self.name.pack(packer)
-        packer.pack_uint(len(self.input_types))
-        for input_types_item in self.input_types:
-            input_types_item.pack(packer)
-        packer.pack_uint(len(self.output_types))
-        for output_types_item in self.output_types:
-            output_types_item.pack(packer)
+        packer.pack_uint(len(self.inputs))
+        for inputs_item in self.inputs:
+            inputs_item.pack(packer)
+        packer.pack_uint(len(self.outputs))
+        for outputs_item in self.outputs:
+            outputs_item.pack(packer)
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "SCSpecFunctionV0":
         name = SCSymbol.unpack(unpacker)
         length = unpacker.unpack_uint()
-        input_types = []
+        inputs = []
         for _ in range(length):
-            input_types.append(SCSpecTypeDef.unpack(unpacker))
+            inputs.append(SCSpecFunctionInputV0.unpack(unpacker))
         length = unpacker.unpack_uint()
-        output_types = []
+        outputs = []
         for _ in range(length):
-            output_types.append(SCSpecTypeDef.unpack(unpacker))
+            outputs.append(SCSpecTypeDef.unpack(unpacker))
         return cls(
             name=name,
-            input_types=input_types,
-            output_types=output_types,
+            inputs=inputs,
+            outputs=outputs,
         )
 
     def to_xdr_bytes(self) -> bytes:
@@ -92,14 +93,14 @@ class SCSpecFunctionV0:
             return NotImplemented
         return (
             self.name == other.name
-            and self.input_types == other.input_types
-            and self.output_types == other.output_types
+            and self.inputs == other.inputs
+            and self.outputs == other.outputs
         )
 
     def __str__(self):
         out = [
             f"name={self.name}",
-            f"input_types={self.input_types}",
-            f"output_types={self.output_types}",
+            f"inputs={self.inputs}",
+            f"outputs={self.outputs}",
         ]
         return f"<SCSpecFunctionV0 [{', '.join(out)}]>"

@@ -38,7 +38,9 @@ class MessageType(IntEnum):
             SURVEY_REQUEST = 14,
             SURVEY_RESPONSE = 15,
 
-            SEND_MORE = 16
+            SEND_MORE = 16,
+            FLOOD_ADVERT = 18,
+            FLOOD_DEMAND = 19
         };
     """
 
@@ -59,6 +61,8 @@ class MessageType(IntEnum):
     SURVEY_REQUEST = 14
     SURVEY_RESPONSE = 15
     SEND_MORE = 16
+    FLOOD_ADVERT = 18
+    FLOOD_DEMAND = 19
 
     def pack(self, packer: Packer) -> None:
         packer.pack_int(self.value)

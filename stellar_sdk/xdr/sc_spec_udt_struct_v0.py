@@ -16,6 +16,7 @@ class SCSpecUDTStructV0:
 
         struct SCSpecUDTStructV0
         {
+            string lib<80>;
             string name<60>;
             SCSpecUDTStructFieldV0 fields<40>;
         };
@@ -23,6 +24,7 @@ class SCSpecUDTStructV0:
 
     def __init__(
         self,
+        lib: bytes,
         name: bytes,
         fields: List[SCSpecUDTStructFieldV0],
     ) -> None:
@@ -31,10 +33,12 @@ class SCSpecUDTStructV0:
             raise ValueError(
                 f"The maximum length of `fields` should be {_expect_max_length}, but got {len(fields)}."
             )
+        self.lib = lib
         self.name = name
         self.fields = fields
 
     def pack(self, packer: Packer) -> None:
+        String(self.lib, 80).pack(packer)
         String(self.name, 60).pack(packer)
         packer.pack_uint(len(self.fields))
         for fields_item in self.fields:
@@ -42,12 +46,14 @@ class SCSpecUDTStructV0:
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "SCSpecUDTStructV0":
+        lib = String.unpack(unpacker)
         name = String.unpack(unpacker)
         length = unpacker.unpack_uint()
         fields = []
         for _ in range(length):
             fields.append(SCSpecUDTStructFieldV0.unpack(unpacker))
         return cls(
+            lib=lib,
             name=name,
             fields=fields,
         )
@@ -74,10 +80,15 @@ class SCSpecUDTStructV0:
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented
-        return self.name == other.name and self.fields == other.fields
+        return (
+            self.lib == other.lib
+            and self.name == other.name
+            and self.fields == other.fields
+        )
 
     def __str__(self):
         out = [
+            f"lib={self.lib}",
             f"name={self.name}",
             f"fields={self.fields}",
         ]

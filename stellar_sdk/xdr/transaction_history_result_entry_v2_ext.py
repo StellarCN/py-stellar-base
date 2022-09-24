@@ -5,34 +5,37 @@ from xdrlib import Packer, Unpacker
 
 from .base import Integer
 
-__all__ = ["Auth"]
+__all__ = ["TransactionHistoryResultEntryV2Ext"]
 
 
-class Auth:
+class TransactionHistoryResultEntryV2Ext:
     """
     XDR Source Code::
 
-        struct Auth
-        {
-            int flags;
-        };
+        union switch (int v)
+            {
+            case 0:
+                void;
+            }
     """
 
     def __init__(
         self,
-        flags: int,
+        v: int,
     ) -> None:
-        self.flags = flags
+        self.v = v
 
     def pack(self, packer: Packer) -> None:
-        Integer(self.flags).pack(packer)
+        Integer(self.v).pack(packer)
+        if self.v == 0:
+            return
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "Auth":
-        flags = Integer.unpack(unpacker)
-        return cls(
-            flags=flags,
-        )
+    def unpack(cls, unpacker: Unpacker) -> "TransactionHistoryResultEntryV2Ext":
+        v = Integer.unpack(unpacker)
+        if v == 0:
+            return cls(v=v)
+        return cls(v=v)
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()
@@ -40,7 +43,7 @@ class Auth:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "Auth":
+    def from_xdr_bytes(cls, xdr: bytes) -> "TransactionHistoryResultEntryV2Ext":
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -49,17 +52,16 @@ class Auth:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "Auth":
+    def from_xdr(cls, xdr: str) -> "TransactionHistoryResultEntryV2Ext":
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented
-        return self.flags == other.flags
+        return self.v == other.v
 
     def __str__(self):
-        out = [
-            f"flags={self.flags}",
-        ]
-        return f"<Auth [{', '.join(out)}]>"
+        out = []
+        out.append(f"v={self.v}")
+        return f"<TransactionHistoryResultEntryV2Ext [{', '.join(out)}]>"

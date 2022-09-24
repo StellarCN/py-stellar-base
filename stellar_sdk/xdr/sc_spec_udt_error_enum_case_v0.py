@@ -3,35 +3,42 @@
 import base64
 from xdrlib import Packer, Unpacker
 
-from .base import Integer
+from .base import String
+from .uint32 import Uint32
 
-__all__ = ["Auth"]
+__all__ = ["SCSpecUDTErrorEnumCaseV0"]
 
 
-class Auth:
+class SCSpecUDTErrorEnumCaseV0:
     """
     XDR Source Code::
 
-        struct Auth
+        struct SCSpecUDTErrorEnumCaseV0
         {
-            int flags;
+            string name<60>;
+            uint32 value;
         };
     """
 
     def __init__(
         self,
-        flags: int,
+        name: bytes,
+        value: Uint32,
     ) -> None:
-        self.flags = flags
+        self.name = name
+        self.value = value
 
     def pack(self, packer: Packer) -> None:
-        Integer(self.flags).pack(packer)
+        String(self.name, 60).pack(packer)
+        self.value.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "Auth":
-        flags = Integer.unpack(unpacker)
+    def unpack(cls, unpacker: Unpacker) -> "SCSpecUDTErrorEnumCaseV0":
+        name = String.unpack(unpacker)
+        value = Uint32.unpack(unpacker)
         return cls(
-            flags=flags,
+            name=name,
+            value=value,
         )
 
     def to_xdr_bytes(self) -> bytes:
@@ -40,7 +47,7 @@ class Auth:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "Auth":
+    def from_xdr_bytes(cls, xdr: bytes) -> "SCSpecUDTErrorEnumCaseV0":
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -49,17 +56,18 @@ class Auth:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "Auth":
+    def from_xdr(cls, xdr: str) -> "SCSpecUDTErrorEnumCaseV0":
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented
-        return self.flags == other.flags
+        return self.name == other.name and self.value == other.value
 
     def __str__(self):
         out = [
-            f"flags={self.flags}",
+            f"name={self.name}",
+            f"value={self.value}",
         ]
-        return f"<Auth [{', '.join(out)}]>"
+        return f"<SCSpecUDTErrorEnumCaseV0 [{', '.join(out)}]>"

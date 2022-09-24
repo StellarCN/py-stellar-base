@@ -4,26 +4,28 @@ import base64
 from enum import IntEnum
 from xdrlib import Packer, Unpacker
 
-__all__ = ["SCHashType"]
+__all__ = ["ContractEventType"]
 
 
-class SCHashType(IntEnum):
+class ContractEventType(IntEnum):
     """
     XDR Source Code::
 
-        enum SCHashType
+        enum ContractEventType
         {
-            SCHASH_SHA256 = 0
+            SYSTEM = 0,
+            CONTRACT = 1
         };
     """
 
-    SCHASH_SHA256 = 0
+    SYSTEM = 0
+    CONTRACT = 1
 
     def pack(self, packer: Packer) -> None:
         packer.pack_int(self.value)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "SCHashType":
+    def unpack(cls, unpacker: Unpacker) -> "ContractEventType":
         value = unpacker.unpack_int()
         return cls(value)
 
@@ -33,7 +35,7 @@ class SCHashType(IntEnum):
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "SCHashType":
+    def from_xdr_bytes(cls, xdr: bytes) -> "ContractEventType":
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -42,6 +44,6 @@ class SCHashType(IntEnum):
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "SCHashType":
+    def from_xdr(cls, xdr: str) -> "ContractEventType":
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)

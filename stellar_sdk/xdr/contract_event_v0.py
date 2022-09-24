@@ -3,35 +3,42 @@
 import base64
 from xdrlib import Packer, Unpacker
 
-from .base import Integer
+from .sc_val import SCVal
+from .sc_vec import SCVec
 
-__all__ = ["Auth"]
+__all__ = ["ContractEventV0"]
 
 
-class Auth:
+class ContractEventV0:
     """
     XDR Source Code::
 
-        struct Auth
-        {
-            int flags;
-        };
+        struct
+                {
+                    SCVec topics;
+                    SCVal data;
+                }
     """
 
     def __init__(
         self,
-        flags: int,
+        topics: SCVec,
+        data: SCVal,
     ) -> None:
-        self.flags = flags
+        self.topics = topics
+        self.data = data
 
     def pack(self, packer: Packer) -> None:
-        Integer(self.flags).pack(packer)
+        self.topics.pack(packer)
+        self.data.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "Auth":
-        flags = Integer.unpack(unpacker)
+    def unpack(cls, unpacker: Unpacker) -> "ContractEventV0":
+        topics = SCVec.unpack(unpacker)
+        data = SCVal.unpack(unpacker)
         return cls(
-            flags=flags,
+            topics=topics,
+            data=data,
         )
 
     def to_xdr_bytes(self) -> bytes:
@@ -40,7 +47,7 @@ class Auth:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "Auth":
+    def from_xdr_bytes(cls, xdr: bytes) -> "ContractEventV0":
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -49,17 +56,18 @@ class Auth:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "Auth":
+    def from_xdr(cls, xdr: str) -> "ContractEventV0":
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented
-        return self.flags == other.flags
+        return self.topics == other.topics and self.data == other.data
 
     def __str__(self):
         out = [
-            f"flags={self.flags}",
+            f"topics={self.topics}",
+            f"data={self.data}",
         ]
-        return f"<Auth [{', '.join(out)}]>"
+        return f"<ContractEventV0 [{', '.join(out)}]>"

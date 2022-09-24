@@ -11,6 +11,7 @@ from .sc_host_val_error_code import SCHostValErrorCode
 from .sc_status_type import SCStatusType
 from .sc_unknown_error_code import SCUnknownErrorCode
 from .sc_vm_error_code import SCVmErrorCode
+from .uint32 import Uint32
 
 __all__ = ["SCStatus"]
 
@@ -37,6 +38,8 @@ class SCStatus:
             SCHostContextErrorCode hostContextErrorCode;
         case SST_VM_ERROR:
             SCVmErrorCode vmErrorCode;
+        case SST_CONTRACT_ERROR:
+            uint32 contractCode;
         };
     """
 
@@ -50,6 +53,7 @@ class SCStatus:
         host_storage_error_code: SCHostStorageErrorCode = None,
         host_context_error_code: SCHostContextErrorCode = None,
         vm_error_code: SCVmErrorCode = None,
+        contract_code: Uint32 = None,
     ) -> None:
         self.type = type
         self.unknown_code = unknown_code
@@ -59,6 +63,7 @@ class SCStatus:
         self.host_storage_error_code = host_storage_error_code
         self.host_context_error_code = host_context_error_code
         self.vm_error_code = vm_error_code
+        self.contract_code = contract_code
 
     def pack(self, packer: Packer) -> None:
         self.type.pack(packer)
@@ -99,6 +104,11 @@ class SCStatus:
                 raise ValueError("vm_error_code should not be None.")
             self.vm_error_code.pack(packer)
             return
+        if self.type == SCStatusType.SST_CONTRACT_ERROR:
+            if self.contract_code is None:
+                raise ValueError("contract_code should not be None.")
+            self.contract_code.pack(packer)
+            return
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "SCStatus":
@@ -126,6 +136,9 @@ class SCStatus:
         if type == SCStatusType.SST_VM_ERROR:
             vm_error_code = SCVmErrorCode.unpack(unpacker)
             return cls(type=type, vm_error_code=vm_error_code)
+        if type == SCStatusType.SST_CONTRACT_ERROR:
+            contract_code = Uint32.unpack(unpacker)
+            return cls(type=type, contract_code=contract_code)
         return cls(type=type)
 
     def to_xdr_bytes(self) -> bytes:
@@ -159,6 +172,7 @@ class SCStatus:
             and self.host_storage_error_code == other.host_storage_error_code
             and self.host_context_error_code == other.host_context_error_code
             and self.vm_error_code == other.vm_error_code
+            and self.contract_code == other.contract_code
         )
 
     def __str__(self):
@@ -185,4 +199,7 @@ class SCStatus:
         out.append(
             f"vm_error_code={self.vm_error_code}"
         ) if self.vm_error_code is not None else None
+        out.append(
+            f"contract_code={self.contract_code}"
+        ) if self.contract_code is not None else None
         return f"<SCStatus [{', '.join(out)}]>"
