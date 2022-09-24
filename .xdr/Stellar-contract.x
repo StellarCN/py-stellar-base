@@ -77,7 +77,8 @@ enum SCStatusType
     SST_HOST_FUNCTION_ERROR = 4,
     SST_HOST_STORAGE_ERROR = 5,
     SST_HOST_CONTEXT_ERROR = 6,
-    SST_VM_ERROR = 7
+    SST_VM_ERROR = 7,
+    SST_CONTRACT_ERROR = 8
     // TODO: add more
 };
 
@@ -179,6 +180,8 @@ case SST_HOST_CONTEXT_ERROR:
     SCHostContextErrorCode hostContextErrorCode;
 case SST_VM_ERROR:
     SCVmErrorCode vmErrorCode;
+case SST_CONTRACT_ERROR:
+    uint32 contractCode;
 };
 
 union SCVal switch (SCValType type)
@@ -212,9 +215,7 @@ enum SCObjectType
     SCO_I64 = 3,
     SCO_BYTES = 4,
     SCO_BIG_INT = 5,
-    SCO_HASH = 6,
-    SCO_PUBLIC_KEY = 7,
-    SCO_CONTRACT_CODE = 8
+    SCO_CONTRACT_CODE = 6
 
     // TODO: add more
 };
@@ -246,17 +247,6 @@ case NEGATIVE:
     opaque magnitude<256000>;
 };
 
-enum SCHashType
-{
-    SCHASH_SHA256 = 0
-};
-
-union SCHash switch (SCHashType type)
-{
-case SCHASH_SHA256:
-    Hash sha256;
-};
-
 enum SCContractCodeType
 {
     SCCONTRACT_CODE_WASM = 0,
@@ -285,10 +275,6 @@ case SCO_BYTES:
     opaque bin<SCVAL_LIMIT>;
 case SCO_BIG_INT:
     SCBigInt bigInt;
-case SCO_HASH:
-    SCHash hash;
-case SCO_PUBLIC_KEY:
-    PublicKey publicKey;
 case SCO_CONTRACT_CODE:
     SCContractCode contractCode;
 };
