@@ -24,11 +24,17 @@ class BaseAsyncClient(metaclass=ABCMeta):
         pass  # pragma: no cover
 
     @abstractmethod
-    async def post(self, url: str, data: Dict[str, str]) -> Response:
+    async def post(
+        self,
+        url: str,
+        data: Dict[str, str] = None,
+        json_data: Dict[str, Any] = None,
+    ) -> Response:
         """Perform HTTP POST request.
 
         :param url: the request url
         :param data: the data send to server
+        :param json_data: the json data send to server
         :return: the response from server
         :raise: :exc:`ConnectionError <stellar_sdk.exceptions.ConnectionError>`
         """
