@@ -1,5 +1,14 @@
 Release History
 ==============
+
+### Version 8.1.1
+
+Released on October 12, 2022
+
+#### Update
+- docs: correct the horizon address of the public network ([#611](https://github.com/StellarCN/py-stellar-base/pull/611))
+- deps: Update dependencies.
+
 ### Version 8.1.0
 
 Released on June 13, 2022

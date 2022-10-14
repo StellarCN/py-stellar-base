@@ -7,7 +7,7 @@ updates:
     time: "09:00"
     timezone: Asia/Shanghai
   open-pull-requests-limit: 10
-  target-branch: v8
+  target-branch: main
   reviewers:
   - overcat
   assignees:
