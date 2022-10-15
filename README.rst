@@ -25,7 +25,7 @@ Stellar Python SDK
     :alt: PyPI
     :target: https://pypi.python.org/pypi/stellar-sdk
 
-.. image:: https://img.shields.io/badge/python-%3E%3D3.6-blue
+.. image:: https://img.shields.io/badge/python-%3E%3D3.7-blue
     :alt: Python - Version
     :target: https://pypi.python.org/pypi/stellar-sdk
 
@@ -38,8 +38,8 @@ Stellar Python SDK
     :target: https://developers.stellar.org/docs/glossary/scp/
 
 py-stellar-base is a Python library for communicating with
-a `Stellar Horizon server`_. It is used for building Stellar apps on Python. It supports **Python 3.6+** as
-well as PyPy 3.6+.
+a `Stellar Horizon server`_. It is used for building Stellar apps on Python. It supports **Python 3.7+** as
+well as PyPy 3.7+.
 
 It provides:
 
