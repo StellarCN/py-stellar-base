@@ -101,7 +101,6 @@ class AiohttpClient(BaseAsyncClient):
 
         self.headers: dict = {
             **IDENTIFICATION_HEADERS,
-            "Content-Type": "application/x-www-form-urlencoded",
             "User-Agent": self.user_agent,
         }
 
@@ -137,17 +136,23 @@ class AiohttpClient(BaseAsyncClient):
         except aiohttp.ClientError as e:  # TODO: need more research
             raise ConnectionError(e)
 
-    async def post(self, url: str, data: Dict[str, str] = None) -> Response:
+    async def post(
+        self, url: str, data: Dict[str, str] = None, json_data: Dict[str, Any] = None
+    ) -> Response:
         """Perform HTTP POST request.
 
         :param url: the request url
         :param data: the data send to server
+        :param json_data: the json data send to server
         :return: the response from server
         :raise: :exc:`ConnectionError <stellar_sdk.exceptions.ConnectionError>`
         """
         try:
             response = await self._session.post(
-                url, data=data, timeout=aiohttp.ClientTimeout(total=self.post_timeout)
+                url,
+                data=data,
+                json=json_data,
+                timeout=aiohttp.ClientTimeout(total=self.post_timeout),
             )
             return Response(
                 status_code=response.status,
