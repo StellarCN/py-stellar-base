@@ -1195,6 +1195,22 @@ class TransactionBuilder:
         )
         return self.append_operation(op)
 
+    def append_invoke_host_function_op(
+        self,
+        contract_id: str,
+        method: str,
+        params: List[stellar_xdr.SCVal],
+        footprint: stellar_xdr.LedgerFootprint = None,
+        source: Optional[Union[MuxedAccount, str]] = None,
+    ) -> "TransactionBuilder":
+        """Append an :class:`InvokeHostFunction <stellar_sdk.operation.InvokeHostFunction>`
+        operation to the list of operations.
+
+        :return: This builder instance.
+        """
+        op = InvokeHostFunction(contract_id, method, params, footprint, source)
+        return self.append_operation(op)
+
     def __str__(self):
         return (
             f"<TransactionBuilder [source_account={self.source_account}, "

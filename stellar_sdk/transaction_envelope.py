@@ -7,6 +7,7 @@ from .base_transaction_envelope import BaseTransactionEnvelope
 from .decorated_signature import DecoratedSignature
 from .exceptions import SignatureExistError
 from .keypair import Keypair
+from .operation.invoke_host_function import InvokeHostFunction
 from .signer_key import SignerKeyType
 from .transaction import Transaction
 from .type_checked import type_checked
@@ -151,6 +152,22 @@ class TransactionEnvelope(BaseTransactionEnvelope["TransactionEnvelope"]):
             raise ValueError(f"Unexpected EnvelopeType: {xdr_object.type}.")
         te = cls(tx, network_passphrase=network_passphrase, signatures=signatures)
         return te
+
+    def set_footpoint(self, footpoint: Union[str, stellar_xdr.LedgerFootprint]) -> None:
+        """Set footpoint to the InvokeHostFunction Operation.
+
+        :param footpoint: The LedgerFootprint to set to the transaction.
+        """
+        if isinstance(footpoint, str):
+            try:
+                footpoint = stellar_xdr.LedgerFootprint.from_xdr(footpoint)
+            except Exception:
+                raise ValueError("Invalid footpoint.")
+
+        for op in self.transaction.operations:
+            if isinstance(op, InvokeHostFunction):
+                op.footprint = footpoint
+        # TODO: check valid?
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):

@@ -20,7 +20,7 @@ class InvokeHostFunction(Operation):
         contract_id: str,
         method: str,
         params: List[stellar_xdr.SCVal],
-        footprint: stellar_xdr.LedgerFootprint,
+        footprint: stellar_xdr.LedgerFootprint = None,
         source: Optional[Union[MuxedAccount, str]] = None,
     ):
         super().__init__(source)
@@ -28,6 +28,8 @@ class InvokeHostFunction(Operation):
         self.method = method  # TODO: method, str only?
         self.footprint = footprint
         self.params = params
+        if self.footprint is None:
+            self.footprint = stellar_xdr.LedgerFootprint([], [])
 
     def _to_operation_body(self) -> stellar_xdr.OperationBody:
         invoke_host_function_op = stellar_xdr.InvokeHostFunctionOp(
