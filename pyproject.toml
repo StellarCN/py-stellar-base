@@ -54,6 +54,7 @@ mnemonic = "^0.20"
 toml = "^0.10.2"
 typeguard = "^2.13.0"
 urllib3 = "^1.26.7"
+pydantic = "^1.10.2"
 
 [tool.poetry.dev-dependencies]
 pytest = "^7.0.1"
