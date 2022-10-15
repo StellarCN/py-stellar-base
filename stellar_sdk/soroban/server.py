@@ -5,6 +5,7 @@ from .exceptions import RequestException
 from .jsonrpc import *
 from .soroban_rpc import *
 from .. import xdr as stellar_xdr
+from ..account import Account
 from ..client.base_sync_client import BaseSyncClient
 from ..client.requests_client import RequestsClient
 from ..transaction_envelope import TransactionEnvelope
@@ -35,11 +36,11 @@ class SorobanServer:
         )
         return self._post(request, GetHealthResponse)
 
-    def get_account(self, address: str) -> GetAccountResponse:
+    def get_account(self, account_id: str) -> GetAccountResponse:
         request = Request[List[str]](
             id=_generate_unique_request_id(),
             method="getAccount",
-            params=[address],
+            params=[account_id],
         )
         return self._post(request, GetAccountResponse)
 
@@ -93,6 +94,10 @@ class SorobanServer:
         if response.error:
             raise RequestException(response.error.code, response.error.message)
         return response.result  # type: ignore[return-value]
+
+    def load_account(self, account_id: str) -> Account:
+        data = self.get_account(account_id)
+        return Account(account_id, data.sequence)
 
     def close(self) -> None:
         """Close underlying connector, and release all acquired resources."""
