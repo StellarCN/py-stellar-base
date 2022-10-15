@@ -32,7 +32,7 @@ Stellar Python SDK
     :alt: PyPI
     :target: https://pypi.python.org/pypi/stellar-sdk
 
-.. image:: https://img.shields.io/badge/python-%3E%3D3.6-blue
+.. image:: https://img.shields.io/badge/python-%3E%3D3.7-blue
     :alt: Python - Version
     :target: https://pypi.python.org/pypi/stellar-sdk
 
@@ -44,7 +44,7 @@ Stellar Python SDK
     :alt: Stellar Protocol
     :target: https://developers.stellar.org/docs/glossary/scp/
 
-py-stellar-base 是用于开发 Stellar 应用程序的 Python 库。它目前支持 Python 3.6+ 和 PyPy3.6+。
+py-stellar-base 是用于开发 Stellar 应用程序的 Python 库。它目前支持 Python 3.7+ 和 PyPy3.7+。
 
 它提供了：
 
