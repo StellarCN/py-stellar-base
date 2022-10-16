@@ -43,7 +43,7 @@ class GetContractDataResponse(BaseModel):
 class GetTransactionStatusResponse(BaseModel):
     id: str
     status: TransactionStatus
-    results: List[TransactionStatusResult]
+    results: Optional[List[TransactionStatusResult]]
     # error: Optional[jsonrpc.Error[E]]
 
 
