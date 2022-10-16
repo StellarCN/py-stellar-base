@@ -27,7 +27,7 @@ soroban_server = SorobanServer(rpc_server_url)
 source = soroban_server.load_account(kp.public_key)
 
 tx = (
-    TransactionBuilder(source, network_passphrase=Network.STANDALONE_NETWORK_PASSPHRASE)
+    TransactionBuilder(source, network_passphrase)
     .set_timeout(300)
     .append_invoke_host_function_op(
         contract_id=contract_id,
@@ -35,7 +35,7 @@ tx = (
         params=[
             stellar_xdr.SCVal(
                 type=stellar_xdr.SCValType.SCV_SYMBOL,
-                sym=stellar_xdr.SCSymbol(sc_symbol="world".encode("utf-8")),
+                sym=stellar_xdr.SCSymbol(sc_symbol="world".encode()),
             )
         ],
         source=kp.public_key,
