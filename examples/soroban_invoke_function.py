@@ -54,13 +54,16 @@ send_transaction_data = soroban_server.send_transaction(tx)
 print(f"sent transaction: {send_transaction_data}")
 
 while True:
+    print("waiting for transaction to be confirmed...")
     get_transaction_status_data = soroban_server.get_transaction_status(
         send_transaction_data.id
     )
-    print(f"transaction status: {get_transaction_status_data}")
     if get_transaction_status_data.status != TransactionStatus.PENDING:
-        result = stellar_xdr.SCVal.from_xdr(get_transaction_status_data.results[0].xdr)  # type: ignore
-        output = [x.sym.sc_symbol.decode() for x in result.obj.vec.sc_vec]  # type: ignore
-        print(f"output: {output}")
         break
     time.sleep(3)
+print(f"transaction status: {get_transaction_status_data}")
+
+if get_transaction_status_data.status == TransactionStatus.SUCCESS:
+    result = stellar_xdr.SCVal.from_xdr(get_transaction_status_data.results[0].xdr)  # type: ignore
+    output = [x.sym.sc_symbol.decode() for x in result.obj.vec.sc_vec]  # type: ignore
+    print(f"transaction result: {output}")
