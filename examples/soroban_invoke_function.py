@@ -59,8 +59,8 @@ while True:
     )
     print(f"transaction status: {get_transaction_status_data}")
     if get_transaction_status_data.status != TransactionStatus.PENDING:
-        result = stellar_xdr.SCVal.from_xdr(get_transaction_status_data.results[0].xdr)
-        output = [x.sym.sc_symbol.decode() for x in result.obj.vec.sc_vec]
+        result = stellar_xdr.SCVal.from_xdr(get_transaction_status_data.results[0].xdr)  # type: ignore
+        output = [x.sym.sc_symbol.decode() for x in result.obj.vec.sc_vec]  # type: ignore
         print(f"output: {output}")
         break
     time.sleep(3)

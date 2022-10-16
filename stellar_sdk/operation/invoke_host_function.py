@@ -26,10 +26,10 @@ class InvokeHostFunction(Operation):
         super().__init__(source)
         self.contract_id = contract_id
         self.method = method  # TODO: method, str only?
-        self.footprint = footprint
+        self.footprint = (
+            stellar_xdr.LedgerFootprint([], []) if footprint is None else footprint
+        )
         self.params = params
-        if self.footprint is None:
-            self.footprint = stellar_xdr.LedgerFootprint([], [])
 
     def _to_operation_body(self) -> stellar_xdr.OperationBody:
         invoke_host_function_op = stellar_xdr.InvokeHostFunctionOp(
