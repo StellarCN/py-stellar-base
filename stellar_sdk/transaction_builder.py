@@ -1,3 +1,5 @@
+import binascii
+import os
 import time
 import warnings
 from decimal import Decimal
@@ -1195,11 +1197,11 @@ class TransactionBuilder:
         )
         return self.append_operation(op)
 
-    def append_invoke_host_function_op(
+    def append_invoke_contract_function_op(
         self,
         contract_id: str,
         method: str,
-        params: List[stellar_xdr.SCVal],
+        parameters: List[stellar_xdr.SCVal],
         footprint: stellar_xdr.LedgerFootprint = None,
         source: Optional[Union[MuxedAccount, str]] = None,
     ) -> "TransactionBuilder":
@@ -1208,7 +1210,58 @@ class TransactionBuilder:
 
         :return: This builder instance.
         """
-        op = InvokeHostFunction(contract_id, method, params, footprint, source)
+        invoke_params = [
+            stellar_xdr.SCVal(
+                stellar_xdr.SCValType.SCV_OBJECT,
+                obj=stellar_xdr.SCObject(
+                    stellar_xdr.SCObjectType.SCO_BYTES,
+                    bin=binascii.unhexlify(contract_id),
+                ),
+            ),
+            stellar_xdr.SCVal(
+                stellar_xdr.SCValType.SCV_SYMBOL,
+                sym=stellar_xdr.SCSymbol(sc_symbol=method.encode("utf-8")),
+            ),
+            *parameters,
+        ]
+        op = InvokeHostFunction(
+            stellar_xdr.HostFunction.HOST_FN_CALL, invoke_params, footprint, source
+        )
+        return self.append_operation(op)
+
+    def append_deploy_contract_op(
+        self,
+        contract: Union[bytes, str],
+        footprint: stellar_xdr.LedgerFootprint = None,
+        source: Optional[Union[MuxedAccount, str]] = None,
+    ) -> "TransactionBuilder":
+        """Append an :class:`InvokeHostFunction <stellar_sdk.operation.InvokeHostFunction>`
+        operation to the list of operations.
+
+        :return: This builder instance.
+        """
+
+        if isinstance(contract, str):
+            with open(contract, "rb") as f:
+                contract = f.read()
+        contract_parameter = stellar_xdr.SCVal(
+            stellar_xdr.SCValType.SCV_OBJECT,
+            obj=stellar_xdr.SCObject(stellar_xdr.SCObjectType.SCO_BYTES, bin=contract),
+        )
+        salt_parameter = stellar_xdr.SCVal(
+            stellar_xdr.SCValType.SCV_OBJECT,
+            obj=stellar_xdr.SCObject(
+                stellar_xdr.SCObjectType.SCO_BYTES, bin=os.urandom(32)
+            ),
+        )
+        invoke_params = [contract_parameter, salt_parameter]
+        # TODO: HOST_FN_CREATE_CONTRACT_WITH_ED25519?
+        op = InvokeHostFunction(
+            stellar_xdr.HostFunction.HOST_FN_CREATE_CONTRACT_WITH_SOURCE,
+            invoke_params,
+            footprint,
+            source,
+        )
         return self.append_operation(op)
 
     def __str__(self):
