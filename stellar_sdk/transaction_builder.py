@@ -1267,6 +1267,50 @@ class TransactionBuilder:
         )
         return self.append_operation(op)
 
+    def append_deploy_create_token_contract_with_asset_op(
+        self,
+        asset: Asset,
+        footprint: stellar_xdr.LedgerFootprint = None,
+        source: Optional[Union[MuxedAccount, str]] = None,
+    ) -> "TransactionBuilder":
+        # TODO: a more understandable name?
+        invoke_params = [
+            stellar_xdr.SCVal(
+                stellar_xdr.SCValType.SCV_OBJECT,
+                obj=stellar_xdr.SCObject(
+                    stellar_xdr.SCObjectType.SCO_BYTES,
+                    bin=asset.to_xdr_object().to_xdr_bytes(),
+                ),
+            )
+        ]
+        op = InvokeHostFunction(
+            stellar_xdr.HostFunction.HOST_FN_CREATE_TOKEN_CONTRACT_WITH_ASSET,
+            invoke_params,
+            footprint,
+            source,
+        )
+        return self.append_operation(op)
+
+    def append_deploy_create_token_contract_with_source_account_op(
+        self,
+        footprint: stellar_xdr.LedgerFootprint = None,
+        source: Optional[Union[MuxedAccount, str]] = None,
+    ) -> "TransactionBuilder":
+        salt_parameter = stellar_xdr.SCVal(
+            stellar_xdr.SCValType.SCV_OBJECT,
+            obj=stellar_xdr.SCObject(
+                stellar_xdr.SCObjectType.SCO_BYTES, bin=os.urandom(32)
+            ),
+        )
+        invoke_params = [salt_parameter]
+        op = InvokeHostFunction(
+            stellar_xdr.HostFunction.HOST_FN_CREATE_TOKEN_CONTRACT_WITH_SOURCE_ACCOUNT,
+            invoke_params,
+            footprint,
+            source,
+        )
+        return self.append_operation(op)
+
     def __str__(self):
         return (
             f"<TransactionBuilder [source_account={self.source_account}, "
