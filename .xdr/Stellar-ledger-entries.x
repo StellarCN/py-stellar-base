@@ -8,7 +8,6 @@
 namespace stellar
 {
 
-typedef PublicKey AccountID;
 typedef opaque Thresholds[4];
 typedef string string32<32>;
 typedef string string64<64>;
@@ -646,6 +645,6 @@ enum EnvelopeType
     ENVELOPE_TYPE_CONTRACT_ID_FROM_ED25519 = 8,
     ENVELOPE_TYPE_CONTRACT_ID_FROM_CONTRACT = 9,
     ENVELOPE_TYPE_CONTRACT_ID_FROM_ASSET = 10,
-    ENVELOPE_TYPE_CONTRACT_ID_FROM_SOURCE = 11
+    ENVELOPE_TYPE_CONTRACT_ID_FROM_SOURCE_ACCOUNT = 11
 };
 }

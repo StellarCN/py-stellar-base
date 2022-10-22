@@ -9,7 +9,9 @@ from .hash_id_preimage_contract_id import HashIDPreimageContractID
 from .hash_id_preimage_ed25519_contract_id import HashIDPreimageEd25519ContractID
 from .hash_id_preimage_operation_id import HashIDPreimageOperationID
 from .hash_id_preimage_revoke_id import HashIDPreimageRevokeID
-from .hash_id_preimage_source_contract_id import HashIDPreimageSourceContractID
+from .hash_id_preimage_source_account_contract_id import (
+    HashIDPreimageSourceAccountContractID,
+)
 
 __all__ = ["HashIDPreimage"]
 
@@ -50,12 +52,12 @@ class HashIDPreimage:
             } contractID;
         case ENVELOPE_TYPE_CONTRACT_ID_FROM_ASSET:
             Asset fromAsset;
-        case ENVELOPE_TYPE_CONTRACT_ID_FROM_SOURCE:
+        case ENVELOPE_TYPE_CONTRACT_ID_FROM_SOURCE_ACCOUNT:
             struct
             {
                 AccountID sourceAccount;
                 uint256 salt;
-            } sourceContractID;
+            } sourceAccountContractID;
         };
     """
 
@@ -67,7 +69,7 @@ class HashIDPreimage:
         ed25519_contract_id: HashIDPreimageEd25519ContractID = None,
         contract_id: HashIDPreimageContractID = None,
         from_asset: Asset = None,
-        source_contract_id: HashIDPreimageSourceContractID = None,
+        source_account_contract_id: HashIDPreimageSourceAccountContractID = None,
     ) -> None:
         self.type = type
         self.operation_id = operation_id
@@ -75,7 +77,7 @@ class HashIDPreimage:
         self.ed25519_contract_id = ed25519_contract_id
         self.contract_id = contract_id
         self.from_asset = from_asset
-        self.source_contract_id = source_contract_id
+        self.source_account_contract_id = source_account_contract_id
 
     def pack(self, packer: Packer) -> None:
         self.type.pack(packer)
@@ -104,10 +106,10 @@ class HashIDPreimage:
                 raise ValueError("from_asset should not be None.")
             self.from_asset.pack(packer)
             return
-        if self.type == EnvelopeType.ENVELOPE_TYPE_CONTRACT_ID_FROM_SOURCE:
-            if self.source_contract_id is None:
-                raise ValueError("source_contract_id should not be None.")
-            self.source_contract_id.pack(packer)
+        if self.type == EnvelopeType.ENVELOPE_TYPE_CONTRACT_ID_FROM_SOURCE_ACCOUNT:
+            if self.source_account_contract_id is None:
+                raise ValueError("source_account_contract_id should not be None.")
+            self.source_account_contract_id.pack(packer)
             return
 
     @classmethod
@@ -128,9 +130,11 @@ class HashIDPreimage:
         if type == EnvelopeType.ENVELOPE_TYPE_CONTRACT_ID_FROM_ASSET:
             from_asset = Asset.unpack(unpacker)
             return cls(type=type, from_asset=from_asset)
-        if type == EnvelopeType.ENVELOPE_TYPE_CONTRACT_ID_FROM_SOURCE:
-            source_contract_id = HashIDPreimageSourceContractID.unpack(unpacker)
-            return cls(type=type, source_contract_id=source_contract_id)
+        if type == EnvelopeType.ENVELOPE_TYPE_CONTRACT_ID_FROM_SOURCE_ACCOUNT:
+            source_account_contract_id = HashIDPreimageSourceAccountContractID.unpack(
+                unpacker
+            )
+            return cls(type=type, source_account_contract_id=source_account_contract_id)
         return cls(type=type)
 
     def to_xdr_bytes(self) -> bytes:
@@ -162,7 +166,7 @@ class HashIDPreimage:
             and self.ed25519_contract_id == other.ed25519_contract_id
             and self.contract_id == other.contract_id
             and self.from_asset == other.from_asset
-            and self.source_contract_id == other.source_contract_id
+            and self.source_account_contract_id == other.source_account_contract_id
         )
 
     def __str__(self):
@@ -184,6 +188,6 @@ class HashIDPreimage:
             f"from_asset={self.from_asset}"
         ) if self.from_asset is not None else None
         out.append(
-            f"source_contract_id={self.source_contract_id}"
-        ) if self.source_contract_id is not None else None
+            f"source_account_contract_id={self.source_account_contract_id}"
+        ) if self.source_account_contract_id is not None else None
         return f"<HashIDPreimage [{', '.join(out)}]>"

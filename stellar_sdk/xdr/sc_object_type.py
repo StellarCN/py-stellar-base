@@ -22,7 +22,8 @@ class SCObjectType(IntEnum):
             SCO_I64 = 3,
             SCO_BYTES = 4,
             SCO_BIG_INT = 5,
-            SCO_CONTRACT_CODE = 6
+            SCO_CONTRACT_CODE = 6,
+            SCO_ACCOUNT_ID = 7
 
             // TODO: add more
         };
@@ -35,6 +36,7 @@ class SCObjectType(IntEnum):
     SCO_BYTES = 4
     SCO_BIG_INT = 5
     SCO_CONTRACT_CODE = 6
+    SCO_ACCOUNT_ID = 7
 
     def pack(self, packer: Packer) -> None:
         packer.pack_int(self.value)

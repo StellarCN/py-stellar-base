@@ -1225,7 +1225,10 @@ class TransactionBuilder:
             *parameters,
         ]
         op = InvokeHostFunction(
-            stellar_xdr.HostFunction.HOST_FN_CALL, invoke_params, footprint, source
+            stellar_xdr.HostFunction.HOST_FN_INVOKE_CONTRACT,
+            invoke_params,
+            footprint,
+            source,
         )
         return self.append_operation(op)
 
@@ -1257,7 +1260,7 @@ class TransactionBuilder:
         invoke_params = [contract_parameter, salt_parameter]
         # TODO: HOST_FN_CREATE_CONTRACT_WITH_ED25519?
         op = InvokeHostFunction(
-            stellar_xdr.HostFunction.HOST_FN_CREATE_CONTRACT_WITH_SOURCE,
+            stellar_xdr.HostFunction.HOST_FN_CREATE_CONTRACT_WITH_SOURCE_ACCOUNT,
             invoke_params,
             footprint,
             source,

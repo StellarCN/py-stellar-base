@@ -119,7 +119,9 @@ from .hash_id_preimage_contract_id import HashIDPreimageContractID
 from .hash_id_preimage_ed25519_contract_id import HashIDPreimageEd25519ContractID
 from .hash_id_preimage_operation_id import HashIDPreimageOperationID
 from .hash_id_preimage_revoke_id import HashIDPreimageRevokeID
-from .hash_id_preimage_source_contract_id import HashIDPreimageSourceContractID
+from .hash_id_preimage_source_account_contract_id import (
+    HashIDPreimageSourceAccountContractID,
+)
 from .hello import Hello
 from .hmac_sha256_key import HmacSha256Key
 from .hmac_sha256_mac import HmacSha256Mac

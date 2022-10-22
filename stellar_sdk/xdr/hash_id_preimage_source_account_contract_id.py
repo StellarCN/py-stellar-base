@@ -6,10 +6,10 @@ from xdrlib import Packer, Unpacker
 from .account_id import AccountID
 from .uint256 import Uint256
 
-__all__ = ["HashIDPreimageSourceContractID"]
+__all__ = ["HashIDPreimageSourceAccountContractID"]
 
 
-class HashIDPreimageSourceContractID:
+class HashIDPreimageSourceAccountContractID:
     """
     XDR Source Code::
 
@@ -33,7 +33,7 @@ class HashIDPreimageSourceContractID:
         self.salt.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "HashIDPreimageSourceContractID":
+    def unpack(cls, unpacker: Unpacker) -> "HashIDPreimageSourceAccountContractID":
         source_account = AccountID.unpack(unpacker)
         salt = Uint256.unpack(unpacker)
         return cls(
@@ -47,7 +47,7 @@ class HashIDPreimageSourceContractID:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "HashIDPreimageSourceContractID":
+    def from_xdr_bytes(cls, xdr: bytes) -> "HashIDPreimageSourceAccountContractID":
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -56,7 +56,7 @@ class HashIDPreimageSourceContractID:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "HashIDPreimageSourceContractID":
+    def from_xdr(cls, xdr: str) -> "HashIDPreimageSourceAccountContractID":
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
 
@@ -70,4 +70,4 @@ class HashIDPreimageSourceContractID:
             f"source_account={self.source_account}",
             f"salt={self.salt}",
         ]
-        return f"<HashIDPreimageSourceContractID [{', '.join(out)}]>"
+        return f"<HashIDPreimageSourceAccountContractID [{', '.join(out)}]>"

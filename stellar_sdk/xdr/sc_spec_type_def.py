@@ -38,6 +38,8 @@ class SCSpecTypeDef:
         case SC_SPEC_TYPE_STATUS:
         case SC_SPEC_TYPE_BYTES:
         case SC_SPEC_TYPE_BIG_INT:
+        case SC_SPEC_TYPE_INVOKER:
+        case SC_SPEC_TYPE_ACCOUNT_ID:
             void;
         case SC_SPEC_TYPE_OPTION:
             SCSpecTypeOption option;
@@ -104,6 +106,10 @@ class SCSpecTypeDef:
             return
         if self.type == SCSpecType.SC_SPEC_TYPE_BIG_INT:
             return
+        if self.type == SCSpecType.SC_SPEC_TYPE_INVOKER:
+            return
+        if self.type == SCSpecType.SC_SPEC_TYPE_ACCOUNT_ID:
+            return
         if self.type == SCSpecType.SC_SPEC_TYPE_OPTION:
             if self.option is None:
                 raise ValueError("option should not be None.")
@@ -169,6 +175,10 @@ class SCSpecTypeDef:
         if type == SCSpecType.SC_SPEC_TYPE_BYTES:
             return cls(type=type)
         if type == SCSpecType.SC_SPEC_TYPE_BIG_INT:
+            return cls(type=type)
+        if type == SCSpecType.SC_SPEC_TYPE_INVOKER:
+            return cls(type=type)
+        if type == SCSpecType.SC_SPEC_TYPE_ACCOUNT_ID:
             return cls(type=type)
         if type == SCSpecType.SC_SPEC_TYPE_OPTION:
             from .sc_spec_type_option import SCSpecTypeOption

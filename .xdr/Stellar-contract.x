@@ -169,17 +169,17 @@ case SST_OK:
 case SST_UNKNOWN_ERROR:
     SCUnknownErrorCode unknownCode;
 case SST_HOST_VALUE_ERROR:
-    SCHostValErrorCode hostValErrorCode;
+    SCHostValErrorCode valCode;
 case SST_HOST_OBJECT_ERROR:
-    SCHostObjErrorCode hostObjErrorCode;
+    SCHostObjErrorCode objCode;
 case SST_HOST_FUNCTION_ERROR:
-    SCHostFnErrorCode hostFnErrorCode;
+    SCHostFnErrorCode fnCode;
 case SST_HOST_STORAGE_ERROR:
-    SCHostStorageErrorCode hostStorageErrorCode;
+    SCHostStorageErrorCode storageCode;
 case SST_HOST_CONTEXT_ERROR:
-    SCHostContextErrorCode hostContextErrorCode;
+    SCHostContextErrorCode contextCode;
 case SST_VM_ERROR:
-    SCVmErrorCode vmErrorCode;
+    SCVmErrorCode vmCode;
 case SST_CONTRACT_ERROR:
     uint32 contractCode;
 };
@@ -215,7 +215,8 @@ enum SCObjectType
     SCO_I64 = 3,
     SCO_BYTES = 4,
     SCO_BIG_INT = 5,
-    SCO_CONTRACT_CODE = 6
+    SCO_CONTRACT_CODE = 6,
+    SCO_ACCOUNT_ID = 7
 
     // TODO: add more
 };
@@ -277,5 +278,7 @@ case SCO_BIG_INT:
     SCBigInt bigInt;
 case SCO_CONTRACT_CODE:
     SCContractCode contractCode;
+case SCO_ACCOUNT_ID:
+    AccountID accountID;
 };
 }

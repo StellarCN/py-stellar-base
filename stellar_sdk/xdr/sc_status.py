@@ -27,17 +27,17 @@ class SCStatus:
         case SST_UNKNOWN_ERROR:
             SCUnknownErrorCode unknownCode;
         case SST_HOST_VALUE_ERROR:
-            SCHostValErrorCode hostValErrorCode;
+            SCHostValErrorCode valCode;
         case SST_HOST_OBJECT_ERROR:
-            SCHostObjErrorCode hostObjErrorCode;
+            SCHostObjErrorCode objCode;
         case SST_HOST_FUNCTION_ERROR:
-            SCHostFnErrorCode hostFnErrorCode;
+            SCHostFnErrorCode fnCode;
         case SST_HOST_STORAGE_ERROR:
-            SCHostStorageErrorCode hostStorageErrorCode;
+            SCHostStorageErrorCode storageCode;
         case SST_HOST_CONTEXT_ERROR:
-            SCHostContextErrorCode hostContextErrorCode;
+            SCHostContextErrorCode contextCode;
         case SST_VM_ERROR:
-            SCVmErrorCode vmErrorCode;
+            SCVmErrorCode vmCode;
         case SST_CONTRACT_ERROR:
             uint32 contractCode;
         };
@@ -47,22 +47,22 @@ class SCStatus:
         self,
         type: SCStatusType,
         unknown_code: SCUnknownErrorCode = None,
-        host_val_error_code: SCHostValErrorCode = None,
-        host_obj_error_code: SCHostObjErrorCode = None,
-        host_fn_error_code: SCHostFnErrorCode = None,
-        host_storage_error_code: SCHostStorageErrorCode = None,
-        host_context_error_code: SCHostContextErrorCode = None,
-        vm_error_code: SCVmErrorCode = None,
+        val_code: SCHostValErrorCode = None,
+        obj_code: SCHostObjErrorCode = None,
+        fn_code: SCHostFnErrorCode = None,
+        storage_code: SCHostStorageErrorCode = None,
+        context_code: SCHostContextErrorCode = None,
+        vm_code: SCVmErrorCode = None,
         contract_code: Uint32 = None,
     ) -> None:
         self.type = type
         self.unknown_code = unknown_code
-        self.host_val_error_code = host_val_error_code
-        self.host_obj_error_code = host_obj_error_code
-        self.host_fn_error_code = host_fn_error_code
-        self.host_storage_error_code = host_storage_error_code
-        self.host_context_error_code = host_context_error_code
-        self.vm_error_code = vm_error_code
+        self.val_code = val_code
+        self.obj_code = obj_code
+        self.fn_code = fn_code
+        self.storage_code = storage_code
+        self.context_code = context_code
+        self.vm_code = vm_code
         self.contract_code = contract_code
 
     def pack(self, packer: Packer) -> None:
@@ -75,34 +75,34 @@ class SCStatus:
             self.unknown_code.pack(packer)
             return
         if self.type == SCStatusType.SST_HOST_VALUE_ERROR:
-            if self.host_val_error_code is None:
-                raise ValueError("host_val_error_code should not be None.")
-            self.host_val_error_code.pack(packer)
+            if self.val_code is None:
+                raise ValueError("val_code should not be None.")
+            self.val_code.pack(packer)
             return
         if self.type == SCStatusType.SST_HOST_OBJECT_ERROR:
-            if self.host_obj_error_code is None:
-                raise ValueError("host_obj_error_code should not be None.")
-            self.host_obj_error_code.pack(packer)
+            if self.obj_code is None:
+                raise ValueError("obj_code should not be None.")
+            self.obj_code.pack(packer)
             return
         if self.type == SCStatusType.SST_HOST_FUNCTION_ERROR:
-            if self.host_fn_error_code is None:
-                raise ValueError("host_fn_error_code should not be None.")
-            self.host_fn_error_code.pack(packer)
+            if self.fn_code is None:
+                raise ValueError("fn_code should not be None.")
+            self.fn_code.pack(packer)
             return
         if self.type == SCStatusType.SST_HOST_STORAGE_ERROR:
-            if self.host_storage_error_code is None:
-                raise ValueError("host_storage_error_code should not be None.")
-            self.host_storage_error_code.pack(packer)
+            if self.storage_code is None:
+                raise ValueError("storage_code should not be None.")
+            self.storage_code.pack(packer)
             return
         if self.type == SCStatusType.SST_HOST_CONTEXT_ERROR:
-            if self.host_context_error_code is None:
-                raise ValueError("host_context_error_code should not be None.")
-            self.host_context_error_code.pack(packer)
+            if self.context_code is None:
+                raise ValueError("context_code should not be None.")
+            self.context_code.pack(packer)
             return
         if self.type == SCStatusType.SST_VM_ERROR:
-            if self.vm_error_code is None:
-                raise ValueError("vm_error_code should not be None.")
-            self.vm_error_code.pack(packer)
+            if self.vm_code is None:
+                raise ValueError("vm_code should not be None.")
+            self.vm_code.pack(packer)
             return
         if self.type == SCStatusType.SST_CONTRACT_ERROR:
             if self.contract_code is None:
@@ -119,23 +119,23 @@ class SCStatus:
             unknown_code = SCUnknownErrorCode.unpack(unpacker)
             return cls(type=type, unknown_code=unknown_code)
         if type == SCStatusType.SST_HOST_VALUE_ERROR:
-            host_val_error_code = SCHostValErrorCode.unpack(unpacker)
-            return cls(type=type, host_val_error_code=host_val_error_code)
+            val_code = SCHostValErrorCode.unpack(unpacker)
+            return cls(type=type, val_code=val_code)
         if type == SCStatusType.SST_HOST_OBJECT_ERROR:
-            host_obj_error_code = SCHostObjErrorCode.unpack(unpacker)
-            return cls(type=type, host_obj_error_code=host_obj_error_code)
+            obj_code = SCHostObjErrorCode.unpack(unpacker)
+            return cls(type=type, obj_code=obj_code)
         if type == SCStatusType.SST_HOST_FUNCTION_ERROR:
-            host_fn_error_code = SCHostFnErrorCode.unpack(unpacker)
-            return cls(type=type, host_fn_error_code=host_fn_error_code)
+            fn_code = SCHostFnErrorCode.unpack(unpacker)
+            return cls(type=type, fn_code=fn_code)
         if type == SCStatusType.SST_HOST_STORAGE_ERROR:
-            host_storage_error_code = SCHostStorageErrorCode.unpack(unpacker)
-            return cls(type=type, host_storage_error_code=host_storage_error_code)
+            storage_code = SCHostStorageErrorCode.unpack(unpacker)
+            return cls(type=type, storage_code=storage_code)
         if type == SCStatusType.SST_HOST_CONTEXT_ERROR:
-            host_context_error_code = SCHostContextErrorCode.unpack(unpacker)
-            return cls(type=type, host_context_error_code=host_context_error_code)
+            context_code = SCHostContextErrorCode.unpack(unpacker)
+            return cls(type=type, context_code=context_code)
         if type == SCStatusType.SST_VM_ERROR:
-            vm_error_code = SCVmErrorCode.unpack(unpacker)
-            return cls(type=type, vm_error_code=vm_error_code)
+            vm_code = SCVmErrorCode.unpack(unpacker)
+            return cls(type=type, vm_code=vm_code)
         if type == SCStatusType.SST_CONTRACT_ERROR:
             contract_code = Uint32.unpack(unpacker)
             return cls(type=type, contract_code=contract_code)
@@ -166,12 +166,12 @@ class SCStatus:
         return (
             self.type == other.type
             and self.unknown_code == other.unknown_code
-            and self.host_val_error_code == other.host_val_error_code
-            and self.host_obj_error_code == other.host_obj_error_code
-            and self.host_fn_error_code == other.host_fn_error_code
-            and self.host_storage_error_code == other.host_storage_error_code
-            and self.host_context_error_code == other.host_context_error_code
-            and self.vm_error_code == other.vm_error_code
+            and self.val_code == other.val_code
+            and self.obj_code == other.obj_code
+            and self.fn_code == other.fn_code
+            and self.storage_code == other.storage_code
+            and self.context_code == other.context_code
+            and self.vm_code == other.vm_code
             and self.contract_code == other.contract_code
         )
 
@@ -181,24 +181,16 @@ class SCStatus:
         out.append(
             f"unknown_code={self.unknown_code}"
         ) if self.unknown_code is not None else None
+        out.append(f"val_code={self.val_code}") if self.val_code is not None else None
+        out.append(f"obj_code={self.obj_code}") if self.obj_code is not None else None
+        out.append(f"fn_code={self.fn_code}") if self.fn_code is not None else None
         out.append(
-            f"host_val_error_code={self.host_val_error_code}"
-        ) if self.host_val_error_code is not None else None
+            f"storage_code={self.storage_code}"
+        ) if self.storage_code is not None else None
         out.append(
-            f"host_obj_error_code={self.host_obj_error_code}"
-        ) if self.host_obj_error_code is not None else None
-        out.append(
-            f"host_fn_error_code={self.host_fn_error_code}"
-        ) if self.host_fn_error_code is not None else None
-        out.append(
-            f"host_storage_error_code={self.host_storage_error_code}"
-        ) if self.host_storage_error_code is not None else None
-        out.append(
-            f"host_context_error_code={self.host_context_error_code}"
-        ) if self.host_context_error_code is not None else None
-        out.append(
-            f"vm_error_code={self.vm_error_code}"
-        ) if self.vm_error_code is not None else None
+            f"context_code={self.context_code}"
+        ) if self.context_code is not None else None
+        out.append(f"vm_code={self.vm_code}") if self.vm_code is not None else None
         out.append(
             f"contract_code={self.contract_code}"
         ) if self.contract_code is not None else None

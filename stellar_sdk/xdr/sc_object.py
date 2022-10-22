@@ -3,6 +3,7 @@
 import base64
 from xdrlib import Packer, Unpacker
 
+from .account_id import AccountID
 from .base import Opaque
 from .constants import *
 from .int64 import Int64
@@ -36,6 +37,8 @@ class SCObject:
             SCBigInt bigInt;
         case SCO_CONTRACT_CODE:
             SCContractCode contractCode;
+        case SCO_ACCOUNT_ID:
+            AccountID accountID;
         };
     """
 
@@ -49,6 +52,7 @@ class SCObject:
         bin: bytes = None,
         big_int: SCBigInt = None,
         contract_code: SCContractCode = None,
+        account_id: AccountID = None,
     ) -> None:
         self.type = type
         self.vec = vec
@@ -58,6 +62,7 @@ class SCObject:
         self.bin = bin
         self.big_int = big_int
         self.contract_code = contract_code
+        self.account_id = account_id
 
     def pack(self, packer: Packer) -> None:
         self.type.pack(packer)
@@ -96,6 +101,11 @@ class SCObject:
                 raise ValueError("contract_code should not be None.")
             self.contract_code.pack(packer)
             return
+        if self.type == SCObjectType.SCO_ACCOUNT_ID:
+            if self.account_id is None:
+                raise ValueError("account_id should not be None.")
+            self.account_id.pack(packer)
+            return
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "SCObject":
@@ -121,6 +131,9 @@ class SCObject:
         if type == SCObjectType.SCO_CONTRACT_CODE:
             contract_code = SCContractCode.unpack(unpacker)
             return cls(type=type, contract_code=contract_code)
+        if type == SCObjectType.SCO_ACCOUNT_ID:
+            account_id = AccountID.unpack(unpacker)
+            return cls(type=type, account_id=account_id)
         return cls(type=type)
 
     def to_xdr_bytes(self) -> bytes:
@@ -154,6 +167,7 @@ class SCObject:
             and self.bin == other.bin
             and self.big_int == other.big_int
             and self.contract_code == other.contract_code
+            and self.account_id == other.account_id
         )
 
     def __str__(self):
@@ -168,4 +182,7 @@ class SCObject:
         out.append(
             f"contract_code={self.contract_code}"
         ) if self.contract_code is not None else None
+        out.append(
+            f"account_id={self.account_id}"
+        ) if self.account_id is not None else None
         return f"<SCObject [{', '.join(out)}]>"
