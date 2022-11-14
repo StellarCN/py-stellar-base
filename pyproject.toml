@@ -59,7 +59,7 @@ urllib3 = "^1.26.7"
 pytest = "^7.2.0"
 pytest-cov = "^4.0.0"
 pytest-timeout = "^2.0.1"
-pytest-asyncio = "^0.20.1"
+pytest-asyncio = "^0.20.2"
 pytest-httpserver = "^1.0.6"
 # currently, mypy cannot run in pypy https://github.com/python/typed_ast/issues/111
 mypy = {version = "^0.982", markers = "platform_python_implementation == 'CPython'"}
