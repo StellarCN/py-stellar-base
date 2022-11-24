@@ -28,6 +28,15 @@ class SurveyResponseBody:
         self.type = type
         self.topology_response_body = topology_response_body
 
+    @classmethod
+    def survey_topology(
+        cls, topology_response_body: TopologyResponseBody
+    ) -> "SurveyResponseBody":
+        return cls(
+            SurveyMessageCommandType.SURVEY_TOPOLOGY,
+            topology_response_body=topology_response_body,
+        )
+
     def pack(self, packer: Packer) -> None:
         self.type.pack(packer)
         if self.type == SurveyMessageCommandType.SURVEY_TOPOLOGY:

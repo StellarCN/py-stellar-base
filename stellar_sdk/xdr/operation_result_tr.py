@@ -151,6 +151,192 @@ class OperationResultTr:
         self.liquidity_pool_withdraw_result = liquidity_pool_withdraw_result
         self.invoke_host_function_result = invoke_host_function_result
 
+    @classmethod
+    def create_account(
+        cls, create_account_result: CreateAccountResult
+    ) -> "OperationResultTr":
+        return cls(
+            OperationType.CREATE_ACCOUNT, create_account_result=create_account_result
+        )
+
+    @classmethod
+    def payment(cls, payment_result: PaymentResult) -> "OperationResultTr":
+        return cls(OperationType.PAYMENT, payment_result=payment_result)
+
+    @classmethod
+    def path_payment_strict_receive(
+        cls, path_payment_strict_receive_result: PathPaymentStrictReceiveResult
+    ) -> "OperationResultTr":
+        return cls(
+            OperationType.PATH_PAYMENT_STRICT_RECEIVE,
+            path_payment_strict_receive_result=path_payment_strict_receive_result,
+        )
+
+    @classmethod
+    def manage_sell_offer(
+        cls, manage_sell_offer_result: ManageSellOfferResult
+    ) -> "OperationResultTr":
+        return cls(
+            OperationType.MANAGE_SELL_OFFER,
+            manage_sell_offer_result=manage_sell_offer_result,
+        )
+
+    @classmethod
+    def create_passive_sell_offer(
+        cls, create_passive_sell_offer_result: ManageSellOfferResult
+    ) -> "OperationResultTr":
+        return cls(
+            OperationType.CREATE_PASSIVE_SELL_OFFER,
+            create_passive_sell_offer_result=create_passive_sell_offer_result,
+        )
+
+    @classmethod
+    def set_options(cls, set_options_result: SetOptionsResult) -> "OperationResultTr":
+        return cls(OperationType.SET_OPTIONS, set_options_result=set_options_result)
+
+    @classmethod
+    def change_trust(
+        cls, change_trust_result: ChangeTrustResult
+    ) -> "OperationResultTr":
+        return cls(OperationType.CHANGE_TRUST, change_trust_result=change_trust_result)
+
+    @classmethod
+    def allow_trust(cls, allow_trust_result: AllowTrustResult) -> "OperationResultTr":
+        return cls(OperationType.ALLOW_TRUST, allow_trust_result=allow_trust_result)
+
+    @classmethod
+    def account_merge(
+        cls, account_merge_result: AccountMergeResult
+    ) -> "OperationResultTr":
+        return cls(
+            OperationType.ACCOUNT_MERGE, account_merge_result=account_merge_result
+        )
+
+    @classmethod
+    def inflation(cls, inflation_result: InflationResult) -> "OperationResultTr":
+        return cls(OperationType.INFLATION, inflation_result=inflation_result)
+
+    @classmethod
+    def manage_data(cls, manage_data_result: ManageDataResult) -> "OperationResultTr":
+        return cls(OperationType.MANAGE_DATA, manage_data_result=manage_data_result)
+
+    @classmethod
+    def bump_sequence(cls, bump_seq_result: BumpSequenceResult) -> "OperationResultTr":
+        return cls(OperationType.BUMP_SEQUENCE, bump_seq_result=bump_seq_result)
+
+    @classmethod
+    def manage_buy_offer(
+        cls, manage_buy_offer_result: ManageBuyOfferResult
+    ) -> "OperationResultTr":
+        return cls(
+            OperationType.MANAGE_BUY_OFFER,
+            manage_buy_offer_result=manage_buy_offer_result,
+        )
+
+    @classmethod
+    def path_payment_strict_send(
+        cls, path_payment_strict_send_result: PathPaymentStrictSendResult
+    ) -> "OperationResultTr":
+        return cls(
+            OperationType.PATH_PAYMENT_STRICT_SEND,
+            path_payment_strict_send_result=path_payment_strict_send_result,
+        )
+
+    @classmethod
+    def create_claimable_balance(
+        cls, create_claimable_balance_result: CreateClaimableBalanceResult
+    ) -> "OperationResultTr":
+        return cls(
+            OperationType.CREATE_CLAIMABLE_BALANCE,
+            create_claimable_balance_result=create_claimable_balance_result,
+        )
+
+    @classmethod
+    def claim_claimable_balance(
+        cls, claim_claimable_balance_result: ClaimClaimableBalanceResult
+    ) -> "OperationResultTr":
+        return cls(
+            OperationType.CLAIM_CLAIMABLE_BALANCE,
+            claim_claimable_balance_result=claim_claimable_balance_result,
+        )
+
+    @classmethod
+    def begin_sponsoring_future_reserves(
+        cls,
+        begin_sponsoring_future_reserves_result: BeginSponsoringFutureReservesResult,
+    ) -> "OperationResultTr":
+        return cls(
+            OperationType.BEGIN_SPONSORING_FUTURE_RESERVES,
+            begin_sponsoring_future_reserves_result=begin_sponsoring_future_reserves_result,
+        )
+
+    @classmethod
+    def end_sponsoring_future_reserves(
+        cls, end_sponsoring_future_reserves_result: EndSponsoringFutureReservesResult
+    ) -> "OperationResultTr":
+        return cls(
+            OperationType.END_SPONSORING_FUTURE_RESERVES,
+            end_sponsoring_future_reserves_result=end_sponsoring_future_reserves_result,
+        )
+
+    @classmethod
+    def revoke_sponsorship(
+        cls, revoke_sponsorship_result: RevokeSponsorshipResult
+    ) -> "OperationResultTr":
+        return cls(
+            OperationType.REVOKE_SPONSORSHIP,
+            revoke_sponsorship_result=revoke_sponsorship_result,
+        )
+
+    @classmethod
+    def clawback(cls, clawback_result: ClawbackResult) -> "OperationResultTr":
+        return cls(OperationType.CLAWBACK, clawback_result=clawback_result)
+
+    @classmethod
+    def clawback_claimable_balance(
+        cls, clawback_claimable_balance_result: ClawbackClaimableBalanceResult
+    ) -> "OperationResultTr":
+        return cls(
+            OperationType.CLAWBACK_CLAIMABLE_BALANCE,
+            clawback_claimable_balance_result=clawback_claimable_balance_result,
+        )
+
+    @classmethod
+    def set_trust_line_flags(
+        cls, set_trust_line_flags_result: SetTrustLineFlagsResult
+    ) -> "OperationResultTr":
+        return cls(
+            OperationType.SET_TRUST_LINE_FLAGS,
+            set_trust_line_flags_result=set_trust_line_flags_result,
+        )
+
+    @classmethod
+    def liquidity_pool_deposit(
+        cls, liquidity_pool_deposit_result: LiquidityPoolDepositResult
+    ) -> "OperationResultTr":
+        return cls(
+            OperationType.LIQUIDITY_POOL_DEPOSIT,
+            liquidity_pool_deposit_result=liquidity_pool_deposit_result,
+        )
+
+    @classmethod
+    def liquidity_pool_withdraw(
+        cls, liquidity_pool_withdraw_result: LiquidityPoolWithdrawResult
+    ) -> "OperationResultTr":
+        return cls(
+            OperationType.LIQUIDITY_POOL_WITHDRAW,
+            liquidity_pool_withdraw_result=liquidity_pool_withdraw_result,
+        )
+
+    @classmethod
+    def invoke_host_function(
+        cls, invoke_host_function_result: InvokeHostFunctionResult
+    ) -> "OperationResultTr":
+        return cls(
+            OperationType.INVOKE_HOST_FUNCTION,
+            invoke_host_function_result=invoke_host_function_result,
+        )
+
     def pack(self, packer: Packer) -> None:
         self.type.pack(packer)
         if self.type == OperationType.CREATE_ACCOUNT:

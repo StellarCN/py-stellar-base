@@ -44,6 +44,22 @@ class Memo:
         self.hash = hash
         self.ret_hash = ret_hash
 
+    @classmethod
+    def memo_text(cls, text: bytes) -> "Memo":
+        return cls(MemoType.MEMO_TEXT, text=text)
+
+    @classmethod
+    def memo_id(cls, id: Uint64) -> "Memo":
+        return cls(MemoType.MEMO_ID, id=id)
+
+    @classmethod
+    def memo_hash(cls, hash: Hash) -> "Memo":
+        return cls(MemoType.MEMO_HASH, hash=hash)
+
+    @classmethod
+    def memo_return(cls, ret_hash: Hash) -> "Memo":
+        return cls(MemoType.MEMO_RETURN, ret_hash=ret_hash)
+
     def pack(self, packer: Packer) -> None:
         self.type.pack(packer)
         if self.type == MemoType.MEMO_NONE:

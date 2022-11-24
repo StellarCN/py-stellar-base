@@ -68,6 +68,38 @@ class SCVal:
         self.bits = bits
         self.status = status
 
+    @classmethod
+    def scv_u63(cls, u63: Int64) -> "SCVal":
+        return cls(SCValType.SCV_U63, u63=u63)
+
+    @classmethod
+    def scv_u32(cls, u32: Uint32) -> "SCVal":
+        return cls(SCValType.SCV_U32, u32=u32)
+
+    @classmethod
+    def scv_i32(cls, i32: Int32) -> "SCVal":
+        return cls(SCValType.SCV_I32, i32=i32)
+
+    @classmethod
+    def scv_static(cls, ic: SCStatic) -> "SCVal":
+        return cls(SCValType.SCV_STATIC, ic=ic)
+
+    @classmethod
+    def scv_object(cls, obj: Optional["SCObject"]) -> "SCVal":
+        return cls(SCValType.SCV_OBJECT, obj=obj)
+
+    @classmethod
+    def scv_symbol(cls, sym: SCSymbol) -> "SCVal":
+        return cls(SCValType.SCV_SYMBOL, sym=sym)
+
+    @classmethod
+    def scv_bitset(cls, bits: Uint64) -> "SCVal":
+        return cls(SCValType.SCV_BITSET, bits=bits)
+
+    @classmethod
+    def scv_status(cls, status: SCStatus) -> "SCVal":
+        return cls(SCValType.SCV_STATUS, status=status)
+
     def pack(self, packer: Packer) -> None:
         self.type.pack(packer)
         if self.type == SCValType.SCV_U63:

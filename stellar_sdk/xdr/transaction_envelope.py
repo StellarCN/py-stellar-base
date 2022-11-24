@@ -38,6 +38,20 @@ class TransactionEnvelope:
         self.v1 = v1
         self.fee_bump = fee_bump
 
+    @classmethod
+    def envelope_type_tx_v0(cls, v0: TransactionV0Envelope) -> "TransactionEnvelope":
+        return cls(EnvelopeType.ENVELOPE_TYPE_TX_V0, v0=v0)
+
+    @classmethod
+    def envelope_type_tx(cls, v1: TransactionV1Envelope) -> "TransactionEnvelope":
+        return cls(EnvelopeType.ENVELOPE_TYPE_TX, v1=v1)
+
+    @classmethod
+    def envelope_type_tx_fee_bump(
+        cls, fee_bump: FeeBumpTransactionEnvelope
+    ) -> "TransactionEnvelope":
+        return cls(EnvelopeType.ENVELOPE_TYPE_TX_FEE_BUMP, fee_bump=fee_bump)
+
     def pack(self, packer: Packer) -> None:
         self.type.pack(packer)
         if self.type == EnvelopeType.ENVELOPE_TYPE_TX_V0:

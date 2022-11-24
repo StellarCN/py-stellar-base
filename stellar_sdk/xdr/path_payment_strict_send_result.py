@@ -50,6 +50,24 @@ class PathPaymentStrictSendResult:
         self.success = success
         self.no_issuer = no_issuer
 
+    @classmethod
+    def path_payment_strict_send_success(
+        cls, success: PathPaymentStrictSendResultSuccess
+    ) -> "PathPaymentStrictSendResult":
+        return cls(
+            PathPaymentStrictSendResultCode.PATH_PAYMENT_STRICT_SEND_SUCCESS,
+            success=success,
+        )
+
+    @classmethod
+    def path_payment_strict_send_no_issuer(
+        cls, no_issuer: Asset
+    ) -> "PathPaymentStrictSendResult":
+        return cls(
+            PathPaymentStrictSendResultCode.PATH_PAYMENT_STRICT_SEND_NO_ISSUER,
+            no_issuer=no_issuer,
+        )
+
     def pack(self, packer: Packer) -> None:
         self.code.pack(packer)
         if (

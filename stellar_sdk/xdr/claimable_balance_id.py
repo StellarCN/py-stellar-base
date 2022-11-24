@@ -28,6 +28,10 @@ class ClaimableBalanceID:
         self.type = type
         self.v0 = v0
 
+    @classmethod
+    def claimable_balance_id_type_v0(cls, v0: Hash) -> "ClaimableBalanceID":
+        return cls(ClaimableBalanceIDType.CLAIMABLE_BALANCE_ID_TYPE_V0, v0=v0)
+
     def pack(self, packer: Packer) -> None:
         self.type.pack(packer)
         if self.type == ClaimableBalanceIDType.CLAIMABLE_BALANCE_ID_TYPE_V0:

@@ -28,6 +28,10 @@ class ConfigSetting:
         self.type = type
         self.uint32_val = uint32_val
 
+    @classmethod
+    def config_setting_type_uint32(cls, uint32_val: Uint32) -> "ConfigSetting":
+        return cls(ConfigSettingType.CONFIG_SETTING_TYPE_UINT32, uint32_val=uint32_val)
+
     def pack(self, packer: Packer) -> None:
         self.type.pack(packer)
         if self.type == ConfigSettingType.CONFIG_SETTING_TYPE_UINT32:

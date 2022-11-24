@@ -35,6 +35,15 @@ class CreateClaimableBalanceResult:
         self.code = code
         self.balance_id = balance_id
 
+    @classmethod
+    def create_claimable_balance_success(
+        cls, balance_id: ClaimableBalanceID
+    ) -> "CreateClaimableBalanceResult":
+        return cls(
+            CreateClaimableBalanceResultCode.CREATE_CLAIMABLE_BALANCE_SUCCESS,
+            balance_id=balance_id,
+        )
+
     def pack(self, packer: Packer) -> None:
         self.code.pack(packer)
         if (

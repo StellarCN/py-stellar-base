@@ -31,6 +31,12 @@ class InvokeHostFunctionResult:
         self.code = code
         self.success = success
 
+    @classmethod
+    def invoke_host_function_success(cls, success: SCVal) -> "InvokeHostFunctionResult":
+        return cls(
+            InvokeHostFunctionResultCode.INVOKE_HOST_FUNCTION_SUCCESS, success=success
+        )
+
     def pack(self, packer: Packer) -> None:
         self.code.pack(packer)
         if self.code == InvokeHostFunctionResultCode.INVOKE_HOST_FUNCTION_SUCCESS:

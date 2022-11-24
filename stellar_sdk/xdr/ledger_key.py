@@ -96,6 +96,42 @@ class LedgerKey:
         self.contract_data = contract_data
         self.config_setting = config_setting
 
+    @classmethod
+    def account(cls, account: LedgerKeyAccount) -> "LedgerKey":
+        return cls(LedgerEntryType.ACCOUNT, account=account)
+
+    @classmethod
+    def trustline(cls, trust_line: LedgerKeyTrustLine) -> "LedgerKey":
+        return cls(LedgerEntryType.TRUSTLINE, trust_line=trust_line)
+
+    @classmethod
+    def offer(cls, offer: LedgerKeyOffer) -> "LedgerKey":
+        return cls(LedgerEntryType.OFFER, offer=offer)
+
+    @classmethod
+    def data(cls, data: LedgerKeyData) -> "LedgerKey":
+        return cls(LedgerEntryType.DATA, data=data)
+
+    @classmethod
+    def claimable_balance(
+        cls, claimable_balance: LedgerKeyClaimableBalance
+    ) -> "LedgerKey":
+        return cls(
+            LedgerEntryType.CLAIMABLE_BALANCE, claimable_balance=claimable_balance
+        )
+
+    @classmethod
+    def liquidity_pool(cls, liquidity_pool: LedgerKeyLiquidityPool) -> "LedgerKey":
+        return cls(LedgerEntryType.LIQUIDITY_POOL, liquidity_pool=liquidity_pool)
+
+    @classmethod
+    def contract_data(cls, contract_data: LedgerKeyContractData) -> "LedgerKey":
+        return cls(LedgerEntryType.CONTRACT_DATA, contract_data=contract_data)
+
+    @classmethod
+    def config_setting(cls, config_setting: LedgerKeyConfigSetting) -> "LedgerKey":
+        return cls(LedgerEntryType.CONFIG_SETTING, config_setting=config_setting)
+
     def pack(self, packer: Packer) -> None:
         self.type.pack(packer)
         if self.type == LedgerEntryType.ACCOUNT:

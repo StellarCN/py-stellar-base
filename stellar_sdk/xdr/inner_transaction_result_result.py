@@ -52,6 +52,18 @@ class InnerTransactionResultResult:
         self.code = code
         self.results = results
 
+    @classmethod
+    def tx_success(
+        cls, results: List[OperationResult]
+    ) -> "InnerTransactionResultResult":
+        return cls(TransactionResultCode.txSUCCESS, results=results)
+
+    @classmethod
+    def tx_failed(
+        cls, results: List[OperationResult]
+    ) -> "InnerTransactionResultResult":
+        return cls(TransactionResultCode.txFAILED, results=results)
+
     def pack(self, packer: Packer) -> None:
         self.code.pack(packer)
         if self.code == TransactionResultCode.txSUCCESS:

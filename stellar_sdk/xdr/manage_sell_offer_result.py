@@ -41,6 +41,12 @@ class ManageSellOfferResult:
         self.code = code
         self.success = success
 
+    @classmethod
+    def manage_sell_offer_success(
+        cls, success: ManageOfferSuccessResult
+    ) -> "ManageSellOfferResult":
+        return cls(ManageSellOfferResultCode.MANAGE_SELL_OFFER_SUCCESS, success=success)
+
     def pack(self, packer: Packer) -> None:
         self.code.pack(packer)
         if self.code == ManageSellOfferResultCode.MANAGE_SELL_OFFER_SUCCESS:

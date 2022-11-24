@@ -65,6 +65,38 @@ class SCStatus:
         self.vm_code = vm_code
         self.contract_code = contract_code
 
+    @classmethod
+    def sst_unknown_error(cls, unknown_code: SCUnknownErrorCode) -> "SCStatus":
+        return cls(SCStatusType.SST_UNKNOWN_ERROR, unknown_code=unknown_code)
+
+    @classmethod
+    def sst_host_value_error(cls, val_code: SCHostValErrorCode) -> "SCStatus":
+        return cls(SCStatusType.SST_HOST_VALUE_ERROR, val_code=val_code)
+
+    @classmethod
+    def sst_host_object_error(cls, obj_code: SCHostObjErrorCode) -> "SCStatus":
+        return cls(SCStatusType.SST_HOST_OBJECT_ERROR, obj_code=obj_code)
+
+    @classmethod
+    def sst_host_function_error(cls, fn_code: SCHostFnErrorCode) -> "SCStatus":
+        return cls(SCStatusType.SST_HOST_FUNCTION_ERROR, fn_code=fn_code)
+
+    @classmethod
+    def sst_host_storage_error(cls, storage_code: SCHostStorageErrorCode) -> "SCStatus":
+        return cls(SCStatusType.SST_HOST_STORAGE_ERROR, storage_code=storage_code)
+
+    @classmethod
+    def sst_host_context_error(cls, context_code: SCHostContextErrorCode) -> "SCStatus":
+        return cls(SCStatusType.SST_HOST_CONTEXT_ERROR, context_code=context_code)
+
+    @classmethod
+    def sst_vm_error(cls, vm_code: SCVmErrorCode) -> "SCStatus":
+        return cls(SCStatusType.SST_VM_ERROR, vm_code=vm_code)
+
+    @classmethod
+    def sst_contract_error(cls, contract_code: Uint32) -> "SCStatus":
+        return cls(SCStatusType.SST_CONTRACT_ERROR, contract_code=contract_code)
+
     def pack(self, packer: Packer) -> None:
         self.type.pack(packer)
         if self.type == SCStatusType.SST_OK:

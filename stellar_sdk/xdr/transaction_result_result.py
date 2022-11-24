@@ -57,6 +57,32 @@ class TransactionResultResult:
         self.inner_result_pair = inner_result_pair
         self.results = results
 
+    @classmethod
+    def tx_fee_bump_inner_success(
+        cls, inner_result_pair: InnerTransactionResultPair
+    ) -> "TransactionResultResult":
+        return cls(
+            TransactionResultCode.txFEE_BUMP_INNER_SUCCESS,
+            inner_result_pair=inner_result_pair,
+        )
+
+    @classmethod
+    def tx_fee_bump_inner_failed(
+        cls, inner_result_pair: InnerTransactionResultPair
+    ) -> "TransactionResultResult":
+        return cls(
+            TransactionResultCode.txFEE_BUMP_INNER_FAILED,
+            inner_result_pair=inner_result_pair,
+        )
+
+    @classmethod
+    def tx_success(cls, results: List[OperationResult]) -> "TransactionResultResult":
+        return cls(TransactionResultCode.txSUCCESS, results=results)
+
+    @classmethod
+    def tx_failed(cls, results: List[OperationResult]) -> "TransactionResultResult":
+        return cls(TransactionResultCode.txFAILED, results=results)
+
     def pack(self, packer: Packer) -> None:
         self.code.pack(packer)
         if self.code == TransactionResultCode.txFEE_BUMP_INNER_SUCCESS:

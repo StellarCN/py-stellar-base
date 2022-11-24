@@ -30,6 +30,15 @@ class LiquidityPoolParameters:
         self.type = type
         self.constant_product = constant_product
 
+    @classmethod
+    def liquidity_pool_constant_product(
+        cls, constant_product: LiquidityPoolConstantProductParameters
+    ) -> "LiquidityPoolParameters":
+        return cls(
+            LiquidityPoolType.LIQUIDITY_POOL_CONSTANT_PRODUCT,
+            constant_product=constant_product,
+        )
+
     def pack(self, packer: Packer) -> None:
         self.type.pack(packer)
         if self.type == LiquidityPoolType.LIQUIDITY_POOL_CONSTANT_PRODUCT:

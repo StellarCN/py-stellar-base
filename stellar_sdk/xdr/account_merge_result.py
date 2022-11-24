@@ -36,6 +36,15 @@ class AccountMergeResult:
         self.code = code
         self.source_account_balance = source_account_balance
 
+    @classmethod
+    def account_merge_success(
+        cls, source_account_balance: Int64
+    ) -> "AccountMergeResult":
+        return cls(
+            AccountMergeResultCode.ACCOUNT_MERGE_SUCCESS,
+            source_account_balance=source_account_balance,
+        )
+
     def pack(self, packer: Packer) -> None:
         self.code.pack(packer)
         if self.code == AccountMergeResultCode.ACCOUNT_MERGE_SUCCESS:
