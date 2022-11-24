@@ -58,6 +58,48 @@ class ClaimPredicate:
         self.abs_before = abs_before
         self.rel_before = rel_before
 
+    @classmethod
+    def from_claim_predicate_unconditional(cls) -> "ClaimPredicate":
+        return cls(ClaimPredicateType.CLAIM_PREDICATE_UNCONDITIONAL)
+
+    @classmethod
+    def from_claim_predicate_and(
+        cls, and_predicates: List["ClaimPredicate"]
+    ) -> "ClaimPredicate":
+        return cls(
+            ClaimPredicateType.CLAIM_PREDICATE_AND, and_predicates=and_predicates
+        )
+
+    @classmethod
+    def from_claim_predicate_or(
+        cls, or_predicates: List["ClaimPredicate"]
+    ) -> "ClaimPredicate":
+        return cls(ClaimPredicateType.CLAIM_PREDICATE_OR, or_predicates=or_predicates)
+
+    @classmethod
+    def from_claim_predicate_not(
+        cls, not_predicate: Optional["ClaimPredicate"]
+    ) -> "ClaimPredicate":
+        return cls(ClaimPredicateType.CLAIM_PREDICATE_NOT, not_predicate=not_predicate)
+
+    @classmethod
+    def from_claim_predicate_before_absolute_time(
+        cls, abs_before: Int64
+    ) -> "ClaimPredicate":
+        return cls(
+            ClaimPredicateType.CLAIM_PREDICATE_BEFORE_ABSOLUTE_TIME,
+            abs_before=abs_before,
+        )
+
+    @classmethod
+    def from_claim_predicate_before_relative_time(
+        cls, rel_before: Int64
+    ) -> "ClaimPredicate":
+        return cls(
+            ClaimPredicateType.CLAIM_PREDICATE_BEFORE_RELATIVE_TIME,
+            rel_before=rel_before,
+        )
+
     def pack(self, packer: Packer) -> None:
         self.type.pack(packer)
         if self.type == ClaimPredicateType.CLAIM_PREDICATE_UNCONDITIONAL:

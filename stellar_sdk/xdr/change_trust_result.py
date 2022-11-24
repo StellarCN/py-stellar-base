@@ -34,6 +34,42 @@ class ChangeTrustResult:
     ) -> None:
         self.code = code
 
+    @classmethod
+    def from_change_trust_success(cls) -> "ChangeTrustResult":
+        return cls(ChangeTrustResultCode.CHANGE_TRUST_SUCCESS)
+
+    @classmethod
+    def from_change_trust_malformed(cls) -> "ChangeTrustResult":
+        return cls(ChangeTrustResultCode.CHANGE_TRUST_MALFORMED)
+
+    @classmethod
+    def from_change_trust_no_issuer(cls) -> "ChangeTrustResult":
+        return cls(ChangeTrustResultCode.CHANGE_TRUST_NO_ISSUER)
+
+    @classmethod
+    def from_change_trust_invalid_limit(cls) -> "ChangeTrustResult":
+        return cls(ChangeTrustResultCode.CHANGE_TRUST_INVALID_LIMIT)
+
+    @classmethod
+    def from_change_trust_low_reserve(cls) -> "ChangeTrustResult":
+        return cls(ChangeTrustResultCode.CHANGE_TRUST_LOW_RESERVE)
+
+    @classmethod
+    def from_change_trust_self_not_allowed(cls) -> "ChangeTrustResult":
+        return cls(ChangeTrustResultCode.CHANGE_TRUST_SELF_NOT_ALLOWED)
+
+    @classmethod
+    def from_change_trust_trust_line_missing(cls) -> "ChangeTrustResult":
+        return cls(ChangeTrustResultCode.CHANGE_TRUST_TRUST_LINE_MISSING)
+
+    @classmethod
+    def from_change_trust_cannot_delete(cls) -> "ChangeTrustResult":
+        return cls(ChangeTrustResultCode.CHANGE_TRUST_CANNOT_DELETE)
+
+    @classmethod
+    def from_change_trust_not_auth_maintain_liabilities(cls) -> "ChangeTrustResult":
+        return cls(ChangeTrustResultCode.CHANGE_TRUST_NOT_AUTH_MAINTAIN_LIABILITIES)
+
     def pack(self, packer: Packer) -> None:
         self.code.pack(packer)
         if self.code == ChangeTrustResultCode.CHANGE_TRUST_SUCCESS:

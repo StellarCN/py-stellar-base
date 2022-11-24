@@ -38,6 +38,22 @@ class ClaimAtom:
         self.order_book = order_book
         self.liquidity_pool = liquidity_pool
 
+    @classmethod
+    def from_claim_atom_type_v0(cls, v0: ClaimOfferAtomV0) -> "ClaimAtom":
+        return cls(ClaimAtomType.CLAIM_ATOM_TYPE_V0, v0=v0)
+
+    @classmethod
+    def from_claim_atom_type_order_book(cls, order_book: ClaimOfferAtom) -> "ClaimAtom":
+        return cls(ClaimAtomType.CLAIM_ATOM_TYPE_ORDER_BOOK, order_book=order_book)
+
+    @classmethod
+    def from_claim_atom_type_liquidity_pool(
+        cls, liquidity_pool: ClaimLiquidityAtom
+    ) -> "ClaimAtom":
+        return cls(
+            ClaimAtomType.CLAIM_ATOM_TYPE_LIQUIDITY_POOL, liquidity_pool=liquidity_pool
+        )
+
     def pack(self, packer: Packer) -> None:
         self.type.pack(packer)
         if self.type == ClaimAtomType.CLAIM_ATOM_TYPE_V0:

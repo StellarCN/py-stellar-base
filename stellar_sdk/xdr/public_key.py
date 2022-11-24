@@ -28,6 +28,10 @@ class PublicKey:
         self.type = type
         self.ed25519 = ed25519
 
+    @classmethod
+    def from_public_key_type_ed25519(cls, ed25519: Uint256) -> "PublicKey":
+        return cls(PublicKeyType.PUBLIC_KEY_TYPE_ED25519, ed25519=ed25519)
+
     def pack(self, packer: Packer) -> None:
         self.type.pack(packer)
         if self.type == PublicKeyType.PUBLIC_KEY_TYPE_ED25519:

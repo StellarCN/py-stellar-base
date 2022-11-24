@@ -31,6 +31,18 @@ class SCBigInt:
         self.sign = sign
         self.magnitude = magnitude
 
+    @classmethod
+    def from_zero(cls) -> "SCBigInt":
+        return cls(SCNumSign.ZERO)
+
+    @classmethod
+    def from_positive(cls, magnitude: bytes) -> "SCBigInt":
+        return cls(SCNumSign.POSITIVE, magnitude=magnitude)
+
+    @classmethod
+    def from_negative(cls, magnitude: bytes) -> "SCBigInt":
+        return cls(SCNumSign.NEGATIVE, magnitude=magnitude)
+
     def pack(self, packer: Packer) -> None:
         self.sign.pack(packer)
         if self.sign == SCNumSign.ZERO:

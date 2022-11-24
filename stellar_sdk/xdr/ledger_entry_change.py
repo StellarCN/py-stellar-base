@@ -41,6 +41,22 @@ class LedgerEntryChange:
         self.removed = removed
         self.state = state
 
+    @classmethod
+    def from_ledger_entry_created(cls, created: LedgerEntry) -> "LedgerEntryChange":
+        return cls(LedgerEntryChangeType.LEDGER_ENTRY_CREATED, created=created)
+
+    @classmethod
+    def from_ledger_entry_updated(cls, updated: LedgerEntry) -> "LedgerEntryChange":
+        return cls(LedgerEntryChangeType.LEDGER_ENTRY_UPDATED, updated=updated)
+
+    @classmethod
+    def from_ledger_entry_removed(cls, removed: LedgerKey) -> "LedgerEntryChange":
+        return cls(LedgerEntryChangeType.LEDGER_ENTRY_REMOVED, removed=removed)
+
+    @classmethod
+    def from_ledger_entry_state(cls, state: LedgerEntry) -> "LedgerEntryChange":
+        return cls(LedgerEntryChangeType.LEDGER_ENTRY_STATE, state=state)
+
     def pack(self, packer: Packer) -> None:
         self.type.pack(packer)
         if self.type == LedgerEntryChangeType.LEDGER_ENTRY_CREATED:

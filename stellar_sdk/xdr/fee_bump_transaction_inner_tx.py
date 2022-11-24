@@ -28,6 +28,12 @@ class FeeBumpTransactionInnerTx:
         self.type = type
         self.v1 = v1
 
+    @classmethod
+    def from_envelope_type_tx(
+        cls, v1: TransactionV1Envelope
+    ) -> "FeeBumpTransactionInnerTx":
+        return cls(EnvelopeType.ENVELOPE_TYPE_TX, v1=v1)
+
     def pack(self, packer: Packer) -> None:
         self.type.pack(packer)
         if self.type == EnvelopeType.ENVELOPE_TYPE_TX:

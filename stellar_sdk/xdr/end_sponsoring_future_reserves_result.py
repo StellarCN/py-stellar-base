@@ -30,6 +30,22 @@ class EndSponsoringFutureReservesResult:
     ) -> None:
         self.code = code
 
+    @classmethod
+    def from_end_sponsoring_future_reserves_success(
+        cls,
+    ) -> "EndSponsoringFutureReservesResult":
+        return cls(
+            EndSponsoringFutureReservesResultCode.END_SPONSORING_FUTURE_RESERVES_SUCCESS
+        )
+
+    @classmethod
+    def from_end_sponsoring_future_reserves_not_sponsored(
+        cls,
+    ) -> "EndSponsoringFutureReservesResult":
+        return cls(
+            EndSponsoringFutureReservesResultCode.END_SPONSORING_FUTURE_RESERVES_NOT_SPONSORED
+        )
+
     def pack(self, packer: Packer) -> None:
         self.code.pack(packer)
         if (

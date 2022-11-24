@@ -37,6 +37,16 @@ class MuxedAccount:
         self.ed25519 = ed25519
         self.med25519 = med25519
 
+    @classmethod
+    def from_key_type_ed25519(cls, ed25519: Uint256) -> "MuxedAccount":
+        return cls(CryptoKeyType.KEY_TYPE_ED25519, ed25519=ed25519)
+
+    @classmethod
+    def from_key_type_muxed_ed25519(
+        cls, med25519: MuxedAccountMed25519
+    ) -> "MuxedAccount":
+        return cls(CryptoKeyType.KEY_TYPE_MUXED_ED25519, med25519=med25519)
+
     def pack(self, packer: Packer) -> None:
         self.type.pack(packer)
         if self.type == CryptoKeyType.KEY_TYPE_ED25519:

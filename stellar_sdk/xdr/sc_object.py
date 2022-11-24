@@ -64,6 +64,38 @@ class SCObject:
         self.contract_code = contract_code
         self.account_id = account_id
 
+    @classmethod
+    def from_sco_vec(cls, vec: SCVec) -> "SCObject":
+        return cls(SCObjectType.SCO_VEC, vec=vec)
+
+    @classmethod
+    def from_sco_map(cls, map: SCMap) -> "SCObject":
+        return cls(SCObjectType.SCO_MAP, map=map)
+
+    @classmethod
+    def from_sco_u64(cls, u64: Uint64) -> "SCObject":
+        return cls(SCObjectType.SCO_U64, u64=u64)
+
+    @classmethod
+    def from_sco_i64(cls, i64: Int64) -> "SCObject":
+        return cls(SCObjectType.SCO_I64, i64=i64)
+
+    @classmethod
+    def from_sco_bytes(cls, bin: bytes) -> "SCObject":
+        return cls(SCObjectType.SCO_BYTES, bin=bin)
+
+    @classmethod
+    def from_sco_big_int(cls, big_int: SCBigInt) -> "SCObject":
+        return cls(SCObjectType.SCO_BIG_INT, big_int=big_int)
+
+    @classmethod
+    def from_sco_contract_code(cls, contract_code: SCContractCode) -> "SCObject":
+        return cls(SCObjectType.SCO_CONTRACT_CODE, contract_code=contract_code)
+
+    @classmethod
+    def from_sco_account_id(cls, account_id: AccountID) -> "SCObject":
+        return cls(SCObjectType.SCO_ACCOUNT_ID, account_id=account_id)
+
     def pack(self, packer: Packer) -> None:
         self.type.pack(packer)
         if self.type == SCObjectType.SCO_VEC:
