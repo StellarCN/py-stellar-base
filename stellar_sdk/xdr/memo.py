@@ -45,6 +45,10 @@ class Memo:
         self.ret_hash = ret_hash
 
     @classmethod
+    def from_memo_none(cls) -> "Memo":
+        return cls(MemoType.MEMO_NONE)
+
+    @classmethod
     def from_memo_text(cls, text: bytes) -> "Memo":
         return cls(MemoType.MEMO_TEXT, text=text)
 

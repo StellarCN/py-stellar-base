@@ -59,6 +59,10 @@ class ClaimPredicate:
         self.rel_before = rel_before
 
     @classmethod
+    def from_claim_predicate_unconditional(cls) -> "ClaimPredicate":
+        return cls(ClaimPredicateType.CLAIM_PREDICATE_UNCONDITIONAL)
+
+    @classmethod
     def from_claim_predicate_and(
         cls, and_predicates: List["ClaimPredicate"]
     ) -> "ClaimPredicate":

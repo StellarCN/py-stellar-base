@@ -35,6 +35,46 @@ class PaymentResult:
     ) -> None:
         self.code = code
 
+    @classmethod
+    def from_payment_success(cls) -> "PaymentResult":
+        return cls(PaymentResultCode.PAYMENT_SUCCESS)
+
+    @classmethod
+    def from_payment_malformed(cls) -> "PaymentResult":
+        return cls(PaymentResultCode.PAYMENT_MALFORMED)
+
+    @classmethod
+    def from_payment_underfunded(cls) -> "PaymentResult":
+        return cls(PaymentResultCode.PAYMENT_UNDERFUNDED)
+
+    @classmethod
+    def from_payment_src_no_trust(cls) -> "PaymentResult":
+        return cls(PaymentResultCode.PAYMENT_SRC_NO_TRUST)
+
+    @classmethod
+    def from_payment_src_not_authorized(cls) -> "PaymentResult":
+        return cls(PaymentResultCode.PAYMENT_SRC_NOT_AUTHORIZED)
+
+    @classmethod
+    def from_payment_no_destination(cls) -> "PaymentResult":
+        return cls(PaymentResultCode.PAYMENT_NO_DESTINATION)
+
+    @classmethod
+    def from_payment_no_trust(cls) -> "PaymentResult":
+        return cls(PaymentResultCode.PAYMENT_NO_TRUST)
+
+    @classmethod
+    def from_payment_not_authorized(cls) -> "PaymentResult":
+        return cls(PaymentResultCode.PAYMENT_NOT_AUTHORIZED)
+
+    @classmethod
+    def from_payment_line_full(cls) -> "PaymentResult":
+        return cls(PaymentResultCode.PAYMENT_LINE_FULL)
+
+    @classmethod
+    def from_payment_no_issuer(cls) -> "PaymentResult":
+        return cls(PaymentResultCode.PAYMENT_NO_ISSUER)
+
     def pack(self, packer: Packer) -> None:
         self.code.pack(packer)
         if self.code == PaymentResultCode.PAYMENT_SUCCESS:

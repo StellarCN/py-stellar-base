@@ -66,6 +66,10 @@ class SCStatus:
         self.contract_code = contract_code
 
     @classmethod
+    def from_sst_ok(cls) -> "SCStatus":
+        return cls(SCStatusType.SST_OK)
+
+    @classmethod
     def from_sst_unknown_error(cls, unknown_code: SCUnknownErrorCode) -> "SCStatus":
         return cls(SCStatusType.SST_UNKNOWN_ERROR, unknown_code=unknown_code)
 

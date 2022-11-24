@@ -35,6 +35,10 @@ class SCContractCode:
     def from_sccontract_code_wasm(cls, wasm: bytes) -> "SCContractCode":
         return cls(SCContractCodeType.SCCONTRACT_CODE_WASM, wasm=wasm)
 
+    @classmethod
+    def from_sccontract_code_token(cls) -> "SCContractCode":
+        return cls(SCContractCodeType.SCCONTRACT_CODE_TOKEN)
+
     def pack(self, packer: Packer) -> None:
         self.type.pack(packer)
         if self.type == SCContractCodeType.SCCONTRACT_CODE_WASM:

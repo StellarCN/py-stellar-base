@@ -39,6 +39,14 @@ class InvokeHostFunctionResult:
             InvokeHostFunctionResultCode.INVOKE_HOST_FUNCTION_SUCCESS, success=success
         )
 
+    @classmethod
+    def from_invoke_host_function_malformed(cls) -> "InvokeHostFunctionResult":
+        return cls(InvokeHostFunctionResultCode.INVOKE_HOST_FUNCTION_MALFORMED)
+
+    @classmethod
+    def from_invoke_host_function_trapped(cls) -> "InvokeHostFunctionResult":
+        return cls(InvokeHostFunctionResultCode.INVOKE_HOST_FUNCTION_TRAPPED)
+
     def pack(self, packer: Packer) -> None:
         self.code.pack(packer)
         if self.code == InvokeHostFunctionResultCode.INVOKE_HOST_FUNCTION_SUCCESS:

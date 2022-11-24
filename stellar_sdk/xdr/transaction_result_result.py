@@ -87,6 +87,62 @@ class TransactionResultResult:
     ) -> "TransactionResultResult":
         return cls(TransactionResultCode.txFAILED, results=results)
 
+    @classmethod
+    def from_tx_too_early(cls) -> "TransactionResultResult":
+        return cls(TransactionResultCode.txTOO_EARLY)
+
+    @classmethod
+    def from_tx_too_late(cls) -> "TransactionResultResult":
+        return cls(TransactionResultCode.txTOO_LATE)
+
+    @classmethod
+    def from_tx_missing_operation(cls) -> "TransactionResultResult":
+        return cls(TransactionResultCode.txMISSING_OPERATION)
+
+    @classmethod
+    def from_tx_bad_seq(cls) -> "TransactionResultResult":
+        return cls(TransactionResultCode.txBAD_SEQ)
+
+    @classmethod
+    def from_tx_bad_auth(cls) -> "TransactionResultResult":
+        return cls(TransactionResultCode.txBAD_AUTH)
+
+    @classmethod
+    def from_tx_insufficient_balance(cls) -> "TransactionResultResult":
+        return cls(TransactionResultCode.txINSUFFICIENT_BALANCE)
+
+    @classmethod
+    def from_tx_no_account(cls) -> "TransactionResultResult":
+        return cls(TransactionResultCode.txNO_ACCOUNT)
+
+    @classmethod
+    def from_tx_insufficient_fee(cls) -> "TransactionResultResult":
+        return cls(TransactionResultCode.txINSUFFICIENT_FEE)
+
+    @classmethod
+    def from_tx_bad_auth_extra(cls) -> "TransactionResultResult":
+        return cls(TransactionResultCode.txBAD_AUTH_EXTRA)
+
+    @classmethod
+    def from_tx_internal_error(cls) -> "TransactionResultResult":
+        return cls(TransactionResultCode.txINTERNAL_ERROR)
+
+    @classmethod
+    def from_tx_not_supported(cls) -> "TransactionResultResult":
+        return cls(TransactionResultCode.txNOT_SUPPORTED)
+
+    @classmethod
+    def from_tx_bad_sponsorship(cls) -> "TransactionResultResult":
+        return cls(TransactionResultCode.txBAD_SPONSORSHIP)
+
+    @classmethod
+    def from_tx_bad_min_seq_age_or_gap(cls) -> "TransactionResultResult":
+        return cls(TransactionResultCode.txBAD_MIN_SEQ_AGE_OR_GAP)
+
+    @classmethod
+    def from_tx_malformed(cls) -> "TransactionResultResult":
+        return cls(TransactionResultCode.txMALFORMED)
+
     def pack(self, packer: Packer) -> None:
         self.code.pack(packer)
         if self.code == TransactionResultCode.txFEE_BUMP_INNER_SUCCESS:

@@ -45,6 +45,34 @@ class AccountMergeResult:
             source_account_balance=source_account_balance,
         )
 
+    @classmethod
+    def from_account_merge_malformed(cls) -> "AccountMergeResult":
+        return cls(AccountMergeResultCode.ACCOUNT_MERGE_MALFORMED)
+
+    @classmethod
+    def from_account_merge_no_account(cls) -> "AccountMergeResult":
+        return cls(AccountMergeResultCode.ACCOUNT_MERGE_NO_ACCOUNT)
+
+    @classmethod
+    def from_account_merge_immutable_set(cls) -> "AccountMergeResult":
+        return cls(AccountMergeResultCode.ACCOUNT_MERGE_IMMUTABLE_SET)
+
+    @classmethod
+    def from_account_merge_has_sub_entries(cls) -> "AccountMergeResult":
+        return cls(AccountMergeResultCode.ACCOUNT_MERGE_HAS_SUB_ENTRIES)
+
+    @classmethod
+    def from_account_merge_seqnum_too_far(cls) -> "AccountMergeResult":
+        return cls(AccountMergeResultCode.ACCOUNT_MERGE_SEQNUM_TOO_FAR)
+
+    @classmethod
+    def from_account_merge_dest_full(cls) -> "AccountMergeResult":
+        return cls(AccountMergeResultCode.ACCOUNT_MERGE_DEST_FULL)
+
+    @classmethod
+    def from_account_merge_is_sponsor(cls) -> "AccountMergeResult":
+        return cls(AccountMergeResultCode.ACCOUNT_MERGE_IS_SPONSOR)
+
     def pack(self, packer: Packer) -> None:
         self.code.pack(packer)
         if self.code == AccountMergeResultCode.ACCOUNT_MERGE_SUCCESS:

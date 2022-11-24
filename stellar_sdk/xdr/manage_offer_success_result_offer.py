@@ -43,6 +43,10 @@ class ManageOfferSuccessResultOffer:
     ) -> "ManageOfferSuccessResultOffer":
         return cls(ManageOfferEffect.MANAGE_OFFER_UPDATED, offer=offer)
 
+    @classmethod
+    def from_manage_offer_deleted(cls) -> "ManageOfferSuccessResultOffer":
+        return cls(ManageOfferEffect.MANAGE_OFFER_DELETED)
+
     def pack(self, packer: Packer) -> None:
         self.effect.pack(packer)
         if self.effect == ManageOfferEffect.MANAGE_OFFER_CREATED:

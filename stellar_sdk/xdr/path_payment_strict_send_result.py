@@ -60,12 +60,84 @@ class PathPaymentStrictSendResult:
         )
 
     @classmethod
+    def from_path_payment_strict_send_malformed(cls) -> "PathPaymentStrictSendResult":
+        return cls(PathPaymentStrictSendResultCode.PATH_PAYMENT_STRICT_SEND_MALFORMED)
+
+    @classmethod
+    def from_path_payment_strict_send_underfunded(cls) -> "PathPaymentStrictSendResult":
+        return cls(PathPaymentStrictSendResultCode.PATH_PAYMENT_STRICT_SEND_UNDERFUNDED)
+
+    @classmethod
+    def from_path_payment_strict_send_src_no_trust(
+        cls,
+    ) -> "PathPaymentStrictSendResult":
+        return cls(
+            PathPaymentStrictSendResultCode.PATH_PAYMENT_STRICT_SEND_SRC_NO_TRUST
+        )
+
+    @classmethod
+    def from_path_payment_strict_send_src_not_authorized(
+        cls,
+    ) -> "PathPaymentStrictSendResult":
+        return cls(
+            PathPaymentStrictSendResultCode.PATH_PAYMENT_STRICT_SEND_SRC_NOT_AUTHORIZED
+        )
+
+    @classmethod
+    def from_path_payment_strict_send_no_destination(
+        cls,
+    ) -> "PathPaymentStrictSendResult":
+        return cls(
+            PathPaymentStrictSendResultCode.PATH_PAYMENT_STRICT_SEND_NO_DESTINATION
+        )
+
+    @classmethod
+    def from_path_payment_strict_send_no_trust(cls) -> "PathPaymentStrictSendResult":
+        return cls(PathPaymentStrictSendResultCode.PATH_PAYMENT_STRICT_SEND_NO_TRUST)
+
+    @classmethod
+    def from_path_payment_strict_send_not_authorized(
+        cls,
+    ) -> "PathPaymentStrictSendResult":
+        return cls(
+            PathPaymentStrictSendResultCode.PATH_PAYMENT_STRICT_SEND_NOT_AUTHORIZED
+        )
+
+    @classmethod
+    def from_path_payment_strict_send_line_full(cls) -> "PathPaymentStrictSendResult":
+        return cls(PathPaymentStrictSendResultCode.PATH_PAYMENT_STRICT_SEND_LINE_FULL)
+
+    @classmethod
     def from_path_payment_strict_send_no_issuer(
         cls, no_issuer: Asset
     ) -> "PathPaymentStrictSendResult":
         return cls(
             PathPaymentStrictSendResultCode.PATH_PAYMENT_STRICT_SEND_NO_ISSUER,
             no_issuer=no_issuer,
+        )
+
+    @classmethod
+    def from_path_payment_strict_send_too_few_offers(
+        cls,
+    ) -> "PathPaymentStrictSendResult":
+        return cls(
+            PathPaymentStrictSendResultCode.PATH_PAYMENT_STRICT_SEND_TOO_FEW_OFFERS
+        )
+
+    @classmethod
+    def from_path_payment_strict_send_offer_cross_self(
+        cls,
+    ) -> "PathPaymentStrictSendResult":
+        return cls(
+            PathPaymentStrictSendResultCode.PATH_PAYMENT_STRICT_SEND_OFFER_CROSS_SELF
+        )
+
+    @classmethod
+    def from_path_payment_strict_send_under_destmin(
+        cls,
+    ) -> "PathPaymentStrictSendResult":
+        return cls(
+            PathPaymentStrictSendResultCode.PATH_PAYMENT_STRICT_SEND_UNDER_DESTMIN
         )
 
     def pack(self, packer: Packer) -> None:

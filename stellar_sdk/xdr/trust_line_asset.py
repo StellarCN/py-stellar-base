@@ -46,6 +46,10 @@ class TrustLineAsset:
         self.liquidity_pool_id = liquidity_pool_id
 
     @classmethod
+    def from_asset_type_native(cls) -> "TrustLineAsset":
+        return cls(AssetType.ASSET_TYPE_NATIVE)
+
+    @classmethod
     def from_asset_type_credit_alphanum4(
         cls, alpha_num4: AlphaNum4
     ) -> "TrustLineAsset":

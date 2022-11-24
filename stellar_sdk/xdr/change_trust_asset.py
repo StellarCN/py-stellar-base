@@ -46,6 +46,10 @@ class ChangeTrustAsset:
         self.liquidity_pool = liquidity_pool
 
     @classmethod
+    def from_asset_type_native(cls) -> "ChangeTrustAsset":
+        return cls(AssetType.ASSET_TYPE_NATIVE)
+
+    @classmethod
     def from_asset_type_credit_alphanum4(
         cls, alpha_num4: AlphaNum4
     ) -> "ChangeTrustAsset":

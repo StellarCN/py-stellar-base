@@ -32,6 +32,34 @@ class AllowTrustResult:
     ) -> None:
         self.code = code
 
+    @classmethod
+    def from_allow_trust_success(cls) -> "AllowTrustResult":
+        return cls(AllowTrustResultCode.ALLOW_TRUST_SUCCESS)
+
+    @classmethod
+    def from_allow_trust_malformed(cls) -> "AllowTrustResult":
+        return cls(AllowTrustResultCode.ALLOW_TRUST_MALFORMED)
+
+    @classmethod
+    def from_allow_trust_no_trust_line(cls) -> "AllowTrustResult":
+        return cls(AllowTrustResultCode.ALLOW_TRUST_NO_TRUST_LINE)
+
+    @classmethod
+    def from_allow_trust_trust_not_required(cls) -> "AllowTrustResult":
+        return cls(AllowTrustResultCode.ALLOW_TRUST_TRUST_NOT_REQUIRED)
+
+    @classmethod
+    def from_allow_trust_cant_revoke(cls) -> "AllowTrustResult":
+        return cls(AllowTrustResultCode.ALLOW_TRUST_CANT_REVOKE)
+
+    @classmethod
+    def from_allow_trust_self_not_allowed(cls) -> "AllowTrustResult":
+        return cls(AllowTrustResultCode.ALLOW_TRUST_SELF_NOT_ALLOWED)
+
+    @classmethod
+    def from_allow_trust_low_reserve(cls) -> "AllowTrustResult":
+        return cls(AllowTrustResultCode.ALLOW_TRUST_LOW_RESERVE)
+
     def pack(self, packer: Packer) -> None:
         self.code.pack(packer)
         if self.code == AllowTrustResultCode.ALLOW_TRUST_SUCCESS:

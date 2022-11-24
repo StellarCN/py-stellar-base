@@ -193,6 +193,10 @@ class OperationBody:
         return cls(OperationType.ACCOUNT_MERGE, destination=destination)
 
     @classmethod
+    def from_inflation(cls) -> "OperationBody":
+        return cls(OperationType.INFLATION)
+
+    @classmethod
     def from_manage_data(cls, manage_data_op: ManageDataOp) -> "OperationBody":
         return cls(OperationType.MANAGE_DATA, manage_data_op=manage_data_op)
 
@@ -243,6 +247,10 @@ class OperationBody:
             OperationType.BEGIN_SPONSORING_FUTURE_RESERVES,
             begin_sponsoring_future_reserves_op=begin_sponsoring_future_reserves_op,
         )
+
+    @classmethod
+    def from_end_sponsoring_future_reserves(cls) -> "OperationBody":
+        return cls(OperationType.END_SPONSORING_FUTURE_RESERVES)
 
     @classmethod
     def from_revoke_sponsorship(

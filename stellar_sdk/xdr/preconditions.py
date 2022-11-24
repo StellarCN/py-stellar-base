@@ -36,6 +36,10 @@ class Preconditions:
         self.v2 = v2
 
     @classmethod
+    def from_precond_none(cls) -> "Preconditions":
+        return cls(PreconditionType.PRECOND_NONE)
+
+    @classmethod
     def from_precond_time(cls, time_bounds: TimeBounds) -> "Preconditions":
         return cls(PreconditionType.PRECOND_TIME, time_bounds=time_bounds)
 

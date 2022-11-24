@@ -145,6 +145,10 @@ class StellarMessage:
         return cls(MessageType.DONT_HAVE, dont_have=dont_have)
 
     @classmethod
+    def from_get_peers(cls) -> "StellarMessage":
+        return cls(MessageType.GET_PEERS)
+
+    @classmethod
     def from_peers(cls, peers: List[PeerAddress]) -> "StellarMessage":
         return cls(MessageType.PEERS, peers=peers)
 

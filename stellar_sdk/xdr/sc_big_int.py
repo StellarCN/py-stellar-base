@@ -32,6 +32,10 @@ class SCBigInt:
         self.magnitude = magnitude
 
     @classmethod
+    def from_zero(cls) -> "SCBigInt":
+        return cls(SCNumSign.ZERO)
+
+    @classmethod
     def from_positive(cls, magnitude: bytes) -> "SCBigInt":
         return cls(SCNumSign.POSITIVE, magnitude=magnitude)
 

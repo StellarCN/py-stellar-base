@@ -42,6 +42,10 @@ class InflationResult:
     ) -> "InflationResult":
         return cls(InflationResultCode.INFLATION_SUCCESS, payouts=payouts)
 
+    @classmethod
+    def from_inflation_not_time(cls) -> "InflationResult":
+        return cls(InflationResultCode.INFLATION_NOT_TIME)
+
     def pack(self, packer: Packer) -> None:
         self.code.pack(packer)
         if self.code == InflationResultCode.INFLATION_SUCCESS:
