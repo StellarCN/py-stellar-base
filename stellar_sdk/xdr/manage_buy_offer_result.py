@@ -42,7 +42,7 @@ class ManageBuyOfferResult:
         self.success = success
 
     @classmethod
-    def manage_buy_offer_success(
+    def from_manage_buy_offer_success(
         cls, success: ManageOfferSuccessResult
     ) -> "ManageBuyOfferResult":
         return cls(ManageBuyOfferResultCode.MANAGE_BUY_OFFER_SUCCESS, success=success)

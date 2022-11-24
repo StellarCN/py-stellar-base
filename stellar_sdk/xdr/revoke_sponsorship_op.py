@@ -38,7 +38,7 @@ class RevokeSponsorshipOp:
         self.signer = signer
 
     @classmethod
-    def revoke_sponsorship_ledger_entry(
+    def from_revoke_sponsorship_ledger_entry(
         cls, ledger_key: LedgerKey
     ) -> "RevokeSponsorshipOp":
         return cls(
@@ -46,7 +46,7 @@ class RevokeSponsorshipOp:
         )
 
     @classmethod
-    def revoke_sponsorship_signer(
+    def from_revoke_sponsorship_signer(
         cls, signer: RevokeSponsorshipOpSigner
     ) -> "RevokeSponsorshipOp":
         return cls(RevokeSponsorshipType.REVOKE_SPONSORSHIP_SIGNER, signer=signer)

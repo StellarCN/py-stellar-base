@@ -58,7 +58,7 @@ class TransactionResultResult:
         self.results = results
 
     @classmethod
-    def tx_fee_bump_inner_success(
+    def from_tx_fee_bump_inner_success(
         cls, inner_result_pair: InnerTransactionResultPair
     ) -> "TransactionResultResult":
         return cls(
@@ -67,7 +67,7 @@ class TransactionResultResult:
         )
 
     @classmethod
-    def tx_fee_bump_inner_failed(
+    def from_tx_fee_bump_inner_failed(
         cls, inner_result_pair: InnerTransactionResultPair
     ) -> "TransactionResultResult":
         return cls(
@@ -76,11 +76,15 @@ class TransactionResultResult:
         )
 
     @classmethod
-    def tx_success(cls, results: List[OperationResult]) -> "TransactionResultResult":
+    def from_tx_success(
+        cls, results: List[OperationResult]
+    ) -> "TransactionResultResult":
         return cls(TransactionResultCode.txSUCCESS, results=results)
 
     @classmethod
-    def tx_failed(cls, results: List[OperationResult]) -> "TransactionResultResult":
+    def from_tx_failed(
+        cls, results: List[OperationResult]
+    ) -> "TransactionResultResult":
         return cls(TransactionResultCode.txFAILED, results=results)
 
     def pack(self, packer: Packer) -> None:

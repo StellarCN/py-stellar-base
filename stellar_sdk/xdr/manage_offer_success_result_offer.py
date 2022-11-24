@@ -32,11 +32,15 @@ class ManageOfferSuccessResultOffer:
         self.offer = offer
 
     @classmethod
-    def manage_offer_created(cls, offer: OfferEntry) -> "ManageOfferSuccessResultOffer":
+    def from_manage_offer_created(
+        cls, offer: OfferEntry
+    ) -> "ManageOfferSuccessResultOffer":
         return cls(ManageOfferEffect.MANAGE_OFFER_CREATED, offer=offer)
 
     @classmethod
-    def manage_offer_updated(cls, offer: OfferEntry) -> "ManageOfferSuccessResultOffer":
+    def from_manage_offer_updated(
+        cls, offer: OfferEntry
+    ) -> "ManageOfferSuccessResultOffer":
         return cls(ManageOfferEffect.MANAGE_OFFER_UPDATED, offer=offer)
 
     def pack(self, packer: Packer) -> None:

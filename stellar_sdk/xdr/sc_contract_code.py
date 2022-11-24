@@ -32,7 +32,7 @@ class SCContractCode:
         self.wasm = wasm
 
     @classmethod
-    def sccontract_code_wasm(cls, wasm: bytes) -> "SCContractCode":
+    def from_sccontract_code_wasm(cls, wasm: bytes) -> "SCContractCode":
         return cls(SCContractCodeType.SCCONTRACT_CODE_WASM, wasm=wasm)
 
     def pack(self, packer: Packer) -> None:

@@ -33,11 +33,11 @@ class PeerAddressIp:
         self.ipv6 = ipv6
 
     @classmethod
-    def i_pv4(cls, ipv4: bytes) -> "PeerAddressIp":
+    def from_i_pv4(cls, ipv4: bytes) -> "PeerAddressIp":
         return cls(IPAddrType.IPv4, ipv4=ipv4)
 
     @classmethod
-    def i_pv6(cls, ipv6: bytes) -> "PeerAddressIp":
+    def from_i_pv6(cls, ipv6: bytes) -> "PeerAddressIp":
         return cls(IPAddrType.IPv6, ipv6=ipv6)
 
     def pack(self, packer: Packer) -> None:

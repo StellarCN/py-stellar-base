@@ -29,7 +29,7 @@ class SCEnvMetaEntry:
         self.interface_version = interface_version
 
     @classmethod
-    def sc_env_meta_kind_interface_version(
+    def from_sc_env_meta_kind_interface_version(
         cls, interface_version: Uint64
     ) -> "SCEnvMetaEntry":
         return cls(

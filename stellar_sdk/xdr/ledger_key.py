@@ -97,23 +97,23 @@ class LedgerKey:
         self.config_setting = config_setting
 
     @classmethod
-    def account(cls, account: LedgerKeyAccount) -> "LedgerKey":
+    def from_account(cls, account: LedgerKeyAccount) -> "LedgerKey":
         return cls(LedgerEntryType.ACCOUNT, account=account)
 
     @classmethod
-    def trustline(cls, trust_line: LedgerKeyTrustLine) -> "LedgerKey":
+    def from_trustline(cls, trust_line: LedgerKeyTrustLine) -> "LedgerKey":
         return cls(LedgerEntryType.TRUSTLINE, trust_line=trust_line)
 
     @classmethod
-    def offer(cls, offer: LedgerKeyOffer) -> "LedgerKey":
+    def from_offer(cls, offer: LedgerKeyOffer) -> "LedgerKey":
         return cls(LedgerEntryType.OFFER, offer=offer)
 
     @classmethod
-    def data(cls, data: LedgerKeyData) -> "LedgerKey":
+    def from_data(cls, data: LedgerKeyData) -> "LedgerKey":
         return cls(LedgerEntryType.DATA, data=data)
 
     @classmethod
-    def claimable_balance(
+    def from_claimable_balance(
         cls, claimable_balance: LedgerKeyClaimableBalance
     ) -> "LedgerKey":
         return cls(
@@ -121,15 +121,15 @@ class LedgerKey:
         )
 
     @classmethod
-    def liquidity_pool(cls, liquidity_pool: LedgerKeyLiquidityPool) -> "LedgerKey":
+    def from_liquidity_pool(cls, liquidity_pool: LedgerKeyLiquidityPool) -> "LedgerKey":
         return cls(LedgerEntryType.LIQUIDITY_POOL, liquidity_pool=liquidity_pool)
 
     @classmethod
-    def contract_data(cls, contract_data: LedgerKeyContractData) -> "LedgerKey":
+    def from_contract_data(cls, contract_data: LedgerKeyContractData) -> "LedgerKey":
         return cls(LedgerEntryType.CONTRACT_DATA, contract_data=contract_data)
 
     @classmethod
-    def config_setting(cls, config_setting: LedgerKeyConfigSetting) -> "LedgerKey":
+    def from_config_setting(cls, config_setting: LedgerKeyConfigSetting) -> "LedgerKey":
         return cls(LedgerEntryType.CONFIG_SETTING, config_setting=config_setting)
 
     def pack(self, packer: Packer) -> None:

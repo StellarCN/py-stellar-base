@@ -32,11 +32,11 @@ class SCBigInt:
         self.magnitude = magnitude
 
     @classmethod
-    def positive(cls, magnitude: bytes) -> "SCBigInt":
+    def from_positive(cls, magnitude: bytes) -> "SCBigInt":
         return cls(SCNumSign.POSITIVE, magnitude=magnitude)
 
     @classmethod
-    def negative(cls, magnitude: bytes) -> "SCBigInt":
+    def from_negative(cls, magnitude: bytes) -> "SCBigInt":
         return cls(SCNumSign.NEGATIVE, magnitude=magnitude)
 
     def pack(self, packer: Packer) -> None:

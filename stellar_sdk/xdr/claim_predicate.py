@@ -59,7 +59,7 @@ class ClaimPredicate:
         self.rel_before = rel_before
 
     @classmethod
-    def claim_predicate_and(
+    def from_claim_predicate_and(
         cls, and_predicates: List["ClaimPredicate"]
     ) -> "ClaimPredicate":
         return cls(
@@ -67,19 +67,19 @@ class ClaimPredicate:
         )
 
     @classmethod
-    def claim_predicate_or(
+    def from_claim_predicate_or(
         cls, or_predicates: List["ClaimPredicate"]
     ) -> "ClaimPredicate":
         return cls(ClaimPredicateType.CLAIM_PREDICATE_OR, or_predicates=or_predicates)
 
     @classmethod
-    def claim_predicate_not(
+    def from_claim_predicate_not(
         cls, not_predicate: Optional["ClaimPredicate"]
     ) -> "ClaimPredicate":
         return cls(ClaimPredicateType.CLAIM_PREDICATE_NOT, not_predicate=not_predicate)
 
     @classmethod
-    def claim_predicate_before_absolute_time(
+    def from_claim_predicate_before_absolute_time(
         cls, abs_before: Int64
     ) -> "ClaimPredicate":
         return cls(
@@ -88,7 +88,7 @@ class ClaimPredicate:
         )
 
     @classmethod
-    def claim_predicate_before_relative_time(
+    def from_claim_predicate_before_relative_time(
         cls, rel_before: Int64
     ) -> "ClaimPredicate":
         return cls(

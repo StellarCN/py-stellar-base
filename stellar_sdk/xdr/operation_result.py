@@ -89,7 +89,7 @@ class OperationResult:
         self.tr = tr
 
     @classmethod
-    def op_inner(cls, tr: OperationResultTr) -> "OperationResult":
+    def from_op_inner(cls, tr: OperationResultTr) -> "OperationResult":
         return cls(OperationResultCode.opINNER, tr=tr)
 
     def pack(self, packer: Packer) -> None:

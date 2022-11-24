@@ -46,15 +46,19 @@ class TrustLineAsset:
         self.liquidity_pool_id = liquidity_pool_id
 
     @classmethod
-    def asset_type_credit_alphanum4(cls, alpha_num4: AlphaNum4) -> "TrustLineAsset":
+    def from_asset_type_credit_alphanum4(
+        cls, alpha_num4: AlphaNum4
+    ) -> "TrustLineAsset":
         return cls(AssetType.ASSET_TYPE_CREDIT_ALPHANUM4, alpha_num4=alpha_num4)
 
     @classmethod
-    def asset_type_credit_alphanum12(cls, alpha_num12: AlphaNum12) -> "TrustLineAsset":
+    def from_asset_type_credit_alphanum12(
+        cls, alpha_num12: AlphaNum12
+    ) -> "TrustLineAsset":
         return cls(AssetType.ASSET_TYPE_CREDIT_ALPHANUM12, alpha_num12=alpha_num12)
 
     @classmethod
-    def asset_type_pool_share(cls, liquidity_pool_id: PoolID) -> "TrustLineAsset":
+    def from_asset_type_pool_share(cls, liquidity_pool_id: PoolID) -> "TrustLineAsset":
         return cls(AssetType.ASSET_TYPE_POOL_SHARE, liquidity_pool_id=liquidity_pool_id)
 
     def pack(self, packer: Packer) -> None:

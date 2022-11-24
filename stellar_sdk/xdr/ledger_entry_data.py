@@ -64,23 +64,23 @@ class LedgerEntryData:
         self.config_setting = config_setting
 
     @classmethod
-    def account(cls, account: AccountEntry) -> "LedgerEntryData":
+    def from_account(cls, account: AccountEntry) -> "LedgerEntryData":
         return cls(LedgerEntryType.ACCOUNT, account=account)
 
     @classmethod
-    def trustline(cls, trust_line: TrustLineEntry) -> "LedgerEntryData":
+    def from_trustline(cls, trust_line: TrustLineEntry) -> "LedgerEntryData":
         return cls(LedgerEntryType.TRUSTLINE, trust_line=trust_line)
 
     @classmethod
-    def offer(cls, offer: OfferEntry) -> "LedgerEntryData":
+    def from_offer(cls, offer: OfferEntry) -> "LedgerEntryData":
         return cls(LedgerEntryType.OFFER, offer=offer)
 
     @classmethod
-    def data(cls, data: DataEntry) -> "LedgerEntryData":
+    def from_data(cls, data: DataEntry) -> "LedgerEntryData":
         return cls(LedgerEntryType.DATA, data=data)
 
     @classmethod
-    def claimable_balance(
+    def from_claimable_balance(
         cls, claimable_balance: ClaimableBalanceEntry
     ) -> "LedgerEntryData":
         return cls(
@@ -88,15 +88,19 @@ class LedgerEntryData:
         )
 
     @classmethod
-    def liquidity_pool(cls, liquidity_pool: LiquidityPoolEntry) -> "LedgerEntryData":
+    def from_liquidity_pool(
+        cls, liquidity_pool: LiquidityPoolEntry
+    ) -> "LedgerEntryData":
         return cls(LedgerEntryType.LIQUIDITY_POOL, liquidity_pool=liquidity_pool)
 
     @classmethod
-    def contract_data(cls, contract_data: ContractDataEntry) -> "LedgerEntryData":
+    def from_contract_data(cls, contract_data: ContractDataEntry) -> "LedgerEntryData":
         return cls(LedgerEntryType.CONTRACT_DATA, contract_data=contract_data)
 
     @classmethod
-    def config_setting(cls, config_setting: ConfigSettingEntry) -> "LedgerEntryData":
+    def from_config_setting(
+        cls, config_setting: ConfigSettingEntry
+    ) -> "LedgerEntryData":
         return cls(LedgerEntryType.CONFIG_SETTING, config_setting=config_setting)
 
     def pack(self, packer: Packer) -> None:

@@ -152,7 +152,7 @@ class OperationResultTr:
         self.invoke_host_function_result = invoke_host_function_result
 
     @classmethod
-    def create_account(
+    def from_create_account(
         cls, create_account_result: CreateAccountResult
     ) -> "OperationResultTr":
         return cls(
@@ -160,11 +160,11 @@ class OperationResultTr:
         )
 
     @classmethod
-    def payment(cls, payment_result: PaymentResult) -> "OperationResultTr":
+    def from_payment(cls, payment_result: PaymentResult) -> "OperationResultTr":
         return cls(OperationType.PAYMENT, payment_result=payment_result)
 
     @classmethod
-    def path_payment_strict_receive(
+    def from_path_payment_strict_receive(
         cls, path_payment_strict_receive_result: PathPaymentStrictReceiveResult
     ) -> "OperationResultTr":
         return cls(
@@ -173,7 +173,7 @@ class OperationResultTr:
         )
 
     @classmethod
-    def manage_sell_offer(
+    def from_manage_sell_offer(
         cls, manage_sell_offer_result: ManageSellOfferResult
     ) -> "OperationResultTr":
         return cls(
@@ -182,7 +182,7 @@ class OperationResultTr:
         )
 
     @classmethod
-    def create_passive_sell_offer(
+    def from_create_passive_sell_offer(
         cls, create_passive_sell_offer_result: ManageSellOfferResult
     ) -> "OperationResultTr":
         return cls(
@@ -191,21 +191,25 @@ class OperationResultTr:
         )
 
     @classmethod
-    def set_options(cls, set_options_result: SetOptionsResult) -> "OperationResultTr":
+    def from_set_options(
+        cls, set_options_result: SetOptionsResult
+    ) -> "OperationResultTr":
         return cls(OperationType.SET_OPTIONS, set_options_result=set_options_result)
 
     @classmethod
-    def change_trust(
+    def from_change_trust(
         cls, change_trust_result: ChangeTrustResult
     ) -> "OperationResultTr":
         return cls(OperationType.CHANGE_TRUST, change_trust_result=change_trust_result)
 
     @classmethod
-    def allow_trust(cls, allow_trust_result: AllowTrustResult) -> "OperationResultTr":
+    def from_allow_trust(
+        cls, allow_trust_result: AllowTrustResult
+    ) -> "OperationResultTr":
         return cls(OperationType.ALLOW_TRUST, allow_trust_result=allow_trust_result)
 
     @classmethod
-    def account_merge(
+    def from_account_merge(
         cls, account_merge_result: AccountMergeResult
     ) -> "OperationResultTr":
         return cls(
@@ -213,19 +217,23 @@ class OperationResultTr:
         )
 
     @classmethod
-    def inflation(cls, inflation_result: InflationResult) -> "OperationResultTr":
+    def from_inflation(cls, inflation_result: InflationResult) -> "OperationResultTr":
         return cls(OperationType.INFLATION, inflation_result=inflation_result)
 
     @classmethod
-    def manage_data(cls, manage_data_result: ManageDataResult) -> "OperationResultTr":
+    def from_manage_data(
+        cls, manage_data_result: ManageDataResult
+    ) -> "OperationResultTr":
         return cls(OperationType.MANAGE_DATA, manage_data_result=manage_data_result)
 
     @classmethod
-    def bump_sequence(cls, bump_seq_result: BumpSequenceResult) -> "OperationResultTr":
+    def from_bump_sequence(
+        cls, bump_seq_result: BumpSequenceResult
+    ) -> "OperationResultTr":
         return cls(OperationType.BUMP_SEQUENCE, bump_seq_result=bump_seq_result)
 
     @classmethod
-    def manage_buy_offer(
+    def from_manage_buy_offer(
         cls, manage_buy_offer_result: ManageBuyOfferResult
     ) -> "OperationResultTr":
         return cls(
@@ -234,7 +242,7 @@ class OperationResultTr:
         )
 
     @classmethod
-    def path_payment_strict_send(
+    def from_path_payment_strict_send(
         cls, path_payment_strict_send_result: PathPaymentStrictSendResult
     ) -> "OperationResultTr":
         return cls(
@@ -243,7 +251,7 @@ class OperationResultTr:
         )
 
     @classmethod
-    def create_claimable_balance(
+    def from_create_claimable_balance(
         cls, create_claimable_balance_result: CreateClaimableBalanceResult
     ) -> "OperationResultTr":
         return cls(
@@ -252,7 +260,7 @@ class OperationResultTr:
         )
 
     @classmethod
-    def claim_claimable_balance(
+    def from_claim_claimable_balance(
         cls, claim_claimable_balance_result: ClaimClaimableBalanceResult
     ) -> "OperationResultTr":
         return cls(
@@ -261,7 +269,7 @@ class OperationResultTr:
         )
 
     @classmethod
-    def begin_sponsoring_future_reserves(
+    def from_begin_sponsoring_future_reserves(
         cls,
         begin_sponsoring_future_reserves_result: BeginSponsoringFutureReservesResult,
     ) -> "OperationResultTr":
@@ -271,7 +279,7 @@ class OperationResultTr:
         )
 
     @classmethod
-    def end_sponsoring_future_reserves(
+    def from_end_sponsoring_future_reserves(
         cls, end_sponsoring_future_reserves_result: EndSponsoringFutureReservesResult
     ) -> "OperationResultTr":
         return cls(
@@ -280,7 +288,7 @@ class OperationResultTr:
         )
 
     @classmethod
-    def revoke_sponsorship(
+    def from_revoke_sponsorship(
         cls, revoke_sponsorship_result: RevokeSponsorshipResult
     ) -> "OperationResultTr":
         return cls(
@@ -289,11 +297,11 @@ class OperationResultTr:
         )
 
     @classmethod
-    def clawback(cls, clawback_result: ClawbackResult) -> "OperationResultTr":
+    def from_clawback(cls, clawback_result: ClawbackResult) -> "OperationResultTr":
         return cls(OperationType.CLAWBACK, clawback_result=clawback_result)
 
     @classmethod
-    def clawback_claimable_balance(
+    def from_clawback_claimable_balance(
         cls, clawback_claimable_balance_result: ClawbackClaimableBalanceResult
     ) -> "OperationResultTr":
         return cls(
@@ -302,7 +310,7 @@ class OperationResultTr:
         )
 
     @classmethod
-    def set_trust_line_flags(
+    def from_set_trust_line_flags(
         cls, set_trust_line_flags_result: SetTrustLineFlagsResult
     ) -> "OperationResultTr":
         return cls(
@@ -311,7 +319,7 @@ class OperationResultTr:
         )
 
     @classmethod
-    def liquidity_pool_deposit(
+    def from_liquidity_pool_deposit(
         cls, liquidity_pool_deposit_result: LiquidityPoolDepositResult
     ) -> "OperationResultTr":
         return cls(
@@ -320,7 +328,7 @@ class OperationResultTr:
         )
 
     @classmethod
-    def liquidity_pool_withdraw(
+    def from_liquidity_pool_withdraw(
         cls, liquidity_pool_withdraw_result: LiquidityPoolWithdrawResult
     ) -> "OperationResultTr":
         return cls(
@@ -329,7 +337,7 @@ class OperationResultTr:
         )
 
     @classmethod
-    def invoke_host_function(
+    def from_invoke_host_function(
         cls, invoke_host_function_result: InvokeHostFunctionResult
     ) -> "OperationResultTr":
         return cls(

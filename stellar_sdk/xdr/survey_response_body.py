@@ -29,7 +29,7 @@ class SurveyResponseBody:
         self.topology_response_body = topology_response_body
 
     @classmethod
-    def survey_topology(
+    def from_survey_topology(
         cls, topology_response_body: TopologyResponseBody
     ) -> "SurveyResponseBody":
         return cls(

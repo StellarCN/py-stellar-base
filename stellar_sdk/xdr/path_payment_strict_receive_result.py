@@ -54,7 +54,7 @@ class PathPaymentStrictReceiveResult:
         self.no_issuer = no_issuer
 
     @classmethod
-    def path_payment_strict_receive_success(
+    def from_path_payment_strict_receive_success(
         cls, success: PathPaymentStrictReceiveResultSuccess
     ) -> "PathPaymentStrictReceiveResult":
         return cls(
@@ -63,7 +63,7 @@ class PathPaymentStrictReceiveResult:
         )
 
     @classmethod
-    def path_payment_strict_receive_no_issuer(
+    def from_path_payment_strict_receive_no_issuer(
         cls, no_issuer: Asset
     ) -> "PathPaymentStrictReceiveResult":
         return cls(

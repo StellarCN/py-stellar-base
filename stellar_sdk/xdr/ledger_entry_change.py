@@ -42,19 +42,19 @@ class LedgerEntryChange:
         self.state = state
 
     @classmethod
-    def ledger_entry_created(cls, created: LedgerEntry) -> "LedgerEntryChange":
+    def from_ledger_entry_created(cls, created: LedgerEntry) -> "LedgerEntryChange":
         return cls(LedgerEntryChangeType.LEDGER_ENTRY_CREATED, created=created)
 
     @classmethod
-    def ledger_entry_updated(cls, updated: LedgerEntry) -> "LedgerEntryChange":
+    def from_ledger_entry_updated(cls, updated: LedgerEntry) -> "LedgerEntryChange":
         return cls(LedgerEntryChangeType.LEDGER_ENTRY_UPDATED, updated=updated)
 
     @classmethod
-    def ledger_entry_removed(cls, removed: LedgerKey) -> "LedgerEntryChange":
+    def from_ledger_entry_removed(cls, removed: LedgerKey) -> "LedgerEntryChange":
         return cls(LedgerEntryChangeType.LEDGER_ENTRY_REMOVED, removed=removed)
 
     @classmethod
-    def ledger_entry_state(cls, state: LedgerEntry) -> "LedgerEntryChange":
+    def from_ledger_entry_state(cls, state: LedgerEntry) -> "LedgerEntryChange":
         return cls(LedgerEntryChangeType.LEDGER_ENTRY_STATE, state=state)
 
     def pack(self, packer: Packer) -> None:

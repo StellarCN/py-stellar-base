@@ -53,13 +53,13 @@ class InnerTransactionResultResult:
         self.results = results
 
     @classmethod
-    def tx_success(
+    def from_tx_success(
         cls, results: List[OperationResult]
     ) -> "InnerTransactionResultResult":
         return cls(TransactionResultCode.txSUCCESS, results=results)
 
     @classmethod
-    def tx_failed(
+    def from_tx_failed(
         cls, results: List[OperationResult]
     ) -> "InnerTransactionResultResult":
         return cls(TransactionResultCode.txFAILED, results=results)

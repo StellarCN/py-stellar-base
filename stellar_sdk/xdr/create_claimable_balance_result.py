@@ -36,7 +36,7 @@ class CreateClaimableBalanceResult:
         self.balance_id = balance_id
 
     @classmethod
-    def create_claimable_balance_success(
+    def from_create_claimable_balance_success(
         cls, balance_id: ClaimableBalanceID
     ) -> "CreateClaimableBalanceResult":
         return cls(

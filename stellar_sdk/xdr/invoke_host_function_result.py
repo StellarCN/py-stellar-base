@@ -32,7 +32,9 @@ class InvokeHostFunctionResult:
         self.success = success
 
     @classmethod
-    def invoke_host_function_success(cls, success: SCVal) -> "InvokeHostFunctionResult":
+    def from_invoke_host_function_success(
+        cls, success: SCVal
+    ) -> "InvokeHostFunctionResult":
         return cls(
             InvokeHostFunctionResultCode.INVOKE_HOST_FUNCTION_SUCCESS, success=success
         )

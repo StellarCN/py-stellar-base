@@ -37,7 +37,9 @@ class InflationResult:
         self.payouts = payouts
 
     @classmethod
-    def inflation_success(cls, payouts: List[InflationPayout]) -> "InflationResult":
+    def from_inflation_success(
+        cls, payouts: List[InflationPayout]
+    ) -> "InflationResult":
         return cls(InflationResultCode.INFLATION_SUCCESS, payouts=payouts)
 
     def pack(self, packer: Packer) -> None:

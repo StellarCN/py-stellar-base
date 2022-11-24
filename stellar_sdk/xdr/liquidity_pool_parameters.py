@@ -31,7 +31,7 @@ class LiquidityPoolParameters:
         self.constant_product = constant_product
 
     @classmethod
-    def liquidity_pool_constant_product(
+    def from_liquidity_pool_constant_product(
         cls, constant_product: LiquidityPoolConstantProductParameters
     ) -> "LiquidityPoolParameters":
         return cls(

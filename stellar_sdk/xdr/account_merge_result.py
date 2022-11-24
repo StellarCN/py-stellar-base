@@ -37,7 +37,7 @@ class AccountMergeResult:
         self.source_account_balance = source_account_balance
 
     @classmethod
-    def account_merge_success(
+    def from_account_merge_success(
         cls, source_account_balance: Int64
     ) -> "AccountMergeResult":
         return cls(

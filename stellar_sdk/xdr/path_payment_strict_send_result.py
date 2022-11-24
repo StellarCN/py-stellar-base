@@ -51,7 +51,7 @@ class PathPaymentStrictSendResult:
         self.no_issuer = no_issuer
 
     @classmethod
-    def path_payment_strict_send_success(
+    def from_path_payment_strict_send_success(
         cls, success: PathPaymentStrictSendResultSuccess
     ) -> "PathPaymentStrictSendResult":
         return cls(
@@ -60,7 +60,7 @@ class PathPaymentStrictSendResult:
         )
 
     @classmethod
-    def path_payment_strict_send_no_issuer(
+    def from_path_payment_strict_send_no_issuer(
         cls, no_issuer: Asset
     ) -> "PathPaymentStrictSendResult":
         return cls(

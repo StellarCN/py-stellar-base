@@ -36,11 +36,11 @@ class Preconditions:
         self.v2 = v2
 
     @classmethod
-    def precond_time(cls, time_bounds: TimeBounds) -> "Preconditions":
+    def from_precond_time(cls, time_bounds: TimeBounds) -> "Preconditions":
         return cls(PreconditionType.PRECOND_TIME, time_bounds=time_bounds)
 
     @classmethod
-    def precond_v2(cls, v2: PreconditionsV2) -> "Preconditions":
+    def from_precond_v2(cls, v2: PreconditionsV2) -> "Preconditions":
         return cls(PreconditionType.PRECOND_V2, v2=v2)
 
     def pack(self, packer: Packer) -> None:

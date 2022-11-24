@@ -80,19 +80,19 @@ class HashIDPreimage:
         self.source_account_contract_id = source_account_contract_id
 
     @classmethod
-    def envelope_type_op_id(
+    def from_envelope_type_op_id(
         cls, operation_id: HashIDPreimageOperationID
     ) -> "HashIDPreimage":
         return cls(EnvelopeType.ENVELOPE_TYPE_OP_ID, operation_id=operation_id)
 
     @classmethod
-    def envelope_type_pool_revoke_op_id(
+    def from_envelope_type_pool_revoke_op_id(
         cls, revoke_id: HashIDPreimageRevokeID
     ) -> "HashIDPreimage":
         return cls(EnvelopeType.ENVELOPE_TYPE_POOL_REVOKE_OP_ID, revoke_id=revoke_id)
 
     @classmethod
-    def envelope_type_contract_id_from_ed25519(
+    def from_envelope_type_contract_id_from_ed25519(
         cls, ed25519_contract_id: HashIDPreimageEd25519ContractID
     ) -> "HashIDPreimage":
         return cls(
@@ -101,7 +101,7 @@ class HashIDPreimage:
         )
 
     @classmethod
-    def envelope_type_contract_id_from_contract(
+    def from_envelope_type_contract_id_from_contract(
         cls, contract_id: HashIDPreimageContractID
     ) -> "HashIDPreimage":
         return cls(
@@ -110,7 +110,7 @@ class HashIDPreimage:
         )
 
     @classmethod
-    def envelope_type_contract_id_from_asset(
+    def from_envelope_type_contract_id_from_asset(
         cls, from_asset: Asset
     ) -> "HashIDPreimage":
         return cls(
@@ -118,7 +118,7 @@ class HashIDPreimage:
         )
 
     @classmethod
-    def envelope_type_contract_id_from_source_account(
+    def from_envelope_type_contract_id_from_source_account(
         cls, source_account_contract_id: HashIDPreimageSourceAccountContractID
     ) -> "HashIDPreimage":
         return cls(

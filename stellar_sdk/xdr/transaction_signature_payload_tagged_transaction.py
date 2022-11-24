@@ -35,13 +35,13 @@ class TransactionSignaturePayloadTaggedTransaction:
         self.fee_bump = fee_bump
 
     @classmethod
-    def envelope_type_tx(
+    def from_envelope_type_tx(
         cls, tx: Transaction
     ) -> "TransactionSignaturePayloadTaggedTransaction":
         return cls(EnvelopeType.ENVELOPE_TYPE_TX, tx=tx)
 
     @classmethod
-    def envelope_type_tx_fee_bump(
+    def from_envelope_type_tx_fee_bump(
         cls, fee_bump: FeeBumpTransaction
     ) -> "TransactionSignaturePayloadTaggedTransaction":
         return cls(EnvelopeType.ENVELOPE_TYPE_TX_FEE_BUMP, fee_bump=fee_bump)

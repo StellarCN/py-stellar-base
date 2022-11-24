@@ -129,35 +129,35 @@ class StellarMessage:
         self.flood_demand = flood_demand
 
     @classmethod
-    def error_msg(cls, error: Error) -> "StellarMessage":
+    def from_error_msg(cls, error: Error) -> "StellarMessage":
         return cls(MessageType.ERROR_MSG, error=error)
 
     @classmethod
-    def hello(cls, hello: Hello) -> "StellarMessage":
+    def from_hello(cls, hello: Hello) -> "StellarMessage":
         return cls(MessageType.HELLO, hello=hello)
 
     @classmethod
-    def auth(cls, auth: Auth) -> "StellarMessage":
+    def from_auth(cls, auth: Auth) -> "StellarMessage":
         return cls(MessageType.AUTH, auth=auth)
 
     @classmethod
-    def dont_have(cls, dont_have: DontHave) -> "StellarMessage":
+    def from_dont_have(cls, dont_have: DontHave) -> "StellarMessage":
         return cls(MessageType.DONT_HAVE, dont_have=dont_have)
 
     @classmethod
-    def peers(cls, peers: List[PeerAddress]) -> "StellarMessage":
+    def from_peers(cls, peers: List[PeerAddress]) -> "StellarMessage":
         return cls(MessageType.PEERS, peers=peers)
 
     @classmethod
-    def get_tx_set(cls, tx_set_hash: Uint256) -> "StellarMessage":
+    def from_get_tx_set(cls, tx_set_hash: Uint256) -> "StellarMessage":
         return cls(MessageType.GET_TX_SET, tx_set_hash=tx_set_hash)
 
     @classmethod
-    def tx_set(cls, tx_set: TransactionSet) -> "StellarMessage":
+    def from_tx_set(cls, tx_set: TransactionSet) -> "StellarMessage":
         return cls(MessageType.TX_SET, tx_set=tx_set)
 
     @classmethod
-    def generalized_tx_set(
+    def from_generalized_tx_set(
         cls, generalized_tx_set: GeneralizedTransactionSet
     ) -> "StellarMessage":
         return cls(
@@ -165,11 +165,11 @@ class StellarMessage:
         )
 
     @classmethod
-    def transaction(cls, transaction: TransactionEnvelope) -> "StellarMessage":
+    def from_transaction(cls, transaction: TransactionEnvelope) -> "StellarMessage":
         return cls(MessageType.TRANSACTION, transaction=transaction)
 
     @classmethod
-    def survey_request(
+    def from_survey_request(
         cls, signed_survey_request_message: SignedSurveyRequestMessage
     ) -> "StellarMessage":
         return cls(
@@ -178,7 +178,7 @@ class StellarMessage:
         )
 
     @classmethod
-    def survey_response(
+    def from_survey_response(
         cls, signed_survey_response_message: SignedSurveyResponseMessage
     ) -> "StellarMessage":
         return cls(
@@ -187,31 +187,31 @@ class StellarMessage:
         )
 
     @classmethod
-    def get_scp_quorumset(cls, q_set_hash: Uint256) -> "StellarMessage":
+    def from_get_scp_quorumset(cls, q_set_hash: Uint256) -> "StellarMessage":
         return cls(MessageType.GET_SCP_QUORUMSET, q_set_hash=q_set_hash)
 
     @classmethod
-    def scp_quorumset(cls, q_set: SCPQuorumSet) -> "StellarMessage":
+    def from_scp_quorumset(cls, q_set: SCPQuorumSet) -> "StellarMessage":
         return cls(MessageType.SCP_QUORUMSET, q_set=q_set)
 
     @classmethod
-    def scp_message(cls, envelope: SCPEnvelope) -> "StellarMessage":
+    def from_scp_message(cls, envelope: SCPEnvelope) -> "StellarMessage":
         return cls(MessageType.SCP_MESSAGE, envelope=envelope)
 
     @classmethod
-    def get_scp_state(cls, get_scp_ledger_seq: Uint32) -> "StellarMessage":
+    def from_get_scp_state(cls, get_scp_ledger_seq: Uint32) -> "StellarMessage":
         return cls(MessageType.GET_SCP_STATE, get_scp_ledger_seq=get_scp_ledger_seq)
 
     @classmethod
-    def send_more(cls, send_more_message: SendMore) -> "StellarMessage":
+    def from_send_more(cls, send_more_message: SendMore) -> "StellarMessage":
         return cls(MessageType.SEND_MORE, send_more_message=send_more_message)
 
     @classmethod
-    def flood_advert(cls, flood_advert: FloodAdvert) -> "StellarMessage":
+    def from_flood_advert(cls, flood_advert: FloodAdvert) -> "StellarMessage":
         return cls(MessageType.FLOOD_ADVERT, flood_advert=flood_advert)
 
     @classmethod
-    def flood_demand(cls, flood_demand: FloodDemand) -> "StellarMessage":
+    def from_flood_demand(cls, flood_demand: FloodDemand) -> "StellarMessage":
         return cls(MessageType.FLOOD_DEMAND, flood_demand=flood_demand)
 
     def pack(self, packer: Packer) -> None:

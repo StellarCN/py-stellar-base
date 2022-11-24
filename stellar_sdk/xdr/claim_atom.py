@@ -39,15 +39,15 @@ class ClaimAtom:
         self.liquidity_pool = liquidity_pool
 
     @classmethod
-    def claim_atom_type_v0(cls, v0: ClaimOfferAtomV0) -> "ClaimAtom":
+    def from_claim_atom_type_v0(cls, v0: ClaimOfferAtomV0) -> "ClaimAtom":
         return cls(ClaimAtomType.CLAIM_ATOM_TYPE_V0, v0=v0)
 
     @classmethod
-    def claim_atom_type_order_book(cls, order_book: ClaimOfferAtom) -> "ClaimAtom":
+    def from_claim_atom_type_order_book(cls, order_book: ClaimOfferAtom) -> "ClaimAtom":
         return cls(ClaimAtomType.CLAIM_ATOM_TYPE_ORDER_BOOK, order_book=order_book)
 
     @classmethod
-    def claim_atom_type_liquidity_pool(
+    def from_claim_atom_type_liquidity_pool(
         cls, liquidity_pool: ClaimLiquidityAtom
     ) -> "ClaimAtom":
         return cls(
