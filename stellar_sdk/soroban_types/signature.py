@@ -1,5 +1,5 @@
 import abc
-from typing import Sequence
+from typing import Sequence, Union
 
 from stellar_sdk.xdr import (
     SCVal,
@@ -13,6 +13,8 @@ from stellar_sdk.xdr import (
 )
 from .base import BaseScValAlias
 from ..keypair import Keypair
+
+__all__ = ["Signature", "InvokerSignature", "Ed25519Signature", "AccountSignature"]
 
 
 class Signature(BaseScValAlias, metaclass=abc.ABCMeta):
@@ -38,8 +40,10 @@ class InvokerSignature(Signature):
 
 
 class Ed25519Signature(Signature):
-    def __init__(self, public_key: str, signature: bytes):
-        self.public_key: Keypair = Keypair.from_public_key(public_key)
+    def __init__(self, public_key: Union[str, Keypair], signature: bytes):
+        if isinstance(public_key, str):
+            public_key = Keypair.from_public_key(public_key)
+        self.public_key: Keypair = public_key
         self.signature: bytes = signature
 
     def _to_xdr_sc_val(self) -> SCVal:
@@ -85,8 +89,12 @@ class Ed25519Signature(Signature):
 
 
 class AccountSignature:
-    def __init__(self, account: str, signatures: Sequence[Ed25519Signature]):
-        self.account: Keypair = Keypair.from_public_key(account)
+    def __init__(
+        self, account: Union[str, Keypair], signatures: Sequence[Ed25519Signature]
+    ):
+        if isinstance(account, str):
+            account = Keypair.from_public_key(account)
+        self.account: Keypair = account
         self.signatures = signatures
 
     def _to_xdr_sc_val(self) -> SCVal:
@@ -118,7 +126,8 @@ class AccountSignature:
                         ]
                     ),
                 ),
-            ) for signature in self.signatures
+            )
+            for signature in self.signatures
         ]
         return SCVal.from_scv_object(
             SCObject.from_sco_vec(

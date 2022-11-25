@@ -1,6 +1,8 @@
 import abc
 from stellar_sdk import xdr as stellar_xdr
 
+__all__ = ["BaseScValAlias"]
+
 
 class BaseScValAlias(metaclass=abc.ABCMeta):
     """An abstract base class for Stellar identifiers."""
