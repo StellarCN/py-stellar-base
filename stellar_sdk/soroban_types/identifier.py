@@ -2,12 +2,12 @@ import abc
 from typing import Union
 
 from .base import BaseScValAlias
-from stellar_sdk import xdr as stellar_xdr
-from stellar_sdk.keypair import Keypair
+from .. import xdr as stellar_xdr
+from ..keypair import Keypair
 
 
 class Identifier(BaseScValAlias, metaclass=abc.ABCMeta):
-    """An abstract base class for Stellar identifiers."""
+    """An abstract base class for Stellar Soroban Identifiers."""
 
 
 class Ed25519Identifier(Identifier):
