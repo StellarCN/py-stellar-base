@@ -1,5 +1,5 @@
 import binascii
-from typing import List
+from typing import List, Union
 
 from .signature import Ed25519Signature
 from ..keypair import Keypair
@@ -20,13 +20,21 @@ __all__ = ["SignaturePayload"]
 
 class SignaturePayload:
     def __init__(
-        self, network_passphrase: str, contract_id: str, name: str, args: List[SCVal]
+        self,
+        network_passphrase: str,
+        contract_id: str,
+        name: str,
+        args: List[Union[SCVal, BaseScValAlias]],
     ):
         self.network_passphrase = network_passphrase
         self.contract_id = contract_id
         self.name = name
-        self.args = args or []
         self._contract_id = binascii.unhexlify(contract_id)
+        args = [] if args is None else args
+        self.args = [
+            arg._to_xdr_sc_val() if isinstance(arg, BaseScValAlias) else arg
+            for arg in args
+        ]
 
     def sign(self, signer: Keypair) -> bytes:
         return signer.sign(self._to_xdr_object().to_xdr_bytes())
