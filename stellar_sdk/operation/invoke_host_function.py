@@ -1,9 +1,9 @@
-import binascii
-from typing import Optional, Union, List
+from typing import Optional, Union, Sequence
 
 from .operation import Operation
 from .. import xdr as stellar_xdr
 from ..muxed_account import MuxedAccount
+from stellar_sdk.soroban_types.base import BaseScValAlias
 from ..type_checked import type_checked
 
 __all__ = ["InvokeHostFunction"]
@@ -18,7 +18,7 @@ class InvokeHostFunction(Operation):
     def __init__(
         self,
         function: stellar_xdr.HostFunction,
-        parameters: List[stellar_xdr.SCVal],
+        parameters: Sequence[Union[stellar_xdr.SCVal, BaseScValAlias]],
         footprint: stellar_xdr.LedgerFootprint = None,
         source: Optional[Union[MuxedAccount, str]] = None,
     ):
@@ -27,7 +27,10 @@ class InvokeHostFunction(Operation):
             stellar_xdr.LedgerFootprint([], []) if footprint is None else footprint
         )
         self.function = function
-        self.parameters = parameters
+        self.parameters = [
+            p._to_xdr_sc_val() if isinstance(p, BaseScValAlias) else p
+            for p in parameters
+        ]
 
     def _to_operation_body(self) -> stellar_xdr.OperationBody:
         invoke_host_function_op = stellar_xdr.InvokeHostFunctionOp(

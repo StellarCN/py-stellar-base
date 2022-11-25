@@ -172,7 +172,7 @@ def to_xdr_amount(value: Union[str, Decimal]) -> int:
 
 
 def from_xdr_amount(value: int) -> str:
-    """Converts an str amount from an XDR amount object
+    """Converts a str amount from an XDR amount object
 
     :param value: The amount to convert to a string from an XDR int64
         amount.
