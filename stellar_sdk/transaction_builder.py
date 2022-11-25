@@ -28,6 +28,7 @@ from .transaction import Transaction
 from .transaction_envelope import TransactionEnvelope
 from .type_checked import type_checked
 from .utils import hex_to_bytes, is_valid_hash
+from .soroban_types.base import BaseScValAlias
 
 __all__ = ["TransactionBuilder"]
 
@@ -1201,7 +1202,7 @@ class TransactionBuilder:
         self,
         contract_id: str,
         method: str,
-        parameters: List[stellar_xdr.SCVal],
+        parameters: List[Union[stellar_xdr.SCVal, BaseScValAlias]],
         footprint: stellar_xdr.LedgerFootprint = None,
         source: Optional[Union[MuxedAccount, str]] = None,
     ) -> "TransactionBuilder":
