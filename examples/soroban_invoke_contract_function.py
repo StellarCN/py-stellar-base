@@ -16,12 +16,13 @@ from stellar_sdk import Network, Keypair, TransactionBuilder
 from stellar_sdk import xdr as stellar_xdr
 from stellar_sdk.soroban import SorobanServer
 from stellar_sdk.soroban.soroban_rpc import TransactionStatus
+from stellar_sdk.soroban_types import Symbol
 
 # TODO: You need to replace the following parameters according to the actual situation
 secret = "SAAPYAPTTRZMCUZFPG3G66V4ZMHTK4TWA6NS7U4F7Z3IMUD52EK4DDEV"
-rpc_server_url = "http://127.0.0.1:8000/soroban/rpc"
-contract_id = "ca08ea2c19bd47d9e04de0cc86e1440866f6c7f8634095872c38000e1a7cbcd9"
-network_passphrase = Network.STANDALONE_NETWORK_PASSPHRASE
+rpc_server_url = "https://horizon-futurenet.stellar.cash:443/soroban/rpc"
+contract_id = "348548af2ce5e6970147a80b3097f2d9ea89e5f6830e5da0adca7f7db15e6aa9"
+network_passphrase = Network.FUTURENET_NETWORK_PASSPHRASE
 
 kp = Keypair.from_secret(secret)
 soroban_server = SorobanServer(rpc_server_url)
@@ -34,13 +35,7 @@ tx = (
     .append_invoke_contract_function_op(
         contract_id=contract_id,
         method="hello",
-        parameters=[
-            # May simplify the construction of SCVal in the future
-            stellar_xdr.SCVal(
-                type=stellar_xdr.SCValType.SCV_SYMBOL,
-                sym=stellar_xdr.SCSymbol(sc_symbol="world".encode()),
-            )
-        ],
+        parameters=[Symbol("world")],
         source=kp.public_key,
     )
     .build()
