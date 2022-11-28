@@ -10,3 +10,4 @@ from .signature_payload import *
 from .symbol import *
 from .uint32 import *
 from .uint63 import *
+from .vec import *
