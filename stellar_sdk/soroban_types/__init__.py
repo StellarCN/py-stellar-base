@@ -2,6 +2,7 @@ from .account_id import *
 from .base import *
 from .big_int import *
 from .bytes import *
+from .custom_type import *
 from .identifier import *
 from .int32 import *
 from .signature import *
