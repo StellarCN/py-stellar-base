@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Union, Sequence, Optional
+from typing import Union, Sequence
 
 from .base import BaseScValAlias
 from ..xdr import (
@@ -13,17 +13,17 @@ from ..xdr import (
     SCVec,
 )
 
-__all__ = ["CustomTypeStructField", "CustomTypeStruct", "CustomTypeEnum"]
+__all__ = ["StructField", "Struct"]
 
 
 @dataclass
-class CustomTypeStructField:
+class StructField:
     key: str
     value: Union[SCVal, BaseScValAlias]
 
 
-class CustomTypeStruct(BaseScValAlias):
-    def __init__(self, fields: Sequence[CustomTypeStructField]):
+class Struct(BaseScValAlias):
+    def __init__(self, fields: Sequence[StructField]):
         self.fields = fields
 
     def _to_xdr_sc_val(self) -> SCVal:
@@ -49,25 +49,22 @@ class CustomTypeStruct(BaseScValAlias):
         )
 
 
-class CustomTypeEnum(BaseScValAlias):
-    def __init__(self, key: str, value: Optional[Union[SCVal, BaseScValAlias]]):
-        self.key = key
-        self.value = value
+class TupleStruct(BaseScValAlias):
+    def __init__(self, fields: Sequence[Union[SCVal, BaseScValAlias]]):
+        self.fields = fields
 
     def _to_xdr_sc_val(self) -> SCVal:
-        vec = [
-            SCVal(SCValType.SCV_SYMBOL, sym=SCSymbol(self.key.encode())),
-        ]
-        if self.value is not None:
-            vec.append(
-                self.value._to_xdr_sc_val()
-                if isinstance(self.value, BaseScValAlias)
-                else self.value
-            )
         return SCVal(
             SCValType.SCV_OBJECT,
             obj=SCObject(
                 SCObjectType.SCO_VEC,
-                vec=SCVec(vec),
+                vec=SCVec(
+                    [
+                        field._to_xdr_sc_val()
+                        if isinstance(field, BaseScValAlias)
+                        else field
+                        for field in self.fields
+                    ]
+                ),
             ),
         )
