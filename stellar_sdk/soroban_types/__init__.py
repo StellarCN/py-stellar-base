@@ -5,6 +5,7 @@ from .bytes import *
 from .enum import *
 from .identifier import *
 from .int32 import *
+from .int64 import *
 from .signature import *
 from .signature_payload import *
 from .struct import *
