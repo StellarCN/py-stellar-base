@@ -1,4 +1,5 @@
 import abc
+import binascii
 from typing import Union
 
 from .base import BaseScValAlias
@@ -71,10 +72,8 @@ class AccountIdentifier(Identifier):
 
 
 class ContractIdentifier(Identifier):
-    def __init__(self, public_key: Union[str, Keypair]):
-        if isinstance(public_key, str):
-            public_key = Keypair.from_public_key(public_key)
-        self.keypair: Keypair = public_key
+    def __init__(self, contract_id: str):
+        self.contract_id = contract_id
 
     def _to_xdr_sc_val(self) -> stellar_xdr.SCVal:
         return stellar_xdr.SCVal(
@@ -89,7 +88,7 @@ class ContractIdentifier(Identifier):
                         ),
                         stellar_xdr.SCVal.from_scv_object(
                             obj=stellar_xdr.SCObject.from_sco_bytes(
-                                bin=self.keypair.raw_public_key()
+                                bin=binascii.unhexlify(self.contract_id)
                             ),
                         ),
                     ]
