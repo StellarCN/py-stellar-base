@@ -7,7 +7,7 @@ from .account_id import AccountID
 from .base import Opaque
 from .constants import *
 from .int64 import Int64
-from .sc_big_int import SCBigInt
+from .int128_parts import Int128Parts
 from .sc_contract_code import SCContractCode
 from .sc_map import SCMap
 from .sc_object_type import SCObjectType
@@ -31,10 +31,12 @@ class SCObject:
             uint64 u64;
         case SCO_I64:
             int64 i64;
+        case SCO_U128:
+            Int128Parts u128;
+        case SCO_I128:
+            Int128Parts i128;
         case SCO_BYTES:
             opaque bin<SCVAL_LIMIT>;
-        case SCO_BIG_INT:
-            SCBigInt bigInt;
         case SCO_CONTRACT_CODE:
             SCContractCode contractCode;
         case SCO_ACCOUNT_ID:
@@ -49,8 +51,9 @@ class SCObject:
         map: SCMap = None,
         u64: Uint64 = None,
         i64: Int64 = None,
+        u128: Int128Parts = None,
+        i128: Int128Parts = None,
         bin: bytes = None,
-        big_int: SCBigInt = None,
         contract_code: SCContractCode = None,
         account_id: AccountID = None,
     ) -> None:
@@ -59,8 +62,9 @@ class SCObject:
         self.map = map
         self.u64 = u64
         self.i64 = i64
+        self.u128 = u128
+        self.i128 = i128
         self.bin = bin
-        self.big_int = big_int
         self.contract_code = contract_code
         self.account_id = account_id
 
@@ -81,12 +85,16 @@ class SCObject:
         return cls(SCObjectType.SCO_I64, i64=i64)
 
     @classmethod
-    def from_sco_bytes(cls, bin: bytes) -> "SCObject":
-        return cls(SCObjectType.SCO_BYTES, bin=bin)
+    def from_sco_u128(cls, u128: Int128Parts) -> "SCObject":
+        return cls(SCObjectType.SCO_U128, u128=u128)
 
     @classmethod
-    def from_sco_big_int(cls, big_int: SCBigInt) -> "SCObject":
-        return cls(SCObjectType.SCO_BIG_INT, big_int=big_int)
+    def from_sco_i128(cls, i128: Int128Parts) -> "SCObject":
+        return cls(SCObjectType.SCO_I128, i128=i128)
+
+    @classmethod
+    def from_sco_bytes(cls, bin: bytes) -> "SCObject":
+        return cls(SCObjectType.SCO_BYTES, bin=bin)
 
     @classmethod
     def from_sco_contract_code(cls, contract_code: SCContractCode) -> "SCObject":
@@ -118,15 +126,20 @@ class SCObject:
                 raise ValueError("i64 should not be None.")
             self.i64.pack(packer)
             return
+        if self.type == SCObjectType.SCO_U128:
+            if self.u128 is None:
+                raise ValueError("u128 should not be None.")
+            self.u128.pack(packer)
+            return
+        if self.type == SCObjectType.SCO_I128:
+            if self.i128 is None:
+                raise ValueError("i128 should not be None.")
+            self.i128.pack(packer)
+            return
         if self.type == SCObjectType.SCO_BYTES:
             if self.bin is None:
                 raise ValueError("bin should not be None.")
             Opaque(self.bin, SCVAL_LIMIT, False).pack(packer)
-            return
-        if self.type == SCObjectType.SCO_BIG_INT:
-            if self.big_int is None:
-                raise ValueError("big_int should not be None.")
-            self.big_int.pack(packer)
             return
         if self.type == SCObjectType.SCO_CONTRACT_CODE:
             if self.contract_code is None:
@@ -154,12 +167,15 @@ class SCObject:
         if type == SCObjectType.SCO_I64:
             i64 = Int64.unpack(unpacker)
             return cls(type=type, i64=i64)
+        if type == SCObjectType.SCO_U128:
+            u128 = Int128Parts.unpack(unpacker)
+            return cls(type=type, u128=u128)
+        if type == SCObjectType.SCO_I128:
+            i128 = Int128Parts.unpack(unpacker)
+            return cls(type=type, i128=i128)
         if type == SCObjectType.SCO_BYTES:
             bin = Opaque.unpack(unpacker, SCVAL_LIMIT, False)
             return cls(type=type, bin=bin)
-        if type == SCObjectType.SCO_BIG_INT:
-            big_int = SCBigInt.unpack(unpacker)
-            return cls(type=type, big_int=big_int)
         if type == SCObjectType.SCO_CONTRACT_CODE:
             contract_code = SCContractCode.unpack(unpacker)
             return cls(type=type, contract_code=contract_code)
@@ -196,8 +212,9 @@ class SCObject:
             and self.map == other.map
             and self.u64 == other.u64
             and self.i64 == other.i64
+            and self.u128 == other.u128
+            and self.i128 == other.i128
             and self.bin == other.bin
-            and self.big_int == other.big_int
             and self.contract_code == other.contract_code
             and self.account_id == other.account_id
         )
@@ -209,8 +226,9 @@ class SCObject:
         out.append(f"map={self.map}") if self.map is not None else None
         out.append(f"u64={self.u64}") if self.u64 is not None else None
         out.append(f"i64={self.i64}") if self.i64 is not None else None
+        out.append(f"u128={self.u128}") if self.u128 is not None else None
+        out.append(f"i128={self.i128}") if self.i128 is not None else None
         out.append(f"bin={self.bin}") if self.bin is not None else None
-        out.append(f"big_int={self.big_int}") if self.big_int is not None else None
         out.append(
             f"contract_code={self.contract_code}"
         ) if self.contract_code is not None else None

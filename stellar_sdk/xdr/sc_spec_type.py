@@ -20,14 +20,15 @@ class SCSpecType(IntEnum):
             SC_SPEC_TYPE_I32 = 2,
             SC_SPEC_TYPE_U64 = 3,
             SC_SPEC_TYPE_I64 = 4,
-            SC_SPEC_TYPE_BOOL = 5,
-            SC_SPEC_TYPE_SYMBOL = 6,
-            SC_SPEC_TYPE_BITSET = 7,
-            SC_SPEC_TYPE_STATUS = 8,
-            SC_SPEC_TYPE_BYTES = 9,
-            SC_SPEC_TYPE_BIG_INT = 10,
-            SC_SPEC_TYPE_INVOKER = 11,
-            SC_SPEC_TYPE_ACCOUNT_ID = 12,
+            SC_SPEC_TYPE_U128 = 5,
+            SC_SPEC_TYPE_I128 = 6,
+            SC_SPEC_TYPE_BOOL = 7,
+            SC_SPEC_TYPE_SYMBOL = 8,
+            SC_SPEC_TYPE_BITSET = 9,
+            SC_SPEC_TYPE_STATUS = 10,
+            SC_SPEC_TYPE_BYTES = 11,
+            SC_SPEC_TYPE_INVOKER = 12,
+            SC_SPEC_TYPE_ACCOUNT_ID = 13,
 
             // Types with parameters.
             SC_SPEC_TYPE_OPTION = 1000,
@@ -48,14 +49,15 @@ class SCSpecType(IntEnum):
     SC_SPEC_TYPE_I32 = 2
     SC_SPEC_TYPE_U64 = 3
     SC_SPEC_TYPE_I64 = 4
-    SC_SPEC_TYPE_BOOL = 5
-    SC_SPEC_TYPE_SYMBOL = 6
-    SC_SPEC_TYPE_BITSET = 7
-    SC_SPEC_TYPE_STATUS = 8
-    SC_SPEC_TYPE_BYTES = 9
-    SC_SPEC_TYPE_BIG_INT = 10
-    SC_SPEC_TYPE_INVOKER = 11
-    SC_SPEC_TYPE_ACCOUNT_ID = 12
+    SC_SPEC_TYPE_U128 = 5
+    SC_SPEC_TYPE_I128 = 6
+    SC_SPEC_TYPE_BOOL = 7
+    SC_SPEC_TYPE_SYMBOL = 8
+    SC_SPEC_TYPE_BITSET = 9
+    SC_SPEC_TYPE_STATUS = 10
+    SC_SPEC_TYPE_BYTES = 11
+    SC_SPEC_TYPE_INVOKER = 12
+    SC_SPEC_TYPE_ACCOUNT_ID = 13
     SC_SPEC_TYPE_OPTION = 1000
     SC_SPEC_TYPE_RESULT = 1001
     SC_SPEC_TYPE_VEC = 1002

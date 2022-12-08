@@ -15,6 +15,7 @@ class HashIDPreimageContractID:
 
         struct
             {
+                Hash networkID;
                 Hash contractID;
                 uint256 salt;
             }
@@ -22,21 +23,26 @@ class HashIDPreimageContractID:
 
     def __init__(
         self,
+        network_id: Hash,
         contract_id: Hash,
         salt: Uint256,
     ) -> None:
+        self.network_id = network_id
         self.contract_id = contract_id
         self.salt = salt
 
     def pack(self, packer: Packer) -> None:
+        self.network_id.pack(packer)
         self.contract_id.pack(packer)
         self.salt.pack(packer)
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "HashIDPreimageContractID":
+        network_id = Hash.unpack(unpacker)
         contract_id = Hash.unpack(unpacker)
         salt = Uint256.unpack(unpacker)
         return cls(
+            network_id=network_id,
             contract_id=contract_id,
             salt=salt,
         )
@@ -63,10 +69,15 @@ class HashIDPreimageContractID:
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented
-        return self.contract_id == other.contract_id and self.salt == other.salt
+        return (
+            self.network_id == other.network_id
+            and self.contract_id == other.contract_id
+            and self.salt == other.salt
+        )
 
     def __str__(self):
         out = [
+            f"network_id={self.network_id}",
             f"contract_id={self.contract_id}",
             f"salt={self.salt}",
         ]

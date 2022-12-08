@@ -3,48 +3,47 @@
 import base64
 from xdrlib import Packer, Unpacker
 
-from .account_id import AccountID
-from .hash import Hash
+from .signature import Signature
 from .uint256 import Uint256
 
-__all__ = ["HashIDPreimageSourceAccountContractID"]
+__all__ = ["ContractIDFromEd25519PublicKey"]
 
 
-class HashIDPreimageSourceAccountContractID:
+class ContractIDFromEd25519PublicKey:
     """
     XDR Source Code::
 
         struct
             {
-                Hash networkID;
-                AccountID sourceAccount;
+                uint256 key;
+                Signature signature;
                 uint256 salt;
             }
     """
 
     def __init__(
         self,
-        network_id: Hash,
-        source_account: AccountID,
+        key: Uint256,
+        signature: Signature,
         salt: Uint256,
     ) -> None:
-        self.network_id = network_id
-        self.source_account = source_account
+        self.key = key
+        self.signature = signature
         self.salt = salt
 
     def pack(self, packer: Packer) -> None:
-        self.network_id.pack(packer)
-        self.source_account.pack(packer)
+        self.key.pack(packer)
+        self.signature.pack(packer)
         self.salt.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "HashIDPreimageSourceAccountContractID":
-        network_id = Hash.unpack(unpacker)
-        source_account = AccountID.unpack(unpacker)
+    def unpack(cls, unpacker: Unpacker) -> "ContractIDFromEd25519PublicKey":
+        key = Uint256.unpack(unpacker)
+        signature = Signature.unpack(unpacker)
         salt = Uint256.unpack(unpacker)
         return cls(
-            network_id=network_id,
-            source_account=source_account,
+            key=key,
+            signature=signature,
             salt=salt,
         )
 
@@ -54,7 +53,7 @@ class HashIDPreimageSourceAccountContractID:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "HashIDPreimageSourceAccountContractID":
+    def from_xdr_bytes(cls, xdr: bytes) -> "ContractIDFromEd25519PublicKey":
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -63,7 +62,7 @@ class HashIDPreimageSourceAccountContractID:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "HashIDPreimageSourceAccountContractID":
+    def from_xdr(cls, xdr: str) -> "ContractIDFromEd25519PublicKey":
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
 
@@ -71,15 +70,15 @@ class HashIDPreimageSourceAccountContractID:
         if not isinstance(other, self.__class__):
             return NotImplemented
         return (
-            self.network_id == other.network_id
-            and self.source_account == other.source_account
+            self.key == other.key
+            and self.signature == other.signature
             and self.salt == other.salt
         )
 
     def __str__(self):
         out = [
-            f"network_id={self.network_id}",
-            f"source_account={self.source_account}",
+            f"key={self.key}",
+            f"signature={self.signature}",
             f"salt={self.salt}",
         ]
-        return f"<HashIDPreimageSourceAccountContractID [{', '.join(out)}]>"
+        return f"<ContractIDFromEd25519PublicKey [{', '.join(out)}]>"

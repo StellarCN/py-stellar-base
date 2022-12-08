@@ -4,9 +4,9 @@ import base64
 from typing import List
 from xdrlib import Packer, Unpacker
 
-from .contract_event import ContractEvent
 from .hash import Hash
 from .ledger_entry_changes import LedgerEntryChanges
+from .operation_events import OperationEvents
 from .operation_meta import OperationMeta
 from .transaction_result import TransactionResult
 
@@ -24,8 +24,8 @@ class TransactionMetaV3:
             OperationMeta operations<>;         // meta for each operation
             LedgerEntryChanges txChangesAfter;  // tx level changes after operations are
                                                 // applied if any
-            ContractEvent events<>;            // custom events populated by the
-                                                // contracts themselves
+            OperationEvents events<>;           // custom events populated by the
+                                                // contracts themselves. One list per operation.
             TransactionResult txResult;
 
             Hash hashes[3];                     // stores sha256(txChangesBefore, operations, txChangesAfter),
@@ -38,7 +38,7 @@ class TransactionMetaV3:
         tx_changes_before: LedgerEntryChanges,
         operations: List[OperationMeta],
         tx_changes_after: LedgerEntryChanges,
-        events: List[ContractEvent],
+        events: List[OperationEvents],
         tx_result: TransactionResult,
         hashes: List[Hash],
     ) -> None:
@@ -88,7 +88,7 @@ class TransactionMetaV3:
         length = unpacker.unpack_uint()
         events = []
         for _ in range(length):
-            events.append(ContractEvent.unpack(unpacker))
+            events.append(OperationEvents.unpack(unpacker))
         tx_result = TransactionResult.unpack(unpacker)
         length = 3
         hashes = []

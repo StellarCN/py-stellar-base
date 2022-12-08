@@ -23,12 +23,12 @@ from .preconditions import Preconditions
 from .price import Price
 from .signer import Signer
 from .signer_key import SignedPayloadSigner, SignerKey
+from .soroban_types.base import BaseScValAlias
 from .time_bounds import TimeBounds
 from .transaction import Transaction
 from .transaction_envelope import TransactionEnvelope
 from .type_checked import type_checked
 from .utils import hex_to_bytes, is_valid_hash
-from .soroban_types.base import BaseScValAlias
 
 __all__ = ["TransactionBuilder"]
 
@@ -1225,15 +1225,23 @@ class TransactionBuilder:
             ),
             *parameters,
         ]
+        func = stellar_xdr.HostFunction(
+            stellar_xdr.HostFunctionType.HOST_FUNCTION_TYPE_INVOKE_CONTRACT,
+            invoke_args=stellar_xdr.SCVec(
+                [
+                    p._to_xdr_sc_val() if isinstance(p, BaseScValAlias) else p
+                    for p in invoke_params
+                ]
+            ),
+        )
         op = InvokeHostFunction(
-            stellar_xdr.HostFunction.HOST_FN_INVOKE_CONTRACT,
-            invoke_params,
+            func,
             footprint,
             source,
         )
         return self.append_operation(op)
 
-    def append_deploy_contract_op(
+    def append_install_contract_code_op(
         self,
         contract: Union[bytes, str],
         footprint: stellar_xdr.LedgerFootprint = None,
@@ -1248,21 +1256,49 @@ class TransactionBuilder:
         if isinstance(contract, str):
             with open(contract, "rb") as f:
                 contract = f.read()
-        contract_parameter = stellar_xdr.SCVal(
-            stellar_xdr.SCValType.SCV_OBJECT,
-            obj=stellar_xdr.SCObject(stellar_xdr.SCObjectType.SCO_BYTES, bin=contract),
+
+        # TODO: HOST_FN_CREATE_CONTRACT_WITH_ED25519?
+        func = stellar_xdr.HostFunction(
+            stellar_xdr.HostFunctionType.HOST_FUNCTION_TYPE_INSTALL_CONTRACT_CODE,
+            install_contract_code_args=stellar_xdr.InstallContractCodeArgs(contract),
         )
-        salt_parameter = stellar_xdr.SCVal(
-            stellar_xdr.SCValType.SCV_OBJECT,
-            obj=stellar_xdr.SCObject(
-                stellar_xdr.SCObjectType.SCO_BYTES, bin=os.urandom(32)
+        op = InvokeHostFunction(
+            func,
+            footprint,
+            source,
+        )
+        return self.append_operation(op)
+
+    def append_create_contract_op(
+        self,
+        wasm_id: Union[bytes, str],
+        footprint: stellar_xdr.LedgerFootprint = None,
+        source: Optional[Union[MuxedAccount, str]] = None,
+    ) -> "TransactionBuilder":
+        """Append an :class:`InvokeHostFunction <stellar_sdk.operation.InvokeHostFunction>`
+        operation to the list of operations.
+
+        :return: This builder instance.
+        """
+
+        if isinstance(wasm_id, str):
+            wasm_id = binascii.unhexlify(wasm_id)
+
+        func = stellar_xdr.HostFunction(
+            stellar_xdr.HostFunctionType.HOST_FUNCTION_TYPE_CREATE_CONTRACT,
+            create_contract_args=stellar_xdr.CreateContractArgs(
+                stellar_xdr.ContractID(
+                    stellar_xdr.ContractIDType.CONTRACT_ID_FROM_SOURCE_ACCOUNT,
+                    salt=stellar_xdr.Uint256(os.urandom(32)),
+                ),
+                stellar_xdr.SCContractCode(
+                    stellar_xdr.SCContractCodeType.SCCONTRACT_CODE_WASM_REF,
+                    wasm_id=stellar_xdr.Hash(wasm_id),
+                ),
             ),
         )
-        invoke_params = [contract_parameter, salt_parameter]
-        # TODO: HOST_FN_CREATE_CONTRACT_WITH_ED25519?
         op = InvokeHostFunction(
-            stellar_xdr.HostFunction.HOST_FN_CREATE_CONTRACT_WITH_SOURCE_ACCOUNT,
-            invoke_params,
+            func,
             footprint,
             source,
         )
@@ -1275,18 +1311,21 @@ class TransactionBuilder:
         source: Optional[Union[MuxedAccount, str]] = None,
     ) -> "TransactionBuilder":
         # TODO: a more understandable name?
-        invoke_params = [
-            stellar_xdr.SCVal(
-                stellar_xdr.SCValType.SCV_OBJECT,
-                obj=stellar_xdr.SCObject(
-                    stellar_xdr.SCObjectType.SCO_BYTES,
-                    bin=asset.to_xdr_object().to_xdr_bytes(),
+        asset_param = asset.to_xdr_object()
+
+        func = stellar_xdr.HostFunction(
+            stellar_xdr.HostFunctionType.HOST_FUNCTION_TYPE_CREATE_CONTRACT,
+            create_contract_args=stellar_xdr.CreateContractArgs(
+                stellar_xdr.ContractID(
+                    stellar_xdr.ContractIDType.CONTRACT_ID_FROM_ASSET, asset=asset_param
                 ),
-            )
-        ]
+                stellar_xdr.SCContractCode(
+                    stellar_xdr.SCContractCodeType.SCCONTRACT_CODE_TOKEN
+                ),
+            ),
+        )
         op = InvokeHostFunction(
-            stellar_xdr.HostFunction.HOST_FN_CREATE_TOKEN_CONTRACT_WITH_ASSET,
-            invoke_params,
+            func,
             footprint,
             source,
         )
@@ -1297,16 +1336,22 @@ class TransactionBuilder:
         footprint: stellar_xdr.LedgerFootprint = None,
         source: Optional[Union[MuxedAccount, str]] = None,
     ) -> "TransactionBuilder":
-        salt_parameter = stellar_xdr.SCVal(
-            stellar_xdr.SCValType.SCV_OBJECT,
-            obj=stellar_xdr.SCObject(
-                stellar_xdr.SCObjectType.SCO_BYTES, bin=os.urandom(32)
+        salt = stellar_xdr.Uint256(os.urandom(32))
+
+        func = stellar_xdr.HostFunction(
+            stellar_xdr.HostFunctionType.HOST_FUNCTION_TYPE_CREATE_CONTRACT,
+            create_contract_args=stellar_xdr.CreateContractArgs(
+                stellar_xdr.ContractID(
+                    stellar_xdr.ContractIDType.CONTRACT_ID_FROM_SOURCE_ACCOUNT,
+                    salt=salt,
+                ),
+                stellar_xdr.SCContractCode(
+                    stellar_xdr.SCContractCodeType.SCCONTRACT_CODE_TOKEN
+                ),
             ),
         )
-        invoke_params = [salt_parameter]
         op = InvokeHostFunction(
-            stellar_xdr.HostFunction.HOST_FN_CREATE_TOKEN_CONTRACT_WITH_SOURCE_ACCOUNT,
-            invoke_params,
+            func,
             footprint,
             source,
         )

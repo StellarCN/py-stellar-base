@@ -4,30 +4,28 @@ import base64
 from enum import IntEnum
 from xdrlib import Packer, Unpacker
 
-__all__ = ["SCNumSign"]
+__all__ = ["ContractIDPublicKeyType"]
 
 
-class SCNumSign(IntEnum):
+class ContractIDPublicKeyType(IntEnum):
     """
     XDR Source Code::
 
-        enum SCNumSign
+        enum ContractIDPublicKeyType
         {
-            NEGATIVE = -1,
-            ZERO = 0,
-            POSITIVE = 1
+            CONTRACT_ID_PUBLIC_KEY_SOURCE_ACCOUNT = 0,
+            CONTRACT_ID_PUBLIC_KEY_ED25519 = 1
         };
     """
 
-    NEGATIVE = -1
-    ZERO = 0
-    POSITIVE = 1
+    CONTRACT_ID_PUBLIC_KEY_SOURCE_ACCOUNT = 0
+    CONTRACT_ID_PUBLIC_KEY_ED25519 = 1
 
     def pack(self, packer: Packer) -> None:
         packer.pack_int(self.value)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "SCNumSign":
+    def unpack(cls, unpacker: Unpacker) -> "ContractIDPublicKeyType":
         value = unpacker.unpack_int()
         return cls(value)
 
@@ -37,7 +35,7 @@ class SCNumSign(IntEnum):
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "SCNumSign":
+    def from_xdr_bytes(cls, xdr: bytes) -> "ContractIDPublicKeyType":
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -46,6 +44,6 @@ class SCNumSign(IntEnum):
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "SCNumSign":
+    def from_xdr(cls, xdr: str) -> "ContractIDPublicKeyType":
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)

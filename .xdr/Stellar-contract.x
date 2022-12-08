@@ -213,10 +213,11 @@ enum SCObjectType
     SCO_MAP = 1,
     SCO_U64 = 2,
     SCO_I64 = 3,
-    SCO_BYTES = 4,
-    SCO_BIG_INT = 5,
-    SCO_CONTRACT_CODE = 6,
-    SCO_ACCOUNT_ID = 7
+    SCO_U128 = 4,
+    SCO_I128 = 5,
+    SCO_BYTES = 6,
+    SCO_CONTRACT_CODE = 7,
+    SCO_ACCOUNT_ID = 8
 
     // TODO: add more
 };
@@ -232,34 +233,26 @@ const SCVAL_LIMIT = 256000;
 typedef SCVal SCVec<SCVAL_LIMIT>;
 typedef SCMapEntry SCMap<SCVAL_LIMIT>;
 
-enum SCNumSign
-{
-    NEGATIVE = -1,
-    ZERO = 0,
-    POSITIVE = 1
-};
-
-union SCBigInt switch (SCNumSign sign)
-{
-case ZERO:
-    void;
-case POSITIVE:
-case NEGATIVE:
-    opaque magnitude<256000>;
-};
-
 enum SCContractCodeType
 {
-    SCCONTRACT_CODE_WASM = 0,
+    SCCONTRACT_CODE_WASM_REF = 0,
     SCCONTRACT_CODE_TOKEN = 1
 };
 
 union SCContractCode switch (SCContractCodeType type)
 {
-case SCCONTRACT_CODE_WASM:
-    opaque wasm<SCVAL_LIMIT>;
+case SCCONTRACT_CODE_WASM_REF:
+    Hash wasm_id;
 case SCCONTRACT_CODE_TOKEN:
     void;
+};
+
+struct Int128Parts {
+    // Both signed and unsigned 128-bit ints
+    // are transported in a pair of uint64s
+    // to reduce the risk of sign-extension.
+    uint64 lo;
+    uint64 hi;
 };
 
 union SCObject switch (SCObjectType type)
@@ -272,10 +265,12 @@ case SCO_U64:
     uint64 u64;
 case SCO_I64:
     int64 i64;
+case SCO_U128:
+    Int128Parts u128;
+case SCO_I128:
+    Int128Parts i128;
 case SCO_BYTES:
     opaque bin<SCVAL_LIMIT>;
-case SCO_BIG_INT:
-    SCBigInt bigInt;
 case SCO_CONTRACT_CODE:
     SCContractCode contractCode;
 case SCO_ACCOUNT_ID:

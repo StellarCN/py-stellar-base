@@ -30,6 +30,8 @@ class SCSpecTypeDef:
         case SC_SPEC_TYPE_VAL:
         case SC_SPEC_TYPE_U64:
         case SC_SPEC_TYPE_I64:
+        case SC_SPEC_TYPE_U128:
+        case SC_SPEC_TYPE_I128:
         case SC_SPEC_TYPE_U32:
         case SC_SPEC_TYPE_I32:
         case SC_SPEC_TYPE_BOOL:
@@ -37,7 +39,6 @@ class SCSpecTypeDef:
         case SC_SPEC_TYPE_BITSET:
         case SC_SPEC_TYPE_STATUS:
         case SC_SPEC_TYPE_BYTES:
-        case SC_SPEC_TYPE_BIG_INT:
         case SC_SPEC_TYPE_INVOKER:
         case SC_SPEC_TYPE_ACCOUNT_ID:
             void;
@@ -83,6 +84,62 @@ class SCSpecTypeDef:
         self.udt = udt
 
     @classmethod
+    def from_sc_spec_type_val(cls) -> "SCSpecTypeDef":
+        return cls(SCSpecType.SC_SPEC_TYPE_VAL)
+
+    @classmethod
+    def from_sc_spec_type_u64(cls) -> "SCSpecTypeDef":
+        return cls(SCSpecType.SC_SPEC_TYPE_U64)
+
+    @classmethod
+    def from_sc_spec_type_i64(cls) -> "SCSpecTypeDef":
+        return cls(SCSpecType.SC_SPEC_TYPE_I64)
+
+    @classmethod
+    def from_sc_spec_type_u128(cls) -> "SCSpecTypeDef":
+        return cls(SCSpecType.SC_SPEC_TYPE_U128)
+
+    @classmethod
+    def from_sc_spec_type_i128(cls) -> "SCSpecTypeDef":
+        return cls(SCSpecType.SC_SPEC_TYPE_I128)
+
+    @classmethod
+    def from_sc_spec_type_u32(cls) -> "SCSpecTypeDef":
+        return cls(SCSpecType.SC_SPEC_TYPE_U32)
+
+    @classmethod
+    def from_sc_spec_type_i32(cls) -> "SCSpecTypeDef":
+        return cls(SCSpecType.SC_SPEC_TYPE_I32)
+
+    @classmethod
+    def from_sc_spec_type_bool(cls) -> "SCSpecTypeDef":
+        return cls(SCSpecType.SC_SPEC_TYPE_BOOL)
+
+    @classmethod
+    def from_sc_spec_type_symbol(cls) -> "SCSpecTypeDef":
+        return cls(SCSpecType.SC_SPEC_TYPE_SYMBOL)
+
+    @classmethod
+    def from_sc_spec_type_bitset(cls) -> "SCSpecTypeDef":
+        return cls(SCSpecType.SC_SPEC_TYPE_BITSET)
+
+    @classmethod
+    def from_sc_spec_type_status(cls) -> "SCSpecTypeDef":
+        return cls(SCSpecType.SC_SPEC_TYPE_STATUS)
+
+    @classmethod
+    def from_sc_spec_type_bytes(cls) -> "SCSpecTypeDef":
+        return cls(SCSpecType.SC_SPEC_TYPE_BYTES)
+
+    @classmethod
+    def from_sc_spec_type_invoker(cls) -> "SCSpecTypeDef":
+        return cls(SCSpecType.SC_SPEC_TYPE_INVOKER)
+
+    @classmethod
+    def from_sc_spec_type_account_id(cls) -> "SCSpecTypeDef":
+        return cls(SCSpecType.SC_SPEC_TYPE_ACCOUNT_ID)
+
+    @classmethod
     def from_sc_spec_type_option(cls, option: "SCSpecTypeOption") -> "SCSpecTypeDef":
         return cls(SCSpecType.SC_SPEC_TYPE_OPTION, option=option)
 
@@ -122,6 +179,10 @@ class SCSpecTypeDef:
             return
         if self.type == SCSpecType.SC_SPEC_TYPE_I64:
             return
+        if self.type == SCSpecType.SC_SPEC_TYPE_U128:
+            return
+        if self.type == SCSpecType.SC_SPEC_TYPE_I128:
+            return
         if self.type == SCSpecType.SC_SPEC_TYPE_U32:
             return
         if self.type == SCSpecType.SC_SPEC_TYPE_I32:
@@ -135,8 +196,6 @@ class SCSpecTypeDef:
         if self.type == SCSpecType.SC_SPEC_TYPE_STATUS:
             return
         if self.type == SCSpecType.SC_SPEC_TYPE_BYTES:
-            return
-        if self.type == SCSpecType.SC_SPEC_TYPE_BIG_INT:
             return
         if self.type == SCSpecType.SC_SPEC_TYPE_INVOKER:
             return
@@ -192,6 +251,10 @@ class SCSpecTypeDef:
             return cls(type=type)
         if type == SCSpecType.SC_SPEC_TYPE_I64:
             return cls(type=type)
+        if type == SCSpecType.SC_SPEC_TYPE_U128:
+            return cls(type=type)
+        if type == SCSpecType.SC_SPEC_TYPE_I128:
+            return cls(type=type)
         if type == SCSpecType.SC_SPEC_TYPE_U32:
             return cls(type=type)
         if type == SCSpecType.SC_SPEC_TYPE_I32:
@@ -205,8 +268,6 @@ class SCSpecTypeDef:
         if type == SCSpecType.SC_SPEC_TYPE_STATUS:
             return cls(type=type)
         if type == SCSpecType.SC_SPEC_TYPE_BYTES:
-            return cls(type=type)
-        if type == SCSpecType.SC_SPEC_TYPE_BIG_INT:
             return cls(type=type)
         if type == SCSpecType.SC_SPEC_TYPE_INVOKER:
             return cls(type=type)

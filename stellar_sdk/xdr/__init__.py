@@ -76,17 +76,23 @@ from .config_setting_entry_ext import ConfigSettingEntryExt
 from .config_setting_id import ConfigSettingID
 from .config_setting_type import ConfigSettingType
 from .constants import *
+from .contract_code_entry import ContractCodeEntry
 from .contract_data_entry import ContractDataEntry
 from .contract_event import ContractEvent
 from .contract_event_body import ContractEventBody
 from .contract_event_type import ContractEventType
 from .contract_event_v0 import ContractEventV0
+from .contract_id import ContractID
+from .contract_id_from_ed25519_public_key import ContractIDFromEd25519PublicKey
+from .contract_id_public_key_type import ContractIDPublicKeyType
+from .contract_id_type import ContractIDType
 from .create_account_op import CreateAccountOp
 from .create_account_result import CreateAccountResult
 from .create_account_result_code import CreateAccountResultCode
 from .create_claimable_balance_op import CreateClaimableBalanceOp
 from .create_claimable_balance_result import CreateClaimableBalanceResult
 from .create_claimable_balance_result_code import CreateClaimableBalanceResultCode
+from .create_contract_args import CreateContractArgs
 from .create_passive_sell_offer_op import CreatePassiveSellOfferOp
 from .crypto_key_type import CryptoKeyType
 from .curve25519_public import Curve25519Public
@@ -116,7 +122,9 @@ from .generalized_transaction_set import GeneralizedTransactionSet
 from .hash import Hash
 from .hash_id_preimage import HashIDPreimage
 from .hash_id_preimage_contract_id import HashIDPreimageContractID
+from .hash_id_preimage_create_contract_args import HashIDPreimageCreateContractArgs
 from .hash_id_preimage_ed25519_contract_id import HashIDPreimageEd25519ContractID
+from .hash_id_preimage_from_asset import HashIDPreimageFromAsset
 from .hash_id_preimage_operation_id import HashIDPreimageOperationID
 from .hash_id_preimage_revoke_id import HashIDPreimageRevokeID
 from .hash_id_preimage_source_account_contract_id import (
@@ -126,6 +134,7 @@ from .hello import Hello
 from .hmac_sha256_key import HmacSha256Key
 from .hmac_sha256_mac import HmacSha256Mac
 from .host_function import HostFunction
+from .host_function_type import HostFunctionType
 from .inflation_payout import InflationPayout
 from .inflation_result import InflationResult
 from .inflation_result_code import InflationResultCode
@@ -133,8 +142,10 @@ from .inner_transaction_result import InnerTransactionResult
 from .inner_transaction_result_ext import InnerTransactionResultExt
 from .inner_transaction_result_pair import InnerTransactionResultPair
 from .inner_transaction_result_result import InnerTransactionResultResult
+from .install_contract_code_args import InstallContractCodeArgs
 from .int32 import Int32
 from .int64 import Int64
+from .int128_parts import Int128Parts
 from .invoke_host_function_op import InvokeHostFunctionOp
 from .invoke_host_function_result import InvokeHostFunctionResult
 from .invoke_host_function_result_code import InvokeHostFunctionResultCode
@@ -166,6 +177,7 @@ from .ledger_key import LedgerKey
 from .ledger_key_account import LedgerKeyAccount
 from .ledger_key_claimable_balance import LedgerKeyClaimableBalance
 from .ledger_key_config_setting import LedgerKeyConfigSetting
+from .ledger_key_contract_code import LedgerKeyContractCode
 from .ledger_key_contract_data import LedgerKeyContractData
 from .ledger_key_data import LedgerKeyData
 from .ledger_key_liquidity_pool import LedgerKeyLiquidityPool
@@ -213,6 +225,7 @@ from .offer_entry_ext import OfferEntryExt
 from .offer_entry_flags import OfferEntryFlags
 from .operation import Operation
 from .operation_body import OperationBody
+from .operation_events import OperationEvents
 from .operation_meta import OperationMeta
 from .operation_result import OperationResult
 from .operation_result_code import OperationResultCode
@@ -250,7 +263,6 @@ from .revoke_sponsorship_op_signer import RevokeSponsorshipOpSigner
 from .revoke_sponsorship_result import RevokeSponsorshipResult
 from .revoke_sponsorship_result_code import RevokeSponsorshipResultCode
 from .revoke_sponsorship_type import RevokeSponsorshipType
-from .sc_big_int import SCBigInt
 from .sc_contract_code import SCContractCode
 from .sc_contract_code_type import SCContractCodeType
 from .sc_env_meta_entry import SCEnvMetaEntry
@@ -262,7 +274,6 @@ from .sc_host_storage_error_code import SCHostStorageErrorCode
 from .sc_host_val_error_code import SCHostValErrorCode
 from .sc_map import SCMap
 from .sc_map_entry import SCMapEntry
-from .sc_num_sign import SCNumSign
 from .sc_object import SCObject
 from .sc_object_type import SCObjectType
 from .sc_spec_entry import SCSpecEntry

@@ -5,7 +5,6 @@ from xdrlib import Packer, Unpacker
 
 from .host_function import HostFunction
 from .ledger_footprint import LedgerFootprint
-from .sc_vec import SCVec
 
 __all__ = ["InvokeHostFunctionOp"]
 
@@ -18,10 +17,6 @@ class InvokeHostFunctionOp:
         {
             // The host function to invoke
             HostFunction function;
-
-            // Parameters to the host function
-            SCVec parameters;
-
             // The footprint for this invocation
             LedgerFootprint footprint;
         };
@@ -30,26 +25,21 @@ class InvokeHostFunctionOp:
     def __init__(
         self,
         function: HostFunction,
-        parameters: SCVec,
         footprint: LedgerFootprint,
     ) -> None:
         self.function = function
-        self.parameters = parameters
         self.footprint = footprint
 
     def pack(self, packer: Packer) -> None:
         self.function.pack(packer)
-        self.parameters.pack(packer)
         self.footprint.pack(packer)
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "InvokeHostFunctionOp":
         function = HostFunction.unpack(unpacker)
-        parameters = SCVec.unpack(unpacker)
         footprint = LedgerFootprint.unpack(unpacker)
         return cls(
             function=function,
-            parameters=parameters,
             footprint=footprint,
         )
 
@@ -75,16 +65,11 @@ class InvokeHostFunctionOp:
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented
-        return (
-            self.function == other.function
-            and self.parameters == other.parameters
-            and self.footprint == other.footprint
-        )
+        return self.function == other.function and self.footprint == other.footprint
 
     def __str__(self):
         out = [
             f"function={self.function}",
-            f"parameters={self.parameters}",
             f"footprint={self.footprint}",
         ]
         return f"<InvokeHostFunctionOp [{', '.join(out)}]>"

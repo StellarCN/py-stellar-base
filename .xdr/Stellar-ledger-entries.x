@@ -100,7 +100,8 @@ enum LedgerEntryType
     CLAIMABLE_BALANCE = 4,
     LIQUIDITY_POOL = 5,
     CONTRACT_DATA = 6,
-    CONFIG_SETTING = 7
+    CONTRACT_CODE = 7,
+    CONFIG_SETTING = 8
 };
 
 struct Signer
@@ -499,6 +500,13 @@ struct ContractDataEntry {
     SCVal val;
 };
 
+struct ContractCodeEntry {
+    ExtensionPoint ext;
+
+    Hash hash;
+    opaque code<SCVAL_LIMIT>;
+};
+
 enum ConfigSettingType
 {
     CONFIG_SETTING_TYPE_UINT32 = 0
@@ -560,6 +568,8 @@ struct LedgerEntry
         LiquidityPoolEntry liquidityPool;
     case CONTRACT_DATA:
         ContractDataEntry contractData;
+    case CONTRACT_CODE:
+        ContractCodeEntry contractCode;
     case CONFIG_SETTING:
         ConfigSettingEntry configSetting;
     }
@@ -622,6 +632,11 @@ case CONTRACT_DATA:
         Hash contractID;
         SCVal key;
     } contractData;
+case CONTRACT_CODE:
+    struct
+    {
+        Hash hash;
+    } contractCode;
 case CONFIG_SETTING:
     struct
     {
@@ -645,6 +660,7 @@ enum EnvelopeType
     ENVELOPE_TYPE_CONTRACT_ID_FROM_ED25519 = 8,
     ENVELOPE_TYPE_CONTRACT_ID_FROM_CONTRACT = 9,
     ENVELOPE_TYPE_CONTRACT_ID_FROM_ASSET = 10,
-    ENVELOPE_TYPE_CONTRACT_ID_FROM_SOURCE_ACCOUNT = 11
+    ENVELOPE_TYPE_CONTRACT_ID_FROM_SOURCE_ACCOUNT = 11,
+    ENVELOPE_TYPE_CREATE_CONTRACT_ARGS = 12
 };
 }

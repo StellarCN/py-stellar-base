@@ -18,7 +18,6 @@ class InvokeHostFunction(Operation):
     def __init__(
         self,
         function: stellar_xdr.HostFunction,
-        parameters: Sequence[Union[stellar_xdr.SCVal, BaseScValAlias]],
         footprint: stellar_xdr.LedgerFootprint = None,
         source: Optional[Union[MuxedAccount, str]] = None,
     ):
@@ -27,15 +26,10 @@ class InvokeHostFunction(Operation):
             stellar_xdr.LedgerFootprint([], []) if footprint is None else footprint
         )
         self.function = function
-        self.parameters = [
-            p._to_xdr_sc_val() if isinstance(p, BaseScValAlias) else p
-            for p in parameters
-        ]
 
     def _to_operation_body(self) -> stellar_xdr.OperationBody:
         invoke_host_function_op = stellar_xdr.InvokeHostFunctionOp(
             function=self.function,
-            parameters=stellar_xdr.SCVec(sc_vec=self.parameters),
             # TODO: Figure out how to calculate this or get it from the user?
             footprint=self.footprint,
         )
@@ -51,11 +45,9 @@ class InvokeHostFunction(Operation):
         source = Operation.get_source_from_xdr_obj(xdr_object)
         assert xdr_object.body.invoke_host_function_op is not None
         function = xdr_object.body.invoke_host_function_op.function
-        parameters = xdr_object.body.invoke_host_function_op.parameters.sc_vec
         footprint = xdr_object.body.invoke_host_function_op.footprint
         return cls(
             function=function,
-            parameters=parameters,
             footprint=footprint,
             source=source,
         )
@@ -63,5 +55,5 @@ class InvokeHostFunction(Operation):
     def __str__(self):
         return (
             f"<InvokeHostFunction [function={self.function}, "
-            f"parameters={self.parameters}, footprint={self.footprint}, source={self.source}]>"
+            f"footprint={self.footprint}, source={self.source}]>"
         )

@@ -3,6 +3,7 @@
 import base64
 from xdrlib import Packer, Unpacker
 
+from .hash import Hash
 from .uint256 import Uint256
 
 __all__ = ["HashIDPreimageEd25519ContractID"]
@@ -14,6 +15,7 @@ class HashIDPreimageEd25519ContractID:
 
         struct
             {
+                Hash networkID;
                 uint256 ed25519;
                 uint256 salt;
             }
@@ -21,21 +23,26 @@ class HashIDPreimageEd25519ContractID:
 
     def __init__(
         self,
+        network_id: Hash,
         ed25519: Uint256,
         salt: Uint256,
     ) -> None:
+        self.network_id = network_id
         self.ed25519 = ed25519
         self.salt = salt
 
     def pack(self, packer: Packer) -> None:
+        self.network_id.pack(packer)
         self.ed25519.pack(packer)
         self.salt.pack(packer)
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "HashIDPreimageEd25519ContractID":
+        network_id = Hash.unpack(unpacker)
         ed25519 = Uint256.unpack(unpacker)
         salt = Uint256.unpack(unpacker)
         return cls(
+            network_id=network_id,
             ed25519=ed25519,
             salt=salt,
         )
@@ -62,10 +69,15 @@ class HashIDPreimageEd25519ContractID:
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented
-        return self.ed25519 == other.ed25519 and self.salt == other.salt
+        return (
+            self.network_id == other.network_id
+            and self.ed25519 == other.ed25519
+            and self.salt == other.salt
+        )
 
     def __str__(self):
         out = [
+            f"network_id={self.network_id}",
             f"ed25519={self.ed25519}",
             f"salt={self.salt}",
         ]

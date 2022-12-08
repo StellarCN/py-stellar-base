@@ -3,10 +3,11 @@
 import base64
 from xdrlib import Packer, Unpacker
 
-from .asset import Asset
 from .envelope_type import EnvelopeType
 from .hash_id_preimage_contract_id import HashIDPreimageContractID
+from .hash_id_preimage_create_contract_args import HashIDPreimageCreateContractArgs
 from .hash_id_preimage_ed25519_contract_id import HashIDPreimageEd25519ContractID
+from .hash_id_preimage_from_asset import HashIDPreimageFromAsset
 from .hash_id_preimage_operation_id import HashIDPreimageOperationID
 from .hash_id_preimage_revoke_id import HashIDPreimageRevokeID
 from .hash_id_preimage_source_account_contract_id import (
@@ -41,23 +42,37 @@ class HashIDPreimage:
         case ENVELOPE_TYPE_CONTRACT_ID_FROM_ED25519:
             struct
             {
+                Hash networkID;
                 uint256 ed25519;
                 uint256 salt;
             } ed25519ContractID;
         case ENVELOPE_TYPE_CONTRACT_ID_FROM_CONTRACT:
             struct
             {
+                Hash networkID;
                 Hash contractID;
                 uint256 salt;
             } contractID;
         case ENVELOPE_TYPE_CONTRACT_ID_FROM_ASSET:
-            Asset fromAsset;
+            struct
+            {
+                Hash networkID;
+                Asset asset;
+            } fromAsset;
         case ENVELOPE_TYPE_CONTRACT_ID_FROM_SOURCE_ACCOUNT:
             struct
             {
+                Hash networkID;
                 AccountID sourceAccount;
                 uint256 salt;
             } sourceAccountContractID;
+        case ENVELOPE_TYPE_CREATE_CONTRACT_ARGS:
+            struct
+            {
+                Hash networkID;
+                SCContractCode source;
+                uint256 salt;
+            } createContractArgs;
         };
     """
 
@@ -68,8 +83,9 @@ class HashIDPreimage:
         revoke_id: HashIDPreimageRevokeID = None,
         ed25519_contract_id: HashIDPreimageEd25519ContractID = None,
         contract_id: HashIDPreimageContractID = None,
-        from_asset: Asset = None,
+        from_asset: HashIDPreimageFromAsset = None,
         source_account_contract_id: HashIDPreimageSourceAccountContractID = None,
+        create_contract_args: HashIDPreimageCreateContractArgs = None,
     ) -> None:
         self.type = type
         self.operation_id = operation_id
@@ -78,6 +94,7 @@ class HashIDPreimage:
         self.contract_id = contract_id
         self.from_asset = from_asset
         self.source_account_contract_id = source_account_contract_id
+        self.create_contract_args = create_contract_args
 
     @classmethod
     def from_envelope_type_op_id(
@@ -111,7 +128,7 @@ class HashIDPreimage:
 
     @classmethod
     def from_envelope_type_contract_id_from_asset(
-        cls, from_asset: Asset
+        cls, from_asset: HashIDPreimageFromAsset
     ) -> "HashIDPreimage":
         return cls(
             EnvelopeType.ENVELOPE_TYPE_CONTRACT_ID_FROM_ASSET, from_asset=from_asset
@@ -124,6 +141,15 @@ class HashIDPreimage:
         return cls(
             EnvelopeType.ENVELOPE_TYPE_CONTRACT_ID_FROM_SOURCE_ACCOUNT,
             source_account_contract_id=source_account_contract_id,
+        )
+
+    @classmethod
+    def from_envelope_type_create_contract_args(
+        cls, create_contract_args: HashIDPreimageCreateContractArgs
+    ) -> "HashIDPreimage":
+        return cls(
+            EnvelopeType.ENVELOPE_TYPE_CREATE_CONTRACT_ARGS,
+            create_contract_args=create_contract_args,
         )
 
     def pack(self, packer: Packer) -> None:
@@ -158,6 +184,11 @@ class HashIDPreimage:
                 raise ValueError("source_account_contract_id should not be None.")
             self.source_account_contract_id.pack(packer)
             return
+        if self.type == EnvelopeType.ENVELOPE_TYPE_CREATE_CONTRACT_ARGS:
+            if self.create_contract_args is None:
+                raise ValueError("create_contract_args should not be None.")
+            self.create_contract_args.pack(packer)
+            return
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "HashIDPreimage":
@@ -175,13 +206,16 @@ class HashIDPreimage:
             contract_id = HashIDPreimageContractID.unpack(unpacker)
             return cls(type=type, contract_id=contract_id)
         if type == EnvelopeType.ENVELOPE_TYPE_CONTRACT_ID_FROM_ASSET:
-            from_asset = Asset.unpack(unpacker)
+            from_asset = HashIDPreimageFromAsset.unpack(unpacker)
             return cls(type=type, from_asset=from_asset)
         if type == EnvelopeType.ENVELOPE_TYPE_CONTRACT_ID_FROM_SOURCE_ACCOUNT:
             source_account_contract_id = HashIDPreimageSourceAccountContractID.unpack(
                 unpacker
             )
             return cls(type=type, source_account_contract_id=source_account_contract_id)
+        if type == EnvelopeType.ENVELOPE_TYPE_CREATE_CONTRACT_ARGS:
+            create_contract_args = HashIDPreimageCreateContractArgs.unpack(unpacker)
+            return cls(type=type, create_contract_args=create_contract_args)
         return cls(type=type)
 
     def to_xdr_bytes(self) -> bytes:
@@ -214,6 +248,7 @@ class HashIDPreimage:
             and self.contract_id == other.contract_id
             and self.from_asset == other.from_asset
             and self.source_account_contract_id == other.source_account_contract_id
+            and self.create_contract_args == other.create_contract_args
         )
 
     def __str__(self):
@@ -237,4 +272,7 @@ class HashIDPreimage:
         out.append(
             f"source_account_contract_id={self.source_account_contract_id}"
         ) if self.source_account_contract_id is not None else None
+        out.append(
+            f"create_contract_args={self.create_contract_args}"
+        ) if self.create_contract_args is not None else None
         return f"<HashIDPreimage [{', '.join(out)}]>"
