@@ -370,3 +370,93 @@ class TestStrKey:
     )
     def test_is_valid_ed25519_signed_payload(self, key, valid):
         assert StrKey.is_valid_ed25519_signed_payload(key) is valid
+
+    def test_encode_contract(self):
+        data = bytes(
+            bytearray(
+                [
+                    0x3F,
+                    0x0C,
+                    0x34,
+                    0xBF,
+                    0x93,
+                    0xAD,
+                    0x0D,
+                    0x99,
+                    0x71,
+                    0xD0,
+                    0x4C,
+                    0xCC,
+                    0x90,
+                    0xF7,
+                    0x05,
+                    0x51,
+                    0x1C,
+                    0x83,
+                    0x8A,
+                    0xAD,
+                    0x97,
+                    0x34,
+                    0xA4,
+                    0xA2,
+                    0xFB,
+                    0x0D,
+                    0x7A,
+                    0x03,
+                    0xFC,
+                    0x7F,
+                    0xE8,
+                    0x9A,
+                ]
+            )
+        )
+        assert (
+            StrKey.encode_contract(data)
+            == "CA7QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLTJJFC7MGXUA74P7UJUWDA"
+        )
+
+    def test_decode_contract(self):
+        data = bytes(
+            bytearray(
+                [
+                    0x3F,
+                    0x0C,
+                    0x34,
+                    0xBF,
+                    0x93,
+                    0xAD,
+                    0x0D,
+                    0x99,
+                    0x71,
+                    0xD0,
+                    0x4C,
+                    0xCC,
+                    0x90,
+                    0xF7,
+                    0x05,
+                    0x51,
+                    0x1C,
+                    0x83,
+                    0x8A,
+                    0xAD,
+                    0x97,
+                    0x34,
+                    0xA4,
+                    0xA2,
+                    0xFB,
+                    0x0D,
+                    0x7A,
+                    0x03,
+                    0xFC,
+                    0x7F,
+                    0xE8,
+                    0x9A,
+                ]
+            )
+        )
+        assert (
+            StrKey.decode_contract(
+                "CA7QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLTJJFC7MGXUA74P7UJUWDA"
+            )
+            == data
+        )
