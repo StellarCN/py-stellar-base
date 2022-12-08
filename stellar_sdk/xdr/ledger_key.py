@@ -7,6 +7,7 @@ from .ledger_entry_type import LedgerEntryType
 from .ledger_key_account import LedgerKeyAccount
 from .ledger_key_claimable_balance import LedgerKeyClaimableBalance
 from .ledger_key_config_setting import LedgerKeyConfigSetting
+from .ledger_key_contract_code import LedgerKeyContractCode
 from .ledger_key_contract_data import LedgerKeyContractData
 from .ledger_key_data import LedgerKeyData
 from .ledger_key_liquidity_pool import LedgerKeyLiquidityPool
@@ -66,6 +67,11 @@ class LedgerKey:
                 Hash contractID;
                 SCVal key;
             } contractData;
+        case CONTRACT_CODE:
+            struct
+            {
+                Hash hash;
+            } contractCode;
         case CONFIG_SETTING:
             struct
             {
@@ -84,6 +90,7 @@ class LedgerKey:
         claimable_balance: LedgerKeyClaimableBalance = None,
         liquidity_pool: LedgerKeyLiquidityPool = None,
         contract_data: LedgerKeyContractData = None,
+        contract_code: LedgerKeyContractCode = None,
         config_setting: LedgerKeyConfigSetting = None,
     ) -> None:
         self.type = type
@@ -94,6 +101,7 @@ class LedgerKey:
         self.claimable_balance = claimable_balance
         self.liquidity_pool = liquidity_pool
         self.contract_data = contract_data
+        self.contract_code = contract_code
         self.config_setting = config_setting
 
     @classmethod
@@ -127,6 +135,10 @@ class LedgerKey:
     @classmethod
     def from_contract_data(cls, contract_data: LedgerKeyContractData) -> "LedgerKey":
         return cls(LedgerEntryType.CONTRACT_DATA, contract_data=contract_data)
+
+    @classmethod
+    def from_contract_code(cls, contract_code: LedgerKeyContractCode) -> "LedgerKey":
+        return cls(LedgerEntryType.CONTRACT_CODE, contract_code=contract_code)
 
     @classmethod
     def from_config_setting(cls, config_setting: LedgerKeyConfigSetting) -> "LedgerKey":
@@ -169,6 +181,11 @@ class LedgerKey:
                 raise ValueError("contract_data should not be None.")
             self.contract_data.pack(packer)
             return
+        if self.type == LedgerEntryType.CONTRACT_CODE:
+            if self.contract_code is None:
+                raise ValueError("contract_code should not be None.")
+            self.contract_code.pack(packer)
+            return
         if self.type == LedgerEntryType.CONFIG_SETTING:
             if self.config_setting is None:
                 raise ValueError("config_setting should not be None.")
@@ -199,6 +216,9 @@ class LedgerKey:
         if type == LedgerEntryType.CONTRACT_DATA:
             contract_data = LedgerKeyContractData.unpack(unpacker)
             return cls(type=type, contract_data=contract_data)
+        if type == LedgerEntryType.CONTRACT_CODE:
+            contract_code = LedgerKeyContractCode.unpack(unpacker)
+            return cls(type=type, contract_code=contract_code)
         if type == LedgerEntryType.CONFIG_SETTING:
             config_setting = LedgerKeyConfigSetting.unpack(unpacker)
             return cls(type=type, config_setting=config_setting)
@@ -235,6 +255,7 @@ class LedgerKey:
             and self.claimable_balance == other.claimable_balance
             and self.liquidity_pool == other.liquidity_pool
             and self.contract_data == other.contract_data
+            and self.contract_code == other.contract_code
             and self.config_setting == other.config_setting
         )
 
@@ -256,6 +277,9 @@ class LedgerKey:
         out.append(
             f"contract_data={self.contract_data}"
         ) if self.contract_data is not None else None
+        out.append(
+            f"contract_code={self.contract_code}"
+        ) if self.contract_code is not None else None
         out.append(
             f"config_setting={self.config_setting}"
         ) if self.config_setting is not None else None

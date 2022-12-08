@@ -20,10 +20,11 @@ class SCObjectType(IntEnum):
             SCO_MAP = 1,
             SCO_U64 = 2,
             SCO_I64 = 3,
-            SCO_BYTES = 4,
-            SCO_BIG_INT = 5,
-            SCO_CONTRACT_CODE = 6,
-            SCO_ACCOUNT_ID = 7
+            SCO_U128 = 4,
+            SCO_I128 = 5,
+            SCO_BYTES = 6,
+            SCO_CONTRACT_CODE = 7,
+            SCO_ACCOUNT_ID = 8
 
             // TODO: add more
         };
@@ -33,10 +34,11 @@ class SCObjectType(IntEnum):
     SCO_MAP = 1
     SCO_U64 = 2
     SCO_I64 = 3
-    SCO_BYTES = 4
-    SCO_BIG_INT = 5
-    SCO_CONTRACT_CODE = 6
-    SCO_ACCOUNT_ID = 7
+    SCO_U128 = 4
+    SCO_I128 = 5
+    SCO_BYTES = 6
+    SCO_CONTRACT_CODE = 7
+    SCO_ACCOUNT_ID = 8
 
     def pack(self, packer: Packer) -> None:
         packer.pack_int(self.value)

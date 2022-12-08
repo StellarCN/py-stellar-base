@@ -47,6 +47,7 @@ struct Hello
     uint256 nonce;
 };
 
+
 // During the roll-out phrase, pull mode will be optional.
 // Therefore, we need a way to communicate with other nodes
 // that we want/don't want pull mode.
@@ -189,6 +190,12 @@ struct TopologyResponseBody
     uint32 totalOutboundPeerCount;
 };
 
+union SurveyResponseBody switch (SurveyMessageCommandType type)
+{
+case SURVEY_TOPOLOGY:
+    TopologyResponseBody topologyResponseBody;
+};
+
 const TX_ADVERT_VECTOR_MAX_SIZE = 1000;
 typedef Hash TxAdvertVector<TX_ADVERT_VECTOR_MAX_SIZE>;
 
@@ -203,12 +210,6 @@ typedef Hash TxDemandVector<TX_DEMAND_VECTOR_MAX_SIZE>;
 struct FloodDemand
 {
     TxDemandVector txHashes;
-};
-
-union SurveyResponseBody switch (SurveyMessageCommandType type)
-{
-case SURVEY_TOPOLOGY:
-    TopologyResponseBody topologyResponseBody;
 };
 
 union StellarMessage switch (MessageType type)
@@ -256,9 +257,9 @@ case SEND_MORE:
 
 // Pull mode
 case FLOOD_ADVERT:
-    FloodAdvert floodAdvert;
+     FloodAdvert floodAdvert;
 case FLOOD_DEMAND:
-    FloodDemand floodDemand;
+     FloodDemand floodDemand;
 };
 
 union AuthenticatedMessage switch (uint32 v)

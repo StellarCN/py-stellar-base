@@ -75,9 +75,9 @@ class StellarMessage:
 
         // Pull mode
         case FLOOD_ADVERT:
-            FloodAdvert floodAdvert;
+             FloodAdvert floodAdvert;
         case FLOOD_DEMAND:
-            FloodDemand floodDemand;
+             FloodDemand floodDemand;
         };
     """
 

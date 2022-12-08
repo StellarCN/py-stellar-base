@@ -4,28 +4,30 @@ import base64
 from enum import IntEnum
 from xdrlib import Packer, Unpacker
 
-__all__ = ["SCContractCodeType"]
+__all__ = ["HostFunctionType"]
 
 
-class SCContractCodeType(IntEnum):
+class HostFunctionType(IntEnum):
     """
     XDR Source Code::
 
-        enum SCContractCodeType
+        enum HostFunctionType
         {
-            SCCONTRACT_CODE_WASM_REF = 0,
-            SCCONTRACT_CODE_TOKEN = 1
+            HOST_FUNCTION_TYPE_INVOKE_CONTRACT = 0,
+            HOST_FUNCTION_TYPE_CREATE_CONTRACT = 1,
+            HOST_FUNCTION_TYPE_INSTALL_CONTRACT_CODE = 2
         };
     """
 
-    SCCONTRACT_CODE_WASM_REF = 0
-    SCCONTRACT_CODE_TOKEN = 1
+    HOST_FUNCTION_TYPE_INVOKE_CONTRACT = 0
+    HOST_FUNCTION_TYPE_CREATE_CONTRACT = 1
+    HOST_FUNCTION_TYPE_INSTALL_CONTRACT_CODE = 2
 
     def pack(self, packer: Packer) -> None:
         packer.pack_int(self.value)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "SCContractCodeType":
+    def unpack(cls, unpacker: Unpacker) -> "HostFunctionType":
         value = unpacker.unpack_int()
         return cls(value)
 
@@ -35,7 +37,7 @@ class SCContractCodeType(IntEnum):
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "SCContractCodeType":
+    def from_xdr_bytes(cls, xdr: bytes) -> "HostFunctionType":
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -44,6 +46,6 @@ class SCContractCodeType(IntEnum):
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "SCContractCodeType":
+    def from_xdr(cls, xdr: str) -> "HostFunctionType":
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
