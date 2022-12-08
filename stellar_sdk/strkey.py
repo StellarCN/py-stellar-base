@@ -24,6 +24,7 @@ class _VersionByte(Enum):
     SHA256_HASH = binascii.a2b_hex("b8")  # X 184 23 << 3
     MUXED_ACCOUNT = binascii.a2b_hex("60")  # M 96 12 << 3
     ED25519_SIGNED_PAYLOAD = binascii.a2b_hex("78")  # P 120 15 << 3
+    CONTRACT = binascii.a2b_hex("10")  # C 16 2 << 3
 
 
 @type_checked
@@ -256,6 +257,40 @@ class StrKey:
         :return: ``True`` if the given key is valid
         """
         return _is_valid(_VersionByte.ED25519_SIGNED_PAYLOAD, ed25519_signed_payload)
+
+    @staticmethod
+    def encode_contract(data: bytes) -> str:
+        """Encodes data to encoded contract strkey.
+
+        :param data: data to encode
+        :return: encoded contract strkey
+        :raises:
+            :exc:`ValueError <stellar_sdk.exceptions.ValueError>`
+        """
+        return _encode_check(_VersionByte.CONTRACT, data)
+
+    @staticmethod
+    def decode_contract(data: str) -> bytes:
+        """Decodes encoded contract strkey to raw data.
+
+        :param data: encoded contract strkey
+        :return: raw bytes
+        :raises:
+            :exc:`ValueError <stellar_sdk.exceptions.ValueError>`
+        """
+        try:
+            return _decode_check(_VersionByte.CONTRACT, data)
+        except Exception as e:
+            raise ValueError(f"Invalid Pre Auth Tx Key: {data}") from e
+
+    @staticmethod
+    def is_valid_contract(contract: str) -> bool:
+        """Returns ``True`` if the given `contract` is a valid encoded contract strkey.
+
+        :param pre_auth_tx: encoded contract strkey
+        :return: ``True`` if the given key is valid
+        """
+        return _is_valid(_VersionByte.CONTRACT, contract)
 
 
 @type_checked
