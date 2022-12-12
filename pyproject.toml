@@ -67,7 +67,7 @@ types-toml = {version = "^0.10.8", markers = "platform_python_implementation == 
 types-requests = {version = "^2.28.11", markers = "platform_python_implementation == 'CPython'"}
 autoflake = "^1.7"
 isort = "^5.10.1"
-black = "^22.10.0"
+black = "^22.12.0"
 
 [tool.poetry.extras]
 docs = ["sphinx", "sphinx-rtd-theme", "sphinx-autodoc-typehints"]
