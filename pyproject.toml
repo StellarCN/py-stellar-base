@@ -65,7 +65,7 @@ pytest-httpserver = "^1.0.6"
 mypy = {version = "^0.982", markers = "platform_python_implementation == 'CPython'"}
 types-toml = {version = "^0.10.8", markers = "platform_python_implementation == 'CPython'"}
 types-requests = {version = "^2.28.11", markers = "platform_python_implementation == 'CPython'"}
-autoflake = "^1.7"
+autoflake = "^2.0"
 isort = "^5.10.1"
 black = "^22.10.0"
 
