@@ -1392,13 +1392,9 @@ def _add_operation(
             "clearFlags",
             operation.clear_flags.value if operation.clear_flags else None,
             True,
-            comment=operation.clear_flags,
         )
         add_body_line(
-            "setFlags",
-            operation.set_flags.value if operation.set_flags else None,
-            True,
-            comment=operation.set_flags,
+            "setFlags", operation.set_flags.value if operation.set_flags else None, True
         )
         add_body_line("masterWeight", operation.master_weight, True)
         add_body_line("lowThreshold", operation.low_threshold, True)
