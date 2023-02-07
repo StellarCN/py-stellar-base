@@ -102,7 +102,8 @@ def raise_if_not_valid_ed25519_public_key(value: str, argument_name: str) -> Non
 @type_checked
 def raise_if_not_valid_amount(value: str, argument_name: str) -> None:
     amount = Decimal(value)
-    if abs(amount.as_tuple().exponent) > _EXPONENT:
+    exponent = amount.as_tuple().exponent
+    if not isinstance(exponent, int) or abs(exponent) > _EXPONENT:
         raise ValueError(
             f'Value of argument "{argument_name}" must have at most 7 digits after the decimal: {amount}'
         )
