@@ -1,11 +1,11 @@
 Stellar Python SDK
 ==================
 
-.. image:: https://img.shields.io/github/workflow/status/StellarCN/py-stellar-base/GitHub%20Action/master?maxAge=1800
-    :alt: GitHub Action
+.. image:: https://img.shields.io/github/actions/workflow/status/StellarCN/py-stellar-base/continuous-integration-workflow.yml?branch=main
+    :alt: GitHub Workflow Status
     :target: https://github.com/StellarCN/py-stellar-base/actions
 
-.. image:: https://img.shields.io/readthedocs/stellar-sdk.svg?maxAge=1800
+.. image:: https://img.shields.io/readthedocs/stellar-sdk.svg
     :alt: Read the Docs
     :target: https://stellar-sdk.readthedocs.io/en/latest/
 
@@ -13,15 +13,15 @@ Stellar Python SDK
     :alt: PyPI - Downloads
     :target: https://pypi.python.org/pypi/stellar-sdk
 
-.. image:: https://img.shields.io/codeclimate/maintainability/StellarCN/py-stellar-base?maxAge=1800
+.. image:: https://img.shields.io/codeclimate/maintainability/StellarCN/py-stellar-base
     :alt: Code Climate maintainability
     :target: https://codeclimate.com/github/StellarCN/py-stellar-base/maintainability
 
-.. image:: https://img.shields.io/codecov/c/github/StellarCN/py-stellar-base/v2?maxAge=1800
+.. image:: https://img.shields.io/codecov/c/github/StellarCN/py-stellar-base/v2
     :alt: Codecov
     :target: https://codecov.io/gh/StellarCN/py-stellar-base
 
-.. image:: https://img.shields.io/pypi/v/stellar-sdk.svg?maxAge=1800
+.. image:: https://img.shields.io/pypi/v/stellar-sdk.svg
     :alt: PyPI
     :target: https://pypi.python.org/pypi/stellar-sdk
 

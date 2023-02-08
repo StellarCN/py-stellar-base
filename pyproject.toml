@@ -57,18 +57,18 @@ urllib3 = "^1.26.7"
 pydantic = "^1.10.2"
 
 [tool.poetry.dev-dependencies]
-pytest = "^7.0.1"
+pytest = "^7.2.1"
 pytest-cov = "^4.0.0"
 pytest-timeout = "^2.0.1"
-pytest-asyncio = "^0.16.0"
-pytest-httpserver = "^1.0.5"
+pytest-asyncio = "^0.20.1"
+pytest-httpserver = "^1.0.6"
 # currently, mypy cannot run in pypy https://github.com/python/typed_ast/issues/111
-mypy = {version = "^0.971", markers = "platform_python_implementation == 'CPython'"}
+mypy = {version = "^1.0", markers = "platform_python_implementation == 'CPython'"}
 types-toml = {version = "^0.10.8", markers = "platform_python_implementation == 'CPython'"}
 types-requests = {version = "^2.28.11", markers = "platform_python_implementation == 'CPython'"}
-autoflake = "^1.4"
+autoflake = "^2.0"
 isort = "^5.10.1"
-black = "^22.8.0"
+black = "^23.1.0"
 
 [tool.poetry.extras]
 docs = ["sphinx", "sphinx-rtd-theme", "sphinx-autodoc-typehints"]
@@ -77,6 +77,7 @@ docs = ["sphinx", "sphinx-rtd-theme", "sphinx-autodoc-typehints"]
 show_error_codes = true
 ignore_missing_imports = true
 warn_unused_configs = true
+no_implicit_optional = false
 
 [tool.coverage.run]
 source = [
