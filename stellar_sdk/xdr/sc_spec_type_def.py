@@ -39,8 +39,7 @@ class SCSpecTypeDef:
         case SC_SPEC_TYPE_BITSET:
         case SC_SPEC_TYPE_STATUS:
         case SC_SPEC_TYPE_BYTES:
-        case SC_SPEC_TYPE_INVOKER:
-        case SC_SPEC_TYPE_ACCOUNT_ID:
+        case SC_SPEC_TYPE_ADDRESS:
             void;
         case SC_SPEC_TYPE_OPTION:
             SCSpecTypeOption option;
@@ -132,12 +131,8 @@ class SCSpecTypeDef:
         return cls(SCSpecType.SC_SPEC_TYPE_BYTES)
 
     @classmethod
-    def from_sc_spec_type_invoker(cls) -> "SCSpecTypeDef":
-        return cls(SCSpecType.SC_SPEC_TYPE_INVOKER)
-
-    @classmethod
-    def from_sc_spec_type_account_id(cls) -> "SCSpecTypeDef":
-        return cls(SCSpecType.SC_SPEC_TYPE_ACCOUNT_ID)
+    def from_sc_spec_type_address(cls) -> "SCSpecTypeDef":
+        return cls(SCSpecType.SC_SPEC_TYPE_ADDRESS)
 
     @classmethod
     def from_sc_spec_type_option(cls, option: "SCSpecTypeOption") -> "SCSpecTypeDef":
@@ -197,9 +192,7 @@ class SCSpecTypeDef:
             return
         if self.type == SCSpecType.SC_SPEC_TYPE_BYTES:
             return
-        if self.type == SCSpecType.SC_SPEC_TYPE_INVOKER:
-            return
-        if self.type == SCSpecType.SC_SPEC_TYPE_ACCOUNT_ID:
+        if self.type == SCSpecType.SC_SPEC_TYPE_ADDRESS:
             return
         if self.type == SCSpecType.SC_SPEC_TYPE_OPTION:
             if self.option is None:
@@ -269,9 +262,7 @@ class SCSpecTypeDef:
             return cls(type=type)
         if type == SCSpecType.SC_SPEC_TYPE_BYTES:
             return cls(type=type)
-        if type == SCSpecType.SC_SPEC_TYPE_INVOKER:
-            return cls(type=type)
-        if type == SCSpecType.SC_SPEC_TYPE_ACCOUNT_ID:
+        if type == SCSpecType.SC_SPEC_TYPE_ADDRESS:
             return cls(type=type)
         if type == SCSpecType.SC_SPEC_TYPE_OPTION:
             from .sc_spec_type_option import SCSpecTypeOption

@@ -1,8 +1,10 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
 import base64
+from typing import List
 from xdrlib import Packer, Unpacker
 
+from .contract_auth import ContractAuth
 from .host_function import HostFunction
 from .ledger_footprint import LedgerFootprint
 
@@ -19,6 +21,9 @@ class InvokeHostFunctionOp:
             HostFunction function;
             // The footprint for this invocation
             LedgerFootprint footprint;
+            // Per-address authorizations for this host fn
+            // Currently only supported for INVOKE_CONTRACT function
+            ContractAuth auth<>;
         };
     """
 
@@ -26,21 +31,36 @@ class InvokeHostFunctionOp:
         self,
         function: HostFunction,
         footprint: LedgerFootprint,
+        auth: List[ContractAuth],
     ) -> None:
+        _expect_max_length = 4294967295
+        if auth and len(auth) > _expect_max_length:
+            raise ValueError(
+                f"The maximum length of `auth` should be {_expect_max_length}, but got {len(auth)}."
+            )
         self.function = function
         self.footprint = footprint
+        self.auth = auth
 
     def pack(self, packer: Packer) -> None:
         self.function.pack(packer)
         self.footprint.pack(packer)
+        packer.pack_uint(len(self.auth))
+        for auth_item in self.auth:
+            auth_item.pack(packer)
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "InvokeHostFunctionOp":
         function = HostFunction.unpack(unpacker)
         footprint = LedgerFootprint.unpack(unpacker)
+        length = unpacker.unpack_uint()
+        auth = []
+        for _ in range(length):
+            auth.append(ContractAuth.unpack(unpacker))
         return cls(
             function=function,
             footprint=footprint,
+            auth=auth,
         )
 
     def to_xdr_bytes(self) -> bytes:
@@ -65,11 +85,16 @@ class InvokeHostFunctionOp:
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented
-        return self.function == other.function and self.footprint == other.footprint
+        return (
+            self.function == other.function
+            and self.footprint == other.footprint
+            and self.auth == other.auth
+        )
 
     def __str__(self):
         out = [
             f"function={self.function}",
             f"footprint={self.footprint}",
+            f"auth={self.auth}",
         ]
         return f"<InvokeHostFunctionOp [{', '.join(out)}]>"

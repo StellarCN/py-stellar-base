@@ -25,7 +25,8 @@ class EnvelopeType(IntEnum):
             ENVELOPE_TYPE_CONTRACT_ID_FROM_CONTRACT = 9,
             ENVELOPE_TYPE_CONTRACT_ID_FROM_ASSET = 10,
             ENVELOPE_TYPE_CONTRACT_ID_FROM_SOURCE_ACCOUNT = 11,
-            ENVELOPE_TYPE_CREATE_CONTRACT_ARGS = 12
+            ENVELOPE_TYPE_CREATE_CONTRACT_ARGS = 12,
+            ENVELOPE_TYPE_CONTRACT_AUTH = 13
         };
     """
 
@@ -42,6 +43,7 @@ class EnvelopeType(IntEnum):
     ENVELOPE_TYPE_CONTRACT_ID_FROM_ASSET = 10
     ENVELOPE_TYPE_CONTRACT_ID_FROM_SOURCE_ACCOUNT = 11
     ENVELOPE_TYPE_CREATE_CONTRACT_ARGS = 12
+    ENVELOPE_TYPE_CONTRACT_AUTH = 13
 
     def pack(self, packer: Packer) -> None:
         packer.pack_int(self.value)

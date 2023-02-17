@@ -3,11 +3,11 @@
 import base64
 from xdrlib import Packer, Unpacker
 
-from .account_id import AccountID
 from .base import Opaque
 from .constants import *
 from .int64 import Int64
 from .int128_parts import Int128Parts
+from .sc_address import SCAddress
 from .sc_contract_code import SCContractCode
 from .sc_map import SCMap
 from .sc_object_type import SCObjectType
@@ -39,8 +39,10 @@ class SCObject:
             opaque bin<SCVAL_LIMIT>;
         case SCO_CONTRACT_CODE:
             SCContractCode contractCode;
-        case SCO_ACCOUNT_ID:
-            AccountID accountID;
+        case SCO_ADDRESS:
+            SCAddress address;
+        case SCO_NONCE_KEY:
+            SCAddress nonceAddress;
         };
     """
 
@@ -55,7 +57,8 @@ class SCObject:
         i128: Int128Parts = None,
         bin: bytes = None,
         contract_code: SCContractCode = None,
-        account_id: AccountID = None,
+        address: SCAddress = None,
+        nonce_address: SCAddress = None,
     ) -> None:
         self.type = type
         self.vec = vec
@@ -66,7 +69,8 @@ class SCObject:
         self.i128 = i128
         self.bin = bin
         self.contract_code = contract_code
-        self.account_id = account_id
+        self.address = address
+        self.nonce_address = nonce_address
 
     @classmethod
     def from_sco_vec(cls, vec: SCVec) -> "SCObject":
@@ -101,8 +105,12 @@ class SCObject:
         return cls(SCObjectType.SCO_CONTRACT_CODE, contract_code=contract_code)
 
     @classmethod
-    def from_sco_account_id(cls, account_id: AccountID) -> "SCObject":
-        return cls(SCObjectType.SCO_ACCOUNT_ID, account_id=account_id)
+    def from_sco_address(cls, address: SCAddress) -> "SCObject":
+        return cls(SCObjectType.SCO_ADDRESS, address=address)
+
+    @classmethod
+    def from_sco_nonce_key(cls, nonce_address: SCAddress) -> "SCObject":
+        return cls(SCObjectType.SCO_NONCE_KEY, nonce_address=nonce_address)
 
     def pack(self, packer: Packer) -> None:
         self.type.pack(packer)
@@ -146,10 +154,15 @@ class SCObject:
                 raise ValueError("contract_code should not be None.")
             self.contract_code.pack(packer)
             return
-        if self.type == SCObjectType.SCO_ACCOUNT_ID:
-            if self.account_id is None:
-                raise ValueError("account_id should not be None.")
-            self.account_id.pack(packer)
+        if self.type == SCObjectType.SCO_ADDRESS:
+            if self.address is None:
+                raise ValueError("address should not be None.")
+            self.address.pack(packer)
+            return
+        if self.type == SCObjectType.SCO_NONCE_KEY:
+            if self.nonce_address is None:
+                raise ValueError("nonce_address should not be None.")
+            self.nonce_address.pack(packer)
             return
 
     @classmethod
@@ -179,9 +192,12 @@ class SCObject:
         if type == SCObjectType.SCO_CONTRACT_CODE:
             contract_code = SCContractCode.unpack(unpacker)
             return cls(type=type, contract_code=contract_code)
-        if type == SCObjectType.SCO_ACCOUNT_ID:
-            account_id = AccountID.unpack(unpacker)
-            return cls(type=type, account_id=account_id)
+        if type == SCObjectType.SCO_ADDRESS:
+            address = SCAddress.unpack(unpacker)
+            return cls(type=type, address=address)
+        if type == SCObjectType.SCO_NONCE_KEY:
+            nonce_address = SCAddress.unpack(unpacker)
+            return cls(type=type, nonce_address=nonce_address)
         return cls(type=type)
 
     def to_xdr_bytes(self) -> bytes:
@@ -216,7 +232,8 @@ class SCObject:
             and self.i128 == other.i128
             and self.bin == other.bin
             and self.contract_code == other.contract_code
-            and self.account_id == other.account_id
+            and self.address == other.address
+            and self.nonce_address == other.nonce_address
         )
 
     def __str__(self):
@@ -232,7 +249,8 @@ class SCObject:
         out.append(
             f"contract_code={self.contract_code}"
         ) if self.contract_code is not None else None
+        out.append(f"address={self.address}") if self.address is not None else None
         out.append(
-            f"account_id={self.account_id}"
-        ) if self.account_id is not None else None
+            f"nonce_address={self.nonce_address}"
+        ) if self.nonce_address is not None else None
         return f"<SCObject [{', '.join(out)}]>"

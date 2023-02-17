@@ -3,8 +3,9 @@
 import base64
 from xdrlib import Packer, Unpacker
 
-from .survey_message_command_type import SurveyMessageCommandType
-from .topology_response_body import TopologyResponseBody
+from .survey_message_response_type import SurveyMessageResponseType
+from .topology_response_body_v0 import TopologyResponseBodyV0
+from .topology_response_body_v1 import TopologyResponseBodyV1
 
 __all__ = ["SurveyResponseBody"]
 
@@ -13,44 +14,65 @@ class SurveyResponseBody:
     """
     XDR Source Code::
 
-        union SurveyResponseBody switch (SurveyMessageCommandType type)
+        union SurveyResponseBody switch (SurveyMessageResponseType type)
         {
-        case SURVEY_TOPOLOGY:
-            TopologyResponseBody topologyResponseBody;
+        case SURVEY_TOPOLOGY_RESPONSE_V0:
+            TopologyResponseBodyV0 topologyResponseBodyV0;
+        case SURVEY_TOPOLOGY_RESPONSE_V1:
+            TopologyResponseBodyV1 topologyResponseBodyV1;
         };
     """
 
     def __init__(
         self,
-        type: SurveyMessageCommandType,
-        topology_response_body: TopologyResponseBody = None,
+        type: SurveyMessageResponseType,
+        topology_response_body_v0: TopologyResponseBodyV0 = None,
+        topology_response_body_v1: TopologyResponseBodyV1 = None,
     ) -> None:
         self.type = type
-        self.topology_response_body = topology_response_body
+        self.topology_response_body_v0 = topology_response_body_v0
+        self.topology_response_body_v1 = topology_response_body_v1
 
     @classmethod
-    def from_survey_topology(
-        cls, topology_response_body: TopologyResponseBody
+    def from_survey_topology_response_v0(
+        cls, topology_response_body_v0: TopologyResponseBodyV0
     ) -> "SurveyResponseBody":
         return cls(
-            SurveyMessageCommandType.SURVEY_TOPOLOGY,
-            topology_response_body=topology_response_body,
+            SurveyMessageResponseType.SURVEY_TOPOLOGY_RESPONSE_V0,
+            topology_response_body_v0=topology_response_body_v0,
+        )
+
+    @classmethod
+    def from_survey_topology_response_v1(
+        cls, topology_response_body_v1: TopologyResponseBodyV1
+    ) -> "SurveyResponseBody":
+        return cls(
+            SurveyMessageResponseType.SURVEY_TOPOLOGY_RESPONSE_V1,
+            topology_response_body_v1=topology_response_body_v1,
         )
 
     def pack(self, packer: Packer) -> None:
         self.type.pack(packer)
-        if self.type == SurveyMessageCommandType.SURVEY_TOPOLOGY:
-            if self.topology_response_body is None:
-                raise ValueError("topology_response_body should not be None.")
-            self.topology_response_body.pack(packer)
+        if self.type == SurveyMessageResponseType.SURVEY_TOPOLOGY_RESPONSE_V0:
+            if self.topology_response_body_v0 is None:
+                raise ValueError("topology_response_body_v0 should not be None.")
+            self.topology_response_body_v0.pack(packer)
+            return
+        if self.type == SurveyMessageResponseType.SURVEY_TOPOLOGY_RESPONSE_V1:
+            if self.topology_response_body_v1 is None:
+                raise ValueError("topology_response_body_v1 should not be None.")
+            self.topology_response_body_v1.pack(packer)
             return
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "SurveyResponseBody":
-        type = SurveyMessageCommandType.unpack(unpacker)
-        if type == SurveyMessageCommandType.SURVEY_TOPOLOGY:
-            topology_response_body = TopologyResponseBody.unpack(unpacker)
-            return cls(type=type, topology_response_body=topology_response_body)
+        type = SurveyMessageResponseType.unpack(unpacker)
+        if type == SurveyMessageResponseType.SURVEY_TOPOLOGY_RESPONSE_V0:
+            topology_response_body_v0 = TopologyResponseBodyV0.unpack(unpacker)
+            return cls(type=type, topology_response_body_v0=topology_response_body_v0)
+        if type == SurveyMessageResponseType.SURVEY_TOPOLOGY_RESPONSE_V1:
+            topology_response_body_v1 = TopologyResponseBodyV1.unpack(unpacker)
+            return cls(type=type, topology_response_body_v1=topology_response_body_v1)
         return cls(type=type)
 
     def to_xdr_bytes(self) -> bytes:
@@ -77,13 +99,17 @@ class SurveyResponseBody:
             return NotImplemented
         return (
             self.type == other.type
-            and self.topology_response_body == other.topology_response_body
+            and self.topology_response_body_v0 == other.topology_response_body_v0
+            and self.topology_response_body_v1 == other.topology_response_body_v1
         )
 
     def __str__(self):
         out = []
         out.append(f"type={self.type}")
         out.append(
-            f"topology_response_body={self.topology_response_body}"
-        ) if self.topology_response_body is not None else None
+            f"topology_response_body_v0={self.topology_response_body_v0}"
+        ) if self.topology_response_body_v0 is not None else None
+        out.append(
+            f"topology_response_body_v1={self.topology_response_body_v1}"
+        ) if self.topology_response_body_v1 is not None else None
         return f"<SurveyResponseBody [{', '.join(out)}]>"

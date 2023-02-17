@@ -3,7 +3,6 @@ from typing import Optional, Union, Sequence
 from .operation import Operation
 from .. import xdr as stellar_xdr
 from ..muxed_account import MuxedAccount
-from stellar_sdk.soroban_types.base import BaseScValAlias
 from ..type_checked import type_checked
 
 __all__ = ["InvokeHostFunction"]
@@ -32,6 +31,7 @@ class InvokeHostFunction(Operation):
             function=self.function,
             # TODO: Figure out how to calculate this or get it from the user?
             footprint=self.footprint,
+            auth=[]
         )
         body = stellar_xdr.OperationBody(
             type=self._XDR_OPERATION_TYPE,

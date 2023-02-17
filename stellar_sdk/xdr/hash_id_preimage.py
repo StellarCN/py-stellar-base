@@ -4,6 +4,7 @@ import base64
 from xdrlib import Packer, Unpacker
 
 from .envelope_type import EnvelopeType
+from .hash_id_preimage_contract_auth import HashIDPreimageContractAuth
 from .hash_id_preimage_contract_id import HashIDPreimageContractID
 from .hash_id_preimage_create_contract_args import HashIDPreimageCreateContractArgs
 from .hash_id_preimage_ed25519_contract_id import HashIDPreimageEd25519ContractID
@@ -73,6 +74,13 @@ class HashIDPreimage:
                 SCContractCode source;
                 uint256 salt;
             } createContractArgs;
+        case ENVELOPE_TYPE_CONTRACT_AUTH:
+            struct
+            {
+                Hash networkID;
+                uint64 nonce;
+                AuthorizedInvocation invocation;
+            } contractAuth;
         };
     """
 
@@ -86,6 +94,7 @@ class HashIDPreimage:
         from_asset: HashIDPreimageFromAsset = None,
         source_account_contract_id: HashIDPreimageSourceAccountContractID = None,
         create_contract_args: HashIDPreimageCreateContractArgs = None,
+        contract_auth: HashIDPreimageContractAuth = None,
     ) -> None:
         self.type = type
         self.operation_id = operation_id
@@ -95,6 +104,7 @@ class HashIDPreimage:
         self.from_asset = from_asset
         self.source_account_contract_id = source_account_contract_id
         self.create_contract_args = create_contract_args
+        self.contract_auth = contract_auth
 
     @classmethod
     def from_envelope_type_op_id(
@@ -152,6 +162,14 @@ class HashIDPreimage:
             create_contract_args=create_contract_args,
         )
 
+    @classmethod
+    def from_envelope_type_contract_auth(
+        cls, contract_auth: HashIDPreimageContractAuth
+    ) -> "HashIDPreimage":
+        return cls(
+            EnvelopeType.ENVELOPE_TYPE_CONTRACT_AUTH, contract_auth=contract_auth
+        )
+
     def pack(self, packer: Packer) -> None:
         self.type.pack(packer)
         if self.type == EnvelopeType.ENVELOPE_TYPE_OP_ID:
@@ -189,6 +207,11 @@ class HashIDPreimage:
                 raise ValueError("create_contract_args should not be None.")
             self.create_contract_args.pack(packer)
             return
+        if self.type == EnvelopeType.ENVELOPE_TYPE_CONTRACT_AUTH:
+            if self.contract_auth is None:
+                raise ValueError("contract_auth should not be None.")
+            self.contract_auth.pack(packer)
+            return
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "HashIDPreimage":
@@ -216,6 +239,9 @@ class HashIDPreimage:
         if type == EnvelopeType.ENVELOPE_TYPE_CREATE_CONTRACT_ARGS:
             create_contract_args = HashIDPreimageCreateContractArgs.unpack(unpacker)
             return cls(type=type, create_contract_args=create_contract_args)
+        if type == EnvelopeType.ENVELOPE_TYPE_CONTRACT_AUTH:
+            contract_auth = HashIDPreimageContractAuth.unpack(unpacker)
+            return cls(type=type, contract_auth=contract_auth)
         return cls(type=type)
 
     def to_xdr_bytes(self) -> bytes:
@@ -249,6 +275,7 @@ class HashIDPreimage:
             and self.from_asset == other.from_asset
             and self.source_account_contract_id == other.source_account_contract_id
             and self.create_contract_args == other.create_contract_args
+            and self.contract_auth == other.contract_auth
         )
 
     def __str__(self):
@@ -275,4 +302,7 @@ class HashIDPreimage:
         out.append(
             f"create_contract_args={self.create_contract_args}"
         ) if self.create_contract_args is not None else None
+        out.append(
+            f"contract_auth={self.contract_auth}"
+        ) if self.contract_auth is not None else None
         return f"<HashIDPreimage [{', '.join(out)}]>"

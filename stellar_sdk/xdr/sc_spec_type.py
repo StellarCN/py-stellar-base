@@ -28,7 +28,7 @@ class SCSpecType(IntEnum):
             SC_SPEC_TYPE_STATUS = 10,
             SC_SPEC_TYPE_BYTES = 11,
             SC_SPEC_TYPE_INVOKER = 12,
-            SC_SPEC_TYPE_ACCOUNT_ID = 13,
+            SC_SPEC_TYPE_ADDRESS = 13,
 
             // Types with parameters.
             SC_SPEC_TYPE_OPTION = 1000,
@@ -57,7 +57,7 @@ class SCSpecType(IntEnum):
     SC_SPEC_TYPE_STATUS = 10
     SC_SPEC_TYPE_BYTES = 11
     SC_SPEC_TYPE_INVOKER = 12
-    SC_SPEC_TYPE_ACCOUNT_ID = 13
+    SC_SPEC_TYPE_ADDRESS = 13
     SC_SPEC_TYPE_OPTION = 1000
     SC_SPEC_TYPE_RESULT = 1001
     SC_SPEC_TYPE_VEC = 1002

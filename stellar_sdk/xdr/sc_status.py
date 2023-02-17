@@ -3,6 +3,7 @@
 import base64
 from xdrlib import Packer, Unpacker
 
+from .sc_host_auth_error_code import SCHostAuthErrorCode
 from .sc_host_context_error_code import SCHostContextErrorCode
 from .sc_host_fn_error_code import SCHostFnErrorCode
 from .sc_host_obj_error_code import SCHostObjErrorCode
@@ -40,6 +41,8 @@ class SCStatus:
             SCVmErrorCode vmCode;
         case SST_CONTRACT_ERROR:
             uint32 contractCode;
+        case SST_HOST_AUTH_ERROR:
+            SCHostAuthErrorCode authCode;
         };
     """
 
@@ -54,6 +57,7 @@ class SCStatus:
         context_code: SCHostContextErrorCode = None,
         vm_code: SCVmErrorCode = None,
         contract_code: Uint32 = None,
+        auth_code: SCHostAuthErrorCode = None,
     ) -> None:
         self.type = type
         self.unknown_code = unknown_code
@@ -64,6 +68,7 @@ class SCStatus:
         self.context_code = context_code
         self.vm_code = vm_code
         self.contract_code = contract_code
+        self.auth_code = auth_code
 
     @classmethod
     def from_sst_ok(cls) -> "SCStatus":
@@ -104,6 +109,10 @@ class SCStatus:
     @classmethod
     def from_sst_contract_error(cls, contract_code: Uint32) -> "SCStatus":
         return cls(SCStatusType.SST_CONTRACT_ERROR, contract_code=contract_code)
+
+    @classmethod
+    def from_sst_host_auth_error(cls, auth_code: SCHostAuthErrorCode) -> "SCStatus":
+        return cls(SCStatusType.SST_HOST_AUTH_ERROR, auth_code=auth_code)
 
     def pack(self, packer: Packer) -> None:
         self.type.pack(packer)
@@ -149,6 +158,11 @@ class SCStatus:
                 raise ValueError("contract_code should not be None.")
             self.contract_code.pack(packer)
             return
+        if self.type == SCStatusType.SST_HOST_AUTH_ERROR:
+            if self.auth_code is None:
+                raise ValueError("auth_code should not be None.")
+            self.auth_code.pack(packer)
+            return
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "SCStatus":
@@ -179,6 +193,9 @@ class SCStatus:
         if type == SCStatusType.SST_CONTRACT_ERROR:
             contract_code = Uint32.unpack(unpacker)
             return cls(type=type, contract_code=contract_code)
+        if type == SCStatusType.SST_HOST_AUTH_ERROR:
+            auth_code = SCHostAuthErrorCode.unpack(unpacker)
+            return cls(type=type, auth_code=auth_code)
         return cls(type=type)
 
     def to_xdr_bytes(self) -> bytes:
@@ -213,6 +230,7 @@ class SCStatus:
             and self.context_code == other.context_code
             and self.vm_code == other.vm_code
             and self.contract_code == other.contract_code
+            and self.auth_code == other.auth_code
         )
 
     def __str__(self):
@@ -234,4 +252,7 @@ class SCStatus:
         out.append(
             f"contract_code={self.contract_code}"
         ) if self.contract_code is not None else None
+        out.append(
+            f"auth_code={self.auth_code}"
+        ) if self.auth_code is not None else None
         return f"<SCStatus [{', '.join(out)}]>"

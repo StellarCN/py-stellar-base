@@ -1,11 +1,11 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
 import base64
-from typing import Optional
 from xdrlib import Packer, Unpacker
 
-from .base import String
-from .sc_spec_type_def import SCSpecTypeDef
+from .sc_spec_udt_union_case_tuple_v0 import SCSpecUDTUnionCaseTupleV0
+from .sc_spec_udt_union_case_v0_kind import SCSpecUDTUnionCaseV0Kind
+from .sc_spec_udt_union_case_void_v0 import SCSpecUDTUnionCaseVoidV0
 
 __all__ = ["SCSpecUDTUnionCaseV0"]
 
@@ -14,37 +14,65 @@ class SCSpecUDTUnionCaseV0:
     """
     XDR Source Code::
 
-        struct SCSpecUDTUnionCaseV0
+        union SCSpecUDTUnionCaseV0 switch (SCSpecUDTUnionCaseV0Kind kind)
         {
-            string name<60>;
-            SCSpecTypeDef *type;
+        case SC_SPEC_UDT_UNION_CASE_VOID_V0:
+            SCSpecUDTUnionCaseVoidV0 voidCase;
+        case SC_SPEC_UDT_UNION_CASE_TUPLE_V0:
+            SCSpecUDTUnionCaseTupleV0 tupleCase;
         };
     """
 
     def __init__(
         self,
-        name: bytes,
-        type: Optional[SCSpecTypeDef],
+        kind: SCSpecUDTUnionCaseV0Kind,
+        void_case: SCSpecUDTUnionCaseVoidV0 = None,
+        tuple_case: SCSpecUDTUnionCaseTupleV0 = None,
     ) -> None:
-        self.name = name
-        self.type = type
+        self.kind = kind
+        self.void_case = void_case
+        self.tuple_case = tuple_case
+
+    @classmethod
+    def from_sc_spec_udt_union_case_void_v0(
+        cls, void_case: SCSpecUDTUnionCaseVoidV0
+    ) -> "SCSpecUDTUnionCaseV0":
+        return cls(
+            SCSpecUDTUnionCaseV0Kind.SC_SPEC_UDT_UNION_CASE_VOID_V0, void_case=void_case
+        )
+
+    @classmethod
+    def from_sc_spec_udt_union_case_tuple_v0(
+        cls, tuple_case: SCSpecUDTUnionCaseTupleV0
+    ) -> "SCSpecUDTUnionCaseV0":
+        return cls(
+            SCSpecUDTUnionCaseV0Kind.SC_SPEC_UDT_UNION_CASE_TUPLE_V0,
+            tuple_case=tuple_case,
+        )
 
     def pack(self, packer: Packer) -> None:
-        String(self.name, 60).pack(packer)
-        if self.type is None:
-            packer.pack_uint(0)
-        else:
-            packer.pack_uint(1)
-            self.type.pack(packer)
+        self.kind.pack(packer)
+        if self.kind == SCSpecUDTUnionCaseV0Kind.SC_SPEC_UDT_UNION_CASE_VOID_V0:
+            if self.void_case is None:
+                raise ValueError("void_case should not be None.")
+            self.void_case.pack(packer)
+            return
+        if self.kind == SCSpecUDTUnionCaseV0Kind.SC_SPEC_UDT_UNION_CASE_TUPLE_V0:
+            if self.tuple_case is None:
+                raise ValueError("tuple_case should not be None.")
+            self.tuple_case.pack(packer)
+            return
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "SCSpecUDTUnionCaseV0":
-        name = String.unpack(unpacker)
-        type = SCSpecTypeDef.unpack(unpacker) if unpacker.unpack_uint() else None
-        return cls(
-            name=name,
-            type=type,
-        )
+        kind = SCSpecUDTUnionCaseV0Kind.unpack(unpacker)
+        if kind == SCSpecUDTUnionCaseV0Kind.SC_SPEC_UDT_UNION_CASE_VOID_V0:
+            void_case = SCSpecUDTUnionCaseVoidV0.unpack(unpacker)
+            return cls(kind=kind, void_case=void_case)
+        if kind == SCSpecUDTUnionCaseV0Kind.SC_SPEC_UDT_UNION_CASE_TUPLE_V0:
+            tuple_case = SCSpecUDTUnionCaseTupleV0.unpack(unpacker)
+            return cls(kind=kind, tuple_case=tuple_case)
+        return cls(kind=kind)
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()
@@ -68,11 +96,19 @@ class SCSpecUDTUnionCaseV0:
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented
-        return self.name == other.name and self.type == other.type
+        return (
+            self.kind == other.kind
+            and self.void_case == other.void_case
+            and self.tuple_case == other.tuple_case
+        )
 
     def __str__(self):
-        out = [
-            f"name={self.name}",
-            f"type={self.type}",
-        ]
+        out = []
+        out.append(f"kind={self.kind}")
+        out.append(
+            f"void_case={self.void_case}"
+        ) if self.void_case is not None else None
+        out.append(
+            f"tuple_case={self.tuple_case}"
+        ) if self.tuple_case is not None else None
         return f"<SCSpecUDTUnionCaseV0 [{', '.join(out)}]>"

@@ -4,6 +4,8 @@ import base64
 from typing import List
 from xdrlib import Packer, Unpacker
 
+from .base import String
+from .constants import *
 from .sc_spec_function_input_v0 import SCSpecFunctionInputV0
 from .sc_spec_type_def import SCSpecTypeDef
 from .sc_symbol import SCSymbol
@@ -17,6 +19,7 @@ class SCSpecFunctionV0:
 
         struct SCSpecFunctionV0
         {
+            string doc<SC_SPEC_DOC_LIMIT>;
             SCSymbol name;
             SCSpecFunctionInputV0 inputs<10>;
             SCSpecTypeDef outputs<1>;
@@ -25,6 +28,7 @@ class SCSpecFunctionV0:
 
     def __init__(
         self,
+        doc: bytes,
         name: SCSymbol,
         inputs: List[SCSpecFunctionInputV0],
         outputs: List[SCSpecTypeDef],
@@ -39,11 +43,13 @@ class SCSpecFunctionV0:
             raise ValueError(
                 f"The maximum length of `outputs` should be {_expect_max_length}, but got {len(outputs)}."
             )
+        self.doc = doc
         self.name = name
         self.inputs = inputs
         self.outputs = outputs
 
     def pack(self, packer: Packer) -> None:
+        String(self.doc, SC_SPEC_DOC_LIMIT).pack(packer)
         self.name.pack(packer)
         packer.pack_uint(len(self.inputs))
         for inputs_item in self.inputs:
@@ -54,6 +60,7 @@ class SCSpecFunctionV0:
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "SCSpecFunctionV0":
+        doc = String.unpack(unpacker)
         name = SCSymbol.unpack(unpacker)
         length = unpacker.unpack_uint()
         inputs = []
@@ -64,6 +71,7 @@ class SCSpecFunctionV0:
         for _ in range(length):
             outputs.append(SCSpecTypeDef.unpack(unpacker))
         return cls(
+            doc=doc,
             name=name,
             inputs=inputs,
             outputs=outputs,
@@ -92,13 +100,15 @@ class SCSpecFunctionV0:
         if not isinstance(other, self.__class__):
             return NotImplemented
         return (
-            self.name == other.name
+            self.doc == other.doc
+            and self.name == other.name
             and self.inputs == other.inputs
             and self.outputs == other.outputs
         )
 
     def __str__(self):
         out = [
+            f"doc={self.doc}",
             f"name={self.name}",
             f"inputs={self.inputs}",
             f"outputs={self.outputs}",

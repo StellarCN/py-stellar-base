@@ -530,12 +530,36 @@ case HOST_FUNCTION_TYPE_INSTALL_CONTRACT_CODE:
     InstallContractCodeArgs installContractCodeArgs;
 };
 
+struct AuthorizedInvocation
+{
+    Hash contractID;
+    SCSymbol functionName;
+    SCVec args;
+    AuthorizedInvocation subInvocations<>;
+};
+
+struct AddressWithNonce
+{
+    SCAddress address;
+    uint64 nonce;
+};
+
+struct ContractAuth
+{
+    AddressWithNonce* addressWithNonce; // not present for invoker
+    AuthorizedInvocation rootInvocation;
+    SCVec signatureArgs;
+};
+
 struct InvokeHostFunctionOp
 {
     // The host function to invoke
     HostFunction function;
     // The footprint for this invocation
     LedgerFootprint footprint;
+    // Per-address authorizations for this host fn
+    // Currently only supported for INVOKE_CONTRACT function
+    ContractAuth auth<>;
 };
 
 /* An operation is the lowest unit of work that a transaction does */
@@ -653,7 +677,14 @@ case ENVELOPE_TYPE_CREATE_CONTRACT_ARGS:
         Hash networkID;
         SCContractCode source;
         uint256 salt;
-    } createContractArgs;        
+    } createContractArgs;
+case ENVELOPE_TYPE_CONTRACT_AUTH:
+    struct
+    {
+        Hash networkID;
+        uint64 nonce;
+        AuthorizedInvocation invocation;
+    } contractAuth;
 };
 
 enum MemoType

@@ -4,6 +4,7 @@ import base64
 from xdrlib import Packer, Unpacker
 
 from .base import String
+from .constants import *
 from .sc_spec_type_def import SCSpecTypeDef
 
 __all__ = ["SCSpecFunctionInputV0"]
@@ -15,6 +16,7 @@ class SCSpecFunctionInputV0:
 
         struct SCSpecFunctionInputV0
         {
+            string doc<SC_SPEC_DOC_LIMIT>;
             string name<30>;
             SCSpecTypeDef type;
         };
@@ -22,21 +24,26 @@ class SCSpecFunctionInputV0:
 
     def __init__(
         self,
+        doc: bytes,
         name: bytes,
         type: SCSpecTypeDef,
     ) -> None:
+        self.doc = doc
         self.name = name
         self.type = type
 
     def pack(self, packer: Packer) -> None:
+        String(self.doc, SC_SPEC_DOC_LIMIT).pack(packer)
         String(self.name, 30).pack(packer)
         self.type.pack(packer)
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "SCSpecFunctionInputV0":
+        doc = String.unpack(unpacker)
         name = String.unpack(unpacker)
         type = SCSpecTypeDef.unpack(unpacker)
         return cls(
+            doc=doc,
             name=name,
             type=type,
         )
@@ -63,10 +70,15 @@ class SCSpecFunctionInputV0:
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented
-        return self.name == other.name and self.type == other.type
+        return (
+            self.doc == other.doc
+            and self.name == other.name
+            and self.type == other.type
+        )
 
     def __str__(self):
         out = [
+            f"doc={self.doc}",
             f"name={self.name}",
             f"type={self.type}",
         ]

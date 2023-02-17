@@ -78,7 +78,8 @@ enum SCStatusType
     SST_HOST_STORAGE_ERROR = 5,
     SST_HOST_CONTEXT_ERROR = 6,
     SST_VM_ERROR = 7,
-    SST_CONTRACT_ERROR = 8
+    SST_CONTRACT_ERROR = 8,
+    SST_HOST_AUTH_ERROR = 9
     // TODO: add more
 };
 
@@ -126,6 +127,14 @@ enum SCHostStorageErrorCode
     HOST_STORAGE_ACCESS_TO_UNKNOWN_ENTRY = 3,
     HOST_STORAGE_MISSING_KEY_IN_GET = 4,
     HOST_STORAGE_GET_ON_DELETED_KEY = 5
+};
+
+enum SCHostAuthErrorCode
+{
+    HOST_AUTH_UNKNOWN_ERROR = 0,
+    HOST_AUTH_NONCE_ERROR = 1,
+    HOST_AUTH_DUPLICATE_AUTHORIZATION = 2,
+    HOST_AUTH_NOT_AUTHORIZED = 3
 };
 
 enum SCHostContextErrorCode
@@ -182,6 +191,8 @@ case SST_VM_ERROR:
     SCVmErrorCode vmCode;
 case SST_CONTRACT_ERROR:
     uint32 contractCode;
+case SST_HOST_AUTH_ERROR:
+    SCHostAuthErrorCode authCode;
 };
 
 union SCVal switch (SCValType type)
@@ -217,7 +228,8 @@ enum SCObjectType
     SCO_I128 = 5,
     SCO_BYTES = 6,
     SCO_CONTRACT_CODE = 7,
-    SCO_ACCOUNT_ID = 8
+    SCO_ADDRESS = 8,
+    SCO_NONCE_KEY = 9
 
     // TODO: add more
 };
@@ -255,6 +267,20 @@ struct Int128Parts {
     uint64 hi;
 };
 
+enum SCAddressType
+{
+    SC_ADDRESS_TYPE_ACCOUNT = 0,
+    SC_ADDRESS_TYPE_CONTRACT = 1
+};
+
+union SCAddress switch (SCAddressType type)
+{
+case SC_ADDRESS_TYPE_ACCOUNT:
+    AccountID accountId;
+case SC_ADDRESS_TYPE_CONTRACT:
+    Hash contractId;
+};
+
 union SCObject switch (SCObjectType type)
 {
 case SCO_VEC:
@@ -273,7 +299,9 @@ case SCO_BYTES:
     opaque bin<SCVAL_LIMIT>;
 case SCO_CONTRACT_CODE:
     SCContractCode contractCode;
-case SCO_ACCOUNT_ID:
-    AccountID accountID;
+case SCO_ADDRESS:
+    SCAddress address;
+case SCO_NONCE_KEY:
+    SCAddress nonceAddress;
 };
 }

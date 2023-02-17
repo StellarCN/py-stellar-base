@@ -5,6 +5,7 @@ from typing import List
 from xdrlib import Packer, Unpacker
 
 from .base import String
+from .constants import *
 from .sc_spec_udt_union_case_v0 import SCSpecUDTUnionCaseV0
 
 __all__ = ["SCSpecUDTUnionV0"]
@@ -16,6 +17,7 @@ class SCSpecUDTUnionV0:
 
         struct SCSpecUDTUnionV0
         {
+            string doc<SC_SPEC_DOC_LIMIT>;
             string lib<80>;
             string name<60>;
             SCSpecUDTUnionCaseV0 cases<50>;
@@ -24,6 +26,7 @@ class SCSpecUDTUnionV0:
 
     def __init__(
         self,
+        doc: bytes,
         lib: bytes,
         name: bytes,
         cases: List[SCSpecUDTUnionCaseV0],
@@ -33,11 +36,13 @@ class SCSpecUDTUnionV0:
             raise ValueError(
                 f"The maximum length of `cases` should be {_expect_max_length}, but got {len(cases)}."
             )
+        self.doc = doc
         self.lib = lib
         self.name = name
         self.cases = cases
 
     def pack(self, packer: Packer) -> None:
+        String(self.doc, SC_SPEC_DOC_LIMIT).pack(packer)
         String(self.lib, 80).pack(packer)
         String(self.name, 60).pack(packer)
         packer.pack_uint(len(self.cases))
@@ -46,6 +51,7 @@ class SCSpecUDTUnionV0:
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "SCSpecUDTUnionV0":
+        doc = String.unpack(unpacker)
         lib = String.unpack(unpacker)
         name = String.unpack(unpacker)
         length = unpacker.unpack_uint()
@@ -53,6 +59,7 @@ class SCSpecUDTUnionV0:
         for _ in range(length):
             cases.append(SCSpecUDTUnionCaseV0.unpack(unpacker))
         return cls(
+            doc=doc,
             lib=lib,
             name=name,
             cases=cases,
@@ -81,13 +88,15 @@ class SCSpecUDTUnionV0:
         if not isinstance(other, self.__class__):
             return NotImplemented
         return (
-            self.lib == other.lib
+            self.doc == other.doc
+            and self.lib == other.lib
             and self.name == other.name
             and self.cases == other.cases
         )
 
     def __str__(self):
         out = [
+            f"doc={self.doc}",
             f"lib={self.lib}",
             f"name={self.name}",
             f"cases={self.cases}",

@@ -11,6 +11,7 @@ from .account_flags import AccountFlags
 from .account_id import AccountID
 from .account_merge_result import AccountMergeResult
 from .account_merge_result_code import AccountMergeResultCode
+from .address_with_nonce import AddressWithNonce
 from .allow_trust_op import AllowTrustOp
 from .allow_trust_result import AllowTrustResult
 from .allow_trust_result_code import AllowTrustResultCode
@@ -25,6 +26,7 @@ from .auth import Auth
 from .auth_cert import AuthCert
 from .authenticated_message import AuthenticatedMessage
 from .authenticated_message_v0 import AuthenticatedMessageV0
+from .authorized_invocation import AuthorizedInvocation
 from .base import *
 from .begin_sponsoring_future_reserves_op import BeginSponsoringFutureReservesOp
 from .begin_sponsoring_future_reserves_result import BeginSponsoringFutureReservesResult
@@ -76,6 +78,7 @@ from .config_setting_entry_ext import ConfigSettingEntryExt
 from .config_setting_id import ConfigSettingID
 from .config_setting_type import ConfigSettingType
 from .constants import *
+from .contract_auth import ContractAuth
 from .contract_code_entry import ContractCodeEntry
 from .contract_data_entry import ContractDataEntry
 from .contract_event import ContractEvent
@@ -121,6 +124,7 @@ from .flood_demand import FloodDemand
 from .generalized_transaction_set import GeneralizedTransactionSet
 from .hash import Hash
 from .hash_id_preimage import HashIDPreimage
+from .hash_id_preimage_contract_auth import HashIDPreimageContractAuth
 from .hash_id_preimage_contract_id import HashIDPreimageContractID
 from .hash_id_preimage_create_contract_args import HashIDPreimageCreateContractArgs
 from .hash_id_preimage_ed25519_contract_id import HashIDPreimageEd25519ContractID
@@ -263,10 +267,13 @@ from .revoke_sponsorship_op_signer import RevokeSponsorshipOpSigner
 from .revoke_sponsorship_result import RevokeSponsorshipResult
 from .revoke_sponsorship_result_code import RevokeSponsorshipResultCode
 from .revoke_sponsorship_type import RevokeSponsorshipType
+from .sc_address import SCAddress
+from .sc_address_type import SCAddressType
 from .sc_contract_code import SCContractCode
 from .sc_contract_code_type import SCContractCodeType
 from .sc_env_meta_entry import SCEnvMetaEntry
 from .sc_env_meta_kind import SCEnvMetaKind
+from .sc_host_auth_error_code import SCHostAuthErrorCode
 from .sc_host_context_error_code import SCHostContextErrorCode
 from .sc_host_fn_error_code import SCHostFnErrorCode
 from .sc_host_obj_error_code import SCHostObjErrorCode
@@ -296,7 +303,10 @@ from .sc_spec_udt_error_enum_case_v0 import SCSpecUDTErrorEnumCaseV0
 from .sc_spec_udt_error_enum_v0 import SCSpecUDTErrorEnumV0
 from .sc_spec_udt_struct_field_v0 import SCSpecUDTStructFieldV0
 from .sc_spec_udt_struct_v0 import SCSpecUDTStructV0
+from .sc_spec_udt_union_case_tuple_v0 import SCSpecUDTUnionCaseTupleV0
 from .sc_spec_udt_union_case_v0 import SCSpecUDTUnionCaseV0
+from .sc_spec_udt_union_case_v0_kind import SCSpecUDTUnionCaseV0Kind
+from .sc_spec_udt_union_case_void_v0 import SCSpecUDTUnionCaseVoidV0
 from .sc_spec_udt_union_v0 import SCSpecUDTUnionV0
 from .sc_static import SCStatic
 from .sc_status import SCStatus
@@ -345,6 +355,7 @@ from .stored_transaction_set import StoredTransactionSet
 from .string32 import String32
 from .string64 import String64
 from .survey_message_command_type import SurveyMessageCommandType
+from .survey_message_response_type import SurveyMessageResponseType
 from .survey_request_message import SurveyRequestMessage
 from .survey_response_body import SurveyResponseBody
 from .survey_response_message import SurveyResponseMessage
@@ -352,7 +363,8 @@ from .threshold_indexes import ThresholdIndexes
 from .thresholds import Thresholds
 from .time_bounds import TimeBounds
 from .time_point import TimePoint
-from .topology_response_body import TopologyResponseBody
+from .topology_response_body_v0 import TopologyResponseBodyV0
+from .topology_response_body_v1 import TopologyResponseBodyV1
 from .transaction import Transaction
 from .transaction_envelope import TransactionEnvelope
 from .transaction_ext import TransactionExt

@@ -6,14 +6,14 @@ from xdrlib import Packer, Unpacker
 from .peer_stat_list import PeerStatList
 from .uint32 import Uint32
 
-__all__ = ["TopologyResponseBody"]
+__all__ = ["TopologyResponseBodyV0"]
 
 
-class TopologyResponseBody:
+class TopologyResponseBodyV0:
     """
     XDR Source Code::
 
-        struct TopologyResponseBody
+        struct TopologyResponseBodyV0
         {
             PeerStatList inboundPeers;
             PeerStatList outboundPeers;
@@ -42,7 +42,7 @@ class TopologyResponseBody:
         self.total_outbound_peer_count.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "TopologyResponseBody":
+    def unpack(cls, unpacker: Unpacker) -> "TopologyResponseBodyV0":
         inbound_peers = PeerStatList.unpack(unpacker)
         outbound_peers = PeerStatList.unpack(unpacker)
         total_inbound_peer_count = Uint32.unpack(unpacker)
@@ -60,7 +60,7 @@ class TopologyResponseBody:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "TopologyResponseBody":
+    def from_xdr_bytes(cls, xdr: bytes) -> "TopologyResponseBodyV0":
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -69,7 +69,7 @@ class TopologyResponseBody:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "TopologyResponseBody":
+    def from_xdr(cls, xdr: str) -> "TopologyResponseBodyV0":
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
 
@@ -90,4 +90,4 @@ class TopologyResponseBody:
             f"total_inbound_peer_count={self.total_inbound_peer_count}",
             f"total_outbound_peer_count={self.total_outbound_peer_count}",
         ]
-        return f"<TopologyResponseBody [{', '.join(out)}]>"
+        return f"<TopologyResponseBodyV0 [{', '.join(out)}]>"

@@ -10,6 +10,8 @@
 namespace stellar
 {
 
+const SC_SPEC_DOC_LIMIT = 1024;
+
 enum SCSpecType
 {
     SC_SPEC_TYPE_VAL = 0,
@@ -27,7 +29,7 @@ enum SCSpecType
     SC_SPEC_TYPE_STATUS = 10,
     SC_SPEC_TYPE_BYTES = 11,
     SC_SPEC_TYPE_INVOKER = 12,
-    SC_SPEC_TYPE_ACCOUNT_ID = 13,
+    SC_SPEC_TYPE_ADDRESS = 13,
 
     // Types with parameters.
     SC_SPEC_TYPE_OPTION = 1000,
@@ -98,8 +100,7 @@ case SC_SPEC_TYPE_SYMBOL:
 case SC_SPEC_TYPE_BITSET:
 case SC_SPEC_TYPE_STATUS:
 case SC_SPEC_TYPE_BYTES:
-case SC_SPEC_TYPE_INVOKER:
-case SC_SPEC_TYPE_ACCOUNT_ID:
+case SC_SPEC_TYPE_ADDRESS:
     void;
 case SC_SPEC_TYPE_OPTION:
     SCSpecTypeOption option;
@@ -121,25 +122,49 @@ case SC_SPEC_TYPE_UDT:
 
 struct SCSpecUDTStructFieldV0
 {
+    string doc<SC_SPEC_DOC_LIMIT>;
     string name<30>;
     SCSpecTypeDef type;
 };
 
 struct SCSpecUDTStructV0
 {
+    string doc<SC_SPEC_DOC_LIMIT>;
     string lib<80>;
     string name<60>;
     SCSpecUDTStructFieldV0 fields<40>;
 };
 
-struct SCSpecUDTUnionCaseV0
+struct SCSpecUDTUnionCaseVoidV0
 {
+    string doc<SC_SPEC_DOC_LIMIT>;
     string name<60>;
-    SCSpecTypeDef *type;
+};
+
+struct SCSpecUDTUnionCaseTupleV0
+{
+    string doc<SC_SPEC_DOC_LIMIT>;
+    string name<60>;
+    SCSpecTypeDef type<12>;
+};
+
+enum SCSpecUDTUnionCaseV0Kind
+{
+    SC_SPEC_UDT_UNION_CASE_VOID_V0 = 0,
+    SC_SPEC_UDT_UNION_CASE_TUPLE_V0 = 1
+};
+
+union SCSpecUDTUnionCaseV0 switch (SCSpecUDTUnionCaseV0Kind kind)
+{
+case SC_SPEC_UDT_UNION_CASE_VOID_V0:
+    SCSpecUDTUnionCaseVoidV0 voidCase;
+case SC_SPEC_UDT_UNION_CASE_TUPLE_V0:
+    SCSpecUDTUnionCaseTupleV0 tupleCase;
 };
 
 struct SCSpecUDTUnionV0
 {
+    string doc<SC_SPEC_DOC_LIMIT>;
     string lib<80>;
     string name<60>;
     SCSpecUDTUnionCaseV0 cases<50>;
@@ -147,12 +172,14 @@ struct SCSpecUDTUnionV0
 
 struct SCSpecUDTEnumCaseV0
 {
+    string doc<SC_SPEC_DOC_LIMIT>;
     string name<60>;
     uint32 value;
 };
 
 struct SCSpecUDTEnumV0
 {
+    string doc<SC_SPEC_DOC_LIMIT>;
     string lib<80>;
     string name<60>;
     SCSpecUDTEnumCaseV0 cases<50>;
@@ -160,12 +187,14 @@ struct SCSpecUDTEnumV0
 
 struct SCSpecUDTErrorEnumCaseV0
 {
+    string doc<SC_SPEC_DOC_LIMIT>;
     string name<60>;
     uint32 value;
 };
 
 struct SCSpecUDTErrorEnumV0
 {
+    string doc<SC_SPEC_DOC_LIMIT>;
     string lib<80>;
     string name<60>;
     SCSpecUDTErrorEnumCaseV0 cases<50>;
@@ -173,12 +202,14 @@ struct SCSpecUDTErrorEnumV0
 
 struct SCSpecFunctionInputV0
 {
+    string doc<SC_SPEC_DOC_LIMIT>;
     string name<30>;
     SCSpecTypeDef type;
 };
 
 struct SCSpecFunctionV0
 {
+    string doc<SC_SPEC_DOC_LIMIT>;
     SCSymbol name;
     SCSpecFunctionInputV0 inputs<10>;
     SCSpecTypeDef outputs<1>;

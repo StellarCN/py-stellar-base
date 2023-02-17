@@ -6,63 +6,57 @@ from xdrlib import Packer, Unpacker
 
 from .base import String
 from .constants import *
-from .sc_spec_udt_struct_field_v0 import SCSpecUDTStructFieldV0
+from .sc_spec_type_def import SCSpecTypeDef
 
-__all__ = ["SCSpecUDTStructV0"]
+__all__ = ["SCSpecUDTUnionCaseTupleV0"]
 
 
-class SCSpecUDTStructV0:
+class SCSpecUDTUnionCaseTupleV0:
     """
     XDR Source Code::
 
-        struct SCSpecUDTStructV0
+        struct SCSpecUDTUnionCaseTupleV0
         {
             string doc<SC_SPEC_DOC_LIMIT>;
-            string lib<80>;
             string name<60>;
-            SCSpecUDTStructFieldV0 fields<40>;
+            SCSpecTypeDef type<12>;
         };
     """
 
     def __init__(
         self,
         doc: bytes,
-        lib: bytes,
         name: bytes,
-        fields: List[SCSpecUDTStructFieldV0],
+        type: List[SCSpecTypeDef],
     ) -> None:
-        _expect_max_length = 40
-        if fields and len(fields) > _expect_max_length:
+        _expect_max_length = 12
+        if type and len(type) > _expect_max_length:
             raise ValueError(
-                f"The maximum length of `fields` should be {_expect_max_length}, but got {len(fields)}."
+                f"The maximum length of `type` should be {_expect_max_length}, but got {len(type)}."
             )
         self.doc = doc
-        self.lib = lib
         self.name = name
-        self.fields = fields
+        self.type = type
 
     def pack(self, packer: Packer) -> None:
         String(self.doc, SC_SPEC_DOC_LIMIT).pack(packer)
-        String(self.lib, 80).pack(packer)
         String(self.name, 60).pack(packer)
-        packer.pack_uint(len(self.fields))
-        for fields_item in self.fields:
-            fields_item.pack(packer)
+        packer.pack_uint(len(self.type))
+        for type_item in self.type:
+            type_item.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "SCSpecUDTStructV0":
+    def unpack(cls, unpacker: Unpacker) -> "SCSpecUDTUnionCaseTupleV0":
         doc = String.unpack(unpacker)
-        lib = String.unpack(unpacker)
         name = String.unpack(unpacker)
         length = unpacker.unpack_uint()
-        fields = []
+        type = []
         for _ in range(length):
-            fields.append(SCSpecUDTStructFieldV0.unpack(unpacker))
+            type.append(SCSpecTypeDef.unpack(unpacker))
         return cls(
             doc=doc,
-            lib=lib,
             name=name,
-            fields=fields,
+            type=type,
         )
 
     def to_xdr_bytes(self) -> bytes:
@@ -71,7 +65,7 @@ class SCSpecUDTStructV0:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "SCSpecUDTStructV0":
+    def from_xdr_bytes(cls, xdr: bytes) -> "SCSpecUDTUnionCaseTupleV0":
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -80,7 +74,7 @@ class SCSpecUDTStructV0:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "SCSpecUDTStructV0":
+    def from_xdr(cls, xdr: str) -> "SCSpecUDTUnionCaseTupleV0":
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
 
@@ -89,16 +83,14 @@ class SCSpecUDTStructV0:
             return NotImplemented
         return (
             self.doc == other.doc
-            and self.lib == other.lib
             and self.name == other.name
-            and self.fields == other.fields
+            and self.type == other.type
         )
 
     def __str__(self):
         out = [
             f"doc={self.doc}",
-            f"lib={self.lib}",
             f"name={self.name}",
-            f"fields={self.fields}",
+            f"type={self.type}",
         ]
-        return f"<SCSpecUDTStructV0 [{', '.join(out)}]>"
+        return f"<SCSpecUDTUnionCaseTupleV0 [{', '.join(out)}]>"

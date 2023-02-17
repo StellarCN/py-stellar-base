@@ -1,5 +1,7 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
+#: const SC_SPEC_DOC_LIMIT = 1024;
+SC_SPEC_DOC_LIMIT: int = 1024
 #: const SCVAL_LIMIT = 256000;
 SCVAL_LIMIT: int = 256000
 #: const MASK_ACCOUNT_FLAGS = 0x7;
