@@ -45,7 +45,8 @@ simulate_transaction_data = soroban_server.simulate_transaction(tx)
 print(f"simulated transaction: {simulate_transaction_data}")
 
 print(f"setting footprint and signing transaction...")
-tx.set_footpoint(simulate_transaction_data.footprint)
+assert simulate_transaction_data.results is not None
+tx.set_footpoint(simulate_transaction_data.results[0].footprint)
 tx.sign(kp)
 
 send_transaction_data = soroban_server.send_transaction(tx)

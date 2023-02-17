@@ -33,7 +33,8 @@ print(f"simulated transaction: {simulate_transaction_data}")
 
 # The footpoint is predictable, maybe we can optimize the code to omit this step
 print(f"setting footprint and signing transaction...")
-tx.set_footpoint(simulate_transaction_data.footprint)
+assert simulate_transaction_data.results is not None
+tx.set_footpoint(simulate_transaction_data.results[0].footprint)
 tx.sign(kp)
 
 send_transaction_data = soroban_server.send_transaction(tx)
