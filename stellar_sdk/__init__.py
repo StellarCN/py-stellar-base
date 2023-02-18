@@ -10,6 +10,8 @@ from .__version__ import (
 )
 from .account import *
 from .asset import *
+from .authorized_invocation import *
+from .contract_auth import *
 from .client.aiohttp_client import AiohttpClient
 from .client.requests_client import RequestsClient
 from .decorated_signature import *

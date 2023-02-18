@@ -24,8 +24,8 @@ class TestSorobanServer:
             assert response.sequence > 0
 
     def test_get_events(self):
-        start_ledger = 8000
-        end_ledger = 9000
+        start_ledger = 90000
+        end_ledger = 90300
         with SorobanServer(RPC_SERVER) as server:
             response = server.get_events(start_ledger, end_ledger)
             assert isinstance(response, GetEventsResponse)
