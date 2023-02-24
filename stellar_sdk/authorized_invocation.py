@@ -29,7 +29,7 @@ class AuthorizedInvocation:
         self.contract_id = contract_id
         self.function_name = function_name
         self.args = [
-            arg if isinstance(arg, stellar_xdr.SCVal) else arg._to_xdr_sc_val()
+            arg if isinstance(arg, stellar_xdr.SCVal) else arg.to_xdr_sc_val()
             for arg in args
         ]
         self.sub_invocations = sub_invocations

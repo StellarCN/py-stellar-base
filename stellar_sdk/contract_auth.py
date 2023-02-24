@@ -40,7 +40,7 @@ class ContractAuth:
         self.signature_args = []
         if signature_args:
             self.signature_args = [
-                arg._to_xdr_sc_val() if isinstance(arg, BaseScValAlias) else arg
+                arg.to_xdr_sc_val() if isinstance(arg, BaseScValAlias) else arg
                 for arg in signature_args
             ]
 
@@ -48,7 +48,6 @@ class ContractAuth:
         """Sign the contract authorization, the signature will be added to the `signature_args`.
 
         For custom accounts, this signature format may not be applicable.
-        See `Soroban Documentation - Stellar Account Signatures <https://soroban.stellar.org/docs/how-to-guides/invoking-contracts-with-transactions#stellar-account-signatures>`_
 
         :param signer: The signer.
         """
@@ -68,7 +67,7 @@ class ContractAuth:
         signature_bytes = signer.sign(payload)
         signature = AccountEd25519Signature(
             signer.public_key, signature_bytes
-        )._to_xdr_sc_val()
+        ).to_xdr_sc_val()
         self.signature_args.append(signature)
 
     def to_xdr_object(self) -> stellar_xdr.ContractAuth:
@@ -76,7 +75,7 @@ class ContractAuth:
         if self.address:
             assert self.nonce is not None
             address_with_nonce = stellar_xdr.AddressWithNonce(
-                address=self.address._to_xdr_sc_address(),
+                address=self.address.to_xdr_sc_address(),
                 nonce=stellar_xdr.Uint64(self.nonce),
             )
         if self.signature_args:
@@ -103,9 +102,7 @@ class ContractAuth:
         address = None
         nonce = None
         if xdr_object.address_with_nonce:
-            address = Address._from_xdr_sc_address(
-                xdr_object.address_with_nonce.address
-            )
+            address = Address.from_xdr_sc_address(xdr_object.address_with_nonce.address)
             nonce = xdr_object.address_with_nonce.nonce.uint64
         root_invocation = AuthorizedInvocation.from_xdr_object(
             xdr_object.root_invocation
