@@ -8,20 +8,18 @@ __all__ = ["Vec"]
 
 class Vec(BaseScValAlias):
     def __init__(self, vec: Sequence[Union[SCVal, BaseScValAlias]]):
-        self.vec = vec
+        self.vec = [
+            sc_val.to_xdr_sc_val() if isinstance(sc_val, BaseScValAlias) else sc_val
+            for sc_val in vec
+        ]
 
-    def _to_xdr_sc_val(self) -> SCVal:
+    def to_xdr_sc_val(self) -> SCVal:
         return SCVal(
             SCValType.SCV_OBJECT,
             obj=SCObject(
                 SCObjectType.SCO_VEC,
                 vec=SCVec(
-                    [
-                        sc_val._to_xdr_sc_val()
-                        if isinstance(sc_val, BaseScValAlias)
-                        else sc_val
-                        for sc_val in self.vec
-                    ]
+                    self.vec,
                 ),
             ),
         )

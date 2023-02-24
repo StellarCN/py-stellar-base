@@ -1231,7 +1231,7 @@ class TransactionBuilder:
             stellar_xdr.HostFunctionType.HOST_FUNCTION_TYPE_INVOKE_CONTRACT,
             invoke_args=stellar_xdr.SCVec(
                 [
-                    p._to_xdr_sc_val() if isinstance(p, BaseScValAlias) else p
+                    p.to_xdr_sc_val() if isinstance(p, BaseScValAlias) else p
                     for p in invoke_params
                 ]
             ),

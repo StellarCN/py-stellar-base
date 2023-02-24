@@ -55,7 +55,7 @@ class Address(BaseScValAlias):
             contract = binascii.unhexlify(contract)
         return Address(StrKey.encode_contract(contract))
 
-    def _to_xdr_sc_address(self) -> stellar_xdr.SCAddress:
+    def to_xdr_sc_address(self) -> stellar_xdr.SCAddress:
         if self.type == AddressType.ACCOUNT:
             account = stellar_xdr.AccountID(
                 stellar_xdr.PublicKey(
@@ -71,7 +71,7 @@ class Address(BaseScValAlias):
             raise ValueError("Unsupported address type.")
 
     @classmethod
-    def _from_xdr_sc_address(cls, sc_address: stellar_xdr.SCAddress) -> "Address":
+    def from_xdr_sc_address(cls, sc_address: stellar_xdr.SCAddress) -> "Address":
         if sc_address.type == stellar_xdr.SCAddressType.SC_ADDRESS_TYPE_ACCOUNT:
             assert sc_address.account_id is not None
             assert sc_address.account_id.account_id.ed25519 is not None
@@ -84,13 +84,13 @@ class Address(BaseScValAlias):
         else:
             raise ValueError("Unsupported address type.")
 
-    def _to_xdr_sc_val(self) -> stellar_xdr.SCVal:
+    def to_xdr_sc_val(self) -> stellar_xdr.SCVal:
         return stellar_xdr.SCVal.from_scv_object(
-            stellar_xdr.SCObject.from_sco_address(self._to_xdr_sc_address())
+            stellar_xdr.SCObject.from_sco_address(self.to_xdr_sc_address())
         )
 
     @classmethod
-    def _from_xdr_sc_val(cls, sc_val: stellar_xdr.SCVal) -> "Address":
+    def from_xdr_sc_val(cls, sc_val: stellar_xdr.SCVal) -> "Address":
         if sc_val.type != stellar_xdr.SCValType.SCV_OBJECT:
             raise ValueError("Unsupported SCVal type.")
         assert sc_val.obj is not None
@@ -98,7 +98,7 @@ class Address(BaseScValAlias):
             raise ValueError("Unsupported SCObject type.")
         sc_address = sc_val.obj.address
         assert sc_address is not None
-        return cls._from_xdr_sc_address(sc_address)
+        return cls.from_xdr_sc_address(sc_address)
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
