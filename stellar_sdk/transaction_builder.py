@@ -1211,6 +1211,14 @@ class TransactionBuilder:
         """Append an :class:`InvokeHostFunction <stellar_sdk.operation.InvokeHostFunction>`
         operation to the list of operations.
 
+        You can use this method to invoke a contract function.
+
+        :param contract_id: The ID of the contract to invoke.
+        :param method: The name of the method to invoke.
+        :param parameters: The parameters to pass to the method.
+        :param auth: The authorizations.
+        :param footprint: The ledger footprint.
+        :param source: The source account for the operation. Defaults to the transaction's source account.
         :return: This builder instance.
         """
         invoke_params = [
@@ -1253,6 +1261,12 @@ class TransactionBuilder:
         """Append an :class:`InvokeHostFunction <stellar_sdk.operation.InvokeHostFunction>`
         operation to the list of operations.
 
+        You can use this method to install a contract code,
+        and then use :func:`append_create_contract_op` to create a contract.
+
+        :param contract: The contract code to install, path to a file or bytes.
+        :param footprint: The ledger footprint.
+        :param source: The source account for the operation. Defaults to the transaction's source account.
         :return: This builder instance.
         """
 
@@ -1276,24 +1290,37 @@ class TransactionBuilder:
     def append_create_contract_op(
         self,
         wasm_id: Union[bytes, str],
+        salt: Optional[bytes] = None,
         footprint: stellar_xdr.LedgerFootprint = None,
         source: Optional[Union[MuxedAccount, str]] = None,
     ) -> "TransactionBuilder":
         """Append an :class:`InvokeHostFunction <stellar_sdk.operation.InvokeHostFunction>`
         operation to the list of operations.
 
+        You can use this method to create a contract.
+
+        :param wasm_id: The ID of the contract code to install.
+        :param salt: The 32-byte salt to use to derive the contract ID.
+        :param footprint: The ledger footprint.
+        :param source: The source account for the operation. Defaults to the transaction's source account.
         :return: This builder instance.
         """
 
         if isinstance(wasm_id, str):
             wasm_id = binascii.unhexlify(wasm_id)
 
+        if salt is None:
+            salt = os.urandom(32)
+        else:
+            if len(salt) != 32:
+                raise ValueError("`salt` must be 32 bytes long")
+
         func = stellar_xdr.HostFunction(
             stellar_xdr.HostFunctionType.HOST_FUNCTION_TYPE_CREATE_CONTRACT,
             create_contract_args=stellar_xdr.CreateContractArgs(
                 stellar_xdr.ContractID(
                     stellar_xdr.ContractIDType.CONTRACT_ID_FROM_SOURCE_ACCOUNT,
-                    salt=stellar_xdr.Uint256(os.urandom(32)),
+                    salt=stellar_xdr.Uint256(salt),
                 ),
                 stellar_xdr.SCContractCode(
                     stellar_xdr.SCContractCodeType.SCCONTRACT_CODE_WASM_REF,
@@ -1315,7 +1342,16 @@ class TransactionBuilder:
         footprint: stellar_xdr.LedgerFootprint = None,
         source: Optional[Union[MuxedAccount, str]] = None,
     ) -> "TransactionBuilder":
-        # TODO: a more understandable name?
+        """Append an :class:`InvokeHostFunction <stellar_sdk.operation.InvokeHostFunction>`
+        operation to the list of operations.
+
+        You can use this method to deploy a contract that wraps a classic asset.
+
+        :param asset: The asset to wrap.
+        :param footprint: The ledger footprint.
+        :param source: The source account for the operation. Defaults to the transaction's source account.
+        :return: This builder instance.
+        """
         asset_param = asset.to_xdr_object()
 
         func = stellar_xdr.HostFunction(
@@ -1339,17 +1375,35 @@ class TransactionBuilder:
 
     def append_deploy_create_token_contract_with_source_account_op(
         self,
+        salt: Optional[bytes] = None,
         footprint: stellar_xdr.LedgerFootprint = None,
         source: Optional[Union[MuxedAccount, str]] = None,
     ) -> "TransactionBuilder":
-        salt = stellar_xdr.Uint256(os.urandom(32))
+        """Append an :class:`InvokeHostFunction <stellar_sdk.operation.InvokeHostFunction>`
+        operation to the list of operations.
+
+        You can use this method to create a new Soroban token contract.
+
+        I do not recommend using this method, please check
+        `the documentation <https://soroban.stellar.org/docs/learn/faq#should-i-issue-my-token-as-a-stellar-asset-or-a-custom-soroban-token>`__ for more information.
+
+        :param salt: The 32-byte salt to use to derive the contract ID.
+        :param footprint: The ledger footprint.
+        :param source: The source account for the operation. Defaults to the transaction's source account.
+        :return: This builder instance.
+        """
+        if salt is None:
+            salt = os.urandom(32)
+        else:
+            if len(salt) != 32:
+                raise ValueError("`salt` must be 32 bytes long")
 
         func = stellar_xdr.HostFunction(
             stellar_xdr.HostFunctionType.HOST_FUNCTION_TYPE_CREATE_CONTRACT,
             create_contract_args=stellar_xdr.CreateContractArgs(
                 stellar_xdr.ContractID(
                     stellar_xdr.ContractIDType.CONTRACT_ID_FROM_SOURCE_ACCOUNT,
-                    salt=salt,
+                    salt=stellar_xdr.Uint256(salt),
                 ),
                 stellar_xdr.SCContractCode(
                     stellar_xdr.SCContractCodeType.SCCONTRACT_CODE_TOKEN
