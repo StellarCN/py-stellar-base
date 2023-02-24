@@ -3,11 +3,12 @@ import os
 import time
 import warnings
 from decimal import Decimal
-from typing import List, Optional, Union
+from typing import List, Optional, Union, Sequence
 
 from . import xdr as stellar_xdr
 from .account import Account
 from .asset import Asset
+from .contract_auth import ContractAuth
 from .exceptions import ValueError
 from .fee_bump_transaction import FeeBumpTransaction
 from .fee_bump_transaction_envelope import FeeBumpTransactionEnvelope
@@ -1202,7 +1203,8 @@ class TransactionBuilder:
         self,
         contract_id: str,
         method: str,
-        parameters: List[Union[stellar_xdr.SCVal, BaseScValAlias]],
+        parameters: Sequence[Union[stellar_xdr.SCVal, BaseScValAlias]],
+        auth: List[ContractAuth] = None,
         footprint: stellar_xdr.LedgerFootprint = None,
         source: Optional[Union[MuxedAccount, str]] = None,
     ) -> "TransactionBuilder":
@@ -1236,6 +1238,7 @@ class TransactionBuilder:
         )
         op = InvokeHostFunction(
             func,
+            auth,
             footprint,
             source,
         )
@@ -1264,6 +1267,7 @@ class TransactionBuilder:
         )
         op = InvokeHostFunction(
             func,
+            None,
             footprint,
             source,
         )
@@ -1299,6 +1303,7 @@ class TransactionBuilder:
         )
         op = InvokeHostFunction(
             func,
+            None,
             footprint,
             source,
         )
@@ -1326,6 +1331,7 @@ class TransactionBuilder:
         )
         op = InvokeHostFunction(
             func,
+            None,
             footprint,
             source,
         )
@@ -1352,6 +1358,7 @@ class TransactionBuilder:
         )
         op = InvokeHostFunction(
             func,
+            None,
             footprint,
             source,
         )
