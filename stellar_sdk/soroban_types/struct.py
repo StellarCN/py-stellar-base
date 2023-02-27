@@ -17,6 +17,13 @@ __all__ = ["StructField", "Struct", "TupleStruct"]
 
 
 class StructField:
+    """Represents a Soroban Struct field.
+
+    :param key: The field key.
+    :param value: The field value.
+    """
+
+    # TODO: code example
     def __init__(self, key: str, value: Union[stellar_xdr.SCVal, BaseScValAlias]):
         self.key = key
         self.value = (
@@ -50,6 +57,12 @@ class StructField:
 
 
 class Struct(BaseScValAlias):
+    """Represents a Soroban Struct type.
+
+    :param fields: The struct fields.
+    """
+
+    # TODO: code example
     def __init__(self, fields: Sequence[StructField]):
         self.fields = fields
 
@@ -85,6 +98,12 @@ class Struct(BaseScValAlias):
 
 
 class TupleStruct(BaseScValAlias):
+    """Represents a Soroban Tuple Struct type.
+
+    :param fields: The tuple struct fields.
+    """
+
+    # TODO: code example
     def __init__(self, fields: Sequence[Union[SCVal, BaseScValAlias]]):
         self.fields = [
             field.to_xdr_sc_val() if isinstance(field, BaseScValAlias) else field

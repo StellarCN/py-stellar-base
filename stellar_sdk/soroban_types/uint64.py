@@ -5,10 +5,14 @@ __all__ = ["Uint64"]
 
 
 class Uint64(BaseScValAlias):
+    """Represents a Soroban Uint64 type.
+
+    :param value: The 64-bit unsigned integer value.
+    """
+
     def __init__(self, value: int):
         if value < 0 or value > 2**64 - 1:
             raise ValueError("Invalid Uint64 value.")
-        self.value: int = value
         self.value: int = value
 
     def to_xdr_sc_val(self) -> SCVal:

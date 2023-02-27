@@ -5,6 +5,10 @@ __all__ = ["Uint63"]
 
 
 class Uint63(BaseScValAlias):
+    """Represents a Soroban Uint63 type.
+
+    :param value: The 63-bit unsigned integer value."""
+
     def __init__(self, value: int):
         if value < 0 or value > 2**63 - 1:
             raise ValueError("Invalid Uint63 value.")

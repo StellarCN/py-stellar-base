@@ -5,6 +5,11 @@ __all__ = ["Int32"]
 
 
 class Int32(BaseScValAlias):
+    """Represents a Soroban Int32 type.
+
+    :param value: The 32-bit integer value.
+    """
+
     def __init__(self, value: int):
         if value < -(2**31) or value > 2**31 - 1:
             raise ValueError("Invalid Int32 value.")

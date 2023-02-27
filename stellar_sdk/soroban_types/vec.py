@@ -7,6 +7,11 @@ __all__ = ["Vec"]
 
 
 class Vec(BaseScValAlias):
+    """Represents a Soroban Vec type.
+
+    :param vec: The vec value.
+    """
+
     def __init__(self, vec: Sequence[Union[SCVal, BaseScValAlias]]):
         self.vec = [
             sc_val.to_xdr_sc_val() if isinstance(sc_val, BaseScValAlias) else sc_val

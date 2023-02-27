@@ -5,6 +5,11 @@ __all__ = ["Uint32"]
 
 
 class Uint32(BaseScValAlias):
+    """Represents a Soroban Uint32 type.
+
+    :param value: The 32-bit unsigned integer value.
+    """
+
     def __init__(self, value: int):
         if value < 0 or value > 2**32 - 1:
             raise ValueError("Invalid Uint32 value.")

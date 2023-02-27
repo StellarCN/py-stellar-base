@@ -5,6 +5,11 @@ __all__ = ["Symbol"]
 
 
 class Symbol(BaseScValAlias):
+    """Represents a Soroban Symbol type.
+
+    :param value: The symbol value.
+    """
+
     def __init__(self, value: str):
         self.value = value
 

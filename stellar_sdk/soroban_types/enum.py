@@ -14,6 +14,13 @@ __all__ = ["Enum"]
 
 
 class Enum(BaseScValAlias):
+    """Represents a Soroban Enum type.
+
+    :param key: The enum key.
+    :param value: The enum value.
+    """
+
+    # TODO: code example
     def __init__(self, key: str, value: Optional[Union[SCVal, BaseScValAlias]]):
         self.key = key
         if self.value is not None:

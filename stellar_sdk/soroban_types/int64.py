@@ -5,6 +5,11 @@ __all__ = ["Int64"]
 
 
 class Int64(BaseScValAlias):
+    """Represents a Soroban Int64 type.
+
+    :param value: The 64-bit integer value.
+    """
+
     def __init__(self, value: int):
         if value < -(2**63) or value > 2**63 - 1:
             raise ValueError("Invalid Int64 value.")

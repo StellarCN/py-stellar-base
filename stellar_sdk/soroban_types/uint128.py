@@ -5,6 +5,11 @@ __all__ = ["Uint128"]
 
 
 class Uint128(BaseScValAlias):
+    """Represents a Soroban Uint128 type.
+
+    :param value: The 128-bit unsigned integer value.
+    """
+
     def __init__(self, value: int):
         if value < 0 or value > 2**128 - 1:
             raise ValueError("Invalid Uint128 value.")

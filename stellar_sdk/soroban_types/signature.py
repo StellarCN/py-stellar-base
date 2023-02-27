@@ -18,7 +18,11 @@ __all__ = ["Signature", "AccountEd25519Signature"]
 
 
 class Signature(BaseScValAlias, metaclass=abc.ABCMeta):
-    """An abstract base class for Stellar Soroban Signatures."""
+    """An abstract base class for Stellar Soroban Signatures, if you want to implement your own signature type,
+    you can inherit from this class.
+
+    See `Soroban Documentation - Stellar Account Signatures <https://soroban.stellar.org/docs/how-to-guides/invoking-contracts-with-transactions#stellar-account-signatures>`_
+    """
 
 
 class AccountEd25519Signature(Signature):
@@ -113,4 +117,4 @@ class AccountEd25519Signature(Signature):
         return self.public_key == other.public_key and self.signature == other.signature
 
     def __str__(self) -> str:
-        return f"<AccountEd25519Signature [public_key={self.public_key}, signature={self.signature}]>"
+        return f"<AccountEd25519Signature [public_key={self.public_key!r}, signature={self.signature!r}]>"

@@ -5,6 +5,11 @@ __all__ = ["Int128"]
 
 
 class Int128(BaseScValAlias):
+    """Represents a Soroban Int128 type.
+
+    :param value: The 128-bit integer value.
+    """
+
     def __init__(self, value: int):
         if value < -(2**127) or value > 2**127 - 1:
             raise ValueError("Invalid Int128 value.")

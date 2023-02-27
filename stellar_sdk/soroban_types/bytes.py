@@ -6,6 +6,11 @@ __all__ = ["Bytes"]
 
 
 class Bytes(BaseScValAlias):
+    """Represents a Soroban Bytes type.
+
+    :param value: The bytes value.
+    """
+
     def __init__(self, value: bytes):
         self.value = value
 
@@ -31,4 +36,4 @@ class Bytes(BaseScValAlias):
         return self.value == other.value
 
     def __str__(self) -> str:
-        return f"<Bytes [value={self.value}]>"
+        return f"<Bytes [value={self.value!r}]>"

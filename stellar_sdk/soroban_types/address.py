@@ -56,6 +56,10 @@ class Address(BaseScValAlias):
         return Address(StrKey.encode_contract(contract))
 
     def to_xdr_sc_address(self) -> stellar_xdr.SCAddress:
+        """Converts the Address object to a :class:`stellar_sdk.xdr.SCAddress` XDR object.
+
+        :return: A :class:`stellar_sdk.xdr.SCAddress` XDR object.
+        """
         if self.type == AddressType.ACCOUNT:
             account = stellar_xdr.AccountID(
                 stellar_xdr.PublicKey(
@@ -72,6 +76,11 @@ class Address(BaseScValAlias):
 
     @classmethod
     def from_xdr_sc_address(cls, sc_address: stellar_xdr.SCAddress) -> "Address":
+        """Creates a new Address object from a :class:`stellar_sdk.xdr.SCAddress` XDR object.
+
+        :param sc_address: The :class:`stellar_sdk.xdr.SCAddress` XDR object.
+        :return: A new Address object.
+        """
         if sc_address.type == stellar_xdr.SCAddressType.SC_ADDRESS_TYPE_ACCOUNT:
             assert sc_address.account_id is not None
             assert sc_address.account_id.account_id.ed25519 is not None
