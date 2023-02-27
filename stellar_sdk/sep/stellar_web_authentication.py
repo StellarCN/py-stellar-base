@@ -10,8 +10,10 @@ Version 3.3.0
 import base64
 import os
 import time
-from typing import Iterable, List, Optional, Union
+from typing import Sequence, Iterable, List, Optional, Union
 
+from .ed25519_public_key_signer import Ed25519PublicKeySigner
+from .exceptions import InvalidSep10ChallengeError
 from .. import xdr as stellar_xdr
 from ..account import Account
 from ..exceptions import BadSignatureError, ValueError
@@ -22,8 +24,6 @@ from ..operation.manage_data import ManageData
 from ..transaction_builder import TransactionBuilder
 from ..transaction_envelope import TransactionEnvelope
 from ..type_checked import type_checked
-from .ed25519_public_key_signer import Ed25519PublicKeySigner
-from .exceptions import InvalidSep10ChallengeError
 
 __all__ = [
     "build_challenge_transaction",
@@ -33,7 +33,6 @@ __all__ = [
     "read_challenge_transaction",
     "verify_challenge_transaction",
 ]
-
 
 MUXED_ACCOUNT_STARTING_LETTER: str = "M"
 
@@ -330,7 +329,7 @@ def verify_challenge_transaction_signers(
     home_domains: Union[str, Iterable[str]],
     web_auth_domain: str,
     network_passphrase: str,
-    signers: List[Ed25519PublicKeySigner],
+    signers: Sequence[Ed25519PublicKeySigner],
 ) -> List[Ed25519PublicKeySigner]:
     """Verifies that for a SEP 10 challenge transaction
     all signatures on the transaction are accounted for. A transaction is
@@ -476,7 +475,7 @@ def verify_challenge_transaction_threshold(
     web_auth_domain: str,
     network_passphrase: str,
     threshold: int,
-    signers: List[Ed25519PublicKeySigner],
+    signers: Sequence[Ed25519PublicKeySigner],
 ) -> List[Ed25519PublicKeySigner]:
     """Verifies that for a SEP 10 challenge transaction
     all signatures on the transaction are accounted for and that the signatures
@@ -574,7 +573,7 @@ def verify_challenge_transaction(
 
 
 def _verify_transaction_signatures(
-    transaction_envelope: TransactionEnvelope, signers: List[Ed25519PublicKeySigner]
+    transaction_envelope: TransactionEnvelope, signers: Sequence[Ed25519PublicKeySigner]
 ) -> List[Ed25519PublicKeySigner]:
     """Checks if a transaction has been signed by one or more of
     the signers, returning a list of signers that were found to have signed the
@@ -622,7 +621,7 @@ def _verify_te_signed_by_account_id(
 
 
 def _signer_in_signers(
-    signer: Ed25519PublicKeySigner, signers: List[Ed25519PublicKeySigner]
+    signer: Ed25519PublicKeySigner, signers: Sequence[Ed25519PublicKeySigner]
 ) -> bool:
     for s in signers:
         if s.account_id == signer.account_id:

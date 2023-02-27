@@ -1,5 +1,5 @@
 from abc import abstractmethod
-from typing import Generic, List, TypeVar, Union
+from typing import Sequence, Generic, TypeVar, Union, List
 
 from . import xdr as stellar_xdr
 from .decorated_signature import DecoratedSignature
@@ -17,10 +17,12 @@ class BaseTransactionEnvelope(Generic[T]):
     def __init__(
         self,
         network_passphrase: str,
-        signatures: List[DecoratedSignature] = None,
+        signatures: Sequence[DecoratedSignature] = None,
     ) -> None:
         self.network_passphrase: str = network_passphrase
-        self.signatures: List[DecoratedSignature] = signatures or []
+        self.signatures: List[DecoratedSignature] = (
+            list(signatures) if signatures else []
+        )
         self._network_id: bytes = Network(network_passphrase).network_id()
 
     def hash(self) -> bytes:

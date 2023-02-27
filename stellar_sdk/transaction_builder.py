@@ -3,7 +3,7 @@ import os
 import time
 import warnings
 from decimal import Decimal
-from typing import List, Optional, Union, Sequence
+from typing import Optional, Union, Sequence, List
 
 from . import xdr as stellar_xdr
 from .account import Account
@@ -498,7 +498,7 @@ class TransactionBuilder:
         send_max: Union[str, Decimal],
         dest_asset: Asset,
         dest_amount: Union[str, Decimal],
-        path: List[Asset],
+        path: Sequence[Asset],
         source: Optional[Union[MuxedAccount, str]] = None,
     ) -> "TransactionBuilder":
         """Append a :class:`PathPaymentStrictReceive <stellar_sdk.operation.PathPaymentStrictReceive>`
@@ -533,7 +533,7 @@ class TransactionBuilder:
         send_amount: Union[str, Decimal],
         dest_asset: Asset,
         dest_min: Union[str, Decimal],
-        path: List[Asset],
+        path: Sequence[Asset],
         source: Optional[Union[MuxedAccount, str]] = None,
     ) -> "TransactionBuilder":
         """Append a :class:`PathPaymentStrictSend <stellar_sdk.operation.PathPaymentStrictSend>`
@@ -882,7 +882,7 @@ class TransactionBuilder:
         self,
         asset: Asset,
         amount: Union[str, Decimal],
-        claimants: List[Claimant],
+        claimants: Sequence[Claimant],
         source: Optional[Union[MuxedAccount, str]] = None,
     ) -> "TransactionBuilder":
         """Append a :class:`CreateClaimableBalance <stellar_sdk.operation.CreateClaimableBalance>`
@@ -1204,7 +1204,7 @@ class TransactionBuilder:
         contract_id: str,
         method: str,
         parameters: Sequence[Union[stellar_xdr.SCVal, BaseScValAlias]],
-        auth: List[ContractAuth] = None,
+        auth: Sequence[ContractAuth] = None,
         footprint: stellar_xdr.LedgerFootprint = None,
         source: Optional[Union[MuxedAccount, str]] = None,
     ) -> "TransactionBuilder":

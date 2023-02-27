@@ -48,7 +48,7 @@ class SorobanServer:
         self,
         start_ledger: int,
         end_ledger: int,
-        filters: List[EventFilter] = None,
+        filters: Sequence[EventFilter] = None,
         cursor: str = None,
         limit: int = None,
     ) -> GetEventsResponse:

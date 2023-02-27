@@ -1,12 +1,12 @@
 from decimal import Decimal
-from typing import List, Optional, Union
+from typing import Sequence, Optional, Union
 
+from .operation import Operation
 from .. import xdr as stellar_xdr
 from ..asset import Asset
 from ..muxed_account import MuxedAccount
 from ..type_checked import type_checked
 from ..utils import raise_if_not_valid_amount
-from .operation import Operation
 
 __all__ = ["PathPaymentStrictSend"]
 
@@ -45,7 +45,7 @@ class PathPaymentStrictSend(Operation):
         send_amount: Union[str, Decimal],
         dest_asset: Asset,
         dest_min: Union[str, Decimal],
-        path: List[Asset],
+        path: Sequence[Asset],
         source: Optional[Union[MuxedAccount, str]] = None,
     ) -> None:
         super().__init__(source)
@@ -56,7 +56,7 @@ class PathPaymentStrictSend(Operation):
         self.send_amount: str = str(send_amount)
         self.dest_asset: Asset = dest_asset
         self.dest_min: str = str(dest_min)
-        self.path: List[Asset] = path  # a list of paths/assets
+        self.path: Sequence[Asset] = path  # a list of paths/assets
         raise_if_not_valid_amount(self.send_amount, "send_amount")
         raise_if_not_valid_amount(self.dest_min, "dest_min")
 

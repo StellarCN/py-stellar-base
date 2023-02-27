@@ -8,12 +8,12 @@ from sseclient import SSEClient
 from urllib3.exceptions import NewConnectionError
 from urllib3.util import Retry
 
+from . import defines
 from ..__version__ import __version__
 from ..client.base_sync_client import BaseSyncClient
 from ..client.response import Response
 from ..exceptions import ConnectionError
 from ..type_checked import type_checked
-from . import defines
 
 DEFAULT_NUM_RETRIES = 3
 DEFAULT_BACKOFF_FACTOR = 0.5

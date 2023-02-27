@@ -1,6 +1,6 @@
 from datetime import datetime
 from enum import Enum
-from typing import Optional, List, Dict, Any
+from typing import Sequence, Optional, List, Dict, Any
 
 from pydantic import BaseModel, Field
 
@@ -46,7 +46,7 @@ class EventInfo(BaseModel):
     contract_id: str = Field(alias="contractId")
     id: str = Field(alias="id")
     paging_token: str = Field(alias="pagingToken")
-    topic: List[str] = Field(alias="topic")
+    topic: Sequence[str] = Field(alias="topic")
     value: EventInfoValue = Field(alias="value")
 
 
@@ -63,7 +63,7 @@ class GetEventsRequest(BaseModel):
 
 
 class GetEventsResponse(BaseModel):
-    events: List[EventInfo] = Field(alias="events")
+    events: Sequence[EventInfo] = Field(alias="events")
     latest_ledger: int = Field(alias="latestLedger")
 
 

@@ -1,5 +1,5 @@
 import copy
-from typing import List, Union
+from typing import Sequence, Union
 from xdrlib import Packer
 
 from . import xdr as stellar_xdr
@@ -36,7 +36,7 @@ class TransactionEnvelope(BaseTransactionEnvelope["TransactionEnvelope"]):
         self,
         transaction: Transaction,
         network_passphrase: str,
-        signatures: List[DecoratedSignature] = None,
+        signatures: Sequence[DecoratedSignature] = None,
     ) -> None:
         super().__init__(network_passphrase, signatures)
         self.transaction: Transaction = transaction

@@ -1,13 +1,13 @@
 from decimal import Decimal
 from typing import Optional, Union
 
+from .operation import Operation
 from .. import xdr as stellar_xdr
 from ..asset import Asset
 from ..muxed_account import MuxedAccount
 from ..price import Price
 from ..type_checked import type_checked
 from ..utils import raise_if_not_valid_amount
-from .operation import Operation
 
 __all__ = ["ManageBuyOffer"]
 

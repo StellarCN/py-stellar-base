@@ -1,4 +1,4 @@
-from typing import List, Optional, Union
+from typing import Sequence, Optional, Union, List
 
 from . import xdr as stellar_xdr
 from .keypair import Keypair
@@ -58,7 +58,7 @@ class Transaction:
         source: Union[MuxedAccount, Keypair, str],
         sequence: int,
         fee: int,
-        operations: List[Operation],
+        operations: Sequence[Operation],
         memo: Memo = None,
         preconditions: Preconditions = None,
         v1: bool = True,
@@ -81,7 +81,7 @@ class Transaction:
 
         self.source: MuxedAccount = source
         self.sequence: int = sequence
-        self.operations: List[Operation] = operations
+        self.operations: List[Operation] = list(operations) if operations else []
         self.memo: Memo = memo
         self.fee: int = fee
         self.preconditions: Optional[Preconditions] = preconditions
