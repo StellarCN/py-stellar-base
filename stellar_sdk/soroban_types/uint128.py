@@ -6,6 +6,8 @@ __all__ = ["Uint128"]
 
 class Uint128(BaseScValAlias):
     def __init__(self, value: int):
+        if value < 0 or value > 2**128 - 1:
+            raise ValueError("Invalid Uint128 value.")
         self.value: int = value
 
     def to_xdr_sc_val(self) -> SCVal:
@@ -13,7 +15,7 @@ class Uint128(BaseScValAlias):
             SCValType.SCV_OBJECT,
             obj=SCObject(
                 SCObjectType.SCO_U128,
-                i128=Int128Parts(
+                u128=Int128Parts(
                     lo=Uint64(self.value & (2**64 - 1)),
                     hi=Uint64(self.value >> 64),
                 ),
@@ -30,3 +32,11 @@ class Uint128(BaseScValAlias):
             raise ValueError("Invalid SCVal value.")
         assert sc_val.obj.u128 is not None
         return cls(sc_val.obj.u128.lo.uint64 + (sc_val.obj.u128.hi.uint64 << 64))
+
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, self.__class__):
+            return NotImplemented
+        return self.value == other.value
+
+    def __str__(self) -> str:
+        return f"<Uint128 [value={self.value}]>"

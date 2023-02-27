@@ -6,6 +6,8 @@ __all__ = ["Int32"]
 
 class Int32(BaseScValAlias):
     def __init__(self, value: int):
+        if value < -(2**31) or value > 2**31 - 1:
+            raise ValueError("Invalid Int32 value.")
         self.value: int = value
 
     def to_xdr_sc_val(self) -> SCVal:
@@ -17,3 +19,11 @@ class Int32(BaseScValAlias):
             raise ValueError("Invalid SCVal value.")
         assert sc_val.i32 is not None
         return cls(sc_val.i32.int32)
+
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, self.__class__):
+            return NotImplemented
+        return self.value == other.value
+
+    def __str__(self) -> str:
+        return f"<Int32 [value={self.value}]>"

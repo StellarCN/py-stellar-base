@@ -40,6 +40,14 @@ class StructField:
             sc_map_entry.val,
         )
 
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, self.__class__):
+            return NotImplemented
+        return self.key == other.key and self.value == other.value
+
+    def __str__(self) -> str:
+        return f"<StructField key={self.key} value={self.value}>"
+
 
 class Struct(BaseScValAlias):
     def __init__(self, fields: Sequence[StructField]):
@@ -67,6 +75,14 @@ class Struct(BaseScValAlias):
         ]
         return cls(fields)
 
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, self.__class__):
+            return NotImplemented
+        return self.fields == other.fields
+
+    def __str__(self) -> str:
+        return f"<Struct fields={self.fields}>"
+
 
 class TupleStruct(BaseScValAlias):
     def __init__(self, fields: Sequence[Union[SCVal, BaseScValAlias]]):
@@ -93,3 +109,11 @@ class TupleStruct(BaseScValAlias):
             raise ValueError("Invalid SCObject type.")
         assert sc_val.obj.vec is not None
         return cls(sc_val.obj.vec.sc_vec)
+
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, self.__class__):
+            return NotImplemented
+        return self.fields == other.fields
+
+    def __str__(self) -> str:
+        return f"<TupleStruct fields={self.fields}>"

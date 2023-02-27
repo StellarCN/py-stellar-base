@@ -6,6 +6,9 @@ __all__ = ["Uint64"]
 
 class Uint64(BaseScValAlias):
     def __init__(self, value: int):
+        if value < 0 or value > 2**64 - 1:
+            raise ValueError("Invalid Uint64 value.")
+        self.value: int = value
         self.value: int = value
 
     def to_xdr_sc_val(self) -> SCVal:
@@ -21,3 +24,11 @@ class Uint64(BaseScValAlias):
             raise ValueError("Invalid SCVal value.")
         assert sc_val.obj.u64 is not None
         return cls(sc_val.obj.u64.uint64)
+
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, self.__class__):
+            return NotImplemented
+        return self.value == other.value
+
+    def __str__(self) -> str:
+        return f"<Uint64 [value={self.value}]>"

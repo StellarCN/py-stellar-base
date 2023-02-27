@@ -23,3 +23,11 @@ class Vec(BaseScValAlias):
                 ),
             ),
         )
+
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, self.__class__):
+            return NotImplemented
+        return self.vec == other.vec
+
+    def __str__(self) -> str:
+        return f"<Vec [vec={self.vec}]>"

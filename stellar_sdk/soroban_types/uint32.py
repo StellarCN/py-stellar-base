@@ -6,6 +6,8 @@ __all__ = ["Uint32"]
 
 class Uint32(BaseScValAlias):
     def __init__(self, value: int):
+        if value < 0 or value > 2**32 - 1:
+            raise ValueError("Invalid Uint32 value.")
         self.value: int = value
 
     def to_xdr_sc_val(self) -> SCVal:
@@ -17,3 +19,11 @@ class Uint32(BaseScValAlias):
             raise ValueError("Invalid SCVal value.")
         assert sc_val.u32 is not None
         return cls(sc_val.u32.uint32)
+
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, self.__class__):
+            return NotImplemented
+        return self.value == other.value
+
+    def __str__(self) -> str:
+        return f"<Uint32 [value={self.value}]>"

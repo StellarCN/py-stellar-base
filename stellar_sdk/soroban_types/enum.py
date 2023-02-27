@@ -51,3 +51,11 @@ class Enum(BaseScValAlias):
         value_exists = len(sc_val.obj.vec.sc_vec) > 1
         value = sc_val.obj.vec.sc_vec[1] if value_exists else None
         return cls(key, value)
+
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, self.__class__):
+            return NotImplemented
+        return self.value == other.value
+
+    def __str__(self) -> str:
+        return f"<Enum [key={self.key}, value={self.value}]>"

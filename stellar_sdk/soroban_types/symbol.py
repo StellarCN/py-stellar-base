@@ -17,3 +17,11 @@ class Symbol(BaseScValAlias):
             raise ValueError("Invalid SCVal value.")
         assert sc_val.sym is not None
         return cls(sc_val.sym.sc_symbol.decode("utf-8"))
+
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, self.__class__):
+            return NotImplemented
+        return self.value == other.value
+
+    def __str__(self) -> str:
+        return f"<Symbol [value={self.value}]>"

@@ -106,3 +106,11 @@ class AccountEd25519Signature(Signature):
         public_key = StrKey.encode_ed25519_public_key(public_key_entry.val.obj.bin)
         signature = signature_entry.val.obj.bin
         return cls(public_key, signature)
+
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, self.__class__):
+            return NotImplemented
+        return self.public_key == other.public_key and self.signature == other.signature
+
+    def __str__(self) -> str:
+        return f"<AccountEd25519Signature [public_key={self.public_key}, signature={self.signature}]>"
