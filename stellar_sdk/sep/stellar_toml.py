@@ -11,13 +11,13 @@ from typing import Any, MutableMapping
 
 import toml
 
+from .exceptions import StellarTomlNotFoundError
 from ..client.aiohttp_client import AiohttpClient
 from ..client.base_async_client import BaseAsyncClient
 from ..client.base_sync_client import BaseSyncClient
 from ..client.requests_client import RequestsClient
 from ..client.response import Response
 from ..type_checked import type_checked
-from .exceptions import StellarTomlNotFoundError
 
 __all__ = ["fetch_stellar_toml", "fetch_stellar_toml_async"]
 

@@ -10,7 +10,7 @@ import json
 from datetime import datetime
 from decimal import Decimal
 from enum import Enum
-from typing import Dict, List, Optional, Union
+from typing import Sequence, Dict, List, Optional, Union
 
 from .. import xdr as stellar_xdr
 from ..asset import Asset
@@ -1142,7 +1142,7 @@ def _add_signer_key(prefix: str, signer_key: SignerKey, lines: List[str]) -> Non
 
 
 def _add_extra_signers(
-    prefix: str, extra_signers: Optional[List[SignerKey]], lines: List[str]
+    prefix: str, extra_signers: Optional[Sequence[SignerKey]], lines: List[str]
 ) -> None:
     if extra_signers is None:
         extra_signers = []
@@ -1211,7 +1211,9 @@ def _add_memo(memo: Memo, prefix: str, lines: List[str]) -> None:
         _add_line(f"{prefix}memo.retHash", _to_opaque(memo.memo_return), lines)
 
 
-def _add_operations(operations: List[Operation], prefix: str, lines: List[str]) -> None:
+def _add_operations(
+    operations: Sequence[Operation], prefix: str, lines: List[str]
+) -> None:
     _add_line(f"{prefix}operations.len", len(operations), lines)
     for index, operation in enumerate(operations):
         _add_operation(index, operation, prefix, lines)
@@ -1645,7 +1647,7 @@ def _add_operation(
 
 
 def _add_signatures(
-    signatures: List[DecoratedSignature], prefix: str, lines: List[str]
+    signatures: Sequence[DecoratedSignature], prefix: str, lines: List[str]
 ) -> None:
     _add_line(f"{prefix}signatures.len", len(signatures), lines)
     for index, signature in enumerate(signatures):

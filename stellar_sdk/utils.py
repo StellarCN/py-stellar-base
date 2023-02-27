@@ -2,7 +2,7 @@ import hashlib
 import os
 import re
 from decimal import ROUND_FLOOR, Context, Decimal, Inexact
-from typing import Dict, List, Optional, Union
+from typing import Sequence, Dict, Optional, Union
 from urllib.parse import urlsplit, urlunsplit
 
 from .asset import Asset
@@ -58,7 +58,7 @@ def hex_to_bytes(hex_string: Union[str, bytes]) -> bytes:
 
 
 @type_checked
-def convert_assets_to_horizon_param(assets: List[Asset]) -> str:
+def convert_assets_to_horizon_param(assets: Sequence[Asset]) -> str:
     assets_string = []
     for asset in assets:
         if asset.is_native():

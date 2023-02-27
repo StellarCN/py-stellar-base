@@ -1,6 +1,7 @@
 from enum import IntFlag
 from typing import Optional, Union
 
+from .operation import Operation
 from .. import xdr as stellar_xdr
 from ..asset import Asset
 from ..keypair import Keypair
@@ -8,7 +9,6 @@ from ..muxed_account import MuxedAccount
 from ..strkey import StrKey
 from ..type_checked import type_checked
 from ..utils import raise_if_not_valid_ed25519_public_key
-from .operation import Operation
 
 __all__ = ["TrustLineFlags", "SetTrustLineFlags"]
 

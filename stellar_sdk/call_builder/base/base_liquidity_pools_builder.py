@@ -1,6 +1,6 @@
-from typing import List
+from typing import Sequence
 
-from ... import Asset
+from ...asset import Asset
 from ...call_builder.base.base_call_builder import BaseCallBuilder
 from ...type_checked import type_checked
 from ...utils import convert_assets_to_horizon_param
@@ -32,7 +32,7 @@ class BaseLiquidityPoolsBuilder(BaseCallBuilder):
         self.endpoint = f"liquidity_pools/{liquidity_pool_id}"
         return self
 
-    def for_reserves(self, reserves: List[Asset]):
+    def for_reserves(self, reserves: Sequence[Asset]):
         """Get pools by reserves.
 
         Horizon will provide an endpoint to find all liquidity pools

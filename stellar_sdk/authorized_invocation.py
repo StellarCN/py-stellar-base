@@ -1,5 +1,5 @@
 import binascii
-from typing import List, Union, Sequence
+from typing import Union, Sequence
 
 from . import xdr as stellar_xdr
 from .soroban_types import BaseScValAlias
@@ -24,7 +24,7 @@ class AuthorizedInvocation:
         contract_id: str,
         function_name: str,
         args: Sequence[Union[stellar_xdr.SCVal, BaseScValAlias]],
-        sub_invocations: List["AuthorizedInvocation"],
+        sub_invocations: Sequence["AuthorizedInvocation"],
     ):
         self.contract_id = contract_id
         self.function_name = function_name

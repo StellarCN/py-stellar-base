@@ -31,7 +31,6 @@ __all__ = [
     "FeatureNotEnabledError",
 ]
 
-
 # The following is kept for compatibility
 ValueError = ValueError
 TypeError = TypeError

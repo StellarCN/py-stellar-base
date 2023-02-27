@@ -3,6 +3,7 @@ import binascii
 from enum import IntEnum
 from typing import Optional, Union
 
+from .operation import Operation
 from .. import xdr as stellar_xdr
 from ..asset import Asset
 from ..exceptions import ValueError
@@ -17,7 +18,6 @@ from ..utils import (
     raise_if_not_valid_ed25519_public_key,
     raise_if_not_valid_hash,
 )
-from .operation import Operation
 
 __all__ = ["RevokeSponsorship"]
 

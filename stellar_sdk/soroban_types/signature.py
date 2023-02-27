@@ -1,10 +1,9 @@
 import abc
 from typing import Union
 
-from ..strkey import StrKey
-
 from .base import BaseScValAlias
 from ..keypair import Keypair
+from ..strkey import StrKey
 from ..xdr import (
     SCVal,
     SCObject,

@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import Sequence, List, Optional
 
 from . import xdr as stellar_xdr
 from .ledger_bounds import LedgerBounds
@@ -33,7 +33,7 @@ class Preconditions:
         min_sequence_number: int = None,
         min_sequence_age: int = None,
         min_sequence_ledger_gap: int = None,
-        extra_signers: List[SignerKey] = None,
+        extra_signers: Sequence[SignerKey] = None,
     ):
         if not extra_signers:
             extra_signers = []

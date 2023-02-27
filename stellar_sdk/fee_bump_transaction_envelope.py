@@ -1,4 +1,4 @@
-from typing import List, Union
+from typing import Sequence, Union
 from xdrlib import Packer
 
 from . import xdr as stellar_xdr
@@ -34,7 +34,7 @@ class FeeBumpTransactionEnvelope(BaseTransactionEnvelope["FeeBumpTransactionEnve
         self,
         transaction: FeeBumpTransaction,
         network_passphrase: str,
-        signatures: List[DecoratedSignature] = None,
+        signatures: Sequence[DecoratedSignature] = None,
     ) -> None:
         super().__init__(network_passphrase, signatures)
         self.transaction: FeeBumpTransaction = transaction

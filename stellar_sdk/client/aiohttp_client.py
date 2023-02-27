@@ -6,12 +6,12 @@ from typing import Any, AsyncGenerator, Dict, Optional
 import aiohttp
 from aiohttp_sse_client.client import EventSource
 
-from ..__version__ import __version__
-from ..exceptions import ConnectionError, StreamClientError
-from ..type_checked import type_checked
 from . import defines
 from .base_async_client import BaseAsyncClient
 from .response import Response
+from ..__version__ import __version__
+from ..exceptions import ConnectionError, StreamClientError
+from ..type_checked import type_checked
 
 logger = logging.getLogger(__name__)
 
