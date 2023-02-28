@@ -9,14 +9,13 @@ from ..account import Account
 from ..client.base_sync_client import BaseSyncClient
 from ..client.requests_client import RequestsClient
 from ..transaction_envelope import TransactionEnvelope
-from ..type_checked import type_checked
+
 
 __all__ = ["SorobanServer"]
 
 V = TypeVar("V")
 
 
-@type_checked
 class SorobanServer:
     def __init__(
         self,

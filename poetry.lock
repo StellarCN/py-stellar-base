@@ -524,18 +524,6 @@ optional = false
 python-versions = ">=3.6"
 
 [[package]]
-name = "typeguard"
-version = "2.13.3"
-description = "Run-time type checker for Python"
-category = "main"
-optional = false
-python-versions = ">=3.5.3"
-
-[package.extras]
-doc = ["sphinx-rtd-theme", "sphinx-autodoc-typehints (>=1.2.0)"]
-test = ["pytest", "typing-extensions", "mypy"]
-
-[[package]]
 name = "types-requests"
 version = "2.28.11.15"
 description = "Typing stubs for requests"
@@ -628,7 +616,7 @@ docs = []
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.7,<4.0"
-content-hash = "1e437bffc223f4e5a3bd7e2695056bfd92b27e6fffe38d5f74fd553de8251418"
+content-hash = "71224d24dc0553047d19154a472599ff5753f69e6a921a66414bf7a99c38704d"
 
 [metadata.files]
 aiohttp = []
@@ -712,10 +700,6 @@ tomli = [
     {file = "tomli-2.0.1.tar.gz", hash = "sha256:de526c12914f0c550d15924c62d72abc48d6fe7364aa87328337a31007fe8a4f"},
 ]
 typed-ast = []
-typeguard = [
-    {file = "typeguard-2.13.3-py3-none-any.whl", hash = "sha256:5e3e3be01e887e7eafae5af63d1f36c849aaa94e3a0112097312aabfa16284f1"},
-    {file = "typeguard-2.13.3.tar.gz", hash = "sha256:00edaa8da3a133674796cf5ea87d9f4b4c367d77476e185e80251cc13dfbb8c4"},
-]
 types-requests = []
 types-toml = []
 types-urllib3 = []

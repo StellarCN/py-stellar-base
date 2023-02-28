@@ -5,12 +5,11 @@ from typing import Optional, Union
 from .. import utils
 from .. import xdr as stellar_xdr
 from ..muxed_account import MuxedAccount
-from ..type_checked import type_checked
+
 
 __all__ = ["Operation"]
 
 
-@type_checked
 class Operation(metaclass=ABCMeta):
     """The :class:`Operation` object, which represents an operation on
     Stellar's network.

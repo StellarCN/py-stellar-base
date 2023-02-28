@@ -2,13 +2,12 @@ import binascii
 
 from . import xdr as stellar_xdr
 from .exceptions import ValueError
-from .type_checked import type_checked
+
 from .utils import raise_if_not_valid_hash
 
 __all__ = ["LiquidityPoolId"]
 
 
-@type_checked
 class LiquidityPoolId:
     """The :class:`LiquidityPoolId` object, which represents the asset referenced by a trustline to a liquidity pool.
 

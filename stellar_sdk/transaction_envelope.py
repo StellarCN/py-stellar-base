@@ -10,12 +10,11 @@ from .keypair import Keypair
 from .operation.invoke_host_function import InvokeHostFunction
 from .signer_key import SignerKeyType
 from .transaction import Transaction
-from .type_checked import type_checked
+
 
 __all__ = ["TransactionEnvelope"]
 
 
-@type_checked
 class TransactionEnvelope(BaseTransactionEnvelope["TransactionEnvelope"]):
     """The :class:`TransactionEnvelope` object, which represents a transaction
     envelope ready to sign and submit to send over the network.

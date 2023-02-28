@@ -5,7 +5,7 @@ from . import xdr as stellar_xdr
 from .__version__ import __issues__
 from .exceptions import ValueError
 from .strkey import StrKey, _get_version_byte_for_prefix, _VersionByte
-from .type_checked import type_checked
+
 
 __all__ = ["SignerKey", "SignerKeyType", "SignedPayloadSigner"]
 
@@ -17,7 +17,6 @@ class SignerKeyType(IntEnum):
     SIGNER_KEY_TYPE_ED25519_SIGNED_PAYLOAD = 3
 
 
-@type_checked
 class SignedPayloadSigner:
     """The :class:`SignedPayloadSigner` object, which represents a signed payload signer.
 
@@ -38,7 +37,6 @@ class SignedPayloadSigner:
         return f"<SignedPayloadSigner [account_id={self.account_id}, payload={self.payload}]>"
 
 
-@type_checked
 class SignerKey:
     """The :class:`SignerKey` object, which represents an account signer key on Stellar's network.
 

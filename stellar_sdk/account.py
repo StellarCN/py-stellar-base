@@ -2,12 +2,11 @@ from typing import Any, Dict, List, Optional, Union
 
 from .muxed_account import MuxedAccount
 from .sep.ed25519_public_key_signer import Ed25519PublicKeySigner
-from .type_checked import type_checked
+
 
 __all__ = ["Account"]
 
 
-@type_checked
 class Account:
     """The :class:`Account` object represents a single
     account on the Stellar network and its sequence number.
@@ -98,7 +97,6 @@ class Account:
         return f"<Account [account={self.account}, sequence={self.sequence}]>"
 
 
-@type_checked
 class Thresholds:
     def __init__(
         self, low_threshold: int, med_threshold: int, high_threshold: int

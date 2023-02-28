@@ -5,12 +5,11 @@ from . import xdr as stellar_xdr
 from .exceptions import AssetCodeInvalidError, AssetIssuerInvalidError, AttributeError
 from .keypair import Keypair
 from .strkey import StrKey
-from .type_checked import type_checked
+
 
 __all__ = ["Asset"]
 
 
-@type_checked
 class Asset:
     """The :class:`Asset` object, which represents an asset and its
     corresponding issuer on the Stellar network.
