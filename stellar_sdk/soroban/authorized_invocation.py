@@ -20,11 +20,11 @@ class AuthorizedInvocation:
     """
 
     def __init__(
-            self,
-            contract_id: str,
-            function_name: str,
-            args: Sequence[Union[stellar_xdr.SCVal, BaseScValAlias]],
-            sub_invocations: Sequence["AuthorizedInvocation"],
+        self,
+        contract_id: str,
+        function_name: str,
+        args: Sequence[Union[stellar_xdr.SCVal, BaseScValAlias]],
+        sub_invocations: Sequence["AuthorizedInvocation"],
     ):
         self.contract_id = contract_id
         self.function_name = function_name
@@ -50,7 +50,7 @@ class AuthorizedInvocation:
 
     @classmethod
     def from_xdr_object(
-            cls, xdr_object: stellar_xdr.AuthorizedInvocation
+        cls, xdr_object: stellar_xdr.AuthorizedInvocation
     ) -> "AuthorizedInvocation":
         contract_id = xdr_object.contract_id.hash.hex()
         function_name = xdr_object.function_name.sc_symbol.decode("utf-8")
@@ -65,10 +65,10 @@ class AuthorizedInvocation:
         if not isinstance(other, self.__class__):
             return NotImplemented
         return (
-                self.contract_id == other.contract_id
-                and self.function_name == other.function_name
-                and self.args == other.args
-                and self.sub_invocations == other.sub_invocations
+            self.contract_id == other.contract_id
+            and self.function_name == other.function_name
+            and self.args == other.args
+            and self.sub_invocations == other.sub_invocations
         )
 
     def __str__(self):

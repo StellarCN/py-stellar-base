@@ -11,7 +11,7 @@ class Uint32(BaseScValAlias):
     """
 
     def __init__(self, value: int):
-        if value < 0 or value > 2 ** 32 - 1:
+        if value < 0 or value > 2**32 - 1:
             raise ValueError("Invalid Uint32 value.")
         self.value: int = value
 

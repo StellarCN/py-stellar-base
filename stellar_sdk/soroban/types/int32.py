@@ -11,7 +11,7 @@ class Int32(BaseScValAlias):
     """
 
     def __init__(self, value: int):
-        if value < -(2 ** 31) or value > 2 ** 31 - 1:
+        if value < -(2**31) or value > 2**31 - 1:
             raise ValueError("Invalid Int32 value.")
         self.value: int = value
 

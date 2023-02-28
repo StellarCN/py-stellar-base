@@ -24,13 +24,13 @@ class ContractAuth:
     """
 
     def __init__(
-            self,
-            address: Optional[Address],
-            nonce: Optional[int],
-            root_invocation: AuthorizedInvocation,
-            signature_args: Optional[
-                Sequence[Union[BaseScValAlias, stellar_xdr.SCVal]]
-            ] = None,
+        self,
+        address: Optional[Address],
+        nonce: Optional[int],
+        root_invocation: AuthorizedInvocation,
+        signature_args: Optional[
+            Sequence[Union[BaseScValAlias, stellar_xdr.SCVal]]
+        ] = None,
     ):
         if (address and nonce is None) or (not address and nonce is not None):
             raise ValueError("address and nonce must both be set or both be None")
@@ -114,10 +114,10 @@ class ContractAuth:
         if not isinstance(other, self.__class__):
             return NotImplemented
         return (
-                self.address == other.address
-                and self.nonce == other.nonce
-                and self.root_invocation == other.root_invocation
-                and self.signature_args == other.signature_args
+            self.address == other.address
+            and self.nonce == other.nonce
+            and self.root_invocation == other.root_invocation
+            and self.signature_args == other.signature_args
         )
 
     def __str__(self):
