@@ -25,7 +25,9 @@ class TestSorobanServer:
             assert response.id == account_id
             assert response.sequence > 0
 
-    @pytest.mark.skip(reason="TODO: We need automated contract generation and submission")
+    @pytest.mark.skip(
+        reason="TODO: We need automated contract generation and submission"
+    )
     def test_get_events(self):
         start_ledger = 90000
         end_ledger = 90300

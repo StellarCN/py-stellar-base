@@ -52,7 +52,6 @@ aiohttp-sse-client = "^0.2.1"
 stellar-base-sseclient = "^0.0.21"
 mnemonic = "^0.20"
 toml = "^0.10.2"
-typeguard = "^2.13.0"
 urllib3 = "^1.26.7"
 pydantic = "^1.10.2"
 

@@ -1,7 +1,7 @@
 from . import xdr as stellar_xdr
 from .asset import Asset
 from .exceptions import ValueError
-from .type_checked import type_checked
+
 from .utils import sha256
 
 __all__ = ["LiquidityPoolAsset", "LIQUIDITY_POOL_FEE_V18"]
@@ -11,7 +11,6 @@ __all__ = ["LiquidityPoolAsset", "LIQUIDITY_POOL_FEE_V18"]
 LIQUIDITY_POOL_FEE_V18 = stellar_xdr.LIQUIDITY_POOL_FEE_V18
 
 
-@type_checked
 class LiquidityPoolAsset:
     """The :class:`LiquidityPoolAsset` object, which represents a liquidity pool trustline change.
 

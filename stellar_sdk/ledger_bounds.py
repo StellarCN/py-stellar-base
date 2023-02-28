@@ -1,11 +1,10 @@
 from . import xdr as stellar_xdr
 from .exceptions import ValueError
-from .type_checked import type_checked
+
 
 __all__ = ["LedgerBounds"]
 
 
-@type_checked
 class LedgerBounds:
     """LedgerBounds represents the ledger interval that a transaction is valid.
 

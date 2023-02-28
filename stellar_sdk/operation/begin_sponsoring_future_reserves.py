@@ -5,13 +5,12 @@ from .. import xdr as stellar_xdr
 from ..keypair import Keypair
 from ..muxed_account import MuxedAccount
 from ..strkey import StrKey
-from ..type_checked import type_checked
+
 from ..utils import raise_if_not_valid_ed25519_public_key
 
 __all__ = ["BeginSponsoringFutureReserves"]
 
 
-@type_checked
 class BeginSponsoringFutureReserves(Operation):
     """The :class:`BeginSponsoringFutureReserves` object, which represents a BeginSponsoringFutureReserves
     operation on Stellar's network.

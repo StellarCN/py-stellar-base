@@ -10,7 +10,6 @@ from .. import xdr as stellar_xdr
 from ..account import Account
 from ..client.base_sync_client import BaseSyncClient
 from ..client.requests_client import RequestsClient
-from ..type_checked import type_checked
 
 if TYPE_CHECKING:
     from ..transaction_envelope import TransactionEnvelope
@@ -20,7 +19,6 @@ __all__ = ["SorobanServer"]
 V = TypeVar("V")
 
 
-@type_checked
 class SorobanServer:
     def __init__(
             self,

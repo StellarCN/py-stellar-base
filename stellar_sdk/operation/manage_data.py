@@ -4,12 +4,11 @@ from .operation import Operation
 from .. import xdr as stellar_xdr
 from ..exceptions import ValueError
 from ..muxed_account import MuxedAccount
-from ..type_checked import type_checked
+
 
 __all__ = ["ManageData"]
 
 
-@type_checked
 class ManageData(Operation):
     """The :class:`ManageData` object, which represents a
     ManageData operation on Stellar's network.

@@ -4,12 +4,11 @@ from . import xdr as stellar_xdr
 from .exceptions import ValueError
 from .keypair import Keypair
 from .strkey import StrKey
-from .type_checked import type_checked
+
 
 __all__ = ["MuxedAccount"]
 
 
-@type_checked
 class MuxedAccount:
     """The :class:`MuxedAccount` object, which represents a multiplexed account on Stellar's network.
 
