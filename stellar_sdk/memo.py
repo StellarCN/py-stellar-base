@@ -3,13 +3,12 @@ from typing import Union
 
 from . import xdr as stellar_xdr
 from .exceptions import MemoInvalidException
-from .type_checked import type_checked
+
 from .utils import hex_to_bytes
 
 __all__ = ["Memo", "NoneMemo", "TextMemo", "IdMemo", "HashMemo", "ReturnHashMemo"]
 
 
-@type_checked
 class Memo(object, metaclass=abc.ABCMeta):
     """The :class:`Memo` object, which represents the base class for memos for
     use with Stellar transactions.
@@ -58,7 +57,6 @@ class Memo(object, metaclass=abc.ABCMeta):
         pass  # pragma: no cover
 
 
-@type_checked
 class NoneMemo(Memo):
     """The :class:`NoneMemo`, which represents no memo for a transaction."""
 
@@ -81,7 +79,6 @@ class NoneMemo(Memo):
         return "<NoneMemo>"
 
 
-@type_checked
 class TextMemo(Memo):
     """The :class:`TextMemo`, which represents ``MEMO_TEXT`` in a transaction.
 
@@ -125,7 +122,6 @@ class TextMemo(Memo):
         return f"<TextMemo [memo={self.memo_text}]>"
 
 
-@type_checked
 class IdMemo(Memo):
     """The :class:`IdMemo` which represents ``MEMO_ID`` in a transaction.
 
@@ -164,7 +160,6 @@ class IdMemo(Memo):
         return f"<IdMemo [memo={self.memo_id}]>"
 
 
-@type_checked
 class HashMemo(Memo):
     """The :class:`HashMemo` which represents ``MEMO_HASH`` in a transaction.
 
@@ -204,7 +199,6 @@ class HashMemo(Memo):
         return f"<HashMemo [memo={self.memo_hash}]>"
 
 
-@type_checked
 class ReturnHashMemo(Memo):
     """The :class:`ReturnHashMemo` which represents ``MEMO_RETURN`` in a transaction.
 

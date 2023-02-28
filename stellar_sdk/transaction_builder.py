@@ -28,13 +28,12 @@ from .soroban_types.base import BaseScValAlias
 from .time_bounds import TimeBounds
 from .transaction import Transaction
 from .transaction_envelope import TransactionEnvelope
-from .type_checked import type_checked
+
 from .utils import hex_to_bytes, is_valid_hash
 
 __all__ = ["TransactionBuilder"]
 
 
-@type_checked
 class TransactionBuilder:
     """Transaction builder helps constructs a new :class:`TransactionEnvelope
     <stellar_sdk.transaction_envelope.TransactionEnvelope>` using the given

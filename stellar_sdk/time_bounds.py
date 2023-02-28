@@ -1,11 +1,10 @@
 from . import xdr as stellar_xdr
 from .exceptions import ValueError
-from .type_checked import type_checked
+
 
 __all__ = ["TimeBounds"]
 
 
-@type_checked
 class TimeBounds:
     """TimeBounds represents the time interval that a transaction is valid.
 

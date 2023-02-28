@@ -6,13 +6,12 @@ from .decorated_signature import DecoratedSignature
 from .exceptions import SignatureExistError
 from .keypair import Keypair
 from .network import Network
-from .type_checked import type_checked
+
 from .utils import hex_to_bytes, sha256
 
 T = TypeVar("T")
 
 
-@type_checked
 class BaseTransactionEnvelope(Generic[T]):
     def __init__(
         self,

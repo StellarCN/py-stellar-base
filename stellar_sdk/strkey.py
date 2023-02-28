@@ -12,7 +12,7 @@ from .exceptions import (
     TypeError,
     ValueError,
 )
-from .type_checked import type_checked
+
 
 __all__ = ["StrKey"]
 
@@ -27,7 +27,6 @@ class _VersionByte(Enum):
     CONTRACT = binascii.a2b_hex("10")  # C 16 2 << 3
 
 
-@type_checked
 class StrKey:
     """StrKey is a helper class that allows encoding and decoding strkey."""
 
@@ -293,7 +292,6 @@ class StrKey:
         return _is_valid(_VersionByte.CONTRACT, contract)
 
 
-@type_checked
 def _decode_check(version_byte: _VersionByte, encoded: str) -> bytes:
     encoded_data = encoded.encode("ascii")
     encoded_data = encoded_data + b"=" * ((8 - len(encoded_data) % 8) % 8)
@@ -340,14 +338,12 @@ def _decode_check(version_byte: _VersionByte, encoded: str) -> bytes:
     return data
 
 
-@type_checked
 def _encode_check(version_byte: _VersionByte, data: bytes) -> str:
     payload = version_byte.value + data
     crc = _calculate_checksum(payload)
     return base64.b32encode(payload + crc).decode("utf-8").rstrip("=")
 
 
-@type_checked
 def _is_valid(version_byte: _VersionByte, encoded: str) -> bool:
     try:
         _decode_check(version_byte, encoded)
@@ -356,14 +352,12 @@ def _is_valid(version_byte: _VersionByte, encoded: str) -> bool:
     return True
 
 
-@type_checked
 def _get_version_byte_for_prefix(encoded: str) -> _VersionByte:
     prefix = encoded[0]
     _version_byte = ((ord(prefix) - ord("A")) << 3).to_bytes(1, byteorder="big")
     return _VersionByte(_version_byte)
 
 
-@type_checked
 def _calculate_checksum(payload: bytes) -> bytes:
     # memo note: https://gist.github.com/manran/a8357808ef71415d266dc64f0079f298
     # This code calculates CRC16-XModem checksum of payload

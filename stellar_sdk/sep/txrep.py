@@ -33,7 +33,7 @@ from ..strkey import StrKey
 from ..time_bounds import TimeBounds
 from ..transaction import Transaction
 from ..transaction_envelope import TransactionEnvelope
-from ..type_checked import type_checked
+
 
 __all__ = ["to_txrep", "from_txrep"]
 
@@ -47,7 +47,6 @@ class _EnvelopeType(Enum):
     ENVELOPE_TYPE_TX_FEE_BUMP = "ENVELOPE_TYPE_TX_FEE_BUMP"
 
 
-@type_checked
 def to_txrep(
     transaction_envelope: Union[TransactionEnvelope, FeeBumpTransactionEnvelope],
 ) -> str:
@@ -127,7 +126,8 @@ def to_txrep(
 
 
 # Setting to ignore pass in .coveragerc will cause this function to not be counted by pytest.
-@type_checked
+
+
 def from_txrep(
     txrep: str, network_passphrase: str
 ) -> Union[TransactionEnvelope, FeeBumpTransactionEnvelope]:

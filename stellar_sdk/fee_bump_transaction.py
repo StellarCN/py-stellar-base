@@ -6,14 +6,13 @@ from .keypair import Keypair
 from .muxed_account import MuxedAccount
 from .transaction import Transaction
 from .transaction_envelope import TransactionEnvelope
-from .type_checked import type_checked
+
 
 BASE_FEE = 100
 
 __all__ = ["FeeBumpTransaction"]
 
 
-@type_checked
 class FeeBumpTransaction:
     """The :class:`FeeBumpTransaction` object, which represents a fee bump transaction
     on Stellar's network.
