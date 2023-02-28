@@ -8,7 +8,7 @@ from typing import Optional, Union, Sequence, List
 from . import xdr as stellar_xdr
 from .account import Account
 from .asset import Asset
-from .contract_auth import ContractAuth
+from .soroban.contract_auth import ContractAuth
 from .exceptions import ValueError
 from .fee_bump_transaction import FeeBumpTransaction
 from .fee_bump_transaction_envelope import FeeBumpTransactionEnvelope
@@ -24,7 +24,7 @@ from .preconditions import Preconditions
 from .price import Price
 from .signer import Signer
 from .signer_key import SignedPayloadSigner, SignerKey
-from .soroban_types.base import BaseScValAlias
+from .soroban.types import BaseScValAlias
 from .time_bounds import TimeBounds
 from .transaction import Transaction
 from .transaction_envelope import TransactionEnvelope
@@ -1201,7 +1201,7 @@ class TransactionBuilder:
     def append_invoke_contract_function_op(
         self,
         contract_id: str,
-        method: str,
+        function_name: str,
         parameters: Sequence[Union[stellar_xdr.SCVal, BaseScValAlias]],
         auth: Sequence[ContractAuth] = None,
         footprint: stellar_xdr.LedgerFootprint = None,
@@ -1213,7 +1213,7 @@ class TransactionBuilder:
         You can use this method to invoke a contract function.
 
         :param contract_id: The ID of the contract to invoke.
-        :param method: The name of the method to invoke.
+        :param function_name: The name of the function to invoke.
         :param parameters: The parameters to pass to the method.
         :param auth: The authorizations.
         :param footprint: The ledger footprint.
@@ -1230,7 +1230,7 @@ class TransactionBuilder:
             ),
             stellar_xdr.SCVal(
                 stellar_xdr.SCValType.SCV_SYMBOL,
-                sym=stellar_xdr.SCSymbol(sc_symbol=method.encode("utf-8")),
+                sym=stellar_xdr.SCSymbol(sc_symbol=function_name.encode("utf-8")),
             ),
             *parameters,
         ]

@@ -1,8 +1,8 @@
 import binascii
 from typing import Union, Sequence
 
-from . import xdr as stellar_xdr
-from .soroban_types import BaseScValAlias
+from .. import xdr as stellar_xdr
+from ..soroban.types import BaseScValAlias
 
 __all__ = ["AuthorizedInvocation"]
 

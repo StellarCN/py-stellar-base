@@ -1,5 +1,5 @@
 from .base import BaseScValAlias
-from ..xdr import SCVal, SCValType, SCObject, SCObjectType, Int64 as XdrInt64
+from ...xdr import SCVal, SCValType, SCObject, SCObjectType, Int64 as XdrInt64
 
 __all__ = ["Int64"]
 

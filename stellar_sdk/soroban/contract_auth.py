@@ -1,12 +1,12 @@
 from typing import Optional, Union, Sequence
 
-from . import xdr as stellar_xdr
 from .authorized_invocation import AuthorizedInvocation
-from .keypair import Keypair
-from .network import Network
-from .soroban_types import BaseScValAlias, AccountEd25519Signature
-from .soroban_types.address import Address
-from .utils import sha256
+from .. import xdr as stellar_xdr
+from ..keypair import Keypair
+from ..network import Network
+from ..soroban.types import BaseScValAlias, AccountEd25519Signature
+from ..soroban.types.address import Address
+from ..utils import sha256
 
 __all__ = ["ContractAuth"]
 

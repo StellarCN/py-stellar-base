@@ -1,7 +1,7 @@
 from typing import Union, Optional, List
 
 from .base import BaseScValAlias
-from ..xdr import (
+from ...xdr import (
     SCObjectType,
     SCSymbol,
     SCVal,

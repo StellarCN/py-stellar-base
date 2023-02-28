@@ -11,13 +11,11 @@ from stellar_sdk import (
     Network,
     Keypair,
     TransactionBuilder,
-    ContractAuth,
-    AuthorizedInvocation,
 )
 from stellar_sdk import xdr as stellar_xdr
-from stellar_sdk.soroban import SorobanServer
+from stellar_sdk.soroban import SorobanServer, ContractAuth, AuthorizedInvocation
 from stellar_sdk.soroban.soroban_rpc import TransactionStatus
-from stellar_sdk.soroban_types import Uint32, Address
+from stellar_sdk.soroban.types import Uint32, Address
 
 rpc_server_url = "https://horizon-futurenet.stellar.cash:443/soroban/rpc"
 soroban_server = SorobanServer(rpc_server_url)
@@ -78,7 +76,7 @@ tx = (
     .add_time_bounds(0, 0)
     .append_invoke_contract_function_op(
         contract_id=contract_id,
-        method=func_name,
+        function_name=func_name,
         parameters=args,
         auth=[contract_auth],
     )

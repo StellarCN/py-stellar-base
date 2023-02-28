@@ -1,6 +1,6 @@
 from .base import BaseScValAlias
-from .. import xdr as stellar_xdr
-from ..xdr import SCVal, SCValType, SCObject, SCObjectType
+from ... import xdr as stellar_xdr
+from ...xdr import SCVal, SCValType, SCObject, SCObjectType
 
 __all__ = ["Bytes"]
 

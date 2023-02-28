@@ -1,6 +1,6 @@
 import abc
 
-from .. import xdr as stellar_xdr
+from ... import xdr as stellar_xdr
 
 __all__ = ["BaseScValAlias"]
 

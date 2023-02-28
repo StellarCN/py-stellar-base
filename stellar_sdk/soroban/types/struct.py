@@ -1,8 +1,8 @@
 from typing import Union, Sequence
 
 from .base import BaseScValAlias
-from .. import xdr as stellar_xdr
-from ..xdr import (
+from ... import xdr as stellar_xdr
+from ...xdr import (
     SCObjectType,
     SCMap,
     SCMapEntry,

@@ -1,7 +1,7 @@
 from typing import Sequence, Union
 
 from .base import BaseScValAlias
-from ..xdr import SCVal, SCValType, SCVec, SCObject, SCObjectType
+from ...xdr import SCVal, SCValType, SCVec, SCObject, SCObjectType
 
 __all__ = ["Vec"]
 

@@ -1,5 +1,7 @@
+from __future__ import annotations
+
 import uuid
-from typing import Type
+from typing import Type, TYPE_CHECKING
 
 from .exceptions import RequestException
 from .jsonrpc import *
@@ -8,8 +10,9 @@ from .. import xdr as stellar_xdr
 from ..account import Account
 from ..client.base_sync_client import BaseSyncClient
 from ..client.requests_client import RequestsClient
-from ..transaction_envelope import TransactionEnvelope
 
+if TYPE_CHECKING:
+    from ..transaction_envelope import TransactionEnvelope
 
 __all__ = ["SorobanServer"]
 
@@ -93,9 +96,9 @@ class SorobanServer:
         self, transaction_envelope: Union[TransactionEnvelope, str]
     ) -> SimulateTransactionResponse:
         xdr = (
-            transaction_envelope.to_xdr()
-            if isinstance(transaction_envelope, TransactionEnvelope)
-            else transaction_envelope
+            transaction_envelope
+            if isinstance(transaction_envelope, str)
+            else transaction_envelope.to_xdr()
         )
         request = Request[SimulateTransactionRequest](
             id=_generate_unique_request_id(),
@@ -109,9 +112,9 @@ class SorobanServer:
         self, transaction_envelope: Union[TransactionEnvelope, str]
     ) -> SendTransactionResponse:
         xdr = (
-            transaction_envelope.to_xdr()
-            if isinstance(transaction_envelope, TransactionEnvelope)
-            else transaction_envelope
+            transaction_envelope
+            if isinstance(transaction_envelope, str)
+            else transaction_envelope.to_xdr()
         )
         request = Request[SendTransactionRequest](
             id=_generate_unique_request_id(),
