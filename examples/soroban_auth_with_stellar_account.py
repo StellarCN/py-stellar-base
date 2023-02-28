@@ -4,7 +4,6 @@ See https://soroban.stellar.org/docs/how-to-guides/auth
 See https://soroban.stellar.org/docs/learn/authorization#stellar-account
 """
 
-import binascii
 import time
 
 from stellar_sdk import (
@@ -31,27 +30,7 @@ op_invoker_kp = Keypair.from_secret(
     "SAEZSI6DY7AXJFIYA4PM6SIBNEYYXIEM2MSOTHFGKHDW32MBQ7KVO6EN"
 )
 
-
-def get_nonce(account_id) -> int:
-    ledger_key = stellar_xdr.LedgerKey.from_contract_data(
-        stellar_xdr.LedgerKeyContractData(
-            contract_id=stellar_xdr.Hash(binascii.unhexlify(contract_id)),
-            key=stellar_xdr.SCVal.from_scv_object(
-                stellar_xdr.SCObject.from_sco_nonce_key(
-                    Address(account_id).to_xdr_sc_address()
-                )
-            ),
-        )
-    )
-    try:
-        response = soroban_server.get_ledger_entry(ledger_key)
-        data = stellar_xdr.LedgerEntryData.from_xdr(response.xdr)
-        return data.contract_data.val.obj.u64.uint64  # type: ignore[union-attr]
-    except:
-        return 0
-
-
-nonce = get_nonce(op_invoker_kp.public_key)
+nonce = soroban_server.get_nonce(contract_id, op_invoker_kp.public_key)
 func_name = "increment"
 args = [Address(op_invoker_kp.public_key), Uint32(10)]
 

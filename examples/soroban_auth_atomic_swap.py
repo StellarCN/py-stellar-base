@@ -38,26 +38,6 @@ cat_token_contract_id = (
 
 source = soroban_server.load_account(submitter_kp.public_key)
 
-
-def get_nonce(account_id) -> int:
-    ledger_key = stellar_xdr.LedgerKey.from_contract_data(
-        stellar_xdr.LedgerKeyContractData(
-            contract_id=stellar_xdr.Hash(binascii.unhexlify(atomic_swap_contract_id)),
-            key=stellar_xdr.SCVal.from_scv_object(
-                stellar_xdr.SCObject.from_sco_nonce_key(
-                    Address(account_id).to_xdr_sc_address()
-                )
-            ),
-        )
-    )
-    try:
-        response = soroban_server.get_ledger_entry(ledger_key)
-        data = stellar_xdr.LedgerEntryData.from_xdr(response.xdr)
-        return data.contract_data.val.obj.u64.uint64  # type: ignore[union-attr]
-    except:
-        return 0
-
-
 args = [
     Address(alice_kp.public_key),  # a
     Address(bob_kp.public_key),  # b
@@ -69,8 +49,8 @@ args = [
     Int128(950),  # min_a_for_b
 ]
 
-alice_nonce = get_nonce(alice_kp.public_key)
-bob_nonce = get_nonce(bob_kp.public_key)
+alice_nonce = soroban_server.get_nonce(atomic_swap_contract_id, alice_kp.public_key)
+bob_nonce = soroban_server.get_nonce(atomic_swap_contract_id, bob_kp.public_key)
 
 alice_root_invocation = AuthorizedInvocation(
     contract_id=atomic_swap_contract_id,
