@@ -9,13 +9,12 @@ from .operation.operation import Operation
 from .preconditions import Preconditions
 from .strkey import StrKey
 from .time_bounds import TimeBounds
-from .type_checked import type_checked
+
 from .utils import sha256
 
 __all__ = ["Transaction"]
 
 
-@type_checked
 class Transaction:
     """The :class:`Transaction` object, which represents a transaction(Transaction or TransactionV0)
     on Stellar's network.

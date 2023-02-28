@@ -2,13 +2,12 @@ from decimal import Decimal
 from typing import Union
 
 from . import xdr as stellar_xdr
-from .type_checked import type_checked
+
 from .utils import best_rational_approximation
 
 __all__ = ["Price"]
 
 
-@type_checked
 class Price:
     """Create a new price. Price in Stellar is represented as a fraction.
 

@@ -5,13 +5,12 @@ from typing import Optional, Union
 from .operation import Operation
 from .. import xdr as stellar_xdr
 from ..muxed_account import MuxedAccount
-from ..type_checked import type_checked
+
 from ..utils import raise_if_not_valid_amount, raise_if_not_valid_hash
 
 __all__ = ["LiquidityPoolWithdraw"]
 
 
-@type_checked
 class LiquidityPoolWithdraw(Operation):
     """The :class:`LiquidityPoolWithdraw` object, which represents a LiquidityPoolWithdraw
     operation on Stellar's network.

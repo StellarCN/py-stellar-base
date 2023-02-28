@@ -4,12 +4,11 @@ from .operation import Operation
 from .. import xdr as stellar_xdr
 from ..contract_auth import ContractAuth
 from ..muxed_account import MuxedAccount
-from ..type_checked import type_checked
+
 
 __all__ = ["InvokeHostFunction"]
 
 
-@type_checked
 class InvokeHostFunction(Operation):
     _XDR_OPERATION_TYPE: stellar_xdr.OperationType = (
         stellar_xdr.OperationType.INVOKE_HOST_FUNCTION

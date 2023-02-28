@@ -2,12 +2,11 @@ from typing import Union
 
 from .fee_bump_transaction_envelope import FeeBumpTransactionEnvelope
 from .transaction_envelope import TransactionEnvelope
-from .type_checked import type_checked
+
 
 __all__ = ["parse_transaction_envelope_from_xdr"]
 
 
-@type_checked
 def parse_transaction_envelope_from_xdr(
     xdr: str, network_passphrase: str
 ) -> Union[TransactionEnvelope, FeeBumpTransactionEnvelope]:

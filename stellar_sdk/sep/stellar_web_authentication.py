@@ -23,7 +23,7 @@ from ..muxed_account import MuxedAccount
 from ..operation.manage_data import ManageData
 from ..transaction_builder import TransactionBuilder
 from ..transaction_envelope import TransactionEnvelope
-from ..type_checked import type_checked
+
 
 __all__ = [
     "build_challenge_transaction",
@@ -37,7 +37,6 @@ __all__ = [
 MUXED_ACCOUNT_STARTING_LETTER: str = "M"
 
 
-@type_checked
 class ChallengeTransaction:
     """Used to store the results produced
     by :func:`stellar_sdk.sep.stellar_web_authentication.read_challenge_transaction`.
@@ -74,7 +73,6 @@ class ChallengeTransaction:
         return f"<ChallengeTransaction [transaction={self.transaction}, client_account_id={self.client_account_id}, memo={self.memo}, matched_home_domain={self.matched_home_domain}]>"
 
 
-@type_checked
 def build_challenge_transaction(
     server_secret: str,
     client_account_id: str,
@@ -141,7 +139,6 @@ def build_challenge_transaction(
     return transaction.to_xdr()
 
 
-@type_checked
 def read_challenge_transaction(
     challenge_transaction: str,
     server_account_id: str,
@@ -322,7 +319,6 @@ def read_challenge_transaction(
     )
 
 
-@type_checked
 def verify_challenge_transaction_signers(
     challenge_transaction: str,
     server_account_id: str,
@@ -435,7 +431,6 @@ def verify_challenge_transaction_signers(
     return signers_found
 
 
-@type_checked
 def verify_challenge_transaction_signed_by_client_master_key(
     challenge_transaction: str,
     server_account_id: str,
@@ -467,7 +462,6 @@ def verify_challenge_transaction_signed_by_client_master_key(
     )
 
 
-@type_checked
 def verify_challenge_transaction_threshold(
     challenge_transaction: str,
     server_account_id: str,
@@ -518,7 +512,6 @@ def verify_challenge_transaction_threshold(
     return signers_found
 
 
-@type_checked
 def verify_challenge_transaction(
     challenge_transaction: str,
     server_account_id: str,

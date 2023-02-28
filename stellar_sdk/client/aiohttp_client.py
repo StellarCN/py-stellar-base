@@ -11,7 +11,7 @@ from .base_async_client import BaseAsyncClient
 from .response import Response
 from ..__version__ import __version__
 from ..exceptions import ConnectionError, StreamClientError
-from ..type_checked import type_checked
+
 
 logger = logging.getLogger(__name__)
 
@@ -62,7 +62,6 @@ async def __readline(self) -> bytes:
 aiohttp.streams.StreamReader.readline = __readline  # type: ignore[assignment]
 
 
-@type_checked
 class AiohttpClient(BaseAsyncClient):
     """The :class:`AiohttpClient` object is a asynchronous http client,
     which represents the interface for making requests to a server instance.

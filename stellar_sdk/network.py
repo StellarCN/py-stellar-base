@@ -1,10 +1,8 @@
-from .type_checked import type_checked
 from .utils import sha256
 
 __all__ = ["Network"]
 
 
-@type_checked
 class Network:
     """The :class:`Network` object, which represents a Stellar network.
 

@@ -12,7 +12,7 @@ from ..liquidity_pool_id import LiquidityPoolId
 from ..muxed_account import MuxedAccount
 from ..signer_key import SignerKey
 from ..strkey import StrKey
-from ..type_checked import type_checked
+
 from ..utils import (
     raise_if_not_valid_balance_id,
     raise_if_not_valid_ed25519_public_key,
@@ -34,7 +34,6 @@ class RevokeSponsorshipType(IntEnum):
     LIQUIDITY_POOL = 6
 
 
-@type_checked
 class TrustLine:
     def __init__(self, account_id: str, asset: Union[Asset, LiquidityPoolId]) -> None:
         self.account_id = account_id
@@ -50,7 +49,6 @@ class TrustLine:
         return f"<TrustLine [account_id={self.account_id}, asset={self.asset}]>"
 
 
-@type_checked
 class Offer:
     def __init__(self, seller_id: str, offer_id: int) -> None:
         self.seller_id = seller_id
@@ -66,7 +64,6 @@ class Offer:
         return f"<Offer [seller_id={self.seller_id}, offer_id={self.offer_id}]>"
 
 
-@type_checked
 class Data:
     def __init__(self, account_id: str, data_name: str) -> None:
         self.account_id = account_id
@@ -82,7 +79,6 @@ class Data:
         return f"<Data [account_id={self.account_id}, data_name={self.data_name}]>"
 
 
-@type_checked
 class Signer:
     def __init__(self, account_id: str, signer_key: SignerKey) -> None:
         self.account_id = account_id
@@ -100,7 +96,6 @@ class Signer:
         return f"<Signer [account_id={self.account_id}, signer_key={self.signer_key}]>"
 
 
-@type_checked
 class RevokeSponsorship(Operation):
     """The :class:`RevokeSponsorship` object, which represents a RevokeSponsorship
     operation on Stellar's network.
