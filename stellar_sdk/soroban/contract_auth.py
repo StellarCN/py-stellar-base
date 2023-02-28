@@ -1,12 +1,12 @@
 from typing import Optional, Union, Sequence
 
-from . import xdr as stellar_xdr
 from .authorized_invocation import AuthorizedInvocation
-from .keypair import Keypair
-from .network import Network
-from .soroban_types import BaseScValAlias, AccountEd25519Signature
-from .soroban_types.address import Address
-from .utils import sha256
+from .. import xdr as stellar_xdr
+from ..keypair import Keypair
+from ..network import Network
+from ..soroban.types import BaseScValAlias, AccountEd25519Signature
+from ..soroban.types.address import Address
+from ..utils import sha256
 
 __all__ = ["ContractAuth"]
 
@@ -24,13 +24,13 @@ class ContractAuth:
     """
 
     def __init__(
-        self,
-        address: Optional[Address],
-        nonce: Optional[int],
-        root_invocation: AuthorizedInvocation,
-        signature_args: Optional[
-            Sequence[Union[BaseScValAlias, stellar_xdr.SCVal]]
-        ] = None,
+            self,
+            address: Optional[Address],
+            nonce: Optional[int],
+            root_invocation: AuthorizedInvocation,
+            signature_args: Optional[
+                Sequence[Union[BaseScValAlias, stellar_xdr.SCVal]]
+            ] = None,
     ):
         if (address and nonce is None) or (not address and nonce is not None):
             raise ValueError("address and nonce must both be set or both be None")
@@ -114,10 +114,10 @@ class ContractAuth:
         if not isinstance(other, self.__class__):
             return NotImplemented
         return (
-            self.address == other.address
-            and self.nonce == other.nonce
-            and self.root_invocation == other.root_invocation
-            and self.signature_args == other.signature_args
+                self.address == other.address
+                and self.nonce == other.nonce
+                and self.root_invocation == other.root_invocation
+                and self.signature_args == other.signature_args
         )
 
     def __str__(self):

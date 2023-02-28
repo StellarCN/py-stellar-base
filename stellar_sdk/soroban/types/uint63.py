@@ -1,5 +1,5 @@
 from .base import BaseScValAlias
-from ..xdr import SCVal, SCValType, Int64 as Int64
+from ...xdr import SCVal, SCValType, Int64 as Int64
 
 __all__ = ["Uint63"]
 
@@ -10,7 +10,7 @@ class Uint63(BaseScValAlias):
     :param value: The 63-bit unsigned integer value."""
 
     def __init__(self, value: int):
-        if value < 0 or value > 2**63 - 1:
+        if value < 0 or value > 2 ** 63 - 1:
             raise ValueError("Invalid Uint63 value.")
         self.value: int = value
 

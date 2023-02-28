@@ -1,7 +1,7 @@
 from typing import Union, Optional, List
 
 from .base import BaseScValAlias
-from ..xdr import (
+from ...xdr import (
     SCObjectType,
     SCSymbol,
     SCVal,
@@ -48,8 +48,8 @@ class Enum(BaseScValAlias):
     def from_xdr_sc_val(cls, sc_val: SCVal) -> "Enum":
         assert sc_val.obj is not None
         if (
-            sc_val.type != SCValType.SCV_OBJECT
-            or sc_val.obj.type != SCObjectType.SCO_VEC
+                sc_val.type != SCValType.SCV_OBJECT
+                or sc_val.obj.type != SCObjectType.SCO_VEC
         ):
             raise ValueError("Invalid SCVal value.")
         assert sc_val.obj.vec is not None

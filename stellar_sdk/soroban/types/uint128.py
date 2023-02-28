@@ -1,5 +1,5 @@
 from .base import BaseScValAlias
-from ..xdr import SCVal, SCValType, SCObject, SCObjectType, Int128Parts, Uint64
+from ...xdr import SCVal, SCValType, SCObject, SCObjectType, Int128Parts, Uint64
 
 __all__ = ["Uint128"]
 
@@ -11,7 +11,7 @@ class Uint128(BaseScValAlias):
     """
 
     def __init__(self, value: int):
-        if value < 0 or value > 2**128 - 1:
+        if value < 0 or value > 2 ** 128 - 1:
             raise ValueError("Invalid Uint128 value.")
         self.value: int = value
 
@@ -21,7 +21,7 @@ class Uint128(BaseScValAlias):
             obj=SCObject(
                 SCObjectType.SCO_U128,
                 u128=Int128Parts(
-                    lo=Uint64(self.value & (2**64 - 1)),
+                    lo=Uint64(self.value & (2 ** 64 - 1)),
                     hi=Uint64(self.value >> 64),
                 ),
             ),
@@ -31,8 +31,8 @@ class Uint128(BaseScValAlias):
     def from_xdr_sc_val(cls, sc_val: SCVal) -> "Uint128":
         assert sc_val.obj is not None
         if (
-            sc_val.type != SCValType.SCV_OBJECT
-            or sc_val.obj.type != SCObjectType.SCO_U128
+                sc_val.type != SCValType.SCV_OBJECT
+                or sc_val.obj.type != SCObjectType.SCO_U128
         ):
             raise ValueError("Invalid SCVal value.")
         assert sc_val.obj.u128 is not None

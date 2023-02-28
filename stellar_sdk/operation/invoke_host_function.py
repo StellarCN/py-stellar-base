@@ -2,7 +2,7 @@ from typing import Optional, Union, Sequence
 
 from .operation import Operation
 from .. import xdr as stellar_xdr
-from ..contract_auth import ContractAuth
+from stellar_sdk.soroban.contract_auth import ContractAuth
 from ..muxed_account import MuxedAccount
 from ..type_checked import type_checked
 

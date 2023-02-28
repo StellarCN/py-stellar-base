@@ -1,5 +1,5 @@
 from .base import BaseScValAlias
-from ..xdr import SCVal, SCValType, Uint32 as XdrUint32
+from ...xdr import SCVal, SCValType, Uint32 as XdrUint32
 
 __all__ = ["Uint32"]
 
@@ -11,7 +11,7 @@ class Uint32(BaseScValAlias):
     """
 
     def __init__(self, value: int):
-        if value < 0 or value > 2**32 - 1:
+        if value < 0 or value > 2 ** 32 - 1:
             raise ValueError("Invalid Uint32 value.")
         self.value: int = value
 

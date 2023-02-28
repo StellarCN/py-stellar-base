@@ -8,7 +8,7 @@ from typing import Optional, Union, Sequence, List
 from . import xdr as stellar_xdr
 from .account import Account
 from .asset import Asset
-from .contract_auth import ContractAuth
+from .soroban.contract_auth import ContractAuth
 from .exceptions import ValueError
 from .fee_bump_transaction import FeeBumpTransaction
 from .fee_bump_transaction_envelope import FeeBumpTransactionEnvelope
@@ -24,7 +24,7 @@ from .preconditions import Preconditions
 from .price import Price
 from .signer import Signer
 from .signer_key import SignedPayloadSigner, SignerKey
-from .soroban_types.base import BaseScValAlias
+from .soroban.types import BaseScValAlias
 from .time_bounds import TimeBounds
 from .transaction import Transaction
 from .transaction_envelope import TransactionEnvelope

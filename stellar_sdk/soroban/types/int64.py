@@ -1,5 +1,5 @@
 from .base import BaseScValAlias
-from ..xdr import SCVal, SCValType, SCObject, SCObjectType, Int64 as XdrInt64
+from ...xdr import SCVal, SCValType, SCObject, SCObjectType, Int64 as XdrInt64
 
 __all__ = ["Int64"]
 
@@ -11,7 +11,7 @@ class Int64(BaseScValAlias):
     """
 
     def __init__(self, value: int):
-        if value < -(2**63) or value > 2**63 - 1:
+        if value < -(2 ** 63) or value > 2 ** 63 - 1:
             raise ValueError("Invalid Int64 value.")
         self.value: int = value
 
@@ -28,8 +28,8 @@ class Int64(BaseScValAlias):
     def from_xdr_sc_val(cls, sc_val: SCVal) -> "Int64":
         assert sc_val.obj is not None
         if (
-            sc_val.type != SCValType.SCV_OBJECT
-            or sc_val.obj.type != SCObjectType.SCO_I64
+                sc_val.type != SCValType.SCV_OBJECT
+                or sc_val.obj.type != SCObjectType.SCO_I64
         ):
             raise ValueError("Invalid SCVal value.")
         assert sc_val.obj.i64 is not None

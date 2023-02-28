@@ -1,5 +1,7 @@
+from __future__ import annotations
+
 import uuid
-from typing import Type
+from typing import Type, TYPE_CHECKING
 
 from .exceptions import RequestException
 from .jsonrpc import *
@@ -8,8 +10,10 @@ from .. import xdr as stellar_xdr
 from ..account import Account
 from ..client.base_sync_client import BaseSyncClient
 from ..client.requests_client import RequestsClient
-from ..transaction_envelope import TransactionEnvelope
 from ..type_checked import type_checked
+
+if TYPE_CHECKING:
+    from ..transaction_envelope import TransactionEnvelope
 
 __all__ = ["SorobanServer"]
 
@@ -19,9 +23,9 @@ V = TypeVar("V")
 @type_checked
 class SorobanServer:
     def __init__(
-        self,
-        server_url: str = "https://horizon-futurenet.stellar.org/soroban/rpc",
-        client: BaseSyncClient = None,
+            self,
+            server_url: str = "https://horizon-futurenet.stellar.org/soroban/rpc",
+            client: BaseSyncClient = None,
     ) -> None:
         self.server_url: str = server_url
 
@@ -45,12 +49,12 @@ class SorobanServer:
         return self._post(request, GetAccountResponse)
 
     def get_events(
-        self,
-        start_ledger: int,
-        end_ledger: int,
-        filters: Sequence[EventFilter] = None,
-        cursor: str = None,
-        limit: int = None,
+            self,
+            start_ledger: int,
+            end_ledger: int,
+            filters: Sequence[EventFilter] = None,
+            cursor: str = None,
+            limit: int = None,
     ) -> GetEventsResponse:
         pagination = PaginationOptions(cursor=cursor, limit=limit)
         data = GetEventsRequest(
@@ -81,7 +85,7 @@ class SorobanServer:
         return self._post(request, GetLedgerEntryResponse)
 
     def get_transaction_status(
-        self, transaction_hash: str
+            self, transaction_hash: str
     ) -> GetTransactionStatusResponse:
         request = Request[GetTransactionStatusRequest](
             id=_generate_unique_request_id(),
@@ -91,7 +95,7 @@ class SorobanServer:
         return self._post(request, GetTransactionStatusResponse)
 
     def simulate_transaction(
-        self, transaction_envelope: Union[TransactionEnvelope, str]
+            self, transaction_envelope: Union[TransactionEnvelope, str]
     ) -> SimulateTransactionResponse:
         xdr = (
             transaction_envelope.to_xdr()
@@ -107,13 +111,9 @@ class SorobanServer:
         return self._post(request, SimulateTransactionResponse)
 
     def send_transaction(
-        self, transaction_envelope: Union[TransactionEnvelope, str]
+            self, transaction_envelope: Union[TransactionEnvelope, str]
     ) -> SendTransactionResponse:
-        xdr = (
-            transaction_envelope.to_xdr()
-            if isinstance(transaction_envelope, TransactionEnvelope)
-            else transaction_envelope
-        )
+        xdr = transaction_envelope if isinstance(transaction_envelope, str) else transaction_envelope.to_xdr()
         request = Request[SendTransactionRequest](
             id=_generate_unique_request_id(),
             method="sendTransaction",

@@ -1,5 +1,5 @@
 from .base import BaseScValAlias
-from ..xdr import SCVal, SCValType, SCSymbol
+from ...xdr import SCVal, SCValType, SCSymbol
 
 __all__ = ["Symbol"]
 

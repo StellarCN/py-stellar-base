@@ -3,9 +3,9 @@ from enum import IntEnum
 from typing import Union
 
 from .base import BaseScValAlias
-from .. import xdr as stellar_xdr
-from ..strkey import StrKey
-from ..xdr import Hash
+from ... import xdr as stellar_xdr
+from ...strkey import StrKey
+from ...xdr import Hash
 
 __all__ = ["Address", "AddressType"]
 
