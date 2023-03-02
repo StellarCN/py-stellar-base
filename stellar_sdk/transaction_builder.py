@@ -53,7 +53,7 @@ class TransactionBuilder:
 
     The following code example creates a new transaction with :class:`CreateAccount <stellar_sdk.operation.CreateAccount>`
     and :class:`Payment <stellar_sdk.operation.Payment>` operations. The Transaction's source account(alice) first
-    funds `bob`, then sends a payment to `bob`. The built transaction is then signed by `alice_keypair`.
+    funds `bob`, then sends a payment to `bob`. The built transaction is then signed by `alice_keypair`::
 
         # Alice funds Bob with 5 XLM and then pays Bob 10.25 XLM
         from stellar_sdk import Server, Asset, Keypair, TransactionBuilder, Network
