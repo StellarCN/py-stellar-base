@@ -36,8 +36,13 @@ class TransactionBuilder:
     <stellar_sdk.transaction_envelope.TransactionEnvelope>` using the given
     :class:`Account <stellar_sdk.account.Account>` as the transaction's "source account". The transaction will use
     the current sequence number of the given account as its sequence number and increment the given account's
-    sequence number by one. The given source account must include a private key for signing the transaction or
-    an error will be thrown.
+    sequence number by one.
+
+    Operations can be added to the transaction via their corresponding builder
+    methods, and each returns the :class:`TransactionEnvelope <stellar_sdk.transaction_envelope.TransactionEnvelope>`
+    object, so they can be chained together. After adding the desired operations, call
+    the :func:`build` method on the TransactionBuilder to return a fully constructed
+    :class:`TransactionEnvelope <stellar_sdk.transaction_envelope.TransactionEnvelope>` that can be signed.
 
     Be careful about **unsubmitted transactions**! When you build a transaction, stellar-sdk automatically
     increments the source account's sequence number. If you end up not submitting this transaction and submitting
@@ -46,9 +51,11 @@ class TransactionBuilder:
     with :func:`stellar_sdk.server.Server.load_account` or :func:`stellar_sdk.server_async.ServerAsync.load_account`
     before creating another transaction.
 
-    An example::
+    The following code example creates a new transaction with :class:`CreateAccount <stellar_sdk.operation.CreateAccount>`
+    and :class:`Payment <stellar_sdk.operation.Payment>` operations. The Transaction's source account(alice) first
+    funds `bob`, then sends a payment to `bob`. The built transaction is then signed by `alice_keypair`.
 
-        # Alice pay 10.25 XLM to Bob
+        # Alice funds Bob with 5 XLM and then pays Bob 10.25 XLM
         from stellar_sdk import Server, Asset, Keypair, TransactionBuilder, Network
 
         alice_keypair = Keypair.from_secret("SBFZCHU5645DOKRWYBXVOXY2ELGJKFRX6VGGPRYUWHQ7PMXXJNDZFMKD")
@@ -65,6 +72,7 @@ class TransactionBuilder:
                 base_fee=base_fee,
             )
                 .add_text_memo("Hello, Stellar!")
+                .append_create_account_op(bob_address, "5")
                 .append_payment_op(bob_address, Asset.native(), "10.25")
                 .set_timeout(30)
                 .build()
