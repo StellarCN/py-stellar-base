@@ -133,6 +133,12 @@ Building transaction with synchronous server
     if __name__ == "__main__":
         asyncio.run(payment())
 
+Soroban support
+---------------
+As `Soroban <https://soroban.stellar.org/docs>`_ is still under active development, I have not merged it into the main branch.
+You can obtain support for it in the `soroban branch <https://github.com/StellarCN/py-stellar-base/tree/soroban>`_,
+but please note that there may be breaking updates at any time before the stable release.
+
 stellar-model
 -------------
 stellar-model allows you to parse the JSON returned by Stellar Horizon
