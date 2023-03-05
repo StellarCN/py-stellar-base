@@ -37,7 +37,8 @@ account of your own, here's an example of how to do so:
    :linenos:
 
 
-Note: To avoid risks, TESTNET is used in the example above. In order to use the
-Stellar Live Network you will have to change the network passphrase to
-Network.PUBLIC_NETWORK_PASSPHRASE and the server URL to point to
-https://horizon.stellar.org too.
+.. note::
+    To avoid risks, :code:`TESTNET` is used in the example above. In order to use the
+    Stellar Live Network you will have to change the network passphrase to
+    :code:`Network.PUBLIC_NETWORK_PASSPHRASE` and the server URL to point to
+    :code:`https://horizon.stellar.org` too.

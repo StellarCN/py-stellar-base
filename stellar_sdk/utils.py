@@ -1,3 +1,6 @@
+"""This file contains constants, functions and classes used internally by this SDK.
+They may change at any time, so please do not use them directly.
+"""
 import hashlib
 import os
 import re

@@ -8,8 +8,8 @@
 Stellar Python SDK
 ==================
 
-.. image:: https://img.shields.io/github/workflow/status/StellarCN/py-stellar-base/GitHub%20Action/master?maxAge=1800
-    :alt: GitHub Action
+.. image:: https://img.shields.io/github/actions/workflow/status/StellarCN/py-stellar-base/continuous-integration-workflow.yml?branch=main
+    :alt: GitHub Workflow Status
     :target: https://github.com/StellarCN/py-stellar-base/actions
 
 .. image:: https://img.shields.io/readthedocs/stellar-sdk.svg?maxAge=1800

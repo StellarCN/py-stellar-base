@@ -25,7 +25,7 @@ class FeeBumpTransactionEnvelope(BaseTransactionEnvelope["FeeBumpTransactionEnve
     See `CAP-0015 <https://github.com/stellar/stellar-protocol/blob/master/core/cap-0015.md>`__ for more information.
 
     :param transaction: The fee bump transaction that is encapsulated in this envelope.
-    :param list signatures: which contains a list of signatures that have
+    :param signatures: which contains a list of signatures that have
           already been created.
     :param network_passphrase: The network to connect to for verifying and retrieving additional attributes from.
     """
