@@ -15,7 +15,6 @@ from stellar_sdk.soroban.types import Address, Bytes, Int128
 rpc_server_url = "https://horizon-futurenet.stellar.cash:443/soroban/rpc"
 soroban_server = SorobanServer(rpc_server_url)
 network_passphrase = Network.FUTURENET_NETWORK_PASSPHRASE
-network_id = Network(network_passphrase).network_id()
 
 submitter_kp = Keypair.from_secret(
     "SBPTTA3D3QYQ6E2GSACAZDUFH2UILBNG3EBJCK3NNP7BE4O757KGZUGA"
