@@ -1,6 +1,16 @@
 Release History
 ==============
 
+### Version 8.2.0
+
+Released on March 15, 2023
+
+#### Add
+- feat: add support for SEP-0035. ([#711](https://github.com/StellarCN/py-stellar-base/pull/711))
+
+#### Note
+- Python 3.6 is no longer supported.
+
 ### Version 8.1.1
 
 Released on October 12, 2022
