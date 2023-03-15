@@ -770,6 +770,12 @@ SEP 0011: Txrep: human-readable low-level representation of Stellar transactions
 .. autofunction:: stellar_sdk.sep.txrep.to_txrep
 .. autofunction:: stellar_sdk.sep.txrep.from_txrep
 
+SEP 0035: Operation IDs
+-----------------------------------------------------
+.. autoclass:: stellar_sdk.sep.toid.TOID
+   :members:
+   :inherited-members:
+
 Exceptions
 ----------
 .. autoclass:: stellar_sdk.sep.exceptions.StellarTomlNotFoundError
