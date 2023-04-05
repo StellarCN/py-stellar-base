@@ -5,67 +5,73 @@
 % #include "xdr/Stellar-types.h"
 namespace stellar
 {
-/*
- * Smart Contracts deal in SCVals. These are a (dynamic) disjoint union
- * between several possible variants, to allow storing generic SCVals in
- * generic data structures and passing them in and out of languages that
- * have simple or dynamic type systems.
- *
- * SCVals are (in WASM's case) stored in a tagged 64-bit word encoding. Most
- * signed 64-bit values in Stellar are actually signed positive values
- * (sequence numbers, timestamps, amounts), so we don't need the high bit
- * and can get away with 1-bit tagging and store them as "unsigned 63bit",
- * (u63) separate from everything else.
- *
- * We actually reserve the low _four_ bits, leaving 3 bits for 8 cases of
- * "non-u63 values", some of which have substructure of their own.
- *
- *    0x_NNNN_NNNN_NNNN_NNNX  - u63, for any even X
- *    0x_0000_000N_NNNN_NNN1  - u32
- *    0x_0000_000N_NNNN_NNN3  - i32
- *    0x_NNNN_NNNN_NNNN_NNN5  - static: void, true, false, ... (SCS_*)
- *    0x_IIII_IIII_TTTT_TTT7  - object: 32-bit index I, 28-bit type code T
- *    0x_NNNN_NNNN_NNNN_NNN9  - symbol: up to 10 6-bit identifier characters
- *    0x_NNNN_NNNN_NNNN_NNNb  - bitset: up to 60 bits
- *    0x_CCCC_CCCC_TTTT_TTTd  - status: 32-bit code C, 28-bit type code T
- *    0x_NNNN_NNNN_NNNN_NNNf  - reserved
- *
- * Up here in XDR we have variable-length tagged disjoint unions but no
- * bit-level packing, so we can be more explicit in their structure, at the
- * cost of spending more than 64 bits to encode many cases, and also having
- * to convert. It's a little non-obvious at the XDR level why there's a
- * split between SCVal and SCObject given that they are both immutable types
- * with value semantics; but the split reflects the split that happens in
- * the implementation, and marks a place where different implementations of
- * immutability (CoW, structural sharing, etc.) will likely occur.
- */
 
-// A symbol is up to 10 chars drawn from [a-zA-Z0-9_], which can be packed
-// into 60 bits with a 6-bit-per-character code, usable as a small key type
-// to specify function, argument, tx-local environment and map entries
-// efficiently.
-typedef string SCSymbol<10>;
+// We fix a maximum of 128 value types in the system for two reasons: we want to
+// keep the codes relatively small (<= 8 bits) when bit-packing values into a
+// u64 at the environment interface level, so that we keep many bits for
+// payloads (small strings, small numeric values, object handles); and then we
+// actually want to go one step further and ensure (for code-size) that our
+// codes fit in a single ULEB128-code byte, which means we can only use 7 bits.
+//
+// We also reserve several type codes from this space because we want to _reuse_
+// the SCValType codes at the environment interface level (or at least not
+// exceed its number-space) but there are more types at that level, assigned to
+// optimizations/special case representations of values abstract at this level.
 
 enum SCValType
 {
-    SCV_U63 = 0,
-    SCV_U32 = 1,
-    SCV_I32 = 2,
-    SCV_STATIC = 3,
-    SCV_OBJECT = 4,
-    SCV_SYMBOL = 5,
-    SCV_BITSET = 6,
-    SCV_STATUS = 7
-};
+    SCV_BOOL = 0,
+    SCV_VOID = 1,
+    SCV_STATUS = 2,
 
-% struct SCObject;
+    // 32 bits is the smallest type in WASM or XDR; no need for u8/u16.
+    SCV_U32 = 3,
+    SCV_I32 = 4,
 
-enum SCStatic
-{
-    SCS_VOID = 0,
-    SCS_TRUE = 1,
-    SCS_FALSE = 2,
-    SCS_LEDGER_KEY_CONTRACT_CODE = 3
+    // 64 bits is naturally supported by both WASM and XDR also.
+    SCV_U64 = 5,
+    SCV_I64 = 6,
+
+    // Time-related u64 subtypes with their own functions and formatting.
+    SCV_TIMEPOINT = 7,
+    SCV_DURATION = 8,
+
+    // 128 bits is naturally supported by Rust and we use it for Soroban
+    // fixed-point arithmetic prices / balances / similar "quantities". These
+    // are represented in XDR as a pair of 2 u64s, unlike {u,i}256 which is
+    // represented as an array of 32 bytes.
+    SCV_U128 = 9,
+    SCV_I128 = 10,
+
+    // 256 bits is the size of sha256 output, ed25519 keys, and the EVM machine
+    // word, so for interop use we include this even though it requires a small
+    // amount of Rust guest and/or host library code.
+    SCV_U256 = 11,
+    SCV_I256 = 12,
+
+    // TODO: possibly allocate subtypes of i64, i128 and/or u256 for
+    // fixed-precision with a specific number of decimals.
+
+    // Bytes come in 3 flavors, 2 of which have meaningfully different
+    // formatting and validity-checking / domain-restriction.
+    SCV_BYTES = 13,
+    SCV_STRING = 14,
+    SCV_SYMBOL = 15,
+
+    // Vecs and maps are just polymorphic containers of other ScVals.
+    SCV_VEC = 16,
+    SCV_MAP = 17,
+
+    // SCContractExecutable and SCAddressType are types that gets used separately from
+    // SCVal so we do not flatten their structures into separate SCVal cases.
+    SCV_CONTRACT_EXECUTABLE = 18,
+    SCV_ADDRESS = 19,
+
+    // SCV_LEDGER_KEY_CONTRACT_EXECUTABLE and SCV_LEDGER_KEY_NONCE are unique
+    // symbolic SCVals used as the key for ledger entries for a contract's code
+    // and an address' nonce, respectively.
+    SCV_LEDGER_KEY_CONTRACT_EXECUTABLE = 20,
+    SCV_LEDGER_KEY_NONCE = 21
 };
 
 enum SCStatusType
@@ -195,76 +201,26 @@ case SST_HOST_AUTH_ERROR:
     SCHostAuthErrorCode authCode;
 };
 
-union SCVal switch (SCValType type)
-{
-case SCV_U63:
-    int64 u63;
-case SCV_U32:
-    uint32 u32;
-case SCV_I32:
-    int32 i32;
-case SCV_STATIC:
-    SCStatic ic;
-case SCV_OBJECT:
-    SCObject* obj;
-case SCV_SYMBOL:
-    SCSymbol sym;
-case SCV_BITSET:
-    uint64 bits;
-case SCV_STATUS:
-    SCStatus status;
-};
-
-enum SCObjectType
-{
-    // We have a few objects that represent non-stellar-specific concepts
-    // like general-purpose maps, vectors, numbers, blobs.
-
-    SCO_VEC = 0,
-    SCO_MAP = 1,
-    SCO_U64 = 2,
-    SCO_I64 = 3,
-    SCO_U128 = 4,
-    SCO_I128 = 5,
-    SCO_BYTES = 6,
-    SCO_CONTRACT_CODE = 7,
-    SCO_ADDRESS = 8,
-    SCO_NONCE_KEY = 9
-
-    // TODO: add more
-};
-
-struct SCMapEntry
-{
-    SCVal key;
-    SCVal val;
-};
-
-const SCVAL_LIMIT = 256000;
-
-typedef SCVal SCVec<SCVAL_LIMIT>;
-typedef SCMapEntry SCMap<SCVAL_LIMIT>;
-
-enum SCContractCodeType
-{
-    SCCONTRACT_CODE_WASM_REF = 0,
-    SCCONTRACT_CODE_TOKEN = 1
-};
-
-union SCContractCode switch (SCContractCodeType type)
-{
-case SCCONTRACT_CODE_WASM_REF:
-    Hash wasm_id;
-case SCCONTRACT_CODE_TOKEN:
-    void;
-};
-
 struct Int128Parts {
     // Both signed and unsigned 128-bit ints
     // are transported in a pair of uint64s
     // to reduce the risk of sign-extension.
     uint64 lo;
     uint64 hi;
+};
+
+enum SCContractExecutableType
+{
+    SCCONTRACT_EXECUTABLE_WASM_REF = 0,
+    SCCONTRACT_EXECUTABLE_TOKEN = 1
+};
+
+union SCContractExecutable switch (SCContractExecutableType type)
+{
+case SCCONTRACT_EXECUTABLE_WASM_REF:
+    Hash wasm_id;
+case SCCONTRACT_EXECUTABLE_TOKEN:
+    void;
 };
 
 enum SCAddressType
@@ -281,27 +237,88 @@ case SC_ADDRESS_TYPE_CONTRACT:
     Hash contractId;
 };
 
-union SCObject switch (SCObjectType type)
-{
-case SCO_VEC:
-    SCVec vec;
-case SCO_MAP:
-    SCMap map;
-case SCO_U64:
-    uint64 u64;
-case SCO_I64:
-    int64 i64;
-case SCO_U128:
-    Int128Parts u128;
-case SCO_I128:
-    Int128Parts i128;
-case SCO_BYTES:
-    opaque bin<SCVAL_LIMIT>;
-case SCO_CONTRACT_CODE:
-    SCContractCode contractCode;
-case SCO_ADDRESS:
-    SCAddress address;
-case SCO_NONCE_KEY:
-    SCAddress nonceAddress;
+%struct SCVal;
+%struct SCMapEntry;
+
+const SCVAL_LIMIT = 256000;
+const SCSYMBOL_LIMIT = 32;
+
+typedef SCVal SCVec<SCVAL_LIMIT>;
+typedef SCMapEntry SCMap<SCVAL_LIMIT>;
+
+typedef opaque SCBytes<SCVAL_LIMIT>;
+typedef string SCString<SCVAL_LIMIT>;
+typedef string SCSymbol<SCSYMBOL_LIMIT>;
+
+struct SCNonceKey {
+    SCAddress nonce_address;
 };
+
+union SCVal switch (SCValType type)
+{
+
+case SCV_BOOL:
+    bool b;
+case SCV_VOID:
+    void;
+case SCV_STATUS:
+    SCStatus error;
+
+case SCV_U32:
+    uint32 u32;
+case SCV_I32:
+    int32 i32;
+
+case SCV_U64:
+    uint64 u64;
+case SCV_I64:
+    int64 i64;
+case SCV_TIMEPOINT:
+    TimePoint timepoint;
+case SCV_DURATION:
+    Duration duration;
+
+case SCV_U128:
+    Int128Parts u128;
+case SCV_I128:
+    Int128Parts i128;
+
+case SCV_U256:
+    uint256 u256;
+case SCV_I256:
+    uint256 i256;
+
+case SCV_BYTES:
+    SCBytes bytes;
+case SCV_STRING:
+    SCString str;
+case SCV_SYMBOL:
+    SCSymbol sym;
+
+// Vec and Map are recursive so need to live
+// behind an option, due to xdrpp limitations.
+case SCV_VEC:
+    SCVec *vec;
+case SCV_MAP:
+    SCMap *map;
+
+case SCV_CONTRACT_EXECUTABLE:
+    SCContractExecutable exec;
+case SCV_ADDRESS:
+    SCAddress address;
+
+// Special SCVals reserved for system-constructed contract-data
+// ledger keys, not generally usable elsewhere.
+case SCV_LEDGER_KEY_CONTRACT_EXECUTABLE:
+    void;
+case SCV_LEDGER_KEY_NONCE:
+    SCNonceKey nonce_key;
+};
+
+struct SCMapEntry
+{
+    SCVal key;
+    SCVal val;
+};
+
 }
