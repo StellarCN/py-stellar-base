@@ -144,9 +144,15 @@ class GetTransactionResponse(BaseModel):
     # The fields below are only present if Status is not TransactionStatus.NOT_FOUND.
     application_order: Optional[int] = Field(alias="applicationOrder")
     fee_bump: Optional[bool] = Field(alias="feeBump")
-    envelope_xdr: Optional[str] = Field(alias="envelopeXdr")  # stellar_sdk.xdr.TransactionEnvelope
-    result_xdr: Optional[str] = Field(alias="resultXdr")  # stellar_sdk.xdr.TransactionResult
-    result_meta_xdr: Optional[str] = Field(alias="resultMetaXdr")  # stellar_sdk.xdr.TransactionMeta
+    envelope_xdr: Optional[str] = Field(
+        alias="envelopeXdr"
+    )  # stellar_sdk.xdr.TransactionEnvelope
+    result_xdr: Optional[str] = Field(
+        alias="resultXdr"
+    )  # stellar_sdk.xdr.TransactionResult
+    result_meta_xdr: Optional[str] = Field(
+        alias="resultMetaXdr"
+    )  # stellar_sdk.xdr.TransactionMeta
     ledger: Optional[int] = Field(alias="ledger")
     ledger_close_time: Optional[int] = Field(alias="ledgerCloseTime")
 
