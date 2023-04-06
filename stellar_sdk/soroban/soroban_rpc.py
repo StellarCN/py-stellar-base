@@ -48,6 +48,7 @@ class EventInfo(BaseModel):
     paging_token: str = Field(alias="pagingToken")
     topic: Sequence[str] = Field(alias="topic")
     value: EventInfoValue = Field(alias="value")
+    in_successful_contract_call: bool = Field(alias="inSuccessfulContractCall")
 
 
 class PaginationOptions(BaseModel):
@@ -57,7 +58,6 @@ class PaginationOptions(BaseModel):
 
 class GetEventsRequest(BaseModel):
     start_ledger: str = Field(alias="startLedger")
-    end_ledger: str = Field(alias="endLedger")  # TODO: check it
     filters: Optional[List[EventFilter]]
     pagination: Optional[PaginationOptions]
 
@@ -74,7 +74,7 @@ class GetLedgerEntryRequest(BaseModel):
 
 class GetLedgerEntryResponse(BaseModel):
     xdr: str
-    last_modified_ledger_seq: int = Field(alias="lastModifiedLedgerSeq")
+    last_modified_ledger: int = Field(alias="lastModifiedLedgerSeq")
     latest_ledger: int = Field(alias="latestLedger")
 
 
@@ -102,6 +102,7 @@ class SimulateTransactionCost(BaseModel):
 
 class SimulateTransactionResult(BaseModel):
     auth: Optional[List[str]]
+    events: Optional[List[str]]
     footprint: str
     xdr: str
 
@@ -114,10 +115,10 @@ class SimulateTransactionResponse(BaseModel):
 
 
 # get_transaction_status
-class TransactionStatus(Enum):
-    PENDING = "pending"
-    SUCCESS = "success"
-    ERROR = "error"
+class GetTransactionStatus(Enum):
+    SUCCESS = "SUCCESS"  # "indicates the transaction was included in the ledger and it was executed without errors.",
+    NOT_FOUND = "NOT_FOUND"  # "indicates the transaction was not found in Soroban-RPC's transaction store.",
+    FAILED = "FAILED"  # "TransactionStatusFailed indicates the transaction was included in the ledger and it was executed with an error.",
 
 
 class TransactionResponseError(BaseModel):
@@ -130,28 +131,41 @@ class SCVal(BaseModel):
     xdr: str
 
 
-class GetTransactionStatusRequest(BaseModel):
+class GetTransactionRequest(BaseModel):
     hash: str
 
 
-class GetTransactionStatusResponse(BaseModel):
-    id: str
-    status: TransactionStatus
+class GetTransactionResponse(BaseModel):
+    status: GetTransactionStatus
+    latest_ledger: int = Field(alias="latestLedger")
+    latest_ledger_close_time: int = Field(alias="latestLedgerCloseTime")
+    oldest_ledger: int = Field(alias="oldestLedger")
+    oldest_ledger_close_time: int = Field(alias="oldestLedgerCloseTime")
+    # The fields below are only present if Status is not TransactionStatus.NOT_FOUND.
+    application_order: Optional[int] = Field(alias="applicationOrder")
+    fee_bump: Optional[bool] = Field(alias="feeBump")
     envelope_xdr: Optional[str] = Field(alias="envelopeXdr")
     result_xdr: Optional[str] = Field(alias="resultXdr")
     result_meta_xdr: Optional[str] = Field(alias="resultMetaXdr")
-    results: Optional[List[SCVal]]
-    # error will be empty unless status is equal to "error"
-    error: Optional[TransactionResponseError]
+    ledger: Optional[int] = Field(alias="ledger")
+    ledger_close_time: Optional[int] = Field(alias="ledgerCloseTime")
 
 
 # send_transaction
+class SendTransactionStatus(Enum):
+    ERROR = "ERROR"  # represents the status value returned by stellar-core when an error occurred from submitting a transaction
+    PENDING = "PENDING"  # represents the status value returned by stellar-core when a transaction has been accepted for processing
+    DUPLICATE = "DUPLICATE"  # represents the status value returned by stellar-core when a submitted transaction is a duplicate
+    TRY_AGAIN_LATER = "TRY_AGAIN_LATER"  # represents the status value returned by stellar-core when a submitted transaction was not included in the previous 4 ledgers and get banned for being added in the next few ledgers.
+
+
 class SendTransactionRequest(BaseModel):
     transaction: str
 
 
 class SendTransactionResponse(BaseModel):
-    id: str
-    status: TransactionStatus
-    # error will be empty unless status is equal to "error"
-    error: Optional[TransactionResponseError]
+    error_result_xdr: Optional[str] = Field(alias="errorResultXdr")
+    status: SendTransactionStatus = Field(alias="status")
+    hash: str = Field(alias="hash")
+    latest_ledger: int = Field(alias="latestLedger")
+    latest_ledger_close_time: int = Field(alias="latestLedgerCloseTime")
