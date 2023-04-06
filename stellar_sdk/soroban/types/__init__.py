@@ -11,6 +11,5 @@ from .struct import *
 from .symbol import *
 from .uint128 import *
 from .uint32 import *
-from .uint63 import *
 from .uint64 import *
 from .vec import *

@@ -1,28 +1,32 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
+# This file contains manual patches
+
 import base64
-from typing import Optional
+from typing import Optional, TYPE_CHECKING
 from xdrlib import Packer, Unpacker
 
-from .base import Boolean
-from .duration import Duration
-from .int32 import Int32
-from .int64 import Int64
-from .int128_parts import Int128Parts
-from .sc_address import SCAddress
-from .sc_bytes import SCBytes
-from .sc_contract_executable import SCContractExecutable
-from .sc_map import SCMap
-from .sc_nonce_key import SCNonceKey
-from .sc_status import SCStatus
-from .sc_string import SCString
-from .sc_symbol import SCSymbol
 from .sc_val_type import SCValType
-from .sc_vec import SCVec
-from .time_point import TimePoint
-from .uint32 import Uint32
-from .uint64 import Uint64
-from .uint256 import Uint256
+from .base import Boolean
+
+if TYPE_CHECKING:
+    from .duration import Duration
+    from .int32 import Int32
+    from .int64 import Int64
+    from .int128_parts import Int128Parts
+    from .sc_address import SCAddress
+    from .sc_bytes import SCBytes
+    from .sc_contract_executable import SCContractExecutable
+    from .sc_map import SCMap
+    from .sc_nonce_key import SCNonceKey
+    from .sc_status import SCStatus
+    from .sc_string import SCString
+    from .sc_symbol import SCSymbol
+    from .sc_vec import SCVec
+    from .time_point import TimePoint
+    from .uint32 import Uint32
+    from .uint64 import Uint64
+    from .uint256 import Uint256
 
 __all__ = ["SCVal"]
 
@@ -95,27 +99,27 @@ class SCVal:
 
     def __init__(
         self,
-        type: SCValType,
+        type: "SCValType",
         b: bool = None,
-        error: SCStatus = None,
-        u32: Uint32 = None,
-        i32: Int32 = None,
-        u64: Uint64 = None,
-        i64: Int64 = None,
-        timepoint: TimePoint = None,
-        duration: Duration = None,
-        u128: Int128Parts = None,
-        i128: Int128Parts = None,
-        u256: Uint256 = None,
-        i256: Uint256 = None,
-        bytes: SCBytes = None,
-        str: SCString = None,
-        sym: SCSymbol = None,
-        vec: Optional[SCVec] = None,
-        map: Optional[SCMap] = None,
-        exec: SCContractExecutable = None,
-        address: SCAddress = None,
-        nonce_key: SCNonceKey = None,
+        error: "SCStatus" = None,
+        u32: "Uint32" = None,
+        i32: "Int32" = None,
+        u64: "Uint64" = None,
+        i64: "Int64" = None,
+        timepoint: "TimePoint" = None,
+        duration: "Duration" = None,
+        u128: "Int128Parts" = None,
+        i128: "Int128Parts" = None,
+        u256: "Uint256" = None,
+        i256: "Uint256" = None,
+        bytes: "SCBytes" = None,
+        str: "SCString" = None,
+        sym: "SCSymbol" = None,
+        vec: Optional["SCVec"] = None,
+        map: Optional["SCMap"] = None,
+        exec: "SCContractExecutable" = None,
+        address: "SCAddress" = None,
+        nonce_key: "SCNonceKey" = None,
     ) -> None:
         self.type = type
         self.b = b
@@ -148,75 +152,75 @@ class SCVal:
         return cls(SCValType.SCV_VOID)
 
     @classmethod
-    def from_scv_status(cls, error: SCStatus) -> "SCVal":
+    def from_scv_status(cls, error: "SCStatus") -> "SCVal":
         return cls(SCValType.SCV_STATUS, error=error)
 
     @classmethod
-    def from_scv_u32(cls, u32: Uint32) -> "SCVal":
+    def from_scv_u32(cls, u32: "Uint32") -> "SCVal":
         return cls(SCValType.SCV_U32, u32=u32)
 
     @classmethod
-    def from_scv_i32(cls, i32: Int32) -> "SCVal":
+    def from_scv_i32(cls, i32: "Int32") -> "SCVal":
         return cls(SCValType.SCV_I32, i32=i32)
 
     @classmethod
-    def from_scv_u64(cls, u64: Uint64) -> "SCVal":
+    def from_scv_u64(cls, u64: "Uint64") -> "SCVal":
         return cls(SCValType.SCV_U64, u64=u64)
 
     @classmethod
-    def from_scv_i64(cls, i64: Int64) -> "SCVal":
+    def from_scv_i64(cls, i64: "Int64") -> "SCVal":
         return cls(SCValType.SCV_I64, i64=i64)
 
     @classmethod
-    def from_scv_timepoint(cls, timepoint: TimePoint) -> "SCVal":
+    def from_scv_timepoint(cls, timepoint: "TimePoint") -> "SCVal":
         return cls(SCValType.SCV_TIMEPOINT, timepoint=timepoint)
 
     @classmethod
-    def from_scv_duration(cls, duration: Duration) -> "SCVal":
+    def from_scv_duration(cls, duration: "Duration") -> "SCVal":
         return cls(SCValType.SCV_DURATION, duration=duration)
 
     @classmethod
-    def from_scv_u128(cls, u128: Int128Parts) -> "SCVal":
+    def from_scv_u128(cls, u128: "Int128Parts") -> "SCVal":
         return cls(SCValType.SCV_U128, u128=u128)
 
     @classmethod
-    def from_scv_i128(cls, i128: Int128Parts) -> "SCVal":
+    def from_scv_i128(cls, i128: "Int128Parts") -> "SCVal":
         return cls(SCValType.SCV_I128, i128=i128)
 
     @classmethod
-    def from_scv_u256(cls, u256: Uint256) -> "SCVal":
+    def from_scv_u256(cls, u256: "Uint256") -> "SCVal":
         return cls(SCValType.SCV_U256, u256=u256)
 
     @classmethod
-    def from_scv_i256(cls, i256: Uint256) -> "SCVal":
+    def from_scv_i256(cls, i256: "Uint256") -> "SCVal":
         return cls(SCValType.SCV_I256, i256=i256)
 
     @classmethod
-    def from_scv_bytes(cls, bytes: SCBytes) -> "SCVal":
+    def from_scv_bytes(cls, bytes: "SCBytes") -> "SCVal":
         return cls(SCValType.SCV_BYTES, bytes=bytes)
 
     @classmethod
-    def from_scv_string(cls, str: SCString) -> "SCVal":
+    def from_scv_string(cls, str: "SCString") -> "SCVal":
         return cls(SCValType.SCV_STRING, str=str)
 
     @classmethod
-    def from_scv_symbol(cls, sym: SCSymbol) -> "SCVal":
+    def from_scv_symbol(cls, sym: "SCSymbol") -> "SCVal":
         return cls(SCValType.SCV_SYMBOL, sym=sym)
 
     @classmethod
-    def from_scv_vec(cls, vec: Optional[SCVec]) -> "SCVal":
+    def from_scv_vec(cls, vec: Optional["SCVec"]) -> "SCVal":
         return cls(SCValType.SCV_VEC, vec=vec)
 
     @classmethod
-    def from_scv_map(cls, map: Optional[SCMap]) -> "SCVal":
+    def from_scv_map(cls, map: Optional["SCMap"]) -> "SCVal":
         return cls(SCValType.SCV_MAP, map=map)
 
     @classmethod
-    def from_scv_contract_executable(cls, exec: SCContractExecutable) -> "SCVal":
+    def from_scv_contract_executable(cls, exec: "SCContractExecutable") -> "SCVal":
         return cls(SCValType.SCV_CONTRACT_EXECUTABLE, exec=exec)
 
     @classmethod
-    def from_scv_address(cls, address: SCAddress) -> "SCVal":
+    def from_scv_address(cls, address: "SCAddress") -> "SCVal":
         return cls(SCValType.SCV_ADDRESS, address=address)
 
     @classmethod
@@ -224,7 +228,7 @@ class SCVal:
         return cls(SCValType.SCV_LEDGER_KEY_CONTRACT_EXECUTABLE)
 
     @classmethod
-    def from_scv_ledger_key_nonce(cls, nonce_key: SCNonceKey) -> "SCVal":
+    def from_scv_ledger_key_nonce(cls, nonce_key: "SCNonceKey") -> "SCVal":
         return cls(SCValType.SCV_LEDGER_KEY_NONCE, nonce_key=nonce_key)
 
     def pack(self, packer: Packer) -> None:
@@ -351,62 +355,100 @@ class SCVal:
         if type == SCValType.SCV_VOID:
             return cls(type=type)
         if type == SCValType.SCV_STATUS:
+            from .sc_status import SCStatus
+
             error = SCStatus.unpack(unpacker)
             return cls(type=type, error=error)
         if type == SCValType.SCV_U32:
+            from .uint32 import Uint32
+
             u32 = Uint32.unpack(unpacker)
             return cls(type=type, u32=u32)
         if type == SCValType.SCV_I32:
+            from .int32 import Int32
+
             i32 = Int32.unpack(unpacker)
             return cls(type=type, i32=i32)
         if type == SCValType.SCV_U64:
+            from .uint64 import Uint64
+
             u64 = Uint64.unpack(unpacker)
             return cls(type=type, u64=u64)
         if type == SCValType.SCV_I64:
+            from .int64 import Int64
+
             i64 = Int64.unpack(unpacker)
             return cls(type=type, i64=i64)
         if type == SCValType.SCV_TIMEPOINT:
+            from .time_point import TimePoint
+
             timepoint = TimePoint.unpack(unpacker)
             return cls(type=type, timepoint=timepoint)
         if type == SCValType.SCV_DURATION:
+            from .duration import Duration
+
             duration = Duration.unpack(unpacker)
             return cls(type=type, duration=duration)
         if type == SCValType.SCV_U128:
+            from .int128_parts import Int128Parts
+
             u128 = Int128Parts.unpack(unpacker)
             return cls(type=type, u128=u128)
         if type == SCValType.SCV_I128:
+            from .int128_parts import Int128Parts
+
             i128 = Int128Parts.unpack(unpacker)
             return cls(type=type, i128=i128)
         if type == SCValType.SCV_U256:
+            from .uint256 import Uint256
+
             u256 = Uint256.unpack(unpacker)
             return cls(type=type, u256=u256)
         if type == SCValType.SCV_I256:
+            from .uint256 import Uint256
+
             i256 = Uint256.unpack(unpacker)
             return cls(type=type, i256=i256)
         if type == SCValType.SCV_BYTES:
+            from .sc_bytes import SCBytes
+
             bytes = SCBytes.unpack(unpacker)
             return cls(type=type, bytes=bytes)
         if type == SCValType.SCV_STRING:
+            from .sc_string import SCString
+
             str = SCString.unpack(unpacker)
             return cls(type=type, str=str)
         if type == SCValType.SCV_SYMBOL:
+            from .sc_symbol import SCSymbol
+
             sym = SCSymbol.unpack(unpacker)
             return cls(type=type, sym=sym)
         if type == SCValType.SCV_VEC:
+            from .sc_vec import SCVec
+
             vec = SCVec.unpack(unpacker) if unpacker.unpack_uint() else None
             return cls(type=type, vec=vec)
         if type == SCValType.SCV_MAP:
+            from .sc_map import SCMap
+
             map = SCMap.unpack(unpacker) if unpacker.unpack_uint() else None
             return cls(type=type, map=map)
         if type == SCValType.SCV_CONTRACT_EXECUTABLE:
+            from .sc_contract_executable import SCContractExecutable
+
             exec = SCContractExecutable.unpack(unpacker)
             return cls(type=type, exec=exec)
         if type == SCValType.SCV_ADDRESS:
+            from .sc_address import SCAddress
+
             address = SCAddress.unpack(unpacker)
             return cls(type=type, address=address)
         if type == SCValType.SCV_LEDGER_KEY_CONTRACT_EXECUTABLE:
             return cls(type=type)
         if type == SCValType.SCV_LEDGER_KEY_NONCE:
+            from .sc_nonce_key import SCNonceKey
+
             nonce_key = SCNonceKey.unpack(unpacker)
             return cls(type=type, nonce_key=nonce_key)
         return cls(type=type)

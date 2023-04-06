@@ -27,7 +27,6 @@ class LiquidityPoolAsset:
     def __init__(
         self, asset_a: Asset, asset_b: Asset, fee: int = LIQUIDITY_POOL_FEE_V18
     ) -> None:
-
         if not self.is_valid_lexicographic_order(asset_a, asset_b):
             raise ValueError("`Assets are not in lexicographic order.")
 

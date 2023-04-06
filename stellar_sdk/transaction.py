@@ -62,7 +62,6 @@ class Transaction:
         preconditions: Preconditions = None,
         v1: bool = True,
     ) -> None:
-
         # if not operations:
         #     raise ValueError("At least one operation required.")
 

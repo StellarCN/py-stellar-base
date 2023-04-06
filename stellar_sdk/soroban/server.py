@@ -200,7 +200,7 @@ class SorobanServer:
         data = self.get_account(account_id)
         return Account(account_id, data.sequence)
 
-    def get_nonce(self,  contract_id: str, account_id: str) -> int:
+    def get_nonce(self, contract_id: str, account_id: str) -> int:
         """Loads nonce from ledger entry if available, otherwise returns 0.
 
         :param contract_id: The contract ID.
@@ -211,10 +211,8 @@ class SorobanServer:
         ledger_key = stellar_xdr.LedgerKey.from_contract_data(
             stellar_xdr.LedgerKeyContractData(
                 contract_id=stellar_xdr.Hash(contract_id_bytes),
-                key=stellar_xdr.SCVal.from_scv_object(
-                    stellar_xdr.SCObject.from_sco_nonce_key(
-                        Address(account_id).to_xdr_sc_address()
-                    )
+                key=stellar_xdr.SCVal.from_scv_ledger_key_nonce(
+                    stellar_xdr.SCNonceKey(Address(account_id).to_xdr_sc_address())
                 ),
             )
         )
@@ -222,9 +220,8 @@ class SorobanServer:
             response = self.get_ledger_entry(ledger_key)
             data = stellar_xdr.LedgerEntryData.from_xdr(response.xdr)
             assert data.contract_data is not None
-            assert data.contract_data.val.obj is not None
-            assert data.contract_data.val.obj.u64 is not None
-            return data.contract_data.val.obj.u64.uint64
+            assert data.contract_data.val.u64 is not None
+            return data.contract_data.val.u64.uint64
         except RequestException as e:
             if e.code == -32600:
                 return 0

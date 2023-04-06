@@ -2,17 +2,9 @@ import abc
 from typing import Union
 
 from .base import BaseScValAlias
+from ... import xdr as stellar_xdr
 from ...keypair import Keypair
 from ...strkey import StrKey
-from ...xdr import (
-    SCVal,
-    SCObject,
-    SCSymbol,
-    SCMap,
-    SCMapEntry,
-    SCValType,
-    SCObjectType,
-)
 
 __all__ = ["Signature", "AccountEd25519Signature"]
 
@@ -40,52 +32,45 @@ class AccountEd25519Signature(Signature):
         self.public_key: str = public_key
         self.signature: bytes = signature
 
-    def to_xdr_sc_val(self) -> SCVal:
-        return SCVal.from_scv_object(
-            obj=SCObject.from_sco_map(
-                map=SCMap(
-                    [
-                        SCMapEntry(
-                            key=SCVal.from_scv_symbol(
-                                sym=SCSymbol("public_key".encode()),
-                            ),
-                            val=SCVal.from_scv_object(
-                                obj=SCObject.from_sco_bytes(
-                                    bin=StrKey.decode_ed25519_public_key(
-                                        self.public_key
-                                    )
-                                ),
-                            ),
+    def to_xdr_sc_val(self) -> stellar_xdr.SCVal:
+        return stellar_xdr.SCVal.from_scv_map(
+            map=stellar_xdr.SCMap(
+                [
+                    stellar_xdr.SCMapEntry(
+                        key=stellar_xdr.SCVal.from_scv_symbol(
+                            sym=stellar_xdr.SCSymbol("public_key".encode()),
                         ),
-                        SCMapEntry(
-                            key=SCVal.from_scv_symbol(
-                                sym=SCSymbol("signature".encode()),
-                            ),
-                            val=SCVal.from_scv_object(
-                                obj=SCObject.from_sco_bytes(bin=self.signature),
-                            ),
+                        val=stellar_xdr.SCVal.from_scv_bytes(
+                            bytes=stellar_xdr.SCBytes(
+                                StrKey.decode_ed25519_public_key(self.public_key)
+                            )
                         ),
-                    ]
-                ),
+                    ),
+                    stellar_xdr.SCMapEntry(
+                        key=stellar_xdr.SCVal.from_scv_symbol(
+                            sym=stellar_xdr.SCSymbol("signature".encode()),
+                        ),
+                        val=stellar_xdr.SCVal.from_scv_bytes(
+                            bytes=stellar_xdr.SCBytes(self.signature)
+                        ),
+                    ),
+                ]
             ),
         )
 
     @classmethod
-    def from_xdr_sc_val(cls, sc_val: SCVal) -> "AccountEd25519Signature":
-        if sc_val.type != SCValType.SCV_OBJECT:
+    def from_xdr_sc_val(cls, sc_val: stellar_xdr.SCVal) -> "AccountEd25519Signature":
+        if sc_val.type != stellar_xdr.SCValType.SCV_MAP:
             raise ValueError("Invalid SCVal value.")
-        assert sc_val.obj is not None
-        if sc_val.obj.type != SCObjectType.SCO_MAP:
-            raise ValueError("Invalid SCVal value.")
-        assert sc_val.obj.map is not None
+        assert sc_val.map is not None
 
-        if len(sc_val.obj.map.sc_map) != 2:
+        if len(sc_val.map.sc_map) != 2:
             raise ValueError("Invalid SCVal value.")
-        public_key_entry, signature_entry = sc_val.obj.map.sc_map
+        public_key_entry, signature_entry = sc_val.map.sc_map
 
-        if public_key_entry.key.type != SCValType.SCV_SYMBOL:
+        if public_key_entry.key.type != stellar_xdr.SCValType.SCV_SYMBOL:
             raise ValueError("Invalid SCVal value.")
-        if signature_entry.key.type != SCValType.SCV_SYMBOL:
+        if signature_entry.key.type != stellar_xdr.SCValType.SCV_SYMBOL:
             raise ValueError("Invalid SCVal value.")
         assert public_key_entry.key.sym is not None
         assert signature_entry.key.sym is not None
@@ -94,21 +79,17 @@ class AccountEd25519Signature(Signature):
         if signature_entry.key.sym.sc_symbol.decode() != "signature":
             raise ValueError("Invalid SCVal value.")
 
-        if public_key_entry.val.type != SCValType.SCV_OBJECT:
+        if public_key_entry.val.type != stellar_xdr.SCValType.SCV_BYTES:
             raise ValueError("Invalid SCVal value.")
-        if signature_entry.val.type != SCValType.SCV_OBJECT:
+        if signature_entry.val.type != stellar_xdr.SCValType.SCV_BYTES:
             raise ValueError("Invalid SCVal value.")
-        assert public_key_entry.val.obj is not None
-        assert signature_entry.val.obj is not None
-        if public_key_entry.val.obj.type != SCObjectType.SCO_BYTES:
-            raise ValueError("Invalid SCVal value.")
-        if signature_entry.val.obj.type != SCObjectType.SCO_BYTES:
-            raise ValueError("Invalid SCVal value.")
+        assert public_key_entry.val.bytes is not None
+        assert signature_entry.val.bytes is not None
 
-        assert public_key_entry.val.obj.bin is not None
-        assert signature_entry.val.obj.bin is not None
-        public_key = StrKey.encode_ed25519_public_key(public_key_entry.val.obj.bin)
-        signature = signature_entry.val.obj.bin
+        public_key = StrKey.encode_ed25519_public_key(
+            public_key_entry.val.bytes.sc_bytes
+        )
+        signature = signature_entry.val.bytes.sc_bytes
         return cls(public_key, signature)
 
     def __eq__(self, other: object) -> bool:

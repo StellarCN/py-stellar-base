@@ -1,5 +1,5 @@
 from .base import BaseScValAlias
-from ...xdr import SCVal, SCValType, Uint32 as XdrUint32
+from ... import xdr as stellar_xdr
 
 __all__ = ["Uint32"]
 
@@ -15,12 +15,12 @@ class Uint32(BaseScValAlias):
             raise ValueError("Invalid Uint32 value.")
         self.value: int = value
 
-    def to_xdr_sc_val(self) -> SCVal:
-        return SCVal(SCValType.SCV_U32, u32=XdrUint32(self.value))
+    def to_xdr_sc_val(self) -> stellar_xdr.SCVal:
+        return stellar_xdr.SCVal.from_scv_u32(u32=stellar_xdr.Uint32(self.value))
 
     @classmethod
-    def from_xdr_sc_val(cls, sc_val: SCVal) -> "Uint32":
-        if sc_val.type != SCValType.SCV_U32:
+    def from_xdr_sc_val(cls, sc_val: stellar_xdr.SCVal) -> "Uint32":
+        if sc_val.type != stellar_xdr.SCValType.SCV_U32:
             raise ValueError("Invalid SCVal value.")
         assert sc_val.u32 is not None
         return cls(sc_val.u32.uint32)

@@ -2,16 +2,6 @@ from typing import Union, Sequence
 
 from .base import BaseScValAlias
 from ... import xdr as stellar_xdr
-from ...xdr import (
-    SCObjectType,
-    SCMap,
-    SCMapEntry,
-    SCSymbol,
-    SCVal,
-    SCValType,
-    SCObject,
-    SCVec,
-)
 
 __all__ = ["StructField", "Struct", "TupleStruct"]
 
@@ -30,17 +20,19 @@ class StructField:
             value.to_xdr_sc_val() if isinstance(value, BaseScValAlias) else value
         )
 
-    def to_xdr_sc_map_entry(self) -> SCMapEntry:
-        return SCMapEntry(
-            key=SCVal(
-                SCValType.SCV_SYMBOL,
-                sym=SCSymbol(self.key.encode()),
+    def to_xdr_sc_map_entry(self) -> stellar_xdr.SCMapEntry:
+        return stellar_xdr.SCMapEntry(
+            key=stellar_xdr.SCVal(
+                stellar_xdr.SCValType.SCV_SYMBOL,
+                sym=stellar_xdr.SCSymbol(self.key.encode()),
             ),
             val=self.value,
         )
 
     @classmethod
-    def from_xdr_sc_map_entry(cls, sc_map_entry: SCMapEntry) -> "StructField":
+    def from_xdr_sc_map_entry(
+        cls, sc_map_entry: stellar_xdr.SCMapEntry
+    ) -> "StructField":
         assert sc_map_entry.key.sym is not None
         return cls(
             sc_map_entry.key.sym.sc_symbol.decode(),
@@ -66,25 +58,20 @@ class Struct(BaseScValAlias):
     def __init__(self, fields: Sequence[StructField]):
         self.fields = fields
 
-    def to_xdr_sc_val(self) -> SCVal:
-        return SCVal(
-            SCValType.SCV_OBJECT,
-            obj=SCObject(
-                SCObjectType.SCO_MAP,
-                map=SCMap([field.to_xdr_sc_map_entry() for field in self.fields]),
-            ),
+    def to_xdr_sc_val(self) -> stellar_xdr.SCVal:
+        return stellar_xdr.SCVal.from_scv_map(
+            map=stellar_xdr.SCMap(
+                [field.to_xdr_sc_map_entry() for field in self.fields]
+            )
         )
 
     @classmethod
     def from_xdr_sc_val(cls, sc_val: stellar_xdr.SCVal) -> "Struct":
-        if sc_val.type != SCValType.SCV_OBJECT:
+        if sc_val.type != stellar_xdr.SCValType.SCV_MAP:
             raise ValueError("Invalid SCVal value.")
-        assert sc_val.obj is not None
-        if sc_val.obj.type != SCObjectType.SCO_MAP:
-            raise ValueError("Invalid SCObject type.")
-        assert sc_val.obj.map is not None
+        assert sc_val.map is not None
         fields = [
-            StructField.from_xdr_sc_map_entry(field) for field in sc_val.obj.map.sc_map
+            StructField.from_xdr_sc_map_entry(field) for field in sc_val.map.sc_map
         ]
         return cls(fields)
 
@@ -104,30 +91,23 @@ class TupleStruct(BaseScValAlias):
     """
 
     # TODO: code example
-    def __init__(self, fields: Sequence[Union[SCVal, BaseScValAlias]]):
+    def __init__(self, fields: Sequence[Union[stellar_xdr.SCVal, BaseScValAlias]]):
         self.fields = [
             field.to_xdr_sc_val() if isinstance(field, BaseScValAlias) else field
             for field in fields
         ]
 
-    def to_xdr_sc_val(self) -> SCVal:
-        return SCVal(
-            SCValType.SCV_OBJECT,
-            obj=SCObject(
-                SCObjectType.SCO_VEC,
-                vec=SCVec(self.fields),
-            ),
+    def to_xdr_sc_val(self) -> stellar_xdr.SCVal:
+        return stellar_xdr.SCVal.from_scv_vec(
+            vec=stellar_xdr.SCVec(self.fields),
         )
 
     @classmethod
     def from_xdr_sc_val(cls, sc_val: stellar_xdr.SCVal) -> "TupleStruct":
-        if sc_val.type != SCValType.SCV_OBJECT:
+        if sc_val.type != stellar_xdr.SCValType.SCV_VEC:
             raise ValueError("Invalid SCVal value.")
-        assert sc_val.obj is not None
-        if sc_val.obj.type != SCObjectType.SCO_VEC:
-            raise ValueError("Invalid SCObject type.")
-        assert sc_val.obj.vec is not None
-        return cls(sc_val.obj.vec.sc_vec)
+        assert sc_val.vec is not None
+        return cls(sc_val.vec.sc_vec)
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):

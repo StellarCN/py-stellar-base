@@ -1,17 +1,21 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
-import base64
-from xdrlib import Packer, Unpacker
+# This file contains manual patches
 
+import base64
+from typing import TYPE_CHECKING
+from xdrlib import Packer, Unpacker
 from .sc_spec_type import SCSpecType
-from .sc_spec_type_bytes_n import SCSpecTypeBytesN
-from .sc_spec_type_map import SCSpecTypeMap
-from .sc_spec_type_option import SCSpecTypeOption
-from .sc_spec_type_result import SCSpecTypeResult
-from .sc_spec_type_set import SCSpecTypeSet
-from .sc_spec_type_tuple import SCSpecTypeTuple
-from .sc_spec_type_udt import SCSpecTypeUDT
-from .sc_spec_type_vec import SCSpecTypeVec
+
+if TYPE_CHECKING:
+    from .sc_spec_type_bytes_n import SCSpecTypeBytesN
+    from .sc_spec_type_map import SCSpecTypeMap
+    from .sc_spec_type_option import SCSpecTypeOption
+    from .sc_spec_type_result import SCSpecTypeResult
+    from .sc_spec_type_set import SCSpecTypeSet
+    from .sc_spec_type_tuple import SCSpecTypeTuple
+    from .sc_spec_type_udt import SCSpecTypeUDT
+    from .sc_spec_type_vec import SCSpecTypeVec
 
 __all__ = ["SCSpecTypeDef"]
 
@@ -63,14 +67,14 @@ class SCSpecTypeDef:
     def __init__(
         self,
         type: SCSpecType,
-        option: SCSpecTypeOption = None,
-        result: SCSpecTypeResult = None,
-        vec: SCSpecTypeVec = None,
-        map: SCSpecTypeMap = None,
-        set: SCSpecTypeSet = None,
-        tuple: SCSpecTypeTuple = None,
-        bytes_n: SCSpecTypeBytesN = None,
-        udt: SCSpecTypeUDT = None,
+        option: "SCSpecTypeOption" = None,
+        result: "SCSpecTypeResult" = None,
+        vec: "SCSpecTypeVec" = None,
+        map: "SCSpecTypeMap" = None,
+        set: "SCSpecTypeSet" = None,
+        tuple: "SCSpecTypeTuple" = None,
+        bytes_n: "SCSpecTypeBytesN" = None,
+        udt: "SCSpecTypeUDT" = None,
     ) -> None:
         self.type = type
         self.option = option
@@ -155,35 +159,35 @@ class SCSpecTypeDef:
         return cls(SCSpecType.SC_SPEC_TYPE_ADDRESS)
 
     @classmethod
-    def from_sc_spec_type_option(cls, option: SCSpecTypeOption) -> "SCSpecTypeDef":
+    def from_sc_spec_type_option(cls, option: "SCSpecTypeOption") -> "SCSpecTypeDef":
         return cls(SCSpecType.SC_SPEC_TYPE_OPTION, option=option)
 
     @classmethod
-    def from_sc_spec_type_result(cls, result: SCSpecTypeResult) -> "SCSpecTypeDef":
+    def from_sc_spec_type_result(cls, result: "SCSpecTypeResult") -> "SCSpecTypeDef":
         return cls(SCSpecType.SC_SPEC_TYPE_RESULT, result=result)
 
     @classmethod
-    def from_sc_spec_type_vec(cls, vec: SCSpecTypeVec) -> "SCSpecTypeDef":
+    def from_sc_spec_type_vec(cls, vec: "SCSpecTypeVec") -> "SCSpecTypeDef":
         return cls(SCSpecType.SC_SPEC_TYPE_VEC, vec=vec)
 
     @classmethod
-    def from_sc_spec_type_map(cls, map: SCSpecTypeMap) -> "SCSpecTypeDef":
+    def from_sc_spec_type_map(cls, map: "SCSpecTypeMap") -> "SCSpecTypeDef":
         return cls(SCSpecType.SC_SPEC_TYPE_MAP, map=map)
 
     @classmethod
-    def from_sc_spec_type_set(cls, set: SCSpecTypeSet) -> "SCSpecTypeDef":
+    def from_sc_spec_type_set(cls, set: "SCSpecTypeSet") -> "SCSpecTypeDef":
         return cls(SCSpecType.SC_SPEC_TYPE_SET, set=set)
 
     @classmethod
-    def from_sc_spec_type_tuple(cls, tuple: SCSpecTypeTuple) -> "SCSpecTypeDef":
+    def from_sc_spec_type_tuple(cls, tuple: "SCSpecTypeTuple") -> "SCSpecTypeDef":
         return cls(SCSpecType.SC_SPEC_TYPE_TUPLE, tuple=tuple)
 
     @classmethod
-    def from_sc_spec_type_bytes_n(cls, bytes_n: SCSpecTypeBytesN) -> "SCSpecTypeDef":
+    def from_sc_spec_type_bytes_n(cls, bytes_n: "SCSpecTypeBytesN") -> "SCSpecTypeDef":
         return cls(SCSpecType.SC_SPEC_TYPE_BYTES_N, bytes_n=bytes_n)
 
     @classmethod
-    def from_sc_spec_type_udt(cls, udt: SCSpecTypeUDT) -> "SCSpecTypeDef":
+    def from_sc_spec_type_udt(cls, udt: "SCSpecTypeUDT") -> "SCSpecTypeDef":
         return cls(SCSpecType.SC_SPEC_TYPE_UDT, udt=udt)
 
     def pack(self, packer: Packer) -> None:
@@ -305,27 +309,43 @@ class SCSpecTypeDef:
         if type == SCSpecType.SC_SPEC_TYPE_ADDRESS:
             return cls(type=type)
         if type == SCSpecType.SC_SPEC_TYPE_OPTION:
+            from .sc_spec_type_option import SCSpecTypeOption
+
             option = SCSpecTypeOption.unpack(unpacker)
             return cls(type=type, option=option)
         if type == SCSpecType.SC_SPEC_TYPE_RESULT:
+            from .sc_spec_type_result import SCSpecTypeResult
+
             result = SCSpecTypeResult.unpack(unpacker)
             return cls(type=type, result=result)
         if type == SCSpecType.SC_SPEC_TYPE_VEC:
+            from .sc_spec_type_vec import SCSpecTypeVec
+
             vec = SCSpecTypeVec.unpack(unpacker)
             return cls(type=type, vec=vec)
         if type == SCSpecType.SC_SPEC_TYPE_MAP:
+            from .sc_spec_type_map import SCSpecTypeMap
+
             map = SCSpecTypeMap.unpack(unpacker)
             return cls(type=type, map=map)
         if type == SCSpecType.SC_SPEC_TYPE_SET:
+            from .sc_spec_type_set import SCSpecTypeSet
+
             set = SCSpecTypeSet.unpack(unpacker)
             return cls(type=type, set=set)
         if type == SCSpecType.SC_SPEC_TYPE_TUPLE:
+            from .sc_spec_type_tuple import SCSpecTypeTuple
+
             tuple = SCSpecTypeTuple.unpack(unpacker)
             return cls(type=type, tuple=tuple)
         if type == SCSpecType.SC_SPEC_TYPE_BYTES_N:
+            from .sc_spec_type_bytes_n import SCSpecTypeBytesN
+
             bytes_n = SCSpecTypeBytesN.unpack(unpacker)
             return cls(type=type, bytes_n=bytes_n)
         if type == SCSpecType.SC_SPEC_TYPE_UDT:
+            from .sc_spec_type_udt import SCSpecTypeUDT
+
             udt = SCSpecTypeUDT.unpack(unpacker)
             return cls(type=type, udt=udt)
         return cls(type=type)

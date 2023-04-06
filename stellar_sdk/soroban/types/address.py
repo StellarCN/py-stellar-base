@@ -94,20 +94,14 @@ class Address(BaseScValAlias):
             raise ValueError("Unsupported address type.")
 
     def to_xdr_sc_val(self) -> stellar_xdr.SCVal:
-        return stellar_xdr.SCVal.from_scv_object(
-            stellar_xdr.SCObject.from_sco_address(self.to_xdr_sc_address())
-        )
+        return stellar_xdr.SCVal.from_scv_address(self.to_xdr_sc_address())
 
     @classmethod
     def from_xdr_sc_val(cls, sc_val: stellar_xdr.SCVal) -> "Address":
-        if sc_val.type != stellar_xdr.SCValType.SCV_OBJECT:
+        if sc_val.type != stellar_xdr.SCValType.SCV_ADDRESS:
             raise ValueError("Unsupported SCVal type.")
-        assert sc_val.obj is not None
-        if sc_val.obj.type != stellar_xdr.SCObjectType.SCO_ADDRESS:
-            raise ValueError("Unsupported SCObject type.")
-        sc_address = sc_val.obj.address
-        assert sc_address is not None
-        return cls.from_xdr_sc_address(sc_address)
+        assert sc_val.address is not None
+        return cls.from_xdr_sc_address(sc_val.address)
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):

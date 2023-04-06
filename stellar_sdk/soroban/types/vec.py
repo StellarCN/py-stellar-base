@@ -1,7 +1,7 @@
 from typing import Sequence, Union
 
 from .base import BaseScValAlias
-from ...xdr import SCVal, SCValType, SCVec, SCObject, SCObjectType
+from ... import xdr as stellar_xdr
 
 __all__ = ["Vec"]
 
@@ -12,22 +12,14 @@ class Vec(BaseScValAlias):
     :param vec: The vec value.
     """
 
-    def __init__(self, vec: Sequence[Union[SCVal, BaseScValAlias]]):
+    def __init__(self, vec: Sequence[Union[stellar_xdr.SCVal, BaseScValAlias]]):
         self.vec = [
             sc_val.to_xdr_sc_val() if isinstance(sc_val, BaseScValAlias) else sc_val
             for sc_val in vec
         ]
 
-    def to_xdr_sc_val(self) -> SCVal:
-        return SCVal(
-            SCValType.SCV_OBJECT,
-            obj=SCObject(
-                SCObjectType.SCO_VEC,
-                vec=SCVec(
-                    self.vec,
-                ),
-            ),
-        )
+    def to_xdr_sc_val(self) -> stellar_xdr.SCVal:
+        return stellar_xdr.SCVal.from_scv_vec(stellar_xdr.SCVec(self.vec))
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):

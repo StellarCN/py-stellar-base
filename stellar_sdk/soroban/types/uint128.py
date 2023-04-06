@@ -1,5 +1,5 @@
 from .base import BaseScValAlias
-from ...xdr import SCVal, SCValType, SCObject, SCObjectType, Int128Parts, Uint64
+from ... import xdr as stellar_xdr
 
 __all__ = ["Uint128"]
 
@@ -15,28 +15,19 @@ class Uint128(BaseScValAlias):
             raise ValueError("Invalid Uint128 value.")
         self.value: int = value
 
-    def to_xdr_sc_val(self) -> SCVal:
-        return SCVal(
-            SCValType.SCV_OBJECT,
-            obj=SCObject(
-                SCObjectType.SCO_U128,
-                u128=Int128Parts(
-                    lo=Uint64(self.value & (2**64 - 1)),
-                    hi=Uint64(self.value >> 64),
-                ),
-            ),
+    def to_xdr_sc_val(self) -> stellar_xdr.SCVal:
+        u128 = stellar_xdr.Int128Parts(
+            lo=stellar_xdr.Uint64(self.value & (2**64 - 1)),
+            hi=stellar_xdr.Uint64(self.value >> 64),
         )
+        return stellar_xdr.SCVal.from_scv_u128(u128)
 
     @classmethod
-    def from_xdr_sc_val(cls, sc_val: SCVal) -> "Uint128":
-        assert sc_val.obj is not None
-        if (
-            sc_val.type != SCValType.SCV_OBJECT
-            or sc_val.obj.type != SCObjectType.SCO_U128
-        ):
+    def from_xdr_sc_val(cls, sc_val: stellar_xdr.SCVal) -> "Uint128":
+        if sc_val.type != stellar_xdr.SCValType.SCV_U128:
             raise ValueError("Invalid SCVal value.")
-        assert sc_val.obj.u128 is not None
-        return cls(sc_val.obj.u128.lo.uint64 + (sc_val.obj.u128.hi.uint64 << 64))
+        assert sc_val.u128 is not None
+        return cls(sc_val.u128.lo.uint64 + (sc_val.u128.hi.uint64 << 64))
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):

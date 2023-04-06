@@ -81,13 +81,7 @@ class ContractAuth:
         if self.signature_args:
             # TODO: https://discord.com/channels/897514728459468821/1076723574884282398/1078095366890729595
             signature_args = stellar_xdr.SCVec(
-                [
-                    stellar_xdr.SCVal.from_scv_object(
-                        stellar_xdr.SCObject.from_sco_vec(
-                            stellar_xdr.SCVec(self.signature_args)
-                        )
-                    )
-                ]
+                [stellar_xdr.SCVal.from_scv_vec(stellar_xdr.SCVec(self.signature_args))]
             )
         else:
             signature_args = stellar_xdr.SCVec([])
