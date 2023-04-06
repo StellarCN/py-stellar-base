@@ -3,29 +3,35 @@
 import base64
 from xdrlib import Packer, Unpacker
 
-from .base import String
-from .constants import *
+from .sc_address import SCAddress
 
-__all__ = ["SCSymbol"]
+__all__ = ["SCNonceKey"]
 
 
-class SCSymbol:
+class SCNonceKey:
     """
     XDR Source Code::
 
-        typedef string SCSymbol<SCSYMBOL_LIMIT>;
+        struct SCNonceKey {
+            SCAddress nonce_address;
+        };
     """
 
-    def __init__(self, sc_symbol: bytes) -> None:
-        self.sc_symbol = sc_symbol
+    def __init__(
+        self,
+        nonce_address: SCAddress,
+    ) -> None:
+        self.nonce_address = nonce_address
 
     def pack(self, packer: Packer) -> None:
-        String(self.sc_symbol, SCSYMBOL_LIMIT).pack(packer)
+        self.nonce_address.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "SCSymbol":
-        sc_symbol = String.unpack(unpacker)
-        return cls(sc_symbol)
+    def unpack(cls, unpacker: Unpacker) -> "SCNonceKey":
+        nonce_address = SCAddress.unpack(unpacker)
+        return cls(
+            nonce_address=nonce_address,
+        )
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()
@@ -33,7 +39,7 @@ class SCSymbol:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "SCSymbol":
+    def from_xdr_bytes(cls, xdr: bytes) -> "SCNonceKey":
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -42,14 +48,17 @@ class SCSymbol:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "SCSymbol":
+    def from_xdr(cls, xdr: str) -> "SCNonceKey":
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented
-        return self.sc_symbol == other.sc_symbol
+        return self.nonce_address == other.nonce_address
 
     def __str__(self):
-        return f"<SCSymbol [sc_symbol={self.sc_symbol}]>"
+        out = [
+            f"nonce_address={self.nonce_address}",
+        ]
+        return f"<SCNonceKey [{', '.join(out)}]>"

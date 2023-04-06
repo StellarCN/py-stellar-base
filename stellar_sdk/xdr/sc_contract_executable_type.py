@@ -4,30 +4,28 @@ import base64
 from enum import IntEnum
 from xdrlib import Packer, Unpacker
 
-__all__ = ["ContractEventType"]
+__all__ = ["SCContractExecutableType"]
 
 
-class ContractEventType(IntEnum):
+class SCContractExecutableType(IntEnum):
     """
     XDR Source Code::
 
-        enum ContractEventType
+        enum SCContractExecutableType
         {
-            SYSTEM = 0,
-            CONTRACT = 1,
-            DIAGNOSTIC = 2
+            SCCONTRACT_EXECUTABLE_WASM_REF = 0,
+            SCCONTRACT_EXECUTABLE_TOKEN = 1
         };
     """
 
-    SYSTEM = 0
-    CONTRACT = 1
-    DIAGNOSTIC = 2
+    SCCONTRACT_EXECUTABLE_WASM_REF = 0
+    SCCONTRACT_EXECUTABLE_TOKEN = 1
 
     def pack(self, packer: Packer) -> None:
         packer.pack_int(self.value)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "ContractEventType":
+    def unpack(cls, unpacker: Unpacker) -> "SCContractExecutableType":
         value = unpacker.unpack_int()
         return cls(value)
 
@@ -37,7 +35,7 @@ class ContractEventType(IntEnum):
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "ContractEventType":
+    def from_xdr_bytes(cls, xdr: bytes) -> "SCContractExecutableType":
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -46,6 +44,6 @@ class ContractEventType(IntEnum):
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "ContractEventType":
+    def from_xdr(cls, xdr: str) -> "SCContractExecutableType":
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)

@@ -12,8 +12,6 @@ typedef opaque Thresholds[4];
 typedef string string32<32>;
 typedef string string64<64>;
 typedef int64 SequenceNumber;
-typedef uint64 TimePoint;
-typedef uint64 Duration;
 typedef opaque DataValue<64>;
 typedef Hash PoolID; // SHA256(LiquidityPoolParameters)
 
@@ -507,33 +505,15 @@ struct ContractCodeEntry {
     opaque code<SCVAL_LIMIT>;
 };
 
-enum ConfigSettingType
-{
-    CONFIG_SETTING_TYPE_UINT32 = 0
-};
-
-union ConfigSetting switch (ConfigSettingType type)
-{
-case CONFIG_SETTING_TYPE_UINT32:
-    uint32 uint32Val;
-};
-
 enum ConfigSettingID
 {
-    CONFIG_SETTING_CONTRACT_MAX_SIZE = 0
+    CONFIG_SETTING_CONTRACT_MAX_SIZE_BYTES = 0
 };
 
-struct ConfigSettingEntry
+union ConfigSettingEntry switch (ConfigSettingID configSettingID)
 {
-    union switch (int v)
-    {
-    case 0:
-        void;
-    }
-    ext;
-
-    ConfigSettingID configSettingID;
-    ConfigSetting setting;
+case CONFIG_SETTING_CONTRACT_MAX_SIZE_BYTES:
+    uint32 contractMaxSizeBytes;
 };
 
 struct LedgerEntryExtensionV1

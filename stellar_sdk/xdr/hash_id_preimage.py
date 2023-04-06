@@ -71,7 +71,7 @@ class HashIDPreimage:
             struct
             {
                 Hash networkID;
-                SCContractCode source;
+                SCContractExecutable source;
                 uint256 salt;
             } createContractArgs;
         case ENVELOPE_TYPE_CONTRACT_AUTH:

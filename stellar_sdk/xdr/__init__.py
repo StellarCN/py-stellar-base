@@ -72,11 +72,10 @@ from .clawback_claimable_balance_result_code import ClawbackClaimableBalanceResu
 from .clawback_op import ClawbackOp
 from .clawback_result import ClawbackResult
 from .clawback_result_code import ClawbackResultCode
-from .config_setting import ConfigSetting
 from .config_setting_entry import ConfigSettingEntry
-from .config_setting_entry_ext import ConfigSettingEntryExt
 from .config_setting_id import ConfigSettingID
-from .config_setting_type import ConfigSettingType
+from .config_upgrade_set import ConfigUpgradeSet
+from .config_upgrade_set_key import ConfigUpgradeSetKey
 from .constants import *
 from .contract_auth import ContractAuth
 from .contract_code_entry import ContractCodeEntry
@@ -104,6 +103,7 @@ from .data_entry import DataEntry
 from .data_entry_ext import DataEntryExt
 from .data_value import DataValue
 from .decorated_signature import DecoratedSignature
+from .diagnostic_event import DiagnosticEvent
 from .dont_have import DontHave
 from .duration import Duration
 from .encrypted_body import EncryptedBody
@@ -189,7 +189,6 @@ from .ledger_key_offer import LedgerKeyOffer
 from .ledger_key_trust_line import LedgerKeyTrustLine
 from .ledger_scp_messages import LedgerSCPMessages
 from .ledger_upgrade import LedgerUpgrade
-from .ledger_upgrade_config_setting import LedgerUpgradeConfigSetting
 from .ledger_upgrade_type import LedgerUpgradeType
 from .liabilities import Liabilities
 from .liquidity_pool_constant_product_parameters import (
@@ -229,6 +228,7 @@ from .offer_entry_ext import OfferEntryExt
 from .offer_entry_flags import OfferEntryFlags
 from .operation import Operation
 from .operation_body import OperationBody
+from .operation_diagnostic_events import OperationDiagnosticEvents
 from .operation_events import OperationEvents
 from .operation_meta import OperationMeta
 from .operation_result import OperationResult
@@ -269,8 +269,9 @@ from .revoke_sponsorship_result_code import RevokeSponsorshipResultCode
 from .revoke_sponsorship_type import RevokeSponsorshipType
 from .sc_address import SCAddress
 from .sc_address_type import SCAddressType
-from .sc_contract_code import SCContractCode
-from .sc_contract_code_type import SCContractCodeType
+from .sc_bytes import SCBytes
+from .sc_contract_executable import SCContractExecutable
+from .sc_contract_executable_type import SCContractExecutableType
 from .sc_env_meta_entry import SCEnvMetaEntry
 from .sc_env_meta_kind import SCEnvMetaKind
 from .sc_host_auth_error_code import SCHostAuthErrorCode
@@ -281,8 +282,7 @@ from .sc_host_storage_error_code import SCHostStorageErrorCode
 from .sc_host_val_error_code import SCHostValErrorCode
 from .sc_map import SCMap
 from .sc_map_entry import SCMapEntry
-from .sc_object import SCObject
-from .sc_object_type import SCObjectType
+from .sc_nonce_key import SCNonceKey
 from .sc_spec_entry import SCSpecEntry
 from .sc_spec_entry_kind import SCSpecEntryKind
 from .sc_spec_function_input_v0 import SCSpecFunctionInputV0
@@ -308,9 +308,9 @@ from .sc_spec_udt_union_case_v0 import SCSpecUDTUnionCaseV0
 from .sc_spec_udt_union_case_v0_kind import SCSpecUDTUnionCaseV0Kind
 from .sc_spec_udt_union_case_void_v0 import SCSpecUDTUnionCaseVoidV0
 from .sc_spec_udt_union_v0 import SCSpecUDTUnionV0
-from .sc_static import SCStatic
 from .sc_status import SCStatus
 from .sc_status_type import SCStatusType
+from .sc_string import SCString
 from .sc_symbol import SCSymbol
 from .sc_unknown_error_code import SCUnknownErrorCode
 from .sc_val import SCVal

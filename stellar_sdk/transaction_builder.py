@@ -1221,15 +1221,10 @@ class TransactionBuilder:
         :return: This builder instance.
         """
         invoke_params = [
-            stellar_xdr.SCVal(
-                stellar_xdr.SCValType.SCV_OBJECT,
-                obj=stellar_xdr.SCObject(
-                    stellar_xdr.SCObjectType.SCO_BYTES,
-                    bin=binascii.unhexlify(contract_id),
-                ),
+            stellar_xdr.SCVal.from_scv_bytes(
+                stellar_xdr.SCBytes(binascii.unhexlify(contract_id))
             ),
-            stellar_xdr.SCVal(
-                stellar_xdr.SCValType.SCV_SYMBOL,
+            stellar_xdr.SCVal.from_scv_symbol(
                 sym=stellar_xdr.SCSymbol(sc_symbol=function_name.encode("utf-8")),
             ),
             *parameters,
@@ -1321,8 +1316,8 @@ class TransactionBuilder:
                     stellar_xdr.ContractIDType.CONTRACT_ID_FROM_SOURCE_ACCOUNT,
                     salt=stellar_xdr.Uint256(salt),
                 ),
-                stellar_xdr.SCContractCode(
-                    stellar_xdr.SCContractCodeType.SCCONTRACT_CODE_WASM_REF,
+                stellar_xdr.SCContractExecutable(
+                    stellar_xdr.SCContractExecutableType.SCCONTRACT_EXECUTABLE_WASM_REF,
                     wasm_id=stellar_xdr.Hash(wasm_id),
                 ),
             ),
@@ -1359,8 +1354,8 @@ class TransactionBuilder:
                 stellar_xdr.ContractID(
                     stellar_xdr.ContractIDType.CONTRACT_ID_FROM_ASSET, asset=asset_param
                 ),
-                stellar_xdr.SCContractCode(
-                    stellar_xdr.SCContractCodeType.SCCONTRACT_CODE_TOKEN
+                stellar_xdr.SCContractExecutable(
+                    stellar_xdr.SCContractExecutableType.SCCONTRACT_EXECUTABLE_TOKEN
                 ),
             ),
         )
@@ -1404,8 +1399,8 @@ class TransactionBuilder:
                     stellar_xdr.ContractIDType.CONTRACT_ID_FROM_SOURCE_ACCOUNT,
                     salt=stellar_xdr.Uint256(salt),
                 ),
-                stellar_xdr.SCContractCode(
-                    stellar_xdr.SCContractCodeType.SCCONTRACT_CODE_TOKEN
+                stellar_xdr.SCContractExecutable(
+                    stellar_xdr.SCContractExecutableType.SCCONTRACT_EXECUTABLE_TOKEN
                 ),
             ),
         )

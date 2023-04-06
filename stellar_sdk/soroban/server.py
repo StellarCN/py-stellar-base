@@ -10,6 +10,7 @@ from .soroban_rpc import *
 from .types import Address
 from .. import xdr as stellar_xdr
 from ..account import Account
+from ..strkey import StrKey
 from ..client.base_sync_client import BaseSyncClient
 from ..client.requests_client import RequestsClient
 
@@ -25,13 +26,13 @@ class SorobanServer:
     """Server handles the network connection to a Soroban RPC instance and
     exposes an interface for requests to that instance.
 
-    :param server_url: Soroban RPC server URL. (ex. ``https://horizon-futurenet.stellar.org:443/soroban/rpc``)
+    :param server_url: Soroban RPC server URL. (ex. ``https://rpc-futurenet.stellar.org:443/``)
     :param client: A client instance that will be used to make requests.
     """
 
     def __init__(
         self,
-        server_url: str = "https://horizon-futurenet.stellar.org:443/soroban/rpc",
+        server_url: str = "https://rpc-futurenet.stellar.org:443/",
         client: Optional[BaseSyncClient] = None,
     ) -> None:
         self.server_url: str = server_url
@@ -52,20 +53,6 @@ class SorobanServer:
             method="getHealth",
         )
         return self._post(request, GetHealthResponse)
-
-    def get_account(self, account_id: str) -> GetAccountResponse:
-        """Fetch a minimal set of current info about a Stellar account.
-
-        See `Soroban Documentation - getAccount <https://soroban.stellar.org/api/methods/getAccount>`_
-
-        :return: A :class:`GetAccountResponse <stellar_sdk.soroban_rpc.get_account.GetAccountResponse>` object.
-        """
-        request = Request[GetAccountRequest](
-            id=_generate_unique_request_id(),
-            method="getAccount",
-            params=GetAccountRequest(address=account_id),
-        )
-        return self._post(request, GetAccountResponse)
 
     def get_events(
         self,
@@ -128,22 +115,20 @@ class SorobanServer:
         )
         return self._post(request, GetLedgerEntryResponse)
 
-    def get_transaction_status(
-        self, transaction_hash: str
-    ) -> GetTransactionStatusResponse:
-        """Fetch the status of a transaction.
+    def get_transaction(self, transaction_hash: str) -> GetTransactionResponse:
+        """Fetch the specified transaction.
 
-        See `Soroban Documentation - getTransactionStatus <https://soroban.stellar.org/api/methods/getTransactionStatus>`_
+        See `Soroban Documentation - getTransaction <https://soroban.stellar.org/api/methods/getTransaction>`_
 
         :param transaction_hash: The hash of the transaction to fetch.
-        :return: A :class:`GetTransactionStatusResponse <stellar_sdk.soroban_rpc.get_transaction_status.GetTransactionStatusResponse>` object.
+        :return: A :class:`GetTransactionResponse <stellar_sdk.soroban_rpc.get_transaction_status.GetTransactionResponse>` object.
         """
-        request = Request[GetTransactionStatusRequest](
+        request = Request[GetTransactionRequest](
             id=_generate_unique_request_id(),
-            method="getTransactionStatus",
-            params=GetTransactionStatusRequest(hash=transaction_hash),
+            method="getTransaction",
+            params=GetTransactionRequest(hash=transaction_hash),
         )
-        return self._post(request, GetTransactionStatusResponse)
+        return self._post(request, GetTransactionResponse)
 
     def simulate_transaction(
         self, transaction_envelope: Union[TransactionEnvelope, str]
@@ -197,10 +182,23 @@ class SorobanServer:
         :param account_id: The account ID.
         :return: An :class:`Account <stellar_sdk.account.Account>` object.
         """
-        data = self.get_account(account_id)
-        return Account(account_id, data.sequence)
+        ed25519 = StrKey.decode_ed25519_public_key(account_id)
+        key = stellar_xdr.LedgerKey.from_account(
+            stellar_xdr.LedgerKeyAccount(
+                account_id=stellar_xdr.AccountID(
+                    stellar_xdr.PublicKey.from_public_key_type_ed25519(
+                        stellar_xdr.Uint256(ed25519)
+                    )
+                )
+            )
+        )
 
-    def get_nonce(self,  contract_id: str, account_id: str) -> int:
+        resp = self.get_ledger_entry(key)
+        data = stellar_xdr.LedgerEntryData.from_xdr(resp.xdr)
+        assert data.account is not None
+        return Account(account_id, data.account.seq_num.sequence_number.int64)
+
+    def get_nonce(self, contract_id: str, account_id: str) -> int:
         """Loads nonce from ledger entry if available, otherwise returns 0.
 
         :param contract_id: The contract ID.
@@ -211,10 +209,8 @@ class SorobanServer:
         ledger_key = stellar_xdr.LedgerKey.from_contract_data(
             stellar_xdr.LedgerKeyContractData(
                 contract_id=stellar_xdr.Hash(contract_id_bytes),
-                key=stellar_xdr.SCVal.from_scv_object(
-                    stellar_xdr.SCObject.from_sco_nonce_key(
-                        Address(account_id).to_xdr_sc_address()
-                    )
+                key=stellar_xdr.SCVal.from_scv_ledger_key_nonce(
+                    stellar_xdr.SCNonceKey(Address(account_id).to_xdr_sc_address())
                 ),
             )
         )
@@ -222,9 +218,8 @@ class SorobanServer:
             response = self.get_ledger_entry(ledger_key)
             data = stellar_xdr.LedgerEntryData.from_xdr(response.xdr)
             assert data.contract_data is not None
-            assert data.contract_data.val.obj is not None
-            assert data.contract_data.val.obj.u64 is not None
-            return data.contract_data.val.obj.u64.uint64
+            assert data.contract_data.val.u64 is not None
+            return data.contract_data.val.u64.uint64
         except RequestException as e:
             if e.code == -32600:
                 return 0

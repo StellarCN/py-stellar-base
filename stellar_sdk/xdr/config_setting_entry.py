@@ -3,9 +3,8 @@
 import base64
 from xdrlib import Packer, Unpacker
 
-from .config_setting import ConfigSetting
-from .config_setting_entry_ext import ConfigSettingEntryExt
 from .config_setting_id import ConfigSettingID
+from .uint32 import Uint32
 
 __all__ = ["ConfigSettingEntry"]
 
@@ -14,45 +13,51 @@ class ConfigSettingEntry:
     """
     XDR Source Code::
 
-        struct ConfigSettingEntry
+        union ConfigSettingEntry switch (ConfigSettingID configSettingID)
         {
-            union switch (int v)
-            {
-            case 0:
-                void;
-            }
-            ext;
-
-            ConfigSettingID configSettingID;
-            ConfigSetting setting;
+        case CONFIG_SETTING_CONTRACT_MAX_SIZE_BYTES:
+            uint32 contractMaxSizeBytes;
         };
     """
 
     def __init__(
         self,
-        ext: ConfigSettingEntryExt,
         config_setting_id: ConfigSettingID,
-        setting: ConfigSetting,
+        contract_max_size_bytes: Uint32 = None,
     ) -> None:
-        self.ext = ext
         self.config_setting_id = config_setting_id
-        self.setting = setting
+        self.contract_max_size_bytes = contract_max_size_bytes
+
+    @classmethod
+    def from_config_setting_contract_max_size_bytes(
+        cls, contract_max_size_bytes: Uint32
+    ) -> "ConfigSettingEntry":
+        return cls(
+            ConfigSettingID.CONFIG_SETTING_CONTRACT_MAX_SIZE_BYTES,
+            contract_max_size_bytes=contract_max_size_bytes,
+        )
 
     def pack(self, packer: Packer) -> None:
-        self.ext.pack(packer)
         self.config_setting_id.pack(packer)
-        self.setting.pack(packer)
+        if (
+            self.config_setting_id
+            == ConfigSettingID.CONFIG_SETTING_CONTRACT_MAX_SIZE_BYTES
+        ):
+            if self.contract_max_size_bytes is None:
+                raise ValueError("contract_max_size_bytes should not be None.")
+            self.contract_max_size_bytes.pack(packer)
+            return
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "ConfigSettingEntry":
-        ext = ConfigSettingEntryExt.unpack(unpacker)
         config_setting_id = ConfigSettingID.unpack(unpacker)
-        setting = ConfigSetting.unpack(unpacker)
-        return cls(
-            ext=ext,
-            config_setting_id=config_setting_id,
-            setting=setting,
-        )
+        if config_setting_id == ConfigSettingID.CONFIG_SETTING_CONTRACT_MAX_SIZE_BYTES:
+            contract_max_size_bytes = Uint32.unpack(unpacker)
+            return cls(
+                config_setting_id=config_setting_id,
+                contract_max_size_bytes=contract_max_size_bytes,
+            )
+        return cls(config_setting_id=config_setting_id)
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()
@@ -77,15 +82,14 @@ class ConfigSettingEntry:
         if not isinstance(other, self.__class__):
             return NotImplemented
         return (
-            self.ext == other.ext
-            and self.config_setting_id == other.config_setting_id
-            and self.setting == other.setting
+            self.config_setting_id == other.config_setting_id
+            and self.contract_max_size_bytes == other.contract_max_size_bytes
         )
 
     def __str__(self):
-        out = [
-            f"ext={self.ext}",
-            f"config_setting_id={self.config_setting_id}",
-            f"setting={self.setting}",
-        ]
+        out = []
+        out.append(f"config_setting_id={self.config_setting_id}")
+        out.append(
+            f"contract_max_size_bytes={self.contract_max_size_bytes}"
+        ) if self.contract_max_size_bytes is not None else None
         return f"<ConfigSettingEntry [{', '.join(out)}]>"

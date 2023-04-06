@@ -1,5 +1,5 @@
 from .base import BaseScValAlias
-from ...xdr import SCVal, SCObject, Uint64 as XdrUint64, SCValType, SCObjectType
+from ... import xdr as stellar_xdr
 
 __all__ = ["Uint64"]
 
@@ -15,19 +15,15 @@ class Uint64(BaseScValAlias):
             raise ValueError("Invalid Uint64 value.")
         self.value: int = value
 
-    def to_xdr_sc_val(self) -> SCVal:
-        return SCVal.from_scv_object(SCObject.from_sco_u64(XdrUint64(self.value)))
+    def to_xdr_sc_val(self) -> stellar_xdr.SCVal:
+        return stellar_xdr.SCVal.from_scv_u64(stellar_xdr.Uint64(self.value))
 
     @classmethod
-    def from_xdr_sc_val(cls, sc_val: SCVal) -> "Uint64":
-        assert sc_val.obj is not None
-        if (
-            sc_val.type != SCValType.SCV_OBJECT
-            or sc_val.obj.type != SCObjectType.SCO_U64
-        ):
+    def from_xdr_sc_val(cls, sc_val: stellar_xdr.SCVal) -> "Uint64":
+        if sc_val.type != stellar_xdr.SCValType.SCV_U64:
             raise ValueError("Invalid SCVal value.")
-        assert sc_val.obj.u64 is not None
-        return cls(sc_val.obj.u64.uint64)
+        assert sc_val.u64 is not None
+        return cls(sc_val.u64.uint64)
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):

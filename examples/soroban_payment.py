@@ -7,10 +7,10 @@ import time
 from stellar_sdk import Network, Keypair, TransactionBuilder
 from stellar_sdk import xdr as stellar_xdr
 from stellar_sdk.soroban import AuthorizedInvocation, ContractAuth, SorobanServer
-from stellar_sdk.soroban.soroban_rpc import TransactionStatus
+from stellar_sdk.soroban.soroban_rpc import GetTransactionStatus
 from stellar_sdk.soroban.types import Address, Int128
 
-rpc_server_url = "https://horizon-futurenet.stellar.cash:443/soroban/rpc"
+rpc_server_url = "https://rpc-futurenet.stellar.org:443/"
 soroban_server = SorobanServer(rpc_server_url)
 network_passphrase = Network.FUTURENET_NETWORK_PASSPHRASE
 
@@ -72,14 +72,17 @@ print(f"sent transaction: {send_transaction_data}")
 
 while True:
     print("waiting for transaction to be confirmed...")
-    get_transaction_status_data = soroban_server.get_transaction_status(
-        send_transaction_data.id
-    )
-    if get_transaction_status_data.status != TransactionStatus.PENDING:
+    get_transaction_data = soroban_server.get_transaction(send_transaction_data.hash)
+    if get_transaction_data.status != GetTransactionStatus.NOT_FOUND:
         break
     time.sleep(3)
-print(f"transaction status: {get_transaction_status_data}")
 
-if get_transaction_status_data.status == TransactionStatus.SUCCESS:
-    result = stellar_xdr.SCVal.from_xdr(get_transaction_status_data.results[0].xdr)  # type: ignore
-    print(f"transaction result: {result}")
+print(f"transaction: {get_transaction_data}")
+
+if get_transaction_data.status == GetTransactionStatus.SUCCESS:
+    assert get_transaction_data.result_meta_xdr is not None
+    transaction_meta = stellar_xdr.TransactionMeta.from_xdr(
+        get_transaction_data.result_meta_xdr
+    )
+    result = transaction_meta.v3.tx_result.result.results[0].tr.invoke_host_function_result.success  # type: ignore
+    print(f"Function result: {result}")

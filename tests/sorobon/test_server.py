@@ -6,10 +6,13 @@ from stellar_sdk import xdr as stellar_xdr
 from stellar_sdk.soroban import SorobanServer
 from stellar_sdk.soroban.soroban_rpc import *
 
-RPC_SERVER = "https://horizon-futurenet.stellar.cash/soroban/rpc"
+RPC_SERVER = "https://rpc-futurenet.stellar.org:443/"
 
 
 # TODO: We need automated contract generation and submission
+@pytest.mark.skip(
+    reason="TODO: We need automated contract generation and submission"
+)
 class TestSorobanServer:
     def test_get_health(self):
         with SorobanServer(RPC_SERVER) as server:
@@ -17,17 +20,6 @@ class TestSorobanServer:
             expected_resp = GetHealthResponse(status="healthy")
             assert response == expected_resp
 
-    def test_get_account(self):
-        account_id = "GDAT5HWTGIU4TSSZ4752OUC4SABDLTLZFRPZUJ3D6LKBNEPA7V2CIG54"
-        with SorobanServer(RPC_SERVER) as server:
-            response = server.get_account(account_id)
-            assert isinstance(response, GetAccountResponse)
-            assert response.id == account_id
-            assert response.sequence > 0
-
-    @pytest.mark.skip(
-        reason="TODO: We need automated contract generation and submission"
-    )
     def test_get_events(self):
         start_ledger = 90000
         end_ledger = 90300
@@ -58,13 +50,12 @@ class TestSorobanServer:
             response = server.get_ledger_entry(ledger_key)
             assert isinstance(response, GetLedgerEntryResponse)
 
-    def test_get_transaction_status(self):
+    def test_get_transaction(self):
         tx_id = "d45558a5e00781c676098e8a339c0f7e997239ba8a38d4b7dfb1af7266f827a2"
         with SorobanServer(RPC_SERVER) as server:
-            response = server.get_transaction_status(tx_id)
-            assert isinstance(response, GetTransactionStatusResponse)
-            assert response.id == tx_id
-            assert response.status == TransactionStatus.SUCCESS
+            response = server.get_transaction(tx_id)
+            assert isinstance(response, GetTransactionResponse)
+            assert response.status == GetTransactionStatus.SUCCESS
 
     def test_simulate_transaction(self):
         xdr = "AAAAAgAAAADBPp7TMinJylnn+6dQXJACNc15LF+aJ2Py1BaR4P10JAAAAGQAABt3AAAAAwAAAAAAAAAAAAAAAQAAAAAAAAAYAAAAAAAAAAIAAAAEAAAAAQAAAAYAAAAgLgqw6ZJB+W8bRRRYnVAZlrizavUCFVbd75vDqKtpwMQAAAAFAAAACWluY3JlbWVudAAAAAAAAAIAAAAGLgqw6ZJB+W8bRRRYnVAZlrizavUCFVbd75vDqKtpwMQAAAADAAAAAwAAAAdhzePVa/b9zS2vgzgjO4T/UT45VAsuLjoTRFAB3ze3lwAAAAEAAAAGLgqw6ZJB+W8bRRRYnVAZlrizavUCFVbd75vDqKtpwMQAAAAFAAAAB0NPVU5URVIAAAAAAAAAAAAAAAAB4P10JAAAAECa3YcH7yRCNKEhnPaJDvPXwEQx5p9x6/WeNlRG4ulVAFrrjtgX7+vJm1G5z+DJQgj7iC0aly0dsuqyuPKn1oYK"
@@ -79,4 +70,4 @@ class TestSorobanServer:
         with SorobanServer(RPC_SERVER) as server:
             response = server.send_transaction(xdr)
             assert isinstance(response, SendTransactionResponse)
-            assert response.id == tx_id
+            assert response.hash == tx_id
