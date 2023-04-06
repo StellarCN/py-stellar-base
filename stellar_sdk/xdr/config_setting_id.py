@@ -13,11 +13,11 @@ class ConfigSettingID(IntEnum):
 
         enum ConfigSettingID
         {
-            CONFIG_SETTING_CONTRACT_MAX_SIZE = 0
+            CONFIG_SETTING_CONTRACT_MAX_SIZE_BYTES = 0
         };
     """
 
-    CONFIG_SETTING_CONTRACT_MAX_SIZE = 0
+    CONFIG_SETTING_CONTRACT_MAX_SIZE_BYTES = 0
 
     def pack(self, packer: Packer) -> None:
         packer.pack_int(self.value)

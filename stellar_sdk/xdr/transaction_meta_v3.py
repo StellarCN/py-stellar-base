@@ -6,6 +6,7 @@ from xdrlib import Packer, Unpacker
 
 from .hash import Hash
 from .ledger_entry_changes import LedgerEntryChanges
+from .operation_diagnostic_events import OperationDiagnosticEvents
 from .operation_events import OperationEvents
 from .operation_meta import OperationMeta
 from .transaction_result import TransactionResult
@@ -30,6 +31,11 @@ class TransactionMetaV3:
 
             Hash hashes[3];                     // stores sha256(txChangesBefore, operations, txChangesAfter),
                                                 // sha256(events), and sha256(txResult)
+
+            // Diagnostics events that are not hashed. One list per operation.
+            // This will contain all contract and diagnostic events. Even ones
+            // that were emitted in a failed contract call.
+            OperationDiagnosticEvents diagnosticEvents<>;
         };
     """
 
@@ -41,6 +47,7 @@ class TransactionMetaV3:
         events: List[OperationEvents],
         tx_result: TransactionResult,
         hashes: List[Hash],
+        diagnostic_events: List[OperationDiagnosticEvents],
     ) -> None:
         _expect_max_length = 4294967295
         if operations and len(operations) > _expect_max_length:
@@ -57,12 +64,18 @@ class TransactionMetaV3:
             raise ValueError(
                 f"The length of `hashes` should be {_expect_length}, but got {len(hashes)}."
             )
+        _expect_max_length = 4294967295
+        if diagnostic_events and len(diagnostic_events) > _expect_max_length:
+            raise ValueError(
+                f"The maximum length of `diagnostic_events` should be {_expect_max_length}, but got {len(diagnostic_events)}."
+            )
         self.tx_changes_before = tx_changes_before
         self.operations = operations
         self.tx_changes_after = tx_changes_after
         self.events = events
         self.tx_result = tx_result
         self.hashes = hashes
+        self.diagnostic_events = diagnostic_events
 
     def pack(self, packer: Packer) -> None:
         self.tx_changes_before.pack(packer)
@@ -76,6 +89,9 @@ class TransactionMetaV3:
         self.tx_result.pack(packer)
         for hashes_item in self.hashes:
             hashes_item.pack(packer)
+        packer.pack_uint(len(self.diagnostic_events))
+        for diagnostic_events_item in self.diagnostic_events:
+            diagnostic_events_item.pack(packer)
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "TransactionMetaV3":
@@ -94,6 +110,10 @@ class TransactionMetaV3:
         hashes = []
         for _ in range(length):
             hashes.append(Hash.unpack(unpacker))
+        length = unpacker.unpack_uint()
+        diagnostic_events = []
+        for _ in range(length):
+            diagnostic_events.append(OperationDiagnosticEvents.unpack(unpacker))
         return cls(
             tx_changes_before=tx_changes_before,
             operations=operations,
@@ -101,6 +121,7 @@ class TransactionMetaV3:
             events=events,
             tx_result=tx_result,
             hashes=hashes,
+            diagnostic_events=diagnostic_events,
         )
 
     def to_xdr_bytes(self) -> bytes:
@@ -132,6 +153,7 @@ class TransactionMetaV3:
             and self.events == other.events
             and self.tx_result == other.tx_result
             and self.hashes == other.hashes
+            and self.diagnostic_events == other.diagnostic_events
         )
 
     def __str__(self):
@@ -142,5 +164,6 @@ class TransactionMetaV3:
             f"events={self.events}",
             f"tx_result={self.tx_result}",
             f"hashes={self.hashes}",
+            f"diagnostic_events={self.diagnostic_events}",
         ]
         return f"<TransactionMetaV3 [{', '.join(out)}]>"

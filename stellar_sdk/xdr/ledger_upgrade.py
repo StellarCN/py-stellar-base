@@ -3,7 +3,7 @@
 import base64
 from xdrlib import Packer, Unpacker
 
-from .ledger_upgrade_config_setting import LedgerUpgradeConfigSetting
+from .config_upgrade_set_key import ConfigUpgradeSetKey
 from .ledger_upgrade_type import LedgerUpgradeType
 from .uint32 import Uint32
 
@@ -27,11 +27,7 @@ class LedgerUpgrade:
         case LEDGER_UPGRADE_FLAGS:
             uint32 newFlags; // update flags
         case LEDGER_UPGRADE_CONFIG:
-            struct
-            {
-                ConfigSettingID id; // id to update
-                ConfigSetting setting; // new value
-            } configSetting;
+            ConfigUpgradeSetKey newConfig;
         };
     """
 
@@ -43,7 +39,7 @@ class LedgerUpgrade:
         new_max_tx_set_size: Uint32 = None,
         new_base_reserve: Uint32 = None,
         new_flags: Uint32 = None,
-        config_setting: LedgerUpgradeConfigSetting = None,
+        new_config: ConfigUpgradeSetKey = None,
     ) -> None:
         self.type = type
         self.new_ledger_version = new_ledger_version
@@ -51,7 +47,7 @@ class LedgerUpgrade:
         self.new_max_tx_set_size = new_max_tx_set_size
         self.new_base_reserve = new_base_reserve
         self.new_flags = new_flags
-        self.config_setting = config_setting
+        self.new_config = new_config
 
     @classmethod
     def from_ledger_upgrade_version(cls, new_ledger_version: Uint32) -> "LedgerUpgrade":
@@ -88,11 +84,9 @@ class LedgerUpgrade:
 
     @classmethod
     def from_ledger_upgrade_config(
-        cls, config_setting: LedgerUpgradeConfigSetting
+        cls, new_config: ConfigUpgradeSetKey
     ) -> "LedgerUpgrade":
-        return cls(
-            LedgerUpgradeType.LEDGER_UPGRADE_CONFIG, config_setting=config_setting
-        )
+        return cls(LedgerUpgradeType.LEDGER_UPGRADE_CONFIG, new_config=new_config)
 
     def pack(self, packer: Packer) -> None:
         self.type.pack(packer)
@@ -122,9 +116,9 @@ class LedgerUpgrade:
             self.new_flags.pack(packer)
             return
         if self.type == LedgerUpgradeType.LEDGER_UPGRADE_CONFIG:
-            if self.config_setting is None:
-                raise ValueError("config_setting should not be None.")
-            self.config_setting.pack(packer)
+            if self.new_config is None:
+                raise ValueError("new_config should not be None.")
+            self.new_config.pack(packer)
             return
 
     @classmethod
@@ -146,8 +140,8 @@ class LedgerUpgrade:
             new_flags = Uint32.unpack(unpacker)
             return cls(type=type, new_flags=new_flags)
         if type == LedgerUpgradeType.LEDGER_UPGRADE_CONFIG:
-            config_setting = LedgerUpgradeConfigSetting.unpack(unpacker)
-            return cls(type=type, config_setting=config_setting)
+            new_config = ConfigUpgradeSetKey.unpack(unpacker)
+            return cls(type=type, new_config=new_config)
         return cls(type=type)
 
     def to_xdr_bytes(self) -> bytes:
@@ -179,7 +173,7 @@ class LedgerUpgrade:
             and self.new_max_tx_set_size == other.new_max_tx_set_size
             and self.new_base_reserve == other.new_base_reserve
             and self.new_flags == other.new_flags
-            and self.config_setting == other.config_setting
+            and self.new_config == other.new_config
         )
 
     def __str__(self):
@@ -201,6 +195,6 @@ class LedgerUpgrade:
             f"new_flags={self.new_flags}"
         ) if self.new_flags is not None else None
         out.append(
-            f"config_setting={self.config_setting}"
-        ) if self.config_setting is not None else None
+            f"new_config={self.new_config}"
+        ) if self.new_config is not None else None
         return f"<LedgerUpgrade [{', '.join(out)}]>"

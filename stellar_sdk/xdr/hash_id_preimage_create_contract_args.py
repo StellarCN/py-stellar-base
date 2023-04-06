@@ -4,7 +4,7 @@ import base64
 from xdrlib import Packer, Unpacker
 
 from .hash import Hash
-from .sc_contract_code import SCContractCode
+from .sc_contract_executable import SCContractExecutable
 from .uint256 import Uint256
 
 __all__ = ["HashIDPreimageCreateContractArgs"]
@@ -17,7 +17,7 @@ class HashIDPreimageCreateContractArgs:
         struct
             {
                 Hash networkID;
-                SCContractCode source;
+                SCContractExecutable source;
                 uint256 salt;
             }
     """
@@ -25,7 +25,7 @@ class HashIDPreimageCreateContractArgs:
     def __init__(
         self,
         network_id: Hash,
-        source: SCContractCode,
+        source: SCContractExecutable,
         salt: Uint256,
     ) -> None:
         self.network_id = network_id
@@ -40,7 +40,7 @@ class HashIDPreimageCreateContractArgs:
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "HashIDPreimageCreateContractArgs":
         network_id = Hash.unpack(unpacker)
-        source = SCContractCode.unpack(unpacker)
+        source = SCContractExecutable.unpack(unpacker)
         salt = Uint256.unpack(unpacker)
         return cls(
             network_id=network_id,

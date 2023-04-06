@@ -16,19 +16,23 @@ class SCSpecType(IntEnum):
             SC_SPEC_TYPE_VAL = 0,
 
             // Types with no parameters.
-            SC_SPEC_TYPE_U32 = 1,
-            SC_SPEC_TYPE_I32 = 2,
-            SC_SPEC_TYPE_U64 = 3,
-            SC_SPEC_TYPE_I64 = 4,
-            SC_SPEC_TYPE_U128 = 5,
-            SC_SPEC_TYPE_I128 = 6,
-            SC_SPEC_TYPE_BOOL = 7,
-            SC_SPEC_TYPE_SYMBOL = 8,
-            SC_SPEC_TYPE_BITSET = 9,
-            SC_SPEC_TYPE_STATUS = 10,
-            SC_SPEC_TYPE_BYTES = 11,
-            SC_SPEC_TYPE_INVOKER = 12,
-            SC_SPEC_TYPE_ADDRESS = 13,
+            SC_SPEC_TYPE_BOOL = 1,
+            SC_SPEC_TYPE_VOID = 2,
+            SC_SPEC_TYPE_STATUS = 3,
+            SC_SPEC_TYPE_U32 = 4,
+            SC_SPEC_TYPE_I32 = 5,
+            SC_SPEC_TYPE_U64 = 6,
+            SC_SPEC_TYPE_I64 = 7,
+            SC_SPEC_TYPE_TIMEPOINT = 8,
+            SC_SPEC_TYPE_DURATION = 9,
+            SC_SPEC_TYPE_U128 = 10,
+            SC_SPEC_TYPE_I128 = 11,
+            SC_SPEC_TYPE_U256 = 12,
+            SC_SPEC_TYPE_I256 = 13,
+            SC_SPEC_TYPE_BYTES = 14,
+            SC_SPEC_TYPE_STRING = 16,
+            SC_SPEC_TYPE_SYMBOL = 17,
+            SC_SPEC_TYPE_ADDRESS = 19,
 
             // Types with parameters.
             SC_SPEC_TYPE_OPTION = 1000,
@@ -45,19 +49,23 @@ class SCSpecType(IntEnum):
     """
 
     SC_SPEC_TYPE_VAL = 0
-    SC_SPEC_TYPE_U32 = 1
-    SC_SPEC_TYPE_I32 = 2
-    SC_SPEC_TYPE_U64 = 3
-    SC_SPEC_TYPE_I64 = 4
-    SC_SPEC_TYPE_U128 = 5
-    SC_SPEC_TYPE_I128 = 6
-    SC_SPEC_TYPE_BOOL = 7
-    SC_SPEC_TYPE_SYMBOL = 8
-    SC_SPEC_TYPE_BITSET = 9
-    SC_SPEC_TYPE_STATUS = 10
-    SC_SPEC_TYPE_BYTES = 11
-    SC_SPEC_TYPE_INVOKER = 12
-    SC_SPEC_TYPE_ADDRESS = 13
+    SC_SPEC_TYPE_BOOL = 1
+    SC_SPEC_TYPE_VOID = 2
+    SC_SPEC_TYPE_STATUS = 3
+    SC_SPEC_TYPE_U32 = 4
+    SC_SPEC_TYPE_I32 = 5
+    SC_SPEC_TYPE_U64 = 6
+    SC_SPEC_TYPE_I64 = 7
+    SC_SPEC_TYPE_TIMEPOINT = 8
+    SC_SPEC_TYPE_DURATION = 9
+    SC_SPEC_TYPE_U128 = 10
+    SC_SPEC_TYPE_I128 = 11
+    SC_SPEC_TYPE_U256 = 12
+    SC_SPEC_TYPE_I256 = 13
+    SC_SPEC_TYPE_BYTES = 14
+    SC_SPEC_TYPE_STRING = 16
+    SC_SPEC_TYPE_SYMBOL = 17
+    SC_SPEC_TYPE_ADDRESS = 19
     SC_SPEC_TYPE_OPTION = 1000
     SC_SPEC_TYPE_RESULT = 1001
     SC_SPEC_TYPE_VEC = 1002
