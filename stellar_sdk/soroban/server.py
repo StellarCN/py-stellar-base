@@ -26,13 +26,13 @@ class SorobanServer:
     """Server handles the network connection to a Soroban RPC instance and
     exposes an interface for requests to that instance.
 
-    :param server_url: Soroban RPC server URL. (ex. ``https://horizon-futurenet.stellar.org:443/soroban/rpc``)
+    :param server_url: Soroban RPC server URL. (ex. ``https://rpc-futurenet.stellar.org:443/``)
     :param client: A client instance that will be used to make requests.
     """
 
     def __init__(
         self,
-        server_url: str = "https://horizon-futurenet.stellar.org:443/soroban/rpc",
+        server_url: str = "https://rpc-futurenet.stellar.org:443/",
         client: Optional[BaseSyncClient] = None,
     ) -> None:
         self.server_url: str = server_url
