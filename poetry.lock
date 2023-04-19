@@ -191,14 +191,14 @@ tests-no-zope = ["cloudpickle", "coverage[toml] (>=5.0.2)", "hypothesis", "mypy 
 
 [[package]]
 name = "autoflake"
-version = "2.0.2"
+version = "2.1.1"
 description = "Removes unused imports and unused variables"
 category = "dev"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "autoflake-2.0.2-py3-none-any.whl", hash = "sha256:a82d8efdcbbb7129a8a23238c529fb9d9919c562e26bb7963ea6890fbfff7d02"},
-    {file = "autoflake-2.0.2.tar.gz", hash = "sha256:e0164421ff13f805f08a023e249d84200bd00463d213b490906bfefa67e83830"},
+    {file = "autoflake-2.1.1-py3-none-any.whl", hash = "sha256:94e330a2bcf5ac01384fb2bf98bea60c6383eaa59ea62be486e376622deba985"},
+    {file = "autoflake-2.1.1.tar.gz", hash = "sha256:75524b48d42d6537041d91f17573b8a98cb645642f9f05c7fcc68de10b1cade3"},
 ]
 
 [package.dependencies]
@@ -1345,4 +1345,4 @@ docs = []
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.7,<4.0"
-content-hash = "f269095f8ef4949ff215703ea5d9a9a163d26ef5110614b92ef38b0d3fd3685f"
+content-hash = "98a6efce149b098b7ae291d12967a9ccc18879824c121e964a3a376deffba840"
