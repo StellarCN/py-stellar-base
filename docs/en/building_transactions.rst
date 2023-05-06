@@ -36,7 +36,7 @@ can add a payment operation to the :py:class:`TransactionBuilder <stellar_sdk.tr
 
 After adding the desired operations, call the :py:meth:`build() <stellar_sdk.transaction_builder.TransactionBuilder.build>`
 method on the :py:class:`TransactionBuilder <stellar_sdk.transaction_builder.TransactionBuilder>`.
-This will return a fully constructed :py:class:`TransactionEnvelope <stellar_sdk.transaction_envelop.TransactionEnvelope>`.
+This will return a fully constructed :py:class:`TransactionEnvelope <stellar_sdk.transaction_envelope.TransactionEnvelope>`.
 The transaction object is wrapped in an object called a :py:class:`TransactionEnvelope <stellar_sdk.transaction_envelope.TransactionEnvelope>`,
 the returned transaction will contain
 the sequence number of the source account. This transaction is unsigned.

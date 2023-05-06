@@ -24,6 +24,7 @@ class Keypair:
     * :meth:`Keypair.random`
     * :meth:`Keypair.from_secret`
     * :meth:`Keypair.from_public_key`
+    * :meth:`Keypair.from_mnemonic_phrase`
 
     Learn how to create a key through our documentation:
     `Generate Keypair <https://stellar-sdk.readthedocs.io/en/latest/generate_keypair.html>`__.

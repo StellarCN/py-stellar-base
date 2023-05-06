@@ -718,11 +718,6 @@ Helpers
 ^^^^^^^
 .. autofunction:: stellar_sdk.helpers.parse_transaction_envelope_from_xdr
 
-XDR Utils
-^^^^^^^^^
-.. autofunction:: stellar_sdk.xdr.utils.from_xdr_amount
-.. autofunction:: stellar_sdk.xdr.utils.to_xdr_amount
-
 Stellar Ecosystem Proposals
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 SEP 0001: stellar.toml
@@ -775,6 +770,12 @@ SEP 0011: Txrep: human-readable low-level representation of Stellar transactions
 .. autofunction:: stellar_sdk.sep.txrep.to_txrep
 .. autofunction:: stellar_sdk.sep.txrep.from_txrep
 
+SEP 0035: Operation IDs
+-----------------------
+.. autoclass:: stellar_sdk.sep.toid.TOID
+   :members:
+   :inherited-members:
+
 Exceptions
 ----------
 .. autoclass:: stellar_sdk.sep.exceptions.StellarTomlNotFoundError
@@ -812,6 +813,10 @@ AccountEntryExtensionV2
 AccountEntryExtensionV2Ext
 --------------------------
 .. autoclass:: stellar_sdk.xdr.account_entry_extension_v2_ext.AccountEntryExtensionV2Ext
+
+AccountEntryExtensionV3
+-----------------------
+.. autoclass:: stellar_sdk.xdr.account_entry_extension_v3.AccountEntryExtensionV3
 
 AccountFlags
 ------------
@@ -1109,6 +1114,14 @@ DontHave
 --------
 .. autoclass:: stellar_sdk.xdr.dont_have.DontHave
 
+Double
+------
+.. autoclass:: stellar_sdk.xdr.base.Double
+
+Duration
+--------
+.. autoclass:: stellar_sdk.xdr.duration.Duration
+
 EncryptedBody
 -------------
 .. autoclass:: stellar_sdk.xdr.encrypted_body.EncryptedBody
@@ -1133,6 +1146,10 @@ ErrorCode
 ---------
 .. autoclass:: stellar_sdk.xdr.error_code.ErrorCode
 
+ExtensionPoint
+--------------
+.. autoclass:: stellar_sdk.xdr.extension_point.ExtensionPoint
+
 FeeBumpTransaction
 ------------------
 .. autoclass:: stellar_sdk.xdr.fee_bump_transaction.FeeBumpTransaction
@@ -1149,9 +1166,25 @@ FeeBumpTransactionInnerTx
 -------------------------
 .. autoclass:: stellar_sdk.xdr.fee_bump_transaction_inner_tx.FeeBumpTransactionInnerTx
 
+Float
+-----
+.. autoclass:: stellar_sdk.xdr.base.Float
+
 Hash
 ----
 .. autoclass:: stellar_sdk.xdr.hash.Hash
+
+HashIDPreimage
+--------------
+.. autoclass:: stellar_sdk.xdr.hash_id_preimage.HashIDPreimage
+
+HashIDPreimageOperationID
+-------------------------
+.. autoclass:: stellar_sdk.xdr.hash_id_preimage_operation_id.HashIDPreimageOperationID
+
+HashIDPreimageRevokeID
+----------------------
+.. autoclass:: stellar_sdk.xdr.hash_id_preimage_revoke_id.HashIDPreimageRevokeID
 
 Hello
 -----
@@ -1213,6 +1246,10 @@ Integer
 -------
 .. autoclass:: stellar_sdk.xdr.base.Integer
 
+LedgerBounds
+------------
+.. autoclass:: stellar_sdk.xdr.ledger_bounds.LedgerBounds
+
 LedgerCloseMeta
 ---------------
 .. autoclass:: stellar_sdk.xdr.ledger_close_meta.LedgerCloseMeta
@@ -1268,6 +1305,18 @@ LedgerHeader
 LedgerHeaderExt
 ---------------
 .. autoclass:: stellar_sdk.xdr.ledger_header_ext.LedgerHeaderExt
+
+LedgerHeaderExtensionV1
+-----------------------
+.. autoclass:: stellar_sdk.xdr.ledger_header_extension_v1.LedgerHeaderExtensionV1
+
+LedgerHeaderExtensionV1Ext
+--------------------------
+.. autoclass:: stellar_sdk.xdr.ledger_header_extension_v1_ext.LedgerHeaderExtensionV1Ext
+
+LedgerHeaderFlags
+-----------------
+.. autoclass:: stellar_sdk.xdr.ledger_header_flags.LedgerHeaderFlags
 
 LedgerHeaderHistoryEntry
 ------------------------
@@ -1465,14 +1514,6 @@ OperationBody
 -------------
 .. autoclass:: stellar_sdk.xdr.operation_body.OperationBody
 
-OperationID
------------
-.. autoclass:: stellar_sdk.xdr.operation_id.OperationID
-
-OperationIDId
--------------
-.. autoclass:: stellar_sdk.xdr.operation_id_id.OperationIDId
-
 OperationMeta
 -------------
 .. autoclass:: stellar_sdk.xdr.operation_meta.OperationMeta
@@ -1557,6 +1598,18 @@ PoolID
 ------
 .. autoclass:: stellar_sdk.xdr.pool_id.PoolID
 
+PreconditionType
+----------------
+.. autoclass:: stellar_sdk.xdr.precondition_type.PreconditionType
+
+Preconditions
+-------------
+.. autoclass:: stellar_sdk.xdr.preconditions.Preconditions
+
+PreconditionsV2
+---------------
+.. autoclass:: stellar_sdk.xdr.preconditions_v2.PreconditionsV2
+
 Price
 -----
 .. autoclass:: stellar_sdk.xdr.price.Price
@@ -1637,6 +1690,10 @@ SCPStatementType
 ----------------
 .. autoclass:: stellar_sdk.xdr.scp_statement_type.SCPStatementType
 
+SendMore
+--------
+.. autoclass:: stellar_sdk.xdr.send_more.SendMore
+
 SequenceNumber
 --------------
 .. autoclass:: stellar_sdk.xdr.sequence_number.SequenceNumber
@@ -1688,6 +1745,10 @@ Signer
 SignerKey
 ---------
 .. autoclass:: stellar_sdk.xdr.signer_key.SignerKey
+
+SignerKeyEd25519SignedPayload
+-----------------------------
+.. autoclass:: stellar_sdk.xdr.signer_key_ed25519_signed_payload.SignerKeyEd25519SignedPayload
 
 SignerKeyType
 -------------
@@ -1931,6 +1992,7 @@ Constants
 .. autodata:: stellar_sdk.xdr.constants.MASK_ACCOUNT_FLAGS
 .. autodata:: stellar_sdk.xdr.constants.MASK_ACCOUNT_FLAGS_V17
 .. autodata:: stellar_sdk.xdr.constants.MASK_CLAIMABLE_BALANCE_FLAGS
+.. autodata:: stellar_sdk.xdr.constants.MASK_LEDGER_HEADER_FLAGS
 .. autodata:: stellar_sdk.xdr.constants.MASK_OFFERENTRY_FLAGS
 .. autodata:: stellar_sdk.xdr.constants.MASK_TRUSTLINE_FLAGS
 .. autodata:: stellar_sdk.xdr.constants.MASK_TRUSTLINE_FLAGS_V13
