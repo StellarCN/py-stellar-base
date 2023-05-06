@@ -51,6 +51,7 @@ class SorobanServer:
         request: Request = Request(
             id=_generate_unique_request_id(),
             method="getHealth",
+            params=None,
         )
         return self._post(request, GetHealthResponse)
 
@@ -75,8 +76,7 @@ class SorobanServer:
         """
         pagination = PaginationOptions(cursor=cursor, limit=limit)
         data = GetEventsRequest(
-            startLedger=start_ledger,
-            endLedger=end_ledger,
+            startLedger=str(start_ledger),
             filters=filters,
             pagination=pagination,
         )
@@ -93,6 +93,7 @@ class SorobanServer:
         request: Request = Request(
             id=_generate_unique_request_id(),
             method="getNetwork",
+            params=None,
         )
         return self._post(request, GetNetworkResponse)
 

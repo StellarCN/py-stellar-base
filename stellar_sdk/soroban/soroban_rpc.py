@@ -58,7 +58,7 @@ class PaginationOptions(BaseModel):
 
 class GetEventsRequest(BaseModel):
     start_ledger: str = Field(alias="startLedger")
-    filters: Optional[List[EventFilter]]
+    filters: Optional[Sequence[EventFilter]]
     pagination: Optional[PaginationOptions]
 
 
