@@ -20,27 +20,18 @@ jobs:
         # https://endoflife.date/python
     steps:
       - uses: actions/checkout@v3
+
+      - name: Install poetry
+        run: pipx install poetry
+
       - name: Setup Python ${{ matrix.python-version }} on ${{ matrix.os }}
         uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
-
-      - name: Get pip cache
-        id: pip-cache
-        run: |
-          python -c "from pip._internal.locations import USER_CACHE_DIR; print('::set-output name=dir::' + USER_CACHE_DIR)"
-
-      - uses: actions/cache@v3
-        with:
-          path: ${{ steps.pip-cache.outputs.dir }}
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/poetry.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-pip-
+          cache: 'poetry'
 
       - name: Install dependencies
         run: |
-          python -m pip install --upgrade pip
-          pip install poetry
           poetry install
 
       - name: Test with pytest
@@ -66,27 +57,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+
+      - name: Install poetry
+        run: pipx install poetry
+
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.10'
-
-      - name: Get pip cache
-        id: pip-cache
-        run: |
-          python -c "from pip._internal.locations import USER_CACHE_DIR; print('::set-output name=dir::' + USER_CACHE_DIR)"
-
-      - uses: actions/cache@v3
-        with:
-          path: ${{ steps.pip-cache.outputs.dir }}
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/poetry.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-pip-
+          cache: 'poetry'
 
       - name: Install dependencies
         run: |
-          python -m pip install --upgrade pip
-          pip install poetry
           poetry install
 
       - name: Run mypy check
@@ -101,15 +83,14 @@ jobs:
     if: github.event_name == 'release'
     steps:
       - uses: actions/checkout@v3
+
+      - name: Install poetry
+        run: pipx install poetry
+
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.10'
-
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install poetry
 
       - name: Build Packages
         run: poetry build
