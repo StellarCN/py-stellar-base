@@ -10,9 +10,7 @@ RPC_SERVER = "https://rpc-futurenet.stellar.org:443/"
 
 
 # TODO: We need automated contract generation and submission
-@pytest.mark.skip(
-    reason="TODO: We need automated contract generation and submission"
-)
+@pytest.mark.skip(reason="TODO: We need automated contract generation and submission")
 class TestSorobanServer:
     def test_get_health(self):
         with SorobanServer(RPC_SERVER) as server:
@@ -22,9 +20,8 @@ class TestSorobanServer:
 
     def test_get_events(self):
         start_ledger = 90000
-        end_ledger = 90300
         with SorobanServer(RPC_SERVER) as server:
-            response = server.get_events(start_ledger, end_ledger)
+            response = server.get_events(start_ledger)
             assert isinstance(response, GetEventsResponse)
             assert len(response.events) > 1
 

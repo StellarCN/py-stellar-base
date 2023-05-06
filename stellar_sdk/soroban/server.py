@@ -58,7 +58,6 @@ class SorobanServer:
     def get_events(
         self,
         start_ledger: int,
-        end_ledger: int,
         filters: Sequence[EventFilter] = None,
         cursor: str = None,
         limit: int = None,
@@ -68,7 +67,6 @@ class SorobanServer:
         See `Soroban Documentation - getEvents <https://soroban.stellar.org/api/methods/getEvents>`_
 
         :param start_ledger: The first ledger to include in the results.
-        :param end_ledger: The last ledger to include in the results.
         :param filters: A list of filters to apply to the results.
         :param cursor: A cursor value for use in pagination.
         :param limit: The maximum number of records to return.
