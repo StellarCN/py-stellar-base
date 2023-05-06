@@ -24,7 +24,7 @@ class AuthorizedInvocation:
         contract_id: str,
         function_name: str,
         args: Sequence[Union[stellar_xdr.SCVal, BaseScValAlias]],
-        sub_invocations: Sequence["AuthorizedInvocation"],
+        sub_invocations: Sequence["AuthorizedInvocation"] = None,
     ):
         self.contract_id = contract_id
         self.function_name = function_name
@@ -32,7 +32,7 @@ class AuthorizedInvocation:
             arg if isinstance(arg, stellar_xdr.SCVal) else arg.to_xdr_sc_val()
             for arg in args
         ]
-        self.sub_invocations = sub_invocations
+        self.sub_invocations = [] if sub_invocations is None else sub_invocations
 
     def to_xdr_object(self) -> stellar_xdr.AuthorizedInvocation:
         contract_id = stellar_xdr.Hash(binascii.unhexlify(self.contract_id))
