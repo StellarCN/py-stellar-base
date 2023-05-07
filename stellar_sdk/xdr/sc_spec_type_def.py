@@ -4,7 +4,7 @@
 
 import base64
 from typing import TYPE_CHECKING
-from xdrlib import Packer, Unpacker
+from xdrlib3 import Packer, Unpacker
 from .sc_spec_type import SCSpecType
 
 if TYPE_CHECKING:

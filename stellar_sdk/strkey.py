@@ -2,7 +2,7 @@ import base64
 import binascii
 import struct
 from enum import Enum
-from xdrlib import Packer, Unpacker
+from xdrlib3 import Packer, Unpacker
 
 from . import xdr as stellar_xdr
 from .exceptions import (

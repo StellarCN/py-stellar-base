@@ -1,7 +1,7 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
 import base64
-from xdrlib import Packer, Unpacker
+from xdrlib3 import Packer, Unpacker
 
 from .transaction_history_result_entry_v2_ext import TransactionHistoryResultEntryV2Ext
 from .transaction_result_set_v2 import TransactionResultSetV2

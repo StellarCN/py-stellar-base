@@ -1,7 +1,7 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
 import base64
-from xdrlib import Packer, Unpacker
+from xdrlib3 import Packer, Unpacker
 
 from .sc_spec_entry_kind import SCSpecEntryKind
 from .sc_spec_function_v0 import SCSpecFunctionV0

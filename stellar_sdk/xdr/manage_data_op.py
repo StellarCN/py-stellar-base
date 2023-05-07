@@ -2,7 +2,7 @@
 # DO NOT EDIT or your changes may be overwritten
 import base64
 from typing import Optional
-from xdrlib import Packer, Unpacker
+from xdrlib3 import Packer, Unpacker
 
 from .data_value import DataValue
 from .string64 import String64

@@ -2,7 +2,7 @@
 # DO NOT EDIT or your changes may be overwritten
 import base64
 from typing import List
-from xdrlib import Packer, Unpacker
+from xdrlib3 import Packer, Unpacker
 
 from .generalized_transaction_set import GeneralizedTransactionSet
 from .ledger_header_history_entry import LedgerHeaderHistoryEntry

@@ -4,7 +4,7 @@
 
 import base64
 from typing import Optional, TYPE_CHECKING
-from xdrlib import Packer, Unpacker
+from xdrlib3 import Packer, Unpacker
 
 from .sc_val_type import SCValType
 from .base import Boolean

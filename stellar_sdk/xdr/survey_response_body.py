@@ -1,7 +1,7 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
 import base64
-from xdrlib import Packer, Unpacker
+from xdrlib3 import Packer, Unpacker
 
 from .survey_message_response_type import SurveyMessageResponseType
 from .topology_response_body_v0 import TopologyResponseBodyV0

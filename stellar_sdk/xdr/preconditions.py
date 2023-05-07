@@ -1,7 +1,7 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
 import base64
-from xdrlib import Packer, Unpacker
+from xdrlib3 import Packer, Unpacker
 
 from .precondition_type import PreconditionType
 from .preconditions_v2 import PreconditionsV2

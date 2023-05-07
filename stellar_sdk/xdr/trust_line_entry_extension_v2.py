@@ -1,7 +1,7 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
 import base64
-from xdrlib import Packer, Unpacker
+from xdrlib3 import Packer, Unpacker
 
 from .int32 import Int32
 from .trust_line_entry_extension_v2_ext import TrustLineEntryExtensionV2Ext

@@ -1,7 +1,7 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
 import base64
-from xdrlib import Packer, Unpacker
+from xdrlib3 import Packer, Unpacker
 
 from .sc_host_auth_error_code import SCHostAuthErrorCode
 from .sc_host_context_error_code import SCHostContextErrorCode
