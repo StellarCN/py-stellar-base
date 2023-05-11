@@ -1,5 +1,5 @@
 from typing import Sequence, Union
-from xdrlib import Packer
+from xdrlib3 import Packer
 
 from . import xdr as stellar_xdr
 from .base_transaction_envelope import BaseTransactionEnvelope

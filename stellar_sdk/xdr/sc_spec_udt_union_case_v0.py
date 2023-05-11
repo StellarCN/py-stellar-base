@@ -1,7 +1,7 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
 import base64
-from xdrlib import Packer, Unpacker
+from xdrlib3 import Packer, Unpacker
 
 from .sc_spec_udt_union_case_tuple_v0 import SCSpecUDTUnionCaseTupleV0
 from .sc_spec_udt_union_case_v0_kind import SCSpecUDTUnionCaseV0Kind

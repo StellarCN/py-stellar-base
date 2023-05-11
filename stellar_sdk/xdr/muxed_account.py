@@ -1,7 +1,7 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
 import base64
-from xdrlib import Packer, Unpacker
+from xdrlib3 import Packer, Unpacker
 
 from .crypto_key_type import CryptoKeyType
 from .muxed_account_med25519 import MuxedAccountMed25519
