@@ -57,7 +57,7 @@ urllib3 = ">=1.26.7,<3.0.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^7.3.1"
-pytest-cov = "^4.0.0"
+pytest-cov = "^4.1.0"
 pytest-timeout = "^2.0.1"
 pytest-asyncio = "^0.21.0"
 pytest-httpserver = "^1.0.6"
