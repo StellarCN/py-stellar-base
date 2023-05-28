@@ -33,8 +33,8 @@ class RequestsClient(BaseSyncClient):
 
     :param pool_size: persistent connection to Horizon and connection pool
     :param num_retries: configurable request retry functionality
-    :param request_timeout: the timeout for all GET requests
-    :param post_timeout: the timeout for all POST requests
+    :param request_timeout: the timeout for all GET requests (for each retry)
+    :param post_timeout: the timeout for all POST requests (for each retry)
     :param backoff_factor: a backoff factor to apply between attempts after the second try
     :param session: the request session
     :param stream_session: the stream request session
