@@ -201,12 +201,36 @@ case SST_HOST_AUTH_ERROR:
     SCHostAuthErrorCode authCode;
 };
 
-struct Int128Parts {
-    // Both signed and unsigned 128-bit ints
-    // are transported in a pair of uint64s
-    // to reduce the risk of sign-extension.
-    uint64 lo;
+struct UInt128Parts {
     uint64 hi;
+    uint64 lo;
+};
+
+// A signed int128 has a high sign bit and 127 value bits. We break it into a
+// signed high int64 (that carries the sign bit and the high 63 value bits) and
+// a low unsigned uint64 that carries the low 64 bits. This will sort in
+// generated code in the same order the underlying int128 sorts.
+struct Int128Parts {
+    int64 hi;
+    uint64 lo;
+};
+
+struct UInt256Parts {
+    uint64 hi_hi;
+    uint64 hi_lo;
+    uint64 lo_hi;
+    uint64 lo_lo;
+};
+
+// A signed int256 has a high sign bit and 255 value bits. We break it into a
+// signed high int64 (that carries the sign bit and the high 63 value bits) and
+// three low unsigned `uint64`s that carry the lower bits. This will sort in
+// generated code in the same order the underlying int256 sorts.
+struct Int256Parts {
+    int64 hi_hi;
+    uint64 hi_lo;
+    uint64 lo_hi;
+    uint64 lo_lo;
 };
 
 enum SCContractExecutableType
@@ -279,14 +303,14 @@ case SCV_DURATION:
     Duration duration;
 
 case SCV_U128:
-    Int128Parts u128;
+    UInt128Parts u128;
 case SCV_I128:
     Int128Parts i128;
 
 case SCV_U256:
-    uint256 u256;
+    UInt256Parts u256;
 case SCV_I256:
-    uint256 i256;
+    Int256Parts i256;
 
 case SCV_BYTES:
     SCBytes bytes;

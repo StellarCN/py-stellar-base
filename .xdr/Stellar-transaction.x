@@ -8,6 +8,9 @@
 namespace stellar
 {
 
+// maximum number of operations per transaction
+const MAX_OPS_PER_TX = 100;
+
 union LiquidityPoolParameters switch (LiquidityPoolType type)
 {
 case LIQUIDITY_POOL_CONSTANT_PRODUCT:
@@ -31,13 +34,6 @@ struct DecoratedSignature
 {
     SignatureHint hint;  // last 4 bytes of the public key, used as a hint
     Signature signature; // actual signature
-};
-
-// Ledger key sets touched by a smart contract transaction.
-struct LedgerFootprint
-{
-    LedgerKey readOnly<>;
-    LedgerKey readWrite<>;
 };
 
 enum OperationType
@@ -478,7 +474,7 @@ enum HostFunctionType
 {
     HOST_FUNCTION_TYPE_INVOKE_CONTRACT = 0,
     HOST_FUNCTION_TYPE_CREATE_CONTRACT = 1,
-    HOST_FUNCTION_TYPE_INSTALL_CONTRACT_CODE = 2
+    HOST_FUNCTION_TYPE_UPLOAD_CONTRACT_WASM = 2
 };
 
 enum ContractIDType
@@ -494,7 +490,7 @@ enum ContractIDPublicKeyType
     CONTRACT_ID_PUBLIC_KEY_ED25519 = 1
 };
 
-struct InstallContractCodeArgs
+struct UploadContractWasmArgs
 {
     opaque code<SCVAL_LIMIT>;
 };
@@ -517,17 +513,17 @@ case CONTRACT_ID_FROM_ASSET:
 struct CreateContractArgs
 {
     ContractID contractID;
-    SCContractExecutable source;
+    SCContractExecutable executable;
 };
 
-union HostFunction switch (HostFunctionType type)
+union HostFunctionArgs switch (HostFunctionType type)
 {
 case HOST_FUNCTION_TYPE_INVOKE_CONTRACT:
-    SCVec invokeArgs;
+    SCVec invokeContract;
 case HOST_FUNCTION_TYPE_CREATE_CONTRACT:
-    CreateContractArgs createContractArgs;
-case HOST_FUNCTION_TYPE_INSTALL_CONTRACT_CODE:
-    InstallContractCodeArgs installContractCodeArgs;
+    CreateContractArgs createContract;
+case HOST_FUNCTION_TYPE_UPLOAD_CONTRACT_WASM:
+    UploadContractWasmArgs uploadContractWasm;
 };
 
 struct AuthorizedInvocation
@@ -551,15 +547,22 @@ struct ContractAuth
     SCVec signatureArgs;
 };
 
-struct InvokeHostFunctionOp
-{
-    // The host function to invoke
-    HostFunction function;
-    // The footprint for this invocation
-    LedgerFootprint footprint;
+struct HostFunction {
+    // Arguments of the function to call defined by the function
+    // type.
+    HostFunctionArgs args;
     // Per-address authorizations for this host fn
     // Currently only supported for INVOKE_CONTRACT function
     ContractAuth auth<>;
+};
+
+struct InvokeHostFunctionOp
+{
+    // The host functions to invoke. The functions will be executed
+    // in the same fashion as operations: either all functions will
+    // be successfully applied or all fail if at least one of them
+    // fails.
+    HostFunction functions<MAX_OPS_PER_TX>;
 };
 
 /* An operation is the lowest unit of work that a transaction does */
@@ -675,7 +678,7 @@ case ENVELOPE_TYPE_CREATE_CONTRACT_ARGS:
     struct
     {
         Hash networkID;
-        SCContractExecutable source;
+        SCContractExecutable executable;
         uint256 salt;
     } createContractArgs;
 case ENVELOPE_TYPE_CONTRACT_AUTH:
@@ -772,8 +775,40 @@ case PRECOND_V2:
     PreconditionsV2 v2;
 };
 
-// maximum number of operations per transaction
-const MAX_OPS_PER_TX = 100;
+// Ledger key sets touched by a smart contract transaction.
+struct LedgerFootprint
+{
+    LedgerKey readOnly<>;
+    LedgerKey readWrite<>;
+};
+
+// Resource limits for a Soroban transaction.
+// The transaction will fail if it exceeds any of these limits.
+struct SorobanResources
+{   
+    // The ledger footprint of the transaction.
+    LedgerFootprint footprint;
+    // The maximum number of instructions this transaction can use
+    uint32 instructions; 
+
+    // The maximum number of bytes this transaction can read from ledger
+    uint32 readBytes;
+    // The maximum number of bytes this transaction can write to ledger
+    uint32 writeBytes;
+
+    // Maximum size of dynamic metadata produced by this contract (
+    // currently only includes the events).
+    uint32 extendedMetaDataSizeBytes;
+};
+
+// The transaction extension for Soroban.
+struct SorobanTransactionData
+{
+    SorobanResources resources;
+    // Portion of transaction `fee` allocated to refundable fees.
+    int64 refundableFee;
+    ExtensionPoint ext;
+};
 
 // TransactionV0 is a transaction with the AccountID discriminant stripped off,
 // leaving a raw ed25519 public key to identify the source account. This is used
@@ -835,6 +870,8 @@ struct Transaction
     {
     case 0:
         void;
+    case 1:
+        SorobanTransactionData sorobanData;
     }
     ext;
 };
@@ -1735,15 +1772,17 @@ enum InvokeHostFunctionResultCode
 
     // codes considered as "failure" for the operation
     INVOKE_HOST_FUNCTION_MALFORMED = -1,
-    INVOKE_HOST_FUNCTION_TRAPPED = -2
+    INVOKE_HOST_FUNCTION_TRAPPED = -2,
+    INVOKE_HOST_FUNCTION_RESOURCE_LIMIT_EXCEEDED = -3
 };
 
 union InvokeHostFunctionResult switch (InvokeHostFunctionResultCode code)
 {
 case INVOKE_HOST_FUNCTION_SUCCESS:
-    SCVal success;
+    SCVal success<MAX_OPS_PER_TX>;
 case INVOKE_HOST_FUNCTION_MALFORMED:
 case INVOKE_HOST_FUNCTION_TRAPPED:
+case INVOKE_HOST_FUNCTION_RESOURCE_LIMIT_EXCEEDED:
     void;
 };
 
@@ -1850,7 +1889,9 @@ enum TransactionResultCode
     txBAD_SPONSORSHIP = -14,       // sponsorship not confirmed
     txBAD_MIN_SEQ_AGE_OR_GAP =
         -15, // minSeqAge or minSeqLedgerGap conditions not met
-    txMALFORMED = -16 // precondition is invalid
+    txMALFORMED = -16, // precondition is invalid
+    // declared Soroban resource usage exceeds the network limit
+    txSOROBAN_RESOURCE_LIMIT_EXCEEDED = -17
 };
 
 // InnerTransactionResult must be binary compatible with TransactionResult
@@ -1881,6 +1922,7 @@ struct InnerTransactionResult
     case txBAD_SPONSORSHIP:
     case txBAD_MIN_SEQ_AGE_OR_GAP:
     case txMALFORMED:
+    case txSOROBAN_RESOURCE_LIMIT_EXCEEDED:
         void;
     }
     result;
@@ -1927,6 +1969,7 @@ struct TransactionResult
     case txBAD_SPONSORSHIP:
     case txBAD_MIN_SEQ_AGE_OR_GAP:
     case txMALFORMED:
+    case txSOROBAN_RESOURCE_LIMIT_EXCEEDED:
         void;
     }
     result;
