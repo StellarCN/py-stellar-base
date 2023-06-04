@@ -72,6 +72,13 @@ from .clawback_claimable_balance_result_code import ClawbackClaimableBalanceResu
 from .clawback_op import ClawbackOp
 from .clawback_result import ClawbackResult
 from .clawback_result_code import ClawbackResultCode
+from .config_setting_contract_bandwidth_v0 import ConfigSettingContractBandwidthV0
+from .config_setting_contract_compute_v0 import ConfigSettingContractComputeV0
+from .config_setting_contract_historical_data_v0 import (
+    ConfigSettingContractHistoricalDataV0,
+)
+from .config_setting_contract_ledger_cost_v0 import ConfigSettingContractLedgerCostV0
+from .config_setting_contract_meta_data_v0 import ConfigSettingContractMetaDataV0
 from .config_setting_entry import ConfigSettingEntry
 from .config_setting_id import ConfigSettingID
 from .config_upgrade_set import ConfigUpgradeSet
@@ -79,6 +86,9 @@ from .config_upgrade_set_key import ConfigUpgradeSetKey
 from .constants import *
 from .contract_auth import ContractAuth
 from .contract_code_entry import ContractCodeEntry
+from .contract_cost_param_entry import ContractCostParamEntry
+from .contract_cost_params import ContractCostParams
+from .contract_cost_type import ContractCostType
 from .contract_data_entry import ContractDataEntry
 from .contract_event import ContractEvent
 from .contract_event_body import ContractEventBody
@@ -138,6 +148,7 @@ from .hello import Hello
 from .hmac_sha256_key import HmacSha256Key
 from .hmac_sha256_mac import HmacSha256Mac
 from .host_function import HostFunction
+from .host_function_args import HostFunctionArgs
 from .host_function_type import HostFunctionType
 from .inflation_payout import InflationPayout
 from .inflation_result import InflationResult
@@ -146,10 +157,10 @@ from .inner_transaction_result import InnerTransactionResult
 from .inner_transaction_result_ext import InnerTransactionResultExt
 from .inner_transaction_result_pair import InnerTransactionResultPair
 from .inner_transaction_result_result import InnerTransactionResultResult
-from .install_contract_code_args import InstallContractCodeArgs
 from .int32 import Int32
 from .int64 import Int64
 from .int128_parts import Int128Parts
+from .int256_parts import Int256Parts
 from .invoke_host_function_op import InvokeHostFunctionOp
 from .invoke_host_function_result import InvokeHostFunctionResult
 from .invoke_host_function_result_code import InvokeHostFunctionResultCode
@@ -282,6 +293,9 @@ from .sc_host_storage_error_code import SCHostStorageErrorCode
 from .sc_host_val_error_code import SCHostValErrorCode
 from .sc_map import SCMap
 from .sc_map_entry import SCMapEntry
+from .sc_meta_entry import SCMetaEntry
+from .sc_meta_kind import SCMetaKind
+from .sc_meta_v0 import SCMetaV0
 from .sc_nonce_key import SCNonceKey
 from .sc_spec_entry import SCSpecEntry
 from .sc_spec_entry_kind import SCSpecEntryKind
@@ -346,6 +360,8 @@ from .signer_key import SignerKey
 from .signer_key_ed25519_signed_payload import SignerKeyEd25519SignedPayload
 from .signer_key_type import SignerKeyType
 from .simple_payment_result import SimplePaymentResult
+from .soroban_resources import SorobanResources
+from .soroban_transaction_data import SorobanTransactionData
 from .sponsorship_descriptor import SponsorshipDescriptor
 from .stellar_message import StellarMessage
 from .stellar_value import StellarValue
@@ -414,9 +430,12 @@ from .tx_set_component_txs_maybe_discounted_fee import (
     TxSetComponentTxsMaybeDiscountedFee,
 )
 from .tx_set_component_type import TxSetComponentType
+from .u_int128_parts import UInt128Parts
+from .u_int256_parts import UInt256Parts
 from .uint32 import Uint32
 from .uint64 import Uint64
 from .uint256 import Uint256
 from .upgrade_entry_meta import UpgradeEntryMeta
 from .upgrade_type import UpgradeType
+from .upload_contract_wasm_args import UploadContractWasmArgs
 from .value import Value

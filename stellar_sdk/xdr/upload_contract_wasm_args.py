@@ -3,41 +3,36 @@
 import base64
 from xdrlib3 import Packer, Unpacker
 
-from .int64 import Int64
-from .uint64 import Uint64
+from .base import Opaque
+from .constants import *
 
-__all__ = ["Int128Parts"]
+__all__ = ["UploadContractWasmArgs"]
 
 
-class Int128Parts:
+class UploadContractWasmArgs:
     """
     XDR Source Code::
 
-        struct Int128Parts {
-            int64 hi;
-            uint64 lo;
+        struct UploadContractWasmArgs
+        {
+            opaque code<SCVAL_LIMIT>;
         };
     """
 
     def __init__(
         self,
-        hi: Int64,
-        lo: Uint64,
+        code: bytes,
     ) -> None:
-        self.hi = hi
-        self.lo = lo
+        self.code = code
 
     def pack(self, packer: Packer) -> None:
-        self.hi.pack(packer)
-        self.lo.pack(packer)
+        Opaque(self.code, SCVAL_LIMIT, False).pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "Int128Parts":
-        hi = Int64.unpack(unpacker)
-        lo = Uint64.unpack(unpacker)
+    def unpack(cls, unpacker: Unpacker) -> "UploadContractWasmArgs":
+        code = Opaque.unpack(unpacker, SCVAL_LIMIT, False)
         return cls(
-            hi=hi,
-            lo=lo,
+            code=code,
         )
 
     def to_xdr_bytes(self) -> bytes:
@@ -46,7 +41,7 @@ class Int128Parts:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "Int128Parts":
+    def from_xdr_bytes(cls, xdr: bytes) -> "UploadContractWasmArgs":
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -55,18 +50,17 @@ class Int128Parts:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "Int128Parts":
+    def from_xdr(cls, xdr: str) -> "UploadContractWasmArgs":
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented
-        return self.hi == other.hi and self.lo == other.lo
+        return self.code == other.code
 
     def __str__(self):
         out = [
-            f"hi={self.hi}",
-            f"lo={self.lo}",
+            f"code={self.code}",
         ]
-        return f"<Int128Parts [{', '.join(out)}]>"
+        return f"<UploadContractWasmArgs [{', '.join(out)}]>"

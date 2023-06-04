@@ -38,6 +38,7 @@ class TransactionResultResult:
             case txBAD_SPONSORSHIP:
             case txBAD_MIN_SEQ_AGE_OR_GAP:
             case txMALFORMED:
+            case txSOROBAN_RESOURCE_LIMIT_EXCEEDED:
                 void;
             }
     """
@@ -143,6 +144,10 @@ class TransactionResultResult:
     def from_tx_malformed(cls) -> "TransactionResultResult":
         return cls(TransactionResultCode.txMALFORMED)
 
+    @classmethod
+    def from_tx_soroban_resource_limit_exceeded(cls) -> "TransactionResultResult":
+        return cls(TransactionResultCode.txSOROBAN_RESOURCE_LIMIT_EXCEEDED)
+
     def pack(self, packer: Packer) -> None:
         self.code.pack(packer)
         if self.code == TransactionResultCode.txFEE_BUMP_INNER_SUCCESS:
@@ -197,6 +202,8 @@ class TransactionResultResult:
             return
         if self.code == TransactionResultCode.txMALFORMED:
             return
+        if self.code == TransactionResultCode.txSOROBAN_RESOURCE_LIMIT_EXCEEDED:
+            return
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "TransactionResultResult":
@@ -246,6 +253,8 @@ class TransactionResultResult:
         if code == TransactionResultCode.txBAD_MIN_SEQ_AGE_OR_GAP:
             return cls(code=code)
         if code == TransactionResultCode.txMALFORMED:
+            return cls(code=code)
+        if code == TransactionResultCode.txSOROBAN_RESOURCE_LIMIT_EXCEEDED:
             return cls(code=code)
         return cls(code=code)
 

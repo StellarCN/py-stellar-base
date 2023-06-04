@@ -4,26 +4,26 @@ import base64
 from enum import IntEnum
 from xdrlib3 import Packer, Unpacker
 
-__all__ = ["ConfigSettingType"]
+__all__ = ["SCMetaKind"]
 
 
-class ConfigSettingType(IntEnum):
+class SCMetaKind(IntEnum):
     """
     XDR Source Code::
 
-        enum ConfigSettingType
+        enum SCMetaKind
         {
-            CONFIG_SETTING_TYPE_UINT32 = 0
+            SC_META_V0 = 0
         };
     """
 
-    CONFIG_SETTING_TYPE_UINT32 = 0
+    SC_META_V0 = 0
 
     def pack(self, packer: Packer) -> None:
         packer.pack_int(self.value)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "ConfigSettingType":
+    def unpack(cls, unpacker: Unpacker) -> "SCMetaKind":
         value = unpacker.unpack_int()
         return cls(value)
 
@@ -33,7 +33,7 @@ class ConfigSettingType(IntEnum):
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "ConfigSettingType":
+    def from_xdr_bytes(cls, xdr: bytes) -> "SCMetaKind":
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -42,6 +42,6 @@ class ConfigSettingType(IntEnum):
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "ConfigSettingType":
+    def from_xdr(cls, xdr: str) -> "SCMetaKind":
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)

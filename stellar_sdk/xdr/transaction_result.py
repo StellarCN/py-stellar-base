@@ -41,6 +41,7 @@ class TransactionResult:
             case txBAD_SPONSORSHIP:
             case txBAD_MIN_SEQ_AGE_OR_GAP:
             case txMALFORMED:
+            case txSOROBAN_RESOURCE_LIMIT_EXCEEDED:
                 void;
             }
             result;

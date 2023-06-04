@@ -43,6 +43,8 @@ class Transaction:
             {
             case 0:
                 void;
+            case 1:
+                SorobanTransactionData sorobanData;
             }
             ext;
         };
