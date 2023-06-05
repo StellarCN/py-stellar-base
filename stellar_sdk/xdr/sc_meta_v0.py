@@ -3,39 +3,42 @@
 import base64
 from xdrlib3 import Packer, Unpacker
 
-from .base import Integer
+from .base import String
 
-__all__ = ["ConfigSettingEntryExt"]
+__all__ = ["SCMetaV0"]
 
 
-class ConfigSettingEntryExt:
+class SCMetaV0:
     """
     XDR Source Code::
 
-        union switch (int v)
-            {
-            case 0:
-                void;
-            }
+        struct SCMetaV0
+        {
+            string key<>;
+            string val<>;
+        };
     """
 
     def __init__(
         self,
-        v: int,
+        key: bytes,
+        val: bytes,
     ) -> None:
-        self.v = v
+        self.key = key
+        self.val = val
 
     def pack(self, packer: Packer) -> None:
-        Integer(self.v).pack(packer)
-        if self.v == 0:
-            return
+        String(self.key, 4294967295).pack(packer)
+        String(self.val, 4294967295).pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "ConfigSettingEntryExt":
-        v = Integer.unpack(unpacker)
-        if v == 0:
-            return cls(v=v)
-        return cls(v=v)
+    def unpack(cls, unpacker: Unpacker) -> "SCMetaV0":
+        key = String.unpack(unpacker)
+        val = String.unpack(unpacker)
+        return cls(
+            key=key,
+            val=val,
+        )
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()
@@ -43,7 +46,7 @@ class ConfigSettingEntryExt:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "ConfigSettingEntryExt":
+    def from_xdr_bytes(cls, xdr: bytes) -> "SCMetaV0":
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -52,16 +55,18 @@ class ConfigSettingEntryExt:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "ConfigSettingEntryExt":
+    def from_xdr(cls, xdr: str) -> "SCMetaV0":
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented
-        return self.v == other.v
+        return self.key == other.key and self.val == other.val
 
     def __str__(self):
-        out = []
-        out.append(f"v={self.v}")
-        return f"<ConfigSettingEntryExt [{', '.join(out)}]>"
+        out = [
+            f"key={self.key}",
+            f"val={self.val}",
+        ]
+        return f"<SCMetaV0 [{', '.join(out)}]>"

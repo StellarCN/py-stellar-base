@@ -4,9 +4,8 @@ import base64
 from typing import List
 from xdrlib3 import Packer, Unpacker
 
-from .contract_auth import ContractAuth
+from .constants import *
 from .host_function import HostFunction
-from .ledger_footprint import LedgerFootprint
 
 __all__ = ["InvokeHostFunctionOp"]
 
@@ -17,50 +16,38 @@ class InvokeHostFunctionOp:
 
         struct InvokeHostFunctionOp
         {
-            // The host function to invoke
-            HostFunction function;
-            // The footprint for this invocation
-            LedgerFootprint footprint;
-            // Per-address authorizations for this host fn
-            // Currently only supported for INVOKE_CONTRACT function
-            ContractAuth auth<>;
+            // The host functions to invoke. The functions will be executed
+            // in the same fashion as operations: either all functions will
+            // be successfully applied or all fail if at least one of them
+            // fails.
+            HostFunction functions<MAX_OPS_PER_TX>;
         };
     """
 
     def __init__(
         self,
-        function: HostFunction,
-        footprint: LedgerFootprint,
-        auth: List[ContractAuth],
+        functions: List[HostFunction],
     ) -> None:
-        _expect_max_length = 4294967295
-        if auth and len(auth) > _expect_max_length:
+        _expect_max_length = MAX_OPS_PER_TX
+        if functions and len(functions) > _expect_max_length:
             raise ValueError(
-                f"The maximum length of `auth` should be {_expect_max_length}, but got {len(auth)}."
+                f"The maximum length of `functions` should be {_expect_max_length}, but got {len(functions)}."
             )
-        self.function = function
-        self.footprint = footprint
-        self.auth = auth
+        self.functions = functions
 
     def pack(self, packer: Packer) -> None:
-        self.function.pack(packer)
-        self.footprint.pack(packer)
-        packer.pack_uint(len(self.auth))
-        for auth_item in self.auth:
-            auth_item.pack(packer)
+        packer.pack_uint(len(self.functions))
+        for functions_item in self.functions:
+            functions_item.pack(packer)
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "InvokeHostFunctionOp":
-        function = HostFunction.unpack(unpacker)
-        footprint = LedgerFootprint.unpack(unpacker)
         length = unpacker.unpack_uint()
-        auth = []
+        functions = []
         for _ in range(length):
-            auth.append(ContractAuth.unpack(unpacker))
+            functions.append(HostFunction.unpack(unpacker))
         return cls(
-            function=function,
-            footprint=footprint,
-            auth=auth,
+            functions=functions,
         )
 
     def to_xdr_bytes(self) -> bytes:
@@ -85,16 +72,10 @@ class InvokeHostFunctionOp:
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented
-        return (
-            self.function == other.function
-            and self.footprint == other.footprint
-            and self.auth == other.auth
-        )
+        return self.functions == other.functions
 
     def __str__(self):
         out = [
-            f"function={self.function}",
-            f"footprint={self.footprint}",
-            f"auth={self.auth}",
+            f"functions={self.functions}",
         ]
         return f"<InvokeHostFunctionOp [{', '.join(out)}]>"

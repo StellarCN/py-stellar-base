@@ -105,7 +105,7 @@ class TestTransaction:
         ops = [Payment(destination, asset, amount), ManageData("hello", "world")]
 
         tx_object = Transaction(
-            source, sequence, fee, ops, memo, cond, True
+            source, sequence, fee, ops, memo, cond, None, True
         ).to_xdr_object()
         restore_transaction = Transaction.from_xdr(tx_object.to_xdr(), True)
         assert isinstance(restore_transaction, Transaction)
@@ -130,7 +130,7 @@ class TestTransaction:
         ops = [Payment(destination, asset, amount), ManageData("hello", "world")]
 
         tx_object = Transaction(
-            source, sequence, fee, ops, memo, cond, True
+            source, sequence, fee, ops, memo, cond, None, True
         ).to_xdr_object()
         restore_transaction = Transaction.from_xdr(tx_object.to_xdr(), True)
         assert isinstance(restore_transaction, Transaction)

@@ -16,29 +16,29 @@ class CreateContractArgs:
         struct CreateContractArgs
         {
             ContractID contractID;
-            SCContractExecutable source;
+            SCContractExecutable executable;
         };
     """
 
     def __init__(
         self,
         contract_id: ContractID,
-        source: SCContractExecutable,
+        executable: SCContractExecutable,
     ) -> None:
         self.contract_id = contract_id
-        self.source = source
+        self.executable = executable
 
     def pack(self, packer: Packer) -> None:
         self.contract_id.pack(packer)
-        self.source.pack(packer)
+        self.executable.pack(packer)
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "CreateContractArgs":
         contract_id = ContractID.unpack(unpacker)
-        source = SCContractExecutable.unpack(unpacker)
+        executable = SCContractExecutable.unpack(unpacker)
         return cls(
             contract_id=contract_id,
-            source=source,
+            executable=executable,
         )
 
     def to_xdr_bytes(self) -> bytes:
@@ -63,11 +63,14 @@ class CreateContractArgs:
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented
-        return self.contract_id == other.contract_id and self.source == other.source
+        return (
+            self.contract_id == other.contract_id
+            and self.executable == other.executable
+        )
 
     def __str__(self):
         out = [
             f"contract_id={self.contract_id}",
-            f"source={self.source}",
+            f"executable={self.executable}",
         ]
         return f"<CreateContractArgs [{', '.join(out)}]>"

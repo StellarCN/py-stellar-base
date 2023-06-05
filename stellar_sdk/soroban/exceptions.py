@@ -5,7 +5,7 @@ from ..exceptions import SdkError
 
 # TODO: define more specific exceptions
 class RequestException(SdkError):
-    def __init__(self, code: int, message: Optional[str]):
+    def __init__(self, code: Optional[int], message: Optional[str]):
         self.code = code
         self.message = message
         super().__init__(

@@ -14,6 +14,7 @@ if TYPE_CHECKING:
     from .int32 import Int32
     from .int64 import Int64
     from .int128_parts import Int128Parts
+    from .int256_parts import Int256Parts
     from .sc_address import SCAddress
     from .sc_bytes import SCBytes
     from .sc_contract_executable import SCContractExecutable
@@ -26,7 +27,8 @@ if TYPE_CHECKING:
     from .time_point import TimePoint
     from .uint32 import Uint32
     from .uint64 import Uint64
-    from .uint256 import Uint256
+    from .u_int128_parts import UInt128Parts
+    from .u_int256_parts import UInt256Parts
 
 __all__ = ["SCVal"]
 
@@ -60,14 +62,14 @@ class SCVal:
             Duration duration;
 
         case SCV_U128:
-            Int128Parts u128;
+            UInt128Parts u128;
         case SCV_I128:
             Int128Parts i128;
 
         case SCV_U256:
-            uint256 u256;
+            UInt256Parts u256;
         case SCV_I256:
-            uint256 i256;
+            Int256Parts i256;
 
         case SCV_BYTES:
             SCBytes bytes;
@@ -108,10 +110,10 @@ class SCVal:
         i64: "Int64" = None,
         timepoint: "TimePoint" = None,
         duration: "Duration" = None,
-        u128: "Int128Parts" = None,
+        u128: "UInt128Parts" = None,
         i128: "Int128Parts" = None,
-        u256: "Uint256" = None,
-        i256: "Uint256" = None,
+        u256: "UInt256Parts" = None,
+        i256: "Int256Parts" = None,
         bytes: "SCBytes" = None,
         str: "SCString" = None,
         sym: "SCSymbol" = None,
@@ -180,7 +182,7 @@ class SCVal:
         return cls(SCValType.SCV_DURATION, duration=duration)
 
     @classmethod
-    def from_scv_u128(cls, u128: "Int128Parts") -> "SCVal":
+    def from_scv_u128(cls, u128: "UInt128Parts") -> "SCVal":
         return cls(SCValType.SCV_U128, u128=u128)
 
     @classmethod
@@ -188,11 +190,11 @@ class SCVal:
         return cls(SCValType.SCV_I128, i128=i128)
 
     @classmethod
-    def from_scv_u256(cls, u256: "Uint256") -> "SCVal":
+    def from_scv_u256(cls, u256: "UInt256Parts") -> "SCVal":
         return cls(SCValType.SCV_U256, u256=u256)
 
     @classmethod
-    def from_scv_i256(cls, i256: "Uint256") -> "SCVal":
+    def from_scv_i256(cls, i256: "Int256Parts") -> "SCVal":
         return cls(SCValType.SCV_I256, i256=i256)
 
     @classmethod
@@ -390,9 +392,9 @@ class SCVal:
             duration = Duration.unpack(unpacker)
             return cls(type=type, duration=duration)
         if type == SCValType.SCV_U128:
-            from .int128_parts import Int128Parts
+            from .u_int128_parts import UInt128Parts
 
-            u128 = Int128Parts.unpack(unpacker)
+            u128 = UInt128Parts.unpack(unpacker)
             return cls(type=type, u128=u128)
         if type == SCValType.SCV_I128:
             from .int128_parts import Int128Parts
@@ -400,14 +402,14 @@ class SCVal:
             i128 = Int128Parts.unpack(unpacker)
             return cls(type=type, i128=i128)
         if type == SCValType.SCV_U256:
-            from .uint256 import Uint256
+            from .u_int256_parts import UInt256Parts
 
-            u256 = Uint256.unpack(unpacker)
+            u256 = UInt256Parts.unpack(unpacker)
             return cls(type=type, u256=u256)
         if type == SCValType.SCV_I256:
-            from .uint256 import Uint256
+            from .int256_parts import Int256Parts
 
-            i256 = Uint256.unpack(unpacker)
+            i256 = Int256Parts.unpack(unpacker)
             return cls(type=type, i256=i256)
         if type == SCValType.SCV_BYTES:
             from .sc_bytes import SCBytes

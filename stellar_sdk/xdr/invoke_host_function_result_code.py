@@ -18,13 +18,15 @@ class InvokeHostFunctionResultCode(IntEnum):
 
             // codes considered as "failure" for the operation
             INVOKE_HOST_FUNCTION_MALFORMED = -1,
-            INVOKE_HOST_FUNCTION_TRAPPED = -2
+            INVOKE_HOST_FUNCTION_TRAPPED = -2,
+            INVOKE_HOST_FUNCTION_RESOURCE_LIMIT_EXCEEDED = -3
         };
     """
 
     INVOKE_HOST_FUNCTION_SUCCESS = 0
     INVOKE_HOST_FUNCTION_MALFORMED = -1
     INVOKE_HOST_FUNCTION_TRAPPED = -2
+    INVOKE_HOST_FUNCTION_RESOURCE_LIMIT_EXCEEDED = -3
 
     def pack(self, packer: Packer) -> None:
         packer.pack_int(self.value)

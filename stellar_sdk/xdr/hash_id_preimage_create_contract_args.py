@@ -17,7 +17,7 @@ class HashIDPreimageCreateContractArgs:
         struct
             {
                 Hash networkID;
-                SCContractExecutable source;
+                SCContractExecutable executable;
                 uint256 salt;
             }
     """
@@ -25,26 +25,26 @@ class HashIDPreimageCreateContractArgs:
     def __init__(
         self,
         network_id: Hash,
-        source: SCContractExecutable,
+        executable: SCContractExecutable,
         salt: Uint256,
     ) -> None:
         self.network_id = network_id
-        self.source = source
+        self.executable = executable
         self.salt = salt
 
     def pack(self, packer: Packer) -> None:
         self.network_id.pack(packer)
-        self.source.pack(packer)
+        self.executable.pack(packer)
         self.salt.pack(packer)
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "HashIDPreimageCreateContractArgs":
         network_id = Hash.unpack(unpacker)
-        source = SCContractExecutable.unpack(unpacker)
+        executable = SCContractExecutable.unpack(unpacker)
         salt = Uint256.unpack(unpacker)
         return cls(
             network_id=network_id,
-            source=source,
+            executable=executable,
             salt=salt,
         )
 
@@ -72,14 +72,14 @@ class HashIDPreimageCreateContractArgs:
             return NotImplemented
         return (
             self.network_id == other.network_id
-            and self.source == other.source
+            and self.executable == other.executable
             and self.salt == other.salt
         )
 
     def __str__(self):
         out = [
             f"network_id={self.network_id}",
-            f"source={self.source}",
+            f"executable={self.executable}",
             f"salt={self.salt}",
         ]
         return f"<HashIDPreimageCreateContractArgs [{', '.join(out)}]>"

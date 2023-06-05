@@ -1,8 +1,10 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
 import base64
+from typing import List
 from xdrlib3 import Packer, Unpacker
 
+from .constants import *
 from .invoke_host_function_result_code import InvokeHostFunctionResultCode
 from .sc_val import SCVal
 
@@ -16,9 +18,10 @@ class InvokeHostFunctionResult:
         union InvokeHostFunctionResult switch (InvokeHostFunctionResultCode code)
         {
         case INVOKE_HOST_FUNCTION_SUCCESS:
-            SCVal success;
+            SCVal success<MAX_OPS_PER_TX>;
         case INVOKE_HOST_FUNCTION_MALFORMED:
         case INVOKE_HOST_FUNCTION_TRAPPED:
+        case INVOKE_HOST_FUNCTION_RESOURCE_LIMIT_EXCEEDED:
             void;
         };
     """
@@ -26,14 +29,19 @@ class InvokeHostFunctionResult:
     def __init__(
         self,
         code: InvokeHostFunctionResultCode,
-        success: SCVal = None,
+        success: List[SCVal] = None,
     ) -> None:
+        _expect_max_length = MAX_OPS_PER_TX
+        if success and len(success) > _expect_max_length:
+            raise ValueError(
+                f"The maximum length of `success` should be {_expect_max_length}, but got {len(success)}."
+            )
         self.code = code
         self.success = success
 
     @classmethod
     def from_invoke_host_function_success(
-        cls, success: SCVal
+        cls, success: List[SCVal]
     ) -> "InvokeHostFunctionResult":
         return cls(
             InvokeHostFunctionResultCode.INVOKE_HOST_FUNCTION_SUCCESS, success=success
@@ -47,27 +55,50 @@ class InvokeHostFunctionResult:
     def from_invoke_host_function_trapped(cls) -> "InvokeHostFunctionResult":
         return cls(InvokeHostFunctionResultCode.INVOKE_HOST_FUNCTION_TRAPPED)
 
+    @classmethod
+    def from_invoke_host_function_resource_limit_exceeded(
+        cls,
+    ) -> "InvokeHostFunctionResult":
+        return cls(
+            InvokeHostFunctionResultCode.INVOKE_HOST_FUNCTION_RESOURCE_LIMIT_EXCEEDED
+        )
+
     def pack(self, packer: Packer) -> None:
         self.code.pack(packer)
         if self.code == InvokeHostFunctionResultCode.INVOKE_HOST_FUNCTION_SUCCESS:
             if self.success is None:
                 raise ValueError("success should not be None.")
-            self.success.pack(packer)
+            packer.pack_uint(len(self.success))
+            for success_item in self.success:
+                success_item.pack(packer)
             return
         if self.code == InvokeHostFunctionResultCode.INVOKE_HOST_FUNCTION_MALFORMED:
             return
         if self.code == InvokeHostFunctionResultCode.INVOKE_HOST_FUNCTION_TRAPPED:
+            return
+        if (
+            self.code
+            == InvokeHostFunctionResultCode.INVOKE_HOST_FUNCTION_RESOURCE_LIMIT_EXCEEDED
+        ):
             return
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> "InvokeHostFunctionResult":
         code = InvokeHostFunctionResultCode.unpack(unpacker)
         if code == InvokeHostFunctionResultCode.INVOKE_HOST_FUNCTION_SUCCESS:
-            success = SCVal.unpack(unpacker)
+            length = unpacker.unpack_uint()
+            success = []
+            for _ in range(length):
+                success.append(SCVal.unpack(unpacker))
             return cls(code=code, success=success)
         if code == InvokeHostFunctionResultCode.INVOKE_HOST_FUNCTION_MALFORMED:
             return cls(code=code)
         if code == InvokeHostFunctionResultCode.INVOKE_HOST_FUNCTION_TRAPPED:
+            return cls(code=code)
+        if (
+            code
+            == InvokeHostFunctionResultCode.INVOKE_HOST_FUNCTION_RESOURCE_LIMIT_EXCEEDED
+        ):
             return cls(code=code)
         return cls(code=code)
 

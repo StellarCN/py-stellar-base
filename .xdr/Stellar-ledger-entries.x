@@ -4,6 +4,7 @@
 
 %#include "xdr/Stellar-types.h"
 %#include "xdr/Stellar-contract.h"
+%#include "xdr/Stellar-contract-config-setting.h"
 
 namespace stellar
 {
@@ -505,16 +506,6 @@ struct ContractCodeEntry {
     opaque code<SCVAL_LIMIT>;
 };
 
-enum ConfigSettingID
-{
-    CONFIG_SETTING_CONTRACT_MAX_SIZE_BYTES = 0
-};
-
-union ConfigSettingEntry switch (ConfigSettingID configSettingID)
-{
-case CONFIG_SETTING_CONTRACT_MAX_SIZE_BYTES:
-    uint32 contractMaxSizeBytes;
-};
 
 struct LedgerEntryExtensionV1
 {

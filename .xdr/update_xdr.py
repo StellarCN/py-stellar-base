@@ -1,22 +1,25 @@
 import os
-from urllib.parse import urljoin
 
 import requests
 
-BASE_XDR_GITHUB_URL = (
-    "https://raw.githubusercontent.com/stellar/stellar-xdr/next/"
-)
-XDR_FILES = (
-    "Stellar-contract-spec.x", "Stellar-ledger-entries.x", "Stellar-transaction.x",
-    "Stellar-SCP.x", "Stellar-contract.x", "Stellar-ledger.x", "Stellar-types.x",
-    "Stellar-contract-env-meta.x", "Stellar-internal.x", "Stellar-overlay.x"
-)
+REPO = "stellar/stellar-xdr"
+BRANCH = "next"
 BASE_DIR = os.path.dirname(os.path.realpath(__file__))
-print("Downloading xdr files from {}".format(BASE_XDR_GITHUB_URL))
-for filename in XDR_FILES:
-    print("Downloading {}".format(filename))
-    url = urljoin(BASE_XDR_GITHUB_URL, filename)
+
+print(f"Downloading xdr files from {REPO}")
+
+raw_data = requests.get(
+    f"https://api.github.com/repos/{REPO}/contents", params={"ref": BRANCH}
+)
+files = raw_data.json()
+
+for file in files:
+    filename: str = file["name"]
+    if not filename.endswith(".x"):
+        continue
+    print(f"Downloading {filename}")
+    download_url: str = file["download_url"]
     file = os.path.join(BASE_DIR, filename)
-    resp = requests.get(url, allow_redirects=True)
+    resp = requests.get(download_url, allow_redirects=True)
     open(file, "wb").write(resp.content)
 print("Finished")

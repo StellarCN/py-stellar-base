@@ -152,22 +152,6 @@ class TransactionEnvelope(BaseTransactionEnvelope["TransactionEnvelope"]):
         te = cls(tx, network_passphrase=network_passphrase, signatures=signatures)
         return te
 
-    def set_footpoint(self, footpoint: Union[str, stellar_xdr.LedgerFootprint]) -> None:
-        """Set footpoint to the InvokeHostFunction Operation.
-
-        :param footpoint: The LedgerFootprint to set to the transaction.
-        """
-        if isinstance(footpoint, str):
-            try:
-                footpoint = stellar_xdr.LedgerFootprint.from_xdr(footpoint)
-            except Exception:
-                raise ValueError("Invalid footpoint.")
-
-        for op in self.transaction.operations:
-            if isinstance(op, InvokeHostFunction):
-                op.footprint = footpoint
-        # TODO: check valid?
-
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
             return NotImplemented

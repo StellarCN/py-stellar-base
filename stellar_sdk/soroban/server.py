@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import binascii
+import copy
 import uuid
 from typing import Type, TYPE_CHECKING
 
@@ -16,6 +17,7 @@ from ..client.requests_client import RequestsClient
 
 if TYPE_CHECKING:
     from ..transaction_envelope import TransactionEnvelope
+    from ..fee_bump_transaction_envelope import FeeBumpTransactionEnvelope
 
 __all__ = ["SorobanServer"]
 
@@ -130,7 +132,10 @@ class SorobanServer:
         return self._post(request, GetTransactionResponse)
 
     def simulate_transaction(
-        self, transaction_envelope: Union[TransactionEnvelope, str]
+        self,
+        transaction_envelope: Union[
+            TransactionEnvelope, FeeBumpTransactionEnvelope, str
+        ],
     ) -> SimulateTransactionResponse:
         """Submit a trial contract invocation to get back return values, expected ledger footprint, and expected costs.
 
@@ -223,6 +228,42 @@ class SorobanServer:
             if e.code == -32600:
                 return 0
             raise e
+
+    def prepare_transaction(
+        self,
+        transaction_envelope: TransactionEnvelope,
+    ) -> TransactionEnvelope:
+        """
+        Submit a trial contract invocation, first run a simulation of the contract
+        invocation as defined on the incoming transaction, and apply the results
+        to a new copy of the transaction which is then returned. Setting the ledger
+        footprint and authorization, so the resulting transaction is ready for signing & sending.
+        The returned transaction will also have an updated fee that is the sum of fee set
+        on incoming transaction with the contract resource fees estimated from simulation. It is
+        advisable to check the fee on returned transaction and validate or take appropriate
+        measures for interaction with user to confirm it is acceptable.
+
+        You can call the :meth:`simulate_transaction` method directly first if you
+        want to inspect estimated fees for a given transaction in detail first if that is
+        of importance.
+
+        :param transaction_envelope: The transaction to prepare.
+        :return: A :class:`TransactionEnvelope <stellar_sdk.transaction_envelope.TransactionEnvelope>` object.
+        """
+        resp = self.simulate_transaction(transaction_envelope)
+        if resp.error:
+            raise RequestException(None, resp.error)
+        soroban_data_xdr_object = stellar_xdr.SorobanTransactionData.from_xdr(
+            resp.transaction_data
+        )
+        # TODO: https://discord.com/channels/897514728459468821/1112853306881081354/1112853306881081354
+        # soroban_data_xdr_object.resources.instructions = stellar_xdr.Uint32(soroban_data_xdr_object.resources.instructions.uint32 * 2)
+        te = copy.deepcopy(transaction_envelope)
+        te.signatures = []
+        te.transaction.fee += resp.min_resource_fee
+        te.transaction.soroban_data = soroban_data_xdr_object
+        # TODO: Fee Bump Tx
+        return te
 
     def close(self) -> None:
         """Close underlying connector, and release all acquired resources."""

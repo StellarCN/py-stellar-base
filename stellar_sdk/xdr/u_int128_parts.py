@@ -3,25 +3,24 @@
 import base64
 from xdrlib3 import Packer, Unpacker
 
-from .int64 import Int64
 from .uint64 import Uint64
 
-__all__ = ["Int128Parts"]
+__all__ = ["UInt128Parts"]
 
 
-class Int128Parts:
+class UInt128Parts:
     """
     XDR Source Code::
 
-        struct Int128Parts {
-            int64 hi;
+        struct UInt128Parts {
+            uint64 hi;
             uint64 lo;
         };
     """
 
     def __init__(
         self,
-        hi: Int64,
+        hi: Uint64,
         lo: Uint64,
     ) -> None:
         self.hi = hi
@@ -32,8 +31,8 @@ class Int128Parts:
         self.lo.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "Int128Parts":
-        hi = Int64.unpack(unpacker)
+    def unpack(cls, unpacker: Unpacker) -> "UInt128Parts":
+        hi = Uint64.unpack(unpacker)
         lo = Uint64.unpack(unpacker)
         return cls(
             hi=hi,
@@ -46,7 +45,7 @@ class Int128Parts:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "Int128Parts":
+    def from_xdr_bytes(cls, xdr: bytes) -> "UInt128Parts":
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -55,7 +54,7 @@ class Int128Parts:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "Int128Parts":
+    def from_xdr(cls, xdr: str) -> "UInt128Parts":
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
 
@@ -69,4 +68,4 @@ class Int128Parts:
             f"hi={self.hi}",
             f"lo={self.lo}",
         ]
-        return f"<Int128Parts [{', '.join(out)}]>"
+        return f"<UInt128Parts [{', '.join(out)}]>"

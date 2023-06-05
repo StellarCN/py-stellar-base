@@ -16,10 +16,12 @@ class Int128(BaseScValAlias):
         self.value: int = value
 
     def to_xdr_sc_val(self) -> stellar_xdr.SCVal:
-        v = self.value & (2**128 - 1)
+        value_bytes = self.value.to_bytes(16, "big", signed=True)
         i128 = stellar_xdr.Int128Parts(
-            lo=stellar_xdr.Uint64(v & (2**64 - 1)),
-            hi=stellar_xdr.Uint64(v >> 64),
+            hi=stellar_xdr.Int64(int.from_bytes(value_bytes[0:8], "big", signed=True)),
+            lo=stellar_xdr.Uint64(
+                int.from_bytes(value_bytes[8:16], "big", signed=False)
+            ),
         )
         return stellar_xdr.SCVal.from_scv_i128(i128)
 
@@ -28,9 +30,10 @@ class Int128(BaseScValAlias):
         if sc_val.type != stellar_xdr.SCValType.SCV_I128:
             raise ValueError("Invalid SCVal value.")
         assert sc_val.i128 is not None
-        v = sc_val.i128.lo.uint64 + (sc_val.i128.hi.uint64 << 64)
-        if v >= 2**127:
-            v -= 2**128
+        value_bytes = sc_val.i128.hi.int64.to_bytes(
+            8, "big", signed=True
+        ) + sc_val.i128.lo.uint64.to_bytes(8, "big", signed=False)
+        v = int.from_bytes(value_bytes, "big", signed=True)
         return cls(v)
 
     def __eq__(self, other: object) -> bool:

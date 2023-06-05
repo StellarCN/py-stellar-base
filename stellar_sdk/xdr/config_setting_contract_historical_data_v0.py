@@ -3,36 +3,35 @@
 import base64
 from xdrlib3 import Packer, Unpacker
 
-from .base import Opaque
-from .constants import *
+from .int64 import Int64
 
-__all__ = ["InstallContractCodeArgs"]
+__all__ = ["ConfigSettingContractHistoricalDataV0"]
 
 
-class InstallContractCodeArgs:
+class ConfigSettingContractHistoricalDataV0:
     """
     XDR Source Code::
 
-        struct InstallContractCodeArgs
+        struct ConfigSettingContractHistoricalDataV0
         {
-            opaque code<SCVAL_LIMIT>;
+            int64 feeHistorical1KB; // Fee for storing 1KB in archives
         };
     """
 
     def __init__(
         self,
-        code: bytes,
+        fee_historical1_kb: Int64,
     ) -> None:
-        self.code = code
+        self.fee_historical1_kb = fee_historical1_kb
 
     def pack(self, packer: Packer) -> None:
-        Opaque(self.code, SCVAL_LIMIT, False).pack(packer)
+        self.fee_historical1_kb.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "InstallContractCodeArgs":
-        code = Opaque.unpack(unpacker, SCVAL_LIMIT, False)
+    def unpack(cls, unpacker: Unpacker) -> "ConfigSettingContractHistoricalDataV0":
+        fee_historical1_kb = Int64.unpack(unpacker)
         return cls(
-            code=code,
+            fee_historical1_kb=fee_historical1_kb,
         )
 
     def to_xdr_bytes(self) -> bytes:
@@ -41,7 +40,7 @@ class InstallContractCodeArgs:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "InstallContractCodeArgs":
+    def from_xdr_bytes(cls, xdr: bytes) -> "ConfigSettingContractHistoricalDataV0":
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -50,17 +49,17 @@ class InstallContractCodeArgs:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "InstallContractCodeArgs":
+    def from_xdr(cls, xdr: str) -> "ConfigSettingContractHistoricalDataV0":
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented
-        return self.code == other.code
+        return self.fee_historical1_kb == other.fee_historical1_kb
 
     def __str__(self):
         out = [
-            f"code={self.code}",
+            f"fee_historical1_kb={self.fee_historical1_kb}",
         ]
-        return f"<InstallContractCodeArgs [{', '.join(out)}]>"
+        return f"<ConfigSettingContractHistoricalDataV0 [{', '.join(out)}]>"

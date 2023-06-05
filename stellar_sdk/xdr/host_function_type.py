@@ -15,13 +15,13 @@ class HostFunctionType(IntEnum):
         {
             HOST_FUNCTION_TYPE_INVOKE_CONTRACT = 0,
             HOST_FUNCTION_TYPE_CREATE_CONTRACT = 1,
-            HOST_FUNCTION_TYPE_INSTALL_CONTRACT_CODE = 2
+            HOST_FUNCTION_TYPE_UPLOAD_CONTRACT_WASM = 2
         };
     """
 
     HOST_FUNCTION_TYPE_INVOKE_CONTRACT = 0
     HOST_FUNCTION_TYPE_CREATE_CONTRACT = 1
-    HOST_FUNCTION_TYPE_INSTALL_CONTRACT_CODE = 2
+    HOST_FUNCTION_TYPE_UPLOAD_CONTRACT_WASM = 2
 
     def pack(self, packer: Packer) -> None:
         packer.pack_int(self.value)

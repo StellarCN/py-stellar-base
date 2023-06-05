@@ -35,7 +35,9 @@ class TransactionResultCode(IntEnum):
             txBAD_SPONSORSHIP = -14,       // sponsorship not confirmed
             txBAD_MIN_SEQ_AGE_OR_GAP =
                 -15, // minSeqAge or minSeqLedgerGap conditions not met
-            txMALFORMED = -16 // precondition is invalid
+            txMALFORMED = -16, // precondition is invalid
+            // declared Soroban resource usage exceeds the network limit
+            txSOROBAN_RESOURCE_LIMIT_EXCEEDED = -17
         };
     """
 
@@ -57,6 +59,7 @@ class TransactionResultCode(IntEnum):
     txBAD_SPONSORSHIP = -14
     txBAD_MIN_SEQ_AGE_OR_GAP = -15
     txMALFORMED = -16
+    txSOROBAN_RESOURCE_LIMIT_EXCEEDED = -17
 
     def pack(self, packer: Packer) -> None:
         packer.pack_int(self.value)
