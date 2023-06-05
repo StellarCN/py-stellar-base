@@ -37,10 +37,10 @@ class Uint256(BaseScValAlias):
             raise ValueError("Invalid SCVal value.")
         assert sc_val.u256 is not None
         value_bytes = (
-            sc_val.i256.hi_hi.int64.to_bytes(8, "big", signed=False)
-            + sc_val.i256.hi_lo.uint64.to_bytes(8, "big", signed=False)
-            + sc_val.i256.lo_hi.uint64.to_bytes(8, "big", signed=False)
-            + sc_val.i256.lo_lo.uint64.to_bytes(8, "big", signed=False)
+            sc_val.u256.hi_hi.uint64.to_bytes(8, "big", signed=False)
+            + sc_val.u256.hi_lo.uint64.to_bytes(8, "big", signed=False)
+            + sc_val.u256.lo_hi.uint64.to_bytes(8, "big", signed=False)
+            + sc_val.u256.lo_lo.uint64.to_bytes(8, "big", signed=False)
         )
         v = int.from_bytes(value_bytes, "big", signed=True)
         return cls(v)

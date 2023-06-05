@@ -1,10 +1,9 @@
-from typing import Optional, Union, Sequence
+from typing import Optional, Union, Sequence, List
 
 from .operation import Operation
 from .. import xdr as stellar_xdr
 from ..soroban.contract_auth import ContractAuth
 from ..muxed_account import MuxedAccount
-
 
 __all__ = ["InvokeHostFunction"]
 
@@ -16,29 +15,15 @@ class InvokeHostFunction(Operation):
 
     def __init__(
         self,
-        function: stellar_xdr.HostFunction,
-        auth: Sequence[Union[stellar_xdr.ContractAuth, ContractAuth]] = None,
-        footprint: stellar_xdr.LedgerFootprint = None,
+        functions: List[stellar_xdr.HostFunction],
         source: Optional[Union[MuxedAccount, str]] = None,
     ):
         super().__init__(source)
-        self.footprint = (
-            stellar_xdr.LedgerFootprint([], []) if footprint is None else footprint
-        )
-        self.function = function
-        self.auth = []
-        if auth:
-            self.auth = [
-                auth.to_xdr_object() if isinstance(auth, ContractAuth) else auth
-                for auth in auth
-            ]
+        self.functions = functions
 
     def _to_operation_body(self) -> stellar_xdr.OperationBody:
         invoke_host_function_op = stellar_xdr.InvokeHostFunctionOp(
-            function=self.function,
-            # TODO: Figure out how to calculate this or get it from the user?
-            footprint=self.footprint,
-            auth=self.auth,
+            functions=self.functions
         )
         body = stellar_xdr.OperationBody(
             type=self._XDR_OPERATION_TYPE,
@@ -51,18 +36,13 @@ class InvokeHostFunction(Operation):
         """Creates a :class:`InvokeHostFunction` object from an XDR Operation object."""
         source = Operation.get_source_from_xdr_obj(xdr_object)
         assert xdr_object.body.invoke_host_function_op is not None
-        function = xdr_object.body.invoke_host_function_op.function
-        footprint = xdr_object.body.invoke_host_function_op.footprint
-        auth = xdr_object.body.invoke_host_function_op.auth
+        functions = xdr_object.body.invoke_host_function_op.functions
         return cls(
-            function=function,
-            auth=auth,
-            footprint=footprint,
+            functions=functions,
             source=source,
         )
 
     def __str__(self):
         return (
-            f"<InvokeHostFunction [function={self.function}, auth={self.auth}, "
-            f"footprint={self.footprint}, source={self.source}]>"
+            f"<InvokeHostFunction [functions={self.functions}, source={self.source}]>"
         )

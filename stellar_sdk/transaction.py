@@ -47,6 +47,8 @@ class Transaction:
     :param memo: The memo being sent with the transaction, being
           represented as one of the subclasses of the
           :class:`Memo <stellar_sdk.memo.Memo>` object.
+    :param soroban_data: The soroban data being sent with the transaction, being represented as
+            :class:`SorobanTransactionData <stellar_sdk.xdr.SorobanTransactionData>`.
     :param v1: When this value is set to ``True``, V1 transactions will be generated,
         otherwise V0 transactions will be generated.
         See `CAP-0015 <https://github.com/stellar/stellar-protocol/blob/master/core/cap-0015.md>`__ for more information.
@@ -60,6 +62,7 @@ class Transaction:
         operations: Sequence[Operation],
         memo: Memo = None,
         preconditions: Preconditions = None,
+        soroban_data: stellar_xdr.SorobanTransactionData = None,
         v1: bool = True,
     ) -> None:
         # if not operations:
@@ -83,6 +86,7 @@ class Transaction:
         self.memo: Memo = memo
         self.fee: int = fee
         self.preconditions: Optional[Preconditions] = preconditions
+        self.soroban_data: Optional[stellar_xdr.SorobanTransactionData] = soroban_data
         self.v1: bool = v1
 
     def get_claimable_balance_id(self, operation_index: int) -> str:
@@ -158,7 +162,14 @@ class Transaction:
             else Preconditions().to_xdr_object()
         )
         source_xdr = self.source.to_xdr_object()
-        ext = stellar_xdr.TransactionExt(0)
+        if self.soroban_data:
+            ext = stellar_xdr.TransactionExt(
+                1,
+                self.soroban_data,
+            )
+        else:
+            ext = stellar_xdr.TransactionExt(0)
+
         return stellar_xdr.Transaction(
             source_xdr,
             fee,
@@ -185,6 +196,7 @@ class Transaction:
 
         :return: A new :class:`Transaction` object from the given XDR Transaction object.
         """
+        soroban_data = None
         if v1:
             assert isinstance(xdr_object, stellar_xdr.Transaction)
             source = MuxedAccount.from_xdr_object(xdr_object.source_account)
@@ -192,6 +204,8 @@ class Transaction:
                 preconditions = None
             else:
                 preconditions = Preconditions.from_xdr_object(xdr_object.cond)
+            if xdr_object.ext.v == 1:
+                soroban_data = xdr_object.ext.soroban_data
         else:
             assert isinstance(xdr_object, stellar_xdr.TransactionV0)
             ed25519_key = StrKey.encode_ed25519_public_key(
@@ -208,6 +222,7 @@ class Transaction:
         fee = xdr_object.fee.uint32
         memo = Memo.from_xdr_object(xdr_object.memo)
         operations = list(map(Operation.from_xdr_object, xdr_object.operations))
+
         tx = cls(
             source=source,
             sequence=sequence,
@@ -215,6 +230,7 @@ class Transaction:
             fee=fee,
             operations=operations,
             preconditions=preconditions,
+            soroban_data=soroban_data,
             v1=v1,
         )
         return tx
@@ -246,5 +262,5 @@ class Transaction:
         return (
             f"<Transaction [source={self.source}, sequence={self.sequence}, "
             f"fee={self.fee}, operations={self.operations}, memo={self.memo}, "
-            f"preconditions={self.preconditions}, v1={self.v1}]>"
+            f"preconditions={self.preconditions}, soroban_data={self.soroban_data}, v1={self.v1}]>"
         )

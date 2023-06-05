@@ -107,9 +107,18 @@ class SimulateTransactionResult(BaseModel):
     xdr: str
 
 
+class SimulateHostFunctionResult(BaseModel):
+    auth: Optional[List[str]]
+    xdr: str
+
+
 class SimulateTransactionResponse(BaseModel):
     error: Optional[str]
-    results: Optional[List[SimulateTransactionResult]]
+    # Empty string?
+    transaction_data: str = Field(alias="transactionData")
+    events: Optional[List[str]]
+    min_resource_fee: int = Field(alias="minResourceFee")
+    results: Optional[List[SimulateHostFunctionResult]]
     cost: SimulateTransactionCost
     latest_ledger: int = Field(alias="latestLedger")
 

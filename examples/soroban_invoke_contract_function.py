@@ -21,7 +21,7 @@ from stellar_sdk.soroban.types import Symbol
 # TODO: You need to replace the following parameters according to the actual situation
 secret = "SAAPYAPTTRZMCUZFPG3G66V4ZMHTK4TWA6NS7U4F7Z3IMUD52EK4DDEV"
 rpc_server_url = "https://rpc-futurenet.stellar.org:443/"
-contract_id = "14d04b99ac22a080c81c607b7032e887aa7ad8c2192c3b5ee47e3c09f21da5dd"
+contract_id = "d175b6708333f75dd8a010975327468e6a7c17ca19ecf36dad199154cdadcb10"
 network_passphrase = Network.FUTURENET_NETWORK_PASSPHRASE
 
 kp = Keypair.from_secret(secret)
@@ -30,23 +30,18 @@ source = soroban_server.load_account(kp.public_key)
 
 # Let's build a transaction that invokes the `hello` function.
 tx = (
-    TransactionBuilder(source, network_passphrase)
+    TransactionBuilder(source, network_passphrase, base_fee=100)
     .set_timeout(300)
     .append_invoke_contract_function_op(
         contract_id=contract_id,
         function_name="hello",
         parameters=[Symbol("world")],
-        source=kp.public_key,
     )
     .build()
 )
+print(f"XDR: {tx.to_xdr()}")
 
-simulate_transaction_data = soroban_server.simulate_transaction(tx)
-print(f"simulated transaction: {simulate_transaction_data}")
-
-print(f"setting footprint and signing transaction...")
-assert simulate_transaction_data.results is not None
-tx.set_footpoint(simulate_transaction_data.results[0].footprint)
+tx = soroban_server.prepare_transaction(tx)
 tx.sign(kp)
 
 send_transaction_data = soroban_server.send_transaction(tx)
@@ -66,6 +61,6 @@ if get_transaction_data.status == GetTransactionStatus.SUCCESS:
     transaction_meta = stellar_xdr.TransactionMeta.from_xdr(
         get_transaction_data.result_meta_xdr
     )
-    result = transaction_meta.v3.tx_result.result.results[0].tr.invoke_host_function_result.success  # type: ignore
+    result = transaction_meta.v3.tx_result.result.results[0].tr.invoke_host_function_result.success[0]  # type: ignore
     output = [x.sym.sc_symbol.decode() for x in result.vec.sc_vec]  # type: ignore
     print(f"transaction result: {output}")

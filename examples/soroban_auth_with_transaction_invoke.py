@@ -54,14 +54,8 @@ tx = (
     .build()
 )
 
-simulate_transaction_data = soroban_server.simulate_transaction(tx)
-print(f"simulated transaction: {simulate_transaction_data}")
-
-print(f"setting footprint and signing transaction...")
-assert simulate_transaction_data.results is not None
-tx.set_footpoint(simulate_transaction_data.results[0].footprint)
+tx = soroban_server.prepare_transaction(tx)
 tx.sign(tx_submitter_kp)
-
 print(f"Signed XDR:\n{tx.to_xdr()}")
 
 send_transaction_data = soroban_server.send_transaction(tx)
@@ -81,5 +75,5 @@ if get_transaction_data.status == GetTransactionStatus.SUCCESS:
     transaction_meta = stellar_xdr.TransactionMeta.from_xdr(
         get_transaction_data.result_meta_xdr
     )
-    result = transaction_meta.v3.tx_result.result.results[0].tr.invoke_host_function_result.success  # type: ignore
+    result = transaction_meta.v3.tx_result.result.results[0].tr.invoke_host_function_result.success[0]  # type: ignore
     print(f"Function result: {result}")
