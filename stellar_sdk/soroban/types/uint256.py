@@ -15,34 +15,35 @@ class Uint256(BaseScValAlias):
             raise ValueError("Invalid Uint256 value.")
         self.value: int = value
 
-    @classmethod
-    def from_be_bytes(cls, value: bytes) -> "Uint256":
-        """Converts a big-endian bytes to an Uint256 object.
-
-        :param value: The big-endian bytes value.
-        :return: The Uint256 value.
-        """
-        if len(value) != 32:
-            raise ValueError("Invalid value.")
-        v = int.from_bytes(value, "big")
-        return cls(v)
-
-    def to_be_bytes(self) -> bytes:
-        """Converts the Uint256 object to big-endian bytes.
-
-        :return: The big-endian bytes value.
-        """
-        return self.value.to_bytes(32, "big")
-
     def to_xdr_sc_val(self) -> stellar_xdr.SCVal:
-        return stellar_xdr.SCVal.from_scv_u256(stellar_xdr.Uint256(self.to_be_bytes()))
+        value_bytes = self.value.to_bytes(32, "big", signed=False)
+        hi_hi, hi_lo, lo_hi, lo_lo = (
+            int.from_bytes(value_bytes[0:8], "big", signed=False),
+            int.from_bytes(value_bytes[8:16], "big", signed=False),
+            int.from_bytes(value_bytes[16:24], "big", signed=False),
+            int.from_bytes(value_bytes[24:32], "big", signed=False),
+        )
+        u256 = stellar_xdr.UInt256Parts(
+            hi_hi=stellar_xdr.Uint64(hi_hi),
+            hi_lo=stellar_xdr.Uint64(hi_lo),
+            lo_hi=stellar_xdr.Uint64(lo_hi),
+            lo_lo=stellar_xdr.Uint64(lo_lo),
+        )
+        return stellar_xdr.SCVal.from_scv_u256(u256)
 
     @classmethod
     def from_xdr_sc_val(cls, sc_val: stellar_xdr.SCVal) -> "Uint256":
         if sc_val.type != stellar_xdr.SCValType.SCV_U256:
             raise ValueError("Invalid SCVal value.")
         assert sc_val.u256 is not None
-        return cls.from_be_bytes(sc_val.u256.uint256)
+        value_bytes = (
+            sc_val.i256.hi_hi.int64.to_bytes(8, "big", signed=False)
+            + sc_val.i256.hi_lo.uint64.to_bytes(8, "big", signed=False)
+            + sc_val.i256.lo_hi.uint64.to_bytes(8, "big", signed=False)
+            + sc_val.i256.lo_lo.uint64.to_bytes(8, "big", signed=False)
+        )
+        v = int.from_bytes(value_bytes, "big", signed=True)
+        return cls(v)
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
