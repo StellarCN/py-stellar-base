@@ -78,6 +78,22 @@ class GetLedgerEntryResponse(BaseModel):
     latest_ledger: int = Field(alias="latestLedger")
 
 
+# get_ledger_entries
+class GetLedgerEntriesRequest(BaseModel):
+    keys: List[str]
+
+
+class LedgerEntryResult(BaseModel):
+    key: str
+    xdr: str
+    last_modified_ledger_seq: int = Field(alias="lastModifiedLedgerSeq")
+
+
+class GetLedgerEntriesResponse(BaseModel):
+    entries: Optional[List[LedgerEntryResult]]
+    latest_ledger: int = Field(alias="latestLedger")
+
+
 # get_network
 class GetNetworkResponse(BaseModel):
     friendbot_url: Optional[str] = Field(alias="friendbotUrl")

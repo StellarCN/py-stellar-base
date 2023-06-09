@@ -116,6 +116,20 @@ class SorobanServer:
         )
         return self._post(request, GetLedgerEntryResponse)
 
+    def get_ledger_entries(
+        self, keys: List[stellar_xdr.LedgerKey]
+    ) -> GetLedgerEntriesResponse:
+        """
+        :param keys: The ledger keys to fetch.
+        :return: A :class:`GetLedgerEntriesResponse <stellar_sdk.soroban_rpc.get_ledger_entries.GetLedgerEntryResponse>` object.
+        """
+        request = Request[GetLedgerEntriesRequest](
+            id=_generate_unique_request_id(),
+            method="getLedgerEntries",
+            params=GetLedgerEntriesRequest(keys=[key.to_xdr() for key in keys]),
+        )
+        return self._post(request, GetLedgerEntriesResponse)
+
     def get_transaction(self, transaction_hash: str) -> GetTransactionResponse:
         """Fetch the specified transaction.
 
