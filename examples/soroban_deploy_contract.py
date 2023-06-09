@@ -11,7 +11,7 @@ from stellar_sdk.soroban.soroban_rpc import GetTransactionStatus
 secret = "SAAPYAPTTRZMCUZFPG3G66V4ZMHTK4TWA6NS7U4F7Z3IMUD52EK4DDEV"
 rpc_server_url = "https://rpc-futurenet.stellar.org:443/"
 network_passphrase = Network.FUTURENET_NETWORK_PASSPHRASE
-contract_file_path = "/Users/overcat/repo/stellar/soroban-examples/target/wasm32-unknown-unknown/release/soroban_hello_world_contract.wasm"
+contract_file_path = "/Users/overcat/repo/stellar/soroban-examples/hello_world/target/wasm32-unknown-unknown/release/soroban_hello_world_contract.wasm"
 
 kp = Keypair.from_secret(secret)
 soroban_server = SorobanServer(rpc_server_url)
@@ -51,7 +51,7 @@ if get_transaction_data.status == GetTransactionStatus.SUCCESS:
     transaction_meta = stellar_xdr.TransactionMeta.from_xdr(
         get_transaction_data.result_meta_xdr
     )
-    result = transaction_meta.v3.tx_result.result.results[0].tr.invoke_host_function_result.success  # type: ignore
+    result = transaction_meta.v3.tx_result.result.results[0].tr.invoke_host_function_result.success[0]  # type: ignore
     wasm_id = result.bytes.sc_bytes.hex()  # type: ignore
     print(f"wasm id: {wasm_id}")
 
