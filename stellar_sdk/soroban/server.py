@@ -3,6 +3,7 @@ from __future__ import annotations
 import binascii
 import copy
 import uuid
+import warnings
 from typing import Type, TYPE_CHECKING
 
 from .exceptions import RequestException
@@ -99,6 +100,7 @@ class SorobanServer:
 
     def get_ledger_entry(self, key: stellar_xdr.LedgerKey) -> GetLedgerEntryResponse:
         """For reading the current value of ledger entries directly.
+
         Allows you to directly inspect the current state of a contract, a contract's code,
         or any other ledger entry. This is a backup way to access your contract data
         which may not be available via events or simulateTransaction.
@@ -108,7 +110,11 @@ class SorobanServer:
         :param key: The ledger key to fetch.
         :return: A :class:`GetLedgerEntryResponse <stellar_sdk.soroban_rpc.get_ledger_entry.GetLedgerEntryResponse>` object.
         """
-        # TODO: Split it into multiple points
+        warnings.warn(
+            "This method will be removed soon. "
+            "Please use `get_ledger_entries` instead.",
+            DeprecationWarning,
+        )
         request = Request[GetLedgerEntryRequest](
             id=_generate_unique_request_id(),
             method="getLedgerEntry",
@@ -119,7 +125,14 @@ class SorobanServer:
     def get_ledger_entries(
         self, keys: List[stellar_xdr.LedgerKey]
     ) -> GetLedgerEntriesResponse:
-        """
+        """For reading the current value of ledger entries directly.
+
+        Allows you to directly inspect the current state of a contract, a contract's code,
+        or any other ledger entry. This is a backup way to access your contract data
+        which may not be available via events or simulateTransaction.
+
+        See `Soroban Documentation - getLedgerEntries <https://soroban.stellar.org/api/methods/getLedgerEntries>`_
+
         :param keys: The ledger keys to fetch.
         :return: A :class:`GetLedgerEntriesResponse <stellar_sdk.soroban_rpc.get_ledger_entries.GetLedgerEntryResponse>` object.
         """
@@ -211,8 +224,15 @@ class SorobanServer:
             )
         )
 
-        resp = self.get_ledger_entry(key)
-        data = stellar_xdr.LedgerEntryData.from_xdr(resp.xdr)
+        resp = self.get_ledger_entries([key])
+        if resp.entries is None:
+            raise RequestException(
+                404,
+                f"Ledger entry not found, maybe you need to activate "
+                f"this account on the Stellar network.. Key: {key.to_xdr()}",
+            )
+        assert len(resp.entries) == 1
+        data = stellar_xdr.LedgerEntryData.from_xdr(resp.entries[0].xdr)
         assert data.account is not None
         return Account(account_id, data.account.seq_num.sequence_number.int64)
 
