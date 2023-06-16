@@ -2,7 +2,7 @@
 # DO NOT EDIT or your changes may be overwritten
 import base64
 from typing import List
-from xdrlib import Packer, Unpacker
+from xdrlib3 import Packer, Unpacker
 
 from .claim_atom import ClaimAtom
 from .simple_payment_result import SimplePaymentResult

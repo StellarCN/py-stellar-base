@@ -1,7 +1,7 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
 import base64
-from xdrlib import Packer, Unpacker
+from xdrlib3 import Packer, Unpacker
 
 from .operation_result_code import OperationResultCode
 from .operation_result_tr import OperationResultTr
