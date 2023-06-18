@@ -19,7 +19,7 @@ class Enum(BaseScValAlias):
         self, key: str, value: Optional[Union[stellar_xdr.SCVal, BaseScValAlias]]
     ):
         self.key = key
-        if self.value is not None:
+        if value is not None:
             self.value: Optional[stellar_xdr.SCVal] = (
                 value.to_xdr_sc_val() if isinstance(value, BaseScValAlias) else value
             )
