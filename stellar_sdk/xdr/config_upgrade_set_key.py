@@ -1,6 +1,9 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
+from __future__ import annotations
+
 import base64
+
 from xdrlib3 import Packer, Unpacker
 
 from .hash import Hash
@@ -31,7 +34,7 @@ class ConfigUpgradeSetKey:
         self.content_hash.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "ConfigUpgradeSetKey":
+    def unpack(cls, unpacker: Unpacker) -> ConfigUpgradeSetKey:
         contract_id = Hash.unpack(unpacker)
         content_hash = Hash.unpack(unpacker)
         return cls(
@@ -45,7 +48,7 @@ class ConfigUpgradeSetKey:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "ConfigUpgradeSetKey":
+    def from_xdr_bytes(cls, xdr: bytes) -> ConfigUpgradeSetKey:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -54,7 +57,7 @@ class ConfigUpgradeSetKey:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "ConfigUpgradeSetKey":
+    def from_xdr(cls, xdr: str) -> ConfigUpgradeSetKey:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
 

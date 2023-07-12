@@ -1,6 +1,9 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
+from __future__ import annotations
+
 import base64
+
 from xdrlib3 import Packer, Unpacker
 
 from .base import Opaque
@@ -22,7 +25,7 @@ class Thresholds:
         Opaque(self.thresholds, 4, True).pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "Thresholds":
+    def unpack(cls, unpacker: Unpacker) -> Thresholds:
         thresholds = Opaque.unpack(unpacker, 4, True)
         return cls(thresholds)
 
@@ -32,7 +35,7 @@ class Thresholds:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "Thresholds":
+    def from_xdr_bytes(cls, xdr: bytes) -> Thresholds:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -41,7 +44,7 @@ class Thresholds:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "Thresholds":
+    def from_xdr(cls, xdr: str) -> Thresholds:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
 

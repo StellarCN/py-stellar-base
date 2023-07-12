@@ -1,6 +1,9 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
+from __future__ import annotations
+
 import base64
+
 from xdrlib3 import Packer, Unpacker
 
 from .liquidity_pool_deposit_result_code import LiquidityPoolDepositResultCode
@@ -91,7 +94,7 @@ class LiquidityPoolDepositResult:
             return
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "LiquidityPoolDepositResult":
+    def unpack(cls, unpacker: Unpacker) -> LiquidityPoolDepositResult:
         code = LiquidityPoolDepositResultCode.unpack(unpacker)
         if code == LiquidityPoolDepositResultCode.LIQUIDITY_POOL_DEPOSIT_SUCCESS:
             return cls(code=code)
@@ -117,7 +120,7 @@ class LiquidityPoolDepositResult:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "LiquidityPoolDepositResult":
+    def from_xdr_bytes(cls, xdr: bytes) -> LiquidityPoolDepositResult:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -126,7 +129,7 @@ class LiquidityPoolDepositResult:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "LiquidityPoolDepositResult":
+    def from_xdr(cls, xdr: str) -> LiquidityPoolDepositResult:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
 

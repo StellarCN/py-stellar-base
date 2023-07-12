@@ -1,6 +1,9 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
+from __future__ import annotations
+
 import base64
+
 from xdrlib3 import Packer, Unpacker
 
 from .sc_spec_type_def import SCSpecTypeDef
@@ -28,7 +31,7 @@ class SCSpecTypeOption:
         self.value_type.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "SCSpecTypeOption":
+    def unpack(cls, unpacker: Unpacker) -> SCSpecTypeOption:
         value_type = SCSpecTypeDef.unpack(unpacker)
         return cls(
             value_type=value_type,
@@ -40,7 +43,7 @@ class SCSpecTypeOption:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "SCSpecTypeOption":
+    def from_xdr_bytes(cls, xdr: bytes) -> SCSpecTypeOption:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -49,7 +52,7 @@ class SCSpecTypeOption:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "SCSpecTypeOption":
+    def from_xdr(cls, xdr: str) -> SCSpecTypeOption:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
 

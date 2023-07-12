@@ -1,7 +1,10 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
+from __future__ import annotations
+
 import base64
 from enum import IntEnum
+
 from xdrlib3 import Packer, Unpacker
 
 __all__ = ["SCSpecUDTUnionCaseV0Kind"]
@@ -25,7 +28,7 @@ class SCSpecUDTUnionCaseV0Kind(IntEnum):
         packer.pack_int(self.value)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "SCSpecUDTUnionCaseV0Kind":
+    def unpack(cls, unpacker: Unpacker) -> SCSpecUDTUnionCaseV0Kind:
         value = unpacker.unpack_int()
         return cls(value)
 
@@ -35,7 +38,7 @@ class SCSpecUDTUnionCaseV0Kind(IntEnum):
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "SCSpecUDTUnionCaseV0Kind":
+    def from_xdr_bytes(cls, xdr: bytes) -> SCSpecUDTUnionCaseV0Kind:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -44,6 +47,6 @@ class SCSpecUDTUnionCaseV0Kind(IntEnum):
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "SCSpecUDTUnionCaseV0Kind":
+    def from_xdr(cls, xdr: str) -> SCSpecUDTUnionCaseV0Kind:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)

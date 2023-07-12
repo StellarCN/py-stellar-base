@@ -1,6 +1,9 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
+from __future__ import annotations
+
 import base64
+
 from xdrlib3 import Packer, Unpacker
 
 from .ledger_entry import LedgerEntry
@@ -81,7 +84,7 @@ class LedgerEntryChange:
             return
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "LedgerEntryChange":
+    def unpack(cls, unpacker: Unpacker) -> LedgerEntryChange:
         type = LedgerEntryChangeType.unpack(unpacker)
         if type == LedgerEntryChangeType.LEDGER_ENTRY_CREATED:
             created = LedgerEntry.unpack(unpacker)
@@ -103,7 +106,7 @@ class LedgerEntryChange:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "LedgerEntryChange":
+    def from_xdr_bytes(cls, xdr: bytes) -> LedgerEntryChange:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -112,7 +115,7 @@ class LedgerEntryChange:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "LedgerEntryChange":
+    def from_xdr(cls, xdr: str) -> LedgerEntryChange:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
 

@@ -1,6 +1,9 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
+from __future__ import annotations
+
 import base64
+
 from xdrlib3 import Packer, Unpacker
 
 from .sc_val import SCVal
@@ -33,7 +36,7 @@ class ContractEventV0:
         self.data.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "ContractEventV0":
+    def unpack(cls, unpacker: Unpacker) -> ContractEventV0:
         topics = SCVec.unpack(unpacker)
         data = SCVal.unpack(unpacker)
         return cls(
@@ -47,7 +50,7 @@ class ContractEventV0:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "ContractEventV0":
+    def from_xdr_bytes(cls, xdr: bytes) -> ContractEventV0:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -56,7 +59,7 @@ class ContractEventV0:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "ContractEventV0":
+    def from_xdr(cls, xdr: str) -> ContractEventV0:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
 

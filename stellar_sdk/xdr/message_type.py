@@ -1,7 +1,10 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
+from __future__ import annotations
+
 import base64
 from enum import IntEnum
+
 from xdrlib3 import Packer, Unpacker
 
 __all__ = ["MessageType"]
@@ -39,6 +42,8 @@ class MessageType(IntEnum):
             SURVEY_RESPONSE = 15,
 
             SEND_MORE = 16,
+            SEND_MORE_EXTENDED = 20,
+
             FLOOD_ADVERT = 18,
             FLOOD_DEMAND = 19
         };
@@ -61,6 +66,7 @@ class MessageType(IntEnum):
     SURVEY_REQUEST = 14
     SURVEY_RESPONSE = 15
     SEND_MORE = 16
+    SEND_MORE_EXTENDED = 20
     FLOOD_ADVERT = 18
     FLOOD_DEMAND = 19
 
@@ -68,7 +74,7 @@ class MessageType(IntEnum):
         packer.pack_int(self.value)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "MessageType":
+    def unpack(cls, unpacker: Unpacker) -> MessageType:
         value = unpacker.unpack_int()
         return cls(value)
 
@@ -78,7 +84,7 @@ class MessageType(IntEnum):
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "MessageType":
+    def from_xdr_bytes(cls, xdr: bytes) -> MessageType:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -87,6 +93,6 @@ class MessageType(IntEnum):
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "MessageType":
+    def from_xdr(cls, xdr: str) -> MessageType:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)

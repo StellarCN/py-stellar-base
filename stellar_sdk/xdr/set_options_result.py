@@ -1,6 +1,9 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
+from __future__ import annotations
+
 import base64
+
 from xdrlib3 import Packer, Unpacker
 
 from .set_options_result_code import SetOptionsResultCode
@@ -106,7 +109,7 @@ class SetOptionsResult:
             return
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "SetOptionsResult":
+    def unpack(cls, unpacker: Unpacker) -> SetOptionsResult:
         code = SetOptionsResultCode.unpack(unpacker)
         if code == SetOptionsResultCode.SET_OPTIONS_SUCCESS:
             return cls(code=code)
@@ -138,7 +141,7 @@ class SetOptionsResult:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "SetOptionsResult":
+    def from_xdr_bytes(cls, xdr: bytes) -> SetOptionsResult:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -147,7 +150,7 @@ class SetOptionsResult:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "SetOptionsResult":
+    def from_xdr(cls, xdr: str) -> SetOptionsResult:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
 

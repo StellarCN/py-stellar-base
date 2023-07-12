@@ -1,6 +1,9 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
+from __future__ import annotations
+
 import base64
+
 from xdrlib3 import Packer, Unpacker
 
 from .ledger_entry_changes import LedgerEntryChanges
@@ -28,7 +31,7 @@ class OperationMeta:
         self.changes.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "OperationMeta":
+    def unpack(cls, unpacker: Unpacker) -> OperationMeta:
         changes = LedgerEntryChanges.unpack(unpacker)
         return cls(
             changes=changes,
@@ -40,7 +43,7 @@ class OperationMeta:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "OperationMeta":
+    def from_xdr_bytes(cls, xdr: bytes) -> OperationMeta:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -49,7 +52,7 @@ class OperationMeta:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "OperationMeta":
+    def from_xdr(cls, xdr: str) -> OperationMeta:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
 

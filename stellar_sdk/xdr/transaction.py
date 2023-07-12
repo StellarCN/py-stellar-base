@@ -1,7 +1,10 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
+from __future__ import annotations
+
 import base64
 from typing import List
+
 from xdrlib3 import Packer, Unpacker
 
 from .constants import *
@@ -85,7 +88,7 @@ class Transaction:
         self.ext.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "Transaction":
+    def unpack(cls, unpacker: Unpacker) -> Transaction:
         source_account = MuxedAccount.unpack(unpacker)
         fee = Uint32.unpack(unpacker)
         seq_num = SequenceNumber.unpack(unpacker)
@@ -112,7 +115,7 @@ class Transaction:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "Transaction":
+    def from_xdr_bytes(cls, xdr: bytes) -> Transaction:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -121,7 +124,7 @@ class Transaction:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "Transaction":
+    def from_xdr(cls, xdr: str) -> Transaction:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
 

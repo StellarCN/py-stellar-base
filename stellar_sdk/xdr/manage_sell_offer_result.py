@@ -1,6 +1,9 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
+from __future__ import annotations
+
 import base64
+
 from xdrlib3 import Packer, Unpacker
 
 from .manage_offer_success_result import ManageOfferSuccessResult
@@ -128,7 +131,7 @@ class ManageSellOfferResult:
             return
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "ManageSellOfferResult":
+    def unpack(cls, unpacker: Unpacker) -> ManageSellOfferResult:
         code = ManageSellOfferResultCode.unpack(unpacker)
         if code == ManageSellOfferResultCode.MANAGE_SELL_OFFER_SUCCESS:
             success = ManageOfferSuccessResult.unpack(unpacker)
@@ -165,7 +168,7 @@ class ManageSellOfferResult:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "ManageSellOfferResult":
+    def from_xdr_bytes(cls, xdr: bytes) -> ManageSellOfferResult:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -174,7 +177,7 @@ class ManageSellOfferResult:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "ManageSellOfferResult":
+    def from_xdr(cls, xdr: str) -> ManageSellOfferResult:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
 

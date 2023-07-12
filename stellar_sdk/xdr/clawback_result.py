@@ -1,6 +1,9 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
+from __future__ import annotations
+
 import base64
+
 from xdrlib3 import Packer, Unpacker
 
 from .clawback_result_code import ClawbackResultCode
@@ -64,7 +67,7 @@ class ClawbackResult:
             return
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "ClawbackResult":
+    def unpack(cls, unpacker: Unpacker) -> ClawbackResult:
         code = ClawbackResultCode.unpack(unpacker)
         if code == ClawbackResultCode.CLAWBACK_SUCCESS:
             return cls(code=code)
@@ -84,7 +87,7 @@ class ClawbackResult:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "ClawbackResult":
+    def from_xdr_bytes(cls, xdr: bytes) -> ClawbackResult:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -93,7 +96,7 @@ class ClawbackResult:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "ClawbackResult":
+    def from_xdr(cls, xdr: str) -> ClawbackResult:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
 

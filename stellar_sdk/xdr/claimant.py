@@ -1,6 +1,9 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
+from __future__ import annotations
+
 import base64
+
 from xdrlib3 import Packer, Unpacker
 
 from .claimant_type import ClaimantType
@@ -45,7 +48,7 @@ class Claimant:
             return
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "Claimant":
+    def unpack(cls, unpacker: Unpacker) -> Claimant:
         type = ClaimantType.unpack(unpacker)
         if type == ClaimantType.CLAIMANT_TYPE_V0:
             v0 = ClaimantV0.unpack(unpacker)
@@ -58,7 +61,7 @@ class Claimant:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "Claimant":
+    def from_xdr_bytes(cls, xdr: bytes) -> Claimant:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -67,7 +70,7 @@ class Claimant:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "Claimant":
+    def from_xdr(cls, xdr: str) -> Claimant:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
 

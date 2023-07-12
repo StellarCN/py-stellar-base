@@ -1,6 +1,9 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
+from __future__ import annotations
+
 import base64
+
 from xdrlib3 import Packer, Unpacker
 
 from .envelope_type import EnvelopeType
@@ -43,7 +46,7 @@ class FeeBumpTransactionInnerTx:
             return
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "FeeBumpTransactionInnerTx":
+    def unpack(cls, unpacker: Unpacker) -> FeeBumpTransactionInnerTx:
         type = EnvelopeType.unpack(unpacker)
         if type == EnvelopeType.ENVELOPE_TYPE_TX:
             v1 = TransactionV1Envelope.unpack(unpacker)
@@ -56,7 +59,7 @@ class FeeBumpTransactionInnerTx:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "FeeBumpTransactionInnerTx":
+    def from_xdr_bytes(cls, xdr: bytes) -> FeeBumpTransactionInnerTx:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -65,7 +68,7 @@ class FeeBumpTransactionInnerTx:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "FeeBumpTransactionInnerTx":
+    def from_xdr(cls, xdr: str) -> FeeBumpTransactionInnerTx:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
 

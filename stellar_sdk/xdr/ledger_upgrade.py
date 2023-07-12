@@ -1,6 +1,9 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
+from __future__ import annotations
+
 import base64
+
 from xdrlib3 import Packer, Unpacker
 
 from .config_upgrade_set_key import ConfigUpgradeSetKey
@@ -122,7 +125,7 @@ class LedgerUpgrade:
             return
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "LedgerUpgrade":
+    def unpack(cls, unpacker: Unpacker) -> LedgerUpgrade:
         type = LedgerUpgradeType.unpack(unpacker)
         if type == LedgerUpgradeType.LEDGER_UPGRADE_VERSION:
             new_ledger_version = Uint32.unpack(unpacker)
@@ -150,7 +153,7 @@ class LedgerUpgrade:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "LedgerUpgrade":
+    def from_xdr_bytes(cls, xdr: bytes) -> LedgerUpgrade:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -159,7 +162,7 @@ class LedgerUpgrade:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "LedgerUpgrade":
+    def from_xdr(cls, xdr: str) -> LedgerUpgrade:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
 

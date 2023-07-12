@@ -1,6 +1,9 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
+from __future__ import annotations
+
 import base64
+
 from xdrlib3 import Packer, Unpacker
 
 from .ledger_entry_type import LedgerEntryType
@@ -64,13 +67,16 @@ class LedgerKey:
         case CONTRACT_DATA:
             struct
             {
-                Hash contractID;
+                SCAddress contract;
                 SCVal key;
+                ContractDataDurability durability;
+                ContractEntryBodyType bodyType;
             } contractData;
         case CONTRACT_CODE:
             struct
             {
                 Hash hash;
+                ContractEntryBodyType bodyType;
             } contractCode;
         case CONFIG_SETTING:
             struct
@@ -193,7 +199,7 @@ class LedgerKey:
             return
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "LedgerKey":
+    def unpack(cls, unpacker: Unpacker) -> LedgerKey:
         type = LedgerEntryType.unpack(unpacker)
         if type == LedgerEntryType.ACCOUNT:
             account = LedgerKeyAccount.unpack(unpacker)
@@ -230,7 +236,7 @@ class LedgerKey:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "LedgerKey":
+    def from_xdr_bytes(cls, xdr: bytes) -> LedgerKey:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -239,7 +245,7 @@ class LedgerKey:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "LedgerKey":
+    def from_xdr(cls, xdr: str) -> LedgerKey:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
 

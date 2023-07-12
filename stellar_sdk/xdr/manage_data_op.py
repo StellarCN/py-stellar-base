@@ -1,7 +1,10 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
+from __future__ import annotations
+
 import base64
 from typing import Optional
+
 from xdrlib3 import Packer, Unpacker
 
 from .data_value import DataValue
@@ -38,7 +41,7 @@ class ManageDataOp:
             self.data_value.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "ManageDataOp":
+    def unpack(cls, unpacker: Unpacker) -> ManageDataOp:
         data_name = String64.unpack(unpacker)
         data_value = DataValue.unpack(unpacker) if unpacker.unpack_uint() else None
         return cls(
@@ -52,7 +55,7 @@ class ManageDataOp:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "ManageDataOp":
+    def from_xdr_bytes(cls, xdr: bytes) -> ManageDataOp:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -61,7 +64,7 @@ class ManageDataOp:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "ManageDataOp":
+    def from_xdr(cls, xdr: str) -> ManageDataOp:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
 

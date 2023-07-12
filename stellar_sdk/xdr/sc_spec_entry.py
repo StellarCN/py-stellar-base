@@ -1,6 +1,9 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
+from __future__ import annotations
+
 import base64
+
 from xdrlib3 import Packer, Unpacker
 
 from .sc_spec_entry_kind import SCSpecEntryKind
@@ -114,7 +117,7 @@ class SCSpecEntry:
             return
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "SCSpecEntry":
+    def unpack(cls, unpacker: Unpacker) -> SCSpecEntry:
         kind = SCSpecEntryKind.unpack(unpacker)
         if kind == SCSpecEntryKind.SC_SPEC_ENTRY_FUNCTION_V0:
             function_v0 = SCSpecFunctionV0.unpack(unpacker)
@@ -139,7 +142,7 @@ class SCSpecEntry:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "SCSpecEntry":
+    def from_xdr_bytes(cls, xdr: bytes) -> SCSpecEntry:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -148,7 +151,7 @@ class SCSpecEntry:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "SCSpecEntry":
+    def from_xdr(cls, xdr: str) -> SCSpecEntry:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
 

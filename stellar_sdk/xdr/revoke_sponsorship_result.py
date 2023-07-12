@@ -1,6 +1,9 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
+from __future__ import annotations
+
 import base64
+
 from xdrlib3 import Packer, Unpacker
 
 from .revoke_sponsorship_result_code import RevokeSponsorshipResultCode
@@ -74,7 +77,7 @@ class RevokeSponsorshipResult:
             return
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "RevokeSponsorshipResult":
+    def unpack(cls, unpacker: Unpacker) -> RevokeSponsorshipResult:
         code = RevokeSponsorshipResultCode.unpack(unpacker)
         if code == RevokeSponsorshipResultCode.REVOKE_SPONSORSHIP_SUCCESS:
             return cls(code=code)
@@ -96,7 +99,7 @@ class RevokeSponsorshipResult:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "RevokeSponsorshipResult":
+    def from_xdr_bytes(cls, xdr: bytes) -> RevokeSponsorshipResult:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -105,7 +108,7 @@ class RevokeSponsorshipResult:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "RevokeSponsorshipResult":
+    def from_xdr(cls, xdr: str) -> RevokeSponsorshipResult:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
 

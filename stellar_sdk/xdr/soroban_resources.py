@@ -1,6 +1,9 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
+from __future__ import annotations
+
 import base64
+
 from xdrlib3 import Packer, Unpacker
 
 from .ledger_footprint import LedgerFootprint
@@ -26,7 +29,7 @@ class SorobanResources:
             uint32 writeBytes;
 
             // Maximum size of dynamic metadata produced by this contract (
-            // currently only includes the events).
+            // bytes read from ledger + bytes written to ledger + event bytes written to meta).
             uint32 extendedMetaDataSizeBytes;
         };
     """
@@ -53,7 +56,7 @@ class SorobanResources:
         self.extended_meta_data_size_bytes.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "SorobanResources":
+    def unpack(cls, unpacker: Unpacker) -> SorobanResources:
         footprint = LedgerFootprint.unpack(unpacker)
         instructions = Uint32.unpack(unpacker)
         read_bytes = Uint32.unpack(unpacker)
@@ -73,7 +76,7 @@ class SorobanResources:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "SorobanResources":
+    def from_xdr_bytes(cls, xdr: bytes) -> SorobanResources:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -82,7 +85,7 @@ class SorobanResources:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "SorobanResources":
+    def from_xdr(cls, xdr: str) -> SorobanResources:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
 

@@ -1,6 +1,9 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
+from __future__ import annotations
+
 import base64
+
 from xdrlib3 import Packer, Unpacker
 
 from .public_key_type import PublicKeyType
@@ -41,7 +44,7 @@ class PublicKey:
             return
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "PublicKey":
+    def unpack(cls, unpacker: Unpacker) -> PublicKey:
         type = PublicKeyType.unpack(unpacker)
         if type == PublicKeyType.PUBLIC_KEY_TYPE_ED25519:
             ed25519 = Uint256.unpack(unpacker)
@@ -54,7 +57,7 @@ class PublicKey:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "PublicKey":
+    def from_xdr_bytes(cls, xdr: bytes) -> PublicKey:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -63,7 +66,7 @@ class PublicKey:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "PublicKey":
+    def from_xdr(cls, xdr: str) -> PublicKey:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
 

@@ -11,7 +11,6 @@ from .account_flags import AccountFlags
 from .account_id import AccountID
 from .account_merge_result import AccountMergeResult
 from .account_merge_result_code import AccountMergeResultCode
-from .address_with_nonce import AddressWithNonce
 from .allow_trust_op import AllowTrustOp
 from .allow_trust_result import AllowTrustResult
 from .allow_trust_result_code import AllowTrustResultCode
@@ -26,7 +25,6 @@ from .auth import Auth
 from .auth_cert import AuthCert
 from .authenticated_message import AuthenticatedMessage
 from .authenticated_message_v0 import AuthenticatedMessageV0
-from .authorized_invocation import AuthorizedInvocation
 from .base import *
 from .begin_sponsoring_future_reserves_op import BeginSponsoringFutureReservesOp
 from .begin_sponsoring_future_reserves_result import BeginSponsoringFutureReservesResult
@@ -37,6 +35,9 @@ from .bucket_entry import BucketEntry
 from .bucket_entry_type import BucketEntryType
 from .bucket_metadata import BucketMetadata
 from .bucket_metadata_ext import BucketMetadataExt
+from .bump_footprint_expiration_op import BumpFootprintExpirationOp
+from .bump_footprint_expiration_result import BumpFootprintExpirationResult
+from .bump_footprint_expiration_result_code import BumpFootprintExpirationResultCode
 from .bump_sequence_op import BumpSequenceOp
 from .bump_sequence_result import BumpSequenceResult
 from .bump_sequence_result_code import BumpSequenceResultCode
@@ -74,6 +75,9 @@ from .clawback_result import ClawbackResult
 from .clawback_result_code import ClawbackResultCode
 from .config_setting_contract_bandwidth_v0 import ConfigSettingContractBandwidthV0
 from .config_setting_contract_compute_v0 import ConfigSettingContractComputeV0
+from .config_setting_contract_execution_lanes_v0 import (
+    ConfigSettingContractExecutionLanesV0,
+)
 from .config_setting_contract_historical_data_v0 import (
     ConfigSettingContractHistoricalDataV0,
 )
@@ -84,20 +88,26 @@ from .config_setting_id import ConfigSettingID
 from .config_upgrade_set import ConfigUpgradeSet
 from .config_upgrade_set_key import ConfigUpgradeSetKey
 from .constants import *
-from .contract_auth import ContractAuth
 from .contract_code_entry import ContractCodeEntry
+from .contract_code_entry_body import ContractCodeEntryBody
 from .contract_cost_param_entry import ContractCostParamEntry
 from .contract_cost_params import ContractCostParams
 from .contract_cost_type import ContractCostType
+from .contract_data_durability import ContractDataDurability
 from .contract_data_entry import ContractDataEntry
+from .contract_data_entry_body import ContractDataEntryBody
+from .contract_data_entry_data import ContractDataEntryData
+from .contract_data_flags import ContractDataFlags
+from .contract_entry_body_type import ContractEntryBodyType
 from .contract_event import ContractEvent
 from .contract_event_body import ContractEventBody
 from .contract_event_type import ContractEventType
 from .contract_event_v0 import ContractEventV0
-from .contract_id import ContractID
-from .contract_id_from_ed25519_public_key import ContractIDFromEd25519PublicKey
-from .contract_id_public_key_type import ContractIDPublicKeyType
-from .contract_id_type import ContractIDType
+from .contract_executable import ContractExecutable
+from .contract_executable_type import ContractExecutableType
+from .contract_id_preimage import ContractIDPreimage
+from .contract_id_preimage_from_address import ContractIDPreimageFromAddress
+from .contract_id_preimage_type import ContractIDPreimageType
 from .create_account_op import CreateAccountOp
 from .create_account_result import CreateAccountResult
 from .create_account_result_code import CreateAccountResultCode
@@ -134,21 +144,14 @@ from .flood_demand import FloodDemand
 from .generalized_transaction_set import GeneralizedTransactionSet
 from .hash import Hash
 from .hash_id_preimage import HashIDPreimage
-from .hash_id_preimage_contract_auth import HashIDPreimageContractAuth
 from .hash_id_preimage_contract_id import HashIDPreimageContractID
-from .hash_id_preimage_create_contract_args import HashIDPreimageCreateContractArgs
-from .hash_id_preimage_ed25519_contract_id import HashIDPreimageEd25519ContractID
-from .hash_id_preimage_from_asset import HashIDPreimageFromAsset
 from .hash_id_preimage_operation_id import HashIDPreimageOperationID
 from .hash_id_preimage_revoke_id import HashIDPreimageRevokeID
-from .hash_id_preimage_source_account_contract_id import (
-    HashIDPreimageSourceAccountContractID,
-)
+from .hash_id_preimage_soroban_authorization import HashIDPreimageSorobanAuthorization
 from .hello import Hello
 from .hmac_sha256_key import HmacSha256Key
 from .hmac_sha256_mac import HmacSha256Mac
 from .host_function import HostFunction
-from .host_function_args import HostFunctionArgs
 from .host_function_type import HostFunctionType
 from .inflation_payout import InflationPayout
 from .inflation_result import InflationResult
@@ -164,6 +167,7 @@ from .int256_parts import Int256Parts
 from .invoke_host_function_op import InvokeHostFunctionOp
 from .invoke_host_function_result import InvokeHostFunctionResult
 from .invoke_host_function_result_code import InvokeHostFunctionResultCode
+from .invoke_host_function_success_pre_image import InvokeHostFunctionSuccessPreImage
 from .ip_addr_type import IPAddrType
 from .ledger_bounds import LedgerBounds
 from .ledger_close_meta import LedgerCloseMeta
@@ -239,8 +243,6 @@ from .offer_entry_ext import OfferEntryExt
 from .offer_entry_flags import OfferEntryFlags
 from .operation import Operation
 from .operation_body import OperationBody
-from .operation_diagnostic_events import OperationDiagnosticEvents
-from .operation_events import OperationEvents
 from .operation_meta import OperationMeta
 from .operation_result import OperationResult
 from .operation_result_code import OperationResultCode
@@ -273,6 +275,9 @@ from .preconditions_v2 import PreconditionsV2
 from .price import Price
 from .public_key import PublicKey
 from .public_key_type import PublicKeyType
+from .restore_footprint_op import RestoreFootprintOp
+from .restore_footprint_result import RestoreFootprintResult
+from .restore_footprint_result_code import RestoreFootprintResultCode
 from .revoke_sponsorship_op import RevokeSponsorshipOp
 from .revoke_sponsorship_op_signer import RevokeSponsorshipOpSigner
 from .revoke_sponsorship_result import RevokeSponsorshipResult
@@ -281,16 +286,12 @@ from .revoke_sponsorship_type import RevokeSponsorshipType
 from .sc_address import SCAddress
 from .sc_address_type import SCAddressType
 from .sc_bytes import SCBytes
-from .sc_contract_executable import SCContractExecutable
-from .sc_contract_executable_type import SCContractExecutableType
+from .sc_contract_instance import SCContractInstance
 from .sc_env_meta_entry import SCEnvMetaEntry
 from .sc_env_meta_kind import SCEnvMetaKind
-from .sc_host_auth_error_code import SCHostAuthErrorCode
-from .sc_host_context_error_code import SCHostContextErrorCode
-from .sc_host_fn_error_code import SCHostFnErrorCode
-from .sc_host_obj_error_code import SCHostObjErrorCode
-from .sc_host_storage_error_code import SCHostStorageErrorCode
-from .sc_host_val_error_code import SCHostValErrorCode
+from .sc_error import SCError
+from .sc_error_code import SCErrorCode
+from .sc_error_type import SCErrorType
 from .sc_map import SCMap
 from .sc_map_entry import SCMapEntry
 from .sc_meta_entry import SCMetaEntry
@@ -322,15 +323,11 @@ from .sc_spec_udt_union_case_v0 import SCSpecUDTUnionCaseV0
 from .sc_spec_udt_union_case_v0_kind import SCSpecUDTUnionCaseV0Kind
 from .sc_spec_udt_union_case_void_v0 import SCSpecUDTUnionCaseVoidV0
 from .sc_spec_udt_union_v0 import SCSpecUDTUnionV0
-from .sc_status import SCStatus
-from .sc_status_type import SCStatusType
 from .sc_string import SCString
 from .sc_symbol import SCSymbol
-from .sc_unknown_error_code import SCUnknownErrorCode
 from .sc_val import SCVal
 from .sc_val_type import SCValType
 from .sc_vec import SCVec
-from .sc_vm_error_code import SCVmErrorCode
 from .scp_ballot import SCPBallot
 from .scp_envelope import SCPEnvelope
 from .scp_history_entry import SCPHistoryEntry
@@ -344,6 +341,7 @@ from .scp_statement_pledges import SCPStatementPledges
 from .scp_statement_prepare import SCPStatementPrepare
 from .scp_statement_type import SCPStatementType
 from .send_more import SendMore
+from .send_more_extended import SendMoreExtended
 from .sequence_number import SequenceNumber
 from .set_options_op import SetOptionsOp
 from .set_options_result import SetOptionsResult
@@ -360,9 +358,19 @@ from .signer_key import SignerKey
 from .signer_key_ed25519_signed_payload import SignerKeyEd25519SignedPayload
 from .signer_key_type import SignerKeyType
 from .simple_payment_result import SimplePaymentResult
+from .soroban_address_credentials import SorobanAddressCredentials
+from .soroban_authorization_entry import SorobanAuthorizationEntry
+from .soroban_authorized_contract_function import SorobanAuthorizedContractFunction
+from .soroban_authorized_function import SorobanAuthorizedFunction
+from .soroban_authorized_function_type import SorobanAuthorizedFunctionType
+from .soroban_authorized_invocation import SorobanAuthorizedInvocation
+from .soroban_credentials import SorobanCredentials
+from .soroban_credentials_type import SorobanCredentialsType
 from .soroban_resources import SorobanResources
 from .soroban_transaction_data import SorobanTransactionData
+from .soroban_transaction_meta import SorobanTransactionMeta
 from .sponsorship_descriptor import SponsorshipDescriptor
+from .state_expiration_settings import StateExpirationSettings
 from .stellar_message import StellarMessage
 from .stellar_value import StellarValue
 from .stellar_value_ext import StellarValueExt
@@ -388,8 +396,6 @@ from .transaction_history_entry import TransactionHistoryEntry
 from .transaction_history_entry_ext import TransactionHistoryEntryExt
 from .transaction_history_result_entry import TransactionHistoryResultEntry
 from .transaction_history_result_entry_ext import TransactionHistoryResultEntryExt
-from .transaction_history_result_entry_v2 import TransactionHistoryResultEntryV2
-from .transaction_history_result_entry_v2_ext import TransactionHistoryResultEntryV2Ext
 from .transaction_meta import TransactionMeta
 from .transaction_meta_v1 import TransactionMetaV1
 from .transaction_meta_v2 import TransactionMetaV2
@@ -399,12 +405,9 @@ from .transaction_result import TransactionResult
 from .transaction_result_code import TransactionResultCode
 from .transaction_result_ext import TransactionResultExt
 from .transaction_result_meta import TransactionResultMeta
-from .transaction_result_meta_v2 import TransactionResultMetaV2
 from .transaction_result_pair import TransactionResultPair
-from .transaction_result_pair_v2 import TransactionResultPairV2
 from .transaction_result_result import TransactionResultResult
 from .transaction_result_set import TransactionResultSet
-from .transaction_result_set_v2 import TransactionResultSetV2
 from .transaction_set import TransactionSet
 from .transaction_set_v1 import TransactionSetV1
 from .transaction_signature_payload import TransactionSignaturePayload
@@ -437,5 +440,4 @@ from .uint64 import Uint64
 from .uint256 import Uint256
 from .upgrade_entry_meta import UpgradeEntryMeta
 from .upgrade_type import UpgradeType
-from .upload_contract_wasm_args import UploadContractWasmArgs
 from .value import Value

@@ -1,6 +1,9 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
+from __future__ import annotations
+
 import base64
+
 from xdrlib3 import Packer, Unpacker
 
 from .asset import Asset
@@ -42,7 +45,7 @@ class CreatePassiveSellOfferOp:
         self.price.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "CreatePassiveSellOfferOp":
+    def unpack(cls, unpacker: Unpacker) -> CreatePassiveSellOfferOp:
         selling = Asset.unpack(unpacker)
         buying = Asset.unpack(unpacker)
         amount = Int64.unpack(unpacker)
@@ -60,7 +63,7 @@ class CreatePassiveSellOfferOp:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "CreatePassiveSellOfferOp":
+    def from_xdr_bytes(cls, xdr: bytes) -> CreatePassiveSellOfferOp:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -69,7 +72,7 @@ class CreatePassiveSellOfferOp:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "CreatePassiveSellOfferOp":
+    def from_xdr(cls, xdr: str) -> CreatePassiveSellOfferOp:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
 

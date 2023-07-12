@@ -1,10 +1,13 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
 # This file contains manual patches
+from __future__ import annotations
 
 import base64
 from typing import TYPE_CHECKING
+
 from xdrlib3 import Packer, Unpacker
+
 from .sc_spec_type import SCSpecType
 
 if TYPE_CHECKING:
@@ -29,7 +32,7 @@ class SCSpecTypeDef:
         case SC_SPEC_TYPE_VAL:
         case SC_SPEC_TYPE_BOOL:
         case SC_SPEC_TYPE_VOID:
-        case SC_SPEC_TYPE_STATUS:
+        case SC_SPEC_TYPE_ERROR:
         case SC_SPEC_TYPE_U32:
         case SC_SPEC_TYPE_I32:
         case SC_SPEC_TYPE_U64:
@@ -67,14 +70,14 @@ class SCSpecTypeDef:
     def __init__(
         self,
         type: SCSpecType,
-        option: "SCSpecTypeOption" = None,
-        result: "SCSpecTypeResult" = None,
-        vec: "SCSpecTypeVec" = None,
-        map: "SCSpecTypeMap" = None,
-        set: "SCSpecTypeSet" = None,
-        tuple: "SCSpecTypeTuple" = None,
-        bytes_n: "SCSpecTypeBytesN" = None,
-        udt: "SCSpecTypeUDT" = None,
+        option: SCSpecTypeOption = None,
+        result: SCSpecTypeResult = None,
+        vec: SCSpecTypeVec = None,
+        map: SCSpecTypeMap = None,
+        set: SCSpecTypeSet = None,
+        tuple: SCSpecTypeTuple = None,
+        bytes_n: SCSpecTypeBytesN = None,
+        udt: SCSpecTypeUDT = None,
     ) -> None:
         self.type = type
         self.option = option
@@ -87,107 +90,107 @@ class SCSpecTypeDef:
         self.udt = udt
 
     @classmethod
-    def from_sc_spec_type_val(cls) -> "SCSpecTypeDef":
+    def from_sc_spec_type_val(cls) -> SCSpecTypeDef:
         return cls(SCSpecType.SC_SPEC_TYPE_VAL)
 
     @classmethod
-    def from_sc_spec_type_bool(cls) -> "SCSpecTypeDef":
+    def from_sc_spec_type_bool(cls) -> SCSpecTypeDef:
         return cls(SCSpecType.SC_SPEC_TYPE_BOOL)
 
     @classmethod
-    def from_sc_spec_type_void(cls) -> "SCSpecTypeDef":
+    def from_sc_spec_type_void(cls) -> SCSpecTypeDef:
         return cls(SCSpecType.SC_SPEC_TYPE_VOID)
 
     @classmethod
-    def from_sc_spec_type_status(cls) -> "SCSpecTypeDef":
-        return cls(SCSpecType.SC_SPEC_TYPE_STATUS)
+    def from_sc_spec_type_error(cls) -> SCSpecTypeDef:
+        return cls(SCSpecType.SC_SPEC_TYPE_ERROR)
 
     @classmethod
-    def from_sc_spec_type_u32(cls) -> "SCSpecTypeDef":
+    def from_sc_spec_type_u32(cls) -> SCSpecTypeDef:
         return cls(SCSpecType.SC_SPEC_TYPE_U32)
 
     @classmethod
-    def from_sc_spec_type_i32(cls) -> "SCSpecTypeDef":
+    def from_sc_spec_type_i32(cls) -> SCSpecTypeDef:
         return cls(SCSpecType.SC_SPEC_TYPE_I32)
 
     @classmethod
-    def from_sc_spec_type_u64(cls) -> "SCSpecTypeDef":
+    def from_sc_spec_type_u64(cls) -> SCSpecTypeDef:
         return cls(SCSpecType.SC_SPEC_TYPE_U64)
 
     @classmethod
-    def from_sc_spec_type_i64(cls) -> "SCSpecTypeDef":
+    def from_sc_spec_type_i64(cls) -> SCSpecTypeDef:
         return cls(SCSpecType.SC_SPEC_TYPE_I64)
 
     @classmethod
-    def from_sc_spec_type_timepoint(cls) -> "SCSpecTypeDef":
+    def from_sc_spec_type_timepoint(cls) -> SCSpecTypeDef:
         return cls(SCSpecType.SC_SPEC_TYPE_TIMEPOINT)
 
     @classmethod
-    def from_sc_spec_type_duration(cls) -> "SCSpecTypeDef":
+    def from_sc_spec_type_duration(cls) -> SCSpecTypeDef:
         return cls(SCSpecType.SC_SPEC_TYPE_DURATION)
 
     @classmethod
-    def from_sc_spec_type_u128(cls) -> "SCSpecTypeDef":
+    def from_sc_spec_type_u128(cls) -> SCSpecTypeDef:
         return cls(SCSpecType.SC_SPEC_TYPE_U128)
 
     @classmethod
-    def from_sc_spec_type_i128(cls) -> "SCSpecTypeDef":
+    def from_sc_spec_type_i128(cls) -> SCSpecTypeDef:
         return cls(SCSpecType.SC_SPEC_TYPE_I128)
 
     @classmethod
-    def from_sc_spec_type_u256(cls) -> "SCSpecTypeDef":
+    def from_sc_spec_type_u256(cls) -> SCSpecTypeDef:
         return cls(SCSpecType.SC_SPEC_TYPE_U256)
 
     @classmethod
-    def from_sc_spec_type_i256(cls) -> "SCSpecTypeDef":
+    def from_sc_spec_type_i256(cls) -> SCSpecTypeDef:
         return cls(SCSpecType.SC_SPEC_TYPE_I256)
 
     @classmethod
-    def from_sc_spec_type_bytes(cls) -> "SCSpecTypeDef":
+    def from_sc_spec_type_bytes(cls) -> SCSpecTypeDef:
         return cls(SCSpecType.SC_SPEC_TYPE_BYTES)
 
     @classmethod
-    def from_sc_spec_type_string(cls) -> "SCSpecTypeDef":
+    def from_sc_spec_type_string(cls) -> SCSpecTypeDef:
         return cls(SCSpecType.SC_SPEC_TYPE_STRING)
 
     @classmethod
-    def from_sc_spec_type_symbol(cls) -> "SCSpecTypeDef":
+    def from_sc_spec_type_symbol(cls) -> SCSpecTypeDef:
         return cls(SCSpecType.SC_SPEC_TYPE_SYMBOL)
 
     @classmethod
-    def from_sc_spec_type_address(cls) -> "SCSpecTypeDef":
+    def from_sc_spec_type_address(cls) -> SCSpecTypeDef:
         return cls(SCSpecType.SC_SPEC_TYPE_ADDRESS)
 
     @classmethod
-    def from_sc_spec_type_option(cls, option: "SCSpecTypeOption") -> "SCSpecTypeDef":
+    def from_sc_spec_type_option(cls, option: SCSpecTypeOption) -> SCSpecTypeDef:
         return cls(SCSpecType.SC_SPEC_TYPE_OPTION, option=option)
 
     @classmethod
-    def from_sc_spec_type_result(cls, result: "SCSpecTypeResult") -> "SCSpecTypeDef":
+    def from_sc_spec_type_result(cls, result: SCSpecTypeResult) -> SCSpecTypeDef:
         return cls(SCSpecType.SC_SPEC_TYPE_RESULT, result=result)
 
     @classmethod
-    def from_sc_spec_type_vec(cls, vec: "SCSpecTypeVec") -> "SCSpecTypeDef":
+    def from_sc_spec_type_vec(cls, vec: SCSpecTypeVec) -> SCSpecTypeDef:
         return cls(SCSpecType.SC_SPEC_TYPE_VEC, vec=vec)
 
     @classmethod
-    def from_sc_spec_type_map(cls, map: "SCSpecTypeMap") -> "SCSpecTypeDef":
+    def from_sc_spec_type_map(cls, map: SCSpecTypeMap) -> SCSpecTypeDef:
         return cls(SCSpecType.SC_SPEC_TYPE_MAP, map=map)
 
     @classmethod
-    def from_sc_spec_type_set(cls, set: "SCSpecTypeSet") -> "SCSpecTypeDef":
+    def from_sc_spec_type_set(cls, set: SCSpecTypeSet) -> SCSpecTypeDef:
         return cls(SCSpecType.SC_SPEC_TYPE_SET, set=set)
 
     @classmethod
-    def from_sc_spec_type_tuple(cls, tuple: "SCSpecTypeTuple") -> "SCSpecTypeDef":
+    def from_sc_spec_type_tuple(cls, tuple: SCSpecTypeTuple) -> SCSpecTypeDef:
         return cls(SCSpecType.SC_SPEC_TYPE_TUPLE, tuple=tuple)
 
     @classmethod
-    def from_sc_spec_type_bytes_n(cls, bytes_n: "SCSpecTypeBytesN") -> "SCSpecTypeDef":
+    def from_sc_spec_type_bytes_n(cls, bytes_n: SCSpecTypeBytesN) -> SCSpecTypeDef:
         return cls(SCSpecType.SC_SPEC_TYPE_BYTES_N, bytes_n=bytes_n)
 
     @classmethod
-    def from_sc_spec_type_udt(cls, udt: "SCSpecTypeUDT") -> "SCSpecTypeDef":
+    def from_sc_spec_type_udt(cls, udt: SCSpecTypeUDT) -> SCSpecTypeDef:
         return cls(SCSpecType.SC_SPEC_TYPE_UDT, udt=udt)
 
     def pack(self, packer: Packer) -> None:
@@ -198,7 +201,7 @@ class SCSpecTypeDef:
             return
         if self.type == SCSpecType.SC_SPEC_TYPE_VOID:
             return
-        if self.type == SCSpecType.SC_SPEC_TYPE_STATUS:
+        if self.type == SCSpecType.SC_SPEC_TYPE_ERROR:
             return
         if self.type == SCSpecType.SC_SPEC_TYPE_U32:
             return
@@ -278,7 +281,7 @@ class SCSpecTypeDef:
             return cls(type=type)
         if type == SCSpecType.SC_SPEC_TYPE_VOID:
             return cls(type=type)
-        if type == SCSpecType.SC_SPEC_TYPE_STATUS:
+        if type == SCSpecType.SC_SPEC_TYPE_ERROR:
             return cls(type=type)
         if type == SCSpecType.SC_SPEC_TYPE_U32:
             return cls(type=type)

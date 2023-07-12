@@ -1,6 +1,9 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
+from __future__ import annotations
+
 import base64
+
 from xdrlib3 import Packer, Unpacker
 
 from .uint64 import Uint64
@@ -31,7 +34,7 @@ class UInt128Parts:
         self.lo.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "UInt128Parts":
+    def unpack(cls, unpacker: Unpacker) -> UInt128Parts:
         hi = Uint64.unpack(unpacker)
         lo = Uint64.unpack(unpacker)
         return cls(
@@ -45,7 +48,7 @@ class UInt128Parts:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "UInt128Parts":
+    def from_xdr_bytes(cls, xdr: bytes) -> UInt128Parts:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -54,7 +57,7 @@ class UInt128Parts:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "UInt128Parts":
+    def from_xdr(cls, xdr: str) -> UInt128Parts:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
 

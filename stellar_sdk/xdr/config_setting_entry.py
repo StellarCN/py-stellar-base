@@ -1,10 +1,17 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
+from __future__ import annotations
+
 import base64
+from typing import List
+
 from xdrlib3 import Packer, Unpacker
 
 from .config_setting_contract_bandwidth_v0 import ConfigSettingContractBandwidthV0
 from .config_setting_contract_compute_v0 import ConfigSettingContractComputeV0
+from .config_setting_contract_execution_lanes_v0 import (
+    ConfigSettingContractExecutionLanesV0,
+)
 from .config_setting_contract_historical_data_v0 import (
     ConfigSettingContractHistoricalDataV0,
 )
@@ -12,7 +19,9 @@ from .config_setting_contract_ledger_cost_v0 import ConfigSettingContractLedgerC
 from .config_setting_contract_meta_data_v0 import ConfigSettingContractMetaDataV0
 from .config_setting_id import ConfigSettingID
 from .contract_cost_params import ContractCostParams
+from .state_expiration_settings import StateExpirationSettings
 from .uint32 import Uint32
+from .uint64 import Uint64
 
 __all__ = ["ConfigSettingEntry"]
 
@@ -43,6 +52,12 @@ class ConfigSettingEntry:
             uint32 contractDataKeySizeBytes;
         case CONFIG_SETTING_CONTRACT_DATA_ENTRY_SIZE_BYTES:
             uint32 contractDataEntrySizeBytes;
+        case CONFIG_SETTING_STATE_EXPIRATION:
+            StateExpirationSettings stateExpirationSettings;
+        case CONFIG_SETTING_CONTRACT_EXECUTION_LANES:
+            ConfigSettingContractExecutionLanesV0 contractExecutionLanes;
+        case CONFIG_SETTING_BUCKETLIST_SIZE_WINDOW:
+            uint64 bucketListSizeWindow<>;
         };
     """
 
@@ -59,7 +74,18 @@ class ConfigSettingEntry:
         contract_cost_params_mem_bytes: ContractCostParams = None,
         contract_data_key_size_bytes: Uint32 = None,
         contract_data_entry_size_bytes: Uint32 = None,
+        state_expiration_settings: StateExpirationSettings = None,
+        contract_execution_lanes: ConfigSettingContractExecutionLanesV0 = None,
+        bucket_list_size_window: List[Uint64] = None,
     ) -> None:
+        _expect_max_length = 4294967295
+        if (
+            bucket_list_size_window
+            and len(bucket_list_size_window) > _expect_max_length
+        ):
+            raise ValueError(
+                f"The maximum length of `bucket_list_size_window` should be {_expect_max_length}, but got {len(bucket_list_size_window)}."
+            )
         self.config_setting_id = config_setting_id
         self.contract_max_size_bytes = contract_max_size_bytes
         self.contract_compute = contract_compute
@@ -71,6 +97,9 @@ class ConfigSettingEntry:
         self.contract_cost_params_mem_bytes = contract_cost_params_mem_bytes
         self.contract_data_key_size_bytes = contract_data_key_size_bytes
         self.contract_data_entry_size_bytes = contract_data_entry_size_bytes
+        self.state_expiration_settings = state_expiration_settings
+        self.contract_execution_lanes = contract_execution_lanes
+        self.bucket_list_size_window = bucket_list_size_window
 
     @classmethod
     def from_config_setting_contract_max_size_bytes(
@@ -162,6 +191,33 @@ class ConfigSettingEntry:
             contract_data_entry_size_bytes=contract_data_entry_size_bytes,
         )
 
+    @classmethod
+    def from_config_setting_state_expiration(
+        cls, state_expiration_settings: StateExpirationSettings
+    ) -> "ConfigSettingEntry":
+        return cls(
+            ConfigSettingID.CONFIG_SETTING_STATE_EXPIRATION,
+            state_expiration_settings=state_expiration_settings,
+        )
+
+    @classmethod
+    def from_config_setting_contract_execution_lanes(
+        cls, contract_execution_lanes: ConfigSettingContractExecutionLanesV0
+    ) -> "ConfigSettingEntry":
+        return cls(
+            ConfigSettingID.CONFIG_SETTING_CONTRACT_EXECUTION_LANES,
+            contract_execution_lanes=contract_execution_lanes,
+        )
+
+    @classmethod
+    def from_config_setting_bucketlist_size_window(
+        cls, bucket_list_size_window: List[Uint64]
+    ) -> "ConfigSettingEntry":
+        return cls(
+            ConfigSettingID.CONFIG_SETTING_BUCKETLIST_SIZE_WINDOW,
+            bucket_list_size_window=bucket_list_size_window,
+        )
+
     def pack(self, packer: Packer) -> None:
         self.config_setting_id.pack(packer)
         if (
@@ -241,9 +297,32 @@ class ConfigSettingEntry:
                 raise ValueError("contract_data_entry_size_bytes should not be None.")
             self.contract_data_entry_size_bytes.pack(packer)
             return
+        if self.config_setting_id == ConfigSettingID.CONFIG_SETTING_STATE_EXPIRATION:
+            if self.state_expiration_settings is None:
+                raise ValueError("state_expiration_settings should not be None.")
+            self.state_expiration_settings.pack(packer)
+            return
+        if (
+            self.config_setting_id
+            == ConfigSettingID.CONFIG_SETTING_CONTRACT_EXECUTION_LANES
+        ):
+            if self.contract_execution_lanes is None:
+                raise ValueError("contract_execution_lanes should not be None.")
+            self.contract_execution_lanes.pack(packer)
+            return
+        if (
+            self.config_setting_id
+            == ConfigSettingID.CONFIG_SETTING_BUCKETLIST_SIZE_WINDOW
+        ):
+            if self.bucket_list_size_window is None:
+                raise ValueError("bucket_list_size_window should not be None.")
+            packer.pack_uint(len(self.bucket_list_size_window))
+            for bucket_list_size_window_item in self.bucket_list_size_window:
+                bucket_list_size_window_item.pack(packer)
+            return
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "ConfigSettingEntry":
+    def unpack(cls, unpacker: Unpacker) -> ConfigSettingEntry:
         config_setting_id = ConfigSettingID.unpack(unpacker)
         if config_setting_id == ConfigSettingID.CONFIG_SETTING_CONTRACT_MAX_SIZE_BYTES:
             contract_max_size_bytes = Uint32.unpack(unpacker)
@@ -321,6 +400,29 @@ class ConfigSettingEntry:
                 config_setting_id=config_setting_id,
                 contract_data_entry_size_bytes=contract_data_entry_size_bytes,
             )
+        if config_setting_id == ConfigSettingID.CONFIG_SETTING_STATE_EXPIRATION:
+            state_expiration_settings = StateExpirationSettings.unpack(unpacker)
+            return cls(
+                config_setting_id=config_setting_id,
+                state_expiration_settings=state_expiration_settings,
+            )
+        if config_setting_id == ConfigSettingID.CONFIG_SETTING_CONTRACT_EXECUTION_LANES:
+            contract_execution_lanes = ConfigSettingContractExecutionLanesV0.unpack(
+                unpacker
+            )
+            return cls(
+                config_setting_id=config_setting_id,
+                contract_execution_lanes=contract_execution_lanes,
+            )
+        if config_setting_id == ConfigSettingID.CONFIG_SETTING_BUCKETLIST_SIZE_WINDOW:
+            length = unpacker.unpack_uint()
+            bucket_list_size_window = []
+            for _ in range(length):
+                bucket_list_size_window.append(Uint64.unpack(unpacker))
+            return cls(
+                config_setting_id=config_setting_id,
+                bucket_list_size_window=bucket_list_size_window,
+            )
         return cls(config_setting_id=config_setting_id)
 
     def to_xdr_bytes(self) -> bytes:
@@ -329,7 +431,7 @@ class ConfigSettingEntry:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "ConfigSettingEntry":
+    def from_xdr_bytes(cls, xdr: bytes) -> ConfigSettingEntry:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -338,7 +440,7 @@ class ConfigSettingEntry:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "ConfigSettingEntry":
+    def from_xdr(cls, xdr: str) -> ConfigSettingEntry:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
 
@@ -360,6 +462,9 @@ class ConfigSettingEntry:
             and self.contract_data_key_size_bytes == other.contract_data_key_size_bytes
             and self.contract_data_entry_size_bytes
             == other.contract_data_entry_size_bytes
+            and self.state_expiration_settings == other.state_expiration_settings
+            and self.contract_execution_lanes == other.contract_execution_lanes
+            and self.bucket_list_size_window == other.bucket_list_size_window
         )
 
     def __str__(self):
@@ -395,4 +500,13 @@ class ConfigSettingEntry:
         out.append(
             f"contract_data_entry_size_bytes={self.contract_data_entry_size_bytes}"
         ) if self.contract_data_entry_size_bytes is not None else None
+        out.append(
+            f"state_expiration_settings={self.state_expiration_settings}"
+        ) if self.state_expiration_settings is not None else None
+        out.append(
+            f"contract_execution_lanes={self.contract_execution_lanes}"
+        ) if self.contract_execution_lanes is not None else None
+        out.append(
+            f"bucket_list_size_window={self.bucket_list_size_window}"
+        ) if self.bucket_list_size_window is not None else None
         return f"<ConfigSettingEntry [{', '.join(out)}]>"

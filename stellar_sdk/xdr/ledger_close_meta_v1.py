@@ -1,7 +1,10 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
+from __future__ import annotations
+
 import base64
 from typing import List
+
 from xdrlib3 import Packer, Unpacker
 
 from .generalized_transaction_set import GeneralizedTransactionSet
@@ -79,7 +82,7 @@ class LedgerCloseMetaV1:
             scp_info_item.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "LedgerCloseMetaV1":
+    def unpack(cls, unpacker: Unpacker) -> LedgerCloseMetaV1:
         ledger_header = LedgerHeaderHistoryEntry.unpack(unpacker)
         tx_set = GeneralizedTransactionSet.unpack(unpacker)
         length = unpacker.unpack_uint()
@@ -108,7 +111,7 @@ class LedgerCloseMetaV1:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "LedgerCloseMetaV1":
+    def from_xdr_bytes(cls, xdr: bytes) -> LedgerCloseMetaV1:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -117,7 +120,7 @@ class LedgerCloseMetaV1:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "LedgerCloseMetaV1":
+    def from_xdr(cls, xdr: str) -> LedgerCloseMetaV1:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
 

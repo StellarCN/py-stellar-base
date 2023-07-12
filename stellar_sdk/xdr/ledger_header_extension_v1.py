@@ -1,6 +1,9 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
+from __future__ import annotations
+
 import base64
+
 from xdrlib3 import Packer, Unpacker
 
 from .ledger_header_extension_v1_ext import LedgerHeaderExtensionV1Ext
@@ -39,7 +42,7 @@ class LedgerHeaderExtensionV1:
         self.ext.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "LedgerHeaderExtensionV1":
+    def unpack(cls, unpacker: Unpacker) -> LedgerHeaderExtensionV1:
         flags = Uint32.unpack(unpacker)
         ext = LedgerHeaderExtensionV1Ext.unpack(unpacker)
         return cls(
@@ -53,7 +56,7 @@ class LedgerHeaderExtensionV1:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "LedgerHeaderExtensionV1":
+    def from_xdr_bytes(cls, xdr: bytes) -> LedgerHeaderExtensionV1:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -62,7 +65,7 @@ class LedgerHeaderExtensionV1:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "LedgerHeaderExtensionV1":
+    def from_xdr(cls, xdr: str) -> LedgerHeaderExtensionV1:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
 

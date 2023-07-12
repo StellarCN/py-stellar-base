@@ -1,6 +1,9 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
+from __future__ import annotations
+
 import base64
+
 from xdrlib3 import Packer, Unpacker
 
 from .claim_claimable_balance_result_code import ClaimClaimableBalanceResultCode
@@ -94,7 +97,7 @@ class ClaimClaimableBalanceResult:
             return
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "ClaimClaimableBalanceResult":
+    def unpack(cls, unpacker: Unpacker) -> ClaimClaimableBalanceResult:
         code = ClaimClaimableBalanceResultCode.unpack(unpacker)
         if code == ClaimClaimableBalanceResultCode.CLAIM_CLAIMABLE_BALANCE_SUCCESS:
             return cls(code=code)
@@ -122,7 +125,7 @@ class ClaimClaimableBalanceResult:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "ClaimClaimableBalanceResult":
+    def from_xdr_bytes(cls, xdr: bytes) -> ClaimClaimableBalanceResult:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -131,7 +134,7 @@ class ClaimClaimableBalanceResult:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "ClaimClaimableBalanceResult":
+    def from_xdr(cls, xdr: str) -> ClaimClaimableBalanceResult:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
 

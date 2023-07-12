@@ -1,6 +1,9 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
+from __future__ import annotations
+
 import base64
+
 from xdrlib3 import Packer, Unpacker
 
 from .int64 import Int64
@@ -41,7 +44,7 @@ class ConfigSettingContractBandwidthV0:
         self.fee_propagate_data1_kb.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "ConfigSettingContractBandwidthV0":
+    def unpack(cls, unpacker: Unpacker) -> ConfigSettingContractBandwidthV0:
         ledger_max_propagate_size_bytes = Uint32.unpack(unpacker)
         tx_max_size_bytes = Uint32.unpack(unpacker)
         fee_propagate_data1_kb = Int64.unpack(unpacker)
@@ -57,7 +60,7 @@ class ConfigSettingContractBandwidthV0:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "ConfigSettingContractBandwidthV0":
+    def from_xdr_bytes(cls, xdr: bytes) -> ConfigSettingContractBandwidthV0:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -66,7 +69,7 @@ class ConfigSettingContractBandwidthV0:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "ConfigSettingContractBandwidthV0":
+    def from_xdr(cls, xdr: str) -> ConfigSettingContractBandwidthV0:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
 

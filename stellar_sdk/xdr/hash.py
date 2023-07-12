@@ -1,6 +1,9 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
+from __future__ import annotations
+
 import base64
+
 from xdrlib3 import Packer, Unpacker
 
 from .base import Opaque
@@ -22,7 +25,7 @@ class Hash:
         Opaque(self.hash, 32, True).pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "Hash":
+    def unpack(cls, unpacker: Unpacker) -> Hash:
         hash = Opaque.unpack(unpacker, 32, True)
         return cls(hash)
 
@@ -32,7 +35,7 @@ class Hash:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "Hash":
+    def from_xdr_bytes(cls, xdr: bytes) -> Hash:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -41,7 +44,7 @@ class Hash:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "Hash":
+    def from_xdr(cls, xdr: str) -> Hash:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
 

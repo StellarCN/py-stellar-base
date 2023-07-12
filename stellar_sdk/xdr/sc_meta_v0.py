@@ -1,6 +1,9 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
+from __future__ import annotations
+
 import base64
+
 from xdrlib3 import Packer, Unpacker
 
 from .base import String
@@ -32,7 +35,7 @@ class SCMetaV0:
         String(self.val, 4294967295).pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "SCMetaV0":
+    def unpack(cls, unpacker: Unpacker) -> SCMetaV0:
         key = String.unpack(unpacker)
         val = String.unpack(unpacker)
         return cls(
@@ -46,7 +49,7 @@ class SCMetaV0:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "SCMetaV0":
+    def from_xdr_bytes(cls, xdr: bytes) -> SCMetaV0:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -55,7 +58,7 @@ class SCMetaV0:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "SCMetaV0":
+    def from_xdr(cls, xdr: str) -> SCMetaV0:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
 

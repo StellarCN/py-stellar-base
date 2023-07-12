@@ -1,11 +1,15 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
+from __future__ import annotations
+
 import base64
+
 from xdrlib3 import Packer, Unpacker
 
 from .account_merge_result import AccountMergeResult
 from .allow_trust_result import AllowTrustResult
 from .begin_sponsoring_future_reserves_result import BeginSponsoringFutureReservesResult
+from .bump_footprint_expiration_result import BumpFootprintExpirationResult
 from .bump_sequence_result import BumpSequenceResult
 from .change_trust_result import ChangeTrustResult
 from .claim_claimable_balance_result import ClaimClaimableBalanceResult
@@ -25,6 +29,7 @@ from .operation_type import OperationType
 from .path_payment_strict_receive_result import PathPaymentStrictReceiveResult
 from .path_payment_strict_send_result import PathPaymentStrictSendResult
 from .payment_result import PaymentResult
+from .restore_footprint_result import RestoreFootprintResult
 from .revoke_sponsorship_result import RevokeSponsorshipResult
 from .set_options_result import SetOptionsResult
 from .set_trust_line_flags_result import SetTrustLineFlagsResult
@@ -88,6 +93,10 @@ class OperationResultTr:
                 LiquidityPoolWithdrawResult liquidityPoolWithdrawResult;
             case INVOKE_HOST_FUNCTION:
                 InvokeHostFunctionResult invokeHostFunctionResult;
+            case BUMP_FOOTPRINT_EXPIRATION:
+                BumpFootprintExpirationResult bumpFootprintExpirationResult;
+            case RESTORE_FOOTPRINT:
+                RestoreFootprintResult restoreFootprintResult;
             }
     """
 
@@ -119,6 +128,8 @@ class OperationResultTr:
         liquidity_pool_deposit_result: LiquidityPoolDepositResult = None,
         liquidity_pool_withdraw_result: LiquidityPoolWithdrawResult = None,
         invoke_host_function_result: InvokeHostFunctionResult = None,
+        bump_footprint_expiration_result: BumpFootprintExpirationResult = None,
+        restore_footprint_result: RestoreFootprintResult = None,
     ) -> None:
         self.type = type
         self.create_account_result = create_account_result
@@ -150,6 +161,8 @@ class OperationResultTr:
         self.liquidity_pool_deposit_result = liquidity_pool_deposit_result
         self.liquidity_pool_withdraw_result = liquidity_pool_withdraw_result
         self.invoke_host_function_result = invoke_host_function_result
+        self.bump_footprint_expiration_result = bump_footprint_expiration_result
+        self.restore_footprint_result = restore_footprint_result
 
     @classmethod
     def from_create_account(
@@ -345,6 +358,24 @@ class OperationResultTr:
             invoke_host_function_result=invoke_host_function_result,
         )
 
+    @classmethod
+    def from_bump_footprint_expiration(
+        cls, bump_footprint_expiration_result: BumpFootprintExpirationResult
+    ) -> "OperationResultTr":
+        return cls(
+            OperationType.BUMP_FOOTPRINT_EXPIRATION,
+            bump_footprint_expiration_result=bump_footprint_expiration_result,
+        )
+
+    @classmethod
+    def from_restore_footprint(
+        cls, restore_footprint_result: RestoreFootprintResult
+    ) -> "OperationResultTr":
+        return cls(
+            OperationType.RESTORE_FOOTPRINT,
+            restore_footprint_result=restore_footprint_result,
+        )
+
     def pack(self, packer: Packer) -> None:
         self.type.pack(packer)
         if self.type == OperationType.CREATE_ACCOUNT:
@@ -480,9 +511,19 @@ class OperationResultTr:
                 raise ValueError("invoke_host_function_result should not be None.")
             self.invoke_host_function_result.pack(packer)
             return
+        if self.type == OperationType.BUMP_FOOTPRINT_EXPIRATION:
+            if self.bump_footprint_expiration_result is None:
+                raise ValueError("bump_footprint_expiration_result should not be None.")
+            self.bump_footprint_expiration_result.pack(packer)
+            return
+        if self.type == OperationType.RESTORE_FOOTPRINT:
+            if self.restore_footprint_result is None:
+                raise ValueError("restore_footprint_result should not be None.")
+            self.restore_footprint_result.pack(packer)
+            return
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "OperationResultTr":
+    def unpack(cls, unpacker: Unpacker) -> OperationResultTr:
         type = OperationType.unpack(unpacker)
         if type == OperationType.CREATE_ACCOUNT:
             create_account_result = CreateAccountResult.unpack(unpacker)
@@ -606,6 +647,17 @@ class OperationResultTr:
             return cls(
                 type=type, invoke_host_function_result=invoke_host_function_result
             )
+        if type == OperationType.BUMP_FOOTPRINT_EXPIRATION:
+            bump_footprint_expiration_result = BumpFootprintExpirationResult.unpack(
+                unpacker
+            )
+            return cls(
+                type=type,
+                bump_footprint_expiration_result=bump_footprint_expiration_result,
+            )
+        if type == OperationType.RESTORE_FOOTPRINT:
+            restore_footprint_result = RestoreFootprintResult.unpack(unpacker)
+            return cls(type=type, restore_footprint_result=restore_footprint_result)
         return cls(type=type)
 
     def to_xdr_bytes(self) -> bytes:
@@ -614,7 +666,7 @@ class OperationResultTr:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "OperationResultTr":
+    def from_xdr_bytes(cls, xdr: bytes) -> OperationResultTr:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -623,7 +675,7 @@ class OperationResultTr:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "OperationResultTr":
+    def from_xdr(cls, xdr: str) -> OperationResultTr:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
 
@@ -667,6 +719,9 @@ class OperationResultTr:
             and self.liquidity_pool_withdraw_result
             == other.liquidity_pool_withdraw_result
             and self.invoke_host_function_result == other.invoke_host_function_result
+            and self.bump_footprint_expiration_result
+            == other.bump_footprint_expiration_result
+            and self.restore_footprint_result == other.restore_footprint_result
         )
 
     def __str__(self):
@@ -747,4 +802,10 @@ class OperationResultTr:
         out.append(
             f"invoke_host_function_result={self.invoke_host_function_result}"
         ) if self.invoke_host_function_result is not None else None
+        out.append(
+            f"bump_footprint_expiration_result={self.bump_footprint_expiration_result}"
+        ) if self.bump_footprint_expiration_result is not None else None
+        out.append(
+            f"restore_footprint_result={self.restore_footprint_result}"
+        ) if self.restore_footprint_result is not None else None
         return f"<OperationResultTr [{', '.join(out)}]>"

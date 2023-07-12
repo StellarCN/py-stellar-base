@@ -1,6 +1,9 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
+from __future__ import annotations
+
 import base64
+
 from xdrlib3 import Packer, Unpacker
 
 from .alpha_num4 import AlphaNum4
@@ -86,7 +89,7 @@ class TrustLineAsset:
             return
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "TrustLineAsset":
+    def unpack(cls, unpacker: Unpacker) -> TrustLineAsset:
         type = AssetType.unpack(unpacker)
         if type == AssetType.ASSET_TYPE_NATIVE:
             return cls(type=type)
@@ -107,7 +110,7 @@ class TrustLineAsset:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "TrustLineAsset":
+    def from_xdr_bytes(cls, xdr: bytes) -> TrustLineAsset:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -116,7 +119,7 @@ class TrustLineAsset:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "TrustLineAsset":
+    def from_xdr(cls, xdr: str) -> TrustLineAsset:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
 

@@ -1,9 +1,12 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
+from __future__ import annotations
+
 import base64
+
 from xdrlib3 import Packer, Unpacker
 
-from .sc_address import SCAddress
+from .int64 import Int64
 
 __all__ = ["SCNonceKey"]
 
@@ -13,24 +16,24 @@ class SCNonceKey:
     XDR Source Code::
 
         struct SCNonceKey {
-            SCAddress nonce_address;
+            int64 nonce;
         };
     """
 
     def __init__(
         self,
-        nonce_address: SCAddress,
+        nonce: Int64,
     ) -> None:
-        self.nonce_address = nonce_address
+        self.nonce = nonce
 
     def pack(self, packer: Packer) -> None:
-        self.nonce_address.pack(packer)
+        self.nonce.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "SCNonceKey":
-        nonce_address = SCAddress.unpack(unpacker)
+    def unpack(cls, unpacker: Unpacker) -> SCNonceKey:
+        nonce = Int64.unpack(unpacker)
         return cls(
-            nonce_address=nonce_address,
+            nonce=nonce,
         )
 
     def to_xdr_bytes(self) -> bytes:
@@ -39,7 +42,7 @@ class SCNonceKey:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "SCNonceKey":
+    def from_xdr_bytes(cls, xdr: bytes) -> SCNonceKey:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -48,17 +51,17 @@ class SCNonceKey:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "SCNonceKey":
+    def from_xdr(cls, xdr: str) -> SCNonceKey:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented
-        return self.nonce_address == other.nonce_address
+        return self.nonce == other.nonce
 
     def __str__(self):
         out = [
-            f"nonce_address={self.nonce_address}",
+            f"nonce={self.nonce}",
         ]
         return f"<SCNonceKey [{', '.join(out)}]>"

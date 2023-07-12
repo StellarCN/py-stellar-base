@@ -1,6 +1,9 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
+from __future__ import annotations
+
 import base64
+
 from xdrlib3 import Packer, Unpacker
 
 from .claimable_balance_entry_extension_v1_ext import (
@@ -41,7 +44,7 @@ class ClaimableBalanceEntryExtensionV1:
         self.flags.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "ClaimableBalanceEntryExtensionV1":
+    def unpack(cls, unpacker: Unpacker) -> ClaimableBalanceEntryExtensionV1:
         ext = ClaimableBalanceEntryExtensionV1Ext.unpack(unpacker)
         flags = Uint32.unpack(unpacker)
         return cls(
@@ -55,7 +58,7 @@ class ClaimableBalanceEntryExtensionV1:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "ClaimableBalanceEntryExtensionV1":
+    def from_xdr_bytes(cls, xdr: bytes) -> ClaimableBalanceEntryExtensionV1:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -64,7 +67,7 @@ class ClaimableBalanceEntryExtensionV1:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "ClaimableBalanceEntryExtensionV1":
+    def from_xdr(cls, xdr: str) -> ClaimableBalanceEntryExtensionV1:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
 

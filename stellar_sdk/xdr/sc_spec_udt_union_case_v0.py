@@ -1,6 +1,9 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
+from __future__ import annotations
+
 import base64
+
 from xdrlib3 import Packer, Unpacker
 
 from .sc_spec_udt_union_case_tuple_v0 import SCSpecUDTUnionCaseTupleV0
@@ -64,7 +67,7 @@ class SCSpecUDTUnionCaseV0:
             return
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "SCSpecUDTUnionCaseV0":
+    def unpack(cls, unpacker: Unpacker) -> SCSpecUDTUnionCaseV0:
         kind = SCSpecUDTUnionCaseV0Kind.unpack(unpacker)
         if kind == SCSpecUDTUnionCaseV0Kind.SC_SPEC_UDT_UNION_CASE_VOID_V0:
             void_case = SCSpecUDTUnionCaseVoidV0.unpack(unpacker)
@@ -80,7 +83,7 @@ class SCSpecUDTUnionCaseV0:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "SCSpecUDTUnionCaseV0":
+    def from_xdr_bytes(cls, xdr: bytes) -> SCSpecUDTUnionCaseV0:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -89,7 +92,7 @@ class SCSpecUDTUnionCaseV0:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "SCSpecUDTUnionCaseV0":
+    def from_xdr(cls, xdr: str) -> SCSpecUDTUnionCaseV0:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
 

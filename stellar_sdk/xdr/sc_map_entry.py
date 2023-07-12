@@ -1,6 +1,9 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
+from __future__ import annotations
+
 import base64
+
 from xdrlib3 import Packer, Unpacker
 
 from .sc_val import SCVal
@@ -32,7 +35,7 @@ class SCMapEntry:
         self.val.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "SCMapEntry":
+    def unpack(cls, unpacker: Unpacker) -> SCMapEntry:
         key = SCVal.unpack(unpacker)
         val = SCVal.unpack(unpacker)
         return cls(
@@ -46,7 +49,7 @@ class SCMapEntry:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "SCMapEntry":
+    def from_xdr_bytes(cls, xdr: bytes) -> SCMapEntry:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -55,7 +58,7 @@ class SCMapEntry:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "SCMapEntry":
+    def from_xdr(cls, xdr: str) -> SCMapEntry:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
 

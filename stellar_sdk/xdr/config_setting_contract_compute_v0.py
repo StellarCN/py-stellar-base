@@ -1,6 +1,9 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
+from __future__ import annotations
+
 import base64
+
 from xdrlib3 import Packer, Unpacker
 
 from .int64 import Int64
@@ -47,7 +50,7 @@ class ConfigSettingContractComputeV0:
         self.tx_memory_limit.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "ConfigSettingContractComputeV0":
+    def unpack(cls, unpacker: Unpacker) -> ConfigSettingContractComputeV0:
         ledger_max_instructions = Int64.unpack(unpacker)
         tx_max_instructions = Int64.unpack(unpacker)
         fee_rate_per_instructions_increment = Int64.unpack(unpacker)
@@ -65,7 +68,7 @@ class ConfigSettingContractComputeV0:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "ConfigSettingContractComputeV0":
+    def from_xdr_bytes(cls, xdr: bytes) -> ConfigSettingContractComputeV0:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -74,7 +77,7 @@ class ConfigSettingContractComputeV0:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "ConfigSettingContractComputeV0":
+    def from_xdr(cls, xdr: str) -> ConfigSettingContractComputeV0:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
 

@@ -1,6 +1,9 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
+from __future__ import annotations
+
 import base64
+
 from xdrlib3 import Packer, Unpacker
 
 from .hash import Hash
@@ -33,7 +36,7 @@ class TransactionResultPair:
         self.result.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "TransactionResultPair":
+    def unpack(cls, unpacker: Unpacker) -> TransactionResultPair:
         transaction_hash = Hash.unpack(unpacker)
         result = TransactionResult.unpack(unpacker)
         return cls(
@@ -47,7 +50,7 @@ class TransactionResultPair:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "TransactionResultPair":
+    def from_xdr_bytes(cls, xdr: bytes) -> TransactionResultPair:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -56,7 +59,7 @@ class TransactionResultPair:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "TransactionResultPair":
+    def from_xdr(cls, xdr: str) -> TransactionResultPair:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
 

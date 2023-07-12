@@ -1,7 +1,10 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
+from __future__ import annotations
+
 import base64
 from typing import List
+
 from xdrlib3 import Packer, Unpacker
 
 from .base import Integer
@@ -45,7 +48,7 @@ class TransactionPhase:
             return
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "TransactionPhase":
+    def unpack(cls, unpacker: Unpacker) -> TransactionPhase:
         v = Integer.unpack(unpacker)
         if v == 0:
             length = unpacker.unpack_uint()
@@ -61,7 +64,7 @@ class TransactionPhase:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "TransactionPhase":
+    def from_xdr_bytes(cls, xdr: bytes) -> TransactionPhase:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -70,7 +73,7 @@ class TransactionPhase:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "TransactionPhase":
+    def from_xdr(cls, xdr: str) -> TransactionPhase:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
 

@@ -1,6 +1,9 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
+from __future__ import annotations
+
 import base64
+
 from xdrlib3 import Packer, Unpacker
 
 from .sc_meta_kind import SCMetaKind
@@ -41,7 +44,7 @@ class SCMetaEntry:
             return
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "SCMetaEntry":
+    def unpack(cls, unpacker: Unpacker) -> SCMetaEntry:
         kind = SCMetaKind.unpack(unpacker)
         if kind == SCMetaKind.SC_META_V0:
             v0 = SCMetaV0.unpack(unpacker)
@@ -54,7 +57,7 @@ class SCMetaEntry:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "SCMetaEntry":
+    def from_xdr_bytes(cls, xdr: bytes) -> SCMetaEntry:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -63,7 +66,7 @@ class SCMetaEntry:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "SCMetaEntry":
+    def from_xdr(cls, xdr: str) -> SCMetaEntry:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
 
