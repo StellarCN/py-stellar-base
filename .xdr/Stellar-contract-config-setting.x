@@ -1,6 +1,13 @@
 %#include "xdr/Stellar-types.h"
 
 namespace stellar {
+// General “Soroban execution lane” settings
+struct ConfigSettingContractExecutionLanesV0
+{
+    // maximum number of Soroban transactions per ledger
+    uint32 ledgerMaxTxCount;
+};
+
 // "Compute" settings for contracts (instructions and memory).
 struct ConfigSettingContractComputeV0
 {
@@ -40,7 +47,7 @@ struct ConfigSettingContractLedgerCostV0
     int64 feeReadLedgerEntry;  // Fee per ledger entry read
     int64 feeWriteLedgerEntry; // Fee per ledger entry write
 
-    int64 feeRead1KB;  // Fee for reading 1KB    
+    int64 feeRead1KB;  // Fee for reading 1KB
     int64 feeWrite1KB; // Fee for writing 1KB
 
     // Bucket list fees grow slowly up to that size
@@ -122,17 +129,58 @@ enum ContractCostType {
     VmMemWrite = 17,
     // Cost of instantiation a VM from wasm bytes code.
     VmInstantiation = 18,
+    // Cost of instantiation a VM from a cached state.
+    VmCachedInstantiation = 19,
     // Roundtrip cost of invoking a VM function from the host.
-    InvokeVmFunction = 19,
+    InvokeVmFunction = 20,
     // Cost of charging a value to the budgeting system.
-    ChargeBudget = 20
+    ChargeBudget = 21,
+    // Cost of computing a keccak256 hash from bytes.
+    ComputeKeccak256Hash = 22,
+    // Cost of computing an ECDSA secp256k1 pubkey from bytes.
+    ComputeEcdsaSecp256k1Key = 23,
+    // Cost of computing an ECDSA secp256k1 signature from bytes.
+    ComputeEcdsaSecp256k1Sig = 24,
+    // Cost of recovering an ECDSA secp256k1 key from a signature.
+    RecoverEcdsaSecp256k1Key = 25,
+    // Cost of int256 addition (`+`) and subtraction (`-`) operations
+    Int256AddSub = 26,
+    // Cost of int256 multiplication (`*`) operation
+    Int256Mul = 27,
+    // Cost of int256 division (`/`) operation
+    Int256Div = 28,
+    // Cost of int256 power (`exp`) operation
+    Int256Pow = 29,    
+    // Cost of int256 shift (`shl`, `shr`) operation
+    Int256Shift = 30
 };
 
 struct ContractCostParamEntry {
-    int64 constTerm;
-    int64 linearTerm;
     // use `ext` to add more terms (e.g. higher order polynomials) in the future
     ExtensionPoint ext;
+
+    int64 constTerm;
+    int64 linearTerm;
+};
+
+struct StateExpirationSettings {
+    uint32 maxEntryExpiration;
+    uint32 minTempEntryExpiration;
+    uint32 minPersistentEntryExpiration;
+    uint32 autoBumpLedgers;
+
+    // rent_fee = wfee_rate_average / rent_rate_denominator_for_type
+    int64 persistentRentRateDenominator;
+    int64 tempRentRateDenominator;
+
+    // max number of entries that emit expiration meta in a single ledger
+    uint32 maxEntriesToExpire;
+
+    // Number of snapshots to use when calculating average BucketList size
+    uint32 bucketListSizeWindowSampleSize;
+
+    // Maximum number of bytes that we scan for eviction per ledger
+    uint64 evictionScanSize;
 };
 
 // limits the ContractCostParams size to 20kB
@@ -152,7 +200,10 @@ enum ConfigSettingID
     CONFIG_SETTING_CONTRACT_COST_PARAMS_CPU_INSTRUCTIONS = 6,
     CONFIG_SETTING_CONTRACT_COST_PARAMS_MEMORY_BYTES = 7,
     CONFIG_SETTING_CONTRACT_DATA_KEY_SIZE_BYTES = 8,
-    CONFIG_SETTING_CONTRACT_DATA_ENTRY_SIZE_BYTES = 9
+    CONFIG_SETTING_CONTRACT_DATA_ENTRY_SIZE_BYTES = 9,
+    CONFIG_SETTING_STATE_EXPIRATION = 10,
+    CONFIG_SETTING_CONTRACT_EXECUTION_LANES = 11,
+    CONFIG_SETTING_BUCKETLIST_SIZE_WINDOW = 12
 };
 
 union ConfigSettingEntry switch (ConfigSettingID configSettingID)
@@ -177,5 +228,11 @@ case CONFIG_SETTING_CONTRACT_DATA_KEY_SIZE_BYTES:
     uint32 contractDataKeySizeBytes;
 case CONFIG_SETTING_CONTRACT_DATA_ENTRY_SIZE_BYTES:
     uint32 contractDataEntrySizeBytes;
+case CONFIG_SETTING_STATE_EXPIRATION:
+    StateExpirationSettings stateExpirationSettings;
+case CONFIG_SETTING_CONTRACT_EXECUTION_LANES:
+    ConfigSettingContractExecutionLanesV0 contractExecutionLanes;
+case CONFIG_SETTING_BUCKETLIST_SIZE_WINDOW:
+    uint64 bucketListSizeWindow<>;
 };
 }

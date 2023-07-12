@@ -62,7 +62,9 @@ enum OperationType
     SET_TRUST_LINE_FLAGS = 21,
     LIQUIDITY_POOL_DEPOSIT = 22,
     LIQUIDITY_POOL_WITHDRAW = 23,
-    INVOKE_HOST_FUNCTION = 24
+    INVOKE_HOST_FUNCTION = 24,
+    BUMP_FOOTPRINT_EXPIRATION = 25,
+    RESTORE_FOOTPRINT = 26
 };
 
 /* CreateAccount
@@ -477,92 +479,133 @@ enum HostFunctionType
     HOST_FUNCTION_TYPE_UPLOAD_CONTRACT_WASM = 2
 };
 
-enum ContractIDType
+enum ContractIDPreimageType
 {
-    CONTRACT_ID_FROM_SOURCE_ACCOUNT = 0,
-    CONTRACT_ID_FROM_ED25519_PUBLIC_KEY = 1,
-    CONTRACT_ID_FROM_ASSET = 2
+    CONTRACT_ID_PREIMAGE_FROM_ADDRESS = 0,
+    CONTRACT_ID_PREIMAGE_FROM_ASSET = 1
 };
  
-enum ContractIDPublicKeyType
+union ContractIDPreimage switch (ContractIDPreimageType type)
 {
-    CONTRACT_ID_PUBLIC_KEY_SOURCE_ACCOUNT = 0,
-    CONTRACT_ID_PUBLIC_KEY_ED25519 = 1
-};
-
-struct UploadContractWasmArgs
-{
-    opaque code<SCVAL_LIMIT>;
-};
-
-union ContractID switch (ContractIDType type)
-{
-case CONTRACT_ID_FROM_SOURCE_ACCOUNT:
-    uint256 salt;
-case CONTRACT_ID_FROM_ED25519_PUBLIC_KEY:
-    struct 
+case CONTRACT_ID_PREIMAGE_FROM_ADDRESS:
+    struct
     {
-        uint256 key;
-        Signature signature;
+        SCAddress address;
         uint256 salt;
-    } fromEd25519PublicKey;
-case CONTRACT_ID_FROM_ASSET:
-    Asset asset;
+    } fromAddress;
+case CONTRACT_ID_PREIMAGE_FROM_ASSET:
+    Asset fromAsset;
 };
 
 struct CreateContractArgs
 {
-    ContractID contractID;
-    SCContractExecutable executable;
+    ContractIDPreimage contractIDPreimage;
+    ContractExecutable executable;
 };
 
-union HostFunctionArgs switch (HostFunctionType type)
+union HostFunction switch (HostFunctionType type)
 {
 case HOST_FUNCTION_TYPE_INVOKE_CONTRACT:
     SCVec invokeContract;
 case HOST_FUNCTION_TYPE_CREATE_CONTRACT:
     CreateContractArgs createContract;
 case HOST_FUNCTION_TYPE_UPLOAD_CONTRACT_WASM:
-    UploadContractWasmArgs uploadContractWasm;
+    opaque wasm<>;
 };
 
-struct AuthorizedInvocation
+enum SorobanAuthorizedFunctionType
 {
-    Hash contractID;
+    SOROBAN_AUTHORIZED_FUNCTION_TYPE_CONTRACT_FN = 0,
+    SOROBAN_AUTHORIZED_FUNCTION_TYPE_CREATE_CONTRACT_HOST_FN = 1
+};
+
+struct SorobanAuthorizedContractFunction 
+{
+    SCAddress contractAddress;
     SCSymbol functionName;
     SCVec args;
-    AuthorizedInvocation subInvocations<>;
 };
 
-struct AddressWithNonce
+union SorobanAuthorizedFunction switch (SorobanAuthorizedFunctionType type)
+{
+case SOROBAN_AUTHORIZED_FUNCTION_TYPE_CONTRACT_FN:
+    SorobanAuthorizedContractFunction contractFn;
+case SOROBAN_AUTHORIZED_FUNCTION_TYPE_CREATE_CONTRACT_HOST_FN:
+    CreateContractArgs createContractHostFn;
+};
+
+struct SorobanAuthorizedInvocation
+{
+    SorobanAuthorizedFunction function;
+    SorobanAuthorizedInvocation subInvocations<>;
+};
+
+struct SorobanAddressCredentials
 {
     SCAddress address;
-    uint64 nonce;
-};
-
-struct ContractAuth
-{
-    AddressWithNonce* addressWithNonce; // not present for invoker
-    AuthorizedInvocation rootInvocation;
+    int64 nonce;
+    uint32 signatureExpirationLedger;    
     SCVec signatureArgs;
 };
 
-struct HostFunction {
-    // Arguments of the function to call defined by the function
-    // type.
-    HostFunctionArgs args;
-    // Per-address authorizations for this host fn
-    // Currently only supported for INVOKE_CONTRACT function
-    ContractAuth auth<>;
+enum SorobanCredentialsType
+{
+    SOROBAN_CREDENTIALS_SOURCE_ACCOUNT = 0,
+    SOROBAN_CREDENTIALS_ADDRESS = 1
 };
 
+union SorobanCredentials switch (SorobanCredentialsType type)
+{
+case SOROBAN_CREDENTIALS_SOURCE_ACCOUNT:
+    void;
+case SOROBAN_CREDENTIALS_ADDRESS:
+    SorobanAddressCredentials address;
+};
+
+/* Unit of authorization data for Soroban.
+
+   Represents an authorization for executing the tree of authorized contract 
+   and/or host function calls by the user defined by `credentials`.
+*/
+struct SorobanAuthorizationEntry
+{
+    SorobanCredentials credentials;
+    SorobanAuthorizedInvocation rootInvocation;
+};
+
+/* Upload WASM, create, and invoke contracts in Soroban.
+
+    Threshold: med
+    Result: InvokeHostFunctionResult
+*/
 struct InvokeHostFunctionOp
 {
-    // The host functions to invoke. The functions will be executed
-    // in the same fashion as operations: either all functions will
-    // be successfully applied or all fail if at least one of them
-    // fails.
-    HostFunction functions<MAX_OPS_PER_TX>;
+    // Host function to invoke.
+    HostFunction hostFunction;
+    // Per-address authorizations for this host function.
+    SorobanAuthorizationEntry auth<>;
+};
+
+/* Bump the expiration ledger of the entries specified in the readOnly footprint
+   so they'll expire at least ledgersToExpire ledgers from lcl.
+
+    Threshold: med
+    Result: BumpFootprintExpirationResult
+*/
+struct BumpFootprintExpirationOp
+{
+    ExtensionPoint ext;
+    uint32 ledgersToExpire;
+};
+
+/* Restore the expired or evicted entries specified in the readWrite footprint.
+
+    Threshold: med
+    Result: RestoreFootprintOp
+*/
+struct RestoreFootprintOp
+{
+    ExtensionPoint ext;
 };
 
 /* An operation is the lowest unit of work that a transaction does */
@@ -625,6 +668,10 @@ struct Operation
         LiquidityPoolWithdrawOp liquidityPoolWithdrawOp;
     case INVOKE_HOST_FUNCTION:
         InvokeHostFunctionOp invokeHostFunctionOp;
+    case BUMP_FOOTPRINT_EXPIRATION:
+        BumpFootprintExpirationOp bumpFootprintExpirationOp;
+    case RESTORE_FOOTPRINT:
+        RestoreFootprintOp restoreFootprintOp;
     }
     body;
 };
@@ -642,52 +689,25 @@ case ENVELOPE_TYPE_POOL_REVOKE_OP_ID:
     struct
     {
         AccountID sourceAccount;
-        SequenceNumber seqNum;
+        SequenceNumber seqNum; 
         uint32 opNum;
         PoolID liquidityPoolID;
         Asset asset;
     } revokeID;
-case ENVELOPE_TYPE_CONTRACT_ID_FROM_ED25519:
+case ENVELOPE_TYPE_CONTRACT_ID:
     struct
     {
         Hash networkID;
-        uint256 ed25519;
-        uint256 salt;
-    } ed25519ContractID;
-case ENVELOPE_TYPE_CONTRACT_ID_FROM_CONTRACT:
-    struct
-    {
-        Hash networkID;
-        Hash contractID;
-        uint256 salt;
+        ContractIDPreimage contractIDPreimage;
     } contractID;
-case ENVELOPE_TYPE_CONTRACT_ID_FROM_ASSET:
+case ENVELOPE_TYPE_SOROBAN_AUTHORIZATION:
     struct
     {
         Hash networkID;
-        Asset asset;
-    } fromAsset;
-case ENVELOPE_TYPE_CONTRACT_ID_FROM_SOURCE_ACCOUNT:
-    struct
-    {
-        Hash networkID;
-        AccountID sourceAccount;
-        uint256 salt;
-    } sourceAccountContractID;
-case ENVELOPE_TYPE_CREATE_CONTRACT_ARGS:
-    struct
-    {
-        Hash networkID;
-        SCContractExecutable executable;
-        uint256 salt;
-    } createContractArgs;
-case ENVELOPE_TYPE_CONTRACT_AUTH:
-    struct
-    {
-        Hash networkID;
-        uint64 nonce;
-        AuthorizedInvocation invocation;
-    } contractAuth;
+        int64 nonce;
+        uint32 signatureExpirationLedger;
+        SorobanAuthorizedInvocation invocation;
+    } sorobanAuthorization;
 };
 
 enum MemoType
@@ -797,17 +817,17 @@ struct SorobanResources
     uint32 writeBytes;
 
     // Maximum size of dynamic metadata produced by this contract (
-    // currently only includes the events).
+    // bytes read from ledger + bytes written to ledger + event bytes written to meta).
     uint32 extendedMetaDataSizeBytes;
 };
 
 // The transaction extension for Soroban.
 struct SorobanTransactionData
 {
+    ExtensionPoint ext;
     SorobanResources resources;
     // Portion of transaction `fee` allocated to refundable fees.
     int64 refundableFee;
-    ExtensionPoint ext;
 };
 
 // TransactionV0 is a transaction with the AccountID discriminant stripped off,
@@ -1773,16 +1793,56 @@ enum InvokeHostFunctionResultCode
     // codes considered as "failure" for the operation
     INVOKE_HOST_FUNCTION_MALFORMED = -1,
     INVOKE_HOST_FUNCTION_TRAPPED = -2,
-    INVOKE_HOST_FUNCTION_RESOURCE_LIMIT_EXCEEDED = -3
+    INVOKE_HOST_FUNCTION_RESOURCE_LIMIT_EXCEEDED = -3,
+    INVOKE_HOST_FUNCTION_ENTRY_EXPIRED = -4
 };
 
 union InvokeHostFunctionResult switch (InvokeHostFunctionResultCode code)
 {
 case INVOKE_HOST_FUNCTION_SUCCESS:
-    SCVal success<MAX_OPS_PER_TX>;
+    Hash success; // sha256(InvokeHostFunctionSuccessPreImage)
 case INVOKE_HOST_FUNCTION_MALFORMED:
 case INVOKE_HOST_FUNCTION_TRAPPED:
 case INVOKE_HOST_FUNCTION_RESOURCE_LIMIT_EXCEEDED:
+case INVOKE_HOST_FUNCTION_ENTRY_EXPIRED:
+    void;
+};
+
+enum BumpFootprintExpirationResultCode
+{
+    // codes considered as "success" for the operation
+    BUMP_FOOTPRINT_EXPIRATION_SUCCESS = 0,
+
+    // codes considered as "failure" for the operation
+    BUMP_FOOTPRINT_EXPIRATION_MALFORMED = -1,
+    BUMP_FOOTPRINT_EXPIRATION_RESOURCE_LIMIT_EXCEEDED = -2
+};
+
+union BumpFootprintExpirationResult switch (BumpFootprintExpirationResultCode code)
+{
+case BUMP_FOOTPRINT_EXPIRATION_SUCCESS:
+    void;
+case BUMP_FOOTPRINT_EXPIRATION_MALFORMED:
+case BUMP_FOOTPRINT_EXPIRATION_RESOURCE_LIMIT_EXCEEDED:
+    void;
+};
+
+enum RestoreFootprintResultCode
+{
+    // codes considered as "success" for the operation
+    RESTORE_FOOTPRINT_SUCCESS = 0,
+
+    // codes considered as "failure" for the operation
+    RESTORE_FOOTPRINT_MALFORMED = -1,
+    RESTORE_FOOTPRINT_RESOURCE_LIMIT_EXCEEDED = -2
+};
+
+union RestoreFootprintResult switch (RestoreFootprintResultCode code)
+{
+case RESTORE_FOOTPRINT_SUCCESS:
+    void;
+case RESTORE_FOOTPRINT_MALFORMED:
+case RESTORE_FOOTPRINT_RESOURCE_LIMIT_EXCEEDED:
     void;
 };
 
@@ -1854,6 +1914,10 @@ case opINNER:
         LiquidityPoolWithdrawResult liquidityPoolWithdrawResult;
     case INVOKE_HOST_FUNCTION:
         InvokeHostFunctionResult invokeHostFunctionResult;
+    case BUMP_FOOTPRINT_EXPIRATION:
+        BumpFootprintExpirationResult bumpFootprintExpirationResult;
+    case RESTORE_FOOTPRINT:
+        RestoreFootprintResult restoreFootprintResult;
     }
     tr;
 case opBAD_AUTH:

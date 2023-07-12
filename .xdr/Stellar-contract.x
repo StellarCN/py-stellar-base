@@ -22,7 +22,7 @@ enum SCValType
 {
     SCV_BOOL = 0,
     SCV_VOID = 1,
-    SCV_STATUS = 2,
+    SCV_ERROR = 2,
 
     // 32 bits is the smallest type in WASM or XDR; no need for u8/u16.
     SCV_U32 = 3,
@@ -49,9 +49,6 @@ enum SCValType
     SCV_U256 = 11,
     SCV_I256 = 12,
 
-    // TODO: possibly allocate subtypes of i64, i128 and/or u256 for
-    // fixed-precision with a specific number of decimals.
-
     // Bytes come in 3 flavors, 2 of which have meaningfully different
     // formatting and validity-checking / domain-restriction.
     SCV_BYTES = 13,
@@ -62,143 +59,53 @@ enum SCValType
     SCV_VEC = 16,
     SCV_MAP = 17,
 
-    // SCContractExecutable and SCAddressType are types that gets used separately from
-    // SCVal so we do not flatten their structures into separate SCVal cases.
-    SCV_CONTRACT_EXECUTABLE = 18,
-    SCV_ADDRESS = 19,
+    // Address is the universal identifier for contracts and classic
+    // accounts.
+    SCV_ADDRESS = 18,
 
-    // SCV_LEDGER_KEY_CONTRACT_EXECUTABLE and SCV_LEDGER_KEY_NONCE are unique
-    // symbolic SCVals used as the key for ledger entries for a contract's code
-    // and an address' nonce, respectively.
-    SCV_LEDGER_KEY_CONTRACT_EXECUTABLE = 20,
+    // The following are the internal SCVal variants that are not
+    // exposed to the contracts. 
+    SCV_CONTRACT_INSTANCE = 19,
+
+    // SCV_LEDGER_KEY_CONTRACT_INSTANCE and SCV_LEDGER_KEY_NONCE are unique
+    // symbolic SCVals used as the key for ledger entries for a contract's
+    // instance and an address' nonce, respectively.
+    SCV_LEDGER_KEY_CONTRACT_INSTANCE = 20,
     SCV_LEDGER_KEY_NONCE = 21
 };
 
-enum SCStatusType
+enum SCErrorType
 {
-    SST_OK = 0,
-    SST_UNKNOWN_ERROR = 1,
-    SST_HOST_VALUE_ERROR = 2,
-    SST_HOST_OBJECT_ERROR = 3,
-    SST_HOST_FUNCTION_ERROR = 4,
-    SST_HOST_STORAGE_ERROR = 5,
-    SST_HOST_CONTEXT_ERROR = 6,
-    SST_VM_ERROR = 7,
-    SST_CONTRACT_ERROR = 8,
-    SST_HOST_AUTH_ERROR = 9
-    // TODO: add more
+    SCE_CONTRACT = 0,
+    SCE_WASM_VM = 1,
+    SCE_CONTEXT = 2,
+    SCE_STORAGE = 3,
+    SCE_OBJECT = 4,
+    SCE_CRYPTO = 5,
+    SCE_EVENTS = 6,
+    SCE_BUDGET = 7,
+    SCE_VALUE = 8,
+    SCE_AUTH = 9
 };
 
-enum SCHostValErrorCode
+enum SCErrorCode
 {
-    HOST_VALUE_UNKNOWN_ERROR = 0,
-    HOST_VALUE_RESERVED_TAG_VALUE = 1,
-    HOST_VALUE_UNEXPECTED_VAL_TYPE = 2,
-    HOST_VALUE_U63_OUT_OF_RANGE = 3,
-    HOST_VALUE_U32_OUT_OF_RANGE = 4,
-    HOST_VALUE_STATIC_UNKNOWN = 5,
-    HOST_VALUE_MISSING_OBJECT = 6,
-    HOST_VALUE_SYMBOL_TOO_LONG = 7,
-    HOST_VALUE_SYMBOL_BAD_CHAR = 8,
-    HOST_VALUE_SYMBOL_CONTAINS_NON_UTF8 = 9,
-    HOST_VALUE_BITSET_TOO_MANY_BITS = 10,
-    HOST_VALUE_STATUS_UNKNOWN = 11
+    SCEC_ARITH_DOMAIN = 0,      // some arithmetic wasn't defined (overflow, divide-by-zero)
+    SCEC_INDEX_BOUNDS = 1,      // something was indexed beyond its bounds
+    SCEC_INVALID_INPUT = 2,     // user provided some otherwise-bad data
+    SCEC_MISSING_VALUE = 3,     // some value was required but not provided
+    SCEC_EXISTING_VALUE = 4,    // some value was provided where not allowed
+    SCEC_EXCEEDED_LIMIT = 5,    // some arbitrary limit -- gas or otherwise -- was hit
+    SCEC_INVALID_ACTION = 6,    // data was valid but action requested was not
+    SCEC_INTERNAL_ERROR = 7,    // the internal state of the host was otherwise-bad
+    SCEC_UNEXPECTED_TYPE = 8,   // some type wasn't as expected
+    SCEC_UNEXPECTED_SIZE = 9    // something's size wasn't as expected
 };
 
-enum SCHostObjErrorCode
+struct SCError
 {
-    HOST_OBJECT_UNKNOWN_ERROR = 0,
-    HOST_OBJECT_UNKNOWN_REFERENCE = 1,
-    HOST_OBJECT_UNEXPECTED_TYPE = 2,
-    HOST_OBJECT_OBJECT_COUNT_EXCEEDS_U32_MAX = 3,
-    HOST_OBJECT_OBJECT_NOT_EXIST = 4,
-    HOST_OBJECT_VEC_INDEX_OUT_OF_BOUND = 5,
-    HOST_OBJECT_CONTRACT_HASH_WRONG_LENGTH = 6
-};
-
-enum SCHostFnErrorCode
-{
-    HOST_FN_UNKNOWN_ERROR = 0,
-    HOST_FN_UNEXPECTED_HOST_FUNCTION_ACTION = 1,
-    HOST_FN_INPUT_ARGS_WRONG_LENGTH = 2,
-    HOST_FN_INPUT_ARGS_WRONG_TYPE = 3,
-    HOST_FN_INPUT_ARGS_INVALID = 4
-};
-
-enum SCHostStorageErrorCode
-{
-    HOST_STORAGE_UNKNOWN_ERROR = 0,
-    HOST_STORAGE_EXPECT_CONTRACT_DATA = 1,
-    HOST_STORAGE_READWRITE_ACCESS_TO_READONLY_ENTRY = 2,
-    HOST_STORAGE_ACCESS_TO_UNKNOWN_ENTRY = 3,
-    HOST_STORAGE_MISSING_KEY_IN_GET = 4,
-    HOST_STORAGE_GET_ON_DELETED_KEY = 5
-};
-
-enum SCHostAuthErrorCode
-{
-    HOST_AUTH_UNKNOWN_ERROR = 0,
-    HOST_AUTH_NONCE_ERROR = 1,
-    HOST_AUTH_DUPLICATE_AUTHORIZATION = 2,
-    HOST_AUTH_NOT_AUTHORIZED = 3
-};
-
-enum SCHostContextErrorCode
-{
-    HOST_CONTEXT_UNKNOWN_ERROR = 0,
-    HOST_CONTEXT_NO_CONTRACT_RUNNING = 1
-};
-
-enum SCVmErrorCode {
-    VM_UNKNOWN = 0,
-    VM_VALIDATION = 1,
-    VM_INSTANTIATION = 2,
-    VM_FUNCTION = 3,
-    VM_TABLE = 4,
-    VM_MEMORY = 5,
-    VM_GLOBAL = 6,
-    VM_VALUE = 7,
-    VM_TRAP_UNREACHABLE = 8,
-    VM_TRAP_MEMORY_ACCESS_OUT_OF_BOUNDS = 9,
-    VM_TRAP_TABLE_ACCESS_OUT_OF_BOUNDS = 10,
-    VM_TRAP_ELEM_UNINITIALIZED = 11,
-    VM_TRAP_DIVISION_BY_ZERO = 12,
-    VM_TRAP_INTEGER_OVERFLOW = 13,
-    VM_TRAP_INVALID_CONVERSION_TO_INT = 14,
-    VM_TRAP_STACK_OVERFLOW = 15,
-    VM_TRAP_UNEXPECTED_SIGNATURE = 16,
-    VM_TRAP_MEM_LIMIT_EXCEEDED = 17,
-    VM_TRAP_CPU_LIMIT_EXCEEDED = 18
-};
-
-enum SCUnknownErrorCode
-{
-    UNKNOWN_ERROR_GENERAL = 0,
-    UNKNOWN_ERROR_XDR = 1
-};
-
-union SCStatus switch (SCStatusType type)
-{
-case SST_OK:
-    void;
-case SST_UNKNOWN_ERROR:
-    SCUnknownErrorCode unknownCode;
-case SST_HOST_VALUE_ERROR:
-    SCHostValErrorCode valCode;
-case SST_HOST_OBJECT_ERROR:
-    SCHostObjErrorCode objCode;
-case SST_HOST_FUNCTION_ERROR:
-    SCHostFnErrorCode fnCode;
-case SST_HOST_STORAGE_ERROR:
-    SCHostStorageErrorCode storageCode;
-case SST_HOST_CONTEXT_ERROR:
-    SCHostContextErrorCode contextCode;
-case SST_VM_ERROR:
-    SCVmErrorCode vmCode;
-case SST_CONTRACT_ERROR:
-    uint32 contractCode;
-case SST_HOST_AUTH_ERROR:
-    SCHostAuthErrorCode authCode;
+    SCErrorType type;
+    SCErrorCode code;
 };
 
 struct UInt128Parts {
@@ -233,17 +140,17 @@ struct Int256Parts {
     uint64 lo_lo;
 };
 
-enum SCContractExecutableType
+enum ContractExecutableType
 {
-    SCCONTRACT_EXECUTABLE_WASM_REF = 0,
-    SCCONTRACT_EXECUTABLE_TOKEN = 1
+    CONTRACT_EXECUTABLE_WASM = 0,
+    CONTRACT_EXECUTABLE_TOKEN = 1
 };
 
-union SCContractExecutable switch (SCContractExecutableType type)
+union ContractExecutable switch (ContractExecutableType type)
 {
-case SCCONTRACT_EXECUTABLE_WASM_REF:
-    Hash wasm_id;
-case SCCONTRACT_EXECUTABLE_TOKEN:
+case CONTRACT_EXECUTABLE_WASM:
+    Hash wasm_hash;
+case CONTRACT_EXECUTABLE_TOKEN:
     void;
 };
 
@@ -264,18 +171,22 @@ case SC_ADDRESS_TYPE_CONTRACT:
 %struct SCVal;
 %struct SCMapEntry;
 
-const SCVAL_LIMIT = 256000;
 const SCSYMBOL_LIMIT = 32;
 
-typedef SCVal SCVec<SCVAL_LIMIT>;
-typedef SCMapEntry SCMap<SCVAL_LIMIT>;
+typedef SCVal SCVec<>;
+typedef SCMapEntry SCMap<>;
 
-typedef opaque SCBytes<SCVAL_LIMIT>;
-typedef string SCString<SCVAL_LIMIT>;
+typedef opaque SCBytes<>;
+typedef string SCString<>;
 typedef string SCSymbol<SCSYMBOL_LIMIT>;
 
 struct SCNonceKey {
-    SCAddress nonce_address;
+    int64 nonce;
+};
+
+struct SCContractInstance {
+    ContractExecutable executable;
+    SCMap* storage;
 };
 
 union SCVal switch (SCValType type)
@@ -285,8 +196,8 @@ case SCV_BOOL:
     bool b;
 case SCV_VOID:
     void;
-case SCV_STATUS:
-    SCStatus error;
+case SCV_ERROR:
+    SCError error;
 
 case SCV_U32:
     uint32 u32;
@@ -326,17 +237,18 @@ case SCV_VEC:
 case SCV_MAP:
     SCMap *map;
 
-case SCV_CONTRACT_EXECUTABLE:
-    SCContractExecutable exec;
 case SCV_ADDRESS:
     SCAddress address;
 
 // Special SCVals reserved for system-constructed contract-data
 // ledger keys, not generally usable elsewhere.
-case SCV_LEDGER_KEY_CONTRACT_EXECUTABLE:
+case SCV_LEDGER_KEY_CONTRACT_INSTANCE:
     void;
 case SCV_LEDGER_KEY_NONCE:
     SCNonceKey nonce_key;
+
+case SCV_CONTRACT_INSTANCE:
+    SCContractInstance instance;
 };
 
 struct SCMapEntry
