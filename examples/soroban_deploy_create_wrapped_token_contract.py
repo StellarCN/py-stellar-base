@@ -3,7 +3,7 @@ This example shows how to deploy a wrapped token contract to the Stellar network
 """
 import time
 
-from stellar_sdk import Network, Keypair, TransactionBuilder, Asset
+from stellar_sdk import Network, Keypair, TransactionBuilder, Asset, StrKey
 from stellar_sdk import xdr as stellar_xdr
 from stellar_sdk.soroban import SorobanServer
 from stellar_sdk.soroban.soroban_rpc import GetTransactionStatus
@@ -21,7 +21,7 @@ source = soroban_server.load_account(kp.public_key)
 tx = (
     TransactionBuilder(source, network_passphrase)
     .set_timeout(300)
-    .append_deploy_create_token_contract_with_asset_op(asset=hello_asset)
+    .append_deploy_create_token_contract_from_asset_op(asset=hello_asset)
     .build()
 )
 
@@ -46,6 +46,6 @@ if get_transaction_data.status == GetTransactionStatus.SUCCESS:
     transaction_meta = stellar_xdr.TransactionMeta.from_xdr(
         get_transaction_data.result_meta_xdr
     )
-    result = transaction_meta.v3.tx_result.result.results[0].tr.invoke_host_function_result.success[0]  # type: ignore
-    contract_id = result.bytes.sc_bytes.hex()  # type: ignore
+    result = transaction_meta.v3.soroban_meta.return_value.address.contract_id.hash  # type: ignore
+    contract_id = StrKey.encode_contract(result)
     print(f"contract id: {contract_id}")

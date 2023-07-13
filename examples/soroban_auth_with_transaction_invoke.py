@@ -11,7 +11,7 @@ from stellar_sdk import (
     TransactionBuilder,
 )
 from stellar_sdk import xdr as stellar_xdr
-from stellar_sdk.soroban import SorobanServer, ContractAuth, AuthorizedInvocation
+from stellar_sdk.soroban import SorobanServer
 from stellar_sdk.soroban.soroban_rpc import GetTransactionStatus
 from stellar_sdk.soroban.types import Uint32, Address
 
@@ -20,7 +20,7 @@ soroban_server = SorobanServer(rpc_server_url)
 network_passphrase = Network.FUTURENET_NETWORK_PASSPHRASE
 
 # https://github.com/stellar/soroban-examples/tree/v0.6.0/auth
-contract_id = "8542841a633aafc771f07bc472b7a799fa2e82cced417356505f569daaaedc47"
+contract_id = "CDNTSPC5WR5MF5J42B5JTVFWR6NXVYBP7VUMB74J7IYT6JYDWT67NV5T"
 tx_submitter_kp = Keypair.from_secret(
     "SAAPYAPTTRZMCUZFPG3G66V4ZMHTK4TWA6NS7U4F7Z3IMUD52EK4DDEV"
 )
@@ -28,28 +28,14 @@ tx_submitter_kp = Keypair.from_secret(
 func_name = "increment"
 args = [Address(tx_submitter_kp.public_key), Uint32(10)]
 
-invocation = AuthorizedInvocation(
-    contract_id=contract_id,
-    function_name=func_name,
-    args=args,
-    sub_invocations=[],
-)
-
-contract_auth = ContractAuth(
-    address=None,
-    nonce=None,
-    root_invocation=invocation,
-)
-
 source = soroban_server.load_account(tx_submitter_kp.public_key)
 tx = (
-    TransactionBuilder(source, network_passphrase)
+    TransactionBuilder(source, network_passphrase, base_fee=100)
     .add_time_bounds(0, 0)
     .append_invoke_contract_function_op(
         contract_id=contract_id,
         function_name=func_name,
         parameters=args,
-        auth=[contract_auth],
     )
     .build()
 )
@@ -75,5 +61,5 @@ if get_transaction_data.status == GetTransactionStatus.SUCCESS:
     transaction_meta = stellar_xdr.TransactionMeta.from_xdr(
         get_transaction_data.result_meta_xdr
     )
-    result = transaction_meta.v3.tx_result.result.results[0].tr.invoke_host_function_result.success[0]  # type: ignore
+    result = transaction_meta.v3.soroban_meta.return_value.u32  # type: ignore
     print(f"Function result: {result}")

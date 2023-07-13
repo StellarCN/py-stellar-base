@@ -21,7 +21,7 @@ from stellar_sdk.soroban.types import Symbol
 # TODO: You need to replace the following parameters according to the actual situation
 secret = "SAAPYAPTTRZMCUZFPG3G66V4ZMHTK4TWA6NS7U4F7Z3IMUD52EK4DDEV"
 rpc_server_url = "https://rpc-futurenet.stellar.org:443/"
-contract_id = "d175b6708333f75dd8a010975327468e6a7c17ca19ecf36dad199154cdadcb10"
+contract_id = "CCQVDTV3WGU73LTPTTG3YFBOCS7VJ5ODJQJI7XTBYATZTA4WMV5XAILW"
 network_passphrase = Network.FUTURENET_NETWORK_PASSPHRASE
 
 kp = Keypair.from_secret(secret)
@@ -43,6 +43,7 @@ print(f"XDR: {tx.to_xdr()}")
 
 tx = soroban_server.prepare_transaction(tx)
 tx.sign(kp)
+print(f"Signed XDR: {tx.to_xdr()}")
 
 send_transaction_data = soroban_server.send_transaction(tx)
 print(f"sent transaction: {send_transaction_data}")
@@ -61,6 +62,6 @@ if get_transaction_data.status == GetTransactionStatus.SUCCESS:
     transaction_meta = stellar_xdr.TransactionMeta.from_xdr(
         get_transaction_data.result_meta_xdr
     )
-    result = transaction_meta.v3.tx_result.result.results[0].tr.invoke_host_function_result.success[0]  # type: ignore
+    result = transaction_meta.v3.soroban_meta.return_value  # type: ignore[union-attr]
     output = [x.sym.sc_symbol.decode() for x in result.vec.sc_vec]  # type: ignore
     print(f"transaction result: {output}")

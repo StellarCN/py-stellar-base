@@ -1,9 +1,9 @@
-from typing import Optional, Union, Sequence, List
+from typing import Optional, Union, List
 
 from .operation import Operation
 from .. import xdr as stellar_xdr
-from ..soroban.contract_auth import ContractAuth
 from ..muxed_account import MuxedAccount
+from ..soroban.authorization_entry import AuthorizationEntry
 
 __all__ = ["InvokeHostFunction"]
 
@@ -15,15 +15,37 @@ class InvokeHostFunction(Operation):
 
     def __init__(
         self,
-        functions: List[stellar_xdr.HostFunction],
+        host_function: stellar_xdr.HostFunction,
+        auth: List[AuthorizationEntry],
         source: Optional[Union[MuxedAccount, str]] = None,
     ):
         super().__init__(source)
-        self.functions = functions
+        self.host_function = host_function
+        self._auth: List[AuthorizationEntry] = auth
+
+    # auth setter
+    @property
+    def auth(self) -> List[AuthorizationEntry]:
+        return self._auth
+
+    @auth.setter
+    def auth(self, value: Union[List[AuthorizationEntry], List[str]]):
+        for v in value:
+            if isinstance(v, str):
+                self._auth.append(
+                    AuthorizationEntry.from_xdr_object(
+                        stellar_xdr.SorobanAuthorizationEntry.from_xdr(v)
+                    )
+                )
+            elif isinstance(v, AuthorizationEntry):
+                self._auth.append(v)
+            else:
+                raise TypeError("Only AuthorizationEntry or str is allowed")
 
     def _to_operation_body(self) -> stellar_xdr.OperationBody:
         invoke_host_function_op = stellar_xdr.InvokeHostFunctionOp(
-            functions=self.functions
+            host_function=self.host_function,
+            auth=[auth.to_xdr_object() for auth in self.auth],
         )
         body = stellar_xdr.OperationBody(
             type=self._XDR_OPERATION_TYPE,
@@ -36,13 +58,16 @@ class InvokeHostFunction(Operation):
         """Creates a :class:`InvokeHostFunction` object from an XDR Operation object."""
         source = Operation.get_source_from_xdr_obj(xdr_object)
         assert xdr_object.body.invoke_host_function_op is not None
-        functions = xdr_object.body.invoke_host_function_op.functions
+        host_function = xdr_object.body.invoke_host_function_op.host_function
+        auth = [
+            AuthorizationEntry.from_xdr_object(auth)
+            for auth in xdr_object.body.invoke_host_function_op.auth
+        ]
         return cls(
-            functions=functions,
+            host_function=host_function,
+            auth=auth,
             source=source,
         )
 
     def __str__(self):
-        return (
-            f"<InvokeHostFunction [functions={self.functions}, source={self.source}]>"
-        )
+        return f"<InvokeHostFunction [host_function={self.host_function}, auth={self.auth}, source={self.source}]>"

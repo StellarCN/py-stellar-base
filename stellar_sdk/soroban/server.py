@@ -9,20 +9,25 @@ from typing import Type, TYPE_CHECKING
 from .exceptions import RequestException
 from .jsonrpc import *
 from .soroban_rpc import *
-from .types import Address
+from .types import Address, BaseScValAlias
 from .. import xdr as stellar_xdr
 from ..account import Account
-from ..strkey import StrKey
-from ..client.base_sync_client import BaseSyncClient
 from ..client.requests_client import RequestsClient
+from ..strkey import StrKey
+from ..utils import is_valid_hash
 
 if TYPE_CHECKING:
     from ..transaction_envelope import TransactionEnvelope
-    from ..fee_bump_transaction_envelope import FeeBumpTransactionEnvelope
+    from ..client.base_sync_client import BaseSyncClient
 
 __all__ = ["SorobanServer"]
 
 V = TypeVar("V")
+
+
+class Durability(Enum):
+    TEMPORARY = ("temporary",)
+    PERSISTENT = ("persistent",)
 
 
 class SorobanServer:
@@ -49,7 +54,7 @@ class SorobanServer:
 
         See `Soroban Documentation - getHealth <https://soroban.stellar.org/api/methods/getHealth>`_
 
-        :return: A :class:`GetHealthResponse <stellar_sdk.soroban_rpc.get_health.GetHealthResponse>` object.
+        :return: A :class:`GetHealthResponse <stellar_sdk.soroban_rpc.GetHealthResponse>` object.
         """
         request: Request = Request(
             id=_generate_unique_request_id(),
@@ -73,7 +78,7 @@ class SorobanServer:
         :param filters: A list of filters to apply to the results.
         :param cursor: A cursor value for use in pagination.
         :param limit: The maximum number of records to return.
-        :return: A :class:`GetEventsResponse <stellar_sdk.soroban_rpc.get_events.GetEventsResponse>` object.
+        :return: A :class:`GetEventsResponse <stellar_sdk.soroban_rpc.GetEventsResponse>` object.
         """
         pagination = PaginationOptions(cursor=cursor, limit=limit)
         data = GetEventsRequest(
@@ -89,7 +94,7 @@ class SorobanServer:
     def get_network(self) -> GetNetworkResponse:
         """General info about the currently configured network.
 
-        :return: A :class:`GetNetworkResponse <stellar_sdk.soroban_rpc.get_network.GetNetworkResponse>` object.
+        :return: A :class:`GetNetworkResponse <stellar_sdk.soroban_rpc.GetNetworkResponse>` object.
         """
         request: Request = Request(
             id=_generate_unique_request_id(),
@@ -97,6 +102,18 @@ class SorobanServer:
             params=None,
         )
         return self._post(request, GetNetworkResponse)
+
+    def get_latest_ledger(self) -> GetLatestLedgerResponse:
+        """Fetches the latest ledger meta info from network which Soroban-RPC is connected to.
+
+        :return: A :class:`GetLatestLedgerResponse <stellar_sdk.soroban_rpc.GetLatestLedgerResponse>` object.
+        """
+        request: Request = Request(
+            id=_generate_unique_request_id(),
+            method="getLatestLedger",
+            params=None,
+        )
+        return self._post(request, GetLatestLedgerResponse)
 
     def get_ledger_entry(self, key: stellar_xdr.LedgerKey) -> GetLedgerEntryResponse:
         """For reading the current value of ledger entries directly.
@@ -108,7 +125,7 @@ class SorobanServer:
         See `Soroban Documentation - getLedgerEntry <https://soroban.stellar.org/api/methods/getLedgerEntry>`_
 
         :param key: The ledger key to fetch.
-        :return: A :class:`GetLedgerEntryResponse <stellar_sdk.soroban_rpc.get_ledger_entry.GetLedgerEntryResponse>` object.
+        :return: A :class:`GetLedgerEntryResponse <stellar_sdk.soroban_rpc.GetLedgerEntryResponse>` object.
         """
         warnings.warn(
             "This method will be removed soon. "
@@ -134,7 +151,7 @@ class SorobanServer:
         See `Soroban Documentation - getLedgerEntries <https://soroban.stellar.org/api/methods/getLedgerEntries>`_
 
         :param keys: The ledger keys to fetch.
-        :return: A :class:`GetLedgerEntriesResponse <stellar_sdk.soroban_rpc.get_ledger_entries.GetLedgerEntryResponse>` object.
+        :return: A :class:`GetLedgerEntriesResponse <stellar_sdk.soroban_rpc.GetLedgerEntryResponse>` object.
         """
         request = Request[GetLedgerEntriesRequest](
             id=_generate_unique_request_id(),
@@ -149,7 +166,7 @@ class SorobanServer:
         See `Soroban Documentation - getTransaction <https://soroban.stellar.org/api/methods/getTransaction>`_
 
         :param transaction_hash: The hash of the transaction to fetch.
-        :return: A :class:`GetTransactionResponse <stellar_sdk.soroban_rpc.get_transaction_status.GetTransactionResponse>` object.
+        :return: A :class:`GetTransactionResponse <stellar_sdk.soroban_rpc.GetTransactionResponse>` object.
         """
         request = Request[GetTransactionRequest](
             id=_generate_unique_request_id(),
@@ -159,17 +176,14 @@ class SorobanServer:
         return self._post(request, GetTransactionResponse)
 
     def simulate_transaction(
-        self,
-        transaction_envelope: Union[
-            TransactionEnvelope, FeeBumpTransactionEnvelope, str
-        ],
+        self, transaction_envelope: TransactionEnvelope
     ) -> SimulateTransactionResponse:
         """Submit a trial contract invocation to get back return values, expected ledger footprint, and expected costs.
 
         See `Soroban Documentation - simulateTransaction <https://soroban.stellar.org/api/methods/simulateTransaction>`_
 
         :param transaction_envelope: The transaction to simulate.
-        :return: A :class:`SimulateTransactionResponse <stellar_sdk.soroban_rpc.simulate_transaction.SimulateTransactionResponse>` object.
+        :return: A :class:`SimulateTransactionResponse <stellar_sdk.soroban_rpc.SimulateTransactionResponse>` object.
         """
         xdr = (
             transaction_envelope
@@ -192,7 +206,7 @@ class SorobanServer:
         See `Soroban Documentation - sendTransaction <https://soroban.stellar.org/api/methods/sendTransaction>`_
 
         :param transaction_envelope: The transaction to send.
-        :return: A :class:`SendTransactionResponse <stellar_sdk.soroban_rpc.send_transaction.SendTransactionResponse>` object.
+        :return: A :class:`SendTransactionResponse <stellar_sdk.soroban_rpc.SendTransactionResponse>` object.
         """
         xdr = (
             transaction_envelope
@@ -236,32 +250,32 @@ class SorobanServer:
         assert data.account is not None
         return Account(account_id, data.account.seq_num.sequence_number.int64)
 
-    def get_nonce(self, contract_id: str, account_id: str) -> int:
-        """Loads nonce from ledger entry if available, otherwise returns 0.
-
-        :param contract_id: The contract ID.
-        :param account_id: The account ID.
-        :return: The nonce.
-        """
-        contract_id_bytes = binascii.unhexlify(contract_id)
-        ledger_key = stellar_xdr.LedgerKey.from_contract_data(
+    def get_contract_data(
+        self,
+        contract_id: str,
+        key: Union[stellar_xdr.SCVal, BaseScValAlias],
+        durability: Durability = Durability.PERSISTENT,
+    ):
+        """Reads the current value of contract data ledger entries directly."""
+        if is_valid_hash(contract_id):
+            contract_id = StrKey.encode_contract(binascii.unhexlify(contract_id))
+        sc_address = Address(contract_id).to_xdr_sc_address()
+        sc_key = key.to_xdr_sc_val() if isinstance(key, BaseScValAlias) else key
+        xdr_durability = (
+            stellar_xdr.ContractDataDurability.PERSISTENT
+            if durability == Durability.PERSISTENT
+            else stellar_xdr.ContractDataDurability.TEMPORARY
+        )
+        contract_key = stellar_xdr.LedgerKey.from_contract_data(
             stellar_xdr.LedgerKeyContractData(
-                contract_id=stellar_xdr.Hash(contract_id_bytes),
-                key=stellar_xdr.SCVal.from_scv_ledger_key_nonce(
-                    stellar_xdr.SCNonceKey(Address(account_id).to_xdr_sc_address())
-                ),
+                contract=sc_address,
+                key=sc_key,
+                durability=xdr_durability,
+                body_type=stellar_xdr.ContractEntryBodyType.DATA_ENTRY,
             )
         )
-        try:
-            response = self.get_ledger_entry(ledger_key)
-            data = stellar_xdr.LedgerEntryData.from_xdr(response.xdr)
-            assert data.contract_data is not None
-            assert data.contract_data.val.u64 is not None
-            return data.contract_data.val.u64.uint64
-        except RequestException as e:
-            if e.code == -32600:
-                return 0
-            raise e
+        print(contract_key.to_xdr())
+        return self.get_ledger_entries([contract_key])
 
     def prepare_transaction(
         self,
@@ -287,16 +301,7 @@ class SorobanServer:
         resp = self.simulate_transaction(transaction_envelope)
         if resp.error:
             raise RequestException(None, resp.error)
-        soroban_data_xdr_object = stellar_xdr.SorobanTransactionData.from_xdr(
-            resp.transaction_data
-        )
-        # TODO: https://discord.com/channels/897514728459468821/1112853306881081354/1112853306881081354
-        # soroban_data_xdr_object.resources.instructions = stellar_xdr.Uint32(soroban_data_xdr_object.resources.instructions.uint32 * 2)
-        te = copy.deepcopy(transaction_envelope)
-        te.signatures = []
-        te.transaction.fee += resp.min_resource_fee
-        te.transaction.soroban_data = soroban_data_xdr_object
-        # TODO: Fee Bump Tx
+        te = _assemble_transaction(transaction_envelope, resp)
         return te
 
     def close(self) -> None:
@@ -326,3 +331,43 @@ class SorobanServer:
 
 def _generate_unique_request_id() -> str:
     return uuid.uuid4().hex
+
+
+def _assemble_transaction(
+    transaction_envelope: TransactionEnvelope,
+    simulation: SimulateTransactionResponse,
+) -> TransactionEnvelope:
+    # TODO: add support for FeeBumpTransactionEnvelope
+    if not transaction_envelope.transaction.is_soroban_transaction():
+        raise ValueError(
+            "Unsupported transaction: must contain exactly one operation of "
+            "type RestoreFootprint, InvokeHostFunction or BumpFootprintExpiration"
+        )
+
+    if not simulation.results or len(simulation.results) != 1:
+        raise ValueError(f"Simulation results invalid: {simulation.results}")
+
+    min_resource_fee = simulation.min_resource_fee
+    soroban_data = stellar_xdr.SorobanTransactionData.from_xdr(
+        simulation.transaction_data
+    )
+
+    # TODO: https://discord.com/channels/897514728459468821/1112853306881081354/1112853306881081354
+    # soroban_data.resources.instructions = stellar_xdr.Uint32(soroban_data.resources.instructions.uint32 * 2)
+
+    te = copy.deepcopy(transaction_envelope)
+    te.signatures = []
+    te.transaction.fee += min_resource_fee
+    te.transaction.soroban_data = soroban_data
+
+    # TODO: https://discord.com/channels/897514728459468821/1112853306881081354/1112853306881081354
+    # soroban_data_xdr_object.resources.instructions = stellar_xdr.Uint32(soroban_data_xdr_object.resources.instructions.uint32 * 2)
+
+    op = te.transaction.operations[0]
+    if (
+        te.transaction._is_soroban_invoke_host_function_transaction()
+        and not op.auth  # type: ignore[attr-defined]
+        and simulation.results[0].auth
+    ):
+        op.auth = simulation.results[0].auth  # type: ignore[attr-defined]
+    return te
