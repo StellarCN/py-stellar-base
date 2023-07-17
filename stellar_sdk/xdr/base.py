@@ -1,4 +1,4 @@
-from xdrlib import Packer, Unpacker
+from xdrlib3 import Packer, Unpacker
 
 __all__ = [
     "Integer",

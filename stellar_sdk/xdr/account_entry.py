@@ -2,7 +2,7 @@
 # DO NOT EDIT or your changes may be overwritten
 import base64
 from typing import List, Optional
-from xdrlib import Packer, Unpacker
+from xdrlib3 import Packer, Unpacker
 
 from .account_entry_ext import AccountEntryExt
 from .account_id import AccountID

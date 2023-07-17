@@ -2,7 +2,7 @@
 # DO NOT EDIT or your changes may be overwritten
 import base64
 from typing import Optional
-from xdrlib import Packer, Unpacker
+from xdrlib3 import Packer, Unpacker
 
 from .muxed_account import MuxedAccount
 from .operation_body import OperationBody
