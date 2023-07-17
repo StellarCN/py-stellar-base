@@ -1,6 +1,9 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
+from __future__ import annotations
+
 import base64
+
 from xdrlib3 import Packer, Unpacker
 
 from .base import Integer
@@ -22,7 +25,7 @@ class Int32:
         Integer(self.int32).pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "Int32":
+    def unpack(cls, unpacker: Unpacker) -> Int32:
         int32 = Integer.unpack(unpacker)
         return cls(int32)
 
@@ -32,7 +35,7 @@ class Int32:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "Int32":
+    def from_xdr_bytes(cls, xdr: bytes) -> Int32:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -41,7 +44,7 @@ class Int32:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "Int32":
+    def from_xdr(cls, xdr: str) -> Int32:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
 

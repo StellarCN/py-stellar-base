@@ -1,6 +1,9 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
+from __future__ import annotations
+
 import base64
+
 from xdrlib3 import Packer, Unpacker
 
 from .int64 import Int64
@@ -72,7 +75,7 @@ class TransactionResult:
         self.ext.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "TransactionResult":
+    def unpack(cls, unpacker: Unpacker) -> TransactionResult:
         fee_charged = Int64.unpack(unpacker)
         result = TransactionResultResult.unpack(unpacker)
         ext = TransactionResultExt.unpack(unpacker)
@@ -88,7 +91,7 @@ class TransactionResult:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "TransactionResult":
+    def from_xdr_bytes(cls, xdr: bytes) -> TransactionResult:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -97,7 +100,7 @@ class TransactionResult:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "TransactionResult":
+    def from_xdr(cls, xdr: str) -> TransactionResult:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
 

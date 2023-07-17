@@ -1,10 +1,16 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
+from __future__ import annotations
+
 import base64
+
 from xdrlib3 import Packer, Unpacker
 
-from .hash import Hash
+from .contract_data_durability import ContractDataDurability
+from .contract_data_entry_body import ContractDataEntryBody
+from .sc_address import SCAddress
 from .sc_val import SCVal
+from .uint32 import Uint32
 
 __all__ = ["ContractDataEntry"]
 
@@ -14,36 +20,60 @@ class ContractDataEntry:
     XDR Source Code::
 
         struct ContractDataEntry {
-            Hash contractID;
+            SCAddress contract;
             SCVal key;
-            SCVal val;
+            ContractDataDurability durability;
+
+            union switch (ContractEntryBodyType bodyType)
+            {
+            case DATA_ENTRY:
+            struct
+            {
+                uint32 flags;
+                SCVal val;
+            } data;
+            case EXPIRATION_EXTENSION:
+                void;
+            } body;
+
+            uint32 expirationLedgerSeq;
         };
     """
 
     def __init__(
         self,
-        contract_id: Hash,
+        contract: SCAddress,
         key: SCVal,
-        val: SCVal,
+        durability: ContractDataDurability,
+        body: ContractDataEntryBody,
+        expiration_ledger_seq: Uint32,
     ) -> None:
-        self.contract_id = contract_id
+        self.contract = contract
         self.key = key
-        self.val = val
+        self.durability = durability
+        self.body = body
+        self.expiration_ledger_seq = expiration_ledger_seq
 
     def pack(self, packer: Packer) -> None:
-        self.contract_id.pack(packer)
+        self.contract.pack(packer)
         self.key.pack(packer)
-        self.val.pack(packer)
+        self.durability.pack(packer)
+        self.body.pack(packer)
+        self.expiration_ledger_seq.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "ContractDataEntry":
-        contract_id = Hash.unpack(unpacker)
+    def unpack(cls, unpacker: Unpacker) -> ContractDataEntry:
+        contract = SCAddress.unpack(unpacker)
         key = SCVal.unpack(unpacker)
-        val = SCVal.unpack(unpacker)
+        durability = ContractDataDurability.unpack(unpacker)
+        body = ContractDataEntryBody.unpack(unpacker)
+        expiration_ledger_seq = Uint32.unpack(unpacker)
         return cls(
-            contract_id=contract_id,
+            contract=contract,
             key=key,
-            val=val,
+            durability=durability,
+            body=body,
+            expiration_ledger_seq=expiration_ledger_seq,
         )
 
     def to_xdr_bytes(self) -> bytes:
@@ -52,7 +82,7 @@ class ContractDataEntry:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "ContractDataEntry":
+    def from_xdr_bytes(cls, xdr: bytes) -> ContractDataEntry:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -61,7 +91,7 @@ class ContractDataEntry:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "ContractDataEntry":
+    def from_xdr(cls, xdr: str) -> ContractDataEntry:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
 
@@ -69,15 +99,19 @@ class ContractDataEntry:
         if not isinstance(other, self.__class__):
             return NotImplemented
         return (
-            self.contract_id == other.contract_id
+            self.contract == other.contract
             and self.key == other.key
-            and self.val == other.val
+            and self.durability == other.durability
+            and self.body == other.body
+            and self.expiration_ledger_seq == other.expiration_ledger_seq
         )
 
     def __str__(self):
         out = [
-            f"contract_id={self.contract_id}",
+            f"contract={self.contract}",
             f"key={self.key}",
-            f"val={self.val}",
+            f"durability={self.durability}",
+            f"body={self.body}",
+            f"expiration_ledger_seq={self.expiration_ledger_seq}",
         ]
         return f"<ContractDataEntry [{', '.join(out)}]>"

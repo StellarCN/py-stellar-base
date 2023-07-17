@@ -1,7 +1,10 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
+from __future__ import annotations
+
 import base64
 from typing import List, Optional
+
 from xdrlib3 import Packer, Unpacker
 
 from .claim_predicate_type import ClaimPredicateType
@@ -139,7 +142,7 @@ class ClaimPredicate:
             return
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "ClaimPredicate":
+    def unpack(cls, unpacker: Unpacker) -> ClaimPredicate:
         type = ClaimPredicateType.unpack(unpacker)
         if type == ClaimPredicateType.CLAIM_PREDICATE_UNCONDITIONAL:
             return cls(type=type)
@@ -174,7 +177,7 @@ class ClaimPredicate:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "ClaimPredicate":
+    def from_xdr_bytes(cls, xdr: bytes) -> ClaimPredicate:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -183,7 +186,7 @@ class ClaimPredicate:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "ClaimPredicate":
+    def from_xdr(cls, xdr: str) -> ClaimPredicate:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
 

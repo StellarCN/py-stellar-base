@@ -493,17 +493,57 @@ struct LiquidityPoolEntry
     body;
 };
 
+enum ContractEntryBodyType {
+    DATA_ENTRY = 0,
+    EXPIRATION_EXTENSION = 1
+};
+
+const MASK_CONTRACT_DATA_FLAGS_V20 = 0x1;
+
+enum ContractDataFlags {
+    // When set, the given entry does not recieve automatic expiration bumps
+    // on access. Note that entries can still be bumped manually via the footprint.
+    NO_AUTOBUMP = 0x1
+};
+
+enum ContractDataDurability {
+    TEMPORARY = 0,
+    PERSISTENT = 1
+};
+
 struct ContractDataEntry {
-    Hash contractID;
+    SCAddress contract;
     SCVal key;
-    SCVal val;
+    ContractDataDurability durability;
+
+    union switch (ContractEntryBodyType bodyType)
+    {
+    case DATA_ENTRY:
+    struct
+    {
+        uint32 flags;
+        SCVal val;
+    } data;
+    case EXPIRATION_EXTENSION:
+        void;
+    } body;
+
+    uint32 expirationLedgerSeq;
 };
 
 struct ContractCodeEntry {
     ExtensionPoint ext;
 
     Hash hash;
-    opaque code<SCVAL_LIMIT>;
+    union switch (ContractEntryBodyType bodyType)
+    {
+    case DATA_ENTRY:
+        opaque code<>;
+    case EXPIRATION_EXTENSION:
+        void;
+    } body;
+
+    uint32 expirationLedgerSeq;
 };
 
 
@@ -600,13 +640,16 @@ case LIQUIDITY_POOL:
 case CONTRACT_DATA:
     struct
     {
-        Hash contractID;
+        SCAddress contract;
         SCVal key;
+        ContractDataDurability durability;
+        ContractEntryBodyType bodyType;
     } contractData;
 case CONTRACT_CODE:
     struct
     {
         Hash hash;
+        ContractEntryBodyType bodyType;
     } contractCode;
 case CONFIG_SETTING:
     struct
@@ -628,11 +671,7 @@ enum EnvelopeType
     ENVELOPE_TYPE_TX_FEE_BUMP = 5,
     ENVELOPE_TYPE_OP_ID = 6,
     ENVELOPE_TYPE_POOL_REVOKE_OP_ID = 7,
-    ENVELOPE_TYPE_CONTRACT_ID_FROM_ED25519 = 8,
-    ENVELOPE_TYPE_CONTRACT_ID_FROM_CONTRACT = 9,
-    ENVELOPE_TYPE_CONTRACT_ID_FROM_ASSET = 10,
-    ENVELOPE_TYPE_CONTRACT_ID_FROM_SOURCE_ACCOUNT = 11,
-    ENVELOPE_TYPE_CREATE_CONTRACT_ARGS = 12,
-    ENVELOPE_TYPE_CONTRACT_AUTH = 13
+    ENVELOPE_TYPE_CONTRACT_ID = 8,
+    ENVELOPE_TYPE_SOROBAN_AUTHORIZATION = 9
 };
 }

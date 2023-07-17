@@ -1,6 +1,9 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
+from __future__ import annotations
+
 import base64
+
 from xdrlib3 import Packer, Unpacker
 
 from .change_trust_result_code import ChangeTrustResultCode
@@ -95,7 +98,7 @@ class ChangeTrustResult:
             return
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "ChangeTrustResult":
+    def unpack(cls, unpacker: Unpacker) -> ChangeTrustResult:
         code = ChangeTrustResultCode.unpack(unpacker)
         if code == ChangeTrustResultCode.CHANGE_TRUST_SUCCESS:
             return cls(code=code)
@@ -123,7 +126,7 @@ class ChangeTrustResult:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "ChangeTrustResult":
+    def from_xdr_bytes(cls, xdr: bytes) -> ChangeTrustResult:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -132,7 +135,7 @@ class ChangeTrustResult:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "ChangeTrustResult":
+    def from_xdr(cls, xdr: str) -> ChangeTrustResult:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
 

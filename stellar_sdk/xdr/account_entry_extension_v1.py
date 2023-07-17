@@ -1,6 +1,9 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
+from __future__ import annotations
+
 import base64
+
 from xdrlib3 import Packer, Unpacker
 
 from .account_entry_extension_v1_ext import AccountEntryExtensionV1Ext
@@ -41,7 +44,7 @@ class AccountEntryExtensionV1:
         self.ext.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "AccountEntryExtensionV1":
+    def unpack(cls, unpacker: Unpacker) -> AccountEntryExtensionV1:
         liabilities = Liabilities.unpack(unpacker)
         ext = AccountEntryExtensionV1Ext.unpack(unpacker)
         return cls(
@@ -55,7 +58,7 @@ class AccountEntryExtensionV1:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "AccountEntryExtensionV1":
+    def from_xdr_bytes(cls, xdr: bytes) -> AccountEntryExtensionV1:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -64,7 +67,7 @@ class AccountEntryExtensionV1:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "AccountEntryExtensionV1":
+    def from_xdr(cls, xdr: str) -> AccountEntryExtensionV1:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
 

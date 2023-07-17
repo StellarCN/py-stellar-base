@@ -1,11 +1,15 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
+from __future__ import annotations
+
 import base64
-from typing import List
+
 from xdrlib3 import Packer, Unpacker
 
-from .contract_auth import ContractAuth
-from .host_function_args import HostFunctionArgs
+from .base import Opaque
+from .create_contract_args import CreateContractArgs
+from .host_function_type import HostFunctionType
+from .sc_vec import SCVec
 
 __all__ = ["HostFunction"]
 
@@ -14,46 +18,84 @@ class HostFunction:
     """
     XDR Source Code::
 
-        struct HostFunction {
-            // Arguments of the function to call defined by the function
-            // type.
-            HostFunctionArgs args;
-            // Per-address authorizations for this host fn
-            // Currently only supported for INVOKE_CONTRACT function
-            ContractAuth auth<>;
+        union HostFunction switch (HostFunctionType type)
+        {
+        case HOST_FUNCTION_TYPE_INVOKE_CONTRACT:
+            SCVec invokeContract;
+        case HOST_FUNCTION_TYPE_CREATE_CONTRACT:
+            CreateContractArgs createContract;
+        case HOST_FUNCTION_TYPE_UPLOAD_CONTRACT_WASM:
+            opaque wasm<>;
         };
     """
 
     def __init__(
         self,
-        args: HostFunctionArgs,
-        auth: List[ContractAuth],
+        type: HostFunctionType,
+        invoke_contract: SCVec = None,
+        create_contract: CreateContractArgs = None,
+        wasm: bytes = None,
     ) -> None:
-        _expect_max_length = 4294967295
-        if auth and len(auth) > _expect_max_length:
-            raise ValueError(
-                f"The maximum length of `auth` should be {_expect_max_length}, but got {len(auth)}."
-            )
-        self.args = args
-        self.auth = auth
-
-    def pack(self, packer: Packer) -> None:
-        self.args.pack(packer)
-        packer.pack_uint(len(self.auth))
-        for auth_item in self.auth:
-            auth_item.pack(packer)
+        self.type = type
+        self.invoke_contract = invoke_contract
+        self.create_contract = create_contract
+        self.wasm = wasm
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "HostFunction":
-        args = HostFunctionArgs.unpack(unpacker)
-        length = unpacker.unpack_uint()
-        auth = []
-        for _ in range(length):
-            auth.append(ContractAuth.unpack(unpacker))
+    def from_host_function_type_invoke_contract(
+        cls, invoke_contract: SCVec
+    ) -> "HostFunction":
         return cls(
-            args=args,
-            auth=auth,
+            HostFunctionType.HOST_FUNCTION_TYPE_INVOKE_CONTRACT,
+            invoke_contract=invoke_contract,
         )
+
+    @classmethod
+    def from_host_function_type_create_contract(
+        cls, create_contract: CreateContractArgs
+    ) -> "HostFunction":
+        return cls(
+            HostFunctionType.HOST_FUNCTION_TYPE_CREATE_CONTRACT,
+            create_contract=create_contract,
+        )
+
+    @classmethod
+    def from_host_function_type_upload_contract_wasm(
+        cls, wasm: bytes
+    ) -> "HostFunction":
+        return cls(HostFunctionType.HOST_FUNCTION_TYPE_UPLOAD_CONTRACT_WASM, wasm=wasm)
+
+    def pack(self, packer: Packer) -> None:
+        self.type.pack(packer)
+        if self.type == HostFunctionType.HOST_FUNCTION_TYPE_INVOKE_CONTRACT:
+            if self.invoke_contract is None:
+                raise ValueError("invoke_contract should not be None.")
+            self.invoke_contract.pack(packer)
+            return
+        if self.type == HostFunctionType.HOST_FUNCTION_TYPE_CREATE_CONTRACT:
+            if self.create_contract is None:
+                raise ValueError("create_contract should not be None.")
+            self.create_contract.pack(packer)
+            return
+        if self.type == HostFunctionType.HOST_FUNCTION_TYPE_UPLOAD_CONTRACT_WASM:
+            if self.wasm is None:
+                raise ValueError("wasm should not be None.")
+            Opaque(self.wasm, 4294967295, False).pack(packer)
+            return
+
+    @classmethod
+    def unpack(cls, unpacker: Unpacker) -> HostFunction:
+        type = HostFunctionType.unpack(unpacker)
+        if type == HostFunctionType.HOST_FUNCTION_TYPE_INVOKE_CONTRACT:
+            invoke_contract = SCVec.unpack(unpacker)
+            return cls(type=type, invoke_contract=invoke_contract)
+        if type == HostFunctionType.HOST_FUNCTION_TYPE_CREATE_CONTRACT:
+            create_contract = CreateContractArgs.unpack(unpacker)
+            return cls(type=type, create_contract=create_contract)
+        if type == HostFunctionType.HOST_FUNCTION_TYPE_UPLOAD_CONTRACT_WASM:
+            wasm = Opaque.unpack(unpacker, 4294967295, False)
+            return cls(type=type, wasm=wasm)
+        return cls(type=type)
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()
@@ -61,7 +103,7 @@ class HostFunction:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "HostFunction":
+    def from_xdr_bytes(cls, xdr: bytes) -> HostFunction:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -70,18 +112,28 @@ class HostFunction:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "HostFunction":
+    def from_xdr(cls, xdr: str) -> HostFunction:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented
-        return self.args == other.args and self.auth == other.auth
+        return (
+            self.type == other.type
+            and self.invoke_contract == other.invoke_contract
+            and self.create_contract == other.create_contract
+            and self.wasm == other.wasm
+        )
 
     def __str__(self):
-        out = [
-            f"args={self.args}",
-            f"auth={self.auth}",
-        ]
+        out = []
+        out.append(f"type={self.type}")
+        out.append(
+            f"invoke_contract={self.invoke_contract}"
+        ) if self.invoke_contract is not None else None
+        out.append(
+            f"create_contract={self.create_contract}"
+        ) if self.create_contract is not None else None
+        out.append(f"wasm={self.wasm}") if self.wasm is not None else None
         return f"<HostFunction [{', '.join(out)}]>"

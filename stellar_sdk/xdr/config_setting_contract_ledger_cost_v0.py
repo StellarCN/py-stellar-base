@@ -1,6 +1,9 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
+from __future__ import annotations
+
 import base64
+
 from xdrlib3 import Packer, Unpacker
 
 from .int64 import Int64
@@ -105,7 +108,7 @@ class ConfigSettingContractLedgerCostV0:
         self.bucket_list_growth_factor.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "ConfigSettingContractLedgerCostV0":
+    def unpack(cls, unpacker: Unpacker) -> ConfigSettingContractLedgerCostV0:
         ledger_max_read_ledger_entries = Uint32.unpack(unpacker)
         ledger_max_read_bytes = Uint32.unpack(unpacker)
         ledger_max_write_ledger_entries = Uint32.unpack(unpacker)
@@ -147,7 +150,7 @@ class ConfigSettingContractLedgerCostV0:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "ConfigSettingContractLedgerCostV0":
+    def from_xdr_bytes(cls, xdr: bytes) -> ConfigSettingContractLedgerCostV0:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -156,7 +159,7 @@ class ConfigSettingContractLedgerCostV0:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "ConfigSettingContractLedgerCostV0":
+    def from_xdr(cls, xdr: str) -> ConfigSettingContractLedgerCostV0:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
 

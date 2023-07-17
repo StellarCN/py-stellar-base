@@ -1,13 +1,15 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
 # This file contains manual patches
+from __future__ import annotations
 
 import base64
-from typing import Optional, TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional
+
 from xdrlib3 import Packer, Unpacker
 
-from .sc_val_type import SCValType
 from .base import Boolean
+from .sc_val_type import SCValType
 
 if TYPE_CHECKING:
     from .duration import Duration
@@ -17,18 +19,18 @@ if TYPE_CHECKING:
     from .int256_parts import Int256Parts
     from .sc_address import SCAddress
     from .sc_bytes import SCBytes
-    from .sc_contract_executable import SCContractExecutable
+    from .sc_contract_instance import SCContractInstance
+    from .sc_error import SCError
     from .sc_map import SCMap
     from .sc_nonce_key import SCNonceKey
-    from .sc_status import SCStatus
     from .sc_string import SCString
     from .sc_symbol import SCSymbol
     from .sc_vec import SCVec
     from .time_point import TimePoint
-    from .uint32 import Uint32
-    from .uint64 import Uint64
     from .u_int128_parts import UInt128Parts
     from .u_int256_parts import UInt256Parts
+    from .uint32 import Uint32
+    from .uint64 import Uint64
 
 __all__ = ["SCVal"]
 
@@ -44,8 +46,8 @@ class SCVal:
             bool b;
         case SCV_VOID:
             void;
-        case SCV_STATUS:
-            SCStatus error;
+        case SCV_ERROR:
+            SCError error;
 
         case SCV_U32:
             uint32 u32;
@@ -85,43 +87,44 @@ class SCVal:
         case SCV_MAP:
             SCMap *map;
 
-        case SCV_CONTRACT_EXECUTABLE:
-            SCContractExecutable exec;
         case SCV_ADDRESS:
             SCAddress address;
 
         // Special SCVals reserved for system-constructed contract-data
         // ledger keys, not generally usable elsewhere.
-        case SCV_LEDGER_KEY_CONTRACT_EXECUTABLE:
+        case SCV_LEDGER_KEY_CONTRACT_INSTANCE:
             void;
         case SCV_LEDGER_KEY_NONCE:
             SCNonceKey nonce_key;
+
+        case SCV_CONTRACT_INSTANCE:
+            SCContractInstance instance;
         };
     """
 
     def __init__(
         self,
-        type: "SCValType",
+        type: SCValType,
         b: bool = None,
-        error: "SCStatus" = None,
-        u32: "Uint32" = None,
-        i32: "Int32" = None,
-        u64: "Uint64" = None,
-        i64: "Int64" = None,
-        timepoint: "TimePoint" = None,
-        duration: "Duration" = None,
-        u128: "UInt128Parts" = None,
-        i128: "Int128Parts" = None,
-        u256: "UInt256Parts" = None,
-        i256: "Int256Parts" = None,
-        bytes: "SCBytes" = None,
-        str: "SCString" = None,
-        sym: "SCSymbol" = None,
-        vec: Optional["SCVec"] = None,
-        map: Optional["SCMap"] = None,
-        exec: "SCContractExecutable" = None,
-        address: "SCAddress" = None,
-        nonce_key: "SCNonceKey" = None,
+        error: SCError = None,
+        u32: Uint32 = None,
+        i32: Int32 = None,
+        u64: Uint64 = None,
+        i64: Int64 = None,
+        timepoint: TimePoint = None,
+        duration: Duration = None,
+        u128: UInt128Parts = None,
+        i128: Int128Parts = None,
+        u256: UInt256Parts = None,
+        i256: Int256Parts = None,
+        bytes: SCBytes = None,
+        str: SCString = None,
+        sym: SCSymbol = None,
+        vec: Optional[SCVec] = None,
+        map: Optional[SCMap] = None,
+        address: SCAddress = None,
+        nonce_key: SCNonceKey = None,
+        instance: SCContractInstance = None,
     ) -> None:
         self.type = type
         self.b = b
@@ -141,9 +144,9 @@ class SCVal:
         self.sym = sym
         self.vec = vec
         self.map = map
-        self.exec = exec
         self.address = address
         self.nonce_key = nonce_key
+        self.instance = instance
 
     @classmethod
     def from_scv_bool(cls, b: bool) -> "SCVal":
@@ -154,84 +157,84 @@ class SCVal:
         return cls(SCValType.SCV_VOID)
 
     @classmethod
-    def from_scv_status(cls, error: "SCStatus") -> "SCVal":
-        return cls(SCValType.SCV_STATUS, error=error)
+    def from_scv_error(cls, error: SCError) -> "SCVal":
+        return cls(SCValType.SCV_ERROR, error=error)
 
     @classmethod
-    def from_scv_u32(cls, u32: "Uint32") -> "SCVal":
+    def from_scv_u32(cls, u32: Uint32) -> "SCVal":
         return cls(SCValType.SCV_U32, u32=u32)
 
     @classmethod
-    def from_scv_i32(cls, i32: "Int32") -> "SCVal":
+    def from_scv_i32(cls, i32: Int32) -> "SCVal":
         return cls(SCValType.SCV_I32, i32=i32)
 
     @classmethod
-    def from_scv_u64(cls, u64: "Uint64") -> "SCVal":
+    def from_scv_u64(cls, u64: Uint64) -> "SCVal":
         return cls(SCValType.SCV_U64, u64=u64)
 
     @classmethod
-    def from_scv_i64(cls, i64: "Int64") -> "SCVal":
+    def from_scv_i64(cls, i64: Int64) -> "SCVal":
         return cls(SCValType.SCV_I64, i64=i64)
 
     @classmethod
-    def from_scv_timepoint(cls, timepoint: "TimePoint") -> "SCVal":
+    def from_scv_timepoint(cls, timepoint: TimePoint) -> "SCVal":
         return cls(SCValType.SCV_TIMEPOINT, timepoint=timepoint)
 
     @classmethod
-    def from_scv_duration(cls, duration: "Duration") -> "SCVal":
+    def from_scv_duration(cls, duration: Duration) -> "SCVal":
         return cls(SCValType.SCV_DURATION, duration=duration)
 
     @classmethod
-    def from_scv_u128(cls, u128: "UInt128Parts") -> "SCVal":
+    def from_scv_u128(cls, u128: UInt128Parts) -> "SCVal":
         return cls(SCValType.SCV_U128, u128=u128)
 
     @classmethod
-    def from_scv_i128(cls, i128: "Int128Parts") -> "SCVal":
+    def from_scv_i128(cls, i128: Int128Parts) -> "SCVal":
         return cls(SCValType.SCV_I128, i128=i128)
 
     @classmethod
-    def from_scv_u256(cls, u256: "UInt256Parts") -> "SCVal":
+    def from_scv_u256(cls, u256: UInt256Parts) -> "SCVal":
         return cls(SCValType.SCV_U256, u256=u256)
 
     @classmethod
-    def from_scv_i256(cls, i256: "Int256Parts") -> "SCVal":
+    def from_scv_i256(cls, i256: Int256Parts) -> "SCVal":
         return cls(SCValType.SCV_I256, i256=i256)
 
     @classmethod
-    def from_scv_bytes(cls, bytes: "SCBytes") -> "SCVal":
+    def from_scv_bytes(cls, bytes: SCBytes) -> "SCVal":
         return cls(SCValType.SCV_BYTES, bytes=bytes)
 
     @classmethod
-    def from_scv_string(cls, str: "SCString") -> "SCVal":
+    def from_scv_string(cls, str: SCString) -> "SCVal":
         return cls(SCValType.SCV_STRING, str=str)
 
     @classmethod
-    def from_scv_symbol(cls, sym: "SCSymbol") -> "SCVal":
+    def from_scv_symbol(cls, sym: SCSymbol) -> "SCVal":
         return cls(SCValType.SCV_SYMBOL, sym=sym)
 
     @classmethod
-    def from_scv_vec(cls, vec: Optional["SCVec"]) -> "SCVal":
+    def from_scv_vec(cls, vec: Optional[SCVec]) -> "SCVal":
         return cls(SCValType.SCV_VEC, vec=vec)
 
     @classmethod
-    def from_scv_map(cls, map: Optional["SCMap"]) -> "SCVal":
+    def from_scv_map(cls, map: Optional[SCMap]) -> "SCVal":
         return cls(SCValType.SCV_MAP, map=map)
 
     @classmethod
-    def from_scv_contract_executable(cls, exec: "SCContractExecutable") -> "SCVal":
-        return cls(SCValType.SCV_CONTRACT_EXECUTABLE, exec=exec)
-
-    @classmethod
-    def from_scv_address(cls, address: "SCAddress") -> "SCVal":
+    def from_scv_address(cls, address: SCAddress) -> "SCVal":
         return cls(SCValType.SCV_ADDRESS, address=address)
 
     @classmethod
-    def from_scv_ledger_key_contract_executable(cls) -> "SCVal":
-        return cls(SCValType.SCV_LEDGER_KEY_CONTRACT_EXECUTABLE)
+    def from_scv_ledger_key_contract_instance(cls) -> "SCVal":
+        return cls(SCValType.SCV_LEDGER_KEY_CONTRACT_INSTANCE)
 
     @classmethod
-    def from_scv_ledger_key_nonce(cls, nonce_key: "SCNonceKey") -> "SCVal":
+    def from_scv_ledger_key_nonce(cls, nonce_key: SCNonceKey) -> "SCVal":
         return cls(SCValType.SCV_LEDGER_KEY_NONCE, nonce_key=nonce_key)
+
+    @classmethod
+    def from_scv_contract_instance(cls, instance: SCContractInstance) -> "SCVal":
+        return cls(SCValType.SCV_CONTRACT_INSTANCE, instance=instance)
 
     def pack(self, packer: Packer) -> None:
         self.type.pack(packer)
@@ -242,7 +245,7 @@ class SCVal:
             return
         if self.type == SCValType.SCV_VOID:
             return
-        if self.type == SCValType.SCV_STATUS:
+        if self.type == SCValType.SCV_ERROR:
             if self.error is None:
                 raise ValueError("error should not be None.")
             self.error.pack(packer)
@@ -330,36 +333,38 @@ class SCVal:
                     raise ValueError("map should not be None.")
                 self.map.pack(packer)
             return
-        if self.type == SCValType.SCV_CONTRACT_EXECUTABLE:
-            if self.exec is None:
-                raise ValueError("exec should not be None.")
-            self.exec.pack(packer)
-            return
         if self.type == SCValType.SCV_ADDRESS:
             if self.address is None:
                 raise ValueError("address should not be None.")
             self.address.pack(packer)
             return
-        if self.type == SCValType.SCV_LEDGER_KEY_CONTRACT_EXECUTABLE:
+        if self.type == SCValType.SCV_LEDGER_KEY_CONTRACT_INSTANCE:
             return
         if self.type == SCValType.SCV_LEDGER_KEY_NONCE:
             if self.nonce_key is None:
                 raise ValueError("nonce_key should not be None.")
             self.nonce_key.pack(packer)
             return
+        if self.type == SCValType.SCV_CONTRACT_INSTANCE:
+            if self.instance is None:
+                raise ValueError("instance should not be None.")
+            self.instance.pack(packer)
+            return
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "SCVal":
+    def unpack(cls, unpacker: Unpacker) -> SCVal:
         type = SCValType.unpack(unpacker)
         if type == SCValType.SCV_BOOL:
+            from .base import Boolean
+
             b = Boolean.unpack(unpacker)
             return cls(type=type, b=b)
         if type == SCValType.SCV_VOID:
             return cls(type=type)
-        if type == SCValType.SCV_STATUS:
-            from .sc_status import SCStatus
+        if type == SCValType.SCV_ERROR:
+            from .sc_error import SCError
 
-            error = SCStatus.unpack(unpacker)
+            error = SCError.unpack(unpacker)
             return cls(type=type, error=error)
         if type == SCValType.SCV_U32:
             from .uint32 import Uint32
@@ -436,23 +441,23 @@ class SCVal:
 
             map = SCMap.unpack(unpacker) if unpacker.unpack_uint() else None
             return cls(type=type, map=map)
-        if type == SCValType.SCV_CONTRACT_EXECUTABLE:
-            from .sc_contract_executable import SCContractExecutable
-
-            exec = SCContractExecutable.unpack(unpacker)
-            return cls(type=type, exec=exec)
         if type == SCValType.SCV_ADDRESS:
             from .sc_address import SCAddress
 
             address = SCAddress.unpack(unpacker)
             return cls(type=type, address=address)
-        if type == SCValType.SCV_LEDGER_KEY_CONTRACT_EXECUTABLE:
+        if type == SCValType.SCV_LEDGER_KEY_CONTRACT_INSTANCE:
             return cls(type=type)
         if type == SCValType.SCV_LEDGER_KEY_NONCE:
             from .sc_nonce_key import SCNonceKey
 
             nonce_key = SCNonceKey.unpack(unpacker)
             return cls(type=type, nonce_key=nonce_key)
+        if type == SCValType.SCV_CONTRACT_INSTANCE:
+            from .sc_contract_instance import SCContractInstance
+
+            instance = SCContractInstance.unpack(unpacker)
+            return cls(type=type, instance=instance)
         return cls(type=type)
 
     def to_xdr_bytes(self) -> bytes:
@@ -461,7 +466,7 @@ class SCVal:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "SCVal":
+    def from_xdr_bytes(cls, xdr: bytes) -> SCVal:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -470,7 +475,7 @@ class SCVal:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "SCVal":
+    def from_xdr(cls, xdr: str) -> SCVal:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
 
@@ -496,9 +501,9 @@ class SCVal:
             and self.sym == other.sym
             and self.vec == other.vec
             and self.map == other.map
-            and self.exec == other.exec
             and self.address == other.address
             and self.nonce_key == other.nonce_key
+            and self.instance == other.instance
         )
 
     def __str__(self):
@@ -523,9 +528,9 @@ class SCVal:
         out.append(f"sym={self.sym}") if self.sym is not None else None
         out.append(f"vec={self.vec}") if self.vec is not None else None
         out.append(f"map={self.map}") if self.map is not None else None
-        out.append(f"exec={self.exec}") if self.exec is not None else None
         out.append(f"address={self.address}") if self.address is not None else None
         out.append(
             f"nonce_key={self.nonce_key}"
         ) if self.nonce_key is not None else None
+        out.append(f"instance={self.instance}") if self.instance is not None else None
         return f"<SCVal [{', '.join(out)}]>"

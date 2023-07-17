@@ -1,6 +1,9 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
+from __future__ import annotations
+
 import base64
+
 from xdrlib3 import Packer, Unpacker
 
 from .uint32 import Uint32
@@ -28,7 +31,7 @@ class SCSpecTypeBytesN:
         self.n.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "SCSpecTypeBytesN":
+    def unpack(cls, unpacker: Unpacker) -> SCSpecTypeBytesN:
         n = Uint32.unpack(unpacker)
         return cls(
             n=n,
@@ -40,7 +43,7 @@ class SCSpecTypeBytesN:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "SCSpecTypeBytesN":
+    def from_xdr_bytes(cls, xdr: bytes) -> SCSpecTypeBytesN:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -49,7 +52,7 @@ class SCSpecTypeBytesN:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "SCSpecTypeBytesN":
+    def from_xdr(cls, xdr: str) -> SCSpecTypeBytesN:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
 

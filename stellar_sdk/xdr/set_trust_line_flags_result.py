@@ -1,6 +1,9 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
+from __future__ import annotations
+
 import base64
+
 from xdrlib3 import Packer, Unpacker
 
 from .set_trust_line_flags_result_code import SetTrustLineFlagsResultCode
@@ -71,7 +74,7 @@ class SetTrustLineFlagsResult:
             return
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "SetTrustLineFlagsResult":
+    def unpack(cls, unpacker: Unpacker) -> SetTrustLineFlagsResult:
         code = SetTrustLineFlagsResultCode.unpack(unpacker)
         if code == SetTrustLineFlagsResultCode.SET_TRUST_LINE_FLAGS_SUCCESS:
             return cls(code=code)
@@ -93,7 +96,7 @@ class SetTrustLineFlagsResult:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "SetTrustLineFlagsResult":
+    def from_xdr_bytes(cls, xdr: bytes) -> SetTrustLineFlagsResult:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -102,7 +105,7 @@ class SetTrustLineFlagsResult:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "SetTrustLineFlagsResult":
+    def from_xdr(cls, xdr: str) -> SetTrustLineFlagsResult:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
 

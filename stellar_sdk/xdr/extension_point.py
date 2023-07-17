@@ -1,6 +1,9 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
+from __future__ import annotations
+
 import base64
+
 from xdrlib3 import Packer, Unpacker
 
 from .base import Integer
@@ -31,7 +34,7 @@ class ExtensionPoint:
             return
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "ExtensionPoint":
+    def unpack(cls, unpacker: Unpacker) -> ExtensionPoint:
         v = Integer.unpack(unpacker)
         if v == 0:
             return cls(v=v)
@@ -43,7 +46,7 @@ class ExtensionPoint:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "ExtensionPoint":
+    def from_xdr_bytes(cls, xdr: bytes) -> ExtensionPoint:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -52,7 +55,7 @@ class ExtensionPoint:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "ExtensionPoint":
+    def from_xdr(cls, xdr: str) -> ExtensionPoint:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
 

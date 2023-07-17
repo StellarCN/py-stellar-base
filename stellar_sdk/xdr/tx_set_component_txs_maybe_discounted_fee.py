@@ -1,7 +1,10 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
+from __future__ import annotations
+
 import base64
 from typing import List, Optional
+
 from xdrlib3 import Packer, Unpacker
 
 from .int64 import Int64
@@ -45,7 +48,7 @@ class TxSetComponentTxsMaybeDiscountedFee:
             txs_item.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "TxSetComponentTxsMaybeDiscountedFee":
+    def unpack(cls, unpacker: Unpacker) -> TxSetComponentTxsMaybeDiscountedFee:
         base_fee = Int64.unpack(unpacker) if unpacker.unpack_uint() else None
         length = unpacker.unpack_uint()
         txs = []
@@ -62,7 +65,7 @@ class TxSetComponentTxsMaybeDiscountedFee:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "TxSetComponentTxsMaybeDiscountedFee":
+    def from_xdr_bytes(cls, xdr: bytes) -> TxSetComponentTxsMaybeDiscountedFee:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -71,7 +74,7 @@ class TxSetComponentTxsMaybeDiscountedFee:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "TxSetComponentTxsMaybeDiscountedFee":
+    def from_xdr(cls, xdr: str) -> TxSetComponentTxsMaybeDiscountedFee:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
 

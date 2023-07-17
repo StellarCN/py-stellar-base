@@ -1,7 +1,10 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
+from __future__ import annotations
+
 import base64
 from typing import List
+
 from xdrlib3 import Packer, Unpacker
 
 from .transaction_result_pair import TransactionResultPair
@@ -36,7 +39,7 @@ class TransactionResultSet:
             results_item.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "TransactionResultSet":
+    def unpack(cls, unpacker: Unpacker) -> TransactionResultSet:
         length = unpacker.unpack_uint()
         results = []
         for _ in range(length):
@@ -51,7 +54,7 @@ class TransactionResultSet:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "TransactionResultSet":
+    def from_xdr_bytes(cls, xdr: bytes) -> TransactionResultSet:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -60,7 +63,7 @@ class TransactionResultSet:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "TransactionResultSet":
+    def from_xdr(cls, xdr: str) -> TransactionResultSet:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
 

@@ -1,6 +1,9 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
+from __future__ import annotations
+
 import base64
+
 from xdrlib3 import Packer, Unpacker
 
 from .tx_set_component_txs_maybe_discounted_fee import (
@@ -52,7 +55,7 @@ class TxSetComponent:
             return
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "TxSetComponent":
+    def unpack(cls, unpacker: Unpacker) -> TxSetComponent:
         type = TxSetComponentType.unpack(unpacker)
         if type == TxSetComponentType.TXSET_COMP_TXS_MAYBE_DISCOUNTED_FEE:
             txs_maybe_discounted_fee = TxSetComponentTxsMaybeDiscountedFee.unpack(
@@ -67,7 +70,7 @@ class TxSetComponent:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "TxSetComponent":
+    def from_xdr_bytes(cls, xdr: bytes) -> TxSetComponent:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -76,7 +79,7 @@ class TxSetComponent:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "TxSetComponent":
+    def from_xdr(cls, xdr: str) -> TxSetComponent:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
 

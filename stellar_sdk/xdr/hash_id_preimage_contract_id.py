@@ -1,10 +1,13 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
+from __future__ import annotations
+
 import base64
+
 from xdrlib3 import Packer, Unpacker
 
+from .contract_id_preimage import ContractIDPreimage
 from .hash import Hash
-from .uint256 import Uint256
 
 __all__ = ["HashIDPreimageContractID"]
 
@@ -16,35 +19,29 @@ class HashIDPreimageContractID:
         struct
             {
                 Hash networkID;
-                Hash contractID;
-                uint256 salt;
+                ContractIDPreimage contractIDPreimage;
             }
     """
 
     def __init__(
         self,
         network_id: Hash,
-        contract_id: Hash,
-        salt: Uint256,
+        contract_id_preimage: ContractIDPreimage,
     ) -> None:
         self.network_id = network_id
-        self.contract_id = contract_id
-        self.salt = salt
+        self.contract_id_preimage = contract_id_preimage
 
     def pack(self, packer: Packer) -> None:
         self.network_id.pack(packer)
-        self.contract_id.pack(packer)
-        self.salt.pack(packer)
+        self.contract_id_preimage.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "HashIDPreimageContractID":
+    def unpack(cls, unpacker: Unpacker) -> HashIDPreimageContractID:
         network_id = Hash.unpack(unpacker)
-        contract_id = Hash.unpack(unpacker)
-        salt = Uint256.unpack(unpacker)
+        contract_id_preimage = ContractIDPreimage.unpack(unpacker)
         return cls(
             network_id=network_id,
-            contract_id=contract_id,
-            salt=salt,
+            contract_id_preimage=contract_id_preimage,
         )
 
     def to_xdr_bytes(self) -> bytes:
@@ -53,7 +50,7 @@ class HashIDPreimageContractID:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "HashIDPreimageContractID":
+    def from_xdr_bytes(cls, xdr: bytes) -> HashIDPreimageContractID:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -62,7 +59,7 @@ class HashIDPreimageContractID:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "HashIDPreimageContractID":
+    def from_xdr(cls, xdr: str) -> HashIDPreimageContractID:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
 
@@ -71,14 +68,12 @@ class HashIDPreimageContractID:
             return NotImplemented
         return (
             self.network_id == other.network_id
-            and self.contract_id == other.contract_id
-            and self.salt == other.salt
+            and self.contract_id_preimage == other.contract_id_preimage
         )
 
     def __str__(self):
         out = [
             f"network_id={self.network_id}",
-            f"contract_id={self.contract_id}",
-            f"salt={self.salt}",
+            f"contract_id_preimage={self.contract_id_preimage}",
         ]
         return f"<HashIDPreimageContractID [{', '.join(out)}]>"

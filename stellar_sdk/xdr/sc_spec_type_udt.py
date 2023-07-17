@@ -1,6 +1,9 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
+from __future__ import annotations
+
 import base64
+
 from xdrlib3 import Packer, Unpacker
 
 from .base import String
@@ -28,7 +31,7 @@ class SCSpecTypeUDT:
         String(self.name, 60).pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "SCSpecTypeUDT":
+    def unpack(cls, unpacker: Unpacker) -> SCSpecTypeUDT:
         name = String.unpack(unpacker)
         return cls(
             name=name,
@@ -40,7 +43,7 @@ class SCSpecTypeUDT:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "SCSpecTypeUDT":
+    def from_xdr_bytes(cls, xdr: bytes) -> SCSpecTypeUDT:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -49,7 +52,7 @@ class SCSpecTypeUDT:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "SCSpecTypeUDT":
+    def from_xdr(cls, xdr: str) -> SCSpecTypeUDT:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
 

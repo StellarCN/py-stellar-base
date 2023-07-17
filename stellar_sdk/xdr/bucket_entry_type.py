@@ -1,7 +1,10 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
+from __future__ import annotations
+
 import base64
 from enum import IntEnum
+
 from xdrlib3 import Packer, Unpacker
 
 __all__ = ["BucketEntryType"]
@@ -31,7 +34,7 @@ class BucketEntryType(IntEnum):
         packer.pack_int(self.value)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "BucketEntryType":
+    def unpack(cls, unpacker: Unpacker) -> BucketEntryType:
         value = unpacker.unpack_int()
         return cls(value)
 
@@ -41,7 +44,7 @@ class BucketEntryType(IntEnum):
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "BucketEntryType":
+    def from_xdr_bytes(cls, xdr: bytes) -> BucketEntryType:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -50,6 +53,6 @@ class BucketEntryType(IntEnum):
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "BucketEntryType":
+    def from_xdr(cls, xdr: str) -> BucketEntryType:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)

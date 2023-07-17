@@ -1,7 +1,10 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
+from __future__ import annotations
+
 import base64
 from typing import List
+
 from xdrlib3 import Packer, Unpacker
 
 from .constants import *
@@ -31,7 +34,7 @@ class TxDemandVector:
             tx_demand_vector_item.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "TxDemandVector":
+    def unpack(cls, unpacker: Unpacker) -> TxDemandVector:
         length = unpacker.unpack_uint()
         tx_demand_vector = []
         for _ in range(length):
@@ -44,7 +47,7 @@ class TxDemandVector:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "TxDemandVector":
+    def from_xdr_bytes(cls, xdr: bytes) -> TxDemandVector:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -53,7 +56,7 @@ class TxDemandVector:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "TxDemandVector":
+    def from_xdr(cls, xdr: str) -> TxDemandVector:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
 

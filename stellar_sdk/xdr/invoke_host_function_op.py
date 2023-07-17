@@ -1,11 +1,14 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
+from __future__ import annotations
+
 import base64
 from typing import List
+
 from xdrlib3 import Packer, Unpacker
 
-from .constants import *
 from .host_function import HostFunction
+from .soroban_authorization_entry import SorobanAuthorizationEntry
 
 __all__ = ["InvokeHostFunctionOp"]
 
@@ -16,38 +19,42 @@ class InvokeHostFunctionOp:
 
         struct InvokeHostFunctionOp
         {
-            // The host functions to invoke. The functions will be executed
-            // in the same fashion as operations: either all functions will
-            // be successfully applied or all fail if at least one of them
-            // fails.
-            HostFunction functions<MAX_OPS_PER_TX>;
+            // Host function to invoke.
+            HostFunction hostFunction;
+            // Per-address authorizations for this host function.
+            SorobanAuthorizationEntry auth<>;
         };
     """
 
     def __init__(
         self,
-        functions: List[HostFunction],
+        host_function: HostFunction,
+        auth: List[SorobanAuthorizationEntry],
     ) -> None:
-        _expect_max_length = MAX_OPS_PER_TX
-        if functions and len(functions) > _expect_max_length:
+        _expect_max_length = 4294967295
+        if auth and len(auth) > _expect_max_length:
             raise ValueError(
-                f"The maximum length of `functions` should be {_expect_max_length}, but got {len(functions)}."
+                f"The maximum length of `auth` should be {_expect_max_length}, but got {len(auth)}."
             )
-        self.functions = functions
+        self.host_function = host_function
+        self.auth = auth
 
     def pack(self, packer: Packer) -> None:
-        packer.pack_uint(len(self.functions))
-        for functions_item in self.functions:
-            functions_item.pack(packer)
+        self.host_function.pack(packer)
+        packer.pack_uint(len(self.auth))
+        for auth_item in self.auth:
+            auth_item.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "InvokeHostFunctionOp":
+    def unpack(cls, unpacker: Unpacker) -> InvokeHostFunctionOp:
+        host_function = HostFunction.unpack(unpacker)
         length = unpacker.unpack_uint()
-        functions = []
+        auth = []
         for _ in range(length):
-            functions.append(HostFunction.unpack(unpacker))
+            auth.append(SorobanAuthorizationEntry.unpack(unpacker))
         return cls(
-            functions=functions,
+            host_function=host_function,
+            auth=auth,
         )
 
     def to_xdr_bytes(self) -> bytes:
@@ -56,7 +63,7 @@ class InvokeHostFunctionOp:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "InvokeHostFunctionOp":
+    def from_xdr_bytes(cls, xdr: bytes) -> InvokeHostFunctionOp:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -65,17 +72,18 @@ class InvokeHostFunctionOp:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "InvokeHostFunctionOp":
+    def from_xdr(cls, xdr: str) -> InvokeHostFunctionOp:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented
-        return self.functions == other.functions
+        return self.host_function == other.host_function and self.auth == other.auth
 
     def __str__(self):
         out = [
-            f"functions={self.functions}",
+            f"host_function={self.host_function}",
+            f"auth={self.auth}",
         ]
         return f"<InvokeHostFunctionOp [{', '.join(out)}]>"

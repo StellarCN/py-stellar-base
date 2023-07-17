@@ -3,12 +3,11 @@ import os
 import time
 import warnings
 from decimal import Decimal
-from typing import Optional, Union, Sequence, List
+from typing import Optional, Union, Sequence, List, TYPE_CHECKING
 
-from . import xdr as stellar_xdr
+from . import xdr as stellar_xdr, StrKey
 from .account import Account
 from .asset import Asset
-from .soroban.contract_auth import ContractAuth
 from .exceptions import ValueError
 from .fee_bump_transaction import FeeBumpTransaction
 from .fee_bump_transaction_envelope import FeeBumpTransactionEnvelope
@@ -24,12 +23,12 @@ from .preconditions import Preconditions
 from .price import Price
 from .signer import Signer
 from .signer_key import SignedPayloadSigner, SignerKey
-from .soroban.types import BaseScValAlias
+from .soroban.types import BaseScValAlias, Address
 from .time_bounds import TimeBounds
 from .transaction import Transaction
 from .transaction_envelope import TransactionEnvelope
-
 from .utils import hex_to_bytes, is_valid_hash
+
 
 __all__ = ["TransactionBuilder"]
 
@@ -114,8 +113,6 @@ class TransactionBuilder:
         self.v1: bool = v1
 
         self.soroban_data: Optional[stellar_xdr.SorobanTransactionData] = None
-        self.soroban_functions: List[stellar_xdr.HostFunction] = []
-        self.invoke_host_function_op_source: Optional[MuxedAccount] = None
 
     def build(self) -> TransactionEnvelope:
         """This will build the transaction envelope.
@@ -130,20 +127,6 @@ class TransactionBuilder:
                 "You can learn why you should set it up through this link: "
                 "https://www.stellar.org/developers-blog/transaction-submission-timeouts-and-dynamic-fees-faq"
             )
-
-        if self.soroban_functions:
-            if len(self.operations) != 0:
-                raise ValueError(
-                    "Transaction contains more than one operation. "
-                    "If your transaction includes the InvokeHostFunction Operation, "
-                    "then it can contain only one operation."
-                )
-            self.operations = [
-                InvokeHostFunction(
-                    functions=self.soroban_functions,
-                    source=self.invoke_host_function_op_source,
-                )
-            ]
 
         source = self.source_account.account
         sequence = self.source_account.sequence + 1
@@ -256,20 +239,6 @@ class TransactionBuilder:
             )
         transaction_builder.operations = transaction_envelope.transaction.operations
         transaction_builder.memo = transaction_envelope.transaction.memo
-
-        if len(transaction_envelope.transaction.operations) == 1 and isinstance(
-            transaction_envelope.transaction.operations[0], InvokeHostFunction
-        ):
-            transaction_builder.soroban_functions = (
-                transaction_envelope.transaction.operations[0].functions
-            )
-            transaction_builder.invoke_host_function_op_source = (
-                transaction_envelope.transaction.operations[0].source
-            )
-            transaction_builder.soroban_data = (
-                transaction_envelope.transaction.soroban_data
-            )
-
         return transaction_builder
 
     def add_time_bounds(self, min_time: int, max_time: int) -> "TransactionBuilder":
@@ -1260,59 +1229,60 @@ class TransactionBuilder:
         contract_id: str,
         function_name: str,
         parameters: Sequence[Union[stellar_xdr.SCVal, BaseScValAlias]],
-        auth: Sequence[ContractAuth] = None,
+        source: Optional[Union[MuxedAccount, str]] = None,
     ) -> "TransactionBuilder":
-        """Append an :class:`HostFunction <stellar_sdk.xdr.HostFunction>`
-        to the list of `soroban_functions`, when you call the :meth:`build` method,
-        all Soroban functions will be placed together in
-        an :class:`InvokeHostFunction <stellar_sdk.operation.InvokeHostFunction>` Operation.
+        """Append an :class:`HostFunction <stellar_sdk.xdr.HostFunction>` operation to the list of operations.
 
         You can use this method to invoke a contract function.
 
         :param contract_id: The ID of the contract to invoke.
         :param function_name: The name of the function to invoke.
         :param parameters: The parameters to pass to the method.
-        :param auth: The authorizations.
+        :param source: The source account for the operation. Defaults to the
+            transaction's source account.
         :return: This builder instance.
         """
+        if StrKey.is_valid_contract(contract_id):
+            contract_id_bytes = StrKey.decode_contract(contract_id)
+        elif is_valid_hash(contract_id):
+            contract_id_bytes = binascii.unhexlify(contract_id)
+        else:
+            raise ValueError("`contract_id` is invalid.")
+
         invoke_params = [
-            stellar_xdr.SCVal.from_scv_bytes(
-                stellar_xdr.SCBytes(binascii.unhexlify(contract_id))
-            ),
+            Address(StrKey.encode_contract(contract_id_bytes)).to_xdr_sc_val(),
             stellar_xdr.SCVal.from_scv_symbol(
                 sym=stellar_xdr.SCSymbol(sc_symbol=function_name.encode("utf-8")),
             ),
             *parameters,
         ]
-        auth_xdr = [a.to_xdr_object() for a in auth] if auth else []
-        func = stellar_xdr.HostFunction(
-            args=stellar_xdr.HostFunctionArgs(
-                type=stellar_xdr.HostFunctionType.HOST_FUNCTION_TYPE_INVOKE_CONTRACT,
-                invoke_contract=stellar_xdr.SCVec(
+
+        host_function = (
+            stellar_xdr.HostFunction.from_host_function_type_invoke_contract(
+                stellar_xdr.SCVec(
                     [
                         p.to_xdr_sc_val() if isinstance(p, BaseScValAlias) else p
                         for p in invoke_params
                     ]
-                ),
-            ),
-            auth=auth_xdr,
+                )
+            )
         )
-        self.soroban_functions.append(func)
-        return self
+        op = InvokeHostFunction(host_function=host_function, auth=[], source=source)
+        return self.append_operation(op)
 
-    def append_install_contract_code_op(
+    def append_upload_contract_wasm_op(
         self,
         contract: Union[bytes, str],
+        source: Optional[Union[MuxedAccount, str]] = None,
     ) -> "TransactionBuilder":
-        """Append an :class:`HostFunction <stellar_sdk.xdr.HostFunction>`
-        to the list of `soroban_functions`, when you call the :meth:`build` method,
-        all Soroban functions will be placed together in
-        an :class:`InvokeHostFunction <stellar_sdk.operation.InvokeHostFunction>` Operation.
+        """Append an :class:`HostFunction <stellar_sdk.xdr.HostFunction>` operation to the list of operations.
 
         You can use this method to install a contract code,
         and then use :func:`append_create_contract_op` to create a contract.
 
         :param contract: The contract code to install, path to a file or bytes.
+        :param source: The source account for the operation. Defaults to the
+            transaction's source account.
         :return: This builder instance.
         """
 
@@ -1320,34 +1290,34 @@ class TransactionBuilder:
             with open(contract, "rb") as f:
                 contract = f.read()
 
-        # TODO: HOST_FN_CREATE_CONTRACT_WITH_ED25519?
-        func = stellar_xdr.HostFunction(
-            args=stellar_xdr.HostFunctionArgs(
-                type=stellar_xdr.HostFunctionType.HOST_FUNCTION_TYPE_UPLOAD_CONTRACT_WASM,
-                upload_contract_wasm=stellar_xdr.UploadContractWasmArgs(code=contract),
-            ),
-            auth=[],
+        host_function = (
+            stellar_xdr.HostFunction.from_host_function_type_upload_contract_wasm(
+                contract
+            )
         )
-        self.soroban_functions.append(func)
-        return self
+        op = InvokeHostFunction(host_function=host_function, auth=[], source=source)
+        return self.append_operation(op)
 
     def append_create_contract_op(
         self,
         wasm_id: Union[bytes, str],
+        address: Optional[Address] = None,
         salt: Optional[bytes] = None,
+        source: Optional[Union[MuxedAccount, str]] = None,
     ) -> "TransactionBuilder":
-        """Append an :class:`HostFunction <stellar_sdk.xdr.HostFunction>`
-        to the list of `soroban_functions`, when you call the :meth:`build` method,
-        all Soroban functions will be placed together in
-        an :class:`InvokeHostFunction <stellar_sdk.operation.InvokeHostFunction>` Operation.
+        """Append an :class:`HostFunction <stellar_sdk.xdr.HostFunction>` operation to the list of operations.
 
         You can use this method to create a contract.
 
         :param wasm_id: The ID of the contract code to install.
+        :param address: The address using to derive the contract ID, defaults to the operation's source account or
+            the transaction's source account if not set.
         :param salt: The 32-byte salt to use to derive the contract ID.
+        :param source: The source account for the operation. Defaults to the
+            transaction's source account.
         :return: This builder instance.
         """
-
+        # TODO: only support source auth now, add more auth support later?
         if isinstance(wasm_id, str):
             wasm_id = binascii.unhexlify(wasm_id)
 
@@ -1357,74 +1327,89 @@ class TransactionBuilder:
             if len(salt) != 32:
                 raise ValueError("`salt` must be 32 bytes long")
 
-        func = stellar_xdr.HostFunction(
-            args=stellar_xdr.HostFunctionArgs(
-                type=stellar_xdr.HostFunctionType.HOST_FUNCTION_TYPE_CREATE_CONTRACT,
-                create_contract=stellar_xdr.CreateContractArgs(
-                    contract_id=stellar_xdr.ContractID(
-                        stellar_xdr.ContractIDType.CONTRACT_ID_FROM_SOURCE_ACCOUNT,
-                        salt=stellar_xdr.Uint256(salt),
-                    ),
-                    executable=stellar_xdr.SCContractExecutable(
-                        stellar_xdr.SCContractExecutableType.SCCONTRACT_EXECUTABLE_WASM_REF,
-                        wasm_id=stellar_xdr.Hash(wasm_id),
-                    ),
-                ),
-            ),
-            auth=[],
-        )
-        self.soroban_functions.append(func)
-        return self
+        if address is None:
+            if source:
+                if isinstance(source, str):
+                    address = Address(MuxedAccount.from_account(source).account_id)
+                else:
+                    address = Address(source.account_id)
+            else:
+                address = Address(self.source_account.account.account_id)
 
-    def append_deploy_create_token_contract_with_asset_op(
+        create_contract = stellar_xdr.CreateContractArgs(
+            contract_id_preimage=stellar_xdr.ContractIDPreimage.from_contract_id_preimage_from_address(
+                stellar_xdr.ContractIDPreimageFromAddress(
+                    address=address.to_xdr_sc_address(),
+                    salt=stellar_xdr.Uint256(salt),
+                )
+            ),
+            executable=stellar_xdr.ContractExecutable(
+                stellar_xdr.ContractExecutableType.CONTRACT_EXECUTABLE_WASM,
+                stellar_xdr.Hash(wasm_id),
+            ),
+        )
+
+        host_function = (
+            stellar_xdr.HostFunction.from_host_function_type_create_contract(
+                create_contract
+            )
+        )
+
+        op = InvokeHostFunction(host_function=host_function, auth=[], source=source)
+        return self.append_operation(op)
+
+    def append_deploy_create_token_contract_from_asset_op(
         self,
         asset: Asset,
+        source: Optional[Union[MuxedAccount, str]] = None,
     ) -> "TransactionBuilder":
-        """Append an :class:`HostFunction <stellar_sdk.xdr.HostFunction>`
-        to the list of `soroban_functions`, when you call the :meth:`build` method,
-        all Soroban functions will be placed together in
-        an :class:`InvokeHostFunction <stellar_sdk.operation.InvokeHostFunction>` Operation.
+        """Append an :class:`HostFunction <stellar_sdk.xdr.HostFunction>` operation to the list of operations.
 
         You can use this method to deploy a contract that wraps a classic asset.
 
         :param asset: The asset to wrap.
+        :param source: The source account for the operation. Defaults to the
+            transaction's source account.
         :return: This builder instance.
         """
         asset_param = asset.to_xdr_object()
 
-        func = stellar_xdr.HostFunction(
-            args=stellar_xdr.HostFunctionArgs(
-                type=stellar_xdr.HostFunctionType.HOST_FUNCTION_TYPE_CREATE_CONTRACT,
-                create_contract=stellar_xdr.CreateContractArgs(
-                    contract_id=stellar_xdr.ContractID(
-                        stellar_xdr.ContractIDType.CONTRACT_ID_FROM_ASSET,
-                        asset=asset_param,
-                    ),
-                    executable=stellar_xdr.SCContractExecutable(
-                        stellar_xdr.SCContractExecutableType.SCCONTRACT_EXECUTABLE_TOKEN
-                    ),
-                ),
+        create_contract = stellar_xdr.CreateContractArgs(
+            contract_id_preimage=stellar_xdr.ContractIDPreimage.from_contract_id_preimage_from_asset(
+                asset_param
             ),
-            auth=[],
+            executable=stellar_xdr.ContractExecutable(
+                stellar_xdr.ContractExecutableType.CONTRACT_EXECUTABLE_TOKEN,
+            ),
         )
-        self.soroban_functions.append(func)
-        return self
 
-    def append_deploy_create_token_contract_with_source_account_op(
+        host_function = (
+            stellar_xdr.HostFunction.from_host_function_type_create_contract(
+                create_contract
+            )
+        )
+
+        op = InvokeHostFunction(host_function=host_function, auth=[], source=source)
+        return self.append_operation(op)
+
+    def append_deploy_create_token_contract_from_address_op(
         self,
+        address: Optional[Address] = None,
         salt: Optional[bytes] = None,
+        source: Optional[Union[MuxedAccount, str]] = None,
     ) -> "TransactionBuilder":
-        """Append an :class:`HostFunction <stellar_sdk.xdr.HostFunction>`
-        to the list of `soroban_functions`, when you call the :meth:`build` method,
-        all Soroban functions will be placed together in
-        an :class:`InvokeHostFunction <stellar_sdk.operation.InvokeHostFunction>` Operation.
+        """Append an :class:`HostFunction <stellar_sdk.xdr.HostFunction>` operation to the list of operations.
 
         You can use this method to create a new Soroban token contract.
 
         I do not recommend using this method, please check
         `the documentation <https://soroban.stellar.org/docs/learn/faq#should-i-issue-my-token-as-a-stellar-asset-or-a-custom-soroban-token>`__ for more information.
 
+        :param address: The address using to derive the contract ID, defaults to the operation's source account or
+            the transaction's source account if not set.
         :param salt: The 32-byte salt to use to derive the contract ID.
+        :param source: The source account for the operation. Defaults to the
+            transaction's source account.
         :return: This builder instance.
         """
         if salt is None:
@@ -1433,34 +1418,45 @@ class TransactionBuilder:
             if len(salt) != 32:
                 raise ValueError("`salt` must be 32 bytes long")
 
-        func = stellar_xdr.HostFunction(
-            args=stellar_xdr.HostFunctionArgs(
-                type=stellar_xdr.HostFunctionType.HOST_FUNCTION_TYPE_CREATE_CONTRACT,
-                create_contract=stellar_xdr.CreateContractArgs(
-                    contract_id=stellar_xdr.ContractID(
-                        stellar_xdr.ContractIDType.CONTRACT_ID_FROM_SOURCE_ACCOUNT,
-                        salt=stellar_xdr.Uint256(salt),
-                    ),
-                    executable=stellar_xdr.SCContractExecutable(
-                        stellar_xdr.SCContractExecutableType.SCCONTRACT_EXECUTABLE_TOKEN
-                    ),
-                ),
+        if address is None:
+            if source:
+                if isinstance(source, str):
+                    address = Address(MuxedAccount.from_account(source).account_id)
+                else:
+                    address = Address(source.account_id)
+            else:
+                address = Address(self.source_account.account.account_id)
+
+        create_contract = stellar_xdr.CreateContractArgs(
+            contract_id_preimage=stellar_xdr.ContractIDPreimage.from_contract_id_preimage_from_address(
+                stellar_xdr.ContractIDPreimageFromAddress(
+                    address=address.to_xdr_sc_address(),
+                    salt=stellar_xdr.Uint256(salt),
+                )
             ),
-            auth=[],
+            executable=stellar_xdr.ContractExecutable(
+                stellar_xdr.ContractExecutableType.CONTRACT_EXECUTABLE_TOKEN,
+            ),
         )
-        self.soroban_functions.append(func)
-        return self
 
-    def set_invoke_host_function_op_source(
-        self, source: Optional[Union[MuxedAccount, str]]
-    ):
-        """Set the source account for the :class:`InvokeHostFunction <stellar_sdk.operation.InvokeHostFunction>`.
+        host_function = (
+            stellar_xdr.HostFunction.from_host_function_type_create_contract(
+                create_contract
+            )
+        )
 
-        :param source: The source account for the
-            :class:`InvokeHostFunction <stellar_sdk.operation.InvokeHostFunction>` operation.
-            Defaults to the transaction's source account.
-        :return: This builder instance.
-        """
+        op = InvokeHostFunction(host_function=host_function, auth=[], source=source)
+        return self.append_operation(op)
+
+    def append_bump_footprint_expiration_op(
+        self, ledgers_to_expire: int, source: Optional[Union[MuxedAccount, str]] = None
+    ) -> "TransactionBuilder":
+        op = BumpFootprintExpiration(ledgers_to_expire=ledgers_to_expire, source=source)
+        return self.append_operation(op)
+
+    def append_restore_footprint_op(self):
+        op = RestoreFootprint()
+        return self.append_operation(op)
 
     def __str__(self):
         return (
@@ -1473,8 +1469,6 @@ class TransactionBuilder:
             f"min_sequence_age={self.min_sequence_age}, "
             f"min_sequence_ledger_gap={self.min_sequence_ledger_gap}, "
             f"extra_signers={self.extra_signers}, "
-            f"soroban_functions={self.soroban_functions}, "
-            f"invoke_host_function_op_source={self.invoke_host_function_op_source}, "
             f"soroban_data={self.soroban_data}, "
             f"v1={self.v1}]>"
         )

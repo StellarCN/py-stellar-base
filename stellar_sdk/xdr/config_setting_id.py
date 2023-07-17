@@ -1,7 +1,10 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
+from __future__ import annotations
+
 import base64
 from enum import IntEnum
+
 from xdrlib3 import Packer, Unpacker
 
 __all__ = ["ConfigSettingID"]
@@ -22,7 +25,10 @@ class ConfigSettingID(IntEnum):
             CONFIG_SETTING_CONTRACT_COST_PARAMS_CPU_INSTRUCTIONS = 6,
             CONFIG_SETTING_CONTRACT_COST_PARAMS_MEMORY_BYTES = 7,
             CONFIG_SETTING_CONTRACT_DATA_KEY_SIZE_BYTES = 8,
-            CONFIG_SETTING_CONTRACT_DATA_ENTRY_SIZE_BYTES = 9
+            CONFIG_SETTING_CONTRACT_DATA_ENTRY_SIZE_BYTES = 9,
+            CONFIG_SETTING_STATE_EXPIRATION = 10,
+            CONFIG_SETTING_CONTRACT_EXECUTION_LANES = 11,
+            CONFIG_SETTING_BUCKETLIST_SIZE_WINDOW = 12
         };
     """
 
@@ -36,12 +42,15 @@ class ConfigSettingID(IntEnum):
     CONFIG_SETTING_CONTRACT_COST_PARAMS_MEMORY_BYTES = 7
     CONFIG_SETTING_CONTRACT_DATA_KEY_SIZE_BYTES = 8
     CONFIG_SETTING_CONTRACT_DATA_ENTRY_SIZE_BYTES = 9
+    CONFIG_SETTING_STATE_EXPIRATION = 10
+    CONFIG_SETTING_CONTRACT_EXECUTION_LANES = 11
+    CONFIG_SETTING_BUCKETLIST_SIZE_WINDOW = 12
 
     def pack(self, packer: Packer) -> None:
         packer.pack_int(self.value)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "ConfigSettingID":
+    def unpack(cls, unpacker: Unpacker) -> ConfigSettingID:
         value = unpacker.unpack_int()
         return cls(value)
 
@@ -51,7 +60,7 @@ class ConfigSettingID(IntEnum):
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "ConfigSettingID":
+    def from_xdr_bytes(cls, xdr: bytes) -> ConfigSettingID:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -60,6 +69,6 @@ class ConfigSettingID(IntEnum):
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "ConfigSettingID":
+    def from_xdr(cls, xdr: str) -> ConfigSettingID:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)

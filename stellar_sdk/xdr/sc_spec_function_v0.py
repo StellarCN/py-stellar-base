@@ -1,7 +1,10 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
+from __future__ import annotations
+
 import base64
 from typing import List
+
 from xdrlib3 import Packer, Unpacker
 
 from .base import String
@@ -59,7 +62,7 @@ class SCSpecFunctionV0:
             outputs_item.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "SCSpecFunctionV0":
+    def unpack(cls, unpacker: Unpacker) -> SCSpecFunctionV0:
         doc = String.unpack(unpacker)
         name = SCSymbol.unpack(unpacker)
         length = unpacker.unpack_uint()
@@ -83,7 +86,7 @@ class SCSpecFunctionV0:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "SCSpecFunctionV0":
+    def from_xdr_bytes(cls, xdr: bytes) -> SCSpecFunctionV0:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -92,7 +95,7 @@ class SCSpecFunctionV0:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "SCSpecFunctionV0":
+    def from_xdr(cls, xdr: str) -> SCSpecFunctionV0:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
 

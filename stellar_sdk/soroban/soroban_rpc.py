@@ -200,3 +200,10 @@ class SendTransactionResponse(BaseModel):
     hash: str = Field(alias="hash")
     latest_ledger: int = Field(alias="latestLedger")
     latest_ledger_close_time: int = Field(alias="latestLedgerCloseTime")
+
+
+# get_latest_ledger
+class GetLatestLedgerResponse(BaseModel):
+    id: str
+    protocol_version: int = Field(alias="protocolVersion")
+    sequence: int

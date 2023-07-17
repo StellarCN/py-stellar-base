@@ -1,7 +1,10 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
+from __future__ import annotations
+
 import base64
 from typing import List
+
 from xdrlib3 import Packer, Unpacker
 
 from .inner_transaction_result_pair import InnerTransactionResultPair
@@ -206,7 +209,7 @@ class TransactionResultResult:
             return
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "TransactionResultResult":
+    def unpack(cls, unpacker: Unpacker) -> TransactionResultResult:
         code = TransactionResultCode.unpack(unpacker)
         if code == TransactionResultCode.txFEE_BUMP_INNER_SUCCESS:
             inner_result_pair = InnerTransactionResultPair.unpack(unpacker)
@@ -264,7 +267,7 @@ class TransactionResultResult:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "TransactionResultResult":
+    def from_xdr_bytes(cls, xdr: bytes) -> TransactionResultResult:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -273,7 +276,7 @@ class TransactionResultResult:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "TransactionResultResult":
+    def from_xdr(cls, xdr: str) -> TransactionResultResult:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
 

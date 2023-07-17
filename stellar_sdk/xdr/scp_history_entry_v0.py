@@ -1,7 +1,10 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
+from __future__ import annotations
+
 import base64
 from typing import List
+
 from xdrlib3 import Packer, Unpacker
 
 from .ledger_scp_messages import LedgerSCPMessages
@@ -41,7 +44,7 @@ class SCPHistoryEntryV0:
         self.ledger_messages.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "SCPHistoryEntryV0":
+    def unpack(cls, unpacker: Unpacker) -> SCPHistoryEntryV0:
         length = unpacker.unpack_uint()
         quorum_sets = []
         for _ in range(length):
@@ -58,7 +61,7 @@ class SCPHistoryEntryV0:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "SCPHistoryEntryV0":
+    def from_xdr_bytes(cls, xdr: bytes) -> SCPHistoryEntryV0:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -67,7 +70,7 @@ class SCPHistoryEntryV0:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "SCPHistoryEntryV0":
+    def from_xdr(cls, xdr: str) -> SCPHistoryEntryV0:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
 

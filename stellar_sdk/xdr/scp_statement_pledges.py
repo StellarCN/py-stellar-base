@@ -1,6 +1,9 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
+from __future__ import annotations
+
 import base64
+
 from xdrlib3 import Packer, Unpacker
 
 from .scp_nomination import SCPNomination
@@ -105,7 +108,7 @@ class SCPStatementPledges:
             return
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "SCPStatementPledges":
+    def unpack(cls, unpacker: Unpacker) -> SCPStatementPledges:
         type = SCPStatementType.unpack(unpacker)
         if type == SCPStatementType.SCP_ST_PREPARE:
             prepare = SCPStatementPrepare.unpack(unpacker)
@@ -127,7 +130,7 @@ class SCPStatementPledges:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "SCPStatementPledges":
+    def from_xdr_bytes(cls, xdr: bytes) -> SCPStatementPledges:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -136,7 +139,7 @@ class SCPStatementPledges:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "SCPStatementPledges":
+    def from_xdr(cls, xdr: str) -> SCPStatementPledges:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
 

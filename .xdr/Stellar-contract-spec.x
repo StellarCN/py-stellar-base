@@ -19,7 +19,7 @@ enum SCSpecType
     // Types with no parameters.
     SC_SPEC_TYPE_BOOL = 1,
     SC_SPEC_TYPE_VOID = 2,
-    SC_SPEC_TYPE_STATUS = 3,
+    SC_SPEC_TYPE_ERROR = 3,
     SC_SPEC_TYPE_U32 = 4,
     SC_SPEC_TYPE_I32 = 5,
     SC_SPEC_TYPE_U64 = 6,
@@ -95,7 +95,7 @@ union SCSpecTypeDef switch (SCSpecType type)
 case SC_SPEC_TYPE_VAL:
 case SC_SPEC_TYPE_BOOL:
 case SC_SPEC_TYPE_VOID:
-case SC_SPEC_TYPE_STATUS:
+case SC_SPEC_TYPE_ERROR:
 case SC_SPEC_TYPE_U32:
 case SC_SPEC_TYPE_I32:
 case SC_SPEC_TYPE_U64:

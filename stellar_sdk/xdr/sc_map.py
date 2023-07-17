@@ -1,10 +1,12 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
+from __future__ import annotations
+
 import base64
 from typing import List
+
 from xdrlib3 import Packer, Unpacker
 
-from .constants import *
 from .sc_map_entry import SCMapEntry
 
 __all__ = ["SCMap"]
@@ -14,11 +16,11 @@ class SCMap:
     """
     XDR Source Code::
 
-        typedef SCMapEntry SCMap<SCVAL_LIMIT>;
+        typedef SCMapEntry SCMap<>;
     """
 
     def __init__(self, sc_map: List[SCMapEntry]) -> None:
-        _expect_max_length = SCVAL_LIMIT
+        _expect_max_length = 4294967295
         if sc_map and len(sc_map) > _expect_max_length:
             raise ValueError(
                 f"The maximum length of `sc_map` should be {_expect_max_length}, but got {len(sc_map)}."
@@ -31,7 +33,7 @@ class SCMap:
             sc_map_item.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "SCMap":
+    def unpack(cls, unpacker: Unpacker) -> SCMap:
         length = unpacker.unpack_uint()
         sc_map = []
         for _ in range(length):
@@ -44,7 +46,7 @@ class SCMap:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "SCMap":
+    def from_xdr_bytes(cls, xdr: bytes) -> SCMap:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -53,7 +55,7 @@ class SCMap:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "SCMap":
+    def from_xdr(cls, xdr: str) -> SCMap:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
 

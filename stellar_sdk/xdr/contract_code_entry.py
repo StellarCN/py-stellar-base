@@ -1,12 +1,15 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
+from __future__ import annotations
+
 import base64
+
 from xdrlib3 import Packer, Unpacker
 
-from .base import Opaque
-from .constants import *
+from .contract_code_entry_body import ContractCodeEntryBody
 from .extension_point import ExtensionPoint
 from .hash import Hash
+from .uint32 import Uint32
 
 __all__ = ["ContractCodeEntry"]
 
@@ -19,7 +22,15 @@ class ContractCodeEntry:
             ExtensionPoint ext;
 
             Hash hash;
-            opaque code<SCVAL_LIMIT>;
+            union switch (ContractEntryBodyType bodyType)
+            {
+            case DATA_ENTRY:
+                opaque code<>;
+            case EXPIRATION_EXTENSION:
+                void;
+            } body;
+
+            uint32 expirationLedgerSeq;
         };
     """
 
@@ -27,26 +38,31 @@ class ContractCodeEntry:
         self,
         ext: ExtensionPoint,
         hash: Hash,
-        code: bytes,
+        body: ContractCodeEntryBody,
+        expiration_ledger_seq: Uint32,
     ) -> None:
         self.ext = ext
         self.hash = hash
-        self.code = code
+        self.body = body
+        self.expiration_ledger_seq = expiration_ledger_seq
 
     def pack(self, packer: Packer) -> None:
         self.ext.pack(packer)
         self.hash.pack(packer)
-        Opaque(self.code, SCVAL_LIMIT, False).pack(packer)
+        self.body.pack(packer)
+        self.expiration_ledger_seq.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "ContractCodeEntry":
+    def unpack(cls, unpacker: Unpacker) -> ContractCodeEntry:
         ext = ExtensionPoint.unpack(unpacker)
         hash = Hash.unpack(unpacker)
-        code = Opaque.unpack(unpacker, SCVAL_LIMIT, False)
+        body = ContractCodeEntryBody.unpack(unpacker)
+        expiration_ledger_seq = Uint32.unpack(unpacker)
         return cls(
             ext=ext,
             hash=hash,
-            code=code,
+            body=body,
+            expiration_ledger_seq=expiration_ledger_seq,
         )
 
     def to_xdr_bytes(self) -> bytes:
@@ -55,7 +71,7 @@ class ContractCodeEntry:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "ContractCodeEntry":
+    def from_xdr_bytes(cls, xdr: bytes) -> ContractCodeEntry:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -64,7 +80,7 @@ class ContractCodeEntry:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "ContractCodeEntry":
+    def from_xdr(cls, xdr: str) -> ContractCodeEntry:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
 
@@ -74,13 +90,15 @@ class ContractCodeEntry:
         return (
             self.ext == other.ext
             and self.hash == other.hash
-            and self.code == other.code
+            and self.body == other.body
+            and self.expiration_ledger_seq == other.expiration_ledger_seq
         )
 
     def __str__(self):
         out = [
             f"ext={self.ext}",
             f"hash={self.hash}",
-            f"code={self.code}",
+            f"body={self.body}",
+            f"expiration_ledger_seq={self.expiration_ledger_seq}",
         ]
         return f"<ContractCodeEntry [{', '.join(out)}]>"

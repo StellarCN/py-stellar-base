@@ -1,6 +1,9 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
+from __future__ import annotations
+
 import base64
+
 from xdrlib3 import Packer, Unpacker
 
 from .int64 import Int64
@@ -28,7 +31,7 @@ class ConfigSettingContractHistoricalDataV0:
         self.fee_historical1_kb.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "ConfigSettingContractHistoricalDataV0":
+    def unpack(cls, unpacker: Unpacker) -> ConfigSettingContractHistoricalDataV0:
         fee_historical1_kb = Int64.unpack(unpacker)
         return cls(
             fee_historical1_kb=fee_historical1_kb,
@@ -40,7 +43,7 @@ class ConfigSettingContractHistoricalDataV0:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "ConfigSettingContractHistoricalDataV0":
+    def from_xdr_bytes(cls, xdr: bytes) -> ConfigSettingContractHistoricalDataV0:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -49,7 +52,7 @@ class ConfigSettingContractHistoricalDataV0:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "ConfigSettingContractHistoricalDataV0":
+    def from_xdr(cls, xdr: str) -> ConfigSettingContractHistoricalDataV0:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
 

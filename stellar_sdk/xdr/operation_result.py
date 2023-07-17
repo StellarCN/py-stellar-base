@@ -1,6 +1,9 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
+from __future__ import annotations
+
 import base64
+
 from xdrlib3 import Packer, Unpacker
 
 from .operation_result_code import OperationResultCode
@@ -68,6 +71,10 @@ class OperationResult:
                 LiquidityPoolWithdrawResult liquidityPoolWithdrawResult;
             case INVOKE_HOST_FUNCTION:
                 InvokeHostFunctionResult invokeHostFunctionResult;
+            case BUMP_FOOTPRINT_EXPIRATION:
+                BumpFootprintExpirationResult bumpFootprintExpirationResult;
+            case RESTORE_FOOTPRINT:
+                RestoreFootprintResult restoreFootprintResult;
             }
             tr;
         case opBAD_AUTH:
@@ -137,7 +144,7 @@ class OperationResult:
             return
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "OperationResult":
+    def unpack(cls, unpacker: Unpacker) -> OperationResult:
         code = OperationResultCode.unpack(unpacker)
         if code == OperationResultCode.opINNER:
             tr = OperationResultTr.unpack(unpacker)
@@ -162,7 +169,7 @@ class OperationResult:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "OperationResult":
+    def from_xdr_bytes(cls, xdr: bytes) -> OperationResult:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -171,7 +178,7 @@ class OperationResult:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "OperationResult":
+    def from_xdr(cls, xdr: str) -> OperationResult:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
 

@@ -1,6 +1,9 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
+from __future__ import annotations
+
 import base64
+
 from xdrlib3 import Packer, Unpacker
 
 from .int64 import Int64
@@ -35,7 +38,7 @@ class ConfigSettingContractMetaDataV0:
         self.fee_extended_meta_data1_kb.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "ConfigSettingContractMetaDataV0":
+    def unpack(cls, unpacker: Unpacker) -> ConfigSettingContractMetaDataV0:
         tx_max_extended_meta_data_size_bytes = Uint32.unpack(unpacker)
         fee_extended_meta_data1_kb = Int64.unpack(unpacker)
         return cls(
@@ -49,7 +52,7 @@ class ConfigSettingContractMetaDataV0:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "ConfigSettingContractMetaDataV0":
+    def from_xdr_bytes(cls, xdr: bytes) -> ConfigSettingContractMetaDataV0:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -58,7 +61,7 @@ class ConfigSettingContractMetaDataV0:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "ConfigSettingContractMetaDataV0":
+    def from_xdr(cls, xdr: str) -> ConfigSettingContractMetaDataV0:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
 

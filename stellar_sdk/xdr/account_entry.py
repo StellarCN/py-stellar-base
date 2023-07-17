@@ -1,7 +1,10 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
+from __future__ import annotations
+
 import base64
 from typing import List, Optional
+
 from xdrlib3 import Packer, Unpacker
 
 from .account_entry_ext import AccountEntryExt
@@ -99,7 +102,7 @@ class AccountEntry:
         self.ext.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "AccountEntry":
+    def unpack(cls, unpacker: Unpacker) -> AccountEntry:
         account_id = AccountID.unpack(unpacker)
         balance = Int64.unpack(unpacker)
         seq_num = SequenceNumber.unpack(unpacker)
@@ -132,7 +135,7 @@ class AccountEntry:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "AccountEntry":
+    def from_xdr_bytes(cls, xdr: bytes) -> AccountEntry:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -141,7 +144,7 @@ class AccountEntry:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "AccountEntry":
+    def from_xdr(cls, xdr: str) -> AccountEntry:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
 

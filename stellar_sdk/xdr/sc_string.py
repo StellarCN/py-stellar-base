@@ -1,10 +1,12 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
+from __future__ import annotations
+
 import base64
+
 from xdrlib3 import Packer, Unpacker
 
 from .base import String
-from .constants import *
 
 __all__ = ["SCString"]
 
@@ -13,17 +15,17 @@ class SCString:
     """
     XDR Source Code::
 
-        typedef string SCString<SCVAL_LIMIT>;
+        typedef string SCString<>;
     """
 
     def __init__(self, sc_string: bytes) -> None:
         self.sc_string = sc_string
 
     def pack(self, packer: Packer) -> None:
-        String(self.sc_string, SCVAL_LIMIT).pack(packer)
+        String(self.sc_string, 4294967295).pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "SCString":
+    def unpack(cls, unpacker: Unpacker) -> SCString:
         sc_string = String.unpack(unpacker)
         return cls(sc_string)
 
@@ -33,7 +35,7 @@ class SCString:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "SCString":
+    def from_xdr_bytes(cls, xdr: bytes) -> SCString:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -42,7 +44,7 @@ class SCString:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "SCString":
+    def from_xdr(cls, xdr: str) -> SCString:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
 

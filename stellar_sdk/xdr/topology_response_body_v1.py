@@ -1,6 +1,9 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
+from __future__ import annotations
+
 import base64
+
 from xdrlib3 import Packer, Unpacker
 
 from .peer_stat_list import PeerStatList
@@ -51,7 +54,7 @@ class TopologyResponseBodyV1:
         self.max_outbound_peer_count.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "TopologyResponseBodyV1":
+    def unpack(cls, unpacker: Unpacker) -> TopologyResponseBodyV1:
         inbound_peers = PeerStatList.unpack(unpacker)
         outbound_peers = PeerStatList.unpack(unpacker)
         total_inbound_peer_count = Uint32.unpack(unpacker)
@@ -73,7 +76,7 @@ class TopologyResponseBodyV1:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "TopologyResponseBodyV1":
+    def from_xdr_bytes(cls, xdr: bytes) -> TopologyResponseBodyV1:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -82,7 +85,7 @@ class TopologyResponseBodyV1:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "TopologyResponseBodyV1":
+    def from_xdr(cls, xdr: str) -> TopologyResponseBodyV1:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
 

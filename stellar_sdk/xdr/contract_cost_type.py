@@ -1,7 +1,10 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
+from __future__ import annotations
+
 import base64
 from enum import IntEnum
+
 from xdrlib3 import Packer, Unpacker
 
 __all__ = ["ContractCostType"]
@@ -53,10 +56,30 @@ class ContractCostType(IntEnum):
             VmMemWrite = 17,
             // Cost of instantiation a VM from wasm bytes code.
             VmInstantiation = 18,
+            // Cost of instantiation a VM from a cached state.
+            VmCachedInstantiation = 19,
             // Roundtrip cost of invoking a VM function from the host.
-            InvokeVmFunction = 19,
+            InvokeVmFunction = 20,
             // Cost of charging a value to the budgeting system.
-            ChargeBudget = 20
+            ChargeBudget = 21,
+            // Cost of computing a keccak256 hash from bytes.
+            ComputeKeccak256Hash = 22,
+            // Cost of computing an ECDSA secp256k1 pubkey from bytes.
+            ComputeEcdsaSecp256k1Key = 23,
+            // Cost of computing an ECDSA secp256k1 signature from bytes.
+            ComputeEcdsaSecp256k1Sig = 24,
+            // Cost of recovering an ECDSA secp256k1 key from a signature.
+            RecoverEcdsaSecp256k1Key = 25,
+            // Cost of int256 addition (`+`) and subtraction (`-`) operations
+            Int256AddSub = 26,
+            // Cost of int256 multiplication (`*`) operation
+            Int256Mul = 27,
+            // Cost of int256 division (`/`) operation
+            Int256Div = 28,
+            // Cost of int256 power (`exp`) operation
+            Int256Pow = 29,
+            // Cost of int256 shift (`shl`, `shr`) operation
+            Int256Shift = 30
         };
     """
 
@@ -79,14 +102,24 @@ class ContractCostType(IntEnum):
     VmMemRead = 16
     VmMemWrite = 17
     VmInstantiation = 18
-    InvokeVmFunction = 19
-    ChargeBudget = 20
+    VmCachedInstantiation = 19
+    InvokeVmFunction = 20
+    ChargeBudget = 21
+    ComputeKeccak256Hash = 22
+    ComputeEcdsaSecp256k1Key = 23
+    ComputeEcdsaSecp256k1Sig = 24
+    RecoverEcdsaSecp256k1Key = 25
+    Int256AddSub = 26
+    Int256Mul = 27
+    Int256Div = 28
+    Int256Pow = 29
+    Int256Shift = 30
 
     def pack(self, packer: Packer) -> None:
         packer.pack_int(self.value)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "ContractCostType":
+    def unpack(cls, unpacker: Unpacker) -> ContractCostType:
         value = unpacker.unpack_int()
         return cls(value)
 
@@ -96,7 +129,7 @@ class ContractCostType(IntEnum):
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "ContractCostType":
+    def from_xdr_bytes(cls, xdr: bytes) -> ContractCostType:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -105,6 +138,6 @@ class ContractCostType(IntEnum):
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "ContractCostType":
+    def from_xdr(cls, xdr: str) -> ContractCostType:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)

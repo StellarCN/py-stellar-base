@@ -1,7 +1,10 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
+from __future__ import annotations
+
 import base64
 from typing import List
+
 from xdrlib3 import Packer, Unpacker
 
 from .config_setting_entry import ConfigSettingEntry
@@ -35,7 +38,7 @@ class ConfigUpgradeSet:
             updated_entry_item.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "ConfigUpgradeSet":
+    def unpack(cls, unpacker: Unpacker) -> ConfigUpgradeSet:
         length = unpacker.unpack_uint()
         updated_entry = []
         for _ in range(length):
@@ -50,7 +53,7 @@ class ConfigUpgradeSet:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "ConfigUpgradeSet":
+    def from_xdr_bytes(cls, xdr: bytes) -> ConfigUpgradeSet:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -59,7 +62,7 @@ class ConfigUpgradeSet:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "ConfigUpgradeSet":
+    def from_xdr(cls, xdr: str) -> ConfigUpgradeSet:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
 
