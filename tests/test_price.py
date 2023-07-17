@@ -17,7 +17,13 @@ class TestPrice:
         assert price.n == 36731261
         assert price.d == 12500000
 
-    def test_equals(self):
+    def test_cmp(self):
         assert Price(1, 2) == Price(1, 2)
         assert Price(1, 2) != Price(3, 4)
         assert Price(1, 2) != "BAD TYPE"
+        assert Price(2, 5) > Price(3, 100)
+        assert Price(2, 5) >= Price(3, 100)
+        assert Price(1, 2) >= Price(1, 2)
+        assert Price(3, 100) < Price(2, 5)
+        assert Price(3, 100) <= Price(2, 5)
+        assert Price(1, 2) <= Price(1, 2)

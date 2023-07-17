@@ -1,6 +1,13 @@
 Release History
 ==============
 
+### Version 8.2.1
+
+Released on June 22, 2023
+
+#### Add
+- feat: add comparison operators to Price class. ([#741](https://github.com/StellarCN/py-stellar-base/pull/741))
+
 ### Version 8.2.0
 
 Released on March 15, 2023
