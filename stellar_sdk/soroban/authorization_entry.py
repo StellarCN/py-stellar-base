@@ -2,9 +2,9 @@ from __future__ import annotations
 
 from typing import Union, Optional, Sequence, Callable, TYPE_CHECKING
 
-from .. import xdr as stellar_xdr
 from .authorized_invocation import AuthorizedInvocation
 from .credentials import Credentials, SourceCredentials, AddressCredentials
+from .. import xdr as stellar_xdr
 from ..network import Network
 from ..soroban.types import AccountEd25519Signature, Address, BaseScValAlias
 from ..utils import sha256
@@ -86,6 +86,23 @@ class AuthorizationEntry:
             signature_args=signature_args,
         )
         return AuthorizationEntry(credentials.to_xdr_object(), root_invocation)
+
+    def set_signature_expiration_ledger(self, signature_expiration_ledger: int):
+        """Set the signature expiration ledger.
+
+        :param signature_expiration_ledger: The signature expiration ledger.
+        """
+        if (
+            self.credentials.type
+            != stellar_xdr.SorobanCredentialsType.SOROBAN_CREDENTIALS_ADDRESS
+        ):
+            raise ValueError(
+                "The authorization entry cannot be set signature expiration ledger."
+            )
+        assert self.credentials.address is not None
+        self.credentials.address.signature_expiration_ledger = stellar_xdr.Uint32(
+            signature_expiration_ledger
+        )
 
     def signature_base(self, network_passphrase: str) -> bytes:
         """Get the signature base of the authorization entry.

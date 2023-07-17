@@ -8,6 +8,7 @@ import time
 from stellar_sdk import Network, Keypair, TransactionBuilder, InvokeHostFunction
 from stellar_sdk import xdr as stellar_xdr
 from stellar_sdk.soroban import SorobanServer
+from stellar_sdk.soroban.authorization_entry import AuthorizationEntry
 from stellar_sdk.soroban.soroban_rpc import GetTransactionStatus
 from stellar_sdk.soroban.types import Address, Int128
 
@@ -59,12 +60,13 @@ latest_ledger = soroban_server.get_latest_ledger().sequence
 
 op = tx.transaction.operations[0]
 assert isinstance(op, InvokeHostFunction)
-alice_authorization_entry, bob_authorization_entry = op.auth
+alice_authorization_entry: AuthorizationEntry = op.auth[0]
+bob_authorization_entry: AuthorizationEntry = op.auth[1]
 
-alice_authorization_entry.credentials.address.signature_expiration_ledger.uint32 = latest_ledger + 3  # type: ignore[union-attr]
+alice_authorization_entry.set_signature_expiration_ledger(latest_ledger + 3)
 alice_authorization_entry.sign(alice_kp, network_passphrase)
 
-bob_authorization_entry.credentials.address.signature_expiration_ledger.uint32 = latest_ledger + 3  # type: ignore[union-attr]
+bob_authorization_entry.set_signature_expiration_ledger(latest_ledger + 3)
 bob_authorization_entry.sign(bob_kp, network_passphrase)
 
 tx.sign(submitter_kp)

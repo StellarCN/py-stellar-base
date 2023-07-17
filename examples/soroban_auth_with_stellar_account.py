@@ -13,6 +13,7 @@ from stellar_sdk import (
 )
 from stellar_sdk import xdr as stellar_xdr
 from stellar_sdk.soroban import SorobanServer
+from stellar_sdk.soroban.authorization_entry import AuthorizationEntry
 from stellar_sdk.soroban.soroban_rpc import GetTransactionStatus
 from stellar_sdk.soroban.types import Uint32, Address
 
@@ -51,8 +52,8 @@ latest_ledger = soroban_server.get_latest_ledger().sequence
 
 op = tx.transaction.operations[0]
 assert isinstance(op, InvokeHostFunction)
-authorization_entry = op.auth[0]
-authorization_entry.credentials.address.signature_expiration_ledger.uint32 = latest_ledger + 3  # type: ignore[union-attr]
+authorization_entry: AuthorizationEntry = op.auth[0]
+authorization_entry.set_signature_expiration_ledger(latest_ledger + 3)
 authorization_entry.sign(op_invoker_kp, network_passphrase)
 
 tx.sign(tx_submitter_kp)
