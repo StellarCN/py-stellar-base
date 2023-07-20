@@ -349,7 +349,7 @@ class TransactionBuilder:
 
     def set_soroban_data(
         self, soroban_data: Union[stellar_xdr.SorobanTransactionData]
-    ) -> None:
+    ) -> "TransactionBuilder":
         """Set the SorobanTransactionData. For non-contract(non-Soroban) transactions, this setting has no effect.
 
         In the case of Soroban transactions, set to an instance of
@@ -358,10 +358,12 @@ class TransactionBuilder:
         It provides necessary resource estimations for contract invocation.
 
         :param soroban_data: The SorobanTransactionData as XDR object or base64 encoded string.
+        :return: This builder instance.
         """
         if isinstance(soroban_data, str):
             soroban_data = stellar_xdr.SorobanTransactionData.from_xdr(soroban_data)
         self.soroban_data = soroban_data
+        return self
 
     def add_extra_signer(
         self, signer_key: Union[SignerKey, SignedPayloadSigner, str]
