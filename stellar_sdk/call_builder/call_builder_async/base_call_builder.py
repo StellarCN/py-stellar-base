@@ -4,7 +4,6 @@ from ...call_builder.base.base_call_builder import BaseCallBuilder as _BaseCallB
 from ...client.base_async_client import BaseAsyncClient
 from ...client.response import Response
 from ...exceptions import NotPageableError, raise_request_exception
-
 from ...utils import urljoin_with_query
 
 __all__ = ["BaseCallBuilder"]

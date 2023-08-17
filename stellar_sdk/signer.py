@@ -3,7 +3,6 @@ from typing import Union
 from . import xdr as stellar_xdr
 from .signer_key import SignerKey
 
-
 __all__ = ["Signer"]
 
 

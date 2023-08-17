@@ -1,12 +1,11 @@
 from abc import abstractmethod
-from typing import Sequence, Generic, TypeVar, Union, List
+from typing import Generic, List, Sequence, TypeVar, Union
 
 from . import xdr as stellar_xdr
 from .decorated_signature import DecoratedSignature
 from .exceptions import SignatureExistError
 from .keypair import Keypair
 from .network import Network
-
 from .utils import hex_to_bytes, sha256
 
 T = TypeVar("T")

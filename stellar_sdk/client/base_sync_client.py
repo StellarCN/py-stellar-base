@@ -21,7 +21,6 @@ class BaseSyncClient(metaclass=ABCMeta):
         :return: the response from server
         :raise: :exc:`ConnectionError <stellar_sdk.exceptions.ConnectionError>`
         """
-        pass
 
     @abstractmethod
     def post(
@@ -38,7 +37,6 @@ class BaseSyncClient(metaclass=ABCMeta):
         :return: the response from server
         :raise: :exc:`ConnectionError <stellar_sdk.exceptions.ConnectionError>`
         """
-        pass
 
     @abstractmethod
     def stream(
@@ -55,7 +53,6 @@ class BaseSyncClient(metaclass=ABCMeta):
         :return: a dict Generator for server response
         :raise: :exc:`ConnectionError <stellar_sdk.exceptions.ConnectionError>`
         """
-        pass
 
     @abstractmethod
     def close(self):

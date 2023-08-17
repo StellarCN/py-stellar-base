@@ -39,7 +39,6 @@ from .sep.exceptions import AccountRequiresMemoError
 from .transaction import Transaction
 from .transaction_envelope import TransactionEnvelope
 
-
 __all__ = ["BaseServer"]
 
 

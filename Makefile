@@ -55,13 +55,12 @@ pypi:
 
 clean:
 	find . -name \*.pyc -delete
-	rm -rf coverage.xml .coverage  dist  htmlcov  stellar_sdk.egg-info  tests/.mypy_cache  tests/.pytest_cache  docs/en/_build  docs/zh_CN/_build
+	rm -rf coverage.xml .coverage dist htmlcov stellar_sdk.egg-info tests/.mypy_cache tests/.pytest_cache docs/en/_build docs/zh_CN/_build
 .PHONY: clean
 
 format:
-	autoflake --in-place --ignore-init-module-imports --remove-all-unused-imports stellar_sdk/**/*.py tests/**/*.py examples/*.py
-	isort stellar_sdk/**/*.py tests/**/*.py examples/*.py
-	black stellar_sdk/**/*.py tests/**/*.py examples/*.py
+	autoflake --in-place --ignore-init-module-imports --remove-all-unused-imports --recursive .
+	isort .
 .PHONY: format
 
 replace-xdr-keywords:

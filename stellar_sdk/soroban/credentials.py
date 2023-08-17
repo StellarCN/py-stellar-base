@@ -1,6 +1,6 @@
 import abc
 import random
-from typing import Optional, Union, Sequence, List
+from typing import List, Optional, Sequence, Union
 
 from .. import xdr as stellar_xdr
 from ..soroban.types import BaseScValAlias

@@ -2,7 +2,6 @@ from typing import Sequence
 
 from ...asset import Asset
 from ...call_builder.base.base_call_builder import BaseCallBuilder
-
 from ...utils import convert_assets_to_horizon_param
 
 __all__ = ["BaseLiquidityPoolsBuilder"]

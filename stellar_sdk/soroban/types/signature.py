@@ -1,10 +1,10 @@
 import abc
 from typing import Union
 
-from .base import BaseScValAlias
 from ... import xdr as stellar_xdr
 from ...keypair import Keypair
 from ...strkey import StrKey
+from .base import BaseScValAlias
 
 __all__ = ["Signature", "AccountEd25519Signature"]
 

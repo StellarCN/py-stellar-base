@@ -5,7 +5,7 @@ https://soroban.stellar.org/docs/learn/authorization
 """
 import time
 
-from stellar_sdk import Network, Keypair, TransactionBuilder, InvokeHostFunction
+from stellar_sdk import InvokeHostFunction, Keypair, Network, TransactionBuilder
 from stellar_sdk import xdr as stellar_xdr
 from stellar_sdk.soroban import SorobanServer
 from stellar_sdk.soroban.authorization_entry import AuthorizationEntry

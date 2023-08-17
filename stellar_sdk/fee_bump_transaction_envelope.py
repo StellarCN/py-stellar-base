@@ -1,11 +1,11 @@
 from typing import Sequence, Union
+
 from xdrlib3 import Packer
 
 from . import xdr as stellar_xdr
 from .base_transaction_envelope import BaseTransactionEnvelope
 from .decorated_signature import DecoratedSignature
 from .fee_bump_transaction import FeeBumpTransaction
-
 
 __all__ = ["FeeBumpTransactionEnvelope"]
 

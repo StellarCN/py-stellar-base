@@ -5,17 +5,12 @@ See https://soroban.stellar.org/docs/learn/authorization#stellar-account
 """
 import time
 
-from stellar_sdk import InvokeHostFunction
-from stellar_sdk import (
-    Network,
-    Keypair,
-    TransactionBuilder,
-)
+from stellar_sdk import InvokeHostFunction, Keypair, Network, TransactionBuilder
 from stellar_sdk import xdr as stellar_xdr
 from stellar_sdk.soroban import SorobanServer
 from stellar_sdk.soroban.authorization_entry import AuthorizationEntry
 from stellar_sdk.soroban.soroban_rpc import GetTransactionStatus
-from stellar_sdk.soroban.types import Uint32, Address
+from stellar_sdk.soroban.types import Address, Uint32
 
 rpc_server_url = "https://rpc-futurenet.stellar.org:443/"
 soroban_server = SorobanServer(rpc_server_url)

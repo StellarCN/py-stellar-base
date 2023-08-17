@@ -1,5 +1,6 @@
 import copy
 from typing import Sequence, Union
+
 from xdrlib3 import Packer
 
 from . import xdr as stellar_xdr
@@ -7,10 +8,8 @@ from .base_transaction_envelope import BaseTransactionEnvelope
 from .decorated_signature import DecoratedSignature
 from .exceptions import SignatureExistError
 from .keypair import Keypair
-from .operation.invoke_host_function import InvokeHostFunction
 from .signer_key import SignerKeyType
 from .transaction import Transaction
-
 
 __all__ = ["TransactionEnvelope"]
 

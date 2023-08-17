@@ -2,6 +2,7 @@ import base64
 import binascii
 import struct
 from enum import Enum
+
 from xdrlib3 import Packer, Unpacker
 
 from . import xdr as stellar_xdr
@@ -12,7 +13,6 @@ from .exceptions import (
     TypeError,
     ValueError,
 )
-
 
 __all__ = ["StrKey"]
 

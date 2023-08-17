@@ -2,12 +2,11 @@ import binascii
 from decimal import Decimal
 from typing import Optional, Union
 
-from .operation import Operation
 from .. import xdr as stellar_xdr
 from ..muxed_account import MuxedAccount
 from ..price import Price
-
 from ..utils import raise_if_not_valid_amount, raise_if_not_valid_hash
+from .operation import Operation
 
 __all__ = ["LiquidityPoolDeposit"]
 

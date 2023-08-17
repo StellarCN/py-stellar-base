@@ -1,6 +1,5 @@
-from .address import Address
-from .base import BaseScValAlias
 from ... import xdr as stellar_xdr
+from .base import BaseScValAlias
 
 __all__ = ["NonceKey"]
 

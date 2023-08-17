@@ -1,8 +1,7 @@
-from typing import Union, Optional, List
+from typing import List, Optional, Union
 
-from .base import BaseScValAlias
 from ... import xdr as stellar_xdr
-
+from .base import BaseScValAlias
 
 __all__ = ["Enum"]
 

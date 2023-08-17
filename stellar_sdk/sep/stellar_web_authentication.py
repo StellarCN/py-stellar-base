@@ -10,10 +10,8 @@ Version 3.3.0
 import base64
 import os
 import time
-from typing import Sequence, Iterable, List, Optional, Union
+from typing import Iterable, List, Optional, Sequence, Union
 
-from .ed25519_public_key_signer import Ed25519PublicKeySigner
-from .exceptions import InvalidSep10ChallengeError
 from .. import xdr as stellar_xdr
 from ..account import Account
 from ..exceptions import BadSignatureError, ValueError
@@ -23,7 +21,8 @@ from ..muxed_account import MuxedAccount
 from ..operation.manage_data import ManageData
 from ..transaction_builder import TransactionBuilder
 from ..transaction_envelope import TransactionEnvelope
-
+from .ed25519_public_key_signer import Ed25519PublicKeySigner
+from .exceptions import InvalidSep10ChallengeError
 
 __all__ = [
     "build_challenge_transaction",

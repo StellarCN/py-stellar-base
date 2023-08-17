@@ -1,9 +1,9 @@
-from typing import Optional, Union, List
+from typing import List, Optional, Union
 
-from .operation import Operation
 from .. import xdr as stellar_xdr
 from ..muxed_account import MuxedAccount
 from ..soroban.authorization_entry import AuthorizationEntry
+from .operation import Operation
 
 __all__ = ["InvokeHostFunction"]
 

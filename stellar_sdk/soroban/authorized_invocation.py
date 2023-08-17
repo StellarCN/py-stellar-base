@@ -1,9 +1,9 @@
 import abc
-from typing import Union, Sequence, List
-from ..soroban.types import BaseScValAlias
+from typing import List, Sequence, Union
+
 from .. import xdr as stellar_xdr
 from ..asset import Asset
-from ..soroban.types import Address
+from ..soroban.types import Address, BaseScValAlias
 
 __all__ = ["AuthorizedInvocation"]
 
