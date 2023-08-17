@@ -38,11 +38,11 @@ class ContractDataEntryBody:
         self.data = data
 
     @classmethod
-    def from_data_entry(cls, data: ContractDataEntryData) -> "ContractDataEntryBody":
+    def from_data_entry(cls, data: ContractDataEntryData) -> ContractDataEntryBody:
         return cls(ContractEntryBodyType.DATA_ENTRY, data=data)
 
     @classmethod
-    def from_expiration_extension(cls) -> "ContractDataEntryBody":
+    def from_expiration_extension(cls) -> ContractDataEntryBody:
         return cls(ContractEntryBodyType.EXPIRATION_EXTENSION)
 
     def pack(self, packer: Packer) -> None:

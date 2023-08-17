@@ -53,20 +53,20 @@ class LedgerUpgrade:
         self.new_config = new_config
 
     @classmethod
-    def from_ledger_upgrade_version(cls, new_ledger_version: Uint32) -> "LedgerUpgrade":
+    def from_ledger_upgrade_version(cls, new_ledger_version: Uint32) -> LedgerUpgrade:
         return cls(
             LedgerUpgradeType.LEDGER_UPGRADE_VERSION,
             new_ledger_version=new_ledger_version,
         )
 
     @classmethod
-    def from_ledger_upgrade_base_fee(cls, new_base_fee: Uint32) -> "LedgerUpgrade":
+    def from_ledger_upgrade_base_fee(cls, new_base_fee: Uint32) -> LedgerUpgrade:
         return cls(LedgerUpgradeType.LEDGER_UPGRADE_BASE_FEE, new_base_fee=new_base_fee)
 
     @classmethod
     def from_ledger_upgrade_max_tx_set_size(
         cls, new_max_tx_set_size: Uint32
-    ) -> "LedgerUpgrade":
+    ) -> LedgerUpgrade:
         return cls(
             LedgerUpgradeType.LEDGER_UPGRADE_MAX_TX_SET_SIZE,
             new_max_tx_set_size=new_max_tx_set_size,
@@ -75,20 +75,20 @@ class LedgerUpgrade:
     @classmethod
     def from_ledger_upgrade_base_reserve(
         cls, new_base_reserve: Uint32
-    ) -> "LedgerUpgrade":
+    ) -> LedgerUpgrade:
         return cls(
             LedgerUpgradeType.LEDGER_UPGRADE_BASE_RESERVE,
             new_base_reserve=new_base_reserve,
         )
 
     @classmethod
-    def from_ledger_upgrade_flags(cls, new_flags: Uint32) -> "LedgerUpgrade":
+    def from_ledger_upgrade_flags(cls, new_flags: Uint32) -> LedgerUpgrade:
         return cls(LedgerUpgradeType.LEDGER_UPGRADE_FLAGS, new_flags=new_flags)
 
     @classmethod
     def from_ledger_upgrade_config(
         cls, new_config: ConfigUpgradeSetKey
-    ) -> "LedgerUpgrade":
+    ) -> LedgerUpgrade:
         return cls(LedgerUpgradeType.LEDGER_UPGRADE_CONFIG, new_config=new_config)
 
     def pack(self, packer: Packer) -> None:

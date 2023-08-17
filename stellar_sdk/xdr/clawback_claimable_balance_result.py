@@ -34,9 +34,7 @@ class ClawbackClaimableBalanceResult:
         self.code = code
 
     @classmethod
-    def from_clawback_claimable_balance_success(
-        cls,
-    ) -> "ClawbackClaimableBalanceResult":
+    def from_clawback_claimable_balance_success(cls) -> ClawbackClaimableBalanceResult:
         return cls(
             ClawbackClaimableBalanceResultCode.CLAWBACK_CLAIMABLE_BALANCE_SUCCESS
         )
@@ -44,7 +42,7 @@ class ClawbackClaimableBalanceResult:
     @classmethod
     def from_clawback_claimable_balance_does_not_exist(
         cls,
-    ) -> "ClawbackClaimableBalanceResult":
+    ) -> ClawbackClaimableBalanceResult:
         return cls(
             ClawbackClaimableBalanceResultCode.CLAWBACK_CLAIMABLE_BALANCE_DOES_NOT_EXIST
         )
@@ -52,7 +50,7 @@ class ClawbackClaimableBalanceResult:
     @classmethod
     def from_clawback_claimable_balance_not_issuer(
         cls,
-    ) -> "ClawbackClaimableBalanceResult":
+    ) -> ClawbackClaimableBalanceResult:
         return cls(
             ClawbackClaimableBalanceResultCode.CLAWBACK_CLAIMABLE_BALANCE_NOT_ISSUER
         )
@@ -60,7 +58,7 @@ class ClawbackClaimableBalanceResult:
     @classmethod
     def from_clawback_claimable_balance_not_clawback_enabled(
         cls,
-    ) -> "ClawbackClaimableBalanceResult":
+    ) -> ClawbackClaimableBalanceResult:
         return cls(
             ClawbackClaimableBalanceResultCode.CLAWBACK_CLAIMABLE_BALANCE_NOT_CLAWBACK_ENABLED
         )

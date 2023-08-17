@@ -34,23 +34,23 @@ class ClawbackResult:
         self.code = code
 
     @classmethod
-    def from_clawback_success(cls) -> "ClawbackResult":
+    def from_clawback_success(cls) -> ClawbackResult:
         return cls(ClawbackResultCode.CLAWBACK_SUCCESS)
 
     @classmethod
-    def from_clawback_malformed(cls) -> "ClawbackResult":
+    def from_clawback_malformed(cls) -> ClawbackResult:
         return cls(ClawbackResultCode.CLAWBACK_MALFORMED)
 
     @classmethod
-    def from_clawback_not_clawback_enabled(cls) -> "ClawbackResult":
+    def from_clawback_not_clawback_enabled(cls) -> ClawbackResult:
         return cls(ClawbackResultCode.CLAWBACK_NOT_CLAWBACK_ENABLED)
 
     @classmethod
-    def from_clawback_no_trust(cls) -> "ClawbackResult":
+    def from_clawback_no_trust(cls) -> ClawbackResult:
         return cls(ClawbackResultCode.CLAWBACK_NO_TRUST)
 
     @classmethod
-    def from_clawback_underfunded(cls) -> "ClawbackResult":
+    def from_clawback_underfunded(cls) -> ClawbackResult:
         return cls(ClawbackResultCode.CLAWBACK_UNDERFUNDED)
 
     def pack(self, packer: Packer) -> None:

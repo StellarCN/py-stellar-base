@@ -47,55 +47,55 @@ class ManageSellOfferResult:
     @classmethod
     def from_manage_sell_offer_success(
         cls, success: ManageOfferSuccessResult
-    ) -> "ManageSellOfferResult":
+    ) -> ManageSellOfferResult:
         return cls(ManageSellOfferResultCode.MANAGE_SELL_OFFER_SUCCESS, success=success)
 
     @classmethod
-    def from_manage_sell_offer_malformed(cls) -> "ManageSellOfferResult":
+    def from_manage_sell_offer_malformed(cls) -> ManageSellOfferResult:
         return cls(ManageSellOfferResultCode.MANAGE_SELL_OFFER_MALFORMED)
 
     @classmethod
-    def from_manage_sell_offer_sell_no_trust(cls) -> "ManageSellOfferResult":
+    def from_manage_sell_offer_sell_no_trust(cls) -> ManageSellOfferResult:
         return cls(ManageSellOfferResultCode.MANAGE_SELL_OFFER_SELL_NO_TRUST)
 
     @classmethod
-    def from_manage_sell_offer_buy_no_trust(cls) -> "ManageSellOfferResult":
+    def from_manage_sell_offer_buy_no_trust(cls) -> ManageSellOfferResult:
         return cls(ManageSellOfferResultCode.MANAGE_SELL_OFFER_BUY_NO_TRUST)
 
     @classmethod
-    def from_manage_sell_offer_sell_not_authorized(cls) -> "ManageSellOfferResult":
+    def from_manage_sell_offer_sell_not_authorized(cls) -> ManageSellOfferResult:
         return cls(ManageSellOfferResultCode.MANAGE_SELL_OFFER_SELL_NOT_AUTHORIZED)
 
     @classmethod
-    def from_manage_sell_offer_buy_not_authorized(cls) -> "ManageSellOfferResult":
+    def from_manage_sell_offer_buy_not_authorized(cls) -> ManageSellOfferResult:
         return cls(ManageSellOfferResultCode.MANAGE_SELL_OFFER_BUY_NOT_AUTHORIZED)
 
     @classmethod
-    def from_manage_sell_offer_line_full(cls) -> "ManageSellOfferResult":
+    def from_manage_sell_offer_line_full(cls) -> ManageSellOfferResult:
         return cls(ManageSellOfferResultCode.MANAGE_SELL_OFFER_LINE_FULL)
 
     @classmethod
-    def from_manage_sell_offer_underfunded(cls) -> "ManageSellOfferResult":
+    def from_manage_sell_offer_underfunded(cls) -> ManageSellOfferResult:
         return cls(ManageSellOfferResultCode.MANAGE_SELL_OFFER_UNDERFUNDED)
 
     @classmethod
-    def from_manage_sell_offer_cross_self(cls) -> "ManageSellOfferResult":
+    def from_manage_sell_offer_cross_self(cls) -> ManageSellOfferResult:
         return cls(ManageSellOfferResultCode.MANAGE_SELL_OFFER_CROSS_SELF)
 
     @classmethod
-    def from_manage_sell_offer_sell_no_issuer(cls) -> "ManageSellOfferResult":
+    def from_manage_sell_offer_sell_no_issuer(cls) -> ManageSellOfferResult:
         return cls(ManageSellOfferResultCode.MANAGE_SELL_OFFER_SELL_NO_ISSUER)
 
     @classmethod
-    def from_manage_sell_offer_buy_no_issuer(cls) -> "ManageSellOfferResult":
+    def from_manage_sell_offer_buy_no_issuer(cls) -> ManageSellOfferResult:
         return cls(ManageSellOfferResultCode.MANAGE_SELL_OFFER_BUY_NO_ISSUER)
 
     @classmethod
-    def from_manage_sell_offer_not_found(cls) -> "ManageSellOfferResult":
+    def from_manage_sell_offer_not_found(cls) -> ManageSellOfferResult:
         return cls(ManageSellOfferResultCode.MANAGE_SELL_OFFER_NOT_FOUND)
 
     @classmethod
-    def from_manage_sell_offer_low_reserve(cls) -> "ManageSellOfferResult":
+    def from_manage_sell_offer_low_reserve(cls) -> ManageSellOfferResult:
         return cls(ManageSellOfferResultCode.MANAGE_SELL_OFFER_LOW_RESERVE)
 
     def pack(self, packer: Packer) -> None:

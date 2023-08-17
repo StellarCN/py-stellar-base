@@ -40,13 +40,11 @@ class InflationResult:
         self.payouts = payouts
 
     @classmethod
-    def from_inflation_success(
-        cls, payouts: List[InflationPayout]
-    ) -> "InflationResult":
+    def from_inflation_success(cls, payouts: List[InflationPayout]) -> InflationResult:
         return cls(InflationResultCode.INFLATION_SUCCESS, payouts=payouts)
 
     @classmethod
-    def from_inflation_not_time(cls) -> "InflationResult":
+    def from_inflation_not_time(cls) -> InflationResult:
         return cls(InflationResultCode.INFLATION_NOT_TIME)
 
     def pack(self, packer: Packer) -> None:

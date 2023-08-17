@@ -44,19 +44,19 @@ class BucketEntry:
         self.meta_entry = meta_entry
 
     @classmethod
-    def from_liveentry(cls, live_entry: LedgerEntry) -> "BucketEntry":
+    def from_liveentry(cls, live_entry: LedgerEntry) -> BucketEntry:
         return cls(BucketEntryType.LIVEENTRY, live_entry=live_entry)
 
     @classmethod
-    def from_initentry(cls, live_entry: LedgerEntry) -> "BucketEntry":
+    def from_initentry(cls, live_entry: LedgerEntry) -> BucketEntry:
         return cls(BucketEntryType.INITENTRY, live_entry=live_entry)
 
     @classmethod
-    def from_deadentry(cls, dead_entry: LedgerKey) -> "BucketEntry":
+    def from_deadentry(cls, dead_entry: LedgerKey) -> BucketEntry:
         return cls(BucketEntryType.DEADENTRY, dead_entry=dead_entry)
 
     @classmethod
-    def from_metaentry(cls, meta_entry: BucketMetadata) -> "BucketEntry":
+    def from_metaentry(cls, meta_entry: BucketMetadata) -> BucketEntry:
         return cls(BucketEntryType.METAENTRY, meta_entry=meta_entry)
 
     def pack(self, packer: Packer) -> None:

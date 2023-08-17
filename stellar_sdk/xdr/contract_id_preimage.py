@@ -43,7 +43,7 @@ class ContractIDPreimage:
     @classmethod
     def from_contract_id_preimage_from_address(
         cls, from_address: ContractIDPreimageFromAddress
-    ) -> "ContractIDPreimage":
+    ) -> ContractIDPreimage:
         return cls(
             ContractIDPreimageType.CONTRACT_ID_PREIMAGE_FROM_ADDRESS,
             from_address=from_address,
@@ -52,7 +52,7 @@ class ContractIDPreimage:
     @classmethod
     def from_contract_id_preimage_from_asset(
         cls, from_asset: Asset
-    ) -> "ContractIDPreimage":
+    ) -> ContractIDPreimage:
         return cls(
             ContractIDPreimageType.CONTRACT_ID_PREIMAGE_FROM_ASSET,
             from_asset=from_asset,

@@ -156,17 +156,17 @@ class OperationBody:
         self.restore_footprint_op = restore_footprint_op
 
     @classmethod
-    def from_create_account(cls, create_account_op: CreateAccountOp) -> "OperationBody":
+    def from_create_account(cls, create_account_op: CreateAccountOp) -> OperationBody:
         return cls(OperationType.CREATE_ACCOUNT, create_account_op=create_account_op)
 
     @classmethod
-    def from_payment(cls, payment_op: PaymentOp) -> "OperationBody":
+    def from_payment(cls, payment_op: PaymentOp) -> OperationBody:
         return cls(OperationType.PAYMENT, payment_op=payment_op)
 
     @classmethod
     def from_path_payment_strict_receive(
         cls, path_payment_strict_receive_op: PathPaymentStrictReceiveOp
-    ) -> "OperationBody":
+    ) -> OperationBody:
         return cls(
             OperationType.PATH_PAYMENT_STRICT_RECEIVE,
             path_payment_strict_receive_op=path_payment_strict_receive_op,
@@ -175,7 +175,7 @@ class OperationBody:
     @classmethod
     def from_manage_sell_offer(
         cls, manage_sell_offer_op: ManageSellOfferOp
-    ) -> "OperationBody":
+    ) -> OperationBody:
         return cls(
             OperationType.MANAGE_SELL_OFFER, manage_sell_offer_op=manage_sell_offer_op
         )
@@ -183,44 +183,44 @@ class OperationBody:
     @classmethod
     def from_create_passive_sell_offer(
         cls, create_passive_sell_offer_op: CreatePassiveSellOfferOp
-    ) -> "OperationBody":
+    ) -> OperationBody:
         return cls(
             OperationType.CREATE_PASSIVE_SELL_OFFER,
             create_passive_sell_offer_op=create_passive_sell_offer_op,
         )
 
     @classmethod
-    def from_set_options(cls, set_options_op: SetOptionsOp) -> "OperationBody":
+    def from_set_options(cls, set_options_op: SetOptionsOp) -> OperationBody:
         return cls(OperationType.SET_OPTIONS, set_options_op=set_options_op)
 
     @classmethod
-    def from_change_trust(cls, change_trust_op: ChangeTrustOp) -> "OperationBody":
+    def from_change_trust(cls, change_trust_op: ChangeTrustOp) -> OperationBody:
         return cls(OperationType.CHANGE_TRUST, change_trust_op=change_trust_op)
 
     @classmethod
-    def from_allow_trust(cls, allow_trust_op: AllowTrustOp) -> "OperationBody":
+    def from_allow_trust(cls, allow_trust_op: AllowTrustOp) -> OperationBody:
         return cls(OperationType.ALLOW_TRUST, allow_trust_op=allow_trust_op)
 
     @classmethod
-    def from_account_merge(cls, destination: MuxedAccount) -> "OperationBody":
+    def from_account_merge(cls, destination: MuxedAccount) -> OperationBody:
         return cls(OperationType.ACCOUNT_MERGE, destination=destination)
 
     @classmethod
-    def from_inflation(cls) -> "OperationBody":
+    def from_inflation(cls) -> OperationBody:
         return cls(OperationType.INFLATION)
 
     @classmethod
-    def from_manage_data(cls, manage_data_op: ManageDataOp) -> "OperationBody":
+    def from_manage_data(cls, manage_data_op: ManageDataOp) -> OperationBody:
         return cls(OperationType.MANAGE_DATA, manage_data_op=manage_data_op)
 
     @classmethod
-    def from_bump_sequence(cls, bump_sequence_op: BumpSequenceOp) -> "OperationBody":
+    def from_bump_sequence(cls, bump_sequence_op: BumpSequenceOp) -> OperationBody:
         return cls(OperationType.BUMP_SEQUENCE, bump_sequence_op=bump_sequence_op)
 
     @classmethod
     def from_manage_buy_offer(
         cls, manage_buy_offer_op: ManageBuyOfferOp
-    ) -> "OperationBody":
+    ) -> OperationBody:
         return cls(
             OperationType.MANAGE_BUY_OFFER, manage_buy_offer_op=manage_buy_offer_op
         )
@@ -228,7 +228,7 @@ class OperationBody:
     @classmethod
     def from_path_payment_strict_send(
         cls, path_payment_strict_send_op: PathPaymentStrictSendOp
-    ) -> "OperationBody":
+    ) -> OperationBody:
         return cls(
             OperationType.PATH_PAYMENT_STRICT_SEND,
             path_payment_strict_send_op=path_payment_strict_send_op,
@@ -237,7 +237,7 @@ class OperationBody:
     @classmethod
     def from_create_claimable_balance(
         cls, create_claimable_balance_op: CreateClaimableBalanceOp
-    ) -> "OperationBody":
+    ) -> OperationBody:
         return cls(
             OperationType.CREATE_CLAIMABLE_BALANCE,
             create_claimable_balance_op=create_claimable_balance_op,
@@ -246,7 +246,7 @@ class OperationBody:
     @classmethod
     def from_claim_claimable_balance(
         cls, claim_claimable_balance_op: ClaimClaimableBalanceOp
-    ) -> "OperationBody":
+    ) -> OperationBody:
         return cls(
             OperationType.CLAIM_CLAIMABLE_BALANCE,
             claim_claimable_balance_op=claim_claimable_balance_op,
@@ -255,33 +255,33 @@ class OperationBody:
     @classmethod
     def from_begin_sponsoring_future_reserves(
         cls, begin_sponsoring_future_reserves_op: BeginSponsoringFutureReservesOp
-    ) -> "OperationBody":
+    ) -> OperationBody:
         return cls(
             OperationType.BEGIN_SPONSORING_FUTURE_RESERVES,
             begin_sponsoring_future_reserves_op=begin_sponsoring_future_reserves_op,
         )
 
     @classmethod
-    def from_end_sponsoring_future_reserves(cls) -> "OperationBody":
+    def from_end_sponsoring_future_reserves(cls) -> OperationBody:
         return cls(OperationType.END_SPONSORING_FUTURE_RESERVES)
 
     @classmethod
     def from_revoke_sponsorship(
         cls, revoke_sponsorship_op: RevokeSponsorshipOp
-    ) -> "OperationBody":
+    ) -> OperationBody:
         return cls(
             OperationType.REVOKE_SPONSORSHIP,
             revoke_sponsorship_op=revoke_sponsorship_op,
         )
 
     @classmethod
-    def from_clawback(cls, clawback_op: ClawbackOp) -> "OperationBody":
+    def from_clawback(cls, clawback_op: ClawbackOp) -> OperationBody:
         return cls(OperationType.CLAWBACK, clawback_op=clawback_op)
 
     @classmethod
     def from_clawback_claimable_balance(
         cls, clawback_claimable_balance_op: ClawbackClaimableBalanceOp
-    ) -> "OperationBody":
+    ) -> OperationBody:
         return cls(
             OperationType.CLAWBACK_CLAIMABLE_BALANCE,
             clawback_claimable_balance_op=clawback_claimable_balance_op,
@@ -290,7 +290,7 @@ class OperationBody:
     @classmethod
     def from_set_trust_line_flags(
         cls, set_trust_line_flags_op: SetTrustLineFlagsOp
-    ) -> "OperationBody":
+    ) -> OperationBody:
         return cls(
             OperationType.SET_TRUST_LINE_FLAGS,
             set_trust_line_flags_op=set_trust_line_flags_op,
@@ -299,7 +299,7 @@ class OperationBody:
     @classmethod
     def from_liquidity_pool_deposit(
         cls, liquidity_pool_deposit_op: LiquidityPoolDepositOp
-    ) -> "OperationBody":
+    ) -> OperationBody:
         return cls(
             OperationType.LIQUIDITY_POOL_DEPOSIT,
             liquidity_pool_deposit_op=liquidity_pool_deposit_op,
@@ -308,7 +308,7 @@ class OperationBody:
     @classmethod
     def from_liquidity_pool_withdraw(
         cls, liquidity_pool_withdraw_op: LiquidityPoolWithdrawOp
-    ) -> "OperationBody":
+    ) -> OperationBody:
         return cls(
             OperationType.LIQUIDITY_POOL_WITHDRAW,
             liquidity_pool_withdraw_op=liquidity_pool_withdraw_op,
@@ -317,7 +317,7 @@ class OperationBody:
     @classmethod
     def from_invoke_host_function(
         cls, invoke_host_function_op: InvokeHostFunctionOp
-    ) -> "OperationBody":
+    ) -> OperationBody:
         return cls(
             OperationType.INVOKE_HOST_FUNCTION,
             invoke_host_function_op=invoke_host_function_op,
@@ -326,7 +326,7 @@ class OperationBody:
     @classmethod
     def from_bump_footprint_expiration(
         cls, bump_footprint_expiration_op: BumpFootprintExpirationOp
-    ) -> "OperationBody":
+    ) -> OperationBody:
         return cls(
             OperationType.BUMP_FOOTPRINT_EXPIRATION,
             bump_footprint_expiration_op=bump_footprint_expiration_op,
@@ -335,7 +335,7 @@ class OperationBody:
     @classmethod
     def from_restore_footprint(
         cls, restore_footprint_op: RestoreFootprintOp
-    ) -> "OperationBody":
+    ) -> OperationBody:
         return cls(
             OperationType.RESTORE_FOOTPRINT, restore_footprint_op=restore_footprint_op
         )

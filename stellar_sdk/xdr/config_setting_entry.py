@@ -104,7 +104,7 @@ class ConfigSettingEntry:
     @classmethod
     def from_config_setting_contract_max_size_bytes(
         cls, contract_max_size_bytes: Uint32
-    ) -> "ConfigSettingEntry":
+    ) -> ConfigSettingEntry:
         return cls(
             ConfigSettingID.CONFIG_SETTING_CONTRACT_MAX_SIZE_BYTES,
             contract_max_size_bytes=contract_max_size_bytes,
@@ -113,7 +113,7 @@ class ConfigSettingEntry:
     @classmethod
     def from_config_setting_contract_compute_v0(
         cls, contract_compute: ConfigSettingContractComputeV0
-    ) -> "ConfigSettingEntry":
+    ) -> ConfigSettingEntry:
         return cls(
             ConfigSettingID.CONFIG_SETTING_CONTRACT_COMPUTE_V0,
             contract_compute=contract_compute,
@@ -122,7 +122,7 @@ class ConfigSettingEntry:
     @classmethod
     def from_config_setting_contract_ledger_cost_v0(
         cls, contract_ledger_cost: ConfigSettingContractLedgerCostV0
-    ) -> "ConfigSettingEntry":
+    ) -> ConfigSettingEntry:
         return cls(
             ConfigSettingID.CONFIG_SETTING_CONTRACT_LEDGER_COST_V0,
             contract_ledger_cost=contract_ledger_cost,
@@ -131,7 +131,7 @@ class ConfigSettingEntry:
     @classmethod
     def from_config_setting_contract_historical_data_v0(
         cls, contract_historical_data: ConfigSettingContractHistoricalDataV0
-    ) -> "ConfigSettingEntry":
+    ) -> ConfigSettingEntry:
         return cls(
             ConfigSettingID.CONFIG_SETTING_CONTRACT_HISTORICAL_DATA_V0,
             contract_historical_data=contract_historical_data,
@@ -140,7 +140,7 @@ class ConfigSettingEntry:
     @classmethod
     def from_config_setting_contract_meta_data_v0(
         cls, contract_meta_data: ConfigSettingContractMetaDataV0
-    ) -> "ConfigSettingEntry":
+    ) -> ConfigSettingEntry:
         return cls(
             ConfigSettingID.CONFIG_SETTING_CONTRACT_META_DATA_V0,
             contract_meta_data=contract_meta_data,
@@ -149,7 +149,7 @@ class ConfigSettingEntry:
     @classmethod
     def from_config_setting_contract_bandwidth_v0(
         cls, contract_bandwidth: ConfigSettingContractBandwidthV0
-    ) -> "ConfigSettingEntry":
+    ) -> ConfigSettingEntry:
         return cls(
             ConfigSettingID.CONFIG_SETTING_CONTRACT_BANDWIDTH_V0,
             contract_bandwidth=contract_bandwidth,
@@ -158,7 +158,7 @@ class ConfigSettingEntry:
     @classmethod
     def from_config_setting_contract_cost_params_cpu_instructions(
         cls, contract_cost_params_cpu_insns: ContractCostParams
-    ) -> "ConfigSettingEntry":
+    ) -> ConfigSettingEntry:
         return cls(
             ConfigSettingID.CONFIG_SETTING_CONTRACT_COST_PARAMS_CPU_INSTRUCTIONS,
             contract_cost_params_cpu_insns=contract_cost_params_cpu_insns,
@@ -167,7 +167,7 @@ class ConfigSettingEntry:
     @classmethod
     def from_config_setting_contract_cost_params_memory_bytes(
         cls, contract_cost_params_mem_bytes: ContractCostParams
-    ) -> "ConfigSettingEntry":
+    ) -> ConfigSettingEntry:
         return cls(
             ConfigSettingID.CONFIG_SETTING_CONTRACT_COST_PARAMS_MEMORY_BYTES,
             contract_cost_params_mem_bytes=contract_cost_params_mem_bytes,
@@ -176,7 +176,7 @@ class ConfigSettingEntry:
     @classmethod
     def from_config_setting_contract_data_key_size_bytes(
         cls, contract_data_key_size_bytes: Uint32
-    ) -> "ConfigSettingEntry":
+    ) -> ConfigSettingEntry:
         return cls(
             ConfigSettingID.CONFIG_SETTING_CONTRACT_DATA_KEY_SIZE_BYTES,
             contract_data_key_size_bytes=contract_data_key_size_bytes,
@@ -185,7 +185,7 @@ class ConfigSettingEntry:
     @classmethod
     def from_config_setting_contract_data_entry_size_bytes(
         cls, contract_data_entry_size_bytes: Uint32
-    ) -> "ConfigSettingEntry":
+    ) -> ConfigSettingEntry:
         return cls(
             ConfigSettingID.CONFIG_SETTING_CONTRACT_DATA_ENTRY_SIZE_BYTES,
             contract_data_entry_size_bytes=contract_data_entry_size_bytes,
@@ -194,7 +194,7 @@ class ConfigSettingEntry:
     @classmethod
     def from_config_setting_state_expiration(
         cls, state_expiration_settings: StateExpirationSettings
-    ) -> "ConfigSettingEntry":
+    ) -> ConfigSettingEntry:
         return cls(
             ConfigSettingID.CONFIG_SETTING_STATE_EXPIRATION,
             state_expiration_settings=state_expiration_settings,
@@ -203,7 +203,7 @@ class ConfigSettingEntry:
     @classmethod
     def from_config_setting_contract_execution_lanes(
         cls, contract_execution_lanes: ConfigSettingContractExecutionLanesV0
-    ) -> "ConfigSettingEntry":
+    ) -> ConfigSettingEntry:
         return cls(
             ConfigSettingID.CONFIG_SETTING_CONTRACT_EXECUTION_LANES,
             contract_execution_lanes=contract_execution_lanes,
@@ -212,7 +212,7 @@ class ConfigSettingEntry:
     @classmethod
     def from_config_setting_bucketlist_size_window(
         cls, bucket_list_size_window: List[Uint64]
-    ) -> "ConfigSettingEntry":
+    ) -> ConfigSettingEntry:
         return cls(
             ConfigSettingID.CONFIG_SETTING_BUCKETLIST_SIZE_WINDOW,
             bucket_list_size_window=bucket_list_size_window,

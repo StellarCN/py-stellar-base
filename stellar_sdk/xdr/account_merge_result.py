@@ -42,38 +42,38 @@ class AccountMergeResult:
     @classmethod
     def from_account_merge_success(
         cls, source_account_balance: Int64
-    ) -> "AccountMergeResult":
+    ) -> AccountMergeResult:
         return cls(
             AccountMergeResultCode.ACCOUNT_MERGE_SUCCESS,
             source_account_balance=source_account_balance,
         )
 
     @classmethod
-    def from_account_merge_malformed(cls) -> "AccountMergeResult":
+    def from_account_merge_malformed(cls) -> AccountMergeResult:
         return cls(AccountMergeResultCode.ACCOUNT_MERGE_MALFORMED)
 
     @classmethod
-    def from_account_merge_no_account(cls) -> "AccountMergeResult":
+    def from_account_merge_no_account(cls) -> AccountMergeResult:
         return cls(AccountMergeResultCode.ACCOUNT_MERGE_NO_ACCOUNT)
 
     @classmethod
-    def from_account_merge_immutable_set(cls) -> "AccountMergeResult":
+    def from_account_merge_immutable_set(cls) -> AccountMergeResult:
         return cls(AccountMergeResultCode.ACCOUNT_MERGE_IMMUTABLE_SET)
 
     @classmethod
-    def from_account_merge_has_sub_entries(cls) -> "AccountMergeResult":
+    def from_account_merge_has_sub_entries(cls) -> AccountMergeResult:
         return cls(AccountMergeResultCode.ACCOUNT_MERGE_HAS_SUB_ENTRIES)
 
     @classmethod
-    def from_account_merge_seqnum_too_far(cls) -> "AccountMergeResult":
+    def from_account_merge_seqnum_too_far(cls) -> AccountMergeResult:
         return cls(AccountMergeResultCode.ACCOUNT_MERGE_SEQNUM_TOO_FAR)
 
     @classmethod
-    def from_account_merge_dest_full(cls) -> "AccountMergeResult":
+    def from_account_merge_dest_full(cls) -> AccountMergeResult:
         return cls(AccountMergeResultCode.ACCOUNT_MERGE_DEST_FULL)
 
     @classmethod
-    def from_account_merge_is_sponsor(cls) -> "AccountMergeResult":
+    def from_account_merge_is_sponsor(cls) -> AccountMergeResult:
         return cls(AccountMergeResultCode.ACCOUNT_MERGE_IS_SPONSOR)
 
     def pack(self, packer: Packer) -> None:

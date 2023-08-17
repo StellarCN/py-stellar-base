@@ -71,25 +71,25 @@ class HashIDPreimage:
     @classmethod
     def from_envelope_type_op_id(
         cls, operation_id: HashIDPreimageOperationID
-    ) -> "HashIDPreimage":
+    ) -> HashIDPreimage:
         return cls(EnvelopeType.ENVELOPE_TYPE_OP_ID, operation_id=operation_id)
 
     @classmethod
     def from_envelope_type_pool_revoke_op_id(
         cls, revoke_id: HashIDPreimageRevokeID
-    ) -> "HashIDPreimage":
+    ) -> HashIDPreimage:
         return cls(EnvelopeType.ENVELOPE_TYPE_POOL_REVOKE_OP_ID, revoke_id=revoke_id)
 
     @classmethod
     def from_envelope_type_contract_id(
         cls, contract_id: HashIDPreimageContractID
-    ) -> "HashIDPreimage":
+    ) -> HashIDPreimage:
         return cls(EnvelopeType.ENVELOPE_TYPE_CONTRACT_ID, contract_id=contract_id)
 
     @classmethod
     def from_envelope_type_soroban_authorization(
         cls, soroban_authorization: HashIDPreimageSorobanAuthorization
-    ) -> "HashIDPreimage":
+    ) -> HashIDPreimage:
         return cls(
             EnvelopeType.ENVELOPE_TYPE_SOROBAN_AUTHORIZATION,
             soroban_authorization=soroban_authorization,

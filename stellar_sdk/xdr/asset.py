@@ -43,15 +43,15 @@ class Asset:
         self.alpha_num12 = alpha_num12
 
     @classmethod
-    def from_asset_type_native(cls) -> "Asset":
+    def from_asset_type_native(cls) -> Asset:
         return cls(AssetType.ASSET_TYPE_NATIVE)
 
     @classmethod
-    def from_asset_type_credit_alphanum4(cls, alpha_num4: AlphaNum4) -> "Asset":
+    def from_asset_type_credit_alphanum4(cls, alpha_num4: AlphaNum4) -> Asset:
         return cls(AssetType.ASSET_TYPE_CREDIT_ALPHANUM4, alpha_num4=alpha_num4)
 
     @classmethod
-    def from_asset_type_credit_alphanum12(cls, alpha_num12: AlphaNum12) -> "Asset":
+    def from_asset_type_credit_alphanum12(cls, alpha_num12: AlphaNum12) -> Asset:
         return cls(AssetType.ASSET_TYPE_CREDIT_ALPHANUM12, alpha_num12=alpha_num12)
 
     def pack(self, packer: Packer) -> None:

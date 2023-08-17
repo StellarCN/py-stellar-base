@@ -54,13 +54,13 @@ class SCSpecEntry:
     @classmethod
     def from_sc_spec_entry_function_v0(
         cls, function_v0: SCSpecFunctionV0
-    ) -> "SCSpecEntry":
+    ) -> SCSpecEntry:
         return cls(SCSpecEntryKind.SC_SPEC_ENTRY_FUNCTION_V0, function_v0=function_v0)
 
     @classmethod
     def from_sc_spec_entry_udt_struct_v0(
         cls, udt_struct_v0: SCSpecUDTStructV0
-    ) -> "SCSpecEntry":
+    ) -> SCSpecEntry:
         return cls(
             SCSpecEntryKind.SC_SPEC_ENTRY_UDT_STRUCT_V0, udt_struct_v0=udt_struct_v0
         )
@@ -68,7 +68,7 @@ class SCSpecEntry:
     @classmethod
     def from_sc_spec_entry_udt_union_v0(
         cls, udt_union_v0: SCSpecUDTUnionV0
-    ) -> "SCSpecEntry":
+    ) -> SCSpecEntry:
         return cls(
             SCSpecEntryKind.SC_SPEC_ENTRY_UDT_UNION_V0, udt_union_v0=udt_union_v0
         )
@@ -76,13 +76,13 @@ class SCSpecEntry:
     @classmethod
     def from_sc_spec_entry_udt_enum_v0(
         cls, udt_enum_v0: SCSpecUDTEnumV0
-    ) -> "SCSpecEntry":
+    ) -> SCSpecEntry:
         return cls(SCSpecEntryKind.SC_SPEC_ENTRY_UDT_ENUM_V0, udt_enum_v0=udt_enum_v0)
 
     @classmethod
     def from_sc_spec_entry_udt_error_enum_v0(
         cls, udt_error_enum_v0: SCSpecUDTErrorEnumV0
-    ) -> "SCSpecEntry":
+    ) -> SCSpecEntry:
         return cls(
             SCSpecEntryKind.SC_SPEC_ENTRY_UDT_ERROR_ENUM_V0,
             udt_error_enum_v0=udt_error_enum_v0,

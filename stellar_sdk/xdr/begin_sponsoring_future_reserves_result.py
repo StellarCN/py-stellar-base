@@ -38,7 +38,7 @@ class BeginSponsoringFutureReservesResult:
     @classmethod
     def from_begin_sponsoring_future_reserves_success(
         cls,
-    ) -> "BeginSponsoringFutureReservesResult":
+    ) -> BeginSponsoringFutureReservesResult:
         return cls(
             BeginSponsoringFutureReservesResultCode.BEGIN_SPONSORING_FUTURE_RESERVES_SUCCESS
         )
@@ -46,7 +46,7 @@ class BeginSponsoringFutureReservesResult:
     @classmethod
     def from_begin_sponsoring_future_reserves_malformed(
         cls,
-    ) -> "BeginSponsoringFutureReservesResult":
+    ) -> BeginSponsoringFutureReservesResult:
         return cls(
             BeginSponsoringFutureReservesResultCode.BEGIN_SPONSORING_FUTURE_RESERVES_MALFORMED
         )
@@ -54,7 +54,7 @@ class BeginSponsoringFutureReservesResult:
     @classmethod
     def from_begin_sponsoring_future_reserves_already_sponsored(
         cls,
-    ) -> "BeginSponsoringFutureReservesResult":
+    ) -> BeginSponsoringFutureReservesResult:
         return cls(
             BeginSponsoringFutureReservesResultCode.BEGIN_SPONSORING_FUTURE_RESERVES_ALREADY_SPONSORED
         )
@@ -62,7 +62,7 @@ class BeginSponsoringFutureReservesResult:
     @classmethod
     def from_begin_sponsoring_future_reserves_recursive(
         cls,
-    ) -> "BeginSponsoringFutureReservesResult":
+    ) -> BeginSponsoringFutureReservesResult:
         return cls(
             BeginSponsoringFutureReservesResultCode.BEGIN_SPONSORING_FUTURE_RESERVES_RECURSIVE
         )

@@ -31,11 +31,11 @@ class BumpSequenceResult:
         self.code = code
 
     @classmethod
-    def from_bump_sequence_success(cls) -> "BumpSequenceResult":
+    def from_bump_sequence_success(cls) -> BumpSequenceResult:
         return cls(BumpSequenceResultCode.BUMP_SEQUENCE_SUCCESS)
 
     @classmethod
-    def from_bump_sequence_bad_seq(cls) -> "BumpSequenceResult":
+    def from_bump_sequence_bad_seq(cls) -> BumpSequenceResult:
         return cls(BumpSequenceResultCode.BUMP_SEQUENCE_BAD_SEQ)
 
     def pack(self, packer: Packer) -> None:

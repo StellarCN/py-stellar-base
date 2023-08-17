@@ -53,21 +53,21 @@ class SignerKey:
         self.ed25519_signed_payload = ed25519_signed_payload
 
     @classmethod
-    def from_signer_key_type_ed25519(cls, ed25519: Uint256) -> "SignerKey":
+    def from_signer_key_type_ed25519(cls, ed25519: Uint256) -> SignerKey:
         return cls(SignerKeyType.SIGNER_KEY_TYPE_ED25519, ed25519=ed25519)
 
     @classmethod
-    def from_signer_key_type_pre_auth_tx(cls, pre_auth_tx: Uint256) -> "SignerKey":
+    def from_signer_key_type_pre_auth_tx(cls, pre_auth_tx: Uint256) -> SignerKey:
         return cls(SignerKeyType.SIGNER_KEY_TYPE_PRE_AUTH_TX, pre_auth_tx=pre_auth_tx)
 
     @classmethod
-    def from_signer_key_type_hash_x(cls, hash_x: Uint256) -> "SignerKey":
+    def from_signer_key_type_hash_x(cls, hash_x: Uint256) -> SignerKey:
         return cls(SignerKeyType.SIGNER_KEY_TYPE_HASH_X, hash_x=hash_x)
 
     @classmethod
     def from_signer_key_type_ed25519_signed_payload(
         cls, ed25519_signed_payload: SignerKeyEd25519SignedPayload
-    ) -> "SignerKey":
+    ) -> SignerKey:
         return cls(
             SignerKeyType.SIGNER_KEY_TYPE_ED25519_SIGNED_PAYLOAD,
             ed25519_signed_payload=ed25519_signed_payload,

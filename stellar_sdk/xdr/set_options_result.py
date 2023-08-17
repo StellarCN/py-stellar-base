@@ -40,47 +40,47 @@ class SetOptionsResult:
         self.code = code
 
     @classmethod
-    def from_set_options_success(cls) -> "SetOptionsResult":
+    def from_set_options_success(cls) -> SetOptionsResult:
         return cls(SetOptionsResultCode.SET_OPTIONS_SUCCESS)
 
     @classmethod
-    def from_set_options_low_reserve(cls) -> "SetOptionsResult":
+    def from_set_options_low_reserve(cls) -> SetOptionsResult:
         return cls(SetOptionsResultCode.SET_OPTIONS_LOW_RESERVE)
 
     @classmethod
-    def from_set_options_too_many_signers(cls) -> "SetOptionsResult":
+    def from_set_options_too_many_signers(cls) -> SetOptionsResult:
         return cls(SetOptionsResultCode.SET_OPTIONS_TOO_MANY_SIGNERS)
 
     @classmethod
-    def from_set_options_bad_flags(cls) -> "SetOptionsResult":
+    def from_set_options_bad_flags(cls) -> SetOptionsResult:
         return cls(SetOptionsResultCode.SET_OPTIONS_BAD_FLAGS)
 
     @classmethod
-    def from_set_options_invalid_inflation(cls) -> "SetOptionsResult":
+    def from_set_options_invalid_inflation(cls) -> SetOptionsResult:
         return cls(SetOptionsResultCode.SET_OPTIONS_INVALID_INFLATION)
 
     @classmethod
-    def from_set_options_cant_change(cls) -> "SetOptionsResult":
+    def from_set_options_cant_change(cls) -> SetOptionsResult:
         return cls(SetOptionsResultCode.SET_OPTIONS_CANT_CHANGE)
 
     @classmethod
-    def from_set_options_unknown_flag(cls) -> "SetOptionsResult":
+    def from_set_options_unknown_flag(cls) -> SetOptionsResult:
         return cls(SetOptionsResultCode.SET_OPTIONS_UNKNOWN_FLAG)
 
     @classmethod
-    def from_set_options_threshold_out_of_range(cls) -> "SetOptionsResult":
+    def from_set_options_threshold_out_of_range(cls) -> SetOptionsResult:
         return cls(SetOptionsResultCode.SET_OPTIONS_THRESHOLD_OUT_OF_RANGE)
 
     @classmethod
-    def from_set_options_bad_signer(cls) -> "SetOptionsResult":
+    def from_set_options_bad_signer(cls) -> SetOptionsResult:
         return cls(SetOptionsResultCode.SET_OPTIONS_BAD_SIGNER)
 
     @classmethod
-    def from_set_options_invalid_home_domain(cls) -> "SetOptionsResult":
+    def from_set_options_invalid_home_domain(cls) -> SetOptionsResult:
         return cls(SetOptionsResultCode.SET_OPTIONS_INVALID_HOME_DOMAIN)
 
     @classmethod
-    def from_set_options_auth_revocable_required(cls) -> "SetOptionsResult":
+    def from_set_options_auth_revocable_required(cls) -> SetOptionsResult:
         return cls(SetOptionsResultCode.SET_OPTIONS_AUTH_REVOCABLE_REQUIRED)
 
     def pack(self, packer: Packer) -> None:

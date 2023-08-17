@@ -39,7 +39,7 @@ class SCSpecUDTUnionCaseV0:
     @classmethod
     def from_sc_spec_udt_union_case_void_v0(
         cls, void_case: SCSpecUDTUnionCaseVoidV0
-    ) -> "SCSpecUDTUnionCaseV0":
+    ) -> SCSpecUDTUnionCaseV0:
         return cls(
             SCSpecUDTUnionCaseV0Kind.SC_SPEC_UDT_UNION_CASE_VOID_V0, void_case=void_case
         )
@@ -47,7 +47,7 @@ class SCSpecUDTUnionCaseV0:
     @classmethod
     def from_sc_spec_udt_union_case_tuple_v0(
         cls, tuple_case: SCSpecUDTUnionCaseTupleV0
-    ) -> "SCSpecUDTUnionCaseV0":
+    ) -> SCSpecUDTUnionCaseV0:
         return cls(
             SCSpecUDTUnionCaseV0Kind.SC_SPEC_UDT_UNION_CASE_TUPLE_V0,
             tuple_case=tuple_case,

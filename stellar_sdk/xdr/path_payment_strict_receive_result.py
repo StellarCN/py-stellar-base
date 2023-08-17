@@ -59,7 +59,7 @@ class PathPaymentStrictReceiveResult:
     @classmethod
     def from_path_payment_strict_receive_success(
         cls, success: PathPaymentStrictReceiveResultSuccess
-    ) -> "PathPaymentStrictReceiveResult":
+    ) -> PathPaymentStrictReceiveResult:
         return cls(
             PathPaymentStrictReceiveResultCode.PATH_PAYMENT_STRICT_RECEIVE_SUCCESS,
             success=success,
@@ -68,7 +68,7 @@ class PathPaymentStrictReceiveResult:
     @classmethod
     def from_path_payment_strict_receive_malformed(
         cls,
-    ) -> "PathPaymentStrictReceiveResult":
+    ) -> PathPaymentStrictReceiveResult:
         return cls(
             PathPaymentStrictReceiveResultCode.PATH_PAYMENT_STRICT_RECEIVE_MALFORMED
         )
@@ -76,7 +76,7 @@ class PathPaymentStrictReceiveResult:
     @classmethod
     def from_path_payment_strict_receive_underfunded(
         cls,
-    ) -> "PathPaymentStrictReceiveResult":
+    ) -> PathPaymentStrictReceiveResult:
         return cls(
             PathPaymentStrictReceiveResultCode.PATH_PAYMENT_STRICT_RECEIVE_UNDERFUNDED
         )
@@ -84,7 +84,7 @@ class PathPaymentStrictReceiveResult:
     @classmethod
     def from_path_payment_strict_receive_src_no_trust(
         cls,
-    ) -> "PathPaymentStrictReceiveResult":
+    ) -> PathPaymentStrictReceiveResult:
         return cls(
             PathPaymentStrictReceiveResultCode.PATH_PAYMENT_STRICT_RECEIVE_SRC_NO_TRUST
         )
@@ -92,7 +92,7 @@ class PathPaymentStrictReceiveResult:
     @classmethod
     def from_path_payment_strict_receive_src_not_authorized(
         cls,
-    ) -> "PathPaymentStrictReceiveResult":
+    ) -> PathPaymentStrictReceiveResult:
         return cls(
             PathPaymentStrictReceiveResultCode.PATH_PAYMENT_STRICT_RECEIVE_SRC_NOT_AUTHORIZED
         )
@@ -100,7 +100,7 @@ class PathPaymentStrictReceiveResult:
     @classmethod
     def from_path_payment_strict_receive_no_destination(
         cls,
-    ) -> "PathPaymentStrictReceiveResult":
+    ) -> PathPaymentStrictReceiveResult:
         return cls(
             PathPaymentStrictReceiveResultCode.PATH_PAYMENT_STRICT_RECEIVE_NO_DESTINATION
         )
@@ -108,7 +108,7 @@ class PathPaymentStrictReceiveResult:
     @classmethod
     def from_path_payment_strict_receive_no_trust(
         cls,
-    ) -> "PathPaymentStrictReceiveResult":
+    ) -> PathPaymentStrictReceiveResult:
         return cls(
             PathPaymentStrictReceiveResultCode.PATH_PAYMENT_STRICT_RECEIVE_NO_TRUST
         )
@@ -116,7 +116,7 @@ class PathPaymentStrictReceiveResult:
     @classmethod
     def from_path_payment_strict_receive_not_authorized(
         cls,
-    ) -> "PathPaymentStrictReceiveResult":
+    ) -> PathPaymentStrictReceiveResult:
         return cls(
             PathPaymentStrictReceiveResultCode.PATH_PAYMENT_STRICT_RECEIVE_NOT_AUTHORIZED
         )
@@ -124,7 +124,7 @@ class PathPaymentStrictReceiveResult:
     @classmethod
     def from_path_payment_strict_receive_line_full(
         cls,
-    ) -> "PathPaymentStrictReceiveResult":
+    ) -> PathPaymentStrictReceiveResult:
         return cls(
             PathPaymentStrictReceiveResultCode.PATH_PAYMENT_STRICT_RECEIVE_LINE_FULL
         )
@@ -132,7 +132,7 @@ class PathPaymentStrictReceiveResult:
     @classmethod
     def from_path_payment_strict_receive_no_issuer(
         cls, no_issuer: Asset
-    ) -> "PathPaymentStrictReceiveResult":
+    ) -> PathPaymentStrictReceiveResult:
         return cls(
             PathPaymentStrictReceiveResultCode.PATH_PAYMENT_STRICT_RECEIVE_NO_ISSUER,
             no_issuer=no_issuer,
@@ -141,7 +141,7 @@ class PathPaymentStrictReceiveResult:
     @classmethod
     def from_path_payment_strict_receive_too_few_offers(
         cls,
-    ) -> "PathPaymentStrictReceiveResult":
+    ) -> PathPaymentStrictReceiveResult:
         return cls(
             PathPaymentStrictReceiveResultCode.PATH_PAYMENT_STRICT_RECEIVE_TOO_FEW_OFFERS
         )
@@ -149,7 +149,7 @@ class PathPaymentStrictReceiveResult:
     @classmethod
     def from_path_payment_strict_receive_offer_cross_self(
         cls,
-    ) -> "PathPaymentStrictReceiveResult":
+    ) -> PathPaymentStrictReceiveResult:
         return cls(
             PathPaymentStrictReceiveResultCode.PATH_PAYMENT_STRICT_RECEIVE_OFFER_CROSS_SELF
         )
@@ -157,7 +157,7 @@ class PathPaymentStrictReceiveResult:
     @classmethod
     def from_path_payment_strict_receive_over_sendmax(
         cls,
-    ) -> "PathPaymentStrictReceiveResult":
+    ) -> PathPaymentStrictReceiveResult:
         return cls(
             PathPaymentStrictReceiveResultCode.PATH_PAYMENT_STRICT_RECEIVE_OVER_SENDMAX
         )
