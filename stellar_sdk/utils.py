@@ -5,13 +5,12 @@ import hashlib
 import os
 import re
 from decimal import ROUND_FLOOR, Context, Decimal, Inexact
-from typing import Sequence, Dict, Optional, Union
+from typing import Dict, Optional, Sequence, Union
 from urllib.parse import urlsplit, urlunsplit
 
 from .asset import Asset
 from .exceptions import Ed25519PublicKeyInvalidError, NoApproximationError, ValueError
 from .strkey import StrKey
-
 
 MUXED_ACCOUNT_STARTING_LETTER: str = "M"
 ED25519_PUBLIC_KEY_STARTING_LETTER: str = "G"

@@ -10,7 +10,7 @@ import json
 from datetime import datetime
 from decimal import Decimal
 from enum import Enum
-from typing import Sequence, Dict, List, Optional, Union
+from typing import Dict, List, Optional, Sequence, Union
 
 from .. import xdr as stellar_xdr
 from ..asset import Asset
@@ -33,7 +33,6 @@ from ..strkey import StrKey
 from ..time_bounds import TimeBounds
 from ..transaction import Transaction
 from ..transaction_envelope import TransactionEnvelope
-
 
 __all__ = ["to_txrep", "from_txrep"]
 

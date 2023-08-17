@@ -2,7 +2,7 @@
 """
 import time
 
-from stellar_sdk import Network, Keypair, TransactionBuilder, StrKey
+from stellar_sdk import Keypair, Network, StrKey, TransactionBuilder
 from stellar_sdk import xdr as stellar_xdr
 from stellar_sdk.soroban import SorobanServer
 from stellar_sdk.soroban.soroban_rpc import GetTransactionStatus

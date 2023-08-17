@@ -3,7 +3,6 @@ from typing import Union
 from .fee_bump_transaction_envelope import FeeBumpTransactionEnvelope
 from .transaction_envelope import TransactionEnvelope
 
-
 __all__ = ["parse_transaction_envelope_from_xdr"]
 
 

@@ -3,7 +3,6 @@ from typing import Optional
 
 from .client.response import Response
 
-
 __all__ = [
     "SdkError",
     "ValueError",

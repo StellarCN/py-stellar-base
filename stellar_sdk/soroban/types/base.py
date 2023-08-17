@@ -17,7 +17,6 @@ class BaseScValAlias(metaclass=abc.ABCMeta):
 
         :return: An :class:`stellar_sdk.xdr.SCVal` XDR object.
         """
-        pass
 
     @classmethod
     def from_xdr_sc_val(cls, sc_val: stellar_xdr.SCVal) -> "BaseScValAlias":

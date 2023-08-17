@@ -3,7 +3,7 @@ This example shows how to deploy a wrapped token contract to the Stellar network
 """
 import time
 
-from stellar_sdk import Network, Keypair, TransactionBuilder, Asset, StrKey
+from stellar_sdk import Asset, Keypair, Network, StrKey, TransactionBuilder
 from stellar_sdk import xdr as stellar_xdr
 from stellar_sdk.soroban import SorobanServer
 from stellar_sdk.soroban.soroban_rpc import GetTransactionStatus

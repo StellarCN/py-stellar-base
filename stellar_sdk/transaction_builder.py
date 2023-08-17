@@ -3,9 +3,10 @@ import os
 import time
 import warnings
 from decimal import Decimal
-from typing import Optional, Union, Sequence, List, TYPE_CHECKING
+from typing import List, Optional, Sequence, Union
 
-from . import xdr as stellar_xdr, StrKey
+from . import StrKey
+from . import xdr as stellar_xdr
 from .account import Account
 from .asset import Asset
 from .exceptions import ValueError
@@ -23,12 +24,11 @@ from .preconditions import Preconditions
 from .price import Price
 from .signer import Signer
 from .signer_key import SignedPayloadSigner, SignerKey
-from .soroban.types import BaseScValAlias, Address
+from .soroban.types import Address, BaseScValAlias
 from .time_bounds import TimeBounds
 from .transaction import Transaction
 from .transaction_envelope import TransactionEnvelope
 from .utils import hex_to_bytes, is_valid_hash
-
 
 __all__ = ["TransactionBuilder"]
 

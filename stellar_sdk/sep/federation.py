@@ -9,19 +9,18 @@ Version 1.1.0
 """
 from typing import Dict, Optional
 
-from .exceptions import (
-    BadFederationResponseError,
-    FederationServerNotFoundError,
-    InvalidFederationAddress,
-)
-from .stellar_toml import fetch_stellar_toml, fetch_stellar_toml_async
 from ..client.aiohttp_client import AiohttpClient
 from ..client.base_async_client import BaseAsyncClient
 from ..client.base_sync_client import BaseSyncClient
 from ..client.requests_client import RequestsClient
 from ..client.response import Response
 from ..exceptions import ValueError
-
+from .exceptions import (
+    BadFederationResponseError,
+    FederationServerNotFoundError,
+    InvalidFederationAddress,
+)
+from .stellar_toml import fetch_stellar_toml, fetch_stellar_toml_async
 
 SEPARATOR = "*"
 FEDERATION_SERVER_KEY = "FEDERATION_SERVER"

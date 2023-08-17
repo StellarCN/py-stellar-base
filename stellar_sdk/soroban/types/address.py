@@ -2,10 +2,10 @@ import binascii
 from enum import IntEnum
 from typing import Union
 
-from .base import BaseScValAlias
 from ... import xdr as stellar_xdr
 from ...strkey import StrKey
 from ...xdr import Hash
+from .base import BaseScValAlias
 
 __all__ = ["Address", "AddressType"]
 

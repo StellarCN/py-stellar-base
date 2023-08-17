@@ -6,7 +6,6 @@ from .. import utils
 from .. import xdr as stellar_xdr
 from ..muxed_account import MuxedAccount
 
-
 __all__ = ["Operation"]
 
 

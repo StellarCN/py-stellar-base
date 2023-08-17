@@ -5,7 +5,6 @@ from .exceptions import ValueError
 from .keypair import Keypair
 from .strkey import StrKey
 
-
 __all__ = ["MuxedAccount"]
 
 

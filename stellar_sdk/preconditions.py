@@ -1,4 +1,4 @@
-from typing import Sequence, List, Optional
+from typing import List, Optional, Sequence
 
 from . import xdr as stellar_xdr
 from .ledger_bounds import LedgerBounds

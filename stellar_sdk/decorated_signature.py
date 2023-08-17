@@ -1,6 +1,5 @@
 from . import xdr as stellar_xdr
 
-
 __all__ = ["DecoratedSignature"]
 
 

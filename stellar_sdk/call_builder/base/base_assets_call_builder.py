@@ -1,6 +1,5 @@
 from ...call_builder.base.base_call_builder import BaseCallBuilder
 
-
 __all__ = ["BaseAssetsCallBuilder"]
 
 

@@ -3,7 +3,6 @@ from typing import Any, Dict, List, Optional, Union
 from .muxed_account import MuxedAccount
 from .sep.ed25519_public_key_signer import Ed25519PublicKeySigner
 
-
 __all__ = ["Account"]
 
 

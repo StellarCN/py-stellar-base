@@ -1,13 +1,12 @@
 from decimal import Decimal
 from typing import Optional, Union
 
-from .operation import Operation
 from .. import xdr as stellar_xdr
 from ..asset import Asset
 from ..liquidity_pool_asset import LiquidityPoolAsset
 from ..muxed_account import MuxedAccount
-
 from ..utils import raise_if_not_valid_amount
+from .operation import Operation
 
 __all__ = ["ChangeTrust"]
 

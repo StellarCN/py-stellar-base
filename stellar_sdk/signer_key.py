@@ -6,7 +6,6 @@ from .__version__ import __issues__
 from .exceptions import ValueError
 from .strkey import StrKey, _get_version_byte_for_prefix, _VersionByte
 
-
 __all__ = ["SignerKey", "SignerKeyType", "SignedPayloadSigner"]
 
 

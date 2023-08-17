@@ -16,7 +16,6 @@ from .memo import NoneMemo
 from .muxed_account import MuxedAccount
 from .transaction import Transaction
 from .transaction_envelope import TransactionEnvelope
-
 from .utils import MUXED_ACCOUNT_STARTING_LETTER, urljoin_with_query
 
 __all__ = ["Server"]

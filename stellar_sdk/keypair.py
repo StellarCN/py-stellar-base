@@ -10,7 +10,6 @@ from .exceptions import AttributeError, BadSignatureError, MissingEd25519SecretS
 from .sep.mnemonic import Language, StellarMnemonic
 from .strkey import StrKey
 
-
 __all__ = ["Keypair"]
 
 

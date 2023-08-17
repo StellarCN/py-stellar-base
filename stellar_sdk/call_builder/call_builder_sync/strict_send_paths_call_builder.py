@@ -6,7 +6,6 @@ from ...call_builder.base import BaseStrictSendPathsCallBuilder
 from ...call_builder.call_builder_sync.base_call_builder import BaseCallBuilder
 from ...client.base_sync_client import BaseSyncClient
 
-
 __all__ = ["StrictSendPathsCallBuilder"]
 
 

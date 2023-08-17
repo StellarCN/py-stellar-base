@@ -2,7 +2,6 @@ from decimal import Decimal
 from typing import Union
 
 from . import xdr as stellar_xdr
-
 from .utils import best_rational_approximation
 
 __all__ = ["Price"]

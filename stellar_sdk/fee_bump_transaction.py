@@ -7,7 +7,6 @@ from .muxed_account import MuxedAccount
 from .transaction import Transaction
 from .transaction_envelope import TransactionEnvelope
 
-
 BASE_FEE = 100
 
 __all__ = ["FeeBumpTransaction"]

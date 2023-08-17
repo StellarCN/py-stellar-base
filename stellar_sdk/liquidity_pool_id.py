@@ -2,7 +2,6 @@ import binascii
 
 from . import xdr as stellar_xdr
 from .exceptions import ValueError
-
 from .utils import raise_if_not_valid_hash
 
 __all__ = ["LiquidityPoolId"]

@@ -3,7 +3,6 @@ import binascii
 from enum import IntEnum
 from typing import Optional, Union
 
-from .operation import Operation
 from .. import xdr as stellar_xdr
 from ..asset import Asset
 from ..exceptions import ValueError
@@ -12,12 +11,12 @@ from ..liquidity_pool_id import LiquidityPoolId
 from ..muxed_account import MuxedAccount
 from ..signer_key import SignerKey
 from ..strkey import StrKey
-
 from ..utils import (
     raise_if_not_valid_balance_id,
     raise_if_not_valid_ed25519_public_key,
     raise_if_not_valid_hash,
 )
+from .operation import Operation
 
 __all__ = ["RevokeSponsorship"]
 

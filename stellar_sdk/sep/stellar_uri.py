@@ -21,7 +21,6 @@ from ..keypair import Keypair
 from ..memo import HashMemo, IdMemo, Memo, NoneMemo, ReturnHashMemo, TextMemo
 from ..transaction_envelope import TransactionEnvelope
 
-
 __all__ = ["PayStellarUri", "TransactionStellarUri", "Replacement"]
 
 STELLAR_SCHEME: str = "web+stellar"

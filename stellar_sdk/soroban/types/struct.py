@@ -1,7 +1,7 @@
-from typing import Union, Sequence
+from typing import Sequence, Union
 
-from .base import BaseScValAlias
 from ... import xdr as stellar_xdr
+from .base import BaseScValAlias
 
 __all__ = ["StructField", "Struct", "TupleStruct"]
 
