@@ -59,9 +59,9 @@ clean:
 .PHONY: clean
 
 format:
-	autoflake --in-place --ignore-init-module-imports --remove-all-unused-imports .
-	isort .
-	black .
+	autoflake --in-place --ignore-init-module-imports --remove-all-unused-imports stellar_sdk/**/*.py tests/**/*.py examples/*.py
+	isort stellar_sdk/**/*.py tests/**/*.py examples/*.py
+	black stellar_sdk/**/*.py tests/**/*.py examples/*.py
 .PHONY: format
 
 replace-xdr-keywords:
