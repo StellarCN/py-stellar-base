@@ -15,6 +15,12 @@ XDRGEN_REPO=overcat/xdrgen
 XDRGEN_COMMIT=3a25689ac881fd9370b45ac2e98908cea86ddaf3
 XDRNEXT_COMMIT=e372df9f677961aac04c5a4cc80a3667f310b29f
 
+UNAME := $(shell uname)
+SED := sed
+ifeq ($(UNAME), Darwin)
+	SED := sed -i ''
+endif
+
 # default target does nothing
 .DEFAULT_GOAL: default
 default: ;
@@ -58,7 +64,12 @@ format:
 	black .
 .PHONY: format
 
+replace-xdr-keywords:
+	find xdr -type f -exec $(SED) 's/from;/from_;/g' {} +
+.PHONY: replace-xdr-keywords
+
 xdr-generate: $(XDRS)
+	make replace-xdr-keywords
 	docker run -it --rm -v $$PWD:/wd -w /wd ruby /bin/bash -c '\
 		gem install specific_install -v 0.3.8 && \
 		gem specific_install https://github.com/$(XDRGEN_REPO).git -b $(XDRGEN_COMMIT) && \
