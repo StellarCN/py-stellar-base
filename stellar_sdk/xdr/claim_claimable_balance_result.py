@@ -35,33 +35,29 @@ class ClaimClaimableBalanceResult:
         self.code = code
 
     @classmethod
-    def from_claim_claimable_balance_success(cls) -> "ClaimClaimableBalanceResult":
+    def from_claim_claimable_balance_success(cls) -> ClaimClaimableBalanceResult:
         return cls(ClaimClaimableBalanceResultCode.CLAIM_CLAIMABLE_BALANCE_SUCCESS)
 
     @classmethod
-    def from_claim_claimable_balance_does_not_exist(
-        cls,
-    ) -> "ClaimClaimableBalanceResult":
+    def from_claim_claimable_balance_does_not_exist(cls) -> ClaimClaimableBalanceResult:
         return cls(
             ClaimClaimableBalanceResultCode.CLAIM_CLAIMABLE_BALANCE_DOES_NOT_EXIST
         )
 
     @classmethod
-    def from_claim_claimable_balance_cannot_claim(cls) -> "ClaimClaimableBalanceResult":
+    def from_claim_claimable_balance_cannot_claim(cls) -> ClaimClaimableBalanceResult:
         return cls(ClaimClaimableBalanceResultCode.CLAIM_CLAIMABLE_BALANCE_CANNOT_CLAIM)
 
     @classmethod
-    def from_claim_claimable_balance_line_full(cls) -> "ClaimClaimableBalanceResult":
+    def from_claim_claimable_balance_line_full(cls) -> ClaimClaimableBalanceResult:
         return cls(ClaimClaimableBalanceResultCode.CLAIM_CLAIMABLE_BALANCE_LINE_FULL)
 
     @classmethod
-    def from_claim_claimable_balance_no_trust(cls) -> "ClaimClaimableBalanceResult":
+    def from_claim_claimable_balance_no_trust(cls) -> ClaimClaimableBalanceResult:
         return cls(ClaimClaimableBalanceResultCode.CLAIM_CLAIMABLE_BALANCE_NO_TRUST)
 
     @classmethod
-    def from_claim_claimable_balance_not_authorized(
-        cls,
-    ) -> "ClaimClaimableBalanceResult":
+    def from_claim_claimable_balance_not_authorized(cls) -> ClaimClaimableBalanceResult:
         return cls(
             ClaimClaimableBalanceResultCode.CLAIM_CLAIMABLE_BALANCE_NOT_AUTHORIZED
         )

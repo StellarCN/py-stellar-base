@@ -32,7 +32,7 @@ class SCMetaEntry:
         self.v0 = v0
 
     @classmethod
-    def from_sc_meta_v0(cls, v0: SCMetaV0) -> "SCMetaEntry":
+    def from_sc_meta_v0(cls, v0: SCMetaV0) -> SCMetaEntry:
         return cls(SCMetaKind.SC_META_V0, v0=v0)
 
     def pack(self, packer: Packer) -> None:

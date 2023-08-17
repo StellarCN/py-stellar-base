@@ -36,7 +36,7 @@ class EndSponsoringFutureReservesResult:
     @classmethod
     def from_end_sponsoring_future_reserves_success(
         cls,
-    ) -> "EndSponsoringFutureReservesResult":
+    ) -> EndSponsoringFutureReservesResult:
         return cls(
             EndSponsoringFutureReservesResultCode.END_SPONSORING_FUTURE_RESERVES_SUCCESS
         )
@@ -44,7 +44,7 @@ class EndSponsoringFutureReservesResult:
     @classmethod
     def from_end_sponsoring_future_reserves_not_sponsored(
         cls,
-    ) -> "EndSponsoringFutureReservesResult":
+    ) -> EndSponsoringFutureReservesResult:
         return cls(
             EndSponsoringFutureReservesResultCode.END_SPONSORING_FUTURE_RESERVES_NOT_SPONSORED
         )

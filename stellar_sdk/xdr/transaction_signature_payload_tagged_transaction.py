@@ -40,13 +40,13 @@ class TransactionSignaturePayloadTaggedTransaction:
     @classmethod
     def from_envelope_type_tx(
         cls, tx: Transaction
-    ) -> "TransactionSignaturePayloadTaggedTransaction":
+    ) -> TransactionSignaturePayloadTaggedTransaction:
         return cls(EnvelopeType.ENVELOPE_TYPE_TX, tx=tx)
 
     @classmethod
     def from_envelope_type_tx_fee_bump(
         cls, fee_bump: FeeBumpTransaction
-    ) -> "TransactionSignaturePayloadTaggedTransaction":
+    ) -> TransactionSignaturePayloadTaggedTransaction:
         return cls(EnvelopeType.ENVELOPE_TYPE_TX_FEE_BUMP, fee_bump=fee_bump)
 
     def pack(self, packer: Packer) -> None:

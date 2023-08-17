@@ -59,73 +59,73 @@ class InnerTransactionResultResult:
     @classmethod
     def from_tx_success(
         cls, results: List[OperationResult]
-    ) -> "InnerTransactionResultResult":
+    ) -> InnerTransactionResultResult:
         return cls(TransactionResultCode.txSUCCESS, results=results)
 
     @classmethod
     def from_tx_failed(
         cls, results: List[OperationResult]
-    ) -> "InnerTransactionResultResult":
+    ) -> InnerTransactionResultResult:
         return cls(TransactionResultCode.txFAILED, results=results)
 
     @classmethod
-    def from_tx_too_early(cls) -> "InnerTransactionResultResult":
+    def from_tx_too_early(cls) -> InnerTransactionResultResult:
         return cls(TransactionResultCode.txTOO_EARLY)
 
     @classmethod
-    def from_tx_too_late(cls) -> "InnerTransactionResultResult":
+    def from_tx_too_late(cls) -> InnerTransactionResultResult:
         return cls(TransactionResultCode.txTOO_LATE)
 
     @classmethod
-    def from_tx_missing_operation(cls) -> "InnerTransactionResultResult":
+    def from_tx_missing_operation(cls) -> InnerTransactionResultResult:
         return cls(TransactionResultCode.txMISSING_OPERATION)
 
     @classmethod
-    def from_tx_bad_seq(cls) -> "InnerTransactionResultResult":
+    def from_tx_bad_seq(cls) -> InnerTransactionResultResult:
         return cls(TransactionResultCode.txBAD_SEQ)
 
     @classmethod
-    def from_tx_bad_auth(cls) -> "InnerTransactionResultResult":
+    def from_tx_bad_auth(cls) -> InnerTransactionResultResult:
         return cls(TransactionResultCode.txBAD_AUTH)
 
     @classmethod
-    def from_tx_insufficient_balance(cls) -> "InnerTransactionResultResult":
+    def from_tx_insufficient_balance(cls) -> InnerTransactionResultResult:
         return cls(TransactionResultCode.txINSUFFICIENT_BALANCE)
 
     @classmethod
-    def from_tx_no_account(cls) -> "InnerTransactionResultResult":
+    def from_tx_no_account(cls) -> InnerTransactionResultResult:
         return cls(TransactionResultCode.txNO_ACCOUNT)
 
     @classmethod
-    def from_tx_insufficient_fee(cls) -> "InnerTransactionResultResult":
+    def from_tx_insufficient_fee(cls) -> InnerTransactionResultResult:
         return cls(TransactionResultCode.txINSUFFICIENT_FEE)
 
     @classmethod
-    def from_tx_bad_auth_extra(cls) -> "InnerTransactionResultResult":
+    def from_tx_bad_auth_extra(cls) -> InnerTransactionResultResult:
         return cls(TransactionResultCode.txBAD_AUTH_EXTRA)
 
     @classmethod
-    def from_tx_internal_error(cls) -> "InnerTransactionResultResult":
+    def from_tx_internal_error(cls) -> InnerTransactionResultResult:
         return cls(TransactionResultCode.txINTERNAL_ERROR)
 
     @classmethod
-    def from_tx_not_supported(cls) -> "InnerTransactionResultResult":
+    def from_tx_not_supported(cls) -> InnerTransactionResultResult:
         return cls(TransactionResultCode.txNOT_SUPPORTED)
 
     @classmethod
-    def from_tx_bad_sponsorship(cls) -> "InnerTransactionResultResult":
+    def from_tx_bad_sponsorship(cls) -> InnerTransactionResultResult:
         return cls(TransactionResultCode.txBAD_SPONSORSHIP)
 
     @classmethod
-    def from_tx_bad_min_seq_age_or_gap(cls) -> "InnerTransactionResultResult":
+    def from_tx_bad_min_seq_age_or_gap(cls) -> InnerTransactionResultResult:
         return cls(TransactionResultCode.txBAD_MIN_SEQ_AGE_OR_GAP)
 
     @classmethod
-    def from_tx_malformed(cls) -> "InnerTransactionResultResult":
+    def from_tx_malformed(cls) -> InnerTransactionResultResult:
         return cls(TransactionResultCode.txMALFORMED)
 
     @classmethod
-    def from_tx_soroban_resource_limit_exceeded(cls) -> "InnerTransactionResultResult":
+    def from_tx_soroban_resource_limit_exceeded(cls) -> InnerTransactionResultResult:
         return cls(TransactionResultCode.txSOROBAN_RESOURCE_LIMIT_EXCEEDED)
 
     def pack(self, packer: Packer) -> None:

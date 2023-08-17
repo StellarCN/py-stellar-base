@@ -40,7 +40,7 @@ class TxSetComponent:
     @classmethod
     def from_txset_comp_txs_maybe_discounted_fee(
         cls, txs_maybe_discounted_fee: TxSetComponentTxsMaybeDiscountedFee
-    ) -> "TxSetComponent":
+    ) -> TxSetComponent:
         return cls(
             TxSetComponentType.TXSET_COMP_TXS_MAYBE_DISCOUNTED_FEE,
             txs_maybe_discounted_fee=txs_maybe_discounted_fee,

@@ -44,7 +44,7 @@ class HostFunction:
     @classmethod
     def from_host_function_type_invoke_contract(
         cls, invoke_contract: SCVec
-    ) -> "HostFunction":
+    ) -> HostFunction:
         return cls(
             HostFunctionType.HOST_FUNCTION_TYPE_INVOKE_CONTRACT,
             invoke_contract=invoke_contract,
@@ -53,16 +53,14 @@ class HostFunction:
     @classmethod
     def from_host_function_type_create_contract(
         cls, create_contract: CreateContractArgs
-    ) -> "HostFunction":
+    ) -> HostFunction:
         return cls(
             HostFunctionType.HOST_FUNCTION_TYPE_CREATE_CONTRACT,
             create_contract=create_contract,
         )
 
     @classmethod
-    def from_host_function_type_upload_contract_wasm(
-        cls, wasm: bytes
-    ) -> "HostFunction":
+    def from_host_function_type_upload_contract_wasm(cls, wasm: bytes) -> HostFunction:
         return cls(HostFunctionType.HOST_FUNCTION_TYPE_UPLOAD_CONTRACT_WASM, wasm=wasm)
 
     def pack(self, packer: Packer) -> None:

@@ -34,13 +34,13 @@ class StellarValueExt:
         self.lc_value_signature = lc_value_signature
 
     @classmethod
-    def from_stellar_value_basic(cls) -> "StellarValueExt":
+    def from_stellar_value_basic(cls) -> StellarValueExt:
         return cls(StellarValueType.STELLAR_VALUE_BASIC)
 
     @classmethod
     def from_stellar_value_signed(
         cls, lc_value_signature: LedgerCloseValueSignature
-    ) -> "StellarValueExt":
+    ) -> StellarValueExt:
         return cls(
             StellarValueType.STELLAR_VALUE_SIGNED, lc_value_signature=lc_value_signature
         )

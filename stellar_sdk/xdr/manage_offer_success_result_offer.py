@@ -37,17 +37,17 @@ class ManageOfferSuccessResultOffer:
     @classmethod
     def from_manage_offer_created(
         cls, offer: OfferEntry
-    ) -> "ManageOfferSuccessResultOffer":
+    ) -> ManageOfferSuccessResultOffer:
         return cls(ManageOfferEffect.MANAGE_OFFER_CREATED, offer=offer)
 
     @classmethod
     def from_manage_offer_updated(
         cls, offer: OfferEntry
-    ) -> "ManageOfferSuccessResultOffer":
+    ) -> ManageOfferSuccessResultOffer:
         return cls(ManageOfferEffect.MANAGE_OFFER_UPDATED, offer=offer)
 
     @classmethod
-    def from_manage_offer_deleted(cls) -> "ManageOfferSuccessResultOffer":
+    def from_manage_offer_deleted(cls) -> ManageOfferSuccessResultOffer:
         return cls(ManageOfferEffect.MANAGE_OFFER_DELETED)
 
     def pack(self, packer: Packer) -> None:

@@ -43,7 +43,7 @@ class RevokeSponsorshipOp:
     @classmethod
     def from_revoke_sponsorship_ledger_entry(
         cls, ledger_key: LedgerKey
-    ) -> "RevokeSponsorshipOp":
+    ) -> RevokeSponsorshipOp:
         return cls(
             RevokeSponsorshipType.REVOKE_SPONSORSHIP_LEDGER_ENTRY, ledger_key=ledger_key
         )
@@ -51,7 +51,7 @@ class RevokeSponsorshipOp:
     @classmethod
     def from_revoke_sponsorship_signer(
         cls, signer: RevokeSponsorshipOpSigner
-    ) -> "RevokeSponsorshipOp":
+    ) -> RevokeSponsorshipOp:
         return cls(RevokeSponsorshipType.REVOKE_SPONSORSHIP_SIGNER, signer=signer)
 
     def pack(self, packer: Packer) -> None:

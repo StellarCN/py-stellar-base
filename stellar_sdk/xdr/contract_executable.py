@@ -34,11 +34,11 @@ class ContractExecutable:
         self.wasm_hash = wasm_hash
 
     @classmethod
-    def from_contract_executable_wasm(cls, wasm_hash: Hash) -> "ContractExecutable":
+    def from_contract_executable_wasm(cls, wasm_hash: Hash) -> ContractExecutable:
         return cls(ContractExecutableType.CONTRACT_EXECUTABLE_WASM, wasm_hash=wasm_hash)
 
     @classmethod
-    def from_contract_executable_token(cls) -> "ContractExecutable":
+    def from_contract_executable_token(cls) -> ContractExecutable:
         return cls(ContractExecutableType.CONTRACT_EXECUTABLE_TOKEN)
 
     def pack(self, packer: Packer) -> None:

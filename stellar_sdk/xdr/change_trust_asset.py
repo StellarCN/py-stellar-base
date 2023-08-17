@@ -49,25 +49,25 @@ class ChangeTrustAsset:
         self.liquidity_pool = liquidity_pool
 
     @classmethod
-    def from_asset_type_native(cls) -> "ChangeTrustAsset":
+    def from_asset_type_native(cls) -> ChangeTrustAsset:
         return cls(AssetType.ASSET_TYPE_NATIVE)
 
     @classmethod
     def from_asset_type_credit_alphanum4(
         cls, alpha_num4: AlphaNum4
-    ) -> "ChangeTrustAsset":
+    ) -> ChangeTrustAsset:
         return cls(AssetType.ASSET_TYPE_CREDIT_ALPHANUM4, alpha_num4=alpha_num4)
 
     @classmethod
     def from_asset_type_credit_alphanum12(
         cls, alpha_num12: AlphaNum12
-    ) -> "ChangeTrustAsset":
+    ) -> ChangeTrustAsset:
         return cls(AssetType.ASSET_TYPE_CREDIT_ALPHANUM12, alpha_num12=alpha_num12)
 
     @classmethod
     def from_asset_type_pool_share(
         cls, liquidity_pool: LiquidityPoolParameters
-    ) -> "ChangeTrustAsset":
+    ) -> ChangeTrustAsset:
         return cls(AssetType.ASSET_TYPE_POOL_SHARE, liquidity_pool=liquidity_pool)
 
     def pack(self, packer: Packer) -> None:

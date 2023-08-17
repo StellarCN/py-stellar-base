@@ -817,7 +817,7 @@ struct SorobanResources
     uint32 writeBytes;
 
     // Maximum size of dynamic metadata produced by this contract (
-    // bytes read from ledger + bytes written to ledger + event bytes written to meta).
+    // currently only includes the events).
     uint32 extendedMetaDataSizeBytes;
 };
 
@@ -1793,8 +1793,7 @@ enum InvokeHostFunctionResultCode
     // codes considered as "failure" for the operation
     INVOKE_HOST_FUNCTION_MALFORMED = -1,
     INVOKE_HOST_FUNCTION_TRAPPED = -2,
-    INVOKE_HOST_FUNCTION_RESOURCE_LIMIT_EXCEEDED = -3,
-    INVOKE_HOST_FUNCTION_ENTRY_EXPIRED = -4
+    INVOKE_HOST_FUNCTION_RESOURCE_LIMIT_EXCEEDED = -3
 };
 
 union InvokeHostFunctionResult switch (InvokeHostFunctionResultCode code)
@@ -1804,7 +1803,6 @@ case INVOKE_HOST_FUNCTION_SUCCESS:
 case INVOKE_HOST_FUNCTION_MALFORMED:
 case INVOKE_HOST_FUNCTION_TRAPPED:
 case INVOKE_HOST_FUNCTION_RESOURCE_LIMIT_EXCEEDED:
-case INVOKE_HOST_FUNCTION_ENTRY_EXPIRED:
     void;
 };
 

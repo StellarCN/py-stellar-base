@@ -67,21 +67,21 @@ class SCPStatementPledges:
         self.nominate = nominate
 
     @classmethod
-    def from_scp_st_prepare(cls, prepare: SCPStatementPrepare) -> "SCPStatementPledges":
+    def from_scp_st_prepare(cls, prepare: SCPStatementPrepare) -> SCPStatementPledges:
         return cls(SCPStatementType.SCP_ST_PREPARE, prepare=prepare)
 
     @classmethod
-    def from_scp_st_confirm(cls, confirm: SCPStatementConfirm) -> "SCPStatementPledges":
+    def from_scp_st_confirm(cls, confirm: SCPStatementConfirm) -> SCPStatementPledges:
         return cls(SCPStatementType.SCP_ST_CONFIRM, confirm=confirm)
 
     @classmethod
     def from_scp_st_externalize(
         cls, externalize: SCPStatementExternalize
-    ) -> "SCPStatementPledges":
+    ) -> SCPStatementPledges:
         return cls(SCPStatementType.SCP_ST_EXTERNALIZE, externalize=externalize)
 
     @classmethod
-    def from_scp_st_nominate(cls, nominate: SCPNomination) -> "SCPStatementPledges":
+    def from_scp_st_nominate(cls, nominate: SCPNomination) -> SCPStatementPledges:
         return cls(SCPStatementType.SCP_ST_NOMINATE, nominate=nominate)
 
     def pack(self, packer: Packer) -> None:

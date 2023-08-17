@@ -35,29 +35,27 @@ class LiquidityPoolWithdrawResult:
         self.code = code
 
     @classmethod
-    def from_liquidity_pool_withdraw_success(cls) -> "LiquidityPoolWithdrawResult":
+    def from_liquidity_pool_withdraw_success(cls) -> LiquidityPoolWithdrawResult:
         return cls(LiquidityPoolWithdrawResultCode.LIQUIDITY_POOL_WITHDRAW_SUCCESS)
 
     @classmethod
-    def from_liquidity_pool_withdraw_malformed(cls) -> "LiquidityPoolWithdrawResult":
+    def from_liquidity_pool_withdraw_malformed(cls) -> LiquidityPoolWithdrawResult:
         return cls(LiquidityPoolWithdrawResultCode.LIQUIDITY_POOL_WITHDRAW_MALFORMED)
 
     @classmethod
-    def from_liquidity_pool_withdraw_no_trust(cls) -> "LiquidityPoolWithdrawResult":
+    def from_liquidity_pool_withdraw_no_trust(cls) -> LiquidityPoolWithdrawResult:
         return cls(LiquidityPoolWithdrawResultCode.LIQUIDITY_POOL_WITHDRAW_NO_TRUST)
 
     @classmethod
-    def from_liquidity_pool_withdraw_underfunded(cls) -> "LiquidityPoolWithdrawResult":
+    def from_liquidity_pool_withdraw_underfunded(cls) -> LiquidityPoolWithdrawResult:
         return cls(LiquidityPoolWithdrawResultCode.LIQUIDITY_POOL_WITHDRAW_UNDERFUNDED)
 
     @classmethod
-    def from_liquidity_pool_withdraw_line_full(cls) -> "LiquidityPoolWithdrawResult":
+    def from_liquidity_pool_withdraw_line_full(cls) -> LiquidityPoolWithdrawResult:
         return cls(LiquidityPoolWithdrawResultCode.LIQUIDITY_POOL_WITHDRAW_LINE_FULL)
 
     @classmethod
-    def from_liquidity_pool_withdraw_under_minimum(
-        cls,
-    ) -> "LiquidityPoolWithdrawResult":
+    def from_liquidity_pool_withdraw_under_minimum(cls) -> LiquidityPoolWithdrawResult:
         return cls(
             LiquidityPoolWithdrawResultCode.LIQUIDITY_POOL_WITHDRAW_UNDER_MINIMUM
         )

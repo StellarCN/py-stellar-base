@@ -48,23 +48,23 @@ class Memo:
         self.ret_hash = ret_hash
 
     @classmethod
-    def from_memo_none(cls) -> "Memo":
+    def from_memo_none(cls) -> Memo:
         return cls(MemoType.MEMO_NONE)
 
     @classmethod
-    def from_memo_text(cls, text: bytes) -> "Memo":
+    def from_memo_text(cls, text: bytes) -> Memo:
         return cls(MemoType.MEMO_TEXT, text=text)
 
     @classmethod
-    def from_memo_id(cls, id: Uint64) -> "Memo":
+    def from_memo_id(cls, id: Uint64) -> Memo:
         return cls(MemoType.MEMO_ID, id=id)
 
     @classmethod
-    def from_memo_hash(cls, hash: Hash) -> "Memo":
+    def from_memo_hash(cls, hash: Hash) -> Memo:
         return cls(MemoType.MEMO_HASH, hash=hash)
 
     @classmethod
-    def from_memo_return(cls, ret_hash: Hash) -> "Memo":
+    def from_memo_return(cls, ret_hash: Hash) -> Memo:
         return cls(MemoType.MEMO_RETURN, ret_hash=ret_hash)
 
     def pack(self, packer: Packer) -> None:

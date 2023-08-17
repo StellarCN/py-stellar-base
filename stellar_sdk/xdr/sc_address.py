@@ -37,11 +37,11 @@ class SCAddress:
         self.contract_id = contract_id
 
     @classmethod
-    def from_sc_address_type_account(cls, account_id: AccountID) -> "SCAddress":
+    def from_sc_address_type_account(cls, account_id: AccountID) -> SCAddress:
         return cls(SCAddressType.SC_ADDRESS_TYPE_ACCOUNT, account_id=account_id)
 
     @classmethod
-    def from_sc_address_type_contract(cls, contract_id: Hash) -> "SCAddress":
+    def from_sc_address_type_contract(cls, contract_id: Hash) -> SCAddress:
         return cls(SCAddressType.SC_ADDRESS_TYPE_CONTRACT, contract_id=contract_id)
 
     def pack(self, packer: Packer) -> None:

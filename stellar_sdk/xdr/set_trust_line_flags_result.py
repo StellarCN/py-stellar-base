@@ -35,27 +35,27 @@ class SetTrustLineFlagsResult:
         self.code = code
 
     @classmethod
-    def from_set_trust_line_flags_success(cls) -> "SetTrustLineFlagsResult":
+    def from_set_trust_line_flags_success(cls) -> SetTrustLineFlagsResult:
         return cls(SetTrustLineFlagsResultCode.SET_TRUST_LINE_FLAGS_SUCCESS)
 
     @classmethod
-    def from_set_trust_line_flags_malformed(cls) -> "SetTrustLineFlagsResult":
+    def from_set_trust_line_flags_malformed(cls) -> SetTrustLineFlagsResult:
         return cls(SetTrustLineFlagsResultCode.SET_TRUST_LINE_FLAGS_MALFORMED)
 
     @classmethod
-    def from_set_trust_line_flags_no_trust_line(cls) -> "SetTrustLineFlagsResult":
+    def from_set_trust_line_flags_no_trust_line(cls) -> SetTrustLineFlagsResult:
         return cls(SetTrustLineFlagsResultCode.SET_TRUST_LINE_FLAGS_NO_TRUST_LINE)
 
     @classmethod
-    def from_set_trust_line_flags_cant_revoke(cls) -> "SetTrustLineFlagsResult":
+    def from_set_trust_line_flags_cant_revoke(cls) -> SetTrustLineFlagsResult:
         return cls(SetTrustLineFlagsResultCode.SET_TRUST_LINE_FLAGS_CANT_REVOKE)
 
     @classmethod
-    def from_set_trust_line_flags_invalid_state(cls) -> "SetTrustLineFlagsResult":
+    def from_set_trust_line_flags_invalid_state(cls) -> SetTrustLineFlagsResult:
         return cls(SetTrustLineFlagsResultCode.SET_TRUST_LINE_FLAGS_INVALID_STATE)
 
     @classmethod
-    def from_set_trust_line_flags_low_reserve(cls) -> "SetTrustLineFlagsResult":
+    def from_set_trust_line_flags_low_reserve(cls) -> SetTrustLineFlagsResult:
         return cls(SetTrustLineFlagsResultCode.SET_TRUST_LINE_FLAGS_LOW_RESERVE)
 
     def pack(self, packer: Packer) -> None:

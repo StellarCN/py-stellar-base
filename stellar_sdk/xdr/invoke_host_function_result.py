@@ -23,7 +23,6 @@ class InvokeHostFunctionResult:
         case INVOKE_HOST_FUNCTION_MALFORMED:
         case INVOKE_HOST_FUNCTION_TRAPPED:
         case INVOKE_HOST_FUNCTION_RESOURCE_LIMIT_EXCEEDED:
-        case INVOKE_HOST_FUNCTION_ENTRY_EXPIRED:
             void;
         };
     """
@@ -39,30 +38,26 @@ class InvokeHostFunctionResult:
     @classmethod
     def from_invoke_host_function_success(
         cls, success: Hash
-    ) -> "InvokeHostFunctionResult":
+    ) -> InvokeHostFunctionResult:
         return cls(
             InvokeHostFunctionResultCode.INVOKE_HOST_FUNCTION_SUCCESS, success=success
         )
 
     @classmethod
-    def from_invoke_host_function_malformed(cls) -> "InvokeHostFunctionResult":
+    def from_invoke_host_function_malformed(cls) -> InvokeHostFunctionResult:
         return cls(InvokeHostFunctionResultCode.INVOKE_HOST_FUNCTION_MALFORMED)
 
     @classmethod
-    def from_invoke_host_function_trapped(cls) -> "InvokeHostFunctionResult":
+    def from_invoke_host_function_trapped(cls) -> InvokeHostFunctionResult:
         return cls(InvokeHostFunctionResultCode.INVOKE_HOST_FUNCTION_TRAPPED)
 
     @classmethod
     def from_invoke_host_function_resource_limit_exceeded(
         cls,
-    ) -> "InvokeHostFunctionResult":
+    ) -> InvokeHostFunctionResult:
         return cls(
             InvokeHostFunctionResultCode.INVOKE_HOST_FUNCTION_RESOURCE_LIMIT_EXCEEDED
         )
-
-    @classmethod
-    def from_invoke_host_function_entry_expired(cls) -> "InvokeHostFunctionResult":
-        return cls(InvokeHostFunctionResultCode.INVOKE_HOST_FUNCTION_ENTRY_EXPIRED)
 
     def pack(self, packer: Packer) -> None:
         self.code.pack(packer)
@@ -80,8 +75,6 @@ class InvokeHostFunctionResult:
             == InvokeHostFunctionResultCode.INVOKE_HOST_FUNCTION_RESOURCE_LIMIT_EXCEEDED
         ):
             return
-        if self.code == InvokeHostFunctionResultCode.INVOKE_HOST_FUNCTION_ENTRY_EXPIRED:
-            return
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> InvokeHostFunctionResult:
@@ -97,8 +90,6 @@ class InvokeHostFunctionResult:
             code
             == InvokeHostFunctionResultCode.INVOKE_HOST_FUNCTION_RESOURCE_LIMIT_EXCEEDED
         ):
-            return cls(code=code)
-        if code == InvokeHostFunctionResultCode.INVOKE_HOST_FUNCTION_ENTRY_EXPIRED:
             return cls(code=code)
         return cls(code=code)
 
