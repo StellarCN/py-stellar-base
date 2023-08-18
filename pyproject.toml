@@ -69,6 +69,8 @@ types-requests = {version = "^2.29.0", markers = "platform_python_implementation
 autoflake = "^2.1"
 isort = "^5.10.1"
 black = "^23.3.0"
+requests-mock = "^1.11.0"
+aioresponses = "^0.7.4"
 
 [tool.poetry.extras]
 docs = ["sphinx", "sphinx-rtd-theme", "sphinx-autodoc-typehints"]
