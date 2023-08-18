@@ -40,7 +40,7 @@ jobs:
 
       - name: Ensure httpbin server is running
         run: |
-          while true; do response=$(curl -s -o /dev/null -w "%{http_code}" http://httpbin.org/get); if [ "$response" = "200" ]; then echo "HTTP 200 OK received"; break; else echo "Retrying..."; sleep 1; fi; done
+          while true; do response=$(curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:9876/get); if [ "$response" = "200" ]; then echo "HTTP 200 OK received"; break; else echo "Retrying..."; sleep 1; fi; done
 
       - name: Test with pytest
         run: poetry run pytest -v -rs tests --runslow --cov=./ --cov-report=xml
