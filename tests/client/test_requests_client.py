@@ -1,13 +1,14 @@
 import pytest
 
 from stellar_sdk.client.requests_client import USER_AGENT, RequestsClient
+from tests import HTTPBIN_URL
 
 
 @pytest.mark.slow
 class TestRequestsClient:
     def test_get(self):
         client = RequestsClient()
-        url = "https://httpbin.overcat.me/get"
+        url = HTTPBIN_URL + "get"
         params = {"hello": "world", "stellar": "sdk"}
         resp = client.get(url, params=params)
         assert resp.status_code == 200
@@ -17,7 +18,7 @@ class TestRequestsClient:
 
     def test_post(self):
         client = RequestsClient()
-        url = "https://httpbin.overcat.me/post"
+        url = HTTPBIN_URL + "post"
         data = {
             "tx": "AAAAABa3N0+hJk17vP/AnYK5xV4o/PhOnEfgi36HlYo4g+3nAAAAZQFDfjoAAaTSAAAAAA"
             "AAAAEAAAAJX3VwZGF0ZWRfAAAAAAAAAQAAAAEAAAAAFrc3T6EmTXu8/8CdgrnFXij8+E6cR+"
@@ -45,7 +46,7 @@ class TestRequestsClient:
 
     def test_with(self):
         with RequestsClient() as client:
-            url = "https://httpbin.overcat.me/get"
+            url = HTTPBIN_URL + "get"
             params = {"hello": "world", "stellar": "sdk"}
             resp = client.get(url, params=params)
             assert resp.status_code == 200
@@ -56,7 +57,7 @@ class TestRequestsClient:
     def test_custom_headers(self):
         custom_headers = {"a": "b", "c": "d"}
         client = RequestsClient(custom_headers=custom_headers)
-        url = "https://httpbin.overcat.me/get"
+        url = HTTPBIN_URL + "get"
         params = {"hello": "world", "stellar": "sdk"}
         resp = client.get(url, params=params)
         assert resp.status_code == 200

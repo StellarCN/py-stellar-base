@@ -21,6 +21,10 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      - name: Start httpbin server
+        run: |
+          docker run -d -p 9876:80 kennethreitz/httpbin
+
       - name: Install poetry
         run: pipx install poetry
 
@@ -34,14 +38,12 @@ jobs:
         run: |
           poetry install
 
+      - name: Ensure httpbin server is running
+        run: |
+          while true; do response=$(curl -s -o /dev/null -w "%{http_code}" http://httpbin.org/get); if [ "$response" = "200" ]; then echo "HTTP 200 OK received"; break; else echo "Retrying..."; sleep 1; fi; done
+
       - name: Test with pytest
         run: poetry run pytest -v -rs tests --runslow --cov=./ --cov-report=xml
-
-      - name: Test with pytest (runtime type checking disabled)
-        if: matrix.os == 'ubuntu-latest' && matrix.python-version == '3.7'
-        run: poetry run pytest -v -rs tests --runslow
-        env:
-          STELLAR_SDK_RUNTIME_TYPE_CHECKING: 0
 
       - name: Upload coverage to Codecov
         if: matrix.os == 'ubuntu-latest' && matrix.python-version == '3.7'

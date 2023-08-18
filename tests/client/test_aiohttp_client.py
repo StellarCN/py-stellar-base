@@ -1,6 +1,7 @@
 import pytest
 
 from stellar_sdk.client.aiohttp_client import USER_AGENT, AiohttpClient
+from tests import HTTPBIN_URL
 
 
 @pytest.mark.slow
@@ -9,7 +10,7 @@ class TestAiohttpClient:
     async def test_get(self):
         user_agent = "Hello/Stellar/overcat"
         client = AiohttpClient(pool_size=10, user_agent=user_agent)
-        url = "https://httpbin.overcat.me/get"
+        url = HTTPBIN_URL + "get"
         params = {"hello": "world", "stellar": "sdk"}
         resp = await client.get(url, params=params)
         assert resp.status_code == 200
@@ -21,7 +22,7 @@ class TestAiohttpClient:
     @pytest.mark.asyncio
     async def test_post(self):
         client = AiohttpClient()
-        url = "https://httpbin.overcat.me/post"
+        url = HTTPBIN_URL + "post"
         data = {
             "tx": "AAAAABa3N0+hJk17vP/AnYK5xV4o/PhOnEfgi36HlYo4g+3nAAAAZQFDfjoAAaTSAAAAAA"
             "AAAAEAAAAJX3VwZGF0ZWRfAAAAAAAAAQAAAAEAAAAAFrc3T6EmTXu8/8CdgrnFXij8+E6cR+"
@@ -52,7 +53,7 @@ class TestAiohttpClient:
     @pytest.mark.asyncio
     async def test_with(self):
         async with AiohttpClient() as client:
-            url = "https://httpbin.overcat.me/get"
+            url = HTTPBIN_URL + "get"
             params = {"hello": "world", "stellar": "sdk"}
             resp = await client.get(url, params=params)
             assert resp.status_code == 200
@@ -67,7 +68,7 @@ class TestAiohttpClient:
         client = AiohttpClient(
             pool_size=10, user_agent=user_agent, custom_headers=custom_headers
         )
-        url = "https://httpbin.overcat.me/get"
+        url = HTTPBIN_URL + "get"
         params = {"hello": "world", "stellar": "sdk"}
         resp = await client.get(url, params=params)
         assert resp.status_code == 200
