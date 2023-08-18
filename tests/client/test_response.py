@@ -1,16 +1,13 @@
-import pytest
-
 from stellar_sdk.client.response import Response
 
 
-@pytest.mark.slow
 class TestResponse:
     def test_json(self):
         resp = Response(
             status_code=200,
             text='{"a": "b", "c": "d"}',
             headers={"User-Agent": "Stellar"},
-            url="https://httpbin.overcat.me",
+            url="https://overcat.me",
         )
         assert resp.json() == {"a": "b", "c": "d"}
 
@@ -19,21 +16,21 @@ class TestResponse:
             status_code=200,
             text="{'a': 'b', 'c': 'd'}",
             headers={"User-Agent": "Stellar"},
-            url="https://httpbin.overcat.me",
+            url="https://stellar.org",
         )
 
         resp2 = Response(
             status_code=200,
             text="{'a': 'b', 'c': 'd'}",
             headers={"User-Agent": "Stellar"},
-            url="https://httpbin.overcat.me",
+            url="https://stellar.org",
         )
 
         resp3 = Response(
             status_code=404,
             text="{'a': 'b', 'c': 'd'}",
             headers={"User-Agent": "Stellar"},
-            url="https://httpbin.overcat.me",
+            url="https://stellar.org",
         )
 
         resp4 = "BAD TYPE"
