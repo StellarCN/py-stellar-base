@@ -86,7 +86,7 @@ def resolve_stellar_address(
     :param federation_url: The federation server URL (ex. ``"https://stellar.org/federation"``),
         if you don't set this value, we will try to get it from `stellar_address`.
     :param use_http: Specifies whether the request should go over plain HTTP vs HTTPS.
-        Note it is recommend that you **always** use HTTPS.
+        Note it is recommended that you **always** use HTTPS.
     :return: Federation record.
     """
     if not client:
@@ -118,7 +118,7 @@ async def resolve_stellar_address_async(
     :param federation_url: The federation server URL (ex. ``"https://stellar.org/federation"``),
         if you don't set this value, we will try to get it from `stellar_address`.
     :param use_http: Specifies whether the request should go over plain HTTP vs HTTPS.
-        Note it is recommend that you **always** use HTTPS.
+        Note it is recommended that you **always** use HTTPS.
     :return: Federation record.
     """
     if not client:
@@ -151,7 +151,7 @@ def resolve_account_id(
     :param federation_url: The federation server URL (ex. ``"https://stellar.org/federation"``).
     :param client: Http Client used to send the request.
     :param use_http: Specifies whether the request should go over plain HTTP vs HTTPS.
-        Note it is recommend that you **always** use HTTPS.
+        Note it is recommended that you **always** use HTTPS.
     :return: Federation record.
     """
     if domain is None and federation_url is None:
@@ -186,7 +186,7 @@ async def resolve_account_id_async(
     :param federation_url: The federation server URL (ex. ``"https://stellar.org/federation"``).
     :param client: Http Client used to send the request.
     :param use_http: Specifies whether the request should go over plain HTTP vs HTTPS.
-        Note it is recommend that you **always** use HTTPS.
+        Note it is recommended that you **always** use HTTPS.
     :return: Federation record.
     """
     if domain is None and federation_url is None:
