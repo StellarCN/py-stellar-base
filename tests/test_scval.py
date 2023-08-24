@@ -270,3 +270,70 @@ def test_vec():
     )
     assert scval == expected_scval
     assert from_vec(scval) == v
+
+
+def test_enum_with_value():
+    key = "Address"
+    value = to_address("GAHJJJKMOKYE4RVPZEWZTKH5FVI4PA3VL7GK2LFNUBSGBV6OJP7TQSLX")
+    scval = to_enum(key, value)
+    expected_scval = xdr.SCVal.from_scv_vec(xdr.SCVec([to_symbol(key), value]))
+    assert scval == expected_scval
+    assert from_enum(scval) == (key, value)
+
+
+def test_enum_without_value():
+    key = "Address"
+    scval = to_enum(key, None)
+    expected_scval = xdr.SCVal.from_scv_vec(xdr.SCVec([to_symbol(key)]))
+    assert scval == expected_scval
+    assert from_enum(scval) == (key, None)
+
+
+def test_tuple_struct():
+    v = [to_int32(1), to_int256(23423432), to_string("world")]
+    scval = to_tuple_struct(v)
+    expected_scval = xdr.SCVal.from_scv_vec(
+        xdr.SCVec([to_int32(1), to_int256(23423432), to_string("world")])
+    )
+    assert scval == expected_scval
+    assert from_tuple_struct(scval) == v
+
+
+def test_struct():
+    v = {
+        "data1": to_int32(1),
+        "data2": to_int256(23423432),
+        "data3": to_string("world"),
+        "data4": to_vec([to_int32(1), to_int256(23423432), to_string("world")]),
+        "data5": to_struct(
+            {
+                "inner_data1": to_int32(1),
+                "inner_data2": to_int256(23423432),
+            }
+        ),
+    }
+    scval = to_struct(v)
+    expected_scval = xdr.SCVal.from_scv_map(
+        xdr.SCMap(
+            [
+                xdr.SCMapEntry(to_symbol("data1"), to_int32(1)),
+                xdr.SCMapEntry(to_symbol("data2"), to_int256(23423432)),
+                xdr.SCMapEntry(to_symbol("data3"), to_string("world")),
+                xdr.SCMapEntry(
+                    to_symbol("data4"),
+                    to_vec([to_int32(1), to_int256(23423432), to_string("world")]),
+                ),
+                xdr.SCMapEntry(
+                    to_symbol("data5"),
+                    to_map(
+                        {
+                            to_symbol("inner_data1"): to_int32(1),
+                            to_symbol("inner_data2"): to_int256(23423432),
+                        }
+                    ),
+                ),
+            ]
+        )
+    )
+    assert scval == expected_scval
+    assert from_struct(scval) == v

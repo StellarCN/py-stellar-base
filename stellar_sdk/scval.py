@@ -1,4 +1,4 @@
-from typing import Dict, List, Union
+from typing import Dict, List, Optional, Sequence, Tuple, Union
 
 from . import xdr as stellar_xdr
 from .address import Address
@@ -38,7 +38,15 @@ __all__ = [
     "from_uint256",
     "to_vec",
     "from_vec",
+    "to_enum",
+    "from_enum",
+    "to_struct",
+    "from_struct",
+    "to_tuple_struct",
+    "from_tuple_struct",
 ]
+
+from .xdr import SCVal
 
 
 def to_address(value: Union[Address, str]) -> stellar_xdr.SCVal:
@@ -507,13 +515,13 @@ def from_uint256(sc_val: stellar_xdr.SCVal) -> int:
     return int.from_bytes(value_bytes, "big", signed=False)
 
 
-def to_vec(value: List[stellar_xdr.SCVal]) -> stellar_xdr.SCVal:
+def to_vec(value: Sequence[stellar_xdr.SCVal]) -> stellar_xdr.SCVal:
     """Creates a new :class:`stellar_sdk.xdr.SCVal` XDR object from a list of :class:`stellar_sdk.xdr.SCVal` XDR objects.
 
     :param value: The list of :class:`stellar_sdk.xdr.SCVal` XDR objects.
     :return: A new :class:`stellar_sdk.xdr.SCVal` XDR object with type :class:`stellar_sdk.xdr.SCValType.SCV_VEC`.
     """
-    return stellar_xdr.SCVal.from_scv_vec(stellar_xdr.SCVec(value))
+    return stellar_xdr.SCVal.from_scv_vec(stellar_xdr.SCVec(list(value)))
 
 
 def from_vec(sc_val: stellar_xdr.SCVal) -> List[stellar_xdr.SCVal]:
@@ -527,3 +535,48 @@ def from_vec(sc_val: stellar_xdr.SCVal) -> List[stellar_xdr.SCVal]:
         raise ValueError(f"Invalid sc_val type, must be VEC, got {sc_val.type}")
     assert sc_val.vec is not None
     return sc_val.vec.sc_vec
+
+
+def to_enum(key: str, value: Optional[stellar_xdr.SCVal]) -> stellar_xdr.SCVal:
+    scv = [to_symbol(key)]
+    if value is not None:
+        scv.append(value)
+    return to_vec(scv)
+
+
+def from_enum(sc_val: stellar_xdr.SCVal) -> Tuple[str, Optional[stellar_xdr.SCVal]]:
+    vec = from_vec(sc_val)
+    if len(vec) < 1 or len(vec) > 2:
+        raise ValueError(
+            f"Invalid sc_val, can not parse enum, sc_val: {sc_val.to_xdr()}"
+        )
+    key = from_symbol(vec[0])
+    value = None
+    if len(vec) == 2:
+        value = vec[1]
+    return key, value
+
+
+def to_tuple_struct(fields: Sequence[stellar_xdr.SCVal]) -> stellar_xdr.SCVal:
+    return to_vec(list(fields))
+
+
+def from_tuple_struct(sc_val: stellar_xdr.SCVal) -> List[SCVal]:
+    return from_vec(sc_val)
+
+
+def to_struct(value: Dict[str, stellar_xdr.SCVal]) -> stellar_xdr.SCVal:
+    """Creates a new :class:`stellar_sdk.xdr.SCVal` XDR object from a dict value.
+
+    :param value: The dict value.
+    :return: A new :class:`stellar_sdk.xdr.SCVal` XDR object with type :class:`stellar_sdk.xdr.SCValType.STRUCT`.
+    """
+    v = dict()
+    for key, val in value.items():
+        v[to_symbol(key)] = val
+    return to_map(v)
+
+
+def from_struct(sc_val: stellar_xdr.SCVal) -> Dict[str, stellar_xdr.SCVal]:
+    v = from_map(sc_val)
+    return dict([(from_symbol(key), val) for key, val in v.items()])
