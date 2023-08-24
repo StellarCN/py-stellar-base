@@ -28,8 +28,14 @@ __all__ = [
     "NotPageableError",
     "StreamClientError",
     "FeatureNotEnabledError",
+    "SorobanRpcErrorResponse",
+    "AccountNotFoundException",
+    "PrepareTransactionException"
 ]
 
+from .soroban_rpc import SimulateTransactionResponse
+
+# TODO: remove the following lines
 # The following is kept for compatibility
 ValueError = ValueError
 TypeError = TypeError
@@ -168,6 +174,26 @@ class StreamClientError(BaseRequestError):
 
 class FeatureNotEnabledError(SdkError):
     """The feature is not enabled."""
+
+class SorobanRpcErrorResponse(BaseRequestError):
+    """The exception is thrown when the RPC server returns an error response."""
+    def __init__(self, code: int, message: str, data: Optional[str] = None) -> None:
+        super().__init__(message)
+        self.code = code
+        self.data = data
+
+
+class AccountNotFoundException(SdkError):
+    """The exception is thrown when trying to load an account that doesn't exist on the Stellar network."""
+    def __init__(self, account_id: str) -> None:
+        super().__init__(f"Account not found, account_id: {account_id}")
+        self.account_id = account_id
+
+class PrepareTransactionException(SdkError):
+    """The exception is thrown when trying to prepare a transaction."""
+    def __init__(self, message: str, simulate_transaction_response: SimulateTransactionResponse) -> None:
+        super().__init__(message)
+        self.simulate_transaction_response = simulate_transaction_response
 
 
 def raise_request_exception(response: Response) -> None:

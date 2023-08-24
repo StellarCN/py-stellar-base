@@ -2,24 +2,24 @@ import binascii
 from enum import IntEnum
 from typing import Union
 
-from ... import xdr as stellar_xdr
-from ...strkey import StrKey
-from ...xdr import Hash
-from .base import BaseScValAlias
+from . import xdr as stellar_xdr
+from .strkey import StrKey
+from .xdr import Hash
 
-__all__ = ["Address", "AddressType"]
+__all__ = ["Address"]
 
 
 class AddressType(IntEnum):
     """Represents an Address type."""
+
     ACCOUNT = 0
-    """An account address"""
+    """An account address, address looks like ``GBJCHUKZMTFSLOMNC7P4TS4VJJBTCYL3XKSOLXAUJSD56C4LHND5TWUC``."""
 
     CONTRACT = 1
-    """An contract address"""
+    """An account address, address looks like ``CCJZ5DGASBWQXR5MPFCJXMBI333XE5U3FSJTNQU7RIKE3P5GN2K2WYD5``."""
 
 
-class Address(BaseScValAlias):
+class Address:
     """Represents a single address in the Stellar network.
     An address can represent an account or a contract.
 
@@ -29,13 +29,13 @@ class Address(BaseScValAlias):
 
     def __init__(self, address: str):
         if StrKey.is_valid_ed25519_public_key(address):
-            address_type = AddressType.ACCOUNT
+            self.type = AddressType.ACCOUNT
+            self.key = StrKey.decode_ed25519_public_key(address)
         elif StrKey.is_valid_contract(address):
-            address_type = AddressType.CONTRACT
+            self.type = AddressType.CONTRACT
+            self.key = StrKey.decode_contract(address)
         else:
             raise ValueError("Unsupported address type.")
-        self.type = address_type
-        self.address = address
 
     @staticmethod
     def from_raw_account(account: Union[bytes, str]) -> "Address":
@@ -68,12 +68,12 @@ class Address(BaseScValAlias):
             account = stellar_xdr.AccountID(
                 stellar_xdr.PublicKey(
                     stellar_xdr.PublicKeyType.PUBLIC_KEY_TYPE_ED25519,
-                    stellar_xdr.Uint256(StrKey.decode_ed25519_public_key(self.address)),
+                    stellar_xdr.Uint256(self.key),
                 )
             )
             return stellar_xdr.SCAddress.from_sc_address_type_account(account)
         elif self.type == AddressType.CONTRACT:
-            contract = Hash(StrKey.decode_contract(self.address))
+            contract = Hash(self.key)
             return stellar_xdr.SCAddress.from_sc_address_type_contract(contract)
         else:
             raise ValueError("Unsupported address type.")
@@ -110,7 +110,13 @@ class Address(BaseScValAlias):
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
             return NotImplemented
-        return self.address == other.address and self.type == other.type
+        return self.key == other.key and self.type == other.type
 
     def __str__(self):
-        return f"<Address [type={self.type.name}, address={self.address}]>"
+        if self.type == AddressType.ACCOUNT:
+            address = StrKey.encode_ed25519_public_key(self.key)
+        elif self.type == AddressType.CONTRACT:
+            address = StrKey.encode_contract(self.key)
+        else:
+            raise ValueError("Unsupported address type.")
+        return f"<Address [type={self.type.name}, address={address}]>"

@@ -1,17 +1,16 @@
 from datetime import datetime
 from enum import Enum
-from typing import Any, Dict, List, Optional, Sequence
+from typing import Any, Dict, List, Sequence
 
 from pydantic import BaseModel, Field
 
-from ..xdr.sc_val import SCVal as XdrSCVal
+from .xdr.sc_val import SCVal as XdrSCVal
 
 from typing import Generic, Optional, TypeVar, Union
 
 from pydantic.generics import GenericModel
 
 T = TypeVar("T")
-E = TypeVar("E")
 
 Id = Union[str, int]
 
@@ -24,17 +23,17 @@ class Request(GenericModel, Generic[T]):
     params: Optional[T]
 
 
-class Error(GenericModel, Generic[E]):
+class Error(GenericModel):
     code: int
     message: Optional[str]
-    data: Optional[E]
+    data: Optional[str]
 
 
-class Response(GenericModel, Generic[T, E]):
+class Response(GenericModel, Generic[T]):
     jsonrpc: str
     id: Id
     result: Optional[T]
-    error: Optional[Error[E]]
+    error: Optional[Error]
 
 
 # account

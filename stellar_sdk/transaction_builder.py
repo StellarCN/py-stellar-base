@@ -24,7 +24,7 @@ from .preconditions import Preconditions
 from .price import Price
 from .signer import Signer
 from .signer_key import SignedPayloadSigner, SignerKey
-from .soroban.types import Address, BaseScValAlias
+from .address import Address
 from .time_bounds import TimeBounds
 from .transaction import Transaction
 from .transaction_envelope import TransactionEnvelope
@@ -1230,7 +1230,7 @@ class TransactionBuilder:
         self,
         contract_id: str,
         function_name: str,
-        parameters: Sequence[Union[stellar_xdr.SCVal, BaseScValAlias]],
+        parameters: Sequence[stellar_xdr.SCVal],
         source: Optional[Union[MuxedAccount, str]] = None,
     ) -> "TransactionBuilder":
         """Append an :class:`HostFunction <stellar_sdk.xdr.HostFunction>` operation to the list of operations.
@@ -1262,10 +1262,7 @@ class TransactionBuilder:
         host_function = (
             stellar_xdr.HostFunction.from_host_function_type_invoke_contract(
                 stellar_xdr.SCVec(
-                    [
-                        p.to_xdr_sc_val() if isinstance(p, BaseScValAlias) else p
-                        for p in invoke_params
-                    ]
+                    invoke_params
                 )
             )
         )
