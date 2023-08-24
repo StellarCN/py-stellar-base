@@ -475,6 +475,33 @@ class SCVal:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
 
+    def __hash__(self):
+        return hash(
+            (
+                self.type,
+                self.b,
+                self.error,
+                self.u32,
+                self.i32,
+                self.u64,
+                self.i64,
+                self.timepoint,
+                self.duration,
+                self.u128,
+                self.i128,
+                self.u256,
+                self.i256,
+                self.bytes,
+                self.str,
+                self.sym,
+                self.vec,
+                self.map,
+                self.address,
+                self.nonce_key,
+                self.instance,
+            )
+        )
+
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented

@@ -191,6 +191,21 @@ class LedgerCloseMetaV2:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
 
+    def __hash__(self):
+        return hash(
+            (
+                self.ext,
+                self.ledger_header,
+                self.tx_set,
+                self.tx_processing,
+                self.upgrades_processing,
+                self.scp_info,
+                self.total_byte_size_of_bucket_list,
+                self.evicted_temporary_ledger_keys,
+                self.evicted_persistent_ledger_entries,
+            )
+        )
+
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented

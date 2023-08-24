@@ -163,6 +163,28 @@ class ConfigSettingContractLedgerCostV0:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
 
+    def __hash__(self):
+        return hash(
+            (
+                self.ledger_max_read_ledger_entries,
+                self.ledger_max_read_bytes,
+                self.ledger_max_write_ledger_entries,
+                self.ledger_max_write_bytes,
+                self.tx_max_read_ledger_entries,
+                self.tx_max_read_bytes,
+                self.tx_max_write_ledger_entries,
+                self.tx_max_write_bytes,
+                self.fee_read_ledger_entry,
+                self.fee_write_ledger_entry,
+                self.fee_read1_kb,
+                self.fee_write1_kb,
+                self.bucket_list_size_bytes,
+                self.bucket_list_fee_rate_low,
+                self.bucket_list_fee_rate_high,
+                self.bucket_list_growth_factor,
+            )
+        )
+
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented

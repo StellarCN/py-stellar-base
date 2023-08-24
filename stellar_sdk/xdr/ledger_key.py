@@ -249,6 +249,22 @@ class LedgerKey:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
 
+    def __hash__(self):
+        return hash(
+            (
+                self.type,
+                self.account,
+                self.trust_line,
+                self.offer,
+                self.data,
+                self.claimable_balance,
+                self.liquidity_pool,
+                self.contract_data,
+                self.contract_code,
+                self.config_setting,
+            )
+        )
+
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented

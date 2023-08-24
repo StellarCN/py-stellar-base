@@ -444,6 +444,26 @@ class ConfigSettingEntry:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
 
+    def __hash__(self):
+        return hash(
+            (
+                self.config_setting_id,
+                self.contract_max_size_bytes,
+                self.contract_compute,
+                self.contract_ledger_cost,
+                self.contract_historical_data,
+                self.contract_meta_data,
+                self.contract_bandwidth,
+                self.contract_cost_params_cpu_insns,
+                self.contract_cost_params_mem_bytes,
+                self.contract_data_key_size_bytes,
+                self.contract_data_entry_size_bytes,
+                self.state_expiration_settings,
+                self.contract_execution_lanes,
+                self.bucket_list_size_window,
+            )
+        )
+
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented

@@ -113,6 +113,21 @@ class StateExpirationSettings:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
 
+    def __hash__(self):
+        return hash(
+            (
+                self.max_entry_expiration,
+                self.min_temp_entry_expiration,
+                self.min_persistent_entry_expiration,
+                self.auto_bump_ledgers,
+                self.persistent_rent_rate_denominator,
+                self.temp_rent_rate_denominator,
+                self.max_entries_to_expire,
+                self.bucket_list_size_window_sample_size,
+                self.eviction_scan_size,
+            )
+        )
+
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented

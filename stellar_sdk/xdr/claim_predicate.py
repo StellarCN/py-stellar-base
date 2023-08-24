@@ -190,6 +190,18 @@ class ClaimPredicate:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
 
+    def __hash__(self):
+        return hash(
+            (
+                self.type,
+                self.and_predicates,
+                self.or_predicates,
+                self.not_predicate,
+                self.abs_before,
+                self.rel_before,
+            )
+        )
+
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented
