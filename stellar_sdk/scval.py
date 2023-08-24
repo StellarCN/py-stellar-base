@@ -2,6 +2,7 @@ from typing import Union, List
 
 from . import xdr as stellar_xdr
 from .address import Address
+from collections import OrderedDict
 
 
 def to_address(value: Union[Address, str]) -> stellar_xdr.SCVal:
@@ -232,6 +233,28 @@ def from_int256(sc_val: stellar_xdr.SCVal) -> int:
     )
     return int.from_bytes(value_bytes, "big", signed=True)
 
+
+def to_map(value: OrderedDict[stellar_xdr.SCVal, stellar_xdr.SCVal]) -> stellar_xdr.SCVal:
+    """Creates a new :class:`stellar_sdk.xdr.SCVal` XDR object from an OrderedDict value.
+
+    :param value: The OrderedDict value.
+    :return: A new :class:`stellar_sdk.xdr.SCVal` XDR object with type :class:`stellar_sdk.xdr.SCValType.SCV_MAP`.
+    """
+    return stellar_xdr.SCVal.from_scv_map(
+        stellar_xdr.SCMap(sc_map=[stellar_xdr.SCMapEntry(key=key, val=value) for key, value in value.items()]))
+
+
+def from_map(sc_val: stellar_xdr.SCVal) -> OrderedDict[stellar_xdr.SCVal, stellar_xdr.SCVal]:
+    """Creates an OrderedDict value from a :class:`stellar_sdk.xdr.SCVal` XDR object.
+
+    :param sc_val: The :class:`stellar_sdk.xdr.SCVal` XDR object.
+    :return: An OrderedDict value.
+    :raises: :exc:`ValueError` if ``sc_val`` is not of type :class:`stellar_sdk.xdr.SCValType.SCV_MAP`.
+    """
+    if sc_val.type != stellar_xdr.SCValType.SCV_MAP:
+        raise ValueError(f"Invalid sc_val type, must be SCV_MAP, got {sc_val.type}")
+    assert sc_val.map is not None
+    return OrderedDict([(entry.key, entry.val) for entry in sc_val.map.sc_map])
 
 def to_string(value: Union[str, bytes]) -> stellar_xdr.SCVal:
     """Creates a new :class:`stellar_sdk.xdr.SCVal` XDR object from a string value.
