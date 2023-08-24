@@ -12,7 +12,7 @@ xdr/Stellar-internal.x \
 xdr/Stellar-contract-config-setting.x
 
 XDRGEN_REPO=overcat/xdrgen
-XDRGEN_COMMIT=3a25689ac881fd9370b45ac2e98908cea86ddaf3
+XDRGEN_COMMIT=904ac3c9925902fa892fbfd4883e20b056f71712
 XDRNEXT_COMMIT=e372df9f677961aac04c5a4cc80a3667f310b29f
 
 UNAME := $(shell uname)
@@ -61,6 +61,7 @@ clean:
 format:
 	autoflake --in-place --ignore-init-module-imports --remove-all-unused-imports --recursive .
 	isort .
+	black .
 .PHONY: format
 
 replace-xdr-keywords:

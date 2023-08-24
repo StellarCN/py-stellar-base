@@ -141,6 +141,18 @@ class PreconditionsV2:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
 
+    def __hash__(self):
+        return hash(
+            (
+                self.time_bounds,
+                self.ledger_bounds,
+                self.min_seq_num,
+                self.min_seq_age,
+                self.min_seq_ledger_gap,
+                self.extra_signers,
+            )
+        )
+
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented

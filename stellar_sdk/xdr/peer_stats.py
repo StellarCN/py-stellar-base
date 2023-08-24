@@ -144,6 +144,27 @@ class PeerStats:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
 
+    def __hash__(self):
+        return hash(
+            (
+                self.id,
+                self.version_str,
+                self.messages_read,
+                self.messages_written,
+                self.bytes_read,
+                self.bytes_written,
+                self.seconds_connected,
+                self.unique_flood_bytes_recv,
+                self.duplicate_flood_bytes_recv,
+                self.unique_fetch_bytes_recv,
+                self.duplicate_fetch_bytes_recv,
+                self.unique_flood_message_recv,
+                self.duplicate_flood_message_recv,
+                self.unique_fetch_message_recv,
+                self.duplicate_fetch_message_recv,
+            )
+        )
+
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented

@@ -428,6 +428,32 @@ class StellarMessage:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
 
+    def __hash__(self):
+        return hash(
+            (
+                self.type,
+                self.error,
+                self.hello,
+                self.auth,
+                self.dont_have,
+                self.peers,
+                self.tx_set_hash,
+                self.tx_set,
+                self.generalized_tx_set,
+                self.transaction,
+                self.signed_survey_request_message,
+                self.signed_survey_response_message,
+                self.q_set_hash,
+                self.q_set,
+                self.envelope,
+                self.get_scp_ledger_seq,
+                self.send_more_message,
+                self.send_more_extended_message,
+                self.flood_advert,
+                self.flood_demand,
+            )
+        )
+
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented

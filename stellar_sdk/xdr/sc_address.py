@@ -87,6 +87,15 @@ class SCAddress:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
 
+    def __hash__(self):
+        return hash(
+            (
+                self.type,
+                self.account_id,
+                self.contract_id,
+            )
+        )
+
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented

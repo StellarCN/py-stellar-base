@@ -151,6 +151,21 @@ class SetOptionsOp:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
 
+    def __hash__(self):
+        return hash(
+            (
+                self.inflation_dest,
+                self.clear_flags,
+                self.set_flags,
+                self.master_weight,
+                self.low_threshold,
+                self.med_threshold,
+                self.high_threshold,
+                self.home_domain,
+                self.signer,
+            )
+        )
+
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented

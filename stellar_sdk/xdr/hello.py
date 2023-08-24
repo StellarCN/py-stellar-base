@@ -109,6 +109,21 @@ class Hello:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
 
+    def __hash__(self):
+        return hash(
+            (
+                self.ledger_version,
+                self.overlay_version,
+                self.overlay_min_version,
+                self.network_id,
+                self.version_str,
+                self.listening_port,
+                self.peer_id,
+                self.cert,
+                self.nonce,
+            )
+        )
+
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented

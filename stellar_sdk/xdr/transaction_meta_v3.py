@@ -104,6 +104,17 @@ class TransactionMetaV3:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
 
+    def __hash__(self):
+        return hash(
+            (
+                self.ext,
+                self.tx_changes_before,
+                self.operations,
+                self.tx_changes_after,
+                self.soroban_meta,
+            )
+        )
+
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented
