@@ -12,6 +12,7 @@ __all__ = ["Address", "AddressType"]
 
 class AddressType(IntEnum):
     """Represents an Address type."""
+
     ACCOUNT = 0
     """An account address"""
 

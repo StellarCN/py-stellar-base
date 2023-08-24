@@ -1,14 +1,11 @@
 from datetime import datetime
 from enum import Enum
-from typing import Any, Dict, List, Sequence
+from typing import Any, Dict, Generic, List, Optional, Sequence, TypeVar, Union
 
 from pydantic import BaseModel, Field
+from pydantic.generics import GenericModel
 
 from .xdr.sc_val import SCVal as XdrSCVal
-
-from typing import Generic, Optional, TypeVar, Union
-
-from pydantic.generics import GenericModel
 
 T = TypeVar("T")
 

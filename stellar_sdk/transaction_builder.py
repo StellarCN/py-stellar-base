@@ -8,6 +8,7 @@ from typing import List, Optional, Sequence, Union
 from . import StrKey
 from . import xdr as stellar_xdr
 from .account import Account
+from .address import Address
 from .asset import Asset
 from .exceptions import ValueError
 from .fee_bump_transaction import FeeBumpTransaction
@@ -24,7 +25,6 @@ from .preconditions import Preconditions
 from .price import Price
 from .signer import Signer
 from .signer_key import SignedPayloadSigner, SignerKey
-from .address import Address
 from .time_bounds import TimeBounds
 from .transaction import Transaction
 from .transaction_envelope import TransactionEnvelope
@@ -1261,9 +1261,7 @@ class TransactionBuilder:
 
         host_function = (
             stellar_xdr.HostFunction.from_host_function_type_invoke_contract(
-                stellar_xdr.SCVec(
-                    invoke_params
-                )
+                stellar_xdr.SCVec(invoke_params)
             )
         )
         op = InvokeHostFunction(host_function=host_function, auth=[], source=source)

@@ -7,12 +7,16 @@ from typing import TYPE_CHECKING, Type
 
 from . import xdr as stellar_xdr
 from .account import Account
+from .address import Address
 from .client.requests_client import RequestsClient
-from .exceptions import SorobanRpcErrorResponse, AccountNotFoundException, PrepareTransactionException
+from .exceptions import (
+    AccountNotFoundException,
+    PrepareTransactionException,
+    SorobanRpcErrorResponse,
+)
+from .soroban_rpc import *
 from .strkey import StrKey
 from .utils import is_valid_hash
-from .soroban_rpc import *
-from .address import Address
 
 if TYPE_CHECKING:
     from .client.base_sync_client import BaseSyncClient
@@ -236,7 +240,7 @@ class SorobanServer:
     def get_contract_data(
         self,
         contract_id: str,
-            key: stellar_xdr.SCVal,
+        key: stellar_xdr.SCVal,
         durability: Durability = Durability.PERSISTENT,
     ) -> Optional[LedgerEntryResult]:
         """Reads the current value of contract data ledger entries directly.
@@ -294,10 +298,14 @@ class SorobanServer:
         """
         resp = self.simulate_transaction(transaction_envelope)
         if resp.error:
-            raise PrepareTransactionException("Simulation transaction failed, the response contains error information.",
-                                              resp)
+            raise PrepareTransactionException(
+                "Simulation transaction failed, the response contains error information.",
+                resp,
+            )
         if not resp.results or len(resp.results) != 1:
-            raise PrepareTransactionException(f'Simulation transaction failed, the "results" field is invalid.', resp)
+            raise PrepareTransactionException(
+                f'Simulation transaction failed, the "results" field is invalid.', resp
+            )
         te = _assemble_transaction(transaction_envelope, resp)
         return te
 
@@ -313,7 +321,9 @@ class SorobanServer:
         )
         response = Response[response_body_type, str].parse_obj(data.json())  # type: ignore[valid-type]
         if response.error:
-            raise SorobanRpcErrorResponse(response.error.code, response.error.message, response.error.data)
+            raise SorobanRpcErrorResponse(
+                response.error.code, response.error.message, response.error.data
+            )
         return response.result  # type: ignore[return-value]
 
     def __enter__(self) -> "SorobanServer":

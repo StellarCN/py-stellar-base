@@ -28,21 +28,23 @@ class InvokeHostFunction(Operation):
         return self._auth
 
     @auth.setter
-    def auth(self, value: Union[List[stellar_xdr.SorobanAuthorizationEntry], List[str]]):
+    def auth(
+        self, value: Union[List[stellar_xdr.SorobanAuthorizationEntry], List[str]]
+    ):
         for v in value:
             if isinstance(v, str):
-                self._auth.append(
-                    stellar_xdr.SorobanAuthorizationEntry.from_xdr(v)
-                )
-            elif isinstance(v, stellar_xdr.SorobanAuthorizationEntry,):
+                self._auth.append(stellar_xdr.SorobanAuthorizationEntry.from_xdr(v))
+            elif isinstance(
+                v,
+                stellar_xdr.SorobanAuthorizationEntry,
+            ):
                 self._auth.append(v)
             else:
                 raise TypeError("Only SorobanAuthorizationEntry or str is allowed")
 
     def _to_operation_body(self) -> stellar_xdr.OperationBody:
         invoke_host_function_op = stellar_xdr.InvokeHostFunctionOp(
-            host_function=self.host_function,
-            auth=self.auth
+            host_function=self.host_function, auth=self.auth
         )
         body = stellar_xdr.OperationBody(
             type=self._XDR_OPERATION_TYPE,

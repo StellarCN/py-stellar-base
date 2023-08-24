@@ -1,8 +1,7 @@
-from typing import Union, List, Dict
+from typing import Dict, List, Union
 
 from . import xdr as stellar_xdr
 from .address import Address
-
 
 __all__ = [
     "to_address",
@@ -38,8 +37,9 @@ __all__ = [
     "to_uint256",
     "from_uint256",
     "to_vec",
-    "from_vec"
+    "from_vec",
 ]
+
 
 def to_address(value: Union[Address, str]) -> stellar_xdr.SCVal:
     """Creates a new :class:`stellar_sdk.xdr.SCVal` XDR object from an :class:`stellar_sdk.address.Address` object.
@@ -116,7 +116,7 @@ def to_duration(value: int) -> stellar_xdr.SCVal:
     :return: A new :class:`stellar_sdk.xdr.SCVal` XDR object with type :class:`stellar_sdk.xdr.SCValType.SCV_DURATION`.
     :raises: :exc:`ValueError` if ``value`` is out of uint64 range.
     """
-    if value < 0 or value > 2 ** 64 - 1:
+    if value < 0 or value > 2**64 - 1:
         raise ValueError("Invalid value, must be between 0 and 2**64 - 1.")
     duration = stellar_xdr.Duration(stellar_xdr.Uint64(value))
     return stellar_xdr.SCVal.from_scv_duration(duration)
@@ -130,7 +130,9 @@ def from_duration(sc_val: stellar_xdr.SCVal) -> int:
     :raises: :exc:`ValueError` if ``sc_val`` is not of type :class:`stellar_sdk.xdr.SCValType.SCV_DURATION`.
     """
     if sc_val.type != stellar_xdr.SCValType.SCV_DURATION:
-        raise ValueError(f"Invalid sc_val type, must be SCV_DURATION, got {sc_val.type}")
+        raise ValueError(
+            f"Invalid sc_val type, must be SCV_DURATION, got {sc_val.type}"
+        )
     return sc_val.duration.duration.uint64
 
 
@@ -141,7 +143,7 @@ def to_int32(value: int) -> stellar_xdr.SCVal:
     :return: A new :class:`stellar_sdk.xdr.SCVal` XDR object with type :class:`stellar_sdk.xdr.SCValType.SCV_I32`.
     :raises: :exc:`ValueError` if ``value`` is out of int32 range.
     """
-    if value < -(2 ** 31) or value > 2 ** 31 - 1:
+    if value < -(2**31) or value > 2**31 - 1:
         raise ValueError("Invalid value, must be between -(2**31) and 2**31 - 1.")
 
     return stellar_xdr.SCVal.from_scv_i32(stellar_xdr.Int32(value))
@@ -167,7 +169,7 @@ def to_int64(value: int) -> stellar_xdr.SCVal:
     :return: A new :class:`stellar_sdk.xdr.SCVal` XDR object with type :class:`stellar_sdk.xdr.SCValType.SCV_I64`.
     :raises: :exc:`ValueError` if ``value`` is out of int64 range.
     """
-    if value < -(2 ** 63) or value > 2 ** 63 - 1:
+    if value < -(2**63) or value > 2**63 - 1:
         raise ValueError("Invalid value, must be between -(2**63) and 2**63 - 1.")
 
     return stellar_xdr.SCVal.from_scv_i64(stellar_xdr.Int64(value))
@@ -193,15 +195,13 @@ def to_int128(value: int) -> stellar_xdr.SCVal:
     :return: A new :class:`stellar_sdk.xdr.SCVal` XDR object with type :class:`stellar_sdk.xdr.SCValType.SCV_I128`.
     :raises: :exc:`ValueError` if ``value`` is out of int128 range.
     """
-    if value < -(2 ** 127) or value > 2 ** 127 - 1:
+    if value < -(2**127) or value > 2**127 - 1:
         raise ValueError("Invalid value, must be between -(2**127) and 2**127 - 1.")
 
     value_bytes = value.to_bytes(16, "big", signed=True)
     i128 = stellar_xdr.Int128Parts(
         hi=stellar_xdr.Int64(int.from_bytes(value_bytes[0:8], "big", signed=True)),
-        lo=stellar_xdr.Uint64(
-            int.from_bytes(value_bytes[8:16], "big", signed=False)
-        ),
+        lo=stellar_xdr.Uint64(int.from_bytes(value_bytes[8:16], "big", signed=False)),
     )
     return stellar_xdr.SCVal.from_scv_i128(i128)
 
@@ -230,7 +230,7 @@ def to_int256(value: int) -> stellar_xdr.SCVal:
     :return: A new :class:`stellar_sdk.xdr.SCVal` XDR object with type :class:`stellar_sdk.xdr.SCValType.SCV_I256`.
     :raises: :exc:`ValueError` if ``value`` is out of int256 range.
     """
-    if value < -(2 ** 255) or value > 2 ** 255 - 1:
+    if value < -(2**255) or value > 2**255 - 1:
         raise ValueError("Invalid value, must be between -(2**255) and 2**255 - 1.")
 
     value_bytes = value.to_bytes(32, "big", signed=True)
@@ -261,10 +261,10 @@ def from_int256(sc_val: stellar_xdr.SCVal) -> int:
     assert sc_val.i256 is not None
 
     value_bytes = (
-            sc_val.i256.hi_hi.int64.to_bytes(8, "big", signed=True)
-            + sc_val.i256.hi_lo.uint64.to_bytes(8, "big", signed=False)
-            + sc_val.i256.lo_hi.uint64.to_bytes(8, "big", signed=False)
-            + sc_val.i256.lo_lo.uint64.to_bytes(8, "big", signed=False)
+        sc_val.i256.hi_hi.int64.to_bytes(8, "big", signed=True)
+        + sc_val.i256.hi_lo.uint64.to_bytes(8, "big", signed=False)
+        + sc_val.i256.lo_hi.uint64.to_bytes(8, "big", signed=False)
+        + sc_val.i256.lo_lo.uint64.to_bytes(8, "big", signed=False)
     )
     return int.from_bytes(value_bytes, "big", signed=True)
 
@@ -276,7 +276,13 @@ def to_map(value: Dict[stellar_xdr.SCVal, stellar_xdr.SCVal]) -> stellar_xdr.SCV
     :return: A new :class:`stellar_sdk.xdr.SCVal` XDR object with type :class:`stellar_sdk.xdr.SCValType.SCV_MAP`.
     """
     return stellar_xdr.SCVal.from_scv_map(
-        stellar_xdr.SCMap(sc_map=[stellar_xdr.SCMapEntry(key=key, val=value) for key, value in value.items()]))
+        stellar_xdr.SCMap(
+            sc_map=[
+                stellar_xdr.SCMapEntry(key=key, val=value)
+                for key, value in value.items()
+            ]
+        )
+    )
 
 
 def from_map(sc_val: stellar_xdr.SCVal) -> Dict[stellar_xdr.SCVal, stellar_xdr.SCVal]:
@@ -291,6 +297,7 @@ def from_map(sc_val: stellar_xdr.SCVal) -> Dict[stellar_xdr.SCVal, stellar_xdr.S
     assert sc_val.map is not None
     return dict([(entry.key, entry.val) for entry in sc_val.map.sc_map])
 
+
 def to_string(value: Union[str, bytes]) -> stellar_xdr.SCVal:
     """Creates a new :class:`stellar_sdk.xdr.SCVal` XDR object from a string value.
 
@@ -302,7 +309,7 @@ def to_string(value: Union[str, bytes]) -> stellar_xdr.SCVal:
     return stellar_xdr.SCVal.from_scv_string(stellar_xdr.SCString(value))
 
 
-def from_string(sc_val: stellar_xdr.SCVal) -> str:
+def from_string(sc_val: stellar_xdr.SCVal) -> bytes:
     """Creates a string value from a :class:`stellar_sdk.xdr.SCVal` XDR object.
 
     :param sc_val: The :class:`stellar_sdk.xdr.SCVal` XDR object.
@@ -312,7 +319,7 @@ def from_string(sc_val: stellar_xdr.SCVal) -> str:
     if sc_val.type != stellar_xdr.SCValType.SCV_STRING:
         raise ValueError(f"Invalid sc_val type, must be SCV_STRING, got {sc_val.type}")
     assert sc_val.str is not None
-    return sc_val.str.sc_string.decode("utf-8")
+    return sc_val.str.sc_string
 
 
 def to_symbol(value: str) -> stellar_xdr.SCVal:
@@ -321,7 +328,9 @@ def to_symbol(value: str) -> stellar_xdr.SCVal:
     :param value: The symbol value.
     :return: A new :class:`stellar_sdk.xdr.SCVal` XDR object with type :class:`stellar_sdk.xdr.SCValType.SCV_SYMBOL`.
     """
-    return stellar_xdr.SCVal.from_scv_symbol(stellar_xdr.SCSymbol(value.encode("utf-8")))
+    return stellar_xdr.SCVal.from_scv_symbol(
+        stellar_xdr.SCSymbol(value.encode("utf-8"))
+    )
 
 
 def from_symbol(sc_val: stellar_xdr.SCVal) -> str:
@@ -344,7 +353,7 @@ def to_timepoint(value: int) -> stellar_xdr.SCVal:
     :return: A new :class:`stellar_sdk.xdr.SCVal` XDR object with type :class:`stellar_sdk.xdr.SCValType.SCV_TIME_POINT`.
     :raises: :exc:`ValueError` if ``value`` is out of uint64 range.
     """
-    if value < 0 or value > 2 ** 64 - 1:
+    if value < 0 or value > 2**64 - 1:
         raise ValueError("Invalid value, must be between 0 and 2**64 - 1.")
     time_point = stellar_xdr.TimePoint(stellar_xdr.Uint64(value))
     return stellar_xdr.SCVal.from_scv_timepoint(time_point)
@@ -358,7 +367,9 @@ def from_timepoint(sc_val: stellar_xdr.SCVal) -> int:
     :raises: :exc:`ValueError` if ``sc_val`` is not of type :class:`stellar_sdk.xdr.SCValType.SCV_TIMEPOINT`.
     """
     if sc_val.type != stellar_xdr.SCValType.SCV_TIMEPOINT:
-        raise ValueError(f"Invalid sc_val type, must be SCV_TIMEPOINT, got {sc_val.type}")
+        raise ValueError(
+            f"Invalid sc_val type, must be SCV_TIMEPOINT, got {sc_val.type}"
+        )
     assert sc_val.timepoint is not None
     return sc_val.timepoint.time_point.uint64
 
@@ -370,7 +381,7 @@ def to_uint32(value: int) -> stellar_xdr.SCVal:
     :return: A new :class:`stellar_sdk.xdr.SCVal` XDR object with type :class:`stellar_sdk.xdr.SCValType.SCV_U32`.
     :raises: :exc:`ValueError` if ``value`` is out of uint32 range.
     """
-    if value < 0 or value > 2 ** 32 - 1:
+    if value < 0 or value > 2**32 - 1:
         raise ValueError("Invalid value, must be between 0 and 2**32 - 1.")
 
     return stellar_xdr.SCVal.from_scv_u32(stellar_xdr.Uint32(value))
@@ -396,7 +407,7 @@ def to_uint64(value: int) -> stellar_xdr.SCVal:
     :return: A new :class:`stellar_sdk.xdr.SCVal` XDR object with type :class:`stellar_sdk.xdr.SCValType.SCV_U64`.
     :raises: :exc:`ValueError` if ``value`` is out of uint64 range.
     """
-    if value < 0 or value > 2 ** 64 - 1:
+    if value < 0 or value > 2**64 - 1:
         raise ValueError("Invalid value, must be between 0 and 2**64 - 1.")
 
     return stellar_xdr.SCVal.from_scv_u64(stellar_xdr.Uint64(value))
@@ -422,17 +433,13 @@ def to_uint128(value: int) -> stellar_xdr.SCVal:
     :return: A new :class:`stellar_sdk.xdr.SCVal` XDR object with type :class:`stellar_sdk.xdr.SCValType.SCV_U128`.
     :raises: :exc:`ValueError` if ``value`` is out of uint128 range.
     """
-    if value < 0 or value > 2 ** 128 - 1:
+    if value < 0 or value > 2**128 - 1:
         raise ValueError("Invalid value, must be between 0 and 2**128 - 1.")
 
     value_bytes = value.to_bytes(16, "big", signed=False)
     u128 = stellar_xdr.UInt128Parts(
-        hi=stellar_xdr.Uint64(
-            int.from_bytes(value_bytes[0:8], "big", signed=False)
-        ),
-        lo=stellar_xdr.Uint64(
-            int.from_bytes(value_bytes[8:16], "big", signed=False)
-        ),
+        hi=stellar_xdr.Uint64(int.from_bytes(value_bytes[0:8], "big", signed=False)),
+        lo=stellar_xdr.Uint64(int.from_bytes(value_bytes[8:16], "big", signed=False)),
     )
     return stellar_xdr.SCVal.from_scv_u128(u128)
 
@@ -461,7 +468,7 @@ def to_uint256(value: int) -> stellar_xdr.SCVal:
     :return: A new :class:`stellar_sdk.xdr.SCVal` XDR object with type :class:`stellar_sdk.xdr.SCValType.SCV_U256`.
     :raises: :exc:`ValueError` if ``value`` is out of uint256 range.
     """
-    if value < 0 or value > 2 ** 256 - 1:
+    if value < 0 or value > 2**256 - 1:
         raise ValueError("Invalid value, must be between 0 and 2**256 - 1.")
 
     value_bytes = value.to_bytes(32, "big", signed=False)
@@ -492,12 +499,12 @@ def from_uint256(sc_val: stellar_xdr.SCVal) -> int:
     assert sc_val.u256 is not None
 
     value_bytes = (
-            sc_val.u256.hi_hi.uint64.to_bytes(8, "big", signed=False)
-            + sc_val.u256.hi_lo.uint64.to_bytes(8, "big", signed=False)
-            + sc_val.u256.lo_hi.uint64.to_bytes(8, "big", signed=False)
-            + sc_val.u256.lo_lo.uint64.to_bytes(8, "big", signed=False)
+        sc_val.u256.hi_hi.uint64.to_bytes(8, "big", signed=False)
+        + sc_val.u256.hi_lo.uint64.to_bytes(8, "big", signed=False)
+        + sc_val.u256.lo_hi.uint64.to_bytes(8, "big", signed=False)
+        + sc_val.u256.lo_lo.uint64.to_bytes(8, "big", signed=False)
     )
-    return int.from_bytes(value_bytes, "big", signed=True)
+    return int.from_bytes(value_bytes, "big", signed=False)
 
 
 def to_vec(value: List[stellar_xdr.SCVal]) -> stellar_xdr.SCVal:
