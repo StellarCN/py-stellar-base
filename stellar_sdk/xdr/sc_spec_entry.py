@@ -155,6 +155,18 @@ class SCSpecEntry:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
 
+    def __hash__(self):
+        return hash(
+            (
+                self.kind,
+                self.function_v0,
+                self.udt_struct_v0,
+                self.udt_union_v0,
+                self.udt_enum_v0,
+                self.udt_error_enum_v0,
+            )
+        )
+
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented

@@ -81,6 +81,16 @@ class ConfigSettingContractComputeV0:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
 
+    def __hash__(self):
+        return hash(
+            (
+                self.ledger_max_instructions,
+                self.tx_max_instructions,
+                self.fee_rate_per_instructions_increment,
+                self.tx_memory_limit,
+            )
+        )
+
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented

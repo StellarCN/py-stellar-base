@@ -594,6 +594,38 @@ class OperationBody:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
 
+    def __hash__(self):
+        return hash(
+            (
+                self.type,
+                self.create_account_op,
+                self.payment_op,
+                self.path_payment_strict_receive_op,
+                self.manage_sell_offer_op,
+                self.create_passive_sell_offer_op,
+                self.set_options_op,
+                self.change_trust_op,
+                self.allow_trust_op,
+                self.destination,
+                self.manage_data_op,
+                self.bump_sequence_op,
+                self.manage_buy_offer_op,
+                self.path_payment_strict_send_op,
+                self.create_claimable_balance_op,
+                self.claim_claimable_balance_op,
+                self.begin_sponsoring_future_reserves_op,
+                self.revoke_sponsorship_op,
+                self.clawback_op,
+                self.clawback_claimable_balance_op,
+                self.set_trust_line_flags_op,
+                self.liquidity_pool_deposit_op,
+                self.liquidity_pool_withdraw_op,
+                self.invoke_host_function_op,
+                self.bump_footprint_expiration_op,
+                self.restore_footprint_op,
+            )
+        )
+
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented

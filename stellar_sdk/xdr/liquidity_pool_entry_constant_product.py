@@ -85,6 +85,17 @@ class LiquidityPoolEntryConstantProduct:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
 
+    def __hash__(self):
+        return hash(
+            (
+                self.params,
+                self.reserve_a,
+                self.reserve_b,
+                self.total_pool_shares,
+                self.pool_shares_trust_line_count,
+            )
+        )
+
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented

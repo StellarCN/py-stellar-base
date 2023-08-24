@@ -166,6 +166,19 @@ class LedgerUpgrade:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
 
+    def __hash__(self):
+        return hash(
+            (
+                self.type,
+                self.new_ledger_version,
+                self.new_base_fee,
+                self.new_max_tx_set_size,
+                self.new_base_reserve,
+                self.new_flags,
+                self.new_config,
+            )
+        )
+
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented

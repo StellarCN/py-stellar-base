@@ -61,6 +61,7 @@ clean:
 format:
 	autoflake --in-place --ignore-init-module-imports --remove-all-unused-imports --recursive .
 	isort .
+	black .
 .PHONY: format
 
 replace-xdr-keywords:

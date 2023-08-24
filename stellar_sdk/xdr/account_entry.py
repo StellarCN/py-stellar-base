@@ -148,6 +148,22 @@ class AccountEntry:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
 
+    def __hash__(self):
+        return hash(
+            (
+                self.account_id,
+                self.balance,
+                self.seq_num,
+                self.num_sub_entries,
+                self.inflation_dest,
+                self.flags,
+                self.home_domain,
+                self.thresholds,
+                self.signers,
+                self.ext,
+            )
+        )
+
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented

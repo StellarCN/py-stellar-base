@@ -119,6 +119,19 @@ class TransactionV0:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
 
+    def __hash__(self):
+        return hash(
+            (
+                self.source_account_ed25519,
+                self.fee,
+                self.seq_num,
+                self.time_bounds,
+                self.memo,
+                self.operations,
+                self.ext,
+            )
+        )
+
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented

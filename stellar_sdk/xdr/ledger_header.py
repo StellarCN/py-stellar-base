@@ -176,6 +176,27 @@ class LedgerHeader:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
 
+    def __hash__(self):
+        return hash(
+            (
+                self.ledger_version,
+                self.previous_ledger_hash,
+                self.scp_value,
+                self.tx_set_result_hash,
+                self.bucket_list_hash,
+                self.ledger_seq,
+                self.total_coins,
+                self.fee_pool,
+                self.inflation_seq,
+                self.id_pool,
+                self.base_fee,
+                self.base_reserve,
+                self.max_tx_set_size,
+                self.skip_list,
+                self.ext,
+            )
+        )
+
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented

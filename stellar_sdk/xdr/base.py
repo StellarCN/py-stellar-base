@@ -24,6 +24,9 @@ class Integer:
     def unpack(unpacker: Unpacker) -> int:
         return unpacker.unpack_int()
 
+    def __hash__(self):
+        return hash(self.value)
+
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
             return NotImplemented
@@ -43,6 +46,9 @@ class UnsignedInteger:
     @staticmethod
     def unpack(unpacker: Unpacker) -> int:
         return unpacker.unpack_uint()
+
+    def __hash__(self):
+        return hash(self.value)
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
@@ -64,6 +70,9 @@ class Float:
     def unpack(unpacker: Unpacker) -> float:
         return unpacker.unpack_float()
 
+    def __hash__(self):
+        return hash(self.value)
+
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
             return NotImplemented
@@ -83,6 +92,9 @@ class Double:
     @staticmethod
     def unpack(unpacker: Unpacker) -> float:
         return unpacker.unpack_double()
+
+    def __hash__(self):
+        return hash(self.value)
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
@@ -104,6 +116,9 @@ class Hyper:
     def unpack(unpacker: Unpacker) -> int:
         return unpacker.unpack_hyper()
 
+    def __hash__(self):
+        return hash(self.value)
+
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
             return NotImplemented
@@ -124,6 +139,9 @@ class UnsignedHyper:
     def unpack(unpacker: Unpacker) -> int:
         return unpacker.unpack_uhyper()
 
+    def __hash__(self):
+        return hash(self.value)
+
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
             return NotImplemented
@@ -143,6 +161,9 @@ class Boolean:
     @staticmethod
     def unpack(unpacker: Unpacker) -> bool:
         return unpacker.unpack_bool()
+
+    def __hash__(self):
+        return hash(self.value)
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
@@ -171,6 +192,9 @@ class String:
     def unpack(unpacker: Unpacker) -> bytes:
         size = unpacker.unpack_uint()
         return unpacker.unpack_fopaque(size)
+
+    def __hash__(self):
+        return hash((self.value, self.size))
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
@@ -211,6 +235,9 @@ class Opaque:
         if not fixed:
             size = unpacker.unpack_uint()
         return unpacker.unpack_fopaque(size)
+
+    def __hash__(self):
+        return hash((self.value, self.size, self.fixed))
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
