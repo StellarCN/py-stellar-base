@@ -37,6 +37,19 @@ class Address:
         else:
             raise ValueError("Unsupported address type.")
 
+    @property
+    def address(self) -> str:
+        """Returns the encoded address.
+
+        :return: The encoded address.
+        """
+        if self.type == AddressType.ACCOUNT:
+            return StrKey.encode_ed25519_public_key(self.key)
+        elif self.type == AddressType.CONTRACT:
+            return StrKey.encode_contract(self.key)
+        else:
+            raise ValueError("Unsupported address type.")
+
     @staticmethod
     def from_raw_account(account: Union[bytes, str]) -> "Address":
         """Creates a new account Address object from raw bytes.
@@ -113,10 +126,4 @@ class Address:
         return self.key == other.key and self.type == other.type
 
     def __str__(self):
-        if self.type == AddressType.ACCOUNT:
-            address = StrKey.encode_ed25519_public_key(self.key)
-        elif self.type == AddressType.CONTRACT:
-            address = StrKey.encode_contract(self.key)
-        else:
-            raise ValueError("Unsupported address type.")
-        return f"<Address [type={self.type.name}, address={address}]>"
+        return f"<Address [type={self.type.name}, address={self.address}]>"
