@@ -1231,7 +1231,7 @@ class TransactionBuilder:
         contract_id: str,
         function_name: str,
         parameters: Sequence[stellar_xdr.SCVal],
-        auth: Sequence[stellar_xdr.SorobanAuthorizationEntry] = None,
+        auth: List[stellar_xdr.SorobanAuthorizationEntry] = None,  # TODO: sequence
         source: Optional[Union[MuxedAccount, str]] = None,
     ) -> "TransactionBuilder":
         """Append an :class:`HostFunction <stellar_sdk.xdr.HostFunction>` operation to the list of operations.

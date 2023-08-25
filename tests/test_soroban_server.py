@@ -1,9 +1,16 @@
+import copy
+
 import pytest
 import requests_mock
 
 from stellar_sdk import Account, Keypair, Network, TransactionBuilder, scval
 from stellar_sdk import xdr as stellar_xdr
-from stellar_sdk.exceptions import AccountNotFoundException, SorobanRpcErrorResponse
+from stellar_sdk.address import Address
+from stellar_sdk.exceptions import (
+    AccountNotFoundException,
+    PrepareTransactionException,
+    SorobanRpcErrorResponse,
+)
 from stellar_sdk.soroban_rpc import *
 from stellar_sdk.soroban_server import SorobanServer
 
@@ -293,7 +300,7 @@ class TestSorobanServer:
         }
 
         start_ledger = 100
-        filters: Sequence[EventFilter] = [
+        filters = [
             EventFilter(
                 event_type="contract",
                 contract_ids=[
@@ -304,8 +311,8 @@ class TestSorobanServer:
                 ],
             )
         ]
-        cursor: str = "0000007799660613632-0000000000"
-        limit: int = 10
+        cursor = "0000007799660613632-0000000000"
+        limit = 10
         with requests_mock.Mocker() as m:
             m.post(PRC_URL, json=data)
             assert SorobanServer(PRC_URL).get_events(
@@ -391,6 +398,230 @@ class TestSorobanServer:
         assert request_data["jsonrpc"] == "2.0"
         assert request_data["method"] == "simulateTransaction"
         assert request_data["params"] == {"transaction": transaction.to_xdr()}
+
+    def test_prepare_transaction_without_auth_and_soroban_data(self):
+        data = {
+            "jsonrpc": "2.0",
+            "id": "e1fabdcdf0244a2a9adfab94d7748b6c",
+            "result": {
+                "transactionData": "AAAAAAAAAAIAAAAGAAAAAcWLK/vE8FTnMk9r8gytPgJuQbutGm0gw9fUkY3tFlQRAAAAFAAAAAEAAAAAAAAAB300Hyg0HZG+Qie3zvsxLvugrNtFqd3AIntWy9bg2YvZAAAAAAAAAAEAAAAGAAAAAcWLK/vE8FTnMk9r8gytPgJuQbutGm0gw9fUkY3tFlQRAAAAEAAAAAEAAAACAAAADwAAAAdDb3VudGVyAAAAABIAAAAAAAAAAFi3xKLI8peqjz0kcSgf38zsr+SOVmMxPsGOEqc+ypihAAAAAQAAAAAAFcLDAAAF8AAAAQgAAAMcAAAAAAAAAJw=",
+                "events": [
+                    "AAAAAQAAAAAAAAAAAAAAAgAAAAAAAAADAAAADwAAAAdmbl9jYWxsAAAAAA0AAAAgxYsr+8TwVOcyT2vyDK0+Am5Bu60abSDD19SRje0WVBEAAAAPAAAACWluY3JlbWVudAAAAAAAABAAAAABAAAAAgAAABIAAAAAAAAAAFi3xKLI8peqjz0kcSgf38zsr+SOVmMxPsGOEqc+ypihAAAAAwAAAAo=",
+                    "AAAAAQAAAAAAAAABxYsr+8TwVOcyT2vyDK0+Am5Bu60abSDD19SRje0WVBEAAAACAAAAAAAAAAIAAAAPAAAACWZuX3JldHVybgAAAAAAAA8AAAAJaW5jcmVtZW50AAAAAAAAAwAAABQ=",
+                ],
+                "minResourceFee": "58595",
+                "results": [
+                    {
+                        "auth": [
+                            "AAAAAAAAAAAAAAABxYsr+8TwVOcyT2vyDK0+Am5Bu60abSDD19SRje0WVBEAAAAJaW5jcmVtZW50AAAAAAAAAgAAABIAAAAAAAAAAFi3xKLI8peqjz0kcSgf38zsr+SOVmMxPsGOEqc+ypihAAAAAwAAAAoAAAAA"
+                        ],
+                        "xdr": "AAAAAwAAABQ=",
+                    }
+                ],
+                "cost": {"cpuInsns": "1240100", "memBytes": "161637"},
+                "latestLedger": "1479",
+            },
+        }
+
+        transaction = _build_soroban_transaction(None, [])
+        with requests_mock.Mocker() as m:
+            m.post(PRC_URL, json=data)
+            new_transaction = SorobanServer(PRC_URL).prepare_transaction(transaction)
+        expected_transaction = copy.deepcopy(transaction)
+        expected_transaction.transaction.fee += int(data["result"]["minResourceFee"])
+        expected_transaction.transaction.soroban_data = (
+            stellar_xdr.SorobanTransactionData.from_xdr(
+                data["result"]["transactionData"]
+            )
+        )
+        op = expected_transaction.transaction.operations[0]
+        op.auth = [
+            stellar_xdr.SorobanAuthorizationEntry.from_xdr(xdr)
+            for xdr in data["result"]["results"][0]["auth"]
+        ]
+        assert new_transaction == expected_transaction
+
+    def test_prepare_transaction_with_soroban_data(self):
+        data = {
+            "jsonrpc": "2.0",
+            "id": "e1fabdcdf0244a2a9adfab94d7748b6c",
+            "result": {
+                "transactionData": "AAAAAAAAAAIAAAAGAAAAAcWLK/vE8FTnMk9r8gytPgJuQbutGm0gw9fUkY3tFlQRAAAAFAAAAAEAAAAAAAAAB300Hyg0HZG+Qie3zvsxLvugrNtFqd3AIntWy9bg2YvZAAAAAAAAAAEAAAAGAAAAAcWLK/vE8FTnMk9r8gytPgJuQbutGm0gw9fUkY3tFlQRAAAAEAAAAAEAAAACAAAADwAAAAdDb3VudGVyAAAAABIAAAAAAAAAAFi3xKLI8peqjz0kcSgf38zsr+SOVmMxPsGOEqc+ypihAAAAAQAAAAAAFcLDAAAF8AAAAQgAAAMcAAAAAAAAAJw=",
+                "events": [
+                    "AAAAAQAAAAAAAAAAAAAAAgAAAAAAAAADAAAADwAAAAdmbl9jYWxsAAAAAA0AAAAgxYsr+8TwVOcyT2vyDK0+Am5Bu60abSDD19SRje0WVBEAAAAPAAAACWluY3JlbWVudAAAAAAAABAAAAABAAAAAgAAABIAAAAAAAAAAFi3xKLI8peqjz0kcSgf38zsr+SOVmMxPsGOEqc+ypihAAAAAwAAAAo=",
+                    "AAAAAQAAAAAAAAABxYsr+8TwVOcyT2vyDK0+Am5Bu60abSDD19SRje0WVBEAAAACAAAAAAAAAAIAAAAPAAAACWZuX3JldHVybgAAAAAAAA8AAAAJaW5jcmVtZW50AAAAAAAAAwAAABQ=",
+                ],
+                "minResourceFee": "58595",
+                "results": [
+                    {
+                        "auth": [
+                            "AAAAAAAAAAAAAAABxYsr+8TwVOcyT2vyDK0+Am5Bu60abSDD19SRje0WVBEAAAAJaW5jcmVtZW50AAAAAAAAAgAAABIAAAAAAAAAAFi3xKLI8peqjz0kcSgf38zsr+SOVmMxPsGOEqc+ypihAAAAAwAAAAoAAAAA"
+                        ],
+                        "xdr": "AAAAAwAAABQ=",
+                    }
+                ],
+                "cost": {"cpuInsns": "1240100", "memBytes": "161637"},
+                "latestLedger": "1479",
+            },
+        }
+
+        soroban_data = stellar_xdr.SorobanTransactionData(
+            ext=stellar_xdr.ExtensionPoint(0),
+            refundable_fee=stellar_xdr.Int64(100),
+            resources=stellar_xdr.SorobanResources(
+                footprint=stellar_xdr.LedgerFootprint(
+                    read_only=[],
+                    read_write=[],
+                ),
+                extended_meta_data_size_bytes=stellar_xdr.Uint32(1),
+                read_bytes=stellar_xdr.Uint32(2),
+                write_bytes=stellar_xdr.Uint32(3),
+                instructions=stellar_xdr.Uint32(4),
+            ),
+        )  # soroban_data will be overwritten by the response
+        transaction = _build_soroban_transaction(soroban_data, [])
+        with requests_mock.Mocker() as m:
+            m.post(PRC_URL, json=data)
+            new_transaction = SorobanServer(PRC_URL).prepare_transaction(transaction)
+        expected_transaction = copy.deepcopy(transaction)
+        expected_transaction.transaction.fee += int(data["result"]["minResourceFee"])
+        expected_transaction.transaction.soroban_data = (
+            stellar_xdr.SorobanTransactionData.from_xdr(
+                data["result"]["transactionData"]
+            )
+        )
+        op = expected_transaction.transaction.operations[0]
+        op.auth = [
+            stellar_xdr.SorobanAuthorizationEntry.from_xdr(xdr)
+            for xdr in data["result"]["results"][0]["auth"]
+        ]
+        assert new_transaction == expected_transaction
+
+    def test_prepare_transaction_with_auth(self):
+        data = {
+            "jsonrpc": "2.0",
+            "id": "e1fabdcdf0244a2a9adfab94d7748b6c",
+            "result": {
+                "transactionData": "AAAAAAAAAAIAAAAGAAAAAcWLK/vE8FTnMk9r8gytPgJuQbutGm0gw9fUkY3tFlQRAAAAFAAAAAEAAAAAAAAAB300Hyg0HZG+Qie3zvsxLvugrNtFqd3AIntWy9bg2YvZAAAAAAAAAAEAAAAGAAAAAcWLK/vE8FTnMk9r8gytPgJuQbutGm0gw9fUkY3tFlQRAAAAEAAAAAEAAAACAAAADwAAAAdDb3VudGVyAAAAABIAAAAAAAAAAFi3xKLI8peqjz0kcSgf38zsr+SOVmMxPsGOEqc+ypihAAAAAQAAAAAAFcLDAAAF8AAAAQgAAAMcAAAAAAAAAJw=",
+                "events": [
+                    "AAAAAQAAAAAAAAAAAAAAAgAAAAAAAAADAAAADwAAAAdmbl9jYWxsAAAAAA0AAAAgxYsr+8TwVOcyT2vyDK0+Am5Bu60abSDD19SRje0WVBEAAAAPAAAACWluY3JlbWVudAAAAAAAABAAAAABAAAAAgAAABIAAAAAAAAAAFi3xKLI8peqjz0kcSgf38zsr+SOVmMxPsGOEqc+ypihAAAAAwAAAAo=",
+                    "AAAAAQAAAAAAAAABxYsr+8TwVOcyT2vyDK0+Am5Bu60abSDD19SRje0WVBEAAAACAAAAAAAAAAIAAAAPAAAACWZuX3JldHVybgAAAAAAAA8AAAAJaW5jcmVtZW50AAAAAAAAAwAAABQ=",
+                ],
+                "minResourceFee": "58595",
+                "results": [
+                    {
+                        "auth": [
+                            "AAAAAAAAAAAAAAABxYsr+8TwVOcyT2vyDK0+Am5Bu60abSDD19SRje0WVBEAAAAJaW5jcmVtZW50AAAAAAAAAgAAABIAAAAAAAAAAFi3xKLI8peqjz0kcSgf38zsr+SOVmMxPsGOEqc+ypihAAAAAwAAAAoAAAAA"
+                        ],
+                        "xdr": "AAAAAwAAABQ=",
+                    }
+                ],
+                "cost": {"cpuInsns": "1240100", "memBytes": "161637"},
+                "latestLedger": "1479",
+            },
+        }
+
+        auth = stellar_xdr.SorobanAuthorizationEntry(
+            credentials=stellar_xdr.SorobanCredentials.from_soroban_credentials_source_account(),
+            root_invocation=stellar_xdr.SorobanAuthorizedInvocation(
+                function=stellar_xdr.SorobanAuthorizedFunction(
+                    type=stellar_xdr.SorobanAuthorizedFunctionType.SOROBAN_AUTHORIZED_FUNCTION_TYPE_CONTRACT_FN,
+                    contract_fn=stellar_xdr.SorobanAuthorizedContractFunction(
+                        contract_address=Address(
+                            "CDCYWK73YTYFJZZSJ5V7EDFNHYBG4QN3VUNG2IGD27KJDDPNCZKBCBXK"
+                        ).to_xdr_sc_address(),
+                        function_name=stellar_xdr.SCSymbol(b"increment"),
+                        args=stellar_xdr.SCVec([]),
+                    ),
+                ),
+                sub_invocations=[],
+            ),
+        )
+
+        transaction = _build_soroban_transaction(None, [auth])
+        with requests_mock.Mocker() as m:
+            m.post(PRC_URL, json=data)
+            new_transaction = SorobanServer(PRC_URL).prepare_transaction(transaction)
+        expected_transaction = copy.deepcopy(transaction)
+        expected_transaction.transaction.fee += int(data["result"]["minResourceFee"])
+        expected_transaction.transaction.soroban_data = (
+            stellar_xdr.SorobanTransactionData.from_xdr(
+                data["result"]["transactionData"]
+            )
+        )
+        op = expected_transaction.transaction.operations[0]
+        op.auth = [auth]
+        assert new_transaction == expected_transaction
+
+    def test_prepare_transaction_error_resp_prepare_transaction_exception_raise(self):
+        data = {
+            "jsonrpc": "2.0",
+            "id": "7b6ada2bdec04ee28147d1557aadc3cf",
+            "result": {
+                "error": 'HostError: Error(WasmVm, MissingValue)\n\nEvent log (newest first):\n   0: [Diagnostic Event] contract:607682f2477a6be8cdf0fdf32be13d5f25a686cc094fd93d5aa3d7b68232d0c0, topics:[error, Error(WasmVm, MissingValue)], data:["invoking unknown export", increment]\n   1: [Diagnostic Event] topics:[fn_call, Bytes(607682f2477a6be8cdf0fdf32be13d5f25a686cc094fd93d5aa3d7b68232d0c0), increment], data:[Address(Account(58b7c4a2c8f297aa8f3d2471281fdfccecafe48e5663313ec18e12a73eca98a1)), 10]\n\nBacktrace (newest first):\n   0: soroban_env_host::vm::Vm::invoke_function_raw\n   1: soroban_env_host::host::frame::<impl soroban_env_host::host::Host>::call_n_internal\n   2: soroban_env_host::host::frame::<impl soroban_env_host::host::Host>::invoke_function\n   3: preflight::preflight_invoke_hf_op::{{closure}}\n   4: preflight::catch_preflight_panic\n   5: _cgo_a3255893d7fd_Cfunc_preflight_invoke_hf_op\n             at /tmp/go-build/cgo-gcc-prolog:99:11\n   6: runtime.asmcgocall\n             at ./runtime/asm_amd64.s:848\n\n',
+                "transactionData": "",
+                "events": None,
+                "minResourceFee": "0",
+                "cost": {"cpuInsns": "0", "memBytes": "0"},
+                "latestLedger": "898",
+            },
+        }
+        transaction = _build_soroban_transaction(None, [])
+        with requests_mock.Mocker() as m:
+            m.post(PRC_URL, json=data)
+            with pytest.raises(
+                PrepareTransactionException,
+                match="Simulation transaction failed, the response contains error information.",
+            ) as e:
+                SorobanServer(PRC_URL).prepare_transaction(transaction)
+            assert (
+                e.value.simulate_transaction_response
+                == SimulateTransactionResponse.parse_obj(data["result"])
+            )
+
+    def test_prepare_transaction_invalid_results_prepare_transaction_exception_raise(
+        self,
+    ):
+        data = {
+            "jsonrpc": "2.0",
+            "id": "e1fabdcdf0244a2a9adfab94d7748b6c",
+            "result": {
+                "transactionData": "AAAAAAAAAAIAAAAGAAAAAcWLK/vE8FTnMk9r8gytPgJuQbutGm0gw9fUkY3tFlQRAAAAFAAAAAEAAAAAAAAAB300Hyg0HZG+Qie3zvsxLvugrNtFqd3AIntWy9bg2YvZAAAAAAAAAAEAAAAGAAAAAcWLK/vE8FTnMk9r8gytPgJuQbutGm0gw9fUkY3tFlQRAAAAEAAAAAEAAAACAAAADwAAAAdDb3VudGVyAAAAABIAAAAAAAAAAFi3xKLI8peqjz0kcSgf38zsr+SOVmMxPsGOEqc+ypihAAAAAQAAAAAAFcLDAAAF8AAAAQgAAAMcAAAAAAAAAJw=",
+                "events": [
+                    "AAAAAQAAAAAAAAAAAAAAAgAAAAAAAAADAAAADwAAAAdmbl9jYWxsAAAAAA0AAAAgxYsr+8TwVOcyT2vyDK0+Am5Bu60abSDD19SRje0WVBEAAAAPAAAACWluY3JlbWVudAAAAAAAABAAAAABAAAAAgAAABIAAAAAAAAAAFi3xKLI8peqjz0kcSgf38zsr+SOVmMxPsGOEqc+ypihAAAAAwAAAAo=",
+                    "AAAAAQAAAAAAAAABxYsr+8TwVOcyT2vyDK0+Am5Bu60abSDD19SRje0WVBEAAAACAAAAAAAAAAIAAAAPAAAACWZuX3JldHVybgAAAAAAAA8AAAAJaW5jcmVtZW50AAAAAAAAAwAAABQ=",
+                ],
+                "minResourceFee": "58595",
+                "results": [
+                    {
+                        "auth": [
+                            "AAAAAAAAAAAAAAABxYsr+8TwVOcyT2vyDK0+Am5Bu60abSDD19SRje0WVBEAAAAJaW5jcmVtZW50AAAAAAAAAgAAABIAAAAAAAAAAFi3xKLI8peqjz0kcSgf38zsr+SOVmMxPsGOEqc+ypihAAAAAwAAAAoAAAAA"
+                        ],
+                        "xdr": "AAAAAwAAABQ=",
+                    },
+                    {
+                        "auth": [
+                            "AAAAAAAAAAAAAAABxYsr+8TwVOcyT2vyDK0+Am5Bu60abSDD19SRje0WVBEAAAAJaW5jcmVtZW50AAAAAAAAAgAAABIAAAAAAAAAAFi3xKLI8peqjz0kcSgf38zsr+SOVmMxPsGOEqc+ypihAAAAAwAAAAoAAAAA"
+                        ],
+                        "xdr": "AAAAAwAAABQ=",
+                    },
+                ],
+                "cost": {"cpuInsns": "1240100", "memBytes": "161637"},
+                "latestLedger": "1479",
+            },
+        }
+        transaction = _build_soroban_transaction(None, [])
+        with requests_mock.Mocker() as m:
+            m.post(PRC_URL, json=data)
+            with pytest.raises(
+                PrepareTransactionException,
+                match='Simulation transaction failed, the "results" field is invalid.',
+            ) as e:
+                SorobanServer(PRC_URL).prepare_transaction(transaction)
+            assert (
+                e.value.simulate_transaction_response
+                == SimulateTransactionResponse.parse_obj(data["result"])
+            )
 
     def test_send_transaction(self):
         result = {

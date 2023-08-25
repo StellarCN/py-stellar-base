@@ -203,6 +203,7 @@ class PrepareTransactionException(SdkError):
         self, message: str, simulate_transaction_response: SimulateTransactionResponse
     ) -> None:
         super().__init__(message)
+        self.message = message
         self.simulate_transaction_response = simulate_transaction_response
 
 
