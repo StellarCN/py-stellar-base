@@ -14,10 +14,9 @@ from .exceptions import (
     PrepareTransactionException,
     SorobanRpcErrorResponse,
 )
-from .operation import BumpFootprintExpiration, InvokeHostFunction, RestoreFootprint
+from .operation import InvokeHostFunction
 from .soroban_rpc import *
 from .strkey import StrKey
-from .transaction import Transaction
 
 if TYPE_CHECKING:
     from .client.base_sync_client import BaseSyncClient
@@ -278,22 +277,35 @@ class SorobanServer:
         self,
         transaction_envelope: TransactionEnvelope,
     ) -> TransactionEnvelope:
-        """
-        Submit a trial contract invocation, first run a simulation of the contract
-        invocation as defined on the incoming transaction, and apply the results
-        to a new copy of the transaction which is then returned. Setting the ledger
-        footprint and authorization, so the resulting transaction is ready for signing & sending.
-        The returned transaction will also have an updated fee that is the sum of fee set
-        on incoming transaction with the contract resource fees estimated from simulation. It is
-        advisable to check the fee on returned transaction and validate or take appropriate
-        measures for interaction with user to confirm it is acceptable.
+        """Submit a trial contract invocation, first run a simulation of the contract
+        invocation as defined on the incoming transaction, and apply the results to
+        a new copy of the transaction which is then returned. Setting the ledger
+        footprint and authorization, so the resulting transaction is ready for signing
+        and sending.
+
+        The returned transaction will also have an updated fee that is the sum of fee
+        set on incoming transaction with the contract resource fees estimated from
+        simulation. It is advisable to check the fee on returned transaction and validate
+        or take appropriate measures for interaction with user to confirm it is acceptable.
 
         You can call the :meth:`simulate_transaction` method directly first if you
         want to inspect estimated fees for a given transaction in detail first if that is
         of importance.
 
-        :param transaction_envelope: The transaction to prepare.
-        :return: A :class:`TransactionEnvelope <stellar_sdk.transaction_envelope.TransactionEnvelope>` object.
+        :param transaction_envelope: The transaction to prepare. It should include exactly one operation, which
+            must be one of :py:class:`RestoreFootprint <stellar_sdk.operation.RestoreFootprint>`,
+            :py:class:`BumpFootprintExpiration <stellar_sdk.operation.BumpFootprintExpiration>`,
+            or :py:class:`InvokeHostFunction <stellar_sdk.operation.InvokeHostFunction>`. Any provided
+            footprint will be ignored. You can use :meth:`stellar_sdk.Transaction.is_soroban_transaction` to check
+            if a transaction is a Soroban transaction. Any provided footprint will be overwritten.
+            However, if your operation has existing auth entries, they will be preferred over ALL auth
+            entries from the simulation. In other words, if you include auth entries, you don't care
+            about the auth returned from the simulation. Other fields (footprint, etc.) will be filled
+            as normal.
+        :return: A copy of the :class:`TransactionEnvelope <stellar_sdk.transaction_envelope.TransactionEnvelope>`,
+            with the expected authorizations (in the case of invocation) and ledger footprint added.
+            The transaction fee will also automatically be padded with the contract's minimum resource fees
+            discovered from the simulation.
         """
         resp = self.simulate_transaction(transaction_envelope)
         if resp.error:
@@ -339,23 +351,12 @@ def _generate_unique_request_id() -> str:
     return uuid.uuid4().hex
 
 
-def _is_soroban_transaction(tx: Transaction) -> bool:
-    if len(tx.operations) != 1:
-        return False
-    if not isinstance(
-        tx.operations[0],
-        (RestoreFootprint, InvokeHostFunction, BumpFootprintExpiration),
-    ):
-        return False
-    return True
-
-
 def _assemble_transaction(
     transaction_envelope: TransactionEnvelope,
     simulation: SimulateTransactionResponse,
 ) -> TransactionEnvelope:
     # TODO: add support for FeeBumpTransactionEnvelope
-    if not _is_soroban_transaction(transaction_envelope.transaction):
+    if not transaction_envelope.transaction.is_soroban_transaction():
         raise ValueError(
             "Unsupported transaction: must contain exactly one operation of "
             "type RestoreFootprint, InvokeHostFunction or BumpFootprintExpiration"
