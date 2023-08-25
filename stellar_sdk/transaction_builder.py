@@ -1391,8 +1391,9 @@ class TransactionBuilder:
 
     def append_create_token_contract_from_address_op(
         self,
-        address: Optional[Address] = None,
+        address: Optional[Union[str, Address]] = None,
         salt: Optional[bytes] = None,
+        auth: List[stellar_xdr.SorobanAuthorizationEntry] = None,  # TODO: sequence
         source: Optional[Union[MuxedAccount, str]] = None,
     ) -> "TransactionBuilder":
         """Append an :class:`HostFunction <stellar_sdk.xdr.HostFunction>` operation to the list of operations.
@@ -1402,9 +1403,9 @@ class TransactionBuilder:
         I do not recommend using this method, please check
         `the documentation <https://soroban.stellar.org/docs/learn/faq#should-i-issue-my-token-as-a-stellar-asset-or-a-custom-soroban-token>`__ for more information.
 
-        :param address: The address using to derive the contract ID, defaults to the operation's source account or
-            the transaction's source account if not set.
+        :param address: The address using to derive the contract ID.
         :param salt: The 32-byte salt to use to derive the contract ID.
+        :param auth: The authorizations required to execute the host function.
         :param source: The source account for the operation. Defaults to the
             transaction's source account.
         :return: This builder instance.
@@ -1415,14 +1416,8 @@ class TransactionBuilder:
             if len(salt) != 32:
                 raise ValueError("`salt` must be 32 bytes long")
 
-        if address is None:
-            if source:
-                if isinstance(source, str):
-                    address = Address(MuxedAccount.from_account(source).account_id)
-                else:
-                    address = Address(source.account_id)
-            else:
-                address = Address(self.source_account.account.account_id)
+        if isinstance(address, str):
+            address = Address(address)
 
         create_contract = stellar_xdr.CreateContractArgs(
             contract_id_preimage=stellar_xdr.ContractIDPreimage.from_contract_id_preimage_from_address(
@@ -1442,7 +1437,9 @@ class TransactionBuilder:
             )
         )
 
-        op = InvokeHostFunction(host_function=host_function, auth=[], source=source)
+        op = InvokeHostFunction(
+            host_function=host_function, auth=auth or [], source=source
+        )
         return self.append_operation(op)
 
     def append_bump_footprint_expiration_op(
