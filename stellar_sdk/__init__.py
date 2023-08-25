@@ -1,3 +1,4 @@
+from . import scval
 from .__version__ import (
     __author__,
     __author_email__,
@@ -30,6 +31,7 @@ from .server import *
 from .server_async import *
 from .signer import *
 from .signer_key import *
+from .soroban_server import *
 from .strkey import *
 from .time_bounds import *
 from .transaction import *

@@ -5,8 +5,6 @@ from typing import Any, Dict, Generic, List, Optional, Sequence, TypeVar, Union
 from pydantic import BaseModel, Field
 from pydantic.generics import GenericModel
 
-from .xdr.sc_val import SCVal as XdrSCVal
-
 T = TypeVar("T")
 
 Id = Union[str, int]
@@ -15,7 +13,7 @@ Id = Union[str, int]
 # JSON-RPC 2.0 definitions
 class Request(GenericModel, Generic[T]):
     jsonrpc: str = "2.0"
-    id: Id  # TODO: Optional?
+    id: Id
     method: str
     params: Optional[T]
 
@@ -44,15 +42,6 @@ class GetAccountResponse(BaseModel):
 
 
 # get_events
-class SegmentFilter(BaseModel):
-    wildcard: Optional[str]
-    scval: Optional[XdrSCVal]
-
-    class Config:
-        json_encoders = {
-            XdrSCVal: lambda v: v.to_xdr(),
-        }
-        arbitrary_types_allowed = True
 
 
 class EventFilterType(Enum):
@@ -174,10 +163,6 @@ class TransactionResponseError(BaseModel):
     code: str
     message: str
     data: Dict[str, Any]
-
-
-class SCVal(BaseModel):
-    xdr: str
 
 
 class GetTransactionRequest(BaseModel):
