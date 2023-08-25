@@ -8,7 +8,6 @@ from pydantic.generics import GenericModel
 from ..xdr.sc_val import SCVal as XdrSCVal
 
 T = TypeVar("T")
-E = TypeVar("E")
 
 Id = Union[str, int]
 
@@ -16,22 +15,22 @@ Id = Union[str, int]
 # JSON-RPC 2.0 definitions
 class Request(GenericModel, Generic[T]):
     jsonrpc: str = "2.0"
-    id: Id  # TODO: Optional?
+    id: Id
     method: str
     params: Optional[T]
 
 
-class Error(GenericModel, Generic[E]):
+class Error(GenericModel):
     code: int
     message: Optional[str]
-    data: Optional[E]
+    data: Optional[str]
 
 
-class Response(GenericModel, Generic[T, E]):
+class Response(GenericModel, Generic[T]):
     jsonrpc: str
     id: Id
     result: Optional[T]
-    error: Optional[Error[E]]
+    error: Optional[Error]
 
 
 # account
