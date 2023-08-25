@@ -1246,15 +1246,11 @@ class TransactionBuilder:
             transaction's source account.
         :return: This builder instance.
         """
-        if StrKey.is_valid_contract(contract_id):
-            contract_id_bytes = StrKey.decode_contract(contract_id)
-        elif is_valid_hash(contract_id):
-            contract_id_bytes = binascii.unhexlify(contract_id)
-        else:
+        if not StrKey.is_valid_contract(contract_id):
             raise ValueError("`contract_id` is invalid.")
 
         invoke_params = [
-            Address(StrKey.encode_contract(contract_id_bytes)).to_xdr_sc_val(),
+            Address(contract_id).to_xdr_sc_val(),
             stellar_xdr.SCVal.from_scv_symbol(
                 sym=stellar_xdr.SCSymbol(sc_symbol=function_name.encode("utf-8")),
             ),

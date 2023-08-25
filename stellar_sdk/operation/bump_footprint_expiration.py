@@ -16,6 +16,11 @@ class BumpFootprintExpiration(Operation):
         self, ledgers_to_expire: int, source: Optional[Union[MuxedAccount, str]] = None
     ) -> None:
         super().__init__(source)
+        if ledgers_to_expire < 0 or ledgers_to_expire > 2**32 - 1:
+            raise ValueError(
+                f"`ledgers_to_expire` value must be between 0 and 2**32-1, got {ledgers_to_expire}"
+            )
+
         self.ledgers_to_expire: int = ledgers_to_expire
 
     def _to_operation_body(self) -> stellar_xdr.OperationBody:
