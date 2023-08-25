@@ -81,7 +81,7 @@ def test_int64_out_of_range_raise(v):
         (-1, "AAAACv////////////////////8="),
         (2**64, "AAAACgAAAAAAAAABAAAAAAAAAAA="),
         (-(2**64), "AAAACv//////////AAAAAAAAAAA="),
-        (2**127 - 1, "AAAACn////////////////////8="),  # TODO: recheck
+        (2**127 - 1, "AAAACn////////////////////8="),
         (-(2**127), "AAAACoAAAAAAAAAAAAAAAAAAAAA="),
     ],
 )
@@ -112,7 +112,7 @@ def test_int128_out_of_range_raise(v):
         (
             2**255 - 1,
             "AAAADH//////////////////////////////////////////",
-        ),  # TODO: recheck
+        ),
         (-(2**255), "AAAADIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"),
     ],
 )
@@ -215,7 +215,7 @@ def test_uint64_out_of_range_raise(v):
         (0, "AAAACQAAAAAAAAAAAAAAAAAAAAA="),
         (1, "AAAACQAAAAAAAAAAAAAAAAAAAAE="),
         (2**64, "AAAACQAAAAAAAAABAAAAAAAAAAA="),
-        (2**128 - 1, "AAAACf////////////////////8="),  # TODO: recheck
+        (2**128 - 1, "AAAACf////////////////////8="),
     ],
 )
 def test_uint128(v, expected_xdr):
