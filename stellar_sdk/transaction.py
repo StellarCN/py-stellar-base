@@ -4,11 +4,8 @@ from . import xdr as stellar_xdr
 from .keypair import Keypair
 from .memo import Memo, NoneMemo
 from .muxed_account import MuxedAccount
-from .operation.bump_footprint_expiration import BumpFootprintExpiration
 from .operation.create_claimable_balance import CreateClaimableBalance
-from .operation.invoke_host_function import InvokeHostFunction
 from .operation.operation import Operation
-from .operation.restore_footprint import RestoreFootprint
 from .preconditions import Preconditions
 from .strkey import StrKey
 from .time_bounds import TimeBounds
@@ -254,23 +251,6 @@ class Transaction:
             return cls.from_xdr_object(xdr_object, v1)
         xdr_object_v0 = stellar_xdr.TransactionV0.from_xdr(xdr)
         return cls.from_xdr_object(xdr_object_v0, v1)
-
-    def is_soroban_transaction(self) -> bool:
-        if len(self.operations) != 1:
-            return False
-        if not isinstance(
-            self.operations[0],
-            (RestoreFootprint, InvokeHostFunction, BumpFootprintExpiration),
-        ):
-            return False
-        return True
-
-    def _is_soroban_invoke_host_function_transaction(self) -> bool:
-        if not self.is_soroban_transaction():
-            return False
-        if not isinstance(self.operations[0], InvokeHostFunction):
-            return False
-        return True
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):

@@ -14,8 +14,10 @@ from .exceptions import (
     PrepareTransactionException,
     SorobanRpcErrorResponse,
 )
+from .operation import BumpFootprintExpiration, InvokeHostFunction, RestoreFootprint
 from .soroban_rpc import *
 from .strkey import StrKey
+from .transaction import Transaction
 from .utils import is_valid_hash
 
 if TYPE_CHECKING:
@@ -340,12 +342,23 @@ def _generate_unique_request_id() -> str:
     return uuid.uuid4().hex
 
 
+def _is_soroban_transaction(tx: Transaction) -> bool:
+    if len(tx.operations) != 1:
+        return False
+    if not isinstance(
+        tx.operations[0],
+        (RestoreFootprint, InvokeHostFunction, BumpFootprintExpiration),
+    ):
+        return False
+    return True
+
+
 def _assemble_transaction(
     transaction_envelope: TransactionEnvelope,
     simulation: SimulateTransactionResponse,
 ) -> TransactionEnvelope:
     # TODO: add support for FeeBumpTransactionEnvelope
-    if not transaction_envelope.transaction.is_soroban_transaction():
+    if not _is_soroban_transaction(transaction_envelope.transaction):
         raise ValueError(
             "Unsupported transaction: must contain exactly one operation of "
             "type RestoreFootprint, InvokeHostFunction or BumpFootprintExpiration"
@@ -369,9 +382,9 @@ def _assemble_transaction(
 
     op = te.transaction.operations[0]
     if (
-        te.transaction._is_soroban_invoke_host_function_transaction()
-        and not op.auth  # type: ignore[attr-defined]
+        isinstance(op, InvokeHostFunction)
+        and not op.auth
         and simulation.results[0].auth
     ):
-        op.auth = simulation.results[0].auth  # type: ignore[attr-defined]
+        op.auth = simulation.results[0].auth
     return te
