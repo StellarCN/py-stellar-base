@@ -1355,7 +1355,7 @@ class TransactionBuilder:
         op = InvokeHostFunction(host_function=host_function, auth=[], source=source)
         return self.append_operation(op)
 
-    def append_deploy_create_token_contract_from_asset_op(
+    def append_create_token_contract_from_asset_op(
         self,
         asset: Asset,
         source: Optional[Union[MuxedAccount, str]] = None,
@@ -1389,7 +1389,7 @@ class TransactionBuilder:
         op = InvokeHostFunction(host_function=host_function, auth=[], source=source)
         return self.append_operation(op)
 
-    def append_deploy_create_token_contract_from_address_op(
+    def append_create_token_contract_from_address_op(
         self,
         address: Optional[Address] = None,
         salt: Optional[bytes] = None,
