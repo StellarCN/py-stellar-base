@@ -55,9 +55,14 @@ class SegmentFilter(BaseModel):
         arbitrary_types_allowed = True
 
 
+class EventFilterType(Enum):
+    SYSTEM = "system"
+    CONTRACT = "contract"
+    DIAGNOSTIC = "diagnostic"
+
+
 class EventFilter(BaseModel):
-    # TODO: enum
-    event_type: Optional[str] = Field(alias="type")
+    event_type: Optional[EventFilterType] = Field(alias="type")
     contract_ids: Optional[List[str]] = Field(alias="contractIds")
     topics: Optional[List[List[str]]]
 

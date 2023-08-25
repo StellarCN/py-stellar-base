@@ -302,7 +302,7 @@ class TestSorobanServer:
         start_ledger = 100
         filters = [
             EventFilter(
-                event_type="contract",
+                event_type=EventFilterType.CONTRACT,
                 contract_ids=[
                     "607682f2477a6be8cdf0fdf32be13d5f25a686cc094fd93d5aa3d7b68232d0c0"
                 ],
@@ -311,6 +311,7 @@ class TestSorobanServer:
                 ],
             )
         ]
+        GetEventsResponse.parse_obj(result)
         cursor = "0000007799660613632-0000000000"
         limit = 10
         with requests_mock.Mocker() as m:

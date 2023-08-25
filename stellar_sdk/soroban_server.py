@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import copy
+import json
 import uuid
 from typing import TYPE_CHECKING, Type
 
@@ -312,10 +313,10 @@ class SorobanServer:
         self._client.close()
 
     def _post(self, request_body: Request, response_body_type: Type[V]) -> V:
-        json_data = request_body.dict(by_alias=True)
+        json_data = request_body.json(by_alias=True)
         data = self._client.post(
             self.server_url,
-            json_data=json_data,
+            json_data=json.loads(json_data),
         )
         response = Response[response_body_type].parse_obj(data.json())  # type: ignore[valid-type]
         if response.error:
