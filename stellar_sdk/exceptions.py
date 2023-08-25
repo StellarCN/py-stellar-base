@@ -179,10 +179,13 @@ class FeatureNotEnabledError(SdkError):
 class SorobanRpcErrorResponse(BaseRequestError):
     """The exception is thrown when the RPC server returns an error response."""
 
-    def __init__(self, code: int, message: str, data: Optional[str] = None) -> None:
+    def __init__(
+        self, code: int, message: Optional[str], data: Optional[str] = None
+    ) -> None:
         super().__init__(message)
         self.code = code
         self.data = data
+        self.message = message
 
 
 class AccountNotFoundException(SdkError):

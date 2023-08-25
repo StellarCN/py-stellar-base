@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import binascii
 import copy
 import uuid
 from typing import TYPE_CHECKING, Type
@@ -18,7 +17,6 @@ from .operation import BumpFootprintExpiration, InvokeHostFunction, RestoreFootp
 from .soroban_rpc import *
 from .strkey import StrKey
 from .transaction import Transaction
-from .utils import is_valid_hash
 
 if TYPE_CHECKING:
     from .client.base_sync_client import BaseSyncClient
@@ -232,7 +230,7 @@ class SorobanServer:
         )
 
         resp = self.get_ledger_entries([key])
-        if resp.entries is None:
+        if not resp.entries:
             raise AccountNotFoundException(account_id)
         assert len(resp.entries) == 1
         data = stellar_xdr.LedgerEntryData.from_xdr(resp.entries[0].xdr)
@@ -255,8 +253,6 @@ class SorobanServer:
         :return: A :class:`LedgerEntryResult <stellar_sdk.soroban_rpc.LedgerEntryResult>` object contains the ledger entry result or ``None`` if not found.
         :raises: :exc:`SorobanRpcErrorResponse <stellar_sdk.exceptions.SorobanRpcErrorResponse>` - If the Soroban-RPC instance returns an error response.
         """
-        if is_valid_hash(contract_id):
-            contract_id = StrKey.encode_contract(binascii.unhexlify(contract_id))
         sc_address = Address(contract_id).to_xdr_sc_address()
         xdr_durability = (
             stellar_xdr.ContractDataDurability.PERSISTENT
@@ -321,7 +317,7 @@ class SorobanServer:
             self.server_url,
             json_data=json_data,
         )
-        response = Response[response_body_type, str].parse_obj(data.json())  # type: ignore[valid-type]
+        response = Response[response_body_type].parse_obj(data.json())  # type: ignore[valid-type]
         if response.error:
             raise SorobanRpcErrorResponse(
                 response.error.code, response.error.message, response.error.data
@@ -386,5 +382,8 @@ def _assemble_transaction(
         and not op.auth
         and simulation.results[0].auth
     ):
-        op.auth = simulation.results[0].auth
+        op.auth = [
+            stellar_xdr.SorobanAuthorizationEntry.from_xdr(xdr)
+            for xdr in simulation.results[0].auth
+        ]
     return te

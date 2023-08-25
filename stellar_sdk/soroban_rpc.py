@@ -20,7 +20,7 @@ class Request(GenericModel, Generic[T]):
     params: Optional[T]
 
 
-class Error(GenericModel):
+class Error(BaseModel):
     code: int
     message: Optional[str]
     data: Optional[str]
@@ -56,9 +56,13 @@ class SegmentFilter(BaseModel):
 
 
 class EventFilter(BaseModel):
+    # TODO: enum
     event_type: Optional[str] = Field(alias="type")
     contract_ids: Optional[List[str]] = Field(alias="contractIds")
-    topics: Optional[List[List[SegmentFilter]]]
+    topics: Optional[List[List[str]]]
+
+    class Config:
+        allow_population_by_field_name = True
 
 
 class EventInfoValue(BaseModel):
@@ -90,17 +94,6 @@ class GetEventsRequest(BaseModel):
 
 class GetEventsResponse(BaseModel):
     events: Sequence[EventInfo] = Field(alias="events")
-    latest_ledger: int = Field(alias="latestLedger")
-
-
-# get_ledger_entry
-class GetLedgerEntryRequest(BaseModel):
-    key: str
-
-
-class GetLedgerEntryResponse(BaseModel):
-    xdr: str
-    last_modified_ledger: int = Field(alias="lastModifiedLedgerSeq")
     latest_ledger: int = Field(alias="latestLedger")
 
 

@@ -139,6 +139,7 @@ def from_duration(sc_val: stellar_xdr.SCVal) -> int:
         raise ValueError(
             f"Invalid sc_val type, must be SCV_DURATION, got {sc_val.type}"
         )
+    assert sc_val.duration is not None
     return sc_val.duration.duration.uint64
 
 

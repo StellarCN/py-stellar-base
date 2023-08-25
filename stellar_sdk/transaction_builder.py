@@ -1231,6 +1231,7 @@ class TransactionBuilder:
         contract_id: str,
         function_name: str,
         parameters: Sequence[stellar_xdr.SCVal],
+        auth: Sequence[stellar_xdr.SorobanAuthorizationEntry] = None,
         source: Optional[Union[MuxedAccount, str]] = None,
     ) -> "TransactionBuilder":
         """Append an :class:`HostFunction <stellar_sdk.xdr.HostFunction>` operation to the list of operations.
@@ -1240,6 +1241,7 @@ class TransactionBuilder:
         :param contract_id: The ID of the contract to invoke.
         :param function_name: The name of the function to invoke.
         :param parameters: The parameters to pass to the method.
+        :param auth: The authorizations required to execute the host function.
         :param source: The source account for the operation. Defaults to the
             transaction's source account.
         :return: This builder instance.
@@ -1264,7 +1266,9 @@ class TransactionBuilder:
                 stellar_xdr.SCVec(invoke_params)
             )
         )
-        op = InvokeHostFunction(host_function=host_function, auth=[], source=source)
+        op = InvokeHostFunction(
+            host_function=host_function, auth=auth or [], source=source
+        )
         return self.append_operation(op)
 
     def append_upload_contract_wasm_op(
