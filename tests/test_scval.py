@@ -41,7 +41,7 @@ def test_duration(v):
 @pytest.mark.parametrize("v", [2**64, -1])
 def test_duration_out_of_range_raise(v):
     v = 2**64
-    with pytest.raises(ValueError, match="Invalid value"):
+    with pytest.raises(ValueError, match="Invalid data"):
         to_duration(v)
 
 
@@ -55,7 +55,7 @@ def test_int32(v):
 
 @pytest.mark.parametrize("v", [2**31, -(2**31) - 1])
 def test_int32_out_of_range_raise(v):
-    with pytest.raises(ValueError, match="Invalid value"):
+    with pytest.raises(ValueError, match="Invalid data"):
         to_int32(v)
 
 
@@ -69,7 +69,7 @@ def test_int64(v):
 
 @pytest.mark.parametrize("v", [2**63, -(2**63) - 1])
 def test_int64_out_of_range_raise(v):
-    with pytest.raises(ValueError, match="Invalid value"):
+    with pytest.raises(ValueError, match="Invalid data"):
         to_int64(v)
 
 
@@ -93,7 +93,7 @@ def test_int128(v, expected_xdr):
 
 @pytest.mark.parametrize("v", [2**127, -(2**127) - 1])
 def test_int128_out_of_range_raise(v):
-    with pytest.raises(ValueError, match="Invalid value"):
+    with pytest.raises(ValueError, match="Invalid data"):
         to_int128(v)
 
 
@@ -124,7 +124,7 @@ def test_int256(v, expected_xdr):
 
 @pytest.mark.parametrize("v", [2**255, -(2**255) - 1])
 def test_int256_out_of_range_raise(v):
-    with pytest.raises(ValueError, match="Invalid value"):
+    with pytest.raises(ValueError, match="Invalid data"):
         to_int256(v)
 
 
@@ -177,7 +177,7 @@ def test_timepoint():
 
 @pytest.mark.parametrize("v", [2**64, -1])
 def test_timepoint_out_of_range_raise(v):
-    with pytest.raises(ValueError, match="Invalid value"):
+    with pytest.raises(ValueError, match="Invalid data"):
         to_timepoint(v)
 
 
@@ -191,7 +191,7 @@ def test_uint32(v):
 
 @pytest.mark.parametrize("v", [2**32, -1])
 def test_uint32_out_of_range_raise(v):
-    with pytest.raises(ValueError, match="Invalid value"):
+    with pytest.raises(ValueError, match="Invalid data"):
         to_uint32(v)
 
 
@@ -205,7 +205,7 @@ def test_uint64(v):
 
 @pytest.mark.parametrize("v", [2**64, -1])
 def test_uint64_out_of_range_raise(v):
-    with pytest.raises(ValueError, match="Invalid value"):
+    with pytest.raises(ValueError, match="Invalid data"):
         to_uint64(v)
 
 
@@ -226,7 +226,7 @@ def test_uint128(v, expected_xdr):
 
 @pytest.mark.parametrize("v", [-1, 2**128])
 def test_uint128_out_of_range_raise(v):
-    with pytest.raises(ValueError, match="Invalid value"):
+    with pytest.raises(ValueError, match="Invalid data"):
         to_uint128(v)
 
 
@@ -252,7 +252,7 @@ def test_uint256(v, expected_xdr):
 
 @pytest.mark.parametrize("v", [-1, 2**256])
 def test_uint256_out_of_range_raise(v):
-    with pytest.raises(ValueError, match="Invalid value"):
+    with pytest.raises(ValueError, match="Invalid data"):
         to_uint256(v)
 
 
