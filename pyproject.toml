@@ -53,7 +53,7 @@ stellar-base-sseclient = "^0.0.21"
 mnemonic = "^0.20"
 toml = "^0.10.2"
 urllib3 = "^1.26.7"
-pydantic = "^1.10.2"
+pydantic = "^2.3.0"
 xdrlib3 = "^0.1.1"
 
 [tool.poetry.dev-dependencies]
