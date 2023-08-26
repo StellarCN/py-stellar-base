@@ -16,7 +16,7 @@ class AddressType(IntEnum):
     """An account address, address looks like ``GBJCHUKZMTFSLOMNC7P4TS4VJJBTCYL3XKSOLXAUJSD56C4LHND5TWUC``."""
 
     CONTRACT = 1
-    """An account address, address looks like ``CCJZ5DGASBWQXR5MPFCJXMBI333XE5U3FSJTNQU7RIKE3P5GN2K2WYD5``."""
+    """An contract address, address looks like ``CCJZ5DGASBWQXR5MPFCJXMBI333XE5U3FSJTNQU7RIKE3P5GN2K2WYD5``."""
 
 
 class Address:

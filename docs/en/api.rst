@@ -19,7 +19,7 @@ Address
 ^^^^^^^
 
 .. autoclass:: stellar_sdk.address.Address
-   :members: to_xdr_object, from_xdr_object
+   :members:
 
 .. autoclass:: stellar_sdk.address.AddressType
    :members:
