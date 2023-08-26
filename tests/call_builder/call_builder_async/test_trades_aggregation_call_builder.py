@@ -2,7 +2,6 @@ import pytest
 
 from stellar_sdk import Asset
 from stellar_sdk.call_builder.call_builder_async import TradeAggregationsCallBuilder
-from stellar_sdk.exceptions import ValueError
 from tests.call_builder.call_builder_async import client, horizon_url
 
 

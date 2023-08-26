@@ -9,7 +9,7 @@ from typing import Dict, Optional, Sequence, Union
 from urllib.parse import urlsplit, urlunsplit
 
 from .asset import Asset
-from .exceptions import Ed25519PublicKeyInvalidError, NoApproximationError, ValueError
+from .exceptions import Ed25519PublicKeyInvalidError, NoApproximationError
 from .strkey import StrKey
 
 MUXED_ACCOUNT_STARTING_LETTER: str = "M"

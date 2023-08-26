@@ -4,7 +4,6 @@ from typing import Optional, Sequence, Union
 
 from .. import xdr as stellar_xdr
 from ..asset import Asset
-from ..exceptions import ValueError
 from ..keypair import Keypair
 from ..muxed_account import MuxedAccount
 from ..strkey import StrKey

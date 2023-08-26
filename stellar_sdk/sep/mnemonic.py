@@ -13,8 +13,6 @@ from typing import Union
 from mnemonic import Mnemonic
 from mnemonic.mnemonic import PBKDF2_ROUNDS
 
-from ..exceptions import ValueError
-
 
 @unique
 class Language(Enum):

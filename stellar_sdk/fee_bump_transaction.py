@@ -1,7 +1,6 @@
 from typing import Union
 
 from . import xdr as stellar_xdr
-from .exceptions import ValueError
 from .keypair import Keypair
 from .muxed_account import MuxedAccount
 from .transaction import Transaction

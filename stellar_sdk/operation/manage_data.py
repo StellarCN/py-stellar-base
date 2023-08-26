@@ -1,7 +1,6 @@
 from typing import Optional, Union
 
 from .. import xdr as stellar_xdr
-from ..exceptions import ValueError
 from ..muxed_account import MuxedAccount
 from .operation import Operation
 

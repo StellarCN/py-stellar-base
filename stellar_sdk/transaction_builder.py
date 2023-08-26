@@ -10,7 +10,6 @@ from . import xdr as stellar_xdr
 from .account import Account
 from .address import Address
 from .asset import Asset
-from .exceptions import ValueError
 from .fee_bump_transaction import FeeBumpTransaction
 from .fee_bump_transaction_envelope import FeeBumpTransactionEnvelope
 from .keypair import Keypair

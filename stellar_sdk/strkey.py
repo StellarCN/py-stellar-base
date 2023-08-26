@@ -10,8 +10,6 @@ from .exceptions import (
     Ed25519PublicKeyInvalidError,
     Ed25519SecretSeedInvalidError,
     MuxedEd25519AccountInvalidError,
-    TypeError,
-    ValueError,
 )
 
 __all__ = ["StrKey"]

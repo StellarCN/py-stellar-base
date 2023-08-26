@@ -2,7 +2,7 @@ import re
 from typing import Dict, Optional, Type, Union
 
 from . import xdr as stellar_xdr
-from .exceptions import AssetCodeInvalidError, AssetIssuerInvalidError, AttributeError
+from .exceptions import AssetCodeInvalidError, AssetIssuerInvalidError
 from .keypair import Keypair
 from .strkey import StrKey
 

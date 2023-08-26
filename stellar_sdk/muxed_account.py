@@ -1,7 +1,6 @@
 from typing import Optional
 
 from . import xdr as stellar_xdr
-from .exceptions import ValueError
 from .keypair import Keypair
 from .strkey import StrKey
 

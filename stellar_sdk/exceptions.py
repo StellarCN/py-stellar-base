@@ -5,9 +5,6 @@ from .client.response import Response
 
 __all__ = [
     "SdkError",
-    "ValueError",
-    "TypeError",
-    "AttributeError",
     "BadSignatureError",
     "Ed25519PublicKeyInvalidError",
     "Ed25519SecretSeedInvalidError",
@@ -34,12 +31,6 @@ __all__ = [
 ]
 
 from .soroban_rpc import SimulateTransactionResponse
-
-# TODO: remove the following lines
-# The following is kept for compatibility
-ValueError = ValueError
-TypeError = TypeError
-AttributeError = AttributeError
 
 
 class SdkError(Exception):

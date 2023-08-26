@@ -14,7 +14,6 @@ from ..client.base_async_client import BaseAsyncClient
 from ..client.base_sync_client import BaseSyncClient
 from ..client.requests_client import RequestsClient
 from ..client.response import Response
-from ..exceptions import ValueError
 from .exceptions import (
     BadFederationResponseError,
     FederationServerNotFoundError,

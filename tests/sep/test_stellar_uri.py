@@ -3,7 +3,6 @@ from decimal import Decimal
 import pytest
 
 from stellar_sdk import Asset, Keypair, Network
-from stellar_sdk.exceptions import ValueError
 from stellar_sdk.fee_bump_transaction_envelope import FeeBumpTransactionEnvelope
 from stellar_sdk.memo import *
 from stellar_sdk.sep.stellar_uri import (

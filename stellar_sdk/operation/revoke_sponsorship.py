@@ -5,7 +5,6 @@ from typing import Optional, Union
 
 from .. import xdr as stellar_xdr
 from ..asset import Asset
-from ..exceptions import ValueError
 from ..keypair import Keypair
 from ..liquidity_pool_id import LiquidityPoolId
 from ..muxed_account import MuxedAccount
