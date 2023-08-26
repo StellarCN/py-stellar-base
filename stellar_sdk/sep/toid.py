@@ -99,9 +99,14 @@ class TOID:
 
     @staticmethod
     def ledger_range_inclusive(start: int, end: int) -> Tuple[int, int]:
-        """:return: The inclusive range representation between two
-        ledgers inclusive. The second value points at the `end`+1 ledger so when using
-        this value make sure < order is used."""
+        """The inclusive range representation between two
+        ledgers inclusive. The second value points at the end+1 ledger so when using
+        this value make sure < order is used.
+
+        :param start: The start ledger sequence.
+        :param end: The end ledger sequence.
+        :return: The inclusive range representation between two ledgers.
+        """
         if start > end:
             raise ValueError(
                 "Invalid `start` and `end` values, `start` must be less than or equal to `end`."
