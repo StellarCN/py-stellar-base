@@ -5,18 +5,17 @@ See https://soroban.stellar.org/docs/learn/authorization#transaction-invoker
 """
 import time
 
-from stellar_sdk import Keypair, Network, TransactionBuilder
+from stellar_sdk import Keypair, Network, SorobanServer, TransactionBuilder, scval
 from stellar_sdk import xdr as stellar_xdr
-from stellar_sdk import SorobanServer
+from stellar_sdk.exceptions import PrepareTransactionException
 from stellar_sdk.soroban_rpc import GetTransactionStatus
-from stellar_sdk import scval
 
 rpc_server_url = "https://rpc-futurenet.stellar.org:443/"
 soroban_server = SorobanServer(rpc_server_url)
 network_passphrase = Network.FUTURENET_NETWORK_PASSPHRASE
 
 # https://github.com/stellar/soroban-examples/tree/v0.6.0/auth
-contract_id = "CDNTSPC5WR5MF5J42B5JTVFWR6NXVYBP7VUMB74J7IYT6JYDWT67NV5T"
+contract_id = "CAROXTYEBHAQWS2DFQBFZPMHWDUMPB2HJRNPPUMJUNBC3USBZJYKTAKF"
 tx_submitter_kp = Keypair.from_secret(
     "SAAPYAPTTRZMCUZFPG3G66V4ZMHTK4TWA6NS7U4F7Z3IMUD52EK4DDEV"
 )
@@ -36,7 +35,12 @@ tx = (
     .build()
 )
 
-tx = soroban_server.prepare_transaction(tx)
+try:
+    tx = soroban_server.prepare_transaction(tx)
+except PrepareTransactionException as e:
+    print(f"Got exception: {e.simulate_transaction_response}")
+    raise e
+
 tx.sign(tx_submitter_kp)
 print(f"Signed XDR:\n{tx.to_xdr()}")
 

@@ -2,9 +2,9 @@
 """
 import time
 
-from stellar_sdk import Keypair, Network, StrKey, TransactionBuilder
+from stellar_sdk import Keypair, Network, SorobanServer, StrKey, TransactionBuilder
 from stellar_sdk import xdr as stellar_xdr
-from stellar_sdk import SorobanServer
+from stellar_sdk.exceptions import PrepareTransactionException
 from stellar_sdk.soroban_rpc import GetTransactionStatus
 
 # TODO: You need to replace the following parameters according to the actual situation
@@ -31,7 +31,12 @@ tx = (
     .build()
 )
 
-tx = soroban_server.prepare_transaction(tx)
+try:
+    tx = soroban_server.prepare_transaction(tx)
+except PrepareTransactionException as e:
+    print(f"Got exception: {e.simulate_transaction_response}")
+    raise e
+
 tx.sign(kp)
 send_transaction_data = soroban_server.send_transaction(tx)
 print(f"sent transaction: {send_transaction_data}")
@@ -67,14 +72,16 @@ source = soroban_server.load_account(
 tx = (
     TransactionBuilder(source, network_passphrase)
     .set_timeout(300)
-    .append_create_contract_op(
-        wasm_id=wasm_id,
-        address=kp.public_key
-    )
+    .append_create_contract_op(wasm_id=wasm_id, address=kp.public_key)
     .build()
 )
 
-tx = soroban_server.prepare_transaction(tx)
+try:
+    tx = soroban_server.prepare_transaction(tx)
+except PrepareTransactionException as e:
+    print(f"Got exception: {e.simulate_transaction_response}")
+    raise e
+
 tx.sign(kp)
 
 send_transaction_data = soroban_server.send_transaction(tx)
