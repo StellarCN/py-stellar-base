@@ -31,6 +31,7 @@ from .server import *
 from .server_async import *
 from .signer import *
 from .signer_key import *
+from .soroban_data_builder import *
 from .soroban_server import *
 from .strkey import *
 from .time_bounds import *

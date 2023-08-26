@@ -8,6 +8,7 @@ from .operation import BumpFootprintExpiration, InvokeHostFunction, RestoreFootp
 from .operation.create_claimable_balance import CreateClaimableBalance
 from .operation.operation import Operation
 from .preconditions import Preconditions
+from .soroban_data_builder import SorobanDataBuilder
 from .strkey import StrKey
 from .time_bounds import TimeBounds
 from .utils import sha256
@@ -86,7 +87,9 @@ class Transaction:
         self.memo: Memo = memo
         self.fee: int = fee
         self.preconditions: Optional[Preconditions] = preconditions
-        self.soroban_data: Optional[stellar_xdr.SorobanTransactionData] = soroban_data
+        self.soroban_data: Optional[stellar_xdr.SorobanTransactionData] = (
+            SorobanDataBuilder.from_xdr(soroban_data).build() if soroban_data else None
+        )
         self.v1: bool = v1
 
     def get_claimable_balance_id(self, operation_index: int) -> str:
