@@ -25,6 +25,7 @@ from .preconditions import Preconditions
 from .price import Price
 from .signer import Signer
 from .signer_key import SignedPayloadSigner, SignerKey
+from .soroban_data_builder import SorobanDataBuilder
 from .time_bounds import TimeBounds
 from .transaction import Transaction
 from .transaction_envelope import TransactionEnvelope
@@ -348,7 +349,7 @@ class TransactionBuilder:
         return self
 
     def set_soroban_data(
-        self, soroban_data: Union[stellar_xdr.SorobanTransactionData]
+        self, soroban_data: Union[stellar_xdr.SorobanTransactionData, str]
     ) -> "TransactionBuilder":
         """Set the SorobanTransactionData. For non-contract(non-Soroban) transactions, this setting has no effect.
 
@@ -360,9 +361,7 @@ class TransactionBuilder:
         :param soroban_data: The SorobanTransactionData as XDR object or base64 encoded string.
         :return: This builder instance.
         """
-        if isinstance(soroban_data, str):
-            soroban_data = stellar_xdr.SorobanTransactionData.from_xdr(soroban_data)
-        self.soroban_data = soroban_data
+        self.soroban_data = SorobanDataBuilder.from_xdr(soroban_data).build()
         return self
 
     def add_extra_signer(
