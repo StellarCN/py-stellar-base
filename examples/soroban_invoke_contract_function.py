@@ -14,9 +14,9 @@ import time
 
 from stellar_sdk import Keypair, Network, TransactionBuilder
 from stellar_sdk import xdr as stellar_xdr
-from stellar_sdk.soroban import SorobanServer
-from stellar_sdk.soroban.soroban_rpc import GetTransactionStatus
-from stellar_sdk.soroban.types import Symbol
+from stellar_sdk import SorobanServer
+from stellar_sdk.soroban_rpc import GetTransactionStatus
+from stellar_sdk import scval
 
 # TODO: You need to replace the following parameters according to the actual situation
 secret = "SAAPYAPTTRZMCUZFPG3G66V4ZMHTK4TWA6NS7U4F7Z3IMUD52EK4DDEV"
@@ -35,7 +35,7 @@ tx = (
     .append_invoke_contract_function_op(
         contract_id=contract_id,
         function_name="hello",
-        parameters=[Symbol("world")],
+        parameters=[scval.to_symbol("world")],
     )
     .build()
 )
@@ -65,3 +65,5 @@ if get_transaction_data.status == GetTransactionStatus.SUCCESS:
     result = transaction_meta.v3.soroban_meta.return_value  # type: ignore[union-attr]
     output = [x.sym.sc_symbol.decode() for x in result.vec.sc_vec]  # type: ignore
     print(f"transaction result: {output}")
+else:
+    print(f"Transaction failed: {get_transaction_data.result_xdr}")
