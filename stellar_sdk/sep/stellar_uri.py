@@ -15,7 +15,6 @@ from typing import Dict, List, Optional, Tuple, Union
 from urllib import parse
 
 from ..asset import Asset
-from ..exceptions import ValueError
 from ..fee_bump_transaction_envelope import FeeBumpTransactionEnvelope
 from ..keypair import Keypair
 from ..memo import HashMemo, IdMemo, Memo, NoneMemo, ReturnHashMemo, TextMemo

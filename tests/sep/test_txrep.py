@@ -3,7 +3,6 @@ import os
 import pytest
 
 from stellar_sdk import *
-from stellar_sdk.exceptions import ValueError
 from stellar_sdk.sep.txrep import (
     _decode_asset,
     _get_bool_value,

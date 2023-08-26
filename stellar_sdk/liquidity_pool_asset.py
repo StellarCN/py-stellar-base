@@ -1,6 +1,5 @@
 from . import xdr as stellar_xdr
 from .asset import Asset
-from .exceptions import ValueError
 from .utils import sha256
 
 __all__ = ["LiquidityPoolAsset", "LIQUIDITY_POOL_FEE_V18"]

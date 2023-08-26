@@ -1,6 +1,5 @@
 from ...asset import Asset
 from ...call_builder.base.base_call_builder import BaseCallBuilder
-from ...exceptions import ValueError
 
 __all__ = ["BaseTradeAggregationsCallBuilder"]
 

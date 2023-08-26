@@ -6,7 +6,7 @@ from nacl.exceptions import BadSignatureError as NaclBadSignatureError
 
 from . import xdr as stellar_xdr
 from .decorated_signature import DecoratedSignature
-from .exceptions import AttributeError, BadSignatureError, MissingEd25519SecretSeedError
+from .exceptions import BadSignatureError, MissingEd25519SecretSeedError
 from .sep.mnemonic import Language, StellarMnemonic
 from .strkey import StrKey
 

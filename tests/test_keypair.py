@@ -2,7 +2,6 @@ import pytest
 
 from stellar_sdk import Keypair, StrKey
 from stellar_sdk.exceptions import (
-    AttributeError,
     BadSignatureError,
     Ed25519PublicKeyInvalidError,
     Ed25519SecretSeedInvalidError,

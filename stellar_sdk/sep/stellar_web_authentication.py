@@ -14,7 +14,7 @@ from typing import Iterable, List, Optional, Sequence, Union
 
 from .. import xdr as stellar_xdr
 from ..account import Account
-from ..exceptions import BadSignatureError, ValueError
+from ..exceptions import BadSignatureError
 from ..keypair import Keypair
 from ..memo import IdMemo, NoneMemo
 from ..muxed_account import MuxedAccount

@@ -1,7 +1,6 @@
 import pytest
 
 from stellar_sdk import Asset, LiquidityPoolId
-from stellar_sdk.exceptions import ValueError
 from stellar_sdk.xdr import AssetType
 
 

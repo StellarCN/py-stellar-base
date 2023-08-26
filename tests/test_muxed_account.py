@@ -2,7 +2,6 @@ import pytest
 
 from stellar_sdk import MuxedAccount, StrKey
 from stellar_sdk import xdr as stellar_xdr
-from stellar_sdk.exceptions import ValueError
 
 
 class TestMuxedAccount:

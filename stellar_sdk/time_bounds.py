@@ -1,5 +1,4 @@
 from . import xdr as stellar_xdr
-from .exceptions import ValueError
 
 __all__ = ["TimeBounds"]
 

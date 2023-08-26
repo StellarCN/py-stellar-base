@@ -5,7 +5,6 @@ import requests_mock
 from aioresponses import aioresponses
 
 from stellar_sdk.client.aiohttp_client import AiohttpClient
-from stellar_sdk.exceptions import ValueError
 from stellar_sdk.sep.exceptions import (
     BadFederationResponseError,
     FederationServerNotFoundError,
