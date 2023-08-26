@@ -35,30 +35,6 @@ class InvokeHostFunctionResult:
         self.code = code
         self.success = success
 
-    @classmethod
-    def from_invoke_host_function_success(
-        cls, success: Hash
-    ) -> InvokeHostFunctionResult:
-        return cls(
-            InvokeHostFunctionResultCode.INVOKE_HOST_FUNCTION_SUCCESS, success=success
-        )
-
-    @classmethod
-    def from_invoke_host_function_malformed(cls) -> InvokeHostFunctionResult:
-        return cls(InvokeHostFunctionResultCode.INVOKE_HOST_FUNCTION_MALFORMED)
-
-    @classmethod
-    def from_invoke_host_function_trapped(cls) -> InvokeHostFunctionResult:
-        return cls(InvokeHostFunctionResultCode.INVOKE_HOST_FUNCTION_TRAPPED)
-
-    @classmethod
-    def from_invoke_host_function_resource_limit_exceeded(
-        cls,
-    ) -> InvokeHostFunctionResult:
-        return cls(
-            InvokeHostFunctionResultCode.INVOKE_HOST_FUNCTION_RESOURCE_LIMIT_EXCEEDED
-        )
-
     def pack(self, packer: Packer) -> None:
         self.code.pack(packer)
         if self.code == InvokeHostFunctionResultCode.INVOKE_HOST_FUNCTION_SUCCESS:

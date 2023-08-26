@@ -31,18 +31,6 @@ class RestoreFootprintResult:
     ) -> None:
         self.code = code
 
-    @classmethod
-    def from_restore_footprint_success(cls) -> RestoreFootprintResult:
-        return cls(RestoreFootprintResultCode.RESTORE_FOOTPRINT_SUCCESS)
-
-    @classmethod
-    def from_restore_footprint_malformed(cls) -> RestoreFootprintResult:
-        return cls(RestoreFootprintResultCode.RESTORE_FOOTPRINT_MALFORMED)
-
-    @classmethod
-    def from_restore_footprint_resource_limit_exceeded(cls) -> RestoreFootprintResult:
-        return cls(RestoreFootprintResultCode.RESTORE_FOOTPRINT_RESOURCE_LIMIT_EXCEEDED)
-
     def pack(self, packer: Packer) -> None:
         self.code.pack(packer)
         if self.code == RestoreFootprintResultCode.RESTORE_FOOTPRINT_SUCCESS:

@@ -33,16 +33,6 @@ class SorobanCredentials:
         self.type = type
         self.address = address
 
-    @classmethod
-    def from_soroban_credentials_source_account(cls) -> SorobanCredentials:
-        return cls(SorobanCredentialsType.SOROBAN_CREDENTIALS_SOURCE_ACCOUNT)
-
-    @classmethod
-    def from_soroban_credentials_address(
-        cls, address: SorobanAddressCredentials
-    ) -> SorobanCredentials:
-        return cls(SorobanCredentialsType.SOROBAN_CREDENTIALS_ADDRESS, address=address)
-
     def pack(self, packer: Packer) -> None:
         self.type.pack(packer)
         if self.type == SorobanCredentialsType.SOROBAN_CREDENTIALS_SOURCE_ACCOUNT:

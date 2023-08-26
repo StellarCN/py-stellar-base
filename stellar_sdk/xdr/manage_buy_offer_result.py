@@ -44,60 +44,6 @@ class ManageBuyOfferResult:
         self.code = code
         self.success = success
 
-    @classmethod
-    def from_manage_buy_offer_success(
-        cls, success: ManageOfferSuccessResult
-    ) -> ManageBuyOfferResult:
-        return cls(ManageBuyOfferResultCode.MANAGE_BUY_OFFER_SUCCESS, success=success)
-
-    @classmethod
-    def from_manage_buy_offer_malformed(cls) -> ManageBuyOfferResult:
-        return cls(ManageBuyOfferResultCode.MANAGE_BUY_OFFER_MALFORMED)
-
-    @classmethod
-    def from_manage_buy_offer_sell_no_trust(cls) -> ManageBuyOfferResult:
-        return cls(ManageBuyOfferResultCode.MANAGE_BUY_OFFER_SELL_NO_TRUST)
-
-    @classmethod
-    def from_manage_buy_offer_buy_no_trust(cls) -> ManageBuyOfferResult:
-        return cls(ManageBuyOfferResultCode.MANAGE_BUY_OFFER_BUY_NO_TRUST)
-
-    @classmethod
-    def from_manage_buy_offer_sell_not_authorized(cls) -> ManageBuyOfferResult:
-        return cls(ManageBuyOfferResultCode.MANAGE_BUY_OFFER_SELL_NOT_AUTHORIZED)
-
-    @classmethod
-    def from_manage_buy_offer_buy_not_authorized(cls) -> ManageBuyOfferResult:
-        return cls(ManageBuyOfferResultCode.MANAGE_BUY_OFFER_BUY_NOT_AUTHORIZED)
-
-    @classmethod
-    def from_manage_buy_offer_line_full(cls) -> ManageBuyOfferResult:
-        return cls(ManageBuyOfferResultCode.MANAGE_BUY_OFFER_LINE_FULL)
-
-    @classmethod
-    def from_manage_buy_offer_underfunded(cls) -> ManageBuyOfferResult:
-        return cls(ManageBuyOfferResultCode.MANAGE_BUY_OFFER_UNDERFUNDED)
-
-    @classmethod
-    def from_manage_buy_offer_cross_self(cls) -> ManageBuyOfferResult:
-        return cls(ManageBuyOfferResultCode.MANAGE_BUY_OFFER_CROSS_SELF)
-
-    @classmethod
-    def from_manage_buy_offer_sell_no_issuer(cls) -> ManageBuyOfferResult:
-        return cls(ManageBuyOfferResultCode.MANAGE_BUY_OFFER_SELL_NO_ISSUER)
-
-    @classmethod
-    def from_manage_buy_offer_buy_no_issuer(cls) -> ManageBuyOfferResult:
-        return cls(ManageBuyOfferResultCode.MANAGE_BUY_OFFER_BUY_NO_ISSUER)
-
-    @classmethod
-    def from_manage_buy_offer_not_found(cls) -> ManageBuyOfferResult:
-        return cls(ManageBuyOfferResultCode.MANAGE_BUY_OFFER_NOT_FOUND)
-
-    @classmethod
-    def from_manage_buy_offer_low_reserve(cls) -> ManageBuyOfferResult:
-        return cls(ManageBuyOfferResultCode.MANAGE_BUY_OFFER_LOW_RESERVE)
-
     def pack(self, packer: Packer) -> None:
         self.code.pack(packer)
         if self.code == ManageBuyOfferResultCode.MANAGE_BUY_OFFER_SUCCESS:

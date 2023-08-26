@@ -36,24 +36,6 @@ class SurveyResponseBody:
         self.topology_response_body_v0 = topology_response_body_v0
         self.topology_response_body_v1 = topology_response_body_v1
 
-    @classmethod
-    def from_survey_topology_response_v0(
-        cls, topology_response_body_v0: TopologyResponseBodyV0
-    ) -> SurveyResponseBody:
-        return cls(
-            SurveyMessageResponseType.SURVEY_TOPOLOGY_RESPONSE_V0,
-            topology_response_body_v0=topology_response_body_v0,
-        )
-
-    @classmethod
-    def from_survey_topology_response_v1(
-        cls, topology_response_body_v1: TopologyResponseBodyV1
-    ) -> SurveyResponseBody:
-        return cls(
-            SurveyMessageResponseType.SURVEY_TOPOLOGY_RESPONSE_V1,
-            topology_response_body_v1=topology_response_body_v1,
-        )
-
     def pack(self, packer: Packer) -> None:
         self.type.pack(packer)
         if self.type == SurveyMessageResponseType.SURVEY_TOPOLOGY_RESPONSE_V0:

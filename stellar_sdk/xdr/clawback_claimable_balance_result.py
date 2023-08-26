@@ -33,36 +33,6 @@ class ClawbackClaimableBalanceResult:
     ) -> None:
         self.code = code
 
-    @classmethod
-    def from_clawback_claimable_balance_success(cls) -> ClawbackClaimableBalanceResult:
-        return cls(
-            ClawbackClaimableBalanceResultCode.CLAWBACK_CLAIMABLE_BALANCE_SUCCESS
-        )
-
-    @classmethod
-    def from_clawback_claimable_balance_does_not_exist(
-        cls,
-    ) -> ClawbackClaimableBalanceResult:
-        return cls(
-            ClawbackClaimableBalanceResultCode.CLAWBACK_CLAIMABLE_BALANCE_DOES_NOT_EXIST
-        )
-
-    @classmethod
-    def from_clawback_claimable_balance_not_issuer(
-        cls,
-    ) -> ClawbackClaimableBalanceResult:
-        return cls(
-            ClawbackClaimableBalanceResultCode.CLAWBACK_CLAIMABLE_BALANCE_NOT_ISSUER
-        )
-
-    @classmethod
-    def from_clawback_claimable_balance_not_clawback_enabled(
-        cls,
-    ) -> ClawbackClaimableBalanceResult:
-        return cls(
-            ClawbackClaimableBalanceResultCode.CLAWBACK_CLAIMABLE_BALANCE_NOT_CLAWBACK_ENABLED
-        )
-
     def pack(self, packer: Packer) -> None:
         self.code.pack(packer)
         if (

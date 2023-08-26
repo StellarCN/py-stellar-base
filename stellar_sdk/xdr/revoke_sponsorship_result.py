@@ -34,30 +34,6 @@ class RevokeSponsorshipResult:
     ) -> None:
         self.code = code
 
-    @classmethod
-    def from_revoke_sponsorship_success(cls) -> RevokeSponsorshipResult:
-        return cls(RevokeSponsorshipResultCode.REVOKE_SPONSORSHIP_SUCCESS)
-
-    @classmethod
-    def from_revoke_sponsorship_does_not_exist(cls) -> RevokeSponsorshipResult:
-        return cls(RevokeSponsorshipResultCode.REVOKE_SPONSORSHIP_DOES_NOT_EXIST)
-
-    @classmethod
-    def from_revoke_sponsorship_not_sponsor(cls) -> RevokeSponsorshipResult:
-        return cls(RevokeSponsorshipResultCode.REVOKE_SPONSORSHIP_NOT_SPONSOR)
-
-    @classmethod
-    def from_revoke_sponsorship_low_reserve(cls) -> RevokeSponsorshipResult:
-        return cls(RevokeSponsorshipResultCode.REVOKE_SPONSORSHIP_LOW_RESERVE)
-
-    @classmethod
-    def from_revoke_sponsorship_only_transferable(cls) -> RevokeSponsorshipResult:
-        return cls(RevokeSponsorshipResultCode.REVOKE_SPONSORSHIP_ONLY_TRANSFERABLE)
-
-    @classmethod
-    def from_revoke_sponsorship_malformed(cls) -> RevokeSponsorshipResult:
-        return cls(RevokeSponsorshipResultCode.REVOKE_SPONSORSHIP_MALFORMED)
-
     def pack(self, packer: Packer) -> None:
         self.code.pack(packer)
         if self.code == RevokeSponsorshipResultCode.REVOKE_SPONSORSHIP_SUCCESS:

@@ -37,15 +37,6 @@ class TxSetComponent:
         self.type = type
         self.txs_maybe_discounted_fee = txs_maybe_discounted_fee
 
-    @classmethod
-    def from_txset_comp_txs_maybe_discounted_fee(
-        cls, txs_maybe_discounted_fee: TxSetComponentTxsMaybeDiscountedFee
-    ) -> TxSetComponent:
-        return cls(
-            TxSetComponentType.TXSET_COMP_TXS_MAYBE_DISCOUNTED_FEE,
-            txs_maybe_discounted_fee=txs_maybe_discounted_fee,
-        )
-
     def pack(self, packer: Packer) -> None:
         self.type.pack(packer)
         if self.type == TxSetComponentType.TXSET_COMP_TXS_MAYBE_DISCOUNTED_FEE:

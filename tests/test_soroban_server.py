@@ -145,7 +145,7 @@ class TestSorobanServer:
         assert len(request_data["id"]) == 32
         assert request_data["jsonrpc"] == "2.0"
         assert request_data["method"] == "getLedgerEntries"
-        assert key == stellar_xdr.SCVal.from_scv_ledger_key_contract_instance()
+        assert key == stellar_xdr.SCVal(stellar_xdr.SCValType.SCV_LEDGER_KEY_CONTRACT_INSTANCE)
         assert request_data["params"] == {
             "keys": [
                 "AAAABgAAAAFgdoLyR3pr6M3w/fMr4T1fJaaGzAlP2T1ao9e2gjLQwAAAABQAAAABAAAAAA=="

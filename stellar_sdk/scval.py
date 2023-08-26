@@ -55,7 +55,7 @@ def to_address(data: Union[Address, str]) -> stellar_xdr.SCVal:
     """
     if isinstance(data, str):
         data = Address(data)
-    return stellar_xdr.SCVal.from_scv_address(data.to_xdr_sc_address())
+    return stellar_xdr.SCVal(stellar_xdr.SCValType.SCV_ADDRESS, address=data.to_xdr_sc_address())
 
 
 def from_address(sc_val: stellar_xdr.SCVal) -> Address:
@@ -77,7 +77,7 @@ def to_bool(data: bool) -> stellar_xdr.SCVal:
     :param data: The bool value to convert.
     :return: A new :class:`stellar_sdk.xdr.SCVal` XDR object with type :class:`stellar_sdk.xdr.SCValType.SCV_BOOL`.
     """
-    return stellar_xdr.SCVal.from_scv_bool(data)
+    return stellar_xdr.SCVal(stellar_xdr.SCValType.SCV_BOOL, b=data)
 
 
 def from_bool(sc_val: stellar_xdr.SCVal) -> bool:
@@ -99,7 +99,7 @@ def to_bytes(data: bytes) -> stellar_xdr.SCVal:
     :param data: The bytes value to convert.
     :return: A new :class:`stellar_sdk.xdr.SCVal` XDR object with type :class:`stellar_sdk.xdr.SCValType.SCV_BYTES`.
     """
-    return stellar_xdr.SCVal.from_scv_bytes(stellar_xdr.SCBytes(data))
+    return stellar_xdr.SCVal(stellar_xdr.SCValType.SCV_BYTES,bytes= stellar_xdr.SCBytes(data))
 
 
 def from_bytes(sc_val: stellar_xdr.SCVal) -> bytes:
@@ -125,7 +125,7 @@ def to_duration(data: int) -> stellar_xdr.SCVal:
     if data < 0 or data > 2**64 - 1:
         raise ValueError("Invalid data, must be between 0 and 2**64 - 1.")
     duration = stellar_xdr.Duration(stellar_xdr.Uint64(data))
-    return stellar_xdr.SCVal.from_scv_duration(duration)
+    return stellar_xdr.SCVal(stellar_xdr.SCValType.SCV_DURATION, duration=duration)
 
 
 def from_duration(sc_val: stellar_xdr.SCVal) -> int:
@@ -153,7 +153,7 @@ def to_int32(data: int) -> stellar_xdr.SCVal:
     if data < -(2**31) or data > 2**31 - 1:
         raise ValueError("Invalid data, must be between -(2**31) and 2**31 - 1.")
 
-    return stellar_xdr.SCVal.from_scv_i32(stellar_xdr.Int32(data))
+    return stellar_xdr.SCVal(stellar_xdr.SCValType.SCV_I32,i32= stellar_xdr.Int32(data))
 
 
 def from_int32(sc_val: stellar_xdr.SCVal) -> int:
@@ -179,7 +179,7 @@ def to_int64(data: int) -> stellar_xdr.SCVal:
     if data < -(2**63) or data > 2**63 - 1:
         raise ValueError("Invalid data, must be between -(2**63) and 2**63 - 1.")
 
-    return stellar_xdr.SCVal.from_scv_i64(stellar_xdr.Int64(data))
+    return stellar_xdr.SCVal(stellar_xdr.SCValType.SCV_I64, i64=stellar_xdr.Int64(data))
 
 
 def from_int64(sc_val: stellar_xdr.SCVal) -> int:
@@ -210,7 +210,7 @@ def to_int128(data: int) -> stellar_xdr.SCVal:
         hi=stellar_xdr.Int64(int.from_bytes(value_bytes[0:8], "big", signed=True)),
         lo=stellar_xdr.Uint64(int.from_bytes(value_bytes[8:16], "big", signed=False)),
     )
-    return stellar_xdr.SCVal.from_scv_i128(i128)
+    return stellar_xdr.SCVal(stellar_xdr.SCValType.SCV_I128, i128=i128)
 
 
 def from_int128(sc_val: stellar_xdr.SCVal) -> int:
@@ -253,7 +253,7 @@ def to_int256(data: int) -> stellar_xdr.SCVal:
         lo_hi=stellar_xdr.Uint64(lo_hi),
         lo_lo=stellar_xdr.Uint64(lo_lo),
     )
-    return stellar_xdr.SCVal.from_scv_i256(i256)
+    return stellar_xdr.SCVal(stellar_xdr.SCValType.SCV_I256, i256=i256)
 
 
 def from_int256(sc_val: stellar_xdr.SCVal) -> int:
@@ -282,7 +282,7 @@ def to_map(data: Dict[stellar_xdr.SCVal, stellar_xdr.SCVal]) -> stellar_xdr.SCVa
     :param data: The dict value to convert.
     :return: A new :class:`stellar_sdk.xdr.SCVal` XDR object with type :class:`stellar_sdk.xdr.SCValType.SCV_MAP`.
     """
-    return stellar_xdr.SCVal.from_scv_map(
+    return stellar_xdr.SCVal(stellar_xdr.SCValType.SCV_MAP,map=
         stellar_xdr.SCMap(
             sc_map=[
                 stellar_xdr.SCMapEntry(key=key, val=value)
@@ -313,7 +313,7 @@ def to_string(data: Union[str, bytes]) -> stellar_xdr.SCVal:
     """
     if isinstance(data, str):
         data = data.encode("utf-8")
-    return stellar_xdr.SCVal.from_scv_string(stellar_xdr.SCString(data))
+    return stellar_xdr.SCVal(stellar_xdr.SCValType.SCV_STRING, str=stellar_xdr.SCString(data))
 
 
 def from_string(sc_val: stellar_xdr.SCVal) -> bytes:
@@ -335,7 +335,7 @@ def to_symbol(data: str) -> stellar_xdr.SCVal:
     :param data: The symbol value to convert.
     :return: A new :class:`stellar_sdk.xdr.SCVal` XDR object with type :class:`stellar_sdk.xdr.SCValType.SCV_SYMBOL`.
     """
-    return stellar_xdr.SCVal.from_scv_symbol(stellar_xdr.SCSymbol(data.encode("utf-8")))
+    return stellar_xdr.SCVal(stellar_xdr.SCValType.SCV_SYMBOL, sym=stellar_xdr.SCSymbol(data.encode("utf-8")))
 
 
 def from_symbol(sc_val: stellar_xdr.SCVal) -> str:
@@ -361,7 +361,7 @@ def to_timepoint(data: int) -> stellar_xdr.SCVal:
     if data < 0 or data > 2**64 - 1:
         raise ValueError("Invalid data, must be between 0 and 2**64 - 1.")
     time_point = stellar_xdr.TimePoint(stellar_xdr.Uint64(data))
-    return stellar_xdr.SCVal.from_scv_timepoint(time_point)
+    return stellar_xdr.SCVal(stellar_xdr.SCValType.SCV_TIMEPOINT, timepoint=time_point)
 
 
 def from_timepoint(sc_val: stellar_xdr.SCVal) -> int:
@@ -389,7 +389,7 @@ def to_uint32(data: int) -> stellar_xdr.SCVal:
     if data < 0 or data > 2**32 - 1:
         raise ValueError("Invalid data, must be between 0 and 2**32 - 1.")
 
-    return stellar_xdr.SCVal.from_scv_u32(stellar_xdr.Uint32(data))
+    return stellar_xdr.SCVal(stellar_xdr.SCValType.SCV_U32,u32= stellar_xdr.Uint32(data))
 
 
 def from_uint32(sc_val: stellar_xdr.SCVal) -> int:
@@ -415,7 +415,7 @@ def to_uint64(data: int) -> stellar_xdr.SCVal:
     if data < 0 or data > 2**64 - 1:
         raise ValueError("Invalid data, must be between 0 and 2**64 - 1.")
 
-    return stellar_xdr.SCVal.from_scv_u64(stellar_xdr.Uint64(data))
+    return stellar_xdr.SCVal(stellar_xdr.SCValType.SCV_U64, u64=stellar_xdr.Uint64(data))
 
 
 def from_uint64(sc_val: stellar_xdr.SCVal) -> int:
@@ -446,7 +446,7 @@ def to_uint128(data: int) -> stellar_xdr.SCVal:
         hi=stellar_xdr.Uint64(int.from_bytes(value_bytes[0:8], "big", signed=False)),
         lo=stellar_xdr.Uint64(int.from_bytes(value_bytes[8:16], "big", signed=False)),
     )
-    return stellar_xdr.SCVal.from_scv_u128(u128)
+    return stellar_xdr.SCVal(stellar_xdr.SCValType.SCV_U128, u128=u128)
 
 
 def from_uint128(sc_val: stellar_xdr.SCVal) -> int:
@@ -489,7 +489,7 @@ def to_uint256(data: int) -> stellar_xdr.SCVal:
         lo_hi=stellar_xdr.Uint64(lo_hi),
         lo_lo=stellar_xdr.Uint64(lo_lo),
     )
-    return stellar_xdr.SCVal.from_scv_u256(u256)
+    return stellar_xdr.SCVal(stellar_xdr.SCValType.SCV_U256, u256=u256)
 
 
 def from_uint256(sc_val: stellar_xdr.SCVal) -> int:
@@ -518,7 +518,7 @@ def to_vec(data: Sequence[stellar_xdr.SCVal]) -> stellar_xdr.SCVal:
     :param data: The list of :class:`stellar_sdk.xdr.SCVal` XDR objects.
     :return: A new :class:`stellar_sdk.xdr.SCVal` XDR object with type :class:`stellar_sdk.xdr.SCValType.SCV_VEC`.
     """
-    return stellar_xdr.SCVal.from_scv_vec(stellar_xdr.SCVec(list(data)))
+    return stellar_xdr.SCVal(stellar_xdr.SCValType.SCV_VEC, vec=stellar_xdr.SCVec(list(data)))
 
 
 def from_vec(sc_val: stellar_xdr.SCVal) -> List[stellar_xdr.SCVal]:

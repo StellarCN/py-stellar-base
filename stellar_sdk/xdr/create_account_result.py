@@ -33,26 +33,6 @@ class CreateAccountResult:
     ) -> None:
         self.code = code
 
-    @classmethod
-    def from_create_account_success(cls) -> CreateAccountResult:
-        return cls(CreateAccountResultCode.CREATE_ACCOUNT_SUCCESS)
-
-    @classmethod
-    def from_create_account_malformed(cls) -> CreateAccountResult:
-        return cls(CreateAccountResultCode.CREATE_ACCOUNT_MALFORMED)
-
-    @classmethod
-    def from_create_account_underfunded(cls) -> CreateAccountResult:
-        return cls(CreateAccountResultCode.CREATE_ACCOUNT_UNDERFUNDED)
-
-    @classmethod
-    def from_create_account_low_reserve(cls) -> CreateAccountResult:
-        return cls(CreateAccountResultCode.CREATE_ACCOUNT_LOW_RESERVE)
-
-    @classmethod
-    def from_create_account_already_exist(cls) -> CreateAccountResult:
-        return cls(CreateAccountResultCode.CREATE_ACCOUNT_ALREADY_EXIST)
-
     def pack(self, packer: Packer) -> None:
         self.code.pack(packer)
         if self.code == CreateAccountResultCode.CREATE_ACCOUNT_SUCCESS:

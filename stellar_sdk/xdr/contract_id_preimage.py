@@ -40,24 +40,6 @@ class ContractIDPreimage:
         self.from_address = from_address
         self.from_asset = from_asset
 
-    @classmethod
-    def from_contract_id_preimage_from_address(
-        cls, from_address: ContractIDPreimageFromAddress
-    ) -> ContractIDPreimage:
-        return cls(
-            ContractIDPreimageType.CONTRACT_ID_PREIMAGE_FROM_ADDRESS,
-            from_address=from_address,
-        )
-
-    @classmethod
-    def from_contract_id_preimage_from_asset(
-        cls, from_asset: Asset
-    ) -> ContractIDPreimage:
-        return cls(
-            ContractIDPreimageType.CONTRACT_ID_PREIMAGE_FROM_ASSET,
-            from_asset=from_asset,
-        )
-
     def pack(self, packer: Packer) -> None:
         self.type.pack(packer)
         if self.type == ContractIDPreimageType.CONTRACT_ID_PREIMAGE_FROM_ADDRESS:
