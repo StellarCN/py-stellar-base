@@ -293,7 +293,7 @@ def to_map(data: Dict[stellar_xdr.SCVal, stellar_xdr.SCVal]) -> stellar_xdr.SCVa
 
 
 def from_map(sc_val: stellar_xdr.SCVal) -> Dict[stellar_xdr.SCVal, stellar_xdr.SCVal]:
-    """Creates an dict value from a :class:`stellar_sdk.xdr.SCVal` XDR object.
+    """Creates a dict value from a :class:`stellar_sdk.xdr.SCVal` XDR object.
 
     :param sc_val: The :class:`stellar_sdk.xdr.SCVal` XDR object to convert.
     :return: The map value.
@@ -537,8 +537,9 @@ def from_vec(sc_val: stellar_xdr.SCVal) -> List[stellar_xdr.SCVal]:
 def to_enum(key: str, data: Optional[stellar_xdr.SCVal]) -> stellar_xdr.SCVal:
     """Creates a :class:`stellar_sdk.xdr.SCVal` XDR object corresponding to the Enum in the Rust SDK.
 
-    Please note that this API is experimental and may be removed at any time. I recommend using the
-    :meth:`from_vec` to implement it.
+    .. warning::
+        Please note that this API is experimental and may be removed at any time. I recommend using the
+        :meth:`from_vec` to implement it.
 
     :param key: The key of the Enum.
     :param data: The data of the Enum.
@@ -553,8 +554,9 @@ def to_enum(key: str, data: Optional[stellar_xdr.SCVal]) -> stellar_xdr.SCVal:
 def from_enum(sc_val: stellar_xdr.SCVal) -> Tuple[str, Optional[stellar_xdr.SCVal]]:
     """Creates a tuple corresponding to the Enum in the Rust SDK.
 
-    Please note that this API is experimental and may be removed at any time. I recommend using the
-    :meth:`from_vec` and :meth:`from_symbol` to implement it.
+    .. warning::
+        Please note that this API is experimental and may be removed at any time. I recommend using the
+        :meth:`from_vec` and :meth:`from_symbol` to implement it.
 
     :param sc_val: The :class:`stellar_sdk.xdr.SCVal` XDR object to convert.
     :return: A tuple corresponding to the Enum in the Rust SDK.
@@ -574,8 +576,9 @@ def from_enum(sc_val: stellar_xdr.SCVal) -> Tuple[str, Optional[stellar_xdr.SCVa
 def to_tuple_struct(data: Sequence[stellar_xdr.SCVal]) -> stellar_xdr.SCVal:
     """Creates a new :class:`stellar_sdk.xdr.SCVal` XDR object corresponding to the Tuple Struct in the Rust SDK.
 
-    Please note that this API is experimental and may be removed at any time. I recommend using the
-    :meth:`to_vec` to implement it.
+    .. warning::
+        Please note that this API is experimental and may be removed at any time. I recommend using the
+        :meth:`to_vec` to implement it.
 
     :param data: The fields of the Tuple Struct.
     :return: A new :class:`stellar_sdk.xdr.SCVal` XDR object.
@@ -586,8 +589,9 @@ def to_tuple_struct(data: Sequence[stellar_xdr.SCVal]) -> stellar_xdr.SCVal:
 def from_tuple_struct(sc_val: stellar_xdr.SCVal) -> List[stellar_xdr.SCVal]:
     """Creates a list corresponding to the Tuple Struct in the Rust SDK.
 
-    Please note that this API is experimental and may be removed at any time. I recommend using the
-    :meth:`from_vec` to implement it.
+    .. warning::
+        Please note that this API is experimental and may be removed at any time. I recommend using the
+        :meth:`from_vec` to implement it.
 
     :param sc_val: The :class:`stellar_sdk.xdr.SCVal` XDR object to convert.
     :return: A list corresponding to the Tuple Struct in the Rust SDK.
@@ -598,8 +602,9 @@ def from_tuple_struct(sc_val: stellar_xdr.SCVal) -> List[stellar_xdr.SCVal]:
 def to_struct(data: Dict[str, stellar_xdr.SCVal]) -> stellar_xdr.SCVal:
     """Creates a new :class:`stellar_sdk.xdr.SCVal` XDR object corresponding to the Struct in the Rust SDK.
 
-    Please note that this API is experimental and may be removed at any time. I recommend using the
-    :meth:`to_map` and :meth:`to_symbol` to implement it.
+    .. warning::
+        Please note that this API is experimental and may be removed at any time. I recommend using the
+        :meth:`to_map` and :meth:`to_symbol` to implement it.
 
     :param data: The dict value to convert.
     :return: A new :class:`stellar_sdk.xdr.SCVal` XDR object.
@@ -613,8 +618,9 @@ def to_struct(data: Dict[str, stellar_xdr.SCVal]) -> stellar_xdr.SCVal:
 def from_struct(sc_val: stellar_xdr.SCVal) -> Dict[str, stellar_xdr.SCVal]:
     """Creates a dict corresponding to the Struct in the Rust SDK.
 
-    Please note that this API is experimental and may be removed at any time. I recommend using the
-    :meth:`from_map` and :meth:`from_symbol` to implement it.
+    .. warning::
+        Please note that this API is experimental and may be removed at any time. I recommend using the
+        :meth:`from_map` and :meth:`from_symbol` to implement it.
 
     :param sc_val: The :class:`stellar_sdk.xdr.SCVal` XDR object to convert.
     :return: A dict corresponding to the Struct in the Rust SDK.
