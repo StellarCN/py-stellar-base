@@ -1,10 +1,34 @@
 from datetime import datetime
 from enum import Enum
-from typing import Any, Dict, List, Optional, Sequence
+from typing import Any, Dict, Generic, List, Optional, Sequence, TypeVar, Union
 
 from pydantic import BaseModel, Field
+from pydantic.generics import GenericModel
 
-from ..xdr.sc_val import SCVal as XdrSCVal
+T = TypeVar("T")
+
+Id = Union[str, int]
+
+
+# JSON-RPC 2.0 definitions
+class Request(GenericModel, Generic[T]):
+    jsonrpc: str = "2.0"
+    id: Id
+    method: str
+    params: Optional[T]
+
+
+class Error(BaseModel):
+    code: int
+    message: Optional[str]
+    data: Optional[str]
+
+
+class Response(GenericModel, Generic[T]):
+    jsonrpc: str
+    id: Id
+    result: Optional[T]
+    error: Optional[Error]
 
 
 # account
@@ -18,21 +42,21 @@ class GetAccountResponse(BaseModel):
 
 
 # get_events
-class SegmentFilter(BaseModel):
-    wildcard: Optional[str]
-    scval: Optional[XdrSCVal]
 
-    class Config:
-        json_encoders = {
-            XdrSCVal: lambda v: v.to_xdr(),
-        }
-        arbitrary_types_allowed = True
+
+class EventFilterType(Enum):
+    SYSTEM = "system"
+    CONTRACT = "contract"
+    DIAGNOSTIC = "diagnostic"
 
 
 class EventFilter(BaseModel):
-    event_type: Optional[str] = Field(alias="type")
+    event_type: Optional[EventFilterType] = Field(alias="type")
     contract_ids: Optional[List[str]] = Field(alias="contractIds")
-    topics: Optional[List[List[SegmentFilter]]]
+    topics: Optional[List[List[str]]]
+
+    class Config:
+        allow_population_by_field_name = True
 
 
 class EventInfoValue(BaseModel):
@@ -64,17 +88,6 @@ class GetEventsRequest(BaseModel):
 
 class GetEventsResponse(BaseModel):
     events: Sequence[EventInfo] = Field(alias="events")
-    latest_ledger: int = Field(alias="latestLedger")
-
-
-# get_ledger_entry
-class GetLedgerEntryRequest(BaseModel):
-    key: str
-
-
-class GetLedgerEntryResponse(BaseModel):
-    xdr: str
-    last_modified_ledger: int = Field(alias="lastModifiedLedgerSeq")
     latest_ledger: int = Field(alias="latestLedger")
 
 
@@ -150,10 +163,6 @@ class TransactionResponseError(BaseModel):
     code: str
     message: str
     data: Dict[str, Any]
-
-
-class SCVal(BaseModel):
-    xdr: str
 
 
 class GetTransactionRequest(BaseModel):

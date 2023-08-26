@@ -8,6 +8,16 @@ __all__ = ["RestoreFootprint"]
 
 
 class RestoreFootprint(Operation):
+    """The :class:`RestoreFootprint` object, which represents a RestoreFootprint
+    operation on Stellar's network.
+
+    Threshold: Medium
+
+    See `RestoreFootprintOp <https://soroban.stellar.org/docs/fundamentals-and-concepts/state-expiration#restorefootprintop>`_.
+
+    :param source: The source account for the operation. Defaults to the transaction's source account.
+    """
+
     _XDR_OPERATION_TYPE: stellar_xdr.OperationType = (
         stellar_xdr.OperationType.RESTORE_FOOTPRINT
     )
