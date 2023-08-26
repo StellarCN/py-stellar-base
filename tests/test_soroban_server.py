@@ -82,9 +82,9 @@ class TestSorobanServer:
         }
         with requests_mock.Mocker() as m:
             m.post(PRC_URL, json=data)
-            assert SorobanServer(PRC_URL).get_health() == GetHealthResponse.parse_obj(
-                result
-            )
+            assert SorobanServer(
+                PRC_URL
+            ).get_health() == GetHealthResponse.model_validate(result)
 
         request_data = m.last_request.json()
         assert len(request_data["id"]) == 32
@@ -103,8 +103,8 @@ class TestSorobanServer:
             "id": "198cb1a8-9104-4446-a269-88bf000c2721",
             "result": result,
         }
-        Response[GetNetworkResponse].parse_obj(data)
-        GetNetworkResponse.parse_obj(result)
+        Response[GetNetworkResponse].model_validate(data)
+        GetNetworkResponse.model_validate(result)
 
         with requests_mock.Mocker() as m:
             m.post(PRC_URL, json=data)
@@ -138,7 +138,7 @@ class TestSorobanServer:
             m.post(PRC_URL, json=data)
             assert (
                 SorobanServer(PRC_URL).get_contract_data(contract_id, key)
-                == GetLedgerEntriesResponse.parse_obj(result).entries[0]
+                == GetLedgerEntriesResponse.model_validate(result).entries[0]
             )
 
         request_data = m.last_request.json()
@@ -214,7 +214,7 @@ class TestSorobanServer:
             m.post(PRC_URL, json=data)
             assert SorobanServer(PRC_URL).get_ledger_entries(
                 [key0, key1]
-            ) == GetLedgerEntriesResponse.parse_obj(result)
+            ) == GetLedgerEntriesResponse.model_validate(result)
 
         request_data = m.last_request.json()
         assert len(request_data["id"]) == 32
@@ -251,7 +251,7 @@ class TestSorobanServer:
             m.post(PRC_URL, json=data)
             assert SorobanServer(PRC_URL).get_transaction(
                 tx_hash
-            ) == GetTransactionResponse.parse_obj(result)
+            ) == GetTransactionResponse.model_validate(result)
 
         request_data = m.last_request.json()
         assert len(request_data["id"]) == 32
@@ -311,14 +311,14 @@ class TestSorobanServer:
                 ],
             )
         ]
-        GetEventsResponse.parse_obj(result)
+        GetEventsResponse.model_validate(result)
         cursor = "0000007799660613632-0000000000"
         limit = 10
         with requests_mock.Mocker() as m:
             m.post(PRC_URL, json=data)
             assert SorobanServer(PRC_URL).get_events(
                 start_ledger, filters, cursor, limit
-            ) == GetEventsResponse.parse_obj(result)
+            ) == GetEventsResponse.model_validate(result)
 
         request_data = m.last_request.json()
         assert len(request_data["id"]) == 32
@@ -355,7 +355,7 @@ class TestSorobanServer:
             m.post(PRC_URL, json=data)
             assert SorobanServer(
                 PRC_URL
-            ).get_latest_ledger() == GetLatestLedgerResponse.parse_obj(result)
+            ).get_latest_ledger() == GetLatestLedgerResponse.model_validate(result)
 
         request_data = m.last_request.json()
         assert len(request_data["id"]) == 32
@@ -392,7 +392,7 @@ class TestSorobanServer:
             m.post(PRC_URL, json=data)
             assert SorobanServer(PRC_URL).simulate_transaction(
                 transaction
-            ) == SimulateTransactionResponse.parse_obj(result)
+            ) == SimulateTransactionResponse.model_validate(result)
 
         request_data = m.last_request.json()
         assert len(request_data["id"]) == 32
@@ -577,7 +577,7 @@ class TestSorobanServer:
                 SorobanServer(PRC_URL).prepare_transaction(transaction)
             assert (
                 e.value.simulate_transaction_response
-                == SimulateTransactionResponse.parse_obj(data["result"])
+                == SimulateTransactionResponse.model_validate(data["result"])
             )
 
     def test_prepare_transaction_invalid_results_prepare_transaction_exception_raise(
@@ -621,7 +621,7 @@ class TestSorobanServer:
                 SorobanServer(PRC_URL).prepare_transaction(transaction)
             assert (
                 e.value.simulate_transaction_response
-                == SimulateTransactionResponse.parse_obj(data["result"])
+                == SimulateTransactionResponse.model_validate(data["result"])
             )
 
     def test_send_transaction(self):
@@ -642,7 +642,7 @@ class TestSorobanServer:
             m.post(PRC_URL, json=data)
             assert SorobanServer(PRC_URL).send_transaction(
                 transaction
-            ) == SendTransactionResponse.parse_obj(result)
+            ) == SendTransactionResponse.model_validate(result)
 
         request_data = m.last_request.json()
         assert len(request_data["id"]) == 32

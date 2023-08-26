@@ -2,8 +2,7 @@ from datetime import datetime
 from enum import Enum
 from typing import Any, Dict, Generic, List, Optional, Sequence, TypeVar, Union
 
-from pydantic import BaseModel, Field
-from pydantic.generics import GenericModel
+from pydantic import BaseModel, ConfigDict, Field
 
 T = TypeVar("T")
 
@@ -11,24 +10,24 @@ Id = Union[str, int]
 
 
 # JSON-RPC 2.0 definitions
-class Request(GenericModel, Generic[T]):
+class Request(BaseModel, Generic[T]):
     jsonrpc: str = "2.0"
     id: Id
     method: str
-    params: Optional[T]
+    params: Optional[T] = None
 
 
 class Error(BaseModel):
     code: int
-    message: Optional[str]
-    data: Optional[str]
+    message: Optional[str] = None
+    data: Optional[str] = None
 
 
-class Response(GenericModel, Generic[T]):
+class Response(BaseModel, Generic[T]):
     jsonrpc: str
     id: Id
-    result: Optional[T]
-    error: Optional[Error]
+    result: Optional[T] = None
+    error: Optional[Error] = None
 
 
 # account
@@ -51,12 +50,10 @@ class EventFilterType(Enum):
 
 
 class EventFilter(BaseModel):
-    event_type: Optional[EventFilterType] = Field(alias="type")
-    contract_ids: Optional[List[str]] = Field(alias="contractIds")
-    topics: Optional[List[List[str]]]
-
-    class Config:
-        allow_population_by_field_name = True
+    event_type: Optional[EventFilterType] = Field(alias="type", default=None)
+    contract_ids: Optional[List[str]] = Field(alias="contractIds", default=None)
+    topics: Optional[List[List[str]]] = None
+    model_config = ConfigDict(populate_by_name=True)
 
 
 class EventInfoValue(BaseModel):
@@ -76,14 +73,14 @@ class EventInfo(BaseModel):
 
 
 class PaginationOptions(BaseModel):
-    cursor: Optional[str]
-    limit: Optional[int]
+    cursor: Optional[str] = None
+    limit: Optional[int] = None
 
 
 class GetEventsRequest(BaseModel):
     start_ledger: str = Field(alias="startLedger")
-    filters: Optional[Sequence[EventFilter]]
-    pagination: Optional[PaginationOptions]
+    filters: Optional[Sequence[EventFilter]] = None
+    pagination: Optional[PaginationOptions] = None
 
 
 class GetEventsResponse(BaseModel):
@@ -103,13 +100,13 @@ class LedgerEntryResult(BaseModel):
 
 
 class GetLedgerEntriesResponse(BaseModel):
-    entries: Optional[List[LedgerEntryResult]]
+    entries: Optional[List[LedgerEntryResult]] = None
     latest_ledger: int = Field(alias="latestLedger")
 
 
 # get_network
 class GetNetworkResponse(BaseModel):
-    friendbot_url: Optional[str] = Field(alias="friendbotUrl")
+    friendbot_url: Optional[str] = Field(alias="friendbotUrl", default=None)
     passphrase: str
     protocol_version: int = Field(alias="protocolVersion")
 
@@ -130,24 +127,24 @@ class SimulateTransactionCost(BaseModel):
 
 
 class SimulateTransactionResult(BaseModel):
-    auth: Optional[List[str]]
-    events: Optional[List[str]]
+    auth: Optional[List[str]] = None
+    events: Optional[List[str]] = None
     footprint: str
     xdr: str
 
 
 class SimulateHostFunctionResult(BaseModel):
-    auth: Optional[List[str]]
+    auth: Optional[List[str]] = None
     xdr: str
 
 
 class SimulateTransactionResponse(BaseModel):
-    error: Optional[str]
+    error: Optional[str] = None
     # Empty string?
     transaction_data: str = Field(alias="transactionData")
-    events: Optional[List[str]]
+    events: Optional[List[str]] = None
     min_resource_fee: int = Field(alias="minResourceFee")
-    results: Optional[List[SimulateHostFunctionResult]]
+    results: Optional[List[SimulateHostFunctionResult]] = None
     cost: SimulateTransactionCost
     latest_ledger: int = Field(alias="latestLedger")
 
@@ -176,19 +173,19 @@ class GetTransactionResponse(BaseModel):
     oldest_ledger: int = Field(alias="oldestLedger")
     oldest_ledger_close_time: int = Field(alias="oldestLedgerCloseTime")
     # The fields below are only present if Status is not TransactionStatus.NOT_FOUND.
-    application_order: Optional[int] = Field(alias="applicationOrder")
-    fee_bump: Optional[bool] = Field(alias="feeBump")
+    application_order: Optional[int] = Field(alias="applicationOrder", default=None)
+    fee_bump: Optional[bool] = Field(alias="feeBump", default=None)
     envelope_xdr: Optional[str] = Field(
-        alias="envelopeXdr"
+        alias="envelopeXdr", default=None
     )  # stellar_sdk.xdr.TransactionEnvelope
     result_xdr: Optional[str] = Field(
-        alias="resultXdr"
+        alias="resultXdr", default=None
     )  # stellar_sdk.xdr.TransactionResult
     result_meta_xdr: Optional[str] = Field(
-        alias="resultMetaXdr"
+        alias="resultMetaXdr", default=None
     )  # stellar_sdk.xdr.TransactionMeta
-    ledger: Optional[int] = Field(alias="ledger")
-    ledger_close_time: Optional[int] = Field(alias="ledgerCloseTime")
+    ledger: Optional[int] = Field(alias="ledger", default=None)
+    ledger_close_time: Optional[int] = Field(alias="ledgerCloseTime", default=None)
 
 
 # send_transaction
@@ -204,7 +201,7 @@ class SendTransactionRequest(BaseModel):
 
 
 class SendTransactionResponse(BaseModel):
-    error_result_xdr: Optional[str] = Field(alias="errorResultXdr")
+    error_result_xdr: Optional[str] = Field(alias="errorResultXdr", default=None)
     status: SendTransactionStatus = Field(alias="status")
     hash: str = Field(alias="hash")
     latest_ledger: int = Field(alias="latestLedger")
