@@ -78,6 +78,8 @@ xdr-generate: $(XDRS)
 			--namespace stellar \
 			--output stellar_sdk/xdr \
 			$(XDRS)'
+	$(SED) '/stellar_sdk\.xdr/,$$d' docs/en/api.rst
+	python docs/gen_xdr_api.py >> docs/en/api.rst
 .PHONY: xdr-generate
 
 xdr/%.x:

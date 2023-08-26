@@ -17,7 +17,9 @@ for _, cls in inspect.getmembers(stellar_sdk.xdr, inspect.isclass):
     print(f".. autoclass:: {cls_full_name}")
     print("")
 
-constant_names = [item for item in dir(stellar_sdk.xdr.constants) if not item.startswith("__")]
+constant_names = [
+    item for item in dir(stellar_sdk.xdr.constants) if not item.startswith("__")
+]
 
 print("Constants")
 print("---------")
