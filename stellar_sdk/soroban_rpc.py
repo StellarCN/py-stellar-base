@@ -15,6 +15,7 @@ class Request(BaseModel, Generic[T]):
 
     See `JSON-RPC 2.0 Specification - Request object <https://www.jsonrpc.org/specification#request_object>`__ for more information.
     """
+
     jsonrpc: str = "2.0"
     id: Id
     method: str
@@ -32,6 +33,7 @@ class Response(BaseModel, Generic[T]):
 
     See `JSON-RPC 2.0 Specification - Response object <https://www.jsonrpc.org/specification#response_object>`__ for more information.
     """
+
     jsonrpc: str
     id: Id
     result: Optional[T] = None
@@ -79,6 +81,7 @@ class GetEventsRequest(BaseModel):
     See `getEvents documentation <https://soroban.stellar.org/api/methods/getEvents#parameters>`__ for
     more information.
     """
+
     start_ledger: str = Field(alias="startLedger")
     filters: Optional[Sequence[EventFilter]] = None
     pagination: Optional[PaginationOptions] = None
@@ -127,6 +130,7 @@ class GetNetworkResponse(BaseModel):
 
     See `getNetwork documentation <https://soroban.stellar.org/api/methods/getNetwork#returns>`__ for
     more information."""
+
     friendbot_url: Optional[str] = Field(alias="friendbotUrl", default=None)
     passphrase: str
     protocol_version: int = Field(alias="protocolVersion")
