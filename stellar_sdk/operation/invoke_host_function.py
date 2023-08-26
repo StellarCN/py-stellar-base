@@ -1,4 +1,4 @@
-from typing import List, Optional, Union
+from typing import List, Optional, Sequence, Union
 
 from .. import xdr as stellar_xdr
 from ..muxed_account import MuxedAccount
@@ -8,6 +8,18 @@ __all__ = ["InvokeHostFunction"]
 
 
 class InvokeHostFunction(Operation):
+    """The :class:`InvokeHostFunction` object, which represents a InvokeHostFunction
+    operation on Stellar's network.
+
+    Threshold: Medium
+
+    See `Interacting with Soroban via Stellar <https://soroban.stellar.org/docs/fundamentals-and-concepts/invoking-contracts-with-transactions>`_.
+
+    :param host_function: The host function to invoke.
+    :param auth: The authorizations required to execute the host function.
+    :param source: The source account for the operation. Defaults to the transaction's source account.
+    """
+
     _XDR_OPERATION_TYPE: stellar_xdr.OperationType = (
         stellar_xdr.OperationType.INVOKE_HOST_FUNCTION
     )
@@ -15,12 +27,14 @@ class InvokeHostFunction(Operation):
     def __init__(
         self,
         host_function: stellar_xdr.HostFunction,
-        auth: List[stellar_xdr.SorobanAuthorizationEntry],
+        auth: Sequence[stellar_xdr.SorobanAuthorizationEntry] = None,
         source: Optional[Union[MuxedAccount, str]] = None,
     ):
         super().__init__(source)
         self.host_function = host_function
-        self.auth: List[stellar_xdr.SorobanAuthorizationEntry] = auth
+        self.auth: List[stellar_xdr.SorobanAuthorizationEntry] = (
+            list(auth) if auth else []
+        )
 
     def _to_operation_body(self) -> stellar_xdr.OperationBody:
         invoke_host_function_op = stellar_xdr.InvokeHostFunctionOp(

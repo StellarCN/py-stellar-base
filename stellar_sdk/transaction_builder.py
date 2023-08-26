@@ -1231,7 +1231,7 @@ class TransactionBuilder:
         contract_id: str,
         function_name: str,
         parameters: Sequence[stellar_xdr.SCVal],
-        auth: List[stellar_xdr.SorobanAuthorizationEntry] = None,  # TODO: sequence
+        auth: Sequence[stellar_xdr.SorobanAuthorizationEntry] = None,
         source: Optional[Union[MuxedAccount, str]] = None,
     ) -> "TransactionBuilder":
         """Append an :class:`HostFunction <stellar_sdk.xdr.HostFunction>` operation to the list of operations.
@@ -1262,9 +1262,7 @@ class TransactionBuilder:
                 stellar_xdr.SCVec(invoke_params)
             )
         )
-        op = InvokeHostFunction(
-            host_function=host_function, auth=auth or [], source=source
-        )
+        op = InvokeHostFunction(host_function=host_function, auth=auth, source=source)
         return self.append_operation(op)
 
     def append_upload_contract_wasm_op(
@@ -1298,8 +1296,9 @@ class TransactionBuilder:
     def append_create_contract_op(
         self,
         wasm_id: Union[bytes, str],
-        address: Optional[Address] = None,
+        address: Union[str, Address],
         salt: Optional[bytes] = None,
+        auth: Sequence[stellar_xdr.SorobanAuthorizationEntry] = None,
         source: Optional[Union[MuxedAccount, str]] = None,
     ) -> "TransactionBuilder":
         """Append an :class:`HostFunction <stellar_sdk.xdr.HostFunction>` operation to the list of operations.
@@ -1307,14 +1306,13 @@ class TransactionBuilder:
         You can use this method to create a contract.
 
         :param wasm_id: The ID of the contract code to install.
-        :param address: The address using to derive the contract ID, defaults to the operation's source account or
-            the transaction's source account if not set.
+        :param address: The address using to derive the contract ID.
         :param salt: The 32-byte salt to use to derive the contract ID.
+        :param auth: The authorizations required to execute the host function.
         :param source: The source account for the operation. Defaults to the
             transaction's source account.
         :return: This builder instance.
         """
-        # TODO: only support source auth now, add more auth support later?
         if isinstance(wasm_id, str):
             wasm_id = binascii.unhexlify(wasm_id)
 
@@ -1324,14 +1322,8 @@ class TransactionBuilder:
             if len(salt) != 32:
                 raise ValueError("`salt` must be 32 bytes long")
 
-        if address is None:
-            if source:
-                if isinstance(source, str):
-                    address = Address(MuxedAccount.from_account(source).account_id)
-                else:
-                    address = Address(source.account_id)
-            else:
-                address = Address(self.source_account.account.account_id)
+        if isinstance(address, str):
+            address = Address(address)
 
         create_contract = stellar_xdr.CreateContractArgs(
             contract_id_preimage=stellar_xdr.ContractIDPreimage.from_contract_id_preimage_from_address(
@@ -1352,7 +1344,7 @@ class TransactionBuilder:
             )
         )
 
-        op = InvokeHostFunction(host_function=host_function, auth=[], source=source)
+        op = InvokeHostFunction(host_function=host_function, auth=auth, source=source)
         return self.append_operation(op)
 
     def append_create_token_contract_from_asset_op(
@@ -1391,9 +1383,9 @@ class TransactionBuilder:
 
     def append_create_token_contract_from_address_op(
         self,
-        address: Optional[Union[str, Address]] = None,
+        address: Union[str, Address],
         salt: Optional[bytes] = None,
-        auth: List[stellar_xdr.SorobanAuthorizationEntry] = None,  # TODO: sequence
+        auth: Sequence[stellar_xdr.SorobanAuthorizationEntry] = None,
         source: Optional[Union[MuxedAccount, str]] = None,
     ) -> "TransactionBuilder":
         """Append an :class:`HostFunction <stellar_sdk.xdr.HostFunction>` operation to the list of operations.
@@ -1437,9 +1429,7 @@ class TransactionBuilder:
             )
         )
 
-        op = InvokeHostFunction(
-            host_function=host_function, auth=auth or [], source=source
-        )
+        op = InvokeHostFunction(host_function=host_function, auth=auth, source=source)
         return self.append_operation(op)
 
     def append_bump_footprint_expiration_op(
