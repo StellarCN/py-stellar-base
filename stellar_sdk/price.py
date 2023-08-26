@@ -59,10 +59,35 @@ class Price:
         d = xdr_object.d.int32
         return cls(n, d)
 
-    def __eq__(self, other: object) -> bool:
+    def __lt__(self, other):
         if not isinstance(other, self.__class__):
             return NotImplemented
-        return self.n == other.n and self.d == other.d
+        return (self.n * other.d) < (other.n * self.d)
+
+    def __le__(self, other):
+        if not isinstance(other, self.__class__):
+            return NotImplemented
+        return (self.n * other.d) <= (other.n * self.d)
+
+    def __eq__(self, other):
+        if not isinstance(other, self.__class__):
+            return NotImplemented
+        return (self.n * other.d) == (other.n * self.d)
+
+    def __ne__(self, other):
+        if not isinstance(other, self.__class__):
+            return NotImplemented
+        return (self.n * other.d) != (other.n * self.d)
+
+    def __gt__(self, other):
+        if not isinstance(other, self.__class__):
+            return NotImplemented
+        return (self.n * other.d) > (other.n * self.d)
+
+    def __ge__(self, other):
+        if not isinstance(other, self.__class__):
+            return NotImplemented
+        return (self.n * other.d) >= (other.n * self.d)
 
     def __str__(self):
         return f"<Price [n={self.n}, d={self.d}]>"
