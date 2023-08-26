@@ -33,14 +33,6 @@ class ContractCodeEntryBody:
         self.body_type = body_type
         self.code = code
 
-    @classmethod
-    def from_data_entry(cls, code: bytes) -> ContractCodeEntryBody:
-        return cls(ContractEntryBodyType.DATA_ENTRY, code=code)
-
-    @classmethod
-    def from_expiration_extension(cls) -> ContractCodeEntryBody:
-        return cls(ContractEntryBodyType.EXPIRATION_EXTENSION)
-
     def pack(self, packer: Packer) -> None:
         self.body_type.pack(packer)
         if self.body_type == ContractEntryBodyType.DATA_ENTRY:

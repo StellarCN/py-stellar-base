@@ -31,24 +31,6 @@ class BumpFootprintExpirationResult:
     ) -> None:
         self.code = code
 
-    @classmethod
-    def from_bump_footprint_expiration_success(cls) -> BumpFootprintExpirationResult:
-        return cls(BumpFootprintExpirationResultCode.BUMP_FOOTPRINT_EXPIRATION_SUCCESS)
-
-    @classmethod
-    def from_bump_footprint_expiration_malformed(cls) -> BumpFootprintExpirationResult:
-        return cls(
-            BumpFootprintExpirationResultCode.BUMP_FOOTPRINT_EXPIRATION_MALFORMED
-        )
-
-    @classmethod
-    def from_bump_footprint_expiration_resource_limit_exceeded(
-        cls,
-    ) -> BumpFootprintExpirationResult:
-        return cls(
-            BumpFootprintExpirationResultCode.BUMP_FOOTPRINT_EXPIRATION_RESOURCE_LIMIT_EXCEEDED
-        )
-
     def pack(self, packer: Packer) -> None:
         self.code.pack(packer)
         if (

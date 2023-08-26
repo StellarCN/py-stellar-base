@@ -1249,16 +1249,16 @@ class TransactionBuilder:
 
         invoke_params = [
             Address(contract_id).to_xdr_sc_val(),
-            stellar_xdr.SCVal.from_scv_symbol(
+            stellar_xdr.SCVal(
+                stellar_xdr.SCValType.SCV_SYMBOL,
                 sym=stellar_xdr.SCSymbol(sc_symbol=function_name.encode("utf-8")),
             ),
             *parameters,
         ]
 
-        host_function = (
-            stellar_xdr.HostFunction.from_host_function_type_invoke_contract(
-                stellar_xdr.SCVec(invoke_params)
-            )
+        host_function = stellar_xdr.HostFunction(
+            stellar_xdr.HostFunctionType.HOST_FUNCTION_TYPE_INVOKE_CONTRACT,
+            invoke_contract=stellar_xdr.SCVec(invoke_params),
         )
         op = InvokeHostFunction(host_function=host_function, auth=auth, source=source)
         return self.append_operation(op)
@@ -1283,10 +1283,9 @@ class TransactionBuilder:
             with open(contract, "rb") as f:
                 contract = f.read()
 
-        host_function = (
-            stellar_xdr.HostFunction.from_host_function_type_upload_contract_wasm(
-                contract
-            )
+        host_function = stellar_xdr.HostFunction(
+            stellar_xdr.HostFunctionType.HOST_FUNCTION_TYPE_UPLOAD_CONTRACT_WASM,
+            wasm=contract,
         )
         op = InvokeHostFunction(host_function=host_function, auth=[], source=source)
         return self.append_operation(op)
@@ -1324,11 +1323,12 @@ class TransactionBuilder:
             address = Address(address)
 
         create_contract = stellar_xdr.CreateContractArgs(
-            contract_id_preimage=stellar_xdr.ContractIDPreimage.from_contract_id_preimage_from_address(
-                stellar_xdr.ContractIDPreimageFromAddress(
+            contract_id_preimage=stellar_xdr.ContractIDPreimage(
+                stellar_xdr.ContractIDPreimageType.CONTRACT_ID_PREIMAGE_FROM_ADDRESS,
+                from_address=stellar_xdr.ContractIDPreimageFromAddress(
                     address=address.to_xdr_sc_address(),
                     salt=stellar_xdr.Uint256(salt),
-                )
+                ),
             ),
             executable=stellar_xdr.ContractExecutable(
                 stellar_xdr.ContractExecutableType.CONTRACT_EXECUTABLE_WASM,
@@ -1336,10 +1336,9 @@ class TransactionBuilder:
             ),
         )
 
-        host_function = (
-            stellar_xdr.HostFunction.from_host_function_type_create_contract(
-                create_contract
-            )
+        host_function = stellar_xdr.HostFunction(
+            stellar_xdr.HostFunctionType.HOST_FUNCTION_TYPE_CREATE_CONTRACT,
+            create_contract=create_contract,
         )
 
         op = InvokeHostFunction(host_function=host_function, auth=auth, source=source)
@@ -1362,18 +1361,18 @@ class TransactionBuilder:
         asset_param = asset.to_xdr_object()
 
         create_contract = stellar_xdr.CreateContractArgs(
-            contract_id_preimage=stellar_xdr.ContractIDPreimage.from_contract_id_preimage_from_asset(
-                asset_param
+            contract_id_preimage=stellar_xdr.ContractIDPreimage(
+                stellar_xdr.ContractIDPreimageType.CONTRACT_ID_PREIMAGE_FROM_ASSET,
+                from_asset=asset_param,
             ),
             executable=stellar_xdr.ContractExecutable(
                 stellar_xdr.ContractExecutableType.CONTRACT_EXECUTABLE_TOKEN,
             ),
         )
 
-        host_function = (
-            stellar_xdr.HostFunction.from_host_function_type_create_contract(
-                create_contract
-            )
+        host_function = stellar_xdr.HostFunction(
+            stellar_xdr.HostFunctionType.HOST_FUNCTION_TYPE_CREATE_CONTRACT,
+            create_contract=create_contract,
         )
 
         op = InvokeHostFunction(host_function=host_function, auth=[], source=source)
@@ -1410,21 +1409,21 @@ class TransactionBuilder:
             address = Address(address)
 
         create_contract = stellar_xdr.CreateContractArgs(
-            contract_id_preimage=stellar_xdr.ContractIDPreimage.from_contract_id_preimage_from_address(
-                stellar_xdr.ContractIDPreimageFromAddress(
+            contract_id_preimage=stellar_xdr.ContractIDPreimage(
+                stellar_xdr.ContractIDPreimageType.CONTRACT_ID_PREIMAGE_FROM_ADDRESS,
+                from_address=stellar_xdr.ContractIDPreimageFromAddress(
                     address=address.to_xdr_sc_address(),
                     salt=stellar_xdr.Uint256(salt),
-                )
+                ),
             ),
             executable=stellar_xdr.ContractExecutable(
                 stellar_xdr.ContractExecutableType.CONTRACT_EXECUTABLE_TOKEN,
             ),
         )
 
-        host_function = (
-            stellar_xdr.HostFunction.from_host_function_type_create_contract(
-                create_contract
-            )
+        host_function = stellar_xdr.HostFunction(
+            stellar_xdr.HostFunctionType.HOST_FUNCTION_TYPE_CREATE_CONTRACT,
+            create_contract=create_contract,
         )
 
         op = InvokeHostFunction(host_function=host_function, auth=auth, source=source)

@@ -38,43 +38,6 @@ class CreateClaimableBalanceResult:
         self.code = code
         self.balance_id = balance_id
 
-    @classmethod
-    def from_create_claimable_balance_success(
-        cls, balance_id: ClaimableBalanceID
-    ) -> CreateClaimableBalanceResult:
-        return cls(
-            CreateClaimableBalanceResultCode.CREATE_CLAIMABLE_BALANCE_SUCCESS,
-            balance_id=balance_id,
-        )
-
-    @classmethod
-    def from_create_claimable_balance_malformed(cls) -> CreateClaimableBalanceResult:
-        return cls(CreateClaimableBalanceResultCode.CREATE_CLAIMABLE_BALANCE_MALFORMED)
-
-    @classmethod
-    def from_create_claimable_balance_low_reserve(cls) -> CreateClaimableBalanceResult:
-        return cls(
-            CreateClaimableBalanceResultCode.CREATE_CLAIMABLE_BALANCE_LOW_RESERVE
-        )
-
-    @classmethod
-    def from_create_claimable_balance_no_trust(cls) -> CreateClaimableBalanceResult:
-        return cls(CreateClaimableBalanceResultCode.CREATE_CLAIMABLE_BALANCE_NO_TRUST)
-
-    @classmethod
-    def from_create_claimable_balance_not_authorized(
-        cls,
-    ) -> CreateClaimableBalanceResult:
-        return cls(
-            CreateClaimableBalanceResultCode.CREATE_CLAIMABLE_BALANCE_NOT_AUTHORIZED
-        )
-
-    @classmethod
-    def from_create_claimable_balance_underfunded(cls) -> CreateClaimableBalanceResult:
-        return cls(
-            CreateClaimableBalanceResultCode.CREATE_CLAIMABLE_BALANCE_UNDERFUNDED
-        )
-
     def pack(self, packer: Packer) -> None:
         self.code.pack(packer)
         if (

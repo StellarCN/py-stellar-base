@@ -39,14 +39,6 @@ class AssetCode:
         self.asset_code4 = asset_code4
         self.asset_code12 = asset_code12
 
-    @classmethod
-    def from_asset_type_credit_alphanum4(cls, asset_code4: AssetCode4) -> AssetCode:
-        return cls(AssetType.ASSET_TYPE_CREDIT_ALPHANUM4, asset_code4=asset_code4)
-
-    @classmethod
-    def from_asset_type_credit_alphanum12(cls, asset_code12: AssetCode12) -> AssetCode:
-        return cls(AssetType.ASSET_TYPE_CREDIT_ALPHANUM12, asset_code12=asset_code12)
-
     def pack(self, packer: Packer) -> None:
         self.type.pack(packer)
         if self.type == AssetType.ASSET_TYPE_CREDIT_ALPHANUM4:

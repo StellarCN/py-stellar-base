@@ -35,14 +35,6 @@ class PeerAddressIp:
         self.ipv4 = ipv4
         self.ipv6 = ipv6
 
-    @classmethod
-    def from_i_pv4(cls, ipv4: bytes) -> PeerAddressIp:
-        return cls(IPAddrType.IPv4, ipv4=ipv4)
-
-    @classmethod
-    def from_i_pv6(cls, ipv6: bytes) -> PeerAddressIp:
-        return cls(IPAddrType.IPv6, ipv6=ipv6)
-
     def pack(self, packer: Packer) -> None:
         self.type.pack(packer)
         if self.type == IPAddrType.IPv4:

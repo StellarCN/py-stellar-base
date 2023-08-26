@@ -71,46 +71,6 @@ class LedgerEntryData:
         self.contract_code = contract_code
         self.config_setting = config_setting
 
-    @classmethod
-    def from_account(cls, account: AccountEntry) -> LedgerEntryData:
-        return cls(LedgerEntryType.ACCOUNT, account=account)
-
-    @classmethod
-    def from_trustline(cls, trust_line: TrustLineEntry) -> LedgerEntryData:
-        return cls(LedgerEntryType.TRUSTLINE, trust_line=trust_line)
-
-    @classmethod
-    def from_offer(cls, offer: OfferEntry) -> LedgerEntryData:
-        return cls(LedgerEntryType.OFFER, offer=offer)
-
-    @classmethod
-    def from_data(cls, data: DataEntry) -> LedgerEntryData:
-        return cls(LedgerEntryType.DATA, data=data)
-
-    @classmethod
-    def from_claimable_balance(
-        cls, claimable_balance: ClaimableBalanceEntry
-    ) -> LedgerEntryData:
-        return cls(
-            LedgerEntryType.CLAIMABLE_BALANCE, claimable_balance=claimable_balance
-        )
-
-    @classmethod
-    def from_liquidity_pool(cls, liquidity_pool: LiquidityPoolEntry) -> LedgerEntryData:
-        return cls(LedgerEntryType.LIQUIDITY_POOL, liquidity_pool=liquidity_pool)
-
-    @classmethod
-    def from_contract_data(cls, contract_data: ContractDataEntry) -> LedgerEntryData:
-        return cls(LedgerEntryType.CONTRACT_DATA, contract_data=contract_data)
-
-    @classmethod
-    def from_contract_code(cls, contract_code: ContractCodeEntry) -> LedgerEntryData:
-        return cls(LedgerEntryType.CONTRACT_CODE, contract_code=contract_code)
-
-    @classmethod
-    def from_config_setting(cls, config_setting: ConfigSettingEntry) -> LedgerEntryData:
-        return cls(LedgerEntryType.CONFIG_SETTING, config_setting=config_setting)
-
     def pack(self, packer: Packer) -> None:
         self.type.pack(packer)
         if self.type == LedgerEntryType.ACCOUNT:

@@ -95,34 +95,6 @@ class OperationResult:
         self.code = code
         self.tr = tr
 
-    @classmethod
-    def from_op_inner(cls, tr: OperationResultTr) -> OperationResult:
-        return cls(OperationResultCode.opINNER, tr=tr)
-
-    @classmethod
-    def from_op_bad_auth(cls) -> OperationResult:
-        return cls(OperationResultCode.opBAD_AUTH)
-
-    @classmethod
-    def from_op_no_account(cls) -> OperationResult:
-        return cls(OperationResultCode.opNO_ACCOUNT)
-
-    @classmethod
-    def from_op_not_supported(cls) -> OperationResult:
-        return cls(OperationResultCode.opNOT_SUPPORTED)
-
-    @classmethod
-    def from_op_too_many_subentries(cls) -> OperationResult:
-        return cls(OperationResultCode.opTOO_MANY_SUBENTRIES)
-
-    @classmethod
-    def from_op_exceeded_work_limit(cls) -> OperationResult:
-        return cls(OperationResultCode.opEXCEEDED_WORK_LIMIT)
-
-    @classmethod
-    def from_op_too_many_sponsoring(cls) -> OperationResult:
-        return cls(OperationResultCode.opTOO_MANY_SPONSORING)
-
     def pack(self, packer: Packer) -> None:
         self.code.pack(packer)
         if self.code == OperationResultCode.opINNER:

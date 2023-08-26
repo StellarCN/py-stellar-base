@@ -31,15 +31,6 @@ class SCEnvMetaEntry:
         self.kind = kind
         self.interface_version = interface_version
 
-    @classmethod
-    def from_sc_env_meta_kind_interface_version(
-        cls, interface_version: Uint64
-    ) -> SCEnvMetaEntry:
-        return cls(
-            SCEnvMetaKind.SC_ENV_META_KIND_INTERFACE_VERSION,
-            interface_version=interface_version,
-        )
-
     def pack(self, packer: Packer) -> None:
         self.kind.pack(packer)
         if self.kind == SCEnvMetaKind.SC_ENV_META_KIND_INTERFACE_VERSION:

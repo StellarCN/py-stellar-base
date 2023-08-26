@@ -33,26 +33,6 @@ class ManageDataResult:
     ) -> None:
         self.code = code
 
-    @classmethod
-    def from_manage_data_success(cls) -> ManageDataResult:
-        return cls(ManageDataResultCode.MANAGE_DATA_SUCCESS)
-
-    @classmethod
-    def from_manage_data_not_supported_yet(cls) -> ManageDataResult:
-        return cls(ManageDataResultCode.MANAGE_DATA_NOT_SUPPORTED_YET)
-
-    @classmethod
-    def from_manage_data_name_not_found(cls) -> ManageDataResult:
-        return cls(ManageDataResultCode.MANAGE_DATA_NAME_NOT_FOUND)
-
-    @classmethod
-    def from_manage_data_low_reserve(cls) -> ManageDataResult:
-        return cls(ManageDataResultCode.MANAGE_DATA_LOW_RESERVE)
-
-    @classmethod
-    def from_manage_data_invalid_name(cls) -> ManageDataResult:
-        return cls(ManageDataResultCode.MANAGE_DATA_INVALID_NAME)
-
     def pack(self, packer: Packer) -> None:
         self.code.pack(packer)
         if self.code == ManageDataResultCode.MANAGE_DATA_SUCCESS:

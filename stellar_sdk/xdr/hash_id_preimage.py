@@ -68,33 +68,6 @@ class HashIDPreimage:
         self.contract_id = contract_id
         self.soroban_authorization = soroban_authorization
 
-    @classmethod
-    def from_envelope_type_op_id(
-        cls, operation_id: HashIDPreimageOperationID
-    ) -> HashIDPreimage:
-        return cls(EnvelopeType.ENVELOPE_TYPE_OP_ID, operation_id=operation_id)
-
-    @classmethod
-    def from_envelope_type_pool_revoke_op_id(
-        cls, revoke_id: HashIDPreimageRevokeID
-    ) -> HashIDPreimage:
-        return cls(EnvelopeType.ENVELOPE_TYPE_POOL_REVOKE_OP_ID, revoke_id=revoke_id)
-
-    @classmethod
-    def from_envelope_type_contract_id(
-        cls, contract_id: HashIDPreimageContractID
-    ) -> HashIDPreimage:
-        return cls(EnvelopeType.ENVELOPE_TYPE_CONTRACT_ID, contract_id=contract_id)
-
-    @classmethod
-    def from_envelope_type_soroban_authorization(
-        cls, soroban_authorization: HashIDPreimageSorobanAuthorization
-    ) -> HashIDPreimage:
-        return cls(
-            EnvelopeType.ENVELOPE_TYPE_SOROBAN_AUTHORIZATION,
-            soroban_authorization=soroban_authorization,
-        )
-
     def pack(self, packer: Packer) -> None:
         self.type.pack(packer)
         if self.type == EnvelopeType.ENVELOPE_TYPE_OP_ID:

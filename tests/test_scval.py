@@ -1,6 +1,7 @@
 import pytest
 
 from stellar_sdk import xdr
+from stellar_sdk import xdr as stellar_xdr
 from stellar_sdk.address import Address
 from stellar_sdk.scval import *
 
@@ -16,7 +17,7 @@ def test_address():
 
 def test_bool():
     scval = to_bool(True)
-    expected_scval = xdr.SCVal.from_scv_bool(True)
+    expected_scval = xdr.SCVal(stellar_xdr.SCValType.SCV_BOOL, b=True)
     assert scval == expected_scval
     assert from_bool(scval) is True
 
@@ -24,7 +25,7 @@ def test_bool():
 def test_bytes():
     v = b"hello"
     scval = to_bytes(v)
-    expected_scval = xdr.SCVal.from_scv_bytes(xdr.SCBytes(v))
+    expected_scval = xdr.SCVal(stellar_xdr.SCValType.SCV_BYTES, bytes=xdr.SCBytes(v))
     assert scval == expected_scval
     assert from_bytes(scval) == v
 
@@ -32,7 +33,9 @@ def test_bytes():
 @pytest.mark.parametrize("v", [(2**64) - 1, 0])
 def test_duration(v):
     scval = to_duration(v)
-    expected_scval = xdr.SCVal.from_scv_duration(xdr.Duration(xdr.Uint64(v)))
+    expected_scval = xdr.SCVal(
+        stellar_xdr.SCValType.SCV_DURATION, duration=xdr.Duration(xdr.Uint64(v))
+    )
 
     assert scval == expected_scval
     assert from_duration(scval) == v
@@ -48,7 +51,7 @@ def test_duration_out_of_range_raise(v):
 @pytest.mark.parametrize("v", [2**31 - 1, -(2**31)])
 def test_int32(v):
     scval = to_int32(v)
-    expected_scval = xdr.SCVal.from_scv_i32(xdr.Int32(v))
+    expected_scval = xdr.SCVal(stellar_xdr.SCValType.SCV_I32, i32=xdr.Int32(v))
     assert scval == expected_scval
     assert from_int32(scval) == v
 
@@ -62,7 +65,7 @@ def test_int32_out_of_range_raise(v):
 @pytest.mark.parametrize("v", [2**63 - 1, -(2**63)])
 def test_int64(v):
     scval = to_int64(v)
-    expected_scval = xdr.SCVal.from_scv_i64(xdr.Int64(v))
+    expected_scval = xdr.SCVal(stellar_xdr.SCValType.SCV_I64, i64=xdr.Int64(v))
     assert scval == expected_scval
     assert from_int64(scval) == v
 
@@ -135,14 +138,15 @@ def test_map():
         to_string("hello2"): to_string("world"),
     }
     scval = to_map(v)
-    expected_scval = xdr.SCVal.from_scv_map(
-        xdr.SCMap(
+    expected_scval = xdr.SCVal(
+        stellar_xdr.SCValType.SCV_MAP,
+        map=xdr.SCMap(
             [
                 xdr.SCMapEntry(to_symbol("hello3"), to_int32(1)),
                 xdr.SCMapEntry(to_symbol("hello1"), to_int256(23423432)),
                 xdr.SCMapEntry(to_string("hello2"), to_string("world")),
             ]
-        )
+        ),
     )
     assert scval == expected_scval
     assert from_map(scval) == v
@@ -154,7 +158,7 @@ def test_string(v):
 
     if isinstance(v, str):
         v = v.encode("utf-8")
-    expected_scval = xdr.SCVal.from_scv_string(xdr.SCString(v))
+    expected_scval = xdr.SCVal(stellar_xdr.SCValType.SCV_STRING, str=xdr.SCString(v))
     assert scval == expected_scval
     assert from_string(scval) == v
 
@@ -162,7 +166,9 @@ def test_string(v):
 def test_symbol():
     v = "increment"
     scval = to_symbol(v)
-    expected_scval = xdr.SCVal.from_scv_symbol(xdr.SCSymbol(v.encode("utf-8")))
+    expected_scval = xdr.SCVal(
+        stellar_xdr.SCValType.SCV_SYMBOL, sym=xdr.SCSymbol(v.encode("utf-8"))
+    )
     assert scval == expected_scval
     assert from_symbol(scval) == v
 
@@ -170,7 +176,9 @@ def test_symbol():
 def test_timepoint():
     v = 1234567890
     scval = to_timepoint(v)
-    expected_scval = xdr.SCVal.from_scv_timepoint(xdr.TimePoint(xdr.Uint64(v)))
+    expected_scval = xdr.SCVal(
+        stellar_xdr.SCValType.SCV_TIMEPOINT, timepoint=xdr.TimePoint(xdr.Uint64(v))
+    )
     assert scval == expected_scval
     assert from_timepoint(scval) == v
 
@@ -184,7 +192,7 @@ def test_timepoint_out_of_range_raise(v):
 @pytest.mark.parametrize("v", [2**32 - 1, 0])
 def test_uint32(v):
     scval = to_uint32(v)
-    expected_scval = xdr.SCVal.from_scv_u32(xdr.Uint32(v))
+    expected_scval = xdr.SCVal(stellar_xdr.SCValType.SCV_U32, u32=xdr.Uint32(v))
     assert scval == expected_scval
     assert from_uint32(scval) == v
 
@@ -198,7 +206,7 @@ def test_uint32_out_of_range_raise(v):
 @pytest.mark.parametrize("v", [2**64 - 1, 0])
 def test_uint64(v):
     scval = to_uint64(v)
-    expected_scval = xdr.SCVal.from_scv_u64(xdr.Uint64(v))
+    expected_scval = xdr.SCVal(stellar_xdr.SCValType.SCV_U64, u64=xdr.Uint64(v))
     assert scval == expected_scval
     assert from_uint64(scval) == v
 
@@ -259,14 +267,15 @@ def test_uint256_out_of_range_raise(v):
 def test_vec():
     v = [to_int32(1), to_int256(23423432), to_string("world")]
     scval = to_vec(v)
-    expected_scval = xdr.SCVal.from_scv_vec(
-        xdr.SCVec(
+    expected_scval = xdr.SCVal(
+        stellar_xdr.SCValType.SCV_VEC,
+        vec=xdr.SCVec(
             [
                 to_int32(1),
                 to_int256(23423432),
                 to_string("world"),
             ]
-        )
+        ),
     )
     assert scval == expected_scval
     assert from_vec(scval) == v
@@ -276,7 +285,9 @@ def test_enum_with_value():
     key = "Address"
     value = to_address("GAHJJJKMOKYE4RVPZEWZTKH5FVI4PA3VL7GK2LFNUBSGBV6OJP7TQSLX")
     scval = to_enum(key, value)
-    expected_scval = xdr.SCVal.from_scv_vec(xdr.SCVec([to_symbol(key), value]))
+    expected_scval = xdr.SCVal(
+        stellar_xdr.SCValType.SCV_VEC, vec=xdr.SCVec([to_symbol(key), value])
+    )
     assert scval == expected_scval
     assert from_enum(scval) == (key, value)
 
@@ -284,7 +295,9 @@ def test_enum_with_value():
 def test_enum_without_value():
     key = "Address"
     scval = to_enum(key, None)
-    expected_scval = xdr.SCVal.from_scv_vec(xdr.SCVec([to_symbol(key)]))
+    expected_scval = xdr.SCVal(
+        stellar_xdr.SCValType.SCV_VEC, vec=xdr.SCVec([to_symbol(key)])
+    )
     assert scval == expected_scval
     assert from_enum(scval) == (key, None)
 
@@ -292,8 +305,9 @@ def test_enum_without_value():
 def test_tuple_struct():
     v = [to_int32(1), to_int256(23423432), to_string("world")]
     scval = to_tuple_struct(v)
-    expected_scval = xdr.SCVal.from_scv_vec(
-        xdr.SCVec([to_int32(1), to_int256(23423432), to_string("world")])
+    expected_scval = xdr.SCVal(
+        stellar_xdr.SCValType.SCV_VEC,
+        vec=xdr.SCVec([to_int32(1), to_int256(23423432), to_string("world")]),
     )
     assert scval == expected_scval
     assert from_tuple_struct(scval) == v
@@ -313,8 +327,9 @@ def test_struct():
         ),
     }
     scval = to_struct(v)
-    expected_scval = xdr.SCVal.from_scv_map(
-        xdr.SCMap(
+    expected_scval = xdr.SCVal(
+        stellar_xdr.SCValType.SCV_MAP,
+        map=xdr.SCMap(
             [
                 xdr.SCMapEntry(to_symbol("data1"), to_int32(1)),
                 xdr.SCMapEntry(to_symbol("data2"), to_int256(23423432)),
@@ -333,7 +348,7 @@ def test_struct():
                     ),
                 ),
             ]
-        )
+        ),
     )
     assert scval == expected_scval
     assert from_struct(scval) == v

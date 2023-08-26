@@ -84,10 +84,14 @@ class Address:
                     stellar_xdr.Uint256(self.key),
                 )
             )
-            return stellar_xdr.SCAddress.from_sc_address_type_account(account)
+            return stellar_xdr.SCAddress(
+                stellar_xdr.SCAddressType.SC_ADDRESS_TYPE_ACCOUNT, account_id=account
+            )
         elif self.type == AddressType.CONTRACT:
             contract = Hash(self.key)
-            return stellar_xdr.SCAddress.from_sc_address_type_contract(contract)
+            return stellar_xdr.SCAddress(
+                stellar_xdr.SCAddressType.SC_ADDRESS_TYPE_CONTRACT, contract_id=contract
+            )
         else:
             raise ValueError("Unsupported address type.")
 
@@ -111,7 +115,9 @@ class Address:
             raise ValueError("Unsupported address type.")
 
     def to_xdr_sc_val(self) -> stellar_xdr.SCVal:
-        return stellar_xdr.SCVal.from_scv_address(self.to_xdr_sc_address())
+        return stellar_xdr.SCVal(
+            stellar_xdr.SCValType.SCV_ADDRESS, address=self.to_xdr_sc_address()
+        )
 
     @classmethod
     def from_xdr_sc_val(cls, sc_val: stellar_xdr.SCVal) -> "Address":

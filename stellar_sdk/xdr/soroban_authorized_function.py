@@ -36,24 +36,6 @@ class SorobanAuthorizedFunction:
         self.contract_fn = contract_fn
         self.create_contract_host_fn = create_contract_host_fn
 
-    @classmethod
-    def from_soroban_authorized_function_type_contract_fn(
-        cls, contract_fn: SorobanAuthorizedContractFunction
-    ) -> SorobanAuthorizedFunction:
-        return cls(
-            SorobanAuthorizedFunctionType.SOROBAN_AUTHORIZED_FUNCTION_TYPE_CONTRACT_FN,
-            contract_fn=contract_fn,
-        )
-
-    @classmethod
-    def from_soroban_authorized_function_type_create_contract_host_fn(
-        cls, create_contract_host_fn: CreateContractArgs
-    ) -> SorobanAuthorizedFunction:
-        return cls(
-            SorobanAuthorizedFunctionType.SOROBAN_AUTHORIZED_FUNCTION_TYPE_CREATE_CONTRACT_HOST_FN,
-            create_contract_host_fn=create_contract_host_fn,
-        )
-
     def pack(self, packer: Packer) -> None:
         self.type.pack(packer)
         if (

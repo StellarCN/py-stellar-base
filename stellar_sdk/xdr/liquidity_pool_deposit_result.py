@@ -36,38 +36,6 @@ class LiquidityPoolDepositResult:
     ) -> None:
         self.code = code
 
-    @classmethod
-    def from_liquidity_pool_deposit_success(cls) -> LiquidityPoolDepositResult:
-        return cls(LiquidityPoolDepositResultCode.LIQUIDITY_POOL_DEPOSIT_SUCCESS)
-
-    @classmethod
-    def from_liquidity_pool_deposit_malformed(cls) -> LiquidityPoolDepositResult:
-        return cls(LiquidityPoolDepositResultCode.LIQUIDITY_POOL_DEPOSIT_MALFORMED)
-
-    @classmethod
-    def from_liquidity_pool_deposit_no_trust(cls) -> LiquidityPoolDepositResult:
-        return cls(LiquidityPoolDepositResultCode.LIQUIDITY_POOL_DEPOSIT_NO_TRUST)
-
-    @classmethod
-    def from_liquidity_pool_deposit_not_authorized(cls) -> LiquidityPoolDepositResult:
-        return cls(LiquidityPoolDepositResultCode.LIQUIDITY_POOL_DEPOSIT_NOT_AUTHORIZED)
-
-    @classmethod
-    def from_liquidity_pool_deposit_underfunded(cls) -> LiquidityPoolDepositResult:
-        return cls(LiquidityPoolDepositResultCode.LIQUIDITY_POOL_DEPOSIT_UNDERFUNDED)
-
-    @classmethod
-    def from_liquidity_pool_deposit_line_full(cls) -> LiquidityPoolDepositResult:
-        return cls(LiquidityPoolDepositResultCode.LIQUIDITY_POOL_DEPOSIT_LINE_FULL)
-
-    @classmethod
-    def from_liquidity_pool_deposit_bad_price(cls) -> LiquidityPoolDepositResult:
-        return cls(LiquidityPoolDepositResultCode.LIQUIDITY_POOL_DEPOSIT_BAD_PRICE)
-
-    @classmethod
-    def from_liquidity_pool_deposit_pool_full(cls) -> LiquidityPoolDepositResult:
-        return cls(LiquidityPoolDepositResultCode.LIQUIDITY_POOL_DEPOSIT_POOL_FULL)
-
     def pack(self, packer: Packer) -> None:
         self.code.pack(packer)
         if self.code == LiquidityPoolDepositResultCode.LIQUIDITY_POOL_DEPOSIT_SUCCESS:

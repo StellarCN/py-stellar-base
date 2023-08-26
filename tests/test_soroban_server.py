@@ -133,7 +133,7 @@ class TestSorobanServer:
             "result": result,
         }
         contract_id = "CBQHNAXSI55GX2GN6D67GK7BHVPSLJUGZQEU7WJ5LKR5PNUCGLIMAO4K"
-        key = stellar_xdr.SCVal.from_scv_ledger_key_contract_instance()
+        key = stellar_xdr.SCVal(stellar_xdr.SCValType.SCV_LEDGER_KEY_CONTRACT_INSTANCE)
         with requests_mock.Mocker() as m:
             m.post(PRC_URL, json=data)
             assert (
@@ -145,7 +145,9 @@ class TestSorobanServer:
         assert len(request_data["id"]) == 32
         assert request_data["jsonrpc"] == "2.0"
         assert request_data["method"] == "getLedgerEntries"
-        assert key == stellar_xdr.SCVal.from_scv_ledger_key_contract_instance()
+        assert key == stellar_xdr.SCVal(
+            stellar_xdr.SCValType.SCV_LEDGER_KEY_CONTRACT_INSTANCE
+        )
         assert request_data["params"] == {
             "keys": [
                 "AAAABgAAAAFgdoLyR3pr6M3w/fMr4T1fJaaGzAlP2T1ao9e2gjLQwAAAABQAAAABAAAAAA=="
@@ -160,7 +162,7 @@ class TestSorobanServer:
             "result": result,
         }
         contract_id = "CBQHNAXSI55GX2GN6D67GK7BHVPSLJUGZQEU7WJ5LKR5PNUCGLIMAO4K"
-        key = stellar_xdr.SCVal.from_scv_ledger_key_contract_instance()
+        key = stellar_xdr.SCVal(stellar_xdr.SCValType.SCV_LEDGER_KEY_CONTRACT_INSTANCE)
         with requests_mock.Mocker() as m:
             m.post(PRC_URL, json=data)
             assert SorobanServer(PRC_URL).get_contract_data(contract_id, key) is None
@@ -169,7 +171,9 @@ class TestSorobanServer:
         assert len(request_data["id"]) == 32
         assert request_data["jsonrpc"] == "2.0"
         assert request_data["method"] == "getLedgerEntries"
-        assert key == stellar_xdr.SCVal.from_scv_ledger_key_contract_instance()
+        assert key == stellar_xdr.SCVal(
+            stellar_xdr.SCValType.SCV_LEDGER_KEY_CONTRACT_INSTANCE
+        )
         assert request_data["params"] == {
             "keys": [
                 "AAAABgAAAAFgdoLyR3pr6M3w/fMr4T1fJaaGzAlP2T1ao9e2gjLQwAAAABQAAAABAAAAAA=="
@@ -199,16 +203,18 @@ class TestSorobanServer:
         }
 
         account_id0 = "GCZJ46F2ENQAEEZVVY4RKTGVXWZNETKZBZ4LIW5CMUF7AHP6M7BEV464"
-        key0 = stellar_xdr.LedgerKey.from_account(
-            stellar_xdr.LedgerKeyAccount(
+        key0 = stellar_xdr.LedgerKey(
+            stellar_xdr.LedgerEntryType.ACCOUNT,
+            account=stellar_xdr.LedgerKeyAccount(
                 account_id=Keypair.from_public_key(account_id0).xdr_account_id(),
-            )
+            ),
         )
         account_id1 = "GDAT5HWTGIU4TSSZ4752OUC4SABDLTLZFRPZUJ3D6LKBNEPA7V2CIG54"
-        key1 = stellar_xdr.LedgerKey.from_account(
-            stellar_xdr.LedgerKeyAccount(
+        key1 = stellar_xdr.LedgerKey(
+            stellar_xdr.LedgerEntryType.ACCOUNT,
+            account=stellar_xdr.LedgerKeyAccount(
                 account_id=Keypair.from_public_key(account_id1).xdr_account_id(),
-            )
+            ),
         )
         with requests_mock.Mocker() as m:
             m.post(PRC_URL, json=data)
@@ -523,7 +529,9 @@ class TestSorobanServer:
         }
 
         auth = stellar_xdr.SorobanAuthorizationEntry(
-            credentials=stellar_xdr.SorobanCredentials.from_soroban_credentials_source_account(),
+            credentials=stellar_xdr.SorobanCredentials(
+                stellar_xdr.SorobanCredentialsType.SOROBAN_CREDENTIALS_SOURCE_ACCOUNT
+            ),
             root_invocation=stellar_xdr.SorobanAuthorizedInvocation(
                 function=stellar_xdr.SorobanAuthorizedFunction(
                     type=stellar_xdr.SorobanAuthorizedFunctionType.SOROBAN_AUTHORIZED_FUNCTION_TYPE_CONTRACT_FN,

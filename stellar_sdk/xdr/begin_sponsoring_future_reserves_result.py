@@ -35,38 +35,6 @@ class BeginSponsoringFutureReservesResult:
     ) -> None:
         self.code = code
 
-    @classmethod
-    def from_begin_sponsoring_future_reserves_success(
-        cls,
-    ) -> BeginSponsoringFutureReservesResult:
-        return cls(
-            BeginSponsoringFutureReservesResultCode.BEGIN_SPONSORING_FUTURE_RESERVES_SUCCESS
-        )
-
-    @classmethod
-    def from_begin_sponsoring_future_reserves_malformed(
-        cls,
-    ) -> BeginSponsoringFutureReservesResult:
-        return cls(
-            BeginSponsoringFutureReservesResultCode.BEGIN_SPONSORING_FUTURE_RESERVES_MALFORMED
-        )
-
-    @classmethod
-    def from_begin_sponsoring_future_reserves_already_sponsored(
-        cls,
-    ) -> BeginSponsoringFutureReservesResult:
-        return cls(
-            BeginSponsoringFutureReservesResultCode.BEGIN_SPONSORING_FUTURE_RESERVES_ALREADY_SPONSORED
-        )
-
-    @classmethod
-    def from_begin_sponsoring_future_reserves_recursive(
-        cls,
-    ) -> BeginSponsoringFutureReservesResult:
-        return cls(
-            BeginSponsoringFutureReservesResultCode.BEGIN_SPONSORING_FUTURE_RESERVES_RECURSIVE
-        )
-
     def pack(self, packer: Packer) -> None:
         self.code.pack(packer)
         if (
