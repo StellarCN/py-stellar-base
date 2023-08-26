@@ -72,9 +72,6 @@ black = "^23.3.0"
 requests-mock = "^1.11.0"
 aioresponses = "^0.7.4"
 
-[tool.poetry.extras]
-docs = ["sphinx", "sphinx-rtd-theme", "sphinx-autodoc-typehints"]
-
 [tool.mypy]
 show_error_codes = true
 ignore_missing_imports = true

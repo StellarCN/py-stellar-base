@@ -9,11 +9,20 @@ API Documentation
 
 
 Account
-^^^^^^^^
+^^^^^^^
 
 .. autoclass:: stellar_sdk.account.Account
    :members:
    :inherited-members:
+
+Address
+^^^^^^^
+
+.. autoclass:: stellar_sdk.address.Address
+   :members:
+
+.. autoclass:: stellar_sdk.address.AddressType
+   :members:
 
 Asset
 ^^^^^
@@ -622,6 +631,21 @@ SetTrustLineFlags
 .. autoclass:: stellar_sdk.operation.set_trust_line_flags.TrustLineFlags
    :members:
 
+InvokeHostFunction
+------------------
+.. autoclass:: stellar_sdk.operation.InvokeHostFunction
+   :members: to_xdr_object, from_xdr_object
+
+BumpFootprintExpiration
+-----------------------
+.. autoclass:: stellar_sdk.operation.BumpFootprintExpiration
+   :members: to_xdr_object, from_xdr_object
+
+RestoreFootprint
+----------------
+.. autoclass:: stellar_sdk.operation.RestoreFootprint
+   :members: to_xdr_object, from_xdr_object
+
 Price
 ^^^^^
 
@@ -713,6 +737,66 @@ TransactionBuilder
 
 .. autoclass:: stellar_sdk.transaction_builder.TransactionBuilder
    :members:
+
+SorobanDataBuilder
+^^^^^^^^^^^^^^^^^^
+
+.. autoclass:: stellar_sdk.SorobanDataBuilder
+   :members:
+
+SorobanServer
+^^^^^^^^^^^^^
+
+.. autoclass:: stellar_sdk.SorobanServer
+   :members:
+
+Soroban RPC Definitions
+^^^^^^^^^^^^^^^^^^^^^^^
+.. automodule:: stellar_sdk.soroban_rpc
+   :members:
+
+scval
+^^^^^
+.. autofunction:: stellar_sdk.scval.to_address
+.. autofunction:: stellar_sdk.scval.from_address
+.. autofunction:: stellar_sdk.scval.to_bool
+.. autofunction:: stellar_sdk.scval.from_bool
+.. autofunction:: stellar_sdk.scval.to_bytes
+.. autofunction:: stellar_sdk.scval.from_bytes
+.. autofunction:: stellar_sdk.scval.to_duration
+.. autofunction:: stellar_sdk.scval.from_duration
+.. autofunction:: stellar_sdk.scval.to_int32
+.. autofunction:: stellar_sdk.scval.from_int32
+.. autofunction:: stellar_sdk.scval.to_int64
+.. autofunction:: stellar_sdk.scval.from_int64
+.. autofunction:: stellar_sdk.scval.to_int128
+.. autofunction:: stellar_sdk.scval.from_int128
+.. autofunction:: stellar_sdk.scval.to_int256
+.. autofunction:: stellar_sdk.scval.from_int256
+.. autofunction:: stellar_sdk.scval.to_map
+.. autofunction:: stellar_sdk.scval.from_map
+.. autofunction:: stellar_sdk.scval.to_string
+.. autofunction:: stellar_sdk.scval.from_string
+.. autofunction:: stellar_sdk.scval.to_symbol
+.. autofunction:: stellar_sdk.scval.from_symbol
+.. autofunction:: stellar_sdk.scval.to_timepoint
+.. autofunction:: stellar_sdk.scval.from_timepoint
+.. autofunction:: stellar_sdk.scval.to_uint32
+.. autofunction:: stellar_sdk.scval.from_uint32
+.. autofunction:: stellar_sdk.scval.to_uint64
+.. autofunction:: stellar_sdk.scval.from_uint64
+.. autofunction:: stellar_sdk.scval.to_uint128
+.. autofunction:: stellar_sdk.scval.from_uint128
+.. autofunction:: stellar_sdk.scval.to_uint256
+.. autofunction:: stellar_sdk.scval.from_uint256
+.. autofunction:: stellar_sdk.scval.to_vec
+.. autofunction:: stellar_sdk.scval.from_vec
+.. autofunction:: stellar_sdk.scval.to_enum
+.. autofunction:: stellar_sdk.scval.from_enum
+.. autofunction:: stellar_sdk.scval.to_tuple_struct
+.. autofunction:: stellar_sdk.scval.from_tuple_struct
+.. autofunction:: stellar_sdk.scval.to_struct
+.. autofunction:: stellar_sdk.scval.from_struct
 
 Helpers
 ^^^^^^^
