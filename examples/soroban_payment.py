@@ -4,11 +4,10 @@ See https://soroban.stellar.org/docs/reference/interfaces/token-interface
 """
 import time
 
-from stellar_sdk import Keypair, Network, TransactionBuilder
+from stellar_sdk import Keypair, Network, SorobanServer, TransactionBuilder, scval
 from stellar_sdk import xdr as stellar_xdr
-from stellar_sdk.soroban import SorobanServer
-from stellar_sdk.soroban.soroban_rpc import GetTransactionStatus
-from stellar_sdk.soroban.types import Address, Int128
+from stellar_sdk.exceptions import PrepareTransactionException
+from stellar_sdk.soroban_rpc import GetTransactionStatus
 
 rpc_server_url = "https://rpc-futurenet.stellar.org:443/"
 soroban_server = SorobanServer(rpc_server_url)
@@ -20,18 +19,18 @@ alice_kp = Keypair.from_secret(
 bob_kp = Keypair.from_secret(
     "SAEZSI6DY7AXJFIYA4PM6SIBNEYYXIEM2MSOTHFGKHDW32MBQ7KVO6EN"
 )  # GBMLPRFCZDZJPKUPHUSHCKA737GOZL7ERZLGGMJ6YGHBFJZ6ZKMKCZTM
-native_token_contract_id = "CDMT6XD3WDV4JKOI64T4LTV4JZARSTJYEV7B2DMRANLLIO74KKEBHYNJ"
+native_token_contract_id = "CB64D3G7SM2RTH6JSGG34DDTFTQ5CFDKVDZJZSODMCX4NJ2HV2KN7OHT"
 
 alice_source = soroban_server.load_account(alice_kp.public_key)
 
 args = [
-    Address(alice_kp.public_key),  # from
-    Address(bob_kp.public_key),  # to
-    Int128(100 * 10**7),  # amount, 100 XLM
+    scval.to_address(alice_kp.public_key),  # from
+    scval.to_address(bob_kp.public_key),  # to
+    scval.to_int128(100 * 10**7),  # amount, 100 XLM
 ]
 
 tx = (
-    TransactionBuilder(alice_source, network_passphrase, base_fee=100)
+    TransactionBuilder(alice_source, network_passphrase, base_fee=500)
     .add_time_bounds(0, 0)
     .append_invoke_contract_function_op(
         contract_id=native_token_contract_id,
@@ -41,7 +40,12 @@ tx = (
     .build()
 )
 
-tx = soroban_server.prepare_transaction(tx)
+try:
+    tx = soroban_server.prepare_transaction(tx)
+except PrepareTransactionException as e:
+    print(f"Got exception: {e.simulate_transaction_response}")
+    raise e
+
 tx.sign(alice_kp)
 print(f"Signed XDR:\n{tx.to_xdr()}")
 
@@ -63,4 +67,6 @@ if get_transaction_data.status == GetTransactionStatus.SUCCESS:
         get_transaction_data.result_meta_xdr
     )
     if transaction_meta.v3.soroban_meta.return_value.type == stellar_xdr.SCValType.SCV_VOID:  # type: ignore[union-attr]
-        print("swap success")
+        print("send success")
+else:
+    print(f"Transaction failed: {get_transaction_data.result_xdr}")

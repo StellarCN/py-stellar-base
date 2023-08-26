@@ -5,31 +5,27 @@ See https://soroban.stellar.org/docs/learn/authorization#transaction-invoker
 """
 import time
 
-from stellar_sdk import Keypair, Network, TransactionBuilder
+from stellar_sdk import Keypair, Network, SorobanServer, TransactionBuilder, scval
 from stellar_sdk import xdr as stellar_xdr
-from stellar_sdk.soroban import SorobanServer
-from stellar_sdk.soroban.soroban_rpc import GetTransactionStatus
-from stellar_sdk.soroban.types import Address, Uint32, Enum, Symbol
+from stellar_sdk.exceptions import PrepareTransactionException
+from stellar_sdk.soroban_rpc import GetTransactionStatus
 
-rpc_server_url = "http://100.83.15.43:8000/soroban/rpc"
+rpc_server_url = "https://rpc-futurenet.stellar.org:443/"
 soroban_server = SorobanServer(rpc_server_url)
-network_passphrase = Network.STANDALONE_NETWORK_PASSPHRASE
+network_passphrase = Network.FUTURENET_NETWORK_PASSPHRASE
 
-contract_id = "CAYQSZQXD6AFSXTV7YJKJHWIX2CZ3Q6Z5NPXSI7DDUE67NPRT3UMZMHM"
+# https://github.com/stellar/soroban-examples/tree/v0.6.0/auth
+contract_id = "CAROXTYEBHAQWS2DFQBFZPMHWDUMPB2HJRNPPUMJUNBC3USBZJYKTAKF"
 tx_submitter_kp = Keypair.from_secret(
     "SAAPYAPTTRZMCUZFPG3G66V4ZMHTK4TWA6NS7U4F7Z3IMUD52EK4DDEV"
 )
 
-func_name = "initialize"
-args = [
-    Address(tx_submitter_kp.public_key),
-    Enum("Other", Symbol("XLM")),
-    Uint32(18),
-    Uint32(1),
-]
+func_name = "increment"
+args = [scval.to_address(tx_submitter_kp.public_key), scval.to_uint32(10)]
+
 source = soroban_server.load_account(tx_submitter_kp.public_key)
 tx = (
-    TransactionBuilder(source, network_passphrase, base_fee=500000)
+    TransactionBuilder(source, network_passphrase, base_fee=100)
     .add_time_bounds(0, 0)
     .append_invoke_contract_function_op(
         contract_id=contract_id,
@@ -39,7 +35,12 @@ tx = (
     .build()
 )
 
-tx = soroban_server.prepare_transaction(tx)
+try:
+    tx = soroban_server.prepare_transaction(tx)
+except PrepareTransactionException as e:
+    print(f"Got exception: {e.simulate_transaction_response}")
+    raise e
+
 tx.sign(tx_submitter_kp)
 print(f"Signed XDR:\n{tx.to_xdr()}")
 
@@ -62,3 +63,5 @@ if get_transaction_data.status == GetTransactionStatus.SUCCESS:
     )
     result = transaction_meta.v3.soroban_meta.return_value.u32  # type: ignore
     print(f"Function result: {result}")
+else:
+    print(f"Transaction failed: {get_transaction_data.result_xdr}")

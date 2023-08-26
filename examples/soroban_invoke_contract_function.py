@@ -12,16 +12,15 @@
 """
 import time
 
-from stellar_sdk import Keypair, Network, TransactionBuilder
+from stellar_sdk import Keypair, Network, SorobanServer, TransactionBuilder, scval
 from stellar_sdk import xdr as stellar_xdr
-from stellar_sdk.soroban import SorobanServer
-from stellar_sdk.soroban.soroban_rpc import GetTransactionStatus
-from stellar_sdk.soroban.types import Symbol
+from stellar_sdk.exceptions import PrepareTransactionException
+from stellar_sdk.soroban_rpc import GetTransactionStatus
 
 # TODO: You need to replace the following parameters according to the actual situation
 secret = "SAAPYAPTTRZMCUZFPG3G66V4ZMHTK4TWA6NS7U4F7Z3IMUD52EK4DDEV"
 rpc_server_url = "https://rpc-futurenet.stellar.org:443/"
-contract_id = "CCQVDTV3WGU73LTPTTG3YFBOCS7VJ5ODJQJI7XTBYATZTA4WMV5XAILW"
+contract_id = "CDJO3KQKJFHFEZY2ZSWS4CTZEAZUO2SZNRWO2Y7QQS4X3UWSOLFJHSS3"
 network_passphrase = Network.FUTURENET_NETWORK_PASSPHRASE
 
 kp = Keypair.from_secret(secret)
@@ -35,13 +34,18 @@ tx = (
     .append_invoke_contract_function_op(
         contract_id=contract_id,
         function_name="hello",
-        parameters=[Symbol("world")],
+        parameters=[scval.to_symbol("world")],
     )
     .build()
 )
 print(f"XDR: {tx.to_xdr()}")
 
-tx = soroban_server.prepare_transaction(tx)
+try:
+    tx = soroban_server.prepare_transaction(tx)
+except PrepareTransactionException as e:
+    print(f"Got exception: {e.simulate_transaction_response}")
+    raise e
+
 tx.sign(kp)
 print(f"Signed XDR: {tx.to_xdr()}")
 
@@ -65,3 +69,5 @@ if get_transaction_data.status == GetTransactionStatus.SUCCESS:
     result = transaction_meta.v3.soroban_meta.return_value  # type: ignore[union-attr]
     output = [x.sym.sc_symbol.decode() for x in result.vec.sc_vec]  # type: ignore
     print(f"transaction result: {output}")
+else:
+    print(f"Transaction failed: {get_transaction_data.result_xdr}")

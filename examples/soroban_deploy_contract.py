@@ -2,10 +2,10 @@
 """
 import time
 
-from stellar_sdk import Keypair, Network, StrKey, TransactionBuilder
+from stellar_sdk import Keypair, Network, SorobanServer, StrKey, TransactionBuilder
 from stellar_sdk import xdr as stellar_xdr
-from stellar_sdk.soroban import SorobanServer
-from stellar_sdk.soroban.soroban_rpc import GetTransactionStatus
+from stellar_sdk.exceptions import PrepareTransactionException
+from stellar_sdk.soroban_rpc import GetTransactionStatus
 
 # TODO: You need to replace the following parameters according to the actual situation
 secret = "SAAPYAPTTRZMCUZFPG3G66V4ZMHTK4TWA6NS7U4F7Z3IMUD52EK4DDEV"
@@ -31,7 +31,12 @@ tx = (
     .build()
 )
 
-tx = soroban_server.prepare_transaction(tx)
+try:
+    tx = soroban_server.prepare_transaction(tx)
+except PrepareTransactionException as e:
+    print(f"Got exception: {e.simulate_transaction_response}")
+    raise e
+
 tx.sign(kp)
 send_transaction_data = soroban_server.send_transaction(tx)
 print(f"sent transaction: {send_transaction_data}")
@@ -53,6 +58,8 @@ if get_transaction_data.status == GetTransactionStatus.SUCCESS:
     )
     wasm_id = transaction_meta.v3.soroban_meta.return_value.bytes.sc_bytes.hex()  # type: ignore
     print(f"wasm id: {wasm_id}")
+else:
+    print(f"Transaction failed: {get_transaction_data.result_xdr}")
 
 assert wasm_id, "wasm id should not be empty"
 
@@ -65,13 +72,16 @@ source = soroban_server.load_account(
 tx = (
     TransactionBuilder(source, network_passphrase)
     .set_timeout(300)
-    .append_create_contract_op(
-        wasm_id=wasm_id,
-    )
+    .append_create_contract_op(wasm_id=wasm_id, address=kp.public_key)
     .build()
 )
 
-tx = soroban_server.prepare_transaction(tx)
+try:
+    tx = soroban_server.prepare_transaction(tx)
+except PrepareTransactionException as e:
+    print(f"Got exception: {e.simulate_transaction_response}")
+    raise e
+
 tx.sign(kp)
 
 send_transaction_data = soroban_server.send_transaction(tx)
@@ -94,3 +104,5 @@ if get_transaction_data.status == GetTransactionStatus.SUCCESS:
     result = transaction_meta.v3.soroban_meta.return_value.address.contract_id.hash  # type: ignore
     contract_id = StrKey.encode_contract(result)
     print(f"contract id: {contract_id}")
+else:
+    print(f"Transaction failed: {get_transaction_data.result_xdr}")
