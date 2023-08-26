@@ -5,6 +5,7 @@ import json
 import uuid
 from typing import TYPE_CHECKING, Type
 
+from . import Keypair
 from . import xdr as stellar_xdr
 from .account import Account
 from .address import Address
@@ -16,7 +17,6 @@ from .exceptions import (
 )
 from .operation import InvokeHostFunction
 from .soroban_rpc import *
-from .strkey import StrKey
 
 if TYPE_CHECKING:
     from .client.base_sync_client import BaseSyncClient
@@ -218,15 +218,10 @@ class SorobanServer:
         :raises: :exc:`AccountNotFoundException <stellar_sdk.exceptions.AccountNotFoundException>` - If the account is not found on the network.
         :raises: :exc:`SorobanRpcErrorResponse <stellar_sdk.exceptions.SorobanRpcErrorResponse>` - If the Soroban-RPC instance returns an error response.
         """
-        ed25519 = StrKey.decode_ed25519_public_key(account_id)
-        key = stellar_xdr.LedgerKey.from_account(
-            stellar_xdr.LedgerKeyAccount(
-                account_id=stellar_xdr.AccountID(
-                    stellar_xdr.PublicKey.from_public_key_type_ed25519(
-                        stellar_xdr.Uint256(ed25519)
-                    )
-                )
-            )
+        account_id_xdr = Keypair.from_public_key(account_id).xdr_account_id()
+        key = stellar_xdr.LedgerKey(
+            stellar_xdr.LedgerEntryType.ACCOUNT,
+            account=stellar_xdr.LedgerKeyAccount(account_id=account_id_xdr),
         )
 
         resp = self.get_ledger_entries([key])
@@ -259,13 +254,14 @@ class SorobanServer:
             if durability == Durability.PERSISTENT
             else stellar_xdr.ContractDataDurability.TEMPORARY
         )
-        contract_key = stellar_xdr.LedgerKey.from_contract_data(
-            stellar_xdr.LedgerKeyContractData(
+        contract_key = stellar_xdr.LedgerKey(
+            stellar_xdr.LedgerEntryType.CONTRACT_DATA,
+            contract_data=stellar_xdr.LedgerKeyContractData(
                 contract=sc_address,
                 key=key,
                 durability=xdr_durability,
                 body_type=stellar_xdr.ContractEntryBodyType.DATA_ENTRY,
-            )
+            ),
         )
         resp = self.get_ledger_entries([contract_key])
         entries = resp.entries

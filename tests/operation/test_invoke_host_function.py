@@ -12,15 +12,15 @@ class TestInvokeHostFunction:
         function_name = "increment"
         invoke_params = [
             Address(contract_id).to_xdr_sc_val(),
-            stellar_xdr.SCVal.from_scv_symbol(
+            stellar_xdr.SCVal(
+                stellar_xdr.SCValType.SCV_SYMBOL,
                 sym=stellar_xdr.SCSymbol(sc_symbol=function_name.encode("utf-8")),
             ),
             scval.to_int256(234325465),
         ]
-        host_function = (
-            stellar_xdr.HostFunction.from_host_function_type_invoke_contract(
-                stellar_xdr.SCVec(invoke_params)
-            )
+        host_function = stellar_xdr.HostFunction(
+            stellar_xdr.HostFunctionType.HOST_FUNCTION_TYPE_INVOKE_CONTRACT,
+            invoke_contract=stellar_xdr.SCVec(invoke_params),
         )
         op = InvokeHostFunction(host_function, [], source=kp1.public_key)
         assert op.host_function == host_function
@@ -34,20 +34,22 @@ class TestInvokeHostFunction:
         function_name = "increment"
         invoke_params = [
             Address(contract_id).to_xdr_sc_val(),
-            stellar_xdr.SCVal.from_scv_symbol(
+            stellar_xdr.SCVal(
+                stellar_xdr.SCValType.SCV_SYMBOL,
                 sym=stellar_xdr.SCSymbol(sc_symbol=function_name.encode("utf-8")),
             ),
             scval.to_int256(234325465),
         ]
-        host_function = (
-            stellar_xdr.HostFunction.from_host_function_type_invoke_contract(
-                stellar_xdr.SCVec(invoke_params)
-            )
+        host_function = stellar_xdr.HostFunction(
+            stellar_xdr.HostFunctionType.HOST_FUNCTION_TYPE_INVOKE_CONTRACT,
+            invoke_contract=stellar_xdr.SCVec(invoke_params),
         )
 
         auth = [
             stellar_xdr.SorobanAuthorizationEntry(
-                credentials=stellar_xdr.SorobanCredentials.from_soroban_credentials_source_account(),
+                credentials=stellar_xdr.SorobanCredentials(
+                    stellar_xdr.SorobanCredentialsType.SOROBAN_CREDENTIALS_SOURCE_ACCOUNT
+                ),
                 root_invocation=stellar_xdr.SorobanAuthorizedInvocation(
                     function=stellar_xdr.SorobanAuthorizedFunction(
                         type=stellar_xdr.SorobanAuthorizedFunctionType.SOROBAN_AUTHORIZED_FUNCTION_TYPE_CONTRACT_FN,
