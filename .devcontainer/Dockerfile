@@ -1,4 +1,4 @@
-FROM ubuntu:focal
+FROM ubuntu:jammy
 
 # This Dockerfile adds a non-root 'vscode' user with sudo access. However, for Linux,
 # this user's GID/UID must match your local user UID/GID to avoid permission issues
@@ -20,19 +20,10 @@ RUN apt-get update && apt-get upgrade -qy && apt-get install -qy \
     make \
     python-is-python3 \
     python3 \
-    python3-pip \
-    ruby \
-    fish && \
+    python3-pip && \
     apt-get autoclean -y && \
     apt-get autoremove -y && \
     apt-get clean
-
-# Install xdrgen
-RUN cd /opt && \
-    git clone --branch python-sdk https://github.com/overcat/xdrgen && \
-    cd xdrgen && \
-    gem build xdrgen.gemspec && \
-    gem install xdrgen-*.gem
 
 # Install poetry
 RUN pip install poetry
@@ -46,7 +37,7 @@ ENV LC_ALL en_US.UTF-8
 
 # Create a non-root user to use if preferred - see https://aka.ms/vscode-remote/containers/non-root-user.
 RUN groupadd --gid $USER_GID $USERNAME \
-    && useradd -s /bin/fish --uid $USER_UID --gid $USER_GID -m $USERNAME \
+    && useradd --uid $USER_UID --gid $USER_GID -m $USERNAME \
     # [Optional] Add sudo support for the non-root user
     && apt-get install -y sudo \
     && echo $USERNAME ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/$USERNAME\
@@ -57,4 +48,4 @@ ENV DEBIAN_FRONTEND=
 
 USER $USERNAME
 
-CMD ["/bin/fish"]
+CMD ["/bin/bash"]
