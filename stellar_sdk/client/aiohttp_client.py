@@ -87,7 +87,7 @@ class AiohttpClient(BaseAsyncClient):
         custom_headers: Optional[Dict[str, str]] = None,
         **kwargs,
     ) -> None:
-        if not AiohttpClient:
+        if not _AIOHTTP_DEPS_INSTALLED:
             raise ImportError(
                 "The required dependencies have not been installed. "
                 "Please install `stellar-sdk[aiohttp]` to use this feature."
