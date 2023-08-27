@@ -58,6 +58,7 @@ Installing
     pip install -U stellar-sdk
 
 If you need to use asynchronous, please install it using the following method.
+
 .. code-block:: text
 
     pip install -U stellar-sdk[aiohttp]
