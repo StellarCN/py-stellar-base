@@ -55,7 +55,7 @@ Installing
 
 .. code-block:: text
 
-    pip install stellar-sdk==9.0.0.a0
+    pip install stellar-sdk==9.0.0a0
 
 If you need to use asynchronous, please use the following command to install the required dependencies.
 
