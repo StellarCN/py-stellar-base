@@ -33,7 +33,7 @@ Stellar Python SDK
     :alt: PyPI - Implementation
     :target: https://pypi.python.org/pypi/stellar-sdk
 
-.. image:: https://img.shields.io/badge/Stellar%20Protocol-19-blue
+.. image:: https://img.shields.io/badge/Stellar%20Protocol-20-blue
     :alt: Stellar Protocol
     :target: https://developers.stellar.org/docs/glossary/scp/
 
@@ -55,13 +55,13 @@ Installing
 
 .. code-block:: text
 
-    pip install -U stellar-sdk
+    pip install stellar-sdk==9.0.0.a0
 
 If you need to use asynchronous, please use the following command to install the required dependencies.
 
 .. code-block:: text
 
-    pip install -U stellar-sdk[aiohttp]
+    pip install stellar-sdk[aiohttp]==9.0.0a0
 
 
 We follow `Semantic Versioning 2.0.0 <https://semver.org/>`_, and I strongly

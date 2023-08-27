@@ -55,12 +55,12 @@ async def __readline(self) -> bytes:
     return b"".join(line)
 
 
-_AIOHTTP_DEPS_INSTALLED = True
 try:
     import aiohttp
     from aiohttp_sse_client.client import EventSource
 
     aiohttp.streams.StreamReader.readline = __readline  # type: ignore[assignment]
+    _AIOHTTP_DEPS_INSTALLED = True
 except ImportError:
     _AIOHTTP_DEPS_INSTALLED = False
 

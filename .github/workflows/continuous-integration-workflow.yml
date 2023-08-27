@@ -36,7 +36,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          poetry install
+          poetry install --extras 'aiohttp'
 
       - name: Ensure httpbin server is running
         run: |
@@ -44,7 +44,7 @@ jobs:
 
       - name: Echo installed packages
         run: |
-          pip freeze
+          poetry show
 
       - name: Test with pytest
         run: poetry run pytest -v -rs tests --runslow --cov=./ --cov-report=xml
@@ -75,7 +75,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          poetry install
+          poetry install --extras 'aiohttp'
 
       - name: Run mypy check
         run: |

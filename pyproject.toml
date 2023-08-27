@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "stellar-sdk"
-version = "9.0.0.dev0"
+version = "9.0.0a0"
 description = "The Python Stellar SDK library provides APIs to build transactions and connect to Horizon."
 authors = [
     "overcat <4catcode@gmail.com>",
@@ -27,7 +27,7 @@ keywords = [
 ]
 license = "Apache License 2.0"
 classifiers = [
-    "Development Status :: 5 - Production/Stable",
+    "Development Status :: 3 - Alpha",
     "Intended Audience :: Developers",
     "Natural Language :: English",
     "Operating System :: OS Independent",
