@@ -1,17 +1,25 @@
-name: GitHub Action
+name: Test and Deploy
 
 on:
   push:
   pull_request:
-    branches-ignore:
-      - 'temp*'
-      - 'tmp*'
   release:
-    types: [ created ]
+    types:
+      - created
 
 jobs:
+  pre-commit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+      - uses: pre-commit/action@v3.0.0
+
   test:
     runs-on: ubuntu-latest
+    needs: pre-commit
     strategy:
       fail-fast: false
       matrix:
@@ -61,6 +69,7 @@ jobs:
 
   mypy-check:
     runs-on: ubuntu-latest
+    needs: pre-commit
     steps:
       - uses: actions/checkout@v3
 
@@ -84,9 +93,9 @@ jobs:
           poetry run mypy examples
 
   deploy:
-    needs: test
+    needs: [ test, mypy-check ]
     runs-on: ubuntu-latest
-    if: github.event_name == 'release'
+    if: github.event_name == 'release' && github.event.action == 'created'
     steps:
       - uses: actions/checkout@v3
 
