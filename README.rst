@@ -57,6 +57,12 @@ Installing
 
     pip install -U stellar-sdk
 
+If you need to use asynchronous, please install it using the following method.
+.. code-block:: text
+
+    pip install -U stellar-sdk[aiohttp]
+
+
 We follow `Semantic Versioning 2.0.0 <https://semver.org/>`_, and I strongly
 recommend that you specify its major version number in the dependency
 file to avoid the unknown effects of breaking changes.

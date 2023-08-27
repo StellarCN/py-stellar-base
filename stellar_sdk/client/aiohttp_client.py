@@ -3,9 +3,6 @@ import json
 import logging
 from typing import Any, AsyncGenerator, Dict, Optional
 
-import aiohttp
-from aiohttp_sse_client.client import EventSource
-
 from ..__version__ import __version__
 from ..exceptions import ConnectionError, StreamClientError
 from . import defines
@@ -58,7 +55,14 @@ async def __readline(self) -> bytes:
     return b"".join(line)
 
 
-aiohttp.streams.StreamReader.readline = __readline  # type: ignore[assignment]
+_AIOHTTP_DEPS_INSTALLED = True
+try:
+    import aiohttp
+    from aiohttp_sse_client.client import EventSource
+
+    aiohttp.streams.StreamReader.readline = __readline  # type: ignore[assignment]
+except ImportError:
+    _AIOHTTP_DEPS_INSTALLED = False
 
 
 class AiohttpClient(BaseAsyncClient):
@@ -83,6 +87,11 @@ class AiohttpClient(BaseAsyncClient):
         custom_headers: Optional[Dict[str, str]] = None,
         **kwargs,
     ) -> None:
+        if not AiohttpClient:
+            raise ImportError(
+                "The required dependencies have not been installed. "
+                "Please install `stellar-sdk[aiohttp]` to use this feature."
+            )
         self.pool_size = pool_size
         self.backoff_factor: Optional[float] = backoff_factor
         self.request_timeout: float = request_timeout
