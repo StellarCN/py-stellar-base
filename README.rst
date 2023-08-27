@@ -38,13 +38,14 @@ Stellar Python SDK
     :target: https://developers.stellar.org/docs/glossary/scp/
 
 py-stellar-base is a Python library for communicating with
-a `Stellar Horizon server`_. It is used for building Stellar apps on Python. It supports **Python 3.7+** as
+a `Stellar Horizon server`_ and `Soroban-RPC server`_. It is used for building Stellar apps on Python. It supports **Python 3.7+** as
 well as PyPy 3.7+.
 
 It provides:
 
 - a networking layer API for Horizon endpoints.
-- facilities for building and signing transactions, for communicating with a Stellar Horizon instance, and for submitting transactions or querying network history.
+- a networking layer API for Soroban-RPC server methods.
+- facilities for building and signing transactions, for communicating with a Stellar Horizon and Soroban-RPC instance, and for submitting transactions or querying network history.
 
 Documentation
 -------------
@@ -63,7 +64,6 @@ If you need to use asynchronous, please use the following command to install the
 
     pip install stellar-sdk[aiohttp]==9.0.0a0
 
-
 We follow `Semantic Versioning 2.0.0 <https://semver.org/>`_, and I strongly
 recommend that you specify its major version number in the dependency
 file to avoid the unknown effects of breaking changes.
@@ -71,8 +71,6 @@ file to avoid the unknown effects of breaking changes.
 A Simple Example
 ----------------
 You can find more examples `here <https://github.com/StellarCN/py-stellar-base/tree/main/examples>`__.
-
-Building transaction with synchronous server
 
 .. code-block:: python
 
@@ -100,46 +98,6 @@ Building transaction with synchronous server
     response = server.submit_transaction(transaction)
     print(response)
 
-
-* Building transaction with asynchronous server
-
-.. code-block:: python
-
-    # Alice pay 10.25 XLM to Bob
-    import asyncio
-
-    from stellar_sdk import Asset, ServerAsync, Keypair, TransactionBuilder, Network
-    from stellar_sdk.client.aiohttp_client import AiohttpClient
-
-    alice_keypair = Keypair.from_secret("SBFZCHU5645DOKRWYBXVOXY2ELGJKFRX6VGGPRYUWHQ7PMXXJNDZFMKD")
-    bob_address = "GA7YNBW5CBTJZ3ZZOWX3ZNBKD6OE7A7IHUQVWMY62W2ZBG2SGZVOOPVH"
-
-
-    async def payment():
-        async with ServerAsync(
-            horizon_url="https://horizon-testnet.stellar.org", client=AiohttpClient()
-        ) as server:
-            alice_account = await server.load_account(alice_keypair.public_key)
-            base_fee = 100
-            transaction = (
-                TransactionBuilder(
-                    source_account=alice_account,
-                    network_passphrase=Network.TESTNET_NETWORK_PASSPHRASE,
-                    base_fee=base_fee,
-                )
-                .add_text_memo("Hello, Stellar!")
-                .append_payment_op(bob_address, Asset.native(), "10.25")
-                .set_timeout(30)
-                .build()
-            )
-            transaction.sign(alice_keypair)
-            response = await server.submit_transaction(transaction)
-            print(response)
-
-
-    if __name__ == "__main__":
-        asyncio.run(payment())
-
 Soroban support
 ---------------
 As `Soroban <https://soroban.stellar.org/docs>`_ is still under active development, I have not merged it into the main branch.
@@ -163,3 +121,4 @@ Links
 Thank you to all the people who have already contributed to py-stellar-base!
 
 .. _Stellar Horizon server: https://github.com/stellar/go/tree/master/services/horizon
+.. _Soroban-RPC server: https://soroban.stellar.org/docs/reference/rpc
