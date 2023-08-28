@@ -145,6 +145,7 @@ class TransactionBuilder:
             operations=self.operations,
             memo=self.memo,
             preconditions=preconditions,
+            soroban_data=self.soroban_data,
             v1=self.v1,
         )
         transaction_envelope = TransactionEnvelope(
@@ -239,6 +240,7 @@ class TransactionBuilder:
             )
         transaction_builder.operations = transaction_envelope.transaction.operations
         transaction_builder.memo = transaction_envelope.transaction.memo
+        transaction_builder.soroban_data = transaction_envelope.transaction.soroban_data
         return transaction_builder
 
     def add_time_bounds(self, min_time: int, max_time: int) -> "TransactionBuilder":
