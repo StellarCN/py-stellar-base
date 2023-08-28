@@ -1,6 +1,13 @@
 Release History
 ==============
 
+### Version 9.0.0-alpha1
+
+Released on Aug 28, 2023
+
+#### Update
+- fix: fix the issue where soroban data is not correctly set when building a transaction through TransactionBuilder. ([#770](https://github.com/StellarCN/py-stellar-base/pull/770))
+
 ### Version 9.0.0-alpha0
 
 Released on Aug 27, 2023
