@@ -15,7 +15,7 @@ import time
 from stellar_sdk import Keypair, Network, SorobanServer, TransactionBuilder, scval
 from stellar_sdk import xdr as stellar_xdr
 from stellar_sdk.exceptions import PrepareTransactionException
-from stellar_sdk.soroban_rpc import GetTransactionStatus
+from stellar_sdk.soroban_rpc import GetTransactionStatus, SendTransactionStatus
 
 # TODO: You need to replace the following parameters according to the actual situation
 secret = "SAAPYAPTTRZMCUZFPG3G66V4ZMHTK4TWA6NS7U4F7Z3IMUD52EK4DDEV"
@@ -51,7 +51,8 @@ print(f"Signed XDR: {tx.to_xdr()}")
 
 send_transaction_data = soroban_server.send_transaction(tx)
 print(f"sent transaction: {send_transaction_data}")
-
+if send_transaction_data.status != SendTransactionStatus.PENDING:
+    raise Exception("send transaction failed")
 while True:
     print("waiting for transaction to be confirmed...")
     get_transaction_data = soroban_server.get_transaction(send_transaction_data.hash)
