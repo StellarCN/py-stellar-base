@@ -96,6 +96,8 @@ jobs:
     needs: [ test, mypy-check ]
     runs-on: ubuntu-latest
     if: github.event_name == 'release' && github.event.action == 'created'
+    permissions:
+      id-token: write
     steps:
       - uses: actions/checkout@v3
 
