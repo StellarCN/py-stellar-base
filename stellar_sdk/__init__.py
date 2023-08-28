@@ -10,6 +10,7 @@ from .__version__ import (
     __version__,
 )
 from .account import *
+from .address import *
 from .asset import *
 from .client.requests_client import RequestsClient
 from .decorated_signature import *
