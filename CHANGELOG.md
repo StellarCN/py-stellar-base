@@ -12,7 +12,6 @@ Released on Aug 27, 2023
 - Runtime type checking has now been removed. Please use tools like mypy for type checking. ([#706](https://github.com/StellarCN/py-stellar-base/pull/706))
 - Add `__hash__` to the xdr classes. ([#757](https://github.com/StellarCN/py-stellar-base/pull/757))
 - Make `aiohttp` and `aiohttp-sse-client` as optional dependencies. ([#765](https://github.com/StellarCN/py-stellar-base/pull/765))
-- Add comparison operators to `Price` class. ([#741](https://github.com/StellarCN/py-stellar-base/pull/741))
 - Publishing to PyPI with a Trusted Publisher. ([#767](https://github.com/StellarCN/py-stellar-base/pull/767))
 - Update dependencies.
 
