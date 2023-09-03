@@ -1,4 +1,4 @@
-from typing import Union, Callable
+from typing import Callable, Union
 
 from . import scval
 from . import xdr as stellar_xdr
@@ -11,16 +11,22 @@ from .utils import sha256
 __all__ = ["authorize_entry"]
 
 
-def authorize_entry(entry: stellar_xdr.SorobanAuthorizationEntry,
-                    signer: Union[Keypair, Callable[[stellar_xdr.SorobanAuthorizationEntry], bytes]],
-                    valid_until_ledger_sequence: int,
-                    network_passphrase: str
-                    ) -> None:
-    if entry.credentials.type != stellar_xdr.SorobanCredentialsType.SOROBAN_CREDENTIALS_ADDRESS:
+def authorize_entry(
+    entry: stellar_xdr.SorobanAuthorizationEntry,
+    signer: Union[Keypair, Callable[[stellar_xdr.SorobanAuthorizationEntry], bytes]],
+    valid_until_ledger_sequence: int,
+    network_passphrase: str,
+) -> None:
+    if (
+        entry.credentials.type
+        != stellar_xdr.SorobanCredentialsType.SOROBAN_CREDENTIALS_ADDRESS
+    ):
         return
 
     addr_auth = entry.credentials.address
-    addr_auth.signature_expiration_ledger = stellar_xdr.Uint32(valid_until_ledger_sequence)
+    addr_auth.signature_expiration_ledger = stellar_xdr.Uint32(
+        valid_until_ledger_sequence
+    )
 
     network_id = Network(network_passphrase).network_id()
     preimage = stellar_xdr.HashIDPreimage(
@@ -30,7 +36,7 @@ def authorize_entry(entry: stellar_xdr.SorobanAuthorizationEntry,
             nonce=addr_auth.nonce,
             signature_expiration_ledger=addr_auth.signature_expiration_ledger,
             invocation=entry.root_invocation,
-        )
+        ),
     )
     payload = sha256(preimage.to_xdr_bytes())
 
@@ -49,7 +55,6 @@ def authorize_entry(entry: stellar_xdr.SorobanAuthorizationEntry,
         {
             scval.to_symbol("public_key"): scval.to_bytes(public_key),
             scval.to_symbol("signature"): scval.to_bytes(signature),
-
         }
     )
     addr_auth.signature_args = scval.to_vec([sig_scval])
