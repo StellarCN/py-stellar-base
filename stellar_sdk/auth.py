@@ -8,20 +8,20 @@ from .keypair import Keypair
 from .network import Network
 from .utils import sha256
 
-__all__ = ["authorize_entry"]
+__all__ = ["sign_authorize_entry"]
 
 
-def authorize_entry(
+def sign_authorize_entry(
     entry: stellar_xdr.SorobanAuthorizationEntry,
     signer: Union[Keypair, Callable[[stellar_xdr.SorobanAuthorizationEntry], bytes]],
     valid_until_ledger_sequence: int,
     network_passphrase: str,
-) -> None:
+) -> stellar_xdr.SorobanAuthorizationEntry:
     if (
         entry.credentials.type
         != stellar_xdr.SorobanCredentialsType.SOROBAN_CREDENTIALS_ADDRESS
     ):
-        return
+        return entry
 
     addr_auth = entry.credentials.address
     addr_auth.signature_expiration_ledger = stellar_xdr.Uint32(
@@ -58,3 +58,4 @@ def authorize_entry(
         }
     )
     addr_auth.signature_args = scval.to_vec([sig_scval])
+    return entry
