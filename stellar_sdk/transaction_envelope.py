@@ -151,10 +151,17 @@ class TransactionEnvelope(BaseTransactionEnvelope["TransactionEnvelope"]):
         te = cls(tx, network_passphrase=network_passphrase, signatures=signatures)
         return te
 
+    def __hash__(self):
+        return hash((self.transaction, self.network_passphrase, self.signatures))
+
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
             return NotImplemented
-        return self.to_xdr_object() == other.to_xdr_object()
+        return (
+            self.transaction == other.transaction
+            and self.network_passphrase == other.network_passphrase
+            and self.signatures == other.signatures
+        )
 
     def __str__(self):
         return (

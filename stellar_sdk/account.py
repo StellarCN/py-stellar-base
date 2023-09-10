@@ -87,6 +87,9 @@ class Account:
                 )
         return ed25519_public_key_signers
 
+    def __hash__(self):
+        return hash((self.account, self.sequence, self.raw_data))
+
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
             return NotImplemented
@@ -103,6 +106,9 @@ class Thresholds:
         self.low_threshold = low_threshold
         self.med_threshold = med_threshold
         self.high_threshold = high_threshold
+
+    def __hash__(self):
+        return hash((self.low_threshold, self.med_threshold, self.high_threshold))
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):

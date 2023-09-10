@@ -26,6 +26,9 @@ class SignedPayloadSigner:
         self.account_id: str = account_id
         self.payload: bytes = payload
 
+    def __hash__(self):
+        return hash((self.account_id, self.payload))
+
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
             return NotImplemented
@@ -238,6 +241,9 @@ class SignerKey:
             raise ValueError(
                 f"This is an unknown signer key type, please consider creating an issuer at {__issues__}."
             )
+
+    def __hash__(self):
+        return hash((self.signer_key, self.signer_key_type))
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):

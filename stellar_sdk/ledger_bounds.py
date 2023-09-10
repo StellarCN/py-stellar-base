@@ -47,6 +47,9 @@ class LedgerBounds:
             max_ledger=xdr_object.max_ledger.uint32,
         )
 
+    def __hash__(self):
+        return hash((self.min_ledger, self.max_ledger))
+
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
             return NotImplemented

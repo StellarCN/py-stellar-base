@@ -266,10 +266,33 @@ class Transaction:
             return False
         return True
 
+    def __hash__(self):
+        return hash(
+            (
+                self.source,
+                self.sequence,
+                self.fee,
+                self.operations,
+                self.memo,
+                self.preconditions,
+                self.soroban_data,
+                self.v1,
+            )
+        )
+
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
             return NotImplemented
-        return self.to_xdr_object() == other.to_xdr_object()
+        return (
+            self.source == other.source
+            and self.sequence == other.sequence
+            and self.fee == other.fee
+            and self.operations == other.operations
+            and self.memo == other.memo
+            and self.preconditions == other.preconditions
+            and self.soroban_data == other.soroban_data
+            and self.v1 == other.v1
+        )
 
     def __str__(self):
         return (

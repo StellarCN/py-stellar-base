@@ -179,6 +179,18 @@ class Preconditions:
         else:
             raise ValueError(f"Invalid PreconditionType: {xdr_object.type!r}")
 
+    def __hash__(self):
+        return hash(
+            (
+                self.time_bounds,
+                self.ledger_bounds,
+                self.min_sequence_number,
+                self.min_sequence_age,
+                self.min_sequence_ledger_gap,
+                self.extra_signers,
+            )
+        )
+
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
             return NotImplemented

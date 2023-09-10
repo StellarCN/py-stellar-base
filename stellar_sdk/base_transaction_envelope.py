@@ -137,6 +137,10 @@ class BaseTransactionEnvelope(Generic[T]):
         return cls.from_xdr_object(xdr_object, network_passphrase)
 
     @abstractmethod
+    def __hash__(self):
+        pass  # pragma: no cover
+
+    @abstractmethod
     def __eq__(self, other: object) -> bool:
         pass  # pragma: no cover
 

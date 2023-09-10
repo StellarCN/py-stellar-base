@@ -38,6 +38,9 @@ class TrustLine:
         self.asset = asset
         raise_if_not_valid_ed25519_public_key(self.account_id, "account_id")
 
+    def __hash__(self):
+        return hash((self.account_id, self.asset))
+
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
             return NotImplemented
@@ -52,6 +55,9 @@ class Offer:
         self.seller_id = seller_id
         self.offer_id = offer_id
         raise_if_not_valid_ed25519_public_key(self.seller_id, "seller_id")
+
+    def __hash__(self):
+        return hash((self.seller_id, self.offer_id))
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
@@ -68,6 +74,9 @@ class Data:
         self.data_name = data_name
         raise_if_not_valid_ed25519_public_key(self.account_id, "account_id")
 
+    def __hash__(self):
+        return hash((self.account_id, self.data_name))
+
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
             return NotImplemented
@@ -82,6 +91,9 @@ class Signer:
         self.account_id = account_id
         self.signer_key = signer_key
         raise_if_not_valid_ed25519_public_key(self.account_id, "account_id")
+
+    def __hash__(self):
+        return hash((self.account_id, self.signer_key))
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
@@ -123,6 +135,7 @@ class RevokeSponsorship(Operation):
     _XDR_OPERATION_TYPE: stellar_xdr.OperationType = (
         stellar_xdr.OperationType.REVOKE_SPONSORSHIP
     )
+    # TODO: Protocol 20?
 
     def __init__(
         self,
@@ -521,6 +534,21 @@ class RevokeSponsorship(Operation):
         else:
             raise ValueError(f"{op_type} is an unsupported RevokeSponsorship type.")
         return op
+
+    def __hash__(self):
+        return hash(
+            (
+                self.revoke_sponsorship_type,
+                self.account_id,
+                self.trustline,
+                self.offer,
+                self.data,
+                self.claimable_balance_id,
+                self.liquidity_pool_id,
+                self.signer,
+                self.source,
+            )
+        )
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):

@@ -117,6 +117,11 @@ class TOID:
         toid_end = TOID(end + 1, 0, 0).to_int64()
         return toid_start, toid_end
 
+    def __hash__(self):
+        return hash(
+            (self.ledger_sequence, self.transaction_order, self.operation_order)
+        )
+
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
             return NotImplemented

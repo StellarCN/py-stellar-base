@@ -55,6 +55,9 @@ class Network:
         """
         return cls(cls.TESTNET_NETWORK_PASSPHRASE)
 
+    def __hash__(self):
+        return hash(self.network_passphrase)
+
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
             return NotImplemented

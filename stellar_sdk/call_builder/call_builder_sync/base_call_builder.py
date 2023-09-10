@@ -74,6 +74,16 @@ class BaseCallBuilder(_BaseCallBuilder):
             raise NotPageableError("The prev page does not exist.")
         return self._call(self.prev_href, None)
 
+    def __hash__(self):
+        return hash(
+            (
+                self.params,
+                self.endpoint,
+                self.horizon_url,
+                self.client,
+            )
+        )
+
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
             return NotImplemented
