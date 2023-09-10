@@ -136,6 +136,9 @@ class LiquidityPoolAsset:
             liquidity_pool_constant_product_parameters,
         )
 
+    def __hash__(self):
+        return hash((self.asset_a, self.asset_b, self.fee, self.type))
+
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
             return NotImplemented

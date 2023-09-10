@@ -56,6 +56,9 @@ class TimeBounds:
             max_time=xdr_object.max_time.time_point.uint64,
         )
 
+    def __hash__(self):
+        return hash((self.min_time, self.max_time))
+
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
             return NotImplemented

@@ -39,6 +39,9 @@ class DecoratedSignature:
         signature = xdr_object.signature.signature
         return cls(signature_hint, signature)
 
+    def __hash__(self):
+        return hash((self.signature_hint, self.signature))
+
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented

@@ -87,6 +87,9 @@ class Signer:
         signer_key = SignerKey.from_xdr_object(xdr_object.key)
         return cls(signer_key, weight)
 
+    def __hash__(self):
+        return hash((self.signer_key, self.weight))
+
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
             return NotImplemented

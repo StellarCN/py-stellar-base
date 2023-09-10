@@ -69,6 +69,9 @@ class Price:
             return NotImplemented
         return (self.n * other.d) <= (other.n * self.d)
 
+    def __hash__(self):
+        return hash((self.n, self.d))
+
     def __eq__(self, other):
         if not isinstance(other, self.__class__):
             return NotImplemented

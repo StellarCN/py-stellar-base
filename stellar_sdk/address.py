@@ -126,6 +126,9 @@ class Address:
         assert sc_val.address is not None
         return cls.from_xdr_sc_address(sc_val.address)
 
+    def __hash__(self):
+        return hash((self.key, self.type))
+
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
             return NotImplemented

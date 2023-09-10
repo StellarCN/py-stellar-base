@@ -285,6 +285,9 @@ class Keypair:
         hint = bytes(map(lambda x, y: x ^ y, key_hint, payload_hint))
         return DecoratedSignature(hint, signature)
 
+    def __hash__(self):
+        return hash((self.verify_key, self.signing_key))
+
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
             return NotImplemented

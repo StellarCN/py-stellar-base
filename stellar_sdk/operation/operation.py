@@ -124,6 +124,9 @@ class Operation(metaclass=ABCMeta):
             return MuxedAccount.from_xdr_object(xdr_object.source_account)
         return None
 
+    def __hash__(self):
+        return hash(self.to_xdr_object())
+
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
             return NotImplemented

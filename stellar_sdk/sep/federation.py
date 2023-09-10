@@ -55,6 +55,9 @@ class FederationRecord:
         self.memo_type: Optional[str] = memo_type
         self.memo: Optional[str] = memo
 
+    def __hash__(self):
+        return hash((self.account_id, self.stellar_address, self.memo_type, self.memo))
+
     def __str__(self):
         return (
             f"<FederationRecord [account_id={self.account_id}, stellar_address={self.stellar_address}, "
