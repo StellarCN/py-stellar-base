@@ -535,6 +535,21 @@ class RevokeSponsorship(Operation):
             raise ValueError(f"{op_type} is an unsupported RevokeSponsorship type.")
         return op
 
+    def __hash__(self):
+        return hash(
+            (
+                self.revoke_sponsorship_type,
+                self.account_id,
+                self.trustline,
+                self.offer,
+                self.data,
+                self.claimable_balance_id,
+                self.liquidity_pool_id,
+                self.signer,
+                self.source,
+            )
+        )
+
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
             return NotImplemented
