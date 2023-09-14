@@ -38,8 +38,7 @@ enum SCValType
 
     // 128 bits is naturally supported by Rust and we use it for Soroban
     // fixed-point arithmetic prices / balances / similar "quantities". These
-    // are represented in XDR as a pair of 2 u64s, unlike {u,i}256 which is
-    // represented as an array of 32 bytes.
+    // are represented in XDR as a pair of 2 u64s.
     SCV_U128 = 9,
     SCV_I128 = 10,
 
@@ -76,35 +75,58 @@ enum SCValType
 
 enum SCErrorType
 {
-    SCE_CONTRACT = 0,
-    SCE_WASM_VM = 1,
-    SCE_CONTEXT = 2,
-    SCE_STORAGE = 3,
-    SCE_OBJECT = 4,
-    SCE_CRYPTO = 5,
-    SCE_EVENTS = 6,
-    SCE_BUDGET = 7,
-    SCE_VALUE = 8,
-    SCE_AUTH = 9
+    SCE_CONTRACT = 0,          // Contract-specific, user-defined codes.
+    SCE_WASM_VM = 1,           // Errors while interpreting WASM bytecode.
+    SCE_CONTEXT = 2,           // Errors in the contract's host context.
+    SCE_STORAGE = 3,           // Errors accessing host storage.
+    SCE_OBJECT = 4,            // Errors working with host objects.
+    SCE_CRYPTO = 5,            // Errors in cryptographic operations.
+    SCE_EVENTS = 6,            // Errors while emitting events.
+    SCE_BUDGET = 7,            // Errors relating to budget limits.
+    SCE_VALUE = 8,             // Errors working with host values or SCVals.
+    SCE_AUTH = 9               // Errors from the authentication subsystem.
 };
 
 enum SCErrorCode
 {
-    SCEC_ARITH_DOMAIN = 0,      // some arithmetic wasn't defined (overflow, divide-by-zero)
-    SCEC_INDEX_BOUNDS = 1,      // something was indexed beyond its bounds
-    SCEC_INVALID_INPUT = 2,     // user provided some otherwise-bad data
-    SCEC_MISSING_VALUE = 3,     // some value was required but not provided
-    SCEC_EXISTING_VALUE = 4,    // some value was provided where not allowed
-    SCEC_EXCEEDED_LIMIT = 5,    // some arbitrary limit -- gas or otherwise -- was hit
-    SCEC_INVALID_ACTION = 6,    // data was valid but action requested was not
-    SCEC_INTERNAL_ERROR = 7,    // the internal state of the host was otherwise-bad
-    SCEC_UNEXPECTED_TYPE = 8,   // some type wasn't as expected
-    SCEC_UNEXPECTED_SIZE = 9    // something's size wasn't as expected
+    SCEC_ARITH_DOMAIN = 0,      // Some arithmetic was undefined (overflow, divide-by-zero).
+    SCEC_INDEX_BOUNDS = 1,      // Something was indexed beyond its bounds.
+    SCEC_INVALID_INPUT = 2,     // User provided some otherwise-bad data.
+    SCEC_MISSING_VALUE = 3,     // Some value was required but not provided.
+    SCEC_EXISTING_VALUE = 4,    // Some value was provided where not allowed.
+    SCEC_EXCEEDED_LIMIT = 5,    // Some arbitrary limit -- gas or otherwise -- was hit.
+    SCEC_INVALID_ACTION = 6,    // Data was valid but action requested was not.
+    SCEC_INTERNAL_ERROR = 7,    // The host detected an error in its own logic.
+    SCEC_UNEXPECTED_TYPE = 8,   // Some type wasn't as expected.
+    SCEC_UNEXPECTED_SIZE = 9    // Something's size wasn't as expected.
 };
 
-struct SCError
+// Smart contract errors are split into a type (SCErrorType) and a code. When an
+// error is of type SCE_CONTRACT it carries a user-defined uint32 code that
+// Soroban assigns no specific meaning to. In all other cases, the type
+// specifies a subsystem of the Soroban host where the error originated, and the
+// accompanying code is an SCErrorCode, each of which specifies a slightly more
+// precise class of errors within that subsystem.
+//
+// Error types and codes are not maximally precise; there is a tradeoff between
+// precision and flexibility in the implementation, and the granularity here is
+// chosen to be adequate for most purposes while not placing a burden on future
+// system evolution and maintenance. When additional precision is needed for
+// debugging, Soroban can be run with diagnostic events enabled.
+
+union SCError switch (SCErrorType type)
 {
-    SCErrorType type;
+case SCE_CONTRACT:
+    uint32 contractCode;
+case SCE_WASM_VM:
+case SCE_CONTEXT:
+case SCE_STORAGE:
+case SCE_OBJECT:
+case SCE_CRYPTO:
+case SCE_EVENTS:
+case SCE_BUDGET:
+case SCE_VALUE:
+case SCE_AUTH:
     SCErrorCode code;
 };
 

@@ -100,7 +100,8 @@ enum LedgerEntryType
     LIQUIDITY_POOL = 5,
     CONTRACT_DATA = 6,
     CONTRACT_CODE = 7,
-    CONFIG_SETTING = 8
+    CONFIG_SETTING = 8,
+    EXPIRATION = 9
 };
 
 struct Signer
@@ -493,59 +494,32 @@ struct LiquidityPoolEntry
     body;
 };
 
-enum ContractEntryBodyType {
-    DATA_ENTRY = 0,
-    EXPIRATION_EXTENSION = 1
-};
-
-const MASK_CONTRACT_DATA_FLAGS_V20 = 0x1;
-
-enum ContractDataFlags {
-    // When set, the given entry does not recieve automatic expiration bumps
-    // on access. Note that entries can still be bumped manually via the footprint.
-    NO_AUTOBUMP = 0x1
-};
-
 enum ContractDataDurability {
     TEMPORARY = 0,
     PERSISTENT = 1
 };
 
 struct ContractDataEntry {
+    ExtensionPoint ext;
+
     SCAddress contract;
     SCVal key;
     ContractDataDurability durability;
-
-    union switch (ContractEntryBodyType bodyType)
-    {
-    case DATA_ENTRY:
-    struct
-    {
-        uint32 flags;
-        SCVal val;
-    } data;
-    case EXPIRATION_EXTENSION:
-        void;
-    } body;
-
-    uint32 expirationLedgerSeq;
+    SCVal val;
 };
 
 struct ContractCodeEntry {
     ExtensionPoint ext;
 
     Hash hash;
-    union switch (ContractEntryBodyType bodyType)
-    {
-    case DATA_ENTRY:
-        opaque code<>;
-    case EXPIRATION_EXTENSION:
-        void;
-    } body;
-
-    uint32 expirationLedgerSeq;
+    opaque code<>;
 };
 
+struct ExpirationEntry {
+    // Hash of the LedgerKey that is associated with this ExpirationEntry
+    Hash keyHash;
+    uint32 expirationLedgerSeq;
+};
 
 struct LedgerEntryExtensionV1
 {
@@ -583,6 +557,8 @@ struct LedgerEntry
         ContractCodeEntry contractCode;
     case CONFIG_SETTING:
         ConfigSettingEntry configSetting;
+    case EXPIRATION:
+        ExpirationEntry expiration;
     }
     data;
 
@@ -643,19 +619,23 @@ case CONTRACT_DATA:
         SCAddress contract;
         SCVal key;
         ContractDataDurability durability;
-        ContractEntryBodyType bodyType;
     } contractData;
 case CONTRACT_CODE:
     struct
     {
         Hash hash;
-        ContractEntryBodyType bodyType;
     } contractCode;
 case CONFIG_SETTING:
     struct
     {
         ConfigSettingID configSettingID;
     } configSetting;
+case EXPIRATION:
+    struct
+    {
+        // Hash of the LedgerKey that is associated with this ExpirationEntry
+        Hash keyHash;
+    } expiration;
 };
 
 // list of all envelope types used in the application

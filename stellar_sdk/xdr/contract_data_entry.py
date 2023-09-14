@@ -7,10 +7,9 @@ import base64
 from xdrlib3 import Packer, Unpacker
 
 from .contract_data_durability import ContractDataDurability
-from .contract_data_entry_body import ContractDataEntryBody
+from .extension_point import ExtensionPoint
 from .sc_address import SCAddress
 from .sc_val import SCVal
-from .uint32 import Uint32
 
 __all__ = ["ContractDataEntry"]
 
@@ -20,60 +19,49 @@ class ContractDataEntry:
     XDR Source Code::
 
         struct ContractDataEntry {
+            ExtensionPoint ext;
+
             SCAddress contract;
             SCVal key;
             ContractDataDurability durability;
-
-            union switch (ContractEntryBodyType bodyType)
-            {
-            case DATA_ENTRY:
-            struct
-            {
-                uint32 flags;
-                SCVal val;
-            } data;
-            case EXPIRATION_EXTENSION:
-                void;
-            } body;
-
-            uint32 expirationLedgerSeq;
+            SCVal val;
         };
     """
 
     def __init__(
         self,
+        ext: ExtensionPoint,
         contract: SCAddress,
         key: SCVal,
         durability: ContractDataDurability,
-        body: ContractDataEntryBody,
-        expiration_ledger_seq: Uint32,
+        val: SCVal,
     ) -> None:
+        self.ext = ext
         self.contract = contract
         self.key = key
         self.durability = durability
-        self.body = body
-        self.expiration_ledger_seq = expiration_ledger_seq
+        self.val = val
 
     def pack(self, packer: Packer) -> None:
+        self.ext.pack(packer)
         self.contract.pack(packer)
         self.key.pack(packer)
         self.durability.pack(packer)
-        self.body.pack(packer)
-        self.expiration_ledger_seq.pack(packer)
+        self.val.pack(packer)
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> ContractDataEntry:
+        ext = ExtensionPoint.unpack(unpacker)
         contract = SCAddress.unpack(unpacker)
         key = SCVal.unpack(unpacker)
         durability = ContractDataDurability.unpack(unpacker)
-        body = ContractDataEntryBody.unpack(unpacker)
-        expiration_ledger_seq = Uint32.unpack(unpacker)
+        val = SCVal.unpack(unpacker)
         return cls(
+            ext=ext,
             contract=contract,
             key=key,
             durability=durability,
-            body=body,
-            expiration_ledger_seq=expiration_ledger_seq,
+            val=val,
         )
 
     def to_xdr_bytes(self) -> bytes:
@@ -98,11 +86,11 @@ class ContractDataEntry:
     def __hash__(self):
         return hash(
             (
+                self.ext,
                 self.contract,
                 self.key,
                 self.durability,
-                self.body,
-                self.expiration_ledger_seq,
+                self.val,
             )
         )
 
@@ -110,19 +98,19 @@ class ContractDataEntry:
         if not isinstance(other, self.__class__):
             return NotImplemented
         return (
-            self.contract == other.contract
+            self.ext == other.ext
+            and self.contract == other.contract
             and self.key == other.key
             and self.durability == other.durability
-            and self.body == other.body
-            and self.expiration_ledger_seq == other.expiration_ledger_seq
+            and self.val == other.val
         )
 
     def __str__(self):
         out = [
+            f"ext={self.ext}",
             f"contract={self.contract}",
             f"key={self.key}",
             f"durability={self.durability}",
-            f"body={self.body}",
-            f"expiration_ledger_seq={self.expiration_ledger_seq}",
+            f"val={self.val}",
         ]
         return f"<ContractDataEntry [{', '.join(out)}]>"

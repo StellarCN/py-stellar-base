@@ -9,7 +9,7 @@ from xdrlib3 import Packer, Unpacker
 from .base import Opaque
 from .create_contract_args import CreateContractArgs
 from .host_function_type import HostFunctionType
-from .sc_vec import SCVec
+from .invoke_contract_args import InvokeContractArgs
 
 __all__ = ["HostFunction"]
 
@@ -21,7 +21,7 @@ class HostFunction:
         union HostFunction switch (HostFunctionType type)
         {
         case HOST_FUNCTION_TYPE_INVOKE_CONTRACT:
-            SCVec invokeContract;
+            InvokeContractArgs invokeContract;
         case HOST_FUNCTION_TYPE_CREATE_CONTRACT:
             CreateContractArgs createContract;
         case HOST_FUNCTION_TYPE_UPLOAD_CONTRACT_WASM:
@@ -32,7 +32,7 @@ class HostFunction:
     def __init__(
         self,
         type: HostFunctionType,
-        invoke_contract: SCVec = None,
+        invoke_contract: InvokeContractArgs = None,
         create_contract: CreateContractArgs = None,
         wasm: bytes = None,
     ) -> None:
@@ -63,7 +63,7 @@ class HostFunction:
     def unpack(cls, unpacker: Unpacker) -> HostFunction:
         type = HostFunctionType.unpack(unpacker)
         if type == HostFunctionType.HOST_FUNCTION_TYPE_INVOKE_CONTRACT:
-            invoke_contract = SCVec.unpack(unpacker)
+            invoke_contract = InvokeContractArgs.unpack(unpacker)
             return cls(type=type, invoke_contract=invoke_contract)
         if type == HostFunctionType.HOST_FUNCTION_TYPE_CREATE_CONTRACT:
             create_contract = CreateContractArgs.unpack(unpacker)

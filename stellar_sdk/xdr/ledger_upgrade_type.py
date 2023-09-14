@@ -21,7 +21,8 @@ class LedgerUpgradeType(IntEnum):
             LEDGER_UPGRADE_MAX_TX_SET_SIZE = 3,
             LEDGER_UPGRADE_BASE_RESERVE = 4,
             LEDGER_UPGRADE_FLAGS = 5,
-            LEDGER_UPGRADE_CONFIG = 6
+            LEDGER_UPGRADE_CONFIG = 6,
+            LEDGER_UPGRADE_MAX_SOROBAN_TX_SET_SIZE = 7
         };
     """
 
@@ -31,6 +32,7 @@ class LedgerUpgradeType(IntEnum):
     LEDGER_UPGRADE_BASE_RESERVE = 4
     LEDGER_UPGRADE_FLAGS = 5
     LEDGER_UPGRADE_CONFIG = 6
+    LEDGER_UPGRADE_MAX_SOROBAN_TX_SET_SIZE = 7
 
     def pack(self, packer: Packer) -> None:
         packer.pack_int(self.value)

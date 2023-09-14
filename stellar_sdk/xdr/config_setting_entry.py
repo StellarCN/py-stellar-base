@@ -9,6 +9,7 @@ from xdrlib3 import Packer, Unpacker
 
 from .config_setting_contract_bandwidth_v0 import ConfigSettingContractBandwidthV0
 from .config_setting_contract_compute_v0 import ConfigSettingContractComputeV0
+from .config_setting_contract_events_v0 import ConfigSettingContractEventsV0
 from .config_setting_contract_execution_lanes_v0 import (
     ConfigSettingContractExecutionLanesV0,
 )
@@ -16,9 +17,9 @@ from .config_setting_contract_historical_data_v0 import (
     ConfigSettingContractHistoricalDataV0,
 )
 from .config_setting_contract_ledger_cost_v0 import ConfigSettingContractLedgerCostV0
-from .config_setting_contract_meta_data_v0 import ConfigSettingContractMetaDataV0
 from .config_setting_id import ConfigSettingID
 from .contract_cost_params import ContractCostParams
+from .eviction_iterator import EvictionIterator
 from .state_expiration_settings import StateExpirationSettings
 from .uint32 import Uint32
 from .uint64 import Uint64
@@ -40,8 +41,8 @@ class ConfigSettingEntry:
             ConfigSettingContractLedgerCostV0 contractLedgerCost;
         case CONFIG_SETTING_CONTRACT_HISTORICAL_DATA_V0:
             ConfigSettingContractHistoricalDataV0 contractHistoricalData;
-        case CONFIG_SETTING_CONTRACT_META_DATA_V0:
-            ConfigSettingContractMetaDataV0 contractMetaData;
+        case CONFIG_SETTING_CONTRACT_EVENTS_V0:
+            ConfigSettingContractEventsV0 contractEvents;
         case CONFIG_SETTING_CONTRACT_BANDWIDTH_V0:
             ConfigSettingContractBandwidthV0 contractBandwidth;
         case CONFIG_SETTING_CONTRACT_COST_PARAMS_CPU_INSTRUCTIONS:
@@ -58,6 +59,8 @@ class ConfigSettingEntry:
             ConfigSettingContractExecutionLanesV0 contractExecutionLanes;
         case CONFIG_SETTING_BUCKETLIST_SIZE_WINDOW:
             uint64 bucketListSizeWindow<>;
+        case CONFIG_SETTING_EVICTION_ITERATOR:
+            EvictionIterator evictionIterator;
         };
     """
 
@@ -68,7 +71,7 @@ class ConfigSettingEntry:
         contract_compute: ConfigSettingContractComputeV0 = None,
         contract_ledger_cost: ConfigSettingContractLedgerCostV0 = None,
         contract_historical_data: ConfigSettingContractHistoricalDataV0 = None,
-        contract_meta_data: ConfigSettingContractMetaDataV0 = None,
+        contract_events: ConfigSettingContractEventsV0 = None,
         contract_bandwidth: ConfigSettingContractBandwidthV0 = None,
         contract_cost_params_cpu_insns: ContractCostParams = None,
         contract_cost_params_mem_bytes: ContractCostParams = None,
@@ -77,6 +80,7 @@ class ConfigSettingEntry:
         state_expiration_settings: StateExpirationSettings = None,
         contract_execution_lanes: ConfigSettingContractExecutionLanesV0 = None,
         bucket_list_size_window: List[Uint64] = None,
+        eviction_iterator: EvictionIterator = None,
     ) -> None:
         _expect_max_length = 4294967295
         if (
@@ -91,7 +95,7 @@ class ConfigSettingEntry:
         self.contract_compute = contract_compute
         self.contract_ledger_cost = contract_ledger_cost
         self.contract_historical_data = contract_historical_data
-        self.contract_meta_data = contract_meta_data
+        self.contract_events = contract_events
         self.contract_bandwidth = contract_bandwidth
         self.contract_cost_params_cpu_insns = contract_cost_params_cpu_insns
         self.contract_cost_params_mem_bytes = contract_cost_params_mem_bytes
@@ -100,6 +104,7 @@ class ConfigSettingEntry:
         self.state_expiration_settings = state_expiration_settings
         self.contract_execution_lanes = contract_execution_lanes
         self.bucket_list_size_window = bucket_list_size_window
+        self.eviction_iterator = eviction_iterator
 
     def pack(self, packer: Packer) -> None:
         self.config_setting_id.pack(packer)
@@ -132,13 +137,10 @@ class ConfigSettingEntry:
                 raise ValueError("contract_historical_data should not be None.")
             self.contract_historical_data.pack(packer)
             return
-        if (
-            self.config_setting_id
-            == ConfigSettingID.CONFIG_SETTING_CONTRACT_META_DATA_V0
-        ):
-            if self.contract_meta_data is None:
-                raise ValueError("contract_meta_data should not be None.")
-            self.contract_meta_data.pack(packer)
+        if self.config_setting_id == ConfigSettingID.CONFIG_SETTING_CONTRACT_EVENTS_V0:
+            if self.contract_events is None:
+                raise ValueError("contract_events should not be None.")
+            self.contract_events.pack(packer)
             return
         if (
             self.config_setting_id
@@ -203,6 +205,11 @@ class ConfigSettingEntry:
             for bucket_list_size_window_item in self.bucket_list_size_window:
                 bucket_list_size_window_item.pack(packer)
             return
+        if self.config_setting_id == ConfigSettingID.CONFIG_SETTING_EVICTION_ITERATOR:
+            if self.eviction_iterator is None:
+                raise ValueError("eviction_iterator should not be None.")
+            self.eviction_iterator.pack(packer)
+            return
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> ConfigSettingEntry:
@@ -235,11 +242,10 @@ class ConfigSettingEntry:
                 config_setting_id=config_setting_id,
                 contract_historical_data=contract_historical_data,
             )
-        if config_setting_id == ConfigSettingID.CONFIG_SETTING_CONTRACT_META_DATA_V0:
-            contract_meta_data = ConfigSettingContractMetaDataV0.unpack(unpacker)
+        if config_setting_id == ConfigSettingID.CONFIG_SETTING_CONTRACT_EVENTS_V0:
+            contract_events = ConfigSettingContractEventsV0.unpack(unpacker)
             return cls(
-                config_setting_id=config_setting_id,
-                contract_meta_data=contract_meta_data,
+                config_setting_id=config_setting_id, contract_events=contract_events
             )
         if config_setting_id == ConfigSettingID.CONFIG_SETTING_CONTRACT_BANDWIDTH_V0:
             contract_bandwidth = ConfigSettingContractBandwidthV0.unpack(unpacker)
@@ -306,6 +312,11 @@ class ConfigSettingEntry:
                 config_setting_id=config_setting_id,
                 bucket_list_size_window=bucket_list_size_window,
             )
+        if config_setting_id == ConfigSettingID.CONFIG_SETTING_EVICTION_ITERATOR:
+            eviction_iterator = EvictionIterator.unpack(unpacker)
+            return cls(
+                config_setting_id=config_setting_id, eviction_iterator=eviction_iterator
+            )
         return cls(config_setting_id=config_setting_id)
 
     def to_xdr_bytes(self) -> bytes:
@@ -335,7 +346,7 @@ class ConfigSettingEntry:
                 self.contract_compute,
                 self.contract_ledger_cost,
                 self.contract_historical_data,
-                self.contract_meta_data,
+                self.contract_events,
                 self.contract_bandwidth,
                 self.contract_cost_params_cpu_insns,
                 self.contract_cost_params_mem_bytes,
@@ -344,6 +355,7 @@ class ConfigSettingEntry:
                 self.state_expiration_settings,
                 self.contract_execution_lanes,
                 self.bucket_list_size_window,
+                self.eviction_iterator,
             )
         )
 
@@ -356,7 +368,7 @@ class ConfigSettingEntry:
             and self.contract_compute == other.contract_compute
             and self.contract_ledger_cost == other.contract_ledger_cost
             and self.contract_historical_data == other.contract_historical_data
-            and self.contract_meta_data == other.contract_meta_data
+            and self.contract_events == other.contract_events
             and self.contract_bandwidth == other.contract_bandwidth
             and self.contract_cost_params_cpu_insns
             == other.contract_cost_params_cpu_insns
@@ -368,6 +380,7 @@ class ConfigSettingEntry:
             and self.state_expiration_settings == other.state_expiration_settings
             and self.contract_execution_lanes == other.contract_execution_lanes
             and self.bucket_list_size_window == other.bucket_list_size_window
+            and self.eviction_iterator == other.eviction_iterator
         )
 
     def __str__(self):
@@ -386,8 +399,8 @@ class ConfigSettingEntry:
             f"contract_historical_data={self.contract_historical_data}"
         ) if self.contract_historical_data is not None else None
         out.append(
-            f"contract_meta_data={self.contract_meta_data}"
-        ) if self.contract_meta_data is not None else None
+            f"contract_events={self.contract_events}"
+        ) if self.contract_events is not None else None
         out.append(
             f"contract_bandwidth={self.contract_bandwidth}"
         ) if self.contract_bandwidth is not None else None
@@ -412,4 +425,7 @@ class ConfigSettingEntry:
         out.append(
             f"bucket_list_size_window={self.bucket_list_size_window}"
         ) if self.bucket_list_size_window is not None else None
+        out.append(
+            f"eviction_iterator={self.eviction_iterator}"
+        ) if self.eviction_iterator is not None else None
         return f"<ConfigSettingEntry [{', '.join(out)}]>"

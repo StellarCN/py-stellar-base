@@ -12,6 +12,7 @@ from .config_setting_entry import ConfigSettingEntry
 from .contract_code_entry import ContractCodeEntry
 from .contract_data_entry import ContractDataEntry
 from .data_entry import DataEntry
+from .expiration_entry import ExpirationEntry
 from .ledger_entry_type import LedgerEntryType
 from .liquidity_pool_entry import LiquidityPoolEntry
 from .offer_entry import OfferEntry
@@ -44,6 +45,8 @@ class LedgerEntryData:
                 ContractCodeEntry contractCode;
             case CONFIG_SETTING:
                 ConfigSettingEntry configSetting;
+            case EXPIRATION:
+                ExpirationEntry expiration;
             }
     """
 
@@ -59,6 +62,7 @@ class LedgerEntryData:
         contract_data: ContractDataEntry = None,
         contract_code: ContractCodeEntry = None,
         config_setting: ConfigSettingEntry = None,
+        expiration: ExpirationEntry = None,
     ) -> None:
         self.type = type
         self.account = account
@@ -70,6 +74,7 @@ class LedgerEntryData:
         self.contract_data = contract_data
         self.contract_code = contract_code
         self.config_setting = config_setting
+        self.expiration = expiration
 
     def pack(self, packer: Packer) -> None:
         self.type.pack(packer)
@@ -118,6 +123,11 @@ class LedgerEntryData:
                 raise ValueError("config_setting should not be None.")
             self.config_setting.pack(packer)
             return
+        if self.type == LedgerEntryType.EXPIRATION:
+            if self.expiration is None:
+                raise ValueError("expiration should not be None.")
+            self.expiration.pack(packer)
+            return
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> LedgerEntryData:
@@ -149,6 +159,9 @@ class LedgerEntryData:
         if type == LedgerEntryType.CONFIG_SETTING:
             config_setting = ConfigSettingEntry.unpack(unpacker)
             return cls(type=type, config_setting=config_setting)
+        if type == LedgerEntryType.EXPIRATION:
+            expiration = ExpirationEntry.unpack(unpacker)
+            return cls(type=type, expiration=expiration)
         return cls(type=type)
 
     def to_xdr_bytes(self) -> bytes:
@@ -183,6 +196,7 @@ class LedgerEntryData:
                 self.contract_data,
                 self.contract_code,
                 self.config_setting,
+                self.expiration,
             )
         )
 
@@ -200,6 +214,7 @@ class LedgerEntryData:
             and self.contract_data == other.contract_data
             and self.contract_code == other.contract_code
             and self.config_setting == other.config_setting
+            and self.expiration == other.expiration
         )
 
     def __str__(self):
@@ -226,4 +241,7 @@ class LedgerEntryData:
         out.append(
             f"config_setting={self.config_setting}"
         ) if self.config_setting is not None else None
+        out.append(
+            f"expiration={self.expiration}"
+        ) if self.expiration is not None else None
         return f"<LedgerEntryData [{', '.join(out)}]>"

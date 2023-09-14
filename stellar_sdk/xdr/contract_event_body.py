@@ -21,7 +21,7 @@ class ContractEventBody:
             case 0:
                 struct
                 {
-                    SCVec topics;
+                    SCVal topics<>;
                     SCVal data;
                 } v0;
             }

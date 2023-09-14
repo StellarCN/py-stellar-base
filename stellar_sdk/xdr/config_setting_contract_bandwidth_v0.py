@@ -18,40 +18,40 @@ class ConfigSettingContractBandwidthV0:
 
         struct ConfigSettingContractBandwidthV0
         {
-            // Maximum size in bytes to propagate per ledger
-            uint32 ledgerMaxPropagateSizeBytes;
+            // Maximum sum of all transaction sizes in the ledger in bytes
+            uint32 ledgerMaxTxsSizeBytes;
             // Maximum size in bytes for a transaction
             uint32 txMaxSizeBytes;
 
-            // Fee for propagating 1KB of data
-            int64 feePropagateData1KB;
+            // Fee for 1 KB of transaction size
+            int64 feeTxSize1KB;
         };
     """
 
     def __init__(
         self,
-        ledger_max_propagate_size_bytes: Uint32,
+        ledger_max_txs_size_bytes: Uint32,
         tx_max_size_bytes: Uint32,
-        fee_propagate_data1_kb: Int64,
+        fee_tx_size1_kb: Int64,
     ) -> None:
-        self.ledger_max_propagate_size_bytes = ledger_max_propagate_size_bytes
+        self.ledger_max_txs_size_bytes = ledger_max_txs_size_bytes
         self.tx_max_size_bytes = tx_max_size_bytes
-        self.fee_propagate_data1_kb = fee_propagate_data1_kb
+        self.fee_tx_size1_kb = fee_tx_size1_kb
 
     def pack(self, packer: Packer) -> None:
-        self.ledger_max_propagate_size_bytes.pack(packer)
+        self.ledger_max_txs_size_bytes.pack(packer)
         self.tx_max_size_bytes.pack(packer)
-        self.fee_propagate_data1_kb.pack(packer)
+        self.fee_tx_size1_kb.pack(packer)
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> ConfigSettingContractBandwidthV0:
-        ledger_max_propagate_size_bytes = Uint32.unpack(unpacker)
+        ledger_max_txs_size_bytes = Uint32.unpack(unpacker)
         tx_max_size_bytes = Uint32.unpack(unpacker)
-        fee_propagate_data1_kb = Int64.unpack(unpacker)
+        fee_tx_size1_kb = Int64.unpack(unpacker)
         return cls(
-            ledger_max_propagate_size_bytes=ledger_max_propagate_size_bytes,
+            ledger_max_txs_size_bytes=ledger_max_txs_size_bytes,
             tx_max_size_bytes=tx_max_size_bytes,
-            fee_propagate_data1_kb=fee_propagate_data1_kb,
+            fee_tx_size1_kb=fee_tx_size1_kb,
         )
 
     def to_xdr_bytes(self) -> bytes:
@@ -76,9 +76,9 @@ class ConfigSettingContractBandwidthV0:
     def __hash__(self):
         return hash(
             (
-                self.ledger_max_propagate_size_bytes,
+                self.ledger_max_txs_size_bytes,
                 self.tx_max_size_bytes,
-                self.fee_propagate_data1_kb,
+                self.fee_tx_size1_kb,
             )
         )
 
@@ -86,16 +86,15 @@ class ConfigSettingContractBandwidthV0:
         if not isinstance(other, self.__class__):
             return NotImplemented
         return (
-            self.ledger_max_propagate_size_bytes
-            == other.ledger_max_propagate_size_bytes
+            self.ledger_max_txs_size_bytes == other.ledger_max_txs_size_bytes
             and self.tx_max_size_bytes == other.tx_max_size_bytes
-            and self.fee_propagate_data1_kb == other.fee_propagate_data1_kb
+            and self.fee_tx_size1_kb == other.fee_tx_size1_kb
         )
 
     def __str__(self):
         out = [
-            f"ledger_max_propagate_size_bytes={self.ledger_max_propagate_size_bytes}",
+            f"ledger_max_txs_size_bytes={self.ledger_max_txs_size_bytes}",
             f"tx_max_size_bytes={self.tx_max_size_bytes}",
-            f"fee_propagate_data1_kb={self.fee_propagate_data1_kb}",
+            f"fee_tx_size1_kb={self.fee_tx_size1_kb}",
         ]
         return f"<ConfigSettingContractBandwidthV0 [{', '.join(out)}]>"

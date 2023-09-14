@@ -503,10 +503,16 @@ struct CreateContractArgs
     ContractExecutable executable;
 };
 
+struct InvokeContractArgs {
+    SCAddress contractAddress;
+    SCSymbol functionName;
+    SCVal args<>;
+};
+
 union HostFunction switch (HostFunctionType type)
 {
 case HOST_FUNCTION_TYPE_INVOKE_CONTRACT:
-    SCVec invokeContract;
+    InvokeContractArgs invokeContract;
 case HOST_FUNCTION_TYPE_CREATE_CONTRACT:
     CreateContractArgs createContract;
 case HOST_FUNCTION_TYPE_UPLOAD_CONTRACT_WASM:
@@ -519,17 +525,10 @@ enum SorobanAuthorizedFunctionType
     SOROBAN_AUTHORIZED_FUNCTION_TYPE_CREATE_CONTRACT_HOST_FN = 1
 };
 
-struct SorobanAuthorizedContractFunction 
-{
-    SCAddress contractAddress;
-    SCSymbol functionName;
-    SCVec args;
-};
-
 union SorobanAuthorizedFunction switch (SorobanAuthorizedFunctionType type)
 {
 case SOROBAN_AUTHORIZED_FUNCTION_TYPE_CONTRACT_FN:
-    SorobanAuthorizedContractFunction contractFn;
+    InvokeContractArgs contractFn;
 case SOROBAN_AUTHORIZED_FUNCTION_TYPE_CREATE_CONTRACT_HOST_FN:
     CreateContractArgs createContractHostFn;
 };
@@ -545,7 +544,7 @@ struct SorobanAddressCredentials
     SCAddress address;
     int64 nonce;
     uint32 signatureExpirationLedger;    
-    SCVec signatureArgs;
+    SCVal signature;
 };
 
 enum SorobanCredentialsType
@@ -815,10 +814,6 @@ struct SorobanResources
     uint32 readBytes;
     // The maximum number of bytes this transaction can write to ledger
     uint32 writeBytes;
-
-    // Maximum size of dynamic metadata produced by this contract (
-    // currently only includes the events).
-    uint32 extendedMetaDataSizeBytes;
 };
 
 // The transaction extension for Soroban.
@@ -1793,7 +1788,9 @@ enum InvokeHostFunctionResultCode
     // codes considered as "failure" for the operation
     INVOKE_HOST_FUNCTION_MALFORMED = -1,
     INVOKE_HOST_FUNCTION_TRAPPED = -2,
-    INVOKE_HOST_FUNCTION_RESOURCE_LIMIT_EXCEEDED = -3
+    INVOKE_HOST_FUNCTION_RESOURCE_LIMIT_EXCEEDED = -3,
+    INVOKE_HOST_FUNCTION_ENTRY_EXPIRED = -4,
+    INVOKE_HOST_FUNCTION_INSUFFICIENT_REFUNDABLE_FEE = -5
 };
 
 union InvokeHostFunctionResult switch (InvokeHostFunctionResultCode code)
@@ -1803,6 +1800,8 @@ case INVOKE_HOST_FUNCTION_SUCCESS:
 case INVOKE_HOST_FUNCTION_MALFORMED:
 case INVOKE_HOST_FUNCTION_TRAPPED:
 case INVOKE_HOST_FUNCTION_RESOURCE_LIMIT_EXCEEDED:
+case INVOKE_HOST_FUNCTION_ENTRY_EXPIRED:
+case INVOKE_HOST_FUNCTION_INSUFFICIENT_REFUNDABLE_FEE:
     void;
 };
 
@@ -1813,7 +1812,8 @@ enum BumpFootprintExpirationResultCode
 
     // codes considered as "failure" for the operation
     BUMP_FOOTPRINT_EXPIRATION_MALFORMED = -1,
-    BUMP_FOOTPRINT_EXPIRATION_RESOURCE_LIMIT_EXCEEDED = -2
+    BUMP_FOOTPRINT_EXPIRATION_RESOURCE_LIMIT_EXCEEDED = -2,
+    BUMP_FOOTPRINT_EXPIRATION_INSUFFICIENT_REFUNDABLE_FEE = -3
 };
 
 union BumpFootprintExpirationResult switch (BumpFootprintExpirationResultCode code)
@@ -1822,6 +1822,7 @@ case BUMP_FOOTPRINT_EXPIRATION_SUCCESS:
     void;
 case BUMP_FOOTPRINT_EXPIRATION_MALFORMED:
 case BUMP_FOOTPRINT_EXPIRATION_RESOURCE_LIMIT_EXCEEDED:
+case BUMP_FOOTPRINT_EXPIRATION_INSUFFICIENT_REFUNDABLE_FEE:
     void;
 };
 
@@ -1832,7 +1833,8 @@ enum RestoreFootprintResultCode
 
     // codes considered as "failure" for the operation
     RESTORE_FOOTPRINT_MALFORMED = -1,
-    RESTORE_FOOTPRINT_RESOURCE_LIMIT_EXCEEDED = -2
+    RESTORE_FOOTPRINT_RESOURCE_LIMIT_EXCEEDED = -2,
+    RESTORE_FOOTPRINT_INSUFFICIENT_REFUNDABLE_FEE = -3
 };
 
 union RestoreFootprintResult switch (RestoreFootprintResultCode code)
@@ -1841,6 +1843,7 @@ case RESTORE_FOOTPRINT_SUCCESS:
     void;
 case RESTORE_FOOTPRINT_MALFORMED:
 case RESTORE_FOOTPRINT_RESOURCE_LIMIT_EXCEEDED:
+case RESTORE_FOOTPRINT_INSUFFICIENT_REFUNDABLE_FEE:
     void;
 };
 
@@ -1946,14 +1949,12 @@ enum TransactionResultCode
     txBAD_AUTH_EXTRA = -10,      // unused signatures attached to transaction
     txINTERNAL_ERROR = -11,      // an unknown error occurred
 
-    txNOT_SUPPORTED = -12,         // transaction type not supported
-    txFEE_BUMP_INNER_FAILED = -13, // fee bump inner transaction failed
-    txBAD_SPONSORSHIP = -14,       // sponsorship not confirmed
-    txBAD_MIN_SEQ_AGE_OR_GAP =
-        -15, // minSeqAge or minSeqLedgerGap conditions not met
-    txMALFORMED = -16, // precondition is invalid
-    // declared Soroban resource usage exceeds the network limit
-    txSOROBAN_RESOURCE_LIMIT_EXCEEDED = -17
+    txNOT_SUPPORTED = -12,          // transaction type not supported
+    txFEE_BUMP_INNER_FAILED = -13,  // fee bump inner transaction failed
+    txBAD_SPONSORSHIP = -14,        // sponsorship not confirmed
+    txBAD_MIN_SEQ_AGE_OR_GAP = -15, // minSeqAge or minSeqLedgerGap conditions not met
+    txMALFORMED = -16,              // precondition is invalid
+    txSOROBAN_INVALID = -17         // soroban-specific preconditions were not met
 };
 
 // InnerTransactionResult must be binary compatible with TransactionResult
@@ -1984,7 +1985,7 @@ struct InnerTransactionResult
     case txBAD_SPONSORSHIP:
     case txBAD_MIN_SEQ_AGE_OR_GAP:
     case txMALFORMED:
-    case txSOROBAN_RESOURCE_LIMIT_EXCEEDED:
+    case txSOROBAN_INVALID:
         void;
     }
     result;
@@ -2031,7 +2032,7 @@ struct TransactionResult
     case txBAD_SPONSORSHIP:
     case txBAD_MIN_SEQ_AGE_OR_GAP:
     case txMALFORMED:
-    case txSOROBAN_RESOURCE_LIMIT_EXCEEDED:
+    case txSOROBAN_INVALID:
         void;
     }
     result;

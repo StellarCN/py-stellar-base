@@ -41,6 +41,8 @@ class LedgerEntry:
                 ContractCodeEntry contractCode;
             case CONFIG_SETTING:
                 ConfigSettingEntry configSetting;
+            case EXPIRATION:
+                ExpirationEntry expiration;
             }
             data;
 
