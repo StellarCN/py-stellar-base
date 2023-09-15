@@ -1,4 +1,6 @@
-from typing import Callable, Union
+import copy
+import random
+from typing import Callable, Optional, Union
 
 from . import scval
 from . import xdr as stellar_xdr
@@ -8,20 +10,45 @@ from .keypair import Keypair
 from .network import Network
 from .utils import sha256
 
-__all__ = ["sign_authorize_entry"]
+__all__ = ["authorize_entry", "authorize_invocation"]
 
 
-def sign_authorize_entry(
-    entry: stellar_xdr.SorobanAuthorizationEntry,
+def authorize_entry(
+    entry: Union[stellar_xdr.SorobanAuthorizationEntry, str],
     signer: Union[Keypair, Callable[[stellar_xdr.SorobanAuthorizationEntry], bytes]],
     valid_until_ledger_sequence: int,
     network_passphrase: str,
 ) -> stellar_xdr.SorobanAuthorizationEntry:
+    """Actually authorizes an existing authorization entry using the given the
+    credentials and expiration details, returning a signed copy.
+
+    This "fills out" the authorization entry with a signature, indicating to the
+    :class:`stellar_sdk.InvokeHostFunction` it's attached to that:
+        - a particular identity (i.e. signing :class:`stellar_sdk.Keypair` or other signer)
+        - approving the execution of an invocation tree (i.e. a
+            simulation-acquired :class:`stellar_xdr.SorobanAuthorizedInvocation` or otherwise built)
+        - on a particular network (uniquely identified by its passphrase, see :class:`stellar_sdk.Network`)
+        - until a particular ledger sequence is reached.
+
+
+    :param entry: an unsigned Soroban authorization entry.
+    :param signer: either a :class:`Keypair` or a function which takes a bytes payload and returns a bytes signature,
+        the signing key should correspond to the address in the `entry`.
+    :param valid_until_ledger_sequence: the (exclusive) future ledger sequence number until which
+        this authorization entry should be valid (if `currentLedgerSeq==validUntil`, this is expired)
+    :param network_passphrase: the network passphrase is incorporated into the signature (see :class:`stellar_sdk.Network` for options)
+    :return: a signed Soroban authorization entry.
+    """
     if (
         entry.credentials.type
         != stellar_xdr.SorobanCredentialsType.SOROBAN_CREDENTIALS_ADDRESS
     ):
         return entry
+
+    if isinstance(entry, str):
+        entry = stellar_xdr.SorobanAuthorizationEntry.from_xdr(entry)
+    else:
+        entry = copy.deepcopy(entry)
 
     addr_auth = entry.credentials.address
     addr_auth.signature_expiration_ledger = stellar_xdr.Uint32(
@@ -51,6 +78,8 @@ def sign_authorize_entry(
     except BadSignatureError as e:
         raise ValueError("signature doesn't match payload.") from e
 
+    # This structure is defined here:
+    # https://soroban.stellar.org/docs/fundamentals-and-concepts/invoking-contracts-with-transactions#stellar-account-signatures
     sig_scval = scval.to_map(
         {
             scval.to_symbol("public_key"): scval.to_bytes(public_key),
@@ -59,3 +88,54 @@ def sign_authorize_entry(
     )
     addr_auth.signature_args = scval.to_vec([sig_scval])
     return entry
+
+
+def authorize_invocation(
+    signer: Union[Keypair, Callable[[stellar_xdr.SorobanAuthorizationEntry], bytes]],
+    valid_until_ledger_sequence: int,
+    invocation: stellar_xdr.SorobanAuthorizedInvocation,
+    public_key: Optional[str],
+    network_passphrase: str,
+):
+    """This builds an entry from scratch, allowing you to express authorization as a function of:
+        - a particular identity (i.e. signing :class:`stellar_sdk.Keypair` or other signer)
+        - approving the execution of an invocation tree (i.e. a
+            simulation-acquired :class:`stellar_xdr.SorobanAuthorizedInvocation` or otherwise built)
+        - on a particular network (uniquely identified by its passphrase, see :class:`stellar_sdk.Network`)
+        - until a particular ledger sequence is reached.
+
+    This is in contrast to :func:`authorize_entry`, which signs an existing entry "in place".
+
+    :param signer: either a :class:`Keypair` or a function which takes a bytes payload and returns a bytes signature,
+        the signing key should correspond to the address in the `entry`.
+    :param valid_until_ledger_sequence: the (exclusive) future ledger sequence number until which
+        this authorization entry should be valid (if `currentLedgerSeq==validUntil`, this is expired)
+    :param invocation: invocation the invocation tree that we're authorizing (likely, this comes from transaction simulation)
+    :public_key: the public identity of the signer (when providing a :class:`Keypair` to `signer`,
+        this can be omitted, as it just uses the public key of the keypair)
+    :param network_passphrase: the network passphrase is incorporated into the signature (see :class:`stellar_sdk.Network` for options)
+    :return: a signed Soroban authorization entry.
+    """
+    nonce = random.randint(-(2**63), 2**63 - 1)
+    pk = public_key
+    if not pk and isinstance(signer, Keypair):
+        pk = signer.public_key
+
+    if not pk:
+        raise ValueError("`public_key` parameter is required.")
+
+    entry = stellar_xdr.SorobanAuthorizationEntry(
+        root_invocation=invocation,
+        credentials=stellar_xdr.SorobanCredentials(
+            type=stellar_xdr.SorobanCredentialsType.SOROBAN_CREDENTIALS_ADDRESS,
+            address=stellar_xdr.SorobanAddressCredentials(
+                address=Address(pk).to_xdr_sc_address(),
+                nonce=stellar_xdr.Int64(nonce),
+                signature_expiration_ledger=stellar_xdr.Uint32(0),
+                signature_args=stellar_xdr.SCVec([]),
+            ),
+        ),
+    )
+    return authorize_entry(
+        entry, signer, valid_until_ledger_sequence, network_passphrase
+    )
