@@ -1,6 +1,6 @@
 from datetime import datetime
 from enum import Enum
-from typing import Any, Dict, Generic, List, Optional, TypeVar, Union
+from typing import Any, Dict, Generic, List, Optional, Sequence, TypeVar, Union
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -49,8 +49,8 @@ class EventFilterType(Enum):
 
 class EventFilter(BaseModel):
     event_type: Optional[EventFilterType] = Field(alias="type", default=None)
-    contract_ids: Optional[List[str]] = Field(alias="contractIds", default=None)
-    topics: Optional[List[List[str]]] = None
+    contract_ids: Optional[Sequence[str]] = Field(alias="contractIds", default=None)
+    topics: Optional[Sequence[Sequence[str]]] = None
     model_config = ConfigDict(populate_by_name=True)
 
 
@@ -83,7 +83,7 @@ class GetEventsRequest(BaseModel):
     """
 
     start_ledger: str = Field(alias="startLedger")
-    filters: Optional[List[EventFilter]] = None
+    filters: Optional[Sequence[EventFilter]] = None
     pagination: Optional[PaginationOptions] = None
 
 
@@ -105,7 +105,7 @@ class GetLedgerEntriesRequest(BaseModel):
     See `getLedgerEntries documentation <https://soroban.stellar.org/api/methods/getLedgerEntries#parameters>`__ for
     more information."""
 
-    keys: List[str]
+    keys: Sequence[str]
 
 
 class LedgerEntryResult(BaseModel):
