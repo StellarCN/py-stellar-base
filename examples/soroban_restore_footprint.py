@@ -31,7 +31,6 @@ ledger_key = stellar_xdr.LedgerKey(
         contract=Address(contract_id).to_xdr_sc_address(),
         key=stellar_xdr.SCVal(stellar_xdr.SCValType.SCV_LEDGER_KEY_CONTRACT_INSTANCE),
         durability=stellar_xdr.ContractDataDurability.PERSISTENT,
-        body_type=stellar_xdr.ContractEntryBodyType.DATA_ENTRY,
     ),
 )
 soroban_data = SorobanDataBuilder().set_read_only([ledger_key]).build()
