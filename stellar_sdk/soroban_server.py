@@ -3,7 +3,7 @@ from __future__ import annotations
 import copy
 import json
 import uuid
-from typing import TYPE_CHECKING, Type
+from typing import TYPE_CHECKING, Sequence, Type
 
 from . import Keypair
 from . import xdr as stellar_xdr
