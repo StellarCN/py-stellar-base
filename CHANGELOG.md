@@ -1,6 +1,13 @@
 Release History
 ==============
 
+### Version 9.0.0-alpha2
+
+Released on September 16, 2023
+
+#### Update
+- feat: add support for Soroban Preview 11 ([#777](https://github.com/StellarCN/py-stellar-base/pull/777))
+
 ### Version 9.0.0-alpha1
 
 Released on Aug 28, 2023

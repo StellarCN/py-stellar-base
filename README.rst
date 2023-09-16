@@ -56,13 +56,13 @@ Installing
 
 .. code-block:: text
 
-    pip install stellar-sdk==9.0.0a1
+    pip install stellar-sdk==9.0.0a2
 
 If you need to use asynchronous, please use the following command to install the required dependencies.
 
 .. code-block:: text
 
-    pip install stellar-sdk[aiohttp]==9.0.0a1
+    pip install stellar-sdk[aiohttp]==9.0.0a2
 
 We follow `Semantic Versioning 2.0.0 <https://semver.org/>`_, and I strongly
 recommend that you specify its major version number in the dependency
