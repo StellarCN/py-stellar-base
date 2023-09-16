@@ -1,6 +1,6 @@
 from datetime import datetime
 from enum import Enum
-from typing import Any, Dict, Generic, List, Optional, Sequence, TypeVar, Union
+from typing import Any, Dict, Generic, List, Optional, TypeVar, Union
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -83,7 +83,7 @@ class GetEventsRequest(BaseModel):
     """
 
     start_ledger: str = Field(alias="startLedger")
-    filters: Optional[Sequence[EventFilter]] = None
+    filters: Optional[List[EventFilter]] = None
     pagination: Optional[PaginationOptions] = None
 
 
