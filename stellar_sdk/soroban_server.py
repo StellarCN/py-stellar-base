@@ -260,7 +260,6 @@ class SorobanServer:
                 contract=sc_address,
                 key=key,
                 durability=xdr_durability,
-                body_type=stellar_xdr.ContractEntryBodyType.DATA_ENTRY,
             ),
         )
         resp = self.get_ledger_entries([contract_key])
@@ -326,6 +325,7 @@ class SorobanServer:
             self.server_url,
             json_data=json.loads(json_data),
         )
+        print(json.dumps(data.json()))
         response = Response[response_body_type].model_validate(data.json())  # type: ignore[valid-type]
         if response.error:
             raise SorobanRpcErrorResponse(
@@ -362,15 +362,13 @@ def _assemble_transaction(
         raise ValueError(f"Simulation results invalid: {simulation.results}")
 
     min_resource_fee = simulation.min_resource_fee
+    assert simulation.transaction_data is not None
     soroban_data = stellar_xdr.SorobanTransactionData.from_xdr(
         simulation.transaction_data
     )
-
-    # TODO: https://discord.com/channels/897514728459468821/1112853306881081354/1112853306881081354
-    # soroban_data.resources.instructions = stellar_xdr.Uint32(soroban_data.resources.instructions.uint32 * 2)
-
     te = copy.deepcopy(transaction_envelope)
     te.signatures = []
+    assert min_resource_fee is not None
     te.transaction.fee += min_resource_fee
     te.transaction.soroban_data = soroban_data
 

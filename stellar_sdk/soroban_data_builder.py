@@ -27,7 +27,6 @@ class SorobanDataBuilder:
                     read_only=[],
                     read_write=[],
                 ),
-                extended_meta_data_size_bytes=stellar_xdr.Uint32(0),
                 read_bytes=stellar_xdr.Uint32(0),
                 write_bytes=stellar_xdr.Uint32(0),
                 instructions=stellar_xdr.Uint32(0),
@@ -84,7 +83,7 @@ class SorobanDataBuilder:
         return self
 
     def set_resources(
-        self, instructions: int, read_bytes: int, write_bytes: int, metadata_bytes: int
+        self, instructions: int, read_bytes: int, write_bytes: int
     ) -> SorobanDataBuilder:
         """Sets up the resource metrics.
 
@@ -94,15 +93,11 @@ class SorobanDataBuilder:
         :param instructions: Number of CPU instructions (uint32)
         :param read_bytes: Number of bytes being read (uint32)
         :param write_bytes: Number of bytes being written (uint32)
-        :param metadata_bytes: Number of extended metadata bytes (uint32)
         :return: This builder.
         """
         self._data.resources.instructions = stellar_xdr.Uint32(instructions)
         self._data.resources.read_bytes = stellar_xdr.Uint32(read_bytes)
         self._data.resources.write_bytes = stellar_xdr.Uint32(write_bytes)
-        self._data.resources.extended_meta_data_size_bytes = stellar_xdr.Uint32(
-            metadata_bytes
-        )
         return self
 
     def build(self):

@@ -120,19 +120,20 @@ class TestSorobanServer:
         result = {
             "entries": [
                 {
-                    "key": "AAAABgAAAAFgdoLyR3pr6M3w/fMr4T1fJaaGzAlP2T1ao9e2gjLQwAAAABQAAAABAAAAAA==",
-                    "xdr": "AAAABgAAAAFgdoLyR3pr6M3w/fMr4T1fJaaGzAlP2T1ao9e2gjLQwAAAABQAAAABAAAAAAAAAAAAAAATAAAAALnBupvoT7RHZ+oTeaPHSiSufpac3O3mc0u663Kqbko/AAAAAQAAAAEAAAAPAAAAB0NPVU5URVIAAAAAAwAAAAEAABD1",
-                    "lastModifiedLedgerSeq": "290",
+                    "key": "AAAABgAAAAFbihjlAiytnchoNOQZzgshTg9sfCxcBnTGO2xwtRu0awAAABQAAAAB",
+                    "xdr": "AAAABgAAAAAAAAABW4oY5QIsrZ3IaDTkGc4LIU4PbHwsXAZ0xjtscLUbtGsAAAAUAAAAAQAAABMAAAAAJEKO7o0EZBi/DpFId2xLI1yGppi+ADrnh9IIE/CfJEcAAAAA",
+                    "lastModifiedLedgerSeq": "11715",
                 }
             ],
-            "latestLedger": "296",
+            "latestLedger": "12551",
         }
+
         data = {
             "jsonrpc": "2.0",
             "id": "839c6c921d40456db5ba8a1c4e1a0e70",
             "result": result,
         }
-        contract_id = "CBQHNAXSI55GX2GN6D67GK7BHVPSLJUGZQEU7WJ5LKR5PNUCGLIMAO4K"
+        contract_id = "CBNYUGHFAIWK3HOINA2OIGOOBMQU4D3MPQWFYBTUYY5WY4FVDO2GWXUY"
         key = stellar_xdr.SCVal(stellar_xdr.SCValType.SCV_LEDGER_KEY_CONTRACT_INSTANCE)
         with requests_mock.Mocker() as m:
             m.post(PRC_URL, json=data)
@@ -149,9 +150,7 @@ class TestSorobanServer:
             stellar_xdr.SCValType.SCV_LEDGER_KEY_CONTRACT_INSTANCE
         )
         assert request_data["params"] == {
-            "keys": [
-                "AAAABgAAAAFgdoLyR3pr6M3w/fMr4T1fJaaGzAlP2T1ao9e2gjLQwAAAABQAAAABAAAAAA=="
-            ]
+            "keys": ["AAAABgAAAAFbihjlAiytnchoNOQZzgshTg9sfCxcBnTGO2xwtRu0awAAABQAAAAB"]
         }
 
     def test_get_contract_data_not_found(self):
@@ -161,7 +160,7 @@ class TestSorobanServer:
             "id": "839c6c921d40456db5ba8a1c4e1a0e70",
             "result": result,
         }
-        contract_id = "CBQHNAXSI55GX2GN6D67GK7BHVPSLJUGZQEU7WJ5LKR5PNUCGLIMAO4K"
+        contract_id = "CBNYUGHFAIWK3HOINA2OIGOOBMQU4D3MPQWFYBTUYY5WY4FVDO2GWXUY"
         key = stellar_xdr.SCVal(stellar_xdr.SCValType.SCV_LEDGER_KEY_CONTRACT_INSTANCE)
         with requests_mock.Mocker() as m:
             m.post(PRC_URL, json=data)
@@ -175,9 +174,7 @@ class TestSorobanServer:
             stellar_xdr.SCValType.SCV_LEDGER_KEY_CONTRACT_INSTANCE
         )
         assert request_data["params"] == {
-            "keys": [
-                "AAAABgAAAAFgdoLyR3pr6M3w/fMr4T1fJaaGzAlP2T1ao9e2gjLQwAAAABQAAAABAAAAAA=="
-            ]
+            "keys": ["AAAABgAAAAFbihjlAiytnchoNOQZzgshTg9sfCxcBnTGO2xwtRu0awAAABQAAAAB"]
         }
 
     def test_get_ledger_entries(self):
@@ -270,30 +267,30 @@ class TestSorobanServer:
             "events": [
                 {
                     "type": "contract",
-                    "ledger": "107",
-                    "ledgerClosedAt": "2023-07-28T14:57:02Z",
-                    "contractId": "607682f2477a6be8cdf0fdf32be13d5f25a686cc094fd93d5aa3d7b68232d0c0",
-                    "id": "0000000459561504768-0000000000",
-                    "pagingToken": "0000000459561504768-0000000000",
+                    "ledger": "12739",
+                    "ledgerClosedAt": "2023-09-16T06:23:57Z",
+                    "contractId": "CBNYUGHFAIWK3HOINA2OIGOOBMQU4D3MPQWFYBTUYY5WY4FVDO2GWXUY",
+                    "id": "0000054713588387840-0000000000",
+                    "pagingToken": "0000054713588387840-0000000000",
                     "topic": [
                         "AAAADwAAAAdDT1VOVEVSAA==",
                         "AAAADwAAAAlpbmNyZW1lbnQAAAA=",
                     ],
-                    "value": {"xdr": "AAAAAwAAAAQ="},
+                    "value": {"xdr": "AAAAAwAAAAE="},
                     "inSuccessfulContractCall": True,
                 },
                 {
                     "type": "contract",
-                    "ledger": "109",
-                    "ledgerClosedAt": "2023-07-28T14:57:04Z",
-                    "contractId": "607682f2477a6be8cdf0fdf32be13d5f25a686cc094fd93d5aa3d7b68232d0c0",
-                    "id": "0000000468151439360-0000000000",
-                    "pagingToken": "0000000468151439360-0000000000",
+                    "ledger": "12747",
+                    "ledgerClosedAt": "2023-09-16T06:24:05Z",
+                    "contractId": "CBNYUGHFAIWK3HOINA2OIGOOBMQU4D3MPQWFYBTUYY5WY4FVDO2GWXUY",
+                    "id": "0000054747948126208-0000000000",
+                    "pagingToken": "0000054747948126208-0000000000",
                     "topic": [
                         "AAAADwAAAAdDT1VOVEVSAA==",
                         "AAAADwAAAAlpbmNyZW1lbnQAAAA=",
                     ],
-                    "value": {"xdr": "AAAAAwAAAAU="},
+                    "value": {"xdr": "AAAAAwAAAAI="},
                     "inSuccessfulContractCall": True,
                 },
             ],
@@ -310,7 +307,7 @@ class TestSorobanServer:
             EventFilter(
                 event_type=EventFilterType.CONTRACT,
                 contract_ids=[
-                    "607682f2477a6be8cdf0fdf32be13d5f25a686cc094fd93d5aa3d7b68232d0c0"
+                    "CBNYUGHFAIWK3HOINA2OIGOOBMQU4D3MPQWFYBTUYY5WY4FVDO2GWXUY"
                 ],
                 topics=[
                     ["AAAADwAAAAdDT1VOVEVSAA==", "AAAADwAAAAlpbmNyZW1lbnQAAAA="],
@@ -318,7 +315,7 @@ class TestSorobanServer:
             )
         ]
         GetEventsResponse.model_validate(result)
-        cursor = "0000007799660613632-0000000000"
+        cursor = "0000054713588387839-0000000000"
         limit = 10
         with requests_mock.Mocker() as m:
             m.post(PRC_URL, json=data)
@@ -334,7 +331,7 @@ class TestSorobanServer:
             "filters": [
                 {
                     "contractIds": [
-                        "607682f2477a6be8cdf0fdf32be13d5f25a686cc094fd93d5aa3d7b68232d0c0"
+                        "CBNYUGHFAIWK3HOINA2OIGOOBMQU4D3MPQWFYBTUYY5WY4FVDO2GWXUY"
                     ],
                     "topics": [
                         ["AAAADwAAAAdDT1VOVEVSAA==", "AAAADwAAAAlpbmNyZW1lbnQAAAA="]
@@ -342,7 +339,7 @@ class TestSorobanServer:
                     "type": "contract",
                 }
             ],
-            "pagination": {"cursor": "0000007799660613632-0000000000", "limit": 10},
+            "pagination": {"cursor": "0000054713588387839-0000000000", "limit": 10},
             "startLedger": "100",
         }
 
@@ -409,24 +406,24 @@ class TestSorobanServer:
     def test_prepare_transaction_without_auth_and_soroban_data(self):
         data = {
             "jsonrpc": "2.0",
-            "id": "e1fabdcdf0244a2a9adfab94d7748b6c",
+            "id": "7a469b9d6ed4444893491be530862ce3",
             "result": {
-                "transactionData": "AAAAAAAAAAIAAAAGAAAAAcWLK/vE8FTnMk9r8gytPgJuQbutGm0gw9fUkY3tFlQRAAAAFAAAAAEAAAAAAAAAB300Hyg0HZG+Qie3zvsxLvugrNtFqd3AIntWy9bg2YvZAAAAAAAAAAEAAAAGAAAAAcWLK/vE8FTnMk9r8gytPgJuQbutGm0gw9fUkY3tFlQRAAAAEAAAAAEAAAACAAAADwAAAAdDb3VudGVyAAAAABIAAAAAAAAAAFi3xKLI8peqjz0kcSgf38zsr+SOVmMxPsGOEqc+ypihAAAAAQAAAAAAFcLDAAAF8AAAAQgAAAMcAAAAAAAAAJw=",
+                "transactionData": "AAAAAAAAAAIAAAAGAAAAAem354u9STQWq5b3Ed1j9tOemvL7xV0NPwhn4gXg0AP8AAAAFAAAAAEAAAAH8dTe2OoI0BnhlDbH0fWvXmvprkBvBAgKIcL9busuuMEAAAABAAAABgAAAAHpt+eLvUk0FquW9xHdY/bTnpry+8VdDT8IZ+IF4NAD/AAAABAAAAABAAAAAgAAAA8AAAAHQ291bnRlcgAAAAASAAAAAAAAAABYt8SiyPKXqo89JHEoH9/M7K/kjlZjMT7BjhKnPsqYoQAAAAEAHifGAAAFlAAAAIgAAAAAAAAAAg==",
+                "minResourceFee": "58181",
                 "events": [
-                    "AAAAAQAAAAAAAAAAAAAAAgAAAAAAAAADAAAADwAAAAdmbl9jYWxsAAAAAA0AAAAgxYsr+8TwVOcyT2vyDK0+Am5Bu60abSDD19SRje0WVBEAAAAPAAAACWluY3JlbWVudAAAAAAAABAAAAABAAAAAgAAABIAAAAAAAAAAFi3xKLI8peqjz0kcSgf38zsr+SOVmMxPsGOEqc+ypihAAAAAwAAAAo=",
-                    "AAAAAQAAAAAAAAABxYsr+8TwVOcyT2vyDK0+Am5Bu60abSDD19SRje0WVBEAAAACAAAAAAAAAAIAAAAPAAAACWZuX3JldHVybgAAAAAAAA8AAAAJaW5jcmVtZW50AAAAAAAAAwAAABQ=",
+                    "AAAAAQAAAAAAAAAAAAAAAgAAAAAAAAADAAAADwAAAAdmbl9jYWxsAAAAAA0AAAAg6bfni71JNBarlvcR3WP2056a8vvFXQ0/CGfiBeDQA/wAAAAPAAAACWluY3JlbWVudAAAAAAAABAAAAABAAAAAgAAABIAAAAAAAAAAFi3xKLI8peqjz0kcSgf38zsr+SOVmMxPsGOEqc+ypihAAAAAwAAAAo=",
+                    "AAAAAQAAAAAAAAAB6bfni71JNBarlvcR3WP2056a8vvFXQ0/CGfiBeDQA/wAAAACAAAAAAAAAAIAAAAPAAAACWZuX3JldHVybgAAAAAAAA8AAAAJaW5jcmVtZW50AAAAAAAAAwAAABQ=",
                 ],
-                "minResourceFee": "58595",
                 "results": [
                     {
                         "auth": [
-                            "AAAAAAAAAAAAAAABxYsr+8TwVOcyT2vyDK0+Am5Bu60abSDD19SRje0WVBEAAAAJaW5jcmVtZW50AAAAAAAAAgAAABIAAAAAAAAAAFi3xKLI8peqjz0kcSgf38zsr+SOVmMxPsGOEqc+ypihAAAAAwAAAAoAAAAA"
+                            "AAAAAAAAAAAAAAAB6bfni71JNBarlvcR3WP2056a8vvFXQ0/CGfiBeDQA/wAAAAJaW5jcmVtZW50AAAAAAAAAgAAABIAAAAAAAAAAFi3xKLI8peqjz0kcSgf38zsr+SOVmMxPsGOEqc+ypihAAAAAwAAAAoAAAAA"
                         ],
                         "xdr": "AAAAAwAAABQ=",
                     }
                 ],
-                "cost": {"cpuInsns": "1240100", "memBytes": "161637"},
-                "latestLedger": "1479",
+                "cost": {"cpuInsns": "1646885", "memBytes": "1296481"},
+                "latestLedger": "14245",
             },
         }
 
@@ -451,24 +448,24 @@ class TestSorobanServer:
     def test_prepare_transaction_with_soroban_data(self):
         data = {
             "jsonrpc": "2.0",
-            "id": "e1fabdcdf0244a2a9adfab94d7748b6c",
+            "id": "7a469b9d6ed4444893491be530862ce3",
             "result": {
-                "transactionData": "AAAAAAAAAAIAAAAGAAAAAcWLK/vE8FTnMk9r8gytPgJuQbutGm0gw9fUkY3tFlQRAAAAFAAAAAEAAAAAAAAAB300Hyg0HZG+Qie3zvsxLvugrNtFqd3AIntWy9bg2YvZAAAAAAAAAAEAAAAGAAAAAcWLK/vE8FTnMk9r8gytPgJuQbutGm0gw9fUkY3tFlQRAAAAEAAAAAEAAAACAAAADwAAAAdDb3VudGVyAAAAABIAAAAAAAAAAFi3xKLI8peqjz0kcSgf38zsr+SOVmMxPsGOEqc+ypihAAAAAQAAAAAAFcLDAAAF8AAAAQgAAAMcAAAAAAAAAJw=",
+                "transactionData": "AAAAAAAAAAIAAAAGAAAAAem354u9STQWq5b3Ed1j9tOemvL7xV0NPwhn4gXg0AP8AAAAFAAAAAEAAAAH8dTe2OoI0BnhlDbH0fWvXmvprkBvBAgKIcL9busuuMEAAAABAAAABgAAAAHpt+eLvUk0FquW9xHdY/bTnpry+8VdDT8IZ+IF4NAD/AAAABAAAAABAAAAAgAAAA8AAAAHQ291bnRlcgAAAAASAAAAAAAAAABYt8SiyPKXqo89JHEoH9/M7K/kjlZjMT7BjhKnPsqYoQAAAAEAHifGAAAFlAAAAIgAAAAAAAAAAg==",
+                "minResourceFee": "58181",
                 "events": [
-                    "AAAAAQAAAAAAAAAAAAAAAgAAAAAAAAADAAAADwAAAAdmbl9jYWxsAAAAAA0AAAAgxYsr+8TwVOcyT2vyDK0+Am5Bu60abSDD19SRje0WVBEAAAAPAAAACWluY3JlbWVudAAAAAAAABAAAAABAAAAAgAAABIAAAAAAAAAAFi3xKLI8peqjz0kcSgf38zsr+SOVmMxPsGOEqc+ypihAAAAAwAAAAo=",
-                    "AAAAAQAAAAAAAAABxYsr+8TwVOcyT2vyDK0+Am5Bu60abSDD19SRje0WVBEAAAACAAAAAAAAAAIAAAAPAAAACWZuX3JldHVybgAAAAAAAA8AAAAJaW5jcmVtZW50AAAAAAAAAwAAABQ=",
+                    "AAAAAQAAAAAAAAAAAAAAAgAAAAAAAAADAAAADwAAAAdmbl9jYWxsAAAAAA0AAAAg6bfni71JNBarlvcR3WP2056a8vvFXQ0/CGfiBeDQA/wAAAAPAAAACWluY3JlbWVudAAAAAAAABAAAAABAAAAAgAAABIAAAAAAAAAAFi3xKLI8peqjz0kcSgf38zsr+SOVmMxPsGOEqc+ypihAAAAAwAAAAo=",
+                    "AAAAAQAAAAAAAAAB6bfni71JNBarlvcR3WP2056a8vvFXQ0/CGfiBeDQA/wAAAACAAAAAAAAAAIAAAAPAAAACWZuX3JldHVybgAAAAAAAA8AAAAJaW5jcmVtZW50AAAAAAAAAwAAABQ=",
                 ],
-                "minResourceFee": "58595",
                 "results": [
                     {
                         "auth": [
-                            "AAAAAAAAAAAAAAABxYsr+8TwVOcyT2vyDK0+Am5Bu60abSDD19SRje0WVBEAAAAJaW5jcmVtZW50AAAAAAAAAgAAABIAAAAAAAAAAFi3xKLI8peqjz0kcSgf38zsr+SOVmMxPsGOEqc+ypihAAAAAwAAAAoAAAAA"
+                            "AAAAAAAAAAAAAAAB6bfni71JNBarlvcR3WP2056a8vvFXQ0/CGfiBeDQA/wAAAAJaW5jcmVtZW50AAAAAAAAAgAAABIAAAAAAAAAAFi3xKLI8peqjz0kcSgf38zsr+SOVmMxPsGOEqc+ypihAAAAAwAAAAoAAAAA"
                         ],
                         "xdr": "AAAAAwAAABQ=",
                     }
                 ],
-                "cost": {"cpuInsns": "1240100", "memBytes": "161637"},
-                "latestLedger": "1479",
+                "cost": {"cpuInsns": "1646885", "memBytes": "1296481"},
+                "latestLedger": "14245",
             },
         }
 
@@ -480,7 +477,6 @@ class TestSorobanServer:
                     read_only=[],
                     read_write=[],
                 ),
-                extended_meta_data_size_bytes=stellar_xdr.Uint32(1),
                 read_bytes=stellar_xdr.Uint32(2),
                 write_bytes=stellar_xdr.Uint32(3),
                 instructions=stellar_xdr.Uint32(4),
@@ -507,24 +503,24 @@ class TestSorobanServer:
     def test_prepare_transaction_with_auth(self):
         data = {
             "jsonrpc": "2.0",
-            "id": "e1fabdcdf0244a2a9adfab94d7748b6c",
+            "id": "7a469b9d6ed4444893491be530862ce3",
             "result": {
-                "transactionData": "AAAAAAAAAAIAAAAGAAAAAcWLK/vE8FTnMk9r8gytPgJuQbutGm0gw9fUkY3tFlQRAAAAFAAAAAEAAAAAAAAAB300Hyg0HZG+Qie3zvsxLvugrNtFqd3AIntWy9bg2YvZAAAAAAAAAAEAAAAGAAAAAcWLK/vE8FTnMk9r8gytPgJuQbutGm0gw9fUkY3tFlQRAAAAEAAAAAEAAAACAAAADwAAAAdDb3VudGVyAAAAABIAAAAAAAAAAFi3xKLI8peqjz0kcSgf38zsr+SOVmMxPsGOEqc+ypihAAAAAQAAAAAAFcLDAAAF8AAAAQgAAAMcAAAAAAAAAJw=",
+                "transactionData": "AAAAAAAAAAIAAAAGAAAAAem354u9STQWq5b3Ed1j9tOemvL7xV0NPwhn4gXg0AP8AAAAFAAAAAEAAAAH8dTe2OoI0BnhlDbH0fWvXmvprkBvBAgKIcL9busuuMEAAAABAAAABgAAAAHpt+eLvUk0FquW9xHdY/bTnpry+8VdDT8IZ+IF4NAD/AAAABAAAAABAAAAAgAAAA8AAAAHQ291bnRlcgAAAAASAAAAAAAAAABYt8SiyPKXqo89JHEoH9/M7K/kjlZjMT7BjhKnPsqYoQAAAAEAHifGAAAFlAAAAIgAAAAAAAAAAg==",
+                "minResourceFee": "58181",
                 "events": [
-                    "AAAAAQAAAAAAAAAAAAAAAgAAAAAAAAADAAAADwAAAAdmbl9jYWxsAAAAAA0AAAAgxYsr+8TwVOcyT2vyDK0+Am5Bu60abSDD19SRje0WVBEAAAAPAAAACWluY3JlbWVudAAAAAAAABAAAAABAAAAAgAAABIAAAAAAAAAAFi3xKLI8peqjz0kcSgf38zsr+SOVmMxPsGOEqc+ypihAAAAAwAAAAo=",
-                    "AAAAAQAAAAAAAAABxYsr+8TwVOcyT2vyDK0+Am5Bu60abSDD19SRje0WVBEAAAACAAAAAAAAAAIAAAAPAAAACWZuX3JldHVybgAAAAAAAA8AAAAJaW5jcmVtZW50AAAAAAAAAwAAABQ=",
+                    "AAAAAQAAAAAAAAAAAAAAAgAAAAAAAAADAAAADwAAAAdmbl9jYWxsAAAAAA0AAAAg6bfni71JNBarlvcR3WP2056a8vvFXQ0/CGfiBeDQA/wAAAAPAAAACWluY3JlbWVudAAAAAAAABAAAAABAAAAAgAAABIAAAAAAAAAAFi3xKLI8peqjz0kcSgf38zsr+SOVmMxPsGOEqc+ypihAAAAAwAAAAo=",
+                    "AAAAAQAAAAAAAAAB6bfni71JNBarlvcR3WP2056a8vvFXQ0/CGfiBeDQA/wAAAACAAAAAAAAAAIAAAAPAAAACWZuX3JldHVybgAAAAAAAA8AAAAJaW5jcmVtZW50AAAAAAAAAwAAABQ=",
                 ],
-                "minResourceFee": "58595",
                 "results": [
                     {
                         "auth": [
-                            "AAAAAAAAAAAAAAABxYsr+8TwVOcyT2vyDK0+Am5Bu60abSDD19SRje0WVBEAAAAJaW5jcmVtZW50AAAAAAAAAgAAABIAAAAAAAAAAFi3xKLI8peqjz0kcSgf38zsr+SOVmMxPsGOEqc+ypihAAAAAwAAAAoAAAAA"
+                            "AAAAAAAAAAAAAAAB6bfni71JNBarlvcR3WP2056a8vvFXQ0/CGfiBeDQA/wAAAAJaW5jcmVtZW50AAAAAAAAAgAAABIAAAAAAAAAAFi3xKLI8peqjz0kcSgf38zsr+SOVmMxPsGOEqc+ypihAAAAAwAAAAoAAAAA"
                         ],
                         "xdr": "AAAAAwAAABQ=",
                     }
                 ],
-                "cost": {"cpuInsns": "1240100", "memBytes": "161637"},
-                "latestLedger": "1479",
+                "cost": {"cpuInsns": "1646885", "memBytes": "1296481"},
+                "latestLedger": "14245",
             },
         }
 
@@ -535,12 +531,12 @@ class TestSorobanServer:
             root_invocation=stellar_xdr.SorobanAuthorizedInvocation(
                 function=stellar_xdr.SorobanAuthorizedFunction(
                     type=stellar_xdr.SorobanAuthorizedFunctionType.SOROBAN_AUTHORIZED_FUNCTION_TYPE_CONTRACT_FN,
-                    contract_fn=stellar_xdr.SorobanAuthorizedContractFunction(
+                    contract_fn=stellar_xdr.InvokeContractArgs(
                         contract_address=Address(
                             "CDCYWK73YTYFJZZSJ5V7EDFNHYBG4QN3VUNG2IGD27KJDDPNCZKBCBXK"
                         ).to_xdr_sc_address(),
                         function_name=stellar_xdr.SCSymbol(b"increment"),
-                        args=stellar_xdr.SCVec([]),
+                        args=[],
                     ),
                 ),
                 sub_invocations=[],
@@ -635,7 +631,7 @@ class TestSorobanServer:
     def test_send_transaction(self):
         result = {
             "status": "PENDING",
-            "hash": "f59636c3bb27ad958c599632405ed657c3d7d55c717dbfd2644a68625e9d9e7e",
+            "hash": "64977cc4bb7f8bf75bdc47570548a994667899d3319b72f95cb2a64e567ad52c",
             "latestLedger": "1479",
             "latestLedgerCloseTime": "1690594566",
         }
@@ -682,7 +678,9 @@ def _build_soroban_transaction(
     soroban_data: Optional[stellar_xdr.SorobanTransactionData],
     auth: List[stellar_xdr.SorobanAuthorizationEntry],
 ):
-    contract_id = "CDCYWK73YTYFJZZSJ5V7EDFNHYBG4QN3VUNG2IGD27KJDDPNCZKBCBXK"
+    contract_id = (
+        "CDU3PZ4LXVETIFVLS33RDXLD63JZ5GXS7PCV2DJ7BBT6EBPA2AB7YR5H"  # auth contract
+    )
 
     tx_submitter_kp = Keypair.from_secret(
         "SAAPYAPTTRZMCUZFPG3G66V4ZMHTK4TWA6NS7U4F7Z3IMUD52EK4DDEV"
@@ -690,7 +688,7 @@ def _build_soroban_transaction(
     op_invoker_kp = Keypair.from_secret(
         "SAEZSI6DY7AXJFIYA4PM6SIBNEYYXIEM2MSOTHFGKHDW32MBQ7KVO6EN"
     )
-    source = Account(tx_submitter_kp.public_key, 6171868004355)
+    source = Account(tx_submitter_kp.public_key, 3053721747476)
     tx_builder = (
         TransactionBuilder(
             source_account=source,

@@ -65,7 +65,7 @@ class EventInfo(BaseModel):
     contract_id: str = Field(alias="contractId")
     id: str = Field(alias="id")
     paging_token: str = Field(alias="pagingToken")
-    topic: Sequence[str] = Field(alias="topic")
+    topic: List[str] = Field(alias="topic")
     value: EventInfoValue = Field(alias="value")
     in_successful_contract_call: bool = Field(alias="inSuccessfulContractCall")
 
@@ -94,7 +94,7 @@ class GetEventsResponse(BaseModel):
     more information.
     """
 
-    events: Sequence[EventInfo] = Field(alias="events")
+    events: List[EventInfo] = Field(alias="events")
     latest_ledger: int = Field(alias="latestLedger")
 
 
@@ -175,6 +175,11 @@ class SimulateHostFunctionResult(BaseModel):
     xdr: str
 
 
+class RestorePreamble(BaseModel):
+    transaction_data: str = Field(alias="transactionData")
+    min_resource_fee: int = Field(alias="minResourceFee")
+
+
 class SimulateTransactionResponse(BaseModel):
     """Response for JSON-RPC method simulateTransaction.
 
@@ -182,12 +187,19 @@ class SimulateTransactionResponse(BaseModel):
     more information."""
 
     error: Optional[str] = None
-    # Empty string?
-    transaction_data: str = Field(alias="transactionData")
+    transaction_data: Optional[str] = Field(alias="transactionData", default=None)
+    # SorobanTransactionData XDR in base64
+    min_resource_fee: Optional[int] = Field(alias="minResourceFee", default=None)
     events: Optional[List[str]] = None
-    min_resource_fee: int = Field(alias="minResourceFee")
+    # DiagnosticEvent XDR in base64
     results: Optional[List[SimulateHostFunctionResult]] = None
-    cost: SimulateTransactionCost
+    # an array of the individual host function call results
+    cost: Optional[SimulateTransactionCost] = None
+    # the effective cpu and memory cost of the invoked transaction execution.
+    restore_preamble: Optional[RestorePreamble] = Field(
+        alias="restorePreamble", default=None
+    )
+    # If present, it indicates that a prior RestoreFootprint is required
     latest_ledger: int = Field(alias="latestLedger")
 
 
