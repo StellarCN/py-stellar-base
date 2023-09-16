@@ -6,7 +6,6 @@ import base64
 
 from xdrlib3 import Packer, Unpacker
 
-from .contract_entry_body_type import ContractEntryBodyType
 from .hash import Hash
 
 __all__ = ["LedgerKeyContractCode"]
@@ -19,29 +18,23 @@ class LedgerKeyContractCode:
         struct
             {
                 Hash hash;
-                ContractEntryBodyType bodyType;
             }
     """
 
     def __init__(
         self,
         hash: Hash,
-        body_type: ContractEntryBodyType,
     ) -> None:
         self.hash = hash
-        self.body_type = body_type
 
     def pack(self, packer: Packer) -> None:
         self.hash.pack(packer)
-        self.body_type.pack(packer)
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> LedgerKeyContractCode:
         hash = Hash.unpack(unpacker)
-        body_type = ContractEntryBodyType.unpack(unpacker)
         return cls(
             hash=hash,
-            body_type=body_type,
         )
 
     def to_xdr_bytes(self) -> bytes:
@@ -64,21 +57,15 @@ class LedgerKeyContractCode:
         return cls.from_xdr_bytes(xdr_bytes)
 
     def __hash__(self):
-        return hash(
-            (
-                self.hash,
-                self.body_type,
-            )
-        )
+        return hash((self.hash,))
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented
-        return self.hash == other.hash and self.body_type == other.body_type
+        return self.hash == other.hash
 
     def __str__(self):
         out = [
             f"hash={self.hash}",
-            f"body_type={self.body_type}",
         ]
         return f"<LedgerKeyContractCode [{', '.join(out)}]>"

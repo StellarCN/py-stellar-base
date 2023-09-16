@@ -6,35 +6,36 @@ import base64
 
 from xdrlib3 import Packer, Unpacker
 
-from .sc_spec_type_def import SCSpecTypeDef
+from .hash import Hash
 
-__all__ = ["SCSpecTypeSet"]
+__all__ = ["LedgerKeyExpiration"]
 
 
-class SCSpecTypeSet:
+class LedgerKeyExpiration:
     """
     XDR Source Code::
 
-        struct SCSpecTypeSet
-        {
-            SCSpecTypeDef elementType;
-        };
+        struct
+            {
+                // Hash of the LedgerKey that is associated with this ExpirationEntry
+                Hash keyHash;
+            }
     """
 
     def __init__(
         self,
-        element_type: SCSpecTypeDef,
+        key_hash: Hash,
     ) -> None:
-        self.element_type = element_type
+        self.key_hash = key_hash
 
     def pack(self, packer: Packer) -> None:
-        self.element_type.pack(packer)
+        self.key_hash.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> SCSpecTypeSet:
-        element_type = SCSpecTypeDef.unpack(unpacker)
+    def unpack(cls, unpacker: Unpacker) -> LedgerKeyExpiration:
+        key_hash = Hash.unpack(unpacker)
         return cls(
-            element_type=element_type,
+            key_hash=key_hash,
         )
 
     def to_xdr_bytes(self) -> bytes:
@@ -43,7 +44,7 @@ class SCSpecTypeSet:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> SCSpecTypeSet:
+    def from_xdr_bytes(cls, xdr: bytes) -> LedgerKeyExpiration:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -52,20 +53,20 @@ class SCSpecTypeSet:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> SCSpecTypeSet:
+    def from_xdr(cls, xdr: str) -> LedgerKeyExpiration:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
 
     def __hash__(self):
-        return hash((self.element_type,))
+        return hash((self.key_hash,))
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented
-        return self.element_type == other.element_type
+        return self.key_hash == other.key_hash
 
     def __str__(self):
         out = [
-            f"element_type={self.element_type}",
+            f"key_hash={self.key_hash}",
         ]
-        return f"<SCSpecTypeSet [{', '.join(out)}]>"
+        return f"<LedgerKeyExpiration [{', '.join(out)}]>"

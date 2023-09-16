@@ -1249,18 +1249,15 @@ class TransactionBuilder:
         if not StrKey.is_valid_contract(contract_id):
             raise ValueError("`contract_id` is invalid.")
 
-        invoke_params = [
-            Address(contract_id).to_xdr_sc_val(),
-            stellar_xdr.SCVal(
-                stellar_xdr.SCValType.SCV_SYMBOL,
-                sym=stellar_xdr.SCSymbol(sc_symbol=function_name.encode("utf-8")),
-            ),
-            *parameters,
-        ]
-
         host_function = stellar_xdr.HostFunction(
             stellar_xdr.HostFunctionType.HOST_FUNCTION_TYPE_INVOKE_CONTRACT,
-            invoke_contract=stellar_xdr.SCVec(invoke_params),
+            invoke_contract=stellar_xdr.InvokeContractArgs(
+                contract_address=Address(contract_id).to_xdr_sc_address(),
+                function_name=stellar_xdr.SCSymbol(
+                    sc_symbol=function_name.encode("utf-8")
+                ),
+                args=list(parameters),
+            ),
         )
         op = InvokeHostFunction(host_function=host_function, auth=auth, source=source)
         return self.append_operation(op)

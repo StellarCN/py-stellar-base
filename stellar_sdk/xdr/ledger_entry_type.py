@@ -24,7 +24,8 @@ class LedgerEntryType(IntEnum):
             LIQUIDITY_POOL = 5,
             CONTRACT_DATA = 6,
             CONTRACT_CODE = 7,
-            CONFIG_SETTING = 8
+            CONFIG_SETTING = 8,
+            EXPIRATION = 9
         };
     """
 
@@ -37,6 +38,7 @@ class LedgerEntryType(IntEnum):
     CONTRACT_DATA = 6
     CONTRACT_CODE = 7
     CONFIG_SETTING = 8
+    EXPIRATION = 9
 
     def pack(self, packer: Packer) -> None:
         packer.pack_int(self.value)

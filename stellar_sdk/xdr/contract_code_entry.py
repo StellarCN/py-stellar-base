@@ -6,10 +6,9 @@ import base64
 
 from xdrlib3 import Packer, Unpacker
 
-from .contract_code_entry_body import ContractCodeEntryBody
+from .base import Opaque
 from .extension_point import ExtensionPoint
 from .hash import Hash
-from .uint32 import Uint32
 
 __all__ = ["ContractCodeEntry"]
 
@@ -22,15 +21,7 @@ class ContractCodeEntry:
             ExtensionPoint ext;
 
             Hash hash;
-            union switch (ContractEntryBodyType bodyType)
-            {
-            case DATA_ENTRY:
-                opaque code<>;
-            case EXPIRATION_EXTENSION:
-                void;
-            } body;
-
-            uint32 expirationLedgerSeq;
+            opaque code<>;
         };
     """
 
@@ -38,31 +29,26 @@ class ContractCodeEntry:
         self,
         ext: ExtensionPoint,
         hash: Hash,
-        body: ContractCodeEntryBody,
-        expiration_ledger_seq: Uint32,
+        code: bytes,
     ) -> None:
         self.ext = ext
         self.hash = hash
-        self.body = body
-        self.expiration_ledger_seq = expiration_ledger_seq
+        self.code = code
 
     def pack(self, packer: Packer) -> None:
         self.ext.pack(packer)
         self.hash.pack(packer)
-        self.body.pack(packer)
-        self.expiration_ledger_seq.pack(packer)
+        Opaque(self.code, 4294967295, False).pack(packer)
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> ContractCodeEntry:
         ext = ExtensionPoint.unpack(unpacker)
         hash = Hash.unpack(unpacker)
-        body = ContractCodeEntryBody.unpack(unpacker)
-        expiration_ledger_seq = Uint32.unpack(unpacker)
+        code = Opaque.unpack(unpacker, 4294967295, False)
         return cls(
             ext=ext,
             hash=hash,
-            body=body,
-            expiration_ledger_seq=expiration_ledger_seq,
+            code=code,
         )
 
     def to_xdr_bytes(self) -> bytes:
@@ -89,8 +75,7 @@ class ContractCodeEntry:
             (
                 self.ext,
                 self.hash,
-                self.body,
-                self.expiration_ledger_seq,
+                self.code,
             )
         )
 
@@ -100,15 +85,13 @@ class ContractCodeEntry:
         return (
             self.ext == other.ext
             and self.hash == other.hash
-            and self.body == other.body
-            and self.expiration_ledger_seq == other.expiration_ledger_seq
+            and self.code == other.code
         )
 
     def __str__(self):
         out = [
             f"ext={self.ext}",
             f"hash={self.hash}",
-            f"body={self.body}",
-            f"expiration_ledger_seq={self.expiration_ledger_seq}",
+            f"code={self.code}",
         ]
         return f"<ContractCodeEntry [{', '.join(out)}]>"

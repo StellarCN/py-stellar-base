@@ -14,7 +14,6 @@ if TYPE_CHECKING:
     from .sc_spec_type_map import SCSpecTypeMap
     from .sc_spec_type_option import SCSpecTypeOption
     from .sc_spec_type_result import SCSpecTypeResult
-    from .sc_spec_type_set import SCSpecTypeSet
     from .sc_spec_type_tuple import SCSpecTypeTuple
     from .sc_spec_type_udt import SCSpecTypeUDT
     from .sc_spec_type_vec import SCSpecTypeVec
@@ -54,8 +53,6 @@ class SCSpecTypeDef:
             SCSpecTypeVec vec;
         case SC_SPEC_TYPE_MAP:
             SCSpecTypeMap map;
-        case SC_SPEC_TYPE_SET:
-            SCSpecTypeSet set;
         case SC_SPEC_TYPE_TUPLE:
             SCSpecTypeTuple tuple;
         case SC_SPEC_TYPE_BYTES_N:
@@ -72,7 +69,6 @@ class SCSpecTypeDef:
         result: SCSpecTypeResult = None,
         vec: SCSpecTypeVec = None,
         map: SCSpecTypeMap = None,
-        set: SCSpecTypeSet = None,
         tuple: SCSpecTypeTuple = None,
         bytes_n: SCSpecTypeBytesN = None,
         udt: SCSpecTypeUDT = None,
@@ -82,7 +78,6 @@ class SCSpecTypeDef:
         self.result = result
         self.vec = vec
         self.map = map
-        self.set = set
         self.tuple = tuple
         self.bytes_n = bytes_n
         self.udt = udt
@@ -144,11 +139,6 @@ class SCSpecTypeDef:
             if self.map is None:
                 raise ValueError("map should not be None.")
             self.map.pack(packer)
-            return
-        if self.type == SCSpecType.SC_SPEC_TYPE_SET:
-            if self.set is None:
-                raise ValueError("set should not be None.")
-            self.set.pack(packer)
             return
         if self.type == SCSpecType.SC_SPEC_TYPE_TUPLE:
             if self.tuple is None:
@@ -225,11 +215,6 @@ class SCSpecTypeDef:
 
             map = SCSpecTypeMap.unpack(unpacker)
             return cls(type=type, map=map)
-        if type == SCSpecType.SC_SPEC_TYPE_SET:
-            from .sc_spec_type_set import SCSpecTypeSet
-
-            set = SCSpecTypeSet.unpack(unpacker)
-            return cls(type=type, set=set)
         if type == SCSpecType.SC_SPEC_TYPE_TUPLE:
             from .sc_spec_type_tuple import SCSpecTypeTuple
 
@@ -274,7 +259,6 @@ class SCSpecTypeDef:
                 self.result,
                 self.vec,
                 self.map,
-                self.set,
                 self.tuple,
                 self.bytes_n,
                 self.udt,
@@ -290,7 +274,6 @@ class SCSpecTypeDef:
             and self.result == other.result
             and self.vec == other.vec
             and self.map == other.map
-            and self.set == other.set
             and self.tuple == other.tuple
             and self.bytes_n == other.bytes_n
             and self.udt == other.udt
@@ -303,7 +286,6 @@ class SCSpecTypeDef:
         out.append(f"result={self.result}") if self.result is not None else None
         out.append(f"vec={self.vec}") if self.vec is not None else None
         out.append(f"map={self.map}") if self.map is not None else None
-        out.append(f"set={self.set}") if self.set is not None else None
         out.append(f"tuple={self.tuple}") if self.tuple is not None else None
         out.append(f"bytes_n={self.bytes_n}") if self.bytes_n is not None else None
         out.append(f"udt={self.udt}") if self.udt is not None else None

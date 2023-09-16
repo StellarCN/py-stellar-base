@@ -47,17 +47,13 @@ struct StellarValue
     ext;
 };
 
-const MASK_LEDGER_HEADER_FLAGS = 0x7F;
+const MASK_LEDGER_HEADER_FLAGS = 0x7;
 
 enum LedgerHeaderFlags
 {
     DISABLE_LIQUIDITY_POOL_TRADING_FLAG = 0x1,
     DISABLE_LIQUIDITY_POOL_DEPOSIT_FLAG = 0x2,
-    DISABLE_LIQUIDITY_POOL_WITHDRAWAL_FLAG = 0x4,
-    DISABLE_CONTRACT_CREATE = 0x8,
-    DISABLE_CONTRACT_UPDATE = 0x10,
-    DISABLE_CONTRACT_REMOVE = 0x20,
-    DISABLE_CONTRACT_INVOKE = 0x40
+    DISABLE_LIQUIDITY_POOL_WITHDRAWAL_FLAG = 0x4
 };
 
 struct LedgerHeaderExtensionV1
@@ -127,7 +123,8 @@ enum LedgerUpgradeType
     LEDGER_UPGRADE_MAX_TX_SET_SIZE = 3,
     LEDGER_UPGRADE_BASE_RESERVE = 4,
     LEDGER_UPGRADE_FLAGS = 5,
-    LEDGER_UPGRADE_CONFIG = 6
+    LEDGER_UPGRADE_CONFIG = 6,
+    LEDGER_UPGRADE_MAX_SOROBAN_TX_SET_SIZE = 7
 };
 
 struct ConfigUpgradeSetKey {
@@ -148,7 +145,12 @@ case LEDGER_UPGRADE_BASE_RESERVE:
 case LEDGER_UPGRADE_FLAGS:
     uint32 newFlags; // update flags
 case LEDGER_UPGRADE_CONFIG:
+    // Update arbitrary `ConfigSetting` entries identified by the key.
     ConfigUpgradeSetKey newConfig;
+case LEDGER_UPGRADE_MAX_SOROBAN_TX_SET_SIZE:
+    // Update ConfigSettingContractExecutionLanesV0.ledgerMaxTxCount without
+    // using `LEDGER_UPGRADE_CONFIG`.
+    uint32 newMaxSorobanTxSetSize;
 };
 
 struct ConfigUpgradeSet {
@@ -385,7 +387,7 @@ struct ContractEvent
     case 0:
         struct
         {
-            SCVec topics;
+            SCVal topics<>;
             SCVal data;
         } v0;
     }

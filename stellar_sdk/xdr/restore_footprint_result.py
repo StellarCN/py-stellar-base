@@ -21,6 +21,7 @@ class RestoreFootprintResult:
             void;
         case RESTORE_FOOTPRINT_MALFORMED:
         case RESTORE_FOOTPRINT_RESOURCE_LIMIT_EXCEEDED:
+        case RESTORE_FOOTPRINT_INSUFFICIENT_REFUNDABLE_FEE:
             void;
         };
     """
@@ -42,6 +43,11 @@ class RestoreFootprintResult:
             == RestoreFootprintResultCode.RESTORE_FOOTPRINT_RESOURCE_LIMIT_EXCEEDED
         ):
             return
+        if (
+            self.code
+            == RestoreFootprintResultCode.RESTORE_FOOTPRINT_INSUFFICIENT_REFUNDABLE_FEE
+        ):
+            return
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> RestoreFootprintResult:
@@ -51,6 +57,11 @@ class RestoreFootprintResult:
         if code == RestoreFootprintResultCode.RESTORE_FOOTPRINT_MALFORMED:
             return cls(code=code)
         if code == RestoreFootprintResultCode.RESTORE_FOOTPRINT_RESOURCE_LIMIT_EXCEEDED:
+            return cls(code=code)
+        if (
+            code
+            == RestoreFootprintResultCode.RESTORE_FOOTPRINT_INSUFFICIENT_REFUNDABLE_FEE
+        ):
             return cls(code=code)
         return cls(code=code)
 

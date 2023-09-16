@@ -41,7 +41,7 @@ class TransactionResultResult:
             case txBAD_SPONSORSHIP:
             case txBAD_MIN_SEQ_AGE_OR_GAP:
             case txMALFORMED:
-            case txSOROBAN_RESOURCE_LIMIT_EXCEEDED:
+            case txSOROBAN_INVALID:
                 void;
             }
     """
@@ -115,7 +115,7 @@ class TransactionResultResult:
             return
         if self.code == TransactionResultCode.txMALFORMED:
             return
-        if self.code == TransactionResultCode.txSOROBAN_RESOURCE_LIMIT_EXCEEDED:
+        if self.code == TransactionResultCode.txSOROBAN_INVALID:
             return
 
     @classmethod
@@ -167,7 +167,7 @@ class TransactionResultResult:
             return cls(code=code)
         if code == TransactionResultCode.txMALFORMED:
             return cls(code=code)
-        if code == TransactionResultCode.txSOROBAN_RESOURCE_LIMIT_EXCEEDED:
+        if code == TransactionResultCode.txSOROBAN_INVALID:
             return cls(code=code)
         return cls(code=code)
 

@@ -13,7 +13,7 @@ xdr/Stellar-contract-config-setting.x
 
 XDRGEN_REPO=overcat/xdrgen
 XDRGEN_COMMIT=c98916346eeea7e37aaea039de03c1e5ea0a116a
-XDRNEXT_COMMIT=e372df9f677961aac04c5a4cc80a3667f310b29f
+XDRNEXT_COMMIT=9ac02641139e6717924fdad716f6e958d0168491
 
 UNAME := $(shell uname)
 SED := sed
@@ -87,7 +87,7 @@ xdr/%.x:
 .PHONY: xdr
 
 xdr-clean:
-	rm .xdr/*.x || true
+	rm xdr/*.x || true
 	rm stellar_sdk/xdr/*.py || true
 .PHONY: xdr-clean
 

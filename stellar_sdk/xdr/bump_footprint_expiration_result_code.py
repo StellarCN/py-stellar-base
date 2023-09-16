@@ -21,13 +21,15 @@ class BumpFootprintExpirationResultCode(IntEnum):
 
             // codes considered as "failure" for the operation
             BUMP_FOOTPRINT_EXPIRATION_MALFORMED = -1,
-            BUMP_FOOTPRINT_EXPIRATION_RESOURCE_LIMIT_EXCEEDED = -2
+            BUMP_FOOTPRINT_EXPIRATION_RESOURCE_LIMIT_EXCEEDED = -2,
+            BUMP_FOOTPRINT_EXPIRATION_INSUFFICIENT_REFUNDABLE_FEE = -3
         };
     """
 
     BUMP_FOOTPRINT_EXPIRATION_SUCCESS = 0
     BUMP_FOOTPRINT_EXPIRATION_MALFORMED = -1
     BUMP_FOOTPRINT_EXPIRATION_RESOURCE_LIMIT_EXCEEDED = -2
+    BUMP_FOOTPRINT_EXPIRATION_INSUFFICIENT_REFUNDABLE_FEE = -3
 
     def pack(self, packer: Packer) -> None:
         packer.pack_int(self.value)

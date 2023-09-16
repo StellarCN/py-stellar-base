@@ -21,13 +21,15 @@ class RestoreFootprintResultCode(IntEnum):
 
             // codes considered as "failure" for the operation
             RESTORE_FOOTPRINT_MALFORMED = -1,
-            RESTORE_FOOTPRINT_RESOURCE_LIMIT_EXCEEDED = -2
+            RESTORE_FOOTPRINT_RESOURCE_LIMIT_EXCEEDED = -2,
+            RESTORE_FOOTPRINT_INSUFFICIENT_REFUNDABLE_FEE = -3
         };
     """
 
     RESTORE_FOOTPRINT_SUCCESS = 0
     RESTORE_FOOTPRINT_MALFORMED = -1
     RESTORE_FOOTPRINT_RESOURCE_LIMIT_EXCEEDED = -2
+    RESTORE_FOOTPRINT_INSUFFICIENT_REFUNDABLE_FEE = -3
 
     def pack(self, packer: Packer) -> None:
         packer.pack_int(self.value)

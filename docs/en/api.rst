@@ -1158,6 +1158,10 @@ ConfigSettingContractComputeV0
 ------------------------------
 .. autoclass:: stellar_sdk.xdr.config_setting_contract_compute_v0.ConfigSettingContractComputeV0
 
+ConfigSettingContractEventsV0
+-----------------------------
+.. autoclass:: stellar_sdk.xdr.config_setting_contract_events_v0.ConfigSettingContractEventsV0
+
 ConfigSettingContractExecutionLanesV0
 -------------------------------------
 .. autoclass:: stellar_sdk.xdr.config_setting_contract_execution_lanes_v0.ConfigSettingContractExecutionLanesV0
@@ -1169,10 +1173,6 @@ ConfigSettingContractHistoricalDataV0
 ConfigSettingContractLedgerCostV0
 ---------------------------------
 .. autoclass:: stellar_sdk.xdr.config_setting_contract_ledger_cost_v0.ConfigSettingContractLedgerCostV0
-
-ConfigSettingContractMetaDataV0
--------------------------------
-.. autoclass:: stellar_sdk.xdr.config_setting_contract_meta_data_v0.ConfigSettingContractMetaDataV0
 
 ConfigSettingEntry
 ------------------
@@ -1194,10 +1194,6 @@ ContractCodeEntry
 -----------------
 .. autoclass:: stellar_sdk.xdr.contract_code_entry.ContractCodeEntry
 
-ContractCodeEntryBody
----------------------
-.. autoclass:: stellar_sdk.xdr.contract_code_entry_body.ContractCodeEntryBody
-
 ContractCostParamEntry
 ----------------------
 .. autoclass:: stellar_sdk.xdr.contract_cost_param_entry.ContractCostParamEntry
@@ -1217,22 +1213,6 @@ ContractDataDurability
 ContractDataEntry
 -----------------
 .. autoclass:: stellar_sdk.xdr.contract_data_entry.ContractDataEntry
-
-ContractDataEntryBody
----------------------
-.. autoclass:: stellar_sdk.xdr.contract_data_entry_body.ContractDataEntryBody
-
-ContractDataEntryData
----------------------
-.. autoclass:: stellar_sdk.xdr.contract_data_entry_data.ContractDataEntryData
-
-ContractDataFlags
------------------
-.. autoclass:: stellar_sdk.xdr.contract_data_flags.ContractDataFlags
-
-ContractEntryBodyType
----------------------
-.. autoclass:: stellar_sdk.xdr.contract_entry_body_type.ContractEntryBodyType
 
 ContractEvent
 -------------
@@ -1370,6 +1350,14 @@ ErrorCode
 ---------
 .. autoclass:: stellar_sdk.xdr.error_code.ErrorCode
 
+EvictionIterator
+----------------
+.. autoclass:: stellar_sdk.xdr.eviction_iterator.EvictionIterator
+
+ExpirationEntry
+---------------
+.. autoclass:: stellar_sdk.xdr.expiration_entry.ExpirationEntry
+
 ExtensionPoint
 --------------
 .. autoclass:: stellar_sdk.xdr.extension_point.ExtensionPoint
@@ -1506,6 +1494,10 @@ Integer
 -------
 .. autoclass:: stellar_sdk.xdr.base.Integer
 
+InvokeContractArgs
+------------------
+.. autoclass:: stellar_sdk.xdr.invoke_contract_args.InvokeContractArgs
+
 InvokeHostFunctionOp
 --------------------
 .. autoclass:: stellar_sdk.xdr.invoke_host_function_op.InvokeHostFunctionOp
@@ -1641,6 +1633,10 @@ LedgerKeyContractData
 LedgerKeyData
 -------------
 .. autoclass:: stellar_sdk.xdr.ledger_key_data.LedgerKeyData
+
+LedgerKeyExpiration
+-------------------
+.. autoclass:: stellar_sdk.xdr.ledger_key_expiration.LedgerKeyExpiration
 
 LedgerKeyLiquidityPool
 ----------------------
@@ -2114,10 +2110,6 @@ SCSpecTypeResult
 ----------------
 .. autoclass:: stellar_sdk.xdr.sc_spec_type_result.SCSpecTypeResult
 
-SCSpecTypeSet
--------------
-.. autoclass:: stellar_sdk.xdr.sc_spec_type_set.SCSpecTypeSet
-
 SCSpecTypeTuple
 ---------------
 .. autoclass:: stellar_sdk.xdr.sc_spec_type_tuple.SCSpecTypeTuple
@@ -2273,10 +2265,6 @@ SorobanAddressCredentials
 SorobanAuthorizationEntry
 -------------------------
 .. autoclass:: stellar_sdk.xdr.soroban_authorization_entry.SorobanAuthorizationEntry
-
-SorobanAuthorizedContractFunction
----------------------------------
-.. autoclass:: stellar_sdk.xdr.soroban_authorized_contract_function.SorobanAuthorizedContractFunction
 
 SorobanAuthorizedFunction
 -------------------------
@@ -2602,7 +2590,6 @@ Constants
 .. autodata:: stellar_sdk.xdr.constants.MASK_ACCOUNT_FLAGS
 .. autodata:: stellar_sdk.xdr.constants.MASK_ACCOUNT_FLAGS_V17
 .. autodata:: stellar_sdk.xdr.constants.MASK_CLAIMABLE_BALANCE_FLAGS
-.. autodata:: stellar_sdk.xdr.constants.MASK_CONTRACT_DATA_FLAGS_V20
 .. autodata:: stellar_sdk.xdr.constants.MASK_LEDGER_HEADER_FLAGS
 .. autodata:: stellar_sdk.xdr.constants.MASK_OFFERENTRY_FLAGS
 .. autodata:: stellar_sdk.xdr.constants.MASK_TRUSTLINE_FLAGS
@@ -2614,3 +2601,5 @@ Constants
 .. autodata:: stellar_sdk.xdr.constants.SC_SPEC_DOC_LIMIT
 .. autodata:: stellar_sdk.xdr.constants.TX_ADVERT_VECTOR_MAX_SIZE
 .. autodata:: stellar_sdk.xdr.constants.TX_DEMAND_VECTOR_MAX_SIZE
+(stellar-sdk-py3.10) py-stellar-base [soroban-update●●]
+

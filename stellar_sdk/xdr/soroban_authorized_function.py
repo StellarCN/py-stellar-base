@@ -7,7 +7,7 @@ import base64
 from xdrlib3 import Packer, Unpacker
 
 from .create_contract_args import CreateContractArgs
-from .soroban_authorized_contract_function import SorobanAuthorizedContractFunction
+from .invoke_contract_args import InvokeContractArgs
 from .soroban_authorized_function_type import SorobanAuthorizedFunctionType
 
 __all__ = ["SorobanAuthorizedFunction"]
@@ -20,7 +20,7 @@ class SorobanAuthorizedFunction:
         union SorobanAuthorizedFunction switch (SorobanAuthorizedFunctionType type)
         {
         case SOROBAN_AUTHORIZED_FUNCTION_TYPE_CONTRACT_FN:
-            SorobanAuthorizedContractFunction contractFn;
+            InvokeContractArgs contractFn;
         case SOROBAN_AUTHORIZED_FUNCTION_TYPE_CREATE_CONTRACT_HOST_FN:
             CreateContractArgs createContractHostFn;
         };
@@ -29,7 +29,7 @@ class SorobanAuthorizedFunction:
     def __init__(
         self,
         type: SorobanAuthorizedFunctionType,
-        contract_fn: SorobanAuthorizedContractFunction = None,
+        contract_fn: InvokeContractArgs = None,
         create_contract_host_fn: CreateContractArgs = None,
     ) -> None:
         self.type = type
@@ -62,7 +62,7 @@ class SorobanAuthorizedFunction:
             type
             == SorobanAuthorizedFunctionType.SOROBAN_AUTHORIZED_FUNCTION_TYPE_CONTRACT_FN
         ):
-            contract_fn = SorobanAuthorizedContractFunction.unpack(unpacker)
+            contract_fn = InvokeContractArgs.unpack(unpacker)
             return cls(type=type, contract_fn=contract_fn)
         if (
             type
