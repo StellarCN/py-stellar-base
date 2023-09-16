@@ -308,10 +308,6 @@ class SorobanServer:
                 "Simulation transaction failed, the response contains error information.",
                 resp,
             )
-        if not resp.results or len(resp.results) != 1:
-            raise PrepareTransactionException(
-                f'Simulation transaction failed, the "results" field is invalid.', resp
-            )
         te = _assemble_transaction(transaction_envelope, resp)
         return te
 
@@ -325,7 +321,6 @@ class SorobanServer:
             self.server_url,
             json_data=json.loads(json_data),
         )
-        print(json.dumps(data.json()))
         response = Response[response_body_type].model_validate(data.json())  # type: ignore[valid-type]
         if response.error:
             raise SorobanRpcErrorResponse(
@@ -358,9 +353,6 @@ def _assemble_transaction(
             "type RestoreFootprint, InvokeHostFunction or BumpFootprintExpiration"
         )
 
-    if not simulation.results or len(simulation.results) != 1:
-        raise ValueError(f"Simulation results invalid: {simulation.results}")
-
     min_resource_fee = simulation.min_resource_fee
     assert simulation.transaction_data is not None
     soroban_data = stellar_xdr.SorobanTransactionData.from_xdr(
@@ -378,6 +370,8 @@ def _assemble_transaction(
         and not op.auth
         and simulation.results[0].auth
     ):
+        if not simulation.results or len(simulation.results) != 1:
+            raise ValueError(f"Simulation results invalid: {simulation.results}")
         op.auth = [
             stellar_xdr.SorobanAuthorizationEntry.from_xdr(xdr)
             for xdr in simulation.results[0].auth

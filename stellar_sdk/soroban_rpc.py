@@ -193,7 +193,9 @@ class SimulateTransactionResponse(BaseModel):
     events: Optional[List[str]] = None
     # DiagnosticEvent XDR in base64
     results: Optional[List[SimulateHostFunctionResult]] = None
-    # an array of the individual host function call results
+    # an array of the individual host function call results.
+    # This will only contain a single element if present, because only a single invokeHostFunctionOperation
+    # is supported per transaction.
     cost: Optional[SimulateTransactionCost] = None
     # the effective cpu and memory cost of the invoked transaction execution.
     restore_preamble: Optional[RestorePreamble] = Field(
