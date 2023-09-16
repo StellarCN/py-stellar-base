@@ -584,49 +584,33 @@ class TestSorobanServer:
                 == SimulateTransactionResponse.model_validate(data["result"])
             )
 
-    def test_prepare_transaction_invalid_results_prepare_transaction_exception_raise(
+    def test_prepare_transaction_invalid_results_value_raise(
         self,
     ):
+        # this error should not happen
         data = {
             "jsonrpc": "2.0",
-            "id": "e1fabdcdf0244a2a9adfab94d7748b6c",
+            "id": "7a469b9d6ed4444893491be530862ce3",
             "result": {
-                "transactionData": "AAAAAAAAAAIAAAAGAAAAAcWLK/vE8FTnMk9r8gytPgJuQbutGm0gw9fUkY3tFlQRAAAAFAAAAAEAAAAAAAAAB300Hyg0HZG+Qie3zvsxLvugrNtFqd3AIntWy9bg2YvZAAAAAAAAAAEAAAAGAAAAAcWLK/vE8FTnMk9r8gytPgJuQbutGm0gw9fUkY3tFlQRAAAAEAAAAAEAAAACAAAADwAAAAdDb3VudGVyAAAAABIAAAAAAAAAAFi3xKLI8peqjz0kcSgf38zsr+SOVmMxPsGOEqc+ypihAAAAAQAAAAAAFcLDAAAF8AAAAQgAAAMcAAAAAAAAAJw=",
+                "transactionData": "AAAAAAAAAAIAAAAGAAAAAem354u9STQWq5b3Ed1j9tOemvL7xV0NPwhn4gXg0AP8AAAAFAAAAAEAAAAH8dTe2OoI0BnhlDbH0fWvXmvprkBvBAgKIcL9busuuMEAAAABAAAABgAAAAHpt+eLvUk0FquW9xHdY/bTnpry+8VdDT8IZ+IF4NAD/AAAABAAAAABAAAAAgAAAA8AAAAHQ291bnRlcgAAAAASAAAAAAAAAABYt8SiyPKXqo89JHEoH9/M7K/kjlZjMT7BjhKnPsqYoQAAAAEAHifGAAAFlAAAAIgAAAAAAAAAAg==",
+                "minResourceFee": "58181",
                 "events": [
-                    "AAAAAQAAAAAAAAAAAAAAAgAAAAAAAAADAAAADwAAAAdmbl9jYWxsAAAAAA0AAAAgxYsr+8TwVOcyT2vyDK0+Am5Bu60abSDD19SRje0WVBEAAAAPAAAACWluY3JlbWVudAAAAAAAABAAAAABAAAAAgAAABIAAAAAAAAAAFi3xKLI8peqjz0kcSgf38zsr+SOVmMxPsGOEqc+ypihAAAAAwAAAAo=",
-                    "AAAAAQAAAAAAAAABxYsr+8TwVOcyT2vyDK0+Am5Bu60abSDD19SRje0WVBEAAAACAAAAAAAAAAIAAAAPAAAACWZuX3JldHVybgAAAAAAAA8AAAAJaW5jcmVtZW50AAAAAAAAAwAAABQ=",
+                    "AAAAAQAAAAAAAAAAAAAAAgAAAAAAAAADAAAADwAAAAdmbl9jYWxsAAAAAA0AAAAg6bfni71JNBarlvcR3WP2056a8vvFXQ0/CGfiBeDQA/wAAAAPAAAACWluY3JlbWVudAAAAAAAABAAAAABAAAAAgAAABIAAAAAAAAAAFi3xKLI8peqjz0kcSgf38zsr+SOVmMxPsGOEqc+ypihAAAAAwAAAAo=",
+                    "AAAAAQAAAAAAAAAB6bfni71JNBarlvcR3WP2056a8vvFXQ0/CGfiBeDQA/wAAAACAAAAAAAAAAIAAAAPAAAACWZuX3JldHVybgAAAAAAAA8AAAAJaW5jcmVtZW50AAAAAAAAAwAAABQ=",
                 ],
-                "minResourceFee": "58595",
-                "results": [
-                    {
-                        "auth": [
-                            "AAAAAAAAAAAAAAABxYsr+8TwVOcyT2vyDK0+Am5Bu60abSDD19SRje0WVBEAAAAJaW5jcmVtZW50AAAAAAAAAgAAABIAAAAAAAAAAFi3xKLI8peqjz0kcSgf38zsr+SOVmMxPsGOEqc+ypihAAAAAwAAAAoAAAAA"
-                        ],
-                        "xdr": "AAAAAwAAABQ=",
-                    },
-                    {
-                        "auth": [
-                            "AAAAAAAAAAAAAAABxYsr+8TwVOcyT2vyDK0+Am5Bu60abSDD19SRje0WVBEAAAAJaW5jcmVtZW50AAAAAAAAAgAAABIAAAAAAAAAAFi3xKLI8peqjz0kcSgf38zsr+SOVmMxPsGOEqc+ypihAAAAAwAAAAoAAAAA"
-                        ],
-                        "xdr": "AAAAAwAAABQ=",
-                    },
-                ],
-                "cost": {"cpuInsns": "1240100", "memBytes": "161637"},
-                "latestLedger": "1479",
+                "results": [],
+                "cost": {"cpuInsns": "1646885", "memBytes": "1296481"},
+                "latestLedger": "14245",
             },
         }
         transaction = _build_soroban_transaction(None, [])
         with requests_mock.Mocker() as m:
             m.post(PRC_URL, json=data)
             with pytest.raises(
-                PrepareTransactionException,
-                match='Simulation transaction failed, the "results" field is invalid.',
+                ValueError,
+                match="Simulation results invalid",
             ) as e:
                 SorobanServer(PRC_URL).prepare_transaction(transaction)
-            assert (
-                e.value.simulate_transaction_response
-                == SimulateTransactionResponse.model_validate(data["result"])
-            )
 
     def test_send_transaction(self):
         result = {
