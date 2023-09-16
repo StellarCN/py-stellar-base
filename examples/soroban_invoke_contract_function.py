@@ -6,7 +6,7 @@
     to deploy the [Hello World contract](https://github.com/stellar/soroban-examples/tree/main/hello_world) first.
 
 2. Install Stellar Python SDK from pypi:
-    pip install stellar-sdk==9.0.0a1
+    pip install stellar-sdk==9.0.0a2
 
 3. Modify the necessary parameters in this script, then run it.
 """
