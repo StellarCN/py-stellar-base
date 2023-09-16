@@ -365,15 +365,14 @@ def _assemble_transaction(
     te.transaction.soroban_data = soroban_data
 
     op = te.transaction.operations[0]
-    if (
-        isinstance(op, InvokeHostFunction)
-        and not op.auth
-        and simulation.results[0].auth
-    ):
+
+    if isinstance(op, InvokeHostFunction):
         if not simulation.results or len(simulation.results) != 1:
             raise ValueError(f"Simulation results invalid: {simulation.results}")
-        op.auth = [
-            stellar_xdr.SorobanAuthorizationEntry.from_xdr(xdr)
-            for xdr in simulation.results[0].auth
-        ]
+
+        if not op.auth and simulation.results[0].auth:
+            op.auth = [
+                stellar_xdr.SorobanAuthorizationEntry.from_xdr(xdr)
+                for xdr in simulation.results[0].auth
+            ]
     return te
