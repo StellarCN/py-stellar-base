@@ -35,7 +35,6 @@ tx = (
         contract_id=contract_id,
         function_name=func_name,
         parameters=args,
-        source=op_invoker_kp.public_key
     )
     .build()
 )
@@ -47,7 +46,7 @@ try:
     op.auth = [authorize_entry(
         simulate_resp.results[0].auth[0], op_invoker_kp, simulate_resp.latest_ledger + 50, network_passphrase
     )]
-    tx = soroban_server.prepare_transaction(tx)
+    tx = soroban_server.prepare_transaction(tx, simulate_resp)
 except PrepareTransactionException as e:
     print(f"Got exception: {e.simulate_transaction_response}")
     raise e

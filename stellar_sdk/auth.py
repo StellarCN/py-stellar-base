@@ -82,12 +82,12 @@ def authorize_entry(
 
     # This structure is defined here:
     # https://soroban.stellar.org/docs/fundamentals-and-concepts/invoking-contracts-with-transactions#stellar-account-signatures
-    addr_auth.signature = scval.to_map(
+    addr_auth.signature = scval.to_vec([scval.to_map(
         {
             scval.to_symbol("public_key"): scval.to_bytes(public_key),
             scval.to_symbol("signature"): scval.to_bytes(signature),
         }
-    )
+    )])
     return entry
 
 
