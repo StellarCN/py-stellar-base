@@ -12,7 +12,6 @@ class TestSorobanDataBuilder:
                 read_only=[],
                 read_write=[],
             ),
-            extended_meta_data_size_bytes=stellar_xdr.Uint32(0),
             read_bytes=stellar_xdr.Uint32(0),
             write_bytes=stellar_xdr.Uint32(0),
             instructions=stellar_xdr.Uint32(0),
@@ -33,7 +32,6 @@ class TestSorobanDataBuilder:
                     read_only=[],
                     read_write=[],
                 ),
-                extended_meta_data_size_bytes=stellar_xdr.Uint32(1),
                 read_bytes=stellar_xdr.Uint32(2),
                 write_bytes=stellar_xdr.Uint32(3),
                 instructions=stellar_xdr.Uint32(4),
@@ -53,7 +51,6 @@ class TestSorobanDataBuilder:
                     read_only=[],
                     read_write=[],
                 ),
-                extended_meta_data_size_bytes=stellar_xdr.Uint32(1),
                 read_bytes=stellar_xdr.Uint32(2),
                 write_bytes=stellar_xdr.Uint32(3),
                 instructions=stellar_xdr.Uint32(4),
@@ -70,7 +67,7 @@ class TestSorobanDataBuilder:
         assert builder.build().refundable_fee.int64 == 100
 
     def test_set_resources(self):
-        data = SorobanDataBuilder().set_resources(1, 2, 3, 4).build()
+        data = SorobanDataBuilder().set_resources(1, 2, 3).build()
         assert data == stellar_xdr.SorobanTransactionData(
             ext=stellar_xdr.ExtensionPoint(0),
             refundable_fee=stellar_xdr.Int64(0),
@@ -82,7 +79,6 @@ class TestSorobanDataBuilder:
                 instructions=stellar_xdr.Uint32(1),
                 read_bytes=stellar_xdr.Uint32(2),
                 write_bytes=stellar_xdr.Uint32(3),
-                extended_meta_data_size_bytes=stellar_xdr.Uint32(4),
             ),
         )
 
@@ -104,7 +100,6 @@ class TestSorobanDataBuilder:
                     read_only=[ledger_key],
                     read_write=[],
                 ),
-                extended_meta_data_size_bytes=stellar_xdr.Uint32(0),
                 read_bytes=stellar_xdr.Uint32(0),
                 write_bytes=stellar_xdr.Uint32(0),
                 instructions=stellar_xdr.Uint32(0),
@@ -129,7 +124,6 @@ class TestSorobanDataBuilder:
                     read_only=[],
                     read_write=[ledger_key],
                 ),
-                extended_meta_data_size_bytes=stellar_xdr.Uint32(0),
                 read_bytes=stellar_xdr.Uint32(0),
                 write_bytes=stellar_xdr.Uint32(0),
                 instructions=stellar_xdr.Uint32(0),

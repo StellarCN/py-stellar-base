@@ -8,7 +8,7 @@ from xdrlib3 import Packer, Unpacker
 
 from .int64 import Int64
 from .sc_address import SCAddress
-from .sc_vec import SCVec
+from .sc_val import SCVal
 from .uint32 import Uint32
 
 __all__ = ["SorobanAddressCredentials"]
@@ -23,7 +23,7 @@ class SorobanAddressCredentials:
             SCAddress address;
             int64 nonce;
             uint32 signatureExpirationLedger;
-            SCVec signatureArgs;
+            SCVal signature;
         };
     """
 
@@ -32,30 +32,30 @@ class SorobanAddressCredentials:
         address: SCAddress,
         nonce: Int64,
         signature_expiration_ledger: Uint32,
-        signature_args: SCVec,
+        signature: SCVal,
     ) -> None:
         self.address = address
         self.nonce = nonce
         self.signature_expiration_ledger = signature_expiration_ledger
-        self.signature_args = signature_args
+        self.signature = signature
 
     def pack(self, packer: Packer) -> None:
         self.address.pack(packer)
         self.nonce.pack(packer)
         self.signature_expiration_ledger.pack(packer)
-        self.signature_args.pack(packer)
+        self.signature.pack(packer)
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> SorobanAddressCredentials:
         address = SCAddress.unpack(unpacker)
         nonce = Int64.unpack(unpacker)
         signature_expiration_ledger = Uint32.unpack(unpacker)
-        signature_args = SCVec.unpack(unpacker)
+        signature = SCVal.unpack(unpacker)
         return cls(
             address=address,
             nonce=nonce,
             signature_expiration_ledger=signature_expiration_ledger,
-            signature_args=signature_args,
+            signature=signature,
         )
 
     def to_xdr_bytes(self) -> bytes:
@@ -83,7 +83,7 @@ class SorobanAddressCredentials:
                 self.address,
                 self.nonce,
                 self.signature_expiration_ledger,
-                self.signature_args,
+                self.signature,
             )
         )
 
@@ -94,7 +94,7 @@ class SorobanAddressCredentials:
             self.address == other.address
             and self.nonce == other.nonce
             and self.signature_expiration_ledger == other.signature_expiration_ledger
-            and self.signature_args == other.signature_args
+            and self.signature == other.signature
         )
 
     def __str__(self):
@@ -102,6 +102,6 @@ class SorobanAddressCredentials:
             f"address={self.address}",
             f"nonce={self.nonce}",
             f"signature_expiration_ledger={self.signature_expiration_ledger}",
-            f"signature_args={self.signature_args}",
+            f"signature={self.signature}",
         ]
         return f"<SorobanAddressCredentials [{', '.join(out)}]>"

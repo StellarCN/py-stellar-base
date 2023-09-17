@@ -21,6 +21,7 @@ class BumpFootprintExpirationResult:
             void;
         case BUMP_FOOTPRINT_EXPIRATION_MALFORMED:
         case BUMP_FOOTPRINT_EXPIRATION_RESOURCE_LIMIT_EXCEEDED:
+        case BUMP_FOOTPRINT_EXPIRATION_INSUFFICIENT_REFUNDABLE_FEE:
             void;
         };
     """
@@ -48,6 +49,11 @@ class BumpFootprintExpirationResult:
             == BumpFootprintExpirationResultCode.BUMP_FOOTPRINT_EXPIRATION_RESOURCE_LIMIT_EXCEEDED
         ):
             return
+        if (
+            self.code
+            == BumpFootprintExpirationResultCode.BUMP_FOOTPRINT_EXPIRATION_INSUFFICIENT_REFUNDABLE_FEE
+        ):
+            return
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> BumpFootprintExpirationResult:
@@ -62,6 +68,11 @@ class BumpFootprintExpirationResult:
         if (
             code
             == BumpFootprintExpirationResultCode.BUMP_FOOTPRINT_EXPIRATION_RESOURCE_LIMIT_EXCEEDED
+        ):
+            return cls(code=code)
+        if (
+            code
+            == BumpFootprintExpirationResultCode.BUMP_FOOTPRINT_EXPIRATION_INSUFFICIENT_REFUNDABLE_FEE
         ):
             return cls(code=code)
         return cls(code=code)

@@ -27,10 +27,6 @@ class SorobanResources:
             uint32 readBytes;
             // The maximum number of bytes this transaction can write to ledger
             uint32 writeBytes;
-
-            // Maximum size of dynamic metadata produced by this contract (
-            // currently only includes the events).
-            uint32 extendedMetaDataSizeBytes;
         };
     """
 
@@ -40,20 +36,17 @@ class SorobanResources:
         instructions: Uint32,
         read_bytes: Uint32,
         write_bytes: Uint32,
-        extended_meta_data_size_bytes: Uint32,
     ) -> None:
         self.footprint = footprint
         self.instructions = instructions
         self.read_bytes = read_bytes
         self.write_bytes = write_bytes
-        self.extended_meta_data_size_bytes = extended_meta_data_size_bytes
 
     def pack(self, packer: Packer) -> None:
         self.footprint.pack(packer)
         self.instructions.pack(packer)
         self.read_bytes.pack(packer)
         self.write_bytes.pack(packer)
-        self.extended_meta_data_size_bytes.pack(packer)
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> SorobanResources:
@@ -61,13 +54,11 @@ class SorobanResources:
         instructions = Uint32.unpack(unpacker)
         read_bytes = Uint32.unpack(unpacker)
         write_bytes = Uint32.unpack(unpacker)
-        extended_meta_data_size_bytes = Uint32.unpack(unpacker)
         return cls(
             footprint=footprint,
             instructions=instructions,
             read_bytes=read_bytes,
             write_bytes=write_bytes,
-            extended_meta_data_size_bytes=extended_meta_data_size_bytes,
         )
 
     def to_xdr_bytes(self) -> bytes:
@@ -96,7 +87,6 @@ class SorobanResources:
                 self.instructions,
                 self.read_bytes,
                 self.write_bytes,
-                self.extended_meta_data_size_bytes,
             )
         )
 
@@ -108,8 +98,6 @@ class SorobanResources:
             and self.instructions == other.instructions
             and self.read_bytes == other.read_bytes
             and self.write_bytes == other.write_bytes
-            and self.extended_meta_data_size_bytes
-            == other.extended_meta_data_size_bytes
         )
 
     def __str__(self):
@@ -118,6 +106,5 @@ class SorobanResources:
             f"instructions={self.instructions}",
             f"read_bytes={self.read_bytes}",
             f"write_bytes={self.write_bytes}",
-            f"extended_meta_data_size_bytes={self.extended_meta_data_size_bytes}",
         ]
         return f"<SorobanResources [{', '.join(out)}]>"

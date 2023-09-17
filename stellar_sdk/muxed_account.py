@@ -132,6 +132,9 @@ class MuxedAccount:
         )
         return cls(account_id=account_id, account_muxed_id=account_id_id)
 
+    def __hash__(self):
+        return hash((self.account_id, self.account_muxed_id))
+
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
             return NotImplemented

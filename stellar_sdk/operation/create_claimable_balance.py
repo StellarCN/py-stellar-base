@@ -35,6 +35,9 @@ class ClaimPredicateGroup:
         self.left = left
         self.right = right
 
+    def __hash__(self):
+        return hash((self.left, self.right))
+
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
             return NotImplemented
@@ -284,6 +287,18 @@ class ClaimPredicate:
                 f"{claim_predicate_type} is an unsupported ClaimPredicateType."
             )
 
+    def __hash__(self):
+        return hash(
+            (
+                self.claim_predicate_type,
+                self.and_predicates,
+                self.or_predicates,
+                self.not_predicate,
+                self.abs_before,
+                self.rel_before,
+            )
+        )
+
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
             return NotImplemented
@@ -341,6 +356,9 @@ class Claimant:
         )
         predicate = ClaimPredicate.from_xdr_object(xdr_object.v0.predicate)
         return cls(destination=destination, predicate=predicate)
+
+    def __hash__(self):
+        return hash((self.destination, self.predicate))
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):

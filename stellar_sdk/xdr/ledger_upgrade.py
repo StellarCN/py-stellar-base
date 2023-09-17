@@ -30,7 +30,12 @@ class LedgerUpgrade:
         case LEDGER_UPGRADE_FLAGS:
             uint32 newFlags; // update flags
         case LEDGER_UPGRADE_CONFIG:
+            // Update arbitrary `ConfigSetting` entries identified by the key.
             ConfigUpgradeSetKey newConfig;
+        case LEDGER_UPGRADE_MAX_SOROBAN_TX_SET_SIZE:
+            // Update ConfigSettingContractExecutionLanesV0.ledgerMaxTxCount without
+            // using `LEDGER_UPGRADE_CONFIG`.
+            uint32 newMaxSorobanTxSetSize;
         };
     """
 
@@ -43,6 +48,7 @@ class LedgerUpgrade:
         new_base_reserve: Uint32 = None,
         new_flags: Uint32 = None,
         new_config: ConfigUpgradeSetKey = None,
+        new_max_soroban_tx_set_size: Uint32 = None,
     ) -> None:
         self.type = type
         self.new_ledger_version = new_ledger_version
@@ -51,6 +57,7 @@ class LedgerUpgrade:
         self.new_base_reserve = new_base_reserve
         self.new_flags = new_flags
         self.new_config = new_config
+        self.new_max_soroban_tx_set_size = new_max_soroban_tx_set_size
 
     def pack(self, packer: Packer) -> None:
         self.type.pack(packer)
@@ -84,6 +91,11 @@ class LedgerUpgrade:
                 raise ValueError("new_config should not be None.")
             self.new_config.pack(packer)
             return
+        if self.type == LedgerUpgradeType.LEDGER_UPGRADE_MAX_SOROBAN_TX_SET_SIZE:
+            if self.new_max_soroban_tx_set_size is None:
+                raise ValueError("new_max_soroban_tx_set_size should not be None.")
+            self.new_max_soroban_tx_set_size.pack(packer)
+            return
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> LedgerUpgrade:
@@ -106,6 +118,11 @@ class LedgerUpgrade:
         if type == LedgerUpgradeType.LEDGER_UPGRADE_CONFIG:
             new_config = ConfigUpgradeSetKey.unpack(unpacker)
             return cls(type=type, new_config=new_config)
+        if type == LedgerUpgradeType.LEDGER_UPGRADE_MAX_SOROBAN_TX_SET_SIZE:
+            new_max_soroban_tx_set_size = Uint32.unpack(unpacker)
+            return cls(
+                type=type, new_max_soroban_tx_set_size=new_max_soroban_tx_set_size
+            )
         return cls(type=type)
 
     def to_xdr_bytes(self) -> bytes:
@@ -137,6 +154,7 @@ class LedgerUpgrade:
                 self.new_base_reserve,
                 self.new_flags,
                 self.new_config,
+                self.new_max_soroban_tx_set_size,
             )
         )
 
@@ -151,6 +169,7 @@ class LedgerUpgrade:
             and self.new_base_reserve == other.new_base_reserve
             and self.new_flags == other.new_flags
             and self.new_config == other.new_config
+            and self.new_max_soroban_tx_set_size == other.new_max_soroban_tx_set_size
         )
 
     def __str__(self):
@@ -174,4 +193,7 @@ class LedgerUpgrade:
         out.append(
             f"new_config={self.new_config}"
         ) if self.new_config is not None else None
+        out.append(
+            f"new_max_soroban_tx_set_size={self.new_max_soroban_tx_set_size}"
+        ) if self.new_max_soroban_tx_set_size is not None else None
         return f"<LedgerUpgrade [{', '.join(out)}]>"

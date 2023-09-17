@@ -58,6 +58,16 @@ class ChallengeTransaction:
         self.matched_home_domain = matched_home_domain
         self.memo = memo
 
+    def __hash__(self):
+        return hash(
+            (
+                self.transaction,
+                self.client_account_id,
+                self.matched_home_domain,
+                self.memo,
+            )
+        )
+
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
             return NotImplemented

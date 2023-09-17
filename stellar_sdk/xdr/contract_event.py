@@ -33,7 +33,7 @@ class ContractEvent:
             case 0:
                 struct
                 {
-                    SCVec topics;
+                    SCVal topics<>;
                     SCVal data;
                 } v0;
             }

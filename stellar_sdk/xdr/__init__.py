@@ -75,6 +75,7 @@ from .clawback_result import ClawbackResult
 from .clawback_result_code import ClawbackResultCode
 from .config_setting_contract_bandwidth_v0 import ConfigSettingContractBandwidthV0
 from .config_setting_contract_compute_v0 import ConfigSettingContractComputeV0
+from .config_setting_contract_events_v0 import ConfigSettingContractEventsV0
 from .config_setting_contract_execution_lanes_v0 import (
     ConfigSettingContractExecutionLanesV0,
 )
@@ -82,23 +83,17 @@ from .config_setting_contract_historical_data_v0 import (
     ConfigSettingContractHistoricalDataV0,
 )
 from .config_setting_contract_ledger_cost_v0 import ConfigSettingContractLedgerCostV0
-from .config_setting_contract_meta_data_v0 import ConfigSettingContractMetaDataV0
 from .config_setting_entry import ConfigSettingEntry
 from .config_setting_id import ConfigSettingID
 from .config_upgrade_set import ConfigUpgradeSet
 from .config_upgrade_set_key import ConfigUpgradeSetKey
 from .constants import *
 from .contract_code_entry import ContractCodeEntry
-from .contract_code_entry_body import ContractCodeEntryBody
 from .contract_cost_param_entry import ContractCostParamEntry
 from .contract_cost_params import ContractCostParams
 from .contract_cost_type import ContractCostType
 from .contract_data_durability import ContractDataDurability
 from .contract_data_entry import ContractDataEntry
-from .contract_data_entry_body import ContractDataEntryBody
-from .contract_data_entry_data import ContractDataEntryData
-from .contract_data_flags import ContractDataFlags
-from .contract_entry_body_type import ContractEntryBodyType
 from .contract_event import ContractEvent
 from .contract_event_body import ContractEventBody
 from .contract_event_type import ContractEventType
@@ -134,6 +129,8 @@ from .end_sponsoring_future_reserves_result_code import (
 from .envelope_type import EnvelopeType
 from .error import Error
 from .error_code import ErrorCode
+from .eviction_iterator import EvictionIterator
+from .expiration_entry import ExpirationEntry
 from .extension_point import ExtensionPoint
 from .fee_bump_transaction import FeeBumpTransaction
 from .fee_bump_transaction_envelope import FeeBumpTransactionEnvelope
@@ -164,6 +161,7 @@ from .int32 import Int32
 from .int64 import Int64
 from .int128_parts import Int128Parts
 from .int256_parts import Int256Parts
+from .invoke_contract_args import InvokeContractArgs
 from .invoke_host_function_op import InvokeHostFunctionOp
 from .invoke_host_function_result import InvokeHostFunctionResult
 from .invoke_host_function_result_code import InvokeHostFunctionResultCode
@@ -199,6 +197,7 @@ from .ledger_key_config_setting import LedgerKeyConfigSetting
 from .ledger_key_contract_code import LedgerKeyContractCode
 from .ledger_key_contract_data import LedgerKeyContractData
 from .ledger_key_data import LedgerKeyData
+from .ledger_key_expiration import LedgerKeyExpiration
 from .ledger_key_liquidity_pool import LedgerKeyLiquidityPool
 from .ledger_key_offer import LedgerKeyOffer
 from .ledger_key_trust_line import LedgerKeyTrustLine
@@ -308,7 +307,6 @@ from .sc_spec_type_def import SCSpecTypeDef
 from .sc_spec_type_map import SCSpecTypeMap
 from .sc_spec_type_option import SCSpecTypeOption
 from .sc_spec_type_result import SCSpecTypeResult
-from .sc_spec_type_set import SCSpecTypeSet
 from .sc_spec_type_tuple import SCSpecTypeTuple
 from .sc_spec_type_udt import SCSpecTypeUDT
 from .sc_spec_type_vec import SCSpecTypeVec
@@ -360,7 +358,6 @@ from .signer_key_type import SignerKeyType
 from .simple_payment_result import SimplePaymentResult
 from .soroban_address_credentials import SorobanAddressCredentials
 from .soroban_authorization_entry import SorobanAuthorizationEntry
-from .soroban_authorized_contract_function import SorobanAuthorizedContractFunction
 from .soroban_authorized_function import SorobanAuthorizedFunction
 from .soroban_authorized_function_type import SorobanAuthorizedFunctionType
 from .soroban_authorized_invocation import SorobanAuthorizedInvocation

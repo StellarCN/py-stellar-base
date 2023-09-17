@@ -39,7 +39,6 @@ enum SCSpecType
     SC_SPEC_TYPE_OPTION = 1000,
     SC_SPEC_TYPE_RESULT = 1001,
     SC_SPEC_TYPE_VEC = 1002,
-    SC_SPEC_TYPE_SET = 1003,
     SC_SPEC_TYPE_MAP = 1004,
     SC_SPEC_TYPE_TUPLE = 1005,
     SC_SPEC_TYPE_BYTES_N = 1006,
@@ -68,11 +67,6 @@ struct SCSpecTypeMap
 {
     SCSpecTypeDef keyType;
     SCSpecTypeDef valueType;
-};
-
-struct SCSpecTypeSet
-{
-    SCSpecTypeDef elementType;
 };
 
 struct SCSpecTypeTuple
@@ -119,8 +113,6 @@ case SC_SPEC_TYPE_VEC:
     SCSpecTypeVec vec;
 case SC_SPEC_TYPE_MAP:
     SCSpecTypeMap map;
-case SC_SPEC_TYPE_SET:
-    SCSpecTypeSet set;
 case SC_SPEC_TYPE_TUPLE:
     SCSpecTypeTuple tuple;
 case SC_SPEC_TYPE_BYTES_N:

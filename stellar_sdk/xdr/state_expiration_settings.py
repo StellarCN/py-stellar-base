@@ -21,7 +21,6 @@ class StateExpirationSettings:
             uint32 maxEntryExpiration;
             uint32 minTempEntryExpiration;
             uint32 minPersistentEntryExpiration;
-            uint32 autoBumpLedgers;
 
             // rent_fee = wfee_rate_average / rent_rate_denominator_for_type
             int64 persistentRentRateDenominator;
@@ -35,6 +34,9 @@ class StateExpirationSettings:
 
             // Maximum number of bytes that we scan for eviction per ledger
             uint64 evictionScanSize;
+
+            // Lowest BucketList level to be scanned to evict entries
+            uint32 startingEvictionScanLevel;
         };
     """
 
@@ -43,55 +45,55 @@ class StateExpirationSettings:
         max_entry_expiration: Uint32,
         min_temp_entry_expiration: Uint32,
         min_persistent_entry_expiration: Uint32,
-        auto_bump_ledgers: Uint32,
         persistent_rent_rate_denominator: Int64,
         temp_rent_rate_denominator: Int64,
         max_entries_to_expire: Uint32,
         bucket_list_size_window_sample_size: Uint32,
         eviction_scan_size: Uint64,
+        starting_eviction_scan_level: Uint32,
     ) -> None:
         self.max_entry_expiration = max_entry_expiration
         self.min_temp_entry_expiration = min_temp_entry_expiration
         self.min_persistent_entry_expiration = min_persistent_entry_expiration
-        self.auto_bump_ledgers = auto_bump_ledgers
         self.persistent_rent_rate_denominator = persistent_rent_rate_denominator
         self.temp_rent_rate_denominator = temp_rent_rate_denominator
         self.max_entries_to_expire = max_entries_to_expire
         self.bucket_list_size_window_sample_size = bucket_list_size_window_sample_size
         self.eviction_scan_size = eviction_scan_size
+        self.starting_eviction_scan_level = starting_eviction_scan_level
 
     def pack(self, packer: Packer) -> None:
         self.max_entry_expiration.pack(packer)
         self.min_temp_entry_expiration.pack(packer)
         self.min_persistent_entry_expiration.pack(packer)
-        self.auto_bump_ledgers.pack(packer)
         self.persistent_rent_rate_denominator.pack(packer)
         self.temp_rent_rate_denominator.pack(packer)
         self.max_entries_to_expire.pack(packer)
         self.bucket_list_size_window_sample_size.pack(packer)
         self.eviction_scan_size.pack(packer)
+        self.starting_eviction_scan_level.pack(packer)
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> StateExpirationSettings:
         max_entry_expiration = Uint32.unpack(unpacker)
         min_temp_entry_expiration = Uint32.unpack(unpacker)
         min_persistent_entry_expiration = Uint32.unpack(unpacker)
-        auto_bump_ledgers = Uint32.unpack(unpacker)
         persistent_rent_rate_denominator = Int64.unpack(unpacker)
         temp_rent_rate_denominator = Int64.unpack(unpacker)
         max_entries_to_expire = Uint32.unpack(unpacker)
         bucket_list_size_window_sample_size = Uint32.unpack(unpacker)
         eviction_scan_size = Uint64.unpack(unpacker)
+        starting_eviction_scan_level = Uint32.unpack(unpacker)
         return cls(
             max_entry_expiration=max_entry_expiration,
             min_temp_entry_expiration=min_temp_entry_expiration,
             min_persistent_entry_expiration=min_persistent_entry_expiration,
-            auto_bump_ledgers=auto_bump_ledgers,
             persistent_rent_rate_denominator=persistent_rent_rate_denominator,
             temp_rent_rate_denominator=temp_rent_rate_denominator,
             max_entries_to_expire=max_entries_to_expire,
             bucket_list_size_window_sample_size=bucket_list_size_window_sample_size,
             eviction_scan_size=eviction_scan_size,
+            starting_eviction_scan_level=starting_eviction_scan_level,
         )
 
     def to_xdr_bytes(self) -> bytes:
@@ -119,12 +121,12 @@ class StateExpirationSettings:
                 self.max_entry_expiration,
                 self.min_temp_entry_expiration,
                 self.min_persistent_entry_expiration,
-                self.auto_bump_ledgers,
                 self.persistent_rent_rate_denominator,
                 self.temp_rent_rate_denominator,
                 self.max_entries_to_expire,
                 self.bucket_list_size_window_sample_size,
                 self.eviction_scan_size,
+                self.starting_eviction_scan_level,
             )
         )
 
@@ -136,7 +138,6 @@ class StateExpirationSettings:
             and self.min_temp_entry_expiration == other.min_temp_entry_expiration
             and self.min_persistent_entry_expiration
             == other.min_persistent_entry_expiration
-            and self.auto_bump_ledgers == other.auto_bump_ledgers
             and self.persistent_rent_rate_denominator
             == other.persistent_rent_rate_denominator
             and self.temp_rent_rate_denominator == other.temp_rent_rate_denominator
@@ -144,6 +145,7 @@ class StateExpirationSettings:
             and self.bucket_list_size_window_sample_size
             == other.bucket_list_size_window_sample_size
             and self.eviction_scan_size == other.eviction_scan_size
+            and self.starting_eviction_scan_level == other.starting_eviction_scan_level
         )
 
     def __str__(self):
@@ -151,11 +153,11 @@ class StateExpirationSettings:
             f"max_entry_expiration={self.max_entry_expiration}",
             f"min_temp_entry_expiration={self.min_temp_entry_expiration}",
             f"min_persistent_entry_expiration={self.min_persistent_entry_expiration}",
-            f"auto_bump_ledgers={self.auto_bump_ledgers}",
             f"persistent_rent_rate_denominator={self.persistent_rent_rate_denominator}",
             f"temp_rent_rate_denominator={self.temp_rent_rate_denominator}",
             f"max_entries_to_expire={self.max_entries_to_expire}",
             f"bucket_list_size_window_sample_size={self.bucket_list_size_window_sample_size}",
             f"eviction_scan_size={self.eviction_scan_size}",
+            f"starting_eviction_scan_level={self.starting_eviction_scan_level}",
         ]
         return f"<StateExpirationSettings [{', '.join(out)}]>"

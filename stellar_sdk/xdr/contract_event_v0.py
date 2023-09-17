@@ -3,11 +3,11 @@
 from __future__ import annotations
 
 import base64
+from typing import List
 
 from xdrlib3 import Packer, Unpacker
 
 from .sc_val import SCVal
-from .sc_vec import SCVec
 
 __all__ = ["ContractEventV0"]
 
@@ -18,26 +18,36 @@ class ContractEventV0:
 
         struct
                 {
-                    SCVec topics;
+                    SCVal topics<>;
                     SCVal data;
                 }
     """
 
     def __init__(
         self,
-        topics: SCVec,
+        topics: List[SCVal],
         data: SCVal,
     ) -> None:
+        _expect_max_length = 4294967295
+        if topics and len(topics) > _expect_max_length:
+            raise ValueError(
+                f"The maximum length of `topics` should be {_expect_max_length}, but got {len(topics)}."
+            )
         self.topics = topics
         self.data = data
 
     def pack(self, packer: Packer) -> None:
-        self.topics.pack(packer)
+        packer.pack_uint(len(self.topics))
+        for topics_item in self.topics:
+            topics_item.pack(packer)
         self.data.pack(packer)
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> ContractEventV0:
-        topics = SCVec.unpack(unpacker)
+        length = unpacker.unpack_uint()
+        topics = []
+        for _ in range(length):
+            topics.append(SCVal.unpack(unpacker))
         data = SCVal.unpack(unpacker)
         return cls(
             topics=topics,

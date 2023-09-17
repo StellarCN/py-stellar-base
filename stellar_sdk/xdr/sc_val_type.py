@@ -34,8 +34,7 @@ class SCValType(IntEnum):
 
             // 128 bits is naturally supported by Rust and we use it for Soroban
             // fixed-point arithmetic prices / balances / similar "quantities". These
-            // are represented in XDR as a pair of 2 u64s, unlike {u,i}256 which is
-            // represented as an array of 32 bytes.
+            // are represented in XDR as a pair of 2 u64s.
             SCV_U128 = 9,
             SCV_I128 = 10,
 

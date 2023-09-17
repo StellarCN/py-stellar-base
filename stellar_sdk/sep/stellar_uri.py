@@ -250,6 +250,23 @@ class PayStellarUri(StellarUri):
             f"origin_domain={self.origin_domain}, signature={self.signature}]>"
         )
 
+    def __hash__(self):
+        return hash(
+            (
+                self.destination,
+                self.amount,
+                self.asset_code,
+                self.asset_issuer,
+                self.memo,
+                self.memo_type,
+                self.callback,
+                self.msg,
+                self.network_passphrase,
+                self.origin_domain,
+                self.signature,
+            )
+        )
+
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
             return NotImplemented
@@ -298,6 +315,9 @@ class Replacement:
             f"reference_identifier={self.reference_identifier}, "
             f"hint={self.hint}]>"
         )
+
+    def __hash__(self):
+        return hash((self.txrep_tx_field_name, self.reference_identifier, self.hint))
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
@@ -465,6 +485,20 @@ class TransactionStellarUri(StellarUri):
             f"callback={self.callback}, pubkey={self.pubkey}, "
             f"msg={self.msg}, network_passphrase={self.network_passphrase}, "
             f"origin_domain={self.origin_domain}, signature={self.signature}]>"
+        )
+
+    def __hash__(self):
+        return hash(
+            (
+                self.transaction_envelope,
+                self.replace,
+                self.callback,
+                self.pubkey,
+                self.msg,
+                self.network_passphrase,
+                self.origin_domain,
+                self.signature,
+            )
         )
 
     def __eq__(self, other: object) -> bool:

@@ -113,6 +113,9 @@ class FeeBumpTransactionEnvelope(BaseTransactionEnvelope["FeeBumpTransactionEnve
         te = cls(tx, network_passphrase=network_passphrase, signatures=signatures)
         return te
 
+    def __hash__(self):
+        return hash((self.transaction, self.network_passphrase, self.signatures))
+
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
             return NotImplemented

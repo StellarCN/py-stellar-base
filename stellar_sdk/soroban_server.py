@@ -3,7 +3,7 @@ from __future__ import annotations
 import copy
 import json
 import uuid
-from typing import TYPE_CHECKING, Type
+from typing import TYPE_CHECKING, Sequence, Type
 
 from . import Keypair
 from . import xdr as stellar_xdr
@@ -260,7 +260,6 @@ class SorobanServer:
                 contract=sc_address,
                 key=key,
                 durability=xdr_durability,
-                body_type=stellar_xdr.ContractEntryBodyType.DATA_ENTRY,
             ),
         )
         resp = self.get_ledger_entries([contract_key])
@@ -309,10 +308,6 @@ class SorobanServer:
                 "Simulation transaction failed, the response contains error information.",
                 resp,
             )
-        if not resp.results or len(resp.results) != 1:
-            raise PrepareTransactionException(
-                f'Simulation transaction failed, the "results" field is invalid.', resp
-            )
         te = _assemble_transaction(transaction_envelope, resp)
         return te
 
@@ -358,30 +353,26 @@ def _assemble_transaction(
             "type RestoreFootprint, InvokeHostFunction or BumpFootprintExpiration"
         )
 
-    if not simulation.results or len(simulation.results) != 1:
-        raise ValueError(f"Simulation results invalid: {simulation.results}")
-
     min_resource_fee = simulation.min_resource_fee
+    assert simulation.transaction_data is not None
     soroban_data = stellar_xdr.SorobanTransactionData.from_xdr(
         simulation.transaction_data
     )
-
-    # TODO: https://discord.com/channels/897514728459468821/1112853306881081354/1112853306881081354
-    # soroban_data.resources.instructions = stellar_xdr.Uint32(soroban_data.resources.instructions.uint32 * 2)
-
     te = copy.deepcopy(transaction_envelope)
     te.signatures = []
+    assert min_resource_fee is not None
     te.transaction.fee += min_resource_fee
     te.transaction.soroban_data = soroban_data
 
     op = te.transaction.operations[0]
-    if (
-        isinstance(op, InvokeHostFunction)
-        and not op.auth
-        and simulation.results[0].auth
-    ):
-        op.auth = [
-            stellar_xdr.SorobanAuthorizationEntry.from_xdr(xdr)
-            for xdr in simulation.results[0].auth
-        ]
+
+    if isinstance(op, InvokeHostFunction):
+        if not simulation.results or len(simulation.results) != 1:
+            raise ValueError(f"Simulation results invalid: {simulation.results}")
+
+        if not op.auth and simulation.results[0].auth:
+            op.auth = [
+                stellar_xdr.SorobanAuthorizationEntry.from_xdr(xdr)
+                for xdr in simulation.results[0].auth
+            ]
     return te

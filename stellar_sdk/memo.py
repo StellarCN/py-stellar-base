@@ -52,6 +52,10 @@ class Memo(object, metaclass=abc.ABCMeta):
         return memo_cls.from_xdr_object(xdr_object)  # type: ignore[attr-defined]
 
     @abc.abstractmethod
+    def __hash__(self):
+        pass  # pragma: no cover
+
+    @abc.abstractmethod
     def __eq__(self, other: object) -> bool:
         pass  # pragma: no cover
 
@@ -68,6 +72,9 @@ class NoneMemo(Memo):
     def to_xdr_object(self) -> stellar_xdr.Memo:
         """Creates an XDR Memo object that represents this :class:`NoneMemo`."""
         return stellar_xdr.Memo(type=stellar_xdr.MemoType.MEMO_NONE)
+
+    def __hash__(self):
+        return hash(None)
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
@@ -112,6 +119,9 @@ class TextMemo(Memo):
             type=stellar_xdr.MemoType.MEMO_TEXT, text=self.memo_text
         )
 
+    def __hash__(self):
+        return hash(self.memo_text)
+
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
             return NotImplemented
@@ -149,6 +159,9 @@ class IdMemo(Memo):
         return stellar_xdr.Memo(
             type=stellar_xdr.MemoType.MEMO_ID, id=stellar_xdr.Uint64(self.memo_id)
         )
+
+    def __hash__(self):
+        return hash(self.memo_id)
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
@@ -188,6 +201,9 @@ class HashMemo(Memo):
         return stellar_xdr.Memo(
             type=stellar_xdr.MemoType.MEMO_HASH, hash=stellar_xdr.Hash(self.memo_hash)
         )
+
+    def __hash__(self):
+        return hash(self.memo_hash)
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
@@ -233,6 +249,9 @@ class ReturnHashMemo(Memo):
             type=stellar_xdr.MemoType.MEMO_RETURN,
             ret_hash=stellar_xdr.Hash(self.memo_return),
         )
+
+    def __hash__(self):
+        return hash(self.memo_return)
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):

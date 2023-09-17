@@ -45,6 +45,9 @@ class LiquidityPoolId:
         liquidity_pool_id = xdr_object.liquidity_pool_id.pool_id.hash.hex()
         return cls(liquidity_pool_id)
 
+    def __hash__(self):
+        return hash((self.liquidity_pool_id, self.type))
+
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
             return NotImplemented
