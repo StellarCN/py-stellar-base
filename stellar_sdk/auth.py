@@ -82,13 +82,12 @@ def authorize_entry(
 
     # This structure is defined here:
     # https://soroban.stellar.org/docs/fundamentals-and-concepts/invoking-contracts-with-transactions#stellar-account-signatures
-    sig_scval = scval.to_map(
+    addr_auth.signature = scval.to_map(
         {
             scval.to_symbol("public_key"): scval.to_bytes(public_key),
             scval.to_symbol("signature"): scval.to_bytes(signature),
         }
     )
-    addr_auth.signature_args = stellar_xdr.SCVec([sig_scval])
     return entry
 
 
@@ -135,7 +134,7 @@ def authorize_invocation(
                 address=Address(pk).to_xdr_sc_address(),
                 nonce=stellar_xdr.Int64(nonce),
                 signature_expiration_ledger=stellar_xdr.Uint32(0),
-                signature_args=stellar_xdr.SCVec([]),
+                signature=stellar_xdr.SCVal(type=stellar_xdr.SCValType.SCV_VOID),
             ),
         ),
     )
