@@ -1,6 +1,9 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
+from __future__ import annotations
+
 import base64
+
 from xdrlib3 import Packer, Unpacker
 
 from .int64 import Int64
@@ -17,10 +20,10 @@ class LiquidityPoolDepositOp:
         struct LiquidityPoolDepositOp
         {
             PoolID liquidityPoolID;
-            int64 maxAmountA;     // maximum amount of first asset to deposit
-            int64 maxAmountB;     // maximum amount of second asset to deposit
-            Price minPrice;       // minimum depositA/depositB
-            Price maxPrice;       // maximum depositA/depositB
+            int64 maxAmountA; // maximum amount of first asset to deposit
+            int64 maxAmountB; // maximum amount of second asset to deposit
+            Price minPrice;   // minimum depositA/depositB
+            Price maxPrice;   // maximum depositA/depositB
         };
     """
 
@@ -46,7 +49,7 @@ class LiquidityPoolDepositOp:
         self.max_price.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "LiquidityPoolDepositOp":
+    def unpack(cls, unpacker: Unpacker) -> LiquidityPoolDepositOp:
         liquidity_pool_id = PoolID.unpack(unpacker)
         max_amount_a = Int64.unpack(unpacker)
         max_amount_b = Int64.unpack(unpacker)
@@ -66,7 +69,7 @@ class LiquidityPoolDepositOp:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "LiquidityPoolDepositOp":
+    def from_xdr_bytes(cls, xdr: bytes) -> LiquidityPoolDepositOp:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -75,9 +78,20 @@ class LiquidityPoolDepositOp:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "LiquidityPoolDepositOp":
+    def from_xdr(cls, xdr: str) -> LiquidityPoolDepositOp:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def __hash__(self):
+        return hash(
+            (
+                self.liquidity_pool_id,
+                self.max_amount_a,
+                self.max_amount_b,
+                self.min_price,
+                self.max_price,
+            )
+        )
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):

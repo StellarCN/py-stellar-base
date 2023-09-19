@@ -1,16 +1,15 @@
-from typing import List, Union
+from typing import Sequence, Union
+
 from xdrlib3 import Packer
 
 from . import xdr as stellar_xdr
 from .base_transaction_envelope import BaseTransactionEnvelope
 from .decorated_signature import DecoratedSignature
 from .fee_bump_transaction import FeeBumpTransaction
-from .type_checked import type_checked
 
 __all__ = ["FeeBumpTransactionEnvelope"]
 
 
-@type_checked
 class FeeBumpTransactionEnvelope(BaseTransactionEnvelope["FeeBumpTransactionEnvelope"]):
     """The :class:`FeeBumpTransactionEnvelope` object, which represents a fee bump transaction
     envelope ready to sign and submit to send over the network.
@@ -34,7 +33,7 @@ class FeeBumpTransactionEnvelope(BaseTransactionEnvelope["FeeBumpTransactionEnve
         self,
         transaction: FeeBumpTransaction,
         network_passphrase: str,
-        signatures: List[DecoratedSignature] = None,
+        signatures: Sequence[DecoratedSignature] = None,
     ) -> None:
         super().__init__(network_passphrase, signatures)
         self.transaction: FeeBumpTransaction = transaction
@@ -113,6 +112,9 @@ class FeeBumpTransactionEnvelope(BaseTransactionEnvelope["FeeBumpTransactionEnve
         ]
         te = cls(tx, network_passphrase=network_passphrase, signatures=signatures)
         return te
+
+    def __hash__(self):
+        return hash((self.transaction, self.network_passphrase, self.signatures))
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):

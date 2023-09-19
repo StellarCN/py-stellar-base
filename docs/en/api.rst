@@ -9,11 +9,20 @@ API Documentation
 
 
 Account
-^^^^^^^^
+^^^^^^^
 
 .. autoclass:: stellar_sdk.account.Account
    :members:
    :inherited-members:
+
+Address
+^^^^^^^
+
+.. autoclass:: stellar_sdk.address.Address
+   :members:
+
+.. autoclass:: stellar_sdk.address.AddressType
+   :members:
 
 Asset
 ^^^^^
@@ -622,6 +631,21 @@ SetTrustLineFlags
 .. autoclass:: stellar_sdk.operation.set_trust_line_flags.TrustLineFlags
    :members:
 
+InvokeHostFunction
+------------------
+.. autoclass:: stellar_sdk.operation.InvokeHostFunction
+   :members: to_xdr_object, from_xdr_object
+
+BumpFootprintExpiration
+-----------------------
+.. autoclass:: stellar_sdk.operation.BumpFootprintExpiration
+   :members: to_xdr_object, from_xdr_object
+
+RestoreFootprint
+----------------
+.. autoclass:: stellar_sdk.operation.RestoreFootprint
+   :members: to_xdr_object, from_xdr_object
+
 Price
 ^^^^^
 
@@ -713,6 +737,66 @@ TransactionBuilder
 
 .. autoclass:: stellar_sdk.transaction_builder.TransactionBuilder
    :members:
+
+SorobanDataBuilder
+^^^^^^^^^^^^^^^^^^
+
+.. autoclass:: stellar_sdk.SorobanDataBuilder
+   :members:
+
+SorobanServer
+^^^^^^^^^^^^^
+
+.. autoclass:: stellar_sdk.SorobanServer
+   :members:
+
+Soroban RPC Definitions
+^^^^^^^^^^^^^^^^^^^^^^^
+.. automodule:: stellar_sdk.soroban_rpc
+   :members:
+
+scval
+^^^^^
+.. autofunction:: stellar_sdk.scval.to_address
+.. autofunction:: stellar_sdk.scval.from_address
+.. autofunction:: stellar_sdk.scval.to_bool
+.. autofunction:: stellar_sdk.scval.from_bool
+.. autofunction:: stellar_sdk.scval.to_bytes
+.. autofunction:: stellar_sdk.scval.from_bytes
+.. autofunction:: stellar_sdk.scval.to_duration
+.. autofunction:: stellar_sdk.scval.from_duration
+.. autofunction:: stellar_sdk.scval.to_int32
+.. autofunction:: stellar_sdk.scval.from_int32
+.. autofunction:: stellar_sdk.scval.to_int64
+.. autofunction:: stellar_sdk.scval.from_int64
+.. autofunction:: stellar_sdk.scval.to_int128
+.. autofunction:: stellar_sdk.scval.from_int128
+.. autofunction:: stellar_sdk.scval.to_int256
+.. autofunction:: stellar_sdk.scval.from_int256
+.. autofunction:: stellar_sdk.scval.to_map
+.. autofunction:: stellar_sdk.scval.from_map
+.. autofunction:: stellar_sdk.scval.to_string
+.. autofunction:: stellar_sdk.scval.from_string
+.. autofunction:: stellar_sdk.scval.to_symbol
+.. autofunction:: stellar_sdk.scval.from_symbol
+.. autofunction:: stellar_sdk.scval.to_timepoint
+.. autofunction:: stellar_sdk.scval.from_timepoint
+.. autofunction:: stellar_sdk.scval.to_uint32
+.. autofunction:: stellar_sdk.scval.from_uint32
+.. autofunction:: stellar_sdk.scval.to_uint64
+.. autofunction:: stellar_sdk.scval.from_uint64
+.. autofunction:: stellar_sdk.scval.to_uint128
+.. autofunction:: stellar_sdk.scval.from_uint128
+.. autofunction:: stellar_sdk.scval.to_uint256
+.. autofunction:: stellar_sdk.scval.from_uint256
+.. autofunction:: stellar_sdk.scval.to_vec
+.. autofunction:: stellar_sdk.scval.from_vec
+.. autofunction:: stellar_sdk.scval.to_enum
+.. autofunction:: stellar_sdk.scval.from_enum
+.. autofunction:: stellar_sdk.scval.to_tuple_struct
+.. autofunction:: stellar_sdk.scval.from_tuple_struct
+.. autofunction:: stellar_sdk.scval.to_struct
+.. autofunction:: stellar_sdk.scval.from_struct
 
 Helpers
 ^^^^^^^
@@ -922,6 +1006,18 @@ BucketMetadataExt
 -----------------
 .. autoclass:: stellar_sdk.xdr.bucket_metadata_ext.BucketMetadataExt
 
+BumpFootprintExpirationOp
+-------------------------
+.. autoclass:: stellar_sdk.xdr.bump_footprint_expiration_op.BumpFootprintExpirationOp
+
+BumpFootprintExpirationResult
+-----------------------------
+.. autoclass:: stellar_sdk.xdr.bump_footprint_expiration_result.BumpFootprintExpirationResult
+
+BumpFootprintExpirationResultCode
+---------------------------------
+.. autoclass:: stellar_sdk.xdr.bump_footprint_expiration_result_code.BumpFootprintExpirationResultCode
+
 BumpSequenceOp
 --------------
 .. autoclass:: stellar_sdk.xdr.bump_sequence_op.BumpSequenceOp
@@ -1054,6 +1150,106 @@ ClawbackResultCode
 ------------------
 .. autoclass:: stellar_sdk.xdr.clawback_result_code.ClawbackResultCode
 
+ConfigSettingContractBandwidthV0
+--------------------------------
+.. autoclass:: stellar_sdk.xdr.config_setting_contract_bandwidth_v0.ConfigSettingContractBandwidthV0
+
+ConfigSettingContractComputeV0
+------------------------------
+.. autoclass:: stellar_sdk.xdr.config_setting_contract_compute_v0.ConfigSettingContractComputeV0
+
+ConfigSettingContractEventsV0
+-----------------------------
+.. autoclass:: stellar_sdk.xdr.config_setting_contract_events_v0.ConfigSettingContractEventsV0
+
+ConfigSettingContractExecutionLanesV0
+-------------------------------------
+.. autoclass:: stellar_sdk.xdr.config_setting_contract_execution_lanes_v0.ConfigSettingContractExecutionLanesV0
+
+ConfigSettingContractHistoricalDataV0
+-------------------------------------
+.. autoclass:: stellar_sdk.xdr.config_setting_contract_historical_data_v0.ConfigSettingContractHistoricalDataV0
+
+ConfigSettingContractLedgerCostV0
+---------------------------------
+.. autoclass:: stellar_sdk.xdr.config_setting_contract_ledger_cost_v0.ConfigSettingContractLedgerCostV0
+
+ConfigSettingEntry
+------------------
+.. autoclass:: stellar_sdk.xdr.config_setting_entry.ConfigSettingEntry
+
+ConfigSettingID
+---------------
+.. autoclass:: stellar_sdk.xdr.config_setting_id.ConfigSettingID
+
+ConfigUpgradeSet
+----------------
+.. autoclass:: stellar_sdk.xdr.config_upgrade_set.ConfigUpgradeSet
+
+ConfigUpgradeSetKey
+-------------------
+.. autoclass:: stellar_sdk.xdr.config_upgrade_set_key.ConfigUpgradeSetKey
+
+ContractCodeEntry
+-----------------
+.. autoclass:: stellar_sdk.xdr.contract_code_entry.ContractCodeEntry
+
+ContractCostParamEntry
+----------------------
+.. autoclass:: stellar_sdk.xdr.contract_cost_param_entry.ContractCostParamEntry
+
+ContractCostParams
+------------------
+.. autoclass:: stellar_sdk.xdr.contract_cost_params.ContractCostParams
+
+ContractCostType
+----------------
+.. autoclass:: stellar_sdk.xdr.contract_cost_type.ContractCostType
+
+ContractDataDurability
+----------------------
+.. autoclass:: stellar_sdk.xdr.contract_data_durability.ContractDataDurability
+
+ContractDataEntry
+-----------------
+.. autoclass:: stellar_sdk.xdr.contract_data_entry.ContractDataEntry
+
+ContractEvent
+-------------
+.. autoclass:: stellar_sdk.xdr.contract_event.ContractEvent
+
+ContractEventBody
+-----------------
+.. autoclass:: stellar_sdk.xdr.contract_event_body.ContractEventBody
+
+ContractEventType
+-----------------
+.. autoclass:: stellar_sdk.xdr.contract_event_type.ContractEventType
+
+ContractEventV0
+---------------
+.. autoclass:: stellar_sdk.xdr.contract_event_v0.ContractEventV0
+
+ContractExecutable
+------------------
+.. autoclass:: stellar_sdk.xdr.contract_executable.ContractExecutable
+
+ContractExecutableType
+----------------------
+.. autoclass:: stellar_sdk.xdr.contract_executable_type.ContractExecutableType
+
+ContractIDPreimage
+------------------
+.. autoclass:: stellar_sdk.xdr.contract_id_preimage.ContractIDPreimage
+
+ContractIDPreimageFromAddress
+-----------------------------
+.. autoclass:: stellar_sdk.xdr.contract_id_preimage_from_address.ContractIDPreimageFromAddress
+
+ContractIDPreimageType
+----------------------
+.. autoclass:: stellar_sdk.xdr.contract_id_preimage_type.ContractIDPreimageType
+
 CreateAccountOp
 ---------------
 .. autoclass:: stellar_sdk.xdr.create_account_op.CreateAccountOp
@@ -1077,6 +1273,10 @@ CreateClaimableBalanceResult
 CreateClaimableBalanceResultCode
 --------------------------------
 .. autoclass:: stellar_sdk.xdr.create_claimable_balance_result_code.CreateClaimableBalanceResultCode
+
+CreateContractArgs
+------------------
+.. autoclass:: stellar_sdk.xdr.create_contract_args.CreateContractArgs
 
 CreatePassiveSellOfferOp
 ------------------------
@@ -1109,6 +1309,10 @@ DataValue
 DecoratedSignature
 ------------------
 .. autoclass:: stellar_sdk.xdr.decorated_signature.DecoratedSignature
+
+DiagnosticEvent
+---------------
+.. autoclass:: stellar_sdk.xdr.diagnostic_event.DiagnosticEvent
 
 DontHave
 --------
@@ -1146,6 +1350,14 @@ ErrorCode
 ---------
 .. autoclass:: stellar_sdk.xdr.error_code.ErrorCode
 
+EvictionIterator
+----------------
+.. autoclass:: stellar_sdk.xdr.eviction_iterator.EvictionIterator
+
+ExpirationEntry
+---------------
+.. autoclass:: stellar_sdk.xdr.expiration_entry.ExpirationEntry
+
 ExtensionPoint
 --------------
 .. autoclass:: stellar_sdk.xdr.extension_point.ExtensionPoint
@@ -1170,6 +1382,18 @@ Float
 -----
 .. autoclass:: stellar_sdk.xdr.base.Float
 
+FloodAdvert
+-----------
+.. autoclass:: stellar_sdk.xdr.flood_advert.FloodAdvert
+
+FloodDemand
+-----------
+.. autoclass:: stellar_sdk.xdr.flood_demand.FloodDemand
+
+GeneralizedTransactionSet
+-------------------------
+.. autoclass:: stellar_sdk.xdr.generalized_transaction_set.GeneralizedTransactionSet
+
 Hash
 ----
 .. autoclass:: stellar_sdk.xdr.hash.Hash
@@ -1178,6 +1402,10 @@ HashIDPreimage
 --------------
 .. autoclass:: stellar_sdk.xdr.hash_id_preimage.HashIDPreimage
 
+HashIDPreimageContractID
+------------------------
+.. autoclass:: stellar_sdk.xdr.hash_id_preimage_contract_id.HashIDPreimageContractID
+
 HashIDPreimageOperationID
 -------------------------
 .. autoclass:: stellar_sdk.xdr.hash_id_preimage_operation_id.HashIDPreimageOperationID
@@ -1185,6 +1413,10 @@ HashIDPreimageOperationID
 HashIDPreimageRevokeID
 ----------------------
 .. autoclass:: stellar_sdk.xdr.hash_id_preimage_revoke_id.HashIDPreimageRevokeID
+
+HashIDPreimageSorobanAuthorization
+----------------------------------
+.. autoclass:: stellar_sdk.xdr.hash_id_preimage_soroban_authorization.HashIDPreimageSorobanAuthorization
 
 Hello
 -----
@@ -1197,6 +1429,14 @@ HmacSha256Key
 HmacSha256Mac
 -------------
 .. autoclass:: stellar_sdk.xdr.hmac_sha256_mac.HmacSha256Mac
+
+HostFunction
+------------
+.. autoclass:: stellar_sdk.xdr.host_function.HostFunction
+
+HostFunctionType
+----------------
+.. autoclass:: stellar_sdk.xdr.host_function_type.HostFunctionType
 
 Hyper
 -----
@@ -1234,6 +1474,14 @@ InnerTransactionResultResult
 ----------------------------
 .. autoclass:: stellar_sdk.xdr.inner_transaction_result_result.InnerTransactionResultResult
 
+Int128Parts
+-----------
+.. autoclass:: stellar_sdk.xdr.int128_parts.Int128Parts
+
+Int256Parts
+-----------
+.. autoclass:: stellar_sdk.xdr.int256_parts.Int256Parts
+
 Int32
 -----
 .. autoclass:: stellar_sdk.xdr.int32.Int32
@@ -1246,6 +1494,26 @@ Integer
 -------
 .. autoclass:: stellar_sdk.xdr.base.Integer
 
+InvokeContractArgs
+------------------
+.. autoclass:: stellar_sdk.xdr.invoke_contract_args.InvokeContractArgs
+
+InvokeHostFunctionOp
+--------------------
+.. autoclass:: stellar_sdk.xdr.invoke_host_function_op.InvokeHostFunctionOp
+
+InvokeHostFunctionResult
+------------------------
+.. autoclass:: stellar_sdk.xdr.invoke_host_function_result.InvokeHostFunctionResult
+
+InvokeHostFunctionResultCode
+----------------------------
+.. autoclass:: stellar_sdk.xdr.invoke_host_function_result_code.InvokeHostFunctionResultCode
+
+InvokeHostFunctionSuccessPreImage
+---------------------------------
+.. autoclass:: stellar_sdk.xdr.invoke_host_function_success_pre_image.InvokeHostFunctionSuccessPreImage
+
 LedgerBounds
 ------------
 .. autoclass:: stellar_sdk.xdr.ledger_bounds.LedgerBounds
@@ -1257,6 +1525,14 @@ LedgerCloseMeta
 LedgerCloseMetaV0
 -----------------
 .. autoclass:: stellar_sdk.xdr.ledger_close_meta_v0.LedgerCloseMetaV0
+
+LedgerCloseMetaV1
+-----------------
+.. autoclass:: stellar_sdk.xdr.ledger_close_meta_v1.LedgerCloseMetaV1
+
+LedgerCloseMetaV2
+-----------------
+.. autoclass:: stellar_sdk.xdr.ledger_close_meta_v2.LedgerCloseMetaV2
 
 LedgerCloseValueSignature
 -------------------------
@@ -1298,6 +1574,10 @@ LedgerEntryType
 ---------------
 .. autoclass:: stellar_sdk.xdr.ledger_entry_type.LedgerEntryType
 
+LedgerFootprint
+---------------
+.. autoclass:: stellar_sdk.xdr.ledger_footprint.LedgerFootprint
+
 LedgerHeader
 ------------
 .. autoclass:: stellar_sdk.xdr.ledger_header.LedgerHeader
@@ -1338,9 +1618,25 @@ LedgerKeyClaimableBalance
 -------------------------
 .. autoclass:: stellar_sdk.xdr.ledger_key_claimable_balance.LedgerKeyClaimableBalance
 
+LedgerKeyConfigSetting
+----------------------
+.. autoclass:: stellar_sdk.xdr.ledger_key_config_setting.LedgerKeyConfigSetting
+
+LedgerKeyContractCode
+---------------------
+.. autoclass:: stellar_sdk.xdr.ledger_key_contract_code.LedgerKeyContractCode
+
+LedgerKeyContractData
+---------------------
+.. autoclass:: stellar_sdk.xdr.ledger_key_contract_data.LedgerKeyContractData
+
 LedgerKeyData
 -------------
 .. autoclass:: stellar_sdk.xdr.ledger_key_data.LedgerKeyData
+
+LedgerKeyExpiration
+-------------------
+.. autoclass:: stellar_sdk.xdr.ledger_key_expiration.LedgerKeyExpiration
 
 LedgerKeyLiquidityPool
 ----------------------
@@ -1594,6 +1890,18 @@ PeerStats
 ---------
 .. autoclass:: stellar_sdk.xdr.peer_stats.PeerStats
 
+PersistedSCPState
+-----------------
+.. autoclass:: stellar_sdk.xdr.persisted_scp_state.PersistedSCPState
+
+PersistedSCPStateV0
+-------------------
+.. autoclass:: stellar_sdk.xdr.persisted_scp_state_v0.PersistedSCPStateV0
+
+PersistedSCPStateV1
+-------------------
+.. autoclass:: stellar_sdk.xdr.persisted_scp_state_v1.PersistedSCPStateV1
+
 PoolID
 ------
 .. autoclass:: stellar_sdk.xdr.pool_id.PoolID
@@ -1622,6 +1930,18 @@ PublicKeyType
 -------------
 .. autoclass:: stellar_sdk.xdr.public_key_type.PublicKeyType
 
+RestoreFootprintOp
+------------------
+.. autoclass:: stellar_sdk.xdr.restore_footprint_op.RestoreFootprintOp
+
+RestoreFootprintResult
+----------------------
+.. autoclass:: stellar_sdk.xdr.restore_footprint_result.RestoreFootprintResult
+
+RestoreFootprintResultCode
+--------------------------
+.. autoclass:: stellar_sdk.xdr.restore_footprint_result_code.RestoreFootprintResultCode
+
 RevokeSponsorshipOp
 -------------------
 .. autoclass:: stellar_sdk.xdr.revoke_sponsorship_op.RevokeSponsorshipOp
@@ -1641,6 +1961,66 @@ RevokeSponsorshipResultCode
 RevokeSponsorshipType
 ---------------------
 .. autoclass:: stellar_sdk.xdr.revoke_sponsorship_type.RevokeSponsorshipType
+
+SCAddress
+---------
+.. autoclass:: stellar_sdk.xdr.sc_address.SCAddress
+
+SCAddressType
+-------------
+.. autoclass:: stellar_sdk.xdr.sc_address_type.SCAddressType
+
+SCBytes
+-------
+.. autoclass:: stellar_sdk.xdr.sc_bytes.SCBytes
+
+SCContractInstance
+------------------
+.. autoclass:: stellar_sdk.xdr.sc_contract_instance.SCContractInstance
+
+SCEnvMetaEntry
+--------------
+.. autoclass:: stellar_sdk.xdr.sc_env_meta_entry.SCEnvMetaEntry
+
+SCEnvMetaKind
+-------------
+.. autoclass:: stellar_sdk.xdr.sc_env_meta_kind.SCEnvMetaKind
+
+SCError
+-------
+.. autoclass:: stellar_sdk.xdr.sc_error.SCError
+
+SCErrorCode
+-----------
+.. autoclass:: stellar_sdk.xdr.sc_error_code.SCErrorCode
+
+SCErrorType
+-----------
+.. autoclass:: stellar_sdk.xdr.sc_error_type.SCErrorType
+
+SCMap
+-----
+.. autoclass:: stellar_sdk.xdr.sc_map.SCMap
+
+SCMapEntry
+----------
+.. autoclass:: stellar_sdk.xdr.sc_map_entry.SCMapEntry
+
+SCMetaEntry
+-----------
+.. autoclass:: stellar_sdk.xdr.sc_meta_entry.SCMetaEntry
+
+SCMetaKind
+----------
+.. autoclass:: stellar_sdk.xdr.sc_meta_kind.SCMetaKind
+
+SCMetaV0
+--------
+.. autoclass:: stellar_sdk.xdr.sc_meta_v0.SCMetaV0
+
+SCNonceKey
+----------
+.. autoclass:: stellar_sdk.xdr.sc_nonce_key.SCNonceKey
 
 SCPBallot
 ---------
@@ -1690,9 +2070,129 @@ SCPStatementType
 ----------------
 .. autoclass:: stellar_sdk.xdr.scp_statement_type.SCPStatementType
 
+SCSpecEntry
+-----------
+.. autoclass:: stellar_sdk.xdr.sc_spec_entry.SCSpecEntry
+
+SCSpecEntryKind
+---------------
+.. autoclass:: stellar_sdk.xdr.sc_spec_entry_kind.SCSpecEntryKind
+
+SCSpecFunctionInputV0
+---------------------
+.. autoclass:: stellar_sdk.xdr.sc_spec_function_input_v0.SCSpecFunctionInputV0
+
+SCSpecFunctionV0
+----------------
+.. autoclass:: stellar_sdk.xdr.sc_spec_function_v0.SCSpecFunctionV0
+
+SCSpecType
+----------
+.. autoclass:: stellar_sdk.xdr.sc_spec_type.SCSpecType
+
+SCSpecTypeBytesN
+----------------
+.. autoclass:: stellar_sdk.xdr.sc_spec_type_bytes_n.SCSpecTypeBytesN
+
+SCSpecTypeDef
+-------------
+.. autoclass:: stellar_sdk.xdr.sc_spec_type_def.SCSpecTypeDef
+
+SCSpecTypeMap
+-------------
+.. autoclass:: stellar_sdk.xdr.sc_spec_type_map.SCSpecTypeMap
+
+SCSpecTypeOption
+----------------
+.. autoclass:: stellar_sdk.xdr.sc_spec_type_option.SCSpecTypeOption
+
+SCSpecTypeResult
+----------------
+.. autoclass:: stellar_sdk.xdr.sc_spec_type_result.SCSpecTypeResult
+
+SCSpecTypeTuple
+---------------
+.. autoclass:: stellar_sdk.xdr.sc_spec_type_tuple.SCSpecTypeTuple
+
+SCSpecTypeUDT
+-------------
+.. autoclass:: stellar_sdk.xdr.sc_spec_type_udt.SCSpecTypeUDT
+
+SCSpecTypeVec
+-------------
+.. autoclass:: stellar_sdk.xdr.sc_spec_type_vec.SCSpecTypeVec
+
+SCSpecUDTEnumCaseV0
+-------------------
+.. autoclass:: stellar_sdk.xdr.sc_spec_udt_enum_case_v0.SCSpecUDTEnumCaseV0
+
+SCSpecUDTEnumV0
+---------------
+.. autoclass:: stellar_sdk.xdr.sc_spec_udt_enum_v0.SCSpecUDTEnumV0
+
+SCSpecUDTErrorEnumCaseV0
+------------------------
+.. autoclass:: stellar_sdk.xdr.sc_spec_udt_error_enum_case_v0.SCSpecUDTErrorEnumCaseV0
+
+SCSpecUDTErrorEnumV0
+--------------------
+.. autoclass:: stellar_sdk.xdr.sc_spec_udt_error_enum_v0.SCSpecUDTErrorEnumV0
+
+SCSpecUDTStructFieldV0
+----------------------
+.. autoclass:: stellar_sdk.xdr.sc_spec_udt_struct_field_v0.SCSpecUDTStructFieldV0
+
+SCSpecUDTStructV0
+-----------------
+.. autoclass:: stellar_sdk.xdr.sc_spec_udt_struct_v0.SCSpecUDTStructV0
+
+SCSpecUDTUnionCaseTupleV0
+-------------------------
+.. autoclass:: stellar_sdk.xdr.sc_spec_udt_union_case_tuple_v0.SCSpecUDTUnionCaseTupleV0
+
+SCSpecUDTUnionCaseV0
+--------------------
+.. autoclass:: stellar_sdk.xdr.sc_spec_udt_union_case_v0.SCSpecUDTUnionCaseV0
+
+SCSpecUDTUnionCaseV0Kind
+------------------------
+.. autoclass:: stellar_sdk.xdr.sc_spec_udt_union_case_v0_kind.SCSpecUDTUnionCaseV0Kind
+
+SCSpecUDTUnionCaseVoidV0
+------------------------
+.. autoclass:: stellar_sdk.xdr.sc_spec_udt_union_case_void_v0.SCSpecUDTUnionCaseVoidV0
+
+SCSpecUDTUnionV0
+----------------
+.. autoclass:: stellar_sdk.xdr.sc_spec_udt_union_v0.SCSpecUDTUnionV0
+
+SCString
+--------
+.. autoclass:: stellar_sdk.xdr.sc_string.SCString
+
+SCSymbol
+--------
+.. autoclass:: stellar_sdk.xdr.sc_symbol.SCSymbol
+
+SCVal
+-----
+.. autoclass:: stellar_sdk.xdr.sc_val.SCVal
+
+SCValType
+---------
+.. autoclass:: stellar_sdk.xdr.sc_val_type.SCValType
+
+SCVec
+-----
+.. autoclass:: stellar_sdk.xdr.sc_vec.SCVec
+
 SendMore
 --------
 .. autoclass:: stellar_sdk.xdr.send_more.SendMore
+
+SendMoreExtended
+----------------
+.. autoclass:: stellar_sdk.xdr.send_more_extended.SendMoreExtended
 
 SequenceNumber
 --------------
@@ -1758,9 +2258,53 @@ SimplePaymentResult
 -------------------
 .. autoclass:: stellar_sdk.xdr.simple_payment_result.SimplePaymentResult
 
+SorobanAddressCredentials
+-------------------------
+.. autoclass:: stellar_sdk.xdr.soroban_address_credentials.SorobanAddressCredentials
+
+SorobanAuthorizationEntry
+-------------------------
+.. autoclass:: stellar_sdk.xdr.soroban_authorization_entry.SorobanAuthorizationEntry
+
+SorobanAuthorizedFunction
+-------------------------
+.. autoclass:: stellar_sdk.xdr.soroban_authorized_function.SorobanAuthorizedFunction
+
+SorobanAuthorizedFunctionType
+-----------------------------
+.. autoclass:: stellar_sdk.xdr.soroban_authorized_function_type.SorobanAuthorizedFunctionType
+
+SorobanAuthorizedInvocation
+---------------------------
+.. autoclass:: stellar_sdk.xdr.soroban_authorized_invocation.SorobanAuthorizedInvocation
+
+SorobanCredentials
+------------------
+.. autoclass:: stellar_sdk.xdr.soroban_credentials.SorobanCredentials
+
+SorobanCredentialsType
+----------------------
+.. autoclass:: stellar_sdk.xdr.soroban_credentials_type.SorobanCredentialsType
+
+SorobanResources
+----------------
+.. autoclass:: stellar_sdk.xdr.soroban_resources.SorobanResources
+
+SorobanTransactionData
+----------------------
+.. autoclass:: stellar_sdk.xdr.soroban_transaction_data.SorobanTransactionData
+
+SorobanTransactionMeta
+----------------------
+.. autoclass:: stellar_sdk.xdr.soroban_transaction_meta.SorobanTransactionMeta
+
 SponsorshipDescriptor
 ---------------------
 .. autoclass:: stellar_sdk.xdr.sponsorship_descriptor.SponsorshipDescriptor
+
+StateExpirationSettings
+-----------------------
+.. autoclass:: stellar_sdk.xdr.state_expiration_settings.StateExpirationSettings
 
 StellarMessage
 --------------
@@ -1778,6 +2322,10 @@ StellarValueType
 ----------------
 .. autoclass:: stellar_sdk.xdr.stellar_value_type.StellarValueType
 
+StoredTransactionSet
+--------------------
+.. autoclass:: stellar_sdk.xdr.stored_transaction_set.StoredTransactionSet
+
 String
 ------
 .. autoclass:: stellar_sdk.xdr.base.String
@@ -1793,6 +2341,10 @@ String64
 SurveyMessageCommandType
 ------------------------
 .. autoclass:: stellar_sdk.xdr.survey_message_command_type.SurveyMessageCommandType
+
+SurveyMessageResponseType
+-------------------------
+.. autoclass:: stellar_sdk.xdr.survey_message_response_type.SurveyMessageResponseType
 
 SurveyRequestMessage
 --------------------
@@ -1822,9 +2374,13 @@ TimePoint
 ---------
 .. autoclass:: stellar_sdk.xdr.time_point.TimePoint
 
-TopologyResponseBody
---------------------
-.. autoclass:: stellar_sdk.xdr.topology_response_body.TopologyResponseBody
+TopologyResponseBodyV0
+----------------------
+.. autoclass:: stellar_sdk.xdr.topology_response_body_v0.TopologyResponseBodyV0
+
+TopologyResponseBodyV1
+----------------------
+.. autoclass:: stellar_sdk.xdr.topology_response_body_v1.TopologyResponseBodyV1
 
 Transaction
 -----------
@@ -1866,6 +2422,14 @@ TransactionMetaV2
 -----------------
 .. autoclass:: stellar_sdk.xdr.transaction_meta_v2.TransactionMetaV2
 
+TransactionMetaV3
+-----------------
+.. autoclass:: stellar_sdk.xdr.transaction_meta_v3.TransactionMetaV3
+
+TransactionPhase
+----------------
+.. autoclass:: stellar_sdk.xdr.transaction_phase.TransactionPhase
+
 TransactionResult
 -----------------
 .. autoclass:: stellar_sdk.xdr.transaction_result.TransactionResult
@@ -1897,6 +2461,10 @@ TransactionResultSet
 TransactionSet
 --------------
 .. autoclass:: stellar_sdk.xdr.transaction_set.TransactionSet
+
+TransactionSetV1
+----------------
+.. autoclass:: stellar_sdk.xdr.transaction_set_v1.TransactionSetV1
 
 TransactionSignaturePayload
 ---------------------------
@@ -1954,6 +2522,34 @@ TrustLineFlags
 --------------
 .. autoclass:: stellar_sdk.xdr.trust_line_flags.TrustLineFlags
 
+TxAdvertVector
+--------------
+.. autoclass:: stellar_sdk.xdr.tx_advert_vector.TxAdvertVector
+
+TxDemandVector
+--------------
+.. autoclass:: stellar_sdk.xdr.tx_demand_vector.TxDemandVector
+
+TxSetComponent
+--------------
+.. autoclass:: stellar_sdk.xdr.tx_set_component.TxSetComponent
+
+TxSetComponentTxsMaybeDiscountedFee
+-----------------------------------
+.. autoclass:: stellar_sdk.xdr.tx_set_component_txs_maybe_discounted_fee.TxSetComponentTxsMaybeDiscountedFee
+
+TxSetComponentType
+------------------
+.. autoclass:: stellar_sdk.xdr.tx_set_component_type.TxSetComponentType
+
+UInt128Parts
+------------
+.. autoclass:: stellar_sdk.xdr.u_int128_parts.UInt128Parts
+
+UInt256Parts
+------------
+.. autoclass:: stellar_sdk.xdr.u_int256_parts.UInt256Parts
+
 Uint256
 -------
 .. autoclass:: stellar_sdk.xdr.uint256.Uint256
@@ -1988,6 +2584,8 @@ Value
 
 Constants
 ---------
+.. autodata:: stellar_sdk.xdr.constants.AUTH_MSG_FLAG_FLOW_CONTROL_BYTES_REQUESTED
+.. autodata:: stellar_sdk.xdr.constants.CONTRACT_COST_COUNT_LIMIT
 .. autodata:: stellar_sdk.xdr.constants.LIQUIDITY_POOL_FEE_V18
 .. autodata:: stellar_sdk.xdr.constants.MASK_ACCOUNT_FLAGS
 .. autodata:: stellar_sdk.xdr.constants.MASK_ACCOUNT_FLAGS_V17
@@ -1999,3 +2597,9 @@ Constants
 .. autodata:: stellar_sdk.xdr.constants.MASK_TRUSTLINE_FLAGS_V17
 .. autodata:: stellar_sdk.xdr.constants.MAX_OPS_PER_TX
 .. autodata:: stellar_sdk.xdr.constants.MAX_SIGNERS
+.. autodata:: stellar_sdk.xdr.constants.SCSYMBOL_LIMIT
+.. autodata:: stellar_sdk.xdr.constants.SC_SPEC_DOC_LIMIT
+.. autodata:: stellar_sdk.xdr.constants.TX_ADVERT_VECTOR_MAX_SIZE
+.. autodata:: stellar_sdk.xdr.constants.TX_DEMAND_VECTOR_MAX_SIZE
+(stellar-sdk-py3.10) py-stellar-base [soroban-update●●]
+

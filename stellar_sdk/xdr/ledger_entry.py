@@ -1,6 +1,9 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
+from __future__ import annotations
+
 import base64
+
 from xdrlib3 import Packer, Unpacker
 
 from .ledger_entry_data import LedgerEntryData
@@ -32,6 +35,14 @@ class LedgerEntry:
                 ClaimableBalanceEntry claimableBalance;
             case LIQUIDITY_POOL:
                 LiquidityPoolEntry liquidityPool;
+            case CONTRACT_DATA:
+                ContractDataEntry contractData;
+            case CONTRACT_CODE:
+                ContractCodeEntry contractCode;
+            case CONFIG_SETTING:
+                ConfigSettingEntry configSetting;
+            case EXPIRATION:
+                ExpirationEntry expiration;
             }
             data;
 
@@ -63,7 +74,7 @@ class LedgerEntry:
         self.ext.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "LedgerEntry":
+    def unpack(cls, unpacker: Unpacker) -> LedgerEntry:
         last_modified_ledger_seq = Uint32.unpack(unpacker)
         data = LedgerEntryData.unpack(unpacker)
         ext = LedgerEntryExt.unpack(unpacker)
@@ -79,7 +90,7 @@ class LedgerEntry:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "LedgerEntry":
+    def from_xdr_bytes(cls, xdr: bytes) -> LedgerEntry:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -88,9 +99,18 @@ class LedgerEntry:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "LedgerEntry":
+    def from_xdr(cls, xdr: str) -> LedgerEntry:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def __hash__(self):
+        return hash(
+            (
+                self.last_modified_ledger_seq,
+                self.data,
+                self.ext,
+            )
+        )
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):

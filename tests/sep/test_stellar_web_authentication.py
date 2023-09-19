@@ -6,7 +6,6 @@ from random import randrange
 import pytest
 
 from stellar_sdk import Account, Asset, Keypair, MuxedAccount, Network
-from stellar_sdk.exceptions import ValueError
 from stellar_sdk.memo import IdMemo
 from stellar_sdk.operation import ManageData
 from stellar_sdk.sep.ed25519_public_key_signer import Ed25519PublicKeySigner
@@ -22,7 +21,6 @@ from stellar_sdk.sep.stellar_web_authentication import (
 )
 from stellar_sdk.transaction_builder import TransactionBuilder
 from stellar_sdk.transaction_envelope import TransactionEnvelope
-from stellar_sdk.type_checked import _STELLAR_SDK_RUNTIME_TYPE_CHECKING
 
 
 class TestStellarWebAuthentication:
@@ -118,9 +116,7 @@ class TestStellarWebAuthentication:
         ).transaction
         assert transaction.memo == IdMemo(memo)
 
-    @pytest.mark.skipif(
-        not _STELLAR_SDK_RUNTIME_TYPE_CHECKING, reason="runtime_type_checking_disabled"
-    )
+    @pytest.mark.skip(reason="runtime_type_checking_disabled")
     def test_challenge_transaction_non_id_memo_not_permitted(self):
         server_kp = Keypair.random()
         client_account_id = Keypair.random().public_key

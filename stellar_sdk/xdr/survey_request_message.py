@@ -1,6 +1,9 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
+from __future__ import annotations
+
 import base64
+
 from xdrlib3 import Packer, Unpacker
 
 from .curve25519_public import Curve25519Public
@@ -47,7 +50,7 @@ class SurveyRequestMessage:
         self.command_type.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "SurveyRequestMessage":
+    def unpack(cls, unpacker: Unpacker) -> SurveyRequestMessage:
         surveyor_peer_id = NodeID.unpack(unpacker)
         surveyed_peer_id = NodeID.unpack(unpacker)
         ledger_num = Uint32.unpack(unpacker)
@@ -67,7 +70,7 @@ class SurveyRequestMessage:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "SurveyRequestMessage":
+    def from_xdr_bytes(cls, xdr: bytes) -> SurveyRequestMessage:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -76,9 +79,20 @@ class SurveyRequestMessage:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "SurveyRequestMessage":
+    def from_xdr(cls, xdr: str) -> SurveyRequestMessage:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def __hash__(self):
+        return hash(
+            (
+                self.surveyor_peer_id,
+                self.surveyed_peer_id,
+                self.ledger_num,
+                self.encryption_key,
+                self.command_type,
+            )
+        )
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):

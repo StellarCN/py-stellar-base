@@ -38,6 +38,7 @@ extensions = [
     "sphinx.ext.intersphinx",
     "sphinx.ext.viewcode",
     "sphinx_autodoc_typehints",
+    "sphinxcontrib.autodoc_pydantic",
 ]
 
 intersphinx_mapping = {"python": ("https://docs.python.org/3", None)}
@@ -183,3 +184,6 @@ texinfo_documents = [
         "Miscellaneous",
     ),
 ]
+
+autodoc_pydantic_model_show_json = True
+autodoc_pydantic_settings_show_json = False

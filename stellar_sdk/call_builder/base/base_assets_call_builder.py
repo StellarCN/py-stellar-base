@@ -1,10 +1,8 @@
 from ...call_builder.base.base_call_builder import BaseCallBuilder
-from ...type_checked import type_checked
 
 __all__ = ["BaseAssetsCallBuilder"]
 
 
-@type_checked
 class BaseAssetsCallBuilder(BaseCallBuilder):
     """Creates a new :class:`AssetsCallBuilder` pointed to server defined by horizon_url.
 

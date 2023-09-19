@@ -1,6 +1,9 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
+from __future__ import annotations
+
 import base64
+
 from xdrlib3 import Packer, Unpacker
 
 from .bucket_entry_type import BucketEntryType
@@ -64,7 +67,7 @@ class BucketEntry:
             return
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "BucketEntry":
+    def unpack(cls, unpacker: Unpacker) -> BucketEntry:
         type = BucketEntryType.unpack(unpacker)
         if type == BucketEntryType.LIVEENTRY:
             live_entry = LedgerEntry.unpack(unpacker)
@@ -86,7 +89,7 @@ class BucketEntry:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "BucketEntry":
+    def from_xdr_bytes(cls, xdr: bytes) -> BucketEntry:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -95,9 +98,19 @@ class BucketEntry:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "BucketEntry":
+    def from_xdr(cls, xdr: str) -> BucketEntry:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def __hash__(self):
+        return hash(
+            (
+                self.type,
+                self.live_entry,
+                self.dead_entry,
+                self.meta_entry,
+            )
+        )
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):

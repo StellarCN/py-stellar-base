@@ -1,17 +1,15 @@
 from decimal import Decimal
-from typing import List, Optional, Union
+from typing import Optional, Sequence, Union
 
 from .. import xdr as stellar_xdr
 from ..asset import Asset
 from ..muxed_account import MuxedAccount
-from ..type_checked import type_checked
 from ..utils import raise_if_not_valid_amount
 from .operation import Operation
 
 __all__ = ["PathPaymentStrictReceive"]
 
 
-@type_checked
 class PathPaymentStrictReceive(Operation):
     """The :class:`PathPaymentStrictReceive` object, which represents a PathPaymentStrictReceive
     operation on Stellar's network.
@@ -45,7 +43,7 @@ class PathPaymentStrictReceive(Operation):
         send_max: Union[str, Decimal],
         dest_asset: Asset,
         dest_amount: Union[str, Decimal],
-        path: List[Asset],
+        path: Sequence[Asset],
         source: Optional[Union[MuxedAccount, str]] = None,
     ) -> None:
         super().__init__(source)
@@ -56,7 +54,7 @@ class PathPaymentStrictReceive(Operation):
         self.send_max: str = str(send_max)
         self.dest_asset: Asset = dest_asset
         self.dest_amount: str = str(dest_amount)
-        self.path: List[Asset] = path  # a list of paths/assets
+        self.path: Sequence[Asset] = path  # a list of paths/assets
         raise_if_not_valid_amount(self.send_max, "send_max")
         raise_if_not_valid_amount(self.dest_amount, "dest_amount")
 

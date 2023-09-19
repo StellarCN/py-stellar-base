@@ -1,7 +1,10 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
+from __future__ import annotations
+
 import base64
 from typing import List
+
 from xdrlib3 import Packer, Unpacker
 
 from .inner_transaction_result_pair import InnerTransactionResultPair
@@ -23,7 +26,22 @@ class TransactionResultResult:
             case txSUCCESS:
             case txFAILED:
                 OperationResult results<>;
-            default:
+            case txTOO_EARLY:
+            case txTOO_LATE:
+            case txMISSING_OPERATION:
+            case txBAD_SEQ:
+            case txBAD_AUTH:
+            case txINSUFFICIENT_BALANCE:
+            case txNO_ACCOUNT:
+            case txINSUFFICIENT_FEE:
+            case txBAD_AUTH_EXTRA:
+            case txINTERNAL_ERROR:
+            case txNOT_SUPPORTED:
+            // case txFEE_BUMP_INNER_FAILED: handled above
+            case txBAD_SPONSORSHIP:
+            case txBAD_MIN_SEQ_AGE_OR_GAP:
+            case txMALFORMED:
+            case txSOROBAN_INVALID:
                 void;
             }
     """
@@ -69,9 +87,39 @@ class TransactionResultResult:
             for results_item in self.results:
                 results_item.pack(packer)
             return
+        if self.code == TransactionResultCode.txTOO_EARLY:
+            return
+        if self.code == TransactionResultCode.txTOO_LATE:
+            return
+        if self.code == TransactionResultCode.txMISSING_OPERATION:
+            return
+        if self.code == TransactionResultCode.txBAD_SEQ:
+            return
+        if self.code == TransactionResultCode.txBAD_AUTH:
+            return
+        if self.code == TransactionResultCode.txINSUFFICIENT_BALANCE:
+            return
+        if self.code == TransactionResultCode.txNO_ACCOUNT:
+            return
+        if self.code == TransactionResultCode.txINSUFFICIENT_FEE:
+            return
+        if self.code == TransactionResultCode.txBAD_AUTH_EXTRA:
+            return
+        if self.code == TransactionResultCode.txINTERNAL_ERROR:
+            return
+        if self.code == TransactionResultCode.txNOT_SUPPORTED:
+            return
+        if self.code == TransactionResultCode.txBAD_SPONSORSHIP:
+            return
+        if self.code == TransactionResultCode.txBAD_MIN_SEQ_AGE_OR_GAP:
+            return
+        if self.code == TransactionResultCode.txMALFORMED:
+            return
+        if self.code == TransactionResultCode.txSOROBAN_INVALID:
+            return
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "TransactionResultResult":
+    def unpack(cls, unpacker: Unpacker) -> TransactionResultResult:
         code = TransactionResultCode.unpack(unpacker)
         if code == TransactionResultCode.txFEE_BUMP_INNER_SUCCESS:
             inner_result_pair = InnerTransactionResultPair.unpack(unpacker)
@@ -91,6 +139,36 @@ class TransactionResultResult:
             for _ in range(length):
                 results.append(OperationResult.unpack(unpacker))
             return cls(code=code, results=results)
+        if code == TransactionResultCode.txTOO_EARLY:
+            return cls(code=code)
+        if code == TransactionResultCode.txTOO_LATE:
+            return cls(code=code)
+        if code == TransactionResultCode.txMISSING_OPERATION:
+            return cls(code=code)
+        if code == TransactionResultCode.txBAD_SEQ:
+            return cls(code=code)
+        if code == TransactionResultCode.txBAD_AUTH:
+            return cls(code=code)
+        if code == TransactionResultCode.txINSUFFICIENT_BALANCE:
+            return cls(code=code)
+        if code == TransactionResultCode.txNO_ACCOUNT:
+            return cls(code=code)
+        if code == TransactionResultCode.txINSUFFICIENT_FEE:
+            return cls(code=code)
+        if code == TransactionResultCode.txBAD_AUTH_EXTRA:
+            return cls(code=code)
+        if code == TransactionResultCode.txINTERNAL_ERROR:
+            return cls(code=code)
+        if code == TransactionResultCode.txNOT_SUPPORTED:
+            return cls(code=code)
+        if code == TransactionResultCode.txBAD_SPONSORSHIP:
+            return cls(code=code)
+        if code == TransactionResultCode.txBAD_MIN_SEQ_AGE_OR_GAP:
+            return cls(code=code)
+        if code == TransactionResultCode.txMALFORMED:
+            return cls(code=code)
+        if code == TransactionResultCode.txSOROBAN_INVALID:
+            return cls(code=code)
         return cls(code=code)
 
     def to_xdr_bytes(self) -> bytes:
@@ -99,7 +177,7 @@ class TransactionResultResult:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "TransactionResultResult":
+    def from_xdr_bytes(cls, xdr: bytes) -> TransactionResultResult:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -108,9 +186,18 @@ class TransactionResultResult:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "TransactionResultResult":
+    def from_xdr(cls, xdr: str) -> TransactionResultResult:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def __hash__(self):
+        return hash(
+            (
+                self.code,
+                self.inner_result_pair,
+                self.results,
+            )
+        )
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):

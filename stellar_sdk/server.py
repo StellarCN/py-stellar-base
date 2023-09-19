@@ -16,13 +16,11 @@ from .memo import NoneMemo
 from .muxed_account import MuxedAccount
 from .transaction import Transaction
 from .transaction_envelope import TransactionEnvelope
-from .type_checked import type_checked
 from .utils import MUXED_ACCOUNT_STARTING_LETTER, urljoin_with_query
 
 __all__ = ["Server"]
 
 
-@type_checked
 class Server(BaseServer):
     """Server handles the network connection to a `Horizon <https://developers.stellar.org/api/introduction/>`_
     instance and exposes an interface for requests to that instance.

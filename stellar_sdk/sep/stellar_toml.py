@@ -16,13 +16,11 @@ from ..client.base_async_client import BaseAsyncClient
 from ..client.base_sync_client import BaseSyncClient
 from ..client.requests_client import RequestsClient
 from ..client.response import Response
-from ..type_checked import type_checked
 from .exceptions import StellarTomlNotFoundError
 
 __all__ = ["fetch_stellar_toml", "fetch_stellar_toml_async"]
 
 
-@type_checked
 def fetch_stellar_toml(
     domain: str,
     client: BaseSyncClient = None,
@@ -36,11 +34,11 @@ def fetch_stellar_toml(
 
     :param domain: The domain the .toml file is hosted at.
     :param use_http: Specifies whether the request should go over plain HTTP vs HTTPS.
-        Note it is recommend that you **always** use HTTPS.
+        Note it is recommended that you **always** use HTTPS.
     :param client: Http Client used to send the request.
     :return: The stellar.toml file as an object via :func:`toml.loads`.
     :raises: :exc:`StellarTomlNotFoundError <stellar_sdk.sep.exceptions.StellarTomlNotFoundError>`:
-        if the Stellar toml file could not not be found.
+        if the Stellar toml file could not be found.
     """
     if not client:
         client = RequestsClient()
@@ -49,7 +47,6 @@ def fetch_stellar_toml(
     return _handle_raw_response(raw_resp)
 
 
-@type_checked
 async def fetch_stellar_toml_async(
     domain: str,
     client: BaseAsyncClient = None,
@@ -63,11 +60,11 @@ async def fetch_stellar_toml_async(
 
     :param domain: The domain the .toml file is hosted at.
     :param use_http: Specifies whether the request should go over plain HTTP vs HTTPS.
-        Note it is recommend that you **always** use HTTPS.
+        Note it is recommended that you **always** use HTTPS.
     :param client: Http Client used to send the request.
     :return: The stellar.toml file as an object via :func:`toml.loads`.
     :raises: :exc:`StellarTomlNotFoundError <stellar_sdk.sep.exceptions.StellarTomlNotFoundError>`:
-        if the Stellar toml file could not not be found.
+        if the Stellar toml file could not be found.
     """
 
     if not client:

@@ -1,6 +1,9 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
+from __future__ import annotations
+
 import base64
+
 from xdrlib3 import Packer, Unpacker
 
 from .account_id import AccountID
@@ -50,7 +53,7 @@ class DataEntry:
         self.ext.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "DataEntry":
+    def unpack(cls, unpacker: Unpacker) -> DataEntry:
         account_id = AccountID.unpack(unpacker)
         data_name = String64.unpack(unpacker)
         data_value = DataValue.unpack(unpacker)
@@ -68,7 +71,7 @@ class DataEntry:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "DataEntry":
+    def from_xdr_bytes(cls, xdr: bytes) -> DataEntry:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -77,9 +80,19 @@ class DataEntry:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "DataEntry":
+    def from_xdr(cls, xdr: str) -> DataEntry:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def __hash__(self):
+        return hash(
+            (
+                self.account_id,
+                self.data_name,
+                self.data_value,
+                self.ext,
+            )
+        )
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):

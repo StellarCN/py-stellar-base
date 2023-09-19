@@ -1,6 +1,9 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
+from __future__ import annotations
+
 import base64
+
 from xdrlib3 import Packer, Unpacker
 
 from .transaction_history_result_entry_ext import TransactionHistoryResultEntryExt
@@ -45,7 +48,7 @@ class TransactionHistoryResultEntry:
         self.ext.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "TransactionHistoryResultEntry":
+    def unpack(cls, unpacker: Unpacker) -> TransactionHistoryResultEntry:
         ledger_seq = Uint32.unpack(unpacker)
         tx_result_set = TransactionResultSet.unpack(unpacker)
         ext = TransactionHistoryResultEntryExt.unpack(unpacker)
@@ -61,7 +64,7 @@ class TransactionHistoryResultEntry:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "TransactionHistoryResultEntry":
+    def from_xdr_bytes(cls, xdr: bytes) -> TransactionHistoryResultEntry:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -70,9 +73,18 @@ class TransactionHistoryResultEntry:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "TransactionHistoryResultEntry":
+    def from_xdr(cls, xdr: str) -> TransactionHistoryResultEntry:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def __hash__(self):
+        return hash(
+            (
+                self.ledger_seq,
+                self.tx_result_set,
+                self.ext,
+            )
+        )
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):

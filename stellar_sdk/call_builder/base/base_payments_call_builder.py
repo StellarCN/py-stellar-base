@@ -1,12 +1,10 @@
 from typing import Union
 
 from ...call_builder.base.base_call_builder import BaseCallBuilder
-from ...type_checked import type_checked
 
 __all__ = ["BasePaymentsCallBuilder"]
 
 
-@type_checked
 class BasePaymentsCallBuilder(BaseCallBuilder):
     """Creates a new :class:`PaymentsCallBuilder` pointed to server defined by horizon_url.
 

@@ -2,7 +2,7 @@ from decimal import Decimal
 
 import pytest
 
-from stellar_sdk import LiquidityPoolWithdraw, Operation, Price
+from stellar_sdk import LiquidityPoolWithdraw, Operation
 
 from . import *
 

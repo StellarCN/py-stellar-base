@@ -1,6 +1,9 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
+from __future__ import annotations
+
 import base64
+
 from xdrlib3 import Packer, Unpacker
 
 from .asset import Asset
@@ -50,7 +53,7 @@ class ClaimLiquidityAtom:
         self.amount_bought.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "ClaimLiquidityAtom":
+    def unpack(cls, unpacker: Unpacker) -> ClaimLiquidityAtom:
         liquidity_pool_id = PoolID.unpack(unpacker)
         asset_sold = Asset.unpack(unpacker)
         amount_sold = Int64.unpack(unpacker)
@@ -70,7 +73,7 @@ class ClaimLiquidityAtom:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "ClaimLiquidityAtom":
+    def from_xdr_bytes(cls, xdr: bytes) -> ClaimLiquidityAtom:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -79,9 +82,20 @@ class ClaimLiquidityAtom:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "ClaimLiquidityAtom":
+    def from_xdr(cls, xdr: str) -> ClaimLiquidityAtom:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def __hash__(self):
+        return hash(
+            (
+                self.liquidity_pool_id,
+                self.asset_sold,
+                self.amount_sold,
+                self.asset_bought,
+                self.amount_bought,
+            )
+        )
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):

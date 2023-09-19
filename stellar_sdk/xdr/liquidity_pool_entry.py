@@ -1,6 +1,9 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
+from __future__ import annotations
+
 import base64
+
 from xdrlib3 import Packer, Unpacker
 
 from .liquidity_pool_entry_body import LiquidityPoolEntryBody
@@ -27,7 +30,8 @@ class LiquidityPoolEntry:
                     int64 reserveA;        // amount of A in the pool
                     int64 reserveB;        // amount of B in the pool
                     int64 totalPoolShares; // total number of pool shares issued
-                    int64 poolSharesTrustLineCount; // number of trust lines for the associated pool shares
+                    int64 poolSharesTrustLineCount; // number of trust lines for the
+                                                    // associated pool shares
                 } constantProduct;
             }
             body;
@@ -47,7 +51,7 @@ class LiquidityPoolEntry:
         self.body.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "LiquidityPoolEntry":
+    def unpack(cls, unpacker: Unpacker) -> LiquidityPoolEntry:
         liquidity_pool_id = PoolID.unpack(unpacker)
         body = LiquidityPoolEntryBody.unpack(unpacker)
         return cls(
@@ -61,7 +65,7 @@ class LiquidityPoolEntry:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "LiquidityPoolEntry":
+    def from_xdr_bytes(cls, xdr: bytes) -> LiquidityPoolEntry:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -70,9 +74,17 @@ class LiquidityPoolEntry:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "LiquidityPoolEntry":
+    def from_xdr(cls, xdr: str) -> LiquidityPoolEntry:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def __hash__(self):
+        return hash(
+            (
+                self.liquidity_pool_id,
+                self.body,
+            )
+        )
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):

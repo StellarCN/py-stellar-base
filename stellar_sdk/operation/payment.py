@@ -4,14 +4,12 @@ from typing import Optional, Union
 from .. import xdr as stellar_xdr
 from ..asset import Asset
 from ..muxed_account import MuxedAccount
-from ..type_checked import type_checked
 from ..utils import raise_if_not_valid_amount
 from .operation import Operation
 
 __all__ = ["Payment"]
 
 
-@type_checked
 class Payment(Operation):
     """The :class:`Payment` object, which represents a Payment operation on
     Stellar's network.

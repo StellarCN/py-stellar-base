@@ -1,6 +1,9 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
+from __future__ import annotations
+
 import base64
+
 from xdrlib3 import Packer, Unpacker
 
 from .clawback_claimable_balance_result_code import ClawbackClaimableBalanceResultCode
@@ -17,7 +20,9 @@ class ClawbackClaimableBalanceResult:
         {
         case CLAWBACK_CLAIMABLE_BALANCE_SUCCESS:
             void;
-        default:
+        case CLAWBACK_CLAIMABLE_BALANCE_DOES_NOT_EXIST:
+        case CLAWBACK_CLAIMABLE_BALANCE_NOT_ISSUER:
+        case CLAWBACK_CLAIMABLE_BALANCE_NOT_CLAWBACK_ENABLED:
             void;
         };
     """
@@ -35,13 +40,43 @@ class ClawbackClaimableBalanceResult:
             == ClawbackClaimableBalanceResultCode.CLAWBACK_CLAIMABLE_BALANCE_SUCCESS
         ):
             return
+        if (
+            self.code
+            == ClawbackClaimableBalanceResultCode.CLAWBACK_CLAIMABLE_BALANCE_DOES_NOT_EXIST
+        ):
+            return
+        if (
+            self.code
+            == ClawbackClaimableBalanceResultCode.CLAWBACK_CLAIMABLE_BALANCE_NOT_ISSUER
+        ):
+            return
+        if (
+            self.code
+            == ClawbackClaimableBalanceResultCode.CLAWBACK_CLAIMABLE_BALANCE_NOT_CLAWBACK_ENABLED
+        ):
+            return
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "ClawbackClaimableBalanceResult":
+    def unpack(cls, unpacker: Unpacker) -> ClawbackClaimableBalanceResult:
         code = ClawbackClaimableBalanceResultCode.unpack(unpacker)
         if (
             code
             == ClawbackClaimableBalanceResultCode.CLAWBACK_CLAIMABLE_BALANCE_SUCCESS
+        ):
+            return cls(code=code)
+        if (
+            code
+            == ClawbackClaimableBalanceResultCode.CLAWBACK_CLAIMABLE_BALANCE_DOES_NOT_EXIST
+        ):
+            return cls(code=code)
+        if (
+            code
+            == ClawbackClaimableBalanceResultCode.CLAWBACK_CLAIMABLE_BALANCE_NOT_ISSUER
+        ):
+            return cls(code=code)
+        if (
+            code
+            == ClawbackClaimableBalanceResultCode.CLAWBACK_CLAIMABLE_BALANCE_NOT_CLAWBACK_ENABLED
         ):
             return cls(code=code)
         return cls(code=code)
@@ -52,7 +87,7 @@ class ClawbackClaimableBalanceResult:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "ClawbackClaimableBalanceResult":
+    def from_xdr_bytes(cls, xdr: bytes) -> ClawbackClaimableBalanceResult:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -61,9 +96,12 @@ class ClawbackClaimableBalanceResult:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "ClawbackClaimableBalanceResult":
+    def from_xdr(cls, xdr: str) -> ClawbackClaimableBalanceResult:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def __hash__(self):
+        return hash((self.code,))
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):

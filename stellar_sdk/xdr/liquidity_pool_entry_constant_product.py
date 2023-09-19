@@ -1,6 +1,9 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
+from __future__ import annotations
+
 import base64
+
 from xdrlib3 import Packer, Unpacker
 
 from .int64 import Int64
@@ -22,7 +25,8 @@ class LiquidityPoolEntryConstantProduct:
                     int64 reserveA;        // amount of A in the pool
                     int64 reserveB;        // amount of B in the pool
                     int64 totalPoolShares; // total number of pool shares issued
-                    int64 poolSharesTrustLineCount; // number of trust lines for the associated pool shares
+                    int64 poolSharesTrustLineCount; // number of trust lines for the
+                                                    // associated pool shares
                 }
     """
 
@@ -48,7 +52,7 @@ class LiquidityPoolEntryConstantProduct:
         self.pool_shares_trust_line_count.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "LiquidityPoolEntryConstantProduct":
+    def unpack(cls, unpacker: Unpacker) -> LiquidityPoolEntryConstantProduct:
         params = LiquidityPoolConstantProductParameters.unpack(unpacker)
         reserve_a = Int64.unpack(unpacker)
         reserve_b = Int64.unpack(unpacker)
@@ -68,7 +72,7 @@ class LiquidityPoolEntryConstantProduct:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "LiquidityPoolEntryConstantProduct":
+    def from_xdr_bytes(cls, xdr: bytes) -> LiquidityPoolEntryConstantProduct:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -77,9 +81,20 @@ class LiquidityPoolEntryConstantProduct:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "LiquidityPoolEntryConstantProduct":
+    def from_xdr(cls, xdr: str) -> LiquidityPoolEntryConstantProduct:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def __hash__(self):
+        return hash(
+            (
+                self.params,
+                self.reserve_a,
+                self.reserve_b,
+                self.total_pool_shares,
+                self.pool_shares_trust_line_count,
+            )
+        )
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):

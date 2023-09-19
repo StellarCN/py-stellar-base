@@ -1,7 +1,10 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
+from __future__ import annotations
+
 import base64
 from typing import Optional
+
 from xdrlib3 import Packer, Unpacker
 
 from .account_id import AccountID
@@ -107,7 +110,7 @@ class SetOptionsOp:
             self.signer.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "SetOptionsOp":
+    def unpack(cls, unpacker: Unpacker) -> SetOptionsOp:
         inflation_dest = AccountID.unpack(unpacker) if unpacker.unpack_uint() else None
         clear_flags = Uint32.unpack(unpacker) if unpacker.unpack_uint() else None
         set_flags = Uint32.unpack(unpacker) if unpacker.unpack_uint() else None
@@ -135,7 +138,7 @@ class SetOptionsOp:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "SetOptionsOp":
+    def from_xdr_bytes(cls, xdr: bytes) -> SetOptionsOp:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -144,9 +147,24 @@ class SetOptionsOp:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "SetOptionsOp":
+    def from_xdr(cls, xdr: str) -> SetOptionsOp:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def __hash__(self):
+        return hash(
+            (
+                self.inflation_dest,
+                self.clear_flags,
+                self.set_flags,
+                self.master_weight,
+                self.low_threshold,
+                self.med_threshold,
+                self.high_threshold,
+                self.home_domain,
+                self.signer,
+            )
+        )
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):

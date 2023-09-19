@@ -1,17 +1,25 @@
-name: GitHub Action
+name: Test and Deploy
 
 on:
   push:
   pull_request:
-    branches-ignore:
-      - 'temp*'
-      - 'tmp*'
   release:
-    types: [ created ]
+    types:
+      - created
 
 jobs:
+  pre-commit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+      - uses: pre-commit/action@v3.0.0
+
   test:
     runs-on: ubuntu-latest
+    needs: pre-commit
     strategy:
       fail-fast: false
       matrix:
@@ -20,6 +28,10 @@ jobs:
         # https://endoflife.date/python
     steps:
       - uses: actions/checkout@v3
+
+      - name: Start httpbin server
+        run: |
+          docker run -d -p 9876:80 kennethreitz/httpbin
 
       - name: Install poetry
         run: pipx install poetry
@@ -32,16 +44,18 @@ jobs:
 
       - name: Install dependencies
         run: |
-          poetry install
+          poetry install --extras 'aiohttp'
+
+      - name: Ensure httpbin server is running
+        run: |
+          while true; do response=$(curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:9876/get); if [ "$response" = "200" ]; then echo "HTTP 200 OK received"; break; else echo "Retrying..."; sleep 1; fi; done
+
+      - name: Echo installed packages
+        run: |
+          poetry show
 
       - name: Test with pytest
         run: poetry run pytest -v -rs tests --runslow --cov=./ --cov-report=xml
-
-      - name: Test with pytest (runtime type checking disabled)
-        if: matrix.os == 'ubuntu-latest' && matrix.python-version == '3.7'
-        run: poetry run pytest -v -rs tests --runslow
-        env:
-          STELLAR_SDK_RUNTIME_TYPE_CHECKING: 0
 
       - name: Upload coverage to Codecov
         if: matrix.os == 'ubuntu-latest' && matrix.python-version == '3.7'
@@ -55,6 +69,7 @@ jobs:
 
   mypy-check:
     runs-on: ubuntu-latest
+    needs: pre-commit
     steps:
       - uses: actions/checkout@v3
 
@@ -69,7 +84,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          poetry install
+          poetry install --extras 'aiohttp'
 
       - name: Run mypy check
         run: |
@@ -78,25 +93,24 @@ jobs:
           poetry run mypy examples
 
   deploy:
-    needs: test
+    needs: [ test, mypy-check ]
     runs-on: ubuntu-latest
-    if: github.event_name == 'release'
+    if: github.event_name == 'release' && github.event.action == 'created'
+    permissions:
+      id-token: write
     steps:
       - uses: actions/checkout@v3
-
-      - name: Install poetry
-        run: pipx install poetry
 
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.10'
+          python-version: '3.11'
+
+      - name: Install poetry
+        run: pipx install poetry
 
       - name: Build Packages
         run: poetry build
 
-      - name: Publish distribution 📦 to Test PyPI
-        uses: pypa/gh-action-pypi-publish@master
-        with:
-          password: ${{ secrets.test_pypi_api_token }}
-          repository_url: https://test.pypi.org/legacy/
+      - name: Publish package distributions to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1

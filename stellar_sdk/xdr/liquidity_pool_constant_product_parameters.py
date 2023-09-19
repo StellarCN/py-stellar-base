@@ -1,6 +1,9 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
+from __future__ import annotations
+
 import base64
+
 from xdrlib3 import Packer, Unpacker
 
 from .asset import Asset
@@ -17,7 +20,7 @@ class LiquidityPoolConstantProductParameters:
         {
             Asset assetA; // assetA < assetB
             Asset assetB;
-            int32 fee;    // Fee is in basis points, so the actual rate is (fee/100)%
+            int32 fee; // Fee is in basis points, so the actual rate is (fee/100)%
         };
     """
 
@@ -37,7 +40,7 @@ class LiquidityPoolConstantProductParameters:
         self.fee.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "LiquidityPoolConstantProductParameters":
+    def unpack(cls, unpacker: Unpacker) -> LiquidityPoolConstantProductParameters:
         asset_a = Asset.unpack(unpacker)
         asset_b = Asset.unpack(unpacker)
         fee = Int32.unpack(unpacker)
@@ -53,7 +56,7 @@ class LiquidityPoolConstantProductParameters:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "LiquidityPoolConstantProductParameters":
+    def from_xdr_bytes(cls, xdr: bytes) -> LiquidityPoolConstantProductParameters:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -62,9 +65,18 @@ class LiquidityPoolConstantProductParameters:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "LiquidityPoolConstantProductParameters":
+    def from_xdr(cls, xdr: str) -> LiquidityPoolConstantProductParameters:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def __hash__(self):
+        return hash(
+            (
+                self.asset_a,
+                self.asset_b,
+                self.fee,
+            )
+        )
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):

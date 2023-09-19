@@ -1,7 +1,10 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
+from __future__ import annotations
+
 import base64
 from typing import Optional
+
 from xdrlib3 import Packer, Unpacker
 
 from .hash import Hash
@@ -59,7 +62,7 @@ class SCPStatementPrepare:
         self.n_h.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "SCPStatementPrepare":
+    def unpack(cls, unpacker: Unpacker) -> SCPStatementPrepare:
         quorum_set_hash = Hash.unpack(unpacker)
         ballot = SCPBallot.unpack(unpacker)
         prepared = SCPBallot.unpack(unpacker) if unpacker.unpack_uint() else None
@@ -81,7 +84,7 @@ class SCPStatementPrepare:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "SCPStatementPrepare":
+    def from_xdr_bytes(cls, xdr: bytes) -> SCPStatementPrepare:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -90,9 +93,21 @@ class SCPStatementPrepare:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "SCPStatementPrepare":
+    def from_xdr(cls, xdr: str) -> SCPStatementPrepare:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def __hash__(self):
+        return hash(
+            (
+                self.quorum_set_hash,
+                self.ballot,
+                self.prepared,
+                self.prepared_prime,
+                self.n_c,
+                self.n_h,
+            )
+        )
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):

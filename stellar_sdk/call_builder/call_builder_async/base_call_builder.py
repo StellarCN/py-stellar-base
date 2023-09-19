@@ -4,13 +4,11 @@ from ...call_builder.base.base_call_builder import BaseCallBuilder as _BaseCallB
 from ...client.base_async_client import BaseAsyncClient
 from ...client.response import Response
 from ...exceptions import NotPageableError, raise_request_exception
-from ...type_checked import type_checked
 from ...utils import urljoin_with_query
 
 __all__ = ["BaseCallBuilder"]
 
 
-@type_checked
 class BaseCallBuilder(_BaseCallBuilder):
     """Creates a new :class:`BaseCallBuilder` pointed to server defined by horizon_url.
 
@@ -77,6 +75,16 @@ class BaseCallBuilder(_BaseCallBuilder):
         if self.prev_href is None:
             raise NotPageableError("The prev page does not exist.")
         return await self._call(self.prev_href, None)
+
+    def __hash__(self):
+        return hash(
+            (
+                self.params,
+                self.endpoint,
+                self.horizon_url,
+                self.client,
+            )
+        )
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):

@@ -1,6 +1,9 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
+from __future__ import annotations
+
 import base64
+
 from xdrlib3 import Packer, Unpacker
 
 from .hash import Hash
@@ -22,7 +25,7 @@ class PoolID:
         self.pool_id.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "PoolID":
+    def unpack(cls, unpacker: Unpacker) -> PoolID:
         pool_id = Hash.unpack(unpacker)
         return cls(pool_id)
 
@@ -32,7 +35,7 @@ class PoolID:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "PoolID":
+    def from_xdr_bytes(cls, xdr: bytes) -> PoolID:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -41,9 +44,12 @@ class PoolID:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "PoolID":
+    def from_xdr(cls, xdr: str) -> PoolID:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def __hash__(self):
+        return hash(self.pool_id)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):

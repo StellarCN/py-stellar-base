@@ -1,7 +1,10 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
+from __future__ import annotations
+
 import base64
 from enum import IntEnum
+
 from xdrlib3 import Packer, Unpacker
 
 __all__ = ["TransactionResultCode"]
@@ -30,10 +33,12 @@ class TransactionResultCode(IntEnum):
             txBAD_AUTH_EXTRA = -10,      // unused signatures attached to transaction
             txINTERNAL_ERROR = -11,      // an unknown error occurred
 
-            txNOT_SUPPORTED = -12,         // transaction type not supported
-            txFEE_BUMP_INNER_FAILED = -13, // fee bump inner transaction failed
-            txBAD_SPONSORSHIP = -14,       // sponsorship not confirmed
-            txBAD_MIN_SEQ_AGE_OR_GAP = -15 //minSeqAge or minSeqLedgerGap conditions not met
+            txNOT_SUPPORTED = -12,          // transaction type not supported
+            txFEE_BUMP_INNER_FAILED = -13,  // fee bump inner transaction failed
+            txBAD_SPONSORSHIP = -14,        // sponsorship not confirmed
+            txBAD_MIN_SEQ_AGE_OR_GAP = -15, // minSeqAge or minSeqLedgerGap conditions not met
+            txMALFORMED = -16,              // precondition is invalid
+            txSOROBAN_INVALID = -17         // soroban-specific preconditions were not met
         };
     """
 
@@ -54,12 +59,14 @@ class TransactionResultCode(IntEnum):
     txFEE_BUMP_INNER_FAILED = -13
     txBAD_SPONSORSHIP = -14
     txBAD_MIN_SEQ_AGE_OR_GAP = -15
+    txMALFORMED = -16
+    txSOROBAN_INVALID = -17
 
     def pack(self, packer: Packer) -> None:
         packer.pack_int(self.value)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "TransactionResultCode":
+    def unpack(cls, unpacker: Unpacker) -> TransactionResultCode:
         value = unpacker.unpack_int()
         return cls(value)
 
@@ -69,7 +76,7 @@ class TransactionResultCode(IntEnum):
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "TransactionResultCode":
+    def from_xdr_bytes(cls, xdr: bytes) -> TransactionResultCode:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -78,6 +85,6 @@ class TransactionResultCode(IntEnum):
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "TransactionResultCode":
+    def from_xdr(cls, xdr: str) -> TransactionResultCode:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)

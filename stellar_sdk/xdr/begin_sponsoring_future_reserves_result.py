@@ -1,6 +1,9 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
+from __future__ import annotations
+
 import base64
+
 from xdrlib3 import Packer, Unpacker
 
 from .begin_sponsoring_future_reserves_result_code import (
@@ -19,7 +22,9 @@ class BeginSponsoringFutureReservesResult:
         {
         case BEGIN_SPONSORING_FUTURE_RESERVES_SUCCESS:
             void;
-        default:
+        case BEGIN_SPONSORING_FUTURE_RESERVES_MALFORMED:
+        case BEGIN_SPONSORING_FUTURE_RESERVES_ALREADY_SPONSORED:
+        case BEGIN_SPONSORING_FUTURE_RESERVES_RECURSIVE:
             void;
         };
     """
@@ -37,13 +42,43 @@ class BeginSponsoringFutureReservesResult:
             == BeginSponsoringFutureReservesResultCode.BEGIN_SPONSORING_FUTURE_RESERVES_SUCCESS
         ):
             return
+        if (
+            self.code
+            == BeginSponsoringFutureReservesResultCode.BEGIN_SPONSORING_FUTURE_RESERVES_MALFORMED
+        ):
+            return
+        if (
+            self.code
+            == BeginSponsoringFutureReservesResultCode.BEGIN_SPONSORING_FUTURE_RESERVES_ALREADY_SPONSORED
+        ):
+            return
+        if (
+            self.code
+            == BeginSponsoringFutureReservesResultCode.BEGIN_SPONSORING_FUTURE_RESERVES_RECURSIVE
+        ):
+            return
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "BeginSponsoringFutureReservesResult":
+    def unpack(cls, unpacker: Unpacker) -> BeginSponsoringFutureReservesResult:
         code = BeginSponsoringFutureReservesResultCode.unpack(unpacker)
         if (
             code
             == BeginSponsoringFutureReservesResultCode.BEGIN_SPONSORING_FUTURE_RESERVES_SUCCESS
+        ):
+            return cls(code=code)
+        if (
+            code
+            == BeginSponsoringFutureReservesResultCode.BEGIN_SPONSORING_FUTURE_RESERVES_MALFORMED
+        ):
+            return cls(code=code)
+        if (
+            code
+            == BeginSponsoringFutureReservesResultCode.BEGIN_SPONSORING_FUTURE_RESERVES_ALREADY_SPONSORED
+        ):
+            return cls(code=code)
+        if (
+            code
+            == BeginSponsoringFutureReservesResultCode.BEGIN_SPONSORING_FUTURE_RESERVES_RECURSIVE
         ):
             return cls(code=code)
         return cls(code=code)
@@ -54,7 +89,7 @@ class BeginSponsoringFutureReservesResult:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "BeginSponsoringFutureReservesResult":
+    def from_xdr_bytes(cls, xdr: bytes) -> BeginSponsoringFutureReservesResult:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -63,9 +98,12 @@ class BeginSponsoringFutureReservesResult:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "BeginSponsoringFutureReservesResult":
+    def from_xdr(cls, xdr: str) -> BeginSponsoringFutureReservesResult:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def __hash__(self):
+        return hash((self.code,))
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):

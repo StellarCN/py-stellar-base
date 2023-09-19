@@ -5,12 +5,10 @@ from typing import Optional, Union
 from .. import utils
 from .. import xdr as stellar_xdr
 from ..muxed_account import MuxedAccount
-from ..type_checked import type_checked
 
 __all__ = ["Operation"]
 
 
-@type_checked
 class Operation(metaclass=ABCMeta):
     """The :class:`Operation` object, which represents an operation on
     Stellar's network.
@@ -76,7 +74,7 @@ class Operation(metaclass=ABCMeta):
 
     @staticmethod
     def from_xdr_amount(value: int) -> str:
-        """Converts an str amount from an XDR amount object
+        """Converts a str amount from an XDR amount object
 
         :param value: The amount to convert to a string from an XDR int64
             amount.
@@ -125,6 +123,9 @@ class Operation(metaclass=ABCMeta):
         if xdr_object.source_account:
             return MuxedAccount.from_xdr_object(xdr_object.source_account)
         return None
+
+    def __hash__(self):
+        return hash(self.to_xdr_object())
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):

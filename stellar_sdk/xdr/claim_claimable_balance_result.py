@@ -1,6 +1,9 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
+from __future__ import annotations
+
 import base64
+
 from xdrlib3 import Packer, Unpacker
 
 from .claim_claimable_balance_result_code import ClaimClaimableBalanceResultCode
@@ -16,7 +19,11 @@ class ClaimClaimableBalanceResult:
         {
         case CLAIM_CLAIMABLE_BALANCE_SUCCESS:
             void;
-        default:
+        case CLAIM_CLAIMABLE_BALANCE_DOES_NOT_EXIST:
+        case CLAIM_CLAIMABLE_BALANCE_CANNOT_CLAIM:
+        case CLAIM_CLAIMABLE_BALANCE_LINE_FULL:
+        case CLAIM_CLAIMABLE_BALANCE_NO_TRUST:
+        case CLAIM_CLAIMABLE_BALANCE_NOT_AUTHORIZED:
             void;
         };
     """
@@ -31,11 +38,52 @@ class ClaimClaimableBalanceResult:
         self.code.pack(packer)
         if self.code == ClaimClaimableBalanceResultCode.CLAIM_CLAIMABLE_BALANCE_SUCCESS:
             return
+        if (
+            self.code
+            == ClaimClaimableBalanceResultCode.CLAIM_CLAIMABLE_BALANCE_DOES_NOT_EXIST
+        ):
+            return
+        if (
+            self.code
+            == ClaimClaimableBalanceResultCode.CLAIM_CLAIMABLE_BALANCE_CANNOT_CLAIM
+        ):
+            return
+        if (
+            self.code
+            == ClaimClaimableBalanceResultCode.CLAIM_CLAIMABLE_BALANCE_LINE_FULL
+        ):
+            return
+        if (
+            self.code
+            == ClaimClaimableBalanceResultCode.CLAIM_CLAIMABLE_BALANCE_NO_TRUST
+        ):
+            return
+        if (
+            self.code
+            == ClaimClaimableBalanceResultCode.CLAIM_CLAIMABLE_BALANCE_NOT_AUTHORIZED
+        ):
+            return
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "ClaimClaimableBalanceResult":
+    def unpack(cls, unpacker: Unpacker) -> ClaimClaimableBalanceResult:
         code = ClaimClaimableBalanceResultCode.unpack(unpacker)
         if code == ClaimClaimableBalanceResultCode.CLAIM_CLAIMABLE_BALANCE_SUCCESS:
+            return cls(code=code)
+        if (
+            code
+            == ClaimClaimableBalanceResultCode.CLAIM_CLAIMABLE_BALANCE_DOES_NOT_EXIST
+        ):
+            return cls(code=code)
+        if code == ClaimClaimableBalanceResultCode.CLAIM_CLAIMABLE_BALANCE_CANNOT_CLAIM:
+            return cls(code=code)
+        if code == ClaimClaimableBalanceResultCode.CLAIM_CLAIMABLE_BALANCE_LINE_FULL:
+            return cls(code=code)
+        if code == ClaimClaimableBalanceResultCode.CLAIM_CLAIMABLE_BALANCE_NO_TRUST:
+            return cls(code=code)
+        if (
+            code
+            == ClaimClaimableBalanceResultCode.CLAIM_CLAIMABLE_BALANCE_NOT_AUTHORIZED
+        ):
             return cls(code=code)
         return cls(code=code)
 
@@ -45,7 +93,7 @@ class ClaimClaimableBalanceResult:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "ClaimClaimableBalanceResult":
+    def from_xdr_bytes(cls, xdr: bytes) -> ClaimClaimableBalanceResult:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -54,9 +102,12 @@ class ClaimClaimableBalanceResult:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "ClaimClaimableBalanceResult":
+    def from_xdr(cls, xdr: str) -> ClaimClaimableBalanceResult:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def __hash__(self):
+        return hash((self.code,))
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):

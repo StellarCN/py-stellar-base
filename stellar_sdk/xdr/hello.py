@@ -1,6 +1,9 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
+from __future__ import annotations
+
 import base64
+
 from xdrlib3 import Packer, Unpacker
 
 from .auth_cert import AuthCert
@@ -65,7 +68,7 @@ class Hello:
         self.nonce.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "Hello":
+    def unpack(cls, unpacker: Unpacker) -> Hello:
         ledger_version = Uint32.unpack(unpacker)
         overlay_version = Uint32.unpack(unpacker)
         overlay_min_version = Uint32.unpack(unpacker)
@@ -93,7 +96,7 @@ class Hello:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "Hello":
+    def from_xdr_bytes(cls, xdr: bytes) -> Hello:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -102,9 +105,24 @@ class Hello:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "Hello":
+    def from_xdr(cls, xdr: str) -> Hello:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def __hash__(self):
+        return hash(
+            (
+                self.ledger_version,
+                self.overlay_version,
+                self.overlay_min_version,
+                self.network_id,
+                self.version_str,
+                self.listening_port,
+                self.peer_id,
+                self.cert,
+                self.nonce,
+            )
+        )
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):

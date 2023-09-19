@@ -1,11 +1,8 @@
 import json
 
-from ..type_checked import type_checked
-
 __all__ = ["Response"]
 
 
-@type_checked
 class Response:
     """The :class:`Response <Response>` object, which contains a
     server's response to an HTTP request.
@@ -28,6 +25,11 @@ class Response:
         :return: the content from server
         """
         return json.loads(self.text)
+
+    def __hash__(self):
+        return hash(
+            (self.status_code, self.text, tuple(self.headers.items()), self.url)
+        )
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):

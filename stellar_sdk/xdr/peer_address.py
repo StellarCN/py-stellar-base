@@ -1,6 +1,9 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
+from __future__ import annotations
+
 import base64
+
 from xdrlib3 import Packer, Unpacker
 
 from .peer_address_ip import PeerAddressIp
@@ -44,7 +47,7 @@ class PeerAddress:
         self.num_failures.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "PeerAddress":
+    def unpack(cls, unpacker: Unpacker) -> PeerAddress:
         ip = PeerAddressIp.unpack(unpacker)
         port = Uint32.unpack(unpacker)
         num_failures = Uint32.unpack(unpacker)
@@ -60,7 +63,7 @@ class PeerAddress:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "PeerAddress":
+    def from_xdr_bytes(cls, xdr: bytes) -> PeerAddress:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -69,9 +72,18 @@ class PeerAddress:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "PeerAddress":
+    def from_xdr(cls, xdr: str) -> PeerAddress:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def __hash__(self):
+        return hash(
+            (
+                self.ip,
+                self.port,
+                self.num_failures,
+            )
+        )
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):

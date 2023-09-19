@@ -1,6 +1,9 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
+from __future__ import annotations
+
 import base64
+
 from xdrlib3 import Packer, Unpacker
 
 from .operation_result_code import OperationResultCode
@@ -66,9 +69,20 @@ class OperationResult:
                 LiquidityPoolDepositResult liquidityPoolDepositResult;
             case LIQUIDITY_POOL_WITHDRAW:
                 LiquidityPoolWithdrawResult liquidityPoolWithdrawResult;
+            case INVOKE_HOST_FUNCTION:
+                InvokeHostFunctionResult invokeHostFunctionResult;
+            case BUMP_FOOTPRINT_EXPIRATION:
+                BumpFootprintExpirationResult bumpFootprintExpirationResult;
+            case RESTORE_FOOTPRINT:
+                RestoreFootprintResult restoreFootprintResult;
             }
             tr;
-        default:
+        case opBAD_AUTH:
+        case opNO_ACCOUNT:
+        case opNOT_SUPPORTED:
+        case opTOO_MANY_SUBENTRIES:
+        case opEXCEEDED_WORK_LIMIT:
+        case opTOO_MANY_SPONSORING:
             void;
         };
     """
@@ -88,13 +102,37 @@ class OperationResult:
                 raise ValueError("tr should not be None.")
             self.tr.pack(packer)
             return
+        if self.code == OperationResultCode.opBAD_AUTH:
+            return
+        if self.code == OperationResultCode.opNO_ACCOUNT:
+            return
+        if self.code == OperationResultCode.opNOT_SUPPORTED:
+            return
+        if self.code == OperationResultCode.opTOO_MANY_SUBENTRIES:
+            return
+        if self.code == OperationResultCode.opEXCEEDED_WORK_LIMIT:
+            return
+        if self.code == OperationResultCode.opTOO_MANY_SPONSORING:
+            return
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "OperationResult":
+    def unpack(cls, unpacker: Unpacker) -> OperationResult:
         code = OperationResultCode.unpack(unpacker)
         if code == OperationResultCode.opINNER:
             tr = OperationResultTr.unpack(unpacker)
             return cls(code=code, tr=tr)
+        if code == OperationResultCode.opBAD_AUTH:
+            return cls(code=code)
+        if code == OperationResultCode.opNO_ACCOUNT:
+            return cls(code=code)
+        if code == OperationResultCode.opNOT_SUPPORTED:
+            return cls(code=code)
+        if code == OperationResultCode.opTOO_MANY_SUBENTRIES:
+            return cls(code=code)
+        if code == OperationResultCode.opEXCEEDED_WORK_LIMIT:
+            return cls(code=code)
+        if code == OperationResultCode.opTOO_MANY_SPONSORING:
+            return cls(code=code)
         return cls(code=code)
 
     def to_xdr_bytes(self) -> bytes:
@@ -103,7 +141,7 @@ class OperationResult:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "OperationResult":
+    def from_xdr_bytes(cls, xdr: bytes) -> OperationResult:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -112,9 +150,17 @@ class OperationResult:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "OperationResult":
+    def from_xdr(cls, xdr: str) -> OperationResult:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def __hash__(self):
+        return hash(
+            (
+                self.code,
+                self.tr,
+            )
+        )
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):

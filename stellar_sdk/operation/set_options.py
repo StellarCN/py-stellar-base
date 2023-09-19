@@ -7,7 +7,6 @@ from ..keypair import Keypair
 from ..muxed_account import MuxedAccount
 from ..signer import Signer
 from ..strkey import StrKey
-from ..type_checked import type_checked
 from ..utils import raise_if_not_valid_ed25519_public_key
 from .operation import Operation
 
@@ -25,7 +24,6 @@ class AuthorizationFlag(IntFlag):
     AUTHORIZATION_CLAWBACK_ENABLED = 8
 
 
-@type_checked
 class SetOptions(Operation):
     """The :class:`SetOptions` object, which represents a SetOptions operation
     on Stellar's network.

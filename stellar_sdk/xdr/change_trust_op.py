@@ -1,6 +1,9 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
+from __future__ import annotations
+
 import base64
+
 from xdrlib3 import Packer, Unpacker
 
 from .change_trust_asset import ChangeTrustAsset
@@ -35,7 +38,7 @@ class ChangeTrustOp:
         self.limit.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "ChangeTrustOp":
+    def unpack(cls, unpacker: Unpacker) -> ChangeTrustOp:
         line = ChangeTrustAsset.unpack(unpacker)
         limit = Int64.unpack(unpacker)
         return cls(
@@ -49,7 +52,7 @@ class ChangeTrustOp:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "ChangeTrustOp":
+    def from_xdr_bytes(cls, xdr: bytes) -> ChangeTrustOp:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -58,9 +61,17 @@ class ChangeTrustOp:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "ChangeTrustOp":
+    def from_xdr(cls, xdr: str) -> ChangeTrustOp:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def __hash__(self):
+        return hash(
+            (
+                self.line,
+                self.limit,
+            )
+        )
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):

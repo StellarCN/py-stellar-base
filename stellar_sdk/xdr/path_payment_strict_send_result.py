@@ -1,6 +1,9 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
+from __future__ import annotations
+
 import base64
+
 from xdrlib3 import Packer, Unpacker
 
 from .asset import Asset
@@ -22,9 +25,20 @@ class PathPaymentStrictSendResult:
                 ClaimAtom offers<>;
                 SimplePaymentResult last;
             } success;
+        case PATH_PAYMENT_STRICT_SEND_MALFORMED:
+        case PATH_PAYMENT_STRICT_SEND_UNDERFUNDED:
+        case PATH_PAYMENT_STRICT_SEND_SRC_NO_TRUST:
+        case PATH_PAYMENT_STRICT_SEND_SRC_NOT_AUTHORIZED:
+        case PATH_PAYMENT_STRICT_SEND_NO_DESTINATION:
+        case PATH_PAYMENT_STRICT_SEND_NO_TRUST:
+        case PATH_PAYMENT_STRICT_SEND_NOT_AUTHORIZED:
+        case PATH_PAYMENT_STRICT_SEND_LINE_FULL:
+            void;
         case PATH_PAYMENT_STRICT_SEND_NO_ISSUER:
             Asset noIssuer; // the asset that caused the error
-        default:
+        case PATH_PAYMENT_STRICT_SEND_TOO_FEW_OFFERS:
+        case PATH_PAYMENT_STRICT_SEND_OFFER_CROSS_SELF:
+        case PATH_PAYMENT_STRICT_SEND_UNDER_DESTMIN:
             void;
         };
     """
@@ -51,22 +65,120 @@ class PathPaymentStrictSendResult:
             return
         if (
             self.code
+            == PathPaymentStrictSendResultCode.PATH_PAYMENT_STRICT_SEND_MALFORMED
+        ):
+            return
+        if (
+            self.code
+            == PathPaymentStrictSendResultCode.PATH_PAYMENT_STRICT_SEND_UNDERFUNDED
+        ):
+            return
+        if (
+            self.code
+            == PathPaymentStrictSendResultCode.PATH_PAYMENT_STRICT_SEND_SRC_NO_TRUST
+        ):
+            return
+        if (
+            self.code
+            == PathPaymentStrictSendResultCode.PATH_PAYMENT_STRICT_SEND_SRC_NOT_AUTHORIZED
+        ):
+            return
+        if (
+            self.code
+            == PathPaymentStrictSendResultCode.PATH_PAYMENT_STRICT_SEND_NO_DESTINATION
+        ):
+            return
+        if (
+            self.code
+            == PathPaymentStrictSendResultCode.PATH_PAYMENT_STRICT_SEND_NO_TRUST
+        ):
+            return
+        if (
+            self.code
+            == PathPaymentStrictSendResultCode.PATH_PAYMENT_STRICT_SEND_NOT_AUTHORIZED
+        ):
+            return
+        if (
+            self.code
+            == PathPaymentStrictSendResultCode.PATH_PAYMENT_STRICT_SEND_LINE_FULL
+        ):
+            return
+        if (
+            self.code
             == PathPaymentStrictSendResultCode.PATH_PAYMENT_STRICT_SEND_NO_ISSUER
         ):
             if self.no_issuer is None:
                 raise ValueError("no_issuer should not be None.")
             self.no_issuer.pack(packer)
             return
+        if (
+            self.code
+            == PathPaymentStrictSendResultCode.PATH_PAYMENT_STRICT_SEND_TOO_FEW_OFFERS
+        ):
+            return
+        if (
+            self.code
+            == PathPaymentStrictSendResultCode.PATH_PAYMENT_STRICT_SEND_OFFER_CROSS_SELF
+        ):
+            return
+        if (
+            self.code
+            == PathPaymentStrictSendResultCode.PATH_PAYMENT_STRICT_SEND_UNDER_DESTMIN
+        ):
+            return
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "PathPaymentStrictSendResult":
+    def unpack(cls, unpacker: Unpacker) -> PathPaymentStrictSendResult:
         code = PathPaymentStrictSendResultCode.unpack(unpacker)
         if code == PathPaymentStrictSendResultCode.PATH_PAYMENT_STRICT_SEND_SUCCESS:
             success = PathPaymentStrictSendResultSuccess.unpack(unpacker)
             return cls(code=code, success=success)
+        if code == PathPaymentStrictSendResultCode.PATH_PAYMENT_STRICT_SEND_MALFORMED:
+            return cls(code=code)
+        if code == PathPaymentStrictSendResultCode.PATH_PAYMENT_STRICT_SEND_UNDERFUNDED:
+            return cls(code=code)
+        if (
+            code
+            == PathPaymentStrictSendResultCode.PATH_PAYMENT_STRICT_SEND_SRC_NO_TRUST
+        ):
+            return cls(code=code)
+        if (
+            code
+            == PathPaymentStrictSendResultCode.PATH_PAYMENT_STRICT_SEND_SRC_NOT_AUTHORIZED
+        ):
+            return cls(code=code)
+        if (
+            code
+            == PathPaymentStrictSendResultCode.PATH_PAYMENT_STRICT_SEND_NO_DESTINATION
+        ):
+            return cls(code=code)
+        if code == PathPaymentStrictSendResultCode.PATH_PAYMENT_STRICT_SEND_NO_TRUST:
+            return cls(code=code)
+        if (
+            code
+            == PathPaymentStrictSendResultCode.PATH_PAYMENT_STRICT_SEND_NOT_AUTHORIZED
+        ):
+            return cls(code=code)
+        if code == PathPaymentStrictSendResultCode.PATH_PAYMENT_STRICT_SEND_LINE_FULL:
+            return cls(code=code)
         if code == PathPaymentStrictSendResultCode.PATH_PAYMENT_STRICT_SEND_NO_ISSUER:
             no_issuer = Asset.unpack(unpacker)
             return cls(code=code, no_issuer=no_issuer)
+        if (
+            code
+            == PathPaymentStrictSendResultCode.PATH_PAYMENT_STRICT_SEND_TOO_FEW_OFFERS
+        ):
+            return cls(code=code)
+        if (
+            code
+            == PathPaymentStrictSendResultCode.PATH_PAYMENT_STRICT_SEND_OFFER_CROSS_SELF
+        ):
+            return cls(code=code)
+        if (
+            code
+            == PathPaymentStrictSendResultCode.PATH_PAYMENT_STRICT_SEND_UNDER_DESTMIN
+        ):
+            return cls(code=code)
         return cls(code=code)
 
     def to_xdr_bytes(self) -> bytes:
@@ -75,7 +187,7 @@ class PathPaymentStrictSendResult:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "PathPaymentStrictSendResult":
+    def from_xdr_bytes(cls, xdr: bytes) -> PathPaymentStrictSendResult:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -84,9 +196,18 @@ class PathPaymentStrictSendResult:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "PathPaymentStrictSendResult":
+    def from_xdr(cls, xdr: str) -> PathPaymentStrictSendResult:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def __hash__(self):
+        return hash(
+            (
+                self.code,
+                self.success,
+                self.no_issuer,
+            )
+        )
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):

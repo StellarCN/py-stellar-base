@@ -6,7 +6,6 @@ from urllib3.exceptions import NewConnectionError
 
 from ..__version__ import __version__
 from ..client.response import Response
-from ..type_checked import type_checked
 from .base_sync_client import BaseSyncClient
 
 USER_AGENT = f"py-stellar-base/{__version__}/SimpleRequestsClient"
@@ -19,7 +18,6 @@ HEADERS = {
 __all__ = ["SimpleRequestsClient"]
 
 
-@type_checked
 class SimpleRequestsClient(BaseSyncClient):
     """The :class:`SimpleRequestsClient` object is a synchronous http client,
     which represents the interface for making requests to a server instance.
@@ -47,16 +45,19 @@ class SimpleRequestsClient(BaseSyncClient):
             url=resp.url,
         )
 
-    def post(self, url: str, data: Dict[str, str]) -> Response:
+    def post(
+        self, url: str, data: Dict[str, str] = None, json_data: Dict[str, Any] = None
+    ) -> Response:
         """Perform HTTP POST request.
 
         :param url: the request url
         :param data: the data send to server
+        :param json_data: the json data send to server
         :return: the response from server
         :raise: :exc:`ConnectionError <stellar_sdk.exceptions.ConnectionError>`
         """
         try:
-            resp = requests.post(url=url, data=data, headers=HEADERS)
+            resp = requests.post(url=url, data=data, json=json_data, headers=HEADERS)
         except (RequestException, NewConnectionError) as err:
             raise ConnectionError(err)
         return Response(

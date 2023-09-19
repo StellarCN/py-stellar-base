@@ -1,6 +1,9 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
+from __future__ import annotations
+
 import base64
+
 from xdrlib3 import Packer, Unpacker
 
 from .allow_trust_result_code import AllowTrustResultCode
@@ -16,7 +19,12 @@ class AllowTrustResult:
         {
         case ALLOW_TRUST_SUCCESS:
             void;
-        default:
+        case ALLOW_TRUST_MALFORMED:
+        case ALLOW_TRUST_NO_TRUST_LINE:
+        case ALLOW_TRUST_TRUST_NOT_REQUIRED:
+        case ALLOW_TRUST_CANT_REVOKE:
+        case ALLOW_TRUST_SELF_NOT_ALLOWED:
+        case ALLOW_TRUST_LOW_RESERVE:
             void;
         };
     """
@@ -31,11 +39,35 @@ class AllowTrustResult:
         self.code.pack(packer)
         if self.code == AllowTrustResultCode.ALLOW_TRUST_SUCCESS:
             return
+        if self.code == AllowTrustResultCode.ALLOW_TRUST_MALFORMED:
+            return
+        if self.code == AllowTrustResultCode.ALLOW_TRUST_NO_TRUST_LINE:
+            return
+        if self.code == AllowTrustResultCode.ALLOW_TRUST_TRUST_NOT_REQUIRED:
+            return
+        if self.code == AllowTrustResultCode.ALLOW_TRUST_CANT_REVOKE:
+            return
+        if self.code == AllowTrustResultCode.ALLOW_TRUST_SELF_NOT_ALLOWED:
+            return
+        if self.code == AllowTrustResultCode.ALLOW_TRUST_LOW_RESERVE:
+            return
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "AllowTrustResult":
+    def unpack(cls, unpacker: Unpacker) -> AllowTrustResult:
         code = AllowTrustResultCode.unpack(unpacker)
         if code == AllowTrustResultCode.ALLOW_TRUST_SUCCESS:
+            return cls(code=code)
+        if code == AllowTrustResultCode.ALLOW_TRUST_MALFORMED:
+            return cls(code=code)
+        if code == AllowTrustResultCode.ALLOW_TRUST_NO_TRUST_LINE:
+            return cls(code=code)
+        if code == AllowTrustResultCode.ALLOW_TRUST_TRUST_NOT_REQUIRED:
+            return cls(code=code)
+        if code == AllowTrustResultCode.ALLOW_TRUST_CANT_REVOKE:
+            return cls(code=code)
+        if code == AllowTrustResultCode.ALLOW_TRUST_SELF_NOT_ALLOWED:
+            return cls(code=code)
+        if code == AllowTrustResultCode.ALLOW_TRUST_LOW_RESERVE:
             return cls(code=code)
         return cls(code=code)
 
@@ -45,7 +77,7 @@ class AllowTrustResult:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "AllowTrustResult":
+    def from_xdr_bytes(cls, xdr: bytes) -> AllowTrustResult:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -54,9 +86,12 @@ class AllowTrustResult:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "AllowTrustResult":
+    def from_xdr(cls, xdr: str) -> AllowTrustResult:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def __hash__(self):
+        return hash((self.code,))
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):

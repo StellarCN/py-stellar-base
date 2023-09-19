@@ -5,13 +5,11 @@ from typing import Optional, Union
 
 from .. import xdr as stellar_xdr
 from ..asset import Asset
-from ..exceptions import ValueError
 from ..keypair import Keypair
 from ..liquidity_pool_id import LiquidityPoolId
 from ..muxed_account import MuxedAccount
 from ..signer_key import SignerKey
 from ..strkey import StrKey
-from ..type_checked import type_checked
 from ..utils import (
     raise_if_not_valid_balance_id,
     raise_if_not_valid_ed25519_public_key,
@@ -34,12 +32,14 @@ class RevokeSponsorshipType(IntEnum):
     LIQUIDITY_POOL = 6
 
 
-@type_checked
 class TrustLine:
     def __init__(self, account_id: str, asset: Union[Asset, LiquidityPoolId]) -> None:
         self.account_id = account_id
         self.asset = asset
         raise_if_not_valid_ed25519_public_key(self.account_id, "account_id")
+
+    def __hash__(self):
+        return hash((self.account_id, self.asset))
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
@@ -50,12 +50,14 @@ class TrustLine:
         return f"<TrustLine [account_id={self.account_id}, asset={self.asset}]>"
 
 
-@type_checked
 class Offer:
     def __init__(self, seller_id: str, offer_id: int) -> None:
         self.seller_id = seller_id
         self.offer_id = offer_id
         raise_if_not_valid_ed25519_public_key(self.seller_id, "seller_id")
+
+    def __hash__(self):
+        return hash((self.seller_id, self.offer_id))
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
@@ -66,12 +68,14 @@ class Offer:
         return f"<Offer [seller_id={self.seller_id}, offer_id={self.offer_id}]>"
 
 
-@type_checked
 class Data:
     def __init__(self, account_id: str, data_name: str) -> None:
         self.account_id = account_id
         self.data_name = data_name
         raise_if_not_valid_ed25519_public_key(self.account_id, "account_id")
+
+    def __hash__(self):
+        return hash((self.account_id, self.data_name))
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
@@ -82,12 +86,14 @@ class Data:
         return f"<Data [account_id={self.account_id}, data_name={self.data_name}]>"
 
 
-@type_checked
 class Signer:
     def __init__(self, account_id: str, signer_key: SignerKey) -> None:
         self.account_id = account_id
         self.signer_key = signer_key
         raise_if_not_valid_ed25519_public_key(self.account_id, "account_id")
+
+    def __hash__(self):
+        return hash((self.account_id, self.signer_key))
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
@@ -100,7 +106,6 @@ class Signer:
         return f"<Signer [account_id={self.account_id}, signer_key={self.signer_key}]>"
 
 
-@type_checked
 class RevokeSponsorship(Operation):
     """The :class:`RevokeSponsorship` object, which represents a RevokeSponsorship
     operation on Stellar's network.
@@ -130,6 +135,7 @@ class RevokeSponsorship(Operation):
     _XDR_OPERATION_TYPE: stellar_xdr.OperationType = (
         stellar_xdr.OperationType.REVOKE_SPONSORSHIP
     )
+    # TODO: Protocol 20?
 
     def __init__(
         self,
@@ -528,6 +534,21 @@ class RevokeSponsorship(Operation):
         else:
             raise ValueError(f"{op_type} is an unsupported RevokeSponsorship type.")
         return op
+
+    def __hash__(self):
+        return hash(
+            (
+                self.revoke_sponsorship_type,
+                self.account_id,
+                self.trustline,
+                self.offer,
+                self.data,
+                self.claimable_balance_id,
+                self.liquidity_pool_id,
+                self.signer,
+                self.source,
+            )
+        )
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):

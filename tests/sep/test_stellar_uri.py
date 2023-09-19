@@ -3,7 +3,6 @@ from decimal import Decimal
 import pytest
 
 from stellar_sdk import Asset, Keypair, Network
-from stellar_sdk.exceptions import ValueError
 from stellar_sdk.fee_bump_transaction_envelope import FeeBumpTransactionEnvelope
 from stellar_sdk.memo import *
 from stellar_sdk.sep.stellar_uri import (
@@ -12,7 +11,6 @@ from stellar_sdk.sep.stellar_uri import (
     TransactionStellarUri,
 )
 from stellar_sdk.transaction_envelope import TransactionEnvelope
-from stellar_sdk.type_checked import _STELLAR_SDK_RUNTIME_TYPE_CHECKING
 
 
 class TestStellarTransactionStellarUri:
@@ -497,9 +495,7 @@ class TestPayStellarUri:
                 message=message,
             )
 
-    @pytest.mark.skipif(
-        not _STELLAR_SDK_RUNTIME_TYPE_CHECKING, reason="runtime_type_checking_disabled"
-    )
+    @pytest.mark.skip(reason="runtime_type_checking_disabled")
     def test_invalid_memo_raise(self):
         memo = "invalid memo"
         with pytest.raises(

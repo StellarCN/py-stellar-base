@@ -1,6 +1,9 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
+from __future__ import annotations
+
 import base64
+
 from xdrlib3 import Packer, Unpacker
 
 from .transaction_history_entry_ext import TransactionHistoryEntryExt
@@ -19,11 +22,13 @@ class TransactionHistoryEntry:
             uint32 ledgerSeq;
             TransactionSet txSet;
 
-            // reserved for future use
+            // when v != 0, txSet must be empty
             union switch (int v)
             {
             case 0:
                 void;
+            case 1:
+                GeneralizedTransactionSet generalizedTxSet;
             }
             ext;
         };
@@ -45,7 +50,7 @@ class TransactionHistoryEntry:
         self.ext.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "TransactionHistoryEntry":
+    def unpack(cls, unpacker: Unpacker) -> TransactionHistoryEntry:
         ledger_seq = Uint32.unpack(unpacker)
         tx_set = TransactionSet.unpack(unpacker)
         ext = TransactionHistoryEntryExt.unpack(unpacker)
@@ -61,7 +66,7 @@ class TransactionHistoryEntry:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "TransactionHistoryEntry":
+    def from_xdr_bytes(cls, xdr: bytes) -> TransactionHistoryEntry:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -70,9 +75,18 @@ class TransactionHistoryEntry:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "TransactionHistoryEntry":
+    def from_xdr(cls, xdr: str) -> TransactionHistoryEntry:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def __hash__(self):
+        return hash(
+            (
+                self.ledger_seq,
+                self.tx_set,
+                self.ext,
+            )
+        )
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):

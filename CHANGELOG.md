@@ -1,6 +1,38 @@
 Release History
 ==============
 
+### Version 9.0.0-alpha2
+
+Released on September 16, 2023
+
+#### Update
+- feat: add support for Soroban Preview 11 ([#777](https://github.com/StellarCN/py-stellar-base/pull/777))
+
+### Version 9.0.0-alpha1
+
+Released on Aug 28, 2023
+
+#### Update
+- fix: fix the issue where soroban data is not correctly set when building a transaction through TransactionBuilder. ([#770](https://github.com/StellarCN/py-stellar-base/pull/770))
+
+### Version 9.0.0-alpha0
+
+Released on Aug 27, 2023
+
+#### Add
+- feat: add support for Soroban Preview 10. Please check the examples in the `examples` folder to learn how to use it.
+
+#### Update
+- Runtime type checking has now been removed. Please use tools like mypy for type checking. ([#706](https://github.com/StellarCN/py-stellar-base/pull/706))
+- Add `__hash__` to the xdr classes. ([#757](https://github.com/StellarCN/py-stellar-base/pull/757))
+- Make `aiohttp` and `aiohttp-sse-client` as optional dependencies. ([#765](https://github.com/StellarCN/py-stellar-base/pull/765))
+- Publishing to PyPI with a Trusted Publisher. ([#767](https://github.com/StellarCN/py-stellar-base/pull/767))
+- Update dependencies.
+
+#### Breaking changes
+- Remove `ValueError`, `TypeError` and `AttributeError` from `stellar_sdk.exceptions`. ([#763](https://github.com/StellarCN/py-stellar-base/pull/763))
+
+
 ### Version 8.2.1
 
 Released on June 22, 2023

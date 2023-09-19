@@ -1,7 +1,10 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
+from __future__ import annotations
+
 import base64
 from typing import List
+
 from xdrlib3 import Packer, Unpacker
 
 from .hash import Hash
@@ -117,7 +120,7 @@ class LedgerHeader:
         self.ext.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "LedgerHeader":
+    def unpack(cls, unpacker: Unpacker) -> LedgerHeader:
         ledger_version = Uint32.unpack(unpacker)
         previous_ledger_hash = Hash.unpack(unpacker)
         scp_value = StellarValue.unpack(unpacker)
@@ -160,7 +163,7 @@ class LedgerHeader:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "LedgerHeader":
+    def from_xdr_bytes(cls, xdr: bytes) -> LedgerHeader:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -169,9 +172,30 @@ class LedgerHeader:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "LedgerHeader":
+    def from_xdr(cls, xdr: str) -> LedgerHeader:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def __hash__(self):
+        return hash(
+            (
+                self.ledger_version,
+                self.previous_ledger_hash,
+                self.scp_value,
+                self.tx_set_result_hash,
+                self.bucket_list_hash,
+                self.ledger_seq,
+                self.total_coins,
+                self.fee_pool,
+                self.inflation_seq,
+                self.id_pool,
+                self.base_fee,
+                self.base_reserve,
+                self.max_tx_set_size,
+                self.skip_list,
+                self.ext,
+            )
+        )
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):

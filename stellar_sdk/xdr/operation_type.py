@@ -1,7 +1,10 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
+from __future__ import annotations
+
 import base64
 from enum import IntEnum
+
 from xdrlib3 import Packer, Unpacker
 
 __all__ = ["OperationType"]
@@ -36,7 +39,10 @@ class OperationType(IntEnum):
             CLAWBACK_CLAIMABLE_BALANCE = 20,
             SET_TRUST_LINE_FLAGS = 21,
             LIQUIDITY_POOL_DEPOSIT = 22,
-            LIQUIDITY_POOL_WITHDRAW = 23
+            LIQUIDITY_POOL_WITHDRAW = 23,
+            INVOKE_HOST_FUNCTION = 24,
+            BUMP_FOOTPRINT_EXPIRATION = 25,
+            RESTORE_FOOTPRINT = 26
         };
     """
 
@@ -64,12 +70,15 @@ class OperationType(IntEnum):
     SET_TRUST_LINE_FLAGS = 21
     LIQUIDITY_POOL_DEPOSIT = 22
     LIQUIDITY_POOL_WITHDRAW = 23
+    INVOKE_HOST_FUNCTION = 24
+    BUMP_FOOTPRINT_EXPIRATION = 25
+    RESTORE_FOOTPRINT = 26
 
     def pack(self, packer: Packer) -> None:
         packer.pack_int(self.value)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "OperationType":
+    def unpack(cls, unpacker: Unpacker) -> OperationType:
         value = unpacker.unpack_int()
         return cls(value)
 
@@ -79,7 +88,7 @@ class OperationType(IntEnum):
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "OperationType":
+    def from_xdr_bytes(cls, xdr: bytes) -> OperationType:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -88,6 +97,6 @@ class OperationType(IntEnum):
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "OperationType":
+    def from_xdr(cls, xdr: str) -> OperationType:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)

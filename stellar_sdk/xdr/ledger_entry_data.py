@@ -1,11 +1,18 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
+from __future__ import annotations
+
 import base64
+
 from xdrlib3 import Packer, Unpacker
 
 from .account_entry import AccountEntry
 from .claimable_balance_entry import ClaimableBalanceEntry
+from .config_setting_entry import ConfigSettingEntry
+from .contract_code_entry import ContractCodeEntry
+from .contract_data_entry import ContractDataEntry
 from .data_entry import DataEntry
+from .expiration_entry import ExpirationEntry
 from .ledger_entry_type import LedgerEntryType
 from .liquidity_pool_entry import LiquidityPoolEntry
 from .offer_entry import OfferEntry
@@ -32,6 +39,14 @@ class LedgerEntryData:
                 ClaimableBalanceEntry claimableBalance;
             case LIQUIDITY_POOL:
                 LiquidityPoolEntry liquidityPool;
+            case CONTRACT_DATA:
+                ContractDataEntry contractData;
+            case CONTRACT_CODE:
+                ContractCodeEntry contractCode;
+            case CONFIG_SETTING:
+                ConfigSettingEntry configSetting;
+            case EXPIRATION:
+                ExpirationEntry expiration;
             }
     """
 
@@ -44,6 +59,10 @@ class LedgerEntryData:
         data: DataEntry = None,
         claimable_balance: ClaimableBalanceEntry = None,
         liquidity_pool: LiquidityPoolEntry = None,
+        contract_data: ContractDataEntry = None,
+        contract_code: ContractCodeEntry = None,
+        config_setting: ConfigSettingEntry = None,
+        expiration: ExpirationEntry = None,
     ) -> None:
         self.type = type
         self.account = account
@@ -52,6 +71,10 @@ class LedgerEntryData:
         self.data = data
         self.claimable_balance = claimable_balance
         self.liquidity_pool = liquidity_pool
+        self.contract_data = contract_data
+        self.contract_code = contract_code
+        self.config_setting = config_setting
+        self.expiration = expiration
 
     def pack(self, packer: Packer) -> None:
         self.type.pack(packer)
@@ -85,9 +108,29 @@ class LedgerEntryData:
                 raise ValueError("liquidity_pool should not be None.")
             self.liquidity_pool.pack(packer)
             return
+        if self.type == LedgerEntryType.CONTRACT_DATA:
+            if self.contract_data is None:
+                raise ValueError("contract_data should not be None.")
+            self.contract_data.pack(packer)
+            return
+        if self.type == LedgerEntryType.CONTRACT_CODE:
+            if self.contract_code is None:
+                raise ValueError("contract_code should not be None.")
+            self.contract_code.pack(packer)
+            return
+        if self.type == LedgerEntryType.CONFIG_SETTING:
+            if self.config_setting is None:
+                raise ValueError("config_setting should not be None.")
+            self.config_setting.pack(packer)
+            return
+        if self.type == LedgerEntryType.EXPIRATION:
+            if self.expiration is None:
+                raise ValueError("expiration should not be None.")
+            self.expiration.pack(packer)
+            return
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "LedgerEntryData":
+    def unpack(cls, unpacker: Unpacker) -> LedgerEntryData:
         type = LedgerEntryType.unpack(unpacker)
         if type == LedgerEntryType.ACCOUNT:
             account = AccountEntry.unpack(unpacker)
@@ -107,6 +150,18 @@ class LedgerEntryData:
         if type == LedgerEntryType.LIQUIDITY_POOL:
             liquidity_pool = LiquidityPoolEntry.unpack(unpacker)
             return cls(type=type, liquidity_pool=liquidity_pool)
+        if type == LedgerEntryType.CONTRACT_DATA:
+            contract_data = ContractDataEntry.unpack(unpacker)
+            return cls(type=type, contract_data=contract_data)
+        if type == LedgerEntryType.CONTRACT_CODE:
+            contract_code = ContractCodeEntry.unpack(unpacker)
+            return cls(type=type, contract_code=contract_code)
+        if type == LedgerEntryType.CONFIG_SETTING:
+            config_setting = ConfigSettingEntry.unpack(unpacker)
+            return cls(type=type, config_setting=config_setting)
+        if type == LedgerEntryType.EXPIRATION:
+            expiration = ExpirationEntry.unpack(unpacker)
+            return cls(type=type, expiration=expiration)
         return cls(type=type)
 
     def to_xdr_bytes(self) -> bytes:
@@ -115,7 +170,7 @@ class LedgerEntryData:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "LedgerEntryData":
+    def from_xdr_bytes(cls, xdr: bytes) -> LedgerEntryData:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -124,9 +179,26 @@ class LedgerEntryData:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "LedgerEntryData":
+    def from_xdr(cls, xdr: str) -> LedgerEntryData:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def __hash__(self):
+        return hash(
+            (
+                self.type,
+                self.account,
+                self.trust_line,
+                self.offer,
+                self.data,
+                self.claimable_balance,
+                self.liquidity_pool,
+                self.contract_data,
+                self.contract_code,
+                self.config_setting,
+                self.expiration,
+            )
+        )
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -139,6 +211,10 @@ class LedgerEntryData:
             and self.data == other.data
             and self.claimable_balance == other.claimable_balance
             and self.liquidity_pool == other.liquidity_pool
+            and self.contract_data == other.contract_data
+            and self.contract_code == other.contract_code
+            and self.config_setting == other.config_setting
+            and self.expiration == other.expiration
         )
 
     def __str__(self):
@@ -156,4 +232,16 @@ class LedgerEntryData:
         out.append(
             f"liquidity_pool={self.liquidity_pool}"
         ) if self.liquidity_pool is not None else None
+        out.append(
+            f"contract_data={self.contract_data}"
+        ) if self.contract_data is not None else None
+        out.append(
+            f"contract_code={self.contract_code}"
+        ) if self.contract_code is not None else None
+        out.append(
+            f"config_setting={self.config_setting}"
+        ) if self.config_setting is not None else None
+        out.append(
+            f"expiration={self.expiration}"
+        ) if self.expiration is not None else None
         return f"<LedgerEntryData [{', '.join(out)}]>"

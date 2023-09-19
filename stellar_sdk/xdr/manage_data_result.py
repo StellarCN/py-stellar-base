@@ -1,6 +1,9 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
+from __future__ import annotations
+
 import base64
+
 from xdrlib3 import Packer, Unpacker
 
 from .manage_data_result_code import ManageDataResultCode
@@ -16,7 +19,10 @@ class ManageDataResult:
         {
         case MANAGE_DATA_SUCCESS:
             void;
-        default:
+        case MANAGE_DATA_NOT_SUPPORTED_YET:
+        case MANAGE_DATA_NAME_NOT_FOUND:
+        case MANAGE_DATA_LOW_RESERVE:
+        case MANAGE_DATA_INVALID_NAME:
             void;
         };
     """
@@ -31,11 +37,27 @@ class ManageDataResult:
         self.code.pack(packer)
         if self.code == ManageDataResultCode.MANAGE_DATA_SUCCESS:
             return
+        if self.code == ManageDataResultCode.MANAGE_DATA_NOT_SUPPORTED_YET:
+            return
+        if self.code == ManageDataResultCode.MANAGE_DATA_NAME_NOT_FOUND:
+            return
+        if self.code == ManageDataResultCode.MANAGE_DATA_LOW_RESERVE:
+            return
+        if self.code == ManageDataResultCode.MANAGE_DATA_INVALID_NAME:
+            return
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "ManageDataResult":
+    def unpack(cls, unpacker: Unpacker) -> ManageDataResult:
         code = ManageDataResultCode.unpack(unpacker)
         if code == ManageDataResultCode.MANAGE_DATA_SUCCESS:
+            return cls(code=code)
+        if code == ManageDataResultCode.MANAGE_DATA_NOT_SUPPORTED_YET:
+            return cls(code=code)
+        if code == ManageDataResultCode.MANAGE_DATA_NAME_NOT_FOUND:
+            return cls(code=code)
+        if code == ManageDataResultCode.MANAGE_DATA_LOW_RESERVE:
+            return cls(code=code)
+        if code == ManageDataResultCode.MANAGE_DATA_INVALID_NAME:
             return cls(code=code)
         return cls(code=code)
 
@@ -45,7 +67,7 @@ class ManageDataResult:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "ManageDataResult":
+    def from_xdr_bytes(cls, xdr: bytes) -> ManageDataResult:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -54,9 +76,12 @@ class ManageDataResult:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "ManageDataResult":
+    def from_xdr(cls, xdr: str) -> ManageDataResult:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def __hash__(self):
+        return hash((self.code,))
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):

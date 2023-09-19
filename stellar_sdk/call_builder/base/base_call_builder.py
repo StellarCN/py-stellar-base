@@ -9,12 +9,9 @@ from typing import (
     Union,
 )
 
-from ...type_checked import type_checked
-
 __all__ = ["BaseCallBuilder"]
 
 
-@type_checked
 class BaseCallBuilder:
     """Creates a new :class:`BaseCallBuilder` pointed to server defined by horizon_url.
 

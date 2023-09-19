@@ -1,6 +1,9 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
+from __future__ import annotations
+
 import base64
+
 from xdrlib3 import Packer, Unpacker
 
 from .int64 import Int64
@@ -16,9 +19,9 @@ class LiquidityPoolWithdrawOp:
         struct LiquidityPoolWithdrawOp
         {
             PoolID liquidityPoolID;
-            int64 amount;         // amount of pool shares to withdraw
-            int64 minAmountA;     // minimum amount of first asset to withdraw
-            int64 minAmountB;     // minimum amount of second asset to withdraw
+            int64 amount;     // amount of pool shares to withdraw
+            int64 minAmountA; // minimum amount of first asset to withdraw
+            int64 minAmountB; // minimum amount of second asset to withdraw
         };
     """
 
@@ -41,7 +44,7 @@ class LiquidityPoolWithdrawOp:
         self.min_amount_b.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "LiquidityPoolWithdrawOp":
+    def unpack(cls, unpacker: Unpacker) -> LiquidityPoolWithdrawOp:
         liquidity_pool_id = PoolID.unpack(unpacker)
         amount = Int64.unpack(unpacker)
         min_amount_a = Int64.unpack(unpacker)
@@ -59,7 +62,7 @@ class LiquidityPoolWithdrawOp:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "LiquidityPoolWithdrawOp":
+    def from_xdr_bytes(cls, xdr: bytes) -> LiquidityPoolWithdrawOp:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -68,9 +71,19 @@ class LiquidityPoolWithdrawOp:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "LiquidityPoolWithdrawOp":
+    def from_xdr(cls, xdr: str) -> LiquidityPoolWithdrawOp:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def __hash__(self):
+        return hash(
+            (
+                self.liquidity_pool_id,
+                self.amount,
+                self.min_amount_a,
+                self.min_amount_b,
+            )
+        )
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):

@@ -1,10 +1,8 @@
 from . import xdr as stellar_xdr
-from .type_checked import type_checked
 
 __all__ = ["DecoratedSignature"]
 
 
-@type_checked
 class DecoratedSignature:
     def __init__(
         self,
@@ -40,6 +38,9 @@ class DecoratedSignature:
         signature_hint = xdr_object.hint.signature_hint
         signature = xdr_object.signature.signature
         return cls(signature_hint, signature)
+
+    def __hash__(self):
+        return hash((self.signature_hint, self.signature))
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):

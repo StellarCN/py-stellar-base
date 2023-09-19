@@ -1,6 +1,9 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
+from __future__ import annotations
+
 import base64
+
 from xdrlib3 import Packer, Unpacker
 
 from .account_merge_result_code import AccountMergeResultCode
@@ -17,7 +20,13 @@ class AccountMergeResult:
         {
         case ACCOUNT_MERGE_SUCCESS:
             int64 sourceAccountBalance; // how much got transferred from source account
-        default:
+        case ACCOUNT_MERGE_MALFORMED:
+        case ACCOUNT_MERGE_NO_ACCOUNT:
+        case ACCOUNT_MERGE_IMMUTABLE_SET:
+        case ACCOUNT_MERGE_HAS_SUB_ENTRIES:
+        case ACCOUNT_MERGE_SEQNUM_TOO_FAR:
+        case ACCOUNT_MERGE_DEST_FULL:
+        case ACCOUNT_MERGE_IS_SPONSOR:
             void;
         };
     """
@@ -37,13 +46,41 @@ class AccountMergeResult:
                 raise ValueError("source_account_balance should not be None.")
             self.source_account_balance.pack(packer)
             return
+        if self.code == AccountMergeResultCode.ACCOUNT_MERGE_MALFORMED:
+            return
+        if self.code == AccountMergeResultCode.ACCOUNT_MERGE_NO_ACCOUNT:
+            return
+        if self.code == AccountMergeResultCode.ACCOUNT_MERGE_IMMUTABLE_SET:
+            return
+        if self.code == AccountMergeResultCode.ACCOUNT_MERGE_HAS_SUB_ENTRIES:
+            return
+        if self.code == AccountMergeResultCode.ACCOUNT_MERGE_SEQNUM_TOO_FAR:
+            return
+        if self.code == AccountMergeResultCode.ACCOUNT_MERGE_DEST_FULL:
+            return
+        if self.code == AccountMergeResultCode.ACCOUNT_MERGE_IS_SPONSOR:
+            return
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "AccountMergeResult":
+    def unpack(cls, unpacker: Unpacker) -> AccountMergeResult:
         code = AccountMergeResultCode.unpack(unpacker)
         if code == AccountMergeResultCode.ACCOUNT_MERGE_SUCCESS:
             source_account_balance = Int64.unpack(unpacker)
             return cls(code=code, source_account_balance=source_account_balance)
+        if code == AccountMergeResultCode.ACCOUNT_MERGE_MALFORMED:
+            return cls(code=code)
+        if code == AccountMergeResultCode.ACCOUNT_MERGE_NO_ACCOUNT:
+            return cls(code=code)
+        if code == AccountMergeResultCode.ACCOUNT_MERGE_IMMUTABLE_SET:
+            return cls(code=code)
+        if code == AccountMergeResultCode.ACCOUNT_MERGE_HAS_SUB_ENTRIES:
+            return cls(code=code)
+        if code == AccountMergeResultCode.ACCOUNT_MERGE_SEQNUM_TOO_FAR:
+            return cls(code=code)
+        if code == AccountMergeResultCode.ACCOUNT_MERGE_DEST_FULL:
+            return cls(code=code)
+        if code == AccountMergeResultCode.ACCOUNT_MERGE_IS_SPONSOR:
+            return cls(code=code)
         return cls(code=code)
 
     def to_xdr_bytes(self) -> bytes:
@@ -52,7 +89,7 @@ class AccountMergeResult:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "AccountMergeResult":
+    def from_xdr_bytes(cls, xdr: bytes) -> AccountMergeResult:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -61,9 +98,17 @@ class AccountMergeResult:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "AccountMergeResult":
+    def from_xdr(cls, xdr: str) -> AccountMergeResult:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def __hash__(self):
+        return hash(
+            (
+                self.code,
+                self.source_account_balance,
+            )
+        )
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):

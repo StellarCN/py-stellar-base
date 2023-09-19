@@ -6,15 +6,13 @@ from nacl.exceptions import BadSignatureError as NaclBadSignatureError
 
 from . import xdr as stellar_xdr
 from .decorated_signature import DecoratedSignature
-from .exceptions import AttributeError, BadSignatureError, MissingEd25519SecretSeedError
+from .exceptions import BadSignatureError, MissingEd25519SecretSeedError
 from .sep.mnemonic import Language, StellarMnemonic
 from .strkey import StrKey
-from .type_checked import type_checked
 
 __all__ = ["Keypair"]
 
 
-@type_checked
 class Keypair:
     """The :class:`Keypair` object, which represents a signing and
     verifying key for use with the Stellar network.
@@ -286,6 +284,9 @@ class Keypair:
         payload_hint[: data_len if data_len < 4 else 4] = data[-4:]
         hint = bytes(map(lambda x, y: x ^ y, key_hint, payload_hint))
         return DecoratedSignature(hint, signature)
+
+    def __hash__(self):
+        return hash((self.verify_key, self.signing_key))
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):

@@ -1,10 +1,14 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
+from __future__ import annotations
+
 import base64
+
 from xdrlib3 import Packer, Unpacker
 
 from .allow_trust_op import AllowTrustOp
 from .begin_sponsoring_future_reserves_op import BeginSponsoringFutureReservesOp
+from .bump_footprint_expiration_op import BumpFootprintExpirationOp
 from .bump_sequence_op import BumpSequenceOp
 from .change_trust_op import ChangeTrustOp
 from .claim_claimable_balance_op import ClaimClaimableBalanceOp
@@ -13,6 +17,7 @@ from .clawback_op import ClawbackOp
 from .create_account_op import CreateAccountOp
 from .create_claimable_balance_op import CreateClaimableBalanceOp
 from .create_passive_sell_offer_op import CreatePassiveSellOfferOp
+from .invoke_host_function_op import InvokeHostFunctionOp
 from .liquidity_pool_deposit_op import LiquidityPoolDepositOp
 from .liquidity_pool_withdraw_op import LiquidityPoolWithdrawOp
 from .manage_buy_offer_op import ManageBuyOfferOp
@@ -23,6 +28,7 @@ from .operation_type import OperationType
 from .path_payment_strict_receive_op import PathPaymentStrictReceiveOp
 from .path_payment_strict_send_op import PathPaymentStrictSendOp
 from .payment_op import PaymentOp
+from .restore_footprint_op import RestoreFootprintOp
 from .revoke_sponsorship_op import RevokeSponsorshipOp
 from .set_options_op import SetOptionsOp
 from .set_trust_line_flags_op import SetTrustLineFlagsOp
@@ -84,6 +90,12 @@ class OperationBody:
                 LiquidityPoolDepositOp liquidityPoolDepositOp;
             case LIQUIDITY_POOL_WITHDRAW:
                 LiquidityPoolWithdrawOp liquidityPoolWithdrawOp;
+            case INVOKE_HOST_FUNCTION:
+                InvokeHostFunctionOp invokeHostFunctionOp;
+            case BUMP_FOOTPRINT_EXPIRATION:
+                BumpFootprintExpirationOp bumpFootprintExpirationOp;
+            case RESTORE_FOOTPRINT:
+                RestoreFootprintOp restoreFootprintOp;
             }
     """
 
@@ -112,6 +124,9 @@ class OperationBody:
         set_trust_line_flags_op: SetTrustLineFlagsOp = None,
         liquidity_pool_deposit_op: LiquidityPoolDepositOp = None,
         liquidity_pool_withdraw_op: LiquidityPoolWithdrawOp = None,
+        invoke_host_function_op: InvokeHostFunctionOp = None,
+        bump_footprint_expiration_op: BumpFootprintExpirationOp = None,
+        restore_footprint_op: RestoreFootprintOp = None,
     ) -> None:
         self.type = type
         self.create_account_op = create_account_op
@@ -136,6 +151,9 @@ class OperationBody:
         self.set_trust_line_flags_op = set_trust_line_flags_op
         self.liquidity_pool_deposit_op = liquidity_pool_deposit_op
         self.liquidity_pool_withdraw_op = liquidity_pool_withdraw_op
+        self.invoke_host_function_op = invoke_host_function_op
+        self.bump_footprint_expiration_op = bump_footprint_expiration_op
+        self.restore_footprint_op = restore_footprint_op
 
     def pack(self, packer: Packer) -> None:
         self.type.pack(packer)
@@ -255,9 +273,24 @@ class OperationBody:
                 raise ValueError("liquidity_pool_withdraw_op should not be None.")
             self.liquidity_pool_withdraw_op.pack(packer)
             return
+        if self.type == OperationType.INVOKE_HOST_FUNCTION:
+            if self.invoke_host_function_op is None:
+                raise ValueError("invoke_host_function_op should not be None.")
+            self.invoke_host_function_op.pack(packer)
+            return
+        if self.type == OperationType.BUMP_FOOTPRINT_EXPIRATION:
+            if self.bump_footprint_expiration_op is None:
+                raise ValueError("bump_footprint_expiration_op should not be None.")
+            self.bump_footprint_expiration_op.pack(packer)
+            return
+        if self.type == OperationType.RESTORE_FOOTPRINT:
+            if self.restore_footprint_op is None:
+                raise ValueError("restore_footprint_op should not be None.")
+            self.restore_footprint_op.pack(packer)
+            return
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "OperationBody":
+    def unpack(cls, unpacker: Unpacker) -> OperationBody:
         type = OperationType.unpack(unpacker)
         if type == OperationType.CREATE_ACCOUNT:
             create_account_op = CreateAccountOp.unpack(unpacker)
@@ -344,6 +377,17 @@ class OperationBody:
         if type == OperationType.LIQUIDITY_POOL_WITHDRAW:
             liquidity_pool_withdraw_op = LiquidityPoolWithdrawOp.unpack(unpacker)
             return cls(type=type, liquidity_pool_withdraw_op=liquidity_pool_withdraw_op)
+        if type == OperationType.INVOKE_HOST_FUNCTION:
+            invoke_host_function_op = InvokeHostFunctionOp.unpack(unpacker)
+            return cls(type=type, invoke_host_function_op=invoke_host_function_op)
+        if type == OperationType.BUMP_FOOTPRINT_EXPIRATION:
+            bump_footprint_expiration_op = BumpFootprintExpirationOp.unpack(unpacker)
+            return cls(
+                type=type, bump_footprint_expiration_op=bump_footprint_expiration_op
+            )
+        if type == OperationType.RESTORE_FOOTPRINT:
+            restore_footprint_op = RestoreFootprintOp.unpack(unpacker)
+            return cls(type=type, restore_footprint_op=restore_footprint_op)
         return cls(type=type)
 
     def to_xdr_bytes(self) -> bytes:
@@ -352,7 +396,7 @@ class OperationBody:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "OperationBody":
+    def from_xdr_bytes(cls, xdr: bytes) -> OperationBody:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -361,9 +405,41 @@ class OperationBody:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "OperationBody":
+    def from_xdr(cls, xdr: str) -> OperationBody:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def __hash__(self):
+        return hash(
+            (
+                self.type,
+                self.create_account_op,
+                self.payment_op,
+                self.path_payment_strict_receive_op,
+                self.manage_sell_offer_op,
+                self.create_passive_sell_offer_op,
+                self.set_options_op,
+                self.change_trust_op,
+                self.allow_trust_op,
+                self.destination,
+                self.manage_data_op,
+                self.bump_sequence_op,
+                self.manage_buy_offer_op,
+                self.path_payment_strict_send_op,
+                self.create_claimable_balance_op,
+                self.claim_claimable_balance_op,
+                self.begin_sponsoring_future_reserves_op,
+                self.revoke_sponsorship_op,
+                self.clawback_op,
+                self.clawback_claimable_balance_op,
+                self.set_trust_line_flags_op,
+                self.liquidity_pool_deposit_op,
+                self.liquidity_pool_withdraw_op,
+                self.invoke_host_function_op,
+                self.bump_footprint_expiration_op,
+                self.restore_footprint_op,
+            )
+        )
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -395,6 +471,9 @@ class OperationBody:
             and self.set_trust_line_flags_op == other.set_trust_line_flags_op
             and self.liquidity_pool_deposit_op == other.liquidity_pool_deposit_op
             and self.liquidity_pool_withdraw_op == other.liquidity_pool_withdraw_op
+            and self.invoke_host_function_op == other.invoke_host_function_op
+            and self.bump_footprint_expiration_op == other.bump_footprint_expiration_op
+            and self.restore_footprint_op == other.restore_footprint_op
         )
 
     def __str__(self):
@@ -466,4 +545,13 @@ class OperationBody:
         out.append(
             f"liquidity_pool_withdraw_op={self.liquidity_pool_withdraw_op}"
         ) if self.liquidity_pool_withdraw_op is not None else None
+        out.append(
+            f"invoke_host_function_op={self.invoke_host_function_op}"
+        ) if self.invoke_host_function_op is not None else None
+        out.append(
+            f"bump_footprint_expiration_op={self.bump_footprint_expiration_op}"
+        ) if self.bump_footprint_expiration_op is not None else None
+        out.append(
+            f"restore_footprint_op={self.restore_footprint_op}"
+        ) if self.restore_footprint_op is not None else None
         return f"<OperationBody [{', '.join(out)}]>"

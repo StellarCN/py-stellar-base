@@ -1,6 +1,9 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
+from __future__ import annotations
+
 import base64
+
 from xdrlib3 import Packer, Unpacker
 
 from .base import Integer
@@ -31,7 +34,7 @@ class TransactionHistoryResultEntryExt:
             return
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "TransactionHistoryResultEntryExt":
+    def unpack(cls, unpacker: Unpacker) -> TransactionHistoryResultEntryExt:
         v = Integer.unpack(unpacker)
         if v == 0:
             return cls(v=v)
@@ -43,7 +46,7 @@ class TransactionHistoryResultEntryExt:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "TransactionHistoryResultEntryExt":
+    def from_xdr_bytes(cls, xdr: bytes) -> TransactionHistoryResultEntryExt:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -52,9 +55,12 @@ class TransactionHistoryResultEntryExt:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "TransactionHistoryResultEntryExt":
+    def from_xdr(cls, xdr: str) -> TransactionHistoryResultEntryExt:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def __hash__(self):
+        return hash((self.v,))
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):

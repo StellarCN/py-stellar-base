@@ -1,7 +1,10 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
+from __future__ import annotations
+
 import base64
 from typing import List
+
 from xdrlib3 import Packer, Unpacker
 
 from .asset import Asset
@@ -72,7 +75,7 @@ class ClaimableBalanceEntry:
         self.ext.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "ClaimableBalanceEntry":
+    def unpack(cls, unpacker: Unpacker) -> ClaimableBalanceEntry:
         balance_id = ClaimableBalanceID.unpack(unpacker)
         length = unpacker.unpack_uint()
         claimants = []
@@ -95,7 +98,7 @@ class ClaimableBalanceEntry:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "ClaimableBalanceEntry":
+    def from_xdr_bytes(cls, xdr: bytes) -> ClaimableBalanceEntry:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -104,9 +107,20 @@ class ClaimableBalanceEntry:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "ClaimableBalanceEntry":
+    def from_xdr(cls, xdr: str) -> ClaimableBalanceEntry:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def __hash__(self):
+        return hash(
+            (
+                self.balance_id,
+                self.claimants,
+                self.asset,
+                self.amount,
+                self.ext,
+            )
+        )
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):

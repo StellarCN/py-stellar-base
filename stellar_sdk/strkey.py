@@ -2,6 +2,7 @@ import base64
 import binascii
 import struct
 from enum import Enum
+
 from xdrlib3 import Packer, Unpacker
 
 from . import xdr as stellar_xdr
@@ -9,10 +10,7 @@ from .exceptions import (
     Ed25519PublicKeyInvalidError,
     Ed25519SecretSeedInvalidError,
     MuxedEd25519AccountInvalidError,
-    TypeError,
-    ValueError,
 )
-from .type_checked import type_checked
 
 __all__ = ["StrKey"]
 
@@ -24,9 +22,9 @@ class _VersionByte(Enum):
     SHA256_HASH = binascii.a2b_hex("b8")  # X 184 23 << 3
     MUXED_ACCOUNT = binascii.a2b_hex("60")  # M 96 12 << 3
     ED25519_SIGNED_PAYLOAD = binascii.a2b_hex("78")  # P 120 15 << 3
+    CONTRACT = binascii.a2b_hex("10")  # C 16 2 << 3
 
 
-@type_checked
 class StrKey:
     """StrKey is a helper class that allows encoding and decoding strkey."""
 
@@ -257,8 +255,41 @@ class StrKey:
         """
         return _is_valid(_VersionByte.ED25519_SIGNED_PAYLOAD, ed25519_signed_payload)
 
+    @staticmethod
+    def encode_contract(data: bytes) -> str:
+        """Encodes data to encoded contract strkey.
 
-@type_checked
+        :param data: data to encode
+        :return: encoded contract strkey
+        :raises:
+            :exc:`ValueError <stellar_sdk.exceptions.ValueError>`
+        """
+        return _encode_check(_VersionByte.CONTRACT, data)
+
+    @staticmethod
+    def decode_contract(data: str) -> bytes:
+        """Decodes encoded contract strkey to raw data.
+
+        :param data: encoded contract strkey
+        :return: raw bytes
+        :raises:
+            :exc:`ValueError <stellar_sdk.exceptions.ValueError>`
+        """
+        try:
+            return _decode_check(_VersionByte.CONTRACT, data)
+        except Exception as e:
+            raise ValueError(f"Invalid Pre Auth Tx Key: {data}") from e
+
+    @staticmethod
+    def is_valid_contract(contract: str) -> bool:
+        """Returns ``True`` if the given `contract` is a valid encoded contract strkey.
+
+        :param pre_auth_tx: encoded contract strkey
+        :return: ``True`` if the given key is valid
+        """
+        return _is_valid(_VersionByte.CONTRACT, contract)
+
+
 def _decode_check(version_byte: _VersionByte, encoded: str) -> bytes:
     encoded_data = encoded.encode("ascii")
     encoded_data = encoded_data + b"=" * ((8 - len(encoded_data) % 8) % 8)
@@ -305,14 +336,12 @@ def _decode_check(version_byte: _VersionByte, encoded: str) -> bytes:
     return data
 
 
-@type_checked
 def _encode_check(version_byte: _VersionByte, data: bytes) -> str:
     payload = version_byte.value + data
     crc = _calculate_checksum(payload)
     return base64.b32encode(payload + crc).decode("utf-8").rstrip("=")
 
 
-@type_checked
 def _is_valid(version_byte: _VersionByte, encoded: str) -> bool:
     try:
         _decode_check(version_byte, encoded)
@@ -321,14 +350,12 @@ def _is_valid(version_byte: _VersionByte, encoded: str) -> bool:
     return True
 
 
-@type_checked
 def _get_version_byte_for_prefix(encoded: str) -> _VersionByte:
     prefix = encoded[0]
     _version_byte = ((ord(prefix) - ord("A")) << 3).to_bytes(1, byteorder="big")
     return _VersionByte(_version_byte)
 
 
-@type_checked
 def _calculate_checksum(payload: bytes) -> bytes:
     # memo note: https://gist.github.com/manran/a8357808ef71415d266dc64f0079f298
     # This code calculates CRC16-XModem checksum of payload

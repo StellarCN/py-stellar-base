@@ -1,7 +1,10 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
+from __future__ import annotations
+
 import base64
 from typing import Optional
+
 from xdrlib3 import Packer, Unpacker
 
 from .muxed_account import MuxedAccount
@@ -71,6 +74,12 @@ class Operation:
                 LiquidityPoolDepositOp liquidityPoolDepositOp;
             case LIQUIDITY_POOL_WITHDRAW:
                 LiquidityPoolWithdrawOp liquidityPoolWithdrawOp;
+            case INVOKE_HOST_FUNCTION:
+                InvokeHostFunctionOp invokeHostFunctionOp;
+            case BUMP_FOOTPRINT_EXPIRATION:
+                BumpFootprintExpirationOp bumpFootprintExpirationOp;
+            case RESTORE_FOOTPRINT:
+                RestoreFootprintOp restoreFootprintOp;
             }
             body;
         };
@@ -93,7 +102,7 @@ class Operation:
         self.body.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "Operation":
+    def unpack(cls, unpacker: Unpacker) -> Operation:
         source_account = (
             MuxedAccount.unpack(unpacker) if unpacker.unpack_uint() else None
         )
@@ -109,7 +118,7 @@ class Operation:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "Operation":
+    def from_xdr_bytes(cls, xdr: bytes) -> Operation:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -118,9 +127,17 @@ class Operation:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "Operation":
+    def from_xdr(cls, xdr: str) -> Operation:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def __hash__(self):
+        return hash(
+            (
+                self.source_account,
+                self.body,
+            )
+        )
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):

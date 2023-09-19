@@ -2,13 +2,11 @@ from typing import Optional, Union
 
 from .. import xdr as stellar_xdr
 from ..muxed_account import MuxedAccount
-from ..type_checked import type_checked
 from .operation import Operation
 
 __all__ = ["Inflation"]
 
 
-@type_checked
 class Inflation(Operation):
     """The :class:`Inflation` object, which represents a
     Inflation operation on Stellar's network.

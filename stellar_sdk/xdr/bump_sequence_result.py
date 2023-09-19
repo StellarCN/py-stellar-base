@@ -1,6 +1,9 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
+from __future__ import annotations
+
 import base64
+
 from xdrlib3 import Packer, Unpacker
 
 from .bump_sequence_result_code import BumpSequenceResultCode
@@ -16,7 +19,7 @@ class BumpSequenceResult:
         {
         case BUMP_SEQUENCE_SUCCESS:
             void;
-        default:
+        case BUMP_SEQUENCE_BAD_SEQ:
             void;
         };
     """
@@ -31,11 +34,15 @@ class BumpSequenceResult:
         self.code.pack(packer)
         if self.code == BumpSequenceResultCode.BUMP_SEQUENCE_SUCCESS:
             return
+        if self.code == BumpSequenceResultCode.BUMP_SEQUENCE_BAD_SEQ:
+            return
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "BumpSequenceResult":
+    def unpack(cls, unpacker: Unpacker) -> BumpSequenceResult:
         code = BumpSequenceResultCode.unpack(unpacker)
         if code == BumpSequenceResultCode.BUMP_SEQUENCE_SUCCESS:
+            return cls(code=code)
+        if code == BumpSequenceResultCode.BUMP_SEQUENCE_BAD_SEQ:
             return cls(code=code)
         return cls(code=code)
 
@@ -45,7 +52,7 @@ class BumpSequenceResult:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "BumpSequenceResult":
+    def from_xdr_bytes(cls, xdr: bytes) -> BumpSequenceResult:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -54,9 +61,12 @@ class BumpSequenceResult:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "BumpSequenceResult":
+    def from_xdr(cls, xdr: str) -> BumpSequenceResult:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def __hash__(self):
+        return hash((self.code,))
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):

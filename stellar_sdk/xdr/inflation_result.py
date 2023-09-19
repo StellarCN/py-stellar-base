@@ -1,7 +1,10 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
+from __future__ import annotations
+
 import base64
 from typing import List
+
 from xdrlib3 import Packer, Unpacker
 
 from .inflation_payout import InflationPayout
@@ -18,7 +21,7 @@ class InflationResult:
         {
         case INFLATION_SUCCESS:
             InflationPayout payouts<>;
-        default:
+        case INFLATION_NOT_TIME:
             void;
         };
     """
@@ -45,9 +48,11 @@ class InflationResult:
             for payouts_item in self.payouts:
                 payouts_item.pack(packer)
             return
+        if self.code == InflationResultCode.INFLATION_NOT_TIME:
+            return
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "InflationResult":
+    def unpack(cls, unpacker: Unpacker) -> InflationResult:
         code = InflationResultCode.unpack(unpacker)
         if code == InflationResultCode.INFLATION_SUCCESS:
             length = unpacker.unpack_uint()
@@ -55,6 +60,8 @@ class InflationResult:
             for _ in range(length):
                 payouts.append(InflationPayout.unpack(unpacker))
             return cls(code=code, payouts=payouts)
+        if code == InflationResultCode.INFLATION_NOT_TIME:
+            return cls(code=code)
         return cls(code=code)
 
     def to_xdr_bytes(self) -> bytes:
@@ -63,7 +70,7 @@ class InflationResult:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "InflationResult":
+    def from_xdr_bytes(cls, xdr: bytes) -> InflationResult:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -72,9 +79,17 @@ class InflationResult:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "InflationResult":
+    def from_xdr(cls, xdr: str) -> InflationResult:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def __hash__(self):
+        return hash(
+            (
+                self.code,
+                self.payouts,
+            )
+        )
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):

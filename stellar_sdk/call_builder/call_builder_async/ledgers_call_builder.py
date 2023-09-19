@@ -1,12 +1,10 @@
 from ...call_builder.base import BaseLedgersCallBuilder
 from ...call_builder.call_builder_async.base_call_builder import BaseCallBuilder
 from ...client.base_async_client import BaseAsyncClient
-from ...type_checked import type_checked
 
 __all__ = ["LedgersCallBuilder"]
 
 
-@type_checked
 class LedgersCallBuilder(BaseCallBuilder, BaseLedgersCallBuilder):
     """Creates a new :class:`LedgersCallBuilder` pointed to server defined by horizon_url.
     Do not create this object directly, use :func:`stellar_sdk.ServerAsync.ledgers`.

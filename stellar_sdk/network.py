@@ -1,10 +1,8 @@
-from .type_checked import type_checked
 from .utils import sha256
 
 __all__ = ["Network"]
 
 
-@type_checked
 class Network:
     """The :class:`Network` object, which represents a Stellar network.
 
@@ -20,6 +18,15 @@ class Network:
 
     TESTNET_NETWORK_PASSPHRASE: str = "Test SDF Network ; September 2015"
     """The Test network passphrase."""
+
+    FUTURENET_NETWORK_PASSPHRASE: str = "Test SDF Future Network ; October 2022"
+    """The Future network passphrase."""
+
+    STANDALONE_NETWORK_PASSPHRASE: str = "Standalone Network ; February 2017"
+    """The Standalone network passphrase."""
+
+    SANDBOX_NETWORK_PASSPHRASE = "Local Sandbox Stellar Network ; September 2022"
+    """The Sandbox network passphrase."""
 
     def __init__(self, network_passphrase: str) -> None:
         self.network_passphrase: str = network_passphrase
@@ -47,6 +54,9 @@ class Network:
         :return: TESTNET Network
         """
         return cls(cls.TESTNET_NETWORK_PASSPHRASE)
+
+    def __hash__(self):
+        return hash(self.network_passphrase)
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):

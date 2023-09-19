@@ -2,13 +2,11 @@ from decimal import Decimal
 from typing import Union
 
 from . import xdr as stellar_xdr
-from .type_checked import type_checked
 from .utils import best_rational_approximation
 
 __all__ = ["Price"]
 
 
-@type_checked
 class Price:
     """Create a new price. Price in Stellar is represented as a fraction.
 
@@ -70,6 +68,9 @@ class Price:
         if not isinstance(other, self.__class__):
             return NotImplemented
         return (self.n * other.d) <= (other.n * self.d)
+
+    def __hash__(self):
+        return hash((self.n, self.d))
 
     def __eq__(self, other):
         if not isinstance(other, self.__class__):

@@ -1,6 +1,9 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
+from __future__ import annotations
+
 import base64
+
 from xdrlib3 import Packer, Unpacker
 
 from .base import Hyper
@@ -22,7 +25,7 @@ class Int64:
         Hyper(self.int64).pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "Int64":
+    def unpack(cls, unpacker: Unpacker) -> Int64:
         int64 = Hyper.unpack(unpacker)
         return cls(int64)
 
@@ -32,7 +35,7 @@ class Int64:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "Int64":
+    def from_xdr_bytes(cls, xdr: bytes) -> Int64:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -41,9 +44,12 @@ class Int64:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "Int64":
+    def from_xdr(cls, xdr: str) -> Int64:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def __hash__(self):
+        return hash(self.int64)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):

@@ -1,6 +1,9 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
+from __future__ import annotations
+
 import base64
+
 from xdrlib3 import Packer, Unpacker
 
 from .hmac_sha256_mac import HmacSha256Mac
@@ -38,7 +41,7 @@ class AuthenticatedMessageV0:
         self.mac.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "AuthenticatedMessageV0":
+    def unpack(cls, unpacker: Unpacker) -> AuthenticatedMessageV0:
         sequence = Uint64.unpack(unpacker)
         message = StellarMessage.unpack(unpacker)
         mac = HmacSha256Mac.unpack(unpacker)
@@ -54,7 +57,7 @@ class AuthenticatedMessageV0:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "AuthenticatedMessageV0":
+    def from_xdr_bytes(cls, xdr: bytes) -> AuthenticatedMessageV0:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -63,9 +66,18 @@ class AuthenticatedMessageV0:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "AuthenticatedMessageV0":
+    def from_xdr(cls, xdr: str) -> AuthenticatedMessageV0:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def __hash__(self):
+        return hash(
+            (
+                self.sequence,
+                self.message,
+                self.mac,
+            )
+        )
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):

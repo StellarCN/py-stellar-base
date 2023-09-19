@@ -1,7 +1,10 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
+from __future__ import annotations
+
 import base64
 from typing import Optional
+
 from xdrlib3 import Packer, Unpacker
 
 from .account_id import AccountID
@@ -27,7 +30,7 @@ class SponsorshipDescriptor:
             self.sponsorship_descriptor.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "SponsorshipDescriptor":
+    def unpack(cls, unpacker: Unpacker) -> SponsorshipDescriptor:
         sponsorship_descriptor = (
             AccountID.unpack(unpacker) if unpacker.unpack_uint() else None
         )
@@ -39,7 +42,7 @@ class SponsorshipDescriptor:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "SponsorshipDescriptor":
+    def from_xdr_bytes(cls, xdr: bytes) -> SponsorshipDescriptor:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -48,9 +51,12 @@ class SponsorshipDescriptor:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "SponsorshipDescriptor":
+    def from_xdr(cls, xdr: str) -> SponsorshipDescriptor:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def __hash__(self):
+        return hash(self.sponsorship_descriptor)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):

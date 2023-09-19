@@ -1,7 +1,10 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
+from __future__ import annotations
+
 import base64
 from typing import List, Optional
+
 from xdrlib3 import Packer, Unpacker
 
 from .duration import Duration
@@ -18,13 +21,14 @@ class PreconditionsV2:
     """
     XDR Source Code::
 
-        struct PreconditionsV2 {
-            TimeBounds *timeBounds;
+        struct PreconditionsV2
+        {
+            TimeBounds* timeBounds;
 
             // Transaction only valid for ledger numbers n such that
             // minLedger <= n < maxLedger (if maxLedger == 0, then
             // only minLedger is checked)
-            LedgerBounds *ledgerBounds;
+            LedgerBounds* ledgerBounds;
 
             // If NULL, only valid when sourceAccount's sequence number
             // is seqNum - 1.  Otherwise, valid when sourceAccount's
@@ -32,7 +36,7 @@ class PreconditionsV2:
             // Note that after execution the account's sequence number
             // is always raised to tx.seqNum, and a transaction is not
             // valid if tx.seqNum is too high to ensure replay protection.
-            SequenceNumber *minSeqNum;
+            SequenceNumber* minSeqNum;
 
             // For the transaction to be valid, the current ledger time must
             // be at least minSeqAge greater than sourceAccount's seqTime.
@@ -95,7 +99,7 @@ class PreconditionsV2:
             extra_signers_item.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "PreconditionsV2":
+    def unpack(cls, unpacker: Unpacker) -> PreconditionsV2:
         time_bounds = TimeBounds.unpack(unpacker) if unpacker.unpack_uint() else None
         ledger_bounds = (
             LedgerBounds.unpack(unpacker) if unpacker.unpack_uint() else None
@@ -124,7 +128,7 @@ class PreconditionsV2:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "PreconditionsV2":
+    def from_xdr_bytes(cls, xdr: bytes) -> PreconditionsV2:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -133,9 +137,21 @@ class PreconditionsV2:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "PreconditionsV2":
+    def from_xdr(cls, xdr: str) -> PreconditionsV2:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def __hash__(self):
+        return hash(
+            (
+                self.time_bounds,
+                self.ledger_bounds,
+                self.min_seq_num,
+                self.min_seq_age,
+                self.min_seq_ledger_gap,
+                self.extra_signers,
+            )
+        )
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):

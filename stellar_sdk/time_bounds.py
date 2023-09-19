@@ -1,11 +1,8 @@
 from . import xdr as stellar_xdr
-from .exceptions import ValueError
-from .type_checked import type_checked
 
 __all__ = ["TimeBounds"]
 
 
-@type_checked
 class TimeBounds:
     """TimeBounds represents the time interval that a transaction is valid.
 
@@ -58,6 +55,9 @@ class TimeBounds:
             min_time=xdr_object.min_time.time_point.uint64,
             max_time=xdr_object.max_time.time_point.uint64,
         )
+
+    def __hash__(self):
+        return hash((self.min_time, self.max_time))
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):

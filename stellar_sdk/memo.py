@@ -3,13 +3,11 @@ from typing import Union
 
 from . import xdr as stellar_xdr
 from .exceptions import MemoInvalidException
-from .type_checked import type_checked
 from .utils import hex_to_bytes
 
 __all__ = ["Memo", "NoneMemo", "TextMemo", "IdMemo", "HashMemo", "ReturnHashMemo"]
 
 
-@type_checked
 class Memo(object, metaclass=abc.ABCMeta):
     """The :class:`Memo` object, which represents the base class for memos for
     use with Stellar transactions.
@@ -54,11 +52,14 @@ class Memo(object, metaclass=abc.ABCMeta):
         return memo_cls.from_xdr_object(xdr_object)  # type: ignore[attr-defined]
 
     @abc.abstractmethod
+    def __hash__(self):
+        pass  # pragma: no cover
+
+    @abc.abstractmethod
     def __eq__(self, other: object) -> bool:
         pass  # pragma: no cover
 
 
-@type_checked
 class NoneMemo(Memo):
     """The :class:`NoneMemo`, which represents no memo for a transaction."""
 
@@ -72,6 +73,9 @@ class NoneMemo(Memo):
         """Creates an XDR Memo object that represents this :class:`NoneMemo`."""
         return stellar_xdr.Memo(type=stellar_xdr.MemoType.MEMO_NONE)
 
+    def __hash__(self):
+        return hash(None)
+
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
             return NotImplemented
@@ -81,7 +85,6 @@ class NoneMemo(Memo):
         return "<NoneMemo>"
 
 
-@type_checked
 class TextMemo(Memo):
     """The :class:`TextMemo`, which represents ``MEMO_TEXT`` in a transaction.
 
@@ -116,6 +119,9 @@ class TextMemo(Memo):
             type=stellar_xdr.MemoType.MEMO_TEXT, text=self.memo_text
         )
 
+    def __hash__(self):
+        return hash(self.memo_text)
+
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
             return NotImplemented
@@ -125,7 +131,6 @@ class TextMemo(Memo):
         return f"<TextMemo [memo={self.memo_text}]>"
 
 
-@type_checked
 class IdMemo(Memo):
     """The :class:`IdMemo` which represents ``MEMO_ID`` in a transaction.
 
@@ -155,6 +160,9 @@ class IdMemo(Memo):
             type=stellar_xdr.MemoType.MEMO_ID, id=stellar_xdr.Uint64(self.memo_id)
         )
 
+    def __hash__(self):
+        return hash(self.memo_id)
+
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
             return NotImplemented
@@ -164,7 +172,6 @@ class IdMemo(Memo):
         return f"<IdMemo [memo={self.memo_id}]>"
 
 
-@type_checked
 class HashMemo(Memo):
     """The :class:`HashMemo` which represents ``MEMO_HASH`` in a transaction.
 
@@ -195,6 +202,9 @@ class HashMemo(Memo):
             type=stellar_xdr.MemoType.MEMO_HASH, hash=stellar_xdr.Hash(self.memo_hash)
         )
 
+    def __hash__(self):
+        return hash(self.memo_hash)
+
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
             return NotImplemented
@@ -204,7 +214,6 @@ class HashMemo(Memo):
         return f"<HashMemo [memo={self.memo_hash}]>"
 
 
-@type_checked
 class ReturnHashMemo(Memo):
     """The :class:`ReturnHashMemo` which represents ``MEMO_RETURN`` in a transaction.
 
@@ -240,6 +249,9 @@ class ReturnHashMemo(Memo):
             type=stellar_xdr.MemoType.MEMO_RETURN,
             ret_hash=stellar_xdr.Hash(self.memo_return),
         )
+
+    def __hash__(self):
+        return hash(self.memo_return)
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):

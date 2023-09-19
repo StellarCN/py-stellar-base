@@ -1,19 +1,16 @@
 from typing import Union
 
 from . import xdr as stellar_xdr
-from .exceptions import ValueError
 from .keypair import Keypair
 from .muxed_account import MuxedAccount
 from .transaction import Transaction
 from .transaction_envelope import TransactionEnvelope
-from .type_checked import type_checked
 
 BASE_FEE = 100
 
 __all__ = ["FeeBumpTransaction"]
 
 
-@type_checked
 class FeeBumpTransaction:
     """The :class:`FeeBumpTransaction` object, which represents a fee bump transaction
     on Stellar's network.
@@ -116,10 +113,23 @@ class FeeBumpTransaction:
         xdr_object = stellar_xdr.FeeBumpTransaction.from_xdr(xdr)
         return cls.from_xdr_object(xdr_object, network_passphrase)
 
+    def __hash__(self):
+        return hash(
+            (
+                self.fee_source,
+                self.base_fee,
+                self.inner_transaction_envelope,
+            )
+        )
+
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
             return NotImplemented
-        return self.to_xdr_object() == other.to_xdr_object()
+        return (
+            self.fee_source == other.fee_source
+            and self.base_fee == other.base_fee
+            and self.inner_transaction_envelope == other.inner_transaction_envelope
+        )
 
     def __str__(self):
         return (

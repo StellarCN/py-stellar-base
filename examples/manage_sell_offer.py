@@ -10,7 +10,6 @@ import requests
 from stellar_sdk.asset import Asset
 from stellar_sdk.keypair import Keypair
 from stellar_sdk.network import Network
-from stellar_sdk.operation.manage_sell_offer import ManageSellOffer
 from stellar_sdk.server import Server
 from stellar_sdk.transaction_builder import TransactionBuilder
 

@@ -1,6 +1,9 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
+from __future__ import annotations
+
 import base64
+
 from xdrlib3 import Packer, Unpacker
 
 from .base import Opaque
@@ -22,7 +25,7 @@ class AssetCode12:
         Opaque(self.asset_code12, 12, True).pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "AssetCode12":
+    def unpack(cls, unpacker: Unpacker) -> AssetCode12:
         asset_code12 = Opaque.unpack(unpacker, 12, True)
         return cls(asset_code12)
 
@@ -32,7 +35,7 @@ class AssetCode12:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "AssetCode12":
+    def from_xdr_bytes(cls, xdr: bytes) -> AssetCode12:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -41,9 +44,12 @@ class AssetCode12:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "AssetCode12":
+    def from_xdr(cls, xdr: str) -> AssetCode12:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def __hash__(self):
+        return hash(self.asset_code12)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):

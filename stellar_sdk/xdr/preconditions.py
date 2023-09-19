@@ -1,6 +1,9 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
+from __future__ import annotations
+
 import base64
+
 from xdrlib3 import Packer, Unpacker
 
 from .precondition_type import PreconditionType
@@ -14,13 +17,14 @@ class Preconditions:
     """
     XDR Source Code::
 
-        union Preconditions switch (PreconditionType type) {
-            case PRECOND_NONE:
-                void;
-            case PRECOND_TIME:
-                TimeBounds timeBounds;
-            case PRECOND_V2:
-                PreconditionsV2 v2;
+        union Preconditions switch (PreconditionType type)
+        {
+        case PRECOND_NONE:
+            void;
+        case PRECOND_TIME:
+            TimeBounds timeBounds;
+        case PRECOND_V2:
+            PreconditionsV2 v2;
         };
     """
 
@@ -50,7 +54,7 @@ class Preconditions:
             return
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "Preconditions":
+    def unpack(cls, unpacker: Unpacker) -> Preconditions:
         type = PreconditionType.unpack(unpacker)
         if type == PreconditionType.PRECOND_NONE:
             return cls(type=type)
@@ -68,7 +72,7 @@ class Preconditions:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "Preconditions":
+    def from_xdr_bytes(cls, xdr: bytes) -> Preconditions:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -77,9 +81,18 @@ class Preconditions:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "Preconditions":
+    def from_xdr(cls, xdr: str) -> Preconditions:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def __hash__(self):
+        return hash(
+            (
+                self.type,
+                self.time_bounds,
+                self.v2,
+            )
+        )
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):

@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import List, Optional, Sequence
 
 from . import xdr as stellar_xdr
 from .ledger_bounds import LedgerBounds
@@ -33,7 +33,7 @@ class Preconditions:
         min_sequence_number: int = None,
         min_sequence_age: int = None,
         min_sequence_ledger_gap: int = None,
-        extra_signers: List[SignerKey] = None,
+        extra_signers: Sequence[SignerKey] = None,
     ):
         if not extra_signers:
             extra_signers = []
@@ -178,6 +178,18 @@ class Preconditions:
             return cls()
         else:
             raise ValueError(f"Invalid PreconditionType: {xdr_object.type!r}")
+
+    def __hash__(self):
+        return hash(
+            (
+                self.time_bounds,
+                self.ledger_bounds,
+                self.min_sequence_number,
+                self.min_sequence_age,
+                self.min_sequence_ledger_gap,
+                self.extra_signers,
+            )
+        )
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):

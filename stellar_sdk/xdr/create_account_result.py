@@ -1,6 +1,9 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
+from __future__ import annotations
+
 import base64
+
 from xdrlib3 import Packer, Unpacker
 
 from .create_account_result_code import CreateAccountResultCode
@@ -16,7 +19,10 @@ class CreateAccountResult:
         {
         case CREATE_ACCOUNT_SUCCESS:
             void;
-        default:
+        case CREATE_ACCOUNT_MALFORMED:
+        case CREATE_ACCOUNT_UNDERFUNDED:
+        case CREATE_ACCOUNT_LOW_RESERVE:
+        case CREATE_ACCOUNT_ALREADY_EXIST:
             void;
         };
     """
@@ -31,11 +37,27 @@ class CreateAccountResult:
         self.code.pack(packer)
         if self.code == CreateAccountResultCode.CREATE_ACCOUNT_SUCCESS:
             return
+        if self.code == CreateAccountResultCode.CREATE_ACCOUNT_MALFORMED:
+            return
+        if self.code == CreateAccountResultCode.CREATE_ACCOUNT_UNDERFUNDED:
+            return
+        if self.code == CreateAccountResultCode.CREATE_ACCOUNT_LOW_RESERVE:
+            return
+        if self.code == CreateAccountResultCode.CREATE_ACCOUNT_ALREADY_EXIST:
+            return
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "CreateAccountResult":
+    def unpack(cls, unpacker: Unpacker) -> CreateAccountResult:
         code = CreateAccountResultCode.unpack(unpacker)
         if code == CreateAccountResultCode.CREATE_ACCOUNT_SUCCESS:
+            return cls(code=code)
+        if code == CreateAccountResultCode.CREATE_ACCOUNT_MALFORMED:
+            return cls(code=code)
+        if code == CreateAccountResultCode.CREATE_ACCOUNT_UNDERFUNDED:
+            return cls(code=code)
+        if code == CreateAccountResultCode.CREATE_ACCOUNT_LOW_RESERVE:
+            return cls(code=code)
+        if code == CreateAccountResultCode.CREATE_ACCOUNT_ALREADY_EXIST:
             return cls(code=code)
         return cls(code=code)
 
@@ -45,7 +67,7 @@ class CreateAccountResult:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "CreateAccountResult":
+    def from_xdr_bytes(cls, xdr: bytes) -> CreateAccountResult:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -54,9 +76,12 @@ class CreateAccountResult:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "CreateAccountResult":
+    def from_xdr(cls, xdr: str) -> CreateAccountResult:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def __hash__(self):
+        return hash((self.code,))
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):

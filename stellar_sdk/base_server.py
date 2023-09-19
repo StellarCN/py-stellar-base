@@ -38,12 +38,10 @@ from .operation import (
 from .sep.exceptions import AccountRequiresMemoError
 from .transaction import Transaction
 from .transaction_envelope import TransactionEnvelope
-from .type_checked import type_checked
 
 __all__ = ["BaseServer"]
 
 
-@type_checked
 class BaseServer:
     def submit_transaction(
         self,

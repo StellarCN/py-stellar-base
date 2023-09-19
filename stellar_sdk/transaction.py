@@ -1,21 +1,21 @@
-from typing import List, Optional, Union
+from typing import List, Optional, Sequence, Union
 
 from . import xdr as stellar_xdr
 from .keypair import Keypair
 from .memo import Memo, NoneMemo
 from .muxed_account import MuxedAccount
+from .operation import BumpFootprintExpiration, InvokeHostFunction, RestoreFootprint
 from .operation.create_claimable_balance import CreateClaimableBalance
 from .operation.operation import Operation
 from .preconditions import Preconditions
+from .soroban_data_builder import SorobanDataBuilder
 from .strkey import StrKey
 from .time_bounds import TimeBounds
-from .type_checked import type_checked
 from .utils import sha256
 
 __all__ = ["Transaction"]
 
 
-@type_checked
 class Transaction:
     """The :class:`Transaction` object, which represents a transaction(Transaction or TransactionV0)
     on Stellar's network.
@@ -48,6 +48,8 @@ class Transaction:
     :param memo: The memo being sent with the transaction, being
           represented as one of the subclasses of the
           :class:`Memo <stellar_sdk.memo.Memo>` object.
+    :param soroban_data: The soroban data being sent with the transaction, being represented as
+            :class:`SorobanTransactionData <stellar_sdk.xdr.SorobanTransactionData>`.
     :param v1: When this value is set to ``True``, V1 transactions will be generated,
         otherwise V0 transactions will be generated.
         See `CAP-0015 <https://github.com/stellar/stellar-protocol/blob/master/core/cap-0015.md>`__ for more information.
@@ -58,12 +60,12 @@ class Transaction:
         source: Union[MuxedAccount, Keypair, str],
         sequence: int,
         fee: int,
-        operations: List[Operation],
+        operations: Sequence[Operation],
         memo: Memo = None,
         preconditions: Preconditions = None,
+        soroban_data: stellar_xdr.SorobanTransactionData = None,
         v1: bool = True,
     ) -> None:
-
         # if not operations:
         #     raise ValueError("At least one operation required.")
 
@@ -81,10 +83,13 @@ class Transaction:
 
         self.source: MuxedAccount = source
         self.sequence: int = sequence
-        self.operations: List[Operation] = operations
+        self.operations: List[Operation] = list(operations) if operations else []
         self.memo: Memo = memo
         self.fee: int = fee
         self.preconditions: Optional[Preconditions] = preconditions
+        self.soroban_data: Optional[stellar_xdr.SorobanTransactionData] = (
+            SorobanDataBuilder.from_xdr(soroban_data).build() if soroban_data else None
+        )
         self.v1: bool = v1
 
     def get_claimable_balance_id(self, operation_index: int) -> str:
@@ -160,7 +165,14 @@ class Transaction:
             else Preconditions().to_xdr_object()
         )
         source_xdr = self.source.to_xdr_object()
-        ext = stellar_xdr.TransactionExt(0)
+        if self.soroban_data:
+            ext = stellar_xdr.TransactionExt(
+                1,
+                self.soroban_data,
+            )
+        else:
+            ext = stellar_xdr.TransactionExt(0)
+
         return stellar_xdr.Transaction(
             source_xdr,
             fee,
@@ -187,6 +199,7 @@ class Transaction:
 
         :return: A new :class:`Transaction` object from the given XDR Transaction object.
         """
+        soroban_data = None
         if v1:
             assert isinstance(xdr_object, stellar_xdr.Transaction)
             source = MuxedAccount.from_xdr_object(xdr_object.source_account)
@@ -194,6 +207,8 @@ class Transaction:
                 preconditions = None
             else:
                 preconditions = Preconditions.from_xdr_object(xdr_object.cond)
+            if xdr_object.ext.v == 1:
+                soroban_data = xdr_object.ext.soroban_data
         else:
             assert isinstance(xdr_object, stellar_xdr.TransactionV0)
             ed25519_key = StrKey.encode_ed25519_public_key(
@@ -210,6 +225,7 @@ class Transaction:
         fee = xdr_object.fee.uint32
         memo = Memo.from_xdr_object(xdr_object.memo)
         operations = list(map(Operation.from_xdr_object, xdr_object.operations))
+
         tx = cls(
             source=source,
             sequence=sequence,
@@ -217,6 +233,7 @@ class Transaction:
             fee=fee,
             operations=operations,
             preconditions=preconditions,
+            soroban_data=soroban_data,
             v1=v1,
         )
         return tx
@@ -239,14 +256,47 @@ class Transaction:
         xdr_object_v0 = stellar_xdr.TransactionV0.from_xdr(xdr)
         return cls.from_xdr_object(xdr_object_v0, v1)
 
+    def is_soroban_transaction(self) -> bool:
+        if len(self.operations) != 1:
+            return False
+        if not isinstance(
+            self.operations[0],
+            (RestoreFootprint, InvokeHostFunction, BumpFootprintExpiration),
+        ):
+            return False
+        return True
+
+    def __hash__(self):
+        return hash(
+            (
+                self.source,
+                self.sequence,
+                self.fee,
+                self.operations,
+                self.memo,
+                self.preconditions,
+                self.soroban_data,
+                self.v1,
+            )
+        )
+
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
             return NotImplemented
-        return self.to_xdr_object() == other.to_xdr_object()
+        return (
+            self.source == other.source
+            and self.sequence == other.sequence
+            and self.fee == other.fee
+            and self.operations == other.operations
+            and self.memo == other.memo
+            and self.preconditions == other.preconditions
+            and self.soroban_data == other.soroban_data
+            and self.v1 == other.v1
+        )
 
     def __str__(self):
         return (
             f"<Transaction [source={self.source}, sequence={self.sequence}, "
             f"fee={self.fee}, operations={self.operations}, memo={self.memo}, "
-            f"preconditions={self.preconditions}, v1={self.v1}]>"
+            f"preconditions={self.preconditions}, soroban_data={self.soroban_data}, v1={self.v1}]>"
         )

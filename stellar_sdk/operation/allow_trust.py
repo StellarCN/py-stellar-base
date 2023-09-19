@@ -7,7 +7,6 @@ from ..asset import Asset
 from ..keypair import Keypair
 from ..muxed_account import MuxedAccount
 from ..strkey import StrKey
-from ..type_checked import type_checked
 from ..utils import raise_if_not_valid_ed25519_public_key
 from .operation import Operation
 
@@ -30,7 +29,6 @@ class TrustLineEntryFlag(IntFlag):
     AUTHORIZED_TO_MAINTAIN_LIABILITIES_FLAG = 2
 
 
-@type_checked
 class AllowTrust(Operation):
     """The :class:`AllowTrust` object, which represents a AllowTrust operation
     on Stellar's network.

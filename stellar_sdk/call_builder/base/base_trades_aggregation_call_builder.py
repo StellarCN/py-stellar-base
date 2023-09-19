@@ -1,12 +1,9 @@
 from ...asset import Asset
 from ...call_builder.base.base_call_builder import BaseCallBuilder
-from ...exceptions import ValueError
-from ...type_checked import type_checked
 
 __all__ = ["BaseTradeAggregationsCallBuilder"]
 
 
-@type_checked
 class BaseTradeAggregationsCallBuilder(BaseCallBuilder):
     """Creates a new :class:`TradeAggregationsCallBuilder` pointed to server defined by horizon_url.
 

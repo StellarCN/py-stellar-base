@@ -12,7 +12,6 @@ from ..__version__ import __version__
 from ..client.base_sync_client import BaseSyncClient
 from ..client.response import Response
 from ..exceptions import ConnectionError
-from ..type_checked import type_checked
 from . import defines
 
 DEFAULT_NUM_RETRIES = 3
@@ -26,7 +25,6 @@ IDENTIFICATION_HEADERS = {
 __all__ = ["RequestsClient"]
 
 
-@type_checked
 class RequestsClient(BaseSyncClient):
     """The :class:`RequestsClient` object is a synchronous http client,
     which represents the interface for making requests to a server instance.
@@ -134,16 +132,21 @@ class RequestsClient(BaseSyncClient):
             url=resp.url,
         )
 
-    def post(self, url: str, data: Dict[str, str] = None) -> Response:
+    def post(
+        self, url: str, data: Dict[str, str] = None, json_data: Dict[str, Any] = None
+    ) -> Response:
         """Perform HTTP POST request.
 
         :param url: the request url
         :param data: the data send to server
+        :param json_data: the json data send to server
         :return: the response from server
         :raise: :exc:`ConnectionError <stellar_sdk.exceptions.ConnectionError>`
         """
         try:
-            resp = self._session.post(url, data=data, timeout=self.post_timeout)
+            resp = self._session.post(
+                url, data=data, json=json_data, timeout=self.post_timeout
+            )
         except (RequestException, NewConnectionError) as err:
             raise ConnectionError(err)
         return Response(

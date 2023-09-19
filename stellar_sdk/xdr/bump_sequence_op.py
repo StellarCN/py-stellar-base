@@ -1,6 +1,9 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
+from __future__ import annotations
+
 import base64
+
 from xdrlib3 import Packer, Unpacker
 
 from .sequence_number import SequenceNumber
@@ -28,7 +31,7 @@ class BumpSequenceOp:
         self.bump_to.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "BumpSequenceOp":
+    def unpack(cls, unpacker: Unpacker) -> BumpSequenceOp:
         bump_to = SequenceNumber.unpack(unpacker)
         return cls(
             bump_to=bump_to,
@@ -40,7 +43,7 @@ class BumpSequenceOp:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "BumpSequenceOp":
+    def from_xdr_bytes(cls, xdr: bytes) -> BumpSequenceOp:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -49,9 +52,12 @@ class BumpSequenceOp:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "BumpSequenceOp":
+    def from_xdr(cls, xdr: str) -> BumpSequenceOp:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def __hash__(self):
+        return hash((self.bump_to,))
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):

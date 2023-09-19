@@ -9,13 +9,11 @@ Version 1.1.0
 """
 from typing import Dict, Optional
 
-from .. import AiohttpClient
+from ..client.aiohttp_client import AiohttpClient
 from ..client.base_async_client import BaseAsyncClient
 from ..client.base_sync_client import BaseSyncClient
 from ..client.requests_client import RequestsClient
 from ..client.response import Response
-from ..exceptions import ValueError
-from ..type_checked import type_checked
 from .exceptions import (
     BadFederationResponseError,
     FederationServerNotFoundError,
@@ -35,7 +33,6 @@ __all__ = [
 ]
 
 
-@type_checked
 class FederationRecord:
     def __init__(
         self,
@@ -58,6 +55,9 @@ class FederationRecord:
         self.memo_type: Optional[str] = memo_type
         self.memo: Optional[str] = memo
 
+    def __hash__(self):
+        return hash((self.account_id, self.stellar_address, self.memo_type, self.memo))
+
     def __str__(self):
         return (
             f"<FederationRecord [account_id={self.account_id}, stellar_address={self.stellar_address}, "
@@ -75,7 +75,6 @@ class FederationRecord:
         )
 
 
-@type_checked
 def resolve_stellar_address(
     stellar_address: str,
     client: BaseSyncClient = None,
@@ -89,7 +88,7 @@ def resolve_stellar_address(
     :param federation_url: The federation server URL (ex. ``"https://stellar.org/federation"``),
         if you don't set this value, we will try to get it from `stellar_address`.
     :param use_http: Specifies whether the request should go over plain HTTP vs HTTPS.
-        Note it is recommend that you **always** use HTTPS.
+        Note it is recommended that you **always** use HTTPS.
     :return: Federation record.
     """
     if not client:
@@ -108,7 +107,6 @@ def resolve_stellar_address(
     return _handle_raw_response(raw_resp, stellar_address=stellar_address)
 
 
-@type_checked
 async def resolve_stellar_address_async(
     stellar_address: str,
     client: BaseAsyncClient = None,
@@ -122,7 +120,7 @@ async def resolve_stellar_address_async(
     :param federation_url: The federation server URL (ex. ``"https://stellar.org/federation"``),
         if you don't set this value, we will try to get it from `stellar_address`.
     :param use_http: Specifies whether the request should go over plain HTTP vs HTTPS.
-        Note it is recommend that you **always** use HTTPS.
+        Note it is recommended that you **always** use HTTPS.
     :return: Federation record.
     """
     if not client:
@@ -141,7 +139,6 @@ async def resolve_stellar_address_async(
     return _handle_raw_response(raw_resp, stellar_address=stellar_address)
 
 
-@type_checked
 def resolve_account_id(
     account_id: str,
     domain: str = None,
@@ -156,7 +153,7 @@ def resolve_account_id(
     :param federation_url: The federation server URL (ex. ``"https://stellar.org/federation"``).
     :param client: Http Client used to send the request.
     :param use_http: Specifies whether the request should go over plain HTTP vs HTTPS.
-        Note it is recommend that you **always** use HTTPS.
+        Note it is recommended that you **always** use HTTPS.
     :return: Federation record.
     """
     if domain is None and federation_url is None:
@@ -177,7 +174,6 @@ def resolve_account_id(
     return _handle_raw_response(raw_resp, account_id=account_id)
 
 
-@type_checked
 async def resolve_account_id_async(
     account_id: str,
     domain: str = None,
@@ -192,7 +188,7 @@ async def resolve_account_id_async(
     :param federation_url: The federation server URL (ex. ``"https://stellar.org/federation"``).
     :param client: Http Client used to send the request.
     :param use_http: Specifies whether the request should go over plain HTTP vs HTTPS.
-        Note it is recommend that you **always** use HTTPS.
+        Note it is recommended that you **always** use HTTPS.
     :return: Federation record.
     """
     if domain is None and federation_url is None:
@@ -213,7 +209,6 @@ async def resolve_account_id_async(
     return _handle_raw_response(raw_resp, account_id=account_id)
 
 
-@type_checked
 def _handle_raw_response(
     raw_resp: Response, stellar_address=None, account_id=None
 ) -> FederationRecord:
@@ -232,7 +227,6 @@ def _handle_raw_response(
     )
 
 
-@type_checked
 def _split_stellar_address(address: str) -> Dict[str, str]:
     parts = address.split(SEPARATOR)
     if len(parts) != 2:

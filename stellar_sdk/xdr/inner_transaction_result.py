@@ -1,6 +1,9 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
+from __future__ import annotations
+
 import base64
+
 from xdrlib3 import Packer, Unpacker
 
 from .inner_transaction_result_ext import InnerTransactionResultExt
@@ -39,6 +42,8 @@ class InnerTransactionResult:
             // txFEE_BUMP_INNER_FAILED is not included
             case txBAD_SPONSORSHIP:
             case txBAD_MIN_SEQ_AGE_OR_GAP:
+            case txMALFORMED:
+            case txSOROBAN_INVALID:
                 void;
             }
             result;
@@ -69,7 +74,7 @@ class InnerTransactionResult:
         self.ext.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "InnerTransactionResult":
+    def unpack(cls, unpacker: Unpacker) -> InnerTransactionResult:
         fee_charged = Int64.unpack(unpacker)
         result = InnerTransactionResultResult.unpack(unpacker)
         ext = InnerTransactionResultExt.unpack(unpacker)
@@ -85,7 +90,7 @@ class InnerTransactionResult:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "InnerTransactionResult":
+    def from_xdr_bytes(cls, xdr: bytes) -> InnerTransactionResult:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -94,9 +99,18 @@ class InnerTransactionResult:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "InnerTransactionResult":
+    def from_xdr(cls, xdr: str) -> InnerTransactionResult:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def __hash__(self):
+        return hash(
+            (
+                self.fee_charged,
+                self.result,
+                self.ext,
+            )
+        )
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):

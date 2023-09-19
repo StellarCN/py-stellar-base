@@ -1,6 +1,9 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
+from __future__ import annotations
+
 import base64
+
 from xdrlib3 import Packer, Unpacker
 
 from .int64 import Int64
@@ -26,7 +29,22 @@ class TransactionResult:
             case txSUCCESS:
             case txFAILED:
                 OperationResult results<>;
-            default:
+            case txTOO_EARLY:
+            case txTOO_LATE:
+            case txMISSING_OPERATION:
+            case txBAD_SEQ:
+            case txBAD_AUTH:
+            case txINSUFFICIENT_BALANCE:
+            case txNO_ACCOUNT:
+            case txINSUFFICIENT_FEE:
+            case txBAD_AUTH_EXTRA:
+            case txINTERNAL_ERROR:
+            case txNOT_SUPPORTED:
+            // case txFEE_BUMP_INNER_FAILED: handled above
+            case txBAD_SPONSORSHIP:
+            case txBAD_MIN_SEQ_AGE_OR_GAP:
+            case txMALFORMED:
+            case txSOROBAN_INVALID:
                 void;
             }
             result;
@@ -57,7 +75,7 @@ class TransactionResult:
         self.ext.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "TransactionResult":
+    def unpack(cls, unpacker: Unpacker) -> TransactionResult:
         fee_charged = Int64.unpack(unpacker)
         result = TransactionResultResult.unpack(unpacker)
         ext = TransactionResultExt.unpack(unpacker)
@@ -73,7 +91,7 @@ class TransactionResult:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "TransactionResult":
+    def from_xdr_bytes(cls, xdr: bytes) -> TransactionResult:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -82,9 +100,18 @@ class TransactionResult:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "TransactionResult":
+    def from_xdr(cls, xdr: str) -> TransactionResult:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def __hash__(self):
+        return hash(
+            (
+                self.fee_charged,
+                self.result,
+                self.ext,
+            )
+        )
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):

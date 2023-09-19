@@ -1,18 +1,25 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
+from __future__ import annotations
+
 import base64
 from typing import List
+
 from xdrlib3 import Packer, Unpacker
 
 from .auth import Auth
 from .dont_have import DontHave
 from .error import Error
+from .flood_advert import FloodAdvert
+from .flood_demand import FloodDemand
+from .generalized_transaction_set import GeneralizedTransactionSet
 from .hello import Hello
 from .message_type import MessageType
 from .peer_address import PeerAddress
 from .scp_envelope import SCPEnvelope
 from .scp_quorum_set import SCPQuorumSet
 from .send_more import SendMore
+from .send_more_extended import SendMoreExtended
 from .signed_survey_request_message import SignedSurveyRequestMessage
 from .signed_survey_response_message import SignedSurveyResponseMessage
 from .transaction_envelope import TransactionEnvelope
@@ -46,6 +53,8 @@ class StellarMessage:
             uint256 txSetHash;
         case TX_SET:
             TransactionSet txSet;
+        case GENERALIZED_TX_SET:
+            GeneralizedTransactionSet generalizedTxSet;
 
         case TRANSACTION:
             TransactionEnvelope transaction;
@@ -67,6 +76,13 @@ class StellarMessage:
             uint32 getSCPLedgerSeq; // ledger seq requested ; if 0, requests the latest
         case SEND_MORE:
             SendMore sendMoreMessage;
+        case SEND_MORE_EXTENDED:
+            SendMoreExtended sendMoreExtendedMessage;
+        // Pull mode
+        case FLOOD_ADVERT:
+             FloodAdvert floodAdvert;
+        case FLOOD_DEMAND:
+             FloodDemand floodDemand;
         };
     """
 
@@ -80,6 +96,7 @@ class StellarMessage:
         peers: List[PeerAddress] = None,
         tx_set_hash: Uint256 = None,
         tx_set: TransactionSet = None,
+        generalized_tx_set: GeneralizedTransactionSet = None,
         transaction: TransactionEnvelope = None,
         signed_survey_request_message: SignedSurveyRequestMessage = None,
         signed_survey_response_message: SignedSurveyResponseMessage = None,
@@ -88,6 +105,9 @@ class StellarMessage:
         envelope: SCPEnvelope = None,
         get_scp_ledger_seq: Uint32 = None,
         send_more_message: SendMore = None,
+        send_more_extended_message: SendMoreExtended = None,
+        flood_advert: FloodAdvert = None,
+        flood_demand: FloodDemand = None,
     ) -> None:
         _expect_max_length = 100
         if peers and len(peers) > _expect_max_length:
@@ -102,6 +122,7 @@ class StellarMessage:
         self.peers = peers
         self.tx_set_hash = tx_set_hash
         self.tx_set = tx_set
+        self.generalized_tx_set = generalized_tx_set
         self.transaction = transaction
         self.signed_survey_request_message = signed_survey_request_message
         self.signed_survey_response_message = signed_survey_response_message
@@ -110,6 +131,9 @@ class StellarMessage:
         self.envelope = envelope
         self.get_scp_ledger_seq = get_scp_ledger_seq
         self.send_more_message = send_more_message
+        self.send_more_extended_message = send_more_extended_message
+        self.flood_advert = flood_advert
+        self.flood_demand = flood_demand
 
     def pack(self, packer: Packer) -> None:
         self.type.pack(packer)
@@ -152,6 +176,11 @@ class StellarMessage:
                 raise ValueError("tx_set should not be None.")
             self.tx_set.pack(packer)
             return
+        if self.type == MessageType.GENERALIZED_TX_SET:
+            if self.generalized_tx_set is None:
+                raise ValueError("generalized_tx_set should not be None.")
+            self.generalized_tx_set.pack(packer)
+            return
         if self.type == MessageType.TRANSACTION:
             if self.transaction is None:
                 raise ValueError("transaction should not be None.")
@@ -192,9 +221,24 @@ class StellarMessage:
                 raise ValueError("send_more_message should not be None.")
             self.send_more_message.pack(packer)
             return
+        if self.type == MessageType.SEND_MORE_EXTENDED:
+            if self.send_more_extended_message is None:
+                raise ValueError("send_more_extended_message should not be None.")
+            self.send_more_extended_message.pack(packer)
+            return
+        if self.type == MessageType.FLOOD_ADVERT:
+            if self.flood_advert is None:
+                raise ValueError("flood_advert should not be None.")
+            self.flood_advert.pack(packer)
+            return
+        if self.type == MessageType.FLOOD_DEMAND:
+            if self.flood_demand is None:
+                raise ValueError("flood_demand should not be None.")
+            self.flood_demand.pack(packer)
+            return
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "StellarMessage":
+    def unpack(cls, unpacker: Unpacker) -> StellarMessage:
         type = MessageType.unpack(unpacker)
         if type == MessageType.ERROR_MSG:
             error = Error.unpack(unpacker)
@@ -222,6 +266,9 @@ class StellarMessage:
         if type == MessageType.TX_SET:
             tx_set = TransactionSet.unpack(unpacker)
             return cls(type=type, tx_set=tx_set)
+        if type == MessageType.GENERALIZED_TX_SET:
+            generalized_tx_set = GeneralizedTransactionSet.unpack(unpacker)
+            return cls(type=type, generalized_tx_set=generalized_tx_set)
         if type == MessageType.TRANSACTION:
             transaction = TransactionEnvelope.unpack(unpacker)
             return cls(type=type, transaction=transaction)
@@ -252,6 +299,15 @@ class StellarMessage:
         if type == MessageType.SEND_MORE:
             send_more_message = SendMore.unpack(unpacker)
             return cls(type=type, send_more_message=send_more_message)
+        if type == MessageType.SEND_MORE_EXTENDED:
+            send_more_extended_message = SendMoreExtended.unpack(unpacker)
+            return cls(type=type, send_more_extended_message=send_more_extended_message)
+        if type == MessageType.FLOOD_ADVERT:
+            flood_advert = FloodAdvert.unpack(unpacker)
+            return cls(type=type, flood_advert=flood_advert)
+        if type == MessageType.FLOOD_DEMAND:
+            flood_demand = FloodDemand.unpack(unpacker)
+            return cls(type=type, flood_demand=flood_demand)
         return cls(type=type)
 
     def to_xdr_bytes(self) -> bytes:
@@ -260,7 +316,7 @@ class StellarMessage:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "StellarMessage":
+    def from_xdr_bytes(cls, xdr: bytes) -> StellarMessage:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -269,9 +325,35 @@ class StellarMessage:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "StellarMessage":
+    def from_xdr(cls, xdr: str) -> StellarMessage:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def __hash__(self):
+        return hash(
+            (
+                self.type,
+                self.error,
+                self.hello,
+                self.auth,
+                self.dont_have,
+                self.peers,
+                self.tx_set_hash,
+                self.tx_set,
+                self.generalized_tx_set,
+                self.transaction,
+                self.signed_survey_request_message,
+                self.signed_survey_response_message,
+                self.q_set_hash,
+                self.q_set,
+                self.envelope,
+                self.get_scp_ledger_seq,
+                self.send_more_message,
+                self.send_more_extended_message,
+                self.flood_advert,
+                self.flood_demand,
+            )
+        )
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -285,6 +367,7 @@ class StellarMessage:
             and self.peers == other.peers
             and self.tx_set_hash == other.tx_set_hash
             and self.tx_set == other.tx_set
+            and self.generalized_tx_set == other.generalized_tx_set
             and self.transaction == other.transaction
             and self.signed_survey_request_message
             == other.signed_survey_request_message
@@ -295,6 +378,9 @@ class StellarMessage:
             and self.envelope == other.envelope
             and self.get_scp_ledger_seq == other.get_scp_ledger_seq
             and self.send_more_message == other.send_more_message
+            and self.send_more_extended_message == other.send_more_extended_message
+            and self.flood_advert == other.flood_advert
+            and self.flood_demand == other.flood_demand
         )
 
     def __str__(self):
@@ -311,6 +397,9 @@ class StellarMessage:
             f"tx_set_hash={self.tx_set_hash}"
         ) if self.tx_set_hash is not None else None
         out.append(f"tx_set={self.tx_set}") if self.tx_set is not None else None
+        out.append(
+            f"generalized_tx_set={self.generalized_tx_set}"
+        ) if self.generalized_tx_set is not None else None
         out.append(
             f"transaction={self.transaction}"
         ) if self.transaction is not None else None
@@ -331,4 +420,13 @@ class StellarMessage:
         out.append(
             f"send_more_message={self.send_more_message}"
         ) if self.send_more_message is not None else None
+        out.append(
+            f"send_more_extended_message={self.send_more_extended_message}"
+        ) if self.send_more_extended_message is not None else None
+        out.append(
+            f"flood_advert={self.flood_advert}"
+        ) if self.flood_advert is not None else None
+        out.append(
+            f"flood_demand={self.flood_demand}"
+        ) if self.flood_demand is not None else None
         return f"<StellarMessage [{', '.join(out)}]>"

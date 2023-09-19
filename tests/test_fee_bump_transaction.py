@@ -10,7 +10,6 @@ from stellar_sdk import (
     Network,
     TransactionBuilder,
 )
-from stellar_sdk.exceptions import ValueError
 
 
 class TestFeeBumpTransaction:

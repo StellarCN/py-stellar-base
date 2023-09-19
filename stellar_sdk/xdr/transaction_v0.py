@@ -1,7 +1,10 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
+from __future__ import annotations
+
 import base64
 from typing import List, Optional
+
 from xdrlib3 import Packer, Unpacker
 
 from .constants import *
@@ -76,7 +79,7 @@ class TransactionV0:
         self.ext.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "TransactionV0":
+    def unpack(cls, unpacker: Unpacker) -> TransactionV0:
         source_account_ed25519 = Uint256.unpack(unpacker)
         fee = Uint32.unpack(unpacker)
         seq_num = SequenceNumber.unpack(unpacker)
@@ -103,7 +106,7 @@ class TransactionV0:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "TransactionV0":
+    def from_xdr_bytes(cls, xdr: bytes) -> TransactionV0:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -112,9 +115,22 @@ class TransactionV0:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "TransactionV0":
+    def from_xdr(cls, xdr: str) -> TransactionV0:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def __hash__(self):
+        return hash(
+            (
+                self.source_account_ed25519,
+                self.fee,
+                self.seq_num,
+                self.time_bounds,
+                self.memo,
+                self.operations,
+                self.ext,
+            )
+        )
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):

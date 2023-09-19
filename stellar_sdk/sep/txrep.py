@@ -10,7 +10,7 @@ import json
 from datetime import datetime
 from decimal import Decimal
 from enum import Enum
-from typing import Dict, List, Optional, Union
+from typing import Dict, List, Optional, Sequence, Union
 
 from .. import xdr as stellar_xdr
 from ..asset import Asset
@@ -33,7 +33,6 @@ from ..strkey import StrKey
 from ..time_bounds import TimeBounds
 from ..transaction import Transaction
 from ..transaction_envelope import TransactionEnvelope
-from ..type_checked import type_checked
 
 __all__ = ["to_txrep", "from_txrep"]
 
@@ -47,7 +46,6 @@ class _EnvelopeType(Enum):
     ENVELOPE_TYPE_TX_FEE_BUMP = "ENVELOPE_TYPE_TX_FEE_BUMP"
 
 
-@type_checked
 def to_txrep(
     transaction_envelope: Union[TransactionEnvelope, FeeBumpTransactionEnvelope],
 ) -> str:
@@ -127,7 +125,8 @@ def to_txrep(
 
 
 # Setting to ignore pass in .coveragerc will cause this function to not be counted by pytest.
-@type_checked
+
+
 def from_txrep(
     txrep: str, network_passphrase: str
 ) -> Union[TransactionEnvelope, FeeBumpTransactionEnvelope]:
@@ -1142,7 +1141,7 @@ def _add_signer_key(prefix: str, signer_key: SignerKey, lines: List[str]) -> Non
 
 
 def _add_extra_signers(
-    prefix: str, extra_signers: Optional[List[SignerKey]], lines: List[str]
+    prefix: str, extra_signers: Optional[Sequence[SignerKey]], lines: List[str]
 ) -> None:
     if extra_signers is None:
         extra_signers = []
@@ -1211,7 +1210,9 @@ def _add_memo(memo: Memo, prefix: str, lines: List[str]) -> None:
         _add_line(f"{prefix}memo.retHash", _to_opaque(memo.memo_return), lines)
 
 
-def _add_operations(operations: List[Operation], prefix: str, lines: List[str]) -> None:
+def _add_operations(
+    operations: Sequence[Operation], prefix: str, lines: List[str]
+) -> None:
     _add_line(f"{prefix}operations.len", len(operations), lines)
     for index, operation in enumerate(operations):
         _add_operation(index, operation, prefix, lines)
@@ -1645,7 +1646,7 @@ def _add_operation(
 
 
 def _add_signatures(
-    signatures: List[DecoratedSignature], prefix: str, lines: List[str]
+    signatures: Sequence[DecoratedSignature], prefix: str, lines: List[str]
 ) -> None:
     _add_line(f"{prefix}signatures.len", len(signatures), lines)
     for index, signature in enumerate(signatures):

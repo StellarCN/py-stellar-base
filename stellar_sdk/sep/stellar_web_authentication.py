@@ -10,18 +10,17 @@ Version 3.3.0
 import base64
 import os
 import time
-from typing import Iterable, List, Optional, Union
+from typing import Iterable, List, Optional, Sequence, Union
 
 from .. import xdr as stellar_xdr
 from ..account import Account
-from ..exceptions import BadSignatureError, ValueError
+from ..exceptions import BadSignatureError
 from ..keypair import Keypair
 from ..memo import IdMemo, NoneMemo
 from ..muxed_account import MuxedAccount
 from ..operation.manage_data import ManageData
 from ..transaction_builder import TransactionBuilder
 from ..transaction_envelope import TransactionEnvelope
-from ..type_checked import type_checked
 from .ed25519_public_key_signer import Ed25519PublicKeySigner
 from .exceptions import InvalidSep10ChallengeError
 
@@ -34,11 +33,9 @@ __all__ = [
     "verify_challenge_transaction",
 ]
 
-
 MUXED_ACCOUNT_STARTING_LETTER: str = "M"
 
 
-@type_checked
 class ChallengeTransaction:
     """Used to store the results produced
     by :func:`stellar_sdk.sep.stellar_web_authentication.read_challenge_transaction`.
@@ -61,6 +58,16 @@ class ChallengeTransaction:
         self.matched_home_domain = matched_home_domain
         self.memo = memo
 
+    def __hash__(self):
+        return hash(
+            (
+                self.transaction,
+                self.client_account_id,
+                self.matched_home_domain,
+                self.memo,
+            )
+        )
+
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
             return NotImplemented
@@ -75,7 +82,6 @@ class ChallengeTransaction:
         return f"<ChallengeTransaction [transaction={self.transaction}, client_account_id={self.client_account_id}, memo={self.memo}, matched_home_domain={self.matched_home_domain}]>"
 
 
-@type_checked
 def build_challenge_transaction(
     server_secret: str,
     client_account_id: str,
@@ -142,7 +148,6 @@ def build_challenge_transaction(
     return transaction.to_xdr()
 
 
-@type_checked
 def read_challenge_transaction(
     challenge_transaction: str,
     server_account_id: str,
@@ -323,14 +328,13 @@ def read_challenge_transaction(
     )
 
 
-@type_checked
 def verify_challenge_transaction_signers(
     challenge_transaction: str,
     server_account_id: str,
     home_domains: Union[str, Iterable[str]],
     web_auth_domain: str,
     network_passphrase: str,
-    signers: List[Ed25519PublicKeySigner],
+    signers: Sequence[Ed25519PublicKeySigner],
 ) -> List[Ed25519PublicKeySigner]:
     """Verifies that for a SEP 10 challenge transaction
     all signatures on the transaction are accounted for. A transaction is
@@ -436,7 +440,6 @@ def verify_challenge_transaction_signers(
     return signers_found
 
 
-@type_checked
 def verify_challenge_transaction_signed_by_client_master_key(
     challenge_transaction: str,
     server_account_id: str,
@@ -468,7 +471,6 @@ def verify_challenge_transaction_signed_by_client_master_key(
     )
 
 
-@type_checked
 def verify_challenge_transaction_threshold(
     challenge_transaction: str,
     server_account_id: str,
@@ -476,7 +478,7 @@ def verify_challenge_transaction_threshold(
     web_auth_domain: str,
     network_passphrase: str,
     threshold: int,
-    signers: List[Ed25519PublicKeySigner],
+    signers: Sequence[Ed25519PublicKeySigner],
 ) -> List[Ed25519PublicKeySigner]:
     """Verifies that for a SEP 10 challenge transaction
     all signatures on the transaction are accounted for and that the signatures
@@ -519,7 +521,6 @@ def verify_challenge_transaction_threshold(
     return signers_found
 
 
-@type_checked
 def verify_challenge_transaction(
     challenge_transaction: str,
     server_account_id: str,
@@ -574,7 +575,7 @@ def verify_challenge_transaction(
 
 
 def _verify_transaction_signatures(
-    transaction_envelope: TransactionEnvelope, signers: List[Ed25519PublicKeySigner]
+    transaction_envelope: TransactionEnvelope, signers: Sequence[Ed25519PublicKeySigner]
 ) -> List[Ed25519PublicKeySigner]:
     """Checks if a transaction has been signed by one or more of
     the signers, returning a list of signers that were found to have signed the
@@ -622,7 +623,7 @@ def _verify_te_signed_by_account_id(
 
 
 def _signer_in_signers(
-    signer: Ed25519PublicKeySigner, signers: List[Ed25519PublicKeySigner]
+    signer: Ed25519PublicKeySigner, signers: Sequence[Ed25519PublicKeySigner]
 ) -> bool:
     for s in signers:
         if s.account_id == signer.account_id:

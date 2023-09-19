@@ -13,9 +13,6 @@ from typing import Union
 from mnemonic import Mnemonic
 from mnemonic.mnemonic import PBKDF2_ROUNDS
 
-from ..exceptions import ValueError
-from ..type_checked import type_checked
-
 
 @unique
 class Language(Enum):
@@ -31,7 +28,6 @@ class Language(Enum):
     CHINESE_TRADITIONAL = "chinese_traditional"
 
 
-@type_checked
 class StellarMnemonic(Mnemonic):
     """Please use :func:`stellar_sdk.keypair.Keypair.generate_mnemonic_phrase`
     and :func:`stellar_sdk.keypair.Keypair.from_mnemonic_phrase`

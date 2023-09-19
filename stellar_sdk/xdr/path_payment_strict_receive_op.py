@@ -1,7 +1,10 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
+from __future__ import annotations
+
 import base64
 from typing import List
+
 from xdrlib3 import Packer, Unpacker
 
 from .asset import Asset
@@ -62,7 +65,7 @@ class PathPaymentStrictReceiveOp:
             path_item.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "PathPaymentStrictReceiveOp":
+    def unpack(cls, unpacker: Unpacker) -> PathPaymentStrictReceiveOp:
         send_asset = Asset.unpack(unpacker)
         send_max = Int64.unpack(unpacker)
         destination = MuxedAccount.unpack(unpacker)
@@ -87,7 +90,7 @@ class PathPaymentStrictReceiveOp:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "PathPaymentStrictReceiveOp":
+    def from_xdr_bytes(cls, xdr: bytes) -> PathPaymentStrictReceiveOp:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -96,9 +99,21 @@ class PathPaymentStrictReceiveOp:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "PathPaymentStrictReceiveOp":
+    def from_xdr(cls, xdr: str) -> PathPaymentStrictReceiveOp:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def __hash__(self):
+        return hash(
+            (
+                self.send_asset,
+                self.send_max,
+                self.destination,
+                self.dest_asset,
+                self.dest_amount,
+                self.path,
+            )
+        )
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):

@@ -1,6 +1,9 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
+from __future__ import annotations
+
 import base64
+
 from xdrlib3 import Packer, Unpacker
 
 from .authenticated_message_v0 import AuthenticatedMessageV0
@@ -42,7 +45,7 @@ class AuthenticatedMessage:
             return
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "AuthenticatedMessage":
+    def unpack(cls, unpacker: Unpacker) -> AuthenticatedMessage:
         v = Uint32.unpack(unpacker)
         if v == 0:
             v0 = AuthenticatedMessageV0.unpack(unpacker)
@@ -55,7 +58,7 @@ class AuthenticatedMessage:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "AuthenticatedMessage":
+    def from_xdr_bytes(cls, xdr: bytes) -> AuthenticatedMessage:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -64,9 +67,17 @@ class AuthenticatedMessage:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "AuthenticatedMessage":
+    def from_xdr(cls, xdr: str) -> AuthenticatedMessage:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def __hash__(self):
+        return hash(
+            (
+                self.v,
+                self.v0,
+            )
+        )
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):

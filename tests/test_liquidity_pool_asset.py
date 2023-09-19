@@ -1,7 +1,6 @@
 import pytest
 
 from stellar_sdk import LIQUIDITY_POOL_FEE_V18, Asset, LiquidityPoolAsset
-from stellar_sdk.exceptions import ValueError
 from stellar_sdk.xdr import AssetType, ChangeTrustAsset, LiquidityPoolType
 
 

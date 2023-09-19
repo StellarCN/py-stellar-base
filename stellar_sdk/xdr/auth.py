@@ -1,6 +1,9 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
+from __future__ import annotations
+
 import base64
+
 from xdrlib3 import Packer, Unpacker
 
 from .base import Integer
@@ -14,26 +17,24 @@ class Auth:
 
         struct Auth
         {
-            // Empty message, just to confirm
-            // establishment of MAC keys.
-            int unused;
+            int flags;
         };
     """
 
     def __init__(
         self,
-        unused: int,
+        flags: int,
     ) -> None:
-        self.unused = unused
+        self.flags = flags
 
     def pack(self, packer: Packer) -> None:
-        Integer(self.unused).pack(packer)
+        Integer(self.flags).pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "Auth":
-        unused = Integer.unpack(unpacker)
+    def unpack(cls, unpacker: Unpacker) -> Auth:
+        flags = Integer.unpack(unpacker)
         return cls(
-            unused=unused,
+            flags=flags,
         )
 
     def to_xdr_bytes(self) -> bytes:
@@ -42,7 +43,7 @@ class Auth:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "Auth":
+    def from_xdr_bytes(cls, xdr: bytes) -> Auth:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -51,17 +52,20 @@ class Auth:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "Auth":
+    def from_xdr(cls, xdr: str) -> Auth:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def __hash__(self):
+        return hash((self.flags,))
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented
-        return self.unused == other.unused
+        return self.flags == other.flags
 
     def __str__(self):
         out = [
-            f"unused={self.unused}",
+            f"flags={self.flags}",
         ]
         return f"<Auth [{', '.join(out)}]>"

@@ -1,7 +1,10 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
+from __future__ import annotations
+
 import base64
 from enum import IntEnum
+
 from xdrlib3 import Packer, Unpacker
 
 __all__ = ["ClaimAtomType"]
@@ -27,7 +30,7 @@ class ClaimAtomType(IntEnum):
         packer.pack_int(self.value)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "ClaimAtomType":
+    def unpack(cls, unpacker: Unpacker) -> ClaimAtomType:
         value = unpacker.unpack_int()
         return cls(value)
 
@@ -37,7 +40,7 @@ class ClaimAtomType(IntEnum):
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "ClaimAtomType":
+    def from_xdr_bytes(cls, xdr: bytes) -> ClaimAtomType:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -46,6 +49,6 @@ class ClaimAtomType(IntEnum):
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "ClaimAtomType":
+    def from_xdr(cls, xdr: str) -> ClaimAtomType:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)

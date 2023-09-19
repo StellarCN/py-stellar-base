@@ -1,6 +1,9 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
+from __future__ import annotations
+
 import base64
+
 from xdrlib3 import Packer, Unpacker
 
 from .signer_key_ed25519_signed_payload import SignerKeyEd25519SignedPayload
@@ -25,7 +28,8 @@ class SignerKey:
             /* Hash of random 256 bit preimage X */
             uint256 hashX;
         case SIGNER_KEY_TYPE_ED25519_SIGNED_PAYLOAD:
-            struct {
+            struct
+            {
                 /* Public key that must sign the payload. */
                 uint256 ed25519;
                 /* Payload to be raw signed by ed25519. */
@@ -72,7 +76,7 @@ class SignerKey:
             return
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "SignerKey":
+    def unpack(cls, unpacker: Unpacker) -> SignerKey:
         type = SignerKeyType.unpack(unpacker)
         if type == SignerKeyType.SIGNER_KEY_TYPE_ED25519:
             ed25519 = Uint256.unpack(unpacker)
@@ -94,7 +98,7 @@ class SignerKey:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "SignerKey":
+    def from_xdr_bytes(cls, xdr: bytes) -> SignerKey:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -103,9 +107,20 @@ class SignerKey:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "SignerKey":
+    def from_xdr(cls, xdr: str) -> SignerKey:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def __hash__(self):
+        return hash(
+            (
+                self.type,
+                self.ed25519,
+                self.pre_auth_tx,
+                self.hash_x,
+                self.ed25519_signed_payload,
+            )
+        )
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):

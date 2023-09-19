@@ -3,13 +3,11 @@ from typing import List, Union
 
 from ...asset import Asset
 from ...call_builder.base.base_call_builder import BaseCallBuilder
-from ...type_checked import type_checked
 from ...utils import convert_assets_to_horizon_param
 
 __all__ = ["BaseStrictSendPathsCallBuilder"]
 
 
-@type_checked
 class BaseStrictSendPathsCallBuilder(BaseCallBuilder):
     """Creates a new :class:`StrictSendPathsCallBuilder` pointed to server defined by horizon_url.
 

@@ -1,6 +1,9 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
+from __future__ import annotations
+
 import base64
+
 from xdrlib3 import Packer, Unpacker
 
 from .asset_code4 import AssetCode4
@@ -50,7 +53,7 @@ class AssetCode:
             return
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "AssetCode":
+    def unpack(cls, unpacker: Unpacker) -> AssetCode:
         type = AssetType.unpack(unpacker)
         if type == AssetType.ASSET_TYPE_CREDIT_ALPHANUM4:
             asset_code4 = AssetCode4.unpack(unpacker)
@@ -66,7 +69,7 @@ class AssetCode:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "AssetCode":
+    def from_xdr_bytes(cls, xdr: bytes) -> AssetCode:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -75,9 +78,18 @@ class AssetCode:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "AssetCode":
+    def from_xdr(cls, xdr: str) -> AssetCode:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def __hash__(self):
+        return hash(
+            (
+                self.type,
+                self.asset_code4,
+                self.asset_code12,
+            )
+        )
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):

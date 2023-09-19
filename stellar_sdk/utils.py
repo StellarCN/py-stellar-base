@@ -5,13 +5,12 @@ import hashlib
 import os
 import re
 from decimal import ROUND_FLOOR, Context, Decimal, Inexact
-from typing import Dict, List, Optional, Union
+from typing import Dict, Optional, Sequence, Union
 from urllib.parse import urlsplit, urlunsplit
 
 from .asset import Asset
-from .exceptions import Ed25519PublicKeyInvalidError, NoApproximationError, ValueError
+from .exceptions import Ed25519PublicKeyInvalidError, NoApproximationError
 from .strkey import StrKey
-from .type_checked import type_checked
 
 MUXED_ACCOUNT_STARTING_LETTER: str = "M"
 ED25519_PUBLIC_KEY_STARTING_LETTER: str = "G"
@@ -21,12 +20,10 @@ _EXPONENT = 7
 _ONE = Decimal(10**7)
 
 
-@type_checked
 def sha256(data: bytes) -> bytes:
     return hashlib.sha256(data).digest()
 
 
-@type_checked
 def best_rational_approximation(x) -> Dict[str, int]:
     x = Decimal(x)
     int32_max = Decimal(2147483647)
@@ -53,15 +50,13 @@ def best_rational_approximation(x) -> Dict[str, int]:
     return {"n": int(n), "d": int(d)}
 
 
-@type_checked
 def hex_to_bytes(hex_string: Union[str, bytes]) -> bytes:
     if isinstance(hex_string, str):
         return bytes.fromhex(hex_string)
     return hex_string
 
 
-@type_checked
-def convert_assets_to_horizon_param(assets: List[Asset]) -> str:
+def convert_assets_to_horizon_param(assets: Sequence[Asset]) -> str:
     assets_string = []
     for asset in assets:
         if asset.is_native():
@@ -71,7 +66,6 @@ def convert_assets_to_horizon_param(assets: List[Asset]) -> str:
     return ",".join(assets_string)
 
 
-@type_checked
 def urljoin_with_query(base: str, path: Optional[str]) -> str:
     split_url = urlsplit(base)
     query = split_url.query
@@ -84,7 +78,6 @@ def urljoin_with_query(base: str, path: Optional[str]) -> str:
     return url
 
 
-@type_checked
 def is_valid_hash(data: str) -> bool:
     if not data:
         return False
@@ -92,7 +85,6 @@ def is_valid_hash(data: str) -> bool:
     return bool(asset_code_re.match(data))
 
 
-@type_checked
 def raise_if_not_valid_ed25519_public_key(value: str, argument_name: str) -> None:
     try:
         StrKey.decode_ed25519_public_key(value)
@@ -102,7 +94,6 @@ def raise_if_not_valid_ed25519_public_key(value: str, argument_name: str) -> Non
         ) from e
 
 
-@type_checked
 def raise_if_not_valid_amount(value: str, argument_name: str) -> None:
     amount = Decimal(value)
     exponent = amount.as_tuple().exponent
@@ -117,7 +108,6 @@ def raise_if_not_valid_amount(value: str, argument_name: str) -> None:
         )
 
 
-@type_checked
 def raise_if_not_valid_hash(value: str, argument_name: str) -> None:
     if not is_valid_hash(value):
         raise ValueError(
@@ -125,7 +115,6 @@ def raise_if_not_valid_hash(value: str, argument_name: str) -> None:
         )
 
 
-@type_checked
 def raise_if_not_valid_balance_id(value: str, argument_name: str) -> None:
     if len(value) != 72 or value[:8] != "00000000" or not is_valid_hash(value[8:]):
         raise ValueError(
@@ -176,7 +165,7 @@ def to_xdr_amount(value: Union[str, Decimal]) -> int:
 
 
 def from_xdr_amount(value: int) -> str:
-    """Converts an str amount from an XDR amount object
+    """Converts a str amount from an XDR amount object
 
     :param value: The amount to convert to a string from an XDR int64
         amount.

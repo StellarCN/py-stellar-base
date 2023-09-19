@@ -1,6 +1,9 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
+from __future__ import annotations
+
 import base64
+
 from xdrlib3 import Packer, Unpacker
 
 from .uint64 import Uint64
@@ -33,7 +36,7 @@ class MuxedAccountMed25519:
         self.ed25519.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "MuxedAccountMed25519":
+    def unpack(cls, unpacker: Unpacker) -> MuxedAccountMed25519:
         id = Uint64.unpack(unpacker)
         ed25519 = Uint256.unpack(unpacker)
         return cls(
@@ -47,7 +50,7 @@ class MuxedAccountMed25519:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "MuxedAccountMed25519":
+    def from_xdr_bytes(cls, xdr: bytes) -> MuxedAccountMed25519:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -56,9 +59,17 @@ class MuxedAccountMed25519:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "MuxedAccountMed25519":
+    def from_xdr(cls, xdr: str) -> MuxedAccountMed25519:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def __hash__(self):
+        return hash(
+            (
+                self.id,
+                self.ed25519,
+            )
+        )
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):

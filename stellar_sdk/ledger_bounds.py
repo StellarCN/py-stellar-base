@@ -1,11 +1,8 @@
 from . import xdr as stellar_xdr
-from .exceptions import ValueError
-from .type_checked import type_checked
 
 __all__ = ["LedgerBounds"]
 
 
-@type_checked
 class LedgerBounds:
     """LedgerBounds represents the ledger interval that a transaction is valid.
 
@@ -49,6 +46,9 @@ class LedgerBounds:
             min_ledger=xdr_object.min_ledger.uint32,
             max_ledger=xdr_object.max_ledger.uint32,
         )
+
+    def __hash__(self):
+        return hash((self.min_ledger, self.max_ledger))
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):

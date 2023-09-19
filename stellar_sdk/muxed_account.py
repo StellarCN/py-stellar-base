@@ -1,15 +1,12 @@
 from typing import Optional
 
 from . import xdr as stellar_xdr
-from .exceptions import ValueError
 from .keypair import Keypair
 from .strkey import StrKey
-from .type_checked import type_checked
 
 __all__ = ["MuxedAccount"]
 
 
-@type_checked
 class MuxedAccount:
     """The :class:`MuxedAccount` object, which represents a multiplexed account on Stellar's network.
 
@@ -134,6 +131,9 @@ class MuxedAccount:
             xdr_object.med25519.ed25519.uint256
         )
         return cls(account_id=account_id, account_muxed_id=account_id_id)
+
+    def __hash__(self):
+        return hash((self.account_id, self.account_muxed_id))
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):

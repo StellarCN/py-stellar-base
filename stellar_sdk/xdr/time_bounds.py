@@ -1,6 +1,9 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
+from __future__ import annotations
+
 import base64
+
 from xdrlib3 import Packer, Unpacker
 
 from .time_point import TimePoint
@@ -32,7 +35,7 @@ class TimeBounds:
         self.max_time.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "TimeBounds":
+    def unpack(cls, unpacker: Unpacker) -> TimeBounds:
         min_time = TimePoint.unpack(unpacker)
         max_time = TimePoint.unpack(unpacker)
         return cls(
@@ -46,7 +49,7 @@ class TimeBounds:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "TimeBounds":
+    def from_xdr_bytes(cls, xdr: bytes) -> TimeBounds:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -55,9 +58,17 @@ class TimeBounds:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "TimeBounds":
+    def from_xdr(cls, xdr: str) -> TimeBounds:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def __hash__(self):
+        return hash(
+            (
+                self.min_time,
+                self.max_time,
+            )
+        )
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):

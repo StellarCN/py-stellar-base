@@ -3,9 +3,7 @@ from typing import Union
 
 from . import xdr as stellar_xdr
 from .__version__ import __issues__
-from .exceptions import ValueError
 from .strkey import StrKey, _get_version_byte_for_prefix, _VersionByte
-from .type_checked import type_checked
 
 __all__ = ["SignerKey", "SignerKeyType", "SignedPayloadSigner"]
 
@@ -17,7 +15,6 @@ class SignerKeyType(IntEnum):
     SIGNER_KEY_TYPE_ED25519_SIGNED_PAYLOAD = 3
 
 
-@type_checked
 class SignedPayloadSigner:
     """The :class:`SignedPayloadSigner` object, which represents a signed payload signer.
 
@@ -29,6 +26,9 @@ class SignedPayloadSigner:
         self.account_id: str = account_id
         self.payload: bytes = payload
 
+    def __hash__(self):
+        return hash((self.account_id, self.payload))
+
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
             return NotImplemented
@@ -38,7 +38,6 @@ class SignedPayloadSigner:
         return f"<SignedPayloadSigner [account_id={self.account_id}, payload={self.payload}]>"
 
 
-@type_checked
 class SignerKey:
     """The :class:`SignerKey` object, which represents an account signer key on Stellar's network.
 
@@ -242,6 +241,9 @@ class SignerKey:
             raise ValueError(
                 f"This is an unknown signer key type, please consider creating an issuer at {__issues__}."
             )
+
+    def __hash__(self):
+        return hash((self.signer_key, self.signer_key_type))
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):

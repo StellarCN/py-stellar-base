@@ -5,14 +5,12 @@ from .. import xdr as stellar_xdr
 from ..asset import Asset
 from ..liquidity_pool_asset import LiquidityPoolAsset
 from ..muxed_account import MuxedAccount
-from ..type_checked import type_checked
 from ..utils import raise_if_not_valid_amount
 from .operation import Operation
 
 __all__ = ["ChangeTrust"]
 
 
-@type_checked
 class ChangeTrust(Operation):
     """The :class:`ChangeTrust` object, which represents a ChangeTrust
     operation on Stellar's network.

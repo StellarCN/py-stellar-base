@@ -1,6 +1,9 @@
 # This is an automatically generated file.
 # DO NOT EDIT or your changes may be overwritten
+from __future__ import annotations
+
 import base64
+
 from xdrlib3 import Packer, Unpacker
 
 from .signature import Signature
@@ -33,7 +36,7 @@ class SignedSurveyResponseMessage:
         self.response.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> "SignedSurveyResponseMessage":
+    def unpack(cls, unpacker: Unpacker) -> SignedSurveyResponseMessage:
         response_signature = Signature.unpack(unpacker)
         response = SurveyResponseMessage.unpack(unpacker)
         return cls(
@@ -47,7 +50,7 @@ class SignedSurveyResponseMessage:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> "SignedSurveyResponseMessage":
+    def from_xdr_bytes(cls, xdr: bytes) -> SignedSurveyResponseMessage:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -56,9 +59,17 @@ class SignedSurveyResponseMessage:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> "SignedSurveyResponseMessage":
+    def from_xdr(cls, xdr: str) -> SignedSurveyResponseMessage:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def __hash__(self):
+        return hash(
+            (
+                self.response_signature,
+                self.response,
+            )
+        )
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
