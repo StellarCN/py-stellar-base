@@ -82,12 +82,16 @@ def authorize_entry(
 
     # This structure is defined here:
     # https://soroban.stellar.org/docs/fundamentals-and-concepts/invoking-contracts-with-transactions#stellar-account-signatures
-    addr_auth.signature = scval.to_vec([scval.to_map(
-        {
-            scval.to_symbol("public_key"): scval.to_bytes(public_key),
-            scval.to_symbol("signature"): scval.to_bytes(signature),
-        }
-    )])
+    addr_auth.signature = scval.to_vec(
+        [
+            scval.to_map(
+                {
+                    scval.to_symbol("public_key"): scval.to_bytes(public_key),
+                    scval.to_symbol("signature"): scval.to_bytes(signature),
+                }
+            )
+        ]
+    )
     return entry
 
 
@@ -113,7 +117,7 @@ def authorize_invocation(
     :param valid_until_ledger_sequence: the (exclusive) future ledger sequence number until which
         this authorization entry should be valid (if `currentLedgerSeq==validUntil`, this is expired)
     :param invocation: invocation the invocation tree that we're authorizing (likely, this comes from transaction simulation)
-    :public_key: the public identity of the signer (when providing a :class:`Keypair` to `signer`,
+    :param public_key: the public identity of the signer (when providing a :class:`Keypair` to `signer`,
         this can be omitted, as it just uses the public key of the keypair)
     :param network_passphrase: the network passphrase is incorporated into the signature (see :class:`stellar_sdk.Network` for options)
     :return: a signed Soroban authorization entry.

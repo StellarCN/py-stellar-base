@@ -271,7 +271,7 @@ class SorobanServer:
     def prepare_transaction(
         self,
         transaction_envelope: TransactionEnvelope,
-        simulate_transaction_response: SimulateTransactionResponse = None
+        simulate_transaction_response: SimulateTransactionResponse = None,
     ) -> TransactionEnvelope:
         """Submit a trial contract invocation, first run a simulation of the contract
         invocation as defined on the incoming transaction, and apply the results to
@@ -306,7 +306,9 @@ class SorobanServer:
             discovered from the simulation.
         """
         if not simulate_transaction_response:
-            simulate_transaction_response = self.simulate_transaction(transaction_envelope)
+            simulate_transaction_response = self.simulate_transaction(
+                transaction_envelope
+            )
         if simulate_transaction_response.error:
             raise PrepareTransactionException(
                 "Simulation transaction failed, the response contains error information.",
