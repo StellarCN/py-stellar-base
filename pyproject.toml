@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "stellar-sdk"
-version = "9.0.0a2"
-description = "The Python Stellar SDK library provides APIs to build transactions and connect to Horizon."
+version = "9.0.0b0"
+description = "The Python Stellar SDK library provides APIs to build transactions and connect to Horizon and Soroban-RPC server."
 authors = [
     "overcat <4catcode@gmail.com>",
     "Eno <appweb.cn@gmail.com>"
@@ -22,12 +22,13 @@ keywords = [
     "cryptocurrency",
     "dex",
     "horizon",
+    "soroban",
     "sdex",
     "trading"
 ]
 license = "Apache License 2.0"
 classifiers = [
-    "Development Status :: 3 - Alpha",
+    "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
     "Natural Language :: English",
     "Operating System :: OS Independent",
