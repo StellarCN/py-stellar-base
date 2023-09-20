@@ -52,7 +52,7 @@ aiohttp-sse-client = { version = "^0.2.1", optional = true}
 stellar-base-sseclient = "^0.0.21"
 mnemonic = "^0.20"
 toml = "^0.10.2"
-urllib3 = "^1.26.7"
+urllib3 = ">=1.26.7,<3.0.0"
 pydantic = "^2.3.0"
 xdrlib3 = "^0.1.1"
 
