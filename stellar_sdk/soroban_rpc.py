@@ -151,6 +151,12 @@ class GetHealthResponse(BaseModel):
 class SimulateTransactionRequest(BaseModel):
     """Response for JSON-RPC method simulateTransaction.
 
+    .. note::
+        The simulation response will have different model representations with different
+        members present or absent depending on type of response that it is conveying. For example, the
+        simulation response for invoke host function, could be one of three types: error, success, or
+        restore operation needed.
+
     See `simulateTransaction documentation <https://soroban.stellar.org/api/methods/simulateTransaction#parameters>`__ for
     more information.
     """
