@@ -24,12 +24,12 @@ def authorize_entry(
 
     This "fills out" the authorization entry with a signature, indicating to the
     :class:`stellar_sdk.InvokeHostFunction` it's attached to that:
-        - a particular identity (i.e. signing :class:`stellar_sdk.Keypair` or other signer)
-        - approving the execution of an invocation tree (i.e. a
-            simulation-acquired :class:`stellar_xdr.SorobanAuthorizedInvocation` or otherwise built)
-        - on a particular network (uniquely identified by its passphrase, see :class:`stellar_sdk.Network`)
-        - until a particular ledger sequence is reached.
 
+    * a particular identity (i.e. signing :class:`stellar_sdk.Keypair` or other signer)
+    * approving the execution of an invocation tree (i.e. a
+        simulation-acquired :class:`stellar_xdr.SorobanAuthorizedInvocation` or otherwise built)
+    * on a particular network (uniquely identified by its passphrase, see :class:`stellar_sdk.Network`)
+    * until a particular ledger sequence is reached.
 
     :param entry: an unsigned Soroban authorization entry.
     :param signer: either a :class:`Keypair` or a function which takes a payload
@@ -103,11 +103,12 @@ def authorize_invocation(
     network_passphrase: str,
 ):
     """This builds an entry from scratch, allowing you to express authorization as a function of:
-        - a particular identity (i.e. signing :class:`stellar_sdk.Keypair` or other signer)
-        - approving the execution of an invocation tree (i.e. a
-            simulation-acquired :class:`stellar_xdr.SorobanAuthorizedInvocation` or otherwise built)
-        - on a particular network (uniquely identified by its passphrase, see :class:`stellar_sdk.Network`)
-        - until a particular ledger sequence is reached.
+
+    * a particular identity (i.e. signing :class:`stellar_sdk.Keypair` or other signer)
+    * approving the execution of an invocation tree (i.e. a
+        simulation-acquired :class:`stellar_xdr.SorobanAuthorizedInvocation` or otherwise built)
+    * on a particular network (uniquely identified by its passphrase, see :class:`stellar_sdk.Network`)
+    * until a particular ledger sequence is reached.
 
     This is in contrast to :func:`authorize_entry`, which signs an existing entry "in place".
 
