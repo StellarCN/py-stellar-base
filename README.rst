@@ -56,13 +56,13 @@ Installing
 
 .. code-block:: text
 
-    pip install stellar-sdk==9.0.0a2
+    pip install --upgrade --pre stellar-sdk
 
 If you need to use asynchronous, please use the following command to install the required dependencies.
 
 .. code-block:: text
 
-    pip install stellar-sdk[aiohttp]==9.0.0a2
+    pip install --upgrade --pre stellar-sdk[aiohttp]
 
 We follow `Semantic Versioning 2.0.0 <https://semver.org/>`_, and I strongly
 recommend that you specify its major version number in the dependency
@@ -97,12 +97,6 @@ You can find more examples `here <https://github.com/StellarCN/py-stellar-base/t
     transaction.sign(alice_keypair)
     response = server.submit_transaction(transaction)
     print(response)
-
-Soroban support
----------------
-As `Soroban <https://soroban.stellar.org/docs>`_ is still under active development, I have not merged it into the main branch.
-You can obtain support for it in the `soroban branch <https://github.com/StellarCN/py-stellar-base/tree/soroban>`_,
-but please note that there may be breaking updates at any time before the stable release.
 
 stellar-model
 -------------

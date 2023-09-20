@@ -1,6 +1,14 @@
 Release History
 ==============
 
+### Version 9.0.0-beta0
+
+Released on September 20, 2023
+
+#### Update
+- feat: add helper functions to sign authorization entries. ([#776](https://github.com/StellarCN/py-stellar-base/pull/776))
+- feat: add `SorobanServerAsync` to support asynchronous requests. ([#782](https://github.com/StellarCN/py-stellar-base/pull/782))
+
 ### Version 9.0.0-alpha2
 
 Released on September 16, 2023
