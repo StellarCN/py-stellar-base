@@ -750,6 +750,12 @@ SorobanServer
 .. autoclass:: stellar_sdk.SorobanServer
    :members:
 
+SorobanServer
+^^^^^^^^^^^^^
+
+.. autoclass:: stellar_sdk.SorobanServerAsync
+   :members:
+
 Soroban RPC Definitions
 ^^^^^^^^^^^^^^^^^^^^^^^
 .. automodule:: stellar_sdk.soroban_rpc

@@ -41,6 +41,7 @@ from .transaction_envelope import *
 # aiohttp required
 try:
     from .client.aiohttp_client import AiohttpClient
-    from .server_async import *
+    from .server_async import ServerAsync
+    from .soroban_server_async import SorobanServerAsync
 except ImportError:
     pass
