@@ -325,7 +325,8 @@ class SorobanServerAsync:
             raise SorobanRpcErrorResponse(
                 response.error.code, response.error.message, response.error.data
             )
-        return response.result  # type: ignore[return-value]
+        assert response.result is not None
+        return response.result
 
     async def close(self) -> None:
         """Close underlying connector, and release all acquired resources."""

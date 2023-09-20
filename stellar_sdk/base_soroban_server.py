@@ -11,17 +11,19 @@ from .soroban_rpc import *
 if TYPE_CHECKING:
     from .transaction_envelope import TransactionEnvelope
 
+
 class Durability(Enum):
     TEMPORARY = "temporary"
     PERSISTENT = "persistent"
+
 
 def _generate_unique_request_id() -> str:
     return uuid.uuid4().hex
 
 
 def _assemble_transaction(
-        transaction_envelope: TransactionEnvelope,
-        simulation: SimulateTransactionResponse,
+    transaction_envelope: TransactionEnvelope,
+    simulation: SimulateTransactionResponse,
 ) -> TransactionEnvelope:
     # TODO: add support for FeeBumpTransactionEnvelope
     if not transaction_envelope.transaction.is_soroban_transaction():

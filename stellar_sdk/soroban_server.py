@@ -329,7 +329,8 @@ class SorobanServer:
             raise SorobanRpcErrorResponse(
                 response.error.code, response.error.message, response.error.data
             )
-        return response.result  # type: ignore[return-value]
+        assert response.result is not None
+        return response.result
 
     def __enter__(self) -> "SorobanServer":
         return self
