@@ -2612,5 +2612,3 @@ Constants
 .. autodata:: stellar_sdk.xdr.constants.SC_SPEC_DOC_LIMIT
 .. autodata:: stellar_sdk.xdr.constants.TX_ADVERT_VECTOR_MAX_SIZE
 .. autodata:: stellar_sdk.xdr.constants.TX_DEMAND_VECTOR_MAX_SIZE
-(stellar-sdk-py3.10) py-stellar-base [soroban-update●●]
-
