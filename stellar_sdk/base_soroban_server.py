@@ -12,7 +12,7 @@ from .soroban_rpc import *
 if TYPE_CHECKING:
     from .transaction_envelope import TransactionEnvelope
 
-__all__ = ["Durability", "BaseSorobanServer"]
+__all__ = ["BaseSorobanServer"]
 
 
 class Durability(Enum):

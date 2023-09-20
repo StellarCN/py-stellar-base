@@ -20,7 +20,7 @@ if TYPE_CHECKING:
     from .client.base_sync_client import BaseSyncClient
     from .transaction_envelope import TransactionEnvelope
 
-__all__ = ["SorobanServer"]
+__all__ = ["SorobanServer", "Durability"]
 
 V = TypeVar("V")
 
