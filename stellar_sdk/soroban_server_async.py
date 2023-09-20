@@ -12,7 +12,7 @@ from .base_soroban_server import (
     _assemble_transaction,
     _generate_unique_request_id,
 )
-from .client.requests_client import RequestsClient
+from .client.aiohttp_client import AiohttpClient
 from .exceptions import (
     AccountNotFoundException,
     PrepareTransactionException,
@@ -21,15 +21,15 @@ from .exceptions import (
 from .soroban_rpc import *
 
 if TYPE_CHECKING:
-    from .client.base_sync_client import BaseSyncClient
+    from .client.base_async_client import BaseAsyncClient
     from .transaction_envelope import TransactionEnvelope
 
-__all__ = ["SorobanServer", "Durability"]
+__all__ = ["SorobanServerAsync", "Durability"]
 
 V = TypeVar("V")
 
 
-class SorobanServer:
+class SorobanServerAsync:
     """Server handles the network connection to a Soroban RPC instance and
     exposes an interface for requests to that instance.
 
@@ -40,15 +40,15 @@ class SorobanServer:
     def __init__(
         self,
         server_url: str = "https://rpc-futurenet.stellar.org:443/",
-        client: Optional[BaseSyncClient] = None,
+        client: Optional[BaseAsyncClient] = None,
     ) -> None:
         self.server_url: str = server_url
 
         if not client:
-            client = RequestsClient()
-        self._client: BaseSyncClient = client
+            client = AiohttpClient()
+        self._client: BaseAsyncClient = client
 
-    def get_health(self) -> GetHealthResponse:
+    async def get_health(self) -> GetHealthResponse:
         """General node health check.
 
         See `Soroban Documentation - getHealth <https://soroban.stellar.org/api/methods/getHealth>`_
@@ -61,9 +61,9 @@ class SorobanServer:
             method="getHealth",
             params=None,
         )
-        return self._post(request, GetHealthResponse)
+        return await self._post(request, GetHealthResponse)
 
-    def get_events(
+    async def get_events(
         self,
         start_ledger: int,
         filters: Sequence[EventFilter] = None,
@@ -90,9 +90,9 @@ class SorobanServer:
         request: Request = Request[GetEventsRequest](
             id=_generate_unique_request_id(), method="getEvents", params=data
         )
-        return self._post(request, GetEventsResponse)
+        return await self._post(request, GetEventsResponse)
 
-    def get_network(self) -> GetNetworkResponse:
+    async def get_network(self) -> GetNetworkResponse:
         """General info about the currently configured network.
 
         :return: A :class:`GetNetworkResponse <stellar_sdk.soroban_rpc.GetNetworkResponse>` object.
@@ -103,9 +103,9 @@ class SorobanServer:
             method="getNetwork",
             params=None,
         )
-        return self._post(request, GetNetworkResponse)
+        return await self._post(request, GetNetworkResponse)
 
-    def get_latest_ledger(self) -> GetLatestLedgerResponse:
+    async def get_latest_ledger(self) -> GetLatestLedgerResponse:
         """Fetches the latest ledger meta info from network which Soroban-RPC is connected to.
 
         :return: A :class:`GetLatestLedgerResponse <stellar_sdk.soroban_rpc.GetLatestLedgerResponse>` object.
@@ -116,9 +116,9 @@ class SorobanServer:
             method="getLatestLedger",
             params=None,
         )
-        return self._post(request, GetLatestLedgerResponse)
+        return await self._post(request, GetLatestLedgerResponse)
 
-    def get_ledger_entries(
+    async def get_ledger_entries(
         self, keys: List[stellar_xdr.LedgerKey]
     ) -> GetLedgerEntriesResponse:
         """For reading the current value of ledger entries directly.
@@ -138,9 +138,9 @@ class SorobanServer:
             method="getLedgerEntries",
             params=GetLedgerEntriesRequest(keys=[key.to_xdr() for key in keys]),
         )
-        return self._post(request, GetLedgerEntriesResponse)
+        return await self._post(request, GetLedgerEntriesResponse)
 
-    def get_transaction(self, transaction_hash: str) -> GetTransactionResponse:
+    async def get_transaction(self, transaction_hash: str) -> GetTransactionResponse:
         """Fetch the specified transaction.
 
         See `Soroban Documentation - getTransaction <https://soroban.stellar.org/api/methods/getTransaction>`_
@@ -154,9 +154,9 @@ class SorobanServer:
             method="getTransaction",
             params=GetTransactionRequest(hash=transaction_hash),
         )
-        return self._post(request, GetTransactionResponse)
+        return await self._post(request, GetTransactionResponse)
 
-    def simulate_transaction(
+    async def simulate_transaction(
         self, transaction_envelope: TransactionEnvelope
     ) -> SimulateTransactionResponse:
         """Submit a trial contract invocation to get back return values, expected ledger footprint, and expected costs.
@@ -181,9 +181,9 @@ class SorobanServer:
             method="simulateTransaction",
             params=SimulateTransactionRequest(transaction=xdr),
         )
-        return self._post(request, SimulateTransactionResponse)
+        return await self._post(request, SimulateTransactionResponse)
 
-    def send_transaction(
+    async def send_transaction(
         self, transaction_envelope: Union[TransactionEnvelope, str]
     ) -> SendTransactionResponse:
         """Submit a real transaction to the Stellar network. This is the only way to make changes "on-chain".
@@ -204,9 +204,9 @@ class SorobanServer:
             method="sendTransaction",
             params=SendTransactionRequest(transaction=xdr),
         )
-        return self._post(request, SendTransactionResponse)
+        return await self._post(request, SendTransactionResponse)
 
-    def load_account(self, account_id: str) -> Account:
+    async def load_account(self, account_id: str) -> Account:
         """Load an account from the server, you can use the returned account
         object as source account for transactions.
 
@@ -221,7 +221,7 @@ class SorobanServer:
             account=stellar_xdr.LedgerKeyAccount(account_id=account_id_xdr),
         )
 
-        resp = self.get_ledger_entries([key])
+        resp = await self.get_ledger_entries([key])
         if not resp.entries:
             raise AccountNotFoundException(account_id)
         assert len(resp.entries) == 1
@@ -229,7 +229,7 @@ class SorobanServer:
         assert data.account is not None
         return Account(account_id, data.account.seq_num.sequence_number.int64)
 
-    def get_contract_data(
+    async def get_contract_data(
         self,
         contract_id: str,
         key: stellar_xdr.SCVal,
@@ -259,13 +259,13 @@ class SorobanServer:
                 durability=xdr_durability,
             ),
         )
-        resp = self.get_ledger_entries([contract_key])
+        resp = await self.get_ledger_entries([contract_key])
         entries = resp.entries
         if not entries:
             return None
         return entries[0]
 
-    def prepare_transaction(
+    async def prepare_transaction(
         self,
         transaction_envelope: TransactionEnvelope,
         simulate_transaction_response: SimulateTransactionResponse = None,
@@ -303,7 +303,7 @@ class SorobanServer:
             discovered from the simulation.
         """
         if not simulate_transaction_response:
-            simulate_transaction_response = self.simulate_transaction(
+            simulate_transaction_response = await self.simulate_transaction(
                 transaction_envelope
             )
         if simulate_transaction_response.error:
@@ -314,13 +314,9 @@ class SorobanServer:
         te = _assemble_transaction(transaction_envelope, simulate_transaction_response)
         return te
 
-    def close(self) -> None:
-        """Close underlying connector, and release all acquired resources."""
-        self._client.close()
-
-    def _post(self, request_body: Request, response_body_type: Type[V]) -> V:
+    async def _post(self, request_body: Request, response_body_type: Type[V]) -> V:
         json_data = request_body.model_dump_json(by_alias=True)
-        data = self._client.post(
+        data = await self._client.post(
             self.server_url,
             json_data=json.loads(json_data),
         )
@@ -331,11 +327,15 @@ class SorobanServer:
             )
         return response.result  # type: ignore[return-value]
 
-    def __enter__(self) -> "SorobanServer":
+    async def close(self) -> None:
+        """Close underlying connector, and release all acquired resources."""
+        await self._client.close()
+
+    async def __aenter__(self) -> "SorobanServerAsync":
         return self
 
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        self.close()
+    async def __aexit__(self, exc_type, exc_val, exc_tb) -> None:
+        await self.close()
 
     def __str__(self):
-        return f"<SorobanServer [server_url={self.server_url}, client={self._client}]>"
+        return f"<SorobanServerAsync [server_url={self.server_url}, client={self._client}]>"

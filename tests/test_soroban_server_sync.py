@@ -108,7 +108,9 @@ class TestSorobanServer:
 
         with requests_mock.Mocker() as m:
             m.post(PRC_URL, json=data)
-            assert SorobanServer(PRC_URL).get_network()
+            assert SorobanServer(
+                PRC_URL
+            ).get_network() == GetNetworkResponse.model_validate(result)
 
         request_data = m.last_request.json()
         assert len(request_data["id"]) == 32
