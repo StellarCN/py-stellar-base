@@ -97,9 +97,9 @@ def authorize_entry(
 
 def authorize_invocation(
     signer: Union[Keypair, Callable[[stellar_xdr.HashIDPreimage], bytes]],
+    public_key: Optional[str],
     valid_until_ledger_sequence: int,
     invocation: stellar_xdr.SorobanAuthorizedInvocation,
-    public_key: Optional[str],
     network_passphrase: str,
 ):
     """This builds an entry from scratch, allowing you to express authorization as a function of:
@@ -114,11 +114,11 @@ def authorize_invocation(
     :param signer: either a :class:`Keypair` or a function which takes a payload
         (a :class:`stellar_xdr.HashIDPreimage` instance) input and returns a bytes signature,
         the signing key should correspond to the address in the `entry`.
+    :param public_key: the public identity of the signer (when providing a :class:`Keypair` to `signer`,
+        this can be omitted, as it just uses the public key of the keypair)
     :param valid_until_ledger_sequence: the (exclusive) future ledger sequence number until which
         this authorization entry should be valid (if `currentLedgerSeq==validUntil`, this is expired)
     :param invocation: invocation the invocation tree that we're authorizing (likely, this comes from transaction simulation)
-    :param public_key: the public identity of the signer (when providing a :class:`Keypair` to `signer`,
-        this can be omitted, as it just uses the public key of the keypair)
     :param network_passphrase: the network passphrase is incorporated into the signature (see :class:`stellar_sdk.Network` for options)
     :return: a signed Soroban authorization entry.
     """
