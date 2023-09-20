@@ -52,6 +52,8 @@ try:
     # if the error is not None, you need to handle it.
     op = tx.transaction.operations[0]
     assert isinstance(op, InvokeHostFunction)
+    assert simulate_resp.results is not None
+    assert simulate_resp.results[0].auth is not None
     op.auth = [
         authorize_entry(
             simulate_resp.results[0].auth[0],
