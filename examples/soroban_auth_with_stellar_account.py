@@ -18,12 +18,12 @@ from stellar_sdk.auth import authorize_entry
 from stellar_sdk.exceptions import PrepareTransactionException
 from stellar_sdk.soroban_rpc import GetTransactionStatus, SendTransactionStatus
 
-rpc_server_url = "http://100.83.15.43:8000/soroban/rpc"
-network_passphrase = Network.STANDALONE_NETWORK_PASSPHRASE
+rpc_server_url = "https://rpc-futurenet.stellar.org:443/"
+network_passphrase = Network.FUTURENET_NETWORK_PASSPHRASE
 soroban_server = SorobanServer(rpc_server_url)
 
 # https://github.com/stellar/soroban-examples/tree/v0.6.0/auth
-contract_id = "CDCYWK73YTYFJZZSJ5V7EDFNHYBG4QN3VUNG2IGD27KJDDPNCZKBCBXK"
+contract_id = "CDGPP5TBQIVN4ADNH6PL4METZNJ35OX4DIXKAQ3ENWYLBAJZMHHZE3EV"
 tx_submitter_kp = Keypair.from_secret(
     "SAAPYAPTTRZMCUZFPG3G66V4ZMHTK4TWA6NS7U4F7Z3IMUD52EK4DDEV"
 )
@@ -36,26 +36,27 @@ args = [scval.to_address(op_invoker_kp.public_key), scval.to_uint32(10)]
 
 source = soroban_server.load_account(tx_submitter_kp.public_key)
 tx = (
-    TransactionBuilder(source, network_passphrase, base_fee=60000)
+    TransactionBuilder(source, network_passphrase, base_fee=50000)
     .add_time_bounds(0, 0)
     .append_invoke_contract_function_op(
         contract_id=contract_id,
         function_name=func_name,
         parameters=args,
-        # source=op_invoker_kp.public_key
     )
     .build()
 )
 
 try:
     simulate_resp = soroban_server.simulate_transaction(tx)
+    # You need to check the error in the response,
+    # if the error is not None, you need to handle it.
     op = tx.transaction.operations[0]
     assert isinstance(op, InvokeHostFunction)
     op.auth = [
         authorize_entry(
             simulate_resp.results[0].auth[0],
             op_invoker_kp,
-            simulate_resp.latest_ledger + 3,
+            simulate_resp.latest_ledger + 20,
             network_passphrase,
         )
     ]
@@ -64,8 +65,11 @@ except PrepareTransactionException as e:
     print(f"Got exception: {e.simulate_transaction_response}")
     raise e
 
+# tx.transaction.soroban_data.resources.instructions = stellar_xdr.Uint32(
+#     tx.transaction.soroban_data.resources.instructions.uint32 * 2
+# )
+
 tx.sign(tx_submitter_kp)
-# tx.sign(op_invoker_kp)
 print(f"Signed XDR:\n{tx.to_xdr()}")
 
 send_transaction_data = soroban_server.send_transaction(tx)
