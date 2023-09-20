@@ -798,6 +798,11 @@ scval
 .. autofunction:: stellar_sdk.scval.to_struct
 .. autofunction:: stellar_sdk.scval.from_struct
 
+Auth
+^^^^
+.. autofunction:: stellar_sdk.auth.authorize_entry
+.. autofunction:: stellar_sdk.auth.authorize_invocation
+
 Helpers
 ^^^^^^^
 .. autofunction:: stellar_sdk.helpers.parse_transaction_envelope_from_xdr

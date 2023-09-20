@@ -271,6 +271,7 @@ class SorobanServer:
     def prepare_transaction(
         self,
         transaction_envelope: TransactionEnvelope,
+        simulate_transaction_response: SimulateTransactionResponse = None,
     ) -> TransactionEnvelope:
         """Submit a trial contract invocation, first run a simulation of the contract
         invocation as defined on the incoming transaction, and apply the results to
@@ -297,18 +298,23 @@ class SorobanServer:
             entries from the simulation. In other words, if you include auth entries, you don't care
             about the auth returned from the simulation. Other fields (footprint, etc.) will be filled
             as normal.
+        :param simulate_transaction_response: The response of the simulation of the transaction,
+            typically you don't need to pass this parameter, it will be automatically called if you don't pass it.
         :return: A copy of the :class:`TransactionEnvelope <stellar_sdk.transaction_envelope.TransactionEnvelope>`,
             with the expected authorizations (in the case of invocation) and ledger footprint added.
             The transaction fee will also automatically be padded with the contract's minimum resource fees
             discovered from the simulation.
         """
-        resp = self.simulate_transaction(transaction_envelope)
-        if resp.error:
+        if not simulate_transaction_response:
+            simulate_transaction_response = self.simulate_transaction(
+                transaction_envelope
+            )
+        if simulate_transaction_response.error:
             raise PrepareTransactionException(
                 "Simulation transaction failed, the response contains error information.",
-                resp,
+                simulate_transaction_response,
             )
-        te = _assemble_transaction(transaction_envelope, resp)
+        te = _assemble_transaction(transaction_envelope, simulate_transaction_response)
         return te
 
     def close(self) -> None:
