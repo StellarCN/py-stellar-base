@@ -7,23 +7,30 @@ import pytest
 from stellar_sdk import (
     LIQUIDITY_POOL_FEE_V18,
     Account,
+    Address,
     Asset,
     AuthorizationFlag,
+    BumpFootprintExpiration,
     Claimant,
     FeeBumpTransactionEnvelope,
+    InvokeHostFunction,
     Keypair,
     LedgerBounds,
     LiquidityPoolAsset,
     Network,
     Preconditions,
+    RestoreFootprint,
     SignedPayloadSigner,
     Signer,
     SignerKey,
+    SorobanDataBuilder,
     TimeBounds,
     TransactionBuilder,
     TrustLineEntryFlag,
     TrustLineFlags,
+    scval,
 )
+from stellar_sdk import xdr as stellar_xdr
 
 kp1 = Keypair.from_secret(
     "SAMWF63FZ5ZNHY75SNYNAFMWTL5FPBMIV7DLB3UDAVLL7DKPI5ZFS2S6"
@@ -705,3 +712,246 @@ class TestTransaction:
         )
 
         assert tx2.transaction.preconditions == cond
+
+    def test_append_invoke_contract_function_op(self):
+        auth = [
+            stellar_xdr.SorobanAuthorizationEntry(
+                credentials=stellar_xdr.SorobanCredentials(
+                    stellar_xdr.SorobanCredentialsType.SOROBAN_CREDENTIALS_SOURCE_ACCOUNT
+                ),
+                root_invocation=stellar_xdr.SorobanAuthorizedInvocation(
+                    function=stellar_xdr.SorobanAuthorizedFunction(
+                        type=stellar_xdr.SorobanAuthorizedFunctionType.SOROBAN_AUTHORIZED_FUNCTION_TYPE_CONTRACT_FN,
+                        contract_fn=stellar_xdr.InvokeContractArgs(
+                            contract_address=Address(
+                                "CA7QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLTJJFC7MGXUA74P7UJUWDA"
+                            ).to_xdr_sc_address(),
+                            function_name=scval.to_symbol("hello").sym,
+                            args=[
+                                scval.to_address(kp2.public_key),
+                                scval.to_uint32(10),
+                            ],
+                        ),
+                    ),
+                    sub_invocations=[],
+                ),
+            )
+        ]
+        tx = get_tx_builder().append_invoke_contract_function_op(
+            "CA7QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLTJJFC7MGXUA74P7UJUWDA",
+            "hello",
+            [scval.to_symbol("world")],
+            auth,
+            kp2.public_key,
+        )
+        host_function = stellar_xdr.HostFunction(
+            stellar_xdr.HostFunctionType.HOST_FUNCTION_TYPE_INVOKE_CONTRACT,
+            invoke_contract=stellar_xdr.InvokeContractArgs(
+                contract_address=Address(
+                    "CA7QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLTJJFC7MGXUA74P7UJUWDA"
+                ).to_xdr_sc_address(),
+                function_name=stellar_xdr.SCSymbol(sc_symbol="hello".encode("utf-8")),
+                args=[scval.to_symbol("world")],
+            ),
+        )
+        expected_op = InvokeHostFunction(
+            host_function=host_function, auth=auth, source=kp2.public_key
+        )
+        assert tx.build().transaction.operations[0] == expected_op
+        check_from_xdr(tx)
+
+    def test_append_upload_contract_wasm_op(self):
+        tx = get_tx_builder().append_upload_contract_wasm_op(
+            b"test_contract_data", kp2.public_key
+        )
+        host_function = stellar_xdr.HostFunction(
+            stellar_xdr.HostFunctionType.HOST_FUNCTION_TYPE_UPLOAD_CONTRACT_WASM,
+            wasm=b"test_contract_data",
+        )
+        expected_op = InvokeHostFunction(
+            host_function=host_function, auth=[], source=kp2.public_key
+        )
+        assert tx.build().transaction.operations[0] == expected_op
+        check_from_xdr(tx)
+
+    def test_append_create_contract_op(self):
+        auth = [
+            stellar_xdr.SorobanAuthorizationEntry(
+                credentials=stellar_xdr.SorobanCredentials(
+                    stellar_xdr.SorobanCredentialsType.SOROBAN_CREDENTIALS_SOURCE_ACCOUNT
+                ),
+                root_invocation=stellar_xdr.SorobanAuthorizedInvocation(
+                    function=stellar_xdr.SorobanAuthorizedFunction(
+                        type=stellar_xdr.SorobanAuthorizedFunctionType.SOROBAN_AUTHORIZED_FUNCTION_TYPE_CONTRACT_FN,
+                        contract_fn=stellar_xdr.InvokeContractArgs(
+                            contract_address=Address(
+                                "CA7QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLTJJFC7MGXUA74P7UJUWDA"
+                            ).to_xdr_sc_address(),
+                            function_name=scval.to_symbol("hello").sym,
+                            args=[
+                                scval.to_address(kp2.public_key),
+                                scval.to_uint32(10),
+                            ],
+                        ),
+                    ),
+                    sub_invocations=[],
+                ),
+            )
+        ]
+        salt = b"V2\x1c\x18\xecF\xea-\x83\x90\xdc\x96\xe0\xdd\x8e\x9a}\x96\x88\xc7\x13\xaa\xa5\xef\xc5az\xa3\xf8\xb0F_"
+        wasm_id = "75cab8d0f9efb285ef229d57342550dea3c43f5fe397bb500c40eba22900def2"
+        tx = get_tx_builder().append_create_contract_op(
+            wasm_id, kp2.public_key, salt, auth, kp2.public_key
+        )
+        create_contract = stellar_xdr.CreateContractArgs(
+            contract_id_preimage=stellar_xdr.ContractIDPreimage(
+                stellar_xdr.ContractIDPreimageType.CONTRACT_ID_PREIMAGE_FROM_ADDRESS,
+                from_address=stellar_xdr.ContractIDPreimageFromAddress(
+                    address=Address(kp2.public_key).to_xdr_sc_address(),
+                    salt=stellar_xdr.Uint256(salt),
+                ),
+            ),
+            executable=stellar_xdr.ContractExecutable(
+                stellar_xdr.ContractExecutableType.CONTRACT_EXECUTABLE_WASM,
+                stellar_xdr.Hash(binascii.unhexlify(wasm_id)),
+            ),
+        )
+
+        host_function = stellar_xdr.HostFunction(
+            stellar_xdr.HostFunctionType.HOST_FUNCTION_TYPE_CREATE_CONTRACT,
+            create_contract=create_contract,
+        )
+        expected_op = InvokeHostFunction(
+            host_function=host_function, auth=auth, source=kp2.public_key
+        )
+        assert tx.build().transaction.operations[0] == expected_op
+        check_from_xdr(tx)
+
+    def test_append_create_token_contract_from_asset_op(self):
+        asset = Asset.native()
+        tx = get_tx_builder().append_create_token_contract_from_asset_op(
+            asset, kp2.public_key
+        )
+        asset_param = asset.to_xdr_object()
+
+        create_contract = stellar_xdr.CreateContractArgs(
+            contract_id_preimage=stellar_xdr.ContractIDPreimage(
+                stellar_xdr.ContractIDPreimageType.CONTRACT_ID_PREIMAGE_FROM_ASSET,
+                from_asset=asset_param,
+            ),
+            executable=stellar_xdr.ContractExecutable(
+                stellar_xdr.ContractExecutableType.CONTRACT_EXECUTABLE_TOKEN,
+            ),
+        )
+
+        host_function = stellar_xdr.HostFunction(
+            stellar_xdr.HostFunctionType.HOST_FUNCTION_TYPE_CREATE_CONTRACT,
+            create_contract=create_contract,
+        )
+        expected_op = InvokeHostFunction(
+            host_function=host_function, auth=[], source=kp2.public_key
+        )
+        assert tx.build().transaction.operations[0] == expected_op
+        check_from_xdr(tx)
+
+    def test_append_create_token_contract_from_address_op(self):
+        auth = [
+            stellar_xdr.SorobanAuthorizationEntry(
+                credentials=stellar_xdr.SorobanCredentials(
+                    stellar_xdr.SorobanCredentialsType.SOROBAN_CREDENTIALS_SOURCE_ACCOUNT
+                ),
+                root_invocation=stellar_xdr.SorobanAuthorizedInvocation(
+                    function=stellar_xdr.SorobanAuthorizedFunction(
+                        type=stellar_xdr.SorobanAuthorizedFunctionType.SOROBAN_AUTHORIZED_FUNCTION_TYPE_CONTRACT_FN,
+                        contract_fn=stellar_xdr.InvokeContractArgs(
+                            contract_address=Address(
+                                "CA7QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLTJJFC7MGXUA74P7UJUWDA"
+                            ).to_xdr_sc_address(),
+                            function_name=scval.to_symbol("hello").sym,
+                            args=[
+                                scval.to_address(kp2.public_key),
+                                scval.to_uint32(10),
+                            ],
+                        ),
+                    ),
+                    sub_invocations=[],
+                ),
+            )
+        ]
+        salt = b"V2\x1c\x18\xecF\xea-\x83\x90\xdc\x96\xe0\xdd\x8e\x9a}\x96\x88\xc7\x13\xaa\xa5\xef\xc5az\xa3\xf8\xb0F_"
+
+        tx = get_tx_builder().append_create_token_contract_from_address_op(
+            kp2.public_key, salt, auth, kp2.public_key
+        )
+        create_contract = stellar_xdr.CreateContractArgs(
+            contract_id_preimage=stellar_xdr.ContractIDPreimage(
+                stellar_xdr.ContractIDPreimageType.CONTRACT_ID_PREIMAGE_FROM_ADDRESS,
+                from_address=stellar_xdr.ContractIDPreimageFromAddress(
+                    address=Address(kp2.public_key).to_xdr_sc_address(),
+                    salt=stellar_xdr.Uint256(salt),
+                ),
+            ),
+            executable=stellar_xdr.ContractExecutable(
+                stellar_xdr.ContractExecutableType.CONTRACT_EXECUTABLE_TOKEN,
+            ),
+        )
+
+        host_function = stellar_xdr.HostFunction(
+            stellar_xdr.HostFunctionType.HOST_FUNCTION_TYPE_CREATE_CONTRACT,
+            create_contract=create_contract,
+        )
+        expected_op = InvokeHostFunction(
+            host_function=host_function, auth=auth, source=kp2.public_key
+        )
+        assert tx.build().transaction.operations[0] == expected_op
+        check_from_xdr(tx)
+
+    def test_append_bump_footprint_expiration_op(self):
+        ledger_key = stellar_xdr.LedgerKey(
+            stellar_xdr.LedgerEntryType.CONTRACT_DATA,
+            contract_data=stellar_xdr.LedgerKeyContractData(
+                contract=Address(
+                    "CA7QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLTJJFC7MGXUA74P7UJUWDA"
+                ).to_xdr_sc_address(),
+                key=stellar_xdr.SCVal(
+                    stellar_xdr.SCValType.SCV_LEDGER_KEY_CONTRACT_INSTANCE
+                ),
+                durability=stellar_xdr.ContractDataDurability.PERSISTENT,
+            ),
+        )
+        soroban_data = SorobanDataBuilder().set_read_only([ledger_key]).build()
+        tx = (
+            get_tx_builder()
+            .append_bump_footprint_expiration_op(10, kp2.public_key)
+            .set_soroban_data(soroban_data)
+        )
+
+        expected_op = BumpFootprintExpiration(10, source=kp2.public_key)
+        assert tx.build().transaction.operations[0] == expected_op
+        assert tx.soroban_data == soroban_data
+        check_from_xdr(tx)
+
+    def test_append_restore_footprint_op(self):
+        ledger_key = stellar_xdr.LedgerKey(
+            stellar_xdr.LedgerEntryType.CONTRACT_DATA,
+            contract_data=stellar_xdr.LedgerKeyContractData(
+                contract=Address(
+                    "CA7QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLTJJFC7MGXUA74P7UJUWDA"
+                ).to_xdr_sc_address(),
+                key=stellar_xdr.SCVal(
+                    stellar_xdr.SCValType.SCV_LEDGER_KEY_CONTRACT_INSTANCE
+                ),
+                durability=stellar_xdr.ContractDataDurability.PERSISTENT,
+            ),
+        )
+        soroban_data = SorobanDataBuilder().set_read_only([ledger_key]).build()
+        tx = (
+            get_tx_builder()
+            .append_restore_footprint_op(kp2.public_key)
+            .set_soroban_data(soroban_data)
+        )
+
+        expected_op = RestoreFootprint(source=kp2.public_key)
+        assert tx.build().transaction.operations[0] == expected_op
+        assert tx.soroban_data == soroban_data
+        check_from_xdr(tx)

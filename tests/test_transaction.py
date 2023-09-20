@@ -1,16 +1,20 @@
 import pytest
 
 from stellar_sdk import (
+    Address,
     Asset,
     Claimant,
     ClaimPredicate,
     CreateClaimableBalance,
     IdMemo,
+    InvokeHostFunction,
     Keypair,
     MuxedAccount,
     NoneMemo,
     Preconditions,
+    SorobanDataBuilder,
 )
+from stellar_sdk import xdr as stellar_xdr
 from stellar_sdk.operation import ManageData, Payment
 from stellar_sdk.time_bounds import TimeBounds
 from stellar_sdk.transaction import Transaction
@@ -331,3 +335,37 @@ class TestTransaction:
         assert restore_tx.preconditions._is_v2()
         assert restore_tx.preconditions.min_sequence_ledger_gap == 0
         assert restore_tx.preconditions.min_sequence_age == 0
+
+    def test_set_soroban_data(self):
+        source = Keypair.from_public_key(
+            "GCEZWKCA5VLDNRLN3RPRJMRZOX3Z6G5CHCGSNFHEYVXM3XOJMDS674JZ"
+        )
+        sequence = 1
+        memo = IdMemo(100)
+        fee = 200
+        soroban_data = SorobanDataBuilder().set_resources(1, 2, 3).build()
+        time_bounds = TimeBounds(12345, 56789)
+
+        host_function = stellar_xdr.HostFunction(
+            stellar_xdr.HostFunctionType.HOST_FUNCTION_TYPE_INVOKE_CONTRACT,
+            invoke_contract=stellar_xdr.InvokeContractArgs(
+                contract_address=Address(
+                    "CDCYWK73YTYFJZZSJ5V7EDFNHYBG4QN3VUNG2IGD27KJDDPNCZKBCBXK"
+                ).to_xdr_sc_address(),
+                function_name=stellar_xdr.SCSymbol(sc_symbol="hello".encode("utf-8")),
+                args=[],
+            ),
+        )
+        ops = [InvokeHostFunction(host_function=host_function, auth=[])]
+        cond = Preconditions(time_bounds=time_bounds)
+        tx = Transaction(source, sequence, fee, ops, memo, cond, soroban_data, v1=True)
+        tx_object = tx.to_xdr_object()
+        restore_transaction = Transaction.from_xdr_object(tx_object, v1=True)
+        assert isinstance(restore_transaction, Transaction)
+        assert restore_transaction.source.account_id == source.public_key
+        assert restore_transaction.fee == fee
+        assert restore_transaction.memo == memo
+        assert restore_transaction.preconditions == cond
+        assert restore_transaction.sequence == sequence
+        assert restore_transaction.soroban_data == soroban_data
+        assert restore_transaction == tx

@@ -1234,7 +1234,7 @@ class TransactionBuilder:
         auth: Sequence[stellar_xdr.SorobanAuthorizationEntry] = None,
         source: Optional[Union[MuxedAccount, str]] = None,
     ) -> "TransactionBuilder":
-        """Append an :class:`HostFunction <stellar_sdk.xdr.HostFunction>` operation to the list of operations.
+        """Append an :class:`InvokeHostFunction <stellar_sdk.operation.InvokeHostFunction>` operation to the list of operations.
 
         You can use this method to invoke a contract function.
 
@@ -1267,7 +1267,7 @@ class TransactionBuilder:
         contract: Union[bytes, str],
         source: Optional[Union[MuxedAccount, str]] = None,
     ) -> "TransactionBuilder":
-        """Append an :class:`HostFunction <stellar_sdk.xdr.HostFunction>` operation to the list of operations.
+        """Append an :class:`InvokeHostFunction <stellar_sdk.operation.InvokeHostFunction>` operation to the list of operations.
 
         You can use this method to install a contract code,
         and then use :func:`append_create_contract_op` to create a contract.
@@ -1297,7 +1297,7 @@ class TransactionBuilder:
         auth: Sequence[stellar_xdr.SorobanAuthorizationEntry] = None,
         source: Optional[Union[MuxedAccount, str]] = None,
     ) -> "TransactionBuilder":
-        """Append an :class:`HostFunction <stellar_sdk.xdr.HostFunction>` operation to the list of operations.
+        """Append an :class:`InvokeHostFunction <stellar_sdk.operation.InvokeHostFunction>` operation to the list of operations.
 
         You can use this method to create a contract.
 
@@ -1348,7 +1348,7 @@ class TransactionBuilder:
         asset: Asset,
         source: Optional[Union[MuxedAccount, str]] = None,
     ) -> "TransactionBuilder":
-        """Append an :class:`HostFunction <stellar_sdk.xdr.HostFunction>` operation to the list of operations.
+        """Append an :class:`InvokeHostFunction <stellar_sdk.operation.InvokeHostFunction>` operation to the list of operations.
 
         You can use this method to deploy a contract that wraps a classic asset.
 
@@ -1384,7 +1384,7 @@ class TransactionBuilder:
         auth: Sequence[stellar_xdr.SorobanAuthorizationEntry] = None,
         source: Optional[Union[MuxedAccount, str]] = None,
     ) -> "TransactionBuilder":
-        """Append an :class:`HostFunction <stellar_sdk.xdr.HostFunction>` operation to the list of operations.
+        """Append an :class:`InvokeHostFunction <stellar_sdk.operation.InvokeHostFunction>` operation to the list of operations.
 
         You can use this method to create a new Soroban token contract.
 
@@ -1431,11 +1431,27 @@ class TransactionBuilder:
     def append_bump_footprint_expiration_op(
         self, ledgers_to_expire: int, source: Optional[Union[MuxedAccount, str]] = None
     ) -> "TransactionBuilder":
+        """Append an :class:`BumpFootprintExpiration <stellar_sdk.operation.BumpFootprintExpiration>` operation to the list of operations.
+
+        :param ledgers_to_expire: The number of ledgers past the LCL (last closed ledger)
+            by which to extend the validity of the ledger keys in this transaction.
+        :param source: The source account for the operation. Defaults to the
+            transaction's source account.
+        :return: This builder instance.
+        """
         op = BumpFootprintExpiration(ledgers_to_expire=ledgers_to_expire, source=source)
         return self.append_operation(op)
 
-    def append_restore_footprint_op(self):
-        op = RestoreFootprint()
+    def append_restore_footprint_op(
+        self, source: Optional[Union[MuxedAccount, str]] = None
+    ):
+        """Append an :class:`RestoreFootprint <stellar_sdk.operation.RestoreFootprint>` operation to the list of operations.
+
+        :param source: The source account for the operation. Defaults to the
+            transaction's source account.
+        :return: This builder instance.
+        """
+        op = RestoreFootprint(source)
         return self.append_operation(op)
 
     def __str__(self):
