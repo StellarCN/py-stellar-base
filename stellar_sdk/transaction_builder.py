@@ -1230,7 +1230,7 @@ class TransactionBuilder:
         self,
         contract_id: str,
         function_name: str,
-        parameters: Sequence[stellar_xdr.SCVal],
+        parameters: Sequence[stellar_xdr.SCVal] = None,
         auth: Sequence[stellar_xdr.SorobanAuthorizationEntry] = None,
         source: Optional[Union[MuxedAccount, str]] = None,
     ) -> "TransactionBuilder":
@@ -1248,6 +1248,9 @@ class TransactionBuilder:
         """
         if not StrKey.is_valid_contract(contract_id):
             raise ValueError("`contract_id` is invalid.")
+
+        if parameters is None:
+            parameters = []
 
         host_function = stellar_xdr.HostFunction(
             stellar_xdr.HostFunctionType.HOST_FUNCTION_TYPE_INVOKE_CONTRACT,
