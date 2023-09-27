@@ -54,7 +54,7 @@ stellar-base-sseclient = "^0.0.21"
 mnemonic = "^0.20"
 toml = "^0.10.2"
 urllib3 = ">=1.26.7,<3.0.0"
-pydantic = "^2.4.0"
+pydantic = "^2.4.1"
 xdrlib3 = "^0.1.1"
 
 [tool.poetry.extras]
