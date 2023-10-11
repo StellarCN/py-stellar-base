@@ -63,7 +63,7 @@ aiohttp = ["aiohttp", "aiohttp-sse-client"]
 [tool.poetry.dev-dependencies]
 pytest = "^7.4.2"
 pytest-cov = "^4.1.0"
-pytest-timeout = "^2.0.1"
+pytest-timeout = "^2.2.0"
 pytest-asyncio = "^0.21.1"
 pytest-httpserver = "^1.0.6"
 # currently, mypy cannot run in pypy https://github.com/python/typed_ast/issues/111
