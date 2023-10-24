@@ -41,7 +41,7 @@ class OperationType(IntEnum):
             LIQUIDITY_POOL_DEPOSIT = 22,
             LIQUIDITY_POOL_WITHDRAW = 23,
             INVOKE_HOST_FUNCTION = 24,
-            BUMP_FOOTPRINT_EXPIRATION = 25,
+            EXTEND_FOOTPRINT_TTL = 25,
             RESTORE_FOOTPRINT = 26
         };
     """
@@ -71,7 +71,7 @@ class OperationType(IntEnum):
     LIQUIDITY_POOL_DEPOSIT = 22
     LIQUIDITY_POOL_WITHDRAW = 23
     INVOKE_HOST_FUNCTION = 24
-    BUMP_FOOTPRINT_EXPIRATION = 25
+    EXTEND_FOOTPRINT_TTL = 25
     RESTORE_FOOTPRINT = 26
 
     def pack(self, packer: Packer) -> None:

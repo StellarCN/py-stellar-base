@@ -6,7 +6,7 @@ from stellar_sdk.soroban_data_builder import SorobanDataBuilder
 class TestSorobanDataBuilder:
     empty_instance = stellar_xdr.SorobanTransactionData(
         ext=stellar_xdr.ExtensionPoint(0),
-        refundable_fee=stellar_xdr.Int64(0),
+        resource_fee=stellar_xdr.Int64(0),
         resources=stellar_xdr.SorobanResources(
             footprint=stellar_xdr.LedgerFootprint(
                 read_only=[],
@@ -26,7 +26,7 @@ class TestSorobanDataBuilder:
     def test_from_xdr_object(self):
         xdr_obj = stellar_xdr.SorobanTransactionData(
             ext=stellar_xdr.ExtensionPoint(0),
-            refundable_fee=stellar_xdr.Int64(0),
+            resource_fee=stellar_xdr.Int64(0),
             resources=stellar_xdr.SorobanResources(
                 footprint=stellar_xdr.LedgerFootprint(
                     read_only=[],
@@ -45,7 +45,7 @@ class TestSorobanDataBuilder:
     def test_from_xdr_base64(self):
         xdr_obj = stellar_xdr.SorobanTransactionData(
             ext=stellar_xdr.ExtensionPoint(0),
-            refundable_fee=stellar_xdr.Int64(0),
+            resource_fee=stellar_xdr.Int64(0),
             resources=stellar_xdr.SorobanResources(
                 footprint=stellar_xdr.LedgerFootprint(
                     read_only=[],
@@ -61,16 +61,16 @@ class TestSorobanDataBuilder:
         assert builder.build() == xdr_obj
         assert id(builder._data) != id(xdr_obj)
 
-    def test_set_refundable_fee(self):
+    def test_set_resource_fee(self):
         builder = SorobanDataBuilder()
-        builder.set_refundable_fee(100)
-        assert builder.build().refundable_fee.int64 == 100
+        builder.set_resource_fee(100)
+        assert builder.build().resource_fee.int64 == 100
 
     def test_set_resources(self):
         data = SorobanDataBuilder().set_resources(1, 2, 3).build()
         assert data == stellar_xdr.SorobanTransactionData(
             ext=stellar_xdr.ExtensionPoint(0),
-            refundable_fee=stellar_xdr.Int64(0),
+            resource_fee=stellar_xdr.Int64(0),
             resources=stellar_xdr.SorobanResources(
                 footprint=stellar_xdr.LedgerFootprint(
                     read_only=[],
@@ -94,7 +94,7 @@ class TestSorobanDataBuilder:
         data = SorobanDataBuilder().set_read_only([ledger_key]).build()
         assert data == stellar_xdr.SorobanTransactionData(
             ext=stellar_xdr.ExtensionPoint(0),
-            refundable_fee=stellar_xdr.Int64(0),
+            resource_fee=stellar_xdr.Int64(0),
             resources=stellar_xdr.SorobanResources(
                 footprint=stellar_xdr.LedgerFootprint(
                     read_only=[ledger_key],
@@ -118,7 +118,7 @@ class TestSorobanDataBuilder:
         data = SorobanDataBuilder().set_read_write([ledger_key]).build()
         assert data == stellar_xdr.SorobanTransactionData(
             ext=stellar_xdr.ExtensionPoint(0),
-            refundable_fee=stellar_xdr.Int64(0),
+            resource_fee=stellar_xdr.Int64(0),
             resources=stellar_xdr.SorobanResources(
                 footprint=stellar_xdr.LedgerFootprint(
                     read_only=[],

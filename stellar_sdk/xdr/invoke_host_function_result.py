@@ -23,7 +23,7 @@ class InvokeHostFunctionResult:
         case INVOKE_HOST_FUNCTION_MALFORMED:
         case INVOKE_HOST_FUNCTION_TRAPPED:
         case INVOKE_HOST_FUNCTION_RESOURCE_LIMIT_EXCEEDED:
-        case INVOKE_HOST_FUNCTION_ENTRY_EXPIRED:
+        case INVOKE_HOST_FUNCTION_ENTRY_ARCHIVED:
         case INVOKE_HOST_FUNCTION_INSUFFICIENT_REFUNDABLE_FEE:
             void;
         };
@@ -53,7 +53,10 @@ class InvokeHostFunctionResult:
             == InvokeHostFunctionResultCode.INVOKE_HOST_FUNCTION_RESOURCE_LIMIT_EXCEEDED
         ):
             return
-        if self.code == InvokeHostFunctionResultCode.INVOKE_HOST_FUNCTION_ENTRY_EXPIRED:
+        if (
+            self.code
+            == InvokeHostFunctionResultCode.INVOKE_HOST_FUNCTION_ENTRY_ARCHIVED
+        ):
             return
         if (
             self.code
@@ -76,7 +79,7 @@ class InvokeHostFunctionResult:
             == InvokeHostFunctionResultCode.INVOKE_HOST_FUNCTION_RESOURCE_LIMIT_EXCEEDED
         ):
             return cls(code=code)
-        if code == InvokeHostFunctionResultCode.INVOKE_HOST_FUNCTION_ENTRY_EXPIRED:
+        if code == InvokeHostFunctionResultCode.INVOKE_HOST_FUNCTION_ENTRY_ARCHIVED:
             return cls(code=code)
         if (
             code

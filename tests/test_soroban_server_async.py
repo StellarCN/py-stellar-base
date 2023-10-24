@@ -485,7 +485,7 @@ class TestSorobanServer:
 
         soroban_data = stellar_xdr.SorobanTransactionData(
             ext=stellar_xdr.ExtensionPoint(0),
-            refundable_fee=stellar_xdr.Int64(100),
+            resource_fee=stellar_xdr.Int64(100),
             resources=stellar_xdr.SorobanResources(
                 footprint=stellar_xdr.LedgerFootprint(
                     read_only=[],

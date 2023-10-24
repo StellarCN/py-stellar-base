@@ -12,7 +12,7 @@ class SorobanDataBuilder:
     with various items set to specific values.
 
     This is recommended for when you are building :class:`RestoreFootprint <stellar_sdk.operation.RestoreFootprint>`,
-    :class:`BumpFootprintExpiration <stellar_sdk.operation.BumpFootprintExpiration>` operations to avoid (re)building
+    :class:`ExtendFootprintTTL <stellar_sdk.operation.ExtendFootprintTTL>` operations to avoid (re)building
     the entire data structure from scratch.
 
     By default, an empty instance will be created.
@@ -21,7 +21,7 @@ class SorobanDataBuilder:
     def __init__(self):
         self._data = stellar_xdr.SorobanTransactionData(
             ext=stellar_xdr.ExtensionPoint(0),
-            refundable_fee=stellar_xdr.Int64(0),
+            resource_fee=stellar_xdr.Int64(0),
             resources=stellar_xdr.SorobanResources(
                 footprint=stellar_xdr.LedgerFootprint(
                     read_only=[],
@@ -51,13 +51,13 @@ class SorobanDataBuilder:
             )
         return data
 
-    def set_refundable_fee(self, fee: int) -> SorobanDataBuilder:
-        """Sets the "refundable" fee portion of the Soroban data.
+    def set_resource_fee(self, fee: int) -> SorobanDataBuilder:
+        """Sets the "resource" fee portion of the Soroban data.
 
-        :param fee: The refundable fee to set (int64)
+        :param fee: The resource fee to set (int64)
         :return: This builder.
         """
-        self._data.refundable_fee = stellar_xdr.Int64(fee)
+        self._data.resource_fee = stellar_xdr.Int64(fee)
         return self
 
     def set_read_only(

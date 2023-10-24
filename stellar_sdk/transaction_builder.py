@@ -1368,7 +1368,7 @@ class TransactionBuilder:
                 from_asset=asset_param,
             ),
             executable=stellar_xdr.ContractExecutable(
-                stellar_xdr.ContractExecutableType.CONTRACT_EXECUTABLE_TOKEN,
+                stellar_xdr.ContractExecutableType.CONTRACT_EXECUTABLE_STELLAR_ASSET,
             ),
         )
 
@@ -1419,7 +1419,7 @@ class TransactionBuilder:
                 ),
             ),
             executable=stellar_xdr.ContractExecutable(
-                stellar_xdr.ContractExecutableType.CONTRACT_EXECUTABLE_TOKEN,
+                stellar_xdr.ContractExecutableType.CONTRACT_EXECUTABLE_STELLAR_ASSET,
             ),
         )
 
@@ -1431,18 +1431,18 @@ class TransactionBuilder:
         op = InvokeHostFunction(host_function=host_function, auth=auth, source=source)
         return self.append_operation(op)
 
-    def append_bump_footprint_expiration_op(
-        self, ledgers_to_expire: int, source: Optional[Union[MuxedAccount, str]] = None
+    def append_extend_footprint_ttl_op(
+        self, extend_to: int, source: Optional[Union[MuxedAccount, str]] = None
     ) -> "TransactionBuilder":
-        """Append an :class:`BumpFootprintExpiration <stellar_sdk.operation.BumpFootprintExpiration>` operation to the list of operations.
+        """Append an :class:`ExtendFootprintTTL <stellar_sdk.operation.ExtendFootprintTTL>` operation to the list of operations.
 
-        :param ledgers_to_expire: The number of ledgers past the LCL (last closed ledger)
+        :param extend_to: The number of ledgers past the LCL (last closed ledger)
             by which to extend the validity of the ledger keys in this transaction.
         :param source: The source account for the operation. Defaults to the
             transaction's source account.
         :return: This builder instance.
         """
-        op = BumpFootprintExpiration(ledgers_to_expire=ledgers_to_expire, source=source)
+        op = ExtendFootprintTTL(extend_to=extend_to, source=source)
         return self.append_operation(op)
 
     def append_restore_footprint_op(

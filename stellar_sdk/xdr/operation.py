@@ -76,8 +76,8 @@ class Operation:
                 LiquidityPoolWithdrawOp liquidityPoolWithdrawOp;
             case INVOKE_HOST_FUNCTION:
                 InvokeHostFunctionOp invokeHostFunctionOp;
-            case BUMP_FOOTPRINT_EXPIRATION:
-                BumpFootprintExpirationOp bumpFootprintExpirationOp;
+            case EXTEND_FOOTPRINT_TTL:
+                ExtendFootprintTTLOp extendFootprintTTLOp;
             case RESTORE_FOOTPRINT:
                 RestoreFootprintOp restoreFootprintOp;
             }

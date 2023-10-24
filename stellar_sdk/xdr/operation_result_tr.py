@@ -9,7 +9,6 @@ from xdrlib3 import Packer, Unpacker
 from .account_merge_result import AccountMergeResult
 from .allow_trust_result import AllowTrustResult
 from .begin_sponsoring_future_reserves_result import BeginSponsoringFutureReservesResult
-from .bump_footprint_expiration_result import BumpFootprintExpirationResult
 from .bump_sequence_result import BumpSequenceResult
 from .change_trust_result import ChangeTrustResult
 from .claim_claimable_balance_result import ClaimClaimableBalanceResult
@@ -18,6 +17,7 @@ from .clawback_result import ClawbackResult
 from .create_account_result import CreateAccountResult
 from .create_claimable_balance_result import CreateClaimableBalanceResult
 from .end_sponsoring_future_reserves_result import EndSponsoringFutureReservesResult
+from .extend_footprint_ttl_result import ExtendFootprintTTLResult
 from .inflation_result import InflationResult
 from .invoke_host_function_result import InvokeHostFunctionResult
 from .liquidity_pool_deposit_result import LiquidityPoolDepositResult
@@ -93,8 +93,8 @@ class OperationResultTr:
                 LiquidityPoolWithdrawResult liquidityPoolWithdrawResult;
             case INVOKE_HOST_FUNCTION:
                 InvokeHostFunctionResult invokeHostFunctionResult;
-            case BUMP_FOOTPRINT_EXPIRATION:
-                BumpFootprintExpirationResult bumpFootprintExpirationResult;
+            case EXTEND_FOOTPRINT_TTL:
+                ExtendFootprintTTLResult extendFootprintTTLResult;
             case RESTORE_FOOTPRINT:
                 RestoreFootprintResult restoreFootprintResult;
             }
@@ -128,7 +128,7 @@ class OperationResultTr:
         liquidity_pool_deposit_result: LiquidityPoolDepositResult = None,
         liquidity_pool_withdraw_result: LiquidityPoolWithdrawResult = None,
         invoke_host_function_result: InvokeHostFunctionResult = None,
-        bump_footprint_expiration_result: BumpFootprintExpirationResult = None,
+        extend_footprint_ttl_result: ExtendFootprintTTLResult = None,
         restore_footprint_result: RestoreFootprintResult = None,
     ) -> None:
         self.type = type
@@ -161,7 +161,7 @@ class OperationResultTr:
         self.liquidity_pool_deposit_result = liquidity_pool_deposit_result
         self.liquidity_pool_withdraw_result = liquidity_pool_withdraw_result
         self.invoke_host_function_result = invoke_host_function_result
-        self.bump_footprint_expiration_result = bump_footprint_expiration_result
+        self.extend_footprint_ttl_result = extend_footprint_ttl_result
         self.restore_footprint_result = restore_footprint_result
 
     def pack(self, packer: Packer) -> None:
@@ -299,10 +299,10 @@ class OperationResultTr:
                 raise ValueError("invoke_host_function_result should not be None.")
             self.invoke_host_function_result.pack(packer)
             return
-        if self.type == OperationType.BUMP_FOOTPRINT_EXPIRATION:
-            if self.bump_footprint_expiration_result is None:
-                raise ValueError("bump_footprint_expiration_result should not be None.")
-            self.bump_footprint_expiration_result.pack(packer)
+        if self.type == OperationType.EXTEND_FOOTPRINT_TTL:
+            if self.extend_footprint_ttl_result is None:
+                raise ValueError("extend_footprint_ttl_result should not be None.")
+            self.extend_footprint_ttl_result.pack(packer)
             return
         if self.type == OperationType.RESTORE_FOOTPRINT:
             if self.restore_footprint_result is None:
@@ -435,13 +435,10 @@ class OperationResultTr:
             return cls(
                 type=type, invoke_host_function_result=invoke_host_function_result
             )
-        if type == OperationType.BUMP_FOOTPRINT_EXPIRATION:
-            bump_footprint_expiration_result = BumpFootprintExpirationResult.unpack(
-                unpacker
-            )
+        if type == OperationType.EXTEND_FOOTPRINT_TTL:
+            extend_footprint_ttl_result = ExtendFootprintTTLResult.unpack(unpacker)
             return cls(
-                type=type,
-                bump_footprint_expiration_result=bump_footprint_expiration_result,
+                type=type, extend_footprint_ttl_result=extend_footprint_ttl_result
             )
         if type == OperationType.RESTORE_FOOTPRINT:
             restore_footprint_result = RestoreFootprintResult.unpack(unpacker)
@@ -496,7 +493,7 @@ class OperationResultTr:
                 self.liquidity_pool_deposit_result,
                 self.liquidity_pool_withdraw_result,
                 self.invoke_host_function_result,
-                self.bump_footprint_expiration_result,
+                self.extend_footprint_ttl_result,
                 self.restore_footprint_result,
             )
         )
@@ -541,8 +538,7 @@ class OperationResultTr:
             and self.liquidity_pool_withdraw_result
             == other.liquidity_pool_withdraw_result
             and self.invoke_host_function_result == other.invoke_host_function_result
-            and self.bump_footprint_expiration_result
-            == other.bump_footprint_expiration_result
+            and self.extend_footprint_ttl_result == other.extend_footprint_ttl_result
             and self.restore_footprint_result == other.restore_footprint_result
         )
 
@@ -625,8 +621,8 @@ class OperationResultTr:
             f"invoke_host_function_result={self.invoke_host_function_result}"
         ) if self.invoke_host_function_result is not None else None
         out.append(
-            f"bump_footprint_expiration_result={self.bump_footprint_expiration_result}"
-        ) if self.bump_footprint_expiration_result is not None else None
+            f"extend_footprint_ttl_result={self.extend_footprint_ttl_result}"
+        ) if self.extend_footprint_ttl_result is not None else None
         out.append(
             f"restore_footprint_result={self.restore_footprint_result}"
         ) if self.restore_footprint_result is not None else None

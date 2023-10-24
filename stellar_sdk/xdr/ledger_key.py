@@ -13,10 +13,10 @@ from .ledger_key_config_setting import LedgerKeyConfigSetting
 from .ledger_key_contract_code import LedgerKeyContractCode
 from .ledger_key_contract_data import LedgerKeyContractData
 from .ledger_key_data import LedgerKeyData
-from .ledger_key_expiration import LedgerKeyExpiration
 from .ledger_key_liquidity_pool import LedgerKeyLiquidityPool
 from .ledger_key_offer import LedgerKeyOffer
 from .ledger_key_trust_line import LedgerKeyTrustLine
+from .ledger_key_ttl import LedgerKeyTtl
 
 __all__ = ["LedgerKey"]
 
@@ -82,12 +82,12 @@ class LedgerKey:
             {
                 ConfigSettingID configSettingID;
             } configSetting;
-        case EXPIRATION:
+        case TTL:
             struct
             {
-                // Hash of the LedgerKey that is associated with this ExpirationEntry
+                // Hash of the LedgerKey that is associated with this TTLEntry
                 Hash keyHash;
-            } expiration;
+            } ttl;
         };
     """
 
@@ -103,7 +103,7 @@ class LedgerKey:
         contract_data: LedgerKeyContractData = None,
         contract_code: LedgerKeyContractCode = None,
         config_setting: LedgerKeyConfigSetting = None,
-        expiration: LedgerKeyExpiration = None,
+        ttl: LedgerKeyTtl = None,
     ) -> None:
         self.type = type
         self.account = account
@@ -115,7 +115,7 @@ class LedgerKey:
         self.contract_data = contract_data
         self.contract_code = contract_code
         self.config_setting = config_setting
-        self.expiration = expiration
+        self.ttl = ttl
 
     def pack(self, packer: Packer) -> None:
         self.type.pack(packer)
@@ -164,10 +164,10 @@ class LedgerKey:
                 raise ValueError("config_setting should not be None.")
             self.config_setting.pack(packer)
             return
-        if self.type == LedgerEntryType.EXPIRATION:
-            if self.expiration is None:
-                raise ValueError("expiration should not be None.")
-            self.expiration.pack(packer)
+        if self.type == LedgerEntryType.TTL:
+            if self.ttl is None:
+                raise ValueError("ttl should not be None.")
+            self.ttl.pack(packer)
             return
 
     @classmethod
@@ -200,9 +200,9 @@ class LedgerKey:
         if type == LedgerEntryType.CONFIG_SETTING:
             config_setting = LedgerKeyConfigSetting.unpack(unpacker)
             return cls(type=type, config_setting=config_setting)
-        if type == LedgerEntryType.EXPIRATION:
-            expiration = LedgerKeyExpiration.unpack(unpacker)
-            return cls(type=type, expiration=expiration)
+        if type == LedgerEntryType.TTL:
+            ttl = LedgerKeyTtl.unpack(unpacker)
+            return cls(type=type, ttl=ttl)
         return cls(type=type)
 
     def to_xdr_bytes(self) -> bytes:
@@ -237,7 +237,7 @@ class LedgerKey:
                 self.contract_data,
                 self.contract_code,
                 self.config_setting,
-                self.expiration,
+                self.ttl,
             )
         )
 
@@ -255,7 +255,7 @@ class LedgerKey:
             and self.contract_data == other.contract_data
             and self.contract_code == other.contract_code
             and self.config_setting == other.config_setting
-            and self.expiration == other.expiration
+            and self.ttl == other.ttl
         )
 
     def __str__(self):
@@ -282,7 +282,5 @@ class LedgerKey:
         out.append(
             f"config_setting={self.config_setting}"
         ) if self.config_setting is not None else None
-        out.append(
-            f"expiration={self.expiration}"
-        ) if self.expiration is not None else None
+        out.append(f"ttl={self.ttl}") if self.ttl is not None else None
         return f"<LedgerKey [{', '.join(out)}]>"

@@ -10,8 +10,8 @@ from stellar_sdk import (
     Address,
     Asset,
     AuthorizationFlag,
-    BumpFootprintExpiration,
     Claimant,
+    ExtendFootprintTTL,
     FeeBumpTransactionEnvelope,
     InvokeHostFunction,
     Keypair,
@@ -840,7 +840,7 @@ class TestTransaction:
                 from_asset=asset_param,
             ),
             executable=stellar_xdr.ContractExecutable(
-                stellar_xdr.ContractExecutableType.CONTRACT_EXECUTABLE_TOKEN,
+                stellar_xdr.ContractExecutableType.CONTRACT_EXECUTABLE_STELLAR_ASSET,
             ),
         )
 
@@ -892,7 +892,7 @@ class TestTransaction:
                 ),
             ),
             executable=stellar_xdr.ContractExecutable(
-                stellar_xdr.ContractExecutableType.CONTRACT_EXECUTABLE_TOKEN,
+                stellar_xdr.ContractExecutableType.CONTRACT_EXECUTABLE_STELLAR_ASSET,
             ),
         )
 
@@ -922,11 +922,11 @@ class TestTransaction:
         soroban_data = SorobanDataBuilder().set_read_only([ledger_key]).build()
         tx = (
             get_tx_builder()
-            .append_bump_footprint_expiration_op(10, kp2.public_key)
+            .append_extend_footprint_ttl_op(10, kp2.public_key)
             .set_soroban_data(soroban_data)
         )
 
-        expected_op = BumpFootprintExpiration(10, source=kp2.public_key)
+        expected_op = ExtendFootprintTTL(10, source=kp2.public_key)
         assert tx.build().transaction.operations[0] == expected_op
         assert tx.soroban_data == soroban_data
         check_from_xdr(tx)

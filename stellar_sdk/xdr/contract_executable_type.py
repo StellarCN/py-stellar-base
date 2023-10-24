@@ -17,12 +17,12 @@ class ContractExecutableType(IntEnum):
         enum ContractExecutableType
         {
             CONTRACT_EXECUTABLE_WASM = 0,
-            CONTRACT_EXECUTABLE_TOKEN = 1
+            CONTRACT_EXECUTABLE_STELLAR_ASSET = 1
         };
     """
 
     CONTRACT_EXECUTABLE_WASM = 0
-    CONTRACT_EXECUTABLE_TOKEN = 1
+    CONTRACT_EXECUTABLE_STELLAR_ASSET = 1
 
     def pack(self, packer: Packer) -> None:
         packer.pack_int(self.value)

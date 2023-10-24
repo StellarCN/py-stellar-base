@@ -8,7 +8,6 @@ from xdrlib3 import Packer, Unpacker
 
 from .allow_trust_op import AllowTrustOp
 from .begin_sponsoring_future_reserves_op import BeginSponsoringFutureReservesOp
-from .bump_footprint_expiration_op import BumpFootprintExpirationOp
 from .bump_sequence_op import BumpSequenceOp
 from .change_trust_op import ChangeTrustOp
 from .claim_claimable_balance_op import ClaimClaimableBalanceOp
@@ -17,6 +16,7 @@ from .clawback_op import ClawbackOp
 from .create_account_op import CreateAccountOp
 from .create_claimable_balance_op import CreateClaimableBalanceOp
 from .create_passive_sell_offer_op import CreatePassiveSellOfferOp
+from .extend_footprint_ttl_op import ExtendFootprintTTLOp
 from .invoke_host_function_op import InvokeHostFunctionOp
 from .liquidity_pool_deposit_op import LiquidityPoolDepositOp
 from .liquidity_pool_withdraw_op import LiquidityPoolWithdrawOp
@@ -92,8 +92,8 @@ class OperationBody:
                 LiquidityPoolWithdrawOp liquidityPoolWithdrawOp;
             case INVOKE_HOST_FUNCTION:
                 InvokeHostFunctionOp invokeHostFunctionOp;
-            case BUMP_FOOTPRINT_EXPIRATION:
-                BumpFootprintExpirationOp bumpFootprintExpirationOp;
+            case EXTEND_FOOTPRINT_TTL:
+                ExtendFootprintTTLOp extendFootprintTTLOp;
             case RESTORE_FOOTPRINT:
                 RestoreFootprintOp restoreFootprintOp;
             }
@@ -125,7 +125,7 @@ class OperationBody:
         liquidity_pool_deposit_op: LiquidityPoolDepositOp = None,
         liquidity_pool_withdraw_op: LiquidityPoolWithdrawOp = None,
         invoke_host_function_op: InvokeHostFunctionOp = None,
-        bump_footprint_expiration_op: BumpFootprintExpirationOp = None,
+        extend_footprint_ttl_op: ExtendFootprintTTLOp = None,
         restore_footprint_op: RestoreFootprintOp = None,
     ) -> None:
         self.type = type
@@ -152,7 +152,7 @@ class OperationBody:
         self.liquidity_pool_deposit_op = liquidity_pool_deposit_op
         self.liquidity_pool_withdraw_op = liquidity_pool_withdraw_op
         self.invoke_host_function_op = invoke_host_function_op
-        self.bump_footprint_expiration_op = bump_footprint_expiration_op
+        self.extend_footprint_ttl_op = extend_footprint_ttl_op
         self.restore_footprint_op = restore_footprint_op
 
     def pack(self, packer: Packer) -> None:
@@ -278,10 +278,10 @@ class OperationBody:
                 raise ValueError("invoke_host_function_op should not be None.")
             self.invoke_host_function_op.pack(packer)
             return
-        if self.type == OperationType.BUMP_FOOTPRINT_EXPIRATION:
-            if self.bump_footprint_expiration_op is None:
-                raise ValueError("bump_footprint_expiration_op should not be None.")
-            self.bump_footprint_expiration_op.pack(packer)
+        if self.type == OperationType.EXTEND_FOOTPRINT_TTL:
+            if self.extend_footprint_ttl_op is None:
+                raise ValueError("extend_footprint_ttl_op should not be None.")
+            self.extend_footprint_ttl_op.pack(packer)
             return
         if self.type == OperationType.RESTORE_FOOTPRINT:
             if self.restore_footprint_op is None:
@@ -380,11 +380,9 @@ class OperationBody:
         if type == OperationType.INVOKE_HOST_FUNCTION:
             invoke_host_function_op = InvokeHostFunctionOp.unpack(unpacker)
             return cls(type=type, invoke_host_function_op=invoke_host_function_op)
-        if type == OperationType.BUMP_FOOTPRINT_EXPIRATION:
-            bump_footprint_expiration_op = BumpFootprintExpirationOp.unpack(unpacker)
-            return cls(
-                type=type, bump_footprint_expiration_op=bump_footprint_expiration_op
-            )
+        if type == OperationType.EXTEND_FOOTPRINT_TTL:
+            extend_footprint_ttl_op = ExtendFootprintTTLOp.unpack(unpacker)
+            return cls(type=type, extend_footprint_ttl_op=extend_footprint_ttl_op)
         if type == OperationType.RESTORE_FOOTPRINT:
             restore_footprint_op = RestoreFootprintOp.unpack(unpacker)
             return cls(type=type, restore_footprint_op=restore_footprint_op)
@@ -436,7 +434,7 @@ class OperationBody:
                 self.liquidity_pool_deposit_op,
                 self.liquidity_pool_withdraw_op,
                 self.invoke_host_function_op,
-                self.bump_footprint_expiration_op,
+                self.extend_footprint_ttl_op,
                 self.restore_footprint_op,
             )
         )
@@ -472,7 +470,7 @@ class OperationBody:
             and self.liquidity_pool_deposit_op == other.liquidity_pool_deposit_op
             and self.liquidity_pool_withdraw_op == other.liquidity_pool_withdraw_op
             and self.invoke_host_function_op == other.invoke_host_function_op
-            and self.bump_footprint_expiration_op == other.bump_footprint_expiration_op
+            and self.extend_footprint_ttl_op == other.extend_footprint_ttl_op
             and self.restore_footprint_op == other.restore_footprint_op
         )
 
@@ -549,8 +547,8 @@ class OperationBody:
             f"invoke_host_function_op={self.invoke_host_function_op}"
         ) if self.invoke_host_function_op is not None else None
         out.append(
-            f"bump_footprint_expiration_op={self.bump_footprint_expiration_op}"
-        ) if self.bump_footprint_expiration_op is not None else None
+            f"extend_footprint_ttl_op={self.extend_footprint_ttl_op}"
+        ) if self.extend_footprint_ttl_op is not None else None
         out.append(
             f"restore_footprint_op={self.restore_footprint_op}"
         ) if self.restore_footprint_op is not None else None

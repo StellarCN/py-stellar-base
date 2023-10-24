@@ -17,6 +17,13 @@ case 1:
 	GeneralizedTransactionSet generalizedTxSet;
 };
 
+struct StoredDebugTransactionSet
+{
+	StoredTransactionSet txSet;
+	uint32 ledgerSeq;
+	StellarValue scpValue;
+};
+
 struct PersistedSCPStateV0
 {
 	SCPEnvelope scpEnvelopes<>;

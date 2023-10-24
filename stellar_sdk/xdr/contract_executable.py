@@ -20,7 +20,7 @@ class ContractExecutable:
         {
         case CONTRACT_EXECUTABLE_WASM:
             Hash wasm_hash;
-        case CONTRACT_EXECUTABLE_TOKEN:
+        case CONTRACT_EXECUTABLE_STELLAR_ASSET:
             void;
         };
     """
@@ -40,7 +40,7 @@ class ContractExecutable:
                 raise ValueError("wasm_hash should not be None.")
             self.wasm_hash.pack(packer)
             return
-        if self.type == ContractExecutableType.CONTRACT_EXECUTABLE_TOKEN:
+        if self.type == ContractExecutableType.CONTRACT_EXECUTABLE_STELLAR_ASSET:
             return
 
     @classmethod
@@ -49,7 +49,7 @@ class ContractExecutable:
         if type == ContractExecutableType.CONTRACT_EXECUTABLE_WASM:
             wasm_hash = Hash.unpack(unpacker)
             return cls(type=type, wasm_hash=wasm_hash)
-        if type == ContractExecutableType.CONTRACT_EXECUTABLE_TOKEN:
+        if type == ContractExecutableType.CONTRACT_EXECUTABLE_STELLAR_ASSET:
             return cls(type=type)
         return cls(type=type)
 

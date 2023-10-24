@@ -165,14 +165,14 @@ struct Int256Parts {
 enum ContractExecutableType
 {
     CONTRACT_EXECUTABLE_WASM = 0,
-    CONTRACT_EXECUTABLE_TOKEN = 1
+    CONTRACT_EXECUTABLE_STELLAR_ASSET = 1
 };
 
 union ContractExecutable switch (ContractExecutableType type)
 {
 case CONTRACT_EXECUTABLE_WASM:
     Hash wasm_hash;
-case CONTRACT_EXECUTABLE_TOKEN:
+case CONTRACT_EXECUTABLE_STELLAR_ASSET:
     void;
 };
 
