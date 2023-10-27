@@ -1,4 +1,4 @@
-"""This example shows how to bump footprint expiration.
+"""This example shows how to extend footprint TTL.
 
 See https://soroban.stellar.org/docs/fundamentals-and-concepts/state-expiration#bumpfootprintexpirationop
 """

@@ -54,10 +54,6 @@ class EventFilter(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
 
 
-class EventInfoValue(BaseModel):
-    xdr: str
-
-
 class EventInfo(BaseModel):
     event_type: str = Field(alias="type")
     ledger: int = Field(alias="ledger")
@@ -66,7 +62,7 @@ class EventInfo(BaseModel):
     id: str = Field(alias="id")
     paging_token: str = Field(alias="pagingToken")
     topic: List[str] = Field(alias="topic")
-    value: EventInfoValue = Field(alias="value")
+    value: str = Field(alias="value")
     in_successful_contract_call: bool = Field(alias="inSuccessfulContractCall")
 
 
@@ -111,7 +107,8 @@ class GetLedgerEntriesRequest(BaseModel):
 class LedgerEntryResult(BaseModel):
     key: str
     xdr: str
-    last_modified_ledger_seq: int = Field(alias="lastModifiedLedgerSeq")
+    last_modified_ledger: int = Field(alias="lastModifiedLedgerSeq")
+    expiration_ledger: Optional[int] = Field(alias="expirationLedgerSeq", default=None)
 
 
 class GetLedgerEntriesResponse(BaseModel):
