@@ -108,7 +108,7 @@ class LedgerEntryResult(BaseModel):
     key: str
     xdr: str
     last_modified_ledger: int = Field(alias="lastModifiedLedgerSeq")
-    expiration_ledger: Optional[int] = Field(alias="expirationLedgerSeq", default=None)
+    live_until_ledger: Optional[int] = Field(alias="liveUntilLedgerSeq", default=None)
 
 
 class GetLedgerEntriesResponse(BaseModel):

@@ -27,7 +27,7 @@ class TestSorobanServer:
                     "key": "AAAAAAAAAADBPp7TMinJylnn+6dQXJACNc15LF+aJ2Py1BaR4P10JA==",
                     "xdr": "AAAAAAAAAADBPp7TMinJylnn+6dQXJACNc15LF+aJ2Py1BaR4P10JAAAABdIcDhpAAADHAAAAAwAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAADAAAAAAABfI8AAAAAZMK3qQ==",
                     "lastModifiedLedgerSeq": "97423",
-                    "expirationLedgerSeq": "97999",
+                    "liveUntilLedgerSeq": "97999",
                 }
             ],
             "latestLedger": "108023",
@@ -131,7 +131,7 @@ class TestSorobanServer:
                     "key": "AAAABgAAAAFbihjlAiytnchoNOQZzgshTg9sfCxcBnTGO2xwtRu0awAAABQAAAAB",
                     "xdr": "AAAABgAAAAAAAAABW4oY5QIsrZ3IaDTkGc4LIU4PbHwsXAZ0xjtscLUbtGsAAAAUAAAAAQAAABMAAAAAJEKO7o0EZBi/DpFId2xLI1yGppi+ADrnh9IIE/CfJEcAAAAA",
                     "lastModifiedLedgerSeq": "11715",
-                    "expirationLedgerSeq": "12333",
+                    "liveUntilLedgerSeq": "12333",
                 }
             ],
             "latestLedger": "12551",
@@ -194,13 +194,13 @@ class TestSorobanServer:
                     "key": "AAAAAAAAAACynni6I2ACEzWuORVM1b2y0k1ZDni0W6JlC/Ad/mfCSg==",
                     "xdr": "AAAAAAAAAACynni6I2ACEzWuORVM1b2y0k1ZDni0W6JlC/Ad/mfCSgAAABdIdugAAAAAnwAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAA",
                     "lastModifiedLedgerSeq": "159",
-                    "expirationLedgerSeq": "288",
+                    "liveUntilLedgerSeq": "288",
                 },
                 {
                     "key": "AAAAAAAAAADBPp7TMinJylnn+6dQXJACNc15LF+aJ2Py1BaR4P10JA==",
                     "xdr": "AAAAAAAAAADBPp7TMinJylnn+6dQXJACNc15LF+aJ2Py1BaR4P10JAAAABdIcmH6AAAAoQAAAAgAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAADAAAAAAAAHAkAAAAAZMPQ0g==",
                     "lastModifiedLedgerSeq": "7177",
-                    "expirationLedgerSeq": "9872",
+                    "liveUntilLedgerSeq": "9872",
                 },
             ],
             "latestLedger": "7943",
