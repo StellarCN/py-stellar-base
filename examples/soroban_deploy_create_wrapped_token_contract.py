@@ -28,7 +28,7 @@ source = soroban_server.load_account(kp.public_key)
 tx = (
     TransactionBuilder(source, network_passphrase)
     .set_timeout(300)
-    .append_create_token_contract_from_asset_op(asset=hello_asset)
+    .append_create_stellar_asset_contract_from_asset_op(asset=hello_asset)
     .build()
 )
 

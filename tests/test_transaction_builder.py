@@ -827,9 +827,9 @@ class TestTransaction:
         assert tx.build().transaction.operations[0] == expected_op
         check_from_xdr(tx)
 
-    def test_append_create_token_contract_from_asset_op(self):
+    def test_append_create_stellar_asset_contract_from_asset_op(self):
         asset = Asset.native()
-        tx = get_tx_builder().append_create_token_contract_from_asset_op(
+        tx = get_tx_builder().append_create_stellar_asset_contract_from_asset_op(
             asset, kp2.public_key
         )
         asset_param = asset.to_xdr_object()
@@ -854,7 +854,7 @@ class TestTransaction:
         assert tx.build().transaction.operations[0] == expected_op
         check_from_xdr(tx)
 
-    def test_append_create_token_contract_from_address_op(self):
+    def test_append_create_stellar_asset_contract_from_address_op(self):
         auth = [
             stellar_xdr.SorobanAuthorizationEntry(
                 credentials=stellar_xdr.SorobanCredentials(
@@ -880,7 +880,7 @@ class TestTransaction:
         ]
         salt = b"V2\x1c\x18\xecF\xea-\x83\x90\xdc\x96\xe0\xdd\x8e\x9a}\x96\x88\xc7\x13\xaa\xa5\xef\xc5az\xa3\xf8\xb0F_"
 
-        tx = get_tx_builder().append_create_token_contract_from_address_op(
+        tx = get_tx_builder().append_create_stellar_asset_contract_from_address_op(
             kp2.public_key, salt, auth, kp2.public_key
         )
         create_contract = stellar_xdr.CreateContractArgs(
