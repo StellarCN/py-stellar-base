@@ -486,26 +486,8 @@ struct LedgerCloseMetaV0
 
 struct LedgerCloseMetaV1
 {
-    LedgerHeaderHistoryEntry ledgerHeader;
-
-    GeneralizedTransactionSet txSet;
-
-    // NB: transactions are sorted in apply order here
-    // fees for all transactions are processed first
-    // followed by applying transactions
-    TransactionResultMeta txProcessing<>;
-
-    // upgrades are applied last
-    UpgradeEntryMeta upgradesProcessing<>;
-
-    // other misc information attached to the ledger close
-    SCPHistoryEntry scpInfo<>;
-};
-
-struct LedgerCloseMetaV2
-{
-    // We forgot to add an ExtensionPoint in v1 but at least
-    // we can add one now in v2.
+    // We forgot to add an ExtensionPoint in v0 but at least
+    // we can add one now in v1.
     ExtensionPoint ext;
 
     LedgerHeaderHistoryEntry ledgerHeader;
@@ -527,10 +509,10 @@ struct LedgerCloseMetaV2
     // systems calculating storage fees correctly.
     uint64 totalByteSizeOfBucketList;
 
-    // Expired temp keys that are being evicted at this ledger.
+    // Temp keys that are being evicted at this ledger.
     LedgerKey evictedTemporaryLedgerKeys<>;
 
-    // Expired restorable ledger entries that are being
+    // Archived restorable ledger entries that are being
     // evicted at this ledger.
     LedgerEntry evictedPersistentLedgerEntries<>;
 };
@@ -541,7 +523,5 @@ case 0:
     LedgerCloseMetaV0 v0;
 case 1:
     LedgerCloseMetaV1 v1;
-case 2:
-    LedgerCloseMetaV2 v2;
 };
 }

@@ -9,39 +9,39 @@ from xdrlib3 import Packer, Unpacker
 from .hash import Hash
 from .uint32 import Uint32
 
-__all__ = ["ExpirationEntry"]
+__all__ = ["TTLEntry"]
 
 
-class ExpirationEntry:
+class TTLEntry:
     """
     XDR Source Code::
 
-        struct ExpirationEntry {
-            // Hash of the LedgerKey that is associated with this ExpirationEntry
+        struct TTLEntry {
+            // Hash of the LedgerKey that is associated with this TTLEntry
             Hash keyHash;
-            uint32 expirationLedgerSeq;
+            uint32 liveUntilLedgerSeq;
         };
     """
 
     def __init__(
         self,
         key_hash: Hash,
-        expiration_ledger_seq: Uint32,
+        live_until_ledger_seq: Uint32,
     ) -> None:
         self.key_hash = key_hash
-        self.expiration_ledger_seq = expiration_ledger_seq
+        self.live_until_ledger_seq = live_until_ledger_seq
 
     def pack(self, packer: Packer) -> None:
         self.key_hash.pack(packer)
-        self.expiration_ledger_seq.pack(packer)
+        self.live_until_ledger_seq.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> ExpirationEntry:
+    def unpack(cls, unpacker: Unpacker) -> TTLEntry:
         key_hash = Hash.unpack(unpacker)
-        expiration_ledger_seq = Uint32.unpack(unpacker)
+        live_until_ledger_seq = Uint32.unpack(unpacker)
         return cls(
             key_hash=key_hash,
-            expiration_ledger_seq=expiration_ledger_seq,
+            live_until_ledger_seq=live_until_ledger_seq,
         )
 
     def to_xdr_bytes(self) -> bytes:
@@ -50,7 +50,7 @@ class ExpirationEntry:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> ExpirationEntry:
+    def from_xdr_bytes(cls, xdr: bytes) -> TTLEntry:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -59,7 +59,7 @@ class ExpirationEntry:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> ExpirationEntry:
+    def from_xdr(cls, xdr: str) -> TTLEntry:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
 
@@ -67,7 +67,7 @@ class ExpirationEntry:
         return hash(
             (
                 self.key_hash,
-                self.expiration_ledger_seq,
+                self.live_until_ledger_seq,
             )
         )
 
@@ -76,12 +76,12 @@ class ExpirationEntry:
             return NotImplemented
         return (
             self.key_hash == other.key_hash
-            and self.expiration_ledger_seq == other.expiration_ledger_seq
+            and self.live_until_ledger_seq == other.live_until_ledger_seq
         )
 
     def __str__(self):
         out = [
             f"key_hash={self.key_hash}",
-            f"expiration_ledger_seq={self.expiration_ledger_seq}",
+            f"live_until_ledger_seq={self.live_until_ledger_seq}",
         ]
-        return f"<ExpirationEntry [{', '.join(out)}]>"
+        return f"<TTLEntry [{', '.join(out)}]>"

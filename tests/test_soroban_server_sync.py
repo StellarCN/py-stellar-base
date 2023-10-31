@@ -25,6 +25,7 @@ class TestSorobanServer:
                     "key": "AAAAAAAAAADBPp7TMinJylnn+6dQXJACNc15LF+aJ2Py1BaR4P10JA==",
                     "xdr": "AAAAAAAAAADBPp7TMinJylnn+6dQXJACNc15LF+aJ2Py1BaR4P10JAAAABdIcDhpAAADHAAAAAwAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAADAAAAAAABfI8AAAAAZMK3qQ==",
                     "lastModifiedLedgerSeq": "97423",
+                    "liveUntilLedgerSeq": "97999",
                 }
             ],
             "latestLedger": "108023",
@@ -125,6 +126,7 @@ class TestSorobanServer:
                     "key": "AAAABgAAAAFbihjlAiytnchoNOQZzgshTg9sfCxcBnTGO2xwtRu0awAAABQAAAAB",
                     "xdr": "AAAABgAAAAAAAAABW4oY5QIsrZ3IaDTkGc4LIU4PbHwsXAZ0xjtscLUbtGsAAAAUAAAAAQAAABMAAAAAJEKO7o0EZBi/DpFId2xLI1yGppi+ADrnh9IIE/CfJEcAAAAA",
                     "lastModifiedLedgerSeq": "11715",
+                    "liveUntilLedgerSeq": "17882",
                 }
             ],
             "latestLedger": "12551",
@@ -186,11 +188,13 @@ class TestSorobanServer:
                     "key": "AAAAAAAAAACynni6I2ACEzWuORVM1b2y0k1ZDni0W6JlC/Ad/mfCSg==",
                     "xdr": "AAAAAAAAAACynni6I2ACEzWuORVM1b2y0k1ZDni0W6JlC/Ad/mfCSgAAABdIdugAAAAAnwAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAA",
                     "lastModifiedLedgerSeq": "159",
+                    "liveUntilLedgerSeq": "288",
                 },
                 {
                     "key": "AAAAAAAAAADBPp7TMinJylnn+6dQXJACNc15LF+aJ2Py1BaR4P10JA==",
                     "xdr": "AAAAAAAAAADBPp7TMinJylnn+6dQXJACNc15LF+aJ2Py1BaR4P10JAAAABdIcmH6AAAAoQAAAAgAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAADAAAAAAAAHAkAAAAAZMPQ0g==",
                     "lastModifiedLedgerSeq": "7177",
+                    "liveUntilLedgerSeq": "8392",
                 },
             ],
             "latestLedger": "7943",
@@ -278,7 +282,7 @@ class TestSorobanServer:
                         "AAAADwAAAAdDT1VOVEVSAA==",
                         "AAAADwAAAAlpbmNyZW1lbnQAAAA=",
                     ],
-                    "value": {"xdr": "AAAAAwAAAAE="},
+                    "value": "AAAAAwAAAAE=",
                     "inSuccessfulContractCall": True,
                 },
                 {
@@ -292,7 +296,7 @@ class TestSorobanServer:
                         "AAAADwAAAAdDT1VOVEVSAA==",
                         "AAAADwAAAAlpbmNyZW1lbnQAAAA=",
                     ],
-                    "value": {"xdr": "AAAAAwAAAAI="},
+                    "value": "AAAAAwAAAAI=",
                     "inSuccessfulContractCall": True,
                 },
             ],
@@ -473,7 +477,7 @@ class TestSorobanServer:
 
         soroban_data = stellar_xdr.SorobanTransactionData(
             ext=stellar_xdr.ExtensionPoint(0),
-            refundable_fee=stellar_xdr.Int64(100),
+            resource_fee=stellar_xdr.Int64(100),
             resources=stellar_xdr.SorobanResources(
                 footprint=stellar_xdr.LedgerFootprint(
                     read_only=[],

@@ -29,7 +29,7 @@ def _assemble_transaction(
     if not transaction_envelope.transaction.is_soroban_transaction():
         raise ValueError(
             "Unsupported transaction: must contain exactly one operation of "
-            "type RestoreFootprint, InvokeHostFunction or BumpFootprintExpiration"
+            "type RestoreFootprint, InvokeHostFunction or ExtendFootprintTTL"
         )
 
     min_resource_fee = simulation.min_resource_fee

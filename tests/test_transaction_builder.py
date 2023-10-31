@@ -10,8 +10,8 @@ from stellar_sdk import (
     Address,
     Asset,
     AuthorizationFlag,
-    BumpFootprintExpiration,
     Claimant,
+    ExtendFootprintTTL,
     FeeBumpTransactionEnvelope,
     InvokeHostFunction,
     Keypair,
@@ -827,9 +827,9 @@ class TestTransaction:
         assert tx.build().transaction.operations[0] == expected_op
         check_from_xdr(tx)
 
-    def test_append_create_token_contract_from_asset_op(self):
+    def test_append_create_stellar_asset_contract_from_asset_op(self):
         asset = Asset.native()
-        tx = get_tx_builder().append_create_token_contract_from_asset_op(
+        tx = get_tx_builder().append_create_stellar_asset_contract_from_asset_op(
             asset, kp2.public_key
         )
         asset_param = asset.to_xdr_object()
@@ -840,7 +840,7 @@ class TestTransaction:
                 from_asset=asset_param,
             ),
             executable=stellar_xdr.ContractExecutable(
-                stellar_xdr.ContractExecutableType.CONTRACT_EXECUTABLE_TOKEN,
+                stellar_xdr.ContractExecutableType.CONTRACT_EXECUTABLE_STELLAR_ASSET,
             ),
         )
 
@@ -854,7 +854,7 @@ class TestTransaction:
         assert tx.build().transaction.operations[0] == expected_op
         check_from_xdr(tx)
 
-    def test_append_create_token_contract_from_address_op(self):
+    def test_append_create_stellar_asset_contract_from_address_op(self):
         auth = [
             stellar_xdr.SorobanAuthorizationEntry(
                 credentials=stellar_xdr.SorobanCredentials(
@@ -880,7 +880,7 @@ class TestTransaction:
         ]
         salt = b"V2\x1c\x18\xecF\xea-\x83\x90\xdc\x96\xe0\xdd\x8e\x9a}\x96\x88\xc7\x13\xaa\xa5\xef\xc5az\xa3\xf8\xb0F_"
 
-        tx = get_tx_builder().append_create_token_contract_from_address_op(
+        tx = get_tx_builder().append_create_stellar_asset_contract_from_address_op(
             kp2.public_key, salt, auth, kp2.public_key
         )
         create_contract = stellar_xdr.CreateContractArgs(
@@ -892,7 +892,7 @@ class TestTransaction:
                 ),
             ),
             executable=stellar_xdr.ContractExecutable(
-                stellar_xdr.ContractExecutableType.CONTRACT_EXECUTABLE_TOKEN,
+                stellar_xdr.ContractExecutableType.CONTRACT_EXECUTABLE_STELLAR_ASSET,
             ),
         )
 
@@ -922,11 +922,11 @@ class TestTransaction:
         soroban_data = SorobanDataBuilder().set_read_only([ledger_key]).build()
         tx = (
             get_tx_builder()
-            .append_bump_footprint_expiration_op(10, kp2.public_key)
+            .append_extend_footprint_ttl_op(10, kp2.public_key)
             .set_soroban_data(soroban_data)
         )
 
-        expected_op = BumpFootprintExpiration(10, source=kp2.public_key)
+        expected_op = ExtendFootprintTTL(10, source=kp2.public_key)
         assert tx.build().transaction.operations[0] == expected_op
         assert tx.soroban_data == soroban_data
         check_from_xdr(tx)

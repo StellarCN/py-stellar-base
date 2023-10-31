@@ -636,9 +636,9 @@ InvokeHostFunction
 .. autoclass:: stellar_sdk.operation.InvokeHostFunction
    :members: to_xdr_object, from_xdr_object
 
-BumpFootprintExpiration
------------------------
-.. autoclass:: stellar_sdk.operation.BumpFootprintExpiration
+ExtendFootprintTTL
+------------------
+.. autoclass:: stellar_sdk.operation.ExtendFootprintTTL
    :members: to_xdr_object, from_xdr_object
 
 RestoreFootprint
@@ -1017,18 +1017,6 @@ BucketMetadataExt
 -----------------
 .. autoclass:: stellar_sdk.xdr.bucket_metadata_ext.BucketMetadataExt
 
-BumpFootprintExpirationOp
--------------------------
-.. autoclass:: stellar_sdk.xdr.bump_footprint_expiration_op.BumpFootprintExpirationOp
-
-BumpFootprintExpirationResult
------------------------------
-.. autoclass:: stellar_sdk.xdr.bump_footprint_expiration_result.BumpFootprintExpirationResult
-
-BumpFootprintExpirationResultCode
----------------------------------
-.. autoclass:: stellar_sdk.xdr.bump_footprint_expiration_result_code.BumpFootprintExpirationResultCode
-
 BumpSequenceOp
 --------------
 .. autoclass:: stellar_sdk.xdr.bump_sequence_op.BumpSequenceOp
@@ -1365,9 +1353,17 @@ EvictionIterator
 ----------------
 .. autoclass:: stellar_sdk.xdr.eviction_iterator.EvictionIterator
 
-ExpirationEntry
----------------
-.. autoclass:: stellar_sdk.xdr.expiration_entry.ExpirationEntry
+ExtendFootprintTTLOp
+--------------------
+.. autoclass:: stellar_sdk.xdr.extend_footprint_ttl_op.ExtendFootprintTTLOp
+
+ExtendFootprintTTLResult
+------------------------
+.. autoclass:: stellar_sdk.xdr.extend_footprint_ttl_result.ExtendFootprintTTLResult
+
+ExtendFootprintTTLResultCode
+----------------------------
+.. autoclass:: stellar_sdk.xdr.extend_footprint_ttl_result_code.ExtendFootprintTTLResultCode
 
 ExtensionPoint
 --------------
@@ -1541,10 +1537,6 @@ LedgerCloseMetaV1
 -----------------
 .. autoclass:: stellar_sdk.xdr.ledger_close_meta_v1.LedgerCloseMetaV1
 
-LedgerCloseMetaV2
------------------
-.. autoclass:: stellar_sdk.xdr.ledger_close_meta_v2.LedgerCloseMetaV2
-
 LedgerCloseValueSignature
 -------------------------
 .. autoclass:: stellar_sdk.xdr.ledger_close_value_signature.LedgerCloseValueSignature
@@ -1645,10 +1637,6 @@ LedgerKeyData
 -------------
 .. autoclass:: stellar_sdk.xdr.ledger_key_data.LedgerKeyData
 
-LedgerKeyExpiration
--------------------
-.. autoclass:: stellar_sdk.xdr.ledger_key_expiration.LedgerKeyExpiration
-
 LedgerKeyLiquidityPool
 ----------------------
 .. autoclass:: stellar_sdk.xdr.ledger_key_liquidity_pool.LedgerKeyLiquidityPool
@@ -1660,6 +1648,10 @@ LedgerKeyOffer
 LedgerKeyTrustLine
 ------------------
 .. autoclass:: stellar_sdk.xdr.ledger_key_trust_line.LedgerKeyTrustLine
+
+LedgerKeyTtl
+------------
+.. autoclass:: stellar_sdk.xdr.ledger_key_ttl.LedgerKeyTtl
 
 LedgerSCPMessages
 -----------------
@@ -2313,9 +2305,9 @@ SponsorshipDescriptor
 ---------------------
 .. autoclass:: stellar_sdk.xdr.sponsorship_descriptor.SponsorshipDescriptor
 
-StateExpirationSettings
------------------------
-.. autoclass:: stellar_sdk.xdr.state_expiration_settings.StateExpirationSettings
+StateArchivalSettings
+---------------------
+.. autoclass:: stellar_sdk.xdr.state_archival_settings.StateArchivalSettings
 
 StellarMessage
 --------------
@@ -2332,6 +2324,10 @@ StellarValueExt
 StellarValueType
 ----------------
 .. autoclass:: stellar_sdk.xdr.stellar_value_type.StellarValueType
+
+StoredDebugTransactionSet
+-------------------------
+.. autoclass:: stellar_sdk.xdr.stored_debug_transaction_set.StoredDebugTransactionSet
 
 StoredTransactionSet
 --------------------
@@ -2368,6 +2364,10 @@ SurveyResponseBody
 SurveyResponseMessage
 ---------------------
 .. autoclass:: stellar_sdk.xdr.survey_response_message.SurveyResponseMessage
+
+TTLEntry
+--------
+.. autoclass:: stellar_sdk.xdr.ttl_entry.TTLEntry
 
 ThresholdIndexes
 ----------------

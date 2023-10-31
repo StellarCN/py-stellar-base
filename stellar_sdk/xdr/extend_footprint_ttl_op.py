@@ -9,39 +9,39 @@ from xdrlib3 import Packer, Unpacker
 from .extension_point import ExtensionPoint
 from .uint32 import Uint32
 
-__all__ = ["BumpFootprintExpirationOp"]
+__all__ = ["ExtendFootprintTTLOp"]
 
 
-class BumpFootprintExpirationOp:
+class ExtendFootprintTTLOp:
     """
     XDR Source Code::
 
-        struct BumpFootprintExpirationOp
+        struct ExtendFootprintTTLOp
         {
             ExtensionPoint ext;
-            uint32 ledgersToExpire;
+            uint32 extendTo;
         };
     """
 
     def __init__(
         self,
         ext: ExtensionPoint,
-        ledgers_to_expire: Uint32,
+        extend_to: Uint32,
     ) -> None:
         self.ext = ext
-        self.ledgers_to_expire = ledgers_to_expire
+        self.extend_to = extend_to
 
     def pack(self, packer: Packer) -> None:
         self.ext.pack(packer)
-        self.ledgers_to_expire.pack(packer)
+        self.extend_to.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> BumpFootprintExpirationOp:
+    def unpack(cls, unpacker: Unpacker) -> ExtendFootprintTTLOp:
         ext = ExtensionPoint.unpack(unpacker)
-        ledgers_to_expire = Uint32.unpack(unpacker)
+        extend_to = Uint32.unpack(unpacker)
         return cls(
             ext=ext,
-            ledgers_to_expire=ledgers_to_expire,
+            extend_to=extend_to,
         )
 
     def to_xdr_bytes(self) -> bytes:
@@ -50,7 +50,7 @@ class BumpFootprintExpirationOp:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> BumpFootprintExpirationOp:
+    def from_xdr_bytes(cls, xdr: bytes) -> ExtendFootprintTTLOp:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -59,7 +59,7 @@ class BumpFootprintExpirationOp:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> BumpFootprintExpirationOp:
+    def from_xdr(cls, xdr: str) -> ExtendFootprintTTLOp:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
 
@@ -67,20 +67,18 @@ class BumpFootprintExpirationOp:
         return hash(
             (
                 self.ext,
-                self.ledgers_to_expire,
+                self.extend_to,
             )
         )
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented
-        return (
-            self.ext == other.ext and self.ledgers_to_expire == other.ledgers_to_expire
-        )
+        return self.ext == other.ext and self.extend_to == other.extend_to
 
     def __str__(self):
         out = [
             f"ext={self.ext}",
-            f"ledgers_to_expire={self.ledgers_to_expire}",
+            f"extend_to={self.extend_to}",
         ]
-        return f"<BumpFootprintExpirationOp [{', '.join(out)}]>"
+        return f"<ExtendFootprintTTLOp [{', '.join(out)}]>"

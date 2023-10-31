@@ -3,14 +3,14 @@ from typing import Optional, Union
 import pytest
 
 from stellar_sdk import Operation
-from stellar_sdk.operation import BumpFootprintExpiration
+from stellar_sdk.operation import ExtendFootprintTTL
 
 from . import *
 
 
-class TestBumpFootprintExpiration:
+class TestExtendFootprintTTL:
     @pytest.mark.parametrize(
-        "ledgers_to_expire, source, xdr",
+        "extend_to, source, xdr",
         [
             pytest.param(
                 1234567890, None, "AAAAAAAAABkAAAAASZYC0g==", id="without_source"
@@ -37,18 +37,18 @@ class TestBumpFootprintExpiration:
     )
     def test_xdr(
         self,
-        ledgers_to_expire: int,
+        extend_to: int,
         source: Optional[Union[MuxedAccount, str]],
         xdr: str,
     ):
-        op = BumpFootprintExpiration(ledgers_to_expire, source)
-        assert op.ledgers_to_expire == ledgers_to_expire
+        op = ExtendFootprintTTL(extend_to, source)
+        assert op.extend_to == extend_to
         check_source(op.source, source)
         xdr_object = op.to_xdr_object()
         assert xdr_object.to_xdr() == xdr
         assert Operation.from_xdr_object(xdr_object) == op
 
-    @pytest.mark.parametrize("ledgers_to_expire", [-1, 2**32])
-    def test_invalid_ledgers_to_expire(self, ledgers_to_expire):
+    @pytest.mark.parametrize("extend_to", [-1, 2**32])
+    def test_invalid_extend_to(self, extend_to):
         with pytest.raises(ValueError):
-            BumpFootprintExpiration(ledgers_to_expire)
+            ExtendFootprintTTL(extend_to)

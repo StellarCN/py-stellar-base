@@ -4,7 +4,7 @@ from . import xdr as stellar_xdr
 from .keypair import Keypair
 from .memo import Memo, NoneMemo
 from .muxed_account import MuxedAccount
-from .operation import BumpFootprintExpiration, InvokeHostFunction, RestoreFootprint
+from .operation import ExtendFootprintTTL, InvokeHostFunction, RestoreFootprint
 from .operation.create_claimable_balance import CreateClaimableBalance
 from .operation.operation import Operation
 from .preconditions import Preconditions
@@ -261,7 +261,7 @@ class Transaction:
             return False
         if not isinstance(
             self.operations[0],
-            (RestoreFootprint, InvokeHostFunction, BumpFootprintExpiration),
+            (RestoreFootprint, InvokeHostFunction, ExtendFootprintTTL),
         ):
             return False
         return True

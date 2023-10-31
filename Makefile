@@ -13,7 +13,7 @@ xdr/Stellar-contract-config-setting.x
 
 XDRGEN_REPO=overcat/xdrgen
 XDRGEN_COMMIT=c98916346eeea7e37aaea039de03c1e5ea0a116a
-XDRNEXT_COMMIT=9ac02641139e6717924fdad716f6e958d0168491
+XDRNEXT_COMMIT=6a620d160aab22609c982d54578ff6a63bfcdc01
 
 UNAME := $(shell uname)
 SED := sed

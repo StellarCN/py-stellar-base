@@ -8,16 +8,16 @@ from xdrlib3 import Packer, Unpacker
 
 from .hash import Hash
 
-__all__ = ["LedgerKeyExpiration"]
+__all__ = ["LedgerKeyTtl"]
 
 
-class LedgerKeyExpiration:
+class LedgerKeyTtl:
     """
     XDR Source Code::
 
         struct
             {
-                // Hash of the LedgerKey that is associated with this ExpirationEntry
+                // Hash of the LedgerKey that is associated with this TTLEntry
                 Hash keyHash;
             }
     """
@@ -32,7 +32,7 @@ class LedgerKeyExpiration:
         self.key_hash.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> LedgerKeyExpiration:
+    def unpack(cls, unpacker: Unpacker) -> LedgerKeyTtl:
         key_hash = Hash.unpack(unpacker)
         return cls(
             key_hash=key_hash,
@@ -44,7 +44,7 @@ class LedgerKeyExpiration:
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> LedgerKeyExpiration:
+    def from_xdr_bytes(cls, xdr: bytes) -> LedgerKeyTtl:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -53,7 +53,7 @@ class LedgerKeyExpiration:
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> LedgerKeyExpiration:
+    def from_xdr(cls, xdr: str) -> LedgerKeyTtl:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
 
@@ -69,4 +69,4 @@ class LedgerKeyExpiration:
         out = [
             f"key_hash={self.key_hash}",
         ]
-        return f"<LedgerKeyExpiration [{', '.join(out)}]>"
+        return f"<LedgerKeyTtl [{', '.join(out)}]>"

@@ -20,7 +20,7 @@ from .config_setting_contract_ledger_cost_v0 import ConfigSettingContractLedgerC
 from .config_setting_id import ConfigSettingID
 from .contract_cost_params import ContractCostParams
 from .eviction_iterator import EvictionIterator
-from .state_expiration_settings import StateExpirationSettings
+from .state_archival_settings import StateArchivalSettings
 from .uint32 import Uint32
 from .uint64 import Uint64
 
@@ -53,8 +53,8 @@ class ConfigSettingEntry:
             uint32 contractDataKeySizeBytes;
         case CONFIG_SETTING_CONTRACT_DATA_ENTRY_SIZE_BYTES:
             uint32 contractDataEntrySizeBytes;
-        case CONFIG_SETTING_STATE_EXPIRATION:
-            StateExpirationSettings stateExpirationSettings;
+        case CONFIG_SETTING_STATE_ARCHIVAL:
+            StateArchivalSettings stateArchivalSettings;
         case CONFIG_SETTING_CONTRACT_EXECUTION_LANES:
             ConfigSettingContractExecutionLanesV0 contractExecutionLanes;
         case CONFIG_SETTING_BUCKETLIST_SIZE_WINDOW:
@@ -77,7 +77,7 @@ class ConfigSettingEntry:
         contract_cost_params_mem_bytes: ContractCostParams = None,
         contract_data_key_size_bytes: Uint32 = None,
         contract_data_entry_size_bytes: Uint32 = None,
-        state_expiration_settings: StateExpirationSettings = None,
+        state_archival_settings: StateArchivalSettings = None,
         contract_execution_lanes: ConfigSettingContractExecutionLanesV0 = None,
         bucket_list_size_window: List[Uint64] = None,
         eviction_iterator: EvictionIterator = None,
@@ -101,7 +101,7 @@ class ConfigSettingEntry:
         self.contract_cost_params_mem_bytes = contract_cost_params_mem_bytes
         self.contract_data_key_size_bytes = contract_data_key_size_bytes
         self.contract_data_entry_size_bytes = contract_data_entry_size_bytes
-        self.state_expiration_settings = state_expiration_settings
+        self.state_archival_settings = state_archival_settings
         self.contract_execution_lanes = contract_execution_lanes
         self.bucket_list_size_window = bucket_list_size_window
         self.eviction_iterator = eviction_iterator
@@ -182,10 +182,10 @@ class ConfigSettingEntry:
                 raise ValueError("contract_data_entry_size_bytes should not be None.")
             self.contract_data_entry_size_bytes.pack(packer)
             return
-        if self.config_setting_id == ConfigSettingID.CONFIG_SETTING_STATE_EXPIRATION:
-            if self.state_expiration_settings is None:
-                raise ValueError("state_expiration_settings should not be None.")
-            self.state_expiration_settings.pack(packer)
+        if self.config_setting_id == ConfigSettingID.CONFIG_SETTING_STATE_ARCHIVAL:
+            if self.state_archival_settings is None:
+                raise ValueError("state_archival_settings should not be None.")
+            self.state_archival_settings.pack(packer)
             return
         if (
             self.config_setting_id
@@ -289,11 +289,11 @@ class ConfigSettingEntry:
                 config_setting_id=config_setting_id,
                 contract_data_entry_size_bytes=contract_data_entry_size_bytes,
             )
-        if config_setting_id == ConfigSettingID.CONFIG_SETTING_STATE_EXPIRATION:
-            state_expiration_settings = StateExpirationSettings.unpack(unpacker)
+        if config_setting_id == ConfigSettingID.CONFIG_SETTING_STATE_ARCHIVAL:
+            state_archival_settings = StateArchivalSettings.unpack(unpacker)
             return cls(
                 config_setting_id=config_setting_id,
-                state_expiration_settings=state_expiration_settings,
+                state_archival_settings=state_archival_settings,
             )
         if config_setting_id == ConfigSettingID.CONFIG_SETTING_CONTRACT_EXECUTION_LANES:
             contract_execution_lanes = ConfigSettingContractExecutionLanesV0.unpack(
@@ -352,7 +352,7 @@ class ConfigSettingEntry:
                 self.contract_cost_params_mem_bytes,
                 self.contract_data_key_size_bytes,
                 self.contract_data_entry_size_bytes,
-                self.state_expiration_settings,
+                self.state_archival_settings,
                 self.contract_execution_lanes,
                 self.bucket_list_size_window,
                 self.eviction_iterator,
@@ -377,7 +377,7 @@ class ConfigSettingEntry:
             and self.contract_data_key_size_bytes == other.contract_data_key_size_bytes
             and self.contract_data_entry_size_bytes
             == other.contract_data_entry_size_bytes
-            and self.state_expiration_settings == other.state_expiration_settings
+            and self.state_archival_settings == other.state_archival_settings
             and self.contract_execution_lanes == other.contract_execution_lanes
             and self.bucket_list_size_window == other.bucket_list_size_window
             and self.eviction_iterator == other.eviction_iterator
@@ -417,8 +417,8 @@ class ConfigSettingEntry:
             f"contract_data_entry_size_bytes={self.contract_data_entry_size_bytes}"
         ) if self.contract_data_entry_size_bytes is not None else None
         out.append(
-            f"state_expiration_settings={self.state_expiration_settings}"
-        ) if self.state_expiration_settings is not None else None
+            f"state_archival_settings={self.state_archival_settings}"
+        ) if self.state_archival_settings is not None else None
         out.append(
             f"contract_execution_lanes={self.contract_execution_lanes}"
         ) if self.contract_execution_lanes is not None else None

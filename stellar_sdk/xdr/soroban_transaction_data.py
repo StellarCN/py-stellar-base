@@ -21,8 +21,16 @@ class SorobanTransactionData:
         {
             ExtensionPoint ext;
             SorobanResources resources;
-            // Portion of transaction `fee` allocated to refundable fees.
-            int64 refundableFee;
+            // Amount of the transaction `fee` allocated to the Soroban resource fees.
+            // The fraction of `resourceFee` corresponding to `resources` specified
+            // above is *not* refundable (i.e. fees for instructions, ledger I/O), as
+            // well as fees for the transaction size.
+            // The remaining part of the fee is refundable and the charged value is
+            // based on the actual consumption of refundable resources (events, ledger
+            // rent bumps).
+            // The `inclusionFee` used for prioritization of the transaction is defined
+            // as `tx.fee - resourceFee`.
+            int64 resourceFee;
         };
     """
 
@@ -30,26 +38,26 @@ class SorobanTransactionData:
         self,
         ext: ExtensionPoint,
         resources: SorobanResources,
-        refundable_fee: Int64,
+        resource_fee: Int64,
     ) -> None:
         self.ext = ext
         self.resources = resources
-        self.refundable_fee = refundable_fee
+        self.resource_fee = resource_fee
 
     def pack(self, packer: Packer) -> None:
         self.ext.pack(packer)
         self.resources.pack(packer)
-        self.refundable_fee.pack(packer)
+        self.resource_fee.pack(packer)
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> SorobanTransactionData:
         ext = ExtensionPoint.unpack(unpacker)
         resources = SorobanResources.unpack(unpacker)
-        refundable_fee = Int64.unpack(unpacker)
+        resource_fee = Int64.unpack(unpacker)
         return cls(
             ext=ext,
             resources=resources,
-            refundable_fee=refundable_fee,
+            resource_fee=resource_fee,
         )
 
     def to_xdr_bytes(self) -> bytes:
@@ -76,7 +84,7 @@ class SorobanTransactionData:
             (
                 self.ext,
                 self.resources,
-                self.refundable_fee,
+                self.resource_fee,
             )
         )
 
@@ -86,13 +94,13 @@ class SorobanTransactionData:
         return (
             self.ext == other.ext
             and self.resources == other.resources
-            and self.refundable_fee == other.refundable_fee
+            and self.resource_fee == other.resource_fee
         )
 
     def __str__(self):
         out = [
             f"ext={self.ext}",
             f"resources={self.resources}",
-            f"refundable_fee={self.refundable_fee}",
+            f"resource_fee={self.resource_fee}",
         ]
         return f"<SorobanTransactionData [{', '.join(out)}]>"

@@ -1,4 +1,4 @@
-"""This example shows how to bump footprint expiration.
+"""This example shows how to extend footprint TTL.
 
 See https://soroban.stellar.org/docs/fundamentals-and-concepts/state-expiration#bumpfootprintexpirationop
 """
@@ -38,7 +38,7 @@ soroban_data = SorobanDataBuilder().set_read_only([ledger_key]).build()
 tx = (
     TransactionBuilder(source, network_passphrase, base_fee=50000)
     .set_timeout(300)
-    .append_bump_footprint_expiration_op(ledgers_to_expire=101)
+    .append_extend_footprint_ttl_op(extend_to=101)
     .set_soroban_data(soroban_data)
     .build()
 )

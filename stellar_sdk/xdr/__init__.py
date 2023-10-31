@@ -35,9 +35,6 @@ from .bucket_entry import BucketEntry
 from .bucket_entry_type import BucketEntryType
 from .bucket_metadata import BucketMetadata
 from .bucket_metadata_ext import BucketMetadataExt
-from .bump_footprint_expiration_op import BumpFootprintExpirationOp
-from .bump_footprint_expiration_result import BumpFootprintExpirationResult
-from .bump_footprint_expiration_result_code import BumpFootprintExpirationResultCode
 from .bump_sequence_op import BumpSequenceOp
 from .bump_sequence_result import BumpSequenceResult
 from .bump_sequence_result_code import BumpSequenceResultCode
@@ -130,7 +127,9 @@ from .envelope_type import EnvelopeType
 from .error import Error
 from .error_code import ErrorCode
 from .eviction_iterator import EvictionIterator
-from .expiration_entry import ExpirationEntry
+from .extend_footprint_ttl_op import ExtendFootprintTTLOp
+from .extend_footprint_ttl_result import ExtendFootprintTTLResult
+from .extend_footprint_ttl_result_code import ExtendFootprintTTLResultCode
 from .extension_point import ExtensionPoint
 from .fee_bump_transaction import FeeBumpTransaction
 from .fee_bump_transaction_envelope import FeeBumpTransactionEnvelope
@@ -171,7 +170,6 @@ from .ledger_bounds import LedgerBounds
 from .ledger_close_meta import LedgerCloseMeta
 from .ledger_close_meta_v0 import LedgerCloseMetaV0
 from .ledger_close_meta_v1 import LedgerCloseMetaV1
-from .ledger_close_meta_v2 import LedgerCloseMetaV2
 from .ledger_close_value_signature import LedgerCloseValueSignature
 from .ledger_entry import LedgerEntry
 from .ledger_entry_change import LedgerEntryChange
@@ -197,10 +195,10 @@ from .ledger_key_config_setting import LedgerKeyConfigSetting
 from .ledger_key_contract_code import LedgerKeyContractCode
 from .ledger_key_contract_data import LedgerKeyContractData
 from .ledger_key_data import LedgerKeyData
-from .ledger_key_expiration import LedgerKeyExpiration
 from .ledger_key_liquidity_pool import LedgerKeyLiquidityPool
 from .ledger_key_offer import LedgerKeyOffer
 from .ledger_key_trust_line import LedgerKeyTrustLine
+from .ledger_key_ttl import LedgerKeyTtl
 from .ledger_scp_messages import LedgerSCPMessages
 from .ledger_upgrade import LedgerUpgrade
 from .ledger_upgrade_type import LedgerUpgradeType
@@ -367,11 +365,12 @@ from .soroban_resources import SorobanResources
 from .soroban_transaction_data import SorobanTransactionData
 from .soroban_transaction_meta import SorobanTransactionMeta
 from .sponsorship_descriptor import SponsorshipDescriptor
-from .state_expiration_settings import StateExpirationSettings
+from .state_archival_settings import StateArchivalSettings
 from .stellar_message import StellarMessage
 from .stellar_value import StellarValue
 from .stellar_value_ext import StellarValueExt
 from .stellar_value_type import StellarValueType
+from .stored_debug_transaction_set import StoredDebugTransactionSet
 from .stored_transaction_set import StoredTransactionSet
 from .string32 import String32
 from .string64 import String64
@@ -423,6 +422,7 @@ from .trust_line_entry_extension_v2_ext import TrustLineEntryExtensionV2Ext
 from .trust_line_entry_v1 import TrustLineEntryV1
 from .trust_line_entry_v1_ext import TrustLineEntryV1Ext
 from .trust_line_flags import TrustLineFlags
+from .ttl_entry import TTLEntry
 from .tx_advert_vector import TxAdvertVector
 from .tx_demand_vector import TxDemandVector
 from .tx_set_component import TxSetComponent

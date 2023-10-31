@@ -166,7 +166,7 @@ class SorobanServer:
         :param transaction_envelope: The transaction to simulate. It should include exactly one operation,
             which must be one of :class:`RestoreFootprint <stellar_sdk.operation.RestoreFootprintOperation>`,
             :class:`InvokeHostFunction <stellar_sdk.operation.InvokeHostFunction>` or
-            :class:`BumpFootprintExpiration <stellar_sdk.operation.RestoreFootprint>` operation.
+            :class:`ExtendFootprintTTL <stellar_sdk.operation.RestoreFootprint>` operation.
             Any provided footprint will be ignored.
         :return: A :class:`SimulateTransactionResponse <stellar_sdk.soroban_rpc.SimulateTransactionResponse>` object
             contains the cost, footprint, result/auth requirements (if applicable), and error of the transaction.
@@ -287,7 +287,7 @@ class SorobanServer:
 
         :param transaction_envelope: The transaction to prepare. It should include exactly one operation, which
             must be one of :py:class:`RestoreFootprint <stellar_sdk.operation.RestoreFootprint>`,
-            :py:class:`BumpFootprintExpiration <stellar_sdk.operation.BumpFootprintExpiration>`,
+            :py:class:`ExtendFootprintTTL <stellar_sdk.operation.ExtendFootprintTTL>`,
             or :py:class:`InvokeHostFunction <stellar_sdk.operation.InvokeHostFunction>`. Any provided
             footprint will be ignored. You can use :meth:`stellar_sdk.Transaction.is_soroban_transaction` to check
             if a transaction is a Soroban transaction. Any provided footprint will be overwritten.

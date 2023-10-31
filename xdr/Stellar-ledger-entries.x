@@ -101,7 +101,7 @@ enum LedgerEntryType
     CONTRACT_DATA = 6,
     CONTRACT_CODE = 7,
     CONFIG_SETTING = 8,
-    EXPIRATION = 9
+    TTL = 9
 };
 
 struct Signer
@@ -515,10 +515,10 @@ struct ContractCodeEntry {
     opaque code<>;
 };
 
-struct ExpirationEntry {
-    // Hash of the LedgerKey that is associated with this ExpirationEntry
+struct TTLEntry {
+    // Hash of the LedgerKey that is associated with this TTLEntry
     Hash keyHash;
-    uint32 expirationLedgerSeq;
+    uint32 liveUntilLedgerSeq;
 };
 
 struct LedgerEntryExtensionV1
@@ -557,8 +557,8 @@ struct LedgerEntry
         ContractCodeEntry contractCode;
     case CONFIG_SETTING:
         ConfigSettingEntry configSetting;
-    case EXPIRATION:
-        ExpirationEntry expiration;
+    case TTL:
+        TTLEntry ttl;
     }
     data;
 
@@ -630,12 +630,12 @@ case CONFIG_SETTING:
     {
         ConfigSettingID configSettingID;
     } configSetting;
-case EXPIRATION:
+case TTL:
     struct
     {
-        // Hash of the LedgerKey that is associated with this ExpirationEntry
+        // Hash of the LedgerKey that is associated with this TTLEntry
         Hash keyHash;
-    } expiration;
+    } ttl;
 };
 
 // list of all envelope types used in the application
