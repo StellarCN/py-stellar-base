@@ -1239,7 +1239,7 @@ requests = "^2.31.0"
 
 [package.source]
 type = "git"
-url = "git@github.com:overcat/requests-sse"
+url = "https://github.com/overcat/requests-sse.git"
 reference = "HEAD"
 resolved_reference = "13cdceb9db95522c77a95bc851617150368d6707"
 
@@ -1450,4 +1450,4 @@ aiohttp = ["aiohttp", "aiohttp-sse-client"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.8,<4.0"
-content-hash = "d23bb8c1bf3faa485b7278832a28510ce5614b89a55593223968cf54a57bae33"
+content-hash = "d0a6d507ebb4a64e0f059abc7225e6bae099260b35031e3db5fa052caab6fd81"
