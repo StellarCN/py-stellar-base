@@ -45,7 +45,7 @@ classifiers = [
 "Bug Tracker" = "https://github.com/StellarCN/py-stellar-base/issues"
 
 [tool.poetry.dependencies]
-python = ">=3.7,<4.0"
+python = ">=3.8,<4.0"
 PyNaCl = "^1.4.0"
 requests = "^2.26.0"
 aiohttp = { version = "^3.8.6", optional = true}
