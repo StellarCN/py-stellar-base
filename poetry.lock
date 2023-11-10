@@ -1226,6 +1226,20 @@ fixture = ["fixtures"]
 test = ["fixtures", "mock", "purl", "pytest", "requests-futures", "sphinx", "testtools"]
 
 [[package]]
+name = "requests-sse"
+version = "0.2.0"
+description = "server-sent events python client library based on requests"
+optional = false
+python-versions = ">=3.8,<4.0"
+files = [
+    {file = "requests_sse-0.2.0-py3-none-any.whl", hash = "sha256:00347df8f79f48aae35a0a44ef5be169e2dcc86ad251551277fb7f2fd7309dc9"},
+    {file = "requests_sse-0.2.0.tar.gz", hash = "sha256:c1f6efc3f053a76b595ab7900ca2321f9e8a509d0ac465b3adfa571df5e6047e"},
+]
+
+[package.dependencies]
+requests = ">=2.31.0,<3.0.0"
+
+[[package]]
 name = "six"
 version = "1.16.0"
 description = "Python 2 and 3 compatibility utilities"
@@ -1235,20 +1249,6 @@ files = [
     {file = "six-1.16.0-py2.py3-none-any.whl", hash = "sha256:8abb2f1d86890a2dfb989f9a77cfcfd3e47c2a354b01111771326f8aa26e0254"},
     {file = "six-1.16.0.tar.gz", hash = "sha256:1e61c37477a1626458e36f7b1d82aa5c9b094fa4802892072e49de9c60c4c926"},
 ]
-
-[[package]]
-name = "stellar-base-sseclient"
-version = "0.0.21"
-description = "Python client library for reading Server Sent Event streams."
-optional = false
-python-versions = "*"
-files = [
-    {file = "stellar-base-sseclient-0.0.21.tar.gz", hash = "sha256:2a500f3015dede4e9fac0f9d6d9d85f4fdd7fe1c9c10b2b111a6ae190cc5dc00"},
-]
-
-[package.dependencies]
-requests = ">=2.0.0"
-six = "*"
 
 [[package]]
 name = "toml"
@@ -1446,4 +1446,4 @@ aiohttp = ["aiohttp", "aiohttp-sse-client"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.8,<4.0"
-content-hash = "a3d6169876df4e71cf2a5ca8eb0278a98d9c3471de98b9c2f39b198607684288"
+content-hash = "43bf6b841d0dc8118e6d1be2eef08894c861b1526b057bca7595faf9522cf5ab"

@@ -4,7 +4,7 @@ from typing import Any, Dict, Generator, Optional, Tuple, Union
 import requests
 from requests import RequestException, Session
 from requests.adapters import DEFAULT_POOLSIZE, HTTPAdapter
-from sseclient import SSEClient
+from requests_sse import EventSource
 from urllib3.exceptions import NewConnectionError
 from urllib3.util import Retry
 
@@ -94,24 +94,7 @@ class RequestsClient(BaseSyncClient):
             session.mount("http://", adapter)
             session.mount("https://", adapter)
         self._session: Session = session
-
-        if stream_session is None:
-            # configure SSE session (differs from our standard session)
-            stream_session = requests.Session()
-
-            sse_retry = Retry(
-                total=1000000, redirect=0, status_forcelist=self.status_forcelist
-            )
-            sse_adapter = HTTPAdapter(
-                pool_connections=self.pool_size,
-                pool_maxsize=self.pool_size,
-                max_retries=sse_retry,
-            )
-
-            stream_session.headers.update(headers)
-            stream_session.mount("http://", sse_adapter)
-            stream_session.mount("https://", sse_adapter)
-        self._stream_session: Session = stream_session
+        self._stream_session: Optional[Session] = stream_session
 
     def get(self, url: str, params: Dict[str, str] = None) -> Response:
         """Perform HTTP GET request.
@@ -173,23 +156,20 @@ class RequestsClient(BaseSyncClient):
         query_params: Dict[str, Union[int, float, str]] = {**IDENTIFICATION_HEADERS}
         if params:
             query_params = {**params, **query_params}
-        stream_client = _SSEClient(
-            url,
-            retry=0,
-            session=self._stream_session,
-            connect_retry=-1,
-            params=query_params,
-        )
-        for message in stream_client:
-            yield message
-
+        with EventSource(
+            url = url, timeout=60, session=self._stream_session, params=query_params, headers=IDENTIFICATION_HEADERS
+        ) as event_source:
+            for event in event_source:
+                if event.type == 'message':
+                    yield json.loads(event.data)
     def close(self) -> None:
         """Close underlying connector.
 
         Release all acquired resources.
         """
         self._session.close()
-        self._stream_session.close()
+        if self._stream_session:
+            self._stream_session.close()
 
     def __enter__(self):
         return self
@@ -206,45 +186,4 @@ class RequestsClient(BaseSyncClient):
             f"backoff_factor={self.backoff_factor}, "
             f"session={self._session}, "
             f"stream_session={self.backoff_factor}]>"
-        )
-
-
-class _SSEClient:
-    def __init__(
-        self,
-        url: str,
-        last_id: Union[str, int] = None,
-        retry: int = 3000,
-        session: Session = None,
-        chunk_size: int = 1024,
-        connect_retry: int = 0,
-        **kwargs,
-    ):
-        if SSEClient is None:
-            raise ImportError(
-                "SSE not supported, missing `stellar-base-sseclient` module"
-            )  # pragma: no cover
-
-        self.client = SSEClient(
-            url, last_id, retry, session, chunk_size, connect_retry, **kwargs
-        )
-
-    def __iter__(self):
-        return self
-
-    def __next__(self) -> Dict[str, Any]:
-        while True:
-            msg = next(self.client)
-            data = msg.data
-            if data != '"hello"' and data != '"byebye"':
-                return json.loads(data)
-
-    def __str__(self):
-        return (
-            f"<_SSEClient [url={self.client.url}, "
-            f"last_id={self.client.last_id}, "
-            f"retry={self.client.retry}, "
-            f"session={self.client.session}, "
-            f"chunk_size={self.client.chunk_size}, "
-            f"connect_retry={self.client.connect_retry}]>"
         )
