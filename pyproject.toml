@@ -54,7 +54,7 @@ mnemonic = "^0.20"
 toml = "^0.10.2"
 pydantic = "^2.4.2"
 xdrlib3 = "^0.1.1"
-requests-sse = "^0.2.0"
+requests-sse = {git = "git@github.com:overcat/requests-sse"}
 
 [tool.poetry.extras]
 aiohttp = ["aiohttp", "aiohttp-sse-client"]

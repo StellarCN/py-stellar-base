@@ -1230,14 +1230,18 @@ name = "requests-sse"
 version = "0.2.0"
 description = "server-sent events python client library based on requests"
 optional = false
-python-versions = ">=3.8,<4.0"
-files = [
-    {file = "requests_sse-0.2.0-py3-none-any.whl", hash = "sha256:00347df8f79f48aae35a0a44ef5be169e2dcc86ad251551277fb7f2fd7309dc9"},
-    {file = "requests_sse-0.2.0.tar.gz", hash = "sha256:c1f6efc3f053a76b595ab7900ca2321f9e8a509d0ac465b3adfa571df5e6047e"},
-]
+python-versions = "^3.8"
+files = []
+develop = false
 
 [package.dependencies]
-requests = ">=2.31.0,<3.0.0"
+requests = "^2.31.0"
+
+[package.source]
+type = "git"
+url = "git@github.com:overcat/requests-sse"
+reference = "HEAD"
+resolved_reference = "13cdceb9db95522c77a95bc851617150368d6707"
 
 [[package]]
 name = "six"
@@ -1446,4 +1450,4 @@ aiohttp = ["aiohttp", "aiohttp-sse-client"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.8,<4.0"
-content-hash = "43bf6b841d0dc8118e6d1be2eef08894c861b1526b057bca7595faf9522cf5ab"
+content-hash = "d23bb8c1bf3faa485b7278832a28510ce5614b89a55593223968cf54a57bae33"
