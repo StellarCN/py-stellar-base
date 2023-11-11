@@ -1,5 +1,7 @@
 import json
-from typing import Any, Dict, Generator, Optional, Tuple, Union
+import logging
+import time
+from typing import Any, Dict, Generator, Optional, Tuple
 
 import requests
 from requests import RequestException, Session
@@ -11,7 +13,7 @@ from urllib3.util import Retry
 from ..__version__ import __version__
 from ..client.base_sync_client import BaseSyncClient
 from ..client.response import Response
-from ..exceptions import ConnectionError
+from ..exceptions import ConnectionError, StreamClientError
 from . import defines
 
 DEFAULT_NUM_RETRIES = 3
@@ -21,6 +23,8 @@ IDENTIFICATION_HEADERS = {
     "X-Client-Name": "py-stellar-base",
     "X-Client-Version": __version__,
 }
+
+logger = logging.getLogger(__name__)
 
 __all__ = ["RequestsClient"]
 
@@ -79,17 +83,17 @@ class RequestsClient(BaseSyncClient):
             max_retries=retry,
         )
 
-        headers = {**IDENTIFICATION_HEADERS, "User-Agent": USER_AGENT}
+        self.headers = {**IDENTIFICATION_HEADERS, "User-Agent": USER_AGENT}
 
         if custom_headers:
-            headers = {**headers, **custom_headers}
+            self.headers = {**self.headers, **custom_headers}
 
         # init session
         if session is None:
             session = requests.Session()
 
             # set default headers
-            session.headers.update(headers)
+            session.headers.update(self.headers)
 
             session.mount("http://", adapter)
             session.mount("https://", adapter)
@@ -153,15 +157,54 @@ class RequestsClient(BaseSyncClient):
         :return: a Generator for server response
         :raise: :exc:`ConnectionError <stellar_sdk.exceptions.ConnectionError>`
         """
-        query_params: Dict[str, Union[int, float, str]] = {**IDENTIFICATION_HEADERS}
-        if params:
-            query_params = {**params, **query_params}
-        with EventSource(
-            url = url, timeout=60, session=self._stream_session, params=query_params, headers=IDENTIFICATION_HEADERS
-        ) as event_source:
-            for event in event_source:
-                if event.type == 'message':
-                    yield json.loads(event.data)
+        query_params = {**params} if params else dict()
+
+        query_params.update(**IDENTIFICATION_HEADERS)
+        retry = 0.1
+
+        while True:
+            try:
+                """
+                Create a new SSEClient:
+                Using the last id as the cursor
+                Headers are needed because of a bug that makes "params" override the default headers
+                """
+                with EventSource(
+                    url,
+                        timeout=60,
+                        params=query_params,
+                    headers=self.headers.copy(),
+                ) as client:
+                    """
+                    We want to throw a TimeoutError if we didnt get any event in the last x seconds.
+                    read_timeout in aiohttp is not implemented correctly https://github.com/aio-libs/aiohttp/issues/1954
+                    So we will create our own way to do that.
+
+                    Note that the timeout starts from the first event forward. There is no until we get the first event.
+                    """
+                    for event in client:
+                        if event.last_event_id:
+                            query_params["cursor"] = event.last_event_id
+                            # Events that dont have an id are not useful for us (hello/byebye events)
+                        retry = client._reconnection_time.total_seconds()
+                        try:
+                            data = event.data
+                            if data != '"hello"' and data != '"byebye"':
+                                yield json.loads(data)
+                        except json.JSONDecodeError:
+                            # Content was not json-decodable
+                            pass  # pragma: no cover
+            except requests.Timeout:
+                logger.warning(
+                    f"We have encountered an timeout error and we will try to reconnect, cursor = {query_params.get('cursor')}"
+                )
+                time.sleep(retry)
+            except requests.RequestException as e:
+                raise StreamClientError(
+                    query_params["cursor"], "Failed to get stream message."
+                ) from e
+
+
     def close(self) -> None:
         """Close underlying connector.
 
