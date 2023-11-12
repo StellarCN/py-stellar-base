@@ -1228,21 +1228,17 @@ test = ["fixtures", "mock", "purl", "pytest", "requests-futures", "sphinx", "tes
 
 [[package]]
 name = "requests-sse"
-version = "0.2.0"
+version = "0.3.0"
 description = "server-sent events python client library based on requests"
 optional = false
-python-versions = "^3.8"
-files = []
-develop = false
+python-versions = ">=3.8,<4.0"
+files = [
+    {file = "requests_sse-0.3.0-py3-none-any.whl", hash = "sha256:4a81550995e3b26fe2c75796a893a1fea708d43408e445b67ab35ec4ffca6bf2"},
+    {file = "requests_sse-0.3.0.tar.gz", hash = "sha256:7ce67364739d848a3f0bab4b7165acf05a60a7f508a1a449e09114654bcff5a8"},
+]
 
 [package.dependencies]
-requests = "^2.31.0"
-
-[package.source]
-type = "git"
-url = "https://github.com/overcat/requests-sse.git"
-reference = "HEAD"
-resolved_reference = "b30882c05c384310be329d70ec81fd767d8f35c1"
+requests = ">=2.31.0,<3.0.0"
 
 [[package]]
 name = "six"
@@ -1451,4 +1447,4 @@ aiohttp = ["aiohttp", "aiohttp-sse-client"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.8,<4.0"
-content-hash = "d0a6d507ebb4a64e0f059abc7225e6bae099260b35031e3db5fa052caab6fd81"
+content-hash = "3b67c1ba3043b226087abe5b12f13e0c61a564c181649fc89874a9db6018566b"

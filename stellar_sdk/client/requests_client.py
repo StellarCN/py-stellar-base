@@ -167,21 +167,13 @@ class RequestsClient(BaseSyncClient):
                 """
                 Create a new SSEClient:
                 Using the last id as the cursor
-                Headers are needed because of a bug that makes "params" override the default headers
                 """
                 with EventSource(
                     url,
                         timeout=60,
                         params=query_params,
-                    headers=self.headers.copy(),
+                        headers=self.headers,
                 ) as client:
-                    """
-                    We want to throw a TimeoutError if we didnt get any event in the last x seconds.
-                    read_timeout in aiohttp is not implemented correctly https://github.com/aio-libs/aiohttp/issues/1954
-                    So we will create our own way to do that.
-
-                    Note that the timeout starts from the first event forward. There is no until we get the first event.
-                    """
                     for event in client:
                         if event.last_event_id:
                             query_params["cursor"] = event.last_event_id
