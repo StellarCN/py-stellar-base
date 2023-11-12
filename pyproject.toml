@@ -50,12 +50,11 @@ PyNaCl = "^1.4.0"
 requests = "^2.26.0"
 aiohttp = { version = "^3.8.6", optional = true}
 aiohttp-sse-client = { version = "^0.2.1", optional = true}
-stellar-base-sseclient = "^0.0.21"
 mnemonic = "^0.20"
 toml = "^0.10.2"
-urllib3 = ">=1.26.7,<3.0.0"
 pydantic = "^2.4.2"
 xdrlib3 = "^0.1.1"
+requests-sse = "^0.3.0"
 
 [tool.poetry.extras]
 aiohttp = ["aiohttp", "aiohttp-sse-client"]

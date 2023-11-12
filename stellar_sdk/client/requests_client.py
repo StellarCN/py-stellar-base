@@ -1,17 +1,19 @@
 import json
-from typing import Any, Dict, Generator, Optional, Tuple, Union
+import logging
+import time
+from typing import Any, Dict, Generator, Optional, Tuple
 
 import requests
 from requests import RequestException, Session
 from requests.adapters import DEFAULT_POOLSIZE, HTTPAdapter
-from sseclient import SSEClient
+from requests_sse import EventSource
 from urllib3.exceptions import NewConnectionError
 from urllib3.util import Retry
 
 from ..__version__ import __version__
 from ..client.base_sync_client import BaseSyncClient
 from ..client.response import Response
-from ..exceptions import ConnectionError
+from ..exceptions import ConnectionError, StreamClientError
 from . import defines
 
 DEFAULT_NUM_RETRIES = 3
@@ -21,6 +23,8 @@ IDENTIFICATION_HEADERS = {
     "X-Client-Name": "py-stellar-base",
     "X-Client-Version": __version__,
 }
+
+logger = logging.getLogger(__name__)
 
 __all__ = ["RequestsClient"]
 
@@ -79,39 +83,22 @@ class RequestsClient(BaseSyncClient):
             max_retries=retry,
         )
 
-        headers = {**IDENTIFICATION_HEADERS, "User-Agent": USER_AGENT}
+        self.headers = {**IDENTIFICATION_HEADERS, "User-Agent": USER_AGENT}
 
         if custom_headers:
-            headers = {**headers, **custom_headers}
+            self.headers = {**self.headers, **custom_headers}
 
         # init session
         if session is None:
             session = requests.Session()
 
             # set default headers
-            session.headers.update(headers)
+            session.headers.update(self.headers)
 
             session.mount("http://", adapter)
             session.mount("https://", adapter)
         self._session: Session = session
-
-        if stream_session is None:
-            # configure SSE session (differs from our standard session)
-            stream_session = requests.Session()
-
-            sse_retry = Retry(
-                total=1000000, redirect=0, status_forcelist=self.status_forcelist
-            )
-            sse_adapter = HTTPAdapter(
-                pool_connections=self.pool_size,
-                pool_maxsize=self.pool_size,
-                max_retries=sse_retry,
-            )
-
-            stream_session.headers.update(headers)
-            stream_session.mount("http://", sse_adapter)
-            stream_session.mount("https://", sse_adapter)
-        self._stream_session: Session = stream_session
+        self._stream_session: Optional[Session] = stream_session
 
     def get(self, url: str, params: Dict[str, str] = None) -> Response:
         """Perform HTTP GET request.
@@ -170,18 +157,45 @@ class RequestsClient(BaseSyncClient):
         :return: a Generator for server response
         :raise: :exc:`ConnectionError <stellar_sdk.exceptions.ConnectionError>`
         """
-        query_params: Dict[str, Union[int, float, str]] = {**IDENTIFICATION_HEADERS}
-        if params:
-            query_params = {**params, **query_params}
-        stream_client = _SSEClient(
-            url,
-            retry=0,
-            session=self._stream_session,
-            connect_retry=-1,
-            params=query_params,
-        )
-        for message in stream_client:
-            yield message
+        query_params = {**params} if params else dict()
+
+        query_params.update(**IDENTIFICATION_HEADERS)
+        retry = 0.1
+
+        while True:
+            try:
+                """
+                Create a new SSEClient:
+                Using the last id as the cursor
+                """
+                with EventSource(
+                    url,
+                        timeout=60,
+                        params=query_params,
+                        headers=self.headers,
+                ) as client:
+                    for event in client:
+                        if event.last_event_id:
+                            query_params["cursor"] = event.last_event_id
+                            # Events that dont have an id are not useful for us (hello/byebye events)
+                        retry = client._reconnection_time.total_seconds()
+                        try:
+                            data = event.data
+                            if data != '"hello"' and data != '"byebye"':
+                                yield json.loads(data)
+                        except json.JSONDecodeError:
+                            # Content was not json-decodable
+                            pass  # pragma: no cover
+            except requests.Timeout:
+                logger.warning(
+                    f"We have encountered an timeout error and we will try to reconnect, cursor = {query_params.get('cursor')}"
+                )
+                time.sleep(retry)
+            except requests.RequestException as e:
+                raise StreamClientError(
+                    query_params["cursor"], "Failed to get stream message."
+                ) from e
+
 
     def close(self) -> None:
         """Close underlying connector.
@@ -189,7 +203,8 @@ class RequestsClient(BaseSyncClient):
         Release all acquired resources.
         """
         self._session.close()
-        self._stream_session.close()
+        if self._stream_session:
+            self._stream_session.close()
 
     def __enter__(self):
         return self
@@ -206,45 +221,4 @@ class RequestsClient(BaseSyncClient):
             f"backoff_factor={self.backoff_factor}, "
             f"session={self._session}, "
             f"stream_session={self.backoff_factor}]>"
-        )
-
-
-class _SSEClient:
-    def __init__(
-        self,
-        url: str,
-        last_id: Union[str, int] = None,
-        retry: int = 3000,
-        session: Session = None,
-        chunk_size: int = 1024,
-        connect_retry: int = 0,
-        **kwargs,
-    ):
-        if SSEClient is None:
-            raise ImportError(
-                "SSE not supported, missing `stellar-base-sseclient` module"
-            )  # pragma: no cover
-
-        self.client = SSEClient(
-            url, last_id, retry, session, chunk_size, connect_retry, **kwargs
-        )
-
-    def __iter__(self):
-        return self
-
-    def __next__(self) -> Dict[str, Any]:
-        while True:
-            msg = next(self.client)
-            data = msg.data
-            if data != '"hello"' and data != '"byebye"':
-                return json.loads(data)
-
-    def __str__(self):
-        return (
-            f"<_SSEClient [url={self.client.url}, "
-            f"last_id={self.client.last_id}, "
-            f"retry={self.client.retry}, "
-            f"session={self.client.session}, "
-            f"chunk_size={self.client.chunk_size}, "
-            f"connect_retry={self.client.connect_retry}]>"
         )
