@@ -624,8 +624,11 @@ def to_struct(data: Dict[str, stellar_xdr.SCVal]) -> stellar_xdr.SCVal:
     :param data: The dict value to convert.
     :return: A new :class:`stellar_sdk.xdr.SCVal` XDR object.
     """
+    # sort the dict by key to ensure the order of the fields.
+    # see https://github.com/stellar/stellar-protocol/blob/master/core/cap-0046-01.md#validity
+    sorted_data = dict(sorted(data.items()))
     v = dict()
-    for key, val in data.items():
+    for key, val in sorted_data.items():
         v[to_symbol(key)] = val
     return to_map(v)
 

@@ -315,14 +315,14 @@ def test_tuple_struct():
 
 def test_struct():
     v = {
-        "data1": to_int32(1),
-        "data2": to_int256(23423432),
-        "data3": to_string("world"),
-        "data4": to_vec([to_int32(1), to_int256(23423432), to_string("world")]),
-        "data5": to_struct(
+        "simpleData": to_int32(1),
+        "a": to_int256(23423432),
+        "data": to_string("world"),
+        "a1": to_vec([to_int32(1), to_int256(23423432), to_string("world")]),
+        "A": to_struct(
             {
-                "inner_data1": to_int32(1),
-                "inner_data2": to_int256(23423432),
+                "inner_data2": to_int32(1),
+                "inner_data1": to_int256(23423432),
             }
         ),
     }
@@ -331,22 +331,22 @@ def test_struct():
         stellar_xdr.SCValType.SCV_MAP,
         map=xdr.SCMap(
             [
-                xdr.SCMapEntry(to_symbol("data1"), to_int32(1)),
-                xdr.SCMapEntry(to_symbol("data2"), to_int256(23423432)),
-                xdr.SCMapEntry(to_symbol("data3"), to_string("world")),
                 xdr.SCMapEntry(
-                    to_symbol("data4"),
-                    to_vec([to_int32(1), to_int256(23423432), to_string("world")]),
-                ),
-                xdr.SCMapEntry(
-                    to_symbol("data5"),
+                    to_symbol("A"),
                     to_map(
                         {
-                            to_symbol("inner_data1"): to_int32(1),
-                            to_symbol("inner_data2"): to_int256(23423432),
+                            to_symbol("inner_data1"): to_int256(23423432),
+                            to_symbol("inner_data2"): to_int32(1),
                         }
                     ),
                 ),
+                xdr.SCMapEntry(to_symbol("a"), to_int256(23423432)),
+                xdr.SCMapEntry(
+                    to_symbol("a1"),
+                    to_vec([to_int32(1), to_int256(23423432), to_string("world")]),
+                ),
+                xdr.SCMapEntry(to_symbol("data"), to_string("world")),
+                xdr.SCMapEntry(to_symbol("simpleData"), to_int32(1)),
             ]
         ),
     )
