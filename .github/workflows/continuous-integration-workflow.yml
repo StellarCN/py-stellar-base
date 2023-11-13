@@ -11,19 +11,18 @@ jobs:
   pre-commit:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: actions/setup-python@v4
         with:
           python-version: '3.11'
       - uses: pre-commit/action@v3.0.0
 
   test:
-    runs-on: ubuntu-latest
     needs: pre-commit
+    runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        os: [ ubuntu-latest, macos-latest, windows-latest ]
         python-version: [ "3.8", "3.9", "3.10", "3.11", "pypy3.8", "pypy3.9", "pypy3.10" ]
         # https://endoflife.date/python
     steps:
@@ -36,7 +35,7 @@ jobs:
       - name: Install poetry
         run: pipx install poetry
 
-      - name: Setup Python ${{ matrix.python-version }} on ${{ matrix.os }}
+      - name: Setup Python ${{ matrix.python-version }}
         uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
@@ -58,7 +57,7 @@ jobs:
         run: poetry run pytest -v -rs tests --runslow --cov=./ --cov-report=xml
 
       - name: Upload coverage to Codecov
-        if: matrix.os == 'ubuntu-latest' && matrix.python-version == '3.7'
+        if: matrix.python-version == '3.11'
         uses: codecov/codecov-action@v3
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
