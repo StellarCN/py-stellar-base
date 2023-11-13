@@ -68,7 +68,7 @@ jobs:
           fail_ci_if_error: true
 
   deploy:
-    needs: [ test ]
+    needs: test
     runs-on: ubuntu-latest
     if: github.event_name == 'release' && github.event.action == 'created'
     permissions:
