@@ -170,9 +170,9 @@ class RequestsClient(BaseSyncClient):
                 """
                 with EventSource(
                     url,
-                        timeout=60,
-                        params=query_params,
-                        headers=self.headers,
+                    timeout=60,
+                    params=query_params,
+                    headers=self.headers,
                 ) as client:
                     for event in client:
                         if event.last_event_id:
@@ -195,7 +195,6 @@ class RequestsClient(BaseSyncClient):
                 raise StreamClientError(
                     query_params["cursor"], "Failed to get stream message."
                 ) from e
-
 
     def close(self) -> None:
         """Close underlying connector.
