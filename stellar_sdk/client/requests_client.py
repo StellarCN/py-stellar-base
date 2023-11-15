@@ -155,7 +155,7 @@ class RequestsClient(BaseSyncClient):
         :param url: the request url
         :param params: the request params
         :return: a Generator for server response
-        :raise: :exc:`ConnectionError <stellar_sdk.exceptions.ConnectionError>`
+        :raise: :exc:`StreamClientError <stellar_sdk.exceptions.StreamClientError>`
         """
         query_params = {**params} if params else dict()
 
