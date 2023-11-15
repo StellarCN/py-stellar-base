@@ -1,6 +1,19 @@
 Release History
 ==============
 
+### Version 9.0.0-beta1
+
+Released on Nov 15, 2023
+
+#### Update
+- refactor: make the `parameters` parameter in `TransactionBuilder.append_invoke_contract_function_op` optional. ([#789](https://github.com/StellarCN/py-stellar-base/pull/789))
+- improve: sort the dictionary based on the key when calling `scval.to_struct`.  ([#817](https://github.com/StellarCN/py-stellar-base/pull/817))
+
+#### Breaking changes
+- chore: drop support for Python 3.7. ([#813](https://github.com/StellarCN/py-stellar-base/pull/813))
+- refactor: replace `stellar-base-sseclient` with `requests-sse` to improve the stability of the stream. Previously, when encountering an error, it would throw a `ConnectionError`, but now it will throw a `StreamClientError`. ([#814](https://github.com/StellarCN/py-stellar-base/pull/814))
+- feat: update the SDK to the stable Protocol 20 release, this contains some breaking updates, please check [#808](https://github.com/StellarCN/py-stellar-base/issues/808) for more information. ([#809](https://github.com/StellarCN/py-stellar-base/pull/809))
+
 ### Version 9.0.0-beta0
 
 Released on September 20, 2023
