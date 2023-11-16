@@ -2,11 +2,10 @@
 They may change at any time, so please do not use them directly.
 """
 import hashlib
-import os
 import re
 from decimal import ROUND_FLOOR, Context, Decimal, Inexact
 from typing import Dict, Optional, Sequence, Union
-from urllib.parse import urlsplit, urlunsplit
+from urllib.parse import urljoin, urlsplit, urlunsplit
 
 from .asset import Asset
 from .exceptions import Ed25519PublicKeyInvalidError, NoApproximationError
@@ -71,7 +70,9 @@ def urljoin_with_query(base: str, path: Optional[str]) -> str:
     query = split_url.query
     real_path = split_url.path
     if path:
-        real_path = os.path.join(split_url.path, path)
+        if not real_path.endswith("/"):
+            real_path += "/"
+        real_path = urljoin(real_path, path)
     url = urlunsplit(
         (split_url.scheme, split_url.netloc, real_path, query, split_url.fragment)
     )
