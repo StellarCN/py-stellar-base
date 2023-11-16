@@ -1,6 +1,9 @@
 Release History
 ==============
 
+### Pending
+- fix: fix the issue of incorrect handling of special horizon links on the Windows platform. ([#825](https://github.com/StellarCN/py-stellar-base/pull/825))
+
 ### Version 9.0.0-beta1
 
 Released on Nov 15, 2023
