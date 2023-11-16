@@ -19,23 +19,24 @@ jobs:
 
   test:
     needs: pre-commit
-    runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
+        os: [ ubuntu-latest, macos-latest, windows-latest ]
         python-version: [ "3.8", "3.9", "3.10", "3.11", "pypy3.8", "pypy3.9", "pypy3.10" ]
         # https://endoflife.date/python
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v3
 
-      - name: Start httpbin server
+      - name: Wake up httpbin server
         run: |
-          docker run -d -p 9876:80 kennethreitz/httpbin
+          curl https://httpbinx.fly.dev/ip
 
       - name: Install poetry
         run: pipx install poetry
 
-      - name: Setup Python ${{ matrix.python-version }}
+      - name: Setup Python ${{ matrix.python-version }} on ${{ matrix.os }}
         uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
@@ -45,10 +46,6 @@ jobs:
         run: |
           poetry install --extras 'aiohttp'
 
-      - name: Ensure httpbin server is running
-        run: |
-          while true; do response=$(curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:9876/get); if [ "$response" = "200" ]; then echo "HTTP 200 OK received"; break; else echo "Retrying..."; sleep 1; fi; done
-
       - name: Echo installed packages
         run: |
           poetry show
@@ -57,7 +54,7 @@ jobs:
         run: poetry run pytest -v -rs tests --runslow --cov=./ --cov-report=xml
 
       - name: Upload coverage to Codecov
-        if: matrix.python-version == '3.11'
+        if: matrix.python-version == '3.11' && matrix.os == 'ubuntu-latest'
         uses: codecov/codecov-action@v3
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
