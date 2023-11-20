@@ -73,7 +73,7 @@ autoflake = "^2.1"
 isort = "^5.10.1"
 black = "^23.3.0"
 requests-mock = "^1.11.0"
-aioresponses = "^0.7.5"
+aioresponses = {git = "https://github.com/pnuckowski/aioresponses.git"}
 
 [tool.mypy]
 show_error_codes = true

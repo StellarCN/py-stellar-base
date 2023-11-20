@@ -27,6 +27,7 @@ jobs:
           { os: 'ubuntu-latest',  python-version: '3.9' },
           { os: 'ubuntu-latest',  python-version: '3.10' },
           { os: 'ubuntu-latest',  python-version: '3.11' },
+          { os: 'ubuntu-latest',  python-version: '3.12' },
           { os: 'ubuntu-latest',  python-version: 'pypy3.8' },
           { os: 'ubuntu-latest',  python-version: 'pypy3.9' },
           { os: 'ubuntu-latest',  python-version: 'pypy3.10' },
@@ -34,6 +35,7 @@ jobs:
           { os: 'macos-latest',  python-version: '3.9' },
           { os: 'macos-latest',  python-version: '3.10' },
           { os: 'macos-latest',  python-version: '3.11' },
+          { os: 'macos-latest',  python-version: '3.12' },
           { os: 'macos-latest',  python-version: 'pypy3.8' },
           { os: 'macos-latest',  python-version: 'pypy3.9' },
           { os: 'macos-latest',  python-version: 'pypy3.10' },
@@ -41,6 +43,7 @@ jobs:
           { os: 'windows-latest',  python-version: '3.9' },
           { os: 'windows-latest',  python-version: '3.10' },
           { os: 'windows-latest',  python-version: '3.11' },
+          { os: 'windows-latest',  python-version: '3.12' },
         ]
         # https://endoflife.date/python
     runs-on: ${{ matrix.platform.os }}
