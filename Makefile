@@ -15,10 +15,15 @@ XDRGEN_REPO=overcat/xdrgen
 XDRGEN_COMMIT=c98916346eeea7e37aaea039de03c1e5ea0a116a
 XDRNEXT_COMMIT=6a620d160aab22609c982d54578ff6a63bfcdc01
 
-UNAME := $(shell uname)
+
+ifeq ($(shell uname), Darwin)
+SED := sed -i ''
+REPLACE_KEYWORD_COMMAND := find xdr -type f -exec sed -i '' 's/from;/from_;/g' {} +
+REPLACE_DOCS := sed -i '' '/stellar_sdk\.xdr/,$$d' docs/en/api.rst
+else
 SED := sed
-ifeq ($(UNAME), Darwin)
-	SED := sed -i ''
+REPLACE_KEYWORD_COMMAND := find xdr -type f -exec sed -i 's/from;/from_;/g' {} \;
+REPLACE_DOCS := sed -i '/stellar_sdk\.xdr/,$$d' docs/en/api.rst
 endif
 
 # default target does nothing
@@ -59,13 +64,11 @@ clean:
 .PHONY: clean
 
 format:
-	autoflake --in-place --ignore-init-module-imports --remove-all-unused-imports --recursive .
-	isort .
-	black .
+	pre-commit run --all-file
 .PHONY: format
 
 replace-xdr-keywords:
-	find xdr -type f -exec $(SED) 's/from;/from_;/g' {} +
+	$(REPLACE_KEYWORD_COMMAND)
 .PHONY: replace-xdr-keywords
 
 xdr-generate: $(XDRS)
@@ -78,7 +81,8 @@ xdr-generate: $(XDRS)
 			--namespace stellar \
 			--output stellar_sdk/xdr \
 			$(XDRS)'
-	$(SED) '/stellar_sdk\.xdr/,$$d' docs/en/api.rst
+	pip install -e .
+	$(REPLACE_DOCS)
 	python docs/gen_xdr_api.py >> docs/en/api.rst
 .PHONY: xdr-generate
 
@@ -91,5 +95,5 @@ xdr-clean:
 	rm stellar_sdk/xdr/*.py || true
 .PHONY: xdr-clean
 
-xdr-update: xdr-clean xdr-generate format
+xdr-update: xdr-clean xdr-generate
 .PHONY: xdr-update
