@@ -10,9 +10,9 @@ from stellar_sdk import xdr as stellar_xdr
 from stellar_sdk.exceptions import PrepareTransactionException
 from stellar_sdk.soroban_rpc import GetTransactionStatus, SendTransactionStatus
 
-rpc_server_url = "https://rpc-futurenet.stellar.org:443/"
+rpc_server_url = "https://soroban-testnet.stellar.org:443"
 soroban_server = SorobanServer(rpc_server_url)
-network_passphrase = Network.FUTURENET_NETWORK_PASSPHRASE
+network_passphrase = Network.TESTNET_NETWORK_PASSPHRASE
 
 # https://github.com/stellar/soroban-examples/tree/v0.6.0/auth
 contract_id = "CAROXTYEBHAQWS2DFQBFZPMHWDUMPB2HJRNPPUMJUNBC3USBZJYKTAKF"
