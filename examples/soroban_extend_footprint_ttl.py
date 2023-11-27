@@ -17,9 +17,9 @@ from stellar_sdk.exceptions import PrepareTransactionException
 from stellar_sdk.soroban_rpc import GetTransactionStatus
 
 secret = "SAAPYAPTTRZMCUZFPG3G66V4ZMHTK4TWA6NS7U4F7Z3IMUD52EK4DDEV"
-rpc_server_url = "https://rpc-futurenet.stellar.org:443/"
+rpc_server_url = "https://soroban-testnet.stellar.org:443/"
 contract_id = "CBQHNAXSI55GX2GN6D67GK7BHVPSLJUGZQEU7WJ5LKR5PNUCGLIMAO4K"
-network_passphrase = Network.FUTURENET_NETWORK_PASSPHRASE
+network_passphrase = Network.TESTNET_NETWORK_PASSPHRASE
 
 kp = Keypair.from_secret(secret)
 soroban_server = SorobanServer(rpc_server_url)

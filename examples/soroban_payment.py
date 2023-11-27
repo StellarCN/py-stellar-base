@@ -9,9 +9,9 @@ from stellar_sdk import xdr as stellar_xdr
 from stellar_sdk.exceptions import PrepareTransactionException
 from stellar_sdk.soroban_rpc import GetTransactionStatus, SendTransactionStatus
 
-rpc_server_url = "https://rpc-futurenet.stellar.org:443/"
+rpc_server_url = "https://soroban-testnet.stellar.org:443/"
 soroban_server = SorobanServer(rpc_server_url)
-network_passphrase = Network.FUTURENET_NETWORK_PASSPHRASE
+network_passphrase = Network.TESTNET_NETWORK_PASSPHRASE
 
 alice_kp = Keypair.from_secret(
     "SAAPYAPTTRZMCUZFPG3G66V4ZMHTK4TWA6NS7U4F7Z3IMUD52EK4DDEV"
@@ -19,7 +19,7 @@ alice_kp = Keypair.from_secret(
 bob_kp = Keypair.from_secret(
     "SAEZSI6DY7AXJFIYA4PM6SIBNEYYXIEM2MSOTHFGKHDW32MBQ7KVO6EN"
 )  # GBMLPRFCZDZJPKUPHUSHCKA737GOZL7ERZLGGMJ6YGHBFJZ6ZKMKCZTM
-native_token_contract_id = "CB64D3G7SM2RTH6JSGG34DDTFTQ5CFDKVDZJZSODMCX4NJ2HV2KN7OHT"
+native_token_contract_id = "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC"
 
 alice_source = soroban_server.load_account(alice_kp.public_key)
 

@@ -17,8 +17,8 @@ from stellar_sdk.soroban_rpc import GetTransactionStatus, SendTransactionStatus
 
 # TODO: You need to replace the following parameters according to the actual situation
 secret = "SAAPYAPTTRZMCUZFPG3G66V4ZMHTK4TWA6NS7U4F7Z3IMUD52EK4DDEV"
-rpc_server_url = "https://rpc-futurenet.stellar.org:443/"
-network_passphrase = Network.FUTURENET_NETWORK_PASSPHRASE
+rpc_server_url = "https://soroban-testnet.stellar.org:443/"
+network_passphrase = Network.TESTNET_NETWORK_PASSPHRASE
 hello_asset = Asset("XLM", "GBCXQUEPSEGIKXLYODHKMZD7YMTZ4IUY3BYPRZL4D5MSJZHHE7HG6RWR")
 
 kp = Keypair.from_secret(secret)
