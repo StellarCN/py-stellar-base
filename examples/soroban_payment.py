@@ -9,7 +9,7 @@ from stellar_sdk import xdr as stellar_xdr
 from stellar_sdk.exceptions import PrepareTransactionException
 from stellar_sdk.soroban_rpc import GetTransactionStatus, SendTransactionStatus
 
-rpc_server_url = "https://soroban-testnet.stellar.org:443/"
+rpc_server_url = "https://soroban-testnet.stellar.org:443"
 soroban_server = SorobanServer(rpc_server_url)
 network_passphrase = Network.TESTNET_NETWORK_PASSPHRASE
 

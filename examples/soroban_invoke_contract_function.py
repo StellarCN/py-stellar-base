@@ -19,7 +19,7 @@ from stellar_sdk.soroban_rpc import GetTransactionStatus, SendTransactionStatus
 
 # TODO: You need to replace the following parameters according to the actual situation
 secret = "SAAPYAPTTRZMCUZFPG3G66V4ZMHTK4TWA6NS7U4F7Z3IMUD52EK4DDEV"
-rpc_server_url = "https://soroban-testnet.stellar.org:443/"
+rpc_server_url = "https://soroban-testnet.stellar.org:443"
 contract_id = "CDJO3KQKJFHFEZY2ZSWS4CTZEAZUO2SZNRWO2Y7QQS4X3UWSOLFJHSS3"
 network_passphrase = Network.TESTNET_NETWORK_PASSPHRASE
 
