@@ -96,11 +96,7 @@ class AiohttpClient(BaseAsyncClient):
         self.backoff_factor: Optional[float] = backoff_factor
         self.request_timeout: float = request_timeout
         self.post_timeout: float = post_timeout
-        # init session
-        if pool_size is None:
-            connector = aiohttp.TCPConnector()
-        else:
-            connector = aiohttp.TCPConnector(limit=pool_size)
+        self.__kwargs = kwargs
 
         self.user_agent: Optional[str] = USER_AGENT
         if user_agent:
@@ -114,14 +110,7 @@ class AiohttpClient(BaseAsyncClient):
         if custom_headers:
             self.headers = {**self.headers, **custom_headers}
 
-        session = aiohttp.ClientSession(
-            headers=self.headers.copy(),
-            connector=connector,
-            timeout=aiohttp.ClientTimeout(total=request_timeout),
-            **kwargs,
-        )
-
-        self._session: aiohttp.ClientSession = session
+        self._session: Optional[aiohttp.ClientSession] = None
         self._sse_session: Optional[aiohttp.ClientSession] = None
 
     async def get(self, url: str, params: Dict[str, str] = None) -> Response:
@@ -132,6 +121,8 @@ class AiohttpClient(BaseAsyncClient):
         :return: the response from server
         :raise: :exc:`ConnectionError <stellar_sdk.exceptions.ConnectionError>`
         """
+        await self.__init_session()
+        assert self._session is not None
         try:
             response = await self._session.get(url, params=params)
             return Response(
@@ -154,6 +145,8 @@ class AiohttpClient(BaseAsyncClient):
         :return: the response from server
         :raise: :exc:`ConnectionError <stellar_sdk.exceptions.ConnectionError>`
         """
+        await self.__init_session()
+        assert self._session is not None
         try:
             response = await self._session.post(
                 url,
@@ -235,6 +228,21 @@ class AiohttpClient(BaseAsyncClient):
                 )
                 await asyncio.sleep(retry)
 
+    async def __init_session(self):
+        # init session
+        if self._session is None:
+            if self.pool_size is None:
+                connector = aiohttp.TCPConnector()
+            else:
+                connector = aiohttp.TCPConnector(limit=self.pool_size)
+
+            self._session = aiohttp.ClientSession(
+                headers=self.headers.copy(),
+                connector=connector,
+                timeout=aiohttp.ClientTimeout(total=self.request_timeout),
+                **self.__kwargs,
+            )
+
     async def __aenter__(self) -> "AiohttpClient":
         return self
 
@@ -246,7 +254,8 @@ class AiohttpClient(BaseAsyncClient):
 
         Release all acquired resources.
         """
-        await self._session.__aexit__(None, None, None)
+        if self._session is not None:
+            await self._session.__aexit__(None, None, None)
         if self._sse_session is not None:
             await self._sse_session.__aexit__(None, None, None)
 
