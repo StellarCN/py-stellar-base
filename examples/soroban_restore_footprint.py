@@ -33,7 +33,7 @@ ledger_key = stellar_xdr.LedgerKey(
         durability=stellar_xdr.ContractDataDurability.PERSISTENT,
     ),
 )
-soroban_data = SorobanDataBuilder().set_read_only([ledger_key]).build()
+soroban_data = SorobanDataBuilder().set_read_write([ledger_key]).build()
 
 tx = (
     TransactionBuilder(source, network_passphrase, base_fee=50000)
