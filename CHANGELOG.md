@@ -2,7 +2,15 @@ Release History
 ==============
 
 ### Pending
+
+### Version 9.0.0
+
+Released on Dec 9, 2023
+
+#### Update
 - fix: fix the issue of incorrect handling of special horizon links on the Windows platform. ([#825](https://github.com/StellarCN/py-stellar-base/pull/825))
+- chore: add support for Python 3.12. ([#799](https://github.com/StellarCN/py-stellar-base/pull/799))
+- chore: `SorobanServer` uses testnet instead of futurenet by default ([#831](https://github.com/StellarCN/py-stellar-base/pull/831))
 
 ### Version 9.0.0-beta1
 
