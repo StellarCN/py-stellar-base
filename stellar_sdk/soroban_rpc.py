@@ -257,7 +257,6 @@ class GetTransactionResponse(BaseModel):
         alias="resultMetaXdr", default=None
     )  # stellar_sdk.xdr.TransactionMeta
     ledger: Optional[int] = Field(alias="ledger", default=None)
-    ledger_close_time: Optional[int] = Field(alias="ledgerCloseTime", default=None)
 
 
 # send_transaction
