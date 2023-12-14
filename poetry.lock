@@ -1213,13 +1213,13 @@ test = ["fixtures", "mock", "purl", "pytest", "requests-futures", "sphinx", "tes
 
 [[package]]
 name = "requests-sse"
-version = "0.3.0"
+version = "0.3.1"
 description = "server-sent events python client library based on requests"
 optional = false
-python-versions = ">=3.8,<4.0"
+python-versions = ">=3.7,<4.0"
 files = [
-    {file = "requests_sse-0.3.0-py3-none-any.whl", hash = "sha256:4a81550995e3b26fe2c75796a893a1fea708d43408e445b67ab35ec4ffca6bf2"},
-    {file = "requests_sse-0.3.0.tar.gz", hash = "sha256:7ce67364739d848a3f0bab4b7165acf05a60a7f508a1a449e09114654bcff5a8"},
+    {file = "requests_sse-0.3.1-py3-none-any.whl", hash = "sha256:cd6db456bf2175dadc82f7d05efbee6178ee49247a967d935097ff16fa4228e3"},
+    {file = "requests_sse-0.3.1.tar.gz", hash = "sha256:c9d8a3cbe9315a776d167f3359a8623d9d57c9e8d187a30ae3b4a6f076178cda"},
 ]
 
 [package.dependencies]
