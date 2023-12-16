@@ -356,7 +356,7 @@ class TestSorobanServer:
                 }
             ],
             "pagination": {"cursor": "0000054713588387839-0000000000", "limit": 10},
-            "startLedger": "100",
+            "startLedger": 100,
         }
 
     async def test_get_latest_ledger(self):
