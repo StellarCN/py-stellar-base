@@ -9,6 +9,7 @@ from .account import Account
 from .address import Address
 from .base_soroban_server import (
     Durability,
+    ResourceLeeway,
     _assemble_transaction,
     _generate_unique_request_id,
 )
@@ -157,7 +158,9 @@ class SorobanServer:
         return self._post(request, GetTransactionResponse)
 
     def simulate_transaction(
-        self, transaction_envelope: TransactionEnvelope
+        self,
+        transaction_envelope: TransactionEnvelope,
+        addl_resources: Optional[ResourceLeeway] = None,
     ) -> SimulateTransactionResponse:
         """Submit a trial contract invocation to get back return values, expected ledger footprint, and expected costs.
 
@@ -168,6 +171,7 @@ class SorobanServer:
             :class:`InvokeHostFunction <stellar_sdk.operation.InvokeHostFunction>` or
             :class:`ExtendFootprintTTL <stellar_sdk.operation.RestoreFootprint>` operation.
             Any provided footprint will be ignored.
+        :param addl_resources: Additional resource include in the simulation.
         :return: A :class:`SimulateTransactionResponse <stellar_sdk.soroban_rpc.SimulateTransactionResponse>` object
             contains the cost, footprint, result/auth requirements (if applicable), and error of the transaction.
         """
@@ -176,10 +180,18 @@ class SorobanServer:
             if isinstance(transaction_envelope, str)
             else transaction_envelope.to_xdr()
         )
+        resource_config = None
+        if addl_resources:
+            resource_config = ResourceConfig(
+                instruction_lee_way=addl_resources.cpu_instructions,
+            )
+
         request = Request[SimulateTransactionRequest](
             id=_generate_unique_request_id(),
             method="simulateTransaction",
-            params=SimulateTransactionRequest(transaction=xdr),
+            params=SimulateTransactionRequest(
+                transaction=xdr, resource_config=resource_config
+            ),
         )
         return self._post(request, SimulateTransactionResponse)
 

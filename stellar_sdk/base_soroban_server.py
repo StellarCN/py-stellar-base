@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import copy
+import dataclasses
 import uuid
 from typing import TYPE_CHECKING
 
@@ -10,6 +11,13 @@ from .soroban_rpc import *
 
 if TYPE_CHECKING:
     from .transaction_envelope import TransactionEnvelope
+
+
+@dataclasses.dataclass
+class ResourceLeeway:
+    """Describes additional resource leeways for transaction simulation."""
+
+    cpu_instructions: int
 
 
 class Durability(Enum):

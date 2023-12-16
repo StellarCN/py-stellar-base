@@ -7,6 +7,7 @@ from yarl import URL
 from stellar_sdk import Account, Keypair, Network, TransactionBuilder, scval
 from stellar_sdk import xdr as stellar_xdr
 from stellar_sdk.address import Address
+from stellar_sdk.base_soroban_server import ResourceLeeway
 from stellar_sdk.exceptions import (
     AccountNotFoundException,
     PrepareTransactionException,
@@ -418,7 +419,53 @@ class TestSorobanServer:
         assert len(request_data["id"]) == 32
         assert request_data["jsonrpc"] == "2.0"
         assert request_data["method"] == "simulateTransaction"
-        assert request_data["params"] == {"transaction": transaction.to_xdr()}
+        assert request_data["params"] == {
+            "transaction": transaction.to_xdr(),
+            "resourceConfig": None,
+        }
+
+    async def test_simulate_transaction_with_addl_resources(self):
+        result = {
+            "transactionData": "AAAAAAAAAAIAAAAGAAAAAcWLK/vE8FTnMk9r8gytPgJuQbutGm0gw9fUkY3tFlQRAAAAFAAAAAEAAAAAAAAAB300Hyg0HZG+Qie3zvsxLvugrNtFqd3AIntWy9bg2YvZAAAAAAAAAAEAAAAGAAAAAcWLK/vE8FTnMk9r8gytPgJuQbutGm0gw9fUkY3tFlQRAAAAEAAAAAEAAAACAAAADwAAAAdDb3VudGVyAAAAABIAAAAAAAAAAFi3xKLI8peqjz0kcSgf38zsr+SOVmMxPsGOEqc+ypihAAAAAQAAAAAAFcLDAAAF8AAAAQgAAAMcAAAAAAAAAJw=",
+            "events": [
+                "AAAAAQAAAAAAAAAAAAAAAgAAAAAAAAADAAAADwAAAAdmbl9jYWxsAAAAAA0AAAAgxYsr+8TwVOcyT2vyDK0+Am5Bu60abSDD19SRje0WVBEAAAAPAAAACWluY3JlbWVudAAAAAAAABAAAAABAAAAAgAAABIAAAAAAAAAAFi3xKLI8peqjz0kcSgf38zsr+SOVmMxPsGOEqc+ypihAAAAAwAAAAo=",
+                "AAAAAQAAAAAAAAABxYsr+8TwVOcyT2vyDK0+Am5Bu60abSDD19SRje0WVBEAAAACAAAAAAAAAAIAAAAPAAAACWZuX3JldHVybgAAAAAAAA8AAAAJaW5jcmVtZW50AAAAAAAAAwAAABQ=",
+            ],
+            "minResourceFee": "58595",
+            "results": [
+                {
+                    "auth": [
+                        "AAAAAAAAAAAAAAABxYsr+8TwVOcyT2vyDK0+Am5Bu60abSDD19SRje0WVBEAAAAJaW5jcmVtZW50AAAAAAAAAgAAABIAAAAAAAAAAFi3xKLI8peqjz0kcSgf38zsr+SOVmMxPsGOEqc+ypihAAAAAwAAAAoAAAAA"
+                    ],
+                    "xdr": "AAAAAwAAABQ=",
+                }
+            ],
+            "cost": {"cpuInsns": "1240100", "memBytes": "161637"},
+            "latestLedger": "1479",
+        }
+        data = {
+            "jsonrpc": "2.0",
+            "id": "e1fabdcdf0244a2a9adfab94d7748b6c",
+            "result": result,
+        }
+        transaction = _build_soroban_transaction(None, [])
+        with aioresponses() as m:
+            m.post(PRC_URL, payload=data)
+            async with SorobanServerAsync(PRC_URL) as client:
+                assert (
+                    await client.simulate_transaction(
+                        transaction, ResourceLeeway(1000000)
+                    )
+                ) == SimulateTransactionResponse.model_validate(result)
+
+        request_data = m.requests[("POST", URL(PRC_URL))][0].kwargs["json"]
+        assert len(request_data["id"]) == 32
+        assert request_data["jsonrpc"] == "2.0"
+        assert request_data["method"] == "simulateTransaction"
+        assert request_data["params"] == {
+            "transaction": transaction.to_xdr(),
+            "resourceConfig": {"instructionLeeway": 1000000},
+        }
 
     async def test_prepare_transaction_without_auth_and_soroban_data(self):
         data = {

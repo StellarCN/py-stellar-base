@@ -145,6 +145,13 @@ class GetHealthResponse(BaseModel):
 
 
 # simulate_transaction
+class ResourceConfig(BaseModel):
+    """ResourceConfig represents the additional resource leeways for transaction simulation."""
+
+    instruction_lee_way: int = Field(alias="instructionLeeway")
+    model_config = ConfigDict(populate_by_name=True)
+
+
 class SimulateTransactionRequest(BaseModel):
     """Response for JSON-RPC method simulateTransaction.
 
@@ -159,6 +166,10 @@ class SimulateTransactionRequest(BaseModel):
     """
 
     transaction: str
+    resource_config: Optional[ResourceConfig] = Field(
+        alias="resourceConfig", default=None
+    )
+    model_config = ConfigDict(populate_by_name=True)
 
 
 class SimulateTransactionCost(BaseModel):
