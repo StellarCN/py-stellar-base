@@ -3,6 +3,14 @@ Release History
 
 ### Pending
 
+### Version 9.1.0
+
+Released on Dec 16, 2023
+
+#### Update
+- feat: support resource leeway parameter when simulating Soroban transactions. ([#846](https://github.com/StellarCN/py-stellar-base/pull/846))
+- refactor: the type of `GetEventsRequest.start_ledger` has changed from `str` to `int`. ([#847](https://github.com/StellarCN/py-stellar-base/pull/847))
+
 ### Version 9.0.0
 
 Released on Dec 9, 2023
