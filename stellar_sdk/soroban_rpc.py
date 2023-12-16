@@ -78,7 +78,7 @@ class GetEventsRequest(BaseModel):
     more information.
     """
 
-    start_ledger: str = Field(alias="startLedger")
+    start_ledger: int = Field(alias="startLedger")
     filters: Optional[Sequence[EventFilter]] = None
     pagination: Optional[PaginationOptions] = None
 
