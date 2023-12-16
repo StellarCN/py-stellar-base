@@ -3,6 +3,13 @@ Release History
 
 ### Pending
 
+### Version 9.1.1
+
+Released on Dec 16, 2023
+
+#### Update
+- improve: add the missing `create_at` field to `GetTransactionResponse`. ([#849](https://github.com/StellarCN/py-stellar-base/pull/849))
+
 ### Version 9.1.0
 
 Released on Dec 16, 2023
