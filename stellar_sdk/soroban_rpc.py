@@ -268,7 +268,7 @@ class GetTransactionResponse(BaseModel):
         alias="resultMetaXdr", default=None
     )  # stellar_sdk.xdr.TransactionMeta
     ledger: Optional[int] = Field(alias="ledger", default=None)
-    create_at: int = Field(alias="createdAt")
+    create_at: Optional[int] = Field(alias="createdAt", default=None)
 
 
 # send_transaction
