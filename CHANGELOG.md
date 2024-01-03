@@ -3,6 +3,13 @@ Release History
 
 ### Pending
 
+### Version 9.1.3
+
+Released on Jan 3, 2024
+
+#### Update
+- fix: fix the way of exporting modules to resolve pyright warnings. ([#858](https://github.com/StellarCN/py-stellar-base/pull/858))
+
 ### Version 9.1.2
 
 Released on Dec 26, 2023
