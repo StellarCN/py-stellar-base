@@ -10,8 +10,8 @@ class Preconditions:
     """This contains a set of conditions, if a transaction can be accepted by the network,
     it must meet these conditions.
 
-    :param time_bounds: required extra signers.
-    :param ledger_bounds: required extra signers.
+    :param time_bounds: The timebounds for the transaction.
+    :param ledger_bounds: The ledgerbounds for the transaction.
     :param min_sequence_number: The minimum source account sequence
         number this transaction is valid for. If the value is ``None``,
         the transaction is valid when **source account's sequence number == tx.sequence - 1**.
