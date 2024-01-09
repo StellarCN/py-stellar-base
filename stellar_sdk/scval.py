@@ -8,6 +8,8 @@ __all__ = [
     "from_address",
     "to_bool",
     "from_bool",
+    "to_void",
+    "from_void",
     "to_bytes",
     "from_bytes",
     "to_duration",
@@ -93,6 +95,26 @@ def from_bool(sc_val: stellar_xdr.SCVal) -> bool:
         raise ValueError(f"Invalid sc_val type, must be SCV_BOOL, got {sc_val.type}")
     assert sc_val.b is not None
     return sc_val.b
+
+
+def to_void() -> stellar_xdr.SCVal:
+    """Creates a new :class:`stellar_sdk.xdr.SCVal` XDR object of type :class:`stellar_sdk.xdr.SCValType.SCV_VOID`.
+
+    :return: A new :class:`stellar_sdk.xdr.SCVal` XDR object of type :class:`stellar_sdk.xdr.SCValType.SCV_VOID`.
+    """
+    return stellar_xdr.SCVal(stellar_xdr.SCValType.SCV_VOID)
+
+
+def from_void(sc_val: stellar_xdr.SCVal) -> None:
+    """Creates a None value from a :class:`stellar_sdk.xdr.SCVal` XDR object.
+
+    :param sc_val: The :class:`stellar_sdk.xdr.SCVal` XDR object to convert.
+    :return: None.
+    :raises: :exc:`ValueError` if ``sc_val`` is not of type :class:`stellar_sdk.xdr.SCValType.SCV_VOID`.
+    """
+    if sc_val.type != stellar_xdr.SCValType.SCV_VOID:
+        raise ValueError(f"Invalid sc_val type, must be SCV_VOID, got {sc_val.type}")
+    return None
 
 
 def to_bytes(data: bytes) -> stellar_xdr.SCVal:
