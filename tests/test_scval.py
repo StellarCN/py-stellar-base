@@ -22,6 +22,13 @@ def test_bool():
     assert from_bool(scval) is True
 
 
+def test_void():
+    scval = to_void()
+    expected_scval = xdr.SCVal(stellar_xdr.SCValType.SCV_VOID)
+    assert scval == expected_scval
+    assert from_void(scval) is None
+
+
 def test_bytes():
     v = b"hello"
     scval = to_bytes(v)

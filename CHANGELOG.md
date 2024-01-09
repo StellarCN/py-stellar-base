@@ -2,6 +2,8 @@ Release History
 ==============
 
 ### Pending
+#### Update
+- feat: add `scv.to_void` and `scv.from_void`. ([#863](https://github.com/StellarCN/py-stellar-base/pull/863))
 
 ### Version 9.1.3
 
