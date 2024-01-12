@@ -689,6 +689,37 @@ class TestSorobanServer:
         assert request_data["params"] == {"transaction": transaction.to_xdr()}
         assert result["hash"] == transaction.hash_hex()
 
+    def test_send_transaction_error(self):
+        result = {
+            "status": "ERROR",
+            "errorResultXdr": "AAAAAAAAf67////6AAAAAA==",
+            "diagnosticEventsXdr": [
+                "AAAAAQAAAAAAAAAAAAAAAgAAAAAAAAADAAAADwAAAAdmbl9jYWxsAAAAAA0AAAAgr/p6gt6h8MrmSw+WNJnu3+sCP9dHXx7jR8IH0sG6Cy0AAAAPAAAABWhlbGxvAAAAAAAADwAAAAVBbG9oYQAAAA=="
+            ],
+            "hash": "64977cc4bb7f8bf75bdc47570548a994667899d3319b72f95cb2a64e567ad52c",
+            "latestLedger": "1479",
+            "latestLedgerCloseTime": "1690594566",
+        }
+        data = {
+            "jsonrpc": "2.0",
+            "id": "688dfcf3bcd04f52af4866e98dffe387",
+            "result": result,
+        }
+
+        transaction = _build_soroban_transaction(None, [])
+        with requests_mock.Mocker() as m:
+            m.post(PRC_URL, json=data)
+            assert SorobanServer(PRC_URL).send_transaction(
+                transaction
+            ) == SendTransactionResponse.model_validate(result)
+
+        request_data = m.last_request.json()
+        assert len(request_data["id"]) == 32
+        assert request_data["jsonrpc"] == "2.0"
+        assert request_data["method"] == "sendTransaction"
+        assert request_data["params"] == {"transaction": transaction.to_xdr()}
+        assert result["hash"] == transaction.hash_hex()
+
     def test_soroban_rpc_error_response_raise(self):
         data = {
             "jsonrpc": "2.0",

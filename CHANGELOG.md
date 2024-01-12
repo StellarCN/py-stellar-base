@@ -4,6 +4,7 @@ Release History
 ### Pending
 #### Update
 - feat: add `scv.to_void` and `scv.from_void`. ([#863](https://github.com/StellarCN/py-stellar-base/pull/863))
+- feat: Support for the new, optional `diagnostic_events_xdr` field on the `SorobanServer.send_transaction` method. ([#866](https://github.com/stellar/java-stellar-sdk/pull/866))
 
 ### Version 9.1.3
 

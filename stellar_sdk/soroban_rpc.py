@@ -299,6 +299,9 @@ class SendTransactionResponse(BaseModel):
     more information."""
 
     error_result_xdr: Optional[str] = Field(alias="errorResultXdr", default=None)
+    diagnostic_events_xdr: Optional[List[str]] = Field(
+        alias="diagnosticEventsXdr", default=None
+    )
     status: SendTransactionStatus = Field(alias="status")
     hash: str = Field(alias="hash")
     latest_ledger: int = Field(alias="latestLedger")
