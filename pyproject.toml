@@ -73,7 +73,7 @@ types-toml = {version = "^0.10.8", markers = "platform_python_implementation == 
 types-requests = {version = "^2.31.0", markers = "platform_python_implementation == 'CPython'"}
 autoflake = "^2.1"
 isort = "^5.13.2"
-black = "^23.12.1"
+black = "^24.1.1"
 requests-mock = "^1.11.0"
 aioresponses = {git = "https://github.com/pnuckowski/aioresponses.git"}
 
