@@ -15,3 +15,9 @@ class RootCallBuilder(BaseCallBuilder, BaseRootCallBuilder):
 
     def __init__(self, horizon_url: str, client: BaseAsyncClient) -> None:
         super().__init__(horizon_url=horizon_url, client=client)
+
+    async def stream(
+        self,
+    ):
+        """This endpoint does not support streaming."""
+        raise NotImplementedError("Streaming is not supported.")

@@ -17,3 +17,9 @@ class LiquidityPoolsBuilder(BaseCallBuilder, BaseLiquidityPoolsBuilder):
 
     def __init__(self, horizon_url: str, client: BaseSyncClient) -> None:
         super().__init__(horizon_url=horizon_url, client=client)
+
+    def stream(
+        self,
+    ):
+        """This endpoint does not support streaming."""
+        raise NotImplementedError("Streaming is not supported.")
