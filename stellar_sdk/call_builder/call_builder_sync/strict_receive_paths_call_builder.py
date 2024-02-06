@@ -54,3 +54,9 @@ class StrictReceivePathsCallBuilder(BaseCallBuilder, BaseStrictReceivePathsCallB
             destination_asset=destination_asset,
             destination_amount=destination_amount,
         )
+
+    def stream(
+        self,
+    ):
+        """This endpoint does not support streaming."""
+        raise NotImplementedError("Streaming is not supported.")

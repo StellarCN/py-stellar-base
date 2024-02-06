@@ -54,3 +54,9 @@ class StrictSendPathsCallBuilder(BaseCallBuilder, BaseStrictSendPathsCallBuilder
             source_amount=source_amount,
             destination=destination,
         )
+
+    async def stream(
+        self,
+    ):
+        """This endpoint does not support streaming."""
+        raise NotImplementedError("Streaming is not supported.")

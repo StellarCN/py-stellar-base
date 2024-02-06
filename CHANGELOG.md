@@ -2,6 +2,8 @@ Release History
 ==============
 
 ### Pending
+#### Update
+- chore: throw an exception when the API does not provide streaming support. ([#878](https://github.com/StellarCN/py-stellar-base/pull/878))
 
 ### Version 9.2.0
 
