@@ -66,7 +66,7 @@ pytest = "^7.4.4"
 pytest-cov = "^4.1.0"
 pytest-timeout = "^2.2.0"
 pytest-asyncio = "^0.23.5"
-pytest-httpserver = "^1.0.6"
+pytest-httpserver = "^1.0.9"
 # currently, mypy cannot run in pypy https://github.com/python/typed_ast/issues/111
 mypy = {version = "^1.8", markers = "platform_python_implementation == 'CPython'"}
 types-toml = {version = "^0.10.8", markers = "platform_python_implementation == 'CPython'"}
