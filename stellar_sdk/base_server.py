@@ -1,34 +1,40 @@
-from decimal import Decimal
-from typing import Any, Coroutine, Dict, Generator, List, Tuple, Union
+from __future__ import annotations
 
-from .account import Account
-from .asset import Asset
+from decimal import Decimal
+from typing import TYPE_CHECKING, Any, Coroutine, Dict, Generator, List, Tuple, Union
+
+if TYPE_CHECKING:
+    from .call_builder.base import (
+        BaseAccountsCallBuilder,
+        BaseAssetsCallBuilder,
+        BaseClaimableBalancesCallBuilder,
+        BaseDataCallBuilder,
+        BaseEffectsCallBuilder,
+        BaseFeeStatsCallBuilder,
+        BaseLedgersCallBuilder,
+        BaseLiquidityPoolsBuilder,
+        BaseOffersCallBuilder,
+        BaseOperationsCallBuilder,
+        BaseOrderbookCallBuilder,
+        BasePaymentsCallBuilder,
+        BaseRootCallBuilder,
+        BaseStrictReceivePathsCallBuilder,
+        BaseStrictSendPathsCallBuilder,
+        BaseTradeAggregationsCallBuilder,
+        BaseTradesCallBuilder,
+        BaseTransactionsCallBuilder,
+    )
+    from .fee_bump_transaction import FeeBumpTransaction
+    from .fee_bump_transaction_envelope import FeeBumpTransactionEnvelope
+    from .account import Account
+    from .asset import Asset
+    from .muxed_account import MuxedAccount
+    from .transaction import Transaction
+    from .transaction_envelope import TransactionEnvelope
+    from .keypair import Keypair
+
 from .base_transaction_envelope import BaseTransactionEnvelope
-from .call_builder.base import (
-    BaseAccountsCallBuilder,
-    BaseAssetsCallBuilder,
-    BaseClaimableBalancesCallBuilder,
-    BaseDataCallBuilder,
-    BaseEffectsCallBuilder,
-    BaseFeeStatsCallBuilder,
-    BaseLedgersCallBuilder,
-    BaseLiquidityPoolsBuilder,
-    BaseOffersCallBuilder,
-    BaseOperationsCallBuilder,
-    BaseOrderbookCallBuilder,
-    BasePaymentsCallBuilder,
-    BaseRootCallBuilder,
-    BaseStrictReceivePathsCallBuilder,
-    BaseStrictSendPathsCallBuilder,
-    BaseTradeAggregationsCallBuilder,
-    BaseTradesCallBuilder,
-    BaseTransactionsCallBuilder,
-)
-from .fee_bump_transaction import FeeBumpTransaction
-from .fee_bump_transaction_envelope import FeeBumpTransactionEnvelope
 from .helpers import parse_transaction_envelope_from_xdr
-from .keypair import Keypair
-from .muxed_account import MuxedAccount
 from .operation import (
     AccountMerge,
     PathPaymentStrictReceive,
@@ -36,8 +42,6 @@ from .operation import (
     Payment,
 )
 from .sep.exceptions import AccountRequiresMemoError
-from .transaction import Transaction
-from .transaction_envelope import TransactionEnvelope
 
 __all__ = ["BaseServer"]
 

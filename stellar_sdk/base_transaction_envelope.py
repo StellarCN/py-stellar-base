@@ -8,7 +8,7 @@ from .keypair import Keypair
 from .network import Network
 from .utils import hex_to_bytes, sha256
 
-T = TypeVar("T")
+T = TypeVar("T", bound="BaseTransactionEnvelope")
 
 
 class BaseTransactionEnvelope(Generic[T]):

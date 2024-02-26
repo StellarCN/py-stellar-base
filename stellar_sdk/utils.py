@@ -86,6 +86,7 @@ def is_valid_hash(data: str) -> bool:
     return bool(asset_code_re.match(data))
 
 
+# TODO: move to strkey.py
 def raise_if_not_valid_ed25519_public_key(value: str, argument_name: str) -> None:
     try:
         StrKey.decode_ed25519_public_key(value)

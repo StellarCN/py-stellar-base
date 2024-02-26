@@ -1,21 +1,25 @@
-from decimal import Decimal
-from typing import Any, Dict, List, Union
+from __future__ import annotations
 
-from .account import Account
-from .asset import Asset
+from decimal import Decimal
+from typing import TYPE_CHECKING, Any, Dict, List, Union
+
+if TYPE_CHECKING:
+    from .account import Account
+    from .asset import Asset
+    from .client.base_async_client import BaseAsyncClient
+    from .fee_bump_transaction_envelope import FeeBumpTransactionEnvelope
+    from .keypair import Keypair
+    from .muxed_account import MuxedAccount
+    from .transaction import Transaction
+    from .transaction_envelope import TransactionEnvelope
+
 from .base_server import BaseServer
 from .call_builder.call_builder_async import *
 from .client.aiohttp_client import AiohttpClient
-from .client.base_async_client import BaseAsyncClient
 from .client.response import Response
 from .exceptions import NotFoundError, raise_request_exception
 from .fee_bump_transaction import FeeBumpTransaction
-from .fee_bump_transaction_envelope import FeeBumpTransactionEnvelope
-from .keypair import Keypair
 from .memo import NoneMemo
-from .muxed_account import MuxedAccount
-from .transaction import Transaction
-from .transaction_envelope import TransactionEnvelope
 from .utils import MUXED_ACCOUNT_STARTING_LETTER, urljoin_with_query
 
 __all__ = ["ServerAsync"]

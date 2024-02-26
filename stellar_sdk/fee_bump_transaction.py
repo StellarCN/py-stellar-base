@@ -1,10 +1,14 @@
-from typing import Union
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Union
 
 from . import xdr as stellar_xdr
 from .keypair import Keypair
 from .muxed_account import MuxedAccount
-from .transaction import Transaction
 from .transaction_envelope import TransactionEnvelope
+
+if TYPE_CHECKING:
+    from .transaction import Transaction
 
 BASE_FEE = 100
 
