@@ -62,7 +62,7 @@ requests-sse = "^0.3.0"
 aiohttp = ["aiohttp", "aiohttp-sse-client"]
 
 [tool.poetry.dev-dependencies]
-pytest = "^8.0.2"
+pytest = "^8.1.0"
 pytest-cov = "^4.1.0"
 pytest-timeout = "^2.2.0"
 pytest-asyncio = "^0.23.5"
