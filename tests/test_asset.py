@@ -1,5 +1,6 @@
 import pytest
 
+from stellar_sdk import Network
 from stellar_sdk.asset import Asset
 from stellar_sdk.exceptions import AssetCodeInvalidError, AssetIssuerInvalidError
 
@@ -180,3 +181,39 @@ class TestAsset:
         xdr_object = asset.to_change_trust_asset_xdr_object()
         assert xdr_object.to_xdr() == xdr
         assert Asset.from_xdr_object(xdr_object) == asset
+
+    @pytest.mark.parametrize(
+        "asset, network_passphrase, contract_id",
+        [
+            pytest.param(
+                Asset.native(),
+                Network.PUBLIC_NETWORK_PASSPHRASE,
+                "CAS3J7GYLGXMF6TDJBBYYSE3HQ6BBSMLNUQ34T6TZMYMW2EVH34XOWMA",
+                id="native_public",
+            ),
+            pytest.param(
+                Asset.native(),
+                Network.TESTNET_NETWORK_PASSPHRASE,
+                "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+                id="native_testnet",
+            ),
+            pytest.param(
+                Asset(
+                    "USDC", "GA5ZSEJYB37JRC5AVCIA5MOP4RHTM335X2KGX3IHOJAPP5RE34K4KZVN"
+                ),
+                Network.PUBLIC_NETWORK_PASSPHRASE,
+                "CCW67TSZV3SSS2HXMBQ5JFGCKJNXKZM7UQUWUZPUTHXSTZLEO7SJMI75",
+                id="alphanum4_public",
+            ),
+            pytest.param(
+                Asset(
+                    "yUSDC", "GDGTVWSM4MGS4T7Z6W4RPWOCHE2I6RDFCIFZGS3DOA63LWQTRNZNTTFF"
+                ),
+                Network.PUBLIC_NETWORK_PASSPHRASE,
+                "CDOFW7HNKLUZRLFZST4EW7V3AV4JI5IHMT6BPXXSY2IEFZ4NE5TWU2P4",
+                id="alphanum12_public",
+            ),
+        ],
+    )
+    def test_contract_id(self, asset, network_passphrase, contract_id):
+        assert asset.contract_id(network_passphrase) == contract_id
