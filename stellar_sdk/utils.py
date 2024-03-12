@@ -1,15 +1,18 @@
 """This file contains constants, functions and classes used internally by this SDK.
 They may change at any time, so please do not use them directly.
 """
+
 import hashlib
 import re
 from decimal import ROUND_FLOOR, Context, Decimal, Inexact
-from typing import Dict, Optional, Sequence, Union
+from typing import TYPE_CHECKING, Dict, Optional, Sequence, Union
 from urllib.parse import urljoin, urlsplit, urlunsplit
 
-from .asset import Asset
 from .exceptions import Ed25519PublicKeyInvalidError, NoApproximationError
 from .strkey import StrKey
+
+if TYPE_CHECKING:
+    from .asset import Asset
 
 MUXED_ACCOUNT_STARTING_LETTER: str = "M"
 ED25519_PUBLIC_KEY_STARTING_LETTER: str = "G"
@@ -55,7 +58,7 @@ def hex_to_bytes(hex_string: Union[str, bytes]) -> bytes:
     return hex_string
 
 
-def convert_assets_to_horizon_param(assets: Sequence[Asset]) -> str:
+def convert_assets_to_horizon_param(assets: Sequence["Asset"]) -> str:
     assets_string = []
     for asset in assets:
         if asset.is_native():

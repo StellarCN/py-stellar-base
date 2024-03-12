@@ -4,7 +4,9 @@ from typing import Dict, Optional, Type, Union
 from . import xdr as stellar_xdr
 from .exceptions import AssetCodeInvalidError, AssetIssuerInvalidError
 from .keypair import Keypair
+from .network import Network
 from .strkey import StrKey
+from .utils import sha256
 
 __all__ = ["Asset"]
 
@@ -81,6 +83,26 @@ class Asset:
     @type.setter
     def type(self, v) -> None:
         raise AttributeError("Asset type is immutable.")
+
+    def contract_id(self, network_passphrase: str) -> str:
+        """Return the asset contract ID for current asset.
+
+        :param network_passphrase: The network passphrase.
+        :return: The asset contract ID
+        """
+        network_id_hash = stellar_xdr.Hash(Network(network_passphrase).network_id())
+        preimage = stellar_xdr.HashIDPreimage(
+            stellar_xdr.EnvelopeType.ENVELOPE_TYPE_CONTRACT_ID,
+            contract_id=stellar_xdr.HashIDPreimageContractID(
+                network_id=network_id_hash,
+                contract_id_preimage=stellar_xdr.ContractIDPreimage(
+                    stellar_xdr.ContractIDPreimageType.CONTRACT_ID_PREIMAGE_FROM_ASSET,
+                    from_asset=self.to_xdr_object(),
+                ),
+            ),
+        )
+        contract_id = sha256(preimage.to_xdr_bytes())
+        return StrKey.encode_contract(contract_id)
 
     def guess_asset_type(self) -> str:
         """Return the type of the asset, Can be one of
