@@ -85,10 +85,10 @@ class Asset:
         raise AttributeError("Asset type is immutable.")
 
     def contract_id(self, network_passphrase: str) -> str:
-        """Return the asset contract ID for current asset.
+        """Return the contract Id for the asset contract.
 
-        :param network_passphrase: The network passphrase.
-        :return: The asset contract ID
+        :param network_passphrase: The network where the asset is located.
+        :return: The contract Id for the asset contract.
         """
         network_id_hash = stellar_xdr.Hash(Network(network_passphrase).network_id())
         preimage = stellar_xdr.HashIDPreimage(

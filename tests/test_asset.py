@@ -203,7 +203,7 @@ class TestAsset:
                 ),
                 Network.PUBLIC_NETWORK_PASSPHRASE,
                 "CCW67TSZV3SSS2HXMBQ5JFGCKJNXKZM7UQUWUZPUTHXSTZLEO7SJMI75",
-                id="credit_alphanum4_public",
+                id="alphanum4_public",
             ),
             pytest.param(
                 Asset(
@@ -211,7 +211,7 @@ class TestAsset:
                 ),
                 Network.PUBLIC_NETWORK_PASSPHRASE,
                 "CDOFW7HNKLUZRLFZST4EW7V3AV4JI5IHMT6BPXXSY2IEFZ4NE5TWU2P4",
-                id="credit_alphanum12_public",
+                id="alphanum12_public",
             ),
         ],
     )
