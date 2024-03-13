@@ -2,9 +2,14 @@ Release History
 ==============
 
 ### Pending
+
+### Version 9.3.0
+
+Released on March 13, 2024
+
 #### Update
-- chore: throw an exception when the API does not provide streaming support. ([#878](https://github.com/StellarCN/py-stellar-base/pull/878))
 - feat: Add `Asset.contract_id()` for calculating the id of the asset contract. ([#901](https://github.com/StellarCN/py-stellar-base/pull/901))
+- chore: throw an exception when the API does not provide streaming support. ([#878](https://github.com/StellarCN/py-stellar-base/pull/878))
 
 ### Version 9.2.0
 
