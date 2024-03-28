@@ -74,7 +74,7 @@ types-requests = {version = "^2.31.0", markers = "platform_python_implementation
 autoflake = "^2.3"
 isort = "^5.13.2"
 black = "^24.3.0"
-requests-mock = "^1.11.0"
+requests-mock = "^1.12.0"
 aioresponses = {git = "https://github.com/pnuckowski/aioresponses.git"}
 
 [tool.mypy]
