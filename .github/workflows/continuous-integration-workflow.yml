@@ -78,7 +78,6 @@ jobs:
         if: matrix.platform.python-version == '3.11' && matrix.platform.os == 'ubuntu-latest'
         uses: codecov/codecov-action@v3
         with:
-          token: ${{ secrets.CODECOV_TOKEN }}
           file: ./coverage.xml
           flags: unittests
           name: codecov-umbrella
