@@ -1,4 +1,4 @@
-Sphinx==7.2.6
+Sphinx==7.3.4
 sphinx-rtd-theme==2.0.0
 sphinx-autodoc-typehints==2.0.1
 autodoc-pydantic==2.1.0
