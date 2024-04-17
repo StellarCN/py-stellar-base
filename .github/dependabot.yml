@@ -1,20 +1,22 @@
 version: 2
 updates:
-- package-ecosystem: pip
-  directory: "/"
-  schedule:
-    interval: daily
-    time: "09:00"
-    timezone: Asia/Shanghai
-  open-pull-requests-limit: 10
-  target-branch: main
-  reviewers:
-  - overcat
-  assignees:
-  - overcat
-  labels:
-  - dependencies
-  ignore:
-  - dependency-name: aiohttp-sse-client
-    versions:
-    - 0.2.1
+  - package-ecosystem: pip
+    directory: "/"
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 10
+    target-branch: main
+    groups:
+      python-packages:
+        patterns:
+          - "*"
+    reviewers:
+      - overcat
+    assignees:
+      - overcat
+    labels:
+      - dependencies
+    ignore:
+      - dependency-name: aiohttp-sse-client
+        versions:
+          - 0.2.1
