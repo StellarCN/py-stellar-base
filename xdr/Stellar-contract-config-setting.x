@@ -124,8 +124,9 @@ enum ContractCostType {
     InvokeVmFunction = 13,
     // Cost of computing a keccak256 hash from bytes.
     ComputeKeccak256Hash = 14,
-    // Cost of computing an ECDSA secp256k1 signature from bytes.
-    ComputeEcdsaSecp256k1Sig = 15,
+    // Cost of decoding an ECDSA signature computed from a 256-bit prime modulus
+    // curve (e.g. secp256k1 and secp256r1)
+    DecodeEcdsaCurve256Sig = 15,
     // Cost of recovering an ECDSA secp256k1 key from a signature.
     RecoverEcdsaSecp256k1Key = 16,
     // Cost of int256 addition (`+`) and subtraction (`-`) operations
@@ -139,7 +140,55 @@ enum ContractCostType {
     // Cost of int256 shift (`shl`, `shr`) operation
     Int256Shift = 21,
     // Cost of drawing random bytes using a ChaCha20 PRNG
-    ChaCha20DrawBytes = 22
+    ChaCha20DrawBytes = 22,
+
+    // Cost of parsing wasm bytes that only encode instructions.
+    ParseWasmInstructions = 23,
+    // Cost of parsing a known number of wasm functions.
+    ParseWasmFunctions = 24,
+    // Cost of parsing a known number of wasm globals.
+    ParseWasmGlobals = 25,
+    // Cost of parsing a known number of wasm table entries.
+    ParseWasmTableEntries = 26,
+    // Cost of parsing a known number of wasm types.
+    ParseWasmTypes = 27,
+    // Cost of parsing a known number of wasm data segments.
+    ParseWasmDataSegments = 28,
+    // Cost of parsing a known number of wasm element segments.
+    ParseWasmElemSegments = 29,
+    // Cost of parsing a known number of wasm imports.
+    ParseWasmImports = 30,
+    // Cost of parsing a known number of wasm exports.
+    ParseWasmExports = 31,
+    // Cost of parsing a known number of data segment bytes.
+    ParseWasmDataSegmentBytes = 32,
+
+    // Cost of instantiating wasm bytes that only encode instructions.
+    InstantiateWasmInstructions = 33,
+    // Cost of instantiating a known number of wasm functions.
+    InstantiateWasmFunctions = 34,
+    // Cost of instantiating a known number of wasm globals.
+    InstantiateWasmGlobals = 35,
+    // Cost of instantiating a known number of wasm table entries.
+    InstantiateWasmTableEntries = 36,
+    // Cost of instantiating a known number of wasm types.
+    InstantiateWasmTypes = 37,
+    // Cost of instantiating a known number of wasm data segments.
+    InstantiateWasmDataSegments = 38,
+    // Cost of instantiating a known number of wasm element segments.
+    InstantiateWasmElemSegments = 39,
+    // Cost of instantiating a known number of wasm imports.
+    InstantiateWasmImports = 40,
+    // Cost of instantiating a known number of wasm exports.
+    InstantiateWasmExports = 41,
+    // Cost of instantiating a known number of data segment bytes.
+    InstantiateWasmDataSegmentBytes = 42,
+
+    // Cost of decoding a bytes array representing an uncompressed SEC-1 encoded
+    // point on a 256-bit elliptic curve
+    Sec1DecodePointUncompressed = 43,
+    // Cost of verifying an ECDSA Secp256r1 signature
+    VerifyEcdsaSecp256r1Sig = 44
 };
 
 struct ContractCostParamEntry {
@@ -165,8 +214,11 @@ struct StateArchivalSettings {
     // Number of snapshots to use when calculating average BucketList size
     uint32 bucketListSizeWindowSampleSize;
 
+    // How often to sample the BucketList size for the average, in ledgers
+    uint32 bucketListWindowSamplePeriod;
+
     // Maximum number of bytes that we scan for eviction per ledger
-    uint64 evictionScanSize;
+    uint32 evictionScanSize;
 
     // Lowest BucketList level to be scanned to evict entries
     uint32 startingEvictionScanLevel;

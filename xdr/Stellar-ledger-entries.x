@@ -508,8 +508,32 @@ struct ContractDataEntry {
     SCVal val;
 };
 
-struct ContractCodeEntry {
+struct ContractCodeCostInputs {
     ExtensionPoint ext;
+    uint32 nInstructions;
+    uint32 nFunctions;
+    uint32 nGlobals;
+    uint32 nTableEntries;
+    uint32 nTypes;
+    uint32 nDataSegments;
+    uint32 nElemSegments;
+    uint32 nImports;
+    uint32 nExports;
+    uint32 nDataSegmentBytes;
+};
+
+struct ContractCodeEntry {
+    union switch (int v)
+    {
+        case 0:
+            void;
+        case 1:
+            struct
+            {
+                ExtensionPoint ext;
+                ContractCodeCostInputs costInputs;
+            } v1;
+    } ext;
 
     Hash hash;
     opaque code<>;

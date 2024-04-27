@@ -7,7 +7,7 @@ import base64
 from xdrlib3 import Packer, Unpacker
 
 from .base import Opaque
-from .extension_point import ExtensionPoint
+from .contract_code_entry_ext import ContractCodeEntryExt
 from .hash import Hash
 
 __all__ = ["ContractCodeEntry"]
@@ -18,7 +18,17 @@ class ContractCodeEntry:
     XDR Source Code::
 
         struct ContractCodeEntry {
-            ExtensionPoint ext;
+            union switch (int v)
+            {
+                case 0:
+                    void;
+                case 1:
+                    struct
+                    {
+                        ExtensionPoint ext;
+                        ContractCodeCostInputs costInputs;
+                    } v1;
+            } ext;
 
             Hash hash;
             opaque code<>;
@@ -27,7 +37,7 @@ class ContractCodeEntry:
 
     def __init__(
         self,
-        ext: ExtensionPoint,
+        ext: ContractCodeEntryExt,
         hash: Hash,
         code: bytes,
     ) -> None:
@@ -42,7 +52,7 @@ class ContractCodeEntry:
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> ContractCodeEntry:
-        ext = ExtensionPoint.unpack(unpacker)
+        ext = ContractCodeEntryExt.unpack(unpacker)
         hash = Hash.unpack(unpacker)
         code = Opaque.unpack(unpacker, 4294967295, False)
         return cls(

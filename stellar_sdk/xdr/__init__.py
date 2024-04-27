@@ -77,7 +77,10 @@ from .config_setting_id import *
 from .config_upgrade_set import *
 from .config_upgrade_set_key import *
 from .constants import *
+from .contract_code_cost_inputs import *
 from .contract_code_entry import *
+from .contract_code_entry_ext import *
+from .contract_code_entry_v1 import *
 from .contract_cost_param_entry import *
 from .contract_cost_params import *
 from .contract_cost_type import *
@@ -158,6 +161,8 @@ from .invoke_host_function_success_pre_image import *
 from .ip_addr_type import *
 from .ledger_bounds import *
 from .ledger_close_meta import *
+from .ledger_close_meta_ext import *
+from .ledger_close_meta_ext_v1 import *
 from .ledger_close_meta_v0 import *
 from .ledger_close_meta_v1 import *
 from .ledger_close_value_signature import *
@@ -350,6 +355,8 @@ from .soroban_credentials_type import *
 from .soroban_resources import *
 from .soroban_transaction_data import *
 from .soroban_transaction_meta import *
+from .soroban_transaction_meta_ext import *
+from .soroban_transaction_meta_ext_v1 import *
 from .sponsorship_descriptor import *
 from .state_archival_settings import *
 from .stellar_message import *

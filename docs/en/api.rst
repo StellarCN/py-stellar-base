@@ -1189,9 +1189,21 @@ ConfigUpgradeSetKey
 -------------------
 .. autoclass:: stellar_sdk.xdr.config_upgrade_set_key.ConfigUpgradeSetKey
 
+ContractCodeCostInputs
+----------------------
+.. autoclass:: stellar_sdk.xdr.contract_code_cost_inputs.ContractCodeCostInputs
+
 ContractCodeEntry
 -----------------
 .. autoclass:: stellar_sdk.xdr.contract_code_entry.ContractCodeEntry
+
+ContractCodeEntryExt
+--------------------
+.. autoclass:: stellar_sdk.xdr.contract_code_entry_ext.ContractCodeEntryExt
+
+ContractCodeEntryV1
+-------------------
+.. autoclass:: stellar_sdk.xdr.contract_code_entry_v1.ContractCodeEntryV1
 
 ContractCostParamEntry
 ----------------------
@@ -1528,6 +1540,14 @@ LedgerBounds
 LedgerCloseMeta
 ---------------
 .. autoclass:: stellar_sdk.xdr.ledger_close_meta.LedgerCloseMeta
+
+LedgerCloseMetaExt
+------------------
+.. autoclass:: stellar_sdk.xdr.ledger_close_meta_ext.LedgerCloseMetaExt
+
+LedgerCloseMetaExtV1
+--------------------
+.. autoclass:: stellar_sdk.xdr.ledger_close_meta_ext_v1.LedgerCloseMetaExtV1
 
 LedgerCloseMetaV0
 -----------------
@@ -2300,6 +2320,14 @@ SorobanTransactionData
 SorobanTransactionMeta
 ----------------------
 .. autoclass:: stellar_sdk.xdr.soroban_transaction_meta.SorobanTransactionMeta
+
+SorobanTransactionMetaExt
+-------------------------
+.. autoclass:: stellar_sdk.xdr.soroban_transaction_meta_ext.SorobanTransactionMetaExt
+
+SorobanTransactionMetaExtV1
+---------------------------
+.. autoclass:: stellar_sdk.xdr.soroban_transaction_meta_ext_v1.SorobanTransactionMetaExtV1
 
 SponsorshipDescriptor
 ---------------------
