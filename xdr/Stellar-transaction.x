@@ -572,7 +572,7 @@ struct SorobanAuthorizationEntry
     SorobanAuthorizedInvocation rootInvocation;
 };
 
-/* Upload WASM, create, and invoke contracts in Soroban.
+/* Upload Wasm, create, and invoke contracts in Soroban.
 
     Threshold: med
     Result: InvokeHostFunctionResult
@@ -588,7 +588,7 @@ struct InvokeHostFunctionOp
 /* Extend the TTL of the entries specified in the readOnly footprint
    so they will live at least extendTo ledgers from lcl.
 
-    Threshold: med
+    Threshold: low
     Result: ExtendFootprintTTLResult
 */
 struct ExtendFootprintTTLOp
@@ -599,7 +599,7 @@ struct ExtendFootprintTTLOp
 
 /* Restore the archived entries specified in the readWrite footprint.
 
-    Threshold: med
+    Threshold: low
     Result: RestoreFootprintOp
 */
 struct RestoreFootprintOp

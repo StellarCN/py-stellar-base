@@ -9,8 +9,8 @@ from xdrlib3 import Packer, Unpacker
 
 from .contract_event import ContractEvent
 from .diagnostic_event import DiagnosticEvent
-from .extension_point import ExtensionPoint
 from .sc_val import SCVal
+from .soroban_transaction_meta_ext import SorobanTransactionMetaExt
 
 __all__ = ["SorobanTransactionMeta"]
 
@@ -21,7 +21,7 @@ class SorobanTransactionMeta:
 
         struct SorobanTransactionMeta
         {
-            ExtensionPoint ext;
+            SorobanTransactionMetaExt ext;
 
             ContractEvent events<>;             // custom events populated by the
                                                 // contracts themselves.
@@ -36,7 +36,7 @@ class SorobanTransactionMeta:
 
     def __init__(
         self,
-        ext: ExtensionPoint,
+        ext: SorobanTransactionMetaExt,
         events: List[ContractEvent],
         return_value: SCVal,
         diagnostic_events: List[DiagnosticEvent],
@@ -68,7 +68,7 @@ class SorobanTransactionMeta:
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> SorobanTransactionMeta:
-        ext = ExtensionPoint.unpack(unpacker)
+        ext = SorobanTransactionMetaExt.unpack(unpacker)
         length = unpacker.unpack_uint()
         events = []
         for _ in range(length):

@@ -11,7 +11,7 @@ class RestoreFootprint(Operation):
     """The :class:`RestoreFootprint` object, which represents a RestoreFootprint
     operation on Stellar's network.
 
-    Threshold: Medium
+    Threshold: Low
 
     See `RestoreFootprintOp <https://soroban.stellar.org/docs/fundamentals-and-concepts/state-expiration#restorefootprintop>`_.
 

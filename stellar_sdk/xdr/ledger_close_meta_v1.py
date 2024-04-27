@@ -7,8 +7,8 @@ from typing import List
 
 from xdrlib3 import Packer, Unpacker
 
-from .extension_point import ExtensionPoint
 from .generalized_transaction_set import GeneralizedTransactionSet
+from .ledger_close_meta_ext import LedgerCloseMetaExt
 from .ledger_entry import LedgerEntry
 from .ledger_header_history_entry import LedgerHeaderHistoryEntry
 from .ledger_key import LedgerKey
@@ -26,9 +26,7 @@ class LedgerCloseMetaV1:
 
         struct LedgerCloseMetaV1
         {
-            // We forgot to add an ExtensionPoint in v0 but at least
-            // we can add one now in v1.
-            ExtensionPoint ext;
+            LedgerCloseMetaExt ext;
 
             LedgerHeaderHistoryEntry ledgerHeader;
 
@@ -60,7 +58,7 @@ class LedgerCloseMetaV1:
 
     def __init__(
         self,
-        ext: ExtensionPoint,
+        ext: LedgerCloseMetaExt,
         ledger_header: LedgerHeaderHistoryEntry,
         tx_set: GeneralizedTransactionSet,
         tx_processing: List[TransactionResultMeta],
@@ -136,7 +134,7 @@ class LedgerCloseMetaV1:
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> LedgerCloseMetaV1:
-        ext = ExtensionPoint.unpack(unpacker)
+        ext = LedgerCloseMetaExt.unpack(unpacker)
         ledger_header = LedgerHeaderHistoryEntry.unpack(unpacker)
         tx_set = GeneralizedTransactionSet.unpack(unpacker)
         length = unpacker.unpack_uint()

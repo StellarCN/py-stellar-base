@@ -13,7 +13,7 @@ xdr/Stellar-contract-config-setting.x
 
 XDRGEN_REPO=overcat/xdrgen
 XDRGEN_COMMIT=c95ec1f7969b5fc0bd2cd5efae67692d9be536c2
-XDRNEXT_COMMIT=6a620d160aab22609c982d54578ff6a63bfcdc01
+XDR_COMMIT=1a04392432dacc0092caaeae22a600ea1af3c6a5
 
 
 ifeq ($(shell uname), Darwin)
@@ -87,7 +87,7 @@ xdr-generate: $(XDRS)
 .PHONY: xdr-generate
 
 xdr/%.x:
-	curl -Lsf -o $@ https://raw.githubusercontent.com/stellar/stellar-xdr/$(XDRNEXT_COMMIT)/$(@F)
+	curl -Lsf -o $@ https://raw.githubusercontent.com/stellar/stellar-xdr/$(XDR_COMMIT)/$(@F)
 .PHONY: xdr
 
 xdr-clean:

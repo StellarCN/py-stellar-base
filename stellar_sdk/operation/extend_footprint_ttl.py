@@ -11,7 +11,7 @@ class ExtendFootprintTTL(Operation):
     """The :class:`ExtendFootprintTTL` object, which represents a ExtendFootprintTTL
     operation on Stellar's network.
 
-    Threshold: Medium
+    Threshold: Low
 
     See `ExtendFootprintTTLOp <https://soroban.stellar.org/docs/fundamentals-and-concepts/state-expiration#ExtendFootprintTTLop>`_.
 

@@ -8,7 +8,6 @@ from xdrlib3 import Packer, Unpacker
 
 from .int64 import Int64
 from .uint32 import Uint32
-from .uint64 import Uint64
 
 __all__ = ["StateArchivalSettings"]
 
@@ -32,8 +31,11 @@ class StateArchivalSettings:
             // Number of snapshots to use when calculating average BucketList size
             uint32 bucketListSizeWindowSampleSize;
 
+            // How often to sample the BucketList size for the average, in ledgers
+            uint32 bucketListWindowSamplePeriod;
+
             // Maximum number of bytes that we scan for eviction per ledger
-            uint64 evictionScanSize;
+            uint32 evictionScanSize;
 
             // Lowest BucketList level to be scanned to evict entries
             uint32 startingEvictionScanLevel;
@@ -49,7 +51,8 @@ class StateArchivalSettings:
         temp_rent_rate_denominator: Int64,
         max_entries_to_archive: Uint32,
         bucket_list_size_window_sample_size: Uint32,
-        eviction_scan_size: Uint64,
+        bucket_list_window_sample_period: Uint32,
+        eviction_scan_size: Uint32,
         starting_eviction_scan_level: Uint32,
     ) -> None:
         self.max_entry_ttl = max_entry_ttl
@@ -59,6 +62,7 @@ class StateArchivalSettings:
         self.temp_rent_rate_denominator = temp_rent_rate_denominator
         self.max_entries_to_archive = max_entries_to_archive
         self.bucket_list_size_window_sample_size = bucket_list_size_window_sample_size
+        self.bucket_list_window_sample_period = bucket_list_window_sample_period
         self.eviction_scan_size = eviction_scan_size
         self.starting_eviction_scan_level = starting_eviction_scan_level
 
@@ -70,6 +74,7 @@ class StateArchivalSettings:
         self.temp_rent_rate_denominator.pack(packer)
         self.max_entries_to_archive.pack(packer)
         self.bucket_list_size_window_sample_size.pack(packer)
+        self.bucket_list_window_sample_period.pack(packer)
         self.eviction_scan_size.pack(packer)
         self.starting_eviction_scan_level.pack(packer)
 
@@ -82,7 +87,8 @@ class StateArchivalSettings:
         temp_rent_rate_denominator = Int64.unpack(unpacker)
         max_entries_to_archive = Uint32.unpack(unpacker)
         bucket_list_size_window_sample_size = Uint32.unpack(unpacker)
-        eviction_scan_size = Uint64.unpack(unpacker)
+        bucket_list_window_sample_period = Uint32.unpack(unpacker)
+        eviction_scan_size = Uint32.unpack(unpacker)
         starting_eviction_scan_level = Uint32.unpack(unpacker)
         return cls(
             max_entry_ttl=max_entry_ttl,
@@ -92,6 +98,7 @@ class StateArchivalSettings:
             temp_rent_rate_denominator=temp_rent_rate_denominator,
             max_entries_to_archive=max_entries_to_archive,
             bucket_list_size_window_sample_size=bucket_list_size_window_sample_size,
+            bucket_list_window_sample_period=bucket_list_window_sample_period,
             eviction_scan_size=eviction_scan_size,
             starting_eviction_scan_level=starting_eviction_scan_level,
         )
@@ -125,6 +132,7 @@ class StateArchivalSettings:
                 self.temp_rent_rate_denominator,
                 self.max_entries_to_archive,
                 self.bucket_list_size_window_sample_size,
+                self.bucket_list_window_sample_period,
                 self.eviction_scan_size,
                 self.starting_eviction_scan_level,
             )
@@ -143,6 +151,8 @@ class StateArchivalSettings:
             and self.max_entries_to_archive == other.max_entries_to_archive
             and self.bucket_list_size_window_sample_size
             == other.bucket_list_size_window_sample_size
+            and self.bucket_list_window_sample_period
+            == other.bucket_list_window_sample_period
             and self.eviction_scan_size == other.eviction_scan_size
             and self.starting_eviction_scan_level == other.starting_eviction_scan_level
         )
@@ -156,6 +166,7 @@ class StateArchivalSettings:
             f"temp_rent_rate_denominator={self.temp_rent_rate_denominator}",
             f"max_entries_to_archive={self.max_entries_to_archive}",
             f"bucket_list_size_window_sample_size={self.bucket_list_size_window_sample_size}",
+            f"bucket_list_window_sample_period={self.bucket_list_window_sample_period}",
             f"eviction_scan_size={self.eviction_scan_size}",
             f"starting_eviction_scan_level={self.starting_eviction_scan_level}",
         ]
