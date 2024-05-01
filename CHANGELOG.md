@@ -3,6 +3,14 @@ Release History
 
 ### Pending
 
+### Version 9.4.0
+
+Released on May 01, 2024
+
+#### Update
+- chore: The generated XDR has been upgraded to match the upcoming Protocol 21, namely [stellar/stellar-xdr@v21.1](https://github.com/stellar/stellar-xdr/tree/v21.1). ([#927](https://github.com/StellarCN/py-stellar-base/pull/927))
+- chore: updated various dependencies.
+
 ### Version 9.3.0
 
 Released on March 13, 2024
