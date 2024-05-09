@@ -76,7 +76,12 @@ class TestSorobanServer:
         }
 
     def test_get_health(self):
-        result = {"status": "healthy"}
+        result = {
+            "status": "healthy",
+            "latestLedger": 50000,
+            "oldestLedger": 1,
+            "ledgerRetentionWindow": 10000,
+        }
         data = {
             "jsonrpc": "2.0",
             "id": "198cb1a8-9104-4446-a269-88bf000c2721",
@@ -285,6 +290,7 @@ class TestSorobanServer:
                     ],
                     "value": "AAAAAwAAAAE=",
                     "inSuccessfulContractCall": True,
+                    "txHash": "db86e94aa98b7d38213c041ebbb727fbaabf0b7c435de594f36c2d51fc61926d",
                 },
                 {
                     "type": "contract",
@@ -299,6 +305,7 @@ class TestSorobanServer:
                     ],
                     "value": "AAAAAwAAAAI=",
                     "inSuccessfulContractCall": True,
+                    "txHash": "db86e94aa98b7d38213c041ebbb727fbaabf0b7c435de594f36c2d51fc61926d",
                 },
             ],
             "latestLedger": "187",
@@ -390,6 +397,14 @@ class TestSorobanServer:
                 }
             ],
             "cost": {"cpuInsns": "1240100", "memBytes": "161637"},
+            "stateChanges": [
+                {
+                    "type": "created",
+                    "key": "AAAAAAAAAABuaCbVXZ2DlXWarV6UxwbW3GNJgpn3ASChIFp5bxSIWg==",
+                    "before": None,
+                    "after": "AAAAZAAAAAAAAAAAbmgm1V2dg5V1mq1elMcG1txjSYKZ9wEgoSBaeW8UiFoAAAAAAAAAZAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=",
+                }
+            ],
             "latestLedger": "1479",
         }
         data = {
