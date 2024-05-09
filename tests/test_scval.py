@@ -13,6 +13,8 @@ def test_address():
     expected_scval = addr.to_xdr_sc_val()
     assert scval == expected_scval
     assert from_address(scval) == addr
+    assert from_address(scval.to_xdr()) == addr
+    assert from_address(scval.to_xdr_bytes()) == addr
 
 
 def test_bool():
@@ -27,6 +29,8 @@ def test_void():
     expected_scval = xdr.SCVal(stellar_xdr.SCValType.SCV_VOID)
     assert scval == expected_scval
     assert from_void(scval) is None
+    assert from_void(scval.to_xdr()) is None
+    assert from_void(scval.to_xdr_bytes()) is None
 
 
 def test_bytes():
@@ -35,6 +39,8 @@ def test_bytes():
     expected_scval = xdr.SCVal(stellar_xdr.SCValType.SCV_BYTES, bytes=xdr.SCBytes(v))
     assert scval == expected_scval
     assert from_bytes(scval) == v
+    assert from_bytes(scval.to_xdr()) == v
+    assert from_bytes(scval.to_xdr_bytes()) == v
 
 
 @pytest.mark.parametrize("v", [(2**64) - 1, 0])
@@ -46,6 +52,8 @@ def test_duration(v):
 
     assert scval == expected_scval
     assert from_duration(scval) == v
+    assert from_duration(scval.to_xdr()) == v
+    assert from_duration(scval.to_xdr_bytes()) == v
 
 
 @pytest.mark.parametrize("v", [2**64, -1])
@@ -61,6 +69,8 @@ def test_int32(v):
     expected_scval = xdr.SCVal(stellar_xdr.SCValType.SCV_I32, i32=xdr.Int32(v))
     assert scval == expected_scval
     assert from_int32(scval) == v
+    assert from_int32(scval.to_xdr()) == v
+    assert from_int32(scval.to_xdr_bytes()) == v
 
 
 @pytest.mark.parametrize("v", [2**31, -(2**31) - 1])
@@ -75,6 +85,8 @@ def test_int64(v):
     expected_scval = xdr.SCVal(stellar_xdr.SCValType.SCV_I64, i64=xdr.Int64(v))
     assert scval == expected_scval
     assert from_int64(scval) == v
+    assert from_int64(scval.to_xdr()) == v
+    assert from_int64(scval.to_xdr_bytes()) == v
 
 
 @pytest.mark.parametrize("v", [2**63, -(2**63) - 1])
@@ -99,6 +111,8 @@ def test_int128(v, expected_xdr):
     scval = to_int128(v)
     assert scval.to_xdr() == expected_xdr
     assert from_int128(scval) == v
+    assert from_int128(scval.to_xdr()) == v
+    assert from_int128(scval.to_xdr_bytes()) == v
 
 
 @pytest.mark.parametrize("v", [2**127, -(2**127) - 1])
@@ -130,6 +144,8 @@ def test_int256(v, expected_xdr):
     scval = to_int256(v)
     assert scval.to_xdr() == expected_xdr
     assert from_int256(scval) == v
+    assert from_int256(scval.to_xdr()) == v
+    assert from_int256(scval.to_xdr_bytes()) == v
 
 
 @pytest.mark.parametrize("v", [2**255, -(2**255) - 1])
@@ -157,6 +173,8 @@ def test_map():
     )
     assert scval == expected_scval
     assert from_map(scval) == v
+    assert from_map(scval.to_xdr()) == v
+    assert from_map(scval.to_xdr_bytes()) == v
 
 
 @pytest.mark.parametrize("v", ["hello", b"world"])
@@ -168,6 +186,8 @@ def test_string(v):
     expected_scval = xdr.SCVal(stellar_xdr.SCValType.SCV_STRING, str=xdr.SCString(v))
     assert scval == expected_scval
     assert from_string(scval) == v
+    assert from_string(scval.to_xdr()) == v
+    assert from_string(scval.to_xdr_bytes()) == v
 
 
 def test_symbol():
@@ -178,6 +198,8 @@ def test_symbol():
     )
     assert scval == expected_scval
     assert from_symbol(scval) == v
+    assert from_symbol(scval.to_xdr()) == v
+    assert from_symbol(scval.to_xdr_bytes()) == v
 
 
 def test_timepoint():
@@ -188,6 +210,8 @@ def test_timepoint():
     )
     assert scval == expected_scval
     assert from_timepoint(scval) == v
+    assert from_timepoint(scval.to_xdr()) == v
+    assert from_timepoint(scval.to_xdr_bytes()) == v
 
 
 @pytest.mark.parametrize("v", [2**64, -1])
@@ -202,6 +226,8 @@ def test_uint32(v):
     expected_scval = xdr.SCVal(stellar_xdr.SCValType.SCV_U32, u32=xdr.Uint32(v))
     assert scval == expected_scval
     assert from_uint32(scval) == v
+    assert from_uint32(scval.to_xdr()) == v
+    assert from_uint32(scval.to_xdr_bytes()) == v
 
 
 @pytest.mark.parametrize("v", [2**32, -1])
@@ -216,6 +242,8 @@ def test_uint64(v):
     expected_scval = xdr.SCVal(stellar_xdr.SCValType.SCV_U64, u64=xdr.Uint64(v))
     assert scval == expected_scval
     assert from_uint64(scval) == v
+    assert from_uint64(scval.to_xdr()) == v
+    assert from_uint64(scval.to_xdr_bytes()) == v
 
 
 @pytest.mark.parametrize("v", [2**64, -1])
@@ -237,6 +265,8 @@ def test_uint128(v, expected_xdr):
     scval = to_uint128(v)
     assert scval.to_xdr() == expected_xdr
     assert from_uint128(scval) == v
+    assert from_uint128(scval.to_xdr()) == v
+    assert from_uint128(scval.to_xdr_bytes()) == v
 
 
 @pytest.mark.parametrize("v", [-1, 2**128])
@@ -263,6 +293,8 @@ def test_uint256(v, expected_xdr):
     scval = to_uint256(v)
     assert scval.to_xdr() == expected_xdr
     assert from_uint256(scval) == v
+    assert from_uint256(scval.to_xdr()) == v
+    assert from_uint256(scval.to_xdr_bytes()) == v
 
 
 @pytest.mark.parametrize("v", [-1, 2**256])
@@ -286,6 +318,8 @@ def test_vec():
     )
     assert scval == expected_scval
     assert from_vec(scval) == v
+    assert from_vec(scval.to_xdr()) == v
+    assert from_vec(scval.to_xdr_bytes()) == v
 
 
 def test_enum_with_value():
@@ -297,6 +331,8 @@ def test_enum_with_value():
     )
     assert scval == expected_scval
     assert from_enum(scval) == (key, value)
+    assert from_enum(scval.to_xdr()) == (key, value)
+    assert from_enum(scval.to_xdr_bytes()) == (key, value)
 
 
 def test_enum_without_value():
@@ -307,6 +343,8 @@ def test_enum_without_value():
     )
     assert scval == expected_scval
     assert from_enum(scval) == (key, None)
+    assert from_enum(scval.to_xdr()) == (key, None)
+    assert from_enum(scval.to_xdr_bytes()) == (key, None)
 
 
 def test_tuple_struct():
@@ -318,6 +356,8 @@ def test_tuple_struct():
     )
     assert scval == expected_scval
     assert from_tuple_struct(scval) == v
+    assert from_tuple_struct(scval.to_xdr()) == v
+    assert from_tuple_struct(scval.to_xdr_bytes()) == v
 
 
 def test_struct():
@@ -359,3 +399,5 @@ def test_struct():
     )
     assert scval == expected_scval
     assert from_struct(scval) == v
+    assert from_struct(scval.to_xdr()) == v
+    assert from_struct(scval.to_xdr_bytes()) == v
