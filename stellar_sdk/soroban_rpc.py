@@ -64,6 +64,7 @@ class EventInfo(BaseModel):
     topic: List[str] = Field(alias="topic")
     value: str = Field(alias="value")
     in_successful_contract_call: bool = Field(alias="inSuccessfulContractCall")
+    transaction_hash: str = Field(alias="txHash")
 
 
 class PaginationOptions(BaseModel):
@@ -142,6 +143,9 @@ class GetHealthResponse(BaseModel):
     """
 
     status: str
+    latest_ledger: int = Field(alias="latestLedger")
+    oldest_ledger: int = Field(alias="oldestLedger")
+    ledger_retention_window: int = Field(alias="ledgerRetentionWindow")
 
 
 # simulate_transaction
@@ -194,6 +198,21 @@ class RestorePreamble(BaseModel):
     min_resource_fee: int = Field(alias="minResourceFee")
 
 
+class LedgerEntryChange(BaseModel):
+    """LedgerEntryChange designates a change in a ledger entry. Before and After cannot be omitted at the same time.
+    If Before is omitted, it constitutes a creation, if After is omitted, it constitutes a deletion.
+    """
+
+    # LedgerEntryChangeType
+    type: str
+    # LedgerEntryKey in base64
+    key: str
+    # LedgerEntry XDR in base64
+    before: Optional[str] = None
+    # LedgerEntry XDR in base64
+    after: Optional[str] = None
+
+
 class SimulateTransactionResponse(BaseModel):
     """Response for JSON-RPC method simulateTransaction.
 
@@ -214,6 +233,10 @@ class SimulateTransactionResponse(BaseModel):
     # the effective cpu and memory cost of the invoked transaction execution.
     restore_preamble: Optional[RestorePreamble] = Field(
         alias="restorePreamble", default=None
+    )
+    # If present, it indicates how the state (ledger entries) will change as a result of the transaction execution.
+    state_changes: Optional[List[LedgerEntryChange]] = Field(
+        alias="stateChanges", default=None
     )
     # If present, it indicates that a prior RestoreFootprint is required
     latest_ledger: int = Field(alias="latestLedger")
