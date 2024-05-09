@@ -3,6 +3,7 @@ Release History
 
 ### Pending
 #### Update
+- feat: add support for Soroban-RPC 21.
 - improve: The function in `stellar_xdr.scval` can accept `sc_val` of `base64` and `bytes` types.
 
 ### Version 9.4.0
