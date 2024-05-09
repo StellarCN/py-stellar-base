@@ -65,7 +65,8 @@ def to_address(data: Union[Address, str]) -> stellar_xdr.SCVal:
 def from_address(sc_val: Union[stellar_xdr.SCVal, bytes, str]) -> Address:
     """Creates an :class:`stellar_sdk.address.Address` object from a :class:`stellar_sdk.xdr.SCVal` XDR object.
 
-    :param sc_val: The :class:`stellar_sdk.xdr.SCVal` XDR object to convert, or
+    :param sc_val: The :class:`stellar_sdk.xdr.SCVal` XDR object to convert.
+        It can also be an :class:`stellar_sdk.xdr.SCVal` expressed in base64 or bytes.
     :return: An :class:`stellar_sdk.address.Address` object.
     :raises: :exc:`ValueError` if ``sc_val`` is not of type :class:`stellar_sdk.xdr.SCValType.SCV_ADDRESS`.
     """
