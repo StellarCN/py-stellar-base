@@ -2,6 +2,8 @@ Release History
 ==============
 
 ### Pending
+#### Update
+- improve: The function in `stellar_xdr.scval` can accept `sc_val` of `base64` and `bytes` types.
 
 ### Version 9.4.0
 
