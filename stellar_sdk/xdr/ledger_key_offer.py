@@ -76,7 +76,7 @@ class LedgerKeyOffer:
             return NotImplemented
         return self.seller_id == other.seller_id and self.offer_id == other.offer_id
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"seller_id={self.seller_id}",
             f"offer_id={self.offer_id}",

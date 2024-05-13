@@ -56,5 +56,5 @@ class Value:
             return NotImplemented
         return self.value == other.value
 
-    def __str__(self):
+    def __repr__(self):
         return f"<Value [value={self.value}]>"

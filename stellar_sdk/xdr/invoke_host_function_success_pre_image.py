@@ -87,7 +87,7 @@ class InvokeHostFunctionSuccessPreImage:
             return NotImplemented
         return self.return_value == other.return_value and self.events == other.events
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"return_value={self.return_value}",
             f"events={self.events}",

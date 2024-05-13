@@ -97,7 +97,7 @@ class SCAddress:
             and self.contract_id == other.contract_id
         )
 
-    def __str__(self):
+    def __repr__(self):
         out = []
         out.append(f"type={self.type}")
         out.append(

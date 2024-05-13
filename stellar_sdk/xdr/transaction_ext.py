@@ -85,7 +85,7 @@ class TransactionExt:
             return NotImplemented
         return self.v == other.v and self.soroban_data == other.soroban_data
 
-    def __str__(self):
+    def __repr__(self):
         out = []
         out.append(f"v={self.v}")
         out.append(

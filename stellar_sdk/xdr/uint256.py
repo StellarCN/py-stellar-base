@@ -56,5 +56,5 @@ class Uint256:
             return NotImplemented
         return self.uint256 == other.uint256
 
-    def __str__(self):
+    def __repr__(self):
         return f"<Uint256 [uint256={self.uint256}]>"

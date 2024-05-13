@@ -76,7 +76,7 @@ class DecoratedSignature:
             return NotImplemented
         return self.hint == other.hint and self.signature == other.signature
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"hint={self.hint}",
             f"signature={self.signature}",

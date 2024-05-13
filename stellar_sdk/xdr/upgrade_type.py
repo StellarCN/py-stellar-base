@@ -56,5 +56,5 @@ class UpgradeType:
             return NotImplemented
         return self.upgrade_type == other.upgrade_type
 
-    def __str__(self):
+    def __repr__(self):
         return f"<UpgradeType [upgrade_type={self.upgrade_type}]>"

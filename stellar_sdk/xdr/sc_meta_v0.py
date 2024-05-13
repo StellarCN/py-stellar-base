@@ -75,7 +75,7 @@ class SCMetaV0:
             return NotImplemented
         return self.key == other.key and self.val == other.val
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"key={self.key}",
             f"val={self.val}",

@@ -157,7 +157,7 @@ class StateArchivalSettings:
             and self.starting_eviction_scan_level == other.starting_eviction_scan_level
         )
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"max_entry_ttl={self.max_entry_ttl}",
             f"min_temporary_ttl={self.min_temporary_ttl}",

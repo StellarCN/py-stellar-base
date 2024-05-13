@@ -140,7 +140,7 @@ class ManageSellOfferResult:
             return NotImplemented
         return self.code == other.code and self.success == other.success
 
-    def __str__(self):
+    def __repr__(self):
         out = []
         out.append(f"code={self.code}")
         out.append(f"success={self.success}") if self.success is not None else None

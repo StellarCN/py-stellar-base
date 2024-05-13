@@ -75,7 +75,7 @@ class TimeBounds:
             return NotImplemented
         return self.min_time == other.min_time and self.max_time == other.max_time
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"min_time={self.min_time}",
             f"max_time={self.max_time}",

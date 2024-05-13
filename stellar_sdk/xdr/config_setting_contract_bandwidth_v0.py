@@ -91,7 +91,7 @@ class ConfigSettingContractBandwidthV0:
             and self.fee_tx_size1_kb == other.fee_tx_size1_kb
         )
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"ledger_max_txs_size_bytes={self.ledger_max_txs_size_bytes}",
             f"tx_max_size_bytes={self.tx_max_size_bytes}",

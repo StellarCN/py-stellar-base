@@ -82,7 +82,7 @@ class ConfigSettingContractEventsV0:
             and self.fee_contract_events1_kb == other.fee_contract_events1_kb
         )
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"tx_max_contract_events_size_bytes={self.tx_max_contract_events_size_bytes}",
             f"fee_contract_events1_kb={self.fee_contract_events1_kb}",

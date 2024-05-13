@@ -84,7 +84,7 @@ class ClaimableBalanceEntryExtensionV1:
             return NotImplemented
         return self.ext == other.ext and self.flags == other.flags
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"ext={self.ext}",
             f"flags={self.flags}",

@@ -56,5 +56,5 @@ class Thresholds:
             return NotImplemented
         return self.thresholds == other.thresholds
 
-    def __str__(self):
+    def __repr__(self):
         return f"<Thresholds [thresholds={self.thresholds}]>"

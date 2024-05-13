@@ -133,7 +133,7 @@ class ClaimableBalanceEntry:
             and self.ext == other.ext
         )
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"balance_id={self.balance_id}",
             f"claimants={self.claimants}",

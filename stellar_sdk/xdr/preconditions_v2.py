@@ -165,7 +165,7 @@ class PreconditionsV2:
             and self.extra_signers == other.extra_signers
         )
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"time_bounds={self.time_bounds}",
             f"ledger_bounds={self.ledger_bounds}",

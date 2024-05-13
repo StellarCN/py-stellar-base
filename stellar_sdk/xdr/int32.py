@@ -56,5 +56,5 @@ class Int32:
             return NotImplemented
         return self.int32 == other.int32
 
-    def __str__(self):
+    def __repr__(self):
         return f"<Int32 [int32={self.int32}]>"

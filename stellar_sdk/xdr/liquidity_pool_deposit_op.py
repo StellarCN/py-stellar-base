@@ -104,7 +104,7 @@ class LiquidityPoolDepositOp:
             and self.max_price == other.max_price
         )
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"liquidity_pool_id={self.liquidity_pool_id}",
             f"max_amount_a={self.max_amount_a}",

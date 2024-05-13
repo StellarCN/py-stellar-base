@@ -79,7 +79,7 @@ class FeeBumpTransactionInnerTx:
             return NotImplemented
         return self.type == other.type and self.v1 == other.v1
 
-    def __str__(self):
+    def __repr__(self):
         out = []
         out.append(f"type={self.type}")
         out.append(f"v1={self.v1}") if self.v1 is not None else None

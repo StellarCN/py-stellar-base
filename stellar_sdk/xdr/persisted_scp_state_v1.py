@@ -101,7 +101,7 @@ class PersistedSCPStateV1:
             and self.quorum_sets == other.quorum_sets
         )
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"scp_envelopes={self.scp_envelopes}",
             f"quorum_sets={self.quorum_sets}",

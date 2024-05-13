@@ -186,7 +186,7 @@ class PeerStats:
             and self.duplicate_fetch_message_recv == other.duplicate_fetch_message_recv
         )
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"id={self.id}",
             f"version_str={self.version_str}",

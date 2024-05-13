@@ -67,5 +67,5 @@ class SCVec:
             return NotImplemented
         return self.sc_vec == other.sc_vec
 
-    def __str__(self):
+    def __repr__(self):
         return f"<SCVec [sc_vec={self.sc_vec}]>"

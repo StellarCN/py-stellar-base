@@ -68,7 +68,7 @@ class ContractCostParams:
             return NotImplemented
         return self.contract_cost_params == other.contract_cost_params
 
-    def __str__(self):
+    def __repr__(self):
         return (
             f"<ContractCostParams [contract_cost_params={self.contract_cost_params}]>"
         )

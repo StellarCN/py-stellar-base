@@ -63,5 +63,5 @@ class SponsorshipDescriptor:
             return NotImplemented
         return self.sponsorship_descriptor == other.sponsorship_descriptor
 
-    def __str__(self):
+    def __repr__(self):
         return f"<SponsorshipDescriptor [sponsorship_descriptor={self.sponsorship_descriptor}]>"

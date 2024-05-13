@@ -79,7 +79,7 @@ class SCPHistoryEntry:
             return NotImplemented
         return self.v == other.v and self.v0 == other.v0
 
-    def __str__(self):
+    def __repr__(self):
         out = []
         out.append(f"v={self.v}")
         out.append(f"v0={self.v0}") if self.v0 is not None else None

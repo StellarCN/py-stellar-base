@@ -88,7 +88,7 @@ class StoredDebugTransactionSet:
             and self.scp_value == other.scp_value
         )
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"tx_set={self.tx_set}",
             f"ledger_seq={self.ledger_seq}",

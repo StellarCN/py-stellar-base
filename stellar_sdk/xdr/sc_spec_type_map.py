@@ -75,7 +75,7 @@ class SCSpecTypeMap:
             return NotImplemented
         return self.key_type == other.key_type and self.value_type == other.value_type
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"key_type={self.key_type}",
             f"value_type={self.value_type}",

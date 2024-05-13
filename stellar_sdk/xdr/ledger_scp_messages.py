@@ -87,7 +87,7 @@ class LedgerSCPMessages:
             return NotImplemented
         return self.ledger_seq == other.ledger_seq and self.messages == other.messages
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"ledger_seq={self.ledger_seq}",
             f"messages={self.messages}",

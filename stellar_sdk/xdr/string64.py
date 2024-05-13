@@ -56,5 +56,5 @@ class String64:
             return NotImplemented
         return self.string64 == other.string64
 
-    def __str__(self):
+    def __repr__(self):
         return f"<String64 [string64={self.string64}]>"

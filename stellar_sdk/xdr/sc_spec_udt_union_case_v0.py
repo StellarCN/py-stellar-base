@@ -97,7 +97,7 @@ class SCSpecUDTUnionCaseV0:
             and self.tuple_case == other.tuple_case
         )
 
-    def __str__(self):
+    def __repr__(self):
         out = []
         out.append(f"kind={self.kind}")
         out.append(

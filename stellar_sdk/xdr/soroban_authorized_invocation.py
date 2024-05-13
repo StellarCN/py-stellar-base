@@ -89,7 +89,7 @@ class SorobanAuthorizedInvocation:
             and self.sub_invocations == other.sub_invocations
         )
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"function={self.function}",
             f"sub_invocations={self.sub_invocations}",

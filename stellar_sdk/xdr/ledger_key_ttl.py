@@ -65,7 +65,7 @@ class LedgerKeyTtl:
             return NotImplemented
         return self.key_hash == other.key_hash
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"key_hash={self.key_hash}",
         ]

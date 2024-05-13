@@ -64,7 +64,7 @@ class SCSpecTypeBytesN:
             return NotImplemented
         return self.n == other.n
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"n={self.n}",
         ]

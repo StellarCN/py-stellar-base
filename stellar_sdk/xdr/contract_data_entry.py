@@ -105,7 +105,7 @@ class ContractDataEntry:
             and self.val == other.val
         )
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"ext={self.ext}",
             f"contract={self.contract}",

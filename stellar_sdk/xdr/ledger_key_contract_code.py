@@ -64,7 +64,7 @@ class LedgerKeyContractCode:
             return NotImplemented
         return self.hash == other.hash
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"hash={self.hash}",
         ]

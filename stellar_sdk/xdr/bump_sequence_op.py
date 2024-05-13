@@ -64,7 +64,7 @@ class BumpSequenceOp:
             return NotImplemented
         return self.bump_to == other.bump_to
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"bump_to={self.bump_to}",
         ]

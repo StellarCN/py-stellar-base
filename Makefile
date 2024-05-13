@@ -12,7 +12,7 @@ xdr/Stellar-internal.x \
 xdr/Stellar-contract-config-setting.x
 
 XDRGEN_REPO=overcat/xdrgen
-XDRGEN_COMMIT=c95ec1f7969b5fc0bd2cd5efae67692d9be536c2
+XDRGEN_COMMIT=c5f88c2ec9c39296aebf06da8756bb7f8b83b34e
 XDR_COMMIT=1a04392432dacc0092caaeae22a600ea1af3c6a5
 
 

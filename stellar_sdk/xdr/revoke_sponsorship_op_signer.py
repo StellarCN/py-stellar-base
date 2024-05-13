@@ -78,7 +78,7 @@ class RevokeSponsorshipOpSigner:
             self.account_id == other.account_id and self.signer_key == other.signer_key
         )
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"account_id={self.account_id}",
             f"signer_key={self.signer_key}",

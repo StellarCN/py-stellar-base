@@ -76,7 +76,7 @@ class LedgerCloseValueSignature:
             return NotImplemented
         return self.node_id == other.node_id and self.signature == other.signature
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"node_id={self.node_id}",
             f"signature={self.signature}",

@@ -64,7 +64,7 @@ class ConfigSettingContractHistoricalDataV0:
             return NotImplemented
         return self.fee_historical1_kb == other.fee_historical1_kb
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"fee_historical1_kb={self.fee_historical1_kb}",
         ]

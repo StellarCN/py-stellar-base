@@ -180,7 +180,7 @@ class AccountEntry:
             and self.ext == other.ext
         )
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"account_id={self.account_id}",
             f"balance={self.balance}",

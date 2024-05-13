@@ -76,7 +76,7 @@ class AlphaNum4:
             return NotImplemented
         return self.asset_code == other.asset_code and self.issuer == other.issuer
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"asset_code={self.asset_code}",
             f"issuer={self.issuer}",

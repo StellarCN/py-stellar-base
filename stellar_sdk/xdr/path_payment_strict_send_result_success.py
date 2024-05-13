@@ -87,7 +87,7 @@ class PathPaymentStrictSendResultSuccess:
             return NotImplemented
         return self.offers == other.offers and self.last == other.last
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"offers={self.offers}",
             f"last={self.last}",

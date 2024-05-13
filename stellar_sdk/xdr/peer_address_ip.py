@@ -96,7 +96,7 @@ class PeerAddressIp:
             and self.ipv6 == other.ipv6
         )
 
-    def __str__(self):
+    def __repr__(self):
         out = []
         out.append(f"type={self.type}")
         out.append(f"ipv4={self.ipv4}") if self.ipv4 is not None else None

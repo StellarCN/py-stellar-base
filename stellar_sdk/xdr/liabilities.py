@@ -75,7 +75,7 @@ class Liabilities:
             return NotImplemented
         return self.buying == other.buying and self.selling == other.selling
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"buying={self.buying}",
             f"selling={self.selling}",

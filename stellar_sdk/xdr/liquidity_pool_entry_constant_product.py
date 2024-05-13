@@ -107,7 +107,7 @@ class LiquidityPoolEntryConstantProduct:
             and self.pool_shares_trust_line_count == other.pool_shares_trust_line_count
         )
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"params={self.params}",
             f"reserve_a={self.reserve_a}",

@@ -98,7 +98,7 @@ class AllowTrustResult:
             return NotImplemented
         return self.code == other.code
 
-    def __str__(self):
+    def __repr__(self):
         out = []
         out.append(f"code={self.code}")
         return f"<AllowTrustResult [{', '.join(out)}]>"

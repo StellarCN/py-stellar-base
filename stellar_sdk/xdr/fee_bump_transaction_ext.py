@@ -67,7 +67,7 @@ class FeeBumpTransactionExt:
             return NotImplemented
         return self.v == other.v
 
-    def __str__(self):
+    def __repr__(self):
         out = []
         out.append(f"v={self.v}")
         return f"<FeeBumpTransactionExt [{', '.join(out)}]>"

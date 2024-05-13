@@ -97,7 +97,7 @@ class SorobanAddressCredentials:
             and self.signature == other.signature
         )
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"address={self.address}",
             f"nonce={self.nonce}",

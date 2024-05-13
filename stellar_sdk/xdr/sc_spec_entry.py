@@ -142,7 +142,7 @@ class SCSpecEntry:
             and self.udt_error_enum_v0 == other.udt_error_enum_v0
         )
 
-    def __str__(self):
+    def __repr__(self):
         out = []
         out.append(f"kind={self.kind}")
         out.append(

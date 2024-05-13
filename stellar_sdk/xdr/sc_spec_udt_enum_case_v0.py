@@ -88,7 +88,7 @@ class SCSpecUDTEnumCaseV0:
             and self.value == other.value
         )
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"doc={self.doc}",
             f"name={self.name}",

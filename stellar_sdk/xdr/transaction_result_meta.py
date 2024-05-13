@@ -88,7 +88,7 @@ class TransactionResultMeta:
             and self.tx_apply_processing == other.tx_apply_processing
         )
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"result={self.result}",
             f"fee_processing={self.fee_processing}",

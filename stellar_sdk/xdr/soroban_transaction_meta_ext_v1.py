@@ -127,7 +127,7 @@ class SorobanTransactionMetaExtV1:
             and self.rent_fee_charged == other.rent_fee_charged
         )
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"ext={self.ext}",
             f"total_non_refundable_resource_fee_charged={self.total_non_refundable_resource_fee_charged}",

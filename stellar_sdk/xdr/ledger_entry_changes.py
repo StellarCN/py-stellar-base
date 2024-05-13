@@ -67,7 +67,7 @@ class LedgerEntryChanges:
             return NotImplemented
         return self.ledger_entry_changes == other.ledger_entry_changes
 
-    def __str__(self):
+    def __repr__(self):
         return (
             f"<LedgerEntryChanges [ledger_entry_changes={self.ledger_entry_changes}]>"
         )

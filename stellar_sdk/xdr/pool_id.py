@@ -56,5 +56,5 @@ class PoolID:
             return NotImplemented
         return self.pool_id == other.pool_id
 
-    def __str__(self):
+    def __repr__(self):
         return f"<PoolID [pool_id={self.pool_id}]>"

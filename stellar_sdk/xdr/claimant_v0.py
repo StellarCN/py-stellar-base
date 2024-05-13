@@ -78,7 +78,7 @@ class ClaimantV0:
             self.destination == other.destination and self.predicate == other.predicate
         )
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"destination={self.destination}",
             f"predicate={self.predicate}",

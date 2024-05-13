@@ -64,7 +64,7 @@ class LedgerKeyClaimableBalance:
             return NotImplemented
         return self.balance_id == other.balance_id
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"balance_id={self.balance_id}",
         ]

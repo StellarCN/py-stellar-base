@@ -85,7 +85,7 @@ class TrustLineEntryExtensionV2:
             and self.ext == other.ext
         )
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"liquidity_pool_use_count={self.liquidity_pool_use_count}",
             f"ext={self.ext}",

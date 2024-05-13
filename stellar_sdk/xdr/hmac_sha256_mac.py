@@ -64,7 +64,7 @@ class HmacSha256Mac:
             return NotImplemented
         return self.mac == other.mac
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"mac={self.mac}",
         ]

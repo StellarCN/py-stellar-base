@@ -56,5 +56,5 @@ class DataValue:
             return NotImplemented
         return self.data_value == other.data_value
 
-    def __str__(self):
+    def __repr__(self):
         return f"<DataValue [data_value={self.data_value}]>"

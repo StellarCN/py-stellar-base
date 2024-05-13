@@ -123,7 +123,7 @@ class ChangeTrustAsset:
             and self.liquidity_pool == other.liquidity_pool
         )
 
-    def __str__(self):
+    def __repr__(self):
         out = []
         out.append(f"type={self.type}")
         out.append(

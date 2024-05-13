@@ -205,7 +205,7 @@ class ConfigSettingContractLedgerCostV0:
             == other.bucket_list_write_fee_growth_factor
         )
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"ledger_max_read_ledger_entries={self.ledger_max_read_ledger_entries}",
             f"ledger_max_read_bytes={self.ledger_max_read_bytes}",

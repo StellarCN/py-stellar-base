@@ -96,7 +96,7 @@ class CreatePassiveSellOfferOp:
             and self.price == other.price
         )
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"selling={self.selling}",
             f"buying={self.buying}",

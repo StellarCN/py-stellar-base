@@ -67,5 +67,5 @@ class SCMap:
             return NotImplemented
         return self.sc_map == other.sc_map
 
-    def __str__(self):
+    def __repr__(self):
         return f"<SCMap [sc_map={self.sc_map}]>"

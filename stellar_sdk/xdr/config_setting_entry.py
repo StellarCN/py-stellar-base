@@ -383,7 +383,7 @@ class ConfigSettingEntry:
             and self.eviction_iterator == other.eviction_iterator
         )
 
-    def __str__(self):
+    def __repr__(self):
         out = []
         out.append(f"config_setting_id={self.config_setting_id}")
         out.append(

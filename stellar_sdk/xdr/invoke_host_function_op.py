@@ -89,7 +89,7 @@ class InvokeHostFunctionOp:
             return NotImplemented
         return self.host_function == other.host_function and self.auth == other.auth
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"host_function={self.host_function}",
             f"auth={self.auth}",

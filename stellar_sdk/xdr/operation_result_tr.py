@@ -542,7 +542,7 @@ class OperationResultTr:
             and self.restore_footprint_result == other.restore_footprint_result
         )
 
-    def __str__(self):
+    def __repr__(self):
         out = []
         out.append(f"type={self.type}")
         out.append(

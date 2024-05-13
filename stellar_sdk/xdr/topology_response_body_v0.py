@@ -96,7 +96,7 @@ class TopologyResponseBodyV0:
             and self.total_outbound_peer_count == other.total_outbound_peer_count
         )
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"inbound_peers={self.inbound_peers}",
             f"outbound_peers={self.outbound_peers}",

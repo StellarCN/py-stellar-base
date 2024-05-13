@@ -56,5 +56,5 @@ class Duration:
             return NotImplemented
         return self.duration == other.duration
 
-    def __str__(self):
+    def __repr__(self):
         return f"<Duration [duration={self.duration}]>"

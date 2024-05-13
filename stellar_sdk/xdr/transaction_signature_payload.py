@@ -91,7 +91,7 @@ class TransactionSignaturePayload:
             and self.tagged_transaction == other.tagged_transaction
         )
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"network_id={self.network_id}",
             f"tagged_transaction={self.tagged_transaction}",

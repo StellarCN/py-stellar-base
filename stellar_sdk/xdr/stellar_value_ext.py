@@ -85,7 +85,7 @@ class StellarValueExt:
             return NotImplemented
         return self.v == other.v and self.lc_value_signature == other.lc_value_signature
 
-    def __str__(self):
+    def __repr__(self):
         out = []
         out.append(f"v={self.v}")
         out.append(

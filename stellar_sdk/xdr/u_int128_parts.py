@@ -74,7 +74,7 @@ class UInt128Parts:
             return NotImplemented
         return self.hi == other.hi and self.lo == other.lo
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"hi={self.hi}",
             f"lo={self.lo}",

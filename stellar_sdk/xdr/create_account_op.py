@@ -79,7 +79,7 @@ class CreateAccountOp:
             and self.starting_balance == other.starting_balance
         )
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"destination={self.destination}",
             f"starting_balance={self.starting_balance}",

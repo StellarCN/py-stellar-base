@@ -133,7 +133,7 @@ class CreateClaimableBalanceResult:
             return NotImplemented
         return self.code == other.code and self.balance_id == other.balance_id
 
-    def __str__(self):
+    def __repr__(self):
         out = []
         out.append(f"code={self.code}")
         out.append(

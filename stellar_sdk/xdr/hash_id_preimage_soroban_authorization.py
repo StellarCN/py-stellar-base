@@ -97,7 +97,7 @@ class HashIDPreimageSorobanAuthorization:
             and self.invocation == other.invocation
         )
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"network_id={self.network_id}",
             f"nonce={self.nonce}",

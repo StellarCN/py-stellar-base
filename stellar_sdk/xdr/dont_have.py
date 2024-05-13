@@ -76,7 +76,7 @@ class DontHave:
             return NotImplemented
         return self.type == other.type and self.req_hash == other.req_hash
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"type={self.type}",
             f"req_hash={self.req_hash}",

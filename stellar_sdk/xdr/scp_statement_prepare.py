@@ -121,7 +121,7 @@ class SCPStatementPrepare:
             and self.n_h == other.n_h
         )
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"quorum_set_hash={self.quorum_set_hash}",
             f"ballot={self.ballot}",

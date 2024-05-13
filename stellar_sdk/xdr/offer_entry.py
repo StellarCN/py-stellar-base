@@ -144,7 +144,7 @@ class OfferEntry:
             and self.ext == other.ext
         )
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"seller_id={self.seller_id}",
             f"offer_id={self.offer_id}",

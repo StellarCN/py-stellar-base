@@ -108,7 +108,7 @@ class SCPQuorumSet:
             and self.inner_sets == other.inner_sets
         )
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"threshold={self.threshold}",
             f"validators={self.validators}",

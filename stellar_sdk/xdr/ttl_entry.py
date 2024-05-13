@@ -79,7 +79,7 @@ class TTLEntry:
             and self.live_until_ledger_seq == other.live_until_ledger_seq
         )
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"key_hash={self.key_hash}",
             f"live_until_ledger_seq={self.live_until_ledger_seq}",

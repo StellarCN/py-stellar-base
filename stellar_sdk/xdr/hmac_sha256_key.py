@@ -64,7 +64,7 @@ class HmacSha256Key:
             return NotImplemented
         return self.key == other.key
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"key={self.key}",
         ]

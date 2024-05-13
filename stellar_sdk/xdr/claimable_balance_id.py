@@ -79,7 +79,7 @@ class ClaimableBalanceID:
             return NotImplemented
         return self.type == other.type and self.v0 == other.v0
 
-    def __str__(self):
+    def __repr__(self):
         out = []
         out.append(f"type={self.type}")
         out.append(f"v0={self.v0}") if self.v0 is not None else None

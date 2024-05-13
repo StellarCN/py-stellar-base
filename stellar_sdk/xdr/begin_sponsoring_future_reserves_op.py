@@ -64,7 +64,7 @@ class BeginSponsoringFutureReservesOp:
             return NotImplemented
         return self.sponsored_id == other.sponsored_id
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"sponsored_id={self.sponsored_id}",
         ]

@@ -222,7 +222,7 @@ class LedgerCloseMetaV1:
             == other.evicted_persistent_ledger_entries
         )
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"ext={self.ext}",
             f"ledger_header={self.ledger_header}",

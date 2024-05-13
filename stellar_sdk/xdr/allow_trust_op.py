@@ -90,7 +90,7 @@ class AllowTrustOp:
             and self.authorize == other.authorize
         )
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"trustor={self.trustor}",
             f"asset={self.asset}",

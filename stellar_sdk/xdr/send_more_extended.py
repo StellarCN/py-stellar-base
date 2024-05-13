@@ -78,7 +78,7 @@ class SendMoreExtended:
             and self.num_bytes == other.num_bytes
         )
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"num_messages={self.num_messages}",
             f"num_bytes={self.num_bytes}",

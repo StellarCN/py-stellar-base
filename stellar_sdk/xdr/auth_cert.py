@@ -88,7 +88,7 @@ class AuthCert:
             and self.sig == other.sig
         )
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"pubkey={self.pubkey}",
             f"expiration={self.expiration}",

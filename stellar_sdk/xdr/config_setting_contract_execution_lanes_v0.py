@@ -65,7 +65,7 @@ class ConfigSettingContractExecutionLanesV0:
             return NotImplemented
         return self.ledger_max_tx_count == other.ledger_max_tx_count
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"ledger_max_tx_count={self.ledger_max_tx_count}",
         ]

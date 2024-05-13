@@ -56,5 +56,5 @@ class String32:
             return NotImplemented
         return self.string32 == other.string32
 
-    def __str__(self):
+    def __repr__(self):
         return f"<String32 [string32={self.string32}]>"

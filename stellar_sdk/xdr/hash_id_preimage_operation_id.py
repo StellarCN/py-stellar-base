@@ -88,7 +88,7 @@ class HashIDPreimageOperationID:
             and self.op_num == other.op_num
         )
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"source_account={self.source_account}",
             f"seq_num={self.seq_num}",

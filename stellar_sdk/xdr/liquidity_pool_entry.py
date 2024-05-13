@@ -94,7 +94,7 @@ class LiquidityPoolEntry:
             and self.body == other.body
         )
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"liquidity_pool_id={self.liquidity_pool_id}",
             f"body={self.body}",

@@ -107,7 +107,7 @@ class SCSpecUDTErrorEnumV0:
             and self.cases == other.cases
         )
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"doc={self.doc}",
             f"lib={self.lib}",

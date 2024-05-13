@@ -105,7 +105,7 @@ class SurveyRequestMessage:
             and self.command_type == other.command_type
         )
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"surveyor_peer_id={self.surveyor_peer_id}",
             f"surveyed_peer_id={self.surveyed_peer_id}",

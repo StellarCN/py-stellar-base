@@ -139,7 +139,7 @@ class Hello:
             and self.nonce == other.nonce
         )
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"ledger_version={self.ledger_version}",
             f"overlay_version={self.overlay_version}",

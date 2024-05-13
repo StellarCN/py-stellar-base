@@ -182,7 +182,7 @@ class InnerTransactionResultResult:
             return NotImplemented
         return self.code == other.code and self.results == other.results
 
-    def __str__(self):
+    def __repr__(self):
         out = []
         out.append(f"code={self.code}")
         out.append(f"results={self.results}") if self.results is not None else None

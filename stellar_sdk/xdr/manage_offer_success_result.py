@@ -97,7 +97,7 @@ class ManageOfferSuccessResult:
             return NotImplemented
         return self.offers_claimed == other.offers_claimed and self.offer == other.offer
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"offers_claimed={self.offers_claimed}",
             f"offer={self.offer}",

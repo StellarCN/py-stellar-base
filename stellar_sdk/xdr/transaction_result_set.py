@@ -75,7 +75,7 @@ class TransactionResultSet:
             return NotImplemented
         return self.results == other.results
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"results={self.results}",
         ]

@@ -100,7 +100,7 @@ class TransactionMetaV2:
             and self.tx_changes_after == other.tx_changes_after
         )
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"tx_changes_before={self.tx_changes_before}",
             f"operations={self.operations}",

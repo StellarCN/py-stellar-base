@@ -68,5 +68,5 @@ class TxAdvertVector:
             return NotImplemented
         return self.tx_advert_vector == other.tx_advert_vector
 
-    def __str__(self):
+    def __repr__(self):
         return f"<TxAdvertVector [tx_advert_vector={self.tx_advert_vector}]>"

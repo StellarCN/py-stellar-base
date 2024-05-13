@@ -79,7 +79,7 @@ class SignedSurveyRequestMessage:
             and self.request == other.request
         )
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"request_signature={self.request_signature}",
             f"request={self.request}",

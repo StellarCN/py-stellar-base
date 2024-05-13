@@ -56,5 +56,5 @@ class Signature:
             return NotImplemented
         return self.signature == other.signature
 
-    def __str__(self):
+    def __repr__(self):
         return f"<Signature [signature={self.signature}]>"

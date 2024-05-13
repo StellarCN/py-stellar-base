@@ -208,7 +208,7 @@ class TransactionResultResult:
             and self.results == other.results
         )
 
-    def __str__(self):
+    def __repr__(self):
         out = []
         out.append(f"code={self.code}")
         out.append(

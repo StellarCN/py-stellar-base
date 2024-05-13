@@ -98,7 +98,7 @@ class InvokeContractArgs:
             and self.args == other.args
         )
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"contract_address={self.contract_address}",
             f"function_name={self.function_name}",

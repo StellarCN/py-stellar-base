@@ -123,7 +123,7 @@ class StellarValue:
             and self.ext == other.ext
         )
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"tx_set_hash={self.tx_set_hash}",
             f"close_time={self.close_time}",
