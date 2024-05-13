@@ -294,7 +294,7 @@ class Transaction:
             and self.v1 == other.v1
         )
 
-    def __str__(self):
+    def __repr__(self):
         return (
             f"<Transaction [source={self.source}, sequence={self.sequence}, "
             f"fee={self.fee}, operations={self.operations}, memo={self.memo}, "

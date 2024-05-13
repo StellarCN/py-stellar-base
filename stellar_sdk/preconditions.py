@@ -203,7 +203,7 @@ class Preconditions:
             and self.extra_signers == other.extra_signers
         )
 
-    def __str__(self):
+    def __repr__(self):
         return (
             f"<Preconditions ["
             f"time_bounds={self.time_bounds}, "

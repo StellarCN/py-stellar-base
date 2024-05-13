@@ -134,5 +134,5 @@ class Address:
             return NotImplemented
         return self.key == other.key and self.type == other.type
 
-    def __str__(self):
+    def __repr__(self):
         return f"<Address [type={self.type.name}, address={self.address}]>"

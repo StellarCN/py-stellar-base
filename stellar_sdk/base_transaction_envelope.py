@@ -144,7 +144,7 @@ class BaseTransactionEnvelope(Generic[T]):
     def __eq__(self, other: object) -> bool:
         pass  # pragma: no cover
 
-    def __str__(self):
+    def __repr__(self):
         return (
             f"<BaseTransactionEnvelope [network_passphrase={self.network_passphrase}, "
             f"signatures={self.signatures}]>"

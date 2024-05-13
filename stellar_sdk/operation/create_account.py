@@ -77,7 +77,7 @@ class CreateAccount(Operation):
         )
         return op
 
-    def __str__(self):
+    def __repr__(self):
         return (
             f"<CreateAccount [destination={self.destination}, "
             f"starting_balance={self.starting_balance}, "

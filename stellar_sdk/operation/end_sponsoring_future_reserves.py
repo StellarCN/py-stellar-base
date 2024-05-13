@@ -43,5 +43,5 @@ class EndSponsoringFutureReserves(Operation):
         op = cls(source=source)
         return op
 
-    def __str__(self):
+    def __repr__(self):
         return f"<EndSponsoringFutureReserves [source={self.source}]>"

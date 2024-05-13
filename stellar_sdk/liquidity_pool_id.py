@@ -53,5 +53,5 @@ class LiquidityPoolId:
             return NotImplemented
         return self.liquidity_pool_id == other.liquidity_pool_id
 
-    def __str__(self):
+    def __repr__(self):
         return f"<LiquidityPoolId [liquidity_pool_id={self.liquidity_pool_id}]>"

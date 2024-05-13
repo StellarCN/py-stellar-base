@@ -241,7 +241,7 @@ class PayStellarUri(StellarUri):
             signature=signature,
         )
 
-    def __str__(self):
+    def __repr__(self):
         return (
             f"<PayStellarUri [destination={self.destination}, amount={self.amount}, "
             f"asset_code={self.asset_code}, asset_issuer={self.asset_issuer}, "
@@ -309,7 +309,7 @@ class Replacement:
         self.reference_identifier = reference_identifier
         self.hint = hint
 
-    def __str__(self):
+    def __repr__(self):
         return (
             f"<Replacement [txrep_tx_field_name={self.txrep_tx_field_name}, "
             f"reference_identifier={self.reference_identifier}, "
@@ -479,7 +479,7 @@ class TransactionStellarUri(StellarUri):
             signature=signature,
         )
 
-    def __str__(self):
+    def __repr__(self):
         return (
             f"<TransactionStellarUri [xdr={self.transaction_envelope.to_xdr()}, replace={self.replace}, "
             f"callback={self.callback}, pubkey={self.pubkey}, "

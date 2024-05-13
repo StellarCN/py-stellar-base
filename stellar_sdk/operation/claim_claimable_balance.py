@@ -65,5 +65,5 @@ class ClaimClaimableBalance(Operation):
         op = cls(balance_id=balance_id, source=source)
         return op
 
-    def __str__(self):
+    def __repr__(self):
         return f"<ClaimClaimableBalance [balance_id={self.balance_id}, source={self.source}]>"

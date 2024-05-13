@@ -97,7 +97,7 @@ class ManageSellOffer(Operation):
         )
         return op
 
-    def __str__(self):
+    def __repr__(self):
         return (
             f"<ManageSellOffer [selling={self.selling}, buying={self.buying}, "
             f"amount={self.amount}, price={self.price}, offer_id={self.offer_id}, source={self.source}]>"

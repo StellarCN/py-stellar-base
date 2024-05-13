@@ -41,7 +41,7 @@ class Response:
             and self.url == other.url
         )
 
-    def __str__(self):
+    def __repr__(self):
         return (
             f"<Response [status_code={self.status_code}, "
             f"text={self.text}, "

@@ -63,5 +63,5 @@ class Network:
             return NotImplemented
         return self.network_passphrase == other.network_passphrase
 
-    def __str__(self):
+    def __repr__(self):
         return f"<Network [network_passphrase={self.network_passphrase}]>"

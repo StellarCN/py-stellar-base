@@ -54,7 +54,7 @@ class ExtendFootprintTTL(Operation):
         op = cls(source=source, extend_to=extend_to)
         return op
 
-    def __str__(self):
+    def __repr__(self):
         return (
             f"<ExtendFootprintTTL [extend_to={self.extend_to}, source={self.source}]>"
         )

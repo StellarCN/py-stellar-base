@@ -16,5 +16,5 @@ class Ed25519PublicKeySigner:
             return NotImplemented
         return self.account_id == other.account_id and self.weight == other.weight
 
-    def __str__(self):
+    def __repr__(self):
         return f"<Ed25519PublicKeySigner [account_id={self.account_id}, weight={self.weight}]>"

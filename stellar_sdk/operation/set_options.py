@@ -234,7 +234,7 @@ class SetOptions(Operation):
         )
         return op
 
-    def __str__(self):
+    def __repr__(self):
         return (
             f"<SetOptions [inflation_dest={self.inflation_dest}, "
             f"clear_flags={self.clear_flags}, "

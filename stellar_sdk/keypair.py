@@ -296,5 +296,5 @@ class Keypair:
             and self.signing_key == other.signing_key
         )
 
-    def __str__(self):
+    def __repr__(self):
         return f"<Keypair [public_key={self.public_key}, private_key_exists={self.can_sign()}]>"

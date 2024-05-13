@@ -140,7 +140,7 @@ class AllowTrust(Operation):
         )
         return op
 
-    def __str__(self):
+    def __repr__(self):
         return (
             f"<AllowTrust [trustor={self.trustor}, "
             f"asset_code={self.asset_code}, "

@@ -34,7 +34,7 @@ class SignedPayloadSigner:
             return NotImplemented
         return self.account_id == other.account_id and self.payload == self.payload
 
-    def __str__(self):
+    def __repr__(self):
         return f"<SignedPayloadSigner [account_id={self.account_id}, payload={self.payload}]>"
 
 
@@ -253,5 +253,5 @@ class SignerKey:
             and self.signer_key_type == self.signer_key_type
         )
 
-    def __str__(self):
+    def __repr__(self):
         return f"<SignerKey [signer_key={self.signer_key}, signer_key_type={self.signer_key_type}]>"

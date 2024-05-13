@@ -163,7 +163,7 @@ class TransactionEnvelope(BaseTransactionEnvelope["TransactionEnvelope"]):
             and self.signatures == other.signatures
         )
 
-    def __str__(self):
+    def __repr__(self):
         return (
             f"<TransactionEnvelope [transaction={self.transaction}, "
             f"network_passphrase={self.network_passphrase}, signatures={self.signatures}]>"

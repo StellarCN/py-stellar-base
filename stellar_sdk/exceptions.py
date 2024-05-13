@@ -108,7 +108,7 @@ class BaseHorizonError(BaseRequestError):
         self.extras: Optional[dict] = message.get("extras")
         self.result_xdr: Optional[str] = message.get("extras", {}).get("result_xdr")
 
-    def __str__(self):
+    def __repr__(self):
         return self.message
 
 

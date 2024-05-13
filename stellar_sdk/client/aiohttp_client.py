@@ -259,7 +259,7 @@ class AiohttpClient(BaseAsyncClient):
         if self._sse_session is not None:
             await self._sse_session.__aexit__(None, None, None)
 
-    def __str__(self):
+    def __repr__(self):
         return (
             f"<AiohttpClient [pool_size={self.pool_size}, "
             f"request_timeout={self.request_timeout}, "

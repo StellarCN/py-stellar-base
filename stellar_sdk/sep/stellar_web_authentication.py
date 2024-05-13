@@ -78,7 +78,7 @@ class ChallengeTransaction:
             and self.memo == other.memo
         )
 
-    def __str__(self):
+    def __repr__(self):
         return f"<ChallengeTransaction [transaction={self.transaction}, client_account_id={self.client_account_id}, memo={self.memo}, matched_home_domain={self.matched_home_domain}]>"
 
 

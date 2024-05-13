@@ -58,7 +58,7 @@ class FederationRecord:
     def __hash__(self):
         return hash((self.account_id, self.stellar_address, self.memo_type, self.memo))
 
-    def __str__(self):
+    def __repr__(self):
         return (
             f"<FederationRecord [account_id={self.account_id}, stellar_address={self.stellar_address}, "
             f"memo_type={self.memo_type}, memo={self.memo}]>"

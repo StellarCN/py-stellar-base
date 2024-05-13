@@ -37,5 +37,5 @@ class Inflation(Operation):
         op = cls(source)
         return op
 
-    def __str__(self):
+    def __repr__(self):
         return f"<Inflation [source={self.source}]>"

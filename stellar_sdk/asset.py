@@ -249,5 +249,5 @@ class Asset:
             return NotImplemented
         return self.code == other.code and self.issuer == other.issuer
 
-    def __str__(self):
+    def __repr__(self):
         return f"<Asset [code={self.code}, issuer={self.issuer}, type={self.type}]>"

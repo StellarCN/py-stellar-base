@@ -94,7 +94,7 @@ class BaseCallBuilder(_BaseCallBuilder):
             and self.client == other.client
         )
 
-    def __str__(self):
+    def __repr__(self):
         return (
             f"<CallBuilder [horizon_url={self.horizon_url}, "
             f"endpoint={self.endpoint}, "
