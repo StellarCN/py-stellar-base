@@ -1192,13 +1192,13 @@ fixture = ["fixtures"]
 
 [[package]]
 name = "requests-sse"
-version = "0.3.1"
+version = "0.3.2"
 description = "server-sent events python client library based on requests"
 optional = false
-python-versions = ">=3.7,<4.0"
+python-versions = "<4.0,>=3.7"
 files = [
-    {file = "requests_sse-0.3.1-py3-none-any.whl", hash = "sha256:cd6db456bf2175dadc82f7d05efbee6178ee49247a967d935097ff16fa4228e3"},
-    {file = "requests_sse-0.3.1.tar.gz", hash = "sha256:c9d8a3cbe9315a776d167f3359a8623d9d57c9e8d187a30ae3b4a6f076178cda"},
+    {file = "requests_sse-0.3.2-py3-none-any.whl", hash = "sha256:c3399b689f6e7bf0eac7c2031211d66ffbb3ab77afc6c9226a71c73c06609f61"},
+    {file = "requests_sse-0.3.2.tar.gz", hash = "sha256:3e17bd324e500c9b11c7c23dd00af3f0222070328134bda67a8917985cfc4127"},
 ]
 
 [package.dependencies]
