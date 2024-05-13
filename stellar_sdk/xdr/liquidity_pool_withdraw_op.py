@@ -95,7 +95,7 @@ class LiquidityPoolWithdrawOp:
             and self.min_amount_b == other.min_amount_b
         )
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"liquidity_pool_id={self.liquidity_pool_id}",
             f"amount={self.amount}",

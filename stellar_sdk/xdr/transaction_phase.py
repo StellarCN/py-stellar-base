@@ -90,7 +90,7 @@ class TransactionPhase:
             return NotImplemented
         return self.v == other.v and self.v0_components == other.v0_components
 
-    def __str__(self):
+    def __repr__(self):
         out = []
         out.append(f"v={self.v}")
         out.append(

@@ -88,7 +88,7 @@ class LedgerKeyContractData:
             and self.durability == other.durability
         )
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"contract={self.contract}",
             f"key={self.key}",

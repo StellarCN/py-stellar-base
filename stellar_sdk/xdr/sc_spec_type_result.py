@@ -75,7 +75,7 @@ class SCSpecTypeResult:
             return NotImplemented
         return self.ok_type == other.ok_type and self.error_type == other.error_type
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"ok_type={self.ok_type}",
             f"error_type={self.error_type}",

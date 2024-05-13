@@ -94,7 +94,7 @@ class PeerAddress:
             and self.num_failures == other.num_failures
         )
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"ip={self.ip}",
             f"port={self.port}",

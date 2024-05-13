@@ -76,7 +76,7 @@ class LedgerKeyData:
             return NotImplemented
         return self.account_id == other.account_id and self.data_name == other.data_name
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"account_id={self.account_id}",
             f"data_name={self.data_name}",

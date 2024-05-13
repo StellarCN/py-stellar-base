@@ -76,7 +76,7 @@ class LedgerKeyTrustLine:
             return NotImplemented
         return self.account_id == other.account_id and self.asset == other.asset
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"account_id={self.account_id}",
             f"asset={self.asset}",

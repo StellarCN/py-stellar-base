@@ -167,7 +167,7 @@ class OperationResult:
             return NotImplemented
         return self.code == other.code and self.tr == other.tr
 
-    def __str__(self):
+    def __repr__(self):
         out = []
         out.append(f"code={self.code}")
         out.append(f"tr={self.tr}") if self.tr is not None else None

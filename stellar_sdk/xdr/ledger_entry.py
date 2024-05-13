@@ -121,7 +121,7 @@ class LedgerEntry:
             and self.ext == other.ext
         )
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"last_modified_ledger_seq={self.last_modified_ledger_seq}",
             f"data={self.data}",

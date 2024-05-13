@@ -109,7 +109,7 @@ class SorobanAuthorizedFunction:
             and self.create_contract_host_fn == other.create_contract_host_fn
         )
 
-    def __str__(self):
+    def __repr__(self):
         out = []
         out.append(f"type={self.type}")
         out.append(

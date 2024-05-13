@@ -88,7 +88,7 @@ class ContractCostParamEntry:
             and self.linear_term == other.linear_term
         )
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"ext={self.ext}",
             f"const_term={self.const_term}",

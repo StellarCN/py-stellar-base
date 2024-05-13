@@ -85,7 +85,7 @@ class TransactionHistoryEntryExt:
             return NotImplemented
         return self.v == other.v and self.generalized_tx_set == other.generalized_tx_set
 
-    def __str__(self):
+    def __repr__(self):
         out = []
         out.append(f"v={self.v}")
         out.append(

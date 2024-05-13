@@ -94,7 +94,7 @@ class Int256Parts:
             and self.lo_lo == other.lo_lo
         )
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"hi_hi={self.hi_hi}",
             f"hi_lo={self.hi_lo}",

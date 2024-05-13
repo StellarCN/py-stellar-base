@@ -79,7 +79,7 @@ class SignedSurveyResponseMessage:
             and self.response == other.response
         )
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"response_signature={self.response_signature}",
             f"response={self.response}",

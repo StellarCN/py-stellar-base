@@ -57,5 +57,5 @@ class SCSymbol:
             return NotImplemented
         return self.sc_symbol == other.sc_symbol
 
-    def __str__(self):
+    def __repr__(self):
         return f"<SCSymbol [sc_symbol={self.sc_symbol}]>"

@@ -76,7 +76,7 @@ class SCPBallot:
             return NotImplemented
         return self.counter == other.counter and self.value == other.value
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"counter={self.counter}",
             f"value={self.value}",

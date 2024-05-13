@@ -64,7 +64,7 @@ class Auth:
             return NotImplemented
         return self.flags == other.flags
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"flags={self.flags}",
         ]

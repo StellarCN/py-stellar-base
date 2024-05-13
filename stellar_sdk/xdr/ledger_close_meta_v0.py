@@ -146,7 +146,7 @@ class LedgerCloseMetaV0:
             and self.scp_info == other.scp_info
         )
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"ledger_header={self.ledger_header}",
             f"tx_set={self.tx_set}",

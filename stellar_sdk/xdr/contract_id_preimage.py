@@ -101,7 +101,7 @@ class ContractIDPreimage:
             and self.from_asset == other.from_asset
         )
 
-    def __str__(self):
+    def __repr__(self):
         out = []
         out.append(f"type={self.type}")
         out.append(

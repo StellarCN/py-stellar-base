@@ -383,7 +383,7 @@ class StellarMessage:
             and self.flood_demand == other.flood_demand
         )
 
-    def __str__(self):
+    def __repr__(self):
         out = []
         out.append(f"type={self.type}")
         out.append(f"error={self.error}") if self.error is not None else None

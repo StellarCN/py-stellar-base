@@ -76,7 +76,7 @@ class ContractIDPreimageFromAddress:
             return NotImplemented
         return self.address == other.address and self.salt == other.salt
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"address={self.address}",
             f"salt={self.salt}",

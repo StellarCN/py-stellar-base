@@ -56,5 +56,5 @@ class SequenceNumber:
             return NotImplemented
         return self.sequence_number == other.sequence_number
 
-    def __str__(self):
+    def __repr__(self):
         return f"<SequenceNumber [sequence_number={self.sequence_number}]>"

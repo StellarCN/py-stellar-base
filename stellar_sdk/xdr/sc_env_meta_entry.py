@@ -82,7 +82,7 @@ class SCEnvMetaEntry:
             and self.interface_version == other.interface_version
         )
 
-    def __str__(self):
+    def __repr__(self):
         out = []
         out.append(f"kind={self.kind}")
         out.append(

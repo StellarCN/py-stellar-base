@@ -79,7 +79,7 @@ class SorobanAuthorizationEntry:
             and self.root_invocation == other.root_invocation
         )
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"credentials={self.credentials}",
             f"root_invocation={self.root_invocation}",

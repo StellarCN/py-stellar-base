@@ -64,7 +64,7 @@ class FloodDemand:
             return NotImplemented
         return self.tx_hashes == other.tx_hashes
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"tx_hashes={self.tx_hashes}",
         ]

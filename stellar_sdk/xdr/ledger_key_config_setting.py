@@ -64,7 +64,7 @@ class LedgerKeyConfigSetting:
             return NotImplemented
         return self.config_setting_id == other.config_setting_id
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"config_setting_id={self.config_setting_id}",
         ]

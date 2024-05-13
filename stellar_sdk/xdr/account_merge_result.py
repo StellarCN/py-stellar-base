@@ -118,7 +118,7 @@ class AccountMergeResult:
             and self.source_account_balance == other.source_account_balance
         )
 
-    def __str__(self):
+    def __repr__(self):
         out = []
         out.append(f"code={self.code}")
         out.append(

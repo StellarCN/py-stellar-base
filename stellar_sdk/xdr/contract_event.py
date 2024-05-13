@@ -115,7 +115,7 @@ class ContractEvent:
             and self.body == other.body
         )
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"ext={self.ext}",
             f"contract_id={self.contract_id}",

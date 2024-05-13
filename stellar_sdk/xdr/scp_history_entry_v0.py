@@ -90,7 +90,7 @@ class SCPHistoryEntryV0:
             and self.ledger_messages == other.ledger_messages
         )
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"quorum_sets={self.quorum_sets}",
             f"ledger_messages={self.ledger_messages}",

@@ -89,7 +89,7 @@ class TransactionMetaV1:
             self.tx_changes == other.tx_changes and self.operations == other.operations
         )
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"tx_changes={self.tx_changes}",
             f"operations={self.operations}",

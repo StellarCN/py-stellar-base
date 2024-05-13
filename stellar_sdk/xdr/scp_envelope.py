@@ -76,7 +76,7 @@ class SCPEnvelope:
             return NotImplemented
         return self.statement == other.statement and self.signature == other.signature
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"statement={self.statement}",
             f"signature={self.signature}",

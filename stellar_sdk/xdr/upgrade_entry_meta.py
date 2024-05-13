@@ -76,7 +76,7 @@ class UpgradeEntryMeta:
             return NotImplemented
         return self.upgrade == other.upgrade and self.changes == other.changes
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"upgrade={self.upgrade}",
             f"changes={self.changes}",

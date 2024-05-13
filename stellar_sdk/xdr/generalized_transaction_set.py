@@ -80,7 +80,7 @@ class GeneralizedTransactionSet:
             return NotImplemented
         return self.v == other.v and self.v1_tx_set == other.v1_tx_set
 
-    def __str__(self):
+    def __repr__(self):
         out = []
         out.append(f"v={self.v}")
         out.append(

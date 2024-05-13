@@ -97,7 +97,7 @@ class SorobanTransactionData:
             and self.resource_fee == other.resource_fee
         )
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"ext={self.ext}",
             f"resources={self.resources}",

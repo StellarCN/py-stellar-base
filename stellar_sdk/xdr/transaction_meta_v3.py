@@ -126,7 +126,7 @@ class TransactionMetaV3:
             and self.soroban_meta == other.soroban_meta
         )
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"ext={self.ext}",
             f"tx_changes_before={self.tx_changes_before}",

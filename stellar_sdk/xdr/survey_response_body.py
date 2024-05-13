@@ -97,7 +97,7 @@ class SurveyResponseBody:
             and self.topology_response_body_v1 == other.topology_response_body_v1
         )
 
-    def __str__(self):
+    def __repr__(self):
         out = []
         out.append(f"type={self.type}")
         out.append(

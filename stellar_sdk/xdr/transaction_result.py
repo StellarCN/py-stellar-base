@@ -122,7 +122,7 @@ class TransactionResult:
             and self.ext == other.ext
         )
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"fee_charged={self.fee_charged}",
             f"result={self.result}",

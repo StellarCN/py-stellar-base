@@ -80,7 +80,7 @@ class SCContractInstance:
             return NotImplemented
         return self.executable == other.executable and self.storage == other.storage
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"executable={self.executable}",
             f"storage={self.storage}",

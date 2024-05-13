@@ -68,5 +68,5 @@ class TxDemandVector:
             return NotImplemented
         return self.tx_demand_vector == other.tx_demand_vector
 
-    def __str__(self):
+    def __repr__(self):
         return f"<TxDemandVector [tx_demand_vector={self.tx_demand_vector}]>"

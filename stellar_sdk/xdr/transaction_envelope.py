@@ -112,7 +112,7 @@ class TransactionEnvelope:
             and self.fee_bump == other.fee_bump
         )
 
-    def __str__(self):
+    def __repr__(self):
         out = []
         out.append(f"type={self.type}")
         out.append(f"v0={self.v0}") if self.v0 is not None else None

@@ -100,7 +100,7 @@ class SorobanResources:
             and self.write_bytes == other.write_bytes
         )
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"footprint={self.footprint}",
             f"instructions={self.instructions}",

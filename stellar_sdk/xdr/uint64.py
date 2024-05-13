@@ -56,5 +56,5 @@ class Uint64:
             return NotImplemented
         return self.uint64 == other.uint64
 
-    def __str__(self):
+    def __repr__(self):
         return f"<Uint64 [uint64={self.uint64}]>"

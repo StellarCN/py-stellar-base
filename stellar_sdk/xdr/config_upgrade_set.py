@@ -74,7 +74,7 @@ class ConfigUpgradeSet:
             return NotImplemented
         return self.updated_entry == other.updated_entry
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"updated_entry={self.updated_entry}",
         ]

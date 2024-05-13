@@ -154,7 +154,7 @@ class Transaction:
             and self.ext == other.ext
         )
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"source_account={self.source_account}",
             f"fee={self.fee}",

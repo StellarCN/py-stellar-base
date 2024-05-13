@@ -56,5 +56,5 @@ class AssetCode4:
             return NotImplemented
         return self.asset_code4 == other.asset_code4
 
-    def __str__(self):
+    def __repr__(self):
         return f"<AssetCode4 [asset_code4={self.asset_code4}]>"

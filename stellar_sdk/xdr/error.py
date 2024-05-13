@@ -76,7 +76,7 @@ class Error:
             return NotImplemented
         return self.code == other.code and self.msg == other.msg
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"code={self.code}",
             f"msg={self.msg}",

@@ -172,7 +172,7 @@ class LedgerUpgrade:
             and self.new_max_soroban_tx_set_size == other.new_max_soroban_tx_set_size
         )
 
-    def __str__(self):
+    def __repr__(self):
         out = []
         out.append(f"type={self.type}")
         out.append(

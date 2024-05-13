@@ -81,7 +81,7 @@ class ManageDataOp:
             return NotImplemented
         return self.data_name == other.data_name and self.data_value == other.data_value
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"data_name={self.data_name}",
             f"data_value={self.data_value}",

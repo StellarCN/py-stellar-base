@@ -78,7 +78,7 @@ class SignerKeyEd25519SignedPayload:
             return NotImplemented
         return self.ed25519 == other.ed25519 and self.payload == other.payload
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"ed25519={self.ed25519}",
             f"payload={self.payload}",

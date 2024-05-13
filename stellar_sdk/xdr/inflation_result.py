@@ -96,7 +96,7 @@ class InflationResult:
             return NotImplemented
         return self.code == other.code and self.payouts == other.payouts
 
-    def __str__(self):
+    def __repr__(self):
         out = []
         out.append(f"code={self.code}")
         out.append(f"payouts={self.payouts}") if self.payouts is not None else None

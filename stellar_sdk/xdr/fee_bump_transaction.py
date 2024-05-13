@@ -107,7 +107,7 @@ class FeeBumpTransaction:
             and self.ext == other.ext
         )
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"fee_source={self.fee_source}",
             f"fee={self.fee}",

@@ -107,7 +107,7 @@ class Asset:
             and self.alpha_num12 == other.alpha_num12
         )
 
-    def __str__(self):
+    def __repr__(self):
         out = []
         out.append(f"type={self.type}")
         out.append(

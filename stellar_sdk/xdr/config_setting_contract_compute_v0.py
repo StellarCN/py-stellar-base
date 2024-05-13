@@ -102,7 +102,7 @@ class ConfigSettingContractComputeV0:
             and self.tx_memory_limit == other.tx_memory_limit
         )
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"ledger_max_instructions={self.ledger_max_instructions}",
             f"tx_max_instructions={self.tx_max_instructions}",

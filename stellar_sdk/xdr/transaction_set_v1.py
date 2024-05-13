@@ -90,7 +90,7 @@ class TransactionSetV1:
             and self.phases == other.phases
         )
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"previous_ledger_hash={self.previous_ledger_hash}",
             f"phases={self.phases}",

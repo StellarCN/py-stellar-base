@@ -84,7 +84,7 @@ class AccountEntryExtensionV1:
             return NotImplemented
         return self.liabilities == other.liabilities and self.ext == other.ext
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"liabilities={self.liabilities}",
             f"ext={self.ext}",

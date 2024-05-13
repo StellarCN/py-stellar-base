@@ -87,7 +87,7 @@ class LiquidityPoolConstantProductParameters:
             and self.fee == other.fee
         )
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"asset_a={self.asset_a}",
             f"asset_b={self.asset_b}",

@@ -113,7 +113,7 @@ class TopologyResponseBodyV1:
             and self.max_outbound_peer_count == other.max_outbound_peer_count
         )
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"inbound_peers={self.inbound_peers}",
             f"outbound_peers={self.outbound_peers}",

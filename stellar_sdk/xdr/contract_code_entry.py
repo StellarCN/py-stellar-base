@@ -98,7 +98,7 @@ class ContractCodeEntry:
             and self.code == other.code
         )
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"ext={self.ext}",
             f"hash={self.hash}",

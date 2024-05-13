@@ -97,7 +97,7 @@ class SetTrustLineFlagsOp:
             and self.set_flags == other.set_flags
         )
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"trustor={self.trustor}",
             f"asset={self.asset}",

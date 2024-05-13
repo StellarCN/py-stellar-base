@@ -78,7 +78,7 @@ class ChangeTrustOp:
             return NotImplemented
         return self.line == other.line and self.limit == other.limit
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"line={self.line}",
             f"limit={self.limit}",

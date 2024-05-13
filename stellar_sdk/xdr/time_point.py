@@ -56,5 +56,5 @@ class TimePoint:
             return NotImplemented
         return self.time_point == other.time_point
 
-    def __str__(self):
+    def __repr__(self):
         return f"<TimePoint [time_point={self.time_point}]>"

@@ -76,7 +76,7 @@ class Signer:
             return NotImplemented
         return self.key == other.key and self.weight == other.weight
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"key={self.key}",
             f"weight={self.weight}",

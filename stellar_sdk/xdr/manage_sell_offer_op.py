@@ -106,7 +106,7 @@ class ManageSellOfferOp:
             and self.offer_id == other.offer_id
         )
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"selling={self.selling}",
             f"buying={self.buying}",

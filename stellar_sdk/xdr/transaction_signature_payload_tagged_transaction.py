@@ -98,7 +98,7 @@ class TransactionSignaturePayloadTaggedTransaction:
             and self.fee_bump == other.fee_bump
         )
 
-    def __str__(self):
+    def __repr__(self):
         out = []
         out.append(f"type={self.type}")
         out.append(f"tx={self.tx}") if self.tx is not None else None

@@ -94,7 +94,7 @@ class ManageOfferSuccessResultOffer:
             return NotImplemented
         return self.effect == other.effect and self.offer == other.offer
 
-    def __str__(self):
+    def __repr__(self):
         out = []
         out.append(f"effect={self.effect}")
         out.append(f"offer={self.offer}") if self.offer is not None else None

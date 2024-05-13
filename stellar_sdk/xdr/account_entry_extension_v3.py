@@ -94,7 +94,7 @@ class AccountEntryExtensionV3:
             and self.seq_time == other.seq_time
         )
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"ext={self.ext}",
             f"seq_ledger={self.seq_ledger}",

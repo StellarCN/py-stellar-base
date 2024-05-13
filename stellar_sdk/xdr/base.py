@@ -32,7 +32,7 @@ class Integer:
             return NotImplemented
         return self.value == other.value
 
-    def __str__(self):
+    def __repr__(self):
         return f"<Integer [value={self.value}]>"
 
 
@@ -55,7 +55,7 @@ class UnsignedInteger:
             return NotImplemented
         return self.value == other.value
 
-    def __str__(self):
+    def __repr__(self):
         return f"<UnsignedInteger [value={self.value}]>"
 
 
@@ -78,7 +78,7 @@ class Float:
             return NotImplemented
         return self.value == other.value
 
-    def __str__(self):
+    def __repr__(self):
         return f"<Float [value={self.value}]>"
 
 
@@ -101,7 +101,7 @@ class Double:
             return NotImplemented
         return self.value == other.value
 
-    def __str__(self):
+    def __repr__(self):
         return f"<Double [value={self.value}]>"
 
 
@@ -124,7 +124,7 @@ class Hyper:
             return NotImplemented
         return self.value == other.value
 
-    def __str__(self):
+    def __repr__(self):
         return f"<Hyper [value={self.value}]>"
 
 
@@ -147,7 +147,7 @@ class UnsignedHyper:
             return NotImplemented
         return self.value == other.value
 
-    def __str__(self):
+    def __repr__(self):
         return f"<UnsignedHyper [value={self.value}]>"
 
 
@@ -170,7 +170,7 @@ class Boolean:
             return NotImplemented
         return self.value == other.value
 
-    def __str__(self):
+    def __repr__(self):
         return f"<Boolean [value={self.value}]>"
 
 
@@ -201,7 +201,7 @@ class String:
             return NotImplemented
         return self.value == other.value and self.size == other.size
 
-    def __str__(self):
+    def __repr__(self):
         return f"<String [value={self.value}, size={self.size}]>"
 
 
@@ -248,5 +248,5 @@ class Opaque:
             and self.size == other.size
         )
 
-    def __str__(self):
+    def __repr__(self):
         return f"<Opaque [value={self.value}, fixed={self.fixed}, size={self.size}]>"

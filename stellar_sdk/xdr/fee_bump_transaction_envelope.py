@@ -89,7 +89,7 @@ class FeeBumpTransactionEnvelope:
             return NotImplemented
         return self.tx == other.tx and self.signatures == other.signatures
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"tx={self.tx}",
             f"signatures={self.signatures}",

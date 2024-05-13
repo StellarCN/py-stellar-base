@@ -181,7 +181,7 @@ class SetOptionsOp:
             and self.signer == other.signer
         )
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"inflation_dest={self.inflation_dest}",
             f"clear_flags={self.clear_flags}",

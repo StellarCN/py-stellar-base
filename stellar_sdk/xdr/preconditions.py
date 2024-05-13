@@ -103,7 +103,7 @@ class Preconditions:
             and self.v2 == other.v2
         )
 
-    def __str__(self):
+    def __repr__(self):
         out = []
         out.append(f"type={self.type}")
         out.append(

@@ -107,7 +107,7 @@ class SCSpecUDTStructV0:
             and self.fields == other.fields
         )
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"doc={self.doc}",
             f"lib={self.lib}",

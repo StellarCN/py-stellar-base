@@ -79,7 +79,7 @@ class HashIDPreimageContractID:
             and self.contract_id_preimage == other.contract_id_preimage
         )
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"network_id={self.network_id}",
             f"contract_id_preimage={self.contract_id_preimage}",

@@ -64,7 +64,7 @@ class SCSpecTypeVec:
             return NotImplemented
         return self.element_type == other.element_type
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"element_type={self.element_type}",
         ]

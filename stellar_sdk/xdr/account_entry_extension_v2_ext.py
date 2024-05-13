@@ -85,7 +85,7 @@ class AccountEntryExtensionV2Ext:
             return NotImplemented
         return self.v == other.v and self.v3 == other.v3
 
-    def __str__(self):
+    def __repr__(self):
         out = []
         out.append(f"v={self.v}")
         out.append(f"v3={self.v3}") if self.v3 is not None else None

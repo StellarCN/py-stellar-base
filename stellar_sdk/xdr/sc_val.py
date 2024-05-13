@@ -441,7 +441,7 @@ class SCVal:
             and self.instance == other.instance
         )
 
-    def __str__(self):
+    def __repr__(self):
         out = []
         out.append(f"type={self.type}")
         out.append(f"b={self.b}") if self.b is not None else None

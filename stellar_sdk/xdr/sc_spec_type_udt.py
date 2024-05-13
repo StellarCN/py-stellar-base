@@ -64,7 +64,7 @@ class SCSpecTypeUDT:
             return NotImplemented
         return self.name == other.name
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"name={self.name}",
         ]

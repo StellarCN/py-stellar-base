@@ -127,7 +127,7 @@ class PathPaymentStrictSendOp:
             and self.path == other.path
         )
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"send_asset={self.send_asset}",
             f"send_amount={self.send_amount}",

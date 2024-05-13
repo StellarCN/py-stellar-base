@@ -116,7 +116,7 @@ class AccountEntryExtensionV2:
             and self.ext == other.ext
         )
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"num_sponsored={self.num_sponsored}",
             f"num_sponsoring={self.num_sponsoring}",

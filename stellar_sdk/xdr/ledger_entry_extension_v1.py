@@ -82,7 +82,7 @@ class LedgerEntryExtensionV1:
             return NotImplemented
         return self.sponsoring_id == other.sponsoring_id and self.ext == other.ext
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"sponsoring_id={self.sponsoring_id}",
             f"ext={self.ext}",

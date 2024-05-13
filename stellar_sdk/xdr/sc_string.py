@@ -56,5 +56,5 @@ class SCString:
             return NotImplemented
         return self.sc_string == other.sc_string
 
-    def __str__(self):
+    def __repr__(self):
         return f"<SCString [sc_string={self.sc_string}]>"

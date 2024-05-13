@@ -124,7 +124,7 @@ class SorobanTransactionMeta:
             and self.diagnostic_events == other.diagnostic_events
         )
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"ext={self.ext}",
             f"events={self.events}",

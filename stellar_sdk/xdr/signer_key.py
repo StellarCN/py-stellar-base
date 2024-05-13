@@ -133,7 +133,7 @@ class SignerKey:
             and self.ed25519_signed_payload == other.ed25519_signed_payload
         )
 
-    def __str__(self):
+    def __repr__(self):
         out = []
         out.append(f"type={self.type}")
         out.append(f"ed25519={self.ed25519}") if self.ed25519 is not None else None

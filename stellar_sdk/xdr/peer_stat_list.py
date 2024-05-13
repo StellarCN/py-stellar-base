@@ -67,5 +67,5 @@ class PeerStatList:
             return NotImplemented
         return self.peer_stat_list == other.peer_stat_list
 
-    def __str__(self):
+    def __repr__(self):
         return f"<PeerStatList [peer_stat_list={self.peer_stat_list}]>"

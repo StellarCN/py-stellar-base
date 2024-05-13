@@ -64,7 +64,7 @@ class SCSpecTypeOption:
             return NotImplemented
         return self.value_type == other.value_type
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"value_type={self.value_type}",
         ]

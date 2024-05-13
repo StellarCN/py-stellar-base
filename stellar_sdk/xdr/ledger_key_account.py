@@ -64,7 +64,7 @@ class LedgerKeyAccount:
             return NotImplemented
         return self.account_id == other.account_id
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"account_id={self.account_id}",
         ]

@@ -90,7 +90,7 @@ class TxSetComponent:
             and self.txs_maybe_discounted_fee == other.txs_maybe_discounted_fee
         )
 
-    def __str__(self):
+    def __repr__(self):
         out = []
         out.append(f"type={self.type}")
         out.append(

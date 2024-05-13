@@ -86,7 +86,7 @@ class ContractEventV0:
             return NotImplemented
         return self.topics == other.topics and self.data == other.data
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"topics={self.topics}",
             f"data={self.data}",

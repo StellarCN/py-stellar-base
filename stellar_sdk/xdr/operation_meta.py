@@ -64,7 +64,7 @@ class OperationMeta:
             return NotImplemented
         return self.changes == other.changes
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"changes={self.changes}",
         ]

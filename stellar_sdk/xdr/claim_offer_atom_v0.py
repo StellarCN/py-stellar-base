@@ -117,7 +117,7 @@ class ClaimOfferAtomV0:
             and self.amount_bought == other.amount_bought
         )
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"seller_ed25519={self.seller_ed25519}",
             f"offer_id={self.offer_id}",

@@ -79,7 +79,7 @@ class TransactionResultPair:
             and self.result == other.result
         )
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"transaction_hash={self.transaction_hash}",
             f"result={self.result}",

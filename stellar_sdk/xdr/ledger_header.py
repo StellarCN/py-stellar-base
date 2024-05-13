@@ -218,7 +218,7 @@ class LedgerHeader:
             and self.ext == other.ext
         )
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"ledger_version={self.ledger_version}",
             f"previous_ledger_hash={self.previous_ledger_hash}",

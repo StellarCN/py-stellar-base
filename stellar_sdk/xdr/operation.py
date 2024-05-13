@@ -144,7 +144,7 @@ class Operation:
             return NotImplemented
         return self.source_account == other.source_account and self.body == other.body
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"source_account={self.source_account}",
             f"body={self.body}",

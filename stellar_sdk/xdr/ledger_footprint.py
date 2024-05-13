@@ -96,7 +96,7 @@ class LedgerFootprint:
             return NotImplemented
         return self.read_only == other.read_only and self.read_write == other.read_write
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"read_only={self.read_only}",
             f"read_write={self.read_write}",

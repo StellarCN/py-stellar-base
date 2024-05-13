@@ -82,7 +82,7 @@ class LedgerHeaderExtensionV1:
             return NotImplemented
         return self.flags == other.flags and self.ext == other.ext
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"flags={self.flags}",
             f"ext={self.ext}",

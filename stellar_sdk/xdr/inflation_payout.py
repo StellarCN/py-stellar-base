@@ -76,7 +76,7 @@ class InflationPayout:
             return NotImplemented
         return self.destination == other.destination and self.amount == other.amount
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"destination={self.destination}",
             f"amount={self.amount}",

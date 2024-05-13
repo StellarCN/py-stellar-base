@@ -108,7 +108,7 @@ class ClaimLiquidityAtom:
             and self.amount_bought == other.amount_bought
         )
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"liquidity_pool_id={self.liquidity_pool_id}",
             f"asset_sold={self.asset_sold}",

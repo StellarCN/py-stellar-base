@@ -64,7 +64,7 @@ class RestoreFootprintOp:
             return NotImplemented
         return self.ext == other.ext
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"ext={self.ext}",
         ]

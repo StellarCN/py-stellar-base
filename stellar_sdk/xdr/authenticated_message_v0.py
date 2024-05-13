@@ -88,7 +88,7 @@ class AuthenticatedMessageV0:
             and self.mac == other.mac
         )
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"sequence={self.sequence}",
             f"message={self.message}",

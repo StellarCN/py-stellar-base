@@ -85,7 +85,7 @@ class TrustLineEntryV1Ext:
             return NotImplemented
         return self.v == other.v and self.v2 == other.v2
 
-    def __str__(self):
+    def __repr__(self):
         out = []
         out.append(f"v={self.v}")
         out.append(f"v2={self.v2}") if self.v2 is not None else None

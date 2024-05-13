@@ -87,7 +87,7 @@ class EvictionIterator:
             and self.bucket_file_offset == other.bucket_file_offset
         )
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"bucket_list_level={self.bucket_list_level}",
             f"is_curr_bucket={self.is_curr_bucket}",

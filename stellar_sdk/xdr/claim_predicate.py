@@ -172,7 +172,7 @@ class ClaimPredicate:
             and self.rel_before == other.rel_before
         )
 
-    def __str__(self):
+    def __repr__(self):
         out = []
         out.append(f"type={self.type}")
         out.append(

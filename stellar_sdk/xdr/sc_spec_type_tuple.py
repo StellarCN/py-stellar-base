@@ -75,7 +75,7 @@ class SCSpecTypeTuple:
             return NotImplemented
         return self.value_types == other.value_types
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"value_types={self.value_types}",
         ]

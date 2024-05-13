@@ -79,7 +79,7 @@ class LedgerCloseMetaExtV1:
             and self.soroban_fee_write1_kb == other.soroban_fee_write1_kb
         )
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"ext={self.ext}",
             f"soroban_fee_write1_kb={self.soroban_fee_write1_kb}",

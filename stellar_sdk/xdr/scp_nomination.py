@@ -108,7 +108,7 @@ class SCPNomination:
             and self.accepted == other.accepted
         )
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"quorum_set_hash={self.quorum_set_hash}",
             f"votes={self.votes}",

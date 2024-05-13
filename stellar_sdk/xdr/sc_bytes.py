@@ -56,5 +56,5 @@ class SCBytes:
             return NotImplemented
         return self.sc_bytes == other.sc_bytes
 
-    def __str__(self):
+    def __repr__(self):
         return f"<SCBytes [sc_bytes={self.sc_bytes}]>"

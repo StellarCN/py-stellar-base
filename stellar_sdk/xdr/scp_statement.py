@@ -120,7 +120,7 @@ class SCPStatement:
             and self.pledges == other.pledges
         )
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"node_id={self.node_id}",
             f"slot_index={self.slot_index}",

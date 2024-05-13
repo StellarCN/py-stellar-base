@@ -56,5 +56,5 @@ class NodeID:
             return NotImplemented
         return self.node_id == other.node_id
 
-    def __str__(self):
+    def __repr__(self):
         return f"<NodeID [node_id={self.node_id}]>"

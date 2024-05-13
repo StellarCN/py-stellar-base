@@ -84,7 +84,7 @@ class BucketMetadata:
             return NotImplemented
         return self.ledger_version == other.ledger_version and self.ext == other.ext
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"ledger_version={self.ledger_version}",
             f"ext={self.ext}",

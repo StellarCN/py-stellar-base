@@ -147,7 +147,7 @@ class SCPStatementPledges:
             and self.nominate == other.nominate
         )
 
-    def __str__(self):
+    def __repr__(self):
         out = []
         out.append(f"type={self.type}")
         out.append(f"prepare={self.prepare}") if self.prepare is not None else None

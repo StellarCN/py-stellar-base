@@ -79,7 +79,7 @@ class CreateContractArgs:
             and self.executable == other.executable
         )
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"contract_id_preimage={self.contract_id_preimage}",
             f"executable={self.executable}",

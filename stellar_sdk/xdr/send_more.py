@@ -64,7 +64,7 @@ class SendMore:
             return NotImplemented
         return self.num_messages == other.num_messages
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"num_messages={self.num_messages}",
         ]

@@ -79,7 +79,7 @@ class DiagnosticEvent:
             and self.event == other.event
         )
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"in_successful_contract_call={self.in_successful_contract_call}",
             f"event={self.event}",

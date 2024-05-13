@@ -56,5 +56,5 @@ class SignatureHint:
             return NotImplemented
         return self.signature_hint == other.signature_hint
 
-    def __str__(self):
+    def __repr__(self):
         return f"<SignatureHint [signature_hint={self.signature_hint}]>"

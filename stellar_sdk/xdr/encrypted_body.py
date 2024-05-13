@@ -56,5 +56,5 @@ class EncryptedBody:
             return NotImplemented
         return self.encrypted_body == other.encrypted_body
 
-    def __str__(self):
+    def __repr__(self):
         return f"<EncryptedBody [encrypted_body={self.encrypted_body}]>"

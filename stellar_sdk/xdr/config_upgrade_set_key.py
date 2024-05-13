@@ -77,7 +77,7 @@ class ConfigUpgradeSetKey:
             and self.content_hash == other.content_hash
         )
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"contract_id={self.contract_id}",
             f"content_hash={self.content_hash}",

@@ -99,7 +99,7 @@ class CreateClaimableBalanceOp:
             and self.claimants == other.claimants
         )
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"asset={self.asset}",
             f"amount={self.amount}",

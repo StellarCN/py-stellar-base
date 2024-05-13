@@ -76,7 +76,7 @@ class MuxedAccountMed25519:
             return NotImplemented
         return self.id == other.id and self.ed25519 == other.ed25519
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"id={self.id}",
             f"ed25519={self.ed25519}",

@@ -88,7 +88,7 @@ class PaymentOp:
             and self.amount == other.amount
         )
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"destination={self.destination}",
             f"asset={self.asset}",

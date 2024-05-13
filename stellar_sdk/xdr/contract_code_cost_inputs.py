@@ -150,7 +150,7 @@ class ContractCodeCostInputs:
             and self.n_data_segment_bytes == other.n_data_segment_bytes
         )
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"ext={self.ext}",
             f"n_instructions={self.n_instructions}",

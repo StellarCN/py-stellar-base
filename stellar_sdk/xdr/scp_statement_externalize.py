@@ -88,7 +88,7 @@ class SCPStatementExternalize:
             and self.commit_quorum_set_hash == other.commit_quorum_set_hash
         )
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"commit={self.commit}",
             f"n_h={self.n_h}",

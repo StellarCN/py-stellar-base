@@ -75,7 +75,7 @@ class Price:
             return NotImplemented
         return self.n == other.n and self.d == other.d
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"n={self.n}",
             f"d={self.d}",

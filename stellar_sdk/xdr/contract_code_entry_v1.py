@@ -76,7 +76,7 @@ class ContractCodeEntryV1:
             return NotImplemented
         return self.ext == other.ext and self.cost_inputs == other.cost_inputs
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"ext={self.ext}",
             f"cost_inputs={self.cost_inputs}",

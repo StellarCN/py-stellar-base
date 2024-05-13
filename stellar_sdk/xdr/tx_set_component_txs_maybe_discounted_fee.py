@@ -91,7 +91,7 @@ class TxSetComponentTxsMaybeDiscountedFee:
             return NotImplemented
         return self.base_fee == other.base_fee and self.txs == other.txs
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"base_fee={self.base_fee}",
             f"txs={self.txs}",

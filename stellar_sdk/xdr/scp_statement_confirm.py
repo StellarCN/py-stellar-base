@@ -104,7 +104,7 @@ class SCPStatementConfirm:
             and self.quorum_set_hash == other.quorum_set_hash
         )
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"ballot={self.ballot}",
             f"n_prepared={self.n_prepared}",

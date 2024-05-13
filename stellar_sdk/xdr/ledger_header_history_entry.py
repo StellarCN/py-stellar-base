@@ -95,7 +95,7 @@ class LedgerHeaderHistoryEntry:
             and self.ext == other.ext
         )
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"hash={self.hash}",
             f"header={self.header}",

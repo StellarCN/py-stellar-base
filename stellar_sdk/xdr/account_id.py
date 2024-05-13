@@ -56,5 +56,5 @@ class AccountID:
             return NotImplemented
         return self.account_id == other.account_id
 
-    def __str__(self):
+    def __repr__(self):
         return f"<AccountID [account_id={self.account_id}]>"

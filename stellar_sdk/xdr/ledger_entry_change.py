@@ -125,7 +125,7 @@ class LedgerEntryChange:
             and self.state == other.state
         )
 
-    def __str__(self):
+    def __repr__(self):
         out = []
         out.append(f"type={self.type}")
         out.append(f"created={self.created}") if self.created is not None else None

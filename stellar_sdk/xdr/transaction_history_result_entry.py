@@ -95,7 +95,7 @@ class TransactionHistoryResultEntry:
             and self.ext == other.ext
         )
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"ledger_seq={self.ledger_seq}",
             f"tx_result_set={self.tx_result_set}",

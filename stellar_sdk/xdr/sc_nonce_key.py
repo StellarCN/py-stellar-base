@@ -63,7 +63,7 @@ class SCNonceKey:
             return NotImplemented
         return self.nonce == other.nonce
 
-    def __str__(self):
+    def __repr__(self):
         out = [
             f"nonce={self.nonce}",
         ]
