@@ -143,7 +143,7 @@ class MuxedAccount:
             and self.account_muxed_id == other.account_muxed_id
         )
 
-    def __str__(self):
+    def __repr__(self):
         return "<MuxedAccount [account_id={account_id}, account_muxed_id={account_muxed_id}]>".format(
             account_id=self.account_id, account_muxed_id=self.account_muxed_id
         )

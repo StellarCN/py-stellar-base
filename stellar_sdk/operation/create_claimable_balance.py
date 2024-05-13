@@ -43,7 +43,7 @@ class ClaimPredicateGroup:
             return NotImplemented
         return self.left == other.left and self.right == other.right
 
-    def __str__(self):
+    def __repr__(self):
         return f"<ClaimPredicateGroup [left={self.left}, right={self.right}]>"
 
 
@@ -311,7 +311,7 @@ class ClaimPredicate:
             and self.rel_before == other.rel_before
         )
 
-    def __str__(self):
+    def __repr__(self):
         return (
             f"<ClaimPredicate [claim_predicate_type={self.claim_predicate_type}, "
             f"and_predicates={self.and_predicates}, "
@@ -367,7 +367,7 @@ class Claimant:
             self.destination == other.destination and self.predicate == other.predicate
         )
 
-    def __str__(self):
+    def __repr__(self):
         return (
             f"<Claimant [destination={self.destination}, predicate={self.predicate}]>"
         )
@@ -440,7 +440,7 @@ class CreateClaimableBalance(Operation):
         op = cls(asset=asset, amount=amount, claimants=claimants, source=source)
         return op
 
-    def __str__(self):
+    def __repr__(self):
         return (
             f"<CreateClaimableBalance [asset={self.asset}, amount={self.amount}, "
             f"claimants={self.claimants}, source={self.source}]>"

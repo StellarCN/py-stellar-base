@@ -148,5 +148,5 @@ class LiquidityPoolAsset:
             and self.fee == other.fee
         )
 
-    def __str__(self):
+    def __repr__(self):
         return f"<LiquidityPoolAsset [asset_a={self.asset_a}, asset_b={self.asset_b}, fee={self.fee}, type={self.type}]>"

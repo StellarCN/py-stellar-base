@@ -95,7 +95,7 @@ class LiquidityPoolWithdraw(Operation):
         )
         return op
 
-    def __str__(self):
+    def __repr__(self):
         return (
             f"<LiquidityPoolWithdraw [liquidity_pool_id={self.liquidity_pool_id}, amount={self.amount}, "
             f"min_amount_a={self.min_amount_a}, min_amount_b={self.min_amount_b}, source={self.source}]>"

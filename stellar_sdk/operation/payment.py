@@ -71,7 +71,7 @@ class Payment(Operation):
         op = cls(source=source, destination=destination, asset=asset, amount=amount)
         return op
 
-    def __str__(self):
+    def __repr__(self):
         return (
             f"<Payment [destination={self.destination}, asset={self.asset}, "
             f"amount={self.amount}, source={self.source}]>"

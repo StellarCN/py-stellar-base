@@ -121,7 +121,7 @@ class PathPaymentStrictReceive(Operation):
         )
         return op
 
-    def __str__(self):
+    def __repr__(self):
         return (
             f"<PathPaymentStrictReceive [destination={self.destination}, send_asset={self.send_asset}, "
             f"send_max={self.send_max}, dest_asset={self.dest_asset}, dest_amount={self.dest_amount}, "

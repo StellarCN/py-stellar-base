@@ -81,7 +81,7 @@ class NoneMemo(Memo):
             return NotImplemented
         return True
 
-    def __str__(self):
+    def __repr__(self):
         return "<NoneMemo>"
 
 
@@ -127,7 +127,7 @@ class TextMemo(Memo):
             return NotImplemented
         return self.memo_text == other.memo_text
 
-    def __str__(self):
+    def __repr__(self):
         return f"<TextMemo [memo={self.memo_text}]>"
 
 
@@ -168,7 +168,7 @@ class IdMemo(Memo):
             return NotImplemented
         return self.memo_id == other.memo_id
 
-    def __str__(self):
+    def __repr__(self):
         return f"<IdMemo [memo={self.memo_id}]>"
 
 
@@ -210,7 +210,7 @@ class HashMemo(Memo):
             return NotImplemented
         return self.memo_hash == other.memo_hash
 
-    def __str__(self):
+    def __repr__(self):
         return f"<HashMemo [memo={self.memo_hash}]>"
 
 
@@ -258,5 +258,5 @@ class ReturnHashMemo(Memo):
             return NotImplemented
         return self.memo_return == other.memo_return
 
-    def __str__(self):
+    def __repr__(self):
         return f"<ReturnHashMemo [memo={self.memo_return}]>"

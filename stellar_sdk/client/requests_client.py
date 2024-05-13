@@ -211,7 +211,7 @@ class RequestsClient(BaseSyncClient):
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.close()
 
-    def __str__(self):
+    def __repr__(self):
         return (
             f"<RequestsClient [pool_size={self.pool_size}, "
             f"num_retries={self.num_retries}, "

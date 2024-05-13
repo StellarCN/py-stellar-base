@@ -81,5 +81,5 @@ class ChangeTrust(Operation):
         op = cls(source=source, asset=line, limit=limit)
         return op
 
-    def __str__(self):
+    def __repr__(self):
         return f"<ChangeTrust [asset={self.asset}, limit={self.limit}, source={self.source}]>"

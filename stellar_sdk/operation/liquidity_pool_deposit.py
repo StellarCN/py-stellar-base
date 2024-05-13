@@ -109,7 +109,7 @@ class LiquidityPoolDeposit(Operation):
         )
         return op
 
-    def __str__(self):
+    def __repr__(self):
         return (
             f"<LiquidityPoolDeposit [liquidity_pool_id={self.liquidity_pool_id}, max_amount_a={self.max_amount_a}, "
             f"max_amount_b={self.max_amount_b}, min_price={self.min_price}, max_price={self.max_price}, "

@@ -125,7 +125,7 @@ class FeeBumpTransactionEnvelope(BaseTransactionEnvelope["FeeBumpTransactionEnve
             and self.signatures == other.signatures
         )
 
-    def __str__(self):
+    def __repr__(self):
         return (
             f"<FeeBumpTransactionEnvelope [transaction={self.transaction}, "
             f"network_passphrase={self.network_passphrase}, signatures={self.signatures}]>"

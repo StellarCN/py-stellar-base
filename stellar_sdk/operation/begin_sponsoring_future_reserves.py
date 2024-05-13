@@ -66,5 +66,5 @@ class BeginSponsoringFutureReserves(Operation):
         op = cls(source=source, sponsored_id=sponsored_id)
         return op
 
-    def __str__(self):
+    def __repr__(self):
         return f"<BeginSponsoringFutureReserves [sponsored_id={self.sponsored_id}, source={self.source}]>"

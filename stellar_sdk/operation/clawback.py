@@ -68,5 +68,5 @@ class Clawback(Operation):
         op = cls(source=source, from_=from_, asset=asset, amount=amount)
         return op
 
-    def __str__(self):
+    def __repr__(self):
         return f"<Clawback [asset={self.asset}, from_={self.from_}, amount={self.amount}, source={self.source}]>"

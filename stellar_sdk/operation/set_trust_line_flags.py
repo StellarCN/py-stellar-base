@@ -112,7 +112,7 @@ class SetTrustLineFlags(Operation):
         )
         return op
 
-    def __str__(self):
+    def __repr__(self):
         return (
             f"<SetTrustLineFlags [trustor={self.trustor}, asset={self.asset}, "
             f"clear_flags={self.clear_flags}, set_flags={self.set_flags}, source={self.source}]>"

@@ -131,7 +131,7 @@ class FeeBumpTransaction:
             and self.inner_transaction_envelope == other.inner_transaction_envelope
         )
 
-    def __str__(self):
+    def __repr__(self):
         return (
             f"<FeeBumpTransaction [fee_source={self.fee_source}, "
             f"base_fee={self.base_fee}, inner_transaction_envelope={self.inner_transaction_envelope}]>"

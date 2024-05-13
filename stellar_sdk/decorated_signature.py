@@ -50,5 +50,5 @@ class DecoratedSignature:
             and self.signature == other.signature
         )
 
-    def __str__(self):
+    def __repr__(self):
         return f"<DecoratedSignature [signature_hint={self.signature_hint}, signature={self.signature}]>"

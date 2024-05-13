@@ -57,5 +57,5 @@ class LedgerBounds:
             self.min_ledger == other.min_ledger and self.max_ledger == other.max_ledger
         )
 
-    def __str__(self):
+    def __repr__(self):
         return f"<LedgerBounds [min_ledger={self.min_ledger}, max_ledger={self.max_ledger}]>"

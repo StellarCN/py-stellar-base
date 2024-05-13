@@ -92,5 +92,5 @@ class Price:
             return NotImplemented
         return (self.n * other.d) >= (other.n * self.d)
 
-    def __str__(self):
+    def __repr__(self):
         return f"<Price [n={self.n}, d={self.d}]>"

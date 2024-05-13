@@ -46,7 +46,7 @@ class TrustLine:
             return NotImplemented
         return self.account_id == other.account_id and self.asset == other.asset
 
-    def __str__(self):
+    def __repr__(self):
         return f"<TrustLine [account_id={self.account_id}, asset={self.asset}]>"
 
 
@@ -64,7 +64,7 @@ class Offer:
             return NotImplemented
         return self.seller_id == other.seller_id and self.offer_id == other.offer_id
 
-    def __str__(self):
+    def __repr__(self):
         return f"<Offer [seller_id={self.seller_id}, offer_id={self.offer_id}]>"
 
 
@@ -82,7 +82,7 @@ class Data:
             return NotImplemented
         return self.account_id == other.account_id and self.data_name == other.data_name
 
-    def __str__(self):
+    def __repr__(self):
         return f"<Data [account_id={self.account_id}, data_name={self.data_name}]>"
 
 
@@ -102,7 +102,7 @@ class Signer:
             self.account_id == other.account_id and self.signer_key == other.signer_key
         )
 
-    def __str__(self):
+    def __repr__(self):
         return f"<Signer [account_id={self.account_id}, signer_key={self.signer_key}]>"
 
 
@@ -565,7 +565,7 @@ class RevokeSponsorship(Operation):
             and self.source == other.source
         )
 
-    def __str__(self):
+    def __repr__(self):
         return (
             f"<RevokeSponsorship [revoke_sponsorship_type={self.revoke_sponsorship_type}, "
             f"account_id={self.account_id}, "

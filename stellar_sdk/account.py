@@ -95,7 +95,7 @@ class Account:
             return NotImplemented
         return self.account == other.account and self.sequence == other.sequence
 
-    def __str__(self):
+    def __repr__(self):
         return f"<Account [account={self.account}, sequence={self.sequence}]>"
 
 
@@ -119,7 +119,7 @@ class Thresholds:
             and self.high_threshold == other.high_threshold
         )
 
-    def __str__(self):
+    def __repr__(self):
         return (
             f"<Thresholds [low_threshold={self.low_threshold}, med_threshold={self.med_threshold}, "
             f"high_threshold={self.high_threshold}]>"

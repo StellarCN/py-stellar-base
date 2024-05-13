@@ -349,5 +349,5 @@ class SorobanServerAsync:
     async def __aexit__(self, exc_type, exc_val, exc_tb) -> None:
         await self.close()
 
-    def __str__(self):
+    def __repr__(self):
         return f"<SorobanServerAsync [server_url={self.server_url}, client={self._client}]>"

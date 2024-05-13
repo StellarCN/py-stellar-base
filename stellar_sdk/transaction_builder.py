@@ -1457,7 +1457,7 @@ class TransactionBuilder:
         op = RestoreFootprint(source)
         return self.append_operation(op)
 
-    def __str__(self):
+    def __repr__(self):
         return (
             f"<TransactionBuilder [source_account={self.source_account}, "
             f"base_fee={self.base_fee}, network_passphrase={self.network_passphrase}, "

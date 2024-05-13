@@ -59,5 +59,5 @@ class InvokeHostFunction(Operation):
             source=source,
         )
 
-    def __str__(self):
+    def __repr__(self):
         return f"<InvokeHostFunction [host_function={self.host_function}, auth={self.auth}, source={self.source}]>"

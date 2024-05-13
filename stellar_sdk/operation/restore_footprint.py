@@ -41,5 +41,5 @@ class RestoreFootprint(Operation):
         op = cls(source=source)
         return op
 
-    def __str__(self):
+    def __repr__(self):
         return f"<RestoreFootprint [source={self.source}]>"
