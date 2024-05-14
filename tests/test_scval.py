@@ -6,6 +6,69 @@ from stellar_sdk.address import Address
 from stellar_sdk.scval import *
 
 
+@pytest.mark.parametrize(
+    "sc_val, native",
+    [
+        (to_bool(True), True),
+        (to_void(), None),
+        (to_uint32(1), 1),
+        (to_int32(1), 1),
+        (to_uint64(1), 1),
+        (to_int64(1), 1),
+        (to_timepoint(1), 1),
+        (to_duration(1), 1),
+        (to_int128(1), 1),
+        (to_uint128(1), 1),
+        (to_int256(1), 1),
+        (to_uint256(1), 1),
+        (to_bytes(b"hello"), b"hello"),
+        (to_string("hello"), "hello"),
+        (to_string("你好👋"), "你好👋"),
+        (to_string(b"\t\xd0Y\x17Ap}\x96\xces"), b"\t\xd0Y\x17Ap}\x96\xces"),
+        (to_symbol("hello"), "hello"),
+        (
+            to_vec(
+                [
+                    to_int32(1),
+                    to_int256(23423432),
+                    to_string("world"),
+                    to_vec([to_bool(True), to_bool(False)]),
+                    to_map(
+                        {
+                            to_symbol("hello"): to_map(
+                                {
+                                    to_string("stellar"): to_vec(
+                                        [to_bool(True), to_bool(False)]
+                                    ),
+                                }
+                            )
+                        }
+                    ),
+                ]
+            ),
+            [
+                1,
+                23423432,
+                "world",
+                [True, False],
+                {"hello": {"stellar": [True, False]}},
+            ],
+        ),
+        (
+            to_address("GAHJJJKMOKYE4RVPZEWZTKH5FVI4PA3VL7GK2LFNUBSGBV6OJP7TQSLX"),
+            Address("GAHJJJKMOKYE4RVPZEWZTKH5FVI4PA3VL7GK2LFNUBSGBV6OJP7TQSLX"),
+        ),
+        (
+            stellar_xdr.SCVal(stellar_xdr.SCValType.SCV_LEDGER_KEY_CONTRACT_INSTANCE),
+            stellar_xdr.SCVal(stellar_xdr.SCValType.SCV_LEDGER_KEY_CONTRACT_INSTANCE),
+        ),
+        ("AAAADP//////////////////////////////////////////", -1),
+    ],
+)
+def test_sc_val_to_native(sc_val, native):
+    assert to_native(sc_val) == native
+
+
 def test_address():
     addr = Address("GAHJJJKMOKYE4RVPZEWZTKH5FVI4PA3VL7GK2LFNUBSGBV6OJP7TQSLX")
     scval = to_address(addr)
