@@ -763,6 +763,7 @@ Soroban RPC Definitions
 
 scval
 ^^^^^
+.. autofunction:: stellar_sdk.scval.to_native
 .. autofunction:: stellar_sdk.scval.to_address
 .. autofunction:: stellar_sdk.scval.from_address
 .. autofunction:: stellar_sdk.scval.to_bool

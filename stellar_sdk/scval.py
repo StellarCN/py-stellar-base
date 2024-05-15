@@ -1,9 +1,10 @@
-from typing import Dict, List, Optional, Sequence, Tuple, Union
+from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
 
 from . import xdr as stellar_xdr
 from .address import Address
 
 __all__ = [
+    "to_native",
     "to_address",
     "from_address",
     "to_bool",
@@ -47,6 +48,88 @@ __all__ = [
     "to_tuple_struct",
     "from_tuple_struct",
 ]
+
+
+def to_native(
+    sc_val: Union[stellar_xdr.SCVal, bytes, str]
+) -> Union[
+    bool,
+    None,
+    int,
+    str,
+    bytes,
+    Address,
+    stellar_xdr.SCVal,
+    List[Any],
+    Dict[Any, Any],
+]:
+    """Given a :class:`stellar_xdr.SCVal` value, attempt to convert it to a native Python type.
+
+    Possible conversions include:
+      - SCV_VOID -> `None`
+      - SCV_I32, SCV_U32 -> `int`
+      - SCV_I64, SCV_U64, SCV_I128, SCV_U128, SCV_I256, SCV_U256 -> `int`
+      - SCV_TIMEPOINT, SCV_DURATION -> `int`
+      - SCV_VEC -> `list` of any of the above (via recursion)
+      - SCV_MAP -> `dict` with keys and values of any of the above (via recursion)
+      - SCV_BOOL -> `bool`
+      - SCV_BYTES -> `bytes`
+      - SCV_SYMBOL -> `str`
+      - SCV_STRING -> `str` if the underlying buffer can be decoded as UTF-8, `bytes` of the raw contents in any error case
+      - SCV_ADDRESS -> :class:`stellar_sdk.address.Address`
+
+    If no viable conversion can be determined, this function returns the original :class:`stellar_xdr.SCVal` object.
+
+    :param sc_val: The :class:`stellar_sdk.xdr.SCVal` XDR object to convert.
+        It can also be an :class:`stellar_sdk.xdr.SCVal` expressed in base64 or bytes.
+    :return: The native Python type.
+    """
+    sc_val = _parse_sc_val(sc_val)
+    if sc_val.type == stellar_xdr.SCValType.SCV_BOOL:
+        return sc_val.b
+    if sc_val.type == stellar_xdr.SCValType.SCV_VOID:
+        return None
+    if sc_val.type == stellar_xdr.SCValType.SCV_I32:
+        return from_int32(sc_val)
+    if sc_val.type == stellar_xdr.SCValType.SCV_U32:
+        return from_uint32(sc_val)
+    if sc_val.type == stellar_xdr.SCValType.SCV_I64:
+        return from_int64(sc_val)
+    if sc_val.type == stellar_xdr.SCValType.SCV_U64:
+        return from_uint64(sc_val)
+    if sc_val.type == stellar_xdr.SCValType.SCV_TIMEPOINT:
+        return from_timepoint(sc_val)
+    if sc_val.type == stellar_xdr.SCValType.SCV_DURATION:
+        return from_duration(sc_val)
+    if sc_val.type == stellar_xdr.SCValType.SCV_I128:
+        return from_int128(sc_val)
+    if sc_val.type == stellar_xdr.SCValType.SCV_U128:
+        return from_uint128(sc_val)
+    if sc_val.type == stellar_xdr.SCValType.SCV_I256:
+        return from_int256(sc_val)
+    if sc_val.type == stellar_xdr.SCValType.SCV_U256:
+        return from_uint256(sc_val)
+    if sc_val.type == stellar_xdr.SCValType.SCV_BYTES:
+        return from_bytes(sc_val)
+    if sc_val.type == stellar_xdr.SCValType.SCV_STRING:
+        s = from_string(sc_val)
+        try:
+            return s.decode("utf-8")
+        except UnicodeDecodeError:
+            return s
+    if sc_val.type == stellar_xdr.SCValType.SCV_SYMBOL:
+        return from_symbol(sc_val)
+    if sc_val.type == stellar_xdr.SCValType.SCV_VEC:
+        assert sc_val.vec is not None
+        return [to_native(val) for val in sc_val.vec.sc_vec]
+    if sc_val.type == stellar_xdr.SCValType.SCV_MAP:
+        assert sc_val.map is not None
+        return {
+            to_native(entry.key): to_native(entry.val) for entry in sc_val.map.sc_map
+        }
+    if sc_val.type == stellar_xdr.SCValType.SCV_ADDRESS:
+        return from_address(sc_val)
+    return sc_val
 
 
 def to_address(data: Union[Address, str]) -> stellar_xdr.SCVal:
