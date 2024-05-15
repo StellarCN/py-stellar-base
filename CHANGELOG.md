@@ -2,10 +2,20 @@ Release History
 ==============
 
 ### Pending
+
+### Version 10.0.0
+
+Released on May 15, 2024
+
 #### Update
-- feat: add support for Soroban-RPC 21.
-- improve: The function in `stellar_xdr.scval` can accept `sc_val` of `base64` and `bytes` types.
-- refactor: use `__repr__` instead of `__str__` in classes.
+- improve: The function in `stellar_xdr.scval` can accept `sc_val` of `base64` and `bytes` types. ([#932](https://github.com/StellarCN/py-stellar-base/pull/932))
+- feat: add support for Soroban-RPC 21. ([#933](https://github.com/StellarCN/py-stellar-base/pull/933))
+- refactor: use `__repr__` instead of `__str__` in classes. ([#936](https://github.com/StellarCN/py-stellar-base/pull/936))
+- feat: add a helper function to convert SCVal to native types. ([#937](https://github.com/StellarCN/py-stellar-base/pull/937))
+- chore: updated various dependencies.
+
+#### Breaking changes
+- feat: add support for Soroban-RPC 21, you need to upgrade Soroban PRC to version v21 or above. ([#933](https://github.com/StellarCN/py-stellar-base/pull/933))
 
 ### Version 9.4.0
 
