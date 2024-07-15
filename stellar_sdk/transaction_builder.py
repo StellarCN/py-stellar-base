@@ -32,6 +32,8 @@ from .utils import hex_to_bytes, is_valid_hash
 
 __all__ = ["TransactionBuilder"]
 
+BASE_FEE = 100
+
 
 class TransactionBuilder:
     """Transaction builder helps constructs a new :class:`TransactionEnvelope
@@ -96,7 +98,7 @@ class TransactionBuilder:
         self,
         source_account: Account,
         network_passphrase: str = Network.TESTNET_NETWORK_PASSPHRASE,
-        base_fee: int = 100,
+        base_fee: int = BASE_FEE,
         v1: bool = True,
     ):
         self.source_account: Account = source_account
@@ -173,9 +175,23 @@ class TransactionBuilder:
         :param network_passphrase: The network to connect to for verifying and retrieving additional attributes from.
         :return: a :class:`TransactionBuilder <stellar_sdk.transaction_envelope.TransactionBuilder>` via the XDR object.
         """
+
+        inner_base_fee = int(
+            inner_transaction_envelope.transaction.fee
+            / len(inner_transaction_envelope.transaction.operations)
+        )
+
+        if base_fee < inner_base_fee:
+            raise ValueError(
+                f"Invalid base_fee, it should be at least {inner_base_fee} stroops."
+            )
+
+        if base_fee < BASE_FEE:
+            f"Invalid base_fee, it should be at least {BASE_FEE} stroops."
+
         fee_bump_transaction = FeeBumpTransaction(
             fee_source=fee_source,
-            base_fee=base_fee,
+            fee=base_fee * (len(inner_transaction_envelope.transaction.operations) + 1),
             inner_transaction_envelope=inner_transaction_envelope,
         )
         transaction_envelope = FeeBumpTransactionEnvelope(
