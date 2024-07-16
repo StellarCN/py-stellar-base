@@ -17,7 +17,7 @@ class FeeBumpTransaction:
     See `CAP-0015 <https://github.com/stellar/stellar-protocol/blob/master/core/cap-0015.md>`__ for more information.
 
     :param fee_source: The account paying for the transaction.
-    :param fee: The max fee willing to pay for the transaction.
+    :param fee: The max fee willing to pay for the transaction (**in stroops**).
     :param inner_transaction_envelope: The TransactionEnvelope to be bumped by the fee bump transaction.
     """
 
