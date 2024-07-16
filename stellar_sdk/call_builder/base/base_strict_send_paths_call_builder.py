@@ -52,9 +52,9 @@ class BaseStrictSendPathsCallBuilder(BaseCallBuilder):
         params = {
             "source_amount": source_amount,
             "source_asset_type": source_asset.type,
-            "source_asset_code": None
-            if source_asset.is_native()
-            else source_asset.code,
+            "source_asset_code": (
+                None if source_asset.is_native() else source_asset.code
+            ),
             "source_asset_issuer": source_asset.issuer,
         }
 

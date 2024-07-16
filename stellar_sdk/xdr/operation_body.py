@@ -477,79 +477,141 @@ class OperationBody:
     def __repr__(self):
         out = []
         out.append(f"type={self.type}")
-        out.append(
-            f"create_account_op={self.create_account_op}"
-        ) if self.create_account_op is not None else None
-        out.append(
-            f"payment_op={self.payment_op}"
-        ) if self.payment_op is not None else None
-        out.append(
-            f"path_payment_strict_receive_op={self.path_payment_strict_receive_op}"
-        ) if self.path_payment_strict_receive_op is not None else None
-        out.append(
-            f"manage_sell_offer_op={self.manage_sell_offer_op}"
-        ) if self.manage_sell_offer_op is not None else None
-        out.append(
-            f"create_passive_sell_offer_op={self.create_passive_sell_offer_op}"
-        ) if self.create_passive_sell_offer_op is not None else None
-        out.append(
-            f"set_options_op={self.set_options_op}"
-        ) if self.set_options_op is not None else None
-        out.append(
-            f"change_trust_op={self.change_trust_op}"
-        ) if self.change_trust_op is not None else None
-        out.append(
-            f"allow_trust_op={self.allow_trust_op}"
-        ) if self.allow_trust_op is not None else None
-        out.append(
-            f"destination={self.destination}"
-        ) if self.destination is not None else None
-        out.append(
-            f"manage_data_op={self.manage_data_op}"
-        ) if self.manage_data_op is not None else None
-        out.append(
-            f"bump_sequence_op={self.bump_sequence_op}"
-        ) if self.bump_sequence_op is not None else None
-        out.append(
-            f"manage_buy_offer_op={self.manage_buy_offer_op}"
-        ) if self.manage_buy_offer_op is not None else None
-        out.append(
-            f"path_payment_strict_send_op={self.path_payment_strict_send_op}"
-        ) if self.path_payment_strict_send_op is not None else None
-        out.append(
-            f"create_claimable_balance_op={self.create_claimable_balance_op}"
-        ) if self.create_claimable_balance_op is not None else None
-        out.append(
-            f"claim_claimable_balance_op={self.claim_claimable_balance_op}"
-        ) if self.claim_claimable_balance_op is not None else None
-        out.append(
-            f"begin_sponsoring_future_reserves_op={self.begin_sponsoring_future_reserves_op}"
-        ) if self.begin_sponsoring_future_reserves_op is not None else None
-        out.append(
-            f"revoke_sponsorship_op={self.revoke_sponsorship_op}"
-        ) if self.revoke_sponsorship_op is not None else None
-        out.append(
-            f"clawback_op={self.clawback_op}"
-        ) if self.clawback_op is not None else None
-        out.append(
-            f"clawback_claimable_balance_op={self.clawback_claimable_balance_op}"
-        ) if self.clawback_claimable_balance_op is not None else None
-        out.append(
-            f"set_trust_line_flags_op={self.set_trust_line_flags_op}"
-        ) if self.set_trust_line_flags_op is not None else None
-        out.append(
-            f"liquidity_pool_deposit_op={self.liquidity_pool_deposit_op}"
-        ) if self.liquidity_pool_deposit_op is not None else None
-        out.append(
-            f"liquidity_pool_withdraw_op={self.liquidity_pool_withdraw_op}"
-        ) if self.liquidity_pool_withdraw_op is not None else None
-        out.append(
-            f"invoke_host_function_op={self.invoke_host_function_op}"
-        ) if self.invoke_host_function_op is not None else None
-        out.append(
-            f"extend_footprint_ttl_op={self.extend_footprint_ttl_op}"
-        ) if self.extend_footprint_ttl_op is not None else None
-        out.append(
-            f"restore_footprint_op={self.restore_footprint_op}"
-        ) if self.restore_footprint_op is not None else None
+        (
+            out.append(f"create_account_op={self.create_account_op}")
+            if self.create_account_op is not None
+            else None
+        )
+        (
+            out.append(f"payment_op={self.payment_op}")
+            if self.payment_op is not None
+            else None
+        )
+        (
+            out.append(
+                f"path_payment_strict_receive_op={self.path_payment_strict_receive_op}"
+            )
+            if self.path_payment_strict_receive_op is not None
+            else None
+        )
+        (
+            out.append(f"manage_sell_offer_op={self.manage_sell_offer_op}")
+            if self.manage_sell_offer_op is not None
+            else None
+        )
+        (
+            out.append(
+                f"create_passive_sell_offer_op={self.create_passive_sell_offer_op}"
+            )
+            if self.create_passive_sell_offer_op is not None
+            else None
+        )
+        (
+            out.append(f"set_options_op={self.set_options_op}")
+            if self.set_options_op is not None
+            else None
+        )
+        (
+            out.append(f"change_trust_op={self.change_trust_op}")
+            if self.change_trust_op is not None
+            else None
+        )
+        (
+            out.append(f"allow_trust_op={self.allow_trust_op}")
+            if self.allow_trust_op is not None
+            else None
+        )
+        (
+            out.append(f"destination={self.destination}")
+            if self.destination is not None
+            else None
+        )
+        (
+            out.append(f"manage_data_op={self.manage_data_op}")
+            if self.manage_data_op is not None
+            else None
+        )
+        (
+            out.append(f"bump_sequence_op={self.bump_sequence_op}")
+            if self.bump_sequence_op is not None
+            else None
+        )
+        (
+            out.append(f"manage_buy_offer_op={self.manage_buy_offer_op}")
+            if self.manage_buy_offer_op is not None
+            else None
+        )
+        (
+            out.append(
+                f"path_payment_strict_send_op={self.path_payment_strict_send_op}"
+            )
+            if self.path_payment_strict_send_op is not None
+            else None
+        )
+        (
+            out.append(
+                f"create_claimable_balance_op={self.create_claimable_balance_op}"
+            )
+            if self.create_claimable_balance_op is not None
+            else None
+        )
+        (
+            out.append(f"claim_claimable_balance_op={self.claim_claimable_balance_op}")
+            if self.claim_claimable_balance_op is not None
+            else None
+        )
+        (
+            out.append(
+                f"begin_sponsoring_future_reserves_op={self.begin_sponsoring_future_reserves_op}"
+            )
+            if self.begin_sponsoring_future_reserves_op is not None
+            else None
+        )
+        (
+            out.append(f"revoke_sponsorship_op={self.revoke_sponsorship_op}")
+            if self.revoke_sponsorship_op is not None
+            else None
+        )
+        (
+            out.append(f"clawback_op={self.clawback_op}")
+            if self.clawback_op is not None
+            else None
+        )
+        (
+            out.append(
+                f"clawback_claimable_balance_op={self.clawback_claimable_balance_op}"
+            )
+            if self.clawback_claimable_balance_op is not None
+            else None
+        )
+        (
+            out.append(f"set_trust_line_flags_op={self.set_trust_line_flags_op}")
+            if self.set_trust_line_flags_op is not None
+            else None
+        )
+        (
+            out.append(f"liquidity_pool_deposit_op={self.liquidity_pool_deposit_op}")
+            if self.liquidity_pool_deposit_op is not None
+            else None
+        )
+        (
+            out.append(f"liquidity_pool_withdraw_op={self.liquidity_pool_withdraw_op}")
+            if self.liquidity_pool_withdraw_op is not None
+            else None
+        )
+        (
+            out.append(f"invoke_host_function_op={self.invoke_host_function_op}")
+            if self.invoke_host_function_op is not None
+            else None
+        )
+        (
+            out.append(f"extend_footprint_ttl_op={self.extend_footprint_ttl_op}")
+            if self.extend_footprint_ttl_op is not None
+            else None
+        )
+        (
+            out.append(f"restore_footprint_op={self.restore_footprint_op}")
+            if self.restore_footprint_op is not None
+            else None
+        )
         return f"<OperationBody [{', '.join(out)}]>"

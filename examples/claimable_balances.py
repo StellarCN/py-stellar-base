@@ -8,6 +8,7 @@ later time with Claim Claimable Balance.
 
 See: https://developers.stellar.org/docs/glossary/claimable-balance/
 """
+
 from stellar_sdk import (
     Asset,
     Claimant,

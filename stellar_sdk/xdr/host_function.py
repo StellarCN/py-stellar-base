@@ -115,11 +115,15 @@ class HostFunction:
     def __repr__(self):
         out = []
         out.append(f"type={self.type}")
-        out.append(
-            f"invoke_contract={self.invoke_contract}"
-        ) if self.invoke_contract is not None else None
-        out.append(
-            f"create_contract={self.create_contract}"
-        ) if self.create_contract is not None else None
+        (
+            out.append(f"invoke_contract={self.invoke_contract}")
+            if self.invoke_contract is not None
+            else None
+        )
+        (
+            out.append(f"create_contract={self.create_contract}")
+            if self.create_contract is not None
+            else None
+        )
         out.append(f"wasm={self.wasm}") if self.wasm is not None else None
         return f"<HostFunction [{', '.join(out)}]>"

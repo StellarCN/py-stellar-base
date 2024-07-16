@@ -50,9 +50,7 @@ __all__ = [
 ]
 
 
-def to_native(
-    sc_val: Union[stellar_xdr.SCVal, bytes, str]
-) -> Union[
+def to_native(sc_val: Union[stellar_xdr.SCVal, bytes, str]) -> Union[
     bool,
     None,
     int,

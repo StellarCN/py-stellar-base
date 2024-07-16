@@ -145,19 +145,29 @@ class SCSpecEntry:
     def __repr__(self):
         out = []
         out.append(f"kind={self.kind}")
-        out.append(
-            f"function_v0={self.function_v0}"
-        ) if self.function_v0 is not None else None
-        out.append(
-            f"udt_struct_v0={self.udt_struct_v0}"
-        ) if self.udt_struct_v0 is not None else None
-        out.append(
-            f"udt_union_v0={self.udt_union_v0}"
-        ) if self.udt_union_v0 is not None else None
-        out.append(
-            f"udt_enum_v0={self.udt_enum_v0}"
-        ) if self.udt_enum_v0 is not None else None
-        out.append(
-            f"udt_error_enum_v0={self.udt_error_enum_v0}"
-        ) if self.udt_error_enum_v0 is not None else None
+        (
+            out.append(f"function_v0={self.function_v0}")
+            if self.function_v0 is not None
+            else None
+        )
+        (
+            out.append(f"udt_struct_v0={self.udt_struct_v0}")
+            if self.udt_struct_v0 is not None
+            else None
+        )
+        (
+            out.append(f"udt_union_v0={self.udt_union_v0}")
+            if self.udt_union_v0 is not None
+            else None
+        )
+        (
+            out.append(f"udt_enum_v0={self.udt_enum_v0}")
+            if self.udt_enum_v0 is not None
+            else None
+        )
+        (
+            out.append(f"udt_error_enum_v0={self.udt_error_enum_v0}")
+            if self.udt_error_enum_v0 is not None
+            else None
+        )
         return f"<SCSpecEntry [{', '.join(out)}]>"

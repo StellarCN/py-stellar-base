@@ -545,85 +545,165 @@ class OperationResultTr:
     def __repr__(self):
         out = []
         out.append(f"type={self.type}")
-        out.append(
-            f"create_account_result={self.create_account_result}"
-        ) if self.create_account_result is not None else None
-        out.append(
-            f"payment_result={self.payment_result}"
-        ) if self.payment_result is not None else None
-        out.append(
-            f"path_payment_strict_receive_result={self.path_payment_strict_receive_result}"
-        ) if self.path_payment_strict_receive_result is not None else None
-        out.append(
-            f"manage_sell_offer_result={self.manage_sell_offer_result}"
-        ) if self.manage_sell_offer_result is not None else None
-        out.append(
-            f"create_passive_sell_offer_result={self.create_passive_sell_offer_result}"
-        ) if self.create_passive_sell_offer_result is not None else None
-        out.append(
-            f"set_options_result={self.set_options_result}"
-        ) if self.set_options_result is not None else None
-        out.append(
-            f"change_trust_result={self.change_trust_result}"
-        ) if self.change_trust_result is not None else None
-        out.append(
-            f"allow_trust_result={self.allow_trust_result}"
-        ) if self.allow_trust_result is not None else None
-        out.append(
-            f"account_merge_result={self.account_merge_result}"
-        ) if self.account_merge_result is not None else None
-        out.append(
-            f"inflation_result={self.inflation_result}"
-        ) if self.inflation_result is not None else None
-        out.append(
-            f"manage_data_result={self.manage_data_result}"
-        ) if self.manage_data_result is not None else None
-        out.append(
-            f"bump_seq_result={self.bump_seq_result}"
-        ) if self.bump_seq_result is not None else None
-        out.append(
-            f"manage_buy_offer_result={self.manage_buy_offer_result}"
-        ) if self.manage_buy_offer_result is not None else None
-        out.append(
-            f"path_payment_strict_send_result={self.path_payment_strict_send_result}"
-        ) if self.path_payment_strict_send_result is not None else None
-        out.append(
-            f"create_claimable_balance_result={self.create_claimable_balance_result}"
-        ) if self.create_claimable_balance_result is not None else None
-        out.append(
-            f"claim_claimable_balance_result={self.claim_claimable_balance_result}"
-        ) if self.claim_claimable_balance_result is not None else None
-        out.append(
-            f"begin_sponsoring_future_reserves_result={self.begin_sponsoring_future_reserves_result}"
-        ) if self.begin_sponsoring_future_reserves_result is not None else None
-        out.append(
-            f"end_sponsoring_future_reserves_result={self.end_sponsoring_future_reserves_result}"
-        ) if self.end_sponsoring_future_reserves_result is not None else None
-        out.append(
-            f"revoke_sponsorship_result={self.revoke_sponsorship_result}"
-        ) if self.revoke_sponsorship_result is not None else None
-        out.append(
-            f"clawback_result={self.clawback_result}"
-        ) if self.clawback_result is not None else None
-        out.append(
-            f"clawback_claimable_balance_result={self.clawback_claimable_balance_result}"
-        ) if self.clawback_claimable_balance_result is not None else None
-        out.append(
-            f"set_trust_line_flags_result={self.set_trust_line_flags_result}"
-        ) if self.set_trust_line_flags_result is not None else None
-        out.append(
-            f"liquidity_pool_deposit_result={self.liquidity_pool_deposit_result}"
-        ) if self.liquidity_pool_deposit_result is not None else None
-        out.append(
-            f"liquidity_pool_withdraw_result={self.liquidity_pool_withdraw_result}"
-        ) if self.liquidity_pool_withdraw_result is not None else None
-        out.append(
-            f"invoke_host_function_result={self.invoke_host_function_result}"
-        ) if self.invoke_host_function_result is not None else None
-        out.append(
-            f"extend_footprint_ttl_result={self.extend_footprint_ttl_result}"
-        ) if self.extend_footprint_ttl_result is not None else None
-        out.append(
-            f"restore_footprint_result={self.restore_footprint_result}"
-        ) if self.restore_footprint_result is not None else None
+        (
+            out.append(f"create_account_result={self.create_account_result}")
+            if self.create_account_result is not None
+            else None
+        )
+        (
+            out.append(f"payment_result={self.payment_result}")
+            if self.payment_result is not None
+            else None
+        )
+        (
+            out.append(
+                f"path_payment_strict_receive_result={self.path_payment_strict_receive_result}"
+            )
+            if self.path_payment_strict_receive_result is not None
+            else None
+        )
+        (
+            out.append(f"manage_sell_offer_result={self.manage_sell_offer_result}")
+            if self.manage_sell_offer_result is not None
+            else None
+        )
+        (
+            out.append(
+                f"create_passive_sell_offer_result={self.create_passive_sell_offer_result}"
+            )
+            if self.create_passive_sell_offer_result is not None
+            else None
+        )
+        (
+            out.append(f"set_options_result={self.set_options_result}")
+            if self.set_options_result is not None
+            else None
+        )
+        (
+            out.append(f"change_trust_result={self.change_trust_result}")
+            if self.change_trust_result is not None
+            else None
+        )
+        (
+            out.append(f"allow_trust_result={self.allow_trust_result}")
+            if self.allow_trust_result is not None
+            else None
+        )
+        (
+            out.append(f"account_merge_result={self.account_merge_result}")
+            if self.account_merge_result is not None
+            else None
+        )
+        (
+            out.append(f"inflation_result={self.inflation_result}")
+            if self.inflation_result is not None
+            else None
+        )
+        (
+            out.append(f"manage_data_result={self.manage_data_result}")
+            if self.manage_data_result is not None
+            else None
+        )
+        (
+            out.append(f"bump_seq_result={self.bump_seq_result}")
+            if self.bump_seq_result is not None
+            else None
+        )
+        (
+            out.append(f"manage_buy_offer_result={self.manage_buy_offer_result}")
+            if self.manage_buy_offer_result is not None
+            else None
+        )
+        (
+            out.append(
+                f"path_payment_strict_send_result={self.path_payment_strict_send_result}"
+            )
+            if self.path_payment_strict_send_result is not None
+            else None
+        )
+        (
+            out.append(
+                f"create_claimable_balance_result={self.create_claimable_balance_result}"
+            )
+            if self.create_claimable_balance_result is not None
+            else None
+        )
+        (
+            out.append(
+                f"claim_claimable_balance_result={self.claim_claimable_balance_result}"
+            )
+            if self.claim_claimable_balance_result is not None
+            else None
+        )
+        (
+            out.append(
+                f"begin_sponsoring_future_reserves_result={self.begin_sponsoring_future_reserves_result}"
+            )
+            if self.begin_sponsoring_future_reserves_result is not None
+            else None
+        )
+        (
+            out.append(
+                f"end_sponsoring_future_reserves_result={self.end_sponsoring_future_reserves_result}"
+            )
+            if self.end_sponsoring_future_reserves_result is not None
+            else None
+        )
+        (
+            out.append(f"revoke_sponsorship_result={self.revoke_sponsorship_result}")
+            if self.revoke_sponsorship_result is not None
+            else None
+        )
+        (
+            out.append(f"clawback_result={self.clawback_result}")
+            if self.clawback_result is not None
+            else None
+        )
+        (
+            out.append(
+                f"clawback_claimable_balance_result={self.clawback_claimable_balance_result}"
+            )
+            if self.clawback_claimable_balance_result is not None
+            else None
+        )
+        (
+            out.append(
+                f"set_trust_line_flags_result={self.set_trust_line_flags_result}"
+            )
+            if self.set_trust_line_flags_result is not None
+            else None
+        )
+        (
+            out.append(
+                f"liquidity_pool_deposit_result={self.liquidity_pool_deposit_result}"
+            )
+            if self.liquidity_pool_deposit_result is not None
+            else None
+        )
+        (
+            out.append(
+                f"liquidity_pool_withdraw_result={self.liquidity_pool_withdraw_result}"
+            )
+            if self.liquidity_pool_withdraw_result is not None
+            else None
+        )
+        (
+            out.append(
+                f"invoke_host_function_result={self.invoke_host_function_result}"
+            )
+            if self.invoke_host_function_result is not None
+            else None
+        )
+        (
+            out.append(
+                f"extend_footprint_ttl_result={self.extend_footprint_ttl_result}"
+            )
+            if self.extend_footprint_ttl_result is not None
+            else None
+        )
+        (
+            out.append(f"restore_footprint_result={self.restore_footprint_result}")
+            if self.restore_footprint_result is not None
+            else None
+        )
         return f"<OperationResultTr [{', '.join(out)}]>"

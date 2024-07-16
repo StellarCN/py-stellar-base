@@ -4,6 +4,7 @@ another account and removes the source account from the ledger.
 
 See: https://developers.stellar.org/docs/start/list-of-operations/#account-merge
 """
+
 from stellar_sdk import Keypair, Network, Server, TransactionBuilder
 
 # Configure StellarSdk to talk to the horizon instance hosted by Stellar.org

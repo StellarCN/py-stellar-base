@@ -3,6 +3,7 @@ This example shows the various ways to create a Keypair.
 
 See: https://developers.stellar.org/docs/tutorials/create-account/#create-a-keypair
 """
+
 from stellar_sdk.keypair import Keypair
 
 # create a random keypair

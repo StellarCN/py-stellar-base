@@ -88,7 +88,9 @@ class TransactionExt:
     def __repr__(self):
         out = []
         out.append(f"v={self.v}")
-        out.append(
-            f"soroban_data={self.soroban_data}"
-        ) if self.soroban_data is not None else None
+        (
+            out.append(f"soroban_data={self.soroban_data}")
+            if self.soroban_data is not None
+            else None
+        )
         return f"<TransactionExt [{', '.join(out)}]>"

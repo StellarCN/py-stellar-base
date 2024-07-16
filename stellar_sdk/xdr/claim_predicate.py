@@ -175,19 +175,29 @@ class ClaimPredicate:
     def __repr__(self):
         out = []
         out.append(f"type={self.type}")
-        out.append(
-            f"and_predicates={self.and_predicates}"
-        ) if self.and_predicates is not None else None
-        out.append(
-            f"or_predicates={self.or_predicates}"
-        ) if self.or_predicates is not None else None
-        out.append(
-            f"not_predicate={self.not_predicate}"
-        ) if self.not_predicate is not None else None
-        out.append(
-            f"abs_before={self.abs_before}"
-        ) if self.abs_before is not None else None
-        out.append(
-            f"rel_before={self.rel_before}"
-        ) if self.rel_before is not None else None
+        (
+            out.append(f"and_predicates={self.and_predicates}")
+            if self.and_predicates is not None
+            else None
+        )
+        (
+            out.append(f"or_predicates={self.or_predicates}")
+            if self.or_predicates is not None
+            else None
+        )
+        (
+            out.append(f"not_predicate={self.not_predicate}")
+            if self.not_predicate is not None
+            else None
+        )
+        (
+            out.append(f"abs_before={self.abs_before}")
+            if self.abs_before is not None
+            else None
+        )
+        (
+            out.append(f"rel_before={self.rel_before}")
+            if self.rel_before is not None
+            else None
+        )
         return f"<ClaimPredicate [{', '.join(out)}]>"

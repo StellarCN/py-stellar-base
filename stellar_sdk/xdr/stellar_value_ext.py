@@ -88,7 +88,9 @@ class StellarValueExt:
     def __repr__(self):
         out = []
         out.append(f"v={self.v}")
-        out.append(
-            f"lc_value_signature={self.lc_value_signature}"
-        ) if self.lc_value_signature is not None else None
+        (
+            out.append(f"lc_value_signature={self.lc_value_signature}")
+            if self.lc_value_signature is not None
+            else None
+        )
         return f"<StellarValueExt [{', '.join(out)}]>"

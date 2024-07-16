@@ -389,44 +389,72 @@ class StellarMessage:
         out.append(f"error={self.error}") if self.error is not None else None
         out.append(f"hello={self.hello}") if self.hello is not None else None
         out.append(f"auth={self.auth}") if self.auth is not None else None
-        out.append(
-            f"dont_have={self.dont_have}"
-        ) if self.dont_have is not None else None
+        (
+            out.append(f"dont_have={self.dont_have}")
+            if self.dont_have is not None
+            else None
+        )
         out.append(f"peers={self.peers}") if self.peers is not None else None
-        out.append(
-            f"tx_set_hash={self.tx_set_hash}"
-        ) if self.tx_set_hash is not None else None
+        (
+            out.append(f"tx_set_hash={self.tx_set_hash}")
+            if self.tx_set_hash is not None
+            else None
+        )
         out.append(f"tx_set={self.tx_set}") if self.tx_set is not None else None
-        out.append(
-            f"generalized_tx_set={self.generalized_tx_set}"
-        ) if self.generalized_tx_set is not None else None
-        out.append(
-            f"transaction={self.transaction}"
-        ) if self.transaction is not None else None
-        out.append(
-            f"signed_survey_request_message={self.signed_survey_request_message}"
-        ) if self.signed_survey_request_message is not None else None
-        out.append(
-            f"signed_survey_response_message={self.signed_survey_response_message}"
-        ) if self.signed_survey_response_message is not None else None
-        out.append(
-            f"q_set_hash={self.q_set_hash}"
-        ) if self.q_set_hash is not None else None
+        (
+            out.append(f"generalized_tx_set={self.generalized_tx_set}")
+            if self.generalized_tx_set is not None
+            else None
+        )
+        (
+            out.append(f"transaction={self.transaction}")
+            if self.transaction is not None
+            else None
+        )
+        (
+            out.append(
+                f"signed_survey_request_message={self.signed_survey_request_message}"
+            )
+            if self.signed_survey_request_message is not None
+            else None
+        )
+        (
+            out.append(
+                f"signed_survey_response_message={self.signed_survey_response_message}"
+            )
+            if self.signed_survey_response_message is not None
+            else None
+        )
+        (
+            out.append(f"q_set_hash={self.q_set_hash}")
+            if self.q_set_hash is not None
+            else None
+        )
         out.append(f"q_set={self.q_set}") if self.q_set is not None else None
         out.append(f"envelope={self.envelope}") if self.envelope is not None else None
-        out.append(
-            f"get_scp_ledger_seq={self.get_scp_ledger_seq}"
-        ) if self.get_scp_ledger_seq is not None else None
-        out.append(
-            f"send_more_message={self.send_more_message}"
-        ) if self.send_more_message is not None else None
-        out.append(
-            f"send_more_extended_message={self.send_more_extended_message}"
-        ) if self.send_more_extended_message is not None else None
-        out.append(
-            f"flood_advert={self.flood_advert}"
-        ) if self.flood_advert is not None else None
-        out.append(
-            f"flood_demand={self.flood_demand}"
-        ) if self.flood_demand is not None else None
+        (
+            out.append(f"get_scp_ledger_seq={self.get_scp_ledger_seq}")
+            if self.get_scp_ledger_seq is not None
+            else None
+        )
+        (
+            out.append(f"send_more_message={self.send_more_message}")
+            if self.send_more_message is not None
+            else None
+        )
+        (
+            out.append(f"send_more_extended_message={self.send_more_extended_message}")
+            if self.send_more_extended_message is not None
+            else None
+        )
+        (
+            out.append(f"flood_advert={self.flood_advert}")
+            if self.flood_advert is not None
+            else None
+        )
+        (
+            out.append(f"flood_demand={self.flood_demand}")
+            if self.flood_demand is not None
+            else None
+        )
         return f"<StellarMessage [{', '.join(out)}]>"

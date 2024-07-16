@@ -85,7 +85,9 @@ class SCEnvMetaEntry:
     def __repr__(self):
         out = []
         out.append(f"kind={self.kind}")
-        out.append(
-            f"interface_version={self.interface_version}"
-        ) if self.interface_version is not None else None
+        (
+            out.append(f"interface_version={self.interface_version}")
+            if self.interface_version is not None
+            else None
+        )
         return f"<SCEnvMetaEntry [{', '.join(out)}]>"
