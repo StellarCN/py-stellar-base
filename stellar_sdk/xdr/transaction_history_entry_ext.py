@@ -88,7 +88,9 @@ class TransactionHistoryEntryExt:
     def __repr__(self):
         out = []
         out.append(f"v={self.v}")
-        out.append(
-            f"generalized_tx_set={self.generalized_tx_set}"
-        ) if self.generalized_tx_set is not None else None
+        (
+            out.append(f"generalized_tx_set={self.generalized_tx_set}")
+            if self.generalized_tx_set is not None
+            else None
+        )
         return f"<TransactionHistoryEntryExt [{', '.join(out)}]>"

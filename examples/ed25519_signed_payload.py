@@ -1,6 +1,7 @@
 """
 This example shows how to use the new strkey (ED25519_SIGNED_PAYLOAD) introduced in Protocol 19.
 """
+
 from binascii import unhexlify
 
 from stellar_sdk import SignedPayloadSigner, SignerKey

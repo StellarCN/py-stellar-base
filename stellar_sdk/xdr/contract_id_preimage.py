@@ -104,10 +104,14 @@ class ContractIDPreimage:
     def __repr__(self):
         out = []
         out.append(f"type={self.type}")
-        out.append(
-            f"from_address={self.from_address}"
-        ) if self.from_address is not None else None
-        out.append(
-            f"from_asset={self.from_asset}"
-        ) if self.from_asset is not None else None
+        (
+            out.append(f"from_address={self.from_address}")
+            if self.from_address is not None
+            else None
+        )
+        (
+            out.append(f"from_asset={self.from_asset}")
+            if self.from_asset is not None
+            else None
+        )
         return f"<ContractIDPreimage [{', '.join(out)}]>"

@@ -7,6 +7,7 @@ Created: 2017-10-30
 Updated: 2019-10-10
 Version 1.1.0
 """
+
 from typing import Dict, Optional
 
 from ..client.aiohttp_client import AiohttpClient

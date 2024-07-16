@@ -93,7 +93,9 @@ class TransactionPhase:
     def __repr__(self):
         out = []
         out.append(f"v={self.v}")
-        out.append(
-            f"v0_components={self.v0_components}"
-        ) if self.v0_components is not None else None
+        (
+            out.append(f"v0_components={self.v0_components}")
+            if self.v0_components is not None
+            else None
+        )
         return f"<TransactionPhase [{', '.join(out)}]>"

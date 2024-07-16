@@ -7,6 +7,7 @@ Created: 2017-10-30
 Updated: 2019-06-12
 Version: 2.1.0
 """
+
 from typing import Any, MutableMapping
 
 import toml

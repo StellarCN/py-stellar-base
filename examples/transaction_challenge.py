@@ -3,6 +3,7 @@ This example demonstrates how the client interacts with the server as described 
 
 See: https://github.com/stellar/stellar-protocol/blob/master/ecosystem/sep-0010.md
 """
+
 from stellar_sdk import Keypair, Network, Server, TransactionBuilder
 from stellar_sdk.exceptions import NotFoundError
 from stellar_sdk.sep.exceptions import InvalidSep10ChallengeError

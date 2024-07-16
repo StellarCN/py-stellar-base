@@ -83,7 +83,9 @@ class GeneralizedTransactionSet:
     def __repr__(self):
         out = []
         out.append(f"v={self.v}")
-        out.append(
-            f"v1_tx_set={self.v1_tx_set}"
-        ) if self.v1_tx_set is not None else None
+        (
+            out.append(f"v1_tx_set={self.v1_tx_set}")
+            if self.v1_tx_set is not None
+            else None
+        )
         return f"<GeneralizedTransactionSet [{', '.join(out)}]>"

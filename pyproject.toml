@@ -67,13 +67,13 @@ pytest-cov = "^5.0.0"
 pytest-timeout = "^2.3.1"
 pytest-asyncio = "^0.23.7"
 pytest-httpserver = "^1.0.10"
-# currently, mypy cannot run in pypy https://github.com/python/typed_ast/issues/111
-mypy = {version = "^1.10", markers = "platform_python_implementation == 'CPython'"}
 types-toml = {version = "^0.10.8", markers = "platform_python_implementation == 'CPython'"}
 types-requests = {version = "^2.32.0", markers = "platform_python_implementation == 'CPython'"}
-autoflake = "^2.3"
-isort = "^5.13.2"
-black = "^24.4.2"
+autoflake = "2.3.1"
+isort = "5.13.2"
+black = "24.4.2"
+# currently, mypy cannot run in pypy https://github.com/python/typed_ast/issues/111
+mypy = {version = "1.10.1", markers = "platform_python_implementation == 'CPython'"}
 requests-mock = "^1.12.1"
 aioresponses = {git = "https://github.com/pnuckowski/aioresponses.git"}
 

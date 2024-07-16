@@ -136,7 +136,9 @@ class CreateClaimableBalanceResult:
     def __repr__(self):
         out = []
         out.append(f"code={self.code}")
-        out.append(
-            f"balance_id={self.balance_id}"
-        ) if self.balance_id is not None else None
+        (
+            out.append(f"balance_id={self.balance_id}")
+            if self.balance_id is not None
+            else None
+        )
         return f"<CreateClaimableBalanceResult [{', '.join(out)}]>"

@@ -101,7 +101,9 @@ class StoredTransactionSet:
         out = []
         out.append(f"v={self.v}")
         out.append(f"tx_set={self.tx_set}") if self.tx_set is not None else None
-        out.append(
-            f"generalized_tx_set={self.generalized_tx_set}"
-        ) if self.generalized_tx_set is not None else None
+        (
+            out.append(f"generalized_tx_set={self.generalized_tx_set}")
+            if self.generalized_tx_set is not None
+            else None
+        )
         return f"<StoredTransactionSet [{', '.join(out)}]>"

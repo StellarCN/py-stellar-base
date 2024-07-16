@@ -93,7 +93,9 @@ class TxSetComponent:
     def __repr__(self):
         out = []
         out.append(f"type={self.type}")
-        out.append(
-            f"txs_maybe_discounted_fee={self.txs_maybe_discounted_fee}"
-        ) if self.txs_maybe_discounted_fee is not None else None
+        (
+            out.append(f"txs_maybe_discounted_fee={self.txs_maybe_discounted_fee}")
+            if self.txs_maybe_discounted_fee is not None
+            else None
+        )
         return f"<TxSetComponent [{', '.join(out)}]>"

@@ -221,25 +221,37 @@ class LedgerEntryData:
         out = []
         out.append(f"type={self.type}")
         out.append(f"account={self.account}") if self.account is not None else None
-        out.append(
-            f"trust_line={self.trust_line}"
-        ) if self.trust_line is not None else None
+        (
+            out.append(f"trust_line={self.trust_line}")
+            if self.trust_line is not None
+            else None
+        )
         out.append(f"offer={self.offer}") if self.offer is not None else None
         out.append(f"data={self.data}") if self.data is not None else None
-        out.append(
-            f"claimable_balance={self.claimable_balance}"
-        ) if self.claimable_balance is not None else None
-        out.append(
-            f"liquidity_pool={self.liquidity_pool}"
-        ) if self.liquidity_pool is not None else None
-        out.append(
-            f"contract_data={self.contract_data}"
-        ) if self.contract_data is not None else None
-        out.append(
-            f"contract_code={self.contract_code}"
-        ) if self.contract_code is not None else None
-        out.append(
-            f"config_setting={self.config_setting}"
-        ) if self.config_setting is not None else None
+        (
+            out.append(f"claimable_balance={self.claimable_balance}")
+            if self.claimable_balance is not None
+            else None
+        )
+        (
+            out.append(f"liquidity_pool={self.liquidity_pool}")
+            if self.liquidity_pool is not None
+            else None
+        )
+        (
+            out.append(f"contract_data={self.contract_data}")
+            if self.contract_data is not None
+            else None
+        )
+        (
+            out.append(f"contract_code={self.contract_code}")
+            if self.contract_code is not None
+            else None
+        )
+        (
+            out.append(f"config_setting={self.config_setting}")
+            if self.config_setting is not None
+            else None
+        )
         out.append(f"ttl={self.ttl}") if self.ttl is not None else None
         return f"<LedgerEntryData [{', '.join(out)}]>"

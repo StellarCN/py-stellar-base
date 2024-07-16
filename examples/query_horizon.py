@@ -1,6 +1,7 @@
 """
 See: https://stellar-sdk.readthedocs.io/en/latest/querying_horizon.html#building-requests
 """
+
 from stellar_sdk import Server
 
 server = Server(horizon_url="https://horizon.stellar.org")

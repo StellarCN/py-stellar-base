@@ -126,13 +126,19 @@ class ChangeTrustAsset:
     def __repr__(self):
         out = []
         out.append(f"type={self.type}")
-        out.append(
-            f"alpha_num4={self.alpha_num4}"
-        ) if self.alpha_num4 is not None else None
-        out.append(
-            f"alpha_num12={self.alpha_num12}"
-        ) if self.alpha_num12 is not None else None
-        out.append(
-            f"liquidity_pool={self.liquidity_pool}"
-        ) if self.liquidity_pool is not None else None
+        (
+            out.append(f"alpha_num4={self.alpha_num4}")
+            if self.alpha_num4 is not None
+            else None
+        )
+        (
+            out.append(f"alpha_num12={self.alpha_num12}")
+            if self.alpha_num12 is not None
+            else None
+        )
+        (
+            out.append(f"liquidity_pool={self.liquidity_pool}")
+            if self.liquidity_pool is not None
+            else None
+        )
         return f"<ChangeTrustAsset [{', '.join(out)}]>"

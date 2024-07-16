@@ -1,6 +1,7 @@
 """
 See: https://stellar-sdk.readthedocs.io/en/latest/querying_horizon.html#streaming-requests
 """
+
 from stellar_sdk import Server
 
 server = Server(horizon_url="https://horizon-testnet.stellar.org")

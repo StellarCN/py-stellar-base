@@ -134,7 +134,9 @@ class TestMemo:
             pytest.param(NoneMemo(), NoneMemo(), True, id="NoneMemo_equals"),
             pytest.param(IdMemo(1), IdMemo(1), True, id="IdMemo_equals"),
             pytest.param(IdMemo(1), IdMemo(2), False, id="IdMemo_not_equals"),
-            pytest.param(TextMemo("恒星"), TextMemo("恒星"), True, id="TextMemo_equals"),
+            pytest.param(
+                TextMemo("恒星"), TextMemo("恒星"), True, id="TextMemo_equals"
+            ),
             pytest.param(
                 TextMemo("恒星"), TextMemo("太阳"), False, id="TextMemo_not_equals"
             ),

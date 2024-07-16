@@ -15,6 +15,7 @@ with the transaction has multiple public keys.
 
 See: https://developers.stellar.org/docs/glossary/multisig/
 """
+
 from stellar_sdk import Asset, Keypair, Network, Server, Signer, TransactionBuilder
 
 server = Server(horizon_url="https://horizon-testnet.stellar.org")

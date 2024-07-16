@@ -104,8 +104,10 @@ class RevokeSponsorshipOp:
     def __repr__(self):
         out = []
         out.append(f"type={self.type}")
-        out.append(
-            f"ledger_key={self.ledger_key}"
-        ) if self.ledger_key is not None else None
+        (
+            out.append(f"ledger_key={self.ledger_key}")
+            if self.ledger_key is not None
+            else None
+        )
         out.append(f"signer={self.signer}") if self.signer is not None else None
         return f"<RevokeSponsorshipOp [{', '.join(out)}]>"

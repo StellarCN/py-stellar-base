@@ -152,16 +152,24 @@ class HashIDPreimage:
     def __repr__(self):
         out = []
         out.append(f"type={self.type}")
-        out.append(
-            f"operation_id={self.operation_id}"
-        ) if self.operation_id is not None else None
-        out.append(
-            f"revoke_id={self.revoke_id}"
-        ) if self.revoke_id is not None else None
-        out.append(
-            f"contract_id={self.contract_id}"
-        ) if self.contract_id is not None else None
-        out.append(
-            f"soroban_authorization={self.soroban_authorization}"
-        ) if self.soroban_authorization is not None else None
+        (
+            out.append(f"operation_id={self.operation_id}")
+            if self.operation_id is not None
+            else None
+        )
+        (
+            out.append(f"revoke_id={self.revoke_id}")
+            if self.revoke_id is not None
+            else None
+        )
+        (
+            out.append(f"contract_id={self.contract_id}")
+            if self.contract_id is not None
+            else None
+        )
+        (
+            out.append(f"soroban_authorization={self.soroban_authorization}")
+            if self.soroban_authorization is not None
+            else None
+        )
         return f"<HashIDPreimage [{', '.join(out)}]>"

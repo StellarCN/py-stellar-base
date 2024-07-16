@@ -450,9 +450,11 @@ class SCVal:
         out.append(f"i32={self.i32}") if self.i32 is not None else None
         out.append(f"u64={self.u64}") if self.u64 is not None else None
         out.append(f"i64={self.i64}") if self.i64 is not None else None
-        out.append(
-            f"timepoint={self.timepoint}"
-        ) if self.timepoint is not None else None
+        (
+            out.append(f"timepoint={self.timepoint}")
+            if self.timepoint is not None
+            else None
+        )
         out.append(f"duration={self.duration}") if self.duration is not None else None
         out.append(f"u128={self.u128}") if self.u128 is not None else None
         out.append(f"i128={self.i128}") if self.i128 is not None else None
@@ -464,8 +466,10 @@ class SCVal:
         out.append(f"vec={self.vec}") if self.vec is not None else None
         out.append(f"map={self.map}") if self.map is not None else None
         out.append(f"address={self.address}") if self.address is not None else None
-        out.append(
-            f"nonce_key={self.nonce_key}"
-        ) if self.nonce_key is not None else None
+        (
+            out.append(f"nonce_key={self.nonce_key}")
+            if self.nonce_key is not None
+            else None
+        )
         out.append(f"instance={self.instance}") if self.instance is not None else None
         return f"<SCVal [{', '.join(out)}]>"

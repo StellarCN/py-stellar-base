@@ -112,10 +112,14 @@ class SorobanAuthorizedFunction:
     def __repr__(self):
         out = []
         out.append(f"type={self.type}")
-        out.append(
-            f"contract_fn={self.contract_fn}"
-        ) if self.contract_fn is not None else None
-        out.append(
-            f"create_contract_host_fn={self.create_contract_host_fn}"
-        ) if self.create_contract_host_fn is not None else None
+        (
+            out.append(f"contract_fn={self.contract_fn}")
+            if self.contract_fn is not None
+            else None
+        )
+        (
+            out.append(f"create_contract_host_fn={self.create_contract_host_fn}")
+            if self.create_contract_host_fn is not None
+            else None
+        )
         return f"<SorobanAuthorizedFunction [{', '.join(out)}]>"
