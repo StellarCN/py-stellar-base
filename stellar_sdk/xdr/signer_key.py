@@ -137,11 +137,15 @@ class SignerKey:
         out = []
         out.append(f"type={self.type}")
         out.append(f"ed25519={self.ed25519}") if self.ed25519 is not None else None
-        out.append(
-            f"pre_auth_tx={self.pre_auth_tx}"
-        ) if self.pre_auth_tx is not None else None
+        (
+            out.append(f"pre_auth_tx={self.pre_auth_tx}")
+            if self.pre_auth_tx is not None
+            else None
+        )
         out.append(f"hash_x={self.hash_x}") if self.hash_x is not None else None
-        out.append(
-            f"ed25519_signed_payload={self.ed25519_signed_payload}"
-        ) if self.ed25519_signed_payload is not None else None
+        (
+            out.append(f"ed25519_signed_payload={self.ed25519_signed_payload}")
+            if self.ed25519_signed_payload is not None
+            else None
+        )
         return f"<SignerKey [{', '.join(out)}]>"

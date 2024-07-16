@@ -88,9 +88,7 @@ class TestTOID:
         ],
     )
     def test_after_ledger(self, ledger_seq, toid):
-        assert TOID.after_ledger(ledger_seq) == TOID(
-            ledger_seq, 2**20 - 1, 2**12 - 1
-        )
+        assert TOID.after_ledger(ledger_seq) == TOID(ledger_seq, 2**20 - 1, 2**12 - 1)
 
     def test_increment_operation_order(self):
         toid = TOID(0, 0, 1)

@@ -88,7 +88,9 @@ class ContractExecutable:
     def __repr__(self):
         out = []
         out.append(f"type={self.type}")
-        out.append(
-            f"wasm_hash={self.wasm_hash}"
-        ) if self.wasm_hash is not None else None
+        (
+            out.append(f"wasm_hash={self.wasm_hash}")
+            if self.wasm_hash is not None
+            else None
+        )
         return f"<ContractExecutable [{', '.join(out)}]>"

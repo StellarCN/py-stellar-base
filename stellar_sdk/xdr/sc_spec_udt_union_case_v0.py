@@ -100,10 +100,14 @@ class SCSpecUDTUnionCaseV0:
     def __repr__(self):
         out = []
         out.append(f"kind={self.kind}")
-        out.append(
-            f"void_case={self.void_case}"
-        ) if self.void_case is not None else None
-        out.append(
-            f"tuple_case={self.tuple_case}"
-        ) if self.tuple_case is not None else None
+        (
+            out.append(f"void_case={self.void_case}")
+            if self.void_case is not None
+            else None
+        )
+        (
+            out.append(f"tuple_case={self.tuple_case}")
+            if self.tuple_case is not None
+            else None
+        )
         return f"<SCSpecUDTUnionCaseV0 [{', '.join(out)}]>"

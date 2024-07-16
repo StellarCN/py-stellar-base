@@ -175,25 +175,41 @@ class LedgerUpgrade:
     def __repr__(self):
         out = []
         out.append(f"type={self.type}")
-        out.append(
-            f"new_ledger_version={self.new_ledger_version}"
-        ) if self.new_ledger_version is not None else None
-        out.append(
-            f"new_base_fee={self.new_base_fee}"
-        ) if self.new_base_fee is not None else None
-        out.append(
-            f"new_max_tx_set_size={self.new_max_tx_set_size}"
-        ) if self.new_max_tx_set_size is not None else None
-        out.append(
-            f"new_base_reserve={self.new_base_reserve}"
-        ) if self.new_base_reserve is not None else None
-        out.append(
-            f"new_flags={self.new_flags}"
-        ) if self.new_flags is not None else None
-        out.append(
-            f"new_config={self.new_config}"
-        ) if self.new_config is not None else None
-        out.append(
-            f"new_max_soroban_tx_set_size={self.new_max_soroban_tx_set_size}"
-        ) if self.new_max_soroban_tx_set_size is not None else None
+        (
+            out.append(f"new_ledger_version={self.new_ledger_version}")
+            if self.new_ledger_version is not None
+            else None
+        )
+        (
+            out.append(f"new_base_fee={self.new_base_fee}")
+            if self.new_base_fee is not None
+            else None
+        )
+        (
+            out.append(f"new_max_tx_set_size={self.new_max_tx_set_size}")
+            if self.new_max_tx_set_size is not None
+            else None
+        )
+        (
+            out.append(f"new_base_reserve={self.new_base_reserve}")
+            if self.new_base_reserve is not None
+            else None
+        )
+        (
+            out.append(f"new_flags={self.new_flags}")
+            if self.new_flags is not None
+            else None
+        )
+        (
+            out.append(f"new_config={self.new_config}")
+            if self.new_config is not None
+            else None
+        )
+        (
+            out.append(
+                f"new_max_soroban_tx_set_size={self.new_max_soroban_tx_set_size}"
+            )
+            if self.new_max_soroban_tx_set_size is not None
+            else None
+        )
         return f"<LedgerUpgrade [{', '.join(out)}]>"

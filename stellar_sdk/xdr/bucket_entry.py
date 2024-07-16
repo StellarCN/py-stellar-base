@@ -125,13 +125,19 @@ class BucketEntry:
     def __repr__(self):
         out = []
         out.append(f"type={self.type}")
-        out.append(
-            f"live_entry={self.live_entry}"
-        ) if self.live_entry is not None else None
-        out.append(
-            f"dead_entry={self.dead_entry}"
-        ) if self.dead_entry is not None else None
-        out.append(
-            f"meta_entry={self.meta_entry}"
-        ) if self.meta_entry is not None else None
+        (
+            out.append(f"live_entry={self.live_entry}")
+            if self.live_entry is not None
+            else None
+        )
+        (
+            out.append(f"dead_entry={self.dead_entry}")
+            if self.dead_entry is not None
+            else None
+        )
+        (
+            out.append(f"meta_entry={self.meta_entry}")
+            if self.meta_entry is not None
+            else None
+        )
         return f"<BucketEntry [{', '.join(out)}]>"

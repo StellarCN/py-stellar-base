@@ -211,8 +211,10 @@ class TransactionResultResult:
     def __repr__(self):
         out = []
         out.append(f"code={self.code}")
-        out.append(
-            f"inner_result_pair={self.inner_result_pair}"
-        ) if self.inner_result_pair is not None else None
+        (
+            out.append(f"inner_result_pair={self.inner_result_pair}")
+            if self.inner_result_pair is not None
+            else None
+        )
         out.append(f"results={self.results}") if self.results is not None else None
         return f"<TransactionResultResult [{', '.join(out)}]>"

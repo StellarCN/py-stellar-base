@@ -222,7 +222,9 @@ class PathPaymentStrictSendResult:
         out = []
         out.append(f"code={self.code}")
         out.append(f"success={self.success}") if self.success is not None else None
-        out.append(
-            f"no_issuer={self.no_issuer}"
-        ) if self.no_issuer is not None else None
+        (
+            out.append(f"no_issuer={self.no_issuer}")
+            if self.no_issuer is not None
+            else None
+        )
         return f"<PathPaymentStrictSendResult [{', '.join(out)}]>"

@@ -386,46 +386,82 @@ class ConfigSettingEntry:
     def __repr__(self):
         out = []
         out.append(f"config_setting_id={self.config_setting_id}")
-        out.append(
-            f"contract_max_size_bytes={self.contract_max_size_bytes}"
-        ) if self.contract_max_size_bytes is not None else None
-        out.append(
-            f"contract_compute={self.contract_compute}"
-        ) if self.contract_compute is not None else None
-        out.append(
-            f"contract_ledger_cost={self.contract_ledger_cost}"
-        ) if self.contract_ledger_cost is not None else None
-        out.append(
-            f"contract_historical_data={self.contract_historical_data}"
-        ) if self.contract_historical_data is not None else None
-        out.append(
-            f"contract_events={self.contract_events}"
-        ) if self.contract_events is not None else None
-        out.append(
-            f"contract_bandwidth={self.contract_bandwidth}"
-        ) if self.contract_bandwidth is not None else None
-        out.append(
-            f"contract_cost_params_cpu_insns={self.contract_cost_params_cpu_insns}"
-        ) if self.contract_cost_params_cpu_insns is not None else None
-        out.append(
-            f"contract_cost_params_mem_bytes={self.contract_cost_params_mem_bytes}"
-        ) if self.contract_cost_params_mem_bytes is not None else None
-        out.append(
-            f"contract_data_key_size_bytes={self.contract_data_key_size_bytes}"
-        ) if self.contract_data_key_size_bytes is not None else None
-        out.append(
-            f"contract_data_entry_size_bytes={self.contract_data_entry_size_bytes}"
-        ) if self.contract_data_entry_size_bytes is not None else None
-        out.append(
-            f"state_archival_settings={self.state_archival_settings}"
-        ) if self.state_archival_settings is not None else None
-        out.append(
-            f"contract_execution_lanes={self.contract_execution_lanes}"
-        ) if self.contract_execution_lanes is not None else None
-        out.append(
-            f"bucket_list_size_window={self.bucket_list_size_window}"
-        ) if self.bucket_list_size_window is not None else None
-        out.append(
-            f"eviction_iterator={self.eviction_iterator}"
-        ) if self.eviction_iterator is not None else None
+        (
+            out.append(f"contract_max_size_bytes={self.contract_max_size_bytes}")
+            if self.contract_max_size_bytes is not None
+            else None
+        )
+        (
+            out.append(f"contract_compute={self.contract_compute}")
+            if self.contract_compute is not None
+            else None
+        )
+        (
+            out.append(f"contract_ledger_cost={self.contract_ledger_cost}")
+            if self.contract_ledger_cost is not None
+            else None
+        )
+        (
+            out.append(f"contract_historical_data={self.contract_historical_data}")
+            if self.contract_historical_data is not None
+            else None
+        )
+        (
+            out.append(f"contract_events={self.contract_events}")
+            if self.contract_events is not None
+            else None
+        )
+        (
+            out.append(f"contract_bandwidth={self.contract_bandwidth}")
+            if self.contract_bandwidth is not None
+            else None
+        )
+        (
+            out.append(
+                f"contract_cost_params_cpu_insns={self.contract_cost_params_cpu_insns}"
+            )
+            if self.contract_cost_params_cpu_insns is not None
+            else None
+        )
+        (
+            out.append(
+                f"contract_cost_params_mem_bytes={self.contract_cost_params_mem_bytes}"
+            )
+            if self.contract_cost_params_mem_bytes is not None
+            else None
+        )
+        (
+            out.append(
+                f"contract_data_key_size_bytes={self.contract_data_key_size_bytes}"
+            )
+            if self.contract_data_key_size_bytes is not None
+            else None
+        )
+        (
+            out.append(
+                f"contract_data_entry_size_bytes={self.contract_data_entry_size_bytes}"
+            )
+            if self.contract_data_entry_size_bytes is not None
+            else None
+        )
+        (
+            out.append(f"state_archival_settings={self.state_archival_settings}")
+            if self.state_archival_settings is not None
+            else None
+        )
+        (
+            out.append(f"contract_execution_lanes={self.contract_execution_lanes}")
+            if self.contract_execution_lanes is not None
+            else None
+        )
+        (
+            out.append(f"bucket_list_size_window={self.bucket_list_size_window}")
+            if self.bucket_list_size_window is not None
+            else None
+        )
+        (
+            out.append(f"eviction_iterator={self.eviction_iterator}")
+            if self.eviction_iterator is not None
+            else None
+        )
         return f"<ConfigSettingEntry [{', '.join(out)}]>"

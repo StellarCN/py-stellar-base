@@ -116,10 +116,14 @@ class ClaimAtom:
         out = []
         out.append(f"type={self.type}")
         out.append(f"v0={self.v0}") if self.v0 is not None else None
-        out.append(
-            f"order_book={self.order_book}"
-        ) if self.order_book is not None else None
-        out.append(
-            f"liquidity_pool={self.liquidity_pool}"
-        ) if self.liquidity_pool is not None else None
+        (
+            out.append(f"order_book={self.order_book}")
+            if self.order_book is not None
+            else None
+        )
+        (
+            out.append(f"liquidity_pool={self.liquidity_pool}")
+            if self.liquidity_pool is not None
+            else None
+        )
         return f"<ClaimAtom [{', '.join(out)}]>"

@@ -172,8 +172,10 @@ class SCError:
     def __repr__(self):
         out = []
         out.append(f"type={self.type}")
-        out.append(
-            f"contract_code={self.contract_code}"
-        ) if self.contract_code is not None else None
+        (
+            out.append(f"contract_code={self.contract_code}")
+            if self.contract_code is not None
+            else None
+        )
         out.append(f"code={self.code}") if self.code is not None else None
         return f"<SCError [{', '.join(out)}]>"

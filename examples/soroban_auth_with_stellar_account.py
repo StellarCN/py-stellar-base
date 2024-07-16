@@ -3,6 +3,7 @@
 See https://soroban.stellar.org/docs/how-to-guides/auth
 See https://soroban.stellar.org/docs/learn/authorization#stellar-account
 """
+
 import time
 
 from stellar_sdk import (

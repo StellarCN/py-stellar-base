@@ -503,7 +503,10 @@ class TestKeypair:
                 "usual canvas judge video wall ride rookie together enhance able evoke",
                 Language.ENGLISH,
             ),
-            ("胸泉谈新钉励确连球遇孤资氯递陪壤框碧折锋慌拖射潮", Language.CHINESE_SIMPLIFIED),
+            (
+                "胸泉谈新钉励确连球遇孤资氯递陪壤框碧折锋慌拖射潮",
+                Language.CHINESE_SIMPLIFIED,
+            ),
         ],
     )
     def test_invalid_mnemonic_raise(self, mnemonic, language):

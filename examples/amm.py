@@ -1,6 +1,7 @@
 """
 This example shows how to interact with the liquidity pool.
 """
+
 from stellar_sdk import (
     Asset,
     Keypair,

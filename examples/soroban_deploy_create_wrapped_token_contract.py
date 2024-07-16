@@ -1,6 +1,7 @@
 """
 This example shows how to deploy a wrapped token contract to the Stellar network.
 """
+
 import time
 
 from stellar_sdk import (

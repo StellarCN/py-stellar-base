@@ -100,10 +100,14 @@ class SCAddress:
     def __repr__(self):
         out = []
         out.append(f"type={self.type}")
-        out.append(
-            f"account_id={self.account_id}"
-        ) if self.account_id is not None else None
-        out.append(
-            f"contract_id={self.contract_id}"
-        ) if self.contract_id is not None else None
+        (
+            out.append(f"account_id={self.account_id}")
+            if self.account_id is not None
+            else None
+        )
+        (
+            out.append(f"contract_id={self.contract_id}")
+            if self.contract_id is not None
+            else None
+        )
         return f"<SCAddress [{', '.join(out)}]>"

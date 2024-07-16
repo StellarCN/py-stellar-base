@@ -3,6 +3,7 @@ Release History
 
 ### Pending
 #### Update
+- feat: `SorobanServer.send_transaction` supports sending FeeBumpTransactionEnvelope.
 - fix: Corrected the issue where `TransactionBuilder.from_xdr` could not properly parse transactions containing Soroban operations.
 - fix: Corrected the issue where `FeeBumpTransactionEnvelope.from_xdr` could not properly parse transactions containing Soroban operations.
 - refactor: `TransactionBuilder.from_xdr` previously could return `TransactionBuilder` or `FeeBumpTransactionEnvelope`. Now it will no longer return `TransactionBuilder`, but will return `TransactionEnvelope` or `FeeBumpTransactionEnvelope`.

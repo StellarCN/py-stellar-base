@@ -103,10 +103,14 @@ class AssetCode:
     def __repr__(self):
         out = []
         out.append(f"type={self.type}")
-        out.append(
-            f"asset_code4={self.asset_code4}"
-        ) if self.asset_code4 is not None else None
-        out.append(
-            f"asset_code12={self.asset_code12}"
-        ) if self.asset_code12 is not None else None
+        (
+            out.append(f"asset_code4={self.asset_code4}")
+            if self.asset_code4 is not None
+            else None
+        )
+        (
+            out.append(f"asset_code12={self.asset_code12}")
+            if self.asset_code12 is not None
+            else None
+        )
         return f"<AssetCode [{', '.join(out)}]>"

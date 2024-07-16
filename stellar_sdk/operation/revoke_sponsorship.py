@@ -477,9 +477,9 @@ class RevokeSponsorship(Operation):
                     ledger_key.trust_line.asset.type
                     == stellar_xdr.AssetType.ASSET_TYPE_POOL_SHARE
                 ):
-                    asset: Union[
-                        Asset, LiquidityPoolId
-                    ] = LiquidityPoolId.from_xdr_object(ledger_key.trust_line.asset)
+                    asset: Union[Asset, LiquidityPoolId] = (
+                        LiquidityPoolId.from_xdr_object(ledger_key.trust_line.asset)
+                    )
                 else:
                     asset = Asset.from_xdr_object(ledger_key.trust_line.asset)
                 op = cls.revoke_trustline_sponsorship(account_id, asset, source)

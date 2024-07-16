@@ -100,10 +100,14 @@ class SurveyResponseBody:
     def __repr__(self):
         out = []
         out.append(f"type={self.type}")
-        out.append(
-            f"topology_response_body_v0={self.topology_response_body_v0}"
-        ) if self.topology_response_body_v0 is not None else None
-        out.append(
-            f"topology_response_body_v1={self.topology_response_body_v1}"
-        ) if self.topology_response_body_v1 is not None else None
+        (
+            out.append(f"topology_response_body_v0={self.topology_response_body_v0}")
+            if self.topology_response_body_v0 is not None
+            else None
+        )
+        (
+            out.append(f"topology_response_body_v1={self.topology_response_body_v1}")
+            if self.topology_response_body_v1 is not None
+            else None
+        )
         return f"<SurveyResponseBody [{', '.join(out)}]>"

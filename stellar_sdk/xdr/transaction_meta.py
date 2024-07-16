@@ -141,9 +141,11 @@ class TransactionMeta:
     def __repr__(self):
         out = []
         out.append(f"v={self.v}")
-        out.append(
-            f"operations={self.operations}"
-        ) if self.operations is not None else None
+        (
+            out.append(f"operations={self.operations}")
+            if self.operations is not None
+            else None
+        )
         out.append(f"v1={self.v1}") if self.v1 is not None else None
         out.append(f"v2={self.v2}") if self.v2 is not None else None
         out.append(f"v3={self.v3}") if self.v3 is not None else None

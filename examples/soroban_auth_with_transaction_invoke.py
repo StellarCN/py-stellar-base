@@ -3,6 +3,7 @@
 See https://soroban.stellar.org/docs/how-to-guides/auth
 See https://soroban.stellar.org/docs/learn/authorization#transaction-invoker
 """
+
 import time
 
 from stellar_sdk import Keypair, Network, SorobanServer, TransactionBuilder, scval

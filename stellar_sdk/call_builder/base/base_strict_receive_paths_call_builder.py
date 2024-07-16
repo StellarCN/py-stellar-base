@@ -52,9 +52,9 @@ class BaseStrictReceivePathsCallBuilder(BaseCallBuilder):
         params = {
             "destination_amount": destination_amount,
             "destination_asset_type": destination_asset.type,
-            "destination_asset_code": None
-            if destination_asset.is_native()
-            else destination_asset.code,
+            "destination_asset_code": (
+                None if destination_asset.is_native() else destination_asset.code
+            ),
             "destination_asset_issuer": destination_asset.issuer,
         }
         if isinstance(source, str):

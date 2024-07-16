@@ -9,6 +9,7 @@ transaction envelope.
 
 See: https://developers.stellar.org/docs/glossary/fee-bumps/
 """
+
 import pprint
 
 from stellar_sdk import Asset, Keypair, Network, Server, TransactionBuilder

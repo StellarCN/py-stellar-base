@@ -2,6 +2,7 @@
 
 See https://soroban.stellar.org/docs/fundamentals-and-concepts/state-expiration#restorefootprintop
 """
+
 import time
 
 from stellar_sdk import (
