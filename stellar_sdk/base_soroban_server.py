@@ -47,6 +47,11 @@ def _assemble_transaction(
     )
     te = copy.deepcopy(transaction_envelope)
     te.signatures = []
+
+    # Reset fee to the original value, excluding the resource fee
+    if te.transaction.soroban_data:
+        te.transaction.fee -= te.transaction.soroban_data.resource_fee.int64
+
     assert min_resource_fee is not None
     te.transaction.fee += min_resource_fee
     te.transaction.soroban_data = soroban_data
