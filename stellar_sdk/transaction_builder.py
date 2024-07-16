@@ -183,11 +183,13 @@ class TransactionBuilder:
 
         if base_fee < inner_base_fee:
             raise ValueError(
-                f"Invalid base_fee, it should be at least {inner_base_fee} stroops."
+                f"Invalid `base_fee`, it should be at least {inner_base_fee} stroops."
             )
 
         if base_fee < BASE_FEE:
-            f"Invalid base_fee, it should be at least {BASE_FEE} stroops."
+            raise ValueError(
+                f"Invalid `base_fee`, it should be at least {BASE_FEE} stroops."
+            )
 
         fee_bump_transaction = FeeBumpTransaction(
             fee_source=fee_source,
@@ -241,11 +243,19 @@ class TransactionBuilder:
             transaction_envelope.transaction.source,
             transaction_envelope.transaction.sequence - 1,
         )
+
+        assert isinstance(transaction_envelope, TransactionEnvelope)
+        resource_fee = 0
+        if transaction_envelope.transaction.soroban_data:
+            resource_fee = (
+                transaction_envelope.transaction.soroban_data.resource_fee.int64
+            )
+
         transaction_builder = TransactionBuilder(
             source_account=source_account,
             network_passphrase=network_passphrase,
             base_fee=int(
-                transaction_envelope.transaction.fee
+                (transaction_envelope.transaction.fee - resource_fee)
                 / len(transaction_envelope.transaction.operations)
             ),
             v1=transaction_envelope.transaction.v1,

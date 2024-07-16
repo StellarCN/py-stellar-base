@@ -64,7 +64,7 @@ class TestFeeBumpTransaction:
         restore_tx = restore_te.transaction
         assert isinstance(restore_tx, FeeBumpTransaction)
         assert restore_tx.fee_source.account_id == fee_source.public_key
-        assert restore_tx.base_fee == base_fee
+        assert restore_tx.fee == base_fee * (len(inner_tx.transaction.operations) + 1)
         assert restore_tx.inner_transaction_envelope.to_xdr() == inner_tx.to_xdr()
 
     def test_to_source_muxed_xdr(self):
@@ -164,7 +164,7 @@ class TestFeeBumpTransaction:
         restore_tx = restore_te.transaction
         assert isinstance(restore_tx, FeeBumpTransaction)
         assert restore_tx.fee_source == MuxedAccount.from_account(fee_source.public_key)
-        assert restore_tx.base_fee == base_fee
+        assert restore_tx.fee == base_fee * (len(inner_tx.transaction.operations) + 1)
         assert restore_tx.inner_transaction_envelope.to_xdr() == inner_tx.to_xdr()
 
     def test_to_xdr_with_muxed_account_fee_source(self):
@@ -217,7 +217,7 @@ class TestFeeBumpTransaction:
         restore_tx = restore_te.transaction
         assert isinstance(restore_tx, FeeBumpTransaction)
         assert restore_tx.fee_source == fee_source
-        assert restore_tx.base_fee == base_fee
+        assert restore_tx.fee == base_fee * (len(inner_tx.transaction.operations) + 1)
         assert restore_tx.inner_transaction_envelope.to_xdr() == inner_tx.to_xdr()
 
     def test_to_xdr_with_inner_muxed_account_source(self):
@@ -267,7 +267,7 @@ class TestFeeBumpTransaction:
         assert restore_tx.fee_source == MuxedAccount.from_account(
             "MAAAAAAAAAAAH2HAJCI3MGHFBTF7D7MUPSRWDE5QZLWLFND7GLJQLGVBZZ66RP43CKRMY"
         )
-        assert restore_tx.base_fee == base_fee
+        assert restore_tx.fee == base_fee * (len(inner_tx.transaction.operations) + 1)
         assert restore_tx.inner_transaction_envelope.to_xdr() == inner_tx.to_xdr()
 
     def test_tx_v0(self):
@@ -322,7 +322,7 @@ class TestFeeBumpTransaction:
         assert inner_tx.transaction.v1 is False
         assert isinstance(restore_tx, FeeBumpTransaction)
         assert restore_tx.fee_source.account_id == fee_source.public_key
-        assert restore_tx.base_fee == base_fee
+        assert restore_tx.fee == base_fee * (len(inner_tx.transaction.operations) + 1)
         assert restore_tx.inner_transaction_envelope.hash() == inner_tx.hash()
 
     def test_tx_fee_less_than_inner_tx_fee(self):
