@@ -23,6 +23,7 @@ from .soroban_rpc import *
 
 if TYPE_CHECKING:
     from .client.base_sync_client import BaseSyncClient
+    from .fee_bump_transaction_envelope import FeeBumpTransactionEnvelope
     from .transaction_envelope import TransactionEnvelope
 
 __all__ = ["SorobanServer", "Durability"]
@@ -196,7 +197,10 @@ class SorobanServer:
         return self._post(request, SimulateTransactionResponse)
 
     def send_transaction(
-        self, transaction_envelope: Union[TransactionEnvelope, str]
+        self,
+        transaction_envelope: Union[
+            TransactionEnvelope, FeeBumpTransactionEnvelope, str
+        ],
     ) -> SendTransactionResponse:
         """Submit a real transaction to the Stellar network. This is the only way to make changes "on-chain".
 

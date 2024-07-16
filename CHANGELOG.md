@@ -2,6 +2,7 @@ Release History
 ==============
 
 ### Pending
+feat: `SorobanServer.send_transaction` supports sending FeeBumpTransactionEnvelope.
 
 ### Version 10.0.0
 
