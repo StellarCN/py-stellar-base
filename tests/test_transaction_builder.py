@@ -72,9 +72,8 @@ def get_tx_builder(
 
 def check_from_xdr(tx: TransactionBuilder):
     xdr = tx.build().to_xdr()
-    tx_builder = TransactionBuilder.from_xdr(xdr, Network.TESTNET_NETWORK_PASSPHRASE)
-    assert isinstance(tx_builder, TransactionBuilder)
-    assert xdr == tx_builder.build().to_xdr()
+    parsed_tx = TransactionBuilder.from_xdr(xdr, Network.TESTNET_NETWORK_PASSPHRASE)
+    assert xdr == parsed_tx.to_xdr()
 
 
 class TestTransaction:
@@ -623,20 +622,6 @@ class TestTransaction:
         assert isinstance(new_te, FeeBumpTransactionEnvelope)
         assert new_te.to_xdr() == xdr
 
-    def test_from_xdr_remove_signatures(self):
-        tx = (
-            get_tx_builder().append_payment_op(
-                kp2.public_key, asset1, "10000", kp1.public_key
-            )
-        ).build()
-        xdr = tx.to_xdr()
-        tx.sign(kp1)
-        xdr_with_signature = tx.to_xdr()
-        new_tx_builder = TransactionBuilder.from_xdr(
-            xdr_with_signature, Network.TESTNET_NETWORK_PASSPHRASE
-        )
-        assert new_tx_builder.build().to_xdr() == xdr
-
     def test_set_conds(self):
         source_account = Account(kp1.public_key, 100000000000000000)
         time_bounds = TimeBounds(1649237469, 1649238469)
@@ -959,11 +944,8 @@ class TestTransaction:
 
     def test_from_xdr_with_soroban_tx(self):
         xdr = "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"
-        builder = TransactionBuilder.from_xdr(xdr, Network.PUBLIC_NETWORK_PASSPHRASE)
-        assert builder.base_fee == 100
-        tx = builder.build()
+        tx = TransactionBuilder.from_xdr(xdr, Network.PUBLIC_NETWORK_PASSPHRASE)
         assert isinstance(tx, TransactionEnvelope)
         assert tx.transaction.fee == 425164
         expected_tx = stellar_xdr.TransactionEnvelope.from_xdr(xdr)
-        expected_tx.v1.signatures = []
         assert tx.to_xdr() == expected_tx.to_xdr()

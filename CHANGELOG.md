@@ -5,11 +5,14 @@ Release History
 #### Update
 - fix: Corrected the issue where `TransactionBuilder.from_xdr` could not properly parse transactions containing Soroban operations.
 - fix: Corrected the issue where `FeeBumpTransactionEnvelope.from_xdr` could not properly parse transactions containing Soroban operations.
+- refactor: `TransactionBuilder.from_xdr` previously could return `TransactionBuilder` or `FeeBumpTransactionEnvelope`. Now it will no longer return `TransactionBuilder`, but will return `TransactionEnvelope` or `FeeBumpTransactionEnvelope`.
 
 #### Breaking changes
 - refactor: `FeeBumpTransactionEnvelope.base_fee` has been removed. Please use `FeeBumpTransactionEnvelope.fee instead`. Note that their meanings are different:
   - `FeeBumpTransactionEnvelope.base_fee` represented the maximum fee you were willing to pay per operation for this transaction.
   - `FeeBumpTransactionEnvelope.fee` represents the maximum fee you are willing to pay for this transaction.
+- refactor: `TransactionBuilder.from_xdr` previously could return `TransactionBuilder` or `FeeBumpTransactionEnvelope`. Now it will no longer return `TransactionBuilder`, but will return `TransactionEnvelope` or `FeeBumpTransactionEnvelope`.
+- refactor: `helpers.parse_transaction_envelope_from_xdr` has been marked as deprecated. Please use the refactored `TransactionEnvelope.from_xdr` instead.
 
 ### Version 10.0.0
 
