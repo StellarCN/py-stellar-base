@@ -32,7 +32,7 @@ from .utils import hex_to_bytes, is_valid_hash
 
 __all__ = ["TransactionBuilder"]
 
-BASE_FEE = 100
+MIN_BASE_FEE = 100
 
 
 class TransactionBuilder:
@@ -98,7 +98,7 @@ class TransactionBuilder:
         self,
         source_account: Account,
         network_passphrase: str = Network.TESTNET_NETWORK_PASSPHRASE,
-        base_fee: int = BASE_FEE,
+        base_fee: int = MIN_BASE_FEE,
         v1: bool = True,
     ):
         self.source_account: Account = source_account
@@ -140,10 +140,13 @@ class TransactionBuilder:
             min_sequence_ledger_gap=self.min_sequence_ledger_gap,
             extra_signers=self.extra_signers,
         )
+        fee = self.base_fee * len(self.operations)
+        if self.soroban_data:
+            fee += self.soroban_data.resource_fee.int64
         transaction = Transaction(
             source=source,
             sequence=sequence,
-            fee=self.base_fee * len(self.operations),
+            fee=fee,
             operations=self.operations,
             memo=self.memo,
             preconditions=preconditions,
@@ -186,9 +189,9 @@ class TransactionBuilder:
                 f"Invalid `base_fee`, it should be at least {inner_base_fee} stroops."
             )
 
-        if base_fee < BASE_FEE:
+        if base_fee < MIN_BASE_FEE:
             raise ValueError(
-                f"Invalid `base_fee`, it should be at least {BASE_FEE} stroops."
+                f"Invalid `base_fee`, it should be at least {MIN_BASE_FEE} stroops."
             )
 
         fee_bump_transaction = FeeBumpTransaction(
