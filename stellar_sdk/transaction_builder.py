@@ -1,4 +1,5 @@
 import binascii
+import math
 import os
 import time
 import warnings
@@ -31,6 +32,8 @@ from .transaction_envelope import TransactionEnvelope
 from .utils import hex_to_bytes, is_valid_hash
 
 __all__ = ["TransactionBuilder"]
+
+MIN_BASE_FEE = 100
 
 
 class TransactionBuilder:
@@ -96,7 +99,7 @@ class TransactionBuilder:
         self,
         source_account: Account,
         network_passphrase: str = Network.TESTNET_NETWORK_PASSPHRASE,
-        base_fee: int = 100,
+        base_fee: int = MIN_BASE_FEE,
         v1: bool = True,
     ):
         self.source_account: Account = source_account
@@ -138,10 +141,13 @@ class TransactionBuilder:
             min_sequence_ledger_gap=self.min_sequence_ledger_gap,
             extra_signers=self.extra_signers,
         )
+        fee = self.base_fee * len(self.operations)
+        if self.soroban_data:
+            fee += self.soroban_data.resource_fee.int64
         transaction = Transaction(
             source=source,
             sequence=sequence,
-            fee=self.base_fee * len(self.operations),
+            fee=fee,
             operations=self.operations,
             memo=self.memo,
             preconditions=preconditions,
@@ -173,9 +179,36 @@ class TransactionBuilder:
         :param network_passphrase: The network to connect to for verifying and retrieving additional attributes from.
         :return: a :class:`TransactionBuilder <stellar_sdk.transaction_envelope.TransactionBuilder>` via the XDR object.
         """
+
+        if base_fee < MIN_BASE_FEE:
+            raise ValueError(
+                f"Invalid `base_fee`, it should be at least {MIN_BASE_FEE} stroops."
+            )
+
+        soroban_resource_fee = 0
+        if inner_transaction_envelope.transaction.soroban_data:
+            soroban_resource_fee = (
+                inner_transaction_envelope.transaction.soroban_data.resource_fee.int64
+            )
+
+        inner_include_fee = (
+            inner_transaction_envelope.transaction.fee - soroban_resource_fee
+        )  # dont include soroban resource fee
+        inner_base_fee = math.ceil(
+            inner_include_fee / len(inner_transaction_envelope.transaction.operations)
+        )
+
+        if base_fee < inner_base_fee:
+            raise ValueError(
+                f"Invalid `base_fee`, it should be at least {inner_base_fee} stroops."
+            )
+
+        fee = base_fee * (len(inner_transaction_envelope.transaction.operations) + 1)
+        fee += soroban_resource_fee
+
         fee_bump_transaction = FeeBumpTransaction(
             fee_source=fee_source,
-            base_fee=base_fee,
+            fee=fee,
             inner_transaction_envelope=inner_transaction_envelope,
         )
         transaction_envelope = FeeBumpTransactionEnvelope(
@@ -187,61 +220,29 @@ class TransactionBuilder:
     @staticmethod
     def from_xdr(
         xdr: str, network_passphrase: str
-    ) -> Union["TransactionBuilder", FeeBumpTransactionEnvelope]:
-        """Create a :class:`TransactionBuilder
-        <stellar_sdk.transaction_envelope.TransactionBuilder>` or
-        :py:class:`FeeBumpTransactionEnvelope <stellar_sdk.fee_bump_transaction_envelope.FeeBumpTransactionEnvelope>`
-        via an XDR object.
+    ) -> Union[TransactionEnvelope, FeeBumpTransactionEnvelope]:
+        """When you are not sure whether your XDR belongs to
+        :py:class:`TransactionEnvelope <stellar_sdk.transaction_envelope.TransactionEnvelope>`
+        or :py:class:`FeeBumpTransactionEnvelope <stellar_sdk.fee_bump_transaction_envelope.FeeBumpTransactionEnvelope>`,
+        you can use this function.
 
-        .. warning::
-            I don't recommend you to use this function,
-            because it loses its signature when constructing TransactionBuilder.
-            Please use :py:func:`stellar_sdk.helpers.parse_transaction_envelope_from_xdr` instead.
+        An example::
 
-        In addition, if xdr is not of
-        :py:class:`TransactionEnvelope <stellar_sdk.transaction_envelope.TransactionEnvelope>`,
-        it sets the fields of this builder (the transaction envelope,
-        transaction, operations, source, etc.) to all of the fields in the
-        provided XDR transaction envelope, but the signature will not be added to it.
+            from stellar_sdk import Network, TransactionBuilder
 
-        :param xdr: The XDR object representing the transaction envelope to
-            which this builder is setting its state to.
-        :param network_passphrase: The network to connect to for verifying and retrieving additional attributes from.
-        :return: a :class:`TransactionBuilder <stellar_sdk.transaction_envelope.TransactionBuilder>` or
-            :py:class:`FeeBumpTransactionEnvelope <stellar_sdk.fee_bump_transaction_envelope.FeeBumpTransactionEnvelope>`
-            via the XDR object.
+            xdr = "AAAAAgAAAADHJNEDn33/C1uDkDfzDfKVq/4XE9IxDfGiLCfoV7riZQAAA+gCI4TVABpRPgAAAAAAAAAAAAAAAQAAAAAAAAADAAAAAUxpcmEAAAAAabIaDgm0ypyJpsVfEjZw2mO3Enq4Q4t5URKfWtqukSUAAAABVVNEAAAAAADophqGHmCvYPgHc+BjRuXHLL5Z3K3aN2CNWO9CUR2f3AAAAAAAAAAAE8G9mAADcH8AAAAAMYdBWgAAAAAAAAABV7riZQAAAEARGCGwYk/kEB2Z4UL20y536evnwmmSc4c2FnxlvUcPZl5jgWHcNwY8LTpFhdrUN9TZWciCRp/JCZYa0SJh8cYB"
+            te = TransactionBuilder.from_xdr(xdr, Network.PUBLIC_NETWORK_PASSPHRASE)
+            print(te)
+
+        :param xdr: Transaction envelope XDR
+        :param network_passphrase: The network to connect to for verifying and retrieving
+            additional attributes from. (ex. ``"Public Global Stellar Network ; September 2015"``)
+        :raises: :exc:`ValueError <stellar_sdk.exceptions.ValueError>` - XDR is neither :py:class:`TransactionEnvelope <stellar_sdk.transaction_envelope.TransactionEnvelope>`
+            nor :py:class:`FeeBumpTransactionEnvelope <stellar_sdk.fee_bump_transaction_envelope.FeeBumpTransactionEnvelope>`
         """
-        xdr_object = stellar_xdr.TransactionEnvelope.from_xdr(xdr)
-        te_type = xdr_object.type
-        if te_type == stellar_xdr.EnvelopeType.ENVELOPE_TYPE_TX_FEE_BUMP:
-            return FeeBumpTransactionEnvelope.from_xdr_object(
-                xdr_object, network_passphrase
-            )
-        transaction_envelope = TransactionEnvelope.from_xdr(
-            xdr=xdr, network_passphrase=network_passphrase
-        )
-
-        source_account = Account(
-            transaction_envelope.transaction.source,
-            transaction_envelope.transaction.sequence - 1,
-        )
-        transaction_builder = TransactionBuilder(
-            source_account=source_account,
-            network_passphrase=network_passphrase,
-            base_fee=int(
-                transaction_envelope.transaction.fee
-                / len(transaction_envelope.transaction.operations)
-            ),
-            v1=transaction_envelope.transaction.v1,
-        )
-        if transaction_envelope.transaction.preconditions:
-            transaction_builder.time_bounds = (
-                transaction_envelope.transaction.preconditions.time_bounds
-            )
-        transaction_builder.operations = transaction_envelope.transaction.operations
-        transaction_builder.memo = transaction_envelope.transaction.memo
-        transaction_builder.soroban_data = transaction_envelope.transaction.soroban_data
-        return transaction_builder
+        if FeeBumpTransactionEnvelope.is_fee_bump_transaction_envelope(xdr):
+            return FeeBumpTransactionEnvelope.from_xdr(xdr, network_passphrase)
+        return TransactionEnvelope.from_xdr(xdr, network_passphrase)
 
     def add_time_bounds(self, min_time: int, max_time: int) -> "TransactionBuilder":
         """Sets a timeout precondition on the transaction.

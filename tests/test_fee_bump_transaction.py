@@ -64,7 +64,7 @@ class TestFeeBumpTransaction:
         restore_tx = restore_te.transaction
         assert isinstance(restore_tx, FeeBumpTransaction)
         assert restore_tx.fee_source.account_id == fee_source.public_key
-        assert restore_tx.base_fee == base_fee
+        assert restore_tx.fee == base_fee * (len(inner_tx.transaction.operations) + 1)
         assert restore_tx.inner_transaction_envelope.to_xdr() == inner_tx.to_xdr()
 
     def test_to_source_muxed_xdr(self):
@@ -164,7 +164,7 @@ class TestFeeBumpTransaction:
         restore_tx = restore_te.transaction
         assert isinstance(restore_tx, FeeBumpTransaction)
         assert restore_tx.fee_source == MuxedAccount.from_account(fee_source.public_key)
-        assert restore_tx.base_fee == base_fee
+        assert restore_tx.fee == base_fee * (len(inner_tx.transaction.operations) + 1)
         assert restore_tx.inner_transaction_envelope.to_xdr() == inner_tx.to_xdr()
 
     def test_to_xdr_with_muxed_account_fee_source(self):
@@ -217,7 +217,7 @@ class TestFeeBumpTransaction:
         restore_tx = restore_te.transaction
         assert isinstance(restore_tx, FeeBumpTransaction)
         assert restore_tx.fee_source == fee_source
-        assert restore_tx.base_fee == base_fee
+        assert restore_tx.fee == base_fee * (len(inner_tx.transaction.operations) + 1)
         assert restore_tx.inner_transaction_envelope.to_xdr() == inner_tx.to_xdr()
 
     def test_to_xdr_with_inner_muxed_account_source(self):
@@ -267,7 +267,7 @@ class TestFeeBumpTransaction:
         assert restore_tx.fee_source == MuxedAccount.from_account(
             "MAAAAAAAAAAAH2HAJCI3MGHFBTF7D7MUPSRWDE5QZLWLFND7GLJQLGVBZZ66RP43CKRMY"
         )
-        assert restore_tx.base_fee == base_fee
+        assert restore_tx.fee == base_fee * (len(inner_tx.transaction.operations) + 1)
         assert restore_tx.inner_transaction_envelope.to_xdr() == inner_tx.to_xdr()
 
     def test_tx_v0(self):
@@ -322,7 +322,7 @@ class TestFeeBumpTransaction:
         assert inner_tx.transaction.v1 is False
         assert isinstance(restore_tx, FeeBumpTransaction)
         assert restore_tx.fee_source.account_id == fee_source.public_key
-        assert restore_tx.base_fee == base_fee
+        assert restore_tx.fee == base_fee * (len(inner_tx.transaction.operations) + 1)
         assert restore_tx.inner_transaction_envelope.hash() == inner_tx.hash()
 
     def test_tx_fee_less_than_inner_tx_fee(self):
@@ -423,3 +423,24 @@ class TestFeeBumpTransaction:
     def test_parse_transaction_envelope_from_xdr(self, xdr, is_fee_bump_te):
         result = FeeBumpTransactionEnvelope.is_fee_bump_transaction_envelope(xdr)
         assert result is is_fee_bump_te
+
+    # https://github.com/StellarCN/py-stellar-base/issues/953
+    def test_from_xdr_soroban_tx(self):
+        xdr = "AAAABQAAAADmsIA5404L0SCejoRDuqDIG98rMHsELDMTJKJAjYs8+AAAAAACCZiCAAAAAgAAAACR+IxMOJ3vkHZSFqPCpyLqFENdLN/yYjRhojIE5Dz6rAIJcXMDHa56AAAAAQAAAAEAAAAAAAAAAAAAAABmeizDAAAAAAAAAAEAAAAAAAAAGAAAAAAAAAABZHpg2j3gSXQ3PwbyO22dfOAJnhhvMuSRR0rxTI3UXh8AAAAGZGVwbG95AAAAAAACAAAADQAAABQM+a7vJ6ylUis8qPSmfQFRMCEsiwAAAA0AAABBBOWQPnfY1mHIqdwoxJOQb1i4tnFqD3I0tbhPt7/HIIzHUq1IQE4Z+emcO6gdoVslu3Kcqd/F7LP0TraQJKGoUiQAAAAAAAAAAAAAAQAAAAAAAAADAAAABgAAAAFkemDaPeBJdDc/BvI7bZ184AmeGG8y5JFHSvFMjdReHwAAABQAAAABAAAAB09Tl/U18epBIuYjX6O0rlMYzF1tZw4eWExTxGEszzU7AAAAB87BdThZEbuVmpK08n1L5YNRSsOezRbC6ffF06PZOXseAAAAAwAAAAYAAAABZHpg2j3gSXQ3PwbyO22dfOAJnhhvMuSRR0rxTI3UXh8AAAANAAAAFAz5ru8nrKVSKzyo9KZ9AVEwISyLAAAAAQAAAAYAAAABtGdHSrNHQUIXBdV6XwV1HTOwHfPJC4/9iche36y+lA4AAAANAAAAFAz5ru8nrKVSKzyo9KZ9AVEwISyLAAAAAQAAAAYAAAABtGdHSrNHQUIXBdV6XwV1HTOwHfPJC4/9iche36y+lA4AAAAUAAAAAQAztcMAAC0UAAACIAAAAAACCXFzAAAAAeQ8+qwAAABA/dwY67dCI3kuyQpDA3dMUELXMomr/5+OpKV5JQsXSzGBEKpHMYC/zVrEE5SxUsn1ODSCPhID7esWNCjdxPWTBgAAAAAAAAABjYs8+AAAAEDZ7AFWIW5/ZKIBs8CAzbqVcxK5szuxUMeW5pkhSv+mKDxxSEpvYgvn+XaVUXUywnoxS7OB+eIo1IOg43XoLpcH"
+        te = FeeBumpTransactionEnvelope.from_xdr(xdr, Network.PUBLIC_NETWORK_PASSPHRASE)
+        assert isinstance(te, FeeBumpTransactionEnvelope)
+        assert te.transaction.fee == 34183298
+        assert te.to_xdr() == xdr
+
+    def test_build_fee_bump_transaction_with_soroban_tx(self):
+        fee_source = "GDTLBABZ4NHAXUJAT2HIIQ52UDEBXXZLGB5QILBTCMSKEQENRM6PRIZ5"
+        xdr = "AAAAAgAAAACR+IxMOJ3vkHZSFqPCpyLqFENdLN/yYjRhojIE5Dz6rAIJcXMDHa56AAAAAQAAAAEAAAAAAAAAAAAAAABmeizDAAAAAAAAAAEAAAAAAAAAGAAAAAAAAAABZHpg2j3gSXQ3PwbyO22dfOAJnhhvMuSRR0rxTI3UXh8AAAAGZGVwbG95AAAAAAACAAAADQAAABQM+a7vJ6ylUis8qPSmfQFRMCEsiwAAAA0AAABBBOWQPnfY1mHIqdwoxJOQb1i4tnFqD3I0tbhPt7/HIIzHUq1IQE4Z+emcO6gdoVslu3Kcqd/F7LP0TraQJKGoUiQAAAAAAAAAAAAAAQAAAAAAAAADAAAABgAAAAFkemDaPeBJdDc/BvI7bZ184AmeGG8y5JFHSvFMjdReHwAAABQAAAABAAAAB09Tl/U18epBIuYjX6O0rlMYzF1tZw4eWExTxGEszzU7AAAAB87BdThZEbuVmpK08n1L5YNRSsOezRbC6ffF06PZOXseAAAAAwAAAAYAAAABZHpg2j3gSXQ3PwbyO22dfOAJnhhvMuSRR0rxTI3UXh8AAAANAAAAFAz5ru8nrKVSKzyo9KZ9AVEwISyLAAAAAQAAAAYAAAABtGdHSrNHQUIXBdV6XwV1HTOwHfPJC4/9iche36y+lA4AAAANAAAAFAz5ru8nrKVSKzyo9KZ9AVEwISyLAAAAAQAAAAYAAAABtGdHSrNHQUIXBdV6XwV1HTOwHfPJC4/9iche36y+lA4AAAAUAAAAAQAztcMAAC0UAAACIAAAAAACCXFzAAAAAeQ8+qwAAABA/dwY67dCI3kuyQpDA3dMUELXMomr/5+OpKV5JQsXSzGBEKpHMYC/zVrEE5SxUsn1ODSCPhID7esWNCjdxPWTBg=="
+        inner = TransactionBuilder.from_xdr(xdr, Network.PUBLIC_NETWORK_PASSPHRASE)
+        fee_bump_tx = TransactionBuilder.build_fee_bump_transaction(
+            fee_source, 200, inner
+        )
+        assert fee_bump_tx.transaction.fee == 34173299 + 400
+        assert fee_bump_tx.transaction.fee_source == MuxedAccount.from_account(
+            fee_source
+        )
+        assert fee_bump_tx.transaction.inner_transaction_envelope == inner

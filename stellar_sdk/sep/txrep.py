@@ -94,7 +94,7 @@ def to_txrep(
         )
         _add_line(
             "feeBump.tx.fee",
-            fee_bump_transaction.base_fee * (len(transaction.operations) + 1),
+            fee_bump_transaction.fee,
             lines,
         )
         _add_line(
@@ -182,13 +182,12 @@ def from_txrep(
     if is_fee_bump:
         fee_bump_fee_source = _get_value(raw_data_map, "feeBump.tx.feeSource")
         fee_bump_fee = _get_int_value(raw_data_map, "feeBump.tx.fee")
-        fee_bump_base_fee = int(fee_bump_fee / (len(operations) + 1))
 
         fee_bump_transaction_signatures = _get_signatures(raw_data_map, "feeBump.")
 
         fee_bump_transaction = FeeBumpTransaction(
             fee_source=fee_bump_fee_source,
-            base_fee=fee_bump_base_fee,
+            fee=fee_bump_fee,
             inner_transaction_envelope=transaction_envelope,
         )
         fee_bump_transaction_envelope = FeeBumpTransactionEnvelope(

@@ -530,8 +530,8 @@ class TestSorobanServer:
             "jsonrpc": "2.0",
             "id": "7a469b9d6ed4444893491be530862ce3",
             "result": {
-                "transactionData": "AAAAAAAAAAIAAAAGAAAAAem354u9STQWq5b3Ed1j9tOemvL7xV0NPwhn4gXg0AP8AAAAFAAAAAEAAAAH8dTe2OoI0BnhlDbH0fWvXmvprkBvBAgKIcL9busuuMEAAAABAAAABgAAAAHpt+eLvUk0FquW9xHdY/bTnpry+8VdDT8IZ+IF4NAD/AAAABAAAAABAAAAAgAAAA8AAAAHQ291bnRlcgAAAAASAAAAAAAAAABYt8SiyPKXqo89JHEoH9/M7K/kjlZjMT7BjhKnPsqYoQAAAAEAHifGAAAFlAAAAIgAAAAAAAAAAg==",
-                "minResourceFee": "58181",
+                "transactionData": "AAAAAAAAAAEAAAAGAAAAAdeSi3LCcDzP6vfrn/TvTVBKVai5efybRQ6iyEK00c5hAAAAFAAAAAEAAAACAAAAAAAAAABPFZKkWLE8Tlrm5Jx81FUrXpm6EhpW/s8TXPUyf0D5PgAAAAAAAAAAbjEdZhNooxW4Z5oCpgPDCmGnVRwOxutuDO14EQ4kFmoAA3kUAAACGAAAASAAAAAAAAG4Sw==",
+                "minResourceFee": "112715",
                 "events": [
                     "AAAAAQAAAAAAAAAAAAAAAgAAAAAAAAADAAAADwAAAAdmbl9jYWxsAAAAAA0AAAAg6bfni71JNBarlvcR3WP2056a8vvFXQ0/CGfiBeDQA/wAAAAPAAAACWluY3JlbWVudAAAAAAAABAAAAABAAAAAgAAABIAAAAAAAAAAFi3xKLI8peqjz0kcSgf38zsr+SOVmMxPsGOEqc+ypihAAAAAwAAAAo=",
                     "AAAAAQAAAAAAAAAB6bfni71JNBarlvcR3WP2056a8vvFXQ0/CGfiBeDQA/wAAAACAAAAAAAAAAIAAAAPAAAACWZuX3JldHVybgAAAAAAAA8AAAAJaW5jcmVtZW50AAAAAAAAAwAAABQ=",
@@ -551,7 +551,7 @@ class TestSorobanServer:
 
         soroban_data = stellar_xdr.SorobanTransactionData(
             ext=stellar_xdr.ExtensionPoint(0),
-            resource_fee=stellar_xdr.Int64(100),
+            resource_fee=stellar_xdr.Int64(50000),
             resources=stellar_xdr.SorobanResources(
                 footprint=stellar_xdr.LedgerFootprint(
                     read_only=[],
@@ -568,7 +568,9 @@ class TestSorobanServer:
             async with SorobanServerAsync(PRC_URL) as client:
                 new_transaction = await client.prepare_transaction(transaction)
         expected_transaction = copy.deepcopy(transaction)
-        expected_transaction.transaction.fee += int(data["result"]["minResourceFee"])
+        expected_transaction.transaction.fee = 50000 + int(
+            data["result"]["minResourceFee"]
+        )  # 50000 is base fee
         expected_transaction.transaction.soroban_data = (
             stellar_xdr.SorobanTransactionData.from_xdr(
                 data["result"]["transactionData"]
