@@ -2,19 +2,26 @@ Release History
 ==============
 
 ### Pending
+
+### Version 11.0.0
+
+Released on July 16, 2024
+
 #### Update
-- feat: `SorobanServer.send_transaction` supports sending FeeBumpTransactionEnvelope.
-- fix: Corrected the issue where `TransactionBuilder.from_xdr` could not properly parse transactions containing Soroban operations.
-- fix: Corrected the issue where `FeeBumpTransactionEnvelope.from_xdr` could not properly parse transactions containing Soroban operations.
-- refactor: `TransactionBuilder.from_xdr` previously could return `TransactionBuilder` or `FeeBumpTransactionEnvelope`. Now it will no longer return `TransactionBuilder`, but will return `TransactionEnvelope` or `FeeBumpTransactionEnvelope`.
-- feat: `TransactionBuilder.build_fee_bump_transaction` now supports transactions containing Soroban operations.
+- feat: `SorobanServer.send_transaction` supports sending FeeBumpTransactionEnvelope. ([#956](https://github.com/StellarCN/py-stellar-base/pull/956))
+- fix: Corrected the issue where `TransactionBuilder.from_xdr` could not properly parse transactions containing Soroban operations. ([#957](https://github.com/StellarCN/py-stellar-base/pull/957))
+- fix: Corrected the issue where `FeeBumpTransactionEnvelope.from_xdr` could not properly parse transactions containing Soroban operations. ([#957](https://github.com/StellarCN/py-stellar-base/pull/957))
+- refactor: `TransactionBuilder.from_xdr` previously could return `TransactionBuilder` or `FeeBumpTransactionEnvelope`. Now it will no longer return `TransactionBuilder`, but will return `TransactionEnvelope` or `FeeBumpTransactionEnvelope`. ([#957](https://github.com/StellarCN/py-stellar-base/pull/957))
+- feat: `TransactionBuilder.build_fee_bump_transaction` now supports transactions containing Soroban operations. ([#957](https://github.com/StellarCN/py-stellar-base/pull/957))
+- fix: fix the issue where invoking `SorobanServer.prepare_transaction` for transactions that have already set `SorobanData` could result in unexpected high fees. ([#957](https://github.com/StellarCN/py-stellar-base/pull/957))
+- chore: bump dependencies.
 
 #### Breaking changes
-- refactor: `FeeBumpTransactionEnvelope.base_fee` has been removed. Please use `FeeBumpTransactionEnvelope.fee instead`. Note that their meanings are different:
+- refactor: `FeeBumpTransactionEnvelope.base_fee` has been removed. Please use `FeeBumpTransactionEnvelope.fee instead`. Note that their meanings are different: ([#957](https://github.com/StellarCN/py-stellar-base/pull/957))
   - `FeeBumpTransactionEnvelope.base_fee` represented the maximum fee you were willing to pay per operation for this transaction.
   - `FeeBumpTransactionEnvelope.fee` represents the maximum fee you are willing to pay for this transaction.
-- refactor: `TransactionBuilder.from_xdr` previously could return `TransactionBuilder` or `FeeBumpTransactionEnvelope`. Now it will no longer return `TransactionBuilder`, but will return `TransactionEnvelope` or `FeeBumpTransactionEnvelope`.
-- refactor: `helpers.parse_transaction_envelope_from_xdr` has been marked as deprecated. Please use the refactored `TransactionEnvelope.from_xdr` instead.
+- refactor: `TransactionBuilder.from_xdr` previously could return `TransactionBuilder` or `FeeBumpTransactionEnvelope`. Now it will no longer return `TransactionBuilder`, but will return `TransactionEnvelope` or `FeeBumpTransactionEnvelope`. ([#957](https://github.com/StellarCN/py-stellar-base/pull/957))
+- refactor: `helpers.parse_transaction_envelope_from_xdr` has been marked as deprecated. Please use the refactored `TransactionEnvelope.from_xdr` instead. ([#957](https://github.com/StellarCN/py-stellar-base/pull/957))
 
 ### Version 10.0.0
 
