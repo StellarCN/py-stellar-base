@@ -6,6 +6,7 @@ Release History
 - fix: Corrected the issue where `TransactionBuilder.from_xdr` could not properly parse transactions containing Soroban operations.
 - fix: Corrected the issue where `FeeBumpTransactionEnvelope.from_xdr` could not properly parse transactions containing Soroban operations.
 - refactor: `TransactionBuilder.from_xdr` previously could return `TransactionBuilder` or `FeeBumpTransactionEnvelope`. Now it will no longer return `TransactionBuilder`, but will return `TransactionEnvelope` or `FeeBumpTransactionEnvelope`.
+- feat: `TransactionBuilder.build_fee_bump_transaction` now supports transactions containing Soroban operations.
 
 #### Breaking changes
 - refactor: `FeeBumpTransactionEnvelope.base_fee` has been removed. Please use `FeeBumpTransactionEnvelope.fee instead`. Note that their meanings are different:

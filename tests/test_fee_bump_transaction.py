@@ -431,3 +431,16 @@ class TestFeeBumpTransaction:
         assert isinstance(te, FeeBumpTransactionEnvelope)
         assert te.transaction.fee == 34183298
         assert te.to_xdr() == xdr
+
+    def test_build_fee_bump_transaction_with_soroban_tx(self):
+        fee_source = "GDTLBABZ4NHAXUJAT2HIIQ52UDEBXXZLGB5QILBTCMSKEQENRM6PRIZ5"
+        xdr = "AAAAAgAAAACR+IxMOJ3vkHZSFqPCpyLqFENdLN/yYjRhojIE5Dz6rAIJcXMDHa56AAAAAQAAAAEAAAAAAAAAAAAAAABmeizDAAAAAAAAAAEAAAAAAAAAGAAAAAAAAAABZHpg2j3gSXQ3PwbyO22dfOAJnhhvMuSRR0rxTI3UXh8AAAAGZGVwbG95AAAAAAACAAAADQAAABQM+a7vJ6ylUis8qPSmfQFRMCEsiwAAAA0AAABBBOWQPnfY1mHIqdwoxJOQb1i4tnFqD3I0tbhPt7/HIIzHUq1IQE4Z+emcO6gdoVslu3Kcqd/F7LP0TraQJKGoUiQAAAAAAAAAAAAAAQAAAAAAAAADAAAABgAAAAFkemDaPeBJdDc/BvI7bZ184AmeGG8y5JFHSvFMjdReHwAAABQAAAABAAAAB09Tl/U18epBIuYjX6O0rlMYzF1tZw4eWExTxGEszzU7AAAAB87BdThZEbuVmpK08n1L5YNRSsOezRbC6ffF06PZOXseAAAAAwAAAAYAAAABZHpg2j3gSXQ3PwbyO22dfOAJnhhvMuSRR0rxTI3UXh8AAAANAAAAFAz5ru8nrKVSKzyo9KZ9AVEwISyLAAAAAQAAAAYAAAABtGdHSrNHQUIXBdV6XwV1HTOwHfPJC4/9iche36y+lA4AAAANAAAAFAz5ru8nrKVSKzyo9KZ9AVEwISyLAAAAAQAAAAYAAAABtGdHSrNHQUIXBdV6XwV1HTOwHfPJC4/9iche36y+lA4AAAAUAAAAAQAztcMAAC0UAAACIAAAAAACCXFzAAAAAeQ8+qwAAABA/dwY67dCI3kuyQpDA3dMUELXMomr/5+OpKV5JQsXSzGBEKpHMYC/zVrEE5SxUsn1ODSCPhID7esWNCjdxPWTBg=="
+        inner = TransactionBuilder.from_xdr(xdr, Network.PUBLIC_NETWORK_PASSPHRASE)
+        fee_bump_tx = TransactionBuilder.build_fee_bump_transaction(
+            fee_source, 200, inner
+        )
+        assert fee_bump_tx.transaction.fee == 34173299 + 400
+        assert fee_bump_tx.transaction.fee_source == MuxedAccount.from_account(
+            fee_source
+        )
+        assert fee_bump_tx.transaction.inner_transaction_envelope == inner

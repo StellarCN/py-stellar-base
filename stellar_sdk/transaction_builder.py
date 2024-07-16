@@ -1,4 +1,5 @@
 import binascii
+import math
 import os
 import time
 import warnings
@@ -179,9 +180,22 @@ class TransactionBuilder:
         :return: a :class:`TransactionBuilder <stellar_sdk.transaction_envelope.TransactionBuilder>` via the XDR object.
         """
 
-        inner_base_fee = int(
-            inner_transaction_envelope.transaction.fee
-            / len(inner_transaction_envelope.transaction.operations)
+        if base_fee < MIN_BASE_FEE:
+            raise ValueError(
+                f"Invalid `base_fee`, it should be at least {MIN_BASE_FEE} stroops."
+            )
+
+        soroban_resource_fee = 0
+        if inner_transaction_envelope.transaction.soroban_data:
+            soroban_resource_fee = (
+                inner_transaction_envelope.transaction.soroban_data.resource_fee.int64
+            )
+
+        inner_include_fee = (
+            inner_transaction_envelope.transaction.fee - soroban_resource_fee
+        )  # dont include soroban resource fee
+        inner_base_fee = math.ceil(
+            inner_include_fee / len(inner_transaction_envelope.transaction.operations)
         )
 
         if base_fee < inner_base_fee:
@@ -189,14 +203,12 @@ class TransactionBuilder:
                 f"Invalid `base_fee`, it should be at least {inner_base_fee} stroops."
             )
 
-        if base_fee < MIN_BASE_FEE:
-            raise ValueError(
-                f"Invalid `base_fee`, it should be at least {MIN_BASE_FEE} stroops."
-            )
+        fee = base_fee * (len(inner_transaction_envelope.transaction.operations) + 1)
+        fee += soroban_resource_fee
 
         fee_bump_transaction = FeeBumpTransaction(
             fee_source=fee_source,
-            fee=base_fee * (len(inner_transaction_envelope.transaction.operations) + 1),
+            fee=fee,
             inner_transaction_envelope=inner_transaction_envelope,
         )
         transaction_envelope = FeeBumpTransactionEnvelope(
