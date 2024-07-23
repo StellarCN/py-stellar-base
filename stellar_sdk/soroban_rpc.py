@@ -341,3 +341,89 @@ class GetLatestLedgerResponse(BaseModel):
     id: str
     protocol_version: int = Field(alias="protocolVersion")
     sequence: int
+
+
+# get_fee_stats
+class FeeDistribution(BaseModel):
+    max: int
+    min: int
+    mode: int
+    p10: int
+    p20: int
+    p30: int
+    p40: int
+    p50: int
+    p60: int
+    p70: int
+    p80: int
+    p90: int
+    p95: int
+    p99: int
+    transaction_count: int = Field(alias="transactionCount")
+    ledger_count: int = Field(alias="ledgerCount")
+
+
+class GetFeeStatsResponse(BaseModel):
+    """Response for JSON-RPC method getFeeStats.
+
+    See `getFeeStats documentation <https://developers.stellar.org/docs/data/rpc/api-reference/methods/getFeeStats>`__ for
+    more information."""
+
+    soroban_inclusion_fee: FeeDistribution = Field(alias="sorobanInclusionFee")
+    inclusion_fee: FeeDistribution = Field(alias="inclusionFee")
+    latest_ledger: int = Field(alias="latestLedger")
+
+
+# get_transactions
+class GetTransactionsRequest(BaseModel):
+    """Request for JSON-RPC method getTransactions.
+
+    See `getTransactions documentation <https://developers.stellar.org/docs/data/rpc/api-reference/methods/getTransactions>`__ for
+    more information."""
+
+    start_ledger: int = Field(alias="startLedger")
+    pagination: Optional[PaginationOptions] = None
+
+
+class Transaction(BaseModel):
+    status: str
+    application_order: int = Field(alias="applicationOrder")
+    fee_bump: bool = Field(alias="feeBump")
+    envelope_xdr: str = Field(alias="envelopeXdr")
+    result_xdr: str = Field(alias="resultXdr")
+    result_meta_xdr: str = Field(alias="resultMetaXdr")
+    ledger: int
+    created_at: int = Field(alias="createdAt")
+    diagnostic_events_xdr: Optional[List[str]] = Field(
+        alias="diagnosticEventsXdr", default=None
+    )
+
+
+class GetTransactionsResponse(BaseModel):
+    """Response for JSON-RPC method getTransactions.
+
+    See `getTransactions documentation <https://developers.stellar.org/docs/data/rpc/api-reference/methods/getTransactions>`__ for
+    more information."""
+
+    transactions: List[Transaction]
+    latest_ledger: int = Field(alias="latestLedger")
+    latest_ledger_close_timestamp: int = Field(alias="latestLedgerCloseTimestamp")
+    oldest_ledger: int = Field(alias="oldestLedger")
+    oldest_ledger_close_timestamp: int = Field(alias="oldestLedgerCloseTimestamp")
+    cursor: str
+
+
+# get_version_info
+# TODO: To avoid breaking change, let's add it later.
+# See: https://github.com/stellar/soroban-rpc/pull/164
+# class GetVersionInfoResponse(BaseModel):
+#     """Response for JSON-RPC method getVersionInfo.
+#
+#     See `getVersionInfo documentation <https://developers.stellar.org/docs/data/rpc/api-reference/methods/getVersionInfo>`__ for
+#     more information."""
+#
+#     version: str
+#     commit_hash: str = Field(alias="commitHash")
+#     build_time_stamp: str = Field(alias="buildTimeStamp")
+#     captive_core_version: str = Field(alias="captiveCoreVersion")
+#     protocol_version: int = Field(alias="protocolVersion")

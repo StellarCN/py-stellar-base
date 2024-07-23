@@ -2,6 +2,8 @@ Release History
 ==============
 
 ### Pending
+#### Update
+- feat: add support for Soroban PRC's `getTransactions` and `getFeeStats` API interfaces.
 
 ### Version 11.0.0
 
