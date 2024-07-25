@@ -83,6 +83,43 @@ class Server(BaseServer):
         raise_request_exception(resp)
         return resp.json()
 
+    def submit_transaction_async(
+        self,
+        transaction_envelope: Union[
+            TransactionEnvelope, FeeBumpTransactionEnvelope, str
+        ],
+        skip_memo_required_check: bool = False,
+    ) -> Dict[str, Any]:
+        """Submits an asynchronous transaction to the network. Unlike the synchronous version, which blocks
+        and waits for the transaction to be ingested in Horizon, this endpoint relays the response from
+        core directly back to the user.
+
+        See `Horizon Documentation - Submit a Transaction Asynchronously <https://developers.stellar.org/docs/data/horizon/api-reference/resources/submit-async-transaction>`_
+
+        :param transaction_envelope: :class:`stellar_sdk.transaction_envelope.TransactionEnvelope` object
+            or base64 encoded xdr
+        :param skip_memo_required_check: Allow skipping memo
+        :return: the response from horizon
+        :raises:
+            :exc:`ConnectionError <stellar_sdk.exceptions.ConnectionError>`
+            :exc:`NotFoundError <stellar_sdk.exceptions.NotFoundError>`
+            :exc:`BadRequestError <stellar_sdk.exceptions.BadRequestError>`
+            :exc:`BadResponseError <stellar_sdk.exceptions.BadResponseError>`
+            :exc:`UnknownRequestError <stellar_sdk.exceptions.UnknownRequestError>`
+            :exc:`AccountRequiresMemoError <stellar_sdk.sep.exceptions.AccountRequiresMemoError>`
+        """
+        url = urljoin_with_query(self.horizon_url, "transactions_async")
+        xdr, tx = self._get_xdr_and_transaction_from_transaction_envelope(
+            transaction_envelope
+        )
+        if not skip_memo_required_check:
+            self.__check_memo_required_sync(tx)
+        data = {"tx": xdr}
+        resp = self._client.post(url=url, data=data)
+        assert isinstance(resp, Response)
+        raise_request_exception(resp)
+        return resp.json()
+
     def load_account(self, account_id: Union[MuxedAccount, Keypair, str]) -> Account:
         """Fetches an account's most current base state (like sequence) in the ledger and then creates
         and returns an :class:`stellar_sdk.account.Account` object.
