@@ -4,6 +4,7 @@ Release History
 ### Pending
 #### Update
 - feat: add support for Soroban PRC's `getTransactions` and `getFeeStats` API interfaces.
+- feat: add support for Horizon's `transactions_async` API interfaces.
 
 ### Version 11.0.0
 

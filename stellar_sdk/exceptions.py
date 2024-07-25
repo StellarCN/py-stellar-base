@@ -200,7 +200,7 @@ class PrepareTransactionException(SdkError):
 
 def raise_request_exception(response: Response) -> None:
     status_code = response.status_code
-    if status_code == 200:
+    if 200 <= status_code < 300:
         pass  # pragma: no cover
     elif status_code == 404:
         raise NotFoundError(response)

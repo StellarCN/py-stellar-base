@@ -1,6 +1,7 @@
 from decimal import Decimal
 
 import pytest
+import requests_mock
 
 from stellar_sdk import (
     Asset,
@@ -162,3 +163,51 @@ class TestServerSync:
         with Server(horizon_url, client) as server:
             resp = server.submit_transaction(te, True)
             assert resp["envelope_xdr"] == xdr
+
+    def test_submit_transaction_async_with_xdr(self):
+        xdr = "AAAAAHI7fpgo+b7tgpiFyYWimjV7L7IOYLwmQS7k7F8SronXAAAAZAE+QT4AAAAJAAAAAQAAAAAAAAAAAAAAAF1MG8cAAAAAAAAAAQAAAAAAAAAAAAAAAOvi1O/HEn+QgZJw+EMZBtwvTVNmpgvE9p8IRfwp0GY4AAAAAAExLQAAAAAAAAAAARKuidcAAABAJVc1ASGp35hUquGNbzzSqWPoTG0zgc89zc4p+19QkgbPqsdyEfHs7+ng9VJA49YneEXRa6Fv7pfKpEigb3VTCg=="
+        horizon_url = "https://horizon.stellar.org"
+        client = RequestsClient()
+        te = TransactionEnvelope.from_xdr(xdr, Network.PUBLIC_NETWORK_PASSPHRASE)
+        assert (
+            te.hash_hex()
+            == "c1d2d2b16afb3313cea19f9854ffc095a18baf2d04508ef6d367a72928231084"
+        )
+        data = {
+            "tx_status": "PENDING",
+            "hash": "c1d2d2b16afb3313cea19f9854ffc095a18baf2d04508ef6d367a72928231084",
+        }
+
+        with requests_mock.Mocker() as m:
+            m.post(f"{horizon_url}/transactions_async", json=data)
+            with Server(horizon_url, client) as server:
+                resp = server.submit_transaction_async(xdr, True)
+                assert (
+                    resp["hash"]
+                    == "c1d2d2b16afb3313cea19f9854ffc095a18baf2d04508ef6d367a72928231084"
+                )
+                assert resp["tx_status"] == "PENDING"
+
+    def test_submit_transaction_async_with_te(self):
+        xdr = "AAAAAHI7fpgo+b7tgpiFyYWimjV7L7IOYLwmQS7k7F8SronXAAAAZAE+QT4AAAAJAAAAAQAAAAAAAAAAAAAAAF1MG8cAAAAAAAAAAQAAAAAAAAAAAAAAAOvi1O/HEn+QgZJw+EMZBtwvTVNmpgvE9p8IRfwp0GY4AAAAAAExLQAAAAAAAAAAARKuidcAAABAJVc1ASGp35hUquGNbzzSqWPoTG0zgc89zc4p+19QkgbPqsdyEfHs7+ng9VJA49YneEXRa6Fv7pfKpEigb3VTCg=="
+        te = TransactionEnvelope.from_xdr(xdr, Network.PUBLIC_NETWORK_PASSPHRASE)
+        horizon_url = "https://horizon.stellar.org"
+        client = RequestsClient()
+        assert (
+            te.hash_hex()
+            == "c1d2d2b16afb3313cea19f9854ffc095a18baf2d04508ef6d367a72928231084"
+        )
+        data = {
+            "tx_status": "PENDING",
+            "hash": "c1d2d2b16afb3313cea19f9854ffc095a18baf2d04508ef6d367a72928231084",
+        }
+
+        with requests_mock.Mocker() as m:
+            m.post(f"{horizon_url}/transactions_async", json=data)
+            with Server(horizon_url, client) as server:
+                resp = server.submit_transaction_async(te, True)
+                assert (
+                    resp["hash"]
+                    == "c1d2d2b16afb3313cea19f9854ffc095a18baf2d04508ef6d367a72928231084"
+                )
+                assert resp["tx_status"] == "PENDING"
