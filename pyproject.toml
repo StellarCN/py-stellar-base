@@ -71,9 +71,9 @@ types-toml = {version = "^0.10.8", markers = "platform_python_implementation == 
 types-requests = {version = "^2.32.0", markers = "platform_python_implementation == 'CPython'"}
 autoflake = "2.3.1"
 isort = "5.13.2"
-black = "24.4.2"
+black = "24.8.0"
 # currently, mypy cannot run in pypy https://github.com/python/typed_ast/issues/111
-mypy = {version = "1.11.0", markers = "platform_python_implementation == 'CPython'"}
+mypy = {version = "1.11.1", markers = "platform_python_implementation == 'CPython'"}
 requests-mock = "^1.12.1"
 aioresponses = {git = "https://github.com/pnuckowski/aioresponses.git"}
 
