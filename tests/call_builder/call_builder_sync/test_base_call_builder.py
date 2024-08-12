@@ -106,47 +106,33 @@ class TestBaseCallBuilder:
         url = "https://horizon.stellar.org/transactions"
         client = RequestsClient()
         call_builder = (
-            BaseCallBuilder(horizon_url=url, client=client)
-            .cursor(81058917781504)
-            .limit(10)
-            .order(desc=True)
+            BaseCallBuilder(horizon_url=url, client=client).limit(10).order(desc=True)
         )
         first_resp = call_builder.call()
-        assert first_resp["_links"] == {
-            "self": {
-                "href": "https://horizon.stellar.org/transactions?cursor=81058917781504&limit=10&order=desc"
-            },
-            "next": {
-                "href": "https://horizon.stellar.org/transactions?cursor=12884905984&limit=10&order=desc"
-            },
-            "prev": {
-                "href": "https://horizon.stellar.org/transactions?cursor=80607946215424&limit=10&order=asc"
-            },
-        }
+        assert (
+            first_resp["_links"]["self"]["href"]
+            == "https://horizon.stellar.org/transactions?cursor=&limit=10&order=desc"
+        )
+
+        next_url = first_resp["_links"]["next"]["href"]
+        next_url_cursor = next_url.split("cursor=")[1].split("&")[0]
+
         next_resp = call_builder.next()
-        assert next_resp["_links"] == {
-            "self": {
-                "href": "https://horizon.stellar.org/transactions?cursor=12884905984&limit=10&order=desc"
-            },
-            "next": {
-                "href": "https://horizon.stellar.org/transactions?cursor=12884905984&limit=10&order=desc"
-            },
-            "prev": {
-                "href": "https://horizon.stellar.org/transactions?cursor=12884905984&limit=10&order=asc"
-            },
-        }
+        assert next_resp["_links"]["self"][
+            "href"
+        ] == "https://horizon.stellar.org/transactions?cursor={}&limit=10&order=desc".format(
+            next_url_cursor
+        )
+
+        prev_url = next_resp["_links"]["prev"]["href"]
+        prev_url_cursor = prev_url.split("cursor=")[1].split("&")[0]
         prev_page = call_builder.prev()
-        assert prev_page["_links"] == {
-            "self": {
-                "href": "https://horizon.stellar.org/transactions?cursor=12884905984&limit=10&order=asc"
-            },
-            "next": {
-                "href": "https://horizon.stellar.org/transactions?cursor=81827716927488&limit=10&order=asc"
-            },
-            "prev": {
-                "href": "https://horizon.stellar.org/transactions?cursor=33676838572032&limit=10&order=desc"
-            },
-        }
+        assert prev_page["_links"]["self"][
+            "href"
+        ] == "https://horizon.stellar.org/transactions?cursor={}&limit=10&order=asc".format(
+            prev_url_cursor
+        )
+        client.close()
 
     def test_horizon_url_params(self):
         url = HTTPBIN_URL + "get?version=1.2&auth=myPassw0wd"

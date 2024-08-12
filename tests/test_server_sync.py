@@ -148,7 +148,8 @@ class TestServerSync:
             assert server.transactions() == TransactionsCallBuilder(horizon_url, client)
 
     def test_submit_transaction_with_xdr(self):
-        xdr = "AAAAAHI7fpgo+b7tgpiFyYWimjV7L7IOYLwmQS7k7F8SronXAAAAZAE+QT4AAAAJAAAAAQAAAAAAAAAAAAAAAF1MG8cAAAAAAAAAAQAAAAAAAAAAAAAAAOvi1O/HEn+QgZJw+EMZBtwvTVNmpgvE9p8IRfwp0GY4AAAAAAExLQAAAAAAAAAAARKuidcAAABAJVc1ASGp35hUquGNbzzSqWPoTG0zgc89zc4p+19QkgbPqsdyEfHs7+ng9VJA49YneEXRa6Fv7pfKpEigb3VTCg=="
+        # TODO: mock test
+        xdr = "AAAAAgAAAACpYAfsZFw9X5E2fHFl+xYB3D9dxwhtVPZ6c8QW/7KNxAAAAGQDBJRXAAYt2AAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAwAAAAAAAAABVVNEQwAAAAA7mRE4Dv6Yi6CokA6xz+RPNm99vpRr7QdyQPf2JN8VxQAAAAAATEShAA9I5QCYloAAAAAAX5K4WgAAAAAAAAAB/7KNxAAAAEChPdaEabaexQ6vjiJxI0ECXuK97fidU4a8l0/iK6ORCAQ+NGeBAIfaLAZiyww+I/nWEqrihn8zdN+wNdUUoDgF"
         horizon_url = "https://horizon.stellar.org"
         client = RequestsClient()
         with Server(horizon_url, client) as server:
@@ -156,7 +157,7 @@ class TestServerSync:
             assert resp["envelope_xdr"] == xdr
 
     def test_submit_transaction_with_te(self):
-        xdr = "AAAAAHI7fpgo+b7tgpiFyYWimjV7L7IOYLwmQS7k7F8SronXAAAAZAE+QT4AAAAJAAAAAQAAAAAAAAAAAAAAAF1MG8cAAAAAAAAAAQAAAAAAAAAAAAAAAOvi1O/HEn+QgZJw+EMZBtwvTVNmpgvE9p8IRfwp0GY4AAAAAAExLQAAAAAAAAAAARKuidcAAABAJVc1ASGp35hUquGNbzzSqWPoTG0zgc89zc4p+19QkgbPqsdyEfHs7+ng9VJA49YneEXRa6Fv7pfKpEigb3VTCg=="
+        xdr = "AAAAAgAAAACpYAfsZFw9X5E2fHFl+xYB3D9dxwhtVPZ6c8QW/7KNxAAAAGQDBJRXAAYt2AAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAwAAAAAAAAABVVNEQwAAAAA7mRE4Dv6Yi6CokA6xz+RPNm99vpRr7QdyQPf2JN8VxQAAAAAATEShAA9I5QCYloAAAAAAX5K4WgAAAAAAAAAB/7KNxAAAAEChPdaEabaexQ6vjiJxI0ECXuK97fidU4a8l0/iK6ORCAQ+NGeBAIfaLAZiyww+I/nWEqrihn8zdN+wNdUUoDgF"
         te = TransactionEnvelope.from_xdr(xdr, Network.PUBLIC_NETWORK_PASSPHRASE)
         horizon_url = "https://horizon.stellar.org"
         client = RequestsClient()
