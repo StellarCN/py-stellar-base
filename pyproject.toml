@@ -65,7 +65,7 @@ aiohttp = ["aiohttp", "aiohttp-sse-client"]
 pytest = "^8.3.2"
 pytest-cov = "^5.0.0"
 pytest-timeout = "^2.3.1"
-pytest-asyncio = "^0.23.8"
+pytest-asyncio = "^0.24.0"
 pytest-httpserver = "^1.1.0"
 types-toml = {version = "^0.10.8", markers = "platform_python_implementation == 'CPython'"}
 types-requests = {version = "^2.32.0", markers = "platform_python_implementation == 'CPython'"}
@@ -73,7 +73,7 @@ autoflake = "2.3.1"
 isort = "5.13.2"
 black = "24.8.0"
 # currently, mypy cannot run in pypy https://github.com/python/typed_ast/issues/111
-mypy = {version = "1.11.1", markers = "platform_python_implementation == 'CPython'"}
+mypy = {version = "1.11.2", markers = "platform_python_implementation == 'CPython'"}
 requests-mock = "^1.12.1"
 aioresponses = {git = "https://github.com/pnuckowski/aioresponses.git"}
 
