@@ -71,10 +71,11 @@ def authorize_entry(
     payload = sha256(preimage.to_xdr_bytes())
     if isinstance(signer, Keypair):
         signature = signer.sign(payload)
+        public_key = signer.raw_public_key()
     else:
         signature = signer(preimage)
+        public_key = Address.from_xdr_sc_address(addr_auth.address).key
 
-    public_key = Address.from_xdr_sc_address(addr_auth.address).key
     try:
         Keypair.from_raw_ed25519_public_key(public_key).verify(payload, signature)
     except BadSignatureError as e:
