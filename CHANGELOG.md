@@ -3,8 +3,18 @@ Release History
 
 ### Pending
 #### Update
-- feat: add support for Soroban PRC's `getTransactions` and `getFeeStats` API interfaces.
-- feat: add support for Horizon's `transactions_async` API interfaces.
+
+
+### Version 11.1.0
+
+Released on September 18, 2024
+
+#### Update
+- feat: add support for Soroban PRC's `getTransactions` and `getFeeStats` API interfaces. ([#960](https://github.com/StellarCN/py-stellar-base/pull/960))
+- feat: add support for Horizon's `transactions_async` API interfaces. ([#961](https://github.com/StellarCN/py-stellar-base/pull/961))
+- fix: fix `authorize_entry` to use the correct public key when passing `Keypair` as signer. ([#971](https://github.com/StellarCN/py-stellar-base/pull/971))
+- feat: Expose `stellar_sdk.address.AddressType` for easy importing. ([#973](https://github.com/StellarCN/py-stellar-base/pull/973))
+- chore: bump dependencies.
 
 ### Version 11.0.0
 
