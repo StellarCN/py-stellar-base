@@ -6,7 +6,7 @@ from . import xdr as stellar_xdr
 from .strkey import StrKey
 from .xdr import Hash
 
-__all__ = ["Address"]
+__all__ = ["Address", "AddressType"]
 
 
 class AddressType(IntEnum):
