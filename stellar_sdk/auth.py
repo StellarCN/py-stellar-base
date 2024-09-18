@@ -31,6 +31,10 @@ def authorize_entry(
     * on a particular network (uniquely identified by its passphrase, see :class:`stellar_sdk.Network`)
     * until a particular ledger sequence is reached.
 
+    Note that if using the function form of `signer`, the signer is assumed to be
+    the entry's credential address. If you need a different key to sign the
+    entry, you will need to use different method (e.g., fork this code).
+
     :param entry: an unsigned Soroban authorization entry.
     :param signer: either a :class:`Keypair` or a function which takes a payload
         (a :class:`stellar_xdr.HashIDPreimage` instance) input and returns a bytes signature,
@@ -112,6 +116,10 @@ def authorize_invocation(
     * until a particular ledger sequence is reached.
 
     This is in contrast to :func:`authorize_entry`, which signs an existing entry "in place".
+
+    Note that if using the function form of `signer`, the signer is assumed to be
+    the entry's credential address. If you need a different key to sign the
+    entry, you will need to use different method (e.g., fork this code).
 
     :param signer: either a :class:`Keypair` or a function which takes a payload
         (a :class:`stellar_xdr.HashIDPreimage` instance) input and returns a bytes signature,
