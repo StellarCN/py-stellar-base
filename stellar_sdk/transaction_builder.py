@@ -1297,6 +1297,7 @@ class TransactionBuilder:
         self,
         wasm_id: Union[bytes, str],
         address: Union[str, Address],
+        constructor_args: Optional[Sequence[stellar_xdr.SCVal]] = None,
         salt: Optional[bytes] = None,
         auth: Sequence[stellar_xdr.SorobanAuthorizationEntry] = None,
         source: Optional[Union[MuxedAccount, str]] = None,
@@ -1307,6 +1308,7 @@ class TransactionBuilder:
 
         :param wasm_id: The ID of the contract code to install.
         :param address: The address using to derive the contract ID.
+        :param constructor_args: The optional parameters to pass to the constructor of this contract.
         :param salt: The 32-byte salt to use to derive the contract ID.
         :param auth: The authorizations required to execute the host function.
         :param source: The source account for the operation. Defaults to the
@@ -1325,7 +1327,7 @@ class TransactionBuilder:
         if isinstance(address, str):
             address = Address(address)
 
-        create_contract = stellar_xdr.CreateContractArgs(
+        create_contract = stellar_xdr.CreateContractArgsV2(
             contract_id_preimage=stellar_xdr.ContractIDPreimage(
                 stellar_xdr.ContractIDPreimageType.CONTRACT_ID_PREIMAGE_FROM_ADDRESS,
                 from_address=stellar_xdr.ContractIDPreimageFromAddress(
@@ -1337,11 +1339,14 @@ class TransactionBuilder:
                 stellar_xdr.ContractExecutableType.CONTRACT_EXECUTABLE_WASM,
                 stellar_xdr.Hash(wasm_id),
             ),
+            constructor_args=(
+                list(constructor_args) if constructor_args is not None else []
+            ),
         )
 
         host_function = stellar_xdr.HostFunction(
-            stellar_xdr.HostFunctionType.HOST_FUNCTION_TYPE_CREATE_CONTRACT,
-            create_contract=create_contract,
+            stellar_xdr.HostFunctionType.HOST_FUNCTION_TYPE_CREATE_CONTRACT_V2,
+            create_contract_v2=create_contract,
         )
 
         op = InvokeHostFunction(host_function=host_function, auth=auth, source=source)

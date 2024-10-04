@@ -3,7 +3,7 @@ Release History
 
 ### Pending
 #### Update
-
+- feat!: support constructors in contract creation via `TransactionBuilder.append_create_contract_op`, the signature of the function has been changed.
 
 ### Version 11.1.0
 
