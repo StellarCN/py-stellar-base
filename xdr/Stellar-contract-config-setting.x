@@ -188,7 +188,58 @@ enum ContractCostType {
     // point on a 256-bit elliptic curve
     Sec1DecodePointUncompressed = 43,
     // Cost of verifying an ECDSA Secp256r1 signature
-    VerifyEcdsaSecp256r1Sig = 44
+    VerifyEcdsaSecp256r1Sig = 44,
+
+    // Cost of encoding a BLS12-381 Fp (base field element)
+    Bls12381EncodeFp = 45,
+    // Cost of decoding a BLS12-381 Fp (base field element)
+    Bls12381DecodeFp = 46,
+    // Cost of checking a G1 point lies on the curve
+    Bls12381G1CheckPointOnCurve = 47,
+    // Cost of checking a G1 point belongs to the correct subgroup
+    Bls12381G1CheckPointInSubgroup = 48,
+    // Cost of checking a G2 point lies on the curve
+    Bls12381G2CheckPointOnCurve = 49,
+    // Cost of checking a G2 point belongs to the correct subgroup
+    Bls12381G2CheckPointInSubgroup = 50,
+    // Cost of converting a BLS12-381 G1 point from projective to affine coordinates
+    Bls12381G1ProjectiveToAffine = 51,
+    // Cost of converting a BLS12-381 G2 point from projective to affine coordinates
+    Bls12381G2ProjectiveToAffine = 52,
+    // Cost of performing BLS12-381 G1 point addition
+    Bls12381G1Add = 53,
+    // Cost of performing BLS12-381 G1 scalar multiplication
+    Bls12381G1Mul = 54,
+    // Cost of performing BLS12-381 G1 multi-scalar multiplication (MSM)
+    Bls12381G1Msm = 55,
+    // Cost of mapping a BLS12-381 Fp field element to a G1 point
+    Bls12381MapFpToG1 = 56,
+    // Cost of hashing to a BLS12-381 G1 point
+    Bls12381HashToG1 = 57,
+    // Cost of performing BLS12-381 G2 point addition
+    Bls12381G2Add = 58,
+    // Cost of performing BLS12-381 G2 scalar multiplication
+    Bls12381G2Mul = 59,
+    // Cost of performing BLS12-381 G2 multi-scalar multiplication (MSM)
+    Bls12381G2Msm = 60,
+    // Cost of mapping a BLS12-381 Fp2 field element to a G2 point
+    Bls12381MapFp2ToG2 = 61,
+    // Cost of hashing to a BLS12-381 G2 point
+    Bls12381HashToG2 = 62,
+    // Cost of performing BLS12-381 pairing operation
+    Bls12381Pairing = 63,
+    // Cost of converting a BLS12-381 scalar element from U256
+    Bls12381FrFromU256 = 64,
+    // Cost of converting a BLS12-381 scalar element to U256
+    Bls12381FrToU256 = 65,
+    // Cost of performing BLS12-381 scalar element addition/subtraction
+    Bls12381FrAddSub = 66,
+    // Cost of performing BLS12-381 scalar element multiplication
+    Bls12381FrMul = 67,
+    // Cost of performing BLS12-381 scalar element exponentiation
+    Bls12381FrPow = 68,
+    // Cost of performing BLS12-381 scalar element inversion
+    Bls12381FrInv = 69
 };
 
 struct ContractCostParamEntry {

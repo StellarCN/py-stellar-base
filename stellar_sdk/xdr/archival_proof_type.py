@@ -7,32 +7,28 @@ from enum import IntEnum
 
 from xdrlib3 import Packer, Unpacker
 
-__all__ = ["HostFunctionType"]
+__all__ = ["ArchivalProofType"]
 
 
-class HostFunctionType(IntEnum):
+class ArchivalProofType(IntEnum):
     """
     XDR Source Code::
 
-        enum HostFunctionType
+        enum ArchivalProofType
         {
-            HOST_FUNCTION_TYPE_INVOKE_CONTRACT = 0,
-            HOST_FUNCTION_TYPE_CREATE_CONTRACT = 1,
-            HOST_FUNCTION_TYPE_UPLOAD_CONTRACT_WASM = 2,
-            HOST_FUNCTION_TYPE_CREATE_CONTRACT_V2 = 3
+            EXISTENCE = 0,
+            NONEXISTENCE = 1
         };
     """
 
-    HOST_FUNCTION_TYPE_INVOKE_CONTRACT = 0
-    HOST_FUNCTION_TYPE_CREATE_CONTRACT = 1
-    HOST_FUNCTION_TYPE_UPLOAD_CONTRACT_WASM = 2
-    HOST_FUNCTION_TYPE_CREATE_CONTRACT_V2 = 3
+    EXISTENCE = 0
+    NONEXISTENCE = 1
 
     def pack(self, packer: Packer) -> None:
         packer.pack_int(self.value)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> HostFunctionType:
+    def unpack(cls, unpacker: Unpacker) -> ArchivalProofType:
         value = unpacker.unpack_int()
         return cls(value)
 
@@ -42,7 +38,7 @@ class HostFunctionType(IntEnum):
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> HostFunctionType:
+    def from_xdr_bytes(cls, xdr: bytes) -> ArchivalProofType:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -51,6 +47,6 @@ class HostFunctionType(IntEnum):
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> HostFunctionType:
+    def from_xdr(cls, xdr: str) -> ArchivalProofType:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)

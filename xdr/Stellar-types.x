@@ -103,4 +103,35 @@ struct HmacSha256Mac
 {
     opaque mac[32];
 };
+
+struct ShortHashSeed
+{
+    opaque seed[16];
+};
+
+enum BinaryFuseFilterType
+{
+    BINARY_FUSE_FILTER_8_BIT = 0,
+    BINARY_FUSE_FILTER_16_BIT = 1,
+    BINARY_FUSE_FILTER_32_BIT = 2
+};
+
+struct SerializedBinaryFuseFilter
+{
+    BinaryFuseFilterType type;
+
+    // Seed used to hash input to filter
+    ShortHashSeed inputHashSeed;
+
+    // Seed used for internal filter hash operations
+    ShortHashSeed filterSeed;
+    uint32 segmentLength;
+    uint32 segementLengthMask;
+    uint32 segmentCount;
+    uint32 segmentCountLength;
+    uint32 fingerprintLength; // Length in terms of element count, not bytes
+
+    // Array of uint8_t, uint16_t, or uint32_t depending on filter type
+    opaque fingerprints<>;
+};
 }

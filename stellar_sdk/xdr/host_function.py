@@ -8,6 +8,7 @@ from xdrlib3 import Packer, Unpacker
 
 from .base import Opaque
 from .create_contract_args import CreateContractArgs
+from .create_contract_args_v2 import CreateContractArgsV2
 from .host_function_type import HostFunctionType
 from .invoke_contract_args import InvokeContractArgs
 
@@ -26,6 +27,8 @@ class HostFunction:
             CreateContractArgs createContract;
         case HOST_FUNCTION_TYPE_UPLOAD_CONTRACT_WASM:
             opaque wasm<>;
+        case HOST_FUNCTION_TYPE_CREATE_CONTRACT_V2:
+            CreateContractArgsV2 createContractV2;
         };
     """
 
@@ -35,11 +38,13 @@ class HostFunction:
         invoke_contract: InvokeContractArgs = None,
         create_contract: CreateContractArgs = None,
         wasm: bytes = None,
+        create_contract_v2: CreateContractArgsV2 = None,
     ) -> None:
         self.type = type
         self.invoke_contract = invoke_contract
         self.create_contract = create_contract
         self.wasm = wasm
+        self.create_contract_v2 = create_contract_v2
 
     def pack(self, packer: Packer) -> None:
         self.type.pack(packer)
@@ -58,6 +63,11 @@ class HostFunction:
                 raise ValueError("wasm should not be None.")
             Opaque(self.wasm, 4294967295, False).pack(packer)
             return
+        if self.type == HostFunctionType.HOST_FUNCTION_TYPE_CREATE_CONTRACT_V2:
+            if self.create_contract_v2 is None:
+                raise ValueError("create_contract_v2 should not be None.")
+            self.create_contract_v2.pack(packer)
+            return
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> HostFunction:
@@ -71,6 +81,9 @@ class HostFunction:
         if type == HostFunctionType.HOST_FUNCTION_TYPE_UPLOAD_CONTRACT_WASM:
             wasm = Opaque.unpack(unpacker, 4294967295, False)
             return cls(type=type, wasm=wasm)
+        if type == HostFunctionType.HOST_FUNCTION_TYPE_CREATE_CONTRACT_V2:
+            create_contract_v2 = CreateContractArgsV2.unpack(unpacker)
+            return cls(type=type, create_contract_v2=create_contract_v2)
         return cls(type=type)
 
     def to_xdr_bytes(self) -> bytes:
@@ -99,6 +112,7 @@ class HostFunction:
                 self.invoke_contract,
                 self.create_contract,
                 self.wasm,
+                self.create_contract_v2,
             )
         )
 
@@ -110,6 +124,7 @@ class HostFunction:
             and self.invoke_contract == other.invoke_contract
             and self.create_contract == other.create_contract
             and self.wasm == other.wasm
+            and self.create_contract_v2 == other.create_contract_v2
         )
 
     def __repr__(self):
@@ -126,4 +141,9 @@ class HostFunction:
             else None
         )
         out.append(f"wasm={self.wasm}") if self.wasm is not None else None
+        (
+            out.append(f"create_contract_v2={self.create_contract_v2}")
+            if self.create_contract_v2 is not None
+            else None
+        )
         return f"<HostFunction [{', '.join(out)}]>"

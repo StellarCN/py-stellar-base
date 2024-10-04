@@ -950,6 +950,22 @@ AlphaNum4
 ---------
 .. autoclass:: stellar_sdk.xdr.alpha_num4.AlphaNum4
 
+ArchivalProof
+-------------
+.. autoclass:: stellar_sdk.xdr.archival_proof.ArchivalProof
+
+ArchivalProofBody
+-----------------
+.. autoclass:: stellar_sdk.xdr.archival_proof_body.ArchivalProofBody
+
+ArchivalProofNode
+-----------------
+.. autoclass:: stellar_sdk.xdr.archival_proof_node.ArchivalProofNode
+
+ArchivalProofType
+-----------------
+.. autoclass:: stellar_sdk.xdr.archival_proof_type.ArchivalProofType
+
 Asset
 -----
 .. autoclass:: stellar_sdk.xdr.asset.Asset
@@ -998,6 +1014,10 @@ BeginSponsoringFutureReservesResultCode
 ---------------------------------------
 .. autoclass:: stellar_sdk.xdr.begin_sponsoring_future_reserves_result_code.BeginSponsoringFutureReservesResultCode
 
+BinaryFuseFilterType
+--------------------
+.. autoclass:: stellar_sdk.xdr.binary_fuse_filter_type.BinaryFuseFilterType
+
 Boolean
 -------
 .. autoclass:: stellar_sdk.xdr.base.Boolean
@@ -1009,6 +1029,10 @@ BucketEntry
 BucketEntryType
 ---------------
 .. autoclass:: stellar_sdk.xdr.bucket_entry_type.BucketEntryType
+
+BucketListType
+--------------
+.. autoclass:: stellar_sdk.xdr.bucket_list_type.BucketListType
 
 BucketMetadata
 --------------
@@ -1150,6 +1174,30 @@ ClawbackResultCode
 ------------------
 .. autoclass:: stellar_sdk.xdr.clawback_result_code.ClawbackResultCode
 
+ColdArchiveArchivedLeaf
+-----------------------
+.. autoclass:: stellar_sdk.xdr.cold_archive_archived_leaf.ColdArchiveArchivedLeaf
+
+ColdArchiveBoundaryLeaf
+-----------------------
+.. autoclass:: stellar_sdk.xdr.cold_archive_boundary_leaf.ColdArchiveBoundaryLeaf
+
+ColdArchiveBucketEntry
+----------------------
+.. autoclass:: stellar_sdk.xdr.cold_archive_bucket_entry.ColdArchiveBucketEntry
+
+ColdArchiveBucketEntryType
+--------------------------
+.. autoclass:: stellar_sdk.xdr.cold_archive_bucket_entry_type.ColdArchiveBucketEntryType
+
+ColdArchiveDeletedLeaf
+----------------------
+.. autoclass:: stellar_sdk.xdr.cold_archive_deleted_leaf.ColdArchiveDeletedLeaf
+
+ColdArchiveHashEntry
+--------------------
+.. autoclass:: stellar_sdk.xdr.cold_archive_hash_entry.ColdArchiveHashEntry
+
 ConfigSettingContractBandwidthV0
 --------------------------------
 .. autoclass:: stellar_sdk.xdr.config_setting_contract_bandwidth_v0.ConfigSettingContractBandwidthV0
@@ -1290,6 +1338,10 @@ CreateContractArgs
 ------------------
 .. autoclass:: stellar_sdk.xdr.create_contract_args.CreateContractArgs
 
+CreateContractArgsV2
+--------------------
+.. autoclass:: stellar_sdk.xdr.create_contract_args_v2.CreateContractArgsV2
+
 CreatePassiveSellOfferOp
 ------------------------
 .. autoclass:: stellar_sdk.xdr.create_passive_sell_offer_op.CreatePassiveSellOfferOp
@@ -1325,6 +1377,10 @@ DecoratedSignature
 DiagnosticEvent
 ---------------
 .. autoclass:: stellar_sdk.xdr.diagnostic_event.DiagnosticEvent
+
+DiagnosticEvents
+----------------
+.. autoclass:: stellar_sdk.xdr.diagnostic_events.DiagnosticEvents
 
 DontHave
 --------
@@ -1365,6 +1421,10 @@ ErrorCode
 EvictionIterator
 ----------------
 .. autoclass:: stellar_sdk.xdr.eviction_iterator.EvictionIterator
+
+ExistenceProofBody
+------------------
+.. autoclass:: stellar_sdk.xdr.existence_proof_body.ExistenceProofBody
 
 ExtendFootprintTTLOp
 --------------------
@@ -1457,6 +1517,14 @@ HostFunction
 HostFunctionType
 ----------------
 .. autoclass:: stellar_sdk.xdr.host_function_type.HostFunctionType
+
+HotArchiveBucketEntry
+---------------------
+.. autoclass:: stellar_sdk.xdr.hot_archive_bucket_entry.HotArchiveBucketEntry
+
+HotArchiveBucketEntryType
+-------------------------
+.. autoclass:: stellar_sdk.xdr.hot_archive_bucket_entry_type.HotArchiveBucketEntryType
 
 Hyper
 -----
@@ -1810,6 +1878,10 @@ NodeID
 ------
 .. autoclass:: stellar_sdk.xdr.node_id.NodeID
 
+NonexistenceProofBody
+---------------------
+.. autoclass:: stellar_sdk.xdr.nonexistence_proof_body.NonexistenceProofBody
+
 OfferEntry
 ----------
 .. autoclass:: stellar_sdk.xdr.offer_entry.OfferEntry
@@ -1946,6 +2018,10 @@ Price
 -----
 .. autoclass:: stellar_sdk.xdr.price.Price
 
+ProofLevel
+----------
+.. autoclass:: stellar_sdk.xdr.proof_level.ProofLevel
+
 PublicKey
 ---------
 .. autoclass:: stellar_sdk.xdr.public_key.PublicKey
@@ -2005,6 +2081,10 @@ SCContractInstance
 SCEnvMetaEntry
 --------------
 .. autoclass:: stellar_sdk.xdr.sc_env_meta_entry.SCEnvMetaEntry
+
+SCEnvMetaEntryInterfaceVersion
+------------------------------
+.. autoclass:: stellar_sdk.xdr.sc_env_meta_entry_interface_version.SCEnvMetaEntryInterfaceVersion
 
 SCEnvMetaKind
 -------------
@@ -2222,6 +2302,10 @@ SequenceNumber
 --------------
 .. autoclass:: stellar_sdk.xdr.sequence_number.SequenceNumber
 
+SerializedBinaryFuseFilter
+--------------------------
+.. autoclass:: stellar_sdk.xdr.serialized_binary_fuse_filter.SerializedBinaryFuseFilter
+
 SetOptionsOp
 ------------
 .. autoclass:: stellar_sdk.xdr.set_options_op.SetOptionsOp
@@ -2246,6 +2330,10 @@ SetTrustLineFlagsResultCode
 ---------------------------
 .. autoclass:: stellar_sdk.xdr.set_trust_line_flags_result_code.SetTrustLineFlagsResultCode
 
+ShortHashSeed
+-------------
+.. autoclass:: stellar_sdk.xdr.short_hash_seed.ShortHashSeed
+
 Signature
 ---------
 .. autoclass:: stellar_sdk.xdr.signature.Signature
@@ -2261,6 +2349,22 @@ SignedSurveyRequestMessage
 SignedSurveyResponseMessage
 ---------------------------
 .. autoclass:: stellar_sdk.xdr.signed_survey_response_message.SignedSurveyResponseMessage
+
+SignedTimeSlicedSurveyRequestMessage
+------------------------------------
+.. autoclass:: stellar_sdk.xdr.signed_time_sliced_survey_request_message.SignedTimeSlicedSurveyRequestMessage
+
+SignedTimeSlicedSurveyResponseMessage
+-------------------------------------
+.. autoclass:: stellar_sdk.xdr.signed_time_sliced_survey_response_message.SignedTimeSlicedSurveyResponseMessage
+
+SignedTimeSlicedSurveyStartCollectingMessage
+--------------------------------------------
+.. autoclass:: stellar_sdk.xdr.signed_time_sliced_survey_start_collecting_message.SignedTimeSlicedSurveyStartCollectingMessage
+
+SignedTimeSlicedSurveyStopCollectingMessage
+-------------------------------------------
+.. autoclass:: stellar_sdk.xdr.signed_time_sliced_survey_stop_collecting_message.SignedTimeSlicedSurveyStopCollectingMessage
 
 Signer
 ------
@@ -2414,6 +2518,34 @@ TimePoint
 ---------
 .. autoclass:: stellar_sdk.xdr.time_point.TimePoint
 
+TimeSlicedNodeData
+------------------
+.. autoclass:: stellar_sdk.xdr.time_sliced_node_data.TimeSlicedNodeData
+
+TimeSlicedPeerData
+------------------
+.. autoclass:: stellar_sdk.xdr.time_sliced_peer_data.TimeSlicedPeerData
+
+TimeSlicedPeerDataList
+----------------------
+.. autoclass:: stellar_sdk.xdr.time_sliced_peer_data_list.TimeSlicedPeerDataList
+
+TimeSlicedSurveyRequestMessage
+------------------------------
+.. autoclass:: stellar_sdk.xdr.time_sliced_survey_request_message.TimeSlicedSurveyRequestMessage
+
+TimeSlicedSurveyResponseMessage
+-------------------------------
+.. autoclass:: stellar_sdk.xdr.time_sliced_survey_response_message.TimeSlicedSurveyResponseMessage
+
+TimeSlicedSurveyStartCollectingMessage
+--------------------------------------
+.. autoclass:: stellar_sdk.xdr.time_sliced_survey_start_collecting_message.TimeSlicedSurveyStartCollectingMessage
+
+TimeSlicedSurveyStopCollectingMessage
+-------------------------------------
+.. autoclass:: stellar_sdk.xdr.time_sliced_survey_stop_collecting_message.TimeSlicedSurveyStopCollectingMessage
+
 TopologyResponseBodyV0
 ----------------------
 .. autoclass:: stellar_sdk.xdr.topology_response_body_v0.TopologyResponseBodyV0
@@ -2421,6 +2553,10 @@ TopologyResponseBodyV0
 TopologyResponseBodyV1
 ----------------------
 .. autoclass:: stellar_sdk.xdr.topology_response_body_v1.TopologyResponseBodyV1
+
+TopologyResponseBodyV2
+----------------------
+.. autoclass:: stellar_sdk.xdr.topology_response_body_v2.TopologyResponseBodyV2
 
 Transaction
 -----------

@@ -22,6 +22,18 @@ from .send_more import SendMore
 from .send_more_extended import SendMoreExtended
 from .signed_survey_request_message import SignedSurveyRequestMessage
 from .signed_survey_response_message import SignedSurveyResponseMessage
+from .signed_time_sliced_survey_request_message import (
+    SignedTimeSlicedSurveyRequestMessage,
+)
+from .signed_time_sliced_survey_response_message import (
+    SignedTimeSlicedSurveyResponseMessage,
+)
+from .signed_time_sliced_survey_start_collecting_message import (
+    SignedTimeSlicedSurveyStartCollectingMessage,
+)
+from .signed_time_sliced_survey_stop_collecting_message import (
+    SignedTimeSlicedSurveyStopCollectingMessage,
+)
 from .transaction_envelope import TransactionEnvelope
 from .transaction_set import TransactionSet
 from .uint32 import Uint32
@@ -65,6 +77,20 @@ class StellarMessage:
         case SURVEY_RESPONSE:
             SignedSurveyResponseMessage signedSurveyResponseMessage;
 
+        case TIME_SLICED_SURVEY_REQUEST:
+            SignedTimeSlicedSurveyRequestMessage signedTimeSlicedSurveyRequestMessage;
+
+        case TIME_SLICED_SURVEY_RESPONSE:
+            SignedTimeSlicedSurveyResponseMessage signedTimeSlicedSurveyResponseMessage;
+
+        case TIME_SLICED_SURVEY_START_COLLECTING:
+            SignedTimeSlicedSurveyStartCollectingMessage
+                signedTimeSlicedSurveyStartCollectingMessage;
+
+        case TIME_SLICED_SURVEY_STOP_COLLECTING:
+            SignedTimeSlicedSurveyStopCollectingMessage
+                signedTimeSlicedSurveyStopCollectingMessage;
+
         // SCP
         case GET_SCP_QUORUMSET:
             uint256 qSetHash;
@@ -100,6 +126,10 @@ class StellarMessage:
         transaction: TransactionEnvelope = None,
         signed_survey_request_message: SignedSurveyRequestMessage = None,
         signed_survey_response_message: SignedSurveyResponseMessage = None,
+        signed_time_sliced_survey_request_message: SignedTimeSlicedSurveyRequestMessage = None,
+        signed_time_sliced_survey_response_message: SignedTimeSlicedSurveyResponseMessage = None,
+        signed_time_sliced_survey_start_collecting_message: SignedTimeSlicedSurveyStartCollectingMessage = None,
+        signed_time_sliced_survey_stop_collecting_message: SignedTimeSlicedSurveyStopCollectingMessage = None,
         q_set_hash: Uint256 = None,
         q_set: SCPQuorumSet = None,
         envelope: SCPEnvelope = None,
@@ -126,6 +156,18 @@ class StellarMessage:
         self.transaction = transaction
         self.signed_survey_request_message = signed_survey_request_message
         self.signed_survey_response_message = signed_survey_response_message
+        self.signed_time_sliced_survey_request_message = (
+            signed_time_sliced_survey_request_message
+        )
+        self.signed_time_sliced_survey_response_message = (
+            signed_time_sliced_survey_response_message
+        )
+        self.signed_time_sliced_survey_start_collecting_message = (
+            signed_time_sliced_survey_start_collecting_message
+        )
+        self.signed_time_sliced_survey_stop_collecting_message = (
+            signed_time_sliced_survey_stop_collecting_message
+        )
         self.q_set_hash = q_set_hash
         self.q_set = q_set
         self.envelope = envelope
@@ -195,6 +237,34 @@ class StellarMessage:
             if self.signed_survey_response_message is None:
                 raise ValueError("signed_survey_response_message should not be None.")
             self.signed_survey_response_message.pack(packer)
+            return
+        if self.type == MessageType.TIME_SLICED_SURVEY_REQUEST:
+            if self.signed_time_sliced_survey_request_message is None:
+                raise ValueError(
+                    "signed_time_sliced_survey_request_message should not be None."
+                )
+            self.signed_time_sliced_survey_request_message.pack(packer)
+            return
+        if self.type == MessageType.TIME_SLICED_SURVEY_RESPONSE:
+            if self.signed_time_sliced_survey_response_message is None:
+                raise ValueError(
+                    "signed_time_sliced_survey_response_message should not be None."
+                )
+            self.signed_time_sliced_survey_response_message.pack(packer)
+            return
+        if self.type == MessageType.TIME_SLICED_SURVEY_START_COLLECTING:
+            if self.signed_time_sliced_survey_start_collecting_message is None:
+                raise ValueError(
+                    "signed_time_sliced_survey_start_collecting_message should not be None."
+                )
+            self.signed_time_sliced_survey_start_collecting_message.pack(packer)
+            return
+        if self.type == MessageType.TIME_SLICED_SURVEY_STOP_COLLECTING:
+            if self.signed_time_sliced_survey_stop_collecting_message is None:
+                raise ValueError(
+                    "signed_time_sliced_survey_stop_collecting_message should not be None."
+                )
+            self.signed_time_sliced_survey_stop_collecting_message.pack(packer)
             return
         if self.type == MessageType.GET_SCP_QUORUMSET:
             if self.q_set_hash is None:
@@ -284,6 +354,38 @@ class StellarMessage:
             return cls(
                 type=type, signed_survey_response_message=signed_survey_response_message
             )
+        if type == MessageType.TIME_SLICED_SURVEY_REQUEST:
+            signed_time_sliced_survey_request_message = (
+                SignedTimeSlicedSurveyRequestMessage.unpack(unpacker)
+            )
+            return cls(
+                type=type,
+                signed_time_sliced_survey_request_message=signed_time_sliced_survey_request_message,
+            )
+        if type == MessageType.TIME_SLICED_SURVEY_RESPONSE:
+            signed_time_sliced_survey_response_message = (
+                SignedTimeSlicedSurveyResponseMessage.unpack(unpacker)
+            )
+            return cls(
+                type=type,
+                signed_time_sliced_survey_response_message=signed_time_sliced_survey_response_message,
+            )
+        if type == MessageType.TIME_SLICED_SURVEY_START_COLLECTING:
+            signed_time_sliced_survey_start_collecting_message = (
+                SignedTimeSlicedSurveyStartCollectingMessage.unpack(unpacker)
+            )
+            return cls(
+                type=type,
+                signed_time_sliced_survey_start_collecting_message=signed_time_sliced_survey_start_collecting_message,
+            )
+        if type == MessageType.TIME_SLICED_SURVEY_STOP_COLLECTING:
+            signed_time_sliced_survey_stop_collecting_message = (
+                SignedTimeSlicedSurveyStopCollectingMessage.unpack(unpacker)
+            )
+            return cls(
+                type=type,
+                signed_time_sliced_survey_stop_collecting_message=signed_time_sliced_survey_stop_collecting_message,
+            )
         if type == MessageType.GET_SCP_QUORUMSET:
             q_set_hash = Uint256.unpack(unpacker)
             return cls(type=type, q_set_hash=q_set_hash)
@@ -344,6 +446,10 @@ class StellarMessage:
                 self.transaction,
                 self.signed_survey_request_message,
                 self.signed_survey_response_message,
+                self.signed_time_sliced_survey_request_message,
+                self.signed_time_sliced_survey_response_message,
+                self.signed_time_sliced_survey_start_collecting_message,
+                self.signed_time_sliced_survey_stop_collecting_message,
                 self.q_set_hash,
                 self.q_set,
                 self.envelope,
@@ -373,6 +479,14 @@ class StellarMessage:
             == other.signed_survey_request_message
             and self.signed_survey_response_message
             == other.signed_survey_response_message
+            and self.signed_time_sliced_survey_request_message
+            == other.signed_time_sliced_survey_request_message
+            and self.signed_time_sliced_survey_response_message
+            == other.signed_time_sliced_survey_response_message
+            and self.signed_time_sliced_survey_start_collecting_message
+            == other.signed_time_sliced_survey_start_collecting_message
+            and self.signed_time_sliced_survey_stop_collecting_message
+            == other.signed_time_sliced_survey_stop_collecting_message
             and self.q_set_hash == other.q_set_hash
             and self.q_set == other.q_set
             and self.envelope == other.envelope
@@ -423,6 +537,34 @@ class StellarMessage:
                 f"signed_survey_response_message={self.signed_survey_response_message}"
             )
             if self.signed_survey_response_message is not None
+            else None
+        )
+        (
+            out.append(
+                f"signed_time_sliced_survey_request_message={self.signed_time_sliced_survey_request_message}"
+            )
+            if self.signed_time_sliced_survey_request_message is not None
+            else None
+        )
+        (
+            out.append(
+                f"signed_time_sliced_survey_response_message={self.signed_time_sliced_survey_response_message}"
+            )
+            if self.signed_time_sliced_survey_response_message is not None
+            else None
+        )
+        (
+            out.append(
+                f"signed_time_sliced_survey_start_collecting_message={self.signed_time_sliced_survey_start_collecting_message}"
+            )
+            if self.signed_time_sliced_survey_start_collecting_message is not None
+            else None
+        )
+        (
+            out.append(
+                f"signed_time_sliced_survey_stop_collecting_message={self.signed_time_sliced_survey_stop_collecting_message}"
+            )
+            if self.signed_time_sliced_survey_stop_collecting_message is not None
             else None
         )
         (
