@@ -787,9 +787,9 @@ class TestTransaction:
         salt = b"V2\x1c\x18\xecF\xea-\x83\x90\xdc\x96\xe0\xdd\x8e\x9a}\x96\x88\xc7\x13\xaa\xa5\xef\xc5az\xa3\xf8\xb0F_"
         wasm_id = "75cab8d0f9efb285ef229d57342550dea3c43f5fe397bb500c40eba22900def2"
         tx = get_tx_builder().append_create_contract_op(
-            wasm_id, kp2.public_key, salt, auth, kp2.public_key
+            wasm_id, kp2.public_key, None, salt, auth, kp2.public_key
         )
-        create_contract = stellar_xdr.CreateContractArgs(
+        create_contract = stellar_xdr.CreateContractArgsV2(
             contract_id_preimage=stellar_xdr.ContractIDPreimage(
                 stellar_xdr.ContractIDPreimageType.CONTRACT_ID_PREIMAGE_FROM_ADDRESS,
                 from_address=stellar_xdr.ContractIDPreimageFromAddress(
@@ -801,11 +801,67 @@ class TestTransaction:
                 stellar_xdr.ContractExecutableType.CONTRACT_EXECUTABLE_WASM,
                 stellar_xdr.Hash(binascii.unhexlify(wasm_id)),
             ),
+            constructor_args=[],
         )
 
         host_function = stellar_xdr.HostFunction(
-            stellar_xdr.HostFunctionType.HOST_FUNCTION_TYPE_CREATE_CONTRACT,
-            create_contract=create_contract,
+            stellar_xdr.HostFunctionType.HOST_FUNCTION_TYPE_CREATE_CONTRACT_V2,
+            create_contract_v2=create_contract,
+        )
+        expected_op = InvokeHostFunction(
+            host_function=host_function, auth=auth, source=kp2.public_key
+        )
+        assert tx.build().transaction.operations[0] == expected_op
+        check_from_xdr(tx)
+
+    def test_append_create_contract_op_with_constructor_args(self):
+        auth = [
+            stellar_xdr.SorobanAuthorizationEntry(
+                credentials=stellar_xdr.SorobanCredentials(
+                    stellar_xdr.SorobanCredentialsType.SOROBAN_CREDENTIALS_SOURCE_ACCOUNT
+                ),
+                root_invocation=stellar_xdr.SorobanAuthorizedInvocation(
+                    function=stellar_xdr.SorobanAuthorizedFunction(
+                        type=stellar_xdr.SorobanAuthorizedFunctionType.SOROBAN_AUTHORIZED_FUNCTION_TYPE_CONTRACT_FN,
+                        contract_fn=stellar_xdr.InvokeContractArgs(
+                            contract_address=Address(
+                                "CA7QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLTJJFC7MGXUA74P7UJUWDA"
+                            ).to_xdr_sc_address(),
+                            function_name=scval.to_symbol("hello").sym,
+                            args=[
+                                scval.to_address(kp2.public_key),
+                                scval.to_uint32(10),
+                            ],
+                        ),
+                    ),
+                    sub_invocations=[],
+                ),
+            )
+        ]
+        constructor_args = [scval.to_uint32(123), scval.to_uint256(7788)]
+        salt = b"V2\x1c\x18\xecF\xea-\x83\x90\xdc\x96\xe0\xdd\x8e\x9a}\x96\x88\xc7\x13\xaa\xa5\xef\xc5az\xa3\xf8\xb0F_"
+        wasm_id = "75cab8d0f9efb285ef229d57342550dea3c43f5fe397bb500c40eba22900def2"
+        tx = get_tx_builder().append_create_contract_op(
+            wasm_id, kp2.public_key, constructor_args, salt, auth, kp2.public_key
+        )
+        create_contract = stellar_xdr.CreateContractArgsV2(
+            contract_id_preimage=stellar_xdr.ContractIDPreimage(
+                stellar_xdr.ContractIDPreimageType.CONTRACT_ID_PREIMAGE_FROM_ADDRESS,
+                from_address=stellar_xdr.ContractIDPreimageFromAddress(
+                    address=Address(kp2.public_key).to_xdr_sc_address(),
+                    salt=stellar_xdr.Uint256(salt),
+                ),
+            ),
+            executable=stellar_xdr.ContractExecutable(
+                stellar_xdr.ContractExecutableType.CONTRACT_EXECUTABLE_WASM,
+                stellar_xdr.Hash(binascii.unhexlify(wasm_id)),
+            ),
+            constructor_args=constructor_args,
+        )
+
+        host_function = stellar_xdr.HostFunction(
+            stellar_xdr.HostFunctionType.HOST_FUNCTION_TYPE_CREATE_CONTRACT_V2,
+            create_contract_v2=create_contract,
         )
         expected_op = InvokeHostFunction(
             host_function=host_function, auth=auth, source=kp2.public_key
