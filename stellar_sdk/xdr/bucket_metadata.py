@@ -26,6 +26,8 @@ class BucketMetadata:
             {
             case 0:
                 void;
+            case 1:
+                BucketListType bucketListType;
             }
             ext;
         };

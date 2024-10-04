@@ -45,7 +45,12 @@ class MessageType(IntEnum):
             SEND_MORE_EXTENDED = 20,
 
             FLOOD_ADVERT = 18,
-            FLOOD_DEMAND = 19
+            FLOOD_DEMAND = 19,
+
+            TIME_SLICED_SURVEY_REQUEST = 21,
+            TIME_SLICED_SURVEY_RESPONSE = 22,
+            TIME_SLICED_SURVEY_START_COLLECTING = 23,
+            TIME_SLICED_SURVEY_STOP_COLLECTING = 24
         };
     """
 
@@ -69,6 +74,10 @@ class MessageType(IntEnum):
     SEND_MORE_EXTENDED = 20
     FLOOD_ADVERT = 18
     FLOOD_DEMAND = 19
+    TIME_SLICED_SURVEY_REQUEST = 21
+    TIME_SLICED_SURVEY_RESPONSE = 22
+    TIME_SLICED_SURVEY_START_COLLECTING = 23
+    TIME_SLICED_SURVEY_STOP_COLLECTING = 24
 
     def pack(self, packer: Packer) -> None:
         packer.pack_int(self.value)

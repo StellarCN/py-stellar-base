@@ -6,8 +6,8 @@ import base64
 
 from xdrlib3 import Packer, Unpacker
 
+from .sc_env_meta_entry_interface_version import SCEnvMetaEntryInterfaceVersion
 from .sc_env_meta_kind import SCEnvMetaKind
-from .uint64 import Uint64
 
 __all__ = ["SCEnvMetaEntry"]
 
@@ -19,14 +19,17 @@ class SCEnvMetaEntry:
         union SCEnvMetaEntry switch (SCEnvMetaKind kind)
         {
         case SC_ENV_META_KIND_INTERFACE_VERSION:
-            uint64 interfaceVersion;
+            struct {
+                uint32 protocol;
+                uint32 preRelease;
+            } interfaceVersion;
         };
     """
 
     def __init__(
         self,
         kind: SCEnvMetaKind,
-        interface_version: Uint64 = None,
+        interface_version: SCEnvMetaEntryInterfaceVersion = None,
     ) -> None:
         self.kind = kind
         self.interface_version = interface_version
@@ -43,7 +46,7 @@ class SCEnvMetaEntry:
     def unpack(cls, unpacker: Unpacker) -> SCEnvMetaEntry:
         kind = SCEnvMetaKind.unpack(unpacker)
         if kind == SCEnvMetaKind.SC_ENV_META_KIND_INTERFACE_VERSION:
-            interface_version = Uint64.unpack(unpacker)
+            interface_version = SCEnvMetaEntryInterfaceVersion.unpack(unpacker)
             return cls(kind=kind, interface_version=interface_version)
         return cls(kind=kind)
 

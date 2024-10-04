@@ -678,4 +678,120 @@ enum EnvelopeType
     ENVELOPE_TYPE_CONTRACT_ID = 8,
     ENVELOPE_TYPE_SOROBAN_AUTHORIZATION = 9
 };
+
+enum BucketListType
+{
+    LIVE = 0,
+    HOT_ARCHIVE = 1,
+    COLD_ARCHIVE = 2
+};
+
+/* Entries used to define the bucket list */
+enum BucketEntryType
+{
+    METAENTRY =
+        -1, // At-and-after protocol 11: bucket metadata, should come first.
+    LIVEENTRY = 0, // Before protocol 11: created-or-updated;
+                   // At-and-after protocol 11: only updated.
+    DEADENTRY = 1,
+    INITENTRY = 2 // At-and-after protocol 11: only created.
+};
+
+enum HotArchiveBucketEntryType
+{
+    HOT_ARCHIVE_METAENTRY = -1, // Bucket metadata, should come first.
+    HOT_ARCHIVE_ARCHIVED = 0,   // Entry is Archived
+    HOT_ARCHIVE_LIVE = 1,       // Entry was previously HOT_ARCHIVE_ARCHIVED, or HOT_ARCHIVE_DELETED, but
+                                // has been added back to the live BucketList.
+                                // Does not need to be persisted.
+    HOT_ARCHIVE_DELETED = 2     // Entry deleted (Note: must be persisted in archive)
+};
+
+enum ColdArchiveBucketEntryType
+{
+    COLD_ARCHIVE_METAENTRY     = -1,  // Bucket metadata, should come first.
+    COLD_ARCHIVE_ARCHIVED_LEAF = 0,   // Full LedgerEntry that was archived during the epoch
+    COLD_ARCHIVE_DELETED_LEAF  = 1,   // LedgerKey that was deleted during the epoch
+    COLD_ARCHIVE_BOUNDARY_LEAF = 2,   // Dummy leaf representing low/high bound
+    COLD_ARCHIVE_HASH          = 3    // Intermediary Merkle hash entry
+};
+
+struct BucketMetadata
+{
+    // Indicates the protocol version used to create / merge this bucket.
+    uint32 ledgerVersion;
+
+    // reserved for future use
+    union switch (int v)
+    {
+    case 0:
+        void;
+    case 1:
+        BucketListType bucketListType;
+    }
+    ext;
+};
+
+union BucketEntry switch (BucketEntryType type)
+{
+case LIVEENTRY:
+case INITENTRY:
+    LedgerEntry liveEntry;
+
+case DEADENTRY:
+    LedgerKey deadEntry;
+case METAENTRY:
+    BucketMetadata metaEntry;
+};
+
+union HotArchiveBucketEntry switch (HotArchiveBucketEntryType type)
+{
+case HOT_ARCHIVE_ARCHIVED:
+    LedgerEntry archivedEntry;
+
+case HOT_ARCHIVE_LIVE:
+case HOT_ARCHIVE_DELETED:
+    LedgerKey key;
+case HOT_ARCHIVE_METAENTRY:
+    BucketMetadata metaEntry;
+};
+
+struct ColdArchiveArchivedLeaf
+{
+    uint32 index;
+    LedgerEntry archivedEntry;
+};
+
+struct ColdArchiveDeletedLeaf
+{
+    uint32 index;
+    LedgerKey deletedKey;
+};
+
+struct ColdArchiveBoundaryLeaf
+{
+    uint32 index;
+    bool isLowerBound;
+};
+
+struct ColdArchiveHashEntry
+{
+    uint32 index;
+    uint32 level;
+    Hash hash;
+};
+
+union ColdArchiveBucketEntry switch (ColdArchiveBucketEntryType type)
+{
+case COLD_ARCHIVE_METAENTRY:
+    BucketMetadata metaEntry;
+case COLD_ARCHIVE_ARCHIVED_LEAF:
+    ColdArchiveArchivedLeaf archivedLeaf;
+case COLD_ARCHIVE_DELETED_LEAF:
+    ColdArchiveDeletedLeaf deletedLeaf;
+case COLD_ARCHIVE_BOUNDARY_LEAF:
+    ColdArchiveBoundaryLeaf boundaryLeaf;
+case COLD_ARCHIVE_HASH:
+    ColdArchiveHashEntry hashEntry;
+};
 }

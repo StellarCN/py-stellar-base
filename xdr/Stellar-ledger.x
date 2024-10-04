@@ -157,43 +157,6 @@ struct ConfigUpgradeSet {
     ConfigSettingEntry updatedEntry<>;
 };
 
-/* Entries used to define the bucket list */
-enum BucketEntryType
-{
-    METAENTRY =
-        -1, // At-and-after protocol 11: bucket metadata, should come first.
-    LIVEENTRY = 0, // Before protocol 11: created-or-updated;
-                   // At-and-after protocol 11: only updated.
-    DEADENTRY = 1,
-    INITENTRY = 2 // At-and-after protocol 11: only created.
-};
-
-struct BucketMetadata
-{
-    // Indicates the protocol version used to create / merge this bucket.
-    uint32 ledgerVersion;
-
-    // reserved for future use
-    union switch (int v)
-    {
-    case 0:
-        void;
-    }
-    ext;
-};
-
-union BucketEntry switch (BucketEntryType type)
-{
-case LIVEENTRY:
-case INITENTRY:
-    LedgerEntry liveEntry;
-
-case DEADENTRY:
-    LedgerKey deadEntry;
-case METAENTRY:
-    BucketMetadata metaEntry;
-};
-
 enum TxSetComponentType
 {
   // txs with effective fee <= bid derived from a base fee (if any).
@@ -399,6 +362,8 @@ struct DiagnosticEvent
     bool inSuccessfulContractCall;
     ContractEvent event;
 };
+
+typedef DiagnosticEvent DiagnosticEvents<>;
 
 struct SorobanTransactionMetaExtV1
 {

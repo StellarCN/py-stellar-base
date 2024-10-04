@@ -17,12 +17,14 @@ class SurveyMessageResponseType(IntEnum):
         enum SurveyMessageResponseType
         {
             SURVEY_TOPOLOGY_RESPONSE_V0 = 0,
-            SURVEY_TOPOLOGY_RESPONSE_V1 = 1
+            SURVEY_TOPOLOGY_RESPONSE_V1 = 1,
+            SURVEY_TOPOLOGY_RESPONSE_V2 = 2
         };
     """
 
     SURVEY_TOPOLOGY_RESPONSE_V0 = 0
     SURVEY_TOPOLOGY_RESPONSE_V1 = 1
+    SURVEY_TOPOLOGY_RESPONSE_V2 = 2
 
     def pack(self, packer: Packer) -> None:
         packer.pack_int(self.value)

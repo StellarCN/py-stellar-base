@@ -119,7 +119,12 @@ enum MessageType
     SEND_MORE_EXTENDED = 20,
 
     FLOOD_ADVERT = 18,
-    FLOOD_DEMAND = 19
+    FLOOD_DEMAND = 19,
+
+    TIME_SLICED_SURVEY_REQUEST = 21,
+    TIME_SLICED_SURVEY_RESPONSE = 22,
+    TIME_SLICED_SURVEY_START_COLLECTING = 23,
+    TIME_SLICED_SURVEY_STOP_COLLECTING = 24
 };
 
 struct DontHave
@@ -130,13 +135,41 @@ struct DontHave
 
 enum SurveyMessageCommandType
 {
-    SURVEY_TOPOLOGY = 0
+    SURVEY_TOPOLOGY = 0,
+    TIME_SLICED_SURVEY_TOPOLOGY = 1
 };
 
 enum SurveyMessageResponseType
 {
     SURVEY_TOPOLOGY_RESPONSE_V0 = 0,
-    SURVEY_TOPOLOGY_RESPONSE_V1 = 1
+    SURVEY_TOPOLOGY_RESPONSE_V1 = 1,
+    SURVEY_TOPOLOGY_RESPONSE_V2 = 2
+};
+
+struct TimeSlicedSurveyStartCollectingMessage
+{
+    NodeID surveyorID;
+    uint32 nonce;
+    uint32 ledgerNum;
+};
+
+struct SignedTimeSlicedSurveyStartCollectingMessage
+{
+    Signature signature;
+    TimeSlicedSurveyStartCollectingMessage startCollecting;
+};
+
+struct TimeSlicedSurveyStopCollectingMessage
+{
+    NodeID surveyorID;
+    uint32 nonce;
+    uint32 ledgerNum;
+};
+
+struct SignedTimeSlicedSurveyStopCollectingMessage
+{
+    Signature signature;
+    TimeSlicedSurveyStopCollectingMessage stopCollecting;
 };
 
 struct SurveyRequestMessage
@@ -148,10 +181,24 @@ struct SurveyRequestMessage
     SurveyMessageCommandType commandType;
 };
 
+struct TimeSlicedSurveyRequestMessage
+{
+    SurveyRequestMessage request;
+    uint32 nonce;
+    uint32 inboundPeersIndex;
+    uint32 outboundPeersIndex;
+};
+
 struct SignedSurveyRequestMessage
 {
     Signature requestSignature;
     SurveyRequestMessage request;
+};
+
+struct SignedTimeSlicedSurveyRequestMessage
+{
+    Signature requestSignature;
+    TimeSlicedSurveyRequestMessage request;
 };
 
 typedef opaque EncryptedBody<64000>;
@@ -164,10 +211,22 @@ struct SurveyResponseMessage
     EncryptedBody encryptedBody;
 };
 
+struct TimeSlicedSurveyResponseMessage
+{
+    SurveyResponseMessage response;
+    uint32 nonce;
+};
+
 struct SignedSurveyResponseMessage
 {
     Signature responseSignature;
     SurveyResponseMessage response;
+};
+
+struct SignedTimeSlicedSurveyResponseMessage
+{
+    Signature responseSignature;
+    TimeSlicedSurveyResponseMessage response;
 };
 
 struct PeerStats
@@ -193,6 +252,34 @@ struct PeerStats
 
 typedef PeerStats PeerStatList<25>;
 
+struct TimeSlicedNodeData
+{
+    uint32 addedAuthenticatedPeers;
+    uint32 droppedAuthenticatedPeers;
+    uint32 totalInboundPeerCount;
+    uint32 totalOutboundPeerCount;
+
+    // SCP stats
+    uint32 p75SCPFirstToSelfLatencyMs;
+    uint32 p75SCPSelfToOtherLatencyMs;
+
+    // How many times the node lost sync in the time slice
+    uint32 lostSyncCount;
+
+    // Config data
+    bool isValidator;
+    uint32 maxInboundPeerCount;
+    uint32 maxOutboundPeerCount;
+};
+
+struct TimeSlicedPeerData
+{
+    PeerStats peerStats;
+    uint32 averageLatencyMs;
+};
+
+typedef TimeSlicedPeerData TimeSlicedPeerDataList<25>;
+
 struct TopologyResponseBodyV0
 {
     PeerStatList inboundPeers;
@@ -214,12 +301,21 @@ struct TopologyResponseBodyV1
     uint32 maxOutboundPeerCount;
 };
 
+struct TopologyResponseBodyV2
+{
+    TimeSlicedPeerDataList inboundPeers;
+    TimeSlicedPeerDataList outboundPeers;
+    TimeSlicedNodeData nodeData;
+};
+
 union SurveyResponseBody switch (SurveyMessageResponseType type)
 {
 case SURVEY_TOPOLOGY_RESPONSE_V0:
     TopologyResponseBodyV0 topologyResponseBodyV0;
 case SURVEY_TOPOLOGY_RESPONSE_V1:
     TopologyResponseBodyV1 topologyResponseBodyV1;
+case SURVEY_TOPOLOGY_RESPONSE_V2:
+    TopologyResponseBodyV2 topologyResponseBodyV2;
 };
 
 const TX_ADVERT_VECTOR_MAX_SIZE = 1000;
@@ -268,6 +364,20 @@ case SURVEY_REQUEST:
 
 case SURVEY_RESPONSE:
     SignedSurveyResponseMessage signedSurveyResponseMessage;
+
+case TIME_SLICED_SURVEY_REQUEST:
+    SignedTimeSlicedSurveyRequestMessage signedTimeSlicedSurveyRequestMessage;
+
+case TIME_SLICED_SURVEY_RESPONSE:
+    SignedTimeSlicedSurveyResponseMessage signedTimeSlicedSurveyResponseMessage;
+
+case TIME_SLICED_SURVEY_START_COLLECTING:
+    SignedTimeSlicedSurveyStartCollectingMessage
+        signedTimeSlicedSurveyStartCollectingMessage;
+
+case TIME_SLICED_SURVEY_STOP_COLLECTING:
+    SignedTimeSlicedSurveyStopCollectingMessage
+        signedTimeSlicedSurveyStopCollectingMessage;
 
 // SCP
 case GET_SCP_QUORUMSET:

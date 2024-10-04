@@ -7,6 +7,7 @@ import base64
 from xdrlib3 import Packer, Unpacker
 
 from .create_contract_args import CreateContractArgs
+from .create_contract_args_v2 import CreateContractArgsV2
 from .invoke_contract_args import InvokeContractArgs
 from .soroban_authorized_function_type import SorobanAuthorizedFunctionType
 
@@ -21,8 +22,18 @@ class SorobanAuthorizedFunction:
         {
         case SOROBAN_AUTHORIZED_FUNCTION_TYPE_CONTRACT_FN:
             InvokeContractArgs contractFn;
+        // This variant of auth payload for creating new contract instances
+        // doesn't allow specifying the constructor arguments, creating contracts
+        // with constructors that take arguments is only possible by authorizing
+        // `SOROBAN_AUTHORIZED_FUNCTION_TYPE_CREATE_CONTRACT_V2_HOST_FN`
+        // (protocol 22+).
         case SOROBAN_AUTHORIZED_FUNCTION_TYPE_CREATE_CONTRACT_HOST_FN:
             CreateContractArgs createContractHostFn;
+        // This variant of auth payload for creating new contract instances
+        // is only accepted in and after protocol 22. It allows authorizing the
+        // contract constructor arguments.
+        case SOROBAN_AUTHORIZED_FUNCTION_TYPE_CREATE_CONTRACT_V2_HOST_FN:
+            CreateContractArgsV2 createContractV2HostFn;
         };
     """
 
@@ -31,10 +42,12 @@ class SorobanAuthorizedFunction:
         type: SorobanAuthorizedFunctionType,
         contract_fn: InvokeContractArgs = None,
         create_contract_host_fn: CreateContractArgs = None,
+        create_contract_v2_host_fn: CreateContractArgsV2 = None,
     ) -> None:
         self.type = type
         self.contract_fn = contract_fn
         self.create_contract_host_fn = create_contract_host_fn
+        self.create_contract_v2_host_fn = create_contract_v2_host_fn
 
     def pack(self, packer: Packer) -> None:
         self.type.pack(packer)
@@ -54,6 +67,14 @@ class SorobanAuthorizedFunction:
                 raise ValueError("create_contract_host_fn should not be None.")
             self.create_contract_host_fn.pack(packer)
             return
+        if (
+            self.type
+            == SorobanAuthorizedFunctionType.SOROBAN_AUTHORIZED_FUNCTION_TYPE_CREATE_CONTRACT_V2_HOST_FN
+        ):
+            if self.create_contract_v2_host_fn is None:
+                raise ValueError("create_contract_v2_host_fn should not be None.")
+            self.create_contract_v2_host_fn.pack(packer)
+            return
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> SorobanAuthorizedFunction:
@@ -70,6 +91,12 @@ class SorobanAuthorizedFunction:
         ):
             create_contract_host_fn = CreateContractArgs.unpack(unpacker)
             return cls(type=type, create_contract_host_fn=create_contract_host_fn)
+        if (
+            type
+            == SorobanAuthorizedFunctionType.SOROBAN_AUTHORIZED_FUNCTION_TYPE_CREATE_CONTRACT_V2_HOST_FN
+        ):
+            create_contract_v2_host_fn = CreateContractArgsV2.unpack(unpacker)
+            return cls(type=type, create_contract_v2_host_fn=create_contract_v2_host_fn)
         return cls(type=type)
 
     def to_xdr_bytes(self) -> bytes:
@@ -97,6 +124,7 @@ class SorobanAuthorizedFunction:
                 self.type,
                 self.contract_fn,
                 self.create_contract_host_fn,
+                self.create_contract_v2_host_fn,
             )
         )
 
@@ -107,6 +135,7 @@ class SorobanAuthorizedFunction:
             self.type == other.type
             and self.contract_fn == other.contract_fn
             and self.create_contract_host_fn == other.create_contract_host_fn
+            and self.create_contract_v2_host_fn == other.create_contract_v2_host_fn
         )
 
     def __repr__(self):
@@ -120,6 +149,11 @@ class SorobanAuthorizedFunction:
         (
             out.append(f"create_contract_host_fn={self.create_contract_host_fn}")
             if self.create_contract_host_fn is not None
+            else None
+        )
+        (
+            out.append(f"create_contract_v2_host_fn={self.create_contract_v2_host_fn}")
+            if self.create_contract_v2_host_fn is not None
             else None
         )
         return f"<SorobanAuthorizedFunction [{', '.join(out)}]>"
