@@ -4,6 +4,7 @@ Release History
 ### Pending
 #### Update
 - feat!: support constructors in contract creation via `TransactionBuilder.append_create_contract_op`, the signature of the function has been changed.
+- refactor!: Updated `signer` parameter in auth to accept a callable returning (public_key, signatures) instead of just public_key.
 
 ### Version 11.1.0
 
