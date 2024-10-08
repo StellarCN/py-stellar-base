@@ -12,18 +12,20 @@ repos:
 
   # Using this mirror lets us use mypyc-compiled black, which is about 2x faster
   - repo: https://github.com/psf/black-pre-commit-mirror
-    rev: 24.4.2
+    rev: 24.10.0
     hooks:
       - id: black
         # It is recommended to specify the latest version of Python
         # supported by your project here, or alternatively use
         # pre-commit's default_language_version, see
         # https://pre-commit.com/#top_level-default_language_version
-        language_version: python3.11
+        language_version: python3.13
 
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: 'v1.10.1'
+    rev: 'v1.11.2'
     hooks:
       - id: mypy
-        additional_dependencies: [types-requests==2.31.0.10, types-toml==0.10.8.7]
+        # https://pypi.org/project/types-requests/
+        # https://pypi.org/project/types-toml/
+        additional_dependencies: [types-requests==2.32.0.20240914, types-toml==0.10.8.20240310]
         exclude: ^docs/
