@@ -1,6 +1,6 @@
 import copy
 import random
-from typing import Callable, Optional, Union
+from typing import Callable, Optional, Tuple, Union
 
 from . import scval
 from . import xdr as stellar_xdr
@@ -15,7 +15,7 @@ __all__ = ["authorize_entry", "authorize_invocation"]
 
 def authorize_entry(
     entry: Union[stellar_xdr.SorobanAuthorizationEntry, str],
-    signer: Union[Keypair, Callable[[stellar_xdr.HashIDPreimage], bytes]],
+    signer: Union[Keypair, Callable[[stellar_xdr.HashIDPreimage], Tuple[str, bytes]]],
     valid_until_ledger_sequence: int,
     network_passphrase: str,
 ) -> stellar_xdr.SorobanAuthorizationEntry:
@@ -31,14 +31,11 @@ def authorize_entry(
     * on a particular network (uniquely identified by its passphrase, see :class:`stellar_sdk.Network`)
     * until a particular ledger sequence is reached.
 
-    Note that if using the function form of `signer`, the signer is assumed to be
-    the entry's credential address. If you need a different key to sign the
-    entry, you will need to use different method (e.g., fork this code).
-
     :param entry: an unsigned Soroban authorization entry.
     :param signer: either a :class:`Keypair` or a function which takes a payload
-        (a :class:`stellar_xdr.HashIDPreimage` instance) input and returns a bytes signature,
-        the signing key should correspond to the address in the `entry`.
+        (a :class:`stellar_xdr.HashIDPreimage` instance) input and returns a tuple of
+        (str, bytes), where the first str is the public key and the second
+        bytes is the signature. The signing key should correspond to the address in the `entry`.
     :param valid_until_ledger_sequence: the (exclusive) future ledger sequence number until which
         this authorization entry should be valid (if `currentLedgerSeq==validUntil`, this is expired)
     :param network_passphrase: the network passphrase is incorporated into the signature (see :class:`stellar_sdk.Network` for options)
@@ -75,13 +72,12 @@ def authorize_entry(
     payload = sha256(preimage.to_xdr_bytes())
     if isinstance(signer, Keypair):
         signature = signer.sign(payload)
-        public_key = signer.raw_public_key()
+        kp = Keypair.from_raw_ed25519_public_key(signer.raw_public_key())
     else:
-        signature = signer(preimage)
-        public_key = Address.from_xdr_sc_address(addr_auth.address).key
-
+        public_key, signature = signer(preimage)
+        kp = Keypair.from_public_key(public_key)
     try:
-        Keypair.from_raw_ed25519_public_key(public_key).verify(payload, signature)
+        kp.verify(payload, signature)
     except BadSignatureError as e:
         raise ValueError("signature doesn't match payload.") from e
 
@@ -91,7 +87,7 @@ def authorize_entry(
         [
             scval.to_map(
                 {
-                    scval.to_symbol("public_key"): scval.to_bytes(public_key),
+                    scval.to_symbol("public_key"): scval.to_bytes(kp.raw_public_key()),
                     scval.to_symbol("signature"): scval.to_bytes(signature),
                 }
             )
@@ -101,7 +97,7 @@ def authorize_entry(
 
 
 def authorize_invocation(
-    signer: Union[Keypair, Callable[[stellar_xdr.HashIDPreimage], bytes]],
+    signer: Union[Keypair, Callable[[stellar_xdr.HashIDPreimage], Tuple[str, bytes]]],
     public_key: Optional[str],
     valid_until_ledger_sequence: int,
     invocation: stellar_xdr.SorobanAuthorizedInvocation,
@@ -117,13 +113,10 @@ def authorize_invocation(
 
     This is in contrast to :func:`authorize_entry`, which signs an existing entry "in place".
 
-    Note that if using the function form of `signer`, the signer is assumed to be
-    the entry's credential address. If you need a different key to sign the
-    entry, you will need to use different method (e.g., fork this code).
-
     :param signer: either a :class:`Keypair` or a function which takes a payload
-        (a :class:`stellar_xdr.HashIDPreimage` instance) input and returns a bytes signature,
-        the signing key should correspond to the address in the `entry`.
+        (a :class:`stellar_xdr.HashIDPreimage` instance) input and returns a tuple of
+        (str, bytes), where the first str is the public key and the second
+        bytes is the signature. The signing key should correspond to the address in the `entry`.
     :param public_key: the public identity of the signer (when providing a :class:`Keypair` to `signer`,
         this can be omitted, as it just uses the public key of the keypair)
     :param valid_until_ledger_sequence: the (exclusive) future ledger sequence number until which
