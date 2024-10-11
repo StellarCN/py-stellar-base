@@ -130,6 +130,36 @@ class TestSorobanServer:
         assert request_data["method"] == "getNetwork"
         assert request_data["params"] is None
 
+    async def test_version_info(self):
+        result = {
+            "version": "21.1.0",
+            "commitHash": "fcd2f0523f04279bae4502f3e3fa00ca627e6f6a",
+            "buildTimestamp": "2024-05-10T11:18:38",
+            "captiveCoreVersion": "stellar-core 21.0.0.rc2 (c6f474133738ae5f6d11b07963ca841909210273)",
+            "protocolVersion": 21,
+        }
+        data = {
+            "jsonrpc": "2.0",
+            "id": "198cb1a8-9104-4446-a269-88bf000c2721",
+            "result": result,
+        }
+        Response[GetVersionInfoResponse].model_validate(data)
+        GetVersionInfoResponse.model_validate(result)
+
+        with aioresponses() as m:
+            m.post(PRC_URL, payload=data)
+            async with SorobanServerAsync(PRC_URL) as client:
+                assert (
+                    await client.get_version_info()
+                    == GetVersionInfoResponse.model_validate(result)
+                )
+
+        request_data = m.requests[("POST", URL(PRC_URL))][0].kwargs["json"]
+        assert len(request_data["id"]) == 32
+        assert request_data["jsonrpc"] == "2.0"
+        assert request_data["method"] == "getVersionInfo"
+        assert request_data["params"] is None
+
     async def test_get_contract_data(self):
         result = {
             "entries": [
@@ -252,6 +282,7 @@ class TestSorobanServer:
     async def test_get_transaction(self):
         result = {
             "status": "SUCCESS",
+            "txHash": "06dd9ee70bf93bbfe219e2b31363ab5a0361cc6285328592e4d3d1fed4c9025c",
             "latestLedger": "79289",
             "latestLedgerCloseTime": "1690387240",
             "oldestLedger": "77850",
@@ -291,7 +322,6 @@ class TestSorobanServer:
                     "ledgerClosedAt": "2023-09-16T06:23:57Z",
                     "contractId": "CBNYUGHFAIWK3HOINA2OIGOOBMQU4D3MPQWFYBTUYY5WY4FVDO2GWXUY",
                     "id": "0000054713588387840-0000000000",
-                    "pagingToken": "0000054713588387840-0000000000",
                     "topic": [
                         "AAAADwAAAAdDT1VOVEVSAA==",
                         "AAAADwAAAAlpbmNyZW1lbnQAAAA=",
@@ -306,7 +336,6 @@ class TestSorobanServer:
                     "ledgerClosedAt": "2023-09-16T06:24:05Z",
                     "contractId": "CBNYUGHFAIWK3HOINA2OIGOOBMQU4D3MPQWFYBTUYY5WY4FVDO2GWXUY",
                     "id": "0000054747948126208-0000000000",
-                    "pagingToken": "0000054747948126208-0000000000",
                     "topic": [
                         "AAAADwAAAAdDT1VOVEVSAA==",
                         "AAAADwAAAAlpbmNyZW1lbnQAAAA=",
@@ -317,6 +346,7 @@ class TestSorobanServer:
                 },
             ],
             "latestLedger": "187",
+            "cursor": "0000054713588387840-0000000000",
         }
         data = {
             "jsonrpc": "2.0",
@@ -454,36 +484,40 @@ class TestSorobanServer:
             "transactions": [
                 {
                     "status": "FAILED",
+                    "txHash": "1013d3047e00625f64d77de7da7ed55405a25cb10ceb7ac00ca30be59bfdac67",
                     "applicationOrder": 1,
                     "feeBump": False,
                     "envelopeXdr": "AAAAAgAAAACDz21Q3CTITlGqRus3/96/05EDivbtfJncNQKt64BTbAAAASwAAKkyAAXlMwAAAAEAAAAAAAAAAAAAAABmWeASAAAAAQAAABR3YWxsZXQ6MTcxMjkwNjMzNjUxMAAAAAEAAAABAAAAAIPPbVDcJMhOUapG6zf/3r/TkQOK9u18mdw1Aq3rgFNsAAAAAQAAAABwOSvou8mtwTtCkysVioO35TSgyRir2+WGqO8FShG/GAAAAAFVQUgAAAAAAO371tlrHUfK+AvmQvHje1jSUrvJb3y3wrJ7EplQeqTkAAAAAAX14QAAAAAAAAAAAeuAU2wAAABAn+6A+xXvMasptAm9BEJwf5Y9CLLQtV44TsNqS8ocPmn4n8Rtyb09SBiFoMv8isYgeQU5nAHsIwBNbEKCerusAQ==",
                     "resultXdr": "AAAAAAAAAGT/////AAAAAQAAAAAAAAAB////+gAAAAA=",
                     "resultMetaXdr": "AAAAAwAAAAAAAAACAAAAAwAc0RsAAAAAAAAAAIPPbVDcJMhOUapG6zf/3r/TkQOK9u18mdw1Aq3rgFNsAAAAF0YpYBQAAKkyAAXlMgAAAAsAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAMAAAAAABzRGgAAAABmWd/VAAAAAAAAAAEAHNEbAAAAAAAAAACDz21Q3CTITlGqRus3/96/05EDivbtfJncNQKt64BTbAAAABdGKWAUAACpMgAF5TMAAAALAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAADAAAAAAAc0RsAAAAAZlnf2gAAAAAAAAAAAAAAAAAAAAA=",
                     "ledger": 1888539,
-                    "createdAt": 1717166042,
+                    "createdAt": "1717166042",
                 },
                 {
                     "status": "SUCCESS",
+                    "txHash": "2013d3047e00625f64d77de7da7ed55405a25cb10ceb7ac00ca30be59bfdac67",
                     "applicationOrder": 2,
                     "feeBump": False,
                     "envelopeXdr": "AAAAAgAAAAC4EZup+ewCs/doS3hKbeAa4EviBHqAFYM09oHuLtqrGAAPQkAAGgQZAAAANgAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAABAAAAABB90WssODNIgi6BHveqzxTRmIpvAFRyVNM+Hm2GVuCcAAAAAAAAAAAq6aHAHZ2sd9aPbRsskrlXMLWIwqs4Sv2Bk+VwuIR+9wAAABdIdugAAAAAAAAAAAIu2qsYAAAAQERzKOqYYiPXNwsiL8ADAG/f45RBssmf3umGzw4qKkLGlObuPdX0buWmTGrhI13SG38F2V8Mp9DI+eDkcCjMSAOGVuCcAAAAQHnm0o/r+Gsl+6oqBgSbqoSY37gflvQB3zZRghuir0N75UVerd0Q50yG5Zfu08i2crhx6uk+5HYTl8/Sa7uZ+Qc=",
                     "resultXdr": "AAAAAAAAAGQAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAA=",
                     "resultMetaXdr": "AAAAAwAAAAAAAAACAAAAAwAc0RsAAAAAAAAAALgRm6n57AKz92hLeEpt4BrgS+IEeoAVgzT2ge4u2qsYAAAAADwzS2gAGgQZAAAANQAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAMAAAAAABzPVAAAAABmWdZ2AAAAAAAAAAEAHNEbAAAAAAAAAAC4EZup+ewCs/doS3hKbeAa4EviBHqAFYM09oHuLtqrGAAAAAA8M0toABoEGQAAADYAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAADAAAAAAAc0RsAAAAAZlnf2gAAAAAAAAABAAAAAwAAAAMAHNEaAAAAAAAAAAAQfdFrLDgzSIIugR73qs8U0ZiKbwBUclTTPh5thlbgnABZJUSd0V2hAAAAawAAAlEAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAADAAAAAAAaBGEAAAAAZkspCwAAAAAAAAABABzRGwAAAAAAAAAAEH3Rayw4M0iCLoEe96rPFNGYim8AVHJU0z4ebYZW4JwAWSUtVVp1oQAAAGsAAAJRAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAwAAAAAAGgRhAAAAAGZLKQsAAAAAAAAAAAAc0RsAAAAAAAAAACrpocAdnax31o9tGyySuVcwtYjCqzhK/YGT5XC4hH73AAAAF0h26AAAHNEbAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=",
                     "ledger": 1888539,
-                    "createdAt": 1717166042,
+                    "createdAt": "1717166042",
                 },
                 {
                     "status": "SUCCESS",
+                    "txHash": "3013d3047e00625f64d77de7da7ed55405a25cb10ceb7ac00ca30be59bfdac67",
                     "applicationOrder": 3,
                     "feeBump": False,
                     "envelopeXdr": "AAAAAgAAAACwtG/IRC5DZE1UdekijEsoQEPM/uOwZ3iY/Y8UZ3b9xAAPQkAAGgRHAAAANgAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAABAAAAABB90WssODNIgi6BHveqzxTRmIpvAFRyVNM+Hm2GVuCcAAAAAAAAAADgdupKeB04lazKXCOb+E1JfxaM3tI4Xsb/qDa1MWOvXgAAABdIdugAAAAAAAAAAAJndv3EAAAAQKcTimw6KKcM0AeCMxXJcEK/hS9ROoj/qpMFppGNAr4W3ifSOSTGAFbA+cIVHmaV4p7xGcR+9JnUN1YjamvJZwSGVuCcAAAAQK9Cp775JbnYA793SXkkWWbmvnEFTiDPiFyTHxTphCwBDB1zqkXqGG6Q5O3dAyqkNJvj1XNRDsmY4pKV41qijQU=",
                     "resultXdr": "AAAAAAAAAGQAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAA=",
                     "resultMetaXdr": "AAAAAwAAAAAAAAACAAAAAwAc0RsAAAAAAAAAALC0b8hELkNkTVR16SKMSyhAQ8z+47BneJj9jxRndv3EAAAAADwzS2gAGgRHAAAANQAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAMAAAAAABzPVAAAAABmWdZ2AAAAAAAAAAEAHNEbAAAAAAAAAACwtG/IRC5DZE1UdekijEsoQEPM/uOwZ3iY/Y8UZ3b9xAAAAAA8M0toABoERwAAADYAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAADAAAAAAAc0RsAAAAAZlnf2gAAAAAAAAABAAAAAwAAAAMAHNEbAAAAAAAAAAAQfdFrLDgzSIIugR73qs8U0ZiKbwBUclTTPh5thlbgnABZJS1VWnWhAAAAawAAAlEAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAADAAAAAAAaBGEAAAAAZkspCwAAAAAAAAABABzRGwAAAAAAAAAAEH3Rayw4M0iCLoEe96rPFNGYim8AVHJU0z4ebYZW4JwAWSUWDOONoQAAAGsAAAJRAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAwAAAAAAGgRhAAAAAGZLKQsAAAAAAAAAAAAc0RsAAAAAAAAAAOB26kp4HTiVrMpcI5v4TUl/Foze0jhexv+oNrUxY69eAAAAF0h26AAAHNEbAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=",
                     "ledger": 1888539,
-                    "createdAt": 1717166042,
+                    "createdAt": "1717166042",
                 },
                 {
                     "status": "SUCCESS",
+                    "txHash": "4013d3047e00625f64d77de7da7ed55405a25cb10ceb7ac00ca30be59bfdac67",
                     "applicationOrder": 4,
                     "feeBump": False,
                     "envelopeXdr": "AAAAAgAAAACxMt2gKYOehEoVbmh9vfvZ4mVzXFSNTbAU5S4a8zorrAA4wrwAHLqRAAAADAAAAAAAAAAAAAAAAQAAAAAAAAAYAAAAAQAAAAAAAAAAAAAAALEy3aApg56EShVuaH29+9niZXNcVI1NsBTlLhrzOiusz3K+BVgRzXig/Bhz1TL5Qy+Ibv6cDvCfdaAtBMMFPcYAAAAAHXUVmJM11pdJSKKV52UJrVYlvxaPLmmg17nMe0HGy0MAAAABAAAAAAAAAAEAAAAAAAAAAAAAAACxMt2gKYOehEoVbmh9vfvZ4mVzXFSNTbAU5S4a8zorrM9yvgVYEc14oPwYc9Uy+UMviG7+nA7wn3WgLQTDBT3GAAAAAB11FZiTNdaXSUiiledlCa1WJb8Wjy5poNe5zHtBxstDAAAAAAAAAAEAAAAAAAAAAQAAAAcddRWYkzXWl0lIopXnZQmtViW/Fo8uaaDXucx7QcbLQwAAAAEAAAAGAAAAAbolCtTsMrJvK0M2SaskFsaMajj3iAZbXxELZHwDyE5dAAAAFAAAAAEABf2jAAAd1AAAAGgAAAAAADjCWAAAAAHzOiusAAAAQM+qaiMKxMoCVNjdRIh3X9CSxkjAm0BpXYDB9Fd+DS0guYKiY3TMaVe243UB008iBn5ynQv724rReXlg7iFqXQA=",
@@ -511,17 +545,18 @@ class TestSorobanServer:
                         "AAAAAAAAAAAAAAAAAAAAAgAAAAAAAAACAAAADwAAAAxjb3JlX21ldHJpY3MAAAAPAAAAE21heF9lbWl0X2V2ZW50X2J5dGUAAAAABQAAAAAAAAAA",
                     ],
                     "ledger": 1888539,
-                    "createdAt": 1717166042,
+                    "createdAt": "1717166042",
                 },
                 {
                     "status": "FAILED",
+                    "txHash": "5013d3047e00625f64d77de7da7ed55405a25cb10ceb7ac00ca30be59bfdac67",
                     "applicationOrder": 1,
                     "feeBump": False,
                     "envelopeXdr": "AAAAAgAAAAAxLMEcxmfUgNzL687Js4sX/jmFQDqTo1Lj4KDoC1PeSQAehIAAAAIJAAtMUQAAAAEAAAAAAAAAAAAAAABmWeAVAAAAAQAAAAlwc3BiOjMyMTcAAAAAAAACAAAAAQAAAACKlutUN5GT3UOoE2BUkNtJEwoipGOinBFsQtXgpIZMxQAAAAEAAAAA433o+yremWU3t88cKpfpHR+JMFR44JHzmBGni6hqCEYAAAACQVRVQUgAAAAAAAAAAAAAAGfK1mN4mg51jbX6by6TWghGynQ463doEDgzriqZo9bzAAAAAAaOd4AAAAABAAAAAIqW61Q3kZPdQ6gTYFSQ20kTCiKkY6KcEWxC1eCkhkzFAAAAAQAAAADjfej7Kt6ZZTe3zxwql+kdH4kwVHjgkfOYEaeLqGoIRgAAAAJBVFVTRAAAAAAAAAAAAAAAZ8rWY3iaDnWNtfpvLpNaCEbKdDjrd2gQODOuKpmj1vMAAAAAADh1IAAAAAAAAAACC1PeSQAAAEBoad/kqj/4Sqq5tC6HyeMm5LJKM1VqKRGZc3e4uvA3ITThwn2nNMRJRegdQrLrPBTSgw51nY8npilXVIds7I0OpIZMxQAAAEDTZNaLjIDMWPDdCxa1ZB28vUxTcS/0xykOFTI/JAz096vX6Y7wI0QvnbPM7KCoL0cJAciD+pJxNqXQ2Aff1hoO",
                     "resultXdr": "AAAAAAAAAMj/////AAAAAgAAAAAAAAAB////+wAAAAAAAAAB////+wAAAAA=",
                     "resultMetaXdr": "AAAAAwAAAAAAAAACAAAAAwAc0RwAAAAAAAAAADEswRzGZ9SA3Mvrzsmzixf+OYVAOpOjUuPgoOgLU95JAAAAFxzxIbUAAAIJAAtMUAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAMAAAAAABzRGgAAAABmWd/VAAAAAAAAAAEAHNEcAAAAAAAAAAAxLMEcxmfUgNzL687Js4sX/jmFQDqTo1Lj4KDoC1PeSQAAABcc8SG1AAACCQALTFEAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAADAAAAAAAc0RwAAAAAZlnf3wAAAAAAAAAAAAAAAAAAAAA=",
                     "ledger": 1888540,
-                    "createdAt": 1717166047,
+                    "createdAt": "1717166047",
                 },
             ],
             "latestLedger": 1888542,
@@ -572,7 +607,6 @@ class TestSorobanServer:
                     "xdr": "AAAAAwAAABQ=",
                 }
             ],
-            "cost": {"cpuInsns": "1240100", "memBytes": "161637"},
             "stateChanges": [
                 {
                     "type": "created",
@@ -621,7 +655,6 @@ class TestSorobanServer:
                     "xdr": "AAAAAwAAABQ=",
                 }
             ],
-            "cost": {"cpuInsns": "1240100", "memBytes": "161637"},
             "latestLedger": "1479",
         }
         data = {
@@ -667,7 +700,6 @@ class TestSorobanServer:
                         "xdr": "AAAAAwAAABQ=",
                     }
                 ],
-                "cost": {"cpuInsns": "1646885", "memBytes": "1296481"},
                 "latestLedger": "14245",
             },
         }
@@ -710,7 +742,6 @@ class TestSorobanServer:
                         "xdr": "AAAAAwAAABQ=",
                     }
                 ],
-                "cost": {"cpuInsns": "1646885", "memBytes": "1296481"},
                 "latestLedger": "14245",
             },
         }
@@ -768,7 +799,6 @@ class TestSorobanServer:
                         "xdr": "AAAAAwAAABQ=",
                     }
                 ],
-                "cost": {"cpuInsns": "1646885", "memBytes": "1296481"},
                 "latestLedger": "14245",
             },
         }
@@ -819,7 +849,6 @@ class TestSorobanServer:
                 "transactionData": None,
                 "events": None,
                 "minResourceFee": "0",
-                "cost": {"cpuInsns": "0", "memBytes": "0"},
                 "latestLedger": "898",
             },
         }
@@ -852,7 +881,6 @@ class TestSorobanServer:
                     "AAAAAQAAAAAAAAAB6bfni71JNBarlvcR3WP2056a8vvFXQ0/CGfiBeDQA/wAAAACAAAAAAAAAAIAAAAPAAAACWZuX3JldHVybgAAAAAAAA8AAAAJaW5jcmVtZW50AAAAAAAAAwAAABQ=",
                 ],
                 "results": [],
-                "cost": {"cpuInsns": "1646885", "memBytes": "1296481"},
                 "latestLedger": "14245",
             },
         }

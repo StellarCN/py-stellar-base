@@ -136,7 +136,7 @@ class SorobanServer:
         See `Soroban RPC Documentation - getLedgerEntries <https://developers.stellar.org/docs/data/rpc/api-reference/methods/getLedgerEntries>`_
 
         :param keys: The ledger keys to fetch.
-        :return: A :class:`GetLedgerEntriesResponse <stellar_sdk.soroban_rpc.GetLedgerEntryResponse>` object.
+        :return: A :class:`GetLedgerEntriesResponse <stellar_sdk.soroban_rpc.GetLedgerEntriesResponse>` object.
         :raises: :exc:`SorobanRpcErrorResponse <stellar_sdk.exceptions.SorobanRpcErrorResponse>` - If the Soroban-RPC instance returns an error response.
         """
         request = Request[GetLedgerEntriesRequest](
@@ -326,6 +326,21 @@ class SorobanServer:
         if not entries:
             return None
         return entries[0]
+
+    def get_version_info(self) -> GetVersionInfoResponse:
+        """Version information about the RPC and Captive core.
+
+        See `Soroban RPC Documentation - getVersionInfo <https://developers.stellar.org/docs/data/rpc/api-reference/methods/getVersionInfo>`_
+
+        :return: A :class:`GetVersionInfoResponse <stellar_sdk.soroban_rpc.GetVersionInfoResponse>` object.
+        :raises: :exc:`SorobanRpcErrorResponse <stellar_sdk.exceptions.SorobanRpcErrorResponse>` - If the Soroban-RPC instance returns an error response.
+        """
+        request: Request = Request(
+            id=_generate_unique_request_id(),
+            method="getVersionInfo",
+            params=None,
+        )
+        return self._post(request, GetVersionInfoResponse)
 
     def prepare_transaction(
         self,

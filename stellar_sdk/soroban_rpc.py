@@ -60,7 +60,6 @@ class EventInfo(BaseModel):
     ledger_close_at: datetime = Field(alias="ledgerClosedAt")
     contract_id: str = Field(alias="contractId")
     id: str = Field(alias="id")
-    paging_token: str = Field(alias="pagingToken")
     topic: List[str] = Field(alias="topic")
     value: str = Field(alias="value")
     in_successful_contract_call: bool = Field(alias="inSuccessfulContractCall")
@@ -93,6 +92,7 @@ class GetEventsResponse(BaseModel):
 
     events: List[EventInfo] = Field(alias="events")
     latest_ledger: int = Field(alias="latestLedger")
+    cursor: str
 
 
 # get_ledger_entries
@@ -226,10 +226,6 @@ class SimulateTransactionResponse(BaseModel):
     events: Optional[List[str]] = None
     # DiagnosticEvent XDR in base64
     results: Optional[List[SimulateHostFunctionResult]] = None
-    # an array of the individual host function call results.
-    # This will only contain a single element if present, because only a single invokeHostFunctionOperation
-    # is supported per transaction.
-    cost: Optional[SimulateTransactionCost] = None
     # the effective cpu and memory cost of the invoked transaction execution.
     restore_preamble: Optional[RestorePreamble] = Field(
         alias="restorePreamble", default=None
@@ -274,6 +270,7 @@ class GetTransactionResponse(BaseModel):
     more information."""
 
     status: GetTransactionStatus
+    transaction_hash: str = Field(alias="txHash")
     latest_ledger: int = Field(alias="latestLedger")
     latest_ledger_close_time: int = Field(alias="latestLedgerCloseTime")
     oldest_ledger: int = Field(alias="oldestLedger")
@@ -387,6 +384,7 @@ class GetTransactionsRequest(BaseModel):
 
 class Transaction(BaseModel):
     status: str
+    transaction_hash: str = Field(alias="txHash")
     application_order: int = Field(alias="applicationOrder")
     fee_bump: bool = Field(alias="feeBump")
     envelope_xdr: str = Field(alias="envelopeXdr")
@@ -414,16 +412,14 @@ class GetTransactionsResponse(BaseModel):
 
 
 # get_version_info
-# TODO: To avoid breaking change, let's add it later.
-# See: https://github.com/stellar/soroban-rpc/pull/164
-# class GetVersionInfoResponse(BaseModel):
-#     """Response for JSON-RPC method getVersionInfo.
-#
-#     See `getVersionInfo documentation <https://developers.stellar.org/docs/data/rpc/api-reference/methods/getVersionInfo>`__ for
-#     more information."""
-#
-#     version: str
-#     commit_hash: str = Field(alias="commitHash")
-#     build_time_stamp: str = Field(alias="buildTimeStamp")
-#     captive_core_version: str = Field(alias="captiveCoreVersion")
-#     protocol_version: int = Field(alias="protocolVersion")
+class GetVersionInfoResponse(BaseModel):
+    """Response for JSON-RPC method getVersionInfo.
+
+    See `getVersionInfo documentation <https://developers.stellar.org/docs/data/rpc/api-reference/methods/getVersionInfo>`__ for
+    more information."""
+
+    version: str
+    commit_hash: str = Field(alias="commitHash")
+    build_time_stamp: str = Field(alias="buildTimestamp")
+    captive_core_version: str = Field(alias="captiveCoreVersion")
+    protocol_version: int = Field(alias="protocolVersion")
