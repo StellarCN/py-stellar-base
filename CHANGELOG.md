@@ -5,6 +5,10 @@ Release History
 #### Update
 - feat!: support constructors in contract creation via `TransactionBuilder.append_create_contract_op`, the signature of the function has been changed.
 - refactor!: Updated `signer` parameter in auth to accept a callable returning (public_key, signatures) instead of just public_key.
+- feat: add support for Soroban PRC's `getVersionInfo` API interfaces.
+- refactor!: The `paging_token` field has been removed from `EventInfo`, use the `cursor` in `GetEventsResponse` instead.
+- refactor!: The legacy `cost` field has been removed from `SimulateTransactionResponse`, parse it from `transaction_data` instead.
+- feat: Add `transaction_hash` to `GetTransactionResponse` and `GetTransactionsResponse`.
 
 ### Version 11.1.0
 
