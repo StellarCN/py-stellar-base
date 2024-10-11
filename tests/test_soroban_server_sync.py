@@ -284,7 +284,6 @@ class TestSorobanServer:
                     "ledgerClosedAt": "2023-09-16T06:23:57Z",
                     "contractId": "CBNYUGHFAIWK3HOINA2OIGOOBMQU4D3MPQWFYBTUYY5WY4FVDO2GWXUY",
                     "id": "0000054713588387840-0000000000",
-                    "pagingToken": "0000054713588387840-0000000000",
                     "topic": [
                         "AAAADwAAAAdDT1VOVEVSAA==",
                         "AAAADwAAAAlpbmNyZW1lbnQAAAA=",
@@ -299,7 +298,6 @@ class TestSorobanServer:
                     "ledgerClosedAt": "2023-09-16T06:24:05Z",
                     "contractId": "CBNYUGHFAIWK3HOINA2OIGOOBMQU4D3MPQWFYBTUYY5WY4FVDO2GWXUY",
                     "id": "0000054747948126208-0000000000",
-                    "pagingToken": "0000054747948126208-0000000000",
                     "topic": [
                         "AAAADwAAAAdDT1VOVEVSAA==",
                         "AAAADwAAAAlpbmNyZW1lbnQAAAA=",
@@ -310,6 +308,7 @@ class TestSorobanServer:
                 },
             ],
             "latestLedger": "187",
+            "cursor": "0000054713588387840-0000000000",
         }
         data = {
             "jsonrpc": "2.0",

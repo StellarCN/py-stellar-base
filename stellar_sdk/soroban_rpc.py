@@ -60,7 +60,6 @@ class EventInfo(BaseModel):
     ledger_close_at: datetime = Field(alias="ledgerClosedAt")
     contract_id: str = Field(alias="contractId")
     id: str = Field(alias="id")
-    paging_token: str = Field(alias="pagingToken")
     topic: List[str] = Field(alias="topic")
     value: str = Field(alias="value")
     in_successful_contract_call: bool = Field(alias="inSuccessfulContractCall")
@@ -93,6 +92,7 @@ class GetEventsResponse(BaseModel):
 
     events: List[EventInfo] = Field(alias="events")
     latest_ledger: int = Field(alias="latestLedger")
+    cursor: str
 
 
 # get_ledger_entries

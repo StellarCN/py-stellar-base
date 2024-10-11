@@ -136,7 +136,7 @@ class SorobanServerAsync:
         See `Soroban RPC Documentation - getLedgerEntries <https://developers.stellar.org/docs/data/rpc/api-reference/methods/getLedgerEntries>`_
 
         :param keys: The ledger keys to fetch.
-        :return: A :class:`GetLedgerEntriesResponse <stellar_sdk.soroban_rpc.GetLedgerEntryResponse>` object.
+        :return: A :class:`GetLedgerEntriesResponse <stellar_sdk.soroban_rpc.GetLedgerEntriesResponse>` object.
         :raises: :exc:`SorobanRpcErrorResponse <stellar_sdk.exceptions.SorobanRpcErrorResponse>` - If the Soroban-RPC instance returns an error response.
         """
         request = Request[GetLedgerEntriesRequest](
