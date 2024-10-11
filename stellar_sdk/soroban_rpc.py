@@ -274,6 +274,7 @@ class GetTransactionResponse(BaseModel):
     more information."""
 
     status: GetTransactionStatus
+    transaction_hash: str = Field(alias="txHash")
     latest_ledger: int = Field(alias="latestLedger")
     latest_ledger_close_time: int = Field(alias="latestLedgerCloseTime")
     oldest_ledger: int = Field(alias="oldestLedger")
@@ -387,6 +388,7 @@ class GetTransactionsRequest(BaseModel):
 
 class Transaction(BaseModel):
     status: str
+    transaction_hash: str = Field(alias="txHash")
     application_order: int = Field(alias="applicationOrder")
     fee_bump: bool = Field(alias="feeBump")
     envelope_xdr: str = Field(alias="envelopeXdr")
