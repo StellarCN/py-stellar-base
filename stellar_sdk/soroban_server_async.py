@@ -326,6 +326,21 @@ class SorobanServerAsync:
             return None
         return entries[0]
 
+    async def get_version_info(self) -> GetVersionInfoResponse:
+        """Version information about the RPC and Captive core.
+
+        See `Soroban RPC Documentation - getVersionInfo <https://developers.stellar.org/docs/data/rpc/api-reference/methods/getVersionInfo>`_
+
+        :return: A :class:`GetVersionInfoResponse <stellar_sdk.soroban_rpc.GetVersionInfoResponse>` object.
+        :raises: :exc:`SorobanRpcErrorResponse <stellar_sdk.exceptions.SorobanRpcErrorResponse>` - If the Soroban-RPC instance returns an error response.
+        """
+        request: Request = Request(
+            id=_generate_unique_request_id(),
+            method="getVersionInfo",
+            params=None,
+        )
+        return await self._post(request, GetVersionInfoResponse)
+
     async def prepare_transaction(
         self,
         transaction_envelope: TransactionEnvelope,

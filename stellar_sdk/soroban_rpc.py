@@ -412,16 +412,14 @@ class GetTransactionsResponse(BaseModel):
 
 
 # get_version_info
-# TODO: To avoid breaking change, let's add it later.
-# See: https://github.com/stellar/soroban-rpc/pull/164
-# class GetVersionInfoResponse(BaseModel):
-#     """Response for JSON-RPC method getVersionInfo.
-#
-#     See `getVersionInfo documentation <https://developers.stellar.org/docs/data/rpc/api-reference/methods/getVersionInfo>`__ for
-#     more information."""
-#
-#     version: str
-#     commit_hash: str = Field(alias="commitHash")
-#     build_time_stamp: str = Field(alias="buildTimeStamp")
-#     captive_core_version: str = Field(alias="captiveCoreVersion")
-#     protocol_version: int = Field(alias="protocolVersion")
+class GetVersionInfoResponse(BaseModel):
+    """Response for JSON-RPC method getVersionInfo.
+
+    See `getVersionInfo documentation <https://developers.stellar.org/docs/data/rpc/api-reference/methods/getVersionInfo>`__ for
+    more information."""
+
+    version: str
+    commit_hash: str = Field(alias="commitHash")
+    build_time_stamp: str = Field(alias="buildTimestamp")
+    captive_core_version: str = Field(alias="captiveCoreVersion")
+    protocol_version: int = Field(alias="protocolVersion")

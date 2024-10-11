@@ -130,6 +130,36 @@ class TestSorobanServer:
         assert request_data["method"] == "getNetwork"
         assert request_data["params"] is None
 
+    async def test_version_info(self):
+        result = {
+            "version": "21.1.0",
+            "commitHash": "fcd2f0523f04279bae4502f3e3fa00ca627e6f6a",
+            "buildTimestamp": "2024-05-10T11:18:38",
+            "captiveCoreVersion": "stellar-core 21.0.0.rc2 (c6f474133738ae5f6d11b07963ca841909210273)",
+            "protocolVersion": 21,
+        }
+        data = {
+            "jsonrpc": "2.0",
+            "id": "198cb1a8-9104-4446-a269-88bf000c2721",
+            "result": result,
+        }
+        Response[GetVersionInfoResponse].model_validate(data)
+        GetVersionInfoResponse.model_validate(result)
+
+        with aioresponses() as m:
+            m.post(PRC_URL, payload=data)
+            async with SorobanServerAsync(PRC_URL) as client:
+                assert (
+                    await client.get_version_info()
+                    == GetVersionInfoResponse.model_validate(result)
+                )
+
+        request_data = m.requests[("POST", URL(PRC_URL))][0].kwargs["json"]
+        assert len(request_data["id"]) == 32
+        assert request_data["jsonrpc"] == "2.0"
+        assert request_data["method"] == "getVersionInfo"
+        assert request_data["params"] is None
+
     async def test_get_contract_data(self):
         result = {
             "entries": [
