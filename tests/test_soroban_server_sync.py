@@ -566,7 +566,6 @@ class TestSorobanServer:
                     "xdr": "AAAAAwAAABQ=",
                 }
             ],
-            "cost": {"cpuInsns": "1240100", "memBytes": "161637"},
             "stateChanges": [
                 {
                     "type": "created",
@@ -614,7 +613,6 @@ class TestSorobanServer:
                     "xdr": "AAAAAwAAABQ=",
                 }
             ],
-            "cost": {"cpuInsns": "1240100", "memBytes": "161637"},
             "latestLedger": "1479",
         }
         data = {
@@ -657,7 +655,6 @@ class TestSorobanServer:
                         "xdr": "AAAAAwAAABQ=",
                     }
                 ],
-                "cost": {"cpuInsns": "1646885", "memBytes": "1296481"},
                 "latestLedger": "14245",
             },
         }
@@ -699,7 +696,6 @@ class TestSorobanServer:
                         "xdr": "AAAAAwAAABQ=",
                     }
                 ],
-                "cost": {"cpuInsns": "1646885", "memBytes": "1296481"},
                 "latestLedger": "14245",
             },
         }
@@ -756,7 +752,6 @@ class TestSorobanServer:
                         "xdr": "AAAAAwAAABQ=",
                     }
                 ],
-                "cost": {"cpuInsns": "1646885", "memBytes": "1296481"},
                 "latestLedger": "14245",
             },
         }
@@ -804,7 +799,6 @@ class TestSorobanServer:
                 "transactionData": None,
                 "events": None,
                 "minResourceFee": "0",
-                "cost": {"cpuInsns": "0", "memBytes": "0"},
                 "latestLedger": "898",
             },
         }
@@ -836,7 +830,6 @@ class TestSorobanServer:
                     "AAAAAQAAAAAAAAAB6bfni71JNBarlvcR3WP2056a8vvFXQ0/CGfiBeDQA/wAAAACAAAAAAAAAAIAAAAPAAAACWZuX3JldHVybgAAAAAAAA8AAAAJaW5jcmVtZW50AAAAAAAAAwAAABQ=",
                 ],
                 "results": [],
-                "cost": {"cpuInsns": "1646885", "memBytes": "1296481"},
                 "latestLedger": "14245",
             },
         }
