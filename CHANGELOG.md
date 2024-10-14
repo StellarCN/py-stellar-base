@@ -2,13 +2,23 @@ Release History
 ==============
 
 ### Pending
+
+### Version 12.0.0-beta0
+
+Released on October 14, 2024
+
+This is the first release that supports Protocol 22. While the network has not upgraded yet, 
+you can start integrating the new features into your codebase if you want a head start.
+
 #### Update
-- feat!: support constructors in contract creation via `TransactionBuilder.append_create_contract_op`, the signature of the function has been changed.
-- refactor!: Updated `signer` parameter in auth to accept a callable returning (public_key, signatures) instead of just public_key.
 - feat: add support for Soroban PRC's `getVersionInfo` API interfaces.
+- feat: Add `transaction_hash` to `GetTransactionResponse` and `GetTransactionsResponse`.
+
+#### Breaking changes
 - refactor!: The `paging_token` field has been removed from `EventInfo`, use the `cursor` in `GetEventsResponse` instead.
 - refactor!: The legacy `cost` field has been removed from `SimulateTransactionResponse`, parse it from `transaction_data` instead.
-- feat: Add `transaction_hash` to `GetTransactionResponse` and `GetTransactionsResponse`.
+- feat!: support constructors in contract creation via `TransactionBuilder.append_create_contract_op`, the signature of the function has been changed.
+- refactor!: Updated `signer` parameter in auth to accept a callable returning (public_key, signatures) instead of just public_key.
 
 ### Version 11.1.0
 
