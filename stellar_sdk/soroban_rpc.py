@@ -420,6 +420,6 @@ class GetVersionInfoResponse(BaseModel):
 
     version: str
     commit_hash: str = Field(alias="commitHash")
-    build_time_stamp: str = Field(alias="buildTimestamp")
+    build_timestamp: str = Field(alias="buildTimestamp")
     captive_core_version: str = Field(alias="captiveCoreVersion")
     protocol_version: int = Field(alias="protocolVersion")
