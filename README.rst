@@ -33,7 +33,7 @@ Stellar Python SDK
     :alt: PyPI - Implementation
     :target: https://pypi.python.org/pypi/stellar-sdk
 
-.. image:: https://img.shields.io/badge/Stellar%20Protocol-21-blue
+.. image:: https://img.shields.io/badge/Stellar%20Protocol-22-blue
     :alt: Stellar Protocol
     :target: https://developers.stellar.org/docs/glossary/scp/
 
