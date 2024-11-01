@@ -60,6 +60,10 @@ class EventInfo(BaseModel):
     ledger_close_at: datetime = Field(alias="ledgerClosedAt")
     contract_id: str = Field(alias="contractId")
     id: str = Field(alias="id")
+    paging_token: str = Field(
+        alias="pagingToken",
+        description="The field may will be removed in the next version of the protocol. It remains for backward.",
+    )
     topic: List[str] = Field(alias="topic")
     value: str = Field(alias="value")
     in_successful_contract_call: bool = Field(alias="inSuccessfulContractCall")
