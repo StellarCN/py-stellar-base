@@ -3,6 +3,9 @@ Release History
 
 ### Pending
 
+#### Update
+- refactor: add `paging_token` back to `EventInfo`. This is to ensure compatibility with older versions of Soroban-RPC. We still recommend using the `GetEventsResponse.cursor` field after upgrading Soroban-RPC.
+
 ### Version 12.0.0-beta0
 
 Released on October 14, 2024
