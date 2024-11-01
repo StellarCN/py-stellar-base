@@ -3,8 +3,12 @@ Release History
 
 ### Pending
 
+### Version 12.0.0-beta1
+
+Released on November 01, 2024
+
 #### Update
-- refactor: add `paging_token` back to `EventInfo`. This is to ensure compatibility with older versions of Soroban-RPC. We still recommend using the `GetEventsResponse.cursor` field after upgrading Soroban-RPC.
+- refactor: add `paging_token` back to `EventInfo`. This is to ensure compatibility with older versions of Soroban-RPC. We still recommend using the `GetEventsResponse.cursor` field after upgrading Soroban-RPC. ([#990](https://github.com/StellarCN/py-stellar-base/pull/990))
 
 ### Version 12.0.0-beta0
 
@@ -14,14 +18,14 @@ This is the first release that supports Protocol 22. While the network has not u
 you can start integrating the new features into your codebase if you want a head start.
 
 #### Update
-- feat: add support for Soroban PRC's `getVersionInfo` API interfaces.
-- feat: Add `transaction_hash` to `GetTransactionResponse` and `GetTransactionsResponse`.
+- feat: add support for Soroban PRC's `getVersionInfo` API interfaces. ([#984](https://github.com/StellarCN/py-stellar-base/pull/984))
+- feat: Add `transaction_hash` to `GetTransactionResponse` and `GetTransactionsResponse`. ([#984](https://github.com/StellarCN/py-stellar-base/pull/984))
 
 #### Breaking changes
-- refactor!: The `paging_token` field has been removed from `EventInfo`, use the `cursor` in `GetEventsResponse` instead.
-- refactor!: The legacy `cost` field has been removed from `SimulateTransactionResponse`, parse it from `transaction_data` instead.
-- feat!: support constructors in contract creation via `TransactionBuilder.append_create_contract_op`, the signature of the function has been changed.
-- refactor!: Updated `signer` parameter in auth to accept a callable returning (public_key, signatures) instead of just public_key.
+- refactor!: The `paging_token` field has been removed from `EventInfo`, use the `cursor` in `GetEventsResponse` instead. (Reverted in 12.0.0-beta1) ([#984](https://github.com/StellarCN/py-stellar-base/pull/984))
+- refactor!: The legacy `cost` field has been removed from `SimulateTransactionResponse`, parse it from `transaction_data` instead. ([#984](https://github.com/StellarCN/py-stellar-base/pull/984))
+- feat!: support constructors in contract creation via `TransactionBuilder.append_create_contract_op`, the signature of the function has been changed. ([#979](https://github.com/StellarCN/py-stellar-base/pull/979))
+- refactor!: Updated `signer` parameter in auth to accept a callable returning (public_key, signatures) instead of just public_key. ([#982](https://github.com/StellarCN/py-stellar-base/pull/982))
 
 ### Version 11.1.0
 
