@@ -445,9 +445,9 @@ class LedgerInfo(BaseModel):
     sequence: int
     ledger_close_time: int = Field(alias="ledgerCloseTime")
     # LedgerHeaderHistoryEntry XDR in base64
-    ledger_header: str = Field(alias="headerXdr")
+    header_xdr: str = Field(alias="headerXdr")
     # LedgerCloseMeta XDR in base64
-    ledger_metadata: str = Field(alias="metadataXdr")
+    metadata_xdr: str = Field(alias="metadataXdr")
 
 
 class GetLedgersResponse(BaseModel):
