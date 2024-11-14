@@ -2,6 +2,8 @@ Release History
 ==============
 
 ### Pending
+#### Update
+- refactor: rename `LedgerInfo.ledger_header` to `LedgerInfo.header_xdr`, `LedgerInfo.ledger_metadata` to `LedgerInfo.metadata_xdr`
 
 ### Version 12.0.0-beta2
 
