@@ -3,6 +3,10 @@ Release History
 
 ### Pending
 
+### Version 12.0.0-beta2
+
+Released on November 14, 2024
+
 #### Update
 - feat: add support for Soroban PRC's `getLedgers` API interfaces. ([#992](https://github.com/StellarCN/py-stellar-base/pull/992))
 
