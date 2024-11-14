@@ -427,3 +427,38 @@ class GetVersionInfoResponse(BaseModel):
     build_timestamp: str = Field(alias="buildTimestamp")
     captive_core_version: str = Field(alias="captiveCoreVersion")
     protocol_version: int = Field(alias="protocolVersion")
+
+
+# get_ledgers
+class GetLedgersRequest(BaseModel):
+    """Request for JSON-RPC method getLedgers.
+
+    See `getLedgers documentation <https://developers.stellar.org/docs/data/rpc/api-reference/methods/getLedgers>`__ for
+    more information."""
+
+    start_ledger: int = Field(alias="startLedger")
+    pagination: Optional[PaginationOptions] = None
+
+
+class LedgerInfo(BaseModel):
+    hash: str
+    sequence: int
+    ledger_close_time: int = Field(alias="ledgerCloseTime")
+    # LedgerHeaderHistoryEntry XDR in base64
+    ledger_header: str = Field(alias="headerXdr")
+    # LedgerCloseMeta XDR in base64
+    ledger_metadata: str = Field(alias="metadataXdr")
+
+
+class GetLedgersResponse(BaseModel):
+    """Response for JSON-RPC method getLedgers.
+
+    See `getLedgers documentation <https://developers.stellar.org/docs/data/rpc/api-reference/methods/getLedgers>`__ for
+    more information."""
+
+    ledgers: List[LedgerInfo]
+    latest_ledger: int = Field(alias="latestLedger")
+    latest_ledger_close_time: int = Field(alias="latestLedgerCloseTime")
+    oldest_ledger: int = Field(alias="oldestLedger")
+    oldest_ledger_close_time: int = Field(alias="oldestLedgerCloseTime")
+    cursor: str

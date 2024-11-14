@@ -268,6 +268,30 @@ class SorobanServer:
         )
         return self._post(request, GetTransactionsResponse)
 
+    def get_ledgers(
+        self, start_ledger: int, cursor: str = None, limit: int = None
+    ) -> GetLedgersResponse:
+        """Fetch a detailed list of ledgers starting from the user specified starting point that you can paginate
+        as long as the pages fall within the history retention of their corresponding RPC provider.
+
+        See `Soroban RPC Documentation - getLedgers <https://developers.stellar.org/docs/data/rpc/api-reference/methods/getLedgers>`_
+
+        :param start_ledger: The first ledger to include in the results.
+        :param cursor: A cursor value for use in pagination.
+        :param limit: The maximum number of records to return.
+        :return: A :class:`GetLedgersResponse <stellar_sdk.soroban_rpc.GetLedgersResponse>` object.
+        :raises: :exc:`SorobanRpcErrorResponse <stellar_sdk.exceptions.SorobanRpcErrorResponse>` - If the Soroban-RPC instance returns an error response.
+        """
+        pagination = PaginationOptions(cursor=cursor, limit=limit)
+        data = GetLedgersRequest(
+            startLedger=str(start_ledger),
+            pagination=pagination,
+        )
+        request: Request = Request[GetLedgersRequest](
+            id=_generate_unique_request_id(), method="getLedgers", params=data
+        )
+        return self._post(request, GetLedgersResponse)
+
     def load_account(self, account_id: str) -> Account:
         """Load an account from the server, you can use the returned account
         object as source account for transactions.
