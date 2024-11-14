@@ -2,8 +2,16 @@ Release History
 ==============
 
 ### Pending
+
+### Version 12.0.0-beta3
+
+Released on November 14, 2024
+
+Several hours ago, I released version 12.0.0-beta2, which added support for the Soroban RPC's getLedgers API interface. 
+However, some field names in the implementation need to be renamed.
+
 #### Update
-- refactor: rename `LedgerInfo.ledger_header` to `LedgerInfo.header_xdr`, `LedgerInfo.ledger_metadata` to `LedgerInfo.metadata_xdr`
+- refactor: rename `LedgerInfo.ledger_header` to `LedgerInfo.header_xdr`, `LedgerInfo.ledger_metadata` to `LedgerInfo.metadata_xdr`. ([#994](https://github.com/StellarCN/py-stellar-base/pull/992))
 
 ### Version 12.0.0-beta2
 
