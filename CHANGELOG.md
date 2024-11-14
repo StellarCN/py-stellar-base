@@ -4,7 +4,7 @@ Release History
 ### Pending
 
 #### Update
-- feat: add support for Soroban PRC's `getLedgers` API interfaces. ([#984](https://github.com/StellarCN/py-stellar-base/pull/992))
+- feat: add support for Soroban PRC's `getLedgers` API interfaces. ([#992](https://github.com/StellarCN/py-stellar-base/pull/992))
 
 ### Version 12.0.0-beta1
 
