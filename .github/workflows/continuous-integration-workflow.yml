@@ -77,7 +77,7 @@ jobs:
         run: poetry run pytest -v -rs tests --runslow --cov=./ --cov-report=xml
 
       - name: Upload coverage to Codecov
-        if: matrix.platform.python-version == '3.11' && matrix.platform.os == 'ubuntu-latest'
+        if: matrix.platform.python-version == '3.13' && matrix.platform.os == 'ubuntu-latest'
         uses: codecov/codecov-action@v3
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
@@ -95,11 +95,6 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.13'
-
       - name: Install poetry
         run: pipx install poetry
 
@@ -108,3 +103,11 @@ jobs:
 
       - name: Publish package distributions to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
+
+  complete:
+    if: always()
+    needs: [ pre-commit, test, deploy ]
+    runs-on: ubuntu-latest
+    steps:
+      - if: contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled')
+        run: exit 1
