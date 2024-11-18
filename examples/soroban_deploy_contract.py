@@ -12,7 +12,7 @@ from stellar_sdk.soroban_rpc import GetTransactionStatus, SendTransactionStatus
 secret = "SAAPYAPTTRZMCUZFPG3G66V4ZMHTK4TWA6NS7U4F7Z3IMUD52EK4DDEV"
 rpc_server_url = "https://soroban-testnet.stellar.org:443"
 network_passphrase = Network.TESTNET_NETWORK_PASSPHRASE
-contract_file_path = "/Users/overcat/repo/stellar/soroban-examples/hello_world/target/wasm32-unknown-unknown/release/soroban_hello_world_contract.wasm"
+contract_file_path = "/Users/overcat/repo/stellar/soroban-examples/custom_types/target/wasm32-unknown-unknown/release/soroban_hello_world_contract.wasm"
 
 kp = Keypair.from_secret(secret)
 soroban_server = SorobanServer(rpc_server_url)
