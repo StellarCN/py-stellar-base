@@ -1,45 +1,37 @@
 from ..exceptions import SdkError
 
 
-class RestorationFailure(SdkError):
-    pass
+class RestorationFailureError(SdkError):
+    """Raised when a restoration fails."""
 
 
 class NotYetSimulatedError(SdkError):
     """Raised when trying to get the result of a transaction that has not been simulated yet."""
 
-    pass
-
 
 class SimulationFailedError(SdkError):
     """Raised when a simulation fails."""
 
-    pass
-
 
 class ExpiredStateError(SdkError):
-    pass
+    """Raised when the state has expired."""
 
 
 class NoSignatureNeededError(SdkError):
-    pass
+    """Raised when no signature is needed."""
 
 
 class NeedsMoreSignaturesError(SdkError):
-    pass
+    """Raised when more signatures are needed."""
 
 
 class SendTransactionFailedError(SdkError):
-    pass
+    """Raised when invoking `send_transaction` fails."""
+
+
+class TransactionFailedError(SdkError):
+    """Raised when invoking `get_transaction` fails."""
 
 
 class TransactionStillPendingError(SdkError):
-    pass
-
-
-class TransactionAwaitingError(SdkError):
-    pass
-
-
-class TransactionNotSentError(SdkError):
-    pass
+    """Raised when the transaction is still pending."""

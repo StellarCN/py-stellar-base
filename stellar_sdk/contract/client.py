@@ -1,9 +1,10 @@
 from typing import Sequence
 
-from ..soroban_server import SorobanServer
-from ..client.base_sync_client import BaseSyncClient
-from .. import xdr as stellar_xdr, InvokeHostFunction, Address
 from .assembled_transaction import AssembledTransaction
+from .. import xdr as stellar_xdr
+from ..client.base_sync_client import BaseSyncClient
+from ..soroban_server import SorobanServer
+from ..transaction_builder import TransactionBuilder
 
 NULL_ACCOUNT = "GAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWHF"
 
@@ -28,25 +29,20 @@ class Client:
         function_name: str,
         parameters: Sequence[stellar_xdr.SCVal],
         parse_result_xdr,
+        base_fee: int = 100,
     ):
-        if parameters is None:
-            parameters = []
+        source = self.server.load_account(self.source_account)
+        tx = (
+            TransactionBuilder(source, self.network_passphrase, base_fee=base_fee)
+            .append_invoke_contract_function_op(
+                self.contract_id, function_name, parameters
+            )
+            .build()
+        )
+        return AssembledTransaction(tx, self.server, None, parse_result_xdr).simulate()
 
-        host_function = stellar_xdr.HostFunction(
-            stellar_xdr.HostFunctionType.HOST_FUNCTION_TYPE_INVOKE_CONTRACT,
-            invoke_contract=stellar_xdr.InvokeContractArgs(
-                contract_address=Address(self.contract_id).to_xdr_sc_address(),
-                function_name=stellar_xdr.SCSymbol(
-                    sc_symbol=function_name.encode("utf-8")
-                ),
-                args=list(parameters),
-            ),
-        )
-        op = InvokeHostFunction(host_function=host_function, auth=[])
-        return AssembledTransaction.build_with_operation(
-            op,
-            self.server,
-            self.network_passphrase,
-            self.source_account,
-            parse_result_xdr,
-        )
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.server.close()
