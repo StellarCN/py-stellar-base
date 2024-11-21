@@ -1,7 +1,12 @@
 from typing_extensions import Generic
 
 from .exceptions import *
-from ..soroban_rpc import SendTransactionResponse, GetTransactionResponse, GetTransactionStatus, SendTransactionStatus
+from ..soroban_rpc import (
+    SendTransactionResponse,
+    GetTransactionResponse,
+    GetTransactionStatus,
+    SendTransactionStatus,
+)
 from ..soroban_server import SorobanServer
 from ..transaction_envelope import TransactionEnvelope
 from .. import xdr
@@ -26,11 +31,11 @@ class SentTransaction(Generic[T]):
     """
 
     def __init__(
-            self,
-            server: SorobanServer,
-            transaction_envelope: TransactionEnvelope,
-            parse_result_xdr: Optional[Callable[[xdr.SCVal], T]],
-            timeout: int = 300,
+        self,
+        server: SorobanServer,
+        transaction_envelope: TransactionEnvelope,
+        parse_result_xdr: Optional[Callable[[xdr.SCVal], T]],
+        timeout: int = 300,
     ):
         self.server = server
         self.transaction_envelope = transaction_envelope
@@ -110,15 +115,17 @@ class SentTransaction(Generic[T]):
                     f"Transaction was sent to the network, but not yet awaited. No result to show. "
                     f"You can call send() again to await the result."
                 )
-        raise TransactionNotSentError(f"Transaction was not sent to the network. Call send() first.")
+        raise TransactionNotSentError(
+            f"Transaction was not sent to the network. Call send() first."
+        )
 
 
 def with_exponential_backoff(
-        fn,
-        keep_waiting_if,
-        timeout: float,
-        exponential_factor: float = 1.5,
-        verbose: bool = False,
+    fn,
+    keep_waiting_if,
+    timeout: float,
+    exponential_factor: float = 1.5,
+    verbose: bool = False,
 ):
     """Keep calling a function for timeout seconds if keep_waiting_if is true.
     Returns an array of all attempts to call the function.

@@ -4,6 +4,7 @@ from ..exceptions import SdkError
 class RestorationFailure(SdkError):
     pass
 
+
 class NotYetSimulatedError(SdkError):
     """Raised when trying to get the result of a transaction that has not been simulated yet."""
 
@@ -35,8 +36,10 @@ class SendTransactionFailedError(SdkError):
 class TransactionStillPendingError(SdkError):
     pass
 
+
 class TransactionAwaitingError(SdkError):
     pass
+
 
 class TransactionNotSentError(SdkError):
     pass
