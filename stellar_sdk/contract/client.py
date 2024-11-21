@@ -1,7 +1,7 @@
 from typing import Sequence
 
 from .assembled_transaction import AssembledTransaction
-from .. import xdr as stellar_xdr
+from .. import xdr as stellar_xdr, Keypair
 from ..client.base_sync_client import BaseSyncClient
 from ..soroban_server import SorobanServer
 from ..transaction_builder import TransactionBuilder
@@ -11,12 +11,12 @@ NULL_ACCOUNT = "GAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWHF"
 
 class Client:
     def __init__(
-        self,
-        contract_id: str,
-        source_account: str,
-        rpc_url: str,
-        network_passphrase: str,
-        request_client: BaseSyncClient = None,
+            self,
+            contract_id: str,
+            source_account: str,
+            rpc_url: str,
+            network_passphrase: str,
+            request_client: BaseSyncClient = None,
     ):
         self.contract_id = contract_id
         self.source_account = source_account
@@ -25,11 +25,14 @@ class Client:
         self.server = SorobanServer(rpc_url, request_client)
 
     def invoke(
-        self,
-        function_name: str,
-        parameters: Sequence[stellar_xdr.SCVal],
-        parse_result_xdr,
-        base_fee: int = 100,
+            self,
+            function_name: str,
+            parameters: Sequence[stellar_xdr.SCVal],
+            parse_result_xdr,
+            transaction_signer: Keypair = None,
+            base_fee: int = 100,
+            timeout: int = 300,
+            restore: bool = True,
     ):
         source = self.server.load_account(self.source_account)
         tx = (
@@ -39,7 +42,7 @@ class Client:
             )
             .build()
         )
-        return AssembledTransaction(tx, self.server, None, parse_result_xdr).simulate()
+        return AssembledTransaction(tx, self.server, None, parse_result_xdr, timeout).simulate(restore)
 
     def __enter__(self):
         return self

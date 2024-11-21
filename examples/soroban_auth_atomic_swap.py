@@ -15,6 +15,7 @@ from stellar_sdk import (
     scval,
 )
 from stellar_sdk.auth import authorize_entry
+from stellar_sdk.contract.assembled_transaction import AssembledTransaction
 from stellar_sdk.exceptions import PrepareTransactionException
 from stellar_sdk.soroban_rpc import GetTransactionStatus, SendTransactionStatus
 
@@ -29,11 +30,11 @@ alice_kp = Keypair.from_secret(
     "SBPTTA3D3QYQ6E2GSACAZDUFH2UILBNG3EBJCK3NNP7BE4O757KGZUGA"
 )  # GAERW3OYAVYMZMPMVKHSCDS4ORFPLT5Z3YXA4VM3BVYEA2W7CG3V6YYB
 bob_kp = Keypair.from_secret(
-    "SAEZSI6DY7AXJFIYA4PM6SIBNEYYXIEM2MSOTHFGKHDW32MBQ7KVO6EN"
-)  # GBMLPRFCZDZJPKUPHUSHCKA737GOZL7ERZLGGMJ6YGHBFJZ6ZKMKCZTM
-atomic_swap_contract_id = "CCOYWFXSCED6GIUYAYEDVZ7EA4MFDNBXTKSB2RWDSDYMR3EQFT6MUSU5"
-native_token_contract_id = "CB64D3G7SM2RTH6JSGG34DDTFTQ5CFDKVDZJZSODMCX4NJ2HV2KN7OHT"
-cat_token_contract_id = "CDOZ4ZTY2OSEHMTSBL3AFMIDF2EGP3AZTFB7YTCKXNSYZMRV6SROUFAY"
+    "SBJQCT3YSSVRHVGNMGDHJ35SZ635KXPJGGDEBHWWKCPZ7ZY46H2LM7KM"
+)  # GCN326AH3JIS3QVOLSGWEIYIZETJROTONKKKGLBIPMKK6LUEYXCASX2N
+atomic_swap_contract_id = "CAFOTJC77LH7GQHSV3OB4OOSVLD5S77YGPBPJIUILGG45EKSCAAVJUC6"
+native_token_contract_id = "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC"
+cat_token_contract_id = "CBQFF6FIGSR2LNHGZ4CU32WIUFEV7332MUEPMA4SHHHFYRJ2UALAEPMA"
 
 source = soroban_server.load_account(submitter_kp.public_key)
 
@@ -43,72 +44,27 @@ args = [
     scval.to_address(native_token_contract_id),  # token_a
     scval.to_address(cat_token_contract_id),  # token_b
     scval.to_int128(1000),  # amount_a
-    scval.to_int128(4500),  # min_b_for_a
-    scval.to_int128(5000),  # amount_b
-    scval.to_int128(950),  # min_a_for_b
+    scval.to_int128(1000),  # min_b_for_a
+    scval.to_int128(1000),  # amount_b
+    scval.to_int128(1000),  # min_a_for_b
 ]
 
 tx = (
-    TransactionBuilder(source, network_passphrase, base_fee=50000)
+    TransactionBuilder(source, network_passphrase, base_fee=500)
     .add_time_bounds(0, 0)
     .append_invoke_contract_function_op(
         contract_id=atomic_swap_contract_id,
         function_name="swap",
         parameters=args,
     )
-    .build()
 )
 
-try:
-    simulate_resp = soroban_server.simulate_transaction(tx)
-    # You need to check the error in the response,
-    # if the error is not None, you need to handle it.
-    op = tx.transaction.operations[0]
-    assert isinstance(op, InvokeHostFunction)
-    assert simulate_resp.results is not None
-    assert simulate_resp.results[0].auth is not None
-    op.auth = [
-        authorize_entry(
-            simulate_resp.results[0].auth[0],
-            alice_kp,
-            simulate_resp.latest_ledger + 20,
-            network_passphrase,
-        ),  # alice sign the entry
-        authorize_entry(
-            simulate_resp.results[0].auth[1],
-            bob_kp,
-            simulate_resp.latest_ledger + 20,
-            network_passphrase,
-        ),  # bob sign the entry
-    ]
-    tx = soroban_server.prepare_transaction(tx, simulate_resp)
-except PrepareTransactionException as e:
-    print(f"Got exception: {e.simulate_transaction_response}")
-    raise e
+assembled = (
+    AssembledTransaction(tx, soroban_server, parse_result_xdr_fn=None)
+    .simulate()
+    .sign_auth_entries(bob_kp)
+    .sign_auth_entries(alice_kp)
+    .sign_and_submit(submitter_kp)
+)
 
-# tx.transaction.soroban_data.resources.instructions = stellar_xdr.Uint32(
-#     tx.transaction.soroban_data.resources.instructions.uint32 * 2
-# )
-
-tx.sign(submitter_kp)
-print(f"Signed XDR:\n{tx.to_xdr()}")
-
-
-send_transaction_data = soroban_server.send_transaction(tx)
-print(f"sent transaction: {send_transaction_data}")
-if send_transaction_data.status != SendTransactionStatus.PENDING:
-    raise Exception("send transaction failed")
-
-while True:
-    print("waiting for transaction to be confirmed...")
-    get_transaction_data = soroban_server.get_transaction(send_transaction_data.hash)
-    if get_transaction_data.status != GetTransactionStatus.NOT_FOUND:
-        break
-    time.sleep(3)
-
-print(f"transaction: {get_transaction_data}")
-
-if get_transaction_data.status == GetTransactionStatus.SUCCESS:
-    print(f"Transaction successful: {get_transaction_data.result_xdr}")
-else:
-    print(f"Transaction failed: {get_transaction_data.result_xdr}")
+print(assembled)

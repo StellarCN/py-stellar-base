@@ -62,11 +62,14 @@ class InvokeHostFunction(Operation):
         )
 
     @classmethod
-    def invoke_contract_function(cls, contract_id: str,
+    def invoke_contract_function(
+        cls,
+        contract_id: str,
         function_name: str,
         parameters: Sequence[stellar_xdr.SCVal] = None,
         auth: Sequence[stellar_xdr.SorobanAuthorizationEntry] = None,
-        source: Optional[Union[MuxedAccount, str]] = None,) -> "InvokeHostFunction":
+        source: Optional[Union[MuxedAccount, str]] = None,
+    ) -> "InvokeHostFunction":
         """Create a new :class:`InvokeHostFunction` operation.
 
         :param contract_id: The ID of the contract to invoke.

@@ -79,11 +79,11 @@ def get_custom_sections(wasm_data: bytes) -> List[Tuple[str, bytes]]:
         if section_id == 0:  # Custom Section
             name_len, size_name_size = leb128_decode(wasm_data, offset)
             offset += size_name_size
-            name = wasm_data[offset: offset + name_len].decode("utf-8")
+            name = wasm_data[offset : offset + name_len].decode("utf-8")
             offset += name_len
             content = wasm_data[
-                      offset: offset + section_len - size_name_size - name_len
-                      ]
+                offset : offset + section_len - size_name_size - name_len
+            ]
             offset += section_len - size_name_size - name_len
             custom_sections.append((name, content))
         else:
@@ -92,7 +92,7 @@ def get_custom_sections(wasm_data: bytes) -> List[Tuple[str, bytes]]:
 
 
 def parse_entries(
-        data: bytes, cls: Type[Union[xdr.SCEnvMetaEntry, xdr.SCMetaEntry, xdr.SCSpecEntry]]
+    data: bytes, cls: Type[Union[xdr.SCEnvMetaEntry, xdr.SCMetaEntry, xdr.SCSpecEntry]]
 ) -> List[Union[xdr.SCEnvMetaEntry, xdr.SCMetaEntry, xdr.SCSpecEntry]]:
     """Parse a list of entries from the given data.
 
@@ -117,11 +117,18 @@ def number_to_letter(num: int) -> str:
 
 def spec_type_def_to_py(td: xdr.SCSpecTypeDef):
     t = td.type
-    if t in (xdr.SCSpecType.SC_SPEC_TYPE_I32, xdr.SCSpecType.SC_SPEC_TYPE_U32,
-             xdr.SCSpecType.SC_SPEC_TYPE_I64, xdr.SCSpecType.SC_SPEC_TYPE_U64,
-             xdr.SCSpecType.SC_SPEC_TYPE_TIMEPOINT, xdr.SCSpecType.SC_SPEC_TYPE_DURATION,
-             xdr.SCSpecType.SC_SPEC_TYPE_U128, xdr.SCSpecType.SC_SPEC_TYPE_I128,
-             xdr.SCSpecType.SC_SPEC_TYPE_U256, xdr.SCSpecType.SC_SPEC_TYPE_I256):
+    if t in (
+        xdr.SCSpecType.SC_SPEC_TYPE_I32,
+        xdr.SCSpecType.SC_SPEC_TYPE_U32,
+        xdr.SCSpecType.SC_SPEC_TYPE_I64,
+        xdr.SCSpecType.SC_SPEC_TYPE_U64,
+        xdr.SCSpecType.SC_SPEC_TYPE_TIMEPOINT,
+        xdr.SCSpecType.SC_SPEC_TYPE_DURATION,
+        xdr.SCSpecType.SC_SPEC_TYPE_U128,
+        xdr.SCSpecType.SC_SPEC_TYPE_I128,
+        xdr.SCSpecType.SC_SPEC_TYPE_U256,
+        xdr.SCSpecType.SC_SPEC_TYPE_I256,
+    ):
         return "int"
     if t == xdr.SCSpecType.SC_SPEC_TYPE_BOOL:
         return "bool"
@@ -207,7 +214,9 @@ def render_struct(entry: xdr.SCSpecUDTStructV0):
     if entry.doc:
         print(f"    '''{entry.doc.decode()}'''")
     fields = [(f.name.decode(), spec_type_def_to_py(f.type)) for f in entry.fields]
-    print(f"    def __init__(self, {', '.join([f'{name}: {type}' for name, type in fields])}):")
+    print(
+        f"    def __init__(self, {', '.join([f'{name}: {type}' for name, type in fields])}):"
+    )
     for name, type in fields:
         print(f"        self.{name} = {name}")
 
@@ -237,16 +246,23 @@ def render_union(entry: xdr.SCSpecUDTUnionV0):
     case_tuples_fields = []
     for case in case_tuples:
         if len(case.type) == 1:
-            case_tuples_fields.append((camel_to_snake(case.name.decode()), spec_type_def_to_py(case.type[0])))
+            case_tuples_fields.append(
+                (camel_to_snake(case.name.decode()), spec_type_def_to_py(case.type[0]))
+            )
         else:
-            case_tuples_fields.append((camel_to_snake(case.name.decode()),
-                                       f"Tuple[{', '.join([spec_type_def_to_py(t) for t in case.type])}]"))
+            case_tuples_fields.append(
+                (
+                    camel_to_snake(case.name.decode()),
+                    f"Tuple[{', '.join([spec_type_def_to_py(t) for t in case.type])}]",
+                )
+            )
 
     print(f"class {entry.name.decode()}:")
     if entry.doc:
         print(f"    '''{entry.doc.decode()}'''")
     print(
-        f"    def __init__(self, kind: {entry.name.decode()}Kind, {', '.join([f'{name}: {type}' for name, type in case_tuples_fields])}):")
+        f"    def __init__(self, kind: {entry.name.decode()}Kind, {', '.join([f'{name}: {type}' for name, type in case_tuples_fields])}):"
+    )
     print("        self.kind = kind")
     for name, _ in case_tuples_fields:
         print(f"        self.{name} = {name}")
@@ -260,8 +276,10 @@ def render_error_enum(entry: xdr.SCSpecUDTErrorEnumV0):
         print(f"    {case.name.decode()} = {case.value.uint32}")
 
 
-if __name__ == '__main__':
-    wasm_file = "./test_wasms/target/wasm32-unknown-unknown/release/test_custom_types.wasm"
+if __name__ == "__main__":
+    wasm_file = (
+        "./test_wasms/target/wasm32-unknown-unknown/release/test_custom_types.wasm"
+    )
     with open(wasm_file, "rb") as f:
         wasm = f.read()
     metadata = parse_contract_metadata(wasm)
