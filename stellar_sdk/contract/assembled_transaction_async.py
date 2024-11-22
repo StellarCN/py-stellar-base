@@ -100,7 +100,7 @@ class AssembledTransactionAsync(Generic[T]):
                 raise RestorationFailureError(
                     "Failed to restore contract data.", self
                 ) from e
-            await self.simulate()
+            return await self.simulate()
 
         if self.simulation.error is not None:
             raise SimulationFailedError(

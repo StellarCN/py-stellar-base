@@ -100,7 +100,7 @@ class AssembledTransaction(Generic[T]):
                 raise RestorationFailureError(
                     "Failed to restore contract data.", self
                 ) from e
-            self.simulate()
+            return self.simulate()
 
         if self.simulation.error is not None:
             raise SimulationFailedError(
@@ -141,6 +141,14 @@ class AssembledTransaction(Generic[T]):
         if not force and self.is_read_call():
             raise NoSignatureNeededError(
                 "This is a read call. It requires no signature or submitting. Set force=True to sign and submit anyway.",
+                self,
+            )
+
+        if self.simulation and self.simulation.restore_preamble:
+            raise ExpiredStateError(
+                "You need to restore some contract state before you can invoke this method. "
+                + "You can set `restore` to true in order to "
+                + "automatically restore the contract state when needed.",
                 self,
             )
 
@@ -272,7 +280,7 @@ class AssembledTransaction(Generic[T]):
 
         invoke_host_function_op = self.built_transaction.transaction.operations[0]
         if not isinstance(invoke_host_function_op, InvokeHostFunction):
-            raise ValueError("Unexpected operation type.")
+            return set()
 
         result = set()
         for entry in invoke_host_function_op.auth or []:
@@ -334,9 +342,9 @@ class AssembledTransaction(Generic[T]):
             )
             .append_restore_footprint_op()
             .set_soroban_data(
-                SorobanDataBuilder.from_xdr(restore_preamble.transaction_data)
+                SorobanDataBuilder.from_xdr(restore_preamble.transaction_data).build()
             )
-            .time_bounds(0, 0)
+            .add_time_bounds(0, 0)
         )
         restore_assembled: AssembledTransaction = AssembledTransaction(
             restore_tx,
@@ -345,7 +353,7 @@ class AssembledTransaction(Generic[T]):
             None,
             submit_timeout=self.submit_timeout,
         )
-        restore_assembled.simulate(restore=False).sign()._submit()
+        restore_assembled.simulate(restore=False).sign(force=True)._submit()
 
     def _simulation_data(
         self,
@@ -357,14 +365,6 @@ class AssembledTransaction(Generic[T]):
 
         if not self.simulation:
             raise NotYetSimulatedError("Transaction has not yet been simulated.", self)
-
-        if self.simulation.restore_preamble:
-            raise ExpiredStateError(
-                "You need to restore some contract state before you can invoke this method. "
-                + "You can set `restore` to true in order to "
-                + "automatically restore the contract state when needed.",
-                self,
-            )
 
         # SimulateHostFunctionResult(auth=[], xdr='AAAAAQ==') for no return function (void)
         assert self.simulation.results is not None
