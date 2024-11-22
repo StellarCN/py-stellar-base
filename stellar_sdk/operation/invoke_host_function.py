@@ -1,10 +1,10 @@
 from typing import List, Optional, Sequence, Union
 
 from .. import xdr as stellar_xdr
-from ..muxed_account import MuxedAccount
-from .operation import Operation
-from ..strkey import StrKey
 from ..address import Address
+from ..muxed_account import MuxedAccount
+from ..strkey import StrKey
+from .operation import Operation
 
 __all__ = ["InvokeHostFunction"]
 

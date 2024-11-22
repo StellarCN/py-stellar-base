@@ -1,6 +1,7 @@
 import base64
 import dataclasses
-from typing import List, Optional, Tuple, Union, Type
+from typing import List, Optional, Tuple, Type, Union
+
 from stellar_sdk import xdr
 
 

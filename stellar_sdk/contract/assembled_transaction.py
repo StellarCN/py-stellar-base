@@ -1,25 +1,25 @@
 import dataclasses
 import time
-from typing import Optional, TypeVar, Callable, Generic, Set, Union
+from typing import Callable, Generic, Optional, Set, TypeVar, Union
 
-from .exceptions import *
-from .. import xdr, Address, Account, SorobanDataBuilder, Keypair
+from .. import Address, Keypair, SorobanDataBuilder, xdr
 from ..auth import authorize_entry
 from ..base_soroban_server import _assemble_transaction
 from ..operation import InvokeHostFunction
 from ..soroban_rpc import (
-    SimulateTransactionResponse,
-    SimulateHostFunctionResult,
-    RestorePreamble,
-    GetTransactionStatus,
-    SendTransactionResponse,
     GetTransactionResponse,
+    GetTransactionStatus,
+    RestorePreamble,
+    SendTransactionResponse,
     SendTransactionStatus,
+    SimulateHostFunctionResult,
+    SimulateTransactionResponse,
 )
 from ..soroban_server import SorobanServer
 from ..transaction_builder import TransactionBuilder
 from ..transaction_envelope import TransactionEnvelope
 from ..xdr import TransactionMeta
+from .exceptions import *
 
 T = TypeVar("T")
 
@@ -35,29 +35,29 @@ class AssembledTransaction(Generic[T]):
     3. Sign the transaction
     4. Submit the transaction
 
-    :param transaction_envelope: The transaction envelope
+    :param transaction_builder: The transaction builder including the operation to invoke
     :param server: The Soroban server instance to use
     :param transaction_signer: Optional keypair for signing transactions, if you don't need to submit the transaction, you can set this to `None`.
     :param parse_result_xdr_fn: Optional function to parse XDR results, keep `None` for raw XDR
-    :param timeout: Timeout in seconds for transaction submission (default: 300s)
+    :param submit_timeout: Timeout in seconds for transaction submission (default: 180s)
     """
 
     def __init__(
         self,
-        transaction_envelope: TransactionEnvelope,
+        transaction_builder: TransactionBuilder,
         server: SorobanServer,
         transaction_signer: Keypair = None,
         parse_result_xdr_fn: Optional[Callable[[xdr.SCVal], T]] = None,
-        timeout: int = 300,
+        submit_timeout: int = 180,
     ):
         self.server = server
-        self.timeout = timeout
+        self.submit_timeout = submit_timeout
 
         self.transaction_signer = transaction_signer
         self.parse_result_xdr_fn = parse_result_xdr_fn
 
-        self.transaction_envelope: TransactionEnvelope = transaction_envelope
-        self.simulated = False
+        self.transaction_builder: TransactionBuilder = transaction_builder
+        self.built_transaction: Optional[TransactionEnvelope] = None
 
         self.simulation: Optional[SimulateTransactionResponse] = None
         self._simulation_result: Optional[SimulateHostFunctionResult] = None
@@ -79,33 +79,39 @@ class AssembledTransaction(Generic[T]):
         """
         self._simulation_result = None
         self._simulation_transaction_data = None
-        self.simulation = self.server.simulate_transaction(self.transaction_envelope)
+
+        source = self.server.load_account(
+            self.transaction_builder.source_account.account.account_id
+        )
+        self.transaction_builder.source_account.sequence = source.sequence
+
+        built_tx = self.transaction_builder.build()
+        self.simulation = self.server.simulate_transaction(built_tx)
 
         if restore and self.simulation.restore_preamble:
-            source = Account(
-                self.transaction_envelope.transaction.source,
-                self.transaction_envelope.transaction.sequence - 1,
-            )
             try:
-                self._restore_footprint(self.simulation.restore_preamble, source)
+                self.restore_footprint(self.simulation.restore_preamble)
             except (
                 SimulationFailedError,
                 TransactionStillPendingError,
                 SendTransactionFailedError,
                 TransactionFailedError,
             ) as e:
-                raise RestorationFailureError("Failed to restore contract data.") from e
-            self.transaction_envelope.transaction.sequence = source.sequence + 1
+                raise RestorationFailureError(
+                    "Failed to restore contract data.", self
+                ) from e
+
+            source = self.server.load_account(
+                self.transaction_builder.source_account.account.account_id
+            )
+            self.transaction_builder.source_account.sequence = source.sequence
             self.simulate()
 
         if self.simulation.error is not None:
             raise SimulationFailedError(
-                f"Transaction simulation failed: {self.simulation.error}"
+                f"Transaction simulation failed: {self.simulation.error}", self
             )
-        self.transaction_envelope = _assemble_transaction(
-            self.transaction_envelope, self.simulation
-        )
-        self.simulated = True
+        self.built_transaction = _assemble_transaction(built_tx, self.simulation)
         return self
 
     def sign_and_submit(
@@ -117,7 +123,7 @@ class AssembledTransaction(Generic[T]):
 
         :param transaction_signer: transaction_signer: Optional keypair to sign with (overrides instance signer)
         :param force: Whether to sign and submit even if the transaction is a read call
-        :return: The result of the transaction, parsed if parse_result_xdr_fn was set, otherwise raw XDR
+        :return: The value returned by the invoked function, parsed if parse_result_xdr_fn was set, otherwise raw XDR
         """
         self.sign(force=force, transaction_signer=transaction_signer)
         return self.submit()
@@ -134,12 +140,13 @@ class AssembledTransaction(Generic[T]):
         :raises: :exc:`NoSignatureNeededError <stellar_sdk.contract.exceptions.NoSignatureNeededError>`: If the transaction is a read call
         :raises: :exc:`NeedsMoreSignaturesError <stellar_sdk.contract.exceptions.NeedsMoreSignaturesError>`: If the transaction requires more signatures for authorization entries.
         """
-        if not self.simulated:
-            raise NotYetSimulatedError("Transaction has not yet been simulated.")
+        if not self.built_transaction:
+            raise NotYetSimulatedError("Transaction has not yet been simulated.", self)
 
         if not force and self.is_read_call():
             raise NoSignatureNeededError(
-                "This is a read call. It requires no signature or sending. Set force=True to sign and send anyway."
+                "This is a read call. It requires no signature or submitting. Set force=True to sign and submit anyway.",
+                self,
             )
 
         transaction_signer = transaction_signer or self.transaction_signer
@@ -153,10 +160,11 @@ class AssembledTransaction(Generic[T]):
         ]
         if sigs_needed:
             raise NeedsMoreSignaturesError(
-                f"`Transaction requires signatures from {sigs_needed}`. See `needs_non_invoker_signing_by` for details."
+                f"`Transaction requires signatures from {sigs_needed}`. See `needs_non_invoker_signing_by` for details.",
+                self,
             )
 
-        self.transaction_envelope.sign(transaction_signer)
+        self.built_transaction.sign(transaction_signer)
         return self
 
     def sign_auth_entries(
@@ -172,10 +180,10 @@ class AssembledTransaction(Generic[T]):
         if valid_until_ledger_sequence is None:
             valid_until_ledger_sequence = self.server.get_latest_ledger().sequence + 100
 
-        if not self.simulated:
-            raise NotYetSimulatedError("Transaction has not yet been simulated.")
+        if not self.built_transaction:
+            raise NotYetSimulatedError("Transaction has not yet been simulated.", self)
 
-        op = self.transaction_envelope.transaction.operations[0]
+        op = self.built_transaction.transaction.operations[0]
         assert isinstance(op, InvokeHostFunction)
         for i, e in enumerate(op.auth):
             if (
@@ -183,6 +191,7 @@ class AssembledTransaction(Generic[T]):
                 == xdr.SorobanCredentialsType.SOROBAN_CREDENTIALS_SOURCE_ACCOUNT
             ):
                 continue
+            assert e.credentials.address is not None
             if (
                 Address.from_xdr_sc_address(e.credentials.address.address).address
                 != auth_entries_signer.public_key
@@ -192,7 +201,7 @@ class AssembledTransaction(Generic[T]):
                 e,
                 auth_entries_signer,
                 valid_until_ledger_sequence,
-                self.transaction_envelope.network_passphrase,
+                self.built_transaction.network_passphrase,
             )
         return self
 
@@ -207,7 +216,10 @@ class AssembledTransaction(Generic[T]):
         :raises: :exc:`TransactionFailedError <stellar_sdk.contract.exceptions.TransactionFailedError>`: If the transaction fails
         """
         response = self._submit()
+        assert response.result_meta_xdr is not None
         transaction_meta = TransactionMeta.from_xdr(response.result_meta_xdr)
+        assert transaction_meta.v3 is not None
+        assert transaction_meta.v3.soroban_meta is not None
         result_val = transaction_meta.v3.soroban_meta.return_value
         return (
             self.parse_result_xdr_fn(result_val)
@@ -216,32 +228,38 @@ class AssembledTransaction(Generic[T]):
         )
 
     def _submit(self) -> GetTransactionResponse:
+        if not self.built_transaction:
+            raise NotYetSimulatedError("Transaction has not yet been simulated.", self)
+
         if not self.send_transaction_response:
             self.send_transaction_response = self.server.send_transaction(
-                self.transaction_envelope
+                self.built_transaction
             )
             if self.send_transaction_response.status != SendTransactionStatus.PENDING:
                 raise SendTransactionFailedError(
-                    f"Sending the transaction to the network failed!\n{self.send_transaction_response.model_dump_json()}"
+                    f"Sending the transaction to the network failed!\n{self.send_transaction_response.model_dump_json()}",
+                    self,
                 )
 
         tx_hash = self.send_transaction_response.hash
         self.get_transaction_response = _with_exponential_backoff(
             lambda: self.server.get_transaction(tx_hash),
             lambda resp: resp.status == GetTransactionStatus.NOT_FOUND,
-            self.timeout,
+            self.submit_timeout,
         )[-1]
 
+        assert self.get_transaction_response is not None
         if self.get_transaction_response.status == GetTransactionStatus.SUCCESS:
             return self.get_transaction_response
         if self.get_transaction_response.status == GetTransactionStatus.NOT_FOUND:
             raise TransactionStillPendingError(
-                f"Waited {self.timeout} seconds for transaction to complete, but it did not. "
+                f"Waited {self.submit_timeout} seconds for transaction to complete, but it did not. "
                 f"Returning anyway. You can call result() to await the result later "
-                f"or check the status of the transaction manually."
+                f"or check the status of the transaction manually.",
+                self,
             )
         elif self.get_transaction_response.status == GetTransactionStatus.FAILED:
-            raise TransactionFailedError(f"Transaction failed.")
+            raise TransactionFailedError(f"Transaction failed.", self)
         else:
             raise ValueError("Unexpected transaction status.")
 
@@ -254,10 +272,10 @@ class AssembledTransaction(Generic[T]):
         :return: The addresses that need to sign the authorization entries.
         :raises: :exc:`NotYetSimulatedError <stellar_sdk.contract.exceptions.NotYetSimulatedError>`: If the transaction has not been simulated
         """
-        if not self.simulated:
-            raise NotYetSimulatedError("Transaction has not yet been simulated.")
+        if not self.built_transaction:
+            raise NotYetSimulatedError("Transaction has not yet been simulated.", self)
 
-        invoke_host_function_op = self.transaction_envelope.transaction.operations[0]
+        invoke_host_function_op = self.built_transaction.transaction.operations[0]
         if not isinstance(invoke_host_function_op, InvokeHostFunction):
             raise ValueError("Unexpected operation type.")
 
@@ -266,16 +284,18 @@ class AssembledTransaction(Generic[T]):
             if (
                 entry.credentials.type
                 == xdr.SorobanCredentialsType.SOROBAN_CREDENTIALS_ADDRESS
-                and (
+            ):
+                assert entry.credentials.address is not None
+
+                if (
                     include_already_signed
                     or entry.credentials.address.signature.type
                     == xdr.SCValType.SCV_VOID
-                )
-            ):
-                address = Address.from_xdr_sc_address(
-                    entry.credentials.address.address
-                ).address
-                result.add(address)
+                ):
+                    address = Address.from_xdr_sc_address(
+                        entry.credentials.address.address
+                    ).address
+                    result.add(address)
         return result
 
     def result(self) -> Union[T, xdr.SCVal]:
@@ -304,40 +324,33 @@ class AssembledTransaction(Generic[T]):
 
         :return: The XDR representation of the transaction envelope
         """
-        return self.transaction_envelope.to_xdr()
+        return self.built_transaction.to_xdr()
 
-    def _restore_footprint(
-        self, restore_preamble: RestorePreamble, account: Account = None
-    ) -> None:
+    def restore_footprint(self, restore_preamble: RestorePreamble) -> None:
         if not self.transaction_signer:
             raise ValueError(
                 "For automatic restore to work you must provide a transaction_signer when initializing AssembledTransaction."
             )
         restore_tx = (
-            (
-                TransactionBuilder(
-                    account,
-                    self.transaction_envelope.network_passphrase,
-                    int(restore_preamble.min_resource_fee),
-                )
-                .append_restore_footprint_op()
-                .set_soroban_data(
-                    SorobanDataBuilder.from_xdr(restore_preamble.transaction_data)
-                )
+            TransactionBuilder(
+                self.transaction_builder.source_account,
+                self.transaction_builder.network_passphrase,
+                self.transaction_builder.base_fee,
             )
-            .set_timeout(self.timeout)
-            .build()
+            .append_restore_footprint_op()
+            .set_soroban_data(
+                SorobanDataBuilder.from_xdr(restore_preamble.transaction_data)
+            )
+            .time_bounds(0, 0)
         )
-        restore_assembled = AssembledTransaction(
+        restore_assembled: AssembledTransaction = AssembledTransaction(
             restore_tx,
             self.server,
             self.transaction_signer,
             None,
-            timeout=self.timeout,
+            submit_timeout=self.submit_timeout,
         )
-        restore_assembled.simulate(restore=False)
-        restore_assembled.sign()
-        restore_assembled._submit()
+        restore_assembled.simulate(restore=False).sign()._submit()
 
     def _simulation_data(
         self,
@@ -348,16 +361,19 @@ class AssembledTransaction(Generic[T]):
             )
 
         if not self.simulation:
-            raise NotYetSimulatedError("Transaction has not yet been simulated.")
+            raise NotYetSimulatedError("Transaction has not yet been simulated.", self)
 
         if self.simulation.restore_preamble:
             raise ExpiredStateError(
                 "You need to restore some contract state before you can invoke this method. "
                 + "You can set `restore` to true in order to "
-                + "automatically restore the contract state when needed."
+                + "automatically restore the contract state when needed.",
+                self,
             )
 
         # SimulateHostFunctionResult(auth=[], xdr='AAAAAQ==') for no return function (void)
+        assert self.simulation.results is not None
+        assert self.simulation.transaction_data is not None
         self._simulation_result = self.simulation.results[0]
         self._simulation_transaction_data = xdr.SorobanTransactionData.from_xdr(
             self.simulation.transaction_data

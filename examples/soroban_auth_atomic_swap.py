@@ -4,20 +4,8 @@ See https://soroban.stellar.org/docs/how-to-guides/atomic-swap
 https://soroban.stellar.org/docs/learn/authorization
 """
 
-import time
-
-from stellar_sdk import (
-    InvokeHostFunction,
-    Keypair,
-    Network,
-    SorobanServer,
-    TransactionBuilder,
-    scval,
-)
-from stellar_sdk.auth import authorize_entry
-from stellar_sdk.contract.assembled_transaction import AssembledTransaction
-from stellar_sdk.exceptions import PrepareTransactionException
-from stellar_sdk.soroban_rpc import GetTransactionStatus, SendTransactionStatus
+from stellar_sdk import Keypair, Network, SorobanServer, TransactionBuilder, scval
+from stellar_sdk.contract import Client
 
 rpc_server_url = "https://soroban-testnet.stellar.org:443"
 soroban_server = SorobanServer(rpc_server_url)
@@ -59,12 +47,13 @@ tx = (
     )
 )
 
-assembled = (
-    AssembledTransaction(tx, soroban_server, parse_result_xdr_fn=None)
-    .simulate()
-    .sign_auth_entries(bob_kp)
-    .sign_auth_entries(alice_kp)
-    .sign_and_submit(submitter_kp)
+te = Client(atomic_swap_contract_id, rpc_server_url, network_passphrase).invoke(
+    "swap",
+    args,
+    submitter_kp.public_key,
+    submitter_kp,
 )
+print(te.sign_auth_entries(alice_kp))
+print(te.sign_auth_entries(bob_kp))
 
-print(assembled)
+print(te.sign_and_submit())
