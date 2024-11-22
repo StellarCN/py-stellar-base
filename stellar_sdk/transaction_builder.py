@@ -218,34 +218,6 @@ class TransactionBuilder:
         return transaction_envelope
 
     @staticmethod
-    def clone_from(transaction_envelope: TransactionEnvelope, network_passphrase: str):
-        if not isinstance(transaction_envelope, TransactionEnvelope):
-            raise TypeError("`transaction_envelope` should be a TransactionEnvelope")
-        tx = transaction_envelope.transaction
-        sequence = tx.sequence - 1
-        source = tx.source
-        # the initial fee passed to the builder gets scaled up based on the number
-        # of operations at the end, so we have to down-scale first
-        base_fee = int(tx.fee / len(tx.operations))
-        builder = TransactionBuilder(
-            source_account=Account(source, sequence),
-            network_passphrase=network_passphrase,
-            base_fee=base_fee,
-        )
-
-        builder.operations = tx.operations
-        builder.memo = tx.memo
-        builder.soroban_data = tx.soroban_data
-        if tx.preconditions:
-            builder.time_bounds = tx.preconditions.time_bounds
-            builder.ledger_bounds = tx.preconditions.ledger_bounds
-            builder.min_sequence_number = tx.preconditions.min_sequence_number
-            builder.min_sequence_age = tx.preconditions.min_sequence_age
-            builder.min_sequence_ledger_gap = tx.preconditions.min_sequence_ledger_gap
-            builder.extra_signers = tx.preconditions.extra_signers
-        return builder
-
-    @staticmethod
     def from_xdr(
         xdr: str, network_passphrase: str
     ) -> Union[TransactionEnvelope, FeeBumpTransactionEnvelope]:

@@ -4,8 +4,9 @@ See https://soroban.stellar.org/docs/how-to-guides/atomic-swap
 https://soroban.stellar.org/docs/learn/authorization
 """
 
-from stellar_sdk import Keypair, Network, SorobanServer, TransactionBuilder, scval
-from stellar_sdk.contract import Client
+from stellar_sdk import Keypair, Network, SorobanServer, scval
+from stellar_sdk.contract import AssembledTransaction, Client
+from stellar_sdk.contract.exceptions import AssembledTransactionError
 
 rpc_server_url = "https://soroban-testnet.stellar.org:443"
 soroban_server = SorobanServer(rpc_server_url)
@@ -32,28 +33,24 @@ args = [
     scval.to_address(native_token_contract_id),  # token_a
     scval.to_address(cat_token_contract_id),  # token_b
     scval.to_int128(1000),  # amount_a
-    scval.to_int128(1000),  # min_b_for_a
-    scval.to_int128(1000),  # amount_b
-    scval.to_int128(1000),  # min_a_for_b
+    scval.to_int128(4500),  # min_b_for_a
+    scval.to_int128(5000),  # amount_b
+    scval.to_int128(950),  # min_a_for_b
 ]
 
-tx = (
-    TransactionBuilder(source, network_passphrase, base_fee=500)
-    .add_time_bounds(0, 0)
-    .append_invoke_contract_function_op(
-        contract_id=atomic_swap_contract_id,
-        function_name="swap",
-        parameters=args,
-    )
-)
-
-te = Client(atomic_swap_contract_id, rpc_server_url, network_passphrase).invoke(
+assemble_tx: AssembledTransaction = Client(
+    atomic_swap_contract_id, rpc_server_url, network_passphrase
+).invoke(
     "swap",
     args,
     submitter_kp.public_key,
     submitter_kp,
 )
-print(te.sign_auth_entries(alice_kp))
-print(te.sign_auth_entries(bob_kp))
+assemble_tx.sign_auth_entries(alice_kp)
+assemble_tx.sign_auth_entries(bob_kp)
 
-print(te.sign_and_submit())
+try:
+    assemble_tx.sign_and_submit()
+    print("Atomic swap success")
+except AssembledTransactionError as e:
+    print("Transaction failed, check the exception for more details.", e)

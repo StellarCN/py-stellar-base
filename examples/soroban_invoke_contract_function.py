@@ -11,8 +11,10 @@
 3. Modify the necessary parameters in this script, then run it.
 """
 
+from typing import List
+
 from stellar_sdk import Network, scval
-from stellar_sdk.contract.client import Client
+from stellar_sdk.contract import AssembledTransaction, Client
 
 rpc_server_url = "https://soroban-testnet.stellar.org:443"
 contract_id = "CACZTW72246RA2MOCNKUBRRRRPT26UZ7LXE5ZHH44OGKIMCTQJ74O4D5"
@@ -23,7 +25,7 @@ def parse_result_xdr(result):
     return [scval.from_string(s).decode() for s in scval.from_vec(result)]
 
 
-te = Client(contract_id, rpc_server_url, network_passphrase).invoke(
-    "hello", [scval.to_string("world")]
-)
-print(te.result())
+te: AssembledTransaction[List[str]] = Client(
+    contract_id, rpc_server_url, network_passphrase
+).invoke("hello", [scval.to_string("world")])
+te.result()

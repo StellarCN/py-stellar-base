@@ -430,6 +430,9 @@ def _with_exponential_backoff(
         time.sleep(wait_time)
 
         wait_time *= exponential_factor
+        if wait_time >= 30:
+            wait_time = 30
+
         if time.time() + wait_time > wait_until:
             wait_time = wait_until - time.time()
             if verbose:
