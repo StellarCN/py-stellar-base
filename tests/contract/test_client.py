@@ -13,7 +13,7 @@ from stellar_sdk import (
     TransactionBuilder,
     scval,
 )
-from stellar_sdk.contract import Client
+from stellar_sdk.contract import ContractClient
 from stellar_sdk.contract.exceptions import NoSignatureNeededError
 from stellar_sdk.soroban_rpc import GetTransactionStatus
 
@@ -30,10 +30,10 @@ def fund_account(account_id: str):
 def create_contract_from_file(filename):
     current_dir = os.path.dirname(os.path.abspath(__file__))
     wasm_file = os.path.join(current_dir, "wasm_files", filename)
-    wasm_id = Client.upload_contract_wasm(
+    wasm_id = ContractClient.upload_contract_wasm(
         wasm_file, SOURCE.public_key, SOURCE, SorobanServer(RPC_URL)
     )
-    contract_id = Client.create_contract(
+    contract_id = ContractClient.create_contract(
         wasm_id, SOURCE.public_key, SOURCE, SorobanServer(RPC_URL)
     )
     return contract_id
@@ -41,7 +41,7 @@ def create_contract_from_file(filename):
 
 def create_contract_from_asset(asset: Asset):
     try:
-        return Client.create_stellar_asset_contract_from_asset(
+        return ContractClient.create_stellar_asset_contract_from_asset(
             asset, SOURCE.public_key, SOURCE, SorobanServer(RPC_URL)
         )
     except Exception as e:
@@ -73,14 +73,14 @@ class TestClient:
         wasm_file = os.path.join(
             os.path.dirname(__file__), "wasm_files", "soroban_hello_world_contract.wasm"
         )
-        wasm_id = Client.upload_contract_wasm(
+        wasm_id = ContractClient.upload_contract_wasm(
             wasm_file, SOURCE.public_key, SOURCE, SorobanServer(RPC_URL)
         )
         assert isinstance(wasm_id, bytes)
         assert len(wasm_id) == 32
 
     def test_create_contract(self):
-        wasm_id = Client.upload_contract_wasm(
+        wasm_id = ContractClient.upload_contract_wasm(
             os.path.join(
                 os.path.dirname(__file__),
                 "wasm_files",
@@ -90,7 +90,7 @@ class TestClient:
             SOURCE,
             SorobanServer(RPC_URL),
         )
-        contract_id = Client.create_contract(
+        contract_id = ContractClient.create_contract(
             wasm_id, SOURCE.public_key, SOURCE, SorobanServer(RPC_URL)
         )
         assert isinstance(contract_id, str)
@@ -98,7 +98,7 @@ class TestClient:
 
     def test_create_stellar_asset_contract_from_asset(self):
         asset_code = "".join(choice(ascii_uppercase) for _ in range(8))
-        contract_id = Client.create_stellar_asset_contract_from_asset(
+        contract_id = ContractClient.create_stellar_asset_contract_from_asset(
             Asset(asset_code, SOURCE.public_key),
             SOURCE.public_key,
             SOURCE,

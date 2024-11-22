@@ -5,7 +5,7 @@ https://soroban.stellar.org/docs/learn/authorization
 """
 
 from stellar_sdk import Keypair, Network, SorobanServer, scval
-from stellar_sdk.contract import AssembledTransaction, Client
+from stellar_sdk.contract import AssembledTransaction, ContractClient
 from stellar_sdk.contract.exceptions import AssembledTransactionError
 
 rpc_server_url = "https://soroban-testnet.stellar.org:443"
@@ -38,7 +38,7 @@ args = [
     scval.to_int128(950),  # min_a_for_b
 ]
 
-assemble_tx: AssembledTransaction = Client(
+assemble_tx: AssembledTransaction = ContractClient(
     atomic_swap_contract_id, rpc_server_url, network_passphrase
 ).invoke(
     "swap",

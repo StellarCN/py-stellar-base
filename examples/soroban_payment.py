@@ -4,7 +4,7 @@ See https://soroban.stellar.org/docs/reference/interfaces/token-interface
 """
 
 from stellar_sdk import Keypair, Network, scval
-from stellar_sdk.contract import Client, exceptions
+from stellar_sdk.contract import ContractClient, exceptions
 
 rpc_server_url = "https://soroban-testnet.stellar.org:443"
 network_passphrase = Network.TESTNET_NETWORK_PASSPHRASE
@@ -26,7 +26,7 @@ args = [
 
 try:
     result = (
-        Client(native_token_contract_id, rpc_server_url, network_passphrase)
+        ContractClient(native_token_contract_id, rpc_server_url, network_passphrase)
         .invoke(
             function_name,
             args,

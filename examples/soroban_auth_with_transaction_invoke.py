@@ -5,7 +5,7 @@ See https://soroban.stellar.org/docs/learn/authorization#transaction-invoker
 """
 
 from stellar_sdk import Keypair, Network, scval
-from stellar_sdk.contract import Client, exceptions
+from stellar_sdk.contract import ContractClient, exceptions
 
 rpc_server_url = "https://soroban-testnet.stellar.org:443"
 network_passphrase = Network.TESTNET_NETWORK_PASSPHRASE
@@ -21,7 +21,7 @@ args = [scval.to_address(tx_submitter_kp.public_key), scval.to_uint32(10)]
 
 try:
     result = (
-        Client(contract_id, rpc_server_url, network_passphrase)
+        ContractClient(contract_id, rpc_server_url, network_passphrase)
         .invoke(
             function_name,
             args,

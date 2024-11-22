@@ -1,9 +1,10 @@
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Union
 
 from ..exceptions import SdkError
 
 if TYPE_CHECKING:
     from .assembled_transaction import AssembledTransaction
+    from .assembled_transaction_async import AssembledTransactionAsync
 
 __all__ = [
     "AssembledTransactionError",
@@ -22,7 +23,13 @@ __all__ = [
 class AssembledTransactionError(SdkError):
     """Raised when an assembled transaction fails."""
 
-    def __init__(self, message, assembled_transaction: "AssembledTransaction") -> None:
+    def __init__(
+        self,
+        message,
+        assembled_transaction: Union[
+            "AssembledTransaction", "AssembledTransactionAsync"
+        ],
+    ) -> None:
         super().__init__(message)
         self.assembled_transaction = assembled_transaction
 
