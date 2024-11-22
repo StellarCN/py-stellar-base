@@ -292,7 +292,39 @@ Response
 .. autoclass:: stellar_sdk.client.response.Response
    :members:
 
+Contract
+^^^^^^^^
 
+ContractClient
+---------------
+
+.. autoclass:: stellar_sdk.contract.ContractClient
+   :members:
+
+AssembledTransaction
+--------------------
+
+.. autoclass:: stellar_sdk.contract.AssembledTransaction
+   :members:
+
+
+ContractClientAsync
+-------------------
+
+.. autoclass:: stellar_sdk.contract.ContractClientAsync
+   :members:
+
+AssembledTransactionAsync
+-------------------------
+
+.. autoclass:: stellar_sdk.contract.AssembledTransactionAsync
+   :members:
+
+Exceptions
+----------
+
+.. automodule:: stellar_sdk.contract.exceptions
+   :members:
 
 Exceptions
 ^^^^^^^^^^

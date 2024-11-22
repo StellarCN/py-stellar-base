@@ -4,97 +4,37 @@ See https://soroban.stellar.org/docs/how-to-guides/auth
 See https://soroban.stellar.org/docs/learn/authorization#stellar-account
 """
 
-import time
-
-from stellar_sdk import (
-    InvokeHostFunction,
-    Keypair,
-    Network,
-    SorobanServer,
-    TransactionBuilder,
-    scval,
-)
-from stellar_sdk import xdr as stellar_xdr
-from stellar_sdk.auth import authorize_entry
-from stellar_sdk.exceptions import PrepareTransactionException
-from stellar_sdk.soroban_rpc import GetTransactionStatus, SendTransactionStatus
+from stellar_sdk import Keypair, Network, scval
+from stellar_sdk.contract import ContractClient, exceptions
 
 rpc_server_url = "https://soroban-testnet.stellar.org:443"
 network_passphrase = Network.TESTNET_NETWORK_PASSPHRASE
-soroban_server = SorobanServer(rpc_server_url)
 
-# https://github.com/stellar/soroban-examples/tree/v0.6.0/auth
-contract_id = "CDGPP5TBQIVN4ADNH6PL4METZNJ35OX4DIXKAQ3ENWYLBAJZMHHZE3EV"
+# https://github.com/stellar/soroban-examples/tree/main/auth
+contract_id = "CAQRLQH5RBQHSXMVRQJEGK7GINE3QPZUPY6SYSOHGSZA4XGDIXT34XRY"
 tx_submitter_kp = Keypair.from_secret(
     "SAAPYAPTTRZMCUZFPG3G66V4ZMHTK4TWA6NS7U4F7Z3IMUD52EK4DDEV"
 )
 op_invoker_kp = Keypair.from_secret(
-    "SAEZSI6DY7AXJFIYA4PM6SIBNEYYXIEM2MSOTHFGKHDW32MBQ7KVO6EN"
+    "SCS26R6UG5M6JA3D3VA7KTBTBJRHIYIBRY4ZHIIEWPCJ3PO54RKQEKFD"
 )
 
-func_name = "increment"
+function_name = "increment"
 args = [scval.to_address(op_invoker_kp.public_key), scval.to_uint32(10)]
 
-source = soroban_server.load_account(tx_submitter_kp.public_key)
-tx = (
-    TransactionBuilder(source, network_passphrase, base_fee=50000)
-    .add_time_bounds(0, 0)
-    .append_invoke_contract_function_op(
-        contract_id=contract_id,
-        function_name=func_name,
-        parameters=args,
-    )
-    .build()
-)
-
 try:
-    simulate_resp = soroban_server.simulate_transaction(tx)
-    # You need to check the error in the response,
-    # if the error is not None, you need to handle it.
-    op = tx.transaction.operations[0]
-    assert isinstance(op, InvokeHostFunction)
-    assert simulate_resp.results is not None
-    assert simulate_resp.results[0].auth is not None
-    op.auth = [
-        authorize_entry(
-            simulate_resp.results[0].auth[0],
-            op_invoker_kp,
-            simulate_resp.latest_ledger + 20,
-            network_passphrase,
+    result = (
+        ContractClient(contract_id, rpc_server_url, network_passphrase)
+        .invoke(
+            function_name,
+            args,
+            source=tx_submitter_kp.public_key,
+            parse_result_xdr_fn=lambda x: scval.from_uint32(x),
         )
-    ]
-    tx = soroban_server.prepare_transaction(tx, simulate_resp)
-except PrepareTransactionException as e:
-    print(f"Got exception: {e.simulate_transaction_response}")
-    raise e
-
-# tx.transaction.soroban_data.resources.instructions = stellar_xdr.Uint32(
-#     tx.transaction.soroban_data.resources.instructions.uint32 * 2
-# )
-
-tx.sign(tx_submitter_kp)
-print(f"Signed XDR:\n{tx.to_xdr()}")
-
-send_transaction_data = soroban_server.send_transaction(tx)
-print(f"sent transaction: {send_transaction_data}")
-if send_transaction_data.status != SendTransactionStatus.PENDING:
-    raise Exception("send transaction failed")
-
-while True:
-    print("waiting for transaction to be confirmed...")
-    get_transaction_data = soroban_server.get_transaction(send_transaction_data.hash)
-    if get_transaction_data.status != GetTransactionStatus.NOT_FOUND:
-        break
-    time.sleep(3)
-
-print(f"transaction: {get_transaction_data}")
-
-if get_transaction_data.status == GetTransactionStatus.SUCCESS:
-    assert get_transaction_data.result_meta_xdr is not None
-    transaction_meta = stellar_xdr.TransactionMeta.from_xdr(
-        get_transaction_data.result_meta_xdr
+        .sign_auth_entries(op_invoker_kp)
+        .sign_and_submit(tx_submitter_kp)
     )
-    result = transaction_meta.v3.soroban_meta.return_value.u32  # type: ignore
-    print(f"Function result: {result}")
-else:
-    print(f"Transaction failed: {get_transaction_data.result_xdr}")
+    print("Transaction success, result:", result)
+except exceptions.AssembledTransactionError as e:
+    print("Transaction failed, check the exception for more details.")
+    print(e.assembled_transaction)
