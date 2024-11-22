@@ -100,11 +100,6 @@ class AssembledTransactionAsync(Generic[T]):
                 raise RestorationFailureError(
                     "Failed to restore contract data.", self
                 ) from e
-
-            source = await self.server.load_account(
-                self.transaction_builder.source_account.account.account_id
-            )
-            self.transaction_builder.source_account.sequence = source.sequence
             await self.simulate()
 
         if self.simulation.error is not None:

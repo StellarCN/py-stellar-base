@@ -50,7 +50,7 @@ def create_contract_from_asset(asset: Asset):
 
 
 @pytest.mark.integration
-class TestClient:
+class TestContractClient:
     hello_world_contract_id = None
     atomic_swap_contract_id = None
     native_asset_contract_id = None
@@ -108,7 +108,7 @@ class TestClient:
         assert len(contract_id) == 56
 
     def test_invoke_hello_world_contract(self):
-        assemble_tx = Client(
+        assemble_tx = ContractClient(
             self.hello_world_contract_id, RPC_URL, NETWORK_PASSPHRASE
         ).invoke(
             "hello",
@@ -165,7 +165,7 @@ class TestClient:
             scval.to_int128(950),  # min_a_for_b
         ]
 
-        assemble_tx = Client(
+        assemble_tx = ContractClient(
             self.atomic_swap_contract_id, RPC_URL, NETWORK_PASSPHRASE
         ).invoke(
             "swap",
