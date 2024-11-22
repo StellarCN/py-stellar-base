@@ -49,6 +49,7 @@ def create_contract_from_asset(asset: Asset):
     return asset.contract_id(NETWORK_PASSPHRASE)
 
 
+@pytest.mark.integration
 class TestClient:
     hello_world_contract_id = None
     atomic_swap_contract_id = None
