@@ -3,6 +3,10 @@ Release History
 
 ### Pending
 
+### Version 12.0.0-beta4
+
+Released on November 22, 2024
+
 #### Update
 - feat: add `stellar_sdk.contract.ContractClient` and `stellar_sdk.contract.ContractClientAsync`, this greatly reduces the difficulty of calling contracts, and you can learn more through the documentation and [examples](https://github.com/StellarCN/py-stellar-base/blob/main/examples/soroban_invoke_contract_function.py). ([#998](https://github.com/StellarCN/py-stellar-base/pull/998))
 
