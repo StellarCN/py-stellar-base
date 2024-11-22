@@ -30,10 +30,10 @@ class AssembledTransaction(Generic[T]):
     """A class representing an assembled Soroban transaction that can be simulated and sent.
 
     The lifecycle of a transaction typically follows these steps:
-    1. Construct the transaction (usually via a Client)
-    2. Simulate the transaction
-    3. Sign the transaction
-    4. Submit the transaction
+        1. Construct the transaction (usually via a Client)
+        2. Simulate the transaction
+        3. Sign the transaction
+        4. Submit the transaction
 
     :param transaction_builder: The transaction builder including the operation to invoke
     :param server: The Soroban server instance to use
