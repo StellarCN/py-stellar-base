@@ -26,7 +26,9 @@ def parse_result_xdr(result):
 
 
 te: AssembledTransaction[List[str]] = ContractClient(
-    contract_id, rpc_server_url, network_passphrase,
+    contract_id,
+    rpc_server_url,
+    network_passphrase,
 ).invoke("hello", [scval.to_string("world")], parse_result_xdr_fn=parse_result_xdr)
 print(f"Result from simulation: {te.result}")
 
