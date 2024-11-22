@@ -50,6 +50,34 @@ jobs:
           { os: 'windows-latest',  python-version: '3.13' },
         ]
     runs-on: ${{ matrix.platform.os }}
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Wake up httpbin server
+        run: |
+          curl https://httpbinx.fly.dev/ip
+
+      - name: Install poetry
+        run: pipx install poetry
+
+      - name: Setup Python ${{ matrix.platform.python-version }} on ${{ matrix.platform.os }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.platform.python-version }}
+
+      - name: Install dependencies
+        run: |
+          poetry install --extras 'aiohttp'
+
+      - name: Echo installed packages
+        run: |
+          poetry show
+
+      - name: Test with pytest
+        run: poetry run pytest -v -rs tests --runslow
+
+  integration:
+    runs-on: ubuntu-latest
     services:
       rpc:
         image: stellar/quickstart:testing@sha256:5333ec87069efd7bb61f6654a801dc093bf0aad91f43a5ba84806d3efe4a6322
@@ -75,10 +103,10 @@ jobs:
       - name: Install poetry
         run: pipx install poetry
 
-      - name: Setup Python ${{ matrix.platform.python-version }} on ${{ matrix.platform.os }}
+      - name: Setup Python 3.13
         uses: actions/setup-python@v5
         with:
-          python-version: ${{ matrix.platform.python-version }}
+          python-version: 3.13
 
       - name: Install dependencies
         run: |
@@ -89,10 +117,9 @@ jobs:
           poetry show
 
       - name: Test with pytest
-        run: poetry run pytest -v -rs tests --runslow --cov=./ --cov-report=xml
+        run: poetry run pytest -v -rs tests --runslow --integration --cov=./ --cov-report=xml
 
       - name: Upload coverage to Codecov
-        if: matrix.platform.python-version == '3.13' && matrix.platform.os == 'ubuntu-latest'
         uses: codecov/codecov-action@v3
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
@@ -102,7 +129,7 @@ jobs:
           fail_ci_if_error: true
 
   deploy:
-    needs: test
+    needs: [ test, integration ]
     runs-on: ubuntu-latest
     if: github.event_name == 'release' && github.event.action == 'created'
     permissions:
