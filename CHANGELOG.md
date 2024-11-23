@@ -3,6 +3,13 @@ Release History
 
 ### Pending
 
+### Version 12.0.0-beta5
+
+Released on November 23, 2024
+
+#### Update
+- fix: fix a bug in `AssembledTransaction.simulate`. ([#1000](https://github.com/StellarCN/py-stellar-base/pull/1000))
+
 ### Version 12.0.0-beta4
 
 Released on November 22, 2024
