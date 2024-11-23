@@ -144,6 +144,14 @@ class AssembledTransactionAsync(Generic[T]):
                 self,
             )
 
+        if self.simulation and self.simulation.restore_preamble:
+            raise ExpiredStateError(
+                "You need to restore some contract state before you can invoke this method. "
+                + "You can set `restore` to true in order to "
+                + "automatically restore the contract state when needed.",
+                self,
+            )
+
         transaction_signer = transaction_signer or self.transaction_signer
         if not transaction_signer:
             raise ValueError(
@@ -276,7 +284,7 @@ class AssembledTransactionAsync(Generic[T]):
 
         invoke_host_function_op = self.built_transaction.transaction.operations[0]
         if not isinstance(invoke_host_function_op, InvokeHostFunction):
-            raise ValueError("Unexpected operation type.")
+            return set()
 
         result = set()
         for entry in invoke_host_function_op.auth or []:
@@ -338,9 +346,9 @@ class AssembledTransactionAsync(Generic[T]):
             )
             .append_restore_footprint_op()
             .set_soroban_data(
-                SorobanDataBuilder.from_xdr(restore_preamble.transaction_data)
+                SorobanDataBuilder.from_xdr(restore_preamble.transaction_data).build()
             )
-            .time_bounds(0, 0)
+            .add_time_bounds(0, 0)
         )
         restore_assembled: AssembledTransactionAsync = AssembledTransactionAsync(
             restore_tx,
@@ -350,7 +358,7 @@ class AssembledTransactionAsync(Generic[T]):
             submit_timeout=self.submit_timeout,
         )
         await restore_assembled.simulate(restore=False)
-        restore_assembled.sign()
+        restore_assembled.sign(force=True)
         await restore_assembled._submit()
 
     def _simulation_data(
@@ -363,14 +371,6 @@ class AssembledTransactionAsync(Generic[T]):
 
         if not self.simulation:
             raise NotYetSimulatedError("Transaction has not yet been simulated.", self)
-
-        if self.simulation.restore_preamble:
-            raise ExpiredStateError(
-                "You need to restore some contract state before you can invoke this method. "
-                + "You can set `restore` to true in order to "
-                + "automatically restore the contract state when needed.",
-                self,
-            )
 
         # SimulateHostFunctionResult(auth=[], xdr='AAAAAQ==') for no return function (void)
         assert self.simulation.results is not None
@@ -431,8 +431,8 @@ async def _with_exponential_backoff(
         await asyncio.sleep(wait_time)
 
         wait_time *= exponential_factor
-        if wait_time >= 10:
-            wait_time = 10
+        if wait_time >= 6:
+            wait_time = 6
 
         if time.time() + wait_time > wait_until:
             wait_time = wait_until - time.time()

@@ -425,8 +425,8 @@ def _with_exponential_backoff(
         time.sleep(wait_time)
 
         wait_time *= exponential_factor
-        if wait_time >= 10:
-            wait_time = 10
+        if wait_time >= 6:
+            wait_time = 6
 
         if time.time() + wait_time > wait_until:
             wait_time = wait_until - time.time()
