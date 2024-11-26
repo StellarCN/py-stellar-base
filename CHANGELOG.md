@@ -2,6 +2,8 @@ Release History
 ==============
 
 ### Pending
+#### Update
+- feat: `scval.from_enum` and `scval.to_enum` now support multiple values. ([#1001](https://github.com/StellarCN/py-stellar-base/pull/1001))
 
 ### Version 12.0.0-beta5
 

@@ -398,6 +398,22 @@ def test_enum_with_value():
     assert from_enum(scval.to_xdr_bytes()) == (key, value)
 
 
+def test_enum_with_multi_values():
+    key = "Address"
+    v1, v2 = to_address(
+        "GAHJJJKMOKYE4RVPZEWZTKH5FVI4PA3VL7GK2LFNUBSGBV6OJP7TQSLX"
+    ), to_address("GDCN3WSVMS7HM5FUQW6FRTU4E4LU4CJWYFT6DNK6CVNYWQYR5AW3BUEF")
+    value = [v1, v2]
+    scval = to_enum(key, value)
+    expected_scval = xdr.SCVal(
+        stellar_xdr.SCValType.SCV_VEC, vec=xdr.SCVec([to_symbol(key), v1, v2])
+    )
+    assert scval == expected_scval
+    assert from_enum(scval) == (key, value)
+    assert from_enum(scval.to_xdr()) == (key, value)
+    assert from_enum(scval.to_xdr_bytes()) == (key, value)
+
+
 def test_enum_without_value():
     key = "Address"
     scval = to_enum(key, None)
