@@ -46,7 +46,7 @@ class ContractClientAsync:
         parse_result_xdr_fn: Optional[Callable[[stellar_xdr.SCVal], T]] = None,
         base_fee: int = 100,
         transaction_timeout: int = 300,
-        submit_timeout: int = 120,
+        submit_timeout: int = 30,
         simulate: bool = True,
         restore: bool = True,
     ) -> AssembledTransactionAsync[T]:
