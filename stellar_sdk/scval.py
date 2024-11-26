@@ -690,7 +690,9 @@ def from_vec(sc_val: Union[stellar_xdr.SCVal, bytes, str]) -> List[stellar_xdr.S
     return sc_val.vec.sc_vec
 
 
-def to_enum(key: str, data: Optional[stellar_xdr.SCVal]) -> stellar_xdr.SCVal:
+def to_enum(
+    key: str, data: Optional[Union[stellar_xdr.SCVal, List[stellar_xdr.SCVal]]]
+) -> stellar_xdr.SCVal:
     """Creates a :class:`stellar_sdk.xdr.SCVal` XDR object corresponding to the Enum in the Rust SDK.
 
     .. warning::
@@ -703,13 +705,16 @@ def to_enum(key: str, data: Optional[stellar_xdr.SCVal]) -> stellar_xdr.SCVal:
     """
     scv = [to_symbol(key)]
     if data is not None:
-        scv.append(data)
+        if isinstance(data, stellar_xdr.SCVal):
+            scv.append(data)
+        else:
+            scv.extend(data)
     return to_vec(scv)
 
 
 def from_enum(
     sc_val: Union[stellar_xdr.SCVal, bytes, str]
-) -> Tuple[str, Optional[stellar_xdr.SCVal]]:
+) -> Tuple[str, Optional[Union[stellar_xdr.SCVal, List[stellar_xdr.SCVal]]]]:
     """Creates a tuple corresponding to the Enum in the Rust SDK.
 
     .. warning::
@@ -722,15 +727,17 @@ def from_enum(
     """
     sc_val = _parse_sc_val(sc_val)
     vec = from_vec(sc_val)
-    if len(vec) < 1 or len(vec) > 2:
+    if len(vec) == 0:
         raise ValueError(
             f"Invalid sc_val, can not parse enum, sc_val: {sc_val.to_xdr()}"
         )
     key = from_symbol(vec[0])
-    value = None
-    if len(vec) == 2:
-        value = vec[1]
-    return key, value
+    if len(vec) == 1:
+        return key, None
+    elif len(vec) == 2:
+        return key, vec[1]
+    else:
+        return key, vec[1:]
 
 
 def to_tuple_struct(data: Sequence[stellar_xdr.SCVal]) -> stellar_xdr.SCVal:
