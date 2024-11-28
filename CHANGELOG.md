@@ -23,7 +23,7 @@ The following log is the changes since 11.1.0:
 - feat: add `stellar_sdk.contract.ContractClient` and `stellar_sdk.contract.ContractClientAsync`, this greatly reduces the difficulty of calling contracts, and you can learn more through the documentation and [examples](https://github.com/StellarCN/py-stellar-base/blob/main/examples/soroban_invoke_contract_function.py). ([#998](https://github.com/StellarCN/py-stellar-base/pull/998))
 
 #### Breaking changes
-- refactor!: The `EventInfo.paging_token` field has been marked as deprecated, use the `cursor` in `GetEventsResponse` instead. (Reverted in 12.0.0-beta1) ([#984](https://github.com/StellarCN/py-stellar-base/pull/984))
+- refactor!: The `EventInfo.paging_token` field has been marked as deprecated, use the `cursor` in `GetEventsResponse` instead. ([#984](https://github.com/StellarCN/py-stellar-base/pull/984))
 - refactor!: The legacy `cost` field has been removed from `SimulateTransactionResponse`, parse it from `transaction_data` instead. ([#984](https://github.com/StellarCN/py-stellar-base/pull/984))
 - feat!: support constructors in contract creation via `TransactionBuilder.append_create_contract_op`, the signature of the function has been changed. ([#979](https://github.com/StellarCN/py-stellar-base/pull/979))
 - refactor!: Updated `signer` parameter in auth to accept a callable returning (public_key, signatures) instead of just public_key. ([#982](https://github.com/StellarCN/py-stellar-base/pull/982))
