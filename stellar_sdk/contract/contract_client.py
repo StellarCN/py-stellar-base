@@ -34,7 +34,7 @@ class ContractClient:
         contract_id: str,
         rpc_url: str,
         network_passphrase: str,
-        request_client: BaseSyncClient = None,
+        request_client: Optional[BaseSyncClient] = None,
     ):
         self.contract_id = contract_id
         self.rpc_url = rpc_url
@@ -44,9 +44,9 @@ class ContractClient:
     def invoke(
         self,
         function_name: str,
-        parameters: Sequence[stellar_xdr.SCVal] = None,
+        parameters: Optional[Sequence[stellar_xdr.SCVal]] = None,
         source: Union[str, MuxedAccount] = NULL_ACCOUNT,
-        signer: Keypair = None,
+        signer: Optional[Keypair] = None,
         parse_result_xdr_fn: Optional[Callable[[stellar_xdr.SCVal], T]] = None,
         base_fee: int = 100,
         transaction_timeout: int = 300,
@@ -90,7 +90,7 @@ class ContractClient:
         source: Union[str, MuxedAccount],
         signer: Keypair,
         soroban_server: SorobanServer,
-        network_passphrase: str = None,
+        network_passphrase: Optional[str] = None,
         base_fee: int = 100,
         transaction_timeout: int = 300,
         submit_timeout: int = 120,
@@ -138,7 +138,7 @@ class ContractClient:
         soroban_server: SorobanServer,
         constructor_args: Optional[Sequence[stellar_xdr.SCVal]] = None,
         salt: Optional[bytes] = None,
-        network_passphrase: str = None,
+        network_passphrase: Optional[str] = None,
         base_fee: int = 100,
         transaction_timeout: int = 300,
         submit_timeout: int = 120,
@@ -189,7 +189,7 @@ class ContractClient:
         source: Union[str, MuxedAccount],
         signer: Keypair,
         soroban_server: SorobanServer,
-        network_passphrase: str = None,
+        network_passphrase: Optional[str] = None,
         base_fee: int = 100,
         submit_timeout: int = 120,
     ) -> str:
