@@ -20,6 +20,9 @@ class ContractClient:
     This client is a wrapper for :py:class:`TransactionBuilder <stellar_sdk.TransactionBuilder>` and :py:class:`SorobanServer <stellar_sdk.SorobanServer>`.
     If you need more fine-grained control, please consider using them directly.
 
+    I strongly recommend that you do not use this client directly, but instead use `stellar-contract-bindings <https://github.com/lightsail-network/stellar-contract-bindings>`_ to
+    generate contract binding code, which will make calling the contract much simpler.
+
     :param contract_id: The ID of the Soroban contract.
     :param rpc_url: The URL of the RPC server.
     :param network_passphrase: The network passphrase.

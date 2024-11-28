@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "stellar-sdk"
-version = "12.0.0b6"
+version = "12.0.0"
 description = "The Python Stellar SDK library provides APIs to build transactions and connect to Horizon and Soroban-RPC server."
 authors = [
     "overcat <4catcode@gmail.com>",

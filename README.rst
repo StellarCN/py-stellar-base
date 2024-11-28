@@ -98,6 +98,11 @@ You can find more examples `here <https://github.com/StellarCN/py-stellar-base/t
     response = server.submit_transaction(transaction)
     print(response)
 
+stellar-contract-bindings
+-------------------------
+stellar-contract-bindings allows you to generate Python bindings for Stellar Soroban smart contracts, it makes calling
+Stellar Soroban contracts easier. click `here <https://github.com/lightsail-network/stellar-contract-bindings>`__ for more information.
+
 stellar-model
 -------------
 stellar-model allows you to parse the JSON returned by Stellar Horizon
