@@ -19,6 +19,9 @@ class ContractClientAsync:
     This client is a wrapper for :py:class:`TransactionBuilder <stellar_sdk.TransactionBuilder>` and :py:class:`SorobanServerAsync <stellar_sdk.SorobanServerAsync>`.
     If you need more fine-grained control, please consider using them directly.
 
+    I strongly recommend that you do not use this client directly, but instead use `stellar-contract-bindings <https://github.com/lightsail-network/stellar-contract-bindings>`_ to
+    generate contract binding code, which will make calling the contract much simpler.
+
     :param contract_id: The ID of the Soroban contract.
     :param rpc_url: The URL of the RPC server.
     :param network_passphrase: The network passphrase.
@@ -30,7 +33,7 @@ class ContractClientAsync:
         contract_id: str,
         rpc_url: str,
         network_passphrase: str,
-        request_client: BaseAsyncClient = None,
+        request_client: Optional[BaseAsyncClient] = None,
     ):
         self.contract_id = contract_id
         self.rpc_url = rpc_url
@@ -40,9 +43,9 @@ class ContractClientAsync:
     async def invoke(
         self,
         function_name: str,
-        parameters: Sequence[stellar_xdr.SCVal] = None,
+        parameters: Optional[Sequence[stellar_xdr.SCVal]] = None,
         source: Union[str, MuxedAccount] = NULL_ACCOUNT,
-        signer: Keypair = None,
+        signer: Optional[Keypair] = None,
         parse_result_xdr_fn: Optional[Callable[[stellar_xdr.SCVal], T]] = None,
         base_fee: int = 100,
         transaction_timeout: int = 300,
@@ -86,7 +89,7 @@ class ContractClientAsync:
         source: Union[str, MuxedAccount],
         signer: Keypair,
         soroban_server: SorobanServerAsync,
-        network_passphrase: str = None,
+        network_passphrase: Optional[str] = None,
         base_fee: int = 100,
         transaction_timeout: int = 300,
         submit_timeout: int = 120,
@@ -132,7 +135,7 @@ class ContractClientAsync:
         soroban_server: SorobanServerAsync,
         constructor_args: Optional[Sequence[stellar_xdr.SCVal]] = None,
         salt: Optional[bytes] = None,
-        network_passphrase: str = None,
+        network_passphrase: Optional[str] = None,
         base_fee: int = 100,
         transaction_timeout: int = 300,
         submit_timeout: int = 120,
@@ -181,7 +184,7 @@ class ContractClientAsync:
         source: Union[str, MuxedAccount],
         signer: Keypair,
         soroban_server: SorobanServerAsync,
-        network_passphrase: str = None,
+        network_passphrase: Optional[str] = None,
         base_fee: int = 100,
         submit_timeout: int = 120,
     ) -> str:
