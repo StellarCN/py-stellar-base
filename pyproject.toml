@@ -53,6 +53,7 @@ requests = "^2.32.3"
 aiohttp = { version = "^3.9.1", optional = true}
 aiohttp-sse-client = { version = "^0.2.1", optional = true}
 mnemonic = "^0.20"
+shamir-mnemonic = "^0.3.0"
 toml = "^0.10.2"
 pydantic = "^2.5.2"
 xdrlib3 = "^0.1.1"

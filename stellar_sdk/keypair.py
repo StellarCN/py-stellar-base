@@ -2,6 +2,7 @@ import os
 from typing import Optional, Union
 
 import nacl.signing as ed25519
+import shamir_mnemonic
 from nacl.exceptions import BadSignatureError as NaclBadSignatureError
 
 from . import xdr as stellar_xdr
@@ -24,6 +25,7 @@ class Keypair:
     * :meth:`Keypair.from_secret`
     * :meth:`Keypair.from_public_key`
     * :meth:`Keypair.from_mnemonic_phrase`
+    * :meth:`Keypair.from_shamir_mnemonic_phrases`
 
     Learn how to create a key through our documentation:
     `Generate Keypair <https://stellar-sdk.readthedocs.io/en/latest/generate_keypair.html>`__.
@@ -255,6 +257,54 @@ class Keypair:
             mnemonic_phrase, passphrase, index
         )
         return cls.from_raw_ed25519_seed(raw_ed25519_seed)
+
+    @staticmethod
+    def generate_shamir_mnemonic_phrases(
+        member_threshold: int, member_count: int, passphrase: str = ""
+    ) -> list[str]:
+        """Generate mnemonic phrases using Shamir secret sharing method.
+
+        A randomly generated secret key is generated and split into `member_count`
+        mnemonic phrases. The secret key can be later reconstructed using any
+        subset of `member_threshold` phrases.
+
+        :param member_threshold: Number of members required to reconstruct the secret key.
+        :param member_count: Number of shares the secret is split into.
+        :param passphrase: An optional passphrase used to decrypt the secret key.
+        :return: A list of mnemonic phrases.
+        """
+        if member_count < member_threshold:
+            raise ValueError(
+                "There must be more members than the set threshold: "
+                "``member_count > member_threshold``."
+            )
+        secrets = Keypair.random().secret.encode()
+        return shamir_mnemonic.generate_mnemonics(
+            group_threshold=1,
+            groups=[(member_threshold, member_count)],
+            master_secret=secrets,
+            passphrase=passphrase.encode(),
+        )[0]
+
+    @classmethod
+    def from_shamir_mnemonic_phrases(
+        cls,
+        mnemonic_phrases: list[str],
+        passphrase: str = "",
+    ) -> "Keypair":
+        """Generate a :class:`Keypair` object via a list of mnemonic phrases.
+
+        :param mnemonic_phrases: A list of unique strings used to deterministically generate a keypair.
+        :param passphrase: An optional passphrase used to decrypt the secret key.
+        :return: A new :class:`Keypair` object derived from the mnemonic phrases.
+        """
+        try:
+            secret = shamir_mnemonic.combine_mnemonics(
+                mnemonics=mnemonic_phrases, passphrase=passphrase.encode()
+            )
+        except shamir_mnemonic.utils.MnemonicError as exc:
+            raise ValueError(exc) from exc
+        return cls.from_secret(secret.decode())
 
     def sign_decorated(self, data: bytes) -> DecoratedSignature:
         """Sign the provided data with the keypair's private key and returns DecoratedSignature.
