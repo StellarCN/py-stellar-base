@@ -1,8 +1,7 @@
 import os
-from typing import Optional, Union
+from typing import Iterable, Optional, Union
 
 import nacl.signing as ed25519
-import shamir_mnemonic
 from nacl.exceptions import BadSignatureError as NaclBadSignatureError
 
 from . import xdr as stellar_xdr
@@ -273,6 +272,12 @@ class Keypair:
         :param passphrase: An optional passphrase used to decrypt the secret key.
         :return: A list of mnemonic phrases.
         """
+        try:
+            import shamir_mnemonic  # noqa: F401
+        except ModuleNotFoundError as exc:
+            message = "shamir_mnemonic must be installed to use method `generate_shamir_mnemonic_phrases`."
+            raise ModuleNotFoundError(message) from exc
+
         if member_count < member_threshold:
             raise ValueError(
                 "There must be more members than the set threshold: "
@@ -289,7 +294,7 @@ class Keypair:
     @classmethod
     def from_shamir_mnemonic_phrases(
         cls,
-        mnemonic_phrases: list[str],
+        mnemonic_phrases: Iterable[str],
         passphrase: str = "",
         index: int = 0,
     ) -> "Keypair":
@@ -302,6 +307,12 @@ class Keypair:
             mnemonic.
         :return: A new :class:`Keypair` object derived from the mnemonic phrases.
         """
+        try:
+            import shamir_mnemonic  # noqa: F401
+        except ModuleNotFoundError as exc:
+            message = "shamir_mnemonic must be installed to use method `from_shamir_mnemonic_phrases`."
+            raise ModuleNotFoundError(message) from exc
+
         try:
             main_seed = shamir_mnemonic.combine_mnemonics(
                 mnemonics=mnemonic_phrases, passphrase=passphrase.encode()
