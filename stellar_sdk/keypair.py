@@ -278,18 +278,18 @@ class Keypair:
             message = "shamir_mnemonic must be installed to use method `generate_shamir_mnemonic_phrases`."
             raise ModuleNotFoundError(message) from exc
 
-        if member_count < member_threshold:
-            raise ValueError(
-                "There must be more members than the set threshold: "
-                "``member_count > member_threshold``."
-            )
         secrets = Keypair.random().secret.encode()
-        return shamir_mnemonic.generate_mnemonics(
-            group_threshold=1,
-            groups=[(member_threshold, member_count)],
-            master_secret=secrets,
-            passphrase=passphrase.encode(),
-        )[0]
+        try:
+            phrases = shamir_mnemonic.generate_mnemonics(
+                group_threshold=1,
+                groups=[(member_threshold, member_count)],
+                master_secret=secrets,
+                passphrase=passphrase.encode(),
+            )[0]
+        except shamir_mnemonic.utils.MnemonicError as exc:
+            raise ValueError(exc) from exc
+
+        return phrases
 
     @classmethod
     def from_shamir_mnemonic_phrases(
