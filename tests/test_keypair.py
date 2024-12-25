@@ -1,3 +1,5 @@
+import itertools
+
 import pytest
 
 from stellar_sdk import Keypair, StrKey
@@ -518,6 +520,27 @@ class TestKeypair:
             assert Keypair.from_mnemonic_phrase(
                 mnemonic_phrase=mnemonic, language=language
             )
+
+    @pytest.mark.parametrize(
+        "public_key, index",
+        [
+            ("GDZ4GYLVRLM2E6CGCOVYXAYMXJJAV3IHDXU6RUHX5AJVYS4AE6R6CHPJ", 0),  # m/44h/148h/0h
+            ("GCMZKXAAPQ3TDY5P7QDUVJBW66R2DGT7AM6MA3MCQENIF37E25U2PEK3", 1),
+            ("GCF7DAVTXXVQPOSB5TCA2CIFT7DZIPK23NCOV3RJ6FTYTZM6S6RPPACM", 100),
+        ]
+    )
+    def test_shamir_mnemonic(self, public_key, index):
+        # generated from Trezor Safe 3
+        shares = [
+            "glimpse buyer academic acid branch sled disaster sunlight material junction float emperor intend priority scene trash remember radar prospect dryer",
+            "glimpse buyer academic agency burden payroll alpha oven large amount smear forward pharmacy symbolic junk axle exercise segment frequent axle",
+            "glimpse buyer academic always careful become dance teaspoon daisy orange careful steady boundary exceed robin remind software grin space advocate",
+        ]
+        passphrase = "9012"
+
+        for perms in itertools.permutations(shares, 2):
+            kp = Keypair.from_shamir_mnemonic_phrases(perms, index=index, passphrase=passphrase)
+            assert kp.public_key == public_key
 
     def test_xdr_public_key(self):
         public_key = "GBRF6PKZYP4J4WI2A3NF4CGF23SL34GRKA5LTQZCQFEUT2YJDZO2COXH"
