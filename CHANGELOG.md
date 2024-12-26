@@ -3,6 +3,9 @@ Release History
 
 ### Pending
 
+#### Update
+- feat: Add optional support for Shamir Secret Sharing with `Keypair.from_shamir_mnemonic_phrases` and `Keypair.generate_shamir_mnemonic_phrases`. ([#1010](https://github.com/StellarCN/py-stellar-base/pull/1010))
+
 ### Version 12.0.0
 
 Released on November 28, 2024

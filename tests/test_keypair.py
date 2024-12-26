@@ -1,3 +1,5 @@
+import itertools
+
 import pytest
 
 from stellar_sdk import Keypair, StrKey
@@ -517,6 +519,93 @@ class TestKeypair:
         ):
             assert Keypair.from_mnemonic_phrase(
                 mnemonic_phrase=mnemonic, language=language
+            )
+
+    @pytest.mark.parametrize(
+        "public_key, index",
+        [
+            (
+                "GDZ4GYLVRLM2E6CGCOVYXAYMXJJAV3IHDXU6RUHX5AJVYS4AE6R6CHPJ",
+                0,
+            ),  # m/44h/148h/0h
+            ("GCMZKXAAPQ3TDY5P7QDUVJBW66R2DGT7AM6MA3MCQENIF37E25U2PEK3", 1),
+            ("GCF7DAVTXXVQPOSB5TCA2CIFT7DZIPK23NCOV3RJ6FTYTZM6S6RPPACM", 100),
+        ],
+    )
+    def test_from_shamir_mnemonic_phrases(self, public_key, index):
+        # generated from Trezor Safe 3
+        shares = [
+            "glimpse buyer academic acid branch sled disaster sunlight material junction float emperor intend priority scene trash remember radar prospect dryer",
+            "glimpse buyer academic agency burden payroll alpha oven large amount smear forward pharmacy symbolic junk axle exercise segment frequent axle",
+            "glimpse buyer academic always careful become dance teaspoon daisy orange careful steady boundary exceed robin remind software grin space advocate",
+        ]
+        passphrase = "9012"
+
+        for perms in itertools.permutations(shares, 2):
+            kp = Keypair.from_shamir_mnemonic_phrases(
+                perms, index=index, passphrase=passphrase
+            )
+            assert kp.public_key == public_key
+
+    def test_raise_from_shamir_mnemonic_phrases(self):
+        shares = [
+            "glimpse buyer academic acid branch sled disaster sunlight material junction float emperor intend priority scene trash remember radar prospect dryer",
+            "glimpse buyer academic agency burden payroll alpha oven large amount smear forward pharmacy symbolic junk axle exercise segment frequent axle",
+            "glimpse buyer academic always careful become dance teaspoon daisy orange careful steady boundary exceed robin remind software grin space advocate",
+        ]
+        _ = Keypair.from_shamir_mnemonic_phrases(shares[:-1])  # validate good run
+
+        with pytest.raises(ValueError, match="Wrong number of mnemonics"):
+            Keypair.from_shamir_mnemonic_phrases(shares)
+
+        with pytest.raises(ValueError, match="Wrong number of mnemonics"):
+            Keypair.from_shamir_mnemonic_phrases([shares[0]])
+
+        with pytest.raises(ValueError, match="mnemonic word"):
+            Keypair.from_shamir_mnemonic_phrases([shares[0], shares[1] + "a"])
+
+        # remove first word
+        shares_1 = "buyer academic agency burden payroll alpha oven large amount smear forward pharmacy symbolic junk axle exercise segment frequent axle"
+        with pytest.raises(ValueError, match="mnemonic length"):
+            Keypair.from_shamir_mnemonic_phrases([shares[0], shares_1])
+
+        # another first word
+        shares_1 = "acid buyer academic agency burden payroll alpha oven large amount smear forward pharmacy symbolic junk axle exercise segment frequent axle"
+        with pytest.raises(ValueError, match="mnemonic checksum"):
+            Keypair.from_shamir_mnemonic_phrases([shares[0], shares_1])
+
+    @pytest.mark.parametrize(
+        "member_threshold, member_count, passphrase",
+        [
+            (1, 1, ""),
+            (1, 1, "abcde"),
+            (2, 3, "0"),
+        ],
+    )
+    def test_generate_shamir_mnemonic_phrases(
+        self, member_threshold, member_count, passphrase
+    ):
+        Keypair.generate_shamir_mnemonic_phrases(
+            member_threshold=member_threshold,
+            member_count=member_count,
+            passphrase=passphrase,
+        )
+
+    @pytest.mark.parametrize(
+        "member_threshold, member_count, err_msg",
+        [
+            (0, 1, "threshold must be a positive"),
+            (1, 2, "multiple member shares with member threshold 1"),
+            (2, 1, "threshold must not exceed the number of shares"),
+            (3, 1000, "shares must not exceed 16"),
+        ],
+    )
+    def test_raise_generate_shamir_mnemonic_phrases(
+        self, member_threshold, member_count, err_msg
+    ):
+        with pytest.raises(ValueError, match=err_msg):
+            Keypair.generate_shamir_mnemonic_phrases(
+                member_threshold=member_threshold, member_count=member_count
             )
 
     def test_xdr_public_key(self):
