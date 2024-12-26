@@ -67,7 +67,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          poetry install --extras 'aiohttp'
+          poetry install --with dev --all-extras
 
       - name: Echo installed packages
         run: |
@@ -110,7 +110,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          poetry install --extras 'aiohttp'
+          poetry install --with dev --all-extras
 
       - name: Echo installed packages
         run: |
