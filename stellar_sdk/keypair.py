@@ -1,5 +1,5 @@
 import os
-from typing import Iterable, Optional, Union
+from typing import Iterable, List, Optional, Union
 
 import nacl.signing as ed25519
 from nacl.exceptions import BadSignatureError as NaclBadSignatureError
@@ -260,7 +260,7 @@ class Keypair:
     @staticmethod
     def generate_shamir_mnemonic_phrases(
         member_threshold: int, member_count: int, passphrase: str = ""
-    ) -> list[str]:
+    ) -> List[str]:
         """Generate mnemonic phrases using Shamir secret sharing method.
 
         A randomly generated secret key is generated and split into `member_count`
