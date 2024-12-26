@@ -30,7 +30,6 @@ jobs:
           { os: 'ubuntu-latest',  python-version: '3.11' },
           { os: 'ubuntu-latest',  python-version: '3.12' },
           { os: 'ubuntu-latest',  python-version: '3.13' },
-          { os: 'ubuntu-latest',  python-version: 'pypy3.8' },
           { os: 'ubuntu-latest',  python-version: 'pypy3.9' },
           { os: 'ubuntu-latest',  python-version: 'pypy3.10' },
           { os: 'macos-latest',  python-version: '3.8' },
@@ -39,7 +38,6 @@ jobs:
           { os: 'macos-latest',  python-version: '3.11' },
           { os: 'macos-latest',  python-version: '3.12' },
           { os: 'macos-latest',  python-version: '3.13' },
-          { os: 'macos-latest',  python-version: 'pypy3.8' },
           { os: 'macos-latest',  python-version: 'pypy3.9' },
           { os: 'macos-latest',  python-version: 'pypy3.10' },
           { os: 'windows-latest',  python-version: '3.8' },
@@ -57,13 +55,13 @@ jobs:
         run: |
           curl https://httpbinx.fly.dev/ip
 
-      - name: Install poetry
-        run: pipx install poetry
-
       - name: Setup Python ${{ matrix.platform.python-version }} on ${{ matrix.platform.os }}
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.platform.python-version }}
+
+      - name: Install poetry
+        run: pip install poetry
 
       - name: Install dependencies
         run: |
@@ -100,13 +98,13 @@ jobs:
         run: |
           curl https://httpbinx.fly.dev/ip
 
-      - name: Install poetry
-        run: pipx install poetry
-
       - name: Setup Python 3.13
         uses: actions/setup-python@v5
         with:
           python-version: 3.13
+
+      - name: Install poetry
+        run: pip install poetry
 
       - name: Install dependencies
         run: |
@@ -137,8 +135,13 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      - name: Setup Python 3.13
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.13
+
       - name: Install poetry
-        run: pipx install poetry
+        run: pip install poetry
 
       - name: Build Packages
         run: poetry build
