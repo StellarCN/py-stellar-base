@@ -47,6 +47,7 @@ class StellarMnemonic(Mnemonic):
         super().__init__(language)
 
     def to_seed(self, mnemonic: str, passphrase: str = "", index: int = 0) -> bytes:  # type: ignore[override]
+        """Derive an ED25519 key from a mnemonic."""
         if not self.check(mnemonic):
             raise ValueError(
                 "Invalid mnemonic, please check if the mnemonic is correct, "
@@ -71,6 +72,7 @@ class StellarMnemonic(Mnemonic):
 
     @staticmethod
     def derive(seed: bytes, index: int) -> bytes:
+        """Derive an ED25519 key from a BIP-39 seed."""
         # References https://github.com/satoshilabs/slips/blob/master/slip-0010.md
         master_hmac = hmac.new(StellarMnemonic.SEED_MODIFIER, digestmod=hashlib.sha512)
         master_hmac.update(seed)
