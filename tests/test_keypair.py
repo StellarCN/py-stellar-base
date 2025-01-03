@@ -1,6 +1,7 @@
 import itertools
 
 import pytest
+import shamir_mnemonic
 
 from stellar_sdk import Keypair, StrKey
 from stellar_sdk.exceptions import (
@@ -9,7 +10,7 @@ from stellar_sdk.exceptions import (
     Ed25519SecretSeedInvalidError,
     MissingEd25519SecretSeedError,
 )
-from stellar_sdk.sep.mnemonic import Language
+from stellar_sdk.sep.mnemonic import Language, StellarMnemonic
 
 SEP_5_CASES = (
     {
@@ -608,6 +609,43 @@ class TestKeypair:
             Keypair.generate_shamir_mnemonic_phrases(
                 member_threshold=member_threshold, member_count=member_count
             )
+
+    def test_shamir_sep5(self):
+        for case in SEP_5_CASES:
+            mnemonic, passphrase, accounts = (
+                case["mnemonic"],
+                case["passphrase"],
+                case["accounts"],
+            )
+
+            # BIP-39 seed from mnemonic
+            seed_raw = StellarMnemonic().to_bip39_seed(
+                mnemonic=mnemonic, passphrase=passphrase
+            )
+
+            # Shamir from the BIP-39 seed
+            shamir_phrases = shamir_mnemonic.generate_mnemonics(
+                group_threshold=1,
+                groups=[(2, 3)],
+                master_secret=seed_raw,
+                passphrase=passphrase.encode(),
+            )[0]
+
+            # consistency checks
+            for perms in itertools.permutations(shamir_phrases, 2):
+                for idx in range(10):
+                    reconstructed_kp = Keypair.from_shamir_mnemonic_phrases(
+                        mnemonic_phrases=perms, passphrase=passphrase, index=idx
+                    )
+
+                    kp = Keypair.from_mnemonic_phrase(
+                        mnemonic_phrase=mnemonic, passphrase=passphrase, index=idx
+                    )
+                    assert reconstructed_kp.public_key == kp.public_key
+                    assert reconstructed_kp.secret == kp.secret
+
+                    assert reconstructed_kp.public_key == accounts[idx][0]
+                    assert reconstructed_kp.secret == accounts[idx][1]
 
     def test_xdr_public_key(self):
         public_key = "GBRF6PKZYP4J4WI2A3NF4CGF23SL34GRKA5LTQZCQFEUT2YJDZO2COXH"
