@@ -577,37 +577,51 @@ class TestKeypair:
             Keypair.from_shamir_mnemonic_phrases([shares[0], shares_1])
 
     @pytest.mark.parametrize(
-        "member_threshold, member_count, passphrase",
+        "member_threshold, member_count, strength, n_words, passphrase",
         [
-            (1, 1, ""),
-            (1, 1, "abcde"),
-            (2, 3, "0"),
+            (1, 1, 128, 20, ""),
+            (1, 1, 128, 20, "abcde"),
+            (2, 3, 256, 33, "0"),
+            (3, 4, 128, 20, ""),
         ],
     )
     def test_generate_shamir_mnemonic_phrases(
-        self, member_threshold, member_count, passphrase
+        self, member_threshold, member_count, strength, n_words, passphrase
     ):
-        Keypair.generate_shamir_mnemonic_phrases(
+        mnemonic_phrases = Keypair.generate_shamir_mnemonic_phrases(
             member_threshold=member_threshold,
             member_count=member_count,
             passphrase=passphrase,
+            strength=strength,
         )
 
+        assert len(mnemonic_phrases) == member_count
+        for member in mnemonic_phrases:
+            assert len(member.split(" ")) == n_words
+
+        for perms in itertools.permutations(mnemonic_phrases, member_threshold):
+            Keypair.from_shamir_mnemonic_phrases(
+                mnemonic_phrases=perms, passphrase=passphrase
+            )
+
     @pytest.mark.parametrize(
-        "member_threshold, member_count, err_msg",
+        "member_threshold, member_count, strength, err_msg",
         [
-            (0, 1, "threshold must be a positive"),
-            (1, 2, "multiple member shares with member threshold 1"),
-            (2, 1, "threshold must not exceed the number of shares"),
-            (3, 1000, "shares must not exceed 16"),
+            (0, 1, 128, "threshold must be a positive"),
+            (1, 2, 128, "multiple member shares with member threshold 1"),
+            (2, 1, 128, "threshold must not exceed the number of shares"),
+            (3, 1000, 128, "shares must not exceed 16"),
+            (1, 1, 42, "Strength should be"),
         ],
     )
     def test_raise_generate_shamir_mnemonic_phrases(
-        self, member_threshold, member_count, err_msg
+        self, member_threshold, member_count, strength, err_msg
     ):
         with pytest.raises(ValueError, match=err_msg):
             Keypair.generate_shamir_mnemonic_phrases(
-                member_threshold=member_threshold, member_count=member_count
+                member_threshold=member_threshold,
+                member_count=member_count,
+                strength=strength,
             )
 
     def test_shamir_sep5(self):
