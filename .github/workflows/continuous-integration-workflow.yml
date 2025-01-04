@@ -15,7 +15,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.13'
-      - uses: pre-commit/action@v3.0.0
+      - uses: pre-commit/action@v3.0.1
 
   test:
     needs: pre-commit
@@ -49,7 +49,7 @@ jobs:
         ]
     runs-on: ${{ matrix.platform.os }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Wake up httpbin server
         run: |
@@ -92,7 +92,7 @@ jobs:
           --health-timeout 5s
           --health-retries 50
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Wake up httpbin server
         run: |
@@ -118,13 +118,12 @@ jobs:
         run: poetry run pytest -v -rs tests --runslow --integration --cov=./ --cov-report=xml
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          file: ./coverage.xml
+          files: ./coverage.xml
           flags: unittests
           name: codecov-umbrella
-          fail_ci_if_error: true
 
   deploy:
     needs: [ test, integration ]
@@ -133,7 +132,7 @@ jobs:
     permissions:
       id-token: write
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Setup Python 3.13
         uses: actions/setup-python@v5
