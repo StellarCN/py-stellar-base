@@ -62,7 +62,7 @@ Vou can also generate a mnemonic phrase and later use it to generate a keypair:
    print(f"Public Key: {keypair.public_key}")
    print(f"Secret Seed: {keypair.secret}")
 
-Lastly, you can also use the Shamir secret shamir method to split a mnemonic
+Lastly, you can also use the Shamir secret sharing method to split a mnemonic
 phrase into multiple phrases. In the following example, we need exactly 2
 phrases in order to reconstruct the secret:
 
@@ -76,3 +76,21 @@ phrases in order to reconstruct the secret:
    keypair = Keypair.from_shamir_mnemonic_phrases(mnemonic_phrases[:2])  # any combinations
    print(f"Public Key: {keypair.public_key}")
    print(f"Secret Seed: {keypair.secret}")
+
+If you want to convert an existing mnemonic phrase to Shamir, you need to get
+the corresponding BIP-39 seed. You can use these lower level functions:
+
+.. code-block:: python
+   :linenos:
+
+   import shamir_mnemonic
+   from stellar_sdk.sep.mnemonic import StellarMnemonic
+
+   seed_raw = StellarMnemonic("english").to_bip39_seed(mnemonic=mnemonic, passphrase=passphrase)
+   mnemonic_phrases = shamir_mnemonic.generate_mnemonics(
+       group_threshold=1,
+       groups=[(2, 3)],
+       master_secret=seed_raw,
+       passphrase=passphrase.encode(),
+   )[0]
+   print(f"Mnemonic phrases: {mnemonic_phrases}")
