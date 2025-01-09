@@ -632,12 +632,10 @@ class TestKeypair:
                 case["accounts"],
             )
 
-            # BIP-39 seed from mnemonic
-            seed_raw = StellarMnemonic().to_bip39_seed(
-                mnemonic=mnemonic, passphrase=passphrase
-            )
+            # Entropy from mnemonic
+            seed_raw = StellarMnemonic().to_entropy(mnemonic)
 
-            # Shamir from the BIP-39 seed
+            # Shamir from the entropy
             shamir_phrases = shamir_mnemonic.generate_mnemonics(
                 group_threshold=1,
                 groups=[(2, 3)],

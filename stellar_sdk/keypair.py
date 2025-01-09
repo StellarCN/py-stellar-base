@@ -292,12 +292,12 @@ class Keypair:
                 f"Strength should be one of the following (128, 160, 192, 224, 256), but it is not ({strength})."
             )
 
-        bip39_seed = os.urandom(strength // 8)
+        entropy = os.urandom(strength // 8)
         try:
             phrases = shamir_mnemonic.generate_mnemonics(
                 group_threshold=1,
                 groups=[(member_threshold, member_count)],
-                master_secret=bip39_seed,
+                master_secret=entropy,
                 passphrase=passphrase.encode(),
             )[0]
         except shamir_mnemonic.utils.MnemonicError as exc:
@@ -328,14 +328,14 @@ class Keypair:
             raise ModuleNotFoundError(message) from exc
 
         try:
-            # Shamir -> BIP-39 seed
+            # Shamir -> entropy
             main_seed = shamir_mnemonic.combine_mnemonics(
                 mnemonics=mnemonic_phrases, passphrase=passphrase.encode()
             )
         except shamir_mnemonic.utils.MnemonicError as exc:
             raise ValueError(exc) from exc
 
-        # BIP-39 -> SLIP-10 -> ED25519
+        # Entropy -> SLIP-10 -> ED25519
         derived_seed = StellarMnemonic.derive(seed=main_seed, index=index)
         return cls.from_raw_ed25519_seed(derived_seed)
 

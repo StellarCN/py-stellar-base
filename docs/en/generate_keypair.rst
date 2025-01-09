@@ -78,7 +78,7 @@ phrases in order to reconstruct the secret:
    print(f"Secret Seed: {keypair.secret}")
 
 If you want to convert an existing mnemonic phrase to Shamir, you need to get
-the corresponding BIP-39 seed. You can use these lower level functions:
+the corresponding entropy. You can use these lower level functions:
 
 .. code-block:: python
    :linenos:
@@ -86,7 +86,7 @@ the corresponding BIP-39 seed. You can use these lower level functions:
    import shamir_mnemonic
    from stellar_sdk.sep.mnemonic import StellarMnemonic
 
-   seed_raw = StellarMnemonic("english").to_bip39_seed(mnemonic=mnemonic, passphrase=passphrase)
+   seed_raw = StellarMnemonic("english").to_entropy(mnemonic)
    mnemonic_phrases = shamir_mnemonic.generate_mnemonics(
        group_threshold=1,
        groups=[(2, 3)],
