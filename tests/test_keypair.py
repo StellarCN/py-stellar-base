@@ -633,7 +633,7 @@ class TestKeypair:
             )
 
             # Entropy from mnemonic
-            seed_raw = StellarMnemonic().to_entropy(mnemonic)
+            seed_raw = StellarMnemonic().to_bip39_seed(mnemonic, passphrase=passphrase)
 
             # Shamir from the entropy
             shamir_phrases = shamir_mnemonic.generate_mnemonics(
@@ -641,7 +641,7 @@ class TestKeypair:
                 groups=[(2, 3)],
                 master_secret=seed_raw,
                 passphrase=passphrase.encode(),
-            )
+            )[0]
 
             # consistency checks
             for perms in itertools.permutations(shamir_phrases, 2):
