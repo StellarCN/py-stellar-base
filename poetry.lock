@@ -976,13 +976,13 @@ files = [
 
 [[package]]
 name = "pydantic"
-version = "2.10.4"
+version = "2.10.5"
 description = "Data validation using Python type hints"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "pydantic-2.10.4-py3-none-any.whl", hash = "sha256:597e135ea68be3a37552fb524bc7d0d66dcf93d395acd93a00682f1efcb8ee3d"},
-    {file = "pydantic-2.10.4.tar.gz", hash = "sha256:82f12e9723da6de4fe2ba888b5971157b3be7ad914267dea8f05f82b28254f06"},
+    {file = "pydantic-2.10.5-py3-none-any.whl", hash = "sha256:4dd4e322dbe55472cb7ca7e73f4b63574eecccf2835ffa2af9021ce113c83c53"},
+    {file = "pydantic-2.10.5.tar.gz", hash = "sha256:278b38dbbaec562011d659ee05f63346951b3a248a6f3642e1bc68894ea2b4ff"},
 ]
 
 [package.dependencies]
@@ -1258,17 +1258,17 @@ fixture = ["fixtures"]
 
 [[package]]
 name = "requests-sse"
-version = "0.3.2"
+version = "0.5.0"
 description = "server-sent events python client library based on requests"
 optional = false
 python-versions = "<4.0,>=3.7"
 files = [
-    {file = "requests_sse-0.3.2-py3-none-any.whl", hash = "sha256:c3399b689f6e7bf0eac7c2031211d66ffbb3ab77afc6c9226a71c73c06609f61"},
-    {file = "requests_sse-0.3.2.tar.gz", hash = "sha256:3e17bd324e500c9b11c7c23dd00af3f0222070328134bda67a8917985cfc4127"},
+    {file = "requests_sse-0.5.0-py3-none-any.whl", hash = "sha256:549c21737f64ceb01859d08fe286e213a128748395ae5badbe2d734b25dbc5e0"},
+    {file = "requests_sse-0.5.0.tar.gz", hash = "sha256:9b22282b44ce340a5243f9ec82f62daa573d57f8f9f08acf8e4c7cd9bac701a2"},
 ]
 
 [package.dependencies]
-requests = ">=2.31.0,<3.0.0"
+requests = ">=2.0.0,<3.0.0"
 
 [[package]]
 name = "shamir-mnemonic"
@@ -1511,4 +1511,4 @@ shamir = ["shamir-mnemonic"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.8,<4.0"
-content-hash = "22495c8162238ab31774b1e5aa9fbb17b2606b5c9b48a1979f8568f406cbcefb"
+content-hash = "a517fa8f591d646dff7c26796dabee79e2e133471b3cd8d8e297b93d3e2a9142"
