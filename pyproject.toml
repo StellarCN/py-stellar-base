@@ -68,7 +68,7 @@ pytest = "^8.3.4"
 pytest-cov = "^5.0.0"
 pytest-timeout = "^2.3.1"
 pytest-asyncio = "^0.24.0"
-pytest-httpserver = "^1.1.0"
+pytest-httpserver = "^1.1.1"
 requests-mock = "^1.12.1"
 aioresponses = {git = "https://github.com/pnuckowski/aioresponses.git", rev = "b83af203d5550006fd2328af230c2d93e36c6cb1"}
 
