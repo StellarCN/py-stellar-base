@@ -1479,6 +1479,9 @@ class TransactionBuilder:
         The original intention of this interface design is to send assets to the contract account when the Stellar RPC server is inaccessible.
         Without Stellar RPC, we cannot accurately estimate the required resources, so we have preset some values that may be slightly higher than the actual resource consumption.
 
+        If you encounter the `entry_archived` error when submitting this transaction, you should consider calling the :func:`append_restore_asset_balance_entry_op` method to restore the entry,
+        and then use the :func:`append_payment_to_contract_op` method to send assets again.
+
         .. note::
             1. This method should only be used to send assets to contract addresses (starting with 'C'). For sending assets to regular account addresses (starting with 'G'), please use the :func:`append_payment_op` method.
             2. This method is suitable for sending assets to a contract account when you don't have access to a Stellar RPC server. If you have access to a Stellar RPC server, it is recommended to use the :class:`stellar_sdk.contract.ContractClient` to build transactions for sending tokens to contracts.
@@ -1622,6 +1625,58 @@ class TransactionBuilder:
         )
         self.set_soroban_data(soroban_data)
         return self
+
+    def append_restore_asset_balance_entry_op(
+        self,
+        balance_owner: str,
+        asset: Asset,
+        source: Optional[Union[MuxedAccount, str]] = None,
+        read_bytes: int = 500,
+        write_bytes: int = 500,
+        resource_fee: int = 4_000_000,
+    ) -> "TransactionBuilder":
+        """Append an :class:`RestoreFootprint <stellar_sdk.operation.RestoreFootprint>` operation to restore the asset balance entry.
+
+        This method is designed to be used in conjunction with the :func:`append_payment_to_contract_op` method.
+
+        :param balance_owner: The owner of the asset, it should be the same as the `destination` address in the :func:`append_payment_to_contract_op` method.
+        :param asset: The asset
+        :param source: The source account for the operation. Defaults to the
+            transaction's source account.
+        :param read_bytes: The read bytes required to execute the function.
+        :param write_bytes: The write bytes required to execute the function.
+        :param resource_fee: The maximum fee (in stroops) that can be paid for the
+            resources consumed by the function, defaults to 0.4 XLM.
+        :return: This builder instance.
+        """
+
+        contract_id = asset.contract_id(self.network_passphrase)
+        balance_ledger_key = stellar_xdr.LedgerKey(
+            type=stellar_xdr.LedgerEntryType.CONTRACT_DATA,
+            contract_data=stellar_xdr.LedgerKeyContractData(
+                contract=Address(contract_id).to_xdr_sc_address(),
+                key=stellar_xdr.SCVal(
+                    stellar_xdr.SCValType.SCV_VEC,
+                    vec=scval.to_vec(
+                        [scval.to_symbol("Balance"), scval.to_address(balance_owner)]
+                    ).vec,
+                ),
+                durability=stellar_xdr.ContractDataDurability.PERSISTENT,
+            ),
+        )
+        soroban_data = (
+            SorobanDataBuilder()
+            .set_read_only([])
+            .set_read_write([balance_ledger_key])
+            # This means we may pay up to {resource_fee / 10 ** 7} XLM, excluding fees.
+            .set_resource_fee(resource_fee)
+            # This is higher than actually needed, but the loss is not significant.
+            # We should leave some space to handle various situations, including future contract upgrades.
+            .set_resources(0, read_bytes, write_bytes)
+            .build()
+        )
+        self.set_soroban_data(soroban_data)
+        return self.append_restore_footprint_op(source)
 
     def __repr__(self):
         return (
