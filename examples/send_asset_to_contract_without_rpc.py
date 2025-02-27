@@ -20,6 +20,7 @@ destination = "CDNVQW44C3HALYNVQ4SOBXY5EWYTGVYXX6JPESOLQDABJI5FC5LTRRUE"
 amount = "100.125"
 
 # 1. Try to send payment to a contract
+# example tx: https://stellar.expert/explorer/public/tx/18c62daf7d5a180acee1bb9918eccc2a19343a4f3c7012a9103ff2ba4024cec1
 tx = (
     TransactionBuilder(
         source_account, network_passphrase=network_passphrase, base_fee=base_fee
@@ -50,6 +51,7 @@ except BadRequestError as e:
     ):
         print("The contract has been archived, we need to restore it.")
         # 2. Restore the contract
+        # example tx: https://stellar.expert/explorer/public/tx/6992ccd04593452cb1f236ef266e2e9691cded85722c463aee5a01a1ccc006cf
         tx = (
             TransactionBuilder(
                 source_account, network_passphrase=network_passphrase, base_fee=base_fee
@@ -66,6 +68,7 @@ except BadRequestError as e:
         print("Restore balance entry success! Results:", response)
 
         # 3. Try to send payment to a contract again
+        # example tx: https://stellar.expert/explorer/public/tx/7c2a77d538f803da8cf2b14250c3a41b7fa0f2cf37dd437107e3c825efe60b91
         tx = (
             TransactionBuilder(
                 source_account, network_passphrase=network_passphrase, base_fee=base_fee
