@@ -6,7 +6,7 @@ import warnings
 from decimal import Decimal
 from typing import List, Optional, Sequence, Union
 
-from . import StrKey
+from . import StrKey, scval
 from . import xdr as stellar_xdr
 from .account import Account
 from .address import Address
@@ -1462,6 +1462,223 @@ class TransactionBuilder:
         """
         op = RestoreFootprint(source)
         return self.append_operation(op)
+
+    def append_payment_to_contract_op(
+        self,
+        destination: str,
+        asset: Asset,
+        amount: Union[str, Decimal],
+        instructions: int = 400_000,
+        read_bytes: int = 1_000,
+        write_bytes: int = 1_000,
+        resource_fee: int = 5_000_000,
+        source: Optional[Union[MuxedAccount, str]] = None,
+    ) -> "TransactionBuilder":
+        """Append an :class:`InvokeHostFunction <stellar_sdk.operation.InvokeHostFunction>` operation to send assets to a contract address.
+
+        The original intention of this interface design is to send assets to the contract account when the Stellar RPC server is inaccessible.
+        Without Stellar RPC, we cannot accurately estimate the required resources, so we have preset some values that may be slightly higher than the actual resource consumption.
+
+        If you encounter the `entry_archived` error when submitting this transaction, you should consider calling the :func:`append_restore_asset_balance_entry_op` method to restore the entry,
+        and then use the :func:`append_payment_to_contract_op` method to send assets again.
+
+        You can find the example code in the `examples/send_asset_to_contract_without_rpc.py <https://github.com/StellarCN/py-stellar-base/blob/main/examples/>`__.
+
+        .. note::
+            1. This method should only be used to send assets to contract addresses (starting with 'C'). For sending assets to regular account addresses (starting with 'G'), please use the :func:`append_payment_op` method.
+            2. This method is suitable for sending assets to a contract account when you don't have access to a Stellar RPC server. If you have access to a Stellar RPC server, it is recommended to use the :class:`stellar_sdk.contract.ContractClient` to build transactions for sending tokens to contracts.
+            3. This method may consume slightly more transaction fee than actually required.
+
+        :param destination: The contract address to send the assets to.
+        :param asset: The asset to send.
+        :param amount: The amount of the asset to send.
+        :param instructions: The instructions required to execute the contract function.
+        :param read_bytes: The read bytes required to execute the contract function.
+        :param write_bytes: The write bytes required to execute the contract function.
+        :param resource_fee: The maximum fee (in stroops) that can be paid for the
+            resources consumed by the contract function, defaults to 0.5 XLM.
+            The actual consumption is generally much lower than this value.
+        :param source: The source account for the operation. Defaults to the
+            transaction's source account.
+        :return: This builder instance.
+        """
+        if not StrKey.is_valid_contract(destination):
+            raise ValueError("`destination` is not a valid contract address.")
+
+        from_address = (
+            self.source_account.account.account_id
+            if source is None
+            else (
+                source.account_id
+                if isinstance(source, MuxedAccount)
+                else MuxedAccount.from_account(source).account_id
+            )
+        )
+
+        # https://developers.stellar.org/docs/tokens/token-interface
+        contract_id = asset.contract_id(self.network_passphrase)
+        function_name = "transfer"
+        parameters = [
+            scval.to_address(from_address),  # from
+            scval.to_address(destination),  # to
+            scval.to_int128(Operation.to_xdr_amount(amount)),  # amount
+        ]
+
+        self.append_invoke_contract_function_op(
+            contract_id=contract_id,
+            function_name=function_name,
+            parameters=parameters,
+            auth=[
+                stellar_xdr.SorobanAuthorizationEntry(
+                    credentials=stellar_xdr.SorobanCredentials(
+                        stellar_xdr.SorobanCredentialsType.SOROBAN_CREDENTIALS_SOURCE_ACCOUNT
+                    ),
+                    root_invocation=stellar_xdr.SorobanAuthorizedInvocation(
+                        stellar_xdr.SorobanAuthorizedFunction(
+                            stellar_xdr.SorobanAuthorizedFunctionType.SOROBAN_AUTHORIZED_FUNCTION_TYPE_CONTRACT_FN,
+                            contract_fn=stellar_xdr.InvokeContractArgs(
+                                contract_address=Address(
+                                    contract_id
+                                ).to_xdr_sc_address(),
+                                function_name=stellar_xdr.SCSymbol(
+                                    sc_symbol=function_name.encode("utf-8")
+                                ),
+                                args=parameters,
+                            ),
+                        ),
+                        sub_invocations=[],
+                    ),
+                )
+            ],
+        )
+
+        contract_instance_ledger_key = stellar_xdr.LedgerKey(
+            type=stellar_xdr.LedgerEntryType.CONTRACT_DATA,
+            contract_data=stellar_xdr.LedgerKeyContractData(
+                contract=Address(contract_id).to_xdr_sc_address(),
+                key=stellar_xdr.SCVal(
+                    stellar_xdr.SCValType.SCV_LEDGER_KEY_CONTRACT_INSTANCE
+                ),
+                durability=stellar_xdr.ContractDataDurability.PERSISTENT,
+            ),
+        )
+
+        balance_ledger_key = stellar_xdr.LedgerKey(
+            type=stellar_xdr.LedgerEntryType.CONTRACT_DATA,
+            contract_data=stellar_xdr.LedgerKeyContractData(
+                contract=Address(contract_id).to_xdr_sc_address(),
+                key=stellar_xdr.SCVal(
+                    stellar_xdr.SCValType.SCV_VEC,
+                    vec=scval.to_vec(
+                        [scval.to_symbol("Balance"), scval.to_address(destination)]
+                    ).vec,
+                ),
+                durability=stellar_xdr.ContractDataDurability.PERSISTENT,
+            ),
+        )
+
+        if asset.is_native():
+            read_only = [contract_instance_ledger_key]
+            read_write = [
+                stellar_xdr.LedgerKey(
+                    type=stellar_xdr.LedgerEntryType.ACCOUNT,
+                    account=stellar_xdr.LedgerKeyAccount(
+                        Keypair.from_public_key(from_address).xdr_account_id()
+                    ),
+                ),
+                balance_ledger_key,
+            ]
+        else:
+            assert asset.issuer is not None
+            read_only = [
+                # In theory, it is only needed the first time it is sent to the receiving account,
+                # but here we read it every time to simplify the logic.
+                stellar_xdr.LedgerKey(
+                    type=stellar_xdr.LedgerEntryType.ACCOUNT,
+                    account=stellar_xdr.LedgerKeyAccount(
+                        Keypair.from_public_key(asset.issuer).xdr_account_id()
+                    ),
+                ),
+                contract_instance_ledger_key,
+            ]
+            read_write = [
+                stellar_xdr.LedgerKey(
+                    type=stellar_xdr.LedgerEntryType.TRUSTLINE,
+                    trust_line=stellar_xdr.LedgerKeyTrustLine(
+                        account_id=Keypair.from_public_key(
+                            from_address
+                        ).xdr_account_id(),
+                        asset=asset.to_trust_line_asset_xdr_object(),
+                    ),
+                ),
+                balance_ledger_key,
+            ]
+
+        soroban_data = (
+            SorobanDataBuilder()
+            .set_read_only(read_only)
+            .set_read_write(read_write)
+            # This means we may pay up to {resource_fee / 10 ** 7} XLM, excluding fees.
+            .set_resource_fee(resource_fee)
+            # This is higher than actually needed, but the loss is not significant.
+            # We should leave some space to handle various situations, including future contract upgrades.
+            .set_resources(instructions, read_bytes, write_bytes)
+            .build()
+        )
+        self.set_soroban_data(soroban_data)
+        return self
+
+    def append_restore_asset_balance_entry_op(
+        self,
+        balance_owner: str,
+        asset: Asset,
+        source: Optional[Union[MuxedAccount, str]] = None,
+        read_bytes: int = 500,
+        write_bytes: int = 500,
+        resource_fee: int = 4_000_000,
+    ) -> "TransactionBuilder":
+        """Append an :class:`RestoreFootprint <stellar_sdk.operation.RestoreFootprint>` operation to restore the asset balance entry.
+
+        This method is designed to be used in conjunction with the :func:`append_payment_to_contract_op` method.
+
+        :param balance_owner: The owner of the asset, it should be the same as the `destination` address in the :func:`append_payment_to_contract_op` method.
+        :param asset: The asset
+        :param source: The source account for the operation. Defaults to the
+            transaction's source account.
+        :param read_bytes: The read bytes required to execute the function.
+        :param write_bytes: The write bytes required to execute the function.
+        :param resource_fee: The maximum fee (in stroops) that can be paid for the
+            resources consumed by the function, defaults to 0.4 XLM.
+        :return: This builder instance.
+        """
+
+        contract_id = asset.contract_id(self.network_passphrase)
+        balance_ledger_key = stellar_xdr.LedgerKey(
+            type=stellar_xdr.LedgerEntryType.CONTRACT_DATA,
+            contract_data=stellar_xdr.LedgerKeyContractData(
+                contract=Address(contract_id).to_xdr_sc_address(),
+                key=stellar_xdr.SCVal(
+                    stellar_xdr.SCValType.SCV_VEC,
+                    vec=scval.to_vec(
+                        [scval.to_symbol("Balance"), scval.to_address(balance_owner)]
+                    ).vec,
+                ),
+                durability=stellar_xdr.ContractDataDurability.PERSISTENT,
+            ),
+        )
+        soroban_data = (
+            SorobanDataBuilder()
+            .set_read_only([])
+            .set_read_write([balance_ledger_key])
+            # This means we may pay up to {resource_fee / 10 ** 7} XLM, excluding fees.
+            .set_resource_fee(resource_fee)
+            # This is higher than actually needed, but the loss is not significant.
+            # We should leave some space to handle various situations, including future contract upgrades.
+            .set_resources(0, read_bytes, write_bytes)
+            .build()
+        )
+        self.set_soroban_data(soroban_data)
+        return self.append_restore_footprint_op(source)
 
     def __repr__(self):
         return (

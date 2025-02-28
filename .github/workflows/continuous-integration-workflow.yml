@@ -78,7 +78,7 @@ jobs:
     runs-on: ubuntu-latest
     services:
       rpc:
-        image: stellar/quickstart:testing@sha256:5333ec87069efd7bb61f6654a801dc093bf0aad91f43a5ba84806d3efe4a6322
+        image: stellar/quickstart:latest
         ports:
           - 8000:8000
         env:

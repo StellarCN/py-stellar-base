@@ -20,6 +20,7 @@ from stellar_sdk import (
     Network,
     Preconditions,
     RestoreFootprint,
+    Server,
     SignedPayloadSigner,
     Signer,
     SignerKey,
@@ -32,6 +33,8 @@ from stellar_sdk import (
     scval,
 )
 from stellar_sdk import xdr as stellar_xdr
+
+from . import integration_utils
 
 kp1 = Keypair.from_secret(
     "SAMWF63FZ5ZNHY75SNYNAFMWTL5FPBMIV7DLB3UDAVLL7DKPI5ZFS2S6"
@@ -1005,3 +1008,228 @@ class TestTransaction:
         assert tx.transaction.fee == 425164
         expected_tx = stellar_xdr.TransactionEnvelope.from_xdr(xdr)
         assert tx.to_xdr() == expected_tx.to_xdr()
+
+    @pytest.mark.integration
+    def test_append_payment_to_contract_op_with_native_asset(self):
+        asset = Asset.native()
+        amount1 = "100.125"
+        amount2 = "120.7891"
+        destination = asset.contract_id(
+            integration_utils.NETWORK_PASSPHRASE
+        )  # we use it as the destination, do need to create a new contract
+
+        kp = Keypair.random()
+        integration_utils.fund_account(kp.public_key)
+        integration_utils.create_asset_contract(asset, kp)
+        server = Server(horizon_url=integration_utils.HORIZON_URL)
+        source = server.load_account(kp.public_key)
+        tx1 = (
+            TransactionBuilder(
+                source_account=source,
+                network_passphrase=integration_utils.NETWORK_PASSPHRASE,
+                base_fee=100,
+            )
+            .append_payment_to_contract_op(destination, asset, amount1)
+            .set_timeout(30)
+            .build()
+        )
+        tx1.sign(kp)
+        server.submit_transaction(tx1)
+        assert (
+            integration_utils.get_balance_for_contract(
+                destination, asset, kp.public_key
+            )
+            == 1001250000
+        )
+
+        tx2 = (
+            TransactionBuilder(
+                source_account=source,
+                network_passphrase=integration_utils.NETWORK_PASSPHRASE,
+                base_fee=100,
+            )
+            .append_payment_to_contract_op(destination, asset, amount2)
+            .set_timeout(30)
+            .build()
+        )
+        tx2.sign(kp)
+        server.submit_transaction(tx2)
+        assert (
+            integration_utils.get_balance_for_contract(
+                destination, asset, kp.public_key
+            )
+            == 2209141000
+        )
+
+        # In the e2e environment, it has not expired, but we still try to call it.
+        tx3 = (
+            TransactionBuilder(
+                source_account=source,
+                network_passphrase=integration_utils.NETWORK_PASSPHRASE,
+                base_fee=100,
+            )
+            .append_restore_asset_balance_entry_op(destination, asset)
+            .set_timeout(30)
+            .build()
+        )
+        tx3.sign(kp)
+        server.submit_transaction(tx3)
+
+        server.close()
+
+    @pytest.mark.integration
+    def test_append_payment_to_contract_op_with_alphanum4_asset(self):
+        issuer_kp = Keypair.random()
+        kp = Keypair.random()
+
+        asset = Asset("CAT", issuer_kp.public_key)
+        amount1 = "100.125"
+        amount2 = "120.7891"
+        destination = asset.contract_id(
+            integration_utils.NETWORK_PASSPHRASE
+        )  # we use it as the destination, do need to create a new contract
+
+        integration_utils.fund_account(issuer_kp.public_key)
+        integration_utils.fund_account(kp.public_key)
+        integration_utils.issue_asset(asset.code, issuer_kp, kp, "1000")
+        integration_utils.create_asset_contract(asset, kp)
+        server = Server(horizon_url=integration_utils.HORIZON_URL)
+        source = server.load_account(kp.public_key)
+        tx1 = (
+            TransactionBuilder(
+                source_account=source,
+                network_passphrase=integration_utils.NETWORK_PASSPHRASE,
+                base_fee=100,
+            )
+            .append_payment_to_contract_op(destination, asset, amount1)
+            .set_timeout(30)
+            .build()
+        )
+        tx1.sign(kp)
+        server.submit_transaction(tx1)
+        assert (
+            integration_utils.get_balance_for_contract(
+                destination, asset, kp.public_key
+            )
+            == 1001250000
+        )
+
+        tx2 = (
+            TransactionBuilder(
+                source_account=source,
+                network_passphrase=integration_utils.NETWORK_PASSPHRASE,
+                base_fee=100,
+            )
+            .append_payment_to_contract_op(destination, asset, amount2)
+            .set_timeout(30)
+            .build()
+        )
+        tx2.sign(kp)
+        server.submit_transaction(tx2)
+        assert (
+            integration_utils.get_balance_for_contract(
+                destination, asset, kp.public_key
+            )
+            == 2209141000
+        )
+
+        tx3 = (
+            TransactionBuilder(
+                source_account=source,
+                network_passphrase=integration_utils.NETWORK_PASSPHRASE,
+                base_fee=100,
+            )
+            .append_restore_asset_balance_entry_op(destination, asset)
+            .set_timeout(30)
+            .build()
+        )
+        tx3.sign(kp)
+        server.submit_transaction(tx3)
+
+        server.close()
+
+    @pytest.mark.integration
+    def test_append_payment_to_contract_op_with_alphanum12_asset(self):
+        issuer_kp = Keypair.random()
+        kp = Keypair.random()
+
+        asset = Asset("BANANA", issuer_kp.public_key)
+        amount1 = "100.125"
+        amount2 = "120.7891"
+        destination = asset.contract_id(
+            integration_utils.NETWORK_PASSPHRASE
+        )  # we use it as the destination, do need to create a new contract
+
+        integration_utils.fund_account(issuer_kp.public_key)
+        integration_utils.fund_account(kp.public_key)
+        integration_utils.issue_asset(asset.code, issuer_kp, kp, "1000")
+        integration_utils.create_asset_contract(asset, kp)
+        server = Server(horizon_url=integration_utils.HORIZON_URL)
+        source = server.load_account(kp.public_key)
+        tx1 = (
+            TransactionBuilder(
+                source_account=source,
+                network_passphrase=integration_utils.NETWORK_PASSPHRASE,
+                base_fee=100,
+            )
+            .append_payment_to_contract_op(destination, asset, amount1)
+            .set_timeout(30)
+            .build()
+        )
+        tx1.sign(kp)
+        server.submit_transaction(tx1)
+        assert (
+            integration_utils.get_balance_for_contract(
+                destination, asset, kp.public_key
+            )
+            == 1001250000
+        )
+
+        tx2 = (
+            TransactionBuilder(
+                source_account=source,
+                network_passphrase=integration_utils.NETWORK_PASSPHRASE,
+                base_fee=100,
+            )
+            .append_payment_to_contract_op(destination, asset, amount2)
+            .set_timeout(30)
+            .build()
+        )
+        tx2.sign(kp)
+        server.submit_transaction(tx2)
+        assert (
+            integration_utils.get_balance_for_contract(
+                destination, asset, kp.public_key
+            )
+            == 2209141000
+        )
+
+        tx3 = (
+            TransactionBuilder(
+                source_account=source,
+                network_passphrase=integration_utils.NETWORK_PASSPHRASE,
+                base_fee=100,
+            )
+            .append_restore_asset_balance_entry_op(destination, asset)
+            .set_timeout(30)
+            .build()
+        )
+        tx3.sign(kp)
+        server.submit_transaction(tx3)
+
+        server.close()
+
+    def test_append_payment_to_stellar_address_raise(self):
+        kp = Keypair.random()
+        asset = Asset.native()
+        amount = "100.125"
+        destination = Keypair.random()
+        builder = TransactionBuilder(
+            source_account=Account(kp.public_key, 1),
+            network_passphrase=integration_utils.NETWORK_PASSPHRASE,
+            base_fee=100,
+        )
+        with pytest.raises(
+            ValueError, match="`destination` is not a valid contract address."
+        ):
+            builder.append_payment_to_contract_op(destination.public_key, asset, amount)
