@@ -1482,6 +1482,8 @@ class TransactionBuilder:
         If you encounter the `entry_archived` error when submitting this transaction, you should consider calling the :func:`append_restore_asset_balance_entry_op` method to restore the entry,
         and then use the :func:`append_payment_to_contract_op` method to send assets again.
 
+        You can find the example code in the `examples/send_asset_to_contract_without_rpc.py <https://github.com/StellarCN/py-stellar-base/blob/main/examples/>`__.
+
         .. note::
             1. This method should only be used to send assets to contract addresses (starting with 'C'). For sending assets to regular account addresses (starting with 'G'), please use the :func:`append_payment_op` method.
             2. This method is suitable for sending assets to a contract account when you don't have access to a Stellar RPC server. If you have access to a Stellar RPC server, it is recommended to use the :class:`stellar_sdk.contract.ContractClient` to build transactions for sending tokens to contracts.
@@ -1501,7 +1503,7 @@ class TransactionBuilder:
         :return: This builder instance.
         """
         if not StrKey.is_valid_contract(destination):
-            raise ValueError("`destination` is invalid contract address.")
+            raise ValueError("`destination` is not a valid contract address.")
 
         from_address = (
             self.source_account.account.account_id

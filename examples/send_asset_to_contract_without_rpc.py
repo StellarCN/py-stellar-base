@@ -40,12 +40,15 @@ try:
     print("Success! Results:", response)
 except BadRequestError as e:
     print("Failed to send payment to contract. Results:", e)
+    assert e.result_xdr is not None
     tx_result = stellar_xdr.TransactionResult.from_xdr(e.result_xdr)
     # However, it may fail due to the entry being archived; for this reason, we should try to recover the data entry and then resend the transaction.
     # See https://developers.stellar.org/docs/learn/encyclopedia/storage/state-archival
     if (
         tx_result.result.code == stellar_xdr.TransactionResultCode.txFAILED
+        and tx_result.result.results
         and len(tx_result.result.results) == 1
+        and tx_result.result.results[0].tr
         and tx_result.result.results[0].tr.invoke_host_function_result
         and tx_result.result.results[0].tr.invoke_host_function_result.code
         == stellar_xdr.InvokeHostFunctionResultCode.INVOKE_HOST_FUNCTION_ENTRY_ARCHIVED
