@@ -3,6 +3,9 @@ Release History
 
 ### Pending
 
+#### Update
+- feat: add `TransactionBuilder.append_payment_to_contract_op` and `TransactionBuilder.append_restore_asset_balance_entry_op` to send assets to contract accounts without relying on Stellar RPC. ([#1023](https://github.com/StellarCN/py-stellar-base/pull/1023))
+
 ### Version 12.1.0
 
 Released on December 27, 2024
