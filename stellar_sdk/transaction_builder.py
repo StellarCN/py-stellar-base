@@ -1632,10 +1632,10 @@ class TransactionBuilder:
         self,
         balance_owner: str,
         asset: Asset,
-        source: Optional[Union[MuxedAccount, str]] = None,
         read_bytes: int = 500,
         write_bytes: int = 500,
         resource_fee: int = 4_000_000,
+        source: Optional[Union[MuxedAccount, str]] = None,
     ) -> "TransactionBuilder":
         """Append an :class:`RestoreFootprint <stellar_sdk.operation.RestoreFootprint>` operation to restore the asset balance entry.
 
@@ -1643,12 +1643,12 @@ class TransactionBuilder:
 
         :param balance_owner: The owner of the asset, it should be the same as the `destination` address in the :func:`append_payment_to_contract_op` method.
         :param asset: The asset
-        :param source: The source account for the operation. Defaults to the
-            transaction's source account.
         :param read_bytes: The read bytes required to execute the function.
         :param write_bytes: The write bytes required to execute the function.
         :param resource_fee: The maximum fee (in stroops) that can be paid for the
             resources consumed by the function, defaults to 0.4 XLM.
+        :param source: The source account for the operation. Defaults to the
+            transaction's source account.
         :return: This builder instance.
         """
 
