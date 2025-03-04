@@ -1075,7 +1075,7 @@ class TestTransaction:
 
         server.close()
 
-    @pytest.mark.integrationcre
+    @pytest.mark.integration
     def test_append_payment_to_contract_op_with_alphanum4_asset(self):
         issuer_kp = Keypair.random()
         kp = Keypair.random()
