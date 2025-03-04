@@ -116,7 +116,7 @@ class AssembledTransaction(Generic[T]):
 
         A convenience method combining sign() and submit().
 
-        :param transaction_signer: transaction_signer: Optional keypair to sign with (overrides instance signer)
+        :param transaction_signer: Optional keypair to sign with (overrides instance signer)
         :param force: Whether to sign and submit even if the transaction is a read call
         :return: The value returned by the invoked function, parsed if parse_result_xdr_fn was set, otherwise raw XDR
         """

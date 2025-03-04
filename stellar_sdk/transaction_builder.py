@@ -1483,7 +1483,6 @@ class TransactionBuilder:
         and then use the :func:`append_payment_to_contract_op` method to send assets again.
 
         You can find the example code in the `examples/send_asset_to_contract_without_rpc.py <https://github.com/StellarCN/py-stellar-base/blob/main/examples/>`__.
-
         .. note::
             1. This method should only be used to send assets to contract addresses (starting with 'C'). For sending assets to regular account addresses (starting with 'G'), please use the :func:`append_payment_op` method.
             2. This method is suitable for sending assets to a contract account when you don't have access to a Stellar RPC server. If you have access to a Stellar RPC server, it is recommended to use the :class:`stellar_sdk.contract.ContractClient` to build transactions for sending tokens to contracts.
@@ -1550,6 +1549,7 @@ class TransactionBuilder:
                     ),
                 )
             ],
+            source=source,
         )
 
         contract_instance_ledger_key = stellar_xdr.LedgerKey(

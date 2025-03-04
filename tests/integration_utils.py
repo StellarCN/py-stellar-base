@@ -1,6 +1,9 @@
+import time
+
 import requests
 
 from stellar_sdk import (
+    Account,
     Asset,
     Keypair,
     Network,
@@ -9,7 +12,7 @@ from stellar_sdk import (
     TransactionBuilder,
     scval,
 )
-from stellar_sdk.contract import ContractClient
+from stellar_sdk.contract import AssembledTransaction, ContractClient
 from stellar_sdk.contract.exceptions import SimulationFailedError
 
 RPC_URL = "http://127.0.0.1:8000/soroban/rpc"
@@ -45,35 +48,50 @@ def get_balance_for_contract(contract_id: str, asset: Asset, source: str) -> int
         ).result()
 
 
+def get_random_contract_id(source: Keypair):
+    with SorobanServer(RPC_URL) as server:
+        transaction_builder = (
+            TransactionBuilder(
+                source_account=Account(source.public_key, 0),
+                network_passphrase=NETWORK_PASSPHRASE,
+                base_fee=100,
+            )
+            .append_create_stellar_asset_contract_from_address_op(source.public_key)
+            .set_timeout(300)
+        )
+        contract_id = (
+            AssembledTransaction(
+                transaction_builder,
+                server,
+                source,
+                lambda x: scval.from_address(x).address,
+            )
+            .simulate()
+            .sign_and_submit()
+        )
+        time.sleep(1)  # https://github.com/stellar/quickstart/issues/667
+        return contract_id
+
+
 def issue_asset(asset_code: str, issuer_kp: Keypair, receiver_kp: Keypair, amount: str):
     with Server(HORIZON_URL) as server:
         asset = Asset(asset_code, issuer_kp.public_key)
-        # First, the receiving account must trust the asset
-        trust_transaction = (
+        transaction = (
             TransactionBuilder(
                 source_account=server.load_account(receiver_kp.public_key),
                 network_passphrase=NETWORK_PASSPHRASE,
                 base_fee=100,
             )
-            .append_change_trust_op(asset=asset)
-            .set_timeout(30)
-            .build()
-        )
-
-        trust_transaction.sign(receiver_kp)
-        server.submit_transaction(trust_transaction)
-
-        payment_transaction = (
-            TransactionBuilder(
-                source_account=server.load_account(issuer_kp.public_key),
-                network_passphrase=NETWORK_PASSPHRASE,
-                base_fee=100,
-            )
+            .append_change_trust_op(asset=asset, source=receiver_kp.public_key)
             .append_payment_op(
-                destination=receiver_kp.public_key, amount=amount, asset=asset
+                destination=receiver_kp.public_key,
+                amount=amount,
+                asset=asset,
+                source=issuer_kp.public_key,
             )
             .set_timeout(30)
             .build()
         )
-        payment_transaction.sign(issuer_kp)
-        server.submit_transaction(payment_transaction)
+        transaction.sign(receiver_kp)
+        transaction.sign(issuer_kp)
+        server.submit_transaction(transaction)

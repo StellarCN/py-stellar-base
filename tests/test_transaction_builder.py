@@ -1012,16 +1012,14 @@ class TestTransaction:
     @pytest.mark.integration
     def test_append_payment_to_contract_op_with_native_asset(self):
         asset = Asset.native()
-        amount1 = "100.125"
-        amount2 = "120.7891"
-        destination = asset.contract_id(
-            integration_utils.NETWORK_PASSPHRASE
-        )  # we use it as the destination, do need to create a new contract
-
         kp = Keypair.random()
         integration_utils.fund_account(kp.public_key)
         integration_utils.create_asset_contract(asset, kp)
         server = Server(horizon_url=integration_utils.HORIZON_URL)
+        amount1 = "100.125"
+        amount2 = "120.7891"
+        destination = integration_utils.get_random_contract_id(kp)
+
         source = server.load_account(kp.public_key)
         tx1 = (
             TransactionBuilder(
@@ -1077,7 +1075,7 @@ class TestTransaction:
 
         server.close()
 
-    @pytest.mark.integration
+    @pytest.mark.integrationcre
     def test_append_payment_to_contract_op_with_alphanum4_asset(self):
         issuer_kp = Keypair.random()
         kp = Keypair.random()
@@ -1085,14 +1083,13 @@ class TestTransaction:
         asset = Asset("CAT", issuer_kp.public_key)
         amount1 = "100.125"
         amount2 = "120.7891"
-        destination = asset.contract_id(
-            integration_utils.NETWORK_PASSPHRASE
-        )  # we use it as the destination, do need to create a new contract
 
         integration_utils.fund_account(issuer_kp.public_key)
         integration_utils.fund_account(kp.public_key)
         integration_utils.issue_asset(asset.code, issuer_kp, kp, "1000")
         integration_utils.create_asset_contract(asset, kp)
+        destination = integration_utils.get_random_contract_id(kp)
+
         server = Server(horizon_url=integration_utils.HORIZON_URL)
         source = server.load_account(kp.public_key)
         tx1 = (
@@ -1156,14 +1153,12 @@ class TestTransaction:
         asset = Asset("BANANA", issuer_kp.public_key)
         amount1 = "100.125"
         amount2 = "120.7891"
-        destination = asset.contract_id(
-            integration_utils.NETWORK_PASSPHRASE
-        )  # we use it as the destination, do need to create a new contract
 
         integration_utils.fund_account(issuer_kp.public_key)
         integration_utils.fund_account(kp.public_key)
         integration_utils.issue_asset(asset.code, issuer_kp, kp, "1000")
         integration_utils.create_asset_contract(asset, kp)
+        destination = integration_utils.get_random_contract_id(kp)
         server = Server(horizon_url=integration_utils.HORIZON_URL)
         source = server.load_account(kp.public_key)
         tx1 = (
@@ -1215,6 +1210,83 @@ class TestTransaction:
             .build()
         )
         tx3.sign(kp)
+        server.submit_transaction(tx3)
+
+        server.close()
+
+    @pytest.mark.integration
+    def test_append_payment_to_contract_op_with_different_op_source(self):
+        asset = Asset.native()
+        kp = Keypair.random()
+        op_kp = Keypair.random()
+        integration_utils.fund_account(kp.public_key)
+        integration_utils.fund_account(op_kp.public_key)
+        integration_utils.create_asset_contract(asset, kp)
+        server = Server(horizon_url=integration_utils.HORIZON_URL)
+        amount1 = "100.125"
+        amount2 = "120.7891"
+        destination = integration_utils.get_random_contract_id(kp)
+
+        source = server.load_account(kp.public_key)
+        tx1 = (
+            TransactionBuilder(
+                source_account=source,
+                network_passphrase=integration_utils.NETWORK_PASSPHRASE,
+                base_fee=100,
+            )
+            .append_payment_to_contract_op(
+                destination, asset, amount1, source=op_kp.public_key
+            )
+            .set_timeout(30)
+            .build()
+        )
+        tx1.sign(kp)
+        tx1.sign(op_kp)
+        server.submit_transaction(tx1)
+        assert (
+            integration_utils.get_balance_for_contract(
+                destination, asset, kp.public_key
+            )
+            == 1001250000
+        )
+
+        tx2 = (
+            TransactionBuilder(
+                source_account=source,
+                network_passphrase=integration_utils.NETWORK_PASSPHRASE,
+                base_fee=100,
+            )
+            .append_payment_to_contract_op(
+                destination, asset, amount2, source=op_kp.public_key
+            )
+            .set_timeout(30)
+            .build()
+        )
+        tx2.sign(kp)
+        tx2.sign(op_kp)
+        server.submit_transaction(tx2)
+        assert (
+            integration_utils.get_balance_for_contract(
+                destination, asset, kp.public_key
+            )
+            == 2209141000
+        )
+
+        # In the e2e environment, it has not expired, but we still try to call it.
+        tx3 = (
+            TransactionBuilder(
+                source_account=source,
+                network_passphrase=integration_utils.NETWORK_PASSPHRASE,
+                base_fee=100,
+            )
+            .append_restore_asset_balance_entry_op(
+                destination, asset, source=op_kp.public_key
+            )
+            .set_timeout(30)
+            .build()
+        )
+        tx3.sign(kp)
+        tx3.sign(op_kp)
         server.submit_transaction(tx3)
 
         server.close()
