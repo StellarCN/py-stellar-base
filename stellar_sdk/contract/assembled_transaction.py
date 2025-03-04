@@ -88,7 +88,7 @@ class AssembledTransaction(Generic[T]):
         built_tx = self.transaction_builder.build()
         self.simulation = self.server.simulate_transaction(built_tx)
 
-        if restore and self.simulation.restore_preamble:
+        if restore and self.simulation.restore_preamble and not self.is_read_call():
             try:
                 self.restore_footprint(self.simulation.restore_preamble)
             except (
