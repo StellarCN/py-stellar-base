@@ -20,7 +20,7 @@ from stellar_sdk.soroban_rpc import GetTransactionStatus, SendTransactionStatus
 secret = "SAAPYAPTTRZMCUZFPG3G66V4ZMHTK4TWA6NS7U4F7Z3IMUD52EK4DDEV"
 rpc_server_url = "https://soroban-testnet.stellar.org:443"
 contract_id = "CAEZUQ3JTKBLIYFZEHKSK5X2K3MGU66B4F6MJFEKZKF6ZFRWBERV3BKF"
-network_passphrase = Network.STANDALONE_NETWORK_PASSPHRASE
+network_passphrase = Network.TESTNET_NETWORK_PASSPHRASE
 
 kp = Keypair.from_secret(secret)
 soroban_server = SorobanServer(rpc_server_url)
