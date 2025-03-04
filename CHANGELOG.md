@@ -5,6 +5,7 @@ Release History
 
 #### Update
 - feat: add `TransactionBuilder.append_payment_to_contract_op` and `TransactionBuilder.append_restore_asset_balance_entry_op` to send assets to contract accounts without relying on Stellar RPC. ([#1023](https://github.com/StellarCN/py-stellar-base/pull/1023))
+- refactor: `AssembledTransaction.simulate` and `AssembledTransactionAsync.simulate` will no longer restore the state for read-only transactions. ([#1026](https://github.com/StellarCN/py-stellar-base/pull/1026))
 
 ### Version 12.1.0
 
