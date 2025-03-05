@@ -13,9 +13,9 @@ Stellar Python SDK
     :alt: PyPI - Downloads
     :target: https://pypi.python.org/pypi/stellar-sdk
 
-.. image:: https://img.shields.io/codeclimate/maintainability/StellarCN/py-stellar-base
-    :alt: Code Climate maintainability
-    :target: https://codeclimate.com/github/StellarCN/py-stellar-base/maintainability
+.. image:: https://api.codeclimate.com/v1/badges/b82487c7675d823dc0e9/maintainability
+   :target: https://codeclimate.com/github/StellarCN/py-stellar-base/maintainability
+   :alt: Maintainability
 
 .. image:: https://img.shields.io/codecov/c/github/StellarCN/py-stellar-base/v2
     :alt: Codecov
