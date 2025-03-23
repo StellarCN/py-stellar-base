@@ -49,7 +49,7 @@ You can create a randomly generated keypair:
    print("Public Key: " + keypair.public_key)
    print("Secret Seed: " + keypair.secret)
 
-Vou can also generate a mnemonic phrase and later use it to generate a keypair:
+You can also generate a mnemonic phrase and later use it to generate a keypair:
 
 .. code-block:: python
    :linenos:
