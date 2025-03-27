@@ -3,6 +3,9 @@ Release History
 
 ### Pending
 
+#### Update
+- fix: fix the issue where sending assets using `Transaction.append_payment_to_contract_op` fails when the sender's account is the same as the asset issuer's account. ([#1029](https://github.com/StellarCN/py-stellar-base/pull/1029))
+
 ### Version 12.2.0
 
 #### Update

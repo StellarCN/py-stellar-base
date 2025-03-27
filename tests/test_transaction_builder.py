@@ -1291,6 +1291,73 @@ class TestTransaction:
 
         server.close()
 
+    @pytest.mark.integration
+    def test_append_payment_to_contract_op_with_asset_issuer_as_sender(self):
+        kp = Keypair.random()
+
+        asset = Asset("CAT", kp.public_key)
+        amount1 = "100.125"
+        amount2 = "120.7891"
+
+        integration_utils.fund_account(kp.public_key)
+        integration_utils.create_asset_contract(asset, kp)
+        destination = integration_utils.get_random_contract_id(kp)
+
+        server = Server(horizon_url=integration_utils.HORIZON_URL)
+        source = server.load_account(kp.public_key)
+        tx1 = (
+            TransactionBuilder(
+                source_account=source,
+                network_passphrase=integration_utils.NETWORK_PASSPHRASE,
+                base_fee=100,
+            )
+            .append_payment_to_contract_op(destination, asset, amount1)
+            .set_timeout(30)
+            .build()
+        )
+        tx1.sign(kp)
+        server.submit_transaction(tx1)
+        assert (
+            integration_utils.get_balance_for_contract(
+                destination, asset, kp.public_key
+            )
+            == 1001250000
+        )
+
+        tx2 = (
+            TransactionBuilder(
+                source_account=source,
+                network_passphrase=integration_utils.NETWORK_PASSPHRASE,
+                base_fee=100,
+            )
+            .append_payment_to_contract_op(destination, asset, amount2)
+            .set_timeout(30)
+            .build()
+        )
+        tx2.sign(kp)
+        server.submit_transaction(tx2)
+        assert (
+            integration_utils.get_balance_for_contract(
+                destination, asset, kp.public_key
+            )
+            == 2209141000
+        )
+
+        tx3 = (
+            TransactionBuilder(
+                source_account=source,
+                network_passphrase=integration_utils.NETWORK_PASSPHRASE,
+                base_fee=100,
+            )
+            .append_restore_asset_balance_entry_op(destination, asset)
+            .set_timeout(30)
+            .build()
+        )
+        tx3.sign(kp)
+        server.submit_transaction(tx3)
+
+        server.close()
+
     def test_append_payment_to_stellar_address_raise(self):
         kp = Keypair.random()
         asset = Asset.native()

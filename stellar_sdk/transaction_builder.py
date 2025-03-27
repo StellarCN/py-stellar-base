@@ -1602,17 +1602,20 @@ class TransactionBuilder:
                 contract_instance_ledger_key,
             ]
             read_write = [
-                stellar_xdr.LedgerKey(
-                    type=stellar_xdr.LedgerEntryType.TRUSTLINE,
-                    trust_line=stellar_xdr.LedgerKeyTrustLine(
-                        account_id=Keypair.from_public_key(
-                            from_address
-                        ).xdr_account_id(),
-                        asset=asset.to_trust_line_asset_xdr_object(),
-                    ),
-                ),
                 balance_ledger_key,
             ]
+            if asset.issuer != from_address:
+                read_write.append(
+                    stellar_xdr.LedgerKey(
+                        type=stellar_xdr.LedgerEntryType.TRUSTLINE,
+                        trust_line=stellar_xdr.LedgerKeyTrustLine(
+                            account_id=Keypair.from_public_key(
+                                from_address
+                            ).xdr_account_id(),
+                            asset=asset.to_trust_line_asset_xdr_object(),
+                        ),
+                    ),
+                )
 
         soroban_data = (
             SorobanDataBuilder()
