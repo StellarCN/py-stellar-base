@@ -393,7 +393,7 @@ class GetTransactionsRequest(PaginationMixin, BaseModel):
     See `getTransactions documentation <https://developers.stellar.org/docs/data/rpc/api-reference/methods/getTransactions>`__ for
     more information."""
 
-    start_ledger: int = Field(alias="startLedger")
+    start_ledger: Optional[int] = Field(alias="startLedger", default=None)
 
 
 class Transaction(BaseModel):
@@ -446,7 +446,7 @@ class GetLedgersRequest(PaginationMixin, BaseModel):
     See `getLedgers documentation <https://developers.stellar.org/docs/data/rpc/api-reference/methods/getLedgers>`__ for
     more information."""
 
-    start_ledger: int = Field(alias="startLedger")
+    start_ledger: Optional[int] = Field(alias="startLedger", default=None)
 
 
 class LedgerInfo(BaseModel):

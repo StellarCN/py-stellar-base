@@ -606,13 +606,14 @@ class TestSorobanServer:
         }
 
         start_ledger = 1888539
-        GetTransactionsResponse.model_validate(result)
+        txs_response = GetTransactionsResponse.model_validate(result)
         limit = 5
         with requests_mock.Mocker() as m:
             m.post(RPC_URL, json=data)
-            assert SorobanServer(RPC_URL).get_transactions(
-                start_ledger, None, limit
-            ) == GetTransactionsResponse.model_validate(result)
+            assert (
+                SorobanServer(RPC_URL).get_transactions(start_ledger, None, limit)
+                == txs_response
+            )
 
         request_data = m.last_request.json()
         assert len(request_data["id"]) == 32
@@ -622,6 +623,26 @@ class TestSorobanServer:
             "startLedger": 1888539,
             "pagination": {"cursor": None, "limit": 5},
         }
+
+    def test_get_transactions_without_args(self):
+        data = {
+            "jsonrpc": "2.0",
+            "id": "198cb1a8-9104-4446-a269-88bf000c2721",
+            "result": {
+                "transactions": [],
+                "latestLedger": 1888542,
+                "latestLedgerCloseTimestamp": 1717166057,
+                "oldestLedger": 1871263,
+                "oldestLedgerCloseTimestamp": 1717075350,
+                "cursor": "8111217537191937",
+            },
+        }
+        # test that all arguments are optional
+        with requests_mock.Mocker() as m:
+            m.post(RPC_URL, json=data)
+            assert isinstance(
+                SorobanServer(RPC_URL).get_transactions(), GetTransactionsResponse
+            )
 
     def test_get_ledgers(self):
         result = {
@@ -655,13 +676,14 @@ class TestSorobanServer:
         }
 
         start_ledger = 10
-        GetLedgersResponse.model_validate(result)
+        ledgers_response = GetLedgersResponse.model_validate(result)
         limit = 2
         with requests_mock.Mocker() as m:
             m.post(RPC_URL, json=data)
-            assert SorobanServer(RPC_URL).get_ledgers(
-                start_ledger, None, limit
-            ) == GetLedgersResponse.model_validate(result)
+            assert (
+                SorobanServer(RPC_URL).get_ledgers(start_ledger, None, limit)
+                == ledgers_response
+            )
 
         request_data = m.last_request.json()
         assert len(request_data["id"]) == 32
@@ -671,6 +693,24 @@ class TestSorobanServer:
             "startLedger": start_ledger,
             "pagination": {"cursor": None, "limit": 2},
         }
+
+    def test_get_ledgers_without_args(self):
+        data = {
+            "jsonrpc": "2.0",
+            "id": "198cb1a8-9104-4446-a269-88bf000c2721",
+            "result": {
+                "ledgers": [],
+                "latestLedger": 113,
+                "latestLedgerCloseTime": 1731554518,
+                "oldestLedger": 8,
+                "oldestLedgerCloseTime": 1731554412,
+                "cursor": "11",
+            },
+        }
+        # test that all arguments are optional
+        with requests_mock.Mocker() as m:
+            m.post(RPC_URL, json=data)
+            assert isinstance(SorobanServer(RPC_URL).get_ledgers(), GetLedgersResponse)
 
     def test_simulate_transaction(self):
         result = {
