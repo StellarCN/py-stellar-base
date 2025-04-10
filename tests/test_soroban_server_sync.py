@@ -1,5 +1,6 @@
 import copy
 
+from pydantic import ValidationError
 import pytest
 import requests_mock
 
@@ -304,41 +305,42 @@ class TestSorobanServer:
         assert request_data["params"] == {"hash": tx_hash}
 
     def test_get_events(self):
+        events = [
+            {
+                "type": "contract",
+                "ledger": "12739",
+                "ledgerClosedAt": "2023-09-16T06:23:57Z",
+                "contractId": "CBNYUGHFAIWK3HOINA2OIGOOBMQU4D3MPQWFYBTUYY5WY4FVDO2GWXUY",
+                "id": "0000054713588387840-0000000000",
+                "pagingToken": "0000054713588387840-0000000000",
+                "topic": [
+                    "AAAADwAAAAdDT1VOVEVSAA==",
+                    "AAAADwAAAAlpbmNyZW1lbnQAAAA=",
+                ],
+                "value": "AAAAAwAAAAE=",
+                "inSuccessfulContractCall": True,
+                "txHash": "db86e94aa98b7d38213c041ebbb727fbaabf0b7c435de594f36c2d51fc61926d",
+            },
+            {
+                "type": "contract",
+                "ledger": "12747",
+                "ledgerClosedAt": "2023-09-16T06:24:05Z",
+                "contractId": "CBNYUGHFAIWK3HOINA2OIGOOBMQU4D3MPQWFYBTUYY5WY4FVDO2GWXUY",
+                "id": "0000054747948126208-0000000000",
+                "pagingToken": "0000054747948126208-0000000000",
+                "topic": [
+                    "AAAADwAAAAdDT1VOVEVSAA==",
+                    "AAAADwAAAAlpbmNyZW1lbnQAAAA=",
+                ],
+                "value": "AAAAAwAAAAI=",
+                "inSuccessfulContractCall": True,
+                "txHash": "db86e94aa98b7d38213c041ebbb727fbaabf0b7c435de594f36c2d51fc61926d",
+            },
+        ]
         result = {
-            "events": [
-                {
-                    "type": "contract",
-                    "ledger": "12739",
-                    "ledgerClosedAt": "2023-09-16T06:23:57Z",
-                    "contractId": "CBNYUGHFAIWK3HOINA2OIGOOBMQU4D3MPQWFYBTUYY5WY4FVDO2GWXUY",
-                    "id": "0000054713588387840-0000000000",
-                    "pagingToken": "0000054713588387840-0000000000",
-                    "topic": [
-                        "AAAADwAAAAdDT1VOVEVSAA==",
-                        "AAAADwAAAAlpbmNyZW1lbnQAAAA=",
-                    ],
-                    "value": "AAAAAwAAAAE=",
-                    "inSuccessfulContractCall": True,
-                    "txHash": "db86e94aa98b7d38213c041ebbb727fbaabf0b7c435de594f36c2d51fc61926d",
-                },
-                {
-                    "type": "contract",
-                    "ledger": "12747",
-                    "ledgerClosedAt": "2023-09-16T06:24:05Z",
-                    "contractId": "CBNYUGHFAIWK3HOINA2OIGOOBMQU4D3MPQWFYBTUYY5WY4FVDO2GWXUY",
-                    "id": "0000054747948126208-0000000000",
-                    "pagingToken": "0000054747948126208-0000000000",
-                    "topic": [
-                        "AAAADwAAAAdDT1VOVEVSAA==",
-                        "AAAADwAAAAlpbmNyZW1lbnQAAAA=",
-                    ],
-                    "value": "AAAAAwAAAAI=",
-                    "inSuccessfulContractCall": True,
-                    "txHash": "db86e94aa98b7d38213c041ebbb727fbaabf0b7c435de594f36c2d51fc61926d",
-                },
-            ],
+            "events": events,
             "latestLedger": "187",
-            "cursor": "0000054713588387840-0000000000",
+            "cursor": "0000054747948126208-0000000000",
         }
         data = {
             "jsonrpc": "2.0",
@@ -358,14 +360,14 @@ class TestSorobanServer:
                 ],
             )
         ]
-        GetEventsResponse.model_validate(result)
-        cursor = "0000054713588387839-0000000000"
+        events_response = GetEventsResponse.model_validate(result)
         limit = 10
         with requests_mock.Mocker() as m:
             m.post(PRC_URL, json=data)
-            assert SorobanServer(PRC_URL).get_events(
-                start_ledger, filters, cursor, limit
-            ) == GetEventsResponse.model_validate(result)
+            assert (
+                SorobanServer(PRC_URL).get_events(start_ledger, filters, limit=limit)
+                == events_response
+            )
 
         request_data = m.last_request.json()
         assert len(request_data["id"]) == 32
@@ -383,8 +385,50 @@ class TestSorobanServer:
                     "type": "contract",
                 }
             ],
-            "pagination": {"cursor": "0000054713588387839-0000000000", "limit": 10},
+            "pagination": {"cursor": None, "limit": 10},
             "startLedger": 100,
+        }
+
+        # simulate the advance of one ledger
+        cursor = events_response.cursor
+        result = {
+            "events": [],
+            "latestLedger": "188",
+            "cursor": "0000054747948126210-0000000000",
+        }
+        data = {
+            "jsonrpc": "2.0",
+            "id": "198cb1a8-9104-4446-a269-88bf000c3986",
+            "result": result,
+        }
+        events_response = GetEventsResponse.model_validate(result)
+        with requests_mock.Mocker() as m:
+            m.post(PRC_URL, json=data)
+            assert (
+                SorobanServer(PRC_URL).get_events(
+                    filters=filters, cursor=cursor, limit=limit
+                )
+                == events_response
+            )
+
+        request_data = m.last_request.json()
+        assert len(request_data["id"]) == 32
+        assert request_data["jsonrpc"] == "2.0"
+        assert request_data["method"] == "getEvents"
+        assert request_data["params"] == {
+            "filters": [
+                {
+                    "contractIds": [
+                        "CBNYUGHFAIWK3HOINA2OIGOOBMQU4D3MPQWFYBTUYY5WY4FVDO2GWXUY"
+                    ],
+                    "topics": [
+                        ["AAAADwAAAAdDT1VOVEVSAA==", "AAAADwAAAAlpbmNyZW1lbnQAAAA="]
+                    ],
+                    "type": "contract",
+                }
+            ],
+            "pagination": {"cursor": "0000054747948126208-0000000000", "limit": 10},
+            "startLedger": None,
         }
 
     def test_get_latest_ledger(self):
@@ -995,6 +1039,16 @@ class TestSorobanServer:
             assert e.value.code == -32601
             assert e.value.message == "method not found"
             assert e.value.data == "mockTest"
+
+    def test_pagination_start_ledger_and_cursor_raise(self):
+        with pytest.raises(ValidationError) as e:
+            SorobanServer(PRC_URL).get_transactions(
+                start_ledger=67, cursor="8111217537191937", limit=1
+            )
+        assert e.value.error_count() == 1
+        val_error = e.value.errors()[0]
+        assert val_error["type"] == "value_error"
+        assert val_error["msg"].endswith("start_ledger and cursor cannot both be set")
 
 
 def _build_soroban_transaction(

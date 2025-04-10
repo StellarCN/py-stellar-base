@@ -1,8 +1,8 @@
 from datetime import datetime
 from enum import Enum
-from typing import Any, Dict, Generic, List, Optional, Sequence, TypeVar, Union
+from typing import Any, Dict, Generic, List, Optional, Self, Sequence, TypeVar, Union
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 T = TypeVar("T")
 
@@ -75,16 +75,27 @@ class PaginationOptions(BaseModel):
     limit: Optional[int] = None
 
 
-class GetEventsRequest(BaseModel):
+class PaginationMixin:
+    pagination: Optional[PaginationOptions] = None
+
+    @model_validator(mode="after")
+    def verify_ledger_or_cursor(self) -> Self:
+        if self.pagination and (
+            getattr(self, "start_ledger") and self.pagination.cursor
+        ):
+            raise ValueError("start_ledger and cursor cannot both be set")
+        return self
+
+
+class GetEventsRequest(PaginationMixin, BaseModel):
     """Response for JSON-RPC method getEvents.
 
     See `getEvents documentation <https://developers.stellar.org/docs/data/rpc/api-reference/methods/getEvents>`__ for
     more information.
     """
 
-    start_ledger: int = Field(alias="startLedger")
+    start_ledger: Optional[int] = Field(alias="startLedger", default=None)
     filters: Optional[Sequence[EventFilter]] = None
-    pagination: Optional[PaginationOptions] = None
 
 
 class GetEventsResponse(BaseModel):
@@ -376,14 +387,13 @@ class GetFeeStatsResponse(BaseModel):
 
 
 # get_transactions
-class GetTransactionsRequest(BaseModel):
+class GetTransactionsRequest(PaginationMixin, BaseModel):
     """Request for JSON-RPC method getTransactions.
 
     See `getTransactions documentation <https://developers.stellar.org/docs/data/rpc/api-reference/methods/getTransactions>`__ for
     more information."""
 
     start_ledger: int = Field(alias="startLedger")
-    pagination: Optional[PaginationOptions] = None
 
 
 class Transaction(BaseModel):
@@ -430,14 +440,13 @@ class GetVersionInfoResponse(BaseModel):
 
 
 # get_ledgers
-class GetLedgersRequest(BaseModel):
+class GetLedgersRequest(PaginationMixin, BaseModel):
     """Request for JSON-RPC method getLedgers.
 
     See `getLedgers documentation <https://developers.stellar.org/docs/data/rpc/api-reference/methods/getLedgers>`__ for
     more information."""
 
     start_ledger: int = Field(alias="startLedger")
-    pagination: Optional[PaginationOptions] = None
 
 
 class LedgerInfo(BaseModel):

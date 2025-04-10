@@ -67,7 +67,7 @@ class SorobanServer:
 
     def get_events(
         self,
-        start_ledger: int,
+        start_ledger: int = None,
         filters: Sequence[EventFilter] = None,
         cursor: str = None,
         limit: int = None,
@@ -85,7 +85,7 @@ class SorobanServer:
         """
         pagination = PaginationOptions(cursor=cursor, limit=limit)
         data = GetEventsRequest(
-            startLedger=str(start_ledger),
+            startLedger=start_ledger,
             filters=filters,
             pagination=pagination,
         )
@@ -243,7 +243,7 @@ class SorobanServer:
 
     def get_transactions(
         self,
-        start_ledger: int,
+        start_ledger: int = None,
         cursor: str = None,
         limit: int = None,
     ) -> GetTransactionsResponse:
@@ -260,7 +260,7 @@ class SorobanServer:
         """
         pagination = PaginationOptions(cursor=cursor, limit=limit)
         data = GetTransactionsRequest(
-            startLedger=str(start_ledger),
+            startLedger=start_ledger,
             pagination=pagination,
         )
         request: Request = Request[GetTransactionsRequest](
@@ -269,7 +269,10 @@ class SorobanServer:
         return self._post(request, GetTransactionsResponse)
 
     def get_ledgers(
-        self, start_ledger: int, cursor: str = None, limit: int = None
+        self,
+        start_ledger: int = None,
+        cursor: str = None,
+        limit: int = None,
     ) -> GetLedgersResponse:
         """Fetch a detailed list of ledgers starting from the user specified starting point that you can paginate
         as long as the pages fall within the history retention of their corresponding RPC provider.
@@ -284,7 +287,7 @@ class SorobanServer:
         """
         pagination = PaginationOptions(cursor=cursor, limit=limit)
         data = GetLedgersRequest(
-            startLedger=str(start_ledger),
+            startLedger=start_ledger,
             pagination=pagination,
         )
         request: Request = Request[GetLedgersRequest](
