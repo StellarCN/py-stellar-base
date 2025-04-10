@@ -16,7 +16,7 @@ from stellar_sdk.exceptions import (
 from stellar_sdk.soroban_rpc import *
 from stellar_sdk.soroban_server import SorobanServer
 
-PRC_URL = "https://example.com/soroban_rpc"
+RPC_URL = "https://example.com/soroban_rpc"
 
 
 class TestSorobanServer:
@@ -39,8 +39,8 @@ class TestSorobanServer:
         }
         account_id = "GDAT5HWTGIU4TSSZ4752OUC4SABDLTLZFRPZUJ3D6LKBNEPA7V2CIG54"
         with requests_mock.Mocker() as m:
-            m.post(PRC_URL, json=data)
-            assert SorobanServer(PRC_URL).load_account(account_id) == Account(
+            m.post(RPC_URL, json=data)
+            assert SorobanServer(RPC_URL).load_account(account_id) == Account(
                 account_id, 3418793967628
             )
 
@@ -61,12 +61,12 @@ class TestSorobanServer:
         }
         account_id = "GDAT5HWTGIU4TSSZ4752OUC4SABDLTLZFRPZUJ3D6LKBNEPA7V2CIG54"
         with requests_mock.Mocker() as m:
-            m.post(PRC_URL, json=data)
+            m.post(RPC_URL, json=data)
             with pytest.raises(
                 AccountNotFoundException,
                 match=f"Account not found, account_id: {account_id}",
             ):
-                SorobanServer(PRC_URL).load_account(account_id)
+                SorobanServer(RPC_URL).load_account(account_id)
 
         request_data = m.last_request.json()
         assert len(request_data["id"]) == 32
@@ -89,9 +89,9 @@ class TestSorobanServer:
             "result": result,
         }
         with requests_mock.Mocker() as m:
-            m.post(PRC_URL, json=data)
+            m.post(RPC_URL, json=data)
             assert SorobanServer(
-                PRC_URL
+                RPC_URL
             ).get_health() == GetHealthResponse.model_validate(result)
 
         request_data = m.last_request.json()
@@ -115,9 +115,9 @@ class TestSorobanServer:
         GetNetworkResponse.model_validate(result)
 
         with requests_mock.Mocker() as m:
-            m.post(PRC_URL, json=data)
+            m.post(RPC_URL, json=data)
             assert SorobanServer(
-                PRC_URL
+                RPC_URL
             ).get_network() == GetNetworkResponse.model_validate(result)
 
         request_data = m.last_request.json()
@@ -143,9 +143,9 @@ class TestSorobanServer:
         GetVersionInfoResponse.model_validate(result)
 
         with requests_mock.Mocker() as m:
-            m.post(PRC_URL, json=data)
+            m.post(RPC_URL, json=data)
             assert SorobanServer(
-                PRC_URL
+                RPC_URL
             ).get_version_info() == GetVersionInfoResponse.model_validate(result)
 
         request_data = m.last_request.json()
@@ -175,9 +175,9 @@ class TestSorobanServer:
         contract_id = "CBNYUGHFAIWK3HOINA2OIGOOBMQU4D3MPQWFYBTUYY5WY4FVDO2GWXUY"
         key = stellar_xdr.SCVal(stellar_xdr.SCValType.SCV_LEDGER_KEY_CONTRACT_INSTANCE)
         with requests_mock.Mocker() as m:
-            m.post(PRC_URL, json=data)
+            m.post(RPC_URL, json=data)
             assert (
-                SorobanServer(PRC_URL).get_contract_data(contract_id, key)
+                SorobanServer(RPC_URL).get_contract_data(contract_id, key)
                 == GetLedgerEntriesResponse.model_validate(result).entries[0]
             )
 
@@ -202,8 +202,8 @@ class TestSorobanServer:
         contract_id = "CBNYUGHFAIWK3HOINA2OIGOOBMQU4D3MPQWFYBTUYY5WY4FVDO2GWXUY"
         key = stellar_xdr.SCVal(stellar_xdr.SCValType.SCV_LEDGER_KEY_CONTRACT_INSTANCE)
         with requests_mock.Mocker() as m:
-            m.post(PRC_URL, json=data)
-            assert SorobanServer(PRC_URL).get_contract_data(contract_id, key) is None
+            m.post(RPC_URL, json=data)
+            assert SorobanServer(RPC_URL).get_contract_data(contract_id, key) is None
 
         request_data = m.last_request.json()
         assert len(request_data["id"]) == 32
@@ -255,8 +255,8 @@ class TestSorobanServer:
             ),
         )
         with requests_mock.Mocker() as m:
-            m.post(PRC_URL, json=data)
-            assert SorobanServer(PRC_URL).get_ledger_entries(
+            m.post(RPC_URL, json=data)
+            assert SorobanServer(RPC_URL).get_ledger_entries(
                 [key0, key1]
             ) == GetLedgerEntriesResponse.model_validate(result)
 
@@ -293,8 +293,8 @@ class TestSorobanServer:
         }
         tx_hash = "06dd9ee70bf93bbfe219e2b31363ab5a0361cc6285328592e4d3d1fed4c9025c"
         with requests_mock.Mocker() as m:
-            m.post(PRC_URL, json=data)
-            assert SorobanServer(PRC_URL).get_transaction(
+            m.post(RPC_URL, json=data)
+            assert SorobanServer(RPC_URL).get_transaction(
                 tx_hash
             ) == GetTransactionResponse.model_validate(result)
 
@@ -363,9 +363,9 @@ class TestSorobanServer:
         events_response = GetEventsResponse.model_validate(result)
         limit = 10
         with requests_mock.Mocker() as m:
-            m.post(PRC_URL, json=data)
+            m.post(RPC_URL, json=data)
             assert (
-                SorobanServer(PRC_URL).get_events(start_ledger, filters, limit=limit)
+                SorobanServer(RPC_URL).get_events(start_ledger, filters, limit=limit)
                 == events_response
             )
 
@@ -403,9 +403,9 @@ class TestSorobanServer:
         }
         events_response = GetEventsResponse.model_validate(result)
         with requests_mock.Mocker() as m:
-            m.post(PRC_URL, json=data)
+            m.post(RPC_URL, json=data)
             assert (
-                SorobanServer(PRC_URL).get_events(
+                SorobanServer(RPC_URL).get_events(
                     filters=filters, cursor=cursor, limit=limit
                 )
                 == events_response
@@ -443,9 +443,9 @@ class TestSorobanServer:
             "result": result,
         }
         with requests_mock.Mocker() as m:
-            m.post(PRC_URL, json=data)
+            m.post(RPC_URL, json=data)
             assert SorobanServer(
-                PRC_URL
+                RPC_URL
             ).get_latest_ledger() == GetLatestLedgerResponse.model_validate(result)
 
         request_data = m.last_request.json()
@@ -501,9 +501,9 @@ class TestSorobanServer:
             "result": result,
         }
         with requests_mock.Mocker() as m:
-            m.post(PRC_URL, json=data)
+            m.post(RPC_URL, json=data)
             assert SorobanServer(
-                PRC_URL
+                RPC_URL
             ).get_fee_stats() == GetFeeStatsResponse.model_validate(result)
 
         request_data = m.last_request.json()
@@ -609,8 +609,8 @@ class TestSorobanServer:
         GetTransactionsResponse.model_validate(result)
         limit = 5
         with requests_mock.Mocker() as m:
-            m.post(PRC_URL, json=data)
-            assert SorobanServer(PRC_URL).get_transactions(
+            m.post(RPC_URL, json=data)
+            assert SorobanServer(RPC_URL).get_transactions(
                 start_ledger, None, limit
             ) == GetTransactionsResponse.model_validate(result)
 
@@ -658,8 +658,8 @@ class TestSorobanServer:
         GetLedgersResponse.model_validate(result)
         limit = 2
         with requests_mock.Mocker() as m:
-            m.post(PRC_URL, json=data)
-            assert SorobanServer(PRC_URL).get_ledgers(
+            m.post(RPC_URL, json=data)
+            assert SorobanServer(RPC_URL).get_ledgers(
                 start_ledger, None, limit
             ) == GetLedgersResponse.model_validate(result)
 
@@ -705,8 +705,8 @@ class TestSorobanServer:
         }
         transaction = _build_soroban_transaction(None, [])
         with requests_mock.Mocker() as m:
-            m.post(PRC_URL, json=data)
-            assert SorobanServer(PRC_URL).simulate_transaction(
+            m.post(RPC_URL, json=data)
+            assert SorobanServer(RPC_URL).simulate_transaction(
                 transaction
             ) == SimulateTransactionResponse.model_validate(result)
 
@@ -744,8 +744,8 @@ class TestSorobanServer:
         }
         transaction = _build_soroban_transaction(None, [])
         with requests_mock.Mocker() as m:
-            m.post(PRC_URL, json=data)
-            assert SorobanServer(PRC_URL).simulate_transaction(
+            m.post(RPC_URL, json=data)
+            assert SorobanServer(RPC_URL).simulate_transaction(
                 transaction, ResourceLeeway(1000000)
             ) == SimulateTransactionResponse.model_validate(result)
 
@@ -783,8 +783,8 @@ class TestSorobanServer:
 
         transaction = _build_soroban_transaction(None, [])
         with requests_mock.Mocker() as m:
-            m.post(PRC_URL, json=data)
-            new_transaction = SorobanServer(PRC_URL).prepare_transaction(transaction)
+            m.post(RPC_URL, json=data)
+            new_transaction = SorobanServer(RPC_URL).prepare_transaction(transaction)
         expected_transaction = copy.deepcopy(transaction)
         expected_transaction.transaction.fee += int(data["result"]["minResourceFee"])
         expected_transaction.transaction.soroban_data = (
@@ -837,8 +837,8 @@ class TestSorobanServer:
         )  # soroban_data will be overwritten by the response
         transaction = _build_soroban_transaction(soroban_data, [])
         with requests_mock.Mocker() as m:
-            m.post(PRC_URL, json=data)
-            new_transaction = SorobanServer(PRC_URL).prepare_transaction(transaction)
+            m.post(RPC_URL, json=data)
+            new_transaction = SorobanServer(RPC_URL).prepare_transaction(transaction)
         expected_transaction = copy.deepcopy(transaction)
         expected_transaction.transaction.fee = 50000 + int(
             data["result"]["minResourceFee"]
@@ -899,8 +899,8 @@ class TestSorobanServer:
 
         transaction = _build_soroban_transaction(None, [auth])
         with requests_mock.Mocker() as m:
-            m.post(PRC_URL, json=data)
-            new_transaction = SorobanServer(PRC_URL).prepare_transaction(transaction)
+            m.post(RPC_URL, json=data)
+            new_transaction = SorobanServer(RPC_URL).prepare_transaction(transaction)
         expected_transaction = copy.deepcopy(transaction)
         expected_transaction.transaction.fee += int(data["result"]["minResourceFee"])
         expected_transaction.transaction.soroban_data = (
@@ -926,12 +926,12 @@ class TestSorobanServer:
         }
         transaction = _build_soroban_transaction(None, [])
         with requests_mock.Mocker() as m:
-            m.post(PRC_URL, json=data)
+            m.post(RPC_URL, json=data)
             with pytest.raises(
                 PrepareTransactionException,
                 match="Simulation transaction failed, the response contains error information.",
             ) as e:
-                SorobanServer(PRC_URL).prepare_transaction(transaction)
+                SorobanServer(RPC_URL).prepare_transaction(transaction)
             assert (
                 e.value.simulate_transaction_response
                 == SimulateTransactionResponse.model_validate(data["result"])
@@ -957,12 +957,12 @@ class TestSorobanServer:
         }
         transaction = _build_soroban_transaction(None, [])
         with requests_mock.Mocker() as m:
-            m.post(PRC_URL, json=data)
+            m.post(RPC_URL, json=data)
             with pytest.raises(
                 ValueError,
                 match="Simulation results invalid",
             ) as e:
-                SorobanServer(PRC_URL).prepare_transaction(transaction)
+                SorobanServer(RPC_URL).prepare_transaction(transaction)
 
     def test_send_transaction(self):
         result = {
@@ -979,8 +979,8 @@ class TestSorobanServer:
 
         transaction = _build_soroban_transaction(None, [])
         with requests_mock.Mocker() as m:
-            m.post(PRC_URL, json=data)
-            assert SorobanServer(PRC_URL).send_transaction(
+            m.post(RPC_URL, json=data)
+            assert SorobanServer(RPC_URL).send_transaction(
                 transaction
             ) == SendTransactionResponse.model_validate(result)
 
@@ -1010,8 +1010,8 @@ class TestSorobanServer:
 
         transaction = _build_soroban_transaction(None, [])
         with requests_mock.Mocker() as m:
-            m.post(PRC_URL, json=data)
-            assert SorobanServer(PRC_URL).send_transaction(
+            m.post(RPC_URL, json=data)
+            assert SorobanServer(RPC_URL).send_transaction(
                 transaction
             ) == SendTransactionResponse.model_validate(result)
 
@@ -1033,16 +1033,16 @@ class TestSorobanServer:
             },
         }
         with requests_mock.Mocker() as m:
-            m.post(PRC_URL, json=data)
+            m.post(RPC_URL, json=data)
             with pytest.raises(SorobanRpcErrorResponse) as e:
-                SorobanServer(PRC_URL).get_health()
+                SorobanServer(RPC_URL).get_health()
             assert e.value.code == -32601
             assert e.value.message == "method not found"
             assert e.value.data == "mockTest"
 
     def test_pagination_start_ledger_and_cursor_raise(self):
         with pytest.raises(ValidationError) as e:
-            SorobanServer(PRC_URL).get_transactions(
+            SorobanServer(RPC_URL).get_transactions(
                 start_ledger=67, cursor="8111217537191937", limit=1
             )
         assert e.value.error_count() == 1
