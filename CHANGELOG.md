@@ -5,6 +5,7 @@ Release History
 
 #### Update
 - fix: fix the issue where sending assets using `Transaction.append_payment_to_contract_op` fails when the sender's account is the same as the asset issuer's account. ([#1029](https://github.com/StellarCN/py-stellar-base/pull/1029))
+- fix: allow `SorobanServer.get_events()`, `.get_transactions()`, and `.get_ledgers()` to be paginated by making the `start_ledger` argument optional. ([#1032](https://github.com/StellarCN/py-stellar-base/pull/1032))
 
 ### Version 12.2.0
 
