@@ -3,11 +3,17 @@ Release History
 
 ### Pending
 
+### Version 12.2.1
+
+Released on April 11, 2025
+
 #### Update
 - fix: fix the issue where sending assets using `Transaction.append_payment_to_contract_op` fails when the sender's account is the same as the asset issuer's account. ([#1029](https://github.com/StellarCN/py-stellar-base/pull/1029))
 - fix: allow `SorobanServer.get_events()`, `.get_transactions()`, and `.get_ledgers()` to be paginated by making the `start_ledger` argument optional. ([#1032](https://github.com/StellarCN/py-stellar-base/pull/1032))
 
 ### Version 12.2.0
+
+Released on March 04, 2025
 
 #### Update
 - feat: add `TransactionBuilder.append_payment_to_contract_op` and `TransactionBuilder.append_restore_asset_balance_entry_op` to send assets to contract accounts without relying on Stellar RPC. ([#1023](https://github.com/StellarCN/py-stellar-base/pull/1023))
