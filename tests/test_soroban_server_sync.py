@@ -2,6 +2,7 @@ import copy
 
 import pytest
 import requests_mock
+from pydantic import ValidationError
 
 from stellar_sdk import Account, Keypair, Network, TransactionBuilder, scval
 from stellar_sdk import xdr as stellar_xdr
@@ -15,7 +16,7 @@ from stellar_sdk.exceptions import (
 from stellar_sdk.soroban_rpc import *
 from stellar_sdk.soroban_server import SorobanServer
 
-PRC_URL = "https://example.com/soroban_rpc"
+RPC_URL = "https://example.com/soroban_rpc"
 
 
 class TestSorobanServer:
@@ -38,8 +39,8 @@ class TestSorobanServer:
         }
         account_id = "GDAT5HWTGIU4TSSZ4752OUC4SABDLTLZFRPZUJ3D6LKBNEPA7V2CIG54"
         with requests_mock.Mocker() as m:
-            m.post(PRC_URL, json=data)
-            assert SorobanServer(PRC_URL).load_account(account_id) == Account(
+            m.post(RPC_URL, json=data)
+            assert SorobanServer(RPC_URL).load_account(account_id) == Account(
                 account_id, 3418793967628
             )
 
@@ -60,12 +61,12 @@ class TestSorobanServer:
         }
         account_id = "GDAT5HWTGIU4TSSZ4752OUC4SABDLTLZFRPZUJ3D6LKBNEPA7V2CIG54"
         with requests_mock.Mocker() as m:
-            m.post(PRC_URL, json=data)
+            m.post(RPC_URL, json=data)
             with pytest.raises(
                 AccountNotFoundException,
                 match=f"Account not found, account_id: {account_id}",
             ):
-                SorobanServer(PRC_URL).load_account(account_id)
+                SorobanServer(RPC_URL).load_account(account_id)
 
         request_data = m.last_request.json()
         assert len(request_data["id"]) == 32
@@ -88,9 +89,9 @@ class TestSorobanServer:
             "result": result,
         }
         with requests_mock.Mocker() as m:
-            m.post(PRC_URL, json=data)
+            m.post(RPC_URL, json=data)
             assert SorobanServer(
-                PRC_URL
+                RPC_URL
             ).get_health() == GetHealthResponse.model_validate(result)
 
         request_data = m.last_request.json()
@@ -114,9 +115,9 @@ class TestSorobanServer:
         GetNetworkResponse.model_validate(result)
 
         with requests_mock.Mocker() as m:
-            m.post(PRC_URL, json=data)
+            m.post(RPC_URL, json=data)
             assert SorobanServer(
-                PRC_URL
+                RPC_URL
             ).get_network() == GetNetworkResponse.model_validate(result)
 
         request_data = m.last_request.json()
@@ -142,9 +143,9 @@ class TestSorobanServer:
         GetVersionInfoResponse.model_validate(result)
 
         with requests_mock.Mocker() as m:
-            m.post(PRC_URL, json=data)
+            m.post(RPC_URL, json=data)
             assert SorobanServer(
-                PRC_URL
+                RPC_URL
             ).get_version_info() == GetVersionInfoResponse.model_validate(result)
 
         request_data = m.last_request.json()
@@ -174,9 +175,9 @@ class TestSorobanServer:
         contract_id = "CBNYUGHFAIWK3HOINA2OIGOOBMQU4D3MPQWFYBTUYY5WY4FVDO2GWXUY"
         key = stellar_xdr.SCVal(stellar_xdr.SCValType.SCV_LEDGER_KEY_CONTRACT_INSTANCE)
         with requests_mock.Mocker() as m:
-            m.post(PRC_URL, json=data)
+            m.post(RPC_URL, json=data)
             assert (
-                SorobanServer(PRC_URL).get_contract_data(contract_id, key)
+                SorobanServer(RPC_URL).get_contract_data(contract_id, key)
                 == GetLedgerEntriesResponse.model_validate(result).entries[0]
             )
 
@@ -201,8 +202,8 @@ class TestSorobanServer:
         contract_id = "CBNYUGHFAIWK3HOINA2OIGOOBMQU4D3MPQWFYBTUYY5WY4FVDO2GWXUY"
         key = stellar_xdr.SCVal(stellar_xdr.SCValType.SCV_LEDGER_KEY_CONTRACT_INSTANCE)
         with requests_mock.Mocker() as m:
-            m.post(PRC_URL, json=data)
-            assert SorobanServer(PRC_URL).get_contract_data(contract_id, key) is None
+            m.post(RPC_URL, json=data)
+            assert SorobanServer(RPC_URL).get_contract_data(contract_id, key) is None
 
         request_data = m.last_request.json()
         assert len(request_data["id"]) == 32
@@ -254,8 +255,8 @@ class TestSorobanServer:
             ),
         )
         with requests_mock.Mocker() as m:
-            m.post(PRC_URL, json=data)
-            assert SorobanServer(PRC_URL).get_ledger_entries(
+            m.post(RPC_URL, json=data)
+            assert SorobanServer(RPC_URL).get_ledger_entries(
                 [key0, key1]
             ) == GetLedgerEntriesResponse.model_validate(result)
 
@@ -292,8 +293,8 @@ class TestSorobanServer:
         }
         tx_hash = "06dd9ee70bf93bbfe219e2b31363ab5a0361cc6285328592e4d3d1fed4c9025c"
         with requests_mock.Mocker() as m:
-            m.post(PRC_URL, json=data)
-            assert SorobanServer(PRC_URL).get_transaction(
+            m.post(RPC_URL, json=data)
+            assert SorobanServer(RPC_URL).get_transaction(
                 tx_hash
             ) == GetTransactionResponse.model_validate(result)
 
@@ -304,41 +305,42 @@ class TestSorobanServer:
         assert request_data["params"] == {"hash": tx_hash}
 
     def test_get_events(self):
+        events = [
+            {
+                "type": "contract",
+                "ledger": "12739",
+                "ledgerClosedAt": "2023-09-16T06:23:57Z",
+                "contractId": "CBNYUGHFAIWK3HOINA2OIGOOBMQU4D3MPQWFYBTUYY5WY4FVDO2GWXUY",
+                "id": "0000054713588387840-0000000000",
+                "pagingToken": "0000054713588387840-0000000000",
+                "topic": [
+                    "AAAADwAAAAdDT1VOVEVSAA==",
+                    "AAAADwAAAAlpbmNyZW1lbnQAAAA=",
+                ],
+                "value": "AAAAAwAAAAE=",
+                "inSuccessfulContractCall": True,
+                "txHash": "db86e94aa98b7d38213c041ebbb727fbaabf0b7c435de594f36c2d51fc61926d",
+            },
+            {
+                "type": "contract",
+                "ledger": "12747",
+                "ledgerClosedAt": "2023-09-16T06:24:05Z",
+                "contractId": "CBNYUGHFAIWK3HOINA2OIGOOBMQU4D3MPQWFYBTUYY5WY4FVDO2GWXUY",
+                "id": "0000054747948126208-0000000000",
+                "pagingToken": "0000054747948126208-0000000000",
+                "topic": [
+                    "AAAADwAAAAdDT1VOVEVSAA==",
+                    "AAAADwAAAAlpbmNyZW1lbnQAAAA=",
+                ],
+                "value": "AAAAAwAAAAI=",
+                "inSuccessfulContractCall": True,
+                "txHash": "db86e94aa98b7d38213c041ebbb727fbaabf0b7c435de594f36c2d51fc61926d",
+            },
+        ]
         result = {
-            "events": [
-                {
-                    "type": "contract",
-                    "ledger": "12739",
-                    "ledgerClosedAt": "2023-09-16T06:23:57Z",
-                    "contractId": "CBNYUGHFAIWK3HOINA2OIGOOBMQU4D3MPQWFYBTUYY5WY4FVDO2GWXUY",
-                    "id": "0000054713588387840-0000000000",
-                    "pagingToken": "0000054713588387840-0000000000",
-                    "topic": [
-                        "AAAADwAAAAdDT1VOVEVSAA==",
-                        "AAAADwAAAAlpbmNyZW1lbnQAAAA=",
-                    ],
-                    "value": "AAAAAwAAAAE=",
-                    "inSuccessfulContractCall": True,
-                    "txHash": "db86e94aa98b7d38213c041ebbb727fbaabf0b7c435de594f36c2d51fc61926d",
-                },
-                {
-                    "type": "contract",
-                    "ledger": "12747",
-                    "ledgerClosedAt": "2023-09-16T06:24:05Z",
-                    "contractId": "CBNYUGHFAIWK3HOINA2OIGOOBMQU4D3MPQWFYBTUYY5WY4FVDO2GWXUY",
-                    "id": "0000054747948126208-0000000000",
-                    "pagingToken": "0000054747948126208-0000000000",
-                    "topic": [
-                        "AAAADwAAAAdDT1VOVEVSAA==",
-                        "AAAADwAAAAlpbmNyZW1lbnQAAAA=",
-                    ],
-                    "value": "AAAAAwAAAAI=",
-                    "inSuccessfulContractCall": True,
-                    "txHash": "db86e94aa98b7d38213c041ebbb727fbaabf0b7c435de594f36c2d51fc61926d",
-                },
-            ],
+            "events": events,
             "latestLedger": "187",
-            "cursor": "0000054713588387840-0000000000",
+            "cursor": "0000054747948126208-0000000000",
         }
         data = {
             "jsonrpc": "2.0",
@@ -358,14 +360,14 @@ class TestSorobanServer:
                 ],
             )
         ]
-        GetEventsResponse.model_validate(result)
-        cursor = "0000054713588387839-0000000000"
+        events_response = GetEventsResponse.model_validate(result)
         limit = 10
         with requests_mock.Mocker() as m:
-            m.post(PRC_URL, json=data)
-            assert SorobanServer(PRC_URL).get_events(
-                start_ledger, filters, cursor, limit
-            ) == GetEventsResponse.model_validate(result)
+            m.post(RPC_URL, json=data)
+            assert (
+                SorobanServer(RPC_URL).get_events(start_ledger, filters, limit=limit)
+                == events_response
+            )
 
         request_data = m.last_request.json()
         assert len(request_data["id"]) == 32
@@ -383,8 +385,50 @@ class TestSorobanServer:
                     "type": "contract",
                 }
             ],
-            "pagination": {"cursor": "0000054713588387839-0000000000", "limit": 10},
+            "pagination": {"cursor": None, "limit": 10},
             "startLedger": 100,
+        }
+
+        # simulate the advance of one ledger
+        cursor = events_response.cursor
+        result = {
+            "events": [],
+            "latestLedger": "188",
+            "cursor": "0000054747948126210-0000000000",
+        }
+        data = {
+            "jsonrpc": "2.0",
+            "id": "198cb1a8-9104-4446-a269-88bf000c3986",
+            "result": result,
+        }
+        events_response = GetEventsResponse.model_validate(result)
+        with requests_mock.Mocker() as m:
+            m.post(RPC_URL, json=data)
+            assert (
+                SorobanServer(RPC_URL).get_events(
+                    filters=filters, cursor=cursor, limit=limit
+                )
+                == events_response
+            )
+
+        request_data = m.last_request.json()
+        assert len(request_data["id"]) == 32
+        assert request_data["jsonrpc"] == "2.0"
+        assert request_data["method"] == "getEvents"
+        assert request_data["params"] == {
+            "filters": [
+                {
+                    "contractIds": [
+                        "CBNYUGHFAIWK3HOINA2OIGOOBMQU4D3MPQWFYBTUYY5WY4FVDO2GWXUY"
+                    ],
+                    "topics": [
+                        ["AAAADwAAAAdDT1VOVEVSAA==", "AAAADwAAAAlpbmNyZW1lbnQAAAA="]
+                    ],
+                    "type": "contract",
+                }
+            ],
+            "pagination": {"cursor": "0000054747948126208-0000000000", "limit": 10},
+            "startLedger": None,
         }
 
     def test_get_latest_ledger(self):
@@ -399,9 +443,9 @@ class TestSorobanServer:
             "result": result,
         }
         with requests_mock.Mocker() as m:
-            m.post(PRC_URL, json=data)
+            m.post(RPC_URL, json=data)
             assert SorobanServer(
-                PRC_URL
+                RPC_URL
             ).get_latest_ledger() == GetLatestLedgerResponse.model_validate(result)
 
         request_data = m.last_request.json()
@@ -457,9 +501,9 @@ class TestSorobanServer:
             "result": result,
         }
         with requests_mock.Mocker() as m:
-            m.post(PRC_URL, json=data)
+            m.post(RPC_URL, json=data)
             assert SorobanServer(
-                PRC_URL
+                RPC_URL
             ).get_fee_stats() == GetFeeStatsResponse.model_validate(result)
 
         request_data = m.last_request.json()
@@ -562,13 +606,14 @@ class TestSorobanServer:
         }
 
         start_ledger = 1888539
-        GetTransactionsResponse.model_validate(result)
+        txs_response = GetTransactionsResponse.model_validate(result)
         limit = 5
         with requests_mock.Mocker() as m:
-            m.post(PRC_URL, json=data)
-            assert SorobanServer(PRC_URL).get_transactions(
-                start_ledger, None, limit
-            ) == GetTransactionsResponse.model_validate(result)
+            m.post(RPC_URL, json=data)
+            assert (
+                SorobanServer(RPC_URL).get_transactions(start_ledger, None, limit)
+                == txs_response
+            )
 
         request_data = m.last_request.json()
         assert len(request_data["id"]) == 32
@@ -578,6 +623,26 @@ class TestSorobanServer:
             "startLedger": 1888539,
             "pagination": {"cursor": None, "limit": 5},
         }
+
+    def test_get_transactions_without_args(self):
+        data = {
+            "jsonrpc": "2.0",
+            "id": "198cb1a8-9104-4446-a269-88bf000c2721",
+            "result": {
+                "transactions": [],
+                "latestLedger": 1888542,
+                "latestLedgerCloseTimestamp": 1717166057,
+                "oldestLedger": 1871263,
+                "oldestLedgerCloseTimestamp": 1717075350,
+                "cursor": "8111217537191937",
+            },
+        }
+        # test that all arguments are optional
+        with requests_mock.Mocker() as m:
+            m.post(RPC_URL, json=data)
+            assert isinstance(
+                SorobanServer(RPC_URL).get_transactions(), GetTransactionsResponse
+            )
 
     def test_get_ledgers(self):
         result = {
@@ -611,13 +676,14 @@ class TestSorobanServer:
         }
 
         start_ledger = 10
-        GetLedgersResponse.model_validate(result)
+        ledgers_response = GetLedgersResponse.model_validate(result)
         limit = 2
         with requests_mock.Mocker() as m:
-            m.post(PRC_URL, json=data)
-            assert SorobanServer(PRC_URL).get_ledgers(
-                start_ledger, None, limit
-            ) == GetLedgersResponse.model_validate(result)
+            m.post(RPC_URL, json=data)
+            assert (
+                SorobanServer(RPC_URL).get_ledgers(start_ledger, None, limit)
+                == ledgers_response
+            )
 
         request_data = m.last_request.json()
         assert len(request_data["id"]) == 32
@@ -627,6 +693,24 @@ class TestSorobanServer:
             "startLedger": start_ledger,
             "pagination": {"cursor": None, "limit": 2},
         }
+
+    def test_get_ledgers_without_args(self):
+        data = {
+            "jsonrpc": "2.0",
+            "id": "198cb1a8-9104-4446-a269-88bf000c2721",
+            "result": {
+                "ledgers": [],
+                "latestLedger": 113,
+                "latestLedgerCloseTime": 1731554518,
+                "oldestLedger": 8,
+                "oldestLedgerCloseTime": 1731554412,
+                "cursor": "11",
+            },
+        }
+        # test that all arguments are optional
+        with requests_mock.Mocker() as m:
+            m.post(RPC_URL, json=data)
+            assert isinstance(SorobanServer(RPC_URL).get_ledgers(), GetLedgersResponse)
 
     def test_simulate_transaction(self):
         result = {
@@ -661,8 +745,8 @@ class TestSorobanServer:
         }
         transaction = _build_soroban_transaction(None, [])
         with requests_mock.Mocker() as m:
-            m.post(PRC_URL, json=data)
-            assert SorobanServer(PRC_URL).simulate_transaction(
+            m.post(RPC_URL, json=data)
+            assert SorobanServer(RPC_URL).simulate_transaction(
                 transaction
             ) == SimulateTransactionResponse.model_validate(result)
 
@@ -700,8 +784,8 @@ class TestSorobanServer:
         }
         transaction = _build_soroban_transaction(None, [])
         with requests_mock.Mocker() as m:
-            m.post(PRC_URL, json=data)
-            assert SorobanServer(PRC_URL).simulate_transaction(
+            m.post(RPC_URL, json=data)
+            assert SorobanServer(RPC_URL).simulate_transaction(
                 transaction, ResourceLeeway(1000000)
             ) == SimulateTransactionResponse.model_validate(result)
 
@@ -739,8 +823,8 @@ class TestSorobanServer:
 
         transaction = _build_soroban_transaction(None, [])
         with requests_mock.Mocker() as m:
-            m.post(PRC_URL, json=data)
-            new_transaction = SorobanServer(PRC_URL).prepare_transaction(transaction)
+            m.post(RPC_URL, json=data)
+            new_transaction = SorobanServer(RPC_URL).prepare_transaction(transaction)
         expected_transaction = copy.deepcopy(transaction)
         expected_transaction.transaction.fee += int(data["result"]["minResourceFee"])
         expected_transaction.transaction.soroban_data = (
@@ -793,8 +877,8 @@ class TestSorobanServer:
         )  # soroban_data will be overwritten by the response
         transaction = _build_soroban_transaction(soroban_data, [])
         with requests_mock.Mocker() as m:
-            m.post(PRC_URL, json=data)
-            new_transaction = SorobanServer(PRC_URL).prepare_transaction(transaction)
+            m.post(RPC_URL, json=data)
+            new_transaction = SorobanServer(RPC_URL).prepare_transaction(transaction)
         expected_transaction = copy.deepcopy(transaction)
         expected_transaction.transaction.fee = 50000 + int(
             data["result"]["minResourceFee"]
@@ -855,8 +939,8 @@ class TestSorobanServer:
 
         transaction = _build_soroban_transaction(None, [auth])
         with requests_mock.Mocker() as m:
-            m.post(PRC_URL, json=data)
-            new_transaction = SorobanServer(PRC_URL).prepare_transaction(transaction)
+            m.post(RPC_URL, json=data)
+            new_transaction = SorobanServer(RPC_URL).prepare_transaction(transaction)
         expected_transaction = copy.deepcopy(transaction)
         expected_transaction.transaction.fee += int(data["result"]["minResourceFee"])
         expected_transaction.transaction.soroban_data = (
@@ -882,12 +966,12 @@ class TestSorobanServer:
         }
         transaction = _build_soroban_transaction(None, [])
         with requests_mock.Mocker() as m:
-            m.post(PRC_URL, json=data)
+            m.post(RPC_URL, json=data)
             with pytest.raises(
                 PrepareTransactionException,
                 match="Simulation transaction failed, the response contains error information.",
             ) as e:
-                SorobanServer(PRC_URL).prepare_transaction(transaction)
+                SorobanServer(RPC_URL).prepare_transaction(transaction)
             assert (
                 e.value.simulate_transaction_response
                 == SimulateTransactionResponse.model_validate(data["result"])
@@ -913,12 +997,12 @@ class TestSorobanServer:
         }
         transaction = _build_soroban_transaction(None, [])
         with requests_mock.Mocker() as m:
-            m.post(PRC_URL, json=data)
+            m.post(RPC_URL, json=data)
             with pytest.raises(
                 ValueError,
                 match="Simulation results invalid",
             ) as e:
-                SorobanServer(PRC_URL).prepare_transaction(transaction)
+                SorobanServer(RPC_URL).prepare_transaction(transaction)
 
     def test_send_transaction(self):
         result = {
@@ -935,8 +1019,8 @@ class TestSorobanServer:
 
         transaction = _build_soroban_transaction(None, [])
         with requests_mock.Mocker() as m:
-            m.post(PRC_URL, json=data)
-            assert SorobanServer(PRC_URL).send_transaction(
+            m.post(RPC_URL, json=data)
+            assert SorobanServer(RPC_URL).send_transaction(
                 transaction
             ) == SendTransactionResponse.model_validate(result)
 
@@ -966,8 +1050,8 @@ class TestSorobanServer:
 
         transaction = _build_soroban_transaction(None, [])
         with requests_mock.Mocker() as m:
-            m.post(PRC_URL, json=data)
-            assert SorobanServer(PRC_URL).send_transaction(
+            m.post(RPC_URL, json=data)
+            assert SorobanServer(RPC_URL).send_transaction(
                 transaction
             ) == SendTransactionResponse.model_validate(result)
 
@@ -989,12 +1073,22 @@ class TestSorobanServer:
             },
         }
         with requests_mock.Mocker() as m:
-            m.post(PRC_URL, json=data)
+            m.post(RPC_URL, json=data)
             with pytest.raises(SorobanRpcErrorResponse) as e:
-                SorobanServer(PRC_URL).get_health()
+                SorobanServer(RPC_URL).get_health()
             assert e.value.code == -32601
             assert e.value.message == "method not found"
             assert e.value.data == "mockTest"
+
+    def test_pagination_start_ledger_and_cursor_raise(self):
+        with pytest.raises(ValidationError) as e:
+            SorobanServer(RPC_URL).get_transactions(
+                start_ledger=67, cursor="8111217537191937", limit=1
+            )
+        assert e.value.error_count() == 1
+        val_error = e.value.errors()[0]
+        assert val_error["type"] == "value_error"
+        assert val_error["msg"].endswith("start_ledger and cursor cannot both be set")
 
 
 def _build_soroban_transaction(

@@ -2,6 +2,7 @@ import copy
 
 import pytest
 from aioresponses import aioresponses
+from pydantic import ValidationError
 from yarl import URL
 
 from stellar_sdk import Account, Keypair, Network, TransactionBuilder, scval
@@ -16,7 +17,7 @@ from stellar_sdk.exceptions import (
 from stellar_sdk.soroban_rpc import *
 from stellar_sdk.soroban_server_async import SorobanServerAsync
 
-PRC_URL = "https://example.com/soroban_rpc"
+RPC_URL = "https://example.com/soroban_rpc"
 
 
 @pytest.mark.asyncio
@@ -41,12 +42,12 @@ class TestSorobanServer:
         account_id = "GDAT5HWTGIU4TSSZ4752OUC4SABDLTLZFRPZUJ3D6LKBNEPA7V2CIG54"
 
         with aioresponses() as m:
-            m.post(PRC_URL, payload=data)
-            async with SorobanServerAsync(PRC_URL) as client:
+            m.post(RPC_URL, payload=data)
+            async with SorobanServerAsync(RPC_URL) as client:
                 assert (await client.load_account(account_id)) == Account(
                     account_id, 3418793967628
                 )
-        request_data = m.requests[("POST", URL(PRC_URL))][0].kwargs["json"]
+        request_data = m.requests[("POST", URL(RPC_URL))][0].kwargs["json"]
         assert len(request_data["id"]) == 32
         assert request_data["jsonrpc"] == "2.0"
         assert request_data["method"] == "getLedgerEntries"
@@ -63,15 +64,15 @@ class TestSorobanServer:
         }
         account_id = "GDAT5HWTGIU4TSSZ4752OUC4SABDLTLZFRPZUJ3D6LKBNEPA7V2CIG54"
         with aioresponses() as m:
-            m.post(PRC_URL, payload=data)
+            m.post(RPC_URL, payload=data)
             with pytest.raises(
                 AccountNotFoundException,
                 match=f"Account not found, account_id: {account_id}",
             ):
-                async with SorobanServerAsync(PRC_URL) as client:
+                async with SorobanServerAsync(RPC_URL) as client:
                     await client.load_account(account_id)
 
-        request_data = m.requests[("POST", URL(PRC_URL))][0].kwargs["json"]
+        request_data = m.requests[("POST", URL(RPC_URL))][0].kwargs["json"]
         assert len(request_data["id"]) == 32
         assert request_data["jsonrpc"] == "2.0"
         assert request_data["method"] == "getLedgerEntries"
@@ -92,12 +93,12 @@ class TestSorobanServer:
             "result": result,
         }
         with aioresponses() as m:
-            m.post(PRC_URL, payload=data)
-            async with SorobanServerAsync(PRC_URL) as client:
+            m.post(RPC_URL, payload=data)
+            async with SorobanServerAsync(RPC_URL) as client:
                 assert await client.get_health() == GetHealthResponse.model_validate(
                     result
                 )
-        request_data = m.requests[("POST", URL(PRC_URL))][0].kwargs["json"]
+        request_data = m.requests[("POST", URL(RPC_URL))][0].kwargs["json"]
         assert len(request_data["id"]) == 32
         assert request_data["jsonrpc"] == "2.0"
         assert request_data["method"] == "getHealth"
@@ -118,13 +119,13 @@ class TestSorobanServer:
         GetNetworkResponse.model_validate(result)
 
         with aioresponses() as m:
-            m.post(PRC_URL, payload=data)
-            async with SorobanServerAsync(PRC_URL) as client:
+            m.post(RPC_URL, payload=data)
+            async with SorobanServerAsync(RPC_URL) as client:
                 assert await client.get_network() == GetNetworkResponse.model_validate(
                     result
                 )
 
-        request_data = m.requests[("POST", URL(PRC_URL))][0].kwargs["json"]
+        request_data = m.requests[("POST", URL(RPC_URL))][0].kwargs["json"]
         assert len(request_data["id"]) == 32
         assert request_data["jsonrpc"] == "2.0"
         assert request_data["method"] == "getNetwork"
@@ -147,14 +148,14 @@ class TestSorobanServer:
         GetVersionInfoResponse.model_validate(result)
 
         with aioresponses() as m:
-            m.post(PRC_URL, payload=data)
-            async with SorobanServerAsync(PRC_URL) as client:
+            m.post(RPC_URL, payload=data)
+            async with SorobanServerAsync(RPC_URL) as client:
                 assert (
                     await client.get_version_info()
                     == GetVersionInfoResponse.model_validate(result)
                 )
 
-        request_data = m.requests[("POST", URL(PRC_URL))][0].kwargs["json"]
+        request_data = m.requests[("POST", URL(RPC_URL))][0].kwargs["json"]
         assert len(request_data["id"]) == 32
         assert request_data["jsonrpc"] == "2.0"
         assert request_data["method"] == "getVersionInfo"
@@ -181,13 +182,13 @@ class TestSorobanServer:
         contract_id = "CBNYUGHFAIWK3HOINA2OIGOOBMQU4D3MPQWFYBTUYY5WY4FVDO2GWXUY"
         key = stellar_xdr.SCVal(stellar_xdr.SCValType.SCV_LEDGER_KEY_CONTRACT_INSTANCE)
         with aioresponses() as m:
-            m.post(PRC_URL, payload=data)
-            async with SorobanServerAsync(PRC_URL) as client:
+            m.post(RPC_URL, payload=data)
+            async with SorobanServerAsync(RPC_URL) as client:
                 assert (
                     await client.get_contract_data(contract_id, key)
                 ) == GetLedgerEntriesResponse.model_validate(result).entries[0]
 
-        request_data = m.requests[("POST", URL(PRC_URL))][0].kwargs["json"]
+        request_data = m.requests[("POST", URL(RPC_URL))][0].kwargs["json"]
         assert len(request_data["id"]) == 32
         assert request_data["jsonrpc"] == "2.0"
         assert request_data["method"] == "getLedgerEntries"
@@ -208,11 +209,11 @@ class TestSorobanServer:
         contract_id = "CBNYUGHFAIWK3HOINA2OIGOOBMQU4D3MPQWFYBTUYY5WY4FVDO2GWXUY"
         key = stellar_xdr.SCVal(stellar_xdr.SCValType.SCV_LEDGER_KEY_CONTRACT_INSTANCE)
         with aioresponses() as m:
-            m.post(PRC_URL, payload=data)
-            async with SorobanServerAsync(PRC_URL) as client:
+            m.post(RPC_URL, payload=data)
+            async with SorobanServerAsync(RPC_URL) as client:
                 assert (await client.get_contract_data(contract_id, key)) is None
 
-        request_data = m.requests[("POST", URL(PRC_URL))][0].kwargs["json"]
+        request_data = m.requests[("POST", URL(RPC_URL))][0].kwargs["json"]
         assert len(request_data["id"]) == 32
         assert request_data["jsonrpc"] == "2.0"
         assert request_data["method"] == "getLedgerEntries"
@@ -262,13 +263,13 @@ class TestSorobanServer:
             ),
         )
         with aioresponses() as m:
-            m.post(PRC_URL, payload=data)
-            async with SorobanServerAsync(PRC_URL) as client:
+            m.post(RPC_URL, payload=data)
+            async with SorobanServerAsync(RPC_URL) as client:
                 assert (
                     await client.get_ledger_entries([key0, key1])
                 ) == GetLedgerEntriesResponse.model_validate(result)
 
-        request_data = m.requests[("POST", URL(PRC_URL))][0].kwargs["json"]
+        request_data = m.requests[("POST", URL(RPC_URL))][0].kwargs["json"]
         assert len(request_data["id"]) == 32
         assert request_data["jsonrpc"] == "2.0"
         assert request_data["method"] == "getLedgerEntries"
@@ -301,54 +302,55 @@ class TestSorobanServer:
         }
         tx_hash = "06dd9ee70bf93bbfe219e2b31363ab5a0361cc6285328592e4d3d1fed4c9025c"
         with aioresponses() as m:
-            m.post(PRC_URL, payload=data)
-            async with SorobanServerAsync(PRC_URL) as client:
+            m.post(RPC_URL, payload=data)
+            async with SorobanServerAsync(RPC_URL) as client:
                 assert (
                     await client.get_transaction(tx_hash)
                 ) == GetTransactionResponse.model_validate(result)
 
-        request_data = m.requests[("POST", URL(PRC_URL))][0].kwargs["json"]
+        request_data = m.requests[("POST", URL(RPC_URL))][0].kwargs["json"]
         assert len(request_data["id"]) == 32
         assert request_data["jsonrpc"] == "2.0"
         assert request_data["method"] == "getTransaction"
         assert request_data["params"] == {"hash": tx_hash}
 
     async def test_get_events(self):
+        events = [
+            {
+                "type": "contract",
+                "ledger": "12739",
+                "ledgerClosedAt": "2023-09-16T06:23:57Z",
+                "contractId": "CBNYUGHFAIWK3HOINA2OIGOOBMQU4D3MPQWFYBTUYY5WY4FVDO2GWXUY",
+                "id": "0000054713588387840-0000000000",
+                "pagingToken": "0000054713588387840-0000000000",
+                "topic": [
+                    "AAAADwAAAAdDT1VOVEVSAA==",
+                    "AAAADwAAAAlpbmNyZW1lbnQAAAA=",
+                ],
+                "value": "AAAAAwAAAAE=",
+                "inSuccessfulContractCall": True,
+                "txHash": "db86e94aa98b7d38213c041ebbb727fbaabf0b7c435de594f36c2d51fc61926d",
+            },
+            {
+                "type": "contract",
+                "ledger": "12747",
+                "ledgerClosedAt": "2023-09-16T06:24:05Z",
+                "contractId": "CBNYUGHFAIWK3HOINA2OIGOOBMQU4D3MPQWFYBTUYY5WY4FVDO2GWXUY",
+                "id": "0000054747948126208-0000000000",
+                "pagingToken": "0000054747948126208-0000000000",
+                "topic": [
+                    "AAAADwAAAAdDT1VOVEVSAA==",
+                    "AAAADwAAAAlpbmNyZW1lbnQAAAA=",
+                ],
+                "value": "AAAAAwAAAAI=",
+                "inSuccessfulContractCall": True,
+                "txHash": "db86e94aa98b7d38213c041ebbb727fbaabf0b7c435de594f36c2d51fc61926d",
+            },
+        ]
         result = {
-            "events": [
-                {
-                    "type": "contract",
-                    "ledger": "12739",
-                    "ledgerClosedAt": "2023-09-16T06:23:57Z",
-                    "contractId": "CBNYUGHFAIWK3HOINA2OIGOOBMQU4D3MPQWFYBTUYY5WY4FVDO2GWXUY",
-                    "id": "0000054713588387840-0000000000",
-                    "pagingToken": "0000054713588387840-0000000000",
-                    "topic": [
-                        "AAAADwAAAAdDT1VOVEVSAA==",
-                        "AAAADwAAAAlpbmNyZW1lbnQAAAA=",
-                    ],
-                    "value": "AAAAAwAAAAE=",
-                    "inSuccessfulContractCall": True,
-                    "txHash": "db86e94aa98b7d38213c041ebbb727fbaabf0b7c435de594f36c2d51fc61926d",
-                },
-                {
-                    "type": "contract",
-                    "ledger": "12747",
-                    "ledgerClosedAt": "2023-09-16T06:24:05Z",
-                    "contractId": "CBNYUGHFAIWK3HOINA2OIGOOBMQU4D3MPQWFYBTUYY5WY4FVDO2GWXUY",
-                    "id": "0000054747948126208-0000000000",
-                    "pagingToken": "0000054747948126208-0000000000",
-                    "topic": [
-                        "AAAADwAAAAdDT1VOVEVSAA==",
-                        "AAAADwAAAAlpbmNyZW1lbnQAAAA=",
-                    ],
-                    "value": "AAAAAwAAAAI=",
-                    "inSuccessfulContractCall": True,
-                    "txHash": "db86e94aa98b7d38213c041ebbb727fbaabf0b7c435de594f36c2d51fc61926d",
-                },
-            ],
+            "events": events,
             "latestLedger": "187",
-            "cursor": "0000054713588387840-0000000000",
+            "cursor": "0000054747948126208-0000000000",
         }
         data = {
             "jsonrpc": "2.0",
@@ -368,17 +370,17 @@ class TestSorobanServer:
                 ],
             )
         ]
-        GetEventsResponse.model_validate(result)
+        events_response = GetEventsResponse.model_validate(result)
         cursor = "0000054713588387839-0000000000"
         limit = 10
         with aioresponses() as m:
-            m.post(PRC_URL, payload=data)
-            async with SorobanServerAsync(PRC_URL) as client:
+            m.post(RPC_URL, payload=data)
+            async with SorobanServerAsync(RPC_URL) as client:
                 assert (
-                    await client.get_events(start_ledger, filters, cursor, limit)
-                ) == GetEventsResponse.model_validate(result)
+                    await client.get_events(start_ledger, filters, limit=limit)
+                ) == events_response
 
-        request_data = m.requests[("POST", URL(PRC_URL))][0].kwargs["json"]
+        request_data = m.requests[("POST", URL(RPC_URL))][0].kwargs["json"]
         assert len(request_data["id"]) == 32
         assert request_data["jsonrpc"] == "2.0"
         assert request_data["method"] == "getEvents"
@@ -394,8 +396,48 @@ class TestSorobanServer:
                     "type": "contract",
                 }
             ],
-            "pagination": {"cursor": "0000054713588387839-0000000000", "limit": 10},
+            "pagination": {"cursor": None, "limit": 10},
             "startLedger": 100,
+        }
+
+        # simulate the advance of one ledger
+        cursor = events_response.cursor
+        result = {
+            "events": [],
+            "latestLedger": "188",
+            "cursor": "0000054747948126210-0000000000",
+        }
+        data = {
+            "jsonrpc": "2.0",
+            "id": "198cb1a8-9104-4446-a269-88bf000c3986",
+            "result": result,
+        }
+        events_response = GetEventsResponse.model_validate(result)
+        with aioresponses() as m:
+            m.post(RPC_URL, payload=data)
+            async with SorobanServerAsync(RPC_URL) as client:
+                assert (
+                    await client.get_events(filters=filters, cursor=cursor, limit=limit)
+                ) == events_response
+
+        request_data = m.requests[("POST", URL(RPC_URL))][0].kwargs["json"]
+        assert len(request_data["id"]) == 32
+        assert request_data["jsonrpc"] == "2.0"
+        assert request_data["method"] == "getEvents"
+        assert request_data["params"] == {
+            "filters": [
+                {
+                    "contractIds": [
+                        "CBNYUGHFAIWK3HOINA2OIGOOBMQU4D3MPQWFYBTUYY5WY4FVDO2GWXUY"
+                    ],
+                    "topics": [
+                        ["AAAADwAAAAdDT1VOVEVSAA==", "AAAADwAAAAlpbmNyZW1lbnQAAAA="]
+                    ],
+                    "type": "contract",
+                }
+            ],
+            "pagination": {"cursor": "0000054747948126208-0000000000", "limit": 10},
+            "startLedger": None,
         }
 
     async def test_get_latest_ledger(self):
@@ -410,13 +452,13 @@ class TestSorobanServer:
             "result": result,
         }
         with aioresponses() as m:
-            m.post(PRC_URL, payload=data)
-            async with SorobanServerAsync(PRC_URL) as client:
+            m.post(RPC_URL, payload=data)
+            async with SorobanServerAsync(RPC_URL) as client:
                 assert (
                     await client.get_latest_ledger()
                 ) == GetLatestLedgerResponse.model_validate(result)
 
-        request_data = m.requests[("POST", URL(PRC_URL))][0].kwargs["json"]
+        request_data = m.requests[("POST", URL(RPC_URL))][0].kwargs["json"]
         assert len(request_data["id"]) == 32
         assert request_data["jsonrpc"] == "2.0"
         assert request_data["method"] == "getLatestLedger"
@@ -469,13 +511,13 @@ class TestSorobanServer:
             "result": result,
         }
         with aioresponses() as m:
-            m.post(PRC_URL, payload=data)
-            async with SorobanServerAsync(PRC_URL) as client:
+            m.post(RPC_URL, payload=data)
+            async with SorobanServerAsync(RPC_URL) as client:
                 assert (
                     await client.get_fee_stats()
                 ) == GetFeeStatsResponse.model_validate(result)
 
-        request_data = m.requests[("POST", URL(PRC_URL))][0].kwargs["json"]
+        request_data = m.requests[("POST", URL(RPC_URL))][0].kwargs["json"]
         assert len(request_data["id"]) == 32
         assert request_data["jsonrpc"] == "2.0"
         assert request_data["method"] == "getFeeStats"
@@ -578,13 +620,13 @@ class TestSorobanServer:
         GetTransactionsResponse.model_validate(result)
         limit = 5
         with aioresponses() as m:
-            m.post(PRC_URL, payload=data)
-            async with SorobanServerAsync(PRC_URL) as client:
+            m.post(RPC_URL, payload=data)
+            async with SorobanServerAsync(RPC_URL) as client:
                 assert (
                     await client.get_transactions(start_ledger, None, limit)
                 ) == GetTransactionsResponse.model_validate(result)
 
-        request_data = m.requests[("POST", URL(PRC_URL))][0].kwargs["json"]
+        request_data = m.requests[("POST", URL(RPC_URL))][0].kwargs["json"]
         assert len(request_data["id"]) == 32
         assert request_data["jsonrpc"] == "2.0"
         assert request_data["method"] == "getTransactions"
@@ -628,13 +670,13 @@ class TestSorobanServer:
         GetLedgersResponse.model_validate(result)
         limit = 2
         with aioresponses() as m:
-            m.post(PRC_URL, payload=data)
-            async with SorobanServerAsync(PRC_URL) as client:
+            m.post(RPC_URL, payload=data)
+            async with SorobanServerAsync(RPC_URL) as client:
                 assert (
                     await client.get_ledgers(start_ledger, None, limit)
                 ) == GetLedgersResponse.model_validate(result)
 
-        request_data = m.requests[("POST", URL(PRC_URL))][0].kwargs["json"]
+        request_data = m.requests[("POST", URL(RPC_URL))][0].kwargs["json"]
         assert len(request_data["id"]) == 32
         assert request_data["jsonrpc"] == "2.0"
         assert request_data["method"] == "getLedgers"
@@ -676,13 +718,13 @@ class TestSorobanServer:
         }
         transaction = _build_soroban_transaction(None, [])
         with aioresponses() as m:
-            m.post(PRC_URL, payload=data)
-            async with SorobanServerAsync(PRC_URL) as client:
+            m.post(RPC_URL, payload=data)
+            async with SorobanServerAsync(RPC_URL) as client:
                 assert (
                     await client.simulate_transaction(transaction)
                 ) == SimulateTransactionResponse.model_validate(result)
 
-        request_data = m.requests[("POST", URL(PRC_URL))][0].kwargs["json"]
+        request_data = m.requests[("POST", URL(RPC_URL))][0].kwargs["json"]
         assert len(request_data["id"]) == 32
         assert request_data["jsonrpc"] == "2.0"
         assert request_data["method"] == "simulateTransaction"
@@ -716,15 +758,15 @@ class TestSorobanServer:
         }
         transaction = _build_soroban_transaction(None, [])
         with aioresponses() as m:
-            m.post(PRC_URL, payload=data)
-            async with SorobanServerAsync(PRC_URL) as client:
+            m.post(RPC_URL, payload=data)
+            async with SorobanServerAsync(RPC_URL) as client:
                 assert (
                     await client.simulate_transaction(
                         transaction, ResourceLeeway(1000000)
                     )
                 ) == SimulateTransactionResponse.model_validate(result)
 
-        request_data = m.requests[("POST", URL(PRC_URL))][0].kwargs["json"]
+        request_data = m.requests[("POST", URL(RPC_URL))][0].kwargs["json"]
         assert len(request_data["id"]) == 32
         assert request_data["jsonrpc"] == "2.0"
         assert request_data["method"] == "simulateTransaction"
@@ -758,8 +800,8 @@ class TestSorobanServer:
 
         transaction = _build_soroban_transaction(None, [])
         with aioresponses() as m:
-            m.post(PRC_URL, payload=data)
-            async with SorobanServerAsync(PRC_URL) as client:
+            m.post(RPC_URL, payload=data)
+            async with SorobanServerAsync(RPC_URL) as client:
                 new_transaction = await client.prepare_transaction(transaction)
         expected_transaction = copy.deepcopy(transaction)
         expected_transaction.transaction.fee += int(data["result"]["minResourceFee"])
@@ -813,8 +855,8 @@ class TestSorobanServer:
         )  # soroban_data will be overwritten by the response
         transaction = _build_soroban_transaction(soroban_data, [])
         with aioresponses() as m:
-            m.post(PRC_URL, payload=data)
-            async with SorobanServerAsync(PRC_URL) as client:
+            m.post(RPC_URL, payload=data)
+            async with SorobanServerAsync(RPC_URL) as client:
                 new_transaction = await client.prepare_transaction(transaction)
         expected_transaction = copy.deepcopy(transaction)
         expected_transaction.transaction.fee = 50000 + int(
@@ -876,8 +918,8 @@ class TestSorobanServer:
 
         transaction = _build_soroban_transaction(None, [auth])
         with aioresponses() as m:
-            m.post(PRC_URL, payload=data)
-            async with SorobanServerAsync(PRC_URL) as client:
+            m.post(RPC_URL, payload=data)
+            async with SorobanServerAsync(RPC_URL) as client:
                 new_transaction = await client.prepare_transaction(transaction)
         expected_transaction = copy.deepcopy(transaction)
         expected_transaction.transaction.fee += int(data["result"]["minResourceFee"])
@@ -906,12 +948,12 @@ class TestSorobanServer:
         }
         transaction = _build_soroban_transaction(None, [])
         with aioresponses() as m:
-            m.post(PRC_URL, payload=data)
+            m.post(RPC_URL, payload=data)
             with pytest.raises(
                 PrepareTransactionException,
                 match="Simulation transaction failed, the response contains error information.",
             ) as e:
-                async with SorobanServerAsync(PRC_URL) as client:
+                async with SorobanServerAsync(RPC_URL) as client:
                     await client.prepare_transaction(transaction)
             assert (
                 e.value.simulate_transaction_response
@@ -938,12 +980,12 @@ class TestSorobanServer:
         }
         transaction = _build_soroban_transaction(None, [])
         with aioresponses() as m:
-            m.post(PRC_URL, payload=data)
+            m.post(RPC_URL, payload=data)
             with pytest.raises(
                 ValueError,
                 match="Simulation results invalid",
             ) as e:
-                async with SorobanServerAsync(PRC_URL) as client:
+                async with SorobanServerAsync(RPC_URL) as client:
                     await client.prepare_transaction(transaction)
 
     async def test_send_transaction(self):
@@ -961,13 +1003,13 @@ class TestSorobanServer:
 
         transaction = _build_soroban_transaction(None, [])
         with aioresponses() as m:
-            m.post(PRC_URL, payload=data)
-            async with SorobanServerAsync(PRC_URL) as client:
+            m.post(RPC_URL, payload=data)
+            async with SorobanServerAsync(RPC_URL) as client:
                 assert (
                     await client.send_transaction(transaction)
                 ) == SendTransactionResponse.model_validate(result)
 
-        request_data = m.requests[("POST", URL(PRC_URL))][0].kwargs["json"]
+        request_data = m.requests[("POST", URL(RPC_URL))][0].kwargs["json"]
         assert len(request_data["id"]) == 32
         assert request_data["jsonrpc"] == "2.0"
         assert request_data["method"] == "sendTransaction"
@@ -993,13 +1035,13 @@ class TestSorobanServer:
 
         transaction = _build_soroban_transaction(None, [])
         with aioresponses() as m:
-            m.post(PRC_URL, payload=data)
-            async with SorobanServerAsync(PRC_URL) as client:
+            m.post(RPC_URL, payload=data)
+            async with SorobanServerAsync(RPC_URL) as client:
                 assert (
                     await client.send_transaction(transaction)
                 ) == SendTransactionResponse.model_validate(result)
 
-        request_data = m.requests[("POST", URL(PRC_URL))][0].kwargs["json"]
+        request_data = m.requests[("POST", URL(RPC_URL))][0].kwargs["json"]
         assert len(request_data["id"]) == 32
         assert request_data["jsonrpc"] == "2.0"
         assert request_data["method"] == "sendTransaction"
@@ -1017,13 +1059,24 @@ class TestSorobanServer:
             },
         }
         with aioresponses() as m:
-            m.post(PRC_URL, payload=data)
+            m.post(RPC_URL, payload=data)
             with pytest.raises(SorobanRpcErrorResponse) as e:
-                async with SorobanServerAsync(PRC_URL) as client:
+                async with SorobanServerAsync(RPC_URL) as client:
                     await client.get_health()
             assert e.value.code == -32601
             assert e.value.message == "method not found"
             assert e.value.data == "mockTest"
+
+    async def test_pagination_start_ledger_and_cursor_raise(self):
+        with pytest.raises(ValidationError) as e:
+            async with SorobanServerAsync(RPC_URL) as client:
+                await client.get_transactions(
+                    start_ledger=67, cursor="8111217537191937", limit=1
+                )
+        assert e.value.error_count() == 1
+        val_error = e.value.errors()[0]
+        assert val_error["type"] == "value_error"
+        assert val_error["msg"].endswith("start_ledger and cursor cannot both be set")
 
 
 def _build_soroban_transaction(

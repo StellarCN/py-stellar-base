@@ -58,6 +58,7 @@ toml = "^0.10.2"
 pydantic = "^2.5.2"
 xdrlib3 = "^0.1.1"
 requests-sse = ">=0.3,<0.6"
+typing-extensions = "^4.13.2"
 
 [tool.poetry.extras]
 aiohttp = ["aiohttp", "aiohttp-sse-client"]
