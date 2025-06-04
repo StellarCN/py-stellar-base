@@ -496,7 +496,6 @@ class SorobanServer:
             self.server_url,
             json_data=json.loads(json_data),
         )
-        print(json.dumps(data.json()))
         response = Response[response_body_type].model_validate(data.json())  # type: ignore[valid-type]
         if response.error:
             raise SorobanRpcErrorResponse(
