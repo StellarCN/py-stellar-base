@@ -384,7 +384,7 @@ class SorobanServer:
     ) -> GetSACBalanceResponse:
         """Returns a contract's balance of a particular SAC asset, if any.
 
-        This is a convenience wrapper around :py:meth:`get_ledger_entries() <stellar_sdk.soroban_server.SorobanServer.get_ledger_entries>`.
+        This is a convenience wrapper around :meth:`SorobanServer.get_ledger_entries`.
 
         :param contract_id: The contract ID whose balance of `sac` you want to know.
         :param sac: The build-in SAC token that you are querying from the given contract.

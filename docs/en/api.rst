@@ -782,8 +782,8 @@ SorobanServer
 .. autoclass:: stellar_sdk.SorobanServer
    :members:
 
-SorobanServer
-^^^^^^^^^^^^^
+SorobanServerAsync
+^^^^^^^^^^^^^^^^^^
 
 .. autoclass:: stellar_sdk.SorobanServerAsync
    :members:

@@ -475,8 +475,6 @@ class GetLedgersResponse(BaseModel):
 
 
 class SACBalanceEntry(BaseModel):
-    """SACBalanceEntry represents a single entry in the SAC balance response."""
-
     amount: int
     authorized: bool
     clawback: bool
@@ -485,10 +483,9 @@ class SACBalanceEntry(BaseModel):
 
 
 class GetSACBalanceResponse(BaseModel):
-    """Response for JSON-RPC method getSACBalance.
-
-    See `getSACBalance documentation <https://developers.stellar.org/docs/data/rpc/api-reference/methods/getSACBalance>`__ for
-    more information."""
+    """Response for :meth:`stellar_sdk.SorobanServer.get_sac_balance` and :meth:`stellar_sdk.SorobanServerAsync.get_sac_balance` methods."""
 
     latest_ledger: int
-    balance_entry: Optional[SACBalanceEntry]
+    balance_entry: Optional[SACBalanceEntry] = Field(
+        description="The balance entry for the account. If there is not a valid balance entry, this will be None."
+    )
