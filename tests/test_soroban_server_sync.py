@@ -4,7 +4,7 @@ import pytest
 import requests_mock
 from pydantic import ValidationError
 
-from stellar_sdk import Account, Keypair, Network, TransactionBuilder, scval
+from stellar_sdk import Account, Asset, Keypair, Network, TransactionBuilder, scval
 from stellar_sdk import xdr as stellar_xdr
 from stellar_sdk.address import Address
 from stellar_sdk.base_soroban_server import ResourceLeeway
@@ -711,6 +711,68 @@ class TestSorobanServer:
         with requests_mock.Mocker() as m:
             m.post(RPC_URL, json=data)
             assert isinstance(SorobanServer(RPC_URL).get_ledgers(), GetLedgersResponse)
+
+    def test_get_sac_balance(self):
+        result = {
+            "entries": [
+                {
+                    "key": "AAAABgAAAAEltPzYWa7C+mNIQ4xImzw8EMmLbSG+T9PLMMtolT75dwAAABAAAAABAAAAAgAAAA8AAAAHQmFsYW5jZQAAAAASAAAAASW0/NhZrsL6Y0hDjEibPDwQyYttIb5P08swy2iVPvl3AAAAAQ==",
+                    "xdr": "AAAABgAAAAAAAAABJbT82FmuwvpjSEOMSJs8PBDJi20hvk/TyzDLaJU++XcAAAAQAAAAAQAAAAIAAAAPAAAAB0JhbGFuY2UAAAAAEgAAAAEltPzYWa7C+mNIQ4xImzw8EMmLbSG+T9PLMMtolT75dwAAAAEAAAARAAAAAQAAAAMAAAAPAAAABmFtb3VudAAAAAAACgAAAAAAAAAAAAAAABFKkyUAAAAPAAAACmF1dGhvcml6ZWQAAAAAAAAAAAABAAAADwAAAAhjbGF3YmFjawAAAAAAAAAA",
+                    "lastModifiedLedgerSeq": 57386587,
+                    "liveUntilLedgerSeq": 57904987,
+                }
+            ],
+            "latestLedger": 57387047,
+        }
+        data = {
+            "jsonrpc": "2.0",
+            "id": "e1fabdcdf0244a2a9adfab94d7748b6c",
+            "result": result,
+        }
+        expected_result = GetSACBalanceResponse(
+            latest_ledger=57387047,
+            balance_entry=SACBalanceEntry(
+                amount=290100005,
+                authorized=True,
+                clawback=False,
+                last_modified_ledger=57386587,
+                live_until_ledger=57904987,
+            ),
+        )
+        with requests_mock.Mocker() as m:
+            m.post(RPC_URL, json=data)
+            assert (
+                SorobanServer(RPC_URL).get_sac_balance(
+                    "CC25B67T7RG7IBWVQKBFRC6SR4MJDHYFDGMIQYVVI7WE55TPUILMH5YT",
+                    Asset.native(),
+                    Network.PUBLIC_NETWORK_PASSPHRASE,
+                )
+                == expected_result
+            )
+
+    def test_get_sac_balance_with_empty_balance_entry(self):
+        result = {"entries": [], "latestLedger": 57387178}
+        data = {
+            "jsonrpc": "2.0",
+            "id": "e1fabdcdf0244a2a9adfab94d7748b6c",
+            "result": result,
+        }
+        expected_result = GetSACBalanceResponse(
+            latest_ledger=57387178, balance_entry=None
+        )
+        with requests_mock.Mocker() as m:
+            m.post(RPC_URL, json=data)
+            assert (
+                SorobanServer(RPC_URL).get_sac_balance(
+                    "CDOAW6D7NXAPOCO7TFAWZNJHK62E3IYRGNRVX3VOXNKNVOXCLLPJXQCF",
+                    Asset(
+                        "yXLM",
+                        "GARDNV3Q7YGT4AKSDF25LT32YSCCW4EV22Y2TV3I2PU2MMXJTEDL5T55",
+                    ),
+                    Network.PUBLIC_NETWORK_PASSPHRASE,
+                )
+                == expected_result
+            )
 
     def test_simulate_transaction(self):
         result = {

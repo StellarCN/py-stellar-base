@@ -3,10 +3,11 @@ from __future__ import annotations
 import json
 from typing import TYPE_CHECKING, Type
 
-from . import Keypair
+from . import scval
 from . import xdr as stellar_xdr
 from .account import Account
 from .address import Address
+from .asset import Asset
 from .base_soroban_server import (
     Durability,
     ResourceLeeway,
@@ -19,7 +20,16 @@ from .exceptions import (
     PrepareTransactionException,
     SorobanRpcErrorResponse,
 )
+from .keypair import Keypair
 from .soroban_rpc import *
+from .strkey import StrKey
+from .xdr import (
+    ContractDataDurability,
+    LedgerEntryData,
+    LedgerEntryType,
+    LedgerKey,
+    LedgerKeyContractData,
+)
 
 if TYPE_CHECKING:
     from .client.base_sync_client import BaseSyncClient
@@ -368,6 +378,64 @@ class SorobanServer:
             params=None,
         )
         return self._post(request, GetVersionInfoResponse)
+
+    def get_sac_balance(
+        self, contract_id: str, sac: Asset, network_passphrase: Optional[str] = None
+    ) -> GetSACBalanceResponse:
+        """Returns a contract's balance of a particular SAC asset, if any.
+
+        This is a convenience wrapper around :meth:`SorobanServer.get_ledger_entries`.
+
+        :param contract_id: The contract ID whose balance of `sac` you want to know.
+        :param sac: The build-in SAC token that you are querying from the given contract.
+        :param network_passphrase: The network passphrase to use for the contract ID. If not provided, it will use the
+            network passphrase of the current network. We suggest you set it to enhance performance.
+        :return: A :class:`GetSACBalanceResponse <stellar_sdk.soroban_rpc.GetSACBalanceResponse>` which will contain the balance entry details if and only if the request returned a valid balance ledger
+            entry. If it doesn't, the `balance_entry` field will not exist.
+        """
+        if not StrKey.is_valid_contract(contract_id):
+            raise ValueError(f"Invalid contract ID: {contract_id}")
+
+        if network_passphrase is None:
+            network_passphrase = self.get_network().passphrase
+
+        sac_id = sac.contract_id(network_passphrase)
+        key = scval.to_vec([scval.to_symbol("Balance"), scval.to_address(sac_id)])
+        ledger_key = LedgerKey(
+            LedgerEntryType.CONTRACT_DATA,
+            contract_data=LedgerKeyContractData(
+                contract=Address(sac_id).to_xdr_sc_address(),
+                key=key,
+                durability=ContractDataDurability.PERSISTENT,
+            ),
+        )
+        response = self.get_ledger_entries([ledger_key])
+        if not response.entries:
+            return GetSACBalanceResponse(
+                latest_ledger=response.latest_ledger, balance_entry=None
+            )
+
+        raw_entry = response.entries[0]
+        entry_data = LedgerEntryData.from_xdr(raw_entry.xdr)
+
+        if entry_data.type != LedgerEntryType.CONTRACT_DATA:
+            return GetSACBalanceResponse(
+                latest_ledger=response.latest_ledger, balance_entry=None
+            )
+
+        assert entry_data.contract_data is not None
+        contract_data = scval.to_native(entry_data.contract_data.val)
+        assert isinstance(contract_data, dict)
+        return GetSACBalanceResponse(
+            latest_ledger=response.latest_ledger,
+            balance_entry=SACBalanceEntry(
+                amount=contract_data["amount"],
+                authorized=contract_data["authorized"],
+                clawback=contract_data["clawback"],
+                last_modified_ledger=raw_entry.last_modified_ledger,
+                live_until_ledger=raw_entry.live_until_ledger,
+            ),
+        )
 
     def prepare_transaction(
         self,

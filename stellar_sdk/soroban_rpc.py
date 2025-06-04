@@ -472,3 +472,20 @@ class GetLedgersResponse(BaseModel):
     oldest_ledger: int = Field(alias="oldestLedger")
     oldest_ledger_close_time: int = Field(alias="oldestLedgerCloseTime")
     cursor: str
+
+
+class SACBalanceEntry(BaseModel):
+    amount: int
+    authorized: bool
+    clawback: bool
+    last_modified_ledger: Optional[int] = Field(default=None)
+    live_until_ledger: Optional[int] = Field(default=None)
+
+
+class GetSACBalanceResponse(BaseModel):
+    """Response for :meth:`stellar_sdk.SorobanServer.get_sac_balance` and :meth:`stellar_sdk.SorobanServerAsync.get_sac_balance` methods."""
+
+    latest_ledger: int
+    balance_entry: Optional[SACBalanceEntry] = Field(
+        description="The balance entry for the account. If there is not a valid balance entry, this will be None."
+    )

@@ -3,6 +3,9 @@ Release History
 
 ### Pending
 
+#### Update:
+- feat: add `get_sac_balance` to `SorobanServer` and `SorobanServerAsync`. ([#1035](https://github.com/StellarCN/py-stellar-base/pull/1035))
+
 ### Version 12.2.1
 
 Released on April 11, 2025
