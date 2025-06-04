@@ -472,3 +472,23 @@ class GetLedgersResponse(BaseModel):
     oldest_ledger: int = Field(alias="oldestLedger")
     oldest_ledger_close_time: int = Field(alias="oldestLedgerCloseTime")
     cursor: str
+
+
+class SACBalanceEntry(BaseModel):
+    """SACBalanceEntry represents a single entry in the SAC balance response."""
+
+    amount: int
+    authorized: bool
+    clawback: bool
+    last_modified_ledger: Optional[int] = Field(default=None)
+    live_until_ledger: Optional[int] = Field(default=None)
+
+
+class GetSACBalanceResponse(BaseModel):
+    """Response for JSON-RPC method getSACBalance.
+
+    See `getSACBalance documentation <https://developers.stellar.org/docs/data/rpc/api-reference/methods/getSACBalance>`__ for
+    more information."""
+
+    latest_ledger: int
+    balance_entry: Optional[SACBalanceEntry]
