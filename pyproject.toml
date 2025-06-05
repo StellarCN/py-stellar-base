@@ -1,11 +1,8 @@
 [tool.poetry]
 name = "stellar-sdk"
-version = "12.2.1"
+version = "12.3.0"
 description = "The Python Stellar SDK library provides APIs to build transactions and connect to Horizon and Soroban-RPC server."
-authors = [
-    "overcat <4catcode@gmail.com>",
-    "Eno <appweb.cn@gmail.com>"
-]
+authors = ["overcat <4catcode@gmail.com>", "Eno <appweb.cn@gmail.com>"]
 maintainers = ["overcat <4catcode@gmail.com>"]
 readme = "README.rst"
 homepage = "https://github.com/StellarCN/py-stellar-base"
@@ -26,7 +23,7 @@ keywords = [
     "sdex",
     "trading",
     "soroban",
-    "soroban-rpc"
+    "soroban-rpc",
 ]
 license = "Apache License 2.0"
 classifiers = [
@@ -40,7 +37,7 @@ classifiers = [
     "Programming Language :: Python :: Implementation :: CPython",
     "Programming Language :: Python :: Implementation :: PyPy",
     "Topic :: Software Development :: Libraries :: Python Modules",
-    "Typing :: Typed"
+    "Typing :: Typed",
 ]
 
 [tool.poetry.urls]
@@ -50,8 +47,8 @@ classifiers = [
 python = ">=3.8,<4.0"
 PyNaCl = "^1.4.0"
 requests = "^2.32.3"
-aiohttp = { version = "^3.9.1", optional = true}
-aiohttp-sse-client = { version = "^0.2.1", optional = true}
+aiohttp = { version = "^3.9.1", optional = true }
+aiohttp-sse-client = { version = "^0.2.1", optional = true }
 mnemonic = "^0.20"
 shamir-mnemonic = { version = "^0.3.0", optional = true }
 toml = "^0.10.2"
@@ -71,7 +68,7 @@ pytest-timeout = "^2.4.0"
 pytest-asyncio = "^0.24.0"
 pytest-httpserver = "^1.1.1"
 requests-mock = "^1.12.1"
-aioresponses = {git = "https://github.com/pnuckowski/aioresponses.git", rev = "b83af203d5550006fd2328af230c2d93e36c6cb1"}
+aioresponses = { git = "https://github.com/pnuckowski/aioresponses.git", rev = "b83af203d5550006fd2328af230c2d93e36c6cb1" }
 
 [tool.mypy]
 show_error_codes = true
@@ -80,15 +77,10 @@ warn_unused_configs = true
 no_implicit_optional = false
 
 [tool.coverage.run]
-source = [
-    "stellar_sdk/",
-    "tests/"
-]
+source = ["stellar_sdk/", "tests/"]
 
 [tool.coverage.report]
-omit = [
-    "stellar_sdk/xdr/*",
-]
+omit = ["stellar_sdk/xdr/*"]
 exclude_lines = [
     "pragma: no cover",
     "raise AssertionError",
@@ -99,7 +91,7 @@ exclude_lines = [
     "if self\\.debug",
     "if 0:",
     "if __name__ == .__main__.:",
-    "pass"
+    "pass",
 ]
 
 [tool.isort]
