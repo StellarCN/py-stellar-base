@@ -260,18 +260,22 @@ class SorobanServer:
         max_attempts: int = DEFAULT_POLLING_ATTEMPTS if (attempts or 0) < 1 else attempts or DEFAULT_POLLING_ATTEMPTS
 
         attempt: int = 0
-        resp = self.get_transaction(transaction_hash=transaction_hash)
+        resp: GetTransactionResponse
 
         while attempt < max_attempts:
+            attempt += 1
+
+            try:
+                resp = self.get_transaction(transaction_hash=transaction_hash)
+            except SorobanRpcErrorResponse:
+                continue
+
             if (resp.status != GetTransactionStatus.NOT_FOUND):
                 return resp
 
-            attempt += 1
-            resp = self.get_transaction(transaction_hash=transaction_hash)
-
             time.sleep(sleep_strategy(attempt))
 
-        return resp
+        return resp # type: ignore
 
     def get_fee_stats(self) -> GetFeeStatsResponse:
         """General info about the fee stats.
