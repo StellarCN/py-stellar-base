@@ -236,7 +236,12 @@ class SorobanServerAsync:
         )
         return await self._post(request, SendTransactionResponse)
 
-    async def poll_transaction(self, transaction_hash: str, attempts: int = 30, sleep_strategy: int = 1) -> GetTransactionResponse:
+    async def poll_transaction(
+        self,
+        transaction_hash: str,
+        attempts: int = 30,
+        sleep_strategy: SleepStrategy = BasicSleepStrategy,
+    ) -> GetTransactionResponse:
         """Poll for a particular transaction with certain parameters.
 
         After submitting a transaction, clients can use this to poll for transaction completion and return a definitive state of success or failure.
@@ -245,13 +250,13 @@ class SorobanServerAsync:
         :type transaction_hash: str
         :param attempts: The number of attempts to make before returning the last-seen status, defaults to 30.
         :type attempts: int, optional
-        :param sleep_strategy: The amount of time, in seconds, to wait for between each attempt, defaults to 1.
-        :type sleep_strategy: int, optional
+        :param sleep_strategy: The amount of time to wait for between each attempt, defaults to 1 second between each attempt.
+        :type sleep_strategy: SleepStrategy, optional
         :return: A :class:`GetTransactionResponse <stellar_sdk.soroban_rpc.GetTransactionResponse>` response object after a "found" response, (which may be success or failure) or the last response obtained after polling the maximum number of specified attempts.
         :rtype: GetTransactionResponse
         """
         # positive and defined user value or default
-        max_attempts: int = 30 if (attempts or 0) < 1 else attempts or 30
+        max_attempts: int = DEFAULT_POLLING_ATTEMPTS if (attempts or 0) < 1 else attempts or DEFAULT_POLLING_ATTEMPTS
 
         attempt: int = 0
         resp = await self.get_transaction(transaction_hash=transaction_hash)
@@ -263,7 +268,7 @@ class SorobanServerAsync:
             attempt += 1
             resp = await self.get_transaction(transaction_hash=transaction_hash)
 
-            time.sleep(sleep_strategy or 1)
+            time.sleep(sleep_strategy(attempt))
 
         return resp
 
