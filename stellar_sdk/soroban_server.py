@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import time
 from typing import TYPE_CHECKING, Type
 
 from . import scval
@@ -235,6 +236,37 @@ class SorobanServer:
             params=SendTransactionRequest(transaction=xdr),
         )
         return self._post(request, SendTransactionResponse)
+
+    def poll_transaction(self, transaction_hash: str, attempts: int = 30, sleep_strategy: int = 1) -> GetTransactionResponse:
+        """Poll for a particular transaction with certain parameters.
+
+        After submitting a transaction, clients can use this to poll for transaction completion and return a definitive state of success or failure.
+
+        :param transaction_hash: The hash of the transaction to poll for.
+        :type transaction_hash: str
+        :param attempts: The number of attempts to make before returning the last-seen status, defaults to 30.
+        :type attempts: int, optional
+        :param sleep_strategy: The amount of time, in seconds, to wait for between each attempt, defaults to 1.
+        :type sleep_strategy: int, optional
+        :return: A :class:`GetTransactionResponse <stellar_sdk.soroban_rpc.GetTransactionResponse>` response object after a "found" response, (which may be success or failure) or the last response obtained after polling the maximum number of specified attempts.
+        :rtype: GetTransactionResponse
+        """
+        # positive and defined user value or default
+        max_attempts: int = 30 if (attempts or 0) < 1 else attempts or 30
+
+        attempt: int = 0
+        resp = self.get_transaction(transaction_hash=transaction_hash)
+
+        while attempt < max_attempts:
+            if (resp.status != GetTransactionStatus.NOT_FOUND):
+                return resp
+
+            attempt += 1
+            resp = self.get_transaction(transaction_hash=transaction_hash)
+
+            time.sleep(sleep_strategy or 1)
+
+        return resp
 
     def get_fee_stats(self) -> GetFeeStatsResponse:
         """General info about the fee stats.
