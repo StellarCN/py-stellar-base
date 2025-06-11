@@ -255,6 +255,7 @@ class SorobanServer:
         :type sleep_strategy: SleepStrategy, optional
         :return: A :class:`GetTransactionResponse <stellar_sdk.soroban_rpc.GetTransactionResponse>` response object after a "found" response, (which may be success or failure) or the last response obtained after polling the maximum number of specified attempts.
         :rtype: GetTransactionResponse
+        :raises: :exc:`SorobanRpcErrorResponse <stellar_sdk.exceptions.SorobanRpcErrorResponse>` - If the Soroban-RPC instance returns an error response.
         """
         # positive and defined user value or default
         max_attempts: int = DEFAULT_POLLING_ATTEMPTS if (attempts or 0) < 1 else attempts or DEFAULT_POLLING_ATTEMPTS
@@ -263,16 +264,12 @@ class SorobanServer:
         resp: GetTransactionResponse
 
         while attempt < max_attempts:
-            attempt += 1
+            resp = self.get_transaction(transaction_hash=transaction_hash)
 
-            try:
-                resp = self.get_transaction(transaction_hash=transaction_hash)
-            except SorobanRpcErrorResponse:
-                continue
-
-            if (resp.status != GetTransactionStatus.NOT_FOUND):
+            if resp.status != GetTransactionStatus.NOT_FOUND:
                 return resp
 
+            attempt += 1
             time.sleep(sleep_strategy(attempt))
 
         return resp # type: ignore
