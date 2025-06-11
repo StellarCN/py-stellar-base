@@ -498,11 +498,11 @@ SleepStrategy: TypeAlias = Callable[[int], int]
 """A function for :meth:`stellar_sdk.SorobanServer.poll_transaction` that returns the number of _seconds_ to sleep on a given `itertion`."""
 
 
-def BasicSleepStrategy(_iter: int) -> int:
+def BasicSleepStrategy(_iteration: int) -> int:
     """A strategy that will sleep 1 second each time."""
     return 1
 
 
-def LinearSleepStrategy(iter: int) -> int:
+def LinearSleepStrategy(iteration: int) -> int:
     """A strategy that will sleep 1 second longer on each attempt."""
-    return iter * 1
+    return iteration * 1
