@@ -268,7 +268,7 @@ class SorobanServerAsync:
             attempt += 1
             resp = await self.get_transaction(transaction_hash=transaction_hash)
 
-            time.sleep(sleep_strategy(attempt))
+            await asyncio.sleep(sleep_strategy(attempt))
 
         return resp
 
