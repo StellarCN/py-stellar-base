@@ -239,7 +239,7 @@ class SorobanServerAsync:
     async def poll_transaction(
         self,
         transaction_hash: str,
-        attempts: int = 30,
+        max_attempts: int = DEFAULT_POLLING_ATTEMPTS,
         sleep_strategy: SleepStrategy = BasicSleepStrategy,
     ) -> GetTransactionResponse:
         """Poll for a particular transaction with certain parameters.
@@ -256,26 +256,20 @@ class SorobanServerAsync:
         :rtype: GetTransactionResponse
         :raises: :exc:`SorobanRpcErrorResponse <stellar_sdk.exceptions.SorobanRpcErrorResponse>` - If the Soroban-RPC instance returns an error response.
         """
-        # positive and defined user value or default
-        max_attempts: int = (
-            DEFAULT_POLLING_ATTEMPTS
-            if (attempts or 0) < 1
-            else attempts or DEFAULT_POLLING_ATTEMPTS
-        )
-
+        if max_attempts < 1:
+            raise ValueError("max_attempts must be greater than 0")
         attempt: int = 0
-        resp: GetTransactionResponse
 
-        while attempt < max_attempts:
-            resp = await self.get_transaction(transaction_hash=transaction_hash)
-
+        while resp := await self.get_transaction(transaction_hash=transaction_hash):
             if resp.status != GetTransactionStatus.NOT_FOUND:
                 return resp
 
             attempt += 1
-            await asyncio.sleep(sleep_strategy(attempt))
+            if attempt >= max_attempts:
+                break
 
-        return resp  # type: ignore
+            await asyncio.sleep(sleep_strategy(attempt))
+        return resp
 
     async def get_fee_stats(self) -> GetFeeStatsResponse:
         """General info about the fee stats.
