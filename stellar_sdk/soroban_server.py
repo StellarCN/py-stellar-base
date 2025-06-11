@@ -248,13 +248,9 @@ class SorobanServer:
         After submitting a transaction, clients can use this to poll for transaction completion and return a definitive state of success or failure.
 
         :param transaction_hash: The hash of the transaction to poll for.
-        :type transaction_hash: str
-        :param attempts: The number of attempts to make before returning the last-seen status, defaults to 30.
-        :type attempts: int, optional
+        :param max_attempts: The number of attempts to make before returning the last-seen status, defaults to 30.
         :param sleep_strategy: The amount of time to wait for between each attempt, defaults to 1 second between each attempt.
-        :type sleep_strategy: SleepStrategy, optional
         :return: A :class:`GetTransactionResponse <stellar_sdk.soroban_rpc.GetTransactionResponse>` response object after a "found" response, (which may be success or failure) or the last response obtained after polling the maximum number of specified attempts.
-        :rtype: GetTransactionResponse
         :raises: :exc:`SorobanRpcErrorResponse <stellar_sdk.exceptions.SorobanRpcErrorResponse>` - If the Soroban-RPC instance returns an error response.
         """
         if max_attempts < 1:
