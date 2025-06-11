@@ -495,7 +495,7 @@ DEFAULT_POLLING_ATTEMPTS: int = 30
 
 
 SleepStrategy: TypeAlias = Callable[[int], int]
-"""A function for :meth:`stellar_sdk.SorobanServer.poll_transaction` that returns the number of _seconds_ to sleep on a given `itertion`."""
+"""A function for :meth:`stellar_sdk.SorobanServer.poll_transaction` and :meth:`stellar_sdk.SorobanServerAsync.poll_transaction` that returns the number of _seconds_ to sleep on a given `iteration`."""
 
 
 def BasicSleepStrategy(_iteration: int) -> int:
