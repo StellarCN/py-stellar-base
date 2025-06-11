@@ -258,7 +258,11 @@ class SorobanServer:
         :raises: :exc:`SorobanRpcErrorResponse <stellar_sdk.exceptions.SorobanRpcErrorResponse>` - If the Soroban-RPC instance returns an error response.
         """
         # positive and defined user value or default
-        max_attempts: int = DEFAULT_POLLING_ATTEMPTS if (attempts or 0) < 1 else attempts or DEFAULT_POLLING_ATTEMPTS
+        max_attempts: int = (
+            DEFAULT_POLLING_ATTEMPTS
+            if (attempts or 0) < 1
+            else attempts or DEFAULT_POLLING_ATTEMPTS
+        )
 
         attempt: int = 0
         resp: GetTransactionResponse
@@ -272,7 +276,7 @@ class SorobanServer:
             attempt += 1
             time.sleep(sleep_strategy(attempt))
 
-        return resp # type: ignore
+        return resp  # type: ignore
 
     def get_fee_stats(self) -> GetFeeStatsResponse:
         """General info about the fee stats.

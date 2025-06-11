@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-import json
 import asyncio
+import json
 from typing import TYPE_CHECKING, Type
 
 from . import scval
@@ -257,7 +257,11 @@ class SorobanServerAsync:
         :raises: :exc:`SorobanRpcErrorResponse <stellar_sdk.exceptions.SorobanRpcErrorResponse>` - If the Soroban-RPC instance returns an error response.
         """
         # positive and defined user value or default
-        max_attempts: int = DEFAULT_POLLING_ATTEMPTS if (attempts or 0) < 1 else attempts or DEFAULT_POLLING_ATTEMPTS
+        max_attempts: int = (
+            DEFAULT_POLLING_ATTEMPTS
+            if (attempts or 0) < 1
+            else attempts or DEFAULT_POLLING_ATTEMPTS
+        )
 
         attempt: int = 0
         resp: GetTransactionResponse
@@ -271,7 +275,7 @@ class SorobanServerAsync:
             attempt += 1
             await asyncio.sleep(sleep_strategy(attempt))
 
-        return resp # type: ignore
+        return resp  # type: ignore
 
     async def get_fee_stats(self) -> GetFeeStatsResponse:
         """General info about the fee stats.
