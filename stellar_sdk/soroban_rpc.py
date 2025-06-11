@@ -8,7 +8,6 @@ from typing import (
     List,
     Optional,
     Sequence,
-    TypeAlias,
     TypeVar,
     Union,
 )
@@ -505,7 +504,7 @@ class GetSACBalanceResponse(BaseModel):
 DEFAULT_POLLING_ATTEMPTS: int = 30
 
 
-SleepStrategy: TypeAlias = Callable[[int], int]
+SleepStrategy = Callable[[int], int]
 """A function for :meth:`stellar_sdk.SorobanServer.poll_transaction` and :meth:`stellar_sdk.SorobanServerAsync.poll_transaction` that returns the number of _seconds_ to sleep on a given `iteration`."""
 
 
