@@ -1,6 +1,16 @@
 from datetime import datetime
 from enum import Enum
-from typing import Any, Dict, Generic, List, Optional, Sequence, TypeVar, Union
+from typing import (
+    Any,
+    Callable,
+    Dict,
+    Generic,
+    List,
+    Optional,
+    Sequence,
+    TypeVar,
+    Union,
+)
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 from typing_extensions import Self
@@ -489,3 +499,20 @@ class GetSACBalanceResponse(BaseModel):
     balance_entry: Optional[SACBalanceEntry] = Field(
         description="The balance entry for the account. If there is not a valid balance entry, this will be None."
     )
+
+
+DEFAULT_POLLING_ATTEMPTS: int = 30
+
+
+SleepStrategy = Callable[[int], int]
+"""A function for :meth:`stellar_sdk.SorobanServer.poll_transaction` and :meth:`stellar_sdk.SorobanServerAsync.poll_transaction` that returns the number of _seconds_ to sleep on a given `iteration`."""
+
+
+def BasicSleepStrategy(_iteration: int) -> int:
+    """A strategy that will sleep 1 second each time."""
+    return 1
+
+
+def LinearSleepStrategy(iteration: int) -> int:
+    """A strategy that will sleep 1 second longer on each attempt."""
+    return iteration * 1

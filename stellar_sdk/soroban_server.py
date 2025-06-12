@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import time
 from typing import TYPE_CHECKING, Type
 
 from . import scval
@@ -235,6 +236,37 @@ class SorobanServer:
             params=SendTransactionRequest(transaction=xdr),
         )
         return self._post(request, SendTransactionResponse)
+
+    def poll_transaction(
+        self,
+        transaction_hash: str,
+        max_attempts: int = DEFAULT_POLLING_ATTEMPTS,
+        sleep_strategy: SleepStrategy = BasicSleepStrategy,
+    ) -> GetTransactionResponse:
+        """Poll for a particular transaction with certain parameters.
+
+        After submitting a transaction, clients can use this to poll for transaction completion and return a definitive state of success or failure.
+
+        :param transaction_hash: The hash of the transaction to poll for.
+        :param max_attempts: The number of attempts to make before returning the last-seen status, defaults to 30.
+        :param sleep_strategy: The amount of time to wait for between each attempt, defaults to 1 second between each attempt.
+        :return: A :class:`GetTransactionResponse <stellar_sdk.soroban_rpc.GetTransactionResponse>` response object after a "found" response, (which may be success or failure) or the last response obtained after polling the maximum number of specified attempts.
+        :raises: :exc:`SorobanRpcErrorResponse <stellar_sdk.exceptions.SorobanRpcErrorResponse>` - If the Soroban-RPC instance returns an error response.
+        """
+        if max_attempts < 1:
+            raise ValueError("max_attempts must be greater than 0")
+        attempt: int = 0
+
+        while resp := self.get_transaction(transaction_hash=transaction_hash):
+            if resp.status != GetTransactionStatus.NOT_FOUND:
+                return resp
+
+            attempt += 1
+            if attempt >= max_attempts:
+                break
+
+            time.sleep(sleep_strategy(attempt))
+        return resp
 
     def get_fee_stats(self) -> GetFeeStatsResponse:
         """General info about the fee stats.
