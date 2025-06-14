@@ -35,15 +35,15 @@ install:
 .PHONY: install
 
 install-dev:
-	poetry install
+	uv sync --all-extras
 .PHONY: install-dev
 
 test:
-	poetry run pytest -v -s -rs tests --cov --cov-report=html
+	uv run pytest -v -s -rs tests --cov --cov-report=html
 .PHONY: test
 
 full-test:
-	poetry run pytest -v -s -rs tests --runslow --cov --cov-report=html
+	uv run pytest -v -s -rs tests --runslow --cov --cov-report=html
 .PHONY: full-test
 
 codecov:
@@ -51,7 +51,7 @@ codecov:
 .PHONY: codecov
 
 package:
-	poetry build
+	uv build
 .PHONY: package
 
 pypi:
