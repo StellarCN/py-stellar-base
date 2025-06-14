@@ -2078,7 +2078,7 @@ wheels = [
 [[package]]
 name = "stellar-sdk"
 version = "12.3.0"
-source = { editable = "." }
+source = { virtual = "." }
 dependencies = [
     { name = "mnemonic", version = "0.20", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.8.1'" },
     { name = "mnemonic", version = "0.21", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.8.1'" },
