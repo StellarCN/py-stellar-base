@@ -41,14 +41,14 @@ classifiers = [
 ]
 requires-python = ">=3.8,<4.0"
 dependencies = [
+    "mnemonic (>=0.20)",
+    "pydantic (>=2.0.0,<3.0.0)",
     "PyNaCl (>=1.4.0,<2.0.0)",
     "requests (>=2.0.0,<3.0.0)",
-    "mnemonic (>=0.20)",
-    "toml (>=0.10.2,<1.0.0)",
-    "pydantic (>=2.0.0,<3.0.0)",
-    "xdrlib3 (>=0.1.1)",
     "requests-sse (>=0.3,<0.6)",
+    "toml (>=0.10.2,<1.0.0)",
     "typing-extensions (>=4.0.0,<5.0.0)",
+    "xdrlib3 (>=0.1.1)",
 ]
 
 [project.urls]
