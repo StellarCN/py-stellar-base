@@ -41,7 +41,7 @@ class BaseStrictSendPathsCallBuilder(BaseCallBuilder):
         source_asset: Asset,
         source_amount: Union[str, Decimal],
         destination: Union[str, List[Asset]],
-        **kwargs
+        **kwargs,
     ) -> None:
         super().__init__(**kwargs)
         self.endpoint: str = "paths/strict-send"
