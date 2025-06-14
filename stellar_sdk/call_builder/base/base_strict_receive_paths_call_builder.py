@@ -41,7 +41,7 @@ class BaseStrictReceivePathsCallBuilder(BaseCallBuilder):
         source: Union[str, List[Asset]],
         destination_asset: Asset,
         destination_amount: Union[str, Decimal],
-        **kwargs
+        **kwargs,
     ) -> None:
         super().__init__(**kwargs)
         self.endpoint: str = "paths/strict-receive"

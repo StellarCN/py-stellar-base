@@ -14,7 +14,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: '3.13'
+          python-version: "3.13"
       - uses: pre-commit/action@v3.0.1
 
   test:
@@ -23,30 +23,31 @@ jobs:
       fail-fast: false
       matrix:
         # https://endoflife.date/python
-        platform: [
-          { os: 'ubuntu-latest',  python-version: '3.8' },
-          { os: 'ubuntu-latest',  python-version: '3.9' },
-          { os: 'ubuntu-latest',  python-version: '3.10' },
-          { os: 'ubuntu-latest',  python-version: '3.11' },
-          { os: 'ubuntu-latest',  python-version: '3.12' },
-          { os: 'ubuntu-latest',  python-version: '3.13' },
-          { os: 'ubuntu-latest',  python-version: 'pypy3.9' },
-          { os: 'ubuntu-latest',  python-version: 'pypy3.10' },
-          { os: 'macos-latest',  python-version: '3.8' },
-          { os: 'macos-latest',  python-version: '3.9' },
-          { os: 'macos-latest',  python-version: '3.10' },
-          { os: 'macos-latest',  python-version: '3.11' },
-          { os: 'macos-latest',  python-version: '3.12' },
-          { os: 'macos-latest',  python-version: '3.13' },
-          { os: 'macos-latest',  python-version: 'pypy3.9' },
-          { os: 'macos-latest',  python-version: 'pypy3.10' },
-          { os: 'windows-latest',  python-version: '3.8' },
-          { os: 'windows-latest',  python-version: '3.9' },
-          { os: 'windows-latest',  python-version: '3.10' },
-          { os: 'windows-latest',  python-version: '3.11' },
-          { os: 'windows-latest',  python-version: '3.12' },
-          { os: 'windows-latest',  python-version: '3.13' },
-        ]
+        platform:
+          [
+            { os: "ubuntu-latest", python-version: "3.8" },
+            { os: "ubuntu-latest", python-version: "3.9" },
+            { os: "ubuntu-latest", python-version: "3.10" },
+            { os: "ubuntu-latest", python-version: "3.11" },
+            { os: "ubuntu-latest", python-version: "3.12" },
+            { os: "ubuntu-latest", python-version: "3.13" },
+            { os: "ubuntu-latest", python-version: "pypy3.9" },
+            { os: "ubuntu-latest", python-version: "pypy3.10" },
+            { os: "macos-latest", python-version: "3.8" },
+            { os: "macos-latest", python-version: "3.9" },
+            { os: "macos-latest", python-version: "3.10" },
+            { os: "macos-latest", python-version: "3.11" },
+            { os: "macos-latest", python-version: "3.12" },
+            { os: "macos-latest", python-version: "3.13" },
+            { os: "macos-latest", python-version: "pypy3.9" },
+            { os: "macos-latest", python-version: "pypy3.10" },
+            { os: "windows-latest", python-version: "3.8" },
+            { os: "windows-latest", python-version: "3.9" },
+            { os: "windows-latest", python-version: "3.10" },
+            { os: "windows-latest", python-version: "3.11" },
+            { os: "windows-latest", python-version: "3.12" },
+            { os: "windows-latest", python-version: "3.13" },
+          ]
     runs-on: ${{ matrix.platform.os }}
     steps:
       - uses: actions/checkout@v4
@@ -55,24 +56,17 @@ jobs:
         run: |
           curl https://httpbinx.fly.dev/ip
 
-      - name: Setup Python ${{ matrix.platform.python-version }} on ${{ matrix.platform.os }}
-        uses: actions/setup-python@v5
+      - name: Install the latest version of uv and set the python version to ${{ matrix.platform.python-version }} on ${{ matrix.platform.os }}
+        uses: astral-sh/setup-uv@v6
         with:
           python-version: ${{ matrix.platform.python-version }}
 
-      - name: Install poetry
-        run: pip install poetry
-
-      - name: Install dependencies
-        run: |
-          poetry install --with dev --all-extras
-
       - name: Echo installed packages
         run: |
-          poetry show
+          uv tree
 
       - name: Test with pytest
-        run: poetry run pytest -v -rs tests --runslow
+        run: uv run --all-extras pytest -v -rs tests --runslow
 
   integration:
     runs-on: ubuntu-latest
@@ -98,24 +92,13 @@ jobs:
         run: |
           curl https://httpbinx.fly.dev/ip
 
-      - name: Setup Python 3.13
-        uses: actions/setup-python@v5
+      - name: Install the latest version of uv and set the python version to 3.13
+        uses: astral-sh/setup-uv@v6
         with:
           python-version: 3.13
 
-      - name: Install poetry
-        run: pip install poetry
-
-      - name: Install dependencies
-        run: |
-          poetry install --with dev --all-extras
-
-      - name: Echo installed packages
-        run: |
-          poetry show
-
       - name: Test with pytest
-        run: poetry run pytest -v -rs tests --runslow --integration --cov=./ --cov-report=xml
+        run: uv run --all-extras pytest -v -rs tests --runslow --integration --cov=./ --cov-report=xml
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5
@@ -126,7 +109,7 @@ jobs:
           name: codecov-umbrella
 
   deploy:
-    needs: [ test, integration ]
+    needs: [test, integration]
     runs-on: ubuntu-latest
     if: github.event_name == 'release' && github.event.action == 'created'
     permissions:
@@ -134,23 +117,20 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup Python 3.13
-        uses: actions/setup-python@v5
+      - name: Install the latest version of uv and set the python version to 3.13
+        uses: astral-sh/setup-uv@v6
         with:
           python-version: 3.13
 
-      - name: Install poetry
-        run: pip install poetry
-
       - name: Build Packages
-        run: poetry build
+        run: uv build
 
       - name: Publish package distributions to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
 
   complete:
     if: always()
-    needs: [ pre-commit, test, deploy ]
+    needs: [pre-commit, test, deploy]
     runs-on: ubuntu-latest
     steps:
       - if: contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled')
