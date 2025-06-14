@@ -1571,4 +1571,4 @@ shamir = ["shamir-mnemonic"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.8,<4.0"
-content-hash = "c6710ab1306f4ea65a9ba96d05abb35e1f2d3b5b96ad4e14d9731ec2b29c3025"
+content-hash = "87be689b5041cdd5eec3a18a789505e028ee203c3ebab880b3df5efa276a5106"
