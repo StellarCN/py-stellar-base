@@ -1,13 +1,13 @@
-[tool.poetry]
+[project]
 name = "stellar-sdk"
 version = "12.3.0"
 description = "The Python Stellar SDK library provides APIs to build transactions and connect to Horizon and Soroban-RPC server."
-authors = ["overcat <4catcode@gmail.com>", "Eno <appweb.cn@gmail.com>"]
-maintainers = ["overcat <4catcode@gmail.com>"]
+authors = [
+    { name = "overcat", email = "4catcode@gmail.com" },
+    { name = "Eno", email = "appweb.cn@gmail.com" },
+]
+maintainers = [{ name = "overcat", email = "4catcode@gmail.com" }]
 readme = "README.rst"
-homepage = "https://github.com/StellarCN/py-stellar-base"
-repository = "https://github.com/StellarCN/py-stellar-base"
-documentation = "https://stellar-sdk.readthedocs.io/"
 keywords = [
     "stellar-sdk",
     "stellar",
@@ -39,29 +39,31 @@ classifiers = [
     "Topic :: Software Development :: Libraries :: Python Modules",
     "Typing :: Typed",
 ]
+requires-python = ">=3.8,<4.0"
+dependencies = [
+    "PyNaCl (>=1.4.0,<2.0.0)",
+    "requests (>=2.0.0,<3.0.0)",
+    "mnemonic (>=0.20)",
+    "toml (>=0.10.2,<1.0.0)",
+    "pydantic (>=2.0.0,<3.0.0)",
+    "xdrlib3 (>=0.1.1)",
+    "requests-sse (>=0.3,<0.6)",
+    "typing-extensions (>=4.0.0,<5.0.0)",
+]
 
-[tool.poetry.urls]
+[project.urls]
+Homepage = "https://github.com/StellarCN/py-stellar-base"
+Documentation = "https://stellar-sdk.readthedocs.io/"
+Repository = "https://github.com/StellarCN/py-stellar-base"
+Issues = "https://github.com/StellarCN/py-stellar-base/issues"
+Changelog = "https://github.com/StellarCN/py-stellar-base/blob/main/CHANGELOG.md"
 "Bug Tracker" = "https://github.com/StellarCN/py-stellar-base/issues"
 
-[tool.poetry.dependencies]
-python = ">=3.8,<4.0"
-PyNaCl = "^1.4.0"
-requests = "^2.32.3"
-aiohttp = { version = "^3.9.1", optional = true }
-aiohttp-sse-client = { version = "^0.2.1", optional = true }
-mnemonic = "^0.20"
-shamir-mnemonic = { version = "^0.3.0", optional = true }
-toml = "^0.10.2"
-pydantic = "^2.5.2"
-xdrlib3 = "^0.1.1"
-requests-sse = ">=0.3,<0.6"
-typing-extensions = "^4.13.2"
+[project.optional-dependencies]
+aiohttp = ["aiohttp (>=3.9.1,<4.0.0)", "aiohttp-sse-client (>=0.2.1)"]
+shamir = ["shamir-mnemonic (>=0.3.0,<1.0.0)"]
 
-[tool.poetry.extras]
-aiohttp = ["aiohttp", "aiohttp-sse-client"]
-shamir = ["shamir-mnemonic"]
-
-[tool.poetry.dev-dependencies]
+[tool.poetry.group.dev.dependencies]
 pytest = "^8.3.5"
 pytest-cov = "^5.0.0"
 pytest-timeout = "^2.4.0"
@@ -98,5 +100,5 @@ exclude_lines = [
 profile = "black"
 
 [build-system]
-requires = ["poetry-core>=1.0.0"]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
 build-backend = "poetry.core.masonry.api"
