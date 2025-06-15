@@ -45,7 +45,7 @@ dependencies = [
     "pynacl>=1.4.0",
     "requests>=2.0.0",
     "requests-sse>=0.3",
-    "toml>=0.10.2",
+    "toml>=0.10.2; python_version < '3.11'",
     "typing-extensions>=4.0.0",
     "xdrlib3>=0.1.1",
 ]

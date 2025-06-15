@@ -2957,7 +2957,7 @@ dependencies = [
     { name = "pynacl" },
     { name = "requests" },
     { name = "requests-sse" },
-    { name = "toml" },
+    { name = "toml", marker = "python_full_version < '3.11'" },
     { name = "typing-extensions", version = "4.13.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.9'" },
     { name = "typing-extensions", version = "4.14.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.9'" },
     { name = "xdrlib3" },
@@ -3013,7 +3013,7 @@ requires-dist = [
     { name = "requests", specifier = ">=2.0.0" },
     { name = "requests-sse", specifier = ">=0.3" },
     { name = "shamir-mnemonic", marker = "extra == 'shamir'", specifier = ">=0.3.0" },
-    { name = "toml", specifier = ">=0.10.2" },
+    { name = "toml", marker = "python_full_version < '3.11'", specifier = ">=0.10.2" },
     { name = "typing-extensions", specifier = ">=4.0.0" },
     { name = "xdrlib3", specifier = ">=0.1.1" },
 ]
