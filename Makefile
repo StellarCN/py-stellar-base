@@ -63,9 +63,9 @@ clean:
 	rm -rf coverage.xml .coverage dist htmlcov stellar_sdk.egg-info tests/.mypy_cache tests/.pytest_cache docs/en/_build docs/zh_CN/_build
 .PHONY: clean
 
-format:
+pre-commit:
 	uv run pre-commit run --all-file
-.PHONY: format
+.PHONY: pre-commit
 
 replace-xdr-keywords:
 	$(REPLACE_KEYWORD_COMMAND)
