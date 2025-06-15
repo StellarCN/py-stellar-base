@@ -6,6 +6,8 @@ on:
   release:
     types:
       - created
+env:
+  DEFAULT_PYTHON_VERSION: "3.13"
 
 jobs:
   pre-commit:
@@ -14,7 +16,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: "3.13"
+          python-version: ${{ env.DEFAULT_PYTHON_VERSION }}
       - uses: pre-commit/action@v3.0.1
 
   test:
@@ -66,7 +68,7 @@ jobs:
           uv tree
 
       - name: Test with pytest
-        run: uv run --all-extras pytest -v -rs tests --runslow
+        run: uv run --frozen --all-extras --group dev pytest -v -rs tests --runslow
 
   integration:
     runs-on: ubuntu-latest
@@ -92,13 +94,13 @@ jobs:
         run: |
           curl https://httpbinx.fly.dev/ip
 
-      - name: Install the latest version of uv and set the python version to 3.13
+      - name: Install the latest version of uv and set the python version to ${{ env.DEFAULT_PYTHON_VERSION }}
         uses: astral-sh/setup-uv@v6
         with:
-          python-version: 3.13
+          python-version: ${{ env.DEFAULT_PYTHON_VERSION }}
 
       - name: Test with pytest
-        run: uv run --all-extras pytest -v -rs tests --runslow --integration --cov=./ --cov-report=xml
+        run: uv run --frozen --all-extras --group dev pytest -v -rs tests --runslow --integration --cov=./ --cov-report=xml
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5
@@ -117,10 +119,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install the latest version of uv and set the python version to 3.13
+      - name: Install the latest version of uv and set the python version to ${{ env.DEFAULT_PYTHON_VERSION }}
         uses: astral-sh/setup-uv@v6
         with:
-          python-version: 3.13
+          python-version: ${{ env.DEFAULT_PYTHON_VERSION }}
 
       - name: Build Packages
         run: uv build

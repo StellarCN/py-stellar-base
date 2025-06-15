@@ -25,13 +25,12 @@ keywords = [
     "soroban",
     "soroban-rpc",
 ]
-license = "Apache License 2.0"
+license = "Apache-2.0"
 classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Intended Audience :: Developers",
     "Natural Language :: English",
     "Operating System :: OS Independent",
-    "License :: OSI Approved :: Apache Software License",
     "Programming Language :: Python",
     "Programming Language :: Python :: 3 :: Only",
     "Programming Language :: Python :: Implementation :: CPython",
@@ -43,7 +42,7 @@ requires-python = ">=3.8,<4.0"
 dependencies = [
     "mnemonic>=0.20",
     "pydantic>=2.0.0",
-    "PyNaCl>=1.4.0",
+    "pynacl>=1.4.0",
     "requests>=2.0.0",
     "requests-sse>=0.3",
     "toml>=0.10.2",
@@ -73,6 +72,15 @@ dev = [
     "requests-mock>=1.12.1",
     "aioresponses>=0.7.8",
 ]
+docs = [
+    "autodoc-pydantic>=2.1.0",
+    "sphinx>=7.1.2",
+    "sphinx-autodoc-typehints>=2.0.1",
+    "sphinx-rtd-theme>=3.0.2",
+]
+
+[tool.setuptools.packages.find]
+include = ["stellar_sdk*"]
 
 [tool.mypy]
 show_error_codes = true
