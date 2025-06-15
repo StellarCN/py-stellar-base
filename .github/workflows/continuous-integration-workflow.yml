@@ -68,7 +68,7 @@ jobs:
           uv tree
 
       - name: Test with pytest
-        run: uv run --all-extras --group dev pytest -v -rs tests --runslow
+        run: uv run --frozen --all-extras --group dev pytest -v -rs tests --runslow
 
   integration:
     runs-on: ubuntu-latest
@@ -100,7 +100,7 @@ jobs:
           python-version: ${{ env.DEFAULT_PYTHON_VERSION }}
 
       - name: Test with pytest
-        run: uv run --all-extras --group dev pytest -v -rs tests --runslow --integration --cov=./ --cov-report=xml
+        run: uv run --frozen --all-extras --group dev pytest -v -rs tests --runslow --integration --cov=./ --cov-report=xml
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5
