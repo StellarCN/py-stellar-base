@@ -35,7 +35,7 @@ install:
 .PHONY: install
 
 install-dev:
-	uv sync --all-extras
+	uv sync --all-extras --all-groups
 .PHONY: install-dev
 
 test:
@@ -64,7 +64,7 @@ clean:
 .PHONY: clean
 
 format:
-	pre-commit run --all-file
+	uv run pre-commit run --all-file
 .PHONY: format
 
 replace-xdr-keywords:

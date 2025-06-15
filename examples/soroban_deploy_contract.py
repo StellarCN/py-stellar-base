@@ -1,5 +1,4 @@
-"""This example shows how to deploy a compiled contract to the Stellar network.
-"""
+"""This example shows how to deploy a compiled contract to the Stellar network."""
 
 from stellar_sdk import Keypair, Network, SorobanServer
 from stellar_sdk.contract import ContractClient
