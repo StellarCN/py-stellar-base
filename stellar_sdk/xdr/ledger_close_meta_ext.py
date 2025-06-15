@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import base64
+from typing import Optional
 
 from xdrlib3 import Packer, Unpacker
 
@@ -28,7 +29,7 @@ class LedgerCloseMetaExt:
     def __init__(
         self,
         v: int,
-        v1: LedgerCloseMetaExtV1 = None,
+        v1: Optional[LedgerCloseMetaExtV1] = None,
     ) -> None:
         self.v = v
         self.v1 = v1

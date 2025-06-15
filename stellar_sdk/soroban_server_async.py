@@ -78,10 +78,10 @@ class SorobanServerAsync:
 
     async def get_events(
         self,
-        start_ledger: int = None,
-        filters: Sequence[EventFilter] = None,
-        cursor: str = None,
-        limit: int = None,
+        start_ledger: Optional[int] = None,
+        filters: Optional[Sequence[EventFilter]] = None,
+        cursor: Optional[str] = None,
+        limit: Optional[int] = None,
     ) -> GetEventsResponse:
         """Fetch a list of events that occurred in the ledger range.
 
@@ -284,9 +284,9 @@ class SorobanServerAsync:
 
     async def get_transactions(
         self,
-        start_ledger: int = None,
-        cursor: str = None,
-        limit: int = None,
+        start_ledger: Optional[int] = None,
+        cursor: Optional[str] = None,
+        limit: Optional[int] = None,
     ) -> GetTransactionsResponse:
         """Fetch a detailed list of transactions starting from the user specified starting point that you can paginate
         as long as the pages fall within the history retention of their corresponding RPC provider.
@@ -311,9 +311,9 @@ class SorobanServerAsync:
 
     async def get_ledgers(
         self,
-        start_ledger: int = None,
-        cursor: str = None,
-        limit: int = None,
+        start_ledger: Optional[int] = None,
+        cursor: Optional[str] = None,
+        limit: Optional[int] = None,
     ) -> GetLedgersResponse:
         """Fetch a detailed list of ledgers starting from the user specified starting point that you can paginate
         as long as the pages fall within the history retention of their corresponding RPC provider.
@@ -471,7 +471,7 @@ class SorobanServerAsync:
     async def prepare_transaction(
         self,
         transaction_envelope: TransactionEnvelope,
-        simulate_transaction_response: SimulateTransactionResponse = None,
+        simulate_transaction_response: Optional[SimulateTransactionResponse] = None,
     ) -> TransactionEnvelope:
         """Submit a trial contract invocation, first run a simulation of the contract
         invocation as defined on the incoming transaction, and apply the results to

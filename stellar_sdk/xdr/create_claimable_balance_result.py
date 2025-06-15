@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import base64
+from typing import Optional
 
 from xdrlib3 import Packer, Unpacker
 
@@ -33,7 +34,7 @@ class CreateClaimableBalanceResult:
     def __init__(
         self,
         code: CreateClaimableBalanceResultCode,
-        balance_id: ClaimableBalanceID = None,
+        balance_id: Optional[ClaimableBalanceID] = None,
     ) -> None:
         self.code = code
         self.balance_id = balance_id

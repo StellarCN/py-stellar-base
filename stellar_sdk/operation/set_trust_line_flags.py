@@ -55,8 +55,8 @@ class SetTrustLineFlags(Operation):
         self,
         trustor: str,
         asset: Asset,
-        clear_flags: TrustLineFlags = None,
-        set_flags: TrustLineFlags = None,
+        clear_flags: Optional[TrustLineFlags] = None,
+        set_flags: Optional[TrustLineFlags] = None,
         source: Optional[Union[MuxedAccount, str]] = None,
     ):
         super().__init__(source)

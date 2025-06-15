@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import base64
+from typing import Optional
 
 from xdrlib3 import Packer, Unpacker
 
@@ -29,8 +30,8 @@ class ArchivalProofBody:
     def __init__(
         self,
         t: ArchivalProofType,
-        nonexistence_proof: NonexistenceProofBody = None,
-        existence_proof: ExistenceProofBody = None,
+        nonexistence_proof: Optional[NonexistenceProofBody] = None,
+        existence_proof: Optional[ExistenceProofBody] = None,
     ) -> None:
         self.t = t
         self.nonexistence_proof = nonexistence_proof

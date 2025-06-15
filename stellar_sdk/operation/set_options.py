@@ -84,15 +84,15 @@ class SetOptions(Operation):
 
     def __init__(
         self,
-        inflation_dest: str = None,
-        clear_flags: Union[int, AuthorizationFlag] = None,
-        set_flags: Union[int, AuthorizationFlag] = None,
-        master_weight: int = None,
-        low_threshold: int = None,
-        med_threshold: int = None,
-        high_threshold: int = None,
-        signer: Signer = None,
-        home_domain: str = None,
+        inflation_dest: Optional[str] = None,
+        clear_flags: Optional[Union[int, AuthorizationFlag]] = None,
+        set_flags: Optional[Union[int, AuthorizationFlag]] = None,
+        master_weight: Optional[int] = None,
+        low_threshold: Optional[int] = None,
+        med_threshold: Optional[int] = None,
+        high_threshold: Optional[int] = None,
+        signer: Optional[Signer] = None,
+        home_domain: Optional[str] = None,
         source: Optional[Union[MuxedAccount, str]] = None,
     ) -> None:
         super().__init__(source)

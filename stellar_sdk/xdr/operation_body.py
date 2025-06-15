@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import base64
+from typing import Optional
 
 from xdrlib3 import Packer, Unpacker
 
@@ -102,31 +103,33 @@ class OperationBody:
     def __init__(
         self,
         type: OperationType,
-        create_account_op: CreateAccountOp = None,
-        payment_op: PaymentOp = None,
-        path_payment_strict_receive_op: PathPaymentStrictReceiveOp = None,
-        manage_sell_offer_op: ManageSellOfferOp = None,
-        create_passive_sell_offer_op: CreatePassiveSellOfferOp = None,
-        set_options_op: SetOptionsOp = None,
-        change_trust_op: ChangeTrustOp = None,
-        allow_trust_op: AllowTrustOp = None,
-        destination: MuxedAccount = None,
-        manage_data_op: ManageDataOp = None,
-        bump_sequence_op: BumpSequenceOp = None,
-        manage_buy_offer_op: ManageBuyOfferOp = None,
-        path_payment_strict_send_op: PathPaymentStrictSendOp = None,
-        create_claimable_balance_op: CreateClaimableBalanceOp = None,
-        claim_claimable_balance_op: ClaimClaimableBalanceOp = None,
-        begin_sponsoring_future_reserves_op: BeginSponsoringFutureReservesOp = None,
-        revoke_sponsorship_op: RevokeSponsorshipOp = None,
-        clawback_op: ClawbackOp = None,
-        clawback_claimable_balance_op: ClawbackClaimableBalanceOp = None,
-        set_trust_line_flags_op: SetTrustLineFlagsOp = None,
-        liquidity_pool_deposit_op: LiquidityPoolDepositOp = None,
-        liquidity_pool_withdraw_op: LiquidityPoolWithdrawOp = None,
-        invoke_host_function_op: InvokeHostFunctionOp = None,
-        extend_footprint_ttl_op: ExtendFootprintTTLOp = None,
-        restore_footprint_op: RestoreFootprintOp = None,
+        create_account_op: Optional[CreateAccountOp] = None,
+        payment_op: Optional[PaymentOp] = None,
+        path_payment_strict_receive_op: Optional[PathPaymentStrictReceiveOp] = None,
+        manage_sell_offer_op: Optional[ManageSellOfferOp] = None,
+        create_passive_sell_offer_op: Optional[CreatePassiveSellOfferOp] = None,
+        set_options_op: Optional[SetOptionsOp] = None,
+        change_trust_op: Optional[ChangeTrustOp] = None,
+        allow_trust_op: Optional[AllowTrustOp] = None,
+        destination: Optional[MuxedAccount] = None,
+        manage_data_op: Optional[ManageDataOp] = None,
+        bump_sequence_op: Optional[BumpSequenceOp] = None,
+        manage_buy_offer_op: Optional[ManageBuyOfferOp] = None,
+        path_payment_strict_send_op: Optional[PathPaymentStrictSendOp] = None,
+        create_claimable_balance_op: Optional[CreateClaimableBalanceOp] = None,
+        claim_claimable_balance_op: Optional[ClaimClaimableBalanceOp] = None,
+        begin_sponsoring_future_reserves_op: Optional[
+            BeginSponsoringFutureReservesOp
+        ] = None,
+        revoke_sponsorship_op: Optional[RevokeSponsorshipOp] = None,
+        clawback_op: Optional[ClawbackOp] = None,
+        clawback_claimable_balance_op: Optional[ClawbackClaimableBalanceOp] = None,
+        set_trust_line_flags_op: Optional[SetTrustLineFlagsOp] = None,
+        liquidity_pool_deposit_op: Optional[LiquidityPoolDepositOp] = None,
+        liquidity_pool_withdraw_op: Optional[LiquidityPoolWithdrawOp] = None,
+        invoke_host_function_op: Optional[InvokeHostFunctionOp] = None,
+        extend_footprint_ttl_op: Optional[ExtendFootprintTTLOp] = None,
+        restore_footprint_op: Optional[RestoreFootprintOp] = None,
     ) -> None:
         self.type = type
         self.create_account_op = create_account_op

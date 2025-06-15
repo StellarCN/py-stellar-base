@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import base64
+from typing import Optional
 
 from xdrlib3 import Packer, Unpacker
 
@@ -36,10 +37,10 @@ class Memo:
     def __init__(
         self,
         type: MemoType,
-        text: bytes = None,
-        id: Uint64 = None,
-        hash: Hash = None,
-        ret_hash: Hash = None,
+        text: Optional[bytes] = None,
+        id: Optional[Uint64] = None,
+        hash: Optional[Hash] = None,
+        ret_hash: Optional[Hash] = None,
     ) -> None:
         self.type = type
         self.text = text

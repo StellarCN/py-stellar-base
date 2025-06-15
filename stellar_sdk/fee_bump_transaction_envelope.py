@@ -1,4 +1,4 @@
-from typing import Sequence, Union
+from typing import Optional, Sequence, Union
 
 from xdrlib3 import Packer
 
@@ -33,7 +33,7 @@ class FeeBumpTransactionEnvelope(BaseTransactionEnvelope["FeeBumpTransactionEnve
         self,
         transaction: FeeBumpTransaction,
         network_passphrase: str,
-        signatures: Sequence[DecoratedSignature] = None,
+        signatures: Optional[Sequence[DecoratedSignature]] = None,
     ) -> None:
         super().__init__(network_passphrase, signatures)
         self.transaction: FeeBumpTransaction = transaction

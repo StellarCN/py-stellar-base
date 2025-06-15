@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import base64
+from typing import Optional
 
 from xdrlib3 import Packer, Unpacker
 
@@ -26,7 +27,7 @@ class SCPHistoryEntry:
     def __init__(
         self,
         v: int,
-        v0: SCPHistoryEntryV0 = None,
+        v0: Optional[SCPHistoryEntryV0] = None,
     ) -> None:
         self.v = v
         self.v0 = v0

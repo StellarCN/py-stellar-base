@@ -39,7 +39,7 @@ class Account:
         self,
         account: Union[str, MuxedAccount],
         sequence: int,
-        raw_data: Dict[str, Any] = None,
+        raw_data: Optional[Dict[str, Any]] = None,
     ) -> None:
         if isinstance(account, str):
             self.account: MuxedAccount = MuxedAccount.from_account(account)

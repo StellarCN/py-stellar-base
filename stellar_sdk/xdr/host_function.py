@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import base64
+from typing import Optional
 
 from xdrlib3 import Packer, Unpacker
 
@@ -35,10 +36,10 @@ class HostFunction:
     def __init__(
         self,
         type: HostFunctionType,
-        invoke_contract: InvokeContractArgs = None,
-        create_contract: CreateContractArgs = None,
-        wasm: bytes = None,
-        create_contract_v2: CreateContractArgsV2 = None,
+        invoke_contract: Optional[InvokeContractArgs] = None,
+        create_contract: Optional[CreateContractArgs] = None,
+        wasm: Optional[bytes] = None,
+        create_contract_v2: Optional[CreateContractArgsV2] = None,
     ) -> None:
         self.type = type
         self.invoke_contract = invoke_contract

@@ -1,5 +1,5 @@
 from decimal import Decimal
-from typing import Any, Coroutine, Dict, Generator, List, Tuple, Union
+from typing import Any, Coroutine, Dict, Generator, List, Optional, Tuple, Union
 
 from .account import Account
 from .asset import Asset
@@ -210,9 +210,9 @@ class BaseServer:
         base: Asset,
         counter: Asset,
         resolution: int,
-        start_time: int = None,
-        end_time: int = None,
-        offset: int = None,
+        start_time: Optional[int] = None,
+        end_time: Optional[int] = None,
+        offset: Optional[int] = None,
     ) -> BaseTradeAggregationsCallBuilder:
         """
         :param base: base asset

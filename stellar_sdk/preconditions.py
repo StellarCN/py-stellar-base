@@ -28,12 +28,12 @@ class Preconditions:
 
     def __init__(
         self,
-        time_bounds: TimeBounds = None,
-        ledger_bounds: LedgerBounds = None,
-        min_sequence_number: int = None,
-        min_sequence_age: int = None,
-        min_sequence_ledger_gap: int = None,
-        extra_signers: Sequence[SignerKey] = None,
+        time_bounds: Optional[TimeBounds] = None,
+        ledger_bounds: Optional[LedgerBounds] = None,
+        min_sequence_number: Optional[int] = None,
+        min_sequence_age: Optional[int] = None,
+        min_sequence_ledger_gap: Optional[int] = None,
+        extra_signers: Optional[Sequence[SignerKey]] = None,
     ):
         if not extra_signers:
             extra_signers = []

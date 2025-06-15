@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import base64
-from typing import List
+from typing import List, Optional
 
 from xdrlib3 import Packer, Unpacker
 
@@ -49,8 +49,8 @@ class TransactionResultResult:
     def __init__(
         self,
         code: TransactionResultCode,
-        inner_result_pair: InnerTransactionResultPair = None,
-        results: List[OperationResult] = None,
+        inner_result_pair: Optional[InnerTransactionResultPair] = None,
+        results: Optional[List[OperationResult]] = None,
     ) -> None:
         _expect_max_length = 4294967295
         if results and len(results) > _expect_max_length:

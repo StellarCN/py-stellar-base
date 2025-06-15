@@ -1080,7 +1080,7 @@ def _add_line(
     key: str,
     value: Union[str, int],
     lines: List[str],
-    comment: Union[str, int, Decimal] = None,
+    comment: Optional[Union[str, int, Decimal]] = None,
 ) -> None:
     lines.append(f"{key}: {value}{' (' + str(comment) + ')' if comment else ''}")
 
@@ -1224,7 +1224,9 @@ def _add_operation(
     operation_type = operation.__class__.__name__
 
     def add_operation_line(
-        key: str, value: Union[str, int], comment: Union[str, int, Decimal] = None
+        key: str,
+        value: Union[str, int],
+        comment: Optional[Union[str, int, Decimal]] = None,
     ) -> None:
         _add_line(f"{prefix}{key}", value, lines, comment)
 
@@ -1244,7 +1246,7 @@ def _add_operation(
         key: str,
         value: Union[str, int, None],
         optional: bool = False,
-        comment: Union[str, int, Decimal] = None,
+        comment: Optional[Union[str, int, Decimal]] = None,
     ) -> None:
         operation_type = operation.__class__.__name__
         key = f"body.{_to_camel_case(operation_type)}Op.{key}"

@@ -113,7 +113,7 @@ class AiohttpClient(BaseAsyncClient):
         self._session: Optional[aiohttp.ClientSession] = None
         self._sse_session: Optional[aiohttp.ClientSession] = None
 
-    async def get(self, url: str, params: Dict[str, str] = None) -> Response:
+    async def get(self, url: str, params: Optional[Dict[str, str]] = None) -> Response:
         """Perform HTTP GET request.
 
         :param url: the request url
@@ -135,7 +135,10 @@ class AiohttpClient(BaseAsyncClient):
             raise ConnectionError(e)
 
     async def post(
-        self, url: str, data: Dict[str, str] = None, json_data: Dict[str, Any] = None
+        self,
+        url: str,
+        data: Optional[Dict[str, str]] = None,
+        json_data: Optional[Dict[str, Any]] = None,
     ) -> Response:
         """Perform HTTP POST request.
 
@@ -164,7 +167,7 @@ class AiohttpClient(BaseAsyncClient):
             raise ConnectionError(e)
 
     async def stream(
-        self, url: str, params: Dict[str, str] = None
+        self, url: str, params: Optional[Dict[str, str]] = None
     ) -> AsyncGenerator[Dict[str, Any], None]:
         """Perform Stream request.
 

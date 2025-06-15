@@ -46,7 +46,7 @@ class AssembledTransactionAsync(Generic[T]):
         self,
         transaction_builder: TransactionBuilder,
         server: SorobanServerAsync,
-        transaction_signer: Keypair = None,
+        transaction_signer: Optional[Keypair] = None,
         parse_result_xdr_fn: Optional[Callable[[xdr.SCVal], T]] = None,
         submit_timeout: int = 180,
     ):
@@ -110,7 +110,7 @@ class AssembledTransactionAsync(Generic[T]):
         return self
 
     async def sign_and_submit(
-        self, transaction_signer: Keypair = None, force: bool = False
+        self, transaction_signer: Optional[Keypair] = None, force: bool = False
     ) -> Union[T, xdr.SCVal]:
         """Signs and submits the transaction in one step.
 
@@ -124,7 +124,7 @@ class AssembledTransactionAsync(Generic[T]):
         return await self.submit()
 
     def sign(
-        self, transaction_signer: Keypair = None, force: bool = False
+        self, transaction_signer: Optional[Keypair] = None, force: bool = False
     ) -> "AssembledTransactionAsync":
         """Signs the transaction.
 
@@ -171,7 +171,9 @@ class AssembledTransactionAsync(Generic[T]):
         return self
 
     async def sign_auth_entries(
-        self, auth_entries_signer: Keypair, valid_until_ledger_sequence: int = None
+        self,
+        auth_entries_signer: Keypair,
+        valid_until_ledger_sequence: Optional[int] = None,
     ) -> "AssembledTransactionAsync":
         """Signs the transaction's authorization entries.
 

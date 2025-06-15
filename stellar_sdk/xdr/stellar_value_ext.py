@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import base64
+from typing import Optional
 
 from xdrlib3 import Packer, Unpacker
 
@@ -28,7 +29,7 @@ class StellarValueExt:
     def __init__(
         self,
         v: StellarValueType,
-        lc_value_signature: LedgerCloseValueSignature = None,
+        lc_value_signature: Optional[LedgerCloseValueSignature] = None,
     ) -> None:
         self.v = v
         self.lc_value_signature = lc_value_signature

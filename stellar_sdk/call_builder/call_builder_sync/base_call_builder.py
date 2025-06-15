@@ -1,4 +1,4 @@
-from typing import Any, Dict, Generator
+from typing import Any, Dict, Generator, Optional
 
 from ...call_builder.base.base_call_builder import BaseCallBuilder as _BaseCallBuilder
 from ...client.base_sync_client import BaseSyncClient
@@ -40,7 +40,7 @@ class BaseCallBuilder(_BaseCallBuilder):
         url = urljoin_with_query(self.horizon_url, self.endpoint)
         return self._call(url, self.params)
 
-    def _call(self, url: str, params: dict = None) -> Dict[str, Any]:
+    def _call(self, url: str, params: Optional[dict] = None) -> Dict[str, Any]:
         raw_resp = self.client.get(url, params)
         assert isinstance(raw_resp, Response)
         raise_request_exception(raw_resp)
