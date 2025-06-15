@@ -53,7 +53,7 @@ asset3 = Asset("PANDA", "GDJVFDG5OCW5PYWHB64MGTHGFF57DRRJEDUEFDEL2SLNIOONHYJWHA3
 
 
 def get_tx_builder(
-    source_account: Account = None,
+    source_account: Optional[Account] = None,
     base_fee: int = 100,
     network_passphrase: str = Network.TESTNET_NETWORK_PASSPHRASE,
     min_time: Optional[int] = 1600000000,

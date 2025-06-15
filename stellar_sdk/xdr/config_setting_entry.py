@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import base64
-from typing import List
+from typing import List, Optional
 
 from xdrlib3 import Packer, Unpacker
 
@@ -67,20 +67,24 @@ class ConfigSettingEntry:
     def __init__(
         self,
         config_setting_id: ConfigSettingID,
-        contract_max_size_bytes: Uint32 = None,
-        contract_compute: ConfigSettingContractComputeV0 = None,
-        contract_ledger_cost: ConfigSettingContractLedgerCostV0 = None,
-        contract_historical_data: ConfigSettingContractHistoricalDataV0 = None,
-        contract_events: ConfigSettingContractEventsV0 = None,
-        contract_bandwidth: ConfigSettingContractBandwidthV0 = None,
-        contract_cost_params_cpu_insns: ContractCostParams = None,
-        contract_cost_params_mem_bytes: ContractCostParams = None,
-        contract_data_key_size_bytes: Uint32 = None,
-        contract_data_entry_size_bytes: Uint32 = None,
-        state_archival_settings: StateArchivalSettings = None,
-        contract_execution_lanes: ConfigSettingContractExecutionLanesV0 = None,
-        bucket_list_size_window: List[Uint64] = None,
-        eviction_iterator: EvictionIterator = None,
+        contract_max_size_bytes: Optional[Uint32] = None,
+        contract_compute: Optional[ConfigSettingContractComputeV0] = None,
+        contract_ledger_cost: Optional[ConfigSettingContractLedgerCostV0] = None,
+        contract_historical_data: Optional[
+            ConfigSettingContractHistoricalDataV0
+        ] = None,
+        contract_events: Optional[ConfigSettingContractEventsV0] = None,
+        contract_bandwidth: Optional[ConfigSettingContractBandwidthV0] = None,
+        contract_cost_params_cpu_insns: Optional[ContractCostParams] = None,
+        contract_cost_params_mem_bytes: Optional[ContractCostParams] = None,
+        contract_data_key_size_bytes: Optional[Uint32] = None,
+        contract_data_entry_size_bytes: Optional[Uint32] = None,
+        state_archival_settings: Optional[StateArchivalSettings] = None,
+        contract_execution_lanes: Optional[
+            ConfigSettingContractExecutionLanesV0
+        ] = None,
+        bucket_list_size_window: Optional[List[Uint64]] = None,
+        eviction_iterator: Optional[EvictionIterator] = None,
     ) -> None:
         _expect_max_length = 4294967295
         if (

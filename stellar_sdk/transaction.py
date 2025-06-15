@@ -61,9 +61,9 @@ class Transaction:
         sequence: int,
         fee: int,
         operations: Sequence[Operation],
-        memo: Memo = None,
-        preconditions: Preconditions = None,
-        soroban_data: stellar_xdr.SorobanTransactionData = None,
+        memo: Optional[Memo] = None,
+        preconditions: Optional[Preconditions] = None,
+        soroban_data: Optional[stellar_xdr.SorobanTransactionData] = None,
         v1: bool = True,
     ) -> None:
         # if not operations:

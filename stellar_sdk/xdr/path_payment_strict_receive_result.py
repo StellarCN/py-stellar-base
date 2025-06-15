@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import base64
+from typing import Optional
 
 from xdrlib3 import Packer, Unpacker
 
@@ -49,8 +50,8 @@ class PathPaymentStrictReceiveResult:
     def __init__(
         self,
         code: PathPaymentStrictReceiveResultCode,
-        success: PathPaymentStrictReceiveResultSuccess = None,
-        no_issuer: Asset = None,
+        success: Optional[PathPaymentStrictReceiveResultSuccess] = None,
+        no_issuer: Optional[Asset] = None,
     ) -> None:
         self.code = code
         self.success = success

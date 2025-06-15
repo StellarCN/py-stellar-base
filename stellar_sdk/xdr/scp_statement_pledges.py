@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import base64
+from typing import Optional
 
 from xdrlib3 import Packer, Unpacker
 
@@ -55,10 +56,10 @@ class SCPStatementPledges:
     def __init__(
         self,
         type: SCPStatementType,
-        prepare: SCPStatementPrepare = None,
-        confirm: SCPStatementConfirm = None,
-        externalize: SCPStatementExternalize = None,
-        nominate: SCPNomination = None,
+        prepare: Optional[SCPStatementPrepare] = None,
+        confirm: Optional[SCPStatementConfirm] = None,
+        externalize: Optional[SCPStatementExternalize] = None,
+        nominate: Optional[SCPNomination] = None,
     ) -> None:
         self.type = type
         self.prepare = prepare

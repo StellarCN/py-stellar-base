@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import base64
+from typing import Optional
 
 from xdrlib3 import Packer, Unpacker
 
@@ -34,9 +35,9 @@ class BucketEntry:
     def __init__(
         self,
         type: BucketEntryType,
-        live_entry: LedgerEntry = None,
-        dead_entry: LedgerKey = None,
-        meta_entry: BucketMetadata = None,
+        live_entry: Optional[LedgerEntry] = None,
+        dead_entry: Optional[LedgerKey] = None,
+        meta_entry: Optional[BucketMetadata] = None,
     ) -> None:
         self.type = type
         self.live_entry = live_entry

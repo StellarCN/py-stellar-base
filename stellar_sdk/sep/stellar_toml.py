@@ -9,7 +9,7 @@ Version: 2.1.0
 """
 
 import sys
-from typing import Any, MutableMapping
+from typing import Any, MutableMapping, Optional
 
 if sys.version_info >= (3, 11):
     from tomllib import loads as toml_loads
@@ -28,7 +28,7 @@ __all__ = ["fetch_stellar_toml", "fetch_stellar_toml_async"]
 
 def fetch_stellar_toml(
     domain: str,
-    client: BaseSyncClient = None,
+    client: Optional[BaseSyncClient] = None,
     use_http: bool = False,
 ) -> MutableMapping[str, Any]:
     """Retrieve the stellar.toml file from a given domain.
@@ -54,7 +54,7 @@ def fetch_stellar_toml(
 
 async def fetch_stellar_toml_async(
     domain: str,
-    client: BaseAsyncClient = None,
+    client: Optional[BaseAsyncClient] = None,
     use_http: bool = False,
 ) -> MutableMapping[str, Any]:
     """Retrieve the stellar.toml file from a given domain.
@@ -66,7 +66,7 @@ async def fetch_stellar_toml_async(
     :param domain: The domain the .toml file is hosted at.
     :param use_http: Specifies whether the request should go over plain HTTP vs HTTPS.
         Note it is recommended that you **always** use HTTPS.
-    :param client: Http Client used to send the request.
+    :param client: Http client used to send the request.
     :return: The stellar.toml file as a dict object.
     :raises: :exc:`StellarTomlNotFoundError <stellar_sdk.sep.exceptions.StellarTomlNotFoundError>`:
         if the Stellar toml file could not be found.

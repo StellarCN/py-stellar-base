@@ -50,8 +50,8 @@ class RequestsClient(BaseSyncClient):
         request_timeout: int = defines.DEFAULT_GET_TIMEOUT_SECONDS,
         post_timeout: float = defines.DEFAULT_POST_TIMEOUT_SECONDS,
         backoff_factor: float = DEFAULT_BACKOFF_FACTOR,
-        session: Session = None,
-        stream_session: Session = None,
+        session: Optional[Session] = None,
+        stream_session: Optional[Session] = None,
         custom_headers: Optional[Dict[str, str]] = None,
     ):
         self.pool_size: int = pool_size
@@ -100,7 +100,7 @@ class RequestsClient(BaseSyncClient):
         self._session: Session = session
         self._stream_session: Optional[Session] = stream_session
 
-    def get(self, url: str, params: Dict[str, str] = None) -> Response:
+    def get(self, url: str, params: Optional[Dict[str, str]] = None) -> Response:
         """Perform HTTP GET request.
 
         :param url: the request url
@@ -120,7 +120,10 @@ class RequestsClient(BaseSyncClient):
         )
 
     def post(
-        self, url: str, data: Dict[str, str] = None, json_data: Dict[str, Any] = None
+        self,
+        url: str,
+        data: Optional[Dict[str, str]] = None,
+        json_data: Optional[Dict[str, Any]] = None,
     ) -> Response:
         """Perform HTTP POST request.
 
@@ -144,7 +147,7 @@ class RequestsClient(BaseSyncClient):
         )
 
     def stream(
-        self, url: str, params: Dict[str, str] = None
+        self, url: str, params: Optional[Dict[str, str]] = None
     ) -> Generator[Dict[str, Any], None, None]:
         """Creates an EventSource that listens for incoming messages from the server.
 

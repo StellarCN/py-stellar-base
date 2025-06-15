@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import base64
-from typing import List
+from typing import List, Optional
 
 from xdrlib3 import Packer, Unpacker
 
@@ -115,29 +115,37 @@ class StellarMessage:
     def __init__(
         self,
         type: MessageType,
-        error: Error = None,
-        hello: Hello = None,
-        auth: Auth = None,
-        dont_have: DontHave = None,
-        peers: List[PeerAddress] = None,
-        tx_set_hash: Uint256 = None,
-        tx_set: TransactionSet = None,
-        generalized_tx_set: GeneralizedTransactionSet = None,
-        transaction: TransactionEnvelope = None,
-        signed_survey_request_message: SignedSurveyRequestMessage = None,
-        signed_survey_response_message: SignedSurveyResponseMessage = None,
-        signed_time_sliced_survey_request_message: SignedTimeSlicedSurveyRequestMessage = None,
-        signed_time_sliced_survey_response_message: SignedTimeSlicedSurveyResponseMessage = None,
-        signed_time_sliced_survey_start_collecting_message: SignedTimeSlicedSurveyStartCollectingMessage = None,
-        signed_time_sliced_survey_stop_collecting_message: SignedTimeSlicedSurveyStopCollectingMessage = None,
-        q_set_hash: Uint256 = None,
-        q_set: SCPQuorumSet = None,
-        envelope: SCPEnvelope = None,
-        get_scp_ledger_seq: Uint32 = None,
-        send_more_message: SendMore = None,
-        send_more_extended_message: SendMoreExtended = None,
-        flood_advert: FloodAdvert = None,
-        flood_demand: FloodDemand = None,
+        error: Optional[Error] = None,
+        hello: Optional[Hello] = None,
+        auth: Optional[Auth] = None,
+        dont_have: Optional[DontHave] = None,
+        peers: Optional[List[PeerAddress]] = None,
+        tx_set_hash: Optional[Uint256] = None,
+        tx_set: Optional[TransactionSet] = None,
+        generalized_tx_set: Optional[GeneralizedTransactionSet] = None,
+        transaction: Optional[TransactionEnvelope] = None,
+        signed_survey_request_message: Optional[SignedSurveyRequestMessage] = None,
+        signed_survey_response_message: Optional[SignedSurveyResponseMessage] = None,
+        signed_time_sliced_survey_request_message: Optional[
+            SignedTimeSlicedSurveyRequestMessage
+        ] = None,
+        signed_time_sliced_survey_response_message: Optional[
+            SignedTimeSlicedSurveyResponseMessage
+        ] = None,
+        signed_time_sliced_survey_start_collecting_message: Optional[
+            SignedTimeSlicedSurveyStartCollectingMessage
+        ] = None,
+        signed_time_sliced_survey_stop_collecting_message: Optional[
+            SignedTimeSlicedSurveyStopCollectingMessage
+        ] = None,
+        q_set_hash: Optional[Uint256] = None,
+        q_set: Optional[SCPQuorumSet] = None,
+        envelope: Optional[SCPEnvelope] = None,
+        get_scp_ledger_seq: Optional[Uint32] = None,
+        send_more_message: Optional[SendMore] = None,
+        send_more_extended_message: Optional[SendMoreExtended] = None,
+        flood_advert: Optional[FloodAdvert] = None,
+        flood_demand: Optional[FloodDemand] = None,
     ) -> None:
         _expect_max_length = 100
         if peers and len(peers) > _expect_max_length:

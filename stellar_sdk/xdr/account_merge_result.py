@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import base64
+from typing import Optional
 
 from xdrlib3 import Packer, Unpacker
 
@@ -34,7 +35,7 @@ class AccountMergeResult:
     def __init__(
         self,
         code: AccountMergeResultCode,
-        source_account_balance: Int64 = None,
+        source_account_balance: Optional[Int64] = None,
     ) -> None:
         self.code = code
         self.source_account_balance = source_account_balance

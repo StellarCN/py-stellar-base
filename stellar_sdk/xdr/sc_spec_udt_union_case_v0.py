@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import base64
+from typing import Optional
 
 from xdrlib3 import Packer, Unpacker
 
@@ -29,8 +30,8 @@ class SCSpecUDTUnionCaseV0:
     def __init__(
         self,
         kind: SCSpecUDTUnionCaseV0Kind,
-        void_case: SCSpecUDTUnionCaseVoidV0 = None,
-        tuple_case: SCSpecUDTUnionCaseTupleV0 = None,
+        void_case: Optional[SCSpecUDTUnionCaseVoidV0] = None,
+        tuple_case: Optional[SCSpecUDTUnionCaseTupleV0] = None,
     ) -> None:
         self.kind = kind
         self.void_case = void_case

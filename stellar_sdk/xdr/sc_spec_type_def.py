@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import base64
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional
 
 from xdrlib3 import Packer, Unpacker
 
@@ -65,13 +65,13 @@ class SCSpecTypeDef:
     def __init__(
         self,
         type: SCSpecType,
-        option: SCSpecTypeOption = None,
-        result: SCSpecTypeResult = None,
-        vec: SCSpecTypeVec = None,
-        map: SCSpecTypeMap = None,
-        tuple: SCSpecTypeTuple = None,
-        bytes_n: SCSpecTypeBytesN = None,
-        udt: SCSpecTypeUDT = None,
+        option: Optional[SCSpecTypeOption] = None,
+        result: Optional[SCSpecTypeResult] = None,
+        vec: Optional[SCSpecTypeVec] = None,
+        map: Optional[SCSpecTypeMap] = None,
+        tuple: Optional[SCSpecTypeTuple] = None,
+        bytes_n: Optional[SCSpecTypeBytesN] = None,
+        udt: Optional[SCSpecTypeUDT] = None,
     ) -> None:
         self.type = type
         self.option = option

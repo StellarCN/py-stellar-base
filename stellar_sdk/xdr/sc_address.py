@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import base64
+from typing import Optional
 
 from xdrlib3 import Packer, Unpacker
 
@@ -29,8 +30,8 @@ class SCAddress:
     def __init__(
         self,
         type: SCAddressType,
-        account_id: AccountID = None,
-        contract_id: Hash = None,
+        account_id: Optional[AccountID] = None,
+        contract_id: Optional[Hash] = None,
     ) -> None:
         self.type = type
         self.account_id = account_id

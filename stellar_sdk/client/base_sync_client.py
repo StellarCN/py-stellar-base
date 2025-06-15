@@ -1,5 +1,5 @@
 from abc import ABCMeta, abstractmethod
-from typing import Any, Dict, Generator
+from typing import Any, Dict, Generator, Optional
 
 from .response import Response
 
@@ -13,7 +13,7 @@ class BaseSyncClient(metaclass=ABCMeta):
     """
 
     @abstractmethod
-    def get(self, url: str, params: Dict[str, str] = None) -> Response:
+    def get(self, url: str, params: Optional[Dict[str, str]] = None) -> Response:
         """Perform HTTP GET request.
 
         :param url: the request url
@@ -26,8 +26,8 @@ class BaseSyncClient(metaclass=ABCMeta):
     def post(
         self,
         url: str,
-        data: Dict[str, str] = None,
-        json_data: Dict[str, Any] = None,
+        data: Optional[Dict[str, str]] = None,
+        json_data: Optional[Dict[str, Any]] = None,
     ) -> Response:
         """Perform HTTP POST request.
 
@@ -40,7 +40,7 @@ class BaseSyncClient(metaclass=ABCMeta):
 
     @abstractmethod
     def stream(
-        self, url: str, params: Dict[str, str] = None
+        self, url: str, params: Optional[Dict[str, str]] = None
     ) -> Generator[Dict[str, Any], None, None]:
         """Creates an EventSource that listens for incoming messages from the server.
 

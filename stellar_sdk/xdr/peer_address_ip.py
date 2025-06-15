@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import base64
+from typing import Optional
 
 from xdrlib3 import Packer, Unpacker
 
@@ -28,8 +29,8 @@ class PeerAddressIp:
     def __init__(
         self,
         type: IPAddrType,
-        ipv4: bytes = None,
-        ipv6: bytes = None,
+        ipv4: Optional[bytes] = None,
+        ipv6: Optional[bytes] = None,
     ) -> None:
         self.type = type
         self.ipv4 = ipv4

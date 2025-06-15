@@ -482,7 +482,7 @@ class TransactionBuilder:
     def append_change_trust_op(
         self,
         asset: Union[Asset, LiquidityPoolAsset],
-        limit: Union[str, Decimal] = None,
+        limit: Optional[Union[str, Decimal]] = None,
         source: Optional[Union[MuxedAccount, str]] = None,
     ) -> "TransactionBuilder":
         """Append a :class:`ChangeTrust <stellar_sdk.operation.ChangeTrust>`
@@ -618,15 +618,15 @@ class TransactionBuilder:
 
     def append_set_options_op(
         self,
-        inflation_dest: str = None,
-        clear_flags: Union[int, AuthorizationFlag] = None,
-        set_flags: Union[int, AuthorizationFlag] = None,
-        master_weight: int = None,
-        low_threshold: int = None,
-        med_threshold: int = None,
-        high_threshold: int = None,
-        home_domain: str = None,
-        signer: Signer = None,
+        inflation_dest: Optional[str] = None,
+        clear_flags: Optional[Union[int, AuthorizationFlag]] = None,
+        set_flags: Optional[Union[int, AuthorizationFlag]] = None,
+        master_weight: Optional[int] = None,
+        low_threshold: Optional[int] = None,
+        med_threshold: Optional[int] = None,
+        high_threshold: Optional[int] = None,
+        home_domain: Optional[str] = None,
+        signer: Optional[Signer] = None,
         source: Optional[Union[MuxedAccount, str]] = None,
     ) -> "TransactionBuilder":
         """Append a :class:`SetOptions <stellar_sdk.operation.SetOptions>`
@@ -1159,8 +1159,8 @@ class TransactionBuilder:
         self,
         trustor: str,
         asset: Asset,
-        clear_flags: TrustLineFlags = None,
-        set_flags: TrustLineFlags = None,
+        clear_flags: Optional[TrustLineFlags] = None,
+        set_flags: Optional[TrustLineFlags] = None,
         source: Optional[Union[MuxedAccount, str]] = None,
     ) -> "TransactionBuilder":
         """Append an :class:`SetTrustLineFlags <stellar_sdk.operation.SetTrustLineFlags>`
@@ -1231,8 +1231,8 @@ class TransactionBuilder:
         self,
         contract_id: str,
         function_name: str,
-        parameters: Sequence[stellar_xdr.SCVal] = None,
-        auth: Sequence[stellar_xdr.SorobanAuthorizationEntry] = None,
+        parameters: Optional[Sequence[stellar_xdr.SCVal]] = None,
+        auth: Optional[Sequence[stellar_xdr.SorobanAuthorizationEntry]] = None,
         source: Optional[Union[MuxedAccount, str]] = None,
     ) -> "TransactionBuilder":
         """Append an :class:`InvokeHostFunction <stellar_sdk.operation.InvokeHostFunction>` operation to the list of operations.
@@ -1299,7 +1299,7 @@ class TransactionBuilder:
         address: Union[str, Address],
         constructor_args: Optional[Sequence[stellar_xdr.SCVal]] = None,
         salt: Optional[bytes] = None,
-        auth: Sequence[stellar_xdr.SorobanAuthorizationEntry] = None,
+        auth: Optional[Sequence[stellar_xdr.SorobanAuthorizationEntry]] = None,
         source: Optional[Union[MuxedAccount, str]] = None,
     ) -> "TransactionBuilder":
         """Append an :class:`InvokeHostFunction <stellar_sdk.operation.InvokeHostFunction>` operation to the list of operations.
@@ -1390,7 +1390,7 @@ class TransactionBuilder:
         self,
         address: Union[str, Address],
         salt: Optional[bytes] = None,
-        auth: Sequence[stellar_xdr.SorobanAuthorizationEntry] = None,
+        auth: Optional[Sequence[stellar_xdr.SorobanAuthorizationEntry]] = None,
         source: Optional[Union[MuxedAccount, str]] = None,
     ) -> "TransactionBuilder":
         """Append an :class:`InvokeHostFunction <stellar_sdk.operation.InvokeHostFunction>` operation to the list of operations.

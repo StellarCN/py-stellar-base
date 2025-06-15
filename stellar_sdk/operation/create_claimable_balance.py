@@ -329,7 +329,9 @@ class Claimant:
     :param predicate: The claim predicate. It is optional, it defaults to unconditional if none is specified.
     """
 
-    def __init__(self, destination: str, predicate: ClaimPredicate = None) -> None:
+    def __init__(
+        self, destination: str, predicate: Optional[ClaimPredicate] = None
+    ) -> None:
         self.destination = destination
         if predicate is None:
             predicate = ClaimPredicate.predicate_unconditional()

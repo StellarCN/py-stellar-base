@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import base64
+from typing import Optional
 
 from xdrlib3 import Packer, Unpacker
 
@@ -39,7 +40,7 @@ class ManageSellOfferResult:
     def __init__(
         self,
         code: ManageSellOfferResultCode,
-        success: ManageOfferSuccessResult = None,
+        success: Optional[ManageOfferSuccessResult] = None,
     ) -> None:
         self.code = code
         self.success = success

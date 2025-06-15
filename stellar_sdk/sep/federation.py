@@ -78,8 +78,8 @@ class FederationRecord:
 
 def resolve_stellar_address(
     stellar_address: str,
-    client: BaseSyncClient = None,
-    federation_url: str = None,
+    client: Optional[BaseSyncClient] = None,
+    federation_url: Optional[str] = None,
     use_http: bool = False,
 ) -> FederationRecord:
     """Get the federation record if the user was found for a given Stellar address.
@@ -110,8 +110,8 @@ def resolve_stellar_address(
 
 async def resolve_stellar_address_async(
     stellar_address: str,
-    client: BaseAsyncClient = None,
-    federation_url: str = None,
+    client: Optional[BaseAsyncClient] = None,
+    federation_url: Optional[str] = None,
     use_http: bool = False,
 ) -> FederationRecord:
     """Get the federation record if the user was found for a given Stellar address.
@@ -142,9 +142,9 @@ async def resolve_stellar_address_async(
 
 def resolve_account_id(
     account_id: str,
-    domain: str = None,
-    federation_url: str = None,
-    client: BaseSyncClient = None,
+    domain: Optional[str] = None,
+    federation_url: Optional[str] = None,
+    client: Optional[BaseSyncClient] = None,
     use_http: bool = False,
 ) -> FederationRecord:
     """Given an account ID, get their federation record if the user was found
@@ -177,9 +177,9 @@ def resolve_account_id(
 
 async def resolve_account_id_async(
     account_id: str,
-    domain: str = None,
-    federation_url: str = None,
-    client: BaseAsyncClient = None,
+    domain: Optional[str] = None,
+    federation_url: Optional[str] = None,
+    client: Optional[BaseAsyncClient] = None,
     use_http: bool = False,
 ) -> FederationRecord:
     """Given an account ID, get their federation record if the user was found

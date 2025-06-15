@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import base64
+from typing import Optional
 
 from xdrlib3 import Packer, Unpacker
 
@@ -33,10 +34,10 @@ class LedgerEntryChange:
     def __init__(
         self,
         type: LedgerEntryChangeType,
-        created: LedgerEntry = None,
-        updated: LedgerEntry = None,
-        removed: LedgerKey = None,
-        state: LedgerEntry = None,
+        created: Optional[LedgerEntry] = None,
+        updated: Optional[LedgerEntry] = None,
+        removed: Optional[LedgerKey] = None,
+        state: Optional[LedgerEntry] = None,
     ) -> None:
         self.type = type
         self.created = created

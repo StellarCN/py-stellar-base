@@ -27,7 +27,7 @@ class InvokeHostFunction(Operation):
     def __init__(
         self,
         host_function: stellar_xdr.HostFunction,
-        auth: Sequence[stellar_xdr.SorobanAuthorizationEntry] = None,
+        auth: Optional[Sequence[stellar_xdr.SorobanAuthorizationEntry]] = None,
         source: Optional[Union[MuxedAccount, str]] = None,
     ):
         super().__init__(source)

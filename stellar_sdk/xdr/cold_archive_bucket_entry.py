@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import base64
+from typing import Optional
 
 from xdrlib3 import Packer, Unpacker
 
@@ -38,11 +39,11 @@ class ColdArchiveBucketEntry:
     def __init__(
         self,
         type: ColdArchiveBucketEntryType,
-        meta_entry: BucketMetadata = None,
-        archived_leaf: ColdArchiveArchivedLeaf = None,
-        deleted_leaf: ColdArchiveDeletedLeaf = None,
-        boundary_leaf: ColdArchiveBoundaryLeaf = None,
-        hash_entry: ColdArchiveHashEntry = None,
+        meta_entry: Optional[BucketMetadata] = None,
+        archived_leaf: Optional[ColdArchiveArchivedLeaf] = None,
+        deleted_leaf: Optional[ColdArchiveDeletedLeaf] = None,
+        boundary_leaf: Optional[ColdArchiveBoundaryLeaf] = None,
+        hash_entry: Optional[ColdArchiveHashEntry] = None,
     ) -> None:
         self.type = type
         self.meta_entry = meta_entry

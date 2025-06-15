@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import base64
+from typing import Optional
 
 from xdrlib3 import Packer, Unpacker
 
@@ -32,9 +33,9 @@ class TransactionEnvelope:
     def __init__(
         self,
         type: EnvelopeType,
-        v0: TransactionV0Envelope = None,
-        v1: TransactionV1Envelope = None,
-        fee_bump: FeeBumpTransactionEnvelope = None,
+        v0: Optional[TransactionV0Envelope] = None,
+        v1: Optional[TransactionV1Envelope] = None,
+        fee_bump: Optional[FeeBumpTransactionEnvelope] = None,
     ) -> None:
         self.type = type
         self.v0 = v0

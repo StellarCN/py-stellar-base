@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import base64
-from typing import List
+from typing import List, Optional
 
 from xdrlib3 import Packer, Unpacker
 
@@ -29,7 +29,7 @@ class InflationResult:
     def __init__(
         self,
         code: InflationResultCode,
-        payouts: List[InflationPayout] = None,
+        payouts: Optional[List[InflationPayout]] = None,
     ) -> None:
         _expect_max_length = 4294967295
         if payouts and len(payouts) > _expect_max_length:

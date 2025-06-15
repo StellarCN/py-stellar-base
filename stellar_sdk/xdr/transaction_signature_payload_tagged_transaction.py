@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import base64
+from typing import Optional
 
 from xdrlib3 import Packer, Unpacker
 
@@ -30,8 +31,8 @@ class TransactionSignaturePayloadTaggedTransaction:
     def __init__(
         self,
         type: EnvelopeType,
-        tx: Transaction = None,
-        fee_bump: FeeBumpTransaction = None,
+        tx: Optional[Transaction] = None,
+        fee_bump: Optional[FeeBumpTransaction] = None,
     ) -> None:
         self.type = type
         self.tx = tx

@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import base64
-from typing import List
+from typing import List, Optional
 
 from xdrlib3 import Packer, Unpacker
 
@@ -27,7 +27,7 @@ class TransactionPhase:
     def __init__(
         self,
         v: int,
-        v0_components: List[TxSetComponent] = None,
+        v0_components: Optional[List[TxSetComponent]] = None,
     ) -> None:
         _expect_max_length = 4294967295
         if v0_components and len(v0_components) > _expect_max_length:

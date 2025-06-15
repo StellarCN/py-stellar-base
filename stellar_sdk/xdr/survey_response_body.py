@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import base64
+from typing import Optional
 
 from xdrlib3 import Packer, Unpacker
 
@@ -32,9 +33,9 @@ class SurveyResponseBody:
     def __init__(
         self,
         type: SurveyMessageResponseType,
-        topology_response_body_v0: TopologyResponseBodyV0 = None,
-        topology_response_body_v1: TopologyResponseBodyV1 = None,
-        topology_response_body_v2: TopologyResponseBodyV2 = None,
+        topology_response_body_v0: Optional[TopologyResponseBodyV0] = None,
+        topology_response_body_v1: Optional[TopologyResponseBodyV1] = None,
+        topology_response_body_v2: Optional[TopologyResponseBodyV2] = None,
     ) -> None:
         self.type = type
         self.topology_response_body_v0 = topology_response_body_v0

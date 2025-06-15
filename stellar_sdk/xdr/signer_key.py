@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import base64
+from typing import Optional
 
 from xdrlib3 import Packer, Unpacker
 
@@ -41,10 +42,10 @@ class SignerKey:
     def __init__(
         self,
         type: SignerKeyType,
-        ed25519: Uint256 = None,
-        pre_auth_tx: Uint256 = None,
-        hash_x: Uint256 = None,
-        ed25519_signed_payload: SignerKeyEd25519SignedPayload = None,
+        ed25519: Optional[Uint256] = None,
+        pre_auth_tx: Optional[Uint256] = None,
+        hash_x: Optional[Uint256] = None,
+        ed25519_signed_payload: Optional[SignerKeyEd25519SignedPayload] = None,
     ) -> None:
         self.type = type
         self.ed25519 = ed25519
