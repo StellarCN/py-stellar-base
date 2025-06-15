@@ -43,7 +43,7 @@ requires-python = ">=3.8,<4.0"
 dependencies = [
     "mnemonic>=0.20",
     "pydantic>=2.0.0",
-    "PyNaCl>=1.4.0",
+    "pynacl>=1.4.0",
     "requests>=2.0.0",
     "requests-sse>=0.3",
     "toml>=0.10.2",
@@ -72,6 +72,12 @@ dev = [
     "pytest-httpserver>=1.1.1",
     "requests-mock>=1.12.1",
     "aioresponses>=0.7.8",
+]
+docs = [
+    "autodoc-pydantic>=2.1.0",
+    "sphinx>=7.1.2",
+    "sphinx-autodoc-typehints>=2.0.1",
+    "sphinx-rtd-theme>=3.0.2",
 ]
 
 [tool.mypy]
