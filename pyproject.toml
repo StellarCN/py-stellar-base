@@ -71,6 +71,7 @@ dev = [
     "pytest-httpserver>=1.1.1",
     "requests-mock>=1.12.1",
     "aioresponses>=0.7.8",
+    "pre-commit>=3.5.0",
 ]
 docs = [
     "autodoc-pydantic>=2.1.0",

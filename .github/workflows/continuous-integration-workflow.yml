@@ -14,10 +14,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - name: Install the latest version of uv and set the python version to ${{ env.DEFAULT_PYTHON_VERSION }}
+        uses: astral-sh/setup-uv@v6
         with:
           python-version: ${{ env.DEFAULT_PYTHON_VERSION }}
-      - uses: pre-commit/action@v3.0.1
+      - name: Run pre-commit hooks
+        run: |
+          uv run --frozen --all-extras --group dev pre-commit run --all-files
 
   test:
     needs: pre-commit
