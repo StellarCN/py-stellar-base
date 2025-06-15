@@ -18,12 +18,12 @@
   // "forwardPorts": [],
 
   // Use 'postCreateCommand' to run commands after the container is created.
-  "postCreateCommand": "pip3 install pre-commit && pre-commit install && pip3 install uv && uv venv && source .venv/bin/activate && uv sync --all-extras",
+  "postCreateCommand": "pip3 install uv && uv sync --all-extras --all-groups",
 
   // Configure tool-specific properties.
   "customizations": {
     "vscode": {
-      "extensions": ["ms-python.python"]
+      "extensions": ["ms-python.python", "ms-vscode.makefile-tools"]
     }
   }
 
