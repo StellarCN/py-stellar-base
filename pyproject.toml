@@ -79,6 +79,9 @@ docs = [
     "sphinx-rtd-theme>=3.0.2",
 ]
 
+[tool.setuptools.packages.find]
+include = ["stellar_sdk*"]
+
 [tool.mypy]
 show_error_codes = true
 ignore_missing_imports = true
@@ -105,6 +108,3 @@ exclude_lines = [
 
 [tool.isort]
 profile = "black"
-
-[tool.setuptools]
-packages = ["stellar_sdk"]
