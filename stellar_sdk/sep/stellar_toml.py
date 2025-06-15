@@ -67,7 +67,7 @@ async def fetch_stellar_toml_async(
     :param use_http: Specifies whether the request should go over plain HTTP vs HTTPS.
         Note it is recommended that you **always** use HTTPS.
     :param client: Http Client used to send the request.
-    :return: The stellar.toml file as an dict object.
+    :return: The stellar.toml file as a dict object.
     :raises: :exc:`StellarTomlNotFoundError <stellar_sdk.sep.exceptions.StellarTomlNotFoundError>`:
         if the Stellar toml file could not be found.
     """
