@@ -220,6 +220,9 @@ def _handle_raw_response(
     stellar_address = stellar_address or data.get("stellar_address")
     memo_type = data.get("memo_type")
     memo = data.get("memo")
+    if not account_id or not stellar_address:
+        # This should never happen, but if the server-side implementation is not standardized, this error may be triggered.
+        raise BadFederationResponseError(raw_resp)
     return FederationRecord(
         account_id=account_id,
         stellar_address=stellar_address,

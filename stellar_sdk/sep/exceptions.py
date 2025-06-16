@@ -14,7 +14,7 @@ class FederationServerNotFoundError(SdkError):
 
 
 class BadFederationResponseError(BaseRequestError):
-    """If the federation address is invalid, the exception will be thrown.
+    """If the federation server does not return a valid response, the exception will be thrown.
 
     :param response: client response
     """
