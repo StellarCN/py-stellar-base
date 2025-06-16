@@ -33,7 +33,7 @@ class TestBaseCallBuilder:
     async def test_get_stream_data(self):
         url = "https://horizon.stellar.org/ledgers"
         client = AiohttpClient()
-        resp = BaseCallBuilder(horizon_url=url, client=client)._cursor("now").stream()
+        resp = BaseCallBuilder(horizon_url=url, client=client).cursor("now")._stream()
         messages = []
         async for msg in resp:
             assert isinstance(msg, dict)
