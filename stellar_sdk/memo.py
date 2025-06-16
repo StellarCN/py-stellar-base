@@ -31,7 +31,6 @@ class Memo(object, metaclass=abc.ABCMeta):
     <https://developers.stellar.org/docs/glossary/transactions/#memo>`__
     for more information on how memos are used within transactions, as well as
     information on the available types of memos.
-
     """
 
     @abc.abstractmethod
@@ -41,17 +40,21 @@ class Memo(object, metaclass=abc.ABCMeta):
     @classmethod
     def from_xdr_object(cls, xdr_object: stellar_xdr.Memo) -> Memo:
         """Returns an Memo object from XDR memo object."""
-
-        xdr_types = {
-            stellar_xdr.MemoType.MEMO_TEXT: TextMemo,
-            stellar_xdr.MemoType.MEMO_ID: IdMemo,
-            stellar_xdr.MemoType.MEMO_HASH: HashMemo,
-            stellar_xdr.MemoType.MEMO_RETURN: ReturnHashMemo,
-            stellar_xdr.MemoType.MEMO_NONE: NoneMemo,
-        }
-
-        memo_cls = xdr_types.get(xdr_object.type, NoneMemo)
-        return memo_cls.from_xdr_object(xdr_object)  # type: ignore[attr-defined]
+        if xdr_object.type == stellar_xdr.MemoType.MEMO_NONE:
+            return NoneMemo.from_xdr_object(xdr_object)
+        elif xdr_object.type == stellar_xdr.MemoType.MEMO_TEXT:
+            return TextMemo.from_xdr_object(xdr_object)
+        elif xdr_object.type == stellar_xdr.MemoType.MEMO_ID:
+            return IdMemo.from_xdr_object(xdr_object)
+        elif xdr_object.type == stellar_xdr.MemoType.MEMO_HASH:
+            return HashMemo.from_xdr_object(xdr_object)
+        elif xdr_object.type == stellar_xdr.MemoType.MEMO_RETURN:
+            return ReturnHashMemo.from_xdr_object(xdr_object)
+        else:
+            raise ValueError(
+                f"Unknown memo type: {xdr_object.type}. "
+                "Please check the XDR memo object."
+            )
 
     @abc.abstractmethod
     def __hash__(self) -> int:

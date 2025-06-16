@@ -47,7 +47,7 @@ class StrictReceivePathsCallBuilder(BaseCallBuilder, BaseStrictReceivePathsCallB
         destination_asset: Asset,
         destination_amount: Union[str, Decimal],
     ) -> None:
-        super().__init__(  # type: ignore[call-arg]
+        super().__init__(
             horizon_url=horizon_url,
             client=client,
             source=source,

@@ -4,6 +4,8 @@ import asyncio
 import json
 from typing import TYPE_CHECKING, Type
 
+from pydantic import BaseModel
+
 from . import scval
 from . import xdr as stellar_xdr
 from .account import Account
@@ -39,7 +41,7 @@ if TYPE_CHECKING:
 
 __all__ = ["SorobanServerAsync", "Durability"]
 
-V = TypeVar("V")
+V = TypeVar("V", bound=BaseModel)
 
 
 class SorobanServerAsync:
@@ -523,13 +525,15 @@ class SorobanServerAsync:
             self.server_url,
             json_data=json.loads(json_data),
         )
-        response = Response[response_body_type].model_validate(data.json())  # type: ignore[valid-type]
-        if response.error:
+        raw_response = Response[Any].model_validate(data.json())
+        if raw_response.error:
             raise SorobanRpcErrorResponse(
-                response.error.code, response.error.message, response.error.data
+                raw_response.error.code,
+                raw_response.error.message,
+                raw_response.error.data,
             )
-        assert response.result is not None
-        return response.result
+        assert raw_response.result is not None
+        return response_body_type.model_validate(raw_response.result)
 
     async def close(self) -> None:
         """Close underlying connector, and release all acquired resources."""

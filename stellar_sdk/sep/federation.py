@@ -97,7 +97,7 @@ def resolve_stellar_address(
     parts = _split_stellar_address(stellar_address)
     domain = parts["domain"]
     if federation_url is None:
-        federation_url = fetch_stellar_toml(domain, use_http=use_http).get(  # type: ignore[union-attr]
+        federation_url = fetch_stellar_toml(domain, use_http=use_http).get(
             FEDERATION_SERVER_KEY
         )
     if federation_url is None:
@@ -163,7 +163,7 @@ def resolve_account_id(
     if not client:
         client = RequestsClient()
     if domain is not None:
-        federation_url = fetch_stellar_toml(domain, client, use_http).get(  # type: ignore[union-attr]
+        federation_url = fetch_stellar_toml(domain, client, use_http).get(
             FEDERATION_SERVER_KEY
         )
         if federation_url is None:

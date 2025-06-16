@@ -47,7 +47,7 @@ class StrictSendPathsCallBuilder(BaseCallBuilder, BaseStrictSendPathsCallBuilder
         source_amount: Union[str, Decimal],
         destination: Union[str, List[Asset]],
     ) -> None:
-        super().__init__(  # type: ignore[call-arg]
+        super().__init__(
             horizon_url=horizon_url,
             client=client,
             source_asset=source_asset,

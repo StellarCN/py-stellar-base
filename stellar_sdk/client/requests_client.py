@@ -1,7 +1,7 @@
 import json
 import logging
 import time
-from typing import Any, Dict, Generator, Optional, Tuple
+from typing import Any, Dict, Generator, Optional
 
 import requests
 from requests import RequestException, Session
@@ -61,9 +61,7 @@ class RequestsClient(BaseSyncClient):
         self.backoff_factor: float = backoff_factor
 
         # adding 504 to the tuple of statuses to retry
-        self.status_forcelist: Tuple[int] = tuple(Retry.RETRY_AFTER_STATUS_CODES) + (
-            504,
-        )  # type: ignore[assignment]
+        self.status_forcelist = tuple(Retry.RETRY_AFTER_STATUS_CODES) + (504,)
 
         # configure standard session
 
