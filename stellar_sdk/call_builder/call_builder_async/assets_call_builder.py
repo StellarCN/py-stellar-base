@@ -9,7 +9,7 @@ class AssetsCallBuilder(BaseCallBuilder, BaseAssetsCallBuilder):
     """Creates a new :class:`AssetsCallBuilder` pointed to server defined by horizon_url.
     Do not create this object directly, use :func:`stellar_sdk.ServerAsync.assets`.
 
-    See `List All Assets <https://developers.stellar.org/api/resources/assets/list/>`__ for more information.
+    See `Assets <https://developers.stellar.org/docs/data/apis/horizon/api-reference/resources/assets>`__ for more information.
 
     :param horizon_url: Horizon server URL.
     :param client: The client instance used to send request.
@@ -17,9 +17,3 @@ class AssetsCallBuilder(BaseCallBuilder, BaseAssetsCallBuilder):
 
     def __init__(self, horizon_url: str, client: BaseAsyncClient) -> None:
         super().__init__(horizon_url=horizon_url, client=client)
-
-    async def stream(
-        self,
-    ):
-        """This endpoint does not support streaming."""
-        raise NotImplementedError("Streaming is not supported.")

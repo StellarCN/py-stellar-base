@@ -1,3 +1,5 @@
+from typing import Any, AsyncGenerator, Dict
+
 from ...call_builder.base import BaseDataCallBuilder
 from ...call_builder.call_builder_async.base_call_builder import BaseCallBuilder
 from ...client.base_async_client import BaseAsyncClient
@@ -30,3 +32,12 @@ class DataCallBuilder(BaseCallBuilder, BaseDataCallBuilder):
             account_id=account_id,
             data_name=data_name,
         )
+
+    def stream(
+        self,
+    ) -> AsyncGenerator[Dict[str, Any], None]:
+        """Creates an EventSource that listens for events from the `Account Data` endpoint.
+
+        See `Streaming <https://developers.stellar.org/docs/data/apis/horizon/api-reference/structure/streaming>`__ for more information.
+        """
+        return self._stream()

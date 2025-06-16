@@ -48,7 +48,7 @@ class BaseCallBuilder(_BaseCallBuilder):
         self._check_pageable(resp)
         return resp
 
-    def stream(
+    def _stream(
         self,
     ) -> Generator[Dict[str, Any], None, None]:
         """Creates an EventSource that listens for incoming messages from the server.

@@ -51,9 +51,3 @@ class TradeAggregationsCallBuilder(BaseCallBuilder, BaseTradeAggregationsCallBui
             end_time=end_time,
             offset=offset,
         )
-
-    async def stream(
-        self,
-    ):
-        """This endpoint does not support streaming."""
-        raise NotImplementedError("Streaming is not supported.")

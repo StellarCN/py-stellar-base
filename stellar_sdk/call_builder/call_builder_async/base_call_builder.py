@@ -48,7 +48,7 @@ class BaseCallBuilder(_BaseCallBuilder):
         self._check_pageable(resp)
         return resp
 
-    async def stream(
+    async def _stream(
         self,
     ) -> AsyncGenerator[Dict[str, Any], None]:
         """Creates an EventSource that listens for incoming messages from the server.
