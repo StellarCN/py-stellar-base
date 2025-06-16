@@ -1,5 +1,5 @@
 from decimal import Decimal
-from typing import Optional, Union
+from typing import ClassVar, Optional, Union
 
 from .. import xdr as stellar_xdr
 from ..asset import Asset
@@ -32,7 +32,7 @@ class ChangeTrust(Operation):
 
     _DEFAULT_LIMIT = "922337203685.4775807"
 
-    _XDR_OPERATION_TYPE: stellar_xdr.OperationType = (
+    _XDR_OPERATION_TYPE: ClassVar[stellar_xdr.OperationType] = (
         stellar_xdr.OperationType.CHANGE_TRUST
     )
 

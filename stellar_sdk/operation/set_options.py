@@ -1,6 +1,6 @@
 import warnings
 from enum import IntFlag
-from typing import Optional, Union
+from typing import ClassVar, Optional, Union
 
 from .. import xdr as stellar_xdr
 from ..keypair import Keypair
@@ -78,7 +78,7 @@ class SetOptions(Operation):
 
     """
 
-    _XDR_OPERATION_TYPE: stellar_xdr.OperationType = (
+    _XDR_OPERATION_TYPE: ClassVar[stellar_xdr.OperationType] = (
         stellar_xdr.OperationType.SET_OPTIONS
     )
 

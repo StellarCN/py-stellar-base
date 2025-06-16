@@ -1,8 +1,7 @@
 from __future__ import annotations
 
 import abc
-
-from typing_extensions import Union
+from typing import Union
 
 from . import xdr as stellar_xdr
 from .exceptions import MemoInvalidException
@@ -52,7 +51,7 @@ class Memo(object, metaclass=abc.ABCMeta):
         }
 
         memo_cls = xdr_types.get(xdr_object.type, NoneMemo)
-        return memo_cls.from_xdr_object(xdr_object)
+        return memo_cls.from_xdr_object(xdr_object)  # type: ignore[attr-defined]
 
     @abc.abstractmethod
     def __hash__(self) -> int:
@@ -99,11 +98,9 @@ class TextMemo(Memo):
     """
 
     def __init__(self, text: Union[str, bytes]) -> None:
-        if isinstance(text, str):
-            self.memo_text = bytes(text, encoding="utf-8")
-        else:
-            self.memo_text: bytes = text
-
+        self.memo_text = (
+            bytes(text, encoding="utf-8") if isinstance(text, str) else text
+        )
         length = len(self.memo_text)
         if length > 28:
             raise MemoInvalidException(

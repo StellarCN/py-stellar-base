@@ -1,6 +1,6 @@
 from decimal import Decimal
 from enum import IntEnum
-from typing import Optional, Sequence, Union
+from typing import ClassVar, Optional, Sequence, Union
 
 from .. import xdr as stellar_xdr
 from ..asset import Asset
@@ -393,7 +393,7 @@ class CreateClaimableBalance(Operation):
     :param source: The source account for the operation. Defaults to the transaction's source account.
     """
 
-    _XDR_OPERATION_TYPE: stellar_xdr.OperationType = (
+    _XDR_OPERATION_TYPE: ClassVar[stellar_xdr.OperationType] = (
         stellar_xdr.OperationType.CREATE_CLAIMABLE_BALANCE
     )
 

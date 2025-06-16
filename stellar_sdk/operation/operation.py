@@ -1,6 +1,6 @@
 from abc import ABCMeta, abstractmethod
 from decimal import Decimal
-from typing import Optional, Union
+from typing import ClassVar, Optional, Union
 
 from .. import utils
 from .. import xdr as stellar_xdr
@@ -36,7 +36,7 @@ class Operation(metaclass=ABCMeta):
 
     """
 
-    _XDR_OPERATION_TYPE = None
+    _XDR_OPERATION_TYPE: ClassVar[stellar_xdr.OperationType]
 
     def __init__(self, source: Optional[Union[MuxedAccount, str]] = None) -> None:
         if isinstance(source, str):

@@ -73,6 +73,10 @@ def to_txrep(
     prefix = "feeBump.tx.innerTx.tx." if is_fee_bump else "tx."
 
     transaction = transaction_envelope.transaction
+
+    fee_bump_transaction_envelope = None
+    fee_bump_transaction = None
+
     if is_fee_bump:
         assert isinstance(transaction_envelope, FeeBumpTransactionEnvelope)
         fee_bump_transaction_envelope = transaction_envelope
@@ -120,6 +124,7 @@ def to_txrep(
     )
     if is_fee_bump:
         _add_line("feeBump.tx.ext.v", 0, lines)
+        assert fee_bump_transaction_envelope is not None
         _add_signatures(fee_bump_transaction_envelope.signatures, "feeBump.", lines)
     return "\n".join(lines)
 
