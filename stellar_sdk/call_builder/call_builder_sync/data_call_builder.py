@@ -26,7 +26,7 @@ class DataCallBuilder(BaseCallBuilder, BaseDataCallBuilder):
         account_id: str,
         data_name: str,
     ) -> None:
-        super().__init__(  # type: ignore[call-arg]
+        super().__init__(
             horizon_url=horizon_url,
             client=client,
             account_id=account_id,

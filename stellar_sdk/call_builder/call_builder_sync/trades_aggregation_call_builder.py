@@ -41,7 +41,7 @@ class TradeAggregationsCallBuilder(BaseCallBuilder, BaseTradeAggregationsCallBui
         end_time: Optional[int] = None,
         offset: Optional[int] = None,
     ) -> None:
-        super().__init__(  # type: ignore[call-arg]
+        super().__init__(
             horizon_url=horizon_url,
             client=client,
             base=base,
