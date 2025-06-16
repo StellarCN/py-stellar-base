@@ -333,6 +333,9 @@ class AssembledTransactionAsync(Generic[T]):
 
         :return: The XDR representation of the transaction envelope
         """
+        if not self.built_transaction:
+            raise NotYetSimulatedError("Transaction has not yet been simulated.", self)
+
         return self.built_transaction.to_xdr()
 
     async def restore_footprint(self, restore_preamble: RestorePreamble) -> None:
