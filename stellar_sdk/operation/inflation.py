@@ -1,4 +1,4 @@
-from typing import Optional, Union
+from typing import ClassVar, Optional, Union
 
 from .. import xdr as stellar_xdr
 from ..muxed_account import MuxedAccount
@@ -18,7 +18,9 @@ class Inflation(Operation):
     :param source: The source account for the operation. Defaults to the transaction's source account.
     """
 
-    _XDR_OPERATION_TYPE: stellar_xdr.OperationType = stellar_xdr.OperationType.INFLATION
+    _XDR_OPERATION_TYPE: ClassVar[stellar_xdr.OperationType] = (
+        stellar_xdr.OperationType.INFLATION
+    )
 
     def __init__(self, source: Optional[Union[MuxedAccount, str]] = None) -> None:
         super().__init__(source)

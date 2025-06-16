@@ -1,5 +1,5 @@
 from enum import IntFlag
-from typing import Optional, Union
+from typing import ClassVar, Optional, Union
 
 from .. import xdr as stellar_xdr
 from ..asset import Asset
@@ -47,7 +47,7 @@ class SetTrustLineFlags(Operation):
         transaction's source account.
     """
 
-    _XDR_OPERATION_TYPE: stellar_xdr.OperationType = (
+    _XDR_OPERATION_TYPE: ClassVar[stellar_xdr.OperationType] = (
         stellar_xdr.OperationType.SET_TRUST_LINE_FLAGS
     )
 

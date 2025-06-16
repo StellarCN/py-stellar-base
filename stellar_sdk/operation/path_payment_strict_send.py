@@ -1,5 +1,5 @@
 from decimal import Decimal
-from typing import Optional, Sequence, Union
+from typing import ClassVar, Optional, Sequence, Union
 
 from .. import xdr as stellar_xdr
 from ..asset import Asset
@@ -32,7 +32,7 @@ class PathPaymentStrictSend(Operation):
         transaction's source account.
     """
 
-    _XDR_OPERATION_TYPE: stellar_xdr.OperationType = (
+    _XDR_OPERATION_TYPE: ClassVar[stellar_xdr.OperationType] = (
         stellar_xdr.OperationType.PATH_PAYMENT_STRICT_SEND
     )
 

@@ -199,13 +199,13 @@ class SorobanServerAsync:
         resource_config = None
         if addl_resources:
             resource_config = ResourceConfig(
-                instruction_lee_way=addl_resources.cpu_instructions,
+                instructionLeeway=addl_resources.cpu_instructions,
             )
         request = Request[SimulateTransactionRequest](
             id=_generate_unique_request_id(),
             method="simulateTransaction",
             params=SimulateTransactionRequest(
-                transaction=xdr, resource_config=resource_config
+                transaction=xdr, resourceConfig=resource_config
             ),
         )
         return await self._post(request, SimulateTransactionResponse)

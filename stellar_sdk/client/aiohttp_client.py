@@ -1,3 +1,4 @@
+# pyright: reportPossiblyUnboundVariable=false
 import asyncio
 import json
 import logging
@@ -216,7 +217,11 @@ class AiohttpClient(BaseAsyncClient):
                         retry = client._reconnection_time.total_seconds()
                         try:
                             data = event.data
-                            if data != '"hello"' and data != '"byebye"':
+                            if (
+                                data is not None
+                                and data != '"hello"'
+                                and data != '"byebye"'
+                            ):
                                 yield json.loads(data)
                         except json.JSONDecodeError:
                             # Content was not json-decodable

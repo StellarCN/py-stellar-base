@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import abc
 from typing import Union
 
@@ -36,8 +38,8 @@ class Memo(object, metaclass=abc.ABCMeta):
     def to_xdr_object(self) -> stellar_xdr.Memo:
         """Creates an XDR Memo object that represents this :class:`Memo`."""
 
-    @staticmethod
-    def from_xdr_object(xdr_object: stellar_xdr.Memo) -> "Memo":
+    @classmethod
+    def from_xdr_object(cls, xdr_object: stellar_xdr.Memo) -> Memo:
         """Returns an Memo object from XDR memo object."""
 
         xdr_types = {
@@ -52,7 +54,7 @@ class Memo(object, metaclass=abc.ABCMeta):
         return memo_cls.from_xdr_object(xdr_object)  # type: ignore[attr-defined]
 
     @abc.abstractmethod
-    def __hash__(self):
+    def __hash__(self) -> int:
         pass  # pragma: no cover
 
     @abc.abstractmethod
@@ -64,7 +66,7 @@ class NoneMemo(Memo):
     """The :class:`NoneMemo`, which represents no memo for a transaction."""
 
     @classmethod
-    def from_xdr_object(cls, xdr_object: stellar_xdr.Memo) -> "NoneMemo":
+    def from_xdr_object(cls, xdr_object: stellar_xdr.Memo) -> NoneMemo:
         """Returns an :class:`NoneMemo` object from XDR memo object."""
 
         return cls()
@@ -93,14 +95,12 @@ class TextMemo(Memo):
         see `this issue <https://github.com/stellar/new-docs/issues/555>`__ for more information.
     :raises: :exc:`MemoInvalidException <stellar_sdk.exceptions.MemoInvalidException>`:
         if ``text`` is not a valid text memo.
-
     """
 
     def __init__(self, text: Union[str, bytes]) -> None:
-        if not isinstance(text, bytes):
-            text = bytes(text, encoding="utf-8")
-        self.memo_text: bytes = text
-
+        self.memo_text = (
+            bytes(text, encoding="utf-8") if isinstance(text, str) else text
+        )
         length = len(self.memo_text)
         if length > 28:
             raise MemoInvalidException(
@@ -108,7 +108,7 @@ class TextMemo(Memo):
             )
 
     @classmethod
-    def from_xdr_object(cls, xdr_object: stellar_xdr.Memo) -> "TextMemo":
+    def from_xdr_object(cls, xdr_object: stellar_xdr.Memo) -> TextMemo:
         """Returns an :class:`TextMemo` object from XDR memo object."""
         assert xdr_object.text is not None
         return cls(bytes(xdr_object.text))
@@ -149,7 +149,7 @@ class IdMemo(Memo):
         self.memo_id: int = memo_id
 
     @classmethod
-    def from_xdr_object(cls, xdr_object: stellar_xdr.Memo) -> "IdMemo":
+    def from_xdr_object(cls, xdr_object: stellar_xdr.Memo) -> IdMemo:
         """Returns an :class:`IdMemo` object from XDR memo object."""
         assert xdr_object.id is not None
         return cls(xdr_object.id.uint64)
@@ -191,7 +191,7 @@ class HashMemo(Memo):
         self.memo_hash: bytes = memo_hash
 
     @classmethod
-    def from_xdr_object(cls, xdr_object: stellar_xdr.Memo) -> "HashMemo":
+    def from_xdr_object(cls, xdr_object: stellar_xdr.Memo) -> HashMemo:
         """Returns an :class:`HashMemo` object from XDR memo object."""
         assert xdr_object.hash is not None
         return cls(xdr_object.hash.hash)
@@ -238,7 +238,7 @@ class ReturnHashMemo(Memo):
         self.memo_return: bytes = memo_return
 
     @classmethod
-    def from_xdr_object(cls, xdr_object: stellar_xdr.Memo) -> "ReturnHashMemo":
+    def from_xdr_object(cls, xdr_object: stellar_xdr.Memo) -> ReturnHashMemo:
         """Returns an :class:`ReturnHashMemo` object from XDR memo object."""
         assert xdr_object.ret_hash is not None
         return cls(xdr_object.ret_hash.hash)

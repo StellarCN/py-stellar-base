@@ -73,6 +73,10 @@ def to_txrep(
     prefix = "feeBump.tx.innerTx.tx." if is_fee_bump else "tx."
 
     transaction = transaction_envelope.transaction
+
+    fee_bump_transaction_envelope = None
+    fee_bump_transaction = None
+
     if is_fee_bump:
         assert isinstance(transaction_envelope, FeeBumpTransactionEnvelope)
         fee_bump_transaction_envelope = transaction_envelope
@@ -120,6 +124,7 @@ def to_txrep(
     )
     if is_fee_bump:
         _add_line("feeBump.tx.ext.v", 0, lines)
+        assert fee_bump_transaction_envelope is not None
         _add_signatures(fee_bump_transaction_envelope.signatures, "feeBump.", lines)
     return "\n".join(lines)
 
@@ -512,7 +517,7 @@ def _get_operation(index, raw_data_map, tx_prefix):
 
 
 def _get_set_options_op(
-    source: str, operation_prefix: str, raw_data_map: Dict[str, str]
+    source: Optional[str], operation_prefix: str, raw_data_map: Dict[str, str]
 ) -> SetOptions:
     inflation_dest = None
     clear_flags = None
@@ -571,7 +576,7 @@ def _get_set_options_op(
 
 
 def _get_path_payment_strict_receive_op(
-    source: str, operation_prefix: str, raw_data_map: Dict[str, str]
+    source: Optional[str], operation_prefix: str, raw_data_map: Dict[str, str]
 ) -> PathPaymentStrictReceive:
     send_asset = _get_asset(raw_data_map, f"{operation_prefix}sendAsset")
     send_max = _get_amount_value(raw_data_map, f"{operation_prefix}sendMax")
@@ -595,7 +600,7 @@ def _get_path_payment_strict_receive_op(
 
 
 def _get_path_payment_strict_send_op(
-    source: str, operation_prefix: str, raw_data_map: Dict[str, str]
+    source: Optional[str], operation_prefix: str, raw_data_map: Dict[str, str]
 ) -> PathPaymentStrictSend:
     send_asset = _get_asset(raw_data_map, f"{operation_prefix}sendAsset")
     send_amount = _get_amount_value(raw_data_map, f"{operation_prefix}sendAmount")
@@ -619,7 +624,7 @@ def _get_path_payment_strict_send_op(
 
 
 def _get_create_passive_sell_offer_op(
-    source: str, operation_prefix: str, raw_data_map: Dict[str, str]
+    source: Optional[str], operation_prefix: str, raw_data_map: Dict[str, str]
 ) -> CreatePassiveSellOffer:
     selling = _get_asset(raw_data_map, f"{operation_prefix}selling")
     buying = _get_asset(raw_data_map, f"{operation_prefix}buying")
@@ -633,7 +638,7 @@ def _get_create_passive_sell_offer_op(
 
 
 def _get_manage_buy_offer_op(
-    source: str, operation_prefix: str, raw_data_map: Dict[str, str]
+    source: Optional[str], operation_prefix: str, raw_data_map: Dict[str, str]
 ) -> ManageBuyOffer:
     selling = _get_asset(raw_data_map, f"{operation_prefix}selling")
     buying = _get_asset(raw_data_map, f"{operation_prefix}buying")
@@ -653,7 +658,7 @@ def _get_manage_buy_offer_op(
 
 
 def _get_manage_sell_offer_op(
-    source: str, operation_prefix: str, raw_data_map: Dict[str, str]
+    source: Optional[str], operation_prefix: str, raw_data_map: Dict[str, str]
 ) -> ManageSellOffer:
     selling = _get_asset(raw_data_map, f"{operation_prefix}selling")
     buying = _get_asset(raw_data_map, f"{operation_prefix}buying")
@@ -673,7 +678,7 @@ def _get_manage_sell_offer_op(
 
 
 def _get_payment_op(
-    source: str, operation_prefix: str, raw_data_map: Dict[str, str]
+    source: Optional[str], operation_prefix: str, raw_data_map: Dict[str, str]
 ) -> Payment:
     destination = _get_value(raw_data_map, f"{operation_prefix}destination")
     asset = _get_asset(raw_data_map, f"{operation_prefix}asset")
@@ -682,7 +687,7 @@ def _get_payment_op(
 
 
 def _get_manage_data_op(
-    source: str, operation_prefix: str, raw_data_map: Dict[str, str]
+    source: Optional[str], operation_prefix: str, raw_data_map: Dict[str, str]
 ) -> ManageData:
     data_name = _get_string_value(raw_data_map, f"{operation_prefix}dataName")
     data_value = None
@@ -692,14 +697,14 @@ def _get_manage_data_op(
 
 
 def _get_bump_sequence_op(
-    source: str, operation_prefix: str, raw_data_map: Dict[str, str]
+    source: Optional[str], operation_prefix: str, raw_data_map: Dict[str, str]
 ) -> BumpSequence:
     bump_to = _get_int_value(raw_data_map, f"{operation_prefix}bumpTo")
     return BumpSequence(bump_to=bump_to, source=source)
 
 
 def _get_allow_trust_op(
-    source: str, operation_prefix: str, raw_data_map: Dict[str, str]
+    source: Optional[str], operation_prefix: str, raw_data_map: Dict[str, str]
 ) -> AllowTrust:
     trustor = _get_value(raw_data_map, f"{operation_prefix}trustor")
     asset_code = _get_value(raw_data_map, f"{operation_prefix}asset")
@@ -710,7 +715,7 @@ def _get_allow_trust_op(
 
 
 def _get_change_trust_op(
-    source: str, operation_prefix: str, raw_data_map: Dict[str, str]
+    source: Optional[str], operation_prefix: str, raw_data_map: Dict[str, str]
 ) -> ChangeTrust:
     # Keep compatibility
     line_type = raw_data_map.get(f"{operation_prefix}line.type", None)
@@ -733,12 +738,17 @@ def _get_change_trust_op(
     return ChangeTrust(asset=line, limit=limit, source=source)
 
 
-def _get_inflation_op(source: str) -> Inflation:
+def _get_inflation_op(
+    source: Optional[str],
+) -> Inflation:
     return Inflation(source=source)
 
 
 def _get_account_merge_op(
-    source: str, transaction_prefix: str, raw_data_map: Dict[str, str], index: int
+    source: Optional[str],
+    transaction_prefix: str,
+    raw_data_map: Dict[str, str],
+    index: int,
 ) -> AccountMerge:
     destination = _get_value(
         raw_data_map, f"{transaction_prefix}operations[{index}].body.destination"
@@ -747,7 +757,7 @@ def _get_account_merge_op(
 
 
 def _get_create_account_op(
-    source: str, operation_prefix: str, raw_data_map: Dict[str, str]
+    source: Optional[str], operation_prefix: str, raw_data_map: Dict[str, str]
 ) -> CreateAccount:
     destination = _get_value(raw_data_map, f"{operation_prefix}destination")
     starting_balance = _get_amount_value(
@@ -759,21 +769,21 @@ def _get_create_account_op(
 
 
 def _get_begin_sponsoring_future_reserves_op(
-    source: str, operation_prefix: str, raw_data_map: Dict[str, str]
+    source: Optional[str], operation_prefix: str, raw_data_map: Dict[str, str]
 ) -> BeginSponsoringFutureReserves:
     sponsored_id = _get_value(raw_data_map, f"{operation_prefix}sponsoredID")
     return BeginSponsoringFutureReserves(sponsored_id=sponsored_id, source=source)
 
 
 def _get_claim_claimable_balance_op(
-    source: str, operation_prefix: str, raw_data_map: Dict[str, str]
+    source: Optional[str], operation_prefix: str, raw_data_map: Dict[str, str]
 ) -> ClaimClaimableBalance:
     balance_id = _get_value(raw_data_map, f"{operation_prefix}balanceID")
     return ClaimClaimableBalance(balance_id=balance_id, source=source)
 
 
 def _get_clawback_op(
-    source: str, operation_prefix: str, raw_data_map: Dict[str, str]
+    source: Optional[str], operation_prefix: str, raw_data_map: Dict[str, str]
 ) -> Clawback:
     asset = _get_asset(raw_data_map, f"{operation_prefix}asset")
     from_ = _get_value(raw_data_map, f"{operation_prefix}from")
@@ -782,14 +792,14 @@ def _get_clawback_op(
 
 
 def _get_clawback_claimable_balance_op(
-    source: str, operation_prefix: str, raw_data_map: Dict[str, str]
+    source: Optional[str], operation_prefix: str, raw_data_map: Dict[str, str]
 ) -> ClawbackClaimableBalance:
     balance_id = _get_value(raw_data_map, f"{operation_prefix}balanceID")
     return ClawbackClaimableBalance(balance_id=balance_id, source=source)
 
 
 def _get_create_claimable_balance_op(
-    source: str, operation_prefix: str, raw_data_map: Dict[str, str]
+    source: Optional[str], operation_prefix: str, raw_data_map: Dict[str, str]
 ):
     def parse_claimant_predicate(
         prefix: str, raw_data_map: Dict[str, str]
@@ -843,12 +853,14 @@ def _get_create_claimable_balance_op(
     )
 
 
-def _get_end_sponsoring_future_reserves_op(source: str) -> EndSponsoringFutureReserves:
+def _get_end_sponsoring_future_reserves_op(
+    source: Optional[str],
+) -> EndSponsoringFutureReserves:
     return EndSponsoringFutureReserves(source=source)
 
 
 def _get_revoke_sponsorship_op(
-    source: str, operation_prefix: str, raw_data_map: Dict[str, str]
+    source: Optional[str], operation_prefix: str, raw_data_map: Dict[str, str]
 ) -> RevokeSponsorship:
     revoke_sponsorship_type = _get_value(raw_data_map, f"{operation_prefix}type")
     if (
@@ -953,7 +965,7 @@ def _get_revoke_sponsorship_op(
 
 
 def _get_set_trust_line_flags_op(
-    source: str, operation_prefix: str, raw_data_map: Dict[str, str]
+    source: Optional[str], operation_prefix: str, raw_data_map: Dict[str, str]
 ) -> SetTrustLineFlags:
     trustor = _get_value(raw_data_map, f"{operation_prefix}trustor")
     asset = _get_asset(raw_data_map, f"{operation_prefix}asset")
@@ -977,7 +989,7 @@ def _get_set_trust_line_flags_op(
 
 
 def _get_liquidity_pool_deposit_op(
-    source: str, operation_prefix: str, raw_data_map: Dict[str, str]
+    source: Optional[str], operation_prefix: str, raw_data_map: Dict[str, str]
 ):
     liquidity_pool_id = _get_value(raw_data_map, f"{operation_prefix}liquidityPoolID")
     max_amount_a = _get_amount_value(raw_data_map, f"{operation_prefix}maxAmountA")
@@ -999,7 +1011,7 @@ def _get_liquidity_pool_deposit_op(
 
 
 def _get_liquidity_pool_withdraw_op(
-    source: str, operation_prefix: str, raw_data_map: Dict[str, str]
+    source: Optional[str], operation_prefix: str, raw_data_map: Dict[str, str]
 ):
     liquidity_pool_id = _get_value(raw_data_map, f"{operation_prefix}liquidityPoolID")
     amount = _get_amount_value(raw_data_map, f"{operation_prefix}amount")
