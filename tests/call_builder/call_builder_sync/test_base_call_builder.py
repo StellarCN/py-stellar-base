@@ -31,7 +31,7 @@ class TestBaseCallBuilder:
     def test_stream_data(self):
         url = "https://horizon.stellar.org/ledgers"
         client = RequestsClient()
-        resp = BaseCallBuilder(horizon_url=url, client=client).cursor("now").stream()
+        resp = BaseCallBuilder(horizon_url=url, client=client)._cursor("now").stream()
         messages = []
         for msg in resp:
             assert isinstance(msg, dict)
