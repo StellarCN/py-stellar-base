@@ -34,7 +34,9 @@ class Keypair:
     """
 
     def __init__(
-        self, verify_key: ed25519.VerifyKey, signing_key: ed25519.SigningKey = None
+        self,
+        verify_key: ed25519.VerifyKey,
+        signing_key: Optional[ed25519.SigningKey] = None,
     ) -> None:
         self.verify_key: ed25519.VerifyKey = verify_key
         self.signing_key: Optional[ed25519.SigningKey] = signing_key

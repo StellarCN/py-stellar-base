@@ -188,7 +188,12 @@ class SetOptions(Operation):
         source = Operation.get_source_from_xdr_obj(xdr_object)
 
         inflation_dest = None
+        assert xdr_object.body.set_options_op is not None
         if xdr_object.body.set_options_op.inflation_dest:
+            assert (
+                xdr_object.body.set_options_op.inflation_dest.account_id.ed25519
+                is not None
+            )
             inflation_dest = StrKey.encode_ed25519_public_key(
                 xdr_object.body.set_options_op.inflation_dest.account_id.ed25519.uint256
             )

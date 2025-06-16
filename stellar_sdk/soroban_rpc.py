@@ -87,13 +87,10 @@ class PaginationOptions(BaseModel):
 
 
 class PaginationMixin:
-    pagination: Optional[PaginationOptions] = None
-
     @model_validator(mode="after")
     def verify_ledger_or_cursor(self) -> Self:
-        if self.pagination and (
-            getattr(self, "start_ledger") and self.pagination.cursor
-        ):
+        pagination = getattr(self, "pagination", None)
+        if pagination and (getattr(self, "start_ledger") and pagination.cursor):
             raise ValueError("start_ledger and cursor cannot both be set")
         return self
 
@@ -106,6 +103,7 @@ class GetEventsRequest(PaginationMixin, BaseModel):
     """
 
     start_ledger: Optional[int] = Field(alias="startLedger", default=None)
+    pagination: Optional[PaginationOptions] = None
     filters: Optional[Sequence[EventFilter]] = None
 
 
@@ -405,6 +403,7 @@ class GetTransactionsRequest(PaginationMixin, BaseModel):
     more information."""
 
     start_ledger: Optional[int] = Field(alias="startLedger", default=None)
+    pagination: Optional[PaginationOptions] = None
 
 
 class Transaction(BaseModel):
@@ -458,6 +457,7 @@ class GetLedgersRequest(PaginationMixin, BaseModel):
     more information."""
 
     start_ledger: Optional[int] = Field(alias="startLedger", default=None)
+    pagination: Optional[PaginationOptions] = None
 
 
 class LedgerInfo(BaseModel):

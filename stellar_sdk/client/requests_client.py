@@ -184,7 +184,11 @@ class RequestsClient(BaseSyncClient):
                         retry = client._reconnection_time.total_seconds()
                         try:
                             data = event.data
-                            if data != '"hello"' and data != '"byebye"':
+                            if (
+                                data is not None
+                                and data != '"hello"'
+                                and data != '"byebye"'
+                            ):
                                 yield json.loads(data)
                         except json.JSONDecodeError:
                             # Content was not json-decodable

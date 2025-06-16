@@ -88,7 +88,7 @@ class AllowTrust(Operation):
         trustor = Keypair.from_public_key(self.trustor).xdr_account_id()
         length = len(self.asset_code)
         pad_length = 4 - length if length <= 4 else 12 - length
-        asset_code = bytearray(self.asset_code, "ascii") + b"\x00" * pad_length
+        asset_code = bytes(bytearray(self.asset_code, "ascii") + b"\x00" * pad_length)
         authorize = stellar_xdr.Uint32(self.authorize.value)
         if len(asset_code) == 4:
             asset_type = stellar_xdr.AssetType.ASSET_TYPE_CREDIT_ALPHANUM4

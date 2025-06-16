@@ -36,15 +36,12 @@ class Operation(metaclass=ABCMeta):
 
     """
 
+    _XDR_OPERATION_TYPE = None
+
     def __init__(self, source: Optional[Union[MuxedAccount, str]] = None) -> None:
         if isinstance(source, str):
             source = MuxedAccount.from_account(source)
         self.source: Optional[MuxedAccount] = source
-
-    @property
-    @abstractmethod
-    def _XDR_OPERATION_TYPE(self) -> stellar_xdr.OperationType:
-        pass  # pragma: no cover
 
     @staticmethod
     def to_xdr_amount(value: Union[str, Decimal]) -> int:
