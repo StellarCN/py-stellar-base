@@ -23,7 +23,7 @@ class EffectsCallBuilder(BaseCallBuilder, BaseEffectsCallBuilder):
     def stream(
         self,
     ) -> AsyncGenerator[Dict[str, Any], None]:
-        """Creates an EventSource that listens for events from the Effects endpoint.
+        """Creates an EventSource that listens for events from the `Effects` endpoint.
 
         See `Streaming <https://developers.stellar.org/docs/data/apis/horizon/api-reference/structure/streaming>`__ for more information.
         """
