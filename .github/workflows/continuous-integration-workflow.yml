@@ -66,8 +66,10 @@ jobs:
           python-version: ${{ matrix.platform.python-version }}
 
       - name: Echo installed packages
-        run: |
-          uv tree
+        run: uv tree
+
+      - name: Run type check
+        run: make type-check
 
       - name: Test with pytest
         run: make full-unit-test
