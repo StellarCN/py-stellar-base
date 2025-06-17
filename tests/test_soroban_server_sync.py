@@ -1,3 +1,4 @@
+# pyright: reportAttributeAccessIssue=false
 import copy
 
 import pytest
@@ -13,6 +14,7 @@ from stellar_sdk.exceptions import (
     PrepareTransactionException,
     SorobanRpcErrorResponse,
 )
+from stellar_sdk.operation import InvokeHostFunction
 from stellar_sdk.soroban_rpc import *
 from stellar_sdk.soroban_server import SorobanServer
 
@@ -176,9 +178,10 @@ class TestSorobanServer:
         key = stellar_xdr.SCVal(stellar_xdr.SCValType.SCV_LEDGER_KEY_CONTRACT_INSTANCE)
         with requests_mock.Mocker() as m:
             m.post(RPC_URL, json=data)
+            entries = GetLedgerEntriesResponse.model_validate(result).entries
+            assert entries
             assert (
-                SorobanServer(RPC_URL).get_contract_data(contract_id, key)
-                == GetLedgerEntriesResponse.model_validate(result).entries[0]
+                SorobanServer(RPC_URL).get_contract_data(contract_id, key) == entries[0]
             )
 
         request_data = m.last_request.json()
@@ -351,8 +354,8 @@ class TestSorobanServer:
         start_ledger = 100
         filters = [
             EventFilter(
-                event_type=EventFilterType.CONTRACT,
-                contract_ids=[
+                event_type=EventFilterType.CONTRACT,  # pyright: ignore[reportCallIssue]
+                contract_ids=[  # pyright: ignore[reportCallIssue]
                     "CBNYUGHFAIWK3HOINA2OIGOOBMQU4D3MPQWFYBTUYY5WY4FVDO2GWXUY"
                 ],
                 topics=[
@@ -1011,6 +1014,7 @@ class TestSorobanServer:
             )
         )
         op = expected_transaction.transaction.operations[0]
+        assert isinstance(op, InvokeHostFunction)
         op.auth = [auth]
         assert new_transaction == expected_transaction
 

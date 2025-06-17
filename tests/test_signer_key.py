@@ -231,6 +231,7 @@ class TestSignedPayloadSigner:
             xdr_obj.type
             == stellar_xdr.SignerKeyType.SIGNER_KEY_TYPE_ED25519_SIGNED_PAYLOAD
         )
+        assert xdr_obj.ed25519_signed_payload
         assert (
             xdr_obj.ed25519_signed_payload.ed25519.uint256
             == StrKey.decode_ed25519_public_key(account_id)

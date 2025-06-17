@@ -14,6 +14,7 @@ from stellar_sdk.exceptions import (
     PrepareTransactionException,
     SorobanRpcErrorResponse,
 )
+from stellar_sdk.operation import InvokeHostFunction
 from stellar_sdk.soroban_rpc import *
 from stellar_sdk.soroban_server_async import SorobanServerAsync
 
@@ -184,9 +185,9 @@ class TestSorobanServer:
         with aioresponses() as m:
             m.post(RPC_URL, payload=data)
             async with SorobanServerAsync(RPC_URL) as client:
-                assert (
-                    await client.get_contract_data(contract_id, key)
-                ) == GetLedgerEntriesResponse.model_validate(result).entries[0]
+                entries = GetLedgerEntriesResponse.model_validate(result).entries
+                assert entries
+                assert (await client.get_contract_data(contract_id, key)) == entries[0]
 
         request_data = m.requests[("POST", URL(RPC_URL))][0].kwargs["json"]
         assert len(request_data["id"]) == 32
@@ -361,8 +362,8 @@ class TestSorobanServer:
         start_ledger = 100
         filters = [
             EventFilter(
-                event_type=EventFilterType.CONTRACT,
-                contract_ids=[
+                event_type=EventFilterType.CONTRACT,  # pyright: ignore[reportCallIssue]
+                contract_ids=[  # pyright: ignore[reportCallIssue]
                     "CBNYUGHFAIWK3HOINA2OIGOOBMQU4D3MPQWFYBTUYY5WY4FVDO2GWXUY"
                 ],
                 topics=[
@@ -873,6 +874,7 @@ class TestSorobanServer:
             )
         )
         op = expected_transaction.transaction.operations[0]
+        assert isinstance(op, InvokeHostFunction)
         op.auth = [
             stellar_xdr.SorobanAuthorizationEntry.from_xdr(xdr)
             for xdr in data["result"]["results"][0]["auth"]
@@ -930,6 +932,7 @@ class TestSorobanServer:
             )
         )
         op = expected_transaction.transaction.operations[0]
+        assert isinstance(op, InvokeHostFunction)
         op.auth = [
             stellar_xdr.SorobanAuthorizationEntry.from_xdr(xdr)
             for xdr in data["result"]["results"][0]["auth"]
@@ -991,6 +994,7 @@ class TestSorobanServer:
             )
         )
         op = expected_transaction.transaction.operations[0]
+        assert isinstance(op, InvokeHostFunction)
         op.auth = [auth]
         assert new_transaction == expected_transaction
 

@@ -48,6 +48,7 @@ class TestStellarWebAuthentication:
         op0 = transaction.operations[0]
         assert isinstance(op0, ManageData)
         assert op0.data_name == f"{home_domain} auth"
+        assert op0.data_value
         assert len(op0.data_value) == 64
         assert len(base64.b64decode(op0.data_value)) == 48
         assert op0.source == MuxedAccount.from_account(client_account_id)
@@ -55,10 +56,13 @@ class TestStellarWebAuthentication:
         op1 = transaction.operations[1]
         assert isinstance(op1, ManageData)
         assert op1.data_name == "web_auth_domain"
+        assert op1.data_value
         assert op1.data_value.decode() == web_auth_domain
         assert op1.source == MuxedAccount.from_account(server_kp.public_key)
 
         now = int(time.time())
+        assert transaction.preconditions
+        assert transaction.preconditions.time_bounds
         assert now - 3 < transaction.preconditions.time_bounds.min_time < now + 3
         assert (
             transaction.preconditions.time_bounds.max_time
@@ -90,6 +94,7 @@ class TestStellarWebAuthentication:
         transaction = TransactionEnvelope.from_xdr(
             challenge, network_passphrase
         ).transaction
+        assert transaction.operations[0].source
         assert transaction.operations[0].source.account_muxed == client_account_id
 
     def test_challenge_transaction_id_memo_as_int_permitted(self):
@@ -137,7 +142,7 @@ class TestStellarWebAuthentication:
                 web_auth_domain=web_auth_domain,
                 network_passphrase=network_passphrase,
                 timeout=timeout,
-                memo=memo,
+                memo=memo,  # pyright: ignore[reportArgumentType]
             )
 
     def test_challenge_transaction_muxed_client_account_with_memo_not_permitted(self):
@@ -193,6 +198,7 @@ class TestStellarWebAuthentication:
         op0 = transaction.operations[0]
         assert isinstance(op0, ManageData)
         assert op0.data_name == f"{home_domain} auth"
+        assert op0.data_value is not None
         assert len(op0.data_value) == 64
         assert len(base64.b64decode(op0.data_value)) == 48
         assert op0.source == MuxedAccount.from_account(client_account_id)
@@ -200,16 +206,20 @@ class TestStellarWebAuthentication:
         op1 = transaction.operations[1]
         assert isinstance(op1, ManageData)
         assert op1.data_name == "web_auth_domain"
+        assert op1.data_value is not None
         assert op1.data_value.decode() == web_auth_domain
         assert op1.source == MuxedAccount.from_account(server_kp.public_key)
 
         op2 = transaction.operations[2]
         assert isinstance(op2, ManageData)
         assert op2.data_name == "client_domain"
+        assert op2.data_value is not None
         assert op2.data_value.decode() == client_domain
         assert op2.source == MuxedAccount.from_account(client_signing_key)
 
         now = int(time.time())
+        assert transaction.preconditions
+        assert transaction.preconditions.time_bounds
         assert now - 3 < transaction.preconditions.time_bounds.min_time < now + 3
         assert (
             transaction.preconditions.time_bounds.max_time
@@ -281,6 +291,7 @@ class TestStellarWebAuthentication:
         home_domain = "example.com"
         web_auth_domain = "auth.example.com"
 
+        assert client_muxed_account
         challenge = build_challenge_transaction(
             server_secret=server_kp.secret,
             client_account_id=client_muxed_account,
