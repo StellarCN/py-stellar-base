@@ -1,7 +1,7 @@
 import itertools
 
 import pytest
-import shamir_mnemonic
+import shamir_mnemonic  # type: ignore[import-untyped]
 
 from stellar_sdk import Keypair, StrKey
 from stellar_sdk.exceptions import (

@@ -332,6 +332,7 @@ class TestTransaction:
         tx = Transaction(source, sequence, fee, [op], preconditions=preconditions)
         restore_tx = Transaction.from_xdr_object(tx.to_xdr_object())
         assert tx == restore_tx
+        assert restore_tx.preconditions is not None
         assert restore_tx.preconditions._is_v2()
         assert restore_tx.preconditions.min_sequence_ledger_gap == 0
         assert restore_tx.preconditions.min_sequence_age == 0

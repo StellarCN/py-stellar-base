@@ -544,6 +544,8 @@ class TestTransaction:
         )
         check_from_xdr(tx)
         tx = tx.build()
+        assert tx.transaction.preconditions is not None
+        assert tx.transaction.preconditions.time_bounds is not None
         assert tx.transaction.preconditions.time_bounds.min_time == 0
         assert (
             now + 256 <= tx.transaction.preconditions.time_bounds.max_time <= now + 257
@@ -715,7 +717,7 @@ class TestTransaction:
                             contract_address=Address(
                                 "CA7QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLTJJFC7MGXUA74P7UJUWDA"
                             ).to_xdr_sc_address(),
-                            function_name=scval.to_symbol("hello").sym,
+                            function_name=stellar_xdr.SCSymbol(b"hello"),
                             args=[
                                 scval.to_address(kp2.public_key),
                                 scval.to_uint32(10),
@@ -776,7 +778,7 @@ class TestTransaction:
                             contract_address=Address(
                                 "CA7QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLTJJFC7MGXUA74P7UJUWDA"
                             ).to_xdr_sc_address(),
-                            function_name=scval.to_symbol("hello").sym,
+                            function_name=stellar_xdr.SCSymbol(b"hello"),
                             args=[
                                 scval.to_address(kp2.public_key),
                                 scval.to_uint32(10),
@@ -830,7 +832,7 @@ class TestTransaction:
                             contract_address=Address(
                                 "CA7QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLTJJFC7MGXUA74P7UJUWDA"
                             ).to_xdr_sc_address(),
-                            function_name=scval.to_symbol("hello").sym,
+                            function_name=stellar_xdr.SCSymbol(b"hello"),
                             args=[
                                 scval.to_address(kp2.public_key),
                                 scval.to_uint32(10),
@@ -912,7 +914,7 @@ class TestTransaction:
                             contract_address=Address(
                                 "CA7QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLTJJFC7MGXUA74P7UJUWDA"
                             ).to_xdr_sc_address(),
-                            function_name=scval.to_symbol("hello").sym,
+                            function_name=stellar_xdr.SCSymbol(b"hello"),
                             args=[
                                 scval.to_address(kp2.public_key),
                                 scval.to_uint32(10),

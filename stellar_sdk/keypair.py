@@ -282,7 +282,7 @@ class Keypair:
         :return: A list of mnemonic phrases.
         """
         try:
-            import shamir_mnemonic  # noqa: F401
+            import shamir_mnemonic  # type: ignore[import-untyped]
         except ModuleNotFoundError as exc:
             message = "shamir_mnemonic must be installed to use method `generate_shamir_mnemonic_phrases`."
             raise ModuleNotFoundError(message) from exc
