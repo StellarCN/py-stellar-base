@@ -62,7 +62,9 @@ class BaseCallBuilder(_BaseCallBuilder):
         :raise: :exc:`StreamClientError <stellar_sdk.exceptions.StreamClientError>` - Failed to fetch stream resource.
         """
         url = urljoin_with_query(self.horizon_url, self.endpoint)
-        stream: AsyncGenerator[Dict[str, Any], None] = self.client.stream(url, self.params)  # type: ignore[assignment]
+        stream: AsyncGenerator[Dict[str, Any], None] = self.client.stream(
+            url, self.params
+        )
         while True:
             yield await stream.__anext__()
 

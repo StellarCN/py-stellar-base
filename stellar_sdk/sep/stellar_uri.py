@@ -191,7 +191,7 @@ class PayStellarUri(StellarUri):
         if self.signature is not None:
             query_params["signature"] = self.signature
         # https://github.com/python/typeshed/issues/4234
-        return f"{STELLAR_SCHEME}:pay?{parse.urlencode(query_params, quote_via=parse.quote)}"  # type: ignore[type-var]
+        return f"{STELLAR_SCHEME}:pay?{parse.urlencode(query_params, quote_via=parse.quote)}"
 
     @classmethod
     def from_uri(cls, uri: str) -> "PayStellarUri":
@@ -402,7 +402,7 @@ class TransactionStellarUri(StellarUri):
             query_params["origin_domain"] = self.origin_domain
         if self.signature is not None:
             query_params["signature"] = self.signature
-        return f"{STELLAR_SCHEME}:tx?{parse.urlencode(query_params, quote_via=parse.quote)}"  # type: ignore[type-var]
+        return f"{STELLAR_SCHEME}:tx?{parse.urlencode(query_params, quote_via=parse.quote)}"
 
     @classmethod
     def from_uri(
@@ -447,12 +447,13 @@ class TransactionStellarUri(StellarUri):
         msg = query.get("msg")
         origin_domain = query.get("origin_domain")
         signature = query.get("signature")
+        tx: Union[TransactionEnvelope, FeeBumpTransactionEnvelope]
         if xdr is None:
             raise ValueError("`xdr` is missing from uri.")
         if FeeBumpTransactionEnvelope.is_fee_bump_transaction_envelope(xdr):
             tx = FeeBumpTransactionEnvelope.from_xdr(xdr, network_passphrase)
         else:
-            tx = TransactionEnvelope.from_xdr(xdr, network_passphrase)  # type: ignore[assignment]
+            tx = TransactionEnvelope.from_xdr(xdr, network_passphrase)
         raw_replacements = query.get("replace")
         replacements = []
         if raw_replacements is not None:
