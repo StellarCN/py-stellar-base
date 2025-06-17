@@ -119,11 +119,11 @@ xdr-generate: $(XDRS) replace-xdr-keywords
 			--namespace stellar \
 			--output stellar_sdk/xdr \
 			$(XDRS)'
-	@echo "--- Installing package in editable mode ---"
-	$(UV_RUN_CMD) pip install -e .
 	@echo "--- Updating XDR API documentation ---"
 	$(REPLACE_DOCS)
 	$(UV_RUN_CMD) python docs/gen_xdr_api.py >> docs/en/api.rst
+	@echo "--- Running pre-commit hooks ---"
+	$(MAKE) pre-commit
 
 xdr/%.x:
 	@echo "--- Fetching $@ ---"
