@@ -135,6 +135,7 @@ print("Sell offer created\n")
 ## get offer
 print("Get Offer:")
 offers = server.offers().for_seller(seller_public_key).call()
+offer_id = None
 for offer in offers["_embedded"]["records"]:
     print(
         f"ID: {offer['id']}\nSeller: {offer['seller']} \
@@ -144,6 +145,8 @@ for offer in offers["_embedded"]["records"]:
     offer_id = offer["id"]
 
 print("#" * 30)
+
+assert offer_id is not None, "Offer ID should not be None"
 
 # update offer. We will update the price from 0.5 to 1.0.
 print(f"Update offer {offer_id}")

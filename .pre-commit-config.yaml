@@ -25,12 +25,3 @@ repos:
         # pre-commit's default_language_version, see
         # https://pre-commit.com/#top_level-default_language_version
         language_version: python3.13
-
-  - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: "v1.16.0"
-    hooks:
-      - id: mypy
-        # https://pypi.org/project/types-requests/
-        # https://pypi.org/project/types-toml/
-        additional_dependencies: [types-requests, types-toml]
-        exclude: ^docs/
