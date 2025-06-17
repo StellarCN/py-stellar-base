@@ -30,13 +30,16 @@ endif
 .DEFAULT_GOAL: default
 default: ;
 
-test:
-	uv run --all-extras pytest -v -s -rs tests --cov --cov-report=html
+unit-test:
+	uv run --frozen --all-extras pytest -v -s -rs tests --cov --cov-report=html
 .PHONY: test
 
-full-test:
-	uv run --all-extras pytest -v -s -rs tests --runslow --cov --cov-report=html
+full-unit-test:
+	uv run --frozen --all-extras pytest -v -s -rs tests --runslow --cov --cov-report=html
 .PHONY: full-test
+
+integration-test:
+    uv run --frozen --all-extras pytest -v -s -rs tests --runslow --integration --cov=./ --cov-report=xml
 
 codecov:
 	codecov
@@ -51,12 +54,12 @@ clean:
 	rm -rf coverage.xml .coverage dist htmlcov stellar_sdk.egg-info tests/.mypy_cache tests/.pytest_cache docs/en/_build
 
 pre-commit:
-	uv run --all-extras pre-commit run --all-file
+	uv run --frozen --all-extras pre-commit run --all-file
 .PHONY: pre-commit
 
 type-check:
-	uv run --all-extras pyright
-	uv run --all-extras mypy -p stellar_sdk -p tests -p examples
+	uv run --frozen --all-extras pyright
+	uv run --frozen --all-extras mypy -p stellar_sdk -p tests -p examples
 
 replace-xdr-keywords:
 	$(REPLACE_KEYWORD_COMMAND)
@@ -72,9 +75,9 @@ xdr-generate: $(XDRS)
 			--namespace stellar \
 			--output stellar_sdk/xdr \
 			$(XDRS)'
-	uv run pip install -e .
+	uv run --frozen pip install -e .
 	$(REPLACE_DOCS)
-	uv run python docs/gen_xdr_api.py >> docs/en/api.rst
+	uv run --frozen python docs/gen_xdr_api.py >> docs/en/api.rst
 .PHONY: xdr-generate
 
 xdr/%.x:

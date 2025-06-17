@@ -18,9 +18,8 @@ jobs:
         uses: astral-sh/setup-uv@v6
         with:
           python-version: ${{ env.DEFAULT_PYTHON_VERSION }}
-      - name: Run pre-commit hooks
-        run: |
-          uv run --frozen --all-extras --group dev pre-commit run --all-files
+      - name: Run pre-commit
+        run: make pre-commit
 
   test:
     needs: pre-commit
@@ -71,7 +70,7 @@ jobs:
           uv tree
 
       - name: Test with pytest
-        run: uv run --frozen --all-extras --group dev pytest -v -rs tests --runslow
+        run: make full-unit-test
 
   integration:
     runs-on: ubuntu-latest
@@ -103,7 +102,7 @@ jobs:
           python-version: ${{ env.DEFAULT_PYTHON_VERSION }}
 
       - name: Test with pytest
-        run: uv run --frozen --all-extras --group dev pytest -v -rs tests --runslow --integration --cov=./ --cov-report=xml
+        run: make integration-test
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5
@@ -128,7 +127,7 @@ jobs:
           python-version: ${{ env.DEFAULT_PYTHON_VERSION }}
 
       - name: Build Packages
-        run: uv build
+        run: make package
 
       - name: Publish package distributions to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
