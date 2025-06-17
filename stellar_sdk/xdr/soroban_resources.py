@@ -23,8 +23,8 @@ class SorobanResources:
             // The maximum number of instructions this transaction can use
             uint32 instructions;
 
-            // The maximum number of bytes this transaction can read from ledger
-            uint32 readBytes;
+            // The maximum number of bytes this transaction can read from disk backed entries
+            uint32 diskReadBytes;
             // The maximum number of bytes this transaction can write to ledger
             uint32 writeBytes;
         };
@@ -34,30 +34,30 @@ class SorobanResources:
         self,
         footprint: LedgerFootprint,
         instructions: Uint32,
-        read_bytes: Uint32,
+        disk_read_bytes: Uint32,
         write_bytes: Uint32,
     ) -> None:
         self.footprint = footprint
         self.instructions = instructions
-        self.read_bytes = read_bytes
+        self.disk_read_bytes = disk_read_bytes
         self.write_bytes = write_bytes
 
     def pack(self, packer: Packer) -> None:
         self.footprint.pack(packer)
         self.instructions.pack(packer)
-        self.read_bytes.pack(packer)
+        self.disk_read_bytes.pack(packer)
         self.write_bytes.pack(packer)
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> SorobanResources:
         footprint = LedgerFootprint.unpack(unpacker)
         instructions = Uint32.unpack(unpacker)
-        read_bytes = Uint32.unpack(unpacker)
+        disk_read_bytes = Uint32.unpack(unpacker)
         write_bytes = Uint32.unpack(unpacker)
         return cls(
             footprint=footprint,
             instructions=instructions,
-            read_bytes=read_bytes,
+            disk_read_bytes=disk_read_bytes,
             write_bytes=write_bytes,
         )
 
@@ -85,7 +85,7 @@ class SorobanResources:
             (
                 self.footprint,
                 self.instructions,
-                self.read_bytes,
+                self.disk_read_bytes,
                 self.write_bytes,
             )
         )
@@ -96,7 +96,7 @@ class SorobanResources:
         return (
             self.footprint == other.footprint
             and self.instructions == other.instructions
-            and self.read_bytes == other.read_bytes
+            and self.disk_read_bytes == other.disk_read_bytes
             and self.write_bytes == other.write_bytes
         )
 
@@ -104,7 +104,7 @@ class SorobanResources:
         out = [
             f"footprint={self.footprint}",
             f"instructions={self.instructions}",
-            f"read_bytes={self.read_bytes}",
+            f"disk_read_bytes={self.disk_read_bytes}",
             f"write_bytes={self.write_bytes}",
         ]
         return f"<SorobanResources [{', '.join(out)}]>"

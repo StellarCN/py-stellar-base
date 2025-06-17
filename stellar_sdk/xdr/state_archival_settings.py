@@ -28,11 +28,11 @@ class StateArchivalSettings:
             // max number of entries that emit archival meta in a single ledger
             uint32 maxEntriesToArchive;
 
-            // Number of snapshots to use when calculating average BucketList size
-            uint32 bucketListSizeWindowSampleSize;
+            // Number of snapshots to use when calculating average live Soroban State size
+            uint32 liveSorobanStateSizeWindowSampleSize;
 
-            // How often to sample the BucketList size for the average, in ledgers
-            uint32 bucketListWindowSamplePeriod;
+            // How often to sample the live Soroban State size for the average, in ledgers
+            uint32 liveSorobanStateSizeWindowSamplePeriod;
 
             // Maximum number of bytes that we scan for eviction per ledger
             uint32 evictionScanSize;
@@ -50,8 +50,8 @@ class StateArchivalSettings:
         persistent_rent_rate_denominator: Int64,
         temp_rent_rate_denominator: Int64,
         max_entries_to_archive: Uint32,
-        bucket_list_size_window_sample_size: Uint32,
-        bucket_list_window_sample_period: Uint32,
+        live_soroban_state_size_window_sample_size: Uint32,
+        live_soroban_state_size_window_sample_period: Uint32,
         eviction_scan_size: Uint32,
         starting_eviction_scan_level: Uint32,
     ) -> None:
@@ -61,8 +61,12 @@ class StateArchivalSettings:
         self.persistent_rent_rate_denominator = persistent_rent_rate_denominator
         self.temp_rent_rate_denominator = temp_rent_rate_denominator
         self.max_entries_to_archive = max_entries_to_archive
-        self.bucket_list_size_window_sample_size = bucket_list_size_window_sample_size
-        self.bucket_list_window_sample_period = bucket_list_window_sample_period
+        self.live_soroban_state_size_window_sample_size = (
+            live_soroban_state_size_window_sample_size
+        )
+        self.live_soroban_state_size_window_sample_period = (
+            live_soroban_state_size_window_sample_period
+        )
         self.eviction_scan_size = eviction_scan_size
         self.starting_eviction_scan_level = starting_eviction_scan_level
 
@@ -73,8 +77,8 @@ class StateArchivalSettings:
         self.persistent_rent_rate_denominator.pack(packer)
         self.temp_rent_rate_denominator.pack(packer)
         self.max_entries_to_archive.pack(packer)
-        self.bucket_list_size_window_sample_size.pack(packer)
-        self.bucket_list_window_sample_period.pack(packer)
+        self.live_soroban_state_size_window_sample_size.pack(packer)
+        self.live_soroban_state_size_window_sample_period.pack(packer)
         self.eviction_scan_size.pack(packer)
         self.starting_eviction_scan_level.pack(packer)
 
@@ -86,8 +90,8 @@ class StateArchivalSettings:
         persistent_rent_rate_denominator = Int64.unpack(unpacker)
         temp_rent_rate_denominator = Int64.unpack(unpacker)
         max_entries_to_archive = Uint32.unpack(unpacker)
-        bucket_list_size_window_sample_size = Uint32.unpack(unpacker)
-        bucket_list_window_sample_period = Uint32.unpack(unpacker)
+        live_soroban_state_size_window_sample_size = Uint32.unpack(unpacker)
+        live_soroban_state_size_window_sample_period = Uint32.unpack(unpacker)
         eviction_scan_size = Uint32.unpack(unpacker)
         starting_eviction_scan_level = Uint32.unpack(unpacker)
         return cls(
@@ -97,8 +101,8 @@ class StateArchivalSettings:
             persistent_rent_rate_denominator=persistent_rent_rate_denominator,
             temp_rent_rate_denominator=temp_rent_rate_denominator,
             max_entries_to_archive=max_entries_to_archive,
-            bucket_list_size_window_sample_size=bucket_list_size_window_sample_size,
-            bucket_list_window_sample_period=bucket_list_window_sample_period,
+            live_soroban_state_size_window_sample_size=live_soroban_state_size_window_sample_size,
+            live_soroban_state_size_window_sample_period=live_soroban_state_size_window_sample_period,
             eviction_scan_size=eviction_scan_size,
             starting_eviction_scan_level=starting_eviction_scan_level,
         )
@@ -131,8 +135,8 @@ class StateArchivalSettings:
                 self.persistent_rent_rate_denominator,
                 self.temp_rent_rate_denominator,
                 self.max_entries_to_archive,
-                self.bucket_list_size_window_sample_size,
-                self.bucket_list_window_sample_period,
+                self.live_soroban_state_size_window_sample_size,
+                self.live_soroban_state_size_window_sample_period,
                 self.eviction_scan_size,
                 self.starting_eviction_scan_level,
             )
@@ -149,10 +153,10 @@ class StateArchivalSettings:
             == other.persistent_rent_rate_denominator
             and self.temp_rent_rate_denominator == other.temp_rent_rate_denominator
             and self.max_entries_to_archive == other.max_entries_to_archive
-            and self.bucket_list_size_window_sample_size
-            == other.bucket_list_size_window_sample_size
-            and self.bucket_list_window_sample_period
-            == other.bucket_list_window_sample_period
+            and self.live_soroban_state_size_window_sample_size
+            == other.live_soroban_state_size_window_sample_size
+            and self.live_soroban_state_size_window_sample_period
+            == other.live_soroban_state_size_window_sample_period
             and self.eviction_scan_size == other.eviction_scan_size
             and self.starting_eviction_scan_level == other.starting_eviction_scan_level
         )
@@ -165,8 +169,8 @@ class StateArchivalSettings:
             f"persistent_rent_rate_denominator={self.persistent_rent_rate_denominator}",
             f"temp_rent_rate_denominator={self.temp_rent_rate_denominator}",
             f"max_entries_to_archive={self.max_entries_to_archive}",
-            f"bucket_list_size_window_sample_size={self.bucket_list_size_window_sample_size}",
-            f"bucket_list_window_sample_period={self.bucket_list_window_sample_period}",
+            f"live_soroban_state_size_window_sample_size={self.live_soroban_state_size_window_sample_size}",
+            f"live_soroban_state_size_window_sample_period={self.live_soroban_state_size_window_sample_period}",
             f"eviction_scan_size={self.eviction_scan_size}",
             f"starting_eviction_scan_level={self.starting_eviction_scan_level}",
         ]

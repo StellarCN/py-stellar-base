@@ -87,14 +87,14 @@ struct PeerAddress
     uint32 numFailures;
 };
 
-// Next ID: 21
+// Next ID: 25
 enum MessageType
 {
     ERROR_MSG = 0,
     AUTH = 2,
     DONT_HAVE = 3,
+    // GET_PEERS (4) is deprecated
 
-    GET_PEERS = 4, // gets a list of peers this guy knows about
     PEERS = 5,
 
     GET_TX_SET = 6, // gets a particular txset by hash
@@ -112,8 +112,8 @@ enum MessageType
     // new messages
     HELLO = 13,
 
-    SURVEY_REQUEST = 14,
-    SURVEY_RESPONSE = 15,
+    // SURVEY_REQUEST (14) removed and replaced by TIME_SLICED_SURVEY_REQUEST
+    // SURVEY_RESPONSE (15) removed and replaced by TIME_SLICED_SURVEY_RESPONSE
 
     SEND_MORE = 16,
     SEND_MORE_EXTENDED = 20,
@@ -135,14 +135,11 @@ struct DontHave
 
 enum SurveyMessageCommandType
 {
-    SURVEY_TOPOLOGY = 0,
     TIME_SLICED_SURVEY_TOPOLOGY = 1
 };
 
 enum SurveyMessageResponseType
 {
-    SURVEY_TOPOLOGY_RESPONSE_V0 = 0,
-    SURVEY_TOPOLOGY_RESPONSE_V1 = 1,
     SURVEY_TOPOLOGY_RESPONSE_V2 = 2
 };
 
@@ -189,12 +186,6 @@ struct TimeSlicedSurveyRequestMessage
     uint32 outboundPeersIndex;
 };
 
-struct SignedSurveyRequestMessage
-{
-    Signature requestSignature;
-    SurveyRequestMessage request;
-};
-
 struct SignedTimeSlicedSurveyRequestMessage
 {
     Signature requestSignature;
@@ -215,12 +206,6 @@ struct TimeSlicedSurveyResponseMessage
 {
     SurveyResponseMessage response;
     uint32 nonce;
-};
-
-struct SignedSurveyResponseMessage
-{
-    Signature responseSignature;
-    SurveyResponseMessage response;
 };
 
 struct SignedTimeSlicedSurveyResponseMessage
@@ -250,8 +235,6 @@ struct PeerStats
     uint64 duplicateFetchMessageRecv;
 };
 
-typedef PeerStats PeerStatList<25>;
-
 struct TimeSlicedNodeData
 {
     uint32 addedAuthenticatedPeers;
@@ -280,27 +263,6 @@ struct TimeSlicedPeerData
 
 typedef TimeSlicedPeerData TimeSlicedPeerDataList<25>;
 
-struct TopologyResponseBodyV0
-{
-    PeerStatList inboundPeers;
-    PeerStatList outboundPeers;
-
-    uint32 totalInboundPeerCount;
-    uint32 totalOutboundPeerCount;
-};
-
-struct TopologyResponseBodyV1
-{
-    PeerStatList inboundPeers;
-    PeerStatList outboundPeers;
-
-    uint32 totalInboundPeerCount;
-    uint32 totalOutboundPeerCount;
-
-    uint32 maxInboundPeerCount;
-    uint32 maxOutboundPeerCount;
-};
-
 struct TopologyResponseBodyV2
 {
     TimeSlicedPeerDataList inboundPeers;
@@ -310,10 +272,6 @@ struct TopologyResponseBodyV2
 
 union SurveyResponseBody switch (SurveyMessageResponseType type)
 {
-case SURVEY_TOPOLOGY_RESPONSE_V0:
-    TopologyResponseBodyV0 topologyResponseBodyV0;
-case SURVEY_TOPOLOGY_RESPONSE_V1:
-    TopologyResponseBodyV1 topologyResponseBodyV1;
 case SURVEY_TOPOLOGY_RESPONSE_V2:
     TopologyResponseBodyV2 topologyResponseBodyV2;
 };
@@ -344,8 +302,6 @@ case AUTH:
     Auth auth;
 case DONT_HAVE:
     DontHave dontHave;
-case GET_PEERS:
-    void;
 case PEERS:
     PeerAddress peers<100>;
 
@@ -358,12 +314,6 @@ case GENERALIZED_TX_SET:
 
 case TRANSACTION:
     TransactionEnvelope transaction;
-
-case SURVEY_REQUEST:
-    SignedSurveyRequestMessage signedSurveyRequestMessage;
-
-case SURVEY_RESPONSE:
-    SignedSurveyResponseMessage signedSurveyResponseMessage;
 
 case TIME_SLICED_SURVEY_REQUEST:
     SignedTimeSlicedSurveyRequestMessage signedTimeSlicedSurveyRequestMessage;

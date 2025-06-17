@@ -14,7 +14,6 @@ typedef string string32<32>;
 typedef string string64<64>;
 typedef int64 SequenceNumber;
 typedef opaque DataValue<64>;
-typedef Hash PoolID; // SHA256(LiquidityPoolParameters)
 
 // 1-4 alphanumeric characters right-padded with 0 bytes
 typedef opaque AssetCode4[4];
@@ -409,17 +408,6 @@ case CLAIMANT_TYPE_V0:
     } v0;
 };
 
-enum ClaimableBalanceIDType
-{
-    CLAIMABLE_BALANCE_ID_TYPE_V0 = 0
-};
-
-union ClaimableBalanceID switch (ClaimableBalanceIDType type)
-{
-case CLAIMABLE_BALANCE_ID_TYPE_V0:
-    Hash v0;
-};
-
 enum ClaimableBalanceFlags
 {
     // If set, the issuer account of the asset held by the claimable balance may
@@ -682,8 +670,7 @@ enum EnvelopeType
 enum BucketListType
 {
     LIVE = 0,
-    HOT_ARCHIVE = 1,
-    COLD_ARCHIVE = 2
+    HOT_ARCHIVE = 1
 };
 
 /* Entries used to define the bucket list */
@@ -701,19 +688,9 @@ enum HotArchiveBucketEntryType
 {
     HOT_ARCHIVE_METAENTRY = -1, // Bucket metadata, should come first.
     HOT_ARCHIVE_ARCHIVED = 0,   // Entry is Archived
-    HOT_ARCHIVE_LIVE = 1,       // Entry was previously HOT_ARCHIVE_ARCHIVED, or HOT_ARCHIVE_DELETED, but
+    HOT_ARCHIVE_LIVE = 1        // Entry was previously HOT_ARCHIVE_ARCHIVED, but
                                 // has been added back to the live BucketList.
                                 // Does not need to be persisted.
-    HOT_ARCHIVE_DELETED = 2     // Entry deleted (Note: must be persisted in archive)
-};
-
-enum ColdArchiveBucketEntryType
-{
-    COLD_ARCHIVE_METAENTRY     = -1,  // Bucket metadata, should come first.
-    COLD_ARCHIVE_ARCHIVED_LEAF = 0,   // Full LedgerEntry that was archived during the epoch
-    COLD_ARCHIVE_DELETED_LEAF  = 1,   // LedgerKey that was deleted during the epoch
-    COLD_ARCHIVE_BOUNDARY_LEAF = 2,   // Dummy leaf representing low/high bound
-    COLD_ARCHIVE_HASH          = 3    // Intermediary Merkle hash entry
 };
 
 struct BucketMetadata
@@ -750,48 +727,8 @@ case HOT_ARCHIVE_ARCHIVED:
     LedgerEntry archivedEntry;
 
 case HOT_ARCHIVE_LIVE:
-case HOT_ARCHIVE_DELETED:
     LedgerKey key;
 case HOT_ARCHIVE_METAENTRY:
     BucketMetadata metaEntry;
-};
-
-struct ColdArchiveArchivedLeaf
-{
-    uint32 index;
-    LedgerEntry archivedEntry;
-};
-
-struct ColdArchiveDeletedLeaf
-{
-    uint32 index;
-    LedgerKey deletedKey;
-};
-
-struct ColdArchiveBoundaryLeaf
-{
-    uint32 index;
-    bool isLowerBound;
-};
-
-struct ColdArchiveHashEntry
-{
-    uint32 index;
-    uint32 level;
-    Hash hash;
-};
-
-union ColdArchiveBucketEntry switch (ColdArchiveBucketEntryType type)
-{
-case COLD_ARCHIVE_METAENTRY:
-    BucketMetadata metaEntry;
-case COLD_ARCHIVE_ARCHIVED_LEAF:
-    ColdArchiveArchivedLeaf archivedLeaf;
-case COLD_ARCHIVE_DELETED_LEAF:
-    ColdArchiveDeletedLeaf deletedLeaf;
-case COLD_ARCHIVE_BOUNDARY_LEAF:
-    ColdArchiveBoundaryLeaf boundaryLeaf;
-case COLD_ARCHIVE_HASH:
-    ColdArchiveHashEntry hashEntry;
 };
 }

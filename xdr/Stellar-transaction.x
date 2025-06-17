@@ -594,6 +594,8 @@ struct SorobanAuthorizationEntry
     SorobanAuthorizedInvocation rootInvocation;
 };
 
+typedef SorobanAuthorizationEntry SorobanAuthorizationEntries<>;
+
 /* Upload Wasm, create, and invoke contracts in Soroban.
 
     Threshold: med
@@ -823,56 +825,6 @@ struct LedgerFootprint
     LedgerKey readWrite<>;
 };
 
-enum ArchivalProofType
-{
-    EXISTENCE = 0,
-    NONEXISTENCE = 1
-};
-
-struct ArchivalProofNode
-{
-    uint32 index;
-    Hash hash;
-};
-
-typedef ArchivalProofNode ProofLevel<>;
-
-struct NonexistenceProofBody
-{
-    ColdArchiveBucketEntry entriesToProve<>;
-
-    // Vector of vectors, where proofLevels[level]
-    // contains all HashNodes that correspond with that level
-    ProofLevel proofLevels<>;
-};
-
-struct ExistenceProofBody
-{
-    LedgerKey keysToProve<>;
-
-    // Bounds for each key being proved, where bound[n]
-    // corresponds to keysToProve[n]
-    ColdArchiveBucketEntry lowBoundEntries<>;
-    ColdArchiveBucketEntry highBoundEntries<>;
-
-    // Vector of vectors, where proofLevels[level]
-    // contains all HashNodes that correspond with that level
-    ProofLevel proofLevels<>;
-};
-
-struct ArchivalProof
-{
-    uint32 epoch; // AST Subtree for this proof
-
-    union switch (ArchivalProofType t)
-    {
-    case EXISTENCE:
-        NonexistenceProofBody nonexistenceProof;
-    case NONEXISTENCE:
-        ExistenceProofBody existenceProof;
-    } body;
-};
-
 // Resource limits for a Soroban transaction.
 // The transaction will fail if it exceeds any of these limits.
 struct SorobanResources
@@ -882,16 +834,30 @@ struct SorobanResources
     // The maximum number of instructions this transaction can use
     uint32 instructions; 
 
-    // The maximum number of bytes this transaction can read from ledger
-    uint32 readBytes;
+    // The maximum number of bytes this transaction can read from disk backed entries
+    uint32 diskReadBytes;
     // The maximum number of bytes this transaction can write to ledger
     uint32 writeBytes;
+};
+
+struct SorobanResourcesExtV0
+{
+    // Vector of indices representing what Soroban
+    // entries in the footprint are archived, based on the
+    // order of keys provided in the readWrite footprint.
+    uint32 archivedSorobanEntries<>;
 };
 
 // The transaction extension for Soroban.
 struct SorobanTransactionData
 {
-    ExtensionPoint ext;
+    union switch (int v)
+    {
+    case 0:
+        void;
+    case 1:
+        SorobanResourcesExtV0 resourceExt;
+    } ext;
     SorobanResources resources;
     // Amount of the transaction `fee` allocated to the Soroban resource fees.
     // The fraction of `resourceFee` corresponding to `resources` specified 
@@ -960,7 +926,6 @@ struct Transaction
 
     Operation operations<MAX_OPS_PER_TX>;
 
-    // reserved for future use
     union switch (int v)
     {
     case 0:

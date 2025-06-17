@@ -4,41 +4,40 @@ from __future__ import annotations
 
 import base64
 from enum import IntEnum
-
+from typing import List, Optional, TYPE_CHECKING
 from xdrlib3 import Packer, Unpacker
+from .base import Integer, UnsignedInteger, Float, Double, Hyper, UnsignedHyper, Boolean, String, Opaque
+from .constants import *
 
-__all__ = ["ArchivalProofType"]
-
-
-class ArchivalProofType(IntEnum):
+__all__ = ['SCSpecEventDataFormat']
+class SCSpecEventDataFormat(IntEnum):
     """
     XDR Source Code::
 
-        enum ArchivalProofType
+        enum SCSpecEventDataFormat
         {
-            EXISTENCE = 0,
-            NONEXISTENCE = 1
+            SC_SPEC_EVENT_DATA_FORMAT_SINGLE_VALUE = 0,
+            SC_SPEC_EVENT_DATA_FORMAT_VEC = 1,
+            SC_SPEC_EVENT_DATA_FORMAT_MAP = 2
         };
     """
-
-    EXISTENCE = 0
-    NONEXISTENCE = 1
-
+    SC_SPEC_EVENT_DATA_FORMAT_SINGLE_VALUE = 0
+    SC_SPEC_EVENT_DATA_FORMAT_VEC = 1
+    SC_SPEC_EVENT_DATA_FORMAT_MAP = 2
     def pack(self, packer: Packer) -> None:
         packer.pack_int(self.value)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> ArchivalProofType:
+    def unpack(cls, unpacker: Unpacker) -> SCSpecEventDataFormat:
         value = unpacker.unpack_int()
         return cls(value)
-
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()
         self.pack(packer)
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> ArchivalProofType:
+    def from_xdr_bytes(cls, xdr: bytes) -> SCSpecEventDataFormat:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -47,6 +46,6 @@ class ArchivalProofType(IntEnum):
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> ArchivalProofType:
+    def from_xdr(cls, xdr: str) -> SCSpecEventDataFormat:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)

@@ -12,6 +12,7 @@ from .operation_meta import OperationMeta
 from .transaction_meta_v1 import TransactionMetaV1
 from .transaction_meta_v2 import TransactionMetaV2
 from .transaction_meta_v3 import TransactionMetaV3
+from .transaction_meta_v4 import TransactionMetaV4
 
 __all__ = ["TransactionMeta"]
 
@@ -30,6 +31,8 @@ class TransactionMeta:
             TransactionMetaV2 v2;
         case 3:
             TransactionMetaV3 v3;
+        case 4:
+            TransactionMetaV4 v4;
         };
     """
 
@@ -40,6 +43,7 @@ class TransactionMeta:
         v1: Optional[TransactionMetaV1] = None,
         v2: Optional[TransactionMetaV2] = None,
         v3: Optional[TransactionMetaV3] = None,
+        v4: Optional[TransactionMetaV4] = None,
     ) -> None:
         _expect_max_length = 4294967295
         if operations and len(operations) > _expect_max_length:
@@ -51,6 +55,7 @@ class TransactionMeta:
         self.v1 = v1
         self.v2 = v2
         self.v3 = v3
+        self.v4 = v4
 
     def pack(self, packer: Packer) -> None:
         Integer(self.v).pack(packer)
@@ -76,6 +81,11 @@ class TransactionMeta:
                 raise ValueError("v3 should not be None.")
             self.v3.pack(packer)
             return
+        if self.v == 4:
+            if self.v4 is None:
+                raise ValueError("v4 should not be None.")
+            self.v4.pack(packer)
+            return
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> TransactionMeta:
@@ -95,6 +105,9 @@ class TransactionMeta:
         if v == 3:
             v3 = TransactionMetaV3.unpack(unpacker)
             return cls(v=v, v3=v3)
+        if v == 4:
+            v4 = TransactionMetaV4.unpack(unpacker)
+            return cls(v=v, v4=v4)
         return cls(v=v)
 
     def to_xdr_bytes(self) -> bytes:
@@ -124,6 +137,7 @@ class TransactionMeta:
                 self.v1,
                 self.v2,
                 self.v3,
+                self.v4,
             )
         )
 
@@ -136,6 +150,7 @@ class TransactionMeta:
             and self.v1 == other.v1
             and self.v2 == other.v2
             and self.v3 == other.v3
+            and self.v4 == other.v4
         )
 
     def __repr__(self):
@@ -149,4 +164,5 @@ class TransactionMeta:
         out.append(f"v1={self.v1}") if self.v1 is not None else None
         out.append(f"v2={self.v2}") if self.v2 is not None else None
         out.append(f"v3={self.v3}") if self.v3 is not None else None
+        out.append(f"v4={self.v4}") if self.v4 is not None else None
         return f"<TransactionMeta [{', '.join(out)}]>"

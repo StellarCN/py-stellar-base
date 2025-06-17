@@ -19,7 +19,8 @@ class LedgerEntryChangeType(IntEnum):
             LEDGER_ENTRY_CREATED = 0, // entry was added to the ledger
             LEDGER_ENTRY_UPDATED = 1, // entry was modified in the ledger
             LEDGER_ENTRY_REMOVED = 2, // entry was removed from the ledger
-            LEDGER_ENTRY_STATE = 3    // value of the entry
+            LEDGER_ENTRY_STATE    = 3, // value of the entry
+            LEDGER_ENTRY_RESTORED = 4  // archived entry was restored in the ledger
         };
     """
 
@@ -27,6 +28,7 @@ class LedgerEntryChangeType(IntEnum):
     LEDGER_ENTRY_UPDATED = 1
     LEDGER_ENTRY_REMOVED = 2
     LEDGER_ENTRY_STATE = 3
+    LEDGER_ENTRY_RESTORED = 4
 
     def pack(self, packer: Packer) -> None:
         packer.pack_int(self.value)

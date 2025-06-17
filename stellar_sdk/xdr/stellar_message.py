@@ -20,8 +20,6 @@ from .scp_envelope import SCPEnvelope
 from .scp_quorum_set import SCPQuorumSet
 from .send_more import SendMore
 from .send_more_extended import SendMoreExtended
-from .signed_survey_request_message import SignedSurveyRequestMessage
-from .signed_survey_response_message import SignedSurveyResponseMessage
 from .signed_time_sliced_survey_request_message import (
     SignedTimeSlicedSurveyRequestMessage,
 )
@@ -56,8 +54,6 @@ class StellarMessage:
             Auth auth;
         case DONT_HAVE:
             DontHave dontHave;
-        case GET_PEERS:
-            void;
         case PEERS:
             PeerAddress peers<100>;
 
@@ -70,12 +66,6 @@ class StellarMessage:
 
         case TRANSACTION:
             TransactionEnvelope transaction;
-
-        case SURVEY_REQUEST:
-            SignedSurveyRequestMessage signedSurveyRequestMessage;
-
-        case SURVEY_RESPONSE:
-            SignedSurveyResponseMessage signedSurveyResponseMessage;
 
         case TIME_SLICED_SURVEY_REQUEST:
             SignedTimeSlicedSurveyRequestMessage signedTimeSlicedSurveyRequestMessage;
@@ -124,8 +114,6 @@ class StellarMessage:
         tx_set: Optional[TransactionSet] = None,
         generalized_tx_set: Optional[GeneralizedTransactionSet] = None,
         transaction: Optional[TransactionEnvelope] = None,
-        signed_survey_request_message: Optional[SignedSurveyRequestMessage] = None,
-        signed_survey_response_message: Optional[SignedSurveyResponseMessage] = None,
         signed_time_sliced_survey_request_message: Optional[
             SignedTimeSlicedSurveyRequestMessage
         ] = None,
@@ -162,8 +150,6 @@ class StellarMessage:
         self.tx_set = tx_set
         self.generalized_tx_set = generalized_tx_set
         self.transaction = transaction
-        self.signed_survey_request_message = signed_survey_request_message
-        self.signed_survey_response_message = signed_survey_response_message
         self.signed_time_sliced_survey_request_message = (
             signed_time_sliced_survey_request_message
         )
@@ -207,8 +193,6 @@ class StellarMessage:
                 raise ValueError("dont_have should not be None.")
             self.dont_have.pack(packer)
             return
-        if self.type == MessageType.GET_PEERS:
-            return
         if self.type == MessageType.PEERS:
             if self.peers is None:
                 raise ValueError("peers should not be None.")
@@ -235,16 +219,6 @@ class StellarMessage:
             if self.transaction is None:
                 raise ValueError("transaction should not be None.")
             self.transaction.pack(packer)
-            return
-        if self.type == MessageType.SURVEY_REQUEST:
-            if self.signed_survey_request_message is None:
-                raise ValueError("signed_survey_request_message should not be None.")
-            self.signed_survey_request_message.pack(packer)
-            return
-        if self.type == MessageType.SURVEY_RESPONSE:
-            if self.signed_survey_response_message is None:
-                raise ValueError("signed_survey_response_message should not be None.")
-            self.signed_survey_response_message.pack(packer)
             return
         if self.type == MessageType.TIME_SLICED_SURVEY_REQUEST:
             if self.signed_time_sliced_survey_request_message is None:
@@ -330,8 +304,6 @@ class StellarMessage:
         if type == MessageType.DONT_HAVE:
             dont_have = DontHave.unpack(unpacker)
             return cls(type=type, dont_have=dont_have)
-        if type == MessageType.GET_PEERS:
-            return cls(type=type)
         if type == MessageType.PEERS:
             length = unpacker.unpack_uint()
             peers = []
@@ -350,18 +322,6 @@ class StellarMessage:
         if type == MessageType.TRANSACTION:
             transaction = TransactionEnvelope.unpack(unpacker)
             return cls(type=type, transaction=transaction)
-        if type == MessageType.SURVEY_REQUEST:
-            signed_survey_request_message = SignedSurveyRequestMessage.unpack(unpacker)
-            return cls(
-                type=type, signed_survey_request_message=signed_survey_request_message
-            )
-        if type == MessageType.SURVEY_RESPONSE:
-            signed_survey_response_message = SignedSurveyResponseMessage.unpack(
-                unpacker
-            )
-            return cls(
-                type=type, signed_survey_response_message=signed_survey_response_message
-            )
         if type == MessageType.TIME_SLICED_SURVEY_REQUEST:
             signed_time_sliced_survey_request_message = (
                 SignedTimeSlicedSurveyRequestMessage.unpack(unpacker)
@@ -452,8 +412,6 @@ class StellarMessage:
                 self.tx_set,
                 self.generalized_tx_set,
                 self.transaction,
-                self.signed_survey_request_message,
-                self.signed_survey_response_message,
                 self.signed_time_sliced_survey_request_message,
                 self.signed_time_sliced_survey_response_message,
                 self.signed_time_sliced_survey_start_collecting_message,
@@ -483,10 +441,6 @@ class StellarMessage:
             and self.tx_set == other.tx_set
             and self.generalized_tx_set == other.generalized_tx_set
             and self.transaction == other.transaction
-            and self.signed_survey_request_message
-            == other.signed_survey_request_message
-            and self.signed_survey_response_message
-            == other.signed_survey_response_message
             and self.signed_time_sliced_survey_request_message
             == other.signed_time_sliced_survey_request_message
             and self.signed_time_sliced_survey_response_message
@@ -531,20 +485,6 @@ class StellarMessage:
         (
             out.append(f"transaction={self.transaction}")
             if self.transaction is not None
-            else None
-        )
-        (
-            out.append(
-                f"signed_survey_request_message={self.signed_survey_request_message}"
-            )
-            if self.signed_survey_request_message is not None
-            else None
-        )
-        (
-            out.append(
-                f"signed_survey_response_message={self.signed_survey_response_message}"
-            )
-            if self.signed_survey_response_message is not None
             else None
         )
         (

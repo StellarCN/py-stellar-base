@@ -17,14 +17,12 @@ class BucketListType(IntEnum):
         enum BucketListType
         {
             LIVE = 0,
-            HOT_ARCHIVE = 1,
-            COLD_ARCHIVE = 2
+            HOT_ARCHIVE = 1
         };
     """
 
     LIVE = 0
     HOT_ARCHIVE = 1
-    COLD_ARCHIVE = 2
 
     def pack(self, packer: Packer) -> None:
         packer.pack_int(self.value)

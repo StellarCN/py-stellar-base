@@ -179,7 +179,16 @@ case CONTRACT_EXECUTABLE_STELLAR_ASSET:
 enum SCAddressType
 {
     SC_ADDRESS_TYPE_ACCOUNT = 0,
-    SC_ADDRESS_TYPE_CONTRACT = 1
+    SC_ADDRESS_TYPE_CONTRACT = 1,
+    SC_ADDRESS_TYPE_MUXED_ACCOUNT = 2,
+    SC_ADDRESS_TYPE_CLAIMABLE_BALANCE = 3,
+    SC_ADDRESS_TYPE_LIQUIDITY_POOL = 4
+};
+
+struct MuxedEd25519Account
+{
+    uint64 id;
+    uint256 ed25519;
 };
 
 union SCAddress switch (SCAddressType type)
@@ -187,7 +196,13 @@ union SCAddress switch (SCAddressType type)
 case SC_ADDRESS_TYPE_ACCOUNT:
     AccountID accountId;
 case SC_ADDRESS_TYPE_CONTRACT:
-    Hash contractId;
+    ContractID contractId;
+case SC_ADDRESS_TYPE_MUXED_ACCOUNT:
+    MuxedEd25519Account muxedAccount;
+case SC_ADDRESS_TYPE_CLAIMABLE_BALANCE:
+    ClaimableBalanceID claimableBalanceId;
+case SC_ADDRESS_TYPE_LIQUIDITY_POOL:
+    PoolID liquidityPoolId;
 };
 
 %struct SCVal;
@@ -264,13 +279,12 @@ case SCV_ADDRESS:
 
 // Special SCVals reserved for system-constructed contract-data
 // ledger keys, not generally usable elsewhere.
+case SCV_CONTRACT_INSTANCE:
+    SCContractInstance instance;
 case SCV_LEDGER_KEY_CONTRACT_INSTANCE:
     void;
 case SCV_LEDGER_KEY_NONCE:
     SCNonceKey nonce_key;
-
-case SCV_CONTRACT_INSTANCE:
-    SCContractInstance instance;
 };
 
 struct SCMapEntry

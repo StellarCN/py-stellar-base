@@ -6,6 +6,7 @@ import base64
 
 from xdrlib3 import Packer, Unpacker
 
+from .contract_id import ContractID
 from .hash import Hash
 
 __all__ = ["ConfigUpgradeSetKey"]
@@ -16,14 +17,14 @@ class ConfigUpgradeSetKey:
     XDR Source Code::
 
         struct ConfigUpgradeSetKey {
-            Hash contractID;
+            ContractID contractID;
             Hash contentHash;
         };
     """
 
     def __init__(
         self,
-        contract_id: Hash,
+        contract_id: ContractID,
         content_hash: Hash,
     ) -> None:
         self.contract_id = contract_id
@@ -35,7 +36,7 @@ class ConfigUpgradeSetKey:
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> ConfigUpgradeSetKey:
-        contract_id = Hash.unpack(unpacker)
+        contract_id = ContractID.unpack(unpacker)
         content_hash = Hash.unpack(unpacker)
         return cls(
             contract_id=contract_id,

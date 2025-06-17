@@ -23,41 +23,62 @@ struct ConfigSettingContractComputeV0
     uint32 txMemoryLimit;
 };
 
+// Settings for running the contract transactions in parallel.
+struct ConfigSettingContractParallelComputeV0
+{
+    // Maximum number of clusters with dependent transactions allowed in a
+    // stage of parallel tx set component.
+    // This effectively sets the lower bound on the number of physical threads
+    // necessary to effectively apply transaction sets in parallel.
+    uint32 ledgerMaxDependentTxClusters;
+};
+
 // Ledger access settings for contracts.
 struct ConfigSettingContractLedgerCostV0
 {
-    // Maximum number of ledger entry read operations per ledger
-    uint32 ledgerMaxReadLedgerEntries;
-    // Maximum number of bytes that can be read per ledger
-    uint32 ledgerMaxReadBytes;
+    // Maximum number of disk entry read operations per ledger
+    uint32 ledgerMaxDiskReadEntries;
+    // Maximum number of bytes of disk reads that can be performed per ledger
+    uint32 ledgerMaxDiskReadBytes;
     // Maximum number of ledger entry write operations per ledger
     uint32 ledgerMaxWriteLedgerEntries;
     // Maximum number of bytes that can be written per ledger
     uint32 ledgerMaxWriteBytes;
 
-    // Maximum number of ledger entry read operations per transaction
-    uint32 txMaxReadLedgerEntries;
-    // Maximum number of bytes that can be read per transaction
-    uint32 txMaxReadBytes;
+    // Maximum number of disk entry read operations per transaction
+    uint32 txMaxDiskReadEntries;
+    // Maximum number of bytes of disk reads that can be performed per transaction
+    uint32 txMaxDiskReadBytes;
     // Maximum number of ledger entry write operations per transaction
     uint32 txMaxWriteLedgerEntries;
     // Maximum number of bytes that can be written per transaction
     uint32 txMaxWriteBytes;
 
-    int64 feeReadLedgerEntry;  // Fee per ledger entry read
-    int64 feeWriteLedgerEntry; // Fee per ledger entry write
+    int64 feeDiskReadLedgerEntry;  // Fee per disk ledger entry read
+    int64 feeWriteLedgerEntry;     // Fee per ledger entry write
 
-    int64 feeRead1KB;  // Fee for reading 1KB
+    int64 feeDiskRead1KB;          // Fee for reading 1KB disk
 
     // The following parameters determine the write fee per 1KB.
-    // Write fee grows linearly until bucket list reaches this size
-    int64 bucketListTargetSizeBytes;
-    // Fee per 1KB write when the bucket list is empty
-    int64 writeFee1KBBucketListLow;
-    // Fee per 1KB write when the bucket list has reached `bucketListTargetSizeBytes` 
-    int64 writeFee1KBBucketListHigh;
-    // Write fee multiplier for any additional data past the first `bucketListTargetSizeBytes`
-    uint32 bucketListWriteFeeGrowthFactor;
+    // Rent fee grows linearly until soroban state reaches this size
+    int64 sorobanStateTargetSizeBytes;
+    // Fee per 1KB rent when the soroban state is empty
+    int64 rentFee1KBSorobanStateSizeLow;
+    // Fee per 1KB rent when the soroban state has reached `sorobanStateTargetSizeBytes`
+    int64 rentFee1KBSorobanStateSizeHigh;
+    // Rent fee multiplier for any additional data past the first `sorobanStateTargetSizeBytes`
+    uint32 sorobanStateRentFeeGrowthFactor;
+};
+
+// Ledger access settings for contracts.
+struct ConfigSettingContractLedgerCostExtV0
+{
+    // Maximum number of RO+RW entries in the transaction footprint.
+    uint32 txMaxFootprintEntries;
+    // Fee per 1 KB of data written to the ledger.
+    // Unlike the rent fee, this is a flat fee that is charged for any ledger
+    // write, independent of the type of the entry being written.
+    int64 feeWrite1KB;
 };
 
 // Historical data (pushed to core archives) settings for contracts.
@@ -262,11 +283,11 @@ struct StateArchivalSettings {
     // max number of entries that emit archival meta in a single ledger
     uint32 maxEntriesToArchive;
 
-    // Number of snapshots to use when calculating average BucketList size
-    uint32 bucketListSizeWindowSampleSize;
+    // Number of snapshots to use when calculating average live Soroban State size
+    uint32 liveSorobanStateSizeWindowSampleSize;
 
-    // How often to sample the BucketList size for the average, in ledgers
-    uint32 bucketListWindowSamplePeriod;
+    // How often to sample the live Soroban State size for the average, in ledgers
+    uint32 liveSorobanStateSizeWindowSamplePeriod;
 
     // Maximum number of bytes that we scan for eviction per ledger
     uint32 evictionScanSize;
@@ -279,6 +300,14 @@ struct EvictionIterator {
     uint32 bucketListLevel;
     bool isCurrBucket;
     uint64 bucketFileOffset;
+};
+
+struct ConfigSettingSCPTiming {
+    uint32 ledgerTargetCloseTimeMilliseconds;
+    uint32 nominationTimeoutInitialMilliseconds;
+    uint32 nominationTimeoutIncrementMilliseconds;
+    uint32 ballotTimeoutInitialMilliseconds;
+    uint32 ballotTimeoutIncrementMilliseconds;
 };
 
 // limits the ContractCostParams size to 20kB
@@ -301,8 +330,11 @@ enum ConfigSettingID
     CONFIG_SETTING_CONTRACT_DATA_ENTRY_SIZE_BYTES = 9,
     CONFIG_SETTING_STATE_ARCHIVAL = 10,
     CONFIG_SETTING_CONTRACT_EXECUTION_LANES = 11,
-    CONFIG_SETTING_BUCKETLIST_SIZE_WINDOW = 12,
-    CONFIG_SETTING_EVICTION_ITERATOR = 13
+    CONFIG_SETTING_LIVE_SOROBAN_STATE_SIZE_WINDOW = 12,
+    CONFIG_SETTING_EVICTION_ITERATOR = 13,
+    CONFIG_SETTING_CONTRACT_PARALLEL_COMPUTE_V0 = 14,
+    CONFIG_SETTING_CONTRACT_LEDGER_COST_EXT_V0 = 15,
+    CONFIG_SETTING_SCP_TIMING = 16
 };
 
 union ConfigSettingEntry switch (ConfigSettingID configSettingID)
@@ -331,9 +363,15 @@ case CONFIG_SETTING_STATE_ARCHIVAL:
     StateArchivalSettings stateArchivalSettings;
 case CONFIG_SETTING_CONTRACT_EXECUTION_LANES:
     ConfigSettingContractExecutionLanesV0 contractExecutionLanes;
-case CONFIG_SETTING_BUCKETLIST_SIZE_WINDOW:
-    uint64 bucketListSizeWindow<>;
+case CONFIG_SETTING_LIVE_SOROBAN_STATE_SIZE_WINDOW:
+    uint64 liveSorobanStateSizeWindow<>;
 case CONFIG_SETTING_EVICTION_ITERATOR:
     EvictionIterator evictionIterator;
+case CONFIG_SETTING_CONTRACT_PARALLEL_COMPUTE_V0:
+    ConfigSettingContractParallelComputeV0 contractParallelCompute;
+case CONFIG_SETTING_CONTRACT_LEDGER_COST_EXT_V0:
+    ConfigSettingContractLedgerCostExtV0 contractLedgerCostExt;
+case CONFIG_SETTING_SCP_TIMING:
+    ConfigSettingSCPTiming contractSCPTiming;
 };
 }
