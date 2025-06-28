@@ -1469,7 +1469,7 @@ class TransactionBuilder:
         asset: Asset,
         amount: Union[str, Decimal],
         instructions: int = 400_000,
-        read_bytes: int = 1_000,
+        disk_read_bytes: int = 1_000,
         write_bytes: int = 1_000,
         resource_fee: int = 5_000_000,
         source: Optional[Union[MuxedAccount, str]] = None,
@@ -1492,7 +1492,7 @@ class TransactionBuilder:
         :param asset: The asset to send.
         :param amount: The amount of the asset to send.
         :param instructions: The instructions required to execute the contract function.
-        :param read_bytes: The read bytes required to execute the contract function.
+        :param disk_read_bytes: The disk read bytes required to execute the contract function.
         :param write_bytes: The write bytes required to execute the contract function.
         :param resource_fee: The maximum fee (in stroops) that can be paid for the
             resources consumed by the contract function, defaults to 0.5 XLM.
@@ -1625,7 +1625,7 @@ class TransactionBuilder:
             .set_resource_fee(resource_fee)
             # This is higher than actually needed, but the loss is not significant.
             # We should leave some space to handle various situations, including future contract upgrades.
-            .set_resources(instructions, read_bytes, write_bytes)
+            .set_resources(instructions, disk_read_bytes, write_bytes)
             .build()
         )
         self.set_soroban_data(soroban_data)
@@ -1635,7 +1635,7 @@ class TransactionBuilder:
         self,
         balance_owner: str,
         asset: Asset,
-        read_bytes: int = 500,
+        disk_read_bytes: int = 500,
         write_bytes: int = 500,
         resource_fee: int = 4_000_000,
         source: Optional[Union[MuxedAccount, str]] = None,
@@ -1646,7 +1646,7 @@ class TransactionBuilder:
 
         :param balance_owner: The owner of the asset, it should be the same as the `destination` address in the :func:`append_payment_to_contract_op` method.
         :param asset: The asset
-        :param read_bytes: The read bytes required to execute the function.
+        :param disk_read_bytes: The disk read bytes required to execute the function.
         :param write_bytes: The write bytes required to execute the function.
         :param resource_fee: The maximum fee (in stroops) that can be paid for the
             resources consumed by the function, defaults to 0.4 XLM.
@@ -1677,7 +1677,7 @@ class TransactionBuilder:
             .set_resource_fee(resource_fee)
             # This is higher than actually needed, but the loss is not significant.
             # We should leave some space to handle various situations, including future contract upgrades.
-            .set_resources(0, read_bytes, write_bytes)
+            .set_resources(0, disk_read_bytes, write_bytes)
             .build()
         )
         self.set_soroban_data(soroban_data)

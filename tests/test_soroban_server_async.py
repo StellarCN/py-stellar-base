@@ -905,14 +905,14 @@ class TestSorobanServer:
         }
 
         soroban_data = stellar_xdr.SorobanTransactionData(
-            ext=stellar_xdr.ExtensionPoint(0),
+            ext=stellar_xdr.SorobanTransactionDataExt(0),
             resource_fee=stellar_xdr.Int64(50000),
             resources=stellar_xdr.SorobanResources(
                 footprint=stellar_xdr.LedgerFootprint(
                     read_only=[],
                     read_write=[],
                 ),
-                read_bytes=stellar_xdr.Uint32(2),
+                disk_read_bytes=stellar_xdr.Uint32(2),
                 write_bytes=stellar_xdr.Uint32(3),
                 instructions=stellar_xdr.Uint32(4),
             ),
