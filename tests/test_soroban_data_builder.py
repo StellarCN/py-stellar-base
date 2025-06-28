@@ -5,14 +5,14 @@ from stellar_sdk.soroban_data_builder import SorobanDataBuilder
 
 class TestSorobanDataBuilder:
     empty_instance = stellar_xdr.SorobanTransactionData(
-        ext=stellar_xdr.ExtensionPoint(0),
+        ext=stellar_xdr.SorobanTransactionDataExt(0),
         resource_fee=stellar_xdr.Int64(0),
         resources=stellar_xdr.SorobanResources(
             footprint=stellar_xdr.LedgerFootprint(
                 read_only=[],
                 read_write=[],
             ),
-            read_bytes=stellar_xdr.Uint32(0),
+            disk_read_bytes=stellar_xdr.Uint32(0),
             write_bytes=stellar_xdr.Uint32(0),
             instructions=stellar_xdr.Uint32(0),
         ),
@@ -25,14 +25,14 @@ class TestSorobanDataBuilder:
 
     def test_from_xdr_object(self):
         xdr_obj = stellar_xdr.SorobanTransactionData(
-            ext=stellar_xdr.ExtensionPoint(0),
+            ext=stellar_xdr.SorobanTransactionDataExt(0),
             resource_fee=stellar_xdr.Int64(0),
             resources=stellar_xdr.SorobanResources(
                 footprint=stellar_xdr.LedgerFootprint(
                     read_only=[],
                     read_write=[],
                 ),
-                read_bytes=stellar_xdr.Uint32(2),
+                disk_read_bytes=stellar_xdr.Uint32(2),
                 write_bytes=stellar_xdr.Uint32(3),
                 instructions=stellar_xdr.Uint32(4),
             ),
@@ -44,14 +44,14 @@ class TestSorobanDataBuilder:
 
     def test_from_xdr_base64(self):
         xdr_obj = stellar_xdr.SorobanTransactionData(
-            ext=stellar_xdr.ExtensionPoint(0),
+            ext=stellar_xdr.SorobanTransactionDataExt(0),
             resource_fee=stellar_xdr.Int64(0),
             resources=stellar_xdr.SorobanResources(
                 footprint=stellar_xdr.LedgerFootprint(
                     read_only=[],
                     read_write=[],
                 ),
-                read_bytes=stellar_xdr.Uint32(2),
+                disk_read_bytes=stellar_xdr.Uint32(2),
                 write_bytes=stellar_xdr.Uint32(3),
                 instructions=stellar_xdr.Uint32(4),
             ),
@@ -69,7 +69,7 @@ class TestSorobanDataBuilder:
     def test_set_resources(self):
         data = SorobanDataBuilder().set_resources(1, 2, 3).build()
         assert data == stellar_xdr.SorobanTransactionData(
-            ext=stellar_xdr.ExtensionPoint(0),
+            ext=stellar_xdr.SorobanTransactionDataExt(0),
             resource_fee=stellar_xdr.Int64(0),
             resources=stellar_xdr.SorobanResources(
                 footprint=stellar_xdr.LedgerFootprint(
@@ -77,7 +77,7 @@ class TestSorobanDataBuilder:
                     read_write=[],
                 ),
                 instructions=stellar_xdr.Uint32(1),
-                read_bytes=stellar_xdr.Uint32(2),
+                disk_read_bytes=stellar_xdr.Uint32(2),
                 write_bytes=stellar_xdr.Uint32(3),
             ),
         )
@@ -93,14 +93,14 @@ class TestSorobanDataBuilder:
         )
         data = SorobanDataBuilder().set_read_only([ledger_key]).build()
         assert data == stellar_xdr.SorobanTransactionData(
-            ext=stellar_xdr.ExtensionPoint(0),
+            ext=stellar_xdr.SorobanTransactionDataExt(0),
             resource_fee=stellar_xdr.Int64(0),
             resources=stellar_xdr.SorobanResources(
                 footprint=stellar_xdr.LedgerFootprint(
                     read_only=[ledger_key],
                     read_write=[],
                 ),
-                read_bytes=stellar_xdr.Uint32(0),
+                disk_read_bytes=stellar_xdr.Uint32(0),
                 write_bytes=stellar_xdr.Uint32(0),
                 instructions=stellar_xdr.Uint32(0),
             ),
@@ -117,14 +117,14 @@ class TestSorobanDataBuilder:
         )
         data = SorobanDataBuilder().set_read_write([ledger_key]).build()
         assert data == stellar_xdr.SorobanTransactionData(
-            ext=stellar_xdr.ExtensionPoint(0),
+            ext=stellar_xdr.SorobanTransactionDataExt(0),
             resource_fee=stellar_xdr.Int64(0),
             resources=stellar_xdr.SorobanResources(
                 footprint=stellar_xdr.LedgerFootprint(
                     read_only=[],
                     read_write=[ledger_key],
                 ),
-                read_bytes=stellar_xdr.Uint32(0),
+                disk_read_bytes=stellar_xdr.Uint32(0),
                 write_bytes=stellar_xdr.Uint32(0),
                 instructions=stellar_xdr.Uint32(0),
             ),

@@ -6,6 +6,12 @@ Release History
 #### Update:
 - feat: add support for liquidity pool and claimable balance strkeys.
 
+#### Breaking changes
+- refactor!: rename `read_bytes` to `disk_read_bytes` in `SorobanDataBuilder` and related methods.
+  - In `SorobanDataBuilder`, all occurrences of `read_bytes` have been replaced with `disk_read_bytes`. This includes method names, variable names, etc.
+  - `TransactionBuilder.append_payment_to_contract_op` now uses `disk_read_bytes` instead of `read_bytes` in its function signature.
+  - `TransactionBuilder.append_restore_asset_balance_entry_op` now uses `disk_read_bytes` instead of `read_bytes` in its function signature.
+
 ### Version 12.3.0
 
 Released on June 05, 2025
