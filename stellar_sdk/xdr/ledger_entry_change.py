@@ -28,6 +28,8 @@ class LedgerEntryChange:
             LedgerKey removed;
         case LEDGER_ENTRY_STATE:
             LedgerEntry state;
+        case LEDGER_ENTRY_RESTORED:
+            LedgerEntry restored;
         };
     """
 
@@ -38,12 +40,14 @@ class LedgerEntryChange:
         updated: Optional[LedgerEntry] = None,
         removed: Optional[LedgerKey] = None,
         state: Optional[LedgerEntry] = None,
+        restored: Optional[LedgerEntry] = None,
     ) -> None:
         self.type = type
         self.created = created
         self.updated = updated
         self.removed = removed
         self.state = state
+        self.restored = restored
 
     def pack(self, packer: Packer) -> None:
         self.type.pack(packer)
@@ -67,6 +71,11 @@ class LedgerEntryChange:
                 raise ValueError("state should not be None.")
             self.state.pack(packer)
             return
+        if self.type == LedgerEntryChangeType.LEDGER_ENTRY_RESTORED:
+            if self.restored is None:
+                raise ValueError("restored should not be None.")
+            self.restored.pack(packer)
+            return
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> LedgerEntryChange:
@@ -83,6 +92,9 @@ class LedgerEntryChange:
         if type == LedgerEntryChangeType.LEDGER_ENTRY_STATE:
             state = LedgerEntry.unpack(unpacker)
             return cls(type=type, state=state)
+        if type == LedgerEntryChangeType.LEDGER_ENTRY_RESTORED:
+            restored = LedgerEntry.unpack(unpacker)
+            return cls(type=type, restored=restored)
         return cls(type=type)
 
     def to_xdr_bytes(self) -> bytes:
@@ -112,6 +124,7 @@ class LedgerEntryChange:
                 self.updated,
                 self.removed,
                 self.state,
+                self.restored,
             )
         )
 
@@ -124,6 +137,7 @@ class LedgerEntryChange:
             and self.updated == other.updated
             and self.removed == other.removed
             and self.state == other.state
+            and self.restored == other.restored
         )
 
     def __repr__(self):
@@ -133,4 +147,5 @@ class LedgerEntryChange:
         out.append(f"updated={self.updated}") if self.updated is not None else None
         out.append(f"removed={self.removed}") if self.removed is not None else None
         out.append(f"state={self.state}") if self.state is not None else None
+        out.append(f"restored={self.restored}") if self.restored is not None else None
         return f"<LedgerEntryChange [{', '.join(out)}]>"

@@ -90,13 +90,12 @@ class SCVal:
 
         // Special SCVals reserved for system-constructed contract-data
         // ledger keys, not generally usable elsewhere.
+        case SCV_CONTRACT_INSTANCE:
+            SCContractInstance instance;
         case SCV_LEDGER_KEY_CONTRACT_INSTANCE:
             void;
         case SCV_LEDGER_KEY_NONCE:
             SCNonceKey nonce_key;
-
-        case SCV_CONTRACT_INSTANCE:
-            SCContractInstance instance;
         };
     """
 
@@ -121,8 +120,8 @@ class SCVal:
         vec: Optional[Optional[SCVec]] = None,
         map: Optional[Optional[SCMap]] = None,
         address: Optional[SCAddress] = None,
-        nonce_key: Optional[SCNonceKey] = None,
         instance: Optional[SCContractInstance] = None,
+        nonce_key: Optional[SCNonceKey] = None,
     ) -> None:
         self.type = type
         self.b = b
@@ -143,8 +142,8 @@ class SCVal:
         self.vec = vec
         self.map = map
         self.address = address
-        self.nonce_key = nonce_key
         self.instance = instance
+        self.nonce_key = nonce_key
 
     def pack(self, packer: Packer) -> None:
         self.type.pack(packer)
@@ -248,17 +247,17 @@ class SCVal:
                 raise ValueError("address should not be None.")
             self.address.pack(packer)
             return
+        if self.type == SCValType.SCV_CONTRACT_INSTANCE:
+            if self.instance is None:
+                raise ValueError("instance should not be None.")
+            self.instance.pack(packer)
+            return
         if self.type == SCValType.SCV_LEDGER_KEY_CONTRACT_INSTANCE:
             return
         if self.type == SCValType.SCV_LEDGER_KEY_NONCE:
             if self.nonce_key is None:
                 raise ValueError("nonce_key should not be None.")
             self.nonce_key.pack(packer)
-            return
-        if self.type == SCValType.SCV_CONTRACT_INSTANCE:
-            if self.instance is None:
-                raise ValueError("instance should not be None.")
-            self.instance.pack(packer)
             return
 
     @classmethod
@@ -354,6 +353,11 @@ class SCVal:
 
             address = SCAddress.unpack(unpacker)
             return cls(type=type, address=address)
+        if type == SCValType.SCV_CONTRACT_INSTANCE:
+            from .sc_contract_instance import SCContractInstance
+
+            instance = SCContractInstance.unpack(unpacker)
+            return cls(type=type, instance=instance)
         if type == SCValType.SCV_LEDGER_KEY_CONTRACT_INSTANCE:
             return cls(type=type)
         if type == SCValType.SCV_LEDGER_KEY_NONCE:
@@ -361,11 +365,6 @@ class SCVal:
 
             nonce_key = SCNonceKey.unpack(unpacker)
             return cls(type=type, nonce_key=nonce_key)
-        if type == SCValType.SCV_CONTRACT_INSTANCE:
-            from .sc_contract_instance import SCContractInstance
-
-            instance = SCContractInstance.unpack(unpacker)
-            return cls(type=type, instance=instance)
         return cls(type=type)
 
     def to_xdr_bytes(self) -> bytes:
@@ -409,8 +408,8 @@ class SCVal:
                 self.vec,
                 self.map,
                 self.address,
-                self.nonce_key,
                 self.instance,
+                self.nonce_key,
             )
         )
 
@@ -437,8 +436,8 @@ class SCVal:
             and self.vec == other.vec
             and self.map == other.map
             and self.address == other.address
-            and self.nonce_key == other.nonce_key
             and self.instance == other.instance
+            and self.nonce_key == other.nonce_key
         )
 
     def __repr__(self):
@@ -466,10 +465,10 @@ class SCVal:
         out.append(f"vec={self.vec}") if self.vec is not None else None
         out.append(f"map={self.map}") if self.map is not None else None
         out.append(f"address={self.address}") if self.address is not None else None
+        out.append(f"instance={self.instance}") if self.instance is not None else None
         (
             out.append(f"nonce_key={self.nonce_key}")
             if self.nonce_key is not None
             else None
         )
-        out.append(f"instance={self.instance}") if self.instance is not None else None
         return f"<SCVal [{', '.join(out)}]>"

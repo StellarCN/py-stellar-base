@@ -44,6 +44,7 @@ class SCSpecTypeDef:
         case SC_SPEC_TYPE_STRING:
         case SC_SPEC_TYPE_SYMBOL:
         case SC_SPEC_TYPE_ADDRESS:
+        case SC_SPEC_TYPE_MUXED_ADDRESS:
             void;
         case SC_SPEC_TYPE_OPTION:
             SCSpecTypeOption option;
@@ -120,6 +121,8 @@ class SCSpecTypeDef:
             return
         if self.type == SCSpecType.SC_SPEC_TYPE_ADDRESS:
             return
+        if self.type == SCSpecType.SC_SPEC_TYPE_MUXED_ADDRESS:
+            return
         if self.type == SCSpecType.SC_SPEC_TYPE_OPTION:
             if self.option is None:
                 raise ValueError("option should not be None.")
@@ -194,6 +197,8 @@ class SCSpecTypeDef:
         if type == SCSpecType.SC_SPEC_TYPE_SYMBOL:
             return cls(type=type)
         if type == SCSpecType.SC_SPEC_TYPE_ADDRESS:
+            return cls(type=type)
+        if type == SCSpecType.SC_SPEC_TYPE_MUXED_ADDRESS:
             return cls(type=type)
         if type == SCSpecType.SC_SPEC_TYPE_OPTION:
             from .sc_spec_type_option import SCSpecTypeOption

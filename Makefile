@@ -31,14 +31,15 @@ XDRS = xdr/Stellar-SCP.x \
        xdr/Stellar-contract-spec.x \
        xdr/Stellar-contract.x \
        xdr/Stellar-internal.x \
-       xdr/Stellar-contract-config-setting.x
+       xdr/Stellar-contract-config-setting.x \
+       xdr/Stellar-exporter.x
 
 # XDR Generator (xdrgen) repository and commit hash
 XDRGEN_REPO = overcat/xdrgen
 XDRGEN_COMMIT = e3f9c308d55325853ade3e4f12ceb350b368c5fc
 
 # Stellar XDR definitions repository commit hash
-XDR_COMMIT = 529d5176f24c73eeccfa5eba481d4e89c19b1181
+XDR_COMMIT = 4b7a2ef7931ab2ca2499be68d849f38190b443ca
 
 # Command prefix for running Python tools with uv
 UV_RUN_CMD = uv run --frozen --all-extras

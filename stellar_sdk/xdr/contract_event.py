@@ -9,8 +9,8 @@ from xdrlib3 import Packer, Unpacker
 
 from .contract_event_body import ContractEventBody
 from .contract_event_type import ContractEventType
+from .contract_id import ContractID
 from .extension_point import ExtensionPoint
-from .hash import Hash
 
 __all__ = ["ContractEvent"]
 
@@ -25,7 +25,7 @@ class ContractEvent:
             // is first, to change ContractEvent into a union.
             ExtensionPoint ext;
 
-            Hash* contractID;
+            ContractID* contractID;
             ContractEventType type;
 
             union switch (int v)
@@ -44,7 +44,7 @@ class ContractEvent:
     def __init__(
         self,
         ext: ExtensionPoint,
-        contract_id: Optional[Hash],
+        contract_id: Optional[ContractID],
         type: ContractEventType,
         body: ContractEventBody,
     ) -> None:
@@ -66,7 +66,7 @@ class ContractEvent:
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> ContractEvent:
         ext = ExtensionPoint.unpack(unpacker)
-        contract_id = Hash.unpack(unpacker) if unpacker.unpack_uint() else None
+        contract_id = ContractID.unpack(unpacker) if unpacker.unpack_uint() else None
         type = ContractEventType.unpack(unpacker)
         body = ContractEventBody.unpack(unpacker)
         return cls(
