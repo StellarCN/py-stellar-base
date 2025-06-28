@@ -3,6 +3,9 @@ Release History
 
 ### Pending
 
+#### Update:
+- feat: add support for liquidity pool and claimable balance strkeys.
+
 ### Version 12.3.0
 
 Released on June 05, 2025
