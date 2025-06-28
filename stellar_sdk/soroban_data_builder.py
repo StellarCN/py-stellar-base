@@ -20,14 +20,14 @@ class SorobanDataBuilder:
 
     def __init__(self):
         self._data = stellar_xdr.SorobanTransactionData(
-            ext=stellar_xdr.ExtensionPoint(0),
+            ext=stellar_xdr.SorobanTransactionDataExt(0),
             resource_fee=stellar_xdr.Int64(0),
             resources=stellar_xdr.SorobanResources(
                 footprint=stellar_xdr.LedgerFootprint(
                     read_only=[],
                     read_write=[],
                 ),
-                read_bytes=stellar_xdr.Uint32(0),
+                disk_read_bytes=stellar_xdr.Uint32(0),
                 write_bytes=stellar_xdr.Uint32(0),
                 instructions=stellar_xdr.Uint32(0),
             ),
@@ -83,7 +83,7 @@ class SorobanDataBuilder:
         return self
 
     def set_resources(
-        self, instructions: int, read_bytes: int, write_bytes: int
+        self, instructions: int, disk_read_bytes: int, write_bytes: int
     ) -> SorobanDataBuilder:
         """Sets up the resource metrics.
 
@@ -91,12 +91,12 @@ class SorobanDataBuilder:
         by transaction simulation/preflight from a Soroban RPC server.
 
         :param instructions: Number of CPU instructions (uint32)
-        :param read_bytes: Number of bytes being read (uint32)
-        :param write_bytes: Number of bytes being written (uint32)
+        :param disk_read_bytes: Number of bytes being read from disk (uint32)
+        :param write_bytes: Number of bytes being written to disk and memory (uint32)
         :return: This builder.
         """
         self._data.resources.instructions = stellar_xdr.Uint32(instructions)
-        self._data.resources.read_bytes = stellar_xdr.Uint32(read_bytes)
+        self._data.resources.disk_read_bytes = stellar_xdr.Uint32(disk_read_bytes)
         self._data.resources.write_bytes = stellar_xdr.Uint32(write_bytes)
         return self
 
