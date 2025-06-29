@@ -56,7 +56,7 @@ class TestMuxedAccount:
 
     def test_from_account_invalid_account_raise(self):
         invalid_account = "A" * 100
-        with pytest.raises(ValueError, match="Invalid Med25519 Public Key"):
+        with pytest.raises(ValueError, match="This is not a valid account"):
             MuxedAccount.from_account(invalid_account)
 
     def test_set_account_muxed_raise(self):

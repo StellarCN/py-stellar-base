@@ -93,7 +93,7 @@ class MuxedAccount:
         if StrKey.is_valid_ed25519_public_key(account):
             # If the account is a valid ed25519 public key, return a MuxedAccount with no muxed id.
             return cls(account_id=account, account_muxed_id=None)
-        else:
+        elif StrKey.is_valid_med25519_public_key(account):
             raw_bytes = StrKey.decode_med25519_public_key(account)
             muxed = stellar_xdr.MuxedAccountMed25519(
                 id=stellar_xdr.Uint64.from_xdr_bytes(raw_bytes[-8:]),
@@ -102,6 +102,8 @@ class MuxedAccount:
             account_id = StrKey.encode_ed25519_public_key(muxed.ed25519.uint256)
             account_muxed_id = muxed.id.uint64
             return cls(account_id=account_id, account_muxed_id=account_muxed_id)
+        else:
+            raise ValueError(f"This is not a valid account: {account}")
 
     def to_xdr_object(self) -> stellar_xdr.MuxedAccount:
         """Returns the xdr object for this MuxedAccount object.
