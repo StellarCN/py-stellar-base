@@ -1,6 +1,7 @@
 import base64
 import binascii
 import struct
+import warnings
 from enum import Enum
 
 from xdrlib3 import Packer, Unpacker
@@ -20,7 +21,7 @@ class _VersionByte(Enum):
     ED25519_SECRET_SEED = binascii.a2b_hex("90")  # S 144 18 << 3
     PRE_AUTH_TX = binascii.a2b_hex("98")  # T 152 19 << 3
     SHA256_HASH = binascii.a2b_hex("b8")  # X 184 23 << 3
-    MUXED_ACCOUNT = binascii.a2b_hex("60")  # M 96 12 << 3
+    MED25519_PUBLIC_KEY = binascii.a2b_hex("60")  # M 96 12 << 3
     ED25519_SIGNED_PAYLOAD = binascii.a2b_hex("78")  # P 120 15 << 3
     CONTRACT = binascii.a2b_hex("10")  # C 16 2 << 3
     LIQUIDITY_POOL = binascii.a2b_hex("58")  # L 88 11 << 3
@@ -57,7 +58,7 @@ class StrKey:
 
     @staticmethod
     def is_valid_ed25519_public_key(public_key: str) -> bool:
-        """Returns ``True`` if the given `seed` is a valid ed25519 public key strkey (G...).
+        """Returns ``True`` if the given `public_key` is a valid ed25519 public key strkey (G...).
 
         :param public_key: encoded ed25519 public key strkey
         :return: ``True`` if the given key is valid
@@ -175,6 +176,11 @@ class StrKey:
         :raises:
             :exc:`ValueError <stellar_sdk.exceptions.ValueError>`
         """
+        warnings.warn(
+            "The `encode_muxed_account` method is deprecated, use `stellar_sdk.MuxedAccount` instead.",
+            DeprecationWarning,
+        )
+
         if data.type == stellar_xdr.CryptoKeyType.KEY_TYPE_ED25519:
             assert data.ed25519 is not None
             return StrKey.encode_ed25519_public_key(data.ed25519.uint256)
@@ -183,7 +189,7 @@ class StrKey:
         packer = Packer()
         data.med25519.ed25519.pack(packer)
         data.med25519.id.pack(packer)
-        return _encode_check(_VersionByte.MUXED_ACCOUNT, packer.get_buffer())
+        return _encode_check(_VersionByte.MED25519_PUBLIC_KEY, packer.get_buffer())
 
     @staticmethod
     def decode_muxed_account(data: str) -> stellar_xdr.MuxedAccount:
@@ -194,6 +200,11 @@ class StrKey:
         :raises:
             :exc:`ValueError <stellar_sdk.exceptions.ValueError>`
         """
+        warnings.warn(
+            "The `decode_muxed_account` method is deprecated, use `stellar_sdk.MuxedAccount` instead.",
+            DeprecationWarning,
+        )
+
         data_length = len(data)
         if data_length == 56:
             muxed = stellar_xdr.MuxedAccount(
@@ -203,7 +214,7 @@ class StrKey:
         elif data_length == 69:
             # let's optimize it in v3.
             try:
-                xdr_bytes = _decode_check(_VersionByte.MUXED_ACCOUNT, data)
+                xdr_bytes = _decode_check(_VersionByte.MED25519_PUBLIC_KEY, data)
             except Exception:
                 raise MuxedEd25519AccountInvalidError(
                     "Invalid Muxed Account: {}".format(data)
@@ -222,6 +233,40 @@ class StrKey:
         else:
             raise ValueError("Invalid encoded string, this is not a valid account.")
         return muxed
+
+    @staticmethod
+    def encode_med25519_public_key(data: bytes) -> str:
+        """Encodes data to encoded med25519 public key strkey (M...).
+
+        :param data: data to encode, should be 40 bytes long (32 bytes for ed25519 public key + 8 bytes for muxed id)
+        :return: encoded med25519 public key strkey
+        :raises:
+            :exc:`ValueError <stellar_sdk.exceptions.ValueError>`
+        """
+        return _encode_check(_VersionByte.MED25519_PUBLIC_KEY, data)
+
+    @staticmethod
+    def decode_med25519_public_key(data: str) -> bytes:
+        """Decodes encoded med25519 public key strkey (M...) to raw data.
+
+        :param data: encoded med25519 public key strkey
+        :return: raw bytes
+        :raises:
+            :exc:`ValueError <stellar_sdk.exceptions.ValueError>`
+        """
+        try:
+            return _decode_check(_VersionByte.MED25519_PUBLIC_KEY, data)
+        except Exception:
+            raise ValueError(f"Invalid Med25519 Public Key: {data}")
+
+    @staticmethod
+    def is_valid_med25519_public_key(public_key: str) -> bool:
+        """Returns ``True`` if the given `public_key` is a valid med25519 public key strkey (G...).
+
+        :param public_key: encoded med25519 public key strkey
+        :return: ``True`` if the given key is valid
+        """
+        return _is_valid(_VersionByte.MED25519_PUBLIC_KEY, public_key)
 
     @staticmethod
     def encode_ed25519_signed_payload(data: bytes) -> str:
@@ -385,7 +430,7 @@ def _decode_check(version_byte: _VersionByte, encoded: str) -> bytes:
     if version_byte == _VersionByte.ED25519_SIGNED_PAYLOAD:
         if len(data) < 32 + 4 + 4 or len(data) > 32 + 4 + 64:
             raise ValueError(f"Invalid length: {encoded}")
-    elif version_byte == _VersionByte.MUXED_ACCOUNT:
+    elif version_byte == _VersionByte.MED25519_PUBLIC_KEY:
         if len(data) != 32 + 8:
             raise ValueError(f"Invalid length: {encoded}")
     elif version_byte == _VersionByte.CLAIMABLE_BALANCE:
