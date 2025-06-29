@@ -25,7 +25,6 @@ class HotArchiveBucketEntry:
             LedgerEntry archivedEntry;
 
         case HOT_ARCHIVE_LIVE:
-        case HOT_ARCHIVE_DELETED:
             LedgerKey key;
         case HOT_ARCHIVE_METAENTRY:
             BucketMetadata metaEntry;
@@ -56,11 +55,6 @@ class HotArchiveBucketEntry:
                 raise ValueError("key should not be None.")
             self.key.pack(packer)
             return
-        if self.type == HotArchiveBucketEntryType.HOT_ARCHIVE_DELETED:
-            if self.key is None:
-                raise ValueError("key should not be None.")
-            self.key.pack(packer)
-            return
         if self.type == HotArchiveBucketEntryType.HOT_ARCHIVE_METAENTRY:
             if self.meta_entry is None:
                 raise ValueError("meta_entry should not be None.")
@@ -74,9 +68,6 @@ class HotArchiveBucketEntry:
             archived_entry = LedgerEntry.unpack(unpacker)
             return cls(type=type, archived_entry=archived_entry)
         if type == HotArchiveBucketEntryType.HOT_ARCHIVE_LIVE:
-            key = LedgerKey.unpack(unpacker)
-            return cls(type=type, key=key)
-        if type == HotArchiveBucketEntryType.HOT_ARCHIVE_DELETED:
             key = LedgerKey.unpack(unpacker)
             return cls(type=type, key=key)
         if type == HotArchiveBucketEntryType.HOT_ARCHIVE_METAENTRY:

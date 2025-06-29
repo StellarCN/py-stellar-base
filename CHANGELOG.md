@@ -3,6 +3,19 @@ Release History
 
 ### Pending
 
+#### Update:
+- feat: add support for liquidity pool and claimable balance strkeys.
+- feat: add `encode_med25519_public_key`, `decode_med25519_public_key` and `is_valid_med25519_public_key` functions to `stellar_sdk.StrKey`.
+- feat: add muxed account, liquidity pool and claimable balance support to `stellar_sdk.Address`.
+
+#### Breaking changes
+- refactor!: rename `read_bytes` to `disk_read_bytes` in `SorobanDataBuilder` and related methods.
+  - In `SorobanDataBuilder`, all occurrences of `read_bytes` have been replaced with `disk_read_bytes`. This includes method names, variable names, etc.
+  - `TransactionBuilder.append_payment_to_contract_op` now uses `disk_read_bytes` instead of `read_bytes` in its function signature.
+  - `TransactionBuilder.append_restore_asset_balance_entry_op` now uses `disk_read_bytes` instead of `read_bytes` in its function signature.
+- refactor!: `StrKey.decode_muxed_account` and `StrKey.encode_muxed_account` have been marked as deprecated, please use `stellar_sdk.MuxedAccount` instead. They will be removed in the next major release.
+- refactor!: when an invalid account ID is passed into the `MuxedAccount.from_account`, it raises a `ValueError` now. 
+
 ### Version 12.3.0
 
 Released on June 05, 2025

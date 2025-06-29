@@ -6,9 +6,9 @@ import base64
 
 from xdrlib3 import Packer, Unpacker
 
-from .extension_point import ExtensionPoint
 from .int64 import Int64
 from .soroban_resources import SorobanResources
+from .soroban_transaction_data_ext import SorobanTransactionDataExt
 
 __all__ = ["SorobanTransactionData"]
 
@@ -19,7 +19,13 @@ class SorobanTransactionData:
 
         struct SorobanTransactionData
         {
-            ExtensionPoint ext;
+            union switch (int v)
+            {
+            case 0:
+                void;
+            case 1:
+                SorobanResourcesExtV0 resourceExt;
+            } ext;
             SorobanResources resources;
             // Amount of the transaction `fee` allocated to the Soroban resource fees.
             // The fraction of `resourceFee` corresponding to `resources` specified
@@ -36,7 +42,7 @@ class SorobanTransactionData:
 
     def __init__(
         self,
-        ext: ExtensionPoint,
+        ext: SorobanTransactionDataExt,
         resources: SorobanResources,
         resource_fee: Int64,
     ) -> None:
@@ -51,7 +57,7 @@ class SorobanTransactionData:
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> SorobanTransactionData:
-        ext = ExtensionPoint.unpack(unpacker)
+        ext = SorobanTransactionDataExt.unpack(unpacker)
         resources = SorobanResources.unpack(unpacker)
         resource_fee = Int64.unpack(unpacker)
         return cls(

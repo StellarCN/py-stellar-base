@@ -56,7 +56,7 @@ class TestMuxedAccount:
 
     def test_from_account_invalid_account_raise(self):
         invalid_account = "A" * 100
-        with pytest.raises(ValueError, match="This is not a valid account."):
+        with pytest.raises(ValueError, match="This is not a valid account"):
             MuxedAccount.from_account(invalid_account)
 
     def test_set_account_muxed_raise(self):
@@ -71,3 +71,12 @@ class TestMuxedAccount:
             muxed_account.account_muxed = (
                 "MAQAA5L65LSYH7CQ3VTJ7F3HHLGCL3DSLAR2Y47263D56MNNGHSQSAAAAAAAAAAE2LP26"
             )
+
+    def test_account_muxed_id_is_negative_raise(self):
+        account_id = "GAQAA5L65LSYH7CQ3VTJ7F3HHLGCL3DSLAR2Y47263D56MNNGHSQSTVY"
+        account_id_id = -1
+        with pytest.raises(
+            ValueError,
+            match="`account_muxed_id` must be a non-negative integer if provided.",
+        ):
+            MuxedAccount(account_id, account_id_id)

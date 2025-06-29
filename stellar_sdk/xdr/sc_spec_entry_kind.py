@@ -20,7 +20,8 @@ class SCSpecEntryKind(IntEnum):
             SC_SPEC_ENTRY_UDT_STRUCT_V0 = 1,
             SC_SPEC_ENTRY_UDT_UNION_V0 = 2,
             SC_SPEC_ENTRY_UDT_ENUM_V0 = 3,
-            SC_SPEC_ENTRY_UDT_ERROR_ENUM_V0 = 4
+            SC_SPEC_ENTRY_UDT_ERROR_ENUM_V0 = 4,
+            SC_SPEC_ENTRY_EVENT_V0 = 5
         };
     """
 
@@ -29,6 +30,7 @@ class SCSpecEntryKind(IntEnum):
     SC_SPEC_ENTRY_UDT_UNION_V0 = 2
     SC_SPEC_ENTRY_UDT_ENUM_V0 = 3
     SC_SPEC_ENTRY_UDT_ERROR_ENUM_V0 = 4
+    SC_SPEC_ENTRY_EVENT_V0 = 5
 
     def pack(self, packer: Packer) -> None:
         packer.pack_int(self.value)

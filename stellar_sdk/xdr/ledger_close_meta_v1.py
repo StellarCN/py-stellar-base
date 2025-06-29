@@ -43,16 +43,15 @@ class LedgerCloseMetaV1:
             // other misc information attached to the ledger close
             SCPHistoryEntry scpInfo<>;
 
-            // Size in bytes of BucketList, to support downstream
+            // Size in bytes of live Soroban state, to support downstream
             // systems calculating storage fees correctly.
-            uint64 totalByteSizeOfBucketList;
+            uint64 totalByteSizeOfLiveSorobanState;
 
-            // Temp keys that are being evicted at this ledger.
-            LedgerKey evictedTemporaryLedgerKeys<>;
+            // TTL and data/code keys that have been evicted at this ledger.
+            LedgerKey evictedKeys<>;
 
-            // Archived restorable ledger entries that are being
-            // evicted at this ledger.
-            LedgerEntry evictedPersistentLedgerEntries<>;
+            // Maintained for backwards compatibility, should never be populated.
+            LedgerEntry unused<>;
         };
     """
 
@@ -64,9 +63,9 @@ class LedgerCloseMetaV1:
         tx_processing: List[TransactionResultMeta],
         upgrades_processing: List[UpgradeEntryMeta],
         scp_info: List[SCPHistoryEntry],
-        total_byte_size_of_bucket_list: Uint64,
-        evicted_temporary_ledger_keys: List[LedgerKey],
-        evicted_persistent_ledger_entries: List[LedgerEntry],
+        total_byte_size_of_live_soroban_state: Uint64,
+        evicted_keys: List[LedgerKey],
+        unused: List[LedgerEntry],
     ) -> None:
         _expect_max_length = 4294967295
         if tx_processing and len(tx_processing) > _expect_max_length:
@@ -84,20 +83,14 @@ class LedgerCloseMetaV1:
                 f"The maximum length of `scp_info` should be {_expect_max_length}, but got {len(scp_info)}."
             )
         _expect_max_length = 4294967295
-        if (
-            evicted_temporary_ledger_keys
-            and len(evicted_temporary_ledger_keys) > _expect_max_length
-        ):
+        if evicted_keys and len(evicted_keys) > _expect_max_length:
             raise ValueError(
-                f"The maximum length of `evicted_temporary_ledger_keys` should be {_expect_max_length}, but got {len(evicted_temporary_ledger_keys)}."
+                f"The maximum length of `evicted_keys` should be {_expect_max_length}, but got {len(evicted_keys)}."
             )
         _expect_max_length = 4294967295
-        if (
-            evicted_persistent_ledger_entries
-            and len(evicted_persistent_ledger_entries) > _expect_max_length
-        ):
+        if unused and len(unused) > _expect_max_length:
             raise ValueError(
-                f"The maximum length of `evicted_persistent_ledger_entries` should be {_expect_max_length}, but got {len(evicted_persistent_ledger_entries)}."
+                f"The maximum length of `unused` should be {_expect_max_length}, but got {len(unused)}."
             )
         self.ext = ext
         self.ledger_header = ledger_header
@@ -105,9 +98,11 @@ class LedgerCloseMetaV1:
         self.tx_processing = tx_processing
         self.upgrades_processing = upgrades_processing
         self.scp_info = scp_info
-        self.total_byte_size_of_bucket_list = total_byte_size_of_bucket_list
-        self.evicted_temporary_ledger_keys = evicted_temporary_ledger_keys
-        self.evicted_persistent_ledger_entries = evicted_persistent_ledger_entries
+        self.total_byte_size_of_live_soroban_state = (
+            total_byte_size_of_live_soroban_state
+        )
+        self.evicted_keys = evicted_keys
+        self.unused = unused
 
     def pack(self, packer: Packer) -> None:
         self.ext.pack(packer)
@@ -122,15 +117,13 @@ class LedgerCloseMetaV1:
         packer.pack_uint(len(self.scp_info))
         for scp_info_item in self.scp_info:
             scp_info_item.pack(packer)
-        self.total_byte_size_of_bucket_list.pack(packer)
-        packer.pack_uint(len(self.evicted_temporary_ledger_keys))
-        for evicted_temporary_ledger_keys_item in self.evicted_temporary_ledger_keys:
-            evicted_temporary_ledger_keys_item.pack(packer)
-        packer.pack_uint(len(self.evicted_persistent_ledger_entries))
-        for (
-            evicted_persistent_ledger_entries_item
-        ) in self.evicted_persistent_ledger_entries:
-            evicted_persistent_ledger_entries_item.pack(packer)
+        self.total_byte_size_of_live_soroban_state.pack(packer)
+        packer.pack_uint(len(self.evicted_keys))
+        for evicted_keys_item in self.evicted_keys:
+            evicted_keys_item.pack(packer)
+        packer.pack_uint(len(self.unused))
+        for unused_item in self.unused:
+            unused_item.pack(packer)
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> LedgerCloseMetaV1:
@@ -149,15 +142,15 @@ class LedgerCloseMetaV1:
         scp_info = []
         for _ in range(length):
             scp_info.append(SCPHistoryEntry.unpack(unpacker))
-        total_byte_size_of_bucket_list = Uint64.unpack(unpacker)
+        total_byte_size_of_live_soroban_state = Uint64.unpack(unpacker)
         length = unpacker.unpack_uint()
-        evicted_temporary_ledger_keys = []
+        evicted_keys = []
         for _ in range(length):
-            evicted_temporary_ledger_keys.append(LedgerKey.unpack(unpacker))
+            evicted_keys.append(LedgerKey.unpack(unpacker))
         length = unpacker.unpack_uint()
-        evicted_persistent_ledger_entries = []
+        unused = []
         for _ in range(length):
-            evicted_persistent_ledger_entries.append(LedgerEntry.unpack(unpacker))
+            unused.append(LedgerEntry.unpack(unpacker))
         return cls(
             ext=ext,
             ledger_header=ledger_header,
@@ -165,9 +158,9 @@ class LedgerCloseMetaV1:
             tx_processing=tx_processing,
             upgrades_processing=upgrades_processing,
             scp_info=scp_info,
-            total_byte_size_of_bucket_list=total_byte_size_of_bucket_list,
-            evicted_temporary_ledger_keys=evicted_temporary_ledger_keys,
-            evicted_persistent_ledger_entries=evicted_persistent_ledger_entries,
+            total_byte_size_of_live_soroban_state=total_byte_size_of_live_soroban_state,
+            evicted_keys=evicted_keys,
+            unused=unused,
         )
 
     def to_xdr_bytes(self) -> bytes:
@@ -198,9 +191,9 @@ class LedgerCloseMetaV1:
                 self.tx_processing,
                 self.upgrades_processing,
                 self.scp_info,
-                self.total_byte_size_of_bucket_list,
-                self.evicted_temporary_ledger_keys,
-                self.evicted_persistent_ledger_entries,
+                self.total_byte_size_of_live_soroban_state,
+                self.evicted_keys,
+                self.unused,
             )
         )
 
@@ -214,12 +207,10 @@ class LedgerCloseMetaV1:
             and self.tx_processing == other.tx_processing
             and self.upgrades_processing == other.upgrades_processing
             and self.scp_info == other.scp_info
-            and self.total_byte_size_of_bucket_list
-            == other.total_byte_size_of_bucket_list
-            and self.evicted_temporary_ledger_keys
-            == other.evicted_temporary_ledger_keys
-            and self.evicted_persistent_ledger_entries
-            == other.evicted_persistent_ledger_entries
+            and self.total_byte_size_of_live_soroban_state
+            == other.total_byte_size_of_live_soroban_state
+            and self.evicted_keys == other.evicted_keys
+            and self.unused == other.unused
         )
 
     def __repr__(self):
@@ -230,8 +221,8 @@ class LedgerCloseMetaV1:
             f"tx_processing={self.tx_processing}",
             f"upgrades_processing={self.upgrades_processing}",
             f"scp_info={self.scp_info}",
-            f"total_byte_size_of_bucket_list={self.total_byte_size_of_bucket_list}",
-            f"evicted_temporary_ledger_keys={self.evicted_temporary_ledger_keys}",
-            f"evicted_persistent_ledger_entries={self.evicted_persistent_ledger_entries}",
+            f"total_byte_size_of_live_soroban_state={self.total_byte_size_of_live_soroban_state}",
+            f"evicted_keys={self.evicted_keys}",
+            f"unused={self.unused}",
         ]
         return f"<LedgerCloseMetaV1 [{', '.join(out)}]>"
