@@ -39,7 +39,7 @@ classifiers = [
     "Topic :: Software Development :: Libraries :: Python Modules",
     "Typing :: Typed",
 ]
-requires-python = ">=3.8,<4.0"
+requires-python = ">=3.9,<4.0"
 dependencies = [
     "mnemonic>=0.20",
     "pydantic>=2.0.0",
