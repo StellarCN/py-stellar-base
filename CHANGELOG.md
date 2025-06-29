@@ -6,6 +6,7 @@ Release History
 #### Update:
 - feat: add support for liquidity pool and claimable balance strkeys.
 - feat: add `encode_med25519_public_key`, `decode_med25519_public_key` and `is_valid_med25519_public_key` functions to `stellar_sdk.StrKey`.
+- feat: add muxed account, liquidity pool and claimable balance support to `stellar_sdk.Address`.
 
 #### Breaking changes
 - refactor!: rename `read_bytes` to `disk_read_bytes` in `SorobanDataBuilder` and related methods.
