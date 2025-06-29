@@ -155,7 +155,7 @@ class Address:
             )
         elif self.type == AddressType.CLAIMABLE_BALANCE:
             # See https://github.com/stellar/stellar-protocol/pull/1646/files#r1974431825
-            claimable_balance_type = int.from_bytes(self.key[:1])
+            claimable_balance_type = int.from_bytes(self.key[:1], byteorder="big")
             claimable_balance_id = stellar_xdr.ClaimableBalanceID(
                 stellar_xdr.ClaimableBalanceIDType(claimable_balance_type),
                 v0=stellar_xdr.Hash.from_xdr_bytes(self.key[1:]),
