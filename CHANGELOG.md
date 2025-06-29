@@ -13,6 +13,7 @@ Release History
   - `TransactionBuilder.append_payment_to_contract_op` now uses `disk_read_bytes` instead of `read_bytes` in its function signature.
   - `TransactionBuilder.append_restore_asset_balance_entry_op` now uses `disk_read_bytes` instead of `read_bytes` in its function signature.
 - refactor!: `StrKey.decode_muxed_account` and `StrKey.encode_muxed_account` have been marked as deprecated, please use `stellar_sdk.MuxedAccount` instead. They will be removed in the next major release.
+- refactor!: when an invalid account ID is passed into the `MuxedAccount.from_account`, it raises a `ValueError` now. 
 
 ### Version 12.3.0
 
