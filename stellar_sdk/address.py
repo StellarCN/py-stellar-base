@@ -155,9 +155,12 @@ class Address:
             )
         elif self.type == AddressType.CLAIMABLE_BALANCE:
             # See https://github.com/stellar/stellar-protocol/pull/1646/files#r1974431825
-            claimable_balance_type = int.from_bytes(self.key[:1], byteorder="big")
+            if self.key[:1] != b"\x00":
+                raise ValueError(
+                    "The claimable balance ID type is not supported, it must be `CLAIMABLE_BALANCE_ID_TYPE_V0`."
+                )
             claimable_balance_id = stellar_xdr.ClaimableBalanceID(
-                stellar_xdr.ClaimableBalanceIDType(claimable_balance_type),
+                stellar_xdr.ClaimableBalanceIDType.CLAIMABLE_BALANCE_ID_TYPE_V0,
                 v0=stellar_xdr.Hash.from_xdr_bytes(self.key[1:]),
             )
             return stellar_xdr.SCAddress(
@@ -198,9 +201,12 @@ class Address:
         ):
             assert sc_address.claimable_balance_id is not None
             # See https://github.com/stellar/stellar-protocol/pull/1646/files#r1974431825
-            if sc_address.claimable_balance_id.type.value > 255:
+            if (
+                sc_address.claimable_balance_id.type
+                != stellar_xdr.ClaimableBalanceIDType.CLAIMABLE_BALANCE_ID_TYPE_V0
+            ):
                 raise ValueError(
-                    "The claimable balance ID type is not supported."
+                    f"The claimable balance ID type is not supported: {sc_address.claimable_balance_id.type.name}"
                 )  # This is a safeguard.
             return cls.from_raw_claimable_balance(
                 sc_address.claimable_balance_id.to_xdr_bytes()[3:]
