@@ -7,6 +7,7 @@ Release History
 - feat: add support for liquidity pool and claimable balance strkeys.
 - feat: add `encode_med25519_public_key`, `decode_med25519_public_key` and `is_valid_med25519_public_key` functions to `stellar_sdk.StrKey`.
 - feat: add muxed account, liquidity pool and claimable balance support to `stellar_sdk.Address`.
+- feat: implement message signing and verification according to SEP-53, check `Keypair.sign_message` and `Keypair.verify_message` for more details. ([#1067](https://github.com/StellarCN/py-stellar-base/pull/1067))
 
 #### Breaking changes
 - refactor!: rename `read_bytes` to `disk_read_bytes` in `SorobanDataBuilder` and related methods.
