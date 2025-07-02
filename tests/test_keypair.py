@@ -740,10 +740,8 @@ class TestKeypair:
     @pytest.mark.parametrize(
         "signature",
         [
-            (
-                "VA1+7hefNwv2NKScH6n+Sljj15kLAge+M2wE7fzFOf+L0MMbssA1mwfJZRyyrhBORQRle10X1Dxpx+UOI4EbDQ==",
-            ),
-            ("MTI=",),
+            "VA1+7hefNwv2NKScH6n+Sljj15kLAge+M2wE7fzFOf+L0MMbssA1mwfJZRyyrhBORQRle10X1Dxpx+UOI4EbDQ==",
+            "MTI=",
         ],
     )
     def test_verify_message_with_invalid_signature_raise(self, signature):
@@ -751,8 +749,6 @@ class TestKeypair:
             "GBXFXNDLV4LSWA4VB7YIL5GBD7BVNR22SGBTDKMO2SBZZHDXSKZYCP7L"
         )
         message = "Hello, World!"
-        invalid_signature = base64.b64decode(
-            "VA1+7hefNwv2NKScH6n+Sljj15kLAge+M2wE7fzFOf+L0MMbssA1mwfJZRyyrhBORQRle10X1Dxpx+UOI4EbDQ=="
-        )
+
         with pytest.raises(BadSignatureError, match="Signature verification failed."):
-            kp.verify_message(message, invalid_signature)
+            kp.verify_message(message, base64.b64decode(signature))
