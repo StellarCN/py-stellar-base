@@ -372,7 +372,7 @@ class Keypair:
         return DecoratedSignature(hint, signature)
 
     @staticmethod
-    def _calculate_message_hash(message: str | bytes) -> bytes:
+    def _calculate_message_hash(message: Union[str, bytes]) -> bytes:
         """Calculate the hash of a message according to `SEP-53 <https://github.com/stellar/stellar-protocol/blob/master/ecosystem/sep-0053.md>`__.
 
         :param message: The message to hash, as a string or bytes.
@@ -384,7 +384,7 @@ class Keypair:
         signed_message_base = message_prefix + message
         return sha256(signed_message_base)
 
-    def sign_message(self, message: str | bytes) -> bytes:
+    def sign_message(self, message: Union[str, bytes]) -> bytes:
         """Sign a message according to `SEP-53 <https://github.com/stellar/stellar-protocol/blob/master/ecosystem/sep-0053.md>`__.
 
         :param message: The message to sign, as a string or bytes.
@@ -393,7 +393,7 @@ class Keypair:
         message_hash = self._calculate_message_hash(message)
         return self.sign(message_hash)
 
-    def verify_message(self, message: str | bytes, signature: bytes) -> None:
+    def verify_message(self, message: Union[str, bytes], signature: bytes) -> None:
         """Verify a `SEP-53 <https://github.com/stellar/stellar-protocol/blob/master/ecosystem/sep-0053.md>`__ signed message.
 
         :param message: The original message, as a string or bytes.
