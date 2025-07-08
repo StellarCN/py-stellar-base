@@ -179,6 +179,7 @@ class SorobanServerAsync:
         self,
         transaction_envelope: TransactionEnvelope,
         addl_resources: Optional[ResourceLeeway] = None,
+        auth_mode: Optional[AuthMode] = None,
     ) -> SimulateTransactionResponse:
         """Submit a trial contract invocation to get back return values, expected ledger footprint, and expected costs.
 
@@ -190,6 +191,7 @@ class SorobanServerAsync:
             :class:`ExtendFootprintTTL <stellar_sdk.operation.RestoreFootprint>` operation.
             Any provided footprint will be ignored.
         :param addl_resources: Additional resource include in the simulation.
+        :param auth_mode: Explicitly allows users to opt-in to non-root authorization in recording mode.
         :return: A :class:`SimulateTransactionResponse <stellar_sdk.soroban_rpc.SimulateTransactionResponse>` object
             contains the cost, footprint, result/auth requirements (if applicable), and error of the transaction.
         """
@@ -207,7 +209,7 @@ class SorobanServerAsync:
             id=_generate_unique_request_id(),
             method="simulateTransaction",
             params=SimulateTransactionRequest(
-                transaction=xdr, resourceConfig=resource_config
+                transaction=xdr, resourceConfig=resource_config, authMode=auth_mode
             ),
         )
         return await self._post(request, SimulateTransactionResponse)

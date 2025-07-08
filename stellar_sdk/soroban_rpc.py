@@ -180,6 +180,17 @@ class ResourceConfig(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
 
 
+class AuthMode(Enum):
+    """AuthMode represents the authentication mode for transaction simulation."""
+
+    ENFORCE = "enforce"
+    """Always enforce mode, even with an empty list."""
+    RECORD = "record"
+    """Always recording mode, failing if any auth exists."""
+    RECORD_ALL_NOROOT = "record_allow_nonroot"
+    """Like `RECORD` but allowing non-root authorization."""
+
+
 class SimulateTransactionRequest(BaseModel):
     """Response for JSON-RPC method simulateTransaction.
 
@@ -197,6 +208,7 @@ class SimulateTransactionRequest(BaseModel):
     resource_config: Optional[ResourceConfig] = Field(
         alias="resourceConfig", default=None
     )
+    auth_mode: Optional[AuthMode] = Field(alias="authMode", default=None)
     model_config = ConfigDict(populate_by_name=True)
 
 
