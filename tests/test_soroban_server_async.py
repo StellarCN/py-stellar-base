@@ -862,6 +862,7 @@ class TestSorobanServer:
         assert request_data["params"] == {
             "transaction": transaction.to_xdr(),
             "resourceConfig": None,
+            "authMode": None,
         }
 
     async def test_simulate_transaction_with_addl_resources(self):
@@ -904,6 +905,7 @@ class TestSorobanServer:
         assert request_data["params"] == {
             "transaction": transaction.to_xdr(),
             "resourceConfig": {"instructionLeeway": 1000000},
+            "authMode": None,
         }
 
     async def test_simulate_transaction_with_auth_mode(self):
