@@ -71,13 +71,15 @@ class EventInfo(BaseModel):
     ledger_close_at: datetime = Field(alias="ledgerClosedAt")
     contract_id: str = Field(alias="contractId")
     id: str = Field(alias="id")
-    paging_token: str = Field(
-        alias="pagingToken",
-        description="The field may will be removed in the next version of the protocol. It remains for backward.",
-    )
     topic: List[str] = Field(alias="topic")
     value: str = Field(alias="value")
-    in_successful_contract_call: bool = Field(alias="inSuccessfulContractCall")
+    in_successful_contract_call: bool = Field(
+        alias="inSuccessfulContractCall",
+        deprecated=True,
+        description="This field is deprecated and will be removed in the future.",
+    )
+    operation_index: int = Field(alias="operationIndex")
+    transaction_index: int = Field(alias="transactionIndex")
     transaction_hash: str = Field(alias="txHash")
 
 
@@ -116,6 +118,9 @@ class GetEventsResponse(BaseModel):
 
     events: List[EventInfo] = Field(alias="events")
     latest_ledger: int = Field(alias="latestLedger")
+    oldest_ledger: int = Field(alias="oldestLedger")
+    latest_Ledger_close_time: int = Field(alias="latestLedgerCloseTime")
+    oldest_ledger_close_time: int = Field(alias="oldestLedgerCloseTime")
     cursor: str
 
 
