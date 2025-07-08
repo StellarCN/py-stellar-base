@@ -287,6 +287,21 @@ class GetTransactionRequest(BaseModel):
     hash: str
 
 
+class Events(BaseModel):
+    # base64-encoded list of `xdr.DiagnosticEvent`s
+    diagnostic_events_xdr: Optional[List[str]] = Field(
+        alias="diagnosticEventsXdr", default=None
+    )
+    # base64-encoded list of `xdr.TransactionEvent`s
+    transaction_events_xdr: Optional[List[str]] = Field(
+        alias="transactionEventsXdr", default=None
+    )
+    # base64-encoded list of lists of `xdr.ContractEvent`s, where each element of the list corresponds to the events for that operation in the transaction
+    contract_events_xdr: Optional[List[List[str]]] = Field(
+        alias="contractEventsXdr", default=None
+    )
+
+
 class GetTransactionResponse(BaseModel):
     """Response for JSON-RPC method getTransaction.
 
@@ -311,6 +326,7 @@ class GetTransactionResponse(BaseModel):
     result_meta_xdr: Optional[str] = Field(
         alias="resultMetaXdr", default=None
     )  # stellar_sdk.xdr.TransactionMeta
+    events: Optional[Events] = None
     ledger: Optional[int] = Field(alias="ledger", default=None)
     create_at: Optional[int] = Field(alias="createdAt", default=None)
 
@@ -417,8 +433,12 @@ class Transaction(BaseModel):
     ledger: int
     created_at: int = Field(alias="createdAt")
     diagnostic_events_xdr: Optional[List[str]] = Field(
-        alias="diagnosticEventsXdr", default=None
+        alias="diagnosticEventsXdr",
+        default=None,
+        deprecated=True,
+        description="This field is deprecated and will be removed in the future. Use `events.diagnostic_events_xdr` instead.",
     )
+    events: Optional[Events] = None
 
 
 class GetTransactionsResponse(BaseModel):
