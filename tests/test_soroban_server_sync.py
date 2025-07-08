@@ -345,39 +345,44 @@ class TestSorobanServer:
         events = [
             {
                 "type": "contract",
-                "ledger": "12739",
-                "ledgerClosedAt": "2023-09-16T06:23:57Z",
-                "contractId": "CBNYUGHFAIWK3HOINA2OIGOOBMQU4D3MPQWFYBTUYY5WY4FVDO2GWXUY",
-                "id": "0000054713588387840-0000000000",
-                "pagingToken": "0000054713588387840-0000000000",
-                "topic": [
-                    "AAAADwAAAAdDT1VOVEVSAA==",
-                    "AAAADwAAAAlpbmNyZW1lbnQAAAA=",
-                ],
-                "value": "AAAAAwAAAAE=",
+                "ledger": 318983,
+                "ledgerClosedAt": "2025-07-07T04:50:04Z",
+                "contractId": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+                "id": "0001370021552979968-0000000000",
+                "operationIndex": 0,
+                "transactionIndex": 0,
+                "txHash": "4ea7a85ab79ed1a0bd2ae13c477d737986c275008ec27248e84b652dd3b02240",
                 "inSuccessfulContractCall": True,
-                "txHash": "db86e94aa98b7d38213c041ebbb727fbaabf0b7c435de594f36c2d51fc61926d",
+                "topic": [
+                    "AAAADwAAAANmZWUA",
+                    "AAAAEgAAAAAAAAAAjzKVBtmN+VkKUfjbl3IERicBzxUm/hHTbRY5Ap/rXZ0=",
+                ],
+                "value": "AAAACgAAAAAAAAAAAAAAAAAAAMg=",
             },
             {
                 "type": "contract",
-                "ledger": "12747",
-                "ledgerClosedAt": "2023-09-16T06:24:05Z",
-                "contractId": "CBNYUGHFAIWK3HOINA2OIGOOBMQU4D3MPQWFYBTUYY5WY4FVDO2GWXUY",
-                "id": "0000054747948126208-0000000000",
-                "pagingToken": "0000054747948126208-0000000000",
-                "topic": [
-                    "AAAADwAAAAdDT1VOVEVSAA==",
-                    "AAAADwAAAAlpbmNyZW1lbnQAAAA=",
-                ],
-                "value": "AAAAAwAAAAI=",
+                "ledger": 318987,
+                "ledgerClosedAt": "2025-07-07T04:50:24Z",
+                "contractId": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+                "id": "0001370038732849152-0000000000",
+                "operationIndex": 0,
+                "transactionIndex": 0,
+                "txHash": "bdfe344060decbfd77ce0022538633de63947d85774434be8573b14fc870ce21",
                 "inSuccessfulContractCall": True,
-                "txHash": "db86e94aa98b7d38213c041ebbb727fbaabf0b7c435de594f36c2d51fc61926d",
+                "topic": [
+                    "AAAADwAAAANmZWUA",
+                    "AAAAEgAAAAAAAAAAaVEz1z7zd/vL9gpfuqg15Q6kOpLaLnYaMEojDQaoWZ4=",
+                ],
+                "value": "AAAACgAAAAAAAAAAAAAAAACYluQ=",
             },
         ]
         result = {
             "events": events,
-            "latestLedger": "187",
             "cursor": "0000054747948126208-0000000000",
+            "latestLedger": 318987,
+            "oldestLedger": 317964,
+            "latestLedgerCloseTime": "1751863824",
+            "oldestLedgerCloseTime": "1751858705",
         }
         data = {
             "jsonrpc": "2.0",
@@ -430,8 +435,11 @@ class TestSorobanServer:
         cursor = events_response.cursor
         result = {
             "events": [],
-            "latestLedger": "188",
             "cursor": "0000054747948126210-0000000000",
+            "latestLedger": 318987,
+            "oldestLedger": 317964,
+            "latestLedgerCloseTime": "1751863824",
+            "oldestLedgerCloseTime": "1751858705",
         }
         data = {
             "jsonrpc": "2.0",
