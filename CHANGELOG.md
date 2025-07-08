@@ -3,20 +3,37 @@ Release History
 
 ### Pending
 
+### Version 13.0.0-beta0
+
+**This release adds support for Protocol 23.**
+
 #### Update:
-- feat: add support for liquidity pool and claimable balance strkeys.
-- feat: add `encode_med25519_public_key`, `decode_med25519_public_key` and `is_valid_med25519_public_key` functions to `stellar_sdk.StrKey`.
-- feat: add muxed account, liquidity pool and claimable balance support to `stellar_sdk.Address`.
+- feat: add liquidity pool and claimable balance support to `StrKey`. ([#1060](https://github.com/StellarCN/py-stellar-base/pull/1060))
+- feat: add med25519 public keys to `StrKey`. ([#1061](https://github.com/StellarCN/py-stellar-base/pull/1061))
+- feat: add muxed account, liquidity pool and claimable balance support to `Address`. ([#1062](https://github.com/StellarCN/py-stellar-base/pull/1062))
 - feat: implement message signing and verification according to SEP-53, check `Keypair.sign_message` and `Keypair.verify_message` for more details. ([#1067](https://github.com/StellarCN/py-stellar-base/pull/1067))
+- feat: add a `poll_transaction` function to Soroban RPC client. ([#1038](https://github.com/StellarCN/py-stellar-base/pull/1038))
+- refactor: use `tomllib` instead of `toml` library in Python 3.11 and above. ([#1047](https://github.com/StellarCN/py-stellar-base/pull/1047))
+- refactor: optimize the user experience of `call_builder.stream`. ([#1050](https://github.com/StellarCN/py-stellar-base/pull/1050))
+- fix: add error handling for incomplete federation responses. ([#1051](https://github.com/StellarCN/py-stellar-base/pull/1051))
+- feat: add support for non-root authorization in `SorobanServer[Async].simulate_transaction`. ([#1069](https://github.com/StellarCN/py-stellar-base/pull/1069))
 
 #### Breaking changes
-- refactor!: rename `read_bytes` to `disk_read_bytes` in `SorobanDataBuilder` and related methods.
+- chore!: upgrade generated XDR definitions to Protocol 23. ([#1057](https://github.com/StellarCN/py-stellar-base/pull/1057))
+- chore!: drop support for Python 3.8. ([#1065](https://github.com/StellarCN/py-stellar-base/pull/1065))
+- refactor!: rename `read_bytes` to `disk_read_bytes` in `SorobanDataBuilder` and related methods. ([#1058](https://github.com/StellarCN/py-stellar-base/pull/1058))
   - In `SorobanDataBuilder`, all occurrences of `read_bytes` have been replaced with `disk_read_bytes`. This includes method names, variable names, etc.
   - `TransactionBuilder.append_payment_to_contract_op` now uses `disk_read_bytes` instead of `read_bytes` in its function signature.
   - `TransactionBuilder.append_restore_asset_balance_entry_op` now uses `disk_read_bytes` instead of `read_bytes` in its function signature.
-- refactor!: `StrKey.decode_muxed_account` and `StrKey.encode_muxed_account` have been marked as deprecated, please use `stellar_sdk.MuxedAccount` instead. They will be removed in the next major release.
-- refactor!: when an invalid account ID is passed into the `MuxedAccount.from_account`, it raises a `ValueError` now. 
-- chore!: drop support for Python 3.8. ([#1065](https://github.com/StellarCN/py-stellar-base/pull/1065))
+- refactor!: `StrKey.decode_muxed_account` and `StrKey.encode_muxed_account` have been marked as deprecated, please use `stellar_sdk.MuxedAccount` instead. They will be removed in the next major release. ([#1061](https://github.com/StellarCN/py-stellar-base/pull/1061))
+- refactor!: when an invalid account ID is passed into the `MuxedAccount.from_account`, it raises a `ValueError` now. ([#1063](https://github.com/StellarCN/py-stellar-base/pull/1063))
+- feat!: adapt to the changes in the Stellar Soroban RPC v23 `getEvents` interface. ([#1070](https://github.com/StellarCN/py-stellar-base/pull/1070))
+  - drop `paging_token` from `EventInfo`, use `cursor` in `GetEventsResponse` instead.
+  - `in_successful_contract_call` in `EventInfo` has been marked as deprecated now.
+  - add `operation_index` and `transaction_index` to `EventInfo`.
+  - add `oldest_ledger`, `latest_ledger_close_time` and `oldest_ledger_close_time` to `GetEventsResponse`.
+- feat!: adapt to the changes in the Stellar RPC Soroban v23 `getTransaction` and `getTransactions` interface. ([#1068](https://github.com/StellarCN/py-stellar-base/pull/1068))
+  - `diagnosticEvents` in `GetTransactionsResponse.transactions` has been marked as deprecated now, use `GetTransactionsResponse.transactions[{id}].events` instead.
 
 ### Version 12.3.0
 

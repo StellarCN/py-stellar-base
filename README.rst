@@ -17,7 +17,7 @@ Stellar Python SDK
    :target: https://codeclimate.com/github/StellarCN/py-stellar-base/maintainability
    :alt: Maintainability
 
-.. image:: https://img.shields.io/codecov/c/github/StellarCN/py-stellar-base/v2
+.. image:: https://img.shields.io/codecov/c/github/StellarCN/py-stellar-base/main
     :alt: Codecov
     :target: https://codecov.io/gh/StellarCN/py-stellar-base
 
@@ -25,7 +25,7 @@ Stellar Python SDK
     :alt: PyPI
     :target: https://pypi.python.org/pypi/stellar-sdk
 
-.. image:: https://img.shields.io/badge/python-%3E%3D3.8-blue
+.. image:: https://img.shields.io/badge/python-%3E%3D3.9-blue
     :alt: Python - Version
     :target: https://pypi.python.org/pypi/stellar-sdk
 
@@ -33,13 +33,13 @@ Stellar Python SDK
     :alt: PyPI - Implementation
     :target: https://pypi.python.org/pypi/stellar-sdk
 
-.. image:: https://img.shields.io/badge/Stellar%20Protocol-22-blue
+.. image:: https://img.shields.io/badge/Stellar%20Protocol-23-blue
     :alt: Stellar Protocol
     :target: https://developers.stellar.org/docs/glossary/scp/
 
 py-stellar-base is a Python library for communicating with
-a `Stellar Horizon server`_ and `Soroban-RPC server`_. It is used for building Stellar apps on Python. It supports **Python 3.8+** as
-well as PyPy 3.8+.
+a `Stellar Horizon server`_ and `Soroban-RPC server`_. It is used for building Stellar apps on Python. It supports **Python 3.9+** as
+well as PyPy 3.9+.
 
 It provides:
 
