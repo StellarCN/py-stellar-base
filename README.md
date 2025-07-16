@@ -85,7 +85,7 @@ into the Python models, click [here](https://github.com/StellarCN/stellar-model)
 
 ## Contributing
 
-Contributions are welcome! See [CONTRIBUTING.md](./CHANGELOG.md) for more details.
+Contributions are welcome! See [CONTRIBUTING.md](./CONTRIBUTING.md) for more details.
 
 ## Links
 
