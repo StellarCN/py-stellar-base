@@ -223,9 +223,15 @@ class AssembledTransaction(Generic[T]):
         response = self._submit()
         assert response.result_meta_xdr is not None
         transaction_meta = TransactionMeta.from_xdr(response.result_meta_xdr)
-        assert transaction_meta.v3 is not None
-        assert transaction_meta.v3.soroban_meta is not None
-        result_val = transaction_meta.v3.soroban_meta.return_value
+        transaction_meta_body = (
+            transaction_meta.v4 or transaction_meta.v3
+        )  # v4 introduced in protocol 23
+        assert transaction_meta_body is not None
+        assert transaction_meta_body.soroban_meta is not None
+        result_val = transaction_meta_body.soroban_meta.return_value
+        assert (
+            result_val is not None
+        )  # In SorobanTransactionMetaV2, it is defined as possibly null.
         return (
             self.parse_result_xdr_fn(result_val)
             if self.parse_result_xdr_fn
