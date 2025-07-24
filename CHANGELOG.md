@@ -3,6 +3,9 @@ Release History
 
 ### Pending
 
+#### Update:
+- feat: update transaction meta handling to support v4 in protocol 23.
+
 ### Version 13.0.0-beta0
 
 **This release adds support for Protocol 23.**
