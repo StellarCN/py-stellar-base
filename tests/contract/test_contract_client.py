@@ -51,9 +51,9 @@ def create_contract_from_asset(asset: Asset):
 
 @pytest.mark.integration
 class TestContractClient:
-    hello_world_contract_id = None
-    atomic_swap_contract_id = None
-    native_asset_contract_id = None
+    hello_world_contract_id: str
+    atomic_swap_contract_id: str
+    native_asset_contract_id: str
 
     @classmethod
     def setup_class(cls):

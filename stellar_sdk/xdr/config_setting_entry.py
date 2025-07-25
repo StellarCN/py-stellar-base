@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import base64
-from typing import List
+from typing import List, Optional
 
 from xdrlib3 import Packer, Unpacker
 
@@ -16,8 +16,15 @@ from .config_setting_contract_execution_lanes_v0 import (
 from .config_setting_contract_historical_data_v0 import (
     ConfigSettingContractHistoricalDataV0,
 )
+from .config_setting_contract_ledger_cost_ext_v0 import (
+    ConfigSettingContractLedgerCostExtV0,
+)
 from .config_setting_contract_ledger_cost_v0 import ConfigSettingContractLedgerCostV0
+from .config_setting_contract_parallel_compute_v0 import (
+    ConfigSettingContractParallelComputeV0,
+)
 from .config_setting_id import ConfigSettingID
+from .config_setting_scp_timing import ConfigSettingSCPTiming
 from .contract_cost_params import ContractCostParams
 from .eviction_iterator import EvictionIterator
 from .state_archival_settings import StateArchivalSettings
@@ -57,38 +64,53 @@ class ConfigSettingEntry:
             StateArchivalSettings stateArchivalSettings;
         case CONFIG_SETTING_CONTRACT_EXECUTION_LANES:
             ConfigSettingContractExecutionLanesV0 contractExecutionLanes;
-        case CONFIG_SETTING_BUCKETLIST_SIZE_WINDOW:
-            uint64 bucketListSizeWindow<>;
+        case CONFIG_SETTING_LIVE_SOROBAN_STATE_SIZE_WINDOW:
+            uint64 liveSorobanStateSizeWindow<>;
         case CONFIG_SETTING_EVICTION_ITERATOR:
             EvictionIterator evictionIterator;
+        case CONFIG_SETTING_CONTRACT_PARALLEL_COMPUTE_V0:
+            ConfigSettingContractParallelComputeV0 contractParallelCompute;
+        case CONFIG_SETTING_CONTRACT_LEDGER_COST_EXT_V0:
+            ConfigSettingContractLedgerCostExtV0 contractLedgerCostExt;
+        case CONFIG_SETTING_SCP_TIMING:
+            ConfigSettingSCPTiming contractSCPTiming;
         };
     """
 
     def __init__(
         self,
         config_setting_id: ConfigSettingID,
-        contract_max_size_bytes: Uint32 = None,
-        contract_compute: ConfigSettingContractComputeV0 = None,
-        contract_ledger_cost: ConfigSettingContractLedgerCostV0 = None,
-        contract_historical_data: ConfigSettingContractHistoricalDataV0 = None,
-        contract_events: ConfigSettingContractEventsV0 = None,
-        contract_bandwidth: ConfigSettingContractBandwidthV0 = None,
-        contract_cost_params_cpu_insns: ContractCostParams = None,
-        contract_cost_params_mem_bytes: ContractCostParams = None,
-        contract_data_key_size_bytes: Uint32 = None,
-        contract_data_entry_size_bytes: Uint32 = None,
-        state_archival_settings: StateArchivalSettings = None,
-        contract_execution_lanes: ConfigSettingContractExecutionLanesV0 = None,
-        bucket_list_size_window: List[Uint64] = None,
-        eviction_iterator: EvictionIterator = None,
+        contract_max_size_bytes: Optional[Uint32] = None,
+        contract_compute: Optional[ConfigSettingContractComputeV0] = None,
+        contract_ledger_cost: Optional[ConfigSettingContractLedgerCostV0] = None,
+        contract_historical_data: Optional[
+            ConfigSettingContractHistoricalDataV0
+        ] = None,
+        contract_events: Optional[ConfigSettingContractEventsV0] = None,
+        contract_bandwidth: Optional[ConfigSettingContractBandwidthV0] = None,
+        contract_cost_params_cpu_insns: Optional[ContractCostParams] = None,
+        contract_cost_params_mem_bytes: Optional[ContractCostParams] = None,
+        contract_data_key_size_bytes: Optional[Uint32] = None,
+        contract_data_entry_size_bytes: Optional[Uint32] = None,
+        state_archival_settings: Optional[StateArchivalSettings] = None,
+        contract_execution_lanes: Optional[
+            ConfigSettingContractExecutionLanesV0
+        ] = None,
+        live_soroban_state_size_window: Optional[List[Uint64]] = None,
+        eviction_iterator: Optional[EvictionIterator] = None,
+        contract_parallel_compute: Optional[
+            ConfigSettingContractParallelComputeV0
+        ] = None,
+        contract_ledger_cost_ext: Optional[ConfigSettingContractLedgerCostExtV0] = None,
+        contract_scp_timing: Optional[ConfigSettingSCPTiming] = None,
     ) -> None:
         _expect_max_length = 4294967295
         if (
-            bucket_list_size_window
-            and len(bucket_list_size_window) > _expect_max_length
+            live_soroban_state_size_window
+            and len(live_soroban_state_size_window) > _expect_max_length
         ):
             raise ValueError(
-                f"The maximum length of `bucket_list_size_window` should be {_expect_max_length}, but got {len(bucket_list_size_window)}."
+                f"The maximum length of `live_soroban_state_size_window` should be {_expect_max_length}, but got {len(live_soroban_state_size_window)}."
             )
         self.config_setting_id = config_setting_id
         self.contract_max_size_bytes = contract_max_size_bytes
@@ -103,8 +125,11 @@ class ConfigSettingEntry:
         self.contract_data_entry_size_bytes = contract_data_entry_size_bytes
         self.state_archival_settings = state_archival_settings
         self.contract_execution_lanes = contract_execution_lanes
-        self.bucket_list_size_window = bucket_list_size_window
+        self.live_soroban_state_size_window = live_soroban_state_size_window
         self.eviction_iterator = eviction_iterator
+        self.contract_parallel_compute = contract_parallel_compute
+        self.contract_ledger_cost_ext = contract_ledger_cost_ext
+        self.contract_scp_timing = contract_scp_timing
 
     def pack(self, packer: Packer) -> None:
         self.config_setting_id.pack(packer)
@@ -197,18 +222,41 @@ class ConfigSettingEntry:
             return
         if (
             self.config_setting_id
-            == ConfigSettingID.CONFIG_SETTING_BUCKETLIST_SIZE_WINDOW
+            == ConfigSettingID.CONFIG_SETTING_LIVE_SOROBAN_STATE_SIZE_WINDOW
         ):
-            if self.bucket_list_size_window is None:
-                raise ValueError("bucket_list_size_window should not be None.")
-            packer.pack_uint(len(self.bucket_list_size_window))
-            for bucket_list_size_window_item in self.bucket_list_size_window:
-                bucket_list_size_window_item.pack(packer)
+            if self.live_soroban_state_size_window is None:
+                raise ValueError("live_soroban_state_size_window should not be None.")
+            packer.pack_uint(len(self.live_soroban_state_size_window))
+            for (
+                live_soroban_state_size_window_item
+            ) in self.live_soroban_state_size_window:
+                live_soroban_state_size_window_item.pack(packer)
             return
         if self.config_setting_id == ConfigSettingID.CONFIG_SETTING_EVICTION_ITERATOR:
             if self.eviction_iterator is None:
                 raise ValueError("eviction_iterator should not be None.")
             self.eviction_iterator.pack(packer)
+            return
+        if (
+            self.config_setting_id
+            == ConfigSettingID.CONFIG_SETTING_CONTRACT_PARALLEL_COMPUTE_V0
+        ):
+            if self.contract_parallel_compute is None:
+                raise ValueError("contract_parallel_compute should not be None.")
+            self.contract_parallel_compute.pack(packer)
+            return
+        if (
+            self.config_setting_id
+            == ConfigSettingID.CONFIG_SETTING_CONTRACT_LEDGER_COST_EXT_V0
+        ):
+            if self.contract_ledger_cost_ext is None:
+                raise ValueError("contract_ledger_cost_ext should not be None.")
+            self.contract_ledger_cost_ext.pack(packer)
+            return
+        if self.config_setting_id == ConfigSettingID.CONFIG_SETTING_SCP_TIMING:
+            if self.contract_scp_timing is None:
+                raise ValueError("contract_scp_timing should not be None.")
+            self.contract_scp_timing.pack(packer)
             return
 
     @classmethod
@@ -303,19 +351,50 @@ class ConfigSettingEntry:
                 config_setting_id=config_setting_id,
                 contract_execution_lanes=contract_execution_lanes,
             )
-        if config_setting_id == ConfigSettingID.CONFIG_SETTING_BUCKETLIST_SIZE_WINDOW:
+        if (
+            config_setting_id
+            == ConfigSettingID.CONFIG_SETTING_LIVE_SOROBAN_STATE_SIZE_WINDOW
+        ):
             length = unpacker.unpack_uint()
-            bucket_list_size_window = []
+            live_soroban_state_size_window = []
             for _ in range(length):
-                bucket_list_size_window.append(Uint64.unpack(unpacker))
+                live_soroban_state_size_window.append(Uint64.unpack(unpacker))
             return cls(
                 config_setting_id=config_setting_id,
-                bucket_list_size_window=bucket_list_size_window,
+                live_soroban_state_size_window=live_soroban_state_size_window,
             )
         if config_setting_id == ConfigSettingID.CONFIG_SETTING_EVICTION_ITERATOR:
             eviction_iterator = EvictionIterator.unpack(unpacker)
             return cls(
                 config_setting_id=config_setting_id, eviction_iterator=eviction_iterator
+            )
+        if (
+            config_setting_id
+            == ConfigSettingID.CONFIG_SETTING_CONTRACT_PARALLEL_COMPUTE_V0
+        ):
+            contract_parallel_compute = ConfigSettingContractParallelComputeV0.unpack(
+                unpacker
+            )
+            return cls(
+                config_setting_id=config_setting_id,
+                contract_parallel_compute=contract_parallel_compute,
+            )
+        if (
+            config_setting_id
+            == ConfigSettingID.CONFIG_SETTING_CONTRACT_LEDGER_COST_EXT_V0
+        ):
+            contract_ledger_cost_ext = ConfigSettingContractLedgerCostExtV0.unpack(
+                unpacker
+            )
+            return cls(
+                config_setting_id=config_setting_id,
+                contract_ledger_cost_ext=contract_ledger_cost_ext,
+            )
+        if config_setting_id == ConfigSettingID.CONFIG_SETTING_SCP_TIMING:
+            contract_scp_timing = ConfigSettingSCPTiming.unpack(unpacker)
+            return cls(
+                config_setting_id=config_setting_id,
+                contract_scp_timing=contract_scp_timing,
             )
         return cls(config_setting_id=config_setting_id)
 
@@ -354,8 +433,11 @@ class ConfigSettingEntry:
                 self.contract_data_entry_size_bytes,
                 self.state_archival_settings,
                 self.contract_execution_lanes,
-                self.bucket_list_size_window,
+                self.live_soroban_state_size_window,
                 self.eviction_iterator,
+                self.contract_parallel_compute,
+                self.contract_ledger_cost_ext,
+                self.contract_scp_timing,
             )
         )
 
@@ -379,8 +461,12 @@ class ConfigSettingEntry:
             == other.contract_data_entry_size_bytes
             and self.state_archival_settings == other.state_archival_settings
             and self.contract_execution_lanes == other.contract_execution_lanes
-            and self.bucket_list_size_window == other.bucket_list_size_window
+            and self.live_soroban_state_size_window
+            == other.live_soroban_state_size_window
             and self.eviction_iterator == other.eviction_iterator
+            and self.contract_parallel_compute == other.contract_parallel_compute
+            and self.contract_ledger_cost_ext == other.contract_ledger_cost_ext
+            and self.contract_scp_timing == other.contract_scp_timing
         )
 
     def __repr__(self):
@@ -455,13 +541,30 @@ class ConfigSettingEntry:
             else None
         )
         (
-            out.append(f"bucket_list_size_window={self.bucket_list_size_window}")
-            if self.bucket_list_size_window is not None
+            out.append(
+                f"live_soroban_state_size_window={self.live_soroban_state_size_window}"
+            )
+            if self.live_soroban_state_size_window is not None
             else None
         )
         (
             out.append(f"eviction_iterator={self.eviction_iterator}")
             if self.eviction_iterator is not None
+            else None
+        )
+        (
+            out.append(f"contract_parallel_compute={self.contract_parallel_compute}")
+            if self.contract_parallel_compute is not None
+            else None
+        )
+        (
+            out.append(f"contract_ledger_cost_ext={self.contract_ledger_cost_ext}")
+            if self.contract_ledger_cost_ext is not None
+            else None
+        )
+        (
+            out.append(f"contract_scp_timing={self.contract_scp_timing}")
+            if self.contract_scp_timing is not None
             else None
         )
         return f"<ConfigSettingEntry [{', '.join(out)}]>"

@@ -32,10 +32,12 @@ class TestLiquidityPoolAsset:
         xdr_object = asset.to_change_trust_asset_xdr_object()
         assert isinstance(xdr_object, ChangeTrustAsset)
         assert xdr_object.type == AssetType.ASSET_TYPE_POOL_SHARE
+        assert xdr_object.liquidity_pool is not None
         assert (
             xdr_object.liquidity_pool.type
             == LiquidityPoolType.LIQUIDITY_POOL_CONSTANT_PRODUCT
         )
+        assert xdr_object.liquidity_pool.constant_product is not None
         assert (
             xdr_object.liquidity_pool.constant_product.asset_a
             == self.asset_a.to_xdr_object()

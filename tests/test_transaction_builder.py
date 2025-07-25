@@ -53,7 +53,7 @@ asset3 = Asset("PANDA", "GDJVFDG5OCW5PYWHB64MGTHGFF57DRRJEDUEFDEL2SLNIOONHYJWHA3
 
 
 def get_tx_builder(
-    source_account: Account = None,
+    source_account: Optional[Account] = None,
     base_fee: int = 100,
     network_passphrase: str = Network.TESTNET_NETWORK_PASSPHRASE,
     min_time: Optional[int] = 1600000000,
@@ -544,6 +544,8 @@ class TestTransaction:
         )
         check_from_xdr(tx)
         tx = tx.build()
+        assert tx.transaction.preconditions is not None
+        assert tx.transaction.preconditions.time_bounds is not None
         assert tx.transaction.preconditions.time_bounds.min_time == 0
         assert (
             now + 256 <= tx.transaction.preconditions.time_bounds.max_time <= now + 257
@@ -715,7 +717,7 @@ class TestTransaction:
                             contract_address=Address(
                                 "CA7QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLTJJFC7MGXUA74P7UJUWDA"
                             ).to_xdr_sc_address(),
-                            function_name=scval.to_symbol("hello").sym,
+                            function_name=stellar_xdr.SCSymbol(b"hello"),
                             args=[
                                 scval.to_address(kp2.public_key),
                                 scval.to_uint32(10),
@@ -776,7 +778,7 @@ class TestTransaction:
                             contract_address=Address(
                                 "CA7QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLTJJFC7MGXUA74P7UJUWDA"
                             ).to_xdr_sc_address(),
-                            function_name=scval.to_symbol("hello").sym,
+                            function_name=stellar_xdr.SCSymbol(b"hello"),
                             args=[
                                 scval.to_address(kp2.public_key),
                                 scval.to_uint32(10),
@@ -830,7 +832,7 @@ class TestTransaction:
                             contract_address=Address(
                                 "CA7QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLTJJFC7MGXUA74P7UJUWDA"
                             ).to_xdr_sc_address(),
-                            function_name=scval.to_symbol("hello").sym,
+                            function_name=stellar_xdr.SCSymbol(b"hello"),
                             args=[
                                 scval.to_address(kp2.public_key),
                                 scval.to_uint32(10),
@@ -912,7 +914,7 @@ class TestTransaction:
                             contract_address=Address(
                                 "CA7QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLTJJFC7MGXUA74P7UJUWDA"
                             ).to_xdr_sc_address(),
-                            function_name=scval.to_symbol("hello").sym,
+                            function_name=stellar_xdr.SCSymbol(b"hello"),
                             args=[
                                 scval.to_address(kp2.public_key),
                                 scval.to_uint32(10),
@@ -1287,6 +1289,73 @@ class TestTransaction:
         )
         tx3.sign(kp)
         tx3.sign(op_kp)
+        server.submit_transaction(tx3)
+
+        server.close()
+
+    @pytest.mark.integration
+    def test_append_payment_to_contract_op_with_asset_issuer_as_sender(self):
+        kp = Keypair.random()
+
+        asset = Asset("CAT", kp.public_key)
+        amount1 = "100.125"
+        amount2 = "120.7891"
+
+        integration_utils.fund_account(kp.public_key)
+        integration_utils.create_asset_contract(asset, kp)
+        destination = integration_utils.get_random_contract_id(kp)
+
+        server = Server(horizon_url=integration_utils.HORIZON_URL)
+        source = server.load_account(kp.public_key)
+        tx1 = (
+            TransactionBuilder(
+                source_account=source,
+                network_passphrase=integration_utils.NETWORK_PASSPHRASE,
+                base_fee=100,
+            )
+            .append_payment_to_contract_op(destination, asset, amount1)
+            .set_timeout(30)
+            .build()
+        )
+        tx1.sign(kp)
+        server.submit_transaction(tx1)
+        assert (
+            integration_utils.get_balance_for_contract(
+                destination, asset, kp.public_key
+            )
+            == 1001250000
+        )
+
+        tx2 = (
+            TransactionBuilder(
+                source_account=source,
+                network_passphrase=integration_utils.NETWORK_PASSPHRASE,
+                base_fee=100,
+            )
+            .append_payment_to_contract_op(destination, asset, amount2)
+            .set_timeout(30)
+            .build()
+        )
+        tx2.sign(kp)
+        server.submit_transaction(tx2)
+        assert (
+            integration_utils.get_balance_for_contract(
+                destination, asset, kp.public_key
+            )
+            == 2209141000
+        )
+
+        tx3 = (
+            TransactionBuilder(
+                source_account=source,
+                network_passphrase=integration_utils.NETWORK_PASSPHRASE,
+                base_fee=100,
+            )
+            .append_restore_asset_balance_entry_op(destination, asset)
+            .set_timeout(30)
+            .build()
+        )
+        tx3.sign(kp)
         server.submit_transaction(tx3)
 
         server.close()

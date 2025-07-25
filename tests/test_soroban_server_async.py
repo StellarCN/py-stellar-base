@@ -2,9 +2,10 @@ import copy
 
 import pytest
 from aioresponses import aioresponses
+from pydantic import ValidationError
 from yarl import URL
 
-from stellar_sdk import Account, Keypair, Network, TransactionBuilder, scval
+from stellar_sdk import Account, Asset, Keypair, Network, TransactionBuilder, scval
 from stellar_sdk import xdr as stellar_xdr
 from stellar_sdk.address import Address
 from stellar_sdk.base_soroban_server import ResourceLeeway
@@ -13,10 +14,11 @@ from stellar_sdk.exceptions import (
     PrepareTransactionException,
     SorobanRpcErrorResponse,
 )
+from stellar_sdk.operation import InvokeHostFunction
 from stellar_sdk.soroban_rpc import *
 from stellar_sdk.soroban_server_async import SorobanServerAsync
 
-PRC_URL = "https://example.com/soroban_rpc"
+RPC_URL = "https://example.com/soroban_rpc"
 
 
 @pytest.mark.asyncio
@@ -41,12 +43,12 @@ class TestSorobanServer:
         account_id = "GDAT5HWTGIU4TSSZ4752OUC4SABDLTLZFRPZUJ3D6LKBNEPA7V2CIG54"
 
         with aioresponses() as m:
-            m.post(PRC_URL, payload=data)
-            async with SorobanServerAsync(PRC_URL) as client:
+            m.post(RPC_URL, payload=data)
+            async with SorobanServerAsync(RPC_URL) as client:
                 assert (await client.load_account(account_id)) == Account(
                     account_id, 3418793967628
                 )
-        request_data = m.requests[("POST", URL(PRC_URL))][0].kwargs["json"]
+        request_data = m.requests[("POST", URL(RPC_URL))][0].kwargs["json"]
         assert len(request_data["id"]) == 32
         assert request_data["jsonrpc"] == "2.0"
         assert request_data["method"] == "getLedgerEntries"
@@ -63,15 +65,15 @@ class TestSorobanServer:
         }
         account_id = "GDAT5HWTGIU4TSSZ4752OUC4SABDLTLZFRPZUJ3D6LKBNEPA7V2CIG54"
         with aioresponses() as m:
-            m.post(PRC_URL, payload=data)
+            m.post(RPC_URL, payload=data)
             with pytest.raises(
                 AccountNotFoundException,
                 match=f"Account not found, account_id: {account_id}",
             ):
-                async with SorobanServerAsync(PRC_URL) as client:
+                async with SorobanServerAsync(RPC_URL) as client:
                     await client.load_account(account_id)
 
-        request_data = m.requests[("POST", URL(PRC_URL))][0].kwargs["json"]
+        request_data = m.requests[("POST", URL(RPC_URL))][0].kwargs["json"]
         assert len(request_data["id"]) == 32
         assert request_data["jsonrpc"] == "2.0"
         assert request_data["method"] == "getLedgerEntries"
@@ -92,12 +94,12 @@ class TestSorobanServer:
             "result": result,
         }
         with aioresponses() as m:
-            m.post(PRC_URL, payload=data)
-            async with SorobanServerAsync(PRC_URL) as client:
+            m.post(RPC_URL, payload=data)
+            async with SorobanServerAsync(RPC_URL) as client:
                 assert await client.get_health() == GetHealthResponse.model_validate(
                     result
                 )
-        request_data = m.requests[("POST", URL(PRC_URL))][0].kwargs["json"]
+        request_data = m.requests[("POST", URL(RPC_URL))][0].kwargs["json"]
         assert len(request_data["id"]) == 32
         assert request_data["jsonrpc"] == "2.0"
         assert request_data["method"] == "getHealth"
@@ -118,13 +120,13 @@ class TestSorobanServer:
         GetNetworkResponse.model_validate(result)
 
         with aioresponses() as m:
-            m.post(PRC_URL, payload=data)
-            async with SorobanServerAsync(PRC_URL) as client:
+            m.post(RPC_URL, payload=data)
+            async with SorobanServerAsync(RPC_URL) as client:
                 assert await client.get_network() == GetNetworkResponse.model_validate(
                     result
                 )
 
-        request_data = m.requests[("POST", URL(PRC_URL))][0].kwargs["json"]
+        request_data = m.requests[("POST", URL(RPC_URL))][0].kwargs["json"]
         assert len(request_data["id"]) == 32
         assert request_data["jsonrpc"] == "2.0"
         assert request_data["method"] == "getNetwork"
@@ -147,14 +149,14 @@ class TestSorobanServer:
         GetVersionInfoResponse.model_validate(result)
 
         with aioresponses() as m:
-            m.post(PRC_URL, payload=data)
-            async with SorobanServerAsync(PRC_URL) as client:
+            m.post(RPC_URL, payload=data)
+            async with SorobanServerAsync(RPC_URL) as client:
                 assert (
                     await client.get_version_info()
                     == GetVersionInfoResponse.model_validate(result)
                 )
 
-        request_data = m.requests[("POST", URL(PRC_URL))][0].kwargs["json"]
+        request_data = m.requests[("POST", URL(RPC_URL))][0].kwargs["json"]
         assert len(request_data["id"]) == 32
         assert request_data["jsonrpc"] == "2.0"
         assert request_data["method"] == "getVersionInfo"
@@ -181,13 +183,13 @@ class TestSorobanServer:
         contract_id = "CBNYUGHFAIWK3HOINA2OIGOOBMQU4D3MPQWFYBTUYY5WY4FVDO2GWXUY"
         key = stellar_xdr.SCVal(stellar_xdr.SCValType.SCV_LEDGER_KEY_CONTRACT_INSTANCE)
         with aioresponses() as m:
-            m.post(PRC_URL, payload=data)
-            async with SorobanServerAsync(PRC_URL) as client:
-                assert (
-                    await client.get_contract_data(contract_id, key)
-                ) == GetLedgerEntriesResponse.model_validate(result).entries[0]
+            m.post(RPC_URL, payload=data)
+            async with SorobanServerAsync(RPC_URL) as client:
+                entries = GetLedgerEntriesResponse.model_validate(result).entries
+                assert entries
+                assert (await client.get_contract_data(contract_id, key)) == entries[0]
 
-        request_data = m.requests[("POST", URL(PRC_URL))][0].kwargs["json"]
+        request_data = m.requests[("POST", URL(RPC_URL))][0].kwargs["json"]
         assert len(request_data["id"]) == 32
         assert request_data["jsonrpc"] == "2.0"
         assert request_data["method"] == "getLedgerEntries"
@@ -208,11 +210,11 @@ class TestSorobanServer:
         contract_id = "CBNYUGHFAIWK3HOINA2OIGOOBMQU4D3MPQWFYBTUYY5WY4FVDO2GWXUY"
         key = stellar_xdr.SCVal(stellar_xdr.SCValType.SCV_LEDGER_KEY_CONTRACT_INSTANCE)
         with aioresponses() as m:
-            m.post(PRC_URL, payload=data)
-            async with SorobanServerAsync(PRC_URL) as client:
+            m.post(RPC_URL, payload=data)
+            async with SorobanServerAsync(RPC_URL) as client:
                 assert (await client.get_contract_data(contract_id, key)) is None
 
-        request_data = m.requests[("POST", URL(PRC_URL))][0].kwargs["json"]
+        request_data = m.requests[("POST", URL(RPC_URL))][0].kwargs["json"]
         assert len(request_data["id"]) == 32
         assert request_data["jsonrpc"] == "2.0"
         assert request_data["method"] == "getLedgerEntries"
@@ -262,13 +264,13 @@ class TestSorobanServer:
             ),
         )
         with aioresponses() as m:
-            m.post(PRC_URL, payload=data)
-            async with SorobanServerAsync(PRC_URL) as client:
+            m.post(RPC_URL, payload=data)
+            async with SorobanServerAsync(RPC_URL) as client:
                 assert (
                     await client.get_ledger_entries([key0, key1])
                 ) == GetLedgerEntriesResponse.model_validate(result)
 
-        request_data = m.requests[("POST", URL(PRC_URL))][0].kwargs["json"]
+        request_data = m.requests[("POST", URL(RPC_URL))][0].kwargs["json"]
         assert len(request_data["id"]) == 32
         assert request_data["jsonrpc"] == "2.0"
         assert request_data["method"] == "getLedgerEntries"
@@ -291,6 +293,40 @@ class TestSorobanServer:
             "envelopeXdr": "AAAAAgAAAADTYKIzfa0ubKp7qjOcF+ZO8sjQutzo1iHuDh8esi9q+wABNjQAATW1AAAAAQAAAAAAAAAAAAAAAQAAAAAAAAAYAAAAAAAAAAIAAAASAAAAAb3H+V1yFoNDBpje4rchxeaR7/hRNS2CAT2Dh6A8z6xrAAAADwAAAARuYW1lAAAAAAAAAAEAAAAAAAAAAwAAAAYAAAABvcf5XXIWg0MGmN7ityHF5pHv+FE1LYIBPYOHoDzPrGsAAAAPAAAACE1FVEFEQVRBAAAAAQAAAAAAAAAGAAAAAb3H+V1yFoNDBpje4rchxeaR7/hRNS2CAT2Dh6A8z6xrAAAAFAAAAAEAAAAAAAAAB++FkDTZODW0rvolF6AuIZf4w7+GQd8RofaH8u2pM+UPAAAAAAAAAAAAUrutAAAiqAAAAAAAAADIAAAAAAAAACgAAAABsi9q+wAAAEDgHR/5rU+bsXD/oPUFodyEgXFNbDm5T2+M1GarZXy+d+tZ757PBL9ysK41F1hUYz3p5CA7Urlpe3fnNjYcu1EM",
             "resultXdr": "AAAAAAABNCwAAAAAAAAAAQAAAAAAAAAYAAAAAJhEDjNV0Jj46jrxCj87qJ6JaYKJN4c+p5tvapkLwrn8AAAAAA==",
             "resultMetaXdr": "AAAAAwAAAAAAAAACAAAAAwABNbYAAAAAAAAAANNgojN9rS5sqnuqM5wX5k7yyNC63OjWIe4OHx6yL2r7AAAAF0h1s9QAATW1AAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAQABNbYAAAAAAAAAANNgojN9rS5sqnuqM5wX5k7yyNC63OjWIe4OHx6yL2r7AAAAF0h1s9QAATW1AAAAAQAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAMAAAAAAAE1tgAAAABkwUMZAAAAAAAAAAEAAAAAAAAAAgAAAAMAATW2AAAAAAAAAADTYKIzfa0ubKp7qjOcF+ZO8sjQutzo1iHuDh8esi9q+wAAABdIdbPUAAE1tQAAAAEAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAADAAAAAAABNbYAAAAAZMFDGQAAAAAAAAABAAE1tgAAAAAAAAAA02CiM32tLmyqe6oznBfmTvLI0Lrc6NYh7g4fHrIvavsAAAAXSHWz/AABNbUAAAABAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAwAAAAAAATW2AAAAAGTBQxkAAAAAAAAAAQAAAAAAAAAAAAAADgAAAAZUb2tlbkEAAAAAAAIAAAABAAAAAAAAAAAAAAACAAAAAAAAAAMAAAAPAAAAB2ZuX2NhbGwAAAAADQAAACC9x/ldchaDQwaY3uK3IcXmke/4UTUtggE9g4egPM+sawAAAA8AAAAEbmFtZQAAAAEAAAABAAAAAAAAAAG9x/ldchaDQwaY3uK3IcXmke/4UTUtggE9g4egPM+sawAAAAIAAAAAAAAAAgAAAA8AAAAJZm5fcmV0dXJuAAAAAAAADwAAAARuYW1lAAAADgAAAAZUb2tlbkEAAA==",
+            "events": {
+                "diagnosticEventsXdr": [
+                    "AAAAAQAAAAAAAAAAAAAAAgAAAAAAAAADAAAADwAAAAdmbl9jYWxsAAAAAA0AAAAg3+uRtuHcrdavl7t8RV+X83R3Cn949pVzuZ9dW/hJznwAAAAPAAAADWNyZWF0ZV9lc2Nyb3cAAAAAAAAQAAAAAQAAAAUAAAAFAAAAAAAGkZkAAAASAAAAAAAAAAAnDGNhr4xd4oCt9ulsolPIb9dO6fWMbwEtvYLdX5pdlgAAABIAAAAAAAAAAMnsMF5O5aqcYkDWD91ZWdRBKazSvnUgVeCkPYpbsG8fAAAAEgAAAAAAAAAAGNkZtSF153RCNK2INm7df68NpotUmDlE9qnij73+enIAAAASAAAAAbrCs4s4F0bFFiiUEa6VhwFhv8ro0OiwU/6TA5YxIgHo",
+                    "AAAAAQAAAAAAAAAB3+uRtuHcrdavl7t8RV+X83R3Cn949pVzuZ9dW/hJznwAAAACAAAAAAAAAAIAAAAPAAAACWZuX3JldHVybgAAAAAAAA8AAAANY3JlYXRlX2VzY3JvdwAAAAAAAAE=",
+                    "AAAAAAAAAAAAAAAAAAAAAgAAAAAAAAACAAAADwAAAAxjb3JlX21ldHJpY3MAAAAPAAAACnJlYWRfZW50cnkAAAAAAAUAAAAAAAAAAw==",
+                    "AAAAAAAAAAAAAAAAAAAAAgAAAAAAAAACAAAADwAAAAxjb3JlX21ldHJpY3MAAAAPAAAAC3dyaXRlX2VudHJ5AAAAAAUAAAAAAAAAAQ==",
+                    "AAAAAAAAAAAAAAAAAAAAAgAAAAAAAAACAAAADwAAAAxjb3JlX21ldHJpY3MAAAAPAAAAEGxlZGdlcl9yZWFkX2J5dGUAAAAFAAAAAAAAQLQ=",
+                    "AAAAAAAAAAAAAAAAAAAAAgAAAAAAAAACAAAADwAAAAxjb3JlX21ldHJpY3MAAAAPAAAAEWxlZGdlcl93cml0ZV9ieXRlAAAAAAAABQAAAAAAAAG4",
+                    "AAAAAAAAAAAAAAAAAAAAAgAAAAAAAAACAAAADwAAAAxjb3JlX21ldHJpY3MAAAAPAAAADXJlYWRfa2V5X2J5dGUAAAAAAAAFAAAAAAAAAKg=",
+                    "AAAAAAAAAAAAAAAAAAAAAgAAAAAAAAACAAAADwAAAAxjb3JlX21ldHJpY3MAAAAPAAAADndyaXRlX2tleV9ieXRlAAAAAAAFAAAAAAAAAAA=",
+                    "AAAAAAAAAAAAAAAAAAAAAgAAAAAAAAACAAAADwAAAAxjb3JlX21ldHJpY3MAAAAPAAAADnJlYWRfZGF0YV9ieXRlAAAAAAAFAAAAAAAAAGg=",
+                    "AAAAAAAAAAAAAAAAAAAAAgAAAAAAAAACAAAADwAAAAxjb3JlX21ldHJpY3MAAAAPAAAAD3dyaXRlX2RhdGFfYnl0ZQAAAAAFAAAAAAAAAbg=",
+                    "AAAAAAAAAAAAAAAAAAAAAgAAAAAAAAACAAAADwAAAAxjb3JlX21ldHJpY3MAAAAPAAAADnJlYWRfY29kZV9ieXRlAAAAAAAFAAAAAAAAQEw=",
+                    "AAAAAAAAAAAAAAAAAAAAAgAAAAAAAAACAAAADwAAAAxjb3JlX21ldHJpY3MAAAAPAAAAD3dyaXRlX2NvZGVfYnl0ZQAAAAAFAAAAAAAAAAA=",
+                    "AAAAAAAAAAAAAAAAAAAAAgAAAAAAAAACAAAADwAAAAxjb3JlX21ldHJpY3MAAAAPAAAACmVtaXRfZXZlbnQAAAAAAAUAAAAAAAAAAQ==",
+                    "AAAAAAAAAAAAAAAAAAAAAgAAAAAAAAACAAAADwAAAAxjb3JlX21ldHJpY3MAAAAPAAAAD2VtaXRfZXZlbnRfYnl0ZQAAAAAFAAAAAAAAAQQ=",
+                    "AAAAAAAAAAAAAAAAAAAAAgAAAAAAAAACAAAADwAAAAxjb3JlX21ldHJpY3MAAAAPAAAACGNwdV9pbnNuAAAABQAAAAAAM2BC",
+                    "AAAAAAAAAAAAAAAAAAAAAgAAAAAAAAACAAAADwAAAAxjb3JlX21ldHJpY3MAAAAPAAAACG1lbV9ieXRlAAAABQAAAAAAGwer",
+                    "AAAAAAAAAAAAAAAAAAAAAgAAAAAAAAACAAAADwAAAAxjb3JlX21ldHJpY3MAAAAPAAAAEWludm9rZV90aW1lX25zZWNzAAAAAAAABQAAAAAACD99",
+                    "AAAAAAAAAAAAAAAAAAAAAgAAAAAAAAACAAAADwAAAAxjb3JlX21ldHJpY3MAAAAPAAAAD21heF9yd19rZXlfYnl0ZQAAAAAFAAAAAAAAAFQ=",
+                    "AAAAAAAAAAAAAAAAAAAAAgAAAAAAAAACAAAADwAAAAxjb3JlX21ldHJpY3MAAAAPAAAAEG1heF9yd19kYXRhX2J5dGUAAAAFAAAAAAAAAbg=",
+                    "AAAAAAAAAAAAAAAAAAAAAgAAAAAAAAACAAAADwAAAAxjb3JlX21ldHJpY3MAAAAPAAAAEG1heF9yd19jb2RlX2J5dGUAAAAFAAAAAAAAQEw=",
+                    "AAAAAAAAAAAAAAAAAAAAAgAAAAAAAAACAAAADwAAAAxjb3JlX21ldHJpY3MAAAAPAAAAE21heF9lbWl0X2V2ZW50X2J5dGUAAAAABQAAAAAAAAEE",
+                ],
+                "transactionEventsXdr": [
+                    "AAAAAAAAAAAAAAAB15KLcsJwPM/q9+uf9O9NUEpVqLl5/JtFDqLIQrTRzmEAAAABAAAAAAAAAAIAAAAPAAAAA2ZlZQAAAAASAAAAAAAAAADte5nJrehJq/pu3qlV/bASRSOiJVXdNC+gQW/nxVNWuQAAAAoAAAAAAAAAAAAAAAAAWOuO",
+                    "AAAAAQAAAAAAAAAB15KLcsJwPM/q9+uf9O9NUEpVqLl5/JtFDqLIQrTRzmEAAAABAAAAAAAAAAIAAAAPAAAAA2ZlZQAAAAASAAAAAAAAAADte5nJrehJq/pu3qlV/bASRSOiJVXdNC+gQW/nxVNWuQAAAAr/////////////////8/qT",
+                ],
+                "contractEventsXdr": [
+                    [
+                        "AAAAAAAAAAHf65G24dyt1q+Xu3xFX5fzdHcKf3j2lXO5n11b+EnOfAAAAAEAAAAAAAAAAQAAAA8AAAAEaW5pdAAAABAAAAABAAAABQAAAAUAAAAAAAaRmQAAABIAAAAAAAAAACcMY2GvjF3igK326WyiU8hv107p9YxvAS29gt1fml2WAAAAEgAAAAAAAAAAyewwXk7lqpxiQNYP3VlZ1EEprNK+dSBV4KQ9iluwbx8AAAASAAAAAAAAAAAY2Rm1IXXndEI0rYg2bt1/rw2mi1SYOUT2qeKPvf56cgAAABIAAAABusKzizgXRsUWKJQRrpWHAWG/yujQ6LBT/pMDljEiAeg="
+                    ]
+                ],
+            },
             "ledger": "79286",
             "createdAt": "1690387225",
         }
@@ -301,54 +337,60 @@ class TestSorobanServer:
         }
         tx_hash = "06dd9ee70bf93bbfe219e2b31363ab5a0361cc6285328592e4d3d1fed4c9025c"
         with aioresponses() as m:
-            m.post(PRC_URL, payload=data)
-            async with SorobanServerAsync(PRC_URL) as client:
+            m.post(RPC_URL, payload=data)
+            async with SorobanServerAsync(RPC_URL) as client:
                 assert (
                     await client.get_transaction(tx_hash)
                 ) == GetTransactionResponse.model_validate(result)
 
-        request_data = m.requests[("POST", URL(PRC_URL))][0].kwargs["json"]
+        request_data = m.requests[("POST", URL(RPC_URL))][0].kwargs["json"]
         assert len(request_data["id"]) == 32
         assert request_data["jsonrpc"] == "2.0"
         assert request_data["method"] == "getTransaction"
         assert request_data["params"] == {"hash": tx_hash}
 
     async def test_get_events(self):
+        events = [
+            {
+                "type": "contract",
+                "ledger": 318983,
+                "ledgerClosedAt": "2025-07-07T04:50:04Z",
+                "contractId": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+                "id": "0001370021552979968-0000000000",
+                "operationIndex": 0,
+                "transactionIndex": 0,
+                "txHash": "4ea7a85ab79ed1a0bd2ae13c477d737986c275008ec27248e84b652dd3b02240",
+                "inSuccessfulContractCall": True,
+                "topic": [
+                    "AAAADwAAAANmZWUA",
+                    "AAAAEgAAAAAAAAAAjzKVBtmN+VkKUfjbl3IERicBzxUm/hHTbRY5Ap/rXZ0=",
+                ],
+                "value": "AAAACgAAAAAAAAAAAAAAAAAAAMg=",
+            },
+            {
+                "type": "contract",
+                "ledger": 318987,
+                "ledgerClosedAt": "2025-07-07T04:50:24Z",
+                "contractId": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+                "id": "0001370038732849152-0000000000",
+                "operationIndex": 0,
+                "transactionIndex": 0,
+                "txHash": "bdfe344060decbfd77ce0022538633de63947d85774434be8573b14fc870ce21",
+                "inSuccessfulContractCall": True,
+                "topic": [
+                    "AAAADwAAAANmZWUA",
+                    "AAAAEgAAAAAAAAAAaVEz1z7zd/vL9gpfuqg15Q6kOpLaLnYaMEojDQaoWZ4=",
+                ],
+                "value": "AAAACgAAAAAAAAAAAAAAAACYluQ=",
+            },
+        ]
         result = {
-            "events": [
-                {
-                    "type": "contract",
-                    "ledger": "12739",
-                    "ledgerClosedAt": "2023-09-16T06:23:57Z",
-                    "contractId": "CBNYUGHFAIWK3HOINA2OIGOOBMQU4D3MPQWFYBTUYY5WY4FVDO2GWXUY",
-                    "id": "0000054713588387840-0000000000",
-                    "pagingToken": "0000054713588387840-0000000000",
-                    "topic": [
-                        "AAAADwAAAAdDT1VOVEVSAA==",
-                        "AAAADwAAAAlpbmNyZW1lbnQAAAA=",
-                    ],
-                    "value": "AAAAAwAAAAE=",
-                    "inSuccessfulContractCall": True,
-                    "txHash": "db86e94aa98b7d38213c041ebbb727fbaabf0b7c435de594f36c2d51fc61926d",
-                },
-                {
-                    "type": "contract",
-                    "ledger": "12747",
-                    "ledgerClosedAt": "2023-09-16T06:24:05Z",
-                    "contractId": "CBNYUGHFAIWK3HOINA2OIGOOBMQU4D3MPQWFYBTUYY5WY4FVDO2GWXUY",
-                    "id": "0000054747948126208-0000000000",
-                    "pagingToken": "0000054747948126208-0000000000",
-                    "topic": [
-                        "AAAADwAAAAdDT1VOVEVSAA==",
-                        "AAAADwAAAAlpbmNyZW1lbnQAAAA=",
-                    ],
-                    "value": "AAAAAwAAAAI=",
-                    "inSuccessfulContractCall": True,
-                    "txHash": "db86e94aa98b7d38213c041ebbb727fbaabf0b7c435de594f36c2d51fc61926d",
-                },
-            ],
-            "latestLedger": "187",
-            "cursor": "0000054713588387840-0000000000",
+            "events": events,
+            "cursor": "0000054747948126208-0000000000",
+            "latestLedger": 318987,
+            "oldestLedger": 317964,
+            "latestLedgerCloseTime": "1751863824",
+            "oldestLedgerCloseTime": "1751858705",
         }
         data = {
             "jsonrpc": "2.0",
@@ -359,8 +401,8 @@ class TestSorobanServer:
         start_ledger = 100
         filters = [
             EventFilter(
-                event_type=EventFilterType.CONTRACT,
-                contract_ids=[
+                event_type=EventFilterType.CONTRACT,  # pyright: ignore[reportCallIssue]
+                contract_ids=[  # pyright: ignore[reportCallIssue]
                     "CBNYUGHFAIWK3HOINA2OIGOOBMQU4D3MPQWFYBTUYY5WY4FVDO2GWXUY"
                 ],
                 topics=[
@@ -368,17 +410,17 @@ class TestSorobanServer:
                 ],
             )
         ]
-        GetEventsResponse.model_validate(result)
+        events_response = GetEventsResponse.model_validate(result)
         cursor = "0000054713588387839-0000000000"
         limit = 10
         with aioresponses() as m:
-            m.post(PRC_URL, payload=data)
-            async with SorobanServerAsync(PRC_URL) as client:
+            m.post(RPC_URL, payload=data)
+            async with SorobanServerAsync(RPC_URL) as client:
                 assert (
-                    await client.get_events(start_ledger, filters, cursor, limit)
-                ) == GetEventsResponse.model_validate(result)
+                    await client.get_events(start_ledger, filters, limit=limit)
+                ) == events_response
 
-        request_data = m.requests[("POST", URL(PRC_URL))][0].kwargs["json"]
+        request_data = m.requests[("POST", URL(RPC_URL))][0].kwargs["json"]
         assert len(request_data["id"]) == 32
         assert request_data["jsonrpc"] == "2.0"
         assert request_data["method"] == "getEvents"
@@ -394,8 +436,51 @@ class TestSorobanServer:
                     "type": "contract",
                 }
             ],
-            "pagination": {"cursor": "0000054713588387839-0000000000", "limit": 10},
+            "pagination": {"cursor": None, "limit": 10},
             "startLedger": 100,
+        }
+
+        # simulate the advance of one ledger
+        cursor = events_response.cursor
+        result = {
+            "events": [],
+            "cursor": "0000054747948126210-0000000000",
+            "latestLedger": 318987,
+            "oldestLedger": 317964,
+            "latestLedgerCloseTime": "1751863824",
+            "oldestLedgerCloseTime": "1751858705",
+        }
+        data = {
+            "jsonrpc": "2.0",
+            "id": "198cb1a8-9104-4446-a269-88bf000c3986",
+            "result": result,
+        }
+        events_response = GetEventsResponse.model_validate(result)
+        with aioresponses() as m:
+            m.post(RPC_URL, payload=data)
+            async with SorobanServerAsync(RPC_URL) as client:
+                assert (
+                    await client.get_events(filters=filters, cursor=cursor, limit=limit)
+                ) == events_response
+
+        request_data = m.requests[("POST", URL(RPC_URL))][0].kwargs["json"]
+        assert len(request_data["id"]) == 32
+        assert request_data["jsonrpc"] == "2.0"
+        assert request_data["method"] == "getEvents"
+        assert request_data["params"] == {
+            "filters": [
+                {
+                    "contractIds": [
+                        "CBNYUGHFAIWK3HOINA2OIGOOBMQU4D3MPQWFYBTUYY5WY4FVDO2GWXUY"
+                    ],
+                    "topics": [
+                        ["AAAADwAAAAdDT1VOVEVSAA==", "AAAADwAAAAlpbmNyZW1lbnQAAAA="]
+                    ],
+                    "type": "contract",
+                }
+            ],
+            "pagination": {"cursor": "0000054747948126208-0000000000", "limit": 10},
+            "startLedger": None,
         }
 
     async def test_get_latest_ledger(self):
@@ -410,13 +495,13 @@ class TestSorobanServer:
             "result": result,
         }
         with aioresponses() as m:
-            m.post(PRC_URL, payload=data)
-            async with SorobanServerAsync(PRC_URL) as client:
+            m.post(RPC_URL, payload=data)
+            async with SorobanServerAsync(RPC_URL) as client:
                 assert (
                     await client.get_latest_ledger()
                 ) == GetLatestLedgerResponse.model_validate(result)
 
-        request_data = m.requests[("POST", URL(PRC_URL))][0].kwargs["json"]
+        request_data = m.requests[("POST", URL(RPC_URL))][0].kwargs["json"]
         assert len(request_data["id"]) == 32
         assert request_data["jsonrpc"] == "2.0"
         assert request_data["method"] == "getLatestLedger"
@@ -469,13 +554,13 @@ class TestSorobanServer:
             "result": result,
         }
         with aioresponses() as m:
-            m.post(PRC_URL, payload=data)
-            async with SorobanServerAsync(PRC_URL) as client:
+            m.post(RPC_URL, payload=data)
+            async with SorobanServerAsync(RPC_URL) as client:
                 assert (
                     await client.get_fee_stats()
                 ) == GetFeeStatsResponse.model_validate(result)
 
-        request_data = m.requests[("POST", URL(PRC_URL))][0].kwargs["json"]
+        request_data = m.requests[("POST", URL(RPC_URL))][0].kwargs["json"]
         assert len(request_data["id"]) == 32
         assert request_data["jsonrpc"] == "2.0"
         assert request_data["method"] == "getFeeStats"
@@ -546,6 +631,40 @@ class TestSorobanServer:
                         "AAAAAAAAAAAAAAAAAAAAAgAAAAAAAAACAAAADwAAAAxjb3JlX21ldHJpY3MAAAAPAAAAEG1heF9yd19jb2RlX2J5dGUAAAAFAAAAAAAAHdQ=",
                         "AAAAAAAAAAAAAAAAAAAAAgAAAAAAAAACAAAADwAAAAxjb3JlX21ldHJpY3MAAAAPAAAAE21heF9lbWl0X2V2ZW50X2J5dGUAAAAABQAAAAAAAAAA",
                     ],
+                    "events": {
+                        "diagnosticEventsXdr": [
+                            "AAAAAQAAAAAAAAAAAAAAAgAAAAAAAAADAAAADwAAAAdmbl9jYWxsAAAAAA0AAAAg3+uRtuHcrdavl7t8RV+X83R3Cn949pVzuZ9dW/hJznwAAAAPAAAADWNyZWF0ZV9lc2Nyb3cAAAAAAAAQAAAAAQAAAAUAAAAFAAAAAAAGkZkAAAASAAAAAAAAAAAnDGNhr4xd4oCt9ulsolPIb9dO6fWMbwEtvYLdX5pdlgAAABIAAAAAAAAAAMnsMF5O5aqcYkDWD91ZWdRBKazSvnUgVeCkPYpbsG8fAAAAEgAAAAAAAAAAGNkZtSF153RCNK2INm7df68NpotUmDlE9qnij73+enIAAAASAAAAAbrCs4s4F0bFFiiUEa6VhwFhv8ro0OiwU/6TA5YxIgHo",
+                            "AAAAAQAAAAAAAAAB3+uRtuHcrdavl7t8RV+X83R3Cn949pVzuZ9dW/hJznwAAAACAAAAAAAAAAIAAAAPAAAACWZuX3JldHVybgAAAAAAAA8AAAANY3JlYXRlX2VzY3JvdwAAAAAAAAE=",
+                            "AAAAAAAAAAAAAAAAAAAAAgAAAAAAAAACAAAADwAAAAxjb3JlX21ldHJpY3MAAAAPAAAACnJlYWRfZW50cnkAAAAAAAUAAAAAAAAAAw==",
+                            "AAAAAAAAAAAAAAAAAAAAAgAAAAAAAAACAAAADwAAAAxjb3JlX21ldHJpY3MAAAAPAAAAC3dyaXRlX2VudHJ5AAAAAAUAAAAAAAAAAQ==",
+                            "AAAAAAAAAAAAAAAAAAAAAgAAAAAAAAACAAAADwAAAAxjb3JlX21ldHJpY3MAAAAPAAAAEGxlZGdlcl9yZWFkX2J5dGUAAAAFAAAAAAAAQLQ=",
+                            "AAAAAAAAAAAAAAAAAAAAAgAAAAAAAAACAAAADwAAAAxjb3JlX21ldHJpY3MAAAAPAAAAEWxlZGdlcl93cml0ZV9ieXRlAAAAAAAABQAAAAAAAAG4",
+                            "AAAAAAAAAAAAAAAAAAAAAgAAAAAAAAACAAAADwAAAAxjb3JlX21ldHJpY3MAAAAPAAAADXJlYWRfa2V5X2J5dGUAAAAAAAAFAAAAAAAAAKg=",
+                            "AAAAAAAAAAAAAAAAAAAAAgAAAAAAAAACAAAADwAAAAxjb3JlX21ldHJpY3MAAAAPAAAADndyaXRlX2tleV9ieXRlAAAAAAAFAAAAAAAAAAA=",
+                            "AAAAAAAAAAAAAAAAAAAAAgAAAAAAAAACAAAADwAAAAxjb3JlX21ldHJpY3MAAAAPAAAADnJlYWRfZGF0YV9ieXRlAAAAAAAFAAAAAAAAAGg=",
+                            "AAAAAAAAAAAAAAAAAAAAAgAAAAAAAAACAAAADwAAAAxjb3JlX21ldHJpY3MAAAAPAAAAD3dyaXRlX2RhdGFfYnl0ZQAAAAAFAAAAAAAAAbg=",
+                            "AAAAAAAAAAAAAAAAAAAAAgAAAAAAAAACAAAADwAAAAxjb3JlX21ldHJpY3MAAAAPAAAADnJlYWRfY29kZV9ieXRlAAAAAAAFAAAAAAAAQEw=",
+                            "AAAAAAAAAAAAAAAAAAAAAgAAAAAAAAACAAAADwAAAAxjb3JlX21ldHJpY3MAAAAPAAAAD3dyaXRlX2NvZGVfYnl0ZQAAAAAFAAAAAAAAAAA=",
+                            "AAAAAAAAAAAAAAAAAAAAAgAAAAAAAAACAAAADwAAAAxjb3JlX21ldHJpY3MAAAAPAAAACmVtaXRfZXZlbnQAAAAAAAUAAAAAAAAAAQ==",
+                            "AAAAAAAAAAAAAAAAAAAAAgAAAAAAAAACAAAADwAAAAxjb3JlX21ldHJpY3MAAAAPAAAAD2VtaXRfZXZlbnRfYnl0ZQAAAAAFAAAAAAAAAQQ=",
+                            "AAAAAAAAAAAAAAAAAAAAAgAAAAAAAAACAAAADwAAAAxjb3JlX21ldHJpY3MAAAAPAAAACGNwdV9pbnNuAAAABQAAAAAAM2BC",
+                            "AAAAAAAAAAAAAAAAAAAAAgAAAAAAAAACAAAADwAAAAxjb3JlX21ldHJpY3MAAAAPAAAACG1lbV9ieXRlAAAABQAAAAAAGwer",
+                            "AAAAAAAAAAAAAAAAAAAAAgAAAAAAAAACAAAADwAAAAxjb3JlX21ldHJpY3MAAAAPAAAAEWludm9rZV90aW1lX25zZWNzAAAAAAAABQAAAAAACD99",
+                            "AAAAAAAAAAAAAAAAAAAAAgAAAAAAAAACAAAADwAAAAxjb3JlX21ldHJpY3MAAAAPAAAAD21heF9yd19rZXlfYnl0ZQAAAAAFAAAAAAAAAFQ=",
+                            "AAAAAAAAAAAAAAAAAAAAAgAAAAAAAAACAAAADwAAAAxjb3JlX21ldHJpY3MAAAAPAAAAEG1heF9yd19kYXRhX2J5dGUAAAAFAAAAAAAAAbg=",
+                            "AAAAAAAAAAAAAAAAAAAAAgAAAAAAAAACAAAADwAAAAxjb3JlX21ldHJpY3MAAAAPAAAAEG1heF9yd19jb2RlX2J5dGUAAAAFAAAAAAAAQEw=",
+                            "AAAAAAAAAAAAAAAAAAAAAgAAAAAAAAACAAAADwAAAAxjb3JlX21ldHJpY3MAAAAPAAAAE21heF9lbWl0X2V2ZW50X2J5dGUAAAAABQAAAAAAAAEE",
+                        ],
+                        "transactionEventsXdr": [
+                            "AAAAAAAAAAAAAAAB15KLcsJwPM/q9+uf9O9NUEpVqLl5/JtFDqLIQrTRzmEAAAABAAAAAAAAAAIAAAAPAAAAA2ZlZQAAAAASAAAAAAAAAADte5nJrehJq/pu3qlV/bASRSOiJVXdNC+gQW/nxVNWuQAAAAoAAAAAAAAAAAAAAAAAWOuO",
+                            "AAAAAQAAAAAAAAAB15KLcsJwPM/q9+uf9O9NUEpVqLl5/JtFDqLIQrTRzmEAAAABAAAAAAAAAAIAAAAPAAAAA2ZlZQAAAAASAAAAAAAAAADte5nJrehJq/pu3qlV/bASRSOiJVXdNC+gQW/nxVNWuQAAAAr/////////////////8/qT",
+                        ],
+                        "contractEventsXdr": [
+                            [
+                                "AAAAAAAAAAHf65G24dyt1q+Xu3xFX5fzdHcKf3j2lXO5n11b+EnOfAAAAAEAAAAAAAAAAQAAAA8AAAAEaW5pdAAAABAAAAABAAAABQAAAAUAAAAAAAaRmQAAABIAAAAAAAAAACcMY2GvjF3igK326WyiU8hv107p9YxvAS29gt1fml2WAAAAEgAAAAAAAAAAyewwXk7lqpxiQNYP3VlZ1EEprNK+dSBV4KQ9iluwbx8AAAASAAAAAAAAAAAY2Rm1IXXndEI0rYg2bt1/rw2mi1SYOUT2qeKPvf56cgAAABIAAAABusKzizgXRsUWKJQRrpWHAWG/yujQ6LBT/pMDljEiAeg="
+                            ]
+                        ],
+                    },
                     "ledger": 1888539,
                     "createdAt": 1717166042,
                 },
@@ -578,13 +697,13 @@ class TestSorobanServer:
         GetTransactionsResponse.model_validate(result)
         limit = 5
         with aioresponses() as m:
-            m.post(PRC_URL, payload=data)
-            async with SorobanServerAsync(PRC_URL) as client:
+            m.post(RPC_URL, payload=data)
+            async with SorobanServerAsync(RPC_URL) as client:
                 assert (
                     await client.get_transactions(start_ledger, None, limit)
                 ) == GetTransactionsResponse.model_validate(result)
 
-        request_data = m.requests[("POST", URL(PRC_URL))][0].kwargs["json"]
+        request_data = m.requests[("POST", URL(RPC_URL))][0].kwargs["json"]
         assert len(request_data["id"]) == 32
         assert request_data["jsonrpc"] == "2.0"
         assert request_data["method"] == "getTransactions"
@@ -628,13 +747,13 @@ class TestSorobanServer:
         GetLedgersResponse.model_validate(result)
         limit = 2
         with aioresponses() as m:
-            m.post(PRC_URL, payload=data)
-            async with SorobanServerAsync(PRC_URL) as client:
+            m.post(RPC_URL, payload=data)
+            async with SorobanServerAsync(RPC_URL) as client:
                 assert (
                     await client.get_ledgers(start_ledger, None, limit)
                 ) == GetLedgersResponse.model_validate(result)
 
-        request_data = m.requests[("POST", URL(PRC_URL))][0].kwargs["json"]
+        request_data = m.requests[("POST", URL(RPC_URL))][0].kwargs["json"]
         assert len(request_data["id"]) == 32
         assert request_data["jsonrpc"] == "2.0"
         assert request_data["method"] == "getLedgers"
@@ -642,6 +761,68 @@ class TestSorobanServer:
             "startLedger": start_ledger,
             "pagination": {"cursor": None, "limit": 2},
         }
+
+    async def test_get_sac_balance(self):
+        result = {
+            "entries": [
+                {
+                    "key": "AAAABgAAAAEltPzYWa7C+mNIQ4xImzw8EMmLbSG+T9PLMMtolT75dwAAABAAAAABAAAAAgAAAA8AAAAHQmFsYW5jZQAAAAASAAAAASW0/NhZrsL6Y0hDjEibPDwQyYttIb5P08swy2iVPvl3AAAAAQ==",
+                    "xdr": "AAAABgAAAAAAAAABJbT82FmuwvpjSEOMSJs8PBDJi20hvk/TyzDLaJU++XcAAAAQAAAAAQAAAAIAAAAPAAAAB0JhbGFuY2UAAAAAEgAAAAEltPzYWa7C+mNIQ4xImzw8EMmLbSG+T9PLMMtolT75dwAAAAEAAAARAAAAAQAAAAMAAAAPAAAABmFtb3VudAAAAAAACgAAAAAAAAAAAAAAABFKkyUAAAAPAAAACmF1dGhvcml6ZWQAAAAAAAAAAAABAAAADwAAAAhjbGF3YmFjawAAAAAAAAAA",
+                    "lastModifiedLedgerSeq": 57386587,
+                    "liveUntilLedgerSeq": 57904987,
+                }
+            ],
+            "latestLedger": 57387047,
+        }
+        data = {
+            "jsonrpc": "2.0",
+            "id": "e1fabdcdf0244a2a9adfab94d7748b6c",
+            "result": result,
+        }
+        expected_result = GetSACBalanceResponse(
+            latest_ledger=57387047,
+            balance_entry=SACBalanceEntry(
+                amount=290100005,
+                authorized=True,
+                clawback=False,
+                last_modified_ledger=57386587,
+                live_until_ledger=57904987,
+            ),
+        )
+        with aioresponses() as m:
+            m.post(RPC_URL, payload=data)
+            assert (
+                await SorobanServerAsync(RPC_URL).get_sac_balance(
+                    "CC25B67T7RG7IBWVQKBFRC6SR4MJDHYFDGMIQYVVI7WE55TPUILMH5YT",
+                    Asset.native(),
+                    Network.PUBLIC_NETWORK_PASSPHRASE,
+                )
+                == expected_result
+            )
+
+    async def test_get_sac_balance_with_empty_balance_entry(self):
+        result = {"entries": [], "latestLedger": 57387178}
+        data = {
+            "jsonrpc": "2.0",
+            "id": "e1fabdcdf0244a2a9adfab94d7748b6c",
+            "result": result,
+        }
+        expected_result = GetSACBalanceResponse(
+            latest_ledger=57387178, balance_entry=None
+        )
+        with aioresponses() as m:
+            m.post(RPC_URL, payload=data)
+            assert (
+                await SorobanServerAsync(RPC_URL).get_sac_balance(
+                    "CDOAW6D7NXAPOCO7TFAWZNJHK62E3IYRGNRVX3VOXNKNVOXCLLPJXQCF",
+                    Asset(
+                        "yXLM",
+                        "GARDNV3Q7YGT4AKSDF25LT32YSCCW4EV22Y2TV3I2PU2MMXJTEDL5T55",
+                    ),
+                    Network.PUBLIC_NETWORK_PASSPHRASE,
+                )
+                == expected_result
+            )
 
     async def test_simulate_transaction(self):
         result = {
@@ -676,19 +857,20 @@ class TestSorobanServer:
         }
         transaction = _build_soroban_transaction(None, [])
         with aioresponses() as m:
-            m.post(PRC_URL, payload=data)
-            async with SorobanServerAsync(PRC_URL) as client:
+            m.post(RPC_URL, payload=data)
+            async with SorobanServerAsync(RPC_URL) as client:
                 assert (
                     await client.simulate_transaction(transaction)
                 ) == SimulateTransactionResponse.model_validate(result)
 
-        request_data = m.requests[("POST", URL(PRC_URL))][0].kwargs["json"]
+        request_data = m.requests[("POST", URL(RPC_URL))][0].kwargs["json"]
         assert len(request_data["id"]) == 32
         assert request_data["jsonrpc"] == "2.0"
         assert request_data["method"] == "simulateTransaction"
         assert request_data["params"] == {
             "transaction": transaction.to_xdr(),
             "resourceConfig": None,
+            "authMode": None,
         }
 
     async def test_simulate_transaction_with_addl_resources(self):
@@ -716,21 +898,73 @@ class TestSorobanServer:
         }
         transaction = _build_soroban_transaction(None, [])
         with aioresponses() as m:
-            m.post(PRC_URL, payload=data)
-            async with SorobanServerAsync(PRC_URL) as client:
+            m.post(RPC_URL, payload=data)
+            async with SorobanServerAsync(RPC_URL) as client:
                 assert (
                     await client.simulate_transaction(
                         transaction, ResourceLeeway(1000000)
                     )
                 ) == SimulateTransactionResponse.model_validate(result)
 
-        request_data = m.requests[("POST", URL(PRC_URL))][0].kwargs["json"]
+        request_data = m.requests[("POST", URL(RPC_URL))][0].kwargs["json"]
         assert len(request_data["id"]) == 32
         assert request_data["jsonrpc"] == "2.0"
         assert request_data["method"] == "simulateTransaction"
         assert request_data["params"] == {
             "transaction": transaction.to_xdr(),
             "resourceConfig": {"instructionLeeway": 1000000},
+            "authMode": None,
+        }
+
+    async def test_simulate_transaction_with_auth_mode(self):
+        result = {
+            "transactionData": "AAAAAAAAAAIAAAAGAAAAAcWLK/vE8FTnMk9r8gytPgJuQbutGm0gw9fUkY3tFlQRAAAAFAAAAAEAAAAAAAAAB300Hyg0HZG+Qie3zvsxLvugrNtFqd3AIntWy9bg2YvZAAAAAAAAAAEAAAAGAAAAAcWLK/vE8FTnMk9r8gytPgJuQbutGm0gw9fUkY3tFlQRAAAAEAAAAAEAAAACAAAADwAAAAdDb3VudGVyAAAAABIAAAAAAAAAAFi3xKLI8peqjz0kcSgf38zsr+SOVmMxPsGOEqc+ypihAAAAAQAAAAAAFcLDAAAF8AAAAQgAAAMcAAAAAAAAAJw=",
+            "events": [
+                "AAAAAQAAAAAAAAAAAAAAAgAAAAAAAAADAAAADwAAAAdmbl9jYWxsAAAAAA0AAAAgxYsr+8TwVOcyT2vyDK0+Am5Bu60abSDD19SRje0WVBEAAAAPAAAACWluY3JlbWVudAAAAAAAABAAAAABAAAAAgAAABIAAAAAAAAAAFi3xKLI8peqjz0kcSgf38zsr+SOVmMxPsGOEqc+ypihAAAAAwAAAAo=",
+                "AAAAAQAAAAAAAAABxYsr+8TwVOcyT2vyDK0+Am5Bu60abSDD19SRje0WVBEAAAACAAAAAAAAAAIAAAAPAAAACWZuX3JldHVybgAAAAAAAA8AAAAJaW5jcmVtZW50AAAAAAAAAwAAABQ=",
+            ],
+            "minResourceFee": "58595",
+            "results": [
+                {
+                    "auth": [
+                        "AAAAAAAAAAAAAAABxYsr+8TwVOcyT2vyDK0+Am5Bu60abSDD19SRje0WVBEAAAAJaW5jcmVtZW50AAAAAAAAAgAAABIAAAAAAAAAAFi3xKLI8peqjz0kcSgf38zsr+SOVmMxPsGOEqc+ypihAAAAAwAAAAoAAAAA"
+                    ],
+                    "xdr": "AAAAAwAAABQ=",
+                }
+            ],
+            "stateChanges": [
+                {
+                    "type": "created",
+                    "key": "AAAAAAAAAABuaCbVXZ2DlXWarV6UxwbW3GNJgpn3ASChIFp5bxSIWg==",
+                    "before": None,
+                    "after": "AAAAZAAAAAAAAAAAbmgm1V2dg5V1mq1elMcG1txjSYKZ9wEgoSBaeW8UiFoAAAAAAAAAZAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=",
+                }
+            ],
+            "latestLedger": "1479",
+        }
+        data = {
+            "jsonrpc": "2.0",
+            "id": "e1fabdcdf0244a2a9adfab94d7748b6c",
+            "result": result,
+        }
+        transaction = _build_soroban_transaction(None, [])
+        with aioresponses() as m:
+            m.post(RPC_URL, payload=data)
+            async with SorobanServerAsync(RPC_URL) as client:
+                assert (
+                    await client.simulate_transaction(
+                        transaction, auth_mode=AuthMode.RECORD_ALL_NOROOT
+                    )
+                ) == SimulateTransactionResponse.model_validate(result)
+
+        request_data = m.requests[("POST", URL(RPC_URL))][0].kwargs["json"]
+        assert len(request_data["id"]) == 32
+        assert request_data["jsonrpc"] == "2.0"
+        assert request_data["method"] == "simulateTransaction"
+        assert request_data["params"] == {
+            "transaction": transaction.to_xdr(),
+            "resourceConfig": None,
+            "authMode": "record_allow_nonroot",
         }
 
     async def test_prepare_transaction_without_auth_and_soroban_data(self):
@@ -758,8 +992,8 @@ class TestSorobanServer:
 
         transaction = _build_soroban_transaction(None, [])
         with aioresponses() as m:
-            m.post(PRC_URL, payload=data)
-            async with SorobanServerAsync(PRC_URL) as client:
+            m.post(RPC_URL, payload=data)
+            async with SorobanServerAsync(RPC_URL) as client:
                 new_transaction = await client.prepare_transaction(transaction)
         expected_transaction = copy.deepcopy(transaction)
         expected_transaction.transaction.fee += int(data["result"]["minResourceFee"])
@@ -769,6 +1003,7 @@ class TestSorobanServer:
             )
         )
         op = expected_transaction.transaction.operations[0]
+        assert isinstance(op, InvokeHostFunction)
         op.auth = [
             stellar_xdr.SorobanAuthorizationEntry.from_xdr(xdr)
             for xdr in data["result"]["results"][0]["auth"]
@@ -799,22 +1034,22 @@ class TestSorobanServer:
         }
 
         soroban_data = stellar_xdr.SorobanTransactionData(
-            ext=stellar_xdr.ExtensionPoint(0),
+            ext=stellar_xdr.SorobanTransactionDataExt(0),
             resource_fee=stellar_xdr.Int64(50000),
             resources=stellar_xdr.SorobanResources(
                 footprint=stellar_xdr.LedgerFootprint(
                     read_only=[],
                     read_write=[],
                 ),
-                read_bytes=stellar_xdr.Uint32(2),
+                disk_read_bytes=stellar_xdr.Uint32(2),
                 write_bytes=stellar_xdr.Uint32(3),
                 instructions=stellar_xdr.Uint32(4),
             ),
         )  # soroban_data will be overwritten by the response
         transaction = _build_soroban_transaction(soroban_data, [])
         with aioresponses() as m:
-            m.post(PRC_URL, payload=data)
-            async with SorobanServerAsync(PRC_URL) as client:
+            m.post(RPC_URL, payload=data)
+            async with SorobanServerAsync(RPC_URL) as client:
                 new_transaction = await client.prepare_transaction(transaction)
         expected_transaction = copy.deepcopy(transaction)
         expected_transaction.transaction.fee = 50000 + int(
@@ -826,6 +1061,7 @@ class TestSorobanServer:
             )
         )
         op = expected_transaction.transaction.operations[0]
+        assert isinstance(op, InvokeHostFunction)
         op.auth = [
             stellar_xdr.SorobanAuthorizationEntry.from_xdr(xdr)
             for xdr in data["result"]["results"][0]["auth"]
@@ -876,8 +1112,8 @@ class TestSorobanServer:
 
         transaction = _build_soroban_transaction(None, [auth])
         with aioresponses() as m:
-            m.post(PRC_URL, payload=data)
-            async with SorobanServerAsync(PRC_URL) as client:
+            m.post(RPC_URL, payload=data)
+            async with SorobanServerAsync(RPC_URL) as client:
                 new_transaction = await client.prepare_transaction(transaction)
         expected_transaction = copy.deepcopy(transaction)
         expected_transaction.transaction.fee += int(data["result"]["minResourceFee"])
@@ -887,6 +1123,7 @@ class TestSorobanServer:
             )
         )
         op = expected_transaction.transaction.operations[0]
+        assert isinstance(op, InvokeHostFunction)
         op.auth = [auth]
         assert new_transaction == expected_transaction
 
@@ -906,12 +1143,12 @@ class TestSorobanServer:
         }
         transaction = _build_soroban_transaction(None, [])
         with aioresponses() as m:
-            m.post(PRC_URL, payload=data)
+            m.post(RPC_URL, payload=data)
             with pytest.raises(
                 PrepareTransactionException,
                 match="Simulation transaction failed, the response contains error information.",
             ) as e:
-                async with SorobanServerAsync(PRC_URL) as client:
+                async with SorobanServerAsync(RPC_URL) as client:
                     await client.prepare_transaction(transaction)
             assert (
                 e.value.simulate_transaction_response
@@ -938,12 +1175,12 @@ class TestSorobanServer:
         }
         transaction = _build_soroban_transaction(None, [])
         with aioresponses() as m:
-            m.post(PRC_URL, payload=data)
+            m.post(RPC_URL, payload=data)
             with pytest.raises(
                 ValueError,
                 match="Simulation results invalid",
             ) as e:
-                async with SorobanServerAsync(PRC_URL) as client:
+                async with SorobanServerAsync(RPC_URL) as client:
                     await client.prepare_transaction(transaction)
 
     async def test_send_transaction(self):
@@ -961,13 +1198,13 @@ class TestSorobanServer:
 
         transaction = _build_soroban_transaction(None, [])
         with aioresponses() as m:
-            m.post(PRC_URL, payload=data)
-            async with SorobanServerAsync(PRC_URL) as client:
+            m.post(RPC_URL, payload=data)
+            async with SorobanServerAsync(RPC_URL) as client:
                 assert (
                     await client.send_transaction(transaction)
                 ) == SendTransactionResponse.model_validate(result)
 
-        request_data = m.requests[("POST", URL(PRC_URL))][0].kwargs["json"]
+        request_data = m.requests[("POST", URL(RPC_URL))][0].kwargs["json"]
         assert len(request_data["id"]) == 32
         assert request_data["jsonrpc"] == "2.0"
         assert request_data["method"] == "sendTransaction"
@@ -993,13 +1230,13 @@ class TestSorobanServer:
 
         transaction = _build_soroban_transaction(None, [])
         with aioresponses() as m:
-            m.post(PRC_URL, payload=data)
-            async with SorobanServerAsync(PRC_URL) as client:
+            m.post(RPC_URL, payload=data)
+            async with SorobanServerAsync(RPC_URL) as client:
                 assert (
                     await client.send_transaction(transaction)
                 ) == SendTransactionResponse.model_validate(result)
 
-        request_data = m.requests[("POST", URL(PRC_URL))][0].kwargs["json"]
+        request_data = m.requests[("POST", URL(RPC_URL))][0].kwargs["json"]
         assert len(request_data["id"]) == 32
         assert request_data["jsonrpc"] == "2.0"
         assert request_data["method"] == "sendTransaction"
@@ -1017,13 +1254,24 @@ class TestSorobanServer:
             },
         }
         with aioresponses() as m:
-            m.post(PRC_URL, payload=data)
+            m.post(RPC_URL, payload=data)
             with pytest.raises(SorobanRpcErrorResponse) as e:
-                async with SorobanServerAsync(PRC_URL) as client:
+                async with SorobanServerAsync(RPC_URL) as client:
                     await client.get_health()
             assert e.value.code == -32601
             assert e.value.message == "method not found"
             assert e.value.data == "mockTest"
+
+    async def test_pagination_start_ledger_and_cursor_raise(self):
+        with pytest.raises(ValidationError) as e:
+            async with SorobanServerAsync(RPC_URL) as client:
+                await client.get_transactions(
+                    start_ledger=67, cursor="8111217537191937", limit=1
+                )
+        assert e.value.error_count() == 1
+        val_error = e.value.errors()[0]
+        assert val_error["type"] == "value_error"
+        assert val_error["msg"].endswith("start_ledger and cursor cannot both be set")
 
 
 def _build_soroban_transaction(

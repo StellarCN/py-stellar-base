@@ -1,7 +1,8 @@
+import base64
 import itertools
 
 import pytest
-import shamir_mnemonic
+import shamir_mnemonic  # type: ignore[import-untyped]
 
 from stellar_sdk import Keypair, StrKey
 from stellar_sdk.exceptions import (
@@ -708,3 +709,46 @@ class TestKeypair:
         sign_decorated = kp.sign_payload_decorated(payload)
         assert sign_decorated.signature_hint == bytes(hint)
         assert sign_decorated.signature == kp.sign(payload)
+
+    @pytest.mark.parametrize(
+        "message, expected_signature",
+        [
+            (
+                "Hello, World!",
+                "fO5dbYhXUhBMhe6kId/cuVq/AfEnHRHEvsP8vXh03M1uLpi5e46yO2Q8rEBzu3feXQewcQE5GArp88u6ePK6BA==",
+            ),
+            (
+                "こんにちは、世界！",
+                "CDU265Xs8y3OWbB/56H9jPgUss5G9A0qFuTqH2zs2YDgTm+++dIfmAEceFqB7bhfN3am59lCtDXrCtwH2k1GBA==",
+            ),
+            (
+                base64.b64decode("2zZDP1sa1BVBfLP7TeeMk3sUbaxAkUhBhDiNdrksaFo="),
+                "VA1+7hefNwv2NKScH6n+Sljj15kLAge+M2wE7fzFOf+L0MMbssA1mwfJZRyyrhBORQRle10X1Dxpx+UOI4EbDQ==",
+            ),
+        ],
+    )
+    def test_sign_and_verify_message(self, message, expected_signature):
+        kp = Keypair.from_secret(
+            "SAKICEVQLYWGSOJS4WW7HZJWAHZVEEBS527LHK5V4MLJALYKICQCJXMW"
+        )
+        # Sign the message
+        signature = kp.sign_message(message)
+        assert signature == base64.b64decode(expected_signature)
+        # Verify the signature
+        kp.verify_message(message, signature)
+
+    @pytest.mark.parametrize(
+        "signature",
+        [
+            "VA1+7hefNwv2NKScH6n+Sljj15kLAge+M2wE7fzFOf+L0MMbssA1mwfJZRyyrhBORQRle10X1Dxpx+UOI4EbDQ==",
+            "MTI=",
+        ],
+    )
+    def test_verify_message_with_invalid_signature_raise(self, signature):
+        kp = Keypair.from_public_key(
+            "GBXFXNDLV4LSWA4VB7YIL5GBD7BVNR22SGBTDKMO2SBZZHDXSKZYCP7L"
+        )
+        message = "Hello, World!"
+
+        with pytest.raises(BadSignatureError, match="Signature verification failed."):
+            kp.verify_message(message, base64.b64decode(signature))

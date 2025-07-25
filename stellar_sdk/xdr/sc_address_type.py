@@ -17,12 +17,18 @@ class SCAddressType(IntEnum):
         enum SCAddressType
         {
             SC_ADDRESS_TYPE_ACCOUNT = 0,
-            SC_ADDRESS_TYPE_CONTRACT = 1
+            SC_ADDRESS_TYPE_CONTRACT = 1,
+            SC_ADDRESS_TYPE_MUXED_ACCOUNT = 2,
+            SC_ADDRESS_TYPE_CLAIMABLE_BALANCE = 3,
+            SC_ADDRESS_TYPE_LIQUIDITY_POOL = 4
         };
     """
 
     SC_ADDRESS_TYPE_ACCOUNT = 0
     SC_ADDRESS_TYPE_CONTRACT = 1
+    SC_ADDRESS_TYPE_MUXED_ACCOUNT = 2
+    SC_ADDRESS_TYPE_CLAIMABLE_BALANCE = 3
+    SC_ADDRESS_TYPE_LIQUIDITY_POOL = 4
 
     def pack(self, packer: Packer) -> None:
         packer.pack_int(self.value)

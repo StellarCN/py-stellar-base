@@ -47,16 +47,10 @@ class StrictReceivePathsCallBuilder(BaseCallBuilder, BaseStrictReceivePathsCallB
         destination_asset: Asset,
         destination_amount: Union[str, Decimal],
     ) -> None:
-        super().__init__(  # type: ignore[call-arg]
+        super().__init__(
             horizon_url=horizon_url,
             client=client,
             source=source,
             destination_asset=destination_asset,
             destination_amount=destination_amount,
         )
-
-    def stream(
-        self,
-    ):
-        """This endpoint does not support streaming."""
-        raise NotImplementedError("Streaming is not supported.")

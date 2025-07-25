@@ -2,10 +2,6 @@ import pytest
 
 from stellar_sdk import Account, MuxedAccount
 from stellar_sdk.account import Thresholds
-from stellar_sdk.exceptions import (
-    Ed25519PublicKeyInvalidError,
-    MuxedEd25519AccountInvalidError,
-)
 from stellar_sdk.sep.ed25519_public_key_signer import Ed25519PublicKeySigner
 
 
@@ -102,8 +98,8 @@ class TestAccount:
     def test_account_with_invalid_ed25519_public_key_raise(self):
         invalid_account_id = "GA7YNBW5CBTJZ3ZZOWX3ZNBKD6OE7A7IHUQVWMY62W2ZBG2SGZVOOBAD"
         with pytest.raises(
-            Ed25519PublicKeyInvalidError,
-            match=f"Invalid Ed25519 Public Key: {invalid_account_id}",
+            ValueError,
+            match=f"This is not a valid account: {invalid_account_id}",
         ):
             Account(invalid_account_id, 0)
 
@@ -112,8 +108,8 @@ class TestAccount:
             "MA7YNBW5CBTJZ3ZZOWX3ZNBKD6OE7A7IHUQVWMY62W2ZBG2SGZVOOAAAAAAAAEINVALID"
         )
         with pytest.raises(
-            MuxedEd25519AccountInvalidError,
-            match=f"Invalid Muxed Account: {invalid_muxed_account}",
+            ValueError,
+            match=f"This is not a valid account: {invalid_muxed_account}",
         ):
             Account(invalid_muxed_account, 0)
 

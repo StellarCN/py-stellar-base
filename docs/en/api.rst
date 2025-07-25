@@ -782,8 +782,8 @@ SorobanServer
 .. autoclass:: stellar_sdk.SorobanServer
    :members:
 
-SorobanServer
-^^^^^^^^^^^^^
+SorobanServerAsync
+^^^^^^^^^^^^^^^^^^
 
 .. autoclass:: stellar_sdk.SorobanServerAsync
    :members:
@@ -981,22 +981,6 @@ AlphaNum12
 AlphaNum4
 ---------
 .. autoclass:: stellar_sdk.xdr.alpha_num4.AlphaNum4
-
-ArchivalProof
--------------
-.. autoclass:: stellar_sdk.xdr.archival_proof.ArchivalProof
-
-ArchivalProofBody
------------------
-.. autoclass:: stellar_sdk.xdr.archival_proof_body.ArchivalProofBody
-
-ArchivalProofNode
------------------
-.. autoclass:: stellar_sdk.xdr.archival_proof_node.ArchivalProofNode
-
-ArchivalProofType
------------------
-.. autoclass:: stellar_sdk.xdr.archival_proof_type.ArchivalProofType
 
 Asset
 -----
@@ -1206,30 +1190,6 @@ ClawbackResultCode
 ------------------
 .. autoclass:: stellar_sdk.xdr.clawback_result_code.ClawbackResultCode
 
-ColdArchiveArchivedLeaf
------------------------
-.. autoclass:: stellar_sdk.xdr.cold_archive_archived_leaf.ColdArchiveArchivedLeaf
-
-ColdArchiveBoundaryLeaf
------------------------
-.. autoclass:: stellar_sdk.xdr.cold_archive_boundary_leaf.ColdArchiveBoundaryLeaf
-
-ColdArchiveBucketEntry
-----------------------
-.. autoclass:: stellar_sdk.xdr.cold_archive_bucket_entry.ColdArchiveBucketEntry
-
-ColdArchiveBucketEntryType
---------------------------
-.. autoclass:: stellar_sdk.xdr.cold_archive_bucket_entry_type.ColdArchiveBucketEntryType
-
-ColdArchiveDeletedLeaf
-----------------------
-.. autoclass:: stellar_sdk.xdr.cold_archive_deleted_leaf.ColdArchiveDeletedLeaf
-
-ColdArchiveHashEntry
---------------------
-.. autoclass:: stellar_sdk.xdr.cold_archive_hash_entry.ColdArchiveHashEntry
-
 ConfigSettingContractBandwidthV0
 --------------------------------
 .. autoclass:: stellar_sdk.xdr.config_setting_contract_bandwidth_v0.ConfigSettingContractBandwidthV0
@@ -1250,9 +1210,17 @@ ConfigSettingContractHistoricalDataV0
 -------------------------------------
 .. autoclass:: stellar_sdk.xdr.config_setting_contract_historical_data_v0.ConfigSettingContractHistoricalDataV0
 
+ConfigSettingContractLedgerCostExtV0
+------------------------------------
+.. autoclass:: stellar_sdk.xdr.config_setting_contract_ledger_cost_ext_v0.ConfigSettingContractLedgerCostExtV0
+
 ConfigSettingContractLedgerCostV0
 ---------------------------------
 .. autoclass:: stellar_sdk.xdr.config_setting_contract_ledger_cost_v0.ConfigSettingContractLedgerCostV0
+
+ConfigSettingContractParallelComputeV0
+--------------------------------------
+.. autoclass:: stellar_sdk.xdr.config_setting_contract_parallel_compute_v0.ConfigSettingContractParallelComputeV0
 
 ConfigSettingEntry
 ------------------
@@ -1261,6 +1229,10 @@ ConfigSettingEntry
 ConfigSettingID
 ---------------
 .. autoclass:: stellar_sdk.xdr.config_setting_id.ConfigSettingID
+
+ConfigSettingSCPTiming
+----------------------
+.. autoclass:: stellar_sdk.xdr.config_setting_scp_timing.ConfigSettingSCPTiming
 
 ConfigUpgradeSet
 ----------------
@@ -1329,6 +1301,10 @@ ContractExecutable
 ContractExecutableType
 ----------------------
 .. autoclass:: stellar_sdk.xdr.contract_executable_type.ContractExecutableType
+
+ContractID
+----------
+.. autoclass:: stellar_sdk.xdr.contract_id.ContractID
 
 ContractIDPreimage
 ------------------
@@ -1406,13 +1382,13 @@ DecoratedSignature
 ------------------
 .. autoclass:: stellar_sdk.xdr.decorated_signature.DecoratedSignature
 
+DependentTxCluster
+------------------
+.. autoclass:: stellar_sdk.xdr.dependent_tx_cluster.DependentTxCluster
+
 DiagnosticEvent
 ---------------
 .. autoclass:: stellar_sdk.xdr.diagnostic_event.DiagnosticEvent
-
-DiagnosticEvents
-----------------
-.. autoclass:: stellar_sdk.xdr.diagnostic_events.DiagnosticEvents
 
 DontHave
 --------
@@ -1453,10 +1429,6 @@ ErrorCode
 EvictionIterator
 ----------------
 .. autoclass:: stellar_sdk.xdr.eviction_iterator.EvictionIterator
-
-ExistenceProofBody
-------------------
-.. autoclass:: stellar_sdk.xdr.existence_proof_body.ExistenceProofBody
 
 ExtendFootprintTTLOp
 --------------------
@@ -1642,6 +1614,10 @@ LedgerCloseMeta
 ---------------
 .. autoclass:: stellar_sdk.xdr.ledger_close_meta.LedgerCloseMeta
 
+LedgerCloseMetaBatch
+--------------------
+.. autoclass:: stellar_sdk.xdr.ledger_close_meta_batch.LedgerCloseMetaBatch
+
 LedgerCloseMetaExt
 ------------------
 .. autoclass:: stellar_sdk.xdr.ledger_close_meta_ext.LedgerCloseMetaExt
@@ -1657,6 +1633,10 @@ LedgerCloseMetaV0
 LedgerCloseMetaV1
 -----------------
 .. autoclass:: stellar_sdk.xdr.ledger_close_meta_v1.LedgerCloseMetaV1
+
+LedgerCloseMetaV2
+-----------------
+.. autoclass:: stellar_sdk.xdr.ledger_close_meta_v2.LedgerCloseMetaV2
 
 LedgerCloseValueSignature
 -------------------------
@@ -1906,13 +1886,13 @@ MuxedAccountMed25519
 --------------------
 .. autoclass:: stellar_sdk.xdr.muxed_account_med25519.MuxedAccountMed25519
 
+MuxedEd25519Account
+-------------------
+.. autoclass:: stellar_sdk.xdr.muxed_ed25519_account.MuxedEd25519Account
+
 NodeID
 ------
 .. autoclass:: stellar_sdk.xdr.node_id.NodeID
-
-NonexistenceProofBody
----------------------
-.. autoclass:: stellar_sdk.xdr.nonexistence_proof_body.NonexistenceProofBody
 
 OfferEntry
 ----------
@@ -1942,6 +1922,10 @@ OperationMeta
 -------------
 .. autoclass:: stellar_sdk.xdr.operation_meta.OperationMeta
 
+OperationMetaV2
+---------------
+.. autoclass:: stellar_sdk.xdr.operation_meta_v2.OperationMetaV2
+
 OperationResult
 ---------------
 .. autoclass:: stellar_sdk.xdr.operation_result.OperationResult
@@ -1957,6 +1941,14 @@ OperationResultTr
 OperationType
 -------------
 .. autoclass:: stellar_sdk.xdr.operation_type.OperationType
+
+ParallelTxExecutionStage
+------------------------
+.. autoclass:: stellar_sdk.xdr.parallel_tx_execution_stage.ParallelTxExecutionStage
+
+ParallelTxsComponent
+--------------------
+.. autoclass:: stellar_sdk.xdr.parallel_txs_component.ParallelTxsComponent
 
 PathPaymentStrictReceiveOp
 --------------------------
@@ -2010,10 +2002,6 @@ PeerAddressIp
 -------------
 .. autoclass:: stellar_sdk.xdr.peer_address_ip.PeerAddressIp
 
-PeerStatList
-------------
-.. autoclass:: stellar_sdk.xdr.peer_stat_list.PeerStatList
-
 PeerStats
 ---------
 .. autoclass:: stellar_sdk.xdr.peer_stats.PeerStats
@@ -2049,10 +2037,6 @@ PreconditionsV2
 Price
 -----
 .. autoclass:: stellar_sdk.xdr.price.Price
-
-ProofLevel
-----------
-.. autoclass:: stellar_sdk.xdr.proof_level.ProofLevel
 
 PublicKey
 ---------
@@ -2214,6 +2198,22 @@ SCSpecEntryKind
 ---------------
 .. autoclass:: stellar_sdk.xdr.sc_spec_entry_kind.SCSpecEntryKind
 
+SCSpecEventDataFormat
+---------------------
+.. autoclass:: stellar_sdk.xdr.sc_spec_event_data_format.SCSpecEventDataFormat
+
+SCSpecEventParamLocationV0
+--------------------------
+.. autoclass:: stellar_sdk.xdr.sc_spec_event_param_location_v0.SCSpecEventParamLocationV0
+
+SCSpecEventParamV0
+------------------
+.. autoclass:: stellar_sdk.xdr.sc_spec_event_param_v0.SCSpecEventParamV0
+
+SCSpecEventV0
+-------------
+.. autoclass:: stellar_sdk.xdr.sc_spec_event_v0.SCSpecEventV0
+
 SCSpecFunctionInputV0
 ---------------------
 .. autoclass:: stellar_sdk.xdr.sc_spec_function_input_v0.SCSpecFunctionInputV0
@@ -2374,14 +2374,6 @@ SignatureHint
 -------------
 .. autoclass:: stellar_sdk.xdr.signature_hint.SignatureHint
 
-SignedSurveyRequestMessage
---------------------------
-.. autoclass:: stellar_sdk.xdr.signed_survey_request_message.SignedSurveyRequestMessage
-
-SignedSurveyResponseMessage
----------------------------
-.. autoclass:: stellar_sdk.xdr.signed_survey_response_message.SignedSurveyResponseMessage
-
 SignedTimeSlicedSurveyRequestMessage
 ------------------------------------
 .. autoclass:: stellar_sdk.xdr.signed_time_sliced_survey_request_message.SignedTimeSlicedSurveyRequestMessage
@@ -2422,6 +2414,10 @@ SorobanAddressCredentials
 -------------------------
 .. autoclass:: stellar_sdk.xdr.soroban_address_credentials.SorobanAddressCredentials
 
+SorobanAuthorizationEntries
+---------------------------
+.. autoclass:: stellar_sdk.xdr.soroban_authorization_entries.SorobanAuthorizationEntries
+
 SorobanAuthorizationEntry
 -------------------------
 .. autoclass:: stellar_sdk.xdr.soroban_authorization_entry.SorobanAuthorizationEntry
@@ -2450,9 +2446,17 @@ SorobanResources
 ----------------
 .. autoclass:: stellar_sdk.xdr.soroban_resources.SorobanResources
 
+SorobanResourcesExtV0
+---------------------
+.. autoclass:: stellar_sdk.xdr.soroban_resources_ext_v0.SorobanResourcesExtV0
+
 SorobanTransactionData
 ----------------------
 .. autoclass:: stellar_sdk.xdr.soroban_transaction_data.SorobanTransactionData
+
+SorobanTransactionDataExt
+-------------------------
+.. autoclass:: stellar_sdk.xdr.soroban_transaction_data_ext.SorobanTransactionDataExt
 
 SorobanTransactionMeta
 ----------------------
@@ -2465,6 +2469,10 @@ SorobanTransactionMetaExt
 SorobanTransactionMetaExtV1
 ---------------------------
 .. autoclass:: stellar_sdk.xdr.soroban_transaction_meta_ext_v1.SorobanTransactionMetaExtV1
+
+SorobanTransactionMetaV2
+------------------------
+.. autoclass:: stellar_sdk.xdr.soroban_transaction_meta_v2.SorobanTransactionMetaV2
 
 SponsorshipDescriptor
 ---------------------
@@ -2578,14 +2586,6 @@ TimeSlicedSurveyStopCollectingMessage
 -------------------------------------
 .. autoclass:: stellar_sdk.xdr.time_sliced_survey_stop_collecting_message.TimeSlicedSurveyStopCollectingMessage
 
-TopologyResponseBodyV0
-----------------------
-.. autoclass:: stellar_sdk.xdr.topology_response_body_v0.TopologyResponseBodyV0
-
-TopologyResponseBodyV1
-----------------------
-.. autoclass:: stellar_sdk.xdr.topology_response_body_v1.TopologyResponseBodyV1
-
 TopologyResponseBodyV2
 ----------------------
 .. autoclass:: stellar_sdk.xdr.topology_response_body_v2.TopologyResponseBodyV2
@@ -2597,6 +2597,14 @@ Transaction
 TransactionEnvelope
 -------------------
 .. autoclass:: stellar_sdk.xdr.transaction_envelope.TransactionEnvelope
+
+TransactionEvent
+----------------
+.. autoclass:: stellar_sdk.xdr.transaction_event.TransactionEvent
+
+TransactionEventStage
+---------------------
+.. autoclass:: stellar_sdk.xdr.transaction_event_stage.TransactionEventStage
 
 TransactionExt
 --------------
@@ -2634,6 +2642,10 @@ TransactionMetaV3
 -----------------
 .. autoclass:: stellar_sdk.xdr.transaction_meta_v3.TransactionMetaV3
 
+TransactionMetaV4
+-----------------
+.. autoclass:: stellar_sdk.xdr.transaction_meta_v4.TransactionMetaV4
+
 TransactionPhase
 ----------------
 .. autoclass:: stellar_sdk.xdr.transaction_phase.TransactionPhase
@@ -2653,6 +2665,10 @@ TransactionResultExt
 TransactionResultMeta
 ---------------------
 .. autoclass:: stellar_sdk.xdr.transaction_result_meta.TransactionResultMeta
+
+TransactionResultMetaV1
+-----------------------
+.. autoclass:: stellar_sdk.xdr.transaction_result_meta_v1.TransactionResultMetaV1
 
 TransactionResultPair
 ---------------------

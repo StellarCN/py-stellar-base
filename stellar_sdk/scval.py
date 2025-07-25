@@ -419,7 +419,7 @@ def to_map(data: Dict[stellar_xdr.SCVal, stellar_xdr.SCVal]) -> stellar_xdr.SCVa
 
 
 def from_map(
-    sc_val: Union[stellar_xdr.SCVal, bytes, str]
+    sc_val: Union[stellar_xdr.SCVal, bytes, str],
 ) -> Dict[stellar_xdr.SCVal, stellar_xdr.SCVal]:
     """Creates a dict value from a :class:`stellar_sdk.xdr.SCVal` XDR object.
 
@@ -713,7 +713,7 @@ def to_enum(
 
 
 def from_enum(
-    sc_val: Union[stellar_xdr.SCVal, bytes, str]
+    sc_val: Union[stellar_xdr.SCVal, bytes, str],
 ) -> Tuple[str, Optional[Union[stellar_xdr.SCVal, List[stellar_xdr.SCVal]]]]:
     """Creates a tuple corresponding to the Enum in the Rust SDK.
 
@@ -754,7 +754,7 @@ def to_tuple_struct(data: Sequence[stellar_xdr.SCVal]) -> stellar_xdr.SCVal:
 
 
 def from_tuple_struct(
-    sc_val: Union[stellar_xdr.SCVal, bytes, str]
+    sc_val: Union[stellar_xdr.SCVal, bytes, str],
 ) -> List[stellar_xdr.SCVal]:
     """Creates a list corresponding to the Tuple Struct in the Rust SDK.
 
@@ -789,7 +789,7 @@ def to_struct(data: Dict[str, stellar_xdr.SCVal]) -> stellar_xdr.SCVal:
 
 
 def from_struct(
-    sc_val: Union[stellar_xdr.SCVal, bytes, str]
+    sc_val: Union[stellar_xdr.SCVal, bytes, str],
 ) -> Dict[str, stellar_xdr.SCVal]:
     """Creates a dict corresponding to the Struct in the Rust SDK.
 

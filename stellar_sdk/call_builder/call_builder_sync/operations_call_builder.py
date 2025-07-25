@@ -1,3 +1,5 @@
+from typing import Any, Dict, Generator
+
 from ...call_builder.base import BaseOperationsCallBuilder
 from ...call_builder.call_builder_sync.base_call_builder import BaseCallBuilder
 from ...client.base_sync_client import BaseSyncClient
@@ -17,3 +19,12 @@ class OperationsCallBuilder(BaseCallBuilder, BaseOperationsCallBuilder):
 
     def __init__(self, horizon_url, client: BaseSyncClient) -> None:
         super().__init__(horizon_url=horizon_url, client=client)
+
+    def stream(
+        self,
+    ) -> Generator[Dict[str, Any], None, None]:
+        """Creates an EventSource that listens for events from the `Operations` endpoint.
+
+        See `Streaming <https://developers.stellar.org/docs/data/apis/horizon/api-reference/structure/streaming>`__ for more information.
+        """
+        return self._stream()

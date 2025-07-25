@@ -96,6 +96,7 @@ def example_verify_challenge_tx_threshold():
         print("Account does not exist, use master key to verify")
 
     if client_account_exists:
+        assert horizon_client_account
         # gets list of signers from account
         signers = horizon_client_account.load_ed25519_public_key_signers()
         # chooses the threshold to require: low, med or high

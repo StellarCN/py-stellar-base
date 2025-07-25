@@ -482,7 +482,7 @@ class TransactionBuilder:
     def append_change_trust_op(
         self,
         asset: Union[Asset, LiquidityPoolAsset],
-        limit: Union[str, Decimal] = None,
+        limit: Optional[Union[str, Decimal]] = None,
         source: Optional[Union[MuxedAccount, str]] = None,
     ) -> "TransactionBuilder":
         """Append a :class:`ChangeTrust <stellar_sdk.operation.ChangeTrust>`
@@ -618,15 +618,15 @@ class TransactionBuilder:
 
     def append_set_options_op(
         self,
-        inflation_dest: str = None,
-        clear_flags: Union[int, AuthorizationFlag] = None,
-        set_flags: Union[int, AuthorizationFlag] = None,
-        master_weight: int = None,
-        low_threshold: int = None,
-        med_threshold: int = None,
-        high_threshold: int = None,
-        home_domain: str = None,
-        signer: Signer = None,
+        inflation_dest: Optional[str] = None,
+        clear_flags: Optional[Union[int, AuthorizationFlag]] = None,
+        set_flags: Optional[Union[int, AuthorizationFlag]] = None,
+        master_weight: Optional[int] = None,
+        low_threshold: Optional[int] = None,
+        med_threshold: Optional[int] = None,
+        high_threshold: Optional[int] = None,
+        home_domain: Optional[str] = None,
+        signer: Optional[Signer] = None,
         source: Optional[Union[MuxedAccount, str]] = None,
     ) -> "TransactionBuilder":
         """Append a :class:`SetOptions <stellar_sdk.operation.SetOptions>`
@@ -1159,8 +1159,8 @@ class TransactionBuilder:
         self,
         trustor: str,
         asset: Asset,
-        clear_flags: TrustLineFlags = None,
-        set_flags: TrustLineFlags = None,
+        clear_flags: Optional[TrustLineFlags] = None,
+        set_flags: Optional[TrustLineFlags] = None,
         source: Optional[Union[MuxedAccount, str]] = None,
     ) -> "TransactionBuilder":
         """Append an :class:`SetTrustLineFlags <stellar_sdk.operation.SetTrustLineFlags>`
@@ -1231,8 +1231,8 @@ class TransactionBuilder:
         self,
         contract_id: str,
         function_name: str,
-        parameters: Sequence[stellar_xdr.SCVal] = None,
-        auth: Sequence[stellar_xdr.SorobanAuthorizationEntry] = None,
+        parameters: Optional[Sequence[stellar_xdr.SCVal]] = None,
+        auth: Optional[Sequence[stellar_xdr.SorobanAuthorizationEntry]] = None,
         source: Optional[Union[MuxedAccount, str]] = None,
     ) -> "TransactionBuilder":
         """Append an :class:`InvokeHostFunction <stellar_sdk.operation.InvokeHostFunction>` operation to the list of operations.
@@ -1299,7 +1299,7 @@ class TransactionBuilder:
         address: Union[str, Address],
         constructor_args: Optional[Sequence[stellar_xdr.SCVal]] = None,
         salt: Optional[bytes] = None,
-        auth: Sequence[stellar_xdr.SorobanAuthorizationEntry] = None,
+        auth: Optional[Sequence[stellar_xdr.SorobanAuthorizationEntry]] = None,
         source: Optional[Union[MuxedAccount, str]] = None,
     ) -> "TransactionBuilder":
         """Append an :class:`InvokeHostFunction <stellar_sdk.operation.InvokeHostFunction>` operation to the list of operations.
@@ -1390,7 +1390,7 @@ class TransactionBuilder:
         self,
         address: Union[str, Address],
         salt: Optional[bytes] = None,
-        auth: Sequence[stellar_xdr.SorobanAuthorizationEntry] = None,
+        auth: Optional[Sequence[stellar_xdr.SorobanAuthorizationEntry]] = None,
         source: Optional[Union[MuxedAccount, str]] = None,
     ) -> "TransactionBuilder":
         """Append an :class:`InvokeHostFunction <stellar_sdk.operation.InvokeHostFunction>` operation to the list of operations.
@@ -1469,7 +1469,7 @@ class TransactionBuilder:
         asset: Asset,
         amount: Union[str, Decimal],
         instructions: int = 400_000,
-        read_bytes: int = 1_000,
+        disk_read_bytes: int = 1_000,
         write_bytes: int = 1_000,
         resource_fee: int = 5_000_000,
         source: Optional[Union[MuxedAccount, str]] = None,
@@ -1492,7 +1492,7 @@ class TransactionBuilder:
         :param asset: The asset to send.
         :param amount: The amount of the asset to send.
         :param instructions: The instructions required to execute the contract function.
-        :param read_bytes: The read bytes required to execute the contract function.
+        :param disk_read_bytes: The disk read bytes required to execute the contract function.
         :param write_bytes: The write bytes required to execute the contract function.
         :param resource_fee: The maximum fee (in stroops) that can be paid for the
             resources consumed by the contract function, defaults to 0.5 XLM.
@@ -1602,17 +1602,20 @@ class TransactionBuilder:
                 contract_instance_ledger_key,
             ]
             read_write = [
-                stellar_xdr.LedgerKey(
-                    type=stellar_xdr.LedgerEntryType.TRUSTLINE,
-                    trust_line=stellar_xdr.LedgerKeyTrustLine(
-                        account_id=Keypair.from_public_key(
-                            from_address
-                        ).xdr_account_id(),
-                        asset=asset.to_trust_line_asset_xdr_object(),
-                    ),
-                ),
                 balance_ledger_key,
             ]
+            if asset.issuer != from_address:
+                read_write.append(
+                    stellar_xdr.LedgerKey(
+                        type=stellar_xdr.LedgerEntryType.TRUSTLINE,
+                        trust_line=stellar_xdr.LedgerKeyTrustLine(
+                            account_id=Keypair.from_public_key(
+                                from_address
+                            ).xdr_account_id(),
+                            asset=asset.to_trust_line_asset_xdr_object(),
+                        ),
+                    ),
+                )
 
         soroban_data = (
             SorobanDataBuilder()
@@ -1622,7 +1625,7 @@ class TransactionBuilder:
             .set_resource_fee(resource_fee)
             # This is higher than actually needed, but the loss is not significant.
             # We should leave some space to handle various situations, including future contract upgrades.
-            .set_resources(instructions, read_bytes, write_bytes)
+            .set_resources(instructions, disk_read_bytes, write_bytes)
             .build()
         )
         self.set_soroban_data(soroban_data)
@@ -1632,7 +1635,7 @@ class TransactionBuilder:
         self,
         balance_owner: str,
         asset: Asset,
-        read_bytes: int = 500,
+        disk_read_bytes: int = 500,
         write_bytes: int = 500,
         resource_fee: int = 4_000_000,
         source: Optional[Union[MuxedAccount, str]] = None,
@@ -1643,7 +1646,7 @@ class TransactionBuilder:
 
         :param balance_owner: The owner of the asset, it should be the same as the `destination` address in the :func:`append_payment_to_contract_op` method.
         :param asset: The asset
-        :param read_bytes: The read bytes required to execute the function.
+        :param disk_read_bytes: The disk read bytes required to execute the function.
         :param write_bytes: The write bytes required to execute the function.
         :param resource_fee: The maximum fee (in stroops) that can be paid for the
             resources consumed by the function, defaults to 0.4 XLM.
@@ -1674,7 +1677,7 @@ class TransactionBuilder:
             .set_resource_fee(resource_fee)
             # This is higher than actually needed, but the loss is not significant.
             # We should leave some space to handle various situations, including future contract upgrades.
-            .set_resources(0, read_bytes, write_bytes)
+            .set_resources(0, disk_read_bytes, write_bytes)
             .build()
         )
         self.set_soroban_data(soroban_data)

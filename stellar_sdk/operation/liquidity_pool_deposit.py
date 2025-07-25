@@ -1,6 +1,6 @@
 import binascii
 from decimal import Decimal
-from typing import Optional, Union
+from typing import ClassVar, Optional, Union
 
 from .. import xdr as stellar_xdr
 from ..muxed_account import MuxedAccount
@@ -30,7 +30,7 @@ class LiquidityPoolDeposit(Operation):
         transaction's source account.
     """
 
-    _XDR_OPERATION_TYPE: stellar_xdr.OperationType = (
+    _XDR_OPERATION_TYPE: ClassVar[stellar_xdr.OperationType] = (
         stellar_xdr.OperationType.LIQUIDITY_POOL_DEPOSIT
     )
 

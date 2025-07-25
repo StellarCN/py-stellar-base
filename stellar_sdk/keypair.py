@@ -9,6 +9,7 @@ from .decorated_signature import DecoratedSignature
 from .exceptions import BadSignatureError, MissingEd25519SecretSeedError
 from .sep.mnemonic import Language, StellarMnemonic
 from .strkey import StrKey
+from .utils import sha256
 
 __all__ = ["Keypair"]
 
@@ -34,7 +35,9 @@ class Keypair:
     """
 
     def __init__(
-        self, verify_key: ed25519.VerifyKey, signing_key: ed25519.SigningKey = None
+        self,
+        verify_key: ed25519.VerifyKey,
+        signing_key: Optional[ed25519.SigningKey] = None,
     ) -> None:
         self.verify_key: ed25519.VerifyKey = verify_key
         self.signing_key: Optional[ed25519.SigningKey] = signing_key
@@ -280,7 +283,7 @@ class Keypair:
         :return: A list of mnemonic phrases.
         """
         try:
-            import shamir_mnemonic  # noqa: F401
+            import shamir_mnemonic  # type: ignore[import-untyped]
         except ModuleNotFoundError as exc:
             message = "shamir_mnemonic must be installed to use method `generate_shamir_mnemonic_phrases`."
             raise ModuleNotFoundError(message) from exc
@@ -367,6 +370,39 @@ class Keypair:
         payload_hint[: data_len if data_len < 4 else 4] = data[-4:]
         hint = bytes(map(lambda x, y: x ^ y, key_hint, payload_hint))
         return DecoratedSignature(hint, signature)
+
+    @staticmethod
+    def _calculate_message_hash(message: Union[str, bytes]) -> bytes:
+        """Calculate the hash of a message according to `SEP-53 <https://github.com/stellar/stellar-protocol/blob/master/ecosystem/sep-0053.md>`__.
+
+        :param message: The message to hash, as a string or bytes.
+        :return: The SHA-256 hash of the prefixed message.
+        """
+        message_prefix = b"Stellar Signed Message:\n"
+        if isinstance(message, str):
+            message = message.encode("utf-8")
+        signed_message_base = message_prefix + message
+        return sha256(signed_message_base)
+
+    def sign_message(self, message: Union[str, bytes]) -> bytes:
+        """Sign a message according to `SEP-53 <https://github.com/stellar/stellar-protocol/blob/master/ecosystem/sep-0053.md>`__.
+
+        :param message: The message to sign, as a string or bytes.
+        :return: The signature bytes.
+        """
+        message_hash = self._calculate_message_hash(message)
+        return self.sign(message_hash)
+
+    def verify_message(self, message: Union[str, bytes], signature: bytes) -> None:
+        """Verify a `SEP-53 <https://github.com/stellar/stellar-protocol/blob/master/ecosystem/sep-0053.md>`__ signed message.
+
+        :param message: The original message, as a string or bytes.
+        :param signature: The signature to verify.
+        :raise: :exc:`BadSignatureError <stellar_sdk.exceptions.BadSignatureError>`:
+            if the verification failed and the signature was incorrect.
+        """
+        message_hash = self._calculate_message_hash(message)
+        return self.verify(message_hash, signature)
 
     def __hash__(self):
         return hash((self.verify_key, self.signing_key))

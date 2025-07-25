@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import base64
+from typing import Optional
 
 from xdrlib3 import Packer, Unpacker
 
@@ -33,8 +34,8 @@ class MuxedAccount:
     def __init__(
         self,
         type: CryptoKeyType,
-        ed25519: Uint256 = None,
-        med25519: MuxedAccountMed25519 = None,
+        ed25519: Optional[Uint256] = None,
+        med25519: Optional[MuxedAccountMed25519] = None,
     ) -> None:
         self.type = type
         self.ed25519 = ed25519

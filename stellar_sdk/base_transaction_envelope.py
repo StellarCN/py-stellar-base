@@ -1,5 +1,5 @@
 from abc import abstractmethod
-from typing import Generic, List, Sequence, TypeVar, Union
+from typing import Generic, List, Optional, Sequence, TypeVar, Union
 
 from . import xdr as stellar_xdr
 from .decorated_signature import DecoratedSignature
@@ -15,7 +15,7 @@ class BaseTransactionEnvelope(Generic[T]):
     def __init__(
         self,
         network_passphrase: str,
-        signatures: Sequence[DecoratedSignature] = None,
+        signatures: Optional[Sequence[DecoratedSignature]] = None,
     ) -> None:
         self.network_passphrase: str = network_passphrase
         self.signatures: List[DecoratedSignature] = (
@@ -137,7 +137,7 @@ class BaseTransactionEnvelope(Generic[T]):
         return cls.from_xdr_object(xdr_object, network_passphrase)
 
     @abstractmethod
-    def __hash__(self):
+    def __hash__(self) -> int:
         pass  # pragma: no cover
 
     @abstractmethod

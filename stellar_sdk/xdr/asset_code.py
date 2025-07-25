@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import base64
+from typing import Optional
 
 from xdrlib3 import Packer, Unpacker
 
@@ -32,8 +33,8 @@ class AssetCode:
     def __init__(
         self,
         type: AssetType,
-        asset_code4: AssetCode4 = None,
-        asset_code12: AssetCode12 = None,
+        asset_code4: Optional[AssetCode4] = None,
+        asset_code12: Optional[AssetCode12] = None,
     ) -> None:
         self.type = type
         self.asset_code4 = asset_code4

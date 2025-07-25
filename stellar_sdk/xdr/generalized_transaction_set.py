@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import base64
+from typing import Optional
 
 from xdrlib3 import Packer, Unpacker
 
@@ -27,7 +28,7 @@ class GeneralizedTransactionSet:
     def __init__(
         self,
         v: int,
-        v1_tx_set: TransactionSetV1 = None,
+        v1_tx_set: Optional[TransactionSetV1] = None,
     ) -> None:
         self.v = v
         self.v1_tx_set = v1_tx_set

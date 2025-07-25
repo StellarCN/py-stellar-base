@@ -28,7 +28,7 @@ class TestAuth:
                 type=stellar_xdr.SorobanAuthorizedFunctionType.SOROBAN_AUTHORIZED_FUNCTION_TYPE_CONTRACT_FN,
                 contract_fn=stellar_xdr.InvokeContractArgs(
                     contract_address=Address(contract_id).to_xdr_sc_address(),
-                    function_name=scval.to_symbol("increment").sym,
+                    function_name=stellar_xdr.SCSymbol(b"increment"),
                     args=[scval.to_address(signer.public_key), scval.to_uint32(10)],
                 ),
             ),
@@ -106,7 +106,7 @@ class TestAuth:
                 type=stellar_xdr.SorobanAuthorizedFunctionType.SOROBAN_AUTHORIZED_FUNCTION_TYPE_CONTRACT_FN,
                 contract_fn=stellar_xdr.InvokeContractArgs(
                     contract_address=Address(contract_id).to_xdr_sc_address(),
-                    function_name=scval.to_symbol("increment").sym,
+                    function_name=stellar_xdr.SCSymbol(b"increment"),
                     args=[scval.to_address(signer.public_key), scval.to_uint32(10)],
                 ),
             ),
@@ -189,7 +189,7 @@ class TestAuth:
                 type=stellar_xdr.SorobanAuthorizedFunctionType.SOROBAN_AUTHORIZED_FUNCTION_TYPE_CONTRACT_FN,
                 contract_fn=stellar_xdr.InvokeContractArgs(
                     contract_address=Address(contract_id).to_xdr_sc_address(),
-                    function_name=scval.to_symbol("increment").sym,
+                    function_name=stellar_xdr.SCSymbol(b"increment"),
                     args=[scval.to_address(signer.public_key), scval.to_uint32(10)],
                 ),
             ),
@@ -271,7 +271,7 @@ class TestAuth:
                 type=stellar_xdr.SorobanAuthorizedFunctionType.SOROBAN_AUTHORIZED_FUNCTION_TYPE_CONTRACT_FN,
                 contract_fn=stellar_xdr.InvokeContractArgs(
                     contract_address=Address(contract_id).to_xdr_sc_address(),
-                    function_name=scval.to_symbol("increment").sym,
+                    function_name=stellar_xdr.SCSymbol(b"increment"),
                     args=[scval.to_address(signer.public_key), scval.to_uint32(10)],
                 ),
             ),
@@ -343,7 +343,7 @@ class TestAuth:
                 type=stellar_xdr.SorobanAuthorizedFunctionType.SOROBAN_AUTHORIZED_FUNCTION_TYPE_CONTRACT_FN,
                 contract_fn=stellar_xdr.InvokeContractArgs(
                     contract_address=Address(contract_id).to_xdr_sc_address(),
-                    function_name=scval.to_symbol("increment").sym,
+                    function_name=stellar_xdr.SCSymbol(b"increment"),
                     args=[scval.to_address(signer.public_key), scval.to_uint32(10)],
                 ),
             ),
@@ -391,7 +391,7 @@ class TestAuth:
                 type=stellar_xdr.SorobanAuthorizedFunctionType.SOROBAN_AUTHORIZED_FUNCTION_TYPE_CONTRACT_FN,
                 contract_fn=stellar_xdr.InvokeContractArgs(
                     contract_address=Address(contract_id).to_xdr_sc_address(),
-                    function_name=scval.to_symbol("increment").sym,
+                    function_name=stellar_xdr.SCSymbol(b"increment"),
                     args=[scval.to_address(signer.public_key), scval.to_uint32(10)],
                 ),
             ),
@@ -420,7 +420,7 @@ class TestAuth:
                 type=stellar_xdr.SorobanAuthorizedFunctionType.SOROBAN_AUTHORIZED_FUNCTION_TYPE_CONTRACT_FN,
                 contract_fn=stellar_xdr.InvokeContractArgs(
                     contract_address=Address(contract_id).to_xdr_sc_address(),
-                    function_name=scval.to_symbol("increment").sym,
+                    function_name=stellar_xdr.SCSymbol(b"increment"),
                     args=[scval.to_address(signer.public_key), scval.to_uint32(10)],
                 ),
             ),
@@ -436,6 +436,7 @@ class TestAuth:
             signed_entry.credentials.type
             == stellar_xdr.SorobanCredentialsType.SOROBAN_CREDENTIALS_ADDRESS
         )
+        assert signed_entry.credentials.address is not None
         assert (
             signed_entry.credentials.address.address
             == Address(signer.public_key).to_xdr_sc_address()
@@ -448,6 +449,7 @@ class TestAuth:
             signed_entry.credentials.address.signature.type
             == stellar_xdr.SCValType.SCV_VEC
         )
+        assert signed_entry.credentials.address.signature.vec is not None
         assert len(signed_entry.credentials.address.signature.vec.sc_vec) == 1
 
     def test_sign_authorize_invocation_with_function_signer(self):
@@ -467,7 +469,7 @@ class TestAuth:
                 type=stellar_xdr.SorobanAuthorizedFunctionType.SOROBAN_AUTHORIZED_FUNCTION_TYPE_CONTRACT_FN,
                 contract_fn=stellar_xdr.InvokeContractArgs(
                     contract_address=Address(contract_id).to_xdr_sc_address(),
-                    function_name=scval.to_symbol("increment").sym,
+                    function_name=stellar_xdr.SCSymbol(b"increment"),
                     args=[scval.to_address(signer.public_key), scval.to_uint32(10)],
                 ),
             ),
@@ -487,6 +489,7 @@ class TestAuth:
             signed_entry.credentials.type
             == stellar_xdr.SorobanCredentialsType.SOROBAN_CREDENTIALS_ADDRESS
         )
+        assert signed_entry.credentials.address is not None
         assert (
             signed_entry.credentials.address.address
             == Address(signer.public_key).to_xdr_sc_address()
@@ -499,6 +502,7 @@ class TestAuth:
             signed_entry.credentials.address.signature.type
             == stellar_xdr.SCValType.SCV_VEC
         )
+        assert signed_entry.credentials.address.signature.vec is not None
         assert len(signed_entry.credentials.address.signature.vec.sc_vec) == 1
 
     def test_sign_authorize_entry_with_keypair_signer_not_equal_credential_address(
@@ -526,7 +530,7 @@ class TestAuth:
                 type=stellar_xdr.SorobanAuthorizedFunctionType.SOROBAN_AUTHORIZED_FUNCTION_TYPE_CONTRACT_FN,
                 contract_fn=stellar_xdr.InvokeContractArgs(
                     contract_address=Address(contract_id).to_xdr_sc_address(),
-                    function_name=scval.to_symbol("increment").sym,
+                    function_name=stellar_xdr.SCSymbol(b"increment"),
                     args=[scval.to_address(signer.public_key), scval.to_uint32(10)],
                 ),
             ),
@@ -612,7 +616,7 @@ class TestAuth:
                 type=stellar_xdr.SorobanAuthorizedFunctionType.SOROBAN_AUTHORIZED_FUNCTION_TYPE_CONTRACT_FN,
                 contract_fn=stellar_xdr.InvokeContractArgs(
                     contract_address=Address(contract_id).to_xdr_sc_address(),
-                    function_name=scval.to_symbol("increment").sym,
+                    function_name=stellar_xdr.SCSymbol(b"increment"),
                     args=[scval.to_address(signer.public_key), scval.to_uint32(10)],
                 ),
             ),

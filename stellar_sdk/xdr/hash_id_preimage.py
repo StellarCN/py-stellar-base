@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import base64
+from typing import Optional
 
 from xdrlib3 import Packer, Unpacker
 
@@ -57,10 +58,10 @@ class HashIDPreimage:
     def __init__(
         self,
         type: EnvelopeType,
-        operation_id: HashIDPreimageOperationID = None,
-        revoke_id: HashIDPreimageRevokeID = None,
-        contract_id: HashIDPreimageContractID = None,
-        soroban_authorization: HashIDPreimageSorobanAuthorization = None,
+        operation_id: Optional[HashIDPreimageOperationID] = None,
+        revoke_id: Optional[HashIDPreimageRevokeID] = None,
+        contract_id: Optional[HashIDPreimageContractID] = None,
+        soroban_authorization: Optional[HashIDPreimageSorobanAuthorization] = None,
     ) -> None:
         self.type = type
         self.operation_id = operation_id

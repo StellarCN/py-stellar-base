@@ -1,5 +1,3 @@
-import asyncio
-
 import pytest
 import requests_mock
 from aioresponses import aioresponses
@@ -53,8 +51,8 @@ class TestFederation:
             record = resolve_stellar_address(self.STELLAR_ADDRESS)
             assert record == self.FEDERATION_RECORD
 
-    def test_resolve_by_stellar_address_async(self):
-        loop = asyncio.get_event_loop()
+    @pytest.mark.asyncio
+    async def test_resolve_by_stellar_address_async(self):
         with aioresponses() as m:
             m.get(
                 "https://example.com/.well-known/stellar.toml", body=self.TOML_CONTENT
@@ -67,9 +65,7 @@ class TestFederation:
                     "memo": "Nice to meet you :-)",
                 },
             )
-            record = loop.run_until_complete(
-                resolve_stellar_address_async(self.STELLAR_ADDRESS)
-            )
+            record = await resolve_stellar_address_async(self.STELLAR_ADDRESS)
             assert record == self.FEDERATION_RECORD
 
     def test_resolve_by_stellar_address_federation_not_found_sync(self):
@@ -81,18 +77,16 @@ class TestFederation:
             ):
                 resolve_stellar_address(self.STELLAR_ADDRESS)
 
-    def test_resolve_by_stellar_address_federation_not_found_async(self):
-        loop = asyncio.get_event_loop()
+    @pytest.mark.asyncio
+    async def test_resolve_by_stellar_address_federation_not_found_async(self):
         with aioresponses() as m:
             m.get("https://example.com/.well-known/stellar.toml", body="")
             with pytest.raises(
                 FederationServerNotFoundError,
                 match="Unable to find federation server at example.com.",
             ):
-                loop.run_until_complete(
-                    resolve_stellar_address_async(
-                        self.STELLAR_ADDRESS, client=AiohttpClient()
-                    )
+                await resolve_stellar_address_async(
+                    self.STELLAR_ADDRESS, client=AiohttpClient()
                 )
 
     def test_resolve_by_stellar_address_with_federation_url_sync(self):
@@ -111,8 +105,8 @@ class TestFederation:
             )
             assert record.account_id == self.ACCOUNT_ID
 
-    def test_resolve_by_stellar_address_with_federation_url_async(self):
-        loop = asyncio.get_event_loop()
+    @pytest.mark.asyncio
+    async def test_resolve_by_stellar_address_with_federation_url_async(self):
         with aioresponses() as m:
             m.get(
                 "https://example.com/.well-known/stellar.toml", body=self.TOML_CONTENT
@@ -125,10 +119,8 @@ class TestFederation:
                     "memo": "Nice to meet you :-)",
                 },
             )
-            record = loop.run_until_complete(
-                resolve_stellar_address_async(
-                    "hello*example.com", federation_url=self.FEDERATION_SERVER
-                )
+            record = await resolve_stellar_address_async(
+                "hello*example.com", federation_url=self.FEDERATION_SERVER
             )
             assert record.account_id == self.ACCOUNT_ID
 
@@ -148,8 +140,8 @@ class TestFederation:
             record = resolve_account_id(self.ACCOUNT_ID, domain=self.DOMAIN)
             assert record == self.FEDERATION_RECORD
 
-    def test_resolve_by_account_id_with_domain_async(self):
-        loop = asyncio.get_event_loop()
+    @pytest.mark.asyncio
+    async def test_resolve_by_account_id_with_domain_async(self):
         with aioresponses() as m:
             m.get(
                 "https://example.com/.well-known/stellar.toml", body=self.TOML_CONTENT
@@ -162,9 +154,7 @@ class TestFederation:
                     "memo": "Nice to meet you :-)",
                 },
             )
-            record = loop.run_until_complete(
-                resolve_account_id_async(self.ACCOUNT_ID, domain=self.DOMAIN)
-            )
+            record = await resolve_account_id_async(self.ACCOUNT_ID, domain=self.DOMAIN)
             assert record == self.FEDERATION_RECORD
 
     def test_resolve_by_account_id_without_domain_and_federation_url(self):
@@ -182,18 +172,16 @@ class TestFederation:
             ):
                 resolve_account_id(self.ACCOUNT_ID, domain="example.com")
 
-    def test_resolve_by_account_id_federation_not_found_async(self):
-        loop = asyncio.get_event_loop()
+    @pytest.mark.asyncio
+    async def test_resolve_by_account_id_federation_not_found_async(self):
         with aioresponses() as m:
             m.get("https://example.com/.well-known/stellar.toml", body="")
             with pytest.raises(
                 FederationServerNotFoundError,
                 match="Unable to find federation server at example.com.",
             ):
-                loop.run_until_complete(
-                    resolve_account_id_async(
-                        self.ACCOUNT_ID, domain="example.com", client=AiohttpClient()
-                    )
+                await resolve_account_id_async(
+                    self.ACCOUNT_ID, domain="example.com", client=AiohttpClient()
                 )
 
     def test_not_found_record_at_federation(self):

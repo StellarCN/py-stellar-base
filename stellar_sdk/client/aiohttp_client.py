@@ -1,3 +1,4 @@
+# pyright: reportPossiblyUnboundVariable=false
 import asyncio
 import json
 import logging
@@ -57,9 +58,9 @@ async def __readline(self) -> bytes:
 
 try:
     import aiohttp
-    from aiohttp_sse_client.client import EventSource
+    from aiohttp_sse_client.client import EventSource  # type: ignore[import-untyped]
 
-    aiohttp.streams.StreamReader.readline = __readline  # type: ignore[assignment]
+    aiohttp.streams.StreamReader.readline = __readline  # type: ignore[method-assign]
     _AIOHTTP_DEPS_INSTALLED = True
 except ImportError:
     _AIOHTTP_DEPS_INSTALLED = False
@@ -113,7 +114,7 @@ class AiohttpClient(BaseAsyncClient):
         self._session: Optional[aiohttp.ClientSession] = None
         self._sse_session: Optional[aiohttp.ClientSession] = None
 
-    async def get(self, url: str, params: Dict[str, str] = None) -> Response:
+    async def get(self, url: str, params: Optional[Dict[str, str]] = None) -> Response:
         """Perform HTTP GET request.
 
         :param url: the request url
@@ -135,7 +136,10 @@ class AiohttpClient(BaseAsyncClient):
             raise ConnectionError(e)
 
     async def post(
-        self, url: str, data: Dict[str, str] = None, json_data: Dict[str, Any] = None
+        self,
+        url: str,
+        data: Optional[Dict[str, str]] = None,
+        json_data: Optional[Dict[str, Any]] = None,
     ) -> Response:
         """Perform HTTP POST request.
 
@@ -164,7 +168,7 @@ class AiohttpClient(BaseAsyncClient):
             raise ConnectionError(e)
 
     async def stream(
-        self, url: str, params: Dict[str, str] = None
+        self, url: str, params: Optional[Dict[str, str]] = None
     ) -> AsyncGenerator[Dict[str, Any], None]:
         """Perform Stream request.
 
@@ -213,7 +217,11 @@ class AiohttpClient(BaseAsyncClient):
                         retry = client._reconnection_time.total_seconds()
                         try:
                             data = event.data
-                            if data != '"hello"' and data != '"byebye"':
+                            if (
+                                data is not None
+                                and data != '"hello"'
+                                and data != '"byebye"'
+                            ):
                                 yield json.loads(data)
                         except json.JSONDecodeError:
                             # Content was not json-decodable

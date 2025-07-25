@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import base64
+from typing import Optional
 
 from xdrlib3 import Packer, Unpacker
 
@@ -30,7 +31,7 @@ class Claimant:
     def __init__(
         self,
         type: ClaimantType,
-        v0: ClaimantV0 = None,
+        v0: Optional[ClaimantV0] = None,
     ) -> None:
         self.type = type
         self.v0 = v0

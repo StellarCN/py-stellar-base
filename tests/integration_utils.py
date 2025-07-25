@@ -40,15 +40,17 @@ def get_balance_for_contract(contract_id: str, asset: Asset, source: str) -> int
     with ContractClient(
         asset.contract_id(NETWORK_PASSPHRASE), RPC_URL, NETWORK_PASSPHRASE
     ) as client:
-        return client.invoke(
+        result = client.invoke(
             "balance",
             [scval.to_address(contract_id)],
             source=source,
             parse_result_xdr_fn=lambda x: scval.from_int128(x),
         ).result()
+        assert isinstance(result, int)
+        return result
 
 
-def get_random_contract_id(source: Keypair):
+def get_random_contract_id(source: Keypair) -> str:
     with SorobanServer(RPC_URL) as server:
         transaction_builder = (
             TransactionBuilder(
@@ -70,6 +72,7 @@ def get_random_contract_id(source: Keypair):
             .sign_and_submit()
         )
         time.sleep(1)  # https://github.com/stellar/quickstart/issues/667
+        assert isinstance(contract_id, str)
         return contract_id
 
 

@@ -7,28 +7,28 @@ from enum import IntEnum
 
 from xdrlib3 import Packer, Unpacker
 
-__all__ = ["ArchivalProofType"]
+__all__ = ["SCSpecEventParamLocationV0"]
 
 
-class ArchivalProofType(IntEnum):
+class SCSpecEventParamLocationV0(IntEnum):
     """
     XDR Source Code::
 
-        enum ArchivalProofType
+        enum SCSpecEventParamLocationV0
         {
-            EXISTENCE = 0,
-            NONEXISTENCE = 1
+            SC_SPEC_EVENT_PARAM_LOCATION_DATA = 0,
+            SC_SPEC_EVENT_PARAM_LOCATION_TOPIC_LIST = 1
         };
     """
 
-    EXISTENCE = 0
-    NONEXISTENCE = 1
+    SC_SPEC_EVENT_PARAM_LOCATION_DATA = 0
+    SC_SPEC_EVENT_PARAM_LOCATION_TOPIC_LIST = 1
 
     def pack(self, packer: Packer) -> None:
         packer.pack_int(self.value)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> ArchivalProofType:
+    def unpack(cls, unpacker: Unpacker) -> SCSpecEventParamLocationV0:
         value = unpacker.unpack_int()
         return cls(value)
 
@@ -38,7 +38,7 @@ class ArchivalProofType(IntEnum):
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> ArchivalProofType:
+    def from_xdr_bytes(cls, xdr: bytes) -> SCSpecEventParamLocationV0:
         unpacker = Unpacker(xdr)
         return cls.unpack(unpacker)
 
@@ -47,6 +47,6 @@ class ArchivalProofType(IntEnum):
         return base64.b64encode(xdr_bytes).decode()
 
     @classmethod
-    def from_xdr(cls, xdr: str) -> ArchivalProofType:
+    def from_xdr(cls, xdr: str) -> SCSpecEventParamLocationV0:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)

@@ -188,7 +188,7 @@ class Asset:
             assert self.issuer is not None
             length = len(self.code)
             pad_length = 4 - length if length <= 4 else 12 - length
-            asset_code = bytearray(self.code, "ascii") + b"\x00" * pad_length
+            asset_code = bytes(bytearray(self.code, "ascii") + b"\x00" * pad_length)
             issuer = Keypair.from_public_key(self.issuer).xdr_account_id()
         if length <= 4:
             xdr_type = stellar_xdr.AssetType.ASSET_TYPE_CREDIT_ALPHANUM4

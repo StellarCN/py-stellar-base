@@ -1,3 +1,5 @@
+from typing import Any, AsyncGenerator, Dict
+
 from ...call_builder.base import BasePaymentsCallBuilder
 from ...call_builder.call_builder_async.base_call_builder import BaseCallBuilder
 from ...client.base_async_client import BaseAsyncClient
@@ -17,3 +19,12 @@ class PaymentsCallBuilder(BaseCallBuilder, BasePaymentsCallBuilder):
 
     def __init__(self, horizon_url: str, client: BaseAsyncClient) -> None:
         super().__init__(horizon_url=horizon_url, client=client)
+
+    def stream(
+        self,
+    ) -> AsyncGenerator[Dict[str, Any], None]:
+        """Creates an EventSource that listens for events from the `Payments` endpoint.
+
+        See `Streaming <https://developers.stellar.org/docs/data/apis/horizon/api-reference/structure/streaming>`__ for more information.
+        """
+        return self._stream()

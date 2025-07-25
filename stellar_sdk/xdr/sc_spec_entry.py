@@ -3,10 +3,12 @@
 from __future__ import annotations
 
 import base64
+from typing import Optional
 
 from xdrlib3 import Packer, Unpacker
 
 from .sc_spec_entry_kind import SCSpecEntryKind
+from .sc_spec_event_v0 import SCSpecEventV0
 from .sc_spec_function_v0 import SCSpecFunctionV0
 from .sc_spec_udt_enum_v0 import SCSpecUDTEnumV0
 from .sc_spec_udt_error_enum_v0 import SCSpecUDTErrorEnumV0
@@ -32,17 +34,20 @@ class SCSpecEntry:
             SCSpecUDTEnumV0 udtEnumV0;
         case SC_SPEC_ENTRY_UDT_ERROR_ENUM_V0:
             SCSpecUDTErrorEnumV0 udtErrorEnumV0;
+        case SC_SPEC_ENTRY_EVENT_V0:
+            SCSpecEventV0 eventV0;
         };
     """
 
     def __init__(
         self,
         kind: SCSpecEntryKind,
-        function_v0: SCSpecFunctionV0 = None,
-        udt_struct_v0: SCSpecUDTStructV0 = None,
-        udt_union_v0: SCSpecUDTUnionV0 = None,
-        udt_enum_v0: SCSpecUDTEnumV0 = None,
-        udt_error_enum_v0: SCSpecUDTErrorEnumV0 = None,
+        function_v0: Optional[SCSpecFunctionV0] = None,
+        udt_struct_v0: Optional[SCSpecUDTStructV0] = None,
+        udt_union_v0: Optional[SCSpecUDTUnionV0] = None,
+        udt_enum_v0: Optional[SCSpecUDTEnumV0] = None,
+        udt_error_enum_v0: Optional[SCSpecUDTErrorEnumV0] = None,
+        event_v0: Optional[SCSpecEventV0] = None,
     ) -> None:
         self.kind = kind
         self.function_v0 = function_v0
@@ -50,6 +55,7 @@ class SCSpecEntry:
         self.udt_union_v0 = udt_union_v0
         self.udt_enum_v0 = udt_enum_v0
         self.udt_error_enum_v0 = udt_error_enum_v0
+        self.event_v0 = event_v0
 
     def pack(self, packer: Packer) -> None:
         self.kind.pack(packer)
@@ -78,6 +84,11 @@ class SCSpecEntry:
                 raise ValueError("udt_error_enum_v0 should not be None.")
             self.udt_error_enum_v0.pack(packer)
             return
+        if self.kind == SCSpecEntryKind.SC_SPEC_ENTRY_EVENT_V0:
+            if self.event_v0 is None:
+                raise ValueError("event_v0 should not be None.")
+            self.event_v0.pack(packer)
+            return
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> SCSpecEntry:
@@ -97,6 +108,9 @@ class SCSpecEntry:
         if kind == SCSpecEntryKind.SC_SPEC_ENTRY_UDT_ERROR_ENUM_V0:
             udt_error_enum_v0 = SCSpecUDTErrorEnumV0.unpack(unpacker)
             return cls(kind=kind, udt_error_enum_v0=udt_error_enum_v0)
+        if kind == SCSpecEntryKind.SC_SPEC_ENTRY_EVENT_V0:
+            event_v0 = SCSpecEventV0.unpack(unpacker)
+            return cls(kind=kind, event_v0=event_v0)
         return cls(kind=kind)
 
     def to_xdr_bytes(self) -> bytes:
@@ -127,6 +141,7 @@ class SCSpecEntry:
                 self.udt_union_v0,
                 self.udt_enum_v0,
                 self.udt_error_enum_v0,
+                self.event_v0,
             )
         )
 
@@ -140,6 +155,7 @@ class SCSpecEntry:
             and self.udt_union_v0 == other.udt_union_v0
             and self.udt_enum_v0 == other.udt_enum_v0
             and self.udt_error_enum_v0 == other.udt_error_enum_v0
+            and self.event_v0 == other.event_v0
         )
 
     def __repr__(self):
@@ -170,4 +186,5 @@ class SCSpecEntry:
             if self.udt_error_enum_v0 is not None
             else None
         )
+        out.append(f"event_v0={self.event_v0}") if self.event_v0 is not None else None
         return f"<SCSpecEntry [{', '.join(out)}]>"

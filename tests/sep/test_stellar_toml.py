@@ -1,5 +1,3 @@
-import asyncio
-
 import pytest
 import requests_mock
 from aioresponses import aioresponses
@@ -23,13 +21,13 @@ NETWORK_PASSPHRASE="Public Global Stellar Network ; September 2015"
             toml = fetch_stellar_toml("example.com", None)
             assert toml.get("FEDERATION_SERVER") == "https://federation.example.com"
 
-    def test_get_success_async(self):
-        loop = asyncio.get_event_loop()
+    @pytest.mark.asyncio
+    async def test_get_success_async(self):
         with aioresponses() as m:
             m.get(
                 "https://example.com/.well-known/stellar.toml", body=self.TOML_CONTENT
             )
-            toml = loop.run_until_complete(fetch_stellar_toml_async("example.com"))
+            toml = await fetch_stellar_toml_async("example.com")
             assert toml.get("FEDERATION_SERVER") == "https://federation.example.com"
 
     def test_get_success_http(self):

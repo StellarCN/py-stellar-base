@@ -3,50 +3,12 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-.. .. include:: ../README.rst
-
 Stellar Python SDK
 ==================
 
-.. image:: https://img.shields.io/github/actions/workflow/status/StellarCN/py-stellar-base/continuous-integration-workflow.yml?branch=main
-    :alt: GitHub Workflow Status
-    :target: https://github.com/StellarCN/py-stellar-base/actions
-
-.. image:: https://img.shields.io/readthedocs/stellar-sdk.svg?maxAge=1800
-    :alt: Read the Docs
-    :target: https://stellar-sdk.readthedocs.io/en/latest/
-
-.. image:: https://static.pepy.tech/personalized-badge/stellar-sdk?period=total&units=abbreviation&left_color=grey&right_color=brightgreen&left_text=Downloads
-    :alt: PyPI - Downloads
-    :target: https://pypi.python.org/pypi/stellar-sdk
-
-.. image:: https://img.shields.io/codeclimate/maintainability/StellarCN/py-stellar-base?maxAge=1800
-    :alt: Code Climate maintainability
-    :target: https://codeclimate.com/github/StellarCN/py-stellar-base/maintainability
-
-.. image:: https://img.shields.io/codecov/c/github/StellarCN/py-stellar-base/v2?maxAge=1800
-    :alt: Codecov
-    :target: https://codecov.io/gh/StellarCN/py-stellar-base
-
-.. image:: https://img.shields.io/pypi/v/stellar-sdk.svg?maxAge=1800
-    :alt: PyPI
-    :target: https://pypi.python.org/pypi/stellar-sdk
-
-.. image:: https://img.shields.io/badge/python-%3E%3D3.8-blue
-    :alt: Python - Version
-    :target: https://pypi.python.org/pypi/stellar-sdk
-
-.. image:: https://img.shields.io/badge/implementation-cpython%20%7C%20pypy-blue
-    :alt: PyPI - Implementation
-    :target: https://pypi.python.org/pypi/stellar-sdk
-
-.. image:: https://img.shields.io/badge/Stellar%20Protocol-20-blue
-    :alt: Stellar Protocol
-    :target: https://developers.stellar.org/docs/glossary/scp/
-
 py-stellar-base is a Python library for communicating with
-a `Stellar Horizon server`_ and `Soroban-RPC server`_. It is used for building Stellar apps on Python. It supports **Python 3.8+** as
-well as PyPy 3.8+.
+a `Stellar Horizon server`_ and `Soroban-RPC server`_. It is used for building Stellar apps on Python. It supports **Python 3.9+** as
+well as PyPy 3.9+.
 
 It provides:
 

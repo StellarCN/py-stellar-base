@@ -1,3 +1,5 @@
+from typing import Optional
+
 from ...asset import Asset
 from ...call_builder.base import BaseTradeAggregationsCallBuilder
 from ...call_builder.call_builder_sync.base_call_builder import BaseCallBuilder
@@ -35,11 +37,11 @@ class TradeAggregationsCallBuilder(BaseCallBuilder, BaseTradeAggregationsCallBui
         base: Asset,
         counter: Asset,
         resolution: int,
-        start_time: int = None,
-        end_time: int = None,
-        offset: int = None,
+        start_time: Optional[int] = None,
+        end_time: Optional[int] = None,
+        offset: Optional[int] = None,
     ) -> None:
-        super().__init__(  # type: ignore[call-arg]
+        super().__init__(
             horizon_url=horizon_url,
             client=client,
             base=base,
@@ -49,9 +51,3 @@ class TradeAggregationsCallBuilder(BaseCallBuilder, BaseTradeAggregationsCallBui
             end_time=end_time,
             offset=offset,
         )
-
-    def stream(
-        self,
-    ):
-        """This endpoint does not support streaming."""
-        raise NotImplementedError("Streaming is not supported.")

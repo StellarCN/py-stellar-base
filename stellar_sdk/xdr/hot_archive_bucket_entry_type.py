@@ -18,17 +18,15 @@ class HotArchiveBucketEntryType(IntEnum):
         {
             HOT_ARCHIVE_METAENTRY = -1, // Bucket metadata, should come first.
             HOT_ARCHIVE_ARCHIVED = 0,   // Entry is Archived
-            HOT_ARCHIVE_LIVE = 1,       // Entry was previously HOT_ARCHIVE_ARCHIVED, or HOT_ARCHIVE_DELETED, but
+            HOT_ARCHIVE_LIVE = 1        // Entry was previously HOT_ARCHIVE_ARCHIVED, but
                                         // has been added back to the live BucketList.
                                         // Does not need to be persisted.
-            HOT_ARCHIVE_DELETED = 2     // Entry deleted (Note: must be persisted in archive)
         };
     """
 
     HOT_ARCHIVE_METAENTRY = -1
     HOT_ARCHIVE_ARCHIVED = 0
     HOT_ARCHIVE_LIVE = 1
-    HOT_ARCHIVE_DELETED = 2
 
     def pack(self, packer: Packer) -> None:
         packer.pack_int(self.value)

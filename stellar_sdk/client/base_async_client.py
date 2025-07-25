@@ -1,5 +1,5 @@
 from abc import ABCMeta, abstractmethod
-from typing import Any, AsyncGenerator, Dict
+from typing import Any, AsyncGenerator, Dict, Optional
 
 from .response import Response
 
@@ -13,7 +13,7 @@ class BaseAsyncClient(metaclass=ABCMeta):
     """
 
     @abstractmethod
-    async def get(self, url: str, params: Dict[str, str] = None) -> Response:
+    async def get(self, url: str, params: Optional[Dict[str, str]] = None) -> Response:
         """Perform HTTP GET request.
 
         :param url: the request url
@@ -27,8 +27,8 @@ class BaseAsyncClient(metaclass=ABCMeta):
     async def post(
         self,
         url: str,
-        data: Dict[str, str] = None,
-        json_data: Dict[str, Any] = None,
+        data: Optional[Dict[str, str]] = None,
+        json_data: Optional[Dict[str, Any]] = None,
     ) -> Response:
         """Perform HTTP POST request.
 
@@ -42,7 +42,7 @@ class BaseAsyncClient(metaclass=ABCMeta):
 
     @abstractmethod
     def stream(
-        self, url: str, params: Dict[str, str] = None
+        self, url: str, params: Optional[Dict[str, str]] = None
     ) -> AsyncGenerator[Dict[str, Any], None]:
         """Creates an EventSource that listens for incoming messages from the server.
 

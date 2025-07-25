@@ -38,11 +38,11 @@ class ClaimPredicate:
     def __init__(
         self,
         type: ClaimPredicateType,
-        and_predicates: List["ClaimPredicate"] = None,
-        or_predicates: List["ClaimPredicate"] = None,
-        not_predicate: Optional["ClaimPredicate"] = None,
-        abs_before: Int64 = None,
-        rel_before: Int64 = None,
+        and_predicates: Optional[List["ClaimPredicate"]] = None,
+        or_predicates: Optional[List["ClaimPredicate"]] = None,
+        not_predicate: Optional[Optional["ClaimPredicate"]] = None,
+        abs_before: Optional[Int64] = None,
+        rel_before: Optional[Int64] = None,
     ) -> None:
         _expect_max_length = 2
         if and_predicates and len(and_predicates) > _expect_max_length:

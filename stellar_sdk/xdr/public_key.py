@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import base64
+from typing import Optional
 
 from xdrlib3 import Packer, Unpacker
 
@@ -26,7 +27,7 @@ class PublicKey:
     def __init__(
         self,
         type: PublicKeyType,
-        ed25519: Uint256 = None,
+        ed25519: Optional[Uint256] = None,
     ) -> None:
         self.type = type
         self.ed25519 = ed25519

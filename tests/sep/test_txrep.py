@@ -368,7 +368,7 @@ class TestTxrep:
             ),
             amount="40.0004",
             source=keypair.public_key,
-        ),
+        )
         transaction_builder.append_path_payment_strict_receive_op(
             destination="GBAF6NXN3DHSF357QBZLTBNWUTABKUODJXJYYE32ZDKA2QBM2H33IK6O",
             send_asset=Asset(

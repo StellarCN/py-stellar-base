@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import base64
+from typing import Optional
 
 from xdrlib3 import Packer, Unpacker
 
@@ -24,7 +25,6 @@ class HotArchiveBucketEntry:
             LedgerEntry archivedEntry;
 
         case HOT_ARCHIVE_LIVE:
-        case HOT_ARCHIVE_DELETED:
             LedgerKey key;
         case HOT_ARCHIVE_METAENTRY:
             BucketMetadata metaEntry;
@@ -34,9 +34,9 @@ class HotArchiveBucketEntry:
     def __init__(
         self,
         type: HotArchiveBucketEntryType,
-        archived_entry: LedgerEntry = None,
-        key: LedgerKey = None,
-        meta_entry: BucketMetadata = None,
+        archived_entry: Optional[LedgerEntry] = None,
+        key: Optional[LedgerKey] = None,
+        meta_entry: Optional[BucketMetadata] = None,
     ) -> None:
         self.type = type
         self.archived_entry = archived_entry
@@ -55,11 +55,6 @@ class HotArchiveBucketEntry:
                 raise ValueError("key should not be None.")
             self.key.pack(packer)
             return
-        if self.type == HotArchiveBucketEntryType.HOT_ARCHIVE_DELETED:
-            if self.key is None:
-                raise ValueError("key should not be None.")
-            self.key.pack(packer)
-            return
         if self.type == HotArchiveBucketEntryType.HOT_ARCHIVE_METAENTRY:
             if self.meta_entry is None:
                 raise ValueError("meta_entry should not be None.")
@@ -73,9 +68,6 @@ class HotArchiveBucketEntry:
             archived_entry = LedgerEntry.unpack(unpacker)
             return cls(type=type, archived_entry=archived_entry)
         if type == HotArchiveBucketEntryType.HOT_ARCHIVE_LIVE:
-            key = LedgerKey.unpack(unpacker)
-            return cls(type=type, key=key)
-        if type == HotArchiveBucketEntryType.HOT_ARCHIVE_DELETED:
             key = LedgerKey.unpack(unpacker)
             return cls(type=type, key=key)
         if type == HotArchiveBucketEntryType.HOT_ARCHIVE_METAENTRY:

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import base64
+from typing import Optional
 
 from xdrlib3 import Packer, Unpacker
 
@@ -26,7 +27,7 @@ class ClaimableBalanceID:
     def __init__(
         self,
         type: ClaimableBalanceIDType,
-        v0: Hash = None,
+        v0: Optional[Hash] = None,
     ) -> None:
         self.type = type
         self.v0 = v0

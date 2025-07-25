@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import base64
+from typing import Optional
 
 from xdrlib3 import Packer, Unpacker
 
@@ -90,7 +91,7 @@ class OperationResult:
     def __init__(
         self,
         code: OperationResultCode,
-        tr: OperationResultTr = None,
+        tr: Optional[OperationResultTr] = None,
     ) -> None:
         self.code = code
         self.tr = tr

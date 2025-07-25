@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import base64
+from typing import Optional
 
 from xdrlib3 import Packer, Unpacker
 
@@ -103,33 +104,41 @@ class OperationResultTr:
     def __init__(
         self,
         type: OperationType,
-        create_account_result: CreateAccountResult = None,
-        payment_result: PaymentResult = None,
-        path_payment_strict_receive_result: PathPaymentStrictReceiveResult = None,
-        manage_sell_offer_result: ManageSellOfferResult = None,
-        create_passive_sell_offer_result: ManageSellOfferResult = None,
-        set_options_result: SetOptionsResult = None,
-        change_trust_result: ChangeTrustResult = None,
-        allow_trust_result: AllowTrustResult = None,
-        account_merge_result: AccountMergeResult = None,
-        inflation_result: InflationResult = None,
-        manage_data_result: ManageDataResult = None,
-        bump_seq_result: BumpSequenceResult = None,
-        manage_buy_offer_result: ManageBuyOfferResult = None,
-        path_payment_strict_send_result: PathPaymentStrictSendResult = None,
-        create_claimable_balance_result: CreateClaimableBalanceResult = None,
-        claim_claimable_balance_result: ClaimClaimableBalanceResult = None,
-        begin_sponsoring_future_reserves_result: BeginSponsoringFutureReservesResult = None,
-        end_sponsoring_future_reserves_result: EndSponsoringFutureReservesResult = None,
-        revoke_sponsorship_result: RevokeSponsorshipResult = None,
-        clawback_result: ClawbackResult = None,
-        clawback_claimable_balance_result: ClawbackClaimableBalanceResult = None,
-        set_trust_line_flags_result: SetTrustLineFlagsResult = None,
-        liquidity_pool_deposit_result: LiquidityPoolDepositResult = None,
-        liquidity_pool_withdraw_result: LiquidityPoolWithdrawResult = None,
-        invoke_host_function_result: InvokeHostFunctionResult = None,
-        extend_footprint_ttl_result: ExtendFootprintTTLResult = None,
-        restore_footprint_result: RestoreFootprintResult = None,
+        create_account_result: Optional[CreateAccountResult] = None,
+        payment_result: Optional[PaymentResult] = None,
+        path_payment_strict_receive_result: Optional[
+            PathPaymentStrictReceiveResult
+        ] = None,
+        manage_sell_offer_result: Optional[ManageSellOfferResult] = None,
+        create_passive_sell_offer_result: Optional[ManageSellOfferResult] = None,
+        set_options_result: Optional[SetOptionsResult] = None,
+        change_trust_result: Optional[ChangeTrustResult] = None,
+        allow_trust_result: Optional[AllowTrustResult] = None,
+        account_merge_result: Optional[AccountMergeResult] = None,
+        inflation_result: Optional[InflationResult] = None,
+        manage_data_result: Optional[ManageDataResult] = None,
+        bump_seq_result: Optional[BumpSequenceResult] = None,
+        manage_buy_offer_result: Optional[ManageBuyOfferResult] = None,
+        path_payment_strict_send_result: Optional[PathPaymentStrictSendResult] = None,
+        create_claimable_balance_result: Optional[CreateClaimableBalanceResult] = None,
+        claim_claimable_balance_result: Optional[ClaimClaimableBalanceResult] = None,
+        begin_sponsoring_future_reserves_result: Optional[
+            BeginSponsoringFutureReservesResult
+        ] = None,
+        end_sponsoring_future_reserves_result: Optional[
+            EndSponsoringFutureReservesResult
+        ] = None,
+        revoke_sponsorship_result: Optional[RevokeSponsorshipResult] = None,
+        clawback_result: Optional[ClawbackResult] = None,
+        clawback_claimable_balance_result: Optional[
+            ClawbackClaimableBalanceResult
+        ] = None,
+        set_trust_line_flags_result: Optional[SetTrustLineFlagsResult] = None,
+        liquidity_pool_deposit_result: Optional[LiquidityPoolDepositResult] = None,
+        liquidity_pool_withdraw_result: Optional[LiquidityPoolWithdrawResult] = None,
+        invoke_host_function_result: Optional[InvokeHostFunctionResult] = None,
+        extend_footprint_ttl_result: Optional[ExtendFootprintTTLResult] = None,
+        restore_footprint_result: Optional[RestoreFootprintResult] = None,
     ) -> None:
         self.type = type
         self.create_account_result = create_account_result

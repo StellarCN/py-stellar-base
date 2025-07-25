@@ -1,3 +1,5 @@
+import binascii
+
 import pytest
 
 from stellar_sdk import StrKey
@@ -6,12 +8,16 @@ from stellar_sdk import xdr as stellar_xdr
 
 class TestStrKey:
     def test_encode_ed25519_public_key(self):
-        data = b"R#\xd1Yd\xcb%\xb9\x8d\x17\xdf\xc9\xcb\x95JC1a{\xba\xa4\xe5\xdc\x14L\x87\xdf\x0b\x8b;G\xd9"
+        data = binascii.unhexlify(
+            "5223d15964cb25b98d17dfc9cb954a4331617bbaa4e5dc144c87df0b8b3b47d9"
+        )
         encoded = "GBJCHUKZMTFSLOMNC7P4TS4VJJBTCYL3XKSOLXAUJSD56C4LHND5TWUC"
         assert StrKey.encode_ed25519_public_key(data) == encoded
 
     def test_decode_ed25519_public_key(self):
-        decoded = b"R#\xd1Yd\xcb%\xb9\x8d\x17\xdf\xc9\xcb\x95JC1a{\xba\xa4\xe5\xdc\x14L\x87\xdf\x0b\x8b;G\xd9"
+        decoded = binascii.unhexlify(
+            "5223d15964cb25b98d17dfc9cb954a4331617bbaa4e5dc144c87df0b8b3b47d9"
+        )
         data = "GBJCHUKZMTFSLOMNC7P4TS4VJJBTCYL3XKSOLXAUJSD56C4LHND5TWUC"
         assert StrKey.decode_ed25519_public_key(data) == decoded
 
@@ -206,118 +212,76 @@ class TestStrKey:
         )
         assert StrKey.encode_muxed_account(data) == expected
 
+    @pytest.mark.parametrize(
+        "key",
+        [
+            "GAAAAAAAACGC6",
+            "GAQAA5L65LSYH7CQ3VTJ7F3HHLGCL3DSLAR2Y47263D56MNNGHSQSTVY",
+            "MA7QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLTJJFC7MGXUA74P7UJUAAAAAAAAAAAACJUR",
+            "GA7QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLTJJFC7MGXUA74P7UJVSGZA",
+            "GA7QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLTJJFC7MGXUA74P7UJUACUSI",
+            "G47QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLTJJFC7MGXUA74P7UJVP2I",
+            "MA7QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLTJJFC7MGXUA74P7UJVAAAAAAAAAAAAAJLKA",
+            "MA7QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLTJJFC7MGXUA74P7UJVAAAAAAAAAAAAAAV75I",
+            "M47QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLTJJFC7MGXUA74P7UJUAAAAAAAAAAAACJUQ",
+            "MA7QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLTJJFC7MGXUA74P7UJUAAAAAAAAAAAACJUK===",
+            "MA7QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLTJJFC7MGXUA74P7UJUAAAAAAAAAAAACJUO",
+        ],
+    )
+    def test_decode_invalid_med25519_public_key_raise(self, key):
+        with pytest.raises(ValueError):
+            StrKey.decode_med25519_public_key(key)
+
+    def test_decode_med25519_public_key(self):
+        # account_id = "GAQAA5L65LSYH7CQ3VTJ7F3HHLGCL3DSLAR2Y47263D56MNNGHSQSTVY"
+        # account_id_id = 1234
+        account_id_muxed = (
+            "MAQAA5L65LSYH7CQ3VTJ7F3HHLGCL3DSLAR2Y47263D56MNNGHSQSAAAAAAAAAAE2LP26"
+        )
+        decoded = StrKey.decode_med25519_public_key(account_id_muxed)
+        assert len(decoded) == 40
+        assert (
+            StrKey.encode_ed25519_public_key(decoded[0:32])
+            == "GAQAA5L65LSYH7CQ3VTJ7F3HHLGCL3DSLAR2Y47263D56MNNGHSQSTVY"
+        )
+        assert int.from_bytes(decoded[32:], "big") == 1234
+
+    def test_encode_med25519_public_key(self):
+        # GAQAA5L65LSYH7CQ3VTJ7F3HHLGCL3DSLAR2Y47263D56MNNGHSQSTVY + 1234
+        data = StrKey.decode_ed25519_public_key(
+            "GAQAA5L65LSYH7CQ3VTJ7F3HHLGCL3DSLAR2Y47263D56MNNGHSQSTVY"
+        ) + int.to_bytes(1234, 8, "big")
+        expected = (
+            "MAQAA5L65LSYH7CQ3VTJ7F3HHLGCL3DSLAR2Y47263D56MNNGHSQSAAAAAAAAAAE2LP26"
+        )
+        assert StrKey.encode_med25519_public_key(data) == expected
+
+    @pytest.mark.parametrize(
+        "key, valid",
+        [
+            ("GDWZCOEQRODFCH6ISYQPWY67L3ULLWS5ISXYYL5GH43W7YFMTLB65PYM", False),
+            ("GDWZCOEQRODFCH6ISYQPWY67L3ULLWS5ISXYYL5GH43W7Y", False),
+            ("", False),
+            ("SBCVMMCBEDB64TVJZFYJOJAERZC4YVVUOE6SYR2Y76CBTENGUSGWRRVO", False),
+            (
+                "MAQAA5L65LSYH7CQ3VTJ7F3HHLGCL3DSLAR2Y47263D56MNNGHSQSAAAAAAAAAAE2LP26",
+                True,
+            ),
+        ],
+    )
+    def test_is_valid_med25519_public_key(self, key, valid):
+        assert StrKey.is_valid_med25519_public_key(key) is valid
+
     def test_encode_ed25519_signed_payload(self):
-        data = bytes(
-            bytearray(
-                [
-                    0x36,
-                    0x3E,
-                    0xAA,
-                    0x38,
-                    0x67,
-                    0x84,
-                    0x1F,
-                    0xBA,
-                    0xD0,
-                    0xF4,
-                    0xED,
-                    0x88,
-                    0xC7,
-                    0x79,
-                    0xE4,
-                    0xFE,
-                    0x66,
-                    0xE5,
-                    0x6A,
-                    0x24,
-                    0x70,
-                    0xDC,
-                    0x98,
-                    0xC0,
-                    0xEC,
-                    0x9C,
-                    0x07,
-                    0x3D,
-                    0x05,
-                    0xC7,
-                    0xB1,
-                    0x03,
-                    0x00,
-                    0x00,
-                    0x00,
-                    0x09,
-                    0x00,
-                    0x00,
-                    0x00,
-                    0x00,
-                    0x00,
-                    0x00,
-                    0x00,
-                    0x00,
-                    0x00,
-                    0x00,
-                    0x00,
-                    0x00,
-                ]
-            )
+        data = binascii.unhexlify(
+            "363eaa3867841fbad0f4ed88c779e4fe66e56a2470dc98c0ec9c073d05c7b10300000009000000000000000000000000"
         )
         encoded = "PA3D5KRYM6CB7OWQ6TWYRR3Z4T7GNZLKERYNZGGA5SOAOPIFY6YQGAAAAAEQAAAAAAAAAAAAAAAAAABBXA"
         assert StrKey.encode_ed25519_signed_payload(data) == encoded
 
     def test_decode_ed25519_signed_payload(self):
-        decoded = bytes(
-            bytearray(
-                [
-                    0x36,
-                    0x3E,
-                    0xAA,
-                    0x38,
-                    0x67,
-                    0x84,
-                    0x1F,
-                    0xBA,
-                    0xD0,
-                    0xF4,
-                    0xED,
-                    0x88,
-                    0xC7,
-                    0x79,
-                    0xE4,
-                    0xFE,
-                    0x66,
-                    0xE5,
-                    0x6A,
-                    0x24,
-                    0x70,
-                    0xDC,
-                    0x98,
-                    0xC0,
-                    0xEC,
-                    0x9C,
-                    0x07,
-                    0x3D,
-                    0x05,
-                    0xC7,
-                    0xB1,
-                    0x03,
-                    0x00,
-                    0x00,
-                    0x00,
-                    0x09,
-                    0x00,
-                    0x00,
-                    0x00,
-                    0x00,
-                    0x00,
-                    0x00,
-                    0x00,
-                    0x00,
-                    0x00,
-                    0x00,
-                    0x00,
-                    0x00,
-                ]
-            )
+        decoded = binascii.unhexlify(
+            "363eaa3867841fbad0f4ed88c779e4fe66e56a2470dc98c0ec9c073d05c7b10300000009000000000000000000000000"
         )
         data = "PA3D5KRYM6CB7OWQ6TWYRR3Z4T7GNZLKERYNZGGA5SOAOPIFY6YQGAAAAAEQAAAAAAAAAAAAAAAAAABBXA"
         assert StrKey.decode_ed25519_signed_payload(data) == decoded
@@ -372,43 +336,8 @@ class TestStrKey:
         assert StrKey.is_valid_ed25519_signed_payload(key) is valid
 
     def test_encode_contract(self):
-        data = bytes(
-            bytearray(
-                [
-                    0x3F,
-                    0x0C,
-                    0x34,
-                    0xBF,
-                    0x93,
-                    0xAD,
-                    0x0D,
-                    0x99,
-                    0x71,
-                    0xD0,
-                    0x4C,
-                    0xCC,
-                    0x90,
-                    0xF7,
-                    0x05,
-                    0x51,
-                    0x1C,
-                    0x83,
-                    0x8A,
-                    0xAD,
-                    0x97,
-                    0x34,
-                    0xA4,
-                    0xA2,
-                    0xFB,
-                    0x0D,
-                    0x7A,
-                    0x03,
-                    0xFC,
-                    0x7F,
-                    0xE8,
-                    0x9A,
-                ]
-            )
+        data = binascii.unhexlify(
+            "3f0c34bf93ad0d9971d04ccc90f705511c838aad9734a4a2fb0d7a03fc7fe89a"
         )
         assert (
             StrKey.encode_contract(data)
@@ -416,43 +345,8 @@ class TestStrKey:
         )
 
     def test_decode_contract(self):
-        data = bytes(
-            bytearray(
-                [
-                    0x3F,
-                    0x0C,
-                    0x34,
-                    0xBF,
-                    0x93,
-                    0xAD,
-                    0x0D,
-                    0x99,
-                    0x71,
-                    0xD0,
-                    0x4C,
-                    0xCC,
-                    0x90,
-                    0xF7,
-                    0x05,
-                    0x51,
-                    0x1C,
-                    0x83,
-                    0x8A,
-                    0xAD,
-                    0x97,
-                    0x34,
-                    0xA4,
-                    0xA2,
-                    0xFB,
-                    0x0D,
-                    0x7A,
-                    0x03,
-                    0xFC,
-                    0x7F,
-                    0xE8,
-                    0x9A,
-                ]
-            )
+        data = binascii.unhexlify(
+            "3f0c34bf93ad0d9971d04ccc90f705511c838aad9734a4a2fb0d7a03fc7fe89a"
         )
         assert (
             StrKey.decode_contract(
@@ -460,3 +354,69 @@ class TestStrKey:
             )
             == data
         )
+
+    def test_encode_liquidity_pool(self):
+        data = binascii.unhexlify(
+            "3f0c34bf93ad0d9971d04ccc90f705511c838aad9734a4a2fb0d7a03fc7fe89a"
+        )
+        assert (
+            StrKey.encode_liquidity_pool(data)
+            == "LA7QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLTJJFC7MGXUA74P7UJUPJN"
+        )
+
+    def test_decode_liquidity_pool(self):
+        data = binascii.unhexlify(
+            "3f0c34bf93ad0d9971d04ccc90f705511c838aad9734a4a2fb0d7a03fc7fe89a"
+        )
+        assert (
+            StrKey.decode_liquidity_pool(
+                "LA7QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLTJJFC7MGXUA74P7UJUPJN"
+            )
+            == data
+        )
+
+    @pytest.mark.parametrize(
+        "key",
+        [
+            "LA7QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLTJJFC7MGXUA",
+            "",
+            "SBCVMMCBEDB64TVJZFYJOJAERZC4YVVUOE6SYR2Y76CBTENGUSGWRRVO",
+            "MAQAA5L65LSYH7CQ3VTJ7F3HHLGCL3DSLAR2Y47263D56MNNGHSQSAAAAAAAAAAE2LP26",
+        ],
+    )
+    def test_decode_liquidity_pool_raise(self, key):
+        with pytest.raises(ValueError, match=f"Invalid Liquidity Pool Key: {key}"):
+            StrKey.decode_liquidity_pool(key)
+
+    def test_encode_claimable_balance(self):
+        data = binascii.unhexlify(
+            "003f0c34bf93ad0d9971d04ccc90f705511c838aad9734a4a2fb0d7a03fc7fe89a"
+        )
+        assert (
+            StrKey.encode_claimable_balance(data)
+            == "BAAD6DBUX6J22DMZOHIEZTEQ64CVCHEDRKWZONFEUL5Q26QD7R76RGR4TU"
+        )
+
+    def test_decode_claimable_balance(self):
+        data = binascii.unhexlify(
+            "003f0c34bf93ad0d9971d04ccc90f705511c838aad9734a4a2fb0d7a03fc7fe89a"
+        )
+        assert (
+            StrKey.decode_claimable_balance(
+                "BAAD6DBUX6J22DMZOHIEZTEQ64CVCHEDRKWZONFEUL5Q26QD7R76RGR4TU"
+            )
+            == data
+        )
+
+    @pytest.mark.parametrize(
+        "key",
+        [
+            "BAAD6DBUX6J22DMZOHIEZTEQ64CVCHEDRKWZONFEUL5Q26QD7R76RGR4T",
+            "",
+            "SBCVMMCBEDB64TVJZFYJOJAERZC4YVVUOE6SYR2Y76CBTENGUSGWRRVO",
+            "MAQAA5L65LSYH7CQ3VTJ7F3HHLGCL3DSLAR2Y47263D56MNNGHSQSAAAAAAAAAAE2LP26",
+        ],
+    )
+    def test_decode_claimable_balance_raise(self, key):
+        with pytest.raises(ValueError, match=f"Invalid Claimable Balance Key: {key}"):
+            StrKey.decode_claimable_balance(key)

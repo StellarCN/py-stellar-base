@@ -16,12 +16,10 @@ class SurveyMessageCommandType(IntEnum):
 
         enum SurveyMessageCommandType
         {
-            SURVEY_TOPOLOGY = 0,
             TIME_SLICED_SURVEY_TOPOLOGY = 1
         };
     """
 
-    SURVEY_TOPOLOGY = 0
     TIME_SLICED_SURVEY_TOPOLOGY = 1
 
     def pack(self, packer: Packer) -> None:

@@ -1,12 +1,16 @@
 from __future__ import annotations
 
 import json
+import time
 from typing import TYPE_CHECKING, Type
 
-from . import Keypair
+from pydantic import BaseModel
+
+from . import scval
 from . import xdr as stellar_xdr
 from .account import Account
 from .address import Address
+from .asset import Asset
 from .base_soroban_server import (
     Durability,
     ResourceLeeway,
@@ -19,7 +23,16 @@ from .exceptions import (
     PrepareTransactionException,
     SorobanRpcErrorResponse,
 )
+from .keypair import Keypair
 from .soroban_rpc import *
+from .strkey import StrKey
+from .xdr import (
+    ContractDataDurability,
+    LedgerEntryData,
+    LedgerEntryType,
+    LedgerKey,
+    LedgerKeyContractData,
+)
 
 if TYPE_CHECKING:
     from .client.base_sync_client import BaseSyncClient
@@ -28,7 +41,7 @@ if TYPE_CHECKING:
 
 __all__ = ["SorobanServer", "Durability"]
 
-V = TypeVar("V")
+V = TypeVar("V", bound=BaseModel)
 
 
 class SorobanServer:
@@ -67,10 +80,10 @@ class SorobanServer:
 
     def get_events(
         self,
-        start_ledger: int,
-        filters: Sequence[EventFilter] = None,
-        cursor: str = None,
-        limit: int = None,
+        start_ledger: Optional[int] = None,
+        filters: Optional[Sequence[EventFilter]] = None,
+        cursor: Optional[str] = None,
+        limit: Optional[int] = None,
     ) -> GetEventsResponse:
         """Fetch a list of events that occurred in the ledger range.
 
@@ -85,7 +98,7 @@ class SorobanServer:
         """
         pagination = PaginationOptions(cursor=cursor, limit=limit)
         data = GetEventsRequest(
-            startLedger=str(start_ledger),
+            startLedger=start_ledger,
             filters=filters,
             pagination=pagination,
         )
@@ -166,6 +179,7 @@ class SorobanServer:
         self,
         transaction_envelope: TransactionEnvelope,
         addl_resources: Optional[ResourceLeeway] = None,
+        auth_mode: Optional[AuthMode] = None,
     ) -> SimulateTransactionResponse:
         """Submit a trial contract invocation to get back return values, expected ledger footprint, and expected costs.
 
@@ -177,6 +191,7 @@ class SorobanServer:
             :class:`ExtendFootprintTTL <stellar_sdk.operation.RestoreFootprint>` operation.
             Any provided footprint will be ignored.
         :param addl_resources: Additional resource include in the simulation.
+        :param auth_mode: Explicitly allows users to opt-in to non-root authorization in recording mode.
         :return: A :class:`SimulateTransactionResponse <stellar_sdk.soroban_rpc.SimulateTransactionResponse>` object
             contains the cost, footprint, result/auth requirements (if applicable), and error of the transaction.
         """
@@ -188,14 +203,14 @@ class SorobanServer:
         resource_config = None
         if addl_resources:
             resource_config = ResourceConfig(
-                instruction_lee_way=addl_resources.cpu_instructions,
+                instructionLeeway=addl_resources.cpu_instructions,
             )
 
         request = Request[SimulateTransactionRequest](
             id=_generate_unique_request_id(),
             method="simulateTransaction",
             params=SimulateTransactionRequest(
-                transaction=xdr, resource_config=resource_config
+                transaction=xdr, resourceConfig=resource_config, authMode=auth_mode
             ),
         )
         return self._post(request, SimulateTransactionResponse)
@@ -226,6 +241,37 @@ class SorobanServer:
         )
         return self._post(request, SendTransactionResponse)
 
+    def poll_transaction(
+        self,
+        transaction_hash: str,
+        max_attempts: int = DEFAULT_POLLING_ATTEMPTS,
+        sleep_strategy: SleepStrategy = BasicSleepStrategy,
+    ) -> GetTransactionResponse:
+        """Poll for a particular transaction with certain parameters.
+
+        After submitting a transaction, clients can use this to poll for transaction completion and return a definitive state of success or failure.
+
+        :param transaction_hash: The hash of the transaction to poll for.
+        :param max_attempts: The number of attempts to make before returning the last-seen status, defaults to 30.
+        :param sleep_strategy: The amount of time to wait for between each attempt, defaults to 1 second between each attempt.
+        :return: A :class:`GetTransactionResponse <stellar_sdk.soroban_rpc.GetTransactionResponse>` response object after a "found" response, (which may be success or failure) or the last response obtained after polling the maximum number of specified attempts.
+        :raises: :exc:`SorobanRpcErrorResponse <stellar_sdk.exceptions.SorobanRpcErrorResponse>` - If the Soroban-RPC instance returns an error response.
+        """
+        if max_attempts < 1:
+            raise ValueError("max_attempts must be greater than 0")
+        attempt: int = 0
+
+        while resp := self.get_transaction(transaction_hash=transaction_hash):
+            if resp.status != GetTransactionStatus.NOT_FOUND:
+                return resp
+
+            attempt += 1
+            if attempt >= max_attempts:
+                break
+
+            time.sleep(sleep_strategy(attempt))
+        return resp
+
     def get_fee_stats(self) -> GetFeeStatsResponse:
         """General info about the fee stats.
 
@@ -243,9 +289,9 @@ class SorobanServer:
 
     def get_transactions(
         self,
-        start_ledger: int,
-        cursor: str = None,
-        limit: int = None,
+        start_ledger: Optional[int] = None,
+        cursor: Optional[str] = None,
+        limit: Optional[int] = None,
     ) -> GetTransactionsResponse:
         """Fetch a detailed list of transactions starting from the user specified starting point that you can paginate
         as long as the pages fall within the history retention of their corresponding RPC provider.
@@ -260,7 +306,7 @@ class SorobanServer:
         """
         pagination = PaginationOptions(cursor=cursor, limit=limit)
         data = GetTransactionsRequest(
-            startLedger=str(start_ledger),
+            startLedger=start_ledger,
             pagination=pagination,
         )
         request: Request = Request[GetTransactionsRequest](
@@ -269,7 +315,10 @@ class SorobanServer:
         return self._post(request, GetTransactionsResponse)
 
     def get_ledgers(
-        self, start_ledger: int, cursor: str = None, limit: int = None
+        self,
+        start_ledger: Optional[int] = None,
+        cursor: Optional[str] = None,
+        limit: Optional[int] = None,
     ) -> GetLedgersResponse:
         """Fetch a detailed list of ledgers starting from the user specified starting point that you can paginate
         as long as the pages fall within the history retention of their corresponding RPC provider.
@@ -284,7 +333,7 @@ class SorobanServer:
         """
         pagination = PaginationOptions(cursor=cursor, limit=limit)
         data = GetLedgersRequest(
-            startLedger=str(start_ledger),
+            startLedger=start_ledger,
             pagination=pagination,
         )
         request: Request = Request[GetLedgersRequest](
@@ -366,10 +415,68 @@ class SorobanServer:
         )
         return self._post(request, GetVersionInfoResponse)
 
+    def get_sac_balance(
+        self, contract_id: str, sac: Asset, network_passphrase: Optional[str] = None
+    ) -> GetSACBalanceResponse:
+        """Returns a contract's balance of a particular SAC asset, if any.
+
+        This is a convenience wrapper around :meth:`SorobanServer.get_ledger_entries`.
+
+        :param contract_id: The contract ID whose balance of `sac` you want to know.
+        :param sac: The build-in SAC token that you are querying from the given contract.
+        :param network_passphrase: The network passphrase to use for the contract ID. If not provided, it will use the
+            network passphrase of the current network. We suggest you set it to enhance performance.
+        :return: A :class:`GetSACBalanceResponse <stellar_sdk.soroban_rpc.GetSACBalanceResponse>` which will contain the balance entry details if and only if the request returned a valid balance ledger
+            entry. If it doesn't, the `balance_entry` field will not exist.
+        """
+        if not StrKey.is_valid_contract(contract_id):
+            raise ValueError(f"Invalid contract ID: {contract_id}")
+
+        if network_passphrase is None:
+            network_passphrase = self.get_network().passphrase
+
+        sac_id = sac.contract_id(network_passphrase)
+        key = scval.to_vec([scval.to_symbol("Balance"), scval.to_address(sac_id)])
+        ledger_key = LedgerKey(
+            LedgerEntryType.CONTRACT_DATA,
+            contract_data=LedgerKeyContractData(
+                contract=Address(sac_id).to_xdr_sc_address(),
+                key=key,
+                durability=ContractDataDurability.PERSISTENT,
+            ),
+        )
+        response = self.get_ledger_entries([ledger_key])
+        if not response.entries:
+            return GetSACBalanceResponse(
+                latest_ledger=response.latest_ledger, balance_entry=None
+            )
+
+        raw_entry = response.entries[0]
+        entry_data = LedgerEntryData.from_xdr(raw_entry.xdr)
+
+        if entry_data.type != LedgerEntryType.CONTRACT_DATA:
+            return GetSACBalanceResponse(
+                latest_ledger=response.latest_ledger, balance_entry=None
+            )
+
+        assert entry_data.contract_data is not None
+        contract_data = scval.to_native(entry_data.contract_data.val)
+        assert isinstance(contract_data, dict)
+        return GetSACBalanceResponse(
+            latest_ledger=response.latest_ledger,
+            balance_entry=SACBalanceEntry(
+                amount=contract_data["amount"],
+                authorized=contract_data["authorized"],
+                clawback=contract_data["clawback"],
+                last_modified_ledger=raw_entry.last_modified_ledger,
+                live_until_ledger=raw_entry.live_until_ledger,
+            ),
+        )
+
     def prepare_transaction(
         self,
         transaction_envelope: TransactionEnvelope,
-        simulate_transaction_response: SimulateTransactionResponse = None,
+        simulate_transaction_response: Optional[SimulateTransactionResponse] = None,
     ) -> TransactionEnvelope:
         """Submit a trial contract invocation, first run a simulation of the contract
         invocation as defined on the incoming transaction, and apply the results to
@@ -425,13 +532,16 @@ class SorobanServer:
             self.server_url,
             json_data=json.loads(json_data),
         )
-        response = Response[response_body_type].model_validate(data.json())  # type: ignore[valid-type]
-        if response.error:
+        raw_response = Response[Any].model_validate(data.json())
+
+        if raw_response.error:
             raise SorobanRpcErrorResponse(
-                response.error.code, response.error.message, response.error.data
+                raw_response.error.code,
+                raw_response.error.message,
+                raw_response.error.data,
             )
-        assert response.result is not None
-        return response.result
+        assert raw_response.result is not None
+        return response_body_type.model_validate(raw_response.result)
 
     def __enter__(self) -> "SorobanServer":
         return self

@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import base64
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional
 
 from xdrlib3 import Packer, Unpacker
 
@@ -44,6 +44,7 @@ class SCSpecTypeDef:
         case SC_SPEC_TYPE_STRING:
         case SC_SPEC_TYPE_SYMBOL:
         case SC_SPEC_TYPE_ADDRESS:
+        case SC_SPEC_TYPE_MUXED_ADDRESS:
             void;
         case SC_SPEC_TYPE_OPTION:
             SCSpecTypeOption option;
@@ -65,13 +66,13 @@ class SCSpecTypeDef:
     def __init__(
         self,
         type: SCSpecType,
-        option: SCSpecTypeOption = None,
-        result: SCSpecTypeResult = None,
-        vec: SCSpecTypeVec = None,
-        map: SCSpecTypeMap = None,
-        tuple: SCSpecTypeTuple = None,
-        bytes_n: SCSpecTypeBytesN = None,
-        udt: SCSpecTypeUDT = None,
+        option: Optional[SCSpecTypeOption] = None,
+        result: Optional[SCSpecTypeResult] = None,
+        vec: Optional[SCSpecTypeVec] = None,
+        map: Optional[SCSpecTypeMap] = None,
+        tuple: Optional[SCSpecTypeTuple] = None,
+        bytes_n: Optional[SCSpecTypeBytesN] = None,
+        udt: Optional[SCSpecTypeUDT] = None,
     ) -> None:
         self.type = type
         self.option = option
@@ -119,6 +120,8 @@ class SCSpecTypeDef:
         if self.type == SCSpecType.SC_SPEC_TYPE_SYMBOL:
             return
         if self.type == SCSpecType.SC_SPEC_TYPE_ADDRESS:
+            return
+        if self.type == SCSpecType.SC_SPEC_TYPE_MUXED_ADDRESS:
             return
         if self.type == SCSpecType.SC_SPEC_TYPE_OPTION:
             if self.option is None:
@@ -194,6 +197,8 @@ class SCSpecTypeDef:
         if type == SCSpecType.SC_SPEC_TYPE_SYMBOL:
             return cls(type=type)
         if type == SCSpecType.SC_SPEC_TYPE_ADDRESS:
+            return cls(type=type)
+        if type == SCSpecType.SC_SPEC_TYPE_MUXED_ADDRESS:
             return cls(type=type)
         if type == SCSpecType.SC_SPEC_TYPE_OPTION:
             from .sc_spec_type_option import SCSpecTypeOption

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import base64
+from typing import Optional
 
 from xdrlib3 import Packer, Unpacker
 
@@ -32,7 +33,7 @@ class InvokeHostFunctionResult:
     def __init__(
         self,
         code: InvokeHostFunctionResultCode,
-        success: Hash = None,
+        success: Optional[Hash] = None,
     ) -> None:
         self.code = code
         self.success = success

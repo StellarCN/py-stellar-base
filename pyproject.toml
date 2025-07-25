@@ -1,16 +1,13 @@
-[tool.poetry]
+[project]
 name = "stellar-sdk"
-version = "12.2.0"
-description = "The Python Stellar SDK library provides APIs to build transactions and connect to Horizon and Soroban-RPC server."
+description = "The Python Stellar SDK library provides APIs to build transactions and connect to Horizon and Stellar RPC server."
 authors = [
-    "overcat <4catcode@gmail.com>",
-    "Eno <appweb.cn@gmail.com>"
+    { name = "overcat", email = "4catcode@gmail.com" },
+    { name = "Eno", email = "appweb.cn@gmail.com" },
 ]
-maintainers = ["overcat <4catcode@gmail.com>"]
-readme = "README.rst"
-homepage = "https://github.com/StellarCN/py-stellar-base"
-repository = "https://github.com/StellarCN/py-stellar-base"
-documentation = "https://stellar-sdk.readthedocs.io/"
+dynamic = ["version"]
+maintainers = [{ name = "overcat", email = "4catcode@gmail.com" }]
+readme = "README.md"
 keywords = [
     "stellar-sdk",
     "stellar",
@@ -26,68 +23,81 @@ keywords = [
     "sdex",
     "trading",
     "soroban",
-    "soroban-rpc"
+    "soroban-rpc",
+    "stellar-rpc",
 ]
-license = "Apache License 2.0"
+license = "Apache-2.0"
 classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Intended Audience :: Developers",
     "Natural Language :: English",
     "Operating System :: OS Independent",
-    "License :: OSI Approved :: Apache Software License",
     "Programming Language :: Python",
     "Programming Language :: Python :: 3 :: Only",
     "Programming Language :: Python :: Implementation :: CPython",
     "Programming Language :: Python :: Implementation :: PyPy",
     "Topic :: Software Development :: Libraries :: Python Modules",
-    "Typing :: Typed"
+    "Typing :: Typed",
+]
+requires-python = ">=3.9,<4.0"
+dependencies = [
+    "mnemonic>=0.20",
+    "pydantic>=2.0.0",
+    "pynacl>=1.4.0",
+    "requests>=2.0.0",
+    "requests-sse>=0.3",
+    "toml>=0.10.2; python_version < '3.11'",
+    "typing-extensions>=4.0.0",
+    "xdrlib3>=0.1.1",
 ]
 
-[tool.poetry.urls]
+[project.urls]
+Homepage = "https://github.com/StellarCN/py-stellar-base"
+Documentation = "https://stellar-sdk.readthedocs.io/"
+Repository = "https://github.com/StellarCN/py-stellar-base"
+Issues = "https://github.com/StellarCN/py-stellar-base/issues"
+Changelog = "https://github.com/StellarCN/py-stellar-base/blob/main/CHANGELOG.md"
 "Bug Tracker" = "https://github.com/StellarCN/py-stellar-base/issues"
 
-[tool.poetry.dependencies]
-python = ">=3.8,<4.0"
-PyNaCl = "^1.4.0"
-requests = "^2.32.3"
-aiohttp = { version = "^3.9.1", optional = true}
-aiohttp-sse-client = { version = "^0.2.1", optional = true}
-mnemonic = "^0.20"
-shamir-mnemonic = { version = "^0.3.0", optional = true }
-toml = "^0.10.2"
-pydantic = "^2.5.2"
-xdrlib3 = "^0.1.1"
-requests-sse = ">=0.3,<0.6"
+[project.optional-dependencies]
+aiohttp = ["aiohttp>=3.9.1", "aiohttp-sse-client>=0.2.1"]
+shamir = ["shamir-mnemonic>=0.3.0"]
 
-[tool.poetry.extras]
-aiohttp = ["aiohttp", "aiohttp-sse-client"]
-shamir = ["shamir-mnemonic"]
+[dependency-groups]
+dev = [
+    "pytest>=8.3.5",
+    "pytest-cov>=5.0.0",
+    "pytest-timeout>=2.4.0",
+    "pytest-asyncio>=0.24.0",
+    "pytest-httpserver>=1.1.1",
+    "requests-mock>=1.12.1",
+    "aioresponses>=0.7.8",
+    "pre-commit>=3.5.0",
+    "pyright>=1.1.402",
+    "mypy>=1.14.1",
+    "types-requests>=2.32.0.20241016",
+    "types-toml>=0.10.8.20240310; python_version < '3.11'",
+]
+docs = [
+    "autodoc-pydantic>=2.1.0",
+    "sphinx>=7.1.2",
+    "sphinx-autodoc-typehints>=2.0.1",
+    "sphinx-rtd-theme>=3.0.2",
+]
 
-[tool.poetry.dev-dependencies]
-pytest = "^8.3.5"
-pytest-cov = "^5.0.0"
-pytest-timeout = "^2.3.1"
-pytest-asyncio = "^0.24.0"
-pytest-httpserver = "^1.1.1"
-requests-mock = "^1.12.1"
-aioresponses = {git = "https://github.com/pnuckowski/aioresponses.git", rev = "b83af203d5550006fd2328af230c2d93e36c6cb1"}
+[build-system]
+requires = ["flit_core>=3.2,<4"]
+build-backend = "flit_core.buildapi"
 
 [tool.mypy]
 show_error_codes = true
-ignore_missing_imports = true
 warn_unused_configs = true
-no_implicit_optional = false
 
 [tool.coverage.run]
-source = [
-    "stellar_sdk/",
-    "tests/"
-]
+source = ["stellar_sdk/", "tests/"]
 
 [tool.coverage.report]
-omit = [
-    "stellar_sdk/xdr/*",
-]
+omit = ["stellar_sdk/xdr/*"]
 exclude_lines = [
     "pragma: no cover",
     "raise AssertionError",
@@ -98,12 +108,11 @@ exclude_lines = [
     "if self\\.debug",
     "if 0:",
     "if __name__ == .__main__.:",
-    "pass"
+    "pass",
 ]
 
 [tool.isort]
 profile = "black"
 
-[build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
+[tool.pyright]
+include = ["stellar_sdk", "tests", "examples"]

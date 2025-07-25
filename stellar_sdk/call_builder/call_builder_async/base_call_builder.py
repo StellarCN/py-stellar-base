@@ -1,4 +1,4 @@
-from typing import Any, AsyncGenerator, Dict
+from typing import Any, AsyncGenerator, Dict, Optional
 
 from ...call_builder.base.base_call_builder import BaseCallBuilder as _BaseCallBuilder
 from ...client.base_async_client import BaseAsyncClient
@@ -40,7 +40,7 @@ class BaseCallBuilder(_BaseCallBuilder):
         url = urljoin_with_query(self.horizon_url, self.endpoint)
         return await self._call(url, self.params)
 
-    async def _call(self, url: str, params: dict = None) -> Dict[str, Any]:
+    async def _call(self, url: str, params: Optional[dict] = None) -> Dict[str, Any]:
         raw_resp = await self.client.get(url, params)
         assert isinstance(raw_resp, Response)
         raise_request_exception(raw_resp)
@@ -48,7 +48,7 @@ class BaseCallBuilder(_BaseCallBuilder):
         self._check_pageable(resp)
         return resp
 
-    async def stream(
+    async def _stream(
         self,
     ) -> AsyncGenerator[Dict[str, Any], None]:
         """Creates an EventSource that listens for incoming messages from the server.
@@ -62,7 +62,9 @@ class BaseCallBuilder(_BaseCallBuilder):
         :raise: :exc:`StreamClientError <stellar_sdk.exceptions.StreamClientError>` - Failed to fetch stream resource.
         """
         url = urljoin_with_query(self.horizon_url, self.endpoint)
-        stream: AsyncGenerator[Dict[str, Any], None] = self.client.stream(url, self.params)  # type: ignore[assignment]
+        stream: AsyncGenerator[Dict[str, Any], None] = self.client.stream(
+            url, self.params
+        )
         while True:
             yield await stream.__anext__()
 

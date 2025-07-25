@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import base64
+from typing import Optional
 
 from xdrlib3 import Packer, Unpacker
 
@@ -32,9 +33,9 @@ class ClaimAtom:
     def __init__(
         self,
         type: ClaimAtomType,
-        v0: ClaimOfferAtomV0 = None,
-        order_book: ClaimOfferAtom = None,
-        liquidity_pool: ClaimLiquidityAtom = None,
+        v0: Optional[ClaimOfferAtomV0] = None,
+        order_book: Optional[ClaimOfferAtom] = None,
+        liquidity_pool: Optional[ClaimLiquidityAtom] = None,
     ) -> None:
         self.type = type
         self.v0 = v0

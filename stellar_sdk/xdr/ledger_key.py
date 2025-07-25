@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import base64
+from typing import Optional
 
 from xdrlib3 import Packer, Unpacker
 
@@ -94,16 +95,16 @@ class LedgerKey:
     def __init__(
         self,
         type: LedgerEntryType,
-        account: LedgerKeyAccount = None,
-        trust_line: LedgerKeyTrustLine = None,
-        offer: LedgerKeyOffer = None,
-        data: LedgerKeyData = None,
-        claimable_balance: LedgerKeyClaimableBalance = None,
-        liquidity_pool: LedgerKeyLiquidityPool = None,
-        contract_data: LedgerKeyContractData = None,
-        contract_code: LedgerKeyContractCode = None,
-        config_setting: LedgerKeyConfigSetting = None,
-        ttl: LedgerKeyTtl = None,
+        account: Optional[LedgerKeyAccount] = None,
+        trust_line: Optional[LedgerKeyTrustLine] = None,
+        offer: Optional[LedgerKeyOffer] = None,
+        data: Optional[LedgerKeyData] = None,
+        claimable_balance: Optional[LedgerKeyClaimableBalance] = None,
+        liquidity_pool: Optional[LedgerKeyLiquidityPool] = None,
+        contract_data: Optional[LedgerKeyContractData] = None,
+        contract_code: Optional[LedgerKeyContractCode] = None,
+        config_setting: Optional[LedgerKeyConfigSetting] = None,
+        ttl: Optional[LedgerKeyTtl] = None,
     ) -> None:
         self.type = type
         self.account = account

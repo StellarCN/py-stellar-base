@@ -1,5 +1,5 @@
 from decimal import Decimal
-from typing import Optional, Union
+from typing import ClassVar, Optional, Union
 
 from .. import xdr as stellar_xdr
 from ..asset import Asset
@@ -45,7 +45,7 @@ class CreatePassiveSellOffer(Operation):
 
     """
 
-    _XDR_OPERATION_TYPE: stellar_xdr.OperationType = (
+    _XDR_OPERATION_TYPE: ClassVar[stellar_xdr.OperationType] = (
         stellar_xdr.OperationType.CREATE_PASSIVE_SELL_OFFER
     )
 

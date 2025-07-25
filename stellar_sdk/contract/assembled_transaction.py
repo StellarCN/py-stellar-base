@@ -46,7 +46,7 @@ class AssembledTransaction(Generic[T]):
         self,
         transaction_builder: TransactionBuilder,
         server: SorobanServer,
-        transaction_signer: Keypair = None,
+        transaction_signer: Optional[Keypair] = None,
         parse_result_xdr_fn: Optional[Callable[[xdr.SCVal], T]] = None,
         submit_timeout: int = 180,
     ):
@@ -110,7 +110,7 @@ class AssembledTransaction(Generic[T]):
         return self
 
     def sign_and_submit(
-        self, transaction_signer: Keypair = None, force: bool = False
+        self, transaction_signer: Optional[Keypair] = None, force: bool = False
     ) -> Union[T, xdr.SCVal]:
         """Signs and submits the transaction in one step.
 
@@ -124,7 +124,7 @@ class AssembledTransaction(Generic[T]):
         return self.submit()
 
     def sign(
-        self, transaction_signer: Keypair = None, force: bool = False
+        self, transaction_signer: Optional[Keypair] = None, force: bool = False
     ) -> "AssembledTransaction":
         """Signs the transaction.
 
@@ -171,7 +171,9 @@ class AssembledTransaction(Generic[T]):
         return self
 
     def sign_auth_entries(
-        self, auth_entries_signer: Keypair, valid_until_ledger_sequence: int = None
+        self,
+        auth_entries_signer: Keypair,
+        valid_until_ledger_sequence: Optional[int] = None,
     ) -> "AssembledTransaction":
         """Signs the transaction's authorization entries.
 
@@ -221,9 +223,15 @@ class AssembledTransaction(Generic[T]):
         response = self._submit()
         assert response.result_meta_xdr is not None
         transaction_meta = TransactionMeta.from_xdr(response.result_meta_xdr)
-        assert transaction_meta.v3 is not None
-        assert transaction_meta.v3.soroban_meta is not None
-        result_val = transaction_meta.v3.soroban_meta.return_value
+        transaction_meta_body = (
+            transaction_meta.v4 or transaction_meta.v3
+        )  # v4 introduced in protocol 23
+        assert transaction_meta_body is not None
+        assert transaction_meta_body.soroban_meta is not None
+        result_val = transaction_meta_body.soroban_meta.return_value
+        assert (
+            result_val is not None
+        )  # In SorobanTransactionMetaV2, it is defined as possibly null.
         return (
             self.parse_result_xdr_fn(result_val)
             if self.parse_result_xdr_fn
@@ -327,6 +335,9 @@ class AssembledTransaction(Generic[T]):
 
         :return: The XDR representation of the transaction envelope
         """
+        if not self.built_transaction:
+            raise NotYetSimulatedError("Transaction has not yet been simulated.", self)
+
         return self.built_transaction.to_xdr()
 
     def restore_footprint(self, restore_preamble: RestorePreamble) -> None:

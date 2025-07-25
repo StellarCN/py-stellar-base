@@ -3,11 +3,15 @@
 from __future__ import annotations
 
 import base64
+from typing import Optional
 
 from xdrlib3 import Packer, Unpacker
 
 from .account_id import AccountID
-from .hash import Hash
+from .claimable_balance_id import ClaimableBalanceID
+from .contract_id import ContractID
+from .muxed_ed25519_account import MuxedEd25519Account
+from .pool_id import PoolID
 from .sc_address_type import SCAddressType
 
 __all__ = ["SCAddress"]
@@ -22,19 +26,31 @@ class SCAddress:
         case SC_ADDRESS_TYPE_ACCOUNT:
             AccountID accountId;
         case SC_ADDRESS_TYPE_CONTRACT:
-            Hash contractId;
+            ContractID contractId;
+        case SC_ADDRESS_TYPE_MUXED_ACCOUNT:
+            MuxedEd25519Account muxedAccount;
+        case SC_ADDRESS_TYPE_CLAIMABLE_BALANCE:
+            ClaimableBalanceID claimableBalanceId;
+        case SC_ADDRESS_TYPE_LIQUIDITY_POOL:
+            PoolID liquidityPoolId;
         };
     """
 
     def __init__(
         self,
         type: SCAddressType,
-        account_id: AccountID = None,
-        contract_id: Hash = None,
+        account_id: Optional[AccountID] = None,
+        contract_id: Optional[ContractID] = None,
+        muxed_account: Optional[MuxedEd25519Account] = None,
+        claimable_balance_id: Optional[ClaimableBalanceID] = None,
+        liquidity_pool_id: Optional[PoolID] = None,
     ) -> None:
         self.type = type
         self.account_id = account_id
         self.contract_id = contract_id
+        self.muxed_account = muxed_account
+        self.claimable_balance_id = claimable_balance_id
+        self.liquidity_pool_id = liquidity_pool_id
 
     def pack(self, packer: Packer) -> None:
         self.type.pack(packer)
@@ -48,6 +64,21 @@ class SCAddress:
                 raise ValueError("contract_id should not be None.")
             self.contract_id.pack(packer)
             return
+        if self.type == SCAddressType.SC_ADDRESS_TYPE_MUXED_ACCOUNT:
+            if self.muxed_account is None:
+                raise ValueError("muxed_account should not be None.")
+            self.muxed_account.pack(packer)
+            return
+        if self.type == SCAddressType.SC_ADDRESS_TYPE_CLAIMABLE_BALANCE:
+            if self.claimable_balance_id is None:
+                raise ValueError("claimable_balance_id should not be None.")
+            self.claimable_balance_id.pack(packer)
+            return
+        if self.type == SCAddressType.SC_ADDRESS_TYPE_LIQUIDITY_POOL:
+            if self.liquidity_pool_id is None:
+                raise ValueError("liquidity_pool_id should not be None.")
+            self.liquidity_pool_id.pack(packer)
+            return
 
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> SCAddress:
@@ -56,8 +87,17 @@ class SCAddress:
             account_id = AccountID.unpack(unpacker)
             return cls(type=type, account_id=account_id)
         if type == SCAddressType.SC_ADDRESS_TYPE_CONTRACT:
-            contract_id = Hash.unpack(unpacker)
+            contract_id = ContractID.unpack(unpacker)
             return cls(type=type, contract_id=contract_id)
+        if type == SCAddressType.SC_ADDRESS_TYPE_MUXED_ACCOUNT:
+            muxed_account = MuxedEd25519Account.unpack(unpacker)
+            return cls(type=type, muxed_account=muxed_account)
+        if type == SCAddressType.SC_ADDRESS_TYPE_CLAIMABLE_BALANCE:
+            claimable_balance_id = ClaimableBalanceID.unpack(unpacker)
+            return cls(type=type, claimable_balance_id=claimable_balance_id)
+        if type == SCAddressType.SC_ADDRESS_TYPE_LIQUIDITY_POOL:
+            liquidity_pool_id = PoolID.unpack(unpacker)
+            return cls(type=type, liquidity_pool_id=liquidity_pool_id)
         return cls(type=type)
 
     def to_xdr_bytes(self) -> bytes:
@@ -85,6 +125,9 @@ class SCAddress:
                 self.type,
                 self.account_id,
                 self.contract_id,
+                self.muxed_account,
+                self.claimable_balance_id,
+                self.liquidity_pool_id,
             )
         )
 
@@ -95,6 +138,9 @@ class SCAddress:
             self.type == other.type
             and self.account_id == other.account_id
             and self.contract_id == other.contract_id
+            and self.muxed_account == other.muxed_account
+            and self.claimable_balance_id == other.claimable_balance_id
+            and self.liquidity_pool_id == other.liquidity_pool_id
         )
 
     def __repr__(self):
@@ -108,6 +154,21 @@ class SCAddress:
         (
             out.append(f"contract_id={self.contract_id}")
             if self.contract_id is not None
+            else None
+        )
+        (
+            out.append(f"muxed_account={self.muxed_account}")
+            if self.muxed_account is not None
+            else None
+        )
+        (
+            out.append(f"claimable_balance_id={self.claimable_balance_id}")
+            if self.claimable_balance_id is not None
+            else None
+        )
+        (
+            out.append(f"liquidity_pool_id={self.liquidity_pool_id}")
+            if self.liquidity_pool_id is not None
             else None
         )
         return f"<SCAddress [{', '.join(out)}]>"

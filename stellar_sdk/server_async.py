@@ -1,5 +1,5 @@
 from decimal import Decimal
-from typing import Any, Dict, List, Union
+from typing import Any, Dict, List, Optional, Union
 
 from .account import Account
 from .asset import Asset
@@ -46,7 +46,7 @@ class ServerAsync(BaseServer):
     def __init__(
         self,
         horizon_url: str = "https://horizon-testnet.stellar.org/",
-        client: BaseAsyncClient = None,
+        client: Optional[BaseAsyncClient] = None,
     ) -> None:
         self.horizon_url: str = horizon_url
 
@@ -339,9 +339,9 @@ class ServerAsync(BaseServer):
         base: Asset,
         counter: Asset,
         resolution: int,
-        start_time: int = None,
-        end_time: int = None,
-        offset: int = None,
+        start_time: Optional[int] = None,
+        end_time: Optional[int] = None,
+        offset: Optional[int] = None,
     ) -> TradeAggregationsCallBuilder:
         """
         :param base: base asset

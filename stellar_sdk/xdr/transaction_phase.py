@@ -3,11 +3,12 @@
 from __future__ import annotations
 
 import base64
-from typing import List
+from typing import List, Optional
 
 from xdrlib3 import Packer, Unpacker
 
 from .base import Integer
+from .parallel_txs_component import ParallelTxsComponent
 from .tx_set_component import TxSetComponent
 
 __all__ = ["TransactionPhase"]
@@ -21,13 +22,16 @@ class TransactionPhase:
         {
         case 0:
             TxSetComponent v0Components<>;
+        case 1:
+            ParallelTxsComponent parallelTxsComponent;
         };
     """
 
     def __init__(
         self,
         v: int,
-        v0_components: List[TxSetComponent] = None,
+        v0_components: Optional[List[TxSetComponent]] = None,
+        parallel_txs_component: Optional[ParallelTxsComponent] = None,
     ) -> None:
         _expect_max_length = 4294967295
         if v0_components and len(v0_components) > _expect_max_length:
@@ -36,6 +40,7 @@ class TransactionPhase:
             )
         self.v = v
         self.v0_components = v0_components
+        self.parallel_txs_component = parallel_txs_component
 
     def pack(self, packer: Packer) -> None:
         Integer(self.v).pack(packer)
@@ -45,6 +50,11 @@ class TransactionPhase:
             packer.pack_uint(len(self.v0_components))
             for v0_components_item in self.v0_components:
                 v0_components_item.pack(packer)
+            return
+        if self.v == 1:
+            if self.parallel_txs_component is None:
+                raise ValueError("parallel_txs_component should not be None.")
+            self.parallel_txs_component.pack(packer)
             return
 
     @classmethod
@@ -56,6 +66,9 @@ class TransactionPhase:
             for _ in range(length):
                 v0_components.append(TxSetComponent.unpack(unpacker))
             return cls(v=v, v0_components=v0_components)
+        if v == 1:
+            parallel_txs_component = ParallelTxsComponent.unpack(unpacker)
+            return cls(v=v, parallel_txs_component=parallel_txs_component)
         return cls(v=v)
 
     def to_xdr_bytes(self) -> bytes:
@@ -82,13 +95,18 @@ class TransactionPhase:
             (
                 self.v,
                 self.v0_components,
+                self.parallel_txs_component,
             )
         )
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented
-        return self.v == other.v and self.v0_components == other.v0_components
+        return (
+            self.v == other.v
+            and self.v0_components == other.v0_components
+            and self.parallel_txs_component == other.parallel_txs_component
+        )
 
     def __repr__(self):
         out = []
@@ -96,6 +114,11 @@ class TransactionPhase:
         (
             out.append(f"v0_components={self.v0_components}")
             if self.v0_components is not None
+            else None
+        )
+        (
+            out.append(f"parallel_txs_component={self.parallel_txs_component}")
+            if self.parallel_txs_component is not None
             else None
         )
         return f"<TransactionPhase [{', '.join(out)}]>"

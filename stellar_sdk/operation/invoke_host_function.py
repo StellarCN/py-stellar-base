@@ -1,4 +1,4 @@
-from typing import List, Optional, Sequence, Union
+from typing import ClassVar, List, Optional, Sequence, Union
 
 from .. import xdr as stellar_xdr
 from ..muxed_account import MuxedAccount
@@ -20,14 +20,14 @@ class InvokeHostFunction(Operation):
     :param source: The source account for the operation. Defaults to the transaction's source account.
     """
 
-    _XDR_OPERATION_TYPE: stellar_xdr.OperationType = (
+    _XDR_OPERATION_TYPE: ClassVar[stellar_xdr.OperationType] = (
         stellar_xdr.OperationType.INVOKE_HOST_FUNCTION
     )
 
     def __init__(
         self,
         host_function: stellar_xdr.HostFunction,
-        auth: Sequence[stellar_xdr.SorobanAuthorizationEntry] = None,
+        auth: Optional[Sequence[stellar_xdr.SorobanAuthorizationEntry]] = None,
         source: Optional[Union[MuxedAccount, str]] = None,
     ):
         super().__init__(source)

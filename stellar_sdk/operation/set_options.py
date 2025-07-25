@@ -1,6 +1,6 @@
 import warnings
 from enum import IntFlag
-from typing import Optional, Union
+from typing import ClassVar, Optional, Union
 
 from .. import xdr as stellar_xdr
 from ..keypair import Keypair
@@ -78,21 +78,21 @@ class SetOptions(Operation):
 
     """
 
-    _XDR_OPERATION_TYPE: stellar_xdr.OperationType = (
+    _XDR_OPERATION_TYPE: ClassVar[stellar_xdr.OperationType] = (
         stellar_xdr.OperationType.SET_OPTIONS
     )
 
     def __init__(
         self,
-        inflation_dest: str = None,
-        clear_flags: Union[int, AuthorizationFlag] = None,
-        set_flags: Union[int, AuthorizationFlag] = None,
-        master_weight: int = None,
-        low_threshold: int = None,
-        med_threshold: int = None,
-        high_threshold: int = None,
-        signer: Signer = None,
-        home_domain: str = None,
+        inflation_dest: Optional[str] = None,
+        clear_flags: Optional[Union[int, AuthorizationFlag]] = None,
+        set_flags: Optional[Union[int, AuthorizationFlag]] = None,
+        master_weight: Optional[int] = None,
+        low_threshold: Optional[int] = None,
+        med_threshold: Optional[int] = None,
+        high_threshold: Optional[int] = None,
+        signer: Optional[Signer] = None,
+        home_domain: Optional[str] = None,
         source: Optional[Union[MuxedAccount, str]] = None,
     ) -> None:
         super().__init__(source)
@@ -188,7 +188,12 @@ class SetOptions(Operation):
         source = Operation.get_source_from_xdr_obj(xdr_object)
 
         inflation_dest = None
+        assert xdr_object.body.set_options_op is not None
         if xdr_object.body.set_options_op.inflation_dest:
+            assert (
+                xdr_object.body.set_options_op.inflation_dest.account_id.ed25519
+                is not None
+            )
             inflation_dest = StrKey.encode_ed25519_public_key(
                 xdr_object.body.set_options_op.inflation_dest.account_id.ed25519.uint256
             )

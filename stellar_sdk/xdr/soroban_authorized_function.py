@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import base64
+from typing import Optional
 
 from xdrlib3 import Packer, Unpacker
 
@@ -40,9 +41,9 @@ class SorobanAuthorizedFunction:
     def __init__(
         self,
         type: SorobanAuthorizedFunctionType,
-        contract_fn: InvokeContractArgs = None,
-        create_contract_host_fn: CreateContractArgs = None,
-        create_contract_v2_host_fn: CreateContractArgsV2 = None,
+        contract_fn: Optional[InvokeContractArgs] = None,
+        create_contract_host_fn: Optional[CreateContractArgs] = None,
+        create_contract_v2_host_fn: Optional[CreateContractArgsV2] = None,
     ) -> None:
         self.type = type
         self.contract_fn = contract_fn

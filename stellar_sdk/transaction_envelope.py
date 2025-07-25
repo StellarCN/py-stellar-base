@@ -1,5 +1,5 @@
 import copy
-from typing import Sequence, Union
+from typing import Optional, Sequence, Union
 
 from xdrlib3 import Packer
 
@@ -34,7 +34,7 @@ class TransactionEnvelope(BaseTransactionEnvelope["TransactionEnvelope"]):
         self,
         transaction: Transaction,
         network_passphrase: str,
-        signatures: Sequence[DecoratedSignature] = None,
+        signatures: Optional[Sequence[DecoratedSignature]] = None,
     ) -> None:
         super().__init__(network_passphrase, signatures)
         self.transaction: Transaction = transaction
