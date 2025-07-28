@@ -36,7 +36,7 @@ XDRS = xdr/Stellar-SCP.x \
 
 # XDR Generator (xdrgen) repository and commit hash
 XDRGEN_REPO = overcat/xdrgen
-XDRGEN_COMMIT = e3f9c308d55325853ade3e4f12ceb350b368c5fc
+XDRGEN_COMMIT = 2609ddafe9f60a18617492048238bae1cb4b1067
 
 # Stellar XDR definitions repository commit hash
 XDR_COMMIT = 4b7a2ef7931ab2ca2499be68d849f38190b443ca

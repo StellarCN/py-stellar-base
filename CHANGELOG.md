@@ -3,6 +3,9 @@ Release History
 
 ### Pending
 
+#### Update:
+- fix: correct comparison for `Uint32` in `xdr.AuthenticatedMessage`. ([#1076](https://github.com/StellarCN/py-stellar-base/pull/1076))
+
 ### Version 13.0.0-beta0
 
 **This release adds support for Protocol 23.**
