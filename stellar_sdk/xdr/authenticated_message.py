@@ -39,7 +39,7 @@ class AuthenticatedMessage:
 
     def pack(self, packer: Packer) -> None:
         self.v.pack(packer)
-        if self.v == 0:
+        if self.v.uint32 == 0:
             if self.v0 is None:
                 raise ValueError("v0 should not be None.")
             self.v0.pack(packer)
@@ -48,7 +48,7 @@ class AuthenticatedMessage:
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> AuthenticatedMessage:
         v = Uint32.unpack(unpacker)
-        if v == 0:
+        if v.uint32 == 0:
             v0 = AuthenticatedMessageV0.unpack(unpacker)
             return cls(v=v, v0=v0)
         return cls(v=v)
