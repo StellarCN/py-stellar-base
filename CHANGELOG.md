@@ -3,6 +3,8 @@ Release History
 
 ### Pending
 
+### Version 13.0.0-beta1
+
 #### Update:
 - feat: update transaction meta handling to support v4 in protocol 23. ([#1074](https://github.com/StellarCN/py-stellar-base/pull/1074))
 - fix: correct comparison for `Uint32` in `xdr.AuthenticatedMessage`. ([#1076](https://github.com/StellarCN/py-stellar-base/pull/1076))
