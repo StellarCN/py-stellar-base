@@ -148,7 +148,10 @@ class Address:
                 stellar_xdr.SCAddressType.SC_ADDRESS_TYPE_CONTRACT, contract_id=contract
             )
         elif self.type == AddressType.MUXED_ACCOUNT:
-            muxed_account = stellar_xdr.MuxedEd25519Account.from_xdr_bytes(self.key)
+            muxed_account = stellar_xdr.MuxedEd25519Account(
+                id=stellar_xdr.Uint64.from_xdr_bytes(self.key[-8:]),
+                ed25519=stellar_xdr.Uint256.from_xdr_bytes(self.key[:-8]),
+            )
             return stellar_xdr.SCAddress(
                 stellar_xdr.SCAddressType.SC_ADDRESS_TYPE_MUXED_ACCOUNT,
                 muxed_account=muxed_account,
@@ -157,7 +160,7 @@ class Address:
             # See https://github.com/stellar/stellar-protocol/pull/1646/files#r1974431825
             if self.key[:1] != b"\x00":
                 raise ValueError(
-                    "The claimable balance ID type is not supported, it must be `CLAIMABLE_BALANCE_ID_TYPE_V0`."
+                    f"The claimable balance ID type is not supported, it must be {stellar_xdr.ClaimableBalanceIDType.CLAIMABLE_BALANCE_ID_TYPE_V0}."
                 )
             claimable_balance_id = stellar_xdr.ClaimableBalanceID(
                 stellar_xdr.ClaimableBalanceIDType.CLAIMABLE_BALANCE_ID_TYPE_V0,
@@ -194,7 +197,10 @@ class Address:
             return cls.from_raw_contract(sc_address.contract_id.to_xdr_bytes())
         elif sc_address.type == stellar_xdr.SCAddressType.SC_ADDRESS_TYPE_MUXED_ACCOUNT:
             assert sc_address.muxed_account is not None
-            return cls.from_raw_muxed_account(sc_address.muxed_account.to_xdr_bytes())
+            return cls.from_raw_muxed_account(
+                sc_address.muxed_account.ed25519.to_xdr_bytes()
+                + sc_address.muxed_account.id.to_xdr_bytes()
+            )
         elif (
             sc_address.type
             == stellar_xdr.SCAddressType.SC_ADDRESS_TYPE_CLAIMABLE_BALANCE
@@ -206,7 +212,7 @@ class Address:
                 != stellar_xdr.ClaimableBalanceIDType.CLAIMABLE_BALANCE_ID_TYPE_V0
             ):
                 raise ValueError(
-                    f"The claimable balance ID type is not supported: {sc_address.claimable_balance_id.type.name}"
+                    f"The claimable balance ID type is not supported: {sc_address.claimable_balance_id.type}"
                 )  # This is a safeguard.
             return cls.from_raw_claimable_balance(
                 sc_address.claimable_balance_id.to_xdr_bytes()[3:]
