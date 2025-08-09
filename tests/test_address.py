@@ -113,7 +113,7 @@ class TestAddress:
         address = Address(muxed_account_id)
         sc_address = address.to_xdr_sc_address()
 
-        xdr = "AAAAAiAAdX7q5YP8UN1mn5dnOswl7HJYI6xz+vbH3zGtMeUJAAAAAAAABNI="
+        xdr = "AAAAAgAAAAAAAATSIAB1furlg/xQ3Wafl2c6zCXsclgjrHP69sffMa0x5Qk="
         assert sc_address.to_xdr() == xdr
 
     def test_to_xdr_sc_address_claimable_balance(self):
@@ -151,7 +151,7 @@ class TestAddress:
         assert sc_address.type == AddressType.CONTRACT
 
     def test_from_xdr_sc_address_muxed_account(self):
-        xdr = "AAAAAiAAdX7q5YP8UN1mn5dnOswl7HJYI6xz+vbH3zGtMeUJAAAAAAAABNI="
+        xdr = "AAAAAgAAAAAAAATSIAB1furlg/xQ3Wafl2c6zCXsclgjrHP69sffMa0x5Qk="
 
         sc_address = Address.from_xdr_sc_address(stellar_xdr.SCAddress.from_xdr(xdr))
         muxed_account_id = (
