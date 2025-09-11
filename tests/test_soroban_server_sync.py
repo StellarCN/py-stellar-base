@@ -391,6 +391,7 @@ class TestSorobanServer:
         }
 
         start_ledger = 100
+        end_ledger = 101
         filters = [
             EventFilter(
                 event_type=EventFilterType.CONTRACT,  # pyright: ignore[reportCallIssue]
@@ -407,7 +408,12 @@ class TestSorobanServer:
         with requests_mock.Mocker() as m:
             m.post(RPC_URL, json=data)
             assert (
-                SorobanServer(RPC_URL).get_events(start_ledger, filters, limit=limit)
+                SorobanServer(RPC_URL).get_events(
+                    start_ledger=start_ledger,
+                    end_ledger=end_ledger,
+                    filters=filters,
+                    limit=limit,
+                )
                 == events_response
             )
 
@@ -429,6 +435,7 @@ class TestSorobanServer:
             ],
             "pagination": {"cursor": None, "limit": 10},
             "startLedger": 100,
+            "endLedger": 101,
         }
 
         # simulate the advance of one ledger
@@ -474,6 +481,7 @@ class TestSorobanServer:
             ],
             "pagination": {"cursor": "0000054747948126208-0000000000", "limit": 10},
             "startLedger": None,
+            "endLedger": None,
         }
 
     def test_get_latest_ledger(self):
@@ -1281,6 +1289,16 @@ class TestSorobanServer:
         val_error = e.value.errors()[0]
         assert val_error["type"] == "value_error"
         assert val_error["msg"].endswith("start_ledger and cursor cannot both be set")
+
+    def test_pagination_end_ledger_and_cursor_raise(self):
+        with pytest.raises(ValidationError) as e:
+            SorobanServer(RPC_URL).get_events(
+                end_ledger=68, cursor="8111217537191937", limit=1
+            )
+        assert e.value.error_count() == 1
+        val_error = e.value.errors()[0]
+        assert val_error["type"] == "value_error"
+        assert val_error["msg"].endswith("end_ledger and cursor cannot both be set")
 
 
 def _build_soroban_transaction(
