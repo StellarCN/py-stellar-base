@@ -92,8 +92,11 @@ class PaginationMixin:
     @model_validator(mode="after")
     def verify_ledger_or_cursor(self) -> Self:
         pagination = getattr(self, "pagination", None)
-        if pagination and (getattr(self, "start_ledger") and pagination.cursor):
-            raise ValueError("start_ledger and cursor cannot both be set")
+        if pagination and pagination.cursor:
+            if getattr(self, "start_ledger"):
+                raise ValueError("start_ledger and cursor cannot both be set")
+            if getattr(self, "end_ledger"):
+                raise ValueError("end_ledger and cursor cannot both be set")
         return self
 
 
@@ -105,6 +108,7 @@ class GetEventsRequest(PaginationMixin, BaseModel):
     """
 
     start_ledger: Optional[int] = Field(alias="startLedger", default=None)
+    end_ledger: Optional[int] = Field(alias="endLedger", default=None)
     pagination: Optional[PaginationOptions] = None
     filters: Optional[Sequence[EventFilter]] = None
 

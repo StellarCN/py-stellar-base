@@ -81,6 +81,7 @@ class SorobanServerAsync:
     async def get_events(
         self,
         start_ledger: Optional[int] = None,
+        end_ledger: Optional[int] = None,
         filters: Optional[Sequence[EventFilter]] = None,
         cursor: Optional[str] = None,
         limit: Optional[int] = None,
@@ -89,7 +90,8 @@ class SorobanServerAsync:
 
         See `Soroban RPC Documentation - getEvents <https://developers.stellar.org/docs/data/rpc/api-reference/methods/getEvents>`_
 
-        :param start_ledger: The first ledger to include in the results.
+        :param start_ledger: Ledger sequence number to start fetching responses from (inclusive). This method will return an error if startLedger is less than the oldest ledger stored in this node, or greater than the latest ledger seen by this node. If a cursor is included in the request, startLedger must be omitted.
+        :param end_ledger: Ledger sequence number represents the end of search window (exclusive). If a cursor is included in the request, this must be omitted.
         :param filters: A list of filters to apply to the results.
         :param cursor: A cursor value for use in pagination.
         :param limit: The maximum number of records to return.
@@ -99,6 +101,7 @@ class SorobanServerAsync:
         pagination = PaginationOptions(cursor=cursor, limit=limit)
         data = GetEventsRequest(
             startLedger=start_ledger,
+            endLedger=end_ledger,
             filters=filters,
             pagination=pagination,
         )
