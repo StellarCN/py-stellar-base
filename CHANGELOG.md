@@ -3,6 +3,13 @@ Release History
 
 ### Pending
 
+### Version 13.1.0
+
+Released on September 25, 2025
+
+#### Update:
+feat: `getEvents` RPC method - expose `endLedger` param. ([#1081](https://github.com/StellarCN/py-stellar-base/pull/1081))
+
 ### Version 13.0.0
 
 Released on August 15, 2025
