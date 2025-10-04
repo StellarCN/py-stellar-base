@@ -1,7 +1,7 @@
 import base64
 import binascii
 from enum import IntEnum
-from typing import ClassVar, Optional, Union
+from typing import ClassVar
 
 from .. import xdr as stellar_xdr
 from ..asset import Asset
@@ -33,7 +33,7 @@ class RevokeSponsorshipType(IntEnum):
 
 
 class TrustLine:
-    def __init__(self, account_id: str, asset: Union[Asset, LiquidityPoolId]) -> None:
+    def __init__(self, account_id: str, asset: Asset | LiquidityPoolId) -> None:
         self.account_id = account_id
         self.asset = asset
         raise_if_not_valid_ed25519_public_key(self.account_id, "account_id")
@@ -140,24 +140,24 @@ class RevokeSponsorship(Operation):
     def __init__(
         self,
         revoke_sponsorship_type: RevokeSponsorshipType,
-        account_id: Optional[str],
-        trustline: Optional[TrustLine],
-        offer: Optional[Offer],
-        data: Optional[Data],
-        claimable_balance_id: Optional[str],
-        signer: Optional[Signer],
-        liquidity_pool_id: Optional[str],
-        source: Optional[Union[MuxedAccount, str]] = None,
+        account_id: str | None,
+        trustline: TrustLine | None,
+        offer: Offer | None,
+        data: Data | None,
+        claimable_balance_id: str | None,
+        signer: Signer | None,
+        liquidity_pool_id: str | None,
+        source: MuxedAccount | str | None = None,
     ) -> None:
         super().__init__(source)
         self.revoke_sponsorship_type: RevokeSponsorshipType = revoke_sponsorship_type
-        self.account_id: Optional[str] = account_id
-        self.trustline: Optional[TrustLine] = trustline
-        self.offer: Optional[Offer] = offer
-        self.data: Optional[Data] = data
-        self.claimable_balance_id: Optional[str] = claimable_balance_id
-        self.signer: Optional[Signer] = signer
-        self.liquidity_pool_id: Optional[str] = liquidity_pool_id
+        self.account_id: str | None = account_id
+        self.trustline: TrustLine | None = trustline
+        self.offer: Offer | None = offer
+        self.data: Data | None = data
+        self.claimable_balance_id: str | None = claimable_balance_id
+        self.signer: Signer | None = signer
+        self.liquidity_pool_id: str | None = liquidity_pool_id
 
         if self.account_id is not None:
             raise_if_not_valid_ed25519_public_key(self.account_id, "account_id")
@@ -170,7 +170,7 @@ class RevokeSponsorship(Operation):
 
     @classmethod
     def revoke_account_sponsorship(
-        cls, account_id: str, source: Optional[Union[MuxedAccount, str]] = None
+        cls, account_id: str, source: MuxedAccount | str | None = None
     ):
         """Create a **revoke sponsorship** operation for an account.
 
@@ -194,8 +194,8 @@ class RevokeSponsorship(Operation):
     def revoke_trustline_sponsorship(
         cls,
         account_id: str,
-        asset: Union[Asset, LiquidityPoolId],
-        source: Optional[Union[MuxedAccount, str]] = None,
+        asset: Asset | LiquidityPoolId,
+        source: MuxedAccount | str | None = None,
     ):
         """Create a **revoke sponsorship** operation for a trustline.
 
@@ -222,7 +222,7 @@ class RevokeSponsorship(Operation):
         cls,
         seller_id: str,
         offer_id: int,
-        source: Optional[Union[MuxedAccount, str]] = None,
+        source: MuxedAccount | str | None = None,
     ):
         """Create a **revoke sponsorship** operation for an offer.
 
@@ -249,7 +249,7 @@ class RevokeSponsorship(Operation):
         cls,
         account_id: str,
         data_name: str,
-        source: Optional[Union[MuxedAccount, str]] = None,
+        source: MuxedAccount | str | None = None,
     ):
         """Create a **revoke sponsorship** operation for a data entry.
 
@@ -275,7 +275,7 @@ class RevokeSponsorship(Operation):
     def revoke_claimable_balance_sponsorship(
         cls,
         claimable_balance_id: str,
-        source: Optional[Union[MuxedAccount, str]] = None,
+        source: MuxedAccount | str | None = None,
     ):
         """Create a **revoke sponsorship** operation for a claimable balance.
 
@@ -300,7 +300,7 @@ class RevokeSponsorship(Operation):
         cls,
         account_id: str,
         signer_key: SignerKey,
-        source: Optional[Union[MuxedAccount, str]] = None,
+        source: MuxedAccount | str | None = None,
     ):
         """Create a **revoke sponsorship** operation for a signer.
 
@@ -324,7 +324,7 @@ class RevokeSponsorship(Operation):
 
     @classmethod
     def revoke_liquidity_pool_sponsorship(
-        cls, liquidity_pool_id: str, source: Optional[Union[MuxedAccount, str]] = None
+        cls, liquidity_pool_id: str, source: MuxedAccount | str | None = None
     ):
         """Create a **revoke sponsorship** operation for a liquidity pool.
 
@@ -477,8 +477,8 @@ class RevokeSponsorship(Operation):
                     ledger_key.trust_line.asset.type
                     == stellar_xdr.AssetType.ASSET_TYPE_POOL_SHARE
                 ):
-                    asset: Union[Asset, LiquidityPoolId] = (
-                        LiquidityPoolId.from_xdr_object(ledger_key.trust_line.asset)
+                    asset: Asset | LiquidityPoolId = LiquidityPoolId.from_xdr_object(
+                        ledger_key.trust_line.asset
                     )
                 else:
                     asset = Asset.from_xdr_object(ledger_key.trust_line.asset)

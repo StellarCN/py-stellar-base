@@ -1,5 +1,3 @@
-from typing import Optional
-
 from ...asset import Asset
 from ...call_builder.base.base_call_builder import BaseCallBuilder
 
@@ -31,9 +29,9 @@ class BaseTradeAggregationsCallBuilder(BaseCallBuilder):
         base: Asset,
         counter: Asset,
         resolution: int,
-        start_time: Optional[int] = None,
-        end_time: Optional[int] = None,
-        offset: Optional[int] = None,
+        start_time: int | None = None,
+        end_time: int | None = None,
+        offset: int | None = None,
         **kwargs,
     ) -> None:
         super().__init__(**kwargs)

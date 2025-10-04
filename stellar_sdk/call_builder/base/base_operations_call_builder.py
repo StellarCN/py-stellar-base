@@ -1,5 +1,3 @@
-from typing import Union
-
 from ...call_builder.base.base_call_builder import BaseCallBuilder
 
 __all__ = ["BaseOperationsCallBuilder"]
@@ -17,7 +15,7 @@ class BaseOperationsCallBuilder(BaseCallBuilder):
         super().__init__(horizon_url)
         self.endpoint: str = "operations"
 
-    def operation(self, operation_id: Union[int, str]):
+    def operation(self, operation_id: int | str):
         """The operation details endpoint provides information on a single operation. The operation ID provided
         in the id argument specifies which operation to load.
 
@@ -41,7 +39,7 @@ class BaseOperationsCallBuilder(BaseCallBuilder):
         self.endpoint = f"accounts/{account_id}/operations"
         return self
 
-    def for_ledger(self, sequence: Union[int, str]):
+    def for_ledger(self, sequence: int | str):
         """This endpoint returns all operations that occurred in a given ledger.
 
         See `Retrieve a Ledger's Operations <https://developers.stellar.org/api/resources/ledgers/operations/>`__ for more information.

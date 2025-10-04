@@ -4,8 +4,9 @@ They may change at any time, so please do not use them directly.
 
 import hashlib
 import re
+from collections.abc import Sequence
 from decimal import ROUND_FLOOR, Context, Decimal, Inexact
-from typing import TYPE_CHECKING, Dict, Optional, Sequence, Union
+from typing import TYPE_CHECKING
 from urllib.parse import urljoin, urlsplit, urlunsplit
 
 from .exceptions import Ed25519PublicKeyInvalidError, NoApproximationError
@@ -26,7 +27,7 @@ def sha256(data: bytes) -> bytes:
     return hashlib.sha256(data).digest()
 
 
-def best_rational_approximation(x) -> Dict[str, int]:
+def best_rational_approximation(x) -> dict[str, int]:
     x = Decimal(x)
     int32_max = Decimal(2147483647)
     fractions = [[Decimal(0), Decimal(1)], [Decimal(1), Decimal(0)]]
@@ -52,7 +53,7 @@ def best_rational_approximation(x) -> Dict[str, int]:
     return {"n": int(n), "d": int(d)}
 
 
-def hex_to_bytes(hex_string: Union[str, bytes]) -> bytes:
+def hex_to_bytes(hex_string: str | bytes) -> bytes:
     if isinstance(hex_string, str):
         return bytes.fromhex(hex_string)
     return hex_string
@@ -68,7 +69,7 @@ def convert_assets_to_horizon_param(assets: Sequence["Asset"]) -> str:
     return ",".join(assets_string)
 
 
-def urljoin_with_query(base: str, path: Optional[str]) -> str:
+def urljoin_with_query(base: str, path: str | None) -> str:
     split_url = urlsplit(base)
     query = split_url.query
     real_path = split_url.path
@@ -126,7 +127,7 @@ def raise_if_not_valid_balance_id(value: str, argument_name: str) -> None:
         )
 
 
-def to_xdr_amount(value: Union[str, Decimal]) -> int:
+def to_xdr_amount(value: str | Decimal) -> int:
     """Converts an amount to the appropriate value to send over the network
     as a part of an XDR object.
 

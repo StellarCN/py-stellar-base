@@ -1,6 +1,6 @@
 from abc import ABCMeta, abstractmethod
 from decimal import Decimal
-from typing import ClassVar, Optional, Union
+from typing import ClassVar
 
 from .. import utils
 from .. import xdr as stellar_xdr
@@ -38,13 +38,13 @@ class Operation(metaclass=ABCMeta):
 
     _XDR_OPERATION_TYPE: ClassVar[stellar_xdr.OperationType]
 
-    def __init__(self, source: Optional[Union[MuxedAccount, str]] = None) -> None:
+    def __init__(self, source: MuxedAccount | str | None = None) -> None:
         if isinstance(source, str):
             source = MuxedAccount.from_account(source)
-        self.source: Optional[MuxedAccount] = source
+        self.source: MuxedAccount | None = source
 
     @staticmethod
-    def to_xdr_amount(value: Union[str, Decimal]) -> int:
+    def to_xdr_amount(value: str | Decimal) -> int:
         """Converts an amount to the appropriate value to send over the network
         as a part of an XDR object.
 
@@ -111,7 +111,7 @@ class Operation(metaclass=ABCMeta):
     @staticmethod
     def get_source_from_xdr_obj(
         xdr_object: stellar_xdr.Operation,
-    ) -> Optional[MuxedAccount]:
+    ) -> MuxedAccount | None:
         """Get the source account from account the operation xdr object.
 
         :param xdr_object: the operation xdr object.

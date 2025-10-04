@@ -1,4 +1,4 @@
-from typing import ClassVar, Optional, Union
+from typing import ClassVar
 
 from .. import xdr as stellar_xdr
 from ..muxed_account import MuxedAccount
@@ -25,7 +25,7 @@ class ExtendFootprintTTL(Operation):
     )
 
     def __init__(
-        self, extend_to: int, source: Optional[Union[MuxedAccount, str]] = None
+        self, extend_to: int, source: MuxedAccount | str | None = None
     ) -> None:
         super().__init__(source)
         if extend_to < 0 or extend_to > 2**32 - 1:

@@ -1,4 +1,4 @@
-from typing import ClassVar, Optional, Union
+from typing import ClassVar
 
 from .. import xdr as stellar_xdr
 from ..muxed_account import MuxedAccount
@@ -25,7 +25,7 @@ class EndSponsoringFutureReserves(Operation):
         stellar_xdr.OperationType.END_SPONSORING_FUTURE_RESERVES
     )
 
-    def __init__(self, source: Optional[Union[MuxedAccount, str]] = None) -> None:
+    def __init__(self, source: MuxedAccount | str | None = None) -> None:
         super().__init__(source)
 
     def _to_operation_body(self) -> stellar_xdr.OperationBody:

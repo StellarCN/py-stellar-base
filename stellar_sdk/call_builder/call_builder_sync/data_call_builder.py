@@ -1,4 +1,5 @@
-from typing import Any, Dict, Generator
+from collections.abc import Generator
+from typing import Any
 
 from ...call_builder.base import BaseDataCallBuilder
 from ...call_builder.call_builder_sync.base_call_builder import BaseCallBuilder
@@ -35,7 +36,7 @@ class DataCallBuilder(BaseCallBuilder, BaseDataCallBuilder):
 
     def stream(
         self,
-    ) -> Generator[Dict[str, Any], None, None]:
+    ) -> Generator[dict[str, Any], None, None]:
         """Creates an EventSource that listens for events from the `Account Data` endpoint.
 
         See `Streaming <https://developers.stellar.org/docs/data/apis/horizon/api-reference/structure/streaming>`__ for more information.

@@ -1,5 +1,3 @@
-from typing import Optional, Union
-
 import pytest
 
 from stellar_sdk import Operation
@@ -38,7 +36,7 @@ class TestExtendFootprintTTL:
     def test_xdr(
         self,
         extend_to: int,
-        source: Optional[Union[MuxedAccount, str]],
+        source: MuxedAccount | str | None,
         xdr: str,
     ):
         op = ExtendFootprintTTL(extend_to, source)

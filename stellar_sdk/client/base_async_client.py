@@ -1,5 +1,6 @@
 from abc import ABCMeta, abstractmethod
-from typing import Any, AsyncGenerator, Dict, Optional
+from collections.abc import AsyncGenerator
+from typing import Any
 
 from .response import Response
 
@@ -13,7 +14,7 @@ class BaseAsyncClient(metaclass=ABCMeta):
     """
 
     @abstractmethod
-    async def get(self, url: str, params: Optional[Dict[str, str]] = None) -> Response:
+    async def get(self, url: str, params: dict[str, str] | None = None) -> Response:
         """Perform HTTP GET request.
 
         :param url: the request url
@@ -27,8 +28,8 @@ class BaseAsyncClient(metaclass=ABCMeta):
     async def post(
         self,
         url: str,
-        data: Optional[Dict[str, str]] = None,
-        json_data: Optional[Dict[str, Any]] = None,
+        data: dict[str, str] | None = None,
+        json_data: dict[str, Any] | None = None,
     ) -> Response:
         """Perform HTTP POST request.
 
@@ -42,8 +43,8 @@ class BaseAsyncClient(metaclass=ABCMeta):
 
     @abstractmethod
     def stream(
-        self, url: str, params: Optional[Dict[str, str]] = None
-    ) -> AsyncGenerator[Dict[str, Any], None]:
+        self, url: str, params: dict[str, str] | None = None
+    ) -> AsyncGenerator[dict[str, Any], None]:
         """Creates an EventSource that listens for incoming messages from the server.
 
         See `Horizon Response Format <https://developers.stellar.org/api/introduction/response-format/>`__

@@ -1,5 +1,4 @@
 from decimal import Decimal
-from typing import List, Union
 
 from ...asset import Asset
 from ...call_builder.base import BaseStrictSendPathsCallBuilder
@@ -44,8 +43,8 @@ class StrictSendPathsCallBuilder(BaseCallBuilder, BaseStrictSendPathsCallBuilder
         horizon_url: str,
         client: BaseSyncClient,
         source_asset: Asset,
-        source_amount: Union[str, Decimal],
-        destination: Union[str, List[Asset]],
+        source_amount: str | Decimal,
+        destination: str | list[Asset],
     ) -> None:
         super().__init__(
             horizon_url=horizon_url,

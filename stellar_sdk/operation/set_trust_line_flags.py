@@ -1,5 +1,5 @@
 from enum import IntFlag
-from typing import ClassVar, Optional, Union
+from typing import ClassVar
 
 from .. import xdr as stellar_xdr
 from ..asset import Asset
@@ -55,15 +55,15 @@ class SetTrustLineFlags(Operation):
         self,
         trustor: str,
         asset: Asset,
-        clear_flags: Optional[TrustLineFlags] = None,
-        set_flags: Optional[TrustLineFlags] = None,
-        source: Optional[Union[MuxedAccount, str]] = None,
+        clear_flags: TrustLineFlags | None = None,
+        set_flags: TrustLineFlags | None = None,
+        source: MuxedAccount | str | None = None,
     ):
         super().__init__(source)
         self.trustor: str = trustor
         self.asset: Asset = asset
-        self.clear_flags: Optional[TrustLineFlags] = clear_flags
-        self.set_flags: Optional[TrustLineFlags] = set_flags
+        self.clear_flags: TrustLineFlags | None = clear_flags
+        self.set_flags: TrustLineFlags | None = set_flags
         raise_if_not_valid_ed25519_public_key(self.trustor, "trustor")
 
     def _to_operation_body(self) -> stellar_xdr.OperationBody:

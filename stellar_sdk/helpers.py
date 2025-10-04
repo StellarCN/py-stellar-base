@@ -1,5 +1,4 @@
 import warnings
-from typing import Union
 
 from .fee_bump_transaction_envelope import FeeBumpTransactionEnvelope
 from .transaction_envelope import TransactionEnvelope
@@ -9,7 +8,7 @@ __all__ = ["parse_transaction_envelope_from_xdr"]
 
 def parse_transaction_envelope_from_xdr(
     xdr: str, network_passphrase: str
-) -> Union[TransactionEnvelope, FeeBumpTransactionEnvelope]:
+) -> TransactionEnvelope | FeeBumpTransactionEnvelope:
     """When you are not sure whether your XDR belongs to
     :py:class:`TransactionEnvelope <stellar_sdk.transaction_envelope.TransactionEnvelope>`
     or :py:class:`FeeBumpTransactionEnvelope <stellar_sdk.fee_bump_transaction_envelope.FeeBumpTransactionEnvelope>`,

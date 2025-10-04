@@ -1,5 +1,5 @@
 from decimal import Decimal
-from typing import ClassVar, Optional, Union
+from typing import ClassVar
 
 from .. import xdr as stellar_xdr
 from ..keypair import Keypair
@@ -38,8 +38,8 @@ class CreateAccount(Operation):
     def __init__(
         self,
         destination: str,
-        starting_balance: Union[str, Decimal],
-        source: Optional[Union[MuxedAccount, str]] = None,
+        starting_balance: str | Decimal,
+        source: MuxedAccount | str | None = None,
     ) -> None:
         super().__init__(source)
         self.destination: str = destination

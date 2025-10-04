@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, Union
+from typing import TYPE_CHECKING
 
 from ..exceptions import SdkError
 
@@ -26,9 +26,7 @@ class AssembledTransactionError(SdkError):
     def __init__(
         self,
         message,
-        assembled_transaction: Union[
-            "AssembledTransaction", "AssembledTransactionAsync"
-        ],
+        assembled_transaction: "AssembledTransaction | AssembledTransactionAsync",
     ) -> None:
         super().__init__(message)
         self.assembled_transaction = assembled_transaction

@@ -1,5 +1,5 @@
 import re
-from typing import Dict, Optional, Type, Union
+from typing import Type
 
 from . import xdr as stellar_xdr
 from .exceptions import AssetCodeInvalidError, AssetIssuerInvalidError
@@ -22,9 +22,9 @@ class Asset:
         native_asset = Asset.native()  # You can also create a native asset through Asset("XLM").
         credit_alphanum4_asset = Asset("USD", "GBSKJPM2FM6O2C6GVZNAUAMGXZ6I4QIUPMNWVDN2NZULPWWTV3GI2SOX")
         credit_alphanum12_asset = Asset("BANANA", "GA6VT2PDD73TNNRYLPJPJYAAI7EGKBATZ7V562S7XY7TJD4GNOXRG6OS")
-        print(f"Asset type: {credit_alphanum4_asset.type}\\n"
-              f"Asset code: {credit_alphanum4_asset.code}\\n"
-              f"Asset issuer: {credit_alphanum4_asset.issuer}\\n"
+        print(f"Asset type: {credit_alphanum4_asset.type}\n"
+              f"Asset code: {credit_alphanum4_asset.code}\n"
+              f"Asset issuer: {credit_alphanum4_asset.issuer}\n"
               f"Is native asset: {credit_alphanum4_asset.is_native()}")
 
     For more information about the formats used for asset codes and how issuers
@@ -42,7 +42,7 @@ class Asset:
         https://developers.stellar.org/docs/glossary/assets/
     """
 
-    def __init__(self, code: str, issuer: Optional[str] = None) -> None:
+    def __init__(self, code: str, issuer: str | None = None) -> None:
         Asset.check_if_asset_code_is_valid(code)
 
         if code != "XLM" and issuer is None:
@@ -54,7 +54,7 @@ class Asset:
             raise AssetIssuerInvalidError("The issuer should be a correct public key.")
 
         self.code: str = code
-        self.issuer: Optional[str] = issuer
+        self.issuer: str | None = issuer
         self._type: str = self.guess_asset_type()
 
     @staticmethod
@@ -118,12 +118,12 @@ class Asset:
             asset_type = "credit_alphanum4"
         return asset_type
 
-    def to_dict(self) -> dict:
+    def to_dict(self) -> dict[str, str | None]:
         """Generate a dict for this object's attributes.
 
         :return: A dict representing an :class:`Asset`
         """
-        rv: Dict[str, Optional[str]] = {"type": self.type}
+        rv: dict[str, str | None] = {"type": self.type}
         if not self.is_native():
             rv["code"] = self.code
             rv["issuer"] = self.issuer
@@ -173,14 +173,12 @@ class Asset:
 
     def _to_xdr_object(
         self,
-        xdr_asset: Union[
-            Type[stellar_xdr.Asset],
-            Type[stellar_xdr.ChangeTrustAsset],
-            Type[stellar_xdr.TrustLineAsset],
-        ],
-    ) -> Union[
-        stellar_xdr.Asset, stellar_xdr.ChangeTrustAsset, stellar_xdr.TrustLineAsset
-    ]:
+        xdr_asset: (
+            Type[stellar_xdr.Asset]
+            | Type[stellar_xdr.ChangeTrustAsset]
+            | Type[stellar_xdr.TrustLineAsset]
+        ),
+    ) -> stellar_xdr.Asset | stellar_xdr.ChangeTrustAsset | stellar_xdr.TrustLineAsset:
         if self.is_native():
             asset_type = stellar_xdr.AssetType.ASSET_TYPE_NATIVE
             return xdr_asset(type=asset_type)
@@ -204,9 +202,11 @@ class Asset:
     @classmethod
     def from_xdr_object(
         cls,
-        xdr_object: Union[
-            stellar_xdr.Asset, stellar_xdr.ChangeTrustAsset, stellar_xdr.TrustLineAsset
-        ],
+        xdr_object: (
+            stellar_xdr.Asset
+            | stellar_xdr.ChangeTrustAsset
+            | stellar_xdr.TrustLineAsset
+        ),
     ) -> "Asset":
         """Create a :class:`Asset` from an XDR Asset/ChangeTrustAsset/TrustLineAsset object.
 

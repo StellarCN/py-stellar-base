@@ -1,5 +1,4 @@
 from decimal import Decimal
-from typing import List, Union
 
 from ...asset import Asset
 from ...call_builder.base.base_call_builder import BaseCallBuilder
@@ -39,8 +38,8 @@ class BaseStrictSendPathsCallBuilder(BaseCallBuilder):
     def __init__(
         self,
         source_asset: Asset,
-        source_amount: Union[str, Decimal],
-        destination: Union[str, List[Asset]],
+        source_amount: str | Decimal,
+        destination: str | list[Asset],
         **kwargs,
     ) -> None:
         super().__init__(**kwargs)
