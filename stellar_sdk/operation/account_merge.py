@@ -1,4 +1,4 @@
-from typing import ClassVar, Optional, Union
+from typing import ClassVar
 
 from .. import xdr as stellar_xdr
 from ..muxed_account import MuxedAccount
@@ -29,8 +29,8 @@ class AccountMerge(Operation):
 
     def __init__(
         self,
-        destination: Union[MuxedAccount, str],
-        source: Optional[Union[MuxedAccount, str]] = None,
+        destination: MuxedAccount | str,
+        source: MuxedAccount | str | None = None,
     ) -> None:
         super().__init__(source)
         if isinstance(destination, str):

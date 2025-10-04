@@ -1,4 +1,4 @@
-from typing import ClassVar, Optional, Union
+from typing import ClassVar
 
 from .. import xdr as stellar_xdr
 from ..keypair import Keypair
@@ -30,7 +30,7 @@ class BeginSponsoringFutureReserves(Operation):
     )
 
     def __init__(
-        self, sponsored_id: str, source: Optional[Union[MuxedAccount, str]] = None
+        self, sponsored_id: str, source: MuxedAccount | str | None = None
     ) -> None:
         super().__init__(source)
         self.sponsored_id: str = sponsored_id

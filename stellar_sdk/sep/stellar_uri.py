@@ -11,7 +11,6 @@ Version: 2.0.0
 import abc
 import base64
 from decimal import Decimal
-from typing import Dict, List, Optional, Tuple, Union
 from urllib import parse
 
 from ..asset import Asset
@@ -26,7 +25,7 @@ STELLAR_SCHEME: str = "web+stellar"
 
 
 class StellarUri(object, metaclass=abc.ABCMeta):
-    def __init__(self, signature: Optional[str] = None):
+    def __init__(self, signature: str | None = None):
         self.signature = signature
 
     @abc.abstractmethod
@@ -42,7 +41,7 @@ class StellarUri(object, metaclass=abc.ABCMeta):
         sign_data = b"\0" * 35 + b"\4" + b"stellar.sep.7 - URI Scheme" + data.encode()
         return sign_data
 
-    def sign(self, signer: Union[Keypair, str]) -> None:
+    def sign(self, signer: Keypair | str) -> None:
         """Sign the URI.
 
         :param signer: The account used to sign this transaction, it should be the secret key of `URI_REQUEST_SIGNING_KEY`.
@@ -54,11 +53,11 @@ class StellarUri(object, metaclass=abc.ABCMeta):
         self.signature = base64.b64encode(signature).decode()
 
     @staticmethod
-    def _parse_uri_query(uri_query) -> Dict[str, str]:
+    def _parse_uri_query(uri_query) -> dict[str, str]:
         return dict(parse.parse_qsl(uri_query))
 
     @staticmethod
-    def _parse_callback(callback: Optional[str]) -> Optional[str]:
+    def _parse_callback(callback: str | None) -> str | None:
         if callback is None:
             return None
         if not callback.startswith("url:"):
@@ -85,14 +84,14 @@ class PayStellarUri(StellarUri):
     def __init__(
         self,
         destination: str,
-        amount: Union[str, Decimal, None] = None,
-        asset: Optional[Asset] = None,
-        memo: Optional[Memo] = None,
-        callback: Optional[str] = None,
-        message: Optional[str] = None,
-        network_passphrase: Optional[str] = None,
-        origin_domain: Optional[str] = None,
-        signature: Optional[str] = None,
+        amount: str | Decimal | None = None,
+        asset: Asset | None = None,
+        memo: Memo | None = None,
+        callback: str | None = None,
+        message: str | None = None,
+        network_passphrase: str | None = None,
+        origin_domain: str | None = None,
+        signature: str | None = None,
     ) -> None:
         super().__init__(signature)
         if message is not None and len(message) > 300:
@@ -119,7 +118,7 @@ class PayStellarUri(StellarUri):
         self.origin_domain = origin_domain
 
     @staticmethod
-    def _encode_memo(memo) -> Union[Tuple[str, Union[str, int]], Tuple[None, None]]:
+    def _encode_memo(memo) -> tuple[str, str | int] | tuple[None, None]:
         if memo and not isinstance(memo, NoneMemo):
             if isinstance(memo, TextMemo):
                 memo_text = memo.memo_text.decode()  # memo text cant decode?
@@ -142,9 +141,7 @@ class PayStellarUri(StellarUri):
         return None, None
 
     @staticmethod
-    def _decode_memo(
-        memo_type: Optional[str], memo_value: Optional[str]
-    ) -> Optional[Memo]:
+    def _decode_memo(memo_type: str | None, memo_value: str | None) -> Memo | None:
         if memo_type is None:
             return None
         if memo_value is None:
@@ -167,7 +164,7 @@ class PayStellarUri(StellarUri):
 
         :return: Stellar Pay URI.
         """
-        query_params: Dict[str, Union[str, int, None]] = {}
+        query_params: dict[str, str | int | None] = {}
         query_params["destination"] = self.destination
         if self.amount is not None:
             query_params["amount"] = self.amount
@@ -346,14 +343,14 @@ class TransactionStellarUri(StellarUri):
 
     def __init__(
         self,
-        transaction_envelope: Union[TransactionEnvelope, FeeBumpTransactionEnvelope],
-        replace: Optional[List[Replacement]] = None,
-        callback: Optional[str] = None,
-        pubkey: Optional[str] = None,
-        message: Optional[str] = None,
-        network_passphrase: Optional[str] = None,
-        origin_domain: Optional[str] = None,
-        signature: Optional[str] = None,
+        transaction_envelope: TransactionEnvelope | FeeBumpTransactionEnvelope,
+        replace: list[Replacement] | None = None,
+        callback: str | None = None,
+        pubkey: str | None = None,
+        message: str | None = None,
+        network_passphrase: str | None = None,
+        origin_domain: str | None = None,
+        signature: str | None = None,
     ) -> None:
         super().__init__(signature)
         if message is not None and len(message) > 300:
@@ -368,7 +365,7 @@ class TransactionStellarUri(StellarUri):
         self.origin_domain = origin_domain
 
     @property
-    def _replace(self) -> Optional[str]:
+    def _replace(self) -> str | None:
         if not self.replace:
             return None
         replaces = []
@@ -406,7 +403,7 @@ class TransactionStellarUri(StellarUri):
 
     @classmethod
     def from_uri(
-        cls, uri: str, network_passphrase: Optional[str]
+        cls, uri: str, network_passphrase: str | None
     ) -> "TransactionStellarUri":
         """Parse Stellar Transaction URI and generate :class:`TransactionStellarUri` object.
 
@@ -447,7 +444,7 @@ class TransactionStellarUri(StellarUri):
         msg = query.get("msg")
         origin_domain = query.get("origin_domain")
         signature = query.get("signature")
-        tx: Union[TransactionEnvelope, FeeBumpTransactionEnvelope]
+        tx: TransactionEnvelope | FeeBumpTransactionEnvelope
         if xdr is None:
             raise ValueError("`xdr` is missing from uri.")
         if FeeBumpTransactionEnvelope.is_fee_bump_transaction_envelope(xdr):

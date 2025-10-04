@@ -1,5 +1,6 @@
 from abc import ABCMeta, abstractmethod
-from typing import Any, Dict, Generator, Optional
+from collections.abc import Generator
+from typing import Any
 
 from .response import Response
 
@@ -13,7 +14,7 @@ class BaseSyncClient(metaclass=ABCMeta):
     """
 
     @abstractmethod
-    def get(self, url: str, params: Optional[Dict[str, str]] = None) -> Response:
+    def get(self, url: str, params: dict[str, str] | None = None) -> Response:
         """Perform HTTP GET request.
 
         :param url: the request url
@@ -26,8 +27,8 @@ class BaseSyncClient(metaclass=ABCMeta):
     def post(
         self,
         url: str,
-        data: Optional[Dict[str, str]] = None,
-        json_data: Optional[Dict[str, Any]] = None,
+        data: dict[str, str] | None = None,
+        json_data: dict[str, Any] | None = None,
     ) -> Response:
         """Perform HTTP POST request.
 
@@ -40,8 +41,8 @@ class BaseSyncClient(metaclass=ABCMeta):
 
     @abstractmethod
     def stream(
-        self, url: str, params: Optional[Dict[str, str]] = None
-    ) -> Generator[Dict[str, Any], None, None]:
+        self, url: str, params: dict[str, str] | None = None
+    ) -> Generator[dict[str, Any], None, None]:
         """Creates an EventSource that listens for incoming messages from the server.
 
         See `Horizon Response Format <https://developers.stellar.org/api/introduction/response-format/>`__

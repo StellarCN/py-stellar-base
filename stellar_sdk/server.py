@@ -1,5 +1,5 @@
 from decimal import Decimal
-from typing import Any, Dict, List, Optional, Union
+from typing import Any
 
 from .account import Account
 from .asset import Asset
@@ -42,7 +42,7 @@ class Server(BaseServer):
     def __init__(
         self,
         horizon_url: str = "https://horizon-testnet.stellar.org/",
-        client: Optional[BaseSyncClient] = None,
+        client: BaseSyncClient | None = None,
     ) -> None:
         self.horizon_url: str = horizon_url
 
@@ -52,11 +52,9 @@ class Server(BaseServer):
 
     def submit_transaction(
         self,
-        transaction_envelope: Union[
-            TransactionEnvelope, FeeBumpTransactionEnvelope, str
-        ],
+        transaction_envelope: TransactionEnvelope | FeeBumpTransactionEnvelope | str,
         skip_memo_required_check: bool = False,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Submits a transaction to the network.
 
         :param transaction_envelope: :class:`stellar_sdk.transaction_envelope.TransactionEnvelope` object
@@ -85,11 +83,9 @@ class Server(BaseServer):
 
     def submit_transaction_async(
         self,
-        transaction_envelope: Union[
-            TransactionEnvelope, FeeBumpTransactionEnvelope, str
-        ],
+        transaction_envelope: TransactionEnvelope | FeeBumpTransactionEnvelope | str,
         skip_memo_required_check: bool = False,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Submits an asynchronous transaction to the network. Unlike the synchronous version, which blocks
         and waits for the transaction to be ingested in Horizon, this endpoint relays the response from
         core directly back to the user.
@@ -120,7 +116,7 @@ class Server(BaseServer):
         raise_request_exception(resp)
         return resp.json()
 
-    def load_account(self, account_id: Union[MuxedAccount, Keypair, str]) -> Account:
+    def load_account(self, account_id: MuxedAccount | Keypair | str) -> Account:
         """Fetches an account's most current base state (like sequence) in the ledger and then creates
         and returns an :class:`stellar_sdk.account.Account` object.
 
@@ -148,7 +144,7 @@ class Server(BaseServer):
         return account
 
     def __check_memo_required_sync(
-        self, transaction: Union[Transaction, FeeBumpTransaction]
+        self, transaction: Transaction | FeeBumpTransaction
     ) -> None:
         if isinstance(transaction, FeeBumpTransaction):
             transaction = transaction.inner_transaction_envelope.transaction
@@ -283,9 +279,9 @@ class Server(BaseServer):
 
     def strict_receive_paths(
         self,
-        source: Union[str, List[Asset]],
+        source: str | list[Asset],
         destination_asset: Asset,
-        destination_amount: Union[str, Decimal],
+        destination_amount: str | Decimal,
     ) -> StrictReceivePathsCallBuilder:
         """
         :param source: The sender's account ID or a list of Assets. Any returned path must use a source that the sender can hold.
@@ -305,8 +301,8 @@ class Server(BaseServer):
     def strict_send_paths(
         self,
         source_asset: Asset,
-        source_amount: Union[str, Decimal],
-        destination: Union[str, List[Asset]],
+        source_amount: str | Decimal,
+        destination: str | list[Asset],
     ) -> StrictSendPathsCallBuilder:
         """
         :param source_asset: The asset to be sent.
@@ -335,9 +331,9 @@ class Server(BaseServer):
         base: Asset,
         counter: Asset,
         resolution: int,
-        start_time: Optional[int] = None,
-        end_time: Optional[int] = None,
-        offset: Optional[int] = None,
+        start_time: int | None = None,
+        end_time: int | None = None,
+        offset: int | None = None,
     ) -> TradeAggregationsCallBuilder:
         """
         :param base: base asset

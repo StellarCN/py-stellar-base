@@ -1,4 +1,4 @@
-from typing import List, Optional, Sequence
+from collections.abc import Sequence
 
 from . import xdr as stellar_xdr
 from .ledger_bounds import LedgerBounds
@@ -28,12 +28,12 @@ class Preconditions:
 
     def __init__(
         self,
-        time_bounds: Optional[TimeBounds] = None,
-        ledger_bounds: Optional[LedgerBounds] = None,
-        min_sequence_number: Optional[int] = None,
-        min_sequence_age: Optional[int] = None,
-        min_sequence_ledger_gap: Optional[int] = None,
-        extra_signers: Optional[Sequence[SignerKey]] = None,
+        time_bounds: TimeBounds | None = None,
+        ledger_bounds: LedgerBounds | None = None,
+        min_sequence_number: int | None = None,
+        min_sequence_age: int | None = None,
+        min_sequence_ledger_gap: int | None = None,
+        extra_signers: Sequence[SignerKey] | None = None,
     ):
         if not extra_signers:
             extra_signers = []
@@ -156,7 +156,7 @@ class Preconditions:
             )
             min_sequence_age = xdr_object.v2.min_seq_age.duration.uint64
             min_sequence_ledger_gap = xdr_object.v2.min_seq_ledger_gap.uint32
-            extra_signers: Optional[List[SignerKey]] = [
+            extra_signers: list[SignerKey] | None = [
                 SignerKey.from_xdr_object(s) for s in xdr_object.v2.extra_signers
             ]
             return cls(

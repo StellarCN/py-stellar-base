@@ -8,8 +8,6 @@ Updated: 2019-10-10
 Version 1.1.0
 """
 
-from typing import Dict, Optional
-
 from ..client.aiohttp_client import AiohttpClient
 from ..client.base_async_client import BaseAsyncClient
 from ..client.base_sync_client import BaseSyncClient
@@ -39,8 +37,8 @@ class FederationRecord:
         self,
         account_id: str,
         stellar_address: str,
-        memo_type: Optional[str],
-        memo: Optional[str],
+        memo_type: str | None,
+        memo: str | None,
     ) -> None:
         """The :class:`FederationRecord`, which represents record in federation server.
 
@@ -53,8 +51,8 @@ class FederationRecord:
         """
         self.account_id: str = account_id
         self.stellar_address: str = stellar_address
-        self.memo_type: Optional[str] = memo_type
-        self.memo: Optional[str] = memo
+        self.memo_type: str | None = memo_type
+        self.memo: str | None = memo
 
     def __hash__(self):
         return hash((self.account_id, self.stellar_address, self.memo_type, self.memo))
@@ -78,8 +76,8 @@ class FederationRecord:
 
 def resolve_stellar_address(
     stellar_address: str,
-    client: Optional[BaseSyncClient] = None,
-    federation_url: Optional[str] = None,
+    client: BaseSyncClient | None = None,
+    federation_url: str | None = None,
     use_http: bool = False,
 ) -> FederationRecord:
     """Get the federation record if the user was found for a given Stellar address.
@@ -110,8 +108,8 @@ def resolve_stellar_address(
 
 async def resolve_stellar_address_async(
     stellar_address: str,
-    client: Optional[BaseAsyncClient] = None,
-    federation_url: Optional[str] = None,
+    client: BaseAsyncClient | None = None,
+    federation_url: str | None = None,
     use_http: bool = False,
 ) -> FederationRecord:
     """Get the federation record if the user was found for a given Stellar address.
@@ -142,9 +140,9 @@ async def resolve_stellar_address_async(
 
 def resolve_account_id(
     account_id: str,
-    domain: Optional[str] = None,
-    federation_url: Optional[str] = None,
-    client: Optional[BaseSyncClient] = None,
+    domain: str | None = None,
+    federation_url: str | None = None,
+    client: BaseSyncClient | None = None,
     use_http: bool = False,
 ) -> FederationRecord:
     """Given an account ID, get their federation record if the user was found
@@ -177,9 +175,9 @@ def resolve_account_id(
 
 async def resolve_account_id_async(
     account_id: str,
-    domain: Optional[str] = None,
-    federation_url: Optional[str] = None,
-    client: Optional[BaseAsyncClient] = None,
+    domain: str | None = None,
+    federation_url: str | None = None,
+    client: BaseAsyncClient | None = None,
     use_http: bool = False,
 ) -> FederationRecord:
     """Given an account ID, get their federation record if the user was found
@@ -231,7 +229,7 @@ def _handle_raw_response(
     )
 
 
-def _split_stellar_address(address: str) -> Dict[str, str]:
+def _split_stellar_address(address: str) -> dict[str, str]:
     parts = address.split(SEPARATOR)
     if len(parts) != 2:
         raise InvalidFederationAddress(

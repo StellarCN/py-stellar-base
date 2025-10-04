@@ -1,5 +1,3 @@
-from typing import Optional
-
 from . import xdr as stellar_xdr
 from .keypair import Keypair
 from .strkey import StrKey
@@ -37,17 +35,17 @@ class MuxedAccount:
     :param account_muxed_id: account multiplexing id, can be ``None`` or a non-negative integer. (ex. ``1234``)
     """
 
-    def __init__(self, account_id: str, account_muxed_id: Optional[int] = None) -> None:
+    def __init__(self, account_id: str, account_muxed_id: int | None = None) -> None:
         if account_muxed_id is not None and account_muxed_id < 0:
             raise ValueError(
                 "`account_muxed_id` must be a non-negative integer if provided."
             )
         Keypair.from_public_key(account_id)
         self.account_id: str = account_id
-        self.account_muxed_id: Optional[int] = account_muxed_id
+        self.account_muxed_id: int | None = account_muxed_id
 
     @property
-    def account_muxed(self) -> Optional[str]:
+    def account_muxed(self) -> str | None:
         """Get the multiplex address starting with ``M``, return ``None`` if `account_id_id` is ``None``."""
 
         if self.account_muxed_id is None:

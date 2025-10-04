@@ -1,5 +1,3 @@
-from typing import Union
-
 from ...asset import Asset
 from ...call_builder.base.base_call_builder import BaseCallBuilder
 
@@ -85,7 +83,7 @@ class BaseOffersCallBuilder(BaseCallBuilder):
         self._add_query_params(params)
         return self
 
-    def offer(self, offer_id: Union[str, int]):
+    def offer(self, offer_id: int | str):
         """Returns information and links relating to a single offer.
 
         See `Retrieve an Offer <https://developers.stellar.org/api/resources/offers/single/>`__ for more information.

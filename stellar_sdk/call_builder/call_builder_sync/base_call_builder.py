@@ -1,4 +1,5 @@
-from typing import Any, Dict, Generator, Optional
+from collections.abc import Generator
+from typing import Any
 
 from ...call_builder.base.base_call_builder import BaseCallBuilder as _BaseCallBuilder
 from ...client.base_sync_client import BaseSyncClient
@@ -22,7 +23,7 @@ class BaseCallBuilder(_BaseCallBuilder):
         super().__init__(**kwargs)
         self.client: BaseSyncClient = client
 
-    def call(self) -> Dict[str, Any]:
+    def call(self) -> dict[str, Any]:
         """Triggers a HTTP request using this builder's current configuration.
 
         :return: If it is called synchronous, the response will be returned. If
@@ -40,7 +41,7 @@ class BaseCallBuilder(_BaseCallBuilder):
         url = urljoin_with_query(self.horizon_url, self.endpoint)
         return self._call(url, self.params)
 
-    def _call(self, url: str, params: Optional[dict] = None) -> Dict[str, Any]:
+    def _call(self, url: str, params: dict | None = None) -> dict[str, Any]:
         raw_resp = self.client.get(url, params)
         assert isinstance(raw_resp, Response)
         raise_request_exception(raw_resp)
@@ -50,7 +51,7 @@ class BaseCallBuilder(_BaseCallBuilder):
 
     def _stream(
         self,
-    ) -> Generator[Dict[str, Any], None, None]:
+    ) -> Generator[dict[str, Any], None, None]:
         """Creates an EventSource that listens for incoming messages from the server.
 
         See `Horizon Response Format <https://developers.stellar.org/api/introduction/response-format/>`__
@@ -64,12 +65,12 @@ class BaseCallBuilder(_BaseCallBuilder):
         url = urljoin_with_query(self.horizon_url, self.endpoint)
         return self.client.stream(url, self.params)
 
-    def next(self) -> Dict[str, Any]:
+    def next(self) -> dict[str, Any]:
         if self.next_href is None:
             raise NotPageableError("The next page does not exist.")
         return self._call(self.next_href, None)
 
-    def prev(self) -> Dict[str, Any]:
+    def prev(self) -> dict[str, Any]:
         if self.prev_href is None:
             raise NotPageableError("The prev page does not exist.")
         return self._call(self.prev_href, None)

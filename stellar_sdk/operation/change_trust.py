@@ -1,5 +1,5 @@
 from decimal import Decimal
-from typing import ClassVar, Optional, Union
+from typing import ClassVar
 
 from .. import xdr as stellar_xdr
 from ..asset import Asset
@@ -38,9 +38,9 @@ class ChangeTrust(Operation):
 
     def __init__(
         self,
-        asset: Union[Asset, LiquidityPoolAsset],
-        limit: Union[str, Decimal, None] = None,  # _DEFAULT_LIMIT default
-        source: Optional[Union[MuxedAccount, str]] = None,
+        asset: Asset | LiquidityPoolAsset,
+        limit: str | Decimal | None = None,  # _DEFAULT_LIMIT default
+        source: MuxedAccount | str | None = None,
     ) -> None:
         super().__init__(source)
         self.asset = asset
@@ -72,7 +72,7 @@ class ChangeTrust(Operation):
             xdr_object.body.change_trust_op.line.type
             == stellar_xdr.AssetType.ASSET_TYPE_POOL_SHARE
         ):
-            line: Union[Asset, LiquidityPoolAsset] = LiquidityPoolAsset.from_xdr_object(
+            line: Asset | LiquidityPoolAsset = LiquidityPoolAsset.from_xdr_object(
                 xdr_object.body.change_trust_op.line
             )
         else:

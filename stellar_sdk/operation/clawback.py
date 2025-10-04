@@ -1,5 +1,5 @@
 from decimal import Decimal
-from typing import ClassVar, Optional, Union
+from typing import ClassVar
 
 from .. import xdr as stellar_xdr
 from ..asset import Asset
@@ -34,9 +34,9 @@ class Clawback(Operation):
     def __init__(
         self,
         asset: Asset,
-        from_: Union[MuxedAccount, str],
-        amount: Union[str, Decimal],
-        source: Optional[Union[MuxedAccount, str]] = None,
+        from_: MuxedAccount | str,
+        amount: str | Decimal,
+        source: MuxedAccount | str | None = None,
     ) -> None:
         super().__init__(source)
         if isinstance(from_, str):

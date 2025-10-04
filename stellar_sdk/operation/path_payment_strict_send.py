@@ -1,5 +1,6 @@
+from collections.abc import Sequence
 from decimal import Decimal
-from typing import ClassVar, Optional, Sequence, Union
+from typing import ClassVar
 
 from .. import xdr as stellar_xdr
 from ..asset import Asset
@@ -38,13 +39,13 @@ class PathPaymentStrictSend(Operation):
 
     def __init__(
         self,
-        destination: Union[MuxedAccount, str],
+        destination: MuxedAccount | str,
         send_asset: Asset,
-        send_amount: Union[str, Decimal],
+        send_amount: str | Decimal,
         dest_asset: Asset,
-        dest_min: Union[str, Decimal],
+        dest_min: str | Decimal,
         path: Sequence[Asset],
-        source: Optional[Union[MuxedAccount, str]] = None,
+        source: MuxedAccount | str | None = None,
     ) -> None:
         super().__init__(source)
         if isinstance(destination, str):

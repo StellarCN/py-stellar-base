@@ -1,6 +1,5 @@
 import binascii
 from enum import IntEnum
-from typing import Union
 
 from . import xdr as stellar_xdr
 from .strkey import StrKey
@@ -73,7 +72,7 @@ class Address:
             raise ValueError("Unsupported address type.")
 
     @staticmethod
-    def from_raw_account(account: Union[bytes, str]) -> "Address":
+    def from_raw_account(account: bytes | str) -> "Address":
         """Creates a new account Address object from raw bytes.
 
         :param account: The raw bytes of the account, it can be a byte array or a hex encoded string.
@@ -84,7 +83,7 @@ class Address:
         return Address(StrKey.encode_ed25519_public_key(account))
 
     @staticmethod
-    def from_raw_contract(contract: Union[bytes, str]) -> "Address":
+    def from_raw_contract(contract: bytes | str) -> "Address":
         """Creates a new contract Address object from a buffer of raw bytes.
 
         :param contract: The raw bytes of the contract.
@@ -95,7 +94,7 @@ class Address:
         return Address(StrKey.encode_contract(contract))
 
     @staticmethod
-    def from_raw_muxed_account(muxed_account: Union[bytes, str]) -> "Address":
+    def from_raw_muxed_account(muxed_account: bytes | str) -> "Address":
         """Creates a new muxed account Address object from raw bytes.
 
         :param muxed_account: The raw bytes of the muxed account.
@@ -106,7 +105,7 @@ class Address:
         return Address(StrKey.encode_med25519_public_key(muxed_account))
 
     @staticmethod
-    def from_raw_claimable_balance(claimable_balance: Union[bytes, str]) -> "Address":
+    def from_raw_claimable_balance(claimable_balance: bytes | str) -> "Address":
         """Creates a new claimable balance Address object from raw bytes.
 
         :param claimable_balance: The raw bytes of the claimable balance.
@@ -117,7 +116,7 @@ class Address:
         return Address(StrKey.encode_claimable_balance(claimable_balance))
 
     @staticmethod
-    def from_raw_liquidity_pool(liquidity_pool: Union[bytes, str]) -> "Address":
+    def from_raw_liquidity_pool(liquidity_pool: bytes | str) -> "Address":
         """Creates a new liquidity pool Address object from raw bytes.
 
         :param liquidity_pool: The raw bytes of the liquidity pool.

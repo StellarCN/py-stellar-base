@@ -8,7 +8,6 @@ import hmac
 import os
 import struct
 from enum import Enum, unique
-from typing import Union
 
 from mnemonic import Mnemonic
 from mnemonic.mnemonic import PBKDF2_ROUNDS
@@ -37,7 +36,7 @@ class StellarMnemonic(Mnemonic):
     FIRST_HARDENED_INDEX = 0x80000000
     SEED_MODIFIER = b"ed25519 seed"
 
-    def __init__(self, language: Union[str, Language] = Language.ENGLISH) -> None:
+    def __init__(self, language: str | Language = Language.ENGLISH) -> None:
         if isinstance(language, Language):
             language = language.value
         else:

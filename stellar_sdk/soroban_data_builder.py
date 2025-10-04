@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from typing import List, Union
-
 from . import xdr as stellar_xdr
 
 __all__ = ["SorobanDataBuilder"]
@@ -35,7 +33,7 @@ class SorobanDataBuilder:
 
     @classmethod
     def from_xdr(
-        cls, soroban_data: Union[str, stellar_xdr.SorobanTransactionData]
+        cls, soroban_data: str | stellar_xdr.SorobanTransactionData
     ) -> SorobanDataBuilder:
         """Create a new :class:`SorobanDataBuilder` object from an XDR object.
 
@@ -61,7 +59,7 @@ class SorobanDataBuilder:
         return self
 
     def set_read_only(
-        self, read_only: List[stellar_xdr.LedgerKey]
+        self, read_only: list[stellar_xdr.LedgerKey]
     ) -> SorobanDataBuilder:
         """Sets the read-only portion of the storage access footprint to be a certain set of ledger keys.
 
@@ -72,7 +70,7 @@ class SorobanDataBuilder:
         return self
 
     def set_read_write(
-        self, read_write: List[stellar_xdr.LedgerKey]
+        self, read_write: list[stellar_xdr.LedgerKey]
     ) -> SorobanDataBuilder:
         """Sets the read-write portion of the storage access footprint to be a certain set of ledger keys.
 

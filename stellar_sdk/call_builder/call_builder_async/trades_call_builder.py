@@ -1,4 +1,5 @@
-from typing import Any, AsyncGenerator, Dict
+from collections.abc import AsyncGenerator
+from typing import Any
 
 from ...call_builder.base import BaseTradesCallBuilder
 from ...call_builder.call_builder_async.base_call_builder import BaseCallBuilder
@@ -22,7 +23,7 @@ class TradesCallBuilder(BaseCallBuilder, BaseTradesCallBuilder):
 
     def stream(
         self,
-    ) -> AsyncGenerator[Dict[str, Any], None]:
+    ) -> AsyncGenerator[dict[str, Any], None]:
         """Creates an EventSource that listens for events from the `Trades` endpoint.
 
         See `Streaming <https://developers.stellar.org/docs/data/apis/horizon/api-reference/structure/streaming>`__ for more information.

@@ -1,5 +1,4 @@
 from enum import IntEnum
-from typing import Union
 
 from . import xdr as stellar_xdr
 from .__version__ import __issues__
@@ -89,7 +88,7 @@ class SignerKey:
             raise ValueError(f"{prefix!r} is an unsupported version byte.")
 
     @classmethod
-    def ed25519_public_key(cls, account_id: Union[str, bytes]) -> "SignerKey":
+    def ed25519_public_key(cls, account_id: str | bytes) -> "SignerKey":
         """Create ED25519 PUBLIC KEY Signer from account id.
 
         :param account_id: account id
@@ -104,7 +103,7 @@ class SignerKey:
         return cls(signer_key=account_id, signer_key_type=signer_key_type)
 
     @classmethod
-    def pre_auth_tx(cls, pre_auth_tx_hash: Union[str, bytes]) -> "SignerKey":
+    def pre_auth_tx(cls, pre_auth_tx_hash: str | bytes) -> "SignerKey":
         """Create Pre AUTH TX Signer from the sha256 hash of a transaction,
         click `here <https://developers.stellar.org/docs/glossary/multisig/#pre-authorized-transaction>`__ for more information.
 
@@ -117,7 +116,7 @@ class SignerKey:
         return cls(signer_key=pre_auth_tx_hash, signer_key_type=signer_key_type)
 
     @classmethod
-    def sha256_hash(cls, sha256_hash: Union[str, bytes]) -> "SignerKey":
+    def sha256_hash(cls, sha256_hash: str | bytes) -> "SignerKey":
         """Create SHA256 HASH Signer from a sha256 hash of a preimage,
         click `here <https://developers.stellar.org/docs/glossary/multisig/#hashx>`__ for more information.
 
@@ -131,7 +130,7 @@ class SignerKey:
 
     @classmethod
     def ed25519_signed_payload(
-        cls, ed25519_signed_payload: Union[str, bytes, SignedPayloadSigner]
+        cls, ed25519_signed_payload: str | bytes | SignedPayloadSigner
     ) -> "SignerKey":
         """Create ed25519 signed payload Signer from an ed25519 signed payload,
         click `here <https://github.com/stellar/stellar-protocol/blob/master/core/cap-0040.md>`__ for more information.

@@ -1302,8 +1302,8 @@ class TestSorobanServer:
 
 
 def _build_soroban_transaction(
-    soroban_data: Optional[stellar_xdr.SorobanTransactionData],
-    auth: List[stellar_xdr.SorobanAuthorizationEntry],
+    soroban_data: stellar_xdr.SorobanTransactionData | None,
+    auth: list[stellar_xdr.SorobanAuthorizationEntry],
 ):
     contract_id = (
         "CDU3PZ4LXVETIFVLS33RDXLD63JZ5GXS7PCV2DJ7BBT6EBPA2AB7YR5H"  # auth contract

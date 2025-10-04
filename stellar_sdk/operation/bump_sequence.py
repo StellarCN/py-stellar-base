@@ -1,4 +1,4 @@
-from typing import ClassVar, Optional, Union
+from typing import ClassVar
 
 from .. import xdr as stellar_xdr
 from ..muxed_account import MuxedAccount
@@ -29,9 +29,7 @@ class BumpSequence(Operation):
         stellar_xdr.OperationType.BUMP_SEQUENCE
     )
 
-    def __init__(
-        self, bump_to: int, source: Optional[Union[MuxedAccount, str]] = None
-    ) -> None:
+    def __init__(self, bump_to: int, source: MuxedAccount | str | None = None) -> None:
         super().__init__(source)
         self.bump_to: int = bump_to
 
