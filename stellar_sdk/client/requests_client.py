@@ -81,10 +81,10 @@ class RequestsClient(BaseSyncClient):
             max_retries=retry,
         )
 
-        self.headers = {**IDENTIFICATION_HEADERS, "User-Agent": USER_AGENT}
+        self.headers = IDENTIFICATION_HEADERS | {"User-Agent": USER_AGENT}
 
         if custom_headers:
-            self.headers = {**self.headers, **custom_headers}
+            self.headers = self.headers | custom_headers
 
         # init session
         if session is None:
@@ -158,9 +158,9 @@ class RequestsClient(BaseSyncClient):
         :return: a Generator for server response
         :raise: :exc:`StreamClientError <stellar_sdk.exceptions.StreamClientError>`
         """
-        query_params = {**params} if params else dict()
+        query_params = params.copy() if params else dict()
 
-        query_params.update(**IDENTIFICATION_HEADERS)
+        query_params |= IDENTIFICATION_HEADERS
         retry = 0.1
 
         while True:
