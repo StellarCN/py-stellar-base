@@ -103,13 +103,12 @@ class AiohttpClient(BaseAsyncClient):
         if user_agent:
             self.user_agent = user_agent
 
-        self.headers: dict = {
-            **IDENTIFICATION_HEADERS,
+        self.headers: dict = IDENTIFICATION_HEADERS | {
             "User-Agent": self.user_agent,
         }
 
         if custom_headers:
-            self.headers = {**self.headers, **custom_headers}
+            self.headers = self.headers | custom_headers
 
         self._session: Optional[aiohttp.ClientSession] = None
         self._sse_session: Optional[aiohttp.ClientSession] = None
@@ -185,9 +184,9 @@ class AiohttpClient(BaseAsyncClient):
             timeout = aiohttp.ClientTimeout(total=60 * 5)
             self._sse_session = aiohttp.ClientSession(timeout=timeout)
 
-        query_params = {**params} if params else dict()
+        query_params = params.copy() if params else dict()
 
-        query_params.update(**IDENTIFICATION_HEADERS)
+        query_params |= IDENTIFICATION_HEADERS
         retry = 0.1
 
         while True:
