@@ -8,7 +8,7 @@ __all__ = ["BaseOperationsCallBuilder"]
 class BaseOperationsCallBuilder(BaseCallBuilder):
     """Creates a new :class:`OperationsCallBuilder` pointed to server defined by horizon_url.
 
-    See `List All Operations <https://developers.stellar.org/api/resources/operations/list/>`__ for more information.
+    See `List All Operations <https://developers.stellar.org/docs/data/apis/horizon/api-reference/list-all-operations>`__ for more information.
 
     :param horizon_url: Horizon server URL.
     """
@@ -21,7 +21,7 @@ class BaseOperationsCallBuilder(BaseCallBuilder):
         """The operation details endpoint provides information on a single operation. The operation ID provided
         in the id argument specifies which operation to load.
 
-        See `Retrieve an Operation <https://developers.stellar.org/api/resources/operations/single/>`__ for more information.
+        See `Retrieve an Operation <https://developers.stellar.org/docs/data/apis/horizon/api-reference/retrieve-an-operation>`__ for more information.
 
         :param operation_id: Operation ID
         :return: this OperationCallBuilder instance
@@ -33,7 +33,7 @@ class BaseOperationsCallBuilder(BaseCallBuilder):
         """This endpoint represents all operations that were included in valid transactions that
         affected a particular account.
 
-        See `Retrieve an Account's Operations <https://developers.stellar.org/api/resources/accounts/operations/>`__ for more information.
+        See `Retrieve an Account's Operations <https://developers.stellar.org/docs/data/apis/horizon/api-reference/get-operations-by-account-id>`__ for more information.
 
         :param account_id: Account ID
         :return: this OperationCallBuilder instance
@@ -44,7 +44,7 @@ class BaseOperationsCallBuilder(BaseCallBuilder):
     def for_ledger(self, sequence: Union[int, str]):
         """This endpoint returns all operations that occurred in a given ledger.
 
-        See `Retrieve a Ledger's Operations <https://developers.stellar.org/api/resources/ledgers/operations/>`__ for more information.
+        See `Retrieve a Ledger's Operations <https://developers.stellar.org/docs/data/apis/horizon/api-reference/retrieve-a-ledgers-operations>`__ for more information.
 
         :param sequence: Sequence ID
         :return: this OperationCallBuilder instance
@@ -55,7 +55,7 @@ class BaseOperationsCallBuilder(BaseCallBuilder):
     def for_transaction(self, transaction_hash: str):
         """This endpoint represents all operations that are part of a given transaction.
 
-        See `Retrieve a Transaction's Operations <https://developers.stellar.org/api/resources/transactions/operations/>`__ for more information.
+        See `Retrieve a Transaction's Operations <https://developers.stellar.org/docs/data/apis/horizon/api-reference/retrieve-a-transactions-operations>`__ for more information.
 
         :param transaction_hash: Transaction Hash
         :return: this OperationCallBuilder instance
@@ -68,7 +68,7 @@ class BaseOperationsCallBuilder(BaseCallBuilder):
         claimable balance and can be used in streaming mode.
 
 
-        See `Claimable Balances - Retrieve related Operations <https://developers.stellar.org/api/resources/claimablebalances/operations/>`__ for more information.
+        See `Claimable Balances - Retrieve related Operations <https://developers.stellar.org/docs/data/apis/horizon/api-reference/cb-retrieve-related-operations>`__ for more information.
 
         :param claimable_balance_id: This claimable balance’s id encoded in a hex string representation.
         :return: this OperationCallBuilder instance
@@ -79,7 +79,7 @@ class BaseOperationsCallBuilder(BaseCallBuilder):
     def for_liquidity_pool(self, liquidity_pool_id: str):
         """This endpoint represents all operations that are part of a given liquidity pool.
 
-        See `Liquidity Pools - Retrieve related Operations <https://developers.stellar.org/api/resources/liquiditypools/operations/>`__ for more information.
+        See `Liquidity Pools - Retrieve related Operations <https://developers.stellar.org/docs/data/apis/horizon/api-reference/lp-retrieve-related-operations>`__ for more information.
 
         :param liquidity_pool_id: The ID of the liquidity pool in hex string.
         :return: this OperationCallBuilder instance

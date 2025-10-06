@@ -11,7 +11,7 @@ class OffersCallBuilder(BaseCallBuilder, BaseOffersCallBuilder):
     """Creates a new :class:`OffersCallBuilder` pointed to server defined by horizon_url.
     Do not create this object directly, use :func:`stellar_sdk.Server.offers`.
 
-    See `List All Offers <https://developers.stellar.org/api/resources/offers/list/>`__ for more information.
+    See `List All Offers <https://developers.stellar.org/docs/data/apis/horizon/api-reference/get-all-offers>`__ for more information.
 
     :param horizon_url: Horizon server URL.
     :param client: The client instance used to send request.

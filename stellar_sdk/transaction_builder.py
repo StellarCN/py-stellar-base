@@ -658,13 +658,13 @@ class TransactionBuilder:
         :param master_weight: A number from 0-255 (inclusive) representing the weight of the master key.
             If the weight of the master key is updated to 0, it is effectively disabled.
         :param low_threshold: A number from 0-255 (inclusive) representing the threshold this account sets on all
-            operations it performs that have `a low threshold <https://developers.stellar.org/docs/glossary/multisig/>`_.
+            operations it performs that have `a low threshold <https://developers.stellar.org/docs/learn/fundamentals/transactions/signatures-multisig>`_.
         :param med_threshold: A number from 0-255 (inclusive) representing the threshold this account sets on all
-            operations it performs that have `a medium threshold <https://developers.stellar.org/docs/glossary/multisig/>`_.
+            operations it performs that have `a medium threshold <https://developers.stellar.org/docs/learn/fundamentals/transactions/signatures-multisig>`_.
         :param high_threshold: A number from 0-255 (inclusive) representing the threshold this account sets on all
-            operations it performs that have `a high threshold <https://developers.stellar.org/docs/glossary/multisig/>`_.
+            operations it performs that have `a high threshold <https://developers.stellar.org/docs/learn/fundamentals/transactions/signatures-multisig>`_.
         :param home_domain: sets the home domain used for
-            reverse `federation <https://developers.stellar.org/docs/glossary/federation/>`_ lookup.
+            reverse `federation <https://developers.stellar.org/docs/learn/glossary#federation>`_ lookup.
         :param signer: Add, update, or remove a signer from the account.
         :param source: The source account for the operation. Defaults to the transaction's source account.
         :return: This builder instance.

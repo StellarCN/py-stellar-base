@@ -18,7 +18,7 @@ class ClaimClaimableBalance(Operation):
 
     Threshold: Low
 
-    See `Claim Claimable Balance <https://developers.stellar.org/docs/start/list-of-operations/#claim-claimable-balance>`_ for more information.
+    See `Claim Claimable Balance <https://developers.stellar.org/docs/learn/fundamentals/transactions/list-of-operations#claim-claimable-balance>`_ for more information.
 
     :param balance_id: The claimable balance id to be claimed.
     :param source: The source account for the operation. Defaults to the transaction's source account.

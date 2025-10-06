@@ -116,11 +116,11 @@ class RevokeSponsorship(Operation):
     then attempt to revoke the sponsorship. If the source account is sponsored, the next step depends on whether the
     entry is sponsored or not. If it is sponsored, attempt to transfer the sponsorship to the sponsor
     of the source account. If the entry is not sponsored, then establish the sponsorship.
-    See `Sponsored Reserves <https://developers.stellar.org/docs/glossary/sponsored-reserves/>`_ for more information.
+    See `Sponsored Reserves <https://developers.stellar.org/docs/build/guides/transactions/sponsored-reserves>`_ for more information.
 
     Threshold: Medium
 
-    See `Revoke Sponsorship <https://developers.stellar.org/docs/start/list-of-operations/#revoke-sponsorship>`_ for more information.
+    See `Revoke Sponsorship <https://developers.stellar.org/docs/learn/fundamentals/transactions/list-of-operations#revoke-sponsorship>`_ for more information.
 
     :param revoke_sponsorship_type: The sponsored account id.
     :param account_id: The sponsored account ID.

@@ -49,7 +49,7 @@ class BaseCallBuilder:
     ]:
         """Creates an EventSource that listens for incoming messages from the server.
 
-        See `Horizon Response Format <https://developers.stellar.org/api/introduction/response-format/>`__
+        See `Horizon Response Format <https://developers.stellar.org/docs/data/apis/horizon/api-reference/structure/response-format>`__
 
         See `MDN EventSource <https://developer.mozilla.org/en-US/docs/Web/API/EventSource>`__
 
@@ -69,7 +69,7 @@ class BaseCallBuilder:
     def cursor(self, cursor: Union[int, str]):
         """Sets ``cursor`` parameter for the current call. Returns the CallBuilder object on which this method has been called.
 
-        See `Pagination <https://developers.stellar.org/api/introduction/pagination/>`__
+        See `Pagination <https://developers.stellar.org/docs/data/apis/horizon/api-reference/structure/pagination>`__
 
         :param cursor: A cursor is a value that points to a specific location in a collection of resources.
         :return: current CallBuilder instance
@@ -80,7 +80,7 @@ class BaseCallBuilder:
     def limit(self, limit: int):
         """Sets ``limit`` parameter for the current call. Returns the CallBuilder object on which this method has been called.
 
-        See `Pagination <https://developers.stellar.org/api/introduction/pagination/>`__
+        See `Pagination <https://developers.stellar.org/docs/data/apis/horizon/api-reference/structure/pagination>`__
 
         :param limit: Number of records the server should return.
         :return:

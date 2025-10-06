@@ -21,7 +21,7 @@ class ManageData(Operation):
 
     Threshold: Medium
 
-    See `Manage Data <https://developers.stellar.org/docs/start/list-of-operations/#manage-data>`_ for more information.
+    See `Manage Data <https://developers.stellar.org/docs/learn/fundamentals/transactions/list-of-operations#manage-data>`_ for more information.
 
     :param data_name: If this is a new Name
         it will add the given name/value pair to the account. If this Name

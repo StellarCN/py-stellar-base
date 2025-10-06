@@ -21,9 +21,9 @@ class Operation(metaclass=ABCMeta):
     transaction, unless there is an override defined for the operation.
 
     For more on operations, see `Stellar's documentation on operations
-    <https://developers.stellar.org/docs/glossary/operations/>`_ as
+    <https://developers.stellar.org/docs/learn/fundamentals/transactions/operations-and-transactions#operations>`_ as
     well as `Stellar's List of Operations
-    <https://developers.stellar.org/docs/start/list-of-operations/>`_,
+    <https://developers.stellar.org/docs/learn/fundamentals/transactions/list-of-operations>`_,
     which includes information such as the security necessary for a given
     operation, as well as information about when validity checks occur on the
     network.

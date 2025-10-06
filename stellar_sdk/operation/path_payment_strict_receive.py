@@ -20,7 +20,7 @@ class PathPaymentStrictReceive(Operation):
 
     Threshold: Medium
 
-    See `Path Payment Strict Receive <https://developers.stellar.org/docs/start/list-of-operations/#path-payment-strict-receive>`_ for more information.
+    See `Path Payment Strict Receive <https://developers.stellar.org/docs/learn/fundamentals/transactions/list-of-operations#path-payment-strict-receive>`_ for more information.
 
     :param destination: The destination account to send to.
     :param send_asset: The `asset` to pay with.
