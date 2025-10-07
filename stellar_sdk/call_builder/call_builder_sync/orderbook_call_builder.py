@@ -12,7 +12,7 @@ class OrderbookCallBuilder(BaseCallBuilder, BaseOrderbookCallBuilder):
     """Creates a new :class:`OrderbookCallBuilder` pointed to server defined by horizon_url.
     Do not create this object directly, use :func:`stellar_sdk.Server.orderbook`.
 
-    See `Orderbook <https://developers.stellar.org/api/aggregations/order-books/>`__ for more information.
+    See `Orderbook <https://developers.stellar.org/docs/data/apis/horizon/api-reference/retrieve-an-order-book>`__ for more information.
 
     :param horizon_url: Horizon server URL.
     :param client: The client instance used to send request.

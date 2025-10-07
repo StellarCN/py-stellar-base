@@ -35,7 +35,7 @@ class CreatePassiveSellOffer(Operation):
 
     Threshold: Medium
 
-    See `Create Passive Sell Offer <https://developers.stellar.org/docs/start/list-of-operations/#create-passive-sell-offer>`_ for more information.
+    See `Create Passive Sell Offer <https://developers.stellar.org/docs/learn/fundamentals/transactions/list-of-operations#create-passive-sell-offer>`_ for more information.
 
     :param selling: What you're selling.
     :param buying: What you're buying.

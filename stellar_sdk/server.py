@@ -22,7 +22,7 @@ __all__ = ["Server"]
 
 
 class Server(BaseServer):
-    """Server handles the network connection to a `Horizon <https://developers.stellar.org/api/introduction/>`_
+    """Server handles the network connection to a `Horizon <https://developers.stellar.org/docs/data/apis/horizon>`_
     instance and exposes an interface for requests to that instance.
 
     An example::

@@ -37,7 +37,7 @@ class SetTrustLineFlags(Operation):
 
     Threshold: Low
 
-    See `Set Trustline Flags <https://developers.stellar.org/docs/start/list-of-operations/#set-trustline-flags>`_ for more information.
+    See `Set Trustline Flags <https://developers.stellar.org/docs/learn/fundamentals/transactions/list-of-operations#set-trustline-flags>`_ for more information.
 
     :param trustor: The account whose trustline this is.
     :param asset: The asset on the trustline.

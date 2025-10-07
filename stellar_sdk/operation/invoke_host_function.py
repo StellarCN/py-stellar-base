@@ -13,7 +13,8 @@ class InvokeHostFunction(Operation):
 
     Threshold: Medium
 
-    See `Interacting with Soroban via Stellar <https://soroban.stellar.org/docs/fundamentals-and-concepts/invoking-contracts-with-transactions>`_.
+    See `Invoke Host Function <https://developers.stellar.org/docs/learn/fundamentals/transactions/list-of-operations#invoke-host-function>`_.
+    See `Interacting with Soroban via Stellar <https://developers.stellar.org/docs/learn/fundamentals/contract-development/contract-interactions/stellar-transaction>`_.
 
     :param host_function: The host function to invoke.
     :param auth: The authorizations required to execute the host function.

@@ -32,7 +32,7 @@ class Transaction:
     on transactions`_.
 
     .. _Stellar's guide on transactions:
-        https://developers.stellar.org/docs/glossary/transactions/
+        https://developers.stellar.org/docs/learn/fundamentals/transactions/operations-and-transactions#transactions
 
     :param source: the source account for the transaction.
     :param sequence: The sequence number for the transaction.
@@ -40,7 +40,7 @@ class Transaction:
           FEE (currently least 100 stroops) multiplied by the number of
           operations in the transaction. See `Stellar's latest documentation
           on fees
-          <https://developers.stellar.org/docs/glossary/fees/#transaction-fee>`__
+          <https://developers.stellar.org/docs/learn/fundamentals/fees-resource-limits-metering>`__
           for more information.
     :param operations: A list of operations objects (typically its
           subclasses as defined in :mod:`stellar_sdk.operation.Operation`.

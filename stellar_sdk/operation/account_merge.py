@@ -16,7 +16,7 @@ class AccountMerge(Operation):
 
     Threshold: High
 
-    See `Account Merge <https://developers.stellar.org/docs/start/list-of-operations/#account-merge>`_ for more information.
+    See `Account Merge <https://developers.stellar.org/docs/learn/fundamentals/transactions/list-of-operations#account-merge>`_ for more information.
 
     :param destination: Destination to merge the source account into.
     :param source: The source account for the operation. Defaults to the transaction's source account.

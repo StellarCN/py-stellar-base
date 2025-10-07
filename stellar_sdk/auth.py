@@ -82,7 +82,7 @@ def authorize_entry(
         raise ValueError("signature doesn't match payload.") from e
 
     # This structure is defined here:
-    # https://soroban.stellar.org/docs/fundamentals-and-concepts/invoking-contracts-with-transactions#stellar-account-signatures
+    # https://developers.stellar.org/docs/learn/fundamentals/contract-development/contract-interactions/stellar-transaction#stellar-account-signatures
     addr_auth.signature = scval.to_vec(
         [
             scval.to_map(

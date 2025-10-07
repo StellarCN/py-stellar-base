@@ -11,7 +11,7 @@ class EffectsCallBuilder(BaseCallBuilder, BaseEffectsCallBuilder):
     """Creates a new :class:`EffectsCallBuilder` pointed to server defined by horizon_url.
     Do not create this object directly, use :func:`stellar_sdk.ServerAsync.effects`.
 
-    See `List All Effects <https://developers.stellar.org/api/resources/effects/list/>`__ for more information.
+    See `List All Effects <https://developers.stellar.org/docs/data/apis/horizon/api-reference/list-all-effects>`__ for more information.
 
     :param horizon_url: Horizon server URL.
     :param client: The client instance used to send request.

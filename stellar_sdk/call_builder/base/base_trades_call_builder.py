@@ -9,7 +9,7 @@ __all__ = ["BaseTradesCallBuilder"]
 class BaseTradesCallBuilder(BaseCallBuilder):
     """Creates a new :class:`TradesCallBuilder` pointed to server defined by horizon_url.
 
-    See `List All Trades <https://developers.stellar.org/api/resources/trades/list/>`__ for more information.
+    See `List All Trades <https://developers.stellar.org/docs/data/apis/horizon/api-reference/get-all-trades>`__ for more information.
 
     :param horizon_url: Horizon server URL.
     """
@@ -21,7 +21,7 @@ class BaseTradesCallBuilder(BaseCallBuilder):
     def for_asset_pair(self, base: Asset, counter: Asset):
         """Filter trades for a specific asset pair (orderbook)
 
-        See `List All Trades <https://developers.stellar.org/api/resources/trades/list/>`__ for more information.
+        See `List All Trades <https://developers.stellar.org/docs/data/apis/horizon/api-reference/get-all-trades>`__ for more information.
 
         :param base: base asset
         :param counter: counter asset
@@ -41,7 +41,7 @@ class BaseTradesCallBuilder(BaseCallBuilder):
     def for_offer(self, offer_id: Union[int, str]):
         """Filter trades for a specific offer
 
-        See `List All Trades <https://developers.stellar.org/api/resources/trades/list/>`__ for more information.
+        See `List All Trades <https://developers.stellar.org/docs/data/apis/horizon/api-reference/get-all-trades>`__ for more information.
 
         :param offer_id: offer id
         :return: current TradesCallBuilder instance
@@ -52,7 +52,7 @@ class BaseTradesCallBuilder(BaseCallBuilder):
     def for_account(self, account_id: str):
         """Filter trades for a specific account
 
-        See `Retrieve an Account's Trades <https://developers.stellar.org/api/resources/accounts/trades/>`__ for more information.
+        See `Retrieve an Account's Trades <https://developers.stellar.org/docs/data/apis/horizon/api-reference/get-trades-by-account-id>`__ for more information.
 
         :param account_id: account id
         :return: current TradesCallBuilder instance
@@ -77,7 +77,7 @@ class BaseTradesCallBuilder(BaseCallBuilder):
     def for_liquidity_pool(self, liquidity_pool_id: str):
         """Filter trades for a specific liquidity pool.
 
-        See `Liquidity Pools - Retrieve related Trades <https://developers.stellar.org/api/resources/liquiditypools/trades/>`__
+        See `Liquidity Pools - Retrieve related Trades <https://developers.stellar.org/docs/data/apis/horizon/api-reference/retrieve-related-trades>`__
 
         :param liquidity_pool_id: The ID of the liquidity pool in hex string.
         :return: current TradesCallBuilder instance

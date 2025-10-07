@@ -6,7 +6,7 @@ __all__ = ["BaseFeeStatsCallBuilder"]
 class BaseFeeStatsCallBuilder(BaseCallBuilder):
     """Creates a new :class:`FeeStatsCallBuilder` pointed to server defined by horizon_url.
 
-    See `Fee Stats <https://developers.stellar.org/api/aggregations/fee-stats/>`__ for more information.
+    See `Fee Stats <https://developers.stellar.org/docs/data/apis/horizon/api-reference/retrieve-fee-stats>`__ for more information.
 
     :param horizon_url: Horizon server URL.
     """

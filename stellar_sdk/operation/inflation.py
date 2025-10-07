@@ -8,7 +8,7 @@ __all__ = ["Inflation"]
 
 
 class Inflation(Operation):
-    """The :class:`Inflation` object, which represents a
+    """The :class:`Inflation` object, which represents an
     Inflation operation on Stellar's network.
 
     This operation runs inflation.

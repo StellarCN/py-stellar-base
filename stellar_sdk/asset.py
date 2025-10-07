@@ -39,7 +39,7 @@ class Asset:
         | :exc:`AssetIssuerInvalidError <stellar_sdk.exceptions.AssetIssuerInvalidError>`: if ``issuer`` is not a valid ed25519 public key.
 
     .. _Stellar's guide on assets:
-        https://developers.stellar.org/docs/glossary/assets/
+        https://developers.stellar.org/docs/learn/fundamentals/stellar-data-structures/assets
     """
 
     def __init__(self, code: str, issuer: Optional[str] = None) -> None:
