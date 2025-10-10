@@ -1,6 +1,7 @@
+from collections.abc import Sequence
 from decimal import Decimal
 from enum import IntEnum
-from typing import ClassVar, Optional, Sequence, Union
+from typing import ClassVar
 
 from .. import xdr as stellar_xdr
 from ..asset import Asset
@@ -63,11 +64,11 @@ class ClaimPredicate:
     def __init__(
         self,
         claim_predicate_type: ClaimPredicateType,
-        and_predicates: Optional[ClaimPredicateGroup],
-        or_predicates: Optional[ClaimPredicateGroup],
-        not_predicate: Optional["ClaimPredicate"],
-        abs_before: Optional[int],
-        rel_before: Optional[int],
+        and_predicates: ClaimPredicateGroup | None,
+        or_predicates: ClaimPredicateGroup | None,
+        not_predicate: "ClaimPredicate | None",
+        abs_before: int | None,
+        rel_before: int | None,
     ) -> None:
         self.claim_predicate_type = claim_predicate_type
         self.and_predicates = and_predicates
@@ -330,7 +331,7 @@ class Claimant:
     """
 
     def __init__(
-        self, destination: str, predicate: Optional[ClaimPredicate] = None
+        self, destination: str, predicate: ClaimPredicate | None = None
     ) -> None:
         self.destination = destination
         if predicate is None:
@@ -400,9 +401,9 @@ class CreateClaimableBalance(Operation):
     def __init__(
         self,
         asset: Asset,
-        amount: Union[str, Decimal],
+        amount: str | Decimal,
         claimants: Sequence[Claimant],
-        source: Optional[Union[MuxedAccount, str]] = None,
+        source: MuxedAccount | str | None = None,
     ) -> None:
         super().__init__(source)
         self.asset: Asset = asset

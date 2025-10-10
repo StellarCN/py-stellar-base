@@ -1,5 +1,3 @@
-from typing import Union
-
 from ...call_builder.base.base_call_builder import BaseCallBuilder
 
 __all__ = ["BaseLedgersCallBuilder"]
@@ -17,7 +15,7 @@ class BaseLedgersCallBuilder(BaseCallBuilder):
         super().__init__(horizon_url)
         self.endpoint: str = "ledgers"
 
-    def ledger(self, sequence: Union[int, str]):
+    def ledger(self, sequence: int | str):
         """Provides information on a single ledger.
 
         See `Retrieve a Ledger <https://developers.stellar.org/docs/data/apis/horizon/api-reference/retrieve-a-ledger>`__ for more information.

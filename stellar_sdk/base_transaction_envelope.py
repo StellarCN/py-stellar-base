@@ -1,5 +1,6 @@
 from abc import abstractmethod
-from typing import Generic, List, Optional, Sequence, TypeVar, Union
+from collections.abc import Sequence
+from typing import Generic, TypeVar
 
 from . import xdr as stellar_xdr
 from .decorated_signature import DecoratedSignature
@@ -15,10 +16,10 @@ class BaseTransactionEnvelope(Generic[T]):
     def __init__(
         self,
         network_passphrase: str,
-        signatures: Optional[Sequence[DecoratedSignature]] = None,
+        signatures: Sequence[DecoratedSignature] | None = None,
     ) -> None:
         self.network_passphrase: str = network_passphrase
-        self.signatures: List[DecoratedSignature] = (
+        self.signatures: list[DecoratedSignature] = (
             list(signatures) if signatures else []
         )
         self._network_id: bytes = Network(network_passphrase).network_id()
@@ -42,7 +43,7 @@ class BaseTransactionEnvelope(Generic[T]):
         """
         return self.hash().hex()
 
-    def sign(self, signer: Union[Keypair, str]) -> None:
+    def sign(self, signer: Keypair | str) -> None:
         """Sign this transaction envelope with a given keypair.
 
         Note that the signature must not already be in this instance's list of
@@ -78,7 +79,7 @@ class BaseTransactionEnvelope(Generic[T]):
         """
         raise NotImplementedError("The method has not been implemented.")
 
-    def sign_hashx(self, preimage: Union[bytes, str]) -> None:
+    def sign_hashx(self, preimage: bytes | str) -> None:
         """Sign this transaction envelope with a Hash(x) signature.
 
         See Stellar's documentation on `Multi-Sig

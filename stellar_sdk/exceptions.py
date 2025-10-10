@@ -1,5 +1,4 @@
 from json import JSONDecodeError
-from typing import Optional
 
 from .client.response import Response
 
@@ -102,11 +101,11 @@ class BaseHorizonError(BaseRequestError):
             message = response.json()
         except JSONDecodeError:
             pass  # pragma: no cover
-        self.type: Optional[str] = message.get("type")
-        self.title: Optional[str] = message.get("title")
-        self.detail: Optional[str] = message.get("detail")
-        self.extras: Optional[dict] = message.get("extras")
-        self.result_xdr: Optional[str] = message.get("extras", {}).get("result_xdr")
+        self.type: str | None = message.get("type")
+        self.title: str | None = message.get("title")
+        self.detail: str | None = message.get("detail")
+        self.extras: dict | None = message.get("extras")
+        self.result_xdr: str | None = message.get("extras", {}).get("result_xdr")
 
     def __repr__(self):
         return self.message
@@ -170,9 +169,7 @@ class FeatureNotEnabledError(SdkError):
 class SorobanRpcErrorResponse(BaseRequestError):
     """The exception is thrown when the RPC server returns an error response."""
 
-    def __init__(
-        self, code: int, message: Optional[str], data: Optional[str] = None
-    ) -> None:
+    def __init__(self, code: int, message: str | None, data: str | None = None) -> None:
         super().__init__(message)
         self.code = code
         self.data = data

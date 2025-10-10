@@ -1,4 +1,5 @@
-from typing import Any, AsyncGenerator, Dict
+from collections.abc import AsyncGenerator
+from typing import Any
 
 from ...asset import Asset
 from ...call_builder.base import BaseOrderbookCallBuilder
@@ -33,7 +34,7 @@ class OrderbookCallBuilder(BaseCallBuilder, BaseOrderbookCallBuilder):
 
     def stream(
         self,
-    ) -> AsyncGenerator[Dict[str, Any], None]:
+    ) -> AsyncGenerator[dict[str, Any], None]:
         """Creates an EventSource that listens for events from the `Orderbook` endpoint.
 
         See `Streaming <https://developers.stellar.org/docs/data/apis/horizon/api-reference/structure/streaming>`__ for more information.

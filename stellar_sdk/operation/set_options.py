@@ -1,6 +1,6 @@
 import warnings
 from enum import IntFlag
-from typing import ClassVar, Optional, Union
+from typing import ClassVar
 
 from .. import xdr as stellar_xdr
 from ..keypair import Keypair
@@ -84,16 +84,16 @@ class SetOptions(Operation):
 
     def __init__(
         self,
-        inflation_dest: Optional[str] = None,
-        clear_flags: Optional[Union[int, AuthorizationFlag]] = None,
-        set_flags: Optional[Union[int, AuthorizationFlag]] = None,
-        master_weight: Optional[int] = None,
-        low_threshold: Optional[int] = None,
-        med_threshold: Optional[int] = None,
-        high_threshold: Optional[int] = None,
-        signer: Optional[Signer] = None,
-        home_domain: Optional[str] = None,
-        source: Optional[Union[MuxedAccount, str]] = None,
+        inflation_dest: str | None = None,
+        clear_flags: int | AuthorizationFlag | None = None,
+        set_flags: int | AuthorizationFlag | None = None,
+        master_weight: int | None = None,
+        low_threshold: int | None = None,
+        med_threshold: int | None = None,
+        high_threshold: int | None = None,
+        signer: Signer | None = None,
+        home_domain: str | None = None,
+        source: MuxedAccount | str | None = None,
     ) -> None:
         super().__init__(source)
         if set_flags is not None and not isinstance(set_flags, AuthorizationFlag):
@@ -111,14 +111,14 @@ class SetOptions(Operation):
             clear_flags = AuthorizationFlag(clear_flags)
 
         self.inflation_dest = inflation_dest
-        self.clear_flags: Optional[AuthorizationFlag] = clear_flags
-        self.set_flags: Optional[AuthorizationFlag] = set_flags
-        self.master_weight: Optional[int] = master_weight
-        self.low_threshold: Optional[int] = low_threshold
-        self.med_threshold: Optional[int] = med_threshold
-        self.high_threshold: Optional[int] = high_threshold
-        self.home_domain: Optional[str] = home_domain
-        self.signer: Optional[Signer] = signer
+        self.clear_flags: AuthorizationFlag | None = clear_flags
+        self.set_flags: AuthorizationFlag | None = set_flags
+        self.master_weight: int | None = master_weight
+        self.low_threshold: int | None = low_threshold
+        self.med_threshold: int | None = med_threshold
+        self.high_threshold: int | None = high_threshold
+        self.home_domain: str | None = home_domain
+        self.signer: Signer | None = signer
         if self.inflation_dest is not None:
             raise_if_not_valid_ed25519_public_key(self.inflation_dest, "inflation_dest")
 

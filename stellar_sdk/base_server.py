@@ -1,5 +1,6 @@
+from collections.abc import Coroutine, Generator
 from decimal import Decimal
-from typing import Any, Coroutine, Dict, Generator, List, Optional, Tuple, Union
+from typing import Any
 
 from .account import Account
 from .asset import Asset
@@ -45,11 +46,9 @@ __all__ = ["BaseServer"]
 class BaseServer:
     def submit_transaction(
         self,
-        transaction_envelope: Union[
-            TransactionEnvelope, FeeBumpTransactionEnvelope, str
-        ],
+        transaction_envelope: TransactionEnvelope | FeeBumpTransactionEnvelope | str,
         skip_memo_required_check: bool = False,
-    ) -> Union[Dict[str, Any], Coroutine[Any, Any, Dict[str, Any]]]:
+    ) -> dict[str, Any] | Coroutine[Any, Any, dict[str, Any]]:
         """Submits a transaction to the network.
 
         :param transaction_envelope: :class:`stellar_sdk.transaction_envelope.TransactionEnvelope` object
@@ -68,10 +67,8 @@ class BaseServer:
 
     def _get_xdr_and_transaction_from_transaction_envelope(
         self,
-        transaction_envelope: Union[
-            TransactionEnvelope, FeeBumpTransactionEnvelope, str
-        ],
-    ) -> Tuple[str, Union[Transaction, FeeBumpTransaction]]:
+        transaction_envelope: TransactionEnvelope | FeeBumpTransactionEnvelope | str,
+    ) -> tuple[str, Transaction | FeeBumpTransaction]:
         if isinstance(transaction_envelope, BaseTransactionEnvelope):
             xdr = transaction_envelope.to_xdr()
             tx = transaction_envelope.transaction
@@ -170,9 +167,9 @@ class BaseServer:
 
     def strict_receive_paths(
         self,
-        source: Union[str, List[Asset]],
+        source: str | list[Asset],
         destination_asset: Asset,
-        destination_amount: Union[str, Decimal],
+        destination_amount: str | Decimal,
     ) -> BaseStrictReceivePathsCallBuilder:
         """
         :param source: The sender's account ID or a list of Assets. Any returned path must use a source that the sender can hold.
@@ -186,8 +183,8 @@ class BaseServer:
     def strict_send_paths(
         self,
         source_asset: Asset,
-        source_amount: Union[str, Decimal],
-        destination: Union[str, List[Asset]],
+        source_amount: str | Decimal,
+        destination: str | list[Asset],
     ) -> BaseStrictSendPathsCallBuilder:
         """
         :param source_asset: The asset to be sent.
@@ -210,9 +207,9 @@ class BaseServer:
         base: Asset,
         counter: Asset,
         resolution: int,
-        start_time: Optional[int] = None,
-        end_time: Optional[int] = None,
-        offset: Optional[int] = None,
+        start_time: int | None = None,
+        end_time: int | None = None,
+        offset: int | None = None,
     ) -> BaseTradeAggregationsCallBuilder:
         """
         :param base: base asset
@@ -245,8 +242,8 @@ class BaseServer:
         raise NotImplementedError
 
     def load_account(
-        self, account_id: Union[MuxedAccount, Keypair, str]
-    ) -> Union[Account, Coroutine[Any, Any, Account]]:
+        self, account_id: MuxedAccount | Keypair | str
+    ) -> Account | Coroutine[Any, Any, Account]:
         """Fetches an account's most current base state (like sequence) in the ledger and then creates
         and returns an :class:`stellar_sdk.account.Account` object.
 
@@ -279,7 +276,7 @@ class BaseServer:
 
     def _get_check_memo_required_destinations(
         self, transaction: Transaction
-    ) -> Generator[Tuple[int, str], Any, Any]:
+    ) -> Generator[tuple[int, str], Any, Any]:
         destinations = set()
         for index, operation in enumerate(transaction.operations):
             if isinstance(
@@ -299,7 +296,7 @@ class BaseServer:
             destinations.add(destination)
             yield index, destination
 
-    def fetch_base_fee(self) -> Union[int, Coroutine[Any, Any, int]]:
+    def fetch_base_fee(self) -> int | Coroutine[Any, Any, int]:
         """Fetch the base fee. Since this hits the server, if the server call fails,
         you might get an error. You should be prepared to use a default value if that happens.
 
@@ -325,7 +322,7 @@ class BaseServer:
             )
         return base_fee
 
-    def close(self) -> Union[None, Coroutine[Any, Any, None]]:
+    def close(self) -> None | Coroutine[Any, Any, None]:
         """Close underlying connector.
 
         Release all acquired resources.

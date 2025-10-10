@@ -1,5 +1,3 @@
-from typing import Union
-
 from . import xdr as stellar_xdr
 from .keypair import Keypair
 from .muxed_account import MuxedAccount
@@ -23,7 +21,7 @@ class FeeBumpTransaction:
 
     def __init__(
         self,
-        fee_source: Union[MuxedAccount, Keypair, str],
+        fee_source: MuxedAccount | Keypair | str,
         fee: int,
         inner_transaction_envelope: TransactionEnvelope,
     ) -> None:

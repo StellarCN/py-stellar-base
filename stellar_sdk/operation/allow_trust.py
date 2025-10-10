@@ -1,6 +1,6 @@
 import warnings
 from enum import IntFlag
-from typing import ClassVar, Optional, Union
+from typing import ClassVar
 
 from .. import xdr as stellar_xdr
 from ..asset import Asset
@@ -61,8 +61,8 @@ class AllowTrust(Operation):
         self,
         trustor: str,
         asset_code: str,
-        authorize: Union[TrustLineEntryFlag, bool],
-        source: Optional[Union[MuxedAccount, str]] = None,
+        authorize: TrustLineEntryFlag | bool,
+        source: MuxedAccount | str | None = None,
     ) -> None:
         # We keep this class to ensure that the SDK can correctly parse historical transactions.
         warnings.warn(

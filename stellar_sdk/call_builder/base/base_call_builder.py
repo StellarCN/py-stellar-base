@@ -1,13 +1,5 @@
-from typing import (
-    Any,
-    AsyncGenerator,
-    Coroutine,
-    Dict,
-    Generator,
-    Mapping,
-    Optional,
-    Union,
-)
+from collections.abc import AsyncGenerator, Coroutine, Generator, Mapping
+from typing import Any
 
 __all__ = ["BaseCallBuilder"]
 
@@ -20,12 +12,12 @@ class BaseCallBuilder:
 
     def __init__(self, horizon_url: str) -> None:
         self.horizon_url: str = horizon_url
-        self.params: Dict[str, str] = {}
+        self.params: dict[str, str] = {}
         self.endpoint: str = ""
-        self.prev_href: Optional[str] = None
-        self.next_href: Optional[str] = None
+        self.prev_href: str | None = None
+        self.next_href: str | None = None
 
-    def call(self) -> Union[Dict[str, Any], Coroutine[Any, Any, Dict[str, Any]]]:
+    def call(self) -> dict[str, Any] | Coroutine[Any, Any, dict[str, Any]]:
         """Triggers a HTTP request using this builder's current configuration.
 
         :return: If it is called synchronous, the response will be returned. If
@@ -44,9 +36,7 @@ class BaseCallBuilder:
 
     def stream(
         self,
-    ) -> Union[
-        AsyncGenerator[Dict[str, Any], None], Generator[Dict[str, Any], None, None]
-    ]:
+    ) -> AsyncGenerator[dict[str, Any], None] | Generator[dict[str, Any], None, None]:
         """Creates an EventSource that listens for incoming messages from the server.
 
         See `Horizon Response Format <https://developers.stellar.org/docs/data/apis/horizon/api-reference/structure/response-format>`__
@@ -66,7 +56,7 @@ class BaseCallBuilder:
     def prev(self):
         raise NotImplementedError
 
-    def cursor(self, cursor: Union[int, str]):
+    def cursor(self, cursor: int | str):
         """Sets ``cursor`` parameter for the current call. Returns the CallBuilder object on which this method has been called.
 
         See `Pagination <https://developers.stellar.org/docs/data/apis/horizon/api-reference/structure/pagination>`__
@@ -100,7 +90,7 @@ class BaseCallBuilder:
         self._add_query_param("order", order)
         return self
 
-    def _add_query_param(self, key: str, value: Union[str, float, int, bool, None]):
+    def _add_query_param(self, key: str, value: str | float | int | bool | None):
         if value is None:
             pass  # pragma: no cover
         elif value is True:
@@ -122,7 +112,7 @@ class BaseCallBuilder:
             self.next_href = next_page.get("href")
 
     def _add_query_params(
-        self, params: Mapping[str, Union[str, float, int, bool, None]]
+        self, params: Mapping[str, str | float | int | bool | None]
     ) -> None:
         for k, v in params.items():
             self._add_query_param(k, v)

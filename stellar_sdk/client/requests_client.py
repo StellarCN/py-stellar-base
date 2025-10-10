@@ -1,7 +1,8 @@
 import json
 import logging
 import time
-from typing import Any, Dict, Generator, Optional
+from collections.abc import Generator
+from typing import Any
 
 import requests
 from requests import RequestException, Session
@@ -50,9 +51,9 @@ class RequestsClient(BaseSyncClient):
         request_timeout: int = defines.DEFAULT_GET_TIMEOUT_SECONDS,
         post_timeout: float = defines.DEFAULT_POST_TIMEOUT_SECONDS,
         backoff_factor: float = DEFAULT_BACKOFF_FACTOR,
-        session: Optional[Session] = None,
-        stream_session: Optional[Session] = None,
-        custom_headers: Optional[Dict[str, str]] = None,
+        session: Session | None = None,
+        stream_session: Session | None = None,
+        custom_headers: dict[str, str] | None = None,
     ):
         self.pool_size: int = pool_size
         self.num_retries: int = num_retries
@@ -96,9 +97,9 @@ class RequestsClient(BaseSyncClient):
             session.mount("http://", adapter)
             session.mount("https://", adapter)
         self._session: Session = session
-        self._stream_session: Optional[Session] = stream_session
+        self._stream_session: Session | None = stream_session
 
-    def get(self, url: str, params: Optional[Dict[str, str]] = None) -> Response:
+    def get(self, url: str, params: dict[str, str] | None = None) -> Response:
         """Perform HTTP GET request.
 
         :param url: the request url
@@ -120,8 +121,8 @@ class RequestsClient(BaseSyncClient):
     def post(
         self,
         url: str,
-        data: Optional[Dict[str, str]] = None,
-        json_data: Optional[Dict[str, Any]] = None,
+        data: dict[str, str] | None = None,
+        json_data: dict[str, Any] | None = None,
     ) -> Response:
         """Perform HTTP POST request.
 
@@ -145,8 +146,8 @@ class RequestsClient(BaseSyncClient):
         )
 
     def stream(
-        self, url: str, params: Optional[Dict[str, str]] = None
-    ) -> Generator[Dict[str, Any], None, None]:
+        self, url: str, params: dict[str, str] | None = None
+    ) -> Generator[dict[str, Any], None, None]:
         """Creates an EventSource that listens for incoming messages from the server.
 
         See `Horizon Response Format <https://developers.stellar.org/docs/data/apis/horizon/api-reference/structure/response-format>`__

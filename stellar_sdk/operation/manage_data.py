@@ -1,4 +1,4 @@
-from typing import ClassVar, Optional, Union
+from typing import ClassVar
 
 from .. import xdr as stellar_xdr
 from ..muxed_account import MuxedAccount
@@ -39,14 +39,14 @@ class ManageData(Operation):
     def __init__(
         self,
         data_name: str,
-        data_value: Union[str, bytes, None],
-        source: Optional[Union[MuxedAccount, str]] = None,
+        data_value: str | bytes | None,
+        source: MuxedAccount | str | None = None,
     ) -> None:
         super().__init__(source)
         self.data_name: str = data_name
         if isinstance(data_value, str):
             data_value = data_value.encode()
-        self.data_value: Optional[bytes] = data_value
+        self.data_value: bytes | None = data_value
 
         valid_data_name_len = len(self.data_name) <= 64
         valid_data_val_len = self.data_value is None or len(self.data_value) <= 64

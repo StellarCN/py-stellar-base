@@ -1,5 +1,3 @@
-from typing import Union
-
 from . import xdr as stellar_xdr
 from .signer_key import SignerKey
 
@@ -9,7 +7,7 @@ __all__ = ["Signer"]
 class Signer:
     """The :class:`Signer` object, which represents an account signer on Stellar's network.
 
-    An example:
+    An example::
 
         from stellar_sdk import Signer
 
@@ -28,7 +26,7 @@ class Signer:
         self.weight: int = weight
 
     @classmethod
-    def ed25519_public_key(cls, account_id: Union[str, bytes], weight: int) -> "Signer":
+    def ed25519_public_key(cls, account_id: str | bytes, weight: int) -> "Signer":
         """Create ED25519 PUBLIC KEY Signer from account id.
 
         :param account_id: account id (ex. ``"GDNA2V62PVEFBZ74CDJKTUHLY4Y7PL5UAV2MAM4VWF6USFE3SH2354AD"``)
@@ -42,7 +40,7 @@ class Signer:
         return cls(signer_key, weight)
 
     @classmethod
-    def pre_auth_tx(cls, pre_auth_tx_hash: Union[str, bytes], weight: int) -> "Signer":
+    def pre_auth_tx(cls, pre_auth_tx_hash: str | bytes, weight: int) -> "Signer":
         """Create Pre AUTH TX Signer from the sha256 hash of a transaction,
         click `here <https://developers.stellar.org/docs/learn/fundamentals/transactions/signatures-multisig#pre-authorized-transaction>`__ for more information.
 
@@ -55,7 +53,7 @@ class Signer:
         return cls(signer_key, weight)
 
     @classmethod
-    def sha256_hash(cls, sha256_hash: Union[str, bytes], weight: int) -> "Signer":
+    def sha256_hash(cls, sha256_hash: str | bytes, weight: int) -> "Signer":
         """Create SHA256 HASH Signer from a sha256 hash of a preimage,
         click `here <https://developers.stellar.org/docs/learn/fundamentals/transactions/signatures-multisig#hashx>`__ for more information.
 

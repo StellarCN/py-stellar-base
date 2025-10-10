@@ -1,5 +1,5 @@
 import os
-from typing import Iterable, List, Optional, Union
+from collections.abc import Iterable
 
 import nacl.signing as ed25519
 from nacl.exceptions import BadSignatureError as NaclBadSignatureError
@@ -37,10 +37,10 @@ class Keypair:
     def __init__(
         self,
         verify_key: ed25519.VerifyKey,
-        signing_key: Optional[ed25519.SigningKey] = None,
+        signing_key: ed25519.SigningKey | None = None,
     ) -> None:
         self.verify_key: ed25519.VerifyKey = verify_key
-        self.signing_key: Optional[ed25519.SigningKey] = signing_key
+        self.signing_key: ed25519.SigningKey | None = signing_key
 
     @classmethod
     def random(cls) -> "Keypair":
@@ -217,7 +217,7 @@ class Keypair:
 
     @staticmethod
     def generate_mnemonic_phrase(
-        language: Union[Language, str] = Language.ENGLISH, strength: int = 128
+        language: Language | str = Language.ENGLISH, strength: int = 128
     ) -> str:
         """Generate a mnemonic phrase.
 
@@ -233,7 +233,7 @@ class Keypair:
     def from_mnemonic_phrase(
         cls,
         mnemonic_phrase: str,
-        language: Union[Language, str] = Language.ENGLISH,
+        language: Language | str = Language.ENGLISH,
         passphrase: str = "",
         index: int = 0,
     ) -> "Keypair":
@@ -266,7 +266,7 @@ class Keypair:
         member_count: int,
         passphrase: str = "",
         strength: int = 256,
-    ) -> List[str]:
+    ) -> list[str]:
         """Generate mnemonic phrases using Shamir secret sharing method.
 
         A randomly generated secret key is generated and split into `member_count`
@@ -372,7 +372,7 @@ class Keypair:
         return DecoratedSignature(hint, signature)
 
     @staticmethod
-    def _calculate_message_hash(message: Union[str, bytes]) -> bytes:
+    def _calculate_message_hash(message: str | bytes) -> bytes:
         """Calculate the hash of a message according to `SEP-53 <https://github.com/stellar/stellar-protocol/blob/master/ecosystem/sep-0053.md>`__.
 
         :param message: The message to hash, as a string or bytes.
@@ -384,7 +384,7 @@ class Keypair:
         signed_message_base = message_prefix + message
         return sha256(signed_message_base)
 
-    def sign_message(self, message: Union[str, bytes]) -> bytes:
+    def sign_message(self, message: str | bytes) -> bytes:
         """Sign a message according to `SEP-53 <https://github.com/stellar/stellar-protocol/blob/master/ecosystem/sep-0053.md>`__.
 
         :param message: The message to sign, as a string or bytes.
@@ -393,7 +393,7 @@ class Keypair:
         message_hash = self._calculate_message_hash(message)
         return self.sign(message_hash)
 
-    def verify_message(self, message: Union[str, bytes], signature: bytes) -> None:
+    def verify_message(self, message: str | bytes, signature: bytes) -> None:
         """Verify a `SEP-53 <https://github.com/stellar/stellar-protocol/blob/master/ecosystem/sep-0053.md>`__ signed message.
 
         :param message: The original message, as a string or bytes.

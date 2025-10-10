@@ -3,11 +3,15 @@ from __future__ import annotations
 import copy
 import dataclasses
 import uuid
+from enum import Enum
 from typing import TYPE_CHECKING
 
 from . import xdr as stellar_xdr
 from .operation import InvokeHostFunction
 from .soroban_rpc import *
+
+if TYPE_CHECKING:
+    from .transaction_envelope import TransactionEnvelope
 
 if TYPE_CHECKING:
     from .transaction_envelope import TransactionEnvelope

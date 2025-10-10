@@ -1,5 +1,3 @@
-from typing import Union
-
 from ...asset import Asset
 from ...call_builder.base.base_call_builder import BaseCallBuilder
 
@@ -38,7 +36,7 @@ class BaseTradesCallBuilder(BaseCallBuilder):
         self._add_query_params(params)
         return self
 
-    def for_offer(self, offer_id: Union[int, str]):
+    def for_offer(self, offer_id: int | str):
         """Filter trades for a specific offer
 
         See `List All Trades <https://developers.stellar.org/docs/data/apis/horizon/api-reference/get-all-trades>`__ for more information.

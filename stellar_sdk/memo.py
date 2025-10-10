@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import abc
-from typing import Union
 
 from . import xdr as stellar_xdr
 from .exceptions import MemoInvalidException
@@ -100,7 +99,7 @@ class TextMemo(Memo):
         if ``text`` is not a valid text memo.
     """
 
-    def __init__(self, text: Union[str, bytes]) -> None:
+    def __init__(self, text: str | bytes) -> None:
         self.memo_text = (
             bytes(text, encoding="utf-8") if isinstance(text, str) else text
         )
@@ -183,7 +182,7 @@ class HashMemo(Memo):
         if ``memo_hash`` is not a valid hash memo.
     """
 
-    def __init__(self, memo_hash: Union[bytes, str]) -> None:
+    def __init__(self, memo_hash: bytes | str) -> None:
         memo_hash = hex_to_bytes(memo_hash)
         length = len(memo_hash)
         if length != 32:
@@ -230,7 +229,7 @@ class ReturnHashMemo(Memo):
         if ``memo_return`` is not a valid return hash memo.
     """
 
-    def __init__(self, memo_return: Union[bytes, str]) -> None:
+    def __init__(self, memo_return: bytes | str) -> None:
         memo_return = hex_to_bytes(memo_return)
         length = len(memo_return)
         if length != 32:

@@ -1,4 +1,4 @@
-from typing import List, Optional, Sequence, Union
+from collections.abc import Sequence
 
 from . import xdr as stellar_xdr
 from .keypair import Keypair
@@ -57,13 +57,13 @@ class Transaction:
 
     def __init__(
         self,
-        source: Union[MuxedAccount, Keypair, str],
+        source: MuxedAccount | Keypair | str,
         sequence: int,
         fee: int,
         operations: Sequence[Operation],
-        memo: Optional[Memo] = None,
-        preconditions: Optional[Preconditions] = None,
-        soroban_data: Optional[stellar_xdr.SorobanTransactionData] = None,
+        memo: Memo | None = None,
+        preconditions: Preconditions | None = None,
+        soroban_data: stellar_xdr.SorobanTransactionData | None = None,
         v1: bool = True,
     ) -> None:
         # if not operations:
@@ -83,11 +83,11 @@ class Transaction:
 
         self.source: MuxedAccount = source
         self.sequence: int = sequence
-        self.operations: List[Operation] = list(operations) if operations else []
+        self.operations: list[Operation] = list(operations) if operations else []
         self.memo: Memo = memo
         self.fee: int = fee
-        self.preconditions: Optional[Preconditions] = preconditions
-        self.soroban_data: Optional[stellar_xdr.SorobanTransactionData] = (
+        self.preconditions: Preconditions | None = preconditions
+        self.soroban_data: stellar_xdr.SorobanTransactionData | None = (
             SorobanDataBuilder.from_xdr(soroban_data).build() if soroban_data else None
         )
         self.v1: bool = v1
@@ -129,7 +129,7 @@ class Transaction:
 
     def to_xdr_object(
         self,
-    ) -> Union[stellar_xdr.Transaction, stellar_xdr.TransactionV0]:
+    ) -> stellar_xdr.Transaction | stellar_xdr.TransactionV0:
         """Get an XDR object representation of this :class:`Transaction`.
 
         :return: XDR Transaction object
@@ -186,7 +186,7 @@ class Transaction:
     @classmethod
     def from_xdr_object(
         cls,
-        xdr_object: Union[stellar_xdr.Transaction, stellar_xdr.TransactionV0],
+        xdr_object: stellar_xdr.Transaction | stellar_xdr.TransactionV0,
         v1: bool = True,
     ) -> "Transaction":
         """Create a new :class:`Transaction` from an XDR object.

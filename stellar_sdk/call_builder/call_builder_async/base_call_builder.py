@@ -1,4 +1,5 @@
-from typing import Any, AsyncGenerator, Dict, Optional
+from collections.abc import AsyncGenerator
+from typing import Any
 
 from ...call_builder.base.base_call_builder import BaseCallBuilder as _BaseCallBuilder
 from ...client.base_async_client import BaseAsyncClient
@@ -22,7 +23,7 @@ class BaseCallBuilder(_BaseCallBuilder):
         super().__init__(**kwargs)
         self.client: BaseAsyncClient = client
 
-    async def call(self) -> Dict[str, Any]:
+    async def call(self) -> dict[str, Any]:
         """Triggers a HTTP request using this builder's current configuration.
 
         :return: If it is called synchronous, the response will be returned. If
@@ -40,7 +41,7 @@ class BaseCallBuilder(_BaseCallBuilder):
         url = urljoin_with_query(self.horizon_url, self.endpoint)
         return await self._call(url, self.params)
 
-    async def _call(self, url: str, params: Optional[dict] = None) -> Dict[str, Any]:
+    async def _call(self, url: str, params: dict | None = None) -> dict[str, Any]:
         raw_resp = await self.client.get(url, params)
         assert isinstance(raw_resp, Response)
         raise_request_exception(raw_resp)
@@ -50,7 +51,7 @@ class BaseCallBuilder(_BaseCallBuilder):
 
     async def _stream(
         self,
-    ) -> AsyncGenerator[Dict[str, Any], None]:
+    ) -> AsyncGenerator[dict[str, Any], None]:
         """Creates an EventSource that listens for incoming messages from the server.
 
         See `Horizon Response Format <https://developers.stellar.org/docs/data/apis/horizon/api-reference/structure/response-format>`__
@@ -62,18 +63,18 @@ class BaseCallBuilder(_BaseCallBuilder):
         :raise: :exc:`StreamClientError <stellar_sdk.exceptions.StreamClientError>` - Failed to fetch stream resource.
         """
         url = urljoin_with_query(self.horizon_url, self.endpoint)
-        stream: AsyncGenerator[Dict[str, Any], None] = self.client.stream(
+        stream: AsyncGenerator[dict[str, Any], None] = self.client.stream(
             url, self.params
         )
         while True:
             yield await stream.__anext__()
 
-    async def next(self) -> Dict[str, Any]:
+    async def next(self) -> dict[str, Any]:
         if self.next_href is None:
             raise NotPageableError("The next page does not exist.")
         return await self._call(self.next_href, None)
 
-    async def prev(self) -> Dict[str, Any]:
+    async def prev(self) -> dict[str, Any]:
         if self.prev_href is None:
             raise NotPageableError("The prev page does not exist.")
         return await self._call(self.prev_href, None)

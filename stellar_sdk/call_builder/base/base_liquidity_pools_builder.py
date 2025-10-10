@@ -1,4 +1,4 @@
-from typing import Sequence
+from collections.abc import Sequence
 
 from ...asset import Asset
 from ...call_builder.base.base_call_builder import BaseCallBuilder

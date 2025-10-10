@@ -1,6 +1,6 @@
 import copy
 import random
-from typing import Callable, Optional, Tuple, Union
+from typing import Callable
 
 from . import scval
 from . import xdr as stellar_xdr
@@ -14,8 +14,8 @@ __all__ = ["authorize_entry", "authorize_invocation"]
 
 
 def authorize_entry(
-    entry: Union[stellar_xdr.SorobanAuthorizationEntry, str],
-    signer: Union[Keypair, Callable[[stellar_xdr.HashIDPreimage], Tuple[str, bytes]]],
+    entry: stellar_xdr.SorobanAuthorizationEntry | str,
+    signer: Keypair | Callable[[stellar_xdr.HashIDPreimage], tuple[str, bytes]],
     valid_until_ledger_sequence: int,
     network_passphrase: str,
 ) -> stellar_xdr.SorobanAuthorizationEntry:
@@ -97,8 +97,8 @@ def authorize_entry(
 
 
 def authorize_invocation(
-    signer: Union[Keypair, Callable[[stellar_xdr.HashIDPreimage], Tuple[str, bytes]]],
-    public_key: Optional[str],
+    signer: Keypair | Callable[[stellar_xdr.HashIDPreimage], tuple[str, bytes]],
+    public_key: str | None,
     valid_until_ledger_sequence: int,
     invocation: stellar_xdr.SorobanAuthorizedInvocation,
     network_passphrase: str,
