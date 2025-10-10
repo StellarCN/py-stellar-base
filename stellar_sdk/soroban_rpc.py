@@ -309,10 +309,6 @@ class GetTransactionRequest(BaseModel):
 
 
 class Events(BaseModel):
-    # base64-encoded list of `xdr.DiagnosticEvent`s
-    diagnostic_events_xdr: Optional[List[str]] = Field(
-        alias="diagnosticEventsXdr", default=None
-    )
     # base64-encoded list of `xdr.TransactionEvent`s
     transaction_events_xdr: Optional[List[str]] = Field(
         alias="transactionEventsXdr", default=None
@@ -347,6 +343,10 @@ class GetTransactionResponse(BaseModel):
     result_meta_xdr: Optional[str] = Field(
         alias="resultMetaXdr", default=None
     )  # stellar_sdk.xdr.TransactionMeta
+    diagnostic_events_xdr: Optional[List[str]] = Field(
+        alias="diagnosticEventsXdr",
+        default=None,
+    )  # stellar_sdk.xdr.DiagnosticEvent
     events: Optional[Events] = None
     ledger: Optional[int] = Field(alias="ledger", default=None)
     create_at: Optional[int] = Field(alias="createdAt", default=None)
@@ -382,7 +382,7 @@ class SendTransactionResponse(BaseModel):
     error_result_xdr: Optional[str] = Field(alias="errorResultXdr", default=None)
     diagnostic_events_xdr: Optional[List[str]] = Field(
         alias="diagnosticEventsXdr", default=None
-    )
+    )  # stellar_sdk.xdr.DiagnosticEvent
     status: SendTransactionStatus = Field(alias="status")
     hash: str = Field(alias="hash")
     latest_ledger: int = Field(alias="latestLedger")
@@ -456,9 +456,7 @@ class Transaction(BaseModel):
     diagnostic_events_xdr: Optional[List[str]] = Field(
         alias="diagnosticEventsXdr",
         default=None,
-        deprecated=True,
-        description="This field is deprecated and will be removed in the future. Use `events.diagnostic_events_xdr` instead.",
-    )
+    )  # stellar_sdk.xdr.DiagnosticEvent
     events: Optional[Events] = None
 
 
