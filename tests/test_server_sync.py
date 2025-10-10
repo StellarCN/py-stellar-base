@@ -149,19 +149,27 @@ class TestServerSync:
 
     def test_submit_transaction_with_xdr(self):
         # TODO: mock test
-        xdr = "AAAAAgAAAACpYAfsZFw9X5E2fHFl+xYB3D9dxwhtVPZ6c8QW/7KNxAAAAGQDBJRXAAYt2AAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAwAAAAAAAAABVVNEQwAAAAA7mRE4Dv6Yi6CokA6xz+RPNm99vpRr7QdyQPf2JN8VxQAAAAAATEShAA9I5QCYloAAAAAAX5K4WgAAAAAAAAAB/7KNxAAAAEChPdaEabaexQ6vjiJxI0ECXuK97fidU4a8l0/iK6ORCAQ+NGeBAIfaLAZiyww+I/nWEqrihn8zdN+wNdUUoDgF"
         horizon_url = "https://horizon.stellar.org"
         client = RequestsClient()
         with Server(horizon_url, client) as server:
+            xdr = (
+                server.transactions()
+                .limit(1)
+                .call()["_embedded"]["records"][0]["envelope_xdr"]
+            )
             resp = server.submit_transaction(xdr, True)
             assert resp["envelope_xdr"] == xdr
 
     def test_submit_transaction_with_te(self):
-        xdr = "AAAAAgAAAACpYAfsZFw9X5E2fHFl+xYB3D9dxwhtVPZ6c8QW/7KNxAAAAGQDBJRXAAYt2AAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAwAAAAAAAAABVVNEQwAAAAA7mRE4Dv6Yi6CokA6xz+RPNm99vpRr7QdyQPf2JN8VxQAAAAAATEShAA9I5QCYloAAAAAAX5K4WgAAAAAAAAAB/7KNxAAAAEChPdaEabaexQ6vjiJxI0ECXuK97fidU4a8l0/iK6ORCAQ+NGeBAIfaLAZiyww+I/nWEqrihn8zdN+wNdUUoDgF"
-        te = TransactionEnvelope.from_xdr(xdr, Network.PUBLIC_NETWORK_PASSPHRASE)
         horizon_url = "https://horizon.stellar.org"
         client = RequestsClient()
         with Server(horizon_url, client) as server:
+            xdr = (
+                server.transactions()
+                .limit(1)
+                .call()["_embedded"]["records"][0]["envelope_xdr"]
+            )
+            te = TransactionEnvelope.from_xdr(xdr, Network.PUBLIC_NETWORK_PASSPHRASE)
             resp = server.submit_transaction(te, True)
             assert resp["envelope_xdr"] == xdr
 
