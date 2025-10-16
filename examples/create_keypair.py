@@ -1,28 +1,93 @@
 """
-This example shows the various ways to create a Keypair.
+==============================================================
+Example: Creating Keypairs using the Stellar Python SDK
+==============================================================
 
-See: https://developers.stellar.org/docs/tutorials/create-account/#create-a-keypair
+This example demonstrates the different ways to create a Stellar Keypair:
+1. Generate a random keypair.
+2. Create a keypair from an existing secret key.
+3. Create a keypair from an existing public key.
+
+Official Documentation:
+https://developers.stellar.org/docs/tutorials/create-account/#create-a-keypair
 """
 
+# ==============================================================
+# === Installation Guideline ===================================
+# ==============================================================
+# To run this example, you need to install the Stellar SDK for Python.
+# You can install it using pip:
+#
+#     pip install stellar-sdk
+#
+# After installation create a new file named `create_keypair.py`, copy this script into that file and run it with:
+#
+#     python create_keypair.py
+#
+# ==============================================================
+# === Import Required Library ==================================
+# ==============================================================
+
+# Import the Keypair class from the Stellar SDK
+# The Keypair class provides methods to generate and manage Stellar keypairs
 from stellar_sdk.keypair import Keypair
 
-# create a random keypair
-print("create a random keypair")
-kp = Keypair.random()
-print(f"Secret: {kp.secret}")
-print(f"Public Key: {kp.public_key}")
+# ==============================================================
+# === 1. Create a Random Keypair ================================
+# ==============================================================
+
+print("=== Create a Random Keypair ===")
+# Generate a completely new random keypair
+random_kp = Keypair.random()
+
+# Print the randomly generated secret and public key
+print(f"Secret: {random_kp.secret}")
+print(f"Public Key: {random_kp.public_key}")
 print("-" * 68)
 
-# create a keypair from secret
-print("create a keypair from secret")
+# ==============================================================
+# === 2. Create a Keypair from a Secret Key =====================
+# ==============================================================
+
+print("=== Create a Keypair from a Secret Key ===")
+# Define an existing secret key (example only, not for real use)
 secret = "SBRR6ZPBHHTDXYSFRZR2QZCGDZURNE5ON4M4F3HQA42G3Z62SFCR7EEJ"
-kp = Keypair.from_secret(secret)
-print(f"Secret: {kp.secret}")
-print(f"Public Key: {kp.public_key}")
+
+# Create a Keypair object from the secret
+secret_kp = Keypair.from_secret(secret)
+
+# Print both the secret and derived public key
+print(f"Secret: {secret_kp.secret}")
+print(f"Public Key: {secret_kp.public_key}")
 print("-" * 68)
 
-# create a keypair from public key
-print("create a keypair from public key")
+# ==============================================================
+# === 3. Create a Keypair from a Public Key =====================
+# ==============================================================
+
+print("=== Create a Keypair from a Public Key ===")
+# Define an existing public key
 public_key = "GDCZ6JDZMWYORTIHEO2E4ZXKBQ2TLXNRQJPJH5RCFN7Q7I24G4RGLXP6"
-kp = Keypair.from_public_key(public_key)
-print(f"Public Key: {kp.public_key}")
+
+# Create a Keypair object from the public key
+public_kp = Keypair.from_public_key(public_key)
+
+# Print only the public key (secret not available)
+print(f"Public Key: {public_kp.public_key}")
+print("-" * 68)
+
+# ==============================================================
+# === Expected Output ==========================================
+# ==============================================================
+# --------------------------------------------------------------------
+# === Create a Random Keypair ===
+# Secret: S*********** (randomly generated)
+# Public Key: G*********** (randomly generated)
+# --------------------------------------------------------------------
+# === Create a Keypair from a Secret Key ===
+# Secret: SBRR6ZPBHHTDXYSFRZR2QZCGDZURNE5ON4M4F3HQA42G3Z62SFCR7EEJ
+# Public Key: GBVYYWNWG4P4MM2TI2AN5UVW4IJ5ZYFNEHHOBR25KIWFURSTLMEFNOJE
+# --------------------------------------------------------------------
+# === Create a Keypair from a Public Key ===
+# Public Key: GDCZ6JDZMWYORTIHEO2E4ZXKBQ2TLXNRQJPJH5RCFN7Q7I24G4RGLXP6
+# --------------------------------------------------------------------
