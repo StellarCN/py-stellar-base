@@ -28,7 +28,7 @@ Thank you for considering contributing to py-stellar-base! This document provide
 
 ### Prerequisites
 
-- Python 3.9 or higher
+- Python 3.10 or higher
 - uv for package management
 
 ### Environment Setup
