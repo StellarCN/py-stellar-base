@@ -13,7 +13,7 @@ class ExtendFootprintTTL(Operation):
 
     Threshold: Low
 
-    See `ExtendFootprintTTLOp <https://soroban.stellar.org/docs/fundamentals-and-concepts/state-expiration#ExtendFootprintTTLop>`_.
+    See `Extend Footprint TTL <https://developers.stellar.org/docs/learn/fundamentals/transactions/list-of-operations#extend-footprint-ttl>`_.
 
     :param extend_to: The number of ledgers past the LCL (last closed ledger)
         by which to extend the validity of the ledger keys in this transaction.

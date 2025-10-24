@@ -15,7 +15,7 @@ __all__ = ["AuthorizationFlag", "SetOptions"]
 
 class AuthorizationFlag(IntFlag):
     """Indicates which flags to set. For details about the flags,
-    please refer to the `Control Access to an Asset - Flag <https://developers.stellar.org/docs/issuing-assets/control-asset-access/#flags>`__.
+    please refer to the `Control Access to an Asset - Flag <https://developers.stellar.org/docs/tokens/control-asset-access#controlling-access-to-an-asset-with-flags>`__.
     """
 
     AUTHORIZATION_REQUIRED = 1
@@ -31,14 +31,14 @@ class SetOptions(Operation):
     This operation sets the options for an account.
 
     For more information on the signing options, please refer to the `multi-sig
-    doc <https://developers.stellar.org/docs/glossary/multisig/>`_.
+    doc <https://developers.stellar.org/docs/learn/fundamentals/transactions/signatures-multisig>`_.
 
     When updating signers or other thresholds, the threshold of this operation
     is high.
 
     Threshold: Medium or High
 
-    See `Set Options <https://developers.stellar.org/docs/start/list-of-operations/#set-options>`_ for more information.
+    See `Set Options <https://developers.stellar.org/docs/learn/fundamentals/transactions/list-of-operations#set-options>`_ for more information.
 
     :param inflation_dest: Account of the inflation destination.
     :param clear_flags: Indicates which flags to clear. For details about the flags,
@@ -66,13 +66,13 @@ class SetOptions(Operation):
     :param master_weight: A number from 0-255 (inclusive) representing the weight of the master key.
         If the weight of the master key is updated to 0, it is effectively disabled.
     :param low_threshold: A number from 0-255 (inclusive) representing the threshold this account sets on all
-        operations it performs that have `a low threshold <https://developers.stellar.org/docs/glossary/multisig/>`_.
+        operations it performs that have `a low threshold <https://developers.stellar.org/docs/learn/fundamentals/transactions/signatures-multisig>`_.
     :param med_threshold: A number from 0-255 (inclusive) representing the threshold this account sets on all
-        operations it performs that have `a medium threshold <https://developers.stellar.org/docs/glossary/multisig/>`_.
+        operations it performs that have `a medium threshold <https://developers.stellar.org/docs/learn/fundamentals/transactions/signatures-multisig>`_.
     :param high_threshold: A number from 0-255 (inclusive) representing the threshold this account sets on all
-        operations it performs that have `a high threshold <https://developers.stellar.org/docs/glossary/multisig/>`_.
+        operations it performs that have `a high threshold <https://developers.stellar.org/docs/learn/fundamentals/transactions/signatures-multisig>`_.
     :param home_domain: sets the home domain used for
-        reverse `federation <https://developers.stellar.org/docs/glossary/federation/>`_ lookup.
+        reverse `federation <https://developers.stellar.org/docs/learn/glossary#federation>`_ lookup.
     :param signer: Add, update, or remove a signer from the account.
     :param source: The source account for the operation. Defaults to the transaction's source account.
 

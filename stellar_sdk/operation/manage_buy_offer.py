@@ -26,7 +26,7 @@ class ManageBuyOffer(Operation):
 
     Threshold: Medium
 
-    See `Manage Buy Offer <https://developers.stellar.org/docs/start/list-of-operations/#manage-buy-offer>`_ for more information.
+    See `Manage Buy Offer <https://developers.stellar.org/docs/learn/fundamentals/transactions/list-of-operations#manage-buy-offer>`_ for more information.
 
     :param selling: What you're selling.
     :param buying: What you're buying.

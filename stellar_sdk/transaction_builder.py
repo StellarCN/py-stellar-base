@@ -656,13 +656,13 @@ class TransactionBuilder:
         :param master_weight: A number from 0-255 (inclusive) representing the weight of the master key.
             If the weight of the master key is updated to 0, it is effectively disabled.
         :param low_threshold: A number from 0-255 (inclusive) representing the threshold this account sets on all
-            operations it performs that have `a low threshold <https://developers.stellar.org/docs/glossary/multisig/>`_.
+            operations it performs that have `a low threshold <https://developers.stellar.org/docs/learn/fundamentals/transactions/signatures-multisig>`_.
         :param med_threshold: A number from 0-255 (inclusive) representing the threshold this account sets on all
-            operations it performs that have `a medium threshold <https://developers.stellar.org/docs/glossary/multisig/>`_.
+            operations it performs that have `a medium threshold <https://developers.stellar.org/docs/learn/fundamentals/transactions/signatures-multisig>`_.
         :param high_threshold: A number from 0-255 (inclusive) representing the threshold this account sets on all
-            operations it performs that have `a high threshold <https://developers.stellar.org/docs/glossary/multisig/>`_.
+            operations it performs that have `a high threshold <https://developers.stellar.org/docs/learn/fundamentals/transactions/signatures-multisig>`_.
         :param home_domain: sets the home domain used for
-            reverse `federation <https://developers.stellar.org/docs/glossary/federation/>`_ lookup.
+            reverse `federation <https://developers.stellar.org/docs/learn/glossary#federation>`_ lookup.
         :param signer: Add, update, or remove a signer from the account.
         :param source: The source account for the operation. Defaults to the transaction's source account.
         :return: This builder instance.
@@ -1495,8 +1495,10 @@ class TransactionBuilder:
         If you encounter the `entry_archived` error when submitting this transaction, you should consider calling the :func:`append_restore_asset_balance_entry_op` method to restore the entry,
         and then use the :func:`append_payment_to_contract_op` method to send assets again.
 
-        You can find the example code in the `examples/send_asset_to_contract_without_rpc.py <https://github.com/StellarCN/py-stellar-base/blob/main/examples/>`__.
+        You can find the example code in the `examples/send_asset_to_contract_without_rpc.py <https://github.com/StellarCN/py-stellar-base/blob/main/examples/>`_.
+
         .. note::
+
             1. This method should only be used to send assets to contract addresses (starting with 'C'). For sending assets to regular account addresses (starting with 'G'), please use the :func:`append_payment_op` method.
             2. This method is suitable for sending assets to a contract account when you don't have access to a Stellar RPC server. If you have access to a Stellar RPC server, it is recommended to use the :class:`stellar_sdk.contract.ContractClient` to build transactions for sending tokens to contracts.
             3. This method may consume slightly more transaction fee than actually required.

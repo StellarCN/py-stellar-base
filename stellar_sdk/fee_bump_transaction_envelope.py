@@ -20,7 +20,7 @@ class FeeBumpTransactionEnvelope(BaseTransactionEnvelope["FeeBumpTransactionEnve
     class handles signing and conversion to and from XDR for usage on Stellar's
     network.
 
-    See `Fee-Bump Transactions <https://developers.stellar.org/docs/glossary/fee-bumps/>`__ for more information.
+    See `Fee-Bump Transactions <https://developers.stellar.org/docs/build/guides/transactions/fee-bump-transactions>`__ for more information.
     See `CAP-0015 <https://github.com/stellar/stellar-protocol/blob/master/core/cap-0015.md>`__ for more information.
 
     :param transaction: The fee bump transaction that is encapsulated in this envelope.

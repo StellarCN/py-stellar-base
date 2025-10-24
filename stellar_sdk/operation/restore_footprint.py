@@ -13,7 +13,7 @@ class RestoreFootprint(Operation):
 
     Threshold: Low
 
-    See `RestoreFootprintOp <https://soroban.stellar.org/docs/fundamentals-and-concepts/state-expiration#restorefootprintop>`_.
+    See `Restore Footprint <https://developers.stellar.org/docs/learn/fundamentals/transactions/list-of-operations#restore-footprint>`_.
 
     :param source: The source account for the operation. Defaults to the transaction's source account.
     """

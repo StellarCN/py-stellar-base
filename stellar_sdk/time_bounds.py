@@ -13,7 +13,7 @@ class TimeBounds:
     *max_time* equal ``0`` means that it’s not set.
 
     See `Stellar's documentation on Transactions
-    <https://developers.stellar.org/docs/glossary/transactions/#time-bounds>`__
+    <https://developers.stellar.org/docs/learn/fundamentals/stellar-data-structures/operations-and-transactions#time-bounds>`__
     for more information on how TimeBounds are used within transactions.
 
 

@@ -18,7 +18,7 @@ class Payment(Operation):
 
     Threshold: Medium
 
-    See `Payment <https://developers.stellar.org/docs/start/list-of-operations/#payment>`_ for more information.
+    See `Payment <https://developers.stellar.org/docs/learn/fundamentals/transactions/list-of-operations#payment>`_ for more information.
 
     :param destination: The destination account ID.
     :param asset: The asset to send.

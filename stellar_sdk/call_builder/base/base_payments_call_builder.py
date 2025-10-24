@@ -6,7 +6,7 @@ __all__ = ["BasePaymentsCallBuilder"]
 class BasePaymentsCallBuilder(BaseCallBuilder):
     """Creates a new :class:`PaymentsCallBuilder` pointed to server defined by horizon_url.
 
-    See `List All Payments <https://developers.stellar.org/api/resources/operations/list-payments/>`__ for more information.
+    See `List All Payments <https://developers.stellar.org/docs/data/apis/horizon/api-reference/list-all-payments>`__ for more information.
 
     :param horizon_url: Horizon server URL.
     """
@@ -19,7 +19,7 @@ class BasePaymentsCallBuilder(BaseCallBuilder):
         """This endpoint responds with a collection of Payment operations where the given account
         was either the sender or receiver.
 
-        See `Retrieve an Account's Payments <https://developers.stellar.org/api/resources/accounts/payments/>`__ for more information.
+        See `Retrieve an Account's Payments <https://developers.stellar.org/docs/data/apis/horizon/api-reference/get-payments-by-account-id>`__ for more information.
 
         :param account_id: Account ID
         :return: current PaymentsCallBuilder instance
@@ -30,7 +30,7 @@ class BasePaymentsCallBuilder(BaseCallBuilder):
     def for_ledger(self, sequence: int | str):
         """This endpoint represents all payment operations that are part of a valid transactions in a given ledger.
 
-        See `Retrieve a Ledger's Payments <https://developers.stellar.org/api/resources/ledgers/payments/>`__ for more information.
+        See `Retrieve a Ledger's Payments <https://developers.stellar.org/docs/data/apis/horizon/api-reference/retrieve-a-ledgers-payments>`__ for more information.
 
         :param sequence: Ledger sequence
         :return: current PaymentsCallBuilder instance
@@ -41,7 +41,7 @@ class BasePaymentsCallBuilder(BaseCallBuilder):
     def for_transaction(self, transaction_hash: str):
         """This endpoint represents all payment operations that are part of a given transaction.
 
-        P.S. The documentation provided by SDF seems to be missing this API.
+        See `Retrieve a Transaction's Payments <https://developers.stellar.org/docs/data/apis/horizon/api-reference/retrieve-a-transactions-payments>`__ for more information.
 
         :param transaction_hash: Transaction hash
         :return: current PaymentsCallBuilder instance

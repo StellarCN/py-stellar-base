@@ -18,7 +18,7 @@ class BumpSequence(Operation):
 
     Threshold: Low
 
-    See `Bump Sequence <https://developers.stellar.org/docs/start/list-of-operations/#bump-sequence>`_ for more information.
+    See `Bump Sequence <https://developers.stellar.org/docs/learn/fundamentals/transactions/list-of-operations#bump-sequence>`_ for more information.
 
     :param bump_to: Sequence number to bump to.
     :param source: The optional source account.

@@ -10,7 +10,7 @@ __all__ = ["BaseLiquidityPoolsBuilder"]
 class BaseLiquidityPoolsBuilder(BaseCallBuilder):
     """Creates a new :class:`LiquidityPoolsBuilder` pointed to server defined by horizon_url.
 
-    See `List Liquidity Pools <https://developers.stellar.org/api/resources/liquiditypools/list/>`__ for more information.
+    See `List Liquidity Pools <https://developers.stellar.org/docs/data/apis/horizon/api-reference/list-liquidity-pools>`__ for more information.
 
     :param horizon_url: Horizon server URL.
     """
@@ -22,7 +22,7 @@ class BaseLiquidityPoolsBuilder(BaseCallBuilder):
     def liquidity_pool(self, liquidity_pool_id: str):
         """Provides information on a liquidity pool.
 
-        See `Retrieve a Liquidity Pool <https://developers.stellar.org/api/resources/liquiditypools/single/>`__ for more information.
+        See `Retrieve a Liquidity Pool <https://developers.stellar.org/docs/data/apis/horizon/api-reference/retrieve-a-liquidity-pool>`__ for more information.
 
         :param liquidity_pool_id: The ID of the liquidity pool in hex string.
         :return: current LiquidityPoolsBuilder instance
@@ -36,7 +36,7 @@ class BaseLiquidityPoolsBuilder(BaseCallBuilder):
         Horizon will provide an endpoint to find all liquidity pools
         which contain a given set of reserve assets.
 
-        See `List Liquidity Pools <https://developers.stellar.org/api/resources/liquiditypools/list/>`__ for more information.
+        See `List Liquidity Pools <https://developers.stellar.org/docs/data/apis/horizon/api-reference/list-liquidity-pools>`__ for more information.
 
         :return: current LiquidityPoolsBuilder instance
         """
@@ -47,7 +47,7 @@ class BaseLiquidityPoolsBuilder(BaseCallBuilder):
     def for_account(self, account_id: str):
         """Filter pools for a specific account
 
-        See `List Liquidity Pools <https://developers.stellar.org/api/resources/liquiditypools/list/>`__ for more information.
+        See `List Liquidity Pools <https://developers.stellar.org/docs/data/apis/horizon/api-reference/list-liquidity-pools>`__ for more information.
 
         :param account_id: account id
         :return: current LiquidityPoolsBuilder instance

@@ -29,7 +29,7 @@ class StrictReceivePathsCallBuilder(BaseCallBuilder, BaseStrictReceivePathsCallB
     If a list of assets is passed as the source, horizon will find any payment
     paths from those source assets to the desired destination asset.
 
-    See `List Strict Receive Payment Paths <https://developers.stellar.org/api/aggregations/paths/strict-receive/>`__ for more information.
+    See `List Strict Receive Payment Paths <https://developers.stellar.org/docs/data/apis/horizon/api-reference/list-strict-receive-payment-paths>`__ for more information.
 
     :param horizon_url: Horizon server URL.
     :param client: The client instance used to send request.

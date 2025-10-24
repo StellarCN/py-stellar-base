@@ -7,7 +7,7 @@ __all__ = ["BaseOffersCallBuilder"]
 class BaseOffersCallBuilder(BaseCallBuilder):
     """Creates a new :class:`OffersCallBuilder` pointed to server defined by horizon_url.
 
-    See `List All Offers <https://developers.stellar.org/api/resources/offers/list/>`__ for more information.
+    See `List All Offers <https://developers.stellar.org/docs/data/apis/horizon/api-reference/get-all-offers>`__ for more information.
 
     :param horizon_url: Horizon server URL.
     """
@@ -19,7 +19,7 @@ class BaseOffersCallBuilder(BaseCallBuilder):
     def for_account(self, account_id: str):
         """This endpoint represents all offers a given account has currently open and can be used in streaming mode.
 
-        See `Retrieve an Account's Offers <https://developers.stellar.org/api/resources/accounts/offers/>`__ for more information.
+        See `Retrieve an Account's Offers <https://developers.stellar.org/docs/data/apis/horizon/api-reference/get-offers-by-account-id>`__ for more information.
 
         :param account_id: Account ID
         :return: current PaymentsCallBuilder instance
@@ -34,7 +34,7 @@ class BaseOffersCallBuilder(BaseCallBuilder):
         This endpoint represents all the current offers, allowing
         filtering by `seller`, `selling_asset` or `buying_asset`.
 
-        See `List All Offers <https://developers.stellar.org/api/resources/offers/list/>`__ for more information.
+        See `List All Offers <https://developers.stellar.org/docs/data/apis/horizon/api-reference/get-all-offers>`__ for more information.
 
         :param seller: Account ID of the offer creator
         :return: this OffersCallBuilder instance
@@ -50,7 +50,7 @@ class BaseOffersCallBuilder(BaseCallBuilder):
         This endpoint represents all the current offers, allowing
         filtering by `seller`, `selling_asset` or `buying_asset`.
 
-        See `List All Offers <https://developers.stellar.org/api/resources/offers/list/>`__ for more information.
+        See `List All Offers <https://developers.stellar.org/docs/data/apis/horizon/api-reference/get-all-offers>`__ for more information.
 
         :param buying: The asset being bought.
         :return: this OffersCallBuilder instance
@@ -70,7 +70,7 @@ class BaseOffersCallBuilder(BaseCallBuilder):
         This endpoint represents all the current offers, allowing
         filtering by `seller`, `selling_asset` or `buying_asset`.
 
-        See `List All Offers <https://developers.stellar.org/api/resources/offers/list/>`__ for more information.
+        See `List All Offers <https://developers.stellar.org/docs/data/apis/horizon/api-reference/get-all-offers>`__ for more information.
 
         :param selling: The asset being sold.
         :return: this OffersCallBuilder instance
@@ -86,7 +86,7 @@ class BaseOffersCallBuilder(BaseCallBuilder):
     def offer(self, offer_id: int | str):
         """Returns information and links relating to a single offer.
 
-        See `Retrieve an Offer <https://developers.stellar.org/api/resources/offers/single/>`__ for more information.
+        See `Retrieve an Offer <https://developers.stellar.org/docs/data/apis/horizon/api-reference/get-offer-by-offer-id>`__ for more information.
 
         :param offer_id: Offer ID.
         :return: this OffersCallBuilder instance
@@ -97,7 +97,7 @@ class BaseOffersCallBuilder(BaseCallBuilder):
     def for_sponsor(self, sponsor: str):
         """Filtering offers where the given account is sponsoring the offer entry.
 
-        See `List All Offers <https://developers.stellar.org/api/resources/offers/list/>`__ for more information.
+        See `List All Offers <https://developers.stellar.org/docs/data/apis/horizon/api-reference/get-all-offers>`__ for more information.
 
         :param sponsor: the sponsor id, for example: ``"GDGQVOKHW4VEJRU2TETD6DBRKEO5ERCNF353LW5WBFW3JJWQ2BRQ6KDD"``
         :return: current OffersCallBuilder instance

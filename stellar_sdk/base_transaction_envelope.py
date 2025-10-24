@@ -83,7 +83,7 @@ class BaseTransactionEnvelope(Generic[T]):
         """Sign this transaction envelope with a Hash(x) signature.
 
         See Stellar's documentation on `Multi-Sig
-        <https://developers.stellar.org/docs/glossary/multisig/>`_
+        <https://developers.stellar.org/docs/learn/fundamentals/transactions/signatures-multisig>`_
         for more details on Hash(x) signatures.
 
         :param preimage: Preimage of hash used as signer, byte hash or hex encoded string

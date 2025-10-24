@@ -66,7 +66,7 @@ class SorobanServerAsync:
     async def get_health(self) -> GetHealthResponse:
         """General node health check.
 
-        See `Soroban RPC Documentation - getHealth <https://developers.stellar.org/docs/data/rpc/api-reference/methods/getHealth>`_
+        See `Soroban RPC Documentation - getHealth <https://developers.stellar.org/docs/data/apis/rpc/api-reference/methods/getHealth>`_
 
         :return: A :class:`GetHealthResponse <stellar_sdk.soroban_rpc.GetHealthResponse>` object.
         :raises: :exc:`SorobanRpcErrorResponse <stellar_sdk.exceptions.SorobanRpcErrorResponse>` - If the Soroban-RPC instance returns an error response.
@@ -88,7 +88,7 @@ class SorobanServerAsync:
     ) -> GetEventsResponse:
         """Fetch a list of events that occurred in the ledger range.
 
-        See `Soroban RPC Documentation - getEvents <https://developers.stellar.org/docs/data/rpc/api-reference/methods/getEvents>`_
+        See `Soroban RPC Documentation - getEvents <https://developers.stellar.org/docs/data/apis/rpc/api-reference/methods/getEvents>`_
 
         :param start_ledger: Ledger sequence number to start fetching responses from (inclusive). This method will return an error if startLedger is less than the oldest ledger stored in this node, or greater than the latest ledger seen by this node. If a cursor is included in the request, startLedger must be omitted.
         :param end_ledger: Ledger sequence number represents the end of search window (exclusive). If a cursor is included in the request, this must be omitted.
@@ -113,7 +113,7 @@ class SorobanServerAsync:
     async def get_network(self) -> GetNetworkResponse:
         """General info about the currently configured network.
 
-        See `Soroban RPC Documentation - getNetwork <https://developers.stellar.org/docs/data/rpc/api-reference/methods/getNetwork>`_
+        See `Soroban RPC Documentation - getNetwork <https://developers.stellar.org/docs/data/apis/rpc/api-reference/methods/getNetwork>`_
 
         :return: A :class:`GetNetworkResponse <stellar_sdk.soroban_rpc.GetNetworkResponse>` object.
         :raises: :exc:`SorobanRpcErrorResponse <stellar_sdk.exceptions.SorobanRpcErrorResponse>` - If the Soroban-RPC instance returns an error response.
@@ -128,7 +128,7 @@ class SorobanServerAsync:
     async def get_latest_ledger(self) -> GetLatestLedgerResponse:
         """Fetches the latest ledger meta info from network which Soroban-RPC is connected to.
 
-        See `Soroban RPC Documentation - getLatestLedger <https://developers.stellar.org/docs/data/rpc/api-reference/methods/getLatestLedger>`_
+        See `Soroban RPC Documentation - getLatestLedger <https://developers.stellar.org/docs/data/apis/rpc/api-reference/methods/getLatestLedger>`_
 
         :return: A :class:`GetLatestLedgerResponse <stellar_sdk.soroban_rpc.GetLatestLedgerResponse>` object.
         :raises: :exc:`SorobanRpcErrorResponse <stellar_sdk.exceptions.SorobanRpcErrorResponse>` - If the Soroban-RPC instance returns an error response.
@@ -149,7 +149,7 @@ class SorobanServerAsync:
         or any other ledger entry. This is a backup way to access your contract data
         which may not be available via events or simulateTransaction.
 
-        See `Soroban RPC Documentation - getLedgerEntries <https://developers.stellar.org/docs/data/rpc/api-reference/methods/getLedgerEntries>`_
+        See `Soroban RPC Documentation - getLedgerEntries <https://developers.stellar.org/docs/data/apis/rpc/api-reference/methods/getLedgerEntries>`_
 
         :param keys: The ledger keys to fetch.
         :return: A :class:`GetLedgerEntriesResponse <stellar_sdk.soroban_rpc.GetLedgerEntriesResponse>` object.
@@ -165,7 +165,7 @@ class SorobanServerAsync:
     async def get_transaction(self, transaction_hash: str) -> GetTransactionResponse:
         """Fetch the specified transaction.
 
-        See `Soroban RPC Documentation - getTransaction <https://developers.stellar.org/docs/data/rpc/api-reference/methods/getTransaction>`_
+        See `Soroban RPC Documentation - getTransaction <https://developers.stellar.org/docs/data/apis/rpc/api-reference/methods/getTransaction>`_
 
         :param transaction_hash: The hash of the transaction to fetch.
         :return: A :class:`GetTransactionResponse <stellar_sdk.soroban_rpc.GetTransactionResponse>` object.
@@ -186,7 +186,7 @@ class SorobanServerAsync:
     ) -> SimulateTransactionResponse:
         """Submit a trial contract invocation to get back return values, expected ledger footprint, and expected costs.
 
-        See `Soroban RPC Documentation - simulateTransaction <https://developers.stellar.org/docs/data/rpc/api-reference/methods/simulateTransaction>`_
+        See `Soroban RPC Documentation - simulateTransaction <https://developers.stellar.org/docs/data/apis/rpc/api-reference/methods/simulateTransaction>`_
 
         :param transaction_envelope: The transaction to simulate. It should include exactly one operation,
             which must be one of :class:`RestoreFootprint <stellar_sdk.operation.RestoreFootprintOperation>`,
@@ -223,7 +223,7 @@ class SorobanServerAsync:
     ) -> SendTransactionResponse:
         """Submit a real transaction to the Stellar network. This is the only way to make changes "on-chain".
 
-        See `Soroban RPC Documentation - sendTransaction <https://developers.stellar.org/docs/data/rpc/api-reference/methods/sendTransaction>`_
+        See `Soroban RPC Documentation - sendTransaction <https://developers.stellar.org/docs/data/apis/rpc/api-reference/methods/sendTransaction>`_
 
         :param transaction_envelope: The transaction to send.
         :return: A :class:`SendTransactionResponse <stellar_sdk.soroban_rpc.SendTransactionResponse>` object.
@@ -275,7 +275,7 @@ class SorobanServerAsync:
     async def get_fee_stats(self) -> GetFeeStatsResponse:
         """General info about the fee stats.
 
-        See `Soroban RPC Documentation - getFeeStats <https://developers.stellar.org/docs/data/rpc/api-reference/methods/getFeeStats>`_
+        See `Soroban RPC Documentation - getFeeStats <https://developers.stellar.org/docs/data/apis/rpc/api-reference/methods/getFeeStats>`_
 
         :return: A :class:`GetFeeStatsResponse <stellar_sdk.soroban_rpc.GetFeeStatsResponse>` object.
         :raises: :exc:`SorobanRpcErrorResponse <stellar_sdk.exceptions.SorobanRpcErrorResponse>` - If the Soroban-RPC instance returns an error response.
@@ -296,7 +296,7 @@ class SorobanServerAsync:
         """Fetch a detailed list of transactions starting from the user specified starting point that you can paginate
         as long as the pages fall within the history retention of their corresponding RPC provider.
 
-        See `Soroban RPC Documentation - getTransactions <https://developers.stellar.org/docs/data/rpc/api-reference/methods/getTransactions>`_
+        See `Soroban RPC Documentation - getTransactions <https://developers.stellar.org/docs/data/apis/rpc/api-reference/methods/getTransactions>`_
 
         :param start_ledger: The first ledger to include in the results.
         :param cursor: A cursor value for use in pagination.
@@ -323,7 +323,7 @@ class SorobanServerAsync:
         """Fetch a detailed list of ledgers starting from the user specified starting point that you can paginate
         as long as the pages fall within the history retention of their corresponding RPC provider.
 
-        See `Soroban RPC Documentation - getLedgers <https://developers.stellar.org/docs/data/rpc/api-reference/methods/getLedgers>`_
+        See `Soroban RPC Documentation - getLedgers <https://developers.stellar.org/docs/data/apis/rpc/api-reference/methods/getLedgers>`_
 
         :param start_ledger: The first ledger to include in the results.
         :param cursor: A cursor value for use in pagination.
@@ -403,7 +403,7 @@ class SorobanServerAsync:
     async def get_version_info(self) -> GetVersionInfoResponse:
         """Version information about the RPC and Captive core.
 
-        See `Soroban RPC Documentation - getVersionInfo <https://developers.stellar.org/docs/data/rpc/api-reference/methods/getVersionInfo>`_
+        See `Soroban RPC Documentation - getVersionInfo <https://developers.stellar.org/docs/data/apis/rpc/api-reference/methods/getVersionInfo>`_
 
         :return: A :class:`GetVersionInfoResponse <stellar_sdk.soroban_rpc.GetVersionInfoResponse>` object.
         :raises: :exc:`SorobanRpcErrorResponse <stellar_sdk.exceptions.SorobanRpcErrorResponse>` - If the Soroban-RPC instance returns an error response.

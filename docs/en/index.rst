@@ -7,8 +7,8 @@ Stellar Python SDK
 ==================
 
 py-stellar-base is a Python library for communicating with
-a `Stellar Horizon server`_ and `Soroban-RPC server`_. It is used for building Stellar apps on Python. It supports **Python 3.9+** as
-well as PyPy 3.9+.
+a `Stellar Horizon server`_ and `Soroban-RPC server`_. It is used for building Stellar apps on Python. It supports **Python 3.10+** as
+well as PyPy 3.10+.
 
 It provides:
 

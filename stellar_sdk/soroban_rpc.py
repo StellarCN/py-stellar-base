@@ -94,7 +94,7 @@ class PaginationMixin:
 class GetEventsRequest(PaginationMixin, BaseModel):
     """Response for JSON-RPC method getEvents.
 
-    See `getEvents documentation <https://developers.stellar.org/docs/data/rpc/api-reference/methods/getEvents>`__ for
+    See `getEvents documentation <https://developers.stellar.org/docs/data/apis/rpc/api-reference/methods/getEvents>`__ for
     more information.
     """
 
@@ -107,7 +107,7 @@ class GetEventsRequest(PaginationMixin, BaseModel):
 class GetEventsResponse(BaseModel):
     """Response for JSON-RPC method getEvents.
 
-    See `getEvents documentation <https://developers.stellar.org/docs/data/rpc/api-reference/methods/getEvents>`__ for
+    See `getEvents documentation <https://developers.stellar.org/docs/data/apis/rpc/api-reference/methods/getEvents>`__ for
     more information.
     """
 
@@ -123,7 +123,7 @@ class GetEventsResponse(BaseModel):
 class GetLedgerEntriesRequest(BaseModel):
     """Response for JSON-RPC method getLedgerEntries.
 
-    See `getLedgerEntries documentation <https://developers.stellar.org/docs/data/rpc/api-reference/methods/getLedgerEntries>`__ for
+    See `getLedgerEntries documentation <https://developers.stellar.org/docs/data/apis/rpc/api-reference/methods/getLedgerEntries>`__ for
     more information."""
 
     keys: Sequence[str]
@@ -139,7 +139,7 @@ class LedgerEntryResult(BaseModel):
 class GetLedgerEntriesResponse(BaseModel):
     """Response for JSON-RPC method getLedgerEntries.
 
-    See `getLedgerEntries documentation <https://developers.stellar.org/docs/data/rpc/api-reference/methods/getLedgerEntries>`__ for
+    See `getLedgerEntries documentation <https://developers.stellar.org/docs/data/apis/rpc/api-reference/methods/getLedgerEntries>`__ for
     more information."""
 
     entries: list[LedgerEntryResult] | None = None
@@ -150,7 +150,7 @@ class GetLedgerEntriesResponse(BaseModel):
 class GetNetworkResponse(BaseModel):
     """Response for JSON-RPC method getNetwork.
 
-    See `getNetwork documentation <https://developers.stellar.org/docs/data/rpc/api-reference/methods/getNetwork>`__ for
+    See `getNetwork documentation <https://developers.stellar.org/docs/data/apis/rpc/api-reference/methods/getNetwork>`__ for
     more information."""
 
     friendbot_url: str | None = Field(alias="friendbotUrl", default=None)
@@ -162,7 +162,7 @@ class GetNetworkResponse(BaseModel):
 class GetHealthResponse(BaseModel):
     """Response for JSON-RPC method getHealth.
 
-    See `getHealth documentation <https://developers.stellar.org/docs/data/rpc/api-reference/methods/getHealth>`__ for
+    See `getHealth documentation <https://developers.stellar.org/docs/data/apis/rpc/api-reference/methods/getHealth>`__ for
     more information.
     """
 
@@ -200,7 +200,7 @@ class SimulateTransactionRequest(BaseModel):
         simulation response for invoke host function, could be one of three types: error, success, or
         restore operation needed.
 
-    See `simulateTransaction documentation <https://developers.stellar.org/docs/data/rpc/api-reference/methods/simulateTransaction>`__ for
+    See `simulateTransaction documentation <https://developers.stellar.org/docs/data/apis/rpc/api-reference/methods/simulateTransaction>`__ for
     more information.
     """
 
@@ -250,7 +250,7 @@ class LedgerEntryChange(BaseModel):
 class SimulateTransactionResponse(BaseModel):
     """Response for JSON-RPC method simulateTransaction.
 
-    See `simulateTransaction documentation <https://developers.stellar.org/docs/data/rpc/api-reference/methods/simulateTransaction>`__ for
+    See `simulateTransaction documentation <https://developers.stellar.org/docs/data/apis/rpc/api-reference/methods/simulateTransaction>`__ for
     more information."""
 
     error: str | None = None
@@ -291,17 +291,13 @@ class TransactionResponseError(BaseModel):
 class GetTransactionRequest(BaseModel):
     """Response for JSON-RPC method getTransaction.
 
-    See `getTransaction documentation <https://developers.stellar.org/docs/data/rpc/api-reference/methods/getTransaction>`__ for
+    See `getTransaction documentation <https://developers.stellar.org/docs/data/apis/rpc/api-reference/methods/getTransaction>`__ for
     more information."""
 
     hash: str
 
 
 class Events(BaseModel):
-    # base64-encoded list of `xdr.DiagnosticEvent`s
-    diagnostic_events_xdr: list[str] | None = Field(
-        alias="diagnosticEventsXdr", default=None
-    )
     # base64-encoded list of `xdr.TransactionEvent`s
     transaction_events_xdr: list[str] | None = Field(
         alias="transactionEventsXdr", default=None
@@ -315,7 +311,7 @@ class Events(BaseModel):
 class GetTransactionResponse(BaseModel):
     """Response for JSON-RPC method getTransaction.
 
-    See `getTransaction documentation <https://developers.stellar.org/docs/data/rpc/api-reference/methods/getTransaction>`__ for
+    See `getTransaction documentation <https://developers.stellar.org/docs/data/apis/rpc/api-reference/methods/getTransaction>`__ for
     more information."""
 
     status: GetTransactionStatus
@@ -336,6 +332,10 @@ class GetTransactionResponse(BaseModel):
     result_meta_xdr: str | None = Field(
         alias="resultMetaXdr", default=None
     )  # stellar_sdk.xdr.TransactionMeta
+    diagnostic_events_xdr: list[str] | None = Field(
+        alias="diagnosticEventsXdr",
+        default=None,
+    )  # stellar_sdk.xdr.DiagnosticEvent
     events: Events | None = None
     ledger: int | None = Field(alias="ledger", default=None)
     create_at: int | None = Field(alias="createdAt", default=None)
@@ -356,7 +356,7 @@ class SendTransactionStatus(Enum):
 class SendTransactionRequest(BaseModel):
     """Response for JSON-RPC method sendTransaction.
 
-    See `sendTransaction documentation <https://developers.stellar.org/docs/data/rpc/api-reference/methods/sendTransaction>`__ for
+    See `sendTransaction documentation <https://developers.stellar.org/docs/data/apis/rpc/api-reference/methods/sendTransaction>`__ for
     more information."""
 
     transaction: str
@@ -365,13 +365,13 @@ class SendTransactionRequest(BaseModel):
 class SendTransactionResponse(BaseModel):
     """Response for JSON-RPC method sendTransaction.
 
-    See `sendTransaction documentation <https://developers.stellar.org/docs/data/rpc/api-reference/methods/sendTransaction>`__ for
+    See `sendTransaction documentation <https://developers.stellar.org/docs/data/apis/rpc/api-reference/methods/sendTransaction>`__ for
     more information."""
 
     error_result_xdr: str | None = Field(alias="errorResultXdr", default=None)
     diagnostic_events_xdr: list[str] | None = Field(
         alias="diagnosticEventsXdr", default=None
-    )
+    )  # stellar_sdk.xdr.DiagnosticEvent
     status: SendTransactionStatus = Field(alias="status")
     hash: str = Field(alias="hash")
     latest_ledger: int = Field(alias="latestLedger")
@@ -382,7 +382,7 @@ class SendTransactionResponse(BaseModel):
 class GetLatestLedgerResponse(BaseModel):
     """Response for JSON-RPC method getLatestLedger.
 
-    See `getLatestLedger documentation <https://developers.stellar.org/docs/data/rpc/api-reference/methods/getLatestLedger>`__ for
+    See `getLatestLedger documentation <https://developers.stellar.org/docs/data/apis/rpc/api-reference/methods/getLatestLedger>`__ for
     more information."""
 
     id: str
@@ -413,7 +413,7 @@ class FeeDistribution(BaseModel):
 class GetFeeStatsResponse(BaseModel):
     """Response for JSON-RPC method getFeeStats.
 
-    See `getFeeStats documentation <https://developers.stellar.org/docs/data/rpc/api-reference/methods/getFeeStats>`__ for
+    See `getFeeStats documentation <https://developers.stellar.org/docs/data/apis/rpc/api-reference/methods/getFeeStats>`__ for
     more information."""
 
     soroban_inclusion_fee: FeeDistribution = Field(alias="sorobanInclusionFee")
@@ -425,7 +425,7 @@ class GetFeeStatsResponse(BaseModel):
 class GetTransactionsRequest(PaginationMixin, BaseModel):
     """Request for JSON-RPC method getTransactions.
 
-    See `getTransactions documentation <https://developers.stellar.org/docs/data/rpc/api-reference/methods/getTransactions>`__ for
+    See `getTransactions documentation <https://developers.stellar.org/docs/data/apis/rpc/api-reference/methods/getTransactions>`__ for
     more information."""
 
     start_ledger: int | None = Field(alias="startLedger", default=None)
@@ -445,16 +445,14 @@ class Transaction(BaseModel):
     diagnostic_events_xdr: list[str] | None = Field(
         alias="diagnosticEventsXdr",
         default=None,
-        deprecated=True,
-        description="This field is deprecated and will be removed in the future. Use `events.diagnostic_events_xdr` instead.",
-    )
+    )  # stellar_sdk.xdr.DiagnosticEvent
     events: Events | None = None
 
 
 class GetTransactionsResponse(BaseModel):
     """Response for JSON-RPC method getTransactions.
 
-    See `getTransactions documentation <https://developers.stellar.org/docs/data/rpc/api-reference/methods/getTransactions>`__ for
+    See `getTransactions documentation <https://developers.stellar.org/docs/data/apis/rpc/api-reference/methods/getTransactions>`__ for
     more information."""
 
     transactions: list[Transaction]
@@ -469,7 +467,7 @@ class GetTransactionsResponse(BaseModel):
 class GetVersionInfoResponse(BaseModel):
     """Response for JSON-RPC method getVersionInfo.
 
-    See `getVersionInfo documentation <https://developers.stellar.org/docs/data/rpc/api-reference/methods/getVersionInfo>`__ for
+    See `getVersionInfo documentation <https://developers.stellar.org/docs/data/apis/rpc/api-reference/methods/getVersionInfo>`__ for
     more information."""
 
     version: str
@@ -483,7 +481,7 @@ class GetVersionInfoResponse(BaseModel):
 class GetLedgersRequest(PaginationMixin, BaseModel):
     """Request for JSON-RPC method getLedgers.
 
-    See `getLedgers documentation <https://developers.stellar.org/docs/data/rpc/api-reference/methods/getLedgers>`__ for
+    See `getLedgers documentation <https://developers.stellar.org/docs/data/apis/rpc/api-reference/methods/getLedgers>`__ for
     more information."""
 
     start_ledger: int | None = Field(alias="startLedger", default=None)
@@ -503,7 +501,7 @@ class LedgerInfo(BaseModel):
 class GetLedgersResponse(BaseModel):
     """Response for JSON-RPC method getLedgers.
 
-    See `getLedgers documentation <https://developers.stellar.org/docs/data/rpc/api-reference/methods/getLedgers>`__ for
+    See `getLedgers documentation <https://developers.stellar.org/docs/data/apis/rpc/api-reference/methods/getLedgers>`__ for
     more information."""
 
     ledgers: list[LedgerInfo]

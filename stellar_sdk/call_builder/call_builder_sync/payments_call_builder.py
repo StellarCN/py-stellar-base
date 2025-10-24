@@ -12,7 +12,7 @@ class PaymentsCallBuilder(BaseCallBuilder, BasePaymentsCallBuilder):
     """Creates a new :class:`PaymentsCallBuilder` pointed to server defined by horizon_url.
     Do not create this object directly, use :func:`stellar_sdk.Server.payments`.
 
-    See `List All Payments <https://developers.stellar.org/api/resources/operations/list-payments/>`__ for more information.
+    See `List All Payments <https://developers.stellar.org/docs/data/apis/horizon/api-reference/list-all-payments>`__ for more information.
 
     :param horizon_url: Horizon server URL.
     :param client: The client instance used to send request.

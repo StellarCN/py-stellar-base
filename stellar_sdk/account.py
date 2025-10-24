@@ -25,7 +25,7 @@ class Account:
         # `account` can also be a muxed account
         source_account = server.load_account(account=source.public_key)
 
-    See `Accounts <https://developers.stellar.org/docs/glossary/accounts/>`__ for
+    See `Accounts <https://developers.stellar.org/docs/learn/fundamentals/stellar-data-structures/accounts>`__ for
     more information.
 
     :param account: Account Id of the

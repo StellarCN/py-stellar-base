@@ -19,7 +19,7 @@ class LiquidityPoolDeposit(Operation):
 
     Threshold: Medium
 
-    See `Liquidity Pool Deposit <https://developers.stellar.org/docs/start/list-of-operations/#liquidity-pool-deposit>`_ for more information.
+    See `Liquidity Pool Deposit <https://developers.stellar.org/docs/learn/fundamentals/transactions/list-of-operations#liquidity-pool-deposit>`_ for more information.
 
     :param liquidity_pool_id: The liquidity pool ID.
     :param max_amount_a: Maximum amount of first asset to deposit.
