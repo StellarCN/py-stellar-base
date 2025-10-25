@@ -1,6 +1,6 @@
 import base64
 import binascii
-from typing import ClassVar, Optional, Union
+from typing import ClassVar
 
 from .. import xdr as stellar_xdr
 from ..muxed_account import MuxedAccount
@@ -31,7 +31,7 @@ class ClaimClaimableBalance(Operation):
     def __init__(
         self,
         balance_id: str,
-        source: Optional[Union[MuxedAccount, str]] = None,
+        source: MuxedAccount | str | None = None,
     ) -> None:
         super().__init__(source)
         self.balance_id: str = balance_id

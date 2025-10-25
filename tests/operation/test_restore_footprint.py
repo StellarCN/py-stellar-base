@@ -1,5 +1,3 @@
-from typing import Optional, Union
-
 import pytest
 
 from stellar_sdk import Operation
@@ -20,7 +18,7 @@ class TestRestoreFootprint:
             ),
         ],
     )
-    def test_xdr(self, source: Optional[Union[MuxedAccount, str]], xdr: str):
+    def test_xdr(self, source: MuxedAccount | str | None, xdr: str):
         op = RestoreFootprint(source)
         check_source(op.source, source)
         xdr_object = op.to_xdr_object()

@@ -1,4 +1,5 @@
-from typing import Callable, Optional, Sequence, TypeVar, Union
+from collections.abc import Sequence
+from typing import Callable, TypeVar
 
 from .. import Account, Asset, Keypair, MuxedAccount, scval
 from .. import xdr as stellar_xdr
@@ -34,7 +35,7 @@ class ContractClient:
         contract_id: str,
         rpc_url: str,
         network_passphrase: str,
-        request_client: Optional[BaseSyncClient] = None,
+        request_client: BaseSyncClient | None = None,
     ):
         self.contract_id = contract_id
         self.rpc_url = rpc_url
@@ -44,10 +45,10 @@ class ContractClient:
     def invoke(
         self,
         function_name: str,
-        parameters: Optional[Sequence[stellar_xdr.SCVal]] = None,
-        source: Union[str, MuxedAccount] = NULL_ACCOUNT,
-        signer: Optional[Keypair] = None,
-        parse_result_xdr_fn: Optional[Callable[[stellar_xdr.SCVal], T]] = None,
+        parameters: Sequence[stellar_xdr.SCVal] | None = None,
+        source: str | MuxedAccount = NULL_ACCOUNT,
+        signer: Keypair | None = None,
+        parse_result_xdr_fn: Callable[[stellar_xdr.SCVal], T] | None = None,
         base_fee: int = 100,
         transaction_timeout: int = 300,
         submit_timeout: int = 30,
@@ -86,11 +87,11 @@ class ContractClient:
 
     @staticmethod
     def upload_contract_wasm(
-        contract: Union[bytes, str],
-        source: Union[str, MuxedAccount],
+        contract: bytes | str,
+        source: str | MuxedAccount,
         signer: Keypair,
         soroban_server: SorobanServer,
-        network_passphrase: Optional[str] = None,
+        network_passphrase: str | None = None,
         base_fee: int = 100,
         transaction_timeout: int = 300,
         submit_timeout: int = 120,
@@ -132,13 +133,13 @@ class ContractClient:
 
     @staticmethod
     def create_contract(
-        wasm_id: Union[bytes, str],
-        source: Union[str, MuxedAccount],
+        wasm_id: bytes | str,
+        source: str | MuxedAccount,
         signer: Keypair,
         soroban_server: SorobanServer,
-        constructor_args: Optional[Sequence[stellar_xdr.SCVal]] = None,
-        salt: Optional[bytes] = None,
-        network_passphrase: Optional[str] = None,
+        constructor_args: Sequence[stellar_xdr.SCVal] | None = None,
+        salt: bytes | None = None,
+        network_passphrase: str | None = None,
         base_fee: int = 100,
         transaction_timeout: int = 300,
         submit_timeout: int = 120,
@@ -186,10 +187,10 @@ class ContractClient:
     @staticmethod
     def create_stellar_asset_contract_from_asset(
         asset: Asset,
-        source: Union[str, MuxedAccount],
+        source: str | MuxedAccount,
         signer: Keypair,
         soroban_server: SorobanServer,
-        network_passphrase: Optional[str] = None,
+        network_passphrase: str | None = None,
         base_fee: int = 100,
         submit_timeout: int = 120,
     ) -> str:

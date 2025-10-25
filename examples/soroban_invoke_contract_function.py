@@ -11,8 +11,6 @@
 3. Modify the necessary parameters in this script, then run it.
 """
 
-from typing import List
-
 from stellar_sdk import Network, scval
 from stellar_sdk.contract import AssembledTransaction, ContractClient
 
@@ -25,7 +23,7 @@ def parse_result_xdr(result):
     return [scval.from_string(s).decode() for s in scval.from_vec(result)]
 
 
-assembled: AssembledTransaction[List[str]] = ContractClient(
+assembled: AssembledTransaction[list[str]] = ContractClient(
     contract_id,
     rpc_server_url,
     network_passphrase,

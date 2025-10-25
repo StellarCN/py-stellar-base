@@ -1,5 +1,3 @@
-from typing import Union
-
 from ...call_builder.base.base_call_builder import BaseCallBuilder
 
 __all__ = ["BaseTransactionsCallBuilder"]
@@ -41,7 +39,7 @@ class BaseTransactionsCallBuilder(BaseCallBuilder):
         self.endpoint = f"accounts/{account_id}/transactions"
         return self
 
-    def for_ledger(self, sequence: Union[str, int]):
+    def for_ledger(self, sequence: int | str):
         """This endpoint represents all transactions in a given ledger.
 
         See `Retrieve a Ledger's Transactions <https://developers.stellar.org/docs/data/apis/horizon/api-reference/retrieve-a-ledgers-transactions>`__ for more information.

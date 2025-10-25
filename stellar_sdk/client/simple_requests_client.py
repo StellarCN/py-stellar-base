@@ -1,4 +1,5 @@
-from typing import Any, Dict, Generator, Optional
+from collections.abc import Generator
+from typing import Any
 
 import requests
 from requests import RequestException
@@ -26,7 +27,7 @@ class SimpleRequestsClient(BaseSyncClient):
     I don't recommend that you actually use it.**
     """
 
-    def get(self, url: str, params: Optional[Dict[str, str]] = None) -> Response:
+    def get(self, url: str, params: dict[str, str] | None = None) -> Response:
         """Perform HTTP GET request.
 
         :param url: the request url
@@ -48,8 +49,8 @@ class SimpleRequestsClient(BaseSyncClient):
     def post(
         self,
         url: str,
-        data: Optional[Dict[str, str]] = None,
-        json_data: Optional[Dict[str, Any]] = None,
+        data: dict[str, str] | None = None,
+        json_data: dict[str, Any] | None = None,
     ) -> Response:
         """Perform HTTP POST request.
 
@@ -71,8 +72,8 @@ class SimpleRequestsClient(BaseSyncClient):
         )
 
     def stream(
-        self, url: str, params: Optional[Dict[str, str]] = None
-    ) -> Generator[Dict[str, Any], None, None]:
+        self, url: str, params: dict[str, str] | None = None
+    ) -> Generator[dict[str, Any], None, None]:
         """
         **Not Implemented**
 

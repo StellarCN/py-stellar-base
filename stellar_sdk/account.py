@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Optional, Union
+from typing import Any
 
 from .muxed_account import MuxedAccount
 from .sep.ed25519_public_key_signer import Ed25519PublicKeySigner
@@ -37,16 +37,16 @@ class Account:
 
     def __init__(
         self,
-        account: Union[str, MuxedAccount],
+        account: str | MuxedAccount,
         sequence: int,
-        raw_data: Optional[Dict[str, Any]] = None,
+        raw_data: dict[str, Any] | None = None,
     ) -> None:
         if isinstance(account, str):
             self.account: MuxedAccount = MuxedAccount.from_account(account)
         else:
             self.account = account
         self.sequence: int = sequence
-        self.raw_data: Optional[Dict[str, Any]] = raw_data
+        self.raw_data: dict[str, Any] | None = raw_data
 
     @property
     def universal_account_id(self) -> str:
@@ -73,7 +73,7 @@ class Account:
             self.raw_data["thresholds"]["high_threshold"],
         )
 
-    def load_ed25519_public_key_signers(self) -> List[Ed25519PublicKeySigner]:
+    def load_ed25519_public_key_signers(self) -> list[Ed25519PublicKeySigner]:
         """Load ed25519 public key signers."""
         if self.raw_data is None:
             raise ValueError('"raw_data" is None, unable to get signers from it.')

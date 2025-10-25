@@ -10,8 +10,6 @@ Discussion: https://groups.google.com/g/stellar-dev/c/vCgQhmox32Q
 
 __all__ = ["TOID"]
 
-from typing import Tuple
-
 
 class TOID:
     """TOID represents the total order of Ledgers, Transactions and Operations.
@@ -98,7 +96,7 @@ class TOID:
         return TOID(ledger_sequence, 2**20 - 1, 2**12 - 1)
 
     @staticmethod
-    def ledger_range_inclusive(start: int, end: int) -> Tuple[int, int]:
+    def ledger_range_inclusive(start: int, end: int) -> tuple[int, int]:
         """The inclusive range representation between two
         ledgers inclusive. The second value points at the end+1 ledger so when using
         this value make sure < order is used.

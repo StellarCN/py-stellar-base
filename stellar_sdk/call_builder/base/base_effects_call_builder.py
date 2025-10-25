@@ -1,5 +1,3 @@
-from typing import Union
-
 from ...call_builder.base.base_call_builder import BaseCallBuilder
 
 __all__ = ["BaseEffectsCallBuilder"]
@@ -29,7 +27,7 @@ class BaseEffectsCallBuilder(BaseCallBuilder):
         self.endpoint = f"accounts/{account_id}/effects"
         return self
 
-    def for_ledger(self, sequence: Union[int, str]):
+    def for_ledger(self, sequence: int | str):
         """Effects are the specific ways that the ledger was changed by any operation.
         This endpoint represents all effects that occurred in the given ledger.
 
@@ -52,7 +50,7 @@ class BaseEffectsCallBuilder(BaseCallBuilder):
         self.endpoint = f"transactions/{transaction_hash}/effects"
         return self
 
-    def for_operation(self, operation_id: Union[int, str]):
+    def for_operation(self, operation_id: int | str):
         """This endpoint represents all effects that occurred as a result of a given operation.
 
         See `Retrieve an Operation's Effects <https://developers.stellar.org/docs/data/apis/horizon/api-reference/retrieve-an-operations-effects>`__ for more information.
