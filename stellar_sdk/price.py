@@ -1,5 +1,4 @@
 from decimal import Decimal
-from typing import Union
 
 from . import xdr as stellar_xdr
 from .utils import best_rational_approximation
@@ -26,7 +25,7 @@ class Price:
         self.d: int = d
 
     @classmethod
-    def from_raw_price(cls, price: Union[str, Decimal]) -> "Price":
+    def from_raw_price(cls, price: str | Decimal) -> "Price":
         """Create a :class:`Price` from the given str or Decimal price.
 
         :param price: the str or Decimal price. (ex. ``"0.125"``)

@@ -1,6 +1,5 @@
 import binascii
 import time
-from typing import Optional
 
 import pytest
 
@@ -53,11 +52,11 @@ asset3 = Asset("PANDA", "GDJVFDG5OCW5PYWHB64MGTHGFF57DRRJEDUEFDEL2SLNIOONHYJWHA3
 
 
 def get_tx_builder(
-    source_account: Optional[Account] = None,
+    source_account: Account | None = None,
     base_fee: int = 100,
     network_passphrase: str = Network.TESTNET_NETWORK_PASSPHRASE,
-    min_time: Optional[int] = 1600000000,
-    max_time: Optional[int] = 1700000000,
+    min_time: int | None = 1600000000,
+    max_time: int | None = 1700000000,
     v1: bool = True,
 ) -> TransactionBuilder:
     if source_account is None:

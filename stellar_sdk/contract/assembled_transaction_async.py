@@ -1,7 +1,7 @@
 import asyncio
 import dataclasses
 import time
-from typing import Callable, Generic, Optional, Set, TypeVar, Union
+from typing import Callable, Generic, TypeVar
 
 from .. import Address, Keypair, SorobanDataBuilder, SorobanServerAsync, xdr
 from ..auth import authorize_entry
@@ -46,8 +46,8 @@ class AssembledTransactionAsync(Generic[T]):
         self,
         transaction_builder: TransactionBuilder,
         server: SorobanServerAsync,
-        transaction_signer: Optional[Keypair] = None,
-        parse_result_xdr_fn: Optional[Callable[[xdr.SCVal], T]] = None,
+        transaction_signer: Keypair | None = None,
+        parse_result_xdr_fn: Callable[[xdr.SCVal], T] | None = None,
         submit_timeout: int = 180,
     ):
         self.server = server
@@ -57,14 +57,14 @@ class AssembledTransactionAsync(Generic[T]):
         self.parse_result_xdr_fn = parse_result_xdr_fn
 
         self.transaction_builder: TransactionBuilder = transaction_builder
-        self.built_transaction: Optional[TransactionEnvelope] = None
+        self.built_transaction: TransactionEnvelope | None = None
 
-        self.simulation: Optional[SimulateTransactionResponse] = None
-        self._simulation_result: Optional[SimulateHostFunctionResult] = None
-        self._simulation_transaction_data: Optional[xdr.SorobanTransactionData] = None
+        self.simulation: SimulateTransactionResponse | None = None
+        self._simulation_result: SimulateHostFunctionResult | None = None
+        self._simulation_transaction_data: xdr.SorobanTransactionData | None = None
 
-        self.send_transaction_response: Optional[SendTransactionResponse] = None
-        self.get_transaction_response: Optional[GetTransactionResponse] = None
+        self.send_transaction_response: SendTransactionResponse | None = None
+        self.get_transaction_response: GetTransactionResponse | None = None
 
     async def simulate(self, restore: bool = True) -> "AssembledTransactionAsync":
         """Simulates the transaction on the network.
@@ -110,8 +110,8 @@ class AssembledTransactionAsync(Generic[T]):
         return self
 
     async def sign_and_submit(
-        self, transaction_signer: Optional[Keypair] = None, force: bool = False
-    ) -> Union[T, xdr.SCVal]:
+        self, transaction_signer: Keypair | None = None, force: bool = False
+    ) -> T | xdr.SCVal:
         """Signs and submits the transaction in one step.
 
         A convenience method combining sign() and submit().
@@ -124,7 +124,7 @@ class AssembledTransactionAsync(Generic[T]):
         return await self.submit()
 
     def sign(
-        self, transaction_signer: Optional[Keypair] = None, force: bool = False
+        self, transaction_signer: Keypair | None = None, force: bool = False
     ) -> "AssembledTransactionAsync":
         """Signs the transaction.
 
@@ -173,7 +173,7 @@ class AssembledTransactionAsync(Generic[T]):
     async def sign_auth_entries(
         self,
         auth_entries_signer: Keypair,
-        valid_until_ledger_sequence: Optional[int] = None,
+        valid_until_ledger_sequence: int | None = None,
     ) -> "AssembledTransactionAsync":
         """Signs the transaction's authorization entries.
 
@@ -212,7 +212,7 @@ class AssembledTransactionAsync(Generic[T]):
             )
         return self
 
-    async def submit(self) -> Union[T, xdr.SCVal]:
+    async def submit(self) -> T | xdr.SCVal:
         """Submits the transaction to the network.
 
         It will send the transaction to the network and wait for the result.
@@ -280,7 +280,7 @@ class AssembledTransactionAsync(Generic[T]):
 
     def needs_non_invoker_signing_by(
         self, include_already_signed: bool = False
-    ) -> Set[str]:
+    ) -> set[str]:
         """Get the addresses that need to sign the authorization entries.
 
         :param include_already_signed: Whether to include addresses that have already signed the authorization entries.
@@ -313,7 +313,7 @@ class AssembledTransactionAsync(Generic[T]):
                     result.add(address)
         return result
 
-    def result(self) -> Union[T, xdr.SCVal]:
+    def result(self) -> T | xdr.SCVal:
         """Get the result of the function invocation from the simulation.
 
         :return: The value returned by the invoked function, parsed if parse_result_xdr_fn was set, otherwise raw XDR

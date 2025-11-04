@@ -11,7 +11,7 @@ Version 3.3.0
 import base64
 import os
 import time
-from typing import Iterable, List, Optional, Sequence, Union
+from collections.abc import Iterable, Sequence
 
 from .. import xdr as stellar_xdr
 from ..account import Account
@@ -52,7 +52,7 @@ class ChallengeTransaction:
         transaction: TransactionEnvelope,
         client_account_id: str,
         matched_home_domain: str,
-        memo: Optional[int] = None,
+        memo: int | None = None,
     ) -> None:
         self.transaction = transaction
         self.client_account_id = client_account_id
@@ -90,9 +90,9 @@ def build_challenge_transaction(
     web_auth_domain: str,
     network_passphrase: str,
     timeout: int = 900,
-    client_domain: Optional[str] = None,
-    client_signing_key: Optional[str] = None,
-    memo: Optional[int] = None,
+    client_domain: str | None = None,
+    client_signing_key: str | None = None,
+    memo: int | None = None,
 ) -> str:
     """Returns a valid `SEP0010 <https://github.com/stellar/stellar-protocol/blob/master/ecosystem/sep-0010.md>`_
     challenge transaction which you can use for Stellar Web Authentication.
@@ -152,7 +152,7 @@ def build_challenge_transaction(
 def read_challenge_transaction(
     challenge_transaction: str,
     server_account_id: str,
-    home_domains: Union[str, Iterable[str]],
+    home_domains: str | Iterable[str],
     web_auth_domain: str,
     network_passphrase: str,
 ) -> ChallengeTransaction:
@@ -332,11 +332,11 @@ def read_challenge_transaction(
 def verify_challenge_transaction_signers(
     challenge_transaction: str,
     server_account_id: str,
-    home_domains: Union[str, Iterable[str]],
+    home_domains: str | Iterable[str],
     web_auth_domain: str,
     network_passphrase: str,
     signers: Sequence[Ed25519PublicKeySigner],
-) -> List[Ed25519PublicKeySigner]:
+) -> list[Ed25519PublicKeySigner]:
     """Verifies that for a SEP 10 challenge transaction
     all signatures on the transaction are accounted for. A transaction is
     verified if it is signed by the server account, and all other signatures
@@ -403,7 +403,7 @@ def verify_challenge_transaction_signers(
     all_signers = client_signers + additional_signers
     all_signers_found = _verify_transaction_signatures(te, all_signers)
 
-    signers_found: List[Ed25519PublicKeySigner] = []
+    signers_found: list[Ed25519PublicKeySigner] = []
     server_signer_found = False
     client_signing_key_found = False
     for signer in all_signers_found:
@@ -444,7 +444,7 @@ def verify_challenge_transaction_signers(
 def verify_challenge_transaction_signed_by_client_master_key(
     challenge_transaction: str,
     server_account_id: str,
-    home_domains: Union[str, Iterable[str]],
+    home_domains: str | Iterable[str],
     web_auth_domain: str,
     network_passphrase: str,
 ) -> None:
@@ -475,12 +475,12 @@ def verify_challenge_transaction_signed_by_client_master_key(
 def verify_challenge_transaction_threshold(
     challenge_transaction: str,
     server_account_id: str,
-    home_domains: Union[str, Iterable[str]],
+    home_domains: str | Iterable[str],
     web_auth_domain: str,
     network_passphrase: str,
     threshold: int,
     signers: Sequence[Ed25519PublicKeySigner],
-) -> List[Ed25519PublicKeySigner]:
+) -> list[Ed25519PublicKeySigner]:
     """Verifies that for a SEP 10 challenge transaction
     all signatures on the transaction are accounted for and that the signatures
     meet a threshold on an account. A transaction is verified if it is signed by
@@ -525,7 +525,7 @@ def verify_challenge_transaction_threshold(
 def verify_challenge_transaction(
     challenge_transaction: str,
     server_account_id: str,
-    home_domains: Union[str, Iterable[str]],
+    home_domains: str | Iterable[str],
     web_auth_domain: str,
     network_passphrase: str,
 ) -> None:
@@ -577,7 +577,7 @@ def verify_challenge_transaction(
 
 def _verify_transaction_signatures(
     transaction_envelope: TransactionEnvelope, signers: Sequence[Ed25519PublicKeySigner]
-) -> List[Ed25519PublicKeySigner]:
+) -> list[Ed25519PublicKeySigner]:
     """Checks if a transaction has been signed by one or more of
     the signers, returning a list of signers that were found to have signed the
     transaction.

@@ -55,7 +55,7 @@ class SorobanServer:
     def __init__(
         self,
         server_url: str = "https://soroban-testnet.stellar.org:443",
-        client: Optional[BaseSyncClient] = None,
+        client: BaseSyncClient | None = None,
     ) -> None:
         self.server_url: str = server_url
 
@@ -80,11 +80,11 @@ class SorobanServer:
 
     def get_events(
         self,
-        start_ledger: Optional[int] = None,
-        end_ledger: Optional[int] = None,
-        filters: Optional[Sequence[EventFilter]] = None,
-        cursor: Optional[str] = None,
-        limit: Optional[int] = None,
+        start_ledger: int | None = None,
+        end_ledger: int | None = None,
+        filters: Sequence[EventFilter] | None = None,
+        cursor: str | None = None,
+        limit: int | None = None,
     ) -> GetEventsResponse:
         """Fetch a list of events that occurred in the ledger range.
 
@@ -141,7 +141,7 @@ class SorobanServer:
         return self._post(request, GetLatestLedgerResponse)
 
     def get_ledger_entries(
-        self, keys: List[stellar_xdr.LedgerKey]
+        self, keys: list[stellar_xdr.LedgerKey]
     ) -> GetLedgerEntriesResponse:
         """For reading the current value of ledger entries directly.
 
@@ -181,8 +181,8 @@ class SorobanServer:
     def simulate_transaction(
         self,
         transaction_envelope: TransactionEnvelope,
-        addl_resources: Optional[ResourceLeeway] = None,
-        auth_mode: Optional[AuthMode] = None,
+        addl_resources: ResourceLeeway | None = None,
+        auth_mode: AuthMode | None = None,
     ) -> SimulateTransactionResponse:
         """Submit a trial contract invocation to get back return values, expected ledger footprint, and expected costs.
 
@@ -220,9 +220,7 @@ class SorobanServer:
 
     def send_transaction(
         self,
-        transaction_envelope: Union[
-            TransactionEnvelope, FeeBumpTransactionEnvelope, str
-        ],
+        transaction_envelope: TransactionEnvelope | FeeBumpTransactionEnvelope | str,
     ) -> SendTransactionResponse:
         """Submit a real transaction to the Stellar network. This is the only way to make changes "on-chain".
 
@@ -292,9 +290,9 @@ class SorobanServer:
 
     def get_transactions(
         self,
-        start_ledger: Optional[int] = None,
-        cursor: Optional[str] = None,
-        limit: Optional[int] = None,
+        start_ledger: int | None = None,
+        cursor: str | None = None,
+        limit: int | None = None,
     ) -> GetTransactionsResponse:
         """Fetch a detailed list of transactions starting from the user specified starting point that you can paginate
         as long as the pages fall within the history retention of their corresponding RPC provider.
@@ -319,9 +317,9 @@ class SorobanServer:
 
     def get_ledgers(
         self,
-        start_ledger: Optional[int] = None,
-        cursor: Optional[str] = None,
-        limit: Optional[int] = None,
+        start_ledger: int | None = None,
+        cursor: str | None = None,
+        limit: int | None = None,
     ) -> GetLedgersResponse:
         """Fetch a detailed list of ledgers starting from the user specified starting point that you can paginate
         as long as the pages fall within the history retention of their corresponding RPC provider.
@@ -372,7 +370,7 @@ class SorobanServer:
         contract_id: str,
         key: stellar_xdr.SCVal,
         durability: Durability = Durability.PERSISTENT,
-    ) -> Optional[LedgerEntryResult]:
+    ) -> LedgerEntryResult | None:
         """Reads the current value of contract data ledger entries directly.
 
         :param contract_id: The contract ID containing the data to load. Encoded as Stellar Contract Address,
@@ -419,7 +417,7 @@ class SorobanServer:
         return self._post(request, GetVersionInfoResponse)
 
     def get_sac_balance(
-        self, contract_id: str, sac: Asset, network_passphrase: Optional[str] = None
+        self, contract_id: str, sac: Asset, network_passphrase: str | None = None
     ) -> GetSACBalanceResponse:
         """Returns a contract's balance of a particular SAC asset, if any.
 
@@ -479,7 +477,7 @@ class SorobanServer:
     def prepare_transaction(
         self,
         transaction_envelope: TransactionEnvelope,
-        simulate_transaction_response: Optional[SimulateTransactionResponse] = None,
+        simulate_transaction_response: SimulateTransactionResponse | None = None,
     ) -> TransactionEnvelope:
         """Submit a trial contract invocation, first run a simulation of the contract
         invocation as defined on the incoming transaction, and apply the results to

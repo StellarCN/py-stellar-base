@@ -1,5 +1,5 @@
 import copy
-from typing import Optional, Sequence, Union
+from collections.abc import Sequence
 
 from xdrlib3 import Packer
 
@@ -34,7 +34,7 @@ class TransactionEnvelope(BaseTransactionEnvelope["TransactionEnvelope"]):
         self,
         transaction: Transaction,
         network_passphrase: str,
-        signatures: Optional[Sequence[DecoratedSignature]] = None,
+        signatures: Sequence[DecoratedSignature] | None = None,
     ) -> None:
         super().__init__(network_passphrase, signatures)
         self.transaction: Transaction = transaction
@@ -62,7 +62,7 @@ class TransactionEnvelope(BaseTransactionEnvelope["TransactionEnvelope"]):
         tx.to_xdr_object().pack(packer)
         return network_id + packer.get_buffer()
 
-    def sign_extra_signers_payload(self, signer: Union[Keypair, str]) -> None:
+    def sign_extra_signers_payload(self, signer: Keypair | str) -> None:
         """Sign this extra signers' payload with a given keypair.
 
         Note that the signature must not already be in this instance's list of

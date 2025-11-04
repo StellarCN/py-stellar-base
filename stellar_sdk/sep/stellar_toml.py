@@ -9,7 +9,8 @@ Version: 2.1.0
 """
 
 import sys
-from typing import Any, MutableMapping, Optional
+from collections.abc import MutableMapping
+from typing import Any
 
 if sys.version_info >= (3, 11):
     from tomllib import loads as toml_loads
@@ -28,7 +29,7 @@ __all__ = ["fetch_stellar_toml", "fetch_stellar_toml_async"]
 
 def fetch_stellar_toml(
     domain: str,
-    client: Optional[BaseSyncClient] = None,
+    client: BaseSyncClient | None = None,
     use_http: bool = False,
 ) -> MutableMapping[str, Any]:
     """Retrieve the stellar.toml file from a given domain.
@@ -54,7 +55,7 @@ def fetch_stellar_toml(
 
 async def fetch_stellar_toml_async(
     domain: str,
-    client: Optional[BaseAsyncClient] = None,
+    client: BaseAsyncClient | None = None,
     use_http: bool = False,
 ) -> MutableMapping[str, Any]:
     """Retrieve the stellar.toml file from a given domain.

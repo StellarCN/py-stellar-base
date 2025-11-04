@@ -29,25 +29,20 @@ jobs:
         # https://endoflife.date/python
         platform:
           [
-            { os: "ubuntu-latest", python-version: "3.9" },
             { os: "ubuntu-latest", python-version: "3.10" },
             { os: "ubuntu-latest", python-version: "3.11" },
             { os: "ubuntu-latest", python-version: "3.12" },
             { os: "ubuntu-latest", python-version: "3.13" },
             { os: "ubuntu-latest", python-version: "3.14" },
-            { os: "ubuntu-latest", python-version: "pypy3.9" },
             { os: "ubuntu-latest", python-version: "pypy3.10" },
             { os: "ubuntu-latest", python-version: "pypy3.11" },
-            { os: "macos-latest", python-version: "3.9" },
             { os: "macos-latest", python-version: "3.10" },
             { os: "macos-latest", python-version: "3.11" },
             { os: "macos-latest", python-version: "3.12" },
             { os: "macos-latest", python-version: "3.13" },
             { os: "macos-latest", python-version: "3.14" },
-            { os: "macos-latest", python-version: "pypy3.9" },
             { os: "macos-latest", python-version: "pypy3.10" },
             { os: "macos-latest", python-version: "pypy3.11" },
-            { os: "windows-latest", python-version: "3.9" },
             { os: "windows-latest", python-version: "3.10" },
             { os: "windows-latest", python-version: "3.11" },
             { os: "windows-latest", python-version: "3.12" },
@@ -87,7 +82,7 @@ jobs:
           ENABLE_LOGS: true
           NETWORK: local
           ENABLE_SOROBAN_RPC: true
-          PROTOCOL_VERSION: 22
+          PROTOCOL_VERSION: 24
         options: >-
           --health-cmd "curl --no-progress-meter --fail-with-body -X POST \"http://localhost:8000/soroban/rpc\" -H 'Content-Type: application/json' -d '{\"jsonrpc\":\"2.0\",\"id\":8675309,\"method\":\"getNetwork\"}' && curl --no-progress-meter \"http://localhost:8000/friendbot\" | grep '\"invalid_field\": \"addr\"'"
           --health-interval 10s

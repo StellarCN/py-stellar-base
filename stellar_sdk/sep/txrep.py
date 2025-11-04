@@ -7,10 +7,10 @@ Created: 2018-08-31
 """
 
 import json
+from collections.abc import Sequence
 from datetime import datetime
 from decimal import Decimal
 from enum import Enum
-from typing import Dict, List, Optional, Sequence, Union
 
 from .. import xdr as stellar_xdr
 from ..asset import Asset
@@ -47,7 +47,7 @@ class _EnvelopeType(Enum):
 
 
 def to_txrep(
-    transaction_envelope: Union[TransactionEnvelope, FeeBumpTransactionEnvelope],
+    transaction_envelope: TransactionEnvelope | FeeBumpTransactionEnvelope,
 ) -> str:
     """Generate a human-readable format for Stellar transactions.
 
@@ -84,7 +84,7 @@ def to_txrep(
         transaction_envelope = fee_bump_transaction.inner_transaction_envelope
         transaction = transaction_envelope.transaction
 
-    lines: List[str] = []
+    lines: list[str] = []
 
     _add_line("type", tx_type, lines)
     if is_fee_bump:
@@ -134,7 +134,7 @@ def to_txrep(
 
 def from_txrep(
     txrep: str, network_passphrase: str
-) -> Union[TransactionEnvelope, FeeBumpTransactionEnvelope]:
+) -> TransactionEnvelope | FeeBumpTransactionEnvelope:
     """Parse txrep and generate transaction envelope object.
 
     MuxAccount is currently not supported.
@@ -211,7 +211,7 @@ def _to_muxed_account(account: MuxedAccount) -> str:
     return account.account_muxed
 
 
-def _get_operations(raw_data_map: Dict[str, str], prefix: str) -> List[Operation]:
+def _get_operations(raw_data_map: dict[str, str], prefix: str) -> list[Operation]:
     operations = []
     operation_length = _get_int_value(raw_data_map, f"{prefix}operations.len")
     for i in range(operation_length):
@@ -220,7 +220,7 @@ def _get_operations(raw_data_map: Dict[str, str], prefix: str) -> List[Operation
     return operations
 
 
-def _get_raw_data_map(txrep: str) -> Dict[str, str]:
+def _get_raw_data_map(txrep: str) -> dict[str, str]:
     lines = txrep.strip().split("\n")
     raw_data_map = {}
     for line in lines:
@@ -235,7 +235,7 @@ def _get_raw_data_map(txrep: str) -> Dict[str, str]:
     return raw_data_map
 
 
-def _get_preconditions(raw_data_map: Dict[str, str], prefix: str) -> Preconditions:
+def _get_preconditions(raw_data_map: dict[str, str], prefix: str) -> Preconditions:
     preconditions_type = _get_value(raw_data_map, f"{prefix}type")
     if preconditions_type == stellar_xdr.PreconditionType.PRECOND_TIME.name:
         time_bounds = _get_time_bounds(raw_data_map, prefix)
@@ -271,7 +271,7 @@ def _get_preconditions(raw_data_map: Dict[str, str], prefix: str) -> Preconditio
         )
 
 
-def _get_signer_key(raw_data_map: Dict[str, str], prefix: str) -> SignerKey:
+def _get_signer_key(raw_data_map: dict[str, str], prefix: str) -> SignerKey:
     signer_key_type = _get_value(raw_data_map, f"{prefix}.type")
     if signer_key_type == SignerKeyType.SIGNER_KEY_TYPE_ED25519.name:
         key = _get_value(raw_data_map, f"{prefix}.ed25519")
@@ -289,7 +289,7 @@ def _get_signer_key(raw_data_map: Dict[str, str], prefix: str) -> SignerKey:
     return SignerKey.from_encoded_signer_key(key)
 
 
-def _get_extra_signers(raw_data_map: Dict[str, str], prefix: str) -> List[SignerKey]:
+def _get_extra_signers(raw_data_map: dict[str, str], prefix: str) -> list[SignerKey]:
     extra_signers = []
     extra_signers_length = _get_int_value(raw_data_map, f"{prefix}.len")
     for i in range(extra_signers_length):
@@ -299,8 +299,8 @@ def _get_extra_signers(raw_data_map: Dict[str, str], prefix: str) -> List[Signer
 
 
 def _get_time_bounds_optional(
-    raw_data_map: Dict[str, str], prefix: str
-) -> Optional[TimeBounds]:
+    raw_data_map: dict[str, str], prefix: str
+) -> TimeBounds | None:
     time_bounds_present = _get_bool_value(raw_data_map, f"{prefix}timeBounds._present")
     time_bounds = None
     if time_bounds_present:
@@ -308,15 +308,15 @@ def _get_time_bounds_optional(
     return time_bounds
 
 
-def _get_time_bounds(raw_data_map: Dict[str, str], prefix: str) -> TimeBounds:
+def _get_time_bounds(raw_data_map: dict[str, str], prefix: str) -> TimeBounds:
     min_time = _get_int_value(raw_data_map, f"{prefix}timeBounds.minTime")
     max_time = _get_int_value(raw_data_map, f"{prefix}timeBounds.maxTime")
     return TimeBounds(min_time=min_time, max_time=max_time)
 
 
 def _get_ledger_bounds_optional(
-    raw_data_map: Dict[str, str], prefix: str
-) -> Optional[LedgerBounds]:
+    raw_data_map: dict[str, str], prefix: str
+) -> LedgerBounds | None:
     ledger_bounds_present = _get_bool_value(
         raw_data_map, f"{prefix}ledgerBounds._present"
     )
@@ -326,13 +326,13 @@ def _get_ledger_bounds_optional(
     return ledger_bounds
 
 
-def _get_ledger_bounds(raw_data_map: Dict[str, str], prefix: str) -> LedgerBounds:
+def _get_ledger_bounds(raw_data_map: dict[str, str], prefix: str) -> LedgerBounds:
     min_ledger = _get_int_value(raw_data_map, f"{prefix}ledgerBounds.minLedger")
     max_ledger = _get_int_value(raw_data_map, f"{prefix}ledgerBounds.maxLedger")
     return LedgerBounds(min_ledger=min_ledger, max_ledger=max_ledger)
 
 
-def _get_memo(raw_data_map: Dict[str, str], prefix: str) -> Memo:
+def _get_memo(raw_data_map: dict[str, str], prefix: str) -> Memo:
     memo_type = _get_value(raw_data_map, f"{prefix}memo.type")
     if memo_type == "MEMO_TEXT":
         return TextMemo(_get_bytes_value(raw_data_map, f"{prefix}memo.text"))
@@ -386,7 +386,7 @@ def _remove_string_value_comment(value: str) -> str:
 
 
 def _get_signature(
-    index: int, raw_data_map: Dict[str, str], prefix: str
+    index: int, raw_data_map: dict[str, str], prefix: str
 ) -> DecoratedSignature:
     hint = _get_bytes_value(raw_data_map, f"{prefix}signatures[{index}].hint")
     signature = _get_bytes_value(raw_data_map, f"{prefix}signatures[{index}].signature")
@@ -394,9 +394,9 @@ def _get_signature(
 
 
 def _get_signatures(
-    raw_data_map: Dict[str, str], prefix: str
-) -> List[DecoratedSignature]:
-    signatures: List[DecoratedSignature] = []
+    raw_data_map: dict[str, str], prefix: str
+) -> list[DecoratedSignature]:
+    signatures: list[DecoratedSignature] = []
     signature_length = _get_int_value(raw_data_map, f"{prefix}signatures.len")
     for i in range(signature_length):
         signature = _get_signature(i, raw_data_map, prefix)
@@ -517,7 +517,7 @@ def _get_operation(index, raw_data_map, tx_prefix):
 
 
 def _get_set_options_op(
-    source: Optional[str], operation_prefix: str, raw_data_map: Dict[str, str]
+    source: str | None, operation_prefix: str, raw_data_map: dict[str, str]
 ) -> SetOptions:
     inflation_dest = None
     clear_flags = None
@@ -576,7 +576,7 @@ def _get_set_options_op(
 
 
 def _get_path_payment_strict_receive_op(
-    source: Optional[str], operation_prefix: str, raw_data_map: Dict[str, str]
+    source: str | None, operation_prefix: str, raw_data_map: dict[str, str]
 ) -> PathPaymentStrictReceive:
     send_asset = _get_asset(raw_data_map, f"{operation_prefix}sendAsset")
     send_max = _get_amount_value(raw_data_map, f"{operation_prefix}sendMax")
@@ -600,7 +600,7 @@ def _get_path_payment_strict_receive_op(
 
 
 def _get_path_payment_strict_send_op(
-    source: Optional[str], operation_prefix: str, raw_data_map: Dict[str, str]
+    source: str | None, operation_prefix: str, raw_data_map: dict[str, str]
 ) -> PathPaymentStrictSend:
     send_asset = _get_asset(raw_data_map, f"{operation_prefix}sendAsset")
     send_amount = _get_amount_value(raw_data_map, f"{operation_prefix}sendAmount")
@@ -624,7 +624,7 @@ def _get_path_payment_strict_send_op(
 
 
 def _get_create_passive_sell_offer_op(
-    source: Optional[str], operation_prefix: str, raw_data_map: Dict[str, str]
+    source: str | None, operation_prefix: str, raw_data_map: dict[str, str]
 ) -> CreatePassiveSellOffer:
     selling = _get_asset(raw_data_map, f"{operation_prefix}selling")
     buying = _get_asset(raw_data_map, f"{operation_prefix}buying")
@@ -638,7 +638,7 @@ def _get_create_passive_sell_offer_op(
 
 
 def _get_manage_buy_offer_op(
-    source: Optional[str], operation_prefix: str, raw_data_map: Dict[str, str]
+    source: str | None, operation_prefix: str, raw_data_map: dict[str, str]
 ) -> ManageBuyOffer:
     selling = _get_asset(raw_data_map, f"{operation_prefix}selling")
     buying = _get_asset(raw_data_map, f"{operation_prefix}buying")
@@ -658,7 +658,7 @@ def _get_manage_buy_offer_op(
 
 
 def _get_manage_sell_offer_op(
-    source: Optional[str], operation_prefix: str, raw_data_map: Dict[str, str]
+    source: str | None, operation_prefix: str, raw_data_map: dict[str, str]
 ) -> ManageSellOffer:
     selling = _get_asset(raw_data_map, f"{operation_prefix}selling")
     buying = _get_asset(raw_data_map, f"{operation_prefix}buying")
@@ -678,7 +678,7 @@ def _get_manage_sell_offer_op(
 
 
 def _get_payment_op(
-    source: Optional[str], operation_prefix: str, raw_data_map: Dict[str, str]
+    source: str | None, operation_prefix: str, raw_data_map: dict[str, str]
 ) -> Payment:
     destination = _get_value(raw_data_map, f"{operation_prefix}destination")
     asset = _get_asset(raw_data_map, f"{operation_prefix}asset")
@@ -687,7 +687,7 @@ def _get_payment_op(
 
 
 def _get_manage_data_op(
-    source: Optional[str], operation_prefix: str, raw_data_map: Dict[str, str]
+    source: str | None, operation_prefix: str, raw_data_map: dict[str, str]
 ) -> ManageData:
     data_name = _get_string_value(raw_data_map, f"{operation_prefix}dataName")
     data_value = None
@@ -697,14 +697,14 @@ def _get_manage_data_op(
 
 
 def _get_bump_sequence_op(
-    source: Optional[str], operation_prefix: str, raw_data_map: Dict[str, str]
+    source: str | None, operation_prefix: str, raw_data_map: dict[str, str]
 ) -> BumpSequence:
     bump_to = _get_int_value(raw_data_map, f"{operation_prefix}bumpTo")
     return BumpSequence(bump_to=bump_to, source=source)
 
 
 def _get_allow_trust_op(
-    source: Optional[str], operation_prefix: str, raw_data_map: Dict[str, str]
+    source: str | None, operation_prefix: str, raw_data_map: dict[str, str]
 ) -> AllowTrust:
     trustor = _get_value(raw_data_map, f"{operation_prefix}trustor")
     asset_code = _get_value(raw_data_map, f"{operation_prefix}asset")
@@ -715,7 +715,7 @@ def _get_allow_trust_op(
 
 
 def _get_change_trust_op(
-    source: Optional[str], operation_prefix: str, raw_data_map: Dict[str, str]
+    source: str | None, operation_prefix: str, raw_data_map: dict[str, str]
 ) -> ChangeTrust:
     # Keep compatibility
     line_type = raw_data_map.get(f"{operation_prefix}line.type", None)
@@ -729,9 +729,7 @@ def _get_change_trust_op(
         fee = _get_int_value(
             raw_data_map, f"{operation_prefix}line.liquidityPool.constantProduct.fee"
         )
-        line: Union[Asset, LiquidityPoolAsset] = LiquidityPoolAsset(
-            asset_a, asset_b, fee
-        )
+        line: Asset | LiquidityPoolAsset = LiquidityPoolAsset(asset_a, asset_b, fee)
     else:
         line = _get_asset(raw_data_map, f"{operation_prefix}line")
     limit = _get_amount_value(raw_data_map, f"{operation_prefix}limit")
@@ -739,15 +737,15 @@ def _get_change_trust_op(
 
 
 def _get_inflation_op(
-    source: Optional[str],
+    source: str | None,
 ) -> Inflation:
     return Inflation(source=source)
 
 
 def _get_account_merge_op(
-    source: Optional[str],
+    source: str | None,
     transaction_prefix: str,
-    raw_data_map: Dict[str, str],
+    raw_data_map: dict[str, str],
     index: int,
 ) -> AccountMerge:
     destination = _get_value(
@@ -757,7 +755,7 @@ def _get_account_merge_op(
 
 
 def _get_create_account_op(
-    source: Optional[str], operation_prefix: str, raw_data_map: Dict[str, str]
+    source: str | None, operation_prefix: str, raw_data_map: dict[str, str]
 ) -> CreateAccount:
     destination = _get_value(raw_data_map, f"{operation_prefix}destination")
     starting_balance = _get_amount_value(
@@ -769,21 +767,21 @@ def _get_create_account_op(
 
 
 def _get_begin_sponsoring_future_reserves_op(
-    source: Optional[str], operation_prefix: str, raw_data_map: Dict[str, str]
+    source: str | None, operation_prefix: str, raw_data_map: dict[str, str]
 ) -> BeginSponsoringFutureReserves:
     sponsored_id = _get_value(raw_data_map, f"{operation_prefix}sponsoredID")
     return BeginSponsoringFutureReserves(sponsored_id=sponsored_id, source=source)
 
 
 def _get_claim_claimable_balance_op(
-    source: Optional[str], operation_prefix: str, raw_data_map: Dict[str, str]
+    source: str | None, operation_prefix: str, raw_data_map: dict[str, str]
 ) -> ClaimClaimableBalance:
     balance_id = _get_value(raw_data_map, f"{operation_prefix}balanceID")
     return ClaimClaimableBalance(balance_id=balance_id, source=source)
 
 
 def _get_clawback_op(
-    source: Optional[str], operation_prefix: str, raw_data_map: Dict[str, str]
+    source: str | None, operation_prefix: str, raw_data_map: dict[str, str]
 ) -> Clawback:
     asset = _get_asset(raw_data_map, f"{operation_prefix}asset")
     from_ = _get_value(raw_data_map, f"{operation_prefix}from")
@@ -792,17 +790,17 @@ def _get_clawback_op(
 
 
 def _get_clawback_claimable_balance_op(
-    source: Optional[str], operation_prefix: str, raw_data_map: Dict[str, str]
+    source: str | None, operation_prefix: str, raw_data_map: dict[str, str]
 ) -> ClawbackClaimableBalance:
     balance_id = _get_value(raw_data_map, f"{operation_prefix}balanceID")
     return ClawbackClaimableBalance(balance_id=balance_id, source=source)
 
 
 def _get_create_claimable_balance_op(
-    source: Optional[str], operation_prefix: str, raw_data_map: Dict[str, str]
+    source: str | None, operation_prefix: str, raw_data_map: dict[str, str]
 ):
     def parse_claimant_predicate(
-        prefix: str, raw_data_map: Dict[str, str]
+        prefix: str, raw_data_map: dict[str, str]
     ) -> ClaimPredicate:
         claimant_predicate_type = _get_value(raw_data_map, f"{prefix}.type")
         if claimant_predicate_type == ClaimPredicateType.CLAIM_PREDICATE_AND.name:
@@ -836,7 +834,7 @@ def _get_create_claimable_balance_op(
 
     asset = _get_asset(raw_data_map, f"{operation_prefix}asset")
     amount = _get_amount_value(raw_data_map, f"{operation_prefix}amount")
-    claimants: List[Claimant] = []
+    claimants: list[Claimant] = []
     claimants_len = _get_int_value(raw_data_map, f"{operation_prefix}claimants.len")
 
     for index in range(claimants_len):
@@ -854,13 +852,13 @@ def _get_create_claimable_balance_op(
 
 
 def _get_end_sponsoring_future_reserves_op(
-    source: Optional[str],
+    source: str | None,
 ) -> EndSponsoringFutureReserves:
     return EndSponsoringFutureReserves(source=source)
 
 
 def _get_revoke_sponsorship_op(
-    source: Optional[str], operation_prefix: str, raw_data_map: Dict[str, str]
+    source: str | None, operation_prefix: str, raw_data_map: dict[str, str]
 ) -> RevokeSponsorship:
     revoke_sponsorship_type = _get_value(raw_data_map, f"{operation_prefix}type")
     if (
@@ -965,7 +963,7 @@ def _get_revoke_sponsorship_op(
 
 
 def _get_set_trust_line_flags_op(
-    source: Optional[str], operation_prefix: str, raw_data_map: Dict[str, str]
+    source: str | None, operation_prefix: str, raw_data_map: dict[str, str]
 ) -> SetTrustLineFlags:
     trustor = _get_value(raw_data_map, f"{operation_prefix}trustor")
     asset = _get_asset(raw_data_map, f"{operation_prefix}asset")
@@ -989,7 +987,7 @@ def _get_set_trust_line_flags_op(
 
 
 def _get_liquidity_pool_deposit_op(
-    source: Optional[str], operation_prefix: str, raw_data_map: Dict[str, str]
+    source: str | None, operation_prefix: str, raw_data_map: dict[str, str]
 ):
     liquidity_pool_id = _get_value(raw_data_map, f"{operation_prefix}liquidityPoolID")
     max_amount_a = _get_amount_value(raw_data_map, f"{operation_prefix}maxAmountA")
@@ -1011,7 +1009,7 @@ def _get_liquidity_pool_deposit_op(
 
 
 def _get_liquidity_pool_withdraw_op(
-    source: Optional[str], operation_prefix: str, raw_data_map: Dict[str, str]
+    source: str | None, operation_prefix: str, raw_data_map: dict[str, str]
 ):
     liquidity_pool_id = _get_value(raw_data_map, f"{operation_prefix}liquidityPoolID")
     amount = _get_amount_value(raw_data_map, f"{operation_prefix}amount")
@@ -1026,16 +1024,16 @@ def _get_liquidity_pool_withdraw_op(
     )
 
 
-def _get_asset(raw_data_map: Dict[str, str], key: str) -> Asset:
+def _get_asset(raw_data_map: dict[str, str], key: str) -> Asset:
     return _decode_asset(_get_value(raw_data_map, key))
 
 
-def _get_amount_value(raw_data_map: Dict[str, str], key: str) -> str:
+def _get_amount_value(raw_data_map: dict[str, str], key: str) -> str:
     value = _get_int_value(raw_data_map, key)
     return Operation.from_xdr_amount(value)
 
 
-def _get_int_value(raw_data_map: Dict[str, str], key: str) -> int:
+def _get_int_value(raw_data_map: dict[str, str], key: str) -> int:
     value = _get_value(raw_data_map, key)
     try:
         return int(value)
@@ -1043,7 +1041,7 @@ def _get_int_value(raw_data_map: Dict[str, str], key: str) -> int:
         raise ValueError(f"Failed to convert `{value}` to int type.") from e
 
 
-def _get_bool_value(raw_data_map: Dict[str, str], key: str) -> bool:
+def _get_bool_value(raw_data_map: dict[str, str], key: str) -> bool:
     value = _get_value(raw_data_map, key)
     if value == _true:
         return True
@@ -1053,7 +1051,7 @@ def _get_bool_value(raw_data_map: Dict[str, str], key: str) -> bool:
         raise ValueError(f"Failed to convert `{value}` to bool type.")
 
 
-def _get_bytes_value(raw_data_map: Dict[str, str], key: str) -> bytes:
+def _get_bytes_value(raw_data_map: dict[str, str], key: str) -> bytes:
     value = _get_value(raw_data_map, key)
     if value[0] == '"':
         # for text memo.
@@ -1064,14 +1062,14 @@ def _get_bytes_value(raw_data_map: Dict[str, str], key: str) -> bytes:
         raise ValueError(f"Failed to convert `{value}` to bytes type.") from e
 
 
-def _get_string_value(raw_data_map: Dict[str, str], key: str) -> str:
+def _get_string_value(raw_data_map: dict[str, str], key: str) -> str:
     value = _get_value(raw_data_map, key)
     if len(value) == 0:
         return value
     return value[1:-1]
 
 
-def _get_value(raw_data_map: Dict[str, str], key: str) -> str:
+def _get_value(raw_data_map: dict[str, str], key: str) -> str:
     try:
         return raw_data_map[key]
     except KeyError as e:
@@ -1090,15 +1088,15 @@ def _decode_asset(asset: str) -> Asset:
 
 def _add_line(
     key: str,
-    value: Union[str, int],
-    lines: List[str],
-    comment: Optional[Union[str, int, Decimal]] = None,
+    value: str | int,
+    lines: list[str],
+    comment: str | int | Decimal | None = None,
 ) -> None:
     lines.append(f"{key}: {value}{' (' + str(comment) + ')' if comment else ''}")
 
 
 def _add_preconditions(
-    cond: Optional[Preconditions], prefix: str, lines: List[str]
+    cond: Preconditions | None, prefix: str, lines: list[str]
 ) -> None:
     if cond is None:
         cond_xdr = stellar_xdr.Preconditions(stellar_xdr.PreconditionType.PRECOND_NONE)
@@ -1130,7 +1128,7 @@ def _add_preconditions(
         )
 
 
-def _add_signer_key(prefix: str, signer_key: SignerKey, lines: List[str]) -> None:
+def _add_signer_key(prefix: str, signer_key: SignerKey, lines: list[str]) -> None:
     _add_line(f"{prefix}.type", signer_key.signer_key_type.name, lines)
     key = signer_key.encoded_signer_key
     if signer_key.signer_key_type == SignerKeyType.SIGNER_KEY_TYPE_ED25519:
@@ -1152,7 +1150,7 @@ def _add_signer_key(prefix: str, signer_key: SignerKey, lines: List[str]) -> Non
 
 
 def _add_extra_signers(
-    prefix: str, extra_signers: Optional[Sequence[SignerKey]], lines: List[str]
+    prefix: str, extra_signers: Sequence[SignerKey] | None, lines: list[str]
 ) -> None:
     if extra_signers is None:
         extra_signers = []
@@ -1162,7 +1160,7 @@ def _add_extra_signers(
 
 
 def _add_time_bounds_optional(
-    time_bounds: Optional[TimeBounds], prefix: str, lines: List[str]
+    time_bounds: TimeBounds | None, prefix: str, lines: list[str]
 ) -> None:
     if time_bounds is None:
         _add_line(f"{prefix}timeBounds._present", _false, lines)
@@ -1171,7 +1169,7 @@ def _add_time_bounds_optional(
         _add_time_bounds(time_bounds, prefix, lines)
 
 
-def _add_time_bounds(time_bounds: TimeBounds, prefix: str, lines: List[str]) -> None:
+def _add_time_bounds(time_bounds: TimeBounds, prefix: str, lines: list[str]) -> None:
     _add_line(
         f"{prefix}timeBounds.minTime",
         time_bounds.min_time,
@@ -1187,7 +1185,7 @@ def _add_time_bounds(time_bounds: TimeBounds, prefix: str, lines: List[str]) -> 
 
 
 def _add_ledger_bounds_optional(
-    ledger_bounds: Optional[LedgerBounds], prefix: str, lines: List[str]
+    ledger_bounds: LedgerBounds | None, prefix: str, lines: list[str]
 ) -> None:
     if ledger_bounds is None:
         _add_line(f"{prefix}ledgerBounds._present", _false, lines)
@@ -1197,13 +1195,13 @@ def _add_ledger_bounds_optional(
 
 
 def _add_ledger_bounds(
-    ledger_bounds: LedgerBounds, prefix: str, lines: List[str]
+    ledger_bounds: LedgerBounds, prefix: str, lines: list[str]
 ) -> None:
     _add_line(f"{prefix}ledgerBounds.minLedger", ledger_bounds.min_ledger, lines, None)
     _add_line(f"{prefix}ledgerBounds.maxLedger", ledger_bounds.max_ledger, lines, None)
 
 
-def _add_memo(memo: Memo, prefix: str, lines: List[str]) -> None:
+def _add_memo(memo: Memo, prefix: str, lines: list[str]) -> None:
     if isinstance(memo, NoneMemo):
         _add_line(f"{prefix}memo.type", "MEMO_NONE", lines)
     if isinstance(memo, TextMemo):
@@ -1222,7 +1220,7 @@ def _add_memo(memo: Memo, prefix: str, lines: List[str]) -> None:
 
 
 def _add_operations(
-    operations: Sequence[Operation], prefix: str, lines: List[str]
+    operations: Sequence[Operation], prefix: str, lines: list[str]
 ) -> None:
     _add_line(f"{prefix}operations.len", len(operations), lines)
     for index, operation in enumerate(operations):
@@ -1230,15 +1228,15 @@ def _add_operations(
 
 
 def _add_operation(
-    index: int, operation: Operation, prefix: str, lines: List[str]
+    index: int, operation: Operation, prefix: str, lines: list[str]
 ) -> None:
     prefix = f"{prefix}operations[{index}]."
     operation_type = operation.__class__.__name__
 
     def add_operation_line(
         key: str,
-        value: Union[str, int],
-        comment: Optional[Union[str, int, Decimal]] = None,
+        value: str | int,
+        comment: str | int | Decimal | None = None,
     ) -> None:
         _add_line(f"{prefix}{key}", value, lines, comment)
 
@@ -1256,9 +1254,9 @@ def _add_operation(
 
     def add_body_line(
         key: str,
-        value: Union[str, int, None],
+        value: str | int | None,
         optional: bool = False,
-        comment: Optional[Union[str, int, Decimal]] = None,
+        comment: str | int | Decimal | None = None,
     ) -> None:
         operation_type = operation.__class__.__name__
         key = f"body.{_to_camel_case(operation_type)}Op.{key}"
@@ -1272,19 +1270,19 @@ def _add_operation(
             assert value is not None
             add_operation_line(key, value, comment=comment)
 
-    def add_signer(signer: Optional[Signer]) -> None:
+    def add_signer(signer: Signer | None) -> None:
         add_body_line("signer._present", _false if signer is None else _true)
         if signer is None:
             return
         add_body_line("signer.key", signer.signer_key.encoded_signer_key)
         add_body_line("signer.weight", signer.weight)
 
-    def add_price(price: Union[Price, str, Decimal]) -> None:
+    def add_price(price: Price | str | Decimal) -> None:
         price = _to_price(price)
         add_body_line("price.n", price.n)
         add_body_line("price.d", price.d)
 
-    def add_home_domain(home_domain: Optional[str]) -> None:
+    def add_home_domain(home_domain: str | None) -> None:
         if home_domain is None:
             add_body_line("homeDomain", None, True)
         else:
@@ -1659,7 +1657,7 @@ def _add_operation(
 
 
 def _add_signatures(
-    signatures: Sequence[DecoratedSignature], prefix: str, lines: List[str]
+    signatures: Sequence[DecoratedSignature], prefix: str, lines: list[str]
 ) -> None:
     _add_line(f"{prefix}signatures.len", len(signatures), lines)
     for index, signature in enumerate(signatures):
@@ -1667,14 +1665,14 @@ def _add_signatures(
 
 
 def _add_signature(
-    index: int, signature: DecoratedSignature, prefix: str, lines: List[str]
+    index: int, signature: DecoratedSignature, prefix: str, lines: list[str]
 ) -> None:
     prefix = f"{prefix}signatures[{index}]."
     _add_line(f"{prefix}hint", _to_opaque(signature.signature_hint), lines)
     _add_line(f"{prefix}signature", _to_opaque(signature.signature), lines)
 
 
-def _to_asset(asset: Union[Asset, LiquidityPoolAsset, LiquidityPoolId]) -> str:
+def _to_asset(asset: Asset | LiquidityPoolAsset | LiquidityPoolId) -> str:
     if not isinstance(asset, Asset):
         raise ValueError("Unexpected asset type.")
     if asset.is_native():
@@ -1687,7 +1685,7 @@ def _to_readable_utc_time_comment(timestamp: int) -> str:
     return utc_time.strftime("%Y-%m-%d %H:%M:%S.%f+00:00 (UTC)")
 
 
-def _to_muxed_account_comment(account: MuxedAccount) -> Optional[str]:
+def _to_muxed_account_comment(account: MuxedAccount) -> str | None:
     if account.account_muxed_id is None:
         return None
     return (
@@ -1695,11 +1693,11 @@ def _to_muxed_account_comment(account: MuxedAccount) -> Optional[str]:
     )
 
 
-def _to_amount(amount: Union[Decimal, str]) -> int:
+def _to_amount(amount: Decimal | str) -> int:
     return Operation.to_xdr_amount(amount)
 
 
-def _to_price(price: Union[Price, str, Decimal]) -> Price:
+def _to_price(price: Price | str | Decimal) -> Price:
     if isinstance(price, Price):
         price_fraction = price
     else:
@@ -1715,7 +1713,7 @@ def _to_caps_with_under(word):
     return "".join(["_" + c if c.isupper() else c for c in word]).lstrip("_").upper()
 
 
-def _to_string(value: Union[str, bytes]) -> str:
+def _to_string(value: str | bytes) -> str:
     if isinstance(value, str):
         return json.dumps(value)
     # We are not following the standard here, it needs more discussion.
