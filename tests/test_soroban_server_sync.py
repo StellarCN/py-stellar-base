@@ -11,6 +11,7 @@ from stellar_sdk.address import Address
 from stellar_sdk.base_soroban_server import ResourceLeeway
 from stellar_sdk.exceptions import (
     AccountNotFoundException,
+    BadResponseError,
     PrepareTransactionException,
     SorobanRpcErrorResponse,
 )
@@ -1276,6 +1277,13 @@ class TestSorobanServer:
         val_error = e.value.errors()[0]
         assert val_error["type"] == "value_error"
         assert val_error["msg"].endswith("end_ledger and cursor cannot both be set")
+
+    def test_non_json_response(self):
+        with requests_mock.Mocker() as m:
+            m.post(RPC_URL, status_code=500, text="Cloudflare 500 error")
+
+            with pytest.raises(BadResponseError):
+                SorobanServer(RPC_URL).get_health()
 
 
 def _build_soroban_transaction(
