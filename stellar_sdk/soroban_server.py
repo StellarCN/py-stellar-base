@@ -22,6 +22,7 @@ from .exceptions import (
     AccountNotFoundException,
     PrepareTransactionException,
     SorobanRpcErrorResponse,
+    raise_request_exception,
 )
 from .keypair import Keypair
 from .soroban_rpc import *
@@ -70,6 +71,7 @@ class SorobanServer:
 
         :return: A :class:`GetHealthResponse <stellar_sdk.soroban_rpc.GetHealthResponse>` object.
         :raises: :exc:`SorobanRpcErrorResponse <stellar_sdk.exceptions.SorobanRpcErrorResponse>` - If the Soroban-RPC instance returns an error response.
+        :raises: :exc:`BadResponseError <stellar_sdk.exceptions.BadResponseError>` - If a non-JSON error response is returned, possibly by a CDN or reverse proxy.
         """
         request: Request = Request(
             id=_generate_unique_request_id(),
@@ -97,6 +99,7 @@ class SorobanServer:
         :param limit: The maximum number of records to return.
         :return: A :class:`GetEventsResponse <stellar_sdk.soroban_rpc.GetEventsResponse>` object.
         :raises: :exc:`SorobanRpcErrorResponse <stellar_sdk.exceptions.SorobanRpcErrorResponse>` - If the Soroban-RPC instance returns an error response.
+        :raises: :exc:`BadResponseError <stellar_sdk.exceptions.BadResponseError>` - If a non-JSON error response is returned, possibly by a CDN or reverse proxy.
         """
         pagination = PaginationOptions(cursor=cursor, limit=limit)
         data = GetEventsRequest(
@@ -117,6 +120,7 @@ class SorobanServer:
 
         :return: A :class:`GetNetworkResponse <stellar_sdk.soroban_rpc.GetNetworkResponse>` object.
         :raises: :exc:`SorobanRpcErrorResponse <stellar_sdk.exceptions.SorobanRpcErrorResponse>` - If the Soroban-RPC instance returns an error response.
+        :raises: :exc:`BadResponseError <stellar_sdk.exceptions.BadResponseError>` - If a non-JSON error response is returned, possibly by a CDN or reverse proxy.
         """
         request: Request = Request(
             id=_generate_unique_request_id(),
@@ -132,6 +136,7 @@ class SorobanServer:
 
         :return: A :class:`GetLatestLedgerResponse <stellar_sdk.soroban_rpc.GetLatestLedgerResponse>` object.
         :raises: :exc:`SorobanRpcErrorResponse <stellar_sdk.exceptions.SorobanRpcErrorResponse>` - If the Soroban-RPC instance returns an error response.
+        :raises: :exc:`BadResponseError <stellar_sdk.exceptions.BadResponseError>` - If a non-JSON error response is returned, possibly by a CDN or reverse proxy.
         """
         request: Request = Request(
             id=_generate_unique_request_id(),
@@ -154,6 +159,7 @@ class SorobanServer:
         :param keys: The ledger keys to fetch.
         :return: A :class:`GetLedgerEntriesResponse <stellar_sdk.soroban_rpc.GetLedgerEntriesResponse>` object.
         :raises: :exc:`SorobanRpcErrorResponse <stellar_sdk.exceptions.SorobanRpcErrorResponse>` - If the Soroban-RPC instance returns an error response.
+        :raises: :exc:`BadResponseError <stellar_sdk.exceptions.BadResponseError>` - If a non-JSON error response is returned, possibly by a CDN or reverse proxy.
         """
         request = Request[GetLedgerEntriesRequest](
             id=_generate_unique_request_id(),
@@ -170,6 +176,7 @@ class SorobanServer:
         :param transaction_hash: The hash of the transaction to fetch.
         :return: A :class:`GetTransactionResponse <stellar_sdk.soroban_rpc.GetTransactionResponse>` object.
         :raises: :exc:`SorobanRpcErrorResponse <stellar_sdk.exceptions.SorobanRpcErrorResponse>` - If the Soroban-RPC instance returns an error response.
+        :raises: :exc:`BadResponseError <stellar_sdk.exceptions.BadResponseError>` - If a non-JSON error response is returned, possibly by a CDN or reverse proxy.
         """
         request = Request[GetTransactionRequest](
             id=_generate_unique_request_id(),
@@ -197,6 +204,8 @@ class SorobanServer:
         :param auth_mode: Explicitly allows users to opt-in to non-root authorization in recording mode.
         :return: A :class:`SimulateTransactionResponse <stellar_sdk.soroban_rpc.SimulateTransactionResponse>` object
             contains the cost, footprint, result/auth requirements (if applicable), and error of the transaction.
+        :raises: :exc:`SorobanRpcErrorResponse <stellar_sdk.exceptions.SorobanRpcErrorResponse>` - If the Soroban-RPC instance returns an error response.
+        :raises: :exc:`BadResponseError <stellar_sdk.exceptions.BadResponseError>` - If a non-JSON error response is returned, possibly by a CDN or reverse proxy.
         """
         xdr = (
             transaction_envelope
@@ -229,6 +238,7 @@ class SorobanServer:
         :param transaction_envelope: The transaction to send.
         :return: A :class:`SendTransactionResponse <stellar_sdk.soroban_rpc.SendTransactionResponse>` object.
         :raises: :exc:`SorobanRpcErrorResponse <stellar_sdk.exceptions.SorobanRpcErrorResponse>` - If the Soroban-RPC instance returns an error response.
+        :raises: :exc:`BadResponseError <stellar_sdk.exceptions.BadResponseError>` - If a non-JSON error response is returned, possibly by a CDN or reverse proxy.
         """
         xdr = (
             transaction_envelope
@@ -257,6 +267,7 @@ class SorobanServer:
         :param sleep_strategy: The amount of time to wait for between each attempt, defaults to 1 second between each attempt.
         :return: A :class:`GetTransactionResponse <stellar_sdk.soroban_rpc.GetTransactionResponse>` response object after a "found" response, (which may be success or failure) or the last response obtained after polling the maximum number of specified attempts.
         :raises: :exc:`SorobanRpcErrorResponse <stellar_sdk.exceptions.SorobanRpcErrorResponse>` - If the Soroban-RPC instance returns an error response.
+        :raises: :exc:`BadResponseError <stellar_sdk.exceptions.BadResponseError>` - If a non-JSON error response is returned, possibly by a CDN or reverse proxy.
         """
         if max_attempts < 1:
             raise ValueError("max_attempts must be greater than 0")
@@ -280,6 +291,7 @@ class SorobanServer:
 
         :return: A :class:`GetFeeStatsResponse <stellar_sdk.soroban_rpc.GetFeeStatsResponse>` object.
         :raises: :exc:`SorobanRpcErrorResponse <stellar_sdk.exceptions.SorobanRpcErrorResponse>` - If the Soroban-RPC instance returns an error response.
+        :raises: :exc:`BadResponseError <stellar_sdk.exceptions.BadResponseError>` - If a non-JSON error response is returned, possibly by a CDN or reverse proxy.
         """
         request: Request = Request(
             id=_generate_unique_request_id(),
@@ -304,6 +316,7 @@ class SorobanServer:
         :param limit: The maximum number of records to return.
         :return: A :class:`GetTransactionsResponse <stellar_sdk.soroban_rpc.GetTransactionsResponse>` object.
         :raises: :exc:`SorobanRpcErrorResponse <stellar_sdk.exceptions.SorobanRpcErrorResponse>` - If the Soroban-RPC instance returns an error response.
+        :raises: :exc:`BadResponseError <stellar_sdk.exceptions.BadResponseError>` - If a non-JSON error response is returned, possibly by a CDN or reverse proxy.
         """
         pagination = PaginationOptions(cursor=cursor, limit=limit)
         data = GetTransactionsRequest(
@@ -331,6 +344,7 @@ class SorobanServer:
         :param limit: The maximum number of records to return.
         :return: A :class:`GetLedgersResponse <stellar_sdk.soroban_rpc.GetLedgersResponse>` object.
         :raises: :exc:`SorobanRpcErrorResponse <stellar_sdk.exceptions.SorobanRpcErrorResponse>` - If the Soroban-RPC instance returns an error response.
+        :raises: :exc:`BadResponseError <stellar_sdk.exceptions.BadResponseError>` - If a non-JSON error response is returned, possibly by a CDN or reverse proxy.
         """
         pagination = PaginationOptions(cursor=cursor, limit=limit)
         data = GetLedgersRequest(
@@ -350,6 +364,7 @@ class SorobanServer:
         :return: An :class:`Account <stellar_sdk.account.Account>` object.
         :raises: :exc:`AccountNotFoundException <stellar_sdk.exceptions.AccountNotFoundException>` - If the account is not found on the network.
         :raises: :exc:`SorobanRpcErrorResponse <stellar_sdk.exceptions.SorobanRpcErrorResponse>` - If the Soroban-RPC instance returns an error response.
+        :raises: :exc:`BadResponseError <stellar_sdk.exceptions.BadResponseError>` - If a non-JSON error response is returned, possibly by a CDN or reverse proxy.
         """
         account_id_xdr = Keypair.from_public_key(account_id).xdr_account_id()
         key = stellar_xdr.LedgerKey(
@@ -380,6 +395,7 @@ class SorobanServer:
             :class:`Durability.TEMPORARY` or :class:`Durability.PERSISTENT`. Defaults to :class:`Durability.PERSISTENT`.
         :return: A :class:`LedgerEntryResult <stellar_sdk.soroban_rpc.LedgerEntryResult>` object contains the ledger entry result or ``None`` if not found.
         :raises: :exc:`SorobanRpcErrorResponse <stellar_sdk.exceptions.SorobanRpcErrorResponse>` - If the Soroban-RPC instance returns an error response.
+        :raises: :exc:`BadResponseError <stellar_sdk.exceptions.BadResponseError>` - If a non-JSON error response is returned, possibly by a CDN or reverse proxy.
         """
         sc_address = Address(contract_id).to_xdr_sc_address()
         xdr_durability = (
@@ -408,6 +424,7 @@ class SorobanServer:
 
         :return: A :class:`GetVersionInfoResponse <stellar_sdk.soroban_rpc.GetVersionInfoResponse>` object.
         :raises: :exc:`SorobanRpcErrorResponse <stellar_sdk.exceptions.SorobanRpcErrorResponse>` - If the Soroban-RPC instance returns an error response.
+        :raises: :exc:`BadResponseError <stellar_sdk.exceptions.BadResponseError>` - If a non-JSON error response is returned, possibly by a CDN or reverse proxy.
         """
         request: Request = Request(
             id=_generate_unique_request_id(),
@@ -533,7 +550,12 @@ class SorobanServer:
             self.server_url,
             json_data=json.loads(json_data),
         )
-        raw_response = Response[Any].model_validate(data.json())
+        try:
+            raw_response = Response[Any].model_validate(data.json())
+        except json.JSONDecodeError as exc:
+            raise_request_exception(data)
+            # in practice the above should always raise and the re-raise is to please type checkers
+            raise exc
 
         if raw_response.error:
             raise SorobanRpcErrorResponse(
