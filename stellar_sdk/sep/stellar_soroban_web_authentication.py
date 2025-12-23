@@ -42,8 +42,7 @@ WEB_AUTH_VERIFY_FUNCTION_NAME = "web_auth_verify"
 
 
 class ChallengeAuthorizationEntries:
-    """Used to store the results produced by
-    :func:`stellar_sdk.sep.stellar_soroban_web_authentication.read_challenge_authorization_entries`.
+    """Used to store the results of parsing a SEP-45 challenge's authorization entries.
 
     :param authorization_entries: The SorobanAuthorizationEntries objects parsed from challenge XDR.
     :param client_account_id: The contract account (C...) that the wallet wishes to authenticate with the server.
@@ -142,7 +141,7 @@ def read_challenge_authorization_entries(
     :func:`stellar_sdk.sep.stellar_soroban_web_authentication.verify_challenge_authorization_entries`
     to verify the signatures via simulation.
 
-    :param challenge_authorization_entries: SEP0045 challenge authorization entries in base64.
+    :param challenge_authorization_entries: SEP-0045 challenge authorization entries in base64.
     :param server_account_id: Public key (G...) for server's account.
     :param home_domains: The home domain that is expected to be included in the authorization entry's arguments.
         If a list is provided, one of the domain names in the array must match.
@@ -340,7 +339,7 @@ def build_challenge_authorization_entries(
     client_domain_account: str | None = None,
     simulate_tx_account: str = NULL_ACCOUNT,
 ) -> str:
-    """Returns a valid `SEP0045 <https://github.com/stellar/stellar-protocol/blob/master/ecosystem/sep-0045.md>`_
+    """Returns a valid `SEP-0045 <https://github.com/stellar/stellar-protocol/blob/master/ecosystem/sep-0045.md>`_
     challenge which you can use for Stellar Soroban Web Authentication.
 
     :param soroban_server: The SorobanServer to use for simulating the transaction.
@@ -392,7 +391,7 @@ async def build_challenge_authorization_entries_async(
     client_domain_account: str | None = None,
     simulate_tx_account: str = NULL_ACCOUNT,
 ) -> str:
-    """Returns a valid `SEP0045 <https://github.com/stellar/stellar-protocol/blob/master/ecosystem/sep-0045.md>`_
+    """Returns a valid `SEP-0045 <https://github.com/stellar/stellar-protocol/blob/master/ecosystem/sep-0045.md>`_
     challenge which you can use for Stellar Soroban Web Authentication.
 
     This is the async version of :func:`build_challenge_authorization_entries`.
@@ -450,7 +449,7 @@ def verify_challenge_authorization_entries(
     simulation succeeds, the signatures are valid.
 
     :param soroban_server: The SorobanServer to use for simulating the transaction.
-    :param challenge_authorization_entries: SEP0045 challenge authorization entries in base64.
+    :param challenge_authorization_entries: SEP-0045 challenge authorization entries in base64.
     :param server_account_id: Public key (G...) for server's account.
     :param home_domains: The home domain that is expected to be included in the authorization entry's arguments.
         If a list is provided, one of the domain names in the array must match.
@@ -498,7 +497,7 @@ async def verify_challenge_authorization_entries_async(
     simulation succeeds, the signatures are valid.
 
     :param soroban_server: The SorobanServerAsync to use for simulating the transaction.
-    :param challenge_authorization_entries: SEP0045 challenge authorization entries in base64.
+    :param challenge_authorization_entries: SEP-0045 challenge authorization entries in base64.
     :param server_account_id: Public key (G...) for server's account.
     :param home_domains: The home domain that is expected to be included in the authorization entry's arguments.
         If a list is provided, one of the domain names in the array must match.
