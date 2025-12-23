@@ -68,6 +68,10 @@ class ChallengeAuthorizationEntries:
         client_domain: str | None = None,
         client_domain_account: str | None = None,
     ) -> None:
+        if (client_domain is None) != (client_domain_account is None):
+            raise ValueError(
+                "client_domain and client_domain_account must both be provided or both be None."
+            )
         self.authorization_entries = authorization_entries
         self.client_account_id = client_account_id
         self.matched_home_domain = matched_home_domain
@@ -260,9 +264,9 @@ def read_challenge_authorization_entries(
                 f"Home domain '{matched_home_domain}' does not match expected home domains."
             )
 
-    if client_domain and not client_domain_account:
+    if (client_domain is None) != (client_domain_account is None):
         raise InvalidSep45ChallengeError(
-            "'client_domain_account' is required when 'client_domain' is provided."
+            "'client_domain' and 'client_domain_account' must both be provided or both be absent."
         )
 
     server_entry_found = False
@@ -555,11 +559,12 @@ def _build_challenge_tx(
         "web_auth_domain_account": scval.to_string(web_auth_domain_account),
     }
 
-    if client_domain:
-        if not client_domain_account:
-            raise ValueError(
-                "client_domain_account is required if client_domain is provided."
-            )
+    if (client_domain is None) != (client_domain_account is None):
+        raise ValueError(
+            "client_domain and client_domain_account must both be provided or both be None."
+        )
+
+    if client_domain and client_domain_account:
         args["client_domain"] = scval.to_string(client_domain)
         args["client_domain_account"] = scval.to_string(client_domain_account)
 
@@ -638,7 +643,7 @@ def _build_verify_tx(
         "web_auth_domain_account": scval.to_string(parsed_challenge.server_account_id),
     }
 
-    if parsed_challenge.client_domain:
+    if parsed_challenge.client_domain and parsed_challenge.client_domain_account:
         args["client_domain"] = scval.to_string(parsed_challenge.client_domain)
         args["client_domain_account"] = scval.to_string(
             parsed_challenge.client_domain_account
