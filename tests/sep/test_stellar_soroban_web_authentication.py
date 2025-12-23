@@ -875,7 +875,57 @@ def test_read_challenge_client_domain_without_account():
 
     with pytest.raises(
         InvalidSep45ChallengeError,
-        match="'client_domain_account' is required when 'client_domain' is provided.",
+        match="'client_domain' and 'client_domain_account' must both be provided or both be absent.",
+    ):
+        read_challenge_authorization_entries(
+            challenge_authorization_entries=entries.to_xdr(),
+            server_account_id=SERVER_ACCOUNT,
+            home_domains=HOME_DOMAIN,
+            web_auth_domain=WEB_AUTH_DOMAIN,
+            web_auth_contract=WEB_AUTH_CONTRACT,
+        )
+
+
+def test_read_challenge_client_domain_account_without_domain():
+    """Test that client_domain_account without client_domain raises error."""
+    # Build args with client_domain_account but no client_domain
+    args_map = {
+        scval.to_symbol("account"): scval.to_string(CLIENT_CONTRACT_ACCOUNT),
+        scval.to_symbol("home_domain"): scval.to_string(HOME_DOMAIN),
+        scval.to_symbol("nonce"): scval.to_string(NONCE),
+        scval.to_symbol("web_auth_domain"): scval.to_string(WEB_AUTH_DOMAIN),
+        scval.to_symbol("web_auth_domain_account"): scval.to_string(SERVER_ACCOUNT),
+        scval.to_symbol("client_domain_account"): scval.to_string(
+            CLIENT_DOMAIN_ACCOUNT
+        ),
+        # Missing client_domain
+    }
+    root_invocation = build_root_invocation(args=[scval.to_map(args_map)])
+
+    entries = stellar_xdr.SorobanAuthorizationEntries(
+        [
+            build_entry(
+                address=CLIENT_CONTRACT_ACCOUNT,
+                nonce=2539107559517135815,
+                signature_expiration_ledger=79857,
+                public_key_hex="5215c67951e2d4153a9af7376210efb44e123e0d2dbe69a8db62dd5217f3c4a5",
+                signature_hex="0ff220ae2a7f0e3369f1b178ee5560e1c9b57fc11eb1a4af2d1a60a58679aa13390c59a7e7db919902a98b5cbd45bf785b2b7d122fd832d24eabf0bcbe36130e",
+                root_invocation=root_invocation,
+            ),
+            build_entry(
+                address=SERVER_ACCOUNT,
+                nonce=4328727000093922294,
+                signature_expiration_ledger=80007,
+                public_key_hex="a4d88a8cf106454a418350e7fbce6a19af16a2c3f663e0c3e363b1ab85f6fb9d",
+                signature_hex="6dbc3b36f6c96a316ff1e7fcefb1b044cbfdafa70236aad669f9d209565c2ba3086412bfff0218365a97cd1f8c3d2483f0daf29ab434531c3276bad8bbbd5102",
+                root_invocation=root_invocation,
+            ),
+        ]
+    )
+
+    with pytest.raises(
+        InvalidSep45ChallengeError,
+        match="'client_domain' and 'client_domain_account' must both be provided or both be absent.",
     ):
         read_challenge_authorization_entries(
             challenge_authorization_entries=entries.to_xdr(),
@@ -1796,3 +1846,83 @@ async def test_verify_challenge_authorization_entries_async_failed():
                     web_auth_domain=WEB_AUTH_DOMAIN,
                     network_passphrase=NETWORK_PASSPHRASE,
                 )
+
+
+def test_challenge_authorization_entries_client_domain_without_account():
+    """Test that ChallengeAuthorizationEntries raises error when client_domain is provided without client_domain_account."""
+    entries = build_valid_entries_with_client_domain()
+    with pytest.raises(
+        ValueError,
+        match="client_domain and client_domain_account must both be provided or both be None.",
+    ):
+        ChallengeAuthorizationEntries(
+            authorization_entries=entries,
+            client_account_id=CLIENT_CONTRACT_ACCOUNT,
+            matched_home_domain=HOME_DOMAIN,
+            nonce=NONCE,
+            web_auth_domain=WEB_AUTH_DOMAIN,
+            server_account_id=SERVER_ACCOUNT,
+            web_auth_contract=WEB_AUTH_CONTRACT,
+            client_domain=CLIENT_DOMAIN,
+            client_domain_account=None,
+        )
+
+
+def test_challenge_authorization_entries_client_domain_account_without_domain():
+    """Test that ChallengeAuthorizationEntries raises error when client_domain_account is provided without client_domain."""
+    entries = build_valid_entries_with_client_domain()
+    with pytest.raises(
+        ValueError,
+        match="client_domain and client_domain_account must both be provided or both be None.",
+    ):
+        ChallengeAuthorizationEntries(
+            authorization_entries=entries,
+            client_account_id=CLIENT_CONTRACT_ACCOUNT,
+            matched_home_domain=HOME_DOMAIN,
+            nonce=NONCE,
+            web_auth_domain=WEB_AUTH_DOMAIN,
+            server_account_id=SERVER_ACCOUNT,
+            web_auth_contract=WEB_AUTH_CONTRACT,
+            client_domain=None,
+            client_domain_account=CLIENT_DOMAIN_ACCOUNT,
+        )
+
+
+def test_build_challenge_authorization_entries_client_domain_without_account():
+    """Test that build_challenge_authorization_entries raises error when client_domain is provided without client_domain_account."""
+    with pytest.raises(
+        ValueError,
+        match="client_domain and client_domain_account must both be provided or both be None.",
+    ):
+        with SorobanServer(MOCK_RPC_URL) as soroban_server:
+            build_challenge_authorization_entries(
+                soroban_server=soroban_server,
+                web_auth_contract=WEB_AUTH_CONTRACT,
+                server_secret=SERVER_SECRET,
+                client_account_id=CLIENT_CONTRACT_ACCOUNT,
+                home_domain=HOME_DOMAIN,
+                web_auth_domain=WEB_AUTH_DOMAIN,
+                network_passphrase=NETWORK_PASSPHRASE,
+                client_domain=CLIENT_DOMAIN,
+                client_domain_account=None,
+            )
+
+
+def test_build_challenge_authorization_entries_client_domain_account_without_domain():
+    """Test that build_challenge_authorization_entries raises error when client_domain_account is provided without client_domain."""
+    with pytest.raises(
+        ValueError,
+        match="client_domain and client_domain_account must both be provided or both be None.",
+    ):
+        with SorobanServer(MOCK_RPC_URL) as soroban_server:
+            build_challenge_authorization_entries(
+                soroban_server=soroban_server,
+                web_auth_contract=WEB_AUTH_CONTRACT,
+                server_secret=SERVER_SECRET,
+                client_account_id=CLIENT_CONTRACT_ACCOUNT,
+                home_domain=HOME_DOMAIN,
+                web_auth_domain=WEB_AUTH_DOMAIN,
+                network_passphrase=NETWORK_PASSPHRASE,
+                client_domain=None,
+                client_domain_account=CLIENT_DOMAIN_ACCOUNT,
+            )
