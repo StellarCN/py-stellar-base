@@ -1270,6 +1270,56 @@ class TestSorobanServer:
         assert val_error["type"] == "value_error"
         assert val_error["msg"].endswith("end_ledger and cursor cannot both be set")
 
+    async def test_get_transactions_with_cursor_only(self):
+        # Test for https://github.com/StellarCN/py-stellar-base/issues/1105
+        # GetTransactionsRequest does not have end_ledger attribute,
+        # PaginationMixin should handle this gracefully
+        result = {
+            "transactions": [],
+            "latestLedger": 1888542,
+            "latestLedgerCloseTimestamp": 1717166057,
+            "oldestLedger": 1871263,
+            "oldestLedgerCloseTimestamp": 1717075350,
+            "cursor": "8111217537191937",
+        }
+        data = {
+            "jsonrpc": "2.0",
+            "id": "198cb1a8-9104-4446-a269-88bf000c2721",
+            "result": result,
+        }
+        with aioresponses() as m:
+            m.post(RPC_URL, payload=data)
+            async with SorobanServerAsync(RPC_URL) as client:
+                response = await client.get_transactions(
+                    cursor="2428679451844609", limit=200
+                )
+                assert isinstance(response, GetTransactionsResponse)
+
+    async def test_get_ledgers_with_cursor_only(self):
+        # Test for https://github.com/StellarCN/py-stellar-base/issues/1105
+        # GetLedgersRequest does not have end_ledger attribute,
+        # PaginationMixin should handle this gracefully
+        result = {
+            "ledgers": [],
+            "latestLedger": 1888542,
+            "latestLedgerCloseTime": 1717166057,
+            "oldestLedger": 1871263,
+            "oldestLedgerCloseTime": 1717075350,
+            "cursor": "8111217537191937",
+        }
+        data = {
+            "jsonrpc": "2.0",
+            "id": "198cb1a8-9104-4446-a269-88bf000c2721",
+            "result": result,
+        }
+        with aioresponses() as m:
+            m.post(RPC_URL, payload=data)
+            async with SorobanServerAsync(RPC_URL) as client:
+                response = await client.get_ledgers(
+                    cursor="2428679451844609", limit=200
+                )
+                assert isinstance(response, GetLedgersResponse)
+
     async def test_non_json_response(self):
         with aioresponses() as m:
             m.post(RPC_URL, status=500, body="Cloudflare 500 error")

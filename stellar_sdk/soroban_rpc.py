@@ -84,9 +84,9 @@ class PaginationMixin:
     def verify_ledger_or_cursor(self) -> Self:
         pagination = getattr(self, "pagination", None)
         if pagination and pagination.cursor:
-            if getattr(self, "start_ledger"):
+            if getattr(self, "start_ledger", None):
                 raise ValueError("start_ledger and cursor cannot both be set")
-            if getattr(self, "end_ledger"):
+            if getattr(self, "end_ledger", None):
                 raise ValueError("end_ledger and cursor cannot both be set")
         return self
 
