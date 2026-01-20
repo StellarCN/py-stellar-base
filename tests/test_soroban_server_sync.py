@@ -1278,6 +1278,68 @@ class TestSorobanServer:
         assert val_error["type"] == "value_error"
         assert val_error["msg"].endswith("end_ledger and cursor cannot both be set")
 
+    def test_get_transactions_with_cursor_only(self):
+        # Test for https://github.com/StellarCN/py-stellar-base/issues/1105
+        # GetTransactionsRequest does not have end_ledger attribute,
+        # PaginationMixin should handle this gracefully
+        result = {
+            "transactions": [],
+            "latestLedger": 1888542,
+            "latestLedgerCloseTimestamp": 1717166057,
+            "oldestLedger": 1871263,
+            "oldestLedgerCloseTimestamp": 1717075350,
+            "cursor": "8111217537191937",
+        }
+        data = {
+            "jsonrpc": "2.0",
+            "id": "198cb1a8-9104-4446-a269-88bf000c2721",
+            "result": result,
+        }
+        with requests_mock.Mocker() as m:
+            m.post(RPC_URL, json=data)
+            response = SorobanServer(RPC_URL).get_transactions(
+                cursor="2428679451844609", limit=200
+            )
+            assert isinstance(response, GetTransactionsResponse)
+
+        request_data = m.last_request.json()
+        assert request_data["method"] == "getTransactions"
+        assert request_data["params"] == {
+            "startLedger": None,
+            "pagination": {"cursor": "2428679451844609", "limit": 200},
+        }
+
+    def test_get_ledgers_with_cursor_only(self):
+        # Test for https://github.com/StellarCN/py-stellar-base/issues/1105
+        # GetLedgersRequest does not have end_ledger attribute,
+        # PaginationMixin should handle this gracefully
+        result = {
+            "ledgers": [],
+            "latestLedger": 1888542,
+            "latestLedgerCloseTime": 1717166057,
+            "oldestLedger": 1871263,
+            "oldestLedgerCloseTime": 1717075350,
+            "cursor": "8111217537191937",
+        }
+        data = {
+            "jsonrpc": "2.0",
+            "id": "198cb1a8-9104-4446-a269-88bf000c2721",
+            "result": result,
+        }
+        with requests_mock.Mocker() as m:
+            m.post(RPC_URL, json=data)
+            response = SorobanServer(RPC_URL).get_ledgers(
+                cursor="2428679451844609", limit=200
+            )
+            assert isinstance(response, GetLedgersResponse)
+
+        request_data = m.last_request.json()
+        assert request_data["method"] == "getLedgers"
+        assert request_data["params"] == {
+            "startLedger": None,
+            "pagination": {"cursor": "2428679451844609", "limit": 200},
+        }
+
     def test_non_json_response(self):
         with requests_mock.Mocker() as m:
             m.post(RPC_URL, status_code=500, text="Cloudflare 500 error")

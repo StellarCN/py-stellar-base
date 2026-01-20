@@ -2,6 +2,7 @@ Release History
 ===============
 
 ### Pending
+- fix: `get_transactions` and `get_ledgers` with cursor raises `AttributeError` for missing `end_ledger`. ([#1105](https://github.com/StellarCN/py-stellar-base/issues/1105))
 
 ### Version 13.2.0
 
