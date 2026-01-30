@@ -1,6 +1,8 @@
 import pytest
+from aioresponses import aioresponses
 
 from stellar_sdk.client.aiohttp_client import USER_AGENT, AiohttpClient
+from stellar_sdk.exceptions import ContentSizeLimitExceededError
 from tests import HTTPBIN_URL
 
 
@@ -77,4 +79,29 @@ class TestAiohttpClient:
         assert json["headers"]["User-Agent"] == user_agent
         assert json["headers"]["A"] == custom_headers["a"]
         assert json["headers"]["C"] == custom_headers["c"]
+        await client.close()
+
+    @pytest.mark.asyncio
+    async def test_get_with_max_content_size_success(self):
+        client = AiohttpClient()
+        url = "https://example.com/data"
+        content = "Hello, World!"
+        with aioresponses() as m:
+            m.get(url, body=content)
+            resp = await client.get(url, max_content_size=1024)
+            assert resp.status_code == 200
+            assert resp.text == content
+        await client.close()
+
+    @pytest.mark.asyncio
+    async def test_get_with_max_content_size_exceeded(self):
+        client = AiohttpClient()
+        url = "https://example.com/data"
+        content = "x" * 1000
+        with aioresponses() as m:
+            m.get(url, body=content)
+            with pytest.raises(ContentSizeLimitExceededError) as exc_info:
+                await client.get(url, max_content_size=500)
+            assert exc_info.value.limit == 500
+            assert exc_info.value.content_size > 500
         await client.close()

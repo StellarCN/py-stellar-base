@@ -27,14 +27,27 @@ class SimpleRequestsClient(BaseSyncClient):
     I don't recommend that you actually use it.**
     """
 
-    def get(self, url: str, params: dict[str, str] | None = None) -> Response:
+    def get(
+        self,
+        url: str,
+        params: dict[str, str] | None = None,
+        max_content_size: int | None = None,
+    ) -> Response:
         """Perform HTTP GET request.
 
         :param url: the request url
         :param params: the request params
+        :param max_content_size: **Not supported in SimpleRequestsClient**.
+            If provided, raises NotImplementedError.
         :return: the response from server
         :raise: :exc:`ConnectionError <stellar_sdk.exceptions.ConnectionError>`
+        :raise: NotImplementedError: if max_content_size is provided
         """
+        if max_content_size is not None:
+            raise NotImplementedError(
+                "max_content_size is not supported in SimpleRequestsClient, "
+                "please use RequestsClient instead."
+            )
         try:
             resp = requests.get(url=url, params=params, headers=HEADERS)
         except (RequestException, NewConnectionError) as err:

@@ -1,6 +1,8 @@
 import pytest
+import requests_mock as requests_mock_lib
 
 from stellar_sdk.client.requests_client import USER_AGENT, RequestsClient
+from stellar_sdk.exceptions import ContentSizeLimitExceededError
 from tests import HTTPBIN_URL
 
 
@@ -66,3 +68,24 @@ class TestRequestsClient:
         assert json["headers"]["User-Agent"] == USER_AGENT
         assert json["headers"]["A"] == custom_headers["a"]  # httpbin makes it upper
         assert json["headers"]["C"] == custom_headers["c"]
+
+    def test_get_with_max_content_size_success(self):
+        client = RequestsClient()
+        url = "https://example.com/data"
+        content = "Hello, World!"
+        with requests_mock_lib.Mocker() as m:
+            m.get(url, text=content)
+            resp = client.get(url, max_content_size=1024)
+            assert resp.status_code == 200
+            assert resp.text == content
+
+    def test_get_with_max_content_size_exceeded(self):
+        client = RequestsClient()
+        url = "https://example.com/data"
+        content = "x" * 1000
+        with requests_mock_lib.Mocker() as m:
+            m.get(url, text=content)
+            with pytest.raises(ContentSizeLimitExceededError) as exc_info:
+                client.get(url, max_content_size=500)
+            assert exc_info.value.limit == 500
+            assert exc_info.value.content_size > 500

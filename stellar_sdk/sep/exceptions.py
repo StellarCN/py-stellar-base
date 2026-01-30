@@ -2,7 +2,7 @@ from ..exceptions import BaseRequestError, SdkError
 
 
 class StellarTomlNotFoundError(SdkError):
-    """If the SEP 0010 toml file not found, the exception will be thrown."""
+    """If the SEP 0001 toml file not found, the exception will be thrown."""
 
 
 class InvalidFederationAddress(SdkError):

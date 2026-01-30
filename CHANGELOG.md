@@ -3,6 +3,9 @@ Release History
 
 ### Pending
 
+#### Update
+- fix: add `max_content_size` parameter to HTTP client `get()` method to prevent denial-of-service attacks via memory exhaustion. `fetch_stellar_toml` and federation functions now enforce response size limits (512KB for stellar.toml, 100KB for federation responses). Added `ContentSizeLimitExceededError` exception.
+
 ### Version 13.2.1
 
 #### Update:

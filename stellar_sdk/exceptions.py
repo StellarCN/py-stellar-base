@@ -27,6 +27,7 @@ __all__ = [
     "SorobanRpcErrorResponse",
     "AccountNotFoundException",
     "PrepareTransactionException",
+    "ContentSizeLimitExceededError",
 ]
 
 from .soroban_rpc import SimulateTransactionResponse
@@ -193,6 +194,25 @@ class PrepareTransactionException(SdkError):
         super().__init__(message)
         self.message = message
         self.simulate_transaction_response = simulate_transaction_response
+
+
+class ContentSizeLimitExceededError(BaseRequestError):
+    """The exception is thrown when the response content size exceeds the specified limit.
+
+    This is a security measure to prevent denial-of-service attacks via memory exhaustion.
+
+    :param limit: The maximum allowed content size in bytes.
+    :param content_size: The actual content size in bytes (may be approximate if streaming).
+    """
+
+    def __init__(self, limit: int, content_size: int | None = None) -> None:
+        if content_size is not None:
+            message = f"Response content size ({content_size} bytes) exceeds the limit ({limit} bytes)"
+        else:
+            message = f"Response content size exceeds the limit ({limit} bytes)"
+        super().__init__(message)
+        self.limit = limit
+        self.content_size = content_size
 
 
 def raise_request_exception(response: Response) -> None:

@@ -31,3 +31,10 @@ class TestSimpleRequestsClient:
         json = resp.json()
         assert json["headers"]["Content-Type"] == "application/x-www-form-urlencoded"
         assert json["form"] == data
+
+    def test_get_with_max_content_size_raises_not_implemented(self):
+        client = SimpleRequestsClient()
+        with pytest.raises(NotImplementedError) as exc_info:
+            client.get("https://example.com", max_content_size=1024)
+        assert "max_content_size is not supported" in str(exc_info.value)
+        assert "RequestsClient" in str(exc_info.value)
