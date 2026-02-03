@@ -3,7 +3,15 @@ Release History
 
 ### Pending
 
+### Version 13.2.1
+
 #### Update:
+- fix: `get_transactions` and `get_ledgers` with cursor raises `AttributeError` for missing `end_ledger`. ([#1105](https://github.com/StellarCN/py-stellar-base/issues/1105))
+
+### Version 13.2.0
+
+#### Update:
+- feat: add [SEP-45](https://github.com/stellar/stellar-protocol/blob/master/ecosystem/sep-0045.md) (Stellar Web Authentication for Contract Accounts) support. Check `stellar_sdk.sep.stellar_soroban_web_authentication` for more details.
 - fix: remove `diagnostic_events_xdr` from `stellar_sdk.soroban_rpc.Events`, use `stellar_sdk.soroban_rpc.GetTransactionResponse.diagnostic_events_xdr` and `stellar_sdk.soroban_rpc.Transaction.diagnostic_events_xdr` instead. ([#1086](https://github.com/StellarCN/py-stellar-base/pull/1086))
 - chore: drop support for Python 3.9.
 
