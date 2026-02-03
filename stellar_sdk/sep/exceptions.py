@@ -29,6 +29,10 @@ class InvalidSep10ChallengeError(SdkError):
     """If the SEP 0010 validation fails, the exception will be thrown."""
 
 
+class InvalidSep45ChallengeError(SdkError):
+    """If the SEP 0045 validation fails, the exception will be thrown."""
+
+
 class AccountRequiresMemoError(SdkError):
     """AccountRequiresMemoError is raised when a transaction is trying to submit an
     operation to an account which requires a memo.
