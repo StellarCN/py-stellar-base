@@ -34,10 +34,6 @@ XDRS = xdr/Stellar-SCP.x \
        xdr/Stellar-contract-config-setting.x \
        xdr/Stellar-exporter.x
 
-# XDR Generator (xdrgen) repository and commit hash
-XDRGEN_REPO = overcat/xdrgen
-XDRGEN_COMMIT = 2609ddafe9f60a18617492048238bae1cb4b1067
-
 # Stellar XDR definitions repository commit hash
 XDR_COMMIT = 4b7a2ef7931ab2ca2499be68d849f38190b443ca
 
@@ -112,14 +108,10 @@ replace-xdr-keywords:
 xdr-generate: $(XDRS) replace-xdr-keywords
 	@echo "--- Generating XDR Python files ---"
 	$(REPLACE_KEYWORD_COMMAND)
-	docker run -it --rm -v $(PWD):/wd -w /wd ruby /bin/bash -c '\
-		gem install specific_install -v 0.3.8 && \
-		gem specific_install https://github.com/$(XDRGEN_REPO).git -b $(XDRGEN_COMMIT) && \
-		xdrgen \
-			--language python \
-			--namespace stellar \
-			--output stellar_sdk/xdr \
-			$(XDRS)'
+	docker run -it --rm -v $(PWD):/wd -w /wd ruby:3.4 /bin/bash -c '\
+		cd xdr-generator && \
+		bundle install --quiet && \
+		bundle exec ruby generate.rb'
 	@echo "--- Updating XDR API documentation ---"
 	$(REPLACE_DOCS)
 	$(UV_RUN_CMD) python docs/gen_xdr_api.py >> docs/en/api.rst
