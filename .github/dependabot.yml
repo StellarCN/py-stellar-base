@@ -10,8 +10,6 @@ updates:
       python-packages:
         patterns:
           - "*"
-    reviewers:
-      - overcat
     assignees:
       - overcat
     labels:
