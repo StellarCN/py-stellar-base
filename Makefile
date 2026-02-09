@@ -12,7 +12,7 @@
 # ==============================================================================
 .PHONY: default unit-test full-unit-test integration-test package clean \
         pre-commit type-check replace-xdr-keywords xdr-generate xdr \
-        xdr-clean xdr-update
+        xdr-clean xdr-update xdr-generator-test xdr-generator-update-snapshots
 
 # ==============================================================================
 # Configuration Variables
@@ -121,6 +121,20 @@ xdr-generate: $(XDRS) replace-xdr-keywords
 xdr/%.x:
 	@echo "--- Fetching $@ ---"
 	curl -Lsf -o $@ https://raw.githubusercontent.com/stellar/stellar-xdr/$(XDR_COMMIT)/$(@F)
+
+xdr-generator-test:
+	@echo "--- Running xdr-generator snapshot tests ---"
+	docker run --rm -v $(PWD):/wd -w /wd ruby:3.4 /bin/bash -c '\
+		cd xdr-generator && \
+		bundle install --quiet && \
+		bundle exec ruby test/generator_snapshot_test.rb'
+
+xdr-generator-update-snapshots:
+	@echo "--- Updating xdr-generator snapshots ---"
+	docker run --rm -v $(PWD):/wd -w /wd ruby:3.4 /bin/bash -c '\
+		cd xdr-generator && \
+		bundle install --quiet && \
+		UPDATE_SNAPSHOTS=1 bundle exec ruby test/generator_snapshot_test.rb'
 
 xdr-clean:
 	@echo "--- Cleaning XDR files ---"
