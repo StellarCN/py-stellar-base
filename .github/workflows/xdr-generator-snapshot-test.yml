@@ -1,0 +1,23 @@
+name: XDR Generator Snapshot Test
+
+on:
+  push:
+    paths:
+      - "xdr-generator/**"
+      - "Makefile"
+      - ".github/workflows/xdr-generator-snapshot-test.yml"
+  pull_request:
+    paths:
+      - "xdr-generator/**"
+      - "Makefile"
+      - ".github/workflows/xdr-generator-snapshot-test.yml"
+  workflow_dispatch:
+
+jobs:
+  xdr-generator-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run xdr-generator snapshot tests
+        run: make xdr-generator-test
