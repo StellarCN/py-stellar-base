@@ -11,9 +11,17 @@ AST = Xdrgen::AST
 
 class Generator < Xdrgen::Generators::Base
   MAX_SIZE = (2 ** 32) - 1
-  CIRCLE_IMPORT_UNION = %w[SCVal SCSpecTypeDef]
+  CIRCLE_IMPORT_UNION = %w[SCVal SCSpecTypeDef].freeze
 
   def generate
+    initialize_output_files
+    render_base_classes
+    render_definitions(@top)
+  end
+
+  private
+
+  def initialize_output_files
     @constants_out = @output.open("constants.py")
     @constants_out.puts <<-EOS.strip_heredoc
       # This is an automatically generated file.
@@ -27,62 +35,62 @@ class Generator < Xdrgen::Generators::Base
       from .base import *
       from .constants import *
     EOS
-
-    render_base_classes
-    render_definitions(@top)
   end
 
-  private
+  def register_init_import(file_name_underscore)
+    @init_out.puts "from .#{file_name_underscore} import *"
+  end
+
+  def open_definition_file(definition_name)
+    file_name_underscore = definition_name.underscore
+    register_init_import(file_name_underscore)
+    out = @output.open("#{file_name_underscore}.py")
+    render_common_import(out)
+    out
+  end
 
   def render_definitions(node)
-    node.definitions.each { |n| render_definition n }
-    node.namespaces.each { |n| render_definitions n }
+    node.definitions.each { |defn| render_definition(defn) }
+    node.namespaces.each { |namespace| render_definitions(namespace) }
   end
 
   def render_nested_definitions(defn)
-    return unless defn.respond_to? :nested_definitions
-    defn.nested_definitions.each { |ndefn| render_definition ndefn }
+    return unless defn.respond_to?(:nested_definitions)
+
+    defn.nested_definitions.each { |nested| render_definition(nested) }
   end
 
   def render_definition(defn)
     render_nested_definitions(defn)
+
     case defn
-    when AST::Definitions::Struct;
-      render_struct defn
+    when AST::Definitions::Struct
+      render_struct(defn)
     when AST::Definitions::Enum
-      render_enum defn
-    when AST::Definitions::Union;
-      if CIRCLE_IMPORT_UNION.include?(defn.name)
-        render_union defn, true
-      else
-        render_union defn
-      end
+      render_enum(defn)
+    when AST::Definitions::Union
+      render_import_in_func = CIRCLE_IMPORT_UNION.include?(defn.name)
+      render_union(defn, render_import_in_func)
     when AST::Definitions::Typedef
-      render_typedef defn
+      render_typedef(defn)
     when AST::Definitions::Const
-      render_const defn
+      render_const(defn)
     end
   end
 
   def render_const(const)
-    render_const_source_comment @constants_out, const
+    render_const_source_comment(@constants_out, const)
     @constants_out.puts "#{const.name}: int = #{const.value}"
   end
 
   def render_enum(enum)
-    enum_name = name enum
-    enum_name_underscore = enum_name.underscore
-    @init_out.puts "from .#{enum_name_underscore} import *"
-
-    file_name = "#{enum_name_underscore}.py"
-    out = @output.open(file_name)
-    render_common_import out
+    enum_name = name(enum)
+    out = open_definition_file(enum_name)
 
     out.puts "__all__ = ['#{enum_name}']"
-
     out.puts "class #{enum_name}(IntEnum):"
     out.indent(2) do
-      render_source_comment out, enum
+      render_source_comment(out, enum)
       enum.members.each do |member|
         out.puts "#{member.name} = #{member.value}"
       end
@@ -97,45 +105,45 @@ class Generator < Xdrgen::Generators::Base
             return cls(value)
       HEREDOC
 
-      render_xdr_utils out, enum_name
-      out.close
+      render_xdr_utils(out, enum_name)
     end
+
+    out.close
   end
 
   def render_typedef(typedef)
     typedef_name = typedef.name.camelize
     typedef_name_underscore = typedef.name.underscore
 
-    @init_out.puts "from .#{typedef_name_underscore} import *"
+    register_init_import(typedef_name_underscore)
 
-    file_name = "#{typedef_name_underscore}.py"
-    out = @output.open(file_name)
-    render_common_import out
-
-    render_import out, typedef, typedef_name
+    out = @output.open("#{typedef_name_underscore}.py")
+    render_common_import(out)
+    render_import(out, typedef, typedef_name)
 
     out.puts "__all__ = ['#{typedef_name}']"
 
     out.puts "class #{typedef_name}:"
     out.indent(2) do
       render_source_comment(out, typedef)
-      out.puts "def __init__(self, #{typedef_name_underscore}: #{type_hint_string typedef, typedef_name}) -> None:"
+      out.puts "def __init__(self, #{typedef_name_underscore}: #{type_hint_string(typedef, typedef_name)}) -> None:"
       out.indent(2) do
-        render_array_length_checker typedef, out
+        render_array_length_checker(typedef, out)
         out.puts "self.#{typedef_name_underscore} = #{typedef_name_underscore}"
       end
 
       out.puts "def pack(self, packer: Packer) -> None:"
       out.indent(2) do
-        encode_member typedef, out
+        encode_member(typedef, out)
       end
 
       out.puts "@classmethod"
       out.puts "def unpack(cls, unpacker: Unpacker) -> #{typedef_name}:"
       out.indent(2) do
-        decode_member typedef, out
+        decode_member(typedef, out)
         out.puts "return cls(#{typedef_name_underscore})"
       end
+
       render_xdr_utils(out, typedef_name)
       out.puts <<~HEREDOC
         def __hash__(self):
@@ -149,188 +157,273 @@ class Generator < Xdrgen::Generators::Base
             return f"<#{typedef_name} [#{typedef_name_underscore}={self.#{typedef_name_underscore}}]>"
       HEREDOC
     end
+
     out.close
   end
 
   def render_import(out, member, container_name)
-    member_type = type_string member.type
-    unless is_base_type member.type or container_name == member_type
-      out.puts "from .#{member_type.underscore} import #{member_type}"
+    member_type = type_string(member.type)
+    return if is_base_type(member.type) || container_name == member_type
+
+    out.puts "from .#{member_type.underscore} import #{member_type}"
+  end
+
+  def non_void_arms(union)
+    union.arms.reject(&:void?)
+  end
+
+  def render_union_arm_imports(out, union, union_name, render_import_in_func)
+    if render_import_in_func
+      out.puts "if TYPE_CHECKING:"
+      out.indent(2) do
+        non_void_arms(union).each do |arm|
+          # This may cause duplicate imports, we can remove it with autoflake
+          render_import(out, arm.declaration, union_name)
+        end
+      end
+      return
+    end
+
+    non_void_arms(union).each do |arm|
+      # This may cause duplicate imports, we can remove it with autoflake
+      render_import(out, arm.declaration, union_name)
+    end
+  end
+
+  def render_union_initializer(out, union, union_name, discriminant_name)
+    out.puts <<~HEREDOC
+      def __init__(
+          self,
+          #{discriminant_name}: #{type_hint_string(union.discriminant, union_name)},
+    HEREDOC
+
+    out.indent(2) do
+      non_void_arms(union).each do |arm|
+        out.puts "#{arm.name.underscore}: Optional[#{type_hint_string(arm.declaration, union_name)}] = None,"
+      end
+    end
+
+    out.puts ") -> None:"
+    out.indent(2) do
+      non_void_arms(union).each do |arm|
+        render_array_length_checker(arm, out)
+      end
+
+      out.puts "self.#{discriminant_name} = #{discriminant_name}"
+      non_void_arms(union).each do |arm|
+        arm_name = arm.name.underscore
+        out.puts "self.#{arm_name} = #{arm_name}"
+      end
+    end
+  end
+
+  def render_union_case_condition(discriminant_type, discriminant_name, union_case)
+    if union_case.value.is_a?(AST::Identifier)
+      return "if #{discriminant_name} == #{type_string(discriminant_type)}.#{union_case.value.name}:"
+    end
+
+    if type_string(discriminant_type) == "Uint32"
+      return "if #{discriminant_name}.uint32 == #{union_case.value.value}:"
+    end
+
+    "if #{discriminant_name} == #{union_case.value.value}:"
+  end
+
+  def render_union_pack(out, union, discriminant_name)
+    out.puts "def pack(self, packer: Packer) -> None:"
+    out.indent(2) do
+      out.puts encode_type(union.discriminant, "self.#{discriminant_name}")
+
+      union.normal_arms.each do |arm|
+        arm.cases.each do |union_case|
+          condition = render_union_case_condition(union.discriminant.type, "self.#{discriminant_name}", union_case)
+          out.puts condition
+
+          out.indent(2) do
+            encode_member(arm, out, true) unless arm.void?
+            out.puts "return"
+          end
+        end
+      end
+
+      if union.default_arm.present? && !union.default_arm.void?
+        encode_member(union.default_arm, out, true)
+      end
+    end
+  end
+
+  def render_union_unpack_match(out, arm, union_name, discriminant_name, render_import_in_func)
+    if arm.void?
+      out.puts "return cls(#{discriminant_name}=#{discriminant_name})"
+      return
+    end
+
+    render_import(out, arm.declaration, union_name) if render_import_in_func
+
+    decode_member(arm, out)
+    arm_name = arm.name.underscore
+    out.puts "return cls(#{discriminant_name}=#{discriminant_name}, #{arm_name}=#{arm_name})"
+  end
+
+  def render_union_default_unpack(out, union, discriminant_name)
+    if union.default_arm.present? && !union.default_arm.void?
+      decode_member(union.default_arm, out)
+      arm_name = union.default_arm.name.underscore
+      out.puts "return cls(#{discriminant_name}=#{discriminant_name}, #{arm_name}=#{arm_name})"
+      return
+    end
+
+    out.puts "return cls(#{discriminant_name}=#{discriminant_name})"
+  end
+
+  def render_union_unpack(out, union, union_name, discriminant_name, render_import_in_func)
+    out.puts "@classmethod"
+    out.puts "def unpack(cls, unpacker: Unpacker) -> #{union_name}:"
+    out.indent(2) do
+      out.puts "#{discriminant_name} = #{decode_type(union.discriminant)}"
+
+      union.normal_arms.each do |arm|
+        arm.cases.each do |union_case|
+          condition = render_union_case_condition(union.discriminant.type, discriminant_name, union_case)
+          out.puts condition
+
+          out.indent(2) do
+            render_union_unpack_match(out, arm, union_name, discriminant_name, render_import_in_func)
+          end
+        end
+      end
+
+      render_union_default_unpack(out, union, discriminant_name)
+    end
+  end
+
+  def render_hash_and_eq(out, attribute_names)
+    out.puts <<~HEREDOC
+      def __hash__(self):
+          return hash((#{attribute_names.map { |name| "self.#{name}" }.join(", ")},))
+      def __eq__(self, other: object):
+          if not isinstance(other, self.__class__):
+              return NotImplemented
+          return #{attribute_names.map { |name| "self.#{name}== other.#{name}" }.join(" and ")}
+    HEREDOC
+  end
+
+  def render_union_repr(out, union, union_name, discriminant_name)
+    out.puts "def __repr__(self):"
+    out.indent(2) do
+      out.puts "out = []"
+      out.puts "out.append(f'#{discriminant_name}={self.#{discriminant_name}}')"
+      non_void_arms(union).each do |arm|
+        arm_name = arm.name.underscore
+        out.puts "out.append(f'#{arm_name}={self.#{arm_name}}') if self.#{arm_name} is not None else None"
+      end
+      out.puts "return f\"<#{union_name} [{', '.join(out)}]>\""
     end
   end
 
   def render_union(union, render_import_in_func = false)
-    union_name = name union
-    union_name_underscore = union_name.underscore
-    @init_out.puts "from .#{union_name_underscore} import *"
+    union_name = name(union)
+    out = open_definition_file(union_name)
 
-    file_name = "#{union_name_underscore}.py"
-    out = @output.open(file_name)
-    render_common_import out
-
-    render_import out, union.discriminant, union_name
-
-    if render_import_in_func
-      out.puts "if TYPE_CHECKING:"
-      out.indent(2) do
-        union.arms.each do |arm|
-          next if arm.void?
-          # This may cause duplicate imports, we can remove it with autoflake
-          render_import out, arm.declaration, union_name
-        end
-      end
-    else
-      union.arms.each do |arm|
-        next if arm.void?
-        # This may cause duplicate imports, we can remove it with autoflake
-        render_import out, arm.declaration, union_name
-      end
-    end
+    render_import(out, union.discriminant, union_name)
+    render_union_arm_imports(out, union, union_name, render_import_in_func)
 
     out.puts "__all__ = ['#{union_name}']"
-
     out.puts "class #{union_name}:"
     out.indent(2) do
       render_source_comment(out, union)
-      union_discriminant_name_underscore = union.discriminant.name.underscore
-      out.puts <<~HEREDOC
-        def __init__(
-            self,
-            #{union_discriminant_name_underscore}: #{type_hint_string union.discriminant, union_name},
-      HEREDOC
-
-      out.indent(2) do
-        union.arms.each do |arm|
-          next if arm.void?
-          out.puts "#{arm.name.underscore}: Optional[#{type_hint_string arm.declaration, union_name}] = None,"
-        end
-      end
-
-      out.puts ") -> None:"
-      out.indent(2) do
-        union.arms.each do |arm|
-          next if arm.void?
-          render_array_length_checker arm, out
-        end
-
-        out.puts "self.#{union_discriminant_name_underscore} = #{union_discriminant_name_underscore}"
-        union.arms.each do |arm|
-          next if arm.void?
-          arm_name_underscore = arm.name.underscore
-          out.puts "self.#{arm_name_underscore} = #{arm_name_underscore}"
-        end
-      end
-
-      out.puts "def pack(self, packer: Packer) -> None:"
-      out.indent(2) do
-        out.puts "#{encode_type union.discriminant, 'self.' + union_discriminant_name_underscore}"
-        union.normal_arms.each do |arm|
-          arm.cases.each do |c|
-            if c.value.is_a?(AST::Identifier)
-              out.puts "if self.#{union_discriminant_name_underscore} == #{type_string union.discriminant.type}.#{c.value.name}:"
-            else
-              if type_string(union.discriminant.type) == "Uint32"
-                out.puts "if self.#{union_discriminant_name_underscore}.uint32 == #{c.value.value}:"
-              else
-                out.puts "if self.#{union_discriminant_name_underscore} == #{c.value.value}:"
-              end
-            end
-            out.indent(2) do
-              unless arm.void?
-                encode_member arm, out, true
-              end
-              out.puts "return"
-            end
-          end
-        end
-        if union.default_arm.present? and not union.default_arm.void?
-          encode_member union.default_arm, out, true
-        end
-      end
-
-      out.puts "@classmethod"
-      out.puts "def unpack(cls, unpacker: Unpacker) -> #{union_name}:"
-      out.indent(2) do
-        out.puts "#{union_discriminant_name_underscore} = #{decode_type union.discriminant}"
-        union.normal_arms.each do |arm|
-          arm.cases.each do |c|
-            if c.value.is_a?(AST::Identifier)
-              out.puts "if #{union_discriminant_name_underscore} == #{type_string union.discriminant.type}.#{c.value.name}:"
-            else
-              if type_string(union.discriminant.type) == "Uint32"
-                out.puts "if #{union_discriminant_name_underscore}.uint32 == #{c.value.value}:"
-              else
-                out.puts "if #{union_discriminant_name_underscore} == #{c.value.value}:"
-              end
-            end
-            out.indent(2) do
-              if arm.void?
-                out.puts "return cls(#{union_discriminant_name_underscore}=#{union_discriminant_name_underscore})"
-              else
-                if render_import_in_func
-                  render_import out, arm.declaration, union_name
-                end
-
-                decode_member arm, out
-                arm_name_underscore = arm.name.underscore
-                out.puts "return cls(#{union_discriminant_name_underscore}=#{union_discriminant_name_underscore}, #{arm_name_underscore}=#{arm_name_underscore})"
-              end
-            end
-          end
-        end
-
-        if union.default_arm.present? and not union.default_arm.void?
-          decode_member union.default_arm, out
-          arm_name_underscore = union.default_arm.name.underscore
-          out.puts "return cls(#{union_discriminant_name_underscore}=#{union_discriminant_name_underscore}, #{arm_name_underscore}=#{arm_name_underscore})"
-        else
-          out.puts "return cls(#{union_discriminant_name_underscore}=#{union_discriminant_name_underscore})"
-        end
-      end
+      discriminant_name = union.discriminant.name.underscore
+      render_union_initializer(out, union, union_name, discriminant_name)
+      render_union_pack(out, union, discriminant_name)
+      render_union_unpack(out, union, union_name, discriminant_name, render_import_in_func)
 
       render_xdr_utils(out, union_name)
-      attribute_names = []
-      attribute_names.push(union_discriminant_name_underscore)
-      union.arms.each do |arm|
-        next if arm.void?
-        attribute_names.push(arm.name.underscore)
-      end
-      out.puts <<~HEREDOC
-        def __hash__(self):
-            return hash((#{attribute_names.map { |m| 'self.' + m }.join(", ")},))
-        def __eq__(self, other: object):
-            if not isinstance(other, self.__class__):
-                return NotImplemented
-            return #{attribute_names.map { |m| 'self.' + m + '== other.' + m }.join(" and ")}
-      HEREDOC
 
-      out.puts "def __repr__(self):"
-      out.indent(2) do
-        out.puts "out = []"
-        out.puts "out.append(f'#{union_discriminant_name_underscore}={self.#{union_discriminant_name_underscore}}')"
-        union.arms.each do |arm|
-          next if arm.void?
-          arm_name_underscore = arm.name.underscore
-          out.puts "out.append(f'#{arm_name_underscore}={self.#{arm_name_underscore}}') if self.#{arm_name_underscore} is not None else None"
-        end
-        out.puts "return f\"<#{union_name} [{', '.join(out)}]>\""
-      end
+      attribute_names = [discriminant_name] + non_void_arms(union).map { |arm| arm.name.underscore }
+      render_hash_and_eq(out, attribute_names)
+      render_union_repr(out, union, union_name, discriminant_name)
     end
+
     out.close
   end
 
-  def render_struct(struct)
-    struct_name = name struct
-    struct_name_underscore = struct_name.underscore
-    @init_out.puts "from .#{struct_name_underscore} import *"
+  def struct_member_names(struct)
+    struct.members.map { |member| member.name.underscore }
+  end
 
-    file_name = "#{struct_name_underscore}.py"
-    out = @output.open(file_name)
-    render_common_import out
+  def render_struct_initializer(out, struct, struct_name)
+    out.puts <<~HEREDOC
+      def __init__(
+          self,
+    HEREDOC
+
+    out.indent(2) do
+      struct.members.each do |member|
+        out.puts "#{member.name.underscore}: #{type_hint_string(member.declaration, struct_name)},"
+      end
+    end
+
+    out.puts ") -> None:"
+    out.indent(2) do
+      struct.members.each do |member|
+        render_array_length_checker(member, out)
+      end
+      struct.members.each do |member|
+        member_name = member.name.underscore
+        out.puts "self.#{member_name} = #{member_name}"
+      end
+    end
+  end
+
+  def render_struct_pack(out, struct)
+    out.puts "def pack(self, packer: Packer) -> None:"
+    out.indent(2) do
+      struct.members.each do |member|
+        encode_member(member, out)
+      end
+    end
+  end
+
+  def render_struct_unpack(out, struct, struct_name)
+    out.puts "@classmethod"
+    out.puts "def unpack(cls, unpacker: Unpacker) -> #{struct_name}:"
+    out.indent(2) do
+      struct.members.each do |member|
+        decode_member(member, out)
+      end
+
+      out.puts "return cls("
+      out.indent(2) do
+        struct.members.each do |member|
+          member_name = member.name.underscore
+          out.puts "#{member_name}=#{member_name},"
+        end
+      end
+      out.puts ")"
+    end
+  end
+
+  def render_struct_repr(out, struct_name, member_names)
+    out.puts "def __repr__(self):"
+    out.indent(2) do
+      out.puts "out = ["
+      out.indent(2) do
+        member_names.each do |member_name|
+          out.puts "f'#{member_name}={self.#{member_name}}',"
+        end
+      end
+      out.puts "]"
+      out.puts "return f\"<#{struct_name} [{', '.join(out)}]>\""
+    end
+  end
+
+  def render_struct(struct)
+    struct_name = name(struct)
+    out = open_definition_file(struct_name)
 
     struct.members.each do |member|
       # This may cause duplicate imports, we can remove it through autoflake
-      render_import out, member.declaration, struct_name
+      render_import(out, member.declaration, struct_name)
     end
 
     out.puts "__all__ = ['#{struct_name}']"
@@ -338,79 +431,17 @@ class Generator < Xdrgen::Generators::Base
     out.puts "class #{struct_name}:"
     out.indent(2) do
       render_source_comment(out, struct)
-      out.puts <<~HEREDOC
-        def __init__(
-            self,
-      HEREDOC
-
-      out.indent(2) do
-        struct.members.each do |member|
-          out.puts "#{member.name.underscore}: #{type_hint_string member.declaration, struct_name},"
-        end
-      end
-      out.puts ") -> None:"
-
-      out.indent(2) do
-        struct.members.each do |member|
-          render_array_length_checker member, out
-        end
-        struct.members.each do |member|
-          member_name_underscore = member.name.underscore
-          out.puts "self.#{member_name_underscore} = #{member_name_underscore}"
-        end
-      end
-      out.puts "def pack(self, packer: Packer) -> None:"
-      out.indent(2) do
-        struct.members.each do |member|
-          encode_member member, out
-        end
-      end
-
-      out.puts "@classmethod"
-      out.puts "def unpack(cls, unpacker: Unpacker) -> #{struct_name}:"
-      out.indent(2) do
-        struct.members.each do |member|
-          decode_member member, out
-        end
-        out.puts "return cls("
-        out.indent(2) do
-          struct.members.each do |member|
-            member_name_underscore = member.name.underscore
-            out.puts "#{member_name_underscore}=#{member_name_underscore},"
-          end
-        end
-        out.puts ")"
-      end
+      render_struct_initializer(out, struct, struct_name)
+      render_struct_pack(out, struct)
+      render_struct_unpack(out, struct, struct_name)
 
       render_xdr_utils(out, struct_name)
 
-      attribute_names = []
-      struct.members.each do |member|
-        attribute_names.push(member.name.underscore)
-      end
-      out.puts <<~HEREDOC
-        def __hash__(self):
-            return hash((#{attribute_names.map { |m| 'self.' + m }.join(", ")},))
-        def __eq__(self, other: object):
-            if not isinstance(other, self.__class__):
-                return NotImplemented
-            return #{attribute_names.map { |m| 'self.' + m + '== other.' + m }.join(" and ")}
-      HEREDOC
-
-      out.puts "def __repr__(self):"
-      out.indent(2) do
-        out.puts "out = ["
-        out.indent(2) do
-          attribute_names.each do |name|
-            name = name
-            out.puts "f'#{name}={self.#{name}}',"
-          end
-        end
-        out.puts "]"
-        out.puts "return f\"<#{struct_name} [{', '.join(out)}]>\""
-      end
-
+      member_names = struct_member_names(struct)
+      render_hash_and_eq(out, member_names)
+      render_struct_repr(out, struct_name, member_names)
     end
+
     out.close
   end
 
@@ -419,8 +450,11 @@ class Generator < Xdrgen::Generators::Base
     when AST::Declarations::Void
       out.puts "return"
     end
+
     member_name_underscore = member.name.underscore
-    if member.type.sub_type == :optional
+    optional_member = member.type.sub_type == :optional
+
+    if optional_member
       out.puts <<~HEREDOC
         if self.#{member_name_underscore} is None:
             packer.pack_uint(0)
@@ -429,35 +463,36 @@ class Generator < Xdrgen::Generators::Base
       HEREDOC
     end
 
-    out.indent(member.type.sub_type == :optional ? 2 : 0) do
-      if is_union_member # All members of union are actually optional
+    out.indent(optional_member ? 2 : 0) do
+      if is_union_member
+        # All members of union are actually optional.
         out.puts <<~HEREDOC
           if self.#{member_name_underscore} is None:
               raise ValueError("#{member_name_underscore} should not be None.")
         HEREDOC
       end
+
       case member.declaration
       when AST::Declarations::Array
-        unless member.declaration.fixed?
-          out.puts "packer.pack_uint(len(self.#{member_name_underscore}))"
-        end
+        out.puts "packer.pack_uint(len(self.#{member_name_underscore}))" unless member.declaration.fixed?
         out.puts <<~HEREDOC
           for #{member_name_underscore}_item in self.#{member_name_underscore}:
-              #{encode_type member.declaration, member_name_underscore + '_item'}
+              #{encode_type(member.declaration, "#{member_name_underscore}_item")}
         HEREDOC
       else
-        out.puts encode_type member.declaration, 'self.' + member_name_underscore
+        out.puts encode_type(member.declaration, "self.#{member_name_underscore}")
       end
     end
   end
 
   def decode_member(member, out)
     case member.declaration
-    when AST::Declarations::Void;
+    when AST::Declarations::Void
       out.puts "return"
     end
+
     member_name_underscore = member.name.underscore
-    decoded_member_declaration = decode_type member.declaration
+    decoded_member_declaration = decode_type(member.declaration)
 
     case member.declaration
     when AST::Declarations::Array
@@ -542,34 +577,33 @@ class Generator < Xdrgen::Generators::Base
   end
 
   def render_base_classes
-    file_name = "base.py"
-    out = @output.open(file_name)
-    base_py_content = IO.read(__dir__ + "/templates/base.py")
-    out.puts base_py_content
+    out = @output.open("base.py")
+    base_py_content = IO.read("#{__dir__}/templates/base.py")
+    out.puts(base_py_content)
     out.close
   end
 
   def encode_type(decl, value)
     case decl.type
-    when AST::Typespecs::Int;
+    when AST::Typespecs::Int
       "Integer(#{value}).pack(packer)"
-    when AST::Typespecs::UnsignedInt;
+    when AST::Typespecs::UnsignedInt
       "UnsignedInteger(#{value}).pack(packer)"
-    when AST::Typespecs::Hyper;
+    when AST::Typespecs::Hyper
       "Hyper(#{value}).pack(packer)"
-    when AST::Typespecs::UnsignedHyper;
+    when AST::Typespecs::UnsignedHyper
       "UnsignedHyper(#{value}).pack(packer)"
-    when AST::Typespecs::Float;
+    when AST::Typespecs::Float
       "Float(#{value}).pack(packer)"
-    when AST::Typespecs::Double;
+    when AST::Typespecs::Double
       "Double(#{value}).pack(packer)"
-    when AST::Typespecs::Quadruple;
+    when AST::Typespecs::Quadruple
       raise "cannot render quadruple in Python"
-    when AST::Typespecs::Bool;
+    when AST::Typespecs::Bool
       "Boolean(#{value}).pack(packer)"
-    when AST::Typespecs::Opaque;
+    when AST::Typespecs::Opaque
       "Opaque(#{value}, #{decl.size || MAX_SIZE}, #{decl.fixed? ? "True" : "False"}).pack(packer)"
-    when AST::Typespecs::String;
+    when AST::Typespecs::String
       "String(#{value}, #{decl.size || MAX_SIZE}).pack(packer)"
     else
       "#{value}.pack(packer)"
@@ -599,9 +633,9 @@ class Generator < Xdrgen::Generators::Base
     when AST::Typespecs::String
       "String.unpack(unpacker)"
     when AST::Typespecs::Simple
-      "#{name decl.type.resolved_type}.unpack(unpacker)"
+      "#{name(decl.type.resolved_type)}.unpack(unpacker)"
     when AST::Concerns::NestedDefinition
-      "#{name decl.type}.unpack(unpacker)"
+      "#{name(decl.type)}.unpack(unpacker)"
     else
       raise "Unknown typespec: #{decl.type.class.name}"
     end
@@ -624,14 +658,13 @@ class Generator < Xdrgen::Generators::Base
 
   def render_const_source_comment(out, defn)
     return if defn.is_a?(AST::Definitions::Namespace)
+
     out.puts "#: #{defn.text_value}"
   end
 
   def type_hint_string(decl, container_name)
-    type_hint = type_string decl.type
-    if type_hint == container_name
-      type_hint = "\"#{type_hint}\""
-    end
+    type_hint = type_string(decl.type)
+    type_hint = "\"#{type_hint}\"" if type_hint == container_name
 
     case decl.type.sub_type
     when :optional
@@ -683,18 +716,18 @@ class Generator < Xdrgen::Generators::Base
     when AST::Typespecs::UnsignedInt
       "int"
     when AST::Typespecs::Simple
-      name type
+      name(type)
     when AST::Definitions::Base
-      name type
+      name(type)
     when AST::Concerns::NestedDefinition
-      name type
+      name(type)
     else
       raise "Unknown reference type: #{type.class.name}, #{type.class.ancestors}"
     end
   end
 
   def name(named)
-    parent = name named.parent_defn if named.is_a?(AST::Concerns::NestedDefinition)
+    parent = name(named.parent_defn) if named.is_a?(AST::Concerns::NestedDefinition)
     result = named.name.camelize
     "#{parent}#{result}"
   end
