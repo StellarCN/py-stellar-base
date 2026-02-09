@@ -1,5 +1,5 @@
 # Note:
-# 1. If the .x file contains Python reserved words, I suggest you change them to non-reserved words.
+# 1. Python reserved words in identifiers are automatically suffixed with "_".
 # 2. You can generate the file with the following command
 #   xdrgen -o OUTPUT_DIR INPUT -l python
 # 3. The generated code is unformatted, I suggest you format it by the following command:
@@ -12,6 +12,11 @@ AST = Xdrgen::AST
 class Generator < Xdrgen::Generators::Base
   MAX_SIZE = (2 ** 32) - 1
   CIRCLE_IMPORT_UNION = %w[SCVal SCSpecTypeDef].freeze
+  PYTHON_RESERVED_WORDS = %w[
+    False None True and as assert async await break class continue def del
+    elif else except finally for from global if import in is lambda match
+    nonlocal not or pass raise return try while with yield case
+  ].freeze
 
   def generate
     initialize_output_files
@@ -37,14 +42,13 @@ class Generator < Xdrgen::Generators::Base
     EOS
   end
 
-  def register_init_import(file_name_underscore)
-    @init_out.puts "from .#{file_name_underscore} import *"
+  def register_init_import(type_name)
+    @init_out.puts "from .#{python_module_name(type_name)} import *"
   end
 
   def open_definition_file(definition_name)
-    file_name_underscore = definition_name.underscore
-    register_init_import(file_name_underscore)
-    out = @output.open("#{file_name_underscore}.py")
+    register_init_import(definition_name)
+    out = @output.open("#{python_module_name(definition_name)}.py")
     render_common_import(out)
     out
   end
@@ -80,7 +84,7 @@ class Generator < Xdrgen::Generators::Base
 
   def render_const(const)
     render_const_source_comment(@constants_out, const)
-    @constants_out.puts "#{const.name}: int = #{const.value}"
+    @constants_out.puts "#{safe_identifier(const.name)}: int = #{const_value(const.value)}"
   end
 
   def render_enum(enum)
@@ -92,7 +96,7 @@ class Generator < Xdrgen::Generators::Base
     out.indent(2) do
       render_source_comment(out, enum)
       enum.members.each do |member|
-        out.puts "#{member.name} = #{member.value}"
+        out.puts "#{safe_identifier(member.name)} = #{member.value}"
       end
 
       out.puts <<~HEREDOC
@@ -112,12 +116,12 @@ class Generator < Xdrgen::Generators::Base
   end
 
   def render_typedef(typedef)
-    typedef_name = typedef.name.camelize
-    typedef_name_underscore = typedef.name.underscore
+    typedef_name = safe_identifier(typedef.name.camelize)
+    typedef_name_underscore = safe_identifier(typedef.name.underscore)
 
-    register_init_import(typedef_name_underscore)
+    register_init_import(typedef_name)
 
-    out = @output.open("#{typedef_name_underscore}.py")
+    out = @output.open("#{python_module_name(typedef_name)}.py")
     render_common_import(out)
     render_import(out, typedef, typedef_name)
 
@@ -165,7 +169,7 @@ class Generator < Xdrgen::Generators::Base
     member_type = type_string(member.type)
     return if is_base_type(member.type) || container_name == member_type
 
-    out.puts "from .#{member_type.underscore} import #{member_type}"
+    out.puts "from .#{python_module_name(member_type)} import #{member_type}"
   end
 
   def non_void_arms(union)
@@ -199,7 +203,8 @@ class Generator < Xdrgen::Generators::Base
 
     out.indent(2) do
       non_void_arms(union).each do |arm|
-        out.puts "#{arm.name.underscore}: Optional[#{type_hint_string(arm.declaration, union_name)}] = None,"
+        arm_name = safe_identifier(arm.name.underscore)
+        out.puts "#{arm_name}: Optional[#{type_hint_string(arm.declaration, union_name)}] = None,"
       end
     end
 
@@ -211,7 +216,7 @@ class Generator < Xdrgen::Generators::Base
 
       out.puts "self.#{discriminant_name} = #{discriminant_name}"
       non_void_arms(union).each do |arm|
-        arm_name = arm.name.underscore
+        arm_name = safe_identifier(arm.name.underscore)
         out.puts "self.#{arm_name} = #{arm_name}"
       end
     end
@@ -219,7 +224,8 @@ class Generator < Xdrgen::Generators::Base
 
   def render_union_case_condition(discriminant_type, discriminant_name, union_case)
     if union_case.value.is_a?(AST::Identifier)
-      return "if #{discriminant_name} == #{type_string(discriminant_type)}.#{union_case.value.name}:"
+      case_name = safe_identifier(union_case.value.name)
+      return "if #{discriminant_name} == #{type_string(discriminant_type)}.#{case_name}:"
     end
 
     if type_string(discriminant_type) == "Uint32"
@@ -261,14 +267,14 @@ class Generator < Xdrgen::Generators::Base
     render_import(out, arm.declaration, union_name) if render_import_in_func
 
     decode_member(arm, out)
-    arm_name = arm.name.underscore
+    arm_name = safe_identifier(arm.name.underscore)
     out.puts "return cls(#{discriminant_name}=#{discriminant_name}, #{arm_name}=#{arm_name})"
   end
 
   def render_union_default_unpack(out, union, discriminant_name)
     if union.default_arm.present? && !union.default_arm.void?
       decode_member(union.default_arm, out)
-      arm_name = union.default_arm.name.underscore
+      arm_name = safe_identifier(union.default_arm.name.underscore)
       out.puts "return cls(#{discriminant_name}=#{discriminant_name}, #{arm_name}=#{arm_name})"
       return
     end
@@ -314,7 +320,7 @@ class Generator < Xdrgen::Generators::Base
       out.puts "out = []"
       out.puts "out.append(f'#{discriminant_name}={self.#{discriminant_name}}')"
       non_void_arms(union).each do |arm|
-        arm_name = arm.name.underscore
+        arm_name = safe_identifier(arm.name.underscore)
         out.puts "out.append(f'#{arm_name}={self.#{arm_name}}') if self.#{arm_name} is not None else None"
       end
       out.puts "return f\"<#{union_name} [{', '.join(out)}]>\""
@@ -332,14 +338,14 @@ class Generator < Xdrgen::Generators::Base
     out.puts "class #{union_name}:"
     out.indent(2) do
       render_source_comment(out, union)
-      discriminant_name = union.discriminant.name.underscore
+      discriminant_name = safe_identifier(union.discriminant.name.underscore)
       render_union_initializer(out, union, union_name, discriminant_name)
       render_union_pack(out, union, discriminant_name)
       render_union_unpack(out, union, union_name, discriminant_name, render_import_in_func)
 
       render_xdr_utils(out, union_name)
 
-      attribute_names = [discriminant_name] + non_void_arms(union).map { |arm| arm.name.underscore }
+      attribute_names = [discriminant_name] + non_void_arms(union).map { |arm| safe_identifier(arm.name.underscore) }
       render_hash_and_eq(out, attribute_names)
       render_union_repr(out, union, union_name, discriminant_name)
     end
@@ -348,7 +354,7 @@ class Generator < Xdrgen::Generators::Base
   end
 
   def struct_member_names(struct)
-    struct.members.map { |member| member.name.underscore }
+    struct.members.map { |member| safe_identifier(member.name.underscore) }
   end
 
   def render_struct_initializer(out, struct, struct_name)
@@ -359,7 +365,8 @@ class Generator < Xdrgen::Generators::Base
 
     out.indent(2) do
       struct.members.each do |member|
-        out.puts "#{member.name.underscore}: #{type_hint_string(member.declaration, struct_name)},"
+        member_name = safe_identifier(member.name.underscore)
+        out.puts "#{member_name}: #{type_hint_string(member.declaration, struct_name)},"
       end
     end
 
@@ -369,7 +376,7 @@ class Generator < Xdrgen::Generators::Base
         render_array_length_checker(member, out)
       end
       struct.members.each do |member|
-        member_name = member.name.underscore
+        member_name = safe_identifier(member.name.underscore)
         out.puts "self.#{member_name} = #{member_name}"
       end
     end
@@ -395,7 +402,7 @@ class Generator < Xdrgen::Generators::Base
       out.puts "return cls("
       out.indent(2) do
         struct.members.each do |member|
-          member_name = member.name.underscore
+          member_name = safe_identifier(member.name.underscore)
           out.puts "#{member_name}=#{member_name},"
         end
       end
@@ -451,7 +458,7 @@ class Generator < Xdrgen::Generators::Base
       out.puts "return"
     end
 
-    member_name_underscore = member.name.underscore
+    member_name_underscore = safe_identifier(member.name.underscore)
     optional_member = member.type.sub_type == :optional
 
     if optional_member
@@ -491,7 +498,7 @@ class Generator < Xdrgen::Generators::Base
       out.puts "return"
     end
 
-    member_name_underscore = member.name.underscore
+    member_name_underscore = safe_identifier(member.name.underscore)
     decoded_member_declaration = decode_type(member.declaration)
 
     case member.declaration
@@ -536,7 +543,7 @@ class Generator < Xdrgen::Generators::Base
     case member.declaration
     when AST::Declarations::Array
       _, size = member.declaration.type.array_size
-      member_name_underscore = member.name.underscore
+      member_name_underscore = safe_identifier(member.name.underscore)
       if member.declaration.fixed?
         out.puts <<~HEREDOC
           _expect_length = #{size}
@@ -728,7 +735,28 @@ class Generator < Xdrgen::Generators::Base
 
   def name(named)
     parent = name(named.parent_defn) if named.is_a?(AST::Concerns::NestedDefinition)
-    result = named.name.camelize
+    result = safe_identifier(named.name.camelize)
     "#{parent}#{result}"
+  end
+
+  def safe_identifier(identifier)
+    identifier = identifier.to_s
+    return "#{identifier}_" if PYTHON_RESERVED_WORDS.include?(identifier)
+
+    identifier
+  end
+
+  def python_module_name(type_name)
+    safe_identifier(type_name.to_s.underscore)
+  end
+
+  def const_value(value)
+    if value.is_a?(String) && value.match?(/\A[A-Za-z_][A-Za-z0-9_]*\z/)
+      return safe_identifier(value)
+    end
+
+    return safe_identifier(value.name) if value.is_a?(AST::Identifier)
+
+    value
   end
 end
