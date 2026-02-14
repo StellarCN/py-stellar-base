@@ -80,7 +80,7 @@ class HasOptions:
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented
-        return self.first_option== other.first_option and self.second_option== other.second_option and self.third_option== other.third_option
+        return self.first_option == other.first_option and self.second_option == other.second_option and self.third_option == other.third_option
     def __repr__(self):
         out = [
             f'first_option={self.first_option}',

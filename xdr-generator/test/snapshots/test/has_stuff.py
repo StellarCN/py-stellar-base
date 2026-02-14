@@ -56,7 +56,7 @@ class HasStuff:
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented
-        return self.data== other.data
+        return self.data == other.data
     def __repr__(self):
         out = [
             f'data={self.data}',

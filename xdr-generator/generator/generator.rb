@@ -310,7 +310,7 @@ class Generator < Xdrgen::Generators::Base
       def __eq__(self, other: object):
           if not isinstance(other, self.__class__):
               return NotImplemented
-          return #{attribute_names.map { |name| "self.#{name}== other.#{name}" }.join(" and ")}
+          return #{attribute_names.map { |name| "self.#{name} == other.#{name}" }.join(" and ")}
     HEREDOC
   end
 
