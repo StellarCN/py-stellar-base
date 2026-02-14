@@ -48,6 +48,7 @@ class Generator < Xdrgen::Generators::Base
 
   def open_definition_file(definition_name)
     register_init_import(definition_name)
+    @imported_types = Set.new
     out = @output.open("#{python_module_name(definition_name)}.py")
     render_common_import(out)
     out
@@ -120,6 +121,7 @@ class Generator < Xdrgen::Generators::Base
     typedef_name_underscore = safe_identifier(typedef.name.underscore)
 
     register_init_import(typedef_name)
+    @imported_types = Set.new
 
     out = @output.open("#{python_module_name(typedef_name)}.py")
     render_common_import(out)
@@ -168,7 +170,9 @@ class Generator < Xdrgen::Generators::Base
   def render_import(out, member, container_name)
     member_type = type_string(member.type)
     return if is_base_type(member.type) || container_name == member_type
+    return if @imported_types.include?(member_type)
 
+    @imported_types.add(member_type)
     out.puts "from .#{python_module_name(member_type)} import #{member_type}"
   end
 
@@ -189,7 +193,6 @@ class Generator < Xdrgen::Generators::Base
     end
 
     non_void_arms(union).each do |arm|
-      # This may cause duplicate imports, we can remove it with autoflake
       render_import(out, arm.declaration, union_name)
     end
   end
@@ -432,7 +435,6 @@ class Generator < Xdrgen::Generators::Base
     out = open_definition_file(struct_name)
 
     struct.members.each do |member|
-      # This may cause duplicate imports, we can remove it through autoflake
       render_import(out, member.declaration, struct_name)
     end
 
