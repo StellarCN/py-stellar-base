@@ -91,6 +91,8 @@ class IntUnion:
     def __repr__(self):
         out = []
         out.append(f'type={self.type}')
-        out.append(f'error={self.error}') if self.error is not None else None
-        out.append(f'things={self.things}') if self.things is not None else None
+        if self.error is not None:
+            out.append(f'error={self.error}')
+        if self.things is not None:
+            out.append(f'things={self.things}')
         return f"<IntUnion [{', '.join(out)}]>"

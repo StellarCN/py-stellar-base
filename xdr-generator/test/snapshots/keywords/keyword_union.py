@@ -72,5 +72,6 @@ class KeywordUnion:
     def __repr__(self):
         out = []
         out.append(f'from_={self.from_}')
-        out.append(f'class_={self.class_}') if self.class_ is not None else None
+        if self.class_ is not None:
+            out.append(f'class_={self.class_}')
         return f"<KeywordUnion [{', '.join(out)}]>"

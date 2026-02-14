@@ -96,6 +96,8 @@ class MyUnion:
     def __repr__(self):
         out = []
         out.append(f'type={self.type}')
-        out.append(f'one={self.one}') if self.one is not None else None
-        out.append(f'two={self.two}') if self.two is not None else None
+        if self.one is not None:
+            out.append(f'one={self.one}')
+        if self.two is not None:
+            out.append(f'two={self.two}')
         return f"<MyUnion [{', '.join(out)}]>"

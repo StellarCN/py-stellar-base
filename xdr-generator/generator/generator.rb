@@ -321,7 +321,10 @@ class Generator < Xdrgen::Generators::Base
       out.puts "out.append(f'#{discriminant_name}={self.#{discriminant_name}}')"
       non_void_arms(union).each do |arm|
         arm_name = safe_identifier(arm.name.underscore)
-        out.puts "out.append(f'#{arm_name}={self.#{arm_name}}') if self.#{arm_name} is not None else None"
+        out.puts "if self.#{arm_name} is not None:"
+        out.indent(2) do
+          out.puts "out.append(f'#{arm_name}={self.#{arm_name}}')"
+        end
       end
       out.puts "return f\"<#{union_name} [{', '.join(out)}]>\""
     end
