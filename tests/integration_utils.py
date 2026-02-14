@@ -1,3 +1,4 @@
+import pathlib
 import time
 
 import requests
@@ -18,6 +19,7 @@ from stellar_sdk.contract.exceptions import SimulationFailedError
 RPC_URL = "http://127.0.0.1:8000/soroban/rpc"
 HORIZON_URL = "http://127.0.0.1:8000"
 NETWORK_PASSPHRASE = Network.STANDALONE_NETWORK_PASSPHRASE
+WASM_FILES_DIR = pathlib.Path(__file__).parent / "wasm_files"
 
 
 def fund_account(account_id: str):
@@ -50,7 +52,20 @@ def get_balance_for_contract(contract_id: str, asset: Asset, source: str) -> int
         return result
 
 
+def upload_wasm(contract: bytes, source: Keypair) -> bytes:
+    with SorobanServer(RPC_URL) as server:
+        wasm_id = ContractClient.upload_contract_wasm(
+            contract, source.public_key, source, server
+        )
+        assert isinstance(wasm_id, bytes)
+        return wasm_id
+
+
 def get_random_contract_id(source: Keypair) -> str:
+    with open(WASM_FILES_DIR / "soroban_hello_world_contract.wasm", "rb") as f:
+        wasm = f.read()
+        wasm_id = upload_wasm(wasm, source)
+
     with SorobanServer(RPC_URL) as server:
         transaction_builder = (
             TransactionBuilder(
@@ -58,7 +73,7 @@ def get_random_contract_id(source: Keypair) -> str:
                 network_passphrase=NETWORK_PASSPHRASE,
                 base_fee=100,
             )
-            .append_create_stellar_asset_contract_from_address_op(source.public_key)
+            .append_create_contract_op(wasm_id, source.public_key)
             .set_timeout(300)
         )
         contract_id = (

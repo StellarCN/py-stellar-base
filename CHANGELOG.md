@@ -2,6 +2,7 @@ Release History
 ===============
 
 ### Pending
+- refactor!: remove `TransactionBuilder.append_create_stellar_asset_contract_from_address_op`, use `TransactionBuilder.append_create_contract_op` instead.
 
 ### Version 13.2.1
 
