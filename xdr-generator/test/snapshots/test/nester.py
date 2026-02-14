@@ -84,7 +84,7 @@ class Nester:
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented
-        return self.nested_enum== other.nested_enum and self.nested_struct== other.nested_struct and self.nested_union== other.nested_union
+        return self.nested_enum == other.nested_enum and self.nested_struct == other.nested_struct and self.nested_union == other.nested_union
     def __repr__(self):
         out = [
             f'nested_enum={self.nested_enum}',

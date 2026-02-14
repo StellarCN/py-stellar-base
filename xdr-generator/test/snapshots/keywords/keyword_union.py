@@ -68,7 +68,7 @@ class KeywordUnion:
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented
-        return self.from_== other.from_ and self.class_== other.class_
+        return self.from_ == other.from_ and self.class_ == other.class_
     def __repr__(self):
         out = []
         out.append(f'from_={self.from_}')

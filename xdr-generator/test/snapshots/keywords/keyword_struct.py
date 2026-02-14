@@ -62,7 +62,7 @@ class KeywordStruct:
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented
-        return self.from_== other.from_ and self.return_== other.return_
+        return self.from_ == other.from_ and self.return_ == other.return_
     def __repr__(self):
         out = [
             f'from_={self.from_}',

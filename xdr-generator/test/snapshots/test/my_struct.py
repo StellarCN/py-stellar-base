@@ -94,7 +94,7 @@ class MyStruct:
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented
-        return self.field1== other.field1 and self.field2== other.field2 and self.field3== other.field3 and self.field4== other.field4 and self.field5== other.field5 and self.field6== other.field6 and self.field7== other.field7
+        return self.field1 == other.field1 and self.field2 == other.field2 and self.field3 == other.field3 and self.field4 == other.field4 and self.field5 == other.field5 and self.field6 == other.field6 and self.field7 == other.field7
     def __repr__(self):
         out = [
             f'field1={self.field1}',

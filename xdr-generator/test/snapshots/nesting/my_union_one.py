@@ -54,7 +54,7 @@ class MyUnionOne:
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented
-        return self.some_int== other.some_int
+        return self.some_int == other.some_int
     def __repr__(self):
         out = [
             f'some_int={self.some_int}',

@@ -92,7 +92,7 @@ class MyUnion:
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented
-        return self.type== other.type and self.one== other.one and self.two== other.two
+        return self.type == other.type and self.one == other.one and self.two == other.two
     def __repr__(self):
         out = []
         out.append(f'type={self.type}')

@@ -66,7 +66,7 @@ class NesterNestedUnion:
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented
-        return self.color== other.color and self.blah2== other.blah2
+        return self.color == other.color and self.blah2 == other.blah2
     def __repr__(self):
         out = []
         out.append(f'color={self.color}')
