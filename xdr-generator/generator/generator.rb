@@ -120,11 +120,7 @@ class Generator < Xdrgen::Generators::Base
     typedef_name = safe_identifier(typedef.name.camelize)
     typedef_name_underscore = safe_identifier(typedef.name.underscore)
 
-    register_init_import(typedef_name)
-    @imported_types = Set.new
-
-    out = @output.open("#{python_module_name(typedef_name)}.py")
-    render_common_import(out)
+    out = open_definition_file(typedef_name)
     render_import(out, typedef, typedef_name)
 
     out.puts "__all__ = ['#{typedef_name}']"
