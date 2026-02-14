@@ -43,11 +43,10 @@ class Str:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
     def __hash__(self):
-        return hash(self.str)
+        return hash((self.str,))
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented
         return self.str == other.str
-
     def __repr__(self):
         return f"<Str [str={self.str}]>"

@@ -48,11 +48,10 @@ class OptHash1:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
     def __hash__(self):
-        return hash(self.opt_hash1)
+        return hash((self.opt_hash1,))
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented
         return self.opt_hash1 == other.opt_hash1
-
     def __repr__(self):
         return f"<OptHash1 [opt_hash1={self.opt_hash1}]>"
