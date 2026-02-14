@@ -16,7 +16,7 @@ from stellar_sdk import (
 from stellar_sdk.contract import AssembledTransaction, ContractClient
 from stellar_sdk.contract.exceptions import SimulationFailedError
 
-RPC_URL = "http://127.0.0.1:8000/soroban/rpc"
+RPC_URL = "http://127.0.0.1:8000/rpc"
 HORIZON_URL = "http://127.0.0.1:8000"
 NETWORK_PASSPHRASE = Network.STANDALONE_NETWORK_PASSPHRASE
 WASM_FILES_DIR = pathlib.Path(__file__).parent / "wasm_files"
