@@ -82,9 +82,9 @@ jobs:
           ENABLE_LOGS: true
           NETWORK: local
           ENABLE_SOROBAN_RPC: true
-          PROTOCOL_VERSION: 24
+          PROTOCOL_VERSION: 25
         options: >-
-          --health-cmd "curl --no-progress-meter --fail-with-body -X POST \"http://localhost:8000/soroban/rpc\" -H 'Content-Type: application/json' -d '{\"jsonrpc\":\"2.0\",\"id\":8675309,\"method\":\"getNetwork\"}' && curl --no-progress-meter \"http://localhost:8000/friendbot\" | grep '\"invalid_field\": \"addr\"'"
+          --health-cmd "curl --no-progress-meter --fail-with-body -X POST \"http://localhost:8000/rpc\" -H 'Content-Type: application/json' -d '{\"jsonrpc\":\"2.0\",\"id\":8675309,\"method\":\"getNetwork\"}' && curl --no-progress-meter \"http://localhost:8000/friendbot\" | grep '\"invalid_field\": \"addr\"'"
           --health-interval 10s
           --health-timeout 5s
           --health-retries 50

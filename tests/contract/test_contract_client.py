@@ -17,7 +17,7 @@ from stellar_sdk.contract import ContractClient
 from stellar_sdk.contract.exceptions import NoSignatureNeededError
 from stellar_sdk.soroban_rpc import GetTransactionStatus
 
-RPC_URL = "http://127.0.0.1:8000/soroban/rpc"
+RPC_URL = "http://127.0.0.1:8000/rpc"
 SOURCE = Keypair.random()
 NETWORK_PASSPHRASE = Network.STANDALONE_NETWORK_PASSPHRASE
 
