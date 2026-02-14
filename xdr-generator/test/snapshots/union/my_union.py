@@ -89,10 +89,12 @@ class MyUnion:
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented
-        return self.type== other.type and self.error== other.error and self.things== other.things
+        return self.type == other.type and self.error == other.error and self.things == other.things
     def __repr__(self):
         out = []
         out.append(f'type={self.type}')
-        out.append(f'error={self.error}') if self.error is not None else None
-        out.append(f'things={self.things}') if self.things is not None else None
+        if self.error is not None:
+            out.append(f'error={self.error}')
+        if self.things is not None:
+            out.append(f'things={self.things}')
         return f"<MyUnion [{', '.join(out)}]>"

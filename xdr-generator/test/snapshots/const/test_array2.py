@@ -51,11 +51,10 @@ class TestArray2:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
     def __hash__(self):
-        return hash(self.test_array2)
+        return hash((self.test_array2,))
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented
         return self.test_array2 == other.test_array2
-
     def __repr__(self):
         return f"<TestArray2 [test_array2={self.test_array2}]>"

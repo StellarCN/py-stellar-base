@@ -43,11 +43,10 @@ class Uint512:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
     def __hash__(self):
-        return hash(self.uint512)
+        return hash((self.uint512,))
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented
         return self.uint512 == other.uint512
-
     def __repr__(self):
         return f"<Uint512 [uint512={self.uint512}]>"
