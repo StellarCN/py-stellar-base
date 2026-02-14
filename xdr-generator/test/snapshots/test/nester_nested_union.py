@@ -70,5 +70,6 @@ class NesterNestedUnion:
     def __repr__(self):
         out = []
         out.append(f'color={self.color}')
-        out.append(f'blah2={self.blah2}') if self.blah2 is not None else None
+        if self.blah2 is not None:
+            out.append(f'blah2={self.blah2}')
         return f"<NesterNestedUnion [{', '.join(out)}]>"
