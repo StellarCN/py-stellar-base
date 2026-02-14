@@ -181,7 +181,6 @@ class Generator < Xdrgen::Generators::Base
       out.puts "if TYPE_CHECKING:"
       out.indent(2) do
         non_void_arms(union).each do |arm|
-          # This may cause duplicate imports, we can remove it with autoflake
           render_import(out, arm.declaration, union_name)
         end
       end
