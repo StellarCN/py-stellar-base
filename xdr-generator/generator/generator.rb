@@ -453,11 +453,6 @@ class Generator < Xdrgen::Generators::Base
   end
 
   def encode_member(member, out, is_union_member = false)
-    case member.declaration
-    when AST::Declarations::Void
-      out.puts "return"
-    end
-
     member_name_underscore = safe_identifier(member.name.underscore)
     optional_member = member.type.sub_type == :optional
 
@@ -493,11 +488,6 @@ class Generator < Xdrgen::Generators::Base
   end
 
   def decode_member(member, out)
-    case member.declaration
-    when AST::Declarations::Void
-      out.puts "return"
-    end
-
     member_name_underscore = safe_identifier(member.name.underscore)
     decoded_member_declaration = decode_type(member.declaration)
 
