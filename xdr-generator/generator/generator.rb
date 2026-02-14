@@ -147,14 +147,8 @@ class Generator < Xdrgen::Generators::Base
       end
 
       render_xdr_utils(out, typedef_name)
+      render_hash_and_eq(out, [typedef_name_underscore])
       out.puts <<~HEREDOC
-        def __hash__(self):
-            return hash(self.#{typedef_name_underscore})
-        def __eq__(self, other: object):
-            if not isinstance(other, self.__class__):
-                return NotImplemented
-            return self.#{typedef_name_underscore} == other.#{typedef_name_underscore}
-
         def __repr__(self):
             return f"<#{typedef_name} [#{typedef_name_underscore}={self.#{typedef_name_underscore}}]>"
       HEREDOC

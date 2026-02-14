@@ -44,11 +44,10 @@ class IntUnion2:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
     def __hash__(self):
-        return hash(self.int_union2)
+        return hash((self.int_union2,))
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented
         return self.int_union2 == other.int_union2
-
     def __repr__(self):
         return f"<IntUnion2 [int_union2={self.int_union2}]>"

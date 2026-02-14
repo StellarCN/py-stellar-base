@@ -43,11 +43,10 @@ class Int1:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
     def __hash__(self):
-        return hash(self.int1)
+        return hash((self.int1,))
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented
         return self.int1 == other.int1
-
     def __repr__(self):
         return f"<Int1 [int1={self.int1}]>"

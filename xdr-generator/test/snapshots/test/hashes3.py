@@ -52,11 +52,10 @@ class Hashes3:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
     def __hash__(self):
-        return hash(self.hashes3)
+        return hash((self.hashes3,))
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented
         return self.hashes3 == other.hashes3
-
     def __repr__(self):
         return f"<Hashes3 [hashes3={self.hashes3}]>"
