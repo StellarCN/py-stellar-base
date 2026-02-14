@@ -1396,57 +1396,6 @@ class TransactionBuilder:
         op = InvokeHostFunction(host_function=host_function, auth=[], source=source)
         return self.append_operation(op)
 
-    def append_create_stellar_asset_contract_from_address_op(
-        self,
-        address: str | Address,
-        salt: bytes | None = None,
-        auth: Sequence[stellar_xdr.SorobanAuthorizationEntry] | None = None,
-        source: MuxedAccount | str | None = None,
-    ) -> "TransactionBuilder":
-        """Append an :class:`InvokeHostFunction <stellar_sdk.operation.InvokeHostFunction>` operation to the list of operations.
-
-        You can use this method to create a new Soroban token contract.
-
-        I do not recommend using this method, please check
-        `the documentation <https://soroban.stellar.org/docs/learn/faq#should-i-issue-my-token-as-a-stellar-asset-or-a-custom-soroban-token>`__ for more information.
-
-        :param address: The address using to derive the contract ID.
-        :param salt: The 32-byte salt to use to derive the contract ID.
-        :param auth: The authorizations required to execute the host function.
-        :param source: The source account for the operation. Defaults to the
-            transaction's source account.
-        :return: This builder instance.
-        """
-        if salt is None:
-            salt = os.urandom(32)
-        else:
-            if len(salt) != 32:
-                raise ValueError("`salt` must be 32 bytes long")
-
-        if isinstance(address, str):
-            address = Address(address)
-
-        create_contract = stellar_xdr.CreateContractArgs(
-            contract_id_preimage=stellar_xdr.ContractIDPreimage(
-                stellar_xdr.ContractIDPreimageType.CONTRACT_ID_PREIMAGE_FROM_ADDRESS,
-                from_address=stellar_xdr.ContractIDPreimageFromAddress(
-                    address=address.to_xdr_sc_address(),
-                    salt=stellar_xdr.Uint256(salt),
-                ),
-            ),
-            executable=stellar_xdr.ContractExecutable(
-                stellar_xdr.ContractExecutableType.CONTRACT_EXECUTABLE_STELLAR_ASSET,
-            ),
-        )
-
-        host_function = stellar_xdr.HostFunction(
-            stellar_xdr.HostFunctionType.HOST_FUNCTION_TYPE_CREATE_CONTRACT,
-            create_contract=create_contract,
-        )
-
-        op = InvokeHostFunction(host_function=host_function, auth=auth, source=source)
-        return self.append_operation(op)
-
     def append_extend_footprint_ttl_op(
         self,
         extend_to: int,
