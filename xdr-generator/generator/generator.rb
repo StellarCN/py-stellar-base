@@ -244,8 +244,10 @@ class Generator < Xdrgen::Generators::Base
         end
       end
 
-      if union.default_arm.present? && !union.default_arm.void?
-        encode_member(union.default_arm, out, true)
+      if union.default_arm.present?
+        encode_member(union.default_arm, out, true) unless union.default_arm.void?
+      else
+        out.puts "raise ValueError(\"Invalid #{discriminant_name}.\")"
       end
     end
   end

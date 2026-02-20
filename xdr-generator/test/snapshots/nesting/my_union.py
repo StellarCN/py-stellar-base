@@ -57,6 +57,7 @@ class MyUnion:
             return
         if self.type == UnionKey.OFFER:
             return
+        raise ValueError("Invalid type.")
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> MyUnion:
         type = UnionKey.unpack(unpacker)
