@@ -53,6 +53,7 @@ class MyUnion:
             for things_item in self.things:
                 things_item.pack(packer)
             return
+        raise ValueError("Invalid type.")
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> MyUnion:
         type = UnionKey.unpack(unpacker)

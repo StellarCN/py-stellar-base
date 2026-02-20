@@ -6,6 +6,7 @@ Release History
 - fix: xdr-generator security hardening:
   - validate `Opaque`/`String` max sizes on unpack.
   - add remaining-input-length checks for variable-length arrays.
+  - raise on unmatched union discriminants in `pack()`.
 
 ### Version 13.2.1
 
