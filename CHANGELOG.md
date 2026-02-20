@@ -8,6 +8,7 @@ Release History
   - add remaining-input-length checks for variable-length arrays.
   - raise on unmatched union discriminants in `pack()`.
   - raise on unknown union discriminants in `unpack()`.
+  - check for trailing data in `from_xdr_bytes()`.
 
 ### Version 13.2.1
 
