@@ -22,7 +22,7 @@ class Str2:
         String(self.str2, 4294967295).pack(packer)
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> Str2:
-        str2 = String.unpack(unpacker)
+        str2 = String.unpack(unpacker, 4294967295)
         return cls(str2)
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

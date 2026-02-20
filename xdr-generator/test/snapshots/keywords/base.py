@@ -189,8 +189,12 @@ class String:
         packer.pack_fopaque(len(self.value), self.value)
 
     @staticmethod
-    def unpack(unpacker: Unpacker) -> bytes:
+    def unpack(unpacker: Unpacker, max_size: int) -> bytes:
         size = unpacker.unpack_uint()
+        if size > max_size:
+            raise ValueError(
+                f"String size {size} exceeds maximum {max_size}."
+            )
         return unpacker.unpack_fopaque(size)
 
     def __hash__(self):
@@ -233,7 +237,12 @@ class Opaque:
     @staticmethod
     def unpack(unpacker: Unpacker, size: int, fixed: bool) -> bytes:
         if not fixed:
-            size = unpacker.unpack_uint()
+            actual_size = unpacker.unpack_uint()
+            if actual_size > size:
+                raise ValueError(
+                    f"Opaque data size {actual_size} exceeds maximum {size}."
+                )
+            size = actual_size
         return unpacker.unpack_fopaque(size)
 
     def __hash__(self):
