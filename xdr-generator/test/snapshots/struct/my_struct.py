@@ -48,8 +48,8 @@ class MyStruct:
         some_int = Integer.unpack(unpacker)
         a_big_int = Int64.unpack(unpacker)
         some_opaque = Opaque.unpack(unpacker, 10, True)
-        some_string = String.unpack(unpacker)
-        max_string = String.unpack(unpacker)
+        some_string = String.unpack(unpacker, 4294967295)
+        max_string = String.unpack(unpacker, 100)
         return cls(
             some_int=some_int,
             a_big_int=a_big_int,

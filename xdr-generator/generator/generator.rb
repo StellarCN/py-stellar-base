@@ -622,7 +622,7 @@ class Generator < Xdrgen::Generators::Base
     when AST::Typespecs::Opaque
       "Opaque.unpack(unpacker, #{decl.size || MAX_SIZE}, #{decl.fixed? ? "True" : "False"})"
     when AST::Typespecs::String
-      "String.unpack(unpacker)"
+      "String.unpack(unpacker, #{decl.size || MAX_SIZE})"
     when AST::Typespecs::Simple
       "#{name(decl.type.resolved_type)}.unpack(unpacker)"
     when AST::Concerns::NestedDefinition

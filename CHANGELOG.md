@@ -3,6 +3,8 @@ Release History
 
 ### Pending
 - refactor!: remove `TransactionBuilder.append_create_stellar_asset_contract_from_address_op`, use `TransactionBuilder.append_create_contract_op` instead.
+- fix: xdr-generator security hardening:
+  - validate `Opaque`/`String` max sizes on unpack.
 
 ### Version 13.2.1
 
