@@ -17,6 +17,9 @@ class Uint513:
         typedef opaque uint513<64>;
     """
     def __init__(self, uint513: bytes) -> None:
+        _expect_max_length = 64
+        if uint513 and len(uint513) > _expect_max_length:
+            raise ValueError(f"The maximum length of `uint513` should be {_expect_max_length}, but got {len(uint513)}.")
         self.uint513 = uint513
     def pack(self, packer: Packer) -> None:
         Opaque(self.uint513, 64, False).pack(packer)

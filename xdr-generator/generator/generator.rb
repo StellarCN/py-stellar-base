@@ -536,10 +536,10 @@ class Generator < Xdrgen::Generators::Base
   end
 
   def render_array_length_checker(member, out)
+    member_name_underscore = safe_identifier(member.name.underscore)
     case member.declaration
     when AST::Declarations::Array
       _, size = member.declaration.type.array_size
-      member_name_underscore = safe_identifier(member.name.underscore)
       if member.declaration.fixed?
         out.puts <<~HEREDOC
           _expect_length = #{size}
@@ -549,6 +549,31 @@ class Generator < Xdrgen::Generators::Base
       else
         out.puts <<~HEREDOC
           _expect_max_length = #{size || MAX_SIZE}
+          if #{member_name_underscore} and len(#{member_name_underscore}) > _expect_max_length:
+              raise ValueError(f\"The maximum length of `#{member_name_underscore}` should be {_expect_max_length}, but got {len(#{member_name_underscore})}.\")
+        HEREDOC
+      end
+    else
+      case member.declaration.type
+      when AST::Typespecs::Opaque
+        size = member.declaration.size || MAX_SIZE
+        if member.declaration.fixed?
+          out.puts <<~HEREDOC
+            _expect_length = #{size}
+            if #{member_name_underscore} and len(#{member_name_underscore}) != _expect_length:
+                raise ValueError(f\"The length of `#{member_name_underscore}` should be {_expect_length}, but got {len(#{member_name_underscore})}.\")
+          HEREDOC
+        else
+          out.puts <<~HEREDOC
+            _expect_max_length = #{size}
+            if #{member_name_underscore} and len(#{member_name_underscore}) > _expect_max_length:
+                raise ValueError(f\"The maximum length of `#{member_name_underscore}` should be {_expect_max_length}, but got {len(#{member_name_underscore})}.\")
+          HEREDOC
+        end
+      when AST::Typespecs::String
+        size = member.declaration.size || MAX_SIZE
+        out.puts <<~HEREDOC
+          _expect_max_length = #{size}
           if #{member_name_underscore} and len(#{member_name_underscore}) > _expect_max_length:
               raise ValueError(f\"The maximum length of `#{member_name_underscore}` should be {_expect_max_length}, but got {len(#{member_name_underscore})}.\")
         HEREDOC

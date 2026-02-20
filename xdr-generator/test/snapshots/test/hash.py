@@ -17,6 +17,9 @@ class Hash:
         typedef opaque Hash[32];
     """
     def __init__(self, hash: bytes) -> None:
+        _expect_length = 32
+        if hash and len(hash) != _expect_length:
+            raise ValueError(f"The length of `hash` should be {_expect_length}, but got {len(hash)}.")
         self.hash = hash
     def pack(self, packer: Packer) -> None:
         Opaque(self.hash, 32, True).pack(packer)
