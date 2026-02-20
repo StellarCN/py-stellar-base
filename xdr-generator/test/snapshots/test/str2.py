@@ -17,6 +17,9 @@ class Str2:
         typedef string str2<>;
     """
     def __init__(self, str2: bytes) -> None:
+        _expect_max_length = 4294967295
+        if str2 and len(str2) > _expect_max_length:
+            raise ValueError(f"The maximum length of `str2` should be {_expect_max_length}, but got {len(str2)}.")
         self.str2 = str2
     def pack(self, packer: Packer) -> None:
         String(self.str2, 4294967295).pack(packer)

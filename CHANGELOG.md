@@ -9,6 +9,7 @@ Release History
   - raise on unmatched union discriminants in `pack()`.
   - raise on unknown union discriminants in `unpack()`.
   - check for trailing data in `from_xdr_bytes()`.
+  - add length validation for opaque/string in typedef and struct constructors.
 
 ### Version 13.2.1
 
