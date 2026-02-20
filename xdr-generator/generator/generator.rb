@@ -157,12 +157,12 @@ class Generator < Xdrgen::Generators::Base
     out.close
   end
 
-  def render_import(out, member, container_name)
+  def render_import(out, member, container_name, track: true)
     member_type = type_string(member.type)
     return if is_base_type(member.type) || container_name == member_type
     return if @imported_types.include?(member_type)
 
-    @imported_types.add(member_type)
+    @imported_types.add(member_type) if track
     out.puts "from .#{python_module_name(member_type)} import #{member_type}"
   end
 
@@ -175,7 +175,9 @@ class Generator < Xdrgen::Generators::Base
       out.puts "if TYPE_CHECKING:"
       out.indent(2) do
         non_void_arms(union).each do |arm|
-          render_import(out, arm.declaration, union_name)
+          # Don't track these imports so they can be re-emitted as runtime
+          # imports inside the unpack method body.
+          render_import(out, arm.declaration, union_name, track: false)
         end
       end
       return

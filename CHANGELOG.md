@@ -10,6 +10,7 @@ Release History
   - raise on unknown union discriminants in `unpack()`.
   - check for trailing data in `from_xdr_bytes()`.
   - add length validation for opaque/string in typedef and struct constructors.
+  - fix `CIRCLE_IMPORT_UNION` lazy import tracking.
 
 ### Version 13.2.1
 
