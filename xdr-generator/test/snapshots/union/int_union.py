@@ -67,7 +67,7 @@ class IntUnion:
             for _ in range(length):
                 things.append(Multi.unpack(unpacker))
             return cls(type=type, things=things)
-        return cls(type=type)
+        raise ValueError("Invalid type.")
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()
         self.pack(packer)
