@@ -492,6 +492,12 @@ class Generator < Xdrgen::Generators::Base
         out.puts "length = #{size}"
       else
         out.puts "length = unpacker.unpack_uint()"
+        # Add input length check to prevent DoS
+        out.puts "_remaining = len(unpacker.get_buffer()) - unpacker.get_position()"
+        out.puts "if _remaining < length:"
+        out.indent(2) do
+          out.puts "raise ValueError(f\"#{member_name_underscore} length {length} exceeds remaining input length {_remaining}\")"
+        end
       end
       out.puts <<~EOS
         #{member_name_underscore} = []
