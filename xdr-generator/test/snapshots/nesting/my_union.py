@@ -69,7 +69,7 @@ class MyUnion:
             return cls(type=type, two=two)
         if type == UnionKey.OFFER:
             return cls(type=type)
-        return cls(type=type)
+        raise ValueError("Invalid type.")
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()
         self.pack(packer)

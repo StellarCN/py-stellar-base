@@ -266,14 +266,18 @@ class Generator < Xdrgen::Generators::Base
   end
 
   def render_union_default_unpack(out, union, discriminant_name)
-    if union.default_arm.present? && !union.default_arm.void?
-      decode_member(union.default_arm, out)
-      arm_name = safe_identifier(union.default_arm.name.underscore)
-      out.puts "return cls(#{discriminant_name}=#{discriminant_name}, #{arm_name}=#{arm_name})"
+    if union.default_arm.present?
+      if !union.default_arm.void?
+        decode_member(union.default_arm, out)
+        arm_name = safe_identifier(union.default_arm.name.underscore)
+        out.puts "return cls(#{discriminant_name}=#{discriminant_name}, #{arm_name}=#{arm_name})"
+      else
+        out.puts "return cls(#{discriminant_name}=#{discriminant_name})"
+      end
       return
     end
 
-    out.puts "return cls(#{discriminant_name}=#{discriminant_name})"
+    out.puts "raise ValueError(\"Invalid #{discriminant_name}.\")"
   end
 
   def render_union_unpack(out, union, union_name, discriminant_name, render_import_in_func)
