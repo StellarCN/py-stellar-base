@@ -17,6 +17,9 @@ class Uint512:
         typedef opaque uint512[64];
     """
     def __init__(self, uint512: bytes) -> None:
+        _expect_length = 64
+        if uint512 and len(uint512) != _expect_length:
+            raise ValueError(f"The length of `uint512` should be {_expect_length}, but got {len(uint512)}.")
         self.uint512 = uint512
     def pack(self, packer: Packer) -> None:
         Opaque(self.uint512, 64, True).pack(packer)
@@ -32,7 +35,11 @@ class Uint512:
     @classmethod
     def from_xdr_bytes(cls, xdr: bytes) -> Uint512:
         unpacker = Unpacker(xdr)
-        return cls.unpack(unpacker)
+        result = cls.unpack(unpacker)
+        remaining = len(xdr) - unpacker.get_position()
+        if remaining != 0:
+            raise ValueError(f"Unexpected trailing {remaining} bytes in XDR data")
+        return result
 
     def to_xdr(self) -> str:
         xdr_bytes = self.to_xdr_bytes()

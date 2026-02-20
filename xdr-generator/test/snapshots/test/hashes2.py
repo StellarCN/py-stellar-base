@@ -29,6 +29,9 @@ class Hashes2:
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> Hashes2:
         length = unpacker.unpack_uint()
+        _remaining = len(unpacker.get_buffer()) - unpacker.get_position()
+        if _remaining < length:
+            raise ValueError(f"hashes2 length {length} exceeds remaining input length {_remaining}")
         hashes2 = []
         for _ in range(length):
             hashes2.append(Hash.unpack(unpacker))
@@ -41,7 +44,11 @@ class Hashes2:
     @classmethod
     def from_xdr_bytes(cls, xdr: bytes) -> Hashes2:
         unpacker = Unpacker(xdr)
-        return cls.unpack(unpacker)
+        result = cls.unpack(unpacker)
+        remaining = len(xdr) - unpacker.get_position()
+        if remaining != 0:
+            raise ValueError(f"Unexpected trailing {remaining} bytes in XDR data")
+        return result
 
     def to_xdr(self) -> str:
         xdr_bytes = self.to_xdr_bytes()

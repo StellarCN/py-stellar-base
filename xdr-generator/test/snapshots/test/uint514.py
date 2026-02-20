@@ -17,6 +17,9 @@ class Uint514:
         typedef opaque uint514<>;
     """
     def __init__(self, uint514: bytes) -> None:
+        _expect_max_length = 4294967295
+        if uint514 and len(uint514) > _expect_max_length:
+            raise ValueError(f"The maximum length of `uint514` should be {_expect_max_length}, but got {len(uint514)}.")
         self.uint514 = uint514
     def pack(self, packer: Packer) -> None:
         Opaque(self.uint514, 4294967295, False).pack(packer)
@@ -32,7 +35,11 @@ class Uint514:
     @classmethod
     def from_xdr_bytes(cls, xdr: bytes) -> Uint514:
         unpacker = Unpacker(xdr)
-        return cls.unpack(unpacker)
+        result = cls.unpack(unpacker)
+        remaining = len(xdr) - unpacker.get_position()
+        if remaining != 0:
+            raise ValueError(f"Unexpected trailing {remaining} bytes in XDR data")
+        return result
 
     def to_xdr(self) -> str:
         xdr_bytes = self.to_xdr_bytes()

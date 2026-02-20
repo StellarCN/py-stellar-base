@@ -51,6 +51,7 @@ class IntUnion:
             for things_item in self.things:
                 things_item.pack(packer)
             return
+        raise ValueError("Invalid type.")
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> IntUnion:
         type = Integer.unpack(unpacker)
@@ -59,11 +60,14 @@ class IntUnion:
             return cls(type=type, error=error)
         if type == 1:
             length = unpacker.unpack_uint()
+            _remaining = len(unpacker.get_buffer()) - unpacker.get_position()
+            if _remaining < length:
+                raise ValueError(f"things length {length} exceeds remaining input length {_remaining}")
             things = []
             for _ in range(length):
                 things.append(Multi.unpack(unpacker))
             return cls(type=type, things=things)
-        return cls(type=type)
+        raise ValueError("Invalid type.")
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()
         self.pack(packer)
@@ -72,7 +76,11 @@ class IntUnion:
     @classmethod
     def from_xdr_bytes(cls, xdr: bytes) -> IntUnion:
         unpacker = Unpacker(xdr)
-        return cls.unpack(unpacker)
+        result = cls.unpack(unpacker)
+        remaining = len(xdr) - unpacker.get_position()
+        if remaining != 0:
+            raise ValueError(f"Unexpected trailing {remaining} bytes in XDR data")
+        return result
 
     def to_xdr(self) -> str:
         xdr_bytes = self.to_xdr_bytes()

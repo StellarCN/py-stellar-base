@@ -157,12 +157,12 @@ class Generator < Xdrgen::Generators::Base
     out.close
   end
 
-  def render_import(out, member, container_name)
+  def render_import(out, member, container_name, track: true)
     member_type = type_string(member.type)
     return if is_base_type(member.type) || container_name == member_type
     return if @imported_types.include?(member_type)
 
-    @imported_types.add(member_type)
+    @imported_types.add(member_type) if track
     out.puts "from .#{python_module_name(member_type)} import #{member_type}"
   end
 
@@ -175,7 +175,9 @@ class Generator < Xdrgen::Generators::Base
       out.puts "if TYPE_CHECKING:"
       out.indent(2) do
         non_void_arms(union).each do |arm|
-          render_import(out, arm.declaration, union_name)
+          # Don't track these imports so they can be re-emitted as runtime
+          # imports inside the unpack method body.
+          render_import(out, arm.declaration, union_name, track: false)
         end
       end
       return
@@ -244,8 +246,10 @@ class Generator < Xdrgen::Generators::Base
         end
       end
 
-      if union.default_arm.present? && !union.default_arm.void?
-        encode_member(union.default_arm, out, true)
+      if union.default_arm.present?
+        encode_member(union.default_arm, out, true) unless union.default_arm.void?
+      else
+        out.puts "raise ValueError(\"Invalid #{discriminant_name}.\")"
       end
     end
   end
@@ -264,14 +268,18 @@ class Generator < Xdrgen::Generators::Base
   end
 
   def render_union_default_unpack(out, union, discriminant_name)
-    if union.default_arm.present? && !union.default_arm.void?
-      decode_member(union.default_arm, out)
-      arm_name = safe_identifier(union.default_arm.name.underscore)
-      out.puts "return cls(#{discriminant_name}=#{discriminant_name}, #{arm_name}=#{arm_name})"
+    if union.default_arm.present?
+      if !union.default_arm.void?
+        decode_member(union.default_arm, out)
+        arm_name = safe_identifier(union.default_arm.name.underscore)
+        out.puts "return cls(#{discriminant_name}=#{discriminant_name}, #{arm_name}=#{arm_name})"
+      else
+        out.puts "return cls(#{discriminant_name}=#{discriminant_name})"
+      end
       return
     end
 
-    out.puts "return cls(#{discriminant_name}=#{discriminant_name})"
+    out.puts "raise ValueError(\"Invalid #{discriminant_name}.\")"
   end
 
   def render_union_unpack(out, union, union_name, discriminant_name, render_import_in_func)
@@ -492,6 +500,12 @@ class Generator < Xdrgen::Generators::Base
         out.puts "length = #{size}"
       else
         out.puts "length = unpacker.unpack_uint()"
+        # Add input length check to prevent DoS
+        out.puts "_remaining = len(unpacker.get_buffer()) - unpacker.get_position()"
+        out.puts "if _remaining < length:"
+        out.indent(2) do
+          out.puts "raise ValueError(f\"#{member_name_underscore} length {length} exceeds remaining input length {_remaining}\")"
+        end
       end
       out.puts <<~EOS
         #{member_name_underscore} = []
@@ -524,10 +538,10 @@ class Generator < Xdrgen::Generators::Base
   end
 
   def render_array_length_checker(member, out)
+    member_name_underscore = safe_identifier(member.name.underscore)
     case member.declaration
     when AST::Declarations::Array
       _, size = member.declaration.type.array_size
-      member_name_underscore = safe_identifier(member.name.underscore)
       if member.declaration.fixed?
         out.puts <<~HEREDOC
           _expect_length = #{size}
@@ -537,6 +551,31 @@ class Generator < Xdrgen::Generators::Base
       else
         out.puts <<~HEREDOC
           _expect_max_length = #{size || MAX_SIZE}
+          if #{member_name_underscore} and len(#{member_name_underscore}) > _expect_max_length:
+              raise ValueError(f\"The maximum length of `#{member_name_underscore}` should be {_expect_max_length}, but got {len(#{member_name_underscore})}.\")
+        HEREDOC
+      end
+    else
+      case member.declaration.type
+      when AST::Typespecs::Opaque
+        size = member.declaration.size || MAX_SIZE
+        if member.declaration.fixed?
+          out.puts <<~HEREDOC
+            _expect_length = #{size}
+            if #{member_name_underscore} and len(#{member_name_underscore}) != _expect_length:
+                raise ValueError(f\"The length of `#{member_name_underscore}` should be {_expect_length}, but got {len(#{member_name_underscore})}.\")
+          HEREDOC
+        else
+          out.puts <<~HEREDOC
+            _expect_max_length = #{size}
+            if #{member_name_underscore} and len(#{member_name_underscore}) > _expect_max_length:
+                raise ValueError(f\"The maximum length of `#{member_name_underscore}` should be {_expect_max_length}, but got {len(#{member_name_underscore})}.\")
+          HEREDOC
+        end
+      when AST::Typespecs::String
+        size = member.declaration.size || MAX_SIZE
+        out.puts <<~HEREDOC
+          _expect_max_length = #{size}
           if #{member_name_underscore} and len(#{member_name_underscore}) > _expect_max_length:
               raise ValueError(f\"The maximum length of `#{member_name_underscore}` should be {_expect_max_length}, but got {len(#{member_name_underscore})}.\")
         HEREDOC
@@ -554,7 +593,11 @@ class Generator < Xdrgen::Generators::Base
       @classmethod
       def from_xdr_bytes(cls, xdr: bytes) -> #{name}:
           unpacker = Unpacker(xdr)
-          return cls.unpack(unpacker)
+          result = cls.unpack(unpacker)
+          remaining = len(xdr) - unpacker.get_position()
+          if remaining != 0:
+              raise ValueError(f"Unexpected trailing {remaining} bytes in XDR data")
+          return result
 
       def to_xdr(self) -> str:
           xdr_bytes = self.to_xdr_bytes()
@@ -622,7 +665,7 @@ class Generator < Xdrgen::Generators::Base
     when AST::Typespecs::Opaque
       "Opaque.unpack(unpacker, #{decl.size || MAX_SIZE}, #{decl.fixed? ? "True" : "False"})"
     when AST::Typespecs::String
-      "String.unpack(unpacker)"
+      "String.unpack(unpacker, #{decl.size || MAX_SIZE})"
     when AST::Typespecs::Simple
       "#{name(decl.type.resolved_type)}.unpack(unpacker)"
     when AST::Concerns::NestedDefinition

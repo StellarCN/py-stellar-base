@@ -17,6 +17,9 @@ class Hash:
         typedef opaque Hash[32];
     """
     def __init__(self, hash: bytes) -> None:
+        _expect_length = 32
+        if hash and len(hash) != _expect_length:
+            raise ValueError(f"The length of `hash` should be {_expect_length}, but got {len(hash)}.")
         self.hash = hash
     def pack(self, packer: Packer) -> None:
         Opaque(self.hash, 32, True).pack(packer)
@@ -32,7 +35,11 @@ class Hash:
     @classmethod
     def from_xdr_bytes(cls, xdr: bytes) -> Hash:
         unpacker = Unpacker(xdr)
-        return cls.unpack(unpacker)
+        result = cls.unpack(unpacker)
+        remaining = len(xdr) - unpacker.get_position()
+        if remaining != 0:
+            raise ValueError(f"Unexpected trailing {remaining} bytes in XDR data")
+        return result
 
     def to_xdr(self) -> str:
         xdr_bytes = self.to_xdr_bytes()

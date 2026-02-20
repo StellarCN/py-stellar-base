@@ -3,6 +3,14 @@ Release History
 
 ### Pending
 - refactor!: remove `TransactionBuilder.append_create_stellar_asset_contract_from_address_op`, use `TransactionBuilder.append_create_contract_op` instead.
+- fix: xdr-generator security hardening:
+  - validate `Opaque`/`String` max sizes on unpack.
+  - add remaining-input-length checks for variable-length arrays.
+  - raise on unmatched union discriminants in `pack()`.
+  - raise on unknown union discriminants in `unpack()`.
+  - check for trailing data in `from_xdr_bytes()`.
+  - add length validation for opaque/string in typedef and struct constructors.
+  - fix `CIRCLE_IMPORT_UNION` lazy import tracking.
 
 ### Version 13.2.1
 

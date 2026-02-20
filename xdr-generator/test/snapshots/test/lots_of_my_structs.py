@@ -35,6 +35,9 @@ class LotsOfMyStructs:
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> LotsOfMyStructs:
         length = unpacker.unpack_uint()
+        _remaining = len(unpacker.get_buffer()) - unpacker.get_position()
+        if _remaining < length:
+            raise ValueError(f"members length {length} exceeds remaining input length {_remaining}")
         members = []
         for _ in range(length):
             members.append(MyStruct.unpack(unpacker))
@@ -49,7 +52,11 @@ class LotsOfMyStructs:
     @classmethod
     def from_xdr_bytes(cls, xdr: bytes) -> LotsOfMyStructs:
         unpacker = Unpacker(xdr)
-        return cls.unpack(unpacker)
+        result = cls.unpack(unpacker)
+        remaining = len(xdr) - unpacker.get_position()
+        if remaining != 0:
+            raise ValueError(f"Unexpected trailing {remaining} bytes in XDR data")
+        return result
 
     def to_xdr(self) -> str:
         xdr_bytes = self.to_xdr_bytes()

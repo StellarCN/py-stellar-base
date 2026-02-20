@@ -17,12 +17,15 @@ class Str:
         typedef string str<64>;
     """
     def __init__(self, str: bytes) -> None:
+        _expect_max_length = 64
+        if str and len(str) > _expect_max_length:
+            raise ValueError(f"The maximum length of `str` should be {_expect_max_length}, but got {len(str)}.")
         self.str = str
     def pack(self, packer: Packer) -> None:
         String(self.str, 64).pack(packer)
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> Str:
-        str = String.unpack(unpacker)
+        str = String.unpack(unpacker, 64)
         return cls(str)
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()
@@ -32,7 +35,11 @@ class Str:
     @classmethod
     def from_xdr_bytes(cls, xdr: bytes) -> Str:
         unpacker = Unpacker(xdr)
-        return cls.unpack(unpacker)
+        result = cls.unpack(unpacker)
+        remaining = len(xdr) - unpacker.get_position()
+        if remaining != 0:
+            raise ValueError(f"Unexpected trailing {remaining} bytes in XDR data")
+        return result
 
     def to_xdr(self) -> str:
         xdr_bytes = self.to_xdr_bytes()

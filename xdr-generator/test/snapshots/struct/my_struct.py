@@ -32,6 +32,15 @@ class MyStruct:
         some_string: bytes,
         max_string: bytes,
     ) -> None:
+        _expect_length = 10
+        if some_opaque and len(some_opaque) != _expect_length:
+            raise ValueError(f"The length of `some_opaque` should be {_expect_length}, but got {len(some_opaque)}.")
+        _expect_max_length = 4294967295
+        if some_string and len(some_string) > _expect_max_length:
+            raise ValueError(f"The maximum length of `some_string` should be {_expect_max_length}, but got {len(some_string)}.")
+        _expect_max_length = 100
+        if max_string and len(max_string) > _expect_max_length:
+            raise ValueError(f"The maximum length of `max_string` should be {_expect_max_length}, but got {len(max_string)}.")
         self.some_int = some_int
         self.a_big_int = a_big_int
         self.some_opaque = some_opaque
@@ -48,8 +57,8 @@ class MyStruct:
         some_int = Integer.unpack(unpacker)
         a_big_int = Int64.unpack(unpacker)
         some_opaque = Opaque.unpack(unpacker, 10, True)
-        some_string = String.unpack(unpacker)
-        max_string = String.unpack(unpacker)
+        some_string = String.unpack(unpacker, 4294967295)
+        max_string = String.unpack(unpacker, 100)
         return cls(
             some_int=some_int,
             a_big_int=a_big_int,
@@ -65,7 +74,11 @@ class MyStruct:
     @classmethod
     def from_xdr_bytes(cls, xdr: bytes) -> MyStruct:
         unpacker = Unpacker(xdr)
-        return cls.unpack(unpacker)
+        result = cls.unpack(unpacker)
+        remaining = len(xdr) - unpacker.get_position()
+        if remaining != 0:
+            raise ValueError(f"Unexpected trailing {remaining} bytes in XDR data")
+        return result
 
     def to_xdr(self) -> str:
         xdr_bytes = self.to_xdr_bytes()
