@@ -29,6 +29,9 @@ class Hashes3:
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> Hashes3:
         length = unpacker.unpack_uint()
+        _remaining = len(unpacker.get_buffer()) - unpacker.get_position()
+        if _remaining < length:
+            raise ValueError(f"hashes3 length {length} exceeds remaining input length {_remaining}")
         hashes3 = []
         for _ in range(length):
             hashes3.append(Hash.unpack(unpacker))

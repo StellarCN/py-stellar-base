@@ -28,6 +28,9 @@ class TestArray2:
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> TestArray2:
         length = unpacker.unpack_uint()
+        _remaining = len(unpacker.get_buffer()) - unpacker.get_position()
+        if _remaining < length:
+            raise ValueError(f"test_array2 length {length} exceeds remaining input length {_remaining}")
         test_array2 = []
         for _ in range(length):
             test_array2.append(Integer.unpack(unpacker))

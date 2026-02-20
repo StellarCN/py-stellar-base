@@ -35,6 +35,9 @@ class LotsOfMyStructs:
     @classmethod
     def unpack(cls, unpacker: Unpacker) -> LotsOfMyStructs:
         length = unpacker.unpack_uint()
+        _remaining = len(unpacker.get_buffer()) - unpacker.get_position()
+        if _remaining < length:
+            raise ValueError(f"members length {length} exceeds remaining input length {_remaining}")
         members = []
         for _ in range(length):
             members.append(MyStruct.unpack(unpacker))

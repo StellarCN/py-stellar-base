@@ -61,6 +61,9 @@ class MyUnion:
             return cls(type=type, error=error)
         if type == UnionKey.MULTI:
             length = unpacker.unpack_uint()
+            _remaining = len(unpacker.get_buffer()) - unpacker.get_position()
+            if _remaining < length:
+                raise ValueError(f"things length {length} exceeds remaining input length {_remaining}")
             things = []
             for _ in range(length):
                 things.append(Multi.unpack(unpacker))
