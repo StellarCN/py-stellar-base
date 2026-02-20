@@ -39,7 +39,11 @@ class TestArray:
     @classmethod
     def from_xdr_bytes(cls, xdr: bytes) -> TestArray:
         unpacker = Unpacker(xdr)
-        return cls.unpack(unpacker)
+        result = cls.unpack(unpacker)
+        remaining = len(xdr) - unpacker.get_position()
+        if remaining != 0:
+            raise ValueError(f"Unexpected trailing {remaining} bytes in XDR data")
+        return result
 
     def to_xdr(self) -> str:
         xdr_bytes = self.to_xdr_bytes()
