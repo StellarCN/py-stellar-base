@@ -93,6 +93,7 @@ class TestRequestsClientMaxContentSize:
             with pytest.raises(ContentSizeLimitExceededError) as exc_info:
                 client.get(url, max_content_size=500)
             assert exc_info.value.limit == 500
+            assert exc_info.value.content_size is not None
             assert exc_info.value.content_size > 500
 
     def test_get_without_max_content_size(self):
